@@ -1,0 +1,15 @@
+# Dependencias y artefactos
+node_modules/
+.vercel/
+.DS_Store
+
+# Nunca versionar claves reales
+.env
+.env.local
+.env.*.local
+
+# Pruebas
+tests/__pycache__/
+tests/.pytest_cache/
+tests/screenshots/
+.pytest_cache/
