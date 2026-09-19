@@ -92,3 +92,51 @@
   .legal-wrap { padding: 0 14px 48px; }
   .legal-wrap p, .legal-wrap li { font-size: 14px; }
 }
+
+/* Cabecera de las páginas legales.
+   Usan .brand y .link-btn de landing.css; acá solo va lo propio de esta
+   cabecera simple (la landing tiene la suya, sticky y con más cosas). */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: min(1180px, 100% - 40px);
+  margin: 0 auto;
+  padding: 18px 0;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.topbar .link-btn {
+  padding: 8px 14px;
+  border-radius: 999px;
+  text-decoration: none;
+  color: var(--muted);
+  transition: color .16s ease, background .16s ease;
+}
+
+.topbar .link-btn:hover { color: var(--text); background: var(--bg-soft); }
+
+.topbar .link-btn.primary {
+  background: var(--text);
+  color: #fff;
+  font-weight: 800;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, .16);
+}
+
+.topbar .link-btn.primary:hover {
+  background: var(--text);
+  color: #fff;
+  filter: brightness(1.25);
+}
+
+@media (max-width: 560px) {
+  .topbar { width: min(1180px, 100% - 28px); }
+  .brand-text { font-size: 14.5px; }
+}

@@ -140,6 +140,54 @@ export function writeLocalSnapshot(snapshot) {
   }
 }
 
+// El tema por defecto de la app es 'auto' (sigue al sistema operativo), así que
+// en una computadora configurada en oscuro la app abre oscura aunque el usuario
+// nunca haya elegido eso. El producto abre en claro.
+//
+// Es seguro pisar 'auto' sin preguntar: el único control de tema que existe en
+// la interfaz es el switch del sidebar, y ese solo produce 'light' o 'dark'.
+// O sea, 'auto' nunca es una elección del usuario — solo es el valor de fábrica.
+// Una vez que toque el switch, esta función ya no vuelve a intervenir.
+export function applyLightThemeDefault() {
+  let settings;
+  try {
+    const raw = window.localStorage.getItem(APP_KEYS.settings);
+    settings = raw ? JSON.parse(raw) : {};
+  } catch {
+    return;
+  }
+  if (!settings || typeof settings !== 'object' || Array.isArray(settings)) settings = {};
+  if (settings.theme === 'light' || settings.theme === 'dark') return;
+
+  settings.theme = 'light';
+  hydrating = true;
+  try {
+    window.localStorage.setItem(APP_KEYS.settings, JSON.stringify(settings));
+  } catch {
+    /* si no se puede escribir, la app abre en 'auto' — molesto, no roto */
+  } finally {
+    hydrating = false;
+  }
+  syncThemeClass();
+}
+
+// El gate de arranque se dibuja ANTES de que la app corra su applyTheme(), así
+// que sin esto se vería navy por medio segundo y después saltaría a claro. Lee
+// el mismo settings.theme y pone la clase que la app usaría.
+export function syncThemeClass() {
+  let theme = 'light';
+  try {
+    const raw = window.localStorage.getItem(APP_KEYS.settings);
+    const parsed = raw ? JSON.parse(raw) : null;
+    if (parsed && typeof parsed === 'object' && parsed.theme === 'dark') theme = 'dark';
+  } catch {
+    /* sin settings legibles, claro */
+  }
+  const root = document.documentElement;
+  root.classList.toggle('theme-dark', theme === 'dark');
+  root.classList.toggle('theme-light', theme !== 'dark');
+}
+
 export function clearLocalAppData() {
   hydrating = true;
   try {

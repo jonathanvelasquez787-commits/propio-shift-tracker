@@ -22,7 +22,13 @@ import {
   readMeta,
   describeSnapshot,
   readLocalSnapshot,
+  applyLightThemeDefault,
+  syncThemeClass,
 } from './sync.js';
+
+// Antes que nada: el gate hereda los tokens de la app y por defecto son los
+// del tema oscuro. Pintarlo con el tema correcto de entrada evita el parpadeo.
+syncThemeClass();
 
 const overlay = document.getElementById('bootGate');
 const bootText = document.getElementById('bootGateText');
@@ -384,6 +390,10 @@ async function boot() {
     fail('No se pudieron preparar tus datos. ' + (err && err.message ? err.message : ''));
     return;
   }
+
+  // Después de hidratar y antes de montar: la app lee el tema al ejecutarse,
+  // así que si esto corriera después ya se habría dibujado en oscuro.
+  applyLightThemeDefault();
 
   setBootMessage('Abriendo tu turno…');
   startAutoSync();

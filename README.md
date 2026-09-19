@@ -147,7 +147,7 @@ local: `npx vercel dev`.
 | 5 — Opcionales | Adelantado: borrado de cuenta y exportación ya existen. |
 
 El detalle completo, con lo que queda pendiente y por qué, está en
-`resumen_v540.md`.
+`resumen_v541.md`.
 
 ---
 

@@ -180,12 +180,62 @@ le pediste ver datos, le pediste crear tablas.
 
 1. En la barra de la izquierda, busca **Table Editor**.
 2. Tienen que aparecer dos tablas: **`profiles`** y **`user_data`**.
-3. Al lado del nombre de cada una debe verse un **candado** o la palabra
-   **RLS enabled**.
 
-Ese candado es importante de verdad: es lo que hace que la cuenta de una
-persona no pueda ver los datos de otra. Si alguna tabla apareciera **sin**
-candado, vuelve a correr el paso 3.2 completo.
+Con que aparezcan las dos, este paso está bien. **No busques un candado**: según
+la versión de Supabase ese indicador aparece de formas distintas, o no aparece.
+La comprobación de verdad es el paso 3.4.
+
+### 3.4 — Comprobar la seguridad (importante, no te lo saltes)
+
+> ### ⚠️ Antes que nada, esto que parece un problema y no lo es
+>
+> **Si entras al Table Editor y ves los datos de TODAS las cuentas, eso es
+> normal y correcto.**
+>
+> El panel de Supabase entra a la base como dueño, con llave maestra, y a
+> propósito se salta todas las reglas de seguridad. Es como el dueño del
+> edificio abriendo cualquier apartamento con su llave maestra: que él pueda
+> no significa que los inquilinos puedan entre ellos.
+>
+> Lo que importa es qué ve el **navegador de un usuario normal**. Eso es lo
+> que revisa el script de abajo, y lo que vas a probar de verdad en el
+> paso 10.
+
+Repite lo mismo del paso 3.1 y 3.2, pero ahora con el archivo:
+
+```
+propio-shift-tracker/
+└── supabase/
+    └── migrations/
+        └── 0002_verificar_seguridad.sql   ←  ESTE
+```
+
+Ábrelo con el Bloc de notas, `Ctrl + A`, `Ctrl + C`, y pégalo en un
+**New query** del SQL Editor. Dale **Run**.
+
+Este script primero **repara** (vuelve a poner el candado y las reglas, aunque
+ya estuvieran) y después **te imprime una tabla** como esta:
+
+| Revisión | Resultado |
+|---|---|
+| Candado (RLS) en la tabla profiles | ✅ ACTIVADO |
+| Candado (RLS) en la tabla user_data | ✅ ACTIVADO |
+| Reglas de acceso en profiles | ✅ 2 reglas activas |
+| Reglas de acceso en user_data | ✅ 4 reglas activas |
+| Todas las reglas filtran por dueño | ✅ SÍ |
+| El correo NO se puede consultar desde el navegador | ✅ BLOQUEADO |
+| Cuentas registradas | 1 usuario(s) |
+| Filas de datos guardadas | 1 fila(s) en user_data |
+| Cada usuario tiene su perfil | ✅ SÍ, todos |
+
+**Si todas las líneas salen con ✅, la seguridad está bien.** No importa lo que
+veas en el Table Editor.
+
+Si alguna sale con ❌, córrelo otra vez. Si insiste en salir mal después de dos
+intentos, mándame la captura de esa tabla y te digo qué pasó.
+
+Este script lo puedes correr las veces que quieras, y en el futuro también:
+es la forma rápida de confirmar que nada se rompió.
 
 ✅ **Acabas de terminar la parte más difícil.** El resto es más fácil.
 
@@ -482,29 +532,179 @@ inventados que después no pueden recuperar su contraseña.
 Crea una **segunda cuenta** (con otro correo) desde una ventana de incógnito.
 Entra con ella. **No tiene que ver ni uno solo de los datos de la primera.**
 
-Si eso se cumple, el candado está haciendo su trabajo.
+Si eso se cumple, el candado está haciendo su trabajo — aunque desde el panel
+de Supabase tú, como dueño, sigas viendo las filas de las dos cuentas. Esas dos
+cosas no se contradicen: una es lo que ve un usuario, la otra es lo que ve el
+administrador (tú).
 
 ---
 
-## Paso 11 — Google (opcional, déjalo para otro día)
+## Paso 11 — Entrar con Google (opcional)
 
-Ya tienes la app funcionando. Esto es solo para que la gente pueda entrar con
-un clic en vez de escribir correo y contraseña.
+Tu app ya funciona sin esto. Este paso solo agrega el botón "Continuar con
+Google" para que la gente no tenga que escribir correo y contraseña.
 
-Es la parte más tediosa: hay que crear un proyecto en Google Cloud, llenar una
-pantalla de consentimiento y a veces esperar una revisión de días.
+Es el paso más largo y tedioso de todos, porque quien pone las reglas es
+Google, no nosotros. Tómalo con calma: son unos 20 minutos.
 
-**El paso a paso está en `SETUP.md`, Paso 4.** Cuando lo hagas, el único punto
-donde todo el mundo se equivoca es este, así que lo repito acá:
+> **Por qué hasta ahora:** Google exige que le des una dirección pública donde
+> esté tu política de privacidad. Esa dirección no existió hasta que
+> desplegaste en el paso 8.
 
-> En Google, el campo **"URI de redireccionamiento autorizado"** NO lleva la
-> dirección de tu sitio de Vercel. Lleva la de **Supabase**:
-> ```
-> https://TU-PROYECTO.supabase.co/auth/v1/callback
-> ```
+Ten a mano, en tu Bloc de notas:
 
-Mientras no hagas esto, el botón de Google en tu página va a dar error. Si
-quieres, avísame y te lo quito de la pantalla hasta que lo configures.
+- Tu dirección de Vercel → `https://propio-shift-tracker-abc123.vercel.app`
+- Tu Project URL de Supabase → `https://abcdefghijklmnop.supabase.co`
+
+### 11.1 — Crear el proyecto en Google Cloud
+
+1. Entra a **[console.cloud.google.com](https://console.cloud.google.com)** con
+   tu cuenta de Google.
+2. Si es tu primera vez te va a pedir aceptar los términos. Acepta. **No te va
+   a pedir tarjeta** para esto.
+3. Arriba a la izquierda, al lado del logo, hay un **selector de proyecto**
+   (dice "Selecciona un proyecto"). Dale clic → **Proyecto nuevo**.
+4. **Nombre**: `Propio Shift Tracker`. Ubicación: déjala como está. **Crear**.
+5. Espera unos segundos y **asegúrate de que el selector de arriba ahora diga
+   el nombre de tu proyecto**. Si no, selecciónalo. Todo lo que sigue tiene
+   que pasar dentro de ese proyecto.
+
+### 11.2 — La pantalla de consentimiento
+
+Esta es la pantallita que Google le muestra al usuario diciendo "Propio Shift
+Tracker quiere acceder a tu cuenta". Hay que llenarla antes de poder crear las
+credenciales.
+
+1. Menú (☰ arriba a la izquierda) → **APIs y servicios** → **Pantalla de
+   consentimiento de OAuth**.
+
+   > Google mueve esto de lugar seguido. Si no lo ves, usa la **barra de
+   > búsqueda de arriba** y escribe "consentimiento". A veces aparece como
+   > *Branding* o *Google Auth Platform*.
+
+2. **Tipo de usuario**: elige **Externo**. (Interno solo existe si tienes
+   Google Workspace de empresa.) → **Crear**.
+
+3. Llena la información de la app:
+
+   | Campo | Qué poner |
+   |---|---|
+   | Nombre de la aplicación | `Propio Shift Tracker` |
+   | Correo de asistencia | Tu correo |
+   | Logotipo | Déjalo vacío (subirlo dispara una revisión extra) |
+
+4. **Dominio de la aplicación** — acá van tres direcciones. Pon las tuyas:
+
+   | Campo | Qué poner |
+   |---|---|
+   | Página principal | `https://TU-DIRECCION.vercel.app` |
+   | Política de privacidad | `https://TU-DIRECCION.vercel.app/privacidad` |
+   | Condiciones del servicio | `https://TU-DIRECCION.vercel.app/terminos` |
+
+5. **Dominios autorizados**: agrega `vercel.app`
+
+   > Va el dominio pelado, sin `https://` y sin la parte de adelante.
+
+6. **Datos de contacto del desarrollador**: tu correo otra vez.
+   → **Guardar y continuar**.
+
+7. **Permisos (scopes)**: dale a **Agregar o quitar permisos** y marca solo
+   estos tres:
+   - `.../auth/userinfo.email`
+   - `.../auth/userinfo.profile`
+   - `openid`
+
+   **No marques nada más.** Cada permiso extra alarga la revisión de Google y
+   la app no necesita ninguno. → **Actualizar** → **Guardar y continuar**.
+
+8. **Usuarios de prueba**: agrega tu propio correo de Google con
+   **+ Add users**. Mientras la app esté en modo prueba, solo entran los
+   correos que estén en esta lista (hasta 100).
+   → **Guardar y continuar** → **Volver al panel**.
+
+### 11.3 — Crear las credenciales
+
+1. Menú → **APIs y servicios** → **Credenciales**.
+2. Arriba: **+ Crear credenciales** → **ID de cliente de OAuth**.
+3. **Tipo de aplicación**: **Aplicación web**.
+4. **Nombre**: `Propio Shift Tracker Web` (es solo para ti, nadie más lo ve).
+5. **Orígenes autorizados de JavaScript** → **+ Agregar URI**:
+   ```
+   https://TU-DIRECCION.vercel.app
+   ```
+6. **URI de redireccionamiento autorizados** → **+ Agregar URI**:
+
+   > 🛑 **PARA. Este es el campo donde se equivoca absolutamente todo el
+   > mundo, y el error no se nota hasta que intentas entrar.**
+   >
+   > Acá **NO** va tu dirección de Vercel. Va la de **Supabase**, con
+   > `/auth/v1/callback` pegado al final:
+   >
+   > ```
+   > https://abcdefghijklmnop.supabase.co/auth/v1/callback
+   > ```
+   >
+   > ¿Por qué? Porque Google no le habla a tu página: le habla a Supabase, y
+   > Supabase después manda al usuario a tu página. Si pones la de Vercel, al
+   > entrar vas a ver un error rojo que dice `redirect_uri_mismatch`.
+
+7. **Crear**.
+8. Sale una ventana con dos textos largos. **Cópialos a tu Bloc de notas**:
+   - **ID de cliente** → termina en `.apps.googleusercontent.com`
+   - **Secreto del cliente** → empieza con `GOCSPX-`
+
+   > Si cierras la ventana sin copiar el secreto, no pasa nada: puedes volver a
+   > entrar a esa credencial y verlo, o generar uno nuevo.
+
+### 11.4 — Pegarlos en Supabase
+
+1. Vuelve a Supabase → tu proyecto.
+2. **Authentication** → **Providers** (o *Sign In / Providers*).
+3. Busca **Google** en la lista y ábrelo.
+4. **Enciende** el interruptor de arriba.
+5. Pega:
+   - **Client ID** → el que termina en `.apps.googleusercontent.com`
+   - **Client Secret** → el que empieza con `GOCSPX-`
+6. **Save**.
+
+### 11.5 — Probarlo
+
+1. Abre tu app en una **ventana de incógnito** (así no usa la sesión que ya
+   tienes).
+2. Dale a **Continuar con Google**.
+3. Elige tu cuenta. Te tiene que dejar adentro de la app.
+
+**La primera vez, Google muestra un aviso amarillo que dice "Google no ha
+verificado esta aplicación".** Es normal y no es un error: significa que tu app
+está en modo prueba. Dale a **Configuración avanzada** → **Ir a Propio Shift
+Tracker (no seguro)** y entra.
+
+> Tu nombre de usuario se genera solo a partir de tu correo. Si tu correo es
+> `jonathan@gmail.com`, quedas como `jonathan`. Si ese ya estaba ocupado,
+> queda `jonathan1`.
+
+### 11.6 — ¿Y para que entre cualquiera, sin el aviso amarillo?
+
+Mientras estés en modo prueba, solo entran los correos de tu lista del paso
+11.2 punto 8. Para abrirlo a todo el mundo:
+
+**Pantalla de consentimiento de OAuth** → botón **Publicar aplicación** →
+confirmar.
+
+Como solo pediste `email`, `profile` y `openid` (que Google considera permisos
+básicos), normalmente **no** te pide verificación y el aviso amarillo
+desaparece. Si por alguna razón te la piden, el proceso puede tardar días — y
+mientras tanto tus usuarios siguen pudiendo entrar con correo y contraseña sin
+ningún problema.
+
+### Si algo falla en este paso
+
+| Lo que ves | Qué revisar |
+|---|---|
+| `redirect_uri_mismatch` | El paso 11.3 punto 6. Debe ser la URL de **Supabase**, no la de Vercel, y terminar exactamente en `/auth/v1/callback` |
+| Entra pero regresa a la página de inicio | Falta tu dirección en Supabase → *Authentication → URL Configuration → Redirect URLs*, y tiene que terminar en `/**` |
+| "Acceso bloqueado: esta app no completó el proceso de verificación" | Tu correo no está en la lista de usuarios de prueba (paso 11.2 punto 8) |
+| `Unsupported provider: provider is not enabled` | No guardaste el proveedor en Supabase (paso 11.4) o el interruptor quedó apagado |
 
 ---
 
