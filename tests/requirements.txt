@@ -1,0 +1,3 @@
+# Suite de humo. Después de instalar:  playwright install chromium
+pytest>=8.0
+playwright>=1.44

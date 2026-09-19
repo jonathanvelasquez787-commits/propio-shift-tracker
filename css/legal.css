@@ -1,0 +1,94 @@
+/* Páginas legales: una sola columna, pensada para leerse, no para lucirse. */
+
+.legal-wrap {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 20px 70px;
+}
+
+.legal-head { padding: 40px 0 24px; border-bottom: 1px solid var(--card-line); margin-bottom: 30px; }
+
+.legal-head h1 {
+  margin: 14px 0 0;
+  font-size: clamp(26px, 4vw, 36px);
+  letter-spacing: -.04em;
+  line-height: 1.1;
+  font-weight: 900;
+}
+
+.legal-meta { margin: 10px 0 0; color: var(--muted-3); font-size: 12.5px; }
+
+.legal-wrap h2 {
+  margin: 34px 0 10px;
+  font-size: 18px;
+  letter-spacing: -.02em;
+  font-weight: 900;
+}
+
+.legal-wrap h3 { margin: 22px 0 8px; font-size: 14.5px; font-weight: 800; }
+
+.legal-wrap p,
+.legal-wrap li {
+  color: var(--muted);
+  font-size: 14.5px;
+  line-height: 1.7;
+}
+
+.legal-wrap p { margin: 0 0 14px; }
+.legal-wrap ul, .legal-wrap ol { margin: 0 0 16px; padding-left: 22px; display: grid; gap: 8px; }
+.legal-wrap strong { color: var(--text); font-weight: 800; }
+
+.legal-callout {
+  border: 1px solid rgba(var(--accent-rgb), .3);
+  background: rgba(var(--accent-rgb), .08);
+  border-radius: var(--radius-sm);
+  padding: 15px 18px;
+  margin: 0 0 20px;
+}
+
+.legal-callout p { margin: 0; color: var(--text); font-size: 13.5px; }
+
+.legal-table {
+  width: 100%;
+  min-width: 0;
+  border-collapse: collapse;
+  margin: 0 0 18px;
+  font-size: 13.5px;
+}
+
+.legal-table th,
+.legal-table td {
+  border: 1px solid var(--card-line);
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: top;
+  color: var(--muted);
+}
+
+.legal-table th {
+  background: rgba(127, 140, 180, .08);
+  color: var(--text);
+  font-weight: 800;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.legal-table-wrap { overflow-x: auto; }
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.back-link:hover { text-decoration: underline; }
+
+@media (max-width: 620px) {
+  .legal-wrap { padding: 0 14px 48px; }
+  .legal-wrap p, .legal-wrap li { font-size: 14px; }
+}

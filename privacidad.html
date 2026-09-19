@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>Política de privacidad — Propio Shift Tracker</title>
+<meta name="description" content="Qué datos guarda Propio Shift Tracker, dónde, por cuánto tiempo y cómo pedir que se borren."/>
+<link rel="stylesheet" href="/css/tokens.css"/>
+<link rel="stylesheet" href="/css/landing.css"/>
+<link rel="stylesheet" href="/css/legal.css"/>
+<script>
+  try {
+    var s = JSON.parse(localStorage.getItem('propio_shift_tracker_settings_es_v1') || '{}');
+    if (s && s.theme === 'light') document.documentElement.classList.add('theme-light');
+    if (s && s.theme === 'dark') document.documentElement.classList.add('theme-dark');
+  } catch (e) {}
+</script>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="/">
+    <span class="brand-mark" aria-hidden="true">
+      <svg class="ic-svg" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><polyline points="12 9 12 13 15 15"/><path d="M5 3 2 6"/><path d="M22 6 19 3"/></svg>
+    </span>
+    <span class="brand-text">Propio Shift Tracker</span>
+  </a>
+  <nav class="topbar-actions">
+    <a class="link-btn" href="/terminos.html">Términos</a>
+    <a class="link-btn primary" href="/#entrar">Entrar</a>
+  </nav>
+</header>
+
+<main class="legal-wrap">
+
+  <div class="legal-head">
+    <a class="back-link" href="/">← Volver al inicio</a>
+    <h1>Política de privacidad</h1>
+    <p class="legal-meta">
+      Última actualización: <strong id="updated">19 de septiembre de 2026</strong> ·
+      Responsable del tratamiento: <strong>Jonathan Velasquez</strong> ·
+      Contacto: <strong>sjonathanvelasquez@gmail.com</strong>
+    </p>
+  </div>
+
+  <div class="legal-callout">
+    <p>
+      Resumen honesto: esta app guarda lo que tú registras sobre tu jornada de
+      trabajo para poder devolvértelo en otro dispositivo. No se vende, no se
+      comparte con terceros para publicidad y no se usa para entrenar modelos de
+      inteligencia artificial. Lo puedes borrar todo cuando quieras, desde la
+      propia app.
+    </p>
+  </div>
+
+  <h2>1. Qué datos se recogen</h2>
+
+  <h3>Datos de la cuenta</h3>
+  <ul>
+    <li><strong>Correo electrónico.</strong> Necesario para confirmar la cuenta y para recuperar la contraseña. Si entras con nombre de usuario, tu correo no se muestra en ninguna parte de la interfaz.</li>
+    <li><strong>Nombre de usuario</strong> y nombre para mostrar, los que tú elijas.</li>
+    <li><strong>Contraseña.</strong> No se guarda: Supabase almacena únicamente un hash del que no se puede recuperar el original. Ni siquiera quien administra la app puede ver tu contraseña.</li>
+    <li><strong>Si entras con Google:</strong> se recibe tu correo, tu nombre y la foto de perfil pública que Google comparte al iniciar sesión. No se pide acceso a tu Gmail, tu Drive, tus contactos ni a ningún otro servicio de Google.</li>
+  </ul>
+
+  <h3>Datos de uso de la app</h3>
+  <ul>
+    <li>Horarios de turno, breaks y lunch que configuras.</li>
+    <li>Registros de turnos iniciados y terminados, pausas y llamadas (fecha, hora, duración, si fue facturable, pago).</li>
+    <li>Metas, tasa por minuto, moneda secundaria y ciclo de pago.</li>
+    <li>Gastos y metas de ahorro que registras en la sección de Finanzas.</li>
+    <li>Preferencias de la interfaz: tema, avisos, sonidos.</li>
+    <li>Etiqueta del dispositivo desde el que se guardó por última vez (por ejemplo, "Windows" o "Android (móvil)"), solo para poder avisarte cuando dos dispositivos tienen versiones distintas de tus datos.</li>
+  </ul>
+
+  <h3>Qué NO se recoge</h3>
+  <ul>
+    <li>No hay cookies de publicidad, píxeles de seguimiento ni analítica de terceros.</li>
+    <li>No se recoge tu ubicación, tu libreta de contactos ni nada de tu dispositivo.</li>
+    <li>No se graban ni se escuchan tus llamadas: la app solo conoce la duración y el pago que tú registras o pegas desde tu exportación.</li>
+  </ul>
+
+  <h2>2. Para qué se usan</h2>
+  <p>
+    Únicamente para que la app funcione: mostrarte tus propios datos, calcular tu
+    adherencia, tus minutos productivos y tus ganancias, y sincronizar todo entre
+    tus dispositivos. No se usan para ningún otro fin.
+  </p>
+
+  <h2>3. Dónde se guardan</h2>
+  <div class="legal-table-wrap">
+    <table class="legal-table">
+      <thead>
+        <tr><th>Lugar</th><th>Qué guarda</th><th>Quién es</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Tu navegador (<code>localStorage</code>)</td>
+          <td>Una copia completa de tus datos, para que la app funcione sin internet</td>
+          <td>Tu propio dispositivo</td>
+        </tr>
+        <tr>
+          <td>Supabase</td>
+          <td>Tu cuenta y una fila con tus datos, protegida por Row Level Security</td>
+          <td>Supabase Inc. — proveedor de base de datos y autenticación</td>
+        </tr>
+        <tr>
+          <td>Vercel</td>
+          <td>Los archivos de la app. No guarda tus datos personales.</td>
+          <td>Vercel Inc. — proveedor de alojamiento</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    <strong>Aislamiento entre cuentas:</strong> la base de datos aplica Row Level
+    Security. A nivel de motor de base de datos, una consulta hecha con tu sesión
+    solo puede devolver filas cuyo dueño seas tú. No depende de que el código de
+    la app "se acuerde" de filtrar.
+  </p>
+
+  <h2>4. Cuánto tiempo se conservan</h2>
+  <p>
+    Mientras tengas la cuenta abierta. Si la borras, se eliminan de inmediato tu
+    cuenta y todos tus datos asociados. Los respaldos automáticos del proveedor
+    pueden conservar copias por un período corto antes de rotarse.
+  </p>
+
+  <h2>5. Con quién se comparten</h2>
+  <p>
+    Con nadie, salvo los proveedores de infraestructura listados arriba, que
+    procesan los datos por cuenta nuestra para prestar el servicio. No se venden,
+    no se alquilan y no se entregan a terceros con fines comerciales ni
+    publicitarios. Solo se entregarían si una autoridad competente lo exigiera
+    legalmente.
+  </p>
+
+  <h2>6. Tus derechos</h2>
+  <ul>
+    <li><strong>Ver tus datos:</strong> están todos en la app; además puedes descargarlos con "Exportar JSON" en Ajustes.</li>
+    <li><strong>Corregirlos:</strong> todo es editable desde la propia app.</li>
+    <li><strong>Borrarlos:</strong> Ajustes → "Borrar mi cuenta" elimina la cuenta y todo su contenido. También existe "Borrar todos los datos", que limpia solo este navegador.</li>
+    <li><strong>Llevártelos:</strong> el JSON exportado es tu copia completa, en un formato abierto.</li>
+    <li><strong>Reclamar:</strong> si estás en la Unión Europea, puedes presentar una reclamación ante tu autoridad de protección de datos.</li>
+  </ul>
+  <p>Para cualquiera de estos puntos también puedes escribir a <strong>[TU CORREO DE CONTACTO]</strong>.</p>
+
+  <h2>7. Seguridad</h2>
+  <ul>
+    <li>Todo el tráfico viaja cifrado por HTTPS.</li>
+    <li>Las contraseñas se guardan solo como hash, nunca en claro.</li>
+    <li>El aislamiento entre cuentas lo impone la base de datos, no el navegador.</li>
+    <li>La clave con permisos administrativos vive únicamente en el servidor; jamás se envía al navegador.</li>
+    <li>El nombre de usuario nunca se puede traducir a un correo desde el navegador: esa consulta ocurre solo del lado del servidor, para que nadie pueda convertir una lista de usuarios en una lista de correos.</li>
+  </ul>
+
+  <h2>8. Menores de edad</h2>
+  <p>
+    Esta app está pensada para personas que llevan el registro de su propio
+    trabajo. No está dirigida a menores de 16 años y no se recogen datos de forma
+    consciente de esa edad.
+  </p>
+
+  <h2>9. Cambios en esta política</h2>
+  <p>
+    Si cambia algo relevante se actualiza la fecha del encabezado y, si el cambio
+    afecta a cómo se tratan tus datos, se avisa dentro de la app antes de que
+    entre en vigor.
+  </p>
+
+</main>
+
+<footer class="wrap foot">
+  <span>© <span id="year">2026</span> Propio Shift Tracker</span>
+  <nav class="foot-links">
+    <a href="/terminos.html">Términos de uso</a>
+    <a href="/">Inicio</a>
+  </nav>
+</footer>
+
+<script>document.getElementById('year').textContent = String(new Date().getFullYear());</script>
+</body>
+</html>

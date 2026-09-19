@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>Propio Shift Tracker — tu turno, tus llamadas y tus ganancias en un solo lugar</title>
+<meta name="description" content="Registra turnos, breaks, llamadas y ganancias. Adherencia minuto a minuto, Higher Rate, finanzas y calendario de productividad. Tus datos sincronizados entre dispositivos."/>
+<meta name="theme-color" content="#0d1230"/>
+<meta property="og:title" content="Propio Shift Tracker"/>
+<meta property="og:description" content="Turno, pausas, llamadas y ganancias en un solo lugar."/>
+<meta property="og:type" content="website"/>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2309101e'/%3E%3Ccircle cx='32' cy='34' r='20' fill='none' stroke='%2366e2a5' stroke-width='4'/%3E%3Cpath d='M32 22v12l9 6' fill='none' stroke='%2366e2a5' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M24 10l-6 6M40 10l6 6' fill='none' stroke='%237d8cff' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E"/>
+<link rel="stylesheet" href="/css/tokens.css"/>
+<link rel="stylesheet" href="/css/landing.css"/>
+<script>
+  // Respeta el tema que el usuario ya eligió dentro de la app, antes de pintar
+  // nada, para que no haya un destello del tema equivocado.
+  try {
+    var s = JSON.parse(localStorage.getItem('propio_shift_tracker_settings_es_v1') || '{}');
+    if (s && s.theme === 'light') document.documentElement.classList.add('theme-light');
+    if (s && s.theme === 'dark') document.documentElement.classList.add('theme-dark');
+  } catch (e) {}
+</script>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="/">
+    <span class="brand-mark" aria-hidden="true">
+      <svg class="ic-svg" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><polyline points="12 9 12 13 15 15"/><path d="M5 3 2 6"/><path d="M22 6 19 3"/></svg>
+    </span>
+    <span class="brand-text">Propio Shift Tracker</span>
+  </a>
+  <nav class="topbar-actions">
+    <a class="link-btn" href="#funciones">Funciones</a>
+    <a class="link-btn primary" href="#entrar" id="topEnterBtn">Entrar</a>
+  </nav>
+</header>
+
+<main>
+
+  <section class="wrap hero" id="entrar">
+    <div>
+      <span class="eyebrow"><span class="dot"></span>Ahora con cuenta y respaldo en la nube</span>
+
+      <h1>Tu turno, tus llamadas y tus <span class="accent">ganancias reales</span>, en un solo lugar.</h1>
+
+      <p class="lede">
+        Registra cuándo entras, cuándo descansas y cuánto tiempo pasas en llamada.
+        La app calcula sola tu adherencia minuto a minuto, tus minutos productivos
+        y lo que llevas ganado — en dólares y en tu moneda.
+      </p>
+
+      <ul class="hero-points">
+        <li>
+          <svg class="ic-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></svg>
+          <span>Entra con Google, con tu correo o con tu nombre de usuario.</span>
+        </li>
+        <li>
+          <svg class="ic-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></svg>
+          <span>Tus datos te siguen entre el celular y la computadora, sin exportar nada a mano.</span>
+        </li>
+        <li>
+          <svg class="ic-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></svg>
+          <span>Sigue funcionando sin internet: guarda local y sube cuando vuelve la señal.</span>
+        </li>
+      </ul>
+
+      <p class="hero-note">
+        <svg class="ic-svg" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        Cada cuenta ve solo sus propios datos. Nadie más, ni siquiera por error.
+      </p>
+    </div>
+
+    <!-- Panel de entrada -->
+    <div class="auth-card">
+
+      <!-- Sesión ya abierta -->
+      <div class="session-card" id="sessionCard">
+        <div class="session-avatar" id="sessionAvatar">?</div>
+        <div class="auth-title" id="sessionName">Ya iniciaste sesión</div>
+        <p class="auth-sub" id="sessionHandle"></p>
+        <a class="submit-btn" href="/app.html" style="text-decoration:none; margin-top:14px;">Entrar a la app</a>
+        <button class="text-link" id="signOutBtn" type="button" style="margin-top:14px;">Cerrar sesión</button>
+      </div>
+
+      <!-- Formularios -->
+      <div id="authForms">
+        <div class="auth-head">
+          <div class="auth-title" id="authTitle">Entrar</div>
+          <p class="auth-sub" id="authSub">Usa tu correo o tu nombre de usuario.</p>
+        </div>
+
+        <div class="tab-row" role="tablist" aria-label="Entrar o crear cuenta">
+          <button class="tab-btn" id="tabLogin" role="tab" aria-selected="true" type="button">Entrar</button>
+          <button class="tab-btn" id="tabSignup" role="tab" aria-selected="false" type="button">Crear cuenta</button>
+        </div>
+
+        <button class="google-btn" id="googleBtn" type="button">
+          <svg viewBox="0 0 48 48" aria-hidden="true">
+            <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.7-6.7C35.6 2.6 30.2.5 24 .5 14.6.5 6.5 5.8 2.6 13.5l7.8 6.1C12.3 13.5 17.6 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-2.8-.4-4.1H24v7.8h12.7c-.3 2.1-1.6 5.2-4.7 7.3l7.6 5.9c4.5-4.2 6.5-10.3 6.5-16.9z"/>
+            <path fill="#FBBC05" d="M10.4 28.4c-.5-1.5-.8-3.1-.8-4.7s.3-3.2.8-4.7l-7.8-6.1C.9 16.1 0 19.9 0 23.7s.9 7.6 2.6 10.8l7.8-6.1z"/>
+            <path fill="#34A853" d="M24 47c6.2 0 11.4-2 15.2-5.6l-7.6-5.9c-2 1.4-4.7 2.4-7.6 2.4-6.4 0-11.7-4-13.6-9.6l-7.8 6.1C6.5 42.2 14.6 47 24 47z"/>
+          </svg>
+          Continuar con Google
+        </button>
+
+        <div class="divider-row">o</div>
+
+        <!-- Entrar -->
+        <form id="loginForm" novalidate>
+          <div class="field">
+            <label for="loginIdentifier">Usuario o correo</label>
+            <input id="loginIdentifier" name="identifier" type="text" autocomplete="username"
+                   placeholder="jonathan  ·  jonathan@correo.com" required/>
+          </div>
+          <div class="field">
+            <div class="field-row">
+              <label for="loginPassword">Contraseña</label>
+              <button class="text-link" id="forgotBtn" type="button">¿La olvidaste?</button>
+            </div>
+            <input id="loginPassword" name="password" type="password" autocomplete="current-password"
+                   placeholder="••••••••" required/>
+          </div>
+          <button class="submit-btn" id="loginSubmit" type="submit">
+            <span class="spinner" aria-hidden="true"></span><span>Entrar</span>
+          </button>
+        </form>
+
+        <!-- Crear cuenta -->
+        <form id="signupForm" novalidate hidden>
+          <div class="field">
+            <label for="signupUsername">Nombre de usuario</label>
+            <input id="signupUsername" name="username" type="text" autocomplete="username"
+                   placeholder="jonathan" maxlength="24" required/>
+            <span class="field-hint" id="usernameHint">3 a 24 caracteres: letras, números, guion bajo o punto.</span>
+          </div>
+          <div class="field">
+            <label for="signupEmail">Correo</label>
+            <input id="signupEmail" name="email" type="email" autocomplete="email"
+                   placeholder="tucorreo@ejemplo.com" required/>
+            <span class="field-hint">Solo para confirmar la cuenta y recuperar tu contraseña. No se muestra a nadie.</span>
+          </div>
+          <div class="field">
+            <label for="signupPassword">Contraseña</label>
+            <input id="signupPassword" name="password" type="password" autocomplete="new-password"
+                   placeholder="Mínimo 8 caracteres" required/>
+          </div>
+          <button class="submit-btn" id="signupSubmit" type="submit">
+            <span class="spinner" aria-hidden="true"></span><span>Crear mi cuenta</span>
+          </button>
+        </form>
+
+        <!-- Recuperar contraseña -->
+        <form id="forgotForm" novalidate hidden>
+          <div class="field">
+            <label for="forgotEmail">Tu correo</label>
+            <input id="forgotEmail" name="email" type="email" autocomplete="email"
+                   placeholder="tucorreo@ejemplo.com" required/>
+            <span class="field-hint">Te llega un enlace para poner una contraseña nueva.</span>
+          </div>
+          <button class="submit-btn" id="forgotSubmit" type="submit">
+            <span class="spinner" aria-hidden="true"></span><span>Enviar enlace</span>
+          </button>
+          <button class="text-link" id="backToLoginBtn" type="button" style="margin-top:14px; display:block;">Volver a entrar</button>
+        </form>
+
+        <!-- Contraseña nueva (llegando desde el enlace del correo) -->
+        <form id="resetForm" novalidate hidden>
+          <div class="field">
+            <label for="resetPassword">Contraseña nueva</label>
+            <input id="resetPassword" name="password" type="password" autocomplete="new-password"
+                   placeholder="Mínimo 8 caracteres" required/>
+          </div>
+          <button class="submit-btn" id="resetSubmit" type="submit">
+            <span class="spinner" aria-hidden="true"></span><span>Guardar contraseña</span>
+          </button>
+        </form>
+
+        <div class="form-msg" id="authMsg" role="status" aria-live="polite"></div>
+
+        <p class="legal-note">
+          Al crear una cuenta aceptas los
+          <a href="/terminos.html">Términos de uso</a> y la
+          <a href="/privacidad.html">Política de privacidad</a>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap section" id="funciones">
+    <div class="section-head">
+      <h2>Lo que hace por ti mientras trabajas</h2>
+      <p>Nada de llenar formularios al final del día: la app arma el reporte con lo que ya hiciste.</p>
+    </div>
+
+    <div class="feature-grid">
+      <article class="feature" style="--f-rgb: var(--cyan-rgb);">
+        <span class="feature-icon"><svg class="ic-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></span>
+        <h3>Adherencia minuto a minuto</h3>
+        <p>Compara tu plan contra lo que realmente hiciste, minuto por minuto, con ventana de gracia configurable — y te dice el motivo, no solo el porcentaje.</p>
+      </article>
+
+      <article class="feature" style="--f-rgb: var(--warn-rgb);">
+        <span class="feature-icon"><svg class="ic-svg" viewBox="0 0 24 24"><path d="M12 2c2 3-1 4-1 7a3 3 0 1 0 6 0c0-1-.5-2-.5-2 2 1 3 3.5 3 6a7 7 0 1 1-14 0c0-4 2-6 3.5-8 .5 2 1 2.5 3-3Z"/></svg></span>
+        <h3>Higher Rate</h3>
+        <p>Configura las franjas con bono extra y la app suma sola lo ganado de más en cada llamada que califica — incluso si la llamada se extiende fuera de la ventana.</p>
+      </article>
+
+      <article class="feature" style="--f-rgb: var(--teal-rgb);">
+        <span class="feature-icon"><svg class="ic-svg" viewBox="0 0 24 24"><path d="M20 12V8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h13a1 1 0 0 0 1-1v-4"/><path d="M20 12a2 2 0 0 1 0 4h-3a2 2 0 0 1 0-4Z"/></svg></span>
+        <h3>Finanzas que se llenan solas</h3>
+        <p>Gastos y metas de ahorro en cola de prioridad. Cada llamada que guardas reparte tu disponible sin que toques nada.</p>
+      </article>
+
+      <article class="feature" style="--f-rgb: var(--purple-rgb);">
+        <span class="feature-icon"><svg class="ic-svg" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg></span>
+        <h3>Calendario de productividad</h3>
+        <p>Un año entero de un vistazo: qué días cumpliste tu meta, cuáles quedaste cerca y cuánto llevas ganado por mes.</p>
+      </article>
+
+      <article class="feature" style="--f-rgb: var(--good-rgb);">
+        <span class="feature-icon"><svg class="ic-svg" viewBox="0 0 24 24"><line x1="4" y1="20" x2="4" y2="10"/><line x1="10" y1="20" x2="10" y2="4"/><line x1="16" y1="20" x2="16" y2="14"/><line x1="21" y1="20" x2="3" y2="20"/></svg></span>
+        <h3>Reportes y tendencias</h3>
+        <p>Ganancias por mes, adherencia promedio, mejor y peor día, racha de cumplimiento y proyección de tu ciclo de pago.</p>
+      </article>
+
+      <article class="feature" style="--f-rgb: var(--blue-rgb);">
+        <span class="feature-icon"><svg class="ic-svg" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10 20a2 2 0 0 0 4 0"/></svg></span>
+        <h3>Avisos con sonido</h3>
+        <p>Antes de tu turno, antes del break y antes de que se te acabe. Con tu propio sonido y tus propios mensajes si quieres.</p>
+      </article>
+
+      <article class="feature" style="--f-rgb: var(--bad-rgb);">
+        <span class="feature-icon"><svg class="ic-svg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg></span>
+        <h3>Exportación contable</h3>
+        <p>CSV y PDF listos para declarar ingresos: resumen por día más el detalle de cada llamada del período.</p>
+      </article>
+
+      <article class="feature" style="--f-rgb: var(--cyan-rgb);">
+        <span class="feature-icon"><svg class="ic-svg" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3"/></svg></span>
+        <h3>Respaldo en la nube</h3>
+        <p>Todo se guarda en tu cuenta y vuelve intacto en cualquier dispositivo. Y sigues teniendo el "Exportar JSON" de siempre.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="wrap section">
+    <div class="section-head">
+      <h2>Cómo arranca</h2>
+      <p>Tres pasos y estás midiendo tu turno de hoy.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Crea tu cuenta</h3>
+        <p>Con Google o con tu correo. Si ya venías usando la app en este navegador, tus datos se suben solos la primera vez que entras.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Arma tu horario</h3>
+        <p>Inicio, fin, breaks y lunch. Una vez. La plantilla se repite cada semana y puedes cambiar una semana suelta sin tocarla.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Trabaja normal</h3>
+        <p>Inicia turno, pega tus llamadas o regístralas en vivo. El resto — adherencia, ganancias, finanzas — se calcula solo.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap section">
+    <div class="privacy-card">
+      <div class="section-head" style="margin:0;">
+        <h2 style="font-size:20px;">Tus datos, en claro</h2>
+      </div>
+      <ul>
+        <li><strong>Qué se guarda:</strong> tus turnos, pausas, llamadas, horario, metas y configuración. Nada más.</li>
+        <li><strong>Dónde:</strong> en tu navegador y en una base de datos de Supabase, en una fila que solo tu cuenta puede leer.</li>
+        <li><strong>Quién lo ve:</strong> solo tú. No se vende, no se comparte y no se usa para publicidad.</li>
+        <li><strong>Cómo lo borras:</strong> desde Ajustes, con un botón. Se borra la cuenta y todo lo que tenía dentro.</li>
+      </ul>
+      <p style="margin:0; font-size:13px; color:var(--muted-3);">
+        Detalle completo en la <a href="/privacidad.html">Política de privacidad</a>.
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="wrap foot">
+  <span>© <span id="year">2026</span> Propio Shift Tracker</span>
+  <nav class="foot-links">
+    <a href="/terminos.html">Términos de uso</a>
+    <a href="/privacidad.html">Privacidad</a>
+    <a href="#entrar">Entrar</a>
+  </nav>
+</footer>
+
+<script type="module" src="/js/landing.js"></script>
+<script>document.getElementById('year').textContent = String(new Date().getFullYear());</script>
+</body>
+</html>
