@@ -1,12 +1,13 @@
-/* Envoltorio de sesión alrededor de la app + afinado del tema claro.
+/* Envoltorio de sesión alrededor de la app + afinado de los dos temas.
    Usa los mismos tokens que ya define app.html en :root.
 
-   Cómo gana la cascada sin tocar app.html: ese archivo declara su tema claro
-   dos veces, `html.theme-light X` y `:root:not(.theme-dark) X` dentro de
-   @media (prefers-color-scheme: light). Todo lo de abajo va bajo
-   `:root.theme-light X`, que le gana a la primera por especificidad y a la
-   segunda por orden (este archivo carga después del <style>). El modo oscuro
-   no se toca en ninguna regla. */
+   Cómo gana la cascada sin tocar app.html: ese archivo declara el oscuro en
+   `:root` y el claro dos veces, `html.theme-light X` y `:root:not(.theme-dark) X`
+   dentro de @media (prefers-color-scheme: light). Acá todo va bajo
+   `:root.theme-light X` / `:root.theme-dark X`, que le ganan a las primeras por
+   especificidad y a la segunda por orden (este archivo carga después del
+   <style>). Es fiable porque boot.js llama a applyLightThemeDefault() antes de
+   montar: en /app siempre hay una clase de tema puesta. */
 
 /* Mientras la app no está montada, lo único visible es el gate. */
 body:not(.app-ready) > *:not(#bootGate) {
@@ -30,7 +31,7 @@ body:not(.app-ready) > *:not(#bootGate) {
 }
 
 html.theme-dark #bootGate {
-  background: var(--panel-navy, #0d1230);
+  background: #080d1f;
   color: var(--text, #edf4ff);
 }
 
@@ -73,7 +74,7 @@ html.theme-dark #bootGate {
   letter-spacing: -.01em;
 }
 
-html.theme-dark .boot-text { color: var(--muted, #90a0be); }
+html.theme-dark .boot-text { color: var(--muted, #97a6c4); }
 
 /* Tarjetas de error y de conflicto */
 
@@ -91,7 +92,7 @@ html.theme-dark .boot-text { color: var(--muted, #90a0be); }
 
 html.theme-dark .boot-card {
   background: var(--panel-navy, #0d1230);
-  border-color: var(--card-line, rgba(140, 160, 255, .13));
+  border-color: var(--card-line, rgba(140, 160, 255, .18));
   box-shadow: var(--shadow, 0 10px 26px rgba(0, 0, 0, .2));
 }
 
@@ -117,8 +118,8 @@ html.theme-dark .boot-card {
   line-height: 1.5;
 }
 
-html.theme-dark .boot-card-text { color: var(--muted, #90a0be); }
-html.theme-dark .boot-card-hint { color: var(--muted-3, rgba(144, 160, 190, .62)); }
+html.theme-dark .boot-card-text { color: var(--muted, #97a6c4); }
+html.theme-dark .boot-card-hint { color: var(--muted-3, #6f7f9e); }
 
 .boot-card-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 
@@ -143,7 +144,7 @@ html.theme-dark .boot-card-hint { color: var(--muted-3, rgba(144, 160, 190, .62)
   transition: border-color .14s ease, background .14s ease, transform .14s ease;
 }
 
-html.theme-dark .boot-choice { border-color: var(--line-2, rgba(90, 105, 150, .26)); }
+html.theme-dark .boot-choice { border-color: var(--line-2, rgba(125, 145, 215, .26)); }
 
 .boot-choice:hover,
 .boot-choice:focus-visible {
@@ -157,7 +158,7 @@ html.theme-dark .boot-choice { border-color: var(--line-2, rgba(90, 105, 150, .2
 .boot-choice-sub { font-size: 12.5px; color: inherit; opacity: .85; }
 .boot-choice-note { font-size: 11.5px; color: #94a3b8; }
 
-html.theme-dark .boot-choice-note { color: var(--muted-3, rgba(144, 160, 190, .62)); }
+html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 
 @media (max-width: 620px) {
   .boot-choice-grid { grid-template-columns: 1fr; }
@@ -171,7 +172,7 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, rgba(144, 160, 190, .6
   gap: 8px;
   padding: 10px 10px 2px;
   margin-top: 4px;
-  border-top: 1px solid var(--line, rgba(90, 105, 150, .16));
+  border-top: 1px solid var(--line, rgba(125, 145, 215, .16));
 }
 
 .sidebar-account-row {
@@ -208,7 +209,7 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, rgba(144, 160, 190, .6
 
 .sidebar-account-handle {
   font-size: 11.5px;
-  color: var(--muted-3, rgba(144, 160, 190, .62));
+  color: var(--muted-3, #6f7f9e);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -219,7 +220,7 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, rgba(144, 160, 190, .6
   align-items: center;
   gap: 7px;
   font-size: 11.5px;
-  color: var(--muted, #90a0be);
+  color: var(--muted, #97a6c4);
   font-weight: 700;
 }
 
@@ -228,7 +229,7 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, rgba(144, 160, 190, .6
   height: 8px;
   border-radius: 50%;
   flex: 0 0 auto;
-  background: var(--muted, #90a0be);
+  background: var(--muted, #97a6c4);
 }
 
 .sidebar-sync-dot[data-state="ok"] { background: var(--good, #66e2a5); box-shadow: 0 0 10px rgba(var(--good-rgb, 102, 226, 165), .5); }
@@ -239,9 +240,9 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, rgba(144, 160, 190, .6
 
 .sidebar-logout-btn {
   width: 100%;
-  border: 1px solid var(--line-2, rgba(90, 105, 150, .26));
+  border: 1px solid var(--line-2, rgba(125, 145, 215, .26));
   background: transparent;
-  color: var(--muted, #90a0be);
+  color: var(--muted, #97a6c4);
   border-radius: 12px;
   padding: 9px 12px;
   font-weight: 800;
@@ -257,7 +258,84 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, rgba(144, 160, 190, .6
 }
 
 /* ===================================================================
-   1. Tema claro — tokens
+   1. Tipografía de datos — los dos temas
+   =================================================================== */
+
+/* Cifras de ancho fijo: sin esto el reloj y los contadores bailan cada
+   segundo, porque las cifras proporcionales de Inter no miden igual. */
+.clock,
+.earnings-big,
+.gh-ring-value,
+.hero-fig-value,
+.sidebar-progress-ring span,
+.action-sub,
+.live-bar-timer,
+.calls-status-timer,
+.sblk-bar-label-row strong,
+.rpt-cycle-amt,
+.rpt-streak-num,
+.cal-year-total-amt,
+.cal-day-min,
+.cal-day-amt,
+.month-card-amt,
+.wk-row-amount,
+.wk-total-metric strong,
+.tbl-row-amount,
+.tbl-row-time,
+.fin-available-amt,
+.fin-row-right-val,
+.fin-preview-amt,
+.pd-next-date,
+.pd-next-days {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Etiquetas que acompañan a un número y se veían como texto suelto, alineadas
+   con las que ya eran mayúsculas (Disponible, Próximo pago, Siguiente...). */
+.gh-ring-label,
+.hero-fig-label,
+.wk-total-metric-label,
+.fin-preview-amt-label,
+.month-card-amt-label,
+.gh-goal-subitem .gp-label,
+.gh-goal-foot .gp-label {
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  font-weight: 800;
+  color: var(--muted-3);
+}
+
+/* El tamaño se toca solo donde no hay una compactación mobile propia que
+   respetar (ver .month-card-amt-label y .wk-total-metric-label). */
+.gh-ring-label,
+.hero-fig-label,
+.fin-preview-amt-label,
+.gh-goal-subitem .gp-label,
+.gh-goal-foot .gp-label {
+  font-size: 10px;
+}
+
+.accordion-card { box-shadow: var(--shadow); }
+
+:root.theme-light .accordion-head h2,
+:root.theme-dark .accordion-head h2,
+:root.theme-light .section-title h2,
+:root.theme-dark .section-title h2 {
+  font-weight: 900;
+  letter-spacing: -.03em;
+}
+
+/* El subtítulo de cada sección usaba el tercer tono de gris, que sobre blanco
+   queda por debajo del mínimo legible para texto corrido. */
+:root.theme-light .accordion-head p,
+:root.theme-dark .accordion-head p,
+:root.theme-light .section-title p,
+:root.theme-dark .section-title p {
+  color: var(--muted);
+}
+
+/* ===================================================================
+   2. Tema claro — tokens
    app.html no remapea --panel-navy en claro: lo reemplaza regla por regla, y
    todo lo que quedó fuera de esa lista se seguía pintando azul. Remapearlo
    acá cubre esos casos y cualquiera futuro.
@@ -293,7 +371,7 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, rgba(144, 160, 190, .6
 }
 
 /* ===================================================================
-   2. Tema claro — superficies
+   3. Tema claro — superficies
    =================================================================== */
 
 /* app.html apaga el borde de las tarjetas en claro (border-color: transparent).
@@ -403,7 +481,7 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, rgba(144, 160, 190, .6
 }
 
 /* ===================================================================
-   3. Tema claro — un solo acento
+   4. Tema claro — un solo acento
    El modo claro arrastraba un #4a90e2 suelto (un azul que no es de la paleta)
    en casi todos los hover. Acá pasan todos al índigo de la app.
    =================================================================== */
@@ -447,63 +525,43 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, rgba(144, 160, 190, .6
 }
 
 /* ===================================================================
-   4. Tema claro — tipografía de datos
+   5. Tema oscuro
+   Los mismos tres arreglos del claro, al revés: la página baja un escalón para
+   que la tarjeta exista, las líneas se vuelven visibles y el acento se unifica
+   en cian.
    =================================================================== */
 
-/* #94A3B8 sobre blanco queda por debajo del mínimo legible para texto
-   corrido; el subtítulo de cada sección pasa al gris de cuerpo. */
-:root.theme-light .accordion-head p,
-:root.theme-light .section-title p {
-  color: var(--muted);
+:root.theme-dark {
+  /* --line valía rgba(90,105,150,.045): 4,5% de opacidad, o sea nada. Chips,
+     campos, pills y botones vivían sin contorno. Estos son los mismos valores
+     que ya usa la landing. */
+  --line: rgba(125, 145, 215, .16);
+  --line-2: rgba(125, 145, 215, .26);
+  --card-line: rgba(140, 160, 255, .18);
+
+  --muted: #97a6c4;
+  --muted-3: #6f7f9e;
+
+  /* Los hover saltaban a morado aunque el resto del tema fuera cian. */
+  --hover-flip: var(--cyan);
+  --hover-flip-rgb: var(--cyan-rgb);
 }
 
-:root.theme-light .accordion-head h2,
-:root.theme-light .section-title h2 {
-  font-weight: 900;
-  letter-spacing: -.03em;
-}
+/* El fondo de página y las tarjetas eran exactamente el mismo #0d1230, así que
+   la tarjeta no existía como tarjeta. Las tarjetas no se mueven: solo baja el
+   fondo. */
+:root.theme-dark body { background: #080d1f; }
 
-/* Etiquetas que acompañan a un número y hoy se veían como texto suelto,
-   alineadas con las que ya eran mayúsculas (Disponible, Próximo pago...). */
-:root.theme-light .gh-ring-label,
-:root.theme-light .hero-fig-label,
-:root.theme-light .wk-total-metric-label,
-:root.theme-light .fin-preview-amt-label,
-:root.theme-light .month-card-amt-label,
-:root.theme-light .gh-goal-subitem .gp-label,
-:root.theme-light .gh-goal-foot .gp-label {
-  text-transform: uppercase;
-  letter-spacing: .06em;
-  font-size: 10px;
-  font-weight: 800;
-  color: var(--muted-3);
-}
+:root.theme-dark .accordion-card { box-shadow: var(--shadow); }
 
-/* Cifras de ancho fijo: sin esto el reloj y los contadores bailan cada
-   segundo, porque las cifras proporcionales de Inter no miden igual. */
-:root.theme-light .clock,
-:root.theme-light .earnings-big,
-:root.theme-light .gh-ring-value,
-:root.theme-light .hero-fig-value,
-:root.theme-light .sidebar-progress-ring span,
-:root.theme-light .action-sub,
-:root.theme-light .live-bar-timer,
-:root.theme-light .calls-status-timer,
-:root.theme-light .sblk-bar-label-row strong,
-:root.theme-light .rpt-cycle-amt,
-:root.theme-light .rpt-streak-num,
-:root.theme-light .cal-year-total-amt,
-:root.theme-light .cal-day-min,
-:root.theme-light .cal-day-amt,
-:root.theme-light .month-card-amt,
-:root.theme-light .wk-row-amount,
-:root.theme-light .wk-total-metric strong,
-:root.theme-light .tbl-row-amount,
-:root.theme-light .tbl-row-time,
-:root.theme-light .fin-available-amt,
-:root.theme-light .fin-row-right-val,
-:root.theme-light .fin-preview-amt,
-:root.theme-light .pd-next-date,
-:root.theme-light .pd-next-days {
-  font-variant-numeric: tabular-nums;
+/* Separadores que el modo oscuro plano dejaba en transparent y que, con las
+   líneas ya visibles, quedaban como el único borde ausente. */
+:root.theme-dark .hero-top-row,
+:root.theme-dark .sidebar-brand-block { border-bottom-color: var(--line); }
+:root.theme-dark .sidebar-footer { border-top-color: var(--line); }
+:root.theme-dark .divider { background: var(--line); }
+
+/* Quedaba al mismo color exacto que la tarjeta que la contiene. */
+:root.theme-dark .calls-status-card:not(.live) {
+  background: rgba(255, 255, 255, .035);
 }
