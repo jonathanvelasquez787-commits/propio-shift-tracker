@@ -133,21 +133,6 @@ python3 -m http.server 3000
 Las funciones de `api/` **no** corren con `http.server`. Para probarlas en
 local: `npx vercel dev`.
 
----
-
-## Estado del roadmap
-
-| Fase | Estado |
-|---|---|
-| 0 — Red de seguridad | **Hecha**. Congelado + `tests/smoke.py`. |
-| 1 — Cuentas y nube | **Hecha en código**. Falta crear el proyecto de Supabase (ver SETUP.md). |
-| 2 — Landing y login | **Hecha**. Landing, 3 métodos, legales. |
-| 3 — Partir el archivo (Vite) | Sin empezar. |
-| 4 — Protección del código | Parcial: licencia, repo privado y gate de cuenta. Falta el minificado, que llega con la Fase 3. |
-| 5 — Opcionales | Adelantado: borrado de cuenta y exportación ya existen. |
-
-El detalle completo, con lo que queda pendiente y por qué, está en
-`resumen_v541.md`.
 
 ---
 
