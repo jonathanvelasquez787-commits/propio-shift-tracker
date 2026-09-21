@@ -253,6 +253,148 @@ function injectDeleteAccount() {
   });
 }
 
+// ---------------------------------------------------------------------------
+// Proyección del ciclo dentro de Inicio → Ciclo
+//
+// La app no se puede editar (app.html se genera desde el congelado), así que
+// el bloque se inyecta acá igual que el panel de cuenta. No calcula nada
+// nuevo: usa las mismas funciones globales que ya alimentan Reportes.
+// ---------------------------------------------------------------------------
+
+const CYCLE_PROJECTION_DEPS = [
+  'reportsCycleProjection',
+  'cycleGoalPace',
+  'effectiveCycleGoal',
+  'money',
+  'financeConvertedInline',
+  'convertedAmountText',
+  'iconHtml',
+];
+
+function hasCycleProjectionDeps() {
+  return CYCLE_PROJECTION_DEPS.every((name) => typeof window[name] === 'function');
+}
+
+function renderCycleProjection() {
+  const box = document.getElementById('cycleProjectionBox');
+  const rows = document.getElementById('cycleProjectionRows');
+  if (!box || !rows || !hasCycleProjectionDeps()) return;
+
+  // Los números son siempre del ciclo ACTUAL, igual que en Reportes. El
+  // rótulo del rango es el único lugar donde la app dice qué ciclo se está
+  // mirando, así que el bloque se esconde mientras se navega otro.
+  const rangeBadge = document.getElementById('cycleRangeBadge');
+  const viewingCurrent = !!rangeBadge && rangeBadge.textContent.includes('(actual)');
+  box.style.display = viewingCurrent ? '' : 'none';
+  if (!viewingCurrent) return;
+
+  const money = window.money;
+  const inline = window.financeConvertedInline;
+  const converted = window.convertedAmountText;
+  const icon = window.iconHtml;
+
+  const proj = window.reportsCycleProjection();
+  const pace = window.cycleGoalPace();
+  const goal = window.effectiveCycleGoal(0);
+
+  const totalDays = proj.daysElapsed + proj.daysRemaining;
+  const delta = proj.projected - goal;
+  const pct = goal > 0 ? Math.max(0, Math.min(100, (proj.projected / goal) * 100)) : 0;
+  const barColor = delta >= 0 ? 'var(--good)' : 'var(--warn)';
+
+  let paceValue;
+  let paceColor;
+  let paceLabel;
+  let paceSub;
+  if (pace.met) {
+    paceValue = 'Listo';
+    paceColor = 'var(--good)';
+    paceLabel = 'meta cubierta';
+    paceSub = 'Lo que ganes de aquí en adelante es extra.';
+  } else if (!pace.workDaysLeft) {
+    paceValue = '—';
+    paceColor = 'var(--bad)';
+    paceLabel = 'sin días';
+    paceSub = `Faltan ${money(pace.remainingUsd)}${inline(pace.remainingUsd)} y ya no quedan días laborales en este ciclo.`;
+  } else {
+    paceValue = `~${pace.perDayHours.toFixed(1)} h/día`;
+    paceColor = 'var(--warn)';
+    paceLabel = 'productivas';
+    paceSub = `Faltan ${money(pace.remainingUsd)}${inline(pace.remainingUsd)} · ${money(pace.perDayUsd)}${inline(pace.perDayUsd)} por día laboral`;
+  }
+
+  rows.innerHTML = `
+    <div class="fin-preview-row" style="--cat-rgb: var(--blue-rgb);">
+      <span class="fin-preview-icon">${icon('chart')}</span>
+      <div class="fin-preview-main">
+        <div class="fin-preview-name">Al ritmo de hoy</div>
+        <div class="fin-preview-sub">Día ${proj.daysElapsed} de ${totalDays} · ${delta >= 0 ? '+' : ''}${money(delta)}${inline(Math.abs(delta))} vs tu meta</div>
+        <div class="fin-preview-bar"><div style="width:${pct}%; background:${barColor};"></div></div>
+      </div>
+      <div class="fin-preview-right">
+        <div class="fin-preview-amt">${money(proj.projected)}</div>
+        <div class="fin-preview-amt-label">${escapeHtml(converted(proj.projected) || 'proyectado')}</div>
+      </div>
+    </div>
+    <div class="fin-preview-row" style="--cat-rgb: var(--warn-rgb);">
+      <span class="fin-preview-icon">${icon('flag')}</span>
+      <div class="fin-preview-main">
+        <div class="fin-preview-name">Para llegar a tu meta</div>
+        <div class="fin-preview-sub">${paceSub}</div>
+      </div>
+      <div class="fin-preview-right">
+        <div class="fin-preview-amt" style="color:${paceColor};">${escapeHtml(paceValue)}</div>
+        <div class="fin-preview-amt-label">${escapeHtml(paceLabel)}</div>
+      </div>
+    </div>`;
+}
+
+function injectCycleProjection() {
+  const view = document.getElementById('earningsCycleView');
+  if (!view || document.getElementById('cycleProjectionBox') || !hasCycleProjectionDeps()) return;
+
+  const box = document.createElement('div');
+  box.className = 'fin-preview';
+  box.id = 'cycleProjectionBox';
+  box.style.marginTop = '12px';
+  box.innerHTML = `
+    <div class="fin-preview-head">
+      <span class="fin-preview-title">Proyección del ciclo</span>
+      <button class="fin-preview-link" data-nav-page="reports" type="button">Ver Reportes →</button>
+    </div>
+    <div id="cycleProjectionRows"></div>`;
+
+  // data-nav-page ya lo maneja la app con un listener delegado: el botón no
+  // necesita wiring propio para llevar a Reportes.
+  const anchor = view.querySelector('.gh-info-row');
+  if (anchor) view.insertBefore(box, anchor);
+  else view.appendChild(box);
+
+  renderCycleProjection();
+
+  // Repintar al entrar a la pestaña Ciclo o al cambiar de ciclo, sin esperar
+  // al refresco periódico.
+  document.addEventListener('click', (e) => {
+    const el = e.target instanceof Element ? e.target : null;
+    if (!el) return;
+    if (el.closest('[data-earnings-mode]') || el.closest('#cyclePrevBtn, #cycleNextBtn, #cycleCurrentBtn')) {
+      setTimeout(renderCycleProjection, 0);
+    }
+  });
+
+  // Solo mientras se está viendo: estos cálculos recorren los 14 días del
+  // ciclo, igual que Reportes, que por eso tampoco se recalcula de fondo.
+  setInterval(() => {
+    const cycleView = document.getElementById('earningsCycleView');
+    const home = document.querySelector('.app-page[data-page="home"]');
+    const accordion = document.getElementById('earningsAccordion');
+    if (!cycleView || cycleView.style.display === 'none') return;
+    if (!home || home.hidden) return;
+    if (accordion && !accordion.open) return;
+    renderCycleProjection();
+  }, 5000);
+}
+
 function setSyncStatus(kind, text) {
   const dot = document.getElementById('sidebarSyncDot');
   const label = document.getElementById('sidebarSyncText');
@@ -410,6 +552,7 @@ async function boot() {
     injectAccountPanel(null, session.user.email);
   }
   injectDeleteAccount();
+  injectCycleProjection();
 
   // Primera subida del dispositivo: si lo local era lo bueno, que quede en la
   // nube sin esperar a la próxima edición.
