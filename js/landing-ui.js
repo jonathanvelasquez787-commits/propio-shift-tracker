@@ -44,6 +44,31 @@ if (header) {
 }
 
 // ---------------------------------------------------------------------------
+// Ver / ocultar contraseña
+// ---------------------------------------------------------------------------
+
+// Delegado: los formularios se muestran y ocultan, pero nunca se reconstruyen.
+document.addEventListener('click', (e) => {
+  const btn = e.target instanceof Element ? e.target.closest('[data-reveal-for]') : null;
+  if (!btn) return;
+  const input = document.getElementById(btn.getAttribute('data-reveal-for'));
+  if (!input) return;
+
+  const show = input.type === 'password';
+  // Cambiar el type mueve el cursor al final; se guarda y se restaura.
+  const { selectionStart, selectionEnd } = input;
+  input.type = show ? 'text' : 'password';
+  btn.setAttribute('aria-pressed', show ? 'true' : 'false');
+  btn.setAttribute('aria-label', show ? 'Ocultar contraseña' : 'Mostrar contraseña');
+  input.focus();
+  try {
+    input.setSelectionRange(selectionStart, selectionEnd);
+  } catch {
+    /* algunos navegadores no lo permiten en campos de contraseña */
+  }
+});
+
+// ---------------------------------------------------------------------------
 // Reloj del mock: que el minutero corra da la sensación de app viva
 // ---------------------------------------------------------------------------
 
