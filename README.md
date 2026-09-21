@@ -3,7 +3,7 @@
 Registro personal de turnos, pausas, llamadas y ganancias, con adherencia
 minuto a minuto, Higher Rate, finanzas y calendario de productividad.
 
-Esta versión (**v540**) es el salto de "un archivo HTML en localStorage" a
+Esta versión es el salto de "un archivo HTML en localStorage" a
 "producto con cuentas y respaldo en la nube". La app en sí **no se reescribió**:
 sigue siendo el mismo archivo, ahora envuelto en una capa de sesión y
 sincronización.
