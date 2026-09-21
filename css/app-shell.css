@@ -1,12 +1,15 @@
 /* Envoltorio de sesión alrededor de la app.
-   Usa los mismos tokens que ya define app.html en :root — este archivo no
-   declara ninguno propio, así hereda el tema claro/oscuro sin duplicar paleta. */
+   Usa los mismos tokens que ya define app.html en :root — lo único propio es
+   el remapeo de --panel-navy para el tema claro (ver la última sección). */
 
 /* Mientras la app no está montada, lo único visible es el gate. */
 body:not(.app-ready) > *:not(#bootGate) {
   display: none !important;
 }
 
+/* El gate se pinta ANTES de que boot.js pueda poner la clase de tema: es un
+   módulo y espera a que baje supabase-js del CDN. Por eso acá el claro es la
+   base y el oscuro va en html.theme-dark — al revés que en app.html. */
 #bootGate {
   position: fixed;
   inset: 0;
@@ -15,9 +18,14 @@ body:not(.app-ready) > *:not(#bootGate) {
   align-items: center;
   justify-content: center;
   padding: 24px;
+  background: #fff;
+  color: #0f172a;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+html.theme-dark #bootGate {
   background: var(--panel-navy, #0d1230);
   color: var(--text, #edf4ff);
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
 }
 
 .boot-inner {
@@ -35,8 +43,8 @@ body:not(.app-ready) > *:not(#bootGate) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--cyan, #2fd5ff), var(--purple, #8b7bff));
-  color: #07101f;
+  background: linear-gradient(135deg, var(--cyan, #6366f1), var(--purple, #7c3aed));
+  color: #fff;
 }
 
 .boot-mark svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
@@ -46,7 +54,7 @@ body:not(.app-ready) > *:not(#bootGate) {
   height: 30px;
   border-radius: 50%;
   border: 3px solid rgba(127, 140, 180, .25);
-  border-top-color: var(--cyan, #2fd5ff);
+  border-top-color: var(--cyan, #6366f1);
   animation: boot-spin .8s linear infinite;
 }
 
@@ -55,22 +63,30 @@ body:not(.app-ready) > *:not(#bootGate) {
 .boot-text {
   font-size: 14px;
   font-weight: 700;
-  color: var(--muted, #90a0be);
+  color: #64748b;
   letter-spacing: -.01em;
 }
+
+html.theme-dark .boot-text { color: var(--muted, #90a0be); }
 
 /* Tarjetas de error y de conflicto */
 
 .boot-card {
   width: min(460px, 100%);
-  background: var(--panel-navy, #0d1230);
-  border: 1px solid var(--card-line, rgba(140, 160, 255, .13));
+  background: #fff;
+  border: 1px solid #e2e8f0;
   border-radius: 20px;
-  box-shadow: var(--shadow, 0 10px 26px rgba(0, 0, 0, .2));
+  box-shadow: 0 2px 8px rgba(15, 23, 42, .06), 0 18px 40px rgba(15, 23, 42, .10);
   padding: 22px;
   text-align: left;
   display: grid;
   gap: 12px;
+}
+
+html.theme-dark .boot-card {
+  background: var(--panel-navy, #0d1230);
+  border-color: var(--card-line, rgba(140, 160, 255, .13));
+  box-shadow: var(--shadow, 0 10px 26px rgba(0, 0, 0, .2));
 }
 
 .boot-card-wide { width: min(680px, 100%); }
@@ -83,17 +99,20 @@ body:not(.app-ready) > *:not(#bootGate) {
 
 .boot-card-text {
   margin: 0;
-  color: var(--muted, #90a0be);
+  color: #64748b;
   font-size: 13.5px;
   line-height: 1.55;
 }
 
 .boot-card-hint {
   margin: 0;
-  color: var(--muted-3, rgba(144, 160, 190, .62));
+  color: #94a3b8;
   font-size: 12px;
   line-height: 1.5;
 }
+
+html.theme-dark .boot-card-text { color: var(--muted, #90a0be); }
+html.theme-dark .boot-card-hint { color: var(--muted-3, rgba(144, 160, 190, .62)); }
 
 .boot-card-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 
@@ -103,30 +122,36 @@ body:not(.app-ready) > *:not(#bootGate) {
   gap: 10px;
 }
 
+/* color: inherit y no var(--text): sin clase de tema, --text es el casi-blanco
+   del modo oscuro y el texto desaparecía sobre la tarjeta blanca. */
 .boot-choice {
   display: grid;
   gap: 5px;
   text-align: left;
   padding: 15px 16px;
   border-radius: 16px;
-  border: 1.5px solid var(--line-2, rgba(90, 105, 150, .26));
+  border: 1.5px solid #cbd5e1;
   background: transparent;
-  color: var(--text, #edf4ff);
+  color: inherit;
   cursor: pointer;
   transition: border-color .14s ease, background .14s ease, transform .14s ease;
 }
 
+html.theme-dark .boot-choice { border-color: var(--line-2, rgba(90, 105, 150, .26)); }
+
 .boot-choice:hover,
 .boot-choice:focus-visible {
-  border-color: rgba(var(--cyan-rgb, 47, 213, 255), .55);
-  background: rgba(var(--cyan-rgb, 47, 213, 255), .08);
+  border-color: rgba(var(--cyan-rgb, 99, 102, 241), .55);
+  background: rgba(var(--cyan-rgb, 99, 102, 241), .08);
   transform: translateY(-1px);
   outline: none;
 }
 
 .boot-choice-label { font-weight: 900; font-size: 14px; }
-.boot-choice-sub { font-size: 12.5px; color: var(--text, #edf4ff); opacity: .85; }
-.boot-choice-note { font-size: 11.5px; color: var(--muted-3, rgba(144, 160, 190, .62)); }
+.boot-choice-sub { font-size: 12.5px; color: inherit; opacity: .85; }
+.boot-choice-note { font-size: 11.5px; color: #94a3b8; }
+
+html.theme-dark .boot-choice-note { color: var(--muted-3, rgba(144, 160, 190, .62)); }
 
 @media (max-width: 620px) {
   .boot-choice-grid { grid-template-columns: 1fr; }
@@ -223,4 +248,30 @@ body:not(.app-ready) > *:not(#bootGate) {
   background: rgba(var(--bad-rgb, 255, 107, 114), .12);
   border-color: rgba(var(--bad-rgb, 255, 107, 114), .4);
   color: var(--bad, #ff6b72);
+}
+
+/* ===================================================================
+   Tema claro de la app
+   app.html no remapea --panel-navy en claro: lo reemplaza regla por regla
+   (html.theme-light .hero, .modal-card, .toast...). Todo lo que quedó fuera
+   de esa lista se seguía pintando azul con texto oscuro encima: el banner de
+   conflicto, el de audio bloqueado y la pastilla de fecha de Finanzas.
+   Remapear el token una sola vez los cubre a todos; los elementos que ya
+   tienen su propia regla de claro no cambian, porque esa regla sigue ganando.
+   =================================================================== */
+
+html.theme-light {
+  --panel-navy: #ffffff;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not(.theme-dark) { --panel-navy: #ffffff; }
+}
+
+html.theme-light .storage-conflict-banner {
+  box-shadow: var(--shadow-raised, 0 2px 8px rgba(15, 23, 42, .08));
+}
+
+html.theme-light .storage-conflict-dismiss-btn {
+  background: var(--btn-secondary-bg, #f1f5f9);
 }

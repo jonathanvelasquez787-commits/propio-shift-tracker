@@ -3,11 +3,12 @@
    archivos hoy, pero un solo lenguaje visual.
 
    El default ES EL CLARO. La app arranca en claro (ver applyLightThemeDefault
-   en js/sync.js) y la landing es clara siempre, así que tener el oscuro como
+   en js/sync.js) y las páginas públicas también, así que tener el oscuro como
    base obligaba a revertirlo en cada regla. El oscuro sigue disponible: se
-   activa solo cuando el usuario lo eligió en la app y algo pone .theme-dark en
-   el <html>. No se usa @media (prefers-color-scheme): la landing no debe
-   cambiar de color según cómo tenga configurado el sistema quien la visita. */
+   activa solo cuando el usuario lo eligió en la app y la propia página pone
+   .theme-dark en el <html> antes de pintar. No se usa
+   @media (prefers-color-scheme): la landing no debe cambiar de color según
+   cómo tenga configurado el sistema quien la visita. */
 
 :root {
   color-scheme: light;
@@ -153,6 +154,32 @@ a { color: var(--accent); }
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* Correcciones de tema oscuro de las páginas públicas.
+   Son 4 componentes compartidos por landing.css y legal.css que tenían un
+   color fijo pensado solo para fondo claro; viven acá porque los tres HTML
+   públicos ya cargan este archivo y ninguno de los otros dos. */
+
+/* El botón sólido usa var(--text) de fondo, que en oscuro es casi blanco: el
+   #fff fijo del texto desaparecía. */
+html.theme-dark .header-cta,
+html.theme-dark .header-cta:hover,
+html.theme-dark .topbar .link-btn.primary,
+html.theme-dark .topbar .link-btn.primary:hover {
+  color: var(--bg) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .4);
+}
+
+html.theme-dark .header-cta:hover,
+html.theme-dark .topbar .link-btn.primary:hover {
+  filter: brightness(.9);
+}
+
+/* Verde de fondo claro (#15803d) sobre panel oscuro: ilegible. */
+html.theme-dark .form-msg.ok,
+html.theme-dark .pill {
+  color: var(--good);
 }
 
 /* Un solo lugar para apagar TODO el movimiento. La landing se apoya bastante en
