@@ -1,5 +1,5 @@
 /* Landing pública y panel de entrada.
-   Modo claro siempre (ver la nota de tokens.css). */
+   Modo claro por defecto; el oscuro entra con html.theme-dark (ver tokens.css). */
 
 /* ===================================================================
    1. Estructura base
@@ -147,6 +147,36 @@ section { position: relative; }
   filter: brightness(1.25);
   box-shadow: 0 8px 22px rgba(15, 23, 42, .22);
 }
+
+/* Interruptor claro/oscuro. Es un <button>, no un <a>, así que la regla que
+   esconde el nav en pantallas angostas no lo toca: se ve siempre. */
+.theme-toggle {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  margin-right: 4px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--muted);
+  cursor: pointer;
+  transition: color .16s ease, background .16s ease, border-color .16s ease;
+}
+
+.theme-toggle:hover,
+.theme-toggle:focus-visible {
+  color: var(--text);
+  background: var(--bg-soft);
+  border-color: var(--line-2);
+  outline: none;
+}
+
+.theme-toggle .ic-svg { width: 17px; height: 17px; }
+.theme-toggle .ic-sun { display: none; }
+html.theme-dark .theme-toggle .ic-sun { display: block; }
+html.theme-dark .theme-toggle .ic-moon { display: none; }
 
 /* ===================================================================
    3. Hero
@@ -451,6 +481,44 @@ section { position: relative; }
   box-shadow: 0 0 0 40px var(--panel) inset;
 }
 
+/* Contraseña con ver/ocultar. El wrapper existe solo para poder posicionar el
+   botón dentro del campo; el padding derecho reserva su espacio. */
+.field-input-wrap { position: relative; }
+.field-input-wrap input { padding-right: 46px; }
+
+.reveal-btn {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--muted-3);
+  cursor: pointer;
+  transition: color .16s ease, background .16s ease;
+}
+
+.reveal-btn:hover { color: var(--muted); background: var(--bg-soft); }
+
+.reveal-btn:focus-visible {
+  outline: none;
+  color: var(--accent);
+  background: var(--bg-soft);
+}
+
+.reveal-btn[aria-pressed='true'] { color: var(--accent); }
+
+.reveal-btn .ic-svg { width: 18px; height: 18px; }
+.reveal-btn .ic-eye-off { display: none; }
+.reveal-btn[aria-pressed='true'] .ic-eye { display: none; }
+.reveal-btn[aria-pressed='true'] .ic-eye-off { display: block; }
+
 .field-hint {
   font-size: 12px;
   color: var(--muted-3);
@@ -724,7 +792,7 @@ section { position: relative; }
 }
 
 .pcard-label { font-size: 10.5px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--muted-3); }
-.pcard-value { font-size: 19px; font-weight: 900; letter-spacing: -.025em; margin-top: 3px; }
+.pcard-value { font-size: 19px; font-weight: 900; letter-spacing: -.025em; margin-top: 3px; font-variant-numeric: tabular-nums; }
 .pcard-sub   { font-size: 11px; color: var(--muted); margin-top: 1px; }
 
 .ptrack {
@@ -818,7 +886,7 @@ section { position: relative; }
 .prow-main { flex: 1 1 auto; min-width: 0; }
 .prow-title { font-size: 12.5px; font-weight: 800; }
 .prow-sub { font-size: 10.5px; color: var(--muted); margin-top: 1px; }
-.prow-amt { font-size: 12.5px; font-weight: 900; color: var(--good); }
+.prow-amt { font-size: 12.5px; font-weight: 900; color: var(--good); font-variant-numeric: tabular-nums; }
 
 /* ===================================================================
    6. Funciones

@@ -1,6 +1,12 @@
-/* Envoltorio de sesión alrededor de la app.
-   Usa los mismos tokens que ya define app.html en :root — lo único propio es
-   el remapeo de --panel-navy para el tema claro (ver la última sección). */
+/* Envoltorio de sesión alrededor de la app + afinado del tema claro.
+   Usa los mismos tokens que ya define app.html en :root.
+
+   Cómo gana la cascada sin tocar app.html: ese archivo declara su tema claro
+   dos veces, `html.theme-light X` y `:root:not(.theme-dark) X` dentro de
+   @media (prefers-color-scheme: light). Todo lo de abajo va bajo
+   `:root.theme-light X`, que le gana a la primera por especificidad y a la
+   segunda por orden (este archivo carga después del <style>). El modo oscuro
+   no se toca en ninguna regla. */
 
 /* Mientras la app no está montada, lo único visible es el gate. */
 body:not(.app-ready) > *:not(#bootGate) {
@@ -18,7 +24,7 @@ body:not(.app-ready) > *:not(#bootGate) {
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: #fff;
+  background: #f8fafc;
   color: #0f172a;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
 }
@@ -251,27 +257,253 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, rgba(144, 160, 190, .6
 }
 
 /* ===================================================================
-   Tema claro de la app
-   app.html no remapea --panel-navy en claro: lo reemplaza regla por regla
-   (html.theme-light .hero, .modal-card, .toast...). Todo lo que quedó fuera
-   de esa lista se seguía pintando azul con texto oscuro encima: el banner de
-   conflicto, el de audio bloqueado y la pastilla de fecha de Finanzas.
-   Remapear el token una sola vez los cubre a todos; los elementos que ya
-   tienen su propia regla de claro no cambian, porque esa regla sigue ganando.
+   1. Tema claro — tokens
+   app.html no remapea --panel-navy en claro: lo reemplaza regla por regla, y
+   todo lo que quedó fuera de esa lista se seguía pintando azul. Remapearlo
+   acá cubre esos casos y cualquiera futuro.
+   Los dos --surface-* son nuevos: en oscuro casi todos los fondos "hundidos"
+   son rgba(255,255,255,.03..09), que sobre blanco no existen.
    =================================================================== */
 
-html.theme-light {
+:root.theme-light {
   --panel-navy: #ffffff;
+  --bg-page: #f8fafc;
+  --bg-card: #ffffff;
+  --border-light: #e2e8f0;
+  --line-2: #cbd5e1;
+
+  --surface-sunken: #f8fafc;
+  --surface-control: #f1f5f9;
+
+  --shadow: 0 1px 2px rgba(15, 23, 42, .04), 0 4px 16px rgba(15, 23, 42, .06);
+  --shadow-raised: 0 2px 4px rgba(15, 23, 42, .05), 0 12px 28px rgba(15, 23, 42, .09);
+  --shadow-active: 0 2px 6px rgba(99, 102, 241, .14), 0 12px 28px rgba(99, 102, 241, .18);
 }
 
+/* Respaldo para el caso sin clase de tema (app abierta sin boot.js, que es lo
+   que hacen las pruebas). Solo tokens: las reglas de abajo no hacen falta ahí
+   porque en producción boot.js siempre deja la clase puesta. */
 @media (prefers-color-scheme: light) {
-  :root:not(.theme-dark) { --panel-navy: #ffffff; }
+  :root:not(.theme-dark) {
+    --panel-navy: #ffffff;
+    --bg-page: #f8fafc;
+    --surface-sunken: #f8fafc;
+    --surface-control: #f1f5f9;
+  }
 }
 
-html.theme-light .storage-conflict-banner {
-  box-shadow: var(--shadow-raised, 0 2px 8px rgba(15, 23, 42, .08));
+/* ===================================================================
+   2. Tema claro — superficies
+   =================================================================== */
+
+/* app.html apaga el borde de las tarjetas en claro (border-color: transparent).
+   Sin borde y sobre fondo blanco la tarjeta no se lee como tarjeta; con el
+   fondo de página gris + borde + sombra sí. */
+:root.theme-light .hero,
+:root.theme-light .card,
+:root.theme-light .mini,
+:root.theme-light .table-card,
+:root.theme-light .list-card,
+:root.theme-light .accordion-card {
+  border-color: var(--card-line);
+  box-shadow: var(--shadow);
 }
 
-html.theme-light .storage-conflict-dismiss-btn {
-  background: var(--btn-secondary-bg, #f1f5f9);
+:root.theme-light .modal-overlay { background: rgba(15, 23, 42, .45); }
+
+:root.theme-light .modal-card {
+  box-shadow: 0 10px 20px rgba(15, 23, 42, .08), 0 30px 70px rgba(15, 23, 42, .18);
+}
+
+:root.theme-light .toast,
+:root.theme-light .storage-conflict-banner {
+  box-shadow: var(--shadow-raised);
+}
+
+:root.theme-light .sched-help-tooltip {
+  box-shadow: var(--shadow-raised);
+  border-color: var(--line-2);
+}
+
+/* Fondos hundidos que en claro desaparecían. */
+:root.theme-light .chip,
+:root.theme-light .summary-pill,
+:root.theme-light .field,
+:root.theme-light .msg-preview-box,
+:root.theme-light .gap-row,
+:root.theme-light .block-row,
+:root.theme-light .sched-day-card,
+:root.theme-light .sched-compact-card,
+:root.theme-light .fin-preview,
+:root.theme-light .rate-tile,
+:root.theme-light .sblk-collapse-toggle,
+:root.theme-light .hr-live-card,
+:root.theme-light .hr-past-toggle,
+:root.theme-light .calls-status-card:not(.live),
+:root.theme-light .slot-status:not(.good):not(.warn):not(.bad),
+:root.theme-light .tag:not(.good):not(.warn):not(.bad) {
+  background: var(--surface-sunken);
+}
+
+/* Controles: un gris un punto más marcado que las superficies. */
+:root.theme-light .sched-offset-stepper,
+:root.theme-light .sched-segmented,
+:root.theme-light .table-filter-row,
+:root.theme-light .earnings-mode-toggle,
+:root.theme-light .blocks-view-toggle,
+:root.theme-light .fin-tab-toggle,
+:root.theme-light .mc-pill-row,
+:root.theme-light .hr-window-tier-row,
+:root.theme-light .accordion-chevron,
+:root.theme-light .tbl-icon-btn,
+:root.theme-light .wk-row-edit,
+:root.theme-light .fin-priority-btn,
+:root.theme-light .fin-priority-num,
+:root.theme-light .fin-ghost-btn,
+:root.theme-light .fin-mini-input,
+:root.theme-light .emoji-option,
+:root.theme-light .day-tab,
+:root.theme-light .week-nav button,
+:root.theme-light .modal-actions button,
+:root.theme-light .button-row button,
+:root.theme-light .import-actions button,
+:root.theme-light .sidebar-icon-btn,
+:root.theme-light .sidebar-progress-card,
+:root.theme-light .goals-emoji-toggle-btn,
+:root.theme-light .cal-nav-track {
+  background: var(--surface-control);
+}
+
+/* Rieles de progreso: el rgba blanco quedaba invisible, así que la barra se
+   veía flotando sin canal. */
+:root.theme-light .progress,
+:root.theme-light .sblk-bar-track,
+:root.theme-light .sblk-diagnostic-track,
+:root.theme-light .rpt-goal-bar,
+:root.theme-light .fin-progress-track,
+:root.theme-light .fin-preview-bar,
+:root.theme-light .hero-today-track,
+:root.theme-light .block-summary-card .bsc-progress-track,
+:root.theme-light .mini-cell {
+  background: var(--line);
+}
+
+/* Hover gris uniforme donde antes había un rgba blanco invisible. */
+:root.theme-light .sidebar-link:hover,
+:root.theme-light .sidebar-icon-btn:hover,
+:root.theme-light .sidebar-progress-card:hover,
+:root.theme-light .tbl-icon-btn:hover,
+:root.theme-light .wk-row-edit:hover,
+:root.theme-light .fin-priority-btn:hover,
+:root.theme-light .settings-menu-btn:hover,
+:root.theme-light .cal-nav-arrow:hover,
+:root.theme-light .cal-nav-today-btn:hover,
+:root.theme-light .wk-row:not(.is-today):hover {
+  background: var(--surface-control);
+}
+
+/* ===================================================================
+   3. Tema claro — un solo acento
+   El modo claro arrastraba un #4a90e2 suelto (un azul que no es de la paleta)
+   en casi todos los hover. Acá pasan todos al índigo de la app.
+   =================================================================== */
+
+:root.theme-light .hero-action-btn:not(.danger):hover,
+:root.theme-light .hero-action-btn:not(.danger):focus-visible,
+:root.theme-light .gap-edit-btn:hover,
+:root.theme-light .day-nav-btn:hover,
+:root.theme-light .day-nav-btn:focus-visible,
+:root.theme-light .week-nav button:hover,
+:root.theme-light #weekSummaryAccordion .week-nav button:hover,
+:root.theme-light #earningsAccordion .week-nav button:hover,
+:root.theme-light .modal-close:hover,
+:root.theme-light .button-row button:hover,
+:root.theme-light .import-actions button:hover,
+:root.theme-light .footer-tools button:hover,
+:root.theme-light .modal-actions button:hover {
+  background: var(--accent-decorative);
+  border-color: var(--accent-decorative);
+  color: #fff;
+}
+
+:root.theme-light .rate-tile:hover,
+:root.theme-light .rate-tile:focus-visible,
+:root.theme-light .rate-tile.selected,
+:root.theme-light .emoji-option:hover,
+:root.theme-light .emoji-option.selected {
+  background: var(--accent-decorative);
+  border-color: var(--accent-decorative);
+}
+
+/* Los 6 botones grandes de acción quedaban transparentes con borde gris; con
+   un tinte de su propio acento se leen como tarjetas de acción. */
+:root.theme-light .action-btn:not(.is-active) {
+  background: rgba(var(--accent-rgb), .07);
+  border-color: rgba(var(--accent-rgb), .3);
+}
+
+:root.theme-light .storage-conflict-dismiss-btn {
+  background: var(--surface-control);
+}
+
+/* ===================================================================
+   4. Tema claro — tipografía de datos
+   =================================================================== */
+
+/* #94A3B8 sobre blanco queda por debajo del mínimo legible para texto
+   corrido; el subtítulo de cada sección pasa al gris de cuerpo. */
+:root.theme-light .accordion-head p,
+:root.theme-light .section-title p {
+  color: var(--muted);
+}
+
+:root.theme-light .accordion-head h2,
+:root.theme-light .section-title h2 {
+  font-weight: 900;
+  letter-spacing: -.03em;
+}
+
+/* Etiquetas que acompañan a un número y hoy se veían como texto suelto,
+   alineadas con las que ya eran mayúsculas (Disponible, Próximo pago...). */
+:root.theme-light .gh-ring-label,
+:root.theme-light .hero-fig-label,
+:root.theme-light .wk-total-metric-label,
+:root.theme-light .fin-preview-amt-label,
+:root.theme-light .month-card-amt-label,
+:root.theme-light .gh-goal-subitem .gp-label,
+:root.theme-light .gh-goal-foot .gp-label {
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--muted-3);
+}
+
+/* Cifras de ancho fijo: sin esto el reloj y los contadores bailan cada
+   segundo, porque las cifras proporcionales de Inter no miden igual. */
+:root.theme-light .clock,
+:root.theme-light .earnings-big,
+:root.theme-light .gh-ring-value,
+:root.theme-light .hero-fig-value,
+:root.theme-light .sidebar-progress-ring span,
+:root.theme-light .action-sub,
+:root.theme-light .live-bar-timer,
+:root.theme-light .calls-status-timer,
+:root.theme-light .sblk-bar-label-row strong,
+:root.theme-light .rpt-cycle-amt,
+:root.theme-light .rpt-streak-num,
+:root.theme-light .cal-year-total-amt,
+:root.theme-light .cal-day-min,
+:root.theme-light .cal-day-amt,
+:root.theme-light .month-card-amt,
+:root.theme-light .wk-row-amount,
+:root.theme-light .wk-total-metric strong,
+:root.theme-light .tbl-row-amount,
+:root.theme-light .tbl-row-time,
+:root.theme-light .fin-available-amt,
+:root.theme-light .fin-row-right-val,
+:root.theme-light .fin-preview-amt,
+:root.theme-light .pd-next-date,
+:root.theme-light .pd-next-days {
+  font-variant-numeric: tabular-nums;
 }
