@@ -127,6 +127,37 @@ export function describeSnapshot(snap) {
   return parts.join(' · ');
 }
 
+// Postgres guarda jsonb con las claves reordenadas, así que un JSON.stringify
+// directo nunca coincide con el del navegador aunque el dato sea el mismo.
+function stableJson(value) {
+  return JSON.stringify(sortKeys(value));
+}
+
+function sortKeys(value) {
+  if (Array.isArray(value)) return value.map(sortKeys);
+  if (value && typeof value === 'object') {
+    return Object.keys(value)
+      .sort()
+      .reduce((acc, key) => {
+        acc[key] = sortKeys(value[key]);
+        return acc;
+      }, {});
+  }
+  return value;
+}
+
+export function sameSnapshot(a, b) {
+  try {
+    return (
+      stableJson((a && a.state) ?? {}) === stableJson((b && b.state) ?? {}) &&
+      stableJson((a && a.calls) ?? []) === stableJson((b && b.calls) ?? []) &&
+      stableJson((a && a.settings) ?? {}) === stableJson((b && b.settings) ?? {})
+    );
+  } catch {
+    return false;
+  }
+}
+
 // Escribe sin marcar "sucio": lo usa la hidratación desde la nube, que por
 // definición ya está sincronizada.
 export function writeLocalSnapshot(snapshot) {
@@ -204,7 +235,7 @@ export function clearLocalAppData() {
 export async function fetchCloud(userId) {
   const { data, error } = await getSupabase()
     .from('user_data')
-    .select('state, calls, settings, updated_at, device_label, schema_version')
+    .select('state, calls, settings, updated_at, device_id, device_label, schema_version')
     .eq('user_id', userId)
     .maybeSingle();
   if (error) throw error;
@@ -250,6 +281,9 @@ export async function pushSnapshot({ force = false } = {}) {
 // Último intento al cerrar la pestaña. `keepalive` permite que el navegador
 // termine la petición aunque la página ya se esté yendo; sendBeacon no sirve
 // acá porque no deja mandar la cabecera Authorization.
+//
+// Ojo: si esta subida llega, la pestaña ya no vive para anotar el updated_at
+// nuevo. Esa desincronización la resuelve resolveBoot(), no acá.
 function flushOnExit() {
   const meta = readMeta();
   if (!meta.dirty) return;
@@ -395,6 +429,22 @@ export async function resolveBoot(userId) {
     // La nube cambió en otro lado y acá no hay nada sin subir: bajar es
     // seguro, no se pierde nada.
     return { action: BOOT.USE_CLOUD, cloud };
+  }
+
+  // Desde acá hay divergencia APARENTE. Dos casos no son un conflicto real y
+  // no deben preguntarle nada al usuario:
+
+  // 1. Los dos lados tienen exactamente el mismo dato. Pasa cada vez que la
+  //    subida de cierre de pestaña llega al servidor: la marca local queda
+  //    vieja aunque el contenido sea idéntico.
+  if (sameSnapshot(readLocalSnapshot(), cloud)) {
+    return { action: BOOT.USE_CLOUD, cloud };
+  }
+
+  // 2. La versión de la nube la subió ESTE mismo navegador. Lo local es esa
+  //    misma versión más lo que se haya editado después, nunca menos.
+  if (cloud.device_id && cloud.device_id === deviceId()) {
+    return { action: BOOT.USE_LOCAL, cloud };
   }
 
   return {

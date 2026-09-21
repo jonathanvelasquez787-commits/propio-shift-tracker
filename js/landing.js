@@ -37,10 +37,34 @@ const sessionCard = $('sessionCard');
 // usuario estaba entrando para no dejarlo mirando la landing al regresar.
 const PENDING_KEY = 'ps_auth_pending';
 const hadAuthParams = /[?#].*(code=|access_token=|error=|error_code=)/.test(window.location.href);
-let recoveryMode = new URLSearchParams(window.location.search).has('recuperar');
+const params = new URLSearchParams(window.location.search);
+let recoveryMode = params.has('recuperar');
+
+// Con la sesión abierta esta página no tiene nada que ofrecer: se entra
+// directo. `?quedarse=1` la deja ver a propósito.
+const stayOnLanding = params.has('quedarse');
+const AUTO_ENTER_KEY = 'ps_auto_enter_at';
+const AUTO_ENTER_GUARD_MS = 10000;
+
+function bouncedBackFromApp() {
+  const last = Number(sessionStorage.getItem(AUTO_ENTER_KEY) || 0);
+  return Boolean(last) && Date.now() - last < AUTO_ENTER_GUARD_MS;
+}
+
+// La marca de tiempo es el freno: si la app devuelve acá enseguida (sesión que
+// no pudo abrirse), la segunda vez ya no se redirige y se muestra la tarjeta,
+// en vez de quedar rebotando entre las dos páginas.
+function enterApp() {
+  try {
+    sessionStorage.setItem(AUTO_ENTER_KEY, String(Date.now()));
+  } catch {
+    /* sin sessionStorage se pierde el freno, no la entrada */
+  }
+  window.location.replace(nextUrl());
+}
 
 function nextUrl() {
-  const next = new URLSearchParams(window.location.search).get('next');
+  const next = params.get('next');
   // Solo rutas internas: un `next` con http(s) sería un redirect abierto.
   if (next && next.startsWith('/') && !next.startsWith('//')) return next;
   return '/app.html';
@@ -125,6 +149,14 @@ function showSessionCard(profile, user) {
   $('sessionHandle').textContent = handle;
   sessionCard.classList.add('show');
   authForms.style.display = 'none';
+  // .auth-head queda visible: es el único lugar donde se puede explicar algo
+  // con los formularios ocultos.
+  if (titleEl) titleEl.textContent = 'Tu cuenta';
+  if (subEl) {
+    subEl.textContent = bouncedBackFromApp()
+      ? 'La app no pudo abrirse con esta sesión. Prueba de nuevo, o cierra sesión y vuelve a entrar.'
+      : 'Ya tienes la sesión abierta en este navegador.';
+  }
   const topBtn = $('topEnterBtn');
   if (topBtn) {
     topBtn.textContent = 'Abrir la app';
@@ -149,7 +181,6 @@ async function init() {
   }
 
   // Google puede volver con un error explícito en la URL.
-  const params = new URLSearchParams(window.location.search);
   if (params.get('error') || params.get('error_code')) {
     showMessage(
       params.get('error_description') || 'No se pudo completar la entrada con Google. Intenta de nuevo.',
@@ -167,7 +198,7 @@ async function init() {
     if (event === 'SIGNED_IN' && session && !recoveryMode) {
       if (sessionStorage.getItem(PENDING_KEY) || hadAuthParams) {
         sessionStorage.removeItem(PENDING_KEY);
-        window.location.replace(nextUrl());
+        enterApp();
       }
     }
   });
@@ -190,9 +221,11 @@ async function init() {
     return;
   }
 
-  if (sessionStorage.getItem(PENDING_KEY) || hadAuthParams) {
-    sessionStorage.removeItem(PENDING_KEY);
-    window.location.replace(nextUrl());
+  sessionStorage.removeItem(PENDING_KEY);
+
+  if (!stayOnLanding && !bouncedBackFromApp()) {
+    showMessage('Ya tienes la sesión abierta — entrando…', 'info');
+    enterApp();
     return;
   }
 
@@ -242,7 +275,8 @@ forms.login?.addEventListener('submit', async (e) => {
   try {
     sessionStorage.setItem(PENDING_KEY, '1');
     await signInWithIdentifier(identifier, password);
-    window.location.replace(nextUrl());
+    sessionStorage.removeItem(PENDING_KEY);
+    enterApp();
   } catch (err) {
     sessionStorage.removeItem(PENDING_KEY);
     showMessage(authErrorMessage(err), 'error');
@@ -271,7 +305,8 @@ forms.signup?.addEventListener('submit', async (e) => {
       );
       return;
     }
-    window.location.replace(nextUrl());
+    sessionStorage.removeItem(PENDING_KEY);
+    enterApp();
   } catch (err) {
     sessionStorage.removeItem(PENDING_KEY);
     showMessage(authErrorMessage(err), 'error');
@@ -306,7 +341,7 @@ forms.reset?.addEventListener('submit', async (e) => {
     await updatePassword($('resetPassword').value);
     recoveryMode = false;
     showMessage('Listo, contraseña actualizada. Entrando…', 'ok');
-    setTimeout(() => window.location.replace(nextUrl()), 900);
+    setTimeout(enterApp, 900);
   } catch (err) {
     showMessage(authErrorMessage(err), 'error');
     setBusy(btn, false);
@@ -315,7 +350,14 @@ forms.reset?.addEventListener('submit', async (e) => {
 
 $('signOutBtn')?.addEventListener('click', async () => {
   await signOut();
-  window.location.reload();
+  // Sin esto, volver de cerrar sesión con el freno todavía caliente mostraría
+  // el texto de "no se pudo abrir la app" que no viene al caso.
+  try {
+    sessionStorage.removeItem(AUTO_ENTER_KEY);
+  } catch {
+    /* ignorar */
+  }
+  window.location.replace('/');
 });
 
 // Disponibilidad del username mientras se escribe: mejor enterarse acá que
