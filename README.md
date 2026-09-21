@@ -8,13 +8,6 @@ Esta versión (**v540**) es el salto de "un archivo HTML en localStorage" a
 sigue siendo el mismo archivo, ahora envuelto en una capa de sesión y
 sincronización.
 
-> **¿Primera vez que montas algo así?** Ve a **[EMPEZAR-AQUI.md](EMPEZAR-AQUI.md)**:
-> es la misma puesta en marcha, explicada clic por clic y sin dar nada por
-> sabido.
->
-> **¿Ya has usado Supabase/Vercel antes?** **[SETUP.md](SETUP.md)** es la
-> versión corta.
-
 ---
 
 ## Qué hay aquí
