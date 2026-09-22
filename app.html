@@ -4153,6 +4153,28 @@
       padding: 16px 0 4px;
     }
 
+    /* Fija en la esquina, fuera del flujo del header y del sidebar: mismo panel/borde que las
+       tarjetas, sin lenguaje visual nuevo. env(safe-area-inset-bottom) por el mismo motivo que
+       .live-activity-bar usa el de arriba. */
+    .help-fab {
+      position: fixed;
+      right: 18px;
+      bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+      z-index: 60;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--panel-navy);
+      border: 1px solid var(--card-line);
+      color: var(--cyan);
+      box-shadow: var(--shadow);
+      cursor: pointer;
+    }
+    .help-fab .ic-svg { width: 19px; height: 19px; }
+    .help-fab:hover { border-color: var(--line-2); }
+
     .toast {
       position: fixed;
       left: 50%;
@@ -8172,7 +8194,6 @@
 <div class="brand"><span class="dot-state"></span>Propio Shift Tracker</div>
 </div>
 <div class="hero-top-actions">
-<button class="hero-action-btn hero-action-btn-icon" data-nav-page="help" type="button" title="Ayuda"><span aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2.2-3 4.4"/><line x1="12" y1="17.5" x2="12" y2="17.51"/></svg></span><span class="hero-action-btn-label">Ayuda</span></button>
 <button class="hero-action-btn hero-action-btn-icon" id="avisosHeaderBtn" type="button" title="Avisos"><span aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10 20a2 2 0 0 0 4 0"/></svg></span><span class="hero-action-btn-label">Avisos</span></button>
 <button class="hero-action-btn hero-action-btn-icon" id="higherRateHeaderBtn" type="button" title="Higher Rate"><span aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c2 3-1 4-1 7a3 3 0 1 0 6 0c0-1-.5-2-.5-2 2 1 3 3.5 3 6a7 7 0 1 1-14 0c0-4 2-6 3.5-8 .5 2 1 2.5 3-3Z"/></svg></span><span class="hero-action-btn-label">Higher Rate</span></button>
 <div class="hero-ajustes-reset-group">
@@ -10056,6 +10077,7 @@ $0.72"></textarea>
 </div>
 </div>
 </div>
+<button class="help-fab" data-nav-page="help" type="button" title="Ayuda" aria-label="Ayuda"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2.2-3 4.4"/><line x1="12" y1="17.5" x2="12" y2="17.51"/></svg></button>
 <div class="toast" id="toast" aria-live="polite" role="status"></div>
 <div class="storage-conflict-banner" id="storageConflictBanner" role="alert" aria-live="assertive">
   <span class="storage-conflict-banner-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12" y2="17.01"/></svg></span>

@@ -1,22 +1,25 @@
 **NOTA DE MANTENIMIENTO DE ESTE ARCHIVO (leer antes de editar este .md)**
 
-Este archivo se reescribe en cada versión nueva y NO debe crecer indefinidamente:
-- PENDIENTES: sin límite — se conservan TODOS los bugs/tareas pendientes mientras
-  sigan sin resolver, con el detalle que haga falta para retomarlos sin releer
-  código.
-- ÚLTIMOS FIXES: máximo 3 entradas (las 3 versiones más recientes). Al agregar
-  una versión nueva, se BORRA la más antigua de las 3 (no se compacta a una
-  línea, se elimina por completo).
+Este archivo tiene dos partes:
+
+1. **PROTOCOLOS** (de "ESTILO DE LAYOUT" a "FLUJO DE TRABAJO CON ESTE
+   REPOSITORIO"). Reglas permanentes — casi no cambian, y NO se tocan al
+   cerrar una versión. Solo se editan si el usuario pide explícitamente
+   modificar un protocolo.
+2. **ESTADO DEL PROYECTO** (de "ESTADO DEL ROADMAP" en adelante). Roadmap,
+   pendientes, limitaciones conocidas y el historial de las últimas
+   versiones. Esta parte SÍ se reescribe en cada versión nueva:
+
+- PENDIENTES: sin límite — se conservan TODOS los bugs/tareas pendientes
+  mientras sigan sin resolver, con el detalle que haga falta para
+  retomarlos sin releer código.
+- ÚLTIMOS FIXES: máximo 3 entradas (las 3 versiones más recientes). Al
+  agregar una versión nueva, se BORRA la más antigua de las 3 (no se
+  compacta a una línea, se elimina por completo).
 - RESUELTO / historial viejo: no se conserva.
-- Ejemplos puntuales de excepciones a un protocolo (ver LAYOUT abajo) se
-  mantienen genéricos, sin listar cada versión histórica una por una — si algo
-  ya no aporta como referencia futura, se recorta en la siguiente edición de
-  este archivo. Este recorte lo pidió el usuario explícitamente (v546): "hay
-  muchas cosas en el .md que ya están demás".
-- El protocolo de LAYOUT, el protocolo de COMENTARIOS, el protocolo de
-  DIAGNÓSTICO DE OVERFLOW, el protocolo de MONEDA SECUNDARIA y el FLUJO DE
-  TRABAJO CON ESTE REPOSITORIO de abajo son la excepción: son referencia
-  permanente, se mantienen siempre.
+- Ejemplos puntuales de excepciones a un protocolo se mantienen genéricos,
+  sin listar cada versión histórica una por una — si algo ya no aporta como
+  referencia futura, se recorta en la siguiente edición de este archivo.
 
 ---
 
@@ -27,10 +30,15 @@ Todo rediseño 100% visual de esta app sigue el mismo protocolo:
 1. Mockup VISUAL (no texto/ASCII) de la sección a rediseñar, reutilizando los
    colores/variables reales de la app (`--panel-navy`, `--cyan`, `--line`,
    etc.) para que se vea lo más parecido posible al resultado final.
-2. Dos vistas del mockup: celular y escritorio.
-3. Esperar aprobación explícita del usuario antes de escribir una sola línea
+2. Una sola versión del layout, responsive: NO se arman una vista "celular" y
+   otra "escritorio" por separado. El mismo layout de escritorio tiene que
+   funcionar angostado a ancho de celular — es al CSS del mockup al que le
+   toca demostrar eso, no a un segundo diseño aparte.
+3. El mockup se presenta en modo claro Y modo oscuro (misma composición, las
+   dos paletas) — nunca uno solo de los dos temas.
+4. Esperar aprobación explícita del usuario antes de escribir una sola línea
    de HTML/CSS.
-4. CERO cambios funcionales: mismos ids, mismos listeners, mismo JS — el
+5. CERO cambios funcionales: mismos ids, mismos listeners, mismo JS — el
    rediseño es solo HTML/CSS que envuelve lo mismo de siempre.
 
 EXCEPCIONES que NO exigen repetir el protocolo (aunque si incluyen un mockup,
@@ -46,9 +54,9 @@ ese mockup igual debe ser visual y aprobado antes de tocar código):
   en otro lado (ej. un nuevo bloque que copia 1:1 `.fin-preview` con otro id).
 - Ajustes mínimos de HTML/atributos o de estado visual (opacidad/badge) que
   reutilizan 100% patrones ya existentes, sin lenguaje visual nuevo.
-- Cuando el usuario trae el mockup YA armado y aprobado en el mismo mensaje
-  (las dos vistas), o renuncia explícitamente al mockup para un cambio
-  puntual — vale solo para ese cambio, no cambia el protocolo por defecto.
+- Cuando el usuario trae el mockup YA armado y aprobado en el mismo mensaje,
+  o renuncia explícitamente al mockup para un cambio puntual — vale solo para
+  ese cambio, no cambia el protocolo por defecto.
 - Cambios solo de valores/tokens de color sobre componentes que ya existen
   (ej. cambiar qué variable de color usa un borde), sin lenguaje visual nuevo.
 
@@ -199,6 +207,9 @@ futura opera bajo esto, sin excepción:
 - Si en el futuro se reintroduce alguna prueba automática, es una
   herramienta que Claude corre o interpreta por su cuenta cuando tenga el
   entorno disponible — nunca un paso manual del usuario.
+- Este archivo (`instrucciones.md`) sigue la misma regla: cuando haga falta
+  editarlo, Claude entrega el .md completo, nunca una lista de cambios para
+  pegar a mano — salvo que el usuario pida explícitamente solo eso.
 
 ---
 
@@ -268,7 +279,11 @@ Pendientes, en orden:
   `css/app-shell.css` redefine tokens y reglas bajo `:root.theme-light`/
   `:root.theme-dark` porque `app.html` no remapea sus colores en su fuente.
   Funciona y es estable, pero el lugar correcto es el bloque de tokens de
-  cada tema — se unifica en la Fase 3.
+  cada tema — se unifica en la Fase 3. El sidebar de navegación (`.sidebar-
+  link`, `.sidebar-link-icon`) sigue el mismo patrón: el acento único se
+  define dos veces dentro de `app.html` (bloque `@media (prefers-color-
+  scheme: light)` y bloque `html.theme-light`) — es la misma duplicación a
+  propósito, no un descuido.
 - **La landing ya no se puede ver con la sesión abierta.** Entrar a `/` con
   sesión redirige a `/app.html`. Para verla igual: `/?quedarse=1`.
 - **Sin Content-Security-Policy.** No se puede poner sin romper los
@@ -313,7 +328,10 @@ Pendientes, en orden:
   HTML (protegidos por `if (el)`, inofensivos salvo el costo de recalcular
   cada segundo); un `Set` de fechas futuras en `renderHigherRateDayStats()`
   que se arma y no se usa; `stats.possiblePauseTotal` calculado y expuesto
-  pero sin ningún render que lo lea.
+  pero sin ningún render que lo lea; en el sidebar, los `<span>` de flecha
+  (`.sidebar-link-arrow`) y punto (`.sidebar-link-dot`) siguen en el HTML de
+  cada link con `display:none` fijo por CSS — se dejaron para no tocar el JS
+  que los togglea, ver v552.
 - Importación: `parseCalls` guarda `pay` tal como viene en el texto pegado,
   sin clampear negativos (a diferencia del editor/modal manual, que sí lo
   hacen) — no se tocó a propósito porque cambiaría `callDedupeKey` y con eso
@@ -337,6 +355,55 @@ Pendientes, en orden:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v553** — El usuario no quiso "Ayuda" en el menú lateral ("no me gusta que
+esté en el menú") ni el badge "NUEVO" del link. Primer intento (botón de
+ícono sumado al grupo de acciones del header, junto a Avisos/Higher
+Rate/Ajustes/Reiniciar) fue rechazado ("no me gustó para nada dónde lo
+pusiste, ponlo en otro lado que no estorbe"), y el usuario señaló además que
+no se había seguido el protocolo de LAYOUT (mockup antes de tocar código).
+Se armó un mockup visual y se aprobó un botón flotante fijo en la esquina
+inferior derecha. El usuario también señaló que el mockup en sí no había
+reutilizado las variables/clases reales de la app (se había armado con hex
+aproximados e íconos de emoji) — no se repitió el mockup porque el cambio ya
+caía en la excepción de "reutiliza 100% un patrón existente", pero motivó
+las 2 reglas nuevas del protocolo de LAYOUT de arriba (una sola versión
+responsive, sin vista mobile aparte; y modo claro + oscuro).
+
+- `app.html`: sidebar pierde el link `data-page="help"` y su
+  `.sidebar-link-badge-new` (CSS del badge, ya sin uso, removido). Nuevo
+  `.help-fab`: botón circular fijo (`position:fixed`, esquina inferior
+  derecha, con `env(safe-area-inset-bottom)`), mismos `--panel-navy`/
+  `--card-line`/`--shadow` que ya usan `.toast`/`.storage-conflict-banner`,
+  ícono en `--cyan` (se remapea solo a `--primary` en tema claro, sin CSS de
+  tema nuevo). Navega con `data-nav-page="help"` — reutiliza el listener
+  delegado que ya existía para "Ver Finanzas →", sin JS nuevo;
+  `navigateToPage` no cambia (`'help'` ya estaba en la lista de páginas
+  válidas). Cae en la excepción de LAYOUT "ajustes mínimos que reutilizan
+  100% patrones ya existentes". Entregado completo y editado.
+
+**v552** — El usuario pidió que el sidebar real de la app se vea como el
+mockup de "vista previa" que ya existía en la landing (mandó dos capturas,
+claro y oscuro, del `.preview-nav`/`.preview-side` de `landing.css`): un solo
+acento por link en vez de un color distinto por página, sin borde ni
+flecha/punto en el activo. Al traer el mockup ya armado y aprobado en el
+mismo mensaje, no hizo falta repetir el protocolo de LAYOUT completo
+(excepción explícita).
+
+- `app.html`: `.sidebar-link.active` deja de llevar `border-color` propio —
+  el fondo tenue + el color de texto en el acento alcanzan. `.sidebar-link-
+  icon` pasa a fijar un solo `--icon-rgb` (`--cyan-rgb` en oscuro,
+  `--accent-blue-2-rgb` en claro — los mismos hex que ya usa el acento de la
+  landing, `#2fd5ff` y `#6366F1`), en los dos bloques duplicados de tema
+  (`@media (prefers-color-scheme: light)` y `html.theme-light`), en vez de
+  las clases `.sidebar-link-icon-home`/`-schedule`/`-reports` (colores por
+  página) y los `style` inline de Fechas de pago/Calendario/Finanzas/Ayuda
+  (rosa/morado/verde azulado/naranja), todos removidos. `.sidebar-link-arrow`
+  y `.sidebar-link-dot` pasan a `display:none` fijo — quedan en el HTML sin
+  efecto visual, sin tocar el JS que las togglea (ver LIMITACIONES
+  CONOCIDAS). Cero cambios de HTML funcional más allá de sacar clases/
+  atributos de color ya sin uso — mismos ids, mismo `navigateToPage`.
+  Entregado completo y editado.
+
 **v551** — Página de Ayuda completa dentro de la app, a partir del mockup v2
 (protocolo de LAYOUT completo: página completa —no modal—, responsive solo
 de escritorio a pedido explícito del usuario, con las dos vistas de tema en
@@ -356,56 +423,3 @@ el mismo archivo; aprobado antes de tocar código).
   `initSidebarNav()`. `navigateToPage` suma `'help'` a las páginas válidas;
   `relocateCallsSection` esconde "Llamadas" en esta página (contenido de
   referencia, no de trabajo — no aplica ahí). Entregado completo y editado.
-
-**v550** — El usuario reportó una llamada de las 10:17 AM con bono Silver
-pese a estar fuera del horario de su ventana de Higher Rate (06:30–10:15) —
-apareció justo al cambiarle el nivel a esa ventana de Bronce a Silver, sin
-tocar fecha ni horario. Causa raíz: `retuneFrozenHigherRateTiers` (corre en
-cada guardado del editor, incluido un simple click en el pill de nivel)
-sincronizaba el nivel de CUALQUIER llamada con `frozenHigherRateBonus
-.windowId` igual al de la ventana editada, sin revisar si esa llamada seguía
-calificando por horario contra la ventana tal como está hoy. Esa llamada se
-había congelado antes (la ventana debió tener otro horario en algún momento
-que sí la cubría); el cambio de nivel la "revivió" con el nivel nuevo pese a
-caer 2 min después del fin de la ventana actual.
-
-- `app.html`: `retuneFrozenHigherRateTiers` ahora llama a
-  `callQualifiesForHigherRateWindow(c.startISO, w)` antes de actualizar el
-  nivel de un bono ya congelado — si la llamada ya no encaja en el horario
-  actual de la ventana, el cambio de nivel no la toca y se queda con el nivel
-  que tenía congelado. Cero cambios de HTML/CSS — cae en la excepción de
-  LAYOUT "bugs/ajustes puntuales de JS sin tocar HTML/CSS visible". Entregado
-  completo y editado.
-
-**v549** — El usuario reportó que Bronce y Gold de Higher Rate se ven casi
-iguales en todos los lugares donde aparecen (selector de tarifa en
-llamadas, botones de nivel en ventanas, badge de "Ganancias de hoy",
-estado en vivo, chips de reportes). Causa raíz: en tema claro `--tier-gold`
-era literalmente un alias de `var(--break-orange)`, la misma variable que ya
-usa `--warn` — Bronce (`#C2410C`) y Gold (`#F97316`) terminaban siendo el
-mismo naranja con apenas distinta luminosidad. El `colorRgb` que usan los
-badges/tintes (independiente de tema) tenía el mismo problema en menor
-grado: bronce `205,127,50` y gold `201,162,39` — mismo R, poca diferencia
-de G/B.
-
-- `app.html`: `--tier-gold` en tema claro deja de ser `var(--break-orange)` y
-  pasa a su propio hex `#CA8A04` (dorado/ámbar real, no naranja); `--tier-
-  bronze` en tema claro pasa de `#C2410C` a `#96591F` (bronce más marrón,
-  aleja más su tono del nuevo dorado). Cambio hecho en los DOS bloques que
-  redefinen estas variables en tema claro (el de `@media (prefers-color-
-  scheme: light)` y el de `html.theme-light` — están duplicados a propósito,
-  ver PENDIENTE "Los dos temas se afinan con una capa..."). Tema oscuro
-  (`--tier-bronze: #e0a06b` tostado / `--tier-gold: #ffd76e` amarillo) no se
-  tocó: ya eran razonablemente distintos entre sí. `HIGHER_RATE_TIERS.bronze
-  .colorRgb` pasa a `181,101,29` y `.gold.colorRgb` a `234,179,8` — más
-  separados en matiz/saturación, se usan en el badge de "Ganancias de hoy",
-  el borde del estado de llamada en vivo, los chips de Reportes y el acento
-  de la ventana dominante. `--warn` sigue apuntando a `--break-orange` sin
-  cambios — solo se desacopló `--tier-gold` de esa variable compartida.
-  `.hr-window-card[data-tier]` (tarjetas de ventana en Higher Rate) y
-  `.hr-window-tier-btn` no se tocaron: ya usaban valores suficientemente
-  distintos entre sí. Cero cambios de HTML — cae en la excepción de LAYOUT
-  "cambios solo de valores/tokens de color sobre componentes que ya
-  existen". Entregado completo y editado.
-
-
