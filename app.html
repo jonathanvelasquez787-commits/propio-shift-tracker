@@ -17700,6 +17700,12 @@ function saveFinanceRowModal() {
     }
 
     // Congela el bono ya ganado antes de que la ventana desaparezca de settings, por cualquier vía.
+    //
+    // Un cambio de NIVEL en una ventana que sigue viva (mismo id) sí debe corregir el bono de
+    // llamadas ya congeladas — para eso existe esta función. Pero solo si esa llamada TODAVÍA
+    // califica por horario contra la ventana tal como está hoy: si el bono se congeló porque la
+    // ventana se acortó/movió y la llamada quedó fuera del horario actual, un cambio de nivel
+    // posterior no debe "revivirla" con el nivel nuevo — se queda con lo que ya tenía congelado.
     function retuneFrozenHigherRateTiers(windows) {
       let changed = 0;
       calls.forEach(c => {
@@ -17708,6 +17714,7 @@ function saveFinanceRowModal() {
         const w = (windows || []).find(x => x.id === frozen.windowId);
         const meta = w && HIGHER_RATE_TIERS[w.tier];
         if (!meta || w.tier === frozen.tier) return;
+        if (!callQualifiesForHigherRateWindow(c.startISO, w)) return;
         c.frozenHigherRateBonus = { ...frozen, tier: w.tier, amount: meta.bonusPerMin * (Number(c.durationMin) || 0) };
         changed++;
       });

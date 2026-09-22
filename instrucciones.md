@@ -337,6 +337,26 @@ Pendientes, en orden:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v550** — El usuario reportó una llamada de las 10:17 AM con bono Silver
+pese a estar fuera del horario de su ventana de Higher Rate (06:30–10:15) —
+apareció justo al cambiarle el nivel a esa ventana de Bronce a Silver, sin
+tocar fecha ni horario. Causa raíz: `retuneFrozenHigherRateTiers` (corre en
+cada guardado del editor, incluido un simple click en el pill de nivel)
+sincronizaba el nivel de CUALQUIER llamada con `frozenHigherRateBonus
+.windowId` igual al de la ventana editada, sin revisar si esa llamada seguía
+calificando por horario contra la ventana tal como está hoy. Esa llamada se
+había congelado antes (la ventana debió tener otro horario en algún momento
+que sí la cubría); el cambio de nivel la "revivió" con el nivel nuevo pese a
+caer 2 min después del fin de la ventana actual.
+
+- `app.html`: `retuneFrozenHigherRateTiers` ahora llama a
+  `callQualifiesForHigherRateWindow(c.startISO, w)` antes de actualizar el
+  nivel de un bono ya congelado — si la llamada ya no encaja en el horario
+  actual de la ventana, el cambio de nivel no la toca y se queda con el nivel
+  que tenía congelado. Cero cambios de HTML/CSS — cae en la excepción de
+  LAYOUT "bugs/ajustes puntuales de JS sin tocar HTML/CSS visible". Entregado
+  completo y editado.
+
 **v549** — El usuario reportó que Bronce y Gold de Higher Rate se ven casi
 iguales en todos los lugares donde aparecen (selector de tarifa en
 llamadas, botones de nivel en ventanas, badge de "Ganancias de hoy",
@@ -390,14 +410,3 @@ después.
   excepción de LAYOUT "cambios puramente de datos/valores por default".
   Entregado completo y editado.
 
-**v547** — Se completó en `app.html` el retiro del nombre ("Jonathan") de la
-UI, pendiente de la v546 porque el archivo llegó pegado en el chat y no como
-adjunto. El usuario subió el archivo real y se editó con herramientas de
-archivo (4 apariciones, no 3: había una más dentro de un texto de ayuda).
-
-- `app.html`: `defaultSettings().userName` pasa de `'Jonathan'` a `''`;
-  placeholder de `#userNameInput` (Ajustes → Tu perfil) y de
-  `#onboardingNameInput` (popup de bienvenida) pasan de `"Ej. Jonathan"` a
-  `"Tu nombre"`; el texto de ayuda junto al selector de emoji pasa de
-  `"Buenas tardes, Jonathan 🙂"` a `"Buenas tardes, [tu nombre] 🙂"`.
-  Entregado completo y editado — único cambio contra el archivo subido.
