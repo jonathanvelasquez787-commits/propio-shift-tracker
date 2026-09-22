@@ -1,16 +1,15 @@
 """
 Suite de humo de Propio Shift Tracker.
 
-Prueba app.html directamente — ya no existe un archivo de referencia
-"congelado" ni un script que lo genere, así que no hay nada que comparar
-byte por byte. app.html es el único archivo y se edita a mano (o con ayuda
-de Claude) directamente.
+Prueba app.html directamente — no hay archivo de referencia "congelado" ni
+verificación byte por byte. app.html es la única fuente de verdad: se edita
+directo y esta suite corre contra ese mismo archivo.
 
 Uso:
     pip install -r tests/requirements.txt
     playwright install chromium
-    pytest tests/smoke.py -q
-    pytest tests/smoke.py -q -k "390"   # solo mobile
+    pytest tests/smoke.py -q                  # todo
+    pytest tests/smoke.py -q -k "390"         # solo mobile
 """
 
 from __future__ import annotations
@@ -146,7 +145,7 @@ def navegador():
 
 
 # ---------------------------------------------------------------------------
-# Apertura de app.html, con el gate de sesión puenteado a mano
+# Apertura de la app, con el gate de sesión puenteado a mano
 # ---------------------------------------------------------------------------
 
 
@@ -178,7 +177,8 @@ def abrir_app(
     state: dict | None = None,
     calls: list | None = None,
 ):
-    """Devuelve (page, errores, cerrar). El gate de sesión se puentea a mano."""
+    """Devuelve (page, errores, cerrar). El gate de sesión se puentea a mano,
+    igual que hace boot.js en producción, pero sin depender de Supabase."""
     contexto = navegador.new_context(
         viewport={"width": viewport[0], "height": viewport[1]},
         timezone_id=timezone,
@@ -275,6 +275,7 @@ def test_modales_abren_atrapan_foco_y_cierran(navegador, servidor):
                 "el => el.classList.contains('open')"
             ), f"{modal_id} no abrió"
 
+            # 12 Tab seguidos no deben sacar el foco del modal.
             for _ in range(12):
                 page.keyboard.press("Tab")
             dentro = page.evaluate(
@@ -323,26 +324,32 @@ def test_migracion_de_datos_viejos(navegador, servidor):
         calls=CALLS_VIEJAS,
     )
     try:
+        # breaks[]/lunch{} deben haberse convertido a blocks[].
         tiene_bloques = page.evaluate(
             "() => Object.values(window.settings.weeklySchedule).every(d => Array.isArray(d.blocks))"
         )
         assert tiene_bloques, "El horario viejo no migró a blocks[]"
 
+        # La clave de semana sin ceros a la izquierda debe quedar normalizada.
         claves = page.evaluate("() => Object.keys(window.settings.scheduleOverridesByWeek)")
         assert "2026-01-05" in claves, f"La semana específica no se normalizó: {claves}"
 
+        # La ventana válida sobrevive con la fecha acolchada; la basura se descarta.
         ventanas = page.evaluate("() => window.settings.higherRateWindows")
         assert len(ventanas) == 1, f"Se esperaba 1 ventana válida, quedaron {len(ventanas)}"
         assert ventanas[0]["date"] == "01/05/2026"
 
+        # Los overrides basura no deben sobrevivir.
         assert page.evaluate("() => Object.keys(window.settings.cycleGoalOverrides).length") == 0
         assert page.evaluate("() => Object.keys(window.settings.yearGoalOverrides).length") == 0
         assert page.evaluate("() => Object.keys(window.settings.dailyGoalOverrides).length") == 0
 
+        # Los registros sin id deben haber recibido uno.
         assert page.evaluate("() => window.state.events.every(e => !!e.id)")
         assert page.evaluate("() => window.state.pauseHistory.every(p => !!p.id)")
         assert page.evaluate("() => window.calls.every(c => !!c.id)")
 
+        # Los toasts de descarte son esperados; los errores de consola no.
         errores.assert_limpio("migración")
     finally:
         cerrar()
@@ -354,13 +361,13 @@ def test_popup_de_bienvenida_en_perfil_nuevo(navegador, servidor):
         assert page.locator("#onboardingModal").evaluate("el => el.classList.contains('open')"), (
             "Un perfil nuevo debería ver el popup de bienvenida"
         )
-        page.fill("#onboardingNameInput", "Prueba")
+        page.fill("#onboardingNameInput", "Jonathan")
         page.click("#onboardingSaveBtn")
         page.wait_for_timeout(250)
         assert not page.locator("#onboardingModal").evaluate(
             "el => el.classList.contains('open')"
         )
-        assert "Prueba" in page.locator("#greetingTitle").inner_text()
+        assert "Jonathan" in page.locator("#greetingTitle").inner_text()
         errores.assert_limpio("bienvenida")
     finally:
         cerrar()
@@ -382,6 +389,7 @@ def test_gate_de_sesion_bloquea_la_app(navegador, servidor):
         assert page.evaluate("typeof window.render") == "undefined"
         assert page.evaluate("typeof window.state") == "undefined"
         assert page.locator("#bootGate").is_visible()
+        # El resto del documento queda oculto hasta que se monte.
         assert not page.locator("#heroSection").is_visible()
     finally:
         contexto.close()
@@ -397,11 +405,13 @@ def test_landing_carga_y_muestra_formularios(navegador, servidor):
         page.wait_for_timeout(400)
         assert page.locator("#loginForm").is_visible()
         assert page.locator("#googleBtn").count() == 1
+        # Sin configurar Supabase, la landing debe decirlo en vez de romperse.
         assert page.locator("#authMsg").is_visible()
         page.click("#tabSignup")
         page.wait_for_timeout(150)
         assert page.locator("#signupForm").is_visible()
         assert not page.locator("#loginForm").is_visible()
+        # Cero errores de consola pese a la configuración incompleta.
         duros = [e for e in errores.items if "pageerror" in e]
         assert not duros, duros
     finally:
@@ -418,6 +428,7 @@ def test_paginas_legales_cargan(navegador, servidor):
         ]:
             page.goto(f"{servidor}{ruta}", wait_until="domcontentloaded")
             assert titulo in page.locator("h1").first.inner_text()
+            # Recordatorio: quedan marcadores por rellenar antes de publicar.
             pendientes = page.evaluate(
                 "() => (document.body.innerText.match(/\\[TU [^\\]]+\\]/g) || []).length"
             )
