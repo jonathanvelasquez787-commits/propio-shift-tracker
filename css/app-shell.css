@@ -547,10 +547,10 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
   --hover-flip-rgb: var(--cyan-rgb);
 }
 
-/* El fondo de página y las tarjetas eran exactamente el mismo #0d1230, así que
-   la tarjeta no existía como tarjeta. Las tarjetas no se mueven: solo baja el
-   fondo. */
-:root.theme-dark body { background: #080d1f; }
+/* Jonathan pidió que el fondo de página use el mismo tono que la barra
+   lateral (#0d1230, var(--panel-navy)): antes se bajaba un escalón a #080d1f
+   para separar visualmente las tarjetas de la página. La separación ahora
+   queda solo a cargo del borde (--card-line) que las tarjetas ya llevan. */
 
 :root.theme-dark .accordion-card { box-shadow: var(--shadow); }
 
