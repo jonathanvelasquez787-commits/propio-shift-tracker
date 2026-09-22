@@ -237,6 +237,23 @@ Pendientes, en orden:
 
 **PENDIENTES**
 
+- **Página de Ayuda — mockup v2 aprobado, falta el contenido real.** Corrige
+  el planteo inicial (que era un modal, como el de Higher Rate): ahora es una
+  PÁGINA COMPLETA propia, nunca un modal/popup. Solo se hace responsive de
+  ESCRITORIO — el usuario pidió explícitamente no armar mockups mobile
+  aparte, solo que el layout de escritorio se adapte si se abre en celular
+  (excepción puntual al paso 2 del protocolo de LAYOUT — "mockup con las dos
+  vistas, celular y escritorio" — para esta feature). El mockup v2 (aprobado)
+  trae las dos vistas de tema (claro/oscuro) en el mismo archivo con un
+  switch para compararlas, en vez de dos archivos sueltos. Vive dentro de la
+  app, solo accesible con cuenta iniciada (no en la landing pública).
+  6 secciones en acordeón — Turno, Llamadas, Higher Rate, Finanzas,
+  Calendario, Cuenta — y cada una debe explicar qué hace la función Y los
+  pasos exactos para configurarla (más completo que el primer intento, que
+  solo listaba explicaciones sueltas). Entrada probablemente un botón
+  "Ayuda" en la barra de acciones del header, mismo patrón visual que ya usan
+  los demás botones de esa barra. Siguiente paso: escribir/aprobar el
+  contenido real de las 6 secciones — recién ahí se toca `app.html`.
 - **Categorías de Finanzas propias (con su nombre).** El usuario mencionó de
   pasada la idea de poder crear sus propias categorías (además de las 7 fijas
   de `FINANCE_CATEGORIES`) en vez de solo elegir entre las existentes. No
