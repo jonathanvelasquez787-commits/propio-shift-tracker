@@ -1402,18 +1402,6 @@
        solo con el fondo + color de acento. */
     .sidebar-link-arrow { display: none; }
     .sidebar-link-dot { display: none; }
-    /* Temporal: quitar cuando "Ayuda" deje de ser una feature recién agregada. */
-    .sidebar-link-badge-new {
-      flex: 0 0 auto;
-      font-size: 8px;
-      font-weight: 900;
-      letter-spacing: .03em;
-      background: var(--cyan);
-      color: var(--panel-navy);
-      padding: 2px 6px;
-      border-radius: 999px;
-    }
-
     .sidebar-progress-card {
       display: flex;
       align-items: center;
@@ -8156,7 +8144,6 @@
 <button class="sidebar-link" data-page="paydates" type="button"><span class="sidebar-link-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span class="sidebar-link-label">Fechas de pago</span><span class="sidebar-link-arrow">›</span><span class="sidebar-link-dot"></span></button>
 <button class="sidebar-link" data-page="calendar" type="button"><span class="sidebar-link-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg></span><span class="sidebar-link-label">Calendario</span><span class="sidebar-link-arrow">›</span><span class="sidebar-link-dot"></span></button>
 <button class="sidebar-link" data-page="finance" type="button"><span class="sidebar-link-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12V8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h13a1 1 0 0 0 1-1v-4"/><path d="M20 12a2 2 0 0 1 0 4h-3a2 2 0 0 1 0-4Z"/></svg></span><span class="sidebar-link-label">Finanzas</span><span class="sidebar-link-arrow">›</span><span class="sidebar-link-dot"></span></button>
-<button class="sidebar-link" data-page="help" type="button"><span class="sidebar-link-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2.2-3 4.4"/><line x1="12" y1="17.5" x2="12" y2="17.51"/></svg></span><span class="sidebar-link-label">Ayuda</span><span class="sidebar-link-badge-new">NUEVO</span><span class="sidebar-link-arrow">›</span><span class="sidebar-link-dot"></span></button>
 </div>
 <div class="sidebar-section-label">Mi progreso</div>
 <button class="sidebar-progress-card" id="sidebarProgressCard" type="button" title="Ver Reportes">
@@ -8185,6 +8172,7 @@
 <div class="brand"><span class="dot-state"></span>Propio Shift Tracker</div>
 </div>
 <div class="hero-top-actions">
+<button class="hero-action-btn hero-action-btn-icon" data-nav-page="help" type="button" title="Ayuda"><span aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2.2-3 4.4"/><line x1="12" y1="17.5" x2="12" y2="17.51"/></svg></span><span class="hero-action-btn-label">Ayuda</span></button>
 <button class="hero-action-btn hero-action-btn-icon" id="avisosHeaderBtn" type="button" title="Avisos"><span aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10 20a2 2 0 0 0 4 0"/></svg></span><span class="hero-action-btn-label">Avisos</span></button>
 <button class="hero-action-btn hero-action-btn-icon" id="higherRateHeaderBtn" type="button" title="Higher Rate"><span aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c2 3-1 4-1 7a3 3 0 1 0 6 0c0-1-.5-2-.5-2 2 1 3 3.5 3 6a7 7 0 1 1-14 0c0-4 2-6 3.5-8 .5 2 1 2.5 3-3Z"/></svg></span><span class="hero-action-btn-label">Higher Rate</span></button>
 <div class="hero-ajustes-reset-group">
