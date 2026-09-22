@@ -337,6 +337,37 @@ Pendientes, en orden:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v549** — El usuario reportó que Bronce y Gold de Higher Rate se ven casi
+iguales en todos los lugares donde aparecen (selector de tarifa en
+llamadas, botones de nivel en ventanas, badge de "Ganancias de hoy",
+estado en vivo, chips de reportes). Causa raíz: en tema claro `--tier-gold`
+era literalmente un alias de `var(--break-orange)`, la misma variable que ya
+usa `--warn` — Bronce (`#C2410C`) y Gold (`#F97316`) terminaban siendo el
+mismo naranja con apenas distinta luminosidad. El `colorRgb` que usan los
+badges/tintes (independiente de tema) tenía el mismo problema en menor
+grado: bronce `205,127,50` y gold `201,162,39` — mismo R, poca diferencia
+de G/B.
+
+- `app.html`: `--tier-gold` en tema claro deja de ser `var(--break-orange)` y
+  pasa a su propio hex `#CA8A04` (dorado/ámbar real, no naranja); `--tier-
+  bronze` en tema claro pasa de `#C2410C` a `#96591F` (bronce más marrón,
+  aleja más su tono del nuevo dorado). Cambio hecho en los DOS bloques que
+  redefinen estas variables en tema claro (el de `@media (prefers-color-
+  scheme: light)` y el de `html.theme-light` — están duplicados a propósito,
+  ver PENDIENTE "Los dos temas se afinan con una capa..."). Tema oscuro
+  (`--tier-bronze: #e0a06b` tostado / `--tier-gold: #ffd76e` amarillo) no se
+  tocó: ya eran razonablemente distintos entre sí. `HIGHER_RATE_TIERS.bronze
+  .colorRgb` pasa a `181,101,29` y `.gold.colorRgb` a `234,179,8` — más
+  separados en matiz/saturación, se usan en el badge de "Ganancias de hoy",
+  el borde del estado de llamada en vivo, los chips de Reportes y el acento
+  de la ventana dominante. `--warn` sigue apuntando a `--break-orange` sin
+  cambios — solo se desacopló `--tier-gold` de esa variable compartida.
+  `.hr-window-card[data-tier]` (tarjetas de ventana en Higher Rate) y
+  `.hr-window-tier-btn` no se tocaron: ya usaban valores suficientemente
+  distintos entre sí. Cero cambios de HTML — cae en la excepción de LAYOUT
+  "cambios solo de valores/tokens de color sobre componentes que ya
+  existen". Entregado completo y editado.
+
 **v548** — El usuario pidió que, en "Agregar gasto" (Finanzas), el campo
 Nombre se rellene solo con una sugerencia al elegir categoría (ej. Casa →
 Renta), en vez de quedar siempre en blanco. Se descartó a propósito la otra
@@ -370,21 +401,3 @@ archivo (4 apariciones, no 3: había una más dentro de un texto de ayuda).
   `"Tu nombre"`; el texto de ayuda junto al selector de emoji pasa de
   `"Buenas tardes, Jonathan 🙂"` a `"Buenas tardes, [tu nombre] 🙂"`.
   Entregado completo y editado — único cambio contra el archivo subido.
-
-**v546** — El usuario pidió quitar su nombre ("Jonathan") de los lugares
-donde aparecía en la UI, y reducir este `.md` quitando lo que ya no aporta.
-
-- `index.html`: placeholder de `#loginIdentifier` pasa de
-  `"jonathan  ·  jonathan@correo.com"` a `"usuario · correo@ejemplo.com"`;
-  placeholder de `#signupUsername` pasa de `"jonathan"` a `"usuario"`.
-  Entregado completo y editado.
-- `LICENSE`: sin cambios, a pedido explícito del usuario — el nombre ahí es
-  el titular legal del copyright, no un dato de perfil de UI.
-- Este `.md` se reescribió: se recortó la lista item-por-item de excepciones
-  históricas del protocolo de LAYOUT (v477 a v544) a una versión genérica, se
-  condensó el ROADMAP (Fases 0-2 cerradas, resto resumido sin repetir la
-  justificación completa de cada decisión ya tomada), y se agregó una regla
-  permanente nueva dentro de FLUJO DE TRABAJO: toda entrega es siempre el/los
-  archivo(s) completo(s) ya editado(s) listos para GitHub, y si un archivo es
-  demasiado grande para reproducirlo con seguridad solo desde texto pegado,
-  se pide el adjunto real en vez de arriesgar una edición corrupta.
