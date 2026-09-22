@@ -237,6 +237,17 @@ Pendientes, en orden:
 
 **PENDIENTES**
 
+- **Categorías de Finanzas propias (con su nombre).** El usuario mencionó de
+  pasada la idea de poder crear sus propias categorías (además de las 7 fijas
+  de `FINANCE_CATEGORIES`) en vez de solo elegir entre las existentes. No
+  pedido todavía en firme — en la v548 se optó por la alternativa más chica
+  (sugerir nombre por categoría, ver ÚLTIMOS FIXES). Si se pide: toca el
+  protocolo de LAYOUT completo (mockup + aprobación) porque agrega UI nueva
+  (alta/edición/borrado de categoría) y cambia el modelo de datos de
+  `settings.financeCategories` (hoy son 7 claves fijas, no una lista
+  dinámica) — repasar también qué pasa con los colores/íconos fijos por
+  categoría (`rgb`, `icon` en `FINANCE_CATEGORIES`) que una categoría nueva no
+  tendría.
 - **Rellenar los marcadores legales.** `LICENSE`, `privacidad.html` y
   `terminos.html` siguen con `[TU NOMBRE O RAZÓN SOCIAL]`, `[TU CORREO DE
   CONTACTO]` y `[TU PAÍS]`. El nombre del titular en `LICENSE` se deja tal
@@ -325,6 +336,28 @@ Pendientes, en orden:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v548** — El usuario pidió que, en "Agregar gasto" (Finanzas), el campo
+Nombre se rellene solo con una sugerencia al elegir categoría (ej. Casa →
+Renta), en vez de quedar siempre en blanco. Se descartó a propósito la otra
+opción que ofreció el usuario en el mismo pedido (dejar crear categorías
+propias con su nombre) — cambio de mayor alcance, pendiente si lo pide
+después.
+
+- `app.html`: nuevo `FINANCE_NAME_SUGGESTIONS` (junto a `FINANCE_CATEGORIES`)
+  con un nombre sugerido por categoría — `casa: 'Renta'`, `servicios: 'Luz'`,
+  `transporte: 'Gasolina'`, `comida: 'Despensa'`, `deuda: 'Préstamo'`; `otro`
+  no sugiere nada. Nueva `financeApplyNameSuggestion(categoryId)`: solo
+  escribe en `#financeRowNameInput` si el campo está vacío o todavía tiene la
+  última sugerencia sin tocar (`financeRowNameSuggested`) — nunca pisa un
+  nombre que el usuario ya haya escrito a mano. Se llama (1) al abrir el modal
+  para una fila NUEVA que no es meta (con la categoría por default, "Casa"),
+  y (2) en un listener `change` nuevo sobre `#financeRowCategoryInput`. Al
+  abrir el modal para editar una fila existente, `financeRowNameSuggested` se
+  resetea a `''` para que cambiar la categoría en modo edición nunca
+  reemplace el nombre real ya guardado. Cero cambios de HTML/CSS — cae en la
+  excepción de LAYOUT "cambios puramente de datos/valores por default".
+  Entregado completo y editado.
 
 **v547** — Se completó en `app.html` el retiro del nombre ("Jonathan") de la
 UI, pendiente de la v546 porque el archivo llegó pegado en el chat y no como

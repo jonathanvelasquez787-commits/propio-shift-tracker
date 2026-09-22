@@ -9822,6 +9822,16 @@ $0.72"></textarea>
       otro:       { label: 'Otro',           icon: 'moreHorizontal', rgb: '144,160,190' },
     };
 
+    // Nombre sugerido al elegir categoría en "Agregar gasto" (ver financeApplyNameSuggestion) — es
+    // solo un punto de partida editable, no un valor fijo. 'otro' no sugiere nada.
+    const FINANCE_NAME_SUGGESTIONS = {
+      casa: 'Renta',
+      servicios: 'Luz',
+      transporte: 'Gasolina',
+      comida: 'Despensa',
+      deuda: 'Préstamo',
+    };
+
     // Selector visual de tarifa (Normal/Bronce/Silver/Gold) en Editar llamada y Agregar llamada
     // manual.
     const RATE_TILE_DEFS = [
@@ -14731,6 +14741,22 @@ function financeDeleteRow(catId, rowId) {
   });
 }
 
+// Punto de partida editable en #financeRowNameInput al elegir categoría — nunca pisa un nombre que
+// el usuario ya haya escrito a mano (solo actúa si el campo está vacío o todavía tiene la última
+// sugerencia sin tocar).
+let financeRowNameSuggested = '';
+
+function financeApplyNameSuggestion(categoryId) {
+  const nameInput = document.getElementById('financeRowNameInput');
+  if (!nameInput) return;
+  const suggestion = FINANCE_NAME_SUGGESTIONS[categoryId] || '';
+  const current = nameInput.value.trim();
+  if (current === '' || current === financeRowNameSuggested) {
+    nameInput.value = suggestion;
+    financeRowNameSuggested = suggestion;
+  }
+}
+
 function openFinanceRowModal(kind, existingRow = null) {
   financeRowModalKind = kind === 'meta' ? 'meta' : 'gasto';
   financeEditingRowId = existingRow ? existingRow.id : null;
@@ -14745,6 +14771,11 @@ function openFinanceRowModal(kind, existingRow = null) {
   const isMeta = financeRowModalKind === 'meta';
   if (nameInput) nameInput.value = existingRow ? existingRow.name : '';
   if (categoryInput) categoryInput.value = existingRow ? existingRow.categoryId : 'casa';
+  // Fila nueva (no meta): arranca vacío y se llena con la sugerencia de la categoría por default.
+  // Fila existente: financeRowNameSuggested queda vacío para que cambiar la categoría al editar
+  // nunca reemplace un nombre real ya guardado.
+  financeRowNameSuggested = '';
+  if (!existingRow && !isMeta && categoryInput) financeApplyNameSuggestion(categoryInput.value);
   if (typeInput) typeInput.value = existingRow ? (existingRow.recurring ? 'recurring' : 'onetime') : 'recurring';
   if (targetInput) targetInput.value = existingRow ? existingRow.targetAmount : '';
   const targetCurrencyField = document.getElementById('financeRowTargetCurrencyField');
@@ -20012,6 +20043,7 @@ function render() {
     document.getElementById('saveGapBtn').addEventListener('click', saveGapEditor);
     document.getElementById('saveAcwGoalBtn').addEventListener('click', saveAcwGoalEditor);
     document.getElementById('saveFinanceRowBtn').addEventListener('click', saveFinanceRowModal);
+    document.getElementById('financeRowCategoryInput').addEventListener('change', (e) => financeApplyNameSuggestion(e.target.value));
     document.getElementById('financeRowTargetInput').addEventListener('input', () => syncFinanceRowTargetFields('usd'));
     document.getElementById('financeRowTargetCurrencyInput').addEventListener('input', () => syncFinanceRowTargetFields('currency'));
     // Un solo listener delegado en #financeSection (tabs, prioridad ↑/↓, Reiniciar mes, Asignar,
