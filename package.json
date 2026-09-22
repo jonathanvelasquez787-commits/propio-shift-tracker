@@ -1,16 +1,11 @@
 {
   "name": "propio-shift-tracker",
-  "version": "540.0.0",
+  "version": "544.0.0",
   "private": true,
   "description": "Registro personal de turnos, llamadas y ganancias — con cuentas y respaldo en la nube.",
   "type": "module",
   "license": "UNLICENSED",
   "engines": {
     "node": ">=20"
-  },
-  "scripts": {
-    "build:app": "python3 tools/build_app_html.py",
-    "check:app": "python3 tools/build_app_html.py --check",
-    "test:smoke": "python3 -m pytest tests/smoke.py -q"
   }
 }
