@@ -1417,6 +1417,17 @@
     }
     .sidebar-link:not(.active) .sidebar-link-dot { display: none; }
     .sidebar-link.active .sidebar-link-arrow { display: none; }
+    /* Temporal: quitar cuando "Ayuda" deje de ser una feature recién agregada. */
+    .sidebar-link-badge-new {
+      flex: 0 0 auto;
+      font-size: 8px;
+      font-weight: 900;
+      letter-spacing: .03em;
+      background: var(--cyan);
+      color: var(--panel-navy);
+      padding: 2px 6px;
+      border-radius: 999px;
+    }
 
     .sidebar-progress-card {
       display: flex;
@@ -7997,6 +8008,129 @@
         padding: 6px 8px;
       }
     }
+
+    /* ============ Página de Ayuda ============ */
+    .help-head h1 { margin: 0; font-size: 22px; letter-spacing: -.03em; }
+    .help-head p { margin: 6px 0 0; color: var(--muted); font-size: 13.5px; line-height: 1.5; max-width: 62ch; }
+
+    .help-search {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin: 16px 0 0;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: var(--panel-navy);
+    }
+    :root:not(.theme-dark) .help-search { background: var(--panel); }
+    .help-search .ic-svg { width: 16px; height: 16px; color: var(--muted-3); }
+    .help-search input {
+      flex: 1 1 auto;
+      min-width: 0;
+      border: 0;
+      background: transparent;
+      color: var(--text);
+      font: inherit;
+      font-size: 13.5px;
+      outline: none;
+    }
+    .help-search input::placeholder { color: var(--muted-3); }
+
+    .help-search-empty {
+      margin-top: 14px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px dashed var(--line-2);
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .help-toc-mobile {
+      display: none;
+      gap: 7px;
+      overflow-x: auto;
+      padding: 2px 2px 4px;
+      margin: 14px 0 0;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .help-toc-mobile::-webkit-scrollbar { display: none; }
+    .help-toc-mobile a {
+      flex: 0 0 auto;
+      padding: 7px 13px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--panel-navy);
+      color: var(--muted);
+      font-size: 12.5px;
+      font-weight: 800;
+      text-decoration: none;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    :root:not(.theme-dark) .help-toc-mobile a { background: var(--panel); }
+    .help-toc-mobile a.active { color: var(--text); border-color: rgba(var(--cyan-rgb), .4); background: rgba(var(--cyan-rgb), .12); }
+
+    .help-layout { display: flex; gap: 24px; margin-top: 18px; align-items: flex-start; }
+
+    .help-toc {
+      flex: 0 0 190px;
+      position: sticky;
+      top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .help-toc a {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 8px 10px;
+      border-radius: 11px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .help-toc a.active { color: var(--text); background: rgba(var(--cyan-rgb), .12); }
+    .help-toc a .dot { width: 6px; height: 6px; border-radius: 50%; background: rgb(var(--tone-rgb)); flex: 0 0 auto; }
+
+    .help-sections { flex: 1 1 auto; min-width: 0; display: grid; gap: 14px; }
+
+    .help-card { scroll-margin-top: 14px; }
+    .help-card-head { display: flex; align-items: center; gap: 12px; }
+    .help-card-icon {
+      width: 36px; height: 36px; border-radius: 11px; flex: 0 0 auto;
+      display: grid; place-items: center;
+      background: rgba(var(--tone-rgb), .14);
+      border: 1px solid rgba(var(--tone-rgb), .28);
+    }
+    .help-card-icon .ic-svg { width: 18px; height: 18px; }
+    .help-card-head h2 { margin: 0; font-size: 16px; letter-spacing: -.02em; }
+    .help-card-head p { margin: 2px 0 0; color: var(--muted-3); font-size: 12.5px; }
+
+    .help-card-body { margin-top: 12px; display: grid; gap: 14px; }
+    .help-block-label {
+      font-size: 10.5px; font-weight: 900; letter-spacing: .07em; text-transform: uppercase;
+      color: rgb(var(--tone-rgb)); margin: 0 0 6px;
+    }
+    .help-block p { margin: 0; color: var(--muted); font-size: 13.5px; line-height: 1.6; }
+    .help-block ol { margin: 0; padding-left: 19px; display: grid; gap: 7px; }
+    .help-block ol li { color: var(--muted); font-size: 13.5px; line-height: 1.55; }
+    .help-block ol li b, .help-block p b { color: var(--text); font-weight: 800; }
+
+    .help-card.is-hidden-by-search { display: none; }
+
+    @media (max-width: 900px) {
+      .help-toc { display: none; }
+      .help-toc-mobile { display: flex; }
+    }
+    @media (max-width: 620px) {
+      .help-head h1 { font-size: 19px; }
+    }
   </style>
 <link rel="stylesheet" href="/css/app-shell.css"/>
 </head>
@@ -8037,6 +8171,7 @@
 <button class="sidebar-link" data-page="paydates" type="button"><span class="sidebar-link-icon" style="background: rgba(var(--pink-rgb), .14); border: 1px solid rgba(var(--pink-rgb), .28);"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span class="sidebar-link-label">Fechas de pago</span><span class="sidebar-link-arrow">›</span><span class="sidebar-link-dot"></span></button>
 <button class="sidebar-link" data-page="calendar" type="button"><span class="sidebar-link-icon" style="background: rgba(var(--rpt-purple-rgb), .14); border: 1px solid rgba(var(--rpt-purple-rgb), .28);"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg></span><span class="sidebar-link-label">Calendario</span><span class="sidebar-link-arrow">›</span><span class="sidebar-link-dot"></span></button>
 <button class="sidebar-link" data-page="finance" type="button"><span class="sidebar-link-icon" style="background: rgba(var(--teal-rgb), .14); border: 1px solid rgba(var(--teal-rgb), .28);"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12V8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h13a1 1 0 0 0 1-1v-4"/><path d="M20 12a2 2 0 0 1 0 4h-3a2 2 0 0 1 0-4Z"/></svg></span><span class="sidebar-link-label">Finanzas</span><span class="sidebar-link-arrow">›</span><span class="sidebar-link-dot"></span></button>
+<button class="sidebar-link" data-page="help" type="button"><span class="sidebar-link-icon" style="background: rgba(var(--warn-rgb), .14); border: 1px solid rgba(var(--warn-rgb), .28);"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2.2-3 4.4"/><line x1="12" y1="17.5" x2="12" y2="17.51"/></svg></span><span class="sidebar-link-label">Ayuda</span><span class="sidebar-link-badge-new">NUEVO</span><span class="sidebar-link-arrow">›</span><span class="sidebar-link-dot"></span></button>
 </div>
 <div class="sidebar-section-label">Mi progreso</div>
 <button class="sidebar-progress-card" id="sidebarProgressCard" type="button" title="Ver Reportes">
@@ -8717,6 +8852,246 @@
   </div>
 </section>
 </div><!-- /pageFinance -->
+
+<div class="app-page" data-page="help" hidden id="pageHelp">
+<div class="help-head">
+<h1>Ayuda</h1>
+<p>Qué hace cada parte de la app y cómo configurarla — sección por sección.</p>
+</div>
+
+<div class="help-search">
+<svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+<input id="helpSearchInput" type="text" aria-label="Buscar en la ayuda" placeholder='Buscar en la ayuda — ej. &quot;break&quot;, &quot;bono&quot;, &quot;ciclo de pago&quot;, &quot;exportar&quot;'/>
+</div>
+<p class="help-search-empty" id="helpSearchEmpty" hidden>No hay resultados para tu búsqueda.</p>
+
+<div class="help-toc-mobile" id="helpTocMobile">
+<a data-help-toc href="#h-turno">Turno</a>
+<a data-help-toc href="#h-horario">Horario</a>
+<a data-help-toc href="#h-llamadas">Llamadas</a>
+<a data-help-toc href="#h-higherrate">Higher Rate</a>
+<a data-help-toc href="#h-finanzas">Finanzas</a>
+<a data-help-toc href="#h-reportes">Reportes</a>
+<a data-help-toc href="#h-calendario">Calendario</a>
+<a data-help-toc href="#h-cuenta">Cuenta</a>
+<a data-help-toc href="#h-ajustes">Ajustes</a>
+</div>
+
+<div class="help-layout">
+<nav class="help-toc" id="helpToc">
+<a class="active" data-help-toc href="#h-turno" style="--tone-rgb: var(--cyan-rgb);"><span class="dot"></span>Turno</a>
+<a data-help-toc href="#h-horario" style="--tone-rgb: var(--blue-rgb);"><span class="dot"></span>Horario</a>
+<a data-help-toc href="#h-llamadas" style="--tone-rgb: var(--pink-rgb);"><span class="dot"></span>Llamadas</a>
+<a data-help-toc href="#h-higherrate" style="--tone-rgb: var(--warn-rgb);"><span class="dot"></span>Higher Rate</a>
+<a data-help-toc href="#h-finanzas" style="--tone-rgb: var(--teal-rgb);"><span class="dot"></span>Finanzas</a>
+<a data-help-toc href="#h-reportes" style="--tone-rgb: var(--good-rgb);"><span class="dot"></span>Reportes</a>
+<a data-help-toc href="#h-calendario" style="--tone-rgb: var(--rpt-purple-rgb);"><span class="dot"></span>Calendario</a>
+<a data-help-toc href="#h-cuenta" style="--tone-rgb: var(--cyan-rgb);"><span class="dot"></span>Cuenta</a>
+<a data-help-toc href="#h-ajustes" style="--tone-rgb: 148,163,184;"><span class="dot"></span>Ajustes</a>
+</nav>
+
+<div class="help-sections" id="helpSections">
+
+<section class="card help-card" id="h-turno" style="--tone-rgb: var(--cyan-rgb);">
+<div class="help-card-head">
+<span class="help-card-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg></span>
+<div><h2>Turno</h2><p>El registro en vivo de tu jornada</p></div>
+</div>
+<div class="help-card-body">
+<div class="help-block">
+<p class="help-block-label">Qué hace</p>
+<p>Registra tu jornada en vivo — inicio, breaks, lunch y llamadas — y calcula tu <b>adherencia</b> minuto a minuto comparando lo que hiciste contra tu horario planeado, con una ventana de gracia antes de contar un desvío.</p>
+</div>
+<div class="help-block">
+<p class="help-block-label">Cómo configurarlo</p>
+<ol>
+<li>Configura primero tu horario semanal en <b>Horario</b> — es la base contra la que se mide tu adherencia.</li>
+<li>Toca <b>Iniciar turno</b> al empezar; la barra fija de arriba muestra qué está corriendo y cuánto llevas.</li>
+<li>Marca <b>Break</b> o <b>Lunch</b> con un toque al tomarlos, y otra vez al volver.</li>
+<li><b>Terminar shift</b> cierra tu jornada del día.</li>
+<li>Activa avisos con sonido en <b>Ajustes → Alarmas</b> para que te recuerde el inicio del turno o del break antes de que empiece.</li>
+</ol>
+</div>
+<div class="mc-info-box">
+<svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+<span>Si olvidas cerrar el turno antes de medianoche, la app lo empareja igual al abrir uno nuevo al día siguiente.</span>
+</div>
+</div>
+</section>
+
+<section class="card help-card" id="h-horario" style="--tone-rgb: var(--blue-rgb);">
+<div class="help-card-head">
+<span class="help-card-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+<div><h2>Horario</h2><p>Tu horario semanal, por defecto y por excepción</p></div>
+</div>
+<div class="help-card-body">
+<div class="help-block">
+<p class="help-block-label">Qué hace</p>
+<p>Define a qué hora entras, cuándo son tus breaks y tu lunch — es la base contra la que se calcula tu adherencia y tus metas del día.</p>
+</div>
+<div class="help-block">
+<p class="help-block-label">Cómo configurarlo</p>
+<ol>
+<li>Entra a <b>Horario</b> y define hora de entrada/salida, break y lunch para cada día de la semana.</li>
+<li>Si una semana puntual es distinta a tu horario normal, usa <b>Semana específica</b> para anularlo solo esa semana, sin perder tu horario de base.</li>
+<li>El cambio aplica de inmediato a la adherencia del día activo.</li>
+</ol>
+</div>
+</div>
+</section>
+
+<section class="card help-card" id="h-llamadas" style="--tone-rgb: var(--pink-rgb);">
+<div class="help-card-head">
+<span class="help-card-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M15.05 5A5 5 0 0 1 19 8.95M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.68 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.32 1.85.55 2.81.68A2 2 0 0 1 22 16.92Z"/></svg></span>
+<div><h2>Llamadas</h2><p>Cada llamada tomada, manual o importada</p></div>
+</div>
+<div class="help-card-body">
+<div class="help-block">
+<p class="help-block-label">Qué hace</p>
+<p>Guarda cada llamada — pago, duración, si fue facturable o se cayó — y las usa para calcular tus ganancias del día y del ciclo.</p>
+</div>
+<div class="help-block">
+<p class="help-block-label">Cómo configurarlo</p>
+<ol>
+<li>Agrega una llamada a mano con el botón <b>+</b>, llenando pago, minutos, si es facturable y si se cayó.</li>
+<li>O pega tu exportación de Propio en <b>Importar</b> — la app la reconoce y la acomoda sola, sin duplicar llamadas ya guardadas.</li>
+<li>Toca cualquier llamada ya guardada en la tabla para editarla o borrarla.</li>
+</ol>
+</div>
+</div>
+</section>
+
+<section class="card help-card" id="h-higherrate" style="--tone-rgb: var(--warn-rgb);">
+<div class="help-card-head">
+<span class="help-card-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c2 3-1 4-1 7a3 3 0 1 0 6 0c0-1-.5-2-.5-2 2 1 3 3.5 3 6a7 7 0 1 1-14 0c0-4 2-6 3.5-8 .5 2 1 2.5 3-3Z"/></svg></span>
+<div><h2>Higher Rate</h2><p>Bono extra por ventana horaria</p></div>
+</div>
+<div class="help-card-body">
+<div class="help-block">
+<p class="help-block-label">Qué hace</p>
+<p>Ventanas horarias con bono extra por minuto (Bronce, Silver o Gold), avisadas por Propio por correo — el bono se suma solo a cada llamada que califique por horario.</p>
+</div>
+<div class="help-block">
+<p class="help-block-label">Cómo configurarlo</p>
+<ol>
+<li>Abre <b>Higher Rate</b> y agrega una ventana con fecha, hora de inicio/fin y nivel.</li>
+<li>Cualquier llamada que empiece dentro de ese horario (con un margen corto de gracia al inicio) recibe el bono sola.</li>
+<li>El historial de ventanas ya pasadas se puede vaciar de un click sin perder el bono ya ganado.</li>
+</ol>
+</div>
+<div class="mc-info-box">
+<svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+<span>Si editas la fecha o el horario de una ventana, el bono ya ganado por llamadas que calificaban antes del cambio se conserva — nunca se pierde retroactivamente por editar la ventana.</span>
+</div>
+</div>
+</section>
+
+<section class="card help-card" id="h-finanzas" style="--tone-rgb: var(--teal-rgb);">
+<div class="help-card-head">
+<span class="help-card-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12V8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h13a1 1 0 0 0 1-1v-4"/><path d="M20 12a2 2 0 0 1 0 4h-3a2 2 0 0 1 0-4Z"/></svg></span>
+<div><h2>Finanzas</h2><p>Gastos y metas de ahorro</p></div>
+</div>
+<div class="help-card-body">
+<div class="help-block">
+<p class="help-block-label">Qué hace</p>
+<p>Registra gastos y metas de ahorro, y los llena en el orden de prioridad que tú definas con lo que vas ganando.</p>
+</div>
+<div class="help-block">
+<p class="help-block-label">Cómo configurarlo</p>
+<ol>
+<li>Agrega un gasto o una meta desde <b>Finanzas → +</b>, elige categoría (Casa, Servicios, Transporte, Comida, Deuda, Otro) — el nombre se sugiere solo según la categoría.</li>
+<li>Ordena tus prioridades con las flechas — lo que esté primero se llena primero con el saldo disponible.</li>
+<li>El <b>Disponible</b> se calcula solo a partir de tus ganancias reales, sin que tengas que anotarlo tú.</li>
+</ol>
+</div>
+</div>
+</section>
+
+<section class="card help-card" id="h-reportes" style="--tone-rgb: var(--good-rgb);">
+<div class="help-card-head">
+<span class="help-card-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><line x1="4" y1="20" x2="4" y2="10"/><line x1="10" y1="20" x2="10" y2="4"/><line x1="16" y1="20" x2="16" y2="14"/></svg></span>
+<div><h2>Reportes</h2><p>Tu ciclo de pago, resumido y proyectado</p></div>
+</div>
+<div class="help-card-body">
+<div class="help-block">
+<p class="help-block-label">Qué hace</p>
+<p>Resume ganancias, adherencia y minutos productivos por ciclo de pago, con una proyección de a dónde vas a llegar si sigues al ritmo actual.</p>
+</div>
+<div class="help-block">
+<p class="help-block-label">Cómo configurarlo</p>
+<ol>
+<li>Define el ancla de tu ciclo de pago en <b>Ajustes → Horario/Metas</b>.</li>
+<li>Navega entre ciclos con las flechas dentro de Reportes.</li>
+<li>La <b>Proyección del ciclo</b> (también visible en Inicio) siempre muestra el ciclo actual.</li>
+</ol>
+</div>
+</div>
+</section>
+
+<section class="card help-card" id="h-calendario" style="--tone-rgb: var(--rpt-purple-rgb);">
+<div class="help-card-head">
+<span class="help-card-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01M12 14h.01M16 14h.01"/></svg></span>
+<div><h2>Calendario</h2><p>Un año de productividad de un vistazo</p></div>
+</div>
+<div class="help-card-body">
+<div class="help-block">
+<p class="help-block-label">Qué hace</p>
+<p>Muestra qué días cumpliste tu meta, cuáles quedaste cerca, y cuánto ganaste cada mes — incluido el bono de Higher Rate.</p>
+</div>
+<div class="help-block">
+<p class="help-block-label">Cómo configurarlo</p>
+<p>No necesita configuración — se llena solo con lo que ya registraste en Turno y Llamadas.</p>
+</div>
+</div>
+</section>
+
+<section class="card help-card" id="h-cuenta" style="--tone-rgb: var(--cyan-rgb);">
+<div class="help-card-head">
+<span class="help-card-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></span>
+<div><h2>Cuenta y sincronización</h2><p>Tus datos, entre dispositivos</p></div>
+</div>
+<div class="help-card-body">
+<div class="help-block">
+<p class="help-block-label">Qué hace</p>
+<p>Guarda tus datos también en la nube, además de en este dispositivo, para que te sigan entre computadora y teléfono.</p>
+</div>
+<div class="help-block">
+<p class="help-block-label">Cómo configurarlo</p>
+<ol>
+<li>Entra con Google, con correo y contraseña, o con usuario y contraseña.</li>
+<li>Tus datos se sincronizan solos cada pocos segundos mientras tengas internet.</li>
+<li>Si dos dispositivos tienen versiones distintas, la app pregunta cuál conservar — nunca las mezcla sola.</li>
+<li>Exporta tu respaldo completo en JSON, CSV o PDF, y borra tu cuenta con todos sus datos, desde <b>Ajustes</b>.</li>
+</ol>
+</div>
+</div>
+</section>
+
+<section class="card help-card" id="h-ajustes" style="--tone-rgb: 148,163,184;">
+<div class="help-card-head">
+<span class="help-card-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.9 2.9l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.9-2.9l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.9-2.9l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.6V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.9 2.9l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.6 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.6 1Z"/></svg></span>
+<div><h2>Ajustes generales</h2><p>Meta, tasa, moneda, perfil y tema</p></div>
+</div>
+<div class="help-card-body">
+<div class="help-block">
+<p class="help-block-label">Qué hace</p>
+<p>Reúne tu meta diaria (en minutos o en dólares), tu tasa por minuto, tu moneda secundaria, tu nombre/emoji y el tema claro u oscuro.</p>
+</div>
+<div class="help-block">
+<p class="help-block-label">Cómo configurarlo</p>
+<ol>
+<li><b>Ajustes → Tu perfil</b> para nombre y emoji.</li>
+<li><b>Ajustes → Metas</b> para minutos productivos o monto en dólares — se recalculan entre sí solos.</li>
+<li><b>Ajustes → Moneda secundaria</b> para agregar tu moneda local y la tasa de cambio, y ver conversiones en toda la app.</li>
+<li>El interruptor de tema claro/oscuro vive en el sidebar.</li>
+</ol>
+</div>
+</div>
+</section>
+
+</div>
+</div>
+</div><!-- /pageHelp -->
 
 <div class="footer">Todo queda local en el navegador hasta que exportes o descargues el archivo.</div></div>
 <div aria-hidden="true" class="modal-overlay" id="notificationsModal">
@@ -19293,6 +19668,9 @@ function render() {
     function relocateCallsSection(page) {
       const callsSection = document.getElementById('callsSection');
       if (!callsSection) return;
+      // Ayuda es contenido de referencia, no de trabajo: Llamadas no tiene lugar ahí.
+      callsSection.hidden = page === 'help';
+      if (page === 'help') return;
       if (page === 'home') {
         const pageHome = document.getElementById('pageHome');
         const earningsAccordion = document.getElementById('earningsAccordion');
@@ -19310,7 +19688,7 @@ function render() {
 
     function navigateToPage(page) {
       // Páginas válidas del menú lateral.
-      const pages = ['home', 'schedule', 'reports', 'paydates', 'calendar', 'finance'];
+      const pages = ['home', 'schedule', 'reports', 'paydates', 'calendar', 'finance', 'help'];
       if (!pages.includes(page)) page = 'home';
       currentPage = page;
       // Render ya no recalcula renderReportsDashboard salvo que currentPage === 'reports' (ver esa
@@ -19435,6 +19813,50 @@ function render() {
       updateSidebarProgressWidget();
       applySidebarPinnedState();
       navigateToPage('home');
+    }
+
+    // Página de Ayuda: buscador local (filtra tarjetas por texto) y el TOC
+    // (columna en escritorio, chips en mobile) que resalta la sección visible
+    // y hace scroll suave al tocarla — sin depender de ningún estado global.
+    function initHelpPage() {
+      const page = document.getElementById('pageHelp');
+      if (!page) return;
+      const cards = Array.from(page.querySelectorAll('.help-card'));
+      const tocLinks = Array.from(page.querySelectorAll('[data-help-toc]'));
+      const searchInput = document.getElementById('helpSearchInput');
+      const emptyMsg = document.getElementById('helpSearchEmpty');
+
+      if (searchInput) {
+        searchInput.addEventListener('input', () => {
+          const q = searchInput.value.trim().toLowerCase();
+          let anyVisible = false;
+          cards.forEach(card => {
+            const match = !q || card.textContent.toLowerCase().includes(q);
+            card.classList.toggle('is-hidden-by-search', !match);
+            if (match) anyVisible = true;
+          });
+          if (emptyMsg) emptyMsg.hidden = anyVisible;
+        });
+      }
+
+      tocLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const target = document.getElementById(link.getAttribute('href').slice(1));
+          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
+
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            const id = '#' + entry.target.id;
+            tocLinks.forEach(link => link.classList.toggle('active', link.getAttribute('href') === id));
+          });
+        }, { rootMargin: '-15% 0px -70% 0px', threshold: 0 });
+        cards.forEach(card => observer.observe(card));
+      }
     }
 
     // Reemplaza window.confirm, que muchos webviews/PWA en el teléfono ignoran silenciosamente (el
@@ -20222,6 +20644,7 @@ function render() {
     wireAccordionPersistence();
     wireActionButtonPress();
     initSidebarNav();
+    initHelpPage();
     // Toggle "Contraer bloques al terminar".
     const collapseCompletedBlocksBtn = document.getElementById('collapseCompletedBlocksBtn');
     if (collapseCompletedBlocksBtn) collapseCompletedBlocksBtn.addEventListener('click', toggleCollapseCompletedBlocks);

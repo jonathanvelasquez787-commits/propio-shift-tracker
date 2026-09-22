@@ -237,23 +237,6 @@ Pendientes, en orden:
 
 **PENDIENTES**
 
-- **Página de Ayuda — mockup v2 aprobado, falta el contenido real.** Corrige
-  el planteo inicial (que era un modal, como el de Higher Rate): ahora es una
-  PÁGINA COMPLETA propia, nunca un modal/popup. Solo se hace responsive de
-  ESCRITORIO — el usuario pidió explícitamente no armar mockups mobile
-  aparte, solo que el layout de escritorio se adapte si se abre en celular
-  (excepción puntual al paso 2 del protocolo de LAYOUT — "mockup con las dos
-  vistas, celular y escritorio" — para esta feature). El mockup v2 (aprobado)
-  trae las dos vistas de tema (claro/oscuro) en el mismo archivo con un
-  switch para compararlas, en vez de dos archivos sueltos. Vive dentro de la
-  app, solo accesible con cuenta iniciada (no en la landing pública).
-  6 secciones en acordeón — Turno, Llamadas, Higher Rate, Finanzas,
-  Calendario, Cuenta — y cada una debe explicar qué hace la función Y los
-  pasos exactos para configurarla (más completo que el primer intento, que
-  solo listaba explicaciones sueltas). Entrada probablemente un botón
-  "Ayuda" en la barra de acciones del header, mismo patrón visual que ya usan
-  los demás botones de esa barra. Siguiente paso: escribir/aprobar el
-  contenido real de las 6 secciones — recién ahí se toca `app.html`.
 - **Categorías de Finanzas propias (con su nombre).** El usuario mencionó de
   pasada la idea de poder crear sus propias categorías (además de las 7 fijas
   de `FINANCE_CATEGORIES`) en vez de solo elegir entre las existentes. No
@@ -354,6 +337,26 @@ Pendientes, en orden:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v551** — Página de Ayuda completa dentro de la app, a partir del mockup v2
+(protocolo de LAYOUT completo: página completa —no modal—, responsive solo
+de escritorio a pedido explícito del usuario, con las dos vistas de tema en
+el mismo archivo; aprobado antes de tocar código).
+
+- `app.html`: nuevo link de sidebar `data-page="help"` (ícono de
+  interrogación, tono `--warn-rgb`, badge "NUEVO" temporal) después de
+  Finanzas. Nueva página `#pageHelp` con 9 secciones — Turno, Horario,
+  Llamadas, Higher Rate, Finanzas, Reportes, Calendario, Cuenta, Ajustes —
+  cada una con "Qué hace" y "Cómo configurarlo", reutilizando `.card` y
+  `.mc-info-box` ya existentes (hereda tema claro/oscuro sin CSS nuevo de
+  color). Buscador funcional que filtra tarjetas por texto (`helpSearchInput`
+  + `helpSearchEmpty`), TOC en columna fija en escritorio / chips
+  horizontales en mobile (breakpoint 900px, el mismo del sidebar), con
+  scroll suave al tocar un link y resaltado automático de la sección visible
+  vía `IntersectionObserver` — todo en `initHelpPage()`, llamada junto a
+  `initSidebarNav()`. `navigateToPage` suma `'help'` a las páginas válidas;
+  `relocateCallsSection` esconde "Llamadas" en esta página (contenido de
+  referencia, no de trabajo — no aplica ahí). Entregado completo y editado.
+
 **v550** — El usuario reportó una llamada de las 10:17 AM con bono Silver
 pese a estar fuera del horario de su ventana de Higher Rate (06:30–10:15) —
 apareció justo al cambiarle el nivel a esa ventana de Bronce a Silver, sin
@@ -405,25 +408,4 @@ de G/B.
   "cambios solo de valores/tokens de color sobre componentes que ya
   existen". Entregado completo y editado.
 
-**v548** — El usuario pidió que, en "Agregar gasto" (Finanzas), el campo
-Nombre se rellene solo con una sugerencia al elegir categoría (ej. Casa →
-Renta), en vez de quedar siempre en blanco. Se descartó a propósito la otra
-opción que ofreció el usuario en el mismo pedido (dejar crear categorías
-propias con su nombre) — cambio de mayor alcance, pendiente si lo pide
-después.
-
-- `app.html`: nuevo `FINANCE_NAME_SUGGESTIONS` (junto a `FINANCE_CATEGORIES`)
-  con un nombre sugerido por categoría — `casa: 'Renta'`, `servicios: 'Luz'`,
-  `transporte: 'Gasolina'`, `comida: 'Despensa'`, `deuda: 'Préstamo'`; `otro`
-  no sugiere nada. Nueva `financeApplyNameSuggestion(categoryId)`: solo
-  escribe en `#financeRowNameInput` si el campo está vacío o todavía tiene la
-  última sugerencia sin tocar (`financeRowNameSuggested`) — nunca pisa un
-  nombre que el usuario ya haya escrito a mano. Se llama (1) al abrir el modal
-  para una fila NUEVA que no es meta (con la categoría por default, "Casa"),
-  y (2) en un listener `change` nuevo sobre `#financeRowCategoryInput`. Al
-  abrir el modal para editar una fila existente, `financeRowNameSuggested` se
-  resetea a `''` para que cambiar la categoría en modo edición nunca
-  reemplace el nombre real ya guardado. Cero cambios de HTML/CSS — cae en la
-  excepción de LAYOUT "cambios puramente de datos/valores por default".
-  Entregado completo y editado.
 
