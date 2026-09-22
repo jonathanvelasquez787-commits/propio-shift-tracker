@@ -572,7 +572,8 @@
       }
       :root:not(.theme-dark) .sidebar-link.active {
         background: rgba(var(--accent-blue-2-rgb), .14);
-        border-color: rgba(var(--accent-blue-2-rgb), .35);
+        border-color: transparent;
+        color: var(--accent-blue-2);
       }
       :root:not(.theme-dark) .sidebar-link-dot {
         background: var(--accent-blue-2);
@@ -621,7 +622,7 @@
       :root:not(.theme-dark) .earnings-mode-btn.active { background: var(--accent-blue-2); }
       :root:not(.theme-dark) .table-filter-btn.active { background: var(--accent-blue-2); }
       :root:not(.theme-dark) .fin-tab-btn.active { background: var(--accent-blue-2); }
-      :root:not(.theme-dark) .sidebar-link-icon-home { --icon-rgb: var(--accent-blue-2-rgb); }
+      :root:not(.theme-dark) .sidebar-link-icon { --icon-rgb: var(--accent-blue-2-rgb); }
       :root:not(.theme-dark) .gh-ring { background: conic-gradient(var(--accent-blue-2) calc(var(--ring-pct, 0) * 1%), rgba(255,255,255,.10) 0); }
       :root:not(.theme-dark) .tbl-row-icon.type-shift { background: rgba(var(--accent-blue-2-rgb), .14); color: var(--accent-blue-2); }
       :root:not(.theme-dark) .tbl-type-badge.type-shift { background: rgba(var(--accent-blue-2-rgb), .16); color: var(--accent-blue-2); }
@@ -644,9 +645,6 @@
         background: linear-gradient(135deg, rgba(var(--accent-blue-2-rgb), .22), rgba(var(--blue-rgb), .22));
         border-color: rgba(var(--accent-blue-2-rgb), .32);
       }
-      /* --blue-rgb en este tema es un pastel que casi desaparece al 14/28% sobre blanco; aquí se
-         usa --purple. */
-      :root:not(.theme-dark) .sidebar-link-icon-schedule { --icon-rgb: var(--purple-rgb); }
       :root:not(.theme-dark) .sblk-card {
         border-color: var(--line);
         background: var(--panel);
@@ -1055,7 +1053,8 @@
     }
     html.theme-light .sidebar-link.active {
       background: rgba(var(--accent-blue-2-rgb), .14);
-      border-color: rgba(var(--accent-blue-2-rgb), .35);
+      border-color: transparent;
+      color: var(--accent-blue-2);
     }
     html.theme-light .sidebar-link-dot {
       background: var(--accent-blue-2);
@@ -1104,7 +1103,7 @@
     html.theme-light .earnings-mode-btn.active { background: var(--accent-blue-2); }
     html.theme-light .table-filter-btn.active { background: var(--accent-blue-2); }
     html.theme-light .fin-tab-btn.active { background: var(--accent-blue-2); }
-    html.theme-light .sidebar-link-icon-home { --icon-rgb: var(--accent-blue-2-rgb); }
+    html.theme-light .sidebar-link-icon { --icon-rgb: var(--accent-blue-2-rgb); }
     html.theme-light .gh-ring { background: conic-gradient(var(--accent-blue-2) calc(var(--ring-pct, 0) * 1%), rgba(255,255,255,.10) 0); }
     html.theme-light .tbl-row-icon.type-shift { background: rgba(var(--accent-blue-2-rgb), .14); color: var(--accent-blue-2); }
     html.theme-light .tbl-type-badge.type-shift { background: rgba(var(--accent-blue-2-rgb), .16); color: var(--accent-blue-2); }
@@ -1127,7 +1126,6 @@
       background: linear-gradient(135deg, rgba(var(--accent-blue-2-rgb), .22), rgba(var(--blue-rgb), .22));
       border-color: rgba(var(--accent-blue-2-rgb), .32);
     }
-    html.theme-light .sidebar-link-icon-schedule { --icon-rgb: var(--purple-rgb); }
     html.theme-light .sblk-card {
       border-color: var(--line);
       background: var(--panel);
@@ -1362,13 +1360,13 @@
       border-radius: 14px;
       border: 1px solid transparent;
       background: transparent;
-      color: var(--text);
+      color: var(--muted);
       font-weight: 700;
       font-size: 14.5px;
       text-align: left;
       cursor: pointer;
       white-space: nowrap;
-      transition: background .14s ease, border-color .14s ease, transform .14s ease;
+      transition: background .14s ease, color .14s ease, transform .14s ease;
     }
     .sidebar-link:hover {
       background: rgba(255,255,255,.06);
@@ -1376,8 +1374,8 @@
     }
     .sidebar-link.active {
       background: rgba(var(--cyan-rgb), .14);
-      border-color: rgba(var(--cyan-rgb), .35);
-      color: var(--text);
+      border-color: transparent;
+      color: var(--cyan);
     }
     .sidebar-link-icon {
       flex: 0 0 auto;
@@ -1388,35 +1386,22 @@
       align-items: center;
       justify-content: center;
       font-size: 15px;
+      /* Un solo acento para todos los íconos (como el preview de la landing) en vez de
+         un color distinto por página. */
+      --icon-rgb: var(--cyan-rgb);
+      color: rgb(var(--icon-rgb));
       background: rgba(var(--icon-rgb), .14);
       border: 1px solid rgba(var(--icon-rgb), .28);
     }
-    .sidebar-link-icon-home { --icon-rgb: var(--cyan-rgb); }
-    .sidebar-link-icon-schedule { --icon-rgb: var(--blue-rgb); }
-    .sidebar-link-icon-blocks { --icon-rgb: var(--pink-rgb); }
-    .sidebar-link-icon-reports { --icon-rgb: var(--good-rgb); }
-    .sidebar-link-icon-alerts { --icon-rgb: var(--warn-rgb); }
     .sidebar-link-label {
       flex: 1 1 auto;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .sidebar-link-arrow {
-      flex: 0 0 auto;
-      color: var(--muted);
-      font-size: 16px;
-      line-height: 1;
-    }
-    .sidebar-link-dot {
-      flex: 0 0 auto;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--cyan);
-      box-shadow: 0 0 10px rgba(var(--cyan-rgb), .6);
-    }
-    .sidebar-link:not(.active) .sidebar-link-dot { display: none; }
-    .sidebar-link.active .sidebar-link-arrow { display: none; }
+    /* Flecha y punto de "activo" quitados: el preview de la landing marca lo activo
+       solo con el fondo + color de acento. */
+    .sidebar-link-arrow { display: none; }
+    .sidebar-link-dot { display: none; }
     /* Temporal: quitar cuando "Ayuda" deje de ser una feature recién agregada. */
     .sidebar-link-badge-new {
       flex: 0 0 auto;
@@ -8165,13 +8150,13 @@
 </div>
 <div class="sidebar-section-label">Navegación</div>
 <div class="sidebar-links">
-<button class="sidebar-link active" data-page="home" type="button"><span class="sidebar-link-icon sidebar-link-icon-home"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg></span><span class="sidebar-link-label">Inicio</span><span class="sidebar-link-arrow">›</span><span class="sidebar-link-dot"></span></button>
-<button class="sidebar-link" data-page="schedule" type="button"><span class="sidebar-link-icon sidebar-link-icon-schedule"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span class="sidebar-link-label">Horario</span><span class="sidebar-link-arrow">›</span><span class="sidebar-link-dot"></span></button>
-<button class="sidebar-link" data-page="reports" type="button"><span class="sidebar-link-icon sidebar-link-icon-reports"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><line x1="4" y1="20" x2="4" y2="10"/><line x1="10" y1="20" x2="10" y2="4"/><line x1="16" y1="20" x2="16" y2="14"/><line x1="21" y1="20" x2="3" y2="20"/></svg></span><span class="sidebar-link-label">Reportes</span><span class="sidebar-link-arrow">›</span><span class="sidebar-link-dot"></span></button>
-<button class="sidebar-link" data-page="paydates" type="button"><span class="sidebar-link-icon" style="background: rgba(var(--pink-rgb), .14); border: 1px solid rgba(var(--pink-rgb), .28);"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span class="sidebar-link-label">Fechas de pago</span><span class="sidebar-link-arrow">›</span><span class="sidebar-link-dot"></span></button>
-<button class="sidebar-link" data-page="calendar" type="button"><span class="sidebar-link-icon" style="background: rgba(var(--rpt-purple-rgb), .14); border: 1px solid rgba(var(--rpt-purple-rgb), .28);"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg></span><span class="sidebar-link-label">Calendario</span><span class="sidebar-link-arrow">›</span><span class="sidebar-link-dot"></span></button>
-<button class="sidebar-link" data-page="finance" type="button"><span class="sidebar-link-icon" style="background: rgba(var(--teal-rgb), .14); border: 1px solid rgba(var(--teal-rgb), .28);"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12V8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h13a1 1 0 0 0 1-1v-4"/><path d="M20 12a2 2 0 0 1 0 4h-3a2 2 0 0 1 0-4Z"/></svg></span><span class="sidebar-link-label">Finanzas</span><span class="sidebar-link-arrow">›</span><span class="sidebar-link-dot"></span></button>
-<button class="sidebar-link" data-page="help" type="button"><span class="sidebar-link-icon" style="background: rgba(var(--warn-rgb), .14); border: 1px solid rgba(var(--warn-rgb), .28);"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2.2-3 4.4"/><line x1="12" y1="17.5" x2="12" y2="17.51"/></svg></span><span class="sidebar-link-label">Ayuda</span><span class="sidebar-link-badge-new">NUEVO</span><span class="sidebar-link-arrow">›</span><span class="sidebar-link-dot"></span></button>
+<button class="sidebar-link active" data-page="home" type="button"><span class="sidebar-link-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg></span><span class="sidebar-link-label">Inicio</span><span class="sidebar-link-arrow">›</span><span class="sidebar-link-dot"></span></button>
+<button class="sidebar-link" data-page="schedule" type="button"><span class="sidebar-link-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span class="sidebar-link-label">Horario</span><span class="sidebar-link-arrow">›</span><span class="sidebar-link-dot"></span></button>
+<button class="sidebar-link" data-page="reports" type="button"><span class="sidebar-link-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><line x1="4" y1="20" x2="4" y2="10"/><line x1="10" y1="20" x2="10" y2="4"/><line x1="16" y1="20" x2="16" y2="14"/><line x1="21" y1="20" x2="3" y2="20"/></svg></span><span class="sidebar-link-label">Reportes</span><span class="sidebar-link-arrow">›</span><span class="sidebar-link-dot"></span></button>
+<button class="sidebar-link" data-page="paydates" type="button"><span class="sidebar-link-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span class="sidebar-link-label">Fechas de pago</span><span class="sidebar-link-arrow">›</span><span class="sidebar-link-dot"></span></button>
+<button class="sidebar-link" data-page="calendar" type="button"><span class="sidebar-link-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg></span><span class="sidebar-link-label">Calendario</span><span class="sidebar-link-arrow">›</span><span class="sidebar-link-dot"></span></button>
+<button class="sidebar-link" data-page="finance" type="button"><span class="sidebar-link-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12V8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h13a1 1 0 0 0 1-1v-4"/><path d="M20 12a2 2 0 0 1 0 4h-3a2 2 0 0 1 0-4Z"/></svg></span><span class="sidebar-link-label">Finanzas</span><span class="sidebar-link-arrow">›</span><span class="sidebar-link-dot"></span></button>
+<button class="sidebar-link" data-page="help" type="button"><span class="sidebar-link-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2.2-3 4.4"/><line x1="12" y1="17.5" x2="12" y2="17.51"/></svg></span><span class="sidebar-link-label">Ayuda</span><span class="sidebar-link-badge-new">NUEVO</span><span class="sidebar-link-arrow">›</span><span class="sidebar-link-dot"></span></button>
 </div>
 <div class="sidebar-section-label">Mi progreso</div>
 <button class="sidebar-progress-card" id="sidebarProgressCard" type="button" title="Ver Reportes">
