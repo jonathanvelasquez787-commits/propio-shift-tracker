@@ -7188,6 +7188,9 @@
     .fin-cat-chip-icon .ic-svg { width: 14px; height: 14px; }
     .fin-cat-chip-new { border-style: dashed; color: var(--muted); }
     .fin-cat-chip-new:hover { color: var(--text); }
+    /* Categoría propia: el chip normal + sus dos .tbl-icon-btn (editar/borrar, mismo patrón que
+       Tabla de llamadas) agrupados sin separación extra de la grilla. */
+    .fin-cat-chip-wrap { display: inline-flex; align-items: center; gap: 4px; }
 
     /* Panel inline "+ Nueva categoría" — mismo criterio de revelado que .goals-emoji-picker-wrap
        (display:none hasta que se abre), sin modal aparte. */
@@ -9670,6 +9673,7 @@ $0.72"></textarea>
 <input type="hidden" id="financeRowCategoryInput" value="casa"/>
 <div class="fin-cat-chip-grid" id="financeRowCategoryChips"></div>
 <div class="fin-cat-new-panel" id="financeRowNewCatPanel">
+<div class="fin-preview-title" id="financeNewCatPanelTitle">Nueva categoría</div>
 <div class="goals-field">
 <label for="financeNewCatNameInput">Nombre de la categoría</label>
 <input id="financeNewCatNameInput" maxlength="24" placeholder="Ej. Mascota, Gimnasio, Suscripciones..." type="text"/>
@@ -9685,7 +9689,7 @@ $0.72"></textarea>
 <input type="hidden" id="financeNewCatColorInput" value="102,226,165"/>
 </div>
 <div class="modal-actions mc-action-row" style="margin-top:2px;">
-<button class="mc-btn-primary cyan" id="createFinCatBtn" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polyline points="5 12 10 17 19 6"/></svg> Crear categoría</button>
+<button class="mc-btn-primary cyan" id="createFinCatBtn" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polyline points="5 12 10 17 19 6"/></svg> <span id="createFinCatBtnLabel">Crear categoría</span></button>
 <button class="mc-btn-warn-pill" id="cancelFinCatBtn" type="button">Cancelar</button>
 </div>
 </div>
@@ -14854,6 +14858,8 @@ function renderFinancePreview() {
 let financeActiveTab = 'gastos';
 let financeRowModalKind = 'gasto';
 let financeEditingRowId = null;
+// Categoría propia que se está editando en el panel "+ Nueva categoría" (null = modo alta).
+let financeEditingCatId = null;
 let financeRowTargetSyncing = false;
 
 // Sincroniza Monto objetivo ($) ↔ Monto objetivo en tu moneda, en cualquier dirección — mismo
@@ -15309,13 +15315,25 @@ function openFinanceRowModal(kind, existingRow = null) {
 function renderFinanceCategoryChips(selectedId) {
   const grid = document.getElementById('financeRowCategoryChips');
   if (!grid) return;
+  const customIds = new Set(
+    (Array.isArray(settings.customFinanceCategories) ? settings.customFinanceCategories : []).map(c => c.id)
+  );
   const cats = financeAllCategories();
-  grid.innerHTML = cats.map(cat => `
-    <button type="button" class="fin-cat-chip ${cat.id === selectedId ? 'selected' : ''}" data-fin-cat-chip="${escapeHtml(cat.id)}" style="--cat-rgb:${cat.rgb};">
-      <span class="fin-cat-chip-icon">${financeCategoryIconHtml(cat)}</span>
-      <span class="fin-cat-chip-label">${escapeHtml(cat.label)}</span>
-    </button>
-  `).join('') + `
+  grid.innerHTML = cats.map(cat => {
+    const chipBtn = `
+      <button type="button" class="fin-cat-chip ${cat.id === selectedId ? 'selected' : ''}" data-fin-cat-chip="${escapeHtml(cat.id)}" style="--cat-rgb:${cat.rgb};">
+        <span class="fin-cat-chip-icon">${financeCategoryIconHtml(cat)}</span>
+        <span class="fin-cat-chip-label">${escapeHtml(cat.label)}</span>
+      </button>`;
+    // Solo las categorías propias se pueden editar/borrar — las 7 fijas de FINANCE_CATEGORIES no.
+    if (!customIds.has(cat.id)) return chipBtn;
+    return `
+      <div class="fin-cat-chip-wrap">
+        ${chipBtn}
+        <button type="button" class="tbl-icon-btn" data-fin-cat-edit="${escapeHtml(cat.id)}" aria-label="Editar categoría" title="Editar categoría">${iconHtml('edit')}</button>
+        <button type="button" class="tbl-icon-btn bad" data-fin-cat-delete="${escapeHtml(cat.id)}" aria-label="Borrar categoría" title="Borrar categoría">${iconHtml('trash')}</button>
+      </div>`;
+  }).join('') + `
     <button type="button" class="fin-cat-chip fin-cat-chip-new" id="financeRowNewCatToggle">
       <span class="fin-cat-chip-icon">${iconHtml('plus')}</span>
       <span class="fin-cat-chip-label">Nueva categoría</span>
@@ -15332,16 +15350,26 @@ function selectFinanceCategoryChip(catId) {
   if (financeRowModalKind !== 'meta') financeApplyNameSuggestion(catId);
 }
 
-function openFinanceNewCatPanel() {
+// Sin catId: modo alta (panel vacío). Con catId: modo edición, precarga nombre/emoji/color de esa
+// categoría propia y financeEditingCatId queda seteado hasta que se guarda o se cancela.
+function openFinanceNewCatPanel(catId = null) {
   const panel = document.getElementById('financeRowNewCatPanel');
   if (!panel) return;
   const nameInput = document.getElementById('financeNewCatNameInput');
   const emojiInput = document.getElementById('financeNewCatEmojiInput');
   const colorInput = document.getElementById('financeNewCatColorInput');
-  if (nameInput) nameInput.value = '';
-  const defaultEmoji = '🏷️';
+  const title = document.getElementById('financeNewCatPanelTitle');
+  const btnLabel = document.getElementById('createFinCatBtnLabel');
+  const existing = catId
+    ? (Array.isArray(settings.customFinanceCategories) ? settings.customFinanceCategories : []).find(c => c.id === catId)
+    : null;
+  financeEditingCatId = existing ? existing.id : null;
+  if (title) title.textContent = existing ? 'Editar categoría' : 'Nueva categoría';
+  if (btnLabel) btnLabel.textContent = existing ? 'Guardar cambios' : 'Crear categoría';
+  if (nameInput) nameInput.value = existing ? existing.label : '';
+  const defaultEmoji = existing ? existing.emoji : '🏷️';
   if (emojiInput) emojiInput.value = defaultEmoji;
-  const defaultColor = FINANCE_CUSTOM_CATEGORY_PALETTE[0];
+  const defaultColor = existing && FINANCE_CUSTOM_CATEGORY_PALETTE.includes(existing.rgb) ? existing.rgb : FINANCE_CUSTOM_CATEGORY_PALETTE[0];
   if (colorInput) colorInput.value = defaultColor;
   renderEmojiPicker('emojiPickerNewFinCat', defaultEmoji);
   renderFinanceColorSwatches(defaultColor);
@@ -15352,6 +15380,7 @@ function openFinanceNewCatPanel() {
 function closeFinanceNewCatPanel() {
   const panel = document.getElementById('financeRowNewCatPanel');
   if (panel) panel.classList.remove('open');
+  financeEditingCatId = null;
 }
 
 function renderFinanceColorSwatches(selected) {
@@ -15362,9 +15391,10 @@ function renderFinanceColorSwatches(selected) {
   `).join('');
 }
 
-// Crea la categoría con nombre + emoji + color elegidos en el panel, la selecciona en la grilla y
-// vuelve a mostrar los chips (ya con la nueva incluida) — no cierra el modal completo, solo el
-// panel de "+ Nueva categoría".
+// Crea o edita una categoría propia según financeEditingCatId (seteado por openFinanceNewCatPanel).
+// Alta: la agrega, la selecciona en la grilla y crea settings.financeCategories[id] vacío.
+// Edición: actualiza label/emoji/rgb en el mismo objeto — no toca settings.financeCategories[id]
+// (las filas ya guardadas en esa categoría siguen ahí, solo cambia cómo se ve la categoría).
 function createFinanceCategory() {
   const nameInput = document.getElementById('financeNewCatNameInput');
   const emojiInput = document.getElementById('financeNewCatEmojiInput');
@@ -15376,8 +15406,25 @@ function createFinanceCategory() {
   }
   const emoji = String(emojiInput?.value || '').trim() || '🏷️';
   const rgb = FINANCE_CUSTOM_CATEGORY_PALETTE.includes(colorInput?.value) ? colorInput.value : FINANCE_CUSTOM_CATEGORY_PALETTE[0];
-  const id = `custom_${makeLocalId()}`;
   if (!Array.isArray(settings.customFinanceCategories)) settings.customFinanceCategories = [];
+
+  if (financeEditingCatId) {
+    const existing = settings.customFinanceCategories.find(c => c.id === financeEditingCatId);
+    if (!existing) { closeFinanceNewCatPanel(); return; }
+    existing.label = label;
+    existing.emoji = emoji;
+    existing.rgb = rgb;
+    const editedId = existing.id;
+    saveSettingsOnly();
+    closeFinanceNewCatPanel();
+    renderFinanceCategoryChips(editedId);
+    selectFinanceCategoryChip(editedId);
+    renderFinanceSection();
+    toast(`Categoría "${label}" actualizada`);
+    return;
+  }
+
+  const id = `custom_${makeLocalId()}`;
   settings.customFinanceCategories.push({ id, label, emoji, rgb });
   settings.financeCategories[id] = { rows: [] };
   saveSettingsOnly();
@@ -15385,6 +15432,37 @@ function createFinanceCategory() {
   renderFinanceCategoryChips(id);
   selectFinanceCategoryChip(id);
   toast(`Categoría "${label}" creada`);
+}
+
+// Borra una categoría propia. Sus filas (si tenía) no se pierden: pasan a "Otro", igual fija para
+// Gastos y Metas gracias a financeRowIsMeta(). Si la categoría borrada era la seleccionada en el
+// modal abierto, la selección pasa a "Otro" también.
+function financeDeleteCategory(catId) {
+  const cat = (Array.isArray(settings.customFinanceCategories) ? settings.customFinanceCategories : []).find(c => c.id === catId);
+  if (!cat) return;
+  const catRows = settings.financeCategories[catId] ? settings.financeCategories[catId].rows : [];
+  const rowCount = catRows.length;
+  const warning = rowCount > 0
+    ? ` Sus ${rowCount} fila(s) no se borran: pasan a la categoría "Otro".`
+    : '';
+  appConfirm(`¿Borrar la categoría "${cat.label}"?${warning} Esta acción no se puede deshacer.`, () => {
+    if (settings.financeCategories[catId]) {
+      catRows.forEach(row => { row.categoryId = 'otro'; });
+      if (!settings.financeCategories.otro) settings.financeCategories.otro = { rows: [] };
+      settings.financeCategories.otro.rows.push(...catRows);
+      delete settings.financeCategories[catId];
+    }
+    settings.customFinanceCategories = settings.customFinanceCategories.filter(c => c.id !== catId);
+    saveSettingsOnly();
+    if (financeEditingCatId === catId) closeFinanceNewCatPanel();
+    const categoryInput = document.getElementById('financeRowCategoryInput');
+    const wasSelected = categoryInput && categoryInput.value === catId;
+    const nextSelected = wasSelected ? 'otro' : (categoryInput ? categoryInput.value : 'otro');
+    if (categoryInput) categoryInput.value = nextSelected;
+    renderFinanceCategoryChips(nextSelected);
+    renderFinanceSection();
+    toast(`Categoría "${cat.label}" borrada`);
+  });
 }
 
 function saveFinanceRowModal() {
@@ -20693,6 +20771,10 @@ function render() {
     document.getElementById('financeRowCategoryChips').addEventListener('click', (e) => {
       if (!(e.target instanceof Element)) return;
       if (e.target.closest('#financeRowNewCatToggle')) { openFinanceNewCatPanel(); return; }
+      const editBtn = e.target.closest('[data-fin-cat-edit]');
+      if (editBtn) { openFinanceNewCatPanel(editBtn.getAttribute('data-fin-cat-edit')); return; }
+      const deleteBtn = e.target.closest('[data-fin-cat-delete]');
+      if (deleteBtn) { financeDeleteCategory(deleteBtn.getAttribute('data-fin-cat-delete')); return; }
       const chip = e.target.closest('[data-fin-cat-chip]');
       if (chip) selectFinanceCategoryChip(chip.getAttribute('data-fin-cat-chip'));
     });

@@ -213,39 +213,6 @@ futura opera bajo esto, sin excepción:
 
 ---
 
-**ESTADO DEL ROADMAP A PRODUCCIÓN**
-
-Fases 0 (proceso de trabajo), 1 (Supabase: tablas, RLS, triggers, alta/login
-reales) y 2 (landing pública, los 3 métodos de login, páginas legales) están
-**cerradas y funcionando en producción**, verificado por el usuario.
-
-Pendientes, en orden:
-- **Fase 3 — Modularizar.** Partir `app.html` en módulos ES con una
-  herramienta de build (ej. Vite). Riesgo real: hoy `state`/`settings`/
-  `calls` son variables globales de módulo y ~300 funciones se llaman entre
-  sí sin imports; partirlo exige decidir cómo se comparte el estado mutable.
-  Antes de encarar esta fase hay que resolver cómo se entrega el resultado
-  sin que el usuario ejecute ningún comando de build — o evaluar si vale la
-  pena dado que rompe el patrón de "un solo archivo que se edita y se sube
-  tal cual" (ver FLUJO DE TRABAJO arriba). Al modularizar hay que desmontar
-  los andamios que hoy vive en `js/boot.js` (monta la app inyectando
-  `#appMainScript`, inyecta a mano el panel de cuenta, el borrado de cuenta y
-  el bloque de Proyección del ciclo) y mover a su origen todo el afinado de
-  tema que hoy vive como capa en `css/app-shell.css`.
-- **Fase 4 — Protección del código fuente.** Ya hecho: gate de sesión
-  (`#appMainScript` + `js/boot.js`), licencia + términos + privacidad en el
-  repo (falta rellenar los marcadores, ver PENDIENTES). Pendiente: minificar/
-  bundlear sin sourcemaps (depende de Fase 3), mover al servidor el motor de
-  Adherencia/reportes agregados (rompe el offline de esa parte), repo privado
-  en GitHub (pendiente del usuario). Explícitamente descartado: bloquear
-  click derecho, deshabilitar F12, ofuscadores agresivos.
-- **Fase 5 — Opcionales.** `calls` en tabla propia para reportes del lado del
-  servidor, PWA instalable con service worker, monitoreo de errores (Sentry),
-  backup automático diario. Borrado de cuenta y exportación de datos ya están
-  hechos (adelantados en Fase 2).
-
----
-
 **PENDIENTES**
 
 - **Cambiar el username no tiene pantalla.** `auth.js` ya exporta
@@ -328,7 +295,76 @@ Pendientes, en orden:
 
 ---
 
+**ESTADO DEL ROADMAP A PRODUCCIÓN**
+
+Fases 0 (proceso de trabajo), 1 (Supabase: tablas, RLS, triggers, alta/login
+reales) y 2 (landing pública, los 3 métodos de login, páginas legales) están
+**cerradas y funcionando en producción**, verificado por el usuario.
+
+Pendientes, en orden:
+- **Fase 3 — Modularizar.** Partir `app.html` en módulos ES con una
+  herramienta de build (ej. Vite). Riesgo real: hoy `state`/`settings`/
+  `calls` son variables globales de módulo y ~300 funciones se llaman entre
+  sí sin imports; partirlo exige decidir cómo se comparte el estado mutable.
+  Antes de encarar esta fase hay que resolver cómo se entrega el resultado
+  sin que el usuario ejecute ningún comando de build — o evaluar si vale la
+  pena dado que rompe el patrón de "un solo archivo que se edita y se sube
+  tal cual" (ver FLUJO DE TRABAJO arriba). Al modularizar hay que desmontar
+  los andamios que hoy vive en `js/boot.js` (monta la app inyectando
+  `#appMainScript`, inyecta a mano el panel de cuenta, el borrado de cuenta y
+  el bloque de Proyección del ciclo) y mover a su origen todo el afinado de
+  tema que hoy vive como capa en `css/app-shell.css`.
+- **Fase 4 — Protección del código fuente.** Ya hecho: gate de sesión
+  (`#appMainScript` + `js/boot.js`), licencia + términos + privacidad en el
+  repo. Pendiente: minificar/
+  bundlear sin sourcemaps (depende de Fase 3), mover al servidor el motor de
+  Adherencia/reportes agregados (rompe el offline de esa parte), repo privado
+  en GitHub (pendiente del usuario). Explícitamente descartado: bloquear
+  click derecho, deshabilitar F12, ofuscadores agresivos.
+- **Fase 5 — Opcionales.** `calls` en tabla propia para reportes del lado del
+  servidor, PWA instalable con service worker, monitoreo de errores (Sentry),
+  backup automático diario. Borrado de cuenta y exportación de datos ya están
+  hechos (adelantados en Fase 2).
+
+---
+
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v554** — Pendiente pedido por el usuario: que Gastos y Metas puedan tener
+categorías propias con nombre, no solo las 7 fijas. Se armó y aprobó un
+mockup interactivo (protocolo de LAYOUT completo: grilla de chips en vez de
+`<select>`, panel inline "+ Nueva categoría", modo claro y oscuro, una sola
+versión responsive) antes de tocar código. Ya con el mockup aprobado, el
+usuario pidió además editar y borrar esas categorías — se agregó reutilizando
+100% patrones ya existentes (excepción de LAYOUT), sin mockup nuevo.
+
+- `app.html`: `settings.customFinanceCategories` (array, `{id, label, emoji,
+  rgb}`) se suma al default de settings y a la migración (descarta entradas
+  mal formadas, normaliza emoji/rgb contra `FINANCE_CUSTOM_CATEGORY_PALETTE`
+  — 8 tonos ya usados en la app, no una paleta nueva). Helpers nuevos:
+  `financeAllCategories()`, `financeCategoryDef()`, `financeCategoryIconHtml()`
+  (emoji si es propia, ícono lucide si es fija), `financeRowIsMeta()` (decide
+  Gasto vs Meta por `row.kind`, con `categoryId === 'ahorro'` como respaldo
+  para filas viejas sin ese campo — una Meta ya no se fuerza a esa categoría).
+  Todos los usos de `FINANCE_CATEGORIES[row.categoryId] || FINANCE_CATEGORIES.otro`
+  y de `iconHtml(cat.icon)` en Finanzas pasan por estos helpers.
+- El `<select>` de categoría en el modal Agregar/Editar gasto/meta es ahora
+  una grilla de chips (`renderFinanceCategoryChips`) — fijas + propias, con
+  el color de cada una (`--cat-rgb`) igual que en el resto de Finanzas. El
+  campo ya no se esconde en Metas. Al final, chip "+ Nueva categoría" abre un
+  panel inline (`.fin-cat-new-panel`, mismo criterio de revelado que
+  `.goals-emoji-picker-wrap`) con nombre, el mismo emoji picker que ya usa el
+  saludo, y 8 swatches de color.
+- Editar/borrar (solo categorías propias, las 7 fijas no llevan estos
+  botones): cada chip propio suma dos `.tbl-icon-btn` (mismo patrón que
+  Tabla de llamadas) — el de editar reabre el panel de "+ Nueva categoría"
+  precargado (`financeEditingCatId`, título y botón cambian a "Editar
+  categoría"/"Guardar cambios"; `createFinanceCategory()` ahora actualiza en
+  vez de crear si hay una edición en curso); el de borrar pide confirmación
+  con `appConfirm` (`financeDeleteCategory()`) y, si la categoría tenía
+  filas, no las borra — las reasigna a "Otro" antes de sacar la categoría de
+  `settings.customFinanceCategories`.
+- Entregado completo y editado.
 
 **v553** — El usuario no quiso "Ayuda" en el menú lateral ("no me gusta que
 esté en el menú") ni el badge "NUEVO" del link. Primer intento (botón de
@@ -378,23 +414,3 @@ mismo mensaje, no hizo falta repetir el protocolo de LAYOUT completo
   CONOCIDAS). Cero cambios de HTML funcional más allá de sacar clases/
   atributos de color ya sin uso — mismos ids, mismo `navigateToPage`.
   Entregado completo y editado.
-
-**v551** — Página de Ayuda completa dentro de la app, a partir del mockup v2
-(protocolo de LAYOUT completo: página completa —no modal—, responsive solo
-de escritorio a pedido explícito del usuario, con las dos vistas de tema en
-el mismo archivo; aprobado antes de tocar código).
-
-- `app.html`: nuevo link de sidebar `data-page="help"` (ícono de
-  interrogación, tono `--warn-rgb`, badge "NUEVO" temporal) después de
-  Finanzas. Nueva página `#pageHelp` con 9 secciones — Turno, Horario,
-  Llamadas, Higher Rate, Finanzas, Reportes, Calendario, Cuenta, Ajustes —
-  cada una con "Qué hace" y "Cómo configurarlo", reutilizando `.card` y
-  `.mc-info-box` ya existentes (hereda tema claro/oscuro sin CSS nuevo de
-  color). Buscador funcional que filtra tarjetas por texto (`helpSearchInput`
-  + `helpSearchEmpty`), TOC en columna fija en escritorio / chips
-  horizontales en mobile (breakpoint 900px, el mismo del sidebar), con
-  scroll suave al tocar un link y resaltado automático de la sección visible
-  vía `IntersectionObserver` — todo en `initHelpPage()`, llamada junto a
-  `initSidebarNav()`. `navigateToPage` suma `'help'` a las páginas válidas;
-  `relocateCallsSection` esconde "Llamadas" en esta página (contenido de
-  referencia, no de trabajo — no aplica ahí). Entregado completo y editado.
