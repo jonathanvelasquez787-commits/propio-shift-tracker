@@ -1,23 +1,16 @@
 """
 Suite de humo de Propio Shift Tracker.
 
-Formaliza el QA que hasta v539 se armaba a mano en cada ronda: las 6 páginas
-del sidebar, los modales, dos zonas horarias, dos anchos, migración de datos
-viejos y cero errores de consola.
-
-Corre contra dos objetivos:
-  reference -> el v539 congelado, sin cuentas. Es la red de regresión pura
-               de la lógica de la app.
-  app       -> el app.html generado, con el gate de sesión puenteado. Prueba,
-               además, que el truco de type="text/plain" + inyección de
-               verdad monta la app en un navegador real.
+Prueba app.html directamente — ya no existe un archivo de referencia
+"congelado" ni un script que lo genere, así que no hay nada que comparar
+byte por byte. app.html es el único archivo y se edita a mano (o con ayuda
+de Claude) directamente.
 
 Uso:
     pip install -r tests/requirements.txt
     playwright install chromium
-    pytest tests/smoke.py -q                  # los dos objetivos
-    pytest tests/smoke.py -q -k reference     # solo el congelado
-    pytest tests/smoke.py -q -k "app and 390" # solo mobile sobre app.html
+    pytest tests/smoke.py -q
+    pytest tests/smoke.py -q -k "390"   # solo mobile
 """
 
 from __future__ import annotations
@@ -153,7 +146,7 @@ def navegador():
 
 
 # ---------------------------------------------------------------------------
-# Apertura de la app en cualquiera de los dos objetivos
+# Apertura de app.html, con el gate de sesión puenteado a mano
 # ---------------------------------------------------------------------------
 
 
@@ -179,7 +172,6 @@ class Errores:
 def abrir_app(
     navegador,
     servidor: str,
-    objetivo: str,
     viewport: tuple[int, int],
     timezone: str,
     settings: dict | None = None,
@@ -209,44 +201,35 @@ def abrir_app(
         "localStorage.setItem(k, v); })();" % json.dumps(semilla)
     )
 
-    if objetivo == "app":
-        # boot.js necesita Supabase; acá se anula y la app se monta a mano con
-        # exactamente los mismos dos pasos que hace mountApp().
-        page.route(
-            "**/js/boot.js",
-            lambda route: route.fulfill(
-                status=200, content_type="application/javascript", body="/* anulado en pruebas */"
-            ),
-        )
-        page.goto(f"{servidor}/app.html", wait_until="domcontentloaded")
-        # Antes de montar, la app NO debe existir: eso es el gate de sesión.
-        assert page.evaluate("typeof window.render") == "undefined", (
-            "La app se ejecutó sin sesión: el gate de sesión no está funcionando."
-        )
-        assert page.locator("#bootGate").is_visible()
-        page.evaluate(
-            """() => {
-                document.body.classList.add('app-ready');
-                const gate = document.getElementById('bootGate');
-                if (gate) gate.remove();
-                const holder = document.getElementById('appMainScript');
-                const s = document.createElement('script');
-                s.textContent = holder.textContent;
-                document.body.appendChild(s);
-            }"""
-        )
-    else:
-        page.goto(
-            f"{servidor}/reference/propio_shift_tracker_Fixed_v539.html",
-            wait_until="domcontentloaded",
-        )
+    # boot.js necesita Supabase; acá se anula y la app se monta a mano con
+    # exactamente los mismos dos pasos que hace mountApp().
+    page.route(
+        "**/js/boot.js",
+        lambda route: route.fulfill(
+            status=200, content_type="application/javascript", body="/* anulado en pruebas */"
+        ),
+    )
+    page.goto(f"{servidor}/app.html", wait_until="domcontentloaded")
+    # Antes de montar, la app NO debe existir: eso es el gate de sesión.
+    assert page.evaluate("typeof window.render") == "undefined", (
+        "La app se ejecutó sin sesión: el gate de sesión no está funcionando."
+    )
+    assert page.locator("#bootGate").is_visible()
+    page.evaluate(
+        """() => {
+            document.body.classList.add('app-ready');
+            const gate = document.getElementById('bootGate');
+            if (gate) gate.remove();
+            const holder = document.getElementById('appMainScript');
+            const s = document.createElement('script');
+            s.textContent = holder.textContent;
+            document.body.appendChild(s);
+        }"""
+    )
 
     page.wait_for_function("typeof window.render === 'function'", timeout=10_000)
     page.wait_for_timeout(300)
     return page, errores, contexto.close
-
-
-OBJETIVOS = ["reference", "app"]
 
 
 # ---------------------------------------------------------------------------
@@ -254,27 +237,21 @@ OBJETIVOS = ["reference", "app"]
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("objetivo", OBJETIVOS)
 @pytest.mark.parametrize("nombre_vp", list(VIEWPORTS))
 @pytest.mark.parametrize("timezone", TIMEZONES)
-def test_carga_sin_errores(navegador, servidor, objetivo, nombre_vp, timezone):
-    page, errores, cerrar = abrir_app(
-        navegador, servidor, objetivo, VIEWPORTS[nombre_vp], timezone
-    )
+def test_carga_sin_errores(navegador, servidor, nombre_vp, timezone):
+    page, errores, cerrar = abrir_app(navegador, servidor, VIEWPORTS[nombre_vp], timezone)
     try:
         assert page.locator("#heroSection").is_visible()
         assert page.locator("#clockNow").inner_text() != "--:--:--"
-        errores.assert_limpio(f"{objetivo} {nombre_vp}px {timezone}")
+        errores.assert_limpio(f"{nombre_vp}px {timezone}")
     finally:
         cerrar()
 
 
-@pytest.mark.parametrize("objetivo", OBJETIVOS)
 @pytest.mark.parametrize("nombre_vp", list(VIEWPORTS))
-def test_paginas_del_sidebar(navegador, servidor, objetivo, nombre_vp):
-    page, errores, cerrar = abrir_app(
-        navegador, servidor, objetivo, VIEWPORTS[nombre_vp], TIMEZONES[0]
-    )
+def test_paginas_del_sidebar(navegador, servidor, nombre_vp):
+    page, errores, cerrar = abrir_app(navegador, servidor, VIEWPORTS[nombre_vp], TIMEZONES[0])
     try:
         for pagina in PAGINAS:
             page.evaluate(f"window.navigateToPage('{pagina}')")
@@ -283,14 +260,13 @@ def test_paginas_del_sidebar(navegador, servidor, objetivo, nombre_vp):
                 f"!document.querySelector('.app-page[data-page=\"{pagina}\"]').hidden"
             )
             assert visible, f"La página {pagina} no se mostró"
-            errores.assert_limpio(f"{objetivo} página {pagina}")
+            errores.assert_limpio(f"página {pagina}")
     finally:
         cerrar()
 
 
-@pytest.mark.parametrize("objetivo", OBJETIVOS)
-def test_modales_abren_atrapan_foco_y_cierran(navegador, servidor, objetivo):
-    page, errores, cerrar = abrir_app(navegador, servidor, objetivo, VIEWPORTS["1280"], TIMEZONES[0])
+def test_modales_abren_atrapan_foco_y_cierran(navegador, servidor):
+    page, errores, cerrar = abrir_app(navegador, servidor, VIEWPORTS["1280"], TIMEZONES[0])
     try:
         for modal_id in MODALES:
             page.evaluate(f"window.openModal('{modal_id}')")
@@ -299,7 +275,6 @@ def test_modales_abren_atrapan_foco_y_cierran(navegador, servidor, objetivo):
                 "el => el.classList.contains('open')"
             ), f"{modal_id} no abrió"
 
-            # 12 Tab seguidos no deben sacar el foco del modal.
             for _ in range(12):
                 page.keyboard.press("Tab")
             dentro = page.evaluate(
@@ -312,17 +287,14 @@ def test_modales_abren_atrapan_foco_y_cierran(navegador, servidor, objetivo):
             assert not page.locator(f"#{modal_id}").evaluate(
                 "el => el.classList.contains('open')"
             ), f"{modal_id} no cerró con Escape"
-            errores.assert_limpio(f"{objetivo} modal {modal_id}")
+            errores.assert_limpio(f"modal {modal_id}")
     finally:
         cerrar()
 
 
-@pytest.mark.parametrize("objetivo", OBJETIVOS)
 @pytest.mark.parametrize("nombre_vp", list(VIEWPORTS))
-def test_sin_desborde_horizontal(navegador, servidor, objetivo, nombre_vp):
-    page, errores, cerrar = abrir_app(
-        navegador, servidor, objetivo, VIEWPORTS[nombre_vp], TIMEZONES[0]
-    )
+def test_sin_desborde_horizontal(navegador, servidor, nombre_vp):
+    page, errores, cerrar = abrir_app(navegador, servidor, VIEWPORTS[nombre_vp], TIMEZONES[0])
     try:
         for pagina in PAGINAS:
             page.evaluate(f"window.navigateToPage('{pagina}')")
@@ -331,21 +303,19 @@ def test_sin_desborde_horizontal(navegador, servidor, objetivo, nombre_vp):
                 "() => ({ scroll: document.documentElement.scrollWidth, inner: window.innerWidth })"
             )
             assert medidas["scroll"] <= medidas["inner"] + 1, (
-                f"{objetivo} {nombre_vp}px · página {pagina}: desborde horizontal "
+                f"{nombre_vp}px · página {pagina}: desborde horizontal "
                 f"({medidas['scroll']} > {medidas['inner']})"
             )
-        errores.assert_limpio(f"{objetivo} {nombre_vp}px desborde")
+        errores.assert_limpio(f"{nombre_vp}px desborde")
     finally:
         cerrar()
 
 
-@pytest.mark.parametrize("objetivo", OBJETIVOS)
-def test_migracion_de_datos_viejos(navegador, servidor, objetivo):
+def test_migracion_de_datos_viejos(navegador, servidor):
     """Datos de una versión anterior deben migrar sin excepciones ni perder días."""
     page, errores, cerrar = abrir_app(
         navegador,
         servidor,
-        objetivo,
         VIEWPORTS["1280"],
         TIMEZONES[0],
         settings=SETTINGS_VIEJOS,
@@ -353,54 +323,45 @@ def test_migracion_de_datos_viejos(navegador, servidor, objetivo):
         calls=CALLS_VIEJAS,
     )
     try:
-        # breaks[]/lunch{} deben haberse convertido a blocks[].
         tiene_bloques = page.evaluate(
             "() => Object.values(window.settings.weeklySchedule).every(d => Array.isArray(d.blocks))"
         )
         assert tiene_bloques, "El horario viejo no migró a blocks[]"
 
-        # La clave de semana sin ceros a la izquierda debe quedar normalizada.
         claves = page.evaluate("() => Object.keys(window.settings.scheduleOverridesByWeek)")
         assert "2026-01-05" in claves, f"La semana específica no se normalizó: {claves}"
 
-        # La ventana válida sobrevive con la fecha acolchada; la basura se descarta.
         ventanas = page.evaluate("() => window.settings.higherRateWindows")
         assert len(ventanas) == 1, f"Se esperaba 1 ventana válida, quedaron {len(ventanas)}"
         assert ventanas[0]["date"] == "01/05/2026"
 
-        # Los overrides basura no deben sobrevivir.
         assert page.evaluate("() => Object.keys(window.settings.cycleGoalOverrides).length") == 0
         assert page.evaluate("() => Object.keys(window.settings.yearGoalOverrides).length") == 0
         assert page.evaluate("() => Object.keys(window.settings.dailyGoalOverrides).length") == 0
 
-        # Los registros sin id deben haber recibido uno.
         assert page.evaluate("() => window.state.events.every(e => !!e.id)")
         assert page.evaluate("() => window.state.pauseHistory.every(p => !!p.id)")
         assert page.evaluate("() => window.calls.every(c => !!c.id)")
 
-        # Los toasts de descarte son esperados; los errores de consola no.
-        errores.assert_limpio(f"{objetivo} migración")
+        errores.assert_limpio("migración")
     finally:
         cerrar()
 
 
-@pytest.mark.parametrize("objetivo", OBJETIVOS)
-def test_popup_de_bienvenida_en_perfil_nuevo(navegador, servidor, objetivo):
-    page, errores, cerrar = abrir_app(
-        navegador, servidor, objetivo, VIEWPORTS["1280"], TIMEZONES[0], settings={}
-    )
+def test_popup_de_bienvenida_en_perfil_nuevo(navegador, servidor):
+    page, errores, cerrar = abrir_app(navegador, servidor, VIEWPORTS["1280"], TIMEZONES[0], settings={})
     try:
         assert page.locator("#onboardingModal").evaluate("el => el.classList.contains('open')"), (
             "Un perfil nuevo debería ver el popup de bienvenida"
         )
-        page.fill("#onboardingNameInput", "Jonathan")
+        page.fill("#onboardingNameInput", "Prueba")
         page.click("#onboardingSaveBtn")
         page.wait_for_timeout(250)
         assert not page.locator("#onboardingModal").evaluate(
             "el => el.classList.contains('open')"
         )
-        assert "Jonathan" in page.locator("#greetingTitle").inner_text()
-        errores.assert_limpio(f"{objetivo} bienvenida")
+        assert "Prueba" in page.locator("#greetingTitle").inner_text()
+        errores.assert_limpio("bienvenida")
     finally:
         cerrar()
 
@@ -421,7 +382,6 @@ def test_gate_de_sesion_bloquea_la_app(navegador, servidor):
         assert page.evaluate("typeof window.render") == "undefined"
         assert page.evaluate("typeof window.state") == "undefined"
         assert page.locator("#bootGate").is_visible()
-        # El resto del documento queda oculto hasta que se monte.
         assert not page.locator("#heroSection").is_visible()
     finally:
         contexto.close()
@@ -437,13 +397,11 @@ def test_landing_carga_y_muestra_formularios(navegador, servidor):
         page.wait_for_timeout(400)
         assert page.locator("#loginForm").is_visible()
         assert page.locator("#googleBtn").count() == 1
-        # Sin configurar Supabase, la landing debe decirlo en vez de romperse.
         assert page.locator("#authMsg").is_visible()
         page.click("#tabSignup")
         page.wait_for_timeout(150)
         assert page.locator("#signupForm").is_visible()
         assert not page.locator("#loginForm").is_visible()
-        # Cero errores de consola pese a la configuración incompleta.
         duros = [e for e in errores.items if "pageerror" in e]
         assert not duros, duros
     finally:
@@ -460,7 +418,6 @@ def test_paginas_legales_cargan(navegador, servidor):
         ]:
             page.goto(f"{servidor}{ruta}", wait_until="domcontentloaded")
             assert titulo in page.locator("h1").first.inner_text()
-            # Recordatorio: quedan marcadores por rellenar antes de publicar.
             pendientes = page.evaluate(
                 "() => (document.body.innerText.match(/\\[TU [^\\]]+\\]/g) || []).length"
             )
@@ -468,16 +425,3 @@ def test_paginas_legales_cargan(navegador, servidor):
                 print(f"  aviso: {ruta} tiene {pendientes} marcador(es) [TU ...] sin rellenar")
     finally:
         contexto.close()
-
-
-def test_app_html_esta_al_dia():
-    """app.html debe ser exactamente lo que genera el script desde el congelado."""
-    import subprocess
-    import sys
-
-    resultado = subprocess.run(
-        [sys.executable, str(ROOT / "tools" / "build_app_html.py"), "--check"],
-        capture_output=True,
-        text=True,
-    )
-    assert resultado.returncode == 0, resultado.stdout + resultado.stderr
