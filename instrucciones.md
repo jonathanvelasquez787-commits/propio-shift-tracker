@@ -239,9 +239,8 @@ Pendientes, en orden:
 
 - **Rellenar los marcadores legales.** `LICENSE`, `privacidad.html` y
   `terminos.html` siguen con `[TU NOMBRE O RAZÓN SOCIAL]`, `[TU CORREO DE
-  CONTACTO]` y `[TU PAÍS]`. Nota v546: el usuario pidió explícitamente NO
-  tocar el nombre del titular en `LICENSE` — solo se quitó "Jonathan" de los
-  campos de UI (nombre de perfil por defecto y placeholders de ejemplo).
+  CONTACTO]` y `[TU PAÍS]`. El nombre del titular en `LICENSE` se deja tal
+  cual a propósito (es el dueño legal del copyright, no un dato de UI).
 - **El interruptor de tema solo está en la landing.** `js/theme-toggle.js` ya
   es genérico (engancha cualquier `[data-theme-toggle]`). Para ponerlo
   también en `privacidad.html`/`terminos.html`: copiar el
@@ -327,16 +326,21 @@ Pendientes, en orden:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
-**v546** — El usuario pidió quitar su nombre ("Jonathan") de los lugares
-donde aparecía en la UI, y reducir este `.md` quitando lo que ya no aporta.
+**v547** — Se completó en `app.html` el retiro del nombre ("Jonathan") de la
+UI, pendiente de la v546 porque el archivo llegó pegado en el chat y no como
+adjunto. El usuario subió el archivo real y se editó con herramientas de
+archivo (4 apariciones, no 3: había una más dentro de un texto de ayuda).
 
 - `app.html`: `defaultSettings().userName` pasa de `'Jonathan'` a `''`;
   placeholder de `#userNameInput` (Ajustes → Tu perfil) y de
   `#onboardingNameInput` (popup de bienvenida) pasan de `"Ej. Jonathan"` a
-  `"Tu nombre"`. *(Nota: en esta sesión el archivo no se pudo editar porque
-  es demasiado grande para retipearlo con seguridad solo desde el texto
-  pegado en el chat — se pidió al usuario subirlo como adjunto real para
-  completar este cambio con herramientas de archivo.)*
+  `"Tu nombre"`; el texto de ayuda junto al selector de emoji pasa de
+  `"Buenas tardes, Jonathan 🙂"` a `"Buenas tardes, [tu nombre] 🙂"`.
+  Entregado completo y editado — único cambio contra el archivo subido.
+
+**v546** — El usuario pidió quitar su nombre ("Jonathan") de los lugares
+donde aparecía en la UI, y reducir este `.md` quitando lo que ya no aporta.
+
 - `index.html`: placeholder de `#loginIdentifier` pasa de
   `"jonathan  ·  jonathan@correo.com"` a `"usuario · correo@ejemplo.com"`;
   placeholder de `#signupUsername` pasa de `"jonathan"` a `"usuario"`.
