@@ -7165,6 +7165,53 @@
     }
     .fin-cat-icon .ic-svg { width: 17px; height: 17px; }
 
+    /* Grilla de categorías del modal Agregar gasto/meta — mismo patrón visual que .rate-tile
+       (chip, no <select>), pero en fila y con el color propio de cada categoría (--cat-rgb) en vez
+       de un solo acento: cada categoría se sigue viendo con su color en toda la app. */
+    .fin-cat-chip-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+    .fin-cat-chip {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 8px 13px; border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      color: var(--text); font-size: 12.5px; font-weight: 700;
+      cursor: pointer; white-space: nowrap;
+      transition: transform .12s ease, border-color .12s ease, background .12s ease, color .12s ease;
+    }
+    .fin-cat-chip:hover { transform: translateY(-1px); background: rgba(255,255,255,.07); }
+    .fin-cat-chip.selected {
+      border-color: rgba(var(--cat-rgb), .55);
+      background: rgba(var(--cat-rgb), .16);
+      color: rgb(var(--cat-rgb));
+    }
+    .fin-cat-chip-icon { display: inline-flex; align-items: center; justify-content: center; font-size: 14px; line-height: 1; }
+    .fin-cat-chip-icon .ic-svg { width: 14px; height: 14px; }
+    .fin-cat-chip-new { border-style: dashed; color: var(--muted); }
+    .fin-cat-chip-new:hover { color: var(--text); }
+
+    /* Panel inline "+ Nueva categoría" — mismo criterio de revelado que .goals-emoji-picker-wrap
+       (display:none hasta que se abre), sin modal aparte. */
+    .fin-cat-new-panel {
+      display: none; grid-template-columns: 1fr; gap: 14px;
+      margin-top: 12px; padding: 14px; border-radius: 14px;
+      border: 1px dashed var(--line-2);
+      background: rgba(255,255,255,.02);
+    }
+    .fin-cat-new-panel.open { display: grid; }
+
+    .fin-cat-color-row { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 2px; }
+    .fin-cat-color-swatch {
+      width: 28px; height: 28px; border-radius: 50%; padding: 0; cursor: pointer;
+      border: 2px solid transparent;
+      background: rgb(var(--sw-rgb));
+      transition: transform .12s ease, border-color .12s ease;
+    }
+    .fin-cat-color-swatch:hover { transform: translateY(-1px); }
+    .fin-cat-color-swatch.selected {
+      border-color: var(--text);
+      box-shadow: 0 0 0 2px var(--panel-navy), 0 0 0 4px rgb(var(--sw-rgb));
+    }
+
     .fin-row-main { flex: 1 1 240px; min-width: 0; }
     .fin-row-title { font-weight: 800; font-size: 14px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .fin-row-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
@@ -9619,15 +9666,29 @@ $0.72"></textarea>
 <input id="financeRowNameInput" maxlength="40" placeholder="Ej. Casa, Internet, Fondo de emergencia..." type="text"/>
 </div>
 <div class="goals-field" id="financeRowCategoryField">
-<label for="financeRowCategoryInput">Categoría</label>
-<select id="financeRowCategoryInput">
-<option value="casa">Casa</option>
-<option value="servicios">Servicios</option>
-<option value="transporte">Transporte</option>
-<option value="comida">Comida</option>
-<option value="deuda">Deuda</option>
-<option value="otro">Otro</option>
-</select>
+<label>Categoría</label>
+<input type="hidden" id="financeRowCategoryInput" value="casa"/>
+<div class="fin-cat-chip-grid" id="financeRowCategoryChips"></div>
+<div class="fin-cat-new-panel" id="financeRowNewCatPanel">
+<div class="goals-field">
+<label for="financeNewCatNameInput">Nombre de la categoría</label>
+<input id="financeNewCatNameInput" maxlength="24" placeholder="Ej. Mascota, Gimnasio, Suscripciones..." type="text"/>
+</div>
+<div class="goals-field">
+<label>Emoji</label>
+<div class="emoji-picker" id="emojiPickerNewFinCat" aria-label="Elegir emoji para la categoría"></div>
+<input type="hidden" id="financeNewCatEmojiInput" value="🏷️"/>
+</div>
+<div class="goals-field">
+<label>Color</label>
+<div class="fin-cat-color-row" id="financeNewCatColorRow"></div>
+<input type="hidden" id="financeNewCatColorInput" value="102,226,165"/>
+</div>
+<div class="modal-actions mc-action-row" style="margin-top:2px;">
+<button class="mc-btn-primary cyan" id="createFinCatBtn" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polyline points="5 12 10 17 19 6"/></svg> Crear categoría</button>
+<button class="mc-btn-warn-pill" id="cancelFinCatBtn" type="button">Cancelar</button>
+</div>
+</div>
 </div>
 <div class="goals-field" id="financeRowTypeField">
 <label for="financeRowTypeInput">Tipo</label>
@@ -10202,6 +10263,42 @@ $0.72"></textarea>
       deuda: 'Préstamo',
     };
 
+    // Categorías propias (settings.customFinanceCategories) — paleta fija de 8 tonos, los mismos
+    // RGB que ya usa FINANCE_CATEGORIES/tokens de tema (good/warn/blue/cyan/bad/purple/pink/teal),
+    // para no meter un color nuevo que no case con el resto de la app.
+    const FINANCE_CUSTOM_CATEGORY_PALETTE = ['102,226,165', '255,209,92', '125,140,255', '47,213,255', '255,107,114', '139,123,255', '255,111,143', '88,232,200'];
+
+    // Todas las categorías disponibles para elegir en el modal Agregar gasto/meta: las 7 fijas de
+    // FINANCE_CATEGORIES + las que el usuario haya creado, en ese orden.
+    function financeAllCategories() {
+      const fixed = Object.keys(FINANCE_CATEGORIES).map(id => ({ id, ...FINANCE_CATEGORIES[id] }));
+      const custom = (Array.isArray(settings.customFinanceCategories) ? settings.customFinanceCategories : [])
+        .map(c => ({ id: c.id, label: c.label, emoji: c.emoji, rgb: c.rgb }));
+      return fixed.concat(custom);
+    }
+
+    // Definición de una categoría por id (fija o propia) — mismo fallback a "Otro" que ya usaba
+    // FINANCE_CATEGORIES[x] || FINANCE_CATEGORIES.otro en todo el archivo.
+    function financeCategoryDef(catId) {
+      if (FINANCE_CATEGORIES[catId]) return FINANCE_CATEGORIES[catId];
+      const custom = (Array.isArray(settings.customFinanceCategories) ? settings.customFinanceCategories : []).find(c => c.id === catId);
+      if (custom) return { label: custom.label, emoji: custom.emoji, rgb: custom.rgb };
+      return FINANCE_CATEGORIES.otro;
+    }
+
+    // Las categorías fijas se dibujan con un ícono de ICON (ver iconHtml); las propias no tienen
+    // ícono lucide asignado, así que se dibujan con el emoji que el usuario eligió al crearlas.
+    function financeCategoryIconHtml(cat) {
+      return cat.emoji ? `<span style="font-size:15px; line-height:1;">${escapeHtml(cat.emoji)}</span>` : iconHtml(cat.icon);
+    }
+
+    // Una fila es Meta (vs Gasto) según row.kind, que toda fila nueva ya guarda explícito desde que
+    // se permitió elegir cualquier categoría para una Meta. Las filas viejas (de antes de esto) no
+    // tienen kind — para ellas se respeta el criterio anterior (categoría 'ahorro' = Meta).
+    function financeRowIsMeta(row) {
+      return row.kind ? row.kind === 'meta' : row.categoryId === 'ahorro';
+    }
+
     // Selector visual de tarifa (Normal/Bronce/Silver/Gold) en Editar llamada y Agregar llamada
     // manual.
     const RATE_TILE_DEFS = [
@@ -10642,6 +10739,10 @@ $0.72"></textarea>
         // Página "Finanzas" — categorías fijas (ver FINANCE_CATEGORIES), cada una con sus propias
         // filas de gasto/meta.
         financeCategories: { casa: { rows: [] }, servicios: { rows: [] }, transporte: { rows: [] }, comida: { rows: [] }, deuda: { rows: [] }, ahorro: { rows: [] }, otro: { rows: [] } },
+        // Categorías propias creadas desde "+ Nueva categoría" (modal Agregar gasto/meta). Cada una:
+        // { id, label, emoji, rgb }. Se combinan con FINANCE_CATEGORIES al armar la grilla — ver
+        // financeAllCategories/financeCategoryDef.
+        customFinanceCategories: [],
         // Reparte el Disponible SOLO (Gastos primero, luego Metas, ambos en su propio orden de
         // prioridad) cada vez que se guarda una llamada, en vez de exigir "Aplicar" manual en cada
         // fila.
@@ -10802,13 +10903,25 @@ $0.72"></textarea>
           toast(`⚠️ ${discardedWindowCount} ventana(s) de Higher Rate con datos inválidos se descartaron al cargar.`);
         }
       }
+      // Categorías propias del usuario (ver PENDIENTES) — se descarta cualquier entrada mal
+      // formada, mismo criterio defensivo que el resto de esta función.
+      if (!Array.isArray(settings.customFinanceCategories)) settings.customFinanceCategories = [];
+      settings.customFinanceCategories = settings.customFinanceCategories.filter(c =>
+        c && typeof c === 'object' && String(c.id || '').trim() && String(c.label || '').trim()
+      );
+      settings.customFinanceCategories.forEach((c) => {
+        c.emoji = String(c.emoji || '').trim() || '🏷️';
+        if (!FINANCE_CUSTOM_CATEGORY_PALETTE.includes(c.rgb)) c.rgb = FINANCE_CUSTOM_CATEGORY_PALETTE[0];
+      });
       // Finanzas: se recrea cualquier categoría faltante/mal formada con { rows: [] }, y se
       // descarta cualquier row sin id/name/targetAmount numérico válido (mismo criterio defensivo
-      // que cycleGoalOverrides/ higherRateWindows arriba).
+      // que cycleGoalOverrides/ higherRateWindows arriba). Incluye tanto las categorías fijas como
+      // las propias del usuario.
       if (!settings.financeCategories || typeof settings.financeCategories !== 'object' || Array.isArray(settings.financeCategories)) {
         settings.financeCategories = {};
       }
-      Object.keys(FINANCE_CATEGORIES).forEach((catId) => {
+      const allFinCategoryIds = Object.keys(FINANCE_CATEGORIES).concat(settings.customFinanceCategories.map(c => c.id));
+      allFinCategoryIds.forEach((catId) => {
         const cat = settings.financeCategories[catId];
         if (!cat || typeof cat !== 'object' || Array.isArray(cat) || !Array.isArray(cat.rows)) {
           settings.financeCategories[catId] = { rows: [] };
@@ -10817,12 +10930,16 @@ $0.72"></textarea>
         cat.rows = cat.rows.filter(r => r && typeof r === 'object' && String(r.id || '').trim() && String(r.name || '').trim() && Number.isFinite(Number(r.targetAmount)) && Number(r.targetAmount) >= 0);
       });
       if (typeof settings.financeAutoFill !== 'boolean') settings.financeAutoFill = false;
-      // Cada cola (Gastos, Metas) queda con prioridades únicas 1..n, conservando el orden actual.
+      // Cada cola (Gastos, Metas) queda con prioridades únicas 1..n, conservando el orden actual. El
+      // "tipo" de cada fila (Gasto vs Meta) ya no se deduce de su categoría — una Meta puede tener
+      // cualquier categoría desde que se permitió elegirla libremente — así que se decide por
+      // financeRowIsMeta() (row.kind, con 'ahorro' como respaldo para filas viejas sin ese campo).
       const gastoQueue = [];
-      Object.keys(FINANCE_CATEGORIES).forEach(catId => {
-        if (catId !== 'ahorro') settings.financeCategories[catId].rows.forEach(r => gastoQueue.push(r));
+      const metaQueue = [];
+      allFinCategoryIds.forEach(catId => {
+        settings.financeCategories[catId].rows.forEach(r => (financeRowIsMeta(r) ? metaQueue : gastoQueue).push(r));
       });
-      [gastoQueue, settings.financeCategories.ahorro.rows].forEach(queue => {
+      [gastoQueue, metaQueue].forEach(queue => {
         queue.map((r, i) => ({ r, i }))
           .sort((a, b) => ((Number(a.r.priority) || 0) - (Number(b.r.priority) || 0)) || (a.i - b.i))
           .forEach((x, idx) => { x.r.priority = idx + 1; });
@@ -14653,20 +14770,32 @@ function financeAvailableBalance() {
   return financeTotalEarningsAllTime() - financeTotalAssigned();
 }
 
-// Todas las filas de Gastos (todas las categorías menos 'ahorro') en UNA sola cola ordenada por
-// prioridad ascendente — así compiten entre sí en la cascada de "Restante después". Las Metas
-// ('ahorro') tienen su propia cola aparte.
+// Todas las categorías con filas guardadas: las 7 fijas + las propias del usuario. Ya no alcanza
+// con Object.keys(FINANCE_CATEGORIES) para recorrer settings.financeCategories, porque una
+// categoría propia también vive ahí.
+function financeAllCategoryIds() {
+  return Object.keys(FINANCE_CATEGORIES).concat(
+    (Array.isArray(settings.customFinanceCategories) ? settings.customFinanceCategories : []).map(c => c.id)
+  );
+}
+
+// Todas las filas de Gastos (de cualquier categoría, ver financeRowIsMeta) en UNA sola cola
+// ordenada por prioridad ascendente — así compiten entre sí en la cascada de "Restante después".
+// Las Metas tienen su propia cola aparte (financeMetaRowsSorted).
 function financeGastoRowsSorted() {
   const rows = [];
-  Object.keys(FINANCE_CATEGORIES).forEach(catId => {
-    if (catId === 'ahorro') return;
-    (settings.financeCategories[catId]?.rows || []).forEach(r => rows.push(r));
+  financeAllCategoryIds().forEach(catId => {
+    (settings.financeCategories[catId]?.rows || []).forEach(r => { if (!financeRowIsMeta(r)) rows.push(r); });
   });
   return rows.sort((a, b) => (Number(a.priority) || 0) - (Number(b.priority) || 0));
 }
 
 function financeMetaRowsSorted() {
-  return [...(settings.financeCategories.ahorro?.rows || [])].sort((a, b) => (Number(a.priority) || 0) - (Number(b.priority) || 0));
+  const rows = [];
+  financeAllCategoryIds().forEach(catId => {
+    (settings.financeCategories[catId]?.rows || []).forEach(r => { if (financeRowIsMeta(r)) rows.push(r); });
+  });
+  return rows.sort((a, b) => (Number(a.priority) || 0) - (Number(b.priority) || 0));
 }
 
 function financeIsRowPagado(row) {
@@ -14699,7 +14828,7 @@ function renderFinancePreview() {
   if (!items.length) { box.style.display = 'none'; return; }
   box.style.display = '';
   rowsEl.innerHTML = items.map(({ row, isMeta }) => {
-    const cat = FINANCE_CATEGORIES[row.categoryId] || FINANCE_CATEGORIES.otro;
+    const cat = financeCategoryDef(row.categoryId);
     const target = Number(row.targetAmount) || 0;
     const assigned = Number(row.assignedAmount) || 0;
     const pct = target > 0 ? Math.min(100, (assigned / target) * 100) : 0;
@@ -14707,7 +14836,7 @@ function renderFinancePreview() {
     const barColor = isMeta ? 'var(--purple)' : 'var(--warn)';
     return `
       <div class="fin-preview-row">
-        <span class="fin-preview-icon" style="--cat-rgb:${cat.rgb};">${iconHtml(cat.icon)}</span>
+        <span class="fin-preview-icon" style="--cat-rgb:${cat.rgb};">${financeCategoryIconHtml(cat)}</span>
         <div class="fin-preview-main">
           <div class="fin-preview-name">${escapeHtml(row.name)}</div>
           <div class="fin-preview-sub">Faltan ${money(faltante)}${financeConvertedInline(faltante)} de ${money(target)}${financeConvertedInline(target)}</div>
@@ -14784,7 +14913,7 @@ function financeHasSecondaryCurrency() {
 // Arma el HTML de una fila (gasto o meta) — `opts.restanteDespues` solo aplica a gastos (ver
 // cascada en renderFinanceSection).
 function financeRowHtml(row, opts) {
-  const cat = FINANCE_CATEGORIES[row.categoryId] || FINANCE_CATEGORIES.otro;
+  const cat = financeCategoryDef(row.categoryId);
   const upDisabled = opts.index === 0 ? 'disabled' : '';
   const downDisabled = opts.index === opts.count - 1 ? 'disabled' : '';
   const target = Number(row.targetAmount) || 0;
@@ -14811,7 +14940,7 @@ function financeRowHtml(row, opts) {
       <span class="fin-priority-num" title="${priorityTitle}">${opts.index + 1}</span>
       <button class="fin-priority-btn" type="button" data-fin-priority-down="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" ${downDisabled} aria-label="Bajar prioridad" title="${priorityTitle}">${iconHtml('chevronDown')}</button>
     </div>
-    <span class="fin-cat-icon">${iconHtml(cat.icon)}</span>
+    <span class="fin-cat-icon">${financeCategoryIconHtml(cat)}</span>
   `;
 
   if (opts.isMeta) {
@@ -14968,7 +15097,7 @@ function financeSwapPriority(catIdIgnored, rowId, direction) {
   // cola completa (Gastos o Metas), no solo dentro de una categoría.
   const row = financeGastoRowsSorted().find(r => r.id === rowId) || financeMetaRowsSorted().find(r => r.id === rowId);
   if (!row) return;
-  const isMeta = row.categoryId === 'ahorro';
+  const isMeta = financeRowIsMeta(row);
   const list = isMeta ? financeMetaRowsSorted() : financeGastoRowsSorted();
   const idx = list.findIndex(r => r.id === rowId);
   const swapIdx = idx + direction;
@@ -15023,7 +15152,7 @@ function financeApplySignedAmount(catId, rowId, rawAmount, sign) {
     return;
   }
   let appliedAmount = monto;
-  if (catId === 'ahorro') {
+  if (financeRowIsMeta(row)) {
     row.assignedAmount = (Number(row.assignedAmount) || 0) + monto;
   } else {
     const target = Number(row.targetAmount) || 0;
@@ -15132,7 +15261,6 @@ function openFinanceRowModal(kind, existingRow = null) {
   financeEditingRowId = existingRow ? existingRow.id : null;
   const title = document.getElementById('financeRowModalTitle');
   const subtitle = document.getElementById('financeRowModalSubtitle');
-  const categoryField = document.getElementById('financeRowCategoryField');
   const typeField = document.getElementById('financeRowTypeField');
   const nameInput = document.getElementById('financeRowNameInput');
   const categoryInput = document.getElementById('financeRowCategoryInput');
@@ -15140,7 +15268,10 @@ function openFinanceRowModal(kind, existingRow = null) {
   const targetInput = document.getElementById('financeRowTargetInput');
   const isMeta = financeRowModalKind === 'meta';
   if (nameInput) nameInput.value = existingRow ? existingRow.name : '';
-  if (categoryInput) categoryInput.value = existingRow ? existingRow.categoryId : 'casa';
+  const defaultCatId = isMeta ? 'ahorro' : 'casa';
+  if (categoryInput) categoryInput.value = existingRow ? existingRow.categoryId : defaultCatId;
+  closeFinanceNewCatPanel();
+  renderFinanceCategoryChips(categoryInput ? categoryInput.value : defaultCatId);
   // Fila nueva (no meta): arranca vacío y se llena con la sugerencia de la categoría por default.
   // Fila existente: financeRowNameSuggested queda vacío para que cambiar la categoría al editar
   // nunca reemplace un nombre real ya guardado.
@@ -15167,9 +15298,93 @@ function openFinanceRowModal(kind, existingRow = null) {
       ? 'Corrige nombre, categoría/tipo o monto objetivo. Para sumar o restar el monto asignado, usa el pill +/- de la fila.'
       : 'Se agrega al final de la cola de prioridad — puedes reordenarla después con las flechas ↑/↓.';
   }
-  if (categoryField) categoryField.style.display = isMeta ? 'none' : '';
+  // La categoría ya no se esconde en Metas: "Meta de ahorro" es una categoría más entre las que se
+  // puede elegir, no un caso aparte forzado a 'ahorro'.
   if (typeField) typeField.style.display = isMeta ? 'none' : '';
   openModal('financeRowModal');
+}
+
+// Grilla de categorías del modal Agregar gasto/meta: chips (ícono/emoji + nombre) por cada
+// categoría fija + propia, más el chip final "+ Nueva categoría".
+function renderFinanceCategoryChips(selectedId) {
+  const grid = document.getElementById('financeRowCategoryChips');
+  if (!grid) return;
+  const cats = financeAllCategories();
+  grid.innerHTML = cats.map(cat => `
+    <button type="button" class="fin-cat-chip ${cat.id === selectedId ? 'selected' : ''}" data-fin-cat-chip="${escapeHtml(cat.id)}" style="--cat-rgb:${cat.rgb};">
+      <span class="fin-cat-chip-icon">${financeCategoryIconHtml(cat)}</span>
+      <span class="fin-cat-chip-label">${escapeHtml(cat.label)}</span>
+    </button>
+  `).join('') + `
+    <button type="button" class="fin-cat-chip fin-cat-chip-new" id="financeRowNewCatToggle">
+      <span class="fin-cat-chip-icon">${iconHtml('plus')}</span>
+      <span class="fin-cat-chip-label">Nueva categoría</span>
+    </button>
+  `;
+}
+
+function selectFinanceCategoryChip(catId) {
+  const categoryInput = document.getElementById('financeRowCategoryInput');
+  if (categoryInput) categoryInput.value = catId;
+  document.querySelectorAll('#financeRowCategoryChips [data-fin-cat-chip]').forEach(btn => {
+    btn.classList.toggle('selected', btn.getAttribute('data-fin-cat-chip') === catId);
+  });
+  if (financeRowModalKind !== 'meta') financeApplyNameSuggestion(catId);
+}
+
+function openFinanceNewCatPanel() {
+  const panel = document.getElementById('financeRowNewCatPanel');
+  if (!panel) return;
+  const nameInput = document.getElementById('financeNewCatNameInput');
+  const emojiInput = document.getElementById('financeNewCatEmojiInput');
+  const colorInput = document.getElementById('financeNewCatColorInput');
+  if (nameInput) nameInput.value = '';
+  const defaultEmoji = '🏷️';
+  if (emojiInput) emojiInput.value = defaultEmoji;
+  const defaultColor = FINANCE_CUSTOM_CATEGORY_PALETTE[0];
+  if (colorInput) colorInput.value = defaultColor;
+  renderEmojiPicker('emojiPickerNewFinCat', defaultEmoji);
+  renderFinanceColorSwatches(defaultColor);
+  panel.classList.add('open');
+  if (nameInput) setTimeout(() => nameInput.focus(), 40);
+}
+
+function closeFinanceNewCatPanel() {
+  const panel = document.getElementById('financeRowNewCatPanel');
+  if (panel) panel.classList.remove('open');
+}
+
+function renderFinanceColorSwatches(selected) {
+  const row = document.getElementById('financeNewCatColorRow');
+  if (!row) return;
+  row.innerHTML = FINANCE_CUSTOM_CATEGORY_PALETTE.map(rgb => `
+    <button type="button" class="fin-cat-color-swatch ${rgb === selected ? 'selected' : ''}" data-fin-cat-color="${rgb}" style="--sw-rgb:${rgb};" aria-label="Elegir este color"></button>
+  `).join('');
+}
+
+// Crea la categoría con nombre + emoji + color elegidos en el panel, la selecciona en la grilla y
+// vuelve a mostrar los chips (ya con la nueva incluida) — no cierra el modal completo, solo el
+// panel de "+ Nueva categoría".
+function createFinanceCategory() {
+  const nameInput = document.getElementById('financeNewCatNameInput');
+  const emojiInput = document.getElementById('financeNewCatEmojiInput');
+  const colorInput = document.getElementById('financeNewCatColorInput');
+  const label = String(nameInput?.value || '').trim().slice(0, 24);
+  if (!label) {
+    toast('Ponle un nombre a la categoría');
+    return;
+  }
+  const emoji = String(emojiInput?.value || '').trim() || '🏷️';
+  const rgb = FINANCE_CUSTOM_CATEGORY_PALETTE.includes(colorInput?.value) ? colorInput.value : FINANCE_CUSTOM_CATEGORY_PALETTE[0];
+  const id = `custom_${makeLocalId()}`;
+  if (!Array.isArray(settings.customFinanceCategories)) settings.customFinanceCategories = [];
+  settings.customFinanceCategories.push({ id, label, emoji, rgb });
+  settings.financeCategories[id] = { rows: [] };
+  saveSettingsOnly();
+  closeFinanceNewCatPanel();
+  renderFinanceCategoryChips(id);
+  selectFinanceCategoryChip(id);
+  toast(`Categoría "${label}" creada`);
 }
 
 function saveFinanceRowModal() {
@@ -15204,12 +15419,14 @@ function saveFinanceRowModal() {
     return;
   }
   const isMeta = financeRowModalKind === 'meta';
-  const catId = isMeta ? 'ahorro' : (FINANCE_CATEGORIES[categoryInput?.value] ? categoryInput.value : 'otro');
+  const chosenCatId = String(categoryInput?.value || '');
+  const catId = financeAllCategories().some(c => c.id === chosenCatId) ? chosenCatId : (isMeta ? 'ahorro' : 'otro');
 
   if (financeEditingRowId) {
-    const searchCats = isMeta ? ['ahorro'] : Object.keys(FINANCE_CATEGORIES).filter(c => c !== 'ahorro');
+    // Una fila puede vivir en cualquier categoría (fija o propia) — ya no se restringe la búsqueda
+    // según sea Gasto o Meta, porque una Meta ya no está atada a la categoría 'ahorro'.
     let foundCatId = null, foundRow = null;
-    searchCats.forEach(cId => {
+    financeAllCategoryIds().forEach(cId => {
       const r = (settings.financeCategories[cId]?.rows || []).find(row => row.id === financeEditingRowId);
       if (r) { foundCatId = cId; foundRow = r; }
     });
@@ -15229,13 +15446,16 @@ function saveFinanceRowModal() {
     foundRow.name = name;
     foundRow.targetAmount = target;
     foundRow.assignedAmount = clampedAssigned;
+    // Se guarda explícito en cada edición (incluida una fila vieja sin este campo, ver
+    // financeRowIsMeta) para que el tipo ya no dependa de su categoría.
+    foundRow.kind = isMeta ? 'meta' : 'gasto';
     if (!isMeta) {
       foundRow.recurring = (typeInput?.value || 'recurring') === 'recurring';
-      if (catId !== foundCatId) {
-        settings.financeCategories[foundCatId].rows = settings.financeCategories[foundCatId].rows.filter(r => r.id !== foundRow.id);
-        foundRow.categoryId = catId;
-        settings.financeCategories[catId].rows.push(foundRow);
-      }
+    }
+    if (catId !== foundCatId) {
+      settings.financeCategories[foundCatId].rows = settings.financeCategories[foundCatId].rows.filter(r => r.id !== foundRow.id);
+      foundRow.categoryId = catId;
+      settings.financeCategories[catId].rows.push(foundRow);
     }
     financeRunAutoFillCascade();
     saveSettingsOnly();
@@ -15256,6 +15476,7 @@ function saveFinanceRowModal() {
     id: makeLocalId(),
     name,
     categoryId: catId,
+    kind: isMeta ? 'meta' : 'gasto',
     targetAmount: target,
     assignedAmount: 0,
     priority: maxPriority + 1,
@@ -20467,7 +20688,25 @@ function render() {
     document.getElementById('saveGapBtn').addEventListener('click', saveGapEditor);
     document.getElementById('saveAcwGoalBtn').addEventListener('click', saveAcwGoalEditor);
     document.getElementById('saveFinanceRowBtn').addEventListener('click', saveFinanceRowModal);
-    document.getElementById('financeRowCategoryInput').addEventListener('change', (e) => financeApplyNameSuggestion(e.target.value));
+    // Grilla de categorías del modal Agregar gasto/meta: un solo listener delegado para los chips
+    // fijos/propios + el chip final "+ Nueva categoría".
+    document.getElementById('financeRowCategoryChips').addEventListener('click', (e) => {
+      if (!(e.target instanceof Element)) return;
+      if (e.target.closest('#financeRowNewCatToggle')) { openFinanceNewCatPanel(); return; }
+      const chip = e.target.closest('[data-fin-cat-chip]');
+      if (chip) selectFinanceCategoryChip(chip.getAttribute('data-fin-cat-chip'));
+    });
+    document.getElementById('createFinCatBtn').addEventListener('click', createFinanceCategory);
+    document.getElementById('cancelFinCatBtn').addEventListener('click', closeFinanceNewCatPanel);
+    wireEmojiPicker('emojiPickerNewFinCat', 'financeNewCatEmojiInput');
+    document.getElementById('financeNewCatColorRow').addEventListener('click', (e) => {
+      const btn = e.target instanceof Element ? e.target.closest('[data-fin-cat-color]') : null;
+      if (!btn) return;
+      const rgb = btn.getAttribute('data-fin-cat-color');
+      const colorInput = document.getElementById('financeNewCatColorInput');
+      if (colorInput) colorInput.value = rgb;
+      document.querySelectorAll('#financeNewCatColorRow [data-fin-cat-color]').forEach(b => b.classList.toggle('selected', b === btn));
+    });
     document.getElementById('financeRowTargetInput').addEventListener('input', () => syncFinanceRowTargetFields('usd'));
     document.getElementById('financeRowTargetCurrencyInput').addEventListener('input', () => syncFinanceRowTargetFields('currency'));
     // Un solo listener delegado en #financeSection (tabs, prioridad ↑/↓, Reiniciar mes, Asignar,
@@ -20482,7 +20721,7 @@ function render() {
         const catId = editRowBtn.getAttribute('data-fin-cat');
         const rowId = editRowBtn.getAttribute('data-fin-edit');
         const row = financeFindRow(catId, rowId);
-        if (row) openFinanceRowModal(catId === 'ahorro' ? 'meta' : 'gasto', row);
+        if (row) openFinanceRowModal(financeRowIsMeta(row) ? 'meta' : 'gasto', row);
         return;
       }
       const upBtn = e.target.closest('[data-fin-priority-up]');

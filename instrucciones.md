@@ -248,27 +248,6 @@ Pendientes, en orden:
 
 **PENDIENTES**
 
-- **Categorías de Finanzas propias (con su nombre).** El usuario mencionó de
-  pasada la idea de poder crear sus propias categorías (además de las 7 fijas
-  de `FINANCE_CATEGORIES`) en vez de solo elegir entre las existentes. No
-  pedido todavía en firme — en la v548 se optó por la alternativa más chica
-  (sugerir nombre por categoría, ver ÚLTIMOS FIXES). Si se pide: toca el
-  protocolo de LAYOUT completo (mockup + aprobación) porque agrega UI nueva
-  (alta/edición/borrado de categoría) y cambia el modelo de datos de
-  `settings.financeCategories` (hoy son 7 claves fijas, no una lista
-  dinámica) — repasar también qué pasa con los colores/íconos fijos por
-  categoría (`rgb`, `icon` en `FINANCE_CATEGORIES`) que una categoría nueva no
-  tendría.
-- **Rellenar los marcadores legales.** `LICENSE`, `privacidad.html` y
-  `terminos.html` siguen con `[TU NOMBRE O RAZÓN SOCIAL]`, `[TU CORREO DE
-  CONTACTO]` y `[TU PAÍS]`. El nombre del titular en `LICENSE` se deja tal
-  cual a propósito (es el dueño legal del copyright, no un dato de UI).
-- **El interruptor de tema solo está en la landing.** `js/theme-toggle.js` ya
-  es genérico (engancha cualquier `[data-theme-toggle]`). Para ponerlo
-  también en `privacidad.html`/`terminos.html`: copiar el
-  `<button class="theme-toggle" data-theme-toggle>` dentro de
-  `.topbar-actions` y agregar `<script type="module" src="js/theme-toggle.js">`
-  al final — los estilos ya los tienen porque ambas cargan `landing.css`.
 - **Cambiar el username no tiene pantalla.** `auth.js` ya exporta
   `updateUsername()`, pero nada la llama. Importa sobre todo para cuentas de
   Google (username autogenerado del correo). Sitio natural: Ajustes → "Tu
@@ -284,8 +263,6 @@ Pendientes, en orden:
   define dos veces dentro de `app.html` (bloque `@media (prefers-color-
   scheme: light)` y bloque `html.theme-light`) — es la misma duplicación a
   propósito, no un descuido.
-- **La landing ya no se puede ver con la sesión abierta.** Entrar a `/` con
-  sesión redirige a `/app.html`. Para verla igual: `/?quedarse=1`.
 - **Sin Content-Security-Policy.** No se puede poner sin romper los
   `<script>` inline que montan la app y leen el tema — se resuelve en la
   Fase 3, cuando la app sea un módulo con `src`.
@@ -298,8 +275,6 @@ Pendientes, en orden:
 - **El blob de `user_data` no tiene tope.** Cada subida manda el snapshot
   completo. Señal de alarma: que la subida empiece a tardar más de 1-2 s —
   ahí toca la Fase 5 (tabla propia para `calls`).
-- **Moneda secundaria, decisiones conscientes (NO agregar):** ver protocolo
-  de MONEDA SECUNDARIA arriba.
 
 **LIMITACIONES CONOCIDAS** (alcance reducido a propósito, no son bugs)
 
