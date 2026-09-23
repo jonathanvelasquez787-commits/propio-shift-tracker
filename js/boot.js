@@ -1,11 +1,10 @@
 // Arranque de /app.
 //
-// La app es un único <script> que, al ejecutarse, lee localStorage y se dibuja
-// entera de una vez. Si la hidratación desde la nube llegara después, habría
-// que recargar la página para verla. Por eso ese <script> está marcado como
-// type="text/plain" en app.html y este módulo lo inyecta recién cuando la
-// sesión está resuelta y localStorage ya tiene los datos correctos: la app
-// nunca llega a montarse con datos de nadie más ni con datos viejos.
+// La app es un módulo ES (app-main.js) que, al ejecutarse, lee localStorage y se dibuja entera
+// de una vez. Si la hidratación desde la nube llegara después, habría que recargar la página
+// para verla. Por eso este módulo lo importa (import() dinámico, que solo ejecuta la primera vez
+// que se llama) recién cuando la sesión está resuelta y localStorage ya tiene los datos
+// correctos: la app nunca llega a montarse con datos de nadie más ni con datos viejos.
 
 import { getSupabase, isConfigured } from './supabase-client.js';
 import { getProfile, signOut } from './auth.js';
@@ -124,20 +123,21 @@ function askConflict({ localSummary, cloudSummary, cloud }) {
 // Montaje de la app
 // ---------------------------------------------------------------------------
 
-function mountApp() {
-  const holder = document.getElementById('appMainScript');
-  if (!holder) {
-    fail('Falta el bloque principal de la app en app.html.', { retry: false });
-    return false;
-  }
-  // El orden importa: la app mide anchos reales al dibujarse (fundidos de
-  // scroll, tablas). Si se ejecutara con el body todavía oculto, mediría 0.
+// app-main.js es un módulo ES real (import/export), no un <script> clásico inyectado a mano: el
+// import() dinámico solo lo ejecuta la primera vez que se llama, así que sigue funcionando como
+// gate de sesión. Se revela el body ANTES de importar (no después) por la misma razón que antes:
+// la app mide anchos reales al dibujarse (fundidos de scroll, tablas) y con el body oculto
+// mediría 0. app.html precarga el archivo con <link rel="modulepreload"> para que este import()
+// no tenga que esperar una descarga de red — solo evalúa lo que el navegador ya bajó en paralelo.
+async function mountApp() {
   document.body.classList.add('app-ready');
   if (overlay) overlay.remove();
-
-  const script = document.createElement('script');
-  script.textContent = holder.textContent;
-  document.body.appendChild(script);
+  try {
+    await import('/js/app-main.js');
+  } catch (err) {
+    fail('No se pudo cargar la app. ' + (err && err.message ? err.message : ''));
+    return false;
+  }
   return true;
 }
 
@@ -540,7 +540,7 @@ async function boot() {
   setBootMessage('Abriendo tu turno…');
   startAutoSync();
 
-  if (!mountApp()) return;
+  if (!(await mountApp())) return;
 
   wireSyncStatus();
   setSyncStatus(readMeta().dirty ? 'saving' : 'ok', readMeta().dirty ? 'Subiendo…' : 'Sincronizado');
