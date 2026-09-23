@@ -176,9 +176,12 @@ El usuario **no programa**. No ejecuta scripts, no instala nada, no usa
 terminal, no edita código a mano y no verifica nada técnicamente. Toda sesión
 futura opera bajo esto, sin excepción:
 
-- **`app.html` es el ÚNICO archivo de la app y la única fuente de verdad.**
-  No existe (ni debe volver a existir) un archivo "congelado" de referencia
-  ni un script generador ni verificación "byte por byte".
+- **`app.html` + `js/app-main.js` + `js/boot.js` son la app y la única
+  fuente de verdad** (hasta v554 era solo `app.html`; desde la Fase 3 —
+  módulos ES nativos, sin build — el cuerpo de la app vive en
+  `js/app-main.js`, ver ESTADO DEL ROADMAP). No existe (ni debe volver a
+  existir) un archivo "congelado" de referencia ni un script generador ni
+  verificación "byte por byte".
 - **Cualquier cambio a `app.html` (o a cualquier otro archivo del repo) lo
   hace Claude directamente**, con sus propias herramientas de archivo, a
   partir del contenido que el usuario pega o sube en la conversación. Nunca
@@ -302,22 +305,29 @@ reales) y 2 (landing pública, los 3 métodos de login, páginas legales) están
 **cerradas y funcionando en producción**, verificado por el usuario.
 
 Pendientes, en orden:
-- **Fase 3 — Modularizar.** Partir `app.html` en módulos ES con una
-  herramienta de build (ej. Vite). Riesgo real: hoy `state`/`settings`/
-  `calls` son variables globales de módulo y ~300 funciones se llaman entre
-  sí sin imports; partirlo exige decidir cómo se comparte el estado mutable.
-  Antes de encarar esta fase hay que resolver cómo se entrega el resultado
-  sin que el usuario ejecute ningún comando de build — o evaluar si vale la
-  pena dado que rompe el patrón de "un solo archivo que se edita y se sube
-  tal cual" (ver FLUJO DE TRABAJO arriba). Al modularizar hay que desmontar
-  los andamios que hoy vive en `js/boot.js` (monta la app inyectando
-  `#appMainScript`, inyecta a mano el panel de cuenta, el borrado de cuenta y
-  el bloque de Proyección del ciclo) y mover a su origen todo el afinado de
-  tema que hoy vive como capa en `css/app-shell.css`.
+- **Fase 3 — Modularizar (EN CURSO, arrancada v555).** Se resolvió el bloqueo
+  original ("cómo se entrega sin build"): se usan módulos ES **nativos**, sin
+  bundler — el mismo patrón que ya usan `js/auth.js`/`js/sync.js`, cero
+  comandos de terminal para el usuario. Paso 1 ya hecho: todo el cuerpo de la
+  app salió de `app.html` a `js/app-main.js` (un solo módulo por ahora, sin
+  partir todavía por página/sección — eso viene después, de a una página por
+  vez: Finanzas, Calendario, Reportes...). El gate de `js/boot.js` se
+  rediseñó: ya no inyecta un `<script>` clásico desde `#appMainScript` — hace
+  `import()` dinámico de `js/app-main.js` (solo se ejecuta la primera vez que
+  se llama, sigue sirviendo de gate), precargado con
+  `<link rel="modulepreload">` en el `<head>` para que no espere red. Como
+  `state`/`settings`/`calls` siguen siendo variables de un único módulo por
+  ahora, **no hizo falta** resolver todavía el reparto de estado mutable
+  entre varios archivos — eso es lo que viene en el próximo paso al partir
+  por página. Nota técnica: `js/app-main.js` expone a mano en `window` las 9
+  funciones que `js/boot.js` necesita (`toast`, `appConfirm`, `iconHtml`,
+  `money`, `convertedAmountText`, `financeConvertedInline`,
+  `effectiveCycleGoal`, `cycleGoalPace`, `reportsCycleProjection`) — como
+  `<script>` clásico las heredaba gratis, como módulo no.
 - **Fase 4 — Protección del código fuente.** Ya hecho: gate de sesión
-  (`#appMainScript` + `js/boot.js`), licencia + términos + privacidad en el
-  repo. Pendiente: minificar/
-  bundlear sin sourcemaps (depende de Fase 3), mover al servidor el motor de
+  (ahora `js/app-main.js` + `js/boot.js`), licencia + términos + privacidad
+  en el repo. Pendiente: minificar/bundlear sin sourcemaps (más fácil una vez
+  que Fase 3 esté más avanzada), mover al servidor el motor de
   Adherencia/reportes agregados (rompe el offline de esa parte), repo privado
   en GitHub (pendiente del usuario). Explícitamente descartado: bloquear
   click derecho, deshabilitar F12, ofuscadores agresivos.
@@ -329,6 +339,49 @@ Pendientes, en orden:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v555** — Arranque de la Fase 3 (Modularizar), elegida explícitamente por
+el usuario entre las 3 fases restantes del roadmap. Se le explicó primero en
+texto plano qué hace cada fase y, ya elegida la Fase 3, se le planteó el
+enfoque (módulos ES nativos sin build) y el plan por etapas antes de tocar
+código — confirmado por el usuario.
+
+- Se resolvió el bloqueo que el propio roadmap señalaba ("antes de encarar
+  esta fase hay que resolver cómo se entrega sin build"): módulos ES
+  **nativos** vía `<script type="module">`/`import()`, sin bundler — mismo
+  patrón que ya usan `js/auth.js`, `js/sync.js`, etc. Cero comandos de
+  terminal para el usuario.
+- `app.html`: se sacó el `<script type="text/plain" id="appMainScript">`
+  entero (todo el cuerpo de la app — Inicio, Horario, Llamadas, Higher Rate,
+  Finanzas, Reportes, Calendario, Ajustes) y pasó tal cual a `js/app-main.js`
+  como módulo ES nuevo. Se agregó `<link rel="modulepreload" href="/js/app-main.js"/>`
+  en el `<head>` para que el archivo se descargue y parsee en paralelo con
+  el chequeo de sesión, sin ejecutarse todavía.
+- `js/boot.js`: `mountApp()` pasó a ser async — ya no crea un `<script>` y le
+  copia el `textContent` de `#appMainScript` (ese elemento ya no existe);
+  ahora hace `await import('/js/app-main.js')`. El `import()` dinámico solo
+  ejecuta el módulo la primera vez que se llama, así que sigue cumpliendo el
+  mismo rol de gate que el truco de `type="text/plain"` — nada de la app
+  corre antes de que la sesión y los datos estén listos. Se revela el body
+  (clase `app-ready` + sacar el overlay) ANTES del `import()`, no después —
+  mismo motivo que antes: la app mide anchos reales al dibujarse y con el
+  body oculto mediría 0.
+- `js/app-main.js` termina exponiendo a mano en `window` las 9 funciones que
+  `js/boot.js` lee desde ahí (`toast`, `appConfirm`, `iconHtml`, `money`,
+  `convertedAmountText`, `financeConvertedInline`, `effectiveCycleGoal`,
+  `cycleGoalPace`, `reportsCycleProjection`) — como `<script>` clásico las
+  heredaba gratis (nivel superior = global), como módulo no cuelga nada de
+  `window` solo. Se auditó que esas son las únicas 9 (no quedó ninguna otra
+  dependencia implícita de `window` entre `boot.js` y el cuerpo de la app).
+- Por ahora `state`/`settings`/`calls` siguen en un solo archivo
+  (`js/app-main.js`) — no hizo falta todavía resolver cómo se comparte el
+  estado mutable entre varios módulos. Eso viene en el próximo paso, al
+  partir `js/app-main.js` por página (Finanzas primero).
+- Pendiente para la próxima sesión: actualizar `README.md` (su sección
+  "Cómo se edita `app.html`" todavía describe un solo archivo — no se tocó
+  esta vez porque no estaba subido en esta conversación).
+- Entregado completo y editado: `app.html`, `js/app-main.js` (nuevo),
+  `js/boot.js`.
 
 **v554** — Pendiente pedido por el usuario: que Gastos y Metas puedan tener
 categorías propias con nombre, no solo las 7 fijas. Se armó y aprobó un
@@ -391,26 +444,3 @@ responsive, sin vista mobile aparte; y modo claro + oscuro).
   `navigateToPage` no cambia (`'help'` ya estaba en la lista de páginas
   válidas). Cae en la excepción de LAYOUT "ajustes mínimos que reutilizan
   100% patrones ya existentes". Entregado completo y editado.
-
-**v552** — El usuario pidió que el sidebar real de la app se vea como el
-mockup de "vista previa" que ya existía en la landing (mandó dos capturas,
-claro y oscuro, del `.preview-nav`/`.preview-side` de `landing.css`): un solo
-acento por link en vez de un color distinto por página, sin borde ni
-flecha/punto en el activo. Al traer el mockup ya armado y aprobado en el
-mismo mensaje, no hizo falta repetir el protocolo de LAYOUT completo
-(excepción explícita).
-
-- `app.html`: `.sidebar-link.active` deja de llevar `border-color` propio —
-  el fondo tenue + el color de texto en el acento alcanzan. `.sidebar-link-
-  icon` pasa a fijar un solo `--icon-rgb` (`--cyan-rgb` en oscuro,
-  `--accent-blue-2-rgb` en claro — los mismos hex que ya usa el acento de la
-  landing, `#2fd5ff` y `#6366F1`), en los dos bloques duplicados de tema
-  (`@media (prefers-color-scheme: light)` y `html.theme-light`), en vez de
-  las clases `.sidebar-link-icon-home`/`-schedule`/`-reports` (colores por
-  página) y los `style` inline de Fechas de pago/Calendario/Finanzas/Ayuda
-  (rosa/morado/verde azulado/naranja), todos removidos. `.sidebar-link-arrow`
-  y `.sidebar-link-dot` pasan a `display:none` fijo — quedan en el HTML sin
-  efecto visual, sin tocar el JS que las togglea (ver LIMITACIONES
-  CONOCIDAS). Cero cambios de HTML funcional más allá de sacar clases/
-  atributos de color ya sin uso — mismos ids, mismo `navigateToPage`.
-  Entregado completo y editado.
