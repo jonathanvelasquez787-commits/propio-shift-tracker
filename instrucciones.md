@@ -305,29 +305,30 @@ reales) y 2 (landing pública, los 3 métodos de login, páginas legales) están
 **cerradas y funcionando en producción**, verificado por el usuario.
 
 Pendientes, en orden:
-- **Fase 3 — Modularizar (EN CURSO, arrancada v555).** Se resolvió el bloqueo
-  original ("cómo se entrega sin build"): se usan módulos ES **nativos**, sin
-  bundler — el mismo patrón que ya usan `js/auth.js`/`js/sync.js`, cero
-  comandos de terminal para el usuario. Paso 1 ya hecho: todo el cuerpo de la
-  app salió de `app.html` a `js/app-main.js` (un solo módulo por ahora, sin
-  partir todavía por página/sección — eso viene después, de a una página por
-  vez: Finanzas, Calendario, Reportes...). El gate de `js/boot.js` se
-  rediseñó: ya no inyecta un `<script>` clásico desde `#appMainScript` — hace
-  `import()` dinámico de `js/app-main.js` (solo se ejecuta la primera vez que
-  se llama, sigue sirviendo de gate), precargado con
-  `<link rel="modulepreload">` en el `<head>` para que no espere red. Como
-  `state`/`settings`/`calls` siguen siendo variables de un único módulo por
-  ahora, **no hizo falta** resolver todavía el reparto de estado mutable
-  entre varios archivos — eso es lo que viene en el próximo paso al partir
-  por página. Nota técnica: `js/app-main.js` expone a mano en `window` las 9
-  funciones que `js/boot.js` necesita (`toast`, `appConfirm`, `iconHtml`,
-  `money`, `convertedAmountText`, `financeConvertedInline`,
-  `effectiveCycleGoal`, `cycleGoalPace`, `reportsCycleProjection`) — como
-  `<script>` clásico las heredaba gratis, como módulo no.
+- **Fase 3 — Modularizar (EN CURSO, arrancada v555, Finanzas partida v556).**
+  Se resolvió el bloqueo original ("cómo se entrega sin build"): módulos ES
+  **nativos**, sin bundler — mismo patrón que ya usan `js/auth.js`/
+  `js/sync.js`, cero comandos de terminal para el usuario. `js/boot.js` ya no
+  inyecta un `<script>` clásico desde `#appMainScript` — hace `import()`
+  dinámico de `js/app-main.js` (solo se ejecuta la primera vez que se llama,
+  sigue sirviendo de gate), precargado con `<link rel="modulepreload">` en
+  el `<head>` (también para `js/finance.js`) para que no espere red.
+  Progreso: `js/finance.js` ya salió de `js/app-main.js` (Gastos, Metas,
+  categorías propias — 24 funciones/constantes exportadas, `js/app-main.js`
+  exporta de vuelta 16 nombres compartidos: `settings`, `calls`, `money`,
+  `toast`, etc. — ver v556 para el detalle). Cada extracción se hizo con
+  ayuda del parser de `typescript` (ya estaba disponible en el entorno) para
+  detectar con precisión qué usa cada bloque desde afuera y qué necesita el
+  resto del archivo desde el bloque — no a mano ni a ojo, dado el tamaño del
+  archivo. Siguen pendientes, en el mismo orden de páginas: Reportes,
+  Calendario, Horario, Llamadas, Higher Rate, Ajustes — `state` (no
+  exportado todavía, ninguna extracción lo necesitó hasta ahora) se agregará
+  a la exportación de `js/app-main.js` en cuanto la primera lo necesite.
 - **Fase 4 — Protección del código fuente.** Ya hecho: gate de sesión
-  (ahora `js/app-main.js` + `js/boot.js`), licencia + términos + privacidad
-  en el repo. Pendiente: minificar/bundlear sin sourcemaps (más fácil una vez
-  que Fase 3 esté más avanzada), mover al servidor el motor de
+  (ahora `js/app-main.js` + `js/finance.js` + `js/boot.js`), licencia +
+  términos + privacidad en el repo. Pendiente: minificar/bundlear sin
+  sourcemaps (más fácil una vez que Fase 3 esté más avanzada), mover al
+  servidor el motor de
   Adherencia/reportes agregados (rompe el offline de esa parte), repo privado
   en GitHub (pendiente del usuario). Explícitamente descartado: bloquear
   click derecho, deshabilitar F12, ofuscadores agresivos.
@@ -339,6 +340,49 @@ Pendientes, en orden:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v556** — Continuación de la Fase 3: primera página partida de
+`js/app-main.js` a su propio módulo, empezando por Finanzas (elegida por el
+usuario). Mismo enfoque confirmado en v555 (módulos ES nativos).
+
+- Se ubicaron los 3 bloques de código de Finanzas dentro de
+  `js/app-main.js` (constantes/categorías, el bloque principal de
+  Gastos/Metas, y el hint de scroll de Totales) usando el parser real de
+  `typescript` (ya estaba instalado en el entorno) para armar un árbol de
+  sintaxis del archivo completo — necesario porque a mano, en 10,930 líneas
+  con literales de plantilla y regex de por medio, contar niveles de
+  indentación no es confiable (se probó primero así y dio falsos positivos).
+  Con el árbol se calculó automáticamente, cruzando cada identificador contra
+  su alcance real: qué usa ese bloque desde afuera (pasa a ser `import`) y
+  qué usan otras partes del archivo desde ese bloque (pasa a ser `export`).
+- `js/finance.js` (nuevo): 24 funciones/constantes exportadas
+  (`renderFinanceSection`, `openFinanceRowModal`, `saveFinanceRowModal`,
+  `financeDeleteCategory`, `FINANCE_CATEGORIES`, etc. — lista completa al
+  principio del archivo). Importa 16 nombres de `js/app-main.js`: `settings`,
+  `calls` (no `state` — nada de Finanzas lo necesitó), `money`,
+  `convertedAmountText`, `iconHtml`, `escapeHtml`, `toast`, `appConfirm`,
+  `openModal`, `closeModal`, `saveSettingsOnly`, `makeLocalId`, `parseMoney`,
+  `usdCeilFromCurrencyAmount`, `higherRateBonusForCalls`,
+  `renderEmojiPicker`.
+- `js/app-main.js`: se sacaron esos 3 bloques (verificado con el mismo
+  análisis: la cantidad de declaraciones top-level del archivo bajó
+  exactamente en la cantidad que se movió, 579 → 530, ni una de más ni de
+  menos) y se agregó el `import` de los 24 nombres de `js/finance.js`, más
+  `export` en los 16 que `js/finance.js` necesita de vuelta. Es una
+  dependencia circular entre los dos módulos (cada uno importa del otro) —
+  segura acá porque ninguno de los dos lee nada del otro en su propio nivel
+  superior, solo dentro de funciones que se llaman después de que ambos ya
+  terminaron de evaluarse (incluida `ensureCurrencySettings()`, que sí se
+  llama a nivel superior de `js/app-main.js` y sí usa cosas de
+  `js/finance.js` — funciona porque para cuando le toca ejecutarse,
+  `js/finance.js` ya terminó de evaluar).
+- `app.html`: se sumó `<link rel="modulepreload" href="/js/finance.js"/>`
+  junto al de `app-main.js`.
+- **No se pudo probar en un navegador real** (mismo límite que v555) — pedí
+  verificación extra en el mensaje de entrega.
+- Entregado completo y editado: `app.html`, `js/app-main.js`,
+  `js/finance.js` (nuevo), `js/boot.js` (sin cambios esta vez, incluido para
+  que la carpeta `js/` quede completa).
 
 **v555** — Arranque de la Fase 3 (Modularizar), elegida explícitamente por
 el usuario entre las 3 fases restantes del roadmap. Se le explicó primero en
@@ -418,29 +462,3 @@ usuario pidió además editar y borrar esas categorías — se agregó reutiliza
   filas, no las borra — las reasigna a "Otro" antes de sacar la categoría de
   `settings.customFinanceCategories`.
 - Entregado completo y editado.
-
-**v553** — El usuario no quiso "Ayuda" en el menú lateral ("no me gusta que
-esté en el menú") ni el badge "NUEVO" del link. Primer intento (botón de
-ícono sumado al grupo de acciones del header, junto a Avisos/Higher
-Rate/Ajustes/Reiniciar) fue rechazado ("no me gustó para nada dónde lo
-pusiste, ponlo en otro lado que no estorbe"), y el usuario señaló además que
-no se había seguido el protocolo de LAYOUT (mockup antes de tocar código).
-Se armó un mockup visual y se aprobó un botón flotante fijo en la esquina
-inferior derecha. El usuario también señaló que el mockup en sí no había
-reutilizado las variables/clases reales de la app (se había armado con hex
-aproximados e íconos de emoji) — no se repitió el mockup porque el cambio ya
-caía en la excepción de "reutiliza 100% un patrón existente", pero motivó
-las 2 reglas nuevas del protocolo de LAYOUT de arriba (una sola versión
-responsive, sin vista mobile aparte; y modo claro + oscuro).
-
-- `app.html`: sidebar pierde el link `data-page="help"` y su
-  `.sidebar-link-badge-new` (CSS del badge, ya sin uso, removido). Nuevo
-  `.help-fab`: botón circular fijo (`position:fixed`, esquina inferior
-  derecha, con `env(safe-area-inset-bottom)`), mismos `--panel-navy`/
-  `--card-line`/`--shadow` que ya usan `.toast`/`.storage-conflict-banner`,
-  ícono en `--cyan` (se remapea solo a `--primary` en tema claro, sin CSS de
-  tema nuevo). Navega con `data-nav-page="help"` — reutiliza el listener
-  delegado que ya existía para "Ver Finanzas →", sin JS nuevo;
-  `navigateToPage` no cambia (`'help'` ya estaba en la lista de páginas
-  válidas). Cae en la excepción de LAYOUT "ajustes mínimos que reutilizan
-  100% patrones ya existentes". Entregado completo y editado.
