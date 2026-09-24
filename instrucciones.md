@@ -305,30 +305,37 @@ reales) y 2 (landing pública, los 3 métodos de login, páginas legales) están
 **cerradas y funcionando en producción**, verificado por el usuario.
 
 Pendientes, en orden:
-- **Fase 3 — Modularizar (EN CURSO, arrancada v555, Finanzas partida v556).**
-  Se resolvió el bloqueo original ("cómo se entrega sin build"): módulos ES
-  **nativos**, sin bundler — mismo patrón que ya usan `js/auth.js`/
-  `js/sync.js`, cero comandos de terminal para el usuario. `js/boot.js` ya no
-  inyecta un `<script>` clásico desde `#appMainScript` — hace `import()`
-  dinámico de `js/app-main.js` (solo se ejecuta la primera vez que se llama,
-  sigue sirviendo de gate), precargado con `<link rel="modulepreload">` en
-  el `<head>` (también para `js/finance.js`) para que no espere red.
-  Progreso: `js/finance.js` ya salió de `js/app-main.js` (Gastos, Metas,
-  categorías propias — 24 funciones/constantes exportadas, `js/app-main.js`
-  exporta de vuelta 16 nombres compartidos: `settings`, `calls`, `money`,
-  `toast`, etc. — ver v556 para el detalle). Cada extracción se hizo con
+- **Fase 3 — Modularizar (EN CURSO, arrancada v555; Finanzas v556, Reportes
+  v557 ya partidas).** Se resolvió el bloqueo original ("cómo se entrega sin
+  build"): módulos ES **nativos**, sin bundler — mismo patrón que ya usan
+  `js/auth.js`/`js/sync.js`, cero comandos de terminal para el usuario.
+  `js/boot.js` ya no inyecta un `<script>` clásico desde `#appMainScript` —
+  hace `import()` dinámico de `js/app-main.js` (solo se ejecuta la primera
+  vez que se llama, sigue sirviendo de gate), precargado con
+  `<link rel="modulepreload">` en el `<head>` (también para `js/finance.js`
+  y `js/reports.js`) para que no espere red. Cada extracción se hizo con
   ayuda del parser de `typescript` (ya estaba disponible en el entorno) para
   detectar con precisión qué usa cada bloque desde afuera y qué necesita el
   resto del archivo desde el bloque — no a mano ni a ojo, dado el tamaño del
-  archivo. Siguen pendientes, en el mismo orden de páginas: Reportes,
+  archivo. Arquitectura confirmada con Reportes: **hub-and-spoke** —
+  `js/finance.js` y `js/reports.js` solo importan de `js/app-main.js`, nunca
+  entre sí (Reportes necesitó helpers de Adherencia/Calendario/Ganancias que
+  viven en `js/app-main.js` — compartidos con Horario y Calendario, que se
+  quedan ahí por ahora — no se duplicó ninguno ni se armó una dependencia
+  Reportes↔Finanzas). Ojo con variables `let` de estado de vista (como
+  `reportsMonthlyOffset`): si algo FUERA de la página reasigna esa variable
+  (ej. los botones de paginación, que viven en el bloque de wiring
+  centralizado de la app, no dentro de la página misma), esa variable se
+  queda declarada en `js/app-main.js` — un módulo no puede reasignar un
+  `import`, solo leerlo. Siguen pendientes, en el mismo orden de páginas:
   Calendario, Horario, Llamadas, Higher Rate, Ajustes — `state` (no
   exportado todavía, ninguna extracción lo necesitó hasta ahora) se agregará
   a la exportación de `js/app-main.js` en cuanto la primera lo necesite.
 - **Fase 4 — Protección del código fuente.** Ya hecho: gate de sesión
-  (ahora `js/app-main.js` + `js/finance.js` + `js/boot.js`), licencia +
-  términos + privacidad en el repo. Pendiente: minificar/bundlear sin
-  sourcemaps (más fácil una vez que Fase 3 esté más avanzada), mover al
-  servidor el motor de
+  (ahora `js/app-main.js` + `js/finance.js` + `js/reports.js` +
+  `js/boot.js`), licencia + términos + privacidad en el repo. Pendiente:
+  minificar/bundlear sin sourcemaps (más fácil una vez que Fase 3 esté más
+  avanzada), mover al servidor el motor de
   Adherencia/reportes agregados (rompe el offline de esa parte), repo privado
   en GitHub (pendiente del usuario). Explícitamente descartado: bloquear
   click derecho, deshabilitar F12, ofuscadores agresivos.
@@ -340,6 +347,46 @@ Pendientes, en orden:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v557** — Continuación de la Fase 3: segunda página partida de
+`js/app-main.js`, Reportes (KPIs, gráfico mensual, racha, mejores/peores
+días, proyección del ciclo). Mismo método que Finanzas (v556): árbol de
+sintaxis real vía `typescript` para calcular imports/exports, no a mano.
+
+- A diferencia de Finanzas, el código de Reportes **no** era un bloque
+  contiguo — está entreverado con funciones de Adherencia/Calendario que
+  Reportes usa pero no es dueño (`dayAdherence`, `weekSummaryForOffset`,
+  `effectiveHistoryStartDate`, etc.). Se movieron a `js/reports.js` solo las
+  20 funciones/constantes que son genuinamente de Reportes; esas ~33 que
+  Reportes solo consume se quedaron en `js/app-main.js` (compartidas con
+  Horario/Calendario) y ahora están exportadas para que `js/reports.js` las
+  importe.
+- Caso particular: `reportsMonthlyOffset` (variable de qué página del
+  gráfico mensual se está mirando) se lee dentro de Reportes pero se
+  **reasigna** desde los botones prev/next/hoy, que viven en el bloque de
+  wiring centralizado de `js/app-main.js` (junto a los de Horario/Ciclo/
+  Calendario), no dentro de la página de Reportes. Un módulo no puede
+  reasignar algo que importa — así que esa variable se quedó declarada en
+  `js/app-main.js` (exportada de ahí) en vez de moverse a `js/reports.js`
+  como el resto.
+- `js/reports.js` (nuevo): exporta 5 nombres que `js/app-main.js` necesita
+  de vuelta — `renderReportsDashboard`, `renderReportsMonthlyChart`,
+  `reportsCycleProjection`, `cycleGoalPace`, `REPORTS_MONTHLY_PAGE_SIZE` —
+  e importa 32 de `js/app-main.js` (7 ya estaban exportados desde Finanzas:
+  `settings`, `calls`, `money`, `convertedAmountText`, `iconHtml`,
+  `escapeHtml`, `saveSettingsOnly`; se agregó `export` a los otros 25, más
+  `reportsMonthlyOffset`).
+- Se confirmó la arquitectura **hub-and-spoke**: `js/finance.js` y
+  `js/reports.js` importan solo de `js/app-main.js`, nunca uno del otro.
+- Verificado: la cuenta de declaraciones top-level de `js/app-main.js` bajó
+  exactamente en las 20 que se movieron (530 → 510) y las listas de
+  export/import entre los dos archivos coinciden exactamente en ambos
+  sentidos (mismo chequeo automático que en v556).
+- `app.html`: se sumó `<link rel="modulepreload" href="/js/reports.js"/>`.
+- Sigue sin poder probarse en navegador real — mismo pedido de verificación
+  extra que en v555/v556.
+- Entregado completo y editado: `app.html`, `js/app-main.js`,
+  `js/reports.js` (nuevo).
 
 **v556** — Continuación de la Fase 3: primera página partida de
 `js/app-main.js` a su propio módulo, empezando por Finanzas (elegida por el
@@ -426,39 +473,4 @@ código — confirmado por el usuario.
   esta vez porque no estaba subido en esta conversación).
 - Entregado completo y editado: `app.html`, `js/app-main.js` (nuevo),
   `js/boot.js`.
-
-**v554** — Pendiente pedido por el usuario: que Gastos y Metas puedan tener
-categorías propias con nombre, no solo las 7 fijas. Se armó y aprobó un
-mockup interactivo (protocolo de LAYOUT completo: grilla de chips en vez de
-`<select>`, panel inline "+ Nueva categoría", modo claro y oscuro, una sola
-versión responsive) antes de tocar código. Ya con el mockup aprobado, el
-usuario pidió además editar y borrar esas categorías — se agregó reutilizando
-100% patrones ya existentes (excepción de LAYOUT), sin mockup nuevo.
-
-- `app.html`: `settings.customFinanceCategories` (array, `{id, label, emoji,
-  rgb}`) se suma al default de settings y a la migración (descarta entradas
-  mal formadas, normaliza emoji/rgb contra `FINANCE_CUSTOM_CATEGORY_PALETTE`
-  — 8 tonos ya usados en la app, no una paleta nueva). Helpers nuevos:
-  `financeAllCategories()`, `financeCategoryDef()`, `financeCategoryIconHtml()`
-  (emoji si es propia, ícono lucide si es fija), `financeRowIsMeta()` (decide
-  Gasto vs Meta por `row.kind`, con `categoryId === 'ahorro'` como respaldo
-  para filas viejas sin ese campo — una Meta ya no se fuerza a esa categoría).
-  Todos los usos de `FINANCE_CATEGORIES[row.categoryId] || FINANCE_CATEGORIES.otro`
-  y de `iconHtml(cat.icon)` en Finanzas pasan por estos helpers.
-- El `<select>` de categoría en el modal Agregar/Editar gasto/meta es ahora
-  una grilla de chips (`renderFinanceCategoryChips`) — fijas + propias, con
-  el color de cada una (`--cat-rgb`) igual que en el resto de Finanzas. El
-  campo ya no se esconde en Metas. Al final, chip "+ Nueva categoría" abre un
-  panel inline (`.fin-cat-new-panel`, mismo criterio de revelado que
-  `.goals-emoji-picker-wrap`) con nombre, el mismo emoji picker que ya usa el
-  saludo, y 8 swatches de color.
-- Editar/borrar (solo categorías propias, las 7 fijas no llevan estos
-  botones): cada chip propio suma dos `.tbl-icon-btn` (mismo patrón que
-  Tabla de llamadas) — el de editar reabre el panel de "+ Nueva categoría"
-  precargado (`financeEditingCatId`, título y botón cambian a "Editar
-  categoría"/"Guardar cambios"; `createFinanceCategory()` ahora actualiza en
-  vez de crear si hay una edición en curso); el de borrar pide confirmación
-  con `appConfirm` (`financeDeleteCategory()`) y, si la categoría tenía
-  filas, no las borra — las reasigna a "Otro" antes de sacar la categoría de
-  `settings.customFinanceCategories`.
 - Entregado completo y editado.
