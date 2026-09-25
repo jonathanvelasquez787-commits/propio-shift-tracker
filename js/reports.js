@@ -21,6 +21,8 @@ import {
   effectiveDailyGoal,
   effectiveHistoryStartDate,
   escapeHtml,
+  financeConvertedInline,
+  financeConvertedNote,
   formatCallDayLabel,
   formatDuration,
   formatMinutes,
