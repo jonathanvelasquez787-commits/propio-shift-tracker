@@ -129,15 +129,26 @@ function askConflict({ localSummary, cloudSummary, cloud }) {
 // la app mide anchos reales al dibujarse (fundidos de scroll, tablas) y con el body oculto
 // mediría 0. app.html precarga el archivo con <link rel="modulepreload"> para que este import()
 // no tenga que esperar una descarga de red — solo evalúa lo que el navegador ya bajó en paralelo.
+//
+// IMPORTANTE: el overlay (#bootGate) se queda puesto hasta que el import() de arriba termina bien.
+// Antes se quitaba de una vez, ANTES de intentar la carga; si esa carga fallaba (por ejemplo un
+// error de sintaxis en app-main.js, finance.js, reports.js o calendar.js — un import/export que
+// dejó de cuadrar entre esos 4 archivos), fail() escribía el mensaje de error dentro de #bootGate,
+// pero ese nodo YA HABÍA SIDO BORRADO del documento. El resultado: la app se quedaba muda —
+// pantalla estática, botones muertos, reloj parado — SIN ningún error visible en pantalla ni en la
+// consola del navegador, porque el catch de abajo lo atrapaba en silencio. Quitar el overlay solo
+// después de un import() exitoso, y mandar el error también a console.error, hace que cualquier
+// fallo futuro de este tipo sea imposible de pasar por alto.
 async function mountApp() {
   document.body.classList.add('app-ready');
-  if (overlay) overlay.remove();
   try {
     await import('/js/app-main.js');
   } catch (err) {
-    fail('No se pudo cargar la app. ' + (err && err.message ? err.message : ''));
+    console.error('boot: no se pudo importar app-main.js', err);
+    fail('No se pudo cargar la app. ' + (err && err.message ? err.message : String(err)));
     return false;
   }
+  if (overlay) overlay.remove();
   return true;
 }
 
@@ -564,5 +575,6 @@ async function boot() {
 }
 
 boot().catch((err) => {
+  console.error('boot: error inesperado', err);
   fail('Error inesperado al arrancar: ' + (err && err.message ? err.message : String(err)));
 });
