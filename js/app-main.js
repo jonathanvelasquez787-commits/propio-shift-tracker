@@ -62,6 +62,14 @@ import {
 // sin errores en consola, sin nada interactivo).
 export { effectiveHistoryStartDate } from './calendar.js';
 
+// reports.js necesita financeConvertedInline/financeConvertedNote (ver su import desde
+// './app-main.js') para los montos convertidos de "Ganancias del ciclo", pero esas dos funciones
+// viven en js/finance.js — este archivo solo las importaba para su propio uso, nunca las
+// reexportaba. Mismo patrón exacto que el bug de effectiveHistoryStartDate de arriba: sin esto el
+// import de reports.js falla con "does not provide an export named 'financeConvertedInline'", lo
+// que rompe la cadena de módulos completa.
+export { financeConvertedInline, financeConvertedNote };
+
     const STORAGE_KEY = 'propio_shift_tracker_state_es_v4';
     const CALLS_KEY = 'propio_shift_tracker_calls_es_v4';
     const SETTINGS_KEY = 'propio_shift_tracker_settings_es_v1';
