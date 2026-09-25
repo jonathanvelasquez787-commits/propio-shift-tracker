@@ -245,6 +245,16 @@ futura opera bajo esto, sin excepción:
 - **El blob de `user_data` no tiene tope.** Cada subida manda el snapshot
   completo. Señal de alarma: que la subida empiece a tardar más de 1-2 s —
   ahí toca la Fase 5 (tabla propia para `calls`).
+- **Checklist de imports/exports entre los 4 módulos de `js/` no es
+  automático.** Cada vez que se toca `app-main.js`/`finance.js`/
+  `reports.js`/`calendar.js`, hay que revisar a mano (o pedirle a Claude que
+  revise) que cada `import { X } from './otroArchivo.js'` tenga su `export`
+  exacto del otro lado — ya pasó dos veces que una función usada en un
+  módulo (`effectiveHistoryStartDate`, luego `financeConvertedInline`/
+  `financeConvertedNote`) se importaba sin que el archivo de origen la
+  reexportara, lo que rompe la carga de TODOS los módulos en cadena. No hay
+  todavía un script que lo verifique solo — por ahora Claude lo hace a mano
+  con grep/node cada vez que entrega uno de estos 4 archivos.
 
 **LIMITACIONES CONOCIDAS** (alcance reducido a propósito, no son bugs)
 
@@ -350,6 +360,35 @@ Pendientes, en orden:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v559** — Bug de la Fase 3 (mismo patrón que v558/effectiveHistoryStartDate,
+esta vez con las 2 funciones de conversión de moneda): "Reportes" no cargaba
+— consola mostraba `The requested module './app-main.js' does not provide an
+export named 'financeConvertedInline'`.
+
+- Causa: `js/reports.js` usa `financeConvertedInline`/`financeConvertedNote`
+  (montos convertidos a la moneda secundaria en "Ganancias del ciclo") vía
+  `import { ... } from './app-main.js'`. Esas dos funciones viven de verdad
+  en `js/finance.js`, y `js/app-main.js` ya las importaba de ahí para su
+  propio uso interno — pero nunca las reexportaba, así que del lado de
+  `reports.js` el import fallaba en silencio y tumbaba la cadena de módulos
+  completa (misma familia de bug que el de `effectiveHistoryStartDate` en
+  v558, solo que con estas 2 funciones en vez de esa).
+- Fix de una sola línea: se agregó `export { financeConvertedInline,
+  financeConvertedNote };` en `js/app-main.js`, justo después de la línea ya
+  existente `export { effectiveHistoryStartDate } from './calendar.js';` —
+  sin `from` porque ambas ya entran al módulo como bindings locales vía el
+  `import { ... } from './finance.js'` de la cabecera del archivo.
+- Verificado con las mismas 2 comprobaciones automáticas de siempre:
+  `node --check js/app-main.js` sin errores de sintaxis, y un barrido de
+  todos los `export` del archivo confirmando que `financeConvertedInline`,
+  `financeConvertedNote` y `effectiveHistoryStartDate` quedan expuestos.
+  `js/reports.js`, `js/finance.js` y `js/calendar.js` no se tocaron — el
+  problema era 100% de `app-main.js` no reexportando.
+- Se agrega un pendiente nuevo (ver PENDIENTES) para no repetir este patrón
+  una tercera vez: no hay todavía un chequeo automático de imports/exports
+  entre los 4 módulos, se sigue revisando a mano cada vez.
+- Entregado: solo `app-main.js` (único archivo modificado).
+
 **v558** — Continuación de la Fase 3: tercera página partida de
 `js/app-main.js`, Calendario (vista mensual y anual de productividad). Mismo
 método que Finanzas/Reportes (typescript para calcular imports/exports).
@@ -422,46 +461,3 @@ sintaxis real vía `typescript` para calcular imports/exports, no a mano.
   extra que en v555/v556.
 - Entregado completo y editado: `app.html`, `js/app-main.js`,
   `js/reports.js` (nuevo).
-
-**v556** — Continuación de la Fase 3: primera página partida de
-`js/app-main.js` a su propio módulo, empezando por Finanzas (elegida por el
-usuario). Mismo enfoque confirmado en v555 (módulos ES nativos).
-
-- Se ubicaron los 3 bloques de código de Finanzas dentro de
-  `js/app-main.js` (constantes/categorías, el bloque principal de
-  Gastos/Metas, y el hint de scroll de Totales) usando el parser real de
-  `typescript` (ya estaba instalado en el entorno) para armar un árbol de
-  sintaxis del archivo completo — necesario porque a mano, en 10,930 líneas
-  con literales de plantilla y regex de por medio, contar niveles de
-  indentación no es confiable (se probó primero así y dio falsos positivos).
-  Con el árbol se calculó automáticamente, cruzando cada identificador contra
-  su alcance real: qué usa ese bloque desde afuera (pasa a ser `import`) y
-  qué usan otras partes del archivo desde ese bloque (pasa a ser `export`).
-- `js/finance.js` (nuevo): 24 funciones/constantes exportadas
-  (`renderFinanceSection`, `openFinanceRowModal`, `saveFinanceRowModal`,
-  `financeDeleteCategory`, `FINANCE_CATEGORIES`, etc. — lista completa al
-  principio del archivo). Importa 16 nombres de `js/app-main.js`: `settings`,
-  `calls` (no `state` — nada de Finanzas lo necesitó), `money`,
-  `convertedAmountText`, `iconHtml`, `escapeHtml`, `toast`, `appConfirm`,
-  `openModal`, `closeModal`, `saveSettingsOnly`, `makeLocalId`, `parseMoney`,
-  `usdCeilFromCurrencyAmount`, `higherRateBonusForCalls`,
-  `renderEmojiPicker`.
-- `js/app-main.js`: se sacaron esos 3 bloques (verificado con el mismo
-  análisis: la cantidad de declaraciones top-level del archivo bajó
-  exactamente en la cantidad que se movió, 579 → 530, ni una de más ni de
-  menos) y se agregó el `import` de los 24 nombres de `js/finance.js`, más
-  `export` en los 16 que `js/finance.js` necesita de vuelta. Es una
-  dependencia circular entre los dos módulos (cada uno importa del otro) —
-  segura acá porque ninguno de los dos lee nada del otro en su propio nivel
-  superior, solo dentro de funciones que se llaman después de que ambos ya
-  terminaron de evaluarse (incluida `ensureCurrencySettings()`, que sí se
-  llama a nivel superior de `js/app-main.js` y sí usa cosas de
-  `js/finance.js` — funciona porque para cuando le toca ejecutarse,
-  `js/finance.js` ya terminó de evaluar).
-- `app.html`: se sumó `<link rel="modulepreload" href="/js/finance.js"/>`
-  junto al de `app-main.js`.
-- **No se pudo probar en un navegador real** (mismo límite que v555) — pedí
-  verificación extra en el mensaje de entrega.
-- Entregado completo y editado: `app.html`, `js/app-main.js`,
-  `js/finance.js` (nuevo), `js/boot.js` (sin cambios esta vez, incluido para
-  que la carpeta `js/` quede completa).
