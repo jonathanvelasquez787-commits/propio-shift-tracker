@@ -458,7 +458,7 @@ export function openCalMonthFromYear(monthIndex) {
   renderCalendarMonth();
 }
 
-export export function backToCalYearView() {
+export function backToCalYearView() {
   setCalViewMode('year');
   syncCalViewVisibility();
   renderCalYear();
