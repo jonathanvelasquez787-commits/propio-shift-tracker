@@ -54,6 +54,14 @@ import {
   useAutoCalYearGoalModal,
 } from './calendar.js';
 
+// js/reports.js necesita effectiveHistoryStartDate() (ver su import desde './app-main.js'), pero
+// esa función vive en js/calendar.js — este archivo solo la importaba para uso propio, nunca la
+// reexportaba. Sin esta línea, el import de reports.js falla con "The requested module
+// './app-main.js' does not provide an export named 'effectiveHistoryStartDate'", lo cual rompe la
+// cadena de módulos completa (boot.js atrapa ese error en silencio, así que la app se queda muda:
+// sin errores en consola, sin nada interactivo).
+export { effectiveHistoryStartDate } from './calendar.js';
+
     const STORAGE_KEY = 'propio_shift_tracker_state_es_v4';
     const CALLS_KEY = 'propio_shift_tracker_calls_es_v4';
     const SETTINGS_KEY = 'propio_shift_tracker_settings_es_v1';
