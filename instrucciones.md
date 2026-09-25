@@ -306,36 +306,38 @@ reales) y 2 (landing pública, los 3 métodos de login, páginas legales) están
 
 Pendientes, en orden:
 - **Fase 3 — Modularizar (EN CURSO, arrancada v555; Finanzas v556, Reportes
-  v557 ya partidas).** Se resolvió el bloqueo original ("cómo se entrega sin
-  build"): módulos ES **nativos**, sin bundler — mismo patrón que ya usan
-  `js/auth.js`/`js/sync.js`, cero comandos de terminal para el usuario.
-  `js/boot.js` ya no inyecta un `<script>` clásico desde `#appMainScript` —
-  hace `import()` dinámico de `js/app-main.js` (solo se ejecuta la primera
-  vez que se llama, sigue sirviendo de gate), precargado con
-  `<link rel="modulepreload">` en el `<head>` (también para `js/finance.js`
-  y `js/reports.js`) para que no espere red. Cada extracción se hizo con
-  ayuda del parser de `typescript` (ya estaba disponible en el entorno) para
-  detectar con precisión qué usa cada bloque desde afuera y qué necesita el
-  resto del archivo desde el bloque — no a mano ni a ojo, dado el tamaño del
-  archivo. Arquitectura confirmada con Reportes: **hub-and-spoke** —
-  `js/finance.js` y `js/reports.js` solo importan de `js/app-main.js`, nunca
-  entre sí (Reportes necesitó helpers de Adherencia/Calendario/Ganancias que
-  viven en `js/app-main.js` — compartidos con Horario y Calendario, que se
-  quedan ahí por ahora — no se duplicó ninguno ni se armó una dependencia
-  Reportes↔Finanzas). Ojo con variables `let` de estado de vista (como
-  `reportsMonthlyOffset`): si algo FUERA de la página reasigna esa variable
-  (ej. los botones de paginación, que viven en el bloque de wiring
-  centralizado de la app, no dentro de la página misma), esa variable se
-  queda declarada en `js/app-main.js` — un módulo no puede reasignar un
-  `import`, solo leerlo. Siguen pendientes, en el mismo orden de páginas:
-  Calendario, Horario, Llamadas, Higher Rate, Ajustes — `state` (no
-  exportado todavía, ninguna extracción lo necesitó hasta ahora) se agregará
-  a la exportación de `js/app-main.js` en cuanto la primera lo necesite.
+  v557, Calendario v558 ya partidas).** Se resolvió el bloqueo original
+  ("cómo se entrega sin build"): módulos ES **nativos**, sin bundler — mismo
+  patrón que ya usan `js/auth.js`/`js/sync.js`, cero comandos de terminal
+  para el usuario. `js/boot.js` ya no inyecta un `<script>` clásico desde
+  `#appMainScript` — hace `import()` dinámico de `js/app-main.js` (solo se
+  ejecuta la primera vez que se llama, sigue sirviendo de gate), precargado
+  con `<link rel="modulepreload">` en el `<head>` (también para
+  `js/finance.js`, `js/reports.js` y `js/calendar.js`) para que no espere
+  red. Cada extracción se hizo con ayuda del parser de `typescript` (ya
+  estaba disponible en el entorno) para detectar con precisión qué usa cada
+  bloque desde afuera y qué necesita el resto del archivo desde el bloque —
+  no a mano ni a ojo, dado el tamaño del archivo. Arquitectura confirmada:
+  **hub-and-spoke** — `js/finance.js`, `js/reports.js` y `js/calendar.js`
+  solo importan de `js/app-main.js`, nunca entre sí. Patrón para variables
+  `let` de estado de vista (`reportsMonthlyOffset`, `calMonthOffset`,
+  `calViewMode`, `calYearOffset`): si algo FUERA de la página también
+  reasigna esa variable (ej. los botones prev/next/hoy, que viven en el
+  wiring centralizado de la app), la variable se queda declarada en
+  `js/app-main.js`. Si la página misma TAMBIÉN necesita reasignarla (no solo
+  leerla — pasó con `calMonthOffset`/`calViewMode` en Calendario, que las
+  cambia al saltar de la vista año a la vista mes), `js/app-main.js` expone
+  además una función `setX()` que la página importa y llama en vez de
+  reasignar directo (un módulo no puede reasignar algo que solo importó).
+  Siguen pendientes, en el mismo orden de páginas: Horario, Llamadas, Higher
+  Rate, Ajustes — `state` (no exportado todavía, ninguna extracción lo
+  necesitó hasta ahora) se agregará a la exportación de `js/app-main.js` en
+  cuanto la primera lo necesite.
 - **Fase 4 — Protección del código fuente.** Ya hecho: gate de sesión
   (ahora `js/app-main.js` + `js/finance.js` + `js/reports.js` +
-  `js/boot.js`), licencia + términos + privacidad en el repo. Pendiente:
-  minificar/bundlear sin sourcemaps (más fácil una vez que Fase 3 esté más
-  avanzada), mover al servidor el motor de
+  `js/calendar.js` + `js/boot.js`), licencia + términos + privacidad en el
+  repo. Pendiente: minificar/bundlear sin sourcemaps (más fácil una vez que
+  Fase 3 esté más avanzada), mover al servidor el motor de
   Adherencia/reportes agregados (rompe el offline de esa parte), repo privado
   en GitHub (pendiente del usuario). Explícitamente descartado: bloquear
   click derecho, deshabilitar F12, ofuscadores agresivos.
@@ -347,6 +349,39 @@ Pendientes, en orden:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v558** — Continuación de la Fase 3: tercera página partida de
+`js/app-main.js`, Calendario (vista mensual y anual de productividad). Mismo
+método que Finanzas/Reportes (typescript para calcular imports/exports).
+
+- Caso nuevo, más difícil que `reportsMonthlyOffset` (v557): `calMonthOffset`
+  y `calViewMode` no solo se LEEN dentro de Calendario y se reasignan desde
+  afuera (wiring de prev/next/hoy) — la propia página TAMBIÉN necesita
+  reasignarlas (al abrir un mes desde la vista año, o volver de mes a año).
+  Como un módulo no puede reasignar algo que solo importó, se agregaron dos
+  funciones `setCalMonthOffset()`/`setCalViewMode()` en `js/app-main.js`
+  (exportadas, al lado de las variables) y `js/calendar.js` las llama en vez
+  de reasignar directo en esos 2 puntos — las únicas líneas de código que se
+  tocaron dentro del bloque movido, todo lo demás se copió tal cual.
+  `calYearOffset` no necesitó esto (Calendario solo la lee).
+- `js/calendar.js` (nuevo): exporta 12 funciones (`renderCalendarMonth`,
+  `renderCalYear`, `openCalMonthFromYear`, `backToCalYearView`,
+  `effectiveHistoryStartDate`, etc.) e importa 29 nombres de
+  `js/app-main.js` (bastantes ya estaban exportados desde Finanzas/Reportes;
+  se agregaron 5 nuevos: `RATE`, `calMonthOffset`, `calViewMode`,
+  `calYearOffset`, `dayNoteCategoryMeta` — más los 2 setters nuevos).
+- Mismas verificaciones automáticas que v556/v557 (conteo de declaraciones
+  antes/después: 510 → 490, descontando las 22 que se movieron y sumando los
+  2 setters nuevos; cruce exacto export/import en ambos sentidos). Se
+  mantiene hub-and-spoke: `js/calendar.js` no importa de `js/finance.js` ni
+  de `js/reports.js`.
+- `app.html`: se sumó `<link rel="modulepreload" href="/js/calendar.js"/>`.
+- Sigue sin poder probarse en navegador real — mismo pedido de verificación
+  extra que en v555/v556/v557, con énfasis esta vez en saltar entre la vista
+  de año y de mes del Calendario (es el código que se tocó, no solo se
+  movió).
+- Entregado completo y editado: `app.html`, `js/app-main.js`,
+  `js/calendar.js` (nuevo).
 
 **v557** — Continuación de la Fase 3: segunda página partida de
 `js/app-main.js`, Reportes (KPIs, gráfico mensual, racha, mejores/peores
@@ -430,47 +465,3 @@ usuario). Mismo enfoque confirmado en v555 (módulos ES nativos).
 - Entregado completo y editado: `app.html`, `js/app-main.js`,
   `js/finance.js` (nuevo), `js/boot.js` (sin cambios esta vez, incluido para
   que la carpeta `js/` quede completa).
-
-**v555** — Arranque de la Fase 3 (Modularizar), elegida explícitamente por
-el usuario entre las 3 fases restantes del roadmap. Se le explicó primero en
-texto plano qué hace cada fase y, ya elegida la Fase 3, se le planteó el
-enfoque (módulos ES nativos sin build) y el plan por etapas antes de tocar
-código — confirmado por el usuario.
-
-- Se resolvió el bloqueo que el propio roadmap señalaba ("antes de encarar
-  esta fase hay que resolver cómo se entrega sin build"): módulos ES
-  **nativos** vía `<script type="module">`/`import()`, sin bundler — mismo
-  patrón que ya usan `js/auth.js`, `js/sync.js`, etc. Cero comandos de
-  terminal para el usuario.
-- `app.html`: se sacó el `<script type="text/plain" id="appMainScript">`
-  entero (todo el cuerpo de la app — Inicio, Horario, Llamadas, Higher Rate,
-  Finanzas, Reportes, Calendario, Ajustes) y pasó tal cual a `js/app-main.js`
-  como módulo ES nuevo. Se agregó `<link rel="modulepreload" href="/js/app-main.js"/>`
-  en el `<head>` para que el archivo se descargue y parsee en paralelo con
-  el chequeo de sesión, sin ejecutarse todavía.
-- `js/boot.js`: `mountApp()` pasó a ser async — ya no crea un `<script>` y le
-  copia el `textContent` de `#appMainScript` (ese elemento ya no existe);
-  ahora hace `await import('/js/app-main.js')`. El `import()` dinámico solo
-  ejecuta el módulo la primera vez que se llama, así que sigue cumpliendo el
-  mismo rol de gate que el truco de `type="text/plain"` — nada de la app
-  corre antes de que la sesión y los datos estén listos. Se revela el body
-  (clase `app-ready` + sacar el overlay) ANTES del `import()`, no después —
-  mismo motivo que antes: la app mide anchos reales al dibujarse y con el
-  body oculto mediría 0.
-- `js/app-main.js` termina exponiendo a mano en `window` las 9 funciones que
-  `js/boot.js` lee desde ahí (`toast`, `appConfirm`, `iconHtml`, `money`,
-  `convertedAmountText`, `financeConvertedInline`, `effectiveCycleGoal`,
-  `cycleGoalPace`, `reportsCycleProjection`) — como `<script>` clásico las
-  heredaba gratis (nivel superior = global), como módulo no cuelga nada de
-  `window` solo. Se auditó que esas son las únicas 9 (no quedó ninguna otra
-  dependencia implícita de `window` entre `boot.js` y el cuerpo de la app).
-- Por ahora `state`/`settings`/`calls` siguen en un solo archivo
-  (`js/app-main.js`) — no hizo falta todavía resolver cómo se comparte el
-  estado mutable entre varios módulos. Eso viene en el próximo paso, al
-  partir `js/app-main.js` por página (Finanzas primero).
-- Pendiente para la próxima sesión: actualizar `README.md` (su sección
-  "Cómo se edita `app.html`" todavía describe un solo archivo — no se tocó
-  esta vez porque no estaba subido en esta conversación).
-- Entregado completo y editado: `app.html`, `js/app-main.js` (nuevo),
-  `js/boot.js`.
-- Entregado completo y editado.
