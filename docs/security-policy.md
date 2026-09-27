@@ -1,8 +1,8 @@
 # Preparación de Content Security Policy
 
-`vercel.json` envía `Content-Security-Policy-Report-Only`. La política genera
-avisos en la consola del navegador, pero todavía no bloquea recursos. No hay
-un endpoint de reportes ni recopilación centralizada de esos avisos.
+`vercel.json` envía `Content-Security-Policy`. El navegador bloquea scripts,
+conexiones y recursos que no aparezcan en la lista permitida. No hay un
+endpoint de reportes ni recopilación centralizada de violaciones.
 
 Los scripts propios se sirven como archivos de `js/`. `theme-init.js` se
 carga de forma bloqueante en el `<head>` para aplicar el tema antes de pintar;
@@ -15,12 +15,15 @@ inline porque la app usa tanto `<style>` como estilos dinámicos. Los audios
 personalizados y los recursos locales pueden usar `data:` y `blob:`. JavaScript
 inline y `eval` quedarían bloqueados al pasar a aplicación efectiva.
 
-Antes de cambiar el encabezado a `Content-Security-Policy`, verificar en una
-preview de Vercel los tres accesos (Google, correo y username), recuperación,
-retorno OAuth, sincronización, edición de cuenta, audio y exportación PDF.
-Revisar también la consola: Vercel Toolbar puede necesitar una política propia
-para previews; no ampliar la lista de orígenes de producción solo por la barra.
-La comprobación local no sustituye esos flujos con una cuenta real.
+La política se activó después de verificar con una cuenta real el acceso con
+Google, el retorno OAuth, la carga del perfil, una ida y vuelta de tema con
+guardado en la nube, la activación de audio y la generación del reporte PDF.
+El navegador no registró errores ni avisos durante el recorrido. Correo,
+username y recuperación comparten el mismo cliente y los mismos orígenes, pero
+no se enviaron contraseñas ni correos de recuperación durante esta prueba.
+
+Vercel Toolbar puede necesitar una política propia en previews; no ampliar la
+lista de orígenes de producción solo por la barra.
 
 Validación disponible para el agente: `npm test` y `npm run check:modules`.
 No hay pasos técnicos que deba ejecutar el usuario.
