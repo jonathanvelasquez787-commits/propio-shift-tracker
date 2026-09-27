@@ -245,16 +245,6 @@ futura opera bajo esto, sin excepción:
 - **El blob de `user_data` no tiene tope.** Cada subida manda el snapshot
   completo. Señal de alarma: que la subida empiece a tardar más de 1-2 s —
   ahí toca la Fase 5 (tabla propia para `calls`).
-- **Checklist de imports/exports entre los 4 módulos de `js/` no es
-  automático.** Cada vez que se toca `app-main.js`/`finance.js`/
-  `reports.js`/`calendar.js`, hay que revisar a mano (o pedirle a Claude que
-  revise) que cada `import { X } from './otroArchivo.js'` tenga su `export`
-  exacto del otro lado — ya pasó dos veces que una función usada en un
-  módulo (`effectiveHistoryStartDate`, luego `financeConvertedInline`/
-  `financeConvertedNote`) se importaba sin que el archivo de origen la
-  reexportara, lo que rompe la carga de TODOS los módulos en cadena. No hay
-  todavía un script que lo verifique solo — por ahora Claude lo hace a mano
-  con grep/node cada vez que entrega uno de estos 4 archivos.
 
 **LIMITACIONES CONOCIDAS** (alcance reducido a propósito, no son bugs)
 
@@ -315,21 +305,23 @@ reales) y 2 (landing pública, los 3 métodos de login, páginas legales) están
 **cerradas y funcionando en producción**, verificado por el usuario.
 
 Pendientes, en orden:
-- **Fase 3 — Modularizar (EN CURSO, arrancada v555; Finanzas v556, Reportes
-  v557, Calendario v558 ya partidas).** Se resolvió el bloqueo original
+- **Fase 3 — Modularizar (EN CURSO, arrancada v555; Finanzas, Reportes,
+  Calendario, Horario, Llamadas y Higher Rate ya partidas).** Se resolvió el
+  bloqueo original
   ("cómo se entrega sin build"): módulos ES **nativos**, sin bundler — mismo
   patrón que ya usan `js/auth.js`/`js/sync.js`, cero comandos de terminal
   para el usuario. `js/boot.js` ya no inyecta un `<script>` clásico desde
   `#appMainScript` — hace `import()` dinámico de `js/app-main.js` (solo se
   ejecuta la primera vez que se llama, sigue sirviendo de gate), precargado
   con `<link rel="modulepreload">` en el `<head>` (también para
-  `js/finance.js`, `js/reports.js` y `js/calendar.js`) para que no espere
-  red. Cada extracción se hizo con ayuda del parser de `typescript` (ya
+  `js/finance.js`, `js/reports.js`, `js/calendar.js`, `js/schedule.js` y
+  `js/calls.js` y `js/higher-rate.js`) para que no espere red. Cada extracción
+  se hizo con ayuda del parser de `typescript` (ya
   estaba disponible en el entorno) para detectar con precisión qué usa cada
   bloque desde afuera y qué necesita el resto del archivo desde el bloque —
   no a mano ni a ojo, dado el tamaño del archivo. Arquitectura confirmada:
-  **hub-and-spoke** — `js/finance.js`, `js/reports.js` y `js/calendar.js`
-  solo importan de `js/app-main.js`, nunca entre sí. Patrón para variables
+  **hub-and-spoke** — los módulos de página solo importan de `js/app-main.js`,
+  nunca entre sí. Patrón para variables
   `let` de estado de vista (`reportsMonthlyOffset`, `calMonthOffset`,
   `calViewMode`, `calYearOffset`): si algo FUERA de la página también
   reasigna esa variable (ej. los botones prev/next/hoy, que viven en el
@@ -339,14 +331,12 @@ Pendientes, en orden:
   cambia al saltar de la vista año a la vista mes), `js/app-main.js` expone
   además una función `setX()` que la página importa y llama en vez de
   reasignar directo (un módulo no puede reasignar algo que solo importó).
-  Siguen pendientes, en el mismo orden de páginas: Horario, Llamadas, Higher
-  Rate, Ajustes — `state` (no exportado todavía, ninguna extracción lo
-  necesitó hasta ahora) se agregará a la exportación de `js/app-main.js` en
-  cuanto la primera lo necesite.
+  Solo queda pendiente la página Ajustes. `state` ya se exporta desde
+  `js/app-main.js` porque Llamadas lo necesita.
 - **Fase 4 — Protección del código fuente.** Ya hecho: gate de sesión
-  (ahora `js/app-main.js` + `js/finance.js` + `js/reports.js` +
-  `js/calendar.js` + `js/boot.js`), licencia + términos + privacidad en el
-  repo. Pendiente: minificar/bundlear sin sourcemaps (más fácil una vez que
+  (ahora todos los módulos de `js/` detrás de `js/boot.js`), licencia +
+  términos + privacidad en el repo. Pendiente: minificar/bundlear sin
+  sourcemaps (más fácil una vez que
   Fase 3 esté más avanzada), mover al servidor el motor de
   Adherencia/reportes agregados (rompe el offline de esa parte), repo privado
   en GitHub (pendiente del usuario). Explícitamente descartado: bloquear
@@ -359,6 +349,31 @@ Pendientes, en orden:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v561** — Continuación de la Fase 3: Higher Rate se extrae de
+`js/app-main.js` a `js/higher-rate.js`.
+
+- El nuevo módulo concentra cálculo y desglose de bonos, editor de ventanas,
+  estado en vivo, historial y congelado de bonos ya ganados.
+- `js/app-main.js` conserva el modelo compartido y reexporta los helpers que
+  Finanzas, Calendario y Llamadas ya consumían a través del hub.
+- `app.html` precarga `js/higher-rate.js` y el chequeo automático valida ahora
+  siete módulos. Solo queda Ajustes para cerrar la extracción de páginas.
+
+
+**v560** — Continuación de la Fase 3: Horario queda registrado como módulo ya
+partido y se extrae la página Llamadas de `js/app-main.js` a `js/calls.js`.
+
+- `js/calls.js` concentra edición, borrado, alta manual, guardado de llamadas
+  en vivo, tabla combinada y resumen diario; el modelo compartido permanece en
+  `js/app-main.js`.
+- Los cambios a `calls` pasan por `setCalls()` para respetar los bindings de
+  módulos ES, y el wiring central usa una API pequeña para el estado de vista.
+- Se agrega `scripts/check-module-exports.mjs` y `npm run check:modules`: el
+  pendiente de revisar imports/exports a mano queda resuelto.
+- `app.html` precarga `js/calls.js`; el mapa de módulos y el roadmap quedan
+  actualizados. Pendientes de la Fase 3: Higher Rate y Ajustes.
+
 
 **v559** — Bug de la Fase 3 (mismo patrón que v558/effectiveHistoryStartDate,
 esta vez con las 2 funciones de conversión de moneda): "Reportes" no cargaba
@@ -388,76 +403,3 @@ export named 'financeConvertedInline'`.
   una tercera vez: no hay todavía un chequeo automático de imports/exports
   entre los 4 módulos, se sigue revisando a mano cada vez.
 - Entregado: solo `app-main.js` (único archivo modificado).
-
-**v558** — Continuación de la Fase 3: tercera página partida de
-`js/app-main.js`, Calendario (vista mensual y anual de productividad). Mismo
-método que Finanzas/Reportes (typescript para calcular imports/exports).
-
-- Caso nuevo, más difícil que `reportsMonthlyOffset` (v557): `calMonthOffset`
-  y `calViewMode` no solo se LEEN dentro de Calendario y se reasignan desde
-  afuera (wiring de prev/next/hoy) — la propia página TAMBIÉN necesita
-  reasignarlas (al abrir un mes desde la vista año, o volver de mes a año).
-  Como un módulo no puede reasignar algo que solo importó, se agregaron dos
-  funciones `setCalMonthOffset()`/`setCalViewMode()` en `js/app-main.js`
-  (exportadas, al lado de las variables) y `js/calendar.js` las llama en vez
-  de reasignar directo en esos 2 puntos — las únicas líneas de código que se
-  tocaron dentro del bloque movido, todo lo demás se copió tal cual.
-  `calYearOffset` no necesitó esto (Calendario solo la lee).
-- `js/calendar.js` (nuevo): exporta 12 funciones (`renderCalendarMonth`,
-  `renderCalYear`, `openCalMonthFromYear`, `backToCalYearView`,
-  `effectiveHistoryStartDate`, etc.) e importa 29 nombres de
-  `js/app-main.js` (bastantes ya estaban exportados desde Finanzas/Reportes;
-  se agregaron 5 nuevos: `RATE`, `calMonthOffset`, `calViewMode`,
-  `calYearOffset`, `dayNoteCategoryMeta` — más los 2 setters nuevos).
-- Mismas verificaciones automáticas que v556/v557 (conteo de declaraciones
-  antes/después: 510 → 490, descontando las 22 que se movieron y sumando los
-  2 setters nuevos; cruce exacto export/import en ambos sentidos). Se
-  mantiene hub-and-spoke: `js/calendar.js` no importa de `js/finance.js` ni
-  de `js/reports.js`.
-- `app.html`: se sumó `<link rel="modulepreload" href="/js/calendar.js"/>`.
-- Sigue sin poder probarse en navegador real — mismo pedido de verificación
-  extra que en v555/v556/v557, con énfasis esta vez en saltar entre la vista
-  de año y de mes del Calendario (es el código que se tocó, no solo se
-  movió).
-- Entregado completo y editado: `app.html`, `js/app-main.js`,
-  `js/calendar.js` (nuevo).
-
-**v557** — Continuación de la Fase 3: segunda página partida de
-`js/app-main.js`, Reportes (KPIs, gráfico mensual, racha, mejores/peores
-días, proyección del ciclo). Mismo método que Finanzas (v556): árbol de
-sintaxis real vía `typescript` para calcular imports/exports, no a mano.
-
-- A diferencia de Finanzas, el código de Reportes **no** era un bloque
-  contiguo — está entreverado con funciones de Adherencia/Calendario que
-  Reportes usa pero no es dueño (`dayAdherence`, `weekSummaryForOffset`,
-  `effectiveHistoryStartDate`, etc.). Se movieron a `js/reports.js` solo las
-  20 funciones/constantes que son genuinamente de Reportes; esas ~33 que
-  Reportes solo consume se quedaron en `js/app-main.js` (compartidas con
-  Horario/Calendario) y ahora están exportadas para que `js/reports.js` las
-  importe.
-- Caso particular: `reportsMonthlyOffset` (variable de qué página del
-  gráfico mensual se está mirando) se lee dentro de Reportes pero se
-  **reasigna** desde los botones prev/next/hoy, que viven en el bloque de
-  wiring centralizado de `js/app-main.js` (junto a los de Horario/Ciclo/
-  Calendario), no dentro de la página de Reportes. Un módulo no puede
-  reasignar algo que importa — así que esa variable se quedó declarada en
-  `js/app-main.js` (exportada de ahí) en vez de moverse a `js/reports.js`
-  como el resto.
-- `js/reports.js` (nuevo): exporta 5 nombres que `js/app-main.js` necesita
-  de vuelta — `renderReportsDashboard`, `renderReportsMonthlyChart`,
-  `reportsCycleProjection`, `cycleGoalPace`, `REPORTS_MONTHLY_PAGE_SIZE` —
-  e importa 32 de `js/app-main.js` (7 ya estaban exportados desde Finanzas:
-  `settings`, `calls`, `money`, `convertedAmountText`, `iconHtml`,
-  `escapeHtml`, `saveSettingsOnly`; se agregó `export` a los otros 25, más
-  `reportsMonthlyOffset`).
-- Se confirmó la arquitectura **hub-and-spoke**: `js/finance.js` y
-  `js/reports.js` importan solo de `js/app-main.js`, nunca uno del otro.
-- Verificado: la cuenta de declaraciones top-level de `js/app-main.js` bajó
-  exactamente en las 20 que se movieron (530 → 510) y las listas de
-  export/import entre los dos archivos coinciden exactamente en ambos
-  sentidos (mismo chequeo automático que en v556).
-- `app.html`: se sumó `<link rel="modulepreload" href="/js/reports.js"/>`.
-- Sigue sin poder probarse en navegador real — mismo pedido de verificación
-  extra que en v555/v556.
-- Entregado completo y editado: `app.html`, `js/app-main.js`,
-  `js/reports.js` (nuevo).
