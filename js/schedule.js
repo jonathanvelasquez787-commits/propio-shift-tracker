@@ -178,11 +178,17 @@ import {
       return base;
     }
 
-    // Pedido del usuario (rediseño 100% visual de "Horario", timeline de bloques): ícono + subtítulo por tipo, puramente decorativos
+    // Pedido del usuario (rediseño 100% visual de "Horario", timeline de bloques): ícono + subtítulo por tipo, puramente decorativos.
+    // Guarda el NOMBRE del ícono, no el HTML ya renderizado: llamar a iconHtml() aquí arriba (a
+    // nivel de módulo) revienta el arranque, porque este archivo se importa desde app-main.js y a
+    // la vez importa iconHtml() de vuelta desde ahí (import circular) — en ese punto ICON todavía
+    // no existe dentro de app-main.js, así que iconHtml() truena con "Cannot access 'ICON' before
+    // initialization". Se llama a iconHtml(meta.iconName) recién donde se usa, en tiempo de
+    // ejecución (ver renderBlocksEditor más abajo).
     export const BLOCK_TIMELINE_META = {
-      work: { icon: iconHtml('briefcase'), subtitle: 'Enfoque y productividad' },
-      break: { icon: iconHtml('coffee'), subtitle: 'Descanso corto' },
-      lunch: { icon: iconHtml('utensils'), subtitle: 'Almuerzo / Descanso largo' },
+      work: { iconName: 'briefcase', subtitle: 'Enfoque y productividad' },
+      break: { iconName: 'coffee', subtitle: 'Descanso corto' },
+      lunch: { iconName: 'utensils', subtitle: 'Almuerzo / Descanso largo' },
     };
 
     // Duración legible ("2h 10m" / "45 min" / "1h") para la píldora de la tarjeta
@@ -218,7 +224,7 @@ import {
           <div class="sched-tl-rail" aria-hidden="true"><span class="sched-tl-dot"></span></div>
           <div class="sched-tl-card">
             <div class="sched-tl-card-top">
-              <span class="sched-tl-icon">${meta.icon}</span>
+              <span class="sched-tl-icon">${iconHtml(meta.iconName)}</span>
               <div class="sched-tl-titles">
                 <select class="alert-select block-type-input sched-tl-type-select">
                   <option value="work" ${type === 'work' ? 'selected' : ''}>Trabajo</option>

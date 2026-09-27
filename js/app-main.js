@@ -7996,7 +7996,7 @@ function render() {
       const iconEl = row.querySelector('.sched-tl-icon');
       const subtitleEl = row.querySelector('.sched-tl-subtitle');
       const meta = BLOCK_TIMELINE_META[typeInput.value] || BLOCK_TIMELINE_META.work;
-      if (iconEl) iconEl.innerHTML = meta.icon;
+      if (iconEl) iconEl.innerHTML = iconHtml(meta.iconName);
       if (subtitleEl) subtitleEl.textContent = meta.subtitle;
     });
     // La píldora de duración de cada tarjeta del timeline (puramente decorativa, ver
