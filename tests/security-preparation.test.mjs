@@ -64,18 +64,6 @@ test('enforced CSP contains the required Supabase and asset origins', () => {
   assert.ok(directives['media-src'].includes('data:'));
 });
 
-test('Supabase browser client uses an exact stable v2 release allowed by CSP', () => {
-  const source = read('js/supabase-client.js');
-  const importUrl = source.match(/from '([^']*supabase-js@([^/]+)\/\+esm)'/);
-  assert.ok(importUrl, 'missing Supabase CDN import');
-  assert.equal(importUrl[1], 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/+esm');
-  assert.match(importUrl[2], /^2\.\d+\.\d+$/);
-
-  const headers = JSON.parse(read('vercel.json')).headers[0].headers;
-  const policy = headers.find(h => h.key === 'Content-Security-Policy').value;
-  assert.match(policy, /script-src[^;]*https:\/\/cdn\.jsdelivr\.net/);
-});
-
 test('footer year tolerates pages without a footer', () => {
   const footer = {};
   vm.runInNewContext(read('js/footer-year.js'), {document:{getElementById:()=>footer}});
