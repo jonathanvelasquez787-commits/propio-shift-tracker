@@ -35,6 +35,8 @@ js/
   calendar.js               Página Calendario (vista mensual y anual)
   schedule.js               Página Horario (plantilla y semanas específicas)
   calls.js                  Página Llamadas (edición, alta manual y tabla diaria)
+  higher-rate.js            Página Higher Rate (ventanas, bonos e historial)
+  settings.js               Página Ajustes (perfil, metas, tarifa y moneda)
 
 api/
   login.js               Traduce usuario → correo del lado del servidor
@@ -119,10 +121,14 @@ app-main.js  ──imports──▶  reports.js
 app-main.js  ──imports──▶  calendar.js
 app-main.js  ──imports──▶  schedule.js
 app-main.js  ──imports──▶  calls.js
+app-main.js  ──imports──▶  higher-rate.js
+app-main.js  ──imports──▶  settings.js
 reports.js   ──imports──▶  app-main.js   (sí, en las dos direcciones)
 calendar.js  ──imports──▶  app-main.js
 schedule.js  ──imports──▶  app-main.js
 calls.js     ──imports──▶  app-main.js
+higher-rate.js ─imports──▶  app-main.js
+settings.js   ──imports──▶  app-main.js
 finance.js   ──imports──▶  app-main.js
 ```
 

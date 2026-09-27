@@ -14,6 +14,8 @@
 <link rel="modulepreload" href="/js/calendar.js"/>
 <link rel="modulepreload" href="/js/schedule.js"/>
 <link rel="modulepreload" href="/js/calls.js"/>
+<link rel="modulepreload" href="/js/higher-rate.js"/>
+<link rel="modulepreload" href="/js/settings.js"/>
 <style>
     :root {
       color-scheme: dark;
@@ -9394,6 +9396,20 @@
 <div class="emoji-picker" id="emojiPickerMetas" aria-label="Elegir emoji para el saludo"></div>
 <div class="note" style="margin:0;">El emoji aparece junto a tu nombre en el saludo de arriba (ej. "Buenas tardes, [tu nombre] 🙂"). Toca uno de la lista o escribe cualquier otro en el cuadro de texto. Déjalo vacío para no mostrar ninguno.</div>
 </div>
+<div class="divider"></div>
+<div class="goals-section-title"><svg class="goals-section-icon ic-svg blue" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="m4 6 8 6 8-6"/></svg>Datos de acceso</div>
+<div class="goals-field-row">
+<div class="goals-field">
+<label for="accountUsernameInput">Nombre de usuario</label>
+<input id="accountUsernameInput" maxlength="24" autocomplete="username" placeholder="usuario" type="text"/>
+</div>
+<div class="goals-field">
+<label for="accountEmailInput">Correo electrónico</label>
+<input id="accountEmailInput" autocomplete="email" placeholder="tu@correo.com" type="email"/>
+</div>
+</div>
+<div class="note" id="accountProfileStatus" aria-live="polite" style="margin:0;">El usuario sirve para entrar sin escribir tu correo. Si cambias el correo, tendrás que confirmarlo desde el mensaje que envíe Supabase.</div>
+<button class="mc-btn-primary cyan" id="saveAccountProfileBtn" type="button" style="width:100%; margin-top:10px;">Guardar datos de acceso</button>
 </div>
 
 <div class="divider"></div>

@@ -95,6 +95,42 @@ import {
   updateManualCallPreview,
 } from './calls.js';
 
+
+import {
+  addHigherRateWindowRow,
+  higherRateBonusBreakdownForCalls,
+  higherRateBonusChipsHtml,
+  higherRateBonusForCall,
+  higherRateBonusForCalls,
+  higherRateBreakdownTagsHtml,
+  higherRateTierBadgeHtml,
+  purgePastHigherRateWindows,
+  refreshHigherRateWindowsIfNeeded,
+  removeHigherRateWindowRowAt,
+  renderHigherRateLiveCard,
+  saveHigherRateWindowsFromEditor,
+  syncHigherRateModalFields,
+} from './higher-rate.js';
+
+
+import {
+  applyPendingGoalChange,
+  cancelPendingGoalChange,
+  clearActiveDayGoalOverride,
+  finishOnboarding,
+  formatGoalFields,
+  openSettingsModal,
+  renderEmojiPicker,
+  requestGoalChange,
+  saveAccountProfile,
+  syncEmojiPickerSelection,
+  toggleEmojiPickerMetas,
+  toggleEmojiPickerOnboarding,
+  updateCurrencySettings,
+  updateRate,
+  wireEmojiPicker,
+} from './settings.js';
+
 // js/reports.js necesita effectiveHistoryStartDate() (ver su import desde './app-main.js'), pero
 // esa función vive en js/calendar.js — este archivo solo la importaba para uso propio, nunca la
 // reexportaba. Sin esta línea, el import de reports.js falla con "The requested module
@@ -110,6 +146,9 @@ export { effectiveHistoryStartDate } from './calendar.js';
 // import de reports.js falla con "does not provide an export named 'financeConvertedInline'", lo
 // que rompe la cadena de módulos completa.
 export { financeConvertedInline, financeConvertedNote, financeRunAutoFillCascade };
+export { higherRateBonusForCall, higherRateBonusForCalls, higherRateTierBadgeHtml };
+export { formatBlockDurationLabel };
+export { renderEmojiPicker };
 
     const STORAGE_KEY = 'propio_shift_tracker_state_es_v4';
     const CALLS_KEY = 'propio_shift_tracker_calls_es_v4';
@@ -173,11 +212,11 @@ export { financeConvertedInline, financeConvertedNote, financeRunAutoFillCascade
     // Emoji que acompaña el nombre en el saludo (ver greetingText). Es el valor con el que se
     // prellena el campo del popup de bienvenida y el fallback si settings.userEmoji queda
     // vacío/inválido.
-    const DEFAULT_USER_EMOJI = '🙂';
+    export const DEFAULT_USER_EMOJI = '🙂';
     // Lista corta de emojis para el selector visual (ver renderEmojiPicker). El primero ('') es la
     // opción "Sin emoji" — un botón de limpiar, no un emoji real, para poder quitar el emoji sin
     // tener que vaciar el campo de texto a mano.
-    const EMOJI_CHOICES = ['', '🙂', '😄', '😎', '🤩', '🥳', '😴', '☕', '🔥', '💪', '🚀', '⭐', '🎯', '⚡', '🌟', '🙌', '👋', '🐱', '🌮', '🎧'];
+    export const EMOJI_CHOICES = ['', '🙂', '😄', '😎', '🤩', '🥳', '😴', '☕', '🔥', '💪', '🚀', '⭐', '🎯', '⚡', '🌟', '🙌', '👋', '🐱', '🌮', '🎧'];
     const DEFAULT_GOAL_MINUTES = 420;
     const DEFAULT_GOAL_DOLLARS = Number((DEFAULT_GOAL_MINUTES * RATE).toFixed(2));
     // Tope duro de duración para una sola llamada (pegada, editada o agregada a mano) — sin esto,
@@ -193,7 +232,7 @@ export { financeConvertedInline, financeConvertedNote, financeRunAutoFillCascade
       gold: { label: 'Gold', bonusPerMin: 0.03, colorVar: '--tier-gold', colorRgb: '234,179,8' },
     };
     // Una llamada iniciada hasta 5 min antes de que empiece la ventana también cuenta.
-    const HIGHER_RATE_EARLY_GRACE_MIN = 5;
+    export const HIGHER_RATE_EARLY_GRACE_MIN = 5;
 
     // Página "Finanzas" ---- Categorías fijas, mismo patrón que HIGHER_RATE_TIERS — no viven en
     // settings, solo sus filas (ver settings.financeCategories).
@@ -453,7 +492,6 @@ export { financeConvertedInline, financeConvertedNote, financeRunAutoFillCascade
     export let settings = loadSettings();
     ensureCurrencySettings();
     applyTheme();
-    let syncingGoals = false;
     // La hora es clickeable — al tocarla se oculta (muestra un placeholder enmascarado en vez del
     // valor real) y al volver a tocarla se muestra de nuevo. Visible por defecto. Vive en memoria,
     // no en localStorage.
@@ -666,7 +704,7 @@ export { financeConvertedInline, financeConvertedNote, financeRunAutoFillCascade
     // Parche de compatibilidad para settings guardados antes de que existieran
     // rate/currencyLabel/exchangeRate/cycleAnchorDate/ cyclePayOffsetDays (mismo patrón que
     // ensureWeeklySchedule ya usa).
-    function ensureCurrencySettings() {
+    export function ensureCurrencySettings() {
       const fallback = defaultSettings();
       if (!Number.isFinite(Number(settings.rate)) || Number(settings.rate) <= 0) settings.rate = fallback.rate;
       if (!Number.isFinite(Number(settings.exchangeRate)) || Number(settings.exchangeRate) < 0) settings.exchangeRate = fallback.exchangeRate;
@@ -926,7 +964,7 @@ export { financeConvertedInline, financeConvertedNote, financeRunAutoFillCascade
     // Dirección inversa de usdCeilFromCurrencyAmount: convierte una META en dólares a la moneda
     // secundaria, redondeando SIEMPRE hacia arriba — para que la meta mostrada/editada en esa
     // moneda nunca se vea más floja que la meta real en dólares.
-    function currencyCeilFromUsdAmount(usdAmount, exchangeRate) {
+    export function currencyCeilFromUsdAmount(usdAmount, exchangeRate) {
       if (!Number.isFinite(usdAmount) || !Number.isFinite(exchangeRate) || exchangeRate <= 0) return 0;
       return Math.ceil(usdAmount * exchangeRate * 100) / 100;
     }
@@ -1076,7 +1114,7 @@ export { financeConvertedInline, financeConvertedNote, financeRunAutoFillCascade
       render();
     }
 
-    function saveStateOnly() {
+    export function saveStateOnly() {
       if (!safeLocalStorageSet(STORAGE_KEY, JSON.stringify(state))) toast(STORAGE_QUOTA_TOAST);
     }
 
@@ -1121,107 +1159,6 @@ export { financeConvertedInline, financeConvertedNote, financeRunAutoFillCascade
       return Number.isFinite(n) ? n : 0;
     }
 
-    function callQualifiesForHigherRateWindow(callStartISO, window) {
-      const callStart = new Date(callStartISO);
-      const winStart = toDateFromInputs(window.date, timeLabel(window.start));
-      const winEnd = toDateFromInputs(window.date, timeLabel(window.end));
-      if (!winStart || !winEnd || winEnd.getTime() <= winStart.getTime()) return false;
-      const graceStart = new Date(winStart.getTime() - HIGHER_RATE_EARLY_GRACE_MIN * 60000);
-      return callStart.getTime() >= graceStart.getTime() && callStart.getTime() < winEnd.getTime();
-    }
-
-    // Bono de UNA llamada, null si no califica. Solo se comparan ventanas de la MISMA fecha; si
-    // califica más de una, gana la de mayor bono por minuto.
-    export function higherRateBonusForCall(call) {
-      // Bono ya congelado (ver freezeHigherRateBonusesForWindowIds): la ventana que lo generó ya no
-      // existe, pero el nivel que calificó se conserva.
-      if (call.frozenHigherRateBonus) {
-        const frozenTierMeta = HIGHER_RATE_TIERS[call.frozenHigherRateBonus.tier];
-        if (!frozenTierMeta) return call.frozenHigherRateBonus;
-        return {
-          amount: frozenTierMeta.bonusPerMin * (Number(call.durationMin) || 0),
-          tier: call.frozenHigherRateBonus.tier,
-          windowId: call.frozenHigherRateBonus.windowId,
-        };
-      }
-      const windows = (settings.higherRateWindows || []).filter(w => w.date === call.callDate);
-      if (!windows.length) return null;
-      const qualifying = windows.filter(w => callQualifiesForHigherRateWindow(call.startISO, w));
-      if (!qualifying.length) return null;
-      const best = qualifying.reduce((a, b) =>
-        (HIGHER_RATE_TIERS[b.tier]?.bonusPerMin || 0) > (HIGHER_RATE_TIERS[a.tier]?.bonusPerMin || 0) ? b : a
-      );
-      const tierMeta = HIGHER_RATE_TIERS[best.tier];
-      if (!tierMeta) return null;
-      return { amount: tierMeta.bonusPerMin * (Number(call.durationMin) || 0), tier: best.tier, windowId: best.id };
-    }
-
-    // Suma de bonos de un conjunto de llamadas (día, ciclo, etc.) — se reutiliza tanto en
-    // importedCallStats como en cycleEarningsForBounds (ciclo de pago completo).
-    export function higherRateBonusForCalls(sourceCalls) {
-      return sourceCalls.reduce((sum, c) => {
-        const bonus = higherRateBonusForCall(c);
-        return sum + (bonus ? bonus.amount : 0);
-      }, 0);
-    }
-
-    // Desglose por nivel: un día puede tener llamadas de más de un nivel a la vez.
-    function higherRateBonusBreakdownForCalls(sourceCalls) {
-      const breakdown = {};
-      sourceCalls.forEach(c => {
-        const bonus = higherRateBonusForCall(c);
-        if (!bonus) return;
-        breakdown[bonus.tier] = (breakdown[bonus.tier] || 0) + bonus.amount;
-      });
-      return breakdown;
-    }
-
-    // Badge de UNA llamada (Tabla de llamadas, columna Pay / tarjeta mobile)
-    export function higherRateTierBadgeHtml(tier, amount) {
-      const meta = HIGHER_RATE_TIERS[tier];
-      const colorVar = meta?.colorVar || '--warn';
-      const rgb = meta?.colorRgb || '255,209,92';
-      const label = meta?.label || tier;
-      return `<span class="imported-late" style="background: rgba(${rgb},.16); border-color: rgba(${rgb},.4); color: var(${colorVar});" title="Higher Rate Opportunity · ${escapeHtml(label)}">${iconHtml('flame')} ${escapeHtml(label)} +${money(amount)}${financeConvertedInline(amount)}</span>`;
-    }
-
-    // Versión compacta sin pill (solo texto coloreado) — para la línea de pago de la tarjeta
-    // mobile, donde ya no cabe un badge completo al lado del monto principal.
-    function higherRateTierInlineHtml(tier, amount) {
-      const meta = HIGHER_RATE_TIERS[tier];
-      const colorVar = meta?.colorVar || '--warn';
-      const label = meta?.label || tier;
-      return `<span style="color: var(${colorVar}); font-size:11px; font-weight:800;">${iconHtml('flame')} ${escapeHtml(label)} +${money(amount)}${financeConvertedInline(amount)}</span>`;
-    }
-
-    // Fila de tags agregados (uno por cada nivel presente ese día, ordenados de mayor a menor
-    // bono/min)
-    function higherRateBreakdownTagsHtml(breakdown, tagClass) {
-      const entries = Object.entries(breakdown || {}).filter(([, amt]) => amt > 0);
-      if (!entries.length) return '';
-      entries.sort((a, b) => (HIGHER_RATE_TIERS[b[0]]?.bonusPerMin || 0) - (HIGHER_RATE_TIERS[a[0]]?.bonusPerMin || 0));
-      return entries.map(([tier, amount]) => {
-        const meta = HIGHER_RATE_TIERS[tier];
-        const colorVar = meta?.colorVar || '--warn';
-        const rgb = meta?.colorRgb || '255,209,92';
-        const label = meta?.label || tier;
-        return `<span class="${tagClass}" style="background: rgba(${rgb},.16); border-color: rgba(${rgb},.4); color: var(${colorVar});" title="Bono extra ganado por llamadas dentro de una ventana Higher Rate ${escapeHtml(label)}">${iconHtml('flame')} ${escapeHtml(label)}: +${money(amount)}${financeConvertedInline(amount)}</span>`;
-      }).join('');
-    }
-
-    // Rediseño 100% visual de "Ganancias de hoy"/ "Ganancias del ciclo"
-    function higherRateBonusChipsHtml(breakdown) {
-      const entries = Object.entries(breakdown || {}).filter(([, amt]) => amt > 0);
-      if (!entries.length) return '';
-      entries.sort((a, b) => (HIGHER_RATE_TIERS[b[0]]?.bonusPerMin || 0) - (HIGHER_RATE_TIERS[a[0]]?.bonusPerMin || 0));
-      return entries.map(([tier, amount]) => {
-        const meta = HIGHER_RATE_TIERS[tier];
-        const colorVar = meta?.colorVar || '--warn';
-        const rgb = meta?.colorRgb || '255,209,92';
-        const label = meta?.label || tier;
-        return `<div class="gh-bonus-chip" style="background: rgba(${rgb},.14); border-color: rgba(${rgb},.4); color: var(${colorVar});">${iconHtml('flame')} <span>${escapeHtml(label)}: +${money(amount)}${financeConvertedInline(amount)} de bono Higher Rate</span></div>`;
-      }).join('');
-    }
 
     function fmtDate(date) {
       return new Intl.DateTimeFormat('es-MX', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).format(date);
@@ -1939,7 +1876,7 @@ function checkProductiveBreakEarnedAlarm() {
   playProductiveBreakSound();
 }
 
-function mergeIntervals(intervals = []) {
+export function mergeIntervals(intervals = []) {
   const sorted = intervals
     .map(i => ({ start: new Date(i.start), end: new Date(i.end) }))
     .filter(i => Number.isFinite(i.start.getTime()) && Number.isFinite(i.end.getTime()) && i.end > i.start)
@@ -3259,7 +3196,7 @@ export function weekSummaryForOffset(offset = weekViewOffset) {
 
 // Ganancias del ciclo: reutiliza cycleEarningsForOffset(0) tal cual (mismo dato que ya pinta
 // "Ganancias del ciclo" en Inicio).
-function getDailyGoalOverride(dayKey) {
+export function getDailyGoalOverride(dayKey) {
   const normalized = callDateKeyFromValue(dayKey);
   const raw = settings.dailyGoalOverrides && settings.dailyGoalOverrides[normalized];
   if (!raw || typeof raw !== 'object') return null;
@@ -3276,7 +3213,7 @@ export function effectiveDailyGoal(dayKey = getActiveDayKey()) {
 }
 
 // Value=null borra el override de ese día (vuelve a la meta general).
-function setDailyGoalOverride(dayKey, value) {
+export function setDailyGoalOverride(dayKey, value) {
   const normalized = callDateKeyFromValue(dayKey);
   if (!normalized) return;
   if (!settings.dailyGoalOverrides || typeof settings.dailyGoalOverrides !== 'object') settings.dailyGoalOverrides = {};
@@ -3581,227 +3518,6 @@ function renderPayDatesSection() {
 // Página "Finanzas" ---- ver FINANCE_CATEGORIES arriba y el resumen.md para el modelo de datos
 // completo (settings.financeCategories, cascada de "Restante después").
 
-    // Lee los 3 campos de meta y devuelve los valores ya sincronizados entre sí, SIN guardar nada —
-    // quién guarda (y con qué alcance) lo decide applyGoalValues.
-    function computeGoalsFromInputs(source) {
-      const minInput = document.getElementById('productiveGoalInput');
-      const usdInput = document.getElementById('earningsGoalInput');
-      const currencyInput = document.getElementById('goalCurrencyInput');
-      const current = effectiveDailyGoal(getActiveDayKey());
-      let minutes = Number(minInput.value);
-      let dollars = Number(usdInput.value);
-      let currencyAmount = Number(currencyInput?.value);
-      if (!Number.isFinite(minutes)) minutes = current.min;
-      if (!Number.isFinite(dollars)) dollars = current.usd;
-      // El atributo min del input no frena negativos ni notación científica: se clamea aquí.
-      minutes = Math.max(0, minutes);
-      dollars = Math.max(0, dollars);
-      if (Number.isFinite(currencyAmount)) currencyAmount = Math.max(0, currencyAmount);
-      // La tasa por minuto sale de settings.rate, editable en Ajustes.
-      const rate = Number(settings.rate) > 0 ? Number(settings.rate) : RATE;
-      // "Meta en tu moneda" (ej. Lempiras), sincronizada en ambos sentidos con Meta en
-      // dólares/minutos usando la tasa de cambio ya configurada en Metas (settings.exchangeRate).
-      const exchangeRate = Number(settings.exchangeRate) > 0 ? Number(settings.exchangeRate) : 0;
-      if (source === 'minutes') dollars = minutes * rate;
-      if (source === 'dollars') minutes = dollars / rate;
-      if (source === 'currency' && exchangeRate > 0) {
-        if (!Number.isFinite(currencyAmount)) currencyAmount = currencyCeilFromUsdAmount(dollars, exchangeRate);
-        dollars = usdCeilFromCurrencyAmount(currencyAmount, exchangeRate);
-        minutes = dollars / rate;
-      }
-      // Segundo clamp, justo antes de guardar: los 3 renglones de arriba
-      // (source==='minutes'/'dollars'/'currency') recalculan minutes/dollars a partir de otro
-      // campo.
-      minutes = Math.max(0, minutes);
-      dollars = Math.max(0, dollars);
-      return { minutes: Number(minutes), dollars: Number(dollars) };
-    }
-
-    // Scope 'day' guarda la meta SOLO para ese día; 'global' guarda la meta de siempre y borra el
-    // override de ese día, para que la nueva general también aplique ahí.
-    function applyGoalValues(minutes, dollars, scope, dayKey) {
-      if (scope === 'day') {
-        setDailyGoalOverride(dayKey, { min: minutes, usd: dollars });
-      } else {
-        settings.productiveGoalMin = Number(minutes);
-        settings.earningsGoal = Number(dollars);
-        state.productiveGoalMin = settings.productiveGoalMin;
-        state.earningsGoal = settings.earningsGoal;
-        setDailyGoalOverride(dayKey, null);
-        saveStateOnly();
-      }
-      saveSettingsOnly();
-      refreshGoalInputs();
-      render();
-    }
-
-    // Repinta los 3 campos de meta con el valor efectivo del día activo.
-    function refreshGoalInputs() {
-      const minInput = document.getElementById('productiveGoalInput');
-      const usdInput = document.getElementById('earningsGoalInput');
-      const currencyInput = document.getElementById('goalCurrencyInput');
-      const exchangeRate = Number(settings.exchangeRate) > 0 ? Number(settings.exchangeRate) : 0;
-      const goal = effectiveDailyGoal(getActiveDayKey());
-      if (minInput) minInput.value = formatMinutes(goal.min);
-      if (usdInput) usdInput.value = goal.usd.toFixed(2);
-      if (currencyInput && exchangeRate > 0) currencyInput.value = currencyCeilFromUsdAmount(goal.usd, exchangeRate).toFixed(2);
-    }
-
-    function syncGoals(source) {
-      if (syncingGoals) return;
-      syncingGoals = true;
-      const { minutes, dollars } = computeGoalsFromInputs(source);
-      applyGoalValues(minutes, dollars, 'global', getActiveDayKey());
-      syncingGoals = false;
-    }
-
-    let pendingGoalChange = null;
-
-    function requestGoalChange(source) {
-      if (syncingGoals) return;
-      const dayKey = getActiveDayKey();
-      const { minutes, dollars } = computeGoalsFromInputs(source);
-      const current = effectiveDailyGoal(dayKey);
-      if (Math.abs(current.min - minutes) < 0.005 && Math.abs(current.usd - dollars) < 0.005) {
-        refreshGoalInputs();
-        return;
-      }
-      pendingGoalChange = { minutes, dollars, dayKey };
-      const isToday = dayKey === todayCallDateKey();
-      const dayLabel = isToday ? 'hoy' : formatCallDayLabel(dayKey);
-      const summaryEl = document.getElementById('goalScopeSummary');
-      const dayBtnEl = document.getElementById('goalScopeDayBtn');
-      const dayHintEl = document.getElementById('goalScopeDayHint');
-      if (summaryEl) summaryEl.textContent = `Meta nueva: ${formatMinutes(minutes)} min · ${money(dollars)}${convertedAmountText(dollars) ? ` (${convertedAmountText(dollars)})` : ''}`;
-      if (dayBtnEl) dayBtnEl.innerHTML = `${iconHtml('calendar')} Solo ${escapeHtml(dayLabel)}`;
-      if (dayHintEl) dayHintEl.textContent = `"Solo ${dayLabel}" deja tu meta de siempre intacta y aplica esta solo a ese día.`;
-      openModal('goalScopeModal');
-    }
-
-    function applyPendingGoalChange(scope) {
-      if (!pendingGoalChange) return;
-      const { minutes, dollars, dayKey } = pendingGoalChange;
-      pendingGoalChange = null;
-      closeModal('goalScopeModal');
-      applyGoalValues(minutes, dollars, scope, dayKey);
-      toast(scope === 'day'
-        ? `Meta de ${dayKey === todayCallDateKey() ? 'hoy' : formatCallDayLabel(dayKey)}: ${formatMinutes(minutes)} min · ${money(dollars)}${convertedAmountText(dollars) ? ` (${convertedAmountText(dollars)})` : ''}`
-        : `Meta general: ${formatMinutes(minutes)} min · ${money(dollars)}${convertedAmountText(dollars) ? ` (${convertedAmountText(dollars)})` : ''}`);
-    }
-
-    function cancelPendingGoalChange() {
-      if (!pendingGoalChange) return;
-      pendingGoalChange = null;
-      refreshGoalInputs();
-    }
-
-    // Quita el override del día activo desde Ajustes, sin tener que volver a teclear la meta
-    // general.
-    function clearActiveDayGoalOverride() {
-      const dayKey = getActiveDayKey();
-      if (!getDailyGoalOverride(dayKey)) return;
-      setDailyGoalOverride(dayKey, null);
-      saveSettingsOnly();
-      refreshGoalInputs();
-      render();
-      toast('Ese día vuelve a usar tu meta general');
-    }
-
-    // Cuando se edita la tasa por minuto en Metas: se guarda la nueva tasa y se recalcula la Meta
-    // en dólares a partir de la Meta en minutos ya guardada (mismo criterio que el flujo existente
-    // de "source==='minutes'" en syncGoals)
-    function updateRate() {
-      const rateInput = document.getElementById('rateInput');
-      let rate = Number(rateInput?.value);
-      if (!Number.isFinite(rate) || rate <= 0) rate = settings.rate || RATE;
-      settings.rate = rate;
-      saveSettingsOnly();
-      syncGoals('minutes');
-    }
-
-    // Cambios de moneda secundaria (símbolo + tasa de cambio), editables en Metas.
-    function updateCurrencySettings() {
-      const exchangeInput = document.getElementById('exchangeRateInput');
-      const labelInput = document.getElementById('currencyLabelInput');
-      let exchangeRate = Number(exchangeInput?.value);
-      if (!Number.isFinite(exchangeRate) || exchangeRate < 0) exchangeRate = settings.exchangeRate || 0;
-      settings.exchangeRate = exchangeRate;
-      settings.currencyLabel = String(labelInput?.value || '').trim().slice(0, 6);
-      saveSettingsOnly();
-      render();
-    }
-    // Guarda nombre + emoji capturados en el popup de bienvenida (ver onboardingModal) y marca
-    // settings.onboarded = true para que el popup no vuelva a salir en esta misma
-    // instalación/navegador.
-    export function renderEmojiPicker(containerId, selected) {
-      const el = document.getElementById(containerId);
-      if (!el) return;
-      el.innerHTML = EMOJI_CHOICES.map(e => {
-        const isClear = e === '';
-        const display = isClear ? '✕' : e;
-        const label = isClear ? 'Sin emoji' : `Elegir ${e}`;
-        return `<button type="button" class="emoji-option ${isClear ? 'emoji-clear' : ''} ${e === selected ? 'selected' : ''}" data-emoji="${e}" aria-label="${label}">${display}</button>`;
-      }).join('');
-    }
-
-    // Actualiza solo la clase.selected de los botones ya pintados, sin tocar el HTML.
-    function syncEmojiPickerSelection(containerId, selected) {
-      const el = document.getElementById(containerId);
-      if (!el) return;
-      el.querySelectorAll('.emoji-option').forEach(btn => {
-        btn.classList.toggle('selected', btn.getAttribute('data-emoji') === selected);
-      });
-    }
-
-    // Conecta los clicks del grid (delegado, un solo listener por contenedor) con el input de texto
-    // correspondiente.
-    function wireEmojiPicker(containerId, inputId, onPick) {
-      const el = document.getElementById(containerId);
-      if (!el) return;
-      el.addEventListener('click', (e) => {
-        const btn = e.target instanceof Element ? e.target.closest('.emoji-option') : null;
-        if (!btn) return;
-        const emoji = btn.getAttribute('data-emoji') || '';
-        const input = document.getElementById(inputId);
-        if (input) input.value = emoji;
-        el.querySelectorAll('.emoji-option').forEach(b => b.classList.toggle('selected', b === btn));
-        if (typeof onPick === 'function') onPick(emoji);
-      });
-    }
-
-    // Rediseño visual de "Ajustes" — el picker de emojis (#emojiPickerMetas) + su input de texto
-    // (#userEmojiInput) ya no viven siempre expandidos, se revelan con este botón pill "Cambiar
-    // emoji".
-    function toggleEmojiPickerMetas() {
-      const wrap = document.getElementById('goalsEmojiPickerWrap');
-      const btn = document.getElementById('toggleEmojiPickerMetasBtn');
-      if (!wrap || !btn) return;
-      const open = !wrap.classList.contains('open');
-      wrap.classList.toggle('open', open);
-      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-      btn.textContent = open ? 'Ocultar emoji' : 'Cambiar emoji';
-    }
-
-    function toggleEmojiPickerOnboarding() {
-      const wrap = document.getElementById('onboardingEmojiPickerWrap');
-      const btn = document.getElementById('toggleEmojiPickerOnboardingBtn');
-      if (!wrap || !btn) return;
-      const open = !wrap.classList.contains('open');
-      wrap.classList.toggle('open', open);
-      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-      btn.textContent = open ? 'Ocultar emoji' : 'Cambiar emoji';
-    }
-
-    function finishOnboarding() {
-      const nameInput = document.getElementById('onboardingNameInput');
-      const emojiInput = document.getElementById('onboardingEmojiInput');
-      settings.userName = String(nameInput?.value || '').trim().slice(0, 40);
-      settings.userEmoji = String(emojiInput?.value || '').trim().slice(0, 8);
-      settings.onboarded = true;
-      saveSettingsOnly();
-      closeModal('onboardingModal');
-      render();
-    }
 
     function todayIsOff() {
       const cfg = dayConfigFor(todayCallDateKey());
@@ -4768,67 +4484,6 @@ function renderPayDatesSection() {
       reader.readAsText(file);
     }
 
-    function formatGoalFields() {
-      const minInput = document.getElementById('productiveGoalInput');
-      const usdInput = document.getElementById('earningsGoalInput');
-      const nameInput = document.getElementById('userNameInput');
-      const emojiInput = document.getElementById('userEmojiInput');
-      const rateInput = document.getElementById('rateInput');
-      const exchangeInput = document.getElementById('exchangeRateInput');
-      const currencyInput = document.getElementById('currencyLabelInput');
-      // Los 3 campos de meta muestran la meta EFECTIVA del día activo (puede
-      // ser un override de ese día, ver effectiveDailyGoal).
-      const activeDayGoal = effectiveDailyGoal(getActiveDayKey());
-      if (!pendingGoalChange && document.activeElement !== minInput) minInput.value = formatMinutes(activeDayGoal.min);
-      if (!pendingGoalChange && document.activeElement !== usdInput) usdInput.value = activeDayGoal.usd.toFixed(2);
-      const goalDayOverrideNote = document.getElementById('goalDayOverrideNote');
-      const goalDayOverrideNoteText = document.getElementById('goalDayOverrideNoteText');
-      if (goalDayOverrideNote && goalDayOverrideNoteText) {
-        if (activeDayGoal.isOverride) {
-          const activeDayKeyForNote = getActiveDayKey();
-          const dayLabel = activeDayKeyForNote === todayCallDateKey() ? 'hoy' : formatCallDayLabel(activeDayKeyForNote);
-          goalDayOverrideNoteText.textContent = `Meta especial solo para ${dayLabel}. Tu meta general sigue en ${formatMinutes(Number(settings.productiveGoalMin) || 0)} min · ${money(Number(settings.earningsGoal) || 0)}${convertedAmountText(Number(settings.earningsGoal) || 0) ? ` (${convertedAmountText(Number(settings.earningsGoal) || 0)})` : ''}.`;
-          goalDayOverrideNote.style.display = '';
-        } else {
-          goalDayOverrideNote.style.display = 'none';
-        }
-      }
-      if (nameInput && document.activeElement !== nameInput) nameInput.value = String(settings.userName || '');
-      if (emojiInput && document.activeElement !== emojiInput) emojiInput.value = String(settings.userEmoji || '');
-      if (rateInput && document.activeElement !== rateInput) rateInput.value = Number(settings.rate || RATE).toFixed(2);
-      if (exchangeInput && document.activeElement !== exchangeInput) exchangeInput.value = Number(settings.exchangeRate || 0).toFixed(2);
-      if (currencyInput && document.activeElement !== currencyInput) currencyInput.value = String(settings.currencyLabel || '');
-      // Pedido del usuario: "Meta en tu moneda" en el modal Metas — oculto hasta que haya tasa de cambio Y símbolo de moneda configurados (mismo criterio que ya usa convertedAmountText para ocultar el helper "≈ L..." del header).
-      const goalCurrencyField = document.getElementById('goalCurrencyField');
-      const goalCurrencyInput = document.getElementById('goalCurrencyInput');
-      const goalCurrencyLabelEl = document.getElementById('goalCurrencyLabel');
-      const currencyLabelTrimmed = String(settings.currencyLabel || '').trim();
-      const hasCurrency = Number(settings.exchangeRate) > 0 && !!currencyLabelTrimmed;
-      if (goalCurrencyField) goalCurrencyField.style.display = hasCurrency ? '' : 'none';
-      if (hasCurrency) {
-        if (goalCurrencyLabelEl) goalCurrencyLabelEl.textContent = `Meta en ${currencyLabelTrimmed}`;
-        if (goalCurrencyInput && !pendingGoalChange && document.activeElement !== goalCurrencyInput) {
-          goalCurrencyInput.value = currencyCeilFromUsdAmount(activeDayGoal.usd, Number(settings.exchangeRate)).toFixed(2);
-        }
-      }
-      syncEmojiPickerSelection('emojiPickerMetas', String(settings.userEmoji || ''));
-      // Ver comentario junto a ".goals-emoji-circle" en el CSS: círculo grande de solo lectura en la cabecera de "Tu perfil"
-      const goalsEmojiPreview = document.getElementById('goalsEmojiPreview');
-      if (goalsEmojiPreview) goalsEmojiPreview.textContent = String(settings.userEmoji || '').trim() || DEFAULT_USER_EMOJI;
-
-      // Pedido del usuario: Ciclo de pago se movió de Horario a Metas (es
-      // dinero, no horario) — mismo criterio de sincronización que ya usaba
-      // en Horario: settings globales, no dependen del día activo.
-      ensureCurrencySettings();
-      const cycleAnchorInput = document.getElementById('cycleAnchorInput');
-      const cyclePayOffsetInput = document.getElementById('cyclePayOffsetInput');
-      if (cycleAnchorInput && document.activeElement !== cycleAnchorInput) cycleAnchorInput.value = settings.cycleAnchorDate;
-      if (cyclePayOffsetInput && document.activeElement !== cyclePayOffsetInput) cyclePayOffsetInput.value = settings.cyclePayOffsetDays;
-      // v328 — Meta del ciclo actual, editable también desde aquí (ver
-      // comentario junto a cycleGoalOverrides en defaultSettings()).
-      const cycleGoalInput = document.getElementById('cycleGoalInput');
-      if (cycleGoalInput && document.activeElement !== cycleGoalInput) cycleGoalInput.value = effectiveCycleGoal(0).toFixed(2);
-    }
 
     export function formatHHMM(value) {
       const raw = String(value || '').trim();
@@ -4928,10 +4583,6 @@ function renderPayDatesSection() {
       Object.keys(MESSAGE_PREVIEW_CONFIGS).forEach((kind) => syncMessagePreview(kind));
     }
 
-    // Pedido del usuario: Higher Rate Opportunity vive ahora en su propio botón/modal (antes escondido dentro de Horario) — se sincroniza al abrir ese modal, no al abrir Horario.
-    function syncHigherRateModalFields() {
-      renderHigherRateWindowsEditor(settings.higherRateWindows || []);
-    }
 
     export function minutesToHHMM(mins) {
       const m = ((Math.round(mins) % 1440) + 1440) % 1440;
@@ -5294,552 +4945,6 @@ function renderPayDatesSection() {
       toast('Mensaje del aviso actualizado');
     }
 
-    // Editor de ventanas de Higher Rate Opportunity (pedido del usuario) ---- Mismo patrón que el editor de bloques (Trabajo/Break/ Lunch, ver renderBlocksEditor): filas dinámicas con Fecha + Inicio + Fin + Nivel, agregar/eliminar libremente.
-    function hrWindowWeekdayLabel(dayKeyStr) {
-      const d = callDateToDate(dayKeyStr);
-      if (!d) return '—';
-      const raw = new Intl.DateTimeFormat('es-MX', { weekday: 'long' }).format(d);
-      return raw.charAt(0).toUpperCase() + raw.slice(1);
-    }
-    // Texto de cada botón del pill de nivel — el activo muestra su bono ("Gold +$0.03"), los otros solo el nombre.
-    function hrTierButtonLabel(tierKey, active) {
-      const meta = HIGHER_RATE_TIERS[tierKey];
-      return active ? `${meta.label} +${money(meta.bonusPerMin)}` : meta.label;
-    }
-
-    // BUG-016 (QA ) — Pedido del usuario: el `.hr-window-date-input` que arma esta función llevaba min/max agregados (ver el atributo en el template de abajo) para no aceptar años absurdos (0999/9999) sin ninguna validación
-    function renderHigherRateWindowRow(w) {
-      const tier = HIGHER_RATE_TIERS[w.tier] ? w.tier : 'bronze';
-      const tierButtonsHtml = ['bronze', 'silver', 'gold'].map(t => {
-        const active = t === tier;
-        return `<button type="button" class="hr-window-tier-btn" data-hr-tier-btn data-tier="${t}" aria-pressed="${active ? 'true' : 'false'}">${escapeHtml(hrTierButtonLabel(t, active))}</button>`;
-      }).join('');
-      return `
-        <div class="hr-window-card" data-hr-window-id="${escapeHtml(w.id || '')}" data-tier="${tier}">
-          <div class="hr-window-top">
-            <div class="hr-window-day">
-              <span class="hr-window-day-icon" aria-hidden="true">${iconHtml('calendar')}</span>
-              <div class="hr-window-day-text">
-                <div class="hr-window-day-name">${escapeHtml(hrWindowWeekdayLabel(w.date))}</div>
-                <input type="date" class="hr-window-date-input hr-window-date-visible" value="${escapeHtml(isoDateFromDayKey(w.date))}" title="Fecha de la ventana" min="1970-01-01" max="2099-12-31"/>
-              </div>
-            </div>
-            <button type="button" class="hr-window-remove-btn" data-remove-hr-window aria-label="Eliminar ventana"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-          </div>
-          <div class="hr-window-time">
-            <span class="hr-window-time-icon" aria-hidden="true">${iconHtml('clock')}</span>
-            <input type="time" class="hr-window-start-input hr-window-time-input" value="${formatHHMM(w.start)}" title="Hora de inicio"/>
-            <span class="hr-time-sep" aria-hidden="true">–</span>
-            <input type="time" class="hr-window-end-input hr-window-time-input" value="${formatHHMM(w.end)}" title="Hora de fin"/>
-          </div>
-          <select class="alert-select hr-window-tier-input" style="display:none;">
-            <option value="bronze" ${tier === 'bronze' ? 'selected' : ''}>Bronce (+$0.01)</option>
-            <option value="silver" ${tier === 'silver' ? 'selected' : ''}>Silver (+$0.02)</option>
-            <option value="gold" ${tier === 'gold' ? 'selected' : ''}>Gold (+$0.03)</option>
-          </select>
-          <div class="hr-window-tier-row" role="group" aria-label="Nivel de la ventana">${tierButtonsHtml}</div>
-        </div>
-      `;
-    }
-
-    // Total de minutos/horas del día que ya calificaron para un bono de Higher Rate, dentro del
-    // propio modal — reutiliza higherRateBonusForCall (misma regla de elegibilidad de siempre, sin
-    // duplicar lógica) sobre las llamadas de HOY.
-    function higherRateStatsForDay(dayKey = todayCallDateKey()) {
-      const dayCallsList = callsForDay(dayKey, calls);
-      let totalMin = 0;
-      let totalBonus = 0;
-      const breakdown = {};
-      dayCallsList.forEach(c => {
-        const bonus = higherRateBonusForCall(c);
-        if (!bonus) return;
-        totalMin += Number(c.durationMin) || 0;
-        totalBonus += bonus.amount;
-        breakdown[bonus.tier] = (breakdown[bonus.tier] || 0) + (Number(c.durationMin) || 0);
-      });
-      return { totalMin, totalBonus, breakdown };
-    }
-
-    // Duración TOTAL de las ventanas de Higher Rate configuradas para hoy (las hayas aprovechado o
-    // no) — distinto de `higherRateStatsForDay` (tiempo real en llamada).
-    function higherRateWindowsTodayTotalMin(dayKey = todayCallDateKey()) {
-      const todaysWindows = (settings.higherRateWindows || []).filter(w => w.date === dayKey);
-      const intervals = todaysWindows
-        .map(w => ({ start: toDateFromInputs(w.date, timeLabel(w.start)), end: toDateFromInputs(w.date, timeLabel(w.end)) }))
-        .filter(iv => iv.start && iv.end && iv.end > iv.start);
-      return mergeIntervals(intervals).reduce((sum, iv) => sum + (iv.end.getTime() - iv.start.getTime()) / 60000, 0);
-    }
-
-    // Estado EN VIVO de Higher Rate ---- ¿Estás dentro de una ventana AHORA MISMO, o cuándo es la
-    // próxima que viene? Reutiliza la misma regla de elegibilidad que ya usa
-    // callQualifiesForHigherRateWindow (la gracia de 5 min antes de que empiece), pero comparando
-    // contra el reloj en vez de contra el inicio de una llamada.
-    function isNowWithinHigherRateWindow(now, w) {
-      const winStart = toDateFromInputs(w.date, timeLabel(w.start));
-      const winEnd = toDateFromInputs(w.date, timeLabel(w.end));
-      if (!winStart || !winEnd || winEnd.getTime() <= winStart.getTime()) return false;
-      const graceStart = new Date(winStart.getTime() - HIGHER_RATE_EARLY_GRACE_MIN * 60000);
-      return now.getTime() >= graceStart.getTime() && now.getTime() < winEnd.getTime();
-    }
-
-    // Devuelve { active: true, window, minutesLeft } si hay una ventana vigente ahora mismo (la de
-    // mayor bono, si hay varias traslapadas — mismo criterio que higherRateBonusForCall), o {
-    // active: false, window, startsAt } con la próxima ventana futura más cercana (cualquier fecha,
-    // no solo hoy).
-    function higherRateLiveStatus() {
-      const now = new Date();
-      const windows = settings.higherRateWindows || [];
-      const activeNow = windows.filter(w => isNowWithinHigherRateWindow(now, w));
-      if (activeNow.length) {
-        const best = activeNow.reduce((a, b) =>
-          (HIGHER_RATE_TIERS[b.tier]?.bonusPerMin || 0) > (HIGHER_RATE_TIERS[a.tier]?.bonusPerMin || 0) ? b : a
-        );
-        const winEnd = toDateFromInputs(best.date, timeLabel(best.end));
-        const minutesLeft = winEnd ? Math.max(0, Math.round((winEnd.getTime() - now.getTime()) / 60000)) : null;
-        return { active: true, window: best, minutesLeft };
-      }
-      const upcoming = windows
-        .map(w => ({ w, start: toDateFromInputs(w.date, timeLabel(w.start)), end: toDateFromInputs(w.date, timeLabel(w.end)) }))
-        .filter(x => x.start && x.end && x.end.getTime() > x.start.getTime())
-        .map(x => ({ ...x, graceStart: new Date(x.start.getTime() - HIGHER_RATE_EARLY_GRACE_MIN * 60000) }))
-        .filter(x => x.graceStart.getTime() > now.getTime())
-        .sort((a, b) => a.start.getTime() - b.start.getTime());
-      if (upcoming.length) return { active: false, window: upcoming[0].w, startsAt: upcoming[0].start };
-      return null;
-    }
-
-    // Pinta la tarjeta "en vivo"/"próxima ventana" de Higher Rate en un set de ids dado —
-    // reutilizado tanto por #higherRateModal como por el mismo widget dentro de "Ganancias de hoy"
-    // (ver renderHigherRateLiveCard).
-    function renderHigherRateLiveCardInto(ids, { hideWhenUpcoming = false } = {}) {
-      const card = document.getElementById(ids.card);
-      const icon = document.getElementById(ids.icon);
-      const title = document.getElementById(ids.title);
-      const sub = document.getElementById(ids.sub);
-      if (!card || !icon || !title || !sub) return;
-      const status = higherRateLiveStatus();
-      if (!status || (hideWhenUpcoming && !status.active)) {
-        card.style.display = 'none';
-        return;
-      }
-      card.style.display = '';
-      card.classList.toggle('tone-active', status.active);
-      // Ver.tone-tier en el CSS: tiñe ícono/fecha/borde con el color del nivel.
-      card.classList.toggle('tone-tier', !status.active);
-      icon.innerHTML = iconHtml('flame');
-      const tierMeta = HIGHER_RATE_TIERS[status.window.tier];
-      const tierLabel = tierMeta?.label || status.window.tier;
-      if (tierMeta) {
-        card.style.setProperty('--live-rgb', tierMeta.colorRgb);
-        card.style.setProperty('--live-color', `var(${tierMeta.colorVar})`);
-      } else {
-        card.style.removeProperty('--live-rgb');
-        card.style.removeProperty('--live-color');
-      }
-      if (status.active) {
-        title.textContent = `Estás en una ventana ${tierLabel} ahora`;
-        sub.textContent = status.minutesLeft !== null
-          ? `Termina en ${formatMinutes(status.minutesLeft)} min (${timeLabel(status.window.end)})`
-          : `Termina a las ${timeLabel(status.window.end)}`;
-      } else {
-        const isToday = status.window.date === todayCallDateKey();
-        const dayLabelRaw = isToday ? 'Hoy' : formatCallDayLabel(status.window.date);
-        const dayLabel = dayLabelRaw.charAt(0).toUpperCase() + dayLabelRaw.slice(1);
-        const datetimeText = `${dayLabel} · ${timeLabel(status.window.start)}`;
-        const chipRgb = tierMeta?.colorRgb || '255,209,92';
-        const chipColorVar = tierMeta?.colorVar || '--warn';
-        title.innerHTML = `<div class="hr-live-eyebrow">Próxima ventana</div><div class="hr-live-main-row"><span class="hr-live-datetime">${escapeHtml(datetimeText)}</span><span class="hr-live-tier-chip" style="background: rgba(${chipRgb}, .16); border: 1px solid rgba(${chipRgb}, .4); color: var(${chipColorVar});">${escapeHtml(tierLabel)}</span></div>`;
-        sub.textContent = `Termina a las ${timeLabel(status.window.end)}`;
-      }
-    }
-
-    function renderHigherRateLiveCard() {
-      renderHigherRateLiveCardInto({ card: 'higherRateLiveCard', icon: 'higherRateLiveIcon', title: 'higherRateLiveTitle', sub: 'higherRateLiveSub' }, { hideWhenUpcoming: true });
-      renderHigherRateLiveCardInto({ card: 'earningsHigherRateLiveCard', icon: 'earningsHigherRateLiveIcon', title: 'earningsHigherRateLiveTitle', sub: 'earningsHigherRateLiveSub' });
-    }
-
-    // Acordeón "Días pasados" dentro de "Tiempo y bono por día" — vive en memoria, no en
-    // localStorage (mismo patrón que earningsViewMode/blocksViewMode).
-    let higherRateHistoryOpen = false;
-
-    // Nivel más "valioso" (mayor bono/min) presente en un breakdown de minutos por tier (ver
-    // higherRateStatsForDay) — mismo criterio de desempate que ya usa higherRateBonusForCall al
-    // elegir entre ventanas traslapadas.
-    function dominantHigherRateTier(breakdown) {
-      const entries = Object.keys(breakdown || {}).filter(t => breakdown[t] > 0);
-      if (!entries.length) return null;
-      return entries.reduce((a, b) => (HIGHER_RATE_TIERS[b]?.bonusPerMin || 0) > (HIGHER_RATE_TIERS[a]?.bonusPerMin || 0) ? b : a);
-    }
-
-    function higherRateHeroTierBadge(tierKey) {
-      const meta = HIGHER_RATE_TIERS[tierKey];
-      if (!meta) return '';
-      return `<span class="hero-today-tier" style="background: rgba(${meta.colorRgb}, .16); border: 1px solid rgba(${meta.colorRgb}, .4); color: var(${meta.colorVar});">${iconHtml('medal')} ${escapeHtml(meta.label)} +${money(meta.bonusPerMin)}/min</span>`;
-    }
-
-    // "Tiempo y bono por día": tarjeta hero para Hoy (bono ganado, tiempo en llamada, ventana
-    // total, % aprovechado) + timeline de Próximos días / Días pasados (colapsado por default, ver
-    // higherRateHistoryOpen).
-    function renderHigherRateDayStats() {
-      const wrap = document.getElementById('higherRateDayStats');
-      if (!wrap) return;
-      const todayKey = todayCallDateKey();
-      const today = todayRange();
-      const dates = new Set();
-      (settings.higherRateWindows || []).forEach(w => {
-        const key = callDateKeyFromValue(w.date);
-        if (key && key !== todayKey) dates.add(key);
-      });
-
-      const past = [];
-      dates.forEach(key => {
-        const d = callDateToDate(key);
-        if (d && d < today) past.push(key);
-      });
-      past.sort((a, b) => callDateToDate(b) - callDateToDate(a));
-
-      // Tarjeta hero de Hoy.
-      const todayStats = higherRateStatsForDay(todayKey);
-      const todayWindowsMin = higherRateWindowsTodayTotalMin(todayKey);
-      const liveStatus = higherRateLiveStatus();
-      const isActiveNow = !!(liveStatus && liveStatus.active);
-      const todayPct = todayWindowsMin > 0 ? Math.min(100, (todayStats.totalMin / todayWindowsMin) * 100) : 0;
-
-      const liveTierMeta = isActiveNow ? HIGHER_RATE_TIERS[liveStatus.window.tier] : null;
-      const liveTierStyle = liveTierMeta ? ` style="--live-rgb:${liveTierMeta.colorRgb}; --live-color:var(${liveTierMeta.colorVar});"` : '';
-
-      const tierBadgeHtml = isActiveNow
-        ? higherRateHeroTierBadge(liveStatus.window.tier)
-        : higherRateHeroTierBadge(dominantHigherRateTier(todayStats.breakdown));
-
-      const todayDateRaw = new Intl.DateTimeFormat('es-MX', { weekday: 'long', day: 'numeric', month: 'long' }).format(today);
-      const todayDateLabel = `Hoy · ${todayDateRaw.charAt(0).toUpperCase() + todayDateRaw.slice(1)}`;
-
-      const footHtml = todayWindowsMin > 0
-        ? `<div class="hero-today-foot"><span>${Math.round(todayPct)}% de la ventana aprovechada</span><span>${isActiveNow ? `Termina a las ${timeLabel(liveStatus.window.end)}` : ''}</span></div>`
-        : '';
-
-      const heroHtml = `
-        <div class="hero-today ${isActiveNow ? 'is-live' : ''}"${liveTierStyle}>
-          <div class="hero-today-top">
-            <div>
-              <span class="hero-today-label ${isActiveNow ? 'tone-active' : ''}">${isActiveNow ? '<span class="pulse-dot" aria-hidden="true"></span>Ganando bono ahora' : 'Higher Rate hoy'}</span>
-              <div class="hero-today-date">${escapeHtml(todayDateLabel)}</div>
-            </div>
-            ${tierBadgeHtml}
-          </div>
-          <div class="hero-today-figures">
-            <div><div class="hero-fig-value is-bonus">+${money(todayStats.totalBonus)}</div><div class="hero-fig-label">Bono ganado hoy${financeConvertedInline(todayStats.totalBonus)}</div></div>
-            <div><div class="hero-fig-value">${escapeHtml(formatBlockDurationLabel(todayStats.totalMin))}</div><div class="hero-fig-label">en llamada dentro de ventana</div></div>
-            <div><div class="hero-fig-value" style="font-size:20px; color:var(--muted);">${escapeHtml(formatBlockDurationLabel(todayWindowsMin))}</div><div class="hero-fig-label">ventana total de hoy</div></div>
-          </div>
-          ${todayWindowsMin > 0 ? `<div class="hero-today-track"><div style="width:${todayPct}%;"></div></div>` : ''}
-          ${footHtml}
-        </div>
-      `;
-
-      // Timeline de Días pasados.
-      const tlItemHtml = (key) => {
-        const stats = higherRateStatsForDay(key);
-        const windowsForDay = (settings.higherRateWindows || [])
-          .filter(w => callDateKeyFromValue(w.date) === key)
-          .sort((a, b) => toMinutes(formatHHMM(a.start)) - toMinutes(formatHHMM(b.start)));
-        const dateObj = callDateToDate(key);
-        const dayNameRaw = new Intl.DateTimeFormat('es-MX', { weekday: 'long' }).format(dateObj);
-        const dayName = dayNameRaw.charAt(0).toUpperCase() + dayNameRaw.slice(1);
-        const dayNum = new Intl.DateTimeFormat('es-MX', { day: 'numeric', month: 'short' }).format(dateObj);
-
-        let mainHtml, accentRgb;
-        if (windowsForDay.length) {
-          // Acento del día = el nivel de mayor bono entre TODAS sus ventanas (mismo criterio que
-          // dominantHigherRateTier), para un solo color de tarjeta aunque el día tenga niveles
-          // distintos.
-          const dominantWindow = windowsForDay.reduce((a, b) =>
-            (HIGHER_RATE_TIERS[b.tier]?.bonusPerMin || 0) > (HIGHER_RATE_TIERS[a.tier]?.bonusPerMin || 0) ? b : a
-          );
-          accentRgb = HIGHER_RATE_TIERS[dominantWindow.tier]?.colorRgb || '125,140,255';
-          mainHtml = windowsForDay.map(w => {
-            const meta = HIGHER_RATE_TIERS[w.tier];
-            return `<div class="hr-tl-window-row"><span class="hr-tl-name">Ventana ${escapeHtml(meta?.label || w.tier)}</span><span class="hr-tl-sub">${escapeHtml(timeLabel(w.start))} – ${escapeHtml(timeLabel(w.end))}</span></div>`;
-          }).join('');
-        } else {
-          mainHtml = `<div class="hr-tl-name">Sin ventanas configuradas</div>`;
-          accentRgb = '144,160,190';
-        }
-
-        const windowsMinForDay = higherRateWindowsTodayTotalMin(key);
-        const pillsHtml = [
-          stats.totalMin > 0
-            ? `<span class="hr-count-pill tone-live">${iconHtml('flame')} ${escapeHtml(formatBlockDurationLabel(stats.totalMin))} en llamada · +${money(stats.totalBonus)}${financeConvertedInline(stats.totalBonus)}</span>`
-            : `<span class="hr-count-pill tone-muted">Sin llamadas en Higher Rate</span>`,
-          windowsMinForDay > 0 ? `<span class="hr-count-pill tone-window">${escapeHtml(formatBlockDurationLabel(windowsMinForDay))} de ventana</span>` : '',
-        ].filter(Boolean).join('');
-
-        return `
-          <div class="hr-tl-item ${windowsForDay.length ? '' : 'is-empty'}" style="--dot-rgb:${accentRgb};">
-            <div class="hr-tl-date">${escapeHtml(dayName)}<b>${escapeHtml(dayNum)}</b></div>
-            <div class="hr-tl-rail" aria-hidden="true"><span class="hr-tl-dot"></span></div>
-            <div class="hr-tl-card" style="--accent-rgb:${accentRgb};">
-              <span class="hr-tl-icon">${iconHtml(windowsForDay.length ? 'medal' : 'calendar')}</span>
-              <div class="hr-tl-main">${mainHtml}</div>
-              <div class="hr-tl-pills">${pillsHtml}</div>
-            </div>
-          </div>
-        `;
-      };
-
-      const pastHtml = past.length
-        ? `
-          <button type="button" class="hr-past-toggle" id="higherRatePastToggleBtn" data-open="${higherRateHistoryOpen ? 'true' : 'false'}">
-            <span class="hr-past-toggle-left">${iconHtml('history')} Días pasados (${past.length})</span>
-            ${iconHtml('chevronDown', 'chev')}
-          </button>
-          <div class="hr-tl" id="higherRatePastList" style="margin-top:14px;${higherRateHistoryOpen ? '' : ' display:none;'}">${past.map(k => tlItemHtml(k)).join('')}</div>
-        `
-        : '';
-
-      wrap.innerHTML = heroHtml + pastHtml;
-
-      const pastToggleBtn = document.getElementById('higherRatePastToggleBtn');
-      if (pastToggleBtn) {
-        pastToggleBtn.addEventListener('click', () => {
-          higherRateHistoryOpen = !higherRateHistoryOpen;
-          renderHigherRateDayStats();
-        });
-      }
-    }
-
-    // Una ventana es "pasada" cuando su hora de fin ya quedó atrás, no solo si su fecha es anterior
-    // a hoy.
-    function higherRateWindowIsPast(w, now = new Date()) {
-      const end = toDateFromInputs(w.date, timeLabel(w.end));
-      return !!(end && end.getTime() <= now.getTime());
-    }
-
-    // Mientras #higherRateModal esté abierto, revisa cada segundo si alguna ventana acaba de cruzar
-    // a "pasada" y repinta las listas sola en ese caso — sin esto, una ventana solo se movía al
-    // Historial al reabrir el modal.
-    let higherRateLastPastCount = null;
-    function refreshHigherRateWindowsIfNeeded() {
-      const modal = document.getElementById('higherRateModal');
-      if (!modal || !modal.classList.contains('open')) return;
-      const list = document.getElementById('higherRateWindowsList');
-      const historyList = document.getElementById('higherRateHistoryList');
-      if (!list || !historyList) return;
-      const active = document.activeElement;
-      if (active && (list.contains(active) || historyList.contains(active))) return;
-      const windows = settings.higherRateWindows || [];
-      const pastCount = windows.filter(w => higherRateWindowIsPast(w)).length;
-      if (pastCount !== higherRateLastPastCount) {
-        higherRateLastPastCount = pastCount;
-        renderHigherRateWindowsEditor(windows);
-      }
-    }
-
-    function renderHigherRateWindowsEditor(windows) {
-      const list = document.getElementById('higherRateWindowsList');
-      const historyList = document.getElementById('higherRateHistoryList');
-      const historyTitle = document.getElementById('higherRateHistoryTitle');
-      const activeCountPill = document.getElementById('higherRateActiveCountPill');
-      if (!list || !historyList) return;
-      const arr = Array.isArray(windows) ? windows : [];
-      const isPastWindow = (w) => higherRateWindowIsPast(w);
-      const active = arr.filter(w => !isPastWindow(w));
-      const past = arr.filter(isPastWindow);
-      // Orden cronológico (fecha + inicio) solo para que se vea prolijo — no afecta cómo se guardan
-      // ni se calculan los bonos.
-      const sortByDate = (a, b) => `${a.date}${a.start}`.localeCompare(`${b.date}${b.start}`);
-      const sortedActive = [...active].sort(sortByDate);
-      const sortedPast = [...past].sort(sortByDate);
-
-      list.innerHTML = sortedActive.map(renderHigherRateWindowRow).join('')
-        || '<div class="note" style="margin:0;">Sin ventanas de Higher Rate para hoy ni futuras — usa "+ Agregar ventana" cuando te llegue el aviso de Propio.</div>';
-
-      historyList.innerHTML = sortedPast.map(renderHigherRateWindowRow).join('')
-        || '<div class="note" style="margin:0;">Sin ventanas pasadas todavía.</div>';
-      if (historyTitle) historyTitle.innerHTML = `${iconHtml('history')} Historial (${sortedPast.length} ${sortedPast.length === 1 ? 'pasada' : 'pasadas'})`;
-      if (activeCountPill) activeCountPill.textContent = `${sortedActive.length} ${sortedActive.length === 1 ? 'próxima' : 'próximas'}`;
-      higherRateLastPastCount = sortedPast.length;
-      renderHigherRateDayStats();
-      renderHigherRateLiveCard();
-    }
-
-    // Lee todas las filas del editor tal como están en el DOM — AMBAS listas (activas + historial),
-    // ya que las dos son igual de editables. `id` se conserva vía el atributo data-hr-window-id del
-    // contenedor de la fila (asignado al renderizar)
-    function readHigherRateWindowsFromEditor() {
-      const rows = document.querySelectorAll('#higherRateWindowsList .hr-window-card, #higherRateHistoryList .hr-window-card');
-      return Array.from(rows).map(row => {
-        const dateInput = row.querySelector('.hr-window-date-input');
-        const startInput = row.querySelector('.hr-window-start-input');
-        const endInput = row.querySelector('.hr-window-end-input');
-        const tierInput = row.querySelector('.hr-window-tier-input');
-        const tier = HIGHER_RATE_TIERS[tierInput ? tierInput.value : ''] ? tierInput.value : 'bronze';
-        return {
-          id: row.getAttribute('data-hr-window-id') || makeLocalId(),
-          date: dayKeyFromIsoDate(dateInput ? dateInput.value : '') || todayCallDateKey(),
-          start: formatHHMM(startInput ? startInput.value : '07:00'),
-          end: formatHHMM(endInput ? endInput.value : '08:00'),
-          tier,
-        };
-      });
-    }
-
-    // Persiste lo que hay ahora mismo en el editor — llamada en cada cambio de campo (auto-
-    // guardado, mismo patrón que el resto de settings sueltos de Horario) y al eliminar una fila.
-    function saveHigherRateWindowsFromEditor() {
-      const oldWindows = settings.higherRateWindows || [];
-      const oldById = new Map(oldWindows.map(w => [w.id, w]));
-      const newWindows = readHigherRateWindowsFromEditor();
-      // Un cambio de nivel no entra aquí: no altera SI la ventana aplica, y congelar el bono
-      // dejaría pegado el nivel viejo.
-      const changedIds = newWindows
-        .filter(nw => {
-          const old = oldById.get(nw.id);
-          return !old || old.date !== nw.date || old.start !== nw.start || old.end !== nw.end;
-        })
-        .map(w => w.id);
-      const editedIds = changedIds.filter(id => oldById.has(id));
-      if (editedIds.length) freezeHigherRateBonusesForWindowIds(editedIds);
-      settings.higherRateWindows = newWindows;
-      retuneFrozenHigherRateTiers(newWindows);
-      // SaveAll en vez de saveSettingsOnly: freezeHigherRateBonusesForWindowIds puede haber marcado
-      // `calls` con `frozenHigherRateBonus` nuevo.
-      saveAll();
-      renderHigherRateLiveCard();
-      // Editar una ventana ya existente (ej. su hora de fin) no refrescaba "Próximos días" — ese
-      // bloque se quedaba mostrando el horario viejo hasta reabrir el modal, porque nada aquí
-      // volvía a llamar a renderHigherRateDayStats.
-      renderHigherRateDayStats();
-      notifyHigherRateRetroactiveMatches(changedIds);
-      notifyHigherRateMidnightCrossingWindows();
-    }
-
-    // CallQualifiesForHigherRateWindow construye winStart/winEnd con la MISMA fecha para ambos; si
-    // Fin <= Inicio (la ventana cruza medianoche, ej. 22:00–02:00), la función devuelve `false`
-    // incondicionalmente.
-    function notifyHigherRateMidnightCrossingWindows() {
-      const windows = settings.higherRateWindows || [];
-      const offenders = windows.filter(w => toMinutes(formatHHMM(w.end)) <= toMinutes(formatHHMM(w.start)));
-      if (!offenders.length) return;
-      const first = offenders[0];
-      const extra = offenders.length > 1 ? ` (y ${offenders.length - 1} más)` : '';
-      toast(`⚠️ La ventana de Higher Rate ${timeLabel(first.start)}–${timeLabel(first.end)} del ${formatCallDayLabel(first.date)}${extra} cruza la medianoche — todavía no se soporta, no aplicará a ninguna llamada. Divide en dos ventanas (ej. ${timeLabel(first.start)}–11:59 PM y una segunda 12:00–${timeLabel(first.end)} AM al día siguiente).`);
-    }
-
-    // Agregar un Higher Rate para un día que YA tiene llamadas tomadas ("se me olvidó agregarlo a
-    // tiempo") sí actualiza el bono correctamente al instante.
-    function notifyHigherRateRetroactiveMatches(changedWindowIds) {
-      const changed = new Set(Array.isArray(changedWindowIds) ? changedWindowIds : []);
-      if (!changed.size) return;
-      let qualifyingCount = 0;
-      let sampleDate = null;
-      calls.forEach(c => {
-        // Un bono congelado conserva la ventana vieja: la que acaba de cambiar no altera lo que esa
-        // llamada ya tiene ganado.
-        if (c.frozenHigherRateBonus) return;
-        const bonus = higherRateBonusForCall(c);
-        if (!bonus || !changed.has(bonus.windowId)) return;
-        qualifyingCount++;
-        if (!sampleDate) sampleDate = c.callDate;
-      });
-      if (qualifyingCount > 0) {
-        const plural = qualifyingCount === 1 ? 'llamada ya tomada califica' : 'llamadas ya tomadas califican';
-        toast(`🔥 ${qualifyingCount} ${plural} para el bono — revisa Tabla de llamadas del ${formatCallDayLabel(sampleDate)} para verlo.`);
-      }
-    }
-
-    // "agrego una ventana y luego no la encuentro".
-    function addHigherRateWindowRow() {
-      const current = readHigherRateWindowsFromEditor();
-      const todayKey = todayCallDateKey();
-      const todaysEndMins = current.filter(w => w.date === todayKey).map(w => toMinutes(formatHHMM(w.end)));
-      const now = new Date();
-      const nowMin = now.getHours() * 60 + now.getMinutes();
-      let startMin = todaysEndMins.length ? Math.max(...todaysEndMins) : nowMin;
-      startMin = Math.min(startMin, 23 * 60);
-      const endMin = Math.min(23 * 60 + 59, startMin + 60);
-      const newWindow = { id: makeLocalId(), date: todayKey, start: minutesToHHMM(startMin), end: minutesToHHMM(endMin), tier: 'bronze' };
-      current.push(newWindow);
-      renderHigherRateWindowsEditor(current);
-      saveHigherRateWindowsFromEditor();
-      const newCard = document.querySelector(`.hr-window-card[data-hr-window-id="${newWindow.id}"]`);
-      if (newCard && newCard.scrollIntoView) newCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-
-    function removeHigherRateWindowRowAt(id) {
-      // Borrar UNA ventana (individual, con "✕") le quitaba retroactivamente el bono ya calculado a
-      // cualquier llamada real que ya calificaba para ella.
-      freezeHigherRateBonusesForWindowIds([id]);
-      const current = readHigherRateWindowsFromEditor().filter(w => w.id !== id);
-      renderHigherRateWindowsEditor(current);
-      settings.higherRateWindows = current;
-      // SaveAll en vez de saveSettingsOnly: ahora también hay que persistir `calls` (algunas pueden
-      // haber quedado con frozenHigherRateBonus nuevo).
-      saveAll();
-      renderHigherRateLiveCard();
-    }
-
-    // Congela el bono ya ganado antes de que la ventana desaparezca de settings, por cualquier vía.
-    //
-    // Un cambio de NIVEL en una ventana que sigue viva (mismo id) sí debe corregir el bono de
-    // llamadas ya congeladas — para eso existe esta función. Pero solo si esa llamada TODAVÍA
-    // califica por horario contra la ventana tal como está hoy: si el bono se congeló porque la
-    // ventana se acortó/movió y la llamada quedó fuera del horario actual, un cambio de nivel
-    // posterior no debe "revivirla" con el nivel nuevo — se queda con lo que ya tenía congelado.
-    function retuneFrozenHigherRateTiers(windows) {
-      let changed = 0;
-      calls.forEach(c => {
-        const frozen = c.frozenHigherRateBonus;
-        if (!frozen) return;
-        const w = (windows || []).find(x => x.id === frozen.windowId);
-        const meta = w && HIGHER_RATE_TIERS[w.tier];
-        if (!meta || w.tier === frozen.tier) return;
-        if (!callQualifiesForHigherRateWindow(c.startISO, w)) return;
-        c.frozenHigherRateBonus = { ...frozen, tier: w.tier, amount: meta.bonusPerMin * (Number(c.durationMin) || 0) };
-        changed++;
-      });
-      return changed;
-    }
-
-    function freezeHigherRateBonusesForWindowIds(windowIds) {
-      const idSet = new Set(windowIds);
-      let frozenCount = 0;
-      calls.forEach(c => {
-        if (c.frozenHigherRateBonus) return; // Ya congelado antes, no recalcular.
-        const bonus = higherRateBonusForCall(c);
-        if (bonus && idSet.has(bonus.windowId)) {
-          c.frozenHigherRateBonus = bonus;
-          frozenCount++;
-        }
-      });
-      return frozenCount;
-    }
-
-    // Vacía el historial de ventanas ya terminadas; el bono ya ganado se conserva congelado.
-    function purgePastHigherRateWindows() {
-      const current = readHigherRateWindowsFromEditor();
-      const isPast = (w) => higherRateWindowIsPast(w);
-      const pastWindows = current.filter(isPast);
-      if (!pastWindows.length) {
-        toast('El historial ya está vacío — no hay ventanas de Higher Rate que ya hayan terminado.');
-        return;
-      }
-      appConfirm(`¿Vaciar el historial completo (${pastWindows.length} ventana(s) de Higher Rate ya terminadas)? Las que siguen activas o futuras no se tocan. Las llamadas que ya recibieron un bono de esas ventanas conservan su bono ganado. No se puede deshacer.`, () => {
-        // Sin esto, purgar borraba las ventanas pasadas de golpe y el bono que ya habían generado
-        // desaparecía retroactivamente de las ganancias de esos días/ciclo.
-        const pastIds = pastWindows.map(w => w.id);
-        freezeHigherRateBonusesForWindowIds(pastIds);
-
-        const remaining = current.filter(w => !isPast(w));
-        settings.higherRateWindows = remaining;
-        // SaveAll en vez de saveSettingsOnly: también hay que persistir `calls` (varias pueden
-        // haber quedado con frozenHigherRateBonus).
-        saveAll();
-        renderHigherRateWindowsEditor(remaining);
-        toast(`${pastWindows.length} ventana(s) borrada(s) del historial — el bono ya ganado por esas llamadas se conserva.`);
-      });
-    }
 
     
 
@@ -6623,7 +5728,7 @@ function renderSchedule() {
     }
 
     
-function render() {
+export function render() {
       renderHeader();
       renderSchedule();
       renderWeekSummary();
@@ -7202,7 +6307,8 @@ function render() {
     });
     document.getElementById('resetDayBtn').addEventListener('click', resetDay);
     document.getElementById('eraseAllDataBtn').addEventListener('click', eraseAllData);
-    document.getElementById('ajustesHeaderBtn').addEventListener('click', () => openModal('goalsModal'));
+    document.getElementById('ajustesHeaderBtn').addEventListener('click', openSettingsModal);
+    document.getElementById('saveAccountProfileBtn').addEventListener('click', saveAccountProfile);
     document.getElementById('higherRateHeaderBtn').addEventListener('click', () => {
       syncHigherRateModalFields();
       openModal('higherRateModal');
