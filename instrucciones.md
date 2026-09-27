@@ -218,9 +218,6 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
-- **`@supabase/supabase-js` pinchado a 2.45.4 desde jsDelivr**, sin lockfile.
-  Para actualizar: subir el número en `js/supabase-client.js`, probar login +
-  sincronización, y recién ahí desplegar.
 - **El freno por IP de `/api/login` es best-effort** (vive en memoria, las
   funciones serverless se reciclan). Si hace falta de verdad: Upstash Redis o
   el rate limiting de Vercel.
@@ -331,6 +328,15 @@ Pendientes, en orden:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v565** — Cliente de Supabase actualizado.
+
+- `@supabase/supabase-js` sube de 2.45.4 a 2.117.2, la versión estable más
+  reciente, con el número exacto fijado en la URL de jsDelivr para evitar
+  actualizaciones inesperadas en una app sin build ni lockfile.
+- La prueba automática comprueba la URL exacta, que siga dentro de la rama v2
+  estable y que el origen del CDN esté permitido por la CSP activa.
+
+
 **v564** — Content Security Policy activada.
 
 - `vercel.json` pasa de observación a `Content-Security-Policy` efectiva; el
@@ -356,14 +362,3 @@ Pendientes, en orden:
   18 archivos JS. Comparación en navegador del marcado estático: 0 diferencias
   en estilos visibles, claro/oscuro a 1440 y 390 px; páginas legales verificadas
   con CSP aplicada en una prueba local. No se probaron accesos con cuenta real.
-
-
-**v562** — Cierre de la Fase 3: Ajustes se extrae a `js/settings.js` y la
-sección "Tu perfil" permite cambiar username y correo.
-
-- El nuevo módulo concentra perfil local, metas por día/general, tarifa, moneda,
-  selectores de emoji y onboarding.
-- `js/auth.js` agrega `updateEmail()`; username y correo se cargan desde la
-  cuenta y se guardan con mensajes de validación/confirmación.
-- `app.html` precarga `js/settings.js`. El chequeo automático recorre ahora
-  también Auth, Supabase y Config: once módulos locales en total.
