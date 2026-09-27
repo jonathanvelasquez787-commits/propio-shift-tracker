@@ -23,6 +23,8 @@ css/
   app-shell.css         Gate de arranque y panel de cuenta dentro de la app
 
 js/
+  theme-init.js         Tema inicial antes de pintar, sin scripts inline
+  footer-year.js        Año del pie de las páginas públicas
   config.js             URL y anon key de Supabase  ← se edita a mano
   supabase-client.js     Cliente único y compartido
   auth.js                Google · correo/contraseña · usuario/contraseña
@@ -45,7 +47,7 @@ api/
 supabase/migrations/
   0001_init.sql          Tablas, RLS, triggers y funciones. Se corre una vez.
 
-tests/smoke.py            Suite de humo con Playwright, sobre app.html directo
+tests/security-preparation.test.mjs  Pruebas de tema, CSP y reporte PDF
 ```
 
 ---
@@ -178,9 +180,9 @@ encuentre el problema exacto sin tener que adivinar.
 ## Trabajar sobre esto
 
 ```bash
-# Suite de humo (prueba app.html directamente)
-pip install -r tests/requirements.txt && playwright install chromium
-pytest tests/smoke.py -q
+# Comprobaciones automáticas (las ejecuta el agente)
+npm test
+npm run check:modules
 ```
 
 Para probar en local hace falta un servidor HTTP de verdad: los módulos ES no
@@ -199,3 +201,8 @@ local: `npx vercel dev`.
 ## Licencia
 
 Software propietario. Ver [LICENSE](LICENSE).
+
+## Política de seguridad
+
+CSP está en modo de observación (Report-Only). Alcance, orígenes permitidos y
+validación pendiente: [política de seguridad](../docs/security-policy.md).

@@ -9,6 +9,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "check:modules": "node scripts/check-module-exports.mjs"
+    "check:modules": "node scripts/check-module-exports.mjs",
+    "test": "node --test tests/*.test.mjs"
   }
 }

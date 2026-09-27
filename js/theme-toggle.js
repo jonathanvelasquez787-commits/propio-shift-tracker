@@ -1,7 +1,7 @@
 // Interruptor claro/oscuro de las páginas públicas.
 //
 // Escribe en la MISMA clave de settings que lee la app, así el tema elegido
-// antes de entrar es el que la app abre después. El <script> inline del <head>
+// antes de entrar es el que la app abre después. El script theme-init.js del <head>
 // de cada página aplica esa preferencia antes de pintar; este módulo solo la
 // cambia y mantiene los botones sincronizados.
 

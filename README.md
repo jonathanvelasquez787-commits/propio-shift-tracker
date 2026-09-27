@@ -23,6 +23,8 @@ css/
   app-shell.css         Gate de arranque y panel de cuenta dentro de la app
 
 js/
+  theme-init.js         Tema inicial antes de pintar, sin scripts inline
+  footer-year.js        Año del pie de las páginas públicas
   config.js             URL y anon key de Supabase  ← se edita a mano
   supabase-client.js     Cliente único y compartido
   auth.js                Google · correo/contraseña · usuario/contraseña
@@ -37,7 +39,7 @@ api/
 supabase/migrations/
   0001_init.sql          Tablas, RLS, triggers y funciones. Se corre una vez.
 
-tests/smoke.py            Suite de humo con Playwright, sobre app.html directo
+tests/security-preparation.test.mjs  Pruebas de tema, CSP y reporte PDF
 ```
 
 ---
@@ -69,12 +71,10 @@ descarga desde la nube llegara después, habría que recargar la página — o
 peor, alguien podría ver por un instante los datos de la cuenta anterior en
 el mismo navegador.
 
-Por eso, dentro de `app.html`, el `<script>` principal de la app queda
-marcado como `type="text/plain" id="appMainScript"`: el navegador no lo
-corre solo. `js/boot.js` lo inyecta recién cuando (1) hay sesión y (2)
-`localStorage` ya tiene los datos de **esa** cuenta. Es el gate de sesión
-completo, y vive dentro del propio `app.html` — no depende de ningún paso de
-generación aparte.
+`js/boot.js` importa `js/app-main.js` recién cuando hay sesión y
+`localStorage` ya contiene los datos de esa cuenta. Las precargas de módulos
+no ejecutan la aplicación. `js/theme-init.js` aplica el tema antes de pintar,
+sin esperar al cliente de autenticación.
 
 ### Por qué existe `/api/login`
 
@@ -106,9 +106,9 @@ vigente) para que nadie pise a nadie en silencio a mitad de sesión.
 ## Trabajar sobre esto
 
 ```bash
-# Suite de humo (prueba app.html directamente)
-pip install -r tests/requirements.txt && playwright install chromium
-pytest tests/smoke.py -q
+# Comprobaciones automáticas (las ejecuta el agente)
+npm test
+npm run check:modules
 ```
 
 Para probar en local hace falta un servidor HTTP de verdad: los módulos ES no
@@ -127,3 +127,8 @@ local: `npx vercel dev`.
 ## Licencia
 
 Software propietario. Ver [LICENSE](LICENSE).
+
+## Política de seguridad
+
+CSP está en modo de observación (Report-Only). Alcance, orígenes permitidos y
+validación pendiente: [política de seguridad](docs/security-policy.md).

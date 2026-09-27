@@ -15,14 +15,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap"/>
 <link rel="stylesheet" href="css/tokens.css"/>
 <link rel="stylesheet" href="css/landing.css"/>
-<script>
-  /* El tema se lee antes de pintar, si no la página parpadea. Solo 'dark'
-     cambia algo: el default de tokens.css ya es el claro. */
-  try {
-    var s = JSON.parse(localStorage.getItem('propio_shift_tracker_settings_es_v1') || '{}');
-    document.documentElement.classList.add(s && s.theme === 'dark' ? 'theme-dark' : 'theme-light');
-  } catch (e) { document.documentElement.classList.add('theme-light'); }
-</script>
+<script src="/js/theme-init.js"></script>
 </head>
 <body>
 
@@ -465,8 +458,6 @@
 <script type="module" src="js/theme-toggle.js"></script>
 <script type="module" src="js/landing-ui.js"></script>
 <script type="module" src="js/landing.js"></script>
-<script>
-  document.getElementById('year').textContent = String(new Date().getFullYear());
-</script>
+<script src="/js/footer-year.js" defer></script>
 </body>
 </html>
