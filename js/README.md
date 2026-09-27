@@ -33,6 +33,8 @@ js/
   finance.js               Página Finanzas (Gastos, Metas, categorías propias)
   reports.js                Página Reportes (KPIs, gráfico mensual, racha...)
   calendar.js               Página Calendario (vista mensual y anual)
+  schedule.js               Página Horario (plantilla y semanas específicas)
+  calls.js                  Página Llamadas (edición, alta manual y tabla diaria)
 
 api/
   login.js               Traduce usuario → correo del lado del servidor
@@ -109,15 +111,18 @@ vigente) para que nadie pise a nadie en silencio a mitad de sesión.
 ## Los módulos de `js/` dependen unos de otros — cómo no romper la cadena
 
 Desde la Fase 3/4, la lógica de la app dejó de vivir toda en un solo
-`<script>` dentro de `app.html` y se repartió en **4 archivos que se
-importan entre sí como módulos ES**:
+`<script>` dentro de `app.html` y se repartió en módulos ES que se importan entre sí:
 
 ```
 app-main.js  ──imports──▶  finance.js
 app-main.js  ──imports──▶  reports.js
 app-main.js  ──imports──▶  calendar.js
+app-main.js  ──imports──▶  schedule.js
+app-main.js  ──imports──▶  calls.js
 reports.js   ──imports──▶  app-main.js   (sí, en las dos direcciones)
 calendar.js  ──imports──▶  app-main.js
+schedule.js  ──imports──▶  app-main.js
+calls.js     ──imports──▶  app-main.js
 finance.js   ──imports──▶  app-main.js
 ```
 
@@ -125,7 +130,7 @@ Cada `import { nombre } from './otroArchivo.js'` en un archivo **tiene que
 tener su `export` exacto** (mismo nombre, misma mayúscula/minúscula) del
 otro lado. Si uno de los dos lados cambia — se borra un `export`, se le
 cambia el nombre a una función, se olvida reexportarla — el navegador no
-puede terminar de cargar ESE archivo. Y como los 4 están enlazados entre sí,
+puede terminar de cargar ESE archivo. Y como están enlazados entre sí,
 **la app entera se queda muda**: pantalla estática, botones sin reacción,
 reloj parado, sin ningún error visible. Eso fue justo lo que pasó una vez
 (un `export export function` duplicado en `calendar.js`, y después un
@@ -143,22 +148,17 @@ ve en pantalla y además se manda a `console.error`. Si en el futuro algo
 similar vuelve a romperse, ya no vas a ver una app "muda" — vas a ver una
 tarjeta que dice "No se pudo abrir la app" con el motivo.
 
-### Checklist antes de subir un cambio a `app-main.js`, `finance.js`, `reports.js` o `calendar.js`
+### Checklist antes de subir un cambio a los módulos de la app
 
-Si le pides a Claude un cambio en cualquiera de estos 4 archivos, pídele
-explícitamente que, antes de entregarte el resultado, haga esto (es
-exactamente lo que resolvió el bug la vez pasada):
+Antes de entregar un cambio en cualquiera de estos módulos, se ejecuta el chequeo automático de imports/exports: `npm run check:modules`. Además:
 
-1. **Listar cada `import { ... } from './otroArchivo.js'`** de los 4
-   archivos y confirmar que cada nombre importado tiene su `export` con el
-   mismo nombre en el archivo de origen.
-2. **Revisar que no haya ningún `export` duplicado** (`export export
+1. **Revisar que no haya ningún `export` duplicado** (`export export
    function...`) — es un error de tecleo fácil de cometer al editar a mano
    o al pegar un fragmento corregido encima de otro.
-3. Si Claude tiene acceso a una terminal, correr `node --check archivo.js`
-   sobre cada uno de los 4 archivos editados — es gratis y detecta errores
+2. Si Claude tiene acceso a una terminal, correr `node --check archivo.js`
+   sobre cada archivo editado — es gratis y detecta errores
    de sintaxis al instante, sin necesidad de abrir el navegador.
-4. Entregar el **archivo completo**, no un fragmento — así lo reemplazas
+3. Entregar el **archivo completo**, no un fragmento — así lo reemplazas
    entero en GitHub y no hay riesgo de pegar un pedazo a medias.
 
 Y después de subir a GitHub: abre la app, espera a que cargue, y si algo se
