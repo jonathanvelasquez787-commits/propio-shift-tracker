@@ -8,13 +8,7 @@
 <link rel="stylesheet" href="css/tokens.css"/>
 <link rel="stylesheet" href="css/landing.css"/>
 <link rel="stylesheet" href="css/legal.css"/>
-<script>
-  try {
-    var s = JSON.parse(localStorage.getItem('propio_shift_tracker_settings_es_v1') || '{}');
-    if (s && s.theme === 'light') document.documentElement.classList.add('theme-light');
-    if (s && s.theme === 'dark') document.documentElement.classList.add('theme-dark');
-  } catch (e) {}
-</script>
+<script src="/js/theme-init.js"></script>
 </head>
 <body>
 
@@ -147,6 +141,6 @@
   </nav>
 </footer>
 
-<script>document.getElementById('year').textContent = String(new Date().getFullYear());</script>
+<script src="/js/footer-year.js" defer></script>
 </body>
 </html>

@@ -5,9 +5,9 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Propio Shift Tracker</title>
+<script src="/js/theme-init.js"></script>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2309101e'/%3E%3Ccircle cx='32' cy='34' r='20' fill='none' stroke='%2366e2a5' stroke-width='4'/%3E%3Cpath d='M32 22v12l9 6' fill='none' stroke='%2366e2a5' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M24 10l-6 6M40 10l6 6' fill='none' stroke='%237d8cff' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E"/>
-<!-- Precarga (fetch + parseo) el módulo de la app en paralelo con el chequeo de sesión, sin
-     ejecutarlo — boot.js lo ejecuta recién cuando corresponde con un import() dinámico. -->
+<!-- Precarga los módulos sin ejecutarlos; boot.js los monta después de resolver la sesión. -->
 <link rel="modulepreload" href="/js/app-main.js"/>
 <link rel="modulepreload" href="/js/finance.js"/>
 <link rel="modulepreload" href="/js/reports.js"/>
@@ -26,14 +26,13 @@
       /* Superficie plana de modo oscuro: fondo de página y secciones comparten este azul. */
       --panel-navy: #0d1230;
       /* Borde tenue que separa las secciones entre sí, ya que comparten el azul del fondo. */
-      --card-line: rgba(140, 160, 255, .13);
+      --card-line: rgba(140, 160, 255, .18);
       --text: #edf4ff;
-      --muted: #90a0be;
-      /* Tercer tono de texto: mismo RGB que --muted con menos opacidad, para subtítulos
-         secundarios. */
-      --muted-3: rgba(144, 160, 190, .62);
-      --line: rgba(90, 105, 150, 0.045);
-      --line-2: rgba(90, 105, 150, 0.08);
+      --muted: #97a6c4;
+      /* Tercer tono de texto para subtítulos secundarios. */
+      --muted-3: #6f7f9e;
+      --line: rgba(125, 145, 215, .16);
+      --line-2: rgba(125, 145, 215, .26);
       --cyan: #2fd5ff;
       --teal: #58e8c8;
       --blue: #7d8cff;
@@ -41,9 +40,9 @@
       --good: #66e2a5;
       --warn: #ffd15c;
       --bad: #ff6b72;
-      --hover-flip: var(--purple);
+      --hover-flip: var(--cyan);
       /* Contraparte "r,g,b" de --hover-flip, para poder usarse dentro de rgba(). */
-      --hover-flip-rgb: var(--purple-rgb);
+      --hover-flip-rgb: var(--cyan-rgb);
       --cyan-rgb: 47, 213, 255;
       --teal-rgb: 88, 232, 200;
       --blue-rgb: 125, 140, 255;
@@ -91,8 +90,8 @@
     @media (prefers-color-scheme: light) {
       :root:not(.theme-dark) {
         color-scheme: light;
-        --bg-page: #FFFFFF;
-        --bg-card: #FFFFFF;
+        --bg-page: #f8fafc;
+        --bg-card: #ffffff;
         --primary: #6366F1;
         --primary-light: #EEF2FF;
         --gradient-logo: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);
@@ -101,7 +100,7 @@
         /* Tercer tono de texto, exclusivo de este tema claro. */
         --text-muted-3: #94A3B8;
         --btn-secondary-bg: #F1F5F9;
-        --border-light: #E2E8F0;
+        --border-light: #e2e8f0;
         --black-badge: #0F172A;
         --success-green: #22C55E;
         --break-orange: #F97316;
@@ -116,7 +115,7 @@
         --muted: var(--text-gray);
         --muted-3: var(--text-muted-3);
         --line: var(--border-light);
-        --line-2: #CBD5E1;
+        --line-2: #cbd5e1;
         --card-line: var(--line);
         --cyan: var(--primary);
         --teal: #4ADE80;
@@ -132,9 +131,9 @@
         --good-rgb: 34, 197, 94;
         --warn-rgb: 249, 115, 22;
         --bad-rgb: 99, 102, 241;
-        --shadow: 0 1px 2px rgba(15, 23, 42, .04), 0 2px 8px rgba(15, 23, 42, .03);
-        --shadow-raised: 0 2px 4px rgba(15, 23, 42, .05), 0 8px 20px rgba(15, 23, 42, .07);
-        --shadow-active: 0 2px 6px rgba(99, 102, 241, .14), 0 10px 24px rgba(99, 102, 241, .16);
+        --shadow: 0 1px 2px rgba(15, 23, 42, .04), 0 4px 16px rgba(15, 23, 42, .06);
+        --shadow-raised: 0 2px 4px rgba(15, 23, 42, .05), 0 12px 28px rgba(15, 23, 42, .09);
+        --shadow-active: 0 2px 6px rgba(99, 102, 241, .14), 0 12px 28px rgba(99, 102, 241, .18);
         --glow-1: rgba(99, 102, 241, .02);
         --glow-2: rgba(168, 85, 247, .015);
         --pale-good: #15803D;
@@ -163,6 +162,9 @@
         --rpt-blue-rgb: 99, 102, 241;
         --rpt-purple: #A855F7;
         --rpt-purple-rgb: 168, 85, 247;
+        --panel-navy: #ffffff;
+        --surface-sunken: #f8fafc;
+        --surface-control: #f1f5f9;
       }
     }
 
@@ -170,8 +172,8 @@
        regla propia, el CSS base ya lo es. */
     html.theme-light {
       color-scheme: light;
-      --bg-page: #FFFFFF;
-      --bg-card: #FFFFFF;
+      --bg-page: #f8fafc;
+      --bg-card: #ffffff;
       --primary: #6366F1;
       --primary-light: #EEF2FF;
       --gradient-logo: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);
@@ -179,7 +181,7 @@
       --text-gray: #64748B;
       --text-muted-3: #94A3B8;
       --btn-secondary-bg: #F1F5F9;
-      --border-light: #E2E8F0;
+      --border-light: #e2e8f0;
       --black-badge: #0F172A;
       --success-green: #22C55E;
       --break-orange: #F97316;
@@ -193,7 +195,7 @@
       --muted: var(--text-gray);
       --muted-3: var(--text-muted-3);
       --line: var(--border-light);
-      --line-2: #CBD5E1;
+      --line-2: #cbd5e1;
         --card-line: var(--line);
       --cyan: var(--primary);
       --teal: #4ADE80;
@@ -209,9 +211,9 @@
       --good-rgb: 34, 197, 94;
       --warn-rgb: 249, 115, 22;
       --bad-rgb: 99, 102, 241;
-      --shadow: 0 1px 2px rgba(15, 23, 42, .04), 0 2px 8px rgba(15, 23, 42, .03);
-      --shadow-raised: 0 2px 4px rgba(15, 23, 42, .05), 0 8px 20px rgba(15, 23, 42, .07);
-      --shadow-active: 0 2px 6px rgba(99, 102, 241, .14), 0 10px 24px rgba(99, 102, 241, .16);
+      --shadow: 0 1px 2px rgba(15, 23, 42, .04), 0 4px 16px rgba(15, 23, 42, .06);
+      --shadow-raised: 0 2px 4px rgba(15, 23, 42, .05), 0 12px 28px rgba(15, 23, 42, .09);
+      --shadow-active: 0 2px 6px rgba(99, 102, 241, .14), 0 12px 28px rgba(99, 102, 241, .18);
       --glow-1: rgba(99, 102, 241, .02);
       --glow-2: rgba(168, 85, 247, .015);
       --pale-good: #15803D;
@@ -240,6 +242,9 @@
       --rpt-blue-rgb: 99, 102, 241;
       --rpt-purple: #A855F7;
       --rpt-purple-rgb: 168, 85, 247;
+      --panel-navy: #ffffff;
+      --surface-sunken: #f8fafc;
+      --surface-control: #f1f5f9;
     }
 
     @media (prefers-color-scheme: light) {
@@ -580,15 +585,6 @@
         --accent-pale: var(--hover-flip);
         --accent-rgb: var(--hover-flip-rgb);
       }
-      :root:not(.theme-dark) .sidebar-link.active {
-        background: rgba(var(--accent-blue-2-rgb), .14);
-        border-color: transparent;
-        color: var(--accent-blue-2);
-      }
-      :root:not(.theme-dark) .sidebar-link-dot {
-        background: var(--accent-blue-2);
-        box-shadow: 0 0 10px rgba(var(--accent-blue-2-rgb), .6);
-      }
       :root:not(.theme-dark) .block-summary-card[data-accent="cyan"] { --bsc-rgb: var(--accent-blue-2-rgb); }
       :root:not(.theme-dark) .wk-row.is-today { background: rgba(var(--accent-blue-2-rgb), .06); }
       :root:not(.theme-dark) .wk-row-icon.tone-cyan { background: rgba(var(--accent-blue-2-rgb), .16); color: var(--accent-blue-2); }
@@ -632,7 +628,6 @@
       :root:not(.theme-dark) .earnings-mode-btn.active { background: var(--accent-blue-2); }
       :root:not(.theme-dark) .table-filter-btn.active { background: var(--accent-blue-2); }
       :root:not(.theme-dark) .fin-tab-btn.active { background: var(--accent-blue-2); }
-      :root:not(.theme-dark) .sidebar-link-icon { --icon-rgb: var(--accent-blue-2-rgb); }
       :root:not(.theme-dark) .gh-ring { background: conic-gradient(var(--accent-blue-2) calc(var(--ring-pct, 0) * 1%), rgba(255,255,255,.10) 0); }
       :root:not(.theme-dark) .tbl-row-icon.type-shift { background: rgba(var(--accent-blue-2-rgb), .14); color: var(--accent-blue-2); }
       :root:not(.theme-dark) .tbl-type-badge.type-shift { background: rgba(var(--accent-blue-2-rgb), .16); color: var(--accent-blue-2); }
@@ -1061,15 +1056,6 @@
       --accent-pale: var(--hover-flip);
       --accent-rgb: var(--hover-flip-rgb);
     }
-    html.theme-light .sidebar-link.active {
-      background: rgba(var(--accent-blue-2-rgb), .14);
-      border-color: transparent;
-      color: var(--accent-blue-2);
-    }
-    html.theme-light .sidebar-link-dot {
-      background: var(--accent-blue-2);
-      box-shadow: 0 0 10px rgba(var(--accent-blue-2-rgb), .6);
-    }
     html.theme-light .block-summary-card[data-accent="cyan"] { --bsc-rgb: var(--accent-blue-2-rgb); }
     html.theme-light .wk-row.is-today { background: rgba(var(--accent-blue-2-rgb), .06); }
     html.theme-light .wk-row-icon.tone-cyan { background: rgba(var(--accent-blue-2-rgb), .16); color: var(--accent-blue-2); }
@@ -1113,7 +1099,6 @@
     html.theme-light .earnings-mode-btn.active { background: var(--accent-blue-2); }
     html.theme-light .table-filter-btn.active { background: var(--accent-blue-2); }
     html.theme-light .fin-tab-btn.active { background: var(--accent-blue-2); }
-    html.theme-light .sidebar-link-icon { --icon-rgb: var(--accent-blue-2-rgb); }
     html.theme-light .gh-ring { background: conic-gradient(var(--accent-blue-2) calc(var(--ring-pct, 0) * 1%), rgba(255,255,255,.10) 0); }
     html.theme-light .tbl-row-icon.type-shift { background: rgba(var(--accent-blue-2-rgb), .14); color: var(--accent-blue-2); }
     html.theme-light .tbl-type-badge.type-shift { background: rgba(var(--accent-blue-2-rgb), .16); color: var(--accent-blue-2); }
@@ -1411,7 +1396,11 @@
     /* Flecha y punto de "activo" quitados: el preview de la landing marca lo activo
        solo con el fondo + color de acento. */
     .sidebar-link-arrow { display: none; }
-    .sidebar-link-dot { display: none; }
+    .sidebar-link-dot {
+      display: none;
+      background: var(--cyan);
+      box-shadow: 0 0 10px rgba(var(--cyan-rgb), .6);
+    }
     .sidebar-progress-card {
       display: flex;
       align-items: center;

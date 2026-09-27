@@ -4383,7 +4383,7 @@ function renderPayDatesSection() {
 </style></head><body>
 <h1>Reporte de ganancias</h1>
 <p class="sub">${escapeHtml(range.label)} · generado el ${escapeHtml(fmtDate(new Date()))}</p>
-<button class="print-btn" onclick="window.print()">Imprimir / Guardar como PDF</button>
+<button class="print-btn" type="button">Imprimir / Guardar como PDF</button>
 <h2>Resumen por día</h2>
 <table><thead><tr><th>Fecha</th><th>Llamadas</th><th>Productivo</th><th>Adherencia</th><th>Ganancias</th></tr></thead>
 <tbody>${summaryRowsHtml}</tbody>
@@ -4400,6 +4400,7 @@ function renderPayDatesSection() {
       }
       win.document.write(html);
       win.document.close();
+      win.document.querySelector('.print-btn').addEventListener('click', () => win.print());
       toast('Reporte listo — usa "Imprimir / Guardar como PDF" en la pestaña nueva');
     }
 

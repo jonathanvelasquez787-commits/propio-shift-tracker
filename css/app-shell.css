@@ -1,22 +1,12 @@
-/* Envoltorio de sesión alrededor de la app + afinado de los dos temas.
-   Usa los mismos tokens que ya define app.html en :root.
-
-   Cómo gana la cascada sin tocar app.html: ese archivo declara el oscuro en
-   `:root` y el claro dos veces, `html.theme-light X` y `:root:not(.theme-dark) X`
-   dentro de @media (prefers-color-scheme: light). Acá todo va bajo
-   `:root.theme-light X` / `:root.theme-dark X`, que le ganan a las primeras por
-   especificidad y a la segunda por orden (este archivo carga después del
-   <style>). Es fiable porque boot.js llama a applyLightThemeDefault() antes de
-   montar: en /app siempre hay una clase de tema puesta. */
+/* Gate de sesión y componentes de la app.
+   Las paletas claro/oscuro se definen en los bloques de tokens de app.html. */
 
 /* Mientras la app no está montada, lo único visible es el gate. */
 body:not(.app-ready) > *:not(#bootGate) {
   display: none !important;
 }
 
-/* El gate se pinta ANTES de que boot.js pueda poner la clase de tema: es un
-   módulo y espera a que baje supabase-js del CDN. Por eso acá el claro es la
-   base y el oscuro va en html.theme-dark — al revés que en app.html. */
+/* theme-init.js aplica el tema antes del primer pintado, sin esperar al CDN. */
 #bootGate {
   position: fixed;
   inset: 0;
@@ -335,42 +325,6 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 }
 
 /* ===================================================================
-   2. Tema claro — tokens
-   app.html no remapea --panel-navy en claro: lo reemplaza regla por regla, y
-   todo lo que quedó fuera de esa lista se seguía pintando azul. Remapearlo
-   acá cubre esos casos y cualquiera futuro.
-   Los dos --surface-* son nuevos: en oscuro casi todos los fondos "hundidos"
-   son rgba(255,255,255,.03..09), que sobre blanco no existen.
-   =================================================================== */
-
-:root.theme-light {
-  --panel-navy: #ffffff;
-  --bg-page: #f8fafc;
-  --bg-card: #ffffff;
-  --border-light: #e2e8f0;
-  --line-2: #cbd5e1;
-
-  --surface-sunken: #f8fafc;
-  --surface-control: #f1f5f9;
-
-  --shadow: 0 1px 2px rgba(15, 23, 42, .04), 0 4px 16px rgba(15, 23, 42, .06);
-  --shadow-raised: 0 2px 4px rgba(15, 23, 42, .05), 0 12px 28px rgba(15, 23, 42, .09);
-  --shadow-active: 0 2px 6px rgba(99, 102, 241, .14), 0 12px 28px rgba(99, 102, 241, .18);
-}
-
-/* Respaldo para el caso sin clase de tema (app abierta sin boot.js, que es lo
-   que hacen las pruebas). Solo tokens: las reglas de abajo no hacen falta ahí
-   porque en producción boot.js siempre deja la clase puesta. */
-@media (prefers-color-scheme: light) {
-  :root:not(.theme-dark) {
-    --panel-navy: #ffffff;
-    --bg-page: #f8fafc;
-    --surface-sunken: #f8fafc;
-    --surface-control: #f1f5f9;
-  }
-}
-
-/* ===================================================================
    3. Tema claro — superficies
    =================================================================== */
 
@@ -524,33 +478,7 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
   background: var(--surface-control);
 }
 
-/* ===================================================================
-   5. Tema oscuro
-   Los mismos tres arreglos del claro, al revés: la página baja un escalón para
-   que la tarjeta exista, las líneas se vuelven visibles y el acento se unifica
-   en cian.
-   =================================================================== */
-
-:root.theme-dark {
-  /* --line valía rgba(90,105,150,.045): 4,5% de opacidad, o sea nada. Chips,
-     campos, pills y botones vivían sin contorno. Estos son los mismos valores
-     que ya usa la landing. */
-  --line: rgba(125, 145, 215, .16);
-  --line-2: rgba(125, 145, 215, .26);
-  --card-line: rgba(140, 160, 255, .18);
-
-  --muted: #97a6c4;
-  --muted-3: #6f7f9e;
-
-  /* Los hover saltaban a morado aunque el resto del tema fuera cian. */
-  --hover-flip: var(--cyan);
-  --hover-flip-rgb: var(--cyan-rgb);
-}
-
-/* Jonathan pidió que el fondo de página use el mismo tono que la barra
-   lateral (#0d1230, var(--panel-navy)): antes se bajaba un escalón a #080d1f
-   para separar visualmente las tarjetas de la página. La separación ahora
-   queda solo a cargo del borde (--card-line) que las tarjetas ya llevan. */
+/* Tema oscuro: superficies y separadores; los tokens viven en app.html. */
 
 :root.theme-dark .accordion-card { box-shadow: var(--shadow); }
 

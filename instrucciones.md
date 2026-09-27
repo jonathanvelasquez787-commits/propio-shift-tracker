@@ -218,19 +218,13 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
-- **Los dos temas se afinan con una capa, no en su origen.**
-  `css/app-shell.css` redefine tokens y reglas bajo `:root.theme-light`/
-  `:root.theme-dark` porque `app.html` no remapea sus colores en su fuente.
-  Funciona y es estable, pero el lugar correcto es el bloque de tokens de
-  cada tema. El sidebar de navegación (`.sidebar-
-  link`, `.sidebar-link-icon`) sigue el mismo patrón: el acento único se
-  define dos veces dentro de `app.html` (bloque `@media (prefers-color-
-  scheme: light)` y bloque `html.theme-light`) — es la misma duplicación a
-  propósito, no un descuido. Esta limpieza queda para después de la extracción
-  de páginas.
-- **Sin Content-Security-Policy.** No se puede poner sin romper los
-  `<script>` inline que montan la app y leen el tema. Ahora que la Fase 3 cerró, toca retirar/adaptar esos scripts inline antes de
-  habilitarla.
+- **CSP preparada, pendiente de aplicar bloqueo.** `vercel.json` envía
+  `Content-Security-Policy-Report-Only`: avisos locales de consola, sin endpoint
+  de reportes. Los scripts de tema/año y el evento de impresión ya no son
+  inline. Antes de pasar a `Content-Security-Policy`, verificar en preview los
+  accesos Google/correo/username, recuperación, retorno OAuth, sincronización,
+  perfil, audio y PDF con una cuenta real. Los estilos inline siguen permitidos
+  por la arquitectura actual. Ver `docs/security-policy.md`.
 - **`@supabase/supabase-js` pinchado a 2.45.4 desde jsDelivr**, sin lockfile.
   Para actualizar: subir el número en `js/supabase-client.js`, probar login +
   sincronización, y recién ahí desplegar.
@@ -344,6 +338,22 @@ Pendientes, en orden:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v563** — Tokens de temas consolidados y preparación de CSP.
+
+- Los colores, superficies y sombras finales viven en las paletas de
+  `app.html`; `app-shell.css` conserva reglas de componentes, sin sobrescribir
+  tokens. El sidebar usa el acento común de cada tema.
+- `theme-init.js` aplica el tema antes del primer pintado en las cuatro páginas;
+  `footer-year.js` actualiza el año en las páginas públicas. El botón del reporte
+  PDF registra su evento desde JavaScript.
+- CSP en modo Report-Only; la activación efectiva y la validación autenticada
+  quedan pendientes, con alcance y orígenes documentados.
+- Verificados 11 tests automáticos, imports/exports de 11 módulos y sintaxis de
+  18 archivos JS. Comparación en navegador del marcado estático: 0 diferencias
+  en estilos visibles, claro/oscuro a 1440 y 390 px; páginas legales verificadas
+  con CSP aplicada en una prueba local. No se probaron accesos con cuenta real.
+
+
 **v562** — Cierre de la Fase 3: Ajustes se extrae a `js/settings.js` y la
 sección "Tu perfil" permite cambiar username y correo.
 
@@ -364,17 +374,3 @@ sección "Tu perfil" permite cambiar username y correo.
   Finanzas, Calendario y Llamadas ya consumían a través del hub.
 - `app.html` precarga `js/higher-rate.js` y el chequeo automático valida ahora
   siete módulos. Solo queda Ajustes para cerrar la extracción de páginas.
-
-
-**v560** — Continuación de la Fase 3: Horario queda registrado como módulo ya
-partido y se extrae la página Llamadas de `js/app-main.js` a `js/calls.js`.
-
-- `js/calls.js` concentra edición, borrado, alta manual, guardado de llamadas
-  en vivo, tabla combinada y resumen diario; el modelo compartido permanece en
-  `js/app-main.js`.
-- Los cambios a `calls` pasan por `setCalls()` para respetar los bindings de
-  módulos ES, y el wiring central usa una API pequeña para el estado de vista.
-- Se agrega `scripts/check-module-exports.mjs` y `npm run check:modules`: el
-  pendiente de revisar imports/exports a mano queda resuelto.
-- `app.html` precarga `js/calls.js`; el mapa de módulos y el roadmap quedan
-  actualizados. Pendientes de la Fase 3: Higher Rate y Ajustes.
