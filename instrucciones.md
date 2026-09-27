@@ -218,24 +218,19 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
-- **Cambiar el username no tiene pantalla.** `auth.js` ya exporta
-  `updateUsername()`, pero nada la llama. Importa sobre todo para cuentas de
-  Google (username autogenerado del correo). Sitio natural: Ajustes → "Tu
-  perfil", junto a nombre y emoji.
-- **Cambiar el correo tampoco.** Mismo lugar; Supabase lo soporta con
-  `auth.updateUser({ email })`.
 - **Los dos temas se afinan con una capa, no en su origen.**
   `css/app-shell.css` redefine tokens y reglas bajo `:root.theme-light`/
   `:root.theme-dark` porque `app.html` no remapea sus colores en su fuente.
   Funciona y es estable, pero el lugar correcto es el bloque de tokens de
-  cada tema — se unifica en la Fase 3. El sidebar de navegación (`.sidebar-
+  cada tema. El sidebar de navegación (`.sidebar-
   link`, `.sidebar-link-icon`) sigue el mismo patrón: el acento único se
   define dos veces dentro de `app.html` (bloque `@media (prefers-color-
   scheme: light)` y bloque `html.theme-light`) — es la misma duplicación a
-  propósito, no un descuido.
+  propósito, no un descuido. Esta limpieza queda para después de la extracción
+  de páginas.
 - **Sin Content-Security-Policy.** No se puede poner sin romper los
-  `<script>` inline que montan la app y leen el tema — se resuelve en la
-  Fase 3, cuando la app sea un módulo con `src`.
+  `<script>` inline que montan la app y leen el tema. Ahora que la Fase 3 cerró, toca retirar/adaptar esos scripts inline antes de
+  habilitarla.
 - **`@supabase/supabase-js` pinchado a 2.45.4 desde jsDelivr**, sin lockfile.
   Para actualizar: subir el número en `js/supabase-client.js`, probar login +
   sincronización, y recién ahí desplegar.
@@ -305,8 +300,8 @@ reales) y 2 (landing pública, los 3 métodos de login, páginas legales) están
 **cerradas y funcionando en producción**, verificado por el usuario.
 
 Pendientes, en orden:
-- **Fase 3 — Modularizar (EN CURSO, arrancada v555; Finanzas, Reportes,
-  Calendario, Horario, Llamadas y Higher Rate ya partidas).** Se resolvió el
+- **Fase 3 — Modularizar (CERRADA; Finanzas, Reportes, Calendario, Horario,
+  Llamadas, Higher Rate y Ajustes ya partidas).** Se resolvió el
   bloqueo original
   ("cómo se entrega sin build"): módulos ES **nativos**, sin bundler — mismo
   patrón que ya usan `js/auth.js`/`js/sync.js`, cero comandos de terminal
@@ -314,9 +309,9 @@ Pendientes, en orden:
   `#appMainScript` — hace `import()` dinámico de `js/app-main.js` (solo se
   ejecuta la primera vez que se llama, sigue sirviendo de gate), precargado
   con `<link rel="modulepreload">` en el `<head>` (también para
-  `js/finance.js`, `js/reports.js`, `js/calendar.js`, `js/schedule.js` y
-  `js/calls.js` y `js/higher-rate.js`) para que no espere red. Cada extracción
-  se hizo con ayuda del parser de `typescript` (ya
+  `js/finance.js`, `js/reports.js`, `js/calendar.js`, `js/schedule.js`,
+  `js/calls.js`, `js/higher-rate.js` y `js/settings.js`) para que no espere red.
+  Cada extracción se hizo con ayuda del parser de `typescript` (ya
   estaba disponible en el entorno) para detectar con precisión qué usa cada
   bloque desde afuera y qué necesita el resto del archivo desde el bloque —
   no a mano ni a ojo, dado el tamaño del archivo. Arquitectura confirmada:
@@ -331,13 +326,12 @@ Pendientes, en orden:
   cambia al saltar de la vista año a la vista mes), `js/app-main.js` expone
   además una función `setX()` que la página importa y llama en vez de
   reasignar directo (un módulo no puede reasignar algo que solo importó).
-  Solo queda pendiente la página Ajustes. `state` ya se exporta desde
-  `js/app-main.js` porque Llamadas lo necesita.
+  La extracción de páginas está completa. `state` se exporta desde
+  `js/app-main.js` porque Llamadas y Ajustes lo necesitan.
 - **Fase 4 — Protección del código fuente.** Ya hecho: gate de sesión
   (ahora todos los módulos de `js/` detrás de `js/boot.js`), licencia +
   términos + privacidad en el repo. Pendiente: minificar/bundlear sin
-  sourcemaps (más fácil una vez que
-  Fase 3 esté más avanzada), mover al servidor el motor de
+  sourcemaps (ahora que la Fase 3 está cerrada), mover al servidor el motor de
   Adherencia/reportes agregados (rompe el offline de esa parte), repo privado
   en GitHub (pendiente del usuario). Explícitamente descartado: bloquear
   click derecho, deshabilitar F12, ofuscadores agresivos.
@@ -349,6 +343,17 @@ Pendientes, en orden:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v562** — Cierre de la Fase 3: Ajustes se extrae a `js/settings.js` y la
+sección "Tu perfil" permite cambiar username y correo.
+
+- El nuevo módulo concentra perfil local, metas por día/general, tarifa, moneda,
+  selectores de emoji y onboarding.
+- `js/auth.js` agrega `updateEmail()`; username y correo se cargan desde la
+  cuenta y se guardan con mensajes de validación/confirmación.
+- `app.html` precarga `js/settings.js`. El chequeo automático recorre ahora
+  también Auth, Supabase y Config: once módulos locales en total.
+
 
 **v561** — Continuación de la Fase 3: Higher Rate se extrae de
 `js/app-main.js` a `js/higher-rate.js`.
@@ -373,33 +378,3 @@ partido y se extrae la página Llamadas de `js/app-main.js` a `js/calls.js`.
   pendiente de revisar imports/exports a mano queda resuelto.
 - `app.html` precarga `js/calls.js`; el mapa de módulos y el roadmap quedan
   actualizados. Pendientes de la Fase 3: Higher Rate y Ajustes.
-
-
-**v559** — Bug de la Fase 3 (mismo patrón que v558/effectiveHistoryStartDate,
-esta vez con las 2 funciones de conversión de moneda): "Reportes" no cargaba
-— consola mostraba `The requested module './app-main.js' does not provide an
-export named 'financeConvertedInline'`.
-
-- Causa: `js/reports.js` usa `financeConvertedInline`/`financeConvertedNote`
-  (montos convertidos a la moneda secundaria en "Ganancias del ciclo") vía
-  `import { ... } from './app-main.js'`. Esas dos funciones viven de verdad
-  en `js/finance.js`, y `js/app-main.js` ya las importaba de ahí para su
-  propio uso interno — pero nunca las reexportaba, así que del lado de
-  `reports.js` el import fallaba en silencio y tumbaba la cadena de módulos
-  completa (misma familia de bug que el de `effectiveHistoryStartDate` en
-  v558, solo que con estas 2 funciones en vez de esa).
-- Fix de una sola línea: se agregó `export { financeConvertedInline,
-  financeConvertedNote };` en `js/app-main.js`, justo después de la línea ya
-  existente `export { effectiveHistoryStartDate } from './calendar.js';` —
-  sin `from` porque ambas ya entran al módulo como bindings locales vía el
-  `import { ... } from './finance.js'` de la cabecera del archivo.
-- Verificado con las mismas 2 comprobaciones automáticas de siempre:
-  `node --check js/app-main.js` sin errores de sintaxis, y un barrido de
-  todos los `export` del archivo confirmando que `financeConvertedInline`,
-  `financeConvertedNote` y `effectiveHistoryStartDate` quedan expuestos.
-  `js/reports.js`, `js/finance.js` y `js/calendar.js` no se tocaron — el
-  problema era 100% de `app-main.js` no reexportando.
-- Se agrega un pendiente nuevo (ver PENDIENTES) para no repetir este patrón
-  una tercera vez: no hay todavía un chequeo automático de imports/exports
-  entre los 4 módulos, se sigue revisando a mano cada vez.
-- Entregado: solo `app-main.js` (único archivo modificado).

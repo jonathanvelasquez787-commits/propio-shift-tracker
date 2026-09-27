@@ -161,6 +161,16 @@ export async function getProfile() {
   return data || null;
 }
 
+export async function updateEmail(email) {
+  const clean = String(email || '').trim().toLowerCase();
+  if (!looksLikeEmail(clean)) throw new AuthError('EMAIL_INVALID');
+  const session = await getSession();
+  if (!session) throw new AuthError('NOT_AUTHENTICATED');
+  const { error } = await getSupabase().auth.updateUser({ email: clean });
+  if (error) throw error;
+  return true;
+}
+
 export async function updateUsername(username) {
   const clean = String(username || '').trim();
   if (!USERNAME_RE.test(clean)) throw new AuthError('USERNAME_INVALID');

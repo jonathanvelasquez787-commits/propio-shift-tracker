@@ -132,7 +132,7 @@ function askConflict({ localSummary, cloudSummary, cloud }) {
 //
 // IMPORTANTE: el overlay (#bootGate) se queda puesto hasta que el import() de arriba termina bien.
 // Antes se quitaba de una vez, ANTES de intentar la carga; si esa carga fallaba (por ejemplo un
-// error de sintaxis en app-main.js, finance.js, reports.js, calendar.js, schedule.js, calls.js o higher-rate.js —
+// error de sintaxis en app-main.js, finance.js, reports.js, calendar.js, schedule.js, calls.js, higher-rate.js o settings.js —
 // un import/export que dejó de cuadrar entre esos módulos), fail() escribía el mensaje de error dentro de #bootGate,
 // pero ese nodo YA HABÍA SIDO BORRADO del documento. El resultado: la app se quedaba muda —
 // pantalla estática, botones muertos, reloj parado — SIN ningún error visible en pantalla ni en la
