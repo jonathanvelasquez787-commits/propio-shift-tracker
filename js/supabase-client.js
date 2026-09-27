@@ -5,7 +5,7 @@
 // no tiene build ni lockfile. Para actualizar: subir el número acá, probar
 // login + sync, y recién ahí desplegar.
 
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm';
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/+esm';
 import { SUPABASE_URL, SUPABASE_ANON_KEY, isConfigured } from './config.js';
 
 let client = null;
