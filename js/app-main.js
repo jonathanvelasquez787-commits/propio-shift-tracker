@@ -54,6 +54,25 @@ import {
   useAutoCalYearGoalModal,
 } from './calendar.js';
 
+import {
+  BLOCK_TIMELINE_META,
+  addBlockRow,
+  applyScheduleOffset,
+  copyDayToAll,
+  copyDayToWeekend,
+  ensureScheduleWeekOverride,
+  formatBlockDurationLabel,
+  removeBlockRowAt,
+  removeScheduleWeekOverride,
+  renderBlocksEditor,
+  renderDayTabs,
+  saveShiftWindow,
+  scheduleFormIsDirty,
+  scheduleWeekHasCustom,
+  scheduleWeekIsPast,
+  syncShiftModalFields,
+} from './schedule.js';
+
 // js/reports.js necesita effectiveHistoryStartDate() (ver su import desde './app-main.js'), pero
 // esa función vive en js/calendar.js — este archivo solo la importaba para uso propio, nunca la
 // reexportaba. Sin esta línea, el import de reports.js falla con "The requested module
@@ -188,13 +207,13 @@ export { financeConvertedInline, financeConvertedNote };
     }
 
     // Horario semanal (plantilla planeada, editable por día)
-    const WEEKDAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+    export const WEEKDAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
     const WEEKDAY_JS_INDEX = { sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6 };
-    const WEEKDAY_LABELS = { mon: 'Lunes', tue: 'Martes', wed: 'Miércoles', thu: 'Jueves', fri: 'Viernes', sat: 'Sábado', sun: 'Domingo' };
-    const WEEKDAY_LABELS_SHORT = { mon: 'Lun', tue: 'Mar', wed: 'Mié', thu: 'Jue', fri: 'Vie', sat: 'Sáb', sun: 'Dom' };
+    export const WEEKDAY_LABELS = { mon: 'Lunes', tue: 'Martes', wed: 'Miércoles', thu: 'Jueves', fri: 'Viernes', sat: 'Sábado', sun: 'Domingo' };
+    export const WEEKDAY_LABELS_SHORT = { mon: 'Lun', tue: 'Mar', wed: 'Mié', thu: 'Jue', fri: 'Vie', sat: 'Sáb', sun: 'Dom' };
 
     // Todo vive en `blocks[]`: cada bloque es {type, start, dur} y Trabajo lleva además goalMin.
-    function defaultDaySchedule(isWorkDay) {
+    export function defaultDaySchedule(isWorkDay) {
       return {
         off: !isWorkDay,
         start: '07:00',
@@ -276,7 +295,7 @@ export { financeConvertedInline, financeConvertedNote };
       return dayCfg;
     }
 
-    function ensureWeeklySchedule() {
+    export function ensureWeeklySchedule() {
       if (!settings.weeklySchedule || typeof settings.weeklySchedule !== 'object') {
         // Migración: si ya tenías un shiftStart/shiftEnd guardado, úsalo como base de lunes a
         // viernes en vez de perder tu configuración anterior.
@@ -304,7 +323,7 @@ export { financeConvertedInline, financeConvertedNote };
 
     // Overrides puntuales por semana, anclados al mismo inicio de semana de 7 días que usa "Resumen
     // semanal" (startOfCycleWeek).
-    function weekStartKeyFromDate(date) {
+    export function weekStartKeyFromDate(date) {
       const d = startOfCycleWeek(date);
       return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
     }
@@ -317,7 +336,7 @@ export { financeConvertedInline, financeConvertedNote };
     // Una semana queda protegida (solo lectura) una vez que TERMINÓ por completo — no basta con que
     // ya haya empezado. La semana actual (la que contiene "hoy") sigue editable hasta que pase su
     // último día.
-    function isScheduleWeekPast(weekStartDate) {
+    export function isScheduleWeekPast(weekStartDate) {
       const weekEnd = new Date(weekStartDate.getFullYear(), weekStartDate.getMonth(), weekStartDate.getDate() + 6);
       return weekEnd < todayRange();
     }
@@ -1026,7 +1045,7 @@ export { financeConvertedInline, financeConvertedNote };
 
     const STORAGE_QUOTA_TOAST = '⚠️ No se pudo guardar — el almacenamiento del navegador está lleno. Tu cambio se mantiene en esta sesión, pero no quedará guardado hasta que liberes espacio (borra llamadas muy viejas o un sonido personalizado en Avisos).';
 
-    function saveAll() {
+    export function saveAll() {
       const stateOk = safeLocalStorageSet(STORAGE_KEY, JSON.stringify(state));
       const callsOk = safeLocalStorageSet(CALLS_KEY, JSON.stringify(calls));
       const settingsOk = safeLocalStorageSet(SETTINGS_KEY, JSON.stringify(settings));
@@ -1247,7 +1266,7 @@ export { financeConvertedInline, financeConvertedNote };
       return parsed;
     }
 
-    function toMinutes(hhmm) {
+    export function toMinutes(hhmm) {
       const [h, m] = hhmm.split(':').map(Number);
       return h * 60 + m;
     }
@@ -1259,8 +1278,6 @@ export { financeConvertedInline, financeConvertedNote };
       const end = Math.min(aEnd.getTime(), bEnd.getTime());
       return Math.max(0, (end - start) / 60000);
     }
-
-
 
     // Bounds "reales o estimados" del turno de HOY.
     function todayShiftBounds() {
@@ -1348,8 +1365,6 @@ export { financeConvertedInline, financeConvertedNote };
       };
     }
 
-
-
 export function todayRange(base = new Date()) {
   return new Date(base.getFullYear(), base.getMonth(), base.getDate(), 0, 0, 0, 0);
 }
@@ -1369,7 +1384,6 @@ function formatDeltaMinutes(mins) {
   const text = Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
   return `${mins >= 0 ? '+' : '-'}${text}m`;
 }
-
 
 // Restar 86400000 ms cae en el día equivocado tras el cambio de hora de primavera.
 export function previousCalendarDay(date) {
@@ -3064,7 +3078,7 @@ function setBlocksViewMode(mode) {
 
 // "Resumen semanal" usaba semanas Lunes-Domingo fijas, sin relación con cuándo arranca de verdad el
 // ciclo de pago de 14 días (cycleAnchorDate/cyclePayOffsetDays, ver Horario).
-function startOfCycleWeek(date = new Date()) {
+export function startOfCycleWeek(date = new Date()) {
   const anchor = cycleAnchorDate();
   const target = new Date(date.getFullYear(), date.getMonth(), date.getDate());
   const diffDays = Math.round((target.getTime() - anchor.getTime()) / 86400000);
@@ -3093,7 +3107,7 @@ export function weekDaysForOffset(offset = weekViewOffset) {
   return days;
 }
 
-function formatWeekRangeLabel(start, end) {
+export function formatWeekRangeLabel(start, end) {
   const startLabel = new Intl.DateTimeFormat('es-MX', { day: 'numeric', month: 'short' }).format(start);
   const endLabel = new Intl.DateTimeFormat('es-MX', { day: 'numeric', month: 'short', year: 'numeric' }).format(end);
   return `${startLabel} – ${endLabel}`;
@@ -3207,8 +3221,6 @@ export function weekSummaryForOffset(offset = weekViewOffset) {
 // Ganancias y Adherencia agrupadas por MES calendario, en vez de la ventana móvil de 14 días de
 // arriba.
 
-
-
 // Pinta la gráfica de barras (Ganancias, eje izquierdo) + línea (Adherencia promedio, eje derecho
 // 0-100%) para la página actual de reportsMonthlySeries.
 
@@ -3293,7 +3305,6 @@ function setCycleGoalOverride(offset, amount) {
   saveSettingsOnly();
 }
 
-
 // Editor rápido de la meta del ciclo (✎ en la tarjeta de Reportes) — mismo patrón simple que
 // openAcwGoalEditor/#acwGoalModal: un campo, Guardar/ Cancelar, + un botón aparte para volver al
 // cálculo automático.
@@ -3337,7 +3348,6 @@ function updateCycleGoalFromAjustes() {
 // Tendencias: semana actual (weekSummaryForOffset(0)) vs semana anterior (weekSummaryForOffset(-1))
 // — mismos totales que ya calcula Resumen semanal, solo comparados entre sí.
 
-
 // Compliant/failed/off/pending para UN día — usado por la racha. 'off' = día libre según el horario
 // (dayIsEffectivelyOff ya reconoce "trabajaste en tu día libre" como NO libre). 'pending' = HOY,
 // turno aún no arrancado.
@@ -3353,7 +3363,6 @@ function updateCycleGoalFromAjustes() {
 // Proyección de ganancias del ciclo actual al ritmo de hoy: promedio diario ganado hasta ahora ×
 // los 14 días del ciclo completo (CYCLE_LENGTH_DAYS).
 
-
 // Toggle de la tarjeta de Racha — mismo patrón de auto-guardado que el resto de settings sueltos
 // (ej. setThemeFromSidebarSwitch).
 
@@ -3361,7 +3370,6 @@ function updateCycleGoalFromAjustes() {
 
 // Chip estático (sin flecha de tendencia) para % Billable/Dropped de la semana — a diferencia de
 // trendChipHtml no compara contra nada, solo muestra el valor actual con un tono de color.
-
 
 function renderWeekSummary() {
   const wrap = document.getElementById('weekSummaryWrap');
@@ -4301,7 +4309,6 @@ function renderPayDatesSection() {
       });
     }
 
-
     // Clave para detectar llamadas duplicadas. Usa el valor NUMÉRICO de pay (via parseMoney), no el
     // texto crudo — así "$0.72", "0.72" y " $0.72 " se reconocen como el mismo pago.
     function callDedupeKey(c) {
@@ -4738,7 +4745,6 @@ function renderPayDatesSection() {
       reader.readAsText(file);
     }
 
-
     function formatGoalFields() {
       const minInput = document.getElementById('productiveGoalInput');
       const usdInput = document.getElementById('earningsGoalInput');
@@ -4801,7 +4807,7 @@ function renderPayDatesSection() {
       if (cycleGoalInput && document.activeElement !== cycleGoalInput) cycleGoalInput.value = effectiveCycleGoal(0).toFixed(2);
     }
 
-    function formatHHMM(value) {
+    export function formatHHMM(value) {
       const raw = String(value || '').trim();
       const match = raw.match(/^(\d{1,2}):(\d{2})$/);
       if (!match) return '07:00';
@@ -4810,7 +4816,7 @@ function renderPayDatesSection() {
       return `${hh}:${mm}`;
     }
 
-    function timeLabel(value) {
+    export function timeLabel(value) {
       const normalized = formatHHMM(value);
       const [h, m] = normalized.split(':').map(Number);
       const suffix = h >= 12 ? 'PM' : 'AM';
@@ -4857,430 +4863,17 @@ function renderPayDatesSection() {
       }));
     }
 
-    let scheduleEditDay = 'mon';
+    export let scheduleEditDay = 'mon';
+    export function setScheduleEditDay(v) { scheduleEditDay = v; }
     // Pedido del usuario: "Ajustar turno completo" (ver .sched-offset-block en el HTML/CSS) — cuánto se va a mover el turno la próxima vez que se toque "Aplicar a todos", en minutos (positivo = más tarde, negativo = más temprano).
-    let scheduleOffsetMin = 0;
+    export let scheduleOffsetMin = 0;
+    export function setScheduleOffsetMin(v) { scheduleOffsetMin = v; }
     // BUG-013 (QA ) — Pedido del usuario: el stepper "Ajustar turno completo" no tenía límite superior/inferior — hacer click muchas veces en "+" (o "-") podía acumular un offset enorme (ej. +30h) sin ningún aviso.
     const SCHEDULE_OFFSET_LIMIT_MIN = 720;
 
-    // "+1:00" / "-0:30" / "+0:00" — mismo formato que ya usa el resto de la app para horas (ver formatDuration), pero con signo explícito y sin segundos, ya que aquí el usuario razona en pasos de 15 min.
-    function formatScheduleOffsetLabel(mins) {
-      const sign = mins < 0 ? '-' : '+';
-      const abs = Math.abs(mins);
-      const h = Math.floor(abs / 60);
-      const m = abs % 60;
-      return `${sign}${h}:${pad(m)}`;
-    }
-
-    function syncScheduleOffsetUI() {
-      const valueEl = document.getElementById('scheduleOffsetValue');
-      if (valueEl) valueEl.textContent = formatScheduleOffsetLabel(scheduleOffsetMin);
-    }
-
-    // Mueve Inicio/Fin del turno Y todos los bloques del formulario por `scheduleOffsetMin` minutos — mismo desplazamiento para todo, así que el orden y la duración de cada bloque no cambian, solo su hora.
-    function applyScheduleOffset() {
-      if (!scheduleOffsetMin) {
-        toast('Elige cuánto ajustar el turno antes de aplicar.');
-        return;
-      }
-      const startInput = document.getElementById('dayStartInput');
-      const endInput = document.getElementById('dayEndInput');
-      if (startInput) startInput.value = minutesToHHMM(toMinutes(formatHHMM(startInput.value)) + scheduleOffsetMin);
-      if (endInput) endInput.value = minutesToHHMM(toMinutes(formatHHMM(endInput.value)) + scheduleOffsetMin);
-
-      const current = readBlocksFromEditor();
-      if (!current.length) {
-        toast('No hay bloques que ajustar en este día.');
-        return;
-      }
-      const shifted = current.map(b => ({ ...b, start: minutesToHHMM(toMinutes(b.start) + scheduleOffsetMin) }));
-      renderBlocksEditor(shifted);
-      toast(`Turno ajustado ${formatScheduleOffsetLabel(scheduleOffsetMin)} — recuerda "Guardar día" para confirmar`);
-      scheduleOffsetMin = 0;
-      syncScheduleOffsetUI();
-    }
-
     // Pedido del usuario: el editor de Horario ahora tiene 2 modos. 'template' (default, comportamiento de siempre): edita la plantilla recurrente Lunes-Domingo (settings.weeklySchedule). 'week':
-    let scheduleViewMode = 'template';
-    let scheduleWeekOffset = 0;
-
-    function scheduleWeekStartDate(offset = scheduleWeekOffset) {
-      const base = startOfCycleWeek(new Date());
-      return new Date(base.getFullYear(), base.getMonth(), base.getDate() + offset * 7);
-    }
-
-    function scheduleWeekKeyForOffset(offset = scheduleWeekOffset) {
-      return weekStartKeyFromDate(scheduleWeekStartDate(offset));
-    }
-
-    function scheduleWeekIsPast(offset = scheduleWeekOffset) {
-      return isScheduleWeekPast(scheduleWeekStartDate(offset));
-    }
-
-    function scheduleWeekOverride(offset = scheduleWeekOffset) {
-      const key = scheduleWeekKeyForOffset(offset);
-      return (settings.scheduleOverridesByWeek && settings.scheduleOverridesByWeek[key]) || null;
-    }
-
-    function scheduleWeekHasCustom(offset = scheduleWeekOffset) {
-      return !!scheduleWeekOverride(offset);
-    }
-
-    // Clona la plantilla actual (ya migrada/normalizada por ensureWeeklySchedule) como punto de partida de un override nuevo
-    function cloneWeeklyScheduleForOverride() {
-      ensureWeeklySchedule();
-      const out = {};
-      WEEKDAYS.forEach(k => { out[k] = JSON.parse(JSON.stringify(settings.weeklySchedule[k])); });
-      return out;
-    }
-
-    function ensureScheduleWeekOverride(offset = scheduleWeekOffset) {
-      const key = scheduleWeekKeyForOffset(offset);
-      if (!settings.scheduleOverridesByWeek) settings.scheduleOverridesByWeek = {};
-      if (!settings.scheduleOverridesByWeek[key]) settings.scheduleOverridesByWeek[key] = cloneWeeklyScheduleForOverride();
-      return settings.scheduleOverridesByWeek[key];
-    }
-
-    function removeScheduleWeekOverride(offset = scheduleWeekOffset) {
-      const key = scheduleWeekKeyForOffset(offset);
-      if (settings.scheduleOverridesByWeek) delete settings.scheduleOverridesByWeek[key];
-    }
-
-    // Objeto {mon..sun} sobre el que se está leyendo/escribiendo ahora mismo — la plantilla en modo 'template', o el override de la semana actual en modo 'week' (se crea si todavía no existe, salvo que la semana ya esté protegida por pasada
-    function activeScheduleTarget({ createIfMissing = false } = {}) {
-      if (scheduleViewMode === 'template') {
-        ensureWeeklySchedule();
-        return settings.weeklySchedule;
-      }
-      const existing = scheduleWeekOverride(scheduleWeekOffset);
-      if (existing) return existing;
-      if (createIfMissing && !scheduleWeekIsPast(scheduleWeekOffset)) return ensureScheduleWeekOverride(scheduleWeekOffset);
-      // Semana sin personalizar (o ya pasada, protegida): se devuelve una vista de solo-lectura basada en la plantilla, sin crear ni guardar nada
-      ensureWeeklySchedule();
-      return settings.weeklySchedule;
-    }
-
-    function renderDayTabs() {
-      const wrap = document.getElementById('scheduleDayTabs');
-      if (!wrap) return;
-      const target = activeScheduleTarget();
-      wrap.innerHTML = WEEKDAYS.map(k => {
-        const active = k === scheduleEditDay;
-        const off = !target[k] || target[k].off;
-        return `<button class="day-tab ${active ? 'active' : ''} ${off ? 'off' : ''}" data-day="${k}" type="button">${WEEKDAY_LABELS_SHORT[k]}</button>`;
-      }).join('');
-      wrap.querySelectorAll('.day-tab').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const nextDay = btn.getAttribute('data-day');
-          // Clickear el tab que YA está activo no debe hacer nada. Antes esto igual llamaba a syncShiftModalFields, que relee el horario guardado y sobreescribe el formulario — descartando en silencio cualquier cambio sin guardar (ej.
-          if (nextDay === scheduleEditDay) return;
-          // Si hay cambios sin guardar en el día actual, se avisa antes de cambiar de tab y perderlos — mismo patrón de confirmación que ya usa el resto de la app (appConfirm).
-          if (scheduleFormIsDirty()) {
-            appConfirm(`Tienes cambios sin guardar en ${WEEKDAY_LABELS[scheduleEditDay]}. ¿Descartarlos y cambiar a ${WEEKDAY_LABELS[nextDay]}?`, () => {
-              scheduleEditDay = nextDay;
-              syncShiftModalFields();
-            });
-            return;
-          }
-          scheduleEditDay = nextDay;
-          syncShiftModalFields();
-        });
-      });
-    }
-
-    // Pedido del usuario: unificar Trabajo/Break/Lunch en UNA sola lista de bloques en Horario — cada fila tiene Tipo (selector) + inicio + min, todos editables/agregables/eliminables exactamente igual, sin importar el tipo.
-    const BLOCK_TYPE_LABELS = { work: 'Trabajo', break: 'Break', lunch: 'Lunch' };
-
-    // Pedido del usuario: Meta de Productividad configurable POR BLOQUE de Trabajo (reemplaza al viejo ratio global de "Margen"). Esta función arma la forma CANÓNICA de un bloque para comparar/guardar
-    function normalizeBlockForCompare(b) {
-      const type = BLOCK_TYPE_LABELS[String(b && b.type || '').toLowerCase()] ? String(b.type).toLowerCase() : 'work';
-      const base = { type, start: formatHHMM((b && b.start) || '00:00'), dur: Math.max(0, Number(b && b.dur) || 0) };
-      if (type === 'work') base.goalMin = Math.max(0, Number(b && b.goalMin) || 0);
-      return base;
-    }
-
-    // Pedido del usuario (rediseño 100% visual de "Horario", timeline de bloques): ícono + subtítulo por tipo, puramente decorativos
-    const BLOCK_TIMELINE_META = {
-      work: { icon: iconHtml('briefcase'), subtitle: 'Enfoque y productividad' },
-      break: { icon: iconHtml('coffee'), subtitle: 'Descanso corto' },
-      lunch: { icon: iconHtml('utensils'), subtitle: 'Almuerzo / Descanso largo' },
-    };
-
-    // Duración legible ("2h 10m" / "45 min" / "1h") para la píldora de la tarjeta
-    function formatBlockDurationLabel(mins) {
-      const total = Math.max(0, Math.round(Number(mins) || 0));
-      const h = Math.floor(total / 60);
-      const m = total % 60;
-      if (h <= 0) return `${m} min`;
-      if (m === 0) return `${h}h`;
-      return `${h}h ${m}m`;
-    }
-
-    function renderBlocksEditor(blocks) {
-      const list = document.getElementById('blocksEditorList');
-      if (!list) return;
-      const arr = Array.isArray(blocks) ? blocks : [];
-      list.innerHTML = arr.map((b, i) => {
-        const type = BLOCK_TYPE_LABELS[String(b?.type || '').toLowerCase()] ? String(b.type).toLowerCase() : 'work';
-        // Pedido del usuario: mostrar "Inicio" + "Fin" (hora) en vez de "Inicio" + "Min" (duración)
-        const startVal = formatHHMM(b?.start || '09:00');
-        const durVal = Number(b?.dur) || 0;
-        const endVal = minutesToHHMM(toMinutes(startVal) + durVal);
-        // Pedido del usuario: Meta de Productividad EN MINUTOS por cada bloque de Trabajo — campo nuevo, visible solo cuando Tipo = Trabajo (oculto para Break/Lunch, que no tienen este concepto).
-        const rawGoalMin = Number(b?.goalMin);
-        const goalVal = (Number.isFinite(rawGoalMin) && rawGoalMin >= 0) ? rawGoalMin : durVal;
-        // Ver comentario junto a BLOCK_TIMELINE_META/ formatBlockDurationLabel arriba: `meta`/`durationLabel` son solo para pintar la tarjeta (ícono, subtítulo, píldora de duración)
-        const meta = BLOCK_TIMELINE_META[type] || BLOCK_TIMELINE_META.work;
-        const durationLabel = formatBlockDurationLabel(durVal);
-        // Ver comentario junto a `.sched-tl-hour` en el CSS: la hora de inicio se repite aquí como texto suelto a la izquierda de la línea/punto conector
-        return `
-        <div class="block-row sched-tl-item" data-block-row="${i}" data-block-type="${type}">
-          <div class="sched-tl-hour" aria-hidden="true">${startVal}</div>
-          <div class="sched-tl-rail" aria-hidden="true"><span class="sched-tl-dot"></span></div>
-          <div class="sched-tl-card">
-            <div class="sched-tl-card-top">
-              <span class="sched-tl-icon">${meta.icon}</span>
-              <div class="sched-tl-titles">
-                <select class="alert-select block-type-input sched-tl-type-select">
-                  <option value="work" ${type === 'work' ? 'selected' : ''}>Trabajo</option>
-                  <option value="break" ${type === 'break' ? 'selected' : ''}>Break</option>
-                  <option value="lunch" ${type === 'lunch' ? 'selected' : ''}>Lunch</option>
-                </select>
-                <div class="sched-tl-subtitle">${meta.subtitle}</div>
-              </div>
-              <div class="sched-tl-time-inline">
-                <input type="time" class="block-start-input sched-tl-time-input" inputmode="numeric" value="${startVal}"/>
-                <span class="sched-tl-time-sep" aria-hidden="true">—</span>
-                <input type="time" class="block-end-input sched-tl-time-input" inputmode="numeric" value="${endVal}"/>
-              </div>
-              <span class="sched-tl-duration">${durationLabel}</span>
-              <span class="sched-tl-handle" aria-hidden="true" title="Orden (informativo)">⋮⋮</span>
-              <button type="button" class="gap-edit-btn block-remove-btn sched-tl-remove" data-remove-block="${i}" aria-label="Eliminar bloque ${i + 1}"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-            </div>
-            <div class="field block-goal-field sched-tl-goal" style="${type === 'work' ? '' : 'display:none;'}">
-              <label>Meta productiva (min)</label>
-              <input type="number" class="block-goal-input" inputmode="numeric" min="0" step="1" value="${goalVal}"/>
-            </div>
-          </div>
-        </div>
-      `;
-      }).join('') || '<div class="note" style="margin:0;">Sin bloques configurados. Usa "+ Agregar bloque" para empezar (Trabajo también es un bloque explícito ahora).</div>';
-    }
-
-    // Lee todas las filas .block-row actualmente en el DOM (en el mismo orden en que se renderizaron) y arma el arreglo `blocks` — reemplaza a los editores separados de Break/Lunch que había antes. Pedido del usuario:
-    function readBlocksFromEditor() {
-      const rows = document.querySelectorAll('#blocksEditorList .block-row');
-      return Array.from(rows).map(row => {
-        const typeInput = row.querySelector('.block-type-input');
-        const startInput = row.querySelector('.block-start-input');
-        const endInput = row.querySelector('.block-end-input');
-        const goalInput = row.querySelector('.block-goal-input');
-        const type = BLOCK_TYPE_LABELS[typeInput ? typeInput.value : ''] ? typeInput.value : 'work';
-        const start = formatHHMM(startInput ? startInput.value : '09:00');
-        const end = formatHHMM(endInput ? endInput.value : start);
-        const dur = Math.max(0, toMinutes(end) - toMinutes(start));
-        return normalizeBlockForCompare({ type, start, dur, goalMin: goalInput ? goalInput.value : 0 });
-      });
-    }
-
-    // BUG-005 (QA ) — Antes, un bloque con Fin <= Inicio (cruza medianoche, ej. 22:00–06:00, o Fin igual a Inicio por error de tecleo) se descartaba EN SILENCIO:
-    function blockRowsCrossingMidnight() {
-      const rows = document.querySelectorAll('#blocksEditorList .block-row');
-      const offenders = [];
-      Array.from(rows).forEach((row, i) => {
-        const typeInput = row.querySelector('.block-type-input');
-        const startInput = row.querySelector('.block-start-input');
-        const endInput = row.querySelector('.block-end-input');
-        if (!startInput || !endInput) return;
-        const start = formatHHMM(startInput.value);
-        const end = formatHHMM(endInput.value);
-        if (toMinutes(end) <= toMinutes(start)) {
-          const type = BLOCK_TYPE_LABELS[typeInput ? typeInput.value : ''] ? typeInput.value : 'work';
-          offenders.push({ index: i, typeLabel: BLOCK_TYPE_LABELS[type], start, end });
-        }
-      });
-      return offenders;
-    }
-
-    function blockCrossingMidnightMessage(offenders) {
-      const first = offenders[0];
-      const extra = offenders.length > 1 ? ` (y ${offenders.length - 1} más)` : '';
-      return `${first.typeLabel} ${timeLabel(first.start)}–${timeLabel(first.end)} cruza la medianoche${extra} — todavía no se soporta. Divide el bloque en dos (ej. ${timeLabel(first.start)}–11:59 PM y 12:00–${timeLabel(first.end)} AM del día siguiente) o ajusta la hora.`;
-    }
-
-    // "+ Agregar bloque": toma lo que ya está en el formulario (para no perder ediciones a medio hacer en filas existentes) y le agrega una fila nueva al final. Pedido del usuario :
-
-    // Pedido del usuario ("qué más sería buena idea que se hiciera automático al agregar un bloque"): antes Tipo/Duración del bloque nuevo eran SIEMPRE fijos (Break, 15 min), sin importar qué venía antes ni cuánto turno quedaba
-
-    // Tipo sugerido para el próximo bloque — ver comentario de v289 arriba
-    // para el criterio completo.
-    function suggestNextBlockType(current, lastEndingBlock, newStart) {
-      if (!current.length || !lastEndingBlock) return 'work';
-      if (lastEndingBlock.type !== 'work') return 'work';
-      const hasLunch = current.some(b => b.type === 'lunch');
-      if (!hasLunch) {
-        const dayStartVal = document.getElementById('dayStartInput')?.value;
-        const dayEndVal = document.getElementById('dayEndInput')?.value;
-        if (dayStartVal && dayEndVal) {
-          const startMin = toMinutes(formatHHMM(dayStartVal));
-          const endMin = toMinutes(formatHHMM(dayEndVal));
-          if (endMin > startMin) {
-            const midpointMin = startMin + (endMin - startMin) / 2;
-            if (toMinutes(newStart) >= midpointMin) return 'lunch';
-          }
-        }
-      }
-      return 'break';
-    }
-
-    // Duración sugerida para el próximo bloque — ver comentario de v289
-    // arriba para el criterio completo (tope de 130 min en Trabajo, y
-    // recorte para no sugerir pasarse del fin del turno).
-    function suggestNextBlockDuration(type, newStart) {
-      const dayEndVal = document.getElementById('dayEndInput')?.value;
-      const dayEndMin = dayEndVal ? toMinutes(formatHHMM(dayEndVal)) : null;
-      const remainingMin = dayEndMin !== null ? dayEndMin - toMinutes(newStart) : null;
-      let dur = type === 'lunch' ? 50 : type === 'break' ? 15 : 130;
-      if (remainingMin !== null && remainingMin > 0) dur = Math.min(dur, remainingMin);
-      return dur;
-    }
-
-    function addBlockRow() {
-      const current = readBlocksFromEditor();
-      let newStart = '09:00';
-      let lastEndingBlock = null;
-      if (current.length) {
-        let maxEnd = -Infinity;
-        current.forEach(b => {
-          const end = toMinutes(b.start) + b.dur;
-          if (end > maxEnd) { maxEnd = end; lastEndingBlock = b; }
-        });
-        newStart = minutesToHHMM(maxEnd);
-      }
-      const type = suggestNextBlockType(current, lastEndingBlock, newStart);
-      const dur = suggestNextBlockDuration(type, newStart);
-      current.push({ type, start: newStart, dur });
-      renderBlocksEditor(current);
-
-      // Pedido del usuario: si la lista de bloques ya es larga, el bloque recién agregado (siempre al final) puede caer fuera de la vista — se desliza la pantalla hasta él. `block:
-      const newRow = document.querySelector(`#blocksEditorList .block-row[data-block-row="${current.length - 1}"]`);
-      if (newRow && newRow.scrollIntoView) {
-        newRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
-    }
-
-    // Eliminar una fila: se relee el estado actual del formulario (para no perder ediciones de las OTRAS filas) y se vuelve a pintar sin la fila quitada.
-    function removeBlockRowAt(idx) {
-      const current = readBlocksFromEditor();
-      current.splice(idx, 1);
-      renderBlocksEditor(current);
-    }
-
-    // Habilita/deshabilita los campos del día (Día libre, Inicio, Fin, bloques + "+ Agregar bloque") y los botones de copiar/guardar
-    function setScheduleFormDisabled(disabled) {
-      ['dayOffInput', 'dayStartInput', 'dayEndInput', 'addBlockBtn', 'copyDayToAllBtn', 'copyWeekendBtn', 'saveShiftWindowBtn', 'scheduleOffsetMinusBtn', 'scheduleOffsetPlusBtn', 'scheduleOffsetApplyBtn'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.disabled = disabled;
-      });
-      const list = document.getElementById('blocksEditorList');
-      if (list) list.querySelectorAll('input, select, button').forEach(el => { el.disabled = disabled; });
-    }
-
-    // Pedido del usuario: "Plantilla" y "Semana específica" se veían casi idénticas (mismo formulario)
-    function syncScheduleModeBanner(isWeekMode, hasCustom = false) {
-      const accordion = document.getElementById('scheduleConfigAccordion');
-      const banner = document.getElementById('scheduleModeBanner');
-      const bannerText = document.getElementById('scheduleModeBannerText');
-      const bannerIcon = banner ? banner.querySelector('.sched-mode-banner-icon') : null;
-      if (accordion) accordion.classList.toggle('sched-week-active', isWeekMode && hasCustom);
-      if (!banner || !bannerText || !bannerIcon) return;
-      if (!isWeekMode) {
-        banner.className = 'sched-mode-banner tone-template';
-        bannerIcon.innerHTML = iconHtml('repeat');
-        bannerText.textContent = 'Editando tu horario de siempre — se repite cada semana.';
-      } else if (!hasCustom) {
-        banner.className = 'sched-mode-banner tone-template';
-        bannerIcon.innerHTML = iconHtml('eye');
-        bannerText.textContent = 'Viendo tu plantilla como referencia — activa "Personalizar esta semana" para editar solo esta semana.';
-      } else {
-        const weekStart = scheduleWeekStartDate(scheduleWeekOffset);
-        const weekEnd = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + 6);
-        banner.className = 'sched-mode-banner tone-week';
-        bannerIcon.innerHTML = iconHtml('calendar');
-        bannerText.textContent = `Editando SOLO ${formatWeekRangeLabel(weekStart, weekEnd)} — tu plantilla no se toca.`;
-      }
-    }
-
-    function syncScheduleWeekNavUI() {
-      const nav = document.getElementById('scheduleWeekNav');
-      if (!nav) return;
-      const isWeekMode = scheduleViewMode === 'week';
-      nav.style.display = isWeekMode ? '' : 'none';
-      document.querySelectorAll('#scheduleModeTabs .day-tab').forEach(btn => {
-        btn.classList.toggle('active', btn.getAttribute('data-mode') === scheduleViewMode);
-      });
-      // Bug reportado por el usuario ("ninguno de los horarios que quiero hacer me funciona", en ambos modos):
-      if (!isWeekMode) {
-        setScheduleFormDisabled(false);
-        syncScheduleModeBanner(false);
-        return;
-      }
-
-      const weekStart = scheduleWeekStartDate(scheduleWeekOffset);
-      const weekEnd = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + 6);
-      const rangeLabel = document.getElementById('scheduleWeekRangeLabel');
-      if (rangeLabel) {
-        rangeLabel.textContent = `${scheduleWeekOffset === 0 ? 'Semana actual · ' : ''}${formatWeekRangeLabel(weekStart, weekEnd)}`;
-      }
-
-      const isPast = scheduleWeekIsPast(scheduleWeekOffset);
-      const hasCustom = scheduleWeekHasCustom(scheduleWeekOffset);
-      const customInput = document.getElementById('scheduleWeekCustomInput');
-      const lockedNote = document.getElementById('scheduleWeekLockedNote');
-      if (customInput) {
-        customInput.checked = hasCustom;
-        customInput.disabled = isPast;
-      }
-      if (lockedNote) lockedNote.style.display = isPast ? '' : 'none';
-
-      // Editable solo si: no está protegida por pasada, Y ya se activó
-      // "Personalizar esta semana" (si no, se está viendo la plantilla nada
-      // más como referencia, de solo lectura, hasta que se active).
-      setScheduleFormDisabled(isPast || !hasCustom);
-      syncScheduleModeBanner(true, hasCustom);
-    }
-
-    function syncShiftModalFields() {
-      ensureWeeklySchedule();
-      const target = activeScheduleTarget();
-      const cfg = target[scheduleEditDay] || defaultDaySchedule(true);
-      const dayOffInput = document.getElementById('dayOffInput');
-      const startInput = document.getElementById('dayStartInput');
-      const endInput = document.getElementById('dayEndInput');
-      const lateSelect = document.getElementById('lateArrivalModeInput');
-      const blocks = Array.isArray(cfg.blocks) ? cfg.blocks : [];
-
-      if (dayOffInput) dayOffInput.checked = !!cfg.off;
-      if (startInput) startInput.value = formatHHMM(cfg.start || '07:00');
-      if (endInput) endInput.value = formatHHMM(cfg.end || '16:00');
-      // Pedido del usuario: título de la tarjeta de cabecera del día muestra el NOMBRE COMPLETO del día activo (ver `.sched-day-card- title` en el CSS/HTML)
-      const schedDayCardTitle = document.getElementById('schedDayCardTitle');
-      if (schedDayCardTitle) schedDayCardTitle.textContent = WEEKDAY_LABELS[scheduleEditDay] || 'Lunes';
-      renderBlocksEditor(blocks);
-      if (lateSelect) lateSelect.value = settings.lateArrivalMode || 'anchor';
-      // Pedido del usuario (v147): Adherencia vuelve a Horario (pasó por
-      // Avisos en v145 y por Ajustes en v146) — global, no depende de
-      // scheduleEditDay, mismo criterio que ya usaba antes de v145.
-      const adherenceGraceMinInput = document.getElementById('adherenceGraceMinInput');
-      if (adherenceGraceMinInput && document.activeElement !== adherenceGraceMinInput) adherenceGraceMinInput.value = settings.adherenceGraceMin;
-      const adherenceGoalPctInput = document.getElementById('adherenceGoalPctInput');
-      if (adherenceGoalPctInput && document.activeElement !== adherenceGoalPctInput) adherenceGoalPctInput.value = settings.adherenceGoalPct;
-      renderDayTabs();
-      syncScheduleWeekNavUI();
-      // El ajuste de turno es por-visita, no por-día: cambiar de día (o de semana) sin haber tocado "Aplicar a todos" debe dejarlo en 0:00 para el día nuevo, no arrastrar el valor del día anterior.
-      scheduleOffsetMin = 0;
-      syncScheduleOffsetUI();
-    }
+    export let scheduleViewMode = 'template';
+    export let scheduleWeekOffset = 0;
 
     // Pedido del usuario : Volumen/Avisos con sonido/Adherencia/ Descanso por productividad salieron de Horario — no son horario, son cómo y cuándo te avisa la app.
     function syncNotificationsModalFields() {
@@ -5317,190 +4910,9 @@ function renderPayDatesSection() {
       renderHigherRateWindowsEditor(settings.higherRateWindows || []);
     }
 
-    function readScheduleFormAsConfig() {
-      const dayOffInput = document.getElementById('dayOffInput');
-      const startInput = document.getElementById('dayStartInput');
-      const endInput = document.getElementById('dayEndInput');
-      if (!startInput || !endInput) return null;
-      return {
-        off: dayOffInput ? dayOffInput.checked : false,
-        start: formatHHMM(startInput.value),
-        end: formatHHMM(endInput.value),
-        blocks: readBlocksFromEditor(),
-      };
-    }
-
-    // Bug reportado por el usuario: "Guardar día"/"Copiar a todos los días" parecían no hacer nada. Causa real:
-    function scheduleFormIsDirty() {
-      const cfg = readScheduleFormAsConfig();
-      if (!cfg) return false;
-      const stored = activeScheduleTarget()[scheduleEditDay];
-      // Mismo normalizeBlockForCompare que ya usa readBlocksFromEditor (ver ahí) — necesario desde que los bloques de Trabajo llevan `goalMin` (Meta de Productividad):
-      const storedBlocks = (stored && Array.isArray(stored.blocks) ? stored.blocks : [])
-        .map(normalizeBlockForCompare);
-      const storedNormalized = {
-        off: !!(stored && stored.off),
-        start: formatHHMM((stored && stored.start) || '07:00'),
-        end: formatHHMM((stored && stored.end) || '16:00'),
-        blocks: storedBlocks,
-      };
-      const lateSelect = document.getElementById('lateArrivalModeInput');
-      const lateDirty = !!lateSelect && lateSelect.value !== (settings.lateArrivalMode || 'anchor');
-      return lateDirty || JSON.stringify(cfg) !== JSON.stringify(storedNormalized);
-    }
-
-    function minutesToHHMM(mins) {
+    export function minutesToHHMM(mins) {
       const m = ((Math.round(mins) % 1440) + 1440) % 1440;
       return `${pad(Math.floor(m / 60))}:${pad(m % 60)}`;
-    }
-
-    // Valida que TODOS los bloques del día (Trabajo/Break/Lunch, unificados en cfg.blocks) (a) queden dentro de la ventana de turno (inicio–fin) y (b) no se crucen entre sí
-    function validateDayConfig(cfg) {
-      const errors = [];
-      if (!cfg || cfg.off) return { valid: true, errors };
-
-      const dayStart = toMinutes(formatHHMM(cfg.start));
-      const dayEnd = toMinutes(formatHHMM(cfg.end));
-      if (dayEnd <= dayStart) {
-        errors.push('La hora de fin debe ser después del inicio del turno.');
-        return { valid: false, errors };
-      }
-
-      const typeLabel = { work: 'Trabajo', break: 'Break', lunch: 'Lunch' };
-      const counters = { work: 0, break: 0, lunch: 0 };
-      const segments = [];
-      (Array.isArray(cfg.blocks) ? cfg.blocks : []).forEach((b) => {
-        if (!b || !(Number(b.dur) > 0) || !b.start) return;
-        const type = String(b.type || '').toLowerCase();
-        if (!typeLabel[type]) return;
-        counters[type] += 1;
-        const s = toMinutes(formatHHMM(b.start));
-        const label = `${typeLabel[type]} ${counters[type]}`;
-        segments.push({ label, start: s, end: s + Number(b.dur) });
-        // Pedido del usuario: Meta de Productividad por bloque no puede ser
-        // mayor que la propia duración del bloque — no tendría sentido
-        // pedir más minutos productivos de los que el bloque dura.
-        if (type === 'work') {
-          const goalMin = Number(b.goalMin) || 0;
-          if (goalMin > Number(b.dur)) {
-            errors.push(`${label}: la meta productiva (${formatMinutes(goalMin)} min) no puede ser mayor que la duración del bloque (${formatMinutes(Number(b.dur))} min).`);
-          }
-        }
-      });
-
-      segments.forEach(seg => {
-        if (seg.start < dayStart || seg.end > dayEnd) {
-          errors.push(`${seg.label} (${timeLabel(minutesToHHMM(seg.start))}–${timeLabel(minutesToHHMM(seg.end))}) queda fuera del turno (${timeLabel(cfg.start)}–${timeLabel(cfg.end)}).`);
-        }
-      });
-
-      for (let i = 0; i < segments.length; i++) {
-        for (let j = i + 1; j < segments.length; j++) {
-          const a = segments[i], b = segments[j];
-          if (a.start < b.end && b.start < a.end) {
-            errors.push(`${a.label} y ${b.label} se cruzan.`);
-          }
-        }
-      }
-
-      return { valid: errors.length === 0, errors };
-    }
-
-    // Pedido del usuario : "Guardar día" debe guardar SOLO el día que se está editando
-    function saveShiftWindow() {
-      if (scheduleViewMode === 'week' && scheduleWeekIsPast(scheduleWeekOffset)) return; // protegido, no debería llegar aquí (botón deshabilitado)
-      // BUG-005 (QA ) — ver blockRowsCrossingMidnight: antes de leer los bloques (y perder la hora de Fin al colapsarla a `dur`), se revisa si alguno cruza medianoche y se bloquea el guardado con un mensaje e…
-      const midnightOffenders = blockRowsCrossingMidnight();
-      if (midnightOffenders.length) {
-        toast(blockCrossingMidnightMessage(midnightOffenders));
-        return;
-      }
-      const cfg = readScheduleFormAsConfig();
-      if (!cfg) return;
-      const check = validateDayConfig(cfg);
-      if (!check.valid) {
-        toast(check.errors[0]);
-        return;
-      }
-      const target = activeScheduleTarget({ createIfMissing: true });
-      target[scheduleEditDay] = cfg;
-      if (scheduleViewMode === 'template') {
-        const lateSelect = document.getElementById('lateArrivalModeInput');
-        if (lateSelect) settings.lateArrivalMode = lateSelect.value;
-        // mantiene shiftStart/shiftEnd viejos sincronizados por compatibilidad, sin usarlos ya para dibujar bloques
-        settings.shiftStart = cfg.start;
-        settings.shiftEnd = cfg.end;
-      }
-      saveSettingsOnly();
-      saveAll();
-      renderDayTabs();
-      toast(scheduleViewMode === 'week'
-        ? `Horario de ${WEEKDAY_LABELS[scheduleEditDay]} guardado para esa semana`
-        : `Horario de ${WEEKDAY_LABELS[scheduleEditDay]} guardado`);
-    }
-
-    // Pedido del usuario: "Copiar a todos los días" pasa a significar SOLO Lunes-Viernes
-    function copyDayToAll() {
-      if (scheduleViewMode === 'week' && scheduleWeekIsPast(scheduleWeekOffset)) return;
-      // BUG-005 — ver comentario en saveShiftWindow().
-      const midnightOffendersAll = blockRowsCrossingMidnight();
-      if (midnightOffendersAll.length) {
-        toast(blockCrossingMidnightMessage(midnightOffendersAll));
-        return;
-      }
-      const cfg = readScheduleFormAsConfig();
-      if (!cfg) return;
-      const check = validateDayConfig(cfg);
-      if (!check.valid) {
-        toast(check.errors[0]);
-        return;
-      }
-      const scope = scheduleViewMode === 'week' ? 'de esa semana' : '';
-      appConfirm(`¿Copiar este horario (${WEEKDAY_LABELS[scheduleEditDay]}) a Lunes-Viernes ${scope}? Esto sobreescribe Lunes a Viernes — Sábado y Domingo no se tocan.`, () => {
-        const target = activeScheduleTarget({ createIfMissing: true });
-        target[scheduleEditDay] = cfg;
-        WEEKDAYS.filter(k => k !== 'sat' && k !== 'sun').forEach(k => {
-          target[k] = {
-            off: cfg.off,
-            start: cfg.start,
-            end: cfg.end,
-            blocks: cfg.blocks.map(b => ({ ...b })),
-          };
-        });
-        saveSettingsOnly();
-        saveAll();
-        renderDayTabs();
-        toast(`Horario copiado a Lunes-Viernes ${scope}`.trim());
-      });
-    }
-
-    // Pedido del usuario : botón propio "Copiar a Sábado-Domingo", mismo patrón/nivel que "Copiar a Lunes-Viernes" (copyDayToAll)
-    function copyDayToWeekend() {
-      if (scheduleViewMode === 'week' && scheduleWeekIsPast(scheduleWeekOffset)) return;
-      // BUG-005 — ver comentario en saveShiftWindow().
-      const midnightOffendersWeekend = blockRowsCrossingMidnight();
-      if (midnightOffendersWeekend.length) {
-        toast(blockCrossingMidnightMessage(midnightOffendersWeekend));
-        return;
-      }
-      const cfg = readScheduleFormAsConfig();
-      if (!cfg) return;
-      const check = validateDayConfig(cfg);
-      if (!check.valid) {
-        toast(check.errors[0]);
-        return;
-      }
-      const scope = scheduleViewMode === 'week' ? 'de esa semana' : '';
-      appConfirm(`¿Copiar este horario (${WEEKDAY_LABELS[scheduleEditDay]}) a Sábado y Domingo ${scope}? Esto sobreescribe Sábado y Domingo — el resto de los días no se tocan.`, () => {
-        const target = activeScheduleTarget({ createIfMissing: true });
-        target[scheduleEditDay] = cfg;
-        target.sat = { off: cfg.off, start: cfg.start, end: cfg.end, blocks: cfg.blocks.map(b => ({ ...b })) };
-        target.sun = { off: cfg.off, start: cfg.start, end: cfg.end, blocks: cfg.blocks.map(b => ({ ...b })) };
-        saveSettingsOnly();
-        saveAll();
-        renderDayTabs();
-        toast(`Horario copiado a Sábado y Domingo ${scope}`.trim());
-      });
     }
 
     // Pedido del usuario: el ciclo de pago (ver cycleBoundsForDate) debe ser ajustable desde Horario. A diferencia del horario por día, esto se guarda solo al cambiar (mismo patrón que dayOffInput), sin esperar a "Guardar día"
@@ -6406,7 +5818,6 @@ function renderPayDatesSection() {
       });
     }
 
-
     
 
 function renderHeader() {
@@ -6660,7 +6071,6 @@ function updateChipsScrollHint() {
   const overflows = chipsEl.scrollWidth > chipsEl.clientWidth + 1;
   chipsEl.classList.toggle('is-scrollable', overflows);
 }
-
 
 const gapLabels = ['acw', 'break', 'lunch', 'other'];
 let editingGapContext = null;
@@ -7287,7 +6697,6 @@ function renderBlockSummaryStrip(cards) {
   `;
 }
 
-
 function renderSchedule() {
       const dayKey = getActiveDayKey();
       const dayCalls = callsForDay(dayKey);
@@ -7593,7 +7002,6 @@ function renderSchedule() {
 
       renderBlockSummaryStrip(summaryCards);
 
-
       // Indicador en vivo — solo aplica viendo "Hoy" con el turno en curso.
       const adherenceLiveBadge = document.getElementById('adherenceLiveBadge');
       if (adherenceLiveBadge) {
@@ -7865,7 +7273,6 @@ function render() {
         .replaceAll('"', '&quot;')
         .replaceAll("'", '&#039;');
     }
-
 
     // Trampa de foco: sin esto el teclado podía escaparse de un modal abierto.
     let openModalStack = [];
@@ -8909,7 +8316,6 @@ function render() {
     document.getElementById('calHistoryStartModal').addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) saveCalHistoryStartModal();
     });
-
 
     if (!state.events.length && !state.shiftStartedAt && !calls.length) {
       state.events.push({ ts: new Date().toISOString(), type: 'system', title: 'Listo para empezar', detail: 'Inicia el shift para comenzar', meta: 'idle' });
