@@ -44,10 +44,10 @@ test('all pages load local external scripts without inline handlers', () => {
   }
 });
 
-test('CSP remains report-only with the required Supabase and asset origins', () => {
+test('enforced CSP contains the required Supabase and asset origins', () => {
   const headers = JSON.parse(read('vercel.json')).headers[0].headers;
-  assert.ok(!headers.some(h => h.key === 'Content-Security-Policy'));
-  const policy = headers.find(h => h.key === 'Content-Security-Policy-Report-Only').value;
+  assert.ok(!headers.some(h => h.key === 'Content-Security-Policy-Report-Only'));
+  const policy = headers.find(h => h.key === 'Content-Security-Policy').value;
   const directives = Object.fromEntries(policy.split(';').map(part => {
     const [key, ...values] = part.trim().split(/\s+/); return [key, values];
   }));

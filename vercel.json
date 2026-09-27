@@ -26,7 +26,7 @@
           "value": "max-age=63072000; includeSubDomains; preload"
         },
         {
-          "key": "Content-Security-Policy-Report-Only",
+          "key": "Content-Security-Policy",
           "value": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; script-src 'self' https://cdn.jsdelivr.net; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self' data: blob:; connect-src 'self' https://ccqlvcrsoluxoymuhxnl.supabase.co wss://ccqlvcrsoluxoymuhxnl.supabase.co; form-action 'self'; frame-src 'none'; worker-src 'self'"
         }
       ]

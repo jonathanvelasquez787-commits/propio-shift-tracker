@@ -218,13 +218,6 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
-- **CSP preparada, pendiente de aplicar bloqueo.** `vercel.json` envía
-  `Content-Security-Policy-Report-Only`: avisos locales de consola, sin endpoint
-  de reportes. Los scripts de tema/año y el evento de impresión ya no son
-  inline. Antes de pasar a `Content-Security-Policy`, verificar en preview los
-  accesos Google/correo/username, recuperación, retorno OAuth, sincronización,
-  perfil, audio y PDF con una cuenta real. Los estilos inline siguen permitidos
-  por la arquitectura actual. Ver `docs/security-policy.md`.
 - **`@supabase/supabase-js` pinchado a 2.45.4 desde jsDelivr**, sin lockfile.
   Para actualizar: subir el número en `js/supabase-client.js`, probar login +
   sincronización, y recién ahí desplegar.
@@ -338,6 +331,17 @@ Pendientes, en orden:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v564** — Content Security Policy activada.
+
+- `vercel.json` pasa de observación a `Content-Security-Policy` efectiva; el
+  navegador bloquea scripts, conexiones y recursos fuera de la lista permitida.
+- Prueba real completada con la cuenta existente: Google + retorno OAuth, carga
+  de perfil y datos, cambio/restauración del tema con "Guardado en la nube",
+  activación del sonido y generación del reporte PDF. Sin errores ni avisos del
+  navegador. No se enviaron contraseñas ni correos de recuperación.
+- La documentación y las pruebas automáticas reflejan la política activa.
+
+
 **v563** — Tokens de temas consolidados y preparación de CSP.
 
 - Los colores, superficies y sombras finales viven en las paletas de
@@ -363,14 +367,3 @@ sección "Tu perfil" permite cambiar username y correo.
   cuenta y se guardan con mensajes de validación/confirmación.
 - `app.html` precarga `js/settings.js`. El chequeo automático recorre ahora
   también Auth, Supabase y Config: once módulos locales en total.
-
-
-**v561** — Continuación de la Fase 3: Higher Rate se extrae de
-`js/app-main.js` a `js/higher-rate.js`.
-
-- El nuevo módulo concentra cálculo y desglose de bonos, editor de ventanas,
-  estado en vivo, historial y congelado de bonos ya ganados.
-- `js/app-main.js` conserva el modelo compartido y reexporta los helpers que
-  Finanzas, Calendario y Llamadas ya consumían a través del hub.
-- `app.html` precarga `js/higher-rate.js` y el chequeo automático valida ahora
-  siete módulos. Solo queda Ajustes para cerrar la extracción de páginas.

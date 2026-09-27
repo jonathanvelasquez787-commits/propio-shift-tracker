@@ -130,5 +130,5 @@ Software propietario. Ver [LICENSE](LICENSE).
 
 ## Política de seguridad
 
-CSP está en modo de observación (Report-Only). Alcance, orígenes permitidos y
-validación pendiente: [política de seguridad](docs/security-policy.md).
+CSP está activa. Alcance, orígenes permitidos y validación realizada:
+[política de seguridad](docs/security-policy.md).
