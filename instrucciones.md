@@ -218,13 +218,14 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
-Sin pendientes técnicos ni operativos abiertos en las fases 4 y 5. La
+Sin pendientes técnicos ni operativos abiertos en las fases 4, 5 y 6. La
 migración de producción está aplicada y validada en Supabase, y el repositorio
 de GitHub ya es privado.
-- **Fase 6 (El Monstruo): sin código todavía.** El mockup de la Arena
-  (monstruo a la DERECHA, arcade feroz, claro y oscuro) está hecho y espera
-  aprobación explícita del usuario antes de escribir HTML/CSS/JS. Faltan por
-  mockupear: modo "Solo sutil", jefe del ciclo y bestiario.
+- **Fase 6 (El Monstruo): cerrada.** Arena diaria, misiones, racha, combo,
+  nivel, cofres, récords, jefe del ciclo, Logros/bestiario, STAGE CLEAR y
+  ajustes están integrados, persistidos y cubiertos por pruebas. El usuario
+  delegó explícitamente las decisiones de producto restantes y autorizó
+  commit, push y despliegue a producción sin aprobaciones adicionales.
 
 **LIMITACIONES CONOCIDAS** (alcance reducido a propósito, no son bugs)
 
@@ -329,21 +330,19 @@ Pendientes, en orden:
   dinero ni navegación a Sentry u otro tercero. Hay rate limiting persistente
   para login y telemetría, y un backup diario con 30 días de retención. Borrado
   de cuenta y exportación de datos continúan disponibles.
-- **Fase 6 — El Monstruo (gamificación).** Ver sección siguiente. Módulo
-  nuevo `js/monsters.js` (hub-and-spoke, importa solo de `js/app-main.js`),
-  precargado con `modulepreload` en `app.html`.
+- **Fase 6 — El Monstruo (gamificación, CERRADA).** Ver sección siguiente.
+  `js/game.js` se integra por el hub `js/app-main.js`; `js/monsters.js` conserva
+  datos y SVG sin dependencias. Ambos quedan dentro del bundle de producción.
 
 ---
 
-**FASE 6 — GAMIFICACIÓN (EN DISEÑO)**
+**FASE 6 — GAMIFICACIÓN (CERRADA)**
 
-**Estado.** Solo hay mockups exploratorios y este mapa. Ninguna línea de
-código se toca hasta que (1) este mapa esté aprobado, (2) cada pantalla tenga
-su mockup visual claro+oscuro aprobado (protocolo de layout). Mockups ya
-vistos por el usuario: chips/avisos/Ajustes, tarjetas racha-nivel-combo-caja,
-llamada terminada + STAGE CLEAR + cofre, y la Arena en claro y oscuro con el
-monstruo a la derecha. Aún falta la aprobación explícita del conjunto y los
-mockups indicados al final de esta sección.
+**Estado.** Implementada de extremo a extremo en la versión 567. El usuario
+delegó las decisiones y autorizó completar la fase sin aprobaciones
+intermedias. La Arena, el modo Solo sutil, el jefe del ciclo, Logros/bestiario,
+Ajustes, avisos, STAGE CLEAR y cofre tienen estados claro, oscuro, móvil y
+`prefers-reduced-motion`.
 
 **Concepto central acordado: el monstruo del día.** La barra de "jefe final"
 pasa a ser un monstruo pixel-art con personalidad que reacciona a cada
@@ -558,15 +557,24 @@ queda", sin merge.
 - Fuente pixel local o fallback monoespaciado, sin agregar orígenes externos a la CSP. Solo para textos cortos.
 - Tema: paletas de `app.html` (claro índigo/morado, oscuro cian sobre azul marino); nada de colores nuevos fuera de tokens salvo el dorado del juego.
 
-**DECISIONES ABIERTAS (bloquean los mockups siguientes).**
-1. Criterio de estrellas: propuesto (nuevo) = armaduras rotas, 1 a 3. Alternativa anterior: 1 = cerrar turno, 2 = meta diaria, 3 = meta + adherencia.
-2. Definición exacta del combo (propuesto: minutos productivos continuos; Break/Lunch en horario lo pausan sin romperlo; se rompe con hueco "Otro" o desvío de adherencia mayor a la gracia).
-3. Página Logros propia vs. sección dentro de Reportes.
-4. Intensidad por defecto ("Arcade en logros" propuesto).
-5. Multiplicador de Modo Estrella (propuesto ×1.5) o solo visual.
-6. Reparto del tope de 150 XP entre adherencia/puntualidad/productividad/llamadas, curva de niveles, lista de accesorios y frecuencia de la caja "?".
-7. Tope de escudos y cómo se ganan además de E4.
-8. ~~Tono del monstruo~~ **RESUELTO: arcade feroz** (jefe de videojuego: cuernos, dientes, mirada enojada, armadura, fuente pixel, golpes con peso). Las frases y nombres de especies siguen ese tono.
+**DECISIONES CERRADAS.**
+1. Las estrellas representan armaduras/misiones completadas; un turno con
+   actividad obtiene al menos una. Un cierre sin llamadas es corto y da 0 XP.
+2. El combo es una cadena de llamadas productivas. Break/Lunch lo pausan y un
+   hueco clasificado como "Otro" lo rompe.
+3. Logros tiene página propia con racha, nivel, trofeos, bestiario, jefe del
+   ciclo y reapertura del último STAGE CLEAR.
+4. La intensidad predeterminada es "Arcade en logros"; también existen "Solo
+   sutil" y desactivada.
+5. Higher Rate aplica golpe crítico y multiplicador de XP de llamada ×1.5,
+   sin superar el tope diario.
+6. El tope visible es 150 XP/día: productividad 50, llamadas 30, adherencia
+   30, puntualidad 20 y misión total 20; los bonos respetan el mismo tope. La
+   curva de nivel es progresiva y las cajas aparecen cada cinco llamadas.
+7. Hay hasta tres escudos. Un backup semanal concede uno si hay espacio; los
+   días libres se omiten y un escudo consumido protege la racha.
+8. El tono es arcade feroz: cuernos, dientes, mirada enojada, armadura,
+   fuente pixel y golpes con peso. Las especies y frases siguen ese tono.
 
 **DECISIONES RESUELTAS 9-13.** Las especies y frases quedan fijadas en
 "Variedad"; Rey de la Racha aparece desde 7 días. Cofre y caja entregan
@@ -575,15 +583,28 @@ herido. El pop pertenece solo a la capa arcade. La Arena va debajo de
 `#earningsTagsRow`, antes de `.gh-goal-card`, y reemplaza visualmente esa
 tarjeta cuando la intensidad no es Solo sutil.
 
-**Mockups pendientes, en este orden.** (1) Inicio en modo Solo sutil, chips,
-misiones/armaduras, sombra de ayer y jefe del ciclo; (2) página Logros con
-bestiario y jefe del ciclo; (3) Ajustes: sección Gamificación; (4) cola de
-avisos en claro/oscuro/mobile; (5) aprobación final de la Arena, STAGE CLEAR y
-cofre ya hechos.
+**Validación visual cerrada.** Inicio en modo Solo sutil y Arcade, chips,
+misiones/armaduras, sombra de ayer, jefe del ciclo, Logros/bestiario, Ajustes,
+cola de avisos, Arena, STAGE CLEAR y cofre forman el conjunto final de la fase.
 
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v567** — Fase 6 «El Monstruo» cerrada.
+
+- Arena diaria determinista con seis especies SVG y estados de sueño, alerta,
+  furia, herido y derrotado; HP ligado a la meta en USD y conversión visible.
+- XP no negativo con tope diario de 150, niveles, combo, racha, escudos,
+  misiones, cajas cada cinco llamadas, récords semanales y cofre diferido.
+- STAGE CLEAR congela el resultado del día; después de derrotar al monstruo
+  continúan las ganancias, pero no entra XP adicional.
+- Página Logros con bestiario, trofeos y jefe del ciclo; ajustes Arcade/Sutil/
+  Desactivada, tema claro/oscuro, móvil y movimiento reducido.
+- Estado aditivo en `state.game`, ajustes en `settings.game`, sin migración de
+  esquema. Importaciones históricas/tardías y descartes no conceden XP.
+- Verificados tests, contratos de módulos, sintaxis, build y bundle de
+  producción sin sourcemaps ni módulos fuente.
 
 **v566** — Fases 4 y 5 cerradas.
 
@@ -609,21 +630,6 @@ cofre ya hechos.
   activación del sonido y generación del reporte PDF. Sin errores ni avisos del
   navegador. No se enviaron contraseñas ni correos de recuperación.
 - La documentación y las pruebas automáticas reflejan la política activa.
-
-
-**v563** — Tokens de temas consolidados y preparación de CSP.
-
-- Los colores, superficies y sombras finales viven en las paletas de
-  `app.html`; `app-shell.css` conserva reglas de componentes, sin sobrescribir
-  tokens. El sidebar usa el acento común de cada tema.
-- `theme-init.js` aplica el tema antes del primer pintado en las cuatro páginas;
-  `footer-year.js` actualiza el año en las páginas públicas. El botón del reporte
-  PDF registra su evento desde JavaScript.
-- CSP en modo Report-Only; la activación efectiva y la validación autenticada
-  quedan pendientes, con alcance y orígenes documentados.
-- Verificados 11 tests automáticos, imports/exports de 11 módulos y sintaxis de
-  18 archivos JS. Comparación en navegador del marcado estático: 0 diferencias
   en estilos visibles, claro/oscuro a 1440 y 390 px; páginas legales verificadas
   con CSP aplicada en una prueba local. No se probaron accesos con cuenta real.
-
 
