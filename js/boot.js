@@ -7,6 +7,7 @@
 // correctos: la app nunca llega a montarse con datos de nadie más ni con datos viejos.
 
 import { getSupabase, isConfigured } from './supabase-client.js';
+import './monitoring.js';
 import { getProfile, signOut } from './auth.js';
 import {
   BOOT,
@@ -142,7 +143,7 @@ function askConflict({ localSummary, cloudSummary, cloud }) {
 async function mountApp() {
   document.body.classList.add('app-ready');
   try {
-    await import('/js/app-main.js');
+    await import('./app-main.js');
   } catch (err) {
     console.error('boot: no se pudo importar app-main.js', err);
     fail('No se pudo cargar la app. ' + (err && err.message ? err.message : String(err)));

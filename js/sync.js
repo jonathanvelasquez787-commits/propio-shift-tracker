@@ -3,11 +3,11 @@
 // Premisa: la app NO se toca. Sigue guardando en localStorage en cada acción,
 // así que sigue funcionando sin internet. Esta capa se limita a:
 //   1. hidratar localStorage desde la nube ANTES de que la app arranque, y
-//   2. subir un snapshot completo cuando deja de haber cambios por unos segundos.
+//   2. subir estado/ajustes y solo los cambios de llamadas cuando deja de haber
+//      actividad por unos segundos.
 //
-// Por qué snapshot completo y no diffs: las 3 claves de localStorage son el
-// modelo entero de la app y pesan pocos MB al año. Un diff obligaría a
-// reescribir cómo guarda la app — justo lo que esta fase evita.
+// La app sigue usando snapshots locales para mantener el modo sin conexión. En
+// la nube las llamadas se normalizan y se envían como altas, cambios y bajas.
 
 import { getSupabase } from './supabase-client.js';
 import { DATA_SCHEMA_VERSION, SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
@@ -27,6 +27,7 @@ let pushTimer = null;
 let maxWaitTimer = null;
 let pushing = false;
 let listeners = [];
+let cloudCallHashes = new Map();
 
 // ---------------------------------------------------------------------------
 // Metadata local de sincronización
@@ -239,23 +240,73 @@ export async function fetchCloud(userId) {
     .eq('user_id', userId)
     .maybeSingle();
   if (error) throw error;
-  return data || null;
+  if (!data) return null;
+
+  const { data: callRows, error: callsError } = await getSupabase()
+    .from('calls')
+    .select('call_id, payload')
+    .eq('user_id', userId);
+
+  if (callsError) {
+    // Compatibilidad durante el despliegue: antes de aplicar la migración
+    // 0003 la tabla aún no existe y las llamadas siguen dentro de user_data.
+    cloudCallHashes = hashesForCalls(data.calls || []);
+    return data;
+  }
+
+  const normalizedCalls = (callRows || []).map((row) => row.payload).filter(Boolean);
+  cloudCallHashes = hashesForCalls(normalizedCalls);
+  return { ...data, calls: normalizedCalls };
+}
+
+function hashesForCalls(callList) {
+  const hashes = new Map();
+  (Array.isArray(callList) ? callList : []).forEach((call) => {
+    if (call && call.id !== undefined && call.id !== null) hashes.set(String(call.id), stableJson(call));
+  });
+  return hashes;
+}
+
+function callDelta(callList) {
+  const current = new Map();
+  const upserts = [];
+  (Array.isArray(callList) ? callList : []).forEach((call) => {
+    if (!call || call.id === undefined || call.id === null) return;
+    const id = String(call.id);
+    const hash = stableJson(call);
+    current.set(id, hash);
+    if (cloudCallHashes.get(id) !== hash) upserts.push(call);
+  });
+  const deletes = [...cloudCallHashes.keys()].filter((id) => !current.has(id));
+  return { current, upserts, deletes };
 }
 
 export async function pushSnapshot({ force = false } = {}) {
   if (pushing) return { skipped: true };
   const meta = readMeta();
   const snapshot = readLocalSnapshot();
+  const delta = callDelta(snapshot.calls);
   pushing = true;
   try {
-    const { data, error } = await getSupabase().rpc('push_user_data', {
+    let { data, error } = await getSupabase().rpc('push_user_data_v2', {
       p_state: snapshot.state,
-      p_calls: snapshot.calls,
       p_settings: snapshot.settings,
+      p_call_upserts: delta.upserts,
+      p_call_deletes: delta.deletes,
       p_expected_updated_at: force ? null : meta.lastSyncedUpdatedAt,
       p_device_id: deviceId(),
       p_device_label: deviceLabel(),
     });
+    if (error && /push_user_data_v2|schema cache/i.test(error.message || '')) {
+      ({ data, error } = await getSupabase().rpc('push_user_data', {
+        p_state: snapshot.state,
+        p_calls: snapshot.calls,
+        p_settings: snapshot.settings,
+        p_expected_updated_at: force ? null : meta.lastSyncedUpdatedAt,
+        p_device_id: deviceId(),
+        p_device_label: deviceLabel(),
+      }));
+    }
     if (error) throw error;
 
     if (data && data.conflict) {
@@ -268,6 +319,7 @@ export async function pushSnapshot({ force = false } = {}) {
       dirty: false,
       lastPushAt: new Date().toISOString(),
     });
+    cloudCallHashes = delta.current;
     emit('pushed', { updatedAt: data ? data.updated_at : null });
     return { ok: true, updatedAt: data ? data.updated_at : null };
   } catch (err) {
@@ -290,8 +342,9 @@ function flushOnExit() {
   const token = currentAccessToken();
   if (!token) return;
   const snapshot = readLocalSnapshot();
+  const delta = callDelta(snapshot.calls);
   try {
-    fetch(`${SUPABASE_URL}/rest/v1/rpc/push_user_data`, {
+    fetch(`${SUPABASE_URL}/rest/v1/rpc/push_user_data_v2`, {
       method: 'POST',
       keepalive: true,
       headers: {
@@ -301,8 +354,9 @@ function flushOnExit() {
       },
       body: JSON.stringify({
         p_state: snapshot.state,
-        p_calls: snapshot.calls,
         p_settings: snapshot.settings,
+        p_call_upserts: delta.upserts,
+        p_call_deletes: delta.deletes,
         p_expected_updated_at: meta.lastSyncedUpdatedAt,
         p_device_id: deviceId(),
         p_device_label: deviceLabel(),
@@ -477,6 +531,7 @@ export function adoptLocal(userId) {
 }
 
 export function resetForUser(userId) {
+  cloudCallHashes = new Map();
   clearLocalAppData();
   try {
     window.localStorage.removeItem(META_KEY);

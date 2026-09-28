@@ -12,7 +12,7 @@ Esta versión es el salto de "un archivo HTML en localStorage" a
 
 ```
 index.html            Landing pública + los 3 métodos de entrada
-app.html               La app completa — marcado y estilos, se edita directamente, sin build
+app.html               Marcado y estilos fuente; Vercel publica el bundle de public/
 privacidad.html        Política de privacidad
 terminos.html          Términos de uso
 
@@ -31,6 +31,8 @@ js/
   landing.js              Pestañas, registro, recuperación, sesión activa
   sync.js                 localStorage ↔ Supabase, con control de conflictos
   boot.js                 Gate de sesión, hidratación y montaje de la app
+  monitoring.js           Telemetría privada de errores
+  service-worker.js       Shell offline e instalación PWA
   app-main.js              Cuerpo principal de la app (Inicio, Horario, Llamadas...)
   finance.js               Página Finanzas (Gastos, Metas, categorías propias)
   reports.js                Página Reportes (KPIs, gráfico mensual, racha...)
@@ -42,10 +44,12 @@ js/
 
 api/
   login.js               Traduce usuario → correo del lado del servidor
+  telemetry.js           Registra errores saneados
   delete-account.js      Borra la cuenta entera (necesita service_role)
 
 supabase/migrations/
   0001_init.sql          Tablas, RLS, triggers y funciones. Se corre una vez.
+  0003_phase_5.sql       Calls normalizadas, rate limit y backup diario
 
 tests/security-preparation.test.mjs  Pruebas de tema, CSP y reporte PDF
 ```
@@ -96,11 +100,11 @@ devuelve la sesión.
 Por eso también el error de login es **siempre el mismo**, exista o no la
 cuenta: responder distinto sería el mismo problema por otra puerta.
 
-### Por qué el blob y no tablas por entidad
+### Persistencia local y normalizada
 
-`user_data` guarda `state`, `calls` y `settings` como tres `jsonb`: el
-equivalente exacto de las tres claves de `localStorage`. Un año de llamadas
-son unos pocos MB.
+La app conserva `state`, `calls` y `settings` en `localStorage` para funcionar
+offline. En Supabase, `user_data` guarda estado y ajustes; la tabla `calls`
+guarda una fila por llamada. `sync.js` compara hashes y envía solo los cambios.
 
 ### Por qué nunca hay merge automático
 
@@ -183,13 +187,14 @@ encuentre el problema exacto sin tener que adivinar.
 # Comprobaciones automáticas (las ejecuta el agente)
 npm test
 npm run check:modules
+npm run build
 ```
 
 Para probar en local hace falta un servidor HTTP de verdad: los módulos ES no
 cargan desde `file://`.
 
 ```bash
-python3 -m http.server 3000
+python3 -m http.server 3000 --directory public
 # luego: http://localhost:3000
 ```
 

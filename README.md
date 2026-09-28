@@ -12,7 +12,7 @@ Esta versión es el salto de "un archivo HTML en localStorage" a
 
 ```
 index.html            Landing pública + los 3 métodos de entrada
-app.html               La app completa — se edita directamente, sin build
+app.html               Marcado y estilos fuente de la app
 privacidad.html        Política de privacidad
 terminos.html          Términos de uso
 
@@ -31,25 +31,31 @@ js/
   landing.js              Pestañas, registro, recuperación, sesión activa
   sync.js                 localStorage ↔ Supabase, con control de conflictos
   boot.js                 Gate de sesión, hidratación y montaje de la app
+  monitoring.js           Captura errores sin enviar datos a terceros
+  service-worker.js       PWA y caché offline del shell
 
 api/
   login.js               Traduce usuario → correo del lado del servidor
+  telemetry.js           Recibe errores saneados y limitados por IP
   delete-account.js      Borra la cuenta entera (necesita service_role)
 
 supabase/migrations/
   0001_init.sql          Tablas, RLS, triggers y funciones. Se corre una vez.
+  0003_phase_5.sql       Llamadas, límites, telemetría y backup diario
 
-tests/security-preparation.test.mjs  Pruebas de tema, CSP y reporte PDF
+scripts/build.mjs         Bundle Rollup + minificación Terser, sin sourcemaps
+tests/security-preparation.test.mjs  Pruebas de seguridad, PWA y datos
 ```
 
 ---
 
 ## Cómo se edita `app.html`
 
-`app.html` es un único archivo y es la fuente de verdad. No hay un archivo
-de referencia aparte ni un script que lo genere — eso se retiró a propósito,
-porque exigía verificación byte por byte y correr un script en terminal, algo
-que no hace falta para mantener este proyecto.
+`app.html` sigue siendo la fuente de verdad del marcado y los estilos. Los
+módulos de `js/` son la fuente de verdad de la lógica. Vercel ejecuta
+`scripts/build.mjs`: Rollup empaqueta el cliente de Supabase y la app, y Terser
+minifica el resultado sin sourcemaps. Solo `public/` se publica; los módulos
+fuente no quedan expuestos como archivos navegables.
 
 Flujo de trabajo:
 
@@ -87,11 +93,12 @@ devuelve la sesión.
 Por eso también el error de login es **siempre el mismo**, exista o no la
 cuenta: responder distinto sería el mismo problema por otra puerta.
 
-### Por qué el blob y no tablas por entidad
+### Cómo se guardan los datos
 
-`user_data` guarda `state`, `calls` y `settings` como tres `jsonb`: el
-equivalente exacto de las tres claves de `localStorage`. Un año de llamadas
-son unos pocos MB.
+`user_data` guarda `state` y `settings`; cada llamada vive en `calls` con RLS.
+El navegador conserva las tres claves de `localStorage` para trabajar offline,
+pero la sincronización calcula deltas y solo sube llamadas nuevas, modificadas
+o eliminadas. Estado, ajustes, lotes y filas tienen topes de tamaño.
 
 ### Por qué nunca hay merge automático
 
@@ -109,14 +116,15 @@ vigente) para que nadie pise a nadie en silencio a mitad de sesión.
 # Comprobaciones automáticas (las ejecuta el agente)
 npm test
 npm run check:modules
+npm run build
 ```
 
 Para probar en local hace falta un servidor HTTP de verdad: los módulos ES no
 cargan desde `file://`.
 
 ```bash
-python3 -m http.server 3000
-# luego: http://localhost:3000
+python3 -m http.server 3000 --directory public
+# luego: http://localhost:3000 (después de npm run build)
 ```
 
 Las funciones de `api/` **no** corren con `http.server`. Para probarlas en

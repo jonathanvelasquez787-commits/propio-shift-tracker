@@ -9,15 +9,14 @@
 // respondiera distinto para "ese usuario no existe", este endpoint se
 // convertiría en un verificador de quién tiene cuenta.
 //
-// Sin dependencias a propósito: fetch global de Node 18+. Un `npm install` en
-// una app sin build es una pieza más que se puede romper en un despliegue.
+// Sin dependencias: fetch y crypto son nativos de Node 20.
+
+import { createHash } from 'node:crypto';
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const ANON_KEY = process.env.SUPABASE_ANON_KEY;
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-// Freno básico por IP. Las funciones serverless se reciclan, así que esto no
-// reemplaza al rate limit de Supabase Auth — solo abarata los picos obvios.
 const attempts = new Map();
 const WINDOW_MS = 60_000;
 const MAX_ATTEMPTS = 12;
@@ -32,6 +31,21 @@ function throttled(ip) {
   entry.count += 1;
   if (attempts.size > 500) attempts.clear();
   return entry.count > MAX_ATTEMPTS;
+}
+
+async function persistentlyThrottled(ip) {
+  const key = createHash('sha256').update(`${SERVICE_KEY}:${ip}`).digest('hex');
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/consume_rate_limit`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      apikey: SERVICE_KEY,
+      Authorization: `Bearer ${SERVICE_KEY}`,
+    },
+    body: JSON.stringify({ p_key: `login:${key}`, p_limit: MAX_ATTEMPTS, p_window_seconds: 60 }),
+  });
+  if (!response.ok) return throttled(ip);
+  return !(await response.json());
 }
 
 async function readBody(req) {
@@ -90,7 +104,7 @@ export default async function handler(req, res) {
     req.socket?.remoteAddress ||
     'desconocida';
 
-  if (throttled(ip)) {
+  if (await persistentlyThrottled(ip)) {
     res.status(429).json({ error: 'RATE_LIMITED' });
     return;
   }
