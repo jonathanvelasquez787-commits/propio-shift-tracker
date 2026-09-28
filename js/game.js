@@ -1306,9 +1306,12 @@ export function onGameShiftStarted({ continued = false } = {}) {
   const enabled = gameEnabled();
   const hadFinalizedDay = !!state.game.days[dayKey]?.finalized;
 
-  if (enabled && hadFinalizedDay) {
-    revokeStageClear(dayKey, { silent: true });
-    queueGameToast('STAGE CLEAR reabierto · el nuevo turno se sumará al cierre de hoy');
+  // La consistencia del día no depende de que la capa visual de gamificación esté encendida.
+  // Si se reabre un turno con STAGE CLEAR previo, hay que revocarlo siempre; de lo contrario,
+  // apagar gamificación, reabrir turno y volverla a encender deja XP/cofre/finalizado congelados.
+  if (hadFinalizedDay) {
+    revokeStageClear(dayKey, { silent: !enabled });
+    if (enabled) queueGameToast('STAGE CLEAR reabierto · el nuevo turno se sumará al cierre de hoy');
   }
 
   if (continued) {
