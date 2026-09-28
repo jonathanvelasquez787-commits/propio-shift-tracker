@@ -86,7 +86,7 @@ test('XP solo entra por llamadas actuales y oportunas, con tope diario y lock de
   assert.match(game, /return String\(call\.shiftDayKey \|\| ''\) === dayKey/);
   assert.match(game, /if \(lag < 0 \|\| lag > 30 \* 60000\) return false/);
   assert.match(game, /Number\.isFinite\(lockedXp\) \? Math\.min\(rawXp, lockedXp\) : rawXp/);
-  assert.match(game, /!\['manual', 'live'\]\.includes\(source\)/);
+  assert.match(game, /!\['manual', 'live', 'import'\]\.includes\(source\)/);
   assert.match(calls, /onGameCallSaved\(candidate, 'manual'\)/);
   assert.match(calls, /onGameCallSaved\(candidate, 'live'\)/);
   assert.doesNotMatch(calls, /onGameCallSaved\([^\n]*import/i);
