@@ -1,7 +1,8 @@
 # Propio Shift Tracker
 
 Registro personal de turnos, pausas, llamadas y ganancias, con adherencia
-minuto a minuto, Higher Rate, finanzas y calendario de productividad.
+minuto a minuto, Higher Rate, finanzas, calendario de productividad y la
+gamificación opcional «El Monstruo».
 
 Esta versión es el salto de "un archivo HTML en localStorage" a
 "producto con cuentas y respaldo en la nube".
@@ -32,7 +33,12 @@ js/
   sync.js                 localStorage ↔ Supabase, con control de conflictos
   boot.js                 Gate de sesión, hidratación y montaje de la app
   monitoring.js           Captura errores sin enviar datos a terceros
+  game.js                 XP, racha, misiones, cofres y jefes de ciclo
+  monsters.js             Bestiario SVG determinista, sin dependencias
   service-worker.js       PWA y caché offline del shell
+
+css/
+  game.css                Arena, Logros y estados responsive claro/oscuro
 
 api/
   login.js               Traduce usuario → correo del lado del servidor
@@ -45,6 +51,7 @@ supabase/migrations/
 
 scripts/build.mjs         Bundle Rollup + minificación Terser, sin sourcemaps
 tests/security-preparation.test.mjs  Pruebas de seguridad, PWA y datos
+tests/game-phase6.test.mjs           Contratos y límites de la Fase 6
 ```
 
 ---
