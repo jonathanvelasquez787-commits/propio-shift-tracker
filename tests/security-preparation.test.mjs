@@ -71,8 +71,11 @@ test('production build pins and bundles Supabase without source maps', () => {
   assert.equal(pkg.devDependencies.terser, '5.44.0');
   assert.equal(vercel.outputDirectory, 'public');
   assert.match(read('js/supabase-client.js'), /from '@supabase\/supabase-js'/);
-  assert.match(read('scripts/build.mjs'), /sourcemap:\s*false/);
-  assert.match(read('scripts/build.mjs'), /minify\(/);
+  const build = read('scripts/build.mjs');
+  assert.match(build, /sourcemap:\s*false/);
+  assert.match(build, /inlineDynamicImports:\s*true/);
+  assert.doesNotMatch(build, /chunkFileNames/);
+  assert.match(build, /minify\(/);
 });
 
 test('phase 5 migration keeps private data behind RLS and persistent limits', () => {

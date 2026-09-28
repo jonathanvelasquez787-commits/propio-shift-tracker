@@ -12,26 +12,32 @@ await rm(out, { recursive: true, force: true });
 await mkdir(assets, { recursive: true });
 await mkdir(path.join(out, 'icons'), { recursive: true });
 
-const bundle = await rollup({
-  input: {
-    boot: path.join(root, 'js/boot.js'),
-    landing: path.join(root, 'js/landing.js'),
-    'landing-ui': path.join(root, 'js/landing-ui.js'),
-    'theme-toggle': path.join(root, 'js/theme-toggle.js'),
-  },
-  plugins: [nodeResolve({ browser: true })],
-  onwarn(warning, warn) {
-    if (warning.code !== 'CIRCULAR_DEPENDENCY') warn(warning);
-  },
-});
-await bundle.write({
-  dir: assets,
-  format: 'es',
-  entryFileNames: '[name].js',
-  chunkFileNames: 'chunks/[name]-[hash].js',
-  sourcemap: false,
-});
-await bundle.close();
+const entries = {
+  boot: 'js/boot.js',
+  landing: 'js/landing.js',
+  'landing-ui': 'js/landing-ui.js',
+  'theme-toggle': 'js/theme-toggle.js',
+};
+
+// Cada entrypoint queda autocontenido. Además de evitar peticiones extra en el
+// gate de acceso, esto impide que un service worker viejo mezcle un entrypoint
+// nuevo con un chunk compartido de otra versión durante una actualización.
+for (const [name, input] of Object.entries(entries)) {
+  const bundle = await rollup({
+    input: path.join(root, input),
+    plugins: [nodeResolve({ browser: true })],
+    onwarn(warning, warn) {
+      if (warning.code !== 'CIRCULAR_DEPENDENCY') warn(warning);
+    },
+  });
+  await bundle.write({
+    file: path.join(assets, `${name}.js`),
+    format: 'es',
+    inlineDynamicImports: true,
+    sourcemap: false,
+  });
+  await bundle.close();
+}
 
 async function minifyFile(file, source, isModule = false) {
   const result = await minify(source, { module: isModule, compress: true, mangle: true });
