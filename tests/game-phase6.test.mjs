@@ -81,9 +81,10 @@ test('XP solo entra por llamadas actuales y oportunas, con tope diario y lock de
   assert.match(game, /export const GAME_DAILY_XP_CAP = 150/);
   assert.match(game, /Math\.min\(GAME_DAILY_XP_CAP/);
   assert.match(game, /eligibleCalls\.length\s*\? Math\.min\(GAME_DAILY_XP_CAP/);
-  assert.match(game, /todayCallDateKey\(\) !== dayKey/);
-  assert.match(game, /todayCallDateKey\(new Date\(call\.importedAt \|\| 0\)\) !== dayKey/);
-  assert.match(game, /imported - ended <= 30 \* 60000/);
+  assert.match(game, /const importedDay = todayCallDateKey\(new Date\(imported\)\)/);
+  assert.match(game, /if \(importedDay === dayKey\) return true/);
+  assert.match(game, /return String\(call\.shiftDayKey \|\| ''\) === dayKey/);
+  assert.match(game, /if \(lag < 0 \|\| lag > 30 \* 60000\) return false/);
   assert.match(game, /Number\.isFinite\(lockedXp\) \? Math\.min\(rawXp, lockedXp\) : rawXp/);
   assert.match(game, /!\['manual', 'live'\]\.includes\(source\)/);
   assert.match(calls, /onGameCallSaved\(candidate, 'manual'\)/);
@@ -338,7 +339,7 @@ test('segunda simulación mensual: segunda sesión reabre el cierre antes de vol
   const game = read('js/game.js');
   const started = game.slice(game.indexOf('export function onGameShiftStarted'), game.indexOf('function stageComparisonSnapshot'));
   assert.match(started, /hadFinalizedDay/);
-  assert.match(started, /revokeStageClear\(dayKey, \{ silent: true \}\)/);
+  assert.match(started, /revokeStageClear\(dayKey, \{ silent: !enabled \}\)/);
   assert.match(started, /STAGE CLEAR reabierto/);
 });
 
@@ -416,14 +417,14 @@ test('tercera simulación mensual: reset y vaciado limpian estados derivados sin
   assert.match(appMain, /state\.lastCallEndedAt = null/);
 });
 
-test('tercera simulación mensual: gamificación apagada no revoca cierre y filas de cero minutos no dan XP', () => {
+test('tercera simulación mensual: gamificación apagada mantiene consistencia y filas de cero minutos no dan XP', () => {
   const game = read('js/game.js');
   const eligibility = game.slice(game.indexOf('function callIsXpEligible'), game.indexOf('function plannedPauseCount'));
   const started = game.slice(game.indexOf('export function onGameShiftStarted'), game.indexOf('function stageComparisonSnapshot'));
   assert.match(eligibility, /Number\(call\.durationMin\) > 0/);
   assert.match(eligibility, /call\.shiftDayKey/);
-  assert.match(started, /if \(enabled && hadFinalizedDay\)/);
-  assert.doesNotMatch(started, /if \(hadFinalizedDay\) \{\s*revokeStageClear/);
+  assert.match(started, /if \(hadFinalizedDay\)/);
+  assert.match(started, /revokeStageClear\(dayKey, \{ silent: !enabled \}\)/);
 });
 
 test('tercera simulación mensual: turno nocturno conserva día contable y correcciones oficiales', () => {
