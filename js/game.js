@@ -338,7 +338,13 @@ function renderArena() {
   const active = gameEnabled() && day.goal.usd > 0;
   root.hidden = !active;
   classic.style.display = active && settings.game.intensity === 'arcade' ? 'none' : '';
-  if (!active) return;
+  if (!active) {
+    lastArenaRenderKey = '';
+    root.className = 'game-arena';
+    root.removeAttribute('data-game-state');
+    root.removeAttribute('data-game-intensity');
+    return;
+  }
 
   const subtle = settings.game.intensity === 'subtle';
   const monsterState = monsterStateFor(day);
@@ -349,6 +355,8 @@ function renderArena() {
   if (renderKey === lastArenaRenderKey) return;
   lastArenaRenderKey = renderKey;
   root.className = `game-arena ${subtle ? 'game-arena--subtle' : 'game-arena--arcade'} game-${escapeHtml(monsterState)}`;
+  root.dataset.gameState = monsterState;
+  root.dataset.gameIntensity = subtle ? 'subtle' : 'arcade';
   root.innerHTML = `
     <div class="game-arena-copy">
       <div class="game-kicker">MONSTRUO DEL DÍA</div>
@@ -383,21 +391,22 @@ function renderMissions() {
 }
 
 function renderHeroChips() {
+  const enabled = gameEnabled();
   const streak = gameStreak();
   const level = gameLevelProgress();
-  const map = {
-    gameStreakChip: `🔥 Racha <strong>${streak} d</strong>`,
-    gameComboChip: `⚡ Combo <strong>x${state.game.live.combo || 0}</strong>`,
-    gameLevelChip: `🏅 Nivel <strong>${level.level}</strong>`,
-  };
-  Object.entries(map).forEach(([id, html]) => {
-    const element = document.getElementById(id);
-    if (!element) return;
-    element.innerHTML = html;
-    element.hidden = !gameEnabled() || (id === 'gameComboChip' && !state.game.live.combo);
+  const combo = state.game.live.combo || 0;
+  const chips = [
+    ['gameStreakChip', 'gameStreakValue', `${streak} d`, true],
+    ['gameComboChip', 'gameComboValue', `x${combo}`, combo > 0],
+    ['gameLevelChip', 'gameLevelValue', String(level.level), true],
+  ];
+  chips.forEach(([chipId, valueId, value, visible]) => {
+    const chip = document.getElementById(chipId);
+    const valueNode = document.getElementById(valueId);
+    if (valueNode) valueNode.textContent = value;
+    if (chip) chip.hidden = !enabled || !visible;
   });
 }
-
 function cycleBossHtml() {
   const cycle = cycleEarningsForOffset(0);
   const goal = effectiveCycleGoal(0);
@@ -491,9 +500,18 @@ function renderSettingsProfile() {
   const level = gameLevelProgress();
   if (enabled) enabled.checked = gameEnabled();
   if (intensity) intensity.value = settings.game.intensity;
-  if (profile) profile.textContent = `Nivel ${level.level} · ${state.game.totalXp} XP · Mejor racha ${state.game.bestStreak} · ${state.game.accessories.length} accesorios`;
+  if (!profile) return;
+  const values = {
+    level: `Nivel ${level.level}`,
+    xp: `${state.game.totalXp} XP`,
+    streak: `${state.game.bestStreak} días`,
+    collection: String(state.game.accessories.length),
+  };
+  Object.entries(values).forEach(([key, value]) => {
+    const node = profile.querySelector(`[data-game-profile="${key}"]`);
+    if (node) node.textContent = value;
+  });
 }
-
 function syncFinanceRewards() {
   if (!gameEnabled() || !settings.financeCategories) return false;
   let changed = false;

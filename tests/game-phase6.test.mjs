@@ -154,3 +154,20 @@ test('build mantiene módulos fuente fuera de public y el worker precarga el CSS
     assert.deepEqual(files.filter((file) => file.endsWith('.map')), []);
   }
 });
+
+test('gamificación apagada respeta hidden y el render conserva la estructura visual', () => {
+  const css = read('css/game.css');
+  const game = read('js/game.js');
+  assert.match(css, /\.game-chip\[hidden\][\s\S]*display:\s*none\s*!important/);
+  assert.match(css, /\.game-loot-box\[hidden\]/);
+  assert.match(css, /\.game-arena\[hidden\]/);
+  assert.match(css, /\.monster-layer--face/);
+  assert.match(game, /gameStreakValue/);
+  assert.match(game, /gameComboValue/);
+  assert.match(game, /gameLevelValue/);
+  assert.doesNotMatch(game, /element\.innerHTML = html/);
+  assert.match(game, /profile\.querySelector/);
+  assert.match(game, /root\.dataset\.gameState = monsterState/);
+  assert.match(game, /root\.dataset\.gameIntensity = subtle \? 'subtle' : 'arcade'/);
+  assert.match(game, /root\.removeAttribute\('data-game-state'\)/);
+});
