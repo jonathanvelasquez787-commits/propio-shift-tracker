@@ -1,4 +1,5 @@
 const sent = new Set();
+window.__pstRuntimeErrors = window.__pstRuntimeErrors || [];
 
 function clean(value, max = 1200) {
   return String(value || '').replace(/[\w.+-]+@[\w.-]+\.[a-z]{2,}/gi, '[email]').slice(0, max);
@@ -10,6 +11,8 @@ function report(kind, error) {
   const key = `${kind}:${message}:${stack.slice(0, 200)}`;
   if (sent.has(key)) return;
   sent.add(key);
+  window.__pstRuntimeErrors.push({ kind, message, stack });
+  if (window.__pstRuntimeErrors.length > 10) window.__pstRuntimeErrors.shift();
   const body = JSON.stringify({ kind, message, stack, path: location.pathname, release: 'v566' });
   if (navigator.sendBeacon) {
     navigator.sendBeacon('/api/telemetry', new Blob([body], { type: 'application/json' }));

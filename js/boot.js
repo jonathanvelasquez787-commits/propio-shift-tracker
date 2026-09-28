@@ -7,7 +7,6 @@
 // correctos: la app nunca llega a montarse con datos de nadie más ni con datos viejos.
 
 import { getSupabase, isConfigured } from './supabase-client.js';
-import './monitoring.js';
 import { getProfile, signOut } from './auth.js';
 import {
   BOOT,
