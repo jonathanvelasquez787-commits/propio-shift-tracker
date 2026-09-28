@@ -74,6 +74,7 @@ test('production build pins and bundles Supabase without source maps', () => {
   const build = read('scripts/build.mjs');
   assert.match(build, /sourcemap:\s*false/);
   assert.match(build, /inlineDynamicImports:\s*true/);
+  assert.match(build, /format: name === 'boot' \|\| name === 'landing' \? 'iife' : 'es'/);
   assert.doesNotMatch(build, /chunkFileNames/);
   assert.match(build, /minify\(/);
 });
