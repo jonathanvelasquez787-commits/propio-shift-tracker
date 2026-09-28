@@ -90,6 +90,7 @@ import {
   renderDayStatsCards,
   renderTable,
   requestCloseManualCallModal,
+  restorePendingLiveCallBackup,
   resetCallEditorState,
   saveCallEditor,
   saveManualCall,
@@ -106,6 +107,8 @@ import {
   higherRateBonusForCalls,
   higherRateBreakdownTagsHtml,
   higherRateLiveStatus,
+  hrTierButtonLabel,
+  hrWindowWeekdayLabel,
   higherRateTierBadgeHtml,
   purgePastHigherRateWindows,
   refreshHigherRateWindowsIfNeeded,
@@ -551,6 +554,9 @@ export { onGameCallSaved, onGameCallsChanged };
         activePause: null,
         // Llamada en curso desde el botón "Iniciar llamada" (ver toggleCall).
         activeCall: null,
+        // Respaldo persistente de una llamada ya colgada cuyo auto-guardado falló. Así un refresh
+        // mientras está abierto "Guardar llamada" no puede borrar ese tiempo.
+        pendingLiveCallBackup: null,
         // Momento en que colgaste tu última llamada, aunque todavía no la hayas confirmado/guardado
         // en el modal "Guardar llamada".
         lastCallEndedAt: null,
@@ -598,6 +604,9 @@ export { onGameCallSaved, onGameCallsChanged };
         dayInterruptions: src.dayInterruptions && typeof src.dayInterruptions === 'object' && !Array.isArray(src.dayInterruptions) ? src.dayInterruptions : {},
         game: normalizeGameState(src.game),
         activeDayKey: src.activeDayKey ? String(src.activeDayKey) : null,
+        pendingLiveCallBackup: src.pendingLiveCallBackup && typeof src.pendingLiveCallBackup === 'object' && !Array.isArray(src.pendingLiveCallBackup)
+          ? src.pendingLiveCallBackup
+          : null,
       };
       merged.events = merged.events.map(e => (e && !e.id) ? { ...e, id: makeLocalId() } : e);
       merged.pauseHistory = merged.pauseHistory.map(p => (p && !p.id) ? { ...p, id: makeLocalId() } : p);
@@ -2238,15 +2247,25 @@ export function callsForDay(dayKey = getActiveDayKey(), sourceCalls = calls) {
 
 export function dayEvents(dayKey = getActiveDayKey()) {
   const normalized = callDateKeyFromValue(dayKey);
-  return state.events.filter(e => sameCallDay(e.ts, normalized));
+  return state.events.filter(e => {
+    const accountingDay = callDateKeyFromValue(e?.shiftDayKey);
+    return accountingDay ? accountingDay === normalized : sameCallDay(e.ts, normalized);
+  });
 }
 
 function dayPauseIntervals(dayKey = getActiveDayKey()) {
   const normalized = callDateKeyFromValue(dayKey);
   const arr = state.pauseHistory
-    .filter(p => sameCallDay(p.startedAt, normalized))
+    .filter(p => {
+      const accountingDay = callDateKeyFromValue(p?.shiftDayKey);
+      return accountingDay ? accountingDay === normalized : sameCallDay(p.startedAt, normalized);
+    })
     .map(p => ({ type: p.type, start: new Date(p.startedAt), end: new Date(p.endedAt) }));
-  if (normalized === todayCallDateKey() && state.activePause && !state.shiftEndedAt) {
+  const activePauseDay = state.activePause
+    ? (callDateKeyFromValue(state.activePause.shiftDayKey)
+      || (state.shiftStartedAt ? todayCallDateKey(new Date(state.shiftStartedAt)) : todayCallDateKey(new Date(state.activePause.startedAt))))
+    : '';
+  if (activePauseDay === normalized && state.activePause && !state.shiftEndedAt) {
     arr.push({ type: state.activePause.type, start: new Date(state.activePause.startedAt), end: new Date() });
   }
   return arr;
@@ -3889,8 +3908,26 @@ function renderPayDatesSection() {
       return `${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
     }
 
+    function currentShiftAccountingDayKey(fallbackDate = new Date()) {
+      if (state.shiftStartedAt) {
+        const started = new Date(state.shiftStartedAt);
+        if (Number.isFinite(started.getTime())) return todayCallDateKey(started);
+      }
+      return todayCallDateKey(fallbackDate);
+    }
+
     function setEvent(type, title, detail, meta = '') {
-      const event = { id: makeLocalId(), ts: new Date().toISOString(), type, title, detail, meta };
+      const trackedType = ['shift', 'break', 'lunch'].includes(type);
+      const shiftDayKey = trackedType && state.shiftStartedAt ? currentShiftAccountingDayKey() : '';
+      const event = {
+        id: makeLocalId(),
+        ts: new Date().toISOString(),
+        type,
+        title,
+        detail,
+        meta,
+        ...(shiftDayKey ? { shiftDayKey } : {}),
+      };
       state.events.unshift(event);
       state.events = state.events.slice(0, 500);
       return event;
@@ -3961,12 +3998,12 @@ function renderPayDatesSection() {
     function startPause(type) {
       if (!state.shiftStartedAt || state.shiftEndedAt || state.activePause) return;
       const now = new Date();
-      const dayKey = todayCallDateKey();
+      const dayKey = currentShiftAccountingDayKey(now);
       const pretty = type === 'lunch' ? 'Lunch' : 'Break';
 
       // Mismo criterio que startShift: reabrir el MISMO tipo dentro de la ventana de gracia
       // continúa la pausa anterior en vez de crear otra.
-      const sameDayOfType = state.pauseHistory.filter(p => p.type === type && sameCallDay(p.endedAt, dayKey));
+      const sameDayOfType = state.pauseHistory.filter(p => p.type === type && (callDateKeyFromValue(p.shiftDayKey) === dayKey || (!p.shiftDayKey && sameCallDay(p.endedAt, dayKey))));
       let lastClosed = null;
       sameDayOfType.forEach(p => {
         if (!lastClosed || new Date(p.endedAt).getTime() > new Date(lastClosed.endedAt).getTime()) lastClosed = p;
@@ -3975,7 +4012,7 @@ function renderPayDatesSection() {
         const gapMin = (now.getTime() - new Date(lastClosed.endedAt).getTime()) / 60000;
         if (gapMin >= 0 && gapMin <= ACCIDENTAL_TOGGLE_GRACE_MIN) {
           state.pauseHistory = state.pauseHistory.filter(p => p.id !== lastClosed.id);
-          state.activePause = { type, startedAt: lastClosed.startedAt };
+          state.activePause = { type, startedAt: lastClosed.startedAt, shiftDayKey: callDateKeyFromValue(lastClosed.shiftDayKey) || dayKey };
           registerDayInterruption(dayKey, type, lastClosed.endedAt, now.toISOString());
           setEvent(type, `${pretty} continuado (interrupción accidental)`, fmtTime(now), 'manual');
           saveAll();
@@ -3985,7 +4022,7 @@ function renderPayDatesSection() {
         }
       }
 
-      state.activePause = { type, startedAt: now.toISOString() };
+      state.activePause = { type, startedAt: now.toISOString(), shiftDayKey: dayKey };
       setEvent(type, `${pretty} iniciado`, fmtTime(now), 'manual');
       saveAll();
       // El aviso de "va a empezar" ya no aplica una vez que la pausa arrancó de verdad — se apaga
@@ -3995,11 +4032,14 @@ function renderPayDatesSection() {
     }
 
     function endPause(options = {}) {
-      if (!state.activePause) return;
+      if (!state.activePause) return null;
       const { silent = false, deferSave = false } = options;
       const now = new Date().toISOString();
-      state.pauseHistory.push({ id: makeLocalId(), type: state.activePause.type, startedAt: state.activePause.startedAt, endedAt: now });
-      setEvent(state.activePause.type, `${state.activePause.type === 'lunch' ? 'Lunch' : 'Break'} terminado`, fmtTime(new Date(now)), 'manual');
+      const endedPause = { ...state.activePause };
+      const shiftDayKey = callDateKeyFromValue(endedPause.shiftDayKey) || currentShiftAccountingDayKey(new Date(endedPause.startedAt));
+      const pauseRecord = { id: makeLocalId(), type: endedPause.type, startedAt: endedPause.startedAt, endedAt: now, shiftDayKey };
+      state.pauseHistory.push(pauseRecord);
+      const pauseEndEvent = setEvent(endedPause.type, `${endedPause.type === 'lunch' ? 'Lunch' : 'Break'} terminado`, fmtTime(new Date(now)), 'manual');
       state.activePause = null;
       // El aviso de "va a terminar" ya no aplica una vez que se cerró la pausa — se apaga de
       // inmediato en vez de esperar al próximo tick.
@@ -4008,6 +4048,11 @@ function renderPayDatesSection() {
       else saveAll();
       if (!silent) toast('Regresaste');
       onGamePauseEnded();
+      return {
+        pause: endedPause,
+        pauseHistoryId: pauseRecord.id,
+        pauseEndEventId: pauseEndEvent?.id || null,
+      };
     }
 
     function toggleCall() {
@@ -4026,9 +4071,10 @@ function renderPayDatesSection() {
 
       const now = new Date();
       const nowISO = now.toISOString();
+      let interruptedPauseRollback = null;
       if (state.activePause) {
         const pretty = state.activePause.type === 'lunch' ? 'Lunch' : 'Break';
-        endPause({ silent: true, deferSave: true });
+        interruptedPauseRollback = endPause({ silent: true, deferSave: true });
         toast(`${pretty} terminado automáticamente al iniciar la llamada`);
       }
 
@@ -4053,6 +4099,7 @@ function renderPayDatesSection() {
         autoShiftEventId,
         previousShiftStartedAt,
         previousShiftEndedAt,
+        interruptedPauseRollback,
         // onGameShiftStarted puede reabrir STAGE CLEAR, abrir un cofre o tocar ledger/XP.
         // Si esta llamada resulta accidental y se descarta, se restaura exactamente el estado de
         // juego anterior junto con el turno automático.
@@ -4067,7 +4114,8 @@ function renderPayDatesSection() {
     // ese modal, así que se quitó esa fricción de raíz.
     function endCall() {
       if (!state.activeCall) return;
-      const startedAt = state.activeCall.startedAt;
+      const liveContext = state.activeCall;
+      const startedAt = liveContext.startedAt;
       const endedAt = new Date().toISOString();
       state.activeCall = null;
       // Sin esto, el chip "ACW/Available" en vivo (ver computeCurrentAcwStart) no sabía que la
@@ -4075,7 +4123,7 @@ function renderPayDatesSection() {
       state.lastCallEndedAt = endedAt;
       saveStateOnly();
       render();
-      return autoSaveLiveCall(startedAt, endedAt);
+      return autoSaveLiveCall(startedAt, endedAt, liveContext);
     }
 
     // Barra fija de actividad en vivo ---- A diferencia de endCall (que SIEMPRE guarda la llamada,
@@ -4085,6 +4133,13 @@ function renderPayDatesSection() {
       appConfirm('¿Descartar esta llamada sin guardarla? El tiempo registrado se pierde y no queda ninguna fila en Tabla de llamadas.', () => {
         const discarded = state.activeCall;
         state.activeCall = null;
+
+        if (discarded?.interruptedPauseRollback) {
+          const rollback = discarded.interruptedPauseRollback;
+          if (rollback.pauseHistoryId) state.pauseHistory = state.pauseHistory.filter(p => p?.id !== rollback.pauseHistoryId);
+          if (rollback.pauseEndEventId) state.events = state.events.filter(event => event?.id !== rollback.pauseEndEventId);
+          if (rollback.pause) state.activePause = { ...rollback.pause };
+        }
 
         // Si esta llamada fue la única razón por la que se abrió una sesión nueva, descartar también
         // revierte esa sesión automática. No toca turnos que el usuario ya tenía abiertos antes.
@@ -4243,25 +4298,48 @@ function renderPayDatesSection() {
     function resetDay() {
       const dayKey = getActiveDayKey();
       appConfirm(`¿Reiniciar ${formatCallDayLabel(dayKey)}? Se borran llamadas, pausas, huecos, la nota del día y log de ese día.`, () => {
-        calls = calls.filter(c => callDateKeyFromValue(c.callDate) !== dayKey);
-
-        state.events = state.events.filter(e => !sameCallDay(e.ts, dayKey));
-        state.pauseHistory = state.pauseHistory.filter(p => !sameCallDay(p.startedAt, dayKey));
         const normalizedDayKey = callDateKeyFromValue(dayKey);
+        const trackedShiftStart = state.shiftStartedAt ? new Date(state.shiftStartedAt) : null;
+        const trackedShiftEnd = state.shiftEndedAt ? new Date(state.shiftEndedAt) : new Date();
+        const trackedShiftDayKey = trackedShiftStart && Number.isFinite(trackedShiftStart.getTime())
+          ? todayCallDateKey(trackedShiftStart)
+          : '';
+        const resetsTrackedShift = trackedShiftDayKey === normalizedDayKey;
+        const belongsToTrackedShift = (iso) => {
+          if (!resetsTrackedShift || !trackedShiftStart || !Number.isFinite(trackedShiftStart.getTime())) return false;
+          const t = new Date(iso || 0).getTime();
+          const endMs = trackedShiftEnd && Number.isFinite(trackedShiftEnd.getTime()) ? trackedShiftEnd.getTime() : Date.now();
+          return Number.isFinite(t) && t >= trackedShiftStart.getTime() && t <= endMs;
+        };
+
+        calls = calls.filter(c => callDateKeyFromValue(c.callDate) !== normalizedDayKey);
+        state.events = state.events.filter(e => {
+          const accountingDay = callDateKeyFromValue(e?.shiftDayKey);
+          if (accountingDay) return accountingDay !== normalizedDayKey;
+          return !sameCallDay(e.ts, normalizedDayKey) && !belongsToTrackedShift(e.ts);
+        });
+        state.pauseHistory = state.pauseHistory.filter(p => {
+          const accountingDay = callDateKeyFromValue(p?.shiftDayKey);
+          if (accountingDay) return accountingDay !== normalizedDayKey;
+          const touchesCalendarDay = sameCallDay(p.startedAt, normalizedDayKey);
+          const touchesTrackedShift = belongsToTrackedShift(p.startedAt) || belongsToTrackedShift(p.endedAt);
+          return !touchesCalendarDay && !touchesTrackedShift;
+        });
         if (state.gapAnnotations && state.gapAnnotations[normalizedDayKey]) delete state.gapAnnotations[normalizedDayKey];
         if (state.dayNotes && state.dayNotes[normalizedDayKey]) delete state.dayNotes[normalizedDayKey];
         if (state.dayInterruptions && state.dayInterruptions[normalizedDayKey]) delete state.dayInterruptions[normalizedDayKey];
 
-        if (dayKey === todayCallDateKey()) {
+        if (resetsTrackedShift || (!trackedShiftDayKey && normalizedDayKey === todayCallDateKey())) {
           state.shiftStartedAt = null;
           state.shiftEndedAt = null;
           state.activePause = null;
           state.activeCall = null;
+          state.pendingLiveCallBackup = null;
           state.lastCallEndedAt = null;
         }
 
-        state.activeDayKey = dayKey;
-        onGameDayReset(dayKey);
+        state.activeDayKey = normalizedDayKey || dayKey;
+        onGameDayReset(normalizedDayKey || dayKey);
         financeRunAutoFillCascade();
         saveAll();
         toast('Día reiniciado');
@@ -7308,6 +7386,7 @@ export function render() {
       renderGameLive();
     }, 1000);
     render();
+    restorePendingLiveCallBackup();
 
 // boot.js (injectAccountPanel/injectDeleteAccount/injectCycleProjection) sigue leyendo estas
 // funciones desde window: como <script> clásico las heredaba gratis (top-level = global), como
