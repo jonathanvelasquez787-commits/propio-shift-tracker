@@ -62,6 +62,24 @@ let editingCallId = null;
 // localStorage.
 let tableFilterMode = 'all'; // 'all' | 'calls' | 'actions'.
 
+function callAccountingFields(start, fallbackCallDate) {
+  const calendarCallDate = callDateKeyFromValue(fallbackCallDate) || todayCallDateKey(start);
+  const shiftStart = state.shiftStartedAt ? new Date(state.shiftStartedAt) : null;
+  const shiftEnd = state.shiftEndedAt ? new Date(state.shiftEndedAt) : null;
+  const startMs = start instanceof Date ? start.getTime() : Number.NaN;
+  const belongsToTrackedShift = shiftStart
+    && Number.isFinite(shiftStart.getTime())
+    && Number.isFinite(startMs)
+    && startMs >= shiftStart.getTime()
+    && (!shiftEnd || !Number.isFinite(shiftEnd.getTime()) || startMs <= shiftEnd.getTime());
+  const accountingCallDate = belongsToTrackedShift ? todayCallDateKey(shiftStart) : calendarCallDate;
+  return {
+    callDate: accountingCallDate,
+    ...(belongsToTrackedShift ? { shiftDayKey: accountingCallDate } : {}),
+    ...(accountingCallDate !== calendarCallDate ? { calendarCallDate } : {}),
+  };
+}
+
 function reconcileLastCallEndedAt(dayKey) {
   const normalized = callDateKeyFromValue(dayKey);
   const todayKey = todayCallDateKey();
@@ -233,7 +251,7 @@ let manualCallSelectedRateTile = 'normal';
 
 // Este modal puede abrirse como respaldo de una llamada en vivo ya colgada: cerrarlo sin guardar
 // pierde ese tiempo.
-let manualCallLiveBackupPending = false;
+let manualCallLiveBackupPending = !!state.pendingLiveCallBackup;
 
 // Convierte "HH:MM" (24h, valor crudo de <input type="time">) al formato "h:mm AM/PM" que usa
 // internamente callStart (el mismo formato que toDateFromInputs/parseCalls esperan al leer la
@@ -302,20 +320,57 @@ export function openManualCallModal() {
 
 // Desde, esta variante YA NO es el camino normal al terminar una llamada (ver autoSaveLiveCall más
 // abajo, que guarda sola sin abrir nada)
-function openManualCallModalFromLiveCall(startedAtISO, endedAtISO) {
+function openManualCallModalFromLiveCall(startedAtISO, endedAtISO, originalCandidate = null) {
   manualCallPayDirty = false;
   // Este modal SÍ representa una llamada real que ya se colgó y cuyo guardado automático falló
-  // (traslape/duplicado)
+  // (traslape/duplicado). El respaldo conserva segundos/décimas y el día contable por separado.
   manualCallLiveBackupPending = true;
   const start = new Date(startedAtISO);
   const end = new Date(endedAtISO);
-  const durationMin = Math.max(1, Math.round((end.getTime() - start.getTime()) / 60000));
+  const elapsedMs = Math.max(0, end.getTime() - start.getTime());
+  const durationMin = Number.isFinite(Number(originalCandidate?.durationMin))
+    ? Number(originalCandidate.durationMin)
+    : Math.round((elapsedMs / 60000) * 100) / 100;
+  const calendarDayKey = callDateKeyFromValue(originalCandidate?.calendarCallDate) || todayCallDateKey(start);
   const title = document.getElementById('manualCallModalTitle');
   const subtitle = document.getElementById('manualCallModalSubtitle');
   if (title) title.textContent = 'Guardar llamada';
   if (subtitle) subtitle.textContent = `Llamada terminada: ${timeLabelFromDate(start)} – ${timeLabelFromDate(end)} (${formatDuration(durationMin * 60000)}). Ajusta lo que haga falta antes de guardarla.`;
-  prefillManualCallForm({ dayKey: todayCallDateKey(start), startDate: start, durationMin });
+  prefillManualCallForm({ dayKey: calendarDayKey, startDate: start, durationMin });
   openModal('manualCallModal');
+}
+
+function rollbackPendingLiveBackup() {
+  const pending = state.pendingLiveCallBackup;
+  const context = pending?.liveContext;
+
+  if (context?.interruptedPauseRollback) {
+    const rollback = context.interruptedPauseRollback;
+    if (rollback.pauseHistoryId) state.pauseHistory = state.pauseHistory.filter(p => p?.id !== rollback.pauseHistoryId);
+    if (rollback.pauseEndEventId) state.events = state.events.filter(e => e?.id !== rollback.pauseEndEventId);
+    if (rollback.pause) state.activePause = { ...rollback.pause };
+  }
+
+  if (context?.autoStartedShift) {
+    if (context.autoShiftEventId) state.events = state.events.filter(event => event?.id !== context.autoShiftEventId);
+    state.shiftStartedAt = context.previousShiftStartedAt || null;
+    state.shiftEndedAt = context.previousShiftEndedAt || null;
+    if (context.gameBeforeAutoShift) state.game = context.gameBeforeAutoShift;
+  }
+
+  const affectedDayKey = callDateKeyFromValue(pending?.candidate?.callDate)
+    || (pending?.startedAtISO ? todayCallDateKey(new Date(pending.startedAtISO)) : todayCallDateKey());
+  state.pendingLiveCallBackup = null;
+  manualCallLiveBackupPending = false;
+  reconcileLastCallEndedAt(affectedDayKey);
+}
+
+export function restorePendingLiveCallBackup() {
+  const pending = state.pendingLiveCallBackup;
+  if (!pending?.startedAtISO || !pending?.endedAtISO) return false;
+  manualCallLiveBackupPending = true;
+  openManualCallModalFromLiveCall(pending.startedAtISO, pending.endedAtISO, pending.candidate || null);
+  return true;
 }
 
 // Punto único de salida para cerrar #manualCallModal desde cualquier camino (botón "×", click fuera
@@ -326,7 +381,8 @@ export function requestCloseManualCallModal() {
     return;
   }
   appConfirm('¿Descartar esta llamada sin guardarla? La llamada que acabas de colgar se perderá por completo — no quedará ningún registro de ese tiempo trabajado.', () => {
-    manualCallLiveBackupPending = false;
+    rollbackPendingLiveBackup();
+    saveAll();
     closeModal('manualCallModal');
   });
 }
@@ -363,12 +419,13 @@ function buildManualCallCandidate({ customerId, callDate, callStart, durationMin
   const start = toDateFromInputs(callDate, callStart);
   if (!start) return null;
   const end = new Date(start.getTime() + durationMin * 60000);
+  const accounting = callAccountingFields(start, callDate);
   return {
     id: makeLocalId(),
     // Mismo patrón que ya se ve en pantalla para llamadas manuales (Tabla completa/tarjetas mobile
     // ya renderizan "#Manual" cuando no hay customer ID real)
     customerId: String(customerId || '').trim() || 'Manual',
-    callDate,
+    ...accounting,
     callStart,
     durationMin,
     billable,
@@ -393,20 +450,11 @@ function buildLiveCallCandidate({ customerId, startedAtISO, endedAtISO, billable
   const durationMin = Math.round((elapsedMs / 60000) * 100) / 100;
   // Si el fin no quedó después del inicio, se reconstruye con la duración redondeada.
   const end = rawEnd.getTime() > start.getTime() ? rawEnd : new Date(start.getTime() + durationMin * 60000);
-  const shiftStart = state.shiftStartedAt ? new Date(state.shiftStartedAt) : null;
-  const shiftEnd = state.shiftEndedAt ? new Date(state.shiftEndedAt) : null;
-  const belongsToTrackedShift = shiftStart
-    && Number.isFinite(shiftStart.getTime())
-    && start.getTime() >= shiftStart.getTime()
-    && (!shiftEnd || !Number.isFinite(shiftEnd.getTime()) || start.getTime() <= shiftEnd.getTime());
-  const calendarCallDate = todayCallDateKey(start);
-  const accountingCallDate = belongsToTrackedShift ? todayCallDateKey(shiftStart) : calendarCallDate;
+  const accounting = callAccountingFields(start, todayCallDateKey(start));
   return {
     id: makeLocalId(),
     customerId: String(customerId || '').trim() || 'Manual',
-    callDate: accountingCallDate,
-    ...(belongsToTrackedShift ? { shiftDayKey: accountingCallDate } : {}),
-    ...(accountingCallDate !== calendarCallDate ? { calendarCallDate } : {}),
+    ...accounting,
     // CallStart es solo el texto que se ve en Tabla de llamadas — se deriva igual que siempre
     // (hora/minuto), pero NO se usa para calcular startISO/endISO (ver arriba)
     callStart: callStartLabelFromHHMM(`${pad(start.getHours())}:${pad(start.getMinutes())}`),
@@ -467,7 +515,29 @@ export function saveManualCall() {
   const pay = Math.max(0, parseMoney(payInput?.value || manualCallEstimatedPay(duration))).toFixed(2);
   const customerId = customerIdInput?.value || '';
 
-  const candidate = buildManualCallCandidate({ customerId, callDate, callStart, durationMin: duration, billable, dropped, pay });
+  const pendingBackup = manualCallLiveBackupPending ? state.pendingLiveCallBackup : null;
+  let candidate = buildManualCallCandidate({ customerId, callDate, callStart, durationMin: duration, billable, dropped, pay });
+  if (candidate && pendingBackup?.candidate) {
+    const original = pendingBackup.candidate;
+    const originalStart = new Date(original.startISO);
+    const originalCalendarDate = callDateKeyFromValue(original.calendarCallDate) || todayCallDateKey(originalStart);
+    const originalStartLabel = original.callStart || callStartLabelFromHHMM(`${pad(originalStart.getHours())}:${pad(originalStart.getMinutes())}`);
+    // Si el usuario no movió fecha/hora, conserva los segundos reales de la llamada live.
+    if (Number.isFinite(originalStart.getTime()) && callDate === originalCalendarDate && callStart === originalStartLabel) {
+      const exactEnd = new Date(originalStart.getTime() + duration * 60000);
+      candidate = {
+        ...candidate,
+        ...callAccountingFields(originalStart, originalCalendarDate),
+        id: original.id || candidate.id,
+        startISO: originalStart.toISOString(),
+        endISO: exactEnd.toISOString(),
+        source: 'live',
+        importedAt: original.importedAt || new Date().toISOString(),
+      };
+    } else {
+      candidate = { ...candidate, source: 'live', importedAt: original.importedAt || new Date().toISOString() };
+    }
+  }
   if (candidate && new Date(candidate.endISO).getTime() > Date.now()) {
     toast('La llamada no puede terminar en el futuro');
     return;
@@ -479,23 +549,25 @@ export function saveManualCall() {
   }
   // Guardado exitoso (sea "Agregar llamada manual" normal o el respaldo de una llamada en vivo): ya
   // no hay nada que perder al cerrar, se apaga la bandera antes de cerrar sin preguntar.
+  const affectedDayKey = callDateKeyFromValue(candidate.callDate) || callDate;
+  state.pendingLiveCallBackup = null;
   manualCallLiveBackupPending = false;
   closeModal('manualCallModal');
-  reconcileLastCallEndedAt(callDate);
-  if (callDate === todayCallDateKey() && !state.shiftStartedAt && !state.shiftEndedAt) {
+  reconcileLastCallEndedAt(affectedDayKey);
+  if (affectedDayKey === todayCallDateKey() && !state.shiftStartedAt && !state.shiftEndedAt) {
     autoStartShiftFromCalls(true);
   }
   financeRunAutoFillCascade();
   saveAll();
-  onGameCallSaved(candidate, 'manual');
-  onGameCallsChanged(callDate);
+  onGameCallSaved(candidate, pendingBackup ? 'live' : 'manual');
+  onGameCallsChanged(affectedDayKey);
   toast('Llamada agregada');
 }
 
 // Terminar una llamada y querer empezar otra de inmediato (mismo minuto o cualquier otro) "no
 // dejaba" — el modal de "Guardar llamada" cubre toda la pantalla y bloquea el click a "Iniciar
 // llamada" hasta resolverlo.
-export function autoSaveLiveCall(startedAtISO, endedAtISO) {
+export function autoSaveLiveCall(startedAtISO, endedAtISO, liveContext = null) {
   const elapsedMs = Math.max(0, new Date(endedAtISO).getTime() - new Date(startedAtISO).getTime());
   const durationMin = Math.round((elapsedMs / 60000) * 100) / 100;
   const pay = manualCallEstimatedPay(durationMin, 'normal').toFixed(2);
@@ -511,14 +583,25 @@ export function autoSaveLiveCall(startedAtISO, endedAtISO) {
   const result = trySaveCallCandidate(candidate);
 
   if (result.ok) {
+    state.pendingLiveCallBackup = null;
     financeRunAutoFillCascade();
     saveAll();
     onGameCallSaved(candidate, 'live');
     toast(`Llamada guardada (${formatDuration(durationMin * 60000)}) — edítala en Tabla de llamadas si hace falta`);
     return true;
   }
+
+  state.pendingLiveCallBackup = {
+    startedAtISO,
+    endedAtISO,
+    candidate,
+    liveContext: liveContext ? JSON.parse(JSON.stringify(liveContext)) : null,
+  };
+  manualCallLiveBackupPending = true;
+  // Persistir ANTES de abrir el modal: un refresh aquí ya no puede comerse la llamada.
+  saveAll();
   toast(result.reason);
-  openManualCallModalFromLiveCall(startedAtISO, endedAtISO);
+  openManualCallModalFromLiveCall(startedAtISO, endedAtISO, candidate);
   return false;
 }
 
