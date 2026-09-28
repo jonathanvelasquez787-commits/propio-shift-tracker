@@ -160,10 +160,15 @@ function dayEntry(dayKey) {
 
 function callIsXpEligible(call, dayKey) {
   if (!call || todayCallDateKey() !== dayKey || todayCallDateKey(new Date(call.importedAt || 0)) !== dayKey) return false;
+  const productive = typeof call.countsAsProductive === 'boolean'
+    ? call.countsAsProductive
+    : String(call.billable).toLowerCase() === 'yes' && String(call.dropped).toLowerCase() !== 'yes';
+  if (!productive) return false;
   const ended = new Date(call.endISO).getTime();
   const imported = new Date(call.importedAt).getTime();
   if (!Number.isFinite(ended) || !Number.isFinite(imported)) return false;
-  return imported - ended <= 30 * 60000;
+  const lag = imported - ended;
+  return lag >= 0 && lag <= 30 * 60000;
 }
 
 function plannedPauseCount(dayKey) {
@@ -927,7 +932,7 @@ function maybeShowRecord(call) {
 }
 
 export function onGameCallSaved(call, source = 'manual') {
-  if (!gameEnabled() || !call || !['manual', 'live'].includes(source)) return;
+  if (!gameEnabled() || !call || !['manual', 'live', 'import'].includes(source)) return;
   const dayKey = todayCallDateKey();
   if (!callIsXpEligible(call, dayKey)) return;
   ensureGameState();
@@ -1004,8 +1009,24 @@ export function onGameCallsChanged(dayKey) {
   const normalizedDayKey = String(dayKey || '');
   const entry = state.game.days[normalizedDayKey];
   if (!entry?.finalized) {
+    if (entry) {
+      const rawLive = computeGameDay(normalizedDayKey, { ignoreLock: true });
+      const existingLock = Number(entry.xpLocked);
+      const defeatKey = `monster-defeat:${normalizedDayKey}`;
+      if (rawLive.defeated) {
+        entry.xpLocked = Number.isFinite(existingLock) ? Math.min(existingLock, rawLive.xp) : rawLive.xp;
+        if (!state.game.ledger[defeatKey]) {
+          state.game.ledger[defeatKey] = true;
+          if (enabled) queueGameToast('💥 MONSTRUO DERROTADO · datos reconciliados', 'record');
+        }
+      } else {
+        delete entry.xpLocked;
+        delete state.game.ledger[defeatKey];
+      }
+      saveStateOnly();
+    }
     if (enabled) renderGame();
-    return false;
+    return !!entry;
   }
 
   const raw = computeGameDay(normalizedDayKey, { ignoreLock: true });

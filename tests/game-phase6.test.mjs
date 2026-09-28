@@ -271,3 +271,53 @@ test('modo sutil no reproduce pop ni sonido y reduced-motion solo elimina movimi
   assert.match(tone, /if \(!arcadeEnabled\(\)\) return/);
   assert.doesNotMatch(tone, /prefers-reduced-motion/);
 });
+
+
+test('simulación mensual: pegar llamadas usa hooks de juego y reemplaza live provisional', () => {
+  const appMain = read('js/app-main.js');
+  const calls = read('js/calls.js');
+  const game = read('js/game.js');
+
+  assert.match(appMain, /isReplaceableLiveCall/);
+  assert.match(appMain, /source:\s*'import'/);
+  assert.match(appMain, /onGameCallSaved\(item\.call, 'import'\)/);
+  assert.match(appMain, /importedDates\.forEach\(dayKey => onGameCallsChanged\(dayKey\)\)/);
+  assert.match(calls, /source:\s*'live'/);
+  assert.match(calls, /source:\s*'manual'/);
+  assert.match(game, /\['manual', 'live', 'import'\]/);
+});
+
+test('simulación mensual: llamadas y Break Lunch no pueden ocupar los mismos minutos', () => {
+  const appMain = read('js/app-main.js');
+  assert.match(appMain, /subtractCallsFromPauseInterval/);
+  assert.match(appMain, /pauseDurationExcludingCalls/);
+  assert.match(appMain, /if \(state\.activeCall\) return true/);
+  assert.match(appMain, /Termina la llamada antes de iniciar Break\/Lunch/);
+  assert.match(appMain, /terminado automáticamente al iniciar la llamada/);
+});
+
+test('simulación mensual: llamada no salta ventana temprana ni reescribe entrada salida manual', () => {
+  const appMain = read('js/app-main.js');
+  const startCall = appMain.slice(appMain.indexOf('function startCall()'), appMain.indexOf('function endCall()'));
+  assert.match(startCall, /shiftStartTooEarly\(\)/);
+  assert.match(appMain, /Las sesiones explícitas mandan/);
+  assert.match(appMain, /startIsAutomatic/);
+  assert.match(appMain, /endIsAutomatic/);
+});
+
+test('simulación mensual: XP solo para llamadas productivas ya terminadas', () => {
+  const game = read('js/game.js');
+  const eligibility = game.slice(game.indexOf('function callIsXpEligible'), game.indexOf('function plannedPauseCount'));
+  assert.match(eligibility, /countsAsProductive/);
+  assert.match(eligibility, /billable/);
+  assert.match(eligibility, /dropped/);
+  assert.match(eligibility, /lag >= 0/);
+  assert.match(eligibility, /lag <= 30 \* 60000/);
+});
+
+test('simulación mensual: llamada manual futura se rechaza y live conserva segundos', () => {
+  const calls = read('js/calls.js');
+  assert.match(calls, /La hora de la llamada no puede estar en el futuro/);
+  assert.match(calls, /Math\.round\(\(elapsedMs \/ 60000\) \* 100\) \/ 100/);
+  assert.doesNotMatch(calls, /Math\.max\(1, Math\.round\(\(new Date\(endedAtISO\)/);
+});

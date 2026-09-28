@@ -2226,21 +2226,21 @@ export function dayShiftBounds(dayKey = getActiveDayKey()) {
     if (priorEndEvent) priorShiftEndBoundary = new Date(priorEndEvent.ts);
   }
 
-  // Reconciliación con llamadas reales: si el click de "Iniciar shift" llegó más tarde que la
-  // primera llamada, gana la llamada.
+  // Reconciliación con llamadas reales solo para límites automáticos. Un inicio/fin manual no se
+  // mueve por haber tomado una llamada extra antes o después del turno.
   if (start || end) {
     const dayCalls = callsForDay(normalized);
     if (dayCalls.length) {
       const ordered = [...dayCalls].sort((a, b) => new Date(a.startISO) - new Date(b.startISO));
-      // Solo se consideran, para reconciliar el INICIO, llamadas que caen DESPUÉS del cierre del
-      // turno anterior (si existe) — ver priorShiftEndBoundary arriba.
       const relevantForStart = priorShiftEndBoundary
         ? ordered.filter(c => new Date(c.startISO).getTime() >= priorShiftEndBoundary.getTime())
         : ordered;
       const firstCallStart = relevantForStart.length ? new Date(relevantForStart[0].startISO) : null;
       const lastCallEnd = new Date(ordered[ordered.length - 1].endISO);
-      if (start && firstCallStart && firstCallStart.getTime() < start.getTime()) start = firstCallStart;
-      if (end && lastCallEnd.getTime() > end.getTime()) end = lastCallEnd;
+      const startIsAutomatic = !startEvent || String(startEvent.meta || '').toLowerCase() === 'auto';
+      const endIsAutomatic = !endEvent || String(endEvent.meta || '').toLowerCase() === 'auto';
+      if (startIsAutomatic && start && firstCallStart && firstCallStart.getTime() < start.getTime()) start = firstCallStart;
+      if (endIsAutomatic && end && lastCallEnd.getTime() > end.getTime()) end = lastCallEnd;
     }
   }
 
@@ -2338,16 +2338,9 @@ function dayShiftSessions(dayKey = getActiveDayKey()) {
   const sessions = allSessions.filter(s => dateKey(s.start) === normalized || dateKey(s.end) === normalized);
 
   if (sessions.length) {
-    const dayCallsForReconciliation = callsForDay(normalized);
-    if (dayCallsForReconciliation.length) {
-      const ordered = [...dayCallsForReconciliation].sort((a, b) => new Date(a.startISO) - new Date(b.startISO));
-      const firstCallStart = new Date(ordered[0].startISO);
-      const lastCallEnd = new Date(ordered[ordered.length - 1].endISO);
-      const firstSession = sessions[0];
-      const lastSession = sessions[sessions.length - 1];
-      if (firstCallStart.getTime() < firstSession.start.getTime()) firstSession.start = firstCallStart;
-      if (!lastSession.live && lastCallEnd.getTime() > lastSession.end.getTime()) lastSession.end = lastCallEnd;
-    }
+    // Una llamada antes de entrar o después de salir es trabajo real, pero no debe reescribir el
+    // checkpoint de Entrada/Salida que el usuario marcó con los controles del turno. Las sesiones
+    // explícitas mandan; el fallback por llamadas se usa solo cuando no existe ninguna sesión.
     return sessions;
   }
 
@@ -2429,12 +2422,44 @@ function dayPausesForSlotStats(dayKey) {
 
 // El motor de Adherencia minuto a minuto (computeMinuteAdherence, vía dayPauseIntervals) solo
 // conocía pausas REALES tomadas con el botón.
+function subtractCallsFromPauseInterval(interval, dayKey) {
+  const normalized = callDateKeyFromValue(dayKey);
+  let segments = [{ start: new Date(interval.start), end: new Date(interval.end) }]
+    .filter(seg => Number.isFinite(seg.start.getTime()) && Number.isFinite(seg.end.getTime()) && seg.end > seg.start);
+
+  const dayCalls = [...callsForDay(normalized)]
+    .map(call => ({ start: new Date(call.startISO), end: new Date(call.endISO) }))
+    .filter(call => Number.isFinite(call.start.getTime()) && Number.isFinite(call.end.getTime()) && call.end > call.start)
+    .sort((a, b) => a.start - b.start);
+
+  dayCalls.forEach(call => {
+    segments = segments.flatMap(seg => {
+      if (call.end <= seg.start || call.start >= seg.end) return [seg];
+      const pieces = [];
+      if (call.start > seg.start) pieces.push({ start: seg.start, end: new Date(Math.min(call.start.getTime(), seg.end.getTime())) });
+      if (call.end < seg.end) pieces.push({ start: new Date(Math.max(call.end.getTime(), seg.start.getTime())), end: seg.end });
+      return pieces.filter(piece => piece.end > piece.start);
+    });
+  });
+
+  return segments.map(seg => ({ ...seg, type: interval.type }));
+}
+
+function pauseDurationExcludingCalls(startedAt, endedAt, dayKey) {
+  const start = new Date(startedAt);
+  const end = new Date(endedAt);
+  if (!Number.isFinite(start.getTime()) || !Number.isFinite(end.getTime()) || end <= start) return 0;
+  return subtractCallsFromPauseInterval({ type: 'pause', start, end }, dayKey)
+    .reduce((sum, segment) => sum + Math.max(0, (segment.end - segment.start) / 60000), 0);
+}
+
 function actualPauseIntervalsForDay(dayKey) {
   const normalized = callDateKeyFromValue(dayKey);
   const real = dayPauseIntervals(normalized).map(p => ({ type: p.type, start: p.start, end: p.end }));
   const manualBreak = manualGapPauseIntervals(normalized, 'break').map(p => ({ type: 'break', start: new Date(p.startedAt), end: new Date(p.endedAt) }));
   const manualLunch = manualGapPauseIntervals(normalized, 'lunch').map(p => ({ type: 'lunch', start: new Date(p.startedAt), end: new Date(p.endedAt) }));
-  return [...real, ...manualBreak, ...manualLunch];
+  return [...real, ...manualBreak, ...manualLunch]
+    .flatMap(interval => subtractCallsFromPauseInterval(interval, normalized));
 }
 
 // Empareja cada slot planeado (Break 1, Break 2, Lunch...) con la pausa REAL más cercana en el
@@ -2474,7 +2499,10 @@ function pauseAssignmentCache(dayKey, type) {
   // Fusiona duplicados traslapados (ver mergeOverlappingPauseEntries) ANTES de emparejar contra los
   // slots — así una pausa real + un hueco manual clasificado encima cuentan como UNA sola
   // ocurrencia, no dos.
-  const history = mergeOverlappingPauseEntries(rawHistory);
+  const history = mergeOverlappingPauseEntries(rawHistory).map(p => ({
+    ...p,
+    effectiveDurationMin: pauseDurationExcludingCalls(p.startedAt, p.endedAt, normalized),
+  }));
 
   // Se usa el horario EFECTIVO: buildPlannedSlots en crudo ignora el corrimiento de lateArrivalMode
   // === 'shift'.
@@ -2953,7 +2981,10 @@ export function dayAdherence(dayKey) {
     const aStart = new Date(actual.startedAt);
     const aEnd = new Date(actual.endedAt || new Date().toISOString());
     const startD = (aStart.getTime() - slotStart.getTime()) / 60000;
-    const durD = ((aEnd.getTime() - aStart.getTime()) / 60000) - plannedDur;
+    const actualDurationMin = Number.isFinite(Number(actual.effectiveDurationMin))
+      ? Number(actual.effectiveDurationMin)
+      : (aEnd.getTime() - aStart.getTime()) / 60000;
+    const durD = actualDurationMin - plannedDur;
     const ok = Math.abs(startD) <= ADHERENCE_TOLERANCE_MIN && Math.abs(durD) <= ADHERENCE_TOLERANCE_MIN;
     // Crédito parcial = promedio de qué tan cerca estuvo el inicio y qué tan cerca estuvo la
     // duración de lo planeado.
@@ -3615,6 +3646,7 @@ function renderPayDatesSection() {
       // el día activo.
       if (!isViewingToday()) return true;
       if (state.shiftEndedAt) return true;
+      if (state.activeCall) return true;
       if (!state.shiftStartedAt) {
         // Habilitado solo si hay a qué hora anclar el auto-inicio (ver autoStartShiftFromCalls).
         // Sin llamadas hoy, se queda bloqueado.
@@ -3731,6 +3763,10 @@ function renderPayDatesSection() {
         return;
       }
       if (state.shiftEndedAt) return;
+      if (state.activeCall) {
+        toast('Termina la llamada antes de iniciar Break/Lunch');
+        return;
+      }
       if (!state.shiftStartedAt) {
         const started = autoStartShiftFromCalls();
         if (!started) return;
@@ -3877,7 +3913,19 @@ function renderPayDatesSection() {
 
     function startCall() {
       if (state.activeCall || state.shiftEndedAt) return;
+      if (!state.shiftStartedAt && shiftStartTooEarly()) {
+        const cfg = dayConfigFor(todayCallDateKey());
+        toast(`Muy temprano — puedes iniciar una llamada desde ${SHIFT_START_EARLY_GRACE_MIN} min antes de las ${timeLabel(formatHHMM(cfg.start))}`);
+        return;
+      }
+
       const now = new Date();
+      if (state.activePause) {
+        const pretty = state.activePause.type === 'lunch' ? 'Lunch' : 'Break';
+        endPause({ silent: true, deferSave: true });
+        toast(`${pretty} terminado automáticamente al iniciar la llamada`);
+      }
+
       // Igual que Break/Lunch (autoStartShiftFromCalls) y pegar llamadas: si no habías dado click
       // en "Iniciar shift" todavía, iniciar una llamada en vivo también lo arranca solo — anclado a
       // AHORA.
@@ -4165,10 +4213,10 @@ function renderPayDatesSection() {
 
     // Pinta el resumen de filas omitidas al importar (duplicados exactos + traslapes), cada una con
     // su motivo, dentro de #importSkippedSummary — reemplaza el toast-solo-conteo de antes.
-    function renderImportSkippedSummary(duplicates, overlaps) {
+    function renderImportSkippedSummary(duplicates, overlaps, futureRows = [], replacedLive = []) {
       const el = document.getElementById('importSkippedSummary');
       if (!el) return;
-      const total = duplicates.length + overlaps.length;
+      const total = duplicates.length + overlaps.length + futureRows.length + replacedLive.length;
       if (!total) {
         el.style.display = 'none';
         el.innerHTML = '';
@@ -4181,8 +4229,22 @@ function renderPayDatesSection() {
       overlaps.forEach(o => {
         rowsHtml.push(`<li>#${escapeHtml(o.customerId)} · ${escapeHtml(o.callDate)} ${escapeHtml(o.callStart)} — Traslapa con la llamada #${escapeHtml(o.withCustomerId)} (${escapeHtml(o.withCallStart)}) ya guardada</li>`);
       });
-      el.innerHTML = `<strong>${total} fila(s) omitida(s) al importar — revisa si de verdad son la misma llamada:</strong><ul style="margin:6px 0 0; padding-left:18px;">${rowsHtml.join('')}</ul>`;
+      futureRows.forEach(c => {
+        rowsHtml.push(`<li>#${escapeHtml(c.customerId)} · ${escapeHtml(c.callDate)} ${escapeHtml(c.callStart)} — Hora futura: no se importó para evitar registrar una llamada que todavía no ocurrió</li>`);
+      });
+      replacedLive.forEach(item => {
+        rowsHtml.push(`<li>#${escapeHtml(item.call.customerId)} · ${escapeHtml(item.call.callDate)} ${escapeHtml(item.call.callStart)} — Reemplazó la llamada en vivo provisional por los datos oficiales pegados</li>`);
+      });
+      const omitted = duplicates.length + overlaps.length + futureRows.length;
+      const headline = omitted
+        ? `${omitted} fila(s) omitida(s) · ${replacedLive.length} llamada(s) en vivo actualizada(s)`
+        : `${replacedLive.length} llamada(s) en vivo actualizada(s) con datos oficiales`;
+      el.innerHTML = `<strong>${headline}:</strong><ul style="margin:6px 0 0; padding-left:18px;">${rowsHtml.join('')}</ul>`;
       el.style.display = '';
+    }
+
+    function isReplaceableLiveCall(call) {
+      return !!call && String(call.source || '').toLowerCase() === 'live';
     }
 
     function importCalls() {
@@ -4192,13 +4254,21 @@ function renderPayDatesSection() {
         toast('No se pudo leer la data');
         return;
       }
-      const existing = new Set(calls.map(callDedupeKey));
+
       const importTs = new Date().toISOString();
-      // Se conservan las filas descartadas por coincidencia exacta de callDedupeKey (no solo su
-      // conteo) para poder listarlas después.
+      const importNow = new Date(importTs).getTime();
+      // Las llamadas live son provisionales: el pegado oficial puede reemplazarlas si ocupa el mismo
+      // intervalo. No se incluyen en la deduplicación exacta para permitir esa sustitución.
+      const existing = new Set(calls.filter(c => !isReplaceableLiveCall(c)).map(callDedupeKey));
       const skippedDuplicates = [];
+      const futureRows = [];
       const deduped = parsed
         .filter(c => {
+          const startsAt = new Date(c.startISO).getTime();
+          if (Number.isFinite(startsAt) && startsAt > importNow) {
+            futureRows.push(c);
+            return false;
+          }
           if (existing.has(callDedupeKey(c))) {
             skippedDuplicates.push(c);
             return false;
@@ -4207,39 +4277,73 @@ function renderPayDatesSection() {
         })
         .sort((a, b) => new Date(a.startISO) - new Date(b.startISO));
 
-      // No se permite importar una fila que se traslape en el tiempo con una llamada ya guardada o
-      // con otra fila del mismo pegado.
       const overlapCheckSet = [...calls];
       const accepted = [];
-      // Igual que skippedDuplicates arriba: se guarda con qué llamada ya guardada se traslapó cada
-      // fila, no solo el conteo.
+      const replacedLive = [];
+      const replacedIds = new Set();
       const skippedOverlaps = [];
       let overlapSkipped = 0;
+
       for (const c of deduped) {
-        const overlapsWith = overlapCheckSet.find(existingCall => callsOverlap(existingCall, c));
-        if (overlapsWith) {
-          overlapSkipped++;
-          skippedOverlaps.push({ ...c, withCustomerId: overlapsWith.customerId, withCallStart: overlapsWith.callStart });
+        const overlaps = overlapCheckSet.filter(existingCall => callsOverlap(existingCall, c));
+        if (!overlaps.length) {
+          overlapCheckSet.push(c);
+          accepted.push({ call: c, replacesLiveId: null });
           continue;
         }
-        overlapCheckSet.push(c);
-        accepted.push(c);
+
+        if (overlaps.length === 1 && isReplaceableLiveCall(overlaps[0])) {
+          const provisional = overlaps[0];
+          replacedIds.add(provisional.id);
+          const index = overlapCheckSet.findIndex(item => item.id === provisional.id);
+          if (index >= 0) overlapCheckSet.splice(index, 1);
+          overlapCheckSet.push(c);
+          accepted.push({ call: c, replacesLiveId: provisional.id });
+          replacedLive.push({ call: c, provisional });
+          continue;
+        }
+
+        const overlapsWith = overlaps[0];
+        overlapSkipped++;
+        skippedOverlaps.push({ ...c, withCustomerId: overlapsWith.customerId, withCallStart: overlapsWith.callStart });
       }
 
-      const unique = accepted.map(c => ({ ...c, importedAt: importTs }));
-      calls = [...calls, ...unique].sort((a, b) => new Date(a.startISO) - new Date(b.startISO));
+      if (replacedIds.size) calls = calls.filter(c => !replacedIds.has(c.id));
 
-      const importedDates = [...new Set(unique.map(c => callDateKeyFromValue(c.callDate)).filter(Boolean))]
-        .sort((a, b) => callDateToDate(a) - callDateToDate(b));
+      const importedRows = accepted.map(item => ({
+        ...item,
+        call: { ...item.call, importedAt: importTs, source: 'import' },
+      }));
+      const importedDates = new Set();
+      const replacedDates = new Set();
 
+      // Se insertan cronológicamente para que combo, cajas cada 5 llamadas y derrota del monstruo
+      // se comporten igual que si las llamadas hubieran llegado una por una.
+      importedRows.forEach(item => {
+        calls = [...calls, item.call].sort((a, b) => new Date(a.startISO) - new Date(b.startISO));
+        const dayKey = callDateKeyFromValue(item.call.callDate);
+        if (dayKey) importedDates.add(dayKey);
+        if (item.replacesLiveId) {
+          if (dayKey) replacedDates.add(dayKey);
+        } else {
+          onGameCallSaved(item.call, 'import');
+        }
+      });
+
+      // Importar/pegar también debe reconciliar snapshots ya cerrados y cambios de una llamada live
+      // provisional a la fila oficial.
+      importedDates.forEach(dayKey => onGameCallsChanged(dayKey));
+
+      const importedDateList = [...importedDates].sort((a, b) => callDateToDate(a) - callDateToDate(b));
       const todayKey = todayCallDateKey();
-      const preferredDay = importedDates.includes(todayKey)
+      const preferredDay = importedDateList.includes(todayKey)
         ? todayKey
-        : importedDates[importedDates.length - 1] || defaultActiveDayKey();
+        : importedDateList[importedDateList.length - 1] || defaultActiveDayKey();
 
-      if (unique.length) state.activeDayKey = preferredDay;
+      if (importedRows.length) state.activeDayKey = preferredDay;
 
       ta.value = '';
+      const unique = importedRows.map(item => item.call);
       const lateCount = unique.filter(c => callImportFlag(c)?.cls === 'imported-late').length;
       const historicCount = unique.filter(c => callImportFlag(c)?.cls === 'imported-historic').length;
       const importNote = lateCount || historicCount
@@ -4247,18 +4351,22 @@ function renderPayDatesSection() {
         : 'a tiempo';
       const overlapNote = overlapSkipped ? ` · ${overlapSkipped} traslapada(s) omitida(s)` : '';
       const duplicateNote = skippedDuplicates.length ? ` · ${skippedDuplicates.length} duplicada(s) omitida(s)` : '';
-      setEvent('import', 'Llamadas importadas', `${unique.length} fila(s) · ${importNote}${overlapNote}${duplicateNote}`, 'Propio');
-      if (unique.length) financeRunAutoFillCascade();
+      const futureNote = futureRows.length ? ` · ${futureRows.length} futura(s) omitida(s)` : '';
+      const replacedNote = replacedLive.length ? ` · ${replacedLive.length} live actualizada(s)` : '';
+
+      setEvent('import', 'Llamadas importadas', `${unique.length} fila(s) · ${importNote}${overlapNote}${duplicateNote}${futureNote}${replacedNote}`, 'Propio');
+      if (unique.length || replacedLive.length) financeRunAutoFillCascade();
       saveAll();
-      // El resumen detallado (con motivo por fila) queda visible dentro del modal en vez de
-      // depender solo del toast, que ya desaparece solo.
-      renderImportSkippedSummary(skippedDuplicates, skippedOverlaps);
-      if (!unique.length && (overlapSkipped || skippedDuplicates.length)) {
-        toast(`Ninguna fila nueva — todas se omitieron por duplicado o traslape (${overlapSkipped + skippedDuplicates.length}). Revisa el detalle debajo del cuadro de texto.`);
+      renderImportSkippedSummary(skippedDuplicates, skippedOverlaps, futureRows, replacedLive);
+
+      if (!unique.length && (overlapSkipped || skippedDuplicates.length || futureRows.length)) {
+        toast(`Ninguna fila nueva — ${overlapSkipped + skippedDuplicates.length + futureRows.length} omitida(s). Revisa el detalle debajo del cuadro de texto.`);
       } else {
-        toast(`${unique.length} llamada(s) importada(s)${overlapNote}${duplicateNote}`);
+        toast(`${unique.length} llamada(s) importada(s)${replacedNote}${overlapNote}${duplicateNote}${futureNote}`);
       }
     }
+
+
 
     // El botón "Limpiar" dentro del modal "Pegar Llamadas" se veía como si limpiara el cuadro de
     // texto donde se pega la data.

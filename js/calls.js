@@ -352,6 +352,7 @@ function buildManualCallCandidate({ customerId, callDate, callStart, durationMin
     startISO: start.toISOString(),
     endISO: end.toISOString(),
     countsAsProductive: billable === 'Yes' && dropped === 'No',
+    source: 'manual',
     // Se marca "importada ahora" igual que una fila pegada (importCalls)
     importedAt: new Date().toISOString(),
   };
@@ -363,7 +364,8 @@ function buildLiveCallCandidate({ customerId, startedAtISO, endedAtISO, billable
   const start = new Date(startedAtISO);
   const rawEnd = new Date(endedAtISO);
   if (Number.isNaN(start.getTime()) || Number.isNaN(rawEnd.getTime())) return null;
-  const durationMin = Math.max(1, Math.round((rawEnd.getTime() - start.getTime()) / 60000));
+  const elapsedMs = Math.max(0, rawEnd.getTime() - start.getTime());
+  const durationMin = Math.round((elapsedMs / 60000) * 100) / 100;
   // Si el fin no quedó después del inicio, se reconstruye con la duración redondeada.
   const end = rawEnd.getTime() > start.getTime() ? rawEnd : new Date(start.getTime() + durationMin * 60000);
   return {
@@ -380,6 +382,7 @@ function buildLiveCallCandidate({ customerId, startedAtISO, endedAtISO, billable
     startISO: start.toISOString(),
     endISO: end.toISOString(),
     countsAsProductive: billable === 'Yes' && dropped === 'No',
+    source: 'live',
     importedAt: new Date().toISOString(),
   };
 }
@@ -430,6 +433,10 @@ export function saveManualCall() {
   const customerId = customerIdInput?.value || '';
 
   const candidate = buildManualCallCandidate({ customerId, callDate, callStart, durationMin: duration, billable, dropped, pay });
+  if (candidate && new Date(candidate.startISO).getTime() > Date.now()) {
+    toast('La hora de la llamada no puede estar en el futuro');
+    return;
+  }
   const result = trySaveCallCandidate(candidate);
   if (!result.ok) {
     toast(result.reason);
@@ -449,7 +456,8 @@ export function saveManualCall() {
 // dejaba" — el modal de "Guardar llamada" cubre toda la pantalla y bloquea el click a "Iniciar
 // llamada" hasta resolverlo.
 export function autoSaveLiveCall(startedAtISO, endedAtISO) {
-  const durationMin = Math.max(1, Math.round((new Date(endedAtISO).getTime() - new Date(startedAtISO).getTime()) / 60000));
+  const elapsedMs = Math.max(0, new Date(endedAtISO).getTime() - new Date(startedAtISO).getTime());
+  const durationMin = Math.round((elapsedMs / 60000) * 100) / 100;
   const pay = manualCallEstimatedPay(durationMin, 'normal').toFixed(2);
 
   const candidate = buildLiveCallCandidate({
