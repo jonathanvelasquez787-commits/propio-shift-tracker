@@ -154,14 +154,14 @@ import {
       renderHigherRateWindowsEditor(settings.higherRateWindows || []);
     }
     // Editor de ventanas de Higher Rate Opportunity (pedido del usuario) ---- Mismo patrón que el editor de bloques (Trabajo/Break/ Lunch, ver renderBlocksEditor): filas dinámicas con Fecha + Inicio + Fin + Nivel, agregar/eliminar libremente.
-    function hrWindowWeekdayLabel(dayKeyStr) {
+    export function hrWindowWeekdayLabel(dayKeyStr) {
       const d = callDateToDate(dayKeyStr);
       if (!d) return '—';
       const raw = new Intl.DateTimeFormat('es-MX', { weekday: 'long' }).format(d);
       return raw.charAt(0).toUpperCase() + raw.slice(1);
     }
     // Texto de cada botón del pill de nivel — el activo muestra su bono ("Gold +$0.03"), los otros solo el nombre.
-    function hrTierButtonLabel(tierKey, active) {
+    export function hrTierButtonLabel(tierKey, active) {
       const meta = HIGHER_RATE_TIERS[tierKey];
       return active ? `${meta.label} +${money(meta.bonusPerMin)}` : meta.label;
     }
