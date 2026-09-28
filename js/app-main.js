@@ -4350,7 +4350,7 @@ function renderPayDatesSection() {
           const startMs = new Date(call.startISO).getTime();
           if (!Number.isFinite(startMs) || startMs < activeShiftStart.getTime() || startMs > activeShiftEnd.getTime()) return call;
           if (!activeShiftDayKey || callDateKeyFromValue(call.callDate) === activeShiftDayKey) return call;
-          return { ...call, calendarCallDate: call.callDate, callDate: activeShiftDayKey };
+          return { ...call, calendarCallDate: call.callDate, callDate: activeShiftDayKey, shiftDayKey: activeShiftDayKey };
         });
       }
       const existing = new Set(calls.filter(c => !isReplaceableLiveCall(c)).map(callDedupeKey));
@@ -4426,6 +4426,9 @@ function renderPayDatesSection() {
           calendarCallDate: replacingLive
             ? (item.call.calendarCallDate || item.call.callDate)
             : item.call.calendarCallDate,
+          shiftDayKey: replacingLive
+            ? (item.replaces.shiftDayKey || item.replaces.callDate)
+            : item.call.shiftDayKey,
           importedAt: preserveOfficialIdentity ? (item.replaces.importedAt || importTs) : importTs,
           source: 'import',
         };
