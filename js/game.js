@@ -1159,8 +1159,6 @@ function stageComparisonSnapshot(dayKey, earnings) {
   };
 }
 
-function freezeGameDay
-
 function freezeGameDay(dayKey) {
   const snapshot = computeGameDay(dayKey);
   const existing = dayEntry(dayKey);
@@ -1316,11 +1314,6 @@ function openPendingChest(todayKey) {
   }
   playGameTone('clear');
   return true;
-}
-
-export function onGamePauseEnded() {
-  if (!gameEnabled()) return;
-  renderGame();
 }
 
 export function onGamePauseEnded() {
