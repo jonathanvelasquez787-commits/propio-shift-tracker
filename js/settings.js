@@ -19,6 +19,7 @@ import {
   getDailyGoalOverride,
   iconHtml,
   money,
+  onGameDayMetadataChanged,
   openModal,
   render,
   saveSettingsOnly,
@@ -84,6 +85,7 @@ let syncingGoals = false;
         saveStateOnly();
       }
       saveSettingsOnly();
+      onGameDayMetadataChanged(dayKey);
       refreshGoalInputs();
       render();
     }
@@ -155,6 +157,7 @@ let syncingGoals = false;
       if (!getDailyGoalOverride(dayKey)) return;
       setDailyGoalOverride(dayKey, null);
       saveSettingsOnly();
+      onGameDayMetadataChanged(dayKey);
       refreshGoalInputs();
       render();
       toast('Ese día vuelve a usar tu meta general');
