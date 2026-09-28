@@ -1477,8 +1477,8 @@ export function sameCallDay(iso, key) {
 
 function callImportFlag(c) {
   if (!c.importedAt) return null;
-  if (sameCallDay(c.importedAt, c.callDate)) {
-    const lagMin = (new Date(c.importedAt).getTime() - new Date(c.endISO).getTime()) / 60000;
+  const lagMin = (new Date(c.importedAt).getTime() - new Date(c.endISO).getTime()) / 60000;
+  if (sameCallDay(c.importedAt, c.callDate) || String(c.shiftDayKey || '') === callDateKeyFromValue(c.callDate)) {
     if (lagMin > 30) return { cls: 'imported-late', label: 'Importado tarde' };
     return null;
   }
