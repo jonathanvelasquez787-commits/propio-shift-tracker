@@ -58,7 +58,7 @@ async function minifyTree(dir) {
 }
 
 await minifyTree(assets);
-for (const name of ['theme-init', 'footer-year', 'register-sw']) {
+for (const name of ['theme-init', 'footer-year', 'register-sw', 'monitoring']) {
   const source = await readFile(path.join(root, 'js', `${name}.js`), 'utf8');
   await minifyFile(path.join(assets, `${name}.js`), source);
 }
@@ -82,6 +82,7 @@ for (const name of ['index.html', 'app.html', 'privacidad.html', 'terminos.html'
     .replace(/<script type="module" src="(\/assets\/(?:landing|boot)\.js\?v=[^"]+)"><\/script>/g, '<script src="$1" defer></script>')
     .replace(/^<link rel="modulepreload" href="\/js\/.*?"\/>\r?\n/gm, '');
   if (name === 'app.html') html = html.replace('</head>', `<link rel="modulepreload" href="/assets/boot.js?v=${release}">\n</head>`);
+  html = html.replace('</head>', `<script src="/assets/monitoring.js?v=${release}"></script>\n</head>`);
   html = html.replace('</head>', '<link rel="manifest" href="/manifest.webmanifest">\n<meta name="theme-color" content="#07111f">\n</head>');
   html = html.replace('</body>', `<script src="/assets/register-sw.js?v=${release}" defer></script>\n</body>`);
   await writeFile(path.join(out, name), html);

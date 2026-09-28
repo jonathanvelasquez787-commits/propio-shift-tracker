@@ -16,7 +16,6 @@ import {
   authErrorMessage,
   USERNAME_RE,
 } from './auth.js';
-import './monitoring.js';
 
 const $ = (id) => document.getElementById(id);
 
