@@ -230,7 +230,7 @@ import {
     // mayor bono, si hay varias traslapadas — mismo criterio que higherRateBonusForCall), o {
     // active: false, window, startsAt } con la próxima ventana futura más cercana (cualquier fecha,
     // no solo hoy).
-    function higherRateLiveStatus() {
+    export function higherRateLiveStatus() {
       const now = new Date();
       const windows = settings.higherRateWindows || [];
       const activeNow = windows.filter(w => isNowWithinHigherRateWindow(now, w));
