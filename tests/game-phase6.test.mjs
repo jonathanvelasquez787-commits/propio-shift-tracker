@@ -568,3 +568,65 @@ test('cuarta simulación mensual: gamificación nocturna no se parte a medianoch
   assert.match(game, /const dayKey = currentGameDayKey\(\);[\s\S]*computeGameDay\(dayKey\)/);
   assert.doesNotMatch(game, /onGameDayRollover\(\)[\s\S]{0,180}state\.game\.live = \{ dayKey: todayCallDateKey\(\)/);
 });
+
+
+test('quinta simulación mensual: editar fecha y nivel de Higher Rate sí llega al guardado', () => {
+  const appMain = read('js/app-main.js');
+  const higherRate = read('js/higher-rate.js');
+  assert.match(higherRate, /export function hrWindowWeekdayLabel\(/);
+  assert.match(higherRate, /export function hrTierButtonLabel\(/);
+  assert.match(appMain, /hrTierButtonLabel,/);
+  assert.match(appMain, /hrWindowWeekdayLabel,/);
+  const clickHandler = appMain.slice(appMain.indexOf("document.getElementById('higherRateModal').addEventListener('click'"), appMain.indexOf("document.getElementById('higherRateModal').addEventListener('change'"));
+  assert.match(clickHandler, /hrTierButtonLabel\(t, active\)/);
+  assert.match(clickHandler, /saveHigherRateWindowsFromEditor\(\)/);
+  const changeHandler = appMain.slice(appMain.indexOf("document.getElementById('higherRateModal').addEventListener('change'"), appMain.indexOf("document.getElementById('daySelector').addEventListener('change'"));
+  assert.match(changeHandler, /hrWindowWeekdayLabel\(dayKey\)/);
+  assert.match(changeHandler, /saveHigherRateWindowsFromEditor\(\)/);
+});
+
+test('quinta simulación mensual: descartar live iniciada durante Break Lunch restaura la pausa', () => {
+  const appMain = read('js/app-main.js');
+  assert.match(appMain, /let interruptedPauseRollback = null/);
+  assert.match(appMain, /interruptedPauseRollback = endPause\(\{ silent: true, deferSave: true \}\)/);
+  assert.match(appMain, /interruptedPauseRollback,/);
+  assert.match(appMain, /rollback\.pauseHistoryId/);
+  assert.match(appMain, /rollback\.pauseEndEventId/);
+  assert.match(appMain, /state\.activePause = \{ \.\.\.rollback\.pause \}/);
+});
+
+test('quinta simulación mensual: respaldo live sobrevive refresh y descartar revierte turno ACW', () => {
+  const appMain = read('js/app-main.js');
+  const calls = read('js/calls.js');
+  assert.match(appMain, /pendingLiveCallBackup: null/);
+  assert.match(appMain, /autoSaveLiveCall\(startedAt, endedAt, liveContext\)/);
+  assert.match(appMain, /restorePendingLiveCallBackup\(\);/);
+  assert.match(calls, /state\.pendingLiveCallBackup = \{/);
+  assert.match(calls, /export function restorePendingLiveCallBackup\(\)/);
+  assert.match(calls, /function rollbackPendingLiveBackup\(\)/);
+  assert.match(calls, /state\.shiftStartedAt = context\.previousShiftStartedAt \|\| null/);
+  assert.match(calls, /reconcileLastCallEndedAt\(affectedDayKey\)/);
+  assert.doesNotMatch(calls, /let manualCallLiveBackupPending = !!state\.pendingLiveCallBackup/);
+});
+
+test('quinta simulación mensual: respaldo live conserva duración decimal y día contable nocturno', () => {
+  const calls = read('js/calls.js');
+  assert.match(calls, /function callAccountingFields\(start, fallbackCallDate\)/);
+  assert.match(calls, /const accountingCallDate = belongsToTrackedShift \? todayCallDateKey\(shiftStart\) : calendarCallDate/);
+  assert.match(calls, /const accounting = callAccountingFields\(start, callDate\)/);
+  assert.match(calls, /const accounting = callAccountingFields\(start, todayCallDateKey\(start\)\)/);
+  assert.match(calls, /Math\.round\(\(elapsedMs \/ 60000\) \* 100\) \/ 100/);
+  assert.doesNotMatch(calls, /durationMin = Math\.max\(1, Math\.round\(\(end\.getTime\(\) - start\.getTime\(\)\) \/ 60000\)\)/);
+  assert.match(calls, /calendarDayKey = callDateKeyFromValue\(originalCandidate\?\.calendarCallDate\) \|\| todayCallDateKey\(start\)/);
+  assert.match(calls, /source: 'live'/);
+});
+
+test('quinta simulación mensual: Break Lunch y reset respetan día contable de turno nocturno', () => {
+  const appMain = read('js/app-main.js');
+  assert.match(appMain, /function currentShiftAccountingDayKey\(fallbackDate = new Date\(\)\)/);
+  assert.match(appMain, /state\.activePause = \{ type, startedAt: now\.toISOString\(\), shiftDayKey: dayKey \}/);
+  assert.match(appMain, /const pauseRecord = \{ id: makeLocalId\(\), type: endedPause\.type, startedAt: endedPause\.startedAt, endedAt: now, shiftDayKey \}/);
+  assert.match(appMain, /const resetsTrackedShift = trackedShiftDayKey === normalizedDayKey/);
+  assert.match(appMain, /belongsToTrackedShift\(p\.startedAt\) \|\| belongsToTrackedShift\(p\.endedAt\)/);
+  assert.match(appMain, /const accountingDay = callDateKeyFromValue\(e\?\.shiftDayKey\)/);
+});
