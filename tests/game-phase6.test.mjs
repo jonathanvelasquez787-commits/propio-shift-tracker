@@ -433,7 +433,9 @@ test('tercera simulación mensual: turno nocturno conserva día contable y corre
   assert.match(calls, /const accountingCallDate = belongsToTrackedShift/);
   assert.match(calls, /shiftDayKey: accountingCallDate/);
   assert.match(appMain, /calendarCallDate: call\.callDate, callDate: activeShiftDayKey, shiftDayKey: activeShiftDayKey/);
-  assert.match(appMain, /shiftDayKey: replacingLive/);
+  assert.match(appMain, /const replacingExisting = \(preserveOfficialIdentity \|\| replacingLive\) \? item\.replaces : null/);
+  assert.match(appMain, /callDate: replacingExisting \? replacingExisting\.callDate : item\.call\.callDate/);
+  assert.match(appMain, /shiftDayKey: replacingExisting/);
   assert.match(appMain, /startISO ya contiene la fecha real/);
 });
 
