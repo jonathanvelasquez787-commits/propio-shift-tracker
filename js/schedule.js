@@ -32,6 +32,7 @@ import {
   pad,
   saveAll,
   saveSettingsOnly,
+  snapshotHistoricalPlanning,
   scheduleEditDay,
   setScheduleEditDay,
   scheduleOffsetMin,
@@ -121,6 +122,7 @@ import {
     }
 
     export function removeScheduleWeekOverride(offset = scheduleWeekOffset) {
+      snapshotHistoricalPlanning();
       const key = scheduleWeekKeyForOffset(offset);
       if (settings.scheduleOverridesByWeek) delete settings.scheduleOverridesByWeek[key];
     }
@@ -567,6 +569,7 @@ import {
         toast(check.errors[0]);
         return;
       }
+      snapshotHistoricalPlanning();
       const target = activeScheduleTarget({ createIfMissing: true });
       target[scheduleEditDay] = cfg;
       if (scheduleViewMode === 'template') {
@@ -602,7 +605,8 @@ import {
       }
       const scope = scheduleViewMode === 'week' ? 'de esa semana' : '';
       appConfirm(`¿Copiar este horario (${WEEKDAY_LABELS[scheduleEditDay]}) a Lunes-Viernes ${scope}? Esto sobreescribe Lunes a Viernes — Sábado y Domingo no se tocan.`, () => {
-        const target = activeScheduleTarget({ createIfMissing: true });
+        snapshotHistoricalPlanning();
+      const target = activeScheduleTarget({ createIfMissing: true });
         target[scheduleEditDay] = cfg;
         WEEKDAYS.filter(k => k !== 'sat' && k !== 'sun').forEach(k => {
           target[k] = {
@@ -637,7 +641,8 @@ import {
       }
       const scope = scheduleViewMode === 'week' ? 'de esa semana' : '';
       appConfirm(`¿Copiar este horario (${WEEKDAY_LABELS[scheduleEditDay]}) a Sábado y Domingo ${scope}? Esto sobreescribe Sábado y Domingo — el resto de los días no se tocan.`, () => {
-        const target = activeScheduleTarget({ createIfMissing: true });
+        snapshotHistoricalPlanning();
+      const target = activeScheduleTarget({ createIfMissing: true });
         target[scheduleEditDay] = cfg;
         target.sat = { off: cfg.off, start: cfg.start, end: cfg.end, blocks: cfg.blocks.map(b => ({ ...b })) };
         target.sun = { off: cfg.off, start: cfg.start, end: cfg.end, blocks: cfg.blocks.map(b => ({ ...b })) };
