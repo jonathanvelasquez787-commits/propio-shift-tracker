@@ -227,6 +227,10 @@ futura opera bajo esto, sin excepción:
 - **El blob de `user_data` no tiene tope.** Cada subida manda el snapshot
   completo. Señal de alarma: que la subida empiece a tardar más de 1-2 s —
   ahí toca la Fase 5 (tabla propia para `calls`).
+- **Fase 6 (El Monstruo): sin código todavía.** El mockup de la Arena
+  (monstruo a la DERECHA, arcade feroz, claro y oscuro) está hecho y espera
+  aprobación explícita del usuario antes de escribir HTML/CSS/JS. Faltan por
+  mockupear: modo "Solo sutil", jefe del ciclo y bestiario.
 
 **LIMITACIONES CONOCIDAS** (alcance reducido a propósito, no son bugs)
 
@@ -326,6 +330,101 @@ Pendientes, en orden:
   servidor, PWA instalable con service worker, monitoreo de errores (Sentry),
   backup automático diario. Borrado de cuenta y exportación de datos ya están
   hechos (adelantados en Fase 2).
+- **Fase 6 — El Monstruo (gamificación).** Ver sección siguiente. Módulo
+  nuevo `js/monsters.js` (hub-and-spoke, importa solo de `js/app-main.js`),
+  precargado con `modulepreload` en `app.html`.
+
+---
+
+**FASE 6 — EL MONSTRUO (diseño aprobado en concepto; código pendiente)**
+
+NOTA: el archivo de la versión anterior de esta fase (con el mapa de Inicio,
+Logros, XP y decisiones abiertas 1-7) no llegó a esta sesión; esta sección
+recoge el monstruo completo y NO pisa esas partes. Si existen en el repo,
+fusionarlas a mano en la próxima edición.
+
+**Tono: arcade feroz** (jefe de videojuego, pixel-art de 16×13). Decidido.
+
+**Ubicación en pantalla: el monstruo va a la DERECHA** de la tarjeta, con la
+información (vida, dinero, combo) a la izquierda. Se logra con
+`flex-direction: row-reverse` en `.stage`; en ancho móvil sigue igual (sprite
+de 132 px a la derecha). La sombra de ayer y los "Zzz" se espejan con él.
+
+**Concepto**
+- Vida del monstruo = meta diaria en dólares (`effectiveDailyGoal(dayKey).usd`).
+  Cada llamada guardada es un golpe; el daño es lo que pagó (con su bono de
+  Higher Rate). El número flotante lleva conversión, p. ej.
+  `-$1.68 (≈ L 45)` (Protocolo de moneda secundaria: `convertedAmountText`).
+- Seis estados, derivados de un solo cálculo (`stOf`): dormido (Break/Lunch
+  activo), despierto (>50% de vida), enojado (≤50%), herido (≤25%, barra roja
+  parpadeando), furia (ventana Higher Rate activa: sprite dorado, golpes
+  críticos x1.25 con número dorado) y derrotado (vida 0).
+- Combo = golpes encadenados ("COMBO x4!"); se reinicia con el día.
+- Las 3 misiones son 3 armaduras (hombrera izquierda, hombrera derecha,
+  peto): Minutos (meta diaria), Breaks a tiempo, Adherencia ≥ meta. Cada una
+  cumplida se rompe en el sprite. Las 3 rotas + monstruo derrotado =
+  STAGE CLEAR con 3 estrellas (`★☆☆` según armaduras rotas).
+- Fantasma de ayer = marca gris fija en la barra (dónde iba ayer a esta hora)
+  más un monstruito gris en la esquina inferior del arena.
+- Regla: **descansar es seguro**. Con Break/Lunch el monstruo duerme; no se
+  cura ni se enoja ni hay castigo.
+- Regla: **derrotado se queda derrotado**. Lo que se gane después es "botín
+  extra": sin monstruo nuevo, sin XP nuevo; el tope diario de XP no cambia.
+
+**Decisiones resueltas (antes abiertas, 9-13)**
+9. **Especies**, una por día de la semana (nombre + frase; furia = variante
+   dorada del mismo sprite):
+   Lunes «Lunes Perezoso» ("Cinco minutitos más…"), Martes «Martillo Tuerto»
+   ("Hoy sí me doy cuenta de todo"), Miércoles «Mediodía Mordedor» ("Estoy a
+   la mitad y con hambre"), Jueves «Jueves Jadeante» ("Ya casi, ya casi…"),
+   Viernes «Viernes Furioso» (más agresivo: animación de enojado desde el
+   inicio), Sábado y Domingo «Fantasma de Fin de Semana» (translúcido; solo
+   sale si se trabaja un día libre). Variantes raras: dorado en días con
+   Higher Rate; «Rey de la Racha» con racha ≥ 7 días. Nuevas especies se
+   desbloquean al subir de nivel.
+10. **Botín** (sustituye a los stickers): cofre y caja "?" dan monedas de XP
+    cosméticas y accesorios para el bestiario (corona, cuernos dorados,
+    bufanda). Nunca dinero real ni nada que afecte ganancias.
+11. **Jefe del ciclo que no cae**: "huye herido". El día de pago no hay
+    derrota ni castigo; el bestiario lo guarda como "escapó con X% de vida".
+12. **Sonido**: el "pop" del golpe cuenta como capa arcade, NO como capa
+    sutil (ajusta la regla anterior: la capa sutil sigue sin sonido). Golpe =
+    pop corto; crítico = agudo; derrota = fanfarria de ~1 s. Todo escala con
+    `settings.masterVolume` vía Web Audio (patrón de `playShiftAlarmBeep`).
+13. **Ubicación**: la Arena va DENTRO de "Ganancias de hoy" (modo Hoy),
+    justo debajo de `#earningsTagsRow` y antes de `.gh-goal-card`, y la
+    reemplaza visualmente como tarjeta de meta cuando Intensidad ≠ "Solo
+    sutil". Ocupa el lugar del `#financePreviewBox` hacia abajo sin moverlo.
+
+**Tres capas**
+1. Monstruo del día (arriba).
+2. Jefe del ciclo de 14 días: enorme, se agrieta con cada día cumplido
+   (meta del ciclo `effectiveCycleGoal(0)`); el día de pago cae, botín = pago
+   real con conversión.
+3. Bestiario en la página Logros: cada monstruo vencido se colecciona con
+   fecha y estrellas; los pendientes son siluetas "???".
+
+**Intensidad**: "Solo sutil" reduce el monstruo a un icono pequeño con la
+barra, sin efectos ni sonido; "Normal" y "Arcade" muestran la Arena completa,
+Arcade suma confeti, brillo y sonido. `prefers-reduced-motion` deja el
+monstruo quieto pero mostrando su estado.
+
+**Técnica**
+- Sprite: SVG inline (rectángulos por corridas de píxeles), sin imágenes,
+  colores por paleta (`normal`, `furia`, `derrotado`) y tokens de tema
+  (`--good`, `--warn`, `--panel-navy`, `--line`). Referencia: mockup
+  `arena-mockup.html` (funciones `sprite`, `stOf`, `html`).
+- La app repinta cada segundo: reescribir el SVG reiniciaría las animaciones.
+  El monstruo solo se redibuja cuando cambia su estado, sus armaduras o al
+  recibir un golpe; el resto (dinero, barra) se actualiza en sitio.
+- Datos: `state.game` guarda `{ day, species, dayEarnedHits, combo, armor:[b,b,b],
+  defeatedAt, bestiary:[…] }` en el blob existente (sin tablas nuevas).
+- Módulo `js/monsters.js`, export `renderArena()`, llamado desde `render()`;
+  el golpe se dispara desde `autoSaveLiveCall`/`saveManualCall`/`importCalls`
+  (una vez por llamada nueva guardada).
+
+**Próximos mockups** (protocolo de layout): modo "Solo sutil", jefe del ciclo
+de 14 días, bestiario. Después, aprobación explícita y recién ahí código.
 
 ---
 
