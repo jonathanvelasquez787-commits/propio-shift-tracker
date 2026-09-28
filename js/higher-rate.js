@@ -612,12 +612,11 @@ import {
     export function addHigherRateWindowRow() {
       const current = readHigherRateWindowsFromEditor();
       const todayKey = todayCallDateKey();
-      const todaysEndMins = current.filter(w => w.date === todayKey).map(w => toMinutes(formatHHMM(w.end)));
       const now = new Date();
-      const nowMin = now.getHours() * 60 + now.getMinutes();
-      let startMin = todaysEndMins.length ? Math.max(...todaysEndMins) : nowMin;
-      startMin = Math.min(startMin, 23 * 60);
-      const endMin = Math.min(23 * 60 + 59, startMin + 60);
+      const startMin = now.getHours() * 60 + now.getMinutes();
+      // Una ventana nueva empieza "ahora" y dura una hora por default. Si son las 11:50 PM,
+      // termina 12:50 AM del día siguiente: higherRateWindowBounds ya soporta ese cruce.
+      const endMin = (startMin + 60) % 1440;
       const newWindow = { id: makeLocalId(), date: todayKey, start: minutesToHHMM(startMin), end: minutesToHHMM(endMin), tier: 'bronze' };
       current.push(newWindow);
       renderHigherRateWindowsEditor(current);
