@@ -54,14 +54,45 @@ test('enforced CSP contains the required Supabase and asset origins', () => {
   const supabaseUrl = read('js/config.js').match(/SUPABASE_URL = '([^']+)'/)[1];
   assert.ok(directives['connect-src'].includes(supabaseUrl));
   assert.ok(directives['connect-src'].includes(supabaseUrl.replace('https:', 'wss:')));
-  assert.ok(directives['script-src'].includes('https://cdn.jsdelivr.net'));
-  assert.ok(!directives['script-src'].some(s => /unsafe|\*/.test(s)));
+  assert.deepEqual(directives['script-src'], ["'self'"]);
   assert.deepEqual(directives['script-src-attr'], ["'none'"]);
   assert.deepEqual(directives['object-src'], ["'none'"]);
   assert.deepEqual(directives['frame-ancestors'], ["'none'"]);
   assert.ok(directives['style-src'].includes('https://fonts.googleapis.com'));
   assert.ok(directives['font-src'].includes('https://fonts.gstatic.com'));
   assert.ok(directives['media-src'].includes('data:'));
+});
+
+test('production build pins and bundles Supabase without source maps', () => {
+  const pkg = JSON.parse(read('package.json'));
+  const vercel = JSON.parse(read('vercel.json'));
+  assert.equal(pkg.dependencies['@supabase/supabase-js'], '2.117.2');
+  assert.equal(pkg.devDependencies.rollup, '3.29.5');
+  assert.equal(pkg.devDependencies.terser, '5.44.0');
+  assert.equal(vercel.outputDirectory, 'public');
+  assert.match(read('js/supabase-client.js'), /from '@supabase\/supabase-js'/);
+  assert.match(read('scripts/build.mjs'), /sourcemap:\s*false/);
+  assert.match(read('scripts/build.mjs'), /minify\(/);
+});
+
+test('phase 5 migration keeps private data behind RLS and persistent limits', () => {
+  const sql = read('supabase/migrations/0003_phase_5.sql');
+  for (const table of ['calls', 'rate_limit_buckets', 'app_errors', 'daily_backups']) {
+    assert.match(sql, new RegExp(`alter table public\\.${table} enable row level security`, 'i'));
+  }
+  assert.match(sql, /consume_rate_limit/);
+  assert.match(sql, /push_user_data_v2/);
+  assert.match(sql, /cron\.schedule\('propio-daily-backup'/);
+  assert.match(sql, /octet_length\(payload::text\) <= 65536/);
+});
+
+test('PWA shell includes a manifest and service worker with API exclusions', () => {
+  const manifest = JSON.parse(read('manifest.webmanifest'));
+  assert.equal(manifest.display, 'standalone');
+  assert.equal(manifest.start_url, '/app.html');
+  const worker = read('js/service-worker.js');
+  assert.match(worker, /url\.pathname\.startsWith\('\/api\/'\)/);
+  assert.match(worker, /request\.mode === 'navigate'/);
 });
 
 test('footer year tolerates pages without a footer', () => {

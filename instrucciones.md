@@ -218,15 +218,9 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
-- **`@supabase/supabase-js` pinchado a 2.45.4 desde jsDelivr**, sin lockfile.
-  Para actualizar: subir el número en `js/supabase-client.js`, probar login +
-  sincronización, y recién ahí desplegar.
-- **El freno por IP de `/api/login` es best-effort** (vive en memoria, las
-  funciones serverless se reciclan). Si hace falta de verdad: Upstash Redis o
-  el rate limiting de Vercel.
-- **El blob de `user_data` no tiene tope.** Cada subida manda el snapshot
-  completo. Señal de alarma: que la subida empiece a tardar más de 1-2 s —
-  ahí toca la Fase 5 (tabla propia para `calls`).
+Sin pendientes técnicos abiertos en las fases 4 y 5. El cambio de visibilidad
+del repositorio se completa en GitHub como último paso operativo porque afecta
+quién puede acceder al código fuente.
 
 **LIMITACIONES CONOCIDAS** (alcance reducido a propósito, no son bugs)
 
@@ -315,21 +309,38 @@ Pendientes, en orden:
   reasignar directo (un módulo no puede reasignar algo que solo importó).
   La extracción de páginas está completa. `state` se exporta desde
   `js/app-main.js` porque Llamadas y Ajustes lo necesitan.
-- **Fase 4 — Protección del código fuente.** Ya hecho: gate de sesión
-  (ahora todos los módulos de `js/` detrás de `js/boot.js`), licencia +
-  términos + privacidad en el repo. Pendiente: minificar/bundlear sin
-  sourcemaps (ahora que la Fase 3 está cerrada), mover al servidor el motor de
-  Adherencia/reportes agregados (rompe el offline de esa parte), repo privado
-  en GitHub (pendiente del usuario). Explícitamente descartado: bloquear
-  click derecho, deshabilitar F12, ofuscadores agresivos.
-- **Fase 5 — Opcionales.** `calls` en tabla propia para reportes del lado del
-  servidor, PWA instalable con service worker, monitoreo de errores (Sentry),
-  backup automático diario. Borrado de cuenta y exportación de datos ya están
-  hechos (adelantados en Fase 2).
+- **Fase 4 — Protección del código fuente (CERRADA).** El gate de sesión,
+  licencia, términos y privacidad siguen activos. Rollup empaqueta la app y el
+  cliente estable de Supabase; Terser minifica sin sourcemaps y Vercel publica
+  solo `public/`, no los módulos fuente de `js/`. La CSP ya solo permite scripts
+  del mismo origen. El motor de Adherencia permanece en el cliente por decisión
+  de producto: moverlo quitaría el funcionamiento offline, una promesa central
+  de la app, sin impedir que alguien observe el resultado ejecutado. Los
+  agregados futuros pueden salir de la tabla normalizada de llamadas. Se
+  mantienen descartados el bloqueo de click derecho, F12 y los ofuscadores.
+- **Fase 5 — Producción y resiliencia (CERRADA).** `calls` vive en tabla propia
+  con RLS y sincronización por deltas; estado, ajustes, lotes y filas tienen
+  límites de tamaño. La app es instalable y conserva su shell offline mediante
+  service worker. El monitoreo es propio en Supabase para no enviar horas,
+  dinero ni navegación a Sentry u otro tercero. Hay rate limiting persistente
+  para login y telemetría, y un backup diario con 30 días de retención. Borrado
+  de cuenta y exportación de datos continúan disponibles.
 
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v566** — Fases 4 y 5 cerradas.
+
+- Build de producción con Rollup + Terser, cliente Supabase 2.117.2 local,
+  módulos minificados sin sourcemaps y CSP limitada a scripts propios.
+- Llamadas normalizadas con RLS y sincronización por deltas; límites de tamaño,
+  rate limiting persistente, telemetría privada y backup diario.
+- PWA instalable con service worker. El motor de Adherencia queda local para
+  preservar el funcionamiento offline; no se envían datos a Sentry.
+- Verificados 14 tests, imports/exports de 11 módulos, sintaxis y build completo;
+  el bundle no contiene rutas `/js/`, jsDelivr ni `sourceMappingURL`.
+
 
 **v564** — Content Security Policy activada.
 
@@ -356,14 +367,3 @@ Pendientes, en orden:
   18 archivos JS. Comparación en navegador del marcado estático: 0 diferencias
   en estilos visibles, claro/oscuro a 1440 y 390 px; páginas legales verificadas
   con CSP aplicada en una prueba local. No se probaron accesos con cuenta real.
-
-
-**v562** — Cierre de la Fase 3: Ajustes se extrae a `js/settings.js` y la
-sección "Tu perfil" permite cambiar username y correo.
-
-- El nuevo módulo concentra perfil local, metas por día/general, tarifa, moneda,
-  selectores de emoji y onboarding.
-- `js/auth.js` agrega `updateEmail()`; username y correo se cargan desde la
-  cuenta y se guardan con mensajes de validación/confirmación.
-- `app.html` precarga `js/settings.js`. El chequeo automático recorre ahora
-  también Auth, Supabase y Config: once módulos locales en total.
