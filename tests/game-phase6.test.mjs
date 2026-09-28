@@ -1,0 +1,156 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
+const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
+
+test('Fase 6 expone el catálogo semanal y renderiza SVG seguro para todos los estados', async () => {
+  const monstersSource = read('js/monsters.js');
+  assert.doesNotMatch(monstersSource, /^\s*import\s/m);
+  assert.match(monstersSource, /export const MONSTER_CATALOG/);
+  assert.match(monstersSource, /export function monsterSvg/);
+  assert.match(monstersSource, /currentColor/);
+  assert.match(monstersSource, /role="img"/);
+  assert.match(monstersSource, /aria-label=/);
+  assert.match(monstersSource, /replaceAll\('&', '&amp;'/);
+
+  const monsters = await import(new URL('../js/monsters.js?phase6-test', import.meta.url));
+  assert.deepEqual(Object.keys(monsters.MONSTER_CATALOG), ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
+  assert.equal(monsters.MONSTER_CATALOG.sat.id, monsters.MONSTER_CATALOG.sun.id);
+
+  for (const weekdayKey of Object.keys(monsters.MONSTER_CATALOG)) {
+    assert.equal(monsters.monsterForWeekday(weekdayKey).weekdayKey, weekdayKey);
+  }
+  for (const state of ['sleeping', 'awake', 'angry', 'wounded', 'fury', 'defeated']) {
+    for (const variant of ['normal', 'gold', 'streak']) {
+      const svg = monsters.monsterSvg({ species: 'mon', state, variant, hpPct: 42, sizeClass: 'sm' });
+      assert.match(svg, new RegExp(`monster-svg--${state}`));
+      assert.match(svg, new RegExp(`monster-svg--${variant}`));
+      assert.match(svg, /role="img"/);
+      assert.match(svg, /currentColor/);
+    }
+  }
+  const safe = monsters.monsterSvg({ species: 'mon', state: '<script>', sizeClass: 'x" onload="alert(1)' });
+  assert.doesNotMatch(safe, /<script|onload=/i);
+});
+
+test('HTML integra la ruta de Logros, el arena, las misiones, ajustes y modales sin IDs duplicados', () => {
+  const html = read('app.html');
+  const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map((match) => match[1]);
+  const duplicates = ids.filter((id, index) => ids.indexOf(id) !== index);
+  assert.deepEqual(duplicates, []);
+  for (const id of [
+    'gameArena', 'gameMissions', 'gameCycleBoss', 'gameCycleBossAchievements',
+    'gameAchievementsSummary', 'gameStreakPanel', 'gameLevelPanel', 'gameBestiary',
+    'gameTrophies', 'gameRecords', 'gameLastStageClear', 'gameToastStack',
+    'gameEnabledInput', 'gameIntensityInput', 'gameSettingsProfile',
+    'stageClearModal', 'stageClearContent', 'chestModal', 'chestContent',
+  ]) assert.match(html, new RegExp(`\\bid="${id}"`), `missing #${id}`);
+  assert.match(html, /<link rel="stylesheet" href="\/css\/game\.css"\s*\/>/);
+  assert.match(html, /data-page="achievements"/);
+
+  const appMain = read('js/app-main.js');
+  assert.match(appMain, /'achievements'/);
+  assert.match(appMain, /if \(page === 'achievements'\) renderGame\(\)/);
+  assert.match(appMain, /onGameShiftStarted/);
+  assert.match(appMain, /onGameShiftEnded/);
+  assert.match(appMain, /onGamePauseEnded/);
+  assert.match(appMain, /onGameGapSaved/);
+});
+
+test('state y settings conservan defaults y normalización de Fase 6', () => {
+  const game = read('js/game.js');
+  const appMain = read('js/app-main.js');
+  assert.match(game, /export function createDefaultGameState\(\)/);
+  assert.match(game, /chest: \{ pending: false, sealedOn: null \}/);
+  assert.match(game, /live: \{ dayKey: null, combo: 0, shiftAlarmAt: null \}/);
+  assert.match(game, /export function normalizeGameState\(raw\)/);
+  assert.match(game, /shields: Math\.max\(0, Math\.min\(GAME_SHIELD_CAP/);
+  assert.match(game, /if \(settings\.game\.intensity === 'off'\) settings\.game\.enabled = false/);
+  assert.match(appMain, /game: createDefaultGameState\(\)/);
+  assert.match(appMain, /game: normalizeGameState\(src\.game\)/);
+  assert.match(appMain, /game: \{ enabled: true, intensity: 'arcade' \}/);
+});
+
+test('XP solo entra por llamadas actuales y oportunas, con tope diario y lock de snapshot', () => {
+  const game = read('js/game.js');
+  const calls = read('js/calls.js');
+  assert.match(game, /export const GAME_DAILY_XP_CAP = 150/);
+  assert.match(game, /Math\.min\(GAME_DAILY_XP_CAP/);
+  assert.match(game, /dayCalls\.length \? Math\.min\(GAME_DAILY_XP_CAP/);
+  assert.match(game, /todayCallDateKey\(\) !== dayKey/);
+  assert.match(game, /todayCallDateKey\(new Date\(call\.importedAt \|\| 0\)\) !== dayKey/);
+  assert.match(game, /imported - ended <= 30 \* 60000/);
+  assert.match(game, /Number\.isFinite\(lockedXp\) \? Math\.min\(rawXp, lockedXp\) : rawXp/);
+  assert.match(game, /!\['manual', 'live'\]\.includes\(source\)/);
+  assert.match(calls, /onGameCallSaved\(candidate, 'manual'\)/);
+  assert.match(calls, /onGameCallSaved\(candidate, 'live'\)/);
+  assert.doesNotMatch(calls, /onGameCallSaved\([^\n]*import/i);
+});
+
+test('derrota no debe seguir produciendo golpes/recompensas posteriores', () => {
+  const game = read('js/game.js');
+  const handler = game.slice(game.indexOf('export function onGameCallSaved'), game.indexOf('export function onGameGapSaved'));
+  const defeatGuard = handler.indexOf('currentDay.defeated');
+  const fx = handler.indexOf('showCallFx');
+  const reward = handler.indexOf('rewardLootBox');
+  assert.ok(defeatGuard >= 0, 'onGameCallSaved debe reconocer el estado derrotado');
+  assert.ok(defeatGuard < fx, 'la derrota debe bloquear el feedback de golpe');
+  assert.ok(defeatGuard < reward, 'la derrota debe bloquear recompensas posteriores');
+  assert.match(game, /if \(Number\.isFinite\(Number\(entry\.xpLocked\)\)\) return 0/);
+  assert.match(game, /xpLocked: Number\(entry\.xpLocked\)/);
+});
+
+test('cierre y cofre son idempotentes, y el dinero secundario aparece en la experiencia', () => {
+  const game = read('js/game.js');
+  assert.match(game, /if \(existing\.finalized\) return existing/);
+  assert.match(game, /const key = `chest:\$\{sealedOn\}`/);
+  assert.match(game, /if \(!state\.game\.ledger\[key\]\)/);
+  assert.match(game, /state\.game\.chest = \{ pending: false, sealedOn: null \}/);
+  assert.match(game, /if \(snapshot\.stats\.total \|\| snapshot\.eligibleCalls\.length\)/);
+  assert.match(game, /convertedAmountText/);
+  assert.match(game, /function withConversion/);
+  assert.match(game, /withConversion\(parseMoney\(call\.pay\)\)/);
+  assert.match(game, /withConversion\(snapshot\.stats\.earnings\)/);
+});
+
+test('CSS de juego cubre motion reducido, layout estrecho y responsive', () => {
+  const css = read('css/game.css');
+  assert.match(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);
+  assert.match(css, /animation:\s*none\s*!important/);
+  assert.match(css, /transition:\s*none\s*!important/);
+  assert.match(css, /@media\s*\(max-width:\s*760px\)/);
+  assert.match(css, /@media\s*\(max-width:\s*520px\)/);
+  assert.match(css, /min-width:\s*0/);
+  assert.match(css, /overflow-wrap:\s*anywhere/);
+});
+
+test('build mantiene módulos fuente fuera de public y el worker precarga el CSS de juego', () => {
+  const build = read('scripts/build.mjs');
+  const worker = read('js/service-worker.js');
+  assert.match(build, /sourcemap:\s*false/);
+  assert.match(build, /inlineDynamicImports:\s*true/);
+  assert.match(build, /Build listo en public\/ sin sourcemaps ni módulos fuente/);
+  assert.match(build, /cp\(path\.join\(root, 'css'\), path\.join\(out, 'css'\)/);
+  assert.match(worker, /const SHELL = \[/);
+  assert.match(worker, /['"]\/css\/game\.css['"]/);
+
+  const publicRoot = path.join(root, 'public');
+  if (fs.existsSync(publicRoot)) {
+    assert.equal(fs.existsSync(path.join(publicRoot, 'css', 'game.css')), true);
+    assert.equal(fs.existsSync(path.join(publicRoot, 'js')), false);
+    const files = [];
+    const visit = (dir) => {
+      for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        const file = path.join(dir, entry.name);
+        if (entry.isDirectory()) visit(file);
+        else files.push(file);
+      }
+    };
+    visit(publicRoot);
+    assert.deepEqual(files.filter((file) => file.endsWith('.map')), []);
+  }
+});
