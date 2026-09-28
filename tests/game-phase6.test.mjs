@@ -553,6 +553,6 @@ test('cuarta simulación mensual: llamadas antes o después del checkpoint cuent
 
 test('cuarta simulación mensual: descartar live también revierte efectos de gamificación del auto-turno', () => {
   const appMain = read('js/app-main.js');
-  assert.match(appMain, /gameBeforeAutoShift:/);
+  assert.match(appMain, /const gameBeforeAutoShift = needsAutoShift[\s\S]*onGameShiftStarted\(\{ continued: false \}\)[\s\S]*gameBeforeAutoShift,/);
   assert.match(appMain, /discarded\.gameBeforeAutoShift/);
 });
