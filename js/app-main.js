@@ -3743,13 +3743,9 @@ function renderPayDatesSection() {
     // A diferencia de pauseActionDisabled (Break/Lunch), iniciar una llamada NO exige que ya haya
     // llamadas de ese día para anclar el auto-inicio del turno.
     function callActionDisabled() {
-      if (!isViewingToday()) return true;
-      // Terminar una llamada ya en curso nunca se bloquea, sin importar el estado del turno — mismo
-      // criterio que "Finalizar shift" una vez iniciado.
-      if (state.activeCall) return false;
-      // Para INICIAR una llamada nueva: si el turno de hoy ya se cerró, no tiene sentido registrar
-      // una llamada nueva ese día desde este botón.
-      return !!state.shiftEndedAt;
+      // Las llamadas reales pueden ocurrir antes del turno planeado o después de un cierre previo.
+      // El único bloqueo válido es estar viendo un día distinto de Hoy.
+      return !isViewingToday();
     }
 
     function callActionTimer() {
@@ -3795,7 +3791,7 @@ function renderPayDatesSection() {
 
     // Si le das a Break/Lunch sin haber dado click en "Iniciar shift" pero ya tienes llamadas
     // importadas hoy, se asume que ya estás trabajando.
-    function autoStartShiftFromCalls(silent = false) {
+    export function autoStartShiftFromCalls(silent = false) {
       if (state.shiftStartedAt || state.shiftEndedAt) return false;
       const todayCalls = callsForDay(todayCallDateKey());
       if (!todayCalls.length) return false;
@@ -3854,8 +3850,10 @@ function renderPayDatesSection() {
     }
 
     function setEvent(type, title, detail, meta = '') {
-      state.events.unshift({ id: makeLocalId(), ts: new Date().toISOString(), type, title, detail, meta });
+      const event = { id: makeLocalId(), ts: new Date().toISOString(), type, title, detail, meta };
+      state.events.unshift(event);
       state.events = state.events.slice(0, 500);
+      return event;
     }
 
     function startShift() {
@@ -3984,32 +3982,39 @@ function renderPayDatesSection() {
     }
 
     function startCall() {
-      if (state.activeCall || state.shiftEndedAt) return;
-      if (!state.shiftStartedAt && shiftStartTooEarly()) {
-        const cfg = dayConfigFor(todayCallDateKey());
-        toast(`Muy temprano — puedes iniciar una llamada desde ${SHIFT_START_EARLY_GRACE_MIN} min antes de las ${timeLabel(formatHHMM(cfg.start))}`);
-        return;
-      }
+      if (state.activeCall) return;
 
       const now = new Date();
+      const nowISO = now.toISOString();
       if (state.activePause) {
         const pretty = state.activePause.type === 'lunch' ? 'Lunch' : 'Break';
         endPause({ silent: true, deferSave: true });
         toast(`${pretty} terminado automáticamente al iniciar la llamada`);
       }
 
-      // Igual que Break/Lunch (autoStartShiftFromCalls) y pegar llamadas: si no habías dado click
-      // en "Iniciar shift" todavía, iniciar una llamada en vivo también lo arranca solo — anclado a
-      // AHORA.
-      if (!state.shiftStartedAt) {
-        state.shiftStartedAt = now.toISOString();
+      // Una llamada real puede llegar antes del horario planeado o después de haber cerrado el
+      // turno. Nunca se bloquea por eso: si no hay sesión activa, abre una nueva sesión de trabajo
+      // anclada exactamente al inicio de la llamada.
+      const needsAutoShift = !state.shiftStartedAt || !!state.shiftEndedAt;
+      const previousShiftStartedAt = state.shiftStartedAt || null;
+      const previousShiftEndedAt = state.shiftEndedAt || null;
+      let autoShiftEventId = null;
+      if (needsAutoShift) {
+        state.shiftStartedAt = nowISO;
         state.shiftEndedAt = null;
-        setEvent('shift', 'Shift iniciado automáticamente', fmtTime(now), 'auto');
+        const event = setEvent('shift', 'Shift iniciado automáticamente por llamada', fmtTime(now), 'auto');
+        autoShiftEventId = event?.id || null;
         onGameShiftStarted({ continued: false });
       }
-      state.activeCall = { startedAt: now.toISOString() };
+      state.activeCall = {
+        startedAt: nowISO,
+        autoStartedShift: needsAutoShift,
+        autoShiftEventId,
+        previousShiftStartedAt,
+        previousShiftEndedAt,
+      };
       saveAll();
-      toast('Llamada iniciada');
+      toast(needsAutoShift ? 'Llamada iniciada · turno abierto automáticamente' : 'Llamada iniciada');
     }
 
     // Termina la llamada en curso y la guarda SOLA (ver autoSaveLiveCall) — desde ya no abre ningún
@@ -4033,10 +4038,22 @@ function renderPayDatesSection() {
     function discardActiveCall() {
       if (!state.activeCall) return;
       appConfirm('¿Descartar esta llamada sin guardarla? El tiempo registrado se pierde y no queda ninguna fila en Tabla de llamadas.', () => {
+        const discarded = state.activeCall;
         state.activeCall = null;
+
+        // Si esta llamada fue la única razón por la que se abrió una sesión nueva, descartar también
+        // revierte esa sesión automática. No toca turnos que el usuario ya tenía abiertos antes.
+        if (discarded?.autoStartedShift) {
+          if (discarded.autoShiftEventId) {
+            state.events = state.events.filter(event => event?.id !== discarded.autoShiftEventId);
+          }
+          state.shiftStartedAt = discarded.previousShiftStartedAt || null;
+          state.shiftEndedAt = discarded.previousShiftEndedAt || null;
+        }
+
         saveStateOnly();
         render();
-        toast('Llamada descartada');
+        toast(discarded?.autoStartedShift ? 'Llamada descartada · turno automático revertido' : 'Llamada descartada');
       });
     }
 
@@ -4502,7 +4519,7 @@ function renderPayDatesSection() {
     }
 
     function exportJSON() {
-      const payload = { state, calls, exportedAt: new Date().toISOString() };
+      const payload = { schemaVersion: 2, state, calls, settings, exportedAt: new Date().toISOString() };
       const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -4701,13 +4718,24 @@ function renderPayDatesSection() {
       if (!Array.isArray(payload.calls)) {
         return { ok: false, error: 'Falta el campo "calls" (o no es una lista) en el archivo.' };
       }
+      if ('settings' in payload && (!payload.settings || typeof payload.settings !== 'object' || Array.isArray(payload.settings))) {
+        return { ok: false, error: 'El campo "settings" del respaldo no es válido.' };
+      }
       return { ok: true };
     }
 
-    // Reemplaza calls/state en memoria por los del archivo (ya validado) y los persiste. A propósito NO se toca `settings` (horario semanal, metas, tasa, moneda, nombre/emoji)
+    // Los backups nuevos restauran state + calls + settings. Los backups viejos (sin settings)
+    // siguen siendo válidos y conservan la configuración actual, para no romper compatibilidad.
     function applyImportedPayload(payload) {
       state = normalizeStateObject(payload.state);
       calls = normalizeCallsArray(payload.calls);
+      if (payload.settings && typeof payload.settings === 'object' && !Array.isArray(payload.settings)) {
+        const restoredSettings = { ...defaultSettings(), ...payload.settings };
+        if (!('onboarded' in payload.settings)) restoredSettings.onboarded = true;
+        settings = restoredSettings;
+        ensureCurrencySettings();
+        applyTheme();
+      }
       // Mismo criterio que importCalls(): salta a un día con llamadas reales (hoy si tiene, si no la más reciente importada) — sin esto, el día activo se quedaba en el que traía guardado el respaldo, que podía no tener ninguna llamada y daba la impresión de que la importación no hizo nada.
       const importedDates = [...new Set(calls.map(c => callDateKeyFromValue(c.callDate)).filter(Boolean))]
         .sort((a, b) => callDateToDate(a) - callDateToDate(b));
@@ -4752,9 +4780,15 @@ function renderPayDatesSection() {
         const exportedLabel = exportedDate && !Number.isNaN(exportedDate.getTime())
           ? `${fmtDate(exportedDate)}, ${fmtTime(exportedDate)}`
           : 'fecha desconocida';
-        appConfirm(`¿Importar este archivo (exportado el ${exportedLabel} · ${callCount} llamada(s))? Esto reemplaza TODAS tus llamadas, turnos y pausas actuales por las del archivo. Tu horario semanal y tus metas no se tocan. Esta acción no se puede deshacer.`, () => {
+        const restoresSettings = !!(payload.settings && typeof payload.settings === 'object' && !Array.isArray(payload.settings));
+        const settingsNote = restoresSettings
+          ? 'También restaura tu horario, metas, Finanzas, Higher Rate, perfil y demás ajustes del respaldo.'
+          : 'Es un backup antiguo sin settings: tu horario, metas y demás ajustes actuales se conservarán.';
+        appConfirm(`¿Importar este archivo (exportado el ${exportedLabel} · ${callCount} llamada(s))? Esto reemplaza tus llamadas, turnos y pausas actuales. ${settingsNote} Esta acción no se puede deshacer.`, () => {
           applyImportedPayload(payload);
-          toast(`${callCount} llamada(s) importada(s) desde el archivo`);
+          toast(restoresSettings
+            ? `${callCount} llamada(s) y configuración restauradas desde el respaldo`
+            : `${callCount} llamada(s) importada(s) desde el respaldo antiguo`);
         });
       };
       reader.onerror = () => toast('No se pudo leer el archivo.');
