@@ -36,6 +36,7 @@ import {
   isoDateFromDayKey,
   makeLocalId,
   money,
+  onGameCallSaved,
   openModal,
   pad,
   parseMoney,
@@ -434,6 +435,7 @@ export function saveManualCall() {
   closeModal('manualCallModal');
   financeRunAutoFillCascade();
   saveAll();
+  onGameCallSaved(candidate, 'manual');
   toast('Llamada agregada');
 }
 
@@ -457,6 +459,7 @@ export function autoSaveLiveCall(startedAtISO, endedAtISO) {
   if (result.ok) {
     financeRunAutoFillCascade();
     saveAll();
+    onGameCallSaved(candidate, 'live');
     toast(`Llamada guardada (${formatDuration(durationMin * 60000)}) — edítala en Tabla de llamadas si hace falta`);
   } else {
     toast(result.reason);
