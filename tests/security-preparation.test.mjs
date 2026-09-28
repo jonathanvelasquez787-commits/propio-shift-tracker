@@ -88,6 +88,8 @@ test('phase 5 migration keeps private data behind RLS and persistent limits', ()
   assert.match(sql, /push_user_data_v2/);
   assert.match(sql, /cron\.schedule\('propio-daily-backup'/);
   assert.match(sql, /octet_length\(payload::text\) <= 65536/);
+  assert.match(sql, /set schema_version = 2/);
+  assert.match(sql, /function public\.wipe_my_data\(\)[\s\S]*security definer/i);
 });
 
 test('PWA shell includes a manifest and service worker with API exclusions', () => {
@@ -133,3 +135,4 @@ test('PDF report registers a click listener on its own print window', () => {
   click();
   assert.equal(printed, true);
 });
+

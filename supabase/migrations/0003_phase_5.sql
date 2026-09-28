@@ -75,6 +75,10 @@ cross join lateral jsonb_array_elements(coalesce(d.calls, '[]'::jsonb)) item
 where coalesce(item->>'id', '') <> ''
 on conflict (user_id, call_id) do update set payload = excluded.payload, updated_at = now();
 
+update public.user_data
+set schema_version = 2
+where schema_version < 2;
+
 -- Conservar el blob anterior como copia de reversión. Desde esta versión el
 -- cliente lee y escribe public.calls; user_data.calls queda solo como legado.
 
@@ -105,15 +109,15 @@ begin
 
   select updated_at into actual from public.user_data where user_id = uid for update;
   if not found then
-    insert into public.user_data (user_id, state, calls, settings, device_id, device_label)
-    values (uid, coalesce(p_state, '{}'::jsonb), '[]'::jsonb, coalesce(p_settings, '{}'::jsonb), p_device_id, p_device_label)
+    insert into public.user_data (user_id, state, calls, settings, schema_version, device_id, device_label)
+    values (uid, coalesce(p_state, '{}'::jsonb), '[]'::jsonb, coalesce(p_settings, '{}'::jsonb), 2, p_device_id, p_device_label)
     returning updated_at into fresh;
   else
     if p_expected_updated_at is not null and actual is distinct from p_expected_updated_at then
       return jsonb_build_object('ok', false, 'conflict', true, 'updated_at', actual);
     end if;
     update public.user_data
-    set state = coalesce(p_state, state), settings = coalesce(p_settings, settings),
+    set state = coalesce(p_state, state), settings = coalesce(p_settings, settings), schema_version = 2,
         device_id = p_device_id, device_label = p_device_label
     where user_id = uid returning updated_at into fresh;
   end if;
@@ -185,7 +189,7 @@ begin
 end $$;
 
 create or replace function public.wipe_my_data()
-returns void language plpgsql security invoker set search_path = public as $$
+returns void language plpgsql security definer set search_path = public as $$
 begin
   if auth.uid() is null then raise exception 'NOT_AUTHENTICATED' using errcode = '28000'; end if;
   delete from public.calls where user_id = auth.uid();
@@ -195,3 +199,4 @@ end;
 $$;
 revoke all on function public.wipe_my_data() from public;
 grant execute on function public.wipe_my_data() to authenticated;
+
