@@ -251,7 +251,7 @@ let manualCallSelectedRateTile = 'normal';
 
 // Este modal puede abrirse como respaldo de una llamada en vivo ya colgada: cerrarlo sin guardar
 // pierde ese tiempo.
-let manualCallLiveBackupPending = !!state.pendingLiveCallBackup;
+let manualCallLiveBackupPending = false;
 
 // Convierte "HH:MM" (24h, valor crudo de <input type="time">) al formato "h:mm AM/PM" que usa
 // internamente callStart (el mismo formato que toDateFromInputs/parseCalls esperan al leer la
