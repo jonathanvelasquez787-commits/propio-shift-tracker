@@ -490,3 +490,39 @@ test('runtime smoke: helpers de renderGame existen para Logros y Higher Rate', (
   assert.match(higherRate, /export function addHigherRateWindowRow\(\)/);
   assert.match(higherRate, /saveHigherRateWindowsFromEditor\(\)/);
 });
+
+
+test('cuarta simulación mensual: llamadas live antes y después del turno nunca quedan bloqueadas', () => {
+  const appMain = read('js/app-main.js');
+  const startCall = appMain.slice(appMain.indexOf('function startCall()'), appMain.indexOf('function toggleCall()', appMain.indexOf('function startCall()')));
+  const disabled = appMain.slice(appMain.indexOf('function callActionDisabled()'), appMain.indexOf('function callActionTimer()', appMain.indexOf('function callActionDisabled()')));
+  assert.doesNotMatch(startCall, /shiftStartTooEarly\(\)/);
+  assert.match(startCall, /const needsAutoShift = !state\.shiftStartedAt \|\| !!state\.shiftEndedAt/);
+  assert.match(startCall, /Shift iniciado automáticamente por llamada/);
+  assert.doesNotMatch(disabled, /state\.shiftEndedAt/);
+});
+
+test('cuarta simulación mensual: descartar la primera live revierte el turno que esa llamada abrió', () => {
+  const appMain = read('js/app-main.js');
+  assert.match(appMain, /autoStartedShift: needsAutoShift/);
+  assert.match(appMain, /previousShiftStartedAt/);
+  assert.match(appMain, /previousShiftEndedAt/);
+  assert.match(appMain, /state\.events = state\.events\.filter\(event => event\?\.id !== discarded\.autoShiftEventId\)/);
+  assert.match(appMain, /state\.shiftStartedAt = discarded\.previousShiftStartedAt \|\| null/);
+});
+
+test('cuarta simulación mensual: llamada manual de hoy auto inicia turno igual que pegar llamadas', () => {
+  const calls = read('js/calls.js');
+  assert.match(calls, /autoStartShiftFromCalls/);
+  assert.match(calls, /callDate === todayCallDateKey\(\) && !state\.shiftStartedAt && !state\.shiftEndedAt/);
+  assert.match(calls, /autoStartShiftFromCalls\(true\)/);
+});
+
+test('cuarta simulación mensual: backup JSON realmente incluye y restaura settings', () => {
+  const appMain = read('js/app-main.js');
+  const html = read('app.html');
+  assert.match(appMain, /schemaVersion: 2, state, calls, settings/);
+  assert.match(appMain, /settings = restoredSettings/);
+  assert.match(appMain, /backups viejos \(sin settings\)/i);
+  assert.match(html, /respaldo completo: llamadas, turnos, pausas, horario, metas, Finanzas, Higher Rate, gamificación y ajustes/);
+});
