@@ -218,9 +218,9 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
-Sin pendientes técnicos abiertos en las fases 4 y 5. El cambio de visibilidad
-del repositorio se completa en GitHub como último paso operativo porque afecta
-quién puede acceder al código fuente.
+Sin pendientes técnicos ni operativos abiertos en las fases 4 y 5. La
+migración de producción está aplicada y validada en Supabase, y el repositorio
+de GitHub ya es privado.
 - **Fase 6 (El Monstruo): sin código todavía.** El mockup de la Arena
   (monstruo a la DERECHA, arcade feroz, claro y oscuro) está hecho y espera
   aprobación explícita del usuario antes de escribir HTML/CSS/JS. Faltan por
@@ -593,6 +593,9 @@ cofre ya hechos.
   rate limiting persistente, telemetría privada y backup diario.
 - PWA instalable con service worker. El motor de Adherencia queda local para
   preservar el funcionamiento offline; no se envían datos a Sentry.
+- Migración aplicada y validada en Supabase: tablas, RLS, funciones, versión
+  del esquema, llamadas normalizadas, cron y backup diario correctos. El
+  repositorio de GitHub quedó privado.
 - Verificados 14 tests, imports/exports de 11 módulos, sintaxis y build completo;
   el bundle no contiene rutas `/js/`, jsDelivr ni `sourceMappingURL`.
 
@@ -622,3 +625,5 @@ cofre ya hechos.
   18 archivos JS. Comparación en navegador del marcado estático: 0 diferencias
   en estilos visibles, claro/oscuro a 1440 y 390 px; páginas legales verificadas
   con CSP aplicada en una prueba local. No se probaron accesos con cuenta real.
+
+
