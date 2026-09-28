@@ -24,6 +24,7 @@ import {
   mergeIntervals,
   minutesToHHMM,
   money,
+  onGameCallsChanged,
   saveAll,
   settings,
   timeLabel,
@@ -90,6 +91,35 @@ import {
         const bonus = higherRateBonusForCall(c);
         return sum + (bonus ? bonus.amount : 0);
       }, 0);
+    }
+
+    function higherRateGameBonusSnapshot() {
+      const snapshot = new Map();
+      calls.forEach(call => {
+        const bonus = higherRateBonusForCall(call);
+        snapshot.set(String(call.id || ''), {
+          amount: Number(bonus?.amount) || 0,
+          tier: String(bonus?.tier || ''),
+          dayKey: callDateKeyFromValue(call.callDate),
+        });
+      });
+      return snapshot;
+    }
+
+    function reconcileHigherRateGameChanges(beforeSnapshot) {
+      const affectedDays = new Set();
+      calls.forEach(call => {
+        const previous = beforeSnapshot.get(String(call.id || '')) || { amount: 0, tier: '', dayKey: '' };
+        const bonus = higherRateBonusForCall(call);
+        const currentAmount = Number(bonus?.amount) || 0;
+        const currentTier = String(bonus?.tier || '');
+        if (Math.abs(currentAmount - previous.amount) <= 0.0001 && currentTier === previous.tier) return;
+        if (previous.dayKey) affectedDays.add(previous.dayKey);
+        const currentDayKey = callDateKeyFromValue(call.callDate);
+        if (currentDayKey) affectedDays.add(currentDayKey);
+      });
+      affectedDays.forEach(dayKey => onGameCallsChanged(dayKey));
+      return affectedDays;
     }
 
     // Desglose por nivel: un día puede tener llamadas de más de un nivel a la vez.
@@ -546,6 +576,7 @@ import {
     // Persiste lo que hay ahora mismo en el editor — llamada en cada cambio de campo (auto-
     // guardado, mismo patrón que el resto de settings sueltos de Horario) y al eliminar una fila.
     export function saveHigherRateWindowsFromEditor() {
+      const gameBefore = higherRateGameBonusSnapshot();
       const oldWindows = settings.higherRateWindows || [];
       const oldById = new Map(oldWindows.map(w => [w.id, w]));
       const newWindows = readHigherRateWindowsFromEditor();
@@ -563,6 +594,7 @@ import {
       retuneFrozenHigherRateTiers(newWindows);
       // Si el bono cambia, también puede bajar el dinero real disponible en Finanzas.
       financeRunAutoFillCascade();
+      reconcileHigherRateGameChanges(gameBefore);
       // SaveAll en vez de saveSettingsOnly: freezeHigherRateBonusesForWindowIds puede haber marcado
       // `calls` con `frozenHigherRateBonus` nuevo.
       saveAll();
@@ -626,6 +658,7 @@ import {
     }
 
     export function removeHigherRateWindowRowAt(id) {
+      const gameBefore = higherRateGameBonusSnapshot();
       // Borrar UNA ventana (individual, con "✕") le quitaba retroactivamente el bono ya calculado a
       // cualquier llamada real que ya calificaba para ella.
       freezeHigherRateBonusesForWindowIds([id]);
@@ -635,6 +668,7 @@ import {
       // hasta reabrir el modal) la ventana que acabas de borrar.
       settings.higherRateWindows = current;
       financeRunAutoFillCascade();
+      reconcileHigherRateGameChanges(gameBefore);
       // SaveAll en vez de saveSettingsOnly: ahora también hay que persistir `calls` (algunas pueden
       // haber quedado con frozenHigherRateBonus nuevo).
       saveAll();
@@ -681,6 +715,7 @@ import {
     // Vacía el historial de ventanas ya terminadas; el bono ya ganado se conserva congelado.
     export function purgePastHigherRateWindows() {
       const current = readHigherRateWindowsFromEditor();
+      const gameBefore = higherRateGameBonusSnapshot();
       const isPast = (w) => higherRateWindowIsPast(w);
       const pastWindows = current.filter(isPast);
       if (!pastWindows.length) {
@@ -695,6 +730,8 @@ import {
 
         const remaining = current.filter(w => !isPast(w));
         settings.higherRateWindows = remaining;
+        financeRunAutoFillCascade();
+        reconcileHigherRateGameChanges(gameBefore);
         // SaveAll en vez de saveSettingsOnly: también hay que persistir `calls` (varias pueden
         // haber quedado con frozenHigherRateBonus).
         saveAll();
