@@ -16,6 +16,8 @@
 <link rel="modulepreload" href="/js/calls.js"/>
 <link rel="modulepreload" href="/js/higher-rate.js"/>
 <link rel="modulepreload" href="/js/settings.js"/>
+<link rel="modulepreload" href="/js/game.js"/>
+<link rel="modulepreload" href="/js/monsters.js"/>
 <style>
     :root {
       color-scheme: dark;
@@ -8177,6 +8179,7 @@
     }
   </style>
 <link rel="stylesheet" href="/css/app-shell.css"/>
+<link rel="stylesheet" href="/css/game.css"/>
 </head>
 <body>
 <div aria-live="polite" class="live-activity-bar" id="liveActivityBar" role="status">
@@ -8192,6 +8195,7 @@
     <button aria-label="Descartar sin guardar" class="live-bar-btn live-bar-discard" id="liveBarDiscardBtn" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
   </div>
 </div>
+<div aria-live="polite" class="game-toast-stack" id="gameToastStack"></div>
 <button aria-hidden="true" class="sidebar-overlay" id="sidebarOverlay" tabindex="-1" type="button"></button>
 <nav aria-label="Navegación principal" class="sidebar-nav" id="sidebarNav">
 <div class="sidebar-brand-block">
@@ -8215,6 +8219,7 @@
 <button class="sidebar-link" data-page="paydates" type="button"><span class="sidebar-link-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span class="sidebar-link-label">Fechas de pago</span><span class="sidebar-link-arrow">›</span><span class="sidebar-link-dot"></span></button>
 <button class="sidebar-link" data-page="calendar" type="button"><span class="sidebar-link-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg></span><span class="sidebar-link-label">Calendario</span><span class="sidebar-link-arrow">›</span><span class="sidebar-link-dot"></span></button>
 <button class="sidebar-link" data-page="finance" type="button"><span class="sidebar-link-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12V8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h13a1 1 0 0 0 1-1v-4"/><path d="M20 12a2 2 0 0 1 0 4h-3a2 2 0 0 1 0-4Z"/></svg></span><span class="sidebar-link-label">Finanzas</span><span class="sidebar-link-arrow">›</span><span class="sidebar-link-dot"></span></button>
+<button class="sidebar-link" data-page="achievements" type="button"><span class="sidebar-link-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="5"/><path d="m8.5 12.5-2 8 5.5-3 5.5 3-2-8"/><path d="m10.2 8 1.8-2 1.8 2-1.8 1.4Z"/></svg></span><span class="sidebar-link-label">Logros</span><span class="sidebar-link-arrow">›</span><span class="sidebar-link-dot"></span></button>
 </div>
 <div class="sidebar-section-label">Mi progreso</div>
 <button class="sidebar-progress-card" id="sidebarProgressCard" type="button" title="Ver Reportes">
@@ -8264,6 +8269,9 @@
 <div class="chips">
 <div class="chip"><span class="dot-state" id="stateDot"></span><strong id="stateText">No iniciado</strong></div>
 <div class="chip" id="acwLiveChip" style="display:none;" title="Tiempo que llevas disponible/en ACW ahora mismo — sin llamada activa ni Break/Lunch activo.">⏱️ ACW/Available <strong id="acwLiveTimer">00:00:00</strong></div>
+<button class="chip game-chip game-chip-streak" data-game-nav id="gameStreakChip" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c2.8 3.5 5.5 5.8 5.5 10.3A5.5 5.5 0 1 1 6.5 13c0-2.6 1.3-4.8 3.2-6.6-.1 1.8.5 3 1.5 3.8C12.7 8.5 13 5.8 12 3Z"/></svg><span>Racha</span><strong id="gameStreakValue">0</strong></button>
+<button class="chip game-chip game-chip-combo" data-game-nav hidden id="gameComboChip" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="m13 2-9 12h7l-1 8 9-12h-7l1-8Z"/></svg><span>Combo</span><strong id="gameComboValue">x0</strong></button>
+<button class="chip game-chip game-chip-level" data-game-nav id="gameLevelChip" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="5"/><path d="m8.5 12.5-2 8 5.5-3 5.5 3-2-8"/><path d="m10.2 8 1.8-2 1.8 2-1.8 1.4Z"/></svg><span>Nivel</span><strong id="gameLevelValue">1</strong></button>
 <div class="summary-pill">
   <button class="day-active-label-btn" id="dayActiveLabelBtn" type="button" title="Ir a Hoy">Día activo</button>
   <button class="day-nav-btn" id="dayPrevBtn" type="button" aria-label="Día anterior" title="Día anterior">‹</button>
@@ -8316,6 +8324,9 @@
 <button class="calls-status-btn-end" id="callsStatusEndBtn" type="button">Descartar</button>
 </div>
 </div>
+<div class="game-call-fx" id="gameCallFx" aria-hidden="true"></div>
+<div class="game-loot-box" hidden id="gameLootBox" aria-live="polite"></div>
+<div class="game-record-banner" hidden id="gameRecordBanner" role="status"></div>
 
 <div class="controls-grid" id="callsControlsGrid">
 <button class="action-btn" id="callControlBtn" type="button" data-accent="pink">
@@ -8357,7 +8368,29 @@
 </div>
 </div>
 <div class="table-tags" id="earningsTagsRow"></div>
-<div class="gh-goal-card">
+<div class="game-arena" hidden id="gameArena">
+<div class="game-arena-inner" data-game-role="arena">
+  <div class="game-arena-copy">
+    <div class="game-arena-kicker"><span class="game-arena-pulse" aria-hidden="true"></span> ARENA DEL DÍA <span data-game-role="monster-day">—</span></div>
+    <div class="game-arena-title-row"><div><h3 data-game-role="monster-name">Monstruo del día</h3><p data-game-role="monster-quip">La meta está viva. Cada llamada cuenta.</p></div><span class="game-arena-state" data-game-role="monster-state">DORMIDO</span></div>
+    <div class="game-arena-hp" data-game-role="hp-panel">
+      <div class="game-arena-hp-head"><span>VIDA DEL JEFE</span><strong data-game-role="monster-hp-label">$0.00 / $0.00</strong></div>
+      <div class="game-arena-hp-track"><span data-game-role="monster-hp-bar" style="width:100%;"></span><i data-game-role="ghost-marker" title="Sombra de ayer"></i></div>
+      <div class="game-arena-hp-foot"><span data-game-role="monster-hp-pct">100% de vida</span><span data-game-role="ghost-label">Ayer —</span></div>
+    </div>
+    <div class="game-arena-stats"><span><small>COMBO</small><b data-game-role="combo">x0</b></span><span><small>GOLPE ACTUAL</small><b data-game-role="last-hit">—</b></span><span><small>BOTÍN EXTRA</small><b data-game-role="loot">$0.00</b></span></div>
+    <div class="game-arena-mission-hint" data-game-role="mission-hint"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg><span>Completa misiones para romper su armadura.</span></div>
+  </div>
+  <div class="game-monster-stage" data-game-role="monster" role="img" aria-label="Monstruo del día, 100% de vida">
+    <div class="game-monster-sprite" data-game-role="monster-sprite">
+      <svg class="game-monster-svg" viewBox="0 0 160 160" aria-hidden="true"><g fill="currentColor"><rect x="32" y="28" width="22" height="18"/><rect x="106" y="28" width="22" height="18"/><rect x="24" y="44" width="112" height="82" rx="8"/><rect x="40" y="126" width="24" height="14"/><rect x="96" y="126" width="24" height="14"/><rect x="14" y="70" width="16" height="34"/><rect x="130" y="70" width="16" height="34"/></g><g class="game-monster-face"><rect x="48" y="66" width="20" height="14" fill="var(--panel-navy)"/><rect x="92" y="66" width="20" height="14" fill="var(--panel-navy)"/><rect x="64" y="98" width="32" height="10" fill="var(--panel-navy)"/></g></svg>
+      <span class="game-monster-armor" aria-hidden="true"></span><span class="game-monster-crack crack-a" aria-hidden="true"></span><span class="game-monster-crack crack-b" aria-hidden="true"></span>
+    </div>
+    <span class="game-monster-z" data-game-role="monster-z" aria-hidden="true">Zzz</span><span class="game-monster-shadow" aria-hidden="true"></span>
+  </div>
+</div>
+</div>
+<div class="gh-goal-card" id="classicDailyGoalCard">
 <div class="gh-goal-top"><span id="goalDailyLabel">Meta diaria</span><b id="goalAmountBadge">Meta $0.00</b></div>
 <div class="gh-goal-sub-row">
 <span class="gh-goal-subitem" id="goalAmountConvertedText"></span>
@@ -8365,6 +8398,14 @@
 </div>
 <div class="progress" style="margin-top: 4px;"><div id="earningsBar"></div></div>
 <div class="gh-goal-foot" id="remainingText">0 min restantes</div>
+</div>
+<div class="game-missions" hidden id="gameMissions">
+  <div class="game-missions-head"><div><span class="game-panel-eyebrow">ARMADURA</span><h3>Misiones del día</h3></div><span data-game-role="missions-score">0 / 3</span></div>
+  <div class="game-mission-list" data-game-role="mission-list">
+    <div class="game-mission" data-mission-key="productive"><span class="game-mission-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M3 12h18"/></svg></span><div><strong>Minutos productivos</strong><small data-game-role="mission-progress">0 / meta</small></div><span class="game-mission-check" aria-hidden="true">✓</span></div>
+    <div class="game-mission" data-mission-key="break"><span class="game-mission-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/></svg></span><div><strong>Break/Lunch a tiempo</strong><small data-game-role="mission-progress">Pendiente</small></div><span class="game-mission-check" aria-hidden="true">✓</span></div>
+    <div class="game-mission" data-mission-key="adherence"><span class="game-mission-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg></span><div><strong>Adherencia del día</strong><small data-game-role="mission-progress">0% / meta</small></div><span class="game-mission-check" aria-hidden="true">✓</span></div>
+  </div>
 </div>
 <div class="fin-preview" id="financePreviewBox" style="display:none;">
 <div class="fin-preview-head">
@@ -8397,6 +8438,10 @@
 <div class="gh-ring" id="cycleGoalRing"><span class="gh-ring-value" id="cycleGoalPctBadge">0%</span></div>
 <div class="gh-ring-label">de tu meta</div>
 </div>
+</div>
+<div class="game-cycle-boss" hidden id="gameCycleBoss">
+  <div class="game-cycle-boss-head"><div><span class="game-panel-eyebrow">JEFE DEL CICLO</span><h3 data-game-role="cycle-title">Temporada actual</h3></div><span class="game-cycle-label" data-game-role="cycle-status">EN MARCHA</span></div>
+  <div class="game-cycle-boss-body"><div class="game-cycle-boss-meter"><div class="game-cycle-boss-track"><span data-game-role="cycle-progress" style="width:0%;"></span></div><div class="game-cycle-boss-foot"><span data-game-role="cycle-earned">$0.00</span><span data-game-role="cycle-goal">Meta $0.00</span></div></div><div class="game-cycle-boss-sprite" data-game-role="cycle-sprite" role="img" aria-label="Jefe del ciclo"><span class="game-cycle-horn left"></span><span class="game-cycle-horn right"></span><span class="game-cycle-eye left"></span><span class="game-cycle-eye right"></span><span class="game-cycle-teeth"></span></div></div>
 </div>
 <div class="gh-goal-card">
 <div class="gh-goal-top"><span>Meta del ciclo</span><b id="cycleGoalAmountBadge">Meta $0.00</b></div>
@@ -8895,6 +8940,76 @@
   </div>
 </section>
 </div><!-- /pageFinance -->
+
+<div class="app-page game-achievements-page" data-page="achievements" hidden id="pageAchievements">
+<section class="game-achievements-hero">
+  <div class="game-page-kicker"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="5"/><path d="m8.5 12.5-2 8 5.5-3 5.5 3-2-8"/><path d="m10.2 8 1.8-2 1.8 2-1.8 1.4Z"/></svg> El Monstruo</div>
+  <div class="game-achievements-hero-row">
+    <div>
+      <h1>Logros</h1>
+      <p>Tu racha, tu nivel y cada criatura que ya venciste.</p>
+    </div>
+    <div class="game-achievements-season" data-game-role="season-status"><span>Temporada</span><strong data-game-role="season-label">Ciclo actual</strong></div>
+  </div>
+  <div id="gameAchievementsSummary" class="game-achievements-summary">
+    <div class="game-summary-stat"><span>Racha</span><strong data-game-stat="streak">0 días</strong></div>
+    <div class="game-summary-stat"><span>Nivel</span><strong data-game-stat="level">1</strong></div>
+    <div class="game-summary-stat"><span>XP total</span><strong data-game-stat="xp">0</strong></div>
+    <div class="game-summary-stat"><span>Escudos</span><strong data-game-stat="shields">0</strong></div>
+  </div>
+</section>
+
+<section class="game-achievements-grid game-achievements-grid-top">
+  <article class="game-panel game-streak-panel" id="gameStreakPanel">
+    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Constancia</span><h2>Racha semanal</h2></div><span class="game-panel-badge" data-game-role="streak-best">Mejor: 0</span></div>
+    <div class="game-streak-week" data-game-role="streak-week" aria-label="Racha de los últimos siete días">
+      <span class="game-streak-day" data-day-state="empty"><b>L</b><em>—</em></span>
+      <span class="game-streak-day" data-day-state="empty"><b>M</b><em>—</em></span>
+      <span class="game-streak-day" data-day-state="empty"><b>X</b><em>—</em></span>
+      <span class="game-streak-day" data-day-state="empty"><b>J</b><em>—</em></span>
+      <span class="game-streak-day" data-day-state="empty"><b>V</b><em>—</em></span>
+      <span class="game-streak-day" data-day-state="empty"><b>S</b><em>—</em></span>
+      <span class="game-streak-day" data-day-state="empty"><b>D</b><em>—</em></span>
+    </div>
+    <div class="game-panel-foot"><span>Escudos disponibles</span><strong data-game-role="shields">0</strong></div>
+  </article>
+
+  <article class="game-panel game-level-panel" id="gameLevelPanel">
+    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Progreso</span><h2>Nivel <strong data-game-role="level">1</strong></h2></div><span class="game-level-emblem" data-game-role="level-emblem">1</span></div>
+    <div class="game-level-track" aria-label="Progreso hacia el siguiente nivel"><span data-game-role="level-progress" style="width:0%;"></span></div>
+    <div class="game-level-foot"><span data-game-role="level-xp">0 XP</span><span data-game-role="next-level">Siguiente: 100 XP</span></div>
+    <div class="game-level-ladder" data-game-role="level-ladder"><span class="is-current">1</span><i></i><span>2</span><i></i><span>3</span><i></i><span>4</span></div>
+  </article>
+</section>
+
+<section class="game-panel game-cycle-panel" id="gameCycleBossAchievements">
+  <div class="game-panel-head"><div><span class="game-panel-eyebrow">Temporada de 14 días</span><h2>Jefe del ciclo</h2></div><span class="game-cycle-label" data-game-role="cycle-status">En marcha</span></div>
+  <div class="game-cycle-boss-layout"><div class="game-boss-copy"><strong data-game-role="cycle-title">El jefe observa tu progreso.</strong><p data-game-role="cycle-subtitle">La barra refleja lo que llevas acumulado en el ciclo de pago actual.</p><div class="game-boss-progress"><span data-game-role="cycle-progress" style="width:0%;"></span></div><div class="game-boss-progress-foot"><span data-game-role="cycle-earned">$0.00</span><span data-game-role="cycle-goal">Meta $0.00</span></div></div><div class="game-boss-sprite" data-game-role="cycle-sprite" aria-hidden="true"><span class="game-pixel-crown"></span><span class="game-pixel-eye left"></span><span class="game-pixel-eye right"></span><span class="game-pixel-mouth"></span></div></div>
+</section>
+
+<section class="game-achievements-grid game-achievements-grid-collection">
+  <article class="game-panel game-bestiary-panel" id="gameBestiary">
+    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Colección</span><h2>Bestiario</h2></div><span class="game-panel-badge" data-game-role="bestiary-count">0 / 7</span></div>
+    <div class="game-collection-grid" data-game-role="bestiary-list"><div class="game-collection-empty">Derrota tu primer monstruo para llenar esta colección.</div></div>
+  </article>
+  <article class="game-panel game-trophies-panel" id="gameTrophies">
+    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Distinciones</span><h2>Trofeos</h2></div><span class="game-panel-badge" data-game-role="trophy-count">0</span></div>
+    <div class="game-trophy-list" data-game-role="trophy-list"><div class="game-collection-empty">Tus próximos trofeos aparecerán aquí.</div></div>
+  </article>
+</section>
+
+<section class="game-achievements-grid game-achievements-grid-bottom">
+  <article class="game-panel" id="gameRecords">
+    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Récords personales</span><h2>Récords</h2></div><svg class="ic-svg game-panel-head-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9Z"/></svg></div>
+    <div class="game-record-list" data-game-role="records-list"><div class="game-record-row"><span>Mayor pago</span><strong>—</strong></div><div class="game-record-row"><span>Llamada más larga</span><strong>—</strong></div><div class="game-record-row"><span>Mejor racha semanal</span><strong>—</strong></div></div>
+  </article>
+  <article class="game-panel game-last-clear-panel" id="gameLastStageClear">
+    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Última victoria</span><h2>STAGE CLEAR</h2></div><span class="game-panel-badge" data-game-role="last-clear-date">—</span></div>
+    <div class="game-last-clear-content" data-game-role="last-clear-content"><div class="game-clear-stars" aria-hidden="true"><span>★</span><span>★</span><span>★</span></div><p>Aún no hay un STAGE CLEAR guardado.</p></div>
+    <button class="game-text-button" data-game-action="open-last-clear" type="button">Ver detalle</button>
+  </article>
+</section>
+</div><!-- /pageAchievements -->
 
 <div class="app-page" data-page="help" hidden id="pageHelp">
 <div class="help-head">
@@ -9474,6 +9589,30 @@
 
 <div class="divider"></div>
 
+<div class="goals-section game-settings-section">
+<div class="goals-section-title"><svg class="goals-section-icon ic-svg game-settings-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="5"/><path d="m8.5 12.5-2 8 5.5-3 5.5 3-2-8"/><path d="m10.2 8 1.8-2 1.8 2-1.8 1.4Z"/></svg>Gamificación</div>
+<label class="game-settings-toggle" for="gameEnabledInput"><span><strong>Activar El Monstruo</strong><small>Racha, XP, misiones y colección sin cambiar tus ganancias.</small></span><input id="gameEnabledInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label>
+<div class="goals-field game-settings-intensity-field">
+<label for="gameIntensityInput">Intensidad</label>
+<select id="gameIntensityInput">
+<option value="subtle">Solo sutil</option>
+<option value="arcade">Arcade en logros</option>
+<option value="off">Desactivada</option>
+</select>
+</div>
+<div class="game-settings-profile" id="gameSettingsProfile" aria-live="polite">
+<span class="game-settings-profile-label">Perfil de juego</span>
+<div class="game-settings-profile-grid"><span><b data-game-profile="level">Nivel 1</b><small>Nivel</small></span><span><b data-game-profile="xp">0 XP</b><small>XP total</small></span><span><b data-game-profile="streak">0 días</b><small>Mejor racha</small></span><span><b data-game-profile="collection">0</b><small>Colección</small></span></div>
+</div>
+<div class="danger-card tone-bad game-settings-danger">
+<div class="danger-card-head"><span class="danger-card-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 21 9 15 9"/></svg></span><span class="danger-card-title">Reiniciar progreso</span></div>
+<p class="danger-card-desc">Borra nivel, XP, racha, trofeos, accesorios y monstruos derrotados. Tus llamadas, turnos, metas y finanzas no se tocan.</p>
+<button class="mc-btn-solid-full bad" id="resetGameProgressBtn" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 21 9 15 9"/></svg> Reiniciar progreso</button>
+</div>
+</div>
+
+<div class="divider"></div>
+
 <div class="goals-section">
 <div class="goals-section-title"><svg class="goals-section-icon ic-svg pink" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3"/></svg>Backup de datos</div>
 <div class="goals-backup-row">
@@ -9519,6 +9658,35 @@
 <button class="mc-btn-primary cyan" data-close-modal="goalsModal" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polyline points="5 12 10 17 19 6"/></svg> Listo</button>
 </div>
 
+</div>
+</div>
+<div aria-hidden="true" class="modal-overlay game-modal-overlay" id="stageClearModal">
+<div aria-labelledby="stageClearModalTitle" aria-modal="true" class="modal-card game-modal-card" role="dialog">
+<div class="modal-head mc-modal-head game-modal-head">
+<div class="game-modal-kicker"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9Z"/></svg> Victoria</div>
+<button aria-label="Cerrar STAGE CLEAR" class="modal-close" data-close-modal="stageClearModal" id="stageClearCloseBtn" type="button">×</button>
+</div>
+<div id="stageClearContent" class="stage-clear-content">
+<div class="game-stage-title" id="stageClearModalTitle"><span>STAGE</span><strong>CLEAR</strong></div>
+<p class="game-stage-subtitle">El escenario de hoy quedó despejado.</p>
+<div class="game-clear-stars" aria-label="Tres estrellas"><span>★</span><span>★</span><span>★</span></div>
+<div class="game-stage-placeholder-grid"><div><span>XP ganado</span><strong>0 XP</strong></div><div><span>Misiones</span><strong>0 / 3</strong></div><div><span>Récord</span><strong>—</strong></div></div>
+</div>
+<div class="modal-actions mc-action-row"><button class="mc-btn-primary cyan" data-close-modal="stageClearModal" type="button">Continuar</button></div>
+</div>
+</div>
+<div aria-hidden="true" class="modal-overlay game-modal-overlay" id="chestModal">
+<div aria-labelledby="chestModalTitle" aria-modal="true" class="modal-card game-modal-card game-chest-modal-card" role="dialog">
+<div class="modal-head mc-modal-head game-modal-head">
+<div class="game-modal-kicker"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M5 7V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2"/><path d="M3 12h18"/><path d="M12 7v14"/></svg> Recompensa</div>
+<button aria-label="Cerrar cofre" class="modal-close" data-close-modal="chestModal" id="chestCloseBtn" type="button">×</button>
+</div>
+<div id="chestContent" class="chest-content">
+<div class="game-chest-illustration" aria-hidden="true"><span class="game-chest-lid"></span><span class="game-chest-body"></span><span class="game-chest-lock"></span></div>
+<h3 id="chestModalTitle">Cofre sellado</h3>
+<p>Tu recompensa espera al próximo inicio de turno.</p>
+</div>
+<div class="modal-actions mc-action-row"><button class="mc-btn-primary cyan" data-close-modal="chestModal" type="button">Cerrar</button></div>
 </div>
 </div>
 <div aria-hidden="true" class="modal-overlay" id="resetModal">
