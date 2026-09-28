@@ -228,7 +228,7 @@ function missionSnapshot(dayKey, stats, goal, adherence) {
 }
 
 function callXp(call) {
-  const critical = higherRateBonusForCall(call) > 0;
+  const critical = (Number(higherRateBonusForCall(call)?.amount) || 0) > 0;
   return critical ? Math.ceil(3 * 1.5) : 3;
 }
 
@@ -1064,7 +1064,7 @@ export function onGameCallSaved(call, source = 'manual') {
   const currentDay = computeGameDay(dayKey);
   const entry = dayEntry(dayKey);
   const xpLocked = Number.isFinite(Number(entry.xpLocked));
-  const critical = higherRateBonusForCall(call) > 0;
+  const critical = (Number(higherRateBonusForCall(call)?.amount) || 0) > 0;
 
   if (currentDay.defeated && xpLocked) {
     saveStateOnly();
