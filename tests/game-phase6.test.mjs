@@ -180,10 +180,10 @@ test('Logros conserva las tarjetas de app.html y solo actualiza sus nodos intern
   assert.doesNotMatch(game, /trophies\.innerHTML\s*=/);
   assert.doesNotMatch(game, /records\.innerHTML\s*=/);
   assert.doesNotMatch(game, /last\.innerHTML\s*=/);
-  assert.match(game, /data-game-role=\\"bestiary-list/);
-  assert.match(game, /data-game-role=\\"trophy-list/);
-  assert.match(game, /data-game-role=\\"records-list/);
-  assert.match(game, /data-game-stat=\\"\$\{key\}/);
+  assert.match(game, /data-game-role=["\']bestiary-list/);
+  assert.match(game, /data-game-role=["\']trophy-list/);
+  assert.match(game, /data-game-role=["\']records-list/);
+  assert.match(game, /data-game-stat=["\']\$\{key\}/);
   assert.match(game, /collection:\s*String\(seen\.size\)/);
-  assert.match(game, /data-game-action=\\"open-last-clear/);
+  assert.match(game, /data-game-action=["\']open-last-clear/);
 });
