@@ -5121,6 +5121,7 @@ function renderPayDatesSection() {
       const mins = Number(input?.value);
       if (Number.isFinite(mins) && mins >= 0) settings.adherenceGraceMin = mins;
       saveSettingsOnly();
+      onGameDayMetadataChanged(todayCallDateKey());
       render();
       toast(`Ventana de gracia de Adherencia: ${formatMinutes(settings.adherenceGraceMin)} min`);
     }
@@ -5131,6 +5132,7 @@ function renderPayDatesSection() {
       const pct = Number(input?.value);
       if (Number.isFinite(pct) && pct > 0 && pct <= 100) settings.adherenceGoalPct = pct;
       saveSettingsOnly();
+      onGameDayMetadataChanged(todayCallDateKey());
       render();
       toast(`Meta de Adherencia: ${settings.adherenceGoalPct}%`);
     }
