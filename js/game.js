@@ -159,16 +159,24 @@ function dayEntry(dayKey) {
 }
 
 function callIsXpEligible(call, dayKey) {
-  if (!call || todayCallDateKey() !== dayKey || todayCallDateKey(new Date(call.importedAt || 0)) !== dayKey) return false;
+  if (!call) return false;
   const productive = typeof call.countsAsProductive === 'boolean'
     ? call.countsAsProductive
     : String(call.billable).toLowerCase() === 'yes' && String(call.dropped).toLowerCase() !== 'yes';
-  if (!productive) return false;
+  if (!productive || !(Number(call.durationMin) > 0)) return false;
+
   const ended = new Date(call.endISO).getTime();
   const imported = new Date(call.importedAt).getTime();
   if (!Number.isFinite(ended) || !Number.isFinite(imported)) return false;
   const lag = imported - ended;
-  return lag >= 0 && lag <= 30 * 60000;
+  if (lag < 0 || lag > 30 * 60000) return false;
+
+  const importedDay = todayCallDateKey(new Date(imported));
+  if (importedDay === dayKey) return true;
+
+  // Turno nocturno: una llamada puede pertenecer al día contable en que comenzó el shift aunque
+  // termine/importarse después de medianoche. shiftDayKey queda guardado en la propia fila.
+  return String(call.shiftDayKey || '') === dayKey;
 }
 
 function plannedPauseCount(dayKey) {
@@ -596,35 +604,79 @@ function renderSettingsProfile() {
     if (node) node.textContent = value;
   });
 }
+function rollbackFinanceReward(key) {
+  const receipt = state.game.ledger[key];
+  if (key.startsWith('finance-meta:')) {
+    state.game.trophies = state.game.trophies.filter((item) => item?.id !== key);
+  }
+  if (receipt && typeof receipt === 'object') {
+    if (receipt.accessory) {
+      state.game.accessories = state.game.accessories.filter((item) => item !== receipt.accessory);
+    }
+    if (receipt.dayKey && Number(receipt.bonusXp) > 0) {
+      const entry = state.game.days[receipt.dayKey];
+      if (entry && typeof entry === 'object') {
+        entry.bonusXp = Math.max(0, (Number(entry.bonusXp) || 0) - Number(receipt.bonusXp));
+      }
+    }
+  }
+  delete state.game.ledger[key];
+}
+
 function syncFinanceRewards() {
-  if (!gameEnabled() || !settings.financeCategories) return false;
+  if (!settings.financeCategories) return false;
+  const enabled = gameEnabled();
   let changed = false;
   const month = new Date().toISOString().slice(0, 7);
+  const validMetaKeys = new Set();
+  const validPaidKeys = new Set();
+
   Object.values(settings.financeCategories).forEach((category) => {
     (category?.rows || []).forEach((row) => {
       const assigned = Number(row.assignedAmount) || 0;
       const target = Number(row.targetAmount) || 0;
-      if (!(target > 0 && assigned >= target - 0.004)) return;
+
       if (financeRowIsMeta(row)) {
         const key = `finance-meta:${row.id}`;
-        if (state.game.ledger[key]) return;
-        state.game.ledger[key] = true;
-        changed = true;
-        state.game.trophies.push({ id: key, label: `Meta cumplida: ${row.name}`, earnedOn: todayCallDateKey() });
-        grantDayBonus(todayCallDateKey(), 10);
+        const complete = target > 0 && assigned >= target - 0.004;
+        if (complete) validMetaKeys.add(key);
+        if (!complete || state.game.ledger[key] || !enabled) return;
+
+        const dayKey = todayCallDateKey();
+        const granted = grantDayBonus(dayKey, 10);
         const accessory = nextUnownedAccessory(key);
         if (accessory) state.game.accessories.push(accessory);
-        queueGameToast(`🏆 Trofeo desbloqueado: ${row.name}`);
-      } else if (row.recurring && row.manualPaid) {
-        const key = `finance-paid:${row.id}:${month}`;
-        if (state.game.ledger[key]) return;
-        state.game.ledger[key] = true;
+        state.game.trophies.push({ id: key, label: `Meta cumplida: ${row.name}`, earnedOn: dayKey });
+        state.game.ledger[key] = { type: 'finance-meta', dayKey, bonusXp: granted, accessory: accessory || null };
         changed = true;
-        const granted = grantDayBonus(todayCallDateKey(), 5);
+        queueGameToast(`🏆 Trofeo desbloqueado: ${row.name}`);
+        return;
+      }
+
+      if (row.recurring) {
+        const key = `finance-paid:${row.id}:${month}`;
+        if (row.manualPaid) validPaidKeys.add(key);
+        if (!row.manualPaid || state.game.ledger[key] || !enabled) return;
+        const dayKey = todayCallDateKey();
+        const granted = grantDayBonus(dayKey, 5);
+        state.game.ledger[key] = { type: 'finance-paid', dayKey, bonusXp: granted };
+        changed = true;
         queueGameToast(granted > 0 ? `+${granted} XP · ${row.name} pagado a tiempo` : `${row.name} pagado · XP diario sellado`);
       }
     });
   });
+
+  Object.keys(state.game.ledger).forEach((key) => {
+    if (key.startsWith('finance-meta:') && !validMetaKeys.has(key)) {
+      rollbackFinanceReward(key);
+      changed = true;
+    }
+    if (key.startsWith('finance-paid:') && key.endsWith(`:${month}`) && !validPaidKeys.has(key)) {
+      rollbackFinanceReward(key);
+      changed = true;
+    }
+  });
+
   return changed;
 }
 
@@ -740,19 +792,13 @@ function triggerGameEvent(rootId, eventName, duration = 900) {
 
 function grantDayBonus(dayKey, amount) {
   const entry = dayEntry(dayKey);
-  if (Number.isFinite(Number(entry.xpLocked))) return 0;
+  if (entry.finalized || Number.isFinite(Number(entry.xpLocked))) return 0;
   const before = computeGameDay(dayKey).xp;
   if (before >= GAME_DAILY_XP_CAP) return 0;
   const previousBonus = Number(entry.bonusXp) || 0;
   entry.bonusXp = Math.max(0, previousBonus + Math.max(0, Number(amount) || 0));
   const recalculated = computeGameDay(dayKey);
-  const delta = Math.max(0, recalculated.xp - before);
-  if (entry.finalized) {
-    entry.xp = recalculated.xp;
-    state.game.totalXp += delta;
-    state.game.level = levelForXp(state.game.totalXp);
-  }
-  return delta;
+  return Math.max(0, recalculated.xp - before);
 }
 
 function showCallFx(call, xp, critical, mode = 'xp') {
@@ -991,13 +1037,22 @@ export function onGameCallSaved(call, source = 'manual') {
 export function onGameGapSaved(dayKey, gapKey, label) {
   if (!gameEnabled()) return;
   ensureGameState();
-  if (String(label).toLowerCase() === 'other') state.game.live.combo = 0;
+  if (dayKey === todayCallDateKey() && String(label).toLowerCase() === 'other') state.game.live.combo = 0;
+  if (state.game.days[dayKey]?.finalized) {
+    saveStateOnly();
+    renderGame();
+    return;
+  }
   const key = `gap:${dayKey}:${gapKey}`;
   const perDayCount = Object.keys(state.game.ledger).filter((item) => item.startsWith(`gap:${dayKey}:`)).length;
   if (!state.game.ledger[key] && perDayCount < 3) {
-    state.game.ledger[key] = true;
     const granted = grantDayBonus(dayKey, 5);
-    queueGameToast(granted > 0 ? `+${granted} XP · Hueco clasificado` : 'Hueco clasificado · XP diario sellado');
+    if (granted > 0) {
+      state.game.ledger[key] = true;
+      queueGameToast(`+${granted} XP · Hueco clasificado`);
+    } else {
+      queueGameToast('Hueco clasificado · XP diario sellado');
+    }
   }
   saveStateOnly();
   renderGame();
@@ -1037,6 +1092,9 @@ export function onGameCallsChanged(dayKey) {
   // actualiza los hechos del día que pueden venir de Propio: dinero, llamadas y vida del monstruo.
   entry.earnings = Number(raw.stats.earnings) || 0;
   entry.callCount = callsForDay(normalizedDayKey).length;
+  if (entry.callCount === 0 && state.game.chest.pending && state.game.chest.sealedOn === normalizedDayKey) {
+    state.game.chest = { pending: false, sealedOn: null };
+  }
   entry.monster = {
     species: raw.species.id,
     variant: monsterVariantFor(raw),
@@ -1056,6 +1114,75 @@ export function onGameCallsChanged(dayKey) {
   saveStateOnly();
   if (enabled) renderGame();
   return true;
+}
+
+export function onGameDayReset(dayKey) {
+  ensureGameState();
+  const normalized = String(dayKey || '');
+  const entry = state.game.days[normalized];
+
+  Object.keys(state.game.ledger)
+    .filter((key) => key.startsWith(`loot:${normalized}:`))
+    .forEach((key) => rollbackLootReceipt(normalized, key));
+
+  if (entry?.finalized) {
+    state.game.totalXp = Math.max(0, state.game.totalXp - (Number(entry.xp) || 0));
+    if (entry.shieldUsed && state.game.shields < GAME_SHIELD_CAP) state.game.shields++;
+    const awardedKey = entry.rollback?.streakShieldAwardedKey;
+    if (awardedKey && state.game.ledger[awardedKey]) {
+      delete state.game.ledger[awardedKey];
+      if (state.game.shields > 0) state.game.shields--;
+    }
+  }
+
+  const prefixes = [
+    `gap:${normalized}:`,
+    `monster-defeat:${normalized}`,
+    `reflex:${normalized}`,
+    `streak-shield:${normalized}:`,
+  ];
+  Object.keys(state.game.ledger).forEach((key) => {
+    if (prefixes.some((prefix) => key.startsWith(prefix))) delete state.game.ledger[key];
+  });
+
+  if (state.game.chest.pending && state.game.chest.sealedOn === normalized) {
+    state.game.chest = { pending: false, sealedOn: null };
+  }
+  delete state.game.days[normalized];
+  if (normalized === todayCallDateKey()) state.game.live.combo = 0;
+  state.game.level = levelForXp(state.game.totalXp);
+  state.game.bestStreak = recomputeBestStreak();
+  saveStateOnly();
+  if (gameEnabled()) renderGame();
+}
+
+export function onGameDayMetadataChanged(dayKey) {
+  ensureGameState();
+  const normalized = String(dayKey || '');
+  const entry = state.game.days[normalized];
+  if (entry?.finalized) {
+    const status = dayComplianceStatus(normalized);
+    const shouldUseShield = status === 'failed';
+
+    if (entry.shieldUsed && !shouldUseShield) {
+      const restored = state.game.shields < GAME_SHIELD_CAP;
+      if (restored) state.game.shields++;
+      entry.shieldUsed = false;
+      entry.metadataShieldRestored = restored;
+    } else if (!entry.shieldUsed && shouldUseShield) {
+      if (entry.metadataShieldRestored) {
+        if (state.game.shields > 0) state.game.shields--;
+        entry.shieldUsed = true;
+        delete entry.metadataShieldRestored;
+      } else if (state.game.shields > 0) {
+        state.game.shields--;
+        entry.shieldUsed = true;
+      }
+    }
+  }
+  state.game.bestStreak = recomputeBestStreak();
+  saveStateOnly();
+  if (gameEnabled()) renderGame();
 }
 
 export function onGameShiftAlarmFired(dayKey, firedAt = new Date().toISOString()) {
@@ -1100,9 +1227,9 @@ export function onGameShiftStarted({ continued = false } = {}) {
   const enabled = gameEnabled();
   const hadFinalizedDay = !!state.game.days[dayKey]?.finalized;
 
-  if (hadFinalizedDay) {
+  if (enabled && hadFinalizedDay) {
     revokeStageClear(dayKey, { silent: true });
-    if (enabled) queueGameToast('STAGE CLEAR reabierto · el nuevo turno se sumará al cierre de hoy');
+    queueGameToast('STAGE CLEAR reabierto · el nuevo turno se sumará al cierre de hoy');
   }
 
   if (continued) {
@@ -1110,10 +1237,7 @@ export function onGameShiftStarted({ continued = false } = {}) {
     if (enabled) renderGame();
     return;
   }
-  if (!enabled) {
-    if (hadFinalizedDay) saveStateOnly();
-    return;
-  }
+  if (!enabled) return;
 
   openPendingChest(dayKey);
   const firedAt = new Date(state.game.live.shiftAlarmAt || 0).getTime();
