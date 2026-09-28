@@ -227,8 +227,12 @@ function missionSnapshot(dayKey, stats, goal, adherence) {
   return missions;
 }
 
+function higherRateBonusAmount(call) {
+  return Number(higherRateBonusForCall(call)?.amount) || 0;
+}
+
 function callXp(call) {
-  const critical = (Number(higherRateBonusForCall(call)?.amount) || 0) > 0;
+  const critical = higherRateBonusAmount(call) > 0;
   return critical ? Math.ceil(3 * 1.5) : 3;
 }
 
@@ -886,7 +890,7 @@ function showCallFx(call, xp, critical, mode = 'xp') {
     document.querySelectorAll('.game-live-xp-float').forEach((node) => node.remove());
     return;
   }
-  const amount = parseMoney(call.pay) + higherRateBonusForCall(call);
+  const amount = parseMoney(call.pay) + higherRateBonusAmount(call);
   const message = mode === 'extra'
     ? `BOTÍN EXTRA · ${withConversion(amount)}`
     : xp > 0
@@ -1064,7 +1068,7 @@ export function onGameCallSaved(call, source = 'manual') {
   const currentDay = computeGameDay(dayKey);
   const entry = dayEntry(dayKey);
   const xpLocked = Number.isFinite(Number(entry.xpLocked));
-  const critical = (Number(higherRateBonusForCall(call)?.amount) || 0) > 0;
+  const critical = higherRateBonusAmount(call) > 0;
 
   if (currentDay.defeated && xpLocked) {
     saveStateOnly();
