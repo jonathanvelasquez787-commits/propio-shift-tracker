@@ -526,3 +526,15 @@ test('cuarta simulación mensual: backup JSON realmente incluye y restaura setti
   assert.match(appMain, /backups viejos \(sin settings\)/i);
   assert.match(html, /respaldo completo: llamadas, turnos, pausas, horario, metas, Finanzas, Higher Rate, gamificación y ajustes/);
 });
+
+
+test('cuarta simulación mensual: Higher Rate cruza medianoche sin perder bonos', () => {
+  const hr = read('js/higher-rate.js');
+  assert.match(hr, /function higherRateWindowBounds/);
+  assert.match(hr, /endMin === startMin/);
+  assert.match(hr, /end = new Date\(end\.getFullYear\(\), end\.getMonth\(\), end\.getDate\(\) \+ 1/);
+  assert.match(hr, /const windows = settings\.higherRateWindows \|\| \[\]/);
+  assert.doesNotMatch(hr, /filter\(w => w\.date === call\.callDate\)/);
+  assert.match(hr, /const bounds = higherRateWindowBounds\(w\)/);
+  assert.doesNotMatch(hr, /todavía no se soporta, no aplicará a ninguna llamada/);
+});
