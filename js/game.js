@@ -268,6 +268,74 @@ export function computeGameDay(dayKey = todayCallDateKey(), { ignoreLock = false
   };
 }
 
+function gameStreak() {
+  ensureGameState();
+  return Math.max(0, Number(computeComplianceStreak()?.days) || 0);
+}
+
+function recomputeBestStreak() {
+  let best = 0;
+  let current = 0;
+  let cursor = callDateToDate(todayCallDateKey()) || new Date();
+  for (let i = 0; i < GAME_DAY_LIMIT; i++) {
+    const key = todayCallDateKey(cursor);
+    const status = dayComplianceStatus(key);
+    if (status === 'pending') {
+      cursor = new Date(cursor.getFullYear(), cursor.getMonth(), cursor.getDate() - 1);
+      continue;
+    }
+    if (status === 'off') {
+      if (settings.streakSkipOffDays !== false) {
+        cursor = new Date(cursor.getFullYear(), cursor.getMonth(), cursor.getDate() - 1);
+        continue;
+      }
+      current = 0;
+    } else if (status === 'compliant' || state.game.days[key]?.shieldUsed) {
+      current++;
+      best = Math.max(best, current);
+    } else {
+      current = 0;
+    }
+    cursor = new Date(cursor.getFullYear(), cursor.getMonth(), cursor.getDate() - 1);
+  }
+  return best;
+}
+
+function gameLevelProgress() {
+  ensureGameState();
+  const level = levelForXp(state.game.totalXp);
+  const floor = xpThresholdForLevel(level);
+  const ceiling = xpThresholdForLevel(level + 1);
+  return {
+    level,
+    floor,
+    ceiling,
+    current: state.game.totalXp,
+    pct: ceiling > floor ? Math.max(0, Math.min(100, ((state.game.totalXp - floor) / (ceiling - floor)) * 100)) : 100,
+    remaining: Math.max(0, ceiling - state.game.totalXp),
+  };
+}
+
+function withConversion(amount) {
+  const converted = convertedAmountText(amount);
+  return `${money(amount)}${converted ? ` (${escapeHtml(converted)})` : ''}`;
+}
+
+function monsterStateFor(day) {
+  if (day.defeated) return 'defeated';
+  if (state.activePause || !state.shiftStartedAt || state.shiftEndedAt) return 'sleeping';
+  if (higherRateLiveStatus()?.active) return 'fury';
+  if (day.hpPct <= 25) return 'wounded';
+  if (day.hpPct <= 50) return 'angry';
+  return 'awake';
+}
+
+function monsterVariantFor(day) {
+  if (higherRateLiveStatus()?.active) return 'gold';
+  if (gameStreak() >= 7) return 'streak';
+  return 'normal';
+}
+
 function yesterdayShadowPct() {
   const now = new Date();
   const yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
