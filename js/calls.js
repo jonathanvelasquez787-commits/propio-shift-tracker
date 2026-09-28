@@ -61,21 +61,6 @@ let editingCallId = null;
 // localStorage.
 let tableFilterMode = 'all'; // 'all' | 'calls' | 'actions'.
 
-function reconcileLastCallEndedAt(dayKey) {
-  const normalized = callDateKeyFromValue(dayKey);
-  const todayKey = todayCallDateKey();
-  const shiftDayKey = state.shiftStartedAt ? todayCallDateKey(new Date(state.shiftStartedAt)) : '';
-  if (!normalized || (normalized !== todayKey && normalized !== shiftDayKey)) return;
-  const now = Date.now();
-  const latest = callsForDay(normalized)
-    .filter(call => {
-      const end = new Date(call.endISO).getTime();
-      return Number.isFinite(end) && end <= now;
-    })
-    .sort((a, b) => new Date(b.endISO) - new Date(a.endISO))[0];
-  state.lastCallEndedAt = latest ? latest.endISO : null;
-}
-
 // Editor de una llamada ya importada: corrige duración, pago, billable y dropped.
 export function openCallEditor(callId) {
   const call = calls.find(c => c.id === callId);
@@ -178,7 +163,6 @@ export function saveCallEditor() {
 
   editingCallId = null;
   closeModal('callEditModal');
-  if (affectedDayKey) reconcileLastCallEndedAt(affectedDayKey);
   financeRunAutoFillCascade();
   saveAll();
   if (affectedDayKey) onGameCallsChanged(affectedDayKey);
@@ -192,8 +176,6 @@ export function deleteCallRecord(callId) {
   if (!call) return false;
   const affectedDayKey = callDateKeyFromValue(call.callDate);
   setCalls(calls.filter(c => c.id !== callId));
-  if (affectedDayKey) reconcileLastCallEndedAt(affectedDayKey);
-  financeRunAutoFillCascade();
   saveAll();
   if (affectedDayKey) onGameCallsChanged(affectedDayKey);
   toast('Llamada eliminada');
@@ -213,8 +195,6 @@ export function clearActiveDayCalls() {
   const plural = count === 1 ? 'llamada' : 'llamadas';
   appConfirm(`¿Vaciar TODAS las ${plural} de ${formatCallDayLabel(dayKey)} (${count})? Tu turno, pausas y horario de ese día no se tocan. No se puede deshacer.`, () => {
     setCalls(calls.filter(c => callDateKeyFromValue(c.callDate) !== dayKey));
-    reconcileLastCallEndedAt(dayKey);
-    financeRunAutoFillCascade();
     saveAll();
     onGameCallsChanged(dayKey);
     toast(`${count} ${plural} de ${formatCallDayLabel(dayKey)} borrada(s)`);
@@ -392,20 +372,10 @@ function buildLiveCallCandidate({ customerId, startedAtISO, endedAtISO, billable
   const durationMin = Math.round((elapsedMs / 60000) * 100) / 100;
   // Si el fin no quedó después del inicio, se reconstruye con la duración redondeada.
   const end = rawEnd.getTime() > start.getTime() ? rawEnd : new Date(start.getTime() + durationMin * 60000);
-  const shiftStart = state.shiftStartedAt ? new Date(state.shiftStartedAt) : null;
-  const shiftEnd = state.shiftEndedAt ? new Date(state.shiftEndedAt) : null;
-  const belongsToTrackedShift = shiftStart
-    && Number.isFinite(shiftStart.getTime())
-    && start.getTime() >= shiftStart.getTime()
-    && (!shiftEnd || !Number.isFinite(shiftEnd.getTime()) || start.getTime() <= shiftEnd.getTime());
-  const calendarCallDate = todayCallDateKey(start);
-  const accountingCallDate = belongsToTrackedShift ? todayCallDateKey(shiftStart) : calendarCallDate;
   return {
     id: makeLocalId(),
     customerId: String(customerId || '').trim() || 'Manual',
-    callDate: accountingCallDate,
-    ...(belongsToTrackedShift ? { shiftDayKey: accountingCallDate } : {}),
-    ...(accountingCallDate !== calendarCallDate ? { calendarCallDate } : {}),
+    callDate: todayCallDateKey(start),
     // CallStart es solo el texto que se ve en Tabla de llamadas — se deriva igual que siempre
     // (hora/minuto), pero NO se usa para calcular startISO/endISO (ver arriba)
     callStart: callStartLabelFromHHMM(`${pad(start.getHours())}:${pad(start.getMinutes())}`),
@@ -480,7 +450,6 @@ export function saveManualCall() {
   // no hay nada que perder al cerrar, se apaga la bandera antes de cerrar sin preguntar.
   manualCallLiveBackupPending = false;
   closeModal('manualCallModal');
-  reconcileLastCallEndedAt(callDate);
   financeRunAutoFillCascade();
   saveAll();
   onGameCallSaved(candidate, 'manual');

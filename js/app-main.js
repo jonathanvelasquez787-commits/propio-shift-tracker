@@ -142,8 +142,6 @@ import {
   onGameCallSaved,
   onGameCallsChanged,
   onGameDayRollover,
-  onGameDayReset,
-  onGameDayMetadataChanged,
   onGameGapSaved,
   onGamePauseEnded,
   onGameShiftAlarmFired,
@@ -430,73 +428,15 @@ export { onGameCallSaved, onGameCallsChanged };
       return weekEnd < todayRange();
     }
 
-    function baseDayConfigFor(dayKey) {
+    export function dayConfigFor(dayKey) {
       ensureWeeklySchedule();
       const wd = weekdayKeyForDayKey(dayKey);
       const weekKey = weekStartKeyForDayKey(dayKey);
       const overrideWeek = settings.scheduleOverridesByWeek && settings.scheduleOverridesByWeek[weekKey];
+      // Una semana personalizada (ver "📅 Semana específica" en Horario) gana sobre la plantilla
+      // recurrente para los días que trae.
       if (overrideWeek && overrideWeek[wd]) return overrideWeek[wd];
       return settings.weeklySchedule[wd] || { off: true };
-    }
-
-    function clonePlanningValue(value) {
-      try { return JSON.parse(JSON.stringify(value)); } catch { return value; }
-    }
-
-    function earliestTrackedPlanningDate() {
-      const candidates = [];
-      const addDayKey = (key) => {
-        const d = callDateToDate(callDateKeyFromValue(key));
-        if (d && Number.isFinite(d.getTime())) candidates.push(d);
-      };
-      calls.forEach(c => addDayKey(c.callDate));
-      (state.events || []).forEach(e => {
-        const d = new Date(e?.ts || 0);
-        if (Number.isFinite(d.getTime())) candidates.push(todayRange(d));
-      });
-      (state.pauseHistory || []).forEach(p => {
-        const d = new Date(p?.startedAt || 0);
-        if (Number.isFinite(d.getTime())) candidates.push(todayRange(d));
-      });
-      Object.keys(state.game?.days || {}).forEach(addDayKey);
-      Object.keys(state.dayNotes || {}).forEach(addDayKey);
-      Object.keys(settings.dailyGoalOverrides || {}).forEach(addDayKey);
-      if (!candidates.length) return null;
-      return new Date(Math.min(...candidates.map(d => todayRange(d).getTime())));
-    }
-
-    export function snapshotHistoricalPlanning() {
-      if (!settings.scheduleHistoryByDay || typeof settings.scheduleHistoryByDay !== 'object') settings.scheduleHistoryByDay = {};
-      if (!settings.goalHistoryByDay || typeof settings.goalHistoryByDay !== 'object') settings.goalHistoryByDay = {};
-      const start = earliestTrackedPlanningDate();
-      const today = todayRange();
-      if (!start || start >= today) return false;
-      let changed = false;
-      let cursor = new Date(start.getFullYear(), start.getMonth(), start.getDate());
-      let guard = 0;
-      while (cursor < today && guard++ < 5000) {
-        const key = todayCallDateKey(cursor);
-        if (!settings.scheduleHistoryByDay[key]) {
-          settings.scheduleHistoryByDay[key] = clonePlanningValue(baseDayConfigFor(key));
-          changed = true;
-        }
-        if (!settings.goalHistoryByDay[key]) {
-          const override = getDailyGoalOverride(key);
-          settings.goalHistoryByDay[key] = override
-            ? { min: override.min, usd: override.usd }
-            : { min: Number(settings.productiveGoalMin) || 0, usd: Number(settings.earningsGoal) || 0 };
-          changed = true;
-        }
-        cursor = new Date(cursor.getFullYear(), cursor.getMonth(), cursor.getDate() + 1);
-      }
-      return changed;
-    }
-
-    export function dayConfigFor(dayKey) {
-      const normalized = callDateKeyFromValue(dayKey);
-      const historical = normalized && settings.scheduleHistoryByDay && settings.scheduleHistoryByDay[normalized];
-      if (historical && typeof historical === 'object') return historical;
-      return baseDayConfigFor(dayKey);
     }
 
     // Un día "libre" del horario se sigue tratando como libre SALVO que haya actividad real ese día
@@ -1477,8 +1417,8 @@ export function sameCallDay(iso, key) {
 
 function callImportFlag(c) {
   if (!c.importedAt) return null;
-  const lagMin = (new Date(c.importedAt).getTime() - new Date(c.endISO).getTime()) / 60000;
-  if (sameCallDay(c.importedAt, c.callDate) || String(c.shiftDayKey || '') === callDateKeyFromValue(c.callDate)) {
+  if (sameCallDay(c.importedAt, c.callDate)) {
+    const lagMin = (new Date(c.importedAt).getTime() - new Date(c.endISO).getTime()) / 60000;
     if (lagMin > 30) return { cls: 'imported-late', label: 'Importado tarde' };
     return null;
   }
@@ -3245,7 +3185,6 @@ function setDayNote(dayKey, { category, comment, forcedStatus }) {
     state.dayNotes[normalized] = { category: cat, comment: note, forcedStatus: forced };
   }
   saveStateOnly();
-  onGameDayMetadataChanged(normalized);
   render();
 }
 
@@ -3335,15 +3274,6 @@ export function getDailyGoalOverride(dayKey) {
 export function effectiveDailyGoal(dayKey = getActiveDayKey()) {
   const override = getDailyGoalOverride(dayKey);
   if (override) return { min: override.min, usd: override.usd, isOverride: true };
-  const normalized = callDateKeyFromValue(dayKey);
-  const historical = normalized && settings.goalHistoryByDay && settings.goalHistoryByDay[normalized];
-  if (historical && typeof historical === 'object') {
-    const min = Number(historical.min);
-    const usd = Number(historical.usd);
-    if (Number.isFinite(min) && min >= 0 && Number.isFinite(usd) && usd >= 0) {
-      return { min, usd, isOverride: false, isHistorical: true };
-    }
-  }
   return { min: Number(settings.productiveGoalMin) || 0, usd: Number(settings.earningsGoal) || 0, isOverride: false };
 }
 
@@ -4185,22 +4115,25 @@ function renderPayDatesSection() {
         state.events = state.events.filter(e => !sameCallDay(e.ts, dayKey));
         state.pauseHistory = state.pauseHistory.filter(p => !sameCallDay(p.startedAt, dayKey));
         const normalizedDayKey = callDateKeyFromValue(dayKey);
-        if (state.gapAnnotations && state.gapAnnotations[normalizedDayKey]) delete state.gapAnnotations[normalizedDayKey];
-        if (state.dayNotes && state.dayNotes[normalizedDayKey]) delete state.dayNotes[normalizedDayKey];
-        if (state.dayInterruptions && state.dayInterruptions[normalizedDayKey]) delete state.dayInterruptions[normalizedDayKey];
+        if (state.gapAnnotations && state.gapAnnotations[normalizedDayKey]) {
+          delete state.gapAnnotations[normalizedDayKey];
+        }
+        if (state.dayNotes && state.dayNotes[normalizedDayKey]) {
+          delete state.dayNotes[normalizedDayKey];
+        }
 
         if (dayKey === todayCallDateKey()) {
           state.shiftStartedAt = null;
           state.shiftEndedAt = null;
           state.activePause = null;
           state.activeCall = null;
-          state.lastCallEndedAt = null;
         }
 
+        // El día activo se queda en el día reiniciado, no salta al día más viejo con llamadas.
         state.activeDayKey = dayKey;
-        onGameDayReset(dayKey);
-        financeRunAutoFillCascade();
+
         saveAll();
+        onGameCallsChanged(dayKey);
         toast('Día reiniciado');
       });
     }
@@ -4321,8 +4254,7 @@ function renderPayDatesSection() {
 
     function sameImportedCallIdentity(existingCall, incomingCall) {
       if (!existingCall || String(existingCall.source || '').toLowerCase() !== 'import') return false;
-      // startISO ya contiene la fecha real. No se compara callDate porque un turno nocturno puede
-      // contabilizar la llamada en el día anterior aunque Propio la exporte con fecha calendario nueva.
+      if (callDateKeyFromValue(existingCall.callDate) !== callDateKeyFromValue(incomingCall.callDate)) return false;
       const existingCustomer = String(existingCall.customerId || '').trim();
       const incomingCustomer = String(incomingCall.customerId || '').trim();
       if (!existingCustomer || !incomingCustomer || existingCustomer !== incomingCustomer) return false;
@@ -4333,7 +4265,7 @@ function renderPayDatesSection() {
 
     function importCalls() {
       const ta = document.getElementById('callInput');
-      let parsed = parseCalls(ta.value);
+      const parsed = parseCalls(ta.value);
       if (!parsed.length) {
         toast('No se pudo leer la data');
         return;
@@ -4341,19 +4273,6 @@ function renderPayDatesSection() {
 
       const importTs = new Date().toISOString();
       const importNow = new Date(importTs).getTime();
-      const activeShiftStart = state.shiftStartedAt ? new Date(state.shiftStartedAt) : null;
-      const activeShiftEnd = state.shiftEndedAt ? new Date(state.shiftEndedAt) : new Date(importTs);
-      const activeShiftDayKey = activeShiftStart && Number.isFinite(activeShiftStart.getTime())
-        ? todayCallDateKey(activeShiftStart)
-        : '';
-      if (activeShiftStart && Number.isFinite(activeShiftStart.getTime()) && Number.isFinite(activeShiftEnd.getTime())) {
-        parsed = parsed.map(call => {
-          const startMs = new Date(call.startISO).getTime();
-          if (!Number.isFinite(startMs) || startMs < activeShiftStart.getTime() || startMs > activeShiftEnd.getTime()) return call;
-          if (!activeShiftDayKey || callDateKeyFromValue(call.callDate) === activeShiftDayKey) return call;
-          return { ...call, calendarCallDate: call.callDate, callDate: activeShiftDayKey, shiftDayKey: activeShiftDayKey };
-        });
-      }
       const existing = new Set(calls.filter(c => !isReplaceableLiveCall(c)).map(callDedupeKey));
       const skippedDuplicates = [];
       const futureRows = [];
@@ -4419,17 +4338,9 @@ function renderPayDatesSection() {
 
       const importedRows = accepted.map(item => {
         const preserveOfficialIdentity = item.replacementKind === 'import' && item.replaces;
-        const replacingLive = item.replacementKind === 'live' && item.replaces;
         const call = {
           ...item.call,
           id: preserveOfficialIdentity ? item.replaces.id : item.call.id,
-          callDate: replacingLive ? item.replaces.callDate : item.call.callDate,
-          calendarCallDate: replacingLive
-            ? (item.call.calendarCallDate || item.call.callDate)
-            : item.call.calendarCallDate,
-          shiftDayKey: replacingLive
-            ? (item.replaces.shiftDayKey || item.replaces.callDate)
-            : item.call.shiftDayKey,
           importedAt: preserveOfficialIdentity ? (item.replaces.importedAt || importTs) : importTs,
           source: 'import',
         };
@@ -4453,10 +4364,6 @@ function renderPayDatesSection() {
         }
       });
 
-      const todayImportedKey = todayCallDateKey();
-      if (importedDates.has(todayImportedKey) && !state.shiftStartedAt && !state.shiftEndedAt && callsForDay(todayImportedKey).length) {
-        autoStartShiftFromCalls(true);
-      }
       importedDates.forEach(dayKey => onGameCallsChanged(dayKey));
 
       const importedDateList = [...importedDates].sort((a, b) => callDateToDate(a) - callDateToDate(b));
@@ -4717,7 +4624,6 @@ function renderPayDatesSection() {
       } else if (!state.activeDayKey) {
         state.activeDayKey = defaultActiveDayKey();
       }
-      financeRunAutoFillCascade();
       saveAll();
     }
 

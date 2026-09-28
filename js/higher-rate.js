@@ -13,7 +13,6 @@ import {
   dayKeyFromIsoDate,
   escapeHtml,
   financeConvertedInline,
-  financeRunAutoFillCascade,
   formatBlockDurationLabel,
   formatCallDayLabel,
   formatHHMM,
@@ -548,8 +547,6 @@ import {
       if (editedIds.length) freezeHigherRateBonusesForWindowIds(editedIds);
       settings.higherRateWindows = newWindows;
       retuneFrozenHigherRateTiers(newWindows);
-      // Si el bono cambia, también puede bajar el dinero real disponible en Finanzas.
-      financeRunAutoFillCascade();
       // SaveAll en vez de saveSettingsOnly: freezeHigherRateBonusesForWindowIds puede haber marcado
       // `calls` con `frozenHigherRateBonus` nuevo.
       saveAll();
@@ -621,7 +618,6 @@ import {
       const current = readHigherRateWindowsFromEditor().filter(w => w.id !== id);
       renderHigherRateWindowsEditor(current);
       settings.higherRateWindows = current;
-      financeRunAutoFillCascade();
       // SaveAll en vez de saveSettingsOnly: ahora también hay que persistir `calls` (algunas pueden
       // haber quedado con frozenHigherRateBonus nuevo).
       saveAll();
