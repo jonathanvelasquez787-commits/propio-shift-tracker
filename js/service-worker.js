@@ -7,6 +7,7 @@ const SHELL = [
   '/terminos.html',
   '/manifest.webmanifest',
   '/icons/app-icon.svg',
+  '/css/game.css',
 ];
 
 self.addEventListener('install', (event) => {
