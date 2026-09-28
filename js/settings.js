@@ -23,6 +23,7 @@ import {
   render,
   saveSettingsOnly,
   saveStateOnly,
+  snapshotHistoricalPlanning,
   setDailyGoalOverride,
   settings,
   state,
@@ -74,6 +75,7 @@ let syncingGoals = false;
       if (scope === 'day') {
         setDailyGoalOverride(dayKey, { min: minutes, usd: dollars });
       } else {
+        snapshotHistoricalPlanning();
         settings.productiveGoalMin = Number(minutes);
         settings.earningsGoal = Number(dollars);
         state.productiveGoalMin = settings.productiveGoalMin;

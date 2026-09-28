@@ -21,6 +21,7 @@ import {
   usdCeilFromCurrencyAmount,
   higherRateBonusForCalls,
   renderEmojiPicker,
+  render,
 } from './app-main.js';
 
     export const FINANCE_CATEGORIES = {
@@ -468,7 +469,7 @@ export function financeApplySignedAmount(catId, rowId, rawAmount, sign) {
     }
     row.assignedAmount = before - removed;
     saveSettingsOnly();
-    renderFinanceSection();
+    render();
     toast(removed < monto
       ? `Solo se restaron ${money(removed)}${convertedAmountText(removed) ? ` (${convertedAmountText(removed)})` : ''} de ${money(monto)}${convertedAmountText(monto) ? ` (${convertedAmountText(monto)})` : ''} — la fila no tenía más asignado. El resto no se tocó.`
       : 'Aplicado');
@@ -489,7 +490,7 @@ export function financeApplySignedAmount(catId, rowId, rawAmount, sign) {
     appliedAmount = row.assignedAmount - before;
   }
   saveSettingsOnly();
-  renderFinanceSection();
+  render();
   // Un Gasto ya no acepta más de lo que le falta para su objetivo — si el monto pedido se recortó,
   // se avisa cuánto entró de verdad en vez de un "Aplicado" genérico que dejaría creer que se
   // aplicó todo.
@@ -501,18 +502,42 @@ export function financeApplySignedAmount(catId, rowId, rawAmount, sign) {
 // Reparte TODO el Disponible actual, solo, en el mismo orden de prioridad que ya usa la cascada de
 // "Restante después" — primero Gastos (financeGastoRowsSorted, saltando los ya Pagados), luego
 // Metas (financeMetaRowsSorted), sin pasarse del objetivo de cada fila.
-export function financeRunAutoFillCascade() {
+function financeTrimAssignmentsToEarnings() {
+  const earnings = Math.max(0, financeTotalEarningsAllTime());
+  let assigned = financeTotalAssigned();
+  let deficit = assigned - earnings;
+  if (deficit <= 0.004) return false;
+
+  // La cascada llena primero Gastos por prioridad y después Metas. Si las ganancias bajan por una
+  // corrección/borrado, se deshace en orden inverso para conservar primero lo más prioritario.
+  const reverseAllocationOrder = [
+    ...financeGastoRowsSorted(),
+    ...financeMetaRowsSorted(),
+  ].reverse();
+
+  let changed = false;
+  for (const row of reverseAllocationOrder) {
+    if (deficit <= 0.004) break;
+    const before = Math.max(0, Number(row.assignedAmount) || 0);
+    if (before <= 0) continue;
+    const removed = Math.min(before, deficit);
+    row.assignedAmount = Math.max(0, before - removed);
+    deficit -= removed;
+    changed = true;
+  }
+  return changed;
+}
+
+function financeFillAvailableByPriority() {
   if (!settings.financeAutoFill) return false;
   let changed = false;
-  // Tope defensivo de iteraciones — cada vuelta llena una fila distinta o agota el Disponible, así
-  // que nunca debería acercarse a este número.
   let guard = 0;
   while (guard++ < 500) {
     const available = financeAvailableBalance();
     if (available <= 0.004) break;
     const nextRow = financeGastoRowsSorted().find(r => !financeIsRowPagado(r))
       || financeMetaRowsSorted().find(r => (Number(r.assignedAmount) || 0) < (Number(r.targetAmount) || 0) - 0.004);
-    if (!nextRow) break; // Nada pendiente en ninguna cola — el resto se queda en Disponible.
+    if (!nextRow) break;
     const remaining = Math.max(0, (Number(nextRow.targetAmount) || 0) - (Number(nextRow.assignedAmount) || 0));
     const applyAmount = Math.min(available, remaining);
     if (applyAmount <= 0) break;
@@ -522,13 +547,27 @@ export function financeRunAutoFillCascade() {
   return changed;
 }
 
+export function financeReconcileAssignmentsToEarnings({ refill = true } = {}) {
+  const trimmed = financeTrimAssignmentsToEarnings();
+  const filled = refill ? financeFillAvailableByPriority() : false;
+  return trimmed || filled;
+}
+
+export function financeRunAutoFillCascade() {
+  // Aunque auto-fill esté apagado, nunca permitimos que lo ya asignado exceda las ganancias
+  // reales después de editar/borrar/corregir llamadas.
+  const trimmed = financeTrimAssignmentsToEarnings();
+  const filled = financeFillAvailableByPriority();
+  return trimmed || filled;
+}
+
 // Checkbox "Asignar disponible automáticamente" (ver #financeAutoFillInput en el HTML) — al
 // activarlo, reparte de inmediato cualquier Disponible que ya hubiera quedado sin asignar de antes.
 export function updateFinanceAutoFillSetting(checked) {
   settings.financeAutoFill = !!checked;
   const changed = settings.financeAutoFill && financeRunAutoFillCascade();
   saveSettingsOnly();
-  renderFinanceSection();
+  render();
   if (settings.financeAutoFill) {
     toast(changed
       ? 'Asignación automática activada — tu Disponible ya se repartió en orden de prioridad'
@@ -544,7 +583,7 @@ export function financeResetRow(catId, rowId) {
   row.assignedAmount = 0;
   row.manualPaid = false;
   saveSettingsOnly();
-  renderFinanceSection();
+  render();
   toast('Gasto reiniciado');
 }
 
@@ -553,7 +592,7 @@ export function financeToggleManualPaid(catId, rowId, checked) {
   if (!row) return;
   row.manualPaid = !!checked;
   saveSettingsOnly();
-  renderFinanceSection();
+  render();
 }
 
 export function financeDeleteRow(catId, rowId) {
@@ -563,7 +602,7 @@ export function financeDeleteRow(catId, rowId) {
     const cat = settings.financeCategories[catId];
     cat.rows = cat.rows.filter(r => r.id !== rowId);
     saveSettingsOnly();
-    renderFinanceSection();
+    render();
     toast('Fila eliminada');
   });
 }
@@ -860,7 +899,7 @@ export function saveFinanceRowModal() {
     financeRunAutoFillCascade();
     saveSettingsOnly();
     closeModal('financeRowModal');
-    renderFinanceSection();
+    render();
     toast(isMeta ? 'Meta actualizada' : 'Gasto actualizado');
     financeEditingRowId = null;
     return;
@@ -891,7 +930,7 @@ export function saveFinanceRowModal() {
   financeRunAutoFillCascade();
   saveSettingsOnly();
   closeModal('financeRowModal');
-  renderFinanceSection();
+  render();
   toast(isMeta ? 'Meta agregada' : 'Gasto agregado');
 }
 
