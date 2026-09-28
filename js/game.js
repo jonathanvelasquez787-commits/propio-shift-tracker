@@ -614,8 +614,9 @@ function renderAchievements() {
       pendingChest.dataset.gameRole = 'pending-chest';
       last.appendChild(pendingChest);
     }
-    pendingChest.hidden = !state.game.chest.pending;
-    pendingChest.textContent = state.game.chest.pending
+    const hasPendingChest = !!state.game.chest.pending && !!state.game.chest.sealedOn;
+    pendingChest.hidden = !hasPendingChest;
+    pendingChest.textContent = hasPendingChest
       ? `🎁 Cofre sellado desde ${formatCallDayLabel(state.game.chest.sealedOn)} · se abre al iniciar tu próximo día`
       : '';
   }
@@ -953,8 +954,12 @@ export function onGameCallsChanged(dayKey) {
     defeated: raw.defeated,
     hpPct: raw.hpPct,
   };
-  if (raw.defeated) entry.xpLocked = nextXp;
-  else delete entry.xpLocked;
+  if (raw.defeated) {
+    entry.xpLocked = nextXp;
+  } else {
+    delete entry.xpLocked;
+    delete state.game.ledger[`monster-defeat:${normalizedDayKey}`];
+  }
 
   state.game.totalXp = Math.max(0, state.game.totalXp + nextXp - oldXp);
   state.game.level = levelForXp(state.game.totalXp);
@@ -1172,7 +1177,7 @@ function recordPreviousCycleOutcome() {
 export function onGameDayRollover() {
   ensureGameState();
   state.game.live = { dayKey: todayCallDateKey(), combo: 0, shiftAlarmAt: null };
-  recordPreviousCycleOutcome();
+  if (gameEnabled()) recordPreviousCycleOutcome();
   saveStateOnly();
 }
 
