@@ -56,7 +56,7 @@ import {
       return `${sign}${h}:${pad(m)}`;
     }
 
-    function syncScheduleOffsetUI() {
+    export function syncScheduleOffsetUI() {
       const valueEl = document.getElementById('scheduleOffsetValue');
       if (valueEl) valueEl.textContent = formatScheduleOffsetLabel(scheduleOffsetMin);
     }
