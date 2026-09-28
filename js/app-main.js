@@ -4575,16 +4575,25 @@ function renderPayDatesSection() {
       const importedRows = accepted.map(item => {
         const preserveOfficialIdentity = item.replacementKind === 'import' && item.replaces;
         const replacingLive = item.replacementKind === 'live' && item.replaces;
+        const replacingExisting = (preserveOfficialIdentity || replacingLive) ? item.replaces : null;
         const call = {
           ...item.call,
           id: preserveOfficialIdentity ? item.replaces.id : item.call.id,
-          callDate: replacingLive ? item.replaces.callDate : item.call.callDate,
-          calendarCallDate: replacingLive
-            ? (item.call.calendarCallDate || item.call.callDate)
+          // Una corrección oficial conserva el día CONTABLE original igual que el reemplazo de una
+          // live provisional. startISO sigue siendo la identidad real; callDate puede ser el día
+          // anterior en un turno nocturno y no debe volver al día calendario al corregirla después.
+          callDate: replacingExisting ? replacingExisting.callDate : item.call.callDate,
+          calendarCallDate: replacingExisting
+            ? (replacingExisting.calendarCallDate || item.call.calendarCallDate || item.call.callDate)
             : item.call.calendarCallDate,
-          shiftDayKey: replacingLive
-            ? (item.replaces.shiftDayKey || item.replaces.callDate)
+          shiftDayKey: replacingExisting
+            ? (replacingExisting.shiftDayKey || (replacingExisting.callDate !== item.call.callDate ? replacingExisting.callDate : undefined))
             : item.call.shiftDayKey,
+          // Si la ventana Higher Rate que pagó esta llamada ya se movió/borró, el bono quedó
+          // congelado en la fila. Reimportar una corrección de Propio no puede borrar ese derecho.
+          ...(replacingExisting?.frozenHigherRateBonus
+            ? { frozenHigherRateBonus: { ...replacingExisting.frozenHigherRateBonus } }
+            : {}),
           importedAt: preserveOfficialIdentity ? (item.replaces.importedAt || importTs) : importTs,
           source: 'import',
         };
