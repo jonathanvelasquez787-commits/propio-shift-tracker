@@ -170,6 +170,121 @@ por minuto (`$0.12/min`, `Gold +$0.03`) — son tasas, no montos ganados.
 
 ---
 
+**PROTOCOLO DE AUDITORÍA PROFUNDA (SOLO BAJO COMANDO EXPLÍCITO)**
+
+Este protocolo unifica las auditorías funcionales, estructurales y de uso real
+de toda la app. Es deliberadamente costoso y NO forma parte del QA normal de
+cada cambio.
+
+**ACTIVACIÓN ESTRICTA**
+- Ejecutar este protocolo completo **solo** cuando el usuario escriba
+  explícitamente la frase exacta `haz una auditoria profunda`.
+- Se puede ignorar únicamente mayúsculas/minúsculas y puntuación alrededor de
+  la frase. No se activa por sinónimos ni por frases parecidas.
+- Pedidos como "revisa este bug", "haz QA", "prueba estos botones", "revisa
+  Higher Rate", "comprueba que funcione", "testea la app" o "corrige todo lo
+  de esta feature" NO activan la Auditoría Profunda por sí solos: en esos
+  casos se trabaja únicamente el alcance pedido por el usuario.
+- Nunca convertir automáticamente un fix normal en esta auditoría completa.
+
+**QUÉ SIGNIFICA "HAZ UNA AUDITORIA PROFUNDA"**
+
+Cuando se active, hacer UNA sola auditoría integral que combine todo lo
+siguiente, sin esperar que el usuario vuelva a describir estas reglas:
+
+1. **Simulación realista de uso durante al menos un mes**
+   - Usar la app como lo haría un usuario normal durante muchos días, no como
+     una colección de pruebas aisladas.
+   - Iniciar/finalizar turnos, entrar temprano, tarde y a tiempo; trabajar
+     antes y después del horario planeado.
+   - Iniciar/terminar llamadas live.
+   - Agregar llamadas manuales.
+   - Pegar/importar llamadas y probar importaciones normales, tardías,
+     históricas, duplicadas, solapadas y corregidas.
+   - Tomar llamadas antes del turno, después del turno, durante Break y
+     durante Lunch.
+   - Iniciar, terminar, continuar y descartar Break/Lunch; probar pausas
+     accidentales y llamadas que interrumpen pausas.
+   - Editar llamadas pasadas, borrar llamadas individuales y borrar todas las
+     llamadas de un día.
+   - Editar horarios, bloques, metas, Higher Rate, Finanzas, Avisos, Ajustes,
+     Calendario, Reportes, Gamificación y cualquier otro estado editable.
+   - Refrescar/reabrir la app en puntos importantes para comprobar que lo
+     guardado persiste y que no aparecen estados fantasma.
+   - Probar días libres, turnos sin llamadas, múltiples sesiones el mismo día,
+     cruces de medianoche cuando apliquen y cualquier escenario extremo que
+     pueda surgir de combinar funciones.
+   - Pensar activamente en usos adicionales que el usuario no haya mencionado;
+     no limitarse a la lista anterior.
+
+2. **Auditoría estructural de TODOS los controles y funciones**
+   - Revisar todos los botones, inputs, selects, toggles, tabs, chips,
+     steppers, enlaces de navegación, menús, modales y acciones dinámicas.
+   - Revisar listeners directos y delegados, `data-*`, ids, `aria-controls`,
+     apertura/cierre de modales, navegación y elementos creados por JS.
+   - Verificar imports/exports, helpers llamados desde handlers, referencias
+     globales y dependencias entre módulos.
+   - Buscar expresamente el patrón de bug donde la UI reacciona parcialmente
+     pero el handler falla después por `ReferenceError`, helper no importado,
+     función inexistente o excepción silenciosa.
+   - Buscar botones que visualmente cambian algo pero no guardan; funciones que
+     guardan parcialmente; estados que solo se arreglan tras reabrir; UI que
+     muestra datos viejos después de editar/borrar; y acciones que fallan sin
+     feedback.
+   - Revisar desktop y mobile cuando el comportamiento pueda cambiar por
+     layout, sidebar, overlays, modales o controles responsivos.
+
+3. **Persistencia e integridad de estado**
+   - Después de cada flujo importante, comprobar memoria/UI, almacenamiento
+     local y sincronización/nube cuando corresponda.
+   - Confirmar que editar, borrar, cancelar, descartar, resetear, importar,
+     cerrar/reabrir y refrescar conservan exactamente el estado esperado.
+   - Revisar interacciones entre features: Horario ↔ Adherencia, Llamadas ↔
+     Break/Lunch, Higher Rate ↔ ganancias, Finanzas ↔ ganancias, Gamificación
+     ↔ llamadas/turnos, metas ↔ reportes/calendario y cualquier otro acople.
+   - Buscar duplicación de recompensas, bonos, eventos, llamadas, pausas,
+     ganancias o acciones al repetir operaciones o refrescar.
+
+4. **Corrección durante la auditoría**
+   - Corregir TODOS los bugs reproducibles encontrados dentro de la auditoría,
+     salvo que el usuario diga explícitamente que solo quiere diagnóstico.
+   - No hacer rollback general ni deshacer fixes previos para simplificar la
+     reparación. Partir siempre del estado actual y preservar todo lo ya
+     corregido.
+   - Si un bug nuevo fue causado por un fix reciente, arreglar la interacción
+     sin reintroducir el bug anterior.
+   - Evitar "arreglos" que solo oculten el síntoma visual; reparar la causa y
+     mantener consistente el modelo de datos.
+
+5. **Regresión y validación obligatorias**
+   - Agregar o actualizar una prueba de regresión por cada fallo corregido
+     cuando sea técnicamente razonable.
+   - Ejecutar la suite de tests, checks de imports/exports, checks de wiring,
+     sintaxis/build y cualquier validación específica del área tocada.
+   - Verificar que producción/deployment/CI termina correctamente cuando el
+     entorno permita comprobarlo.
+   - Repetir los escenarios que originalmente fallaron después del fix.
+   - No declarar "todo funciona" solo porque el build pasa: distinguir entre
+     validación estructural/automática y pruebas interactivas reales que sí se
+     hayan podido ejecutar.
+
+6. **Entrega**
+   - Al terminar, dar un resumen compacto pero exacto con:
+     - bugs encontrados;
+     - causa de cada uno;
+     - corrección aplicada;
+     - pruebas de regresión agregadas/actualizadas;
+     - tests/checks/build/deployment que pasaron;
+     - cualquier escenario que no se haya podido probar de forma real.
+   - No pedir al usuario que ejecute scripts ni haga verificaciones técnicas:
+     esas tareas pertenecen al agente según el flujo permanente del repo.
+
+Este protocolo sustituye cualquier versión anterior de "auditoría mensual",
+"auditoría de todos los botones" o instrucciones equivalentes: para el futuro,
+la frase `haz una auditoria profunda` significa ejecutar TODO este bloque.
+
+---
+
 **FLUJO DE TRABAJO CON ESTE REPOSITORIO (leer siempre — regla permanente)**
 
 El usuario **no programa**. No ejecuta scripts, no instala nada, no usa
