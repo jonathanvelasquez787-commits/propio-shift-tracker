@@ -3875,7 +3875,9 @@ function renderPayDatesSection() {
       if (!state.dayInterruptions || typeof state.dayInterruptions !== 'object') state.dayInterruptions = {};
       const normalized = callDateKeyFromValue(dayKey) || dayKey;
       if (!Array.isArray(state.dayInterruptions[normalized])) state.dayInterruptions[normalized] = [];
-      state.dayInterruptions[normalized].push({ id: makeLocalId(), type, gapStart: gapStartISO, gapEnd: gapEndISO });
+      const interruption = { id: makeLocalId(), type, gapStart: gapStartISO, gapEnd: gapEndISO };
+      state.dayInterruptions[normalized].push(interruption);
+      return interruption;
     }
 
     function dayInterruptions(dayKey = getActiveDayKey()) {
@@ -4015,9 +4017,15 @@ function renderPayDatesSection() {
         const gapMin = (now.getTime() - new Date(lastClosed.endedAt).getTime()) / 60000;
         if (gapMin >= 0 && gapMin <= ACCIDENTAL_TOGGLE_GRACE_MIN) {
           state.pauseHistory = state.pauseHistory.filter(p => p.id !== lastClosed.id);
-          state.activePause = { type, startedAt: lastClosed.startedAt, shiftDayKey: callDateKeyFromValue(lastClosed.shiftDayKey) || dayKey };
-          registerDayInterruption(dayKey, type, lastClosed.endedAt, now.toISOString());
-          setEvent(type, `${pretty} continuado (interrupción accidental)`, fmtTime(now), 'manual');
+          const interruption = registerDayInterruption(dayKey, type, lastClosed.endedAt, now.toISOString());
+          const continuationEvent = setEvent(type, `${pretty} continuado (interrupción accidental)`, fmtTime(now), 'manual');
+          state.activePause = {
+            type,
+            startedAt: lastClosed.startedAt,
+            shiftDayKey: callDateKeyFromValue(lastClosed.shiftDayKey) || dayKey,
+            continuationInterruptionId: interruption?.id || null,
+            continuationEventId: continuationEvent?.id || null,
+          };
           saveAll();
           stopBreakStartAlarm();
           toast(`${pretty} continuado — interrupción de ${formatMinutes(gapMin)} min registrada`);
@@ -4168,6 +4176,16 @@ function renderPayDatesSection() {
       if (!state.activePause) return;
       const pretty = state.activePause.type === 'lunch' ? 'Lunch' : 'Break';
       appConfirm(`¿Descartar este ${pretty} sin guardarlo? No quedará registrado en tu historial ni en Adherencia.`, () => {
+        const discarded = state.activePause;
+        const accountingDay = callDateKeyFromValue(discarded?.shiftDayKey) || currentShiftAccountingDayKey(new Date(discarded?.startedAt || Date.now()));
+        if (discarded?.continuationInterruptionId && Array.isArray(state.dayInterruptions?.[accountingDay])) {
+          state.dayInterruptions[accountingDay] = state.dayInterruptions[accountingDay]
+            .filter(item => item?.id !== discarded.continuationInterruptionId);
+          if (!state.dayInterruptions[accountingDay].length) delete state.dayInterruptions[accountingDay];
+        }
+        if (discarded?.continuationEventId) {
+          state.events = state.events.filter(event => event?.id !== discarded.continuationEventId);
+        }
         state.activePause = null;
         stopBreakStartAlarm();
         stopBreakEndAlarm();
