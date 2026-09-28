@@ -177,7 +177,7 @@ export { higherRateLiveStatus };
 export { formatBlockDurationLabel };
 export { renderEmojiPicker };
 export { computeComplianceStreak, dayComplianceStatus };
-export { onGameCallSaved, onGameCallsChanged };
+export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
 
     const STORAGE_KEY = 'propio_shift_tracker_state_es_v4';
     const CALLS_KEY = 'propio_shift_tracker_calls_es_v4';
@@ -4298,8 +4298,19 @@ function renderPayDatesSection() {
 
     function resetDay() {
       const dayKey = getActiveDayKey();
+      const normalizedDayKey = callDateKeyFromValue(dayKey);
+      const activeCallDayKey = state.activeCall?.startedAt
+        ? currentShiftAccountingDayKey(new Date(state.activeCall.startedAt))
+        : '';
+      const pendingCallDayKey = callDateKeyFromValue(state.pendingLiveCallBackup?.candidate?.callDate)
+        || (state.pendingLiveCallBackup?.startedAtISO
+          ? currentShiftAccountingDayKey(new Date(state.pendingLiveCallBackup.startedAtISO))
+          : '');
+      if (normalizedDayKey && (activeCallDayKey === normalizedDayKey || pendingCallDayKey === normalizedDayKey)) {
+        toast('Guarda o descarta la llamada pendiente antes de reiniciar este día.');
+        return;
+      }
       appConfirm(`¿Reiniciar ${formatCallDayLabel(dayKey)}? Se borran llamadas, pausas, huecos, la nota del día y log de ese día.`, () => {
-        const normalizedDayKey = callDateKeyFromValue(dayKey);
         const trackedShiftStart = state.shiftStartedAt ? new Date(state.shiftStartedAt) : null;
         const trackedShiftEnd = state.shiftEndedAt ? new Date(state.shiftEndedAt) : new Date();
         const trackedShiftDayKey = trackedShiftStart && Number.isFinite(trackedShiftStart.getTime())
@@ -4621,9 +4632,12 @@ function renderPayDatesSection() {
       const replacedNote = replacedLive.length ? ` · ${replacedLive.length} live actualizada(s)` : '';
       const correctedNote = correctedOfficial.length ? ` · ${correctedOfficial.length} oficial(es) corregida(s)` : '';
 
-      setEvent('import', 'Llamadas importadas', `${unique.length} fila(s) · ${importNote}${overlapNote}${duplicateNote}${futureNote}${replacedNote}${correctedNote}`, 'Propio');
-      if (unique.length || replacedLive.length || correctedOfficial.length) financeRunAutoFillCascade();
-      saveAll();
+      const importChangedData = unique.length || replacedLive.length || correctedOfficial.length;
+      if (importChangedData) {
+        setEvent('import', 'Llamadas importadas', `${unique.length} fila(s) · ${importNote}${overlapNote}${duplicateNote}${futureNote}${replacedNote}${correctedNote}`, 'Propio');
+        financeRunAutoFillCascade();
+        saveAll();
+      }
       renderImportSkippedSummary(skippedDuplicates, skippedOverlaps, futureRows, replacedLive, correctedOfficial);
 
       if (!unique.length && (overlapSkipped || skippedDuplicates.length || futureRows.length)) {
@@ -6717,6 +6731,7 @@ export function render() {
         e.target.checked = true;
         appConfirm('¿Quitar la personalización de esta semana y volver a usar la plantilla? El horario propio de esta semana se borra — no afecta la plantilla ni otras semanas.', () => {
           removeScheduleWeekOverride(scheduleWeekOffset);
+          onGameDayMetadataChanged(todayCallDateKey());
           saveAll();
           syncShiftModalFields();
         });
