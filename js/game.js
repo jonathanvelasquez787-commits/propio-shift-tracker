@@ -450,6 +450,18 @@ function renderCycleBosses() {
     if (goal) goal.textContent = `Meta ${withConversion(boss.goal)}`;
   });
 }
+function syncCycleBossAchievement() {
+  if (!gameEnabled()) return false;
+  const boss = cycleBossSnapshot();
+  if (!boss.defeated) return false;
+  const endKey = todayCallDateKey(boss.cycle.end);
+  const key = `cycle-defeat:${endKey}`;
+  if (state.game.ledger[key]) return false;
+  state.game.ledger[key] = true;
+  queueGameToast(`🏆 JEFE DEL CICLO DERROTADO · ${withConversion(boss.cycle.earnings)}`, 'record');
+  return true;
+}
+
 function bestiarySnapshot() {
   const catalog = Object.values(MONSTER_CATALOG)
     .filter((entry, index, all) => all.findIndex((item) => item.id === entry.id) === index);
@@ -657,8 +669,8 @@ function syncFinanceRewards() {
         changed = true;
         state.game.trophies.push({ id: key, label: `Meta cumplida: ${row.name}`, earnedOn: todayCallDateKey() });
         grantDayBonus(todayCallDateKey(), 10);
-        const accessory = ACCESSORIES[hashText(key) % ACCESSORIES.length];
-        if (!state.game.accessories.includes(accessory)) state.game.accessories.push(accessory);
+        const accessory = nextUnownedAccessory(key);
+        if (accessory) state.game.accessories.push(accessory);
         queueGameToast(`🏆 Trofeo desbloqueado: ${row.name}`);
       } else if (row.recurring && row.manualPaid) {
         const key = `finance-paid:${row.id}:${month}`;
@@ -673,18 +685,47 @@ function syncFinanceRewards() {
   return changed;
 }
 
+function clearTransientGameUi() {
+  const loot = document.getElementById('gameLootBox');
+  if (loot) {
+    loot.hidden = true;
+    loot.classList.remove('is-revealing');
+  }
+  const record = document.getElementById('gameRecordBanner');
+  if (record) record.hidden = true;
+  const fx = document.getElementById('gameCallFx');
+  if (fx) fx.innerHTML = '';
+  document.querySelectorAll('.game-live-xp-float').forEach((node) => node.remove());
+  const stack = document.getElementById('gameToastStack');
+  if (stack) stack.replaceChildren();
+  gameToastQueue.length = 0;
+}
+
 export function renderGame() {
   ensureGameSettings();
   ensureGameState();
+  const enabled = gameEnabled();
   document.documentElement.classList.toggle('game-arcade', arcadeEnabled());
-  document.documentElement.classList.toggle('game-subtle', gameEnabled() && settings.game.intensity === 'subtle');
-  if (syncFinanceRewards()) saveStateOnly();
+  document.documentElement.classList.toggle('game-subtle', enabled && settings.game.intensity === 'subtle');
+
+  if (!enabled) clearTransientGameUi();
+
+  const financeChanged = syncFinanceRewards();
+  const bossDefeatedNow = syncCycleBossAchievement();
+  if (financeChanged || bossDefeatedNow) saveStateOnly();
+
   renderHeroChips();
   renderArena();
   renderMissions();
   renderCycleBosses();
   renderAchievements();
   renderSettingsProfile();
+
+  if (bossDefeatedNow) {
+    triggerGameEvent('gameCycleBoss', 'clear', 1000);
+    triggerGameEvent('gameCycleBossAchievements', 'clear', 1000);
+    playGameTone('clear');
+  }
   drainGameToasts();
 }
 
@@ -722,7 +763,7 @@ function drainGameToasts() {
 }
 
 function playGameTone(kind = 'hit') {
-  if (!arcadeEnabled() || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!arcadeEnabled()) return;
   const volume = Math.max(0, Math.min(1, (Number(settings.masterVolume) || 0) / 100));
   if (!volume) return;
   try {
@@ -740,6 +781,18 @@ function playGameTone(kind = 'hit') {
     oscillator.stop(context.currentTime + (kind === 'clear' ? 0.92 : 0.18));
     oscillator.addEventListener('ended', () => context.close().catch(() => {}));
   } catch {}
+}
+
+function triggerGameEvent(rootId, eventName, duration = 900) {
+  if (!arcadeEnabled()) return;
+  const root = document.getElementById(rootId);
+  if (!root) return;
+  root.removeAttribute('data-game-event');
+  void root.offsetWidth;
+  root.dataset.gameEvent = eventName;
+  setTimeout(() => {
+    if (root.dataset.gameEvent === eventName) root.removeAttribute('data-game-event');
+  }, duration);
 }
 
 function grantDayBonus(dayKey, amount) {
@@ -762,6 +815,11 @@ function grantDayBonus(dayKey, amount) {
 function showCallFx(call, xp, critical, mode = 'xp') {
   const root = document.getElementById('gameCallFx');
   if (!root) return;
+  if (!arcadeEnabled()) {
+    root.innerHTML = '';
+    document.querySelectorAll('.game-live-xp-float').forEach((node) => node.remove());
+    return;
+  }
   const amount = parseMoney(call.pay) + higherRateBonusForCall(call);
   const message = mode === 'extra'
     ? `BOTÍN EXTRA · ${withConversion(amount)}`
@@ -822,15 +880,32 @@ function rewardLootBox(dayKey, callCount) {
   }
   if (root) {
     root.hidden = false;
+    root.classList.toggle('is-revealing', arcadeEnabled());
     root.innerHTML = `<span class="game-loot-icon">?</span><div><b>CAJA ABIERTA</b><span>${escapeHtml(reward)}</span></div>`;
-    setTimeout(() => { root.hidden = true; }, 4200);
+    setTimeout(() => {
+      root.hidden = true;
+      root.classList.remove('is-revealing');
+    }, 4200);
   }
   queueGameToast(`🎁 ${reward}`, 'loot');
 }
 
-function maybeShowRecord(call) {
+let gameRecordBannerTimer = null;
+
+function showGameRecordBanner(message) {
   const root = document.getElementById('gameRecordBanner');
-  if (!root) return;
+  if (!root || !message) return;
+  if (gameRecordBannerTimer) clearTimeout(gameRecordBannerTimer);
+  root.hidden = false;
+  root.textContent = message;
+  queueGameToast(`🏆 ${message}`, 'record');
+  gameRecordBannerTimer = setTimeout(() => {
+    root.hidden = true;
+    gameRecordBannerTimer = null;
+  }, 3000);
+}
+
+function maybeShowRecord(call) {
   const callDate = new Date(call.startISO);
   if (!Number.isFinite(callDate.getTime())) return;
   const weekday = (callDate.getDay() + 6) % 7;
@@ -845,10 +920,10 @@ function maybeShowRecord(call) {
   const durationRecord = prior.every((item) => (Number(call.durationMin) || 0) > (Number(item.durationMin) || 0));
   const payRecord = prior.every((item) => parseMoney(call.pay) > parseMoney(item.pay));
   if (!durationRecord && !payRecord) return;
-  root.hidden = false;
-  root.textContent = durationRecord ? `NUEVO RÉCORD · ${formatMinutes(call.durationMin)} min` : `NUEVO RÉCORD · ${withConversion(parseMoney(call.pay))}`;
-  queueGameToast(`🏆 ${root.textContent}`, 'record');
-  setTimeout(() => { root.hidden = true; }, 3000);
+  const message = durationRecord
+    ? `NUEVO RÉCORD · ${formatMinutes(call.durationMin)} min`
+    : `NUEVO RÉCORD · ${withConversion(parseMoney(call.pay))}`;
+  showGameRecordBanner(message);
 }
 
 export function onGameCallSaved(call, source = 'manual') {
@@ -862,10 +937,10 @@ export function onGameCallSaved(call, source = 'manual') {
   const critical = higherRateBonusForCall(call) > 0;
 
   if (currentDay.defeated && xpLocked) {
-    showCallFx(call, 0, critical, 'extra');
-    maybeShowRecord(call);
     saveStateOnly();
     renderGame();
+    showCallFx(call, 0, critical, 'extra');
+    maybeShowRecord(call);
     playGameTone(critical ? 'critical' : 'hit');
     return;
   }
@@ -881,16 +956,15 @@ export function onGameCallSaved(call, source = 'manual') {
     + currentDay.xpBreakdown.bonusXp;
   const beforeCallXp = Math.min(GAME_DAILY_XP_CAP, nonCallXp + priorCallsXp);
   const grantedXp = Math.max(0, currentDay.xp - beforeCallXp);
-  showCallFx(call, grantedXp, critical);
-  maybeShowRecord(call);
+  let defeatedNow = false;
 
   if (currentDay.defeated && !xpLocked) {
     entry.xpLocked = currentDay.xp;
     const defeatKey = `monster-defeat:${dayKey}`;
     if (!state.game.ledger[defeatKey]) {
       state.game.ledger[defeatKey] = true;
+      defeatedNow = true;
       queueGameToast('💥 MONSTRUO DERROTADO · botín del día asegurado', 'record');
-      playGameTone('clear');
     }
   }
 
@@ -898,7 +972,15 @@ export function onGameCallSaved(call, source = 'manual') {
   if (count > 0 && count % 5 === 0) rewardLootBox(dayKey, count);
   saveStateOnly();
   renderGame();
-  if (!currentDay.defeated) playGameTone(critical ? 'critical' : 'hit');
+
+  showCallFx(call, grantedXp, critical);
+  maybeShowRecord(call);
+  if (defeatedNow) {
+    triggerGameEvent('gameArena', 'clear', 1000);
+    playGameTone('clear');
+  } else {
+    playGameTone(critical ? 'critical' : 'hit');
+  }
 }
 
 export function onGameGapSaved(dayKey, gapKey, label) {
@@ -917,12 +999,12 @@ export function onGameGapSaved(dayKey, gapKey, label) {
 }
 
 export function onGameCallsChanged(dayKey) {
-  if (!gameEnabled()) return false;
+  const enabled = gameEnabled();
   ensureGameState();
   const normalizedDayKey = String(dayKey || '');
   const entry = state.game.days[normalizedDayKey];
   if (!entry?.finalized) {
-    renderGame();
+    if (enabled) renderGame();
     return false;
   }
 
@@ -969,8 +1051,13 @@ export function onGameCallsChanged(dayKey) {
     state.game.chest = { pending: false, sealedOn: null };
   }
 
+  entry.comparisons = stageComparisonSnapshot(normalizedDayKey, entry.earnings);
+  entry.totalXpAfter = state.game.totalXp;
+  entry.levelAfter = state.game.level;
+  entry.nextLevelXp = xpThresholdForLevel(state.game.level + 1);
+
   saveStateOnly();
-  renderGame();
+  if (enabled) renderGame();
   return true;
 }
 
@@ -981,7 +1068,7 @@ export function onGameShiftAlarmFired(dayKey, firedAt = new Date().toISOString()
   saveStateOnly();
 }
 
-function revokeStageClear(dayKey) {
+function revokeStageClear(dayKey, { silent = false } = {}) {
   const entry = state.game.days[dayKey];
   if (!entry?.finalized) return;
   state.game.totalXp = Math.max(0, state.game.totalXp - (Number(entry.xp) || 0));
@@ -1004,29 +1091,75 @@ function revokeStageClear(dayKey) {
   state.game.bestStreak = Number.isFinite(Number(rollback.bestStreakBefore))
     ? Math.max(0, Number(rollback.bestStreakBefore))
     : recomputeBestStreak();
-  closeModal('stageClearModal');
-  queueGameToast('STAGE CLEAR revocado · turno continuado');
+  if (!silent) {
+    closeModal('stageClearModal');
+    queueGameToast('STAGE CLEAR revocado · turno continuado');
+  }
 }
 
 export function onGameShiftStarted({ continued = false } = {}) {
-  if (!gameEnabled()) return;
   ensureGameState();
   const dayKey = todayCallDateKey();
+  const enabled = gameEnabled();
+
   if (continued) {
-    revokeStageClear(dayKey);
-  } else {
-    openPendingChest(dayKey);
-    const firedAt = new Date(state.game.live.shiftAlarmAt || 0).getTime();
-    const elapsed = Date.now() - firedAt;
-    const key = `reflex:${dayKey}`;
-    if (!state.game.ledger[key] && firedAt > 0 && elapsed >= 0 && elapsed <= 2 * 60000) {
-      state.game.ledger[key] = true;
-      queueGameToast('+20 XP · Reflejos perfectos', 'record');
-    }
+    revokeStageClear(dayKey, { silent: !enabled });
+    saveStateOnly();
+    if (enabled) renderGame();
+    return;
+  }
+  if (!enabled) return;
+
+  openPendingChest(dayKey);
+  const firedAt = new Date(state.game.live.shiftAlarmAt || 0).getTime();
+  const elapsed = Date.now() - firedAt;
+  const key = `reflex:${dayKey}`;
+  if (!state.game.ledger[key] && firedAt > 0 && elapsed >= 0 && elapsed <= 2 * 60000) {
+    state.game.ledger[key] = true;
+    queueGameToast('+20 XP · Reflejos perfectos', 'record');
   }
   saveStateOnly();
   renderGame();
 }
+
+function stageComparisonSnapshot(dayKey, earnings) {
+  const dayDate = callDateToDate(dayKey);
+  let yesterdayKey = null;
+  let yesterdayEarnings = 0;
+  let yesterdayHasData = false;
+  if (dayDate) {
+    const previous = new Date(dayDate.getFullYear(), dayDate.getMonth(), dayDate.getDate() - 1);
+    yesterdayKey = todayCallDateKey(previous);
+    const yesterdayCalls = callsForDay(yesterdayKey);
+    yesterdayHasData = yesterdayCalls.length > 0;
+    yesterdayEarnings = Number(importedCallStats(yesterdayCalls, yesterdayKey).earnings) || 0;
+  }
+
+  let recordBefore = 0;
+  let recordDayKey = null;
+  Object.entries(state.game.days).forEach(([key, value]) => {
+    if (key === dayKey || !value?.finalized) return;
+    let valueEarnings = Number(value.earnings);
+    if (!Number.isFinite(valueEarnings)) {
+      valueEarnings = Number(importedCallStats(callsForDay(key), key).earnings) || 0;
+    }
+    if (valueEarnings > recordBefore) {
+      recordBefore = valueEarnings;
+      recordDayKey = key;
+    }
+  });
+
+  return {
+    earnings: Math.max(0, Number(earnings) || 0),
+    yesterdayKey,
+    yesterdayEarnings,
+    yesterdayHasData,
+    recordBefore,
+    recordDayKey,
+  };
+}
+
+function freezeGameDay
 
 function freezeGameDay(dayKey) {
   const snapshot = computeGameDay(dayKey);
@@ -1034,6 +1167,7 @@ function freezeGameDay(dayKey) {
   if (existing.finalized) return existing;
   const shieldsBefore = state.game.shields;
   const bestStreakBefore = state.game.bestStreak;
+  const comparisons = stageComparisonSnapshot(dayKey, snapshot.stats.earnings);
   const shieldNeeded = dayComplianceStatus(dayKey) === 'failed' && state.game.shields > 0;
   const entry = {
     ...existing,
@@ -1043,6 +1177,7 @@ function freezeGameDay(dayKey) {
     xpBreakdown: { ...snapshot.xpBreakdown },
     earnings: Number(snapshot.stats.earnings) || 0,
     callCount: snapshot.stats.total || snapshot.eligibleCalls.length,
+    comparisons,
     stars: snapshot.stars,
     missions: snapshot.missions.map(({ id, ok, detail }) => ({ id, ok, detail })),
     shieldUsed: shieldNeeded,
@@ -1063,8 +1198,14 @@ function freezeGameDay(dayKey) {
   state.game.totalXp += snapshot.xp;
   const oldLevel = state.game.level;
   state.game.level = levelForXp(state.game.totalXp);
+  entry.totalXpAfter = state.game.totalXp;
+  entry.levelAfter = state.game.level;
+  entry.nextLevelXp = xpThresholdForLevel(state.game.level + 1);
   const streak = gameStreak();
   state.game.bestStreak = recomputeBestStreak();
+  if (state.game.bestStreak > bestStreakBefore) {
+    showGameRecordBanner(`NUEVO RÉCORD · Racha ${state.game.bestStreak} días`);
+  }
   const shieldKey = `streak-shield:${dayKey}:${streak}`;
   if (streak >= 7 && streak % 7 === 0 && !state.game.ledger[shieldKey] && state.game.shields < GAME_SHIELD_CAP) {
     state.game.ledger[shieldKey] = true;
@@ -1086,15 +1227,36 @@ function stageClearMarkup(dayKey, entry) {
   if (!(callCount > 0) && !fallback.stats.total && !fallback.eligibleCalls.length) {
     return `<div class="game-stage-clear game-stage-clear--empty"><span class="game-kicker">TURNO CERRADO</span><h2>Descanso guardado</h2><p>No hubo llamadas hoy, así que no se congeló XP. Mañana será otro stage.</p></div>`;
   }
+
   const breakdown = entry.xpBreakdown || fallback.xpBreakdown;
   const earnings = Number.isFinite(Number(entry.earnings)) ? Number(entry.earnings) : fallback.stats.earnings;
+  const comparisons = entry.comparisons || stageComparisonSnapshot(dayKey, earnings);
+  const yesterdayDelta = earnings - (Number(comparisons.yesterdayEarnings) || 0);
+  const yesterdayText = comparisons.yesterdayHasData
+    ? `${withConversion(comparisons.yesterdayEarnings)} · ${yesterdayDelta >= 0 ? '+' : '−'}${withConversion(Math.abs(yesterdayDelta))}`
+    : 'Sin referencia';
+  const recordBefore = Math.max(0, Number(comparisons.recordBefore) || 0);
+  const recordText = recordBefore > 0
+    ? (earnings > recordBefore ? `NUEVO RÉCORD · +${withConversion(earnings - recordBefore)}` : withConversion(recordBefore))
+    : 'Primer registro';
+  const totalXpAfter = Number.isFinite(Number(entry.totalXpAfter)) ? Number(entry.totalXpAfter) : state.game.totalXp;
+  const levelAfter = Math.max(1, Number(entry.levelAfter) || levelForXp(totalXpAfter));
+  const nextLevelXp = Math.max(totalXpAfter, Number(entry.nextLevelXp) || xpThresholdForLevel(levelAfter + 1));
+  const xpToNext = Math.max(0, nextLevelXp - totalXpAfter);
+  const monster = entry.monster || { defeated: false, hpPct: fallback.hpPct };
+
   return `<div class="game-stage-clear">
     <span class="game-kicker">STAGE CLEAR</span>
     <h2>${'★'.repeat(entry.stars || 1)}${'☆'.repeat(Math.max(0, 3 - (entry.stars || 0)))}</h2>
-    <p>${entry.monster.defeated ? 'Monstruo derrotado' : `El monstruo escapó con ${Math.round(entry.monster.hpPct)}% de vida`} · ${withConversion(earnings)}</p>
+    <p>${monster.defeated ? 'Monstruo derrotado' : `El monstruo escapó con ${Math.round(monster.hpPct)}% de vida`} · ${withConversion(earnings)}</p>
     <div class="game-stage-score"><strong>+${entry.xp} XP</strong><span>Tope diario ${GAME_DAILY_XP_CAP}</span></div>
+    <div class="game-stage-comparisons">
+      <div><span>Ayer</span><strong>${yesterdayText}</strong></div>
+      <div><span>Récord diario previo</span><strong>${recordText}</strong></div>
+    </div>
     <div class="game-stage-breakdown"><span>Productividad +${breakdown.productivityXp}</span><span>Llamadas +${breakdown.callsXp}</span><span>Adherencia +${breakdown.adherenceXp}</span><span>Puntualidad +${breakdown.punctualityXp}</span><span>Misiones +${breakdown.missionXp}</span></div>
     <div class="game-stage-missions">${entry.missions.map((mission) => `<span class="${mission.ok ? 'is-complete' : ''}">${mission.ok ? '✓' : '○'} ${escapeHtml(mission.detail)}</span>`).join('')}</div>
+    <div class="game-stage-next-level"><span>Nivel ${levelAfter}</span><strong>${xpToNext > 0 ? `${xpToNext} XP para nivel ${levelAfter + 1}` : 'Nivel completado'}</strong></div>
     <div class="game-sealed-chest">🎁 Cofre sellado · se abre al iniciar tu próximo día</div>
   </div>`;
 }
@@ -1132,20 +1294,33 @@ function openPendingChest(todayKey) {
   const sealedOn = state.game.chest.sealedOn;
   const key = `chest:${sealedOn}`;
   const reward = chestReward(sealedOn);
+  const oldLevel = state.game.level;
+  let granted = false;
   if (!state.game.ledger[key]) {
     state.game.ledger[key] = true;
+    granted = true;
     if (reward.type === 'xp') state.game.totalXp += reward.amount;
     else if (!state.game.accessories.includes(reward.label)) state.game.accessories.push(reward.label);
     state.game.level = levelForXp(state.game.totalXp);
   }
   state.game.chest = { pending: false, sealedOn: null };
+
   const root = document.getElementById('chestContent');
   if (root) {
     root.innerHTML = `<div class="game-chest-open"><span class="game-kicker">COFRE ABIERTO</span><div class="game-chest-icon">🎁</div><h2>${escapeHtml(reward.label)}</h2><p>${reward.type === 'xp' ? 'Se sumó a tu perfil.' : 'Ya está disponible en tu bestiario.'}</p></div>`;
     openModal('chestModal');
-    playGameTone('clear');
   }
+  if (granted) {
+    queueGameToast(`🎁 Cofre abierto · ${reward.label}`, 'loot');
+    if (state.game.level > oldLevel) queueGameToast(`NIVEL ${state.game.level} DESBLOQUEADO`, 'record');
+  }
+  playGameTone('clear');
   return true;
+}
+
+export function onGamePauseEnded() {
+  if (!gameEnabled()) return;
+  renderGame();
 }
 
 export function onGamePauseEnded() {
@@ -1167,6 +1342,7 @@ function recordPreviousCycleOutcome() {
   state.game.ledger[key] = true;
   const pct = Math.max(0, Math.min(100, (cycle.earnings / goal) * 100));
   if (pct >= 100) {
+    if (state.game.ledger[`cycle-defeat:${endKey}`]) return true;
     queueGameToast(`🏆 JEFE DEL CICLO DERROTADO · ${withConversion(cycle.earnings)}`, 'record');
   } else {
     queueGameToast(`JEFE HUYÓ HERIDO · ${Math.round(pct)}% · faltaron ${withConversion(Math.max(0, goal - cycle.earnings))}`);

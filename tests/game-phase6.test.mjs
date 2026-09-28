@@ -233,3 +233,41 @@ test('XP flotante representa concesión real y distingue XP sellado', () => {
   assert.match(game, /XP DIARIO SELLADO/);
   assert.match(game, /BOTÍN EXTRA/);
 });
+
+
+test('pendientes finales de Phase 6 quedan conectados a comportamiento real', () => {
+  const game = read('js/game.js');
+  const css = read('css/game.css');
+
+  assert.match(game, /if \(!arcadeEnabled\(\)\) \{[\s\S]*game-live-xp-float/);
+  assert.match(game, /triggerGameEvent\('gameArena', 'clear'/);
+  assert.match(game, /classList\.toggle\('is-revealing', arcadeEnabled\(\)\)/);
+  assert.match(css, /game-arena--arcade\[data-game-event="clear"\]/);
+  assert.match(css, /@keyframes game-pixel-burst/);
+
+  assert.match(game, /game-stage-comparisons/);
+  assert.match(game, /Récord diario previo/);
+  assert.match(game, /XP para nivel/);
+  assert.match(game, /stageComparisonSnapshot/);
+
+  assert.match(game, /NUEVO RÉCORD · Racha/);
+  assert.match(game, /Cofre abierto ·/);
+  assert.match(game, /syncCycleBossAchievement/);
+  assert.match(game, /cycle-defeat:\$\{endKey\}/);
+});
+
+test('consistencia de gamificación se mantiene aunque esté apagada', () => {
+  const game = read('js/game.js');
+  const changed = game.slice(game.indexOf('export function onGameCallsChanged'), game.indexOf('export function onGameShiftAlarmFired'));
+  const started = game.slice(game.indexOf('export function onGameShiftStarted'), game.indexOf('function stageComparisonSnapshot'));
+  assert.doesNotMatch(changed, /if \(!gameEnabled\(\)\) return false/);
+  assert.match(changed, /const enabled = gameEnabled\(\)/);
+  assert.match(started, /revokeStageClear\(dayKey, \{ silent: !enabled \}\)/);
+});
+
+test('modo sutil no reproduce pop ni sonido y reduced-motion solo elimina movimiento', () => {
+  const game = read('js/game.js');
+  const tone = game.slice(game.indexOf('function playGameTone'), game.indexOf('function triggerGameEvent'));
+  assert.match(tone, /if \(!arcadeEnabled\(\)\) return/);
+  assert.doesNotMatch(tone, /prefers-reduced-motion/);
+});

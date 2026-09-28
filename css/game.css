@@ -680,3 +680,86 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
     scroll-behavior: auto !important;
   }
 }
+
+
+/* Eventos arcade realmente emitidos por game.js. */
+.game-arcade .game-arena--arcade[data-game-event="clear"],
+.game-arcade .game-cycle-boss[data-game-event="clear"] {
+  position: relative;
+  isolation: isolate;
+  animation: game-arena-clear .75s steps(2, end);
+}
+.game-arcade .game-arena--arcade[data-game-event="clear"]::before,
+.game-arcade .game-cycle-boss[data-game-event="clear"]::before {
+  content: "✦  ▪  ✦  ▪  ✦";
+  position: absolute;
+  z-index: 4;
+  inset: 10% 8% auto;
+  pointer-events: none;
+  color: var(--tier-gold);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: clamp(14px, 2.4vw, 22px);
+  font-weight: 950;
+  letter-spacing: .22em;
+  text-align: center;
+  text-shadow: 0 0 12px rgba(var(--tier-gold-rgb, 255, 215, 110), .42);
+  animation: game-pixel-burst .9s steps(5, end) forwards;
+}
+@keyframes game-pixel-burst {
+  0% { transform: translateY(18px) scale(.72); opacity: 0; }
+  20% { opacity: 1; }
+  70% { transform: translateY(-18px) scale(1.12); opacity: 1; }
+  100% { transform: translateY(-34px) scale(1.18); opacity: 0; }
+}
+
+.game-stage-comparisons {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.game-stage-comparisons > div,
+.game-stage-next-level {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid var(--card-line);
+  border-radius: 10px;
+  background: rgba(var(--rpt-purple-rgb), .055);
+}
+.game-stage-comparisons span,
+.game-stage-next-level span {
+  color: var(--muted-3);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.game-stage-comparisons strong,
+.game-stage-next-level strong {
+  color: var(--text);
+  font-size: 11.5px;
+  overflow-wrap: anywhere;
+}
+.game-stage-next-level {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+.game-stage-next-level strong { text-align: right; }
+
+@media (max-width: 520px) {
+  .game-stage-comparisons { grid-template-columns: 1fr; }
+  .game-stage-next-level { grid-template-columns: 1fr; }
+  .game-stage-next-level strong { text-align: left; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-arcade .game-arena--arcade[data-game-event="clear"],
+  .game-arcade .game-cycle-boss[data-game-event="clear"],
+  .game-arcade .game-arena--arcade[data-game-event="clear"]::before,
+  .game-arcade .game-cycle-boss[data-game-event="clear"]::before {
+    animation: none !important;
+  }
+}
