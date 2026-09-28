@@ -37,6 +37,7 @@ import {
   makeLocalId,
   money,
   onGameCallSaved,
+  onGameCallsChanged,
   openModal,
   pad,
   parseMoney,
@@ -128,6 +129,7 @@ export function saveCallEditor() {
 
   const original = calls.find(c => c.id === editingCallId);
   if (!original) return;
+  const affectedDayKey = callDateKeyFromValue(original.callDate);
   const start = new Date(original.startISO);
   const end = new Date(start.getTime() + duration * 60000);
   const candidate = { ...original, startISO: start.toISOString(), endISO: end.toISOString() };
@@ -159,6 +161,7 @@ export function saveCallEditor() {
   closeModal('callEditModal');
   financeRunAutoFillCascade();
   saveAll();
+  if (affectedDayKey) onGameCallsChanged(affectedDayKey);
   toast('Llamada actualizada');
 }
 
@@ -167,8 +170,10 @@ export function saveCallEditor() {
 export function deleteCallRecord(callId) {
   const call = calls.find(c => c.id === callId);
   if (!call) return false;
+  const affectedDayKey = callDateKeyFromValue(call.callDate);
   setCalls(calls.filter(c => c.id !== callId));
   saveAll();
+  if (affectedDayKey) onGameCallsChanged(affectedDayKey);
   toast('Llamada eliminada');
   return true;
 }
@@ -187,6 +192,7 @@ export function clearActiveDayCalls() {
   appConfirm(`¿Vaciar TODAS las ${plural} de ${formatCallDayLabel(dayKey)} (${count})? Tu turno, pausas y horario de ese día no se tocan. No se puede deshacer.`, () => {
     setCalls(calls.filter(c => callDateKeyFromValue(c.callDate) !== dayKey));
     saveAll();
+    onGameCallsChanged(dayKey);
     toast(`${count} ${plural} de ${formatCallDayLabel(dayKey)} borrada(s)`);
   });
 }

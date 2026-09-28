@@ -361,7 +361,7 @@ export function computeComplianceStreak() {
       if (skipOff) { cursor = new Date(cursor.getFullYear(), cursor.getMonth(), cursor.getDate() - 1); continue; }
       break;
     }
-    if (status === 'compliant') { streak++; cursor = new Date(cursor.getFullYear(), cursor.getMonth(), cursor.getDate() - 1); continue; }
+    if (status === 'compliant' || state.game?.days?.[dayKey]?.shieldUsed) { streak++; cursor = new Date(cursor.getFullYear(), cursor.getMonth(), cursor.getDate() - 1); continue; }
     break;
   }
   return { days: streak };

@@ -140,6 +140,7 @@ import {
   normalizeGameState,
   onGameBackupExported,
   onGameCallSaved,
+  onGameCallsChanged,
   onGameDayRollover,
   onGameGapSaved,
   onGamePauseEnded,
@@ -170,7 +171,7 @@ export { higherRateLiveStatus };
 export { formatBlockDurationLabel };
 export { renderEmojiPicker };
 export { computeComplianceStreak, dayComplianceStatus };
-export { onGameCallSaved };
+export { onGameCallSaved, onGameCallsChanged };
 
     const STORAGE_KEY = 'propio_shift_tracker_state_es_v4';
     const CALLS_KEY = 'propio_shift_tracker_calls_es_v4';
@@ -4083,6 +4084,7 @@ function renderPayDatesSection() {
         state.activeDayKey = dayKey;
 
         saveAll();
+        onGameCallsChanged(dayKey);
         toast('Día reiniciado');
       });
     }
@@ -5842,9 +5844,11 @@ export function render() {
       if (id === 'goalScopeModal') cancelPendingGoalChange();
       const modal = document.getElementById(id);
       if (!modal) return;
+      const wasOpen = modal.classList.contains('open');
       modal.classList.remove('open');
       modal.setAttribute('aria-hidden', 'true');
       openModalStack = openModalStack.filter(m => m !== id);
+      if (wasOpen) document.dispatchEvent(new CustomEvent('app:modal-closed', { detail: { id } }));
     }
 
     function closeAllModals() {
@@ -5864,6 +5868,8 @@ export function render() {
       closeModal('calYearGoalModal');
       closeModal('calHistoryStartModal');
       closeModal('financeRowModal');
+      closeModal('stageClearModal');
+      closeModal('chestModal');
       openModalStack = [];
     }
 

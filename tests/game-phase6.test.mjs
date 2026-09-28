@@ -91,15 +91,13 @@ test('XP solo entra por llamadas actuales y oportunas, con tope diario y lock de
   assert.doesNotMatch(calls, /onGameCallSaved\([^\n]*import/i);
 });
 
-test('derrota no debe seguir produciendo golpes/recompensas posteriores', () => {
+test('después de derrotar no entra XP nuevo pero sí se muestra botín extra', () => {
   const game = read('js/game.js');
   const handler = game.slice(game.indexOf('export function onGameCallSaved'), game.indexOf('export function onGameGapSaved'));
-  const defeatGuard = handler.indexOf('currentDay.defeated');
-  const fx = handler.indexOf('showCallFx');
-  const reward = handler.indexOf('rewardLootBox');
-  assert.ok(defeatGuard >= 0, 'onGameCallSaved debe reconocer el estado derrotado');
-  assert.ok(defeatGuard < fx, 'la derrota debe bloquear el feedback de golpe');
-  assert.ok(defeatGuard < reward, 'la derrota debe bloquear recompensas posteriores');
+  assert.match(handler, /currentDay\.defeated && xpLocked/);
+  assert.match(handler, /showCallFx\(call, 0, critical, 'extra'\)/);
+  assert.match(handler, /monster-defeat:\$\{dayKey\}/);
+  assert.match(handler, /MONSTRUO DERROTADO/);
   assert.match(game, /if \(Number\.isFinite\(Number\(entry\.xpLocked\)\)\) return 0/);
   assert.match(game, /xpLocked: Number\(entry\.xpLocked\)/);
 });
@@ -186,4 +184,52 @@ test('Logros conserva las tarjetas de app.html y solo actualiza sus nodos intern
   assert.match(game, /data-game-stat=["\']\$\{key\}/);
   assert.match(game, /collection:\s*String\(seen\.size\)/);
   assert.match(game, /data-game-action=["\']open-last-clear/);
+});
+
+
+test('edición y borrado reconcilian XP congelado sin dejar progreso fantasma', () => {
+  const game = read('js/game.js');
+  const calls = read('js/calls.js');
+  const appMain = read('js/app-main.js');
+  assert.match(game, /export function onGameCallsChanged\(dayKey\)/);
+  assert.match(game, /computeGameDay\(normalizedDayKey, \{ ignoreLock: true \}\)/);
+  assert.match(game, /state\.game\.totalXp = Math\.max\(0, state\.game\.totalXp \+ nextXp - oldXp\)/);
+  assert.match(calls, /onGameCallsChanged\(affectedDayKey\)/);
+  assert.match(calls, /onGameCallsChanged\(dayKey\)/);
+  assert.match(appMain, /onGameCallsChanged\(dayKey\)/);
+});
+
+test('STAGE CLEAR reversible restaura escudos y racha, y conserva snapshot consistente', () => {
+  const game = read('js/game.js');
+  assert.match(game, /shieldsBefore/);
+  assert.match(game, /bestStreakBefore/);
+  assert.match(game, /streakShieldAwardedKey/);
+  assert.match(game, /entry\.xpBreakdown \|\| fallback\.xpBreakdown/);
+  assert.match(game, /entry\.earnings/);
+  assert.match(game, /recomputeBestStreak\(\)/);
+});
+
+test('avisos y modales de juego se recuperan al cerrar', () => {
+  const game = read('js/game.js');
+  const appMain = read('js/app-main.js');
+  assert.match(game, /app:modal-closed/);
+  assert.match(appMain, /new CustomEvent\('app:modal-closed'/);
+  assert.match(appMain, /closeModal\('stageClearModal'\)/);
+  assert.match(appMain, /closeModal\('chestModal'\)/);
+});
+
+test('Logros muestra accesorios y cofre pendiente, y racha de Reportes respeta escudos', () => {
+  const game = read('js/game.js');
+  const reports = read('js/reports.js');
+  assert.match(game, /game-accessory-card/);
+  assert.match(game, /pending-chest/);
+  assert.match(game, /nextUnownedAccessory/);
+  assert.match(reports, /state\.game\?\.days\?\.\[dayKey\]\?\.shieldUsed/);
+});
+
+test('XP flotante representa concesión real y distingue XP sellado', () => {
+  const game = read('js/game.js');
+  assert.match(game, /const grantedXp = Math\.max\(0, currentDay\.xp - beforeCallXp\)/);
+  assert.match(game, /XP DIARIO SELLADO/);
+  assert.match(game, /BOTÍN EXTRA/);
 });
