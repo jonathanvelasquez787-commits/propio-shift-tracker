@@ -6,6 +6,7 @@ import {
   HIGHER_RATE_TIERS,
   MAX_CALL_DURATION_MIN,
   appConfirm,
+  autoStartShiftFromCalls,
   callDateKeyFromValue,
   callDedupeKey,
   calls,
@@ -481,6 +482,9 @@ export function saveManualCall() {
   manualCallLiveBackupPending = false;
   closeModal('manualCallModal');
   reconcileLastCallEndedAt(callDate);
+  if (callDate === todayCallDateKey() && !state.shiftStartedAt && !state.shiftEndedAt) {
+    autoStartShiftFromCalls(true);
+  }
   financeRunAutoFillCascade();
   saveAll();
   onGameCallSaved(candidate, 'manual');
