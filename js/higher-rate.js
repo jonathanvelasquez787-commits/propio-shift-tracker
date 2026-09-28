@@ -34,13 +34,27 @@ import {
   todayRange,
 } from './app-main.js';
 
+    function higherRateWindowBounds(window) {
+      const start = toDateFromInputs(window.date, timeLabel(window.start));
+      let end = toDateFromInputs(window.date, timeLabel(window.end));
+      if (!start || !end) return null;
+      // Fin <= Inicio significa que la oportunidad termina al día siguiente (ej. 10 PM–2 AM).
+      // Fin === Inicio se interpreta como ventana inválida de duración cero, no como 24 horas.
+      const startMin = toMinutes(formatHHMM(window.start));
+      const endMin = toMinutes(formatHHMM(window.end));
+      if (endMin === startMin) return null;
+      if (end.getTime() < start.getTime()) {
+        end = new Date(end.getFullYear(), end.getMonth(), end.getDate() + 1, end.getHours(), end.getMinutes(), end.getSeconds(), end.getMilliseconds());
+      }
+      return { start, end };
+    }
+
     function callQualifiesForHigherRateWindow(callStartISO, window) {
       const callStart = new Date(callStartISO);
-      const winStart = toDateFromInputs(window.date, timeLabel(window.start));
-      const winEnd = toDateFromInputs(window.date, timeLabel(window.end));
-      if (!winStart || !winEnd || winEnd.getTime() <= winStart.getTime()) return false;
-      const graceStart = new Date(winStart.getTime() - HIGHER_RATE_EARLY_GRACE_MIN * 60000);
-      return callStart.getTime() >= graceStart.getTime() && callStart.getTime() < winEnd.getTime();
+      const bounds = higherRateWindowBounds(window);
+      if (!bounds || Number.isNaN(callStart.getTime())) return false;
+      const graceStart = new Date(bounds.start.getTime() - HIGHER_RATE_EARLY_GRACE_MIN * 60000);
+      return callStart.getTime() >= graceStart.getTime() && callStart.getTime() < bounds.end.getTime();
     }
 
     // Bono de UNA llamada, null si no califica. Solo se comparan ventanas de la MISMA fecha; si
@@ -57,7 +71,7 @@ import {
           windowId: call.frozenHigherRateBonus.windowId,
         };
       }
-      const windows = (settings.higherRateWindows || []).filter(w => w.date === call.callDate);
+      const windows = settings.higherRateWindows || [];
       if (!windows.length) return null;
       const qualifying = windows.filter(w => callQualifiesForHigherRateWindow(call.startISO, w));
       if (!qualifying.length) return null;
@@ -210,8 +224,8 @@ import {
     function higherRateWindowsTodayTotalMin(dayKey = todayCallDateKey()) {
       const todaysWindows = (settings.higherRateWindows || []).filter(w => w.date === dayKey);
       const intervals = todaysWindows
-        .map(w => ({ start: toDateFromInputs(w.date, timeLabel(w.start)), end: toDateFromInputs(w.date, timeLabel(w.end)) }))
-        .filter(iv => iv.start && iv.end && iv.end > iv.start);
+        .map(higherRateWindowBounds)
+        .filter(Boolean);
       return mergeIntervals(intervals).reduce((sum, iv) => sum + (iv.end.getTime() - iv.start.getTime()) / 60000, 0);
     }
 
@@ -220,11 +234,10 @@ import {
     // callQualifiesForHigherRateWindow (la gracia de 5 min antes de que empiece), pero comparando
     // contra el reloj en vez de contra el inicio de una llamada.
     function isNowWithinHigherRateWindow(now, w) {
-      const winStart = toDateFromInputs(w.date, timeLabel(w.start));
-      const winEnd = toDateFromInputs(w.date, timeLabel(w.end));
-      if (!winStart || !winEnd || winEnd.getTime() <= winStart.getTime()) return false;
-      const graceStart = new Date(winStart.getTime() - HIGHER_RATE_EARLY_GRACE_MIN * 60000);
-      return now.getTime() >= graceStart.getTime() && now.getTime() < winEnd.getTime();
+      const bounds = higherRateWindowBounds(w);
+      if (!bounds) return false;
+      const graceStart = new Date(bounds.start.getTime() - HIGHER_RATE_EARLY_GRACE_MIN * 60000);
+      return now.getTime() >= graceStart.getTime() && now.getTime() < bounds.end.getTime();
     }
 
     // Devuelve { active: true, window, minutesLeft } si hay una ventana vigente ahora mismo (la de
@@ -239,14 +252,14 @@ import {
         const best = activeNow.reduce((a, b) =>
           (HIGHER_RATE_TIERS[b.tier]?.bonusPerMin || 0) > (HIGHER_RATE_TIERS[a.tier]?.bonusPerMin || 0) ? b : a
         );
-        const winEnd = toDateFromInputs(best.date, timeLabel(best.end));
-        const minutesLeft = winEnd ? Math.max(0, Math.round((winEnd.getTime() - now.getTime()) / 60000)) : null;
+        const bounds = higherRateWindowBounds(best);
+        const minutesLeft = bounds ? Math.max(0, Math.round((bounds.end.getTime() - now.getTime()) / 60000)) : null;
         return { active: true, window: best, minutesLeft };
       }
       const upcoming = windows
-        .map(w => ({ w, start: toDateFromInputs(w.date, timeLabel(w.start)), end: toDateFromInputs(w.date, timeLabel(w.end)) }))
-        .filter(x => x.start && x.end && x.end.getTime() > x.start.getTime())
-        .map(x => ({ ...x, graceStart: new Date(x.start.getTime() - HIGHER_RATE_EARLY_GRACE_MIN * 60000) }))
+        .map(w => ({ w, bounds: higherRateWindowBounds(w) }))
+        .filter(x => x.bounds)
+        .map(x => ({ ...x, start: x.bounds.start, end: x.bounds.end, graceStart: new Date(x.bounds.start.getTime() - HIGHER_RATE_EARLY_GRACE_MIN * 60000) }))
         .filter(x => x.graceStart.getTime() > now.getTime())
         .sort((a, b) => a.start.getTime() - b.start.getTime());
       if (upcoming.length) return { active: false, window: upcoming[0].w, startsAt: upcoming[0].start };
@@ -457,8 +470,8 @@ import {
     // Una ventana es "pasada" cuando su hora de fin ya quedó atrás, no solo si su fecha es anterior
     // a hoy.
     function higherRateWindowIsPast(w, now = new Date()) {
-      const end = toDateFromInputs(w.date, timeLabel(w.end));
-      return !!(end && end.getTime() <= now.getTime());
+      const bounds = higherRateWindowBounds(w);
+      return !!(bounds && bounds.end.getTime() <= now.getTime());
     }
 
     // Mientras #higherRateModal esté abierto, revisa cada segundo si alguna ventana acaba de cruzar
@@ -562,16 +575,15 @@ import {
       notifyHigherRateMidnightCrossingWindows();
     }
 
-    // CallQualifiesForHigherRateWindow construye winStart/winEnd con la MISMA fecha para ambos; si
-    // Fin <= Inicio (la ventana cruza medianoche, ej. 22:00–02:00), la función devuelve `false`
-    // incondicionalmente.
+    // Las ventanas pueden cruzar medianoche. La única combinación inválida es Inicio === Fin,
+    // porque sería una ventana de duración cero y no una oportunidad de 24 horas.
     function notifyHigherRateMidnightCrossingWindows() {
       const windows = settings.higherRateWindows || [];
-      const offenders = windows.filter(w => toMinutes(formatHHMM(w.end)) <= toMinutes(formatHHMM(w.start)));
-      if (!offenders.length) return;
-      const first = offenders[0];
-      const extra = offenders.length > 1 ? ` (y ${offenders.length - 1} más)` : '';
-      toast(`⚠️ La ventana de Higher Rate ${timeLabel(first.start)}–${timeLabel(first.end)} del ${formatCallDayLabel(first.date)}${extra} cruza la medianoche — todavía no se soporta, no aplicará a ninguna llamada. Divide en dos ventanas (ej. ${timeLabel(first.start)}–11:59 PM y una segunda 12:00–${timeLabel(first.end)} AM al día siguiente).`);
+      const invalid = windows.filter(w => toMinutes(formatHHMM(w.end)) === toMinutes(formatHHMM(w.start)));
+      if (!invalid.length) return;
+      const first = invalid[0];
+      const extra = invalid.length > 1 ? ` (y ${invalid.length - 1} más)` : '';
+      toast(`⚠️ La ventana de Higher Rate del ${formatCallDayLabel(first.date)} tiene la misma hora de inicio y fin${extra}. Ajusta una de las dos horas.`);
     }
 
     // Agregar un Higher Rate para un día que YA tiene llamadas tomadas ("se me olvidó agregarlo a
