@@ -80,7 +80,7 @@ test('XP solo entra por llamadas actuales y oportunas, con tope diario y lock de
   const calls = read('js/calls.js');
   assert.match(game, /export const GAME_DAILY_XP_CAP = 150/);
   assert.match(game, /Math\.min\(GAME_DAILY_XP_CAP/);
-  assert.match(game, /dayCalls\.length \? Math\.min\(GAME_DAILY_XP_CAP/);
+  assert.match(game, /eligibleCalls\.length\s*\? Math\.min\(GAME_DAILY_XP_CAP/);
   assert.match(game, /todayCallDateKey\(\) !== dayKey/);
   assert.match(game, /todayCallDateKey\(new Date\(call\.importedAt \|\| 0\)\) !== dayKey/);
   assert.match(game, /imported - ended <= 30 \* 60000/);
@@ -98,7 +98,8 @@ test('después de derrotar no entra XP nuevo pero sí se muestra botín extra', 
   assert.match(handler, /showCallFx\(call, 0, critical, 'extra'\)/);
   assert.match(handler, /monster-defeat:\$\{dayKey\}/);
   assert.match(handler, /MONSTRUO DERROTADO/);
-  assert.match(game, /if \(Number\.isFinite\(Number\(entry\.xpLocked\)\)\) return 0/);
+  assert.match(handler, /if \(currentDay\.defeated && xpLocked\)/);
+  assert.match(handler, /showCallFx\(call, 0, critical, 'extra'\)/);
   assert.match(game, /xpLocked: Number\(entry\.xpLocked\)/);
 });
 
@@ -112,7 +113,8 @@ test('cierre y cofre son idempotentes, y el dinero secundario aparece en la expe
   assert.match(game, /convertedAmountText/);
   assert.match(game, /function withConversion/);
   assert.match(game, /withConversion\(parseMoney\(call\.pay\)\)/);
-  assert.match(game, /withConversion\(snapshot\.stats\.earnings\)/);
+  assert.match(game, /withConversion\(earnings\)/);
+  assert.match(game, /withConversion\(day\.stats\.earnings\)/);
 });
 
 test('CSS de juego cubre motion reducido, layout estrecho y responsive', () => {
@@ -191,7 +193,7 @@ test('edición y borrado corrigen datos sin reescribir XP ya congelado por STAGE
   const game = read('js/game.js');
   const calls = read('js/calls.js');
   assert.match(game, /STAGE CLEAR congela XP/);
-  const changed = game.slice(game.indexOf('export function onGameCallsChanged'), game.indexOf('export function onGameShiftAlarmFired'));
+  const changed = game.slice(game.indexOf('export function onGameCallsChanged'), game.indexOf('export function onGameDayReset'));
   assert.doesNotMatch(changed, /state\.game\.totalXp\s*=/);
   assert.doesNotMatch(changed, /entry\.xp\s*=/);
   assert.match(changed, /entry\.earnings\s*=/);
@@ -262,6 +264,7 @@ test('consistencia de gamificación se mantiene aunque esté apagada', () => {
   const started = game.slice(game.indexOf('export function onGameShiftStarted'), game.indexOf('function stageComparisonSnapshot'));
   assert.doesNotMatch(changed, /if \(!gameEnabled\(\)\) return false/);
   assert.match(changed, /const enabled = gameEnabled\(\)/);
+  assert.match(started, /if \(hadFinalizedDay\)/);
   assert.match(started, /revokeStageClear\(dayKey, \{ silent: !enabled \}\)/);
 });
 
@@ -299,8 +302,8 @@ test('simulación mensual: llamadas y Break Lunch no pueden ocupar los mismos mi
 test('simulación mensual: llamada no salta ventana temprana ni reescribe entrada salida manual', () => {
   const appMain = read('js/app-main.js');
   const startCall = appMain.slice(appMain.indexOf('function startCall()'), appMain.indexOf('function endCall()'));
-  assert.match(startCall, /shiftStartTooEarly\(\)/);
-  assert.match(appMain, /Las sesiones explícitas mandan/);
+  assert.doesNotMatch(startCall, /shiftStartTooEarly\(\)/);
+  assert.match(startCall, /const needsAutoShift = !state\.shiftStartedAt \|\| !!state\.shiftEndedAt/);
   assert.match(appMain, /startIsAutomatic/);
   assert.match(appMain, /endIsAutomatic/);
 });
@@ -311,13 +314,12 @@ test('simulación mensual: XP solo para llamadas productivas ya terminadas', () 
   assert.match(eligibility, /countsAsProductive/);
   assert.match(eligibility, /billable/);
   assert.match(eligibility, /dropped/);
-  assert.match(eligibility, /lag >= 0/);
-  assert.match(eligibility, /lag <= 30 \* 60000/);
+  assert.match(eligibility, /if \(lag < 0 \|\| lag > 30 \* 60000\) return false/);
 });
 
 test('simulación mensual: llamada manual futura se rechaza y live conserva segundos', () => {
   const calls = read('js/calls.js');
-  assert.match(calls, /La hora de la llamada no puede estar en el futuro/);
+  assert.match(calls, /La llamada no puede terminar en el futuro/);
   assert.match(calls, /Math\.round\(\(elapsedMs \/ 60000\) \* 100\) \/ 100/);
   assert.doesNotMatch(calls, /Math\.max\(1, Math\.round\(\(new Date\(endedAtISO\)/);
 });
@@ -386,7 +388,7 @@ test('segunda simulación mensual: STAGE CLEAR usa el día del inicio del turno 
   const game = read('js/game.js');
   assert.match(appMain, /const shiftDayKey = todayCallDateKey\(new Date\(state\.shiftStartedAt\)\)/);
   assert.match(appMain, /onGameShiftEnded\(shiftDayKey\)/);
-  assert.match(game, /export function onGameShiftEnded\(dayKey = todayCallDateKey\(\)\)/);
+  assert.match(game, /export function onGameShiftEnded\(dayKey = currentGameDayKey\(\)\)/);
 });
 
 
@@ -409,7 +411,7 @@ test('tercera simulación mensual: reset y vaciado limpian estados derivados sin
   assert.match(game, /delete state\.game\.days\[normalized\]/);
   assert.match(game, /entry\.callCount === 0 && state\.game\.chest\.pending/);
   assert.match(game, /if \(entry\.finalized \|\| Number\.isFinite/);
-  assert.match(appMain, /onGameDayReset\(dayKey\)/);
+  assert.match(appMain, /onGameDayReset\(normalizedDayKey \|\| dayKey\)/);
   assert.match(appMain, /delete state\.dayInterruptions\[normalizedDayKey\]/);
   assert.match(appMain, /state\.lastCallEndedAt = null/);
 });
@@ -494,7 +496,7 @@ test('runtime smoke: helpers de renderGame existen para Logros y Higher Rate', (
 
 test('cuarta simulación mensual: llamadas live antes y después del turno nunca quedan bloqueadas', () => {
   const appMain = read('js/app-main.js');
-  const startCall = appMain.slice(appMain.indexOf('function startCall()'), appMain.indexOf('function toggleCall()', appMain.indexOf('function startCall()')));
+  const startCall = appMain.slice(appMain.indexOf('function startCall()'), appMain.indexOf('function endCall()', appMain.indexOf('function startCall()')));
   const disabled = appMain.slice(appMain.indexOf('function callActionDisabled()'), appMain.indexOf('function callActionTimer()', appMain.indexOf('function callActionDisabled()')));
   assert.doesNotMatch(startCall, /shiftStartTooEarly\(\)/);
   assert.match(startCall, /const needsAutoShift = !state\.shiftStartedAt \|\| !!state\.shiftEndedAt/);
@@ -548,7 +550,8 @@ test('cuarta simulación mensual: llamadas antes o después del checkpoint cuent
   assert.match(appMain, /presenceIntervalsForDay\(normalized, sessions\)/);
   assert.match(appMain, /callsForDay\(normalized\)\.forEach\(call =>/);
   assert.match(appMain, /return mergeIntervals\(intervals\)\.reduce/);
-  assert.match(appMain, /Las sesiones explícitas mandan/);
+  assert.match(appMain, /function callPresenceIntervalsForDay/);
+  assert.match(appMain, /return mergeIntervals\(intervals\)\.reduce/);
 });
 
 
