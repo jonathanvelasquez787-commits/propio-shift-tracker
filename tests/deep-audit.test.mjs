@@ -94,3 +94,28 @@ test('auditoría profunda: sonidos personalizados detectan fallo real de persist
   assert.match(alarm, /if \(!saveSettingsOnly\(\)\)/);
   assert.match(alarm, /settings\[cfg\.urlKey\] = previous\.dataUrl/);
 });
+
+
+test('auditoría profunda: corrección oficial preserva día contable y bono Higher Rate congelado', () => {
+  const app = read('js/app-main.js');
+  const start = app.indexOf('const importedRows = accepted.map');
+  const end = app.indexOf('const importedDates = new Set()', start);
+  const body = app.slice(start, end);
+  assert.match(body, /const replacingExisting = \(preserveOfficialIdentity \|\| replacingLive\) \? item\.replaces : null/);
+  assert.match(body, /callDate: replacingExisting \? replacingExisting\.callDate : item\.call\.callDate/);
+  assert.match(body, /replacingExisting\.shiftDayKey/);
+  assert.match(body, /replacingExisting\?\.frozenHigherRateBonus/);
+  assert.match(body, /frozenHigherRateBonus: \{ \.\.\.replacingExisting\.frozenHigherRateBonus \}/);
+});
+
+test('auditoría profunda: hidratar desde nube restaura snapshot anterior si localStorage falla a mitad', () => {
+  const sync = read('js/sync.js');
+  const start = sync.indexOf('export function writeLocalSnapshot');
+  const end = sync.indexOf('export function applyLightThemeDefault', start);
+  const body = sync.slice(start, end);
+  assert.match(body, /const previous = \{\}/);
+  assert.match(body, /Object\.values\(APP_KEYS\)\.forEach\(\(key\) => window\.localStorage\.removeItem\(key\)\)/);
+  assert.match(body, /Object\.entries\(previous\)\.forEach/);
+  assert.match(body, /No hay espacio local suficiente para descargar tus datos de la nube/);
+  assert.match(body, /throw error/);
+});
