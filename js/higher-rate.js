@@ -630,12 +630,15 @@ import {
       // cualquier llamada real que ya calificaba para ella.
       freezeHigherRateBonusesForWindowIds([id]);
       const current = readHigherRateWindowsFromEditor().filter(w => w.id !== id);
-      renderHigherRateWindowsEditor(current);
+      // El editor vuelve a calcular "Próximos días"/Historial usando settings.higherRateWindows.
+      // Si se renderiza ANTES de asignar `current`, esos resúmenes muestran por un instante (o
+      // hasta reabrir el modal) la ventana que acabas de borrar.
       settings.higherRateWindows = current;
       financeRunAutoFillCascade();
       // SaveAll en vez de saveSettingsOnly: ahora también hay que persistir `calls` (algunas pueden
       // haber quedado con frozenHigherRateBonus nuevo).
       saveAll();
+      renderHigherRateWindowsEditor(current);
       renderHigherRateLiveCard();
     }
 
