@@ -4038,6 +4038,7 @@ function renderPayDatesSection() {
       const needsAutoShift = !state.shiftStartedAt || !!state.shiftEndedAt;
       const previousShiftStartedAt = state.shiftStartedAt || null;
       const previousShiftEndedAt = state.shiftEndedAt || null;
+      const gameBeforeAutoShift = needsAutoShift ? JSON.parse(JSON.stringify(state.game || null)) : null;
       let autoShiftEventId = null;
       if (needsAutoShift) {
         state.shiftStartedAt = nowISO;
@@ -4055,7 +4056,7 @@ function renderPayDatesSection() {
         // onGameShiftStarted puede reabrir STAGE CLEAR, abrir un cofre o tocar ledger/XP.
         // Si esta llamada resulta accidental y se descarta, se restaura exactamente el estado de
         // juego anterior junto con el turno automático.
-        gameBeforeAutoShift: needsAutoShift ? JSON.parse(JSON.stringify(state.game || null)) : null,
+        gameBeforeAutoShift,
       };
       saveAll();
       toast(needsAutoShift ? 'Llamada iniciada · turno abierto automáticamente' : 'Llamada iniciada');
