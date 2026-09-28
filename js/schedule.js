@@ -29,6 +29,7 @@ import {
   iconHtml,
   isScheduleWeekPast,
   minutesToHHMM,
+  onGameDayMetadataChanged,
   pad,
   saveAll,
   saveSettingsOnly,
@@ -44,6 +45,7 @@ import {
   timeLabel,
   toMinutes,
   toast,
+  todayCallDateKey,
   weekStartKeyFromDate,
 } from './app-main.js';
 
@@ -67,16 +69,16 @@ import {
         toast('Elige cuánto ajustar el turno antes de aplicar.');
         return;
       }
-      const startInput = document.getElementById('dayStartInput');
-      const endInput = document.getElementById('dayEndInput');
-      if (startInput) startInput.value = minutesToHHMM(toMinutes(formatHHMM(startInput.value)) + scheduleOffsetMin);
-      if (endInput) endInput.value = minutesToHHMM(toMinutes(formatHHMM(endInput.value)) + scheduleOffsetMin);
-
       const current = readBlocksFromEditor();
       if (!current.length) {
         toast('No hay bloques que ajustar en este día.');
         return;
       }
+
+      const startInput = document.getElementById('dayStartInput');
+      const endInput = document.getElementById('dayEndInput');
+      if (startInput) startInput.value = minutesToHHMM(toMinutes(formatHHMM(startInput.value)) + scheduleOffsetMin);
+      if (endInput) endInput.value = minutesToHHMM(toMinutes(formatHHMM(endInput.value)) + scheduleOffsetMin);
       const shifted = current.map(b => ({ ...b, start: minutesToHHMM(toMinutes(b.start) + scheduleOffsetMin) }));
       renderBlocksEditor(shifted);
       toast(`Turno ajustado ${formatScheduleOffsetLabel(scheduleOffsetMin)} — recuerda "Guardar día" para confirmar`);
@@ -580,6 +582,7 @@ import {
         settings.shiftEnd = cfg.end;
       }
       saveSettingsOnly();
+      onGameDayMetadataChanged(todayCallDateKey());
       saveAll();
       renderDayTabs();
       toast(scheduleViewMode === 'week'
@@ -617,6 +620,7 @@ import {
           };
         });
         saveSettingsOnly();
+        onGameDayMetadataChanged(todayCallDateKey());
         saveAll();
         renderDayTabs();
         toast(`Horario copiado a Lunes-Viernes ${scope}`.trim());
@@ -647,6 +651,7 @@ import {
         target.sat = { off: cfg.off, start: cfg.start, end: cfg.end, blocks: cfg.blocks.map(b => ({ ...b })) };
         target.sun = { off: cfg.off, start: cfg.start, end: cfg.end, blocks: cfg.blocks.map(b => ({ ...b })) };
         saveSettingsOnly();
+        onGameDayMetadataChanged(todayCallDateKey());
         saveAll();
         renderDayTabs();
         toast(`Horario copiado a Sábado y Domingo ${scope}`.trim());
