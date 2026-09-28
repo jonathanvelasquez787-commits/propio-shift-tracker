@@ -404,6 +404,7 @@ function buildLiveCallCandidate({ customerId, startedAtISO, endedAtISO, billable
     id: makeLocalId(),
     customerId: String(customerId || '').trim() || 'Manual',
     callDate: accountingCallDate,
+    ...(belongsToTrackedShift ? { shiftDayKey: accountingCallDate } : {}),
     ...(accountingCallDate !== calendarCallDate ? { calendarCallDate } : {}),
     // CallStart es solo el texto que se ve en Tabla de llamadas — se deriva igual que siempre
     // (hora/minuto), pero NO se usa para calcular startISO/endISO (ver arriba)
