@@ -556,3 +556,15 @@ test('cuarta simulación mensual: descartar live también revierte efectos de ga
   assert.match(appMain, /const gameBeforeAutoShift = needsAutoShift[\s\S]*onGameShiftStarted\(\{ continued: false \}\)[\s\S]*gameBeforeAutoShift,/);
   assert.match(appMain, /discarded\.gameBeforeAutoShift/);
 });
+
+
+test('cuarta simulación mensual: gamificación nocturna no se parte a medianoche', () => {
+  const game = read('js/game.js');
+  assert.match(game, /function currentGameDayKey\(\)/);
+  assert.match(game, /return todayCallDateKey\(startedAt\)/);
+  assert.match(game, /ensureGameState\(preferredDayKey = null\)/);
+  assert.match(game, /const dayKey = callDateKeyFromValue\(call\.shiftDayKey\)/);
+  assert.match(game, /ensureGameState\(dayKey\)/);
+  assert.match(game, /const dayKey = currentGameDayKey\(\);[\s\S]*computeGameDay\(dayKey\)/);
+  assert.doesNotMatch(game, /onGameDayRollover\(\)[\s\S]{0,180}state\.game\.live = \{ dayKey: todayCallDateKey\(\)/);
+});
