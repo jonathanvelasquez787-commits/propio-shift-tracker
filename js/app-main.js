@@ -2424,6 +2424,35 @@ function sessionsToPresenceIntervals(sessions, normalizedDayKey) {
   }).filter(iv => iv.endMin > iv.startMin);
 }
 
+// Una llamada real implica presencia aunque haya ocurrido antes de dar "Iniciar shift" o después de
+// haber marcado "Finalizar shift". Se suma como presencia SOLO durante la llamada; no reescribe los
+// checkpoints manuales de Entrada/Salida ni inventa un turno completo alrededor de ella.
+function callPresenceIntervalsForDay(dayKey) {
+  const normalized = callDateKeyFromValue(dayKey);
+  const base = callDateToDate(normalized);
+  if (!normalized || !base) return [];
+  const dayStart = new Date(base.getFullYear(), base.getMonth(), base.getDate(), 0, 0, 0, 0).getTime();
+  const dayEnd = new Date(base.getFullYear(), base.getMonth(), base.getDate() + 1, 0, 0, 0, 0).getTime();
+  return callsForDay(normalized).map(call => {
+    const start = new Date(call.startISO).getTime();
+    const end = new Date(call.endISO).getTime();
+    if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return null;
+    const clippedStart = Math.max(start, dayStart);
+    const clippedEnd = Math.min(end, dayEnd);
+    if (clippedEnd <= clippedStart) return null;
+    const startDate = new Date(clippedStart);
+    const endDate = new Date(clippedEnd);
+    const startMin = clippedStart === dayStart ? 0 : startDate.getHours() * 60 + startDate.getMinutes();
+    const endMin = clippedEnd === dayEnd ? 1440 : endDate.getHours() * 60 + endDate.getMinutes();
+    return { startMin, endMin };
+  }).filter(Boolean);
+}
+
+function presenceIntervalsForDay(dayKey, sessions) {
+  const normalized = callDateKeyFromValue(dayKey);
+  return [...sessionsToPresenceIntervals(sessions, normalized), ...callPresenceIntervalsForDay(normalized)];
+}
+
 // Mismo criterio que sessionsToPresenceIntervals: una pausa real (Break/ Lunch o hueco clasificado
 // a mano) que cruza medianoche pierde el día al convertirse a minuto-del-día con
 // getHours/getMinutes — sin este recorte, start > end y la pausa deja de matchear cualquier minuto.
@@ -2437,17 +2466,28 @@ function pauseIntervalsToMinuteRanges(pauses, normalizedDayKey) {
 
 // Usa dayShiftSessions (todas las sesiones del día), no solo la más reciente.
 export function connectedMinutesForDay(dayKey = getActiveDayKey()) {
-  // Una sesión que cruza medianoche pertenece a dos días: se recorta al día consultado, igual que
-  // ya hace sessionsToPresenceIntervals para Adherencia.
-  const base = callDateToDate(callDateKeyFromValue(dayKey));
-  const dayStart = base ? base.getTime() : null;
-  const dayEnd = base ? new Date(base.getFullYear(), base.getMonth(), base.getDate() + 1).getTime() : null;
-  return dayShiftSessions(dayKey).reduce((total, s) => {
-    const end = s.live ? new Date() : s.end;
-    const from = dayStart === null ? s.start.getTime() : Math.max(s.start.getTime(), dayStart);
-    const to = dayEnd === null ? end.getTime() : Math.min(end.getTime(), dayEnd);
-    return total + Math.max(0, (to - from) / 60000);
-  }, 0);
+  // Sesiones explícitas + llamadas fuera de esas sesiones. Las llamadas se agregan como intervalos
+  // reales de presencia y mergeIntervals evita contarlas doble cuando caen dentro de un turno.
+  const normalized = callDateKeyFromValue(dayKey);
+  const base = callDateToDate(normalized);
+  const dayStart = base ? new Date(base.getFullYear(), base.getMonth(), base.getDate(), 0, 0, 0, 0).getTime() : null;
+  const dayEnd = base ? new Date(base.getFullYear(), base.getMonth(), base.getDate() + 1, 0, 0, 0, 0).getTime() : null;
+  if (dayStart === null || dayEnd === null) return 0;
+
+  const intervals = dayShiftSessions(normalized).map(session => ({
+    start: new Date(Math.max(session.start.getTime(), dayStart)),
+    end: new Date(Math.min((session.live ? new Date() : session.end).getTime(), dayEnd)),
+  }));
+  callsForDay(normalized).forEach(call => {
+    const start = new Date(call.startISO).getTime();
+    const end = new Date(call.endISO).getTime();
+    if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return;
+    const from = Math.max(start, dayStart);
+    const to = Math.min(end, dayEnd);
+    if (to > from) intervals.push({ start: new Date(from), end: new Date(to) });
+  });
+
+  return mergeIntervals(intervals).reduce((total, interval) => total + (interval.end.getTime() - interval.start.getTime()) / 60000, 0);
 }
 
 export function productiveMinutesForDay(dayKey = getActiveDayKey()) {
@@ -2906,7 +2946,7 @@ function minuteAdherenceForDay(dayKey, sessions) {
   const minuteOfDay = (date) => date.getHours() * 60 + date.getMinutes();
 
   const actualIntervals = pauseIntervalsToMinuteRanges(actualPauseIntervalsForDay(normalized), normalized);
-  const presenceIntervals = sessionsToPresenceIntervals(sessions, normalized);
+  const presenceIntervals = presenceIntervalsForDay(normalized, sessions);
 
   const rangeStart = plannedSlots[0].startMin;
   const lastSlotEnd = plannedSlots[plannedSlots.length - 1].endMin;
@@ -2960,7 +3000,7 @@ function slotMinuteAdherence(dayKey, originalSlot, sessions) {
   const minuteOfDay = (date) => date.getHours() * 60 + date.getMinutes();
 
   const actualIntervals = pauseIntervalsToMinuteRanges(actualPauseIntervalsForDay(normalized), normalized);
-  const presenceIntervals = sessionsToPresenceIntervals(sessions, normalized);
+  const presenceIntervals = presenceIntervalsForDay(normalized, sessions);
 
   const slotStartMin = toMinutes(originalSlot.start);
   const slotEndMin = toMinutes(originalSlot.end);
