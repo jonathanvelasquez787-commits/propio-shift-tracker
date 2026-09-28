@@ -4321,7 +4321,8 @@ function renderPayDatesSection() {
 
     function sameImportedCallIdentity(existingCall, incomingCall) {
       if (!existingCall || String(existingCall.source || '').toLowerCase() !== 'import') return false;
-      if (callDateKeyFromValue(existingCall.callDate) !== callDateKeyFromValue(incomingCall.callDate)) return false;
+      // startISO ya contiene la fecha real. No se compara callDate porque un turno nocturno puede
+      // contabilizar la llamada en el día anterior aunque Propio la exporte con fecha calendario nueva.
       const existingCustomer = String(existingCall.customerId || '').trim();
       const incomingCustomer = String(incomingCall.customerId || '').trim();
       if (!existingCustomer || !incomingCustomer || existingCustomer !== incomingCustomer) return false;
