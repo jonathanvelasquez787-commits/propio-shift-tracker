@@ -162,11 +162,29 @@ export function sameSnapshot(a, b) {
 // Escribe sin marcar "sucio": lo usa la hidratación desde la nube, que por
 // definición ya está sincronizada.
 export function writeLocalSnapshot(snapshot) {
+  const next = {
+    [APP_KEYS.state]: JSON.stringify(snapshot.state ?? {}),
+    [APP_KEYS.calls]: JSON.stringify(snapshot.calls ?? []),
+    [APP_KEYS.settings]: JSON.stringify(snapshot.settings ?? {}),
+  };
+  const previous = {};
+  Object.values(APP_KEYS).forEach((key) => {
+    previous[key] = window.localStorage.getItem(key);
+  });
+
   hydrating = true;
   try {
-    window.localStorage.setItem(APP_KEYS.state, JSON.stringify(snapshot.state ?? {}));
-    window.localStorage.setItem(APP_KEYS.calls, JSON.stringify(snapshot.calls ?? []));
-    window.localStorage.setItem(APP_KEYS.settings, JSON.stringify(snapshot.settings ?? {}));
+    Object.entries(next).forEach(([key, value]) => window.localStorage.setItem(key, value));
+  } catch (err) {
+    // Las tres llaves forman un solo snapshot. Si una falla por cuota/Storage, no se deja una
+    // mezcla (ej. state nuevo + settings viejos): se libera lo escrito y se restaura todo lo previo.
+    Object.values(APP_KEYS).forEach((key) => window.localStorage.removeItem(key));
+    Object.entries(previous).forEach(([key, value]) => {
+      if (value !== null) window.localStorage.setItem(key, value);
+    });
+    const error = new Error('No hay espacio local suficiente para descargar tus datos de la nube.');
+    error.cause = err;
+    throw error;
   } finally {
     hydrating = false;
   }
