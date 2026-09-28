@@ -119,3 +119,16 @@ test('auditoría profunda: hidratar desde nube restaura snapshot anterior si loc
   assert.match(body, /No hay espacio local suficiente para descargar tus datos de la nube/);
   assert.match(body, /throw error/);
 });
+
+
+test('auditoría profunda: descartar una pausa continuada elimina sus artefactos de interrupción', () => {
+  const app = read('js/app-main.js');
+  const start = app.indexOf('function startPause(type)');
+  const end = app.indexOf('function liveActivityInfo()', start);
+  const body = app.slice(start, end);
+  assert.match(body, /const interruption = registerDayInterruption\(dayKey, type, lastClosed\.endedAt, now\.toISOString\(\)\)/);
+  assert.match(body, /continuationInterruptionId: interruption\?\.id \|\| null/);
+  assert.match(body, /continuationEventId: continuationEvent\?\.id \|\| null/);
+  assert.match(body, /state\.dayInterruptions\[accountingDay\] = state\.dayInterruptions\[accountingDay\][\s\S]*continuationInterruptionId/);
+  assert.match(body, /state\.events = state\.events\.filter\(event => event\?\.id !== discarded\.continuationEventId\)/);
+});
