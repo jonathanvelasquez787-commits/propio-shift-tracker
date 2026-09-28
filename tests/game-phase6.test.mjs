@@ -171,3 +171,19 @@ test('gamificación apagada respeta hidden y el render conserva la estructura vi
   assert.match(game, /root\.dataset\.gameIntensity = subtle \? 'subtle' : 'arcade'/);
   assert.match(game, /root\.removeAttribute\('data-game-state'\)/);
 });
+
+test('Logros conserva las tarjetas de app.html y solo actualiza sus nodos internos', () => {
+  const game = read('js/game.js');
+  assert.doesNotMatch(game, /summary\.innerHTML\s*=/);
+  assert.doesNotMatch(game, /streakRoot\.innerHTML\s*=/);
+  assert.doesNotMatch(game, /levelRoot\.innerHTML\s*=/);
+  assert.doesNotMatch(game, /trophies\.innerHTML\s*=/);
+  assert.doesNotMatch(game, /records\.innerHTML\s*=/);
+  assert.doesNotMatch(game, /last\.innerHTML\s*=/);
+  assert.match(game, /data-game-role=\\"bestiary-list/);
+  assert.match(game, /data-game-role=\\"trophy-list/);
+  assert.match(game, /data-game-role=\\"records-list/);
+  assert.match(game, /data-game-stat=\\"\$\{key\}/);
+  assert.match(game, /collection:\s*String\(seen\.size\)/);
+  assert.match(game, /data-game-action=\\"open-last-clear/);
+});

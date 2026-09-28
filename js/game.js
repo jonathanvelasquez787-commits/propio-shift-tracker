@@ -407,39 +407,47 @@ function renderHeroChips() {
     if (chip) chip.hidden = !enabled || !visible;
   });
 }
-function cycleBossHtml() {
+function cycleBossSnapshot() {
   const cycle = cycleEarningsForOffset(0);
   const goal = effectiveCycleGoal(0);
   const pct = goal > 0 ? Math.max(0, Math.min(100, (cycle.earnings / goal) * 100)) : 0;
   const hp = Math.max(0, 100 - pct);
   const defeated = goal > 0 && pct >= 100;
-  const variant = pct >= 75 ? 'gold' : 'streak';
   const stateName = defeated ? 'defeated' : hp <= 25 ? 'wounded' : hp <= 50 ? 'angry' : 'awake';
-  return `
-    <div class="game-cycle-boss-copy">
-      <span class="game-kicker">JEFE DEL CICLO · 14 DÍAS</span>
-      <h3>${defeated ? 'JEFE DERROTADO' : 'El Guardián de la Quincena'}</h3>
-      <p>${formatCallDayLabel(todayCallDateKey(cycle.start))} – ${formatCallDayLabel(todayCallDateKey(cycle.end))}</p>
-      <div class="game-hp-label"><span>VIDA DEL JEFE</span><strong>${Math.round(hp)}%</strong></div>
-      <div class="game-hp-track"><div class="game-hp-fill game-hp-fill--boss" style="width:${hp}%"></div></div>
-      <div class="game-hp-foot"><span>${withConversion(cycle.earnings)} de ${withConversion(goal)}</span><span>${defeated ? `Botín real: ${withConversion(cycle.earnings)}` : `Faltan ${withConversion(Math.max(0, goal - cycle.earnings))}`}</span></div>
-    </div>
-    <div class="game-cycle-boss-sprite">${monsterSvg({ species: 'viernes-furioso', state: stateName, variant, hpPct: hp, sizeClass: 'xl' })}</div>`;
+  return { cycle, goal, pct, hp, defeated, stateName };
 }
-
 function renderCycleBosses() {
-  const html = cycleBossHtml();
+  const boss = cycleBossSnapshot();
+  const startLabel = formatCallDayLabel(todayCallDateKey(boss.cycle.start));
+  const endLabel = formatCallDayLabel(todayCallDateKey(boss.cycle.end));
+  const seasonLabel = document.querySelector('[data-game-role="season-label"]');
+  if (seasonLabel) seasonLabel.textContent = `${startLabel} – ${endLabel}`;
   ['gameCycleBoss', 'gameCycleBossAchievements'].forEach((id) => {
     const root = document.getElementById(id);
     if (!root) return;
     root.hidden = !gameEnabled();
-    if (gameEnabled()) root.innerHTML = html;
+    if (!gameEnabled()) return;
+    root.dataset.gameState = boss.stateName;
+    const role = (name) => root.querySelector(`[data-game-role="${name}"]`);
+    const title = role('cycle-title');
+    const status = role('cycle-status');
+    const subtitle = role('cycle-subtitle');
+    const progress = role('cycle-progress');
+    const earned = role('cycle-earned');
+    const goal = role('cycle-goal');
+    if (title) title.textContent = boss.defeated ? 'JEFE DERROTADO' : 'El Guardián de la Quincena';
+    if (status) status.textContent = boss.defeated ? 'DERROTADO' : boss.hp <= 25 ? 'CASI CAE' : 'EN MARCHA';
+    if (subtitle) subtitle.textContent = boss.defeated
+      ? 'Meta del ciclo cumplida. El botín real sigue siendo tu pago.'
+      : `Progreso del ciclo: ${Math.round(boss.pct)}%.`;
+    if (progress) progress.style.width = `${boss.pct}%`;
+    if (earned) earned.textContent = withConversion(boss.cycle.earnings);
+    if (goal) goal.textContent = `Meta ${withConversion(boss.goal)}`;
   });
 }
-
-function renderBestiary() {
-  const root = document.getElementById('gameBestiary');
-  if (!root) return;
+function bestiarySnapshot() {
+  const catalog = Object.values(MONSTER_CATALOG)
+    .filter((entry, index, all) => all.findIndex((item) => item.id === entry.id) === index);
   const defeatedDays = Object.entries(state.game.days)
     .filter(([, value]) => value?.monster?.defeated)
     .sort((a, b) => (callDateToDate(b[0])?.getTime() || 0) - (callDateToDate(a[0])?.getTime() || 0));
@@ -447,52 +455,147 @@ function renderBestiary() {
   defeatedDays.forEach(([key, value]) => {
     if (!seen.has(value.monster.species)) seen.set(value.monster.species, { key, ...value });
   });
-  root.innerHTML = Object.values(MONSTER_CATALOG).filter((entry, index, all) => all.findIndex((item) => item.id === entry.id) === index).map((entry) => {
+  return { catalog, seen };
+}
+
+function renderBestiary() {
+  const root = document.getElementById('gameBestiary');
+  if (!root) return;
+  const { catalog, seen } = bestiarySnapshot();
+  const count = root.querySelector('[data-game-role="bestiary-count"]');
+  const list = root.querySelector('[data-game-role="bestiary-list"]');
+  if (count) count.textContent = `${seen.size} / ${catalog.length}`;
+  if (!list) return;
+  list.innerHTML = catalog.map((entry) => {
     const found = seen.get(entry.id);
-    return `<article class="game-bestiary-card ${found ? 'is-unlocked' : 'is-locked'}">
+    return `<article class="game-collection-card ${found ? 'is-unlocked' : 'is-locked'}">
       <div class="game-bestiary-sprite">${monsterSvg({ species: entry.id, state: found ? 'defeated' : 'sleeping', variant: found?.monster?.variant || 'normal', hpPct: found ? 0 : 100, sizeClass: 'md' })}</div>
-      <div><b>${found ? escapeHtml(entry.name) : '???'}</b><span>${found ? `${formatCallDayLabel(found.key)} · ${'★'.repeat(found.stars || 1)}` : 'Derrota esta especie para revelarla'}</span></div>
+      <strong>${found ? escapeHtml(entry.name) : '???'}</strong>
+      <small>${found ? `${formatCallDayLabel(found.key)} · ${'★'.repeat(found.stars || 1)}` : 'Derrota esta especie para revelarla'}</small>
     </article>`;
   }).join('');
 }
-
 function renderAchievements() {
   const summary = document.getElementById('gameAchievementsSummary');
   if (!summary) return;
   const level = gameLevelProgress();
   const streak = gameStreak();
-  summary.innerHTML = `<span class="game-kicker">PERFIL DE COMBATE</span><h2>Nivel ${level.level} · ${state.game.totalXp} XP</h2><p>${level.remaining} XP para el siguiente nivel · Mejor racha ${state.game.bestStreak} días</p>`;
+  const summaryValues = {
+    streak: `${streak} días`,
+    level: String(level.level),
+    xp: String(state.game.totalXp),
+    shields: String(state.game.shields),
+  };
+  Object.entries(summaryValues).forEach(([key, value]) => {
+    const node = summary.querySelector(`[data-game-stat="${key}"]`);
+    if (node) node.textContent = value;
+  });
+
   const streakRoot = document.getElementById('gameStreakPanel');
   if (streakRoot) {
-    const cells = [];
-    const today = callDateToDate(todayCallDateKey()) || new Date();
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date(today.getFullYear(), today.getMonth(), today.getDate() - i);
-      const key = todayCallDateKey(date);
-      const status = dayComplianceStatus(key);
-      const shield = !!state.game.days[key]?.shieldUsed;
-      cells.push(`<span class="game-streak-day is-${shield ? 'shield' : status}" title="${escapeHtml(formatCallDayLabel(key))}">${shield ? '◆' : status === 'compliant' ? '✓' : status === 'off' ? '·' : status === 'pending' ? '○' : '×'}</span>`);
+    const best = streakRoot.querySelector('[data-game-role="streak-best"]');
+    const shields = streakRoot.querySelector('[data-game-role="shields"]');
+    const week = streakRoot.querySelector('[data-game-role="streak-week"]');
+    if (best) best.textContent = `Mejor: ${state.game.bestStreak}`;
+    if (shields) shields.textContent = `${state.game.shields}/${GAME_SHIELD_CAP}`;
+    if (week) {
+      const cells = Array.from(week.querySelectorAll('.game-streak-day'));
+      const todayKey = todayCallDateKey();
+      const today = callDateToDate(todayKey) || new Date();
+      const mondayOffset = (today.getDay() + 6) % 7;
+      const monday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - mondayOffset);
+      cells.forEach((cell, index) => {
+        const date = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + index);
+        const key = todayCallDateKey(date);
+        const status = dayComplianceStatus(key);
+        const shieldUsed = !!state.game.days[key]?.shieldUsed;
+        const isToday = key === todayKey;
+        const displayState = shieldUsed ? 'shield'
+          : status === 'compliant' ? 'done'
+          : status === 'off' ? 'off'
+          : isToday ? 'today'
+          : status === 'failed' ? 'failed'
+          : 'empty';
+        cell.dataset.dayState = displayState;
+        cell.title = formatCallDayLabel(key);
+        const mark = cell.querySelector('em');
+        if (mark) mark.textContent = shieldUsed ? '◆' : status === 'compliant' ? '✓' : status === 'off' ? '·' : isToday ? '○' : status === 'failed' ? '×' : '—';
+      });
     }
-    streakRoot.innerHTML = `<div class="game-section-head"><div><span class="game-kicker">RACHA</span><h3>${streak} días</h3></div><strong>${state.game.shields}/${GAME_SHIELD_CAP} escudos</strong></div><div class="game-streak-week">${cells.join('')}</div>`;
   }
+
   const levelRoot = document.getElementById('gameLevelPanel');
-  if (levelRoot) levelRoot.innerHTML = `<div class="game-section-head"><div><span class="game-kicker">NIVEL ${level.level}</span><h3>${state.game.totalXp} XP</h3></div><strong>${Math.round(level.pct)}%</strong></div><div class="game-level-track"><span style="width:${level.pct}%"></span></div><p>Próximo nivel en ${level.remaining} XP</p>`;
+  if (levelRoot) {
+    const setRole = (name, value) => {
+      const node = levelRoot.querySelector(`[data-game-role="${name}"]`);
+      if (node) node.textContent = value;
+      return node;
+    };
+    setRole('level', String(level.level));
+    setRole('level-emblem', String(level.level));
+    setRole('level-xp', `${state.game.totalXp} XP`);
+    setRole('next-level', `Siguiente: ${level.ceiling} XP`);
+    const progress = levelRoot.querySelector('[data-game-role="level-progress"]');
+    if (progress) progress.style.width = `${level.pct}%`;
+    const ladder = levelRoot.querySelector('[data-game-role="level-ladder"]');
+    if (ladder) {
+      const steps = ladder.querySelectorAll('span');
+      steps.forEach((step, index) => {
+        step.textContent = String(level.level + index);
+        step.classList.toggle('is-current', index === 0);
+      });
+    }
+  }
+
   renderBestiary();
+
   const trophies = document.getElementById('gameTrophies');
-  if (trophies) trophies.innerHTML = state.game.trophies.length ? state.game.trophies.map((item) => `<span class="game-trophy">🏆 ${escapeHtml(item.label || item.id)}</span>`).join('') : '<p class="game-empty">Tus trofeos de Finanzas aparecerán aquí.</p>';
+  if (trophies) {
+    const count = trophies.querySelector('[data-game-role="trophy-count"]');
+    const list = trophies.querySelector('[data-game-role="trophy-list"]');
+    if (count) count.textContent = String(state.game.trophies.length);
+    if (list) list.innerHTML = state.game.trophies.length
+      ? state.game.trophies.map((item) => `<div class="game-trophy-row"><span>🏆 ${escapeHtml(item.label || item.id)}</span><strong>${item.earnedOn ? escapeHtml(formatCallDayLabel(item.earnedOn)) : 'Ganado'}</strong></div>`).join('')
+      : '<div class="game-collection-empty">Tus próximos trofeos aparecerán aquí.</div>';
+  }
+
   const records = document.getElementById('gameRecords');
   if (records) {
+    const list = records.querySelector('[data-game-role="records-list"]');
     const longest = calls.reduce((best, call) => Math.max(best, Number(call.durationMin) || 0), 0);
     const biggest = calls.reduce((best, call) => Math.max(best, parseMoney(call.pay)), 0);
-    records.innerHTML = `<div><b>${formatMinutes(longest)} min</b><span>Llamada más larga</span></div><div><b>${withConversion(biggest)}</b><span>Mayor pago</span></div><div><b>${state.game.bestStreak} días</b><span>Mejor racha</span></div>`;
+    if (list) list.innerHTML = `
+      <div class="game-record-row"><span>Mayor pago</span><strong>${withConversion(biggest)}</strong></div>
+      <div class="game-record-row"><span>Llamada más larga</span><strong>${formatMinutes(longest)} min</strong></div>
+      <div class="game-record-row"><span>Mejor racha semanal</span><strong>${state.game.bestStreak} días</strong></div>`;
   }
+
   const last = document.getElementById('gameLastStageClear');
   if (last) {
-    const latest = Object.entries(state.game.days).filter(([, value]) => value?.finalized).sort((a, b) => (callDateToDate(b[0])?.getTime() || 0) - (callDateToDate(a[0])?.getTime() || 0))[0];
-    last.innerHTML = latest ? `<button type="button" data-reopen-stage="${escapeHtml(latest[0])}"><b>Último STAGE CLEAR</b><span>${formatCallDayLabel(latest[0])} · ${latest[1].xp} XP · ${'★'.repeat(latest[1].stars || 1)}</span></button>` : '<p class="game-empty">Tu primer cierre de turno aparecerá aquí.</p>';
+    const latest = Object.entries(state.game.days)
+      .filter(([, value]) => value?.finalized)
+      .sort((a, b) => (callDateToDate(b[0])?.getTime() || 0) - (callDateToDate(a[0])?.getTime() || 0))[0];
+    const date = last.querySelector('[data-game-role="last-clear-date"]');
+    const content = last.querySelector('[data-game-role="last-clear-content"]');
+    const button = last.querySelector('[data-game-action="open-last-clear"]');
+    if (latest) {
+      const [key, entry] = latest;
+      if (date) date.textContent = formatCallDayLabel(key);
+      if (content) content.innerHTML = `<div class="game-clear-stars" aria-hidden="true"><span>${entry.stars >= 1 ? '★' : '☆'}</span><span>${entry.stars >= 2 ? '★' : '☆'}</span><span>${entry.stars >= 3 ? '★' : '☆'}</span></div><p>${entry.xp} XP · ${entry.monster?.defeated ? 'Monstruo derrotado' : 'Stage guardado'}</p>`;
+      if (button) {
+        button.hidden = false;
+        button.dataset.dayKey = key;
+      }
+    } else {
+      if (date) date.textContent = '—';
+      if (content) content.innerHTML = '<div class="game-clear-stars" aria-hidden="true"><span>☆</span><span>☆</span><span>☆</span></div><p>Aún no hay un STAGE CLEAR guardado.</p>';
+      if (button) {
+        button.hidden = true;
+        delete button.dataset.dayKey;
+      }
+    }
   }
 }
-
 function renderSettingsProfile() {
   const enabled = document.getElementById('gameEnabledInput');
   const intensity = document.getElementById('gameIntensityInput');
@@ -501,11 +604,12 @@ function renderSettingsProfile() {
   if (enabled) enabled.checked = gameEnabled();
   if (intensity) intensity.value = settings.game.intensity;
   if (!profile) return;
+  const { seen } = bestiarySnapshot();
   const values = {
     level: `Nivel ${level.level}`,
     xp: `${state.game.totalXp} XP`,
     streak: `${state.game.bestStreak} días`,
-    collection: String(state.game.accessories.length),
+    collection: String(seen.size),
   };
   Object.entries(values).forEach(([key, value]) => {
     const node = profile.querySelector(`[data-game-profile="${key}"]`);
@@ -943,10 +1047,10 @@ export function initGame() {
   document.addEventListener('click', (event) => {
     const nav = event.target instanceof Element ? event.target.closest('[data-game-nav]') : null;
     if (nav) document.querySelector('.sidebar-link[data-page="achievements"]')?.click();
-    const reopen = event.target instanceof Element ? event.target.closest('[data-reopen-stage]') : null;
+    const reopen = event.target instanceof Element ? event.target.closest('[data-reopen-stage], [data-game-action="open-last-clear"]') : null;
     if (reopen) {
-      const key = reopen.getAttribute('data-reopen-stage');
-      const entry = state.game.days[key];
+      const key = reopen.getAttribute('data-reopen-stage') || reopen.dataset.dayKey;
+      const entry = key ? state.game.days[key] : null;
       if (entry?.finalized) openStageClear(key, entry);
     }
   });
