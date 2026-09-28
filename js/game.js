@@ -893,8 +893,6 @@ function reconcileLiveComboAndLoot(dayKey, snapshot, { allowRewards = true } = {
 
 let gameRecordBannerTimer = null;
 
-let gameRecordBannerTimer = null;
-
 function showGameRecordBanner(message) {
   const root = document.getElementById('gameRecordBanner');
   if (!root || !message) return;
@@ -1067,13 +1065,6 @@ export function onGameShiftAlarmFired(dayKey, firedAt = new Date().toISOString()
   saveStateOnly();
 }
 
-export function onGameShiftAlarmFired(dayKey, firedAt = new Date().toISOString()) {
-  ensureGameState();
-  if (dayKey !== todayCallDateKey()) return;
-  state.game.live.shiftAlarmAt = firedAt;
-  saveStateOnly();
-}
-
 function revokeStageClear(dayKey, { silent = false } = {}) {
   const entry = state.game.days[dayKey];
   if (!entry?.finalized) return;
@@ -1135,8 +1126,6 @@ export function onGameShiftStarted({ continued = false } = {}) {
   saveStateOnly();
   renderGame();
 }
-
-function stageComparisonSnapshot
 
 function stageComparisonSnapshot(dayKey, earnings) {
   const dayDate = callDateToDate(dayKey);
