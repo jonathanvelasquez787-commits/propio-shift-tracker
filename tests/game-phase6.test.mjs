@@ -549,3 +549,10 @@ test('cuarta simulación mensual: llamadas antes o después del checkpoint cuent
   assert.match(appMain, /return mergeIntervals\(intervals\)\.reduce/);
   assert.match(appMain, /Las sesiones explícitas mandan/);
 });
+
+
+test('cuarta simulación mensual: descartar live también revierte efectos de gamificación del auto-turno', () => {
+  const appMain = read('js/app-main.js');
+  assert.match(appMain, /gameBeforeAutoShift:/);
+  assert.match(appMain, /discarded\.gameBeforeAutoShift/);
+});
