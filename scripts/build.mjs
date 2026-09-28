@@ -7,6 +7,7 @@ import path from 'node:path';
 const root = process.cwd();
 const out = path.join(root, 'public');
 const assets = path.join(out, 'assets');
+const release = process.env.VERCEL_GIT_COMMIT_SHA || 'local';
 
 await rm(out, { recursive: true, force: true });
 await mkdir(assets, { recursive: true });
@@ -59,7 +60,7 @@ for (const name of ['theme-init', 'footer-year', 'register-sw']) {
   await minifyFile(path.join(assets, `${name}.js`), source);
 }
 const worker = (await readFile(path.join(root, 'js/service-worker.js'), 'utf8'))
-  .replaceAll('__BUILD_VERSION__', JSON.stringify(process.env.VERCEL_GIT_COMMIT_SHA || 'local'));
+  .replaceAll('__BUILD_VERSION__', JSON.stringify(release));
 await minifyFile(path.join(out, 'sw.js'), worker);
 
 await cp(path.join(root, 'css'), path.join(out, 'css'), { recursive: true });
@@ -69,16 +70,16 @@ await cp(path.join(root, 'icons/app-icon.svg'), path.join(out, 'icons/app-icon.s
 for (const name of ['index.html', 'app.html', 'privacidad.html', 'terminos.html']) {
   let html = await readFile(path.join(root, name), 'utf8');
   html = html
-    .replaceAll('/js/theme-init.js', '/assets/theme-init.js')
-    .replaceAll('/js/footer-year.js', '/assets/footer-year.js')
-    .replaceAll('js/theme-toggle.js', '/assets/theme-toggle.js')
-    .replaceAll('js/landing-ui.js', '/assets/landing-ui.js')
-    .replaceAll('js/landing.js', '/assets/landing.js')
-    .replaceAll('/js/boot.js', '/assets/boot.js')
+    .replaceAll('/js/theme-init.js', `/assets/theme-init.js?v=${release}`)
+    .replaceAll('/js/footer-year.js', `/assets/footer-year.js?v=${release}`)
+    .replaceAll('js/theme-toggle.js', `/assets/theme-toggle.js?v=${release}`)
+    .replaceAll('js/landing-ui.js', `/assets/landing-ui.js?v=${release}`)
+    .replaceAll('js/landing.js', `/assets/landing.js?v=${release}`)
+    .replaceAll('/js/boot.js', `/assets/boot.js?v=${release}`)
     .replace(/^<link rel="modulepreload" href="\/js\/.*?"\/>\r?\n/gm, '');
-  if (name === 'app.html') html = html.replace('</head>', '<link rel="modulepreload" href="/assets/boot.js">\n</head>');
+  if (name === 'app.html') html = html.replace('</head>', `<link rel="modulepreload" href="/assets/boot.js?v=${release}">\n</head>`);
   html = html.replace('</head>', '<link rel="manifest" href="/manifest.webmanifest">\n<meta name="theme-color" content="#07111f">\n</head>');
-  html = html.replace('</body>', '<script src="/assets/register-sw.js" defer></script>\n</body>');
+  html = html.replace('</body>', `<script src="/assets/register-sw.js?v=${release}" defer></script>\n</body>`);
   await writeFile(path.join(out, name), html);
 }
 
