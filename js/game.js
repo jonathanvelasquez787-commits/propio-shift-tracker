@@ -1,5 +1,6 @@
 import {
   appConfirm,
+  callDateKeyFromValue,
   callDateToDate,
   calls,
   callsForDay,
@@ -111,12 +112,20 @@ function ensureGameSettings() {
   return settings.game;
 }
 
-export function ensureGameState() {
+function currentGameDayKey() {
+  const startedAt = state.shiftStartedAt ? new Date(state.shiftStartedAt) : null;
+  if (startedAt && !Number.isNaN(startedAt.getTime()) && !state.shiftEndedAt) {
+    return todayCallDateKey(startedAt);
+  }
+  return todayCallDateKey();
+}
+
+export function ensureGameState(preferredDayKey = null) {
   const normalized = normalizeGameState(state.game);
   state.game = normalized;
-  const today = todayCallDateKey();
-  if (state.game.live.dayKey !== today) {
-    state.game.live = { dayKey: today, combo: 0, shiftAlarmAt: null };
+  const targetDay = callDateKeyFromValue(preferredDayKey) || currentGameDayKey();
+  if (state.game.live.dayKey !== targetDay) {
+    state.game.live = { dayKey: targetDay, combo: 0, shiftAlarmAt: null };
   }
   pruneGameDays();
   state.game.level = levelForXp(state.game.totalXp);
@@ -357,7 +366,7 @@ function renderArena() {
   const root = document.getElementById('gameArena');
   const classic = document.getElementById('classicDailyGoalCard');
   if (!root || !classic) return;
-  const dayKey = todayCallDateKey();
+  const dayKey = currentGameDayKey();
   const day = computeGameDay(dayKey);
   const active = gameEnabled() && day.goal.usd > 0;
   root.hidden = !active;
@@ -404,7 +413,7 @@ function renderMissions() {
     return;
   }
   root.hidden = false;
-  const day = computeGameDay(todayCallDateKey());
+  const day = computeGameDay(currentGameDayKey());
   root.innerHTML = `
     <div class="game-section-head"><div><span class="game-kicker">3 ARMADURAS</span><h3>Misiones del día</h3></div><strong>${day.missions.filter((mission) => mission.ok).length}/3</strong></div>
     <div class="game-mission-grid">${day.missions.map((mission, index) => `
@@ -981,7 +990,7 @@ function latestOtherGapResetTime(dayKey) {
 function reconcileLiveComboAndLoot(dayKey, snapshot, { allowRewards = true } = {}) {
   const eligible = [...(snapshot?.eligibleCalls || [])].sort((a, b) => new Date(a.startISO) - new Date(b.startISO));
 
-  if (dayKey === todayCallDateKey()) {
+  if (dayKey === currentGameDayKey()) {
     const resetAt = latestOtherGapResetTime(dayKey);
     state.game.live.combo = eligible.filter((call) => new Date(call.startISO).getTime() >= resetAt).length;
   }
@@ -1043,9 +1052,11 @@ function maybeShowRecord(call) {
 
 export function onGameCallSaved(call, source = 'manual') {
   if (!gameEnabled() || !call || !['manual', 'live', 'import'].includes(source)) return;
-  const dayKey = todayCallDateKey();
+  const dayKey = callDateKeyFromValue(call.shiftDayKey)
+    || callDateKeyFromValue(call.callDate)
+    || currentGameDayKey();
   if (!callIsXpEligible(call, dayKey)) return;
-  ensureGameState();
+  ensureGameState(dayKey);
   if (state.game.days[dayKey]?.finalized) {
     onGameCallsChanged(dayKey);
     return;
@@ -1105,7 +1116,7 @@ export function onGameCallSaved(call, source = 'manual') {
 export function onGameGapSaved(dayKey, gapKey, label) {
   if (!gameEnabled()) return;
   ensureGameState();
-  if (dayKey === todayCallDateKey() && String(label).toLowerCase() === 'other') state.game.live.combo = 0;
+  if (dayKey === currentGameDayKey() && String(label).toLowerCase() === 'other') state.game.live.combo = 0;
   if (state.game.days[dayKey]?.finalized) {
     saveStateOnly();
     renderGame();
@@ -1217,7 +1228,7 @@ export function onGameDayReset(dayKey) {
     state.game.chest = { pending: false, sealedOn: null };
   }
   delete state.game.days[normalized];
-  if (normalized === todayCallDateKey()) state.game.live.combo = 0;
+  if (normalized === currentGameDayKey()) state.game.live.combo = 0;
   state.game.level = levelForXp(state.game.totalXp);
   state.game.bestStreak = recomputeBestStreak();
   saveStateOnly();
@@ -1290,8 +1301,8 @@ function revokeStageClear(dayKey, { silent = false } = {}) {
 }
 
 export function onGameShiftStarted({ continued = false } = {}) {
-  ensureGameState();
-  const dayKey = todayCallDateKey();
+  const dayKey = currentGameDayKey();
+  ensureGameState(dayKey);
   const enabled = gameEnabled();
   const hadFinalizedDay = !!state.game.days[dayKey]?.finalized;
 
@@ -1464,10 +1475,10 @@ function openStageClear(dayKey, entry) {
   playGameTone('clear');
 }
 
-export function onGameShiftEnded(dayKey = todayCallDateKey()) {
+export function onGameShiftEnded(dayKey = currentGameDayKey()) {
   if (!gameEnabled()) return;
-  ensureGameState();
-  const normalizedDayKey = String(dayKey || todayCallDateKey());
+  const normalizedDayKey = callDateKeyFromValue(dayKey) || currentGameDayKey();
+  ensureGameState(normalizedDayKey);
   const entry = freezeGameDay(normalizedDayKey);
   saveStateOnly();
   renderGame();
@@ -1541,8 +1552,9 @@ function recordPreviousCycleOutcome() {
 }
 
 export function onGameDayRollover() {
+  // ensureGameState conserva el día en que arrancó un turno nocturno todavía activo. Solo cambia
+  // al nuevo día de calendario cuando ya no hay una sesión cruzando medianoche.
   ensureGameState();
-  state.game.live = { dayKey: todayCallDateKey(), combo: 0, shiftAlarmAt: null };
   if (gameEnabled()) recordPreviousCycleOutcome();
   saveStateOnly();
 }
