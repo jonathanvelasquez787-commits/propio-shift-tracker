@@ -1221,7 +1221,9 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
     }
 
     export function saveSettingsOnly() {
-      if (!safeLocalStorageSet(SETTINGS_KEY, JSON.stringify(settings))) toast(STORAGE_QUOTA_TOAST);
+      const ok = safeLocalStorageSet(SETTINGS_KEY, JSON.stringify(settings));
+      if (!ok) toast(STORAGE_QUOTA_TOAST);
+      return ok;
     }
 
     export function pad(n) { return String(n).padStart(2, '0'); }
@@ -5197,18 +5199,21 @@ function renderPayDatesSection() {
       }
       const reader = new FileReader();
       reader.onload = () => {
+        const previous = {
+          dataUrl: settings.productiveBreakCustomSoundDataUrl,
+          name: settings.productiveBreakCustomSoundName,
+          sound: settings.productiveBreakSound,
+        };
         settings.productiveBreakCustomSoundDataUrl = String(reader.result || '');
         settings.productiveBreakCustomSoundName = file.name;
         settings.productiveBreakSound = 'custom';
-        try {
+        if (!saveSettingsOnly()) {
+          // saveSettingsOnly reporta cuota llena sin lanzar excepción; se restaura el último estado
+          // persistible para que la UI nunca anuncie éxito con un sonido que desaparecerá al recargar.
+          settings.productiveBreakCustomSoundDataUrl = previous.dataUrl;
+          settings.productiveBreakCustomSoundName = previous.name;
+          settings.productiveBreakSound = previous.sound;
           saveSettingsOnly();
-        } catch {
-          // Cuota de localStorage llena (raro, pero posible si ya hay mucha
-          // data guardada) — se revierte para no dejar settings a medias
-          // con un Data URL que nunca se pudo persistir.
-          settings.productiveBreakCustomSoundDataUrl = '';
-          settings.productiveBreakCustomSoundName = '';
-          settings.productiveBreakSound = 'classic';
           toast('No se pudo guardar el sonido — el almacenamiento del navegador está lleno.');
           syncProductiveBreakCustomSoundUI();
           return;
@@ -5355,15 +5360,19 @@ function renderPayDatesSection() {
       }
       const reader = new FileReader();
       reader.onload = () => {
+        const previous = {
+          dataUrl: settings[cfg.urlKey],
+          name: settings[cfg.nameKey],
+          sound: settings[cfg.soundKey],
+        };
         settings[cfg.urlKey] = String(reader.result || '');
         settings[cfg.nameKey] = file.name;
         settings[cfg.soundKey] = 'custom';
-        try {
+        if (!saveSettingsOnly()) {
+          settings[cfg.urlKey] = previous.dataUrl;
+          settings[cfg.nameKey] = previous.name;
+          settings[cfg.soundKey] = previous.sound;
           saveSettingsOnly();
-        } catch {
-          settings[cfg.urlKey] = '';
-          settings[cfg.nameKey] = '';
-          settings[cfg.soundKey] = 'classic';
           toast('No se pudo guardar el sonido — el almacenamiento del navegador está lleno.');
           syncAlarmCustomSoundUI(kind);
           return;
