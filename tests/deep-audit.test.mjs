@@ -132,3 +132,17 @@ test('auditoría profunda: descartar una pausa continuada elimina sus artefactos
   assert.match(body, /state\.dayInterruptions\[accountingDay\] = state\.dayInterruptions\[accountingDay\][\s\S]*continuationInterruptionId/);
   assert.match(body, /state\.events = state\.events\.filter\(event => event\?\.id !== discarded\.continuationEventId\)/);
 });
+
+
+test('auditoría profunda: saveAll es atómico entre state calls y settings', () => {
+  const app = read('js/app-main.js');
+  const start = app.indexOf('export function saveAll()');
+  const end = app.indexOf('export function saveStateOnly()', start);
+  const body = app.slice(start, end);
+  assert.match(body, /const keys = \[STORAGE_KEY, CALLS_KEY, SETTINGS_KEY\]/);
+  assert.match(body, /const previous = \{\}/);
+  assert.match(body, /if \(!safeLocalStorageSet\(key, next\[key\]\)\)/);
+  assert.match(body, /localStorage\.removeItem\(key\)/);
+  assert.match(body, /safeLocalStorageSet\(key, previous\[key\]\)/);
+  assert.match(body, /return ok/);
+});
