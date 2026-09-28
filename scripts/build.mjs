@@ -33,7 +33,7 @@ for (const [name, input] of Object.entries(entries)) {
   });
   await bundle.write({
     file: path.join(assets, `${name}.js`),
-    format: 'es',
+    format: name === 'boot' || name === 'landing' ? 'iife' : 'es',
     inlineDynamicImports: true,
     sourcemap: false,
   });
@@ -50,7 +50,10 @@ async function minifyTree(dir) {
   for (const entry of await readdir(dir, { withFileTypes: true })) {
     const file = path.join(dir, entry.name);
     if (entry.isDirectory()) await minifyTree(file);
-    else if (entry.name.endsWith('.js')) await minifyFile(file, await readFile(file, 'utf8'), true);
+    else if (entry.name.endsWith('.js')) {
+      const isModule = entry.name !== 'boot.js' && entry.name !== 'landing.js';
+      await minifyFile(file, await readFile(file, 'utf8'), isModule);
+    }
   }
 }
 
@@ -76,6 +79,7 @@ for (const name of ['index.html', 'app.html', 'privacidad.html', 'terminos.html'
     .replaceAll('js/landing-ui.js', `/assets/landing-ui.js?v=${release}`)
     .replaceAll('js/landing.js', `/assets/landing.js?v=${release}`)
     .replaceAll('/js/boot.js', `/assets/boot.js?v=${release}`)
+    .replace(/<script type="module" src="(\/assets\/(?:landing|boot)\.js\?v=[^"]+)"><\/script>/g, '<script src="$1" defer></script>')
     .replace(/^<link rel="modulepreload" href="\/js\/.*?"\/>\r?\n/gm, '');
   if (name === 'app.html') html = html.replace('</head>', `<link rel="modulepreload" href="/assets/boot.js?v=${release}">\n</head>`);
   html = html.replace('</head>', '<link rel="manifest" href="/manifest.webmanifest">\n<meta name="theme-color" content="#07111f">\n</head>');
