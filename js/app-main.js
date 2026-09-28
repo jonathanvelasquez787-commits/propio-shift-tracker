@@ -1209,11 +1209,38 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
     const STORAGE_QUOTA_TOAST = '⚠️ No se pudo guardar — el almacenamiento del navegador está lleno. Tu cambio se mantiene en esta sesión, pero no quedará guardado hasta que liberes espacio (borra llamadas muy viejas o un sonido personalizado en Avisos).';
 
     export function saveAll() {
-      const stateOk = safeLocalStorageSet(STORAGE_KEY, JSON.stringify(state));
-      const callsOk = safeLocalStorageSet(CALLS_KEY, JSON.stringify(calls));
-      const settingsOk = safeLocalStorageSet(SETTINGS_KEY, JSON.stringify(settings));
-      if (!stateOk || !callsOk || !settingsOk) toast(STORAGE_QUOTA_TOAST);
+      const keys = [STORAGE_KEY, CALLS_KEY, SETTINGS_KEY];
+      const previous = {};
+      try {
+        keys.forEach(key => { previous[key] = localStorage.getItem(key); });
+      } catch {
+        keys.forEach(key => { previous[key] = null; });
+      }
+
+      const next = {
+        [STORAGE_KEY]: JSON.stringify(state),
+        [CALLS_KEY]: JSON.stringify(calls),
+        [SETTINGS_KEY]: JSON.stringify(settings),
+      };
+      let ok = true;
+      for (const key of keys) {
+        if (!safeLocalStorageSet(key, next[key])) {
+          ok = false;
+          break;
+        }
+      }
+
+      if (!ok) {
+        // state/calls/settings describen un solo snapshot. Nunca dejar una mezcla parcial en disco
+        // si la cuota se llena a mitad del guardado.
+        try { keys.forEach(key => localStorage.removeItem(key)); } catch {}
+        keys.forEach(key => {
+          if (previous[key] !== null) safeLocalStorageSet(key, previous[key]);
+        });
+        toast(STORAGE_QUOTA_TOAST);
+      }
       render();
+      return ok;
     }
 
     export function saveStateOnly() {
