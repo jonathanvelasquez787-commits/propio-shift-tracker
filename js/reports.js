@@ -337,7 +337,7 @@ function reportsTrends() {
   };
 }
 
-function dayComplianceStatus(dayKey) {
+export function dayComplianceStatus(dayKey) {
   if (dayIsEffectivelyOff(dayKey)) return 'off';
   const isToday = dayKey === todayCallDateKey();
   const adherence = dayAdherence(dayKey);
@@ -349,7 +349,7 @@ function dayComplianceStatus(dayKey) {
   return (meetsAdherence && meetsProductivity) ? 'compliant' : 'failed';
 }
 
-function computeComplianceStreak() {
+export function computeComplianceStreak() {
   const skipOff = settings.streakSkipOffDays !== false;
   let streak = 0;
   let cursor = todayRange();
