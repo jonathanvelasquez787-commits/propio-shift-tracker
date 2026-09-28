@@ -31,10 +31,12 @@ import {
   iconHtml,
   importedCallStats,
   money,
+  onGameDayMetadataChanged,
   pad,
   previousCalendarDay,
   productiveMinutesForDay,
   reportsMonthlyOffset,
+  render,
   saveSettingsOnly,
   settings,
   state,
@@ -436,7 +438,8 @@ export function reportsCycleProjection() {
 function updateStreakSkipOffSetting(checked) {
   settings.streakSkipOffDays = !!checked;
   saveSettingsOnly();
-  renderReportsDashboard();
+  onGameDayMetadataChanged(todayCallDateKey());
+  render();
 }
 
 function trendChipHtml(label, pct, opts = {}) {
