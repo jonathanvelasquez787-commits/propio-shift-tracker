@@ -35,18 +35,22 @@ self.addEventListener('fetch', (event) => {
           caches.open(CACHE).then((cache) => cache.put(request, copy));
           return response;
         })
-        .catch(() => caches.match(request).then((hit) => hit || caches.match('/index.html')))
+        .catch(() =>
+          caches.open(CACHE).then(async (cache) => (await cache.match(request)) || cache.match('/index.html'))
+        )
     );
     return;
   }
 
   event.respondWith(
-    caches.match(request).then((cached) => {
-      const fresh = fetch(request).then((response) => {
-        if (response.ok) caches.open(CACHE).then((cache) => cache.put(request, response.clone()));
-        return response;
-      });
-      return cached || fresh;
-    })
+    caches.open(CACHE).then((cache) =>
+      cache.match(request).then((cached) => {
+        const fresh = fetch(request).then((response) => {
+          if (response.ok) cache.put(request, response.clone());
+          return response;
+        });
+        return cached || fresh;
+      })
+    )
   );
 });

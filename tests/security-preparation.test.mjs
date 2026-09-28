@@ -96,6 +96,9 @@ test('PWA shell includes a manifest and service worker with API exclusions', () 
   const worker = read('js/service-worker.js');
   assert.match(worker, /url\.pathname\.startsWith\('\/api\/'\)/);
   assert.match(worker, /request\.mode === 'navigate'/);
+  assert.match(worker, /cache\.match\(request\)/);
+  assert.doesNotMatch(worker, /caches\.match\(request\)/);
+  assert.match(read('scripts/build.mjs'), /\?v=\$\{release\}/);
 });
 
 test('footer year tolerates pages without a footer', () => {
