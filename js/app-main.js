@@ -73,6 +73,7 @@ import {
   scheduleWeekHasCustom,
   scheduleWeekIsPast,
   syncShiftModalFields,
+  syncScheduleOffsetUI,
 } from './schedule.js';
 
 
