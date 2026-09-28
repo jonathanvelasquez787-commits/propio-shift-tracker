@@ -3714,8 +3714,9 @@ function renderPayDatesSection() {
       // advertía nada.
       if (state.activeCall) {
         appConfirm('Tienes una llamada en curso. Al finalizar el turno se guardará esa llamada con la duración transcurrida hasta ahora y luego se cerrará el turno. ¿Finalizar de todos modos?', () => {
-          endCall();
-          endShift();
+          const saved = endCall();
+          if (saved) endShift();
+          else toast('Resuelve la llamada pendiente antes de finalizar el turno');
         });
         return;
       }
@@ -3839,13 +3840,14 @@ function renderPayDatesSection() {
 
     function endShift() {
       if (!state.shiftStartedAt || state.shiftEndedAt) return;
+      const shiftDayKey = todayCallDateKey(new Date(state.shiftStartedAt));
       if (state.activePause) endPause({ silent: true, deferSave: true });
       const now = new Date().toISOString();
       state.shiftEndedAt = now;
       setEvent('shift', 'Shift terminado', fmtTime(new Date(now)), 'manual');
       saveAll();
       toast('Shift terminado');
-      onGameShiftEnded();
+      onGameShiftEnded(shiftDayKey);
     }
 
     function startPause(type) {
@@ -3953,7 +3955,7 @@ function renderPayDatesSection() {
       state.lastCallEndedAt = endedAt;
       saveStateOnly();
       render();
-      autoSaveLiveCall(startedAt, endedAt);
+      return autoSaveLiveCall(startedAt, endedAt);
     }
 
     // Barra fija de actividad en vivo ---- A diferencia de endCall (que SIEMPRE guarda la llamada,
@@ -3962,7 +3964,6 @@ function renderPayDatesSection() {
       if (!state.activeCall) return;
       appConfirm('¿Descartar esta llamada sin guardarla? El tiempo registrado se pierde y no queda ninguna fila en Tabla de llamadas.', () => {
         state.activeCall = null;
-        state.lastCallEndedAt = new Date().toISOString();
         saveStateOnly();
         render();
         toast('Llamada descartada');
@@ -4213,10 +4214,10 @@ function renderPayDatesSection() {
 
     // Pinta el resumen de filas omitidas al importar (duplicados exactos + traslapes), cada una con
     // su motivo, dentro de #importSkippedSummary — reemplaza el toast-solo-conteo de antes.
-    function renderImportSkippedSummary(duplicates, overlaps, futureRows = [], replacedLive = []) {
+    function renderImportSkippedSummary(duplicates, overlaps, futureRows = [], replacedLive = [], correctedOfficial = []) {
       const el = document.getElementById('importSkippedSummary');
       if (!el) return;
-      const total = duplicates.length + overlaps.length + futureRows.length + replacedLive.length;
+      const total = duplicates.length + overlaps.length + futureRows.length + replacedLive.length + correctedOfficial.length;
       if (!total) {
         el.style.display = 'none';
         el.innerHTML = '';
@@ -4224,27 +4225,42 @@ function renderPayDatesSection() {
       }
       const rowsHtml = [];
       duplicates.forEach(c => {
-        rowsHtml.push(`<li>#${escapeHtml(c.customerId)} · ${escapeHtml(c.callDate)} ${escapeHtml(c.callStart)} — Duplicado exacto de una llamada ya guardada (mismo cliente/fecha/hora/duración/pago/billable/dropped)</li>`);
+        rowsHtml.push(`<li>#${escapeHtml(c.customerId)} · ${escapeHtml(c.callDate)} ${escapeHtml(c.callStart)} — Duplicado exacto de una llamada ya guardada</li>`);
       });
       overlaps.forEach(o => {
         rowsHtml.push(`<li>#${escapeHtml(o.customerId)} · ${escapeHtml(o.callDate)} ${escapeHtml(o.callStart)} — Traslapa con la llamada #${escapeHtml(o.withCustomerId)} (${escapeHtml(o.withCallStart)}) ya guardada</li>`);
       });
       futureRows.forEach(c => {
-        rowsHtml.push(`<li>#${escapeHtml(c.customerId)} · ${escapeHtml(c.callDate)} ${escapeHtml(c.callStart)} — Hora futura: no se importó para evitar registrar una llamada que todavía no ocurrió</li>`);
+        rowsHtml.push(`<li>#${escapeHtml(c.customerId)} · ${escapeHtml(c.callDate)} ${escapeHtml(c.callStart)} — Termina en el futuro: no se importó</li>`);
       });
       replacedLive.forEach(item => {
-        rowsHtml.push(`<li>#${escapeHtml(item.call.customerId)} · ${escapeHtml(item.call.callDate)} ${escapeHtml(item.call.callStart)} — Reemplazó la llamada en vivo provisional por los datos oficiales pegados</li>`);
+        rowsHtml.push(`<li>#${escapeHtml(item.call.customerId)} · ${escapeHtml(item.call.callDate)} ${escapeHtml(item.call.callStart)} — Reemplazó la llamada en vivo provisional por los datos oficiales</li>`);
+      });
+      correctedOfficial.forEach(item => {
+        rowsHtml.push(`<li>#${escapeHtml(item.call.customerId)} · ${escapeHtml(item.call.callDate)} ${escapeHtml(item.call.callStart)} — Actualizó una llamada oficial que Propio corrigió</li>`);
       });
       const omitted = duplicates.length + overlaps.length + futureRows.length;
+      const updates = replacedLive.length + correctedOfficial.length;
       const headline = omitted
-        ? `${omitted} fila(s) omitida(s) · ${replacedLive.length} llamada(s) en vivo actualizada(s)`
-        : `${replacedLive.length} llamada(s) en vivo actualizada(s) con datos oficiales`;
+        ? `${omitted} fila(s) omitida(s) · ${updates} llamada(s) actualizada(s)`
+        : `${updates} llamada(s) actualizada(s) con datos oficiales`;
       el.innerHTML = `<strong>${headline}:</strong><ul style="margin:6px 0 0; padding-left:18px;">${rowsHtml.join('')}</ul>`;
       el.style.display = '';
     }
 
     function isReplaceableLiveCall(call) {
       return !!call && String(call.source || '').toLowerCase() === 'live';
+    }
+
+    function sameImportedCallIdentity(existingCall, incomingCall) {
+      if (!existingCall || String(existingCall.source || '').toLowerCase() !== 'import') return false;
+      if (callDateKeyFromValue(existingCall.callDate) !== callDateKeyFromValue(incomingCall.callDate)) return false;
+      const existingCustomer = String(existingCall.customerId || '').trim();
+      const incomingCustomer = String(incomingCall.customerId || '').trim();
+      if (!existingCustomer || !incomingCustomer || existingCustomer !== incomingCustomer) return false;
+      const a = new Date(existingCall.startISO).getTime();
+      const b = new Date(incomingCall.startISO).getTime();
+      return Number.isFinite(a) && Number.isFinite(b) && Math.abs(a - b) <= 2 * 60000;
     }
 
     function importCalls() {
@@ -4257,15 +4273,13 @@ function renderPayDatesSection() {
 
       const importTs = new Date().toISOString();
       const importNow = new Date(importTs).getTime();
-      // Las llamadas live son provisionales: el pegado oficial puede reemplazarlas si ocupa el mismo
-      // intervalo. No se incluyen en la deduplicación exacta para permitir esa sustitución.
       const existing = new Set(calls.filter(c => !isReplaceableLiveCall(c)).map(callDedupeKey));
       const skippedDuplicates = [];
       const futureRows = [];
       const deduped = parsed
         .filter(c => {
-          const startsAt = new Date(c.startISO).getTime();
-          if (Number.isFinite(startsAt) && startsAt > importNow) {
+          const endsAt = new Date(c.endISO).getTime();
+          if (Number.isFinite(endsAt) && endsAt > importNow) {
             futureRows.push(c);
             return false;
           }
@@ -4280,6 +4294,7 @@ function renderPayDatesSection() {
       const overlapCheckSet = [...calls];
       const accepted = [];
       const replacedLive = [];
+      const correctedOfficial = [];
       const replacedIds = new Set();
       const skippedOverlaps = [];
       let overlapSkipped = 0;
@@ -4288,7 +4303,7 @@ function renderPayDatesSection() {
         const overlaps = overlapCheckSet.filter(existingCall => callsOverlap(existingCall, c));
         if (!overlaps.length) {
           overlapCheckSet.push(c);
-          accepted.push({ call: c, replacesLiveId: null });
+          accepted.push({ call: c, replaces: null, replacementKind: null });
           continue;
         }
 
@@ -4298,8 +4313,19 @@ function renderPayDatesSection() {
           const index = overlapCheckSet.findIndex(item => item.id === provisional.id);
           if (index >= 0) overlapCheckSet.splice(index, 1);
           overlapCheckSet.push(c);
-          accepted.push({ call: c, replacesLiveId: provisional.id });
+          accepted.push({ call: c, replaces: provisional, replacementKind: 'live' });
           replacedLive.push({ call: c, provisional });
+          continue;
+        }
+
+        if (overlaps.length === 1 && sameImportedCallIdentity(overlaps[0], c)) {
+          const previous = overlaps[0];
+          replacedIds.add(previous.id);
+          const index = overlapCheckSet.findIndex(item => item.id === previous.id);
+          if (index >= 0) overlapCheckSet.splice(index, 1);
+          overlapCheckSet.push(c);
+          accepted.push({ call: c, replaces: previous, replacementKind: 'import' });
+          correctedOfficial.push({ call: c, previous });
           continue;
         }
 
@@ -4310,28 +4336,34 @@ function renderPayDatesSection() {
 
       if (replacedIds.size) calls = calls.filter(c => !replacedIds.has(c.id));
 
-      const importedRows = accepted.map(item => ({
-        ...item,
-        call: { ...item.call, importedAt: importTs, source: 'import' },
-      }));
-      const importedDates = new Set();
-      const replacedDates = new Set();
+      const importedRows = accepted.map(item => {
+        const preserveOfficialIdentity = item.replacementKind === 'import' && item.replaces;
+        const call = {
+          ...item.call,
+          id: preserveOfficialIdentity ? item.replaces.id : item.call.id,
+          importedAt: preserveOfficialIdentity ? (item.replaces.importedAt || importTs) : importTs,
+          source: 'import',
+        };
+        return { ...item, call };
+      });
 
-      // Se insertan cronológicamente para que combo, cajas cada 5 llamadas y derrota del monstruo
-      // se comporten igual que si las llamadas hubieran llegado una por una.
+      const importedDates = new Set();
       importedRows.forEach(item => {
         calls = [...calls, item.call].sort((a, b) => new Date(a.startISO) - new Date(b.startISO));
         const dayKey = callDateKeyFromValue(item.call.callDate);
         if (dayKey) importedDates.add(dayKey);
-        if (item.replacesLiveId) {
-          if (dayKey) replacedDates.add(dayKey);
-        } else {
-          onGameCallSaved(item.call, 'import');
+
+        if (!item.replacementKind) onGameCallSaved(item.call, 'import');
+
+        if (item.replacementKind === 'live' && state.lastCallEndedAt && item.replaces?.endISO) {
+          const tracked = new Date(state.lastCallEndedAt).getTime();
+          const provisionalEnd = new Date(item.replaces.endISO).getTime();
+          if (Number.isFinite(tracked) && Number.isFinite(provisionalEnd) && Math.abs(tracked - provisionalEnd) <= 1000) {
+            state.lastCallEndedAt = item.call.endISO;
+          }
         }
       });
 
-      // Importar/pegar también debe reconciliar snapshots ya cerrados y cambios de una llamada live
-      // provisional a la fila oficial.
       importedDates.forEach(dayKey => onGameCallsChanged(dayKey));
 
       const importedDateList = [...importedDates].sort((a, b) => callDateToDate(a) - callDateToDate(b));
@@ -4339,7 +4371,6 @@ function renderPayDatesSection() {
       const preferredDay = importedDateList.includes(todayKey)
         ? todayKey
         : importedDateList[importedDateList.length - 1] || defaultActiveDayKey();
-
       if (importedRows.length) state.activeDayKey = preferredDay;
 
       ta.value = '';
@@ -4353,16 +4384,17 @@ function renderPayDatesSection() {
       const duplicateNote = skippedDuplicates.length ? ` · ${skippedDuplicates.length} duplicada(s) omitida(s)` : '';
       const futureNote = futureRows.length ? ` · ${futureRows.length} futura(s) omitida(s)` : '';
       const replacedNote = replacedLive.length ? ` · ${replacedLive.length} live actualizada(s)` : '';
+      const correctedNote = correctedOfficial.length ? ` · ${correctedOfficial.length} oficial(es) corregida(s)` : '';
 
-      setEvent('import', 'Llamadas importadas', `${unique.length} fila(s) · ${importNote}${overlapNote}${duplicateNote}${futureNote}${replacedNote}`, 'Propio');
-      if (unique.length || replacedLive.length) financeRunAutoFillCascade();
+      setEvent('import', 'Llamadas importadas', `${unique.length} fila(s) · ${importNote}${overlapNote}${duplicateNote}${futureNote}${replacedNote}${correctedNote}`, 'Propio');
+      if (unique.length || replacedLive.length || correctedOfficial.length) financeRunAutoFillCascade();
       saveAll();
-      renderImportSkippedSummary(skippedDuplicates, skippedOverlaps, futureRows, replacedLive);
+      renderImportSkippedSummary(skippedDuplicates, skippedOverlaps, futureRows, replacedLive, correctedOfficial);
 
       if (!unique.length && (overlapSkipped || skippedDuplicates.length || futureRows.length)) {
         toast(`Ninguna fila nueva — ${overlapSkipped + skippedDuplicates.length + futureRows.length} omitida(s). Revisa el detalle debajo del cuadro de texto.`);
       } else {
-        toast(`${unique.length} llamada(s) importada(s)${replacedNote}${overlapNote}${duplicateNote}${futureNote}`);
+        toast(`${unique.length} llamada(s) importada(s)${replacedNote}${correctedNote}${overlapNote}${duplicateNote}${futureNote}`);
       }
     }
 

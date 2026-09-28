@@ -221,9 +221,10 @@ export function computeGameDay(dayKey = todayCallDateKey(), { ignoreLock = false
   const stats = importedCallStats(dayCalls, dayKey);
   const goal = effectiveDailyGoal(dayKey);
   const adherence = dayAdherence(dayKey);
-  const missions = missionSnapshot(dayKey, stats, goal, adherence);
   const eligibleCalls = dayCalls.filter((call) => callIsXpEligible(call, dayKey));
-  const productivityXp = goal.min > 0 ? Math.round(Math.min(1, stats.productive / goal.min) * 50) : 50;
+  const xpStats = importedCallStats(eligibleCalls, dayKey);
+  const missions = missionSnapshot(dayKey, xpStats, goal, adherence);
+  const productivityXp = goal.min > 0 ? Math.round(Math.min(1, xpStats.productive / goal.min) * 50) : 50;
   const callsXp = Math.min(30, eligibleCalls.reduce((sum, call) => sum + callXp(call), 0));
   const adherencePct = Math.max(0, Number(adherence?.scorePct) || 0);
   const adherenceGoal = Number(settings.adherenceGoalPct) || 95;
@@ -231,16 +232,21 @@ export function computeGameDay(dayKey = todayCallDateKey(), { ignoreLock = false
   const punctualityXp = state.game.ledger[`reflex:${dayKey}`] ? 20 : 0;
   const missionXp = missions.every((mission) => mission.ok) ? 20 : 0;
   const bonusXp = Math.max(0, Number(state.game.days[dayKey]?.bonusXp) || 0);
-  const rawXp = dayCalls.length ? Math.min(GAME_DAILY_XP_CAP, productivityXp + callsXp + adherenceXp + punctualityXp + missionXp + bonusXp) : 0;
+  // Una importación tardía/histórica no abre la puerta a XP indirecto de productividad,
+  // adherencia o misiones. Tiene que existir al menos una llamada elegible de hoy.
+  const rawXp = eligibleCalls.length
+    ? Math.min(GAME_DAILY_XP_CAP, productivityXp + callsXp + adherenceXp + punctualityXp + missionXp + bonusXp)
+    : 0;
   const lockedXp = ignoreLock ? Number.NaN : Number(state.game.days[dayKey]?.xpLocked);
   const xp = Number.isFinite(lockedXp) ? Math.min(rawXp, lockedXp) : rawXp;
   const completedMissions = missions.filter((mission) => mission.ok).length;
-  const stars = dayCalls.length ? Math.max(1, completedMissions) : 0;
+  const stars = eligibleCalls.length ? Math.max(1, completedMissions) : 0;
   const hpPct = goal.usd > 0 ? Math.max(0, Math.min(100, (1 - stats.earnings / goal.usd) * 100)) : 100;
   const defeated = goal.usd > 0 && hpPct <= 0;
   return {
     dayKey,
     stats,
+    xpStats,
     goal,
     adherence,
     missions,
@@ -252,74 +258,6 @@ export function computeGameDay(dayKey = todayCallDateKey(), { ignoreLock = false
     defeated,
     species: monsterForWeekday(weekdayKeyForDayKey(dayKey)),
   };
-}
-
-function gameStreak() {
-  ensureGameState();
-  return Math.max(0, Number(computeComplianceStreak()?.days) || 0);
-}
-
-function recomputeBestStreak() {
-  let best = 0;
-  let current = 0;
-  let cursor = callDateToDate(todayCallDateKey()) || new Date();
-  for (let i = 0; i < GAME_DAY_LIMIT; i++) {
-    const key = todayCallDateKey(cursor);
-    const status = dayComplianceStatus(key);
-    if (status === 'pending') {
-      cursor = new Date(cursor.getFullYear(), cursor.getMonth(), cursor.getDate() - 1);
-      continue;
-    }
-    if (status === 'off') {
-      if (settings.streakSkipOffDays !== false) {
-        cursor = new Date(cursor.getFullYear(), cursor.getMonth(), cursor.getDate() - 1);
-        continue;
-      }
-      current = 0;
-    } else if (status === 'compliant' || state.game.days[key]?.shieldUsed) {
-      current++;
-      best = Math.max(best, current);
-    } else {
-      current = 0;
-    }
-    cursor = new Date(cursor.getFullYear(), cursor.getMonth(), cursor.getDate() - 1);
-  }
-  return best;
-}
-
-function gameLevelProgress() {
-  ensureGameState();
-  const level = levelForXp(state.game.totalXp);
-  const floor = xpThresholdForLevel(level);
-  const ceiling = xpThresholdForLevel(level + 1);
-  return {
-    level,
-    floor,
-    ceiling,
-    current: state.game.totalXp,
-    pct: ceiling > floor ? Math.max(0, Math.min(100, ((state.game.totalXp - floor) / (ceiling - floor)) * 100)) : 100,
-    remaining: Math.max(0, ceiling - state.game.totalXp),
-  };
-}
-
-function withConversion(amount) {
-  const converted = convertedAmountText(amount);
-  return `${money(amount)}${converted ? ` (${escapeHtml(converted)})` : ''}`;
-}
-
-function monsterStateFor(day) {
-  if (day.defeated) return 'defeated';
-  if (state.activePause || !state.shiftStartedAt || state.shiftEndedAt) return 'sleeping';
-  if (higherRateLiveStatus()?.active) return 'fury';
-  if (day.hpPct <= 25) return 'wounded';
-  if (day.hpPct <= 50) return 'angry';
-  return 'awake';
-}
-
-function monsterVariantFor(day) {
-  if (higherRateLiveStatus()?.active) return 'gold';
-  if (gameStreak() >= 7) return 'streak';
-  return 'normal';
 }
 
 function yesterdayShadowPct() {
@@ -866,23 +804,27 @@ function nextUnownedAccessory(seed) {
 function rewardLootBox(dayKey, callCount) {
   const ledgerKey = `loot:${dayKey}:${callCount}`;
   if (state.game.ledger[ledgerKey]) return;
-  state.game.ledger[ledgerKey] = true;
   const root = document.getElementById('gameLootBox');
   const roll = hashText(ledgerKey) % 4;
   let reward;
+  let receipt = { type: 'none' };
   if (roll === 0) {
     const accessory = nextUnownedAccessory(`${ledgerKey}:accessory`);
     if (accessory) {
       state.game.accessories.push(accessory);
+      receipt = { type: 'accessory', accessory };
       reward = `Accesorio: ${accessory}`;
     } else {
       const granted = grantDayBonus(dayKey, 10);
+      if (granted > 0) receipt = { type: 'bonusXp', amount: granted };
       reward = granted > 0 ? `Colección completa · +${granted} XP` : 'Colección completa · XP diario sellado';
     }
   } else {
     const granted = grantDayBonus(dayKey, 10);
+    if (granted > 0) receipt = { type: 'bonusXp', amount: granted };
     reward = granted > 0 ? `+${granted} XP cosmético` : 'XP diario ya sellado';
   }
+  state.game.ledger[ledgerKey] = receipt;
   if (root) {
     root.hidden = false;
     root.classList.toggle('is-revealing', arcadeEnabled());
@@ -894,6 +836,62 @@ function rewardLootBox(dayKey, callCount) {
   }
   queueGameToast(`🎁 ${reward}`, 'loot');
 }
+
+function rollbackLootReceipt(dayKey, ledgerKey) {
+  const receipt = state.game.ledger[ledgerKey];
+  if (receipt && typeof receipt === 'object') {
+    if (receipt.type === 'accessory' && receipt.accessory) {
+      state.game.accessories = state.game.accessories.filter((item) => item !== receipt.accessory);
+    } else if (receipt.type === 'bonusXp' && Number(receipt.amount) > 0) {
+      const entry = dayEntry(dayKey);
+      entry.bonusXp = Math.max(0, (Number(entry.bonusXp) || 0) - Number(receipt.amount));
+    }
+  }
+  delete state.game.ledger[ledgerKey];
+}
+
+function latestOtherGapResetTime(dayKey) {
+  const bucket = state.gapAnnotations?.[dayKey];
+  if (!bucket || typeof bucket !== 'object') return Number.NEGATIVE_INFINITY;
+  let latest = Number.NEGATIVE_INFINITY;
+  Object.entries(bucket).forEach(([gapKey, value]) => {
+    if (String(value?.label || '').toLowerCase() !== 'other') return;
+    const parts = String(gapKey).split('|');
+    const currentStart = parts[3];
+    const time = new Date(currentStart || 0).getTime();
+    if (Number.isFinite(time)) latest = Math.max(latest, time);
+  });
+  return latest;
+}
+
+function reconcileLiveComboAndLoot(dayKey, snapshot, { allowRewards = true } = {}) {
+  const eligible = [...(snapshot?.eligibleCalls || [])].sort((a, b) => new Date(a.startISO) - new Date(b.startISO));
+
+  if (dayKey === todayCallDateKey()) {
+    const resetAt = latestOtherGapResetTime(dayKey);
+    state.game.live.combo = eligible.filter((call) => new Date(call.startISO).getTime() >= resetAt).length;
+  }
+
+  const validMilestones = new Set();
+  for (let count = 5; count <= eligible.length; count += 5) validMilestones.add(count);
+  const prefix = `loot:${dayKey}:`;
+
+  Object.keys(state.game.ledger)
+    .filter((key) => key.startsWith(prefix))
+    .forEach((key) => {
+      const count = Number(key.slice(prefix.length));
+      if (!validMilestones.has(count)) rollbackLootReceipt(dayKey, key);
+    });
+
+  if (allowRewards) {
+    validMilestones.forEach((count) => {
+      const key = `${prefix}${count}`;
+      if (!state.game.ledger[key]) rewardLootBox(dayKey, count);
+    });
+  }
+}
+
+let gameRecordBannerTimer = null;
 
 let gameRecordBannerTimer = null;
 
@@ -936,6 +934,10 @@ export function onGameCallSaved(call, source = 'manual') {
   const dayKey = todayCallDateKey();
   if (!callIsXpEligible(call, dayKey)) return;
   ensureGameState();
+  if (state.game.days[dayKey]?.finalized) {
+    onGameCallsChanged(dayKey);
+    return;
+  }
   const currentDay = computeGameDay(dayKey);
   const entry = dayEntry(dayKey);
   const xpLocked = Number.isFinite(Number(entry.xpLocked));
@@ -1008,13 +1010,17 @@ export function onGameCallsChanged(dayKey) {
   ensureGameState();
   const normalizedDayKey = String(dayKey || '');
   const entry = state.game.days[normalizedDayKey];
+
+  const beforeRewards = computeGameDay(normalizedDayKey, { ignoreLock: true });
+  reconcileLiveComboAndLoot(normalizedDayKey, beforeRewards, { allowRewards: enabled && !entry?.finalized });
+  const raw = computeGameDay(normalizedDayKey, { ignoreLock: true });
+
   if (!entry?.finalized) {
     if (entry) {
-      const rawLive = computeGameDay(normalizedDayKey, { ignoreLock: true });
       const existingLock = Number(entry.xpLocked);
       const defeatKey = `monster-defeat:${normalizedDayKey}`;
-      if (rawLive.defeated) {
-        entry.xpLocked = Number.isFinite(existingLock) ? Math.min(existingLock, rawLive.xp) : rawLive.xp;
+      if (raw.defeated) {
+        entry.xpLocked = Number.isFinite(existingLock) ? Math.min(existingLock, raw.xp) : raw.xp;
         if (!state.game.ledger[defeatKey]) {
           state.game.ledger[defeatKey] = true;
           if (enabled) queueGameToast('💥 MONSTRUO DERROTADO · datos reconciliados', 'record');
@@ -1029,57 +1035,36 @@ export function onGameCallsChanged(dayKey) {
     return !!entry;
   }
 
-  const raw = computeGameDay(normalizedDayKey, { ignoreLock: true });
-  const oldXp = Math.max(0, Number(entry.xp) || 0);
-  const existingLock = Number(entry.xpLocked);
-  const nextXp = raw.defeated && Number.isFinite(existingLock)
-    ? Math.min(raw.xp, existingLock)
-    : raw.xp;
-
-  const shouldUseShield = dayComplianceStatus(normalizedDayKey) === 'failed';
-  if (entry.shieldUsed && !shouldUseShield) {
-    state.game.shields = Math.min(GAME_SHIELD_CAP, state.game.shields + 1);
-    entry.shieldUsed = false;
-  } else if (!entry.shieldUsed && shouldUseShield && state.game.shields > 0) {
-    state.game.shields--;
-    entry.shieldUsed = true;
-  }
-
-  entry.xp = nextXp;
-  entry.xpBreakdown = { ...raw.xpBreakdown };
+  // STAGE CLEAR congela XP, estrellas, misiones, escudos y nivel. Una corrección posterior solo
+  // actualiza los hechos del día que pueden venir de Propio: dinero, llamadas y vida del monstruo.
   entry.earnings = Number(raw.stats.earnings) || 0;
-  entry.callCount = raw.stats.total || raw.eligibleCalls.length;
-  entry.stars = raw.stars;
-  entry.missions = raw.missions.map(({ id, ok, detail }) => ({ id, ok, detail }));
+  entry.callCount = callsForDay(normalizedDayKey).length;
   entry.monster = {
     species: raw.species.id,
     variant: monsterVariantFor(raw),
     defeated: raw.defeated,
     hpPct: raw.hpPct,
   };
-  if (raw.defeated) {
-    entry.xpLocked = nextXp;
-  } else {
+  entry.comparisons = stageComparisonSnapshot(normalizedDayKey, entry.earnings);
+  entry.correctedAt = new Date().toISOString();
+
+  // Este lock solo importa si el usuario decide reabrir el turno después de la corrección.
+  if (raw.defeated) entry.xpLocked = Math.min(Math.max(0, Number(entry.xp) || 0), raw.xp);
+  else {
     delete entry.xpLocked;
     delete state.game.ledger[`monster-defeat:${normalizedDayKey}`];
   }
 
-  state.game.totalXp = Math.max(0, state.game.totalXp + nextXp - oldXp);
-  state.game.level = levelForXp(state.game.totalXp);
-  state.game.bestStreak = recomputeBestStreak();
-
-  if (state.game.chest.pending && state.game.chest.sealedOn === normalizedDayKey && !(entry.callCount > 0)) {
-    state.game.chest = { pending: false, sealedOn: null };
-  }
-
-  entry.comparisons = stageComparisonSnapshot(normalizedDayKey, entry.earnings);
-  entry.totalXpAfter = state.game.totalXp;
-  entry.levelAfter = state.game.level;
-  entry.nextLevelXp = xpThresholdForLevel(state.game.level + 1);
-
   saveStateOnly();
   if (enabled) renderGame();
   return true;
+}
+
+export function onGameShiftAlarmFired(dayKey, firedAt = new Date().toISOString()) {
+  ensureGameState();
+  if (dayKey !== todayCallDateKey()) return;
+  state.game.live.shiftAlarmAt = firedAt;
+  saveStateOnly();
 }
 
 export function onGameShiftAlarmFired(dayKey, firedAt = new Date().toISOString()) {
@@ -1122,14 +1107,22 @@ export function onGameShiftStarted({ continued = false } = {}) {
   ensureGameState();
   const dayKey = todayCallDateKey();
   const enabled = gameEnabled();
+  const hadFinalizedDay = !!state.game.days[dayKey]?.finalized;
+
+  if (hadFinalizedDay) {
+    revokeStageClear(dayKey, { silent: true });
+    if (enabled) queueGameToast('STAGE CLEAR reabierto · el nuevo turno se sumará al cierre de hoy');
+  }
 
   if (continued) {
-    revokeStageClear(dayKey, { silent: !enabled });
     saveStateOnly();
     if (enabled) renderGame();
     return;
   }
-  if (!enabled) return;
+  if (!enabled) {
+    if (hadFinalizedDay) saveStateOnly();
+    return;
+  }
 
   openPendingChest(dayKey);
   const firedAt = new Date(state.game.live.shiftAlarmAt || 0).getTime();
@@ -1142,6 +1135,8 @@ export function onGameShiftStarted({ continued = false } = {}) {
   saveStateOnly();
   renderGame();
 }
+
+function stageComparisonSnapshot
 
 function stageComparisonSnapshot(dayKey, earnings) {
   const dayDate = callDateToDate(dayKey);
@@ -1195,7 +1190,7 @@ function freezeGameDay(dayKey) {
     xp: snapshot.xp,
     xpBreakdown: { ...snapshot.xpBreakdown },
     earnings: Number(snapshot.stats.earnings) || 0,
-    callCount: snapshot.stats.total || snapshot.eligibleCalls.length,
+    callCount: callsForDay(dayKey).length,
     comparisons,
     stars: snapshot.stars,
     missions: snapshot.missions.map(({ id, ok, detail }) => ({ id, ok, detail })),
@@ -1288,14 +1283,14 @@ function openStageClear(dayKey, entry) {
   playGameTone('clear');
 }
 
-export function onGameShiftEnded() {
+export function onGameShiftEnded(dayKey = todayCallDateKey()) {
   if (!gameEnabled()) return;
   ensureGameState();
-  const dayKey = todayCallDateKey();
-  const entry = freezeGameDay(dayKey);
+  const normalizedDayKey = String(dayKey || todayCallDateKey());
+  const entry = freezeGameDay(normalizedDayKey);
   saveStateOnly();
   renderGame();
-  openStageClear(dayKey, entry);
+  openStageClear(normalizedDayKey, entry);
 }
 
 function chestReward(sealedOn) {

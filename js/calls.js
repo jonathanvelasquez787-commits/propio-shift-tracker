@@ -132,6 +132,10 @@ export function saveCallEditor() {
   const affectedDayKey = callDateKeyFromValue(original.callDate);
   const start = new Date(original.startISO);
   const end = new Date(start.getTime() + duration * 60000);
+  if (end.getTime() > Date.now()) {
+    toast('La llamada no puede terminar en el futuro');
+    return;
+  }
   const candidate = { ...original, startISO: start.toISOString(), endISO: end.toISOString() };
 
   // Alargar la duración puede encimar esta llamada con la siguiente o la anterior: se valida el
@@ -433,8 +437,8 @@ export function saveManualCall() {
   const customerId = customerIdInput?.value || '';
 
   const candidate = buildManualCallCandidate({ customerId, callDate, callStart, durationMin: duration, billable, dropped, pay });
-  if (candidate && new Date(candidate.startISO).getTime() > Date.now()) {
-    toast('La hora de la llamada no puede estar en el futuro');
+  if (candidate && new Date(candidate.endISO).getTime() > Date.now()) {
+    toast('La llamada no puede terminar en el futuro');
     return;
   }
   const result = trySaveCallCandidate(candidate);
@@ -449,6 +453,7 @@ export function saveManualCall() {
   financeRunAutoFillCascade();
   saveAll();
   onGameCallSaved(candidate, 'manual');
+  onGameCallsChanged(callDate);
   toast('Llamada agregada');
 }
 
@@ -475,10 +480,11 @@ export function autoSaveLiveCall(startedAtISO, endedAtISO) {
     saveAll();
     onGameCallSaved(candidate, 'live');
     toast(`Llamada guardada (${formatDuration(durationMin * 60000)}) — edítala en Tabla de llamadas si hace falta`);
-  } else {
-    toast(result.reason);
-    openManualCallModalFromLiveCall(startedAtISO, endedAtISO);
+    return true;
   }
+  toast(result.reason);
+  openManualCallModalFromLiveCall(startedAtISO, endedAtISO);
+  return false;
 }
 
 // Fusión de "Turno de Hoy" dentro de la tabla de llamadas. Arma las filas de "acción" del día —

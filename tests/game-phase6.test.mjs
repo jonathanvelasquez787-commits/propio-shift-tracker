@@ -187,16 +187,16 @@ test('Logros conserva las tarjetas de app.html y solo actualiza sus nodos intern
 });
 
 
-test('edición y borrado reconcilian XP congelado sin dejar progreso fantasma', () => {
+test('edición y borrado corrigen datos sin reescribir XP ya congelado por STAGE CLEAR', () => {
   const game = read('js/game.js');
   const calls = read('js/calls.js');
-  const appMain = read('js/app-main.js');
-  assert.match(game, /export function onGameCallsChanged\(dayKey\)/);
-  assert.match(game, /computeGameDay\(normalizedDayKey, \{ ignoreLock: true \}\)/);
-  assert.match(game, /state\.game\.totalXp = Math\.max\(0, state\.game\.totalXp \+ nextXp - oldXp\)/);
+  assert.match(game, /STAGE CLEAR congela XP/);
+  const changed = game.slice(game.indexOf('export function onGameCallsChanged'), game.indexOf('export function onGameShiftAlarmFired'));
+  assert.doesNotMatch(changed, /state\.game\.totalXp\s*=/);
+  assert.doesNotMatch(changed, /entry\.xp\s*=/);
+  assert.match(changed, /entry\.earnings\s*=/);
+  assert.match(changed, /entry\.monster\s*=/);
   assert.match(calls, /onGameCallsChanged\(affectedDayKey\)/);
-  assert.match(calls, /onGameCallsChanged\(dayKey\)/);
-  assert.match(appMain, /onGameCallsChanged\(dayKey\)/);
 });
 
 test('STAGE CLEAR reversible restaura escudos y racha, y conserva snapshot consistente', () => {
@@ -320,4 +320,71 @@ test('simulación mensual: llamada manual futura se rechaza y live conserva segu
   assert.match(calls, /La hora de la llamada no puede estar en el futuro/);
   assert.match(calls, /Math\.round\(\(elapsedMs \/ 60000\) \* 100\) \/ 100/);
   assert.doesNotMatch(calls, /Math\.max\(1, Math\.round\(\(new Date\(endedAtISO\)/);
+});
+
+
+test('segunda simulación mensual: importaciones tardías no dan XP indirecto', () => {
+  const game = read('js/game.js');
+  const compute = game.slice(game.indexOf('export function computeGameDay'), game.indexOf('function yesterdayShadowPct'));
+  assert.match(compute, /const xpStats = importedCallStats\(eligibleCalls, dayKey\)/);
+  assert.match(compute, /missionSnapshot\(dayKey, xpStats/);
+  assert.match(compute, /xpStats\.productive/);
+  assert.match(compute, /const rawXp = eligibleCalls\.length/);
+});
+
+test('segunda simulación mensual: segunda sesión reabre el cierre antes de volver a congelar', () => {
+  const game = read('js/game.js');
+  const started = game.slice(game.indexOf('export function onGameShiftStarted'), game.indexOf('function stageComparisonSnapshot'));
+  assert.match(started, /hadFinalizedDay/);
+  assert.match(started, /revokeStageClear\(dayKey, \{ silent: true \}\)/);
+  assert.match(started, /STAGE CLEAR reabierto/);
+});
+
+test('segunda simulación mensual: caja y combo se reconcilian al corregir una live', () => {
+  const game = read('js/game.js');
+  assert.match(game, /function reconcileLiveComboAndLoot/);
+  assert.match(game, /rollbackLootReceipt/);
+  assert.match(game, /latestOtherGapResetTime/);
+  assert.match(game, /state\.game\.live\.combo = eligible/);
+  assert.match(game, /receipt = \{ type: 'accessory'/);
+});
+
+test('segunda simulación mensual: Propio puede corregir una llamada ya importada', () => {
+  const appMain = read('js/app-main.js');
+  assert.match(appMain, /sameImportedCallIdentity/);
+  assert.match(appMain, /replacementKind: 'import'/);
+  assert.match(appMain, /item\.replaces\.importedAt \|\| importTs/);
+  assert.match(appMain, /oficial\(es\) corregida\(s\)/);
+});
+
+test('segunda simulación mensual: finalizar turno no cierra si falla el guardado de la llamada', () => {
+  const appMain = read('js/app-main.js');
+  const calls = read('js/calls.js');
+  assert.match(calls, /return true;[\s\S]*openManualCallModalFromLiveCall[\s\S]*return false;/);
+  assert.match(appMain, /const saved = endCall\(\);/);
+  assert.match(appMain, /if \(saved\) endShift\(\)/);
+});
+
+test('segunda simulación mensual: ninguna llamada manual editada o pegada puede terminar en el futuro', () => {
+  const calls = read('js/calls.js');
+  const appMain = read('js/app-main.js');
+  assert.match(calls, /new Date\(candidate\.endISO\)\.getTime\(\) > Date\.now\(\)/);
+  assert.match(calls, /if \(end\.getTime\(\) > Date\.now\(\)\)/);
+  assert.match(appMain, /const endsAt = new Date\(c\.endISO\)\.getTime\(\)/);
+  assert.match(appMain, /endsAt > importNow/);
+});
+
+test('segunda simulación mensual: descartar no reinicia ACW y reemplazar live corrige su fin', () => {
+  const appMain = read('js/app-main.js');
+  const discard = appMain.slice(appMain.indexOf('function discardActiveCall()'), appMain.indexOf('function discardActivePause()'));
+  assert.doesNotMatch(discard, /lastCallEndedAt\s*=/);
+  assert.match(appMain, /state\.lastCallEndedAt = item\.call\.endISO/);
+});
+
+test('segunda simulación mensual: STAGE CLEAR usa el día del inicio del turno al cruzar medianoche', () => {
+  const appMain = read('js/app-main.js');
+  const game = read('js/game.js');
+  assert.match(appMain, /const shiftDayKey = todayCallDateKey\(new Date\(state\.shiftStartedAt\)\)/);
+  assert.match(appMain, /onGameShiftEnded\(shiftDayKey\)/);
+  assert.match(game, /export function onGameShiftEnded\(dayKey = todayCallDateKey\(\)\)/);
 });
