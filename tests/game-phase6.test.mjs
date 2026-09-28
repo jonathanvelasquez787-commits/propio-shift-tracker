@@ -514,7 +514,8 @@ test('cuarta simulación mensual: descartar la primera live revierte el turno qu
 test('cuarta simulación mensual: llamada manual de hoy auto inicia turno igual que pegar llamadas', () => {
   const calls = read('js/calls.js');
   assert.match(calls, /autoStartShiftFromCalls/);
-  assert.match(calls, /callDate === todayCallDateKey\(\) && !state\.shiftStartedAt && !state\.shiftEndedAt/);
+  assert.match(calls, /const affectedDayKey = callDateKeyFromValue\(candidate\.callDate\) \|\| callDate/);
+  assert.match(calls, /affectedDayKey === todayCallDateKey\(\) && !state\.shiftStartedAt && !state\.shiftEndedAt/);
   assert.match(calls, /autoStartShiftFromCalls\(true\)/);
 });
 
