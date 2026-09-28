@@ -477,3 +477,16 @@ test('tercera simulación mensual: editar estado manual del día reconcilia gami
   assert.match(game, /export function onGameDayMetadataChanged/);
   assert.match(game, /state\.game\.bestStreak = recomputeBestStreak\(\)/);
 });
+
+
+test('runtime smoke: helpers de renderGame existen para Logros y Higher Rate', () => {
+  const game = read('js/game.js');
+  for (const name of ['gameStreak', 'recomputeBestStreak', 'gameLevelProgress', 'withConversion', 'monsterStateFor', 'monsterVariantFor']) {
+    assert.match(game, new RegExp('function\\s+' + name + '\\s*\\('), name + ' debe existir');
+  }
+  const appMain = read('js/app-main.js');
+  const higherRate = read('js/higher-rate.js');
+  assert.match(appMain, /if \(page === 'achievements'\) renderGame\(\)/);
+  assert.match(higherRate, /export function addHigherRateWindowRow\(\)/);
+  assert.match(higherRate, /saveHigherRateWindowsFromEditor\(\)/);
+});
