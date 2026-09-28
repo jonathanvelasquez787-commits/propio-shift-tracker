@@ -33,7 +33,9 @@ import {
 
 import {
   REPORTS_MONTHLY_PAGE_SIZE,
+  computeComplianceStreak,
   cycleGoalPace,
+  dayComplianceStatus,
   renderReportsDashboard,
   renderReportsMonthlyChart,
   reportsCycleProjection,
@@ -103,6 +105,7 @@ import {
   higherRateBonusForCall,
   higherRateBonusForCalls,
   higherRateBreakdownTagsHtml,
+  higherRateLiveStatus,
   higherRateTierBadgeHtml,
   purgePastHigherRateWindows,
   refreshHigherRateWindowsIfNeeded,
@@ -131,6 +134,22 @@ import {
   wireEmojiPicker,
 } from './settings.js';
 
+import {
+  createDefaultGameState,
+  initGame,
+  normalizeGameState,
+  onGameBackupExported,
+  onGameCallSaved,
+  onGameDayRollover,
+  onGameGapSaved,
+  onGamePauseEnded,
+  onGameShiftAlarmFired,
+  onGameShiftEnded,
+  onGameShiftStarted,
+  renderGame,
+  renderGameLive,
+} from './game.js';
+
 // js/reports.js necesita effectiveHistoryStartDate() (ver su import desde './app-main.js'), pero
 // esa función vive en js/calendar.js — este archivo solo la importaba para uso propio, nunca la
 // reexportaba. Sin esta línea, el import de reports.js falla con "The requested module
@@ -145,10 +164,13 @@ export { effectiveHistoryStartDate } from './calendar.js';
 // reexportaba. Mismo patrón exacto que el bug de effectiveHistoryStartDate de arriba: sin esto el
 // import de reports.js falla con "does not provide an export named 'financeConvertedInline'", lo
 // que rompe la cadena de módulos completa.
-export { financeConvertedInline, financeConvertedNote, financeRunAutoFillCascade };
+export { financeConvertedInline, financeConvertedNote, financeRowIsMeta, financeRunAutoFillCascade };
 export { higherRateBonusForCall, higherRateBonusForCalls, higherRateTierBadgeHtml };
+export { higherRateLiveStatus };
 export { formatBlockDurationLabel };
 export { renderEmojiPicker };
+export { computeComplianceStreak, dayComplianceStatus };
+export { onGameCallSaved };
 
     const STORAGE_KEY = 'propio_shift_tracker_state_es_v4';
     const CALLS_KEY = 'propio_shift_tracker_calls_es_v4';
@@ -160,6 +182,9 @@ export { renderEmojiPicker };
       pin: '<circle cx=\"12\" cy=\"9\" r=\"4\"/><line x1=\"12\" y1=\"13\" x2=\"12\" y2=\"21\"/>',
       bell: '<path d=\"M6 8a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6\"/><path d=\"M10 20a2 2 0 0 0 4 0\"/>',
       flame: '<path d=\"M12 2c2 3-1 4-1 7a3 3 0 1 0 6 0c0-1-.5-2-.5-2 2 1 3 3.5 3 6a7 7 0 1 1-14 0c0-4 2-6 3.5-8 .5 2 1 2.5 3-3Z\"/>',
+      shield: '<path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z\"/>',
+      trophy: '<path d=\"M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4Z\"/><path d=\"M7 6H4v2a4 4 0 0 0 4 4M17 6h3v2a4 4 0 0 1-4 4\"/>',
+      gift: '<rect x=\"3\" y=\"8\" width=\"18\" height=\"13\" rx=\"2\"/><path d=\"M12 8v13M3 12h18M7.5 8C5 8 4 6.5 4.8 5.2 6 3.2 9.5 5.4 12 8M16.5 8c2.5 0 3.5-1.5 2.7-2.8C18 3.2 14.5 5.4 12 8\"/>',
       settings: '<circle cx=\"12\" cy=\"12\" r=\"3\"/><path d=\"M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z\"/>',
       reset: '<path d=\"M21 12a9 9 0 1 1-3-6.7\"/><polyline points=\"21 3 21 9 15 9\"/>',
       coffee: '<path d=\"M17 8h1a4 4 0 1 1 0 8h-1\"/><path d=\"M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z\"/><line x1=\"6\" y1=\"2\" x2=\"6\" y2=\"4\"/><line x1=\"10\" y1=\"2\" x2=\"10\" y2=\"4\"/><line x1=\"14\" y1=\"2\" x2=\"14\" y2=\"4\"/>',
@@ -376,7 +401,7 @@ export { renderEmojiPicker };
       if (!settings.lateArrivalMode) settings.lateArrivalMode = 'anchor';
     }
 
-    function weekdayKeyForDayKey(dayKey) {
+    export function weekdayKeyForDayKey(dayKey) {
       const d = callDateToDate(dayKey) || new Date();
       const idx = d.getDay();
       return Object.keys(WEEKDAY_JS_INDEX).find(k => WEEKDAY_JS_INDEX[k] === idx) || 'mon';
@@ -483,6 +508,7 @@ export { renderEmojiPicker };
         // Qué día de calendario real ("hoy") conocía la app la última vez que se revisó (al cargar
         // la página o en cada tick del reloj).
         lastCalendarDay: null,
+        game: createDefaultGameState(),
       };
     }
 
@@ -509,6 +535,7 @@ export { renderEmojiPicker };
         gapAnnotations: src.gapAnnotations && typeof src.gapAnnotations === 'object' ? src.gapAnnotations : {},
         dayNotes: src.dayNotes && typeof src.dayNotes === 'object' && !Array.isArray(src.dayNotes) ? src.dayNotes : {},
         dayInterruptions: src.dayInterruptions && typeof src.dayInterruptions === 'object' && !Array.isArray(src.dayInterruptions) ? src.dayInterruptions : {},
+        game: normalizeGameState(src.game),
         activeDayKey: src.activeDayKey ? String(src.activeDayKey) : null,
       };
       merged.events = merged.events.map(e => (e && !e.id) ? { ...e, id: makeLocalId() } : e);
@@ -682,6 +709,7 @@ export { renderEmojiPicker };
         // prioridad) cada vez que se guarda una llamada, en vez de exigir "Aplicar" manual en cada
         // fila.
         financeAutoFill: false,
+        game: { enabled: true, intensity: 'arcade' },
       };
     }
 
@@ -865,6 +893,9 @@ export { renderEmojiPicker };
         cat.rows = cat.rows.filter(r => r && typeof r === 'object' && String(r.id || '').trim() && String(r.name || '').trim() && Number.isFinite(Number(r.targetAmount)) && Number(r.targetAmount) >= 0);
       });
       if (typeof settings.financeAutoFill !== 'boolean') settings.financeAutoFill = false;
+      if (!settings.game || typeof settings.game !== 'object' || Array.isArray(settings.game)) settings.game = { ...fallback.game };
+      if (typeof settings.game.enabled !== 'boolean') settings.game.enabled = fallback.game.enabled;
+      if (!['subtle', 'arcade', 'off'].includes(settings.game.intensity)) settings.game.intensity = fallback.game.intensity;
       // Cada cola (Gastos, Metas) queda con prioridades únicas 1..n, conservando el orden actual. El
       // "tipo" de cada fila (Gasto vs Meta) ya no se deduce de su categoría — una Meta puede tener
       // cualquier categoría desde que se permitió elegirla libremente — así que se decide por
@@ -1045,7 +1076,7 @@ export { renderEmojiPicker };
     // No había forma de ver el ciclo ANTERIOR sin cambiar manualmente "Día activo" a un día
     // específico de esa quincena (y si no había llamadas importadas ese día, ni siquiera aparecía
     // en el selector).
-    function cycleBoundsForOffset(offset = cycleViewOffset) {
+    export function cycleBoundsForOffset(offset = cycleViewOffset) {
       const today = new Date();
       const shifted = new Date(today.getFullYear(), today.getMonth(), today.getDate() + offset * CYCLE_LENGTH_DAYS);
       return cycleBoundsForDate(shifted);
@@ -1427,6 +1458,7 @@ function checkDayRollover() {
   if (wasFollowingToday) {
     state.activeDayKey = today;
   }
+  onGameDayRollover();
   saveStateOnly();
   render();
   return true;
@@ -1572,6 +1604,7 @@ function checkShiftAlarm() {
   if (now >= alertTime) {
     if (shiftAlarmFiredForDate !== todayKey) {
       shiftAlarmFiredForDate = todayKey;
+      onGameShiftAlarmFired(todayKey, now.toISOString());
       toast(renderAlertTemplate(settings.shiftAlarmMessage, { hora: timeLabel(formatHHMM(cfg.start)) }));
     }
     startShiftAlarm();
@@ -3667,6 +3700,7 @@ function renderPayDatesSection() {
       state.shiftEndedAt = null;
       setEvent('shift', 'Shift iniciado automáticamente', fmtTime(firstStart), 'auto');
       saveStateOnly();
+      onGameShiftStarted({ continued: false });
       if (!silent) toast(`Shift iniciado automáticamente desde tu primera llamada (${fmtTime(firstStart)})`);
       return true;
     }
@@ -3732,6 +3766,7 @@ function renderPayDatesSection() {
           saveAll();
           stopShiftAlarm();
           toast(`Turno continuado — interrupción de ${formatMinutes(gapMin)} min registrada`);
+          onGameShiftStarted({ continued: true });
           return;
         }
       }
@@ -3747,6 +3782,7 @@ function renderPayDatesSection() {
       // apagaría solo en el próximo tick (hasta 1s de retraso), pero apagarlo aquí de inmediato
       // evita ese beep extra.
       stopShiftAlarm();
+      onGameShiftStarted({ continued: false });
 
       // El estimado desde la primera llamada se reemplaza por la hora del click en cuanto se inicia
       // el turno.
@@ -3772,6 +3808,7 @@ function renderPayDatesSection() {
       setEvent('shift', 'Shift terminado', fmtTime(new Date(now)), 'manual');
       saveAll();
       toast('Shift terminado');
+      onGameShiftEnded();
     }
 
     function startPause(type) {
@@ -3823,6 +3860,7 @@ function renderPayDatesSection() {
       if (deferSave) saveStateOnly();
       else saveAll();
       if (!silent) toast('Regresaste');
+      onGamePauseEnded();
     }
 
     function toggleCall() {
@@ -3846,6 +3884,7 @@ function renderPayDatesSection() {
         state.shiftStartedAt = now.toISOString();
         state.shiftEndedAt = null;
         setEvent('shift', 'Shift iniciado automáticamente', fmtTime(now), 'auto');
+        onGameShiftStarted({ continued: false });
       }
       state.activeCall = { startedAt: now.toISOString() };
       saveAll();
@@ -4236,6 +4275,7 @@ function renderPayDatesSection() {
       a.download = 'propio-shift-tracker-export.json';
       a.click();
       URL.revokeObjectURL(url);
+      onGameBackupExported();
     }
 
     // Exportación para contabilidad/impuestos ---- Distinta de exportJSON (backup completo de
@@ -5292,10 +5332,12 @@ function saveGapEditor() {
   const noteInput = document.getElementById('gapNoteInput');
   const label = String(labelInput?.value || 'acw').toLowerCase();
   const note = String(noteInput?.value || '').trim();
-  setGapAnnotation(editingGapContext.dayKey, editingGapContext.gapKey, { label, note });
+  const savedContext = { ...editingGapContext };
+  setGapAnnotation(savedContext.dayKey, savedContext.gapKey, { label, note });
   editingGapContext = null;
   closeModal('gapModal');
   toast('Hueco guardado');
+  onGameGapSaved(savedContext.dayKey, savedContext.gapKey, label);
 }
 
 // Editar día (Resumen semanal)
@@ -5748,6 +5790,7 @@ export function render() {
       updateLiveActivityBar();
       updateCallsStatusCard();
       updateSidebarProgressWidget();
+      renderGame();
     }
 
     export function toast(msg) {
@@ -5851,7 +5894,7 @@ export function render() {
 
     function navigateToPage(page) {
       // Páginas válidas del menú lateral.
-      const pages = ['home', 'schedule', 'reports', 'paydates', 'calendar', 'finance', 'help'];
+      const pages = ['home', 'schedule', 'reports', 'paydates', 'calendar', 'finance', 'achievements', 'help'];
       if (!pages.includes(page)) page = 'home';
       currentPage = page;
       // Render ya no recalcula renderReportsDashboard salvo que currentPage === 'reports' (ver esa
@@ -5859,6 +5902,7 @@ export function render() {
       if (page === 'reports') renderReportsDashboard();
       if (page === 'paydates') renderPayDatesSection();
       if (page === 'finance') renderFinanceSection();
+      if (page === 'achievements') renderGame();
       // Vista anual por default.
       if (page === 'calendar') { syncCalViewVisibility(); if (calViewMode === 'year') renderCalYear(); else renderCalendarMonth(); }
       relocateCallsSection(page);
@@ -6920,6 +6964,8 @@ export function render() {
       openModal('onboardingModal');
     }
 
+    initGame();
+
     setInterval(() => {
       // Si cambió el día de calendario real, checkDayRollover ya hace un render completo (incluye
       // renderHeader), así que nos ahorramos la llamada duplicada a renderHeader en ese mismo tick.
@@ -6939,6 +6985,7 @@ export function render() {
       // ahora vive tanto en el modal como en "Ganancias de hoy" (siempre visible en Inicio).
       renderHigherRateLiveCard();
       refreshHigherRateWindowsIfNeeded();
+      renderGameLive();
     }, 1000);
     render();
 
