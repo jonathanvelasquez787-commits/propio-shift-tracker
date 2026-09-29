@@ -74,6 +74,26 @@ const STATE_LABELS = Object.freeze({
 const VALID_STATES = new Set(Object.keys(STATE_LABELS));
 const VALID_VARIANTS = new Set(['normal', 'gold', 'streak']);
 
+const EQUIPMENT_LABELS = Object.freeze({
+  'corona-del-ciclo': 'Corona del ciclo',
+  'cuernos-dorados': 'Cuernos dorados',
+  'bufanda-de-racha': 'Bufanda de racha',
+  'alas-pixel': 'Alas pixel',
+  'armadura-cian': 'Armadura cian',
+  'ojo-de-rubi': 'Ojo de rubí',
+});
+
+function equipmentEntries(value) {
+  const values = value && typeof value === 'object' && !Array.isArray(value)
+    ? Object.values(value)
+    : Array.isArray(value) ? value : value ? [value] : [];
+  return values.flatMap((item) => {
+    const raw = item && typeof item === 'object' ? (item.id || item.name || item.label) : item;
+    const token = safeToken(raw, '') || Object.entries(EQUIPMENT_LABELS).find(([, label]) => label.toLowerCase() === String(raw ?? '').trim().toLowerCase())?.[0] || '';
+    return token && EQUIPMENT_LABELS[token] ? [{ id: token, label: EQUIPMENT_LABELS[token] }] : [];
+  });
+}
+
 function safeToken(value, fallback) {
   const token = String(value ?? '').trim().toLowerCase();
   return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(token) ? token : fallback;
@@ -252,12 +272,28 @@ function renderStateFeature(state, variant) {
       </g>` : ''}`;
 }
 
+function renderEquipment(value) {
+  const entries = equipmentEntries(value);
+  if (!entries.length) return '';
+  const ids = new Set(entries.map((item) => item.id));
+  return `
+    <g class="monster-layer monster-layer--equipment" data-equipment="${escapeAttribute(entries.map((item) => item.id).join(' '))}" fill="currentColor" stroke="currentColor" stroke-linecap="square" stroke-width="3">
+      ${ids.has('corona-del-ciclo') ? '<polygon class="monster-equipment monster-equipment--crown" points="57,30 64,13 80,25 96,13 103,30"/>' : ''}
+      ${ids.has('cuernos-dorados') ? '<path class="monster-equipment monster-equipment--horns" d="M45 39 28 16l25 13m62 10 17-23-25 13" fill="none"/>' : ''}
+      ${ids.has('bufanda-de-racha') ? '<path class="monster-equipment monster-equipment--scarf" d="M42 92h76l-8 13H50Z"/>' : ''}
+      ${ids.has('alas-pixel') ? '<path class="monster-equipment monster-equipment--wings" d="M37 62 12 50l17 27m94-15 25-12-17 27" fill="none"/>' : ''}
+      ${ids.has('armadura-cian') ? '<path class="monster-equipment monster-equipment--armor" d="M48 94h64v14H48Z" fill="none"/>' : ''}
+      ${ids.has('ojo-de-rubi') ? '<rect class="monster-equipment monster-equipment--ruby" x="75" y="57" width="12" height="17"/>' : ''}
+    </g>`;
+}
+
 export function monsterSvg({
   species = 'mon',
   state,
   variant = 'normal',
   hpPct = 100,
   sizeClass = 'md',
+  equipment = null,
 } = {}) {
   const entry = speciesEntry(species);
   const hp = clampHp(hpPct);
@@ -265,7 +301,9 @@ export function monsterSvg({
   const variantToken = VALID_VARIANTS.has(safeToken(variant, '')) ? safeToken(variant, '') : 'normal';
   const sizeToken = safeToken(sizeClass, 'md');
   const stateLabel = STATE_LABELS[stateToken];
-  const ariaLabel = `${entry.name}, ${stateLabel}, ${Math.round(hp)}% de vida`;
+  const equipped = equipmentEntries(equipment);
+  const equipmentLabel = equipped.length ? `, equipado con ${equipped.map((item) => item.label).join(', ')}` : '';
+  const ariaLabel = `${entry.name}, ${stateLabel}, ${Math.round(hp)}% de vida${equipmentLabel}`;
   const speciesToken = safeToken(entry.id, 'lunes-perezoso');
 
   return `<svg class="monster-svg monster-svg--${escapeAttribute(sizeToken)} monster-svg--${escapeAttribute(speciesToken)} monster-svg--${escapeAttribute(stateToken)} monster-svg--${escapeAttribute(variantToken)}" data-species="${escapeAttribute(speciesToken)}" data-state="${escapeAttribute(stateToken)}" data-variant="${escapeAttribute(variantToken)}" data-hp-pct="${escapeAttribute(hp)}" viewBox="0 0 160 128" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${escapeAttribute(ariaLabel)}" focusable="false">
@@ -278,6 +316,7 @@ export function monsterSvg({
     ${renderSpeciesFeature(entry)}
     ${renderFace(entry, stateToken)}
     ${renderStateFeature(stateToken, variantToken)}
+    ${renderEquipment(equipment)}
   </g>
 </svg>`;
 }

@@ -8196,6 +8196,7 @@
   </div>
 </div>
 <div aria-live="polite" class="game-toast-stack" id="gameToastStack"></div>
+<div aria-atomic="true" aria-live="polite" class="game-status-live sr-only" id="gameStatusLive" role="status"></div>
 <button aria-hidden="true" class="sidebar-overlay" id="sidebarOverlay" tabindex="-1" type="button"></button>
 <nav aria-label="Navegación principal" class="sidebar-nav" id="sidebarNav">
 <div class="sidebar-brand-block">
@@ -8987,6 +8988,19 @@
   <div class="game-cycle-boss-layout"><div class="game-boss-copy"><strong data-game-role="cycle-title">El jefe observa tu progreso.</strong><p data-game-role="cycle-subtitle">La barra refleja lo que llevas acumulado en el ciclo de pago actual.</p><div class="game-boss-progress" role="progressbar" aria-label="Progreso contra el jefe del ciclo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span data-game-role="cycle-progress" style="width:0%;"></span></div><div class="game-boss-progress-foot"><span data-game-role="cycle-earned">$0.00</span><span data-game-role="cycle-goal">Meta $0.00</span></div></div><div class="game-boss-sprite" data-game-role="cycle-sprite" aria-hidden="true"><span class="game-pixel-crown"></span><span class="game-pixel-eye left"></span><span class="game-pixel-eye right"></span><span class="game-pixel-mouth"></span></div></div>
 </section>
 
+<section aria-labelledby="gameEquipmentTitle" class="game-panel game-equipment-panel" data-game-root="equipment-panel" id="gameEquipmentPanel">
+  <div class="game-panel-head"><div><span class="game-panel-eyebrow">Personalización</span><h2 id="gameEquipmentTitle">Equipo</h2></div><span class="game-panel-badge" data-game-role="equipment-count">0 / 6</span></div>
+  <p class="game-panel-intro">Accesorios y mejoras que se activan al completar tus objetivos.</p>
+  <div aria-label="Equipo desbloqueable" class="game-equipment-grid" data-game-role="equipment-list" data-game-root="equipment-grid" role="list">
+    <article aria-label="Visor bloqueado" class="game-equipment-item is-locked" data-equipment-state="locked" data-game-role="equipment-item" role="listitem">
+      <span aria-hidden="true" class="game-equipment-icon">?</span>
+      <span class="game-equipment-copy"><strong>Próximo accesorio</strong><small data-game-role="equipment-status">Completa una misión para desbloquearlo</small></span>
+      <span aria-hidden="true" class="game-equipment-state">Bloqueado</span>
+    </article>
+  </div>
+  <p class="game-collection-empty" data-game-role="equipment-empty">Tus accesorios aparecerán aquí al conseguirlos.</p>
+</section>
+
 <section class="game-achievements-grid game-achievements-grid-collection">
   <article class="game-panel game-bestiary-panel" id="gameBestiary">
     <div class="game-panel-head"><div><span class="game-panel-eyebrow">Colección</span><h2>Bestiario</h2></div><span class="game-panel-badge" data-game-role="bestiary-count">0 / 7</span></div>
@@ -9007,6 +9021,10 @@
     <div class="game-panel-head"><div><span class="game-panel-eyebrow">Última victoria</span><h2>STAGE CLEAR</h2></div><span class="game-panel-badge" data-game-role="last-clear-date">—</span></div>
     <div class="game-last-clear-content" data-game-role="last-clear-content"><div class="game-clear-stars" aria-hidden="true"><span>★</span><span>★</span><span>★</span></div><p>Aún no hay un STAGE CLEAR guardado.</p></div>
     <button class="game-text-button" data-game-action="open-last-clear" type="button">Ver detalle</button>
+    <div aria-label="Cofre reclamable" class="game-chest-claim" data-game-role="chest-claim" hidden id="gameChestClaim" role="region">
+      <span aria-hidden="true" class="game-chest-claim-icon">🎁</span>
+      <span class="game-chest-claim-copy"><strong data-game-role="chest-claim-title">Cofre listo</strong><small data-game-role="chest-claim-subtitle">Abre tu próxima sesión para reclamarlo.</small></span>
+    </div>
   </article>
 </section>
 </div><!-- /pageAchievements -->
@@ -9681,7 +9699,7 @@
 <div class="game-modal-kicker"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M5 7V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2"/><path d="M3 12h18"/><path d="M12 7v14"/></svg> Recompensa</div>
 <button aria-label="Cerrar cofre" class="modal-close" data-close-modal="chestModal" id="chestCloseBtn" type="button">×</button>
 </div>
-<div id="chestContent" class="chest-content">
+<div id="chestContent" class="chest-content" data-game-role="chest-content">
 <div class="game-chest-illustration" aria-hidden="true"><span class="game-chest-lid"></span><span class="game-chest-body"></span><span class="game-chest-lock"></span></div>
 <h3 id="chestModalTitle">Cofre sellado</h3>
 <p>Tu recompensa espera al próximo inicio de turno.</p>

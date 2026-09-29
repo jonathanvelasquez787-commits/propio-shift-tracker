@@ -269,12 +269,32 @@ La aplicación funciona en producción con estas bases vigentes:
   global, backup diario, exportación y borrado de cuenta permanecen activos.
 - Turnos, llamadas, Horario, Higher Rate, Finanzas, Reportes, Calendario,
   Adherencia y la gamificación «El Monstruo» están integrados.
-- La versión actual es 568. Las mejoras nuevas se documentan como pendientes
+- La versión actual es 569. Las mejoras nuevas se documentan como pendientes
   actuales.
 
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v569** — Gamificación profunda, conectada y satisfactoria.
+
+- El combo ahora tiene hitos idempotentes en x3, x5 y x8; conserva la caja de
+  cinco llamadas y añade feedback y loot mejorado sin premiar horas extra ni
+  saltarse pausas.
+- El monstruo ganó fases Guardado/Furia/Vulnerable/Derrotado, tres placas de
+  armadura ligadas a misiones, reacciones puntuales y avisos accesibles.
+- Las misiones ofrecen enfoques Equilibrio/Calidad/Cuidado, se fijan con la
+  primera llamada elegible y entregan XP individual con feedback al completar.
+- Cofres y cajas muestran rareza, recibos reversibles y recompensas
+  deterministas; el jefe del ciclo permite elegir XP o accesorio sin duplicar
+  premios.
+- Los niveles muestran próximos desbloqueos y gobiernan accesorios equipables
+  que se reflejan sobre el SVG del monstruo; Logros integra equipo y cofres en
+  sus paneles reales, sin duplicados.
+- Toasts priorizados, XP flotante sin layout shift, sonidos con volumen maestro,
+  animaciones transitorias y cobertura completa de movimiento reducido.
+- Verificados 98 tests, contratos/ciclos de 14 módulos, wiring de UI, build sin
+  sourcemaps y arranque limpio del build en navegador sin errores de consola.
 
 **v568** — Auditoría profunda cerrada en código.
 
@@ -307,18 +327,4 @@ La aplicación funciona en producción con estas bases vigentes:
   esquema. Importaciones históricas/tardías y descartes no conceden XP.
 - Verificados tests, contratos de módulos, sintaxis, build y bundle de
   producción sin sourcemaps ni módulos fuente.
-
-**v566** — Fases 4 y 5 cerradas.
-
-- Build de producción con Rollup + Terser, cliente Supabase 2.117.2 local,
-  módulos minificados sin sourcemaps y CSP limitada a scripts propios.
-- Llamadas normalizadas con RLS y sincronización por deltas; límites de tamaño,
-  rate limiting persistente, telemetría privada y backup diario.
-- PWA instalable con service worker. El motor de Adherencia queda local para
-  preservar el funcionamiento offline; no se envían datos a Sentry.
-- Migración aplicada y validada en Supabase: tablas, RLS, funciones, versión
-  del esquema, llamadas normalizadas, cron y backup diario correctos. El
-  repositorio de GitHub quedó privado.
-- Verificados 14 tests, imports/exports de 11 módulos, sintaxis y build completo;
-  el bundle no contiene rutas `/js/`, jsDelivr ni `sourceMappingURL`.
 

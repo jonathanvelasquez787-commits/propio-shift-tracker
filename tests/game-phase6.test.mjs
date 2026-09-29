@@ -352,7 +352,7 @@ test('Logros muestra accesorios y cofre pendiente, y racha de Reportes respeta e
   const game = read('js/game.js');
   const reports = read('js/reports.js');
   assert.match(game, /game-accessory-card/);
-  assert.match(game, /pending-chest/);
+  assert.match(game, /data-game-role="chest-claim"/);
   assert.match(game, /nextUnownedAccessory/);
   assert.match(reports, /state\.game\?\.days\?\.\[dayKey\]\?\.shieldUsed/);
 });
