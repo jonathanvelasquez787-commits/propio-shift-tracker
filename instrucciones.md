@@ -201,10 +201,7 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
-- Aplicar `supabase/migrations/0004_security_hardening.sql` en producción. El
-  script ya está preparado y validado estáticamente; falta la confirmación de
-  interfaz requerida porque su política de retención elimina telemetría con más
-  de 30 días y registros que excedan el tope global de 50,000.
+- Ninguno.
 
 **LIMITACIONES CONOCIDAS** (alcance reducido a propósito, no son bugs)
 
@@ -287,7 +284,7 @@ La aplicación funciona en producción con estas bases vigentes:
   misiones, racha y progreso de nivel exponen semántica accesible.
 - Redirect interno endurecido, telemetría limitada también de forma global,
   archivos de entorno ignorados y migración transaccional de cuota/retención
-  preparada para Supabase.
+  aplicada y validada en Supabase.
 - PWA con precache completo y versión de telemetría inyectada por build;
   Rollup actualizado a 3.30.0 y `npm test` compatible con Windows.
 - Estado compartido extraído a `js/app-context.js`: cero ciclos propios y
