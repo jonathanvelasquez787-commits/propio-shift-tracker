@@ -1,39 +1,19 @@
-// Página Higher Rate — sexto módulo de la Fase 3. Contiene el cálculo de bonos,
-// el editor de ventanas, el estado en vivo y el historial. El modelo compartido
-// de llamadas y ajustes permanece en app-main.js.
+// app-main.js injects Higher Rate helpers; app-context.js owns shared app state.
+import { calls, settings } from './app-context.js';
 
-import {
-  HIGHER_RATE_EARLY_GRACE_MIN,
-  HIGHER_RATE_TIERS,
-  appConfirm,
-  callDateKeyFromValue,
-  callDateToDate,
-  calls,
-  callsForDay,
-  dayKeyFromIsoDate,
-  escapeHtml,
-  financeConvertedInline,
-  financeRunAutoFillCascade,
-  formatBlockDurationLabel,
-  formatCallDayLabel,
-  formatHHMM,
-  formatMinutes,
-  iconHtml,
-  isoDateFromDayKey,
-  makeLocalId,
-  mergeIntervals,
-  minutesToHHMM,
-  money,
-  onGameCallsChanged,
-  saveAll,
-  settings,
-  timeLabel,
-  toDateFromInputs,
-  toMinutes,
-  toast,
-  todayCallDateKey,
-  todayRange,
-} from './app-main.js';
+let HIGHER_RATE_EARLY_GRACE_MIN, HIGHER_RATE_TIERS, appConfirm, callDateKeyFromValue, callDateToDate;
+let callsForDay, dayKeyFromIsoDate, escapeHtml, financeConvertedInline, financeRunAutoFillCascade, formatBlockDurationLabel;
+let formatCallDayLabel, formatHHMM, formatMinutes, iconHtml, isoDateFromDayKey, makeLocalId;
+let mergeIntervals, minutesToHHMM, money, onGameCallsChanged, saveAll, timeLabel, toDateFromInputs, toMinutes;
+let toast, todayCallDateKey, todayRange;
+
+export function configureHigherRateContext(context) {
+  ({ HIGHER_RATE_EARLY_GRACE_MIN, HIGHER_RATE_TIERS, appConfirm, callDateKeyFromValue, callDateToDate,
+    callsForDay, dayKeyFromIsoDate, escapeHtml, financeConvertedInline, financeRunAutoFillCascade, formatBlockDurationLabel,
+    formatCallDayLabel, formatHHMM, formatMinutes, iconHtml, isoDateFromDayKey, makeLocalId,
+    mergeIntervals, minutesToHHMM, money, onGameCallsChanged, saveAll, timeLabel, toDateFromInputs, toMinutes, toast,
+    todayCallDateKey, todayRange } = context);
+}
 
     function higherRateWindowBounds(window) {
       const start = toDateFromInputs(window.date, timeLabel(window.start));

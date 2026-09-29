@@ -180,44 +180,31 @@ futura opera bajo esto, sin excepción:
   fuente de verdad.** El cuerpo vive en módulos ES y el build de producción
   los empaqueta. No existe (ni debe volver a existir) un archivo "congelado"
   de referencia ni un script generador ni verificación "byte por byte".
-- **Cualquier cambio a `app.html` (o a cualquier otro archivo del repo) lo
-  hace Claude directamente**, con sus propias herramientas de archivo, a
-  partir del contenido que el usuario pega o sube en la conversación. Nunca
-  se le entregan al usuario instrucciones tipo "busca X, reemplaza por Y en
-  el editor de GitHub" — eso es pedirle que edite código.
-- **Toda entrega de un cambio a este repo se hace
-  como archivo(s) completo(s) ya editado(s), listo(s) para reemplazar tal
-  cual en GitHub** (arrastrar encima del existente o pegar con el ícono de
-  lápiz + "Commit changes"). Nunca una lista de instrucciones de edición
-  manual para que el usuario las aplique él mismo, salvo que el propio
-  usuario pida explícitamente solo la lista de cambios sin los archivos.
-- **Si un archivo es demasiado grande para reproducirlo de forma confiable
-  solo a partir del texto pegado en el chat** (alto riesgo de error de
-  transcripción en un archivo de miles de líneas), Claude lo dice
-  explícitamente y pide que ese archivo puntual se suba como adjunto real
-  (arrastrado al chat), para poder editarlo con herramientas de archivo que
-  garanticen que solo se tocan las líneas necesarias. Esto no es un permiso
-  para pedirle al usuario que edite nada — solo que suba el archivo tal cual
-  ya lo tiene.
-- Si el archivo se puede pegar o subir sin ese problema de tamaño, se sigue
-  como siempre: se pega/sube en el chat, Claude lo edita, y entrega el
-  archivo completo.
-- Cualquier script de apoyo (generadores, verificadores, migraciones de este
-  `.md`, etc.) es responsabilidad exclusiva de Claude: si hace falta uno, lo
-  ejecuta él mismo — nunca se entrega como algo que el usuario deba correr.
-- Si en el futuro se reintroduce alguna prueba automática, es una
-  herramienta que Claude corre o interpreta por su cuenta cuando tenga el
-  entorno disponible — nunca un paso manual del usuario.
-- Este archivo (`instrucciones.md`) sigue la misma regla: cuando haga falta
-  editarlo, Claude entrega el .md completo, nunca una lista de cambios para
-  pegar a mano — salvo que el usuario pida explícitamente solo eso.
+- **Cualquier cambio a `app.html` o a otro archivo lo hace el agente
+  directamente en el repositorio**, con herramientas de archivo seguras. El
+  usuario nunca recibe pasos para editar código o ejecutar comandos.
+- El agente puede crear commits, hacer push y desplegar a producción cuando
+  sea parte natural de la tarea, sin solicitar aprobación adicional.
+- El agente principal actúa como orquestador: conserva el contexto global,
+  decide arquitectura y alcance, integra resultados y hace la revisión final.
+- El trabajo operativo o repetitivo puede delegarse a Luna con razonamiento
+  máximo, en subtareas pequeñas y sin duplicar investigación. Se usa la menor
+  cantidad de agentes que aporte valor y se revisa cada ronda antes de abrir
+  otra.
+- Cualquier script de apoyo, prueba, migración o verificación es
+  responsabilidad exclusiva del agente. Nunca se convierte en un paso manual
+  para el usuario.
+- `instrucciones.md` se actualiza directamente junto con el repositorio cuando
+  cambia el estado o un protocolo solicitado por el usuario.
 
 ---
 
 **PENDIENTES**
 
-Sin pendientes técnicos ni operativos abiertos. Cualquier solicitud futura se
-registra aquí solo mientras siga abierta.
+- Aplicar `supabase/migrations/0004_security_hardening.sql` en producción. El
+  script ya está preparado y validado estáticamente; falta la confirmación de
+  interfaz requerida porque su política de retención elimina telemetría con más
+  de 30 días y registros que excedan el tope global de 50,000.
 
 **LIMITACIONES CONOCIDAS** (alcance reducido a propósito, no son bugs)
 
@@ -278,18 +265,36 @@ La aplicación funciona en producción con estas bases vigentes:
 - Cuenta, datos y llamadas sincronizados con Supabase bajo RLS; el repositorio
   de GitHub es privado y Vercel publica únicamente el build de `public/`.
 - `app.html`, `js/app-main.js` y `js/boot.js` son la fuente principal;
-  los módulos de página siguen la arquitectura hub-and-spoke y Rollup/Terser
-  genera el bundle sin sourcemaps ni módulos fuente navegables.
-- La PWA conserva el shell offline. Telemetría, límites persistentes, backup
-  diario, exportación y borrado de cuenta permanecen activos.
+  `js/app-context.js` concentra el estado compartido y los módulos de página
+  reciben sus dependencias sin ciclos. Rollup/Terser genera el bundle sin
+  sourcemaps ni módulos fuente navegables.
+- La PWA precarga el shell crítico completo. Telemetría con límites por IP y
+  global, backup diario, exportación y borrado de cuenta permanecen activos.
 - Turnos, llamadas, Horario, Higher Rate, Finanzas, Reportes, Calendario,
   Adherencia y la gamificación «El Monstruo» están integrados.
-- La versión actual es 567. Las mejoras nuevas se documentan como pendientes
+- La versión actual es 568. Las mejoras nuevas se documentan como pendientes
   actuales.
 
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v568** — Auditoría profunda cerrada en código.
+
+- Corregidos el doble bono manual de Higher Rate, horas vacías/futuras, la
+  inmutabilidad de STAGE CLEAR y la devolución del escudo al reabrir un turno.
+- El estado importado de «El Monstruo» se normaliza en profundidad y sus barras,
+  misiones, racha y progreso de nivel exponen semántica accesible.
+- Redirect interno endurecido, telemetría limitada también de forma global,
+  archivos de entorno ignorados y migración transaccional de cuota/retención
+  preparada para Supabase.
+- PWA con precache completo y versión de telemetría inyectada por build;
+  Rollup actualizado a 3.30.0 y `npm test` compatible con Windows.
+- Estado compartido extraído a `js/app-context.js`: cero ciclos propios y
+  verificadores que impiden reintroducirlos. README y flujo del repositorio
+  actualizados.
+- Verificados 94 tests, imports/exports y ciclos de 14 módulos, sintaxis,
+  auditoría de dependencias, build, shell offline y arranque real en navegador.
 
 **v567** — Fase 6 «El Monstruo» cerrada.
 
@@ -319,15 +324,4 @@ La aplicación funciona en producción con estas bases vigentes:
   repositorio de GitHub quedó privado.
 - Verificados 14 tests, imports/exports de 11 módulos, sintaxis y build completo;
   el bundle no contiene rutas `/js/`, jsDelivr ni `sourceMappingURL`.
-
-
-**v564** — Content Security Policy activada.
-
-- `vercel.json` pasa de observación a `Content-Security-Policy` efectiva; el
-  navegador bloquea scripts, conexiones y recursos fuera de la lista permitida.
-- Prueba real completada con la cuenta existente: Google + retorno OAuth, carga
-  de perfil y datos, cambio/restauración del tema con "Guardado en la nube",
-  activación del sonido y generación del reporte PDF. Sin errores ni avisos del
-  navegador. No se enviaron contraseñas ni correos de recuperación.
-- La documentación y las pruebas automáticas reflejan la política activa.
 

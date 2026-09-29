@@ -67,7 +67,7 @@ test('production build pins and bundles Supabase without source maps', () => {
   const pkg = JSON.parse(read('package.json'));
   const vercel = JSON.parse(read('vercel.json'));
   assert.equal(pkg.dependencies['@supabase/supabase-js'], '2.117.2');
-  assert.equal(pkg.devDependencies.rollup, '3.29.5');
+  assert.equal(pkg.devDependencies.rollup, '3.30.0');
   assert.equal(pkg.devDependencies.terser, '5.44.0');
   assert.equal(vercel.outputDirectory, 'public');
   assert.match(read('js/supabase-client.js'), /from '@supabase\/supabase-js'/);
@@ -76,6 +76,7 @@ test('production build pins and bundles Supabase without source maps', () => {
   assert.match(build, /inlineDynamicImports:\s*true/);
   assert.match(build, /format: name === 'boot' \|\| name === 'landing' \? 'iife' : 'es'/);
   assert.doesNotMatch(build, /chunkFileNames/);
+  assert.match(build, /if \(ownCycle\) throw new Error\(warning\.message\)/);
   assert.match(build, /minify\(/);
 });
 
@@ -92,6 +93,57 @@ test('phase 5 migration keeps private data behind RLS and persistent limits', ()
   assert.match(sql, /function public\.wipe_my_data\(\)[\s\S]*security definer/i);
 });
 
+test('landing redirects only to a validated same-origin URL', () => {
+  const source = read('js/landing.js');
+  const nextUrl = source.match(/^function nextUrl\(\) \{[\s\S]*?^\}/m)?.[0] || '';
+  const resolve = next => vm.runInNewContext(`${nextUrl}\nnextUrl()`, {
+    params: new URLSearchParams(next === null ? '' : `next=${encodeURIComponent(next)}`),
+    URL,
+    window: { location: { origin: 'https://app.example' } },
+  });
+
+  assert.equal(resolve('/app.html?from=login#main'), 'https://app.example/app.html?from=login#main');
+  assert.equal(resolve('https://evil.example/path'), '/app.html');
+  assert.equal(resolve('//evil.example/path'), '/app.html');
+  assert.equal(resolve('\\\\evil.example/path'), '/app.html');
+  assert.equal(resolve('/\\\\evil.example/path'), '/app.html');
+  assert.equal(resolve('https://app.example//evil.example/path'), 'https://app.example//evil.example/path');
+  assert.equal(resolve(null), '/app.html');
+});
+
+test('telemetry enforces both global and per-IP limits', () => {
+  const source = read('api/telemetry.js');
+  assert.match(source, /consumeLimit\('telemetry:global',\s*600\)/);
+  assert.match(source, /consumeLimit\(`telemetry:\$\{fingerprint\}`[,]\s*30\)/);
+  assert.ok(source.indexOf('`telemetry:${fingerprint}`') < source.indexOf("'telemetry:global'"));
+  assert.match(source, /createHash\('sha256'\)/);
+});
+
+test('security hardening migration enforces call quota and bounds telemetry storage', () => {
+  const sql = read('supabase/migrations/0004_security_hardening.sql');
+  assert.match(sql, /create table if not exists public\.call_quotas/i);
+  assert.match(sql, /pg_advisory_xact_lock/);
+  assert.match(sql, /call_count\s*<\s*100000/);
+  assert.match(sql, /before insert on public\.calls/i);
+  assert.match(sql, /before delete on public\.calls/i);
+  assert.match(sql, /after delete on public\.calls/i);
+  assert.match(read('supabase/migrations/0003_phase_5.sql'), /if \(select count\(\*\) from public\.calls where user_id = uid\) > 100000 then raise exception 'TOO_MANY_CALLS'/);
+  assert.match(sql, /create or replace function public\.prune_app_errors\(\)/i);
+  assert.match(sql, /interval '30 days'/i);
+  assert.match(sql, /offset 50000/i);
+  assert.match(sql, /cron\.schedule\('propio-prune-app-errors', '\*\/5 \* \* \* \*'/i);
+});
+
+test('git ignores environment files while allowing explicit examples', () => {
+  const ignore = read('.gitignore');
+  assert.match(ignore, /^\.env\.\*$/m);
+  assert.match(ignore, /^\*\.env$/m);
+  assert.match(ignore, /^\*\.env\.\*$/m);
+  assert.match(ignore, /^!\.env\.example$/m);
+  assert.match(ignore, /^!\.env\.\*\.example$/m);
+  assert.match(ignore, /^!\*\.env\.\*\.example$/m);
+});
+
 test('PWA shell includes a manifest and service worker with API exclusions', () => {
   const manifest = JSON.parse(read('manifest.webmanifest'));
   assert.equal(manifest.display, 'standalone');
@@ -101,7 +153,14 @@ test('PWA shell includes a manifest and service worker with API exclusions', () 
   assert.match(worker, /request\.mode === 'navigate'/);
   assert.match(worker, /cache\.match\(request\)/);
   assert.doesNotMatch(worker, /caches\.match\(request\)/);
-  assert.match(read('scripts/build.mjs'), /\?v=\$\{release\}/);
+  for (const asset of [
+    '/css/tokens.css', '/css/landing.css', '/css/legal.css', '/css/app-shell.css', '/css/game.css',
+    '/assets/theme-init.js', '/assets/theme-toggle.js', '/assets/footer-year.js', '/assets/landing-ui.js',
+    '/assets/landing.js', '/assets/boot.js', '/assets/monitoring.js', '/assets/register-sw.js',
+  ]) assert.ok(worker.includes(asset), `missing precache asset ${asset}`);
+  const build = read('scripts/build.mjs');
+  assert.match(build, /\?v=\$\{release\}/);
+  assert.match(build, /name === 'monitoring'[\s\S]*replaceAll\('__BUILD_VERSION__', release\)/);
 });
 
 test('footer year tolerates pages without a footer', () => {

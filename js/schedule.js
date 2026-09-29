@@ -1,39 +1,5 @@
-// Página Horario (plantilla semanal / semana específica, editor de bloques Trabajo-Break-Lunch) —
-// cuarto módulo de la Fase 3, mismo método que finance.js/reports.js/calendar.js (ver
-// instrucciones.md). app-main.js sigue siendo dueño del MODELO de datos (dayConfigFor,
-// buildPlannedSlots, getEffectiveScheduleForDay, el motor de Adherencia) porque eso lo consumen
-// también Reportes, Calendario y el propio "Bloques del día" de Inicio — lo que se mueve aquí es
-// solo la INTERFAZ del editor: pestañas de día, bloques Trabajo/Break/Lunch, semana específica vs.
-// plantilla, y el stepper de "Ajustar turno completo".
-//
-// scheduleEditDay/scheduleOffsetMin se quedan declaradas en app-main.js (con `export`) porque algo
-// FUERA de esta página también las reasigna: eraseAllData() reinicia scheduleEditDay a 'mon', y los
-// botones +/- del stepper (wiring, en app-main.js) reasignan scheduleOffsetMin directo. Como esta
-// página SÍ necesita reasignarlas desde adentro (renderDayTabs / applyScheduleOffset /
-// syncShiftModalFields), app-main.js expone además setScheduleEditDay()/setScheduleOffsetMin() —
-// mismo patrón que setCalMonthOffset()/setCalViewMode() ya usa calendar.js.
-// scheduleViewMode/scheduleWeekOffset también se quedan en app-main.js (los tabs "Plantilla/Semana
-// específica" y la navegación ‹/› de semana viven en el wiring de app-main.js), pero esta página
-// nunca los reasigna — solo los lee, así que no hacen falta setters para esos dos.
-
+// app-main.js injects schedule helpers; app-context.js owns shared state and editor offsets.
 import {
-  WEEKDAYS,
-  WEEKDAY_LABELS,
-  WEEKDAY_LABELS_SHORT,
-  appConfirm,
-  defaultDaySchedule,
-  ensureWeeklySchedule,
-  formatHHMM,
-  formatMinutes,
-  formatWeekRangeLabel,
-  iconHtml,
-  isScheduleWeekPast,
-  minutesToHHMM,
-  onGameDayMetadataChanged,
-  pad,
-  saveAll,
-  saveSettingsOnly,
-  snapshotHistoricalPlanning,
   scheduleEditDay,
   setScheduleEditDay,
   scheduleOffsetMin,
@@ -41,13 +7,19 @@ import {
   scheduleViewMode,
   scheduleWeekOffset,
   settings,
-  startOfCycleWeek,
-  timeLabel,
-  toMinutes,
-  toast,
-  todayCallDateKey,
-  weekStartKeyFromDate,
-} from './app-main.js';
+} from './app-context.js';
+
+let WEEKDAYS, WEEKDAY_LABELS, WEEKDAY_LABELS_SHORT, appConfirm, defaultDaySchedule;
+let ensureWeeklySchedule, formatHHMM, formatMinutes, formatWeekRangeLabel, iconHtml, isScheduleWeekPast;
+let minutesToHHMM, onGameDayMetadataChanged, pad, saveAll, saveSettingsOnly, snapshotHistoricalPlanning;
+let startOfCycleWeek, timeLabel, toMinutes, toast, todayCallDateKey, weekStartKeyFromDate;
+
+export function configureScheduleContext(context) {
+  ({ WEEKDAYS, WEEKDAY_LABELS, WEEKDAY_LABELS_SHORT, appConfirm, defaultDaySchedule, ensureWeeklySchedule,
+    formatHHMM, formatMinutes, formatWeekRangeLabel, iconHtml, isScheduleWeekPast, minutesToHHMM,
+    onGameDayMetadataChanged, pad, saveAll, saveSettingsOnly, snapshotHistoricalPlanning,
+    startOfCycleWeek, timeLabel, toMinutes, toast, todayCallDateKey, weekStartKeyFromDate } = context);
+}
 
     // "+1:00" / "-0:30" / "+0:00" — mismo formato que ya usa el resto de la app para horas (ver formatDuration), pero con signo explícito y sin segundos, ya que aquí el usuario razona en pasos de 15 min.
     function formatScheduleOffsetLabel(mins) {

@@ -47,7 +47,9 @@ api/
 
 supabase/migrations/
   0001_init.sql          Tablas, RLS, triggers y funciones. Se corre una vez.
+  0002_verificar_seguridad.sql  Refuerza y verifica RLS y permisos sensibles.
   0003_phase_5.sql       Llamadas, límites, telemetría y backup diario
+  0004_security_hardening.sql  Cuotas y retención añadidas tras la auditoría.
 
 scripts/build.mjs         Bundle Rollup + minificación Terser, sin sourcemaps
 tests/security-preparation.test.mjs  Pruebas de seguridad, PWA y datos
@@ -64,18 +66,9 @@ módulos de `js/` son la fuente de verdad de la lógica. Vercel ejecuta
 minifica el resultado sin sourcemaps. Solo `public/` se publica; los módulos
 fuente no quedan expuestos como archivos navegables.
 
-Flujo de trabajo:
-
-1. Se comparte el contenido actual de `app.html` (pegado como texto o como
-   documento) en la conversación con Claude.
-2. Claude edita directamente ese contenido con sus propias herramientas de
-   archivo — nunca se le pide a la persona que edite código a mano.
-3. Claude entrega el archivo completo y editado, listo para reemplazar en
-   GitHub (arrastrar el archivo nuevo encima del viejo en la interfaz web de
-   GitHub y confirmar el cambio).
-
-`tools/build_app_html.py` queda solo como aviso de que este flujo ya no se
-usa; puede borrarse del repo sin ningún efecto.
+El agente trabaja directamente en el repositorio, ejecuta las verificaciones,
+crea los commits y publica el build cuando la tarea lo requiere. La persona
+usuaria no necesita editar archivos ni ejecutar comandos manualmente.
 
 ### Por qué el script principal no se autoejecuta al abrir `/app`
 

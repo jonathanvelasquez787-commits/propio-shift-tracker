@@ -8375,7 +8375,7 @@
     <div class="game-arena-title-row"><div><h3 data-game-role="monster-name">Monstruo del día</h3><p data-game-role="monster-quip">La meta está viva. Cada llamada cuenta.</p></div><span class="game-arena-state" data-game-role="monster-state">DORMIDO</span></div>
     <div class="game-arena-hp" data-game-role="hp-panel">
       <div class="game-arena-hp-head"><span>VIDA DEL JEFE</span><strong data-game-role="monster-hp-label">$0.00 / $0.00</strong></div>
-      <div class="game-arena-hp-track"><span data-game-role="monster-hp-bar" style="width:100%;"></span><i data-game-role="ghost-marker" title="Sombra de ayer"></i></div>
+      <div class="game-arena-hp-track" role="progressbar" aria-label="Vida del monstruo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><span data-game-role="monster-hp-bar" style="width:100%;"></span><i data-game-role="ghost-marker" title="Sombra de ayer"></i></div>
       <div class="game-arena-hp-foot"><span data-game-role="monster-hp-pct">100% de vida</span><span data-game-role="ghost-label">Ayer —</span></div>
     </div>
     <div class="game-arena-stats"><span><small>COMBO</small><b data-game-role="combo">x0</b></span><span><small>GOLPE ACTUAL</small><b data-game-role="last-hit">—</b></span><span><small>BOTÍN EXTRA</small><b data-game-role="loot">$0.00</b></span></div>
@@ -8441,7 +8441,7 @@
 </div>
 <div class="game-cycle-boss" hidden id="gameCycleBoss">
   <div class="game-cycle-boss-head"><div><span class="game-panel-eyebrow">JEFE DEL CICLO</span><h3 data-game-role="cycle-title">Temporada actual</h3></div><span class="game-cycle-label" data-game-role="cycle-status">EN MARCHA</span></div>
-  <div class="game-cycle-boss-body"><div class="game-cycle-boss-meter"><div class="game-cycle-boss-track"><span data-game-role="cycle-progress" style="width:0%;"></span></div><div class="game-cycle-boss-foot"><span data-game-role="cycle-earned">$0.00</span><span data-game-role="cycle-goal">Meta $0.00</span></div></div><div class="game-cycle-boss-sprite" data-game-role="cycle-sprite" role="img" aria-label="Jefe del ciclo"><span class="game-cycle-horn left"></span><span class="game-cycle-horn right"></span><span class="game-cycle-eye left"></span><span class="game-cycle-eye right"></span><span class="game-cycle-teeth"></span></div></div>
+  <div class="game-cycle-boss-body"><div class="game-cycle-boss-meter"><div class="game-cycle-boss-track" role="progressbar" aria-label="Progreso contra el jefe del ciclo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span data-game-role="cycle-progress" style="width:0%;"></span></div><div class="game-cycle-boss-foot"><span data-game-role="cycle-earned">$0.00</span><span data-game-role="cycle-goal">Meta $0.00</span></div></div><div class="game-cycle-boss-sprite" data-game-role="cycle-sprite" role="img" aria-label="Jefe del ciclo"><span class="game-cycle-horn left"></span><span class="game-cycle-horn right"></span><span class="game-cycle-eye left"></span><span class="game-cycle-eye right"></span><span class="game-cycle-teeth"></span></div></div>
 </div>
 <div class="gh-goal-card">
 <div class="gh-goal-top"><span>Meta del ciclo</span><b id="cycleGoalAmountBadge">Meta $0.00</b></div>
@@ -8962,21 +8962,21 @@
 <section class="game-achievements-grid game-achievements-grid-top">
   <article class="game-panel game-streak-panel" id="gameStreakPanel">
     <div class="game-panel-head"><div><span class="game-panel-eyebrow">Constancia</span><h2>Racha semanal</h2></div><span class="game-panel-badge" data-game-role="streak-best">Mejor: 0</span></div>
-    <div class="game-streak-week" data-game-role="streak-week" aria-label="Racha de los últimos siete días">
-      <span class="game-streak-day" data-day-state="empty"><b>L</b><em>—</em></span>
-      <span class="game-streak-day" data-day-state="empty"><b>M</b><em>—</em></span>
-      <span class="game-streak-day" data-day-state="empty"><b>X</b><em>—</em></span>
-      <span class="game-streak-day" data-day-state="empty"><b>J</b><em>—</em></span>
-      <span class="game-streak-day" data-day-state="empty"><b>V</b><em>—</em></span>
-      <span class="game-streak-day" data-day-state="empty"><b>S</b><em>—</em></span>
-      <span class="game-streak-day" data-day-state="empty"><b>D</b><em>—</em></span>
+    <div class="game-streak-week" data-game-role="streak-week" role="list" aria-label="Racha de los últimos siete días">
+      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>L</b><em>—</em></span>
+      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>M</b><em>—</em></span>
+      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>X</b><em>—</em></span>
+      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>J</b><em>—</em></span>
+      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>V</b><em>—</em></span>
+      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>S</b><em>—</em></span>
+      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>D</b><em>—</em></span>
     </div>
     <div class="game-panel-foot"><span>Escudos disponibles</span><strong data-game-role="shields">0</strong></div>
   </article>
 
   <article class="game-panel game-level-panel" id="gameLevelPanel">
     <div class="game-panel-head"><div><span class="game-panel-eyebrow">Progreso</span><h2>Nivel <strong data-game-role="level">1</strong></h2></div><span class="game-level-emblem" data-game-role="level-emblem">1</span></div>
-    <div class="game-level-track" aria-label="Progreso hacia el siguiente nivel"><span data-game-role="level-progress" style="width:0%;"></span></div>
+    <div class="game-level-track" role="progressbar" aria-label="Progreso hacia el siguiente nivel" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span data-game-role="level-progress" style="width:0%;"></span></div>
     <div class="game-level-foot"><span data-game-role="level-xp">0 XP</span><span data-game-role="next-level">Siguiente: 100 XP</span></div>
     <div class="game-level-ladder" data-game-role="level-ladder"><span class="is-current">1</span><i></i><span>2</span><i></i><span>3</span><i></i><span>4</span></div>
   </article>
@@ -8984,7 +8984,7 @@
 
 <section class="game-panel game-cycle-panel" id="gameCycleBossAchievements">
   <div class="game-panel-head"><div><span class="game-panel-eyebrow">Temporada de 14 días</span><h2>Jefe del ciclo</h2></div><span class="game-cycle-label" data-game-role="cycle-status">En marcha</span></div>
-  <div class="game-cycle-boss-layout"><div class="game-boss-copy"><strong data-game-role="cycle-title">El jefe observa tu progreso.</strong><p data-game-role="cycle-subtitle">La barra refleja lo que llevas acumulado en el ciclo de pago actual.</p><div class="game-boss-progress"><span data-game-role="cycle-progress" style="width:0%;"></span></div><div class="game-boss-progress-foot"><span data-game-role="cycle-earned">$0.00</span><span data-game-role="cycle-goal">Meta $0.00</span></div></div><div class="game-boss-sprite" data-game-role="cycle-sprite" aria-hidden="true"><span class="game-pixel-crown"></span><span class="game-pixel-eye left"></span><span class="game-pixel-eye right"></span><span class="game-pixel-mouth"></span></div></div>
+  <div class="game-cycle-boss-layout"><div class="game-boss-copy"><strong data-game-role="cycle-title">El jefe observa tu progreso.</strong><p data-game-role="cycle-subtitle">La barra refleja lo que llevas acumulado en el ciclo de pago actual.</p><div class="game-boss-progress" role="progressbar" aria-label="Progreso contra el jefe del ciclo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span data-game-role="cycle-progress" style="width:0%;"></span></div><div class="game-boss-progress-foot"><span data-game-role="cycle-earned">$0.00</span><span data-game-role="cycle-goal">Meta $0.00</span></div></div><div class="game-boss-sprite" data-game-role="cycle-sprite" aria-hidden="true"><span class="game-pixel-crown"></span><span class="game-pixel-eye left"></span><span class="game-pixel-eye right"></span><span class="game-pixel-mouth"></span></div></div>
 </section>
 
 <section class="game-achievements-grid game-achievements-grid-collection">

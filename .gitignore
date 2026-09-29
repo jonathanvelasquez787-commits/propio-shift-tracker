@@ -4,10 +4,15 @@ public/
 .vercel/
 .DS_Store
 
-# Nunca versionar claves reales
+# Nunca versionar configuración de entorno real.
 .env
-.env.local
-.env.*.local
+.env.*
+*.env
+*.env.*
+!.env.example
+!.env.*.example
+!*.env.example
+!*.env.*.example
 
 # Pruebas
 tests/__pycache__/

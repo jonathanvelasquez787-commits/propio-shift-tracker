@@ -1,37 +1,20 @@
-// Página Ajustes — último módulo de páginas de la Fase 3. Contiene perfil, metas,
-// tarifa, moneda y onboarding. El estado persistido continúa en app-main.js.
-
 import { authErrorMessage, getProfile, getUser, updateEmail, updateUsername } from './auth.js';
-import {
-  DEFAULT_USER_EMOJI,
-  EMOJI_CHOICES,
-  RATE,
-  closeModal,
-  convertedAmountText,
-  currencyCeilFromUsdAmount,
-  effectiveCycleGoal,
-  effectiveDailyGoal,
-  ensureCurrencySettings,
-  escapeHtml,
-  formatCallDayLabel,
-  formatMinutes,
-  getActiveDayKey,
-  getDailyGoalOverride,
-  iconHtml,
-  money,
-  onGameDayMetadataChanged,
-  openModal,
-  render,
-  saveSettingsOnly,
-  saveStateOnly,
-  snapshotHistoricalPlanning,
-  setDailyGoalOverride,
-  settings,
-  state,
-  toast,
-  todayCallDateKey,
-  usdCeilFromCurrencyAmount,
-} from './app-main.js';
+import { settings, state } from './app-context.js';
+
+let DEFAULT_USER_EMOJI, EMOJI_CHOICES, RATE, closeModal, convertedAmountText;
+let currencyCeilFromUsdAmount, effectiveCycleGoal, effectiveDailyGoal, ensureCurrencySettings, escapeHtml;
+let formatCallDayLabel, formatMinutes, getActiveDayKey, getDailyGoalOverride, iconHtml, money;
+let onGameDayMetadataChanged, openModal, render, saveSettingsOnly, saveStateOnly, snapshotHistoricalPlanning;
+let setDailyGoalOverride, toast;
+let todayCallDateKey, usdCeilFromCurrencyAmount;
+
+export function configureSettingsContext(context) {
+  ({ DEFAULT_USER_EMOJI, EMOJI_CHOICES, RATE, closeModal, convertedAmountText, currencyCeilFromUsdAmount,
+    effectiveCycleGoal, effectiveDailyGoal, ensureCurrencySettings, escapeHtml, formatCallDayLabel,
+    formatMinutes, getActiveDayKey, getDailyGoalOverride, iconHtml, money, onGameDayMetadataChanged, openModal, render,
+    saveSettingsOnly, saveStateOnly, snapshotHistoricalPlanning, setDailyGoalOverride, toast, todayCallDateKey,
+    usdCeilFromCurrencyAmount } = context);
+}
 
 let syncingGoals = false;
     // Lee los 3 campos de meta y devuelve los valores ya sincronizados entre sí, SIN guardar nada —

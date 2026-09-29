@@ -1,41 +1,17 @@
-// Página Calendario (vista mensual y anual de productividad) — tercer módulo de la Fase 3,
-// mismo método que finance.js/reports.js (ver v556/v557). calMonthOffset/calViewMode/calYearOffset
-// se quedan declaradas en app-main.js (se reasignan también desde el wiring de los botones
-// prev/next/hoy, que vive ahí) — este módulo las importa para leer, y usa setCalMonthOffset()/
-// setCalViewMode() para las dos reasignaciones que sí le tocan a esta página (abrir un mes desde
-// la vista anual, volver a la vista anual).
+// app-main.js injects calendar helpers; app-context.js owns shared state and view offsets.
+import { calMonthOffset, calViewMode, calYearOffset, calls, settings, setCalMonthOffset, setCalViewMode } from './app-context.js';
 
-import {
-  RATE,
-  calMonthOffset,
-  calViewMode,
-  calYearOffset,
-  calls,
-  callsForDay,
-  closeModal,
-  convertedAmountText,
-  dayIsEffectivelyOff,
-  dayNoteCategoryMeta,
-  dayShiftBounds,
-  effectiveDailyGoal,
-  escapeHtml,
-  formatMinutes,
-  getDayNote,
-  higherRateBonusForCalls,
-  iconHtml,
-  importedCallStats,
-  money,
-  openModal,
-  pad,
-  productiveMinutesForDay,
-  saveSettingsOnly,
-  setCalMonthOffset,
-  setCalViewMode,
-  settings,
-  toast,
-  todayCallDateKey,
-  todayRange,
-} from './app-main.js';
+let RATE, callsForDay, closeModal, convertedAmountText, dayIsEffectivelyOff, dayNoteCategoryMeta;
+let dayShiftBounds, effectiveDailyGoal, escapeHtml, formatMinutes, getDayNote, higherRateBonusForCalls;
+let iconHtml, importedCallStats, money, openModal, pad, productiveMinutesForDay, saveSettingsOnly;
+let toast, todayCallDateKey, todayRange;
+
+export function configureCalendarContext(context) {
+  ({ RATE, callsForDay, closeModal, convertedAmountText, dayIsEffectivelyOff, dayNoteCategoryMeta,
+    dayShiftBounds, effectiveDailyGoal, escapeHtml, formatMinutes, getDayNote, higherRateBonusForCalls,
+    iconHtml, importedCallStats, money, openModal, pad, productiveMinutesForDay, saveSettingsOnly,
+    toast, todayCallDateKey, todayRange } = context);
+}
 
 // Calendario de productividad: minutos productivos por día del mes vs meta, con badge de bono
 // Higher Rate equivalente en minutos.

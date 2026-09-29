@@ -65,9 +65,13 @@ function enterApp() {
 
 function nextUrl() {
   const next = params.get('next');
-  // Solo rutas internas: un `next` con http(s) sería un redirect abierto.
-  if (next && next.startsWith('/') && !next.startsWith('//')) return next;
-  return '/app.html';
+  if (!next) return '/app.html';
+  try {
+    const destination = new URL(next, window.location.origin);
+    return destination.origin === window.location.origin ? destination.href : '/app.html';
+  } catch {
+    return '/app.html';
+  }
 }
 
 // ---------------------------------------------------------------------------

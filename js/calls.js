@@ -1,59 +1,25 @@
-// Página Llamadas — quinto módulo de la Fase 3. Reúne el editor, alta manual,
-// guardado de llamadas en vivo y la tabla/resumen diario. El modelo compartido
-// permanece en app-main.js porque también alimenta Inicio, Reportes y Calendario.
+// app-main.js injects call helpers; app-context.js owns shared app state.
+import { calls, settings, state, setAppCalls as setCalls } from './app-context.js';
 
-import {
-  HIGHER_RATE_TIERS,
-  MAX_CALL_DURATION_MIN,
-  appConfirm,
-  autoStartShiftFromCalls,
-  callDateKeyFromValue,
-  callDedupeKey,
-  calls,
-  callsForDay,
-  callsOverlap,
-  closeModal,
-  connectedMinutesForDay,
-  convertedAmountText,
-  dayAdherence,
-  dayEvents,
-  dayGapRows,
-  dayKeyFromIsoDate,
-  dayShiftBounds,
-  escapeHtml,
-  financeConvertedInline,
-  financeConvertedNote,
-  financeRunAutoFillCascade,
-  formatCallDayLabel,
-  formatDuration,
-  formatHHMM,
-  formatMinutes,
-  gapLabelText,
-  getActiveDayKey,
-  higherRateBonusForCall,
-  higherRateTierBadgeHtml,
-  iconHtml,
-  importedCallStats,
-  isoDateFromDayKey,
-  makeLocalId,
-  money,
-  onGameCallSaved,
-  onGameCallsChanged,
-  openModal,
-  pad,
-  parseMoney,
-  rateTilePerMin,
-  renderRateTiles,
-  sameCallDay,
-  saveAll,
-  setCalls,
-  settings,
-  state,
-  timeLabelFromDate,
-  toDateFromInputs,
-  toast,
-  todayCallDateKey,
-} from './app-main.js';
+let HIGHER_RATE_TIERS, MAX_CALL_DURATION_MIN, appConfirm, autoStartShiftFromCalls, callDateKeyFromValue, callDedupeKey;
+let callsForDay, callsOverlap, closeModal, connectedMinutesForDay, convertedAmountText, dayAdherence;
+let dayEvents, dayGapRows, dayKeyFromIsoDate, dayShiftBounds, escapeHtml, financeConvertedInline;
+let financeConvertedNote, financeRunAutoFillCascade, formatCallDayLabel, formatDuration, formatHHMM;
+let formatMinutes, gapLabelText, getActiveDayKey, higherRateBonusForCall, higherRateTierBadgeHtml;
+let iconHtml, importedCallStats, isoDateFromDayKey, makeLocalId, money, onGameCallSaved, onGameCallsChanged, openModal;
+let pad, parseMoney, rateTilePerMin, renderRateTiles, sameCallDay, saveAll, timeLabelFromDate;
+let toDateFromInputs, toast, todayCallDateKey;
+
+export function configureCallsContext(context) {
+  ({ HIGHER_RATE_TIERS, MAX_CALL_DURATION_MIN, appConfirm, autoStartShiftFromCalls, callDateKeyFromValue, callDedupeKey,
+    callsForDay, callsOverlap, closeModal, connectedMinutesForDay, convertedAmountText, dayAdherence,
+    dayEvents, dayGapRows, dayKeyFromIsoDate, dayShiftBounds, escapeHtml, financeConvertedInline,
+    financeConvertedNote, financeRunAutoFillCascade, formatCallDayLabel, formatDuration, formatHHMM,
+    formatMinutes, gapLabelText, getActiveDayKey, higherRateBonusForCall, higherRateTierBadgeHtml,
+    iconHtml, importedCallStats, isoDateFromDayKey, makeLocalId, money, onGameCallSaved, onGameCallsChanged, openModal,
+    pad, parseMoney, rateTilePerMin, renderRateTiles, sameCallDay, saveAll, timeLabelFromDate,
+    toDateFromInputs, toast, todayCallDateKey } = context);
+}
 
 let editingCallId = null;
 
@@ -257,6 +223,8 @@ let manualCallLiveBackupPending = false;
 // internamente callStart (el mismo formato que toDateFromInputs/parseCalls esperan al leer la
 // exportación real de Propio)
 function callStartLabelFromHHMM(hhmm) {
+  const match = String(hhmm ?? '').trim().match(/^(\d{1,2}):(\d{2})$/);
+  if (!match || Number(match[1]) > 23 || Number(match[2]) > 59) return null;
   const normalized = formatHHMM(hhmm);
   const [h, m] = normalized.split(':').map(Number);
   const hour12 = h % 12 || 12;
@@ -490,6 +458,15 @@ function trySaveCallCandidate(candidate) {
   return { ok: true };
 }
 
+function manualCallPayWithoutDuplicateRateBonus(candidate, pay) {
+  const tileBonus = HIGHER_RATE_TIERS[manualCallSelectedRateTile]?.bonusPerMin || 0;
+  const windowBonus = higherRateBonusForCall(candidate);
+  const duration = Number(candidate.durationMin) || 0;
+  if (!tileBonus || !windowBonus || duration <= 0) return pay;
+  const duplicate = Math.min(tileBonus, windowBonus.amount / duration) * duration;
+  return Math.max(0, parseMoney(pay) - duplicate).toFixed(2);
+}
+
 export function saveManualCall() {
   const dateInput = document.getElementById('manualCallDateInput');
   const startInput = document.getElementById('manualCallStartInput');
@@ -510,6 +487,10 @@ export function saveManualCall() {
     return;
   }
   const callStart = callStartLabelFromHHMM(startInput?.value);
+  if (!callStart) {
+    toast('Elige una hora válida');
+    return;
+  }
   const billable = billableInput?.value === 'Yes' ? 'Yes' : 'No';
   const dropped = droppedInput?.value === 'Yes' ? 'Yes' : 'No';
   const pay = Math.max(0, parseMoney(payInput?.value || manualCallEstimatedPay(duration))).toFixed(2);
@@ -542,6 +523,7 @@ export function saveManualCall() {
     toast('La llamada no puede terminar en el futuro');
     return;
   }
+  if (candidate && manualCallSelectedRateTile) candidate.pay = manualCallPayWithoutDuplicateRateBonus(candidate, candidate.pay);
   const result = trySaveCallCandidate(candidate);
   if (!result.ok) {
     toast(result.reason);

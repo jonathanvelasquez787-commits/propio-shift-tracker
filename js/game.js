@@ -1,40 +1,19 @@
-import {
-  appConfirm,
-  callDateKeyFromValue,
-  callDateToDate,
-  calls,
-  callsForDay,
-  closeModal,
-  computeComplianceStreak,
-  convertedAmountText,
-  cycleBoundsForOffset,
-  cycleEarningsForOffset,
-  dayAdherence,
-  dayComplianceStatus,
-  dayConfigFor,
-  dayIsEffectivelyOff,
-  effectiveCycleGoal,
-  effectiveDailyGoal,
-  escapeHtml,
-  financeConvertedInline,
-  financeRowIsMeta,
-  formatCallDayLabel,
-  formatMinutes,
-  higherRateBonusForCall,
-  higherRateLiveStatus,
-  importedCallStats,
-  money,
-  openModal,
-  parseMoney,
-  productiveMinutesForDay,
-  saveSettingsOnly,
-  saveStateOnly,
-  settings,
-  state,
-  todayCallDateKey,
-  toast,
-  weekdayKeyForDayKey,
-} from './app-main.js';
+import { calls, settings, state } from './app-context.js';
+let appConfirm, callDateKeyFromValue, callDateToDate, callsForDay, closeModal, computeComplianceStreak, convertedAmountText;
+let cycleBoundsForOffset, cycleEarningsForOffset, dayAdherence, dayComplianceStatus, dayConfigFor;
+let dayIsEffectivelyOff, effectiveCycleGoal, effectiveDailyGoal, escapeHtml, financeConvertedInline;
+let financeRowIsMeta, formatCallDayLabel, formatMinutes, higherRateBonusForCall, higherRateLiveStatus;
+let importedCallStats, money, openModal, parseMoney, productiveMinutesForDay, saveSettingsOnly;
+let saveStateOnly, todayCallDateKey, toast, weekdayKeyForDayKey;
+
+export function configureGameContext(context) {
+  ({ appConfirm, callDateKeyFromValue, callDateToDate, callsForDay, closeModal, computeComplianceStreak, convertedAmountText,
+    cycleBoundsForOffset, cycleEarningsForOffset, dayAdherence, dayComplianceStatus, dayConfigFor,
+    dayIsEffectivelyOff, effectiveCycleGoal, effectiveDailyGoal, escapeHtml, financeConvertedInline,
+    financeRowIsMeta, formatCallDayLabel, formatMinutes, higherRateBonusForCall, higherRateLiveStatus,
+    importedCallStats, money, openModal, parseMoney, productiveMinutesForDay, saveSettingsOnly,
+    saveStateOnly, todayCallDateKey, toast, weekdayKeyForDayKey } = context);
+}
 import { MONSTER_CATALOG, monsterForWeekday, monsterSvg } from './monsters.js';
 
 export const GAME_DAILY_XP_CAP = 150;
@@ -65,29 +44,103 @@ export function createDefaultGameState() {
   };
 }
 
+function boundedGameNumber(value, max, integer = false) {
+  if ((typeof value !== 'number' && typeof value !== 'string') || (typeof value === 'string' && !value.trim())) return 0;
+  const number = Number(value);
+  if (!Number.isFinite(number)) return 0;
+  return Math.max(0, Math.min(max, integer ? Math.floor(number) : number));
+}
+
+function validGameDayKey(value) {
+  const key = String(value ?? '');
+  return callDateToDate(key) ? key : null;
+}
+
+function normalizeGameDayEntry(rawEntry) {
+  if (!rawEntry || typeof rawEntry !== 'object' || Array.isArray(rawEntry)) return null;
+  const entry = { bonusXp: boundedGameNumber(rawEntry.bonusXp, GAME_DAILY_XP_CAP) };
+  const lockedXp = boundedGameNumber(rawEntry.xpLocked, GAME_DAILY_XP_CAP);
+  if ((typeof rawEntry.xpLocked === 'number' || typeof rawEntry.xpLocked === 'string') && String(rawEntry.xpLocked).trim() && Number.isFinite(Number(rawEntry.xpLocked))) {
+    entry.xpLocked = lockedXp;
+  }
+  if (rawEntry.reopened === true) entry.reopened = true;
+  if (rawEntry.finalized !== true) return entry;
+
+  const missionIds = new Set();
+  const missions = (Array.isArray(rawEntry.missions) ? rawEntry.missions : []).slice(0, 3).flatMap((mission) => {
+    if (!mission || typeof mission !== 'object' || Array.isArray(mission) || !['productive', 'breaks', 'adherence'].includes(mission.id) || missionIds.has(mission.id)) return [];
+    missionIds.add(mission.id);
+    return [{ id: mission.id, ok: mission.ok === true, detail: String(mission.detail ?? '').slice(0, 160) }];
+  });
+  const rawMonster = rawEntry.monster && typeof rawEntry.monster === 'object' && !Array.isArray(rawEntry.monster) ? rawEntry.monster : {};
+  const speciesIds = new Set(Object.values(MONSTER_CATALOG).map((monster) => monster.id));
+  const rawBreakdown = rawEntry.xpBreakdown && typeof rawEntry.xpBreakdown === 'object' && !Array.isArray(rawEntry.xpBreakdown) ? rawEntry.xpBreakdown : null;
+  const species = speciesIds.has(rawMonster.species) ? rawMonster.species : MONSTER_CATALOG.mon.id;
+  const finalizedAt = rawEntry.finalizedAt && Number.isFinite(new Date(rawEntry.finalizedAt).getTime()) ? new Date(rawEntry.finalizedAt).toISOString() : null;
+  const finalized = {
+    ...entry,
+    finalized: true,
+    finalizedAt,
+    xp: boundedGameNumber(rawEntry.xp, GAME_DAILY_XP_CAP, true),
+    stars: boundedGameNumber(rawEntry.stars, 3, true),
+    missions,
+    shieldUsed: rawEntry.shieldUsed === true,
+    monster: {
+      species,
+      variant: ['normal', 'gold', 'streak'].includes(rawMonster.variant) ? rawMonster.variant : 'normal',
+      defeated: rawMonster.defeated === true,
+      hpPct: boundedGameNumber(rawMonster.hpPct, 100),
+    },
+    hasActivity: typeof rawEntry.hasActivity === 'boolean' ? rawEntry.hasActivity : (boundedGameNumber(rawEntry.xp, GAME_DAILY_XP_CAP) > 0 || boundedGameNumber(rawEntry.stars, 3) > 0 || boundedGameNumber(rawEntry.earnings, 1000000000) > 0),
+  };
+  if (rawBreakdown) finalized.xpBreakdown = Object.fromEntries(['productivityXp', 'callsXp', 'adherenceXp', 'punctualityXp', 'missionXp', 'bonusXp'].map((key) => [key, boundedGameNumber(rawBreakdown[key], GAME_DAILY_XP_CAP, true)]));
+  if ((typeof rawEntry.earnings === 'number' || typeof rawEntry.earnings === 'string') && String(rawEntry.earnings).trim() && Number.isFinite(Number(rawEntry.earnings))) {
+    finalized.earnings = boundedGameNumber(rawEntry.earnings, 1000000000);
+  }
+  return finalized;
+}
+
 export function normalizeGameState(raw) {
   const fallback = createDefaultGameState();
   const source = raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
   const chest = source.chest && typeof source.chest === 'object' ? source.chest : {};
   const live = source.live && typeof source.live === 'object' ? source.live : {};
-  const days = source.days && typeof source.days === 'object' && !Array.isArray(source.days) ? source.days : {};
-  const ledger = source.ledger && typeof source.ledger === 'object' && !Array.isArray(source.ledger) ? source.ledger : {};
+  const rawDays = source.days && typeof source.days === 'object' && !Array.isArray(source.days) ? source.days : {};
+  const days = Object.fromEntries(Object.entries(rawDays)
+    .map(([key, value]) => [validGameDayKey(key), value])
+    .filter(([key]) => key)
+    .sort((a, b) => (callDateToDate(b[0])?.getTime() || 0) - (callDateToDate(a[0])?.getTime() || 0))
+    .slice(0, GAME_DAY_LIMIT)
+    .flatMap(([key, value]) => {
+      const entry = normalizeGameDayEntry(value);
+      return entry ? [[key, entry]] : [];
+    }));
+  const rawLedger = source.ledger && typeof source.ledger === 'object' && !Array.isArray(source.ledger) ? source.ledger : {};
+  const ledger = Object.fromEntries(Object.entries(rawLedger).filter(([key, value]) => typeof key === 'string' && key.length <= 180 && value === true).slice(-3000));
+  const sealedOn = validGameDayKey(chest.sealedOn);
+  const alarmAt = live.shiftAlarmAt && Number.isFinite(new Date(live.shiftAlarmAt).getTime()) ? new Date(live.shiftAlarmAt).toISOString() : null;
+  const trophies = (Array.isArray(source.trophies) ? source.trophies : []).slice(-200).flatMap((item) => {
+    if (typeof item === 'string') return [{ id: item.slice(0, 100), label: item.slice(0, 120) }];
+    if (!item || typeof item !== 'object' || Array.isArray(item)) return [];
+    const id = String(item.id ?? '').slice(0, 100);
+    const label = String(item.label ?? id).slice(0, 120);
+    return id || label ? [{ id, label, earnedOn: validGameDayKey(item.earnedOn) }] : [];
+  });
   return {
     ...fallback,
-    ...source,
-    totalXp: Math.max(0, Number(source.totalXp) || 0),
-    level: Math.max(1, Math.floor(Number(source.level) || 1)),
-    shields: Math.max(0, Math.min(GAME_SHIELD_CAP, Math.floor(Number(source.shields) || 0))),
-    bestStreak: Math.max(0, Math.floor(Number(source.bestStreak) || 0)),
-    accessories: Array.from(new Set(Array.isArray(source.accessories) ? source.accessories.map(String) : [])),
-    trophies: Array.isArray(source.trophies) ? source.trophies.filter(Boolean) : [],
-    chest: { pending: !!chest.pending, sealedOn: chest.sealedOn ? String(chest.sealedOn) : null },
+    totalXp: boundedGameNumber(source.totalXp, 1000000000, true),
+    level: Math.max(1, Math.min(100, Math.floor(Number(source.level) || 1))),
+    shields: boundedGameNumber(source.shields, GAME_SHIELD_CAP, true),
+    bestStreak: boundedGameNumber(source.bestStreak, 1000000, true),
+    accessories: Array.from(new Set((Array.isArray(source.accessories) ? source.accessories : []).filter((item) => typeof item === 'string' && ACCESSORIES.includes(item)))),
+    trophies,
+    chest: { pending: chest.pending === true && !!sealedOn, sealedOn: sealedOn && chest.pending === true ? sealedOn : null },
     days,
     ledger,
     live: {
-      dayKey: live.dayKey ? String(live.dayKey) : null,
-      combo: Math.max(0, Math.floor(Number(live.combo) || 0)),
-      shiftAlarmAt: live.shiftAlarmAt ? String(live.shiftAlarmAt) : null,
+      dayKey: validGameDayKey(live.dayKey),
+      combo: boundedGameNumber(live.combo, 10000, true),
+      shiftAlarmAt: alarmAt,
     },
   };
 }
@@ -174,18 +227,22 @@ function callIsXpEligible(call, dayKey) {
     : String(call.billable).toLowerCase() === 'yes' && String(call.dropped).toLowerCase() !== 'yes';
   if (!productive || !(Number(call.durationMin) > 0)) return false;
 
+  const started = new Date(call.startISO).getTime();
   const ended = new Date(call.endISO).getTime();
   const imported = new Date(call.importedAt).getTime();
-  if (!Number.isFinite(ended) || !Number.isFinite(imported)) return false;
+  const now = Date.now();
+  if (!Number.isFinite(started) || !Number.isFinite(ended) || !Number.isFinite(imported)
+    || started > now || ended > now || imported > now) return false;
   const lag = imported - ended;
   if (lag < 0 || lag > 30 * 60000) return false;
 
   const importedDay = todayCallDateKey(new Date(imported));
+  if (importedDay !== todayCallDateKey()) return false;
   if (importedDay === dayKey) return true;
 
   // Turno nocturno: una llamada puede pertenecer al día contable en que comenzó el shift aunque
-  // termine/importarse después de medianoche. shiftDayKey queda guardado en la propia fila.
-  return String(call.shiftDayKey || '') === dayKey;
+  // termine/importarse después de medianoche. Se conserva el límite de importación reciente.
+  return callDateKeyFromValue(call.shiftDayKey) === dayKey;
 }
 
 function plannedPauseCount(dayKey) {
@@ -420,8 +477,8 @@ function renderMissions() {
   const day = computeGameDay(currentGameDayKey());
   root.innerHTML = `
     <div class="game-section-head"><div><span class="game-kicker">3 ARMADURAS</span><h3>Misiones del día</h3></div><strong>${day.missions.filter((mission) => mission.ok).length}/3</strong></div>
-    <div class="game-mission-grid">${day.missions.map((mission, index) => `
-      <div class="game-mission ${mission.ok ? 'is-complete' : ''}">
+    <div class="game-mission-grid" role="list" aria-label="Misiones del día">${day.missions.map((mission, index) => `
+      <div class="game-mission ${mission.ok ? 'is-complete' : ''}" role="listitem" aria-label="${escapeHtml(`Misión ${index + 1}: ${mission.label}. ${mission.ok ? 'Completada' : 'Pendiente'}. ${mission.detail}`)}">
         <span class="game-armor" aria-hidden="true">${mission.ok ? '✦' : '◆'}</span>
         <div><b>${index + 1}. ${escapeHtml(mission.label)}</b><span>${escapeHtml(mission.detail)}</span></div>
       </div>`).join('')}</div>`;
@@ -477,7 +534,10 @@ function renderCycleBosses() {
     if (subtitle) subtitle.textContent = boss.defeated
       ? 'Meta del ciclo cumplida. El botín real sigue siendo tu pago.'
       : `Progreso del ciclo: ${Math.round(boss.pct)}%.`;
-    if (progress) progress.style.width = `${boss.pct}%`;
+    if (progress) {
+      progress.style.width = `${boss.pct}%`;
+      progress.parentElement?.setAttribute('aria-valuenow', String(Math.round(boss.pct)));
+    }
     if (earned) earned.textContent = withConversion(boss.cycle.earnings);
     if (goal) goal.textContent = `Meta ${withConversion(boss.goal)}`;
   });
@@ -574,7 +634,9 @@ function renderAchievements() {
           : status === 'failed' ? 'failed'
           : 'empty';
         cell.dataset.dayState = displayState;
-        cell.title = formatCallDayLabel(key);
+        const label = `${formatCallDayLabel(key)}: ${displayState}`;
+        cell.title = label;
+        cell.setAttribute('aria-label', label);
         const mark = cell.querySelector('em');
         if (mark) mark.textContent = shieldUsed ? '◆' : status === 'compliant' ? '✓' : status === 'off' ? '·' : isToday ? '○' : status === 'failed' ? '×' : '—';
       });
@@ -593,7 +655,10 @@ function renderAchievements() {
     setRole('level-xp', `${state.game.totalXp} XP`);
     setRole('next-level', `Siguiente: ${level.ceiling} XP`);
     const progress = levelRoot.querySelector('[data-game-role="level-progress"]');
-    if (progress) progress.style.width = `${level.pct}%`;
+    if (progress) {
+      progress.style.width = `${level.pct}%`;
+      progress.parentElement?.setAttribute('aria-valuenow', String(Math.round(level.pct)));
+    }
     const ladder = levelRoot.querySelector('[data-game-role="level-ladder"]');
     if (ladder) {
       const steps = ladder.querySelectorAll('span');
@@ -603,7 +668,6 @@ function renderAchievements() {
       });
     }
   }
-
   renderBestiary();
 
   const trophies = document.getElementById('gameTrophies');
@@ -707,6 +771,7 @@ function rollbackFinanceReward(key) {
 function syncFinanceRewards() {
   if (!settings.financeCategories) return false;
   const enabled = gameEnabled();
+  if (state.game.days[currentGameDayKey()]?.finalized) return false;
   let changed = false;
   const month = new Date().toISOString().slice(0, 7);
   const validMetaKeys = new Set();
@@ -1287,7 +1352,6 @@ function revokeStageClear(dayKey, { silent = false } = {}) {
     state.game.shields = Math.min(GAME_SHIELD_CAP, state.game.shields + 1);
   }
   if (rollback.streakShieldAwardedKey) delete state.game.ledger[rollback.streakShieldAwardedKey];
-
   state.game.days[dayKey] = {
     bonusXp: Number(entry.bonusXp) || 0,
     ...(Number.isFinite(Number(entry.xpLocked)) ? { xpLocked: Number(entry.xpLocked) } : {}),
@@ -1323,15 +1387,20 @@ export function onGameShiftStarted({ continued = false } = {}) {
     if (enabled) renderGame();
     return;
   }
-  if (!enabled) return;
+  if (!enabled) {
+    if (hadFinalizedDay) saveStateOnly();
+    return;
+  }
 
-  openPendingChest(dayKey);
-  const firedAt = new Date(state.game.live.shiftAlarmAt || 0).getTime();
-  const elapsed = Date.now() - firedAt;
-  const key = `reflex:${dayKey}`;
-  if (!state.game.ledger[key] && firedAt > 0 && elapsed >= 0 && elapsed <= 2 * 60000) {
-    state.game.ledger[key] = true;
-    queueGameToast('+20 XP · Reflejos perfectos', 'record');
+  if (!state.game.days[dayKey]?.finalized) {
+    openPendingChest(dayKey);
+    const firedAt = new Date(state.game.live.shiftAlarmAt || 0).getTime();
+    const elapsed = Date.now() - firedAt;
+    const key = `reflex:${dayKey}`;
+    if (!state.game.ledger[key] && firedAt > 0 && elapsed >= 0 && elapsed <= 2 * 60000) {
+      state.game.ledger[key] = true;
+      queueGameToast('+20 XP · Reflejos perfectos', 'record');
+    }
   }
   saveStateOnly();
   renderGame();
@@ -1393,6 +1462,7 @@ function freezeGameDay(dayKey) {
     comparisons,
     stars: snapshot.stars,
     missions: snapshot.missions.map(({ id, ok, detail }) => ({ id, ok, detail })),
+    hasActivity: !!(snapshot.stats.total || snapshot.eligibleCalls.length),
     shieldUsed: shieldNeeded,
     rollback: {
       shieldsBefore,
@@ -1436,8 +1506,10 @@ function freezeGameDay(dayKey) {
 
 function stageClearMarkup(dayKey, entry) {
   const fallback = computeGameDay(dayKey);
-  const callCount = Number(entry.callCount);
-  if (!(callCount > 0) && !fallback.stats.total && !fallback.eligibleCalls.length) {
+  const hasActivity = typeof entry.hasActivity === 'boolean'
+    ? entry.hasActivity
+    : Number(entry.callCount) > 0 || !!fallback.stats.total || !!fallback.eligibleCalls.length;
+  if (!hasActivity) {
     return `<div class="game-stage-clear game-stage-clear--empty"><span class="game-kicker">TURNO CERRADO</span><h2>Descanso guardado</h2><p>No hubo llamadas hoy, así que no se congeló XP. Mañana será otro stage.</p></div>`;
   }
 

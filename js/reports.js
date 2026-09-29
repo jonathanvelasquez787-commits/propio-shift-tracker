@@ -1,50 +1,23 @@
-// Página Reportes (KPIs, gráfico mensual, racha, mejores/peores días...) — segundo módulo de la
-// Fase 3, extraído de app-main.js con el mismo método que finance.js (ver v556). Depende de
-// app-main.js para las funciones de cómputo de Adherencia/Calendario/Ganancias que ya existían
-// ahí (compartidas con Horario y Calendario, que se quedan en app-main.js por ahora) — no se
-// duplicó ninguna.
+// app-main.js injects report helpers; app-context.js owns shared app state.
+import { calls, settings, state, reportsMonthlyOffset } from './app-context.js';
 
-import {
-  CYCLE_LENGTH_DAYS,
-  RATE,
-  callDateToDate,
-  calls,
-  callsForDay,
-  connectedMinutesForDay,
-  convertedAmountText,
-  cycleEarningsForOffset,
-  dayAdherence,
-  dayConfigFor,
-  dayIsEffectivelyOff,
-  dayShiftBounds,
-  effectiveCycleGoal,
-  effectiveDailyGoal,
-  effectiveHistoryStartDate,
-  escapeHtml,
-  financeConvertedInline,
-  financeConvertedNote,
-  formatCallDayLabel,
-  formatDuration,
-  formatMinutes,
-  getActiveDayKey,
-  getCycleGoalOverride,
-  iconHtml,
-  importedCallStats,
-  money,
-  onGameDayMetadataChanged,
-  pad,
-  previousCalendarDay,
-  productiveMinutesForDay,
-  reportsMonthlyOffset,
-  render,
-  saveSettingsOnly,
-  settings,
-  state,
-  todayCallDateKey,
-  todayRange,
-  weekDaysForOffset,
-  weekSummaryForOffset,
-} from './app-main.js';
+let CYCLE_LENGTH_DAYS, RATE, callDateToDate, callsForDay, connectedMinutesForDay;
+let convertedAmountText, cycleEarningsForOffset, dayAdherence, dayConfigFor, dayIsEffectivelyOff;
+let dayShiftBounds, effectiveCycleGoal, effectiveDailyGoal, effectiveHistoryStartDate, escapeHtml;
+let financeConvertedInline, financeConvertedNote, formatCallDayLabel, formatDuration, formatMinutes;
+let getActiveDayKey, getCycleGoalOverride, iconHtml, importedCallStats, money, onGameDayMetadataChanged, pad, previousCalendarDay;
+let productiveMinutesForDay, saveSettingsOnly, todayCallDateKey, todayRange, weekDaysForOffset, weekSummaryForOffset;
+let render;
+
+export function configureReportsContext(context) {
+  ({ CYCLE_LENGTH_DAYS, RATE, callDateToDate, callsForDay, connectedMinutesForDay, convertedAmountText,
+    cycleEarningsForOffset, dayAdherence, dayConfigFor, dayIsEffectivelyOff, dayShiftBounds,
+    effectiveCycleGoal, effectiveDailyGoal, effectiveHistoryStartDate, escapeHtml, financeConvertedInline,
+    financeConvertedNote, formatCallDayLabel, formatDuration, formatMinutes, getActiveDayKey,
+    getCycleGoalOverride, iconHtml, importedCallStats, money, onGameDayMetadataChanged, pad, previousCalendarDay,
+    productiveMinutesForDay, saveSettingsOnly, todayCallDateKey, todayRange, weekDaysForOffset,
+    weekSummaryForOffset, render } = context);
+}
 
 function reportsDailySeries(days = 14) {
   const today = todayRange();

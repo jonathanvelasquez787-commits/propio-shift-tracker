@@ -29,6 +29,7 @@ import {
   updateFinanceAutoFillSetting,
   updateFinanceTotalsScrollHint,
   financeRunAutoFillCascade,
+  configureFinanceContext,
 } from './finance.js';
 
 import {
@@ -39,6 +40,7 @@ import {
   renderReportsDashboard,
   renderReportsMonthlyChart,
   reportsCycleProjection,
+  configureReportsContext,
 } from './reports.js';
 
 import {
@@ -54,6 +56,7 @@ import {
   syncCalViewVisibility,
   useAutoCalHistoryStartModal,
   useAutoCalYearGoalModal,
+  configureCalendarContext,
 } from './calendar.js';
 
 import {
@@ -74,6 +77,7 @@ import {
   scheduleWeekIsPast,
   syncShiftModalFields,
   syncScheduleOffsetUI,
+  configureScheduleContext,
 } from './schedule.js';
 
 
@@ -97,6 +101,7 @@ import {
   saveManualCall,
   setTableFilterMode,
   updateManualCallPreview,
+  configureCallsContext,
 } from './calls.js';
 
 
@@ -117,6 +122,7 @@ import {
   renderHigherRateLiveCard,
   saveHigherRateWindowsFromEditor,
   syncHigherRateModalFields,
+  configureHigherRateContext,
 } from './higher-rate.js';
 
 
@@ -136,6 +142,7 @@ import {
   updateCurrencySettings,
   updateRate,
   wireEmojiPicker,
+  configureSettingsContext,
 } from './settings.js';
 
 import {
@@ -155,22 +162,25 @@ import {
   onGameShiftStarted,
   renderGame,
   renderGameLive,
+  configureGameContext,
 } from './game.js';
 
-// js/reports.js necesita effectiveHistoryStartDate() (ver su import desde './app-main.js'), pero
-// esa función vive en js/calendar.js — este archivo solo la importaba para uso propio, nunca la
-// reexportaba. Sin esta línea, el import de reports.js falla con "The requested module
-// './app-main.js' does not provide an export named 'effectiveHistoryStartDate'", lo cual rompe la
-// cadena de módulos completa (boot.js atrapa ese error en silencio, así que la app se queda muda:
-// sin errores en consola, sin nada interactivo).
-export { effectiveHistoryStartDate } from './calendar.js';
+import {
+  state, calls, settings, reportsMonthlyOffset, calMonthOffset, calViewMode, calYearOffset,
+  scheduleEditDay, scheduleOffsetMin, scheduleViewMode, scheduleWeekOffset,
+  setAppState, setAppCalls, setAppSettings, setReportsMonthlyOffset as setContextReportsMonthlyOffset,
+  setCalMonthOffset as setContextCalMonthOffset, setCalViewMode as setContextCalViewMode,
+  setCalYearOffset as setContextCalYearOffset, setScheduleEditDay as setContextScheduleEditDay,
+  setScheduleOffsetMin as setContextScheduleOffsetMin, setScheduleViewMode as setContextScheduleViewMode,
+  setScheduleWeekOffset as setContextScheduleWeekOffset,
+} from './app-context.js';
 
-// reports.js necesita financeConvertedInline/financeConvertedNote (ver su import desde
-// './app-main.js') para los montos convertidos de "Ganancias del ciclo", pero esas dos funciones
-// viven en js/finance.js — este archivo solo las importaba para su propio uso, nunca las
-// reexportaba. Mismo patrón exacto que el bug de effectiveHistoryStartDate de arriba: sin esto el
-// import de reports.js falla con "does not provide an export named 'financeConvertedInline'", lo
-// que rompe la cadena de módulos completa.
+export {
+  state, calls, settings, reportsMonthlyOffset, calMonthOffset, calViewMode, calYearOffset,
+  scheduleEditDay, scheduleOffsetMin, scheduleViewMode, scheduleWeekOffset,
+} from './app-context.js';
+
+export { effectiveHistoryStartDate } from './calendar.js';
 export { financeConvertedInline, financeConvertedNote, financeRowIsMeta, financeRunAutoFillCascade };
 export { higherRateBonusForCall, higherRateBonusForCalls, higherRateTierBadgeHtml };
 export { higherRateLiveStatus };
@@ -580,10 +590,10 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
       };
     }
 
-    export let state = loadState();
-    export let calls = loadCalls();
-    export function setCalls(value) { calls = value; }
-    export let settings = loadSettings();
+    setAppState(loadState());
+    setAppCalls(loadCalls());
+    export function setCalls(value) { setAppCalls(value); }
+    setAppSettings(loadSettings());
     ensureCurrencySettings();
     applyTheme();
     // La hora es clickeable — al tocarla se oculta (muestra un placeholder enmascarado en vez del
@@ -3193,20 +3203,8 @@ function dayProductivityGoalTotals(dayKey = getActiveDayKey()) {
 let weekViewOffset = 0; // 0 = semana actual, -1 = semana pasada, +1 = próxima 0 = ciclo de pago que contiene a "hoy", -1 = ciclo anterior, +1 = siguiente (ver cycleBoundsForOffset/cycleEarningsForOffset).
 let cycleViewOffset = 0;
 
-// Página actual de la gráfica mensual de Reportes (Ganancias + Adherencia por mes) — mismo criterio
-// que weekViewOffset/cycleViewOffset: vive en memoria, no en localStorage (vista de sesión, no
-// preferencia persistida).
-export let reportsMonthlyOffset = 0;
-
-// Calendario de productividad: mes mostrado ahora mismo (0 = mes actual).
-export let calMonthOffset = 0;
-// Vista anual de "Calendario de productividad" (solo escritorio) — 'year' o 'month'. calYearOffset:
-// 0 = año actual, navegable ±1 (mismo criterio que calMonthOffset). Ambas viven en memoria, no en
-// localStorage.
-export let calViewMode = 'month';
-export let calYearOffset = 0;
-export function setCalMonthOffset(v) { calMonthOffset = v; }
-export function setCalViewMode(v) { calViewMode = v; }
+export function setCalMonthOffset(value) { setContextCalMonthOffset(value); }
+export function setCalViewMode(value) { setContextCalViewMode(value); }
 
 // Pastilla "Hoy / Ciclo" dentro de "Ganancias de hoy" — alterna entre
 // #earningsDayView/#earningsCycleView sin animación. Vive en memoria (no en localStorage)
@@ -4309,16 +4307,16 @@ function renderPayDatesSection() {
           localStorage.removeItem(SETTINGS_KEY);
         } catch {}
 
-        state = defaultState();
-        calls = [];
-        settings = defaultSettings();
+        setAppState(defaultState());
+        setAppCalls([]);
+        setAppSettings(defaultSettings());
         ensureCurrencySettings();
 
         // Vistas/edición en memoria que ya no tienen a qué apuntar tras el borrado — mismo criterio
         // de limpieza que ya usan otros flujos (ej. resetDay reacomoda activeDayKey).
         weekViewOffset = 0;
         cycleViewOffset = 0;
-        scheduleEditDay = 'mon';
+        setContextScheduleEditDay('mon');
         editingGapContext = null;
         resetCallEditorState();
 
@@ -4371,7 +4369,7 @@ function renderPayDatesSection() {
           return Number.isFinite(t) && t >= trackedShiftStart.getTime() && t <= endMs;
         };
 
-        calls = calls.filter(c => callDateKeyFromValue(c.callDate) !== normalizedDayKey);
+        setAppCalls(calls.filter(c => callDateKeyFromValue(c.callDate) !== normalizedDayKey));
         state.events = state.events.filter(e => {
           const accountingDay = callDateKeyFromValue(e?.shiftDayKey);
           if (accountingDay) return accountingDay !== normalizedDayKey;
@@ -4615,7 +4613,7 @@ function renderPayDatesSection() {
         skippedOverlaps.push({ ...c, withCustomerId: overlapsWith.customerId, withCallStart: overlapsWith.callStart });
       }
 
-      if (replacedIds.size) calls = calls.filter(c => !replacedIds.has(c.id));
+      if (replacedIds.size) setAppCalls(calls.filter(c => !replacedIds.has(c.id)));
 
       const importedRows = accepted.map(item => {
         const preserveOfficialIdentity = item.replacementKind === 'import' && item.replaces;
@@ -4647,7 +4645,7 @@ function renderPayDatesSection() {
 
       const importedDates = new Set();
       importedRows.forEach(item => {
-        calls = [...calls, item.call].sort((a, b) => new Date(a.startISO) - new Date(b.startISO));
+        setAppCalls([...calls, item.call].sort((a, b) => new Date(a.startISO) - new Date(b.startISO)));
         const dayKey = callDateKeyFromValue(item.call.callDate);
         if (dayKey) importedDates.add(dayKey);
 
@@ -4922,12 +4920,12 @@ function renderPayDatesSection() {
     // Los backups nuevos restauran state + calls + settings. Los backups viejos (sin settings)
     // siguen siendo válidos y conservan la configuración actual, para no romper compatibilidad.
     function applyImportedPayload(payload) {
-      state = normalizeStateObject(payload.state);
-      calls = normalizeCallsArray(payload.calls);
+      setAppState(normalizeStateObject(payload.state));
+      setAppCalls(normalizeCallsArray(payload.calls));
       if (payload.settings && typeof payload.settings === 'object' && !Array.isArray(payload.settings)) {
         const restoredSettings = { ...defaultSettings(), ...payload.settings };
         if (!('onboarded' in payload.settings)) restoredSettings.onboarded = true;
-        settings = restoredSettings;
+        setAppSettings(restoredSettings);
         ensureCurrencySettings();
         applyTheme();
       }
@@ -5047,17 +5045,71 @@ function renderPayDatesSection() {
       }));
     }
 
-    export let scheduleEditDay = 'mon';
-    export function setScheduleEditDay(v) { scheduleEditDay = v; }
-    // Pedido del usuario: "Ajustar turno completo" (ver .sched-offset-block en el HTML/CSS) — cuánto se va a mover el turno la próxima vez que se toque "Aplicar a todos", en minutos (positivo = más tarde, negativo = más temprano).
-    export let scheduleOffsetMin = 0;
-    export function setScheduleOffsetMin(v) { scheduleOffsetMin = v; }
+    export function setScheduleEditDay(value) { setContextScheduleEditDay(value); }
+    export function setScheduleOffsetMin(value) { setContextScheduleOffsetMin(value); }
     // BUG-013 (QA ) — Pedido del usuario: el stepper "Ajustar turno completo" no tenía límite superior/inferior — hacer click muchas veces en "+" (o "-") podía acumular un offset enorme (ej. +30h) sin ningún aviso.
     const SCHEDULE_OFFSET_LIMIT_MIN = 720;
 
-    // Pedido del usuario: el editor de Horario ahora tiene 2 modos. 'template' (default, comportamiento de siempre): edita la plantilla recurrente Lunes-Domingo (settings.weeklySchedule). 'week':
-    export let scheduleViewMode = 'template';
-    export let scheduleWeekOffset = 0;
+    configureFinanceContext({
+      money, convertedAmountText, iconHtml, escapeHtml, toast, appConfirm, openModal, closeModal,
+      saveSettingsOnly, makeLocalId, parseMoney, usdCeilFromCurrencyAmount, higherRateBonusForCalls,
+      renderEmojiPicker, render,
+    });
+    configureReportsContext({
+      CYCLE_LENGTH_DAYS, RATE, callDateToDate, callsForDay, connectedMinutesForDay, convertedAmountText,
+      cycleEarningsForOffset, dayAdherence, dayConfigFor, dayIsEffectivelyOff, dayShiftBounds,
+      effectiveCycleGoal, effectiveDailyGoal, effectiveHistoryStartDate, escapeHtml,
+      financeConvertedInline, financeConvertedNote, formatCallDayLabel, formatDuration, formatMinutes,
+      getActiveDayKey, getCycleGoalOverride, iconHtml, importedCallStats, money, pad, previousCalendarDay,
+      onGameDayMetadataChanged, productiveMinutesForDay, saveSettingsOnly, todayCallDateKey, todayRange,
+      weekDaysForOffset, weekSummaryForOffset, render,
+    });
+    configureCalendarContext({
+      RATE, callsForDay, closeModal, convertedAmountText, dayIsEffectivelyOff, dayNoteCategoryMeta,
+      dayShiftBounds, effectiveDailyGoal, escapeHtml, formatMinutes, getDayNote, higherRateBonusForCalls,
+      iconHtml, importedCallStats, money, openModal, pad, productiveMinutesForDay, saveSettingsOnly,
+      toast, todayCallDateKey, todayRange,
+    });
+    configureScheduleContext({
+      WEEKDAYS, WEEKDAY_LABELS, WEEKDAY_LABELS_SHORT, appConfirm, defaultDaySchedule, ensureWeeklySchedule,
+      formatHHMM, formatMinutes, formatWeekRangeLabel, iconHtml, isScheduleWeekPast, minutesToHHMM,
+      onGameDayMetadataChanged, pad, saveAll, saveSettingsOnly, snapshotHistoricalPlanning, startOfCycleWeek,
+      timeLabel, toMinutes, toast, todayCallDateKey, weekStartKeyFromDate,
+    });
+    configureCallsContext({
+      HIGHER_RATE_TIERS, MAX_CALL_DURATION_MIN, appConfirm, autoStartShiftFromCalls, callDateKeyFromValue, callDedupeKey,
+      callsForDay, callsOverlap, closeModal, connectedMinutesForDay, convertedAmountText, dayAdherence,
+      dayEvents, dayGapRows, dayKeyFromIsoDate, dayShiftBounds, escapeHtml, financeConvertedInline,
+      financeConvertedNote, financeRunAutoFillCascade, formatCallDayLabel, formatDuration, formatHHMM,
+      formatMinutes, gapLabelText, getActiveDayKey, higherRateBonusForCall, higherRateTierBadgeHtml,
+      iconHtml, importedCallStats, isoDateFromDayKey, makeLocalId, money, onGameCallSaved, onGameCallsChanged, openModal,
+      pad, parseMoney, rateTilePerMin, renderRateTiles, sameCallDay, saveAll, timeLabelFromDate,
+      toDateFromInputs, toast, todayCallDateKey,
+    });
+    configureHigherRateContext({
+      HIGHER_RATE_EARLY_GRACE_MIN, HIGHER_RATE_TIERS, appConfirm, callDateKeyFromValue, callDateToDate,
+      callsForDay, dayKeyFromIsoDate, escapeHtml, financeConvertedInline, financeRunAutoFillCascade,
+      onGameCallsChanged, formatBlockDurationLabel,
+      formatCallDayLabel, formatHHMM, formatMinutes, iconHtml, isoDateFromDayKey, makeLocalId,
+      mergeIntervals, minutesToHHMM, money, saveAll, timeLabel, toDateFromInputs, toMinutes, toast,
+      todayCallDateKey, todayRange,
+    });
+    configureSettingsContext({
+      DEFAULT_USER_EMOJI, EMOJI_CHOICES, RATE, closeModal, convertedAmountText, currencyCeilFromUsdAmount,
+      effectiveCycleGoal, effectiveDailyGoal, ensureCurrencySettings, escapeHtml, formatCallDayLabel,
+      formatMinutes, getActiveDayKey, getDailyGoalOverride, iconHtml, money, openModal, render,
+      onGameDayMetadataChanged, saveSettingsOnly, saveStateOnly, snapshotHistoricalPlanning,
+      setDailyGoalOverride, toast, todayCallDateKey,
+      usdCeilFromCurrencyAmount,
+    });
+    configureGameContext({
+      appConfirm, callDateKeyFromValue, callDateToDate, callsForDay, closeModal, computeComplianceStreak, convertedAmountText,
+      cycleBoundsForOffset, cycleEarningsForOffset, dayAdherence, dayComplianceStatus, dayConfigFor,
+      dayIsEffectivelyOff, effectiveCycleGoal, effectiveDailyGoal, escapeHtml, financeConvertedInline,
+      financeRowIsMeta, formatCallDayLabel, formatMinutes, higherRateBonusForCall, higherRateLiveStatus,
+      importedCallStats, money, openModal, parseMoney, productiveMinutesForDay, saveSettingsOnly,
+      saveStateOnly, todayCallDateKey, toast, weekdayKeyForDayKey,
+    });
 
     // Pedido del usuario : Volumen/Avisos con sonido/Adherencia/ Descanso por productividad salieron de Horario — no son horario, son cómo y cuándo te avisa la app.
     function syncNotificationsModalFields() {
@@ -6767,7 +6819,7 @@ export function render() {
       if (!btn) return;
       const nextMode = btn.getAttribute('data-mode');
       if (nextMode === scheduleViewMode) return;
-      const apply = () => { scheduleViewMode = nextMode; syncShiftModalFields(); };
+      const apply = () => { setContextScheduleViewMode(nextMode); syncShiftModalFields(); };
       if (scheduleFormIsDirty()) {
         appConfirm('Tienes cambios sin guardar. ¿Descartarlos y cambiar de vista?', apply);
         return;
@@ -6775,7 +6827,7 @@ export function render() {
       apply();
     });
     function navigateScheduleWeek(nextOffset) {
-      const apply = () => { scheduleWeekOffset = nextOffset; syncShiftModalFields(); };
+      const apply = () => { setContextScheduleWeekOffset(nextOffset); syncShiftModalFields(); };
       if (scheduleFormIsDirty()) {
         appConfirm('Tienes cambios sin guardar en esta semana. ¿Descartarlos y cambiar de semana?', apply);
         return;
@@ -6949,7 +7001,7 @@ export function render() {
         toast(`El ajuste no puede pasar de -12h de una sola vez.`);
         return;
       }
-      scheduleOffsetMin -= 15;
+      setContextScheduleOffsetMin(scheduleOffsetMin - 15);
       syncScheduleOffsetUI();
     });
     document.getElementById('scheduleOffsetPlusBtn').addEventListener('click', () => {
@@ -6957,7 +7009,7 @@ export function render() {
         toast(`El ajuste no puede pasar de +12h de una sola vez.`);
         return;
       }
-      scheduleOffsetMin += 15;
+      setContextScheduleOffsetMin(scheduleOffsetMin + 15);
       syncScheduleOffsetUI();
     });
     document.getElementById('scheduleOffsetApplyBtn').addEventListener('click', applyScheduleOffset);
@@ -7123,32 +7175,32 @@ export function render() {
         const startMonthKey = historyStart.getFullYear() * 12 + historyStart.getMonth();
         if (targetLastMonthKey < startMonthKey) return;
       }
-      reportsMonthlyOffset -= 1;
+      setContextReportsMonthlyOffset(reportsMonthlyOffset - 1);
       renderReportsMonthlyChart();
     });
-    document.getElementById('rptMonthlyNextBtn').addEventListener('click', () => { if (reportsMonthlyOffset < 0) { reportsMonthlyOffset += 1; renderReportsMonthlyChart(); } });
-    document.getElementById('rptMonthlyTodayBtn').addEventListener('click', () => { reportsMonthlyOffset = 0; renderReportsMonthlyChart(); });
+    document.getElementById('rptMonthlyNextBtn').addEventListener('click', () => { if (reportsMonthlyOffset < 0) { setContextReportsMonthlyOffset(reportsMonthlyOffset + 1); renderReportsMonthlyChart(); } });
+    document.getElementById('rptMonthlyTodayBtn').addEventListener('click', () => { setContextReportsMonthlyOffset(0); renderReportsMonthlyChart(); });
     document.getElementById('calMonthPrevBtn').addEventListener('click', () => {
       const historyStart = effectiveHistoryStartDate();
       const today = todayRange();
       const targetMonthKey = (today.getFullYear() * 12 + today.getMonth()) + (calMonthOffset - 1);
       const startMonthKey = historyStart ? historyStart.getFullYear() * 12 + historyStart.getMonth() : null;
       if (startMonthKey !== null && targetMonthKey < startMonthKey) return;
-      calMonthOffset -= 1;
+      setContextCalMonthOffset(calMonthOffset - 1);
       renderCalendarMonth();
     });
-    document.getElementById('calMonthNextBtn').addEventListener('click', () => { if (calMonthOffset < 0) { calMonthOffset += 1; renderCalendarMonth(); } });
-    document.getElementById('calMonthTodayBtn').addEventListener('click', () => { calMonthOffset = 0; renderCalendarMonth(); });
+    document.getElementById('calMonthNextBtn').addEventListener('click', () => { if (calMonthOffset < 0) { setContextCalMonthOffset(calMonthOffset + 1); renderCalendarMonth(); } });
+    document.getElementById('calMonthTodayBtn').addEventListener('click', () => { setContextCalMonthOffset(0); renderCalendarMonth(); });
     // Vista anual del Calendario de productividad (solo escritorio).
     document.getElementById('calBackToYearBtn').addEventListener('click', backToCalYearView);
     document.getElementById('calYearPrevBtn').addEventListener('click', () => {
       const historyStart = effectiveHistoryStartDate();
       const targetYear = todayRange().getFullYear() + calYearOffset - 1;
       if (historyStart && targetYear < historyStart.getFullYear()) return;
-      calYearOffset -= 1;
+      setContextCalYearOffset(calYearOffset - 1);
       renderCalYear();
     });
-    document.getElementById('calYearNextBtn').addEventListener('click', () => { if (calYearOffset < 0) { calYearOffset += 1; renderCalYear(); } });
+    document.getElementById('calYearNextBtn').addEventListener('click', () => { if (calYearOffset < 0) { setContextCalYearOffset(calYearOffset + 1); renderCalYear(); } });
     document.getElementById('calYearGoalEditBtn').addEventListener('click', openCalYearGoalEditor);
     document.getElementById('calHistoryStartEditBtn').addEventListener('click', openHistoryStartDateEditor);
     document.getElementById('calYearMonthGrid').addEventListener('click', (e) => {

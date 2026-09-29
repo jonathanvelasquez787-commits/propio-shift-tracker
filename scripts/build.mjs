@@ -28,7 +28,12 @@ for (const [name, input] of Object.entries(entries)) {
     input: path.join(root, input),
     plugins: [nodeResolve({ browser: true })],
     onwarn(warning, warn) {
-      if (warning.code !== 'CIRCULAR_DEPENDENCY') warn(warning);
+      if (warning.code === 'CIRCULAR_DEPENDENCY') {
+        const ownCycle = (warning.ids || []).some(id => !id.includes('/node_modules/') && !id.includes('\\node_modules\\'));
+        if (ownCycle) throw new Error(warning.message);
+        return;
+      }
+      warn(warning);
     },
   });
   await bundle.write({
@@ -59,7 +64,8 @@ async function minifyTree(dir) {
 
 await minifyTree(assets);
 for (const name of ['theme-init', 'footer-year', 'register-sw', 'monitoring']) {
-  const source = await readFile(path.join(root, 'js', `${name}.js`), 'utf8');
+  let source = await readFile(path.join(root, 'js', `${name}.js`), 'utf8');
+  if (name === 'monitoring') source = source.replaceAll('__BUILD_VERSION__', release);
   await minifyFile(path.join(assets, `${name}.js`), source);
 }
 const worker = (await readFile(path.join(root, 'js/service-worker.js'), 'utf8'))

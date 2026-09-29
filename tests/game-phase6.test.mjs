@@ -6,6 +6,14 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
+const between = (source, startMarker, endMarker) => source.slice(source.indexOf(startMarker), source.indexOf(endMarker, source.indexOf(startMarker)));
+
+function validCallDate(key) {
+  const match = String(key).match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (!match) return null;
+  const date = new Date(Number(match[3]), Number(match[1]) - 1, Number(match[2]));
+  return date.getFullYear() === Number(match[3]) && date.getMonth() === Number(match[1]) - 1 && date.getDate() === Number(match[2]) ? date : null;
+}
 
 test('Fase 6 expone el catálogo semanal y renderiza SVG seguro para todos los estados', async () => {
   const monstersSource = read('js/monsters.js');
@@ -68,7 +76,7 @@ test('state y settings conservan defaults y normalización de Fase 6', () => {
   assert.match(game, /chest: \{ pending: false, sealedOn: null \}/);
   assert.match(game, /live: \{ dayKey: null, combo: 0, shiftAlarmAt: null \}/);
   assert.match(game, /export function normalizeGameState\(raw\)/);
-  assert.match(game, /shields: Math\.max\(0, Math\.min\(GAME_SHIELD_CAP/);
+  assert.match(game, /shields: boundedGameNumber\(source\.shields, GAME_SHIELD_CAP, true\)/);
   assert.match(game, /if \(settings\.game\.intensity === 'off'\) settings\.game\.enabled = false/);
   assert.match(appMain, /game: createDefaultGameState\(\)/);
   assert.match(appMain, /game: normalizeGameState\(src\.game\)/);
@@ -83,7 +91,7 @@ test('XP solo entra por llamadas actuales y oportunas, con tope diario y lock de
   assert.match(game, /eligibleCalls\.length\s*\? Math\.min\(GAME_DAILY_XP_CAP/);
   assert.match(game, /const importedDay = todayCallDateKey\(new Date\(imported\)\)/);
   assert.match(game, /if \(importedDay === dayKey\) return true/);
-  assert.match(game, /return String\(call\.shiftDayKey \|\| ''\) === dayKey/);
+  assert.match(game, /return callDateKeyFromValue\(call\.shiftDayKey\) === dayKey/);
   assert.match(game, /if \(lag < 0 \|\| lag > 30 \* 60000\) return false/);
   assert.match(game, /Number\.isFinite\(lockedXp\) \? Math\.min\(rawXp, lockedXp\) : rawXp/);
   assert.match(game, /!\['manual', 'live', 'import'\]\.includes\(source\)/);
@@ -102,6 +110,125 @@ test('después de derrotar no entra XP nuevo pero sí se muestra botín extra', 
   assert.match(handler, /if \(currentDay\.defeated && xpLocked\)/);
   assert.match(handler, /showCallFx\(call, 0, critical, 'extra'\)/);
   assert.match(game, /xpLocked: Number\(entry\.xpLocked\)/);
+});
+
+test('el bono manual de Higher Rate no se suma dos veces y los tiles conservan su efecto fuera de ventana', () => {
+  const calls = read('js/calls.js');
+  const helper = between(calls, 'function manualCallPayWithoutDuplicateRateBonus', 'export function saveManualCall');
+  const calculate = new Function('HIGHER_RATE_TIERS', 'manualCallSelectedRateTile', 'higherRateBonusForCall', 'parseMoney', `${helper}; return manualCallPayWithoutDuplicateRateBonus;`);
+  const tiers = { gold: { bonusPerMin: 0.04 } };
+  const withinWindow = calculate(tiers, 'gold', () => ({ amount: 0.12 }), (value) => Number(value) || 0);
+  const outsideWindow = calculate(tiers, 'gold', () => null, (value) => Number(value) || 0);
+  const durationMin = 3;
+  const estimatedGoldPay = 1.62;
+  const normalizedBasePay = withinWindow({ durationMin }, estimatedGoldPay);
+  assert.equal(Number(normalizedBasePay) + 0.12, estimatedGoldPay);
+  assert.equal(outsideWindow({ durationMin }, estimatedGoldPay), estimatedGoldPay);
+  assert.match(calls, /if \(!callStart\)\s*\{\s*toast\('Elige una hora válida'\)/);
+});
+
+test('la hora manual vacía no se convierte en 07:00 y las horas futuras no se guardan ni reciben XP', () => {
+  const calls = read('js/calls.js');
+  const timeHelper = between(calls, 'function callStartLabelFromHHMM', '// Estimado de pago');
+  const formatHHMM = (value) => {
+    const [hour, minute] = value.split(':').map(Number);
+    return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+  };
+  const toLabel = new Function('formatHHMM', 'pad', `${timeHelper}; return callStartLabelFromHHMM;`)(formatHHMM, (value) => String(value).padStart(2, '0'));
+  assert.equal(toLabel(''), null);
+  assert.equal(toLabel('24:00'), null);
+  assert.equal(toLabel('07:05'), '7:05 AM');
+  assert.match(calls, /new Date\(candidate\.endISO\)\.getTime\(\) > Date\.now\(\)/);
+  assert.match(calls, /La llamada no puede terminar en el futuro/);
+
+  const game = read('js/game.js');
+  const eligibilitySource = between(game, 'function callIsXpEligible', 'function plannedPauseCount');
+  const now = new Date(2026, 8, 28, 12, 0, 0).getTime();
+  class FixedDate extends Date {
+    constructor(...args) { super(...(args.length ? args : [now])); }
+    static now() { return now; }
+  }
+  const dayKeyFor = (date = new FixedDate()) => `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}/${date.getFullYear()}`;
+  const eligible = new Function('todayCallDateKey', 'callDateKeyFromValue', 'Date', `return (${eligibilitySource});`)(dayKeyFor, value => value || null, FixedDate);
+  const baseCall = { billable: 'Yes', dropped: 'No', durationMin: 1, importedAt: new FixedDate(now).toISOString(), startISO: new FixedDate(now - 120000).toISOString(), endISO: new FixedDate(now - 60000).toISOString() };
+  assert.equal(eligible(baseCall, dayKeyFor()), true);
+  assert.equal(eligible({ ...baseCall, startISO: new FixedDate(now + 60000).toISOString(), endISO: new FixedDate(now + 120000).toISOString() }, dayKeyFor()), false);
+});
+
+test('la normalización profunda contiene xp, estrellas, misiones y monstruo corruptos importados', () => {
+  const game = read('js/game.js');
+  const normalizerSource = between(game, 'export function createDefaultGameState()', '\n\nexport function xpThresholdForLevel').replace(/^export /gm, '');
+  const catalog = { mon: { id: 'mon' }, tue: { id: 'tue' } };
+  const normalize = new Function('GAME_DAILY_XP_CAP', 'GAME_SHIELD_CAP', 'GAME_DAY_LIMIT', 'callDateToDate', 'MONSTER_CATALOG', `${normalizerSource}; return normalizeGameState;`)(150, 3, 400, validCallDate, catalog);
+  const payload = {
+    totalXp: '<svg onload=alert(1)>',
+    days: {
+      '09/28/2026': {
+        finalized: true,
+        xp: '<img src=x onerror=alert(1)>',
+        stars: -1,
+        missions: '<script>alert(1)</script>',
+        monster: { species: '<svg onload=alert(1)>', variant: '<script>', defeated: 'true', hpPct: 'NaN' },
+      },
+      '99/99/2026': { finalized: true, xp: 50, stars: 2 },
+    },
+  };
+  const normalized = normalize(payload);
+  const day = normalized.days['09/28/2026'];
+  assert.equal(normalized.totalXp, 0);
+  assert.deepEqual(Object.keys(normalized.days), ['09/28/2026']);
+  assert.equal(day.xp, 0);
+  assert.equal(day.stars, 0);
+  assert.deepEqual(day.missions, []);
+  assert.deepEqual(day.monster, { species: 'mon', variant: 'normal', defeated: false, hpPct: 0 });
+  assert.doesNotMatch(JSON.stringify(normalized), /<script|onerror=|onload=/i);
+});
+
+test('derrota no debe seguir produciendo golpes/recompensas posteriores', () => {
+  const game = read('js/game.js');
+  const handler = game.slice(game.indexOf('export function onGameCallSaved'), game.indexOf('export function onGameGapSaved'));
+  const defeatGuard = handler.indexOf('currentDay.defeated');
+  const fx = handler.indexOf('showCallFx');
+  const reward = handler.indexOf('rewardLootBox');
+  assert.ok(defeatGuard >= 0, 'onGameCallSaved debe reconocer el estado derrotado');
+  assert.ok(defeatGuard < fx, 'la derrota debe bloquear el feedback de golpe');
+  assert.ok(defeatGuard < reward, 'la derrota debe bloquear recompensas posteriores');
+  assert.match(game, /if \(entry\.finalized \|\| Number\.isFinite\(Number\(entry\.xpLocked\)\)\) return 0/);
+  assert.match(game, /xpLocked: Number\(entry\.xpLocked\)/);
+});
+
+test('STAGE CLEAR bloquea recompensas posteriores y solo vuelve a habilitarse al revocar', () => {
+  const game = read('js/game.js');
+  const callHandler = between(game, 'export function onGameCallSaved', '\n\nexport function onGameGapSaved');
+  const finalizedGuard = callHandler.indexOf('if (state.game.days[dayKey]?.finalized) {');
+  assert.ok(finalizedGuard >= 0);
+  for (const sideEffect of ['showCallFx(call, grantedXp, critical)', 'maybeShowRecord(call)', 'rewardLootBox(dayKey, count)']) {
+    assert.ok(finalizedGuard < callHandler.indexOf(sideEffect), `${sideEffect} must stay behind the finalization guard`);
+  }
+  const gapHandler = between(game, 'export function onGameGapSaved', '\n\nexport function onGameShiftAlarmFired');
+  assert.ok(gapHandler.indexOf('if (state.game.days[dayKey]?.finalized) {') < gapHandler.indexOf('state.game.ledger[key] = true'));
+  assert.match(game, /state\.game\.days\[currentGameDayKey\(\)\]\?\.finalized/);
+  const shiftStartHandler = between(game, 'export function onGameShiftStarted', 'function stageComparisonSnapshot');
+  assert.ok(shiftStartHandler.indexOf('if (!state.game.days[dayKey]?.finalized) {') < shiftStartHandler.indexOf('const firedAt'));
+  assert.match(game, /hasActivity: !!\(snapshot\.stats\.total \|\| snapshot\.eligibleCalls\.length\)/);
+  assert.match(game, /earnings: Number\(snapshot\.stats\.earnings\) \|\| 0/);
+  assert.match(game, /xpBreakdown: \{ \.\.\.snapshot\.xpBreakdown \}/);
+  assert.match(game, /const breakdown = entry\.xpBreakdown \|\| fallback\.xpBreakdown/);
+  assert.match(game, /if \(Number\.isFinite\(Number\(rollback\.shieldsBefore\)\)\)/);
+  assert.match(game, /else if \(entry\.shieldUsed\) \{\s*state\.game\.shields = Math\.min\(GAME_SHIELD_CAP, state\.game\.shields \+ 1\)/);
+});
+
+test('barras, misiones y racha exponen estado accesible', () => {
+  const game = read('js/game.js');
+  const html = read('app.html');
+  assert.match(html, /aria-label="Progreso contra el jefe del ciclo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"/);
+  assert.match(html, /aria-label="Progreso hacia el siguiente nivel" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"/);
+  assert.match(game, /parentElement\?\.setAttribute\('aria-valuenow', String\(Math\.round\(boss\.pct\)\)\)/);
+  assert.match(game, /parentElement\?\.setAttribute\('aria-valuenow', String\(Math\.round\(level\.pct\)\)\)/);
+  assert.match(game, /game-mission-grid" role="list" aria-label="Misiones del día"/);
+  assert.match(game, /role="listitem" aria-label="\$\{escapeHtml\(`Misión/);
+  assert.match(html, /game-streak-week" data-game-role="streak-week" role="list"/);
+  assert.match(game, /cell\.setAttribute\('aria-label', label\)/);
 });
 
 test('cierre y cofre son idempotentes, y el dinero secundario aparece en la experiencia', () => {
@@ -528,7 +655,7 @@ test('cuarta simulación mensual: backup JSON realmente incluye y restaura setti
   const appMain = read('js/app-main.js');
   const html = read('app.html');
   assert.match(appMain, /schemaVersion: 2, state, calls, settings/);
-  assert.match(appMain, /settings = restoredSettings/);
+  assert.match(appMain, /setAppSettings\(restoredSettings\)/);
   assert.match(appMain, /backups viejos \(sin settings\)/i);
   assert.match(html, /respaldo completo: llamadas, turnos, pausas, horario, metas, Finanzas, Higher Rate, gamificación y ajustes/);
 });

@@ -17,8 +17,8 @@ test('wiring crítico: Higher Rate y ajuste de horario importan sus helpers de U
   assert.match(app, /hrWindowWeekdayLabel,/);
   assert.match(schedule, /export function syncScheduleOffsetUI\(/);
   assert.match(app, /syncScheduleOffsetUI,/);
-  assert.match(app, /scheduleOffsetMin -= 15;\s*syncScheduleOffsetUI\(\)/);
-  assert.match(app, /scheduleOffsetMin \+= 15;\s*syncScheduleOffsetUI\(\)/);
+  assert.match(app, /setContextScheduleOffsetMin\(scheduleOffsetMin - 15\);\s*syncScheduleOffsetUI\(\)/);
+  assert.match(app, /setContextScheduleOffsetMin\(scheduleOffsetMin \+ 15\);\s*syncScheduleOffsetUI\(\)/);
 });
 
 test('Higher Rate: borrar ventana actualiza settings antes de repintar resúmenes', () => {

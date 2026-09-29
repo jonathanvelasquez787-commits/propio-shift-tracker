@@ -1,4 +1,5 @@
-const CACHE = `propio-${__BUILD_VERSION__}`;
+const BUILD_VERSION = __BUILD_VERSION__;
+const CACHE = `propio-${BUILD_VERSION}`;
 const SHELL = [
   '/',
   '/index.html',
@@ -7,7 +8,19 @@ const SHELL = [
   '/terminos.html',
   '/manifest.webmanifest',
   '/icons/app-icon.svg',
+  '/css/tokens.css',
+  '/css/landing.css',
+  '/css/legal.css',
+  '/css/app-shell.css',
   '/css/game.css',
+  `/assets/theme-init.js?v=${BUILD_VERSION}`,
+  `/assets/theme-toggle.js?v=${BUILD_VERSION}`,
+  `/assets/footer-year.js?v=${BUILD_VERSION}`,
+  `/assets/landing-ui.js?v=${BUILD_VERSION}`,
+  `/assets/landing.js?v=${BUILD_VERSION}`,
+  `/assets/boot.js?v=${BUILD_VERSION}`,
+  `/assets/monitoring.js?v=${BUILD_VERSION}`,
+  `/assets/register-sw.js?v=${BUILD_VERSION}`,
 ];
 
 self.addEventListener('install', (event) => {

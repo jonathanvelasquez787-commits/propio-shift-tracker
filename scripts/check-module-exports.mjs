@@ -28,10 +28,12 @@ function exportedNames(file) {
 const queue = [entry];
 const visited = new Set();
 const errors = [];
+const graph = new Map();
 while (queue.length) {
   const file = queue.shift();
   if (visited.has(file)) continue;
   visited.add(file);
+  graph.set(file, new Set());
   const source = fs.readFileSync(file, 'utf8');
   if (/\bexport\s+export\b/.test(source)) {
     errors.push(`${path.relative(root, file)} contiene "export export"`);
@@ -43,6 +45,7 @@ while (queue.length) {
       errors.push(`${path.relative(root, file)}: no existe ${match[2]}`);
       continue;
     }
+    graph.get(file).add(target);
     queue.push(target);
     const available = exportedNames(target);
     for (const imported of listedNames(match[1], false)) {
@@ -53,8 +56,24 @@ while (queue.length) {
   }
 }
 
+const visiting = new Set();
+const complete = new Set();
+function visit(file, trail = []) {
+  if (visiting.has(file)) {
+    const start = trail.indexOf(file);
+    errors.push(`Dependencia circular: ${[...trail.slice(start), file].map(item => path.relative(root, item)).join(' -> ')}`);
+    return;
+  }
+  if (complete.has(file)) return;
+  visiting.add(file);
+  for (const target of graph.get(file) || []) visit(target, [...trail, file]);
+  visiting.delete(file);
+  complete.add(file);
+}
+visit(entry);
+
 if (errors.length) {
   console.error(errors.join('\n'));
   process.exit(1);
 }
-console.log(`Imports/exports verificados en ${visited.size} módulos.`);
+console.log(`Imports/exports y ciclos verificados en ${visited.size} módulos.`);

@@ -13,7 +13,7 @@ function report(kind, error) {
   sent.add(key);
   window.__pstRuntimeErrors.push({ kind, message, stack });
   if (window.__pstRuntimeErrors.length > 10) window.__pstRuntimeErrors.shift();
-  const body = JSON.stringify({ kind, message, stack, path: location.pathname, release: 'v566' });
+  const body = JSON.stringify({ kind, message, stack, path: location.pathname, release: '__BUILD_VERSION__' });
   if (navigator.sendBeacon) {
     navigator.sendBeacon('/api/telemetry', new Blob([body], { type: 'application/json' }));
   } else {

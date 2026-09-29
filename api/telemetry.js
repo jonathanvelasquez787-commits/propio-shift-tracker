@@ -15,6 +15,15 @@ async function readBody(req) {
   return JSON.parse(Buffer.concat(chunks).toString('utf8'));
 }
 
+async function consumeLimit(key, limit) {
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/consume_rate_limit`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` },
+    body: JSON.stringify({ p_key: key, p_limit: limit, p_window_seconds: 300 }),
+  });
+  return response.ok && (await response.json()) === true;
+}
+
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
   if (req.method !== 'POST') return res.status(405).json({ error: 'METHOD_NOT_ALLOWED' });
@@ -23,12 +32,8 @@ export default async function handler(req, res) {
   try {
     const ip = String(req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown').split(',')[0].trim();
     const fingerprint = createHash('sha256').update(`${SERVICE_KEY}:${ip}`).digest('hex');
-    const rate = await fetch(`${SUPABASE_URL}/rest/v1/rpc/consume_rate_limit`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` },
-      body: JSON.stringify({ p_key: `telemetry:${fingerprint}`, p_limit: 30, p_window_seconds: 300 }),
-    });
-    if (!rate.ok || !(await rate.json())) return res.status(204).end();
+    if (!(await consumeLimit(`telemetry:${fingerprint}`, 30))) return res.status(204).end();
+    if (!(await consumeLimit('telemetry:global', 600))) return res.status(204).end();
 
     const body = await readBody(req);
     await fetch(`${SUPABASE_URL}/rest/v1/app_errors`, {

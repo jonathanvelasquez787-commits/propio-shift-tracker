@@ -1,28 +1,14 @@
-// Página Finanzas (Gastos, Metas, categorías propias) — extraído de app-main.js como primer
-// módulo de la Fase 3. Depende de app-main.js (estado y helpers compartidos) y app-main.js
-// depende de este archivo (para montar la página) — el ciclo es seguro porque ninguno de los dos
-// lados toca el otro fuera de funciones que se llaman después de que ambos módulos terminaron de
-// evaluarse (ver v556 en instrucciones.md).
+// app-main.js inyecta los helpers; app-context.js mantiene el estado compartido.
+import { settings, calls } from './app-context.js';
 
-import {
-  settings,
-  calls,
-  money,
-  convertedAmountText,
-  iconHtml,
-  escapeHtml,
-  toast,
-  appConfirm,
-  openModal,
-  closeModal,
-  saveSettingsOnly,
-  makeLocalId,
-  parseMoney,
-  usdCeilFromCurrencyAmount,
-  higherRateBonusForCalls,
-  renderEmojiPicker,
-  render,
-} from './app-main.js';
+let money, convertedAmountText, iconHtml, escapeHtml, toast, appConfirm, openModal, closeModal, render;
+let saveSettingsOnly, makeLocalId, parseMoney, usdCeilFromCurrencyAmount, higherRateBonusForCalls, renderEmojiPicker;
+
+export function configureFinanceContext(context) {
+  ({ money, convertedAmountText, iconHtml, escapeHtml, toast, appConfirm, openModal, closeModal,
+    saveSettingsOnly, makeLocalId, parseMoney, usdCeilFromCurrencyAmount, higherRateBonusForCalls,
+    renderEmojiPicker, render } = context);
+}
 
     export const FINANCE_CATEGORIES = {
       casa:       { label: 'Casa',           icon: 'home',           rgb: '102,226,165' },
