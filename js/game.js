@@ -15,6 +15,15 @@ export function configureGameContext(context) {
     saveStateOnly, todayCallDateKey, toast, weekdayKeyForDayKey } = context);
 }
 import { MONSTER_CATALOG, monsterForWeekday, monsterSvg } from './monsters.js';
+import {
+  createDefaultReinforcementState,
+  initPositiveReinforcement,
+  normalizeReinforcementState,
+  onPositiveCallSaved,
+  onPositiveRewardWindow,
+  reconcilePositiveCalls,
+  renderPositiveReinforcement,
+} from './positive-reinforcement.js';
 
 export const GAME_DAILY_XP_CAP = 150;
 export const GAME_SHIELD_CAP = 3;
@@ -74,6 +83,7 @@ export function createDefaultGameState() {
     days: {},
     ledger: {},
     live: { dayKey: null, combo: 0, shiftAlarmAt: null },
+    reinforcement: createDefaultReinforcementState(),
   };
 }
 
@@ -242,6 +252,7 @@ export function normalizeGameState(raw) {
       combo: boundedGameNumber(live.combo, 10000, true),
       shiftAlarmAt: alarmAt,
     },
+    reinforcement: normalizeReinforcementState(source.reinforcement),
   };
 }
 
@@ -259,7 +270,7 @@ export function levelForXp(totalXp) {
 
 function ensureGameSettings() {
   if (!settings.game || typeof settings.game !== 'object' || Array.isArray(settings.game)) settings.game = {};
-  if (typeof settings.game.enabled !== 'boolean') settings.game.enabled = true;
+  if (typeof settings.game.enabled !== 'boolean') settings.game.enabled = false;
   if (!['subtle', 'arcade', 'off'].includes(settings.game.intensity)) settings.game.intensity = 'arcade';
   if (settings.game.intensity === 'off') settings.game.enabled = false;
   return settings.game;
@@ -1052,7 +1063,10 @@ function renderSettingsProfile() {
   const profile = document.getElementById('gameSettingsProfile');
   const level = gameLevelProgress();
   if (enabled) enabled.checked = gameEnabled();
-  if (intensity) intensity.value = settings.game.intensity;
+  if (intensity) {
+    intensity.value = settings.game.intensity;
+    intensity.disabled = !gameEnabled();
+  }
   if (!profile) return;
   const { seen } = bestiarySnapshot();
   const values = {
@@ -1206,6 +1220,7 @@ export function renderGame() {
   renderCycleBosses();
   renderAchievements();
   renderSettingsProfile();
+  renderPositiveReinforcement();
 
   if (bossDefeatedNow) {
     triggerGameEvent('gameCycleBoss', 'clear', 1000);
@@ -1593,10 +1608,12 @@ function maybeShowRecord(call) {
 }
 
 export function onGameCallSaved(call, source = 'manual') {
-  if (!gameEnabled() || !call || !['manual', 'live', 'import'].includes(source)) return;
+  if (!call || !['manual', 'live', 'import'].includes(source)) return;
   const dayKey = callDateKeyFromValue(call.shiftDayKey)
     || callDateKeyFromValue(call.callDate)
     || currentGameDayKey();
+  onPositiveCallSaved(call, source, dayKey);
+  if (!gameEnabled()) return;
   if (!callIsXpEligible(call, dayKey)) return;
   ensureGameState(dayKey);
   if (state.game.days[dayKey]?.finalized) {
@@ -1690,6 +1707,7 @@ export function onGameCallsChanged(dayKey) {
   const enabled = gameEnabled();
   ensureGameState();
   const normalizedDayKey = String(dayKey || '');
+  reconcilePositiveCalls(normalizedDayKey);
   const entry = state.game.days[normalizedDayKey];
 
   const beforeRewards = computeGameDay(normalizedDayKey, { ignoreLock: true });
@@ -1753,6 +1771,7 @@ export function onGameCallsChanged(dayKey) {
 export function onGameDayReset(dayKey) {
   ensureGameState();
   const normalized = String(dayKey || '');
+  reconcilePositiveCalls(normalized);
   const entry = state.game.days[normalized];
 
   Object.keys(state.game.ledger)
@@ -2053,13 +2072,17 @@ function openStageClear(dayKey, entry) {
 }
 
 export function onGameShiftEnded(dayKey = currentGameDayKey()) {
-  if (!gameEnabled()) return;
+  if (!gameEnabled()) {
+    onPositiveRewardWindow('shift-end');
+    return;
+  }
   const normalizedDayKey = callDateKeyFromValue(dayKey) || currentGameDayKey();
   ensureGameState(normalizedDayKey);
   const entry = freezeGameDay(normalizedDayKey);
   saveStateOnly();
   renderGame();
   openStageClear(normalizedDayKey, entry);
+  onPositiveRewardWindow('shift-end');
 }
 
 function chestReward(sealedOn) {
@@ -2118,7 +2141,12 @@ export function onGamePauseEnded() {
   renderGame();
 }
 
+export function onGamePauseStarted(type) {
+  return onPositiveRewardWindow(type === 'lunch' ? 'lunch' : 'break');
+}
+
 export function chooseMissionFocus(dayKey = currentGameDayKey(), focus = 'balanced') {
+  if (!gameEnabled()) return false;
   const normalizedDayKey = callDateKeyFromValue(dayKey) || currentGameDayKey();
   if (!MISSION_FOCUSES.includes(focus)) return false;
   ensureGameState();
@@ -2203,7 +2231,8 @@ export function onGameBackupExported() {
 
 function resetGameProgress() {
   appConfirm('¿Reiniciar todo el progreso de gamificación? Se borran XP, niveles, rachas, escudos, cofres, accesorios, trofeos y bestiario. Tus llamadas, turnos y finanzas no se tocan.', () => {
-    state.game = createDefaultGameState();
+    const reinforcement = normalizeReinforcementState(state.game?.reinforcement);
+    state.game = { ...createDefaultGameState(), reinforcement };
     ensureGameState();
     saveStateOnly();
     renderGame();
@@ -2218,6 +2247,7 @@ export function initGame() {
   gameInitialized = true;
   ensureGameSettings();
   ensureGameState();
+  initPositiveReinforcement();
   document.addEventListener('click', (event) => {
     const nav = event.target instanceof Element ? event.target.closest('[data-game-nav]') : null;
     if (nav) document.querySelector('.sidebar-link[data-page="achievements"]')?.click();

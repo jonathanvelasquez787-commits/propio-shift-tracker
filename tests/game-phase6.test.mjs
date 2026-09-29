@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createDefaultReinforcementState, normalizeReinforcementState } from '../js/positive-reinforcement.js';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
@@ -80,7 +81,8 @@ test('state y settings conservan defaults y normalización de Fase 6', () => {
   assert.match(game, /if \(settings\.game\.intensity === 'off'\) settings\.game\.enabled = false/);
   assert.match(appMain, /game: createDefaultGameState\(\)/);
   assert.match(appMain, /game: normalizeGameState\(src\.game\)/);
-  assert.match(appMain, /game: \{ enabled: true, intensity: 'arcade' \}/);
+  assert.match(appMain, /game: \{ enabled: false, intensity: 'arcade' \}/);
+  assert.match(game, /if \(typeof settings\.game\.enabled !== 'boolean'\) settings\.game\.enabled = false/);
 });
 
 test('XP solo entra por llamadas actuales y oportunas, con tope diario y lock de snapshot', () => {
@@ -159,7 +161,7 @@ test('la normalización profunda contiene xp, estrellas, misiones y monstruo cor
   const game = read('js/game.js');
   const normalizerSource = between(game, 'export function createDefaultGameState()', '\n\nexport function xpThresholdForLevel').replace(/^export /gm, '');
   const catalog = { mon: { id: 'mon' }, tue: { id: 'tue' } };
-  const normalize = new Function('GAME_DAILY_XP_CAP', 'GAME_SHIELD_CAP', 'GAME_DAY_LIMIT', 'callDateToDate', 'MONSTER_CATALOG', `${normalizerSource}; return normalizeGameState;`)(150, 3, 400, validCallDate, catalog);
+  const normalize = new Function('GAME_DAILY_XP_CAP', 'GAME_SHIELD_CAP', 'GAME_DAY_LIMIT', 'callDateToDate', 'MONSTER_CATALOG', 'createDefaultReinforcementState', 'normalizeReinforcementState', `${normalizerSource}; return normalizeGameState;`)(150, 3, 400, validCallDate, catalog, createDefaultReinforcementState, normalizeReinforcementState);
   const payload = {
     totalXp: '<svg onload=alert(1)>',
     days: {

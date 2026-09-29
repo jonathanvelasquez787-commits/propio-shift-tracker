@@ -201,22 +201,16 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
-- Diseñar e implementar el motor de reforzamiento positivo por llamada ya
-  aprobado conceptualmente: premiar la conducta controlable de tomar/completar
-  llamadas, cierre emocional sin puntos negativos, racha de recuperación,
-  evidencia positiva y un "Baúl de premios reales" creado por cada usuario.
-  Cada premio define nombre, disparador y ventana segura de reclamación
-  (próximo Break, Lunch o fin del turno); al desbloquearse queda disponible,
-  nunca interrumpe una llamada y puede reclamarse, guardarse o cambiarse.
-  Incluir un catálogo inicial amplio y editable por momento (Break, Lunch,
-  fin de turno, acumulable y recuperación), duración, costo, frecuencia y
-  condición sugerida, además de "Crear mi propio premio". Añadir límites de
-  frecuencia y presupuesto opcional, sin compras automáticas. Logros conserva
-  el historial; el refuerzo inmediato debe vivir en Inicio y al cerrar cada
-  llamada.
+Ninguno conocido.
 
 **LIMITACIONES CONOCIDAS** (alcance reducido a propósito, no son bugs)
 
+- Los premios físicos son compromisos personales: la app registra que el
+  usuario marcó uno como realizado, pero no comprueba la actividad ni hace
+  compras o pagos automáticos.
+- Se pueden configurar hasta 60 premios y mantener 100 pendientes. Al llenar
+  la cola no se descartan premios: los nuevos hitos conservan su progreso y
+  pueden generar un premio en un evento posterior cuando haya espacio.
 - La Proyección del ciclo de Inicio muestra siempre el ciclo ACTUAL
   (`reportsCycleProjection()`/`cycleGoalPace()` fijadas al offset 0); se
   esconde sola al navegar a otro ciclo.
@@ -281,12 +275,41 @@ La aplicación funciona en producción con estas bases vigentes:
   global, backup diario, exportación y borrado de cuenta permanecen activos.
 - Turnos, llamadas, Horario, Higher Rate, Finanzas, Reportes, Calendario,
   Adherencia y la gamificación «El Monstruo» están integrados.
-- La versión actual es 570. Las mejoras nuevas se documentan como pendientes
+- La versión actual es 571. Las mejoras nuevas se documentan como pendientes
   actuales.
 
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v571** — Refuerzo positivo personal y elección explícita de gamificación.
+
+- Las cuentas nuevas arrancan con «El Monstruo» y el refuerzo positivo
+  desactivados. Ambas preferencias se guardan por usuario; las elecciones
+  existentes de gamificación se conservan.
+- Inicio muestra evidencia de llamadas completadas, cierres positivos,
+  aprendizajes y recuperaciones cuando se activa el refuerzo. Al guardar una
+  llamada manual o en vivo se puede registrar un cierre breve sin puntos
+  negativos; las importaciones se cuentan sin abrir un modal por fila.
+- El catálogo ofrece 16 premios de Break, Lunch y fin del turno, incluido
+  progreso acumulable. Cada usuario puede agregar o editar premios con
+  disparador, frecuencia, hitos, duración, costo y límite diario.
+- Los premios se ganan con llamadas, recuperación o meta diaria y esperan a
+  una ventana segura. Se pueden realizar, cambiar o guardar; el presupuesto
+  semanal opcional impide marcar como realizado un premio que lo exceda.
+  Logros muestra el historial y un botón en Inicio permite reabrir premios
+  durante la pausa o después del turno.
+- «Plan del día» ya respeta `hidden` al apagar la gamificación; sus controles
+  quedan inactivos. Reiniciar solo la gamificación preserva premios personales.
+- ACW deja de ser una tarjeta de resumen y se muestra como tiempo en la línea
+  final de cada bloque de trabajo, junto a los minutos usados, sin barra propia.
+  Se excluyen pausas y huecos clasificados como «Otro».
+- Sustituir una llamada en vivo por su importación oficial conserva su evidencia
+  positiva. La recuperación exige una llamada posterior; realizar o cambiar un
+  premio vuelve a validar la pausa/fin del turno y conserva el límite de origen.
+- Verificados 108 tests, normalización, recompensas idempotentes, presupuesto,
+  ventanas seguras, cálculo ACW, contratos/ciclos de 18 módulos, wiring de UI y
+  build de producción sin sourcemaps; auditoría de dependencias sin alertas.
 
 **v570** — Laboratorio QA reversible y enfoque diario en contexto.
 
@@ -326,21 +349,3 @@ La aplicación funciona en producción con estas bases vigentes:
   animaciones transitorias y cobertura completa de movimiento reducido.
 - Verificados 98 tests, contratos/ciclos de 14 módulos, wiring de UI, build sin
   sourcemaps y arranque limpio del build en navegador sin errores de consola.
-
-**v568** — Auditoría profunda cerrada en código.
-
-- Corregidos el doble bono manual de Higher Rate, horas vacías/futuras, la
-  inmutabilidad de STAGE CLEAR y la devolución del escudo al reabrir un turno.
-- El estado importado de «El Monstruo» se normaliza en profundidad y sus barras,
-  misiones, racha y progreso de nivel exponen semántica accesible.
-- Redirect interno endurecido, telemetría limitada también de forma global,
-  archivos de entorno ignorados y migración transaccional de cuota/retención
-  aplicada y validada en Supabase.
-- PWA con precache completo y versión de telemetría inyectada por build;
-  Rollup actualizado a 3.30.0 y `npm test` compatible con Windows.
-- Estado compartido extraído a `js/app-context.js`: cero ciclos propios y
-  verificadores que impiden reintroducirlos. README y flujo del repositorio
-  actualizados.
-- Verificados 94 tests, imports/exports y ciclos de 14 módulos, sintaxis,
-  auditoría de dependencias, build, shell offline y arranque real en navegador.
-

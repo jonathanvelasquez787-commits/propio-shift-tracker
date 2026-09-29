@@ -157,6 +157,7 @@ import {
   onGameDayMetadataChanged,
   onGameGapSaved,
   onGamePauseEnded,
+  onGamePauseStarted,
   onGameShiftAlarmFired,
   onGameShiftEnded,
   onGameShiftStarted,
@@ -164,6 +165,8 @@ import {
   renderGameLive,
   configureGameContext,
 } from './game.js';
+import { configurePositiveReinforcementContext, migratePositiveCallIdReferences } from './positive-reinforcement.js';
+import { acwMinutesForBlock } from './block-acw.js';
 
 import {
   activeAppKeys,
@@ -801,7 +804,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
         // prioridad) cada vez que se guarda una llamada, en vez de exigir "Aplicar" manual en cada
         // fila.
         financeAutoFill: false,
-        game: { enabled: true, intensity: 'arcade' },
+        game: { enabled: false, intensity: 'arcade' },
       };
     }
 
@@ -2907,7 +2910,7 @@ function slotStats(slot, dayCalls = calls, dayPauses = dayPauseIntervals(getActi
     statusTone = 'warn';
   }
 
-  return { slotStart, slotEnd, durationMin, callMin, acwMin, pauseMin, filledMin, pct, productivityPct, detail, status, statusTone, actualPauseRange, realActivityRange, productivityGoal };
+  return { slotStart, slotEnd, callWindowStart, callWindowEnd, durationMin, callMin, acwMin, pauseMin, filledMin, pct, productivityPct, detail, status, statusTone, actualPauseRange, realActivityRange, productivityGoal };
 }
 
 // Adherencia: plan (horario semanal) vs real (lo que de verdad pasó)
@@ -4076,6 +4079,7 @@ function renderPayDatesSection() {
       // de inmediato en vez de esperar al próximo tick.
       stopBreakStartAlarm();
       toast(`${pretty} iniciado`);
+      onGamePauseStarted(type);
     }
 
     function endPause(options = {}) {
@@ -4656,6 +4660,7 @@ function renderPayDatesSection() {
 
       const importedDates = new Set();
       importedRows.forEach(item => {
+        if (item.replacementKind === 'live') migratePositiveCallIdReferences(item.replaces?.id, item.call.id, item.call.endISO);
         setAppCalls([...calls, item.call].sort((a, b) => new Date(a.startISO) - new Date(b.startISO)));
         const dayKey = callDateKeyFromValue(item.call.callDate);
         if (dayKey) importedDates.add(dayKey);
@@ -5120,6 +5125,11 @@ function renderPayDatesSection() {
       financeRowIsMeta, formatCallDayLabel, formatMinutes, higherRateBonusForCall, higherRateLiveStatus,
       importedCallStats, money, openModal, parseMoney, productiveMinutesForDay, saveSettingsOnly,
       saveStateOnly, todayCallDateKey, toast, weekdayKeyForDayKey,
+    });
+    configurePositiveReinforcementContext({
+      callDateKeyFromValue, callsForDay, closeModal, convertedAmountText, effectiveDailyGoal,
+      escapeHtml, importedCallStats, openModal, saveSettingsOnly, saveStateOnly, toast,
+      todayCallDateKey,
     });
 
     // Pedido del usuario : Volumen/Avisos con sonido/Adherencia/ Descanso por productividad salieron de Horario — no son horario, son cómo y cuándo te avisa la app.
@@ -6063,6 +6073,8 @@ function renderSchedule() {
       const breakBlockTimes = [];
       const lunchBlockTimes = [];
 
+      const blockGaps = dayGapRows(dayKey, dayCalls);
+      const blockPauseIntervals = mergeIntervals(dayPauses);
       const slotRows = plannedSlots.map((slot, slotIdx) => {
         const s = toMinutes(slot.start), e = toMinutes(slot.end);
         const active = t >= s && t < e && dayKey === todayCallDateKey();
@@ -6070,6 +6082,9 @@ function renderSchedule() {
         const extendStart = slotIdx === firstWorkIndex ? shiftStart : null;
         const extendEnd = slotIdx === lastWorkIndex ? shiftEnd : null;
         const stats = slotStats(slot, dayCalls, dayPauses, shiftStart, shiftEnd, dayKey, extendStart, extendEnd);
+        const blockAcwMin = slot.type === 'Work'
+          ? acwMinutesForBlock(blockGaps, stats.callWindowStart, stats.callWindowEnd, blockPauseIntervals, overlapMinutesWithIntervals)
+          : 0;
         if (slot.type === 'Break') {
           breakPlannedMin += stats.durationMin;
           breakFilledMin += stats.filledMin;
@@ -6089,10 +6104,12 @@ function renderSchedule() {
         // "Incompleto".
         const statusText = active ? 'Actual' : done ? 'Hecho' : (isPastDay ? (shiftStart ? 'Incompleto' : 'Sin actividad') : 'Próximo');
         const statusClass = stats.statusTone === 'good' ? 'good' : stats.statusTone === 'warn' ? 'warn' : stats.statusTone === 'bad' ? 'bad' : '';
+        const usedProgressLabel = `${formatDuration(stats.filledMin * 60000)} usados`;
+        const acwProgressLabel = `ACW ${formatDuration(blockAcwMin * 60000)}`;
         const progressLabel = slot.type === 'Work'
           ? (stats.realActivityRange
-              ? `Actividad real: ${timeLabelFromDate(stats.realActivityRange.start)} – ${timeLabelFromDate(stats.realActivityRange.end)} · ${stats.realActivityRange.callCount} llamada(s)`
-              : `${formatDuration(stats.filledMin * 60000)} usados · ${Math.round(stats.pct)}%`)
+              ? `Actividad real: ${timeLabelFromDate(stats.realActivityRange.start)} – ${timeLabelFromDate(stats.realActivityRange.end)} · ${stats.realActivityRange.callCount} llamada(s) · ${usedProgressLabel} · ${acwProgressLabel}`
+              : `${usedProgressLabel} · ${acwProgressLabel} · ${Math.round(stats.pct)}%`)
           : stats.actualPauseRange
             ? `Pausa real: ${formatDuration(stats.actualPauseRange.durationMin * 60000)} (${timeLabelFromDate(stats.actualPauseRange.start)} – ${stats.actualPauseRange.live ? 'en curso' : timeLabelFromDate(stats.actualPauseRange.end)})`
             : `${formatDuration(stats.filledMin * 60000)} de ${formatDuration(stats.durationMin * 60000)} · ${Math.round(stats.pct)}%`;
@@ -6282,20 +6299,6 @@ function renderSchedule() {
         });
       }
 
-      // ACW (última): total de ACW acumulado en el día (mismo importedCallStats.gapTotal que ya usa
-      // el tag "ACW" de Ganancias de hoy/Tabla de llamadas).
-      const dayCallStatsForCard = importedCallStats(dayCalls, dayKey);
-      const acwGoalMin = Number(settings.acwMaxGoalMin) > 0 ? Number(settings.acwMaxGoalMin) : 60;
-      const acwPct = Math.min(100, (dayCallStatsForCard.gapTotal / acwGoalMin) * 100);
-      summaryCards.push({
-        name: 'ACW',
-        icon: iconHtml('timer'),
-        accent: 'good',
-        range: `Total: ${formatDuration(dayCallStatsForCard.gapTotal * 60000)} de Max ${formatMinutes(acwGoalMin)} min`,
-        pct: acwPct,
-        editable: 'acw',
-      });
-
       renderBlockSummaryStrip(summaryCards);
 
       // Indicador en vivo — solo aplica viendo "Hoy" con el turno en curso.
@@ -6405,6 +6408,9 @@ export function render() {
       closeModal('financeRowModal');
       closeModal('stageClearModal');
       closeModal('chestModal');
+      closeModal('positiveReflectionModal');
+      closeModal('physicalRewardClaimModal');
+      closeModal('physicalRewardEditorModal');
       openModalStack = [];
     }
 

@@ -1,4 +1,4 @@
-/* Fase 6 — El Monstruo. La UI comparte los tokens de app.html y no depende de imágenes externas. */
+/* La UI comparte los tokens de app.html y no depende de imágenes externas. */
 
 :root { --tier-gold-rgb: 255, 215, 110; }
 html.theme-light { --tier-gold-rgb: 202, 138, 4; }
@@ -13,7 +13,9 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 .game-achievements-page[hidden],
 .game-toast-stack[hidden],
 .game-chest-claim[hidden],
-.game-modal-overlay[hidden] {
+.game-modal-overlay[hidden],
+.game-daily-focus[hidden],
+.positive-evidence-card[hidden] {
   display: none !important;
 }
 
@@ -1027,4 +1029,188 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
   .game-call-fx:not(:empty) { height: 0; min-height: 0; margin: 0; }
   .game-xp-float,
   .game-live-xp-float { opacity: 1; transform: translateX(-50%); }
+}
+
+/* Refuerzo positivo: evidencia diaria y premios físicos. */
+.positive-evidence-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  margin: 12px 0;
+  padding: 12px 14px;
+  border: 1px solid rgba(var(--good-rgb), .38);
+  border-radius: 14px;
+  background: linear-gradient(120deg, rgba(var(--good-rgb), .09), rgba(var(--cyan-rgb), .045)), var(--panel-navy);
+}
+.positive-evidence-card > div:first-child { display: grid; gap: 4px; min-width: 0; }
+.positive-evidence-card > div:first-child > span { color: var(--good); font-family: var(--font-mono); font-size: 9px; font-weight: 950; letter-spacing: .1em; }
+.positive-evidence-card > div:first-child > strong { color: var(--text); font-size: 14px; }
+.positive-evidence-card > div:first-child > small { color: var(--muted); font-size: 10px; line-height: 1.4; overflow-wrap: anywhere; }
+.positive-evidence-rewards { display: grid; justify-items: center; gap: 2px; min-width: 78px; padding: 7px 10px; border: 1px solid rgba(var(--tier-gold-rgb, 255, 215, 110), .35); border-radius: 10px; background: rgba(var(--tier-gold-rgb, 255, 215, 110), .07); text-align: center; }
+.positive-evidence-rewards > b { color: var(--tier-gold); font-family: var(--font-mono); font-size: 20px; line-height: 1; }
+.positive-evidence-rewards > span { color: var(--muted); font-size: 9px; line-height: 1.25; }
+.positive-evidence-rewards > button { min-height: 24px; padding: 3px 6px; border: 1px solid rgba(var(--tier-gold-rgb, 255, 215, 110), .38); border-radius: 7px; background: var(--panel-navy); color: var(--tier-gold); cursor: pointer; font: inherit; font-size: 9px; font-weight: 800; }
+.positive-evidence-rewards > button:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+.positive-evidence-rewards > button:disabled { cursor: default; opacity: .5; }
+
+.positive-settings-section { display: grid; gap: 12px; }
+.positive-budget-field { max-width: 300px; }
+.positive-budget-field input { width: 100%; min-width: 0; }
+.positive-budget-field > small { color: var(--muted); font-size: 10px; }
+.positive-settings-block { display: grid; gap: 9px; min-width: 0; padding-top: 11px; border-top: 1px solid var(--line); }
+.positive-settings-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 0; }
+.positive-settings-heading > span { display: grid; gap: 3px; min-width: 0; }
+.positive-settings-heading strong { color: var(--text); font-size: 12px; }
+.positive-settings-heading small { color: var(--muted); font-size: 10px; line-height: 1.35; }
+.positive-settings-heading > button,
+.physical-reward-template > button {
+  flex: 0 0 auto;
+  min-height: 32px;
+  padding: 6px 10px;
+  border: 1px solid rgba(var(--cyan-rgb), .38);
+  border-radius: 9px;
+  background: rgba(var(--cyan-rgb), .09);
+  color: var(--cyan);
+  cursor: pointer;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 850;
+}
+.positive-settings-heading > button:hover,
+.positive-settings-heading > button:focus-visible,
+.physical-reward-template > button:hover,
+.physical-reward-template > button:focus-visible { border-color: rgba(var(--cyan-rgb), .72); background: rgba(var(--cyan-rgb), .15); outline: none; }
+.positive-settings-heading > button:focus-visible,
+.physical-reward-template > button:focus-visible { box-shadow: 0 0 0 2px rgba(var(--cyan-rgb), .18); }
+
+.physical-reward-selected-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 7px; min-width: 0; }
+.physical-reward-selected {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-content: center;
+  align-items: center;
+  gap: 2px 8px;
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid rgba(var(--good-rgb), .32);
+  border-radius: 10px;
+  background: rgba(var(--good-rgb), .055);
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+}
+.physical-reward-selected > span { grid-row: 1 / span 2; font-size: 19px; line-height: 1; }
+.physical-reward-selected > strong,
+.physical-reward-selected > small { min-width: 0; overflow-wrap: anywhere; }
+.physical-reward-selected > strong { font-size: 10px; }
+.physical-reward-selected > small { color: var(--muted); font-size: 9px; }
+.physical-reward-selected:hover,
+.physical-reward-selected:focus-visible { border-color: rgba(var(--good-rgb), .66); outline: none; }
+.physical-reward-selected:focus-visible { box-shadow: 0 0 0 2px rgba(var(--good-rgb), .16); }
+.physical-reward-catalog { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; min-width: 0; }
+.physical-reward-template { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px; min-width: 0; padding: 8px 9px; border: 1px solid var(--line); border-radius: 10px; background: rgba(var(--rpt-purple-rgb), .045); }
+.physical-reward-template > span { font-size: 19px; line-height: 1; }
+.physical-reward-template > div { display: grid; gap: 3px; min-width: 0; }
+.physical-reward-template strong,
+.physical-reward-template small { min-width: 0; overflow-wrap: anywhere; }
+.physical-reward-template strong { color: var(--text); font-size: 10px; }
+.physical-reward-template small { color: var(--muted); font-size: 9px; line-height: 1.3; }
+.physical-reward-template > button { min-height: 29px; padding: 5px 8px; }
+.positive-settings-section > .note { color: var(--muted); font-size: 10px; line-height: 1.4; }
+
+.positive-modal-overlay { z-index: 82; }
+.positive-reflection-modal-card,
+.physical-reward-claim-modal-card,
+.physical-reward-editor-modal-card { width: min(600px, 100%); border-color: rgba(var(--good-rgb), .38); }
+.positive-reflection-modal-card .mc-modal-head p,
+.physical-reward-claim-modal-card .mc-modal-head p { overflow-wrap: anywhere; }
+.positive-reflection-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 13px 0; }
+.positive-reflection-options > button {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 6px;
+  min-width: 0;
+  padding: 11px 10px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: rgba(var(--rpt-purple-rgb), .05);
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+}
+.positive-reflection-options > button > span { font-size: 20px; line-height: 1; }
+.positive-reflection-options > button > strong,
+.positive-reflection-options > button > small { min-width: 0; overflow-wrap: anywhere; }
+.positive-reflection-options > button > strong { font-size: 11px; line-height: 1.3; }
+.positive-reflection-options > button > small { color: var(--muted); font-size: 9px; line-height: 1.35; }
+.positive-reflection-options > button:hover,
+.positive-reflection-options > button:focus-visible { border-color: rgba(var(--good-rgb), .62); background: rgba(var(--good-rgb), .07); outline: none; }
+.positive-reflection-options > button:focus-visible { box-shadow: 0 0 0 2px rgba(var(--good-rgb), .16); }
+.positive-reflection-modal-card .goals-field textarea { width: 100%; min-width: 0; min-height: 76px; padding: 9px 10px; border: 1px solid var(--line-2); border-radius: 9px; background: var(--panel-navy); color: var(--text); font: inherit; font-size: 12px; resize: vertical; }
+.positive-reflection-modal-card .goals-field textarea:focus { border-color: rgba(var(--cyan-rgb), .64); outline: none; box-shadow: 0 0 0 2px rgba(var(--cyan-rgb), .14); }
+.positive-reflection-modal-card .goals-field textarea::placeholder { color: var(--muted-3); }
+
+.physical-reward-claim-list { display: grid; gap: 8px; min-width: 0; margin-top: 13px; }
+.physical-reward-claim { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; align-items: center; gap: 8px; min-width: 0; padding: 10px; border: 1px solid rgba(var(--tier-gold-rgb, 255, 215, 110), .34); border-radius: 11px; background: rgba(var(--tier-gold-rgb, 255, 215, 110), .055); }
+.physical-reward-claim-icon { display: grid; place-items: center; width: 32px; height: 32px; border: 1px solid rgba(var(--tier-gold-rgb, 255, 215, 110), .28); border-radius: 9px; font-size: 18px; }
+.physical-reward-claim > div { display: grid; gap: 3px; min-width: 0; }
+.physical-reward-claim > div > strong,
+.physical-reward-claim > div > small { min-width: 0; overflow-wrap: anywhere; }
+.physical-reward-claim > div > strong { color: var(--text); font-size: 11px; }
+.physical-reward-claim > div > small { color: var(--muted); font-size: 9px; line-height: 1.35; }
+.physical-reward-claim > button,
+.physical-reward-claim > select { min-width: 0; min-height: 31px; padding: 5px 8px; border: 1px solid var(--line-2); border-radius: 8px; background: var(--panel-navy); color: var(--text); font: inherit; font-size: 10px; }
+.physical-reward-claim > select { grid-column: 2; grid-row: 2; width: 100%; max-width: 140px; }
+.physical-reward-claim > button { cursor: pointer; font-weight: 800; }
+.physical-reward-claim > button[data-positive-action="swap"] { grid-column: 3; grid-row: 2; }
+.physical-reward-claim > button[data-positive-action="claim"] { border-color: rgba(var(--good-rgb), .48); background: rgba(var(--good-rgb), .1); color: var(--good); }
+.physical-reward-claim > button:hover:not(:disabled),
+.physical-reward-claim > button:focus-visible,
+.physical-reward-claim > select:focus-visible { border-color: rgba(var(--cyan-rgb), .66); outline: none; }
+.physical-reward-claim > button:focus-visible,
+.physical-reward-claim > select:focus-visible { box-shadow: 0 0 0 2px rgba(var(--cyan-rgb), .15); }
+.physical-reward-claim > button:disabled { cursor: not-allowed; opacity: .55; }
+.physical-reward-budget-note { grid-column: 2 / -1; color: var(--muted); font-size: 9px; line-height: 1.35; }
+.positive-reward-editor-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
+.positive-reward-editor-grid > .goals-field { min-width: 0; }
+.positive-reward-editor-grid > .goals-field[hidden] { display: none !important; }
+.positive-reward-editor-grid input,
+.positive-reward-editor-grid select { width: 100%; min-width: 0; }
+.positive-reward-editor-grid .goals-field > small { color: var(--muted); font-size: 9px; }
+.positive-reward-icon-field input { text-align: center; }
+
+.positive-history-section { min-width: 0; margin-top: 12px; }
+.positive-history-section [hidden] { display: none !important; }
+.positive-history-list { display: grid; gap: 7px; min-width: 0; margin-top: 10px; }
+.positive-history-row { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; align-items: start; gap: 8px; min-width: 0; padding: 8px 0; border-top: 1px solid var(--line); }
+.positive-history-row > span { font-size: 17px; }
+.positive-history-row > div { display: grid; gap: 3px; min-width: 0; }
+.positive-history-row strong { color: var(--text); font-size: 11px; overflow-wrap: anywhere; }
+.positive-history-row small { color: var(--muted); font-size: 10px; line-height: 1.35; overflow-wrap: anywhere; }
+.positive-history-row time { color: var(--muted); font-size: 9px; white-space: nowrap; }
+
+@media (max-width: 760px) {
+  .physical-reward-catalog { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 520px) {
+  .positive-evidence-card { gap: 8px; padding: 10px; }
+  .positive-evidence-card > div:first-child > strong { font-size: 12px; }
+  .positive-evidence-card > div:first-child > small { font-size: 9px; }
+  .positive-evidence-rewards { min-width: 68px; padding: 6px 7px; }
+  .positive-settings-heading { align-items: flex-start; }
+  .positive-settings-heading > button { max-width: 104px; white-space: normal; }
+  .positive-reflection-options { grid-template-columns: 1fr; }
+  .positive-reflection-options > button { grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 3px 9px; padding: 9px 10px; }
+  .positive-reflection-options > button > span { grid-row: 1 / span 2; }
+  .positive-reward-editor-grid { grid-template-columns: 1fr; }
+  .positive-reward-icon-field,
+  .positive-reward-name-field { grid-column: auto; }
+  .physical-reward-claim { grid-template-columns: 30px minmax(0, 1fr) auto; gap: 7px; padding: 8px; }
+  .physical-reward-claim-icon { width: 29px; height: 29px; }
+  .physical-reward-claim > button,
+  .physical-reward-claim > select { padding: 5px 6px; font-size: 9px; }
 }

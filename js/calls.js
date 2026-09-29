@@ -541,9 +541,9 @@ export function saveManualCall() {
   }
   financeRunAutoFillCascade();
   saveAll();
+  toast('Llamada agregada');
   onGameCallSaved(candidate, pendingBackup ? 'live' : 'manual');
   onGameCallsChanged(affectedDayKey);
-  toast('Llamada agregada');
 }
 
 // Terminar una llamada y querer empezar otra de inmediato (mismo minuto o cualquier otro) "no
@@ -568,8 +568,8 @@ export function autoSaveLiveCall(startedAtISO, endedAtISO, liveContext = null) {
     state.pendingLiveCallBackup = null;
     financeRunAutoFillCascade();
     saveAll();
-    onGameCallSaved(candidate, 'live');
     toast(`Llamada guardada (${formatDuration(durationMin * 60000)}) — edítala en Tabla de llamadas si hace falta`);
+    onGameCallSaved(candidate, 'live');
     return true;
   }
 

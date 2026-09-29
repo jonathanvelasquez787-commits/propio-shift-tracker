@@ -2081,7 +2081,7 @@
     @media (min-width: 761px) {
       .blocks-top-grid {
         display: grid;
-        grid-template-columns: 1.6fr 1fr 1fr 1fr;
+        grid-template-columns: 1.6fr 1fr 1fr;
         gap: 12px;
         align-items: stretch;
         margin-bottom: 14px;
@@ -2111,7 +2111,7 @@
     }
 
     @media (max-width: 760px) {
-      .block-summary-strip { grid-template-columns: repeat(3, 1fr); gap: 5px; }
+      .block-summary-strip { grid-template-columns: repeat(2, 1fr); gap: 5px; }
       .block-summary-strip .block-summary-card { padding: 7px 6px; border-radius: 11px; gap: 4px; }
       .block-summary-strip .block-summary-card .bsc-icon { font-size: 11px; }
       .block-summary-strip .block-summary-card .bsc-name { font-size: 10px; }
@@ -8334,6 +8334,7 @@
   <div class="game-daily-focus-copy"><span>PLAN DEL DÍA</span><strong>¿Qué quieres reforzar hoy?</strong><small>Elige antes de tu primera llamada; luego queda fijado para el día.</small></div>
   <div class="game-daily-focus-options" data-game-role="daily-focus-options" role="group" aria-label="Enfoque del día"></div>
 </div>
+<div class="positive-evidence-card" hidden id="positiveEvidenceCard" aria-live="polite"></div>
 
 <div class="controls-grid" id="callsControlsGrid">
 <button class="action-btn" id="callControlBtn" type="button" data-accent="pink">
@@ -9033,6 +9034,13 @@
     </div>
   </article>
 </section>
+<section class="positive-history-section">
+  <article class="game-panel" id="positiveHistoryPanel">
+    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Evidencia acumulada</span><h2>Mi historial positivo</h2></div><span class="game-panel-badge" id="positiveHistoryCount">0</span></div>
+    <div class="positive-history-list" id="positiveHistoryList"><div class="game-collection-empty">Tus llamadas y premios realizados aparecerán aquí.</div></div>
+    <button class="game-text-button" id="positiveHistoryToggle" data-positive-action="toggle-history" type="button" hidden>Ver todo</button>
+  </article>
+</section>
 </div><!-- /pageAchievements -->
 
 <div class="app-page" data-page="help" hidden id="pageHelp">
@@ -9637,6 +9645,28 @@
 
 <div class="divider"></div>
 
+<div class="goals-section positive-settings-section">
+<div class="goals-section-title"><svg class="goals-section-icon ic-svg good" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></svg>Refuerzo positivo</div>
+<label class="game-settings-toggle" for="positiveReinforcementEnabledInput"><span><strong>Celebrar llamadas completadas</strong><small>Convierte constancia, recuperación y metas en evidencia positiva y premios seguros.</small></span><input id="positiveReinforcementEnabledInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label>
+<label class="game-settings-toggle" for="positiveAskAfterCallInput"><span><strong>Cierre breve después de cada llamada</strong><small>Marca si cerró bien, si cumpliste aunque fue difícil o si te dejó un aprendizaje.</small></span><input id="positiveAskAfterCallInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label>
+<div class="goals-field positive-budget-field">
+<label for="positiveWeeklyBudgetInput">Presupuesto semanal opcional ($)</label>
+<input id="positiveWeeklyBudgetInput" inputmode="decimal" min="0" step="0.01" type="number" placeholder="Sin límite"/>
+<small id="positiveWeeklyBudgetConverted">Sin límite de presupuesto</small>
+</div>
+<div class="positive-settings-block">
+<div class="positive-settings-heading"><span><strong>Mis premios físicos</strong><small>Se guardan hasta tu próximo Break, Lunch o fin del turno.</small></span><button type="button" data-positive-action="new-reward">Crear mi premio</button></div>
+<div class="physical-reward-selected-list" id="physicalRewardSelected"></div>
+</div>
+<div class="positive-settings-block">
+<div class="positive-settings-heading"><span><strong>Catálogo sugerido</strong><small>Agrega una idea y personalízala a tu gusto.</small></span></div>
+<div class="physical-reward-catalog" id="physicalRewardCatalog"></div>
+</div>
+<p class="note" style="margin:0;">La app nunca compra nada ni interrumpe una llamada. Tú decides cuándo realizar, guardar o cambiar cada premio.</p>
+</div>
+
+<div class="divider"></div>
+
 <div class="goals-section" id="qaModeSection">
 <div class="goals-section-title"><svg class="goals-section-icon ic-svg blue" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6l1 3h3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3Z"/><circle cx="9" cy="13" r="2"/><path d="M15 11v4M13 13h4"/></svg>Laboratorio QA</div>
 <div class="game-settings-profile" id="qaModePanel" aria-live="polite">
@@ -9729,6 +9759,48 @@
 <p>Tu recompensa espera al próximo inicio de turno.</p>
 </div>
 <div class="modal-actions mc-action-row"><button class="mc-btn-primary cyan" data-close-modal="chestModal" type="button">Cerrar</button></div>
+</div>
+</div>
+<div aria-hidden="true" class="modal-overlay positive-modal-overlay" id="positiveReflectionModal">
+<div aria-labelledby="positiveReflectionModalTitle" aria-modal="true" class="modal-card positive-reflection-modal-card" role="dialog">
+<div class="modal-head mc-modal-head">
+<div><span class="game-kicker">ESTA LLAMADA CUENTA</span><h3 id="positiveReflectionModalTitle">Guarda la evidencia</h3><p id="positiveReflectionCall">Llamada completada</p></div>
+<button aria-label="Guardar para después" class="modal-close" data-positive-action="skip-reflection" type="button">×</button>
+</div>
+<div class="goals-field"><label for="positiveReflectionNote">Nota opcional</label><textarea id="positiveReflectionNote" maxlength="240" rows="3" placeholder="¿Qué hiciste bien o qué quieres recordar?"></textarea></div>
+<div class="positive-reflection-options" role="group" aria-label="Resultado positivo de la llamada">
+<button type="button" data-positive-outcome="good"><span>✨</span><strong>Cerró bien</strong><small>Reconozco lo que funcionó.</small></button>
+<button type="button" data-positive-outcome="difficult"><span>🛡️</span><strong>Cumplí aunque fue difícil</strong><small>La tomé y seguí adelante.</small></button>
+<button type="button" data-positive-outcome="learning"><span>💡</span><strong>Me dejó un aprendizaje</strong><small>La experiencia suma práctica.</small></button>
+</div>
+<div class="modal-actions mc-action-row"><button class="mc-btn-secondary" data-positive-action="skip-reflection" type="button">Ahora no</button></div>
+</div>
+</div>
+<div aria-hidden="true" class="modal-overlay positive-modal-overlay" id="physicalRewardClaimModal">
+<div aria-labelledby="physicalRewardClaimTitle" aria-modal="true" class="modal-card physical-reward-claim-modal-card" role="dialog">
+<div class="modal-head mc-modal-head">
+<div><span class="game-kicker">TE LO GANASTE</span><h3 id="physicalRewardClaimTitle">Premios disponibles</h3><p>Realízalo ahora, cámbialo o guárdalo para después.</p></div>
+<button aria-label="Guardar premios para después" class="modal-close" data-close-modal="physicalRewardClaimModal" type="button">×</button>
+</div>
+<div class="physical-reward-claim-list" id="physicalRewardClaimList"></div>
+<div class="modal-actions mc-action-row"><button class="mc-btn-primary cyan" data-close-modal="physicalRewardClaimModal" type="button">Guardar para después</button></div>
+</div>
+</div>
+<div aria-hidden="true" class="modal-overlay positive-modal-overlay" id="physicalRewardEditorModal">
+<div aria-labelledby="physicalRewardEditorTitle" aria-modal="true" class="modal-card physical-reward-editor-modal-card" role="dialog">
+<div class="modal-head mc-modal-head"><div><span class="game-kicker">PREMIO FÍSICO</span><h3 id="physicalRewardEditorTitle">Agregar premio</h3></div><button aria-label="Cerrar editor" class="modal-close" data-close-modal="physicalRewardEditorModal" type="button">×</button></div>
+<div class="positive-reward-editor-grid">
+<div class="goals-field positive-reward-icon-field"><label for="physicalRewardIconInput">Emoji</label><input id="physicalRewardIconInput" maxlength="8" type="text" value="🎁"/></div>
+<div class="goals-field positive-reward-name-field"><label for="physicalRewardNameInput">Nombre</label><input id="physicalRewardNameInput" maxlength="80" type="text" placeholder="Mi premio"/></div>
+<div class="goals-field"><label for="physicalRewardWindowInput">Cuándo ofrecerlo</label><select id="physicalRewardWindowInput"><option value="break">Próximo Break</option><option value="lunch">Próximo Lunch</option><option value="shift-end">Fin del turno</option></select></div>
+<div class="goals-field"><label for="physicalRewardTriggerInput">Cómo ganarlo</label><select id="physicalRewardTriggerInput"><option value="calls">Completar llamadas</option><option value="recovery">Recuperarme después de una difícil</option><option value="daily-goal">Cumplir la meta diaria</option></select></div>
+<div class="goals-field" id="physicalRewardEveryRow"><label for="physicalRewardEveryInput">Cada cuántas llamadas</label><input id="physicalRewardEveryInput" inputmode="numeric" min="1" max="100" step="1" type="number" value="5"/></div>
+<div class="goals-field"><label for="physicalRewardAccumulationInput">Hitos para ganarlo</label><input id="physicalRewardAccumulationInput" inputmode="numeric" min="1" max="30" step="1" type="number" value="1"/><small>Usa más de 1 para un premio acumulable.</small></div>
+<div class="goals-field"><label for="physicalRewardMaxInput">Máximo por día</label><input id="physicalRewardMaxInput" inputmode="numeric" min="1" max="10" step="1" type="number" value="1"/></div>
+<div class="goals-field"><label for="physicalRewardDurationInput">Duración sugerida (min)</label><input id="physicalRewardDurationInput" inputmode="numeric" min="0" max="240" step="1" type="number" placeholder="Opcional"/></div>
+<div class="goals-field"><label for="physicalRewardCostInput">Costo opcional ($)</label><input id="physicalRewardCostInput" inputmode="decimal" min="0" step="0.01" type="number" placeholder="0"/><small id="physicalRewardCostConverted"></small></div>
+</div>
+<div class="modal-actions mc-action-row"><button class="mc-btn-primary cyan" id="savePhysicalRewardBtn" type="button">Guardar premio</button><button class="mc-btn-secondary" id="deletePhysicalRewardBtn" type="button">Eliminar</button><button class="mc-btn-secondary" data-close-modal="physicalRewardEditorModal" type="button">Cancelar</button></div>
 </div>
 </div>
 <div aria-hidden="true" class="modal-overlay" id="resetModal">
