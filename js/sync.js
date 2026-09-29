@@ -17,8 +17,14 @@ export const APP_KEYS = {
   calls: 'propio_shift_tracker_calls_es_v4',
   settings: 'propio_shift_tracker_settings_es_v1',
 };
+export const QA_APP_KEYS = {
+  state: 'propio_qa_state_v1',
+  calls: 'propio_qa_calls_v1',
+  settings: 'propio_qa_settings_v1',
+};
 
 const META_KEY = 'propio_sync_meta_v1';
+const QA_KEY = 'propio_qa_session_v1';
 const DEBOUNCE_MS = 6000;
 const MAX_WAIT_MS = 45000; // aunque siga escribiendo sin parar, sube igual cada 45 s
 
@@ -28,6 +34,82 @@ let maxWaitTimer = null;
 let pushing = false;
 let listeners = [];
 let cloudCallHashes = new Map();
+
+export function readQaSession() {
+  try {
+    const raw = window.localStorage.getItem(QA_KEY);
+    const parsed = raw ? JSON.parse(raw) : null;
+    return parsed && parsed.version === 1 ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+export function isQaModeActive() {
+  return Boolean(readQaSession());
+}
+
+export function activeAppKeys() {
+  return isQaModeActive() ? QA_APP_KEYS : APP_KEYS;
+}
+
+function restoreRawKey(key, value) {
+  if (value === null || value === undefined) window.localStorage.removeItem(key);
+  else window.localStorage.setItem(key, value);
+}
+
+export async function beginQaMode(userId) {
+  if (isQaModeActive()) return { ok: true, alreadyActive: true };
+  if (readMeta().dirty) {
+    const pushed = await pushSnapshot();
+    if (!pushed.ok) return pushed.conflict ? { conflict: true } : { error: pushed.error || new Error('SYNC_FAILED') };
+  }
+  try {
+    window.localStorage.setItem(QA_KEY, JSON.stringify({ version: 1, userId: userId || readMeta().userId || null, startedAt: new Date().toISOString() }));
+  } catch (error) {
+    return { error };
+  }
+  if (pushTimer) clearTimeout(pushTimer);
+  if (maxWaitTimer) clearTimeout(maxWaitTimer);
+  pushTimer = null;
+  maxWaitTimer = null;
+  emit('qa', { active: true });
+  return { ok: true };
+}
+
+export function restoreQaMode() {
+  const session = readQaSession();
+  if (!session) return false;
+  hydrating = true;
+  try {
+    Object.values(QA_APP_KEYS).forEach((key) => window.localStorage.removeItem(key));
+    window.localStorage.removeItem(QA_KEY);
+  } finally {
+    hydrating = false;
+  }
+  emit('qa', { active: false });
+  return true;
+}
+
+export function writeQaSnapshot(snapshot, scenario = 'tour') {
+  if (!isQaModeActive()) throw new Error('QA_NOT_ACTIVE');
+  const previous = {};
+  Object.values(QA_APP_KEYS).forEach((key) => { previous[key] = window.localStorage.getItem(key); });
+  hydrating = true;
+  try {
+    window.localStorage.setItem(QA_APP_KEYS.state, JSON.stringify(snapshot.state ?? {}));
+    window.localStorage.setItem(QA_APP_KEYS.calls, JSON.stringify(snapshot.calls ?? []));
+    window.localStorage.setItem(QA_APP_KEYS.settings, JSON.stringify(snapshot.settings ?? {}));
+    const session = readQaSession();
+    window.localStorage.setItem(QA_KEY, JSON.stringify({ ...session, scenario: String(scenario || 'tour') }));
+  } catch (error) {
+    Object.values(QA_APP_KEYS).forEach((key) => window.localStorage.removeItem(key));
+    Object.entries(previous).forEach(([key, value]) => restoreRawKey(key, value));
+    throw error;
+  } finally {
+    hydrating = false;
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Metadata local de sincronización
@@ -199,9 +281,10 @@ export function writeLocalSnapshot(snapshot) {
 // O sea, 'auto' nunca es una elección del usuario — solo es el valor de fábrica.
 // Una vez que toque el switch, esta función ya no vuelve a intervenir.
 export function applyLightThemeDefault() {
+  const settingsKey = activeAppKeys().settings;
   let settings;
   try {
-    const raw = window.localStorage.getItem(APP_KEYS.settings);
+    const raw = window.localStorage.getItem(settingsKey);
     settings = raw ? JSON.parse(raw) : {};
   } catch {
     return;
@@ -212,7 +295,7 @@ export function applyLightThemeDefault() {
   settings.theme = 'light';
   hydrating = true;
   try {
-    window.localStorage.setItem(APP_KEYS.settings, JSON.stringify(settings));
+    window.localStorage.setItem(settingsKey, JSON.stringify(settings));
   } catch {
     /* si no se puede escribir, la app abre en 'auto' — molesto, no roto */
   } finally {
@@ -227,7 +310,7 @@ export function applyLightThemeDefault() {
 export function syncThemeClass() {
   let theme = 'light';
   try {
-    const raw = window.localStorage.getItem(APP_KEYS.settings);
+    const raw = window.localStorage.getItem(activeAppKeys().settings);
     const parsed = raw ? JSON.parse(raw) : null;
     if (parsed && typeof parsed === 'object' && parsed.theme === 'dark') theme = 'dark';
   } catch {
@@ -300,6 +383,7 @@ function callDelta(callList) {
 }
 
 export async function pushSnapshot({ force = false } = {}) {
+  if (isQaModeActive()) return { skipped: true, qa: true };
   if (pushing) return { skipped: true };
   const meta = readMeta();
   const snapshot = readLocalSnapshot();
@@ -355,6 +439,7 @@ export async function pushSnapshot({ force = false } = {}) {
 // Ojo: si esta subida llega, la pestaña ya no vive para anotar el updated_at
 // nuevo. Esa desincronización la resuelve resolveBoot(), no acá.
 function flushOnExit() {
+  if (isQaModeActive()) return;
   const meta = readMeta();
   if (!meta.dirty) return;
   const token = currentAccessToken();
@@ -416,6 +501,7 @@ function patchLocalStorage() {
 }
 
 function markDirty() {
+  if (isQaModeActive()) return;
   writeMeta({ dirty: true });
   emit('dirty', {});
   if (pushTimer) clearTimeout(pushTimer);
@@ -443,6 +529,10 @@ function markDirty() {
 export function startAutoSync() {
   patchLocalStorage();
 
+  window.addEventListener('storage', (event) => {
+    if (event.key === QA_KEY) window.location.reload();
+  });
+
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden' && readMeta().dirty) {
       pushSnapshot();
@@ -469,9 +559,13 @@ export const BOOT = {
   USE_CLOUD: 'use-cloud', // solo hay nube, o local está limpio: se baja
   OTHER_ACCOUNT: 'other-account', // el local es de otra cuenta: se descarta sin preguntar
   CONFLICT: 'conflict', // hay dos versiones divergentes: decide el usuario
+  QA_LOCAL: 'qa-local', // sandbox local: no se consulta ni se toca la nube
 };
 
 export async function resolveBoot(userId) {
+  const qa = readQaSession();
+  if (qa && (!qa.userId || qa.userId === userId)) return { action: BOOT.QA_LOCAL, qa };
+  if (qa) restoreQaMode();
   const meta = readMeta();
   const cloud = await fetchCloud(userId);
   const local = localHasData();
@@ -553,6 +647,7 @@ export function resetForUser(userId) {
   clearLocalAppData();
   try {
     window.localStorage.removeItem(META_KEY);
+    window.localStorage.removeItem(QA_KEY);
   } catch {
     /* ignorar */
   }

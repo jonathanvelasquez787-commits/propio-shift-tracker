@@ -628,17 +628,30 @@ function renderMissions() {
   root.hidden = false;
   const day = computeGameDay(currentGameDayKey());
   const focus = state.game.days[currentGameDayKey()]?.missionChoice || 'balanced';
-  const choiceLocked = day.eligibleCalls.length > 0;
   const plates = armorPlatesForDay(day);
   root.innerHTML = `
-    <div class="game-section-head"><div><span class="game-kicker">3 ARMADURAS</span><h3>Misiones del día</h3></div><strong>${day.missions.filter((mission) => mission.ok).length}/3</strong></div>
-    <div class="game-mission-choice ${choiceLocked ? 'is-locked' : ''}" role="group" aria-label="Enfoque de misiones"><span>${choiceLocked ? 'Enfoque fijado' : 'Elige enfoque'}</span>${missionFocusOptions().map((option) => `<button type="button" class="${focus === option.id ? 'is-selected' : ''}" data-game-action="choose-mission" data-mission-choice="${escapeHtml(option.id)}" aria-pressed="${focus === option.id}" ${choiceLocked ? 'disabled title="El enfoque se fija con la primera llamada elegible"' : ''}>${escapeHtml(option.label)}</button>`).join('')}</div>
+    <div class="game-section-head"><div><span class="game-kicker">3 ARMADURAS</span><h3>Misiones del día</h3></div><div class="game-missions-status"><span>Enfoque · ${escapeHtml(MISSION_FOCUS_LABELS[focus])}</span><strong>${day.missions.filter((mission) => mission.ok).length}/3</strong></div></div>
     <div class="game-armor-row" role="list" aria-label="Placas de armadura">${plates.map((plate, index) => `<div class="game-armor-plate ${plate.complete ? 'is-complete' : ''} ${plate.status === 'neutral' ? 'is-neutral' : ''}" data-armor-id="${escapeHtml(plate.id)}" role="listitem" aria-label="Placa ${index + 1}: ${escapeHtml(plate.label)}. ${plate.status === 'neutral' ? 'Neutral' : plate.complete ? 'Completada' : 'Pendiente'}"><span aria-hidden="true">${plate.complete ? '✦' : plate.status === 'neutral' ? '·' : '◆'}</span><b>${index + 1}</b></div>`).join('')}</div>
     <div class="game-mission-grid" role="list" aria-label="Misiones del día">${day.missions.map((mission, index) => `
       <div class="game-mission ${mission.ok ? 'is-complete' : ''} ${mission.status === 'neutral' ? 'is-neutral' : ''}" role="listitem" aria-label="${escapeHtml(`Misión ${index + 1}: ${mission.label}. ${mission.status === 'neutral' ? 'Neutral' : mission.ok ? 'Completada' : 'Pendiente'}. ${mission.detail}`)}">
         <span class="game-armor" aria-hidden="true">${mission.ok ? '✦' : mission.status === 'neutral' ? '·' : '◆'}</span>
         <div><b>${index + 1}. ${escapeHtml(mission.label)}</b><span>${escapeHtml(mission.detail)}</span><small class="game-mission-reward">${mission.status === 'neutral' ? 'Sin recompensa: no aplica' : `Recompensa individual · ${mission.rewardXp} XP`}</small></div>
       </div>`).join('')}</div>`;
+}
+
+function renderDailyFocus() {
+  const root = document.getElementById('gameDailyFocus');
+  if (!root) return;
+  root.hidden = !gameEnabled();
+  if (!gameEnabled()) return;
+  const dayKey = currentGameDayKey();
+  const day = computeGameDay(dayKey);
+  const focus = state.game.days[dayKey]?.missionChoice || 'balanced';
+  const locked = day.eligibleCalls.length > 0;
+  const options = root.querySelector('[data-game-role="daily-focus-options"]');
+  if (!options) return;
+  options.classList.toggle('is-locked', locked);
+  options.innerHTML = missionFocusOptions().map((option) => `<button type="button" class="${focus === option.id ? 'is-selected' : ''}" data-game-action="choose-mission" data-mission-choice="${escapeHtml(option.id)}" aria-pressed="${focus === option.id}" ${locked ? 'disabled title="El enfoque se fija con la primera llamada elegible"' : ''}>${escapeHtml(option.label)}</button>`).join('');
 }
 
 function renderHeroChips() {
@@ -1187,6 +1200,7 @@ export function renderGame() {
   if (financeChanged || bossDefeatedNow) saveStateOnly();
 
   renderHeroChips();
+  renderDailyFocus();
   renderArena();
   renderMissions();
   renderCycleBosses();

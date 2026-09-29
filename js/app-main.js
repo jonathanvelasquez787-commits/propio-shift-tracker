@@ -166,6 +166,16 @@ import {
 } from './game.js';
 
 import {
+  activeAppKeys,
+  beginQaMode,
+  isQaModeActive,
+  readQaSession,
+  restoreQaMode,
+  writeQaSnapshot,
+} from './sync.js';
+import { createQaSnapshot, QA_SCENARIOS } from './qa-mode.js';
+
+import {
   state, calls, settings, reportsMonthlyOffset, calMonthOffset, calViewMode, calYearOffset,
   scheduleEditDay, scheduleOffsetMin, scheduleViewMode, scheduleWeekOffset,
   setAppState, setAppCalls, setAppSettings, setReportsMonthlyOffset as setContextReportsMonthlyOffset,
@@ -189,9 +199,10 @@ export { renderEmojiPicker };
 export { computeComplianceStreak, dayComplianceStatus };
 export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
 
-    const STORAGE_KEY = 'propio_shift_tracker_state_es_v4';
-    const CALLS_KEY = 'propio_shift_tracker_calls_es_v4';
-    const SETTINGS_KEY = 'propio_shift_tracker_settings_es_v1';
+    const ACTIVE_APP_KEYS = activeAppKeys();
+    const STORAGE_KEY = ACTIVE_APP_KEYS.state;
+    const CALLS_KEY = ACTIVE_APP_KEYS.calls;
+    const SETTINGS_KEY = ACTIVE_APP_KEYS.settings;
     export const RATE = 0.12;
     const ICON = {
       menu: '<line x1=\"3\" y1=\"6\" x2=\"21\" y2=\"6\"/><line x1=\"3\" y1=\"12\" x2=\"21\" y2=\"12\"/><line x1=\"3\" y1=\"18\" x2=\"21\" y2=\"18\"/>',
@@ -7386,6 +7397,73 @@ export function render() {
       if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) saveCalHistoryStartModal();
     });
 
+    function renderQaModeControls() {
+      const active = isQaModeActive();
+      const select = document.getElementById('qaScenarioInput');
+      const load = document.getElementById('qaLoadBtn');
+      const restore = document.getElementById('qaRestoreBtn');
+      const status = document.getElementById('qaModeStatus');
+      const description = document.getElementById('qaModeDescription');
+      const banner = document.getElementById('qaModeBanner');
+      if (select && !select.options.length) {
+        QA_SCENARIOS.forEach((scenario) => {
+          const option = document.createElement('option');
+          option.value = scenario.id;
+          option.textContent = scenario.label;
+          select.appendChild(option);
+        });
+      }
+      if (select && active) select.value = readQaSession()?.scenario || 'tour';
+      if (load) load.textContent = active ? 'Cargar otro escenario' : 'Entrar y cargar';
+      if (restore) restore.hidden = !active;
+      if (status) status.textContent = active ? 'Modo QA activo · nube pausada' : 'Tus datos reales están protegidos';
+      if (description) description.textContent = active
+        ? 'Puedes editar, borrar y reclamar recompensas libremente. Los cambios quedan en el laboratorio y no se suben.'
+        : 'Carga datos de prueba para recorrer pantallas, estados y recompensas. Nada del laboratorio se sube a la nube.';
+      if (banner) banner.classList.toggle('show', active);
+    }
+
+    async function loadQaScenario() {
+      if (!isQaModeActive() && (state.activeCall || state.activePause || state.pendingLiveCallBackup)) {
+        toast('Termina o descarta la llamada/pausa pendiente antes de entrar al laboratorio QA.');
+        return;
+      }
+      const select = document.getElementById('qaScenarioInput');
+      const scenario = select?.value || 'tour';
+      if (!isQaModeActive()) {
+        const result = await beginQaMode();
+        if (!result.ok) {
+          toast(result.conflict
+            ? 'Hay un conflicto de sincronización. Resuélvelo antes de entrar al laboratorio QA.'
+            : 'No se pudo proteger tu estado actual. Revisa la conexión e intenta otra vez.');
+          return;
+        }
+      }
+      try {
+        writeQaSnapshot(createQaSnapshot({ state, calls, settings }, scenario), scenario);
+        window.location.reload();
+      } catch {
+        if (!isQaModeActive()) return;
+        restoreQaMode();
+        toast('No se pudo crear el escenario QA; tus datos reales siguen intactos.');
+      }
+    }
+
+    function requestRestoreQaMode() {
+      if (!isQaModeActive()) return;
+      appConfirm('¿Salir del laboratorio QA? Se borran solo los datos de prueba y vuelven a aparecer tus datos reales.', () => {
+        restoreQaMode();
+        window.location.reload();
+      });
+    }
+
+    function initQaMode() {
+      renderQaModeControls();
+      document.getElementById('qaLoadBtn')?.addEventListener('click', loadQaScenario);
+      document.getElementById('qaRestoreBtn')?.addEventListener('click', requestRestoreQaMode);
+      document.getElementById('qaBannerRestoreBtn')?.addEventListener('click', requestRestoreQaMode);
+    }
+
     if (!state.events.length && !state.shiftStartedAt && !calls.length) {
       state.events.push({ ts: new Date().toISOString(), type: 'system', title: 'Listo para empezar', detail: 'Inicia el shift para comenzar', meta: 'idle' });
       saveStateOnly();
@@ -7496,6 +7574,7 @@ export function render() {
     }
 
     initGame();
+    initQaMode();
 
     setInterval(() => {
       // Si cambió el día de calendario real, checkDayRollover ya hace un render completo (incluye

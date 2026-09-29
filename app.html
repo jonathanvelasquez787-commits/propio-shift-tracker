@@ -4225,6 +4225,7 @@
       z-index: 101;
     }
     .storage-conflict-banner.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+    .storage-conflict-banner.qa-mode-banner { bottom: 86px; border-color: rgba(47,213,255,.5); }
     .storage-conflict-banner-icon {
       flex: 0 0 auto;
       color: var(--warn);
@@ -8329,6 +8330,11 @@
 <div class="game-loot-box" hidden id="gameLootBox" aria-live="polite"></div>
 <div class="game-record-banner" hidden id="gameRecordBanner" role="status"></div>
 
+<div class="game-daily-focus" hidden id="gameDailyFocus">
+  <div class="game-daily-focus-copy"><span>PLAN DEL DÍA</span><strong>¿Qué quieres reforzar hoy?</strong><small>Elige antes de tu primera llamada; luego queda fijado para el día.</small></div>
+  <div class="game-daily-focus-options" data-game-role="daily-focus-options" role="group" aria-label="Enfoque del día"></div>
+</div>
+
 <div class="controls-grid" id="callsControlsGrid">
 <button class="action-btn" id="callControlBtn" type="button" data-accent="pink">
 <span class="action-ripple"></span>
@@ -9631,6 +9637,24 @@
 
 <div class="divider"></div>
 
+<div class="goals-section" id="qaModeSection">
+<div class="goals-section-title"><svg class="goals-section-icon ic-svg blue" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6l1 3h3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3Z"/><circle cx="9" cy="13" r="2"/><path d="M15 11v4M13 13h4"/></svg>Laboratorio QA</div>
+<div class="game-settings-profile" id="qaModePanel" aria-live="polite">
+<span class="game-settings-profile-label" id="qaModeStatus">Tus datos reales están protegidos</span>
+<p class="danger-card-desc" id="qaModeDescription">Carga datos de prueba para recorrer pantallas, estados y recompensas. Nada del laboratorio se sube a la nube.</p>
+<div class="goals-field" style="margin-top:10px;">
+<label for="qaScenarioInput">Escenario</label>
+<select id="qaScenarioInput"></select>
+</div>
+<div class="goals-backup-row" style="margin-top:10px;">
+<button id="qaLoadBtn" type="button">Entrar y cargar</button>
+<button id="qaRestoreBtn" type="button" hidden>Salir y restaurar mis datos</button>
+</div>
+</div>
+</div>
+
+<div class="divider"></div>
+
 <div class="goals-section">
 <div class="goals-section-title"><svg class="goals-section-icon ic-svg pink" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3"/></svg>Backup de datos</div>
 <div class="goals-backup-row">
@@ -10357,6 +10381,13 @@ $0.72"></textarea>
   <span class="storage-conflict-banner-actions">
     <button class="storage-conflict-reload-btn" id="audioBlockedActivateBtn" type="button">Activar sonido</button>
     <button class="storage-conflict-dismiss-btn" id="audioBlockedDismissBtn" type="button" aria-label="Cerrar aviso">×</button>
+  </span>
+</div>
+<div class="storage-conflict-banner qa-mode-banner" id="qaModeBanner" role="status" aria-live="polite">
+  <span class="storage-conflict-banner-icon" aria-hidden="true">🧪</span>
+  <span class="storage-conflict-banner-text">Modo QA activo · estás usando datos de prueba locales.</span>
+  <span class="storage-conflict-banner-actions">
+    <button class="storage-conflict-reload-btn" id="qaBannerRestoreBtn" type="button">Restaurar mis datos</button>
   </span>
 </div>
 <!-- El cuerpo de la app vive en js/app-main.js (módulo ES) — boot.js lo importa dinámicamente recién con sesión y datos listos. -->

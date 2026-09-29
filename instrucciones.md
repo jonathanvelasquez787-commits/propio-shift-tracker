@@ -201,7 +201,19 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
-- Ninguno.
+- Diseñar e implementar el motor de reforzamiento positivo por llamada ya
+  aprobado conceptualmente: premiar la conducta controlable de tomar/completar
+  llamadas, cierre emocional sin puntos negativos, racha de recuperación,
+  evidencia positiva y un "Baúl de premios reales" creado por cada usuario.
+  Cada premio define nombre, disparador y ventana segura de reclamación
+  (próximo Break, Lunch o fin del turno); al desbloquearse queda disponible,
+  nunca interrumpe una llamada y puede reclamarse, guardarse o cambiarse.
+  Incluir un catálogo inicial amplio y editable por momento (Break, Lunch,
+  fin de turno, acumulable y recuperación), duración, costo, frecuencia y
+  condición sugerida, además de "Crear mi propio premio". Añadir límites de
+  frecuencia y presupuesto opcional, sin compras automáticas. Logros conserva
+  el historial; el refuerzo inmediato debe vivir en Inicio y al cerrar cada
+  llamada.
 
 **LIMITACIONES CONOCIDAS** (alcance reducido a propósito, no son bugs)
 
@@ -269,12 +281,31 @@ La aplicación funciona en producción con estas bases vigentes:
   global, backup diario, exportación y borrado de cuenta permanecen activos.
 - Turnos, llamadas, Horario, Higher Rate, Finanzas, Reportes, Calendario,
   Adherencia y la gamificación «El Monstruo» están integrados.
-- La versión actual es 569. Las mejoras nuevas se documentan como pendientes
+- La versión actual es 570. Las mejoras nuevas se documentan como pendientes
   actuales.
 
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v570** — Laboratorio QA reversible y enfoque diario en contexto.
+
+- Ajustes incorpora un Laboratorio QA con tres escenarios: recorrido completo,
+  victoria próxima y cofres/recompensas. Los fixtures viven en un namespace
+  local separado y nunca pisan las llaves reales.
+- Entrar a QA fuerza primero cualquier subida pendiente; durante la sesión se
+  bloquean debounce, subida manual, visibilidad, reconexión y `pagehide`, y el
+  arranque evita consultar/adoptar datos de nube.
+- Salir de QA elimina únicamente el namespace de prueba: los datos reales se
+  preservan byte a byte. Otras pestañas recargan al cambiar el marcador para
+  no editar accidentalmente el estado equivocado.
+- Un banner persistente y el estado del sidebar dejan claro que la nube está
+  pausada; cerrar sesión restaura primero el estado real.
+- Equilibrio/Calidad/Cuidado se movió de la grilla de Misiones a un bloque
+  "Plan del día" junto a las acciones de llamada. Misiones conserva solo el
+  enfoque activo y las tres armaduras, reduciendo competencia visual.
+- Verificados 100 tests, aislamiento/restauración QA, contratos/ciclos de 16
+  módulos, wiring de UI y build de producción sin sourcemaps.
 
 **v569** — Gamificación profunda, conectada y satisfactoria.
 
@@ -312,19 +343,4 @@ La aplicación funciona en producción con estas bases vigentes:
   actualizados.
 - Verificados 94 tests, imports/exports y ciclos de 14 módulos, sintaxis,
   auditoría de dependencias, build, shell offline y arranque real en navegador.
-
-**v567** — Fase 6 «El Monstruo» cerrada.
-
-- Arena diaria determinista con seis especies SVG y estados de sueño, alerta,
-  furia, herido y derrotado; HP ligado a la meta en USD y conversión visible.
-- XP no negativo con tope diario de 150, niveles, combo, racha, escudos,
-  misiones, cajas cada cinco llamadas, récords semanales y cofre diferido.
-- STAGE CLEAR congela el resultado del día; después de derrotar al monstruo
-  continúan las ganancias, pero no entra XP adicional.
-- Página Logros con bestiario, trofeos y jefe del ciclo; ajustes Arcade/Sutil/
-  Desactivada, tema claro/oscuro, móvil y movimiento reducido.
-- Estado aditivo en `state.game`, ajustes en `settings.game`, sin migración de
-  esquema. Importaciones históricas/tardías y descartes no conceden XP.
-- Verificados tests, contratos de módulos, sintaxis, build y bundle de
-  producción sin sourcemaps ni módulos fuente.
 

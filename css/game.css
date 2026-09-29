@@ -873,6 +873,18 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 .game-mission-choice-button.is-locked,
 .game-mission-choice-button:disabled { border-color: var(--line); background: var(--panel-navy); color: var(--muted-3); cursor: not-allowed; opacity: .64; }
 .game-mission-choice [data-game-role="mission-choice-label"] { min-width: 0; overflow-wrap: anywhere; }
+.game-daily-focus { display: grid; grid-template-columns: minmax(190px, .8fr) minmax(300px, 1.7fr); align-items: center; gap: 12px; margin: 12px 0; padding: 12px; border: 1px solid rgba(var(--cyan-rgb), .34); border-radius: 14px; background: linear-gradient(135deg, rgba(var(--cyan-rgb), .08), rgba(var(--rpt-purple-rgb), .06)); }
+.game-daily-focus-copy { display: grid; gap: 3px; min-width: 0; }
+.game-daily-focus-copy > span { color: var(--cyan); font-family: var(--font-mono); font-size: 9px; font-weight: 950; letter-spacing: .12em; }
+.game-daily-focus-copy > strong { color: var(--text); font-size: 13px; }
+.game-daily-focus-copy > small { color: var(--muted); font-size: 9.5px; line-height: 1.35; }
+.game-daily-focus-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
+.game-daily-focus-options button { min-width: 0; padding: 10px 8px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel-navy); color: var(--text); cursor: pointer; font-weight: 800; }
+.game-daily-focus-options button:hover, .game-daily-focus-options button:focus-visible { border-color: rgba(var(--cyan-rgb), .66); outline: none; }
+.game-daily-focus-options button.is-selected { border-color: rgba(var(--good-rgb), .64); background: rgba(var(--good-rgb), .1); color: var(--good); }
+.game-daily-focus-options button:disabled { cursor: not-allowed; opacity: .7; }
+.game-missions-status { display: flex; align-items: center; gap: 10px; }
+.game-missions-status > span { color: var(--muted); font-size: 9px; font-weight: 800; }
 .game-mission-reward { display: flex; align-items: center; gap: 7px; min-width: 0; padding: 8px 10px; border: 1px solid rgba(var(--tier-gold-rgb, 255, 215, 110), .42); border-radius: 9px; background: rgba(var(--tier-gold-rgb, 255, 215, 110), .08); color: var(--tier-gold); font-size: 10px; overflow-wrap: anywhere; }
 .game-mission-reward strong { color: var(--text); }
 
@@ -978,6 +990,8 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 @keyframes game-feedback-pop { 0% { transform: scale(.98); } 45% { transform: scale(1.035); } 100% { transform: scale(1); } }
 
 @media (max-width: 520px) {
+  .game-daily-focus { grid-template-columns: 1fr; }
+  .game-daily-focus-options { grid-template-columns: 1fr; }
   .game-toast-stack { max-height: calc(100dvh - 86px); overflow: hidden; }
   .game-toast { grid-template-columns: auto minmax(0, 1fr); padding: 10px 11px; }
   .game-xp-float,
