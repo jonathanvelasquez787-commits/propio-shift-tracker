@@ -23,12 +23,12 @@ import {
   readLocalSnapshot,
   applyLightThemeDefault,
   syncThemeClass,
-  isQaModeActive,
-  restoreQaMode,
+  retireLegacyQaStorage,
 } from './sync.js';
 
 // Antes que nada: el gate hereda los tokens de la app y por defecto son los
 // del tema oscuro. Pintarlo con el tema correcto de entrada evita el parpadeo.
+retireLegacyQaStorage();
 syncThemeClass();
 
 const overlay = document.getElementById('bootGate');
@@ -182,7 +182,6 @@ function injectAccountPanel(profile, email) {
   footer.appendChild(wrap);
 
   document.getElementById('sidebarLogoutBtn').addEventListener('click', async () => {
-    if (isQaModeActive()) restoreQaMode();
     const meta = readMeta();
     if (meta.dirty) {
       setSyncStatus('saving', 'Guardando antes de salir…');
@@ -440,8 +439,8 @@ function wireSyncStatus() {
     if (mins >= 1) setSyncStatus('ok', `Guardado hace ${mins} min`);
   }, 60000);
 
-  window.addEventListener('offline', () => setSyncStatus(isQaModeActive() ? 'saving' : 'error', isQaModeActive() ? 'Modo QA · solo local' : 'Sin conexión'));
-  window.addEventListener('online', () => setSyncStatus('saving', isQaModeActive() ? 'Modo QA · solo local' : 'Reconectando…'));
+  window.addEventListener('offline', () => setSyncStatus('error', 'Sin conexión'));
+  window.addEventListener('online', () => setSyncStatus('saving', 'Reconectando…'));
 }
 
 // La app ya trae este banner para el conflicto entre pestañas; el conflicto
@@ -529,9 +528,6 @@ async function boot() {
         adoptLocal(userId);
         break;
 
-      case BOOT.QA_LOCAL:
-        break;
-
       case BOOT.CONFLICT: {
         const choice = await askConflict(decision);
         if (choice === 'cloud') {
@@ -561,8 +557,8 @@ async function boot() {
 
   wireSyncStatus();
   setSyncStatus(
-    isQaModeActive() ? 'saving' : readMeta().dirty ? 'saving' : 'ok',
-    isQaModeActive() ? 'Modo QA · solo local' : readMeta().dirty ? 'Subiendo…' : 'Sincronizado'
+    readMeta().dirty ? 'saving' : 'ok',
+    readMeta().dirty ? 'Subiendo…' : 'Sincronizado'
   );
 
   try {
@@ -576,7 +572,7 @@ async function boot() {
 
   // Primera subida del dispositivo: si lo local era lo bueno, que quede en la
   // nube sin esperar a la próxima edición.
-  if (!isQaModeActive() && decision.action === BOOT.USE_LOCAL && readMeta().dirty) {
+  if (decision.action === BOOT.USE_LOCAL && readMeta().dirty) {
     const snapshot = readLocalSnapshot();
     setSyncStatus('saving', `Subiendo ${describeSnapshot(snapshot)}…`);
     await pushSnapshot({ force: true });

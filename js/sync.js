@@ -17,14 +17,7 @@ export const APP_KEYS = {
   calls: 'propio_shift_tracker_calls_es_v4',
   settings: 'propio_shift_tracker_settings_es_v1',
 };
-export const QA_APP_KEYS = {
-  state: 'propio_qa_state_v1',
-  calls: 'propio_qa_calls_v1',
-  settings: 'propio_qa_settings_v1',
-};
-
 const META_KEY = 'propio_sync_meta_v1';
-const QA_KEY = 'propio_qa_session_v1';
 const DEBOUNCE_MS = 6000;
 const MAX_WAIT_MS = 45000; // aunque siga escribiendo sin parar, sube igual cada 45 s
 
@@ -35,87 +28,24 @@ let pushing = false;
 let listeners = [];
 let cloudCallHashes = new Map();
 
-export function readQaSession() {
-  try {
-    const raw = window.localStorage.getItem(QA_KEY);
-    const parsed = raw ? JSON.parse(raw) : null;
-    return parsed && parsed.version === 1 ? parsed : null;
-  } catch {
-    return null;
-  }
-}
-
-export function isQaModeActive() {
-  return Boolean(readQaSession());
-}
-
 export function activeAppKeys() {
-  return isQaModeActive() ? QA_APP_KEYS : APP_KEYS;
+  return APP_KEYS;
+}
+
+// Retira el namespace de pruebas anterior sin modificar snapshots reales.
+export function retireLegacyQaStorage() {
+  let cleaned = true;
+  for (const key of ['propio_qa_session_v1', 'propio_qa_state_v1', 'propio_qa_calls_v1', 'propio_qa_settings_v1']) {
+    try {
+      if (window.localStorage.getItem(key) !== null) window.localStorage.removeItem(key);
+    } catch { cleaned = false; }
+  }
+  return cleaned;
 }
 
 function restoreRawKey(key, value) {
   if (value === null || value === undefined) window.localStorage.removeItem(key);
   else window.localStorage.setItem(key, value);
-}
-
-export async function beginQaMode(userId) {
-  if (isQaModeActive()) return { ok: true, alreadyActive: true };
-  if (readMeta().dirty) {
-    const pushed = await pushSnapshot();
-    if (!pushed.ok) return pushed.conflict ? { conflict: true } : { error: pushed.error || new Error('SYNC_FAILED') };
-    if (pushed.pending) return { error: new Error('Tus cambios aún se están sincronizando. Abre QA cuando termine el guardado.') };
-  }
-  try {
-    window.localStorage.setItem(QA_KEY, JSON.stringify({ version: 1, userId: userId || readMeta().userId || null, startedAt: new Date().toISOString() }));
-  } catch (error) {
-    return { error };
-  }
-  if (pushTimer) clearTimeout(pushTimer);
-  if (maxWaitTimer) clearTimeout(maxWaitTimer);
-  pushTimer = null;
-  maxWaitTimer = null;
-  emit('qa', { active: true });
-  return { ok: true };
-}
-
-export function restoreQaMode() {
-  const session = readQaSession();
-  if (!session) return false;
-  hydrating = true;
-  try {
-    Object.values(QA_APP_KEYS).forEach((key) => window.localStorage.removeItem(key));
-    window.localStorage.removeItem(QA_KEY);
-  } finally {
-    hydrating = false;
-  }
-  emit('qa', { active: false });
-  return true;
-}
-
-export function writeQaSnapshot(snapshot, scenario = 'tour') {
-  if (!isQaModeActive()) throw new Error('QA_NOT_ACTIVE');
-  const session = readQaSession();
-  const next = {
-    [QA_APP_KEYS.state]: JSON.stringify(snapshot.state ?? {}),
-    [QA_APP_KEYS.calls]: JSON.stringify(snapshot.calls ?? []),
-    [QA_APP_KEYS.settings]: JSON.stringify(snapshot.settings ?? {}),
-    [QA_KEY]: JSON.stringify({ ...session, scenario: String(scenario || 'tour') }),
-  };
-  const previous = {};
-  Object.keys(next).forEach((key) => { previous[key] = window.localStorage.getItem(key); });
-  const written = [];
-  hydrating = true;
-  try {
-    Object.entries(next).forEach(([key, value]) => {
-      window.localStorage.setItem(key, value);
-      written.push(key);
-    });
-  } catch (error) {
-    written.forEach((key) => { try { restoreRawKey(key, previous[key]); } catch {} });
-    throw error;
-  } finally {
-    hydrating = false;
-  }
 }
 
 // ---------------------------------------------------------------------------
@@ -395,7 +325,6 @@ function callDelta(callList) {
 }
 
 export async function pushSnapshot({ force = false } = {}) {
-  if (isQaModeActive()) return { skipped: true, qa: true };
   if (pushing) return { skipped: true };
   const meta = readMeta();
   const snapshot = readLocalSnapshot();
@@ -453,7 +382,6 @@ export async function pushSnapshot({ force = false } = {}) {
 // Ojo: si esta subida llega, la pestaña ya no vive para anotar el updated_at
 // nuevo. Esa desincronización la resuelve resolveBoot(), no acá.
 function flushOnExit() {
-  if (isQaModeActive()) return;
   const meta = readMeta();
   if (!meta.dirty) return;
   const token = currentAccessToken();
@@ -515,7 +443,6 @@ function patchLocalStorage() {
 }
 
 function markDirty() {
-  if (isQaModeActive()) return;
   writeMeta({ dirty: true });
   emit('dirty', {});
   if (pushTimer) clearTimeout(pushTimer);
@@ -543,10 +470,6 @@ function markDirty() {
 export function startAutoSync() {
   patchLocalStorage();
 
-  window.addEventListener('storage', (event) => {
-    if (event.key === QA_KEY) window.location.reload();
-  });
-
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden' && readMeta().dirty) {
       pushSnapshot();
@@ -573,13 +496,10 @@ export const BOOT = {
   USE_CLOUD: 'use-cloud', // solo hay nube, o local está limpio: se baja
   OTHER_ACCOUNT: 'other-account', // el local es de otra cuenta: se descarta sin preguntar
   CONFLICT: 'conflict', // hay dos versiones divergentes: decide el usuario
-  QA_LOCAL: 'qa-local', // sandbox local: no se consulta ni se toca la nube
 };
 
 export async function resolveBoot(userId) {
-  const qa = readQaSession();
-  if (qa && (!qa.userId || qa.userId === userId)) return { action: BOOT.QA_LOCAL, qa };
-  if (qa) restoreQaMode();
+  retireLegacyQaStorage();
   const meta = readMeta();
   const cloud = await fetchCloud(userId);
   const local = localHasData();
@@ -661,7 +581,7 @@ export function resetForUser(userId) {
   clearLocalAppData();
   try {
     window.localStorage.removeItem(META_KEY);
-    window.localStorage.removeItem(QA_KEY);
+    retireLegacyQaStorage();
   } catch {
     /* ignorar */
   }

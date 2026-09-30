@@ -54,7 +54,7 @@ function harness(t, { at = new Date(2026, 8, 29, 12).getTime(), goal = 10000, st
     for (const id of ['gameArena', 'classicDailyGoalCard', 'gameCallFx', 'gameMissions']) {
       const classes = new Set();
       nodes.set(id, {
-        dataset: {}, style: {}, innerHTML: '', hidden: false, offsetWidth: 400,
+        dataset: {}, style: { setProperty(name, value) { this[name] = value; } }, innerHTML: '', hidden: false, offsetWidth: 400,
         get className() { return [...classes].join(' '); },
         set className(value) { classes.clear(); String(value).split(/\s+/).forEach((name) => classes.add(name)); },
         classList: { add(...names) { names.forEach((name) => classes.add(name)); }, remove(...names) { names.forEach((name) => classes.delete(name)); }, contains: (name) => classes.has(name) },

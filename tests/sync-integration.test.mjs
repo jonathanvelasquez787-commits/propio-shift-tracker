@@ -63,22 +63,24 @@ test('un conflicto conserva los cambios locales y un error permite reintentar si
   assert.equal(h.run('readMeta().dirty'), false);
 });
 
-test('QA espera a que el último cambio real se haya sincronizado antes de activar el aislamiento', async () => {
+test('retirar el laboratorio conserva el snapshot real y elimina solo sus cuatro claves de prueba', () => {
   const h = harness();
-  h.run("writeLocalSnapshot({state:{v:1},calls:[],settings:{}}); adoptLocal('audit');");
-  const entering = h.run("beginQaMode('audit')");
-  h.run("window.localStorage.setItem(APP_KEYS.calls, JSON.stringify([{id:'new'}])); markDirty();");
-  h.requests[0].resolve({ data: { updated_at: 'ack' }, error: null });
-  assert.ok((await entering).error);
-  assert.equal(h.run('isQaModeActive()'), false);
-  assert.equal(h.run('readMeta().dirty'), true);
+  h.run("writeLocalSnapshot({state:{real:true},calls:[{id:'real-call'}],settings:{goal:25}}); adoptLocal('audit');");
+  const before = new Map(h.values);
+  h.run("for (const key of ['propio_qa_session_v1','propio_qa_state_v1','propio_qa_calls_v1','propio_qa_settings_v1']) window.localStorage.setItem(key, JSON.stringify({fake:true}));");
+  assert.equal(h.run('retireLegacyQaStorage()'), true);
+  assert.deepEqual(h.values, before);
+  assert.equal(h.run('activeAppKeys().state'), h.run('APP_KEYS.state'));
+  assert.equal(h.run('readLocalSnapshot().calls[0].id'), 'real-call');
+  assert.equal(h.requests.length, 0);
 });
 
-test('un error al reemplazar el escenario QA no borra el escenario anterior ni toca los datos reales', () => {
+test('una clave QA antigua ilegible o imposible de borrar nunca selecciona datos simulados', () => {
   const h = harness();
-  h.run("window.localStorage.setItem(QA_KEY, JSON.stringify({version:1,scenario:'original'})); writeLocalSnapshot({state:{real:true},calls:[],settings:{}}); writeQaSnapshot({state:{original:true},calls:[],settings:{}}, 'original');");
+  h.run("writeLocalSnapshot({state:{real:true},calls:[{id:'real-call'}],settings:{}}); window.localStorage.setItem('propio_qa_session_v1', '{bad json'); window.localStorage.removeItem = () => { throw new Error('Denied'); };");
   const before = new Map(h.values);
-  h.run("window.localStorage.setItem = () => { throw new Error('Denied'); };");
-  assert.throws(() => h.run("writeQaSnapshot({state:{new:true},calls:[{id:'new'}],settings:{}},'new')"), /Denied/);
+  assert.equal(h.run('retireLegacyQaStorage()'), false);
   assert.deepEqual(h.values, before);
+  assert.equal(h.run('readLocalSnapshot().calls[0].id'), 'real-call');
+  assert.equal(h.run('activeAppKeys().state'), h.run('APP_KEYS.state'));
 });

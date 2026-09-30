@@ -4237,7 +4237,6 @@
       z-index: 101;
     }
     .storage-conflict-banner.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
-    .storage-conflict-banner.qa-mode-banner { bottom: 86px; border-color: rgba(47,213,255,.5); }
     .storage-conflict-banner-icon {
       flex: 0 0 auto;
       color: var(--warn);
@@ -8976,7 +8975,7 @@
     </div>
     <div class="game-achievements-season" data-game-role="season-status"><span>Temporada</span><strong data-game-role="season-label">Ciclo actual</strong></div>
   </div>
-  <div class="game-achievements-toolbar"><label class="game-settings-toggle" for="gameEnabledInput"><span><strong>Activar El Monstruo</strong><small>Racha, XP, misiones y colección sin cambiar tus ganancias.</small></span><input id="gameEnabledInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label><a class="game-text-button game-qa-shortcut" href="#qaScenarioInput">Laboratorio QA →</a></div>
+  <div class="game-achievements-toolbar"><label class="game-settings-toggle" for="gameEnabledInput"><span><strong>Activar El Monstruo</strong><small>Racha, XP, misiones y colección sin cambiar tus ganancias.</small></span><input id="gameEnabledInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label></div>
 </section>
 
 <section class="game-settings-disclosures" aria-label="Preferencias de El Monstruo">
@@ -9002,7 +9001,7 @@
           <select id="gameIntensityInput">
             <option value="off">Sin notificaciones de refuerzo</option>
             <option value="subtle">Solo sutil</option>
-            <option value="arcade">Arcade en logros</option>
+            <option value="arcade">Arcade · efectos pixel art</option>
           </select>
         </div>
       </div>
@@ -9121,29 +9120,7 @@
 </section>
 
 <section class="game-advanced-settings" aria-label="Herramientas avanzadas">
-<details class="game-panel game-settings-accordion" id="qaModeAccordion">
-    <summary class="game-settings-accordion-summary">
-      <span class="game-settings-accordion-copy"><span class="game-panel-eyebrow">PRUEBAS LOCALES</span><strong>Laboratorio QA</strong><small>Prueba recorridos aislados de tus datos reales.</small></span>
-      <span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
-    </summary>
-    <div class="game-settings-accordion-body">
-      <div class="goals-section" id="qaModeSection">
-        <div class="goals-section-title"><svg class="goals-section-icon ic-svg blue" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6l1 3h3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3Z"/><circle cx="9" cy="13" r="2"/><path d="M15 11v4M13 13h4"/></svg>Laboratorio QA</div>
-        <div class="game-settings-profile" id="qaModePanel" aria-live="polite">
-          <span class="game-settings-profile-label" id="qaModeStatus">Tus datos reales están protegidos</span>
-          <p class="danger-card-desc" id="qaModeDescription">Carga datos de prueba para recorrer pantallas, estados y recompensas. Nada del laboratorio se sube a la nube.</p>
-          <div class="goals-field" style="margin-top:10px;">
-            <label for="qaScenarioInput">Escenario</label>
-            <select id="qaScenarioInput"></select>
-          </div>
-          <div class="goals-backup-row" style="margin-top:10px;">
-            <button id="qaLoadBtn" type="button">Entrar y cargar</button>
-            <button id="qaRestoreBtn" type="button" hidden>Salir y restaurar mis datos</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </details>
+
   <details class="game-panel game-settings-accordion" id="gameResetAccordion">
     <summary class="game-settings-accordion-summary"><span class="game-settings-accordion-copy"><span class="game-panel-eyebrow">PROGRESO DE JUEGO</span><strong>Reiniciar progreso</strong><small>Revisa qué se borra antes de confirmar.</small></span><span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></summary>
     <div class="game-settings-accordion-body"><div class="danger-card tone-bad game-settings-danger">
@@ -10503,24 +10480,7 @@ $0.72"></textarea>
     <button class="storage-conflict-dismiss-btn" id="audioBlockedDismissBtn" type="button" aria-label="Cerrar aviso">×</button>
   </span>
 </div>
-<div class="storage-conflict-banner qa-mode-banner" id="qaModeBanner" role="status" aria-live="polite">
-  <span class="storage-conflict-banner-icon" aria-hidden="true">🧪</span>
-  <span class="storage-conflict-banner-text">Modo QA activo · estás usando datos de prueba locales.</span>
-  <section class="game-panel qa-walkthrough-panel" id="qaWalkthroughPanel" hidden aria-labelledby="qaWalkthroughTitle" aria-live="off">
-    <span class="game-panel-eyebrow">SIMULACIÓN LOCAL · NADA SUBE A LA NUBE</span>
-    <span class="qa-walkthrough-progress" id="qaWalkthroughProgress"></span>
-    <h2 id="qaWalkthroughTitle"></h2>
-    <p id="qaWalkthroughDescription"></p>
-    <p class="qa-walkthrough-result" id="qaWalkthroughResult" role="status" aria-live="polite"></p>
-    <div class="qa-walkthrough-actions">
-      <button class="storage-conflict-reload-btn" id="qaWalkthroughNextBtn" type="button">Siguiente</button>
-      <button class="qa-walkthrough-restart-btn" id="qaWalkthroughRestartBtn" type="button">Reiniciar recorrido</button>
-    </div>
-  </section>
-  <span class="storage-conflict-banner-actions">
-    <button class="storage-conflict-reload-btn" id="qaBannerRestoreBtn" type="button">Restaurar mis datos</button>
-  </span>
-</div>
+
 <!-- El cuerpo de la app vive en js/app-main.js (módulo ES) — boot.js lo importa dinámicamente recién con sesión y datos listos. -->
 <div id="bootGate" role="status" aria-live="polite">
   <div class="boot-inner" id="bootGateBody">

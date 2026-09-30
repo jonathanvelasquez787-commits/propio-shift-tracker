@@ -144,19 +144,21 @@ function renderBody(entry) {
   if (entry.face === 'ghost') {
     return `
       <g class="monster-layer monster-layer--outline" fill="currentColor">
-        <polygon class="monster-pixel monster-pixel--outline" points="49,35 111,35 124,50 124,91 116,91 116,104 107,104 99,95 90,104 80,95 70,104 61,95 52,104 43,95 36,104 36,54"/>
+        <path class="monster-pixel monster-pixel--outline" d="M52 32h56v8h12v12h8v52h-12v-8h-8v12H92V96H80v12H64V96H52v12H36V52h8V40h8Z"/>
       </g>
       <g class="monster-layer monster-layer--body" fill="currentColor">
-        <polygon class="monster-pixel monster-pixel--body" points="53,40 108,40 117,52 117,88 109,88 109,96 100,87 90,96 80,87 70,96 60,87 51,96 51,87 43,87 43,56"/>
+        <path class="monster-pixel monster-pixel--body" d="M56 40h48v8h12v8h4v36h-8v-8h-12v12h-4V84H76v12h-4V84H48v12h-4V56h4V48h8Z"/>
+        <path class="monster-pixel monster-pixel--highlight" d="M56 40h48v8H56zM48 52h8v28h-8z"/>
       </g>`;
   }
   return `
     <g class="monster-layer monster-layer--outline" fill="currentColor">
-      <polygon class="monster-pixel monster-pixel--outline" points="43,25 117,25 117,33 128,33 128,48 136,48 136,94 124,94 124,105 109,105 109,112 51,112 51,105 36,105 36,94 24,94 24,48 32,48 32,33 43,33"/>
+      <path class="monster-pixel monster-pixel--outline" d="M40 24h12V12h16v12h24V12h16v12h12v12h12v16h8v36h-12v16h-16v8H48v-8H32V88H20V52h8V36h12Z"/>
     </g>
     <g class="monster-layer monster-layer--body" fill="currentColor">
-      <polygon class="monster-pixel monster-pixel--body" points="48,31 112,31 112,39 123,39 123,52 130,52 130,88 118,88 118,99 103,99 103,105 57,105 57,99 42,99 42,88 30,88 30,52 37,52 37,39 48,39"/>
-      <rect class="monster-pixel monster-pixel--body" x="51" y="22" width="58" height="12"/>
+      <path class="monster-pixel monster-pixel--body" d="M48 32h12V20h4v12h32V20h4v12h12v12h12v12h8v24h-12v16h-16v8H56v-8H40V80H28V56h8V44h12Z"/>
+      <path class="monster-pixel monster-pixel--highlight" d="M48 36h64v8H48zM36 48h12v32H36z"/>
+      <path class="monster-pixel monster-pixel--shade" d="M104 80h16v16h-16zM56 96h48v8H56z"/>
     </g>`;
 }
 
@@ -306,7 +308,7 @@ export function monsterSvg({
   const ariaLabel = `${entry.name}, ${stateLabel}, ${Math.round(hp)}% de vida${equipmentLabel}`;
   const speciesToken = safeToken(entry.id, 'lunes-perezoso');
 
-  return `<svg class="monster-svg monster-svg--${escapeAttribute(sizeToken)} monster-svg--${escapeAttribute(speciesToken)} monster-svg--${escapeAttribute(stateToken)} monster-svg--${escapeAttribute(variantToken)}" data-species="${escapeAttribute(speciesToken)}" data-state="${escapeAttribute(stateToken)}" data-variant="${escapeAttribute(variantToken)}" data-hp-pct="${escapeAttribute(hp)}" viewBox="0 0 160 128" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${escapeAttribute(ariaLabel)}" focusable="false">
+  return `<svg class="monster-svg monster-svg--${escapeAttribute(sizeToken)} monster-svg--${escapeAttribute(speciesToken)} monster-svg--${escapeAttribute(stateToken)} monster-svg--${escapeAttribute(variantToken)}" data-species="${escapeAttribute(speciesToken)}" data-state="${escapeAttribute(stateToken)}" data-variant="${escapeAttribute(variantToken)}" data-hp-pct="${escapeAttribute(hp)}" viewBox="0 0 160 128" shape-rendering="crispEdges" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${escapeAttribute(ariaLabel)}" focusable="false">
   <title>${escapeAttribute(ariaLabel)}</title>
   <g class="monster-sprite" aria-hidden="true">
     <g class="monster-layer monster-layer--shadow" fill="currentColor">
@@ -319,4 +321,23 @@ export function monsterSvg({
     ${renderEquipment(equipment)}
   </g>
 </svg>`;
+}
+
+const PIXEL_ICONS = Object.freeze({
+  sword: 'M12 1h3v3l-7 7-3-3zM2 7l7 7-2 2-3-3-2 2-2-2 2-2-2-2z',
+  shield: 'M2 1h12v9h-2v2h-2v2H6v-2H4v-2H2z',
+  check: 'M2 7h3v3h2V8h2V6h2V4h3v4h-2v2h-2v2H8v2H5v-2H3v-2H2z',
+  star: 'M7 0h2v4h2v2h5v3h-3v2h-2v5H8v-2H6v2H3v-5H1V9H0V6h5V4h2z',
+  crown: 'M1 3h3v3h2V2h4v4h2V3h3v9H1zM2 13h12v2H2z',
+  cup: 'M2 4h10v1h3v6h-3v2H3v-2H2zM1 14h12v2H1zM4 0h2v3H4zM8 0h2v3H8z',
+  gem: 'M4 1h8v2h2v2h2v3h-2v2h-2v2h-2v2H6v-2H4v-2H2V8H0V5h2V3h2z',
+});
+
+export function gamePixelIcon(name = 'shield') {
+  const token = Object.hasOwn(PIXEL_ICONS, name) ? name : 'shield';
+  return `<svg class="game-pixel-icon game-pixel-icon--${token}" viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true" focusable="false"><path fill="currentColor" d="${PIXEL_ICONS[token]}"/></svg>`;
+}
+
+export function gamePixelChest(open = false) {
+  return `<svg class="game-pixel-chest${open ? ' is-open' : ''}" viewBox="0 0 32 28" shape-rendering="crispEdges" aria-hidden="true" focusable="false"><path fill="var(--game-pixel-ink)" d="M2 7h28v19H2z"/><path fill="currentColor" d="M4 9h24v15H4z"/><path fill="var(--game-pixel-shade)" d="M7 13h18v8H7z"/><path fill="currentColor" d="M8 10h3v13H8zM21 10h3v13h-3zM14 12h5v6h-5z"/><g class="game-pixel-chest-lid"><path fill="var(--game-pixel-ink)" d="M2 6h2V3h24v3h2v7H2z"/><path fill="currentColor" d="M4 6h2V5h20v1h2v5H4z"/><path fill="var(--game-pixel-highlight)" d="M7 6h18v2H7z"/></g></svg>`;
 }

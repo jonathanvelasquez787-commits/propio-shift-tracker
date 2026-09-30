@@ -76,7 +76,6 @@ test('Logros agrupa los ajustes, conserva el enfoque diario y admite nombre pers
   const html = read('app.html');
   const achievements = between(html, '<div class="app-page game-achievements-page"', '</div><!-- /pageAchievements -->');
   const gameEditor = between(achievements, '<details class="game-panel game-settings-accordion" id="gameSettingsAccordion" open>', '<details class="game-panel game-settings-accordion" id="positiveSettingsAccordion" open>');
-  const qaEditor = between(achievements, '<details class="game-panel game-settings-accordion" id="qaModeAccordion">', '</details>');
   const settingsModal = between(html, '<div aria-hidden="true" class="modal-overlay" id="goalsModal">', '<div aria-hidden="true" class="modal-overlay game-modal-overlay" id="stageClearModal">');
   const allIds = [...html.matchAll(/\bid="([^"]+)"/g)].map((match) => match[1]);
   assert.deepEqual(allIds.filter((id, index) => allIds.indexOf(id) !== index), []);
@@ -89,17 +88,7 @@ test('Logros agrupa los ajustes, conserva el enfoque diario y admite nombre pers
   for (const id of [
     'gameEnabledInput', 'gameIntensityInput', 'gameSettingsProfile', 'positiveReinforcementEnabledInput',
     'positiveAskAfterCallInput', 'positiveWeeklyBudgetInput', 'physicalRewardSelected', 'physicalRewardCatalog',
-    'qaModeSection', 'qaModePanel', 'qaScenarioInput', 'qaLoadBtn', 'qaRestoreBtn',
   ]) assert.doesNotMatch(settingsModal, new RegExp(`\\bid="${id}"`), `#${id} should be under Logros`);
-  assert.match(qaEditor, /id="qaModeSection"[\s\S]*id="qaScenarioInput"[\s\S]*id="qaLoadBtn"[\s\S]*id="qaRestoreBtn"/);
-
-  const banner = between(html, '<div class="storage-conflict-banner qa-mode-banner" id="qaModeBanner"', '<div id="bootGate"');
-  for (const id of ['qaWalkthroughPanel', 'qaWalkthroughProgress', 'qaWalkthroughTitle', 'qaWalkthroughDescription', 'qaWalkthroughResult', 'qaWalkthroughNextBtn', 'qaWalkthroughRestartBtn', 'qaBannerRestoreBtn']) {
-    assert.match(banner, new RegExp(`\\bid="${id}"`), `missing #${id}`);
-  }
-  assert.match(banner, /id="qaWalkthroughPanel" hidden/);
-  assert.match(banner, /SIMULACIÓN LOCAL · NADA SUBE A LA NUBE/);
-
   const game = read('js/game.js');
   const sanitizerSource = between(game, 'function sanitizeMonsterName(value)', '\n\nfunction ensureGameSettings');
   const sanitize = new Function(`${sanitizerSource}; return sanitizeMonsterName;`)();
@@ -434,10 +423,6 @@ test('CSS de juego cubre motion reducido, layout estrecho y responsive', () => {
   assert.match(css, /@media\s*\(max-width:\s*520px\)/);
   assert.match(css, /min-width:\s*0/);
   assert.match(css, /overflow-wrap:\s*anywhere/);
-  assert.match(css, /#qaModePanel \.goals-backup-row\s*\{[^}]*flex-wrap:\s*wrap/);
-  assert.match(css, /#qaModePanel \.goals-backup-row > button:focus-visible/);
-  assert.match(css, /#qaModePanel \.goals-backup-row > button:disabled/);
-  assert.match(css, /#qaModePanel \.goals-backup-row > button\[hidden\]/);
 });
 
 test('build mantiene módulos fuente fuera de public y el worker precarga el CSS de juego', () => {
@@ -582,7 +567,7 @@ test('consistencia de gamificación se mantiene aunque esté apagada', () => {
 
 test('modo sutil no reproduce pop ni sonido y reduced-motion solo elimina movimiento', () => {
   const game = read('js/game.js');
-  const tone = game.slice(game.indexOf('function playGameTone'), game.indexOf('function triggerGameEvent'));
+  const tone = between(game, 'function playGameTone', '\nconst gameEventVersions');
   assert.match(tone, /if \(!arcadeEnabled\(\)\) return/);
   assert.doesNotMatch(tone, /prefers-reduced-motion/);
 });

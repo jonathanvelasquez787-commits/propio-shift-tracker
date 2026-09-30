@@ -35,8 +35,7 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 }
 
 .game-settings-disclosures :is(button, input, select, summary):focus-visible,
-.game-modal-overlay button:focus-visible,
-#qaWalkthroughPanel button:focus-visible {
+.game-modal-overlay button:focus-visible {
   outline: 2px solid var(--cyan);
   outline-offset: 3px;
 }
@@ -485,8 +484,6 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 .game-achievements-hero p { margin: 6px 0 0; color: var(--muted); font-size: 13px; line-height: 1.45; }
 .game-achievements-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
 .game-achievements-toolbar .game-settings-toggle { flex: 1 1 280px; max-width: 540px; padding: 0; border: 0; background: transparent; }
-.game-achievements-toolbar .game-qa-shortcut { margin: 0; flex: 0 0 auto; }
-.game-qa-shortcut:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
 .game-progress-profile { display: contents; }
 .game-unlock-details { margin-top: 9px; border-top: 1px solid var(--line); }
 .game-level-panel .game-unlock-details > summary { padding: 8px 0 0; }
@@ -494,7 +491,6 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 .game-unlock-details .game-settings-accordion-body { padding: 8px 0 0; }
 .game-unlock-details:has(.game-unlock-roadmap[hidden]) { display: none; }
 .game-streak-current { display: inline-block; margin-left: 5px; color: var(--cyan); font-size: 12px; }
-#qaScenarioInput { scroll-margin-top: 114px; }
 .game-achievements-season { display: grid; gap: 3px; flex: 0 0 auto; min-width: 110px; padding: 9px 11px; border: 1px solid rgba(var(--tier-gold-rgb, 255, 215, 110), .33); border-radius: 10px; text-align: right; }
 .game-achievements-season span { color: var(--muted-3); font-size: 9px; font-weight: 950; letter-spacing: .09em; text-transform: uppercase; }
 .game-achievements-season strong { color: var(--tier-gold); font-size: 12px; }
@@ -654,34 +650,6 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 .game-monster-name-setting > small { color: var(--muted); font-size: 10px; line-height: 1.4; }
 .game-monster-name-status { min-height: 0; color: var(--good); font-size: 10px; line-height: 1.4; overflow-wrap: anywhere; }
 .game-monster-name-status:empty { display: none; }
-
-#qaModePanel .goals-backup-row { display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; }
-#qaModePanel .goals-backup-row > button { display: inline-flex; align-items: center; justify-content: center; max-width: 100%; min-height: 38px; padding: 8px 12px; border: 1px solid rgba(var(--cyan-rgb), .42); border-radius: 10px; background: rgba(var(--cyan-rgb), .09); color: var(--text); cursor: pointer; font: inherit; font-size: 11px; font-weight: 850; line-height: 1.3; text-align: center; }
-#qaModePanel #qaRestoreBtn { border-color: var(--line-2); background: transparent; color: var(--text); }
-#qaModePanel .goals-backup-row > button:hover:not(:disabled) { border-color: var(--cyan); background: rgba(var(--cyan-rgb), .15); }
-#qaModePanel .goals-backup-row > button:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
-#qaModePanel .goals-backup-row > button:disabled { cursor: not-allowed; opacity: .56; }
-#qaModePanel .goals-backup-row > button[hidden] { display: none !important; }
-
-.qa-mode-banner { z-index: 79; }
-.qa-mode-banner:has(.qa-walkthrough-panel:not([hidden])) { display: grid; justify-items: stretch; align-items: stretch; width: min(620px, calc(100vw - 24px)); max-height: min(44dvh, 360px); overflow-y: auto; }
-.qa-mode-banner:has(.qa-walkthrough-panel:not([hidden])) .storage-conflict-banner-icon { justify-self: start; }
-.qa-mode-banner:has(.qa-walkthrough-panel:not([hidden])) .storage-conflict-banner-text { flex: none; width: 100%; }
-body:has(#qaModeBanner.show) .app-page { padding-bottom: calc(86px + 132px + 16px); }
-body:has(#qaModeBanner.show .qa-walkthrough-panel:not([hidden])) .app-page { padding-bottom: calc(86px + min(44dvh, 360px) + 16px); }
-.qa-walkthrough-panel[hidden] { display: none !important; }
-.qa-walkthrough-panel { display: grid; flex: 1 1 100%; gap: 7px; width: 100%; padding: 13px; overflow: visible; text-align: left; }
-.qa-walkthrough-progress { color: var(--cyan); font-family: var(--font-mono); font-size: 10px; font-weight: 900; }
-.qa-walkthrough-panel h2 { margin: 0; color: var(--text); font-size: 15px; }
-.qa-walkthrough-panel > p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.45; overflow-wrap: anywhere; }
-.qa-walkthrough-panel > .qa-walkthrough-result:empty { display: none; }
-.qa-walkthrough-panel > .qa-walkthrough-result:not(:empty) { padding: 8px 9px; border: 1px solid rgba(var(--cyan-rgb), .28); border-radius: 9px; background: rgba(var(--cyan-rgb), .06); color: var(--text); }
-.qa-walkthrough-actions { position: sticky; bottom: 0; z-index: 1; display: flex; flex-wrap: wrap; gap: 8px; margin: 0 -4px -4px; padding: 8px 4px 4px; border-top: 1px solid var(--line); background: var(--panel-navy); }
-.qa-walkthrough-actions button { min-height: 34px; padding: 7px 10px; border-radius: 9px; cursor: pointer; font: inherit; font-size: 10.5px; font-weight: 850; }
-.qa-walkthrough-restart-btn { border: 1px solid var(--line); background: transparent; color: var(--muted); }
-.qa-walkthrough-actions button:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
-[data-qa-current-target]:not(.modal-overlay),
-.modal-overlay[data-qa-current-target] .modal-card { outline: 2px solid var(--cyan); outline-offset: 3px; }
 
 /* STAGE CLEAR y cofre. Los efectos visuales fuertes solo se habilitan con .game-arcade. */
 .game-modal-card { width: min(620px, 100%); border-color: rgba(var(--rpt-purple-rgb), .48); }
@@ -1358,4 +1326,158 @@ body:has(#qaModeBanner.show .qa-walkthrough-panel:not([hidden])) .app-page { pad
   .physical-reward-claim-icon { width: 29px; height: 29px; }
   .physical-reward-claim > button,
   .physical-reward-claim > select { padding: 5px 6px; font-size: 9px; }
+}
+
+/* Marcos y sprites pixel art; los colores parten de la paleta de la tool. */
+:root {
+  --game-pixel-ink: #0a0f24;
+  --game-pixel-shade: #7154c5;
+  --game-pixel-highlight: #cbb8ff;
+  --game-pixel-body: #9b7bff;
+  --game-pixel-good: #66e2a5;
+  --game-pixel-good-text: #66e2a5;
+  --game-pixel-floor: #312750;
+}
+html.theme-light {
+  --game-pixel-ink: #221b3b;
+  --game-pixel-shade: #7e42bd;
+  --game-pixel-highlight: #e5caff;
+  --game-pixel-body: #a855f7;
+  --game-pixel-good: #22c55e;
+  --game-pixel-good-text: #15803d;
+  --game-pixel-floor: #e4dcef;
+}
+@media (prefers-color-scheme: light) {
+  html:not(.theme-dark):not(.theme-light) {
+    --game-pixel-ink: #221b3b; --game-pixel-shade: #7e42bd;
+    --game-pixel-highlight: #e5caff; --game-pixel-body: #a855f7;
+    --game-pixel-good: #22c55e; --game-pixel-good-text: #15803d;
+    --game-pixel-floor: #e4dcef;
+  }
+}
+.game-arena, .game-missions, .game-panel, .game-achievements-hero,
+.game-daily-milestones, .game-modal-card, .game-toast {
+  position: relative; border-width: 2px; border-radius: 0;
+  background: var(--panel-navy); box-shadow: 4px 4px 0 var(--line);
+}
+.game-arena::before, .game-arena::after { display: none; }
+.game-panel, .game-missions, .game-achievements-hero { padding: 13px; }
+.game-settings-accordion { padding: 0; }
+.game-arena[data-game-phase="fury"] { background: var(--panel-navy); }
+.game-arena, .game-panel, .game-missions, .game-achievements-hero, .game-daily-milestones {
+  clip-path: polygon(6px 0, calc(100% - 6px) 0, calc(100% - 6px) 4px, 100% 4px, 100% calc(100% - 6px), calc(100% - 4px) calc(100% - 6px), calc(100% - 4px) 100%, 6px 100%, 6px calc(100% - 4px), 0 calc(100% - 4px), 0 6px, 6px 6px);
+}
+.game-day-panels { gap: 14px; }
+.game-arena--arcade, .game-arena--subtle { grid-template-columns: minmax(0, 1fr) 140px; gap: 8px 12px; padding: 14px; align-content: start; }
+.game-arena--arcade > .game-arena-copy, .game-arena--subtle > .game-arena-copy { display: contents; }
+.game-arena-copy > .game-kicker, .game-arena-copy > .game-arena-title-row,
+.game-arena-copy > .game-hp-label, .game-arena-copy > .game-hp-track,
+.game-arena-copy > .game-hp-foot, .game-pixel-arena-hint { grid-column: 1 / -1; }
+.game-arena-copy > .game-phase-meter { grid-column: 1; grid-row: 3; }
+.game-arena-copy > .game-monster-phrase { grid-column: 1; grid-row: 4; align-self: start; }
+.game-arena > .game-monster-stage { grid-column: 2; grid-row: 3 / span 2; min-height: 158px; width: 100%; align-self: center; }
+.game-arena-title-row h3 { font-size: clamp(17px, 2vw, 21px); letter-spacing: -.025em; }
+.game-kicker, .game-panel-eyebrow, .game-page-kicker, .game-hp-label { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+.game-combo-badge, .game-phase-meter, .game-panel-badge { border-radius: 0; }
+.game-phase-meter { grid-template-columns: 1fr; padding: 0; border: 0; background: transparent !important; gap: 6px; align-self: center; }
+.game-phase-meter > span { width: fit-content; padding: 4px 6px; border: 1px solid currentColor; }
+.game-phase-meter > small { line-height: 1.45; }
+.game-monster-phrase { font-size: 11px; line-height: 1.5; }
+.game-pixel-arena-hint { display: flex; gap: 7px; align-items: center; padding-top: 8px; border-top: 1px solid var(--line); color: var(--muted); font-size: 10px; line-height: 1.4; }
+.game-pixel-arena-hint > .game-pixel-icon { color: var(--rpt-purple); flex: 0 0 16px; }
+.game-monster-stage { background-image: radial-gradient(var(--line) 1px, transparent 1px); background-size: 12px 12px; }
+.game-monster-stage::after { width: 90%; height: 5px; border-radius: 0; background: var(--game-pixel-floor); filter: none; }
+.game-monster-stage .monster-svg { width: 140px; max-width: 100%; filter: none !important; color: var(--game-pixel-body) !important; }
+.monster-svg .monster-layer--outline { opacity: 1; color: var(--game-pixel-ink); }
+.monster-svg .monster-layer--body { color: var(--game-pixel-body); }
+.monster-svg--gold .monster-layer--body { color: var(--tier-gold); }
+.monster-svg .monster-layer--face { color: var(--game-pixel-ink); }
+.monster-svg .monster-pixel--highlight { fill: var(--game-pixel-highlight); }
+.monster-svg .monster-pixel--shade { fill: var(--game-pixel-shade); }
+.game-hp-track, .game-boss-progress, .game-cycle-boss-track, .game-level-track { border-radius: 0; height: 12px; background: var(--line); }
+.game-hp-track::after, .game-level-track::after, .game-boss-progress::after { position: absolute; inset: 0; content: ""; background: repeating-linear-gradient(90deg, transparent 0 9px, var(--panel-navy) 9px 11px); opacity: .42; pointer-events: none; }
+.game-level-track { position: relative; }
+.game-hp-fill, .game-boss-progress > span, .game-cycle-boss-track > span { position: relative; z-index: 1; border-radius: 0; background: var(--game-pixel-good); }
+.game-hp-track::after { z-index: 2; }
+.game-hp-damage-trail { position: absolute; inset: 0 auto 0 0; background: var(--bad); }
+.game-level-track > span { border-radius: 0; background: var(--cyan); }
+.game-hp-fill--boss, .game-boss-progress > span { background: var(--tier-gold); }
+.game-hp-foot { font-size: 10px; color: var(--muted); }
+.game-day-panels .game-mission-grid { grid-template-columns: 1fr; gap: 0; margin-top: 7px; }
+.game-mission-grid .game-mission { grid-template-columns: 24px minmax(0, 1fr) minmax(62px, 100px); gap: 8px; padding: 10px 0; border: 0; border-top: 1px solid var(--line); border-radius: 0; background: transparent; }
+.game-mission-grid .game-mission > div { display: grid; gap: 4px; }
+.game-mission-grid .game-mission b { line-height: 1.35; }
+.game-mission-grid .game-mission small.game-mission-reward { color: var(--tier-gold); text-align: right; font: 9px/1.45 ui-monospace, SFMono-Regular, Consolas, monospace; padding: 0; border: 0; background: none; }
+.game-armor, .game-armor-plate { border-radius: 0; }
+.game-armor { width: 24px; height: 26px; background: none; }
+.game-armor-row { gap: 6px; margin-top: 10px; }
+.game-armor-plate > span { display: flex; align-items: center; }
+.game-armor-plate.is-complete > span, .game-mission-grid .game-mission.is-complete .game-armor { color: var(--game-pixel-good-text); background: none; }
+.game-pixel-icon { display: inline-block; vertical-align: middle; width: 16px; height: 16px; flex-shrink: 0; image-rendering: pixelated; }
+.game-daily-milestones { padding: 10px 12px; }
+.game-daily-milestones .gh-goal-subitem::before { width: 10px; height: 10px; border-radius: 0; }
+.game-daily-milestones .gh-goal-subitem[aria-label*="hito registrado"] { color: var(--game-pixel-good-text) !important; }
+.game-daily-milestones .gh-goal-subitem:not(:last-child)::after { top: 6px; }
+.game-achievements-page { gap: 14px; }
+.game-settings-disclosures, .game-achievements-grid { gap: 14px; }
+.game-advanced-settings { grid-template-columns: 1fr; }
+.game-achievements-page :is(.game-settings-switch, .game-settings-switch > span, .game-settings-accordion-chevron, .game-level-emblem, .game-level-ladder span, .game-streak-day, .game-streak-day em, .game-summary-stat, .game-next-goal, .game-equipment-card, .game-unlock-item, .game-chest-claim, .game-trophy, .game-bestiary-card, .game-achievements-season, .game-settings-profile, .game-daily-focus, .game-reward-settings, .game-last-clear-content, .game-settings-toggle, .game-monster-name-controls > input),
+.game-modal-card :is(.game-stage-score, .game-stage-breakdown span, .game-stage-missions span, .game-sealed-chest) { border-radius: 0; }
+.game-settings-toggle:has(input:checked) .game-settings-switch { background: var(--cyan); }
+.game-achievements-page :is(button, select, input[type="text"]) { border-radius: 2px; }
+.game-achievements-page :is(.game-equipment-item, .game-equipment-icon, .game-record-row, .game-collection-card, .game-boss-reward-options > button) { border-radius: 0; }
+.game-equipment-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+#gameTrophies > .game-trophy, #gameRecords > div, #gameLastStageClear > button[data-reopen-stage], #gameBestiary > .game-bestiary-card { border-radius: 0; }
+.game-streak-week { gap: 5px; }
+.game-streak-day[data-day-state="done"] em { background: var(--game-pixel-good); color: var(--game-pixel-ink); }
+.game-boss-sprite { border-radius: 0; border-color: var(--game-pixel-ink); background: var(--game-pixel-body); box-shadow: inset 0 -10px 0 var(--game-pixel-shade), 4px 4px 0 var(--game-pixel-floor); }
+.game-pixel-crown::before, .game-pixel-crown::after { transform: none; border-radius: 0; border-color: var(--tier-gold); background: var(--tier-gold); width: 16px; height: 14px; }
+.game-pixel-eye { background: var(--game-pixel-ink); }
+.game-pixel-stars { display: flex; justify-content: center; gap: 8px; color: var(--tier-gold); }
+.game-pixel-stars .game-pixel-icon { width: 24px; height: 24px; }
+.game-pixel-stars > .is-empty { color: var(--muted-3); opacity: .45; }
+.game-trophy > .game-pixel-icon { color: var(--tier-gold); margin-right: 5px; }
+.game-pixel-chest { width: 42px; height: 36px; color: var(--tier-gold); flex-shrink: 0; image-rendering: pixelated; overflow: visible; }
+.game-chest-icon .game-pixel-chest { width: 112px; height: 98px; }
+.game-pixel-chest-lid { transform-box: fill-box; transform-origin: left bottom; }
+.game-pixel-chest.is-open .game-pixel-chest-lid { transform: translateY(-5px) rotate(-12deg); }
+.game-sealed-chest { display: flex; align-items: center; justify-content: center; gap: 12px; }
+.game-stage-clear h2.game-pixel-clear-title { font-size: clamp(22px, 6vw, 32px); }
+.game-pixel-fx-host { position: relative; }
+.game-pixel-fx-layer { position: absolute; inset: 0; pointer-events: none; z-index: 5; overflow: visible; }
+.game-pixel-particle { position: absolute; top: 50%; left: 50%; width: 4px; height: 4px; background: var(--tier-gold); animation: game-pixel-scatter .75s steps(5, end) forwards; }
+.game-pixel-particle:nth-child(3n) { background: var(--game-pixel-good); }
+.game-pixel-particle:nth-child(3n + 1) { background: var(--cyan); }
+.game-pixel-fx--mission .game-pixel-particle, .game-pixel-fx--armor .game-pixel-particle { background: var(--game-pixel-good); }
+.game-pixel-damage { position: absolute; left: 50%; top: 18%; color: var(--bad); white-space: nowrap; font: 900 13px/1 ui-monospace, SFMono-Regular, Consolas, monospace; animation: game-pixel-damage .8s steps(5, end) forwards; text-shadow: 1px 1px var(--panel-navy); }
+.game-arcade .game-arena--arcade .monster-svg,
+.game-arcade .game-arena--arcade.game-angry .monster-svg,
+.game-arcade .game-arena--arcade.game-wounded .monster-svg { animation: game-monster-idle 2.4s steps(2, end) infinite; }
+.game-arcade .game-arena--arcade.game-defeated .monster-svg { animation: none; }
+.game-arcade .game-arena--arcade.is-hit .monster-svg { animation: game-monster-hit .45s steps(3, end); }
+.game-arcade .game-arena--arcade.is-critical-hit .monster-svg { animation: game-monster-critical .45s steps(3, end); }
+.game-arcade .game-arena[data-game-event="clear"] { animation: none; }
+.game-arcade .game-arena[data-game-event="clear"] .monster-svg { animation: game-pixel-defeat .8s steps(4, end); }
+.game-arcade .game-arena .game-hp-damage-trail { animation: game-pixel-hp .7s steps(6, end); }
+.game-arcade .game-pixel-chest.is-open .game-pixel-chest-lid { animation: game-pixel-chest-open .55s steps(4, end); }
+.game-arcade .game-stage-clear .game-pixel-stars > .is-earned { animation: game-pixel-star .55s steps(4, end) both; }
+.game-arcade .game-stage-clear .game-pixel-stars > .is-earned:nth-child(2) { animation-delay: .12s; }
+.game-arcade .game-stage-clear .game-pixel-stars > .is-earned:nth-child(3) { animation-delay: .24s; }
+@keyframes game-pixel-scatter { 0% { opacity: 1; transform: translate(0,0); } 100% { opacity: 0; transform: translate(var(--pixel-x), var(--pixel-y)); } }
+@keyframes game-pixel-damage { 0% { opacity: 1; transform: translate(-50%, 4px); } 100% { opacity: 0; transform: translate(-50%, -28px); } }
+@keyframes game-pixel-hp { 0%, 25% { width: var(--game-hp-before); } 100% { width: var(--game-hp-after); } }
+@keyframes game-pixel-chest-open { from { transform: none; } to { transform: translateY(-5px) rotate(-12deg); } }
+@keyframes game-pixel-star { 0% { opacity: 0; transform: translateY(8px) scale(.8); } 70% { opacity: 1; transform: translateY(-2px) scale(1.1); } 100% { opacity: 1; transform: none; } }
+@keyframes game-pixel-defeat { 0% { opacity: 1; transform: none; } 55% { opacity: .1; transform: translateY(8px); } 100% { opacity: .55; transform: none; } }
+@media (min-width: 821px) { .game-day-panels { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+@media (max-width: 820px) { .game-day-panels { grid-template-columns: 1fr; } }
+@media (max-width: 760px) { .game-equipment-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 400px) {
+  .game-arena--arcade, .game-arena--subtle { grid-template-columns: minmax(0, 1fr) 88px; gap: 7px 8px; padding: 12px; }
+  .game-arena > .game-monster-stage { min-height: 88px; }
+  .game-mission-grid .game-mission { grid-template-columns: 22px minmax(0, 1fr); gap: 4px 7px; }
+  .game-mission-grid .game-mission small.game-mission-reward { grid-column: 2; text-align: left; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .game-arena *, .game-missions *, .game-modal-card *, .game-achievements-page *, .game-pixel-fx-layer * { animation: none !important; transition: none !important; }
 }

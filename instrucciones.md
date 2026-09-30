@@ -340,8 +340,8 @@ v577: activación visible en la cabecera y preferencias abiertas al principio;
 nivel/XP y racha/escudos juntos, sin duplicar el perfil; jefe del ciclo, última
 victoria/cofre y récords; equipo, bestiario/trofeos e historial positivo.
 Presupuesto/premios y desbloqueos por nivel son desplegables con todo su contenido.
-QA y reinicio quedan separados al final, con acceso a QA desde la cabecera que
-abre el laboratorio y enfoca su selector. Los hitos de ganancias quedan justo
+El reinicio queda al final; el Laboratorio QA se retiró en v578 por petición
+del usuario. Los hitos de ganancias quedan justo
 debajo de Misiones en Inicio, con cuatro marcadores conectados, hitos registrados
 en verde y próximo hito/cantidad restante. Monstruo y misiones siguen en Inicio.
 Shift, Break y Lunch se ven en una sola fila también en móvil, con todo su texto.
@@ -352,11 +352,14 @@ más de 30 minutos después de terminar no concede XP. Históricos, futuros y
 Dropped no disparan golpes sobre el monstruo actual. Off, Sutil y movimiento
 reducido conservan sus límites.
 
-Los dos recorridos QA indican qué ya se hizo, el siguiente botón y dónde tocar.
-Se resalta el botón o modal activo. La navegación apunta al control visible
-debajo de la cabecera, abre su acordeón y el cierre vuelve al resumen superior
-de Logros. La guía deja espacio al final de todas las páginas que utiliza.
-Recarga, reinicio y salida/restauración se verifican en el namespace QA aislado.
+El mockup HTML pixel art quedó aprobado y aplicado en v578: marcos escalonados,
+sprites e iconos SVG nítidos, vida segmentada, armaduras e hitos cuadrados,
+cofres y estrellas. Efectos breves de daño, misión, victoria y apertura;
+Sutil/Off y movimiento reducido no generan partículas. Se mantienen cálculos,
+recompensas, recibos, controles, contenido y ubicación del monstruo en Inicio.
+Se eliminaron el laboratorio, los recorridos y su código de la tool. Al
+actualizar se retiran únicamente sus cuatro claves antiguas de simulación;
+el arranque y la sincronización siempre consultan los snapshots reales.
 
 El protocolo permanente de auditoría profunda se recuperó íntegro del commit
 0d68200; d238d3c lo había eliminado al retirar el roadmap.
@@ -503,7 +506,7 @@ La aplicación funciona en producción con estas bases vigentes:
   global, backup diario, exportación y borrado de cuenta permanecen activos.
 - Turnos, llamadas, Horario, Higher Rate, Finanzas, Reportes, Calendario,
   Adherencia y la gamificación «El Monstruo» están integrados.
-- La versión actual es 577. Refuerzo positivo, Logros y auditoría profunda
+- La versión actual es 578. Refuerzo positivo, Logros y auditoría profunda
   están terminados. Los siete fallos de la auditoría se corrigieron con
   regresiones; cobertura y límites constan en
   `docs/auditoria-profunda-2026-09-30.md`.
@@ -511,6 +514,22 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v578** — Gamificación pixel art aprobada y retirada del Laboratorio QA.
+
+- Marcos escalonados y colores claro/oscuro de la tool; sprites, iconos,
+  armaduras, vida segmentada, estrellas y cofres SVG. Misiones e hitos
+  compactos, equipo en filas legibles y preferencias al principio de Logros.
+- Golpes con daño flotante y partículas acotadas, misiones, derrota, estrellas
+  y apertura de cofre. Efectos breves respetan Sutil/Off y movimiento reducido.
+  Ganancias, XP, recibos y reglas permanecen iguales; monstruo en Inicio.
+- Eliminados panel, accesos, guía y módulos del Laboratorio QA. Limpieza de
+  compatibilidad borra solo cuatro claves de simulación y conserva los datos
+  reales incluso si una clave antigua es ilegible o no se puede eliminar.
+- 171 pruebas, imports/ciclos y wiring de 19 módulos y build correctos.
+  Chrome en claro/oscuro a 320, 390, 768 y 1365 px: Inicio/Logros sin overflow,
+  fila de bloques, manual/live/pegado/ayer/duplicado, derrota, cierre, cofre
+  idempotente y modos de movimiento verificados con datos locales aislados.
 
 **v577** — Distribución coherente de Logros e hitos debajo de Misiones.
 
@@ -544,22 +563,3 @@ La aplicación funciona en producción con estas bases vigentes:
   108 llamadas, recargas, casos extremos y ambos recorridos QA; ocho páginas
   en claro/oscuro y 320–1365 px. Sin excepciones ni overflow del documento.
   Informe completo: docs/auditoria-profunda-2026-09-30.md.
-
-**v575** — Fecha del monstruo, controles de Logros, guía QA y fila móvil.
-
-- Monstruo y misiones vuelven a Inicio. La arena muestra el día seleccionado;
-  llamadas históricas derrotan su propio monstruo, con recibo persistente y
-  bestiario actualizado. El día actual conserva daño/combo y el XP histórico
-  no se concede de nuevo. Correcciones posteriores mantienen el XP sellado.
-- Controles de activación y selección antes del progreso de Logros; paneles,
-  colecciones y niveles compactos, sin eliminar datos ni opciones. Shift,
-  Break y Lunch quedan en una fila en móvil usando el mismo contenido.
-- La guía QA distingue acciones completadas y pendientes, nombra cada botón,
-  señala modal/control activo y navega al elemento visible. El cierre apunta
-  al resumen superior; la guía no tapa permanentemente el final de Inicio.
-- Recuperado sin cambios el protocolo de auditoría profunda eliminado en
-  d238d3c. Conserva su activación únicamente por comando explícito.
-- Verificadas 174 pruebas, imports/ciclos y wiring de 21 módulos, build sin
-  sourcemaps. Chrome local: rutas reales de llamadas y ayer/duplicado; ambos
-  recorridos QA, recarga, reinicio y salida; temas y anchos de 320 a 1365 px.
-  Los datos de prueba son locales/aislados; no se certifica sesión autenticada.

@@ -169,28 +169,12 @@ import {
   configureGameContext,
 } from './game.js';
 import {
-  clearPositiveReinforcementTransients,
   configurePositiveReinforcementContext,
   migratePositiveCallIdReferences,
-  reopenPositiveReflection,
 } from './positive-reinforcement.js';
 import { acwMinutesForBlock } from './block-acw.js';
 
-import {
-  activeAppKeys,
-  beginQaMode,
-  isQaModeActive,
-  readQaSession,
-  restoreQaMode,
-  writeQaSnapshot,
-} from './sync.js';
-import { createQaSnapshot, QA_SCENARIOS } from './qa-mode.js';
-import {
-  configureQaWalkthroughContext,
-  initQaWalkthrough,
-  renderQaWalkthrough,
-  stopQaWalkthrough,
-} from './qa-walkthrough.js';
+import { activeAppKeys } from './sync.js';
 
 import {
   state, calls, settings, reportsMonthlyOffset, calMonthOffset, calViewMode, calYearOffset,
@@ -7483,156 +7467,6 @@ export function render() {
       if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) saveCalHistoryStartModal();
     });
 
-    function renderQaModeControls() {
-      const active = isQaModeActive();
-      const session = readQaSession();
-      const legacyTourSession = active && session?.scenario === 'tour' && state.qaWalkthrough?.version !== 1;
-      const select = document.getElementById('qaScenarioInput');
-      const load = document.getElementById('qaLoadBtn');
-      const restore = document.getElementById('qaRestoreBtn');
-      const status = document.getElementById('qaModeStatus');
-      const description = document.getElementById('qaModeDescription');
-      const banner = document.getElementById('qaModeBanner');
-      if (select && !select.options.length) {
-        QA_SCENARIOS.forEach((scenario) => {
-          const option = document.createElement('option');
-          option.value = scenario.id;
-          option.textContent = scenario.label;
-          select.appendChild(option);
-        });
-      }
-      if (select && active) select.value = session?.scenario || 'tour';
-      if (load) load.textContent = active ? 'Cargar otro escenario' : 'Entrar y cargar';
-      if (restore) restore.hidden = !active;
-      if (status) status.textContent = active ? 'Modo QA activo · nube pausada' : 'Tus datos reales están protegidos';
-      if (description) description.textContent = active
-        ? legacyTourSession
-          ? 'Esta sesión de demostración es de una versión anterior. Elige Recorrido guiado y pulsa Cargar otro escenario para abrir la guía.'
-          : 'Puedes editar, borrar y reclamar recompensas libremente. Los cambios quedan en el laboratorio y no se suben.'
-        : 'Carga datos de prueba para recorrer pantallas, estados y recompensas. Nada del laboratorio se sube a la nube.';
-      if (banner) banner.classList.toggle('show', active);
-      renderQaWalkthrough();
-    }
-
-    function qaTourIsActive() {
-      return isQaModeActive() && ['tour', 'reinforcement'].includes(readQaSession()?.scenario);
-    }
-
-    function clearQaTransientUI() {
-      stopQaWalkthrough();
-      clearPositiveReinforcementTransients();
-      document.querySelectorAll('.modal-overlay.open').forEach((modal) => {
-        if (modal.id) closeModal(modal.id);
-      });
-      ['gameToastStack', 'gameCallFx', 'gameLootBox', 'gameRecordBanner'].forEach((id) => {
-        const element = document.getElementById(id);
-        if (!element) return;
-        element.textContent = '';
-        if (id === 'gameLootBox' || id === 'gameRecordBanner') element.hidden = true;
-      });
-    }
-
-    async function loadQaScenario() {
-      if (!isQaModeActive() && (state.activeCall || state.activePause || state.pendingLiveCallBackup)) {
-        toast('Termina o descarta la llamada/pausa pendiente antes de entrar al laboratorio QA.');
-        return;
-      }
-      const replacingQaScenario = isQaModeActive();
-      const select = document.getElementById('qaScenarioInput');
-      const scenario = select?.value || 'tour';
-      if (!isQaModeActive()) {
-        const result = await beginQaMode();
-        if (!result.ok) {
-          toast(result.conflict
-            ? 'Hay un conflicto de sincronización. Resuélvelo antes de entrar al laboratorio QA.'
-            : 'No se pudo proteger tu estado actual. Revisa la conexión e intenta otra vez.');
-          return;
-        }
-      }
-      try {
-        if (replacingQaScenario) clearQaTransientUI();
-        writeQaSnapshot(createQaSnapshot({ state, calls, settings }, scenario), scenario);
-        window.location.reload();
-      } catch {
-        if (!isQaModeActive()) return;
-        restoreQaMode();
-        toast('No se pudo crear el escenario QA; tus datos reales siguen intactos.');
-      }
-    }
-
-    function requestRestoreQaMode() {
-      if (!isQaModeActive()) return;
-      appConfirm('¿Salir del laboratorio QA? Se borran solo los datos de prueba y vuelven a aparecer tus datos reales.', () => {
-        clearQaTransientUI();
-        restoreQaMode();
-        window.location.reload();
-      });
-    }
-
-    function initQaMode() {
-      configureQaWalkthroughContext({
-        getState: () => state,
-        getCalls: () => calls,
-        getSettings: () => settings,
-        isActive: qaTourIsActive,
-        saveState: saveStateOnly,
-        saveSettings: () => qaTourIsActive() && saveSettingsOnly(),
-        checkInactivity: (now) => qaTourIsActive() && checkReinforcementInactivity(now),
-        setIntensity: (value) => {
-          if (!qaTourIsActive() || !['arcade', 'subtle', 'off'].includes(value)) return;
-          settings.game.intensity = value;
-          settings.game.enabled = true;
-          saveSettingsOnly();
-          renderGame();
-        },
-        addCall: (call, source, { surpriseRandom } = {}) => {
-          if (!qaTourIsActive() || !call?.id || calls.some((item) => String(item?.id) === String(call.id))) return false;
-          setAppCalls([...calls, call]);
-          state.lastCallEndedAt = call.endISO;
-          saveAll();
-          onGameCallSaved(call, source, readQaSession()?.scenario === 'reinforcement' ? { random: () => surpriseRandom ?? 0.99 } : {});
-          render();
-          return true;
-        },
-        reopenReflection: (call, dayKey) => qaTourIsActive() && reopenPositiveReflection(call, dayKey),
-        startPause: (type) => qaTourIsActive() && startPause(type),
-        endPause: () => qaTourIsActive() && endPause(),
-        endShift: () => qaTourIsActive() && endShift(),
-        navigate: (page, targetId) => {
-          if (!qaTourIsActive()) return;
-          const link = Array.from(document.querySelectorAll('.sidebar-link[data-page]'))
-            .find((item) => item.getAttribute('data-page') === page);
-          link?.click();
-          const target = targetId ? document.getElementById(targetId) : null;
-          const details = target?.closest('details');
-          if (details) details.open = true;
-          const anchor = target?.matches('details') ? target.querySelector('summary') : target;
-          anchor?.scrollIntoView?.({ block: 'start', behavior: 'auto' });
-          if (anchor) window.scrollBy({ top: -96, behavior: 'auto' });
-          document.body.classList.remove('sidebar-open');
-        },
-        markTarget: (targetId) => {
-          document.querySelectorAll('[data-qa-current-target]').forEach((element) => element.removeAttribute('data-qa-current-target'));
-          if (qaTourIsActive()) document.getElementById(targetId)?.setAttribute('data-qa-current-target', 'true');
-        },
-        restart: () => {
-          if (!qaTourIsActive()) return;
-          clearQaTransientUI();
-          const scenario = readQaSession()?.scenario || 'tour';
-          writeQaSnapshot(createQaSnapshot({ state, calls, settings }, scenario), scenario);
-          window.location.reload();
-        },
-        hasOpenModal: () => !!document.querySelector('.modal-overlay.open'),
-        getOpenModalId: () => document.querySelector('.modal-overlay.open')?.id,
-        notify: toast,
-      });
-      initQaWalkthrough();
-      renderQaModeControls();
-      document.getElementById('qaLoadBtn')?.addEventListener('click', loadQaScenario);
-      document.getElementById('qaRestoreBtn')?.addEventListener('click', requestRestoreQaMode);
-      document.getElementById('qaBannerRestoreBtn')?.addEventListener('click', requestRestoreQaMode);
-    }
-
     if (!state.events.length && !state.shiftStartedAt && !calls.length) {
       state.events.push({ ts: new Date().toISOString(), type: 'system', title: 'Listo para empezar', detail: 'Inicia el shift para comenzar', meta: 'idle' });
       saveStateOnly();
@@ -7743,7 +7577,6 @@ export function render() {
     }
 
     initGame();
-    initQaMode();
 
     setInterval(() => {
       // Si cambió el día de calendario real, checkDayRollover ya hace un render completo (incluye

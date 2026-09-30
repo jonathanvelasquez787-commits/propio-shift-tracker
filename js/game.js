@@ -18,7 +18,7 @@ export function configureGameContext(context) {
     saveStateOnly, todayCallDateKey, toast, weekdayKeyForDayKey, getReinforcementWorkIntervals } = context);
   configureReinforcementFeedback({ queueToast: queueGameToast, triggerEffect: () => triggerGameEvent('gameArena', 'clear', 900) });
 }
-import { MONSTER_CATALOG, monsterForWeekday, monsterSvg } from './monsters.js';
+import { MONSTER_CATALOG, monsterForWeekday, monsterSvg, gamePixelIcon, gamePixelChest } from './monsters.js';
 import {
   createDefaultReinforcementState,
   initPositiveReinforcement,
@@ -687,11 +687,15 @@ function renderArena() {
   lastArenaRenderKey = renderKey;
   const impactClasses = root.dataset.gameDayKey === dayKey
     ? ['is-hit', 'is-critical-hit'].filter((name) => root.classList.contains(name)) : [];
+  const previousHp = root.dataset.gameDayKey === dayKey ? Number(root.dataset.gameHp) : day.hpPct;
   if (root.dataset.gameDayKey && root.dataset.gameDayKey !== dayKey) delete root.dataset.gameEvent;
   root.className = `game-arena ${subtle ? 'game-arena--subtle' : 'game-arena--arcade'} game-${escapeHtml(monsterState)}`;
   root.classList.add(...impactClasses);
   root.dataset.gameState = monsterState;
   root.dataset.gameDayKey = dayKey;
+  root.dataset.gameHp = String(day.hpPct);
+  root.style.setProperty('--game-hp-before', `${Number.isFinite(previousHp) ? previousHp : day.hpPct}%`);
+  root.style.setProperty('--game-hp-after', `${day.hpPct}%`);
   root.dataset.gamePhase = monsterPhase;
   root.dataset.gameIntensity = subtle ? 'subtle' : 'arcade';
   const monsterImageLabel = `${displayName}${customName ? `, ${day.species.name}` : ''}, ${PHASE_LABELS[monsterPhase] || monsterPhase}, ${Math.round(day.hpPct)}% de vida`;
@@ -705,12 +709,14 @@ function renderArena() {
       <p class="game-monster-phrase">“${escapeHtml(day.species.phrase)}”</p>
       <div class="game-hp-label"><span>VIDA</span><strong>${Math.round(day.hpPct)}%</strong></div>
       <div class="game-hp-track" role="progressbar" aria-label="Vida del monstruo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(day.hpPct)}">
+        <div class="game-hp-damage-trail" style="width:${day.hpPct}%" aria-hidden="true"></div>
         <div class="game-hp-fill" style="width:${day.hpPct}%"></div>
         ${shadow === null ? '' : `<span class="game-shadow-marker" style="left:${shadow}%" title="Ayer a esta hora: ${Math.round(shadow)}% de la meta"></span>`}
       </div>
       <div class="game-hp-foot"><span>${withConversion(damage)} de vida restante</span><span>${day.defeated ? 'Botín extra: las ganancias siguen, el XP no' : `${withConversion(day.stats.earnings)} de daño`}</span></div>
     </div>
-    <div class="game-monster-stage" role="img" aria-label="${escapeHtml(monsterImageLabel)}">${sprite}</div>`;
+    <div class="game-monster-stage" role="img" aria-label="${escapeHtml(monsterImageLabel)}">${sprite}</div>
+    <div class="game-pixel-arena-hint">${gamePixelIcon('shield')}<span>${day.defeated ? 'Meta alcanzada. Las ganancias extra siguen contando.' : `${day.missions.filter((mission) => mission.applies !== false && !mission.ok).length} armaduras pendientes · completa tus misiones del día.`}</span></div>`;
 }
 
 function renderMissions() {
@@ -727,11 +733,12 @@ function renderMissions() {
   const plates = armorPlatesForDay(day);
   root.innerHTML = `
     <div class="game-section-head"><div><span class="game-kicker">3 ARMADURAS</span><h3>Misiones del día</h3></div><div class="game-missions-status"><span>Enfoque · ${escapeHtml(MISSION_FOCUS_LABELS[focus])}</span><strong>${day.missions.filter((mission) => mission.ok).length}/3</strong></div></div>
-    <div class="game-armor-row" role="list" aria-label="Placas de armadura">${plates.map((plate, index) => `<div class="game-armor-plate ${plate.complete ? 'is-complete' : ''} ${plate.status === 'neutral' ? 'is-neutral' : ''}" data-armor-id="${escapeHtml(plate.id)}" role="listitem" aria-label="Placa ${index + 1}: ${escapeHtml(plate.label)}. ${plate.status === 'neutral' ? 'Neutral' : plate.complete ? 'Completada' : 'Pendiente'}"><span aria-hidden="true">${plate.complete ? '✦' : plate.status === 'neutral' ? '·' : '◆'}</span><b>${index + 1}</b></div>`).join('')}</div>
+    <div class="game-armor-row" role="list" aria-label="Placas de armadura">${plates.map((plate, index) => `<div class="game-armor-plate ${plate.complete ? 'is-complete' : ''} ${plate.status === 'neutral' ? 'is-neutral' : ''}" data-armor-id="${escapeHtml(plate.id)}" role="listitem" aria-label="Placa ${index + 1}: ${escapeHtml(plate.label)}. ${plate.status === 'neutral' ? 'Neutral' : plate.complete ? 'Completada' : 'Pendiente'}"><span aria-hidden="true">${gamePixelIcon(plate.complete ? 'check' : 'shield')}</span><b>${index + 1}</b></div>`).join('')}</div>
     <div class="game-mission-grid" role="list" aria-label="Misiones del día">${day.missions.map((mission, index) => `
       <div class="game-mission ${mission.ok ? 'is-complete' : ''} ${mission.status === 'neutral' ? 'is-neutral' : ''}" role="listitem" aria-label="${escapeHtml(`Misión ${index + 1}: ${mission.label}. ${mission.status === 'neutral' ? 'Neutral' : mission.ok ? 'Completada' : 'Pendiente'}. ${mission.detail}`)}">
-        <span class="game-armor" aria-hidden="true">${mission.ok ? '✦' : mission.status === 'neutral' ? '·' : '◆'}</span>
-        <div><b>${index + 1}. ${escapeHtml(mission.label)}</b><span>${escapeHtml(mission.detail)}</span><small class="game-mission-reward">${mission.status === 'neutral' ? 'Sin recompensa: no aplica' : `Recompensa individual · ${mission.rewardXp} XP`}</small></div>
+        <span class="game-armor" aria-hidden="true">${gamePixelIcon(mission.ok ? 'check' : index === 0 ? 'sword' : index === 1 ? 'cup' : 'shield')}</span>
+        <div><b>${index + 1}. ${escapeHtml(mission.label)}</b><span>${escapeHtml(mission.detail)}</span></div>
+        <small class="game-mission-reward">${mission.status === 'neutral' ? 'Sin recompensa: no aplica' : `Recompensa individual · ${mission.rewardXp} XP`}</small>
       </div>`).join('')}</div>`;
 }
 
@@ -1012,7 +1019,7 @@ function renderGameProgressRoadmap() {
       const control = available
         ? `<button type="button" class="game-text-button game-equipment-state" data-game-action="equip-accessory" data-accessory="${escapeHtml(item.label)}" aria-pressed="${active}">${active ? 'Quitar' : 'Equipar'}</button>`
         : `<span class="game-equipment-state">${escapeHtml(lockedLabel)}</span>`;
-      return `<article class="game-equipment-item ${active ? 'is-equipped' : available ? 'is-owned' : 'is-locked'}" data-equipment-state="${stateName}" role="listitem"><span class="game-equipment-icon" aria-hidden="true">${available ? '✦' : '?'}</span><span class="game-equipment-copy"><strong>${escapeHtml(item.label)}</strong><small>Ranura ${escapeHtml(item.slot)} · nivel ${item.unlockLevel}</small></span>${control}</article>`;
+      return `<article class="game-equipment-item ${active ? 'is-equipped' : available ? 'is-owned' : 'is-locked'}" data-equipment-state="${stateName}" role="listitem"><span class="game-equipment-icon" aria-hidden="true">${gamePixelIcon(item.slot === 'body' ? 'shield' : item.slot === 'head' ? 'crown' : 'gem')}</span><span class="game-equipment-copy"><strong>${escapeHtml(item.label)}</strong><small>Ranura ${escapeHtml(item.slot)} · nivel ${item.unlockLevel}</small></span>${control}</article>`;
     }).join('');
   }
 }
@@ -1102,7 +1109,7 @@ function renderAchievements() {
     const list = trophies.querySelector('[data-game-role="trophy-list"]');
     if (count) count.textContent = String(state.game.trophies.length);
     if (list) list.innerHTML = state.game.trophies.length
-      ? state.game.trophies.map((item) => `<div class="game-trophy-row"><span>🏆 ${escapeHtml(item.label || item.id)}</span><strong>${item.earnedOn ? escapeHtml(formatCallDayLabel(item.earnedOn)) : 'Ganado'}</strong></div>`).join('')
+      ? state.game.trophies.map((item) => `<div class="game-trophy-row"><span>${gamePixelIcon('star')} ${escapeHtml(item.label || item.id)}</span><strong>${item.earnedOn ? escapeHtml(formatCallDayLabel(item.earnedOn)) : 'Ganado'}</strong></div>`).join('')
       : '<div class="game-collection-empty">Tus próximos trofeos aparecerán aquí.</div>';
   }
 
@@ -1128,14 +1135,14 @@ function renderAchievements() {
     if (latest) {
       const [key, entry] = latest;
       if (date) date.textContent = formatCallDayLabel(key);
-      if (content) content.innerHTML = `<div class="game-clear-stars" aria-hidden="true"><span>${entry.stars >= 1 ? '★' : '☆'}</span><span>${entry.stars >= 2 ? '★' : '☆'}</span><span>${entry.stars >= 3 ? '★' : '☆'}</span></div><p>${entry.xp} XP · ${entry.monster?.defeated ? 'Monstruo derrotado' : 'Stage guardado'}</p>`;
+      if (content) content.innerHTML = `${pixelStars(entry.stars)}<p>${entry.xp} XP · ${entry.monster?.defeated ? 'Monstruo derrotado' : 'Stage guardado'}</p>`;
       if (button) {
         button.hidden = false;
         button.dataset.dayKey = key;
       }
     } else {
       if (date) date.textContent = '—';
-      if (content) content.innerHTML = '<div class="game-clear-stars" aria-hidden="true"><span>☆</span><span>☆</span><span>☆</span></div><p>Aún no hay un STAGE CLEAR guardado.</p>';
+      if (content) content.innerHTML = `${pixelStars(0)}<p>Aún no hay un STAGE CLEAR guardado.</p>`;
       if (button) {
         button.hidden = true;
         delete button.dataset.dayKey;
@@ -1146,7 +1153,7 @@ function renderAchievements() {
     if (pendingChest) {
       pendingChest.hidden = !hasPendingChest;
       pendingChest.innerHTML = hasPendingChest
-        ? `<span aria-hidden="true" class="game-chest-claim-icon">🎁</span><span class="game-chest-claim-copy"><strong>Cofre sellado desde ${escapeHtml(formatCallDayLabel(state.game.chest.sealedOn))}</strong><small>Tu recompensa ya está lista.</small><button type="button" class="game-text-button" data-game-action="claim-chest">Reclamar ahora</button></span>`
+        ? `<span aria-hidden="true" class="game-chest-claim-icon">${gamePixelChest()}</span><span class="game-chest-claim-copy"><strong>Cofre sellado desde ${escapeHtml(formatCallDayLabel(state.game.chest.sealedOn))}</strong><small>Tu recompensa ya está lista.</small><button type="button" class="game-text-button" data-game-action="claim-chest">Reclamar ahora</button></span>`
         : '';
     }
   }
@@ -1299,6 +1306,7 @@ function clearTransientGameUi() {
   if (record) record.hidden = true;
   const fx = document.getElementById('gameCallFx');
   if (fx) fx.innerHTML = '';
+  document.querySelectorAll('.game-pixel-fx-layer').forEach((node) => node.remove());
   document.querySelectorAll('.game-live-xp-float').forEach((node) => node.remove());
   const stack = document.getElementById('gameToastStack');
   if (stack) stack.replaceChildren();
@@ -1434,6 +1442,36 @@ function playGameTone(kind = 'hit') {
 
 const gameEventVersions = new WeakMap();
 
+function pixelBurst(root, kind, damageText = '') {
+  if (!arcadeEnabled() || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+  if (!root || root.hidden || typeof document.createElement !== 'function' || typeof root.appendChild !== 'function') return;
+  const host = root.querySelector('.game-monster-stage') || root;
+  if (host.getClientRects && !host.getClientRects().length) return;
+  if (!damageText && ['hit', 'critical'].includes(kind) && host.querySelector('.game-pixel-damage')) return;
+  host.querySelector('.game-pixel-fx-layer')?.remove();
+  host.classList.add('game-pixel-fx-host');
+  const layer = document.createElement('div');
+  layer.className = `game-pixel-fx-layer game-pixel-fx--${kind}`;
+  layer.setAttribute('aria-hidden', 'true');
+  const count = kind === 'clear' || kind === 'loot' ? 20 : kind === 'mission' ? 14 : 8;
+  for (let index = 0; index < count; index++) {
+    const bit = document.createElement('i');
+    const angle = index / count * Math.PI * 2;
+    bit.className = 'game-pixel-particle';
+    bit.style.setProperty('--pixel-x', `${Math.round(Math.cos(angle) * (34 + index % 4 * 10))}px`);
+    bit.style.setProperty('--pixel-y', `${Math.round(Math.sin(angle) * 45 - 16)}px`);
+    layer.appendChild(bit);
+  }
+  if (damageText) {
+    const damage = document.createElement('span');
+    damage.className = 'game-pixel-damage';
+    damage.textContent = damageText;
+    layer.appendChild(damage);
+  }
+  host.appendChild(layer);
+  setTimeout(() => layer.remove(), 950);
+}
+
 function triggerGameEvent(rootId, eventName, duration = 900) {
   if (!arcadeEnabled()) return;
   if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
@@ -1444,6 +1482,9 @@ function triggerGameEvent(rootId, eventName, duration = 900) {
   root.removeAttribute('data-game-event');
   void root.offsetWidth;
   root.dataset.gameEvent = eventName;
+  queueMicrotask(() => {
+    if (gameEventVersions.get(root) === version && root.dataset.gameEvent === eventName) pixelBurst(root, eventName);
+  });
   setTimeout(() => {
     if (gameEventVersions.get(root) === version && root.dataset.gameEvent === eventName) root.removeAttribute('data-game-event');
   }, duration);
@@ -1500,6 +1541,7 @@ function showCallFx(call, xp, critical, mode = 'xp') {
     arena.classList.remove('is-hit', 'is-critical-hit');
     void arena.offsetWidth;
     arena.classList.add(critical ? 'is-critical-hit' : 'is-hit');
+    pixelBurst(arena, critical ? 'critical' : 'hit', `−${money(amount)}`);
   }
   setTimeout(() => {
     liveFx?.remove();
@@ -2331,6 +2373,10 @@ function freezeGameDay(dayKey, { projectStreak = false } = {}) {
   return entry;
 }
 
+function pixelStars(count) {
+  return `<div class="game-clear-stars game-pixel-stars" role="img" aria-label="${Number(count) || 0} de 3 estrellas">${[1, 2, 3].map((index) => `<span class="${index <= count ? 'is-earned' : 'is-empty'}">${gamePixelIcon('star')}</span>`).join('')}</div>`;
+}
+
 function stageClearMarkup(dayKey, entry) {
   const fallback = computeGameDay(dayKey);
   const hasActivity = typeof entry.hasActivity === 'boolean'
@@ -2367,7 +2413,8 @@ function stageClearMarkup(dayKey, entry) {
 
   return `<div class="game-stage-clear">
     <span class="game-kicker">STAGE CLEAR</span>
-    <h2>${'★'.repeat(entry.stars || 1)}${'☆'.repeat(Math.max(0, 3 - (entry.stars || 0)))}</h2>
+    <h2 class="game-pixel-clear-title">STAGE CLEAR</h2>
+    ${pixelStars(entry.stars || 1)}
     <p>${escapeHtml(monsterOutcome)} · ${withConversion(earnings)}</p>
     ${evidenceMarkup}
     <div class="game-stage-score"><strong>+${entry.xp} XP</strong><span>Tope diario ${GAME_DAILY_XP_CAP}</span></div>
@@ -2378,7 +2425,7 @@ function stageClearMarkup(dayKey, entry) {
     <div class="game-stage-breakdown"><span>Productividad +${breakdown.productivityXp}</span><span>Llamadas +${breakdown.callsXp}</span><span>Adherencia +${breakdown.adherenceXp}</span><span>Puntualidad +${breakdown.punctualityXp}</span><span>Misiones +${breakdown.missionXp}</span></div>
     <div class="game-stage-missions">${entry.missions.map((mission) => `<span class="${mission.ok ? 'is-complete' : ''}">${mission.ok ? '✓' : '○'} ${escapeHtml(mission.detail)}</span>`).join('')}</div>
     <div class="game-stage-next-level"><span>Nivel ${levelAfter}</span><strong>${xpToNext > 0 ? `${xpToNext} XP para nivel ${levelAfter + 1}` : 'Nivel completado'}</strong></div>
-    <div class="game-sealed-chest">🎁 Cofre sellado · reclámalo en Logros o al iniciar tu próximo día</div>
+    <div class="game-sealed-chest">${gamePixelChest()}<span>Cofre sellado · reclámalo en Logros o al iniciar tu próximo día</span></div>
   </div>`;
 }
 
@@ -2387,6 +2434,7 @@ function openStageClear(dayKey, entry) {
   if (!root) return;
   root.innerHTML = stageClearMarkup(dayKey, entry);
   openModal('stageClearModal');
+  pixelBurst(root, 'clear');
   playGameTone('clear');
 }
 
@@ -2442,8 +2490,9 @@ function openPendingChest(todayKey, { allowSameDay = false } = {}) {
 
   const root = document.getElementById('chestContent');
   if (root) {
-    root.innerHTML = `<div class="game-chest-open"><span class="game-kicker">COFRE ABIERTO</span><div class="game-chest-icon">🎁</div><h2>${escapeHtml(displayReward)}</h2><p>${reward.type === 'xp' ? 'Se sumó a tu perfil.' : 'Ya está disponible en tu bestiario.'}</p></div>`;
+    root.innerHTML = `<div class="game-chest-open"><span class="game-kicker">COFRE ABIERTO</span><div class="game-chest-icon">${gamePixelChest(true)}</div><h2>${escapeHtml(displayReward)}</h2><p>${reward.type === 'xp' ? 'Se sumó a tu perfil.' : 'Ya está disponible en tu bestiario.'}</p></div>`;
     openModal('chestModal');
+    pixelBurst(root, 'loot');
   }
   if (granted) {
     queueGameToast(`🎁 Cofre abierto · ${displayReward}`, 'loot');
