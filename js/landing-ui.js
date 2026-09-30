@@ -1,3 +1,4 @@
+import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 // Movimiento de la landing. Nada de esto toca la autenticación: si este módulo
 // falla, la página se ve estática pero entra igual (ver la regla
 // `html:not(.js-reveal) .reveal` en landing.css).
@@ -59,7 +60,7 @@ document.addEventListener('click', (e) => {
   const { selectionStart, selectionEnd } = input;
   input.type = show ? 'text' : 'password';
   btn.setAttribute('aria-pressed', show ? 'true' : 'false');
-  btn.setAttribute('aria-label', show ? 'Ocultar contraseña' : 'Mostrar contraseña');
+  btn.setAttribute('aria-label', show ? translateText('Ocultar contraseña') : translateText('Mostrar contraseña'));
   input.focus();
   try {
     input.setSelectionRange(selectionStart, selectionEnd);
@@ -76,7 +77,7 @@ const clock = document.getElementById('previewClock');
 if (clock && !reduceMotion) {
   const tick = () => {
     const now = new Date();
-    clock.textContent = new Intl.DateTimeFormat('es-MX', {
+    clock.textContent = new Intl.DateTimeFormat(displayLocale(), {
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit',

@@ -1,3 +1,4 @@
+import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 // app-main.js injects call helpers; app-context.js owns shared app state.
 import { calls, settings, state, setAppCalls as setCalls } from './app-context.js';
 
@@ -65,7 +66,7 @@ function reconcileLastCallEndedAt(dayKey) {
 export function openCallEditor(callId) {
   const call = calls.find(c => c.id === callId);
   if (!call) {
-    toast('No pude encontrar esa llamada');
+    toast(translateText('No pude encontrar esa llamada'));
     return;
   }
   editingCallId = callId;
@@ -76,12 +77,12 @@ export function openCallEditor(callId) {
   const billableInput = document.getElementById('callEditBillableInput');
   const droppedInput = document.getElementById('callEditDroppedInput');
 
-  if (title) title.textContent = `Editar llamada · #${call.customerId}`;
-  if (preview) preview.textContent = `${call.callDate} · ${call.callStart} — los datos de fecha/hora no se pueden editar aquí, solo duración, pago, billable y dropped.`;
+  if (title) title.textContent = ui`Editar llamada · #${call.customerId}`;
+  if (preview) preview.textContent = ui`${call.callDate} · ${call.callStart} — los datos de fecha/hora no se pueden editar aquí, solo duración, pago, billable y dropped.`;
   if (durationInput) durationInput.value = call.durationMin;
   if (payInput) payInput.value = parseMoney(call.pay).toFixed(2);
-  if (billableInput) billableInput.value = String(call.billable).toLowerCase() === 'yes' ? 'Yes' : 'No';
-  if (droppedInput) droppedInput.value = String(call.dropped).toLowerCase() === 'yes' ? 'Yes' : 'No';
+  if (billableInput) billableInput.value = String(call.billable).toLowerCase() === 'yes' ? translateText('Yes') : translateText('No');
+  if (droppedInput) droppedInput.value = String(call.dropped).toLowerCase() === 'yes' ? translateText('Yes') : translateText('No');
   syncManualCallPillsUI('callEditModal');
 
   // El nivel de Higher Rate NO se elige aquí: lo decide la ventana configurada
@@ -96,11 +97,11 @@ export function openCallEditor(callId) {
     if (existingBonus) {
       const tierMeta = HIGHER_RATE_TIERS[existingBonus.tier];
       const tierLabel = tierMeta?.label || existingBonus.tier;
-      infoTextEl.innerHTML = `Esta llamada cae en una ventana <strong>${escapeHtml(tierLabel)}</strong> (+${money(tierMeta?.bonusPerMin || 0)}/min), así que ya suma <strong>${money(existingBonus.amount)}</strong>${financeConvertedInline(existingBonus.amount)} de bono aparte del Pago de arriba. Para cambiar el nivel, edita esa ventana en "Higher Rate" (botón del header) — no hace falta tocar el Pago.`;
+      infoTextEl.innerHTML = ui`Esta llamada cae en una ventana <strong>${escapeHtml(tierLabel)}</strong> (+${money(tierMeta?.bonusPerMin || 0)}/min), así que ya suma <strong>${money(existingBonus.amount)}</strong>${financeConvertedInline(existingBonus.amount)} de bono aparte del Pago de arriba. Para cambiar el nivel, edita esa ventana en "Higher Rate" (botón del header) — no hace falta tocar el Pago.`;
       infoEl.style.display = '';
       warningEl.style.display = 'none';
     } else {
-      warningTextEl.textContent = 'Esta llamada no cae en ninguna ventana de Higher Rate, así que no lleva bono. El nivel se calcula solo desde tus ventanas: agrégala o ajústala en "Higher Rate" (botón del header) y el bono se suma solo a esta llamada.';
+      warningTextEl.textContent = translateText('Esta llamada no cae en ninguna ventana de Higher Rate, así que no lleva bono. El nivel se calcula solo desde tus ventanas: agrégala o ajústala en "Higher Rate" (botón del header) y el bono se suma solo a esta llamada.');
       warningEl.style.display = '';
       infoEl.style.display = 'none';
     }
@@ -118,14 +119,14 @@ export function saveCallEditor() {
 
   const duration = Number(durationInput?.value);
   if (!Number.isFinite(duration) || duration < 0 || duration > MAX_CALL_DURATION_MIN) {
-    toast(`La duración debe ser un número entre 0 y ${MAX_CALL_DURATION_MIN} minutos`);
+    toast(ui`La duración debe ser un número entre 0 y ${MAX_CALL_DURATION_MIN} minutos`);
     return;
   }
   // ParseMoney preserva el signo '-' a propósito (para poder leer valores ya negativos de datos
   // viejos/importados), así que un valor negativo tecleado a mano se guardaba tal cual.
   const pay = Math.max(0, parseMoney(payInput?.value)).toFixed(2);
-  const billable = billableInput?.value === 'Yes' ? 'Yes' : 'No';
-  const dropped = droppedInput?.value === 'Yes' ? 'Yes' : 'No';
+  const billable = billableInput?.value === 'Yes' ? translateText('Yes') : translateText('No');
+  const dropped = droppedInput?.value === 'Yes' ? translateText('Yes') : translateText('No');
 
   const original = calls.find(c => c.id === editingCallId);
   if (!original) return;
@@ -133,7 +134,7 @@ export function saveCallEditor() {
   const start = new Date(original.startISO);
   const end = new Date(start.getTime() + duration * 60000);
   if (end.getTime() > Date.now()) {
-    toast('La llamada no puede terminar en el futuro');
+    toast(translateText('La llamada no puede terminar en el futuro'));
     return;
   }
   const candidate = { ...original, startISO: start.toISOString(), endISO: end.toISOString() };
@@ -142,7 +143,7 @@ export function saveCallEditor() {
   // traslape.
   const overlapsWith = calls.find(c => c.id !== editingCallId && callsOverlap(c, candidate));
   if (overlapsWith) {
-    toast(`Esa duración traslapa con la llamada #${overlapsWith.customerId} (${overlapsWith.callStart}). Ajusta la duración.`);
+    toast(ui`Esa duración traslapa con la llamada #${overlapsWith.customerId} (${overlapsWith.callStart}). Ajusta la duración.`);
     return;
   }
 
@@ -167,7 +168,7 @@ export function saveCallEditor() {
   financeRunAutoFillCascade();
   saveAll();
   if (affectedDayKey) onGameCallsChanged(affectedDayKey);
-  toast('Llamada actualizada');
+  toast(translateText('Llamada actualizada'));
 }
 
 // Borra una llamada individual desde "Tabla completa" (botón "Eliminar" junto a "Editar", ver
@@ -181,7 +182,7 @@ export function deleteCallRecord(callId) {
   financeRunAutoFillCascade();
   saveAll();
   if (affectedDayKey) onGameCallsChanged(affectedDayKey);
-  toast('Llamada eliminada');
+  toast(translateText('Llamada eliminada'));
   return true;
 }
 
@@ -191,18 +192,18 @@ export function clearActiveDayCalls() {
   const dayKey = getActiveDayKey();
   const dayCallsList = callsForDay(dayKey);
   if (!dayCallsList.length) {
-    toast('No hay llamadas que borrar en este día.');
+    toast(translateText('No hay llamadas que borrar en este día.'));
     return;
   }
   const count = dayCallsList.length;
-  const plural = count === 1 ? 'llamada' : 'llamadas';
-  appConfirm(`¿Vaciar TODAS las ${plural} de ${formatCallDayLabel(dayKey)} (${count})? Tu turno, pausas y horario de ese día no se tocan. No se puede deshacer.`, () => {
+  const plural = count === 1 ? translateText('llamada') : translateText('llamadas');
+  appConfirm(ui`¿Vaciar TODAS las ${plural} de ${formatCallDayLabel(dayKey)} (${count})? Tu turno, pausas y horario de ese día no se tocan. No se puede deshacer.`, () => {
     setCalls(calls.filter(c => callDateKeyFromValue(c.callDate) !== dayKey));
     reconcileLastCallEndedAt(dayKey);
     financeRunAutoFillCascade();
     saveAll();
     onGameCallsChanged(dayKey);
-    toast(`${count} ${plural} de ${formatCallDayLabel(dayKey)} borrada(s)`);
+    toast(ui`${count} ${plural} de ${formatCallDayLabel(dayKey)} borrada(s)`);
   });
 }
 
@@ -228,7 +229,7 @@ function callStartLabelFromHHMM(hhmm) {
   const normalized = formatHHMM(hhmm);
   const [h, m] = normalized.split(':').map(Number);
   const hour12 = h % 12 || 12;
-  const suffix = h >= 12 ? 'PM' : 'AM';
+  const suffix = h >= 12 ? translateText('PM') : translateText('AM');
   return `${hour12}:${pad(m)} ${suffix}`;
 }
 
@@ -280,8 +281,8 @@ export function openManualCallModal() {
   manualCallLiveBackupPending = false;
   const title = document.getElementById('manualCallModalTitle');
   const subtitle = document.getElementById('manualCallModalSubtitle');
-  if (title) title.textContent = 'Agregar llamada manual';
-  if (subtitle) subtitle.textContent = 'Para una llamada que no vino en la exportación de Propio. Se guarda igual que cualquier otra fila — mismo cálculo de huecos, ACW y ganancias.';
+  if (title) title.textContent = translateText('Agregar llamada manual');
+  if (subtitle) subtitle.textContent = translateText('Para una llamada que no vino en la exportación de Propio. Se guarda igual que cualquier otra fila — mismo cálculo de huecos, ACW y ganancias.');
   prefillManualCallForm({ dayKey: getActiveDayKey(), startDate: new Date(), durationMin: '' });
   openModal('manualCallModal');
 }
@@ -302,8 +303,8 @@ function openManualCallModalFromLiveCall(startedAtISO, endedAtISO, originalCandi
   const calendarDayKey = callDateKeyFromValue(originalCandidate?.calendarCallDate) || todayCallDateKey(start);
   const title = document.getElementById('manualCallModalTitle');
   const subtitle = document.getElementById('manualCallModalSubtitle');
-  if (title) title.textContent = 'Guardar llamada';
-  if (subtitle) subtitle.textContent = `Llamada terminada: ${timeLabelFromDate(start)} – ${timeLabelFromDate(end)} (${formatDuration(durationMin * 60000)}). Ajusta lo que haga falta antes de guardarla.`;
+  if (title) title.textContent = translateText('Guardar llamada');
+  if (subtitle) subtitle.textContent = ui`Llamada terminada: ${timeLabelFromDate(start)} – ${timeLabelFromDate(end)} (${formatDuration(durationMin * 60000)}). Ajusta lo que haga falta antes de guardarla.`;
   prefillManualCallForm({ dayKey: calendarDayKey, startDate: start, durationMin });
   openModal('manualCallModal');
 }
@@ -348,7 +349,7 @@ export function requestCloseManualCallModal() {
     closeModal('manualCallModal');
     return;
   }
-  appConfirm('¿Descartar esta llamada sin guardarla? La llamada que acabas de colgar se perderá por completo — no quedará ningún registro de ese tiempo trabajado.', () => {
+  appConfirm(translateText('¿Descartar esta llamada sin guardarla? La llamada que acabas de colgar se perderá por completo — no quedará ningún registro de ese tiempo trabajado.'), () => {
     rollbackPendingLiveBackup();
     saveAll();
     closeModal('manualCallModal');
@@ -376,8 +377,8 @@ export function updateManualCallPreview() {
   }
   if (preview) {
     preview.textContent = validDuration
-      ? `Se guardará como ${formatDuration(duration * 60000)} de llamada.`
-      : 'Completa los campos para agregar la llamada.';
+      ? ui`Se guardará como ${formatDuration(duration * 60000)} de llamada.`
+      : translateText('Completa los campos para agregar la llamada.');
   }
 }
 
@@ -442,14 +443,14 @@ function buildLiveCallCandidate({ customerId, startedAtISO, endedAtISO, billable
 // importCalls/saveCallEditor/el modal manual) y, si pasa, guarda la llamada en `calls` y actualiza
 // el día activo. NO llama a saveAll/toast.
 function trySaveCallCandidate(candidate) {
-  if (!candidate) return { ok: false, reason: 'Fecha u hora inválida' };
+  if (!candidate) return { ok: false, reason: translateText('Fecha u hora inválida') };
   const overlapsWith = calls.find(c => callsOverlap(c, candidate));
   if (overlapsWith) {
-    return { ok: false, reason: `Esa hora se traslapa con la llamada #${overlapsWith.customerId} (${overlapsWith.callStart}). Ajusta la hora o la duración.` };
+    return { ok: false, reason: ui`Esa hora se traslapa con la llamada #${overlapsWith.customerId} (${overlapsWith.callStart}). Ajusta la hora o la duración.` };
   }
   const key = callDedupeKey(candidate);
   if (calls.some(c => callDedupeKey(c) === key)) {
-    return { ok: false, reason: 'Ya existe una llamada idéntica guardada (mismo cliente, fecha, hora, duración, pago, billable y dropped).' };
+    return { ok: false, reason: translateText('Ya existe una llamada idéntica guardada (mismo cliente, fecha, hora, duración, pago, billable y dropped).') };
   }
   setCalls([...calls, candidate].sort((a, b) => new Date(a.startISO) - new Date(b.startISO)));
   // Igual que importCalls, si agregaste la llamada para un día distinto al que estabas viendo, "Día
@@ -478,21 +479,21 @@ export function saveManualCall() {
 
   const callDate = dayKeyFromIsoDate(dateInput?.value);
   if (!callDate) {
-    toast('Elige una fecha válida');
+    toast(translateText('Elige una fecha válida'));
     return;
   }
   const duration = Number(durationInput?.value);
   if (!Number.isFinite(duration) || duration < 0 || duration > MAX_CALL_DURATION_MIN) {
-    toast(`La duración debe ser un número entre 0 y ${MAX_CALL_DURATION_MIN} minutos`);
+    toast(ui`La duración debe ser un número entre 0 y ${MAX_CALL_DURATION_MIN} minutos`);
     return;
   }
   const callStart = callStartLabelFromHHMM(startInput?.value);
   if (!callStart) {
-    toast('Elige una hora válida');
+    toast(translateText('Elige una hora válida'));
     return;
   }
-  const billable = billableInput?.value === 'Yes' ? 'Yes' : 'No';
-  const dropped = droppedInput?.value === 'Yes' ? 'Yes' : 'No';
+  const billable = billableInput?.value === 'Yes' ? translateText('Yes') : translateText('No');
+  const dropped = droppedInput?.value === 'Yes' ? translateText('Yes') : translateText('No');
   const pay = Math.max(0, parseMoney(payInput?.value || manualCallEstimatedPay(duration))).toFixed(2);
   const customerId = customerIdInput?.value || '';
 
@@ -520,7 +521,7 @@ export function saveManualCall() {
     }
   }
   if (candidate && new Date(candidate.endISO).getTime() > Date.now()) {
-    toast('La llamada no puede terminar en el futuro');
+    toast(translateText('La llamada no puede terminar en el futuro'));
     return;
   }
   if (candidate && manualCallSelectedRateTile) candidate.pay = manualCallPayWithoutDuplicateRateBonus(candidate, candidate.pay);
@@ -541,7 +542,7 @@ export function saveManualCall() {
   }
   financeRunAutoFillCascade();
   saveAll();
-  toast('Llamada agregada');
+  toast(translateText('Llamada agregada'));
   onGameCallSaved(candidate, pendingBackup ? 'live' : 'manual');
   onGameCallsChanged(affectedDayKey);
 }
@@ -568,7 +569,7 @@ export function autoSaveLiveCall(startedAtISO, endedAtISO, liveContext = null) {
     state.pendingLiveCallBackup = null;
     financeRunAutoFillCascade();
     saveAll();
-    toast(`Llamada guardada (${formatDuration(durationMin * 60000)}) — edítala en Tabla de llamadas si hace falta`);
+    toast(ui`Llamada guardada (${formatDuration(durationMin * 60000)}) — edítala en Tabla de llamadas si hace falta`);
     onGameCallSaved(candidate, 'live');
     return true;
   }
@@ -613,7 +614,7 @@ function dayActionRows(dayKey) {
     }
     rows.push({
       ts: e.ts,
-      badgeLabel: e.type === 'shift' ? 'Shift' : e.type === 'break' ? 'Break' : e.type === 'lunch' ? 'Lunch' : 'Importación',
+      badgeLabel: e.type === 'shift' ? translateText('Shift') : e.type === 'break' ? translateText('Break') : e.type === 'lunch' ? translateText('Lunch') : translateText('Importación'),
       badgeClass: `type-${e.type}`,
       detail: e.title,
       note: '',
@@ -634,7 +635,7 @@ function dayActionRows(dayKey) {
       ts: g.prev.endISO,
       badgeLabel: gapLabelText(g.label),
       badgeClass: `type-${g.label}`,
-      detail: g.isShiftStartGap ? 'Inicio de turno → primera llamada' : 'Entre llamadas',
+      detail: g.isShiftStartGap ? translateText('Inicio de turno → primera llamada') : translateText('Entre llamadas'),
       note: g.note || '',
       durationMin: g.displayAmount,
       editable: true,
@@ -662,7 +663,7 @@ export function renderTable() {
       actionRows.forEach(a => entries.push({ kind: 'action', ts: a.ts, action: a }));
 
       if (!entries.length) {
-        wrap.innerHTML = '<div class="note" style="padding:14px;">No hay filas para el día activo. La vista se alimenta de las llamadas importadas, tus acciones del turno (Shift/Break/Lunch/ACW) y del día seleccionado.</div>';
+        wrap.innerHTML = translateMarkup('<div class="note" style="padding:14px;">No hay filas para el día activo. La vista se alimenta de las llamadas importadas, tus acciones del turno (Shift/Break/Lunch/ACW) y del día seleccionado.</div>');
         return;
       }
 
@@ -674,7 +675,7 @@ export function renderTable() {
       });
 
       if (!filtered.length) {
-        wrap.innerHTML = '<div class="note" style="padding:14px;">No hay filas de este tipo para el día activo — cambia el filtro de arriba para ver el resto.</div>';
+        wrap.innerHTML = translateMarkup('<div class="note" style="padding:14px;">No hay filas de este tipo para el día activo — cambia el filtro de arriba para ver el resto.</div>');
         return;
       }
 
@@ -693,12 +694,12 @@ export function renderTable() {
       const rowsHtml = filtered.map(entry => {
         if (entry.kind === 'call') {
           const c = entry.call;
-          const billableText = String(c.billable).toLowerCase() === 'yes' ? 'Billable' : 'No billable';
-          const droppedText = String(c.dropped).toLowerCase() === 'yes' ? 'Dropped' : 'No dropped';
+          const billableText = String(c.billable).toLowerCase() === 'yes' ? translateText('Billable') : translateText('No billable');
+          const droppedText = String(c.dropped).toLowerCase() === 'yes' ? translateText('Dropped') : translateText('No dropped');
           const higherRateBonus = higherRateBonusForCall(c);
           const higherRateBadge = higherRateBonus ? higherRateTierBadgeHtml(higherRateBonus.tier, higherRateBonus.amount) : '';
 
-          return `
+          return ui`
             <div class="tbl-row">
               <span class="tbl-row-icon type-call">${iconHtml('phone')}</span>
               <div class="tbl-row-main">
@@ -724,17 +725,17 @@ export function renderTable() {
         const hasDuration = a.durationMin !== null && a.durationMin !== undefined;
         const durationText = hasDuration ? `${formatMinutes(a.durationMin)} min` : '';
         const editBtn = a.editable && a.gapKey
-          ? `<button class="tbl-icon-btn" type="button" data-gap-edit="${escapeHtml(a.gapKey)}" data-gap-day="${escapeHtml(dayKey)}" aria-label="Editar hueco">${iconHtml('edit')}</button>`
+          ? ui`<button class="tbl-icon-btn" type="button" data-gap-edit="${escapeHtml(a.gapKey)}" data-gap-day="${escapeHtml(dayKey)}" aria-label="Editar hueco">${iconHtml('edit')}</button>`
           : '';
         const iconName = ROW_TYPE_ICON[a.badgeClass] || 'circle';
         const iconMarkup = a.badgeClass === 'type-shift' ? iconHtml(iconName, 'ic-fill') : iconHtml(iconName);
 
-        return `
+        return ui`
           <div class="tbl-row">
             <span class="tbl-row-icon ${a.badgeClass}">${iconMarkup}</span>
             <div class="tbl-row-main">
               <div class="tbl-row-title">${escapeHtml(a.detail)} <span class="tbl-type-badge ${a.badgeClass}">${escapeHtml(a.badgeLabel)}</span></div>
-              ${a.note ? `<div class="tbl-row-sub">${escapeHtml(a.note)}</div>` : ''}
+              ${a.note ? ui`<div class="tbl-row-sub">${escapeHtml(a.note)}</div>` : ''}
             </div>
             <div class="tbl-row-right">
               <div class="tbl-row-time">${escapeHtml(hora)}${hasDuration ? ` · ${escapeHtml(durationText)}` : ''}</div>
@@ -767,7 +768,7 @@ export function renderDayStatsCards() {
   setText('resumenDiaACW', formatDuration(stats.gapTotal * 60000));
   setText('resumenDiaAdherencia', adherence ? `${adherence.scorePct}%` : '—');
   const goalPct = Number.isFinite(Number(settings.adherenceGoalPct)) ? Number(settings.adherenceGoalPct) : 95;
-  setText('resumenDiaAdherenciaGoal', `Objetivo ≥ ${goalPct}%`);
+  setText('resumenDiaAdherenciaGoal', ui`Objetivo ≥ ${goalPct}%`);
 
   setText('statsShortest', dayCalls.length ? formatDuration(stats.shortest * 60000) : '—');
   // Nota aclaratoria cuando "Más corta" da 0 min por una llamada real de inicio=fin — sin esto se
@@ -778,8 +779,8 @@ export function renderDayStatsCards() {
       // El texto anterior ("Hubo 1 llamada de 0 min — siguiente: 00:01:00") no dejaba claro qué
       // relación tenía ese "siguiente" con el 00:00:00 de arriba. Se reescribe para que quede
       // explícito.
-      const intro = stats.zeroCount === 1 ? '1 llamada duró 0 min' : `${stats.zeroCount} llamadas duraron 0 min`;
-      shortestNoteEl.textContent = `${intro} — sin contar esa(s), la más corta fue ${formatDuration(stats.shortestNonZero * 60000)}`;
+      const intro = stats.zeroCount === 1 ? translateText('1 llamada duró 0 min') : ui`${stats.zeroCount} llamadas duraron 0 min`;
+      shortestNoteEl.textContent = ui`${intro} — sin contar esa(s), la más corta fue ${formatDuration(stats.shortestNonZero * 60000)}`;
       shortestNoteEl.style.display = '';
     } else {
       shortestNoteEl.style.display = 'none';

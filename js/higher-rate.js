@@ -1,3 +1,4 @@
+import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 // app-main.js injects Higher Rate helpers; app-context.js owns shared app state.
 import { calls, settings } from './app-context.js';
 
@@ -119,7 +120,7 @@ export function configureHigherRateContext(context) {
       const colorVar = meta?.colorVar || '--warn';
       const rgb = meta?.colorRgb || '255,209,92';
       const label = meta?.label || tier;
-      return `<span class="imported-late" style="background: rgba(${rgb},.16); border-color: rgba(${rgb},.4); color: var(${colorVar});" title="Higher Rate Opportunity · ${escapeHtml(label)}">${iconHtml('flame')} ${escapeHtml(label)} +${money(amount)}${financeConvertedInline(amount)}</span>`;
+      return ui`<span class="imported-late" style="background: rgba(${rgb},.16); border-color: rgba(${rgb},.4); color: var(${colorVar});" title="Higher Rate Opportunity · ${escapeHtml(label)}">${iconHtml('flame')} ${escapeHtml(label)} +${money(amount)}${financeConvertedInline(amount)}</span>`;
     }
 
     // Versión compacta sin pill (solo texto coloreado) — para la línea de pago de la tarjeta
@@ -128,7 +129,7 @@ export function configureHigherRateContext(context) {
       const meta = HIGHER_RATE_TIERS[tier];
       const colorVar = meta?.colorVar || '--warn';
       const label = meta?.label || tier;
-      return `<span style="color: var(${colorVar}); font-size:11px; font-weight:800;">${iconHtml('flame')} ${escapeHtml(label)} +${money(amount)}${financeConvertedInline(amount)}</span>`;
+      return ui`<span style="color: var(${colorVar}); font-size:11px; font-weight:800;">${iconHtml('flame')} ${escapeHtml(label)} +${money(amount)}${financeConvertedInline(amount)}</span>`;
     }
 
     // Fila de tags agregados (uno por cada nivel presente ese día, ordenados de mayor a menor
@@ -142,7 +143,7 @@ export function configureHigherRateContext(context) {
         const colorVar = meta?.colorVar || '--warn';
         const rgb = meta?.colorRgb || '255,209,92';
         const label = meta?.label || tier;
-        return `<span class="${tagClass}" style="background: rgba(${rgb},.16); border-color: rgba(${rgb},.4); color: var(${colorVar});" title="Bono extra ganado por llamadas dentro de una ventana Higher Rate ${escapeHtml(label)}">${iconHtml('flame')} ${escapeHtml(label)}: +${money(amount)}${financeConvertedInline(amount)}</span>`;
+        return ui`<span class="${tagClass}" style="background: rgba(${rgb},.16); border-color: rgba(${rgb},.4); color: var(${colorVar});" title="Bono extra ganado por llamadas dentro de una ventana Higher Rate ${escapeHtml(label)}">${iconHtml('flame')} ${escapeHtml(label)}: +${money(amount)}${financeConvertedInline(amount)}</span>`;
       }).join('');
     }
 
@@ -156,7 +157,7 @@ export function configureHigherRateContext(context) {
         const colorVar = meta?.colorVar || '--warn';
         const rgb = meta?.colorRgb || '255,209,92';
         const label = meta?.label || tier;
-        return `<div class="gh-bonus-chip" style="background: rgba(${rgb},.14); border-color: rgba(${rgb},.4); color: var(${colorVar});">${iconHtml('flame')} <span>${escapeHtml(label)}: +${money(amount)}${financeConvertedInline(amount)} de bono Higher Rate</span></div>`;
+        return ui`<div class="gh-bonus-chip" style="background: rgba(${rgb},.14); border-color: rgba(${rgb},.4); color: var(${colorVar});">${iconHtml('flame')} <span>${escapeHtml(label)}: +${money(amount)}${financeConvertedInline(amount)} de bono Higher Rate</span></div>`;
       }).join('');
     }
     // Pedido del usuario: Higher Rate Opportunity vive ahora en su propio botón/modal (antes escondido dentro de Horario) — se sincroniza al abrir ese modal, no al abrir Horario.
@@ -167,7 +168,7 @@ export function configureHigherRateContext(context) {
     export function hrWindowWeekdayLabel(dayKeyStr) {
       const d = callDateToDate(dayKeyStr);
       if (!d) return '—';
-      const raw = new Intl.DateTimeFormat('es-MX', { weekday: 'long' }).format(d);
+      const raw = new Intl.DateTimeFormat(displayLocale(), { weekday: 'long' }).format(d);
       return raw.charAt(0).toUpperCase() + raw.slice(1);
     }
     // Texto de cada botón del pill de nivel — el activo muestra su bono ("Gold +$0.03"), los otros solo el nombre.
@@ -181,9 +182,9 @@ export function configureHigherRateContext(context) {
       const tier = HIGHER_RATE_TIERS[w.tier] ? w.tier : 'bronze';
       const tierButtonsHtml = ['bronze', 'silver', 'gold'].map(t => {
         const active = t === tier;
-        return `<button type="button" class="hr-window-tier-btn" data-hr-tier-btn data-tier="${t}" aria-pressed="${active ? 'true' : 'false'}">${escapeHtml(hrTierButtonLabel(t, active))}</button>`;
+        return ui`<button type="button" class="hr-window-tier-btn" data-hr-tier-btn data-tier="${t}" aria-pressed="${active ? 'true' : 'false'}">${escapeHtml(hrTierButtonLabel(t, active))}</button>`;
       }).join('');
-      return `
+      return ui`
         <div class="hr-window-card" data-hr-window-id="${escapeHtml(w.id || '')}" data-tier="${tier}">
           <div class="hr-window-top">
             <div class="hr-window-day">
@@ -305,19 +306,19 @@ export function configureHigherRateContext(context) {
         card.style.removeProperty('--live-color');
       }
       if (status.active) {
-        title.textContent = `Estás en una ventana ${tierLabel} ahora`;
+        title.textContent = ui`Estás en una ventana ${tierLabel} ahora`;
         sub.textContent = status.minutesLeft !== null
-          ? `Termina en ${formatMinutes(status.minutesLeft)} min (${timeLabel(status.window.end)})`
-          : `Termina a las ${timeLabel(status.window.end)}`;
+          ? ui`Termina en ${formatMinutes(status.minutesLeft)} min (${timeLabel(status.window.end)})`
+          : ui`Termina a las ${timeLabel(status.window.end)}`;
       } else {
         const isToday = status.window.date === todayCallDateKey();
-        const dayLabelRaw = isToday ? 'Hoy' : formatCallDayLabel(status.window.date);
+        const dayLabelRaw = isToday ? translateText('Hoy') : formatCallDayLabel(status.window.date);
         const dayLabel = dayLabelRaw.charAt(0).toUpperCase() + dayLabelRaw.slice(1);
         const datetimeText = `${dayLabel} · ${timeLabel(status.window.start)}`;
         const chipRgb = tierMeta?.colorRgb || '255,209,92';
         const chipColorVar = tierMeta?.colorVar || '--warn';
-        title.innerHTML = `<div class="hr-live-eyebrow">Próxima ventana</div><div class="hr-live-main-row"><span class="hr-live-datetime">${escapeHtml(datetimeText)}</span><span class="hr-live-tier-chip" style="background: rgba(${chipRgb}, .16); border: 1px solid rgba(${chipRgb}, .4); color: var(${chipColorVar});">${escapeHtml(tierLabel)}</span></div>`;
-        sub.textContent = `Termina a las ${timeLabel(status.window.end)}`;
+        title.innerHTML = ui`<div class="hr-live-eyebrow">Próxima ventana</div><div class="hr-live-main-row"><span class="hr-live-datetime">${escapeHtml(datetimeText)}</span><span class="hr-live-tier-chip" style="background: rgba(${chipRgb}, .16); border: 1px solid rgba(${chipRgb}, .4); color: var(${chipColorVar});">${escapeHtml(tierLabel)}</span></div>`;
+        sub.textContent = ui`Termina a las ${timeLabel(status.window.end)}`;
       }
     }
 
@@ -342,7 +343,7 @@ export function configureHigherRateContext(context) {
     function higherRateHeroTierBadge(tierKey) {
       const meta = HIGHER_RATE_TIERS[tierKey];
       if (!meta) return '';
-      return `<span class="hero-today-tier" style="background: rgba(${meta.colorRgb}, .16); border: 1px solid rgba(${meta.colorRgb}, .4); color: var(${meta.colorVar});">${iconHtml('medal')} ${escapeHtml(meta.label)} +${money(meta.bonusPerMin)}/min</span>`;
+      return ui`<span class="hero-today-tier" style="background: rgba(${meta.colorRgb}, .16); border: 1px solid rgba(${meta.colorRgb}, .4); color: var(${meta.colorVar});">${iconHtml('medal')} ${escapeHtml(meta.label)} +${money(meta.bonusPerMin)}/min</span>`;
     }
 
     // "Tiempo y bono por día": tarjeta hero para Hoy (bono ganado, tiempo en llamada, ventana
@@ -380,18 +381,18 @@ export function configureHigherRateContext(context) {
         ? higherRateHeroTierBadge(liveStatus.window.tier)
         : higherRateHeroTierBadge(dominantHigherRateTier(todayStats.breakdown));
 
-      const todayDateRaw = new Intl.DateTimeFormat('es-MX', { weekday: 'long', day: 'numeric', month: 'long' }).format(today);
-      const todayDateLabel = `Hoy · ${todayDateRaw.charAt(0).toUpperCase() + todayDateRaw.slice(1)}`;
+      const todayDateRaw = new Intl.DateTimeFormat(displayLocale(), { weekday: 'long', day: 'numeric', month: 'long' }).format(today);
+      const todayDateLabel = ui`Hoy · ${todayDateRaw.charAt(0).toUpperCase() + todayDateRaw.slice(1)}`;
 
       const footHtml = todayWindowsMin > 0
-        ? `<div class="hero-today-foot"><span>${Math.round(todayPct)}% de la ventana aprovechada</span><span>${isActiveNow ? `Termina a las ${timeLabel(liveStatus.window.end)}` : ''}</span></div>`
+        ? ui`<div class="hero-today-foot"><span>${Math.round(todayPct)}% de la ventana aprovechada</span><span>${isActiveNow ? ui`Termina a las ${timeLabel(liveStatus.window.end)}` : ''}</span></div>`
         : '';
 
-      const heroHtml = `
+      const heroHtml = ui`
         <div class="hero-today ${isActiveNow ? 'is-live' : ''}"${liveTierStyle}>
           <div class="hero-today-top">
             <div>
-              <span class="hero-today-label ${isActiveNow ? 'tone-active' : ''}">${isActiveNow ? '<span class="pulse-dot" aria-hidden="true"></span>Ganando bono ahora' : 'Higher Rate hoy'}</span>
+              <span class="hero-today-label ${isActiveNow ? 'tone-active' : ''}">${isActiveNow ? translateMarkup('<span class="pulse-dot" aria-hidden="true"></span>Ganando bono ahora') : translateText('Higher Rate hoy')}</span>
               <div class="hero-today-date">${escapeHtml(todayDateLabel)}</div>
             </div>
             ${tierBadgeHtml}
@@ -401,7 +402,7 @@ export function configureHigherRateContext(context) {
             <div><div class="hero-fig-value">${escapeHtml(formatBlockDurationLabel(todayStats.totalMin))}</div><div class="hero-fig-label">en llamada dentro de ventana</div></div>
             <div><div class="hero-fig-value" style="font-size:20px; color:var(--muted);">${escapeHtml(formatBlockDurationLabel(todayWindowsMin))}</div><div class="hero-fig-label">ventana total de hoy</div></div>
           </div>
-          ${todayWindowsMin > 0 ? `<div class="hero-today-track"><div style="width:${todayPct}%;"></div></div>` : ''}
+          ${todayWindowsMin > 0 ? ui`<div class="hero-today-track"><div style="width:${todayPct}%;"></div></div>` : ''}
           ${footHtml}
         </div>
       `;
@@ -413,9 +414,9 @@ export function configureHigherRateContext(context) {
           .filter(w => callDateKeyFromValue(w.date) === key)
           .sort((a, b) => toMinutes(formatHHMM(a.start)) - toMinutes(formatHHMM(b.start)));
         const dateObj = callDateToDate(key);
-        const dayNameRaw = new Intl.DateTimeFormat('es-MX', { weekday: 'long' }).format(dateObj);
+        const dayNameRaw = new Intl.DateTimeFormat(displayLocale(), { weekday: 'long' }).format(dateObj);
         const dayName = dayNameRaw.charAt(0).toUpperCase() + dayNameRaw.slice(1);
-        const dayNum = new Intl.DateTimeFormat('es-MX', { day: 'numeric', month: 'short' }).format(dateObj);
+        const dayNum = new Intl.DateTimeFormat(displayLocale(), { day: 'numeric', month: 'short' }).format(dateObj);
 
         let mainHtml, accentRgb;
         if (windowsForDay.length) {
@@ -428,22 +429,22 @@ export function configureHigherRateContext(context) {
           accentRgb = HIGHER_RATE_TIERS[dominantWindow.tier]?.colorRgb || '125,140,255';
           mainHtml = windowsForDay.map(w => {
             const meta = HIGHER_RATE_TIERS[w.tier];
-            return `<div class="hr-tl-window-row"><span class="hr-tl-name">Ventana ${escapeHtml(meta?.label || w.tier)}</span><span class="hr-tl-sub">${escapeHtml(timeLabel(w.start))} – ${escapeHtml(timeLabel(w.end))}</span></div>`;
+            return ui`<div class="hr-tl-window-row"><span class="hr-tl-name">Ventana ${escapeHtml(meta?.label || w.tier)}</span><span class="hr-tl-sub">${escapeHtml(timeLabel(w.start))} – ${escapeHtml(timeLabel(w.end))}</span></div>`;
           }).join('');
         } else {
-          mainHtml = `<div class="hr-tl-name">Sin ventanas configuradas</div>`;
+          mainHtml = ui`<div class="hr-tl-name">Sin ventanas configuradas</div>`;
           accentRgb = '144,160,190';
         }
 
         const windowsMinForDay = higherRateWindowsTodayTotalMin(key);
         const pillsHtml = [
           stats.totalMin > 0
-            ? `<span class="hr-count-pill tone-live">${iconHtml('flame')} ${escapeHtml(formatBlockDurationLabel(stats.totalMin))} en llamada · +${money(stats.totalBonus)}${financeConvertedInline(stats.totalBonus)}</span>`
-            : `<span class="hr-count-pill tone-muted">Sin llamadas en Higher Rate</span>`,
-          windowsMinForDay > 0 ? `<span class="hr-count-pill tone-window">${escapeHtml(formatBlockDurationLabel(windowsMinForDay))} de ventana</span>` : '',
+            ? ui`<span class="hr-count-pill tone-live">${iconHtml('flame')} ${escapeHtml(formatBlockDurationLabel(stats.totalMin))} en llamada · +${money(stats.totalBonus)}${financeConvertedInline(stats.totalBonus)}</span>`
+            : ui`<span class="hr-count-pill tone-muted">Sin llamadas en Higher Rate</span>`,
+          windowsMinForDay > 0 ? ui`<span class="hr-count-pill tone-window">${escapeHtml(formatBlockDurationLabel(windowsMinForDay))} de ventana</span>` : '',
         ].filter(Boolean).join('');
 
-        return `
+        return ui`
           <div class="hr-tl-item ${windowsForDay.length ? '' : 'is-empty'}" style="--dot-rgb:${accentRgb};">
             <div class="hr-tl-date">${escapeHtml(dayName)}<b>${escapeHtml(dayNum)}</b></div>
             <div class="hr-tl-rail" aria-hidden="true"><span class="hr-tl-dot"></span></div>
@@ -457,7 +458,7 @@ export function configureHigherRateContext(context) {
       };
 
       const pastHtml = past.length
-        ? `
+        ? ui`
           <button type="button" class="hr-past-toggle" id="higherRatePastToggleBtn" data-open="${higherRateHistoryOpen ? 'true' : 'false'}">
             <span class="hr-past-toggle-left">${iconHtml('history')} Días pasados (${past.length})</span>
             ${iconHtml('chevronDown', 'chev')}
@@ -521,12 +522,12 @@ export function configureHigherRateContext(context) {
       const sortedPast = [...past].sort(sortByDate);
 
       list.innerHTML = sortedActive.map(renderHigherRateWindowRow).join('')
-        || '<div class="note" style="margin:0;">Sin ventanas de Higher Rate para hoy ni futuras — usa "+ Agregar ventana" cuando te llegue el aviso de Propio.</div>';
+        || translateMarkup('<div class="note" style="margin:0;">Sin ventanas de Higher Rate para hoy ni futuras — usa "+ Agregar ventana" cuando te llegue el aviso de Propio.</div>');
 
       historyList.innerHTML = sortedPast.map(renderHigherRateWindowRow).join('')
-        || '<div class="note" style="margin:0;">Sin ventanas pasadas todavía.</div>';
-      if (historyTitle) historyTitle.innerHTML = `${iconHtml('history')} Historial (${sortedPast.length} ${sortedPast.length === 1 ? 'pasada' : 'pasadas'})`;
-      if (activeCountPill) activeCountPill.textContent = `${sortedActive.length} ${sortedActive.length === 1 ? 'próxima' : 'próximas'}`;
+        || translateMarkup('<div class="note" style="margin:0;">Sin ventanas pasadas todavía.</div>');
+      if (historyTitle) historyTitle.innerHTML = ui`${iconHtml('history')} Historial (${sortedPast.length} ${sortedPast.length === 1 ? 'pasada' : 'pasadas'})`;
+      if (activeCountPill) activeCountPill.textContent = `${sortedActive.length} ${sortedActive.length === 1 ? translateText('próxima') : translateText('próximas')}`;
       higherRateLastPastCount = sortedPast.length;
       renderHigherRateDayStats();
       renderHigherRateLiveCard();
@@ -594,8 +595,8 @@ export function configureHigherRateContext(context) {
       const invalid = windows.filter(w => toMinutes(formatHHMM(w.end)) === toMinutes(formatHHMM(w.start)));
       if (!invalid.length) return;
       const first = invalid[0];
-      const extra = invalid.length > 1 ? ` (y ${invalid.length - 1} más)` : '';
-      toast(`⚠️ La ventana de Higher Rate del ${formatCallDayLabel(first.date)} tiene la misma hora de inicio y fin${extra}. Ajusta una de las dos horas.`);
+      const extra = invalid.length > 1 ? ui` (y ${invalid.length - 1} más)` : '';
+      toast(ui`⚠️ La ventana de Higher Rate del ${formatCallDayLabel(first.date)} tiene la misma hora de inicio y fin${extra}. Ajusta una de las dos horas.`);
     }
 
     // Agregar un Higher Rate para un día que YA tiene llamadas tomadas ("se me olvidó agregarlo a
@@ -615,8 +616,8 @@ export function configureHigherRateContext(context) {
         if (!sampleDate) sampleDate = c.callDate;
       });
       if (qualifyingCount > 0) {
-        const plural = qualifyingCount === 1 ? 'llamada ya tomada califica' : 'llamadas ya tomadas califican';
-        toast(`🔥 ${qualifyingCount} ${plural} para el bono — revisa Tabla de llamadas del ${formatCallDayLabel(sampleDate)} para verlo.`);
+        const plural = qualifyingCount === 1 ? translateText('llamada ya tomada califica') : translateText('llamadas ya tomadas califican');
+        toast(ui`🔥 ${qualifyingCount} ${plural} para el bono — revisa Tabla de llamadas del ${formatCallDayLabel(sampleDate)} para verlo.`);
       }
     }
 
@@ -699,10 +700,10 @@ export function configureHigherRateContext(context) {
       const isPast = (w) => higherRateWindowIsPast(w);
       const pastWindows = current.filter(isPast);
       if (!pastWindows.length) {
-        toast('El historial ya está vacío — no hay ventanas de Higher Rate que ya hayan terminado.');
+        toast(translateText('El historial ya está vacío — no hay ventanas de Higher Rate que ya hayan terminado.'));
         return;
       }
-      appConfirm(`¿Vaciar el historial completo (${pastWindows.length} ventana(s) de Higher Rate ya terminadas)? Las que siguen activas o futuras no se tocan. Las llamadas que ya recibieron un bono de esas ventanas conservan su bono ganado. No se puede deshacer.`, () => {
+      appConfirm(ui`¿Vaciar el historial completo (${pastWindows.length} ventana(s) de Higher Rate ya terminadas)? Las que siguen activas o futuras no se tocan. Las llamadas que ya recibieron un bono de esas ventanas conservan su bono ganado. No se puede deshacer.`, () => {
         // Sin esto, purgar borraba las ventanas pasadas de golpe y el bono que ya habían generado
         // desaparecía retroactivamente de las ganancias de esos días/ciclo.
         const pastIds = pastWindows.map(w => w.id);
@@ -716,6 +717,6 @@ export function configureHigherRateContext(context) {
         // haber quedado con frozenHigherRateBonus).
         saveAll();
         renderHigherRateWindowsEditor(remaining);
-        toast(`${pastWindows.length} ventana(s) borrada(s) del historial — el bono ya ganado por esas llamadas se conserva.`);
+        toast(ui`${pastWindows.length} ventana(s) borrada(s) del historial — el bono ya ganado por esas llamadas se conserva.`);
       });
     }

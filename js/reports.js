@@ -1,3 +1,4 @@
+import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 // app-main.js injects report helpers; app-context.js owns shared app state.
 import { calls, settings, state, reportsMonthlyOffset } from './app-context.js';
 
@@ -114,8 +115,8 @@ function reportsMonthlySeries(offset = 0, monthsCount = REPORTS_MONTHLY_PAGE_SIZ
     return {
       year, month, isCurrentMonth, isFutureMonth, workedDays, earnings,
       adherencePct: avgAdherencePct,
-      shortLabel: new Intl.DateTimeFormat('es-MX', { month: 'short' }).format(monthDate),
-      fullLabel: new Intl.DateTimeFormat('es-MX', { month: 'long', year: 'numeric' }).format(monthDate),
+      shortLabel: new Intl.DateTimeFormat(displayLocale(), { month: 'short' }).format(monthDate),
+      fullLabel: new Intl.DateTimeFormat(displayLocale(), { month: 'long', year: 'numeric' }).format(monthDate),
     };
   });
 }
@@ -130,7 +131,7 @@ export function renderReportsMonthlyChart() {
   const series = reportsMonthlySeries(reportsMonthlyOffset, REPORTS_MONTHLY_PAGE_SIZE);
   if (rangeLabel) {
     rangeLabel.textContent = !series.length
-      ? 'Sin historial en este rango'
+      ? translateText('Sin historial en este rango')
       : series.length === 1
         ? series[0].fullLabel
         : `${series[0].fullLabel} – ${series[series.length - 1].fullLabel}`;
@@ -176,10 +177,10 @@ export function renderReportsMonthlyChart() {
     const amountLabel = m.earnings > 0 ? money(m.earnings) : '';
     const convertedLabel = m.earnings > 0 ? convertedAmountText(m.earnings) : '';
     const amountY = convertedLabel ? y - 15 : y - 5;
-    return `
+    return ui`
       <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barWidth.toFixed(1)}" height="${barH.toFixed(1)}" rx="4" fill="var(--rpt-blue)" opacity="${opacity}"/>
-      ${amountLabel ? `<text x="${cx.toFixed(1)}" y="${amountY.toFixed(1)}" text-anchor="middle" font-size="10" font-weight="700" fill="var(--text)">${escapeHtml(amountLabel)}</text>` : ''}
-      ${convertedLabel ? `<text x="${cx.toFixed(1)}" y="${(y - 4).toFixed(1)}" text-anchor="middle" font-size="8.5" font-weight="600" fill="var(--muted)">${escapeHtml(convertedLabel)}</text>` : ''}
+      ${amountLabel ? ui`<text x="${cx.toFixed(1)}" y="${amountY.toFixed(1)}" text-anchor="middle" font-size="10" font-weight="700" fill="var(--text)">${escapeHtml(amountLabel)}</text>` : ''}
+      ${convertedLabel ? ui`<text x="${cx.toFixed(1)}" y="${(y - 4).toFixed(1)}" text-anchor="middle" font-size="8.5" font-weight="600" fill="var(--muted)">${escapeHtml(convertedLabel)}</text>` : ''}
       <text x="${cx.toFixed(1)}" y="${h - 7}" text-anchor="middle" font-size="10" fill="var(--muted)">${escapeHtml(m.shortLabel)}</text>
     `;
   }).join('');
@@ -201,14 +202,14 @@ export function renderReportsMonthlyChart() {
 
   const lineHtml = segments
     .filter(seg => seg.length > 1)
-    .map(seg => `<polyline points="${seg.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')}" fill="none" stroke="var(--rpt-purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6 4"/>`)
+    .map(seg => ui`<polyline points="${seg.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')}" fill="none" stroke="var(--rpt-purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6 4"/>`)
     .join('');
 
   // La píldora oscura detrás del % mantiene legible el texto cuando cae sobre una barra.
   const dotsHtml = points.filter(Boolean).map(p => {
     const label = `${p.pct}%`;
     const chipWidth = label.length * 6.2 + 8;
-    return `
+    return ui`
       <rect x="${(p.x - chipWidth / 2).toFixed(1)}" y="${(p.y - 19).toFixed(1)}" width="${chipWidth.toFixed(1)}" height="13" rx="6" fill="rgba(7, 16, 31, .55)"/>
       <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3" fill="var(--rpt-purple)"/>
       <text x="${p.x.toFixed(1)}" y="${(p.y - 9).toFixed(1)}" text-anchor="middle" font-size="9" font-weight="700" fill="var(--rpt-purple)">${escapeHtml(label)}</text>
@@ -417,16 +418,16 @@ function updateStreakSkipOffSetting(checked) {
 
 function trendChipHtml(label, pct, opts = {}) {
   const invertGood = !!opts.invertGood; // ACW: bajar es bueno, subir es malo.
-  if (pct === null) return `<div class="rpt-trend-chip"><span class="flat">${iconHtml('circle')}</span> ${escapeHtml(label)} sin datos</div>`;
-  if (pct === 0) return `<div class="rpt-trend-chip"><span class="flat">→</span> ${escapeHtml(label)} estable</div>`;
+  if (pct === null) return ui`<div class="rpt-trend-chip"><span class="flat">${iconHtml('circle')}</span> ${escapeHtml(label)} sin datos</div>`;
+  if (pct === 0) return ui`<div class="rpt-trend-chip"><span class="flat">→</span> ${escapeHtml(label)} estable</div>`;
   const isUp = pct > 0;
   const isGood = invertGood ? !isUp : isUp;
   const arrow = isUp ? '↑' : '↓';
-  return `<div class="rpt-trend-chip"><span class="${isGood ? 'up' : 'down'}">${arrow}</span> ${escapeHtml(label)} ${isUp ? '+' : ''}${pct}%</div>`;
+  return ui`<div class="rpt-trend-chip"><span class="${isGood ? 'up' : 'down'}">${arrow}</span> ${escapeHtml(label)} ${isUp ? '+' : ''}${pct}%</div>`;
 }
 
 function statChipHtml(label, valueText, tone = 'flat') {
-  return `<div class="rpt-trend-chip"><span class="${tone}">●</span> ${escapeHtml(label)} ${escapeHtml(valueText)}</div>`;
+  return ui`<div class="rpt-trend-chip"><span class="${tone}">●</span> ${escapeHtml(label)} ${escapeHtml(valueText)}</div>`;
 }
 
 export function renderReportsDashboard() {
@@ -435,16 +436,16 @@ export function renderReportsDashboard() {
   const dayKey = getActiveDayKey();
 
   const datePill = document.getElementById('rptDatePill');
-  if (datePill) datePill.innerHTML = `${iconHtml('calendar')} ${escapeHtml(dayKey === todayCallDateKey() ? 'Hoy, ' : '')}${escapeHtml(formatCallDayLabel(dayKey))}`;
+  if (datePill) datePill.innerHTML = `${iconHtml('calendar')} ${escapeHtml(dayKey === todayCallDateKey() ? translateText('Hoy, ') : '')}${escapeHtml(formatCallDayLabel(dayKey))}`;
 
   // Cada cabecera de sección tiene su propio id (en vez de depender del orden de aparición de
   // `.rpt-section-title` en el DOM) — más robusto ante reordenamientos futuros de esta página.
   const setSecTitle = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
-  setSecTitle('rptSecGoals', `${iconHtml('target')} Hoy: objetivos y progreso`);
-  setSecTitle('rptSecChart', `${iconHtml('chart')} Productividad — últimos 14 días`);
-  setSecTitle('rptSecHours', `${iconHtml('phone')} Llamadas por hora del día`);
-  setSecTitle('rptSecQuality', `${iconHtml('zap')} Calidad y adherencia`);
-  setSecTitle('rptSecCycle', `${iconHtml('flag')} Ganancias del ciclo`);
+  setSecTitle('rptSecGoals', ui`${iconHtml('target')} Hoy: objetivos y progreso`);
+  setSecTitle('rptSecChart', ui`${iconHtml('chart')} Productividad — últimos 14 días`);
+  setSecTitle('rptSecHours', ui`${iconHtml('phone')} Llamadas por hora del día`);
+  setSecTitle('rptSecQuality', ui`${iconHtml('zap')} Calidad y adherencia`);
+  setSecTitle('rptSecCycle', ui`${iconHtml('flag')} Ganancias del ciclo`);
 
   // Fusión de los 4 KPI cards (Productivo/ Adherencia/Llamadas/Ganancias, comparados contra ayer)
   // con las 3 tarjetas de "Objetivos del día" (comparadas contra tu meta)
@@ -459,29 +460,29 @@ export function renderReportsDashboard() {
     const earningsPct = goalUsd > 0 ? Math.min(100, (kpi.earnings / goalUsd) * 100) : 0;
     const adherencePct = kpi.adherencePct === null ? 0 : Math.min(100, (kpi.adherencePct / goalAdherence) * 100);
     const deltaLine = (val, unit) => {
-      if (val === null || !Number.isFinite(val) || val === 0) return `<div class="rpt-goal-delta flat">Sin cambio vs ayer</div>`;
+      if (val === null || !Number.isFinite(val) || val === 0) return ui`<div class="rpt-goal-delta flat">Sin cambio vs ayer</div>`;
       const up = val > 0;
       const text = unit === '$' ? `${money(Math.abs(val))}${financeConvertedInline(Math.abs(val))}` : `${Math.abs(val)}${unit}`;
-      return `<div class="rpt-goal-delta ${up ? 'up' : 'down'}">${up ? '↑' : '↓'} ${text} vs ayer</div>`;
+      return ui`<div class="rpt-goal-delta ${up ? 'up' : 'down'}">${up ? '↑' : '↓'} ${text} vs ayer</div>`;
     };
-    goalsGrid.innerHTML = `
+    goalsGrid.innerHTML = ui`
       <div class="rpt-goal-card gh-goal-card" style="margin-top:0;">
         <div class="gh-goal-top"><span>Productividad</span><b>${formatMinutes(kpi.productiveMin)}/${formatMinutes(goalMin)} min</b></div>
         <div class="rpt-goal-bar blue"><div style="width:${productivePct}%;"></div></div>
-        <div class="gh-goal-foot">${kpi.productiveMin >= goalMin ? '¡Meta alcanzada!' : `Faltan ${formatMinutes(Math.max(0, goalMin - kpi.productiveMin))} min`}</div>
+        <div class="gh-goal-foot">${kpi.productiveMin >= goalMin ? translateText('¡Meta alcanzada!') : ui`Faltan ${formatMinutes(Math.max(0, goalMin - kpi.productiveMin))} min`}</div>
         ${deltaLine(kpi.productiveDeltaMin, ' min')}
       </div>
       <div class="rpt-goal-card gh-goal-card" style="margin-top:0;">
         <div class="gh-goal-top"><span>Adherencia</span><b>${kpi.adherencePct === null ? '—' : kpi.adherencePct}/${goalAdherence}%</b></div>
         <div class="rpt-goal-bar good"><div style="width:${adherencePct}%;"></div></div>
-        <div class="gh-goal-foot">${kpi.adherencePct !== null && kpi.adherencePct >= goalAdherence ? '¡Meta alcanzada!' : `Faltan ${kpi.adherencePct === null ? goalAdherence : Math.max(0, goalAdherence - kpi.adherencePct)}%`}</div>
+        <div class="gh-goal-foot">${kpi.adherencePct !== null && kpi.adherencePct >= goalAdherence ? translateText('¡Meta alcanzada!') : ui`Faltan ${kpi.adherencePct === null ? goalAdherence : Math.max(0, goalAdherence - kpi.adherencePct)}%`}</div>
         ${deltaLine(kpi.adherenceDeltaPts, '%')}
       </div>
       <div class="rpt-goal-card gh-goal-card" style="margin-top:0;">
         <div class="gh-goal-top"><span>Ganancias</span><b>${money(kpi.earnings)}/${money(goalUsd)}</b></div>
-        ${convertedAmountText(goalUsd) ? `<div class="fin-row-converted">${escapeHtml(convertedAmountText(kpi.earnings))} / ${escapeHtml(convertedAmountText(goalUsd))}</div>` : ''}
+        ${convertedAmountText(goalUsd) ? ui`<div class="fin-row-converted">${escapeHtml(convertedAmountText(kpi.earnings))} / ${escapeHtml(convertedAmountText(goalUsd))}</div>` : ''}
         <div class="rpt-goal-bar purple"><div style="width:${earningsPct}%;"></div></div>
-        <div class="gh-goal-foot">${kpi.earnings >= goalUsd ? '¡Meta alcanzada!' : `Faltan ${money(Math.max(0, goalUsd - kpi.earnings))}${financeConvertedInline(Math.max(0, goalUsd - kpi.earnings))}`}</div>
+        <div class="gh-goal-foot">${kpi.earnings >= goalUsd ? translateText('¡Meta alcanzada!') : ui`Faltan ${money(Math.max(0, goalUsd - kpi.earnings))}${financeConvertedInline(Math.max(0, goalUsd - kpi.earnings))}`}</div>
         ${deltaLine(kpi.earningsDelta, '$')}
       </div>
     `;
@@ -498,13 +499,13 @@ export function renderReportsDashboard() {
     const yFor = (val) => h - pad - (Math.min(val, maxVal) / maxVal) * (h - pad * 2);
     const points = series.map((r, i) => `${Math.round(i * stepX)},${Math.round(yFor(r.productive))}`).join(' ');
     const goalY = Math.round(yFor(goalMin));
-    chartSvg.innerHTML = `
+    chartSvg.innerHTML = ui`
       <polyline points="${points}" fill="none" stroke="var(--rpt-blue)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
       <polyline points="0,${goalY} ${w},${goalY}" fill="none" stroke="var(--rpt-purple)" stroke-width="2" stroke-dasharray="6 5"/>
     `;
   }
 
-  setSecTitle('rptSecMonthly', `${iconHtml('chart')} Ganancias y adherencia por mes`);
+  setSecTitle('rptSecMonthly', ui`${iconHtml('chart')} Ganancias y adherencia por mes`);
   renderReportsMonthlyChart();
 
   const hourBars = document.getElementById('rptHourBars');
@@ -514,7 +515,7 @@ export function renderReportsDashboard() {
     hourBars.innerHTML = buckets.map((count, hour) => {
       const pct = count > 0 ? Math.max(6, Math.round((count / maxVal) * 100)) : 0;
       const label = hour % 3 === 0 ? `${hour}h` : '';
-      return `<div class="rpt-hour-col" title="${hour}:00 – ${count} llamada(s) en 14 días"><div class="rpt-hour-bar" style="height:${pct}%;"></div><span class="rpt-hour-label">${label}</span></div>`;
+      return ui`<div class="rpt-hour-col" title="${hour}:00 – ${count} llamada(s) en 14 días"><div class="rpt-hour-bar" style="height:${pct}%;"></div><span class="rpt-hour-label">${label}</span></div>`;
     }).join('');
   }
 
@@ -529,7 +530,7 @@ export function renderReportsDashboard() {
     const deltaChip = (val, unit) => {
       if (!val) return '';
       const up = val > 0;
-      return `<span class="rpt-act-delta ${up ? 'up' : 'down'}">${up ? '+' : ''}${unit === 'min' ? formatMinutes(val) : val}${unit === 'min' ? 'm' : ''}</span>`;
+      return ui`<span class="rpt-act-delta ${up ? 'up' : 'down'}">${up ? '+' : ''}${unit === 'min' ? formatMinutes(val) : val}${unit === 'min' ? 'm' : ''}</span>`;
     };
     const q = reportsQualityOfTime(dayKey);
     // Dona: 3 arcos apilados sobre la circunferencia (r=48, circunf.≈301.6)
@@ -541,8 +542,8 @@ export function renderReportsDashboard() {
     const arcTotal = 171; // Longitud del path del arco en el SVG del mock (M10,80 A60,60 0 0 1 130,80)
     const arcPct = adh.todayPct === null ? 0 : adh.todayPct;
     const arcOffset = arcTotal - (arcPct / 100) * arcTotal;
-    const arcLabel = arcPct >= 95 ? 'Excelente' : arcPct >= 85 ? 'Muy buena' : arcPct >= 70 ? 'Aceptable' : arcPct > 0 ? 'Baja' : 'Sin datos';
-    triGrid.innerHTML = `
+    const arcLabel = arcPct >= 95 ? translateText('Excelente') : arcPct >= 85 ? translateText('Muy buena') : arcPct >= 70 ? translateText('Aceptable') : arcPct > 0 ? translateText('Baja') : translateText('Sin datos');
+    triGrid.innerHTML = ui`
       <div class="rpt-mini-card">
         <div class="rpt-mini-title">ACTIVIDAD DE HOY</div>
         <div class="rpt-act-row"><span class="rpt-act-left">${iconHtml('phone')} Llamadas</span><span class="rpt-act-val">${stats.billable + stats.dropped >= 0 ? callsForDay(dayKey).length : 0}${deltaChip(callsForDay(dayKey).length - callsForDay(prevKey).length, '')}</span></div>
@@ -555,7 +556,7 @@ export function renderReportsDashboard() {
         <div class="rpt-donut-wrap">
           <svg width="120" height="120" viewBox="0 0 120 120">
             <circle cx="60" cy="60" r="${R}" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="14"/>
-            ${connectedMin > 0 ? `
+            ${connectedMin > 0 ? ui`
             <circle cx="60" cy="60" r="${R}" fill="none" stroke="var(--rpt-blue)" stroke-width="14" stroke-dasharray="${callLen} ${CIRC - callLen}" stroke-dashoffset="0" transform="rotate(-90 60 60)"/>
             <circle cx="60" cy="60" r="${R}" fill="none" stroke="var(--rpt-purple)" stroke-width="14" stroke-dasharray="${acwLen} ${CIRC - acwLen}" stroke-dashoffset="${-callLen}" transform="rotate(-90 60 60)"/>
             <circle cx="60" cy="60" r="${R}" fill="none" stroke="var(--pink)" stroke-width="14" stroke-dasharray="${otherLen} ${CIRC - otherLen}" stroke-dashoffset="${-(callLen + acwLen)}" transform="rotate(-90 60 60)"/>
@@ -600,22 +601,22 @@ export function renderReportsDashboard() {
     const streak = computeComplianceStreak();
     const skipOff = settings.streakSkipOffDays !== false;
     const paceText = pace.met
-      ? 'Meta alcanzada'
+      ? translateText('Meta alcanzada')
       : pace.workDaysLeft === 0
-        ? 'Sin días laborales'
-        : `~${pace.perDayHours.toFixed(1)} h/día`;
+        ? translateText('Sin días laborales')
+        : ui`~${pace.perDayHours.toFixed(1)} h/día`;
     const paceSubText = pace.met
-      ? 'Todo lo que ganes de aquí en adelante es extra'
+      ? translateText('Todo lo que ganes de aquí en adelante es extra')
       : pace.workDaysLeft === 0
-        ? `Faltan ${money(pace.remainingUsd)}${financeConvertedInline(pace.remainingUsd)} y ya no quedan días laborales en el ciclo`
-        : `Faltan ${money(pace.remainingUsd)}${financeConvertedInline(pace.remainingUsd)} en ${pace.workDaysLeft} ${pace.workDaysLeft === 1 ? 'día laboral' : 'días laborales'} — ${money(pace.perDayUsd)}${financeConvertedInline(pace.perDayUsd)} por día`;
-    cycleGrid.innerHTML = `
+        ? ui`Faltan ${money(pace.remainingUsd)}${financeConvertedInline(pace.remainingUsd)} y ya no quedan días laborales en el ciclo`
+        : ui`Faltan ${money(pace.remainingUsd)}${financeConvertedInline(pace.remainingUsd)} en ${pace.workDaysLeft} ${pace.workDaysLeft === 1 ? translateText('día laboral') : translateText('días laborales')} — ${money(pace.perDayUsd)}${financeConvertedInline(pace.perDayUsd)} por día`;
+    cycleGrid.innerHTML = ui`
       <div class="rpt-mini-card rpt-streak-card">
         <div class="rpt-mini-title">${iconHtml('flame')} RACHA DE CUMPLIMIENTO</div>
         <div class="rpt-streak-main">
           <span class="rpt-streak-icon">${iconHtml('flame')}</span>
           <div>
-            <div class="rpt-streak-num">${streak.days} ${streak.days === 1 ? 'día' : 'días'}</div>
+            <div class="rpt-streak-num">${streak.days} ${streak.days === 1 ? translateText('día') : translateText('días')}</div>
             <div class="rpt-streak-sub">Cumpliendo tu meta de Adherencia y Productividad, seguidos</div>
           </div>
         </div>
@@ -637,7 +638,7 @@ export function renderReportsDashboard() {
           <div class="gh-goal-top"><span>Progreso del ciclo</span><b>${Math.round(c.pctOfGoal)}%</b></div>
           <div class="progress"><div style="width:${c.pctOfGoal}%; background: linear-gradient(90deg, var(--teal), var(--blue));"></div></div>
           <div class="gh-goal-foot">
-            <span>${c.isCustomGoal ? 'Meta personalizada' : 'Sugerida automáticamente'}</span>
+            <span>${c.isCustomGoal ? translateText('Meta personalizada') : translateText('Sugerida automáticamente')}</span>
             <button class="tbl-icon-btn" type="button" data-edit-card="cycle-goal" aria-label="Editar meta del ciclo" title="Editar meta del ciclo">${iconHtml('edit')}</button>
           </div>
         </div>
@@ -669,8 +670,8 @@ export function renderReportsDashboard() {
     trendRow.innerHTML = [
       trendChipHtml('Productividad', t.productivePct),
       trendChipHtml('Adherencia', t.adherencePct),
-      trendChipHtml('Ganancias', t.earningsPct),
-      trendChipHtml('Llamadas', t.callsPct),
+      trendChipHtml(translateText('Ganancias'), t.earningsPct),
+      trendChipHtml(translateText('Llamadas'), t.callsPct),
       trendChipHtml('ACW', t.acwPct, { invertGood: true }),
       statChipHtml('Billable', bd.billablePct === null ? '—' : `${bd.billablePct}%`, bd.billablePct === null ? 'flat' : (bd.billablePct >= 80 ? 'up' : 'down')),
       statChipHtml('Dropped', bd.droppedPct === null ? '—' : `${bd.droppedPct}%`, bd.droppedPct === null ? 'flat' : (bd.droppedPct <= 10 ? 'up' : 'down')),

@@ -1,3 +1,4 @@
+import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 // app-main.js injects calendar helpers; app-context.js owns shared state and view offsets.
 import { calMonthOffset, calViewMode, calYearOffset, calls, settings, setCalMonthOffset, setCalViewMode } from './app-context.js';
 
@@ -81,24 +82,24 @@ export function renderCalendarMonth() {
   // Los 4 textos se veían "muy largos, no se entienden" (frases completas tipo "Más de X min ·
   // superaste tu meta" dentro de un chip chico, sobre todo en mobile).
   if (legendTopEl) {
-    legendTopEl.textContent = `>${formatMinutes(goalMin)}m · Superó meta`;
-    legendTopEl.closest('.cal-legend-chip').title = `Más de ${formatMinutes(goalMin)} min productivos — superaste tu meta`;
+    legendTopEl.textContent = ui`>${formatMinutes(goalMin)}m · Superó meta`;
+    legendTopEl.closest('.cal-legend-chip').title = ui`Más de ${formatMinutes(goalMin)} min productivos — superaste tu meta`;
   }
   if (legendGoodEl) {
-    legendGoodEl.textContent = `${formatMinutes(goalMin)}m · Cumplida`;
-    legendGoodEl.closest('.cal-legend-chip').title = `${formatMinutes(goalMin)} min productivos — meta cumplida`;
+    legendGoodEl.textContent = ui`${formatMinutes(goalMin)}m · Cumplida`;
+    legendGoodEl.closest('.cal-legend-chip').title = ui`${formatMinutes(goalMin)} min productivos — meta cumplida`;
   }
   if (legendNearEl) {
-    legendNearEl.textContent = `${formatMinutes(nearFloor)}–${formatMinutes(nearCeil)}m · Cerca`;
-    legendNearEl.closest('.cal-legend-chip').title = `Entre ${formatMinutes(nearFloor)} y ${formatMinutes(nearCeil)} min productivos — cerca de tu meta`;
+    legendNearEl.textContent = ui`${formatMinutes(nearFloor)}–${formatMinutes(nearCeil)}m · Cerca`;
+    legendNearEl.closest('.cal-legend-chip').title = ui`Entre ${formatMinutes(nearFloor)} y ${formatMinutes(nearCeil)} min productivos — cerca de tu meta`;
   }
   if (legendBadEl) {
-    legendBadEl.textContent = `<${formatMinutes(nearFloor)}m · Lejos`;
-    legendBadEl.closest('.cal-legend-chip').title = `Menos de ${formatMinutes(nearFloor)} min productivos — lejos de tu meta`;
+    legendBadEl.textContent = ui`<${formatMinutes(nearFloor)}m · Lejos`;
+    legendBadEl.closest('.cal-legend-chip').title = ui`Menos de ${formatMinutes(nearFloor)} min productivos — lejos de tu meta`;
   }
 
   if (label) {
-    const raw = new Intl.DateTimeFormat('es-MX', { month: 'long', year: 'numeric' }).format(monthDate);
+    const raw = new Intl.DateTimeFormat(displayLocale(), { month: 'long', year: 'numeric' }).format(monthDate);
     label.textContent = raw.charAt(0).toUpperCase() + raw.slice(1);
   }
   if (nextBtn) nextBtn.disabled = calMonthOffset >= 0;
@@ -131,14 +132,14 @@ export function renderCalendarMonth() {
     const productiveMin = productiveMinutesForDay(dayKey);
     const bonusMin = Math.round(calDailyEquivalentHigherRateMin(dayKey));
     const tier = calDayTier(dayKey);
-    const bonusHtml = bonusMin > 0 ? `<span class="cal-day-bonus">+${bonusMin}</span>` : '';
-    const starHtml = tier === 'cal-tier-8hrpp' ? `<span class="cal-day-star" aria-hidden="true">${iconHtml('star', 'ic-fill')}</span>` : '';
+    const bonusHtml = bonusMin > 0 ? ui`<span class="cal-day-bonus">+${bonusMin}</span>` : '';
+    const starHtml = tier === 'cal-tier-8hrpp' ? ui`<span class="cal-day-star" aria-hidden="true">${iconHtml('star', 'ic-fill')}</span>` : '';
     // Un día libre por una razón concreta (vacaciones, enfermedad, día festivo...) debe mostrar esa
     // razón en vez de un "Libre" genérico siempre igual — reutiliza la misma categoría que ya se
     // guarda desde "Editar día" (Resumen semanal).
     const dayNoteForCell = getDayNote(dayKey);
     const offCategoryLabel = status === 'off' ? dayNoteCategoryMeta(dayNoteForCell?.category)?.label : null;
-    const minLabel = status === 'off' ? (offCategoryLabel || 'Libre') : status === 'nodata' ? '—' : String(Math.round(productiveMin));
+    const minLabel = status === 'off' ? (offCategoryLabel || translateText('Libre')) : status === 'nodata' ? '—' : String(Math.round(productiveMin));
     const titleParts = [offCategoryLabel, dayNoteForCell?.comment].filter(Boolean);
     const titleAttr = titleParts.length ? ` title="${escapeHtml(titleParts.join(' — '))}"` : '';
     const minLabelClass = status === 'normal' ? 'cal-day-min' : 'cal-day-min cal-day-min-label';
@@ -149,11 +150,11 @@ export function renderCalendarMonth() {
     let amtLinesHtml = '';
     if (status === 'normal') {
       const dayEarningsForCell = importedCallStats(callsForDay(dayKey), dayKey).earnings;
-      const amtHtml = `<span class="cal-day-amt">$${dayEarningsForCell.toFixed(2)}</span>`;
-      const amtAltHtml = calHasCurrency ? `<span class="cal-day-amt-alt">${escapeHtml(calCurrencyLabel)}${(dayEarningsForCell * calExchangeRate).toFixed(2)}</span>` : '';
+      const amtHtml = ui`<span class="cal-day-amt">$${dayEarningsForCell.toFixed(2)}</span>`;
+      const amtAltHtml = calHasCurrency ? ui`<span class="cal-day-amt-alt">${escapeHtml(calCurrencyLabel)}${(dayEarningsForCell * calExchangeRate).toFixed(2)}</span>` : '';
       amtLinesHtml = `${amtHtml}${amtAltHtml}`;
     }
-    cellsHtml.push(`<div class="cal-day-cell ${tier}"${titleAttr}>${bonusHtml}<div class="cal-day-top-row"><span class="cal-day-num">${day}</span>${starHtml}</div><span class="${minLabelClass}">${minLabel}</span>${amtLinesHtml}</div>`);
+    cellsHtml.push(ui`<div class="cal-day-cell ${tier}"${titleAttr}>${bonusHtml}<div class="cal-day-top-row"><span class="cal-day-num">${day}</span>${starHtml}</div><span class="${minLabelClass}">${minLabel}</span>${amtLinesHtml}</div>`);
   }
   // Si el offset de día de semana + los días recortados por "Historial desde" suman una o más filas
   // COMPLETAS de celdas vacías al inicio, se quitan esas filas enteras (múltiplos de 7) — así el
@@ -247,20 +248,20 @@ export function saveCalYearGoalModal() {
   const input = document.getElementById('calYearGoalAmountInput');
   const amount = Number(input?.value);
   if (!Number.isFinite(amount) || amount <= 0) {
-    toast('Valor inválido — la meta anual no se modificó');
+    toast(translateText('Valor inválido — la meta anual no se modificó'));
     return;
   }
   setCalYearGoalOverride(calYearOffset, amount);
   closeModal('calYearGoalModal');
   renderCalYear();
-  toast(`Meta anual: ${money(amount)}${convertedAmountText(amount) ? ` (${convertedAmountText(amount)})` : ''}`);
+  toast(ui`Meta anual: ${money(amount)}${convertedAmountText(amount) ? ` (${convertedAmountText(amount)})` : ''}`);
 }
 
 export function useAutoCalYearGoalModal() {
   setCalYearGoalOverride(calYearOffset, null);
   closeModal('calYearGoalModal');
   renderCalYear();
-  toast('Meta anual vuelve a calcularse automáticamente');
+  toast(translateText('Meta anual vuelve a calcularse automáticamente'));
 }
 
 export function openHistoryStartDateEditor() {
@@ -278,18 +279,18 @@ export function saveCalHistoryStartModal() {
     saveSettingsOnly();
     closeModal('calHistoryStartModal');
     renderCalYear();
-    toast('Historial vuelve a calcularse desde tu llamada más antigua');
+    toast(translateText('Historial vuelve a calcularse desde tu llamada más antigua'));
     return;
   }
   if (!/^\d{4}-\d{2}-\d{2}$/.test(trimmed) || Number.isNaN(new Date(`${trimmed}T00:00:00`).getTime())) {
-    toast('Fecha inválida');
+    toast(translateText('Fecha inválida'));
     return;
   }
   settings.historyStartDateOverride = trimmed;
   saveSettingsOnly();
   closeModal('calHistoryStartModal');
   renderCalYear();
-  toast(`Historial desde: ${trimmed}`);
+  toast(ui`Historial desde: ${trimmed}`);
 }
 
 export function useAutoCalHistoryStartModal() {
@@ -297,7 +298,7 @@ export function useAutoCalHistoryStartModal() {
   saveSettingsOnly();
   closeModal('calHistoryStartModal');
   renderCalYear();
-  toast('Historial vuelve a calcularse desde tu llamada más antigua');
+  toast(translateText('Historial vuelve a calcularse desde tu llamada más antigua'));
 }
 
 // Pinta la vista anual completa: 2 tarjetas (Total del año / Meta anual) + grid de 12 meses con
@@ -330,8 +331,8 @@ export function renderCalYear() {
   const historyNoteText = document.getElementById('calHistoryStartText');
   if (historyNoteWrap && historyNoteText) {
     if (historyStart) {
-      const historyLabel = new Intl.DateTimeFormat('es-MX', { day: 'numeric', month: 'long', year: 'numeric' }).format(historyStart);
-      historyNoteText.textContent = `Historial desde: ${historyLabel}`;
+      const historyLabel = new Intl.DateTimeFormat(displayLocale(), { day: 'numeric', month: 'long', year: 'numeric' }).format(historyStart);
+      historyNoteText.textContent = ui`Historial desde: ${historyLabel}`;
       historyNoteWrap.style.display = '';
     } else {
       historyNoteWrap.style.display = 'none';
@@ -383,22 +384,22 @@ export function renderCalYear() {
   if (goalBarEl) goalBarEl.style.width = `${goalPct}%`;
   const remainingToGoal = Math.max(0, yearGoal - yearTotal);
   const remainingConverted = convertedAmountText(remainingToGoal);
-  if (goalFootEl) goalFootEl.textContent = `${Math.round(goalPct)}% alcanzado · Faltan ${money(remainingToGoal)}${remainingConverted ? ` (${remainingConverted})` : ''}`;
+  if (goalFootEl) goalFootEl.textContent = ui`${Math.round(goalPct)}% alcanzado · Faltan ${money(remainingToGoal)}${remainingConverted ? ` (${remainingConverted})` : ''}`;
   const goalAmtEl = document.getElementById('calYearGoalAmt');
   if (goalAmtEl) goalAmtEl.textContent = money(yearGoal);
   const goalConvertedEl = document.getElementById('calYearGoalConvertedText');
   if (goalConvertedEl) goalConvertedEl.textContent = convertedAmountText(yearGoal);
 
   const monthNames = Array.from({ length: 12 }, (_, m) => {
-    const raw = new Intl.DateTimeFormat('es-MX', { month: 'long' }).format(new Date(2000, m, 1));
+    const raw = new Intl.DateTimeFormat(displayLocale(), { month: 'long' }).format(new Date(2000, m, 1));
     return raw.charAt(0).toUpperCase() + raw.slice(1);
   });
 
   monthGrid.innerHTML = monthCellsData.map((cells, m) => {
     if (m < startMonthForYear) return ''; // Mes anterior al inicio del historial: no hay nada que mostrar.
     const isCurrentMonth = isCurrentYear && m === today.getMonth();
-    const miniHtml = cells.map(c => c.empty ? '<div class="mini-cell cal-empty"></div>' : `<div class="mini-cell ${c.tier}"></div>`).join('');
-    return `
+    const miniHtml = cells.map(c => c.empty ? '<div class="mini-cell cal-empty"></div>' : ui`<div class="mini-cell ${c.tier}"></div>`).join('');
+    return ui`
       <div class="month-card ${isCurrentMonth ? 'is-current' : ''}" data-cal-month-idx="${m}">
         <div class="month-card-head">
           <span class="month-card-name">${escapeHtml(monthNames[m])}</span>
@@ -408,7 +409,7 @@ export function renderCalYear() {
         <div class="month-card-amt-wrap">
           <div class="month-card-amt">${money(monthTotals[m])}</div>
           <div class="month-card-amt-label">ganado este mes</div>
-          ${convertedAmountText(monthTotals[m]) ? `<div class="month-card-amt-converted">${escapeHtml(convertedAmountText(monthTotals[m]))}</div>` : ''}
+          ${convertedAmountText(monthTotals[m]) ? ui`<div class="month-card-amt-converted">${escapeHtml(convertedAmountText(monthTotals[m]))}</div>` : ''}
         </div>
       </div>
     `;

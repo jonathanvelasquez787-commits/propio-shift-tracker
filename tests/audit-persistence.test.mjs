@@ -1,3 +1,5 @@
+import { ui, translateText, translateMarkup, displayLocale } from '../js/i18n.js';
+import { applySavedColors } from '../js/appearance-colors.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -11,7 +13,7 @@ function storageHarness() {
   const values = new Map([['state', JSON.stringify(state)], ['calls', '[]'], ['settings', JSON.stringify(settings)]]);
   let reject = () => false;
   const warnings = [];
-  const context = vm.createContext({ state, calls, settings, STORAGE_KEY: 'state', CALLS_KEY: 'calls', SETTINGS_KEY: 'settings',
+  const context = vm.createContext({ ui, translateText, translateMarkup, displayLocale, applySavedColors, state, calls, settings, STORAGE_KEY: 'state', CALLS_KEY: 'calls', SETTINGS_KEY: 'settings',
     localStorage: {
       getItem: (key) => values.get(key) ?? null,
       setItem(key, value) { if (reject(key, value)) throw new Error('QuotaExceededError'); values.set(key, value); },
@@ -65,7 +67,7 @@ test('un fallo al guardar solo estado obliga a guardar el siguiente snapshot com
 test('el JSON descargado incluye el recibo y escudo del mismo respaldo', () => {
   let downloaded;
   const state = { game: { shields: 0, ledger: {} } };
-  const context = vm.createContext({ state, calls: [], settings: {}, Date,
+  const context = vm.createContext({ ui, translateText, translateMarkup, displayLocale, applySavedColors, state, calls: [], settings: {}, Date,
     onGameBackupExported() {
       if (!state.game.ledger['backup-shield:week']) { state.game.shields++; state.game.ledger['backup-shield:week'] = true; }
     },
@@ -83,7 +85,7 @@ test('el JSON descargado incluye el recibo y escudo del mismo respaldo', () => {
 
 test('una exportación de dos años conserva los días y las llamadas después del día 400', () => {
   const lastCall = { id: 'last-day', startISO: '2026-12-31T12:00:00Z', pay: 15 };
-  const context = vm.createContext({ Date,
+  const context = vm.createContext({ ui, translateText, translateMarkup, displayLocale, applySavedColors, Date,
     todayCallDateKey: (d) => `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`,
     callsForDay: (key) => key === '2026-12-31' ? [lastCall] : [],
     importedCallStats: (calls) => ({ earnings: calls.reduce((sum, call) => sum + call.pay, 0) }),

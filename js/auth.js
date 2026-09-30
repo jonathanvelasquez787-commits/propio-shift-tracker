@@ -1,3 +1,4 @@
+import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 // Autenticación — los 3 métodos de entrada.
 //
 // Google y correo/contraseña los resuelve Supabase Auth directo desde el
@@ -202,20 +203,20 @@ export class AuthError extends Error {
 }
 
 const MESSAGES = {
-  LOGIN_FAILED: 'Usuario o contraseña incorrectos.',
-  INVALID_CREDENTIALS: 'Usuario o contraseña incorrectos.',
-  EMAIL_INVALID: 'Ese correo no parece válido.',
-  EMAIL_TAKEN: 'Ya existe una cuenta con ese correo.',
+  LOGIN_FAILED: translateText('Usuario o contraseña incorrectos.'),
+  INVALID_CREDENTIALS: translateText('Usuario o contraseña incorrectos.'),
+  EMAIL_INVALID: translateText('Ese correo no parece válido.'),
+  EMAIL_TAKEN: translateText('Ya existe una cuenta con ese correo.'),
   USERNAME_INVALID:
-    'El usuario debe tener entre 3 y 24 caracteres: letras, números, guion bajo o punto.',
-  USERNAME_TAKEN: 'Ese nombre de usuario ya está ocupado.',
-  PASSWORD_TOO_SHORT: 'La contraseña necesita al menos 8 caracteres.',
-  NOT_AUTHENTICATED: 'Tu sesión expiró. Vuelve a entrar.',
-  EMAIL_NOT_CONFIRMED: 'Falta confirmar tu correo. Revisa la bandeja de entrada.',
-  RATE_LIMITED: 'Demasiados intentos seguidos. Espera un minuto y vuelve a probar.',
-  NETWORK: 'No se pudo conectar. Revisa tu internet y vuelve a intentar.',
+    translateText('El usuario debe tener entre 3 y 24 caracteres: letras, números, guion bajo o punto.'),
+  USERNAME_TAKEN: translateText('Ese nombre de usuario ya está ocupado.'),
+  PASSWORD_TOO_SHORT: translateText('La contraseña necesita al menos 8 caracteres.'),
+  NOT_AUTHENTICATED: translateText('Tu sesión expiró. Vuelve a entrar.'),
+  EMAIL_NOT_CONFIRMED: translateText('Falta confirmar tu correo. Revisa la bandeja de entrada.'),
+  RATE_LIMITED: translateText('Demasiados intentos seguidos. Espera un minuto y vuelve a probar.'),
+  NETWORK: translateText('No se pudo conectar. Revisa tu internet y vuelve a intentar.'),
   NOT_CONFIGURED:
-    'La app todavía no está conectada a su base de datos (falta configurar js/config.js).',
+    translateText('La app todavía no está conectada a su base de datos (falta configurar js/config.js).'),
 };
 
 export function authErrorMessage(err) {
@@ -224,7 +225,7 @@ export function authErrorMessage(err) {
 
   const raw = String(err.message || err.error_description || err).toLowerCase();
 
-  if (raw.includes('sin configurar')) return MESSAGES.NOT_CONFIGURED;
+  if (raw.includes(translateText('sin configurar'))) return MESSAGES.NOT_CONFIGURED;
   if (raw.includes('failed to fetch') || raw.includes('networkerror')) return MESSAGES.NETWORK;
   if (raw.includes('invalid login credentials')) return MESSAGES.INVALID_CREDENTIALS;
   if (raw.includes('email not confirmed')) return MESSAGES.EMAIL_NOT_CONFIRMED;

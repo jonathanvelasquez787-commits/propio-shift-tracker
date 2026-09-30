@@ -13,6 +13,7 @@ const SHELL = [
   '/css/legal.css',
   '/css/app-shell.css',
   '/css/game.css',
+  '/css/appearance.css',
   `/assets/theme-init.js?v=${BUILD_VERSION}`,
   `/assets/theme-toggle.js?v=${BUILD_VERSION}`,
   `/assets/footer-year.js?v=${BUILD_VERSION}`,

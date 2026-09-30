@@ -1,3 +1,5 @@
+import { ui, translateText, translateMarkup, displayLocale } from '../js/i18n.js';
+import { applySavedColors } from '../js/appearance-colors.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -11,7 +13,7 @@ const source = fs.readFileSync(new URL('../js/sync.js', import.meta.url), 'utf8'
 function harness() {
   const values = new Map(), requests = [], timers = new Map(), events = [];
   let timerId = 0;
-  const context = vm.createContext({ Date, Math, JSON, Map, Set, Promise, Error, navigator: { userAgent: 'Audit', platform: 'Audit' },
+  const context = vm.createContext({ ui, translateText, translateMarkup, displayLocale, applySavedColors, Date, Math, JSON, Map, Set, Promise, Error, navigator: { userAgent: 'Audit', platform: 'Audit' },
     DATA_SCHEMA_VERSION: 2, SUPABASE_URL: 'https://audit.invalid', SUPABASE_ANON_KEY: 'audit',
     window: { localStorage: {
       getItem: (key) => values.get(key) ?? null,

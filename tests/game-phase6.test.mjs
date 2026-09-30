@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { translateText, ui, displayLocale } from '../js/i18n.js';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -20,7 +21,7 @@ function validCallDate(key) {
 
 test('Fase 6 expone el catálogo semanal y renderiza SVG seguro para todos los estados', async () => {
   const monstersSource = read('js/monsters.js');
-  assert.doesNotMatch(monstersSource, /^\s*import\s/m);
+  assert.match(monstersSource, /from '\.\/i18n\.js'/);
   assert.match(monstersSource, /export const MONSTER_CATALOG/);
   assert.match(monstersSource, /export function monsterSvg/);
   assert.match(monstersSource, /currentColor/);
@@ -75,7 +76,7 @@ test('HTML integra la ruta de Logros, el arena, las misiones, ajustes y modales 
 test('Logros simplifica ajustes, comparte activación lateral y admite nombre personalizado seguro', () => {
   const html = read('app.html');
   const achievements = between(html, '<div class="app-page game-achievements-page"', '</div><!-- /pageAchievements -->');
-  const gameEditor = between(achievements, '<details class="game-panel game-settings-accordion" id="gameSettingsAccordion" open>', '<details class="game-panel game-settings-accordion" id="positiveSettingsAccordion" open>');
+  const gameEditor = between(achievements, '<details class="game-panel game-settings-accordion" id="gameSettingsAccordion">', '<details class="game-panel game-settings-accordion" id="positiveSettingsAccordion">');
   const settingsModal = between(html, '<div aria-hidden="true" class="modal-overlay" id="goalsModal">', '<div aria-hidden="true" class="modal-overlay game-modal-overlay" id="stageClearModal">');
   const allIds = [...html.matchAll(/\bid="([^"]+)"/g)].map((match) => match[1]);
   assert.deepEqual(allIds.filter((id, index) => allIds.indexOf(id) !== index), []);
@@ -296,7 +297,7 @@ test('el bono manual de Higher Rate no se suma dos veces y los tiles conservan s
   const normalizedBasePay = withinWindow({ durationMin }, estimatedGoldPay);
   assert.equal(Number(normalizedBasePay) + 0.12, estimatedGoldPay);
   assert.equal(outsideWindow({ durationMin }, estimatedGoldPay), estimatedGoldPay);
-  assert.match(calls, /if \(!callStart\)\s*\{\s*toast\('Elige una hora válida'\)/);
+  assert.match(calls, /if \(!callStart\)\s*\{\s*toast\(translateText\('Elige una hora válida'\)\)/);
 });
 
 test('la hora manual vacía no se convierte en 07:00 y las horas futuras no se guardan ni reciben XP', () => {
@@ -306,7 +307,7 @@ test('la hora manual vacía no se convierte en 07:00 y las horas futuras no se g
     const [hour, minute] = value.split(':').map(Number);
     return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
   };
-  const toLabel = new Function('formatHHMM', 'pad', `${timeHelper}; return callStartLabelFromHHMM;`)(formatHHMM, (value) => String(value).padStart(2, '0'));
+  const toLabel = new Function('formatHHMM', 'pad', 'translateText', `${timeHelper}; return callStartLabelFromHHMM;`)(formatHHMM, (value) => String(value).padStart(2, '0'), translateText);
   assert.equal(toLabel(''), null);
   assert.equal(toLabel('24:00'), null);
   assert.equal(toLabel('07:05'), '7:05 AM');
@@ -398,7 +399,7 @@ test('barras, misiones y racha exponen estado accesible', () => {
   assert.match(game, /parentElement\?\.setAttribute\('aria-valuenow', String\(Math\.round\(boss\.pct\)\)\)/);
   assert.match(game, /parentElement\?\.setAttribute\('aria-valuenow', String\(Math\.round\(level\.pct\)\)\)/);
   assert.match(game, /game-mission-grid" role="list" aria-label="Misiones del día"/);
-  assert.match(game, /role="listitem" aria-label="\$\{escapeHtml\(`Misión/);
+  assert.match(game, /role="listitem" aria-label="\$\{escapeHtml\(ui`Misión/);
   assert.match(html, /game-streak-week" data-game-role="streak-week" role="list"/);
   assert.match(game, /cell\.setAttribute\('aria-label', label\)/);
 });

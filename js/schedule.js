@@ -1,3 +1,4 @@
+import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 // app-main.js injects schedule helpers; app-context.js owns shared state and editor offsets.
 import {
   scheduleEditDay,
@@ -38,12 +39,12 @@ export function configureScheduleContext(context) {
     // Mueve Inicio/Fin del turno Y todos los bloques del formulario por `scheduleOffsetMin` minutos — mismo desplazamiento para todo, así que el orden y la duración de cada bloque no cambian, solo su hora.
     export function applyScheduleOffset() {
       if (!scheduleOffsetMin) {
-        toast('Elige cuánto ajustar el turno antes de aplicar.');
+        toast(translateText('Elige cuánto ajustar el turno antes de aplicar.'));
         return;
       }
       const current = readBlocksFromEditor();
       if (!current.length) {
-        toast('No hay bloques que ajustar en este día.');
+        toast(translateText('No hay bloques que ajustar en este día.'));
         return;
       }
 
@@ -53,7 +54,7 @@ export function configureScheduleContext(context) {
       if (endInput) endInput.value = minutesToHHMM(toMinutes(formatHHMM(endInput.value)) + scheduleOffsetMin);
       const shifted = current.map(b => ({ ...b, start: minutesToHHMM(toMinutes(b.start) + scheduleOffsetMin) }));
       renderBlocksEditor(shifted);
-      toast(`Turno ajustado ${formatScheduleOffsetLabel(scheduleOffsetMin)} — recuerda "Guardar día" para confirmar`);
+      toast(ui`Turno ajustado ${formatScheduleOffsetLabel(scheduleOffsetMin)} — recuerda "Guardar día" para confirmar`);
       setScheduleOffsetMin(0);
       syncScheduleOffsetUI();
     }
@@ -122,7 +123,7 @@ export function configureScheduleContext(context) {
       wrap.innerHTML = WEEKDAYS.map(k => {
         const active = k === scheduleEditDay;
         const off = !target[k] || target[k].off;
-        return `<button class="day-tab ${active ? 'active' : ''} ${off ? 'off' : ''}" data-day="${k}" type="button">${WEEKDAY_LABELS_SHORT[k]}</button>`;
+        return ui`<button class="day-tab ${active ? 'active' : ''} ${off ? 'off' : ''}" data-day="${k}" type="button">${WEEKDAY_LABELS_SHORT[k]}</button>`;
       }).join('');
       wrap.querySelectorAll('.day-tab').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -131,7 +132,7 @@ export function configureScheduleContext(context) {
           if (nextDay === scheduleEditDay) return;
           // Si hay cambios sin guardar en el día actual, se avisa antes de cambiar de tab y perderlos — mismo patrón de confirmación que ya usa el resto de la app (appConfirm).
           if (scheduleFormIsDirty()) {
-            appConfirm(`Tienes cambios sin guardar en ${WEEKDAY_LABELS[scheduleEditDay]}. ¿Descartarlos y cambiar a ${WEEKDAY_LABELS[nextDay]}?`, () => {
+            appConfirm(ui`Tienes cambios sin guardar en ${WEEKDAY_LABELS[scheduleEditDay]}. ¿Descartarlos y cambiar a ${WEEKDAY_LABELS[nextDay]}?`, () => {
               setScheduleEditDay(nextDay);
               syncShiftModalFields();
             });
@@ -144,7 +145,7 @@ export function configureScheduleContext(context) {
     }
 
     // Pedido del usuario: unificar Trabajo/Break/Lunch en UNA sola lista de bloques en Horario — cada fila tiene Tipo (selector) + inicio + min, todos editables/agregables/eliminables exactamente igual, sin importar el tipo.
-    const BLOCK_TYPE_LABELS = { work: 'Trabajo', break: 'Break', lunch: 'Lunch' };
+    const BLOCK_TYPE_LABELS = { work: translateText('Trabajo'), break: 'Break', lunch: 'Lunch' };
 
     // Pedido del usuario: Meta de Productividad configurable POR BLOQUE de Trabajo (reemplaza al viejo ratio global de "Margen"). Esta función arma la forma CANÓNICA de un bloque para comparar/guardar
     function normalizeBlockForCompare(b) {
@@ -162,9 +163,9 @@ export function configureScheduleContext(context) {
     // initialization". Se llama a iconHtml(meta.iconName) recién donde se usa, en tiempo de
     // ejecución (ver renderBlocksEditor más abajo).
     export const BLOCK_TIMELINE_META = {
-      work: { iconName: 'briefcase', subtitle: 'Enfoque y productividad' },
-      break: { iconName: 'coffee', subtitle: 'Descanso corto' },
-      lunch: { iconName: 'utensils', subtitle: 'Almuerzo / Descanso largo' },
+      work: { iconName: 'briefcase', subtitle: translateText('Enfoque y productividad') },
+      break: { iconName: 'coffee', subtitle: translateText('Descanso corto') },
+      lunch: { iconName: 'utensils', subtitle: translateText('Almuerzo / Descanso largo') },
     };
 
     // Duración legible ("2h 10m" / "45 min" / "1h") para la píldora de la tarjeta
@@ -194,7 +195,7 @@ export function configureScheduleContext(context) {
         const meta = BLOCK_TIMELINE_META[type] || BLOCK_TIMELINE_META.work;
         const durationLabel = formatBlockDurationLabel(durVal);
         // Ver comentario junto a `.sched-tl-hour` en el CSS: la hora de inicio se repite aquí como texto suelto a la izquierda de la línea/punto conector
-        return `
+        return ui`
         <div class="block-row sched-tl-item" data-block-row="${i}" data-block-type="${type}">
           <div class="sched-tl-hour" aria-hidden="true">${startVal}</div>
           <div class="sched-tl-rail" aria-hidden="true"><span class="sched-tl-dot"></span></div>
@@ -225,7 +226,7 @@ export function configureScheduleContext(context) {
           </div>
         </div>
       `;
-      }).join('') || '<div class="note" style="margin:0;">Sin bloques configurados. Usa "+ Agregar bloque" para empezar (Trabajo también es un bloque explícito ahora).</div>';
+      }).join('') || translateMarkup('<div class="note" style="margin:0;">Sin bloques configurados. Usa "+ Agregar bloque" para empezar (Trabajo también es un bloque explícito ahora).</div>');
     }
 
     // Lee todas las filas .block-row actualmente en el DOM (en el mismo orden en que se renderizaron) y arma el arreglo `blocks` — reemplaza a los editores separados de Break/Lunch que había antes. Pedido del usuario:
@@ -265,8 +266,8 @@ export function configureScheduleContext(context) {
 
     function blockCrossingMidnightMessage(offenders) {
       const first = offenders[0];
-      const extra = offenders.length > 1 ? ` (y ${offenders.length - 1} más)` : '';
-      return `${first.typeLabel} ${timeLabel(first.start)}–${timeLabel(first.end)} cruza la medianoche${extra} — todavía no se soporta. Divide el bloque en dos (ej. ${timeLabel(first.start)}–11:59 PM y 12:00–${timeLabel(first.end)} AM del día siguiente) o ajusta la hora.`;
+      const extra = offenders.length > 1 ? ui` (y ${offenders.length - 1} más)` : '';
+      return ui`${first.typeLabel} ${timeLabel(first.start)}–${timeLabel(first.end)} cruza la medianoche${extra} — todavía no se soporta. Divide el bloque en dos (ej. ${timeLabel(first.start)}–11:59 PM y 12:00–${timeLabel(first.end)} AM del día siguiente) o ajusta la hora.`;
     }
 
     // "+ Agregar bloque": toma lo que ya está en el formulario (para no perder ediciones a medio hacer en filas existentes) y le agrega una fila nueva al final. Pedido del usuario :
@@ -358,17 +359,17 @@ export function configureScheduleContext(context) {
       if (!isWeekMode) {
         banner.className = 'sched-mode-banner tone-template';
         bannerIcon.innerHTML = iconHtml('repeat');
-        bannerText.textContent = 'Editando tu horario de siempre — se repite cada semana.';
+        bannerText.textContent = translateText('Editando tu horario de siempre — se repite cada semana.');
       } else if (!hasCustom) {
         banner.className = 'sched-mode-banner tone-template';
         bannerIcon.innerHTML = iconHtml('eye');
-        bannerText.textContent = 'Viendo tu plantilla como referencia — activa "Personalizar esta semana" para editar solo esta semana.';
+        bannerText.textContent = translateText('Viendo tu plantilla como referencia — activa "Personalizar esta semana" para editar solo esta semana.');
       } else {
         const weekStart = scheduleWeekStartDate(scheduleWeekOffset);
         const weekEnd = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + 6);
         banner.className = 'sched-mode-banner tone-week';
         bannerIcon.innerHTML = iconHtml('calendar');
-        bannerText.textContent = `Editando SOLO ${formatWeekRangeLabel(weekStart, weekEnd)} — tu plantilla no se toca.`;
+        bannerText.textContent = ui`Editando SOLO ${formatWeekRangeLabel(weekStart, weekEnd)} — tu plantilla no se toca.`;
       }
     }
 
@@ -391,7 +392,7 @@ export function configureScheduleContext(context) {
       const weekEnd = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + 6);
       const rangeLabel = document.getElementById('scheduleWeekRangeLabel');
       if (rangeLabel) {
-        rangeLabel.textContent = `${scheduleWeekOffset === 0 ? 'Semana actual · ' : ''}${formatWeekRangeLabel(weekStart, weekEnd)}`;
+        rangeLabel.textContent = `${scheduleWeekOffset === 0 ? translateText('Semana actual · ') : ''}${formatWeekRangeLabel(weekStart, weekEnd)}`;
       }
 
       const isPast = scheduleWeekIsPast(scheduleWeekOffset);
@@ -426,7 +427,7 @@ export function configureScheduleContext(context) {
       if (endInput) endInput.value = formatHHMM(cfg.end || '16:00');
       // Pedido del usuario: título de la tarjeta de cabecera del día muestra el NOMBRE COMPLETO del día activo (ver `.sched-day-card- title` en el CSS/HTML)
       const schedDayCardTitle = document.getElementById('schedDayCardTitle');
-      if (schedDayCardTitle) schedDayCardTitle.textContent = WEEKDAY_LABELS[scheduleEditDay] || 'Lunes';
+      if (schedDayCardTitle) schedDayCardTitle.textContent = WEEKDAY_LABELS[scheduleEditDay] || translateText('Lunes');
       renderBlocksEditor(blocks);
       if (lateSelect) lateSelect.value = settings.lateArrivalMode || 'anchor';
       // Pedido del usuario (v147): Adherencia vuelve a Horario (pasó por
@@ -483,7 +484,7 @@ export function configureScheduleContext(context) {
       const dayStart = toMinutes(formatHHMM(cfg.start));
       const dayEnd = toMinutes(formatHHMM(cfg.end));
       if (dayEnd <= dayStart) {
-        errors.push('La hora de fin debe ser después del inicio del turno.');
+        errors.push(translateText('La hora de fin debe ser después del inicio del turno.'));
         return { valid: false, errors };
       }
 
@@ -504,14 +505,14 @@ export function configureScheduleContext(context) {
         if (type === 'work') {
           const goalMin = Number(b.goalMin) || 0;
           if (goalMin > Number(b.dur)) {
-            errors.push(`${label}: la meta productiva (${formatMinutes(goalMin)} min) no puede ser mayor que la duración del bloque (${formatMinutes(Number(b.dur))} min).`);
+            errors.push(ui`${label}: la meta productiva (${formatMinutes(goalMin)} min) no puede ser mayor que la duración del bloque (${formatMinutes(Number(b.dur))} min).`);
           }
         }
       });
 
       segments.forEach(seg => {
         if (seg.start < dayStart || seg.end > dayEnd) {
-          errors.push(`${seg.label} (${timeLabel(minutesToHHMM(seg.start))}–${timeLabel(minutesToHHMM(seg.end))}) queda fuera del turno (${timeLabel(cfg.start)}–${timeLabel(cfg.end)}).`);
+          errors.push(ui`${seg.label} (${timeLabel(minutesToHHMM(seg.start))}–${timeLabel(minutesToHHMM(seg.end))}) queda fuera del turno (${timeLabel(cfg.start)}–${timeLabel(cfg.end)}).`);
         }
       });
 
@@ -519,7 +520,7 @@ export function configureScheduleContext(context) {
         for (let j = i + 1; j < segments.length; j++) {
           const a = segments[i], b = segments[j];
           if (a.start < b.end && b.start < a.end) {
-            errors.push(`${a.label} y ${b.label} se cruzan.`);
+            errors.push(ui`${a.label} y ${b.label} se cruzan.`);
           }
         }
       }
@@ -558,8 +559,8 @@ export function configureScheduleContext(context) {
       saveAll();
       renderDayTabs();
       toast(scheduleViewMode === 'week'
-        ? `Horario de ${WEEKDAY_LABELS[scheduleEditDay]} guardado para esa semana`
-        : `Horario de ${WEEKDAY_LABELS[scheduleEditDay]} guardado`);
+        ? ui`Horario de ${WEEKDAY_LABELS[scheduleEditDay]} guardado para esa semana`
+        : ui`Horario de ${WEEKDAY_LABELS[scheduleEditDay]} guardado`);
     }
 
     // Pedido del usuario: "Copiar a todos los días" pasa a significar SOLO Lunes-Viernes
@@ -578,8 +579,8 @@ export function configureScheduleContext(context) {
         toast(check.errors[0]);
         return;
       }
-      const scope = scheduleViewMode === 'week' ? 'de esa semana' : '';
-      appConfirm(`¿Copiar este horario (${WEEKDAY_LABELS[scheduleEditDay]}) a Lunes-Viernes ${scope}? Esto sobreescribe Lunes a Viernes — Sábado y Domingo no se tocan.`, () => {
+      const scope = scheduleViewMode === 'week' ? translateText('de esa semana') : '';
+      appConfirm(ui`¿Copiar este horario (${WEEKDAY_LABELS[scheduleEditDay]}) a Lunes-Viernes ${scope}? Esto sobreescribe Lunes a Viernes — Sábado y Domingo no se tocan.`, () => {
         snapshotHistoricalPlanning();
       const target = activeScheduleTarget({ createIfMissing: true });
         target[scheduleEditDay] = cfg;
@@ -595,7 +596,7 @@ export function configureScheduleContext(context) {
         onGameDayMetadataChanged(todayCallDateKey());
         saveAll();
         renderDayTabs();
-        toast(`Horario copiado a Lunes-Viernes ${scope}`.trim());
+        toast(ui`Horario copiado a Lunes-Viernes ${scope}`.trim());
       });
     }
 
@@ -615,8 +616,8 @@ export function configureScheduleContext(context) {
         toast(check.errors[0]);
         return;
       }
-      const scope = scheduleViewMode === 'week' ? 'de esa semana' : '';
-      appConfirm(`¿Copiar este horario (${WEEKDAY_LABELS[scheduleEditDay]}) a Sábado y Domingo ${scope}? Esto sobreescribe Sábado y Domingo — el resto de los días no se tocan.`, () => {
+      const scope = scheduleViewMode === 'week' ? translateText('de esa semana') : '';
+      appConfirm(ui`¿Copiar este horario (${WEEKDAY_LABELS[scheduleEditDay]}) a Sábado y Domingo ${scope}? Esto sobreescribe Sábado y Domingo — el resto de los días no se tocan.`, () => {
         snapshotHistoricalPlanning();
       const target = activeScheduleTarget({ createIfMissing: true });
         target[scheduleEditDay] = cfg;
@@ -626,6 +627,6 @@ export function configureScheduleContext(context) {
         onGameDayMetadataChanged(todayCallDateKey());
         saveAll();
         renderDayTabs();
-        toast(`Horario copiado a Sábado y Domingo ${scope}`.trim());
+        toast(ui`Horario copiado a Sábado y Domingo ${scope}`.trim());
       });
     }

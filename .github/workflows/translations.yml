@@ -1,0 +1,78 @@
+name: English translations
+
+on:
+  workflow_dispatch:
+    inputs:
+      seed:
+        description: Upload the existing English catalog on first setup
+        type: boolean
+        default: false
+  push:
+    branches: [main]
+    paths:
+      - '*.html'
+      - 'js/**'
+      - '!js/locales.generated.js'
+      - 'scripts/i18n-*.mjs'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: translations-main
+  cancel-in-progress: false
+
+jobs:
+  translate:
+    runs-on: ubuntu-latest
+    env:
+      LOCIZE_PROJECTID: ${{ secrets.LOCIZE_PROJECTID }}
+      LOCIZE_API_KEY: ${{ secrets.LOCIZE_API_KEY }}
+    steps:
+      - name: Check provider configuration
+        id: provider
+        run: |
+          if [ -n "$LOCIZE_PROJECTID" ] && [ -n "$LOCIZE_API_KEY" ]; then
+            echo 'configured=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'configured=false' >> "$GITHUB_OUTPUT"
+            echo 'Integration ready; no provider configured. Nothing was sent.'
+          fi
+      - uses: actions/checkout@v4
+        if: steps.provider.outputs.configured == 'true'
+        with:
+          ref: main
+      - uses: pnpm/action-setup@v4
+        if: steps.provider.outputs.configured == 'true'
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        if: steps.provider.outputs.configured == 'true'
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install dependencies
+        if: steps.provider.outputs.configured == 'true'
+        run: pnpm install --frozen-lockfile
+      - name: Sync and validate translations
+        if: steps.provider.outputs.configured == 'true'
+        env:
+          SEED: ${{ inputs.seed }}
+        run: |
+          if [ "$SEED" = 'true' ]; then
+            pnpm i18n:sync --seed
+          else
+            pnpm i18n:sync
+          fi
+          pnpm test
+          pnpm build
+      - name: Save validated catalog
+        if: steps.provider.outputs.configured == 'true'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add locales/es.json locales/en.json locales/sources.json js/locales.generated.js
+          if ! git diff --cached --quiet; then
+            git commit -m 'Update validated English translations'
+            git push origin HEAD:main
+          fi

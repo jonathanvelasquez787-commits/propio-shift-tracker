@@ -336,10 +336,16 @@ Los días cerrados conservan su XP congelado. Las animaciones de hoy no pasan
 al cambiar a otra fecha.
 
 La distribución de Logros aprobada después de la auditoría quedó aplicada en
-v577, simplificada en v579: «Activar Logros» visible en cabecera y menú lateral;
+v577, simplificada en v579 y compactada en v580: «Activar Logros» visible en cabecera y menú lateral;
 nivel/XP y racha/escudos juntos, sin duplicar el perfil; jefe del ciclo, última
 victoria/cofre y récords; equipo, bestiario/trofeos e historial positivo.
 Mis premios y desbloqueos por nivel son desplegables con todo su contenido.
+El perfil de progreso aparece primero. Colecciones en filas completas evitan
+huecos; preferencias de gamificación y refuerzo quedan reunidas debajo del
+historial y antes del reinicio. Catálogo de 16 premios en una lista elegible,
+con detalles de ventana y disparador y editor para personalizar.
+XP, racha, escudos, jefe, cierre, equipo, colecciones y próximas recompensas
+tienen tooltips accesibles y colocados dentro de la pantalla.
 Se retiraron presupuesto, intensidad y Plan del día. Arcade es fijo; las
 misiones evalúan automáticamente productividad, pausas y adherencia. Los
 resultados sellados conservan sus enfoques anteriores por compatibilidad.
@@ -426,12 +432,31 @@ conservan su límite de 400. El Laboratorio QA y sus recorridos se retiraron.
 Mis premios conserva catálogo, personalización, ventanas seguras, historial,
 costos informativos e idempotencia; no existe límite semanal de presupuesto.
 
-Verificación actual: 173 pruebas, contratos/ciclos de 19 módulos, wiring y build
+Verificación actual: 179 pruebas, contratos/ciclos de 26 módulos, wiring y build
 de producción sin sourcemaps. Chrome aislado en claro/oscuro a 320, 390, 768
 y 1365 px: Inicio/Logros sin overflow, llamadas manual/live/pegado/ayer/duplicado,
 derrota, cierre, cofre idempotente, activación en ambas ubicaciones, progreso
 conservado y movimiento reducido. Las pruebas no certifican una sesión real
 autenticada en dos dispositivos. El mockup pixel art fue aprobado por el usuario.
+
+Selector lateral «Temas y colores»: Original claro/oscuro y siete paletas
+aprobadas, cada una en claro y oscuro. Se guardan junto a los ajustes de la
+cuenta; cambiar a Original elimina únicamente las variables de la paleta.
+Español e inglés completos sin API, incluidos interfaz, avisos, ayuda y
+reportes; 1.989 textos comprobados. Cambiar idioma vuelve a la misma página,
+sin modificar llamadas, nombres personales, recibos ni progreso. Mensajes
+de juego guardados se presentan en el idioma seleccionado sin reescribirlos.
+La PWA incluye ambos idiomas y el CSS de apariencia.
+Integración Locize preparada: script, workflow y validación de textos nuevos,
+variables e HTML. Sin credenciales no contacta servicios. Falta únicamente
+que el usuario contrate/configure su cuenta y los secretos cuando decida
+activar traducción automática; instrucciones en docs/idiomas-y-temas.md.
+Chrome aislado ES/EN, siete paletas más Original en ambos modos y páginas
+principales a 320, 390, 768 y 1365 px sin overflow. Tooltips, lista/editor,
+cambio de idioma y conservación de llamadas/progreso verificados. Build
+real comprobado con autenticación y nube simuladas: preferencias antes de
+pintar, persistencia tras recarga, idioma y regreso a Logros. No certifica
+una sesión real en dos dispositivos ni una cuenta Locize activa.
 
 **LIMITACIONES CONOCIDAS** (alcance reducido a propósito, no son bugs)
 
@@ -505,7 +530,7 @@ La aplicación funciona en producción con estas bases vigentes:
   global, backup diario, exportación y borrado de cuenta permanecen activos.
 - Turnos, llamadas, Horario, Higher Rate, Finanzas, Reportes, Calendario,
   Adherencia y la gamificación «El Monstruo» están integrados.
-- La versión actual es 579. Refuerzo positivo, Logros y auditoría profunda
+- La versión actual es 580. Refuerzo positivo, Logros y auditoría profunda
   están terminados. Los siete fallos de la auditoría se corrigieron con
   regresiones; cobertura y límites constan en
   `docs/auditoria-profunda-2026-09-30.md`.
@@ -513,6 +538,21 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v580** — Temas, español/inglés y Logros compactos.
+
+- Original claro/oscuro más siete paletas aprobadas con nombres, muestras,
+  teclado y persistencia; selector lateral junto a activación de Logros.
+- 1.989 textos ES/EN offline y en PWA. Validación bloquea inglés faltante,
+  variables rotas o HTML añadido; integración Locize lista sin credenciales.
+  Las notas y nombres personales permanecen intactos.
+- Logros ordenado por progreso, temporada, victoria/récords, equipo,
+  colecciones, historial y preferencias. Tooltips accesibles, tarjetas sin
+  huecos de columnas desiguales; 16 premios sugeridos en lista con editor.
+- 179 pruebas, 26 módulos, wiring y build correctos. Chrome ES/EN a
+  320–1365 px, todas las paletas, controles, importación histórica, derrotas,
+  cofre y movimiento reducido. Build real con sesión/nube controladas,
+  preferencias tras recarga y cambio de idioma sin perder llamadas.
 
 **v579** — Ajustes simples y activación de Logros desde el menú lateral.
 
@@ -545,18 +585,3 @@ La aplicación funciona en producción con estas bases vigentes:
   fila de bloques, manual/live/pegado/ayer/duplicado, derrota, cierre, cofre
   idempotente y modos de movimiento verificados con datos locales aislados.
 
-**v577** — Distribución coherente de Logros e hitos debajo de Misiones.
-
-- Activación siempre visible arriba; nombre, enfoque, intensidad, refuerzo y
-  cierre breve antes del progreso. Presupuesto, premios y catálogo desplegables.
-- Nivel/XP y racha/escudos consolidan el perfil duplicado. Desbloqueos por nivel
-  desplegables conservan las once entradas. Jefe del ciclo compacto; victoria,
-  cofre y récords antes de equipo, bestiario, trofeos e historial positivo.
-- QA y reinicio en paneles separados al final; acceso superior a QA abre y lleva
-  al selector. Chevron correcto en acordeones anidados. Mismos IDs y listeners.
-- Hitos de ganancias en un pie compacto inmediatamente después de Misiones,
-  con cuatro marcadores conectados, registrados en verde y próximo hito/restante.
-- 187 pruebas y build/wiring de 21 módulos correctos. Chrome en claro/oscuro y
-  320, 390, 768 y 1365 px sin overflow; controles, despliegue de premios y
-  desbloqueos, llamadas manual/automática/pegado/ayer/duplicado y ambos recorridos
-  QA comprobados con datos aislados, incluyendo recarga, reinicio y restauración.

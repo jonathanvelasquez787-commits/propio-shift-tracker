@@ -14,6 +14,7 @@ await mkdir(assets, { recursive: true });
 await mkdir(path.join(out, 'icons'), { recursive: true });
 
 const entries = {
+  'theme-init': 'js/theme-init.js',
   boot: 'js/boot.js',
   landing: 'js/landing.js',
   'landing-ui': 'js/landing-ui.js',
@@ -38,7 +39,7 @@ for (const [name, input] of Object.entries(entries)) {
   });
   await bundle.write({
     file: path.join(assets, `${name}.js`),
-    format: name === 'boot' || name === 'landing' ? 'iife' : 'es',
+    format: ['boot', 'landing', 'theme-init'].includes(name) ? 'iife' : 'es',
     inlineDynamicImports: true,
     sourcemap: false,
   });
@@ -56,14 +57,14 @@ async function minifyTree(dir) {
     const file = path.join(dir, entry.name);
     if (entry.isDirectory()) await minifyTree(file);
     else if (entry.name.endsWith('.js')) {
-      const isModule = entry.name !== 'boot.js' && entry.name !== 'landing.js';
+      const isModule = !['boot.js', 'landing.js', 'theme-init.js'].includes(entry.name);
       await minifyFile(file, await readFile(file, 'utf8'), isModule);
     }
   }
 }
 
 await minifyTree(assets);
-for (const name of ['theme-init', 'footer-year', 'register-sw', 'monitoring']) {
+for (const name of ['footer-year', 'register-sw', 'monitoring']) {
   let source = await readFile(path.join(root, 'js', `${name}.js`), 'utf8');
   if (name === 'monitoring') source = source.replaceAll('__BUILD_VERSION__', release);
   await minifyFile(path.join(assets, `${name}.js`), source);
@@ -85,6 +86,7 @@ for (const name of ['index.html', 'app.html', 'privacidad.html', 'terminos.html'
     .replaceAll('js/landing-ui.js', `/assets/landing-ui.js?v=${release}`)
     .replaceAll('js/landing.js', `/assets/landing.js?v=${release}`)
     .replaceAll('/js/boot.js', `/assets/boot.js?v=${release}`)
+    .replace(/<script type="module" src="(\/assets\/theme-init\.js\?v=[^"]+)"><\/script>/g, '<script src="$1"></script>')
     .replace(/<script type="module" src="(\/assets\/(?:landing|boot)\.js\?v=[^"]+)"><\/script>/g, '<script src="$1" defer></script>')
     .replace(/^<link rel="modulepreload" href="\/js\/.*?"\/>\r?\n/gm, '');
   if (name === 'app.html') html = html.replace('</head>', `<link rel="modulepreload" href="/assets/boot.js?v=${release}">\n</head>`);

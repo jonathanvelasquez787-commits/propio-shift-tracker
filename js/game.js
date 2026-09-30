@@ -1,3 +1,4 @@
+import { ui, translateText, translateStoredText, translateMarkup, displayLocale } from './i18n.js';
 import { calls, settings, state } from './app-context.js';
 import { financeIsRowPagado } from './finance.js';
 import { activeWorkSinceLastCall, monetaryMilestones, supportiveDayEvidence, surpriseDecision } from './reinforcement-rules.js';
@@ -56,19 +57,19 @@ export const MISSION_FOCUSES = Object.freeze(['balanced', 'quality', 'care']);
 const MISSION_IDS = new Set(['productive', 'breaks', 'adherence', 'quality', 'steady', 'care']);
 export const IMPULSE_MILESTONES = Object.freeze([3, 5, 8]);
 export const LOOT_RARITIES = Object.freeze([
-  { id: 'common', label: 'Común', weight: 60 },
-  { id: 'uncommon', label: 'Poco común', weight: 27 },
-  { id: 'rare', label: 'Raro', weight: 10 },
-  { id: 'epic', label: 'Épico', weight: 3 },
+  { id: 'common', label: translateText('Común'), weight: 60 },
+  { id: 'uncommon', label: translateText('Poco común'), weight: 27 },
+  { id: 'rare', label: translateText('Raro'), weight: 10 },
+  { id: 'epic', label: translateText('Épico'), weight: 3 },
 ]);
 export const UNLOCK_ROADMAP = Object.freeze([
-  { level: 2, id: 'armor', label: 'Placas de armadura visibles' },
-  { level: 3, id: 'equipment', label: 'Ranura de cuello' },
-  { level: 4, id: 'cycle-crown', label: 'Cosméticos de ciclo' },
-  { level: 6, id: 'back', label: 'Ranura de espalda' },
-  { level: 9, id: 'face', label: 'Ranura facial' },
+  { level: 2, id: 'armor', label: translateText('Placas de armadura visibles') },
+  { level: 3, id: 'equipment', label: translateText('Ranura de cuello') },
+  { level: 4, id: 'cycle-crown', label: translateText('Cosméticos de ciclo') },
+  { level: 6, id: 'back', label: translateText('Ranura de espalda') },
+  { level: 9, id: 'face', label: translateText('Ranura facial') },
 ]);
-const PHASE_LABELS = Object.freeze({ guarded: 'Guardado', fury: 'Furia', vulnerable: 'Vulnerable', defeated: 'Derrotado' });
+const PHASE_LABELS = Object.freeze({ guarded: translateText('Con armadura'), fury: translateText('Furia'), vulnerable: 'Vulnerable', defeated: translateText('Derrotado') });
 
 export function createDefaultGameState() {
   const equipmentSlots = ['head', 'neck', 'back', 'body', 'face'];
@@ -280,7 +281,7 @@ export function normalizeGameState(raw) {
   }) : [];
   const cycleRewardKey = validGameDayKey(cycleRewardSource.cycleKey);
   const normalizedCycleRewardOptions = cycleRewardSource.pending === true && cycleRewardKey && !cycleRewardOptions.length
-    ? [{ id: 'cycle-xp', type: 'xp', amount: 35, label: '35 XP de temporada', accessory: null }]
+    ? [{ id: 'cycle-xp', type: 'xp', amount: 35, label: translateText('35 XP de temporada'), accessory: null }]
     : cycleRewardOptions;
   return {
     ...fallback,
@@ -455,12 +456,12 @@ function missionSnapshot(dayKey, stats, goal, adherence, dayState = null) {
   const careApplies = breaksApplies;
   const careOk = careApplies && breaksOk && (!adherenceApplies || adherenceOk);
   const candidates = {
-    productive: { id: 'productive', label: 'Rompe la armadura de productividad', applies: productiveApplies, ok: productiveOk, rewardXp: 8, detail: productiveApplies ? (productiveOk ? `${formatMinutes(stats.productive)} min alcanzados` : `Faltan ${formatMinutes(remainingProductive)} min`) : 'No aplica sin meta productiva' },
-    breaks: { id: 'breaks', label: 'Protege tus Break/Lunch', applies: breaksApplies, ok: breaksOk, rewardXp: 6, detail: breaksApplies ? (breaksOk ? 'Todos dentro de su ventana' : `Faltan ${missingBreaks} pausa(s) a tiempo`) : 'Neutral: no hay pausas programadas' },
-    adherence: { id: 'adherence', label: 'Defiende la Adherencia', applies: adherenceApplies, ok: adherenceOk, rewardXp: 6, detail: adherenceOk ? `${Math.round(adherencePct)}% de ${adherenceGoal}%` : adherenceApplies ? `Faltan ${Math.max(0, Math.ceil(adherenceGoal - adherencePct))} puntos` : 'Neutral: aún sin datos suficientes' },
-    quality: { id: 'quality', label: 'Cuida la calidad de cada llamada', applies: qualityApplies, ok: qualityOk, rewardXp: 6, detail: qualityApplies ? (qualityOk ? 'Sin llamadas caídas ni filas de cero minutos' : 'Revisa llamadas caídas o de cero minutos') : 'Neutral: aún no hay llamadas' },
-    steady: { id: 'steady', label: 'Mantén un ritmo sostenible', applies: steadyApplies, ok: steadyOk, rewardXp: 6, detail: steadyApplies ? (steadyOk ? 'Ritmo y pausas compatibles' : 'Ajusta el ritmo sin saltarte pausas') : 'Neutral: no hay meta productiva' },
-    care: { id: 'care', label: 'Cuida tus pausas programadas', applies: careApplies, ok: careOk, rewardXp: 6, detail: careApplies ? (careOk ? 'Pausas y adherencia cuidadas' : 'Las pausas son parte del turno') : 'Neutral: no hay pausas programadas' },
+    productive: { id: 'productive', label: translateText('Rompe la armadura de productividad'), applies: productiveApplies, ok: productiveOk, rewardXp: 8, detail: productiveApplies ? (productiveOk ? ui`${formatMinutes(stats.productive)} min alcanzados` : ui`Faltan ${formatMinutes(remainingProductive)} min`) : translateText('No aplica sin meta productiva') },
+    breaks: { id: 'breaks', label: translateText('Protege tus Break/Lunch'), applies: breaksApplies, ok: breaksOk, rewardXp: 6, detail: breaksApplies ? (breaksOk ? translateText('Todos dentro de su ventana') : ui`Faltan ${missingBreaks} pausa(s) a tiempo`) : translateText('Neutral: no hay pausas programadas') },
+    adherence: { id: 'adherence', label: translateText('Defiende la Adherencia'), applies: adherenceApplies, ok: adherenceOk, rewardXp: 6, detail: adherenceOk ? ui`${Math.round(adherencePct)}% de ${adherenceGoal}%` : adherenceApplies ? ui`Faltan ${Math.max(0, Math.ceil(adherenceGoal - adherencePct))} puntos` : translateText('Neutral: aún sin datos suficientes') },
+    quality: { id: 'quality', label: translateText('Cuida la calidad de cada llamada'), applies: qualityApplies, ok: qualityOk, rewardXp: 6, detail: qualityApplies ? (qualityOk ? translateText('Sin llamadas caídas ni filas de cero minutos') : translateText('Revisa llamadas caídas o de cero minutos')) : translateText('Neutral: aún no hay llamadas') },
+    steady: { id: 'steady', label: translateText('Mantén un ritmo sostenible'), applies: steadyApplies, ok: steadyOk, rewardXp: 6, detail: steadyApplies ? (steadyOk ? translateText('Ritmo y pausas compatibles') : translateText('Ajusta el ritmo sin saltarte pausas')) : translateText('Neutral: no hay meta productiva') },
+    care: { id: 'care', label: translateText('Cuida tus pausas programadas'), applies: careApplies, ok: careOk, rewardXp: 6, detail: careApplies ? (careOk ? translateText('Pausas y adherencia cuidadas') : translateText('Las pausas son parte del turno')) : translateText('Neutral: no hay pausas programadas') },
   };
   const ids = focus === 'quality' ? ['productive', 'quality', 'adherence'] : focus === 'care' ? ['breaks', 'care', 'adherence'] : ['productive', 'breaks', 'adherence'];
   return ids.map((id) => {
@@ -498,7 +499,7 @@ export function armorPlatesForDay(day = {}) {
   const fallback = ['productive', 'breaks', 'adherence'].map((id) => ({ id, label: id, applies: false, ok: false, status: 'neutral', rewardXp: 0, detail: 'Neutral' }));
   return (missions.length ? missions.slice(0, 3) : fallback).map((mission, index) => {
     const id = mission.id || fallback[index]?.id || `mission-${index + 1}`;
-    return { id, index: index + 1, active: mission.applies !== false && mission.status !== 'neutral', complete: mission.ok === true, status: mission.status || (mission.ok ? 'complete' : 'pending'), label: mission.label, rewardXp: mission.rewardXp || 0, detail: mission.detail };
+    return { id, index: index + 1, active: mission.applies !== false && mission.status !== 'neutral', complete: mission.ok === true, status: mission.status || (mission.ok ? 'complete' : 'pending'), label: mission.label, rewardXp: mission.rewardXp || 0, detail: translateStoredText(mission.detail) };
   });
 }
 
@@ -678,7 +679,7 @@ function renderArena() {
   const monsterPhase = day.phase || monsterPhaseFor(day);
   const variant = monsterVariantFor(day);
   const customName = sanitizeMonsterName(settings.game.monsterName);
-  const displayName = customName || day.species.name;
+  const displayName = customName || translateText(day.species.name);
   const shadow = yesterdayShadowPct(dayKey);
   const damage = Math.max(0, day.goal.usd - day.stats.earnings);
   const renderKey = [dayKey, monsterState, monsterPhase, variant, displayName, day.combo, day.stats.earnings.toFixed(2), Math.round(day.hpPct * 10), Math.round((shadow ?? -1) * 10), day.missions.map((mission) => mission.ok ? 1 : 0).join(''), Object.values(state.game.equipment || {}).join('|')].join(':');
@@ -697,25 +698,25 @@ function renderArena() {
   root.style.setProperty('--game-hp-after', `${day.hpPct}%`);
   root.dataset.gamePhase = monsterPhase;
   root.dataset.gameIntensity = 'arcade';
-  const monsterImageLabel = `${displayName}${customName ? `, ${day.species.name}` : ''}, ${PHASE_LABELS[monsterPhase] || monsterPhase}, ${Math.round(day.hpPct)}% de vida`;
+  const monsterImageLabel = ui`${displayName}${customName ? `, ${translateText(day.species.name)}` : ''}, ${PHASE_LABELS[monsterPhase] || monsterPhase}, ${Math.round(day.hpPct)}% de vida`;
   const sprite = monsterSvg({ species: day.species.id, state: monsterState, variant, hpPct: day.hpPct, sizeClass: 'lg', equipment: state.game.equipment })
     .replace(/ role="img" aria-label="[^"]*"/, ' aria-hidden="true"');
-  root.innerHTML = `
+  root.innerHTML = ui`
     <div class="game-arena-copy">
       <div class="game-kicker">MONSTRUO DEL DÍA · ${escapeHtml(formatCallDayLabel(dayKey))}</div>
       <div class="game-arena-title-row"><h3>${escapeHtml(displayName)}</h3><span class="game-combo-badge">x${day.combo || 0}</span></div>
       <div class="game-phase-meter" data-phase="${escapeHtml(monsterPhase)}" role="status" aria-label="Fase del monstruo: ${escapeHtml(PHASE_LABELS[monsterPhase] || monsterPhase)}"><span>${escapeHtml(PHASE_LABELS[monsterPhase] || monsterPhase)}</span><small>Las ganancias y la vida financiera no cambian por la fase.</small></div>
-      <p class="game-monster-phrase">“${escapeHtml(day.species.phrase)}”</p>
+      <p class="game-monster-phrase">“${escapeHtml(translateText(day.species.phrase))}”</p>
       <div class="game-hp-label"><span>VIDA</span><strong>${Math.round(day.hpPct)}%</strong></div>
       <div class="game-hp-track" role="progressbar" aria-label="Vida del monstruo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(day.hpPct)}">
         <div class="game-hp-damage-trail" style="width:${day.hpPct}%" aria-hidden="true"></div>
         <div class="game-hp-fill" style="width:${day.hpPct}%"></div>
-        ${shadow === null ? '' : `<span class="game-shadow-marker" style="left:${shadow}%" title="Ayer a esta hora: ${Math.round(shadow)}% de la meta"></span>`}
+        ${shadow === null ? '' : ui`<span class="game-shadow-marker" style="left:${shadow}%" title="Ayer a esta hora: ${Math.round(shadow)}% de la meta"></span>`}
       </div>
-      <div class="game-hp-foot"><span>${withConversion(damage)} de vida restante</span><span>${day.defeated ? 'Botín extra: las ganancias siguen, el XP no' : `${withConversion(day.stats.earnings)} de daño`}</span></div>
+      <div class="game-hp-foot"><span>${withConversion(damage)} de vida restante</span><span>${day.defeated ? translateText('Botín extra: las ganancias siguen, el XP no') : ui`${withConversion(day.stats.earnings)} de daño`}</span></div>
     </div>
     <div class="game-monster-stage" role="img" aria-label="${escapeHtml(monsterImageLabel)}">${sprite}</div>
-    <div class="game-pixel-arena-hint">${gamePixelIcon('shield')}<span>${day.defeated ? 'Meta alcanzada. Las ganancias extra siguen contando.' : `${day.missions.filter((mission) => mission.applies !== false && !mission.ok).length} armaduras pendientes · completa tus misiones del día.`}</span></div>`;
+    <div class="game-pixel-arena-hint">${gamePixelIcon('shield')}<span>${day.defeated ? translateText('Meta alcanzada. Las ganancias extra siguen contando.') : ui`${day.missions.filter((mission) => mission.applies !== false && !mission.ok).length} armaduras pendientes · completa tus misiones del día.`}</span></div>`;
 }
 
 function renderMissions() {
@@ -729,14 +730,14 @@ function renderMissions() {
   const dayKey = displayedGameDayKey();
   const day = computeGameDay(dayKey);
   const plates = armorPlatesForDay(day);
-  root.innerHTML = `
+  root.innerHTML = ui`
     <div class="game-section-head"><div><span class="game-kicker">3 ARMADURAS</span><h3>Misiones del día</h3></div><div class="game-missions-status"><span>Misiones automáticas</span><strong>${day.missions.filter((mission) => mission.ok).length}/3</strong></div></div>
-    <div class="game-armor-row" role="list" aria-label="Placas de armadura">${plates.map((plate, index) => `<div class="game-armor-plate ${plate.complete ? 'is-complete' : ''} ${plate.status === 'neutral' ? 'is-neutral' : ''}" data-armor-id="${escapeHtml(plate.id)}" role="listitem" aria-label="Placa ${index + 1}: ${escapeHtml(plate.label)}. ${plate.status === 'neutral' ? 'Neutral' : plate.complete ? 'Completada' : 'Pendiente'}"><span aria-hidden="true">${gamePixelIcon(plate.complete ? 'check' : 'shield')}</span><b>${index + 1}</b></div>`).join('')}</div>
-    <div class="game-mission-grid" role="list" aria-label="Misiones del día">${day.missions.map((mission, index) => `
-      <div class="game-mission ${mission.ok ? 'is-complete' : ''} ${mission.status === 'neutral' ? 'is-neutral' : ''}" role="listitem" aria-label="${escapeHtml(`Misión ${index + 1}: ${mission.label}. ${mission.status === 'neutral' ? 'Neutral' : mission.ok ? 'Completada' : 'Pendiente'}. ${mission.detail}`)}">
+    <div class="game-armor-row" role="list" aria-label="Placas de armadura">${plates.map((plate, index) => ui`<div class="game-armor-plate ${plate.complete ? 'is-complete' : ''} ${plate.status === 'neutral' ? 'is-neutral' : ''}" data-armor-id="${escapeHtml(plate.id)}" role="listitem" aria-label="Placa ${index + 1}: ${escapeHtml(plate.label)}. ${plate.status === 'neutral' ? translateText('Neutral') : plate.complete ? translateText('Completada') : translateText('Pendiente')}"><span aria-hidden="true">${gamePixelIcon(plate.complete ? 'check' : 'shield')}</span><b>${index + 1}</b></div>`).join('')}</div>
+    <div class="game-mission-grid" role="list" aria-label="Misiones del día">${day.missions.map((mission, index) => ui`
+      <div class="game-mission ${mission.ok ? 'is-complete' : ''} ${mission.status === 'neutral' ? 'is-neutral' : ''}" role="listitem" aria-label="${escapeHtml(ui`Misión ${index + 1}: ${mission.label}. ${mission.status === 'neutral' ? translateText('Neutral') : mission.ok ? translateText('Completada') : translateText('Pendiente')}. ${mission.detail}`)}">
         <span class="game-armor" aria-hidden="true">${gamePixelIcon(mission.ok ? 'check' : index === 0 ? 'sword' : index === 1 ? 'cup' : 'shield')}</span>
-        <div><b>${index + 1}. ${escapeHtml(mission.label)}</b><span>${escapeHtml(mission.detail)}</span></div>
-        <small class="game-mission-reward">${mission.status === 'neutral' ? 'Sin recompensa: no aplica' : `Recompensa individual · ${mission.rewardXp} XP`}</small>
+        <div><b>${index + 1}. ${escapeHtml(mission.label)}</b><span>${escapeHtml(translateStoredText(mission.detail))}</span></div>
+        <small class="game-mission-reward">${mission.status === 'neutral' ? translateText('Sin recompensa: no aplica') : ui`Recompensa individual · ${mission.rewardXp} XP`}</small>
       </div>`).join('')}</div>`;
 }
 
@@ -770,7 +771,7 @@ function cycleBossSnapshot() {
 function cycleRewardOptionsFor(cycleKey) {
   const accessory = nextUnownedAccessory(`cycle-reward:${cycleKey}`);
   return [
-    { id: 'cycle-xp', type: 'xp', amount: 35, label: '35 XP de temporada' },
+    { id: 'cycle-xp', type: 'xp', amount: 35, label: translateText('35 XP de temporada') },
     ...(accessory ? [{ id: 'cycle-accessory', type: 'accessory', accessory, amount: 0, label: accessory }] : []),
   ];
 }
@@ -841,7 +842,7 @@ export function chooseCycleReward(choiceId) {
   state.game.level = levelForXp(state.game.totalXp);
   state.game.ledger[key] = { type: 'cycle-reward', cycleKey: pending.cycleKey, choiceId: option.id, gross: Number(option.amount) || 0, applied, accessory: option.accessory || null };
   state.game.cycleReward = { pending: false, cycleKey: null, options: [] };
-  queueGameToast(`🏆 Recompensa del ciclo · ${option.label}`, 'loot');
+  queueGameToast(ui`🏆 Recompensa del ciclo · ${option.label}`, 'loot');
   saveStateOnly();
   renderGame();
   return true;
@@ -866,17 +867,17 @@ function renderCycleBosses() {
     const progress = role('cycle-progress');
     const earned = role('cycle-earned');
     const goal = role('cycle-goal');
-    if (title) title.textContent = boss.defeated ? 'JEFE DERROTADO' : 'El Guardián de la Quincena';
-    if (status) status.textContent = boss.defeated ? 'DERROTADO' : boss.hp <= 25 ? 'CASI CAE' : 'EN MARCHA';
+    if (title) title.textContent = boss.defeated ? translateText('JEFE DERROTADO') : translateText('El Guardián de la Quincena');
+    if (status) status.textContent = boss.defeated ? translateText('DERROTADO') : boss.hp <= 25 ? translateText('CASI CAE') : translateText('EN MARCHA');
     if (subtitle) subtitle.textContent = boss.defeated
-      ? 'Meta del ciclo cumplida. El botín real sigue siendo tu pago.'
-      : `Progreso del ciclo: ${Math.round(boss.pct)}%.`;
+      ? translateText('Meta del ciclo cumplida. El botín real sigue siendo tu pago.')
+      : ui`Progreso del ciclo: ${Math.round(boss.pct)}%.`;
     if (progress) {
       progress.style.width = `${boss.pct}%`;
       progress.parentElement?.setAttribute('aria-valuenow', String(Math.round(boss.pct)));
     }
     if (earned) earned.textContent = withConversion(boss.cycle.earnings);
-    if (goal) goal.textContent = `Meta ${withConversion(boss.goal)}`;
+    if (goal) goal.textContent = ui`Meta ${withConversion(boss.goal)}`;
     let choice = root.querySelector('[data-game-dynamic="cycle-choice"]');
     if (!choice) {
       choice = document.createElement('div');
@@ -886,7 +887,7 @@ function renderCycleBosses() {
     const pending = state.game.cycleReward?.pending && state.game.cycleReward.options?.length;
     choice.className = 'game-cycle-choice';
     choice.hidden = !pending;
-    choice.innerHTML = pending ? `<strong>Elige tu recompensa del ciclo</strong><div>${state.game.cycleReward.options.map((option) => `<button type="button" data-game-action="choose-cycle-reward" data-cycle-reward="${escapeHtml(option.id)}">${escapeHtml(option.label)}</button>`).join('')}</div>` : '';
+    choice.innerHTML = pending ? ui`<strong>Elige tu recompensa del ciclo</strong><div>${state.game.cycleReward.options.map((option) => ui`<button type="button" data-game-action="choose-cycle-reward" data-cycle-reward="${escapeHtml(option.id)}">${escapeHtml(translateStoredText(option.label))}</button>`).join('')}</div>` : '';
   });
 }
 function syncCycleBossAchievement() {
@@ -899,7 +900,7 @@ function syncCycleBossAchievement() {
   if (state.game.ledger[key]) return false;
   state.game.ledger[key] = true;
   state.game.cycleReward = { pending: true, cycleKey: endKey, options: cycleRewardOptionsFor(endKey) };
-  queueGameToast(`🏆 JEFE DEL CICLO DERROTADO · ${withConversion(boss.cycle.earnings)}`, 'record');
+  queueGameToast(ui`🏆 JEFE DEL CICLO DERROTADO · ${withConversion(boss.cycle.earnings)}`, 'record');
   return true;
 }
 
@@ -931,16 +932,16 @@ function renderBestiary() {
   if (!list) return;
   const speciesHtml = catalog.map((entry) => {
     const found = seen.get(entry.id);
-    return `<article class="game-collection-card ${found ? 'is-unlocked' : 'is-locked'}">
+    return ui`<article class="game-collection-card ${found ? 'is-unlocked' : 'is-locked'}">
       <div class="game-bestiary-sprite">${monsterSvg({ species: entry.id, state: found ? 'defeated' : 'sleeping', variant: found?.monster?.variant || 'normal', hpPct: found ? 0 : 100, sizeClass: 'md' })}</div>
-      <strong>${found ? escapeHtml(entry.name) : '???'}</strong>
-      <small>${found ? `${formatCallDayLabel(found.key)} · ${'★'.repeat(found.stars || 1)}` : 'Derrota esta especie para revelarla'}</small>
+      <strong>${found ? escapeHtml(translateText(entry.name)) : '???'}</strong>
+      <small>${found ? `${formatCallDayLabel(found.key)} · ${'★'.repeat(found.stars || 1)}` : translateText('Derrota esta especie para revelarla')}</small>
     </article>`;
   }).join('');
-  const accessoriesHtml = state.game.accessories.map((accessory) => `
+  const accessoriesHtml = state.game.accessories.map((accessory) => ui`
     <article class="game-collection-card is-unlocked game-accessory-card">
       <div class="game-bestiary-sprite" aria-hidden="true">✦</div>
-      <strong>${escapeHtml(accessory)}</strong>
+      <strong>${escapeHtml(translateText(accessory))}</strong>
       <small>Accesorio desbloqueado</small>
     </article>`).join('');
   list.innerHTML = speciesHtml + accessoriesHtml;
@@ -964,19 +965,19 @@ function renderGameProgressRoadmap() {
   const next = nextRewardsSnapshot(currentGameDayKey());
   const nextGoals = dynamicPanelNode(document.getElementById('gameAchievementsSummary'), 'next-goals', 'game-next-goals');
   if (nextGoals) {
-    nextGoals.innerHTML = `<strong>Próximas recompensas</strong><div>${[
-      next.nextImpulse ? `Impulso x${next.nextImpulse} · ${next.nextImpulseRemaining} llamada(s)` : 'Impulsos del día completados',
-      `Caja x${next.nextLoot} · ${next.nextLootRemaining} llamada(s)`,
-      `Nivel ${next.level.next} · ${next.level.xpRemaining} XP`,
-    ].map((label) => `<span class="game-next-goal">${escapeHtml(label)}</span>`).join('')}</div>`;
+    nextGoals.innerHTML = ui`<strong>Próximas recompensas<span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Próximas recompensas" aria-describedby="nextRewardsInfo">i</button><span class="sched-help-tooltip" id="nextRewardsInfo" role="tooltip">Impulso: bonus de XP por mantener una serie de llamadas. Caja: recompensa de juego por llamadas completadas. Los contadores indican cuánto falta para cada hito; respetan los límites diarios y no cambian tu pago.</span></span></strong><div>${[
+      next.nextImpulse ? ui`Impulso x${next.nextImpulse} · ${next.nextImpulseRemaining} llamada(s)` : translateText('Impulsos del día completados'),
+      ui`Caja x${next.nextLoot} · ${next.nextLootRemaining} llamada(s)`,
+      ui`Nivel ${next.level.next} · ${next.level.xpRemaining} XP`,
+    ].map((label) => ui`<span class="game-next-goal">${escapeHtml(label)}</span>`).join('')}</div>`;
   }
 
   const levelRoot = document.getElementById('gameLevelPanel');
   const roadmap = dynamicPanelNode(levelRoot, 'unlock-roadmap', 'game-unlock-roadmap');
   if (roadmap) {
-    const roadmapItems = [...UNLOCK_ROADMAP, ...ACCESSORY_CATALOG.map((item) => ({ level: item.unlockLevel, id: item.id, label: `${item.label} · ranura ${item.slot}` }))];
-    roadmap.innerHTML = roadmapItems.map((item) => `<div class="${item.level <= level.level ? 'is-unlocked' : 'is-locked'}"><strong>Nivel ${item.level}</strong><small>${escapeHtml(item.label)}</small></div>`).join('');
-    roadmap.setAttribute('aria-label', `Desbloqueos del nivel ${level.level}`);
+    const roadmapItems = [...UNLOCK_ROADMAP, ...ACCESSORY_CATALOG.map((item) => ({ level: item.unlockLevel, id: item.id, label: ui`${translateText(item.label)} · ranura ${slotLabel(item.slot)}` }))];
+    roadmap.innerHTML = roadmapItems.map((item) => ui`<div class="${item.level <= level.level ? 'is-unlocked' : 'is-locked'}"><strong>Nivel ${item.level}</strong><small>${escapeHtml(translateText(item.label))}</small></div>`).join('');
+    roadmap.setAttribute('aria-label', ui`Desbloqueos del nivel ${level.level}`);
   }
 
   const equipmentPanel = document.getElementById('gameEquipmentPanel');
@@ -993,14 +994,27 @@ function renderGameProgressRoadmap() {
       const levelUnlocked = level.level >= item.unlockLevel;
       const active = equipped[item.slot] === item.label;
       const available = owned && levelUnlocked;
-      const lockedLabel = !owned ? 'Por encontrar' : `Disponible en nivel ${item.unlockLevel}`;
+      const lockedLabel = !owned ? translateText('Por encontrar') : ui`Disponible en nivel ${item.unlockLevel}`;
       const stateName = active ? 'equipped' : available ? 'available' : 'locked';
       const control = available
-        ? `<button type="button" class="game-text-button game-equipment-state" data-game-action="equip-accessory" data-accessory="${escapeHtml(item.label)}" aria-pressed="${active}">${active ? 'Quitar' : 'Equipar'}</button>`
-        : `<span class="game-equipment-state">${escapeHtml(lockedLabel)}</span>`;
-      return `<article class="game-equipment-item ${active ? 'is-equipped' : available ? 'is-owned' : 'is-locked'}" data-equipment-state="${stateName}" role="listitem"><span class="game-equipment-icon" aria-hidden="true">${gamePixelIcon(item.slot === 'body' ? 'shield' : item.slot === 'head' ? 'crown' : 'gem')}</span><span class="game-equipment-copy"><strong>${escapeHtml(item.label)}</strong><small>Ranura ${escapeHtml(item.slot)} · nivel ${item.unlockLevel}</small></span>${control}</article>`;
+        ? ui`<button type="button" class="game-text-button game-equipment-state" data-game-action="equip-accessory" data-accessory="${escapeHtml(item.id)}" aria-pressed="${active}">${active ? translateText('Quitar') : translateText('Equipar')}</button>`
+        : ui`<span class="game-equipment-state">${escapeHtml(lockedLabel)}</span>`;
+      return ui`<article class="game-equipment-item ${active ? 'is-equipped' : available ? 'is-owned' : 'is-locked'}" data-equipment-state="${stateName}" role="listitem"><span class="game-equipment-icon" aria-hidden="true">${gamePixelIcon(item.slot === 'body' ? 'shield' : item.slot === 'head' ? 'crown' : 'gem')}</span><span class="game-equipment-copy"><strong>${escapeHtml(translateText(item.label))}</strong><small>Ranura ${escapeHtml(slotLabel(item.slot))} · nivel ${item.unlockLevel}</small></span>${control}</article>`;
     }).join('');
   }
+}
+
+function slotLabel(slot) {
+  return ({ head: translateText('Cabeza'), neck: translateText('Cuello'), body: translateText('Cuerpo'), back: translateText('Espalda'), face: translateText('Rostro') })[slot] || slot;
+}
+
+function trophyLabel(item) {
+  const label = String(item.label || item.id || '');
+  const streak = label.match(/^(?:Racha de (\d+) días|(\d+)-day streak)$/);
+  if (streak) return ui`Racha de ${streak[1] || streak[2]} días`;
+  const goal = label.match(/^(?:Meta cumplida|Goal completed): (.*)$/);
+  if (String(item.id).startsWith('finance-meta:') && goal) return ui`Meta cumplida: ${goal[1]}`;
+  return translateText(label);
 }
 
 function renderAchievements() {
@@ -1009,7 +1023,7 @@ function renderAchievements() {
   const level = gameLevelProgress();
   const streak = gameStreak();
   const summaryValues = {
-    streak: `${streak} días`,
+    streak: ui`${streak} días`,
     level: String(level.level),
     xp: String(state.game.totalXp),
     shields: String(state.game.shields),
@@ -1024,7 +1038,7 @@ function renderAchievements() {
     const best = streakRoot.querySelector('[data-game-role="streak-best"]');
     const shields = streakRoot.querySelector('[data-game-role="shields"]');
     const week = streakRoot.querySelector('[data-game-role="streak-week"]');
-    if (best) best.textContent = `Mejor: ${state.game.bestStreak}`;
+    if (best) best.textContent = ui`Mejor: ${state.game.bestStreak}`;
     if (shields) shields.textContent = `${state.game.shields}/${GAME_SHIELD_CAP}`;
     if (week) {
       const cells = Array.from(week.querySelectorAll('.game-streak-day'));
@@ -1045,7 +1059,8 @@ function renderAchievements() {
           : status === 'failed' ? 'failed'
           : 'empty';
         cell.dataset.dayState = displayState;
-        const label = `${formatCallDayLabel(key)}: ${displayState}`;
+        const stateLabel = ({ shield: translateText('Protegido con escudo'), done: translateText('Cumplido'), off: translateText('Día libre'), today: translateText('Hoy'), failed: translateText('No cumplido'), empty: translateText('Sin datos') })[displayState];
+        const label = `${formatCallDayLabel(key)}: ${stateLabel}`;
         cell.title = label;
         cell.setAttribute('aria-label', label);
         const mark = cell.querySelector('em');
@@ -1064,7 +1079,7 @@ function renderAchievements() {
     setRole('level', String(level.level));
     setRole('level-emblem', String(level.level));
     setRole('level-xp', `${state.game.totalXp} XP`);
-    setRole('next-level', `Siguiente: ${level.ceiling} XP`);
+    setRole('next-level', ui`Siguiente: ${level.ceiling} XP`);
     const progress = levelRoot.querySelector('[data-game-role="level-progress"]');
     if (progress) {
       progress.style.width = `${level.pct}%`;
@@ -1088,8 +1103,8 @@ function renderAchievements() {
     const list = trophies.querySelector('[data-game-role="trophy-list"]');
     if (count) count.textContent = String(state.game.trophies.length);
     if (list) list.innerHTML = state.game.trophies.length
-      ? state.game.trophies.map((item) => `<div class="game-trophy-row"><span>${gamePixelIcon('star')} ${escapeHtml(item.label || item.id)}</span><strong>${item.earnedOn ? escapeHtml(formatCallDayLabel(item.earnedOn)) : 'Ganado'}</strong></div>`).join('')
-      : '<div class="game-collection-empty">Tus próximos trofeos aparecerán aquí.</div>';
+      ? state.game.trophies.map((item) => ui`<div class="game-trophy-row"><span>${gamePixelIcon('star')} ${escapeHtml(trophyLabel(item))}</span><strong>${item.earnedOn ? escapeHtml(formatCallDayLabel(item.earnedOn)) : translateText('Ganado')}</strong></div>`).join('')
+      : translateMarkup('<div class="game-collection-empty">Tus próximos trofeos aparecerán aquí.</div>');
   }
 
   const records = document.getElementById('gameRecords');
@@ -1097,7 +1112,7 @@ function renderAchievements() {
     const list = records.querySelector('[data-game-role="records-list"]');
     const longest = calls.reduce((best, call) => Math.max(best, Number(call.durationMin) || 0), 0);
     const biggest = calls.reduce((best, call) => Math.max(best, parseMoney(call.pay)), 0);
-    if (list) list.innerHTML = `
+    if (list) list.innerHTML = ui`
       <div class="game-record-row"><span>Mayor pago</span><strong>${withConversion(biggest)}</strong></div>
       <div class="game-record-row"><span>Llamada más larga</span><strong>${formatMinutes(longest)} min</strong></div>
       <div class="game-record-row"><span>Mejor racha semanal</span><strong>${state.game.bestStreak} días</strong></div>`;
@@ -1114,14 +1129,14 @@ function renderAchievements() {
     if (latest) {
       const [key, entry] = latest;
       if (date) date.textContent = formatCallDayLabel(key);
-      if (content) content.innerHTML = `${pixelStars(entry.stars)}<p>${entry.xp} XP · ${entry.monster?.defeated ? 'Monstruo derrotado' : 'Stage guardado'}</p>`;
+      if (content) content.innerHTML = ui`${pixelStars(entry.stars)}<p>${entry.xp} XP · ${entry.monster?.defeated ? translateText('Monstruo derrotado') : translateText('Stage guardado')}</p>`;
       if (button) {
         button.hidden = false;
         button.dataset.dayKey = key;
       }
     } else {
       if (date) date.textContent = '—';
-      if (content) content.innerHTML = `${pixelStars(0)}<p>Aún no hay un STAGE CLEAR guardado.</p>`;
+      if (content) content.innerHTML = ui`${pixelStars(0)}<p>Aún no hay un STAGE CLEAR guardado.</p>`;
       if (button) {
         button.hidden = true;
         delete button.dataset.dayKey;
@@ -1132,7 +1147,7 @@ function renderAchievements() {
     if (pendingChest) {
       pendingChest.hidden = !hasPendingChest;
       pendingChest.innerHTML = hasPendingChest
-        ? `<span aria-hidden="true" class="game-chest-claim-icon">${gamePixelChest()}</span><span class="game-chest-claim-copy"><strong>Cofre sellado desde ${escapeHtml(formatCallDayLabel(state.game.chest.sealedOn))}</strong><small>Tu recompensa ya está lista.</small><button type="button" class="game-text-button" data-game-action="claim-chest">Reclamar ahora</button></span>`
+        ? ui`<span aria-hidden="true" class="game-chest-claim-icon">${gamePixelChest()}</span><span class="game-chest-claim-copy"><strong>Cofre sellado desde ${escapeHtml(formatCallDayLabel(state.game.chest.sealedOn))}</strong><small>Tu recompensa ya está lista.</small><button type="button" class="game-text-button" data-game-action="claim-chest">Reclamar ahora</button></span>`
         : '';
     }
   }
@@ -1154,9 +1169,9 @@ function renderSettingsProfile() {
   if (!profile) return;
   const { seen } = bestiarySnapshot();
   const values = {
-    level: `Nivel ${level.level}`,
+    level: ui`Nivel ${level.level}`,
     xp: `${state.game.totalXp} XP`,
-    streak: `${state.game.bestStreak} días`,
+    streak: ui`${state.game.bestStreak} días`,
     collection: String(seen.size),
   };
   Object.entries(values).forEach(([key, value]) => {
@@ -1232,10 +1247,10 @@ function syncFinanceRewards() {
         const granted = bonus.applied;
         const accessory = nextUnownedAccessory(key);
         if (accessory) state.game.accessories.push(accessory);
-        state.game.trophies.push({ id: key, label: `Meta cumplida: ${row.name}`, earnedOn: dayKey });
+        state.game.trophies.push({ id: key, label: ui`Meta cumplida: ${row.name}`, earnedOn: dayKey });
         state.game.ledger[key] = { type: 'finance-meta', dayKey, bonusXp: granted, gross: bonus.gross, applied: bonus.applied, accessory: accessory || null };
         changed = true;
-        queueGameToast(`🏆 Trofeo desbloqueado: ${row.name}`);
+        queueGameToast(ui`🏆 Trofeo desbloqueado: ${row.name}`);
         return;
       }
 
@@ -1249,7 +1264,7 @@ function syncFinanceRewards() {
         const granted = bonus.applied;
         state.game.ledger[key] = { type: 'finance-paid', dayKey, bonusXp: granted, gross: bonus.gross, applied: bonus.applied };
         changed = true;
-        queueGameToast(granted > 0 ? `+${granted} XP · ${row.name} pagado a tiempo` : `${row.name} pagado · XP diario sellado`);
+        queueGameToast(granted > 0 ? ui`+${granted} XP · ${row.name} pagado a tiempo` : ui`${row.name} pagado · XP diario sellado`);
       }
     });
   });
@@ -1500,13 +1515,13 @@ function showCallFx(call, xp, critical, mode = 'xp') {
   }
   const amount = parseMoney(call.pay) + higherRateBonusAmount(call);
   const message = mode === 'recorded'
-    ? `LLAMADA REGISTRADA · ${withConversion(amount)} · sin XP por esta llamada`
+    ? ui`LLAMADA REGISTRADA · ${withConversion(amount)} · sin XP por esta llamada`
     : mode === 'extra'
-    ? `BOTÍN EXTRA · ${withConversion(amount)}`
+    ? ui`BOTÍN EXTRA · ${withConversion(amount)}`
     : xp > 0
-      ? `+${xp} XP · ${withConversion(amount)}`
-      : `XP DIARIO SELLADO · ${withConversion(amount)}`;
-  const fxMarkup = `<span class="game-xp-float ${critical ? 'is-critical' : ''}">${message}</span>`;
+      ? ui`+${xp} XP · ${withConversion(amount)}`
+      : ui`XP DIARIO SELLADO · ${withConversion(amount)}`;
+  const fxMarkup = ui`<span class="game-xp-float ${critical ? 'is-critical' : ''}">${message}</span>`;
   root.innerHTML = fxMarkup;
   const liveBar = document.getElementById('liveActivityBar');
   const liveFx = liveBar?.classList.contains('show') ? document.createElement('span') : null;
@@ -1555,7 +1570,7 @@ export function lootRarityFor(seed, improved = false) {
 export const getLootRarity = lootRarityFor;
 
 function lootRarityLabel(id) {
-  return LOOT_RARITIES.find((rarity) => rarity.id === id)?.label || 'Común';
+  return LOOT_RARITIES.find((rarity) => rarity.id === id)?.label || translateText('Común');
 }
 
 function repairBonusReceipt(receipt) {
@@ -1582,22 +1597,22 @@ function rewardLootBox(dayKey, callCount, { improved = false, source = 'calls' }
     if (accessory) {
       state.game.accessories.push(accessory);
       receipt = { type: 'accessory', accessory, dayKey, gross: 0, applied: 0, rarity, improved, source };
-      reward = `Accesorio ${lootRarityLabel(rarity)}: ${accessory}`;
+      reward = ui`Accesorio ${lootRarityLabel(rarity)}: ${accessory}`;
     } else {
       const bonus = grantDayBonusReceipt(dayKey, improved ? 20 : 10);
       receipt = { type: 'bonusXp', dayKey, ...bonus, rarity, improved, source };
-      reward = bonus.applied > 0 ? `Colección completa · +${bonus.applied} XP` : 'Colección completa · XP diario sellado';
+      reward = bonus.applied > 0 ? ui`Colección completa · +${bonus.applied} XP` : translateText('Colección completa · XP diario sellado');
     }
   } else {
     const bonus = grantDayBonusReceipt(dayKey, 10);
     receipt = { type: 'bonusXp', dayKey, ...bonus, rarity, improved, source };
-    reward = bonus.applied > 0 ? `+${bonus.applied} XP ${lootRarityLabel(rarity).toLowerCase()}` : 'XP diario ya sellado';
+    reward = bonus.applied > 0 ? `+${bonus.applied} XP ${lootRarityLabel(rarity).toLowerCase()}` : translateText('XP diario ya sellado');
   }
   state.game.ledger[ledgerKey] = receipt;
   if (root && gameEnabled()) {
     root.hidden = false;
     root.classList.toggle('is-revealing', arcadeEnabled());
-    root.innerHTML = `<span class="game-loot-icon">?</span><div><b>CAJA ${escapeHtml(lootRarityLabel(rarity).toUpperCase())}</b><span>${escapeHtml(reward)}</span></div>`;
+    root.innerHTML = ui`<span class="game-loot-icon">?</span><div><b>CAJA ${escapeHtml(lootRarityLabel(rarity).toUpperCase())}</b><span>${escapeHtml(reward)}</span></div>`;
     setTimeout(() => {
       root.hidden = true;
       root.classList.remove('is-revealing');
@@ -1682,9 +1697,9 @@ function reconcileLiveComboAndLoot(dayKey, snapshot, { allowRewards = true } = {
         dayEntry(dayKey).impulse = impulse;
         state.game.ledger[key] = { type: 'impulse', dayKey, milestone, applied: 0, gross: 0 };
         if (milestone === 8) rewardLootBox(dayKey, milestone, { improved: true, source: 'impulse' });
-        if (milestone === 3) queueGameToast('Buen ritmo · 3 llamadas elegibles', 'impulse');
-        if (milestone === 5) queueGameToast('Impulso estable · tu caja de 5 llamadas se conserva', 'impulse');
-        if (milestone === 8) queueGameToast('Impulso mejorado · caja de rareza elevada', 'loot');
+        if (milestone === 3) queueGameToast(translateText('Buen ritmo · 3 llamadas elegibles'), 'impulse');
+        if (milestone === 5) queueGameToast(translateText('Impulso estable · tu caja de 5 llamadas se conserva'), 'impulse');
+        if (milestone === 8) queueGameToast(translateText('Impulso mejorado · caja de rareza elevada'), 'loot');
         triggerGameEvent('gameArena', milestone === 8 ? 'clear' : 'hit', 700);
         playGameTone(milestone === 8 ? 'impulse' : 'hit');
       }
@@ -1698,7 +1713,7 @@ function recordPhaseEvent(dayKey, phase, previousPhase = null) {
   if (state.game.ledger[key]) return false;
   state.game.ledger[key] = { type: 'phase-event', dayKey, phase, gross: 0, applied: 0 };
   if (dayKey !== currentGameDayKey() || dayKey !== displayedGameDayKey()) return true;
-  const message = phase === 'defeated' ? 'Monstruo derrotado' : phase === 'vulnerable' ? 'Armadura abierta · el monstruo es vulnerable' : 'El monstruo entra en furia';
+  const message = phase === 'defeated' ? translateText('Monstruo derrotado') : phase === 'vulnerable' ? translateText('Armadura abierta · el monstruo es vulnerable') : translateText('El monstruo entra en furia');
   queueGameToast(message, phase === 'defeated' ? 'record' : 'impulse');
   announceGameStatus(message);
   triggerGameEvent('gameArena', phase === 'defeated' ? 'clear' : 'hit', 850);
@@ -1718,7 +1733,7 @@ function reconcileMissionEvents(dayKey, snapshot, { allowFeedback = true } = {})
     const key = `${prefix}${id}`;
     if (state.game.ledger[key]) return;
     state.game.ledger[key] = { type: 'mission', dayKey, missionId: id, gross: Number(mission.rewardXp) || 0, applied: 0 };
-    queueGameToast(`Armadura rota · ${mission.label} · +${mission.rewardXp} XP al cierre`, 'impulse');
+    queueGameToast(ui`Armadura rota · ${mission.label} · +${mission.rewardXp} XP al cierre`, 'impulse');
     triggerGameEvent('gameMissions', 'mission', 700);
     playGameTone('impulse');
     changed = true;
@@ -1758,8 +1773,8 @@ function maybeShowRecord(call) {
   const payRecord = prior.every((item) => parseMoney(call.pay) > parseMoney(item.pay));
   if (!durationRecord && !payRecord) return;
   const message = durationRecord
-    ? `NUEVO RÉCORD · ${formatMinutes(call.durationMin)} min`
-    : `NUEVO RÉCORD · ${withConversion(parseMoney(call.pay))}`;
+    ? ui`NUEVO RÉCORD · ${formatMinutes(call.durationMin)} min`
+    : ui`NUEVO RÉCORD · ${withConversion(parseMoney(call.pay))}`;
   showGameRecordBanner(message);
 }
 
@@ -1808,10 +1823,10 @@ export function rewardSurpriseForCall(call, dayKey, { random = Math.random } = {
       if (root) {
         root.hidden = false;
         root.classList.toggle('is-revealing', arcadeEnabled() && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
-        root.innerHTML = `<span class="game-loot-icon">🎁</span><div><b>COFRE SORPRESA</b><span>${bonus.applied ? `+${bonus.applied} XP` : 'Tu constancia cuenta · XP diario sellado'}</span></div>`;
+        root.innerHTML = ui`<span class="game-loot-icon">🎁</span><div><b>COFRE SORPRESA</b><span>${bonus.applied ? `+${bonus.applied} XP` : translateText('Tu constancia cuenta · XP diario sellado')}</span></div>`;
         setTimeout(() => { root.hidden = true; root.classList.remove('is-revealing'); }, 4200);
       }
-      queueGameToast(bonus.applied ? `🎁 Cofre sorpresa · +${bonus.applied} XP` : '🎁 Cofre sorpresa · XP diario sellado', 'loot');
+      queueGameToast(bonus.applied ? ui`🎁 Cofre sorpresa · +${bonus.applied} XP` : translateText('🎁 Cofre sorpresa · XP diario sellado'), 'loot');
     }
   }
   saveStateOnly();
@@ -1947,7 +1962,7 @@ export function onGameCallSaved(call, source = 'manual', options = {}) {
     if (!state.game.ledger[defeatKey]) {
       state.game.ledger[defeatKey] = true;
       defeatedNow = true;
-      queueGameToast('💥 MONSTRUO DERROTADO · botín del día asegurado', 'record');
+      queueGameToast(translateText('💥 MONSTRUO DERROTADO · botín del día asegurado'), 'record');
     }
   }
 
@@ -1987,7 +2002,7 @@ export function onGameGapSaved(dayKey, gapKey, label) {
     const granted = grantDayBonus(dayKey, 5);
     if (granted > 0) {
       state.game.ledger[key] = true;
-      queueGameToast(`+${granted} XP · Hueco clasificado`);
+      queueGameToast(ui`+${granted} XP · Hueco clasificado`);
     } else {
       queueGameToast('Hueco clasificado · XP diario sellado');
     }
@@ -2033,7 +2048,7 @@ export function onGameCallsChanged(dayKey) {
         entry.xpLocked = Number.isFinite(existingLock) ? Math.min(existingLock, raw.xp) : raw.xp;
         if (!state.game.ledger[defeatKey]) {
           state.game.ledger[defeatKey] = true;
-          if (enabled) queueGameToast(`💥 MONSTRUO DEL ${formatCallDayLabel(normalizedDayKey)} DERROTADO · datos reconciliados`, 'record');
+          if (enabled) queueGameToast(ui`💥 MONSTRUO DEL ${formatCallDayLabel(normalizedDayKey)} DERROTADO · datos reconciliados`, 'record');
         }
       } else {
         delete entry.xpLocked;
@@ -2070,7 +2085,7 @@ export function onGameCallsChanged(dayKey) {
     const defeatKey = `monster-defeat:${normalizedDayKey}`;
     if (!state.game.ledger[defeatKey]) {
       state.game.ledger[defeatKey] = true;
-      if (enabled && !frozenMonster.defeated) queueGameToast(`💥 MONSTRUO DEL ${formatCallDayLabel(normalizedDayKey)} DERROTADO · ganancias actualizadas`, 'record');
+      if (enabled && !frozenMonster.defeated) queueGameToast(ui`💥 MONSTRUO DEL ${formatCallDayLabel(normalizedDayKey)} DERROTADO · ganancias actualizadas`, 'record');
     }
   }
   else {
@@ -2207,7 +2222,7 @@ export function onGameShiftStarted({ continued = false } = {}) {
   // apagar gamificación, reabrir turno y volverla a encender deja XP/cofre/finalizado congelados.
   if (hadFinalizedDay) {
     revokeStageClear(dayKey, { silent: !enabled });
-    if (enabled) queueGameToast('STAGE CLEAR reabierto · el nuevo turno se sumará al cierre de hoy');
+    if (enabled) queueGameToast(translateText('STAGE CLEAR reabierto · el nuevo turno se sumará al cierre de hoy'));
   }
 
   if (continued) {
@@ -2335,16 +2350,16 @@ function freezeGameDay(dayKey, { projectStreak = false } = {}) {
   const streak = gameStreak();
   state.game.bestStreak = recomputeBestStreak();
   if (state.game.bestStreak > bestStreakBefore) {
-    showGameRecordBanner(`NUEVO RÉCORD · Racha ${state.game.bestStreak} días`);
+    showGameRecordBanner(ui`NUEVO RÉCORD · Racha ${state.game.bestStreak} días`);
   }
   const shieldKey = `streak-shield:${dayKey}:${streak}`;
   if (streak >= 7 && streak % 7 === 0 && !state.game.ledger[shieldKey] && state.game.shields < GAME_SHIELD_CAP) {
     state.game.ledger[shieldKey] = true;
     entry.rollback.streakShieldAwardedKey = shieldKey;
     state.game.shields++;
-    queueGameToast('◆ Escudo ganado por racha semanal', 'loot');
+    queueGameToast(translateText('◆ Escudo ganado por racha semanal'), 'loot');
   }
-  if (state.game.level > oldLevel) queueGameToast(`NIVEL ${state.game.level} DESBLOQUEADO`, 'record');
+  if (state.game.level > oldLevel) queueGameToast(ui`NIVEL ${state.game.level} DESBLOQUEADO`, 'record');
   if (snapshot.stats.total || snapshot.eligibleCalls.length) {
     state.game.chest = { pending: true, sealedOn: dayKey };
   }
@@ -2353,7 +2368,7 @@ function freezeGameDay(dayKey, { projectStreak = false } = {}) {
 }
 
 function pixelStars(count) {
-  return `<div class="game-clear-stars game-pixel-stars" role="img" aria-label="${Number(count) || 0} de 3 estrellas">${[1, 2, 3].map((index) => `<span class="${index <= count ? 'is-earned' : 'is-empty'}">${gamePixelIcon('star')}</span>`).join('')}</div>`;
+  return ui`<div class="game-clear-stars game-pixel-stars" role="img" aria-label="${Number(count) || 0} de 3 estrellas">${[1, 2, 3].map((index) => ui`<span class="${index <= count ? 'is-earned' : 'is-empty'}">${gamePixelIcon('star')}</span>`).join('')}</div>`;
 }
 
 function stageClearMarkup(dayKey, entry) {
@@ -2362,7 +2377,7 @@ function stageClearMarkup(dayKey, entry) {
     ? entry.hasActivity
     : Number(entry.callCount) > 0 || !!fallback.stats.total || !!fallback.eligibleCalls.length;
   if (!hasActivity) {
-    return `<div class="game-stage-clear game-stage-clear--empty"><span class="game-kicker">TURNO CERRADO</span><h2>Día guardado</h2><p>Hoy no hubo llamadas completadas. Puedes descansar y retomar mañana a tu ritmo.</p></div>`;
+    return ui`<div class="game-stage-clear game-stage-clear--empty"><span class="game-kicker">TURNO CERRADO</span><h2>Día guardado</h2><p>Hoy no hubo llamadas completadas. Puedes descansar y retomar mañana a tu ritmo.</p></div>`;
   }
 
   const breakdown = entry.xpBreakdown || fallback.xpBreakdown;
@@ -2371,11 +2386,11 @@ function stageClearMarkup(dayKey, entry) {
   const yesterdayDelta = earnings - (Number(comparisons.yesterdayEarnings) || 0);
   const yesterdayText = comparisons.yesterdayHasData
     ? `${withConversion(comparisons.yesterdayEarnings)} · ${yesterdayDelta >= 0 ? '+' : '−'}${withConversion(Math.abs(yesterdayDelta))}`
-    : 'Sin referencia';
+    : translateText('Sin referencia');
   const recordBefore = Math.max(0, Number(comparisons.recordBefore) || 0);
   const recordText = recordBefore > 0
-    ? (earnings > recordBefore ? `NUEVO RÉCORD · +${withConversion(earnings - recordBefore)}` : withConversion(recordBefore))
-    : 'Primer registro';
+    ? (earnings > recordBefore ? ui`NUEVO RÉCORD · +${withConversion(earnings - recordBefore)}` : withConversion(recordBefore))
+    : translateText('Primer registro');
   const totalXpAfter = Number.isFinite(Number(entry.totalXpAfter)) ? Number(entry.totalXpAfter) : state.game.totalXp;
   const levelAfter = Math.max(1, Number(entry.levelAfter) || levelForXp(totalXpAfter));
   const nextLevelXp = Math.max(totalXpAfter, Number(entry.nextLevelXp) || xpThresholdForLevel(levelAfter + 1));
@@ -2383,14 +2398,14 @@ function stageClearMarkup(dayKey, entry) {
   const monster = entry.monster || { defeated: false, hpPct: fallback.hpPct };
   const monsterName = sanitizeMonsterName(settings.game.monsterName) || fallback.species.name;
   const monsterOutcome = monster.defeated
-    ? `Monstruo derrotado: ${monsterName}`
-    : `Escapó con ${Math.round(monster.hpPct)}% de vida: ${monsterName}`;
+    ? ui`Monstruo derrotado: ${monsterName}`
+    : ui`Escapó con ${Math.round(monster.hpPct)}% de vida: ${monsterName}`;
   const evidence = closingEvidenceForDay(dayKey, { ...fallback, stats: { ...fallback.stats, earnings } }, comparisons);
   evidence.projection = entry.closingEvidence?.projection || null;
-  const evidenceMarkup = `<div class="game-stage-missions"><h3>${evidence.things.length === 3 ? 'Tres cosas que hiciste bien hoy' : 'Lo que hiciste bien hoy'}</h3>${evidence.things.map((text) => `<p>${escapeHtml(text)}</p>`).join('')}${evidence.projection ? `<p>${escapeHtml(evidence.projection)}</p>` : ''}</div>`;
-  if (!settings.game.enabled) return `<div class="game-stage-clear"><span class="game-kicker">DÍA GUARDADO</span>${evidenceMarkup}<p>Puedes descansar y retomar mañana a tu ritmo.</p></div>`;
+  const evidenceMarkup = ui`<div class="game-stage-missions"><h3>${evidence.things.length === 3 ? translateText('Tres cosas que hiciste bien hoy') : translateText('Lo que hiciste bien hoy')}</h3>${evidence.things.map((text) => ui`<p>${escapeHtml(text)}</p>`).join('')}${evidence.projection ? ui`<p>${escapeHtml(translateStoredText(evidence.projection))}</p>` : ''}</div>`;
+  if (!settings.game.enabled) return ui`<div class="game-stage-clear"><span class="game-kicker">DÍA GUARDADO</span>${evidenceMarkup}<p>Puedes descansar y retomar mañana a tu ritmo.</p></div>`;
 
-  return `<div class="game-stage-clear">
+  return ui`<div class="game-stage-clear">
     <span class="game-kicker">STAGE CLEAR</span>
     <h2 class="game-pixel-clear-title">STAGE CLEAR</h2>
     ${pixelStars(entry.stars || 1)}
@@ -2402,8 +2417,8 @@ function stageClearMarkup(dayKey, entry) {
       <div><span>Récord diario previo</span><strong>${recordText}</strong></div>
     </div>
     <div class="game-stage-breakdown"><span>Productividad +${breakdown.productivityXp}</span><span>Llamadas +${breakdown.callsXp}</span><span>Adherencia +${breakdown.adherenceXp}</span><span>Puntualidad +${breakdown.punctualityXp}</span><span>Misiones +${breakdown.missionXp}</span></div>
-    <div class="game-stage-missions">${entry.missions.map((mission) => `<span class="${mission.ok ? 'is-complete' : ''}">${mission.ok ? '✓' : '○'} ${escapeHtml(mission.detail)}</span>`).join('')}</div>
-    <div class="game-stage-next-level"><span>Nivel ${levelAfter}</span><strong>${xpToNext > 0 ? `${xpToNext} XP para nivel ${levelAfter + 1}` : 'Nivel completado'}</strong></div>
+    <div class="game-stage-missions">${entry.missions.map((mission) => ui`<span class="${mission.ok ? 'is-complete' : ''}">${mission.ok ? '✓' : '○'} ${escapeHtml(translateStoredText(mission.detail))}</span>`).join('')}</div>
+    <div class="game-stage-next-level"><span>Nivel ${levelAfter}</span><strong>${xpToNext > 0 ? ui`${xpToNext} XP para nivel ${levelAfter + 1}` : translateText('Nivel completado')}</strong></div>
     <div class="game-sealed-chest">${gamePixelChest()}<span>Cofre sellado · reclámalo en Logros o al iniciar tu próximo día</span></div>
   </div>`;
 }
@@ -2443,10 +2458,10 @@ function chestReward(sealedOn) {
   if (roll === 0) {
     const accessory = nextUnownedAccessory(`${sealedOn}:accessory`);
     if (accessory) return { type: 'accessory', label: accessory, rarity };
-    return { type: 'xp', amount: rarity === 'epic' ? 50 : 25, label: `${rarity === 'epic' ? 50 : 25} monedas de XP`, rarity };
+    return { type: 'xp', amount: rarity === 'epic' ? 50 : 25, label: ui`${rarity === 'epic' ? 50 : 25} monedas de XP`, rarity };
   }
   const amount = roll === 1 ? 25 : 40;
-  return { type: 'xp', amount, label: `${amount} monedas de XP`, rarity };
+  return { type: 'xp', amount, label: ui`${amount} monedas de XP`, rarity };
 }
 
 function openPendingChest(todayKey, { allowSameDay = false } = {}) {
@@ -2455,7 +2470,7 @@ function openPendingChest(todayKey, { allowSameDay = false } = {}) {
   const sealedOn = state.game.chest.sealedOn;
   const key = `chest:${sealedOn}`;
   const reward = chestReward(sealedOn);
-  const displayReward = `${lootRarityLabel(reward.rarity)} · ${reward.label}`;
+  const displayReward = `${lootRarityLabel(reward.rarity)} · ${translateStoredText(reward.label)}`;
   const oldLevel = state.game.level;
   let granted = false;
   if (!state.game.ledger[key]) {
@@ -2469,13 +2484,13 @@ function openPendingChest(todayKey, { allowSameDay = false } = {}) {
 
   const root = document.getElementById('chestContent');
   if (root) {
-    root.innerHTML = `<div class="game-chest-open"><span class="game-kicker">COFRE ABIERTO</span><div class="game-chest-icon">${gamePixelChest(true)}</div><h2>${escapeHtml(displayReward)}</h2><p>${reward.type === 'xp' ? 'Se sumó a tu perfil.' : 'Ya está disponible en tu bestiario.'}</p></div>`;
+    root.innerHTML = ui`<div class="game-chest-open"><span class="game-kicker">COFRE ABIERTO</span><div class="game-chest-icon">${gamePixelChest(true)}</div><h2>${escapeHtml(displayReward)}</h2><p>${reward.type === 'xp' ? translateText('Se sumó a tu perfil.') : translateText('Ya está disponible en tu bestiario.')}</p></div>`;
     openModal('chestModal');
     pixelBurst(root, 'loot');
   }
   if (granted) {
-    queueGameToast(`🎁 Cofre abierto · ${displayReward}`, 'loot');
-    if (state.game.level > oldLevel) queueGameToast(`NIVEL ${state.game.level} DESBLOQUEADO`, 'record');
+    queueGameToast(ui`🎁 Cofre abierto · ${displayReward}`, 'loot');
+    if (state.game.level > oldLevel) queueGameToast(ui`NIVEL ${state.game.level} DESBLOQUEADO`, 'record');
   }
   playGameTone('clear');
   return true;
@@ -2501,7 +2516,7 @@ export function onGamePauseEnded(pauseRecord, { onTime = false } = {}) {
       const bonus = onTime ? grantDayBonusReceipt(dayKey, 5) : { gross: 0, applied: 0 };
       state.game.ledger[key] = { type: 'pause', dayKey, onTime, endedAt: pauseRecord.endedAt, ...bonus };
       saveStateOnly();
-      if (onTime) notifyReinforcement(reinforcementText('pause', { pause: pauseRecord.type === 'lunch' ? 'Lunch' : 'Break', xp: bonus.applied ? ` · +${bonus.applied} XP` : '' }, pauseRecord.startedAt), { channel: 'either' });
+      if (onTime) notifyReinforcement(reinforcementText('pause', { pause: pauseRecord.type === 'lunch' ? translateText('Lunch') : translateText('Break'), xp: bonus.applied ? ` · +${bonus.applied} XP` : '' }, pauseRecord.startedAt), { channel: 'either' });
     }
   }
   if (gameEnabled()) renderGame();
@@ -2534,7 +2549,7 @@ export function equipAccessory(accessoryLabel) {
   state.game.equipment[item.slot] = currently === item.label ? null : item.label;
   saveStateOnly();
   renderGame();
-  announceGameStatus(state.game.equipment[item.slot] ? `${item.label} equipado` : `${item.label} retirado`);
+  announceGameStatus(state.game.equipment[item.slot] ? ui`${translateText(item.label)} equipado` : ui`${translateText(item.label)} retirado`);
   return true;
 }
 
@@ -2556,9 +2571,9 @@ function recordPreviousCycleOutcome() {
     if (state.game.ledger[`cycle-defeat:${endKey}`]) return true;
     state.game.ledger[`cycle-defeat:${endKey}`] = true;
     state.game.cycleReward = { pending: true, cycleKey: endKey, options: cycleRewardOptionsFor(endKey) };
-    queueGameToast(`🏆 JEFE DEL CICLO DERROTADO · ${withConversion(cycle.earnings)}`, 'record');
+    queueGameToast(ui`🏆 JEFE DEL CICLO DERROTADO · ${withConversion(cycle.earnings)}`, 'record');
   } else {
-    queueGameToast(`JEFE HUYÓ HERIDO · ${Math.round(pct)}% · faltaron ${withConversion(Math.max(0, goal - cycle.earnings))}`);
+    queueGameToast(ui`JEFE HUYÓ HERIDO · ${Math.round(pct)}% · faltaron ${withConversion(Math.max(0, goal - cycle.earnings))}`);
   }
   return true;
 }
@@ -2582,22 +2597,22 @@ export function onGameBackupExported() {
   state.game.ledger[key] = true;
   if (state.game.shields < GAME_SHIELD_CAP) {
     state.game.shields++;
-    queueGameToast('◆ Escudo ganado por tu backup semanal', 'loot');
+    queueGameToast(translateText('◆ Escudo ganado por tu backup semanal'), 'loot');
   } else {
-    queueGameToast('Backup semanal listo · ya tienes 3 escudos');
+    queueGameToast(translateText('Backup semanal listo · ya tienes 3 escudos'));
   }
   saveStateOnly();
   renderGame();
 }
 
 function resetGameProgress() {
-  appConfirm('¿Reiniciar todo el progreso de gamificación? Se borran XP, niveles, rachas, escudos, cofres, accesorios, trofeos y bestiario. Tus llamadas, turnos y finanzas no se tocan.', () => {
+  appConfirm(translateText('¿Reiniciar todo el progreso de gamificación? Se borran XP, niveles, rachas, escudos, cofres, accesorios, trofeos y bestiario. Tus llamadas, turnos y finanzas no se tocan.'), () => {
     const reinforcement = normalizeReinforcementState(state.game?.reinforcement);
     state.game = { ...createDefaultGameState(), reinforcement };
     ensureGameState();
     saveStateOnly();
     renderGame();
-    toast('Progreso de gamificación reiniciado');
+    toast(translateText('Progreso de gamificación reiniciado'));
   });
 }
 
@@ -2647,7 +2662,7 @@ export function initGame() {
     monsterNameDraftDirty = false;
     saveSettingsOnly();
     const status = document.getElementById('monsterNameSaveStatus');
-    if (status) status.textContent = name ? `Nombre guardado: ${name}.` : 'Se usarán los nombres del catálogo.';
+    if (status) status.textContent = name ? ui`Nombre guardado: ${name}.` : translateText('Se usarán los nombres del catálogo.');
     renderGame();
   });
   document.getElementById('monsterNameInput')?.addEventListener('input', () => {

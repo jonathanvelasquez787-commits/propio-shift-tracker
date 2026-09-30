@@ -1,3 +1,4 @@
+import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 import { settings, state } from './app-context.js';
 import { notifyReinforcement, reinforcementFeedbackEnabled, reinforcementText } from './reinforcement-feedback.js';
 
@@ -32,8 +33,8 @@ export const PHYSICAL_REWARD_PRESETS = Object.freeze([
 const WINDOWS = new Set(['break', 'lunch', 'shift-end']);
 const TRIGGERS = new Set(['calls', 'recovery', 'daily-goal']);
 const OUTCOMES = new Set(['good', 'difficult', 'learning']);
-const WINDOW_LABELS = Object.freeze({ break: 'próximo Break', lunch: 'próximo Lunch', 'shift-end': 'fin del turno' });
-const TRIGGER_LABELS = Object.freeze({ calls: 'llamadas completadas', recovery: 'recuperación', 'daily-goal': 'meta diaria' });
+const WINDOW_LABELS = Object.freeze({ break: translateText('próximo Break'), lunch: translateText('próximo Lunch'), 'shift-end': translateText('fin del turno') });
+const TRIGGER_LABELS = Object.freeze({ calls: translateText('llamadas completadas'), recovery: translateText('recuperación'), 'daily-goal': translateText('meta diaria') });
 
 export function createDefaultReinforcementState() {
   return { reflections: {}, recoveries: [], pendingRewards: [], claims: [], earnedKeys: {}, progress: {}, recoveryPending: null };
@@ -220,7 +221,7 @@ function evaluateCallRewards(call, dayKey, { silent = false } = {}) {
     const first = earned[0];
     notifyReinforcement(reinforcementText('reward-earned', {
       icon: first.icon, window: WINDOW_LABELS[first.window], name: first.name,
-      extra: earned.length > 1 ? ` · +${earned.length - 1} más` : '',
+      extra: earned.length > 1 ? ui` · +${earned.length - 1} más` : '',
     }, call.id), { channel: 'personal' });
   } else if (!silent && recovered) {
     notifyReinforcement(reinforcementText('recovery', {}, call.id), { channel: 'personal' });
@@ -245,7 +246,7 @@ function renderReflectionModal(call, dayKey) {
   const note = document.getElementById('positiveReflectionNote');
   if (note) note.value = '';
   const title = document.getElementById('positiveReflectionCall');
-  if (title) title.textContent = `Llamada #${call.customerId || 'completada'}`;
+  if (title) title.textContent = ui`Llamada #${call.customerId || 'completada'}`;
   openModal('positiveReflectionModal');
 }
 
@@ -313,15 +314,15 @@ function renderClaimWindow(windowName) {
   if (!root || !title) return false;
   const available = availableForWindow(windowName);
   if (!available.length) return false;
-  title.textContent = windowName === 'shift-end' ? 'Premios para cerrar tu turno' : `Premios para tu ${windowName === 'lunch' ? 'Lunch' : 'Break'}`;
+  title.textContent = windowName === 'shift-end' ? translateText('Premios para cerrar tu turno') : ui`Premios para tu ${windowName === 'lunch' ? translateText('Lunch') : translateText('Break')}`;
   const alternatives = settings.reinforcement.rewards.filter((reward) => reward.enabled && reward.window === windowName);
   root.innerHTML = available.map((item) => {
     const swaps = alternatives.filter((reward) => reward.id !== item.rewardId);
-    return `<article class="physical-reward-claim" data-earned-reward="${escapeHtml(item.id)}">
+    return ui`<article class="physical-reward-claim" data-earned-reward="${escapeHtml(item.id)}">
       <span class="physical-reward-claim-icon" aria-hidden="true">${escapeHtml(item.icon)}</span>
-      <div><strong>${escapeHtml(item.name)}</strong><small>Lo ganaste con ${escapeHtml(TRIGGER_LABELS[item.triggerKey.split(':')[0]] || 'tu constancia')}${item.durationMin > 0 ? ` · ${item.durationMin} min` : ''}${item.costUsd > 0 ? ` · $${item.costUsd.toFixed(2)} ${escapeHtml(convertedAmountText(item.costUsd))}` : ''}</small></div>
+      <div><strong>${escapeHtml(item.name)}</strong><small>Lo ganaste con ${escapeHtml(TRIGGER_LABELS[item.triggerKey.split(':')[0]] || translateText('tu constancia'))}${item.durationMin > 0 ? ` · ${item.durationMin} min` : ''}${item.costUsd > 0 ? ` · $${item.costUsd.toFixed(2)} ${escapeHtml(convertedAmountText(item.costUsd))}` : ''}</small></div>
       <button type="button" data-positive-action="claim" data-earned-id="${escapeHtml(item.id)}">Realizado</button>
-      ${swaps.length ? `<select aria-label="Cambiar premio" data-reward-swap="${escapeHtml(item.id)}">${swaps.map((reward) => `<option value="${escapeHtml(reward.id)}">${escapeHtml(reward.icon)} ${escapeHtml(reward.name)}</option>`).join('')}</select><button type="button" data-positive-action="swap" data-earned-id="${escapeHtml(item.id)}">Cambiar</button>` : ''}
+      ${swaps.length ? ui`<select aria-label="Cambiar premio" data-reward-swap="${escapeHtml(item.id)}">${swaps.map((reward) => ui`<option value="${escapeHtml(reward.id)}">${escapeHtml(reward.icon)} ${escapeHtml(reward.name)}</option>`).join('')}</select><button type="button" data-positive-action="swap" data-earned-id="${escapeHtml(item.id)}">Cambiar</button>` : ''}
     </article>`;
   }).join('');
   return true;
@@ -341,10 +342,10 @@ export function onPositiveRewardWindow(windowName, { manual = false } = {}) {
 function openPendingRewardsNow() {
   const windowName = currentRewardWindow();
   if (!windowName) {
-    toast('Tus premios esperan al próximo Break, Lunch o fin del turno.');
+    toast(translateText('Tus premios esperan al próximo Break, Lunch o fin del turno.'));
     return;
   }
-  if (!onPositiveRewardWindow(windowName, { manual: true })) toast('No hay premios para esta pausa; los demás siguen guardados.');
+  if (!onPositiveRewardWindow(windowName, { manual: true })) toast(translateText('No hay premios para esta pausa; los demás siguen guardados.'));
 }
 
 function claimReward(id) {
@@ -353,7 +354,7 @@ function claimReward(id) {
   const item = state.game.reinforcement.pendingRewards[index];
   if (currentRewardWindow() !== item.window) {
     closeModal('physicalRewardClaimModal');
-    toast('La ventana terminó; el premio sigue guardado para después.');
+    toast(translateText('La ventana terminó; el premio sigue guardado para después.'));
     return;
   }
   state.game.reinforcement.pendingRewards.splice(index, 1);
@@ -372,7 +373,7 @@ function swapReward(id) {
   if (!item) return;
   if (currentRewardWindow() !== item.window) {
     closeModal('physicalRewardClaimModal');
-    toast('La ventana terminó; el premio sigue guardado para después.');
+    toast(translateText('La ventana terminó; el premio sigue guardado para después.'));
     return;
   }
   const select = Array.from(document.querySelectorAll('[data-reward-swap]')).find((node) => node.dataset.rewardSwap === id);
@@ -413,9 +414,9 @@ function openRewardEditor(reward = null, template = null) {
   const source = reward || template || { icon: '🎁', name: '', window: 'break', trigger: 'calls', every: 5, maxPerDay: 1, accumulationTarget: 1, durationMin: 0, costUsd: 0 };
   editingRewardId = reward?.id || null;
   editingTemplateId = reward?.templateId || template?.id || null;
-  document.getElementById('physicalRewardEditorTitle').textContent = reward ? 'Editar premio' : 'Agregar premio';
+  document.getElementById('physicalRewardEditorTitle').textContent = reward ? translateText('Editar premio') : translateText('Agregar premio');
   document.getElementById('physicalRewardIconInput').value = source.icon || '🎁';
-  document.getElementById('physicalRewardNameInput').value = source.name || '';
+  document.getElementById('physicalRewardNameInput').value = (template ? translateText(source.name) : source.name) || '';
   document.getElementById('physicalRewardWindowInput').value = source.window || 'break';
   document.getElementById('physicalRewardTriggerInput').value = source.trigger || 'calls';
   document.getElementById('physicalRewardEveryInput').value = source.every || 5;
@@ -431,14 +432,14 @@ function openRewardEditor(reward = null, template = null) {
 function saveRewardEditor() {
   const reward = rewardEditorValues();
   if (!reward) {
-    toast('Escribe un nombre para el premio.');
+    toast(translateText('Escribe un nombre para el premio.'));
     return;
   }
   const index = settings.reinforcement.rewards.findIndex((item) => item.id === editingRewardId);
   if (index >= 0) settings.reinforcement.rewards[index] = reward;
   else {
     if (settings.reinforcement.rewards.length >= 60) {
-      toast('Ya tienes el máximo de 60 premios.');
+      toast(translateText('Ya tienes el máximo de 60 premios.'));
       return;
     }
     settings.reinforcement.rewards.push(reward);
@@ -446,7 +447,7 @@ function saveRewardEditor() {
   saveSettingsOnly();
   closeModal('physicalRewardEditorModal');
   renderPositiveReinforcement();
-  toast('Premio guardado');
+  toast(translateText('Premio guardado'));
 }
 
 function deleteRewardEditor() {
@@ -464,13 +465,29 @@ function renderSettingsRewards() {
   const ask = document.getElementById('positiveAskAfterCallInput');
   if (enabled) enabled.checked = settings.reinforcement.enabled;
   if (ask) ask.checked = settings.reinforcement.askAfterCall;
-  if (catalog) catalog.innerHTML = PHYSICAL_REWARD_PRESETS.map((preset) => {
-    const added = settings.reinforcement.rewards.find((reward) => reward.templateId === preset.id);
-    return `<article class="physical-reward-template"><span>${escapeHtml(preset.icon)}</span><div><strong>${escapeHtml(preset.name)}</strong><small>${escapeHtml(WINDOW_LABELS[preset.window])} · ${escapeHtml(TRIGGER_LABELS[preset.trigger])}${preset.accumulationTarget > 1 ? ` · ${preset.accumulationTarget} hitos` : ''}${preset.durationMin ? ` · ${preset.durationMin} min` : ''}</small></div><button type="button" data-positive-action="${added ? 'edit-reward' : 'add-preset'}" data-reward-id="${escapeHtml(added?.id || '')}" data-template-id="${escapeHtml(preset.id)}">${added ? 'Editar' : 'Agregar'}</button></article>`;
-  }).join('');
+  const picker = document.getElementById('physicalRewardPresetSelect');
+  if (catalog && picker) {
+    const previous = picker.value;
+    picker.innerHTML = PHYSICAL_REWARD_PRESETS.map(preset => ui`<option value="${escapeHtml(preset.id)}">${escapeHtml(preset.icon)} ${escapeHtml(translateText(preset.name))}</option>`).join('');
+    if (PHYSICAL_REWARD_PRESETS.some(preset => preset.id === previous)) picker.value = previous;
+    syncPresetSelection();
+  }
   if (selected) selected.innerHTML = settings.reinforcement.rewards.length
-    ? settings.reinforcement.rewards.map((reward) => `<button type="button" class="physical-reward-selected" data-positive-action="edit-reward" data-reward-id="${escapeHtml(reward.id)}"><span>${escapeHtml(reward.icon)}</span><strong>${escapeHtml(reward.name)}</strong><small>${escapeHtml(WINDOW_LABELS[reward.window])}${reward.accumulationTarget > 1 ? ` · ${Math.min(state.game.reinforcement.progress[reward.id] || 0, reward.accumulationTarget)}/${reward.accumulationTarget} hitos` : ''}</small></button>`).join('')
-    : '<p class="game-collection-empty">Aún no elegiste premios. Agrega uno del catálogo o crea el tuyo.</p>';
+    ? settings.reinforcement.rewards.map((reward) => ui`<button type="button" class="physical-reward-selected" data-positive-action="edit-reward" data-reward-id="${escapeHtml(reward.id)}"><span>${escapeHtml(reward.icon)}</span><strong>${escapeHtml(reward.name)}</strong><small>${escapeHtml(WINDOW_LABELS[reward.window])}${reward.accumulationTarget > 1 ? ui` · ${Math.min(state.game.reinforcement.progress[reward.id] || 0, reward.accumulationTarget)}/${reward.accumulationTarget} hitos` : ''}</small></button>`).join('')
+    : translateMarkup('<p class="game-collection-empty">Aún no elegiste premios. Agrega uno del catálogo o crea el tuyo.</p>');
+}
+
+function syncPresetSelection() {
+  const preset = PHYSICAL_REWARD_PRESETS.find(item => item.id === document.getElementById('physicalRewardPresetSelect')?.value);
+  const button = document.getElementById('physicalRewardPresetAdd');
+  const description = document.getElementById('physicalRewardPresetDescription');
+  if (!preset || !button || !description) return;
+  const added = settings.reinforcement.rewards.find(reward => reward.templateId === preset.id);
+  button.dataset.positiveAction = added ? 'edit-reward' : 'add-preset';
+  button.dataset.templateId = preset.id;
+  button.dataset.rewardId = added?.id || '';
+  button.textContent = added ? translateText('Editar premio') : translateText('Agregar premio');
+  description.textContent = ui`${WINDOW_LABELS[preset.window]} · ${TRIGGER_LABELS[preset.trigger]}${preset.accumulationTarget > 1 ? ui` · ${preset.accumulationTarget} hitos` : ''}${preset.durationMin ? ui` · ${preset.durationMin} min` : ''}`;
 }
 
 function renderEvidence() {
@@ -486,7 +503,7 @@ function renderEvidence() {
   const recoveries = state.game.reinforcement.recoveries.filter((item) => item.dayKey === dayKey).length;
   const completed = callsForDay(dayKey).length;
   const pending = state.game.reinforcement.pendingRewards.length;
-  root.innerHTML = `<div><span>PRUEBA POSITIVA DE HOY</span><strong>${completed} llamada${completed === 1 ? '' : 's'} completada${completed === 1 ? '' : 's'}</strong><small>${good} cerraron bien · ${resilient} difíciles que enfrentaste · ${learning} aprendizajes · ${recoveries} recuperaciones</small></div><div class="positive-evidence-rewards"><b>${pending}</b><span>premio${pending === 1 ? '' : 's'} disponible${pending === 1 ? '' : 's'}</span><button type="button" data-positive-action="open-pending" ${pending ? '' : 'disabled'}>Ver premios</button></div>`;
+  root.innerHTML = ui`<div><span>PRUEBA POSITIVA DE HOY</span><strong>${completed === 1 ? ui`${completed} llamada completada` : ui`${completed} llamadas completadas`}</strong><small>${good} cerraron bien · ${resilient} difíciles que enfrentaste · ${learning} aprendizajes · ${recoveries} recuperaciones</small></div><div class="positive-evidence-rewards"><b>${pending}</b><span>${pending === 1 ? translateText('premio disponible') : translateText('premios disponibles')}</span><button type="button" data-positive-action="open-pending" ${pending ? '' : 'disabled'}>Ver premios</button></div>`;
 }
 
 let historyExpanded = false;
@@ -494,24 +511,24 @@ function renderHistory() {
   const root = document.getElementById('positiveHistoryList');
   if (!root) return;
   const reinforcement = state.game.reinforcement;
-  const outcomes = { good: 'Cerró bien', difficult: 'Cumplí aunque fue difícil', learning: 'Me dejó un aprendizaje' };
+  const outcomes = { good: translateText('Cerró bien'), difficult: translateText('Cumplí aunque fue difícil'), learning: translateText('Me dejó un aprendizaje') };
   const records = [
     ...Object.values(reinforcement.reflections).map((item) => ({
       at: item.savedAt, dayKey: item.dayKey, icon: item.outcome === 'good' ? '✨' : item.outcome === 'difficult' ? '🛡️' : '💡',
       title: outcomes[item.outcome], note: item.note,
     })),
-    ...reinforcement.recoveries.map((item) => ({ at: item.at, dayKey: item.dayKey, icon: '🛡️', title: 'Volví a tomar otra llamada', note: '' })),
-    ...reinforcement.claims.map((item) => ({ at: item.claimedAt, dayKey: item.dayKey, icon: item.icon, title: `Premio realizado: ${item.name}`, note: '' })),
+    ...reinforcement.recoveries.map((item) => ({ at: item.at, dayKey: item.dayKey, icon: '🛡️', title: translateText('Volví a tomar otra llamada'), note: '' })),
+    ...reinforcement.claims.map((item) => ({ at: item.claimedAt, dayKey: item.dayKey, icon: item.icon, title: ui`Premio realizado: ${item.name}`, note: '' })),
   ].sort((a, b) => String(b.at).localeCompare(String(a.at)));
   const count = document.getElementById('positiveHistoryCount');
   if (count) count.textContent = String(records.length);
   root.innerHTML = records.length
-    ? (historyExpanded ? records : records.slice(0, 8)).map((item) => `<div class="positive-history-row"><span aria-hidden="true">${escapeHtml(item.icon)}</span><div><strong>${escapeHtml(item.title)}</strong>${item.note ? `<small>${escapeHtml(item.note)}</small>` : ''}</div><time>${escapeHtml(item.dayKey)}</time></div>`).join('')
-    : '<div class="game-collection-empty">Tus llamadas y premios realizados aparecerán aquí.</div>';
+    ? (historyExpanded ? records : records.slice(0, 8)).map((item) => ui`<div class="positive-history-row"><span aria-hidden="true">${escapeHtml(item.icon)}</span><div><strong>${escapeHtml(item.title)}</strong>${item.note ? ui`<small>${escapeHtml(item.note)}</small>` : ''}</div><time>${escapeHtml(item.dayKey)}</time></div>`).join('')
+    : translateMarkup('<div class="game-collection-empty">Tus llamadas y premios realizados aparecerán aquí.</div>');
   const toggle = document.getElementById('positiveHistoryToggle');
   if (toggle) {
     toggle.hidden = records.length <= 8;
-    toggle.textContent = historyExpanded ? 'Ver menos' : `Ver todo (${records.length})`;
+    toggle.textContent = historyExpanded ? translateText('Ver menos') : ui`Ver todo (${records.length})`;
   }
 }
 
@@ -608,6 +625,7 @@ export function initPositiveReinforcement() {
     if (action === 'open-pending') openPendingRewardsNow();
     if (action === 'toggle-history') { historyExpanded = !historyExpanded; renderHistory(); }
   });
+  document.getElementById('physicalRewardPresetSelect')?.addEventListener('change', syncPresetSelection);
   document.getElementById('savePhysicalRewardBtn')?.addEventListener('click', saveRewardEditor);
   document.getElementById('deletePhysicalRewardBtn')?.addEventListener('click', deleteRewardEditor);
   document.getElementById('physicalRewardTriggerInput')?.addEventListener('change', syncRewardEditorConditional);

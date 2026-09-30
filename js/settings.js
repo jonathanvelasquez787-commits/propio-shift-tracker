@@ -1,3 +1,4 @@
+import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 import { authErrorMessage, getProfile, getUser, updateEmail, updateUsername } from './auth.js';
 import { settings, state } from './app-context.js';
 
@@ -106,13 +107,13 @@ let syncingGoals = false;
       }
       pendingGoalChange = { minutes, dollars, dayKey };
       const isToday = dayKey === todayCallDateKey();
-      const dayLabel = isToday ? 'hoy' : formatCallDayLabel(dayKey);
+      const dayLabel = isToday ? translateText('hoy') : formatCallDayLabel(dayKey);
       const summaryEl = document.getElementById('goalScopeSummary');
       const dayBtnEl = document.getElementById('goalScopeDayBtn');
       const dayHintEl = document.getElementById('goalScopeDayHint');
-      if (summaryEl) summaryEl.textContent = `Meta nueva: ${formatMinutes(minutes)} min · ${money(dollars)}${convertedAmountText(dollars) ? ` (${convertedAmountText(dollars)})` : ''}`;
-      if (dayBtnEl) dayBtnEl.innerHTML = `${iconHtml('calendar')} Solo ${escapeHtml(dayLabel)}`;
-      if (dayHintEl) dayHintEl.textContent = `"Solo ${dayLabel}" deja tu meta de siempre intacta y aplica esta solo a ese día.`;
+      if (summaryEl) summaryEl.textContent = ui`Meta nueva: ${formatMinutes(minutes)} min · ${money(dollars)}${convertedAmountText(dollars) ? ` (${convertedAmountText(dollars)})` : ''}`;
+      if (dayBtnEl) dayBtnEl.innerHTML = ui`${iconHtml('calendar')} Solo ${escapeHtml(dayLabel)}`;
+      if (dayHintEl) dayHintEl.textContent = ui`"Solo ${dayLabel}" deja tu meta de siempre intacta y aplica esta solo a ese día.`;
       openModal('goalScopeModal');
     }
 
@@ -123,8 +124,8 @@ let syncingGoals = false;
       closeModal('goalScopeModal');
       applyGoalValues(minutes, dollars, scope, dayKey);
       toast(scope === 'day'
-        ? `Meta de ${dayKey === todayCallDateKey() ? 'hoy' : formatCallDayLabel(dayKey)}: ${formatMinutes(minutes)} min · ${money(dollars)}${convertedAmountText(dollars) ? ` (${convertedAmountText(dollars)})` : ''}`
-        : `Meta general: ${formatMinutes(minutes)} min · ${money(dollars)}${convertedAmountText(dollars) ? ` (${convertedAmountText(dollars)})` : ''}`);
+        ? ui`Meta de ${dayKey === todayCallDateKey() ? translateText('hoy') : formatCallDayLabel(dayKey)}: ${formatMinutes(minutes)} min · ${money(dollars)}${convertedAmountText(dollars) ? ` (${convertedAmountText(dollars)})` : ''}`
+        : ui`Meta general: ${formatMinutes(minutes)} min · ${money(dollars)}${convertedAmountText(dollars) ? ` (${convertedAmountText(dollars)})` : ''}`);
     }
 
     export function cancelPendingGoalChange() {
@@ -143,7 +144,7 @@ let syncingGoals = false;
       onGameDayMetadataChanged(dayKey);
       refreshGoalInputs();
       render();
-      toast('Ese día vuelve a usar tu meta general');
+      toast(translateText('Ese día vuelve a usar tu meta general'));
     }
 
     // Cuando se edita la tasa por minuto en Metas: se guarda la nueva tasa y se recalcula la Meta
@@ -178,8 +179,8 @@ let syncingGoals = false;
       el.innerHTML = EMOJI_CHOICES.map(e => {
         const isClear = e === '';
         const display = isClear ? '✕' : e;
-        const label = isClear ? 'Sin emoji' : `Elegir ${e}`;
-        return `<button type="button" class="emoji-option ${isClear ? 'emoji-clear' : ''} ${e === selected ? 'selected' : ''}" data-emoji="${e}" aria-label="${label}">${display}</button>`;
+        const label = isClear ? translateText('Sin emoji') : ui`Elegir ${e}`;
+        return ui`<button type="button" class="emoji-option ${isClear ? 'emoji-clear' : ''} ${e === selected ? 'selected' : ''}" data-emoji="${e}" aria-label="${label}">${display}</button>`;
       }).join('');
     }
 
@@ -218,7 +219,7 @@ let syncingGoals = false;
       const open = !wrap.classList.contains('open');
       wrap.classList.toggle('open', open);
       btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-      btn.textContent = open ? 'Ocultar emoji' : 'Cambiar emoji';
+      btn.textContent = open ? translateText('Ocultar emoji') : translateText('Cambiar emoji');
     }
 
     export function toggleEmojiPickerOnboarding() {
@@ -228,7 +229,7 @@ let syncingGoals = false;
       const open = !wrap.classList.contains('open');
       wrap.classList.toggle('open', open);
       btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-      btn.textContent = open ? 'Ocultar emoji' : 'Cambiar emoji';
+      btn.textContent = open ? translateText('Ocultar emoji') : translateText('Cambiar emoji');
     }
 
     export function finishOnboarding() {
@@ -259,8 +260,8 @@ let syncingGoals = false;
       if (goalDayOverrideNote && goalDayOverrideNoteText) {
         if (activeDayGoal.isOverride) {
           const activeDayKeyForNote = getActiveDayKey();
-          const dayLabel = activeDayKeyForNote === todayCallDateKey() ? 'hoy' : formatCallDayLabel(activeDayKeyForNote);
-          goalDayOverrideNoteText.textContent = `Meta especial solo para ${dayLabel}. Tu meta general sigue en ${formatMinutes(Number(settings.productiveGoalMin) || 0)} min · ${money(Number(settings.earningsGoal) || 0)}${convertedAmountText(Number(settings.earningsGoal) || 0) ? ` (${convertedAmountText(Number(settings.earningsGoal) || 0)})` : ''}.`;
+          const dayLabel = activeDayKeyForNote === todayCallDateKey() ? translateText('hoy') : formatCallDayLabel(activeDayKeyForNote);
+          goalDayOverrideNoteText.textContent = ui`Meta especial solo para ${dayLabel}. Tu meta general sigue en ${formatMinutes(Number(settings.productiveGoalMin) || 0)} min · ${money(Number(settings.earningsGoal) || 0)}${convertedAmountText(Number(settings.earningsGoal) || 0) ? ` (${convertedAmountText(Number(settings.earningsGoal) || 0)})` : ''}.`;
           goalDayOverrideNote.style.display = '';
         } else {
           goalDayOverrideNote.style.display = 'none';
@@ -279,7 +280,7 @@ let syncingGoals = false;
       const hasCurrency = Number(settings.exchangeRate) > 0 && !!currencyLabelTrimmed;
       if (goalCurrencyField) goalCurrencyField.style.display = hasCurrency ? '' : 'none';
       if (hasCurrency) {
-        if (goalCurrencyLabelEl) goalCurrencyLabelEl.textContent = `Meta en ${currencyLabelTrimmed}`;
+        if (goalCurrencyLabelEl) goalCurrencyLabelEl.textContent = ui`Meta en ${currencyLabelTrimmed}`;
         if (goalCurrencyInput && !pendingGoalChange && document.activeElement !== goalCurrencyInput) {
           goalCurrencyInput.value = currencyCeilFromUsdAmount(activeDayGoal.usd, Number(settings.exchangeRate)).toFixed(2);
         }
@@ -307,7 +308,7 @@ export async function syncAccountProfileFields() {
   const usernameInput = document.getElementById('accountUsernameInput');
   const emailInput = document.getElementById('accountEmailInput');
   const status = document.getElementById('accountProfileStatus');
-  if (status) status.textContent = 'Cargando los datos de la cuenta…';
+  if (status) status.textContent = translateText('Cargando los datos de la cuenta…');
   try {
     const [profile, user] = await Promise.all([getProfile(), getUser()]);
     if (usernameInput && document.activeElement !== usernameInput) usernameInput.value = profile?.username || '';
@@ -339,9 +340,9 @@ export async function saveAccountProfile() {
     const emailChanged = email.toLowerCase() !== String(user?.email || '').toLowerCase();
     if (emailChanged) await updateEmail(email);
     if (status) status.textContent = emailChanged
-      ? 'Perfil guardado. Revisa tu correo para confirmar la nueva dirección.'
-      : 'Perfil guardado.';
-    toast(emailChanged ? 'Perfil guardado — confirma el correo nuevo' : 'Perfil guardado');
+      ? translateText('Perfil guardado. Revisa tu correo para confirmar la nueva dirección.')
+      : translateText('Perfil guardado.');
+    toast(emailChanged ? translateText('Perfil guardado — confirma el correo nuevo') : translateText('Perfil guardado'));
   } catch (err) {
     const message = authErrorMessage(err);
     if (status) status.textContent = message;

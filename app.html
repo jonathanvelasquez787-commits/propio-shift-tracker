@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Propio Shift Tracker</title>
-<script src="/js/theme-init.js"></script>
+<script type="module" src="/js/theme-init.js"></script>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2309101e'/%3E%3Ccircle cx='32' cy='34' r='20' fill='none' stroke='%2366e2a5' stroke-width='4'/%3E%3Cpath d='M32 22v12l9 6' fill='none' stroke='%2366e2a5' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M24 10l-6 6M40 10l6 6' fill='none' stroke='%237d8cff' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E"/>
 <!-- Precarga los módulos sin ejecutarlos; boot.js los monta después de resolver la sesión. -->
 <link rel="modulepreload" href="/js/app-main.js"/>
@@ -8192,6 +8192,7 @@
   </style>
 <link rel="stylesheet" href="/css/app-shell.css"/>
 <link rel="stylesheet" href="/css/game.css"/>
+<link rel="stylesheet" href="/css/appearance.css"/>
 </head>
 <body>
 <div aria-live="polite" class="live-activity-bar" id="liveActivityBar" role="status">
@@ -8251,14 +8252,7 @@
 <span class="sidebar-switch-track"><span class="sidebar-switch-thumb"></span></span>
 </label>
 </div>
-<div class="sidebar-darkmode-row">
-<span class="sidebar-darkmode-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z"/></svg></span>
-<span>Modo oscuro</span>
-<label class="sidebar-switch" title="Cambiar entre modo claro y oscuro">
-<input aria-label="Modo oscuro" id="sidebarDarkModeInput" type="checkbox"/>
-<span class="sidebar-switch-track"><span class="sidebar-switch-thumb"></span></span>
-</label>
-</div>
+<input aria-hidden="true" tabindex="-1" id="sidebarDarkModeInput" type="checkbox" hidden/><button class="sidebar-appearance-btn" id="sidebarAppearanceBtn" type="button" data-open-appearance><span><strong>Temas y colores</strong><small data-appearance-label>Claro original</small></span><span class="appearance-current-swatches" data-current-swatches aria-hidden="true"></span></button>
 </div>
 </nav>
 <div class="app"><section class="hero" id="heroSection">
@@ -8986,8 +8980,90 @@
   <div class="game-achievements-toolbar"><label class="game-settings-toggle" for="gameEnabledInput"><span><strong>Activar Logros</strong><small>Racha, XP, misiones y colección sin cambiar tus ganancias.</small></span><input id="gameEnabledInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label></div>
 </section>
 
+
+<section class="game-achievements-grid game-achievements-grid-top" id="gameAchievementsSummary" aria-label="Tu progreso">
+  <div class="game-progress-profile" id="gameSettingsProfile" aria-live="polite">
+<article class="game-panel game-level-panel" id="gameLevelPanel">
+    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Progreso</span><h2>Nivel <strong data-game-role="level" data-game-stat="level">1</strong></h2><span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Nivel y XP" aria-describedby="levelInfo">i</button><span class="sched-help-tooltip" id="levelInfo" role="tooltip">XP son puntos de experiencia. Los obtienes al completar llamadas, misiones y objetivos; suben tu nivel y desbloquean equipo. No son dinero ni cambian tu pago.</span></span></div><span class="game-level-emblem" data-game-role="level-emblem">1</span></div>
+    <div class="game-level-track" role="progressbar" aria-label="Progreso hacia el siguiente nivel" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span data-game-role="level-progress" style="width:0%;"></span></div>
+    <div class="game-level-foot"><span data-game-role="level-xp" data-game-stat="xp">0 XP</span><span data-game-role="next-level">Siguiente: 100 XP</span></div>
+    <div class="game-level-ladder" data-game-role="level-ladder"><span class="is-current">1</span><i></i><span>2</span><i></i><span>3</span><i></i><span>4</span></div>
+    <details class="game-settings-accordion game-unlock-details">
+      <summary class="game-settings-accordion-summary"><span class="game-settings-accordion-copy"><strong>Desbloqueos por nivel</strong><small>Fases, equipo y mejoras disponibles en cada nivel.</small></span><span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></summary>
+      <div class="game-settings-accordion-body"><div class="game-unlock-roadmap" data-game-dynamic="unlock-roadmap"></div></div>
+    </details>
+  </article>
+<article class="game-panel game-streak-panel" id="gameStreakPanel">
+    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Constancia</span><h2>Racha semanal <span class="game-streak-current" data-game-stat="streak">0 días</span></h2><span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Racha semanal" aria-describedby="streakInfo">i</button><span class="sched-help-tooltip" id="streakInfo" role="tooltip">Cuenta los días consecutivos que cumples las reglas de productividad y adherencia. Los días libres se tratan según tu configuración. Los símbolos muestran el resultado de cada día.</span></span></div><span class="game-panel-badge" data-game-role="streak-best">Mejor: 0</span></div>
+    <div class="game-streak-week" data-game-role="streak-week" role="list" aria-label="Racha de los últimos siete días">
+      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>L</b><em>—</em></span>
+      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>M</b><em>—</em></span>
+      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>X</b><em>—</em></span>
+      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>J</b><em>—</em></span>
+      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>V</b><em>—</em></span>
+      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>S</b><em>—</em></span>
+      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>D</b><em>—</em></span>
+    </div>
+    <div class="game-panel-foot"><span>Escudos disponibles</span><span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Escudos" aria-describedby="shieldsInfo">i</button><span class="sched-help-tooltip" id="shieldsInfo" role="tooltip">Protegen tu racha si un día no cumple los requisitos. Puedes guardar hasta tres; se ganan por constancia y respaldo semanal y se usan automáticamente cuando corresponda.</span></span><strong data-game-role="shields" data-game-stat="shields">0</strong></div>
+  </article>
+  </div>
+</section>
+
+<section class="game-panel game-cycle-panel" id="gameCycleBossAchievements">
+  <div class="game-panel-head"><div><span class="game-panel-eyebrow">Temporada de 14 días</span><h2>Jefe del ciclo</h2><span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Jefe del ciclo" aria-describedby="cycleBossInfo">i</button><span class="sched-help-tooltip" id="cycleBossInfo" role="tooltip">Representa la meta de ganancias de tu ciclo de pago de 14 días. Cada dólar ganado reduce su vida. Completar la meta desbloquea una recompensa de juego.</span></span></div><span class="game-cycle-label" data-game-role="cycle-status">En marcha</span></div>
+  <div class="game-cycle-boss-layout"><div class="game-boss-copy"><strong data-game-role="cycle-title">El jefe observa tu progreso.</strong><p data-game-role="cycle-subtitle">La barra refleja lo que llevas acumulado en el ciclo de pago actual.</p><div class="game-boss-progress" role="progressbar" aria-label="Progreso contra el jefe del ciclo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span data-game-role="cycle-progress" style="width:0%;"></span></div><div class="game-boss-progress-foot"><span data-game-role="cycle-earned">$0.00</span><span data-game-role="cycle-goal">Meta $0.00</span></div></div><div class="game-boss-sprite" data-game-role="cycle-sprite" aria-hidden="true"><span class="game-pixel-crown"></span><span class="game-pixel-eye left"></span><span class="game-pixel-eye right"></span><span class="game-pixel-mouth"></span></div></div>
+</section>
+
+<section class="game-achievements-grid game-achievements-grid-bottom" aria-label="Victorias y récords">
+<article class="game-panel game-last-clear-panel" id="gameLastStageClear">
+    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Última victoria</span><h2>STAGE CLEAR</h2><span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de STAGE CLEAR" aria-describedby="stageClearInfo">i</button><span class="sched-help-tooltip" id="stageClearInfo" role="tooltip">Es el resumen de un turno terminado: muestra misiones, XP y récords. Puedes abrir el último cierre para revisar lo que conseguiste.</span></span></div><span class="game-panel-badge" data-game-role="last-clear-date">—</span></div>
+    <div class="game-last-clear-content" data-game-role="last-clear-content"><div class="game-clear-stars" aria-hidden="true"><span>★</span><span>★</span><span>★</span></div><p>Aún no hay un STAGE CLEAR guardado.</p></div>
+    <button class="game-text-button" data-game-action="open-last-clear" type="button">Ver detalle</button>
+    <div aria-label="Cofre reclamable" class="game-chest-claim" data-game-role="chest-claim" hidden id="gameChestClaim" role="region">
+      <span aria-hidden="true" class="game-chest-claim-icon">🎁</span>
+      <span class="game-chest-claim-copy"><strong data-game-role="chest-claim-title">Cofre listo</strong><small data-game-role="chest-claim-subtitle">Abre tu próxima sesión para reclamarlo.</small></span>
+    </div>
+  </article>
+<article class="game-panel" id="gameRecords">
+    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Récords personales</span><h2>Récords</h2></div><svg class="ic-svg game-panel-head-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9Z"/></svg></div>
+    <div class="game-record-list" data-game-role="records-list"><div class="game-record-row"><span>Mayor pago</span><strong>—</strong></div><div class="game-record-row"><span>Llamada más larga</span><strong>—</strong></div><div class="game-record-row"><span>Mejor racha semanal</span><strong>—</strong></div></div>
+  </article>
+</section>
+
+<section aria-labelledby="gameEquipmentTitle" class="game-panel game-equipment-panel" data-game-root="equipment-panel" id="gameEquipmentPanel">
+  <div class="game-panel-head"><div><span class="game-panel-eyebrow">Personalización</span><h2 id="gameEquipmentTitle">Equipo</h2><span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Equipo" aria-describedby="equipmentInfo">i</button><span class="sched-help-tooltip" id="equipmentInfo" role="tooltip">Accesorios que desbloqueas con niveles, misiones y objetivos. Selecciona uno disponible para equiparlo o retirarlo; un accesorio bloqueado indica qué falta.</span></span></div><span class="game-panel-badge" data-game-role="equipment-count">0 / 6</span></div>
+  <p class="game-panel-intro">Accesorios y mejoras que se activan al completar tus objetivos.</p>
+  <div aria-label="Equipo desbloqueable" class="game-equipment-grid" data-game-role="equipment-list" data-game-root="equipment-grid" role="list">
+    <article aria-label="Visor bloqueado" class="game-equipment-item is-locked" data-equipment-state="locked" data-game-role="equipment-item" role="listitem">
+      <span aria-hidden="true" class="game-equipment-icon">?</span>
+      <span class="game-equipment-copy"><strong>Próximo accesorio</strong><small data-game-role="equipment-status">Completa una misión para desbloquearlo</small></span>
+      <span aria-hidden="true" class="game-equipment-state">Bloqueado</span>
+    </article>
+  </div>
+  <p class="game-collection-empty" data-game-role="equipment-empty">Tus accesorios aparecerán aquí al conseguirlos.</p>
+</section>
+
+<section class="game-achievements-grid game-achievements-grid-collection" aria-label="Colecciones">
+<article class="game-panel game-bestiary-panel" id="gameBestiary">
+    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Colección</span><h2>Bestiario</h2><span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Bestiario" aria-describedby="bestiaryInfo">i</button><span class="sched-help-tooltip" id="bestiaryInfo" role="tooltip">Colección de monstruos que ya derrotaste al completar la meta diaria. Muestra tu historial de victorias y las criaturas que faltan.</span></span></div><span class="game-panel-badge" data-game-role="bestiary-count">0 / 7</span></div>
+    <div class="game-collection-grid" data-game-role="bestiary-list"><div class="game-collection-empty">Derrota tu primer monstruo para llenar esta colección.</div></div>
+  </article>
+<article class="game-panel game-trophies-panel" id="gameTrophies">
+    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Distinciones</span><h2>Trofeos</h2><span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Trofeos" aria-describedby="trophiesInfo">i</button><span class="sched-help-tooltip" id="trophiesInfo" role="tooltip">Reconocimientos permanentes por completar metas y otros objetivos. Se guardan en tu perfil; no se gastan ni afectan tus ganancias.</span></span></div><span class="game-panel-badge" data-game-role="trophy-count">0</span></div>
+    <div class="game-trophy-list" data-game-role="trophy-list"><div class="game-collection-empty">Tus próximos trofeos aparecerán aquí.</div></div>
+  </article>
+</section>
+
+<section class="positive-history-section">
+  <article class="game-panel" id="positiveHistoryPanel">
+    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Evidencia acumulada</span><h2>Mi historial positivo</h2><span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Historial positivo" aria-describedby="positiveHistoryInfo">i</button><span class="sched-help-tooltip" id="positiveHistoryInfo" role="tooltip">Guarda los cierres de llamadas, recuperaciones y premios realizados. Sirve para reconocer tu constancia; tus comentarios personales se muestran tal como los escribiste.</span></span></div><span class="game-panel-badge" id="positiveHistoryCount">0</span></div>
+    <div class="positive-history-list" id="positiveHistoryList"><div class="game-collection-empty">Tus llamadas y premios realizados aparecerán aquí.</div></div>
+    <button class="game-text-button" id="positiveHistoryToggle" data-positive-action="toggle-history" type="button" hidden>Ver todo</button>
+  </article>
+</section>
+
 <section class="game-settings-disclosures" aria-label="Preferencias de Logros">
-<details class="game-panel game-settings-accordion" id="gameSettingsAccordion" open>
+<details class="game-panel game-settings-accordion" id="gameSettingsAccordion">
     <summary class="game-settings-accordion-summary">
       <span class="game-settings-accordion-copy"><span class="game-panel-eyebrow">PERSONALIZACIÓN</span><strong>Gamificación</strong><small>Personaliza el nombre del monstruo. Las misiones se calculan automáticamente.</small></span>
       <span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
@@ -9003,7 +9079,7 @@
       </div>
     </div>
   </details>
-<details class="game-panel game-settings-accordion" id="positiveSettingsAccordion" open>
+<details class="game-panel game-settings-accordion" id="positiveSettingsAccordion">
     <summary class="game-settings-accordion-summary">
       <span class="game-settings-accordion-copy"><span class="game-panel-eyebrow">CUIDADO PERSONAL</span><strong>Refuerzo positivo</strong><small>Reconoce llamadas, recuperación, metas y premios elegidos por ti.</small></span>
       <span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
@@ -9021,94 +9097,13 @@
         </div>
         <div class="positive-settings-block">
           <div class="positive-settings-heading"><span><strong>Catálogo sugerido</strong><small>Agrega una idea y personalízala a tu gusto.</small></span></div>
-          <div class="physical-reward-catalog" id="physicalRewardCatalog"></div>
+          <div class="physical-reward-catalog" id="physicalRewardCatalog"><label for="physicalRewardPresetSelect">Elegir un premio sugerido</label><div class="game-monster-name-controls"><select id="physicalRewardPresetSelect"></select><button type="button" id="physicalRewardPresetAdd" data-positive-action="add-preset">Agregar premio</button></div><small id="physicalRewardPresetDescription"></small></div>
         </div>
         <p class="note" style="margin:0;">La app nunca compra nada ni interrumpe una llamada. Tú decides cuándo realizar, guardar o cambiar cada premio.</p></div>
         </details>
       </div>
     </div>
   </details>
-</section>
-
-<section class="game-achievements-grid game-achievements-grid-top" id="gameAchievementsSummary" aria-label="Tu progreso">
-  <div class="game-progress-profile" id="gameSettingsProfile" aria-live="polite">
-<article class="game-panel game-level-panel" id="gameLevelPanel">
-    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Progreso</span><h2>Nivel <strong data-game-role="level" data-game-stat="level">1</strong></h2></div><span class="game-level-emblem" data-game-role="level-emblem">1</span></div>
-    <div class="game-level-track" role="progressbar" aria-label="Progreso hacia el siguiente nivel" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span data-game-role="level-progress" style="width:0%;"></span></div>
-    <div class="game-level-foot"><span data-game-role="level-xp" data-game-stat="xp">0 XP</span><span data-game-role="next-level">Siguiente: 100 XP</span></div>
-    <div class="game-level-ladder" data-game-role="level-ladder"><span class="is-current">1</span><i></i><span>2</span><i></i><span>3</span><i></i><span>4</span></div>
-    <details class="game-settings-accordion game-unlock-details">
-      <summary class="game-settings-accordion-summary"><span class="game-settings-accordion-copy"><strong>Desbloqueos por nivel</strong><small>Fases, equipo y mejoras disponibles en cada nivel.</small></span><span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></summary>
-      <div class="game-settings-accordion-body"><div class="game-unlock-roadmap" data-game-dynamic="unlock-roadmap"></div></div>
-    </details>
-  </article>
-<article class="game-panel game-streak-panel" id="gameStreakPanel">
-    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Constancia</span><h2>Racha semanal <span class="game-streak-current" data-game-stat="streak">0 días</span></h2></div><span class="game-panel-badge" data-game-role="streak-best">Mejor: 0</span></div>
-    <div class="game-streak-week" data-game-role="streak-week" role="list" aria-label="Racha de los últimos siete días">
-      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>L</b><em>—</em></span>
-      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>M</b><em>—</em></span>
-      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>X</b><em>—</em></span>
-      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>J</b><em>—</em></span>
-      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>V</b><em>—</em></span>
-      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>S</b><em>—</em></span>
-      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>D</b><em>—</em></span>
-    </div>
-    <div class="game-panel-foot"><span>Escudos disponibles</span><strong data-game-role="shields" data-game-stat="shields">0</strong></div>
-  </article>
-  </div>
-</section>
-
-<section class="game-panel game-cycle-panel" id="gameCycleBossAchievements">
-  <div class="game-panel-head"><div><span class="game-panel-eyebrow">Temporada de 14 días</span><h2>Jefe del ciclo</h2></div><span class="game-cycle-label" data-game-role="cycle-status">En marcha</span></div>
-  <div class="game-cycle-boss-layout"><div class="game-boss-copy"><strong data-game-role="cycle-title">El jefe observa tu progreso.</strong><p data-game-role="cycle-subtitle">La barra refleja lo que llevas acumulado en el ciclo de pago actual.</p><div class="game-boss-progress" role="progressbar" aria-label="Progreso contra el jefe del ciclo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span data-game-role="cycle-progress" style="width:0%;"></span></div><div class="game-boss-progress-foot"><span data-game-role="cycle-earned">$0.00</span><span data-game-role="cycle-goal">Meta $0.00</span></div></div><div class="game-boss-sprite" data-game-role="cycle-sprite" aria-hidden="true"><span class="game-pixel-crown"></span><span class="game-pixel-eye left"></span><span class="game-pixel-eye right"></span><span class="game-pixel-mouth"></span></div></div>
-</section>
-
-<section class="game-achievements-grid game-achievements-grid-bottom" aria-label="Victorias y récords">
-<article class="game-panel game-last-clear-panel" id="gameLastStageClear">
-    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Última victoria</span><h2>STAGE CLEAR</h2></div><span class="game-panel-badge" data-game-role="last-clear-date">—</span></div>
-    <div class="game-last-clear-content" data-game-role="last-clear-content"><div class="game-clear-stars" aria-hidden="true"><span>★</span><span>★</span><span>★</span></div><p>Aún no hay un STAGE CLEAR guardado.</p></div>
-    <button class="game-text-button" data-game-action="open-last-clear" type="button">Ver detalle</button>
-    <div aria-label="Cofre reclamable" class="game-chest-claim" data-game-role="chest-claim" hidden id="gameChestClaim" role="region">
-      <span aria-hidden="true" class="game-chest-claim-icon">🎁</span>
-      <span class="game-chest-claim-copy"><strong data-game-role="chest-claim-title">Cofre listo</strong><small data-game-role="chest-claim-subtitle">Abre tu próxima sesión para reclamarlo.</small></span>
-    </div>
-  </article>
-<article class="game-panel" id="gameRecords">
-    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Récords personales</span><h2>Récords</h2></div><svg class="ic-svg game-panel-head-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9Z"/></svg></div>
-    <div class="game-record-list" data-game-role="records-list"><div class="game-record-row"><span>Mayor pago</span><strong>—</strong></div><div class="game-record-row"><span>Llamada más larga</span><strong>—</strong></div><div class="game-record-row"><span>Mejor racha semanal</span><strong>—</strong></div></div>
-  </article>
-</section>
-
-<section aria-labelledby="gameEquipmentTitle" class="game-panel game-equipment-panel" data-game-root="equipment-panel" id="gameEquipmentPanel">
-  <div class="game-panel-head"><div><span class="game-panel-eyebrow">Personalización</span><h2 id="gameEquipmentTitle">Equipo</h2></div><span class="game-panel-badge" data-game-role="equipment-count">0 / 6</span></div>
-  <p class="game-panel-intro">Accesorios y mejoras que se activan al completar tus objetivos.</p>
-  <div aria-label="Equipo desbloqueable" class="game-equipment-grid" data-game-role="equipment-list" data-game-root="equipment-grid" role="list">
-    <article aria-label="Visor bloqueado" class="game-equipment-item is-locked" data-equipment-state="locked" data-game-role="equipment-item" role="listitem">
-      <span aria-hidden="true" class="game-equipment-icon">?</span>
-      <span class="game-equipment-copy"><strong>Próximo accesorio</strong><small data-game-role="equipment-status">Completa una misión para desbloquearlo</small></span>
-      <span aria-hidden="true" class="game-equipment-state">Bloqueado</span>
-    </article>
-  </div>
-  <p class="game-collection-empty" data-game-role="equipment-empty">Tus accesorios aparecerán aquí al conseguirlos.</p>
-</section>
-
-<section class="game-achievements-grid game-achievements-grid-collection" aria-label="Colecciones">
-<article class="game-panel game-bestiary-panel" id="gameBestiary">
-    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Colección</span><h2>Bestiario</h2></div><span class="game-panel-badge" data-game-role="bestiary-count">0 / 7</span></div>
-    <div class="game-collection-grid" data-game-role="bestiary-list"><div class="game-collection-empty">Derrota tu primer monstruo para llenar esta colección.</div></div>
-  </article>
-<article class="game-panel game-trophies-panel" id="gameTrophies">
-    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Distinciones</span><h2>Trofeos</h2></div><span class="game-panel-badge" data-game-role="trophy-count">0</span></div>
-    <div class="game-trophy-list" data-game-role="trophy-list"><div class="game-collection-empty">Tus próximos trofeos aparecerán aquí.</div></div>
-  </article>
-</section>
-
-<section class="positive-history-section">
-  <article class="game-panel" id="positiveHistoryPanel">
-    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Evidencia acumulada</span><h2>Mi historial positivo</h2></div><span class="game-panel-badge" id="positiveHistoryCount">0</span></div>
-    <div class="positive-history-list" id="positiveHistoryList"><div class="game-collection-empty">Tus llamadas y premios realizados aparecerán aquí.</div></div>
-    <button class="game-text-button" id="positiveHistoryToggle" data-positive-action="toggle-history" type="button" hidden>Ver todo</button>
-  </article>
 </section>
 
 <section class="game-advanced-settings" aria-label="Herramientas avanzadas">
@@ -9354,7 +9349,7 @@
 <li><b>Ajustes → Tu perfil</b> para nombre y emoji.</li>
 <li><b>Ajustes → Metas</b> para minutos productivos o monto en dólares — se recalculan entre sí solos.</li>
 <li><b>Ajustes → Moneda secundaria</b> para agregar tu moneda local y la tasa de cambio, y ver conversiones en toda la app.</li>
-<li>El interruptor de tema claro/oscuro vive en el sidebar.</li>
+<li>Abre Temas y colores en el menú lateral para elegir modo, paleta e idioma.</li>
 </ol>
 </div>
 </div>
@@ -10483,6 +10478,7 @@ $0.72"></textarea>
     <span class="boot-text" id="bootGateText">Abriendo tu cuenta…</span>
   </div>
 </div>
+<dialog class="appearance-dialog" id="appearanceDialog" aria-labelledby="appearanceTitle"><div class="appearance-dialog-head"><div><h2 id="appearanceTitle">Elige cómo se ve tu tool</h2><p>El mismo contenido, con los colores que prefieras.</p></div><button class="appearance-close" type="button" data-close-appearance aria-label="Cerrar selector de temas">×</button></div><div class="appearance-dialog-content"><div class="appearance-mode-row"><span>Modo de apariencia</span><div class="appearance-modes" role="group" aria-label="Modo de apariencia"><button type="button" data-preview-theme="light" aria-pressed="false">Claro original</button><button type="button" data-preview-theme="dark" aria-pressed="false">Oscuro original</button></div></div><div class="appearance-mode-row appearance-language-row"><label for="appearanceLanguage">Idioma de la tool</label><div class="appearance-select-wrap"><select id="appearanceLanguage"><option value="es">Español</option><option value="en">English</option></select></div></div><div class="appearance-section-label"><h3>Paleta de colores</h3><span>Original + 7 paletas</span></div><div class="appearance-palette-grid" role="radiogroup" aria-label="Paletas de colores"><button type="button" class="appearance-palette" data-palette-choice="original" role="radio" aria-checked="true" tabindex="0" aria-label="Original: Los colores actuales de la tool"><span class="appearance-palette-colors" aria-hidden="true"><i style="background:#0D1230" title="#0D1230"></i><i style="background:#2FD5FF" title="#2FD5FF"></i><i style="background:#FFFFFF" title="#FFFFFF"></i><i style="background:#6366F1" title="#6366F1"></i></span><span class="appearance-palette-check" aria-hidden="true">✓</span><span class="appearance-palette-text"><strong>Original</strong><small>Los colores actuales de la tool</small></span></button><button type="button" class="appearance-palette" data-palette-choice="neon" role="radio" aria-checked="false" tabindex="-1" aria-label="Morado Neón: Violeta, fucsia, coral y amarillo"><span class="appearance-palette-colors" aria-hidden="true"><i style="background:#5003C0" title="#5003C0"></i><i style="background:#AB03A9" title="#AB03A9"></i><i style="background:#FF467A" title="#FF467A"></i><i style="background:#FFD51E" title="#FFD51E"></i></span><span class="appearance-palette-check" aria-hidden="true">✓</span><span class="appearance-palette-text"><strong>Morado Neón</strong><small>Violeta, fucsia, coral y amarillo</small></span></button><button type="button" class="appearance-palette" data-palette-choice="lavender" role="radio" aria-checked="false" tabindex="-1" aria-label="Lavanda Pastel: Lavanda, celeste y menta"><span class="appearance-palette-colors" aria-hidden="true"><i style="background:#9FA1FF" title="#9FA1FF"></i><i style="background:#B5BAFF" title="#B5BAFF"></i><i style="background:#AEE2FF" title="#AEE2FF"></i><i style="background:#D9F9DF" title="#D9F9DF"></i></span><span class="appearance-palette-check" aria-hidden="true">✓</span><span class="appearance-palette-text"><strong>Lavanda Pastel</strong><small>Lavanda, celeste y menta</small></span></button><button type="button" class="appearance-palette" data-palette-choice="magenta" role="radio" aria-checked="false" tabindex="-1" aria-label="Rosa Magenta: Morado profundo y tonos rosados"><span class="appearance-palette-colors" aria-hidden="true"><i style="background:#462C7D" title="#462C7D"></i><i style="background:#831C91" title="#831C91"></i><i style="background:#D552A3" title="#D552A3"></i><i style="background:#FF70BF" title="#FF70BF"></i></span><span class="appearance-palette-check" aria-hidden="true">✓</span><span class="appearance-palette-text"><strong>Rosa Magenta</strong><small>Morado profundo y tonos rosados</small></span></button><button type="button" class="appearance-palette" data-palette-choice="sand" role="radio" aria-checked="false" tabindex="-1" aria-label="Azul Arena: Azul suave, crema y arena"><span class="appearance-palette-colors" aria-hidden="true"><i style="background:#81A6C6" title="#81A6C6"></i><i style="background:#AACDDC" title="#AACDDC"></i><i style="background:#F3E3D0" title="#F3E3D0"></i><i style="background:#D2C4B4" title="#D2C4B4"></i></span><span class="appearance-palette-check" aria-hidden="true">✓</span><span class="appearance-palette-text"><strong>Azul Arena</strong><small>Azul suave, crema y arena</small></span></button><button type="button" class="appearance-palette" data-palette-choice="royal" role="radio" aria-checked="false" tabindex="-1" aria-label="Azul Real: Azul noche, intenso y celeste"><span class="appearance-palette-colors" aria-hidden="true"><i style="background:#091540" title="#091540"></i><i style="background:#1B2CC1" title="#1B2CC1"></i><i style="background:#7692FF" title="#7692FF"></i><i style="background:#ABD2FA" title="#ABD2FA"></i></span><span class="appearance-palette-check" aria-hidden="true">✓</span><span class="appearance-palette-text"><strong>Azul Real</strong><small>Azul noche, intenso y celeste</small></span></button><button type="button" class="appearance-palette" data-palette-choice="ocean" role="radio" aria-checked="false" tabindex="-1" aria-label="Turquesa Profundo: Turquesa, azul y violeta"><span class="appearance-palette-colors" aria-hidden="true"><i style="background:#78B9B5" title="#78B9B5"></i><i style="background:#0F828C" title="#0F828C"></i><i style="background:#065084" title="#065084"></i><i style="background:#320A6B" title="#320A6B"></i></span><span class="appearance-palette-check" aria-hidden="true">✓</span><span class="appearance-palette-text"><strong>Turquesa Profundo</strong><small>Turquesa, azul y violeta</small></span></button><button type="button" class="appearance-palette" data-palette-choice="sage" role="radio" aria-checked="false" tabindex="-1" aria-label="Verde Salvia: Verde salvia, menta y crema"><span class="appearance-palette-colors" aria-hidden="true"><i style="background:#659287" title="#659287"></i><i style="background:#88BDA4" title="#88BDA4"></i><i style="background:#B1D3B9" title="#B1D3B9"></i><i style="background:#E6F2DD" title="#E6F2DD"></i></span><span class="appearance-palette-check" aria-hidden="true">✓</span><span class="appearance-palette-text"><strong>Verde Salvia</strong><small>Verde salvia, menta y crema</small></span></button></div><p class="appearance-help">Original conserva los modos claro y oscuro actuales. Las otras paletas se adaptan al modo elegido.</p></div><div class="appearance-dialog-foot"><div class="appearance-current"><span class="appearance-current-swatches" data-current-swatches aria-hidden="true"></span><span data-appearance-label>Claro original</span></div><div class="appearance-footer-actions"><a id="appearanceSource" target="_blank" rel="noopener noreferrer" hidden>Ver en Color Hunt</a><button class="appearance-done" data-close-appearance type="button">Ver tool</button></div></div></dialog>
 <script type="module" src="/js/boot.js"></script>
 </body>
 </html>

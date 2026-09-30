@@ -1,3 +1,4 @@
+import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 const SPECIES = [
   {
     id: 'lunes-perezoso',
@@ -63,12 +64,12 @@ export const MONSTERS_BY_WEEKDAY = MONSTER_CATALOG;
 export const MONSTER_SPECIES_BY_WEEKDAY = MONSTER_CATALOG;
 
 const STATE_LABELS = Object.freeze({
-  sleeping: 'dormido',
-  awake: 'despierto',
-  angry: 'enojado',
-  wounded: 'herido',
-  fury: 'en furia',
-  defeated: 'derrotado',
+  sleeping: translateText('dormido'),
+  awake: translateText('despierto'),
+  angry: translateText('enojado'),
+  wounded: translateText('herido'),
+  fury: translateText('en furia'),
+  defeated: translateText('derrotado'),
 });
 
 const VALID_STATES = new Set(Object.keys(STATE_LABELS));
@@ -142,7 +143,7 @@ function inferredState(value, hpPct) {
 
 function renderBody(entry) {
   if (entry.face === 'ghost') {
-    return `
+    return ui`
       <g class="monster-layer monster-layer--outline" fill="currentColor">
         <path class="monster-pixel monster-pixel--outline" d="M52 32h56v8h12v12h8v52h-12v-8h-8v12H92V96H80v12H64V96H52v12H36V52h8V40h8Z"/>
       </g>
@@ -151,7 +152,7 @@ function renderBody(entry) {
         <path class="monster-pixel monster-pixel--highlight" d="M56 40h48v8H56zM48 52h8v28h-8z"/>
       </g>`;
   }
-  return `
+  return ui`
     <g class="monster-layer monster-layer--outline" fill="currentColor">
       <path class="monster-pixel monster-pixel--outline" d="M40 24h12V12h16v12h24V12h16v12h12v12h12v16h8v36h-12v16h-16v8H48v-8H32V88H20V52h8V36h12Z"/>
     </g>
@@ -164,7 +165,7 @@ function renderBody(entry) {
 
 function renderFace(entry, state) {
   if (state === 'defeated') {
-    return `
+    return ui`
       <g class="monster-layer monster-layer--face monster-layer--defeated" fill="currentColor" stroke="currentColor" stroke-linecap="square" stroke-width="4">
         <line class="monster-pixel monster-pixel--eye" x1="55" y1="57" x2="69" y2="71"/>
         <line class="monster-pixel monster-pixel--eye" x1="69" y1="57" x2="55" y2="71"/>
@@ -175,7 +176,7 @@ function renderFace(entry, state) {
   }
 
   if (state === 'sleeping') {
-    return `
+    return ui`
       <g class="monster-layer monster-layer--face monster-layer--sleeping" fill="none" stroke="currentColor" stroke-linecap="square" stroke-width="4">
         <line class="monster-pixel monster-pixel--eye" x1="53" y1="66" x2="67" y2="66"/>
         <line class="monster-pixel monster-pixel--eye" x1="93" y1="66" x2="107" y2="66"/>
@@ -187,17 +188,17 @@ function renderFace(entry, state) {
 
   const oneEye = entry.face === 'one-eyed';
   const eyeMarkup = oneEye
-    ? '<rect class="monster-pixel monster-pixel--eye" x="76" y="59" width="10" height="14"/>'
-    : `<rect class="monster-pixel monster-pixel--eye" x="54" y="59" width="12" height="14"/>
+    ? translateMarkup('<rect class="monster-pixel monster-pixel--eye" x="76" y="59" width="10" height="14"/>')
+    : ui`<rect class="monster-pixel monster-pixel--eye" x="54" y="59" width="12" height="14"/>
        <rect class="monster-pixel monster-pixel--eye" x="94" y="59" width="12" height="14"/>`;
   const browMarkup = state === 'angry' || state === 'wounded' || state === 'fury'
-    ? `<line class="monster-pixel monster-pixel--brow" x1="51" y1="55" x2="68" y2="61"/>
+    ? ui`<line class="monster-pixel monster-pixel--brow" x1="51" y1="55" x2="68" y2="61"/>
        <line class="monster-pixel monster-pixel--brow" x1="92" y1="61" x2="109" y2="55"/>`
     : '';
   const mouthMarkup = entry.face === 'toothy'
-    ? `<polygon class="monster-pixel monster-pixel--teeth" points="65,80 72,91 79,80 86,91 93,80"/>`
-    : '<rect class="monster-pixel monster-pixel--mouth" x="69" y="81" width="22" height="7"/>';
-  return `
+    ? ui`<polygon class="monster-pixel monster-pixel--teeth" points="65,80 72,91 79,80 86,91 93,80"/>`
+    : translateMarkup('<rect class="monster-pixel monster-pixel--mouth" x="69" y="81" width="22" height="7"/>');
+  return ui`
     <g class="monster-layer monster-layer--face" fill="currentColor" stroke="currentColor" stroke-linecap="square" stroke-width="4">
       ${eyeMarkup}
       ${browMarkup}
@@ -208,37 +209,37 @@ function renderFace(entry, state) {
 function renderSpeciesFeature(entry) {
   switch (entry.face) {
     case 'one-eyed':
-      return `
+      return ui`
         <g class="monster-layer monster-layer--weapon" fill="currentColor" stroke="currentColor" stroke-linecap="square" stroke-width="4">
           <rect class="monster-pixel monster-pixel--handle" x="122" y="57" width="7" height="43"/>
           <polygon class="monster-pixel monster-pixel--hammer" points="116,48 144,48 144,66 116,66"/>
         </g>`;
     case 'toothy':
-      return `
+      return ui`
         <g class="monster-layer monster-layer--accessory" fill="currentColor">
           <polygon class="monster-pixel monster-pixel--bib" points="46,92 114,92 104,113 56,113"/>
         </g>`;
     case 'breathing':
-      return `
+      return ui`
         <g class="monster-layer monster-layer--breath" fill="none" stroke="currentColor" stroke-linecap="square" stroke-width="4">
           <line class="monster-pixel monster-pixel--breath-line" x1="124" y1="74" x2="143" y2="68"/>
           <line class="monster-pixel monster-pixel--breath-line" x1="124" y1="83" x2="148" y2="83"/>
           <line class="monster-pixel monster-pixel--breath-line" x1="124" y1="92" x2="143" y2="98"/>
         </g>`;
     case 'horned':
-      return `
+      return ui`
         <g class="monster-layer monster-layer--horns" fill="currentColor">
           <polygon class="monster-pixel monster-pixel--horn" points="40,38 27,18 49,29"/>
           <polygon class="monster-pixel monster-pixel--horn" points="120,38 133,18 111,29"/>
         </g>`;
     case 'ghost':
-      return `
+      return ui`
         <g class="monster-layer monster-layer--ghost" fill="none" stroke="currentColor" stroke-linecap="square" stroke-width="4">
           <line class="monster-pixel monster-pixel--ghost-line" x1="51" y1="45" x2="61" y2="45"/>
           <line class="monster-pixel monster-pixel--ghost-line" x1="99" y1="45" x2="109" y2="45"/>
         </g>`;
     default:
-      return `
+      return ui`
         <g class="monster-layer monster-layer--accessory" fill="currentColor">
           <polygon class="monster-pixel monster-pixel--sleep-cap" points="42,34 58,17 82,30 107,17 118,34"/>
         </g>`;
@@ -251,22 +252,22 @@ function renderStateFeature(state, variant) {
   const defeated = state === 'defeated';
   const streak = variant === 'streak';
   return `
-    ${wounded ? `
+    ${wounded ? ui`
       <g class="monster-layer monster-layer--wounds" fill="none" stroke="currentColor" stroke-linecap="square" stroke-width="3">
         <polyline class="monster-pixel monster-pixel--crack" points="42,47 52,60 45,72 56,82"/>
         <polyline class="monster-pixel monster-pixel--crack" points="112,48 103,62 112,73 101,89"/>
       </g>` : ''}
-    ${fury ? `
+    ${fury ? ui`
       <g class="monster-layer monster-layer--fury" fill="currentColor" stroke="currentColor" stroke-linecap="square" stroke-width="3">
         <polygon class="monster-pixel monster-pixel--crown" points="57,27 65,12 80,24 95,12 103,27"/>
         <line class="monster-pixel monster-pixel--spark" x1="23" y1="24" x2="34" y2="13"/>
         <line class="monster-pixel monster-pixel--spark" x1="137" y1="24" x2="148" y2="13"/>
       </g>` : ''}
-    ${streak ? `
+    ${streak ? ui`
       <g class="monster-layer monster-layer--streak" fill="currentColor">
         <polygon class="monster-pixel monster-pixel--star" points="80,3 86,16 100,17 89,26 93,39 80,31 67,39 71,26 60,17 74,16"/>
       </g>` : ''}
-    ${defeated ? `
+    ${defeated ? ui`
       <g class="monster-layer monster-layer--loot" fill="currentColor">
         <rect class="monster-pixel monster-pixel--loot-piece" x="19" y="96" width="10" height="10"/>
         <rect class="monster-pixel monster-pixel--loot-piece" x="130" y="97" width="9" height="9"/>
@@ -278,14 +279,14 @@ function renderEquipment(value) {
   const entries = equipmentEntries(value);
   if (!entries.length) return '';
   const ids = new Set(entries.map((item) => item.id));
-  return `
+  return ui`
     <g class="monster-layer monster-layer--equipment" data-equipment="${escapeAttribute(entries.map((item) => item.id).join(' '))}" fill="currentColor" stroke="currentColor" stroke-linecap="square" stroke-width="3">
       ${ids.has('corona-del-ciclo') ? '<polygon class="monster-equipment monster-equipment--crown" points="57,30 64,13 80,25 96,13 103,30"/>' : ''}
       ${ids.has('cuernos-dorados') ? '<path class="monster-equipment monster-equipment--horns" d="M45 39 28 16l25 13m62 10 17-23-25 13" fill="none"/>' : ''}
       ${ids.has('bufanda-de-racha') ? '<path class="monster-equipment monster-equipment--scarf" d="M42 92h76l-8 13H50Z"/>' : ''}
       ${ids.has('alas-pixel') ? '<path class="monster-equipment monster-equipment--wings" d="M37 62 12 50l17 27m94-15 25-12-17 27" fill="none"/>' : ''}
       ${ids.has('armadura-cian') ? '<path class="monster-equipment monster-equipment--armor" d="M48 94h64v14H48Z" fill="none"/>' : ''}
-      ${ids.has('ojo-de-rubi') ? '<rect class="monster-equipment monster-equipment--ruby" x="75" y="57" width="12" height="17"/>' : ''}
+      ${ids.has('ojo-de-rubi') ? translateMarkup('<rect class="monster-equipment monster-equipment--ruby" x="75" y="57" width="12" height="17"/>') : ''}
     </g>`;
 }
 
@@ -302,13 +303,13 @@ export function monsterSvg({
   const stateToken = inferredState(safeToken(state, ''), hp);
   const variantToken = VALID_VARIANTS.has(safeToken(variant, '')) ? safeToken(variant, '') : 'normal';
   const sizeToken = safeToken(sizeClass, 'md');
-  const stateLabel = STATE_LABELS[stateToken];
+  const stateLabel = translateText(STATE_LABELS[stateToken]);
   const equipped = equipmentEntries(equipment);
-  const equipmentLabel = equipped.length ? `, equipado con ${equipped.map((item) => item.label).join(', ')}` : '';
-  const ariaLabel = `${entry.name}, ${stateLabel}, ${Math.round(hp)}% de vida${equipmentLabel}`;
+  const equipmentLabel = equipped.length ? ui`, equipado con ${equipped.map((item) => translateText(item.label)).join(', ')}` : '';
+  const ariaLabel = ui`${translateText(entry.name)}, ${stateLabel}, ${Math.round(hp)}% de vida${equipmentLabel}`;
   const speciesToken = safeToken(entry.id, 'lunes-perezoso');
 
-  return `<svg class="monster-svg monster-svg--${escapeAttribute(sizeToken)} monster-svg--${escapeAttribute(speciesToken)} monster-svg--${escapeAttribute(stateToken)} monster-svg--${escapeAttribute(variantToken)}" data-species="${escapeAttribute(speciesToken)}" data-state="${escapeAttribute(stateToken)}" data-variant="${escapeAttribute(variantToken)}" data-hp-pct="${escapeAttribute(hp)}" viewBox="0 0 160 128" shape-rendering="crispEdges" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${escapeAttribute(ariaLabel)}" focusable="false">
+  return ui`<svg class="monster-svg monster-svg--${escapeAttribute(sizeToken)} monster-svg--${escapeAttribute(speciesToken)} monster-svg--${escapeAttribute(stateToken)} monster-svg--${escapeAttribute(variantToken)}" data-species="${escapeAttribute(speciesToken)}" data-state="${escapeAttribute(stateToken)}" data-variant="${escapeAttribute(variantToken)}" data-hp-pct="${escapeAttribute(hp)}" viewBox="0 0 160 128" shape-rendering="crispEdges" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${escapeAttribute(ariaLabel)}" focusable="false">
   <title>${escapeAttribute(ariaLabel)}</title>
   <g class="monster-sprite" aria-hidden="true">
     <g class="monster-layer monster-layer--shadow" fill="currentColor">
@@ -335,9 +336,9 @@ const PIXEL_ICONS = Object.freeze({
 
 export function gamePixelIcon(name = 'shield') {
   const token = Object.hasOwn(PIXEL_ICONS, name) ? name : 'shield';
-  return `<svg class="game-pixel-icon game-pixel-icon--${token}" viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true" focusable="false"><path fill="currentColor" d="${PIXEL_ICONS[token]}"/></svg>`;
+  return ui`<svg class="game-pixel-icon game-pixel-icon--${token}" viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true" focusable="false"><path fill="currentColor" d="${PIXEL_ICONS[token]}"/></svg>`;
 }
 
 export function gamePixelChest(open = false) {
-  return `<svg class="game-pixel-chest${open ? ' is-open' : ''}" viewBox="0 0 32 28" shape-rendering="crispEdges" aria-hidden="true" focusable="false"><path fill="var(--game-pixel-ink)" d="M2 7h28v19H2z"/><path fill="currentColor" d="M4 9h24v15H4z"/><path fill="var(--game-pixel-shade)" d="M7 13h18v8H7z"/><path fill="currentColor" d="M8 10h3v13H8zM21 10h3v13h-3zM14 12h5v6h-5z"/><g class="game-pixel-chest-lid"><path fill="var(--game-pixel-ink)" d="M2 6h2V3h24v3h2v7H2z"/><path fill="currentColor" d="M4 6h2V5h20v1h2v5H4z"/><path fill="var(--game-pixel-highlight)" d="M7 6h18v2H7z"/></g></svg>`;
+  return ui`<svg class="game-pixel-chest${open ? ' is-open' : ''}" viewBox="0 0 32 28" shape-rendering="crispEdges" aria-hidden="true" focusable="false"><path fill="var(--game-pixel-ink)" d="M2 7h28v19H2z"/><path fill="currentColor" d="M4 9h24v15H4z"/><path fill="var(--game-pixel-shade)" d="M7 13h18v8H7z"/><path fill="currentColor" d="M8 10h3v13H8zM21 10h3v13h-3zM14 12h5v6h-5z"/><g class="game-pixel-chest-lid"><path fill="var(--game-pixel-ink)" d="M2 6h2V3h24v3h2v7H2z"/><path fill="currentColor" d="M4 6h2V5h20v1h2v5H4z"/><path fill="var(--game-pixel-highlight)" d="M7 6h18v2H7z"/></g></svg>`;
 }

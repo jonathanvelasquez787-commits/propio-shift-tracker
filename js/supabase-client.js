@@ -1,3 +1,4 @@
+import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 // Cliente Supabase único, compartido por la landing y por la app.
 //
 // Se carga desde jsDelivr con la versión PINCHADA a propósito: un `@2` flotante
@@ -13,7 +14,7 @@ let client = null;
 export function getSupabase() {
   if (!isConfigured()) {
     throw new Error(
-      'Supabase sin configurar: falta editar js/config.js con la URL y la anon key del proyecto.'
+      translateText('Supabase sin configurar: falta editar js/config.js con la URL y la anon key del proyecto.')
     );
   }
   if (!client) {

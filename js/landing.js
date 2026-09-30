@@ -1,3 +1,5 @@
+import { ui, translateText, translateMarkup, displayLocale, translateDocument } from './i18n.js';
+translateDocument();
 // Landing: decide qué mostrar (formularios, sesión ya abierta, o "pon una
 // contraseña nueva") y ejecuta los 3 métodos de entrada.
 
@@ -81,7 +83,7 @@ function nextUrl() {
 function showMessage(text, kind = 'error') {
   if (!msgEl) return;
   msgEl.textContent = text;
-  msgEl.className = `form-msg show ${kind}`;
+  msgEl.className = ui`form-msg show ${kind}`;
 }
 
 function clearMessage() {
@@ -91,20 +93,20 @@ function clearMessage() {
 }
 
 const VIEWS = {
-  login: { title: 'Entrar', sub: 'Usa tu correo o tu nombre de usuario.', tabs: true },
+  login: { title: translateText('Entrar'), sub: translateText('Usa tu correo o tu nombre de usuario.'), tabs: true },
   signup: {
-    title: 'Crear cuenta',
-    sub: 'Elige cómo te vas a llamar aquí dentro.',
+    title: translateText('Crear cuenta'),
+    sub: translateText('Elige cómo te vas a llamar aquí dentro.'),
     tabs: true,
   },
   forgot: {
-    title: 'Recuperar contraseña',
-    sub: 'Te mandamos un enlace al correo con el que te registraste.',
+    title: translateText('Recuperar contraseña'),
+    sub: translateText('Te mandamos un enlace al correo con el que te registraste.'),
     tabs: false,
   },
   reset: {
-    title: 'Contraseña nueva',
-    sub: 'Escribe la contraseña que vas a usar de ahora en adelante.',
+    title: translateText('Contraseña nueva'),
+    sub: translateText('Escribe la contraseña que vas a usar de ahora en adelante.'),
     tabs: false,
   },
 };
@@ -146,7 +148,7 @@ function setBusy(button, busy, busyLabel) {
 }
 
 function showSessionCard(profile, user) {
-  const name = (profile && (profile.display_name || profile.username)) || user.email || 'Tu cuenta';
+  const name = (profile && (profile.display_name || profile.username)) || user.email || translateText('Tu cuenta');
   const handle = profile && profile.username ? `@${profile.username}` : user.email || '';
   $('sessionAvatar').textContent = String(name).trim().charAt(0).toUpperCase() || '?';
   $('sessionName').textContent = name;
@@ -155,15 +157,15 @@ function showSessionCard(profile, user) {
   authForms.style.display = 'none';
   // .auth-head queda visible: es el único lugar donde se puede explicar algo
   // con los formularios ocultos.
-  if (titleEl) titleEl.textContent = 'Tu cuenta';
+  if (titleEl) titleEl.textContent = translateText('Tu cuenta');
   if (subEl) {
     subEl.textContent = bouncedBackFromApp()
-      ? 'La app no pudo abrirse con esta sesión. Prueba de nuevo, o cierra sesión y vuelve a entrar.'
-      : 'Ya tienes la sesión abierta en este navegador.';
+      ? translateText('La app no pudo abrirse con esta sesión. Prueba de nuevo, o cierra sesión y vuelve a entrar.')
+      : translateText('Ya tienes la sesión abierta en este navegador.');
   }
   const topBtn = $('topEnterBtn');
   if (topBtn) {
-    topBtn.textContent = 'Abrir la app';
+    topBtn.textContent = translateText('Abrir la app');
     topBtn.setAttribute('href', '/app.html');
   }
 }
@@ -177,7 +179,7 @@ async function init() {
 
   if (!isConfigured()) {
     showMessage(
-      'La app todavía no está conectada a su base de datos. Si eres quien la administra: edita js/config.js con la URL y la anon key de Supabase.',
+      translateText('La app todavía no está conectada a su base de datos. Si eres quien la administra: edita js/config.js con la URL y la anon key de Supabase.'),
       'info'
     );
     document.querySelectorAll('.submit-btn, .google-btn').forEach((b) => (b.disabled = true));
@@ -187,7 +189,7 @@ async function init() {
   // Google puede volver con un error explícito en la URL.
   if (params.get('error') || params.get('error_code')) {
     showMessage(
-      params.get('error_description') || 'No se pudo completar la entrada con Google. Intenta de nuevo.',
+      params.get('error_description') || translateText('No se pudo completar la entrada con Google. Intenta de nuevo.'),
       'error'
     );
   }
@@ -196,7 +198,7 @@ async function init() {
     if (event === 'PASSWORD_RECOVERY') {
       recoveryMode = true;
       showView('reset');
-      showMessage('Escribe tu contraseña nueva para terminar.', 'info');
+      showMessage(translateText('Escribe tu contraseña nueva para terminar.'), 'info');
       return;
     }
     if (event === 'SIGNED_IN' && session && !recoveryMode) {
@@ -228,7 +230,7 @@ async function init() {
   sessionStorage.removeItem(PENDING_KEY);
 
   if (!stayOnLanding && !bouncedBackFromApp()) {
-    showMessage('Ya tienes la sesión abierta — entrando…', 'info');
+    showMessage(translateText('Ya tienes la sesión abierta — entrando…'), 'info');
     enterApp();
     return;
   }
@@ -271,7 +273,7 @@ forms.login?.addEventListener('submit', async (e) => {
   const identifier = $('loginIdentifier').value.trim();
   const password = $('loginPassword').value;
   if (!identifier || !password) {
-    showMessage('Faltan datos para entrar.', 'error');
+    showMessage(translateText('Faltan datos para entrar.'), 'error');
     return;
   }
   const btn = $('loginSubmit');
@@ -304,7 +306,7 @@ forms.signup?.addEventListener('submit', async (e) => {
       setBusy(btn, false);
       showView('login');
       showMessage(
-        `Cuenta creada. Te mandamos un correo a ${email} para confirmarla — ábrelo y ya puedes entrar.`,
+        ui`Cuenta creada. Te mandamos un correo a ${email} para confirmarla — ábrelo y ya puedes entrar.`,
         'ok'
       );
       return;
@@ -326,7 +328,7 @@ forms.forgot?.addEventListener('submit', async (e) => {
   try {
     await requestPasswordReset($('forgotEmail').value);
     showMessage(
-      'Si ese correo tiene una cuenta, ya va en camino el enlace para cambiar la contraseña. Revisa también el spam.',
+      translateText('Si ese correo tiene una cuenta, ya va en camino el enlace para cambiar la contraseña. Revisa también el spam.'),
       'ok'
     );
   } catch (err) {
@@ -344,7 +346,7 @@ forms.reset?.addEventListener('submit', async (e) => {
   try {
     await updatePassword($('resetPassword').value);
     recoveryMode = false;
-    showMessage('Listo, contraseña actualizada. Entrando…', 'ok');
+    showMessage(translateText('Listo, contraseña actualizada. Entrando…'), 'ok');
     setTimeout(enterApp, 900);
   } catch (err) {
     showMessage(authErrorMessage(err), 'error');
@@ -374,25 +376,25 @@ $('signupUsername')?.addEventListener('input', (e) => {
 
   if (!value) {
     hint.className = 'field-hint';
-    hint.textContent = '3 a 24 caracteres: letras, números, guion bajo o punto.';
+    hint.textContent = translateText('3 a 24 caracteres: letras, números, guion bajo o punto.');
     return;
   }
   if (!USERNAME_RE.test(value)) {
     hint.className = 'field-hint bad';
-    hint.textContent = 'Solo letras, números, guion bajo y punto — entre 3 y 24 caracteres.';
+    hint.textContent = translateText('Solo letras, números, guion bajo y punto — entre 3 y 24 caracteres.');
     return;
   }
 
   hint.className = 'field-hint';
-  hint.textContent = 'Revisando disponibilidad…';
+  hint.textContent = translateText('Revisando disponibilidad…');
   usernameTimer = setTimeout(async () => {
     try {
       const free = await isUsernameAvailable(value);
       hint.className = `field-hint ${free ? 'ok' : 'bad'}`;
-      hint.textContent = free ? `"${value}" está libre.` : `"${value}" ya está ocupado.`;
+      hint.textContent = free ? ui`"${value}" está libre.` : ui`"${value}" ya está ocupado.`;
     } catch {
       hint.className = 'field-hint';
-      hint.textContent = 'No se pudo revisar ahora; lo confirmamos al crear la cuenta.';
+      hint.textContent = translateText('No se pudo revisar ahora; lo confirmamos al crear la cuenta.');
     }
   }, 450);
 });

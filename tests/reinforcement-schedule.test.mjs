@@ -1,3 +1,5 @@
+import { ui, translateText, translateMarkup, displayLocale } from '../js/i18n.js';
+import { applySavedColors } from '../js/appearance-colors.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -22,7 +24,7 @@ const dateAtTime = (date, hhmm) => {
 };
 const toMinutes = (hhmm) => { const [hour, minute] = hhmm.split(':').map(Number); return hour * 60 + minute; };
 function scheduleHarness(config, { mode = 'anchor', actualStart = '23:30', slots } = {}) {
-  const context = vm.createContext({
+  const context = vm.createContext({ ui, translateText, translateMarkup, displayLocale, applySavedColors,
     Date, settings: { lateArrivalMode: mode }, callDateToDate: (key) => key === dayKey ? new Date(base) : null,
     dayConfigFor: () => config, dayIsEffectivelyOff: () => false,
     getActiveDayKey: () => dayKey, formatHHMM: (value) => value, toMinutes,
@@ -105,7 +107,7 @@ test('inactivity production guard suppresses scheduled break and off-duty delive
     { type: 'work', start: '09:30', dur: 30 },
   ] });
   const state = { shiftStartedAt: new Date(localTime(29, 8)).toISOString(), shiftEndedAt: null, pauseHistory: [], dayInterruptions: {}, game: { ledger: {} } };
-  const context = vm.createContext({ Date, state, calls: [], ensureGameState: () => {},
+  const context = vm.createContext({ ui, translateText, translateMarkup, displayLocale, applySavedColors, Date, state, calls: [], ensureGameState: () => {},
     getReinforcementWorkIntervals: provider, currentGameDayKey: () => dayKey,
     activeWorkSinceLastCall, saveStateOnly: () => {}, notifyReinforcement: () => {}, reinforcementText: () => 'apoyo', hashText: String,
   });
@@ -126,7 +128,7 @@ function pauseHarness({ at, startedAt, planned, absoluteSlots, effectiveDuration
   const state = { activePause: { type: 'break', startedAt: new Date(startedAt).toISOString(), shiftDayKey: dayKey }, pauseHistory: [] };
   const results = [];
   const generalToasts = [];
-  const context = vm.createContext({ Date: FixedDate, state,
+  const context = vm.createContext({ ui, translateText, translateMarkup, displayLocale, applySavedColors, Date: FixedDate, state,
     callDateKeyFromValue: (value) => value, currentShiftAccountingDayKey: () => dayKey,
     findPlannedSlotForActivePause: () => planned, makeLocalId: () => 'closed-pause',
     setEvent: () => ({ id: 'event' }), fmtTime: () => '', stopBreakEndAlarm: () => {},

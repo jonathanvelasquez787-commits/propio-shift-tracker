@@ -1,10 +1,12 @@
+import { ui, translateText, translateMarkup, displayLocale } from '../js/i18n.js';
+import { applySavedColors } from '../js/appearance-colors.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 
 const read = file => fs.readFileSync(new URL('../' + file, import.meta.url), 'utf8');
-const themeSource = read('js/theme-init.js');
+const themeSource = read('js/theme-init.js').replace(/^import .*;\r?$/gm, '');
 
 for (const [name, raw, expected] of [
   ['saved dark', '{"theme":"dark","rate":0.2}', 'dark'],
@@ -17,12 +19,12 @@ for (const [name, raw, expected] of [
 ]) {
   test(`theme initialization: ${name}`, () => {
     const classes = new Set(['theme-dark', 'theme-light']);
-    vm.runInNewContext(themeSource, {
+    vm.runInNewContext(themeSource, { ui, translateText, translateMarkup, displayLocale, applySavedColors,
       localStorage: {
         getItem() { if (raw instanceof Error) throw raw; return raw; },
         setItem() { assert.fail('Theme initialization must not overwrite settings'); },
       },
-      document: { documentElement: { classList: {
+      document: { documentElement: { dataset: {}, style: { setProperty() {}, removeProperty() {} }, classList: {
         toggle(name, on) { if (on) classes.add(name); else classes.delete(name); },
       } } },
     });
@@ -74,7 +76,7 @@ test('production build pins and bundles Supabase without source maps', () => {
   const build = read('scripts/build.mjs');
   assert.match(build, /sourcemap:\s*false/);
   assert.match(build, /inlineDynamicImports:\s*true/);
-  assert.match(build, /format: name === 'boot' \|\| name === 'landing' \? 'iife' : 'es'/);
+  assert.match(build, /format: \[.*'boot'.*'landing'.*'theme-init'.*\]\.includes\(name\) \? 'iife' : 'es'/);
   assert.doesNotMatch(build, /chunkFileNames/);
   assert.match(build, /if \(ownCycle\) throw new Error\(warning\.message\)/);
   assert.match(build, /minify\(/);
@@ -96,7 +98,7 @@ test('phase 5 migration keeps private data behind RLS and persistent limits', ()
 test('landing redirects only to a validated same-origin URL', () => {
   const source = read('js/landing.js');
   const nextUrl = source.match(/^function nextUrl\(\) \{[\s\S]*?^\}/m)?.[0] || '';
-  const resolve = next => vm.runInNewContext(`${nextUrl}\nnextUrl()`, {
+  const resolve = next => vm.runInNewContext(`${nextUrl}\nnextUrl()`, { ui, translateText, translateMarkup, displayLocale, applySavedColors,
     params: new URLSearchParams(next === null ? '' : `next=${encodeURIComponent(next)}`),
     URL,
     window: { location: { origin: 'https://app.example' } },
@@ -165,9 +167,9 @@ test('PWA shell includes a manifest and service worker with API exclusions', () 
 
 test('footer year tolerates pages without a footer', () => {
   const footer = {};
-  vm.runInNewContext(read('js/footer-year.js'), {document:{getElementById:()=>footer}});
+  vm.runInNewContext(read('js/footer-year.js'), { ui, translateText, translateMarkup, displayLocale, applySavedColors,document:{getElementById:()=>footer}});
   assert.equal(footer.textContent, String(new Date().getFullYear()));
-  assert.doesNotThrow(() => vm.runInNewContext(read('js/footer-year.js'), {document:{getElementById:()=>null}}));
+  assert.doesNotThrow(() => vm.runInNewContext(read('js/footer-year.js'), { ui, translateText, translateMarkup, displayLocale, applySavedColors,document:{getElementById:()=>null}}));
 });
 
 test('PDF report registers a click listener on its own print window', () => {
@@ -184,7 +186,7 @@ test('PDF report registers a click listener on its own print window', () => {
       },
     },
   };
-  vm.runInNewContext(fn + '\nexportAccountingPdf();', {
+  vm.runInNewContext(fn + '\nexportAccountingPdf();', { ui, translateText, translateMarkup, displayLocale, applySavedColors,
     window: {open:()=>popup}, accountingExportRange:()=>({label:'Test period'}),
     accountingExportDays:()=>[{dayCalls:[],dayKey:'2026-09-27',productive:0,stats:{earnings:0}}],
     escapeHtml:String, formatCallDayLabel:String, formatMinutes:String, money:String, fmtDate:String, toast() {},

@@ -1,75 +1,76 @@
+import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 import { settings } from './app-context.js';
 
 export const LONG_CALL_MINUTES = 30;
 
 export const REINFORCEMENT_TEXTS = Object.freeze({
   'call-normal': Object.freeze([
-    'Llamada completada · sumaste {amount} a tu día',
-    'Tomaste otra llamada · {amount} ganados',
-    'Una llamada más completada · {amount} para tu meta',
+    translateText('Llamada completada · sumaste {amount} a tu día'),
+    translateText('Tomaste otra llamada · {amount} ganados'),
+    translateText('Una llamada más completada · {amount} para tu meta'),
   ]),
   'call-long': Object.freeze([
-    'Sostuviste una llamada de {minutes} min',
-    'Completaste {minutes} min de atención continua',
-    'Llamada larga completada · {minutes} min de trabajo',
+    translateText('Sostuviste una llamada de {minutes} min'),
+    translateText('Completaste {minutes} min de atención continua'),
+    translateText('Llamada larga completada · {minutes} min de trabajo'),
   ]),
   'call-higher': Object.freeze([
-    'Aprovechaste Higher Rate · bono de {bonus}',
-    'Esta llamada sumó un bono Higher Rate de {bonus}',
-    'Higher Rate aprovechado · {bonus} extra en esta llamada',
+    translateText('Aprovechaste Higher Rate · bono de {bonus}'),
+    translateText('Esta llamada sumó un bono Higher Rate de {bonus}'),
+    translateText('Higher Rate aprovechado · {bonus} extra en esta llamada'),
   ]),
   'call-best': Object.freeze([
-    'Tu mejor llamada por pago de hoy · {amount}',
-    'Nuevo mejor pago por llamada de hoy · {amount}',
-    'Esta es tu llamada de mayor pago de hoy · {amount}',
+    translateText('Tu mejor llamada por pago de hoy · {amount}'),
+    translateText('Nuevo mejor pago por llamada de hoy · {amount}'),
+    translateText('Esta es tu llamada de mayor pago de hoy · {amount}'),
   ]),
   milestone: Object.freeze([
-    'Llegaste al {percent}% de tu meta diaria · {amount} ganados',
-    'Tu trabajo ya cubre el {percent}% de tu meta · {amount}',
-    'Hito del {percent}% alcanzado · sumaste {amount} hoy',
+    translateText('Llegaste al {percent}% de tu meta diaria · {amount} ganados'),
+    translateText('Tu trabajo ya cubre el {percent}% de tu meta · {amount}'),
+    translateText('Hito del {percent}% alcanzado · sumaste {amount} hoy'),
   ]),
   pause: Object.freeze([
-    'Volviste a tiempo de {pause} · cuidaste tu descanso y tu ritmo{xp}',
-    '{pause} terminado a tiempo · tu pausa también cuenta{xp}',
-    'Regreso puntual de {pause} · listo para continuar{xp}',
+    translateText('Volviste a tiempo de {pause} · cuidaste tu descanso y tu ritmo{xp}'),
+    translateText('{pause} terminado a tiempo · tu pausa también cuenta{xp}'),
+    translateText('Regreso puntual de {pause} · listo para continuar{xp}'),
   ]),
   dropped: Object.freeze([
-    'La llamada se cortó · una llamada no define tu día',
-    'El corte quedó registrado · puedes retomar con la siguiente llamada',
-    'Una llamada cortada no borra el trabajo que ya hiciste',
+    translateText('La llamada se cortó · una llamada no define tu día'),
+    translateText('El corte quedó registrado · puedes retomar con la siguiente llamada'),
+    translateText('Una llamada cortada no borra el trabajo que ya hiciste'),
   ]),
   idle: Object.freeze([
-    'Ha pasado una hora de trabajo sin llamadas · puedes retomar a tu ritmo',
-    'Una hora sin llamadas no define tu capacidad · sigue a tu ritmo',
-    'Este tramo estuvo tranquilo · la siguiente llamada será un nuevo paso',
+    translateText('Ha pasado una hora de trabajo sin llamadas · puedes retomar a tu ritmo'),
+    translateText('Una hora sin llamadas no define tu capacidad · sigue a tu ritmo'),
+    translateText('Este tramo estuvo tranquilo · la siguiente llamada será un nuevo paso'),
   ]),
   recovery: Object.freeze([
-    'Volviste a tomar otra llamada · recuperación lograda',
-    'Retomaste después de una llamada difícil · ese paso cuenta',
-    'Una nueva llamada completada · seguiste adelante',
+    translateText('Volviste a tomar otra llamada · recuperación lograda'),
+    translateText('Retomaste después de una llamada difícil · ese paso cuenta'),
+    translateText('Una nueva llamada completada · seguiste adelante'),
   ]),
   'reflection-good': Object.freeze([
-    'Cierre positivo guardado · esta llamada cuenta',
-    'Reconociste algo que salió bien en tu llamada',
-    'Guardaste evidencia de una llamada que cerró bien',
+    translateText('Cierre positivo guardado · esta llamada cuenta'),
+    translateText('Reconociste algo que salió bien en tu llamada'),
+    translateText('Guardaste evidencia de una llamada que cerró bien'),
   ]),
   'reflection-difficult': Object.freeze([
-    'La tomaste aunque fue difícil · puedes volver a tu ritmo',
-    'Enfrentaste una llamada difícil · tu esfuerzo cuenta',
-    'Una llamada difícil no borra las que ya completaste',
+    translateText('La tomaste aunque fue difícil · puedes volver a tu ritmo'),
+    translateText('Enfrentaste una llamada difícil · tu esfuerzo cuenta'),
+    translateText('Una llamada difícil no borra las que ya completaste'),
   ]),
   'reflection-learning': Object.freeze([
-    'Aprendizaje guardado · una llamada no define tu capacidad',
-    'Encontraste un aprendizaje en esta llamada',
-    'Lo que aprendiste hoy puede ayudarte en la siguiente llamada',
+    translateText('Aprendizaje guardado · una llamada no define tu capacidad'),
+    translateText('Encontraste un aprendizaje en esta llamada'),
+    translateText('Lo que aprendiste hoy puede ayudarte en la siguiente llamada'),
   ]),
   'reward-earned': Object.freeze([
-    '{icon} Premio disponible para tu {window}: {name}{extra}',
-    '{icon} Tu constancia desbloqueó {name} · {window}{extra}',
+    translateText('{icon} Premio disponible para tu {window}: {name}{extra}'),
+    translateText('{icon} Tu constancia desbloqueó {name} · {window}{extra}'),
   ]),
   'reward-claimed': Object.freeze([
-    '{icon} Premio realizado: {name}',
-    '{icon} Disfrutaste tu premio: {name}',
+    translateText('{icon} Premio realizado: {name}'),
+    translateText('{icon} Disfrutaste tu premio: {name}'),
   ]),
 });
 

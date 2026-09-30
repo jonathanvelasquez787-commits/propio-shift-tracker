@@ -1,3 +1,6 @@
+import { ui, translateText, translateMarkup, displayLocale, translateDocument } from './i18n.js';
+import { applyAppearance, wireAppearance } from './appearance.js';
+import { wireAchievementHelp } from './help-tooltips.js';
 // Cuerpo principal de la app (Inicio, Horario, Llamadas, Higher Rate, Finanzas, Reportes,
 // Calendario, Ajustes...). Vive como módulo ES aparte para no ser parte del documento HTML: lo
 // carga js/boot.js con un import() dinámico recién cuando la sesión y los datos están listos
@@ -213,17 +216,17 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
       flame: '<path d=\"M12 2c2 3-1 4-1 7a3 3 0 1 0 6 0c0-1-.5-2-.5-2 2 1 3 3.5 3 6a7 7 0 1 1-14 0c0-4 2-6 3.5-8 .5 2 1 2.5 3-3Z\"/>',
       shield: '<path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z\"/>',
       trophy: '<path d=\"M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4Z\"/><path d=\"M7 6H4v2a4 4 0 0 0 4 4M17 6h3v2a4 4 0 0 1-4 4\"/>',
-      gift: '<rect x=\"3\" y=\"8\" width=\"18\" height=\"13\" rx=\"2\"/><path d=\"M12 8v13M3 12h18M7.5 8C5 8 4 6.5 4.8 5.2 6 3.2 9.5 5.4 12 8M16.5 8c2.5 0 3.5-1.5 2.7-2.8C18 3.2 14.5 5.4 12 8\"/>',
+      gift: translateMarkup('<rect x=\"3\" y=\"8\" width=\"18\" height=\"13\" rx=\"2\"/><path d=\"M12 8v13M3 12h18M7.5 8C5 8 4 6.5 4.8 5.2 6 3.2 9.5 5.4 12 8M16.5 8c2.5 0 3.5-1.5 2.7-2.8C18 3.2 14.5 5.4 12 8\"/>'),
       settings: '<circle cx=\"12\" cy=\"12\" r=\"3\"/><path d=\"M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z\"/>',
       reset: '<path d=\"M21 12a9 9 0 1 1-3-6.7\"/><polyline points=\"21 3 21 9 15 9\"/>',
       coffee: '<path d=\"M17 8h1a4 4 0 1 1 0 8h-1\"/><path d=\"M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z\"/><line x1=\"6\" y1=\"2\" x2=\"6\" y2=\"4\"/><line x1=\"10\" y1=\"2\" x2=\"10\" y2=\"4\"/><line x1=\"14\" y1=\"2\" x2=\"14\" y2=\"4\"/>',
       utensils: '<path d=\"M7 2v6a2 2 0 0 0 4 0V2\"/><path d=\"M9 8v14\"/><path d=\"M17 2c-1.5 0-3 1.5-3 4s1.5 4 3 5v11\"/>',
-      briefcase: '<rect x=\"2\" y=\"7\" width=\"20\" height=\"14\" rx=\"2\"/><path d=\"M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2\"/><line x1=\"2\" y1=\"12\" x2=\"22\" y2=\"12\"/>',
+      briefcase: translateMarkup('<rect x=\"2\" y=\"7\" width=\"20\" height=\"14\" rx=\"2\"/><path d=\"M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2\"/><line x1=\"2\" y1=\"12\" x2=\"22\" y2=\"12\"/>'),
       phone: '<path d=\"M15.05 5A5 5 0 0 1 19 8.95M15.05 1A9 9 0 0 1 23 8.94m-1 7.98v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.68 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.32 1.85.55 2.81.68A2 2 0 0 1 22 16.92Z\"/>',
-      clipboard: '<rect x=\"8\" y=\"2\" width=\"8\" height=\"4\" rx=\"1\"/><path d=\"M9 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-3\"/><line x1=\"9\" y1=\"12\" x2=\"15\" y2=\"12\"/><line x1=\"9\" y1=\"16\" x2=\"15\" y2=\"16\"/>',
+      clipboard: translateMarkup('<rect x=\"8\" y=\"2\" width=\"8\" height=\"4\" rx=\"1\"/><path d=\"M9 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-3\"/><line x1=\"9\" y1=\"12\" x2=\"15\" y2=\"12\"/><line x1=\"9\" y1=\"16\" x2=\"15\" y2=\"16\"/>'),
       plus: '<line x1=\"12\" y1=\"5\" x2=\"12\" y2=\"19\"/><line x1=\"5\" y1=\"12\" x2=\"19\" y2=\"12\"/>',
       home: '<path d=\"M3 10.5 12 3l9 7.5\"/><path d=\"M5 9.5V21h14V9.5\"/>',
-      calendar: '<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"/><line x1=\"16\" y1=\"2\" x2=\"16\" y2=\"6\"/><line x1=\"8\" y1=\"2\" x2=\"8\" y2=\"6\"/><line x1=\"3\" y1=\"10\" x2=\"21\" y2=\"10\"/>',
+      calendar: translateMarkup('<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"/><line x1=\"16\" y1=\"2\" x2=\"16\" y2=\"6\"/><line x1=\"8\" y1=\"2\" x2=\"8\" y2=\"6\"/><line x1=\"3\" y1=\"10\" x2=\"21\" y2=\"10\"/>'),
       clock: '<circle cx=\"12\" cy=\"12\" r=\"9\"/><polyline points=\"12 7 12 12 15.5 14\"/>',
       chevronDown: '<polyline points=\"6 9 12 15 18 9\"/>',
       help: '<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.8.4-1.5 1-1.5 2.2\"/><line x1=\"12\" y1=\"17\" x2=\"12\" y2=\"17.01\"/>',
@@ -234,11 +237,11 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
       checkCircle: '<circle cx=\"12\" cy=\"12\" r=\"9\"/><polyline points=\"8 12.5 11 15.5 16 9\"/>',
       alertTriangle: '<path d=\"M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z\"/><line x1=\"12\" y1=\"9\" x2=\"12\" y2=\"13\"/><line x1=\"12\" y1=\"17\" x2=\"12\" y2=\"17.01\"/>',
       moon: '<path d=\"M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z\"/>',
-      lock: '<rect x=\"4\" y=\"11\" width=\"16\" height=\"10\" rx=\"2\"/><path d=\"M8 11V7a4 4 0 0 1 8 0v4\"/>',
+      lock: translateMarkup('<rect x=\"4\" y=\"11\" width=\"16\" height=\"10\" rx=\"2\"/><path d=\"M8 11V7a4 4 0 0 1 8 0v4\"/>'),
       eye: '<path d=\"M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/>',
       repeat: '<path d=\"M17 2 21 6 17 10\"/><path d=\"M3 12v-2a4 4 0 0 1 4-4h14\"/><path d=\"M7 22 3 18 7 14\"/><path d=\"M21 12v2a4 4 0 0 1-4 4H3\"/>',
       trash: '<line x1=\"4\" y1=\"7\" x2=\"20\" y2=\"7\"/><path d=\"M6 7V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v3\"/><path d=\"M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13\"/><line x1=\"10\" y1=\"11\" x2=\"10\" y2=\"17\"/><line x1=\"14\" y1=\"11\" x2=\"14\" y2=\"17\"/>',
-      history: '<rect x=\"3\" y=\"4\" width=\"18\" height=\"4\" rx=\"1\"/><path d=\"M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8\"/><line x1=\"10\" y1=\"13\" x2=\"14\" y2=\"13\"/>',
+      history: translateMarkup('<rect x=\"3\" y=\"4\" width=\"18\" height=\"4\" rx=\"1\"/><path d=\"M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8\"/><line x1=\"10\" y1=\"13\" x2=\"14\" y2=\"13\"/>'),
       edit: '<path d=\"M12 20h9\"/><path d=\"M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z\"/>',
       check: '<polyline points=\"5 12 10 17 19 6\"/>',
       medal: '<circle cx=\"12\" cy=\"15\" r=\"5\"/><path d=\"M9 9 6 3h2l4 6 4-6h2l-3 6\"/>',
@@ -249,8 +252,8 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
       circle: '<circle cx=\"12\" cy=\"12\" r=\"8\"/>',
       play: '<polygon points=\"6 3 20 12 6 21\" fill=\"currentColor\" stroke=\"none\"/>',
       wallet: '<path d=\"M20 12V8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h13a1 1 0 0 0 1-1v-4\"/><path d=\"M20 12a2 2 0 0 1 0 4h-3a2 2 0 0 1 0-4Z\"/>',
-      car: '<path d=\"M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11\"/><rect x=\"3\" y=\"11\" width=\"18\" height=\"6\" rx=\"2\"/><circle cx=\"7.5\" cy=\"17.5\" r=\"1.5\"/><circle cx=\"16.5\" cy=\"17.5\" r=\"1.5\"/>',
-      creditCard: '<rect x=\"2\" y=\"5\" width=\"20\" height=\"14\" rx=\"2\"/><line x1=\"2\" y1=\"10\" x2=\"22\" y2=\"10\"/>',
+      car: translateMarkup('<path d=\"M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11\"/><rect x=\"3\" y=\"11\" width=\"18\" height=\"6\" rx=\"2\"/><circle cx=\"7.5\" cy=\"17.5\" r=\"1.5\"/><circle cx=\"16.5\" cy=\"17.5\" r=\"1.5\"/>'),
+      creditCard: translateMarkup('<rect x=\"2\" y=\"5\" width=\"20\" height=\"14\" rx=\"2\"/><line x1=\"2\" y1=\"10\" x2=\"22\" y2=\"10\"/>'),
       piggyBank: '<path d=\"M4 12a5 5 0 0 1 5-5h6a5 5 0 0 1 5 5v1a2 2 0 0 1-2 2h-1v2a1 1 0 0 1-2 0v-2h-6v2a1 1 0 0 1-2 0v-2H8a4 4 0 0 1-4-4Z\"/><circle cx=\"16\" cy=\"11\" r=\"1\" fill=\"currentColor\" stroke=\"none\"/><path d=\"M4 11H2\"/><path d=\"M17 7l1-2\"/>',
       moreHorizontal: '<circle cx=\"5\" cy=\"12\" r=\"1.5\" fill=\"currentColor\" stroke=\"none\"/><circle cx=\"12\" cy=\"12\" r=\"1.5\" fill=\"currentColor\" stroke=\"none\"/><circle cx=\"19\" cy=\"12\" r=\"1.5\" fill=\"currentColor\" stroke=\"none\"/>',
       star: '<polygon points=\"12 2 15 8.5 22 9.5 17 14.5 18.5 21.5 12 18 5.5 21.5 7 14.5 2 9.5 9 8.5 12 2\"/>',
@@ -261,7 +264,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
     export function iconHtml(name, extraClass) {
       const inner = ICON[name] || '';
       const cls = extraClass ? `ic-svg ${extraClass}` : 'ic-svg';
-      return `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${inner}</svg>`;
+      return ui`<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${inner}</svg>`;
     }
     // Emoji que acompaña el nombre en el saludo (ver greetingText). Es el valor con el que se
     // prellena el campo del popup de bienvenida y el fallback si settings.userEmoji queda
@@ -281,9 +284,9 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
     // Higher Rate Opportunity ---- Propio manda avisos por correo con una fecha y una o más
     // ventanas horarias donde aplica un bono sobre la tasa por minuto.
     export const HIGHER_RATE_TIERS = {
-      bronze: { label: 'Bronce', bonusPerMin: 0.01, colorVar: '--tier-bronze', colorRgb: '181,101,29' },
-      silver: { label: 'Silver', bonusPerMin: 0.02, colorVar: '--tier-silver', colorRgb: '167,177,187' },
-      gold: { label: 'Gold', bonusPerMin: 0.03, colorVar: '--tier-gold', colorRgb: '234,179,8' },
+      bronze: { label: translateText('Bronce'), bonusPerMin: 0.01, colorVar: '--tier-bronze', colorRgb: '181,101,29' },
+      silver: { label: translateText('Silver'), bonusPerMin: 0.02, colorVar: '--tier-silver', colorRgb: '167,177,187' },
+      gold: { label: translateText('Gold'), bonusPerMin: 0.03, colorVar: '--tier-gold', colorRgb: '234,179,8' },
     };
     // Una llamada iniciada hasta 5 min antes de que empiece la ventana también cuenta.
     export const HIGHER_RATE_EARLY_GRACE_MIN = 5;
@@ -291,10 +294,10 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
     // Página "Finanzas" ---- Categorías fijas, mismo patrón que HIGHER_RATE_TIERS — no viven en
     // settings, solo sus filas (ver settings.financeCategories).
     const RATE_TILE_DEFS = [
-      { key: 'normal', label: 'Normal', icon: iconHtml('circle'), bonus: 0 },
-      { key: 'bronze', label: 'Bronce', icon: iconHtml('medal'), bonus: HIGHER_RATE_TIERS.bronze.bonusPerMin },
-      { key: 'silver', label: 'Silver', icon: iconHtml('medal'), bonus: HIGHER_RATE_TIERS.silver.bonusPerMin },
-      { key: 'gold', label: 'Gold', icon: iconHtml('medal'), bonus: HIGHER_RATE_TIERS.gold.bonusPerMin },
+      { key: 'normal', label: translateText('Normal'), icon: iconHtml('circle'), bonus: 0 },
+      { key: 'bronze', label: translateText('Bronce'), icon: iconHtml('medal'), bonus: HIGHER_RATE_TIERS.bronze.bonusPerMin },
+      { key: 'silver', label: translateText('Silver'), icon: iconHtml('medal'), bonus: HIGHER_RATE_TIERS.silver.bonusPerMin },
+      { key: 'gold', label: translateText('Gold'), icon: iconHtml('medal'), bonus: HIGHER_RATE_TIERS.gold.bonusPerMin },
     ];
 
     // $/min de un tile: tasa base de settings.rate + el bono fijo del nivel.
@@ -312,7 +315,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
       if (!el) return;
       el.innerHTML = RATE_TILE_DEFS.map(t => {
         const rate = rateTilePerMin(t.key);
-        return `
+        return ui`
           <button type="button" class="rate-tile ${t.key === selectedKey ? 'selected' : ''}" data-rate-tile="${t.key}">
             <span class="rate-tile-top"><span class="rate-tile-icon" data-tier="${t.key}">${t.icon}</span><span class="rate-tile-amount">$${rate.toFixed(2)}/min</span></span>
             <span class="rate-tile-label">${t.label}</span>
@@ -324,8 +327,8 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
     // Horario semanal (plantilla planeada, editable por día)
     export const WEEKDAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
     const WEEKDAY_JS_INDEX = { sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6 };
-    export const WEEKDAY_LABELS = { mon: 'Lunes', tue: 'Martes', wed: 'Miércoles', thu: 'Jueves', fri: 'Viernes', sat: 'Sábado', sun: 'Domingo' };
-    export const WEEKDAY_LABELS_SHORT = { mon: 'Lun', tue: 'Mar', wed: 'Mié', thu: 'Jue', fri: 'Vie', sat: 'Sáb', sun: 'Dom' };
+    export const WEEKDAY_LABELS = { mon: translateText('Lunes'), tue: translateText('Martes'), wed: translateText('Miércoles'), thu: translateText('Jueves'), fri: translateText('Viernes'), sat: translateText('Sábado'), sun: translateText('Domingo') };
+    export const WEEKDAY_LABELS_SHORT = { mon: translateText('Lun'), tue: translateText('Mar'), wed: translateText('Mié'), thu: translateText('Jue'), fri: translateText('Vie'), sat: translateText('Sáb'), sun: translateText('Dom') };
 
     // Todo vive en `blocks[]`: cada bloque es {type, start, dur} y Trabajo lleva además goalMin.
     export function defaultDaySchedule(isWorkDay) {
@@ -560,7 +563,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
         let type, name;
         if (p.rawType === 'break') { type = 'Break'; name = `Break ${breakIdx++}`; }
         else if (p.rawType === 'lunch') { type = 'Lunch'; name = `Lunch ${lunchIdx++}`; }
-        else { type = 'Work'; name = `Bloque de Trabajo ${workIdx++}`; }
+        else { type = 'Work'; name = ui`Bloque de Trabajo ${workIdx++}`; }
         const slot = { type, name, start: toHHMM(pStart), end: toHHMM(pStart + p.dur) };
         // Meta de Productividad configurable POR BLOQUE (minutos productivos que ese bloque de
         // Trabajo debe alcanzar, reemplaza al viejo ratio global de "Margen"). Solo los bloques de
@@ -607,7 +610,9 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
     export function setCalls(value) { setAppCalls(value); }
     setAppSettings(loadSettings());
     ensureCurrencySettings();
+    translateDocument();
     applyTheme();
+    wireAppearance({ getSettings: () => settings, save: saveSettingsOnly, applyTheme });
     // La hora es clickeable — al tocarla se oculta (muestra un placeholder enmascarado en vez del
     // valor real) y al volver a tocarla se muestra de nuevo. Visible por defecto. Vive en memoria,
     // no en localStorage.
@@ -765,6 +770,8 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
         // Modo claro/oscuro — 'auto' (default) sigue el sistema operativo (prefers-color-scheme);
         // 'light'/'dark' fuerzan el tema sin importar el sistema. Ver applyTheme/themeToggleBtn.
         theme: 'auto',
+        palette: 'original',
+        language: 'es',
         // Volumen maestro (0-100) que escala TODOS los sonidos del programa desde un solo lugar.
         masterVolume: 100,
         // Estado abierto/cerrado de cada <details> con id propio, para que sobreviva a la recarga.
@@ -895,7 +902,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
         });
         settings.scheduleOverridesByWeek = normalizedOverrides;
         if (discardedWeekCount > 0) {
-          toast(`⚠️ ${discardedWeekCount} semana(s) personalizada(s) de Horario con datos inválidos se descartaron al cargar.`);
+          toast(ui`⚠️ ${discardedWeekCount} semana(s) personalizada(s) de Horario con datos inválidos se descartaron al cargar.`);
         }
       }
       if (!settings.cycleGoalOverrides || typeof settings.cycleGoalOverrides !== 'object' || Array.isArray(settings.cycleGoalOverrides)) {
@@ -956,7 +963,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
         });
         settings.higherRateWindows = validWindows;
         if (discardedWindowCount > 0) {
-          toast(`⚠️ ${discardedWindowCount} ventana(s) de Higher Rate con datos inválidos se descartaron al cargar.`);
+          toast(ui`⚠️ ${discardedWindowCount} ventana(s) de Higher Rate con datos inválidos se descartaron al cargar.`);
         }
       }
       // Categorías propias del usuario (ver PENDIENTES) — se descarta cualquier entrada mal
@@ -1012,6 +1019,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
       root.classList.remove('theme-light', 'theme-dark');
       if (settings.theme === 'light') root.classList.add('theme-light');
       else if (settings.theme === 'dark') root.classList.add('theme-dark');
+      applyAppearance(settings);
       updateThemeButtonUI();
     }
 
@@ -1023,8 +1031,8 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
     }
 
     function themeButtonLabel(theme) {
-      if (theme === 'light') return '☀️ Claro';
-      if (theme === 'dark') return '🌙 Oscuro';
+      if (theme === 'light') return translateText('☀️ Claro');
+      if (theme === 'dark') return translateText('🌙 Oscuro');
       return '🌓 Auto';
     }
 
@@ -1046,7 +1054,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
       settings.theme = cycleTheme(settings.theme);
       saveSettingsOnly();
       applyTheme();
-      toast(`Tema: ${themeButtonLabel(settings.theme)}`);
+      toast(ui`Tema: ${themeButtonLabel(settings.theme)}`);
     }
 
     // Switch de Modo oscuro en el sidebar — mismo dato (settings.theme) que ya controla
@@ -1228,7 +1236,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
       }
     }
 
-    const STORAGE_QUOTA_TOAST = '⚠️ No se pudo guardar — el almacenamiento del navegador está lleno. Tu cambio se mantiene en esta sesión, pero no quedará guardado hasta que liberes espacio (borra llamadas muy viejas o un sonido personalizado en Avisos).';
+    const STORAGE_QUOTA_TOAST = translateText('⚠️ No se pudo guardar — el almacenamiento del navegador está lleno. Tu cambio se mantiene en esta sesión, pero no quedará guardado hasta que liberes espacio (borra llamadas muy viejas o un sonido personalizado en Avisos).');
     let storageSnapshotPending = false;
 
     export function saveAll() {
@@ -1329,11 +1337,11 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
 
 
     function fmtDate(date) {
-      return new Intl.DateTimeFormat('es-MX', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).format(date);
+      return new Intl.DateTimeFormat(displayLocale(), { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).format(date);
     }
 
     function fmtTime(date) {
-      return new Intl.DateTimeFormat('es-MX', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(date);
+      return new Intl.DateTimeFormat(displayLocale(), { hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(date);
     }
 
     // Un saludo dinámico tipo "Buenos días/tardes/noches, {nombre}" en vez del "Buen día" fijo de
@@ -1341,7 +1349,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
     // antes de las 19, noche después).
     function greetingText(date = new Date()) {
       const h = date.getHours();
-      const base = h < 12 ? 'Buenos días' : h < 19 ? 'Buenas tardes' : 'Buenas noches';
+      const base = h < 12 ? translateText('Buenos días') : h < 19 ? translateText('Buenas tardes') : translateText('Buenas noches');
       const name = String(settings.userName || '').trim();
       const emoji = String(settings.userEmoji || '').trim();
       // El emoji solo se muestra si también hay nombre — sin nombre no hay "Buenas tardes, {emoji}"
@@ -1354,23 +1362,23 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
     // varias frases elegida al azar una sola vez por carga de página (no en cada render, que corre
     // cada segundo — eso se vería parpadeando).
     const GREETING_SUBTITLES = [
-      'Jornada, pausas, llamadas y ganancias en un solo lugar.',
-      'Hoy también vamos con todo.',
-      'Un día más, una meta más cerca.',
-      'Aquí está todo lo que necesitas para tu turno.',
-      'Vamos a que este día cuente.',
-      'Tu jornada, organizada y clara.',
-      'Un paso a la vez, un turno a la vez.',
-      'Que las llamadas de hoy vengan con buena energía.',
-      'Aunque nadie puede volver atrás y lograr un nuevo comienzo, cualquiera puede empezar ahora y lograr un nuevo final. — Carl Bard',
-      'Un capítulo termina, otro comienza.',
-      'Todo tiene un final, pero cada final significa un nuevo comienzo.',
-      'El primer paso no te lleva a donde quieres ir, pero te saca de donde estás.',
-      'Nunca es demasiado tarde para empezar de nuevo. No se está perdido, simplemente se está comenzando de nuevo desde la experiencia.',
-      'Un viaje de mil millas comienza con un solo paso. — Lao Tse',
-      'Si empiezas, tienes la oportunidad de evolucionar y corregir... Si no empiezas nada, nunca tendrás esa oportunidad. — Seth Godin',
-      'El éxito se da cuando vas de fracaso en fracaso sin perder tu entusiasmo. — Winston Churchill',
-      'No importa lo lento que vayas, siempre y cuando no te detengas. — Confucio',
+      translateText('Jornada, pausas, llamadas y ganancias en un solo lugar.'),
+      translateText('Hoy también vamos con todo.'),
+      translateText('Un día más, una meta más cerca.'),
+      translateText('Aquí está todo lo que necesitas para tu turno.'),
+      translateText('Vamos a que este día cuente.'),
+      translateText('Tu jornada, organizada y clara.'),
+      translateText('Un paso a la vez, un turno a la vez.'),
+      translateText('Que las llamadas de hoy vengan con buena energía.'),
+      translateText('Aunque nadie puede volver atrás y lograr un nuevo comienzo, cualquiera puede empezar ahora y lograr un nuevo final. — Carl Bard'),
+      translateText('Un capítulo termina, otro comienza.'),
+      translateText('Todo tiene un final, pero cada final significa un nuevo comienzo.'),
+      translateText('El primer paso no te lleva a donde quieres ir, pero te saca de donde estás.'),
+      translateText('Nunca es demasiado tarde para empezar de nuevo. No se está perdido, simplemente se está comenzando de nuevo desde la experiencia.'),
+      translateText('Un viaje de mil millas comienza con un solo paso. — Lao Tse'),
+      translateText('Si empiezas, tienes la oportunidad de evolucionar y corregir... Si no empiezas nada, nunca tendrás esa oportunidad. — Seth Godin'),
+      translateText('El éxito se da cuando vas de fracaso en fracaso sin perder tu entusiasmo. — Winston Churchill'),
+      translateText('No importa lo lento que vayas, siempre y cuando no te detengas. — Confucio'),
     ];
     const greetingSubtitleText = GREETING_SUBTITLES[Math.floor(Math.random() * GREETING_SUBTITLES.length)];
 
@@ -1555,10 +1563,10 @@ function callImportFlag(c) {
   if (!c.importedAt) return null;
   const lagMin = (new Date(c.importedAt).getTime() - new Date(c.endISO).getTime()) / 60000;
   if (sameCallDay(c.importedAt, c.callDate) || String(c.shiftDayKey || '') === callDateKeyFromValue(c.callDate)) {
-    if (lagMin > 30) return { cls: 'imported-late', label: 'Importado tarde' };
+    if (lagMin > 30) return { cls: 'imported-late', label: translateText('Importado tarde') };
     return null;
   }
-  return { cls: 'imported-historic', label: 'Importación histórica' };
+  return { cls: 'imported-historic', label: translateText('Importación histórica') };
 }
 
 // Si el día activo guardado quedó en un calendario anterior a hoy (sesión vieja dejada abierta, o
@@ -1812,7 +1820,7 @@ function checkBreakStartAlarm() {
   if (breakStartAlarmActiveKey !== candidate.key) {
     if (!breakStartAlarmFiredKeys.has(candidate.key)) {
       breakStartAlarmFiredKeys.add(candidate.key);
-      const pretty = candidate.slot.type === 'Lunch' ? 'Lunch' : 'Break';
+      const pretty = candidate.slot.type === 'Lunch' ? translateText('Lunch') : translateText('Break');
       toast(renderAlertTemplate(settings.breakStartAlarmMessage, { tipo: pretty, hora: timeLabel(candidate.slot.start) }));
     }
     startBreakStartAlarm(candidate.key);
@@ -1903,7 +1911,7 @@ function checkBreakEndAlarm() {
   if (breakEndAlarmActiveKey !== key) {
     if (!breakEndAlarmFiredKeys.has(key)) {
       breakEndAlarmFiredKeys.add(key);
-      const pretty = state.activePause.type === 'lunch' ? 'Lunch' : 'Break';
+      const pretty = state.activePause.type === 'lunch' ? translateText('Lunch') : translateText('Break');
       toast(renderAlertTemplate(settings.breakEndAlarmMessage, { tipo: pretty, hora: timeLabelFromDate(predictedEnd) }));
     }
     startBreakEndAlarm(key);
@@ -2086,7 +2094,7 @@ const GAP_AUTO_OTHER_THRESHOLD_MIN = 90;
 const PAUSE_SLOT_MAX_DISTANCE_MIN = 180;
 
 export function gapLabelText(label) {
-  const map = { acw: 'ACW', break: 'Break', lunch: 'Lunch', other: 'Otro' };
+  const map = { acw: 'ACW', break: 'Break', lunch: 'Lunch', other: translateText('Otro') };
   return map[String(label || '').toLowerCase()] || 'ACW';
 }
 
@@ -2252,7 +2260,7 @@ function dayGapTotals(dayKey = getActiveDayKey(), sourceCalls = callsForDay(dayK
 export function formatCallDayLabel(key) {
   const d = callDateToDate(key);
   if (!d) return key || '—';
-  return new Intl.DateTimeFormat('es-MX', {
+  return new Intl.DateTimeFormat(displayLocale(), {
     weekday: 'short',
     month: 'short',
     day: 'numeric',
@@ -2261,8 +2269,8 @@ export function formatCallDayLabel(key) {
 
 function earningsSectionLabel(dayKey = getActiveDayKey()) {
   const normalized = callDateKeyFromValue(dayKey);
-  if (normalized === todayCallDateKey()) return 'Ganancias de hoy';
-  return `Ganancias del ${formatCallDayLabel(normalized)}`;
+  if (normalized === todayCallDateKey()) return translateText('Ganancias de hoy');
+  return ui`Ganancias del ${formatCallDayLabel(normalized)}`;
 }
 
 function defaultActiveDayKey() {
@@ -2288,7 +2296,7 @@ function shiftActiveDayBy(deltaDays) {
   const current = callDateToDate(getActiveDayKey()) || new Date();
   const next = new Date(current.getFullYear(), current.getMonth(), current.getDate() + deltaDays);
   if (deltaDays > 0 && next > todayRange()) {
-    toast('📅 Ese día todavía no llega — vas a ver un día futuro sin datos.');
+    toast(translateText('📅 Ese día todavía no llega — vas a ver un día futuro sin datos.'));
   }
   setActiveDayKey(todayCallDateKey(next));
 }
@@ -2297,7 +2305,7 @@ function shiftActiveDayBy(deltaDays) {
 function jumpActiveDayToToday() {
   if (isViewingToday()) return;
   setActiveDayKey(todayCallDateKey());
-  toast('📅 Volviste a Hoy');
+  toast(translateText('📅 Volviste a Hoy'));
 }
 
 // Los controles "en vivo" (Iniciar/Finalizar shift, Break, Lunch) escriben siempre en
@@ -2856,29 +2864,29 @@ function slotStats(slot, dayCalls = calls, dayPauses = dayPauseIntervals(getActi
     }
   }
 
-  let status = 'Pendiente';
+  let status = translateText('Pendiente');
   let statusTone = 'muted';
   let detail = slot.type === 'Work'
-    ? `Usado ${formatDuration(workUsed * 60000)} · ${formatDuration(callMin * 60000)} llamadas · ${formatDuration(acwMin * 60000)} ACW${pauseMin ? ` · ${formatDuration(pauseMin * 60000)} pausa` : ''}`
-    : `Usado ${formatDuration(pauseUsed * 60000)} de ${formatDuration(durationMin * 60000)}`;
+    ? ui`Usado ${formatDuration(workUsed * 60000)} · ${formatDuration(callMin * 60000)} llamadas · ${formatDuration(acwMin * 60000)} ACW${pauseMin ? ui` · ${formatDuration(pauseMin * 60000)} pausa` : ''}`
+    : ui`Usado ${formatDuration(pauseUsed * 60000)} de ${formatDuration(durationMin * 60000)}`;
 
   if (slot.type === 'Work') {
     const startDelta = shiftStart ? (shiftStart.getTime() - slotStart.getTime()) / 60000 : null;
     const endDelta = shiftEnd ? (shiftEnd.getTime() - slotEnd.getTime()) / 60000 : null;
 
     if (!shiftStart) {
-      status = 'Sin shift';
+      status = translateText('Sin shift');
     } else if (shiftStart > slotEnd) {
       status = 'Omitido';
       statusTone = 'bad';
     } else if (startDelta !== null && startDelta > 1) {
-      status = `Entrada tarde ${formatDeltaMinutes(startDelta)}`;
+      status = ui`Entrada tarde ${formatDeltaMinutes(startDelta)}`;
       statusTone = 'warn';
     } else if (endDelta !== null && endDelta < -1) {
-      status = `Salida temprana -${formatMinutes(Math.abs(endDelta))}m`;
+      status = ui`Salida temprana -${formatMinutes(Math.abs(endDelta))}m`;
       statusTone = 'warn';
     } else if (dayKey === todayCallDateKey() && !state.shiftEndedAt && now >= slotStart && now < slotEnd) {
-      status = 'En curso';
+      status = translateText('En curso');
       statusTone = 'good';
     } else if (pct >= 95) {
       status = 'Completo';
@@ -2889,7 +2897,7 @@ function slotStats(slot, dayCalls = calls, dayPauses = dayPauseIntervals(getActi
     } else {
       // Un bloque de Trabajo ya pasado y sin actividad no es "Pendiente": se marca "Sin actividad".
       const isPastSlot = dayKey === todayCallDateKey() ? now >= slotEnd : !!(shiftEnd && shiftEnd >= slotEnd);
-      status = isPastSlot ? 'Sin actividad' : 'Pendiente';
+      status = isPastSlot ? translateText('Sin actividad') : translateText('Pendiente');
       statusTone = 'muted';
     }
   } else if (actualPause) {
@@ -2899,27 +2907,27 @@ function slotStats(slot, dayCalls = calls, dayPauses = dayPauseIntervals(getActi
     const endDelta = (actualEnd.getTime() - slotEnd.getTime()) / 60000;
     const parts = [];
     if (startDelta > 1) {
-      parts.push(`Tarde ${formatDeltaMinutes(startDelta)}`);
+      parts.push(ui`Tarde ${formatDeltaMinutes(startDelta)}`);
       statusTone = 'warn';
     } else if (startDelta < -1) {
-      parts.push(`Antes -${formatMinutes(Math.abs(startDelta))}m`);
+      parts.push(ui`Antes -${formatMinutes(Math.abs(startDelta))}m`);
       statusTone = 'warn';
     } else {
-      parts.push('A tiempo');
+      parts.push(translateText('A tiempo'));
       statusTone = 'good';
     }
     if (endDelta > 1) {
-      parts.push(`+${formatMinutes(endDelta)}m extra`);
+      parts.push(ui`+${formatMinutes(endDelta)}m extra`);
       statusTone = 'warn';
     } else if (endDelta < -1) {
-      parts.push(`-${formatMinutes(Math.abs(endDelta))}m menos`);
+      parts.push(ui`-${formatMinutes(Math.abs(endDelta))}m menos`);
     }
     status = parts.join(' · ');
   } else if (now >= slotEnd) {
-    status = slot.type === 'Lunch' ? 'Lunch no tomado' : 'Break no tomado';
+    status = slot.type === 'Lunch' ? translateText('Lunch no tomado') : translateText('Break no tomado');
     statusTone = 'bad';
   } else if (now >= slotStart && now < slotEnd) {
-    status = `Pendiente`;
+    status = ui`Pendiente`;
     statusTone = 'warn';
   }
 
@@ -2940,12 +2948,12 @@ function adherenceProximityScore(deltaAbsMin, falloffMin) {
 
 const EXCEPTION_REASON_LABELS = {
   ausente: 'Ausencia/llegada tarde',
-  break_extra: 'Break tomado fuera de horario',
-  lunch_extra: 'Lunch tomado fuera de horario',
-  break_perdido: 'Break no tomado a tiempo',
-  lunch_perdido: 'Lunch no tomado a tiempo',
-  lunch_encima_break: 'Lunch encima de tu Break',
-  break_encima_lunch: 'Break encima de tu Lunch',
+  break_extra: translateText('Break tomado fuera de horario'),
+  lunch_extra: translateText('Lunch tomado fuera de horario'),
+  break_perdido: translateText('Break no tomado a tiempo'),
+  lunch_perdido: translateText('Lunch no tomado a tiempo'),
+  lunch_encima_break: translateText('Lunch encima de tu Break'),
+  break_encima_lunch: translateText('Break encima de tu Lunch'),
 };
 
 // Mapa planeado|real → motivo. Combinaciones no listadas (ej. algo fuera de cualquier slot
@@ -3114,7 +3122,7 @@ export function dayAdherence(dayKey) {
   if (!sessions.length) {
     if (isToday) return null;
     if (base > todayRange()) return null;
-    return { dayKey: normalized, checkpoints: [{ label: 'Turno', ok: false, score: 0, note: 'No se inició el turno' }], scorePct: 0 };
+    return { dayKey: normalized, checkpoints: [{ label: 'Turno', ok: false, score: 0, note: translateText('No se inició el turno') }], scorePct: 0 };
   }
 
   const checkpoints = [];
@@ -3125,7 +3133,7 @@ export function dayAdherence(dayKey) {
     label: 'Entrada',
     ok: Math.abs(startDelta) <= ADHERENCE_TOLERANCE_MIN,
     score: adherenceProximityScore(Math.abs(startDelta), ADHERENCE_FALLOFF_SHIFT_MIN),
-    note: startDelta > ADHERENCE_TOLERANCE_MIN ? `Tarde ${formatDeltaMinutes(startDelta)}` : startDelta < -ADHERENCE_TOLERANCE_MIN ? `Temprano ${formatDeltaMinutes(startDelta)}` : 'A tiempo',
+    note: startDelta > ADHERENCE_TOLERANCE_MIN ? ui`Tarde ${formatDeltaMinutes(startDelta)}` : startDelta < -ADHERENCE_TOLERANCE_MIN ? ui`Temprano ${formatDeltaMinutes(startDelta)}` : translateText('A tiempo'),
   });
 
   // Se usa el horario EFECTIVO (getEffectiveScheduleForDay), no buildPlannedSlots(cfg) en crudo.
@@ -3142,12 +3150,12 @@ export function dayAdherence(dayKey) {
       label: 'Salida',
       ok: Math.abs(endDelta) <= ADHERENCE_TOLERANCE_MIN,
       score: adherenceProximityScore(Math.abs(endDelta), ADHERENCE_FALLOFF_SHIFT_MIN),
-      note: endDelta < -ADHERENCE_TOLERANCE_MIN ? `Temprano ${formatDeltaMinutes(endDelta)}` : endDelta > ADHERENCE_TOLERANCE_MIN ? `Tarde +${formatMinutes(endDelta)}m` : 'A tiempo',
+      note: endDelta < -ADHERENCE_TOLERANCE_MIN ? ui`Temprano ${formatDeltaMinutes(endDelta)}` : endDelta > ADHERENCE_TOLERANCE_MIN ? ui`Tarde +${formatMinutes(endDelta)}m` : translateText('A tiempo'),
     });
   } else if (!isToday) {
     // Día pasado sin hora de fin registrada ni llamadas para estimarla: cuenta como checkpoint
     // fallado.
-    checkpoints.push({ label: 'Salida', ok: false, score: 0, note: 'No se registró la salida' });
+    checkpoints.push({ label: 'Salida', ok: false, score: 0, note: translateText('No se registró la salida') });
   }
 
   for (const slot of planned) {
@@ -3160,7 +3168,7 @@ export function dayAdherence(dayKey) {
     if (!actual) {
       const skip = lastSession.live && isToday && now_isBefore(slotEnd);
       if (skip) continue; // Todavía no le tocaba, no penalizar aún Sin puntaje parcial aquí a propósito: "No tomado" es binario (o se marcó con el botón/se clasificó el hueco, o no) — no hay una noción de "casi tomaste tu break" que tenga sentido dar crédito parcial.
-      checkpoints.push({ label: slot.name, ok: false, score: 0, note: 'No tomado' });
+      checkpoints.push({ label: slot.name, ok: false, score: 0, note: translateText('No tomado') });
       continue;
     }
 
@@ -3176,11 +3184,11 @@ export function dayAdherence(dayKey) {
     // duración de lo planeado.
     const score = (adherenceProximityScore(Math.abs(startD), ADHERENCE_FALLOFF_PAUSE_MIN) + adherenceProximityScore(Math.abs(durD), ADHERENCE_FALLOFF_PAUSE_MIN)) / 2;
     const notes = [];
-    if (startD > ADHERENCE_TOLERANCE_MIN) notes.push(`empezó tarde ${formatDeltaMinutes(startD)}`);
-    else if (startD < -ADHERENCE_TOLERANCE_MIN) notes.push(`empezó antes ${formatDeltaMinutes(startD)}`);
-    if (durD > ADHERENCE_TOLERANCE_MIN) notes.push(`se pasó ${formatMinutes(durD)}`);
-    else if (durD < -ADHERENCE_TOLERANCE_MIN) notes.push(`cortó ${formatMinutes(Math.abs(durD))}`);
-    checkpoints.push({ label: slot.name, ok, score, note: notes.length ? notes.join(' · ') : 'A tiempo' });
+    if (startD > ADHERENCE_TOLERANCE_MIN) notes.push(ui`empezó tarde ${formatDeltaMinutes(startD)}`);
+    else if (startD < -ADHERENCE_TOLERANCE_MIN) notes.push(ui`empezó antes ${formatDeltaMinutes(startD)}`);
+    if (durD > ADHERENCE_TOLERANCE_MIN) notes.push(ui`se pasó ${formatMinutes(durD)}`);
+    else if (durD < -ADHERENCE_TOLERANCE_MIN) notes.push(ui`cortó ${formatMinutes(Math.abs(durD))}`);
+    checkpoints.push({ label: slot.name, ok, score, note: notes.length ? notes.join(' · ') : translateText('A tiempo') });
   }
 
   // scorePct sale del cálculo minuto a minuto (computeMinuteAdherence) cuando hay minutos medibles;
@@ -3251,11 +3259,11 @@ function setEarningsViewMode(mode) {
   if (cycleView) cycleView.style.display = earningsViewMode === 'cycle' ? '' : 'none';
   if (goalBadge) goalBadge.style.display = earningsViewMode === 'day' ? '' : 'none';
   if (earningsViewMode === 'cycle') {
-    if (title) title.textContent = 'Ganancias del ciclo';
-    if (subtitle) subtitle.textContent = 'Total del ciclo de pago actual (14 días) y la próxima fecha de pago.';
+    if (title) title.textContent = translateText('Ganancias del ciclo');
+    if (subtitle) subtitle.textContent = translateText('Total del ciclo de pago actual (14 días) y la próxima fecha de pago.');
   } else {
     if (title) title.textContent = earningsSectionLabel(getActiveDayKey());
-    if (subtitle) subtitle.textContent = 'Gana, meta y margen del día, de un vistazo.';
+    if (subtitle) subtitle.textContent = translateText('Gana, meta y margen del día, de un vistazo.');
   }
 }
 
@@ -3307,8 +3315,8 @@ export function weekDaysForOffset(offset = weekViewOffset) {
 }
 
 export function formatWeekRangeLabel(start, end) {
-  const startLabel = new Intl.DateTimeFormat('es-MX', { day: 'numeric', month: 'short' }).format(start);
-  const endLabel = new Intl.DateTimeFormat('es-MX', { day: 'numeric', month: 'short', year: 'numeric' }).format(end);
+  const startLabel = new Intl.DateTimeFormat(displayLocale(), { day: 'numeric', month: 'short' }).format(start);
+  const endLabel = new Intl.DateTimeFormat(displayLocale(), { day: 'numeric', month: 'short', year: 'numeric' }).format(end);
   return `${startLabel} – ${endLabel}`;
 }
 
@@ -3316,14 +3324,14 @@ export function formatWeekRangeLabel(start, end) {
 // vio distinto de lo normal, más un comentario libre. Puramente informativo (ver comentario en
 // defaultState.dayNotes)
 const DAY_NOTE_CATEGORIES = [
-  { value: 'rest', label: 'Descanso', tagClass: '' },
-  { value: 'holiday', label: 'Día festivo', tagClass: 'good' },
-  { value: 'sick', label: 'Enfermedad', tagClass: 'warn' },
-  { value: 'power_outage', label: 'Corte de luz', tagClass: 'bad' },
-  { value: 'internet_outage', label: 'Corte de internet', tagClass: 'bad' },
-  { value: 'platform_issues', label: 'Problemas de la plataforma', tagClass: 'bad' },
-  { value: 'burnout', label: 'Agotamiento', tagClass: 'warn' },
-  { value: 'other', label: 'Otro', tagClass: '' },
+  { value: 'rest', label: translateText('Descanso'), tagClass: '' },
+  { value: 'holiday', label: translateText('Día festivo'), tagClass: 'good' },
+  { value: 'sick', label: translateText('Enfermedad'), tagClass: 'warn' },
+  { value: 'power_outage', label: translateText('Corte de luz'), tagClass: 'bad' },
+  { value: 'internet_outage', label: translateText('Corte de internet'), tagClass: 'bad' },
+  { value: 'platform_issues', label: translateText('Problemas de la plataforma'), tagClass: 'bad' },
+  { value: 'burnout', label: translateText('Agotamiento'), tagClass: 'warn' },
+  { value: 'other', label: translateText('Otro'), tagClass: '' },
 ];
 
 export function dayNoteCategoryMeta(value) {
@@ -3527,20 +3535,20 @@ function saveCycleGoalEditor() {
   const input = document.getElementById('cycleGoalAmountInput');
   const amount = Number(input?.value);
   if (!Number.isFinite(amount) || amount <= 0) {
-    toast('La meta debe ser un número mayor a 0');
+    toast(translateText('La meta debe ser un número mayor a 0'));
     return;
   }
   setCycleGoalOverride(0, amount);
   closeModal('cycleGoalModal');
   render();
-  toast(`Meta del ciclo: ${money(amount)}${convertedAmountText(amount) ? ` (${convertedAmountText(amount)})` : ''}`);
+  toast(ui`Meta del ciclo: ${money(amount)}${convertedAmountText(amount) ? ` (${convertedAmountText(amount)})` : ''}`);
 }
 
 function useAutoCycleGoal() {
   setCycleGoalOverride(0, null);
   closeModal('cycleGoalModal');
   render();
-  toast('Meta del ciclo vuelve a calcularse automáticamente');
+  toast(translateText('Meta del ciclo vuelve a calcularse automáticamente'));
 }
 
 function updateCycleGoalFromAjustes() {
@@ -3590,16 +3598,16 @@ function renderWeekSummary() {
 
   const summary = weekSummaryForOffset(weekViewOffset);
   const rangeLabel = formatWeekRangeLabel(summary.weekStart, summary.weekEnd);
-  const cycleWeekLabel = `Semana ${cycleWeekNumberForWeekStart(summary.weekStart)} del ciclo`;
+  const cycleWeekLabel = ui`Semana ${cycleWeekNumberForWeekStart(summary.weekStart)} del ciclo`;
   if (subtitle) {
-    subtitle.textContent = `${weekViewOffset === 0 ? `Semana actual · ${rangeLabel}` : rangeLabel} · ${cycleWeekLabel}`;
+    subtitle.textContent = `${weekViewOffset === 0 ? ui`Semana actual · ${rangeLabel}` : rangeLabel} · ${cycleWeekLabel}`;
   }
 
   // Rediseño 100% visual de "Resumen semanal".
   const dayShortDateLabel = (dayKey) => {
     const d = callDateToDate(dayKey);
     if (!d) return '';
-    return new Intl.DateTimeFormat('es-MX', { day: 'numeric', month: 'short' }).format(d);
+    return new Intl.DateTimeFormat(displayLocale(), { day: 'numeric', month: 'short' }).format(d);
   };
 
   const itemsHtml = summary.days.map(r => {
@@ -3611,29 +3619,29 @@ function renderWeekSummary() {
     // cuenta como laborado de verdad (Libre > Futuro > Sin datos > Trabajado).
     let badgeText, badgeTone, iconName, iconTone;
     if (r.isOff) {
-      badgeText = 'Libre'; badgeTone = 'neutral'; iconName = 'calendar'; iconTone = 'neutral';
+      badgeText = translateText('Libre'); badgeTone = 'neutral'; iconName = 'calendar'; iconTone = 'neutral';
     } else if (r.isFuture) {
       badgeText = 'Futuro'; badgeTone = 'neutral'; iconName = 'calendar'; iconTone = 'neutral';
     } else if (!r.hasShift && !r.calls) {
-      badgeText = 'Sin datos'; badgeTone = 'bad'; iconName = 'alertTriangle'; iconTone = 'bad';
+      badgeText = translateText('Sin datos'); badgeTone = 'bad'; iconName = 'alertTriangle'; iconTone = 'bad';
     } else {
-      badgeText = 'Trabajado'; badgeTone = 'good'; iconName = 'check'; iconTone = 'good';
+      badgeText = translateText('Trabajado'); badgeTone = 'good'; iconName = 'check'; iconTone = 'good';
     }
-    if (r.isToday && !r.isOff) { badgeText = 'Hoy'; badgeTone = 'cyan'; iconTone = 'cyan'; }
+    if (r.isToday && !r.isOff) { badgeText = translateText('Hoy'); badgeTone = 'cyan'; iconTone = 'cyan'; }
 
     const noteBadgeTone = noteMeta ? (noteMeta.tagClass === 'good' ? 'good' : noteMeta.tagClass === 'bad' ? 'bad' : noteMeta.tagClass === 'warn' ? 'bad' : 'neutral') : '';
-    const noteBadgeHtml = noteMeta ? ` <span class="wk-row-badge tone-${noteBadgeTone}">${escapeHtml(noteMeta.label)}</span>` : '';
+    const noteBadgeHtml = noteMeta ? ui` <span class="wk-row-badge tone-${noteBadgeTone}">${escapeHtml(noteMeta.label)}</span>` : '';
 
     const rowClasses = ['wk-row', r.isToday ? 'is-today' : '', r.isFuture ? 'is-future' : ''].filter(Boolean).join(' ');
 
-    const adherenceText = r.adherencePct === null ? '' : ` · Adherencia ${r.adherencePct}%`;
+    const adherenceText = r.adherencePct === null ? '' : ui` · Adherencia ${r.adherencePct}%`;
     const subText = r.isFuture
       ? escapeHtml(dayShortDateLabel(r.dayKey))
-      : `${escapeHtml(dayShortDateLabel(r.dayKey))} · ${r.calls} llamada(s)${adherenceText}`;
+      : ui`${escapeHtml(dayShortDateLabel(r.dayKey))} · ${r.calls} llamada(s)${adherenceText}`;
 
     // Un día futuro no muestra monto ni tiempo productivo — nada real que reportar todavía, mismo
     // criterio que ya usaba.
-    const rightHtml = r.isFuture ? '' : `
+    const rightHtml = r.isFuture ? '' : ui`
       <div class="wk-row-right">
         <div class="wk-row-amount">${money(r.earnings)}</div>
         ${financeConvertedNote(r.earnings)}
@@ -3641,21 +3649,21 @@ function renderWeekSummary() {
       </div>
     `;
 
-    const editBtnHtml = `<button class="wk-row-edit" type="button" data-day-note-edit="${escapeHtml(r.dayKey)}" aria-label="Editar día" title="Editar día">${iconHtml('edit')}<span class="wk-row-edit-label">Editar</span></button>`;
+    const editBtnHtml = ui`<button class="wk-row-edit" type="button" data-day-note-edit="${escapeHtml(r.dayKey)}" aria-label="Editar día" title="Editar día">${iconHtml('edit')}<span class="wk-row-edit-label">Editar</span></button>`;
 
     const noteHtml = r.note && r.note.comment
-      ? `<div class="wk-row-note" title="${escapeHtml(r.note.comment)}"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg> ${escapeHtml(r.note.comment.length > 60 ? r.note.comment.slice(0, 60) + '…' : r.note.comment)}</div>`
+      ? ui`<div class="wk-row-note" title="${escapeHtml(r.note.comment)}"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg> ${escapeHtml(r.note.comment.length > 60 ? r.note.comment.slice(0, 60) + '…' : r.note.comment)}</div>`
       : '';
 
-    const statusBadgeHtml = `<button type="button" class="wk-row-badge wk-row-badge-tap tone-${badgeTone}" data-day-note-edit="${escapeHtml(r.dayKey)}" data-day-note-focus="status" title="Cambiar estado del día">${escapeHtml(badgeText)}${iconHtml('chevronDown')}</button>`;
+    const statusBadgeHtml = ui`<button type="button" class="wk-row-badge wk-row-badge-tap tone-${badgeTone}" data-day-note-edit="${escapeHtml(r.dayKey)}" data-day-note-focus="status" title="Cambiar estado del día">${escapeHtml(badgeText)}${iconHtml('chevronDown')}</button>`;
     // Dos ubicaciones del mismo enlace: en el título (escritorio) o en la línea secundaria (móvil),
     // alternadas por CSS.
-    const addNoteBtn = (cls) => `<button type="button" class="wk-row-add-note ${cls}" data-day-note-edit="${escapeHtml(r.dayKey)}" data-day-note-focus="note">+ Nota</button>`;
+    const addNoteBtn = (cls) => ui`<button type="button" class="wk-row-add-note ${cls}" data-day-note-edit="${escapeHtml(r.dayKey)}" data-day-note-focus="note">+ Nota</button>`;
     const addNoteHtml = !r.note ? addNoteBtn('wk-row-add-note-title') : '';
     const addNoteSubHtml = !r.note ? addNoteBtn('wk-row-add-note-sub') : '';
-    const goChevronHtml = r.isFuture ? '' : `<span class="wk-row-go" aria-hidden="true">${iconHtml('chevronRight')}</span>`;
+    const goChevronHtml = r.isFuture ? '' : ui`<span class="wk-row-go" aria-hidden="true">${iconHtml('chevronRight')}</span>`;
 
-    return `
+    return ui`
       <div class="${rowClasses}" data-week-day="${escapeHtml(r.dayKey)}">
         <span class="wk-row-icon tone-${iconTone}" aria-hidden="true">${iconHtml(iconName)}</span>
         <div class="wk-row-main">
@@ -3675,20 +3683,20 @@ function renderWeekSummary() {
   // tarjeta propia en Reportes — encaja mejor junto al resto de totales de esta fila.
   const workedDaysCount = summary.days.filter(r => !r.isFuture && (r.hasShift || r.calls > 0)).length;
   const avgCallsPerWorkedDay = workedDaysCount > 0 ? (t.calls / workedDaysCount) : 0;
-  const totalHtml = `
+  const totalHtml = ui`
     <div class="wk-total-row">
       <div class="wk-total-label">Total semana</div>
       <div class="wk-total-metrics">
         <div class="wk-total-metric"><span class="wk-total-metric-label">Productivo</span><strong>${formatDuration(t.productive * 60000)}</strong></div>
         <div class="wk-total-metric"><span class="wk-total-metric-label">Llamadas</span><strong>${t.calls}</strong></div>
-        <div class="wk-total-metric"><span class="wk-total-metric-label">Ganancias</span><strong>${money(t.earnings)}${convertedAmountText(t.earnings) ? ` <span style="opacity:.75; font-weight:700;">(${escapeHtml(convertedAmountText(t.earnings))})</span>` : ''}</strong></div>
+        <div class="wk-total-metric"><span class="wk-total-metric-label">Ganancias</span><strong>${money(t.earnings)}${convertedAmountText(t.earnings) ? ui` <span style="opacity:.75; font-weight:700;">(${escapeHtml(convertedAmountText(t.earnings))})</span>` : ''}</strong></div>
         <div class="wk-total-metric"><span class="wk-total-metric-label">Adherencia</span><strong>${t.avgAdherence === null ? '—' : `${t.avgAdherence}%`}</strong></div>
         <div class="wk-total-metric"><span class="wk-total-metric-label">Prom./día trabajado</span><strong>${workedDaysCount > 0 ? avgCallsPerWorkedDay.toFixed(1) : '—'}</strong></div>
       </div>
     </div>
   `;
 
-  wrap.innerHTML = `<div class="wk-list">${itemsHtml}</div>${totalHtml}`;
+  wrap.innerHTML = ui`<div class="wk-list">${itemsHtml}</div>${totalHtml}`;
 }
 
 // Nueva página "Fechas de pago". CERO cálculo de negocio nuevo.
@@ -3712,12 +3720,12 @@ function renderPayDatesSection() {
 
   const fmtRange = (start, end) => `${formatCallDayLabel(todayCallDateKey(start))} – ${formatCallDayLabel(todayCallDateKey(end))}`;
   const fmtFull = (d) => {
-    const raw = new Intl.DateTimeFormat('es-MX', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(d);
+    const raw = new Intl.DateTimeFormat(displayLocale(), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(d);
     return raw.charAt(0).toUpperCase() + raw.slice(1);
   };
-  const fmtShort = (d) => new Intl.DateTimeFormat('es-MX', { day: 'numeric', month: 'long' }).format(d);
+  const fmtShort = (d) => new Intl.DateTimeFormat(displayLocale(), { day: 'numeric', month: 'long' }).format(d);
 
-  const nextCardHtml = `
+  const nextCardHtml = ui`
     <div class="pd-next-card">
       <div>
         <div class="pd-next-label">Próximo pago</div>
@@ -3739,14 +3747,14 @@ function renderPayDatesSection() {
     const isToday = c.isCurrent;
     const isNextPayment = c.offset === nextPayment.offset;
     const badgeHtml = isToday
-      ? `<span class="wk-row-badge tone-cyan">Actual — día ${dayOfCycle} de 14</span>`
+      ? ui`<span class="wk-row-badge tone-cyan">Actual — día ${dayOfCycle} de 14</span>`
       : '';
     const iconTone = c.isPaid ? 'tone-good' : isNextPayment ? 'tone-cyan' : 'tone-neutral';
     const rowDaysUntilPay = Math.round((todayRange(c.payDate) - today) / 86400000);
-    const statusText = c.isPaid ? 'Pagado' : isNextPayment ? `En ${Math.max(0, rowDaysUntilPay)} días` : 'Próximo';
+    const statusText = c.isPaid ? translateText('Pagado') : isNextPayment ? ui`En ${Math.max(0, rowDaysUntilPay)} días` : translateText('Próximo');
     const rowClass = isToday ? 'wk-row is-today' : 'wk-row';
-    const subText = isToday ? `Hoy, ${fmtShort(today)}` : '14 días';
-    return `
+    const subText = isToday ? ui`Hoy, ${fmtShort(today)}` : translateText('14 días');
+    return ui`
       <div class="${rowClass}">
         <span class="wk-row-icon ${iconTone}">${iconHtml(c.isPaid ? 'checkCircle' : 'calendar')}</span>
         <div class="wk-row-main">
@@ -3761,7 +3769,7 @@ function renderPayDatesSection() {
     `;
   }).join('');
 
-  body.innerHTML = `${nextCardHtml}<div class="wk-list">${rowsHtml}</div>`;
+  body.innerHTML = ui`${nextCardHtml}<div class="wk-list">${rowsHtml}</div>`;
 }
 
 // Página "Finanzas" ---- ver FINANCE_CATEGORIES arriba y el resumen.md para el modelo de datos
@@ -3793,9 +3801,9 @@ function renderPayDatesSection() {
     }
 
     function shiftActionLabel() {
-      if (!isViewingToday()) return 'Iniciar shift';
-      if (!state.shiftStartedAt || state.shiftEndedAt) return 'Iniciar shift';
-      return 'Finalizar shift';
+      if (!isViewingToday()) return translateText('Iniciar shift');
+      if (!state.shiftStartedAt || state.shiftEndedAt) return translateText('Iniciar shift');
+      return translateText('Finalizar shift');
     }
 
     function shiftActionTone() {
@@ -3816,13 +3824,13 @@ function renderPayDatesSection() {
     }
 
     function pauseActionLabel(type) {
-      const pretty = type === 'lunch' ? 'Lunch' : 'Break';
+      const pretty = type === 'lunch' ? translateText('Lunch') : translateText('Break');
       // Si no se está viendo "Hoy", el botón ya está deshabilitado (ver pauseActionDisabled) y su
       // cronómetro dice "Solo en 'Hoy'".
-      if (!isViewingToday()) return `Iniciar ${pretty}`;
-      if (!state.shiftStartedAt || state.shiftEndedAt) return `Iniciar ${pretty}`;
-      if (state.activePause && state.activePause.type === type) return `Terminar ${pretty}`;
-      return `Iniciar ${pretty}`;
+      if (!isViewingToday()) return ui`Iniciar ${pretty}`;
+      if (!state.shiftStartedAt || state.shiftEndedAt) return ui`Iniciar ${pretty}`;
+      if (state.activePause && state.activePause.type === type) return ui`Terminar ${pretty}`;
+      return ui`Iniciar ${pretty}`;
     }
 
     function pauseActionDisabled(type) {
@@ -3850,8 +3858,8 @@ function renderPayDatesSection() {
     function callActionLabel() {
       // El emoji 📞 ya no va aquí — vive en el ícono estático del botón (.action-icon en el HTML,
       // envuelto en el anillo pulsante) desde el rediseño de Controles.
-      if (!isViewingToday()) return 'Iniciar llamada';
-      return state.activeCall ? 'Terminar llamada' : 'Iniciar llamada';
+      if (!isViewingToday()) return translateText('Iniciar llamada');
+      return state.activeCall ? translateText('Terminar llamada') : translateText('Iniciar llamada');
     }
 
     // A diferencia de pauseActionDisabled (Break/Lunch), iniciar una llamada NO exige que ya haya
@@ -3872,31 +3880,31 @@ function renderPayDatesSection() {
     function toggleShift() {
       // Defensa adicional a shiftBtn.disabled por si la función se dispara por otra vía.
       if (!isViewingToday()) {
-        toast("Cambia el día activo a 'Hoy' para usar este control");
+        toast(translateText("Cambia el día activo a 'Hoy' para usar este control"));
         return;
       }
       // Misma defensa para "día libre": el botón ya debería estar deshabilitado en este caso (ver
       // shiftActionDisabled), pero se protege por si se dispara de otra forma. Solo aplica al
       // INICIAR un turno nuevo.
       if (shiftWouldStartNew() && todayIsOff()) {
-        toast('Hoy está marcado como día libre en tu horario — no se puede iniciar un turno manualmente. Si trabajaste, pega tus llamadas y la app lo detecta sola.');
+        toast(translateText('Hoy está marcado como día libre en tu horario — no se puede iniciar un turno manualmente. Si trabajaste, pega tus llamadas y la app lo detecta sola.'));
         return;
       }
       // Misma defensa para la restricción de los 5 minutos — el botón ya debería estar
       // deshabilitado en este caso, pero se protege por si se dispara de otra forma.
       if (shiftStartTooEarly()) {
         const cfg = dayConfigFor(todayCallDateKey());
-        toast(`Muy temprano — puedes iniciar tu turno desde ${SHIFT_START_EARLY_GRACE_MIN} min antes de las ${timeLabel(formatHHMM(cfg.start))}`);
+        toast(ui`Muy temprano — puedes iniciar tu turno desde ${SHIFT_START_EARLY_GRACE_MIN} min antes de las ${timeLabel(formatHHMM(cfg.start))}`);
         return;
       }
       if (shiftWouldStartNew()) return startShift();
       // Si hay una llamada activa al momento de finalizar el turno, endShift no la tocaba ni
       // advertía nada.
       if (state.activeCall) {
-        appConfirm('Tienes una llamada en curso. Al finalizar el turno se guardará esa llamada con la duración transcurrida hasta ahora y luego se cerrará el turno. ¿Finalizar de todos modos?', () => {
+        appConfirm(translateText('Tienes una llamada en curso. Al finalizar el turno se guardará esa llamada con la duración transcurrida hasta ahora y luego se cerrará el turno. ¿Finalizar de todos modos?'), () => {
           const saved = endCall();
           if (saved) endShift();
-          else toast('Resuelve la llamada pendiente antes de finalizar el turno');
+          else toast(translateText('Resuelve la llamada pendiente antes de finalizar el turno'));
         });
         return;
       }
@@ -3912,10 +3920,10 @@ function renderPayDatesSection() {
       const firstStart = new Date(Math.min(...todayCalls.map(c => new Date(c.startISO).getTime())));
       state.shiftStartedAt = firstStart.toISOString();
       state.shiftEndedAt = null;
-      setEvent('shift', 'Shift iniciado automáticamente', fmtTime(firstStart), 'auto');
+      setEvent('shift', translateText('Shift iniciado automáticamente'), fmtTime(firstStart), 'auto');
       saveStateOnly();
       onGameShiftStarted({ continued: false });
-      if (!silent) toast(`Shift iniciado automáticamente desde tu primera llamada (${fmtTime(firstStart)})`);
+      if (!silent) toast(ui`Shift iniciado automáticamente desde tu primera llamada (${fmtTime(firstStart)})`);
       return true;
     }
 
@@ -3942,12 +3950,12 @@ function renderPayDatesSection() {
       // Misma defensa que toggleShift: estos botones solo aplican al turno de hoy, nunca al día
       // seleccionado en "Día activo".
       if (!isViewingToday()) {
-        toast("Cambia el día activo a 'Hoy' para usar este control");
+        toast(translateText("Cambia el día activo a 'Hoy' para usar este control"));
         return;
       }
       if (state.shiftEndedAt) return;
       if (state.activeCall) {
-        toast('Termina la llamada antes de iniciar Break/Lunch');
+        toast(translateText('Termina la llamada antes de iniciar Break/Lunch'));
         return;
       }
       if (!state.shiftStartedAt) {
@@ -4002,10 +4010,10 @@ function renderPayDatesSection() {
         if (gapMin >= 0 && gapMin <= ACCIDENTAL_TOGGLE_GRACE_MIN) {
           registerDayInterruption(todayCallDateKey(), 'shift', state.shiftEndedAt, nowISO);
           state.shiftEndedAt = null;
-          setEvent('shift', 'Shift continuado (interrupción accidental)', fmtTime(now), 'manual');
+          setEvent('shift', translateText('Shift continuado (interrupción accidental)'), fmtTime(now), 'manual');
           saveAll();
           stopShiftAlarm();
-          toast(`Turno continuado — interrupción de ${formatMinutes(gapMin)} min registrada`);
+          toast(ui`Turno continuado — interrupción de ${formatMinutes(gapMin)} min registrada`);
           onGameShiftStarted({ continued: true });
           return;
         }
@@ -4032,7 +4040,7 @@ function renderPayDatesSection() {
           const firstStart = new Date(Math.min(...todayCalls.map(c => new Date(c.startISO).getTime())));
           const lateMin = (now.getTime() - firstStart.getTime()) / 60000;
           if (lateMin > 15) {
-            toast(`Shift iniciado — ya tenías llamadas desde las ${fmtTime(firstStart)} (${formatMinutes(lateMin)} min antes). "Conectado" cuenta desde ahora, no desde esa llamada.`);
+            toast(ui`Shift iniciado — ya tenías llamadas desde las ${fmtTime(firstStart)} (${formatMinutes(lateMin)} min antes). "Conectado" cuenta desde ahora, no desde esa llamada.`);
             return;
           }
         }
@@ -4056,7 +4064,7 @@ function renderPayDatesSection() {
       if (!state.shiftStartedAt || state.shiftEndedAt || state.activePause) return;
       const now = new Date();
       const dayKey = currentShiftAccountingDayKey(now);
-      const pretty = type === 'lunch' ? 'Lunch' : 'Break';
+      const pretty = type === 'lunch' ? translateText('Lunch') : translateText('Break');
 
       // Mismo criterio que startShift: reabrir el MISMO tipo dentro de la ventana de gracia
       // continúa la pausa anterior en vez de crear otra.
@@ -4070,7 +4078,7 @@ function renderPayDatesSection() {
         if (gapMin >= 0 && gapMin <= ACCIDENTAL_TOGGLE_GRACE_MIN) {
           state.pauseHistory = state.pauseHistory.filter(p => p.id !== lastClosed.id);
           const interruption = registerDayInterruption(dayKey, type, lastClosed.endedAt, now.toISOString());
-          const continuationEvent = setEvent(type, `${pretty} continuado (interrupción accidental)`, fmtTime(now), 'manual');
+          const continuationEvent = setEvent(type, ui`${pretty} continuado (interrupción accidental)`, fmtTime(now), 'manual');
           state.activePause = {
             type,
             startedAt: lastClosed.startedAt,
@@ -4081,18 +4089,18 @@ function renderPayDatesSection() {
           saveAll();
           onGamePauseStarted(type);
           stopBreakStartAlarm();
-          toast(`${pretty} continuado — interrupción de ${formatMinutes(gapMin)} min registrada`);
+          toast(ui`${pretty} continuado — interrupción de ${formatMinutes(gapMin)} min registrada`);
           return;
         }
       }
 
       state.activePause = { type, startedAt: now.toISOString(), shiftDayKey: dayKey };
-      setEvent(type, `${pretty} iniciado`, fmtTime(now), 'manual');
+      setEvent(type, ui`${pretty} iniciado`, fmtTime(now), 'manual');
       saveAll();
       // El aviso de "va a empezar" ya no aplica una vez que la pausa arrancó de verdad — se apaga
       // de inmediato en vez de esperar al próximo tick.
       stopBreakStartAlarm();
-      toast(`${pretty} iniciado`);
+      toast(ui`${pretty} iniciado`);
       onGamePauseStarted(type);
     }
 
@@ -4105,7 +4113,7 @@ function renderPayDatesSection() {
       const plannedSlot = findPlannedSlotForActivePause(shiftDayKey);
       const pauseRecord = { id: makeLocalId(), type: endedPause.type, startedAt: endedPause.startedAt, endedAt: now, shiftDayKey };
       state.pauseHistory.push(pauseRecord);
-      const pauseEndEvent = setEvent(endedPause.type, `${endedPause.type === 'lunch' ? 'Lunch' : 'Break'} terminado`, fmtTime(new Date(now)), 'manual');
+      const pauseEndEvent = setEvent(endedPause.type, ui`${endedPause.type === 'lunch' ? translateText('Lunch') : translateText('Break')} terminado`, fmtTime(new Date(now)), 'manual');
       state.activePause = null;
       // El aviso de "va a terminar" ya no aplica una vez que se cerró la pausa — se apaga de
       // inmediato en vez de esperar al próximo tick.
@@ -4138,7 +4146,7 @@ function renderPayDatesSection() {
       // Misma defensa que toggleShift/togglePause: estos botones solo aplican al turno real de hoy,
       // nunca al día seleccionado en "Día activo".
       if (!isViewingToday()) {
-        toast("Cambia el día activo a 'Hoy' para usar este control");
+        toast(translateText("Cambia el día activo a 'Hoy' para usar este control"));
         return;
       }
       if (state.activeCall) return endCall();
@@ -4152,9 +4160,9 @@ function renderPayDatesSection() {
       const nowISO = now.toISOString();
       let interruptedPauseRollback = null;
       if (state.activePause) {
-        const pretty = state.activePause.type === 'lunch' ? 'Lunch' : 'Break';
+        const pretty = state.activePause.type === 'lunch' ? translateText('Lunch') : translateText('Break');
         interruptedPauseRollback = endPause({ silent: true, deferSave: true });
-        toast(`${pretty} terminado automáticamente al iniciar la llamada`);
+        toast(ui`${pretty} terminado automáticamente al iniciar la llamada`);
       }
 
       // Una llamada real puede llegar antes del horario planeado o después de haber cerrado el
@@ -4168,7 +4176,7 @@ function renderPayDatesSection() {
       if (needsAutoShift) {
         state.shiftStartedAt = nowISO;
         state.shiftEndedAt = null;
-        const event = setEvent('shift', 'Shift iniciado automáticamente por llamada', fmtTime(now), 'auto');
+        const event = setEvent('shift', translateText('Shift iniciado automáticamente por llamada'), fmtTime(now), 'auto');
         autoShiftEventId = event?.id || null;
         onGameShiftStarted({ continued: false });
       }
@@ -4185,7 +4193,7 @@ function renderPayDatesSection() {
         gameBeforeAutoShift,
       };
       saveAll();
-      toast(needsAutoShift ? 'Llamada iniciada · turno abierto automáticamente' : 'Llamada iniciada');
+      toast(needsAutoShift ? translateText('Llamada iniciada · turno abierto automáticamente') : translateText('Llamada iniciada'));
     }
 
     // Termina la llamada en curso y la guarda SOLA (ver autoSaveLiveCall) — desde ya no abre ningún
@@ -4209,7 +4217,7 @@ function renderPayDatesSection() {
     // sola o vía el modal de respaldo), esto descarta la llamada en curso sin dejar ningún rastro.
     function discardActiveCall() {
       if (!state.activeCall) return;
-      appConfirm('¿Descartar esta llamada sin guardarla? El tiempo registrado se pierde y no queda ninguna fila en Tabla de llamadas.', () => {
+      appConfirm(translateText('¿Descartar esta llamada sin guardarla? El tiempo registrado se pierde y no queda ninguna fila en Tabla de llamadas.'), () => {
         const discarded = state.activeCall;
         state.activeCall = null;
 
@@ -4233,7 +4241,7 @@ function renderPayDatesSection() {
 
         saveStateOnly();
         render();
-        toast(discarded?.autoStartedShift ? 'Llamada descartada · turno automático revertido' : 'Llamada descartada');
+        toast(discarded?.autoStartedShift ? translateText('Llamada descartada · turno automático revertido') : translateText('Llamada descartada'));
       });
     }
 
@@ -4242,8 +4250,8 @@ function renderPayDatesSection() {
     // iniciado.
     function discardActivePause() {
       if (!state.activePause) return;
-      const pretty = state.activePause.type === 'lunch' ? 'Lunch' : 'Break';
-      appConfirm(`¿Descartar este ${pretty} sin guardarlo? No quedará registrado en tu historial ni en Adherencia.`, () => {
+      const pretty = state.activePause.type === 'lunch' ? translateText('Lunch') : translateText('Break');
+      appConfirm(ui`¿Descartar este ${pretty} sin guardarlo? No quedará registrado en tu historial ni en Adherencia.`, () => {
         const discarded = state.activePause;
         const accountingDay = callDateKeyFromValue(discarded?.shiftDayKey) || currentShiftAccountingDayKey(new Date(discarded?.startedAt || Date.now()));
         if (discarded?.continuationInterruptionId && Array.isArray(state.dayInterruptions?.[accountingDay])) {
@@ -4259,7 +4267,7 @@ function renderPayDatesSection() {
         stopBreakEndAlarm();
         saveStateOnly();
         render();
-        toast(`${pretty} descartado`);
+        toast(ui`${pretty} descartado`);
       });
     }
 
@@ -4267,7 +4275,7 @@ function renderPayDatesSection() {
       if (state.activeCall) {
         return {
           type: 'call',
-          label: 'En llamada',
+          label: translateText('En llamada'),
           startedAt: state.activeCall.startedAt,
           colorVar: '--cyan',
           rgb: '47, 213, 255',
@@ -4279,7 +4287,7 @@ function renderPayDatesSection() {
         const isLunch = state.activePause.type === 'lunch';
         return {
           type: state.activePause.type,
-          label: isLunch ? 'Lunch' : 'Break',
+          label: isLunch ? translateText('Lunch') : translateText('Break'),
           startedAt: state.activePause.startedAt,
           colorVar: isLunch ? '--blue' : '--warn',
           rgb: isLunch ? '124, 140, 255' : '255, 209, 92',
@@ -4332,7 +4340,7 @@ function renderPayDatesSection() {
       const isLive = !!state.activeCall;
       icon.innerHTML = iconHtml('phone');
       card.classList.toggle('live', isLive);
-      textTitle.textContent = isLive ? 'En llamada' : 'Comienza una nueva llamada';
+      textTitle.textContent = isLive ? translateText('En llamada') : translateText('Comienza una nueva llamada');
       if (mid) mid.style.display = isLive ? '' : 'none';
       if (timerEl && isLive) timerEl.textContent = formatDuration(Date.now() - new Date(state.activeCall.startedAt).getTime());
       if (actions) actions.style.display = isLive ? '' : 'none';
@@ -4343,7 +4351,7 @@ function renderPayDatesSection() {
     // este navegador: las 3 llaves de localStorage completas (STORAGE_KEY/CALLS_KEY/SETTINGS_KEY),
     // sin dejar nada.
     function eraseAllData() {
-      appConfirm('¿Borrar TODOS los datos del programa? Esto borra permanentemente todas las llamadas, turnos, pausas, horario semanal, metas y tu nombre/emoji guardados en este navegador. No se puede deshacer. La app queda como recién instalada (con el popup de bienvenida de nuevo).', () => {
+      appConfirm(translateText('¿Borrar TODOS los datos del programa? Esto borra permanentemente todas las llamadas, turnos, pausas, horario semanal, metas y tu nombre/emoji guardados en este navegador. No se puede deshacer. La app queda como recién instalada (con el popup de bienvenida de nuevo).'), () => {
         try {
           localStorage.removeItem(STORAGE_KEY);
           localStorage.removeItem(CALLS_KEY);
@@ -4364,7 +4372,7 @@ function renderPayDatesSection() {
         resetCallEditorState();
 
         saveAll();
-        toast('Todos los datos fueron borrados');
+        toast(translateText('Todos los datos fueron borrados'));
         closeModal('resetModal');
 
         // Vuelve a mostrar el popup de bienvenida, igual que la primera vez que se abre la app.
@@ -4379,7 +4387,7 @@ function renderPayDatesSection() {
         const onboardingEmojiPickerWrapReset = document.getElementById('onboardingEmojiPickerWrap');
         const toggleEmojiPickerOnboardingBtnReset = document.getElementById('toggleEmojiPickerOnboardingBtn');
         if (onboardingEmojiPickerWrapReset) onboardingEmojiPickerWrapReset.classList.remove('open');
-        if (toggleEmojiPickerOnboardingBtnReset) { toggleEmojiPickerOnboardingBtnReset.setAttribute('aria-expanded', 'false'); toggleEmojiPickerOnboardingBtnReset.textContent = 'Cambiar emoji'; }
+        if (toggleEmojiPickerOnboardingBtnReset) { toggleEmojiPickerOnboardingBtnReset.setAttribute('aria-expanded', 'false'); toggleEmojiPickerOnboardingBtnReset.textContent = translateText('Cambiar emoji'); }
         openModal('onboardingModal');
       });
     }
@@ -4395,10 +4403,10 @@ function renderPayDatesSection() {
           ? currentShiftAccountingDayKey(new Date(state.pendingLiveCallBackup.startedAtISO))
           : '');
       if (normalizedDayKey && (activeCallDayKey === normalizedDayKey || pendingCallDayKey === normalizedDayKey)) {
-        toast('Guarda o descarta la llamada pendiente antes de reiniciar este día.');
+        toast(translateText('Guarda o descarta la llamada pendiente antes de reiniciar este día.'));
         return;
       }
-      appConfirm(`¿Reiniciar ${formatCallDayLabel(dayKey)}? Se borran llamadas, pausas, huecos, la nota del día y log de ese día.`, () => {
+      appConfirm(ui`¿Reiniciar ${formatCallDayLabel(dayKey)}? Se borran llamadas, pausas, huecos, la nota del día y log de ese día.`, () => {
         const trackedShiftStart = state.shiftStartedAt ? new Date(state.shiftStartedAt) : null;
         const trackedShiftEnd = state.shiftEndedAt ? new Date(state.shiftEndedAt) : new Date();
         const trackedShiftDayKey = trackedShiftStart && Number.isFinite(trackedShiftStart.getTime())
@@ -4442,7 +4450,7 @@ function renderPayDatesSection() {
         onGameDayReset(normalizedDayKey || dayKey);
         financeRunAutoFillCascade();
         saveAll();
-        toast('Día reiniciado');
+        toast(translateText('Día reiniciado'));
       });
     }
 
@@ -4533,26 +4541,26 @@ function renderPayDatesSection() {
       }
       const rowsHtml = [];
       duplicates.forEach(c => {
-        rowsHtml.push(`<li>#${escapeHtml(c.customerId)} · ${escapeHtml(c.callDate)} ${escapeHtml(c.callStart)} — Duplicado exacto de una llamada ya guardada</li>`);
+        rowsHtml.push(ui`<li>#${escapeHtml(c.customerId)} · ${escapeHtml(c.callDate)} ${escapeHtml(c.callStart)} — Duplicado exacto de una llamada ya guardada</li>`);
       });
       overlaps.forEach(o => {
-        rowsHtml.push(`<li>#${escapeHtml(o.customerId)} · ${escapeHtml(o.callDate)} ${escapeHtml(o.callStart)} — Traslapa con la llamada #${escapeHtml(o.withCustomerId)} (${escapeHtml(o.withCallStart)}) ya guardada</li>`);
+        rowsHtml.push(ui`<li>#${escapeHtml(o.customerId)} · ${escapeHtml(o.callDate)} ${escapeHtml(o.callStart)} — Traslapa con la llamada #${escapeHtml(o.withCustomerId)} (${escapeHtml(o.withCallStart)}) ya guardada</li>`);
       });
       futureRows.forEach(c => {
-        rowsHtml.push(`<li>#${escapeHtml(c.customerId)} · ${escapeHtml(c.callDate)} ${escapeHtml(c.callStart)} — Termina en el futuro: no se importó</li>`);
+        rowsHtml.push(ui`<li>#${escapeHtml(c.customerId)} · ${escapeHtml(c.callDate)} ${escapeHtml(c.callStart)} — Termina en el futuro: no se importó</li>`);
       });
       replacedLive.forEach(item => {
-        rowsHtml.push(`<li>#${escapeHtml(item.call.customerId)} · ${escapeHtml(item.call.callDate)} ${escapeHtml(item.call.callStart)} — Reemplazó la llamada en vivo provisional por los datos oficiales</li>`);
+        rowsHtml.push(ui`<li>#${escapeHtml(item.call.customerId)} · ${escapeHtml(item.call.callDate)} ${escapeHtml(item.call.callStart)} — Reemplazó la llamada en vivo provisional por los datos oficiales</li>`);
       });
       correctedOfficial.forEach(item => {
-        rowsHtml.push(`<li>#${escapeHtml(item.call.customerId)} · ${escapeHtml(item.call.callDate)} ${escapeHtml(item.call.callStart)} — Actualizó una llamada oficial que Propio corrigió</li>`);
+        rowsHtml.push(ui`<li>#${escapeHtml(item.call.customerId)} · ${escapeHtml(item.call.callDate)} ${escapeHtml(item.call.callStart)} — Actualizó una llamada oficial que Propio corrigió</li>`);
       });
       const omitted = duplicates.length + overlaps.length + futureRows.length;
       const updates = replacedLive.length + correctedOfficial.length;
       const headline = omitted
-        ? `${omitted} fila(s) omitida(s) · ${updates} llamada(s) actualizada(s)`
-        : `${updates} llamada(s) actualizada(s) con datos oficiales`;
-      el.innerHTML = `<strong>${headline}:</strong><ul style="margin:6px 0 0; padding-left:18px;">${rowsHtml.join('')}</ul>`;
+        ? ui`${omitted} fila(s) omitida(s) · ${updates} llamada(s) actualizada(s)`
+        : ui`${updates} llamada(s) actualizada(s) con datos oficiales`;
+      el.innerHTML = ui`<strong>${headline}:</strong><ul style="margin:6px 0 0; padding-left:18px;">${rowsHtml.join('')}</ul>`;
       el.style.display = '';
     }
 
@@ -4576,7 +4584,7 @@ function renderPayDatesSection() {
       const ta = document.getElementById('callInput');
       let parsed = parseCalls(ta.value);
       if (!parsed.length) {
-        toast('No se pudo leer la data');
+        toast(translateText('No se pudo leer la data'));
         return;
       }
 
@@ -4725,26 +4733,26 @@ function renderPayDatesSection() {
       const lateCount = unique.filter(c => callImportFlag(c)?.cls === 'imported-late').length;
       const historicCount = unique.filter(c => callImportFlag(c)?.cls === 'imported-historic').length;
       const importNote = lateCount || historicCount
-        ? [lateCount ? `${lateCount} tarde(s)` : '', historicCount ? `${historicCount} histórica(s)` : ''].filter(Boolean).join(' · ')
-        : 'a tiempo';
-      const overlapNote = overlapSkipped ? ` · ${overlapSkipped} traslapada(s) omitida(s)` : '';
-      const duplicateNote = skippedDuplicates.length ? ` · ${skippedDuplicates.length} duplicada(s) omitida(s)` : '';
-      const futureNote = futureRows.length ? ` · ${futureRows.length} futura(s) omitida(s)` : '';
-      const replacedNote = replacedLive.length ? ` · ${replacedLive.length} live actualizada(s)` : '';
-      const correctedNote = correctedOfficial.length ? ` · ${correctedOfficial.length} oficial(es) corregida(s)` : '';
+        ? [lateCount ? ui`${lateCount} tarde(s)` : '', historicCount ? ui`${historicCount} histórica(s)` : ''].filter(Boolean).join(' · ')
+        : translateText('a tiempo');
+      const overlapNote = overlapSkipped ? ui` · ${overlapSkipped} traslapada(s) omitida(s)` : '';
+      const duplicateNote = skippedDuplicates.length ? ui` · ${skippedDuplicates.length} duplicada(s) omitida(s)` : '';
+      const futureNote = futureRows.length ? ui` · ${futureRows.length} futura(s) omitida(s)` : '';
+      const replacedNote = replacedLive.length ? ui` · ${replacedLive.length} live actualizada(s)` : '';
+      const correctedNote = correctedOfficial.length ? ui` · ${correctedOfficial.length} oficial(es) corregida(s)` : '';
 
       const importChangedData = unique.length || replacedLive.length || correctedOfficial.length;
       if (importChangedData) {
-        setEvent('import', 'Llamadas importadas', `${unique.length} fila(s) · ${importNote}${overlapNote}${duplicateNote}${futureNote}${replacedNote}${correctedNote}`, 'Propio');
+        setEvent('import', translateText('Llamadas importadas'), ui`${unique.length} fila(s) · ${importNote}${overlapNote}${duplicateNote}${futureNote}${replacedNote}${correctedNote}`, 'Propio');
         financeRunAutoFillCascade();
         saveAll();
       }
       renderImportSkippedSummary(skippedDuplicates, skippedOverlaps, futureRows, replacedLive, correctedOfficial);
 
       if (!unique.length && (overlapSkipped || skippedDuplicates.length || futureRows.length)) {
-        toast(`Ninguna fila nueva — ${overlapSkipped + skippedDuplicates.length + futureRows.length} omitida(s). Revisa el detalle debajo del cuadro de texto.`);
+        toast(ui`Ninguna fila nueva — ${overlapSkipped + skippedDuplicates.length + futureRows.length} omitida(s). Revisa el detalle debajo del cuadro de texto.`);
       } else {
-        toast(`${unique.length} llamada(s) importada(s)${replacedNote}${correctedNote}${overlapNote}${duplicateNote}${futureNote}`);
+        toast(ui`${unique.length} llamada(s) importada(s)${replacedNote}${correctedNote}${overlapNote}${duplicateNote}${futureNote}`);
       }
     }
 
@@ -4755,7 +4763,7 @@ function renderPayDatesSection() {
     function clearCallInputBox() {
       const ta = document.getElementById('callInput');
       if (ta) ta.value = '';
-      toast('Cuadro de texto limpiado');
+      toast(translateText('Cuadro de texto limpiado'));
     }
 
     function exportJSON() {
@@ -4779,7 +4787,7 @@ function renderPayDatesSection() {
         const now = new Date();
         const start = new Date(now.getFullYear(), now.getMonth(), 1);
         const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-        const label = new Intl.DateTimeFormat('es-MX', { month: 'long', year: 'numeric' }).format(now);
+        const label = new Intl.DateTimeFormat(displayLocale(), { month: 'long', year: 'numeric' }).format(now);
         return { start, end, label: label.charAt(0).toUpperCase() + label.slice(1) };
       }
       if (accountingExportPeriod === 'custom') {
@@ -4801,7 +4809,7 @@ function renderPayDatesSection() {
       }
       // 'cycle' (default)
       const { start, end } = cycleBoundsForOffset(0);
-      return { start, end, label: `Ciclo ${formatCallDayLabel(todayCallDateKey(start))} – ${formatCallDayLabel(todayCallDateKey(end))}` };
+      return { start, end, label: ui`Ciclo ${formatCallDayLabel(todayCallDateKey(start))} – ${formatCallDayLabel(todayCallDateKey(end))}` };
     }
 
     // Un objeto por día del rango (inclusive), con las mismas cifras que ya se ven en
@@ -4830,17 +4838,17 @@ function renderPayDatesSection() {
       const range = accountingExportRange();
       // BUG-024 — Ver comentario junto a accountingExportRange: en modo 'custom' sin ambas fechas llenas, la función devuelve `null` en vez de un fallback silencioso a "hoy"
       if (!range) {
-        toast('Elige las fechas Desde y Hasta antes de exportar');
+        toast(translateText('Elige las fechas Desde y Hasta antes de exportar'));
         return;
       }
       const days = accountingExportDays(range);
       if (!days.length) {
-        toast('Elige un rango de fechas válido primero.');
+        toast(translateText('Elige un rango de fechas válido primero.'));
         return;
       }
       const rows = [];
-      rows.push(['Resumen por día', range.label].map(csvField).join(','));
-      rows.push(['Fecha', 'Llamadas', 'Productivo (min)', 'Adherencia (%)', 'Ganancias ($)'].map(csvField).join(','));
+      rows.push([translateText('Resumen por día'), range.label].map(csvField).join(','));
+      rows.push(['Fecha', translateText('Llamadas'), 'Productivo (min)', 'Adherencia (%)', translateText('Ganancias ($)')].map(csvField).join(','));
       let totalCalls = 0, totalProductive = 0, totalEarnings = 0;
       days.forEach(d => {
         totalCalls += d.dayCalls.length;
@@ -4854,10 +4862,10 @@ function renderPayDatesSection() {
           d.stats.earnings.toFixed(2),
         ].map(csvField).join(','));
       });
-      rows.push(['Total', totalCalls, formatMinutes(totalProductive), '', totalEarnings.toFixed(2)].map(csvField).join(','));
+      rows.push([translateText('Total'), totalCalls, formatMinutes(totalProductive), '', totalEarnings.toFixed(2)].map(csvField).join(','));
       rows.push('');
-      rows.push(['Detalle de llamadas'].map(csvField).join(','));
-      rows.push(['Fecha', 'Customer ID', 'Inicio', 'Duración (min)', 'Billable', 'Dropped', 'Pago ($)'].map(csvField).join(','));
+      rows.push([translateText('Detalle de llamadas')].map(csvField).join(','));
+      rows.push(['Fecha', 'Customer ID', translateText('Inicio'), translateText('Duración (min)'), 'Billable', 'Dropped', 'Pago ($)'].map(csvField).join(','));
       days.forEach(d => {
         d.dayCalls.forEach(c => {
           rows.push([d.dayKey, c.customerId, c.callStart, c.durationMin, c.billable, c.dropped, parseMoney(c.pay).toFixed(2)].map(csvField).join(','));
@@ -4882,12 +4890,12 @@ function renderPayDatesSection() {
       // exportAccountingCsv(): mismo aviso explícito en vez de un fallback
       // silencioso a "hoy" en modo 'custom' sin fechas.
       if (!range) {
-        toast('Elige las fechas Desde y Hasta antes de exportar');
+        toast(translateText('Elige las fechas Desde y Hasta antes de exportar'));
         return;
       }
       const days = accountingExportDays(range);
       if (!days.length) {
-        toast('Elige un rango de fechas válido primero.');
+        toast(translateText('Elige un rango de fechas válido primero.'));
         return;
       }
       let totalCalls = 0, totalProductive = 0, totalEarnings = 0;
@@ -4895,10 +4903,10 @@ function renderPayDatesSection() {
         totalCalls += d.dayCalls.length;
         totalProductive += d.productive;
         totalEarnings += d.stats.earnings;
-        return `<tr><td>${escapeHtml(formatCallDayLabel(d.dayKey))}</td><td>${d.dayCalls.length}</td><td>${escapeHtml(formatMinutes(d.productive))}</td><td>${d.adherence ? d.adherence.scorePct + '%' : '—'}</td><td>${escapeHtml(money(d.stats.earnings))}</td></tr>`;
+        return ui`<tr><td>${escapeHtml(formatCallDayLabel(d.dayKey))}</td><td>${d.dayCalls.length}</td><td>${escapeHtml(formatMinutes(d.productive))}</td><td>${d.adherence ? d.adherence.scorePct + '%' : '—'}</td><td>${escapeHtml(money(d.stats.earnings))}</td></tr>`;
       }).join('');
-      const detailRowsHtml = days.map(d => d.dayCalls.map(c => `<tr><td>${escapeHtml(d.dayKey)}</td><td>${escapeHtml(c.customerId)}</td><td>${escapeHtml(c.callStart)}</td><td>${c.durationMin}</td><td>${escapeHtml(c.billable)}</td><td>${escapeHtml(c.dropped)}</td><td>${escapeHtml(money(parseMoney(c.pay)))}</td></tr>`).join('')).join('') || '<tr><td colspan="7" style="text-align:center;color:#777;">Sin llamadas en este período.</td></tr>';
-      const html = `<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"/><title>Reporte de ganancias — ${escapeHtml(range.label)}</title>
+      const detailRowsHtml = days.map(d => d.dayCalls.map(c => ui`<tr><td>${escapeHtml(d.dayKey)}</td><td>${escapeHtml(c.customerId)}</td><td>${escapeHtml(c.callStart)}</td><td>${c.durationMin}</td><td>${escapeHtml(c.billable)}</td><td>${escapeHtml(c.dropped)}</td><td>${escapeHtml(money(parseMoney(c.pay)))}</td></tr>`).join('')).join('') || translateMarkup('<tr><td colspan="7" style="text-align:center;color:#777;">Sin llamadas en este período.</td></tr>');
+      const html = ui`<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"/><title>Reporte de ganancias — ${escapeHtml(range.label)}</title>
 <style>
   body { font-family: Arial, Helvetica, sans-serif; padding: 28px; color: #171717; }
   h1 { font-size: 18px; margin: 0 0 4px; }
@@ -4925,13 +4933,13 @@ function renderPayDatesSection() {
 </body></html>`;
       const win = window.open('', '_blank');
       if (!win) {
-        toast('El navegador bloqueó la ventana nueva — habilita ventanas emergentes para exportar a PDF.');
+        toast(translateText('El navegador bloqueó la ventana nueva — habilita ventanas emergentes para exportar a PDF.'));
         return;
       }
       win.document.write(html);
       win.document.close();
       win.document.querySelector('.print-btn').addEventListener('click', () => win.print());
-      toast('Reporte listo — usa "Imprimir / Guardar como PDF" en la pestaña nueva');
+      toast(translateText('Reporte listo — usa "Imprimir / Guardar como PDF" en la pestaña nueva'));
     }
 
     function syncAccountingExportPeriodUI() {
@@ -4948,16 +4956,16 @@ function renderPayDatesSection() {
     // Contraparte de exportJSON: valida que el JSON tenga la forma exacta que exportJSON produce ({ state: {...}, calls: [...], exportedAt }).
     function validateImportPayload(payload) {
       if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
-        return { ok: false, error: 'El archivo no contiene un objeto JSON válido.' };
+        return { ok: false, error: translateText('El archivo no contiene un objeto JSON válido.') };
       }
       if (!payload.state || typeof payload.state !== 'object' || Array.isArray(payload.state)) {
-        return { ok: false, error: 'Falta el campo "state" (o no es válido) en el archivo.' };
+        return { ok: false, error: translateText('Falta el campo "state" (o no es válido) en el archivo.') };
       }
       if (!Array.isArray(payload.calls)) {
-        return { ok: false, error: 'Falta el campo "calls" (o no es una lista) en el archivo.' };
+        return { ok: false, error: translateText('Falta el campo "calls" (o no es una lista) en el archivo.') };
       }
       if ('settings' in payload && (!payload.settings || typeof payload.settings !== 'object' || Array.isArray(payload.settings))) {
-        return { ok: false, error: 'El campo "settings" del respaldo no es válido.' };
+        return { ok: false, error: translateText('El campo "settings" del respaldo no es válido.') };
       }
       return { ok: true };
     }
@@ -4996,7 +5004,7 @@ function renderPayDatesSection() {
       // BUG-011 (QA v361) — Rechazo temprano por tamaño, ANTES de leer el
       // archivo — ver comentario junto a MAX_IMPORT_JSON_BYTES arriba.
       if (file.size > MAX_IMPORT_JSON_BYTES) {
-        toast(`Ese archivo pesa demasiado (${(file.size / (1024 * 1024)).toFixed(1)}MB, máximo ${Math.round(MAX_IMPORT_JSON_BYTES / (1024 * 1024))}MB) — no parece un backup válido de esta app. Revisa que sea el archivo correcto.`);
+        toast(ui`Ese archivo pesa demasiado (${(file.size / (1024 * 1024)).toFixed(1)}MB, máximo ${Math.round(MAX_IMPORT_JSON_BYTES / (1024 * 1024))}MB) — no parece un backup válido de esta app. Revisa que sea el archivo correcto.`);
         return;
       }
       const reader = new FileReader();
@@ -5005,7 +5013,7 @@ function renderPayDatesSection() {
         try {
           payload = JSON.parse(String(reader.result || ''));
         } catch {
-          toast('Ese archivo no es JSON válido.');
+          toast(translateText('Ese archivo no es JSON válido.'));
           return;
         }
         const check = validateImportPayload(payload);
@@ -5020,16 +5028,16 @@ function renderPayDatesSection() {
           : 'fecha desconocida';
         const restoresSettings = !!(payload.settings && typeof payload.settings === 'object' && !Array.isArray(payload.settings));
         const settingsNote = restoresSettings
-          ? 'También restaura tu horario, metas, Finanzas, Higher Rate, perfil y demás ajustes del respaldo.'
-          : 'Es un backup antiguo sin settings: tu horario, metas y demás ajustes actuales se conservarán.';
-        appConfirm(`¿Importar este archivo (exportado el ${exportedLabel} · ${callCount} llamada(s))? Esto reemplaza tus llamadas, turnos y pausas actuales. ${settingsNote} Esta acción no se puede deshacer.`, () => {
+          ? translateText('También restaura tu horario, metas, Finanzas, Higher Rate, perfil y demás ajustes del respaldo.')
+          : translateText('Es un backup antiguo sin settings: tu horario, metas y demás ajustes actuales se conservarán.');
+        appConfirm(ui`¿Importar este archivo (exportado el ${exportedLabel} · ${callCount} llamada(s))? Esto reemplaza tus llamadas, turnos y pausas actuales. ${settingsNote} Esta acción no se puede deshacer.`, () => {
           applyImportedPayload(payload);
           toast(restoresSettings
-            ? `${callCount} llamada(s) y configuración restauradas desde el respaldo`
-            : `${callCount} llamada(s) importada(s) desde el respaldo antiguo`);
+            ? ui`${callCount} llamada(s) y configuración restauradas desde el respaldo`
+            : ui`${callCount} llamada(s) importada(s) desde el respaldo antiguo`);
         });
       };
-      reader.onerror = () => toast('No se pudo leer el archivo.');
+      reader.onerror = () => toast(translateText('No se pudo leer el archivo.'));
       reader.readAsText(file);
     }
 
@@ -5046,7 +5054,7 @@ function renderPayDatesSection() {
     export function timeLabel(value) {
       const normalized = formatHHMM(value);
       const [h, m] = normalized.split(':').map(Number);
-      const suffix = h >= 12 ? 'PM' : 'AM';
+      const suffix = h >= 12 ? translateText('PM') : translateText('AM');
       const hour12 = h % 12 || 12;
       return `${pad(hour12)}:${pad(m)} ${suffix}`;
     }
@@ -5256,8 +5264,8 @@ function renderPayDatesSection() {
       saveSettingsOnly();
       render();
       toast(movedWeeks > 0
-        ? `Ciclo de pago actualizado — ${movedWeeks} semana(s) personalizada(s) de Horario se re-anclaron al nuevo inicio de semana`
-        : 'Ciclo de pago actualizado');
+        ? ui`Ciclo de pago actualizado — ${movedWeeks} semana(s) personalizada(s) de Horario se re-anclaron al nuevo inicio de semana`
+        : translateText('Ciclo de pago actualizado'));
     }
 
     // Pedido del usuario: control de volumen maestro para TODOS los sonidos del programa (avisos de turno/Break/Lunch + descanso productivo, incluyendo el sonido personalizado subido). Se guarda en 'input' (no 'change') a propósito
@@ -5277,7 +5285,7 @@ function renderPayDatesSection() {
       const mins = Number(input?.value);
       if (Number.isFinite(mins) && mins >= 0) settings.alertBeforeShiftMin = mins;
       saveSettingsOnly();
-      toast(settings.alertBeforeShiftMin > 0 ? `Aviso configurado: ${formatMinutes(settings.alertBeforeShiftMin)} min antes de tu turno` : 'Aviso de turno desactivado');
+      toast(settings.alertBeforeShiftMin > 0 ? ui`Aviso configurado: ${formatMinutes(settings.alertBeforeShiftMin)} min antes de tu turno` : translateText('Aviso de turno desactivado'));
     }
 
     // Mismo patrón que updateShiftAlertSettings(), pero para los 2 avisos de
@@ -5291,7 +5299,7 @@ function renderPayDatesSection() {
       if (Number.isFinite(startMin) && startMin >= 0) settings.alertBeforeBreakMin = startMin;
       if (Number.isFinite(endMin) && endMin >= 0) settings.alertBeforeBreakEndMin = endMin;
       saveSettingsOnly();
-      toast('Aviso de Break/Lunch actualizado');
+      toast(translateText('Aviso de Break/Lunch actualizado'));
     }
 
     // Ventana de gracia de la Adherencia estilo Calabrio (ver
@@ -5304,7 +5312,7 @@ function renderPayDatesSection() {
       saveSettingsOnly();
       onGameDayMetadataChanged(todayCallDateKey());
       render();
-      toast(`Ventana de gracia de Adherencia: ${formatMinutes(settings.adherenceGraceMin)} min`);
+      toast(ui`Ventana de gracia de Adherencia: ${formatMinutes(settings.adherenceGraceMin)} min`);
     }
 
     // Meta de Adherencia (%, mejora D) — mismo patrón de auto-guardado.
@@ -5315,7 +5323,7 @@ function renderPayDatesSection() {
       saveSettingsOnly();
       onGameDayMetadataChanged(todayCallDateKey());
       render();
-      toast(`Meta de Adherencia: ${settings.adherenceGoalPct}%`);
+      toast(ui`Meta de Adherencia: ${settings.adherenceGoalPct}%`);
     }
 
     // Pedido del usuario: minutos productivos para ganar descanso + minutos
@@ -5329,7 +5337,7 @@ function renderPayDatesSection() {
       if (Number.isFinite(earnMin) && earnMin > 0) settings.productiveBreakEarnMin = earnMin;
       if (Number.isFinite(awardMin) && awardMin >= 0) settings.productiveBreakAwardMin = awardMin;
       saveSettingsOnly();
-      toast(`Descanso por productividad: cada ${formatMinutes(settings.productiveBreakEarnMin)} min productivos = ${formatMinutes(settings.productiveBreakAwardMin)} min de descanso`);
+      toast(ui`Descanso por productividad: cada ${formatMinutes(settings.productiveBreakEarnMin)} min productivos = ${formatMinutes(settings.productiveBreakAwardMin)} min de descanso`);
     }
 
     // Muestra/oculta la sección de subida de archivo según el sonido elegido, y actualiza el texto de estado (nombre del archivo guardado, o aviso de que todavía no hay ninguno).
@@ -5341,8 +5349,8 @@ function renderPayDatesSection() {
       if (section) section.style.display = isCustom ? '' : 'none';
       if (status) {
         status.textContent = settings.productiveBreakCustomSoundDataUrl
-          ? `Archivo guardado: ${settings.productiveBreakCustomSoundName || 'sonido personalizado'}`
-          : 'Ningún archivo propio guardado — usando el beep clásico mientras tanto.';
+          ? ui`Archivo guardado: ${settings.productiveBreakCustomSoundName || 'sonido personalizado'}`
+          : translateText('Ningún archivo propio guardado — usando el beep clásico mientras tanto.');
       }
     }
 
@@ -5369,11 +5377,11 @@ function renderPayDatesSection() {
       input.value = ''; // permite volver a elegir el mismo archivo después
       if (!file) return;
       if (!file.type || !file.type.startsWith('audio/')) {
-        toast('El archivo debe ser de audio (MP3, WAV, OGG...).');
+        toast(translateText('El archivo debe ser de audio (MP3, WAV, OGG...).'));
         return;
       }
       if (file.size > MAX_CUSTOM_SOUND_BYTES) {
-        toast(`El archivo pesa demasiado (máximo ${Math.round(MAX_CUSTOM_SOUND_BYTES / 1024)}KB) — usa un sonido corto.`);
+        toast(ui`El archivo pesa demasiado (máximo ${Math.round(MAX_CUSTOM_SOUND_BYTES / 1024)}KB) — usa un sonido corto.`);
         return;
       }
       const reader = new FileReader();
@@ -5393,16 +5401,16 @@ function renderPayDatesSection() {
           settings.productiveBreakCustomSoundName = previous.name;
           settings.productiveBreakSound = previous.sound;
           saveSettingsOnly();
-          toast('No se pudo guardar el sonido — el almacenamiento del navegador está lleno.');
+          toast(translateText('No se pudo guardar el sonido — el almacenamiento del navegador está lleno.'));
           syncProductiveBreakCustomSoundUI();
           return;
         }
         const soundSelect = document.getElementById('productiveBreakSoundInput');
         if (soundSelect) soundSelect.value = 'custom';
         syncProductiveBreakCustomSoundUI();
-        toast(`Sonido "${file.name}" guardado`);
+        toast(ui`Sonido "${file.name}" guardado`);
       };
-      reader.onerror = () => toast('No se pudo leer el archivo de audio.');
+      reader.onerror = () => toast(translateText('No se pudo leer el archivo de audio.'));
       reader.readAsDataURL(file);
     }
 
@@ -5451,7 +5459,7 @@ function renderPayDatesSection() {
         varsFn: () => {
           const slot = getEffectiveScheduleForDay(todayCallDateKey()).find(s => s.type === 'Break' || s.type === 'Lunch');
           return {
-            tipo: slot ? (slot.type === 'Lunch' ? 'Lunch' : 'Break') : 'Break',
+            tipo: slot ? (slot.type === 'Lunch' ? translateText('Lunch') : translateText('Break')) : translateText('Break'),
             hora: slot ? timeLabel(slot.start) : timeLabel('10:00'),
           };
         },
@@ -5461,7 +5469,7 @@ function renderPayDatesSection() {
         varsFn: () => {
           const slot = getEffectiveScheduleForDay(todayCallDateKey()).find(s => s.type === 'Break' || s.type === 'Lunch');
           return {
-            tipo: slot ? (slot.type === 'Lunch' ? 'Lunch' : 'Break') : 'Break',
+            tipo: slot ? (slot.type === 'Lunch' ? translateText('Lunch') : translateText('Break')) : translateText('Break'),
             hora: slot ? timeLabel(slot.end) : timeLabel('10:15'),
           };
         },
@@ -5507,8 +5515,8 @@ function renderPayDatesSection() {
       if (section) section.style.display = isCustom ? '' : 'none';
       if (status) {
         status.textContent = settings[cfg.urlKey]
-          ? `Archivo guardado: ${settings[cfg.nameKey] || 'sonido personalizado'}`
-          : 'Ningún archivo propio guardado — usando el beep clásico mientras tanto.';
+          ? ui`Archivo guardado: ${settings[cfg.nameKey] || 'sonido personalizado'}`
+          : translateText('Ningún archivo propio guardado — usando el beep clásico mientras tanto.');
       }
     }
 
@@ -5530,11 +5538,11 @@ function renderPayDatesSection() {
       input.value = '';
       if (!file) return;
       if (!file.type || !file.type.startsWith('audio/')) {
-        toast('El archivo debe ser de audio (MP3, WAV, OGG...).');
+        toast(translateText('El archivo debe ser de audio (MP3, WAV, OGG...).'));
         return;
       }
       if (file.size > MAX_CUSTOM_SOUND_BYTES) {
-        toast(`El archivo pesa demasiado (máximo ${Math.round(MAX_CUSTOM_SOUND_BYTES / 1024)}KB) — usa un sonido corto.`);
+        toast(ui`El archivo pesa demasiado (máximo ${Math.round(MAX_CUSTOM_SOUND_BYTES / 1024)}KB) — usa un sonido corto.`);
         return;
       }
       const reader = new FileReader();
@@ -5552,16 +5560,16 @@ function renderPayDatesSection() {
           settings[cfg.nameKey] = previous.name;
           settings[cfg.soundKey] = previous.sound;
           saveSettingsOnly();
-          toast('No se pudo guardar el sonido — el almacenamiento del navegador está lleno.');
+          toast(translateText('No se pudo guardar el sonido — el almacenamiento del navegador está lleno.'));
           syncAlarmCustomSoundUI(kind);
           return;
         }
         const soundSelect = document.getElementById(cfg.selectId);
         if (soundSelect) soundSelect.value = 'custom';
         syncAlarmCustomSoundUI(kind);
-        toast(`Sonido "${file.name}" guardado`);
+        toast(ui`Sonido "${file.name}" guardado`);
       };
-      reader.onerror = () => toast('No se pudo leer el archivo de audio.');
+      reader.onerror = () => toast(translateText('No se pudo leer el archivo de audio.'));
       reader.readAsDataURL(file);
     }
 
@@ -5582,7 +5590,7 @@ function renderPayDatesSection() {
       settings[cfg.key] = value || defaultSettings()[cfg.key];
       if (input) input.value = settings[cfg.key];
       saveSettingsOnly();
-      toast('Mensaje del aviso actualizado');
+      toast(translateText('Mensaje del aviso actualizado'));
     }
 
 
@@ -5597,7 +5605,7 @@ function renderHeader() {
 
   document.getElementById('clockNow').textContent = clockTimeVisible ? fmtTime(now) : '--:--:--';
   document.getElementById('clockDate').textContent = fmtDate(now);
-  document.getElementById('stateText').textContent = currentStateLabel();
+  document.getElementById('stateText').textContent = translateText(currentStateLabel());
 
   // Chip de ACW/Available en vivo — visible solo mientras aplica (computeCurrentAcwStart ya filtra
   // turno no iniciado/terminado y llamada/pausa activa).
@@ -5656,13 +5664,13 @@ function renderHeader() {
   if (tooEarly) {
     const cfgToday = dayConfigFor(todayCallDateKey());
     const availableFrom = new Date(dateAtTime(now, formatHHMM(cfgToday.start)).getTime() - SHIFT_START_EARLY_GRACE_MIN * 60000);
-    earlySubtext = `Disponible desde ${timeLabelFromDate(availableFrom)}`;
+    earlySubtext = ui`Disponible desde ${timeLabelFromDate(availableFrom)}`;
   }
   shiftSub.textContent = !viewingToday
-    ? "Solo disponible viendo 'Hoy'"
+    ? translateText("Solo disponible viendo 'Hoy'")
     : startingNewShift
-      ? (isDayOffBlocking ? 'Hoy es tu día libre' : (tooEarly ? earlySubtext : shiftWindowLabel))
-      : 'Activo';
+      ? (isDayOffBlocking ? translateText('Hoy es tu día libre') : (tooEarly ? earlySubtext : shiftWindowLabel))
+      : translateText('Activo');
   shiftBtn.disabled = shiftActionDisabled();
   // El acento se aplica con data-accent + .is-active, sin estilos inline.
   const shiftIsPrimary = shiftActionTone() === 'primary';
@@ -5678,8 +5686,8 @@ function renderHeader() {
 
   breakLabel.textContent = pauseActionLabel('break');
   lunchLabel.textContent = pauseActionLabel('lunch');
-  breakTimer.textContent = viewingToday ? pauseActionTimer('break') : "Solo en 'Hoy'";
-  lunchTimer.textContent = viewingToday ? pauseActionTimer('lunch') : "Solo en 'Hoy'";
+  breakTimer.textContent = viewingToday ? pauseActionTimer('break') : translateText("Solo en 'Hoy'");
+  lunchTimer.textContent = viewingToday ? pauseActionTimer('lunch') : translateText("Solo en 'Hoy'");
 
   breakBtn.disabled = pauseActionDisabled('break');
   lunchBtn.disabled = pauseActionDisabled('lunch');
@@ -5694,7 +5702,7 @@ function renderHeader() {
   const callLabel = document.getElementById('callControlLabel');
   const callTimer = document.getElementById('callControlTimer');
   callLabel.textContent = callActionLabel();
-  callTimer.textContent = viewingToday ? callActionTimer() : "Solo en 'Hoy'";
+  callTimer.textContent = viewingToday ? callActionTimer() : translateText("Solo en 'Hoy'");
   callBtn.disabled = callActionDisabled();
   const callActive = !!state.activeCall;
   callBtn.classList.toggle('is-active', callActive);
@@ -5710,13 +5718,13 @@ function renderHeader() {
   const milestoneRow = document.getElementById('earningsMilestoneMarkers');
   if (milestoneRow) {
     milestoneRow.hidden = !(goalUsd > 0);
-    milestoneRow.innerHTML = [25, 50, 75, 100].map((pct) => `<span class="gh-goal-subitem" aria-label="${pct}%${milestoneProgress.claimed.includes(pct) ? ', hito registrado' : ''}">${milestoneProgress.claimed.includes(pct) ? '✓ ' : ''}${pct}%</span>`).join('');
+    milestoneRow.innerHTML = [25, 50, 75, 100].map((pct) => ui`<span class="gh-goal-subitem" aria-label="${pct}%${milestoneProgress.claimed.includes(pct) ? ', hito registrado' : ''}">${milestoneProgress.claimed.includes(pct) ? '✓ ' : ''}${pct}%</span>`).join('');
   }
   const nextMilestone = document.getElementById('earningsNextMilestone');
   if (nextMilestone) {
     nextMilestone.hidden = !(goalUsd > 0);
     const next = milestoneProgress.next;
-    nextMilestone.textContent = next ? `Próximo hito: ${next.pct}% · te faltan ${money(next.remaining)}${convertedAmountText(next.remaining) ? ` (${convertedAmountText(next.remaining)})` : ''}` : '100% de tu meta diaria alcanzado';
+    nextMilestone.textContent = next ? ui`Próximo hito: ${next.pct}% · te faltan ${money(next.remaining)}${convertedAmountText(next.remaining) ? ` (${convertedAmountText(next.remaining)})` : ''}` : translateText('100% de tu meta diaria alcanzado');
   }
   // Si aplica un bono de Higher Rate en las llamadas de hoy, lograr la meta debería tomar MENOS
   // minutos.
@@ -5736,8 +5744,8 @@ function renderHeader() {
   // Estas 4 metas (Meta $, ≈ conversión, Meta min, restantes) pasaron de píldora a texto plano
   // (ver.goal-plain-row en el CSS)
   const goalDailyLabelEl = document.getElementById('goalDailyLabel');
-  if (goalDailyLabelEl) goalDailyLabelEl.textContent = dayGoal.isOverride ? 'Meta solo de este día' : 'Meta diaria';
-  document.getElementById('goalAmountBadge').innerHTML = `<span class="gp-label">Meta</span><span class="gp-value">${escapeHtml(money(goalUsd))}</span>`;
+  if (goalDailyLabelEl) goalDailyLabelEl.textContent = dayGoal.isOverride ? translateText('Meta solo de este día') : translateText('Meta diaria');
+  document.getElementById('goalAmountBadge').innerHTML = ui`<span class="gp-label">Meta</span><span class="gp-value">${escapeHtml(money(goalUsd))}</span>`;
   const goalAmountConvertedEl = document.getElementById('goalAmountConvertedText');
   if (goalAmountConvertedEl) {
     // Se arma a mano en vez de reutilizar convertedAmountText (que devuelve un solo string "≈ L
@@ -5747,15 +5755,15 @@ function renderHeader() {
     const hasCurrency = Number.isFinite(exchangeRate) && exchangeRate > 0 && !!currencyLabelTrimmed;
     if (hasCurrency) {
       const convertedValue = currencyCeilFromUsdAmount(goalUsd, exchangeRate).toFixed(2);
-      goalAmountConvertedEl.innerHTML = `<span class="gp-label">≈</span><span class="gp-value">${escapeHtml(currencyLabelTrimmed)} ${convertedValue}</span>`;
+      goalAmountConvertedEl.innerHTML = ui`<span class="gp-label">≈</span><span class="gp-value">${escapeHtml(currencyLabelTrimmed)} ${convertedValue}</span>`;
       goalAmountConvertedEl.style.display = '';
     } else {
       goalAmountConvertedEl.innerHTML = '';
       goalAmountConvertedEl.style.display = 'none';
     }
   }
-  document.getElementById('goalMinBadge').innerHTML = `<span class="gp-label">Meta</span><span class="gp-value">${formatMinutes(goalMin)} min</span>`;
-  document.getElementById('remainingText').innerHTML = `<span class="gp-label">Restan</span><span class="gp-value">${formatMinutes(remainingMin)} min</span>`;
+  document.getElementById('goalMinBadge').innerHTML = ui`<span class="gp-label">Meta</span><span class="gp-value">${formatMinutes(goalMin)} min</span>`;
+  document.getElementById('remainingText').innerHTML = ui`<span class="gp-label">Restan</span><span class="gp-value">${formatMinutes(remainingMin)} min</span>`;
 
   // Ciclo mostrado ahora mismo, independiente de "Día activo".
   const cycle = cycleEarningsForOffset(cycleViewOffset);
@@ -5764,15 +5772,15 @@ function renderHeader() {
   const cycleConvertedEl = document.getElementById('cycleEarningsConvertedText');
   if (cycleConvertedEl) cycleConvertedEl.textContent = convertedAmountText(cycle.earnings);
   const cycleRangeEl = document.getElementById('cycleRangeBadge');
-  if (cycleRangeEl) cycleRangeEl.textContent = `Ciclo: ${formatCallDayLabel(todayCallDateKey(cycle.start))} – ${formatCallDayLabel(todayCallDateKey(cycle.end))}${cycleViewOffset === 0 ? ' (actual)' : ''}`;
+  if (cycleRangeEl) cycleRangeEl.textContent = ui`Ciclo: ${formatCallDayLabel(todayCallDateKey(cycle.start))} – ${formatCallDayLabel(todayCallDateKey(cycle.end))}${cycleViewOffset === 0 ? ' (actual)' : ''}`;
   const cyclePayEl = document.getElementById('cyclePayDateBadge');
-  if (cyclePayEl) cyclePayEl.textContent = `Pago: ${formatCallDayLabel(todayCallDateKey(cycle.payDate))}`;
+  if (cyclePayEl) cyclePayEl.textContent = ui`Pago: ${formatCallDayLabel(todayCallDateKey(cycle.payDate))}`;
   const cycleWeek1El = document.getElementById('cycleWeek1ProductiveTag');
-  if (cycleWeek1El) cycleWeek1El.textContent = `Semana 1: ${formatDuration(cycle.week1ProductiveMin * 60000)}`;
+  if (cycleWeek1El) cycleWeek1El.textContent = ui`Semana 1: ${formatDuration(cycle.week1ProductiveMin * 60000)}`;
   const cycleWeek2El = document.getElementById('cycleWeek2ProductiveTag');
-  if (cycleWeek2El) cycleWeek2El.textContent = `Semana 2: ${formatDuration(cycle.week2ProductiveMin * 60000)}`;
+  if (cycleWeek2El) cycleWeek2El.textContent = ui`Semana 2: ${formatDuration(cycle.week2ProductiveMin * 60000)}`;
   const cycleTotalEl = document.getElementById('cycleTotalProductiveTag');
-  if (cycleTotalEl) cycleTotalEl.textContent = `Total: ${formatDuration(cycle.totalProductiveMin * 60000)}`;
+  if (cycleTotalEl) cycleTotalEl.textContent = ui`Total: ${formatDuration(cycle.totalProductiveMin * 60000)}`;
   // Mismo chip de bono por nivel que ya usa "Ganancias de hoy" (higherRateBonusChipsHtml), ahora
   // también en "Ganancias del ciclo" — ver cycleEarningsForBounds para el nuevo
   // cycle.higherRateBreakdown.
@@ -5786,7 +5794,7 @@ function renderHeader() {
   const cycleGoalPctBadgeEl = document.getElementById('cycleGoalPctBadge');
   if (cycleGoalPctBadgeEl) cycleGoalPctBadgeEl.textContent = `${Math.round(cycleGoalPct)}%`;
   const cycleGoalAmountBadgeEl = document.getElementById('cycleGoalAmountBadge');
-  if (cycleGoalAmountBadgeEl) cycleGoalAmountBadgeEl.textContent = `Meta ${money(cycleGoalAmount)}`;
+  if (cycleGoalAmountBadgeEl) cycleGoalAmountBadgeEl.textContent = ui`Meta ${money(cycleGoalAmount)}`;
   // Mismo equivalente en moneda secundaria que ya muestra "Meta diaria" (#goalAmountConvertedText,
   // ver ese bloque más arriba) — se replica aquí tal cual para "Meta del ciclo", cambiando solo
   // goalUsd por cycleGoalAmount.
@@ -5797,7 +5805,7 @@ function renderHeader() {
     const cycleHasCurrency = Number.isFinite(cycleExchangeRate) && cycleExchangeRate > 0 && !!cycleCurrencyLabelTrimmed;
     if (cycleHasCurrency) {
       const cycleConvertedValue = currencyCeilFromUsdAmount(cycleGoalAmount, cycleExchangeRate).toFixed(2);
-      cycleGoalAmountConvertedEl.innerHTML = `<span class="gp-label">≈</span><span class="gp-value">${escapeHtml(cycleCurrencyLabelTrimmed)} ${cycleConvertedValue}</span>`;
+      cycleGoalAmountConvertedEl.innerHTML = ui`<span class="gp-label">≈</span><span class="gp-value">${escapeHtml(cycleCurrencyLabelTrimmed)} ${cycleConvertedValue}</span>`;
       cycleGoalAmountConvertedEl.style.display = '';
     } else {
       cycleGoalAmountConvertedEl.innerHTML = '';
@@ -5810,24 +5818,24 @@ function renderHeader() {
   const cycleGoalFootTextEl = document.getElementById('cycleGoalFootText');
   if (cycleGoalFootTextEl) {
     cycleGoalFootTextEl.textContent = cycleViewOffset === 0
-      ? (isCustomCycleGoal ? 'Meta personalizada' : 'Sugerida automáticamente')
-      : (isCustomCycleGoal ? 'Meta personalizada de ese ciclo' : 'Sugerida para ese ciclo');
+      ? (isCustomCycleGoal ? translateText('Meta personalizada') : translateText('Sugerida automáticamente'))
+      : (isCustomCycleGoal ? translateText('Meta personalizada de ese ciclo') : translateText('Sugerida para ese ciclo'));
   }
   const cycleGoalEditBtnEl = document.getElementById('cycleGoalEditBtn');
   if (cycleGoalEditBtnEl) cycleGoalEditBtnEl.style.display = cycleViewOffset === 0 ? '' : 'none';
   const adherenceForTag = dayAdherence(dayKey);
   const earningsTagsParts = [
-    `<span class="tag ${hasShift ? 'good' : ''}" title="Tiempo transcurrido desde que iniciaste tu turno hoy">Conectado: ${hasShift ? formatDuration(connected * 60000) : '—'}</span>`,
-    `<span class="tag good" title="Tiempo total que llevas en llamada hoy">Llamadas: ${formatCallTimeLabel(stats.total)}</span>`,
-    `<span class="tag" title="Cantidad de llamadas registradas hoy">Total: ${dayCalls.length}</span>`,
-    `<span class="tag" title="Llamadas marcadas como Billable hoy">Billable: ${stats.billable}</span>`,
-    `<span class="tag" title="Llamadas marcadas como Dropped hoy">Dropped: ${stats.dropped}</span>`,
-    `<span class="tag good" title="Tiempo de ACW/Available acumulado hoy (huecos entre llamadas sin clasificar como Break/Lunch/Otro)">ACW: ${formatDuration(stats.gapTotal * 60000)}</span>`,
-    stats.breakGapTotal > 0 ? `<span class="tag warn" title="Tiempo de Break tomado hoy">Break: ${formatDuration(stats.breakGapTotal * 60000)}</span>` : '',
-    stats.lunchGapTotal > 0 ? `<span class="tag cyan" title="Tiempo de Lunch tomado hoy">Lunch: ${formatDuration(stats.lunchGapTotal * 60000)}</span>` : '',
-    stats.otherGapTotal > 0 ? `<span class="tag" title="Tiempo clasificado como Otro (huecos largos sin Break/Lunch real)">Otro: ${formatDuration(stats.otherGapTotal * 60000)}</span>` : '',
+    ui`<span class="tag ${hasShift ? 'good' : ''}" title="Tiempo transcurrido desde que iniciaste tu turno hoy">Conectado: ${hasShift ? formatDuration(connected * 60000) : '—'}</span>`,
+    ui`<span class="tag good" title="Tiempo total que llevas en llamada hoy">Llamadas: ${formatCallTimeLabel(stats.total)}</span>`,
+    ui`<span class="tag" title="Cantidad de llamadas registradas hoy">Total: ${dayCalls.length}</span>`,
+    ui`<span class="tag" title="Llamadas marcadas como Billable hoy">Billable: ${stats.billable}</span>`,
+    ui`<span class="tag" title="Llamadas marcadas como Dropped hoy">Dropped: ${stats.dropped}</span>`,
+    ui`<span class="tag good" title="Tiempo de ACW/Available acumulado hoy (huecos entre llamadas sin clasificar como Break/Lunch/Otro)">ACW: ${formatDuration(stats.gapTotal * 60000)}</span>`,
+    stats.breakGapTotal > 0 ? ui`<span class="tag warn" title="Tiempo de Break tomado hoy">Break: ${formatDuration(stats.breakGapTotal * 60000)}</span>` : '',
+    stats.lunchGapTotal > 0 ? ui`<span class="tag cyan" title="Tiempo de Lunch tomado hoy">Lunch: ${formatDuration(stats.lunchGapTotal * 60000)}</span>` : '',
+    stats.otherGapTotal > 0 ? ui`<span class="tag" title="Tiempo clasificado como Otro (huecos largos sin Break/Lunch real)">Otro: ${formatDuration(stats.otherGapTotal * 60000)}</span>` : '',
     higherRateBreakdownTagsHtml(stats.higherRateBreakdown, 'tag'),
-    adherenceForTag ? `<span class="tag ${adherenceForTag.scorePct >= 90 ? 'good' : adherenceForTag.scorePct >= 70 ? 'warn' : 'bad'}" title="Qué tan apegado estuviste hoy a tu horario planeado">Adherencia: ${adherenceForTag.scorePct}%</span>` : '',
+    adherenceForTag ? ui`<span class="tag ${adherenceForTag.scorePct >= 90 ? 'good' : adherenceForTag.scorePct >= 70 ? 'warn' : 'bad'}" title="Qué tan apegado estuviste hoy a tu horario planeado">Adherencia: ${adherenceForTag.scorePct}%</span>` : '',
   ].filter(Boolean);
   document.getElementById('earningsTagsRow').innerHTML = earningsTagsParts.join('');
   const earnBar = document.getElementById('earningsBar');
@@ -5866,7 +5874,7 @@ function gapDisplayAmountForLabel(row, label) {
   return (label === 'break' || label === 'lunch') ? row.raw : row.residual;
 }
 function gapDisplayAmountUnitLabel(label) {
-  return (label === 'break' || label === 'lunch') ? 'Total' : 'Residual';
+  return (label === 'break' || label === 'lunch') ? translateText('Total') : translateText('Residual');
 }
 
 // Editor de la meta máxima de ACW (ver #acwGoalModal en el HTML y el botón ✎ de la tarjeta de ACW
@@ -5882,14 +5890,14 @@ function saveAcwGoalEditor() {
   const input = document.getElementById('acwGoalMinInput');
   const mins = Number(input?.value);
   if (!Number.isFinite(mins) || mins <= 0) {
-    toast('La meta debe ser un número mayor a 0');
+    toast(translateText('La meta debe ser un número mayor a 0'));
     return;
   }
   settings.acwMaxGoalMin = mins;
   saveSettingsOnly();
   closeModal('acwGoalModal');
   render();
-  toast(`Meta máxima de ACW: ${formatMinutes(mins)} min`);
+  toast(ui`Meta máxima de ACW: ${formatMinutes(mins)} min`);
 }
 
 // Sincroniza el estado visual (aria-pressed) de los pills de Clasificación (#gapModal) con el valor
@@ -5922,14 +5930,14 @@ function openGapEditor(dayKey, gapKey) {
 
   // El hueco entre "Iniciar shift" y la primera llamada del día (ver dayGapRows) ahora también es
   // editable desde aquí, pero su `prev` es un marcador virtual.
-  const prevLabel = row.isShiftStartGap ? 'Inicio de turno' : `#${row.prev.customerId}`;
+  const prevLabel = row.isShiftStartGap ? translateText('Inicio de turno') : `#${row.prev.customerId}`;
   const prevTimeLabel = row.isShiftStartGap ? timeLabelFromDate(new Date(row.prev.startISO)) : row.prev.callStart;
-  if (title) title.textContent = `Editar hueco · ${prevLabel} → #${row.cur.customerId}`;
-  if (subtitle) subtitle.textContent = `${prevTimeLabel} → ${row.cur.callStart} · ${formatMinutes(row.residual)} min útiles`;
+  if (title) title.textContent = ui`Editar hueco · ${prevLabel} → #${row.cur.customerId}`;
+  if (subtitle) subtitle.textContent = ui`${prevTimeLabel} → ${row.cur.callStart} · ${formatMinutes(row.residual)} min útiles`;
   if (preview) {
     preview.textContent = annotation
-      ? `Clasificación guardada: ${gapLabelText(label)}${note ? ` · Nota: ${note}` : ''}`
-      : `Sugerido: ${gapLabelText(row.suggested)} · ${gapDisplayAmountUnitLabel(row.suggested)} ${gapDisplayAmountForLabel(row, row.suggested).toFixed(1)} min`;
+      ? ui`Clasificación guardada: ${gapLabelText(label)}${note ? ui` · Nota: ${note}` : ''}`
+      : ui`Sugerido: ${gapLabelText(row.suggested)} · ${gapDisplayAmountUnitLabel(row.suggested)} ${gapDisplayAmountForLabel(row, row.suggested).toFixed(1)} min`;
   }
   if (labelInput) labelInput.value = label;
   if (noteInput) noteInput.value = note;
@@ -5955,9 +5963,9 @@ function saveGapEditor() {
 let editingDayNoteKey = null;
 
 const DAY_NOTE_STATUS_HINTS = {
-  '': 'Automático: se decide según tu horario semanal. Si hay llamadas o turno en un día libre, cuenta como trabajado.',
-  work: 'Trabajado: se exige Adherencia y suma a tu meta del ciclo, aunque tu horario diga que es libre.',
-  off: 'Libre: no se exige Adherencia y el día no suma a tu meta del ciclo. Tus llamadas y turno ya registrados no se tocan.',
+  '': translateText('Automático: se decide según tu horario semanal. Si hay llamadas o turno en un día libre, cuenta como trabajado.'),
+  work: translateText('Trabajado: se exige Adherencia y suma a tu meta del ciclo, aunque tu horario diga que es libre.'),
+  off: translateText('Libre: no se exige Adherencia y el día no suma a tu meta del ciclo. Tus llamadas y turno ya registrados no se tocan.'),
 };
 
 // Refleja el <select> oculto (fuente de verdad) en las pastillas visibles + el texto de ayuda.
@@ -5982,7 +5990,7 @@ function openDayNoteModal(dayKey, focusTarget = null) {
   const statusInput = document.getElementById('dayNoteStatusInput');
   const categoryInput = document.getElementById('dayNoteCategoryInput');
   const commentInput = document.getElementById('dayNoteCommentInput');
-  if (titleEl) titleEl.textContent = `Editar día · ${formatCallDayLabel(normalized)}`;
+  if (titleEl) titleEl.textContent = ui`Editar día · ${formatCallDayLabel(normalized)}`;
   if (statusInput) statusInput.value = note ? (note.forcedStatus || '') : '';
   if (categoryInput) categoryInput.value = note ? note.category : '';
   if (commentInput) commentInput.value = note ? note.comment : '';
@@ -6001,7 +6009,7 @@ function saveDayNoteFromModal() {
   setDayNote(editingDayNoteKey, { category: categoryInput?.value || '', comment: commentInput?.value || '', forcedStatus: statusInput?.value || '' });
   editingDayNoteKey = null;
   closeModal('dayNoteModal');
-  toast('Día guardado');
+  toast(translateText('Día guardado'));
 }
 
 function clearDayNoteFromModal() {
@@ -6024,14 +6032,14 @@ function renderBlockSummaryStrip(cards) {
   const cardHtml = (c, extraClass = '') => {
     // Si hoy no hay Break/Lunch planeado, la tarjeta igual se muestra en estado "sin plan".
     if (c.noPlan) {
-      return `
+      return ui`
         <div class="block-summary-card ${extraClass}" data-accent="${escapeHtml(c.accent)}" style="opacity:.82;">
           <div class="bsc-top">
             <span class="bsc-icon">${c.icon}</span>
             <span class="bsc-name">${escapeHtml(c.name)}</span>
           </div>
           <div class="bsc-range">${escapeHtml(c.range)}</div>
-          ${c.rangeExtra ? `<div class="bsc-range" style="opacity:.7;">${escapeHtml(c.rangeExtra)}</div>` : ''}
+          ${c.rangeExtra ? ui`<div class="bsc-range" style="opacity:.7;">${escapeHtml(c.rangeExtra)}</div>` : ''}
         </div>
       `;
     }
@@ -6039,9 +6047,9 @@ function renderBlockSummaryStrip(cards) {
     // La tarjeta de ACW lleva un botón ✎ para editar su propia meta máxima (ver #acwGoalModal,
     // delegado por `data-edit-card`)
     const editBtnHtml = c.editable
-      ? `<button class="bsc-edit-btn" type="button" data-edit-card="${escapeHtml(c.editable)}" aria-label="Editar meta de ${escapeHtml(c.name)}" title="Editar meta"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>`
+      ? ui`<button class="bsc-edit-btn" type="button" data-edit-card="${escapeHtml(c.editable)}" aria-label="Editar meta de ${escapeHtml(c.name)}" title="Editar meta"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>`
       : '';
-    return `
+    return ui`
       <div class="block-summary-card ${extraClass}" data-accent="${escapeHtml(c.accent)}" style="--bsc-pct:${pct}%">
         <div class="bsc-fill" style="width:${pct}%"></div>
         <div class="bsc-top">
@@ -6050,7 +6058,7 @@ function renderBlockSummaryStrip(cards) {
           ${editBtnHtml}
         </div>
         <div class="bsc-range">${escapeHtml(c.range)}</div>
-        ${c.rangeExtra ? `<div class="bsc-range" style="opacity:.7;">${escapeHtml(c.rangeExtra)}</div>` : ''}
+        ${c.rangeExtra ? ui`<div class="bsc-range" style="opacity:.7;">${escapeHtml(c.rangeExtra)}</div>` : ''}
         <div class="bsc-progress-row">
           <div class="bsc-progress-track"><div style="width:${pct}%"></div></div>
           <span class="bsc-pct">${Math.round(pct)}%</span>
@@ -6061,9 +6069,9 @@ function renderBlockSummaryStrip(cards) {
   const shiftIdx = cards.findIndex(c => c.name === 'Shift');
   const shiftCard = cards[shiftIdx !== -1 ? shiftIdx : 0];
   const restCards = cards.filter((c, i) => i !== (shiftIdx !== -1 ? shiftIdx : 0));
-  el.innerHTML = `
+  el.innerHTML = ui`
     <div class="block-summary-shift-row">${cardHtml(shiftCard, 'block-summary-card-shift')}</div>
-    ${restCards.length ? `<div class="block-summary-strip">${restCards.map(c => cardHtml(c)).join('')}</div>` : ''}
+    ${restCards.length ? ui`<div class="block-summary-strip">${restCards.map(c => cardHtml(c)).join('')}</div>` : ''}
   `;
 }
 
@@ -6091,10 +6099,10 @@ function renderSchedule() {
       const originalPlannedSlots = originalPlannedSlotsForDay(dayKey);
       if (subtitle) {
         subtitle.textContent = dayIsEffectivelyOff(dayKey)
-          ? 'Día libre según tu horario semanal.'
+          ? translateText('Día libre según tu horario semanal.')
           : (settings.lateArrivalMode === 'shift'
-              ? 'Tu horario planeado, corrido si llegaste tarde (ver "Si llegas tarde a tu turno" en Horario).'
-              : 'Tu horario planeado. Si llegas tarde o te pasas de un break, aquí se ve la diferencia contra el plan.');
+              ? translateText('Tu horario planeado, corrido si llegaste tarde (ver "Si llegas tarde a tu turno" en Horario).')
+              : translateText('Tu horario planeado. Si llegas tarde o te pasas de un break, aquí se ve la diferencia contra el plan.'));
       }
 
       // Un día marcado off:true en el horario semanal pero con actividad real (dayCfg.off true Y
@@ -6106,11 +6114,11 @@ function renderSchedule() {
         const forced = getDayNote(dayKey)?.forcedStatus;
         if (cfgIsOff && !isOff) {
           offWorkedNote.textContent = forced === 'work'
-            ? 'Marcaste este día como Trabajado a mano (Resumen semanal → Editar día) — no aparece libre, aunque tu horario diga que sí lo es.'
-            : 'Trabajaste en tu día libre — no aparece marcado como libre, se ve igual que un día laboral normal.';
+            ? translateText('Marcaste este día como Trabajado a mano (Resumen semanal → Editar día) — no aparece libre, aunque tu horario diga que sí lo es.')
+            : translateText('Trabajaste en tu día libre — no aparece marcado como libre, se ve igual que un día laboral normal.');
           offWorkedNote.style.display = 'block';
         } else if (!cfgIsOff && isOff) {
-          offWorkedNote.textContent = 'Marcaste este día como Libre a mano (Resumen semanal → Editar día) — no se exige Adherencia, aunque tenías turno planeado.';
+          offWorkedNote.textContent = translateText('Marcaste este día como Libre a mano (Resumen semanal → Editar día) — no se exige Adherencia, aunque tenías turno planeado.');
           offWorkedNote.style.display = 'block';
         } else {
           offWorkedNote.style.display = 'none';
@@ -6118,7 +6126,7 @@ function renderSchedule() {
       }
 
       if (!plannedSlots.length) {
-        wrap.innerHTML = '<div class="note">No hay horario configurado para este día. Edítalo en “Horario”.</div>';
+        wrap.innerHTML = translateMarkup('<div class="note">No hay horario configurado para este día. Edítalo en “Horario”.</div>');
         renderBlockSummaryStrip([]);
         return;
       }
@@ -6166,17 +6174,17 @@ function renderSchedule() {
         const isFutureDay = (callDateToDate(dayKey) || new Date()) > todayRange();
         // Un día pasado con salida temprana dentro del bloque no es "Próximo": se marca
         // "Incompleto".
-        const statusText = active ? 'Actual' : done ? 'Hecho' : (isPastDay ? (shiftStart ? 'Incompleto' : 'Sin actividad') : 'Próximo');
+        const statusText = active ? translateText('Actual') : done ? translateText('Hecho') : (isPastDay ? (shiftStart ? translateText('Incompleto') : translateText('Sin actividad')) : translateText('Próximo'));
         const statusClass = stats.statusTone === 'good' ? 'good' : stats.statusTone === 'warn' ? 'warn' : stats.statusTone === 'bad' ? 'bad' : '';
-        const usedProgressLabel = `${formatDuration(stats.filledMin * 60000)} usados`;
+        const usedProgressLabel = ui`${formatDuration(stats.filledMin * 60000)} usados`;
         const acwProgressLabel = `ACW ${formatDuration(blockAcwMin * 60000)}`;
         const progressLabel = slot.type === 'Work'
           ? (stats.realActivityRange
-              ? `Actividad real: ${timeLabelFromDate(stats.realActivityRange.start)} – ${timeLabelFromDate(stats.realActivityRange.end)} · ${stats.realActivityRange.callCount} llamada(s) · ${usedProgressLabel} · ${acwProgressLabel}`
+              ? ui`Actividad real: ${timeLabelFromDate(stats.realActivityRange.start)} – ${timeLabelFromDate(stats.realActivityRange.end)} · ${stats.realActivityRange.callCount} llamada(s) · ${usedProgressLabel} · ${acwProgressLabel}`
               : `${usedProgressLabel} · ${acwProgressLabel} · ${Math.round(stats.pct)}%`)
           : stats.actualPauseRange
-            ? `Pausa real: ${formatDuration(stats.actualPauseRange.durationMin * 60000)} (${timeLabelFromDate(stats.actualPauseRange.start)} – ${stats.actualPauseRange.live ? 'en curso' : timeLabelFromDate(stats.actualPauseRange.end)})`
-            : `${formatDuration(stats.filledMin * 60000)} de ${formatDuration(stats.durationMin * 60000)} · ${Math.round(stats.pct)}%`;
+            ? ui`Pausa real: ${formatDuration(stats.actualPauseRange.durationMin * 60000)} (${timeLabelFromDate(stats.actualPauseRange.start)} – ${stats.actualPauseRange.live ? translateText('en curso') : timeLabelFromDate(stats.actualPauseRange.end)})`
+            : ui`${formatDuration(stats.filledMin * 60000)} de ${formatDuration(stats.durationMin * 60000)} · ${Math.round(stats.pct)}%`;
 
         // Reemplaza el desglose de "Margen del día" por cada bloque de Trabajo — ahora es una Meta
         // de Productividad EN MINUTOS, configurable POR BLOQUE (Horario → Bloques → "Meta
@@ -6186,11 +6194,11 @@ function renderSchedule() {
           const g = stats.productivityGoal;
           const goalIconHtml = g.met ? `${iconHtml('checkCircle')} ` : '';
           const goalText = g.met
-            ? `Meta productiva alcanzada: ${formatMinutes(g.achievedMin)}/${formatMinutes(g.goalMin)} min`
-            : `Meta productiva: ${formatMinutes(g.achievedMin)}/${formatMinutes(g.goalMin)} min`;
+            ? ui`Meta productiva alcanzada: ${formatMinutes(g.achievedMin)}/${formatMinutes(g.goalMin)} min`
+            : ui`Meta productiva: ${formatMinutes(g.achievedMin)}/${formatMinutes(g.goalMin)} min`;
           const goalLabelColor = g.met ? `color: var(--good); font-weight: 800;` : '';
           const goalFill = g.met ? 'linear-gradient(90deg, var(--good), var(--teal))' : 'linear-gradient(90deg, var(--teal), var(--blue))';
-          goalBarHtml = `
+          goalBarHtml = ui`
             <div class="sblk-bar-row tight" title="Minutos productivos meta de este bloque, configurable en Horario → Bloques.">
               <div class="sblk-bar-label-row" style="${goalLabelColor}"><span>${goalIconHtml}${escapeHtml(goalText)}</span></div>
               <div class="sblk-bar-track" aria-label="${escapeHtml(slot.name)} meta productiva"><div style="width:${g.pct}%; background:${goalFill};"></div></div>
@@ -6208,10 +6216,10 @@ function renderSchedule() {
           // sufijo si no hubo minutos de excepción (bloque perfecto).
           const dominant = dominantExceptionReason(slotAdherence.reasons);
           const reasonSuffix = dominant ? ` · ${dominant.label} (${formatMinutes(dominant.minutes)}m)` : '';
-          const text = `Adherencia del bloque: ${slotAdherence.pct}% (${slotAdherence.adherentMinutes}/${slotAdherence.total} min)${reasonSuffix}`;
+          const text = ui`Adherencia del bloque: ${slotAdherence.pct}% (${slotAdherence.adherentMinutes}/${slotAdherence.total} min)${reasonSuffix}`;
           const diagnosticIcon = tone === 'good' ? iconHtml('checkCircle') : iconHtml('alertTriangle');
           const diagnosticFill = tone === 'good' ? 'linear-gradient(90deg, var(--good), var(--teal))' : tone === 'warn' ? 'linear-gradient(90deg, var(--warn), #ffcf7d)' : 'linear-gradient(90deg, var(--bad), #ff8a95)';
-          adherenceBarHtml = `
+          adherenceBarHtml = ui`
             <div class="sblk-diagnostic tone-${tone}">
               <span class="sblk-diagnostic-icon" aria-hidden="true">${diagnosticIcon}</span>
               <div style="min-width:0; flex:1 1 auto;">
@@ -6226,7 +6234,7 @@ function renderSchedule() {
         // (stats.pct). Solo aplica a Trabajo (stats.productivityPct es null en Break/Lunch, mismo
         // criterio que stats.productivityGoal)
         const productivityBarHtml = slot.type === 'Work' && stats.productivityPct !== null && !isFutureDay
-          ? `
+          ? ui`
               <div class="sblk-bar-row tight">
                 <div class="sblk-bar-label-row"><span>Productividad</span><span>${Math.round(stats.productivityPct)}%</span></div>
                 <div class="sblk-bar-track" aria-label="${escapeHtml(slot.name)} productividad"><div style="width:${stats.productivityPct}%; background: linear-gradient(90deg, var(--good), var(--teal));"></div></div>
@@ -6241,7 +6249,7 @@ function renderSchedule() {
         const badgeToneClass = statusText === 'Hecho' ? 'good' : statusText === 'Omitido' ? 'bad' : (statusText === 'Incompleto' || statusText === 'Actual') ? 'warn' : '';
         const icon = slot.type === 'Work' ? iconHtml('briefcase') : slot.type === 'Break' ? iconHtml('coffee') : iconHtml('utensils');
         const statusDetailLine = stats.status
-          ? `<div class="sblk-meta-line" style="${statusClass ? `color: var(--${statusClass}); font-weight: 700;` : ''}">${escapeHtml(stats.status)}</div>`
+          ? ui`<div class="sblk-meta-line" style="${statusClass ? `color: var(--${statusClass}); font-weight: 700;` : ''}">${escapeHtml(stats.status)}</div>`
           : '';
 
         // Relleno líquido vertical + punto del riel sincronizado + texto legible sobre el líquido.
@@ -6258,7 +6266,7 @@ function renderSchedule() {
         }
         const isCollapsed = !!settings.collapseCompletedBlocks && done;
 
-        return `
+        return ui`
           <div class="sblk-item" data-block-type="${slot.type.toLowerCase()}">
             <div class="sblk-hour">${slot.start}</div>
             <div class="sblk-rail" aria-hidden="true"><span class="sblk-dot" style="top:${sblkPct}%"></span></div>
@@ -6300,7 +6308,7 @@ function renderSchedule() {
       const shiftConnectedMin = shiftStart ? connectedMinutesForDay(dayKey) : 0;
       const shiftPct = plannedShiftMin > 0 ? Math.min(100, (shiftConnectedMin / plannedShiftMin) * 100) : 0;
       summaryCards.push({
-        name: 'Shift',
+        name: translateText('Shift'),
         icon: iconHtml('play', 'ic-fill'),
         accent: 'cyan',
         range: `${timeLabel(shiftWindowForCard.start)} – ${timeLabel(shiftWindowForCard.end)}`,
@@ -6315,15 +6323,15 @@ function renderSchedule() {
         const range = `${timeLabel(blocks[0].start)} – ${timeLabel(blocks[0].end)}`;
         if (blocks.length === 1) return { range, rangeExtra: '' };
         const extraCount = blocks.length - 2;
-        const nextText = `Siguiente: ${timeLabel(blocks[1].start)} – ${timeLabel(blocks[1].end)}`;
-        const rangeExtra = extraCount > 0 ? `${nextText} · +${extraCount} más` : nextText;
+        const nextText = ui`Siguiente: ${timeLabel(blocks[1].start)} – ${timeLabel(blocks[1].end)}`;
+        const rangeExtra = extraCount > 0 ? ui`${nextText} · +${extraCount} más` : nextText;
         return { range, rangeExtra };
       };
       // Sin Break/Lunch planeado hoy, la tarjeta se muestra igual con el texto "sin plan".
       if (breakCount > 0) {
         const { range, rangeExtra } = rangeWithNext(breakBlockTimes);
         summaryCards.push({
-          name: 'Break',
+          name: translateText('Break'),
           icon: iconHtml('coffee'),
           accent: 'warn',
           range,
@@ -6332,11 +6340,11 @@ function renderSchedule() {
         });
       } else {
         summaryCards.push({
-          name: 'Break',
+          name: translateText('Break'),
           icon: iconHtml('coffee'),
           accent: 'warn',
-          range: 'Sin Break planeado hoy',
-          rangeExtra: 'Puedes tomarlo cuando quieras',
+          range: translateText('Sin Break planeado hoy'),
+          rangeExtra: translateText('Puedes tomarlo cuando quieras'),
           pct: 0,
           noPlan: true,
         });
@@ -6344,7 +6352,7 @@ function renderSchedule() {
       if (lunchCount > 0) {
         const { range, rangeExtra } = rangeWithNext(lunchBlockTimes);
         summaryCards.push({
-          name: 'Lunch',
+          name: translateText('Lunch'),
           icon: iconHtml('utensils'),
           accent: 'blue',
           range,
@@ -6353,11 +6361,11 @@ function renderSchedule() {
         });
       } else {
         summaryCards.push({
-          name: 'Lunch',
+          name: translateText('Lunch'),
           icon: iconHtml('utensils'),
           accent: 'blue',
-          range: 'Sin Lunch planeado hoy',
-          rangeExtra: 'Puedes tomarlo cuando quieras',
+          range: translateText('Sin Lunch planeado hoy'),
+          rangeExtra: translateText('Puedes tomarlo cuando quieras'),
           pct: 0,
           noPlan: true,
         });
@@ -6603,7 +6611,7 @@ export function render() {
       const pct = Math.max(0, Math.min(100, Math.round((summary.totals.productive / weeklyGoalMin) * 100)));
       ring.style.setProperty('--ring-pct', String(pct));
       pctEl.textContent = `${pct}%`;
-      subEl.textContent = pct >= 90 ? '¡Vas por buen camino!' : pct >= 50 ? 'Sigue así, ya vas a la mitad.' : 'Toca para ver el detalle.';
+      subEl.textContent = pct >= 90 ? translateText('¡Vas por buen camino!') : pct >= 50 ? translateText('Sigue así, ya vas a la mitad.') : translateText('Toca para ver el detalle.');
     }
 
     function initSidebarNav() {
@@ -6739,7 +6747,7 @@ export function render() {
       if (!callId) return;
       const call = calls.find(c => c.id === callId);
       if (!call) return;
-      appConfirm(`¿Eliminar la llamada #${call.customerId} (${call.callDate} · ${call.callStart})? Esta acción no se puede deshacer.`, () => deleteCallRecord(callId));
+      appConfirm(ui`¿Eliminar la llamada #${call.customerId} (${call.callDate} · ${call.callStart})? Esta acción no se puede deshacer.`, () => deleteCallRecord(callId));
     });
 
     // Filtro Todo/Llamadas/Acciones sobre la tabla fusionada — solo cambia `tableFilterMode` y
@@ -6794,7 +6802,7 @@ export function render() {
       // weekSummaryForOffset para marcar isFuture.
       const dateObj = callDateToDate(dayKey);
       if (dateObj && dateObj > todayRange()) {
-        toast('📅 Ese día todavía no llega — vas a ver un día futuro sin datos.');
+        toast(translateText('📅 Ese día todavía no llega — vas a ver un día futuro sin datos.'));
       }
       setActiveDayKey(dayKey);
       const earningsTitle = document.getElementById('earningsSectionTitle');
@@ -6902,7 +6910,7 @@ export function render() {
       if (nextMode === scheduleViewMode) return;
       const apply = () => { setContextScheduleViewMode(nextMode); syncShiftModalFields(); };
       if (scheduleFormIsDirty()) {
-        appConfirm('Tienes cambios sin guardar. ¿Descartarlos y cambiar de vista?', apply);
+        appConfirm(translateText('Tienes cambios sin guardar. ¿Descartarlos y cambiar de vista?'), apply);
         return;
       }
       apply();
@@ -6910,7 +6918,7 @@ export function render() {
     function navigateScheduleWeek(nextOffset) {
       const apply = () => { setContextScheduleWeekOffset(nextOffset); syncShiftModalFields(); };
       if (scheduleFormIsDirty()) {
-        appConfirm('Tienes cambios sin guardar en esta semana. ¿Descartarlos y cambiar de semana?', apply);
+        appConfirm(translateText('Tienes cambios sin guardar en esta semana. ¿Descartarlos y cambiar de semana?'), apply);
         return;
       }
       apply();
@@ -6923,11 +6931,11 @@ export function render() {
       if (e.target.checked) {
         ensureScheduleWeekOverride(scheduleWeekOffset);
         saveSettingsOnly();
-        toast('Semana personalizada — arrancó como copia de tu plantilla, ajústala y guarda cada día que cambie.');
+        toast(translateText('Semana personalizada — arrancó como copia de tu plantilla, ajústala y guarda cada día que cambie.'));
         syncShiftModalFields();
       } else {
         e.target.checked = true;
-        appConfirm('¿Quitar la personalización de esta semana y volver a usar la plantilla? El horario propio de esta semana se borra — no afecta la plantilla ni otras semanas.', () => {
+        appConfirm(translateText('¿Quitar la personalización de esta semana y volver a usar la plantilla? El horario propio de esta semana se borra — no afecta la plantilla ni otras semanas.'), () => {
           removeScheduleWeekOverride(scheduleWeekOffset);
           onGameDayMetadataChanged(todayCallDateKey());
           saveAll();
@@ -7079,7 +7087,7 @@ export function render() {
     document.getElementById('addBlockBtn').addEventListener('click', addBlockRow);
     document.getElementById('scheduleOffsetMinusBtn').addEventListener('click', () => {
       if (scheduleOffsetMin - 15 < -SCHEDULE_OFFSET_LIMIT_MIN) {
-        toast(`El ajuste no puede pasar de -12h de una sola vez.`);
+        toast(ui`El ajuste no puede pasar de -12h de una sola vez.`);
         return;
       }
       setContextScheduleOffsetMin(scheduleOffsetMin - 15);
@@ -7087,7 +7095,7 @@ export function render() {
     });
     document.getElementById('scheduleOffsetPlusBtn').addEventListener('click', () => {
       if (scheduleOffsetMin + 15 > SCHEDULE_OFFSET_LIMIT_MIN) {
-        toast(`El ajuste no puede pasar de +12h de una sola vez.`);
+        toast(ui`El ajuste no puede pasar de +12h de una sola vez.`);
         return;
       }
       setContextScheduleOffsetMin(scheduleOffsetMin + 15);
@@ -7407,7 +7415,7 @@ export function render() {
       const preview = document.getElementById('gapPreviewText');
       if (row && preview) {
         const label = String(document.getElementById('gapLabelInput').value || 'acw');
-        preview.textContent = `Clasificación lista: ${gapLabelText(label)} · ${gapDisplayAmountUnitLabel(label)} ${gapDisplayAmountForLabel(row, label).toFixed(1)} min`;
+        preview.textContent = ui`Clasificación lista: ${gapLabelText(label)} · ${gapDisplayAmountUnitLabel(label)} ${gapDisplayAmountForLabel(row, label).toFixed(1)} min`;
       }
     });
     document.getElementById('gapModal').addEventListener('keydown', (e) => {
@@ -7468,7 +7476,7 @@ export function render() {
     });
 
     if (!state.events.length && !state.shiftStartedAt && !calls.length) {
-      state.events.push({ ts: new Date().toISOString(), type: 'system', title: 'Listo para empezar', detail: 'Inicia el shift para comenzar', meta: 'idle' });
+      state.events.push({ ts: new Date().toISOString(), type: 'system', title: translateText('Listo para empezar'), detail: translateText('Inicia el shift para comenzar'), meta: 'idle' });
       saveStateOnly();
     }
     if (!state.activeDayKey) {
@@ -7577,6 +7585,7 @@ export function render() {
     }
 
     initGame();
+    wireAchievementHelp();
 
     setInterval(() => {
       // Si cambió el día de calendario real, checkDayRollover ya hace un render completo (incluye

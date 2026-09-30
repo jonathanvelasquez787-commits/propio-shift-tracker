@@ -1,3 +1,6 @@
+import { translateText, translateDocument } from './i18n.js';
+import { applySavedColors } from './appearance-colors.js';
+translateDocument();
 // Interruptor claro/oscuro de las páginas públicas.
 //
 // Escribe en la MISMA clave de settings que lee la app, así el tema elegido
@@ -38,14 +41,17 @@ function applyTheme(theme) {
   const root = document.documentElement;
   root.classList.toggle('theme-dark', theme === 'dark');
   root.classList.toggle('theme-light', theme !== 'dark');
+  let settings = {};
+  try { settings = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}') || {}; } catch {}
+  applySavedColors({ ...settings, theme }, root);
 }
 
 function syncButtons(theme) {
   const isDark = theme === 'dark';
   document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
     btn.setAttribute('aria-pressed', isDark ? 'true' : 'false');
-    btn.setAttribute('aria-label', isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
-    btn.title = isDark ? 'Modo claro' : 'Modo oscuro';
+    btn.setAttribute('aria-label', isDark ? translateText('Cambiar a modo claro') : translateText('Cambiar a modo oscuro'));
+    btn.title = isDark ? translateText('Modo claro') : translateText('Modo oscuro');
   });
 }
 

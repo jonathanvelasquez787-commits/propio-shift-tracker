@@ -1,3 +1,4 @@
+import { ui, translateText, translateMarkup, displayLocale, setLanguage, translateDocument } from './i18n.js';
 // Arranque de /app.
 //
 // La app es un módulo ES (app-main.js) que, al ejecutarse, lee localStorage y se dibuja entera
@@ -30,6 +31,7 @@ import {
 // del tema oscuro. Pintarlo con el tema correcto de entrada evita el parpadeo.
 retireLegacyQaStorage();
 syncThemeClass();
+translateDocument();
 
 const overlay = document.getElementById('bootGate');
 const bootText = document.getElementById('bootGateText');
@@ -41,12 +43,12 @@ function setBootMessage(text) {
 
 function fail(message, { retry = true } = {}) {
   if (!bootBody) return;
-  bootBody.innerHTML = `
+  bootBody.innerHTML = ui`
     <div class="boot-card">
       <div class="boot-card-title">No se pudo abrir la app</div>
       <p class="boot-card-text">${escapeHtml(message)}</p>
       <div class="boot-card-actions">
-        ${retry ? '<button class="mc-btn-primary cyan" id="bootRetryBtn" type="button">Reintentar</button>' : ''}
+        ${retry ? translateMarkup('<button class="mc-btn-primary cyan" id="bootRetryBtn" type="button">Reintentar</button>') : ''}
         <button class="mc-btn-warn-pill" id="bootLogoutBtn" type="button">Cerrar sesión</button>
       </div>
     </div>`;
@@ -81,16 +83,16 @@ function escapeHtml(str) {
 function askConflict({ localSummary, cloudSummary, cloud }) {
   return new Promise((resolve) => {
     const cuando = cloud.updated_at
-      ? new Intl.DateTimeFormat('es-MX', {
+      ? new Intl.DateTimeFormat(displayLocale(), {
           day: 'numeric',
           month: 'short',
           hour: '2-digit',
           minute: '2-digit',
         }).format(new Date(cloud.updated_at))
-      : 'fecha desconocida';
-    const desde = cloud.device_label ? ` desde ${escapeHtml(cloud.device_label)}` : '';
+      : translateText('fecha desconocida');
+    const desde = cloud.device_label ? ui` desde ${escapeHtml(cloud.device_label)}` : '';
 
-    bootBody.innerHTML = `
+    bootBody.innerHTML = ui`
       <div class="boot-card boot-card-wide">
         <div class="boot-card-title">Dos versiones distintas de tus datos</div>
         <p class="boot-card-text">
@@ -147,7 +149,7 @@ async function mountApp() {
     await import('./app-main.js');
   } catch (err) {
     console.error('boot: no se pudo importar app-main.js', err);
-    fail('No se pudo cargar la app. ' + (err && err.message ? err.message : String(err)));
+    fail(translateText('No se pudo cargar la app. ') + (err && err.message ? err.message : String(err)));
     return false;
   }
   if (overlay) overlay.remove();
@@ -159,12 +161,12 @@ async function mountApp() {
 function injectAccountPanel(profile, email) {
   const footer = document.querySelector('#sidebarNav .sidebar-footer');
   if (!footer) return;
-  const name = (profile && (profile.display_name || profile.username)) || email || 'Mi cuenta';
+  const name = (profile && (profile.display_name || profile.username)) || email || translateText('Mi cuenta');
   const handle = profile && profile.username ? `@${profile.username}` : email || '';
 
   const wrap = document.createElement('div');
   wrap.className = 'sidebar-account';
-  wrap.innerHTML = `
+  wrap.innerHTML = ui`
     <div class="sidebar-account-row">
       <span class="sidebar-account-avatar" aria-hidden="true">${escapeHtml(
         String(name).trim().charAt(0).toUpperCase() || '?'
@@ -184,7 +186,7 @@ function injectAccountPanel(profile, email) {
   document.getElementById('sidebarLogoutBtn').addEventListener('click', async () => {
     const meta = readMeta();
     if (meta.dirty) {
-      setSyncStatus('saving', 'Guardando antes de salir…');
+      setSyncStatus('saving', translateText('Guardando antes de salir…'));
       await pushSnapshot();
     }
     try {
@@ -205,7 +207,7 @@ function injectDeleteAccount() {
   const actions = card.querySelector('.modal-actions');
 
   const block = document.createElement('div');
-  block.innerHTML = `
+  block.innerHTML = ui`
     <div class="divider"></div>
     <div class="danger-card tone-bad">
       <div class="danger-card-head">
@@ -234,7 +236,7 @@ function injectDeleteAccount() {
             if (window.confirm(msg)) ok();
           };
     ask(
-      '¿Borrar tu cuenta para siempre? Se elimina todo: llamadas, turnos, horario, metas y finanzas, en este dispositivo y en la nube. No se puede deshacer.',
+      translateText('¿Borrar tu cuenta para siempre? Se elimina todo: llamadas, turnos, horario, metas y finanzas, en este dispositivo y en la nube. No se puede deshacer.'),
       async () => {
         const { data } = await getSupabase().auth.getSession();
         const token = data.session ? data.session.access_token : null;
@@ -250,7 +252,7 @@ function injectDeleteAccount() {
           if (!res.ok) throw new Error('DELETE_FAILED');
         } catch {
           if (typeof window.toast === 'function') {
-            window.toast('No se pudo borrar la cuenta. Revisa tu conexión e intenta de nuevo.');
+            window.toast(translateText('No se pudo borrar la cuenta. Revisa tu conexión e intenta de nuevo.'));
           }
           return;
         }
@@ -320,23 +322,23 @@ function renderCycleProjection() {
   let paceLabel;
   let paceSub;
   if (pace.met) {
-    paceValue = 'Listo';
+    paceValue = translateText('Listo');
     paceColor = 'var(--good)';
-    paceLabel = 'meta cubierta';
-    paceSub = 'Lo que ganes de aquí en adelante es extra.';
+    paceLabel = translateText('meta cubierta');
+    paceSub = translateText('Lo que ganes de aquí en adelante es extra.');
   } else if (!pace.workDaysLeft) {
     paceValue = '—';
     paceColor = 'var(--bad)';
-    paceLabel = 'sin días';
-    paceSub = `Faltan ${money(pace.remainingUsd)}${inline(pace.remainingUsd)} y ya no quedan días laborales en este ciclo.`;
+    paceLabel = translateText('sin días');
+    paceSub = ui`Faltan ${money(pace.remainingUsd)}${inline(pace.remainingUsd)} y ya no quedan días laborales en este ciclo.`;
   } else {
-    paceValue = `~${pace.perDayHours.toFixed(1)} h/día`;
+    paceValue = ui`~${pace.perDayHours.toFixed(1)} h/día`;
     paceColor = 'var(--warn)';
     paceLabel = 'productivas';
-    paceSub = `Faltan ${money(pace.remainingUsd)}${inline(pace.remainingUsd)} · ${money(pace.perDayUsd)}${inline(pace.perDayUsd)} por día laboral`;
+    paceSub = ui`Faltan ${money(pace.remainingUsd)}${inline(pace.remainingUsd)} · ${money(pace.perDayUsd)}${inline(pace.perDayUsd)} por día laboral`;
   }
 
-  rows.innerHTML = `
+  rows.innerHTML = ui`
     <div class="fin-preview-row" style="--cat-rgb: var(--blue-rgb);">
       <span class="fin-preview-icon">${icon('chart')}</span>
       <div class="fin-preview-main">
@@ -370,7 +372,7 @@ function injectCycleProjection() {
   box.className = 'fin-preview';
   box.id = 'cycleProjectionBox';
   box.style.marginTop = '12px';
-  box.innerHTML = `
+  box.innerHTML = ui`
     <div class="fin-preview-head">
       <span class="fin-preview-title">Proyección del ciclo</span>
       <button class="fin-preview-link" data-nav-page="reports" type="button">Ver Reportes →</button>
@@ -419,14 +421,14 @@ function setSyncStatus(kind, text) {
 function wireSyncStatus() {
   let lastPush = null;
   onSync((type) => {
-    if (type === 'dirty') setSyncStatus('saving', 'Cambios sin subir…');
+    if (type === 'dirty') setSyncStatus('saving', translateText('Cambios sin subir…'));
     if (type === 'pushed') {
       lastPush = new Date();
-      setSyncStatus('ok', 'Guardado en la nube');
+      setSyncStatus('ok', translateText('Guardado en la nube'));
     }
-    if (type === 'error') setSyncStatus('error', 'Sin conexión — se guardó local');
+    if (type === 'error') setSyncStatus('error', translateText('Sin conexión — se guardó local'));
     if (type === 'conflict') {
-      setSyncStatus('error', 'Otro dispositivo guardó después');
+      setSyncStatus('error', translateText('Otro dispositivo guardó después'));
       showCloudConflictBanner();
     }
   });
@@ -436,10 +438,10 @@ function wireSyncStatus() {
   setInterval(() => {
     if (!lastPush || readMeta().dirty) return;
     const mins = Math.floor((Date.now() - lastPush.getTime()) / 60000);
-    if (mins >= 1) setSyncStatus('ok', `Guardado hace ${mins} min`);
+    if (mins >= 1) setSyncStatus('ok', ui`Guardado hace ${mins} min`);
   }, 60000);
 
-  window.addEventListener('offline', () => setSyncStatus('error', 'Sin conexión'));
+  window.addEventListener('offline', () => setSyncStatus('error', translateText('Sin conexión')));
   window.addEventListener('online', () => setSyncStatus('saving', 'Reconectando…'));
 }
 
@@ -451,7 +453,7 @@ function showCloudConflictBanner() {
   const text = banner.querySelector('.storage-conflict-banner-text');
   if (text) {
     text.textContent =
-      'Otro dispositivo guardó cambios más recientes en tu cuenta. Si sigues aquí, tu próximo cambio podría sobrescribirlos.';
+      translateText('Otro dispositivo guardó cambios más recientes en tu cuenta. Si sigues aquí, tu próximo cambio podría sobrescribirlos.');
   }
   banner.classList.add('show');
 }
@@ -463,13 +465,13 @@ function showCloudConflictBanner() {
 async function boot() {
   if (!isConfigured()) {
     fail(
-      'Falta conectar la app con Supabase: edita js/config.js con la URL y la anon key del proyecto.',
+      translateText('Falta conectar la app con Supabase: edita js/config.js con la URL y la anon key del proyecto.'),
       { retry: false }
     );
     return;
   }
 
-  setBootMessage('Verificando tu sesión…');
+  setBootMessage(translateText('Verificando tu sesión…'));
 
   let session = null;
   try {
@@ -477,7 +479,7 @@ async function boot() {
     if (error) throw error;
     session = data.session;
   } catch (err) {
-    fail('No se pudo verificar tu sesión. ' + (err && err.message ? err.message : ''));
+    fail(translateText('No se pudo verificar tu sesión. ') + (err && err.message ? err.message : ''));
     return;
   }
 
@@ -493,15 +495,15 @@ async function boot() {
   });
 
   const userId = session.user.id;
-  setBootMessage('Buscando tus datos…');
+  setBootMessage(translateText('Buscando tus datos…'));
 
   let decision;
   try {
     decision = await resolveBoot(userId);
   } catch (err) {
     fail(
-      'No se pudieron leer tus datos guardados. ' +
-        (err && err.message ? err.message : 'Revisa tu conexión.')
+      translateText('No se pudieron leer tus datos guardados. ') +
+        (err && err.message ? err.message : translateText('Revisa tu conexión.'))
     );
     return;
   }
@@ -516,7 +518,7 @@ async function boot() {
         break;
 
       case BOOT.USE_CLOUD:
-        setBootMessage('Descargando tus datos…');
+        setBootMessage(translateText('Descargando tus datos…'));
         adoptCloud(decision.cloud, userId);
         break;
 
@@ -542,15 +544,21 @@ async function boot() {
         adoptLocal(userId);
     }
   } catch (err) {
-    fail('No se pudieron preparar tus datos. ' + (err && err.message ? err.message : ''));
+    fail(translateText('No se pudieron preparar tus datos. ') + (err && err.message ? err.message : ''));
     return;
   }
 
   // Después de hidratar y antes de montar: la app lee el tema al ejecutarse,
   // así que si esto corriera después ya se habría dibujado en oscuro.
   applyLightThemeDefault();
+  syncThemeClass();
+  if (setLanguage(readLocalSnapshot().settings.language, { documentTranslation: true })) {
+    // Reopen with the hydrated preference so module-level UI labels use that language too.
+    window.location.reload();
+    return;
+  }
 
-  setBootMessage('Abriendo tu turno…');
+  setBootMessage(translateText('Abriendo tu turno…'));
   startAutoSync();
 
   if (!(await mountApp())) return;
@@ -558,7 +566,7 @@ async function boot() {
   wireSyncStatus();
   setSyncStatus(
     readMeta().dirty ? 'saving' : 'ok',
-    readMeta().dirty ? 'Subiendo…' : 'Sincronizado'
+    readMeta().dirty ? 'Subiendo…' : translateText('Sincronizado')
   );
 
   try {
@@ -574,12 +582,12 @@ async function boot() {
   // nube sin esperar a la próxima edición.
   if (decision.action === BOOT.USE_LOCAL && readMeta().dirty) {
     const snapshot = readLocalSnapshot();
-    setSyncStatus('saving', `Subiendo ${describeSnapshot(snapshot)}…`);
+    setSyncStatus('saving', ui`Subiendo ${describeSnapshot(snapshot)}…`);
     await pushSnapshot({ force: true });
   }
 }
 
 boot().catch((err) => {
   console.error('boot: error inesperado', err);
-  fail('Error inesperado al arrancar: ' + (err && err.message ? err.message : String(err)));
+  fail(translateText('Error inesperado al arrancar: ') + (err && err.message ? err.message : String(err)));
 });

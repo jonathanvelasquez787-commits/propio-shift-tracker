@@ -1,3 +1,4 @@
+import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 // app-main.js inyecta los helpers; app-context.js mantiene el estado compartido.
 import { settings, calls } from './app-context.js';
 
@@ -11,23 +12,23 @@ export function configureFinanceContext(context) {
 }
 
     export const FINANCE_CATEGORIES = {
-      casa:       { label: 'Casa',           icon: 'home',           rgb: '102,226,165' },
-      servicios:  { label: 'Servicios',      icon: 'zap',            rgb: '255,209,92'  },
-      transporte: { label: 'Transporte',     icon: 'car',            rgb: '125,140,255' },
-      comida:     { label: 'Comida',         icon: 'utensils',       rgb: '47,213,255'  },
-      deuda:      { label: 'Deuda',          icon: 'creditCard',     rgb: '255,107,114' },
-      ahorro:     { label: 'Meta de ahorro', icon: 'piggyBank',      rgb: '139,123,255' },
-      otro:       { label: 'Otro',           icon: 'moreHorizontal', rgb: '144,160,190' },
+      casa:       { label: translateText('Casa'),           icon: 'home',           rgb: '102,226,165' },
+      servicios:  { label: translateText('Servicios'),      icon: 'zap',            rgb: '255,209,92'  },
+      transporte: { label: translateText('Transporte'),     icon: 'car',            rgb: '125,140,255' },
+      comida:     { label: translateText('Comida'),         icon: 'utensils',       rgb: '47,213,255'  },
+      deuda:      { label: translateText('Deuda'),          icon: 'creditCard',     rgb: '255,107,114' },
+      ahorro:     { label: translateText('Meta de ahorro'), icon: 'piggyBank',      rgb: '139,123,255' },
+      otro:       { label: translateText('Otro'),           icon: 'moreHorizontal', rgb: '144,160,190' },
     };
 
     // Nombre sugerido al elegir categoría en "Agregar gasto" (ver financeApplyNameSuggestion) — es
     // solo un punto de partida editable, no un valor fijo. 'otro' no sugiere nada.
     const FINANCE_NAME_SUGGESTIONS = {
-      casa: 'Renta',
-      servicios: 'Luz',
-      transporte: 'Gasolina',
-      comida: 'Despensa',
-      deuda: 'Préstamo',
+      casa: translateText('Renta'),
+      servicios: translateText('Luz'),
+      transporte: translateText('Gasolina'),
+      comida: translateText('Despensa'),
+      deuda: translateText('Préstamo'),
     };
 
     // Categorías propias (settings.customFinanceCategories) — paleta fija de 8 tonos, los mismos
@@ -56,7 +57,7 @@ export function configureFinanceContext(context) {
     // Las categorías fijas se dibujan con un ícono de ICON (ver iconHtml); las propias no tienen
     // ícono lucide asignado, así que se dibujan con el emoji que el usuario eligió al crearlas.
     function financeCategoryIconHtml(cat) {
-      return cat.emoji ? `<span style="font-size:15px; line-height:1;">${escapeHtml(cat.emoji)}</span>` : iconHtml(cat.icon);
+      return cat.emoji ? ui`<span style="font-size:15px; line-height:1;">${escapeHtml(cat.emoji)}</span>` : iconHtml(cat.icon);
     }
 
     // Una fila es Meta (vs Gasto) según row.kind, que toda fila nueva ya guarda explícito desde que
@@ -147,7 +148,7 @@ export function renderFinancePreview() {
     const pct = target > 0 ? Math.min(100, (assigned / target) * 100) : 0;
     const faltante = Math.max(0, target - assigned);
     const barColor = isMeta ? 'var(--purple)' : 'var(--warn)';
-    return `
+    return ui`
       <div class="fin-preview-row">
         <span class="fin-preview-icon" style="--cat-rgb:${cat.rgb};">${financeCategoryIconHtml(cat)}</span>
         <div class="fin-preview-main">
@@ -206,14 +207,14 @@ export function setFinanceTab(tab) {
 // tasa/moneda configurada — mismo `convertedAmountText` que ya usa el resto de la app.
 export function financeConvertedNote(usdAmount) {
   const text = convertedAmountText(usdAmount);
-  return text ? `<div class="fin-row-converted">${escapeHtml(text)}</div>` : '';
+  return text ? ui`<div class="fin-row-converted">${escapeHtml(text)}</div>` : '';
 }
 
 // Finanzas solo mostraba el equivalente en la moneda secundaria para el monto YA ASIGNADO — el
 // objetivo y el restante/ faltante se quedaban solo en dólares.
 export function financeConvertedInline(usdAmount) {
   const text = convertedAmountText(usdAmount);
-  return text ? ` <span class="fin-row-converted-inline">(${escapeHtml(text)})</span>` : '';
+  return text ? ui` <span class="fin-row-converted-inline">(${escapeHtml(text)})</span>` : '';
 }
 
 // Misma condición que ya usa convertedAmountText para decidir si hay moneda secundaria configurada
@@ -234,22 +235,22 @@ function financeRowHtml(row, opts) {
   const target = Number(row.targetAmount) || 0;
   const assigned = Number(row.assignedAmount) || 0;
   const currencyLabelTrim = String(settings.currencyLabel || '').trim();
-  const amountLinkTitle = 'Escribe en cualquiera de los dos — el otro se completa solo';
+  const amountLinkTitle = translateText('Escribe en cualquiera de los dos — el otro se completa solo');
   const currencyAssignInputHtml = financeHasSecondaryCurrency()
-    ? `<input class="fin-mini-input" data-fin-amount-currency-input placeholder="o en ${escapeHtml(currencyLabelTrim)}" type="text" title="${amountLinkTitle}"/>`
+    ? ui`<input class="fin-mini-input" data-fin-amount-currency-input placeholder="o en ${escapeHtml(currencyLabelTrim)}" type="text" title="${amountLinkTitle}"/>`
     : '';
   // El pill +/- (solo símbolos, sin texto) no dejaba claro qué iba a hacer "Aplicar" — pasa a
   // mostrar la palabra completa (mismo patrón.mc-pill-btn de Sí/No, sin lenguaje visual nuevo) +
   // title con el detalle.
-  const signPillHtml = `
+  const signPillHtml = ui`
     <div class="mc-pill-row" role="group" aria-label="Elige si Aplicar suma o resta este monto">
       <button class="mc-pill-btn" data-fin-sign-btn data-sign="plus" aria-pressed="true" type="button" title="Resta este monto de Disponible y lo suma a lo ya asignado de esta fila">+ Sumar</button>
       <button class="mc-pill-btn" data-fin-sign-btn data-sign="minus" aria-pressed="false" type="button" title="Devuelve este monto de lo ya asignado de esta fila a Disponible">− Restar</button>
     </div>
   `;
-  const priorityTitle = 'Prioridad — decide el orden de la cascada de "Restante después"';
-  const restanteDespuesTitle = 'Lo que te queda de tu Disponible después de cubrir esta fila y todas las de más prioridad arriba (↑/↓) — no es lo que falta pagar de este gasto.';
-  const priorityHtml = `
+  const priorityTitle = translateText('Prioridad — decide el orden de la cascada de "Restante después"');
+  const restanteDespuesTitle = translateText('Lo que te queda de tu Disponible después de cubrir esta fila y todas las de más prioridad arriba (↑/↓) — no es lo que falta pagar de este gasto.');
+  const priorityHtml = ui`
     <div class="fin-priority">
       <button class="fin-priority-btn" type="button" data-fin-priority-up="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" ${upDisabled} aria-label="Subir prioridad" title="${priorityTitle}">${iconHtml('chevronUp')}</button>
       <span class="fin-priority-num" title="${priorityTitle}">${opts.index + 1}</span>
@@ -261,10 +262,10 @@ function financeRowHtml(row, opts) {
   if (opts.isMeta) {
     const faltante = Math.max(0, target - assigned);
     let badgeHtml, barPct, barColor;
-    if (assigned === 0) { badgeHtml = '<span class="fin-badge tone-bad">Sin empezar</span>'; barPct = 0; barColor = 'var(--bad)'; }
-    else if (assigned < target) { badgeHtml = '<span class="fin-badge tone-warn">En progreso</span>'; barPct = target > 0 ? Math.min(100, (assigned / target) * 100) : 0; barColor = 'var(--purple)'; }
-    else { badgeHtml = '<span class="fin-badge tone-good">Cumplida</span>'; barPct = 100; barColor = 'var(--purple)'; }
-    return `
+    if (assigned === 0) { badgeHtml = translateMarkup('<span class="fin-badge tone-bad">Sin empezar</span>'); barPct = 0; barColor = 'var(--bad)'; }
+    else if (assigned < target) { badgeHtml = translateMarkup('<span class="fin-badge tone-warn">En progreso</span>'); barPct = target > 0 ? Math.min(100, (assigned / target) * 100) : 0; barColor = 'var(--purple)'; }
+    else { badgeHtml = translateMarkup('<span class="fin-badge tone-good">Cumplida</span>'); barPct = 100; barColor = 'var(--purple)'; }
+    return ui`
       <div class="fin-row" data-fin-row="${escapeHtml(row.id)}" style="--cat-rgb:${cat.rgb};">
         ${priorityHtml}
         <div class="fin-row-main">
@@ -294,24 +295,24 @@ function financeRowHtml(row, opts) {
     `;
   }
 
-  const typeLabel = row.recurring ? 'Recurrente' : 'Puntual';
+  const typeLabel = row.recurring ? translateText('Recurrente') : translateText('Puntual');
   const isPagado = financeIsRowPagado(row);
   const checkboxHtml = !row.recurring
-    ? `<label class="fin-checkbox-label"><input type="checkbox" data-fin-mark-paid="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" ${row.manualPaid ? 'checked' : ''}/> Pagado</label>`
+    ? ui`<label class="fin-checkbox-label"><input type="checkbox" data-fin-mark-paid="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" ${row.manualPaid ? 'checked' : ''}/> Pagado</label>`
     : '';
-  const editBtnHtml = `<button class="fin-ghost-btn fin-ghost-btn-icon" type="button" data-fin-edit="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" aria-label="Editar gasto" title="Editar gasto">${iconHtml('edit')}</button>`;
+  const editBtnHtml = ui`<button class="fin-ghost-btn fin-ghost-btn-icon" type="button" data-fin-edit="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" aria-label="Editar gasto" title="Editar gasto">${iconHtml('edit')}</button>`;
   let badgeHtml, barPct, barColor, actionsHtml;
   if (isPagado) {
-    badgeHtml = '<span class="fin-badge tone-good">Pagado</span>';
+    badgeHtml = translateMarkup('<span class="fin-badge tone-good">Pagado</span>');
     barPct = 100; barColor = 'var(--good)';
-    actionsHtml = `<button class="fin-ghost-btn" type="button" data-fin-reset="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}">${iconHtml('reset')} Reiniciar mes</button>${editBtnHtml}`;
+    actionsHtml = ui`<button class="fin-ghost-btn" type="button" data-fin-reset="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}">${iconHtml('reset')} Reiniciar mes</button>${editBtnHtml}`;
   } else {
     barPct = target > 0 ? Math.min(100, (assigned / target) * 100) : 0;
-    if (assigned > 0) { badgeHtml = '<span class="fin-badge tone-warn">Parcial</span>'; barColor = 'var(--warn)'; }
-    else { badgeHtml = '<span class="fin-badge tone-bad">Sin asignar</span>'; barPct = 0; barColor = 'var(--bad)'; }
-    actionsHtml = `${checkboxHtml}<input class="fin-mini-input" data-fin-amount-input placeholder="$" type="text" title="${amountLinkTitle}"/>${currencyAssignInputHtml}${signPillHtml}<button class="fin-mini-btn-primary" type="button" data-fin-apply="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}">Aplicar</button>${editBtnHtml}`;
+    if (assigned > 0) { badgeHtml = translateMarkup('<span class="fin-badge tone-warn">Parcial</span>'); barColor = 'var(--warn)'; }
+    else { badgeHtml = translateMarkup('<span class="fin-badge tone-bad">Sin asignar</span>'); barPct = 0; barColor = 'var(--bad)'; }
+    actionsHtml = ui`${checkboxHtml}<input class="fin-mini-input" data-fin-amount-input placeholder="$" type="text" title="${amountLinkTitle}"/>${currencyAssignInputHtml}${signPillHtml}<button class="fin-mini-btn-primary" type="button" data-fin-apply="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}">Aplicar</button>${editBtnHtml}`;
   }
-  return `
+  return ui`
     <div class="fin-row" data-fin-row="${escapeHtml(row.id)}" style="--cat-rgb:${cat.rgb};">
       ${priorityHtml}
       <div class="fin-row-main">
@@ -341,7 +342,7 @@ function financeRowHtml(row, opts) {
 // sin lenguaje nuevo.
 function financeTotalsRowHtml(label, targetTotal, assignedTotal, assignedLabel) {
   const remaining = Math.max(0, targetTotal - assignedTotal);
-  return `
+  return ui`
     <div class="wk-total-row" style="margin-bottom: 4px;">
       <div class="wk-total-label">${escapeHtml(label)}</div>
       <div class="wk-total-metrics">
@@ -384,13 +385,13 @@ export function renderFinanceSection() {
   const gastosTotalRowEl = document.getElementById('financeGastosTotalRow');
   if (gastosTotalRowEl) {
     const gastoTargetTotal = gastoRows.reduce((sum, r) => sum + (Number(r.targetAmount) || 0), 0);
-    gastosTotalRowEl.innerHTML = gastoRows.length ? financeTotalsRowHtml('Total gastos', gastoTargetTotal, gastoAssignedTotal, 'Asig.') : '';
+    gastosTotalRowEl.innerHTML = gastoRows.length ? financeTotalsRowHtml(translateText('Total gastos'), gastoTargetTotal, gastoAssignedTotal, 'Asig.') : '';
   }
   const gastosList = document.getElementById('financeGastosList');
   if (gastosList) {
     gastosList.innerHTML = gastoRows.length
       ? gastoRows.map((r, i) => financeRowHtml(r, { index: i, count: gastoRows.length, isMeta: false, restanteDespues: restanteMap[r.id] })).join('')
-      : '<div class="note" style="margin:0;">Sin gastos configurados. Usa "+ Agregar gasto" para empezar.</div>';
+      : translateMarkup('<div class="note" style="margin:0;">Sin gastos configurados. Usa "+ Agregar gasto" para empezar.</div>');
   }
 
   const metaRows = financeMetaRowsSorted();
@@ -399,8 +400,8 @@ export function renderFinanceSection() {
     const metaTargetTotal = metaRows.reduce((sum, r) => sum + (Number(r.targetAmount) || 0), 0);
     const metaAssignedTotal = metaRows.reduce((sum, r) => sum + (Number(r.assignedAmount) || 0), 0);
     metasList.innerHTML = metaRows.length
-      ? metaRows.map((r, i) => financeRowHtml(r, { index: i, count: metaRows.length, isMeta: true })).join('') + financeTotalsRowHtml('Total metas', metaTargetTotal, metaAssignedTotal, 'Ahorr.')
-      : '<div class="note" style="margin:0;">Sin metas configuradas. Usa "+ Agregar meta" para empezar.</div>';
+      ? metaRows.map((r, i) => financeRowHtml(r, { index: i, count: metaRows.length, isMeta: true })).join('') + financeTotalsRowHtml(translateText('Total metas'), metaTargetTotal, metaAssignedTotal, 'Ahorr.')
+      : translateMarkup('<div class="note" style="margin:0;">Sin metas configuradas. Usa "+ Agregar meta" para empezar.</div>');
   }
 
   renderFinancePreview();
@@ -440,7 +441,7 @@ export function financeFindRow(catId, rowId) {
 export function financeApplySignedAmount(catId, rowId, rawAmount, sign) {
   const monto = parseMoney(rawAmount);
   if (!(monto > 0)) {
-    toast('Ingresa un monto mayor a 0');
+    toast(translateText('Ingresa un monto mayor a 0'));
     return;
   }
   const row = financeFindRow(catId, rowId);
@@ -450,20 +451,20 @@ export function financeApplySignedAmount(catId, rowId, rawAmount, sign) {
     const before = Number(row.assignedAmount) || 0;
     const removed = Math.min(monto, before);
     if (removed <= 0) {
-      toast('Esta fila no tiene nada asignado para restar');
+      toast(translateText('Esta fila no tiene nada asignado para restar'));
       return;
     }
     row.assignedAmount = before - removed;
     saveSettingsOnly();
     render();
     toast(removed < monto
-      ? `Solo se restaron ${money(removed)}${convertedAmountText(removed) ? ` (${convertedAmountText(removed)})` : ''} de ${money(monto)}${convertedAmountText(monto) ? ` (${convertedAmountText(monto)})` : ''} — la fila no tenía más asignado. El resto no se tocó.`
-      : 'Aplicado');
+      ? ui`Solo se restaron ${money(removed)}${convertedAmountText(removed) ? ` (${convertedAmountText(removed)})` : ''} de ${money(monto)}${convertedAmountText(monto) ? ` (${convertedAmountText(monto)})` : ''} — la fila no tenía más asignado. El resto no se tocó.`
+      : translateText('Aplicado'));
     return;
   }
 
   if (monto > financeAvailableBalance()) {
-    toast('No tienes suficiente disponible para asignar esa cantidad');
+    toast(translateText('No tienes suficiente disponible para asignar esa cantidad'));
     return;
   }
   let appliedAmount = monto;
@@ -481,8 +482,8 @@ export function financeApplySignedAmount(catId, rowId, rawAmount, sign) {
   // se avisa cuánto entró de verdad en vez de un "Aplicado" genérico que dejaría creer que se
   // aplicó todo.
   toast(appliedAmount < monto
-    ? `Solo se asignaron ${money(appliedAmount)}${convertedAmountText(appliedAmount) ? ` (${convertedAmountText(appliedAmount)})` : ''} de ${money(monto)}${convertedAmountText(monto) ? ` (${convertedAmountText(monto)})` : ''} — el gasto ya llegó a su objetivo. El resto sigue en Disponible.`
-    : 'Aplicado');
+    ? ui`Solo se asignaron ${money(appliedAmount)}${convertedAmountText(appliedAmount) ? ` (${convertedAmountText(appliedAmount)})` : ''} de ${money(monto)}${convertedAmountText(monto) ? ` (${convertedAmountText(monto)})` : ''} — el gasto ya llegó a su objetivo. El resto sigue en Disponible.`
+    : translateText('Aplicado'));
 }
 
 // Reparte TODO el Disponible actual, solo, en el mismo orden de prioridad que ya usa la cascada de
@@ -556,10 +557,10 @@ export function updateFinanceAutoFillSetting(checked) {
   render();
   if (settings.financeAutoFill) {
     toast(changed
-      ? 'Asignación automática activada — tu Disponible ya se repartió en orden de prioridad'
-      : 'Asignación automática activada — se repartirá con tu próxima llamada guardada');
+      ? translateText('Asignación automática activada — tu Disponible ya se repartió en orden de prioridad')
+      : translateText('Asignación automática activada — se repartirá con tu próxima llamada guardada'));
   } else {
-    toast('Asignación automática desactivada — vuelve a ser manual');
+    toast(translateText('Asignación automática desactivada — vuelve a ser manual'));
   }
 }
 
@@ -570,7 +571,7 @@ export function financeResetRow(catId, rowId) {
   row.manualPaid = false;
   saveSettingsOnly();
   render();
-  toast('Gasto reiniciado');
+  toast(translateText('Gasto reiniciado'));
 }
 
 export function financeToggleManualPaid(catId, rowId, checked) {
@@ -584,7 +585,7 @@ export function financeToggleManualPaid(catId, rowId, checked) {
 export function financeDeleteRow(catId, rowId) {
   const row = financeFindRow(catId, rowId);
   if (!row) return;
-  appConfirm(`¿Eliminar "${row.name}"? Esta acción no se puede deshacer.`, () => {
+  appConfirm(ui`¿Eliminar "${row.name}"? Esta acción no se puede deshacer.`, () => {
     const cat = settings.financeCategories[catId];
     cat.rows = cat.rows.filter(r => r.id !== rowId);
     saveSettingsOnly();
@@ -621,7 +622,7 @@ export function openFinanceRowModal(kind, existingRow = null) {
   const targetInput = document.getElementById('financeRowTargetInput');
   const isMeta = financeRowModalKind === 'meta';
   if (nameInput) nameInput.value = existingRow ? existingRow.name : '';
-  const defaultCatId = isMeta ? 'ahorro' : 'casa';
+  const defaultCatId = isMeta ? 'ahorro' : translateText('casa');
   if (categoryInput) categoryInput.value = existingRow ? existingRow.categoryId : defaultCatId;
   closeFinanceNewCatPanel();
   renderFinanceCategoryChips(categoryInput ? categoryInput.value : defaultCatId);
@@ -640,16 +641,16 @@ export function openFinanceRowModal(kind, existingRow = null) {
   const hasCurrency = financeHasSecondaryCurrency();
   if (targetCurrencyField) targetCurrencyField.style.display = hasCurrency ? '' : 'none';
   if (hasCurrency) {
-    if (targetCurrencyLabelEl) targetCurrencyLabelEl.textContent = `Monto objetivo en ${currencyLabelTrim}`;
+    if (targetCurrencyLabelEl) targetCurrencyLabelEl.textContent = ui`Monto objetivo en ${currencyLabelTrim}`;
     if (targetCurrencyInput) targetCurrencyInput.value = existingRow ? (Number(existingRow.targetAmount || 0) * exchangeRate).toFixed(2) : '';
   } else if (targetCurrencyInput) {
     targetCurrencyInput.value = '';
   }
-  if (title) title.textContent = existingRow ? (isMeta ? 'Editar meta' : 'Editar gasto') : (isMeta ? 'Agregar meta' : 'Agregar gasto');
+  if (title) title.textContent = existingRow ? (isMeta ? translateText('Editar meta') : translateText('Editar gasto')) : (isMeta ? translateText('Agregar meta') : translateText('Agregar gasto'));
   if (subtitle) {
     subtitle.textContent = existingRow
-      ? 'Corrige nombre, categoría/tipo o monto objetivo. Para sumar o restar el monto asignado, usa el pill +/- de la fila.'
-      : 'Se agrega al final de la cola de prioridad — puedes reordenarla después con las flechas ↑/↓.';
+      ? translateText('Corrige nombre, categoría/tipo o monto objetivo. Para sumar o restar el monto asignado, usa el pill +/- de la fila.')
+      : translateText('Se agrega al final de la cola de prioridad — puedes reordenarla después con las flechas ↑/↓.');
   }
   // La categoría ya no se esconde en Metas: "Meta de ahorro" es una categoría más entre las que se
   // puede elegir, no un caso aparte forzado a 'ahorro'.
@@ -667,20 +668,20 @@ function renderFinanceCategoryChips(selectedId) {
   );
   const cats = financeAllCategories();
   grid.innerHTML = cats.map(cat => {
-    const chipBtn = `
+    const chipBtn = ui`
       <button type="button" class="fin-cat-chip ${cat.id === selectedId ? 'selected' : ''}" data-fin-cat-chip="${escapeHtml(cat.id)}" style="--cat-rgb:${cat.rgb};">
         <span class="fin-cat-chip-icon">${financeCategoryIconHtml(cat)}</span>
         <span class="fin-cat-chip-label">${escapeHtml(cat.label)}</span>
       </button>`;
     // Solo las categorías propias se pueden editar/borrar — las 7 fijas de FINANCE_CATEGORIES no.
     if (!customIds.has(cat.id)) return chipBtn;
-    return `
+    return ui`
       <div class="fin-cat-chip-wrap">
         ${chipBtn}
         <button type="button" class="tbl-icon-btn" data-fin-cat-edit="${escapeHtml(cat.id)}" aria-label="Editar categoría" title="Editar categoría">${iconHtml('edit')}</button>
         <button type="button" class="tbl-icon-btn bad" data-fin-cat-delete="${escapeHtml(cat.id)}" aria-label="Borrar categoría" title="Borrar categoría">${iconHtml('trash')}</button>
       </div>`;
-  }).join('') + `
+  }).join('') + ui`
     <button type="button" class="fin-cat-chip fin-cat-chip-new" id="financeRowNewCatToggle">
       <span class="fin-cat-chip-icon">${iconHtml('plus')}</span>
       <span class="fin-cat-chip-label">Nueva categoría</span>
@@ -711,8 +712,8 @@ export function openFinanceNewCatPanel(catId = null) {
     ? (Array.isArray(settings.customFinanceCategories) ? settings.customFinanceCategories : []).find(c => c.id === catId)
     : null;
   financeEditingCatId = existing ? existing.id : null;
-  if (title) title.textContent = existing ? 'Editar categoría' : 'Nueva categoría';
-  if (btnLabel) btnLabel.textContent = existing ? 'Guardar cambios' : 'Crear categoría';
+  if (title) title.textContent = existing ? translateText('Editar categoría') : translateText('Nueva categoría');
+  if (btnLabel) btnLabel.textContent = existing ? translateText('Guardar cambios') : translateText('Crear categoría');
   if (nameInput) nameInput.value = existing ? existing.label : '';
   const defaultEmoji = existing ? existing.emoji : '🏷️';
   if (emojiInput) emojiInput.value = defaultEmoji;
@@ -733,7 +734,7 @@ export function closeFinanceNewCatPanel() {
 function renderFinanceColorSwatches(selected) {
   const row = document.getElementById('financeNewCatColorRow');
   if (!row) return;
-  row.innerHTML = FINANCE_CUSTOM_CATEGORY_PALETTE.map(rgb => `
+  row.innerHTML = FINANCE_CUSTOM_CATEGORY_PALETTE.map(rgb => ui`
     <button type="button" class="fin-cat-color-swatch ${rgb === selected ? 'selected' : ''}" data-fin-cat-color="${rgb}" style="--sw-rgb:${rgb};" aria-label="Elegir este color"></button>
   `).join('');
 }
@@ -748,7 +749,7 @@ export function createFinanceCategory() {
   const colorInput = document.getElementById('financeNewCatColorInput');
   const label = String(nameInput?.value || '').trim().slice(0, 24);
   if (!label) {
-    toast('Ponle un nombre a la categoría');
+    toast(translateText('Ponle un nombre a la categoría'));
     return;
   }
   const emoji = String(emojiInput?.value || '').trim() || '🏷️';
@@ -767,7 +768,7 @@ export function createFinanceCategory() {
     renderFinanceCategoryChips(editedId);
     selectFinanceCategoryChip(editedId);
     renderFinanceSection();
-    toast(`Categoría "${label}" actualizada`);
+    toast(ui`Categoría "${label}" actualizada`);
     return;
   }
 
@@ -778,7 +779,7 @@ export function createFinanceCategory() {
   closeFinanceNewCatPanel();
   renderFinanceCategoryChips(id);
   selectFinanceCategoryChip(id);
-  toast(`Categoría "${label}" creada`);
+  toast(ui`Categoría "${label}" creada`);
 }
 
 // Borra una categoría propia. Sus filas (si tenía) no se pierden: pasan a "Otro", igual fija para
@@ -790,9 +791,9 @@ export function financeDeleteCategory(catId) {
   const catRows = settings.financeCategories[catId] ? settings.financeCategories[catId].rows : [];
   const rowCount = catRows.length;
   const warning = rowCount > 0
-    ? ` Sus ${rowCount} fila(s) no se borran: pasan a la categoría "Otro".`
+    ? ui` Sus ${rowCount} fila(s) no se borran: pasan a la categoría "Otro".`
     : '';
-  appConfirm(`¿Borrar la categoría "${cat.label}"?${warning} Esta acción no se puede deshacer.`, () => {
+  appConfirm(ui`¿Borrar la categoría "${cat.label}"?${warning} Esta acción no se puede deshacer.`, () => {
     if (settings.financeCategories[catId]) {
       catRows.forEach(row => { row.categoryId = 'otro'; });
       if (!settings.financeCategories.otro) settings.financeCategories.otro = { rows: [] };
@@ -808,7 +809,7 @@ export function financeDeleteCategory(catId) {
     if (categoryInput) categoryInput.value = nextSelected;
     renderFinanceCategoryChips(nextSelected);
     renderFinanceSection();
-    toast(`Categoría "${cat.label}" borrada`);
+    toast(ui`Categoría "${cat.label}" borrada`);
   });
 }
 
@@ -836,11 +837,11 @@ export function saveFinanceRowModal() {
   }
   const target = Number(targetInput?.value);
   if (!name) {
-    toast('Ponle un nombre a la fila');
+    toast(translateText('Ponle un nombre a la fila'));
     return;
   }
   if (!Number.isFinite(target) || target <= 0) {
-    toast('El monto objetivo debe ser mayor a 0');
+    toast(translateText('El monto objetivo debe ser mayor a 0'));
     return;
   }
   const isMeta = financeRowModalKind === 'meta';
@@ -856,7 +857,7 @@ export function saveFinanceRowModal() {
       if (r) { foundCatId = cId; foundRow = r; }
     });
     if (!foundRow) {
-      toast('No se encontró la fila a editar');
+      toast(translateText('No se encontró la fila a editar'));
       closeModal('financeRowModal');
       financeEditingRowId = null;
       return;
@@ -886,7 +887,7 @@ export function saveFinanceRowModal() {
     saveSettingsOnly();
     closeModal('financeRowModal');
     render();
-    toast(isMeta ? 'Meta actualizada' : 'Gasto actualizado');
+    toast(isMeta ? translateText('Meta actualizada') : translateText('Gasto actualizado'));
     financeEditingRowId = null;
     return;
   }
@@ -917,7 +918,7 @@ export function saveFinanceRowModal() {
   saveSettingsOnly();
   closeModal('financeRowModal');
   render();
-  toast(isMeta ? 'Meta agregada' : 'Gasto agregado');
+  toast(isMeta ? translateText('Meta agregada') : translateText('Gasto agregado'));
 }
 
 // Mismo criterio que updateChipsScrollHint, aplicado a las filas de Totales de Finanzas

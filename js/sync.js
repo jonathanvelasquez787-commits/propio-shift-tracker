@@ -1,3 +1,4 @@
+import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 // Sincronización localStorage <-> Supabase.
 //
 // Premisa: la app NO se toca. Sigue guardando en localStorage en cada acción,
@@ -10,6 +11,7 @@
 // la nube las llamadas se normalizan y se envían como altas, cambios y bajas.
 
 import { getSupabase } from './supabase-client.js';
+import { applySavedColors } from './appearance-colors.js';
 import { DATA_SCHEMA_VERSION, SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
 
 export const APP_KEYS = {
@@ -103,7 +105,7 @@ export function deviceLabel() {
   else if (/iPhone|iPad|iPod/i.test(ua)) os = 'iPhone/iPad';
   else if (/Mac OS X/i.test(ua)) os = 'Mac';
   else if (/Linux/i.test(ua)) os = 'Linux';
-  return `${os}${mobile ? ' (móvil)' : ''}`;
+  return `${os}${mobile ? translateText(' (móvil)') : ''}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -142,8 +144,8 @@ export function describeSnapshot(snap) {
   const events = Array.isArray(snap && snap.state && snap.state.events)
     ? snap.state.events.length
     : 0;
-  const parts = [`${calls} llamada${calls === 1 ? '' : 's'}`];
-  if (events) parts.push(`${events} acción${events === 1 ? '' : 'es'} registrada${events === 1 ? '' : 's'}`);
+  const parts = [ui`${calls} llamada${calls === 1 ? '' : 's'}`];
+  if (events) parts.push(events === 1 ? ui`${events} acción registrada` : ui`${events} acciones registradas`);
   return parts.join(' · ');
 }
 
@@ -206,7 +208,7 @@ export function writeLocalSnapshot(snapshot) {
         else window.localStorage.setItem(key, previous[key]);
       } catch {}
     });
-    const error = new Error('No hay espacio local suficiente para descargar tus datos de la nube.');
+    const error = new Error(translateText('No hay espacio local suficiente para descargar tus datos de la nube.'));
     error.cause = err;
     throw error;
   } finally {
@@ -251,9 +253,11 @@ export function applyLightThemeDefault() {
 // el mismo settings.theme y pone la clase que la app usaría.
 export function syncThemeClass() {
   let theme = 'light';
+  let appearance = {};
   try {
     const raw = window.localStorage.getItem(activeAppKeys().settings);
     const parsed = raw ? JSON.parse(raw) : null;
+    appearance = parsed || {};
     if (parsed && typeof parsed === 'object' && parsed.theme === 'dark') theme = 'dark';
   } catch {
     /* sin settings legibles, claro */
@@ -261,6 +265,7 @@ export function syncThemeClass() {
   const root = document.documentElement;
   root.classList.toggle('theme-dark', theme === 'dark');
   root.classList.toggle('theme-light', theme !== 'dark');
+  applySavedColors({ ...appearance, theme }, root);
 }
 
 export function clearLocalAppData() {

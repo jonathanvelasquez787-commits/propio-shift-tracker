@@ -57,7 +57,7 @@ test('auditoría profunda: pegar solo duplicados omitidos no crea evento falso n
   const end = app.indexOf('function clearCallInputBox', start);
   const body = app.slice(start, end);
   assert.match(body, /const importChangedData = unique\.length \|\| replacedLive\.length \|\| correctedOfficial\.length/);
-  assert.match(body, /if \(importChangedData\) \{[\s\S]*setEvent\('import', 'Llamadas importadas'/);
+  assert.match(body, /if \(importChangedData\) \{[\s\S]*setEvent\('import', translateText\('Llamadas importadas'\)/);
   assert.match(body, /if \(importChangedData\) \{[\s\S]*saveAll\(\)/);
 });
 
