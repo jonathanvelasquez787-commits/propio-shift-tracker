@@ -8403,6 +8403,8 @@
 <div class="progress" style="margin-top: 4px;"><div id="earningsBar"></div></div>
 <div class="gh-goal-foot" id="remainingText">0 min restantes</div>
 </div>
+<div class="gh-goal-sub-row" id="earningsMilestoneMarkers" role="group" aria-label="Hitos de la meta diaria" hidden></div>
+<div class="gh-goal-foot" id="earningsNextMilestone" hidden></div>
 <div class="game-missions" hidden id="gameMissions">
   <div class="game-missions-head"><div><span class="game-panel-eyebrow">ARMADURA</span><h3>Misiones del día</h3></div><span data-game-role="missions-score">0 / 3</span></div>
   <div class="game-mission-list" data-game-role="mission-list">
@@ -9060,6 +9062,7 @@
         <div class="goals-field game-settings-intensity-field">
           <label for="gameIntensityInput">Intensidad</label>
           <select id="gameIntensityInput">
+            <option value="off">Sin notificaciones de refuerzo</option>
             <option value="subtle">Solo sutil</option>
             <option value="arcade">Arcade en logros</option>
           </select>

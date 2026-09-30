@@ -15,8 +15,22 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 .game-chest-claim[hidden],
 .game-modal-overlay[hidden],
 .game-daily-focus[hidden],
-.positive-evidence-card[hidden] {
+.positive-evidence-card[hidden],
+#earningsMilestoneMarkers[hidden],
+#earningsNextMilestone[hidden] {
   display: none !important;
+}
+
+.game-settings-disclosures :is(button, input, select, summary):focus-visible,
+.game-modal-overlay button:focus-visible,
+#qaWalkthroughPanel button:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 3px;
+}
+
+#earningsMilestoneMarkers .gh-goal-subitem,
+#earningsNextMilestone {
+  color: var(--text);
 }
 
 .game-toast-stack,

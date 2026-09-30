@@ -70,7 +70,7 @@ test('llamadas difíciles, premios acumulables, ventana segura y presupuesto con
 
   const addCall = (id) => {
     const start = Date.now() - 120000 + callRows.length * 15000;
-    const call = { id, callDate: dayKey, startISO: new Date(start).toISOString(), endISO: new Date(start + 10000).toISOString(), billable: 'No', dropped: 'Yes' };
+    const call = { id, callDate: dayKey, startISO: new Date(start).toISOString(), endISO: new Date(start + 10000).toISOString(), billable: 'Yes', dropped: 'No' };
     callRows.push(call);
     onPositiveCallSaved(call, 'import', dayKey);
   };
@@ -191,15 +191,17 @@ test('reemplazar una llamada live migra las referencias de refuerzo antes de rec
   const appMain = fs.readFileSync(path.join(root, 'js/app-main.js'), 'utf8');
   const importBody = appMain.slice(appMain.indexOf('function importCalls()'), appMain.indexOf('function clearCallInputBox'));
   assert.ok(importBody.indexOf('migratePositiveCallIdReferences') < importBody.indexOf('onGameCallsChanged'));
-  assert.match(importBody, /item\.replacementKind === 'live'\) migratePositiveCallIdReferences\(item\.replaces\?\.id, item\.call\.id, item\.call\.endISO\)/);
+  assert.ok(importBody.indexOf('migrateGameCallReferences') < importBody.indexOf('onGameCallsChanged'));
+  assert.match(importBody, /item\.replacementKind === 'live'\)\s*\{?\s*migratePositiveCallIdReferences\(item\.replaces\?\.id, item\.call\.id, item\.call\.endISO\)/);
+  assert.match(importBody, /migrateGameCallReferences\(item\.replaces\?\.id, item\.call\.id\)/);
 });
 
 test('una llamada anterior a la difícil no consume la recuperación pendiente', () => {
   const dayKey = currentDayKey();
   const originEnd = Date.now() - 120000;
-  const origin = { id: 'difficult', callDate: dayKey, startISO: new Date(originEnd - 60000).toISOString(), endISO: new Date(originEnd).toISOString() };
-  const earlier = { id: 'earlier', callDate: dayKey, startISO: new Date(originEnd - 30000).toISOString(), endISO: new Date(originEnd - 10000).toISOString() };
-  const later = { id: 'later', callDate: dayKey, startISO: new Date(originEnd).toISOString(), endISO: new Date(originEnd + 30000).toISOString() };
+  const origin = { id: 'difficult', callDate: dayKey, countsAsProductive: true, startISO: new Date(originEnd - 60000).toISOString(), endISO: new Date(originEnd).toISOString() };
+  const earlier = { id: 'earlier', callDate: dayKey, countsAsProductive: true, startISO: new Date(originEnd - 30000).toISOString(), endISO: new Date(originEnd - 10000).toISOString() };
+  const later = { id: 'later', callDate: dayKey, countsAsProductive: true, startISO: new Date(originEnd).toISOString(), endISO: new Date(originEnd + 30000).toISOString() };
   const callRows = [origin];
   const currentState = { game: { reinforcement: { ...createDefaultReinforcementState(), recoveryPending: { callId: 'difficult', dayKey, endISO: new Date(originEnd - 60000).toISOString() } } } };
   setAppState(currentState);
@@ -218,7 +220,7 @@ test('una llamada anterior a la difícil no consume la recuperación pendiente',
   assert.equal(currentState.game.reinforcement.recoveryPending.callId, 'difficult');
   assert.equal(currentState.game.reinforcement.recoveries.length, 0);
   currentState.game.reinforcement.recoveryPending.endISO = 'legacy-invalid-time';
-  const earlierLegacy = { id: 'earlier-legacy', callDate: dayKey, startISO: new Date(originEnd - 5000).toISOString(), endISO: new Date(originEnd + 5000).toISOString() };
+  const earlierLegacy = { id: 'earlier-legacy', callDate: dayKey, countsAsProductive: true, startISO: new Date(originEnd - 5000).toISOString(), endISO: new Date(originEnd + 5000).toISOString() };
   callRows.push(earlierLegacy);
   onPositiveCallSaved(earlierLegacy, 'import', dayKey);
   assert.equal(currentState.game.reinforcement.recoveryPending.callId, 'difficult');
@@ -258,6 +260,52 @@ test('una cola llena conserva el progreso acumulado sin descartar premios previo
   assert.equal(currentState.game.reinforcement.pendingRewards.length, 100);
   assert.ok(currentState.game.reinforcement.pendingRewards.some((item) => item.rewardId === 'snack'));
   assert.equal(currentState.game.reinforcement.progress.snack, 1);
+});
+
+test('dropped repetidas no abren reflexión ni ganan premios y una recuperación requiere llamada productiva', () => {
+  const dayKey = currentDayKey();
+  const now = Date.now();
+  const rows = [];
+  const origin = { id: 'origin-dropped', callDate: dayKey, dropped: 'Yes', billable: 'No', countsAsProductive: false, startISO: new Date(now - 120000).toISOString(), endISO: new Date(now - 90000).toISOString() };
+  const currentState = { game: { reinforcement: { ...createDefaultReinforcementState(), recoveryPending: { callId: origin.id, dayKey, endISO: origin.endISO } } } };
+  setAppState(currentState);
+  setAppCalls(rows);
+  setAppSettings({ game: { enabled: false, intensity: 'subtle' }, reinforcement: { enabled: true, askAfterCall: true, rewards: [
+    { id: 'calls', name: 'Cada cinco llamadas', window: 'break', trigger: 'calls', every: 5 },
+    { id: 'recovery', name: 'Premio por retomar', window: 'break', trigger: 'recovery' },
+  ] } });
+  const opened = [];
+  configurePositiveReinforcementContext({
+    callDateKeyFromValue: (value) => value === dayKey ? value : '', callsForDay: () => rows,
+    closeModal: () => {}, convertedAmountText: () => '', effectiveDailyGoal: () => ({ usd: 0 }), escapeHtml: String,
+    importedCallStats: () => ({ earnings: 0 }), openModal: (id) => opened.push(id), saveStateOnly: () => {},
+    saveSettingsOnly: () => {}, toast: () => {}, todayCallDateKey: () => dayKey,
+  });
+  rows.push(origin);
+  onPositiveCallSaved(origin, 'manual', dayKey);
+  for (let index = 0; index < 5; index++) {
+    const dropped = { ...origin, id: `dropped-${index}` };
+    rows.push(dropped);
+    onPositiveCallSaved(dropped, 'live', dayKey);
+  }
+  assert.equal(currentState.game.reinforcement.pendingRewards.length, 0);
+  assert.equal(currentState.game.reinforcement.recoveries.length, 0);
+  assert.deepEqual(opened, []);
+  assert.equal(currentState.game.reinforcement.recoveryPending.callId, origin.id);
+  assert.equal(reconcilePositiveCalls(dayKey), false, 'el origen dropped conserva la recuperación pendiente');
+  const nonproductive = { ...origin, id: 'nonproductive', dropped: 'No', startISO: new Date(now - 60000).toISOString(), endISO: new Date(now - 30000).toISOString() };
+  rows.push(nonproductive);
+  onPositiveCallSaved(nonproductive, 'import', dayKey);
+  assert.equal(currentState.game.reinforcement.recoveryPending.callId, origin.id);
+  const productive = { ...nonproductive, id: 'productive', billable: 'Yes', countsAsProductive: true, startISO: new Date(now - 20000).toISOString(), endISO: new Date(now - 10000).toISOString() };
+  rows.push(productive);
+  onPositiveCallSaved(productive, 'import', dayKey);
+  assert.equal(currentState.game.reinforcement.recoveryPending, null);
+  assert.equal(currentState.game.reinforcement.recoveries.length, 1);
+  assert.deepEqual(currentState.game.reinforcement.pendingRewards.map((item) => item.rewardId), ['recovery']);
+  onPositiveCallSaved(productive, 'import', dayKey);
+  assert.equal(currentState.game.reinforcement.recoveries.length, 1);
+  assert.equal(currentState.game.reinforcement.pendingRewards.length, 1);
 });
 
 test('Plan del día se oculta de verdad al apagar gamificación', () => {

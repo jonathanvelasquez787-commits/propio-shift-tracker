@@ -1,4 +1,5 @@
 import { settings, state } from './app-context.js';
+import { notifyReinforcement, reinforcementFeedbackEnabled, reinforcementText } from './reinforcement-feedback.js';
 
 let callDateKeyFromValue, callsForDay, closeModal, convertedAmountText, effectiveDailyGoal;
 let escapeHtml, importedCallStats, openModal, saveSettingsOnly, saveStateOnly, toast, todayCallDateKey;
@@ -167,12 +168,15 @@ function earnReward(reward, dayKey, triggerKey) {
 
 function evaluateCallRewards(call, dayKey, { silent = false } = {}) {
   const reinforcement = state.game.reinforcement;
-  const dayCalls = callsForDay(dayKey).filter((item) => item?.endISO && new Date(item.endISO).getTime() <= Date.now());
+  const dayCalls = callsForDay(dayKey).filter((item) => String(item?.dropped).toLowerCase() !== 'yes'
+    && item?.endISO && new Date(item.endISO).getTime() <= Date.now());
   const count = dayCalls.length;
   const earned = [];
   let recovered = false;
 
-  if (reinforcement.recoveryPending && reinforcement.recoveryPending.callId !== String(call.id)) {
+  const productive = typeof call.countsAsProductive === 'boolean'
+    ? call.countsAsProductive : String(call.billable).toLowerCase() === 'yes';
+  if (productive && reinforcement.recoveryPending && reinforcement.recoveryPending.callId !== String(call.id)) {
     const previous = reinforcement.recoveryPending;
     const pendingDay = callDateKeyFromValue(previous.dayKey);
     const candidateDay = callDateKeyFromValue(dayKey);
@@ -215,9 +219,12 @@ function evaluateCallRewards(call, dayKey, { silent = false } = {}) {
 
   if (!silent && earned.length) {
     const first = earned[0];
-    toast(`${first.icon} Premio disponible para tu ${WINDOW_LABELS[first.window]}: ${first.name}${earned.length > 1 ? ` · +${earned.length - 1} más` : ''}`);
+    notifyReinforcement(reinforcementText('reward-earned', {
+      icon: first.icon, window: WINDOW_LABELS[first.window], name: first.name,
+      extra: earned.length > 1 ? ` · +${earned.length - 1} más` : '',
+    }, call.id), { channel: 'personal' });
   } else if (!silent && recovered) {
-    toast('🛡️ Volviste a tomar otra llamada: recuperación lograda');
+    notifyReinforcement(reinforcementText('recovery', {}, call.id), { channel: 'personal' });
   }
   return earned;
 }
@@ -251,6 +258,7 @@ function currentPositiveDayKey() {
 
 export function onPositiveCallSaved(call, source, dayKey) {
   if (!reinforcementEnabled() || !call?.id) return;
+  if (String(call.dropped).toLowerCase() === 'yes') return;
   const normalizedDay = callDateKeyFromValue(dayKey) || callDateKeyFromValue(call.callDate) || currentPositiveDayKey();
   const endTime = new Date(call.endISO).getTime();
   if (normalizedDay !== currentPositiveDayKey() || !Number.isFinite(endTime) || endTime > Date.now()) return;
@@ -258,7 +266,7 @@ export function onPositiveCallSaved(call, source, dayKey) {
   evaluateCallRewards(call, normalizedDay, { silent });
   saveStateOnly();
   renderPositiveReinforcement();
-  if (!silent && settings.reinforcement.askAfterCall && !state.game.reinforcement.reflections[call.id]) {
+  if (!silent && reinforcementFeedbackEnabled('personal') && settings.reinforcement.askAfterCall && !state.game.reinforcement.reflections[call.id]) {
     renderReflectionModal(call, normalizedDay);
   }
 }
@@ -281,16 +289,12 @@ function saveReflection(outcome) {
   if (outcome === 'difficult' || outcome === 'learning') {
     state.game.reinforcement.recoveryPending = { callId: reflectionCall.callId, dayKey: reflectionCall.dayKey, endISO: reflectionCall.endISO };
   }
-  const message = outcome === 'good'
-    ? 'Cierre positivo guardado · esta llamada cuenta'
-    : outcome === 'difficult'
-      ? 'La tomaste aunque fue difícil · la próxima será una recuperación'
-      : 'Aprendizaje guardado · una llamada no define tu capacidad';
+  const message = reinforcementText(`reflection-${outcome}`, {}, reflectionCall.callId);
   reflectionCall = null;
   saveStateOnly();
   closeModal('positiveReflectionModal');
   renderPositiveReinforcement();
-  toast(message);
+  notifyReinforcement(message, { channel: 'personal' });
 }
 
 function budgetUsedThisWeek() {
@@ -341,10 +345,10 @@ function renderClaimWindow(windowName) {
   return true;
 }
 
-export function onPositiveRewardWindow(windowName) {
-  if (!reinforcementEnabled() || !WINDOWS.has(windowName) || currentRewardWindow() !== windowName || !availableForWindow(windowName).length) return false;
+export function onPositiveRewardWindow(windowName, { manual = false } = {}) {
+  if (!reinforcementEnabled() || (!manual && !reinforcementFeedbackEnabled('personal')) || !WINDOWS.has(windowName) || currentRewardWindow() !== windowName || !availableForWindow(windowName).length) return false;
   if (windowName === 'shift-end' && document.getElementById('stageClearModal')?.classList.contains('open')) {
-    deferredWindow = windowName;
+    deferredWindow = { windowName, manual };
     return true;
   }
   if (!renderClaimWindow(windowName)) return false;
@@ -358,7 +362,7 @@ function openPendingRewardsNow() {
     toast('Tus premios esperan al próximo Break, Lunch o fin del turno.');
     return;
   }
-  if (!onPositiveRewardWindow(windowName)) toast('No hay premios para esta pausa; los demás siguen guardados.');
+  if (!onPositiveRewardWindow(windowName, { manual: true })) toast('No hay premios para esta pausa; los demás siguen guardados.');
 }
 
 function claimReward(id) {
@@ -379,7 +383,7 @@ function claimReward(id) {
   const remaining = availableForWindow(item.window);
   if (remaining.length) renderClaimWindow(item.window);
   else closeModal('physicalRewardClaimModal');
-  toast(`${item.icon} Premio realizado: ${item.name}`);
+  notifyReinforcement(reinforcementText('reward-claimed', { icon: item.icon, name: item.name }, item.id), { channel: 'personal' });
 }
 
 function swapReward(id) {
@@ -648,9 +652,9 @@ export function initPositiveReinforcement() {
   document.addEventListener('app:modal-closed', (event) => {
     if (event.detail?.id === 'positiveReflectionModal') reflectionCall = null;
     if (event.detail?.id === 'stageClearModal' && deferredWindow) {
-      const windowName = deferredWindow;
+      const { windowName, manual } = deferredWindow;
       deferredWindow = null;
-      setTimeout(() => onPositiveRewardWindow(windowName), 0);
+      setTimeout(() => onPositiveRewardWindow(windowName, { manual }), 0);
     }
   });
   renderPositiveReinforcement();

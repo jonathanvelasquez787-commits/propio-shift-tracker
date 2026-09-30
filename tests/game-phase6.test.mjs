@@ -84,8 +84,8 @@ test('Logros agrupa los ajustes, conserva el enfoque diario y admite nombre pers
   assert.match(gameEditor, /id="gameEnabledInput"/);
   assert.match(gameEditor, /id="monsterNameInput"[^>]*maxlength="60"/);
   assert.match(gameEditor, /id="monsterNameSaveBtn"/);
-  assert.equal((gameEditor.match(/<option\b/g) || []).length, 2);
-  assert.doesNotMatch(gameEditor, /<option\s+value="off"/);
+  assert.equal((gameEditor.match(/<option\b/g) || []).length, 3);
+  assert.match(gameEditor, /<option\s+value="off"/);
   for (const id of [
     'gameEnabledInput', 'gameIntensityInput', 'gameSettingsProfile', 'positiveReinforcementEnabledInput',
     'positiveAskAfterCallInput', 'positiveWeeklyBudgetInput', 'physicalRewardSelected', 'physicalRewardCatalog',
@@ -106,7 +106,7 @@ test('Logros agrupa los ajustes, conserva el enfoque diario y admite nombre pers
   assert.equal(sanitize('  Ogre\u0001<script>  '), 'Ogre<script>');
   assert.equal(sanitize('😀'.repeat(70)), '😀'.repeat(60));
   assert.equal(sanitize({ name: 'no' }), '');
-  assert.match(game, /settings\.game\.intensity === 'off'\) settings\.game\.enabled = false/);
+  assert.doesNotMatch(game, /intensity === 'off'\) settings\.game\.enabled = false/);
   assert.match(game, /config\.monsterName = name/);
   assert.match(game, /saveSettingsOnly\(\);[\s\S]*renderGame\(\);/);
   assert.match(game, /monsterNameInput'\)\?\.addEventListener\('input'/);
@@ -125,7 +125,7 @@ test('state y settings conservan defaults y normalización de Fase 6', () => {
   assert.match(game, /live: \{ dayKey: null, combo: 0, shiftAlarmAt: null \}/);
   assert.match(game, /export function normalizeGameState\(raw\)/);
   assert.match(game, /shields: boundedGameNumber\(source\.shields, GAME_SHIELD_CAP, true\)/);
-  assert.match(game, /if \(settings\.game\.intensity === 'off'\) settings\.game\.enabled = false/);
+  assert.doesNotMatch(game, /intensity === 'off'\) settings\.game\.enabled = false/);
   assert.match(appMain, /game: createDefaultGameState\(\)/);
   assert.match(appMain, /game: normalizeGameState\(src\.game\)/);
   assert.match(appMain, /game: \{ enabled: false, intensity: 'arcade' \}/);
@@ -255,7 +255,7 @@ test('el hook real conserva el botín XP de la quinta llamada al reconciliar y r
       };
       callRows.push(call);
       setAppCalls(callRows);
-      onGameCallSaved(call, 'manual');
+      onGameCallSaved(call, 'manual', { random: () => 0.99 });
     }
     return keyFor();
   };
@@ -553,7 +553,7 @@ test('pendientes finales de Phase 6 quedan conectados a comportamiento real', ()
   const game = read('js/game.js');
   const css = read('css/game.css');
 
-  assert.match(game, /if \(!arcadeEnabled\(\)\) \{[\s\S]*game-live-xp-float/);
+  assert.match(game, /if \(!arcadeEnabled\(\) \|\| window\.matchMedia[\s\S]*game-live-xp-float/);
   assert.match(game, /triggerGameEvent\('gameArena', 'clear'/);
   assert.match(game, /classList\.toggle\('is-revealing', arcadeEnabled\(\)\)/);
   assert.match(css, /game-arena--arcade\[data-game-event="clear"\]/);

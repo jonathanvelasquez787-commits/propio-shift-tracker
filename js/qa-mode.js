@@ -1,5 +1,6 @@
 import {
   createQaWalkthroughCall,
+  createQaReinforcementCall,
   QA_WALKTHROUGH_CALL_DURATION_MIN,
   QA_WALKTHROUGH_CALL_RATE,
   QA_WALKTHROUGH_TOTAL_CALLS,
@@ -91,7 +92,7 @@ function gameFixture(now, scenario, activeDayKey = localDay(now)) {
   const days = {};
   for (let offset = -5; offset < 0; offset++) {
     const key = localDay(dayAt(now, offset));
-    if (scenario === 'tour' && key === activeDayKey) continue;
+    if (['tour', 'reinforcement'].includes(scenario) && key === activeDayKey) continue;
     days[key] = finalizedDay(key, offset + 5);
   }
   const game = {
@@ -107,7 +108,7 @@ function gameFixture(now, scenario, activeDayKey = localDay(now)) {
     equipment: { head: 'Corona del ciclo', neck: 'Bufanda de racha', back: null, body: 'Armadura cian', face: null },
     days,
     ledger: {},
-    live: { dayKey: today, combo: scenario === 'tour' ? 0 : scenario === 'near-win' ? 7 : 5, shiftAlarmAt: null },
+    live: { dayKey: today, combo: ['tour', 'reinforcement'].includes(scenario) ? 0 : scenario === 'near-win' ? 7 : 5, shiftAlarmAt: null },
   };
   if (scenario === 'rewards') {
     game.chest = { pending: true, sealedOn: localDay(dayAt(now, -1)) };
@@ -133,6 +134,7 @@ export const QA_TOUR_REWARDS = Object.freeze([
 
 export const QA_SCENARIOS = Object.freeze([
   { id: 'tour', label: 'Recorrido guiado' },
+  { id: 'reinforcement', label: 'Refuerzo completo' },
   { id: 'near-win', label: 'Victoria próxima' },
   { id: 'rewards', label: 'Cofres y recompensas' },
 ]);
@@ -141,15 +143,16 @@ export function createQaSnapshot(source, scenario = 'tour', now = new Date()) {
   const selected = QA_SCENARIOS.some((item) => item.id === scenario) ? scenario : 'tour';
   const allCalls = sampleCalls(now, 6, 5);
   const today = localDay(now);
-  const tourAnchor = selected === 'tour'
-    ? createQaWalkthroughCall({ ordinal: 1, dayKey: today, now, totalCalls: QA_WALKTHROUGH_TOTAL_CALLS })
+  const guided = ['tour', 'reinforcement'].includes(selected);
+  const tourAnchor = guided
+    ? (selected === 'reinforcement' ? createQaReinforcementCall : createQaWalkthroughCall)({ ordinal: 1, dayKey: today, now, totalCalls: QA_WALKTHROUGH_TOTAL_CALLS })
     : null;
   const firstTourCallStart = tourAnchor ? new Date(tourAnchor.startISO).getTime() : Number.NaN;
   const shiftStartedAt = Number.isFinite(firstTourCallStart) ? new Date(firstTourCallStart - 60000).toISOString() : null;
   const accountingDayKey = shiftStartedAt ? localDay(new Date(shiftStartedAt)) : today;
   const calls = selected === 'near-win'
     ? allCalls.slice(0, -3)
-    : selected === 'tour'
+    : guided
       ? allCalls.filter((call) => call.callDate !== accountingDayKey)
       : allCalls;
   const inheritedState = selected === 'tour' ? {} : (source.state || {});
@@ -161,7 +164,7 @@ export function createQaSnapshot(source, scenario = 'tour', now = new Date()) {
     activePause: null,
     activeCall: null,
     pendingLiveCallBackup: null,
-    lastCallEndedAt: selected === 'tour' ? null : calls.at(-1)?.endISO || null,
+    lastCallEndedAt: guided ? null : calls.at(-1)?.endISO || null,
     pauseHistory: [],
     events: [],
     gapAnnotations: {},
@@ -169,16 +172,16 @@ export function createQaSnapshot(source, scenario = 'tour', now = new Date()) {
     dayInterruptions: {},
     game: gameFixture(now, selected, accountingDayKey),
     lastCalendarDay: null,
-    qaWalkthrough: selected === 'tour'
-      ? { version: 1, step: 0, completed: false, sessionId: `qa-tour-${new Date(now).getTime().toString(36)}`, nextCallOrdinal: 1, generatedCallIds: [] }
+    qaWalkthrough: guided
+      ? { version: 1, ...(selected === 'reinforcement' ? { scenario: selected } : {}), step: 0, completed: false, sessionId: `qa-${selected === 'tour' ? 'tour' : 'reinforcement'}-${new Date(now).getTime().toString(36)}`, nextCallOrdinal: 1, generatedCallIds: [] }
       : null,
-    activeDayKey: selected === 'tour' ? accountingDayKey : calls.at(-1)?.callDate || today,
+    activeDayKey: guided ? accountingDayKey : calls.at(-1)?.callDate || today,
   };
   const settings = {
     ...inheritedSettings,
     onboarded: true,
-    productiveGoalMin: selected === 'tour' ? QA_TOUR_PRODUCTIVE_GOAL_MIN : 45,
-    earningsGoal: selected === 'tour' ? QA_TOUR_EARNINGS_GOAL : 7.08,
+    productiveGoalMin: selected === 'tour' ? QA_TOUR_PRODUCTIVE_GOAL_MIN : selected === 'reinforcement' ? 48 : 45,
+    earningsGoal: selected === 'tour' ? QA_TOUR_EARNINGS_GOAL : selected === 'reinforcement' ? 10 : 7.08,
     rate: QA_WALKTHROUGH_CALL_RATE,
     weeklySchedule: qaWeeklySchedule(),
     scheduleOverridesByWeek: {},
@@ -191,5 +194,12 @@ export function createQaSnapshot(source, scenario = 'tour', now = new Date()) {
       ? { enabled: true, askAfterCall: true, weeklyBudgetUsd: 1, rewards: QA_TOUR_REWARDS.map((reward) => ({ ...reward })) }
       : { enabled: false, askAfterCall: false, weeklyBudgetUsd: 0, rewards: [] },
   };
+  if (selected === 'reinforcement') {
+    settings.higherRateWindows = [];
+    settings.reinforcement = { enabled: true, askAfterCall: false, weeklyBudgetUsd: 0, rewards: [] };
+    settings.weeklySchedule = Object.fromEntries(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map((key) => [key, {
+      off: false, start: '00:00', end: '23:59', blocks: [{ type: 'work', start: '00:00', dur: 1440, goalMin: 48 }],
+    }]));
+  }
   return { state, calls, settings };
 }

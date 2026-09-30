@@ -151,6 +151,9 @@ import {
   normalizeGameState,
   onGameBackupExported,
   onGameCallSaved,
+  onGameMonetaryProgress,
+  migrateGameCallReferences,
+  checkReinforcementInactivity,
   onGameCallsChanged,
   onGameDayRollover,
   onGameDayReset,
@@ -4041,7 +4044,7 @@ function renderPayDatesSection() {
     function endShift() {
       if (!state.shiftStartedAt || state.shiftEndedAt) return;
       const shiftDayKey = todayCallDateKey(new Date(state.shiftStartedAt));
-      if (state.activePause) endPause({ silent: true, deferSave: true });
+      if (state.activePause) endPause({ silent: true, deferSave: true, forShiftEnd: true });
       const now = new Date().toISOString();
       state.shiftEndedAt = now;
       setEvent('shift', 'Shift terminado', fmtTime(new Date(now)), 'manual');
@@ -4077,6 +4080,7 @@ function renderPayDatesSection() {
             continuationEventId: continuationEvent?.id || null,
           };
           saveAll();
+          onGamePauseStarted(type);
           stopBreakStartAlarm();
           toast(`${pretty} continuado — interrupción de ${formatMinutes(gapMin)} min registrada`);
           return;
@@ -4099,6 +4103,7 @@ function renderPayDatesSection() {
       const now = new Date().toISOString();
       const endedPause = { ...state.activePause };
       const shiftDayKey = callDateKeyFromValue(endedPause.shiftDayKey) || currentShiftAccountingDayKey(new Date(endedPause.startedAt));
+      const plannedSlot = findPlannedSlotForActivePause(shiftDayKey);
       const pauseRecord = { id: makeLocalId(), type: endedPause.type, startedAt: endedPause.startedAt, endedAt: now, shiftDayKey };
       state.pauseHistory.push(pauseRecord);
       const pauseEndEvent = setEvent(endedPause.type, `${endedPause.type === 'lunch' ? 'Lunch' : 'Break'} terminado`, fmtTime(new Date(now)), 'manual');
@@ -4109,7 +4114,20 @@ function renderPayDatesSection() {
       if (deferSave) saveStateOnly();
       else saveAll();
       if (!silent) toast('Regresaste');
-      onGamePauseEnded();
+      let onTime = false;
+      if (plannedSlot && !options.forShiftEnd) {
+        const base = callDateToDate(shiftDayKey) || new Date(endedPause.startedAt);
+        const absoluteSlot = reinforcementScheduleIntervals(shiftDayKey).find((slot) => slot.type === plannedSlot.type && slot.start === plannedSlot.start && slot.end === plannedSlot.end);
+        const plannedStart = absoluteSlot ? new Date(absoluteSlot.startedAt) : dateAtTime(base, plannedSlot.start);
+        const plannedEnd = absoluteSlot ? new Date(absoluteSlot.endedAt) : dateAtTime(base, plannedSlot.end);
+        const actual = pauseForSlot(plannedSlot, shiftDayKey) || pauseRecord;
+        const startDelta = (new Date(actual.startedAt).getTime() - plannedStart.getTime()) / 60000;
+        const duration = Number.isFinite(Number(actual.effectiveDurationMin)) ? Number(actual.effectiveDurationMin)
+          : (new Date(actual.endedAt || now).getTime() - new Date(actual.startedAt).getTime()) / 60000;
+        const durationDelta = duration - (plannedEnd.getTime() - plannedStart.getTime()) / 60000;
+        onTime = Math.abs(startDelta) <= ADHERENCE_TOLERANCE_MIN && Math.abs(durationDelta) <= ADHERENCE_TOLERANCE_MIN;
+      }
+      onGamePauseEnded(pauseRecord, { onTime });
       return {
         pause: endedPause,
         pauseHistoryId: pauseRecord.id,
@@ -4671,7 +4689,10 @@ function renderPayDatesSection() {
 
       const importedDates = new Set();
       importedRows.forEach(item => {
-        if (item.replacementKind === 'live') migratePositiveCallIdReferences(item.replaces?.id, item.call.id, item.call.endISO);
+        if (item.replacementKind === 'live') {
+          migratePositiveCallIdReferences(item.replaces?.id, item.call.id, item.call.endISO);
+          migrateGameCallReferences(item.replaces?.id, item.call.id);
+        }
         setAppCalls([...calls, item.call].sort((a, b) => new Date(a.startISO) - new Date(b.startISO)));
         const dayKey = callDateKeyFromValue(item.call.callDate);
         if (dayKey) importedDates.add(dayKey);
@@ -5072,6 +5093,26 @@ function renderPayDatesSection() {
       }));
     }
 
+    function reinforcementScheduleIntervals(dayKey) {
+      const base = callDateToDate(dayKey);
+      if (!base) return [];
+      const config = dayConfigFor(dayKey);
+      const plannedAnchor = toMinutes(formatHHMM(config?.start));
+      const actualStart = settings.lateArrivalMode === 'shift' ? dayShiftBounds(dayKey).start : null;
+      const anchor = actualStart ? Math.max(plannedAnchor, actualStart.getHours() * 60 + actualStart.getMinutes()) : plannedAnchor;
+      let previousStart = base.getTime();
+      const slots = [...getEffectiveScheduleForDay(dayKey)].sort((a, b) => ((toMinutes(a.start) - anchor + 1440) % 1440) - ((toMinutes(b.start) - anchor + 1440) % 1440));
+      return slots.map((slot) => {
+        const start = dateAtTime(base, slot.start);
+        if (toMinutes(slot.start) < anchor) start.setDate(start.getDate() + 1);
+        while (start.getTime() < previousStart) start.setDate(start.getDate() + 1);
+        const end = dateAtTime(base, slot.end);
+        while (end.getTime() <= start.getTime()) end.setDate(end.getDate() + 1);
+        previousStart = start.getTime();
+        return { ...slot, startedAt: start.toISOString(), endedAt: end.toISOString() };
+      });
+    }
+
     export function setScheduleEditDay(value) { setContextScheduleEditDay(value); }
     export function setScheduleOffsetMin(value) { setContextScheduleOffsetMin(value); }
     // BUG-013 (QA ) — Pedido del usuario: el stepper "Ajustar turno completo" no tenía límite superior/inferior — hacer click muchas veces en "+" (o "-") podía acumular un offset enorme (ej. +30h) sin ningún aviso.
@@ -5136,6 +5177,9 @@ function renderPayDatesSection() {
       financeRowIsMeta, formatCallDayLabel, formatMinutes, higherRateBonusForCall, higherRateLiveStatus,
       importedCallStats, money, openModal, parseMoney, productiveMinutesForDay, saveSettingsOnly,
       saveStateOnly, todayCallDateKey, toast, weekdayKeyForDayKey,
+      getReinforcementWorkIntervals: (dayKey) => {
+        return reinforcementScheduleIntervals(dayKey).filter((slot) => String(slot.type).toLowerCase() === 'work');
+      },
     });
     configurePositiveReinforcementContext({
       callDateKeyFromValue, callsForDay, closeModal, convertedAmountText, effectiveDailyGoal,
@@ -5665,6 +5709,18 @@ function renderHeader() {
   const goalMin = dayGoal.min;
   const goalUsd = dayGoal.usd;
   const goalPct = goalUsd > 0 ? Math.min(100, (stats.earnings / goalUsd) * 100) : 0;
+  const milestoneProgress = onGameMonetaryProgress(dayKey, stats.earnings, goalUsd, { silent: true, record: false });
+  const milestoneRow = document.getElementById('earningsMilestoneMarkers');
+  if (milestoneRow) {
+    milestoneRow.hidden = !(goalUsd > 0);
+    milestoneRow.innerHTML = [25, 50, 75, 100].map((pct) => `<span class="gh-goal-subitem" aria-label="${pct}%${milestoneProgress.claimed.includes(pct) ? ', hito registrado' : ''}">${milestoneProgress.claimed.includes(pct) ? '✓ ' : ''}${pct}%</span>`).join('');
+  }
+  const nextMilestone = document.getElementById('earningsNextMilestone');
+  if (nextMilestone) {
+    nextMilestone.hidden = !(goalUsd > 0);
+    const next = milestoneProgress.next;
+    nextMilestone.textContent = next ? `Próximo hito: ${next.pct}% · te faltan ${money(next.remaining)}${convertedAmountText(next.remaining) ? ` (${convertedAmountText(next.remaining)})` : ''}` : '100% de tu meta diaria alcanzado';
+  }
   // Si aplica un bono de Higher Rate en las llamadas de hoy, lograr la meta debería tomar MENOS
   // minutos.
   const rateForGoal = Number(settings.rate) > 0 ? Number(settings.rate) : RATE;
@@ -7446,7 +7502,7 @@ export function render() {
     }
 
     function qaTourIsActive() {
-      return isQaModeActive() && readQaSession()?.scenario === 'tour';
+      return isQaModeActive() && ['tour', 'reinforcement'].includes(readQaSession()?.scenario);
     }
 
     function clearQaTransientUI() {
@@ -7507,12 +7563,21 @@ export function render() {
         getSettings: () => settings,
         isActive: qaTourIsActive,
         saveState: saveStateOnly,
-        addCall: (call, source) => {
+        saveSettings: () => qaTourIsActive() && saveSettingsOnly(),
+        checkInactivity: (now) => qaTourIsActive() && checkReinforcementInactivity(now),
+        setIntensity: (value) => {
+          if (!qaTourIsActive() || !['arcade', 'subtle', 'off'].includes(value)) return;
+          settings.game.intensity = value;
+          settings.game.enabled = true;
+          saveSettingsOnly();
+          renderGame();
+        },
+        addCall: (call, source, { surpriseRandom } = {}) => {
           if (!qaTourIsActive() || !call?.id || calls.some((item) => String(item?.id) === String(call.id))) return false;
           setAppCalls([...calls, call]);
           state.lastCallEndedAt = call.endISO;
           saveAll();
-          onGameCallSaved(call, source);
+          onGameCallSaved(call, source, readQaSession()?.scenario === 'reinforcement' ? { random: () => surpriseRandom ?? 0.99 } : {});
           render();
           return true;
         },
@@ -7533,7 +7598,8 @@ export function render() {
         restart: () => {
           if (!qaTourIsActive()) return;
           clearQaTransientUI();
-          writeQaSnapshot(createQaSnapshot({ state, calls, settings }, 'tour'), 'tour');
+          const scenario = readQaSession()?.scenario || 'tour';
+          writeQaSnapshot(createQaSnapshot({ state, calls, settings }, scenario), scenario);
           window.location.reload();
         },
         hasOpenModal: () => !!document.querySelector('.modal-overlay.open'),
@@ -7678,6 +7744,7 @@ export function render() {
       renderHigherRateLiveCard();
       refreshHigherRateWindowsIfNeeded();
       renderGameLive();
+      checkReinforcementInactivity();
     }, 1000);
     render();
     restorePendingLiveCallBackup();

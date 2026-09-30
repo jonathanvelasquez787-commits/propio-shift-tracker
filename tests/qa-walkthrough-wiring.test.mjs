@@ -9,7 +9,7 @@ const appMain = fs.readFileSync(path.join(root, 'js/app-main.js'), 'utf8');
 
 test('QA guided tour binds only to its session and guards each state-changing callback', () => {
   assert.match(appMain, /import\s*\{[\s\S]*?configureQaWalkthroughContext[\s\S]*?initQaWalkthrough[\s\S]*?renderQaWalkthrough[\s\S]*?stopQaWalkthrough[\s\S]*?\}\s*from '\.\/qa-walkthrough\.js'/);
-  assert.match(appMain, /function qaTourIsActive\(\)\s*\{\s*return isQaModeActive\(\)\s*&&\s*readQaSession\(\)\?\.scenario === 'tour';/);
+  assert.match(appMain, /function qaTourIsActive\(\)\s*\{\s*return isQaModeActive\(\)\s*&&\s*\['tour', 'reinforcement'\]\.includes\(readQaSession\(\)\?\.scenario\);/);
 
   const initAt = appMain.indexOf('function initQaMode()');
   const gameInitAt = appMain.lastIndexOf('    initGame();');
@@ -18,7 +18,10 @@ test('QA guided tour binds only to its session and guards each state-changing ca
   const initBody = appMain.slice(initAt, appMain.indexOf('\n    }', initAt) + 6);
   assert.match(initBody, /configureQaWalkthroughContext\(/);
   assert.match(initBody, /isActive:\s*qaTourIsActive/);
-  assert.match(initBody, /addCall:\s*\(call, source\) =>\s*\{\s*if \(!qaTourIsActive\(\) \|\| !call\?\.id \|\| calls\.some\(\(item\) => String\(item\?\.id\) === String\(call\.id\)\)\) return false;[\s\S]*?saveAll\(\);\s*onGameCallSaved\(call, source\);\s*render\(\);/);
+  assert.match(initBody, /addCall:\s*\(call, source, \{ surpriseRandom \} = \{\}\) =>\s*\{\s*if \(!qaTourIsActive\(\) \|\| !call\?\.id \|\| calls\.some\(\(item\) => String\(item\?\.id\) === String\(call\.id\)\)\) return false;[\s\S]*?saveAll\(\);\s*onGameCallSaved\(call, source, readQaSession\(\)\?\.scenario === 'reinforcement' \? \{ random: \(\) => surpriseRandom \?\? 0\.99 \} : \{\}\);\s*render\(\);/);
+  assert.match(initBody, /checkInactivity:\s*\(now\) => qaTourIsActive\(\) && checkReinforcementInactivity\(now\)/);
+  assert.match(initBody, /setIntensity:\s*\(value\) =>\s*\{\s*if \(!qaTourIsActive\(\) \|\| !\['arcade', 'subtle', 'off'\]\.includes\(value\)\) return;\s*settings\.game\.intensity = value;\s*settings\.game\.enabled = true;\s*saveSettingsOnly\(\);\s*renderGame\(\);/);
+  assert.match(initBody, /saveSettings:\s*\(\) => qaTourIsActive\(\) && saveSettingsOnly\(\)/);
   assert.match(initBody, /reopenReflection:\s*\(call, dayKey\) => qaTourIsActive\(\) && reopenPositiveReflection\(call, dayKey\)/);
   assert.match(initBody, /startPause:\s*\(type\) => qaTourIsActive\(\) && startPause\(type\)/);
   assert.match(initBody, /endPause:\s*\(\) => qaTourIsActive\(\) && endPause\(\)/);
@@ -48,7 +51,7 @@ test('reiniciar o salir del laboratorio limpia UI y transitorios antes de escrib
   assert.match(loadBody, /const replacingQaScenario = isQaModeActive\(\);[\s\S]*?if \(replacingQaScenario\) clearQaTransientUI\(\);\s*writeQaSnapshot\(/);
   const initBody = appMain.slice(appMain.indexOf('function initQaMode()'), appMain.indexOf('\n    }', appMain.indexOf('function initQaMode()')) + 6);
   const restartBody = initBody.slice(initBody.indexOf('restart: () =>'));
-  assert.match(restartBody, /clearQaTransientUI\(\);[\s\S]*?writeQaSnapshot\(createQaSnapshot\(\{ state, calls, settings \}, 'tour'\), 'tour'\);[\s\S]*?window\.location\.reload\(\)/);
+  assert.match(restartBody, /clearQaTransientUI\(\);\s*const scenario = readQaSession\(\)\?\.scenario \|\| 'tour';\s*writeQaSnapshot\(createQaSnapshot\(\{ state, calls, settings \}, scenario\), scenario\);\s*window\.location\.reload\(\)/);
 });
 
 test('render de controles QA repinta el panel informativo sin engancharlo a cada render global', () => {
