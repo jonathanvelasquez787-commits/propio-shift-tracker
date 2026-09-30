@@ -126,6 +126,63 @@ function harness(t, { at = new Date(2026, 8, 29, 12).getTime(), goal = 10000, st
   };
 }
 
+test('pegar ayer derrota su monstruo y cambiar el día no daña al monstruo actual ni concede XP histórico', (t) => {
+  const h = harness(t, { surface: true, goal: 10 });
+  const today = h.keyFor();
+  onGameCallSaved(h.add('today', { pay: 1 }), 'manual', { random: () => 0.99 });
+  const combo = h.state.game.live.combo;
+  h.nodes.get('gameArena').dataset.gameEvent = 'hit';
+  const yesterday = h.keyFor(new Date(h.now - 86400000));
+  const call = h.add('yesterday', { pay: 11, callDate: yesterday, shiftDayKey: yesterday, startISO: h.iso(h.now - 86400000), endISO: h.iso(h.now - 86340000), importedAt: h.iso(h.now) });
+  onGameCallSaved(call, 'import');
+  onGameCallsChanged(yesterday);
+  h.state.activeDayKey = yesterday;
+  renderGame();
+  assert.equal(computeGameDay(yesterday).hpPct, 0);
+  assert.equal(computeGameDay(yesterday).xp, 0);
+  assert.equal(h.state.game.totalXp, 0);
+  assert.equal(h.state.game.live.combo, combo);
+  assert.equal(h.state.game.ledger[`monster-defeat:${yesterday}`], true);
+  assert.equal(h.nodes.get('gameArena').dataset.gameDayKey, yesterday);
+  assert.equal(h.nodes.get('gameArena').dataset.gameState, 'defeated');
+  assert.equal(h.nodes.get('gameArena').dataset.gameEvent, undefined);
+  h.reload();
+  const notices = h.announcements.length;
+  onGameCallsChanged(yesterday);
+  assert.equal(h.announcements.length, notices);
+  h.state.activeDayKey = today;
+  renderGame();
+  assert.equal(h.nodes.get('gameArena').dataset.gameDayKey, today);
+  assert.equal(computeGameDay(today).hpPct, 90);
+  assert.equal(h.state.game.live.combo, combo);
+});
+
+test('corregir un día cerrado derrota su monstruo sin reabrir XP y retirar dinero revoca esa derrota', (t) => {
+  const h = harness(t, { surface: true, goal: 10 });
+  const call = h.add('original', { pay: 5 });
+  onGameCallSaved(call, 'manual', { random: () => 0.99 });
+  const day = call.shiftDayKey;
+  h.state.shiftEndedAt = h.iso(h.now);
+  onGameShiftEnded(day);
+  const lockedXp = h.state.game.days[day].xp;
+  const totalXp = h.state.game.totalXp;
+  h.advance(86400000);
+  const correction = h.add('late-official', { pay: 6, callDate: day, shiftDayKey: day, startISO: h.iso(h.now - 86200000), endISO: h.iso(h.now - 86140000), importedAt: h.iso(h.now) });
+  onGameCallsChanged(day);
+  assert.equal(h.state.game.days[day].monster.defeated, true);
+  assert.equal(h.state.game.days[day].monster.hpPct, 0);
+  assert.equal(h.state.game.days[day].xp, lockedXp);
+  assert.equal(h.state.game.totalXp, totalXp);
+  h.reload();
+  assert.equal(h.state.game.days[day].monster.defeated, true);
+  correction.pay = 0;
+  onGameCallsChanged(day);
+  assert.equal(h.state.game.days[day].monster.defeated, false);
+  assert.equal(h.state.game.days[day].monster.hpPct, 50);
+  assert.equal(h.state.game.ledger[`monster-defeat:${day}`], undefined);
+  assert.equal(h.state.game.totalXp, totalXp);
+});
+
 test('el combo visible reacciona a una llamada sin pago y el impacto sobrevive al render', (t) => {
   const h = harness(t, { surface: true });
   h.config.game.intensity = 'arcade';

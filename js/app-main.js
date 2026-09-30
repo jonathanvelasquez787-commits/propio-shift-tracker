@@ -7593,7 +7593,14 @@ export function render() {
           const target = targetId ? document.getElementById(targetId) : null;
           const details = target?.closest('details');
           if (details) details.open = true;
-          target?.scrollIntoView?.({ block: 'start', behavior: 'auto' });
+          const anchor = target?.matches('details') ? target.querySelector('summary') : target;
+          anchor?.scrollIntoView?.({ block: 'start', behavior: 'auto' });
+          if (anchor) window.scrollBy({ top: -96, behavior: 'auto' });
+          document.body.classList.remove('sidebar-open');
+        },
+        markTarget: (targetId) => {
+          document.querySelectorAll('[data-qa-current-target]').forEach((element) => element.removeAttribute('data-qa-current-target'));
+          if (qaTourIsActive()) document.getElementById(targetId)?.setAttribute('data-qa-current-target', 'true');
         },
         restart: () => {
           if (!qaTourIsActive()) return;
@@ -7603,6 +7610,7 @@ export function render() {
           window.location.reload();
         },
         hasOpenModal: () => !!document.querySelector('.modal-overlay.open'),
+        getOpenModalId: () => document.querySelector('.modal-overlay.open')?.id,
         notify: toast,
       });
       initQaWalkthrough();

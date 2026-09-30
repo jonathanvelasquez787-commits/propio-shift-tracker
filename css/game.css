@@ -454,11 +454,11 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 
 /* Página Logros. */
 .game-achievements-page { display: grid; gap: 10px; padding-bottom: 18px; }
-.game-achievements-today { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 10px; min-width: 0; align-items: stretch; }
-.game-achievements-today:empty { display: none; }
-.game-achievements-today > :is(.game-arena, .game-missions) { margin: 0; min-width: 0; }
-.game-achievements-today .game-mission-grid { grid-template-columns: 1fr; margin-top: 8px; gap: 6px; }
-.game-achievements-today .game-monster-stage { align-self: center; }
+.game-day-panels { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 10px; min-width: 0; align-items: stretch; }
+.game-day-panels:empty { display: none; }
+.game-day-panels > :is(.game-arena, .game-missions) { margin: 0; min-width: 0; }
+.game-day-panels .game-mission-grid { grid-template-columns: 1fr; margin-top: 8px; gap: 6px; }
+.game-day-panels .game-monster-stage { align-self: center; }
 .game-achievements-hero,
 .game-panel { border: 1px solid var(--card-line); border-radius: var(--radius); background: var(--panel-navy); box-shadow: var(--shadow); }
 .game-achievements-hero { padding: 14px; background: radial-gradient(circle at 88% 10%, rgba(var(--rpt-purple-rgb), .16), transparent 35%), var(--panel-navy); }
@@ -475,12 +475,12 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 .game-summary-stat span { color: var(--muted-3); font-size: 9px; font-weight: 950; letter-spacing: .08em; text-transform: uppercase; }
 .game-summary-stat strong { color: var(--text); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 15px; overflow-wrap: anywhere; }
 .game-achievements-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-.game-achievements-grid-top { align-items: stretch; }
+.game-achievements-grid-top { align-items: start; }
 .game-achievements-grid-collection { align-items: start; }
 .game-achievements-grid-bottom { align-items: stretch; }
-.game-panel { padding: 14px; overflow: hidden; }
+.game-panel { padding: 11px; overflow: hidden; }
 .game-panel-head { align-items: start; }
-.game-panel-head h2 { font-size: 18px; }
+.game-panel-head h2 { font-size: 15px; }
 .game-panel-head-icon { width: 20px; height: 20px; color: var(--tier-gold); }
 .game-panel-badge { flex: 0 0 auto; padding: 5px 8px; border: 1px solid var(--line); border-radius: 8px; color: var(--muted); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 10px; font-weight: 900; }
 .game-streak-week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; margin-top: 18px; }
@@ -596,9 +596,9 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 .game-settings-danger { margin-top: 2px; }
 .game-settings-danger .danger-card-desc { max-width: 58ch; }
 
-.game-settings-disclosures { display: grid; gap: 10px; min-width: 0; }
+.game-settings-disclosures { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; gap: 8px; min-width: 0; }
 .game-settings-accordion { padding: 0; }
-.game-settings-accordion > summary { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: clamp(13px, 2.4vw, 18px); list-style: none; cursor: pointer; }
+.game-settings-accordion > summary { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 11px; list-style: none; cursor: pointer; }
 .game-settings-accordion > summary::-webkit-details-marker { display: none; }
 .game-settings-accordion-summary:focus-visible { outline: 2px solid var(--cyan); outline-offset: -3px; border-radius: inherit; }
 .game-settings-accordion-copy { display: grid; gap: 4px; min-width: 0; }
@@ -608,7 +608,7 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 .game-settings-accordion-chevron .ic-svg { width: 16px; height: 16px; }
 .game-settings-accordion[open] > summary { border-bottom: 1px solid var(--line); }
 .game-settings-accordion[open] .game-settings-accordion-chevron { transform: rotate(180deg); color: var(--text); background: rgba(var(--cyan-rgb), .1); }
-.game-settings-accordion-body { min-width: 0; padding: 14px clamp(12px, 2.4vw, 18px) clamp(14px, 2.4vw, 18px); }
+.game-settings-accordion-body { min-width: 0; padding: 10px 11px; }
 .game-settings-accordion-body > .game-settings-section,
 .game-settings-accordion-body > .positive-settings-section { min-width: 0; }
 .game-monster-name-setting { display: grid; gap: 6px; min-width: 0; }
@@ -633,8 +633,8 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 .qa-mode-banner:has(.qa-walkthrough-panel:not([hidden])) { display: grid; justify-items: stretch; align-items: stretch; width: min(620px, calc(100vw - 24px)); max-height: min(44dvh, 360px); overflow-y: auto; }
 .qa-mode-banner:has(.qa-walkthrough-panel:not([hidden])) .storage-conflict-banner-icon { justify-self: start; }
 .qa-mode-banner:has(.qa-walkthrough-panel:not([hidden])) .storage-conflict-banner-text { flex: none; width: 100%; }
-body:has(#qaModeBanner.show) #pageAchievements { padding-bottom: calc(86px + 132px + 16px); }
-body:has(#qaModeBanner.show .qa-walkthrough-panel:not([hidden])) #pageAchievements { padding-bottom: calc(86px + min(44dvh, 360px) + 16px); }
+body:has(#qaModeBanner.show) .app-page { padding-bottom: calc(86px + 132px + 16px); }
+body:has(#qaModeBanner.show .qa-walkthrough-panel:not([hidden])) .app-page { padding-bottom: calc(86px + min(44dvh, 360px) + 16px); }
 .qa-walkthrough-panel[hidden] { display: none !important; }
 .qa-walkthrough-panel { display: grid; flex: 1 1 100%; gap: 7px; width: 100%; padding: 13px; overflow: visible; text-align: left; }
 .qa-walkthrough-progress { color: var(--cyan); font-family: var(--font-mono); font-size: 10px; font-weight: 900; }
@@ -646,6 +646,8 @@ body:has(#qaModeBanner.show .qa-walkthrough-panel:not([hidden])) #pageAchievemen
 .qa-walkthrough-actions button { min-height: 34px; padding: 7px 10px; border-radius: 9px; cursor: pointer; font: inherit; font-size: 10.5px; font-weight: 850; }
 .qa-walkthrough-restart-btn { border: 1px solid var(--line); background: transparent; color: var(--muted); }
 .qa-walkthrough-actions button:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+[data-qa-current-target]:not(.modal-overlay),
+.modal-overlay[data-qa-current-target] .modal-card { outline: 2px solid var(--cyan); outline-offset: 3px; }
 
 /* STAGE CLEAR y cofre. Los efectos visuales fuertes solo se habilitan con .game-arcade. */
 .game-modal-card { width: min(620px, 100%); border-color: rgba(var(--rpt-purple-rgb), .48); }
@@ -693,12 +695,13 @@ body:has(#qaModeBanner.show .qa-walkthrough-panel:not([hidden])) #pageAchievemen
 @keyframes game-modal-pop { 0% { transform: scale(.96); opacity: .5; } 55% { transform: scale(1.04); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
 
 @media (max-width: 1000px) {
-  .game-achievements-today { grid-template-columns: 1fr; }
-  .game-achievements-today .game-mission-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .game-settings-disclosures { grid-template-columns: 1fr; }
+  .game-day-panels { grid-template-columns: 1fr; }
+  .game-day-panels .game-mission-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 @media (max-width: 760px) {
-  .game-achievements-today .game-mission-grid { grid-template-columns: 1fr; }
+  .game-day-panels .game-mission-grid { grid-template-columns: 1fr; }
   .game-achievements-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .game-mission-list { grid-template-columns: 1fr; }
   .game-mission-grid { grid-template-columns: 1fr; }
@@ -986,7 +989,7 @@ body:has(#qaModeBanner.show .qa-walkthrough-panel:not([hidden])) #pageAchievemen
 .game-mission-reward strong { color: var(--text); }
 
 .game-equipment-panel { display: grid; gap: 0; }
-.game-equipment-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px; margin-top: 13px; }
+.game-equipment-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 8px; margin-top: 13px; }
 .game-equipment-item { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 9px; min-width: 0; padding: 9px 10px; border: 1px solid rgba(var(--cyan-rgb), .34); border-radius: 11px; background: rgba(var(--cyan-rgb), .055); }
 .game-equipment-icon { display: grid; place-items: center; width: 30px; height: 30px; border: 1px solid rgba(var(--cyan-rgb), .42); border-radius: 8px; color: var(--cyan); font-family: var(--font-mono); font-weight: 950; }
 .game-equipment-copy { display: grid; gap: 3px; min-width: 0; }
@@ -1021,7 +1024,7 @@ body:has(#qaModeBanner.show .qa-walkthrough-panel:not([hidden])) #pageAchievemen
 .game-equipment-item[data-equipment-state="locked"] .game-equipment-state { color: var(--muted-3); }
 .game-equipment-panel > .game-collection-empty { margin: 10px 0 0; padding: 0; text-align: left; }
 
-.game-unlock-roadmap { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 8px; }
+.game-unlock-roadmap { display: grid; grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); gap: 8px; }
 .game-unlock-roadmap > *,
 .game-unlock-step { display: grid; gap: 4px; min-width: 0; padding: 9px 10px; border: 1px solid var(--line); border-radius: 10px; background: rgba(var(--rpt-purple-rgb), .045); }
 .game-unlock-roadmap strong,
@@ -1105,6 +1108,8 @@ body:has(#qaModeBanner.show .qa-walkthrough-panel:not([hidden])) #pageAchievemen
   .game-equipment-grid,
   .game-unlock-roadmap,
   .game-cycle-choice { grid-template-columns: 1fr; }
+  .game-equipment-grid,
+  .game-unlock-roadmap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .game-equipment-item { grid-template-columns: auto minmax(0, 1fr); }
   .game-equipment-state { grid-column: 2; justify-self: start; }
   .game-record-row,

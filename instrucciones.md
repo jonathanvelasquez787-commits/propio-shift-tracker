@@ -170,6 +170,121 @@ por minuto (`$0.12/min`, `Gold +$0.03`) — son tasas, no montos ganados.
 
 ---
 
+**PROTOCOLO DE AUDITORÍA PROFUNDA (SOLO BAJO COMANDO EXPLÍCITO)**
+
+Este protocolo unifica las auditorías funcionales, estructurales y de uso real
+de toda la app. Es deliberadamente costoso y NO forma parte del QA normal de
+cada cambio.
+
+**ACTIVACIÓN ESTRICTA**
+- Ejecutar este protocolo completo **solo** cuando el usuario escriba
+  explícitamente la frase exacta `haz una auditoria profunda`.
+- Se puede ignorar únicamente mayúsculas/minúsculas y puntuación alrededor de
+  la frase. No se activa por sinónimos ni por frases parecidas.
+- Pedidos como "revisa este bug", "haz QA", "prueba estos botones", "revisa
+  Higher Rate", "comprueba que funcione", "testea la app" o "corrige todo lo
+  de esta feature" NO activan la Auditoría Profunda por sí solos: en esos
+  casos se trabaja únicamente el alcance pedido por el usuario.
+- Nunca convertir automáticamente un fix normal en esta auditoría completa.
+
+**QUÉ SIGNIFICA "HAZ UNA AUDITORIA PROFUNDA"**
+
+Cuando se active, hacer UNA sola auditoría integral que combine todo lo
+siguiente, sin esperar que el usuario vuelva a describir estas reglas:
+
+1. **Simulación realista de uso durante al menos un mes**
+   - Usar la app como lo haría un usuario normal durante muchos días, no como
+     una colección de pruebas aisladas.
+   - Iniciar/finalizar turnos, entrar temprano, tarde y a tiempo; trabajar
+     antes y después del horario planeado.
+   - Iniciar/terminar llamadas live.
+   - Agregar llamadas manuales.
+   - Pegar/importar llamadas y probar importaciones normales, tardías,
+     históricas, duplicadas, solapadas y corregidas.
+   - Tomar llamadas antes del turno, después del turno, durante Break y
+     durante Lunch.
+   - Iniciar, terminar, continuar y descartar Break/Lunch; probar pausas
+     accidentales y llamadas que interrumpen pausas.
+   - Editar llamadas pasadas, borrar llamadas individuales y borrar todas las
+     llamadas de un día.
+   - Editar horarios, bloques, metas, Higher Rate, Finanzas, Avisos, Ajustes,
+     Calendario, Reportes, Gamificación y cualquier otro estado editable.
+   - Refrescar/reabrir la app en puntos importantes para comprobar que lo
+     guardado persiste y que no aparecen estados fantasma.
+   - Probar días libres, turnos sin llamadas, múltiples sesiones el mismo día,
+     cruces de medianoche cuando apliquen y cualquier escenario extremo que
+     pueda surgir de combinar funciones.
+   - Pensar activamente en usos adicionales que el usuario no haya mencionado;
+     no limitarse a la lista anterior.
+
+2. **Auditoría estructural de TODOS los controles y funciones**
+   - Revisar todos los botones, inputs, selects, toggles, tabs, chips,
+     steppers, enlaces de navegación, menús, modales y acciones dinámicas.
+   - Revisar listeners directos y delegados, `data-*`, ids, `aria-controls`,
+     apertura/cierre de modales, navegación y elementos creados por JS.
+   - Verificar imports/exports, helpers llamados desde handlers, referencias
+     globales y dependencias entre módulos.
+   - Buscar expresamente el patrón de bug donde la UI reacciona parcialmente
+     pero el handler falla después por `ReferenceError`, helper no importado,
+     función inexistente o excepción silenciosa.
+   - Buscar botones que visualmente cambian algo pero no guardan; funciones que
+     guardan parcialmente; estados que solo se arreglan tras reabrir; UI que
+     muestra datos viejos después de editar/borrar; y acciones que fallan sin
+     feedback.
+   - Revisar desktop y mobile cuando el comportamiento pueda cambiar por
+     layout, sidebar, overlays, modales o controles responsivos.
+
+3. **Persistencia e integridad de estado**
+   - Después de cada flujo importante, comprobar memoria/UI, almacenamiento
+     local y sincronización/nube cuando corresponda.
+   - Confirmar que editar, borrar, cancelar, descartar, resetear, importar,
+     cerrar/reabrir y refrescar conservan exactamente el estado esperado.
+   - Revisar interacciones entre features: Horario ↔ Adherencia, Llamadas ↔
+     Break/Lunch, Higher Rate ↔ ganancias, Finanzas ↔ ganancias, Gamificación
+     ↔ llamadas/turnos, metas ↔ reportes/calendario y cualquier otro acople.
+   - Buscar duplicación de recompensas, bonos, eventos, llamadas, pausas,
+     ganancias o acciones al repetir operaciones o refrescar.
+
+4. **Corrección durante la auditoría**
+   - Corregir TODOS los bugs reproducibles encontrados dentro de la auditoría,
+     salvo que el usuario diga explícitamente que solo quiere diagnóstico.
+   - No hacer rollback general ni deshacer fixes previos para simplificar la
+     reparación. Partir siempre del estado actual y preservar todo lo ya
+     corregido.
+   - Si un bug nuevo fue causado por un fix reciente, arreglar la interacción
+     sin reintroducir el bug anterior.
+   - Evitar "arreglos" que solo oculten el síntoma visual; reparar la causa y
+     mantener consistente el modelo de datos.
+
+5. **Regresión y validación obligatorias**
+   - Agregar o actualizar una prueba de regresión por cada fallo corregido
+     cuando sea técnicamente razonable.
+   - Ejecutar la suite de tests, checks de imports/exports, checks de wiring,
+     sintaxis/build y cualquier validación específica del área tocada.
+   - Verificar que producción/deployment/CI termina correctamente cuando el
+     entorno permita comprobarlo.
+   - Repetir los escenarios que originalmente fallaron después del fix.
+   - No declarar "todo funciona" solo porque el build pasa: distinguir entre
+     validación estructural/automática y pruebas interactivas reales que sí se
+     hayan podido ejecutar.
+
+6. **Entrega**
+   - Al terminar, dar un resumen compacto pero exacto con:
+     - bugs encontrados;
+     - causa de cada uno;
+     - corrección aplicada;
+     - pruebas de regresión agregadas/actualizadas;
+     - tests/checks/build/deployment que pasaron;
+     - cualquier escenario que no se haya podido probar de forma real.
+   - No pedir al usuario que ejecute scripts ni haga verificaciones técnicas:
+     esas tareas pertenecen al agente según el flujo permanente del repo.
+
+Este protocolo sustituye cualquier versión anterior de "auditoría mensual",
+"auditoría de todos los botones" o instrucciones equivalentes: para el futuro,
+la frase `haz una auditoria profunda` significa ejecutar TODO este bloque.
+
+---
+
 **FLUJO DE TRABAJO CON ESTE REPOSITORIO (leer siempre — regla permanente)**
 
 El usuario **no programa**. No ejecuta scripts, no instala nada, no usa
@@ -206,21 +321,34 @@ No quedan tareas abiertas del refuerzo positivo enumerado en la versión
 anterior. Los siete requisitos se completaron en v573; las limitaciones
 del apartado siguiente conservan su alcance deliberado.
 
-La revisión de Logros solicitada después quedó terminada en v574: monstruo
-y misiones están agrupados en Logros, con tarjetas compactas y todo su
-contenido. Inicio conserva las ganancias, la meta y los indicadores del juego.
-El texto de estado accesible queda oculto visualmente; los avisos temporales
-sí desaparecen. El combo visible y las animaciones reaccionan sin perderse
-al repintar ni por timers de llamadas anteriores. Se verifica cada ruta real
-manual/automática/pegado en Chrome local con el modelo aislado QA.
+La revisión posterior quedó terminada en v575. Monstruo y misiones vuelven
+a Inicio, con la fecha seleccionada visible. Pegar llamadas de ayer actualiza
+y puede derrotar al monstruo de ayer; no daña al de hoy ni concede XP tardío.
+La derrota histórica queda en el bestiario y persiste sin duplicar recibos;
+corregir o retirar ganancias revoca esa derrota cuando deja de alcanzar la meta.
+Los días cerrados conservan su XP congelado. Las animaciones de hoy no pasan
+al cambiar a otra fecha.
 
-Una llamada del día registrada tarde también actualiza vida y tiene impacto
-visual, pero conserva la regla existente de no sumar XP si se importa más de
-30 minutos después de terminar. El recibo visual se exporta/sincroniza y se
-migra a la llamada oficial; no repite efectos al reimportar o recargar.
-Históricos, llamadas futuras y Dropped no disparan ese impacto. Off, Sutil
-y movimiento reducido mantienen sus límites. Los recorridos QA apuntan al
-monstruo en Logros.
+Logros conserva todas sus secciones, datos y opciones con paneles compactos.
+Activación, nombre, plan, intensidad, refuerzo personal y QA están antes del
+progreso y las colecciones. La configuración del monstruo abre al principio.
+Shift, Break y Lunch se ven en una sola fila también en móvil, con todo su texto.
+
+El estado accesible queda oculto visualmente y los avisos temporales desaparecen.
+Manual, automático y pegado actuales actualizan vida, combo y efectos; importar
+más de 30 minutos después de terminar no concede XP. Históricos, futuros y
+Dropped no disparan golpes sobre el monstruo actual. Off, Sutil y movimiento
+reducido conservan sus límites.
+
+Los dos recorridos QA indican qué ya se hizo, el siguiente botón y dónde tocar.
+Se resalta el botón o modal activo. La navegación apunta al control visible
+debajo de la cabecera, abre su acordeón y el cierre vuelve al resumen superior
+de Logros. La guía deja espacio al final de todas las páginas que utiliza.
+Recarga, reinicio y salida/restauración se verifican en el namespace QA aislado.
+
+El protocolo permanente de auditoría profunda se recuperó íntegro del commit
+0d68200; d238d3c lo había eliminado al retirar el roadmap. Esta revisión QA no
+activa la auditoría integral: sigue requiriendo su comando explícito.
 
 **Criterios vigentes y verificación de los siete requisitos:**
 
@@ -280,10 +408,12 @@ de 400. El escenario **Refuerzo completo** añade una guía de trece pasos con
 llamadas sintéticas, resultados de azar controlados y restauración del estado
 real; conserva el recorrido original de ocho pasos.
 
-Verificación actual: 172 pruebas, contratos/ciclos de 21 módulos, wiring y build de
+Verificación actual: 174 pruebas, contratos/ciclos de 21 módulos, wiring y build de
 producción sin sourcemaps. Auditoría de dependencias de producción sin alertas.
-Chrome local con datos QA: recorrido completo, claro/oscuro, 390 y 1365 px sin
-overflow, foco de teclado, movimiento reducido y recarga sin cambiar recibos.
+Chrome local con datos QA: recorridos original y Refuerzo completo; claro/oscuro,
+320, 390, 768 y 1365 px sin overflow; rutas manual/automática/pegado, importación
+de ayer y duplicados, foco de teclado, movimiento reducido y recarga sin cambiar
+recibos. Reinicio y salida del recorrido original comprobados en móvil/escritorio.
 Esto **no** certifica una sesión autenticada de producción. No se reprodujo
 un mockup externo no disponible: se reutilizaron componentes y tokens existentes.
 
@@ -359,12 +489,31 @@ La aplicación funciona en producción con estas bases vigentes:
   global, backup diario, exportación y borrado de cuenta permanecen activos.
 - Turnos, llamadas, Horario, Higher Rate, Finanzas, Reportes, Calendario,
   Adherencia y la gamificación «El Monstruo» están integrados.
-- La versión actual es 574. Los siete pendientes de refuerzo positivo y
+- La versión actual es 575. Los siete pendientes de refuerzo positivo y
   la revisión de Logros están terminados; sus criterios figuran arriba.
 
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v575** — Fecha del monstruo, controles de Logros, guía QA y fila móvil.
+
+- Monstruo y misiones vuelven a Inicio. La arena muestra el día seleccionado;
+  llamadas históricas derrotan su propio monstruo, con recibo persistente y
+  bestiario actualizado. El día actual conserva daño/combo y el XP histórico
+  no se concede de nuevo. Correcciones posteriores mantienen el XP sellado.
+- Controles de activación y selección antes del progreso de Logros; paneles,
+  colecciones y niveles compactos, sin eliminar datos ni opciones. Shift,
+  Break y Lunch quedan en una fila en móvil usando el mismo contenido.
+- La guía QA distingue acciones completadas y pendientes, nombra cada botón,
+  señala modal/control activo y navega al elemento visible. El cierre apunta
+  al resumen superior; la guía no tapa permanentemente el final de Inicio.
+- Recuperado sin cambios el protocolo de auditoría profunda eliminado en
+  d238d3c. Conserva su activación únicamente por comando explícito.
+- Verificadas 174 pruebas, imports/ciclos y wiring de 21 módulos, build sin
+  sourcemaps. Chrome local: rutas reales de llamadas y ayer/duplicado; ambos
+  recorridos QA, recarga, reinicio y salida; temas y anchos de 320 a 1365 px.
+  Los datos de prueba son locales/aislados; no se certifica sesión autenticada.
 
 **v574** — Logros compacto y reacción visible del monstruo.
 
@@ -407,36 +556,3 @@ La aplicación funciona en producción con estas bases vigentes:
   La revisión visual fue sintética/local, no autenticada en producción.
 - Por indicación del usuario, cualquier delegación futura usa únicamente
   Sol 6.1 con razonamiento Alto, salvo que indique otra cosa.
-
-**v572** — Configuración en Logros y laboratorio guiado.
-
-- Gamificación, refuerzo positivo y Laboratorio QA se agrupan en paneles
-  plegables de Logros, fuera de Ajustes. «Plan del día» vive dentro del
-  editor de gamificación, conserva el bloqueo tras la primera llamada y
-  permanece oculto cuando el juego está apagado.
-- El interruptor de gamificación es la única opción de activación; la
-  intensidad conserva Sutil y Arcade y sigue reconociendo backups antiguos
-  con intensidad `off`.
-- Se puede guardar un nombre personal para el monstruo diario. Dejarlo
-  vacío conserva los nombres del catálogo; las especies, accesorios,
-  cálculos y recompensas no cambian.
-- QA usa horarios de demostración independientes, IDs únicos y un día
-  activo con llamadas progresivas e historial precargado. Se corrigió el escenario que aparecía vacío cerca
-  de medianoche por seleccionar hoy aunque sus muestras pertenecían a ayer.
-- El recorrido guiado demuestra llamadas, cierre positivo, recuperación,
-  constancia, pausas, premios y cierre del turno mediante los motores
-  existentes. Sus preferencias y progreso son locales al namespace QA;
-  reiniciar o salir recarga la app para descartar callbacks transitorios.
-- La normalización de fechas del juego ya no depende del contexto que se
-  configura después de cargar el estado. Un historial guardado podía lanzar
-  un error durante el arranque y activar el fallback vacío; ahora se conserva
-  al cargar y recargar. Las sesiones QA antiguas muestran cómo abrir la guía.
-- Se corrigió el bono de XP que escribía una entrada obsoleta después de
-  recalcular el día. Conserva las reglas de bloqueo y tope; las cajas ya
-  registran el bono concedido en la entrada vigente sin duplicarlo.
-- Verificados 120 tests, contratos/ciclos de 19 módulos, wiring de UI y
-  build de producción sin sourcemaps; auditoría de dependencias sin alertas.
-  En una demostración local aislada se comprobó el recorrido completo,
-  recarga sin duplicados, bono de caja persistente, pausa/premios, cierre
-  del turno y salida/restauración. Controles QA y guía revisados en móvil;
-  esta comprobación no usó una cuenta autenticada de producción.

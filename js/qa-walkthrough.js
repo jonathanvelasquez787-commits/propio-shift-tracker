@@ -236,6 +236,43 @@ function stepResult(model) {
   return '';
 }
 
+function stepPresentation(model) {
+  if (model.completed && modalIsOpen()) return { label: 'Recorrido terminado', description: 'El turno ya está cerrado. Revisa la ventana del resumen o los premios que está abierta y ciérrala con su botón ×. Después podrás revisar Logros, reiniciar o salir de QA.' };
+  if (model.completed) return { label: 'Recorrido terminado', description: 'El turno y el resumen ya están cerrados. Revisa tus logros; usa «Reiniciar recorrido» para repetirlo o «Salir de QA» para recuperar tus datos reales.' };
+  if (model.scenario === 'reinforcement') {
+    const labels = ['Comenzar recorrido', 'Guardar llamada larga', 'Guardar llamada normal', 'Importar llamada Gold', 'Guardar llamada y sorpresa', model.phase === 'break-open' ? 'Terminar Break' : 'Iniciar Break', 'Importar llamada caída', 'Guardar llamada de recuperación', 'Comprobar inactividad', 'Guardar llamada en Sutil', 'Guardar llamada en Off', 'Cerrar turno'];
+    const label = labels[model.step];
+    const description = model.step === 5 && model.phase === 'break-open'
+      ? 'El Break ya está abierto y el combo se reinició. Pulsa «Terminar Break» en esta guía para regresar.'
+      : `${QA_REINFORCEMENT_STEPS[model.step].description} Pulsa «${label}» en esta guía para hacerlo.`;
+    return { label, description };
+  }
+  const count = model.generatedCallIds?.length || 0;
+  if (model.step === 0) return { label: 'Comenzar recorrido', description: 'La arena está en Inicio y el turno ya está preparado. Pulsa «Comenzar recorrido» en esta guía; se abrirán las opciones del monstruo y del plan en Logros.' };
+  if (model.step === 1) return { label: 'Guardar llamada 1', description: 'Las opciones están arriba de Logros. Si quieres, cambia el nombre o el plan. Después pulsa «Guardar llamada 1» en esta guía; se guardará y se abrirá su reflexión.' };
+  if (model.step === 2 || model.step === 3) {
+    const ordinal = model.step - 1;
+    const reflection = reflectionFor(model.reflectionCallId || callIdFor(model, ordinal));
+    const ready = reflection && (model.step === 2 || ['difficult', 'learning'].includes(reflection.outcome));
+    const label = ready ? `Guardar llamada ${ordinal + 1}` : `Abrir reflexión ${ordinal}`;
+    const choice = model.step === 2 ? '«Cerró bien»' : '«Cumplí aunque fue difícil» o «Me dejó un aprendizaje»';
+    return { label, description: ready
+      ? `La llamada ${ordinal} y su reflexión ya están guardadas. Pulsa «${label}» en esta guía para continuar.`
+      : `La llamada ${ordinal} ya está guardada. En la ventana «Guarda la evidencia», toca ${choice}. Si la cerraste, pulsa «${label}» en esta guía para volver a abrirla sin repetir la llamada.` };
+  }
+  if (model.step === 4) {
+    const needsReflection = model.phase === 'awaiting-reflection-3' && !reflectionFor(model.reflectionCallId);
+    const label = needsReflection ? 'Abrir reflexión 3' : `Guardar llamada ${count < 4 ? 4 : 5}`;
+    return { label, description: needsReflection
+      ? 'La llamada de recuperación ya está guardada. En «Guarda la evidencia», elige una respuesta o toca «Ahora no». Después podrás guardar las llamadas 4 y 5 desde esta guía.'
+      : `Ya guardaste ${count} llamadas. Pulsa «${label}» en esta guía para completar el hito de cinco; el motor mostrará el cofre y los premios pendientes.` };
+  }
+  if (model.step === 5) return { label: model.phase === 'break-open' ? 'Terminar Break' : 'Iniciar Break', description: model.phase === 'break-open'
+    ? 'El Break ya está abierto. En «Premios disponibles», toca «Realizado», «Cambiar» o «Guardar para después». Cierra esa ventana y pulsa «Terminar Break» en esta guía.'
+    : 'Las cinco llamadas ya están guardadas. Pulsa «Iniciar Break» en esta guía; se abrirá la ventana de los premios que puedes realizar durante la pausa.' };
+  return { label: 'Guardar llamada 6 y cerrar turno', description: 'El Break ya terminó. Pulsa «Guardar llamada 6 y cerrar turno» en esta guía. Se guardará la última llamada y se abrirá el resumen real del turno.' };
+}
+
 export function renderQaWalkthrough() {
   if (typeof document === 'undefined') return false;
   const panel = document.getElementById(QA_WALKTHROUGH_NODE_IDS.panel);
@@ -254,27 +291,24 @@ export function renderQaWalkthrough() {
 
   const steps = walkthroughSteps(model);
   const step = steps[model.step];
-  const generatedCount = Array.isArray(model.generatedCallIds) ? model.generatedCallIds.length : 0;
+  const presentation = stepPresentation(model);
   if (nodes.progress) nodes.progress.textContent = `Paso ${model.step + 1} de ${steps.length}`;
   if (nodes.title) nodes.title.textContent = step.title;
   if (nodes.description) {
-    nodes.description.textContent = model.scenario !== 'reinforcement' && model.step === 4
-      ? `${step.description} ${generatedCount < 4 ? 'Ahora toca la llamada 4.' : generatedCount < 5 ? 'Ahora toca la llamada 5.' : 'Las dos llamadas ya se guardaron.'}`
-      : step.description;
+    nodes.description.textContent = presentation.description;
   }
   if (nodes.result) {
     nodes.result.textContent = stepResult(model);
     nodes.result.hidden = !nodes.result.textContent;
   }
   if (nodes.next) {
-    nodes.next.textContent = model.scenario === 'reinforcement'
-      ? (model.completed ? 'Recorrido terminado' : model.step === 5 ? (model.phase === 'break-open' ? 'Terminar Break' : 'Iniciar Break') : 'Continuar')
-      : model.step === 5
-      ? (model.phase === 'break-open' ? 'Terminar Break' : 'Iniciar Break')
-      : model.step === 7 ? 'Recorrido terminado' : model.step === 4 ? 'Guardar llamada' : 'Continuar';
+    nodes.next.textContent = presentation.label;
     nodes.next.disabled = walkthroughBusy || model.completed || modalIsOpen();
   }
   if (nodes.restart) nodes.restart.disabled = walkthroughBusy || modalIsOpen();
+  walkthroughContext?.markTarget?.(modalIsOpen()
+    ? walkthroughContext?.getOpenModalId?.() || (model.phase === 'break-open' ? 'physicalRewardClaimModal' : model.completed ? 'stageClearModal' : 'positiveReflectionModal')
+    : 'qaWalkthroughNextBtn');
   return visible;
 }
 
@@ -420,7 +454,7 @@ function runNextReinforcementStep(model) {
     step: model.step + 1, callFactory: createQaReinforcementCall, result, surpriseRandom,
   });
   if (model.step === 0) {
-    walkthroughContext.navigate?.('achievements', 'gameArena');
+    walkthroughContext.navigate?.('home', 'gameArena');
     return advance('Escenario preparado. Los resultados ganadores y no ganadores del sorteo solo se fuerzan en esta guía QA.');
   }
   if (model.step === 1) return add(1, 'live', 'Llamada larga guardada: 30 minutos. Revisa el mensaje y el primer hito monetario.');
@@ -465,7 +499,7 @@ function runNextReinforcementStep(model) {
     if (!state.shiftEndedAt) return false;
     model.completed = true;
     advance('Turno cerrado. Revisa las tres evidencias disponibles y la racha de mañana, condicionada a continuar.', 'completed');
-    walkthroughContext.navigate?.('achievements', 'positiveHistoryPanel');
+    walkthroughContext.navigate?.('achievements', 'gameAchievementsSummary');
     return true;
   }
   return false;
@@ -486,7 +520,7 @@ function runNextStep() {
   }
 
   if (model.step === 1) {
-    walkthroughContext.navigate?.('achievements', 'gameArena');
+    walkthroughContext.navigate?.('home', 'gameArena');
     return addTourCall(1, 'manual', {
       step: 2,
       phase: 'awaiting-reflection-1',
@@ -594,7 +628,7 @@ function runNextStep() {
     model.completed = true;
     model.result = 'Turno cerrado. El resumen y el historial final se muestran en Logros.';
     persistTour();
-    walkthroughContext.navigate?.('achievements', 'positiveHistoryPanel');
+    walkthroughContext.navigate?.('achievements', 'gameAchievementsSummary');
     return true;
   }
 
@@ -605,7 +639,7 @@ function runNextStep() {
     model.phase = 'completed';
     model.result = 'Recorrido listo. Puedes reiniciarlo o salir para volver a tus datos reales.';
     persistTour();
-    walkthroughContext.navigate?.('achievements', 'positiveHistoryPanel');
+    walkthroughContext.navigate?.('achievements', 'gameAchievementsSummary');
     return true;
   }
   return false;

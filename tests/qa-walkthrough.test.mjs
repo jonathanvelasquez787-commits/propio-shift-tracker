@@ -158,17 +158,20 @@ test('recorrido de ocho pasos usa hooks una vez, respeta reflexiones, modales y 
   next();
   h.setDuringAddCall(null);
   assert.equal(h.state.qaWalkthrough.step, 2);
+  assert.match(h.document.getElementById('qaWalkthroughDescription').textContent, /llamada 1 ya está guardada/);
+  assert.equal(h.document.getElementById('qaWalkthroughNextBtn').textContent, 'Abrir reflexión 1');
   assert.equal(h.effects.addCall.length, 1);
   assert.equal(h.effects.addCall[0].source, 'manual');
   assert.equal(h.effects.addCall[0].stepAtHook, 2);
   assert.equal(h.effects.addCall[0].generatedBeforeHook, true);
-  assert.deepEqual(h.effects.navigate.at(-1), { page: 'achievements', targetId: 'gameArena' });
+  assert.deepEqual(h.effects.navigate.at(-1), { page: 'home', targetId: 'gameArena' });
   const firstCall = h.calls[0];
   assert.equal(h.state.qaWalkthrough.reflectionCallId, firstCall.id);
   click(h, 'qaWalkthroughNextBtn', true);
   assert.equal(h.effects.addCall.length, 1);
 
   h.closeModal('positiveReflectionModal', { callId: firstCall.id, outcome: 'good' });
+  assert.equal(h.document.getElementById('qaWalkthroughNextBtn').textContent, 'Guardar llamada 2');
   assert.match(h.document.getElementById('qaWalkthroughResult').textContent, /cierre positivo/i);
   assert.doesNotMatch(h.document.getElementById('qaWalkthroughResult').textContent, /\bgood\b/);
   next();
@@ -224,6 +227,8 @@ test('recorrido de ocho pasos usa hooks una vez, respeta reflexiones, modales y 
   next();
   assert.equal(h.state.qaWalkthrough.step, 5);
   assert.equal(h.state.qaWalkthrough.phase, 'break-open');
+  assert.match(h.document.getElementById('qaWalkthroughDescription').textContent, /Break ya está abierto/);
+  assert.equal(h.document.getElementById('qaWalkthroughNextBtn').textContent, 'Terminar Break');
   assert.deepEqual(h.effects.startPause, ['break']);
   assert.match(h.document.getElementById('qaWalkthroughResult').textContent, /Break: activo/);
   assert.equal((h.document.getElementById('qaWalkthroughResult').textContent.match(/Premios pendientes:/g) || []).length, 1);
@@ -240,7 +245,7 @@ test('recorrido de ocho pasos usa hooks una vez, respeta reflexiones, modales y 
   assert.equal(h.effects.addCall.length, 6);
   assert.equal(h.effects.addCall[5].source, 'import');
   assert.equal(h.effects.endShift, 1);
-  assert.deepEqual(h.effects.navigate.at(-1), { page: 'achievements', targetId: 'positiveHistoryPanel' });
+  assert.deepEqual(h.effects.navigate.at(-1), { page: 'achievements', targetId: 'gameAchievementsSummary' });
   assert.equal(h.document.getElementById('qaWalkthroughNextBtn').disabled, true);
   click(h, 'qaWalkthroughNextBtn', true);
   assert.equal(h.effects.addCall.length, 6);

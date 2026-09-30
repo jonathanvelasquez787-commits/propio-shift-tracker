@@ -615,6 +615,7 @@ function withConversion(amount) {
 
 function monsterStateFor(day) {
   if (day.defeated) return 'defeated';
+  if (day.dayKey !== currentGameDayKey()) return 'sleeping';
   if (state.activePause || !state.shiftStartedAt || state.shiftEndedAt) return 'sleeping';
   if (higherRateLiveStatus()?.active) return 'fury';
   if (day.hpPct <= 25) return 'wounded';
@@ -623,16 +624,23 @@ function monsterStateFor(day) {
 }
 
 function monsterVariantFor(day) {
+  if (day.dayKey !== currentGameDayKey()) return state.game.days[day.dayKey]?.monster?.variant || 'normal';
   if (higherRateLiveStatus()?.active) return 'gold';
   if (gameStreak() >= 7) return 'streak';
   return 'normal';
 }
 
-function yesterdayShadowPct() {
+function displayedGameDayKey() {
+  return callDateKeyFromValue(state.activeDayKey) || currentGameDayKey();
+}
+
+function yesterdayShadowPct(dayKey = currentGameDayKey()) {
   const now = new Date();
-  const yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+  const selected = callDateToDate(dayKey);
+  if (!selected) return null;
+  const yesterday = new Date(selected.getFullYear(), selected.getMonth(), selected.getDate() - 1);
   const key = todayCallDateKey(yesterday);
-  const cutoff = now.getHours() * 60 + now.getMinutes();
+  const cutoff = dayKey === currentGameDayKey() ? now.getHours() * 60 + now.getMinutes() : 1440;
   const partial = callsForDay(key).filter((call) => {
     const start = new Date(call.startISO);
     return start.getHours() * 60 + start.getMinutes() <= cutoff;
@@ -651,7 +659,7 @@ function renderArena() {
   const root = document.getElementById('gameArena');
   const classic = document.getElementById('classicDailyGoalCard');
   if (!root || !classic) return;
-  const dayKey = currentGameDayKey();
+  const dayKey = displayedGameDayKey();
   const day = computeGameDay(dayKey);
   const active = gameEnabled() && day.goal.usd > 0;
   root.hidden = !active;
@@ -671,15 +679,18 @@ function renderArena() {
   const variant = monsterVariantFor(day);
   const customName = sanitizeMonsterName(settings.game.monsterName);
   const displayName = customName || day.species.name;
-  const shadow = yesterdayShadowPct();
+  const shadow = yesterdayShadowPct(dayKey);
   const damage = Math.max(0, day.goal.usd - day.stats.earnings);
   const renderKey = [dayKey, subtle, monsterState, monsterPhase, variant, displayName, day.combo, day.stats.earnings.toFixed(2), Math.round(day.hpPct * 10), Math.round((shadow ?? -1) * 10), day.missions.map((mission) => mission.ok ? 1 : 0).join(''), Object.values(state.game.equipment || {}).join('|')].join(':');
   if (renderKey === lastArenaRenderKey) return;
   lastArenaRenderKey = renderKey;
-  const impactClasses = ['is-hit', 'is-critical-hit'].filter((name) => root.classList.contains(name));
+  const impactClasses = root.dataset.gameDayKey === dayKey
+    ? ['is-hit', 'is-critical-hit'].filter((name) => root.classList.contains(name)) : [];
+  if (root.dataset.gameDayKey && root.dataset.gameDayKey !== dayKey) delete root.dataset.gameEvent;
   root.className = `game-arena ${subtle ? 'game-arena--subtle' : 'game-arena--arcade'} game-${escapeHtml(monsterState)}`;
   root.classList.add(...impactClasses);
   root.dataset.gameState = monsterState;
+  root.dataset.gameDayKey = dayKey;
   root.dataset.gamePhase = monsterPhase;
   root.dataset.gameIntensity = subtle ? 'subtle' : 'arcade';
   const monsterImageLabel = `${displayName}${customName ? `, ${day.species.name}` : ''}, ${PHASE_LABELS[monsterPhase] || monsterPhase}, ${Math.round(day.hpPct)}% de vida`;
@@ -687,8 +698,8 @@ function renderArena() {
     .replace(/ role="img" aria-label="[^"]*"/, ' aria-hidden="true"');
   root.innerHTML = `
     <div class="game-arena-copy">
-      <div class="game-kicker">MONSTRUO DEL DÍA</div>
-      <div class="game-arena-title-row"><h3>${escapeHtml(displayName)}</h3><span class="game-combo-badge">x${state.game.live.combo || 0}</span></div>
+      <div class="game-kicker">MONSTRUO DEL DÍA · ${escapeHtml(formatCallDayLabel(dayKey))}</div>
+      <div class="game-arena-title-row"><h3>${escapeHtml(displayName)}</h3><span class="game-combo-badge">x${day.combo || 0}</span></div>
       <div class="game-phase-meter" data-phase="${escapeHtml(monsterPhase)}" role="status" aria-label="Fase del monstruo: ${escapeHtml(PHASE_LABELS[monsterPhase] || monsterPhase)}"><span>${escapeHtml(PHASE_LABELS[monsterPhase] || monsterPhase)}</span><small>Las ganancias y la vida financiera no cambian por la fase.</small></div>
       <p class="game-monster-phrase">“${escapeHtml(day.species.phrase)}”</p>
       <div class="game-hp-label"><span>VIDA</span><strong>${Math.round(day.hpPct)}%</strong></div>
@@ -709,8 +720,9 @@ function renderMissions() {
     return;
   }
   root.hidden = false;
-  const day = computeGameDay(currentGameDayKey());
-  const focus = state.game.days[currentGameDayKey()]?.missionChoice || 'balanced';
+  const dayKey = displayedGameDayKey();
+  const day = computeGameDay(dayKey);
+  const focus = state.game.days[dayKey]?.missionChoice || 'balanced';
   const plates = armorPlatesForDay(day);
   root.innerHTML = `
     <div class="game-section-head"><div><span class="game-kicker">3 ARMADURAS</span><h3>Misiones del día</h3></div><div class="game-missions-status"><span>Enfoque · ${escapeHtml(MISSION_FOCUS_LABELS[focus])}</span><strong>${day.missions.filter((mission) => mission.ok).length}/3</strong></div></div>
@@ -907,7 +919,12 @@ function syncCycleBossAchievement() {
 function bestiarySnapshot() {
   const catalog = Object.values(MONSTER_CATALOG)
     .filter((entry, index, all) => all.findIndex((item) => item.id === entry.id) === index);
-  const defeatedDays = Object.entries(state.game.days)
+  const currentDate = callDateToDate(currentGameDayKey())?.getTime();
+  const defeatedDays = Object.entries(state.game.days).map(([key, value]) => {
+    if (value?.monster?.defeated || !(callDateToDate(key)?.getTime() < currentDate) || !state.game.ledger[`monster-defeat:${key}`]) return [key, value];
+    const day = computeGameDay(key);
+    return [key, day.defeated ? { ...value, monster: { defeated: true, species: day.species.id, variant: monsterVariantFor(day) } } : value];
+  })
     .filter(([, value]) => value?.monster?.defeated)
     .sort((a, b) => (callDateToDate(b[0])?.getTime() || 0) - (callDateToDate(a[0])?.getTime() || 0));
   const seen = new Map();
@@ -1656,6 +1673,7 @@ function recordPhaseEvent(dayKey, phase, previousPhase = null) {
   const key = `phase:${dayKey}:${phase}`;
   if (state.game.ledger[key]) return false;
   state.game.ledger[key] = { type: 'phase-event', dayKey, phase, gross: 0, applied: 0 };
+  if (dayKey !== currentGameDayKey() || dayKey !== displayedGameDayKey()) return true;
   const message = phase === 'defeated' ? 'Monstruo derrotado' : phase === 'vulnerable' ? 'Armadura abierta · el monstruo es vulnerable' : 'El monstruo entra en furia';
   queueGameToast(message, phase === 'defeated' ? 'record' : 'impulse');
   announceGameStatus(message);
@@ -1977,6 +1995,7 @@ export function onGameCallsChanged(dayKey) {
   if (!entry?.finalized) reconcileLiveComboAndLoot(normalizedDayKey, beforeRewards, { allowRewards: enabled });
   const raw = computeGameDay(normalizedDayKey, { ignoreLock: true });
   entry = state.game.days[normalizedDayKey];
+  if (!entry && callsForDay(normalizedDayKey).length) entry = dayEntry(normalizedDayKey);
 
   if (!entry?.finalized) {
     reconcileMissionEvents(normalizedDayKey, raw, { allowFeedback: enabled });
@@ -1990,7 +2009,7 @@ export function onGameCallsChanged(dayKey) {
         entry.xpLocked = Number.isFinite(existingLock) ? Math.min(existingLock, raw.xp) : raw.xp;
         if (!state.game.ledger[defeatKey]) {
           state.game.ledger[defeatKey] = true;
-          if (enabled) queueGameToast('💥 MONSTRUO DERROTADO · datos reconciliados', 'record');
+          if (enabled) queueGameToast(`💥 MONSTRUO DEL ${formatCallDayLabel(normalizedDayKey)} DERROTADO · datos reconciliados`, 'record');
         }
       } else {
         delete entry.xpLocked;
@@ -2022,7 +2041,14 @@ export function onGameCallsChanged(dayKey) {
   entry.correctedAt = new Date().toISOString();
 
   // Este lock solo importa si el usuario decide reabrir el turno después de la corrección.
-  if (raw.defeated) entry.xpLocked = Math.min(Math.max(0, Number(entry.xp) || 0), raw.xp);
+  if (raw.defeated) {
+    entry.xpLocked = Math.min(Math.max(0, Number(entry.xp) || 0), raw.xp);
+    const defeatKey = `monster-defeat:${normalizedDayKey}`;
+    if (!state.game.ledger[defeatKey]) {
+      state.game.ledger[defeatKey] = true;
+      if (enabled && !frozenMonster.defeated) queueGameToast(`💥 MONSTRUO DEL ${formatCallDayLabel(normalizedDayKey)} DERROTADO · ganancias actualizadas`, 'record');
+    }
+  }
   else {
     delete entry.xpLocked;
     delete state.game.ledger[`monster-defeat:${normalizedDayKey}`];
