@@ -75,13 +75,13 @@ test('HTML integra la ruta de Logros, el arena, las misiones, ajustes y modales 
 test('Logros agrupa los ajustes, conserva el enfoque diario y admite nombre personalizado seguro', () => {
   const html = read('app.html');
   const achievements = between(html, '<div class="app-page game-achievements-page"', '</div><!-- /pageAchievements -->');
-  const gameEditor = between(achievements, '<details class="game-panel game-settings-accordion" id="gameSettingsAccordion" open>', '<details class="game-panel game-settings-accordion" id="positiveSettingsAccordion">');
+  const gameEditor = between(achievements, '<details class="game-panel game-settings-accordion" id="gameSettingsAccordion" open>', '<details class="game-panel game-settings-accordion" id="positiveSettingsAccordion" open>');
   const qaEditor = between(achievements, '<details class="game-panel game-settings-accordion" id="qaModeAccordion">', '</details>');
   const settingsModal = between(html, '<div aria-hidden="true" class="modal-overlay" id="goalsModal">', '<div aria-hidden="true" class="modal-overlay game-modal-overlay" id="stageClearModal">');
   const allIds = [...html.matchAll(/\bid="([^"]+)"/g)].map((match) => match[1]);
   assert.deepEqual(allIds.filter((id, index) => allIds.indexOf(id) !== index), []);
   assert.match(gameEditor, /id="gameDailyFocus"/);
-  assert.match(gameEditor, /id="gameEnabledInput"/);
+  assert.match(achievements, /id="gameEnabledInput"/);
   assert.match(gameEditor, /id="monsterNameInput"[^>]*maxlength="60"/);
   assert.match(gameEditor, /id="monsterNameSaveBtn"/);
   assert.equal((gameEditor.match(/<option\b/g) || []).length, 3);

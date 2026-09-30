@@ -8407,6 +8407,7 @@
   </div>
 </div>
 </div>
+<div class="game-missions-column">
 <div class="game-missions" hidden id="gameMissions">
   <div class="game-missions-head"><div><span class="game-panel-eyebrow">ARMADURA</span><h3>Misiones del día</h3></div><span data-game-role="missions-score">0 / 3</span></div>
   <div class="game-mission-list" data-game-role="mission-list">
@@ -8414,6 +8415,12 @@
     <div class="game-mission" data-mission-key="break"><span class="game-mission-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/></svg></span><div><strong>Break/Lunch a tiempo</strong><small data-game-role="mission-progress">Pendiente</small></div><span class="game-mission-check" aria-hidden="true">✓</span></div>
     <div class="game-mission" data-mission-key="adherence"><span class="game-mission-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg></span><div><strong>Adherencia del día</strong><small data-game-role="mission-progress">0% / meta</small></div><span class="game-mission-check" aria-hidden="true">✓</span></div>
   </div>
+</div>
+<div class="game-daily-milestones" aria-labelledby="earningsMilestoneTitle">
+  <span class="game-panel-eyebrow" id="earningsMilestoneTitle">Hitos de ganancias</span>
+  <div class="gh-goal-sub-row" id="earningsMilestoneMarkers" role="group" aria-label="Hitos de la meta diaria" hidden></div>
+  <div class="gh-goal-foot" id="earningsNextMilestone" hidden></div>
+</div>
 </div>
 </section>
 <div class="gh-goal-card" id="classicDailyGoalCard">
@@ -8425,8 +8432,6 @@
 <div class="progress" style="margin-top: 4px;"><div id="earningsBar"></div></div>
 <div class="gh-goal-foot" id="remainingText">0 min restantes</div>
 </div>
-<div class="gh-goal-sub-row" id="earningsMilestoneMarkers" role="group" aria-label="Hitos de la meta diaria" hidden></div>
-<div class="gh-goal-foot" id="earningsNextMilestone" hidden></div>
 <div class="fin-preview" id="financePreviewBox" style="display:none;">
 <div class="fin-preview-head">
 <span class="fin-preview-title">Próximos pendientes</span>
@@ -8971,23 +8976,17 @@
     </div>
     <div class="game-achievements-season" data-game-role="season-status"><span>Temporada</span><strong data-game-role="season-label">Ciclo actual</strong></div>
   </div>
-  <div id="gameAchievementsSummary" class="game-achievements-summary">
-    <div class="game-summary-stat"><span>Racha</span><strong data-game-stat="streak">0 días</strong></div>
-    <div class="game-summary-stat"><span>Nivel</span><strong data-game-stat="level">1</strong></div>
-    <div class="game-summary-stat"><span>XP total</span><strong data-game-stat="xp">0</strong></div>
-    <div class="game-summary-stat"><span>Escudos</span><strong data-game-stat="shields">0</strong></div>
-  </div>
+  <div class="game-achievements-toolbar"><label class="game-settings-toggle" for="gameEnabledInput"><span><strong>Activar El Monstruo</strong><small>Racha, XP, misiones y colección sin cambiar tus ganancias.</small></span><input id="gameEnabledInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label><a class="game-text-button game-qa-shortcut" href="#qaScenarioInput">Laboratorio QA →</a></div>
 </section>
 
 <section class="game-settings-disclosures" aria-label="Preferencias de El Monstruo">
-  <details class="game-panel game-settings-accordion" id="gameSettingsAccordion" open>
+<details class="game-panel game-settings-accordion" id="gameSettingsAccordion" open>
     <summary class="game-settings-accordion-summary">
-      <span class="game-settings-accordion-copy"><span class="game-panel-eyebrow">PERSONALIZACIÓN</span><strong>Gamificación</strong><small>Activa El Monstruo, configura el enfoque diario y ponle un nombre.</small></span>
+      <span class="game-settings-accordion-copy"><span class="game-panel-eyebrow">PERSONALIZACIÓN</span><strong>Gamificación</strong><small>Nombre, enfoque del día e intensidad.</small></span>
       <span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
     </summary>
     <div class="game-settings-accordion-body">
       <div class="game-settings-section">
-        <label class="game-settings-toggle" for="gameEnabledInput"><span><strong>Activar El Monstruo</strong><small>Racha, XP, misiones y colección sin cambiar tus ganancias.</small></span><input id="gameEnabledInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label>
         <div class="game-monster-name-setting">
           <label for="monsterNameInput">Nombre del monstruo del día</label>
           <div class="game-monster-name-controls"><input id="monsterNameInput" type="text" maxlength="60" autocomplete="off" aria-describedby="monsterNameHelp monsterNameSaveStatus" placeholder="Usar nombre del catálogo"/><button class="mc-btn-primary cyan" id="monsterNameSaveBtn" type="button">Guardar nombre</button></div>
@@ -9006,20 +9005,10 @@
             <option value="arcade">Arcade en logros</option>
           </select>
         </div>
-        <div class="game-settings-profile" id="gameSettingsProfile" aria-live="polite">
-          <span class="game-settings-profile-label">Perfil de juego</span>
-          <div class="game-settings-profile-grid"><span><b data-game-profile="level">Nivel 1</b><small>Nivel</small></span><span><b data-game-profile="xp">0 XP</b><small>XP total</small></span><span><b data-game-profile="streak">0 días</b><small>Mejor racha</small></span><span><b data-game-profile="collection">0</b><small>Colección</small></span></div>
-        </div>
-        <div class="danger-card tone-bad game-settings-danger">
-          <div class="danger-card-head"><span class="danger-card-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 15 9 15 3"/></svg></span><span class="danger-card-title">Reiniciar progreso</span></div>
-          <p class="danger-card-desc">Borra nivel, XP, racha, trofeos, accesorios y monstruos derrotados. Tus llamadas, turnos, metas y finanzas no se tocan.</p>
-          <button class="mc-btn-solid-full bad" id="resetGameProgressBtn" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 15 9 15 3"/></svg> Reiniciar progreso</button>
-        </div>
       </div>
     </div>
   </details>
-
-  <details class="game-panel game-settings-accordion" id="positiveSettingsAccordion">
+<details class="game-panel game-settings-accordion" id="positiveSettingsAccordion" open>
     <summary class="game-settings-accordion-summary">
       <span class="game-settings-accordion-copy"><span class="game-panel-eyebrow">CUIDADO PERSONAL</span><strong>Refuerzo positivo</strong><small>Reconoce llamadas, recuperación, metas y premios elegidos por ti.</small></span>
       <span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
@@ -9028,7 +9017,9 @@
       <div class="positive-settings-section game-settings-section">
         <label class="game-settings-toggle" for="positiveReinforcementEnabledInput"><span><strong>Celebrar llamadas completadas</strong><small>Convierte constancia, recuperación y metas en evidencia positiva y premios seguros.</small></span><input id="positiveReinforcementEnabledInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label>
         <label class="game-settings-toggle" for="positiveAskAfterCallInput"><span><strong>Cierre breve después de cada llamada</strong><small>Marca si cerró bien, si cumpliste aunque fue difícil o si te dejó un aprendizaje.</small></span><input id="positiveAskAfterCallInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label>
-        <div class="goals-field positive-budget-field">
+        <details class="game-settings-accordion game-reward-settings" id="positiveRewardsAccordion">
+          <summary class="game-settings-accordion-summary"><span class="game-settings-accordion-copy"><strong>Presupuesto y mis premios</strong><small>Presupuesto semanal, premios físicos y catálogo sugerido.</small></span><span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></summary>
+          <div class="game-settings-accordion-body positive-rewards-body"><div class="goals-field positive-budget-field">
           <label for="positiveWeeklyBudgetInput">Presupuesto semanal opcional ($)</label>
           <input id="positiveWeeklyBudgetInput" inputmode="decimal" min="0" step="0.01" type="number" placeholder="Sin límite"/>
           <small id="positiveWeeklyBudgetConverted">Sin límite de presupuesto</small>
@@ -9041,12 +9032,96 @@
           <div class="positive-settings-heading"><span><strong>Catálogo sugerido</strong><small>Agrega una idea y personalízala a tu gusto.</small></span></div>
           <div class="physical-reward-catalog" id="physicalRewardCatalog"></div>
         </div>
-        <p class="note" style="margin:0;">La app nunca compra nada ni interrumpe una llamada. Tú decides cuándo realizar, guardar o cambiar cada premio.</p>
+        <p class="note" style="margin:0;">La app nunca compra nada ni interrumpe una llamada. Tú decides cuándo realizar, guardar o cambiar cada premio.</p></div>
+        </details>
       </div>
     </div>
   </details>
+</section>
 
-  <details class="game-panel game-settings-accordion" id="qaModeAccordion">
+<section class="game-achievements-grid game-achievements-grid-top" id="gameAchievementsSummary" aria-label="Tu progreso">
+  <div class="game-progress-profile" id="gameSettingsProfile" aria-live="polite">
+<article class="game-panel game-level-panel" id="gameLevelPanel">
+    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Progreso</span><h2>Nivel <strong data-game-role="level" data-game-stat="level">1</strong></h2></div><span class="game-level-emblem" data-game-role="level-emblem">1</span></div>
+    <div class="game-level-track" role="progressbar" aria-label="Progreso hacia el siguiente nivel" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span data-game-role="level-progress" style="width:0%;"></span></div>
+    <div class="game-level-foot"><span data-game-role="level-xp" data-game-stat="xp">0 XP</span><span data-game-role="next-level">Siguiente: 100 XP</span></div>
+    <div class="game-level-ladder" data-game-role="level-ladder"><span class="is-current">1</span><i></i><span>2</span><i></i><span>3</span><i></i><span>4</span></div>
+    <details class="game-settings-accordion game-unlock-details">
+      <summary class="game-settings-accordion-summary"><span class="game-settings-accordion-copy"><strong>Desbloqueos por nivel</strong><small>Fases, equipo y mejoras disponibles en cada nivel.</small></span><span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></summary>
+      <div class="game-settings-accordion-body"><div class="game-unlock-roadmap" data-game-dynamic="unlock-roadmap"></div></div>
+    </details>
+  </article>
+<article class="game-panel game-streak-panel" id="gameStreakPanel">
+    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Constancia</span><h2>Racha semanal <span class="game-streak-current" data-game-stat="streak">0 días</span></h2></div><span class="game-panel-badge" data-game-role="streak-best">Mejor: 0</span></div>
+    <div class="game-streak-week" data-game-role="streak-week" role="list" aria-label="Racha de los últimos siete días">
+      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>L</b><em>—</em></span>
+      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>M</b><em>—</em></span>
+      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>X</b><em>—</em></span>
+      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>J</b><em>—</em></span>
+      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>V</b><em>—</em></span>
+      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>S</b><em>—</em></span>
+      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>D</b><em>—</em></span>
+    </div>
+    <div class="game-panel-foot"><span>Escudos disponibles</span><strong data-game-role="shields" data-game-stat="shields">0</strong></div>
+  </article>
+  </div>
+</section>
+
+<section class="game-panel game-cycle-panel" id="gameCycleBossAchievements">
+  <div class="game-panel-head"><div><span class="game-panel-eyebrow">Temporada de 14 días</span><h2>Jefe del ciclo</h2></div><span class="game-cycle-label" data-game-role="cycle-status">En marcha</span></div>
+  <div class="game-cycle-boss-layout"><div class="game-boss-copy"><strong data-game-role="cycle-title">El jefe observa tu progreso.</strong><p data-game-role="cycle-subtitle">La barra refleja lo que llevas acumulado en el ciclo de pago actual.</p><div class="game-boss-progress" role="progressbar" aria-label="Progreso contra el jefe del ciclo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span data-game-role="cycle-progress" style="width:0%;"></span></div><div class="game-boss-progress-foot"><span data-game-role="cycle-earned">$0.00</span><span data-game-role="cycle-goal">Meta $0.00</span></div></div><div class="game-boss-sprite" data-game-role="cycle-sprite" aria-hidden="true"><span class="game-pixel-crown"></span><span class="game-pixel-eye left"></span><span class="game-pixel-eye right"></span><span class="game-pixel-mouth"></span></div></div>
+</section>
+
+<section class="game-achievements-grid game-achievements-grid-bottom" aria-label="Victorias y récords">
+<article class="game-panel game-last-clear-panel" id="gameLastStageClear">
+    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Última victoria</span><h2>STAGE CLEAR</h2></div><span class="game-panel-badge" data-game-role="last-clear-date">—</span></div>
+    <div class="game-last-clear-content" data-game-role="last-clear-content"><div class="game-clear-stars" aria-hidden="true"><span>★</span><span>★</span><span>★</span></div><p>Aún no hay un STAGE CLEAR guardado.</p></div>
+    <button class="game-text-button" data-game-action="open-last-clear" type="button">Ver detalle</button>
+    <div aria-label="Cofre reclamable" class="game-chest-claim" data-game-role="chest-claim" hidden id="gameChestClaim" role="region">
+      <span aria-hidden="true" class="game-chest-claim-icon">🎁</span>
+      <span class="game-chest-claim-copy"><strong data-game-role="chest-claim-title">Cofre listo</strong><small data-game-role="chest-claim-subtitle">Abre tu próxima sesión para reclamarlo.</small></span>
+    </div>
+  </article>
+<article class="game-panel" id="gameRecords">
+    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Récords personales</span><h2>Récords</h2></div><svg class="ic-svg game-panel-head-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9Z"/></svg></div>
+    <div class="game-record-list" data-game-role="records-list"><div class="game-record-row"><span>Mayor pago</span><strong>—</strong></div><div class="game-record-row"><span>Llamada más larga</span><strong>—</strong></div><div class="game-record-row"><span>Mejor racha semanal</span><strong>—</strong></div></div>
+  </article>
+</section>
+
+<section aria-labelledby="gameEquipmentTitle" class="game-panel game-equipment-panel" data-game-root="equipment-panel" id="gameEquipmentPanel">
+  <div class="game-panel-head"><div><span class="game-panel-eyebrow">Personalización</span><h2 id="gameEquipmentTitle">Equipo</h2></div><span class="game-panel-badge" data-game-role="equipment-count">0 / 6</span></div>
+  <p class="game-panel-intro">Accesorios y mejoras que se activan al completar tus objetivos.</p>
+  <div aria-label="Equipo desbloqueable" class="game-equipment-grid" data-game-role="equipment-list" data-game-root="equipment-grid" role="list">
+    <article aria-label="Visor bloqueado" class="game-equipment-item is-locked" data-equipment-state="locked" data-game-role="equipment-item" role="listitem">
+      <span aria-hidden="true" class="game-equipment-icon">?</span>
+      <span class="game-equipment-copy"><strong>Próximo accesorio</strong><small data-game-role="equipment-status">Completa una misión para desbloquearlo</small></span>
+      <span aria-hidden="true" class="game-equipment-state">Bloqueado</span>
+    </article>
+  </div>
+  <p class="game-collection-empty" data-game-role="equipment-empty">Tus accesorios aparecerán aquí al conseguirlos.</p>
+</section>
+
+<section class="game-achievements-grid game-achievements-grid-collection" aria-label="Colecciones">
+<article class="game-panel game-bestiary-panel" id="gameBestiary">
+    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Colección</span><h2>Bestiario</h2></div><span class="game-panel-badge" data-game-role="bestiary-count">0 / 7</span></div>
+    <div class="game-collection-grid" data-game-role="bestiary-list"><div class="game-collection-empty">Derrota tu primer monstruo para llenar esta colección.</div></div>
+  </article>
+<article class="game-panel game-trophies-panel" id="gameTrophies">
+    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Distinciones</span><h2>Trofeos</h2></div><span class="game-panel-badge" data-game-role="trophy-count">0</span></div>
+    <div class="game-trophy-list" data-game-role="trophy-list"><div class="game-collection-empty">Tus próximos trofeos aparecerán aquí.</div></div>
+  </article>
+</section>
+
+<section class="positive-history-section">
+  <article class="game-panel" id="positiveHistoryPanel">
+    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Evidencia acumulada</span><h2>Mi historial positivo</h2></div><span class="game-panel-badge" id="positiveHistoryCount">0</span></div>
+    <div class="positive-history-list" id="positiveHistoryList"><div class="game-collection-empty">Tus llamadas y premios realizados aparecerán aquí.</div></div>
+    <button class="game-text-button" id="positiveHistoryToggle" data-positive-action="toggle-history" type="button" hidden>Ver todo</button>
+  </article>
+</section>
+
+<section class="game-advanced-settings" aria-label="Herramientas avanzadas">
+<details class="game-panel game-settings-accordion" id="qaModeAccordion">
     <summary class="game-settings-accordion-summary">
       <span class="game-settings-accordion-copy"><span class="game-panel-eyebrow">PRUEBAS LOCALES</span><strong>Laboratorio QA</strong><small>Prueba recorridos aislados de tus datos reales.</small></span>
       <span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
@@ -9069,86 +9144,15 @@
       </div>
     </div>
   </details>
+  <details class="game-panel game-settings-accordion" id="gameResetAccordion">
+    <summary class="game-settings-accordion-summary"><span class="game-settings-accordion-copy"><span class="game-panel-eyebrow">PROGRESO DE JUEGO</span><strong>Reiniciar progreso</strong><small>Revisa qué se borra antes de confirmar.</small></span><span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></summary>
+    <div class="game-settings-accordion-body"><div class="danger-card tone-bad game-settings-danger">
+          <div class="danger-card-head"><span class="danger-card-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 15 9 15 3"/></svg></span><span class="danger-card-title">Reiniciar progreso</span></div>
+          <p class="danger-card-desc">Borra nivel, XP, racha, trofeos, accesorios y monstruos derrotados. Tus llamadas, turnos, metas y finanzas no se tocan.</p>
+          <button class="mc-btn-solid-full bad" id="resetGameProgressBtn" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 15 9 15 3"/></svg> Reiniciar progreso</button>
+        </div></div>
+  </details>
 </section>
-
-
-
-<section class="game-achievements-grid game-achievements-grid-top">
-  <article class="game-panel game-streak-panel" id="gameStreakPanel">
-    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Constancia</span><h2>Racha semanal</h2></div><span class="game-panel-badge" data-game-role="streak-best">Mejor: 0</span></div>
-    <div class="game-streak-week" data-game-role="streak-week" role="list" aria-label="Racha de los últimos siete días">
-      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>L</b><em>—</em></span>
-      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>M</b><em>—</em></span>
-      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>X</b><em>—</em></span>
-      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>J</b><em>—</em></span>
-      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>V</b><em>—</em></span>
-      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>S</b><em>—</em></span>
-      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>D</b><em>—</em></span>
-    </div>
-    <div class="game-panel-foot"><span>Escudos disponibles</span><strong data-game-role="shields">0</strong></div>
-  </article>
-
-  <article class="game-panel game-level-panel" id="gameLevelPanel">
-    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Progreso</span><h2>Nivel <strong data-game-role="level">1</strong></h2></div><span class="game-level-emblem" data-game-role="level-emblem">1</span></div>
-    <div class="game-level-track" role="progressbar" aria-label="Progreso hacia el siguiente nivel" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span data-game-role="level-progress" style="width:0%;"></span></div>
-    <div class="game-level-foot"><span data-game-role="level-xp">0 XP</span><span data-game-role="next-level">Siguiente: 100 XP</span></div>
-    <div class="game-level-ladder" data-game-role="level-ladder"><span class="is-current">1</span><i></i><span>2</span><i></i><span>3</span><i></i><span>4</span></div>
-  </article>
-</section>
-
-<section class="game-panel game-cycle-panel" id="gameCycleBossAchievements">
-  <div class="game-panel-head"><div><span class="game-panel-eyebrow">Temporada de 14 días</span><h2>Jefe del ciclo</h2></div><span class="game-cycle-label" data-game-role="cycle-status">En marcha</span></div>
-  <div class="game-cycle-boss-layout"><div class="game-boss-copy"><strong data-game-role="cycle-title">El jefe observa tu progreso.</strong><p data-game-role="cycle-subtitle">La barra refleja lo que llevas acumulado en el ciclo de pago actual.</p><div class="game-boss-progress" role="progressbar" aria-label="Progreso contra el jefe del ciclo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span data-game-role="cycle-progress" style="width:0%;"></span></div><div class="game-boss-progress-foot"><span data-game-role="cycle-earned">$0.00</span><span data-game-role="cycle-goal">Meta $0.00</span></div></div><div class="game-boss-sprite" data-game-role="cycle-sprite" aria-hidden="true"><span class="game-pixel-crown"></span><span class="game-pixel-eye left"></span><span class="game-pixel-eye right"></span><span class="game-pixel-mouth"></span></div></div>
-</section>
-
-<section aria-labelledby="gameEquipmentTitle" class="game-panel game-equipment-panel" data-game-root="equipment-panel" id="gameEquipmentPanel">
-  <div class="game-panel-head"><div><span class="game-panel-eyebrow">Personalización</span><h2 id="gameEquipmentTitle">Equipo</h2></div><span class="game-panel-badge" data-game-role="equipment-count">0 / 6</span></div>
-  <p class="game-panel-intro">Accesorios y mejoras que se activan al completar tus objetivos.</p>
-  <div aria-label="Equipo desbloqueable" class="game-equipment-grid" data-game-role="equipment-list" data-game-root="equipment-grid" role="list">
-    <article aria-label="Visor bloqueado" class="game-equipment-item is-locked" data-equipment-state="locked" data-game-role="equipment-item" role="listitem">
-      <span aria-hidden="true" class="game-equipment-icon">?</span>
-      <span class="game-equipment-copy"><strong>Próximo accesorio</strong><small data-game-role="equipment-status">Completa una misión para desbloquearlo</small></span>
-      <span aria-hidden="true" class="game-equipment-state">Bloqueado</span>
-    </article>
-  </div>
-  <p class="game-collection-empty" data-game-role="equipment-empty">Tus accesorios aparecerán aquí al conseguirlos.</p>
-</section>
-
-<section class="game-achievements-grid game-achievements-grid-collection">
-  <article class="game-panel game-bestiary-panel" id="gameBestiary">
-    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Colección</span><h2>Bestiario</h2></div><span class="game-panel-badge" data-game-role="bestiary-count">0 / 7</span></div>
-    <div class="game-collection-grid" data-game-role="bestiary-list"><div class="game-collection-empty">Derrota tu primer monstruo para llenar esta colección.</div></div>
-  </article>
-  <article class="game-panel game-trophies-panel" id="gameTrophies">
-    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Distinciones</span><h2>Trofeos</h2></div><span class="game-panel-badge" data-game-role="trophy-count">0</span></div>
-    <div class="game-trophy-list" data-game-role="trophy-list"><div class="game-collection-empty">Tus próximos trofeos aparecerán aquí.</div></div>
-  </article>
-</section>
-
-<section class="game-achievements-grid game-achievements-grid-bottom">
-  <article class="game-panel" id="gameRecords">
-    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Récords personales</span><h2>Récords</h2></div><svg class="ic-svg game-panel-head-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9Z"/></svg></div>
-    <div class="game-record-list" data-game-role="records-list"><div class="game-record-row"><span>Mayor pago</span><strong>—</strong></div><div class="game-record-row"><span>Llamada más larga</span><strong>—</strong></div><div class="game-record-row"><span>Mejor racha semanal</span><strong>—</strong></div></div>
-  </article>
-  <article class="game-panel game-last-clear-panel" id="gameLastStageClear">
-    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Última victoria</span><h2>STAGE CLEAR</h2></div><span class="game-panel-badge" data-game-role="last-clear-date">—</span></div>
-    <div class="game-last-clear-content" data-game-role="last-clear-content"><div class="game-clear-stars" aria-hidden="true"><span>★</span><span>★</span><span>★</span></div><p>Aún no hay un STAGE CLEAR guardado.</p></div>
-    <button class="game-text-button" data-game-action="open-last-clear" type="button">Ver detalle</button>
-    <div aria-label="Cofre reclamable" class="game-chest-claim" data-game-role="chest-claim" hidden id="gameChestClaim" role="region">
-      <span aria-hidden="true" class="game-chest-claim-icon">🎁</span>
-      <span class="game-chest-claim-copy"><strong data-game-role="chest-claim-title">Cofre listo</strong><small data-game-role="chest-claim-subtitle">Abre tu próxima sesión para reclamarlo.</small></span>
-    </div>
-  </article>
-</section>
-<section class="positive-history-section">
-  <article class="game-panel" id="positiveHistoryPanel">
-    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Evidencia acumulada</span><h2>Mi historial positivo</h2></div><span class="game-panel-badge" id="positiveHistoryCount">0</span></div>
-    <div class="positive-history-list" id="positiveHistoryList"><div class="game-collection-empty">Tus llamadas y premios realizados aparecerán aquí.</div></div>
-    <button class="game-text-button" id="positiveHistoryToggle" data-positive-action="toggle-history" type="button" hidden>Ver todo</button>
-  </article>
-</section>
-
-
 </div><!-- /pageAchievements -->
 
 <div class="app-page" data-page="help" hidden id="pageHelp">

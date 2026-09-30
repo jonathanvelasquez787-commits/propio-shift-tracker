@@ -456,6 +456,22 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 .game-achievements-page { display: grid; gap: 10px; padding-bottom: 18px; }
 .game-day-panels { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 10px; min-width: 0; align-items: stretch; }
 .game-day-panels:empty { display: none; }
+.game-day-panels:not(:has(.game-arena:not([hidden]))) { grid-template-columns: 1fr; }
+.game-day-panels:has(.game-arena[hidden]):has(#earningsMilestoneMarkers[hidden]) { display: none; }
+.game-missions-column { display: grid; align-content: start; gap: 6px; min-width: 0; }
+.game-missions-column .game-missions { margin: 0; }
+.game-daily-milestones { min-width: 0; padding: 9px 11px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel-navy); }
+.game-daily-milestones:has(#earningsMilestoneMarkers[hidden]) { display: none; }
+.game-daily-milestones #earningsMilestoneMarkers { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; margin: 8px 0 0; }
+.game-daily-milestones .gh-goal-subitem { position: relative; display: grid; justify-items: center; gap: 4px; padding: 0; font-size: 10px; font-weight: 800; }
+.game-daily-milestones .gh-goal-subitem::before { position: relative; z-index: 1; content: ""; width: 9px; height: 9px; border: 2px solid var(--line-2); border-radius: 50%; background: var(--panel-navy); }
+.game-daily-milestones .gh-goal-subitem:not(:last-child)::after { position: absolute; content: ""; top: 5px; left: 50%; width: 100%; height: 2px; background: var(--line-2); }
+.game-daily-milestones .gh-goal-subitem[aria-label*="hito registrado"] { color: var(--good) !important; }
+.game-daily-milestones .gh-goal-subitem[aria-label*="hito registrado"]::before,
+.game-daily-milestones .gh-goal-subitem[aria-label*="hito registrado"]::after { border-color: var(--good); background: var(--good); }
+.game-daily-milestones .gh-goal-subitem:not([aria-label*="hito registrado"]):first-child::before,
+.game-daily-milestones .gh-goal-subitem[aria-label*="hito registrado"] + .gh-goal-subitem:not([aria-label*="hito registrado"])::before { border-color: var(--cyan); }
+.game-daily-milestones #earningsNextMilestone { margin-top: 7px; font-size: 11px; line-height: 1.4; overflow-wrap: anywhere; }
 .game-day-panels > :is(.game-arena, .game-missions) { margin: 0; min-width: 0; }
 .game-day-panels .game-mission-grid { grid-template-columns: 1fr; margin-top: 8px; gap: 6px; }
 .game-day-panels .game-monster-stage { align-self: center; }
@@ -467,6 +483,18 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 .game-achievements-hero-row { align-items: end; margin-top: 8px; }
 .game-achievements-hero h1 { margin: 0; font-size: clamp(23px, 3vw, 28px); letter-spacing: -.055em; }
 .game-achievements-hero p { margin: 6px 0 0; color: var(--muted); font-size: 13px; line-height: 1.45; }
+.game-achievements-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
+.game-achievements-toolbar .game-settings-toggle { flex: 1 1 280px; max-width: 540px; padding: 0; border: 0; background: transparent; }
+.game-achievements-toolbar .game-qa-shortcut { margin: 0; flex: 0 0 auto; }
+.game-qa-shortcut:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+.game-progress-profile { display: contents; }
+.game-unlock-details { margin-top: 9px; border-top: 1px solid var(--line); }
+.game-level-panel .game-unlock-details > summary { padding: 8px 0 0; }
+.game-unlock-details .game-settings-accordion-copy > strong { font-size: 11px; }
+.game-unlock-details .game-settings-accordion-body { padding: 8px 0 0; }
+.game-unlock-details:has(.game-unlock-roadmap[hidden]) { display: none; }
+.game-streak-current { display: inline-block; margin-left: 5px; color: var(--cyan); font-size: 12px; }
+#qaScenarioInput { scroll-margin-top: 114px; }
 .game-achievements-season { display: grid; gap: 3px; flex: 0 0 auto; min-width: 110px; padding: 9px 11px; border: 1px solid rgba(var(--tier-gold-rgb, 255, 215, 110), .33); border-radius: 10px; text-align: right; }
 .game-achievements-season span { color: var(--muted-3); font-size: 9px; font-weight: 950; letter-spacing: .09em; text-transform: uppercase; }
 .game-achievements-season strong { color: var(--tier-gold); font-size: 12px; }
@@ -596,7 +624,13 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 .game-settings-danger { margin-top: 2px; }
 .game-settings-danger .danger-card-desc { max-width: 58ch; }
 
-.game-settings-disclosures { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; gap: 8px; min-width: 0; }
+.game-settings-disclosures,
+.game-advanced-settings { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 10px; min-width: 0; }
+.game-settings-disclosures .game-daily-focus { grid-template-columns: 1fr; padding: 9px; margin: 0; gap: 7px; }
+.game-reward-settings { border: 1px solid var(--line); border-radius: 10px; }
+.game-reward-settings .game-settings-accordion-summary { padding: 9px; }
+.positive-rewards-body { display: grid; gap: 10px; }
+.game-advanced-settings .game-settings-danger { margin: 0; }
 .game-settings-accordion { padding: 0; }
 .game-settings-accordion > summary { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 11px; list-style: none; cursor: pointer; }
 .game-settings-accordion > summary::-webkit-details-marker { display: none; }
@@ -607,7 +641,7 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 .game-settings-accordion-chevron { display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); background: rgba(255,255,255,.03); transition: transform .18s ease, color .18s ease, background .18s ease; }
 .game-settings-accordion-chevron .ic-svg { width: 16px; height: 16px; }
 .game-settings-accordion[open] > summary { border-bottom: 1px solid var(--line); }
-.game-settings-accordion[open] .game-settings-accordion-chevron { transform: rotate(180deg); color: var(--text); background: rgba(var(--cyan-rgb), .1); }
+.game-settings-accordion[open] > summary .game-settings-accordion-chevron { transform: rotate(180deg); color: var(--text); background: rgba(var(--cyan-rgb), .1); }
 .game-settings-accordion-body { min-width: 0; padding: 10px 11px; }
 .game-settings-accordion-body > .game-settings-section,
 .game-settings-accordion-body > .positive-settings-section { min-width: 0; }
@@ -695,7 +729,7 @@ body:has(#qaModeBanner.show .qa-walkthrough-panel:not([hidden])) .app-page { pad
 @keyframes game-modal-pop { 0% { transform: scale(.96); opacity: .5; } 55% { transform: scale(1.04); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
 
 @media (max-width: 1000px) {
-  .game-settings-disclosures { grid-template-columns: 1fr; }
+  .game-settings-disclosures, .game-advanced-settings { grid-template-columns: 1fr; }
   .game-day-panels { grid-template-columns: 1fr; }
   .game-day-panels .game-mission-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
@@ -1037,6 +1071,10 @@ body:has(#qaModeBanner.show .qa-walkthrough-panel:not([hidden])) .app-page { pad
 .game-unlock-roadmap [data-state="locked"] { opacity: .64; }
 
 .game-cycle-choice { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 8px; }
+.game-cycle-panel .game-cycle-choice { grid-template-columns: 1fr; margin-top: 10px; }
+.game-cycle-panel .game-cycle-choice > strong { font-size: 11px; }
+.game-cycle-panel .game-cycle-choice > div { display: flex; flex-wrap: wrap; gap: 6px; }
+.game-cycle-panel .game-cycle-choice button { padding: 7px 9px; font-size: 11px; }
 .game-cycle-choice button,
 .game-cycle-choice-item { display: grid; gap: 3px; min-width: 0; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel-navy); color: var(--text); text-align: left; }
 .game-cycle-choice button { cursor: pointer; }

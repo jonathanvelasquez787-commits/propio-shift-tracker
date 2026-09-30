@@ -335,9 +335,15 @@ corregir o retirar ganancias revoca esa derrota cuando deja de alcanzar la meta.
 Los días cerrados conservan su XP congelado. Las animaciones de hoy no pasan
 al cambiar a otra fecha.
 
-Logros conserva todas sus secciones, datos y opciones con paneles compactos.
-Activación, nombre, plan, intensidad, refuerzo personal y QA están antes del
-progreso y las colecciones. La configuración del monstruo abre al principio.
+La distribución de Logros aprobada después de la auditoría quedó aplicada en
+v577: activación visible en la cabecera y preferencias abiertas al principio;
+nivel/XP y racha/escudos juntos, sin duplicar el perfil; jefe del ciclo, última
+victoria/cofre y récords; equipo, bestiario/trofeos e historial positivo.
+Presupuesto/premios y desbloqueos por nivel son desplegables con todo su contenido.
+QA y reinicio quedan separados al final, con acceso a QA desde la cabecera que
+abre el laboratorio y enfoca su selector. Los hitos de ganancias quedan justo
+debajo de Misiones en Inicio, con cuatro marcadores conectados, hitos registrados
+en verde y próximo hito/cantidad restante. Monstruo y misiones siguen en Inicio.
 Shift, Break y Lunch se ven en una sola fila también en móvil, con todo su texto.
 
 El estado accesible queda oculto visualmente y los avisos temporales desaparecen.
@@ -497,7 +503,7 @@ La aplicación funciona en producción con estas bases vigentes:
   global, backup diario, exportación y borrado de cuenta permanecen activos.
 - Turnos, llamadas, Horario, Higher Rate, Finanzas, Reportes, Calendario,
   Adherencia y la gamificación «El Monstruo» están integrados.
-- La versión actual es 576. Refuerzo positivo, Logros y auditoría profunda
+- La versión actual es 577. Refuerzo positivo, Logros y auditoría profunda
   están terminados. Los siete fallos de la auditoría se corrigieron con
   regresiones; cobertura y límites constan en
   `docs/auditoria-profunda-2026-09-30.md`.
@@ -505,6 +511,22 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v577** — Distribución coherente de Logros e hitos debajo de Misiones.
+
+- Activación siempre visible arriba; nombre, enfoque, intensidad, refuerzo y
+  cierre breve antes del progreso. Presupuesto, premios y catálogo desplegables.
+- Nivel/XP y racha/escudos consolidan el perfil duplicado. Desbloqueos por nivel
+  desplegables conservan las once entradas. Jefe del ciclo compacto; victoria,
+  cofre y récords antes de equipo, bestiario, trofeos e historial positivo.
+- QA y reinicio en paneles separados al final; acceso superior a QA abre y lleva
+  al selector. Chevron correcto en acordeones anidados. Mismos IDs y listeners.
+- Hitos de ganancias en un pie compacto inmediatamente después de Misiones,
+  con cuatro marcadores conectados, registrados en verde y próximo hito/restante.
+- 187 pruebas y build/wiring de 21 módulos correctos. Chrome en claro/oscuro y
+  320, 390, 768 y 1365 px sin overflow; controles, despliegue de premios y
+  desbloqueos, llamadas manual/automática/pegado/ayer/duplicado y ambos recorridos
+  QA comprobados con datos aislados, incluyendo recarga, reinicio y restauración.
 
 **v576** — Auditoría profunda: persistencia, Finanzas y exportaciones.
 
@@ -541,23 +563,3 @@ La aplicación funciona en producción con estas bases vigentes:
   sourcemaps. Chrome local: rutas reales de llamadas y ayer/duplicado; ambos
   recorridos QA, recarga, reinicio y salida; temas y anchos de 320 a 1365 px.
   Los datos de prueba son locales/aislados; no se certifica sesión autenticada.
-
-**v574** — Logros compacto y reacción visible del monstruo.
-
-- Monstruo y misiones agrupados debajo del resumen de Logros. Menos altura,
-  sprite y placas pequeños, recompensa individual en texto y paneles con
-  espaciado compacto; se conserva el contenido y la misma vista responsive.
-- Corregida la región accesible que mostraba permanentemente «Armadura rota»
-  arriba de la app. El anuncio queda disponible al lector de pantalla y los
-  toasts visibles desaparecen. El encabezado ya no desborda en tablet por
-  el ancho intrínseco de su celda.
-- Los efectos usan el SVG vigente. Combo incluido en la clave del render,
-  impacto preservado al repintar y timers protegidos para llamadas seguidas.
-  Apagar la intensidad retira cualquier impacto pendiente.
-- Llamadas actuales tardías tienen evidencia visual sin XP nuevo; recibo
-  idempotente y migrable a la oficial. Se conservan elegibilidad, tope,
-  ganancias, metas y adherencia. Históricos/futuros/Dropped no simulan daño.
-- Verificadas 172 pruebas, build y wiring de 21 módulos. Chrome local con
-  rutas reales: formulario manual, guardado automático y textarea de pegado,
-  además de ambos temas, escritorio/tablet/móvil y movimiento reducido.
-  La revisión usa datos QA aislados, no una sesión autenticada de producción.
