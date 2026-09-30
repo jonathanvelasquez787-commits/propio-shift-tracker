@@ -530,7 +530,7 @@ La aplicación funciona en producción con estas bases vigentes:
   global, backup diario, exportación y borrado de cuenta permanecen activos.
 - Turnos, llamadas, Horario, Higher Rate, Finanzas, Reportes, Calendario,
   Adherencia y la gamificación «El Monstruo» están integrados.
-- La versión actual es 580. Refuerzo positivo, Logros y auditoría profunda
+- La versión actual es 581. Refuerzo positivo, Logros y auditoría profunda
   están terminados. Los siete fallos de la auditoría se corrigieron con
   regresiones; cobertura y límites constan en
   `docs/auditoria-profunda-2026-09-30.md`.
@@ -538,6 +538,22 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v581** — Sonidos arcade para Logros.
+
+- 14 efectos Web Audio con melodías, impactos y capas breves para llamadas,
+  Higher Rate, armaduras, combos, fases, premios, equipo, cofres, derrota,
+  jefe del ciclo, nivel y cierre. Audio local, sin archivos externos.
+- «Sonidos arcade» en el menú; volumen propio y botón de prueba en Logros →
+  Gamificación. 40% inicial, combinado con el volumen maestro; preferencias
+  persistentes y textos nuevos en español/inglés.
+- Un solo contexto desbloqueado por gesto. Cada lote conserva el evento de
+  mayor prioridad; ocultar, silenciar o cambiar fecha cancela los pendientes.
+  Recargas, llamadas repetidas, históricos y reapertura de STAGE CLEAR no
+  repiten fanfarrias. Cofres y premios conservan sus recibos idempotentes.
+- 195 pruebas, 27 módulos, wiring y build correctos. Chrome ES/EN en claro y
+  oscuro a 320–1365 px; controles, volumen, llamadas, victoria, cierre/cofre
+  y movimiento reducido. Los 14 efectos renderizados sin saturación.
 
 **v580** — Temas, español/inglés y Logros compactos.
 
@@ -568,20 +584,3 @@ La aplicación funciona en producción con estas bases vigentes:
 - 173 pruebas y build/wiring de 19 módulos correctos. Chrome en claro/oscuro,
   320–1365 px; controles reales de ambas ubicaciones, progreso intacto,
   llamadas y efectos pixel art, cierre/cofre y movimiento reducido verificados.
-
-**v578** — Gamificación pixel art aprobada y retirada del Laboratorio QA.
-
-- Marcos escalonados y colores claro/oscuro de la tool; sprites, iconos,
-  armaduras, vida segmentada, estrellas y cofres SVG. Misiones e hitos
-  compactos, equipo en filas legibles y preferencias al principio de Logros.
-- Golpes con daño flotante y partículas acotadas, misiones, derrota, estrellas
-  y apertura de cofre. Efectos breves respetan Sutil/Off y movimiento reducido.
-  Ganancias, XP, recibos y reglas permanecen iguales; monstruo en Inicio.
-- Eliminados panel, accesos, guía y módulos del Laboratorio QA. Limpieza de
-  compatibilidad borra solo cuatro claves de simulación y conserva los datos
-  reales incluso si una clave antigua es ilegible o no se puede eliminar.
-- 171 pruebas, imports/ciclos y wiring de 19 módulos y build correctos.
-  Chrome en claro/oscuro a 320, 390, 768 y 1365 px: Inicio/Logros sin overflow,
-  fila de bloques, manual/live/pegado/ayer/duplicado, derrota, cierre, cofre
-  idempotente y modos de movimiento verificados con datos locales aislados.
-

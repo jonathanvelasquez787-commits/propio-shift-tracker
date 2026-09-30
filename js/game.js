@@ -1,5 +1,6 @@
 import { ui, translateText, translateStoredText, translateMarkup, displayLocale } from './i18n.js';
 import { calls, settings, state } from './app-context.js';
+import { initGameAudio, playGameSound, syncGameAudio } from './game-audio.js';
 import { financeIsRowPagado } from './finance.js';
 import { activeWorkSinceLastCall, monetaryMilestones, supportiveDayEvidence, surpriseDecision } from './reinforcement-rules.js';
 import { chooseCallFeedback, configureReinforcementFeedback, notifyReinforcement, reinforcementText } from './reinforcement-feedback.js';
@@ -17,7 +18,7 @@ export function configureGameContext(context) {
     financeRowIsMeta, formatCallDayLabel, formatMinutes, higherRateBonusForCall, higherRateLiveStatus,
     importedCallStats, money, openModal, parseMoney, productiveMinutesForDay, saveSettingsOnly,
     saveStateOnly, todayCallDateKey, toast, weekdayKeyForDayKey, getReinforcementWorkIntervals } = context);
-  configureReinforcementFeedback({ queueToast: queueGameToast, triggerEffect: () => triggerGameEvent('gameArena', 'clear', 900) });
+  configureReinforcementFeedback({ queueToast: queueGameToast, triggerEffect: () => triggerGameEvent('gameArena', 'clear', 900), playSound: playGameTone });
 }
 import { MONSTER_CATALOG, monsterForWeekday, monsterSvg, gamePixelIcon, gamePixelChest } from './monsters.js';
 import {
@@ -326,6 +327,9 @@ function ensureGameSettings() {
   if (!settings.game || typeof settings.game !== 'object' || Array.isArray(settings.game)) settings.game = {};
   if (typeof settings.game.enabled !== 'boolean') settings.game.enabled = false;
   settings.game.intensity = 'arcade';
+  if (typeof settings.game.soundEnabled !== 'boolean') settings.game.soundEnabled = true;
+  const soundVolume = Number(settings.game.soundVolume);
+  settings.game.soundVolume = Number.isFinite(soundVolume) ? Math.max(0, Math.min(100, soundVolume)) : 40;
   const monsterName = sanitizeMonsterName(settings.game.monsterName);
   if (monsterName) settings.game.monsterName = monsterName;
   else delete settings.game.monsterName;
@@ -831,6 +835,7 @@ export function chooseCycleReward(choiceId) {
   }
   const option = (pending.options || []).find((item) => item.id === String(choiceId));
   if (!option) return false;
+  const oldLevel = state.game.level;
   let applied = 0;
   if (option.type === 'accessory' && option.accessory) {
     if (!state.game.accessories.includes(option.accessory)) state.game.accessories.push(option.accessory);
@@ -845,6 +850,7 @@ export function chooseCycleReward(choiceId) {
   queueGameToast(ui`🏆 Recompensa del ciclo · ${option.label}`, 'loot');
   saveStateOnly();
   renderGame();
+  playGameSound(state.game.level > oldLevel ? 'level' : 'reward');
   return true;
 }
 
@@ -1160,6 +1166,12 @@ function renderSettingsProfile() {
   if (enabled) enabled.checked = gameEnabled();
   const sidebarEnabled = document.getElementById('sidebarAchievementsInput');
   if (sidebarEnabled) sidebarEnabled.checked = gameEnabled();
+  const soundEnabled = document.getElementById('sidebarGameSoundInput');
+  if (soundEnabled) soundEnabled.checked = settings.game.soundEnabled;
+  const soundVolume = document.getElementById('gameSoundVolumeInput');
+  if (soundVolume && document.activeElement !== soundVolume) soundVolume.value = settings.game.soundVolume;
+  const soundValue = document.getElementById('gameSoundVolumeValue');
+  if (soundValue) soundValue.textContent = `${settings.game.soundVolume}%`;
   const savedMonsterName = sanitizeMonsterName(settings.game.monsterName);
   if (lastSettingsMonsterName !== savedMonsterName) {
     monsterNameDraftDirty = false;
@@ -1313,6 +1325,7 @@ function clearTransientGameUi({ keepPersonal = false } = {}) {
 export function renderGame() {
   ensureGameSettings();
   ensureGameState();
+  syncGameAudio();
   const enabled = gameEnabled();
   document.documentElement.classList.toggle('game-arcade', arcadeEnabled());
   document.documentElement.classList.toggle('game-subtle', false);
@@ -1334,7 +1347,7 @@ export function renderGame() {
   if (bossDefeatedNow) {
     triggerGameEvent('gameCycleBoss', 'clear', 1000);
     triggerGameEvent('gameCycleBossAchievements', 'clear', 1000);
-    playGameTone('clear');
+    playGameTone('cycle');
   }
   drainGameToasts();
 }
@@ -1400,38 +1413,10 @@ function drainGameToasts() {
   }
 }
 
-let gameAudioContext = null;
-
-function getGameAudioContext() {
-  if (gameAudioContext) return gameAudioContext;
-  const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
-  if (!AudioContextCtor) return null;
-  gameAudioContext = new AudioContextCtor();
-  return gameAudioContext;
-}
-
-function playGameTone(kind = 'hit') {
-  if (!arcadeEnabled()) return;
-  const volume = Math.max(0, Math.min(1, (Number(settings.masterVolume) || 0) / 100));
-  if (!volume) return;
-  try {
-    const context = getGameAudioContext();
-    if (!context) return;
-    const resumed = context.resume?.();
-    resumed?.catch?.(() => {});
-    const oscillator = context.createOscillator();
-    const gain = context.createGain();
-    const tones = { hit: [360, 'triangle', 0.16], critical: [720, 'sawtooth', 0.2], clear: [520, 'square', 0.9], impulse: [440, 'sine', 0.34], loot: [620, 'triangle', 0.42], fury: [180, 'sawtooth', 0.28] };
-    const [frequency, type, duration] = tones[kind] || tones.hit;
-    oscillator.type = type;
-    oscillator.frequency.value = frequency;
-    gain.gain.setValueAtTime(0.0001, context.currentTime);
-    gain.gain.exponentialRampToValueAtTime(Math.max(0.0001, volume * 0.12), context.currentTime + 0.01);
-    gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + duration);
-    oscillator.connect(gain).connect(context.destination);
-    oscillator.start();
-    oscillator.stop(context.currentTime + duration + 0.02);
-  } catch {}
+function playGameTone(kind = 'hit', dayKey = currentGameDayKey()) {
+  const allowed = () => arcadeEnabled() && dayKey === currentGameDayKey() && dayKey === displayedGameDayKey();
+  if (!allowed()) return false;
+  return playGameSound(kind, { allowed });
 }
 
 const gameEventVersions = new WeakMap();
@@ -1619,6 +1604,7 @@ function rewardLootBox(dayKey, callCount, { improved = false, source = 'calls' }
     }, 4200);
   }
   queueGameToast(`🎁 ${reward}`, 'loot');
+  playGameTone('loot', dayKey);
 }
 
 function rollbackLootReceipt(dayKey, ledgerKey) {
@@ -1701,7 +1687,7 @@ function reconcileLiveComboAndLoot(dayKey, snapshot, { allowRewards = true } = {
         if (milestone === 5) queueGameToast(translateText('Impulso estable · tu caja de 5 llamadas se conserva'), 'impulse');
         if (milestone === 8) queueGameToast(translateText('Impulso mejorado · caja de rareza elevada'), 'loot');
         triggerGameEvent('gameArena', milestone === 8 ? 'clear' : 'hit', 700);
-        playGameTone(milestone === 8 ? 'impulse' : 'hit');
+        playGameTone('impulse', dayKey);
       }
     });
   }
@@ -1717,7 +1703,7 @@ function recordPhaseEvent(dayKey, phase, previousPhase = null) {
   queueGameToast(message, phase === 'defeated' ? 'record' : 'impulse');
   announceGameStatus(message);
   triggerGameEvent('gameArena', phase === 'defeated' ? 'clear' : 'hit', 850);
-  playGameTone(phase === 'defeated' ? 'clear' : phase === 'fury' ? 'fury' : 'impulse');
+  playGameTone(phase === 'defeated' ? 'clear' : phase === 'fury' ? 'fury' : 'vulnerable', dayKey);
   return true;
 }
 
@@ -1735,7 +1721,7 @@ function reconcileMissionEvents(dayKey, snapshot, { allowFeedback = true } = {})
     state.game.ledger[key] = { type: 'mission', dayKey, missionId: id, gross: Number(mission.rewardXp) || 0, applied: 0 };
     queueGameToast(ui`Armadura rota · ${mission.label} · +${mission.rewardXp} XP al cierre`, 'impulse');
     triggerGameEvent('gameMissions', 'mission', 700);
-    playGameTone('impulse');
+    playGameTone('mission', dayKey);
     changed = true;
   });
   return changed;
@@ -1801,7 +1787,7 @@ export function onGameMonetaryProgress(dayKey, earnings, goal, { silent = false,
   progress.crossed.forEach((pct) => { state.game.ledger[`money-hit:${dayKey}:${pct}`] = true; });
   if (progress.crossed.length) {
     saveStateOnly();
-    if (!silent) notifyReinforcement(reinforcementText('milestone', { percent: progress.crossed.join('%, '), amount: `${money?.(earnings) || `$${Number(earnings).toFixed(2)}`} ${convertedAmountText?.(earnings) || ''}`.trim() }), { channel: 'either', effect: true });
+    if (!silent) notifyReinforcement(reinforcementText('milestone', { percent: progress.crossed.join('%, '), amount: `${money?.(earnings) || `$${Number(earnings).toFixed(2)}`} ${convertedAmountText?.(earnings) || ''}`.trim() }), { channel: 'either', effect: true, sound: 'impulse', dayKey });
   }
   return progress;
 }
@@ -1827,6 +1813,7 @@ export function rewardSurpriseForCall(call, dayKey, { random = Math.random } = {
         setTimeout(() => { root.hidden = true; root.classList.remove('is-revealing'); }, 4200);
       }
       queueGameToast(bonus.applied ? ui`🎁 Cofre sorpresa · +${bonus.applied} XP` : translateText('🎁 Cofre sorpresa · XP diario sellado'), 'loot');
+      playGameTone('loot', dayKey);
     }
   }
   saveStateOnly();
@@ -1918,7 +1905,7 @@ export function onGameCallSaved(call, source = 'manual', options = {}) {
       saveStateOnly();
       renderGame();
       showCallFx(call, 0, higherRateBonusAmount(call) > 0, 'recorded');
-      playGameTone('hit');
+      playGameTone('hit', dayKey);
     }
     return;
   }
@@ -1939,7 +1926,7 @@ export function onGameCallSaved(call, source = 'manual', options = {}) {
     renderGame();
     if (firstVisualEvent) showCallFx(call, 0, critical, 'extra');
     maybeShowRecord(call);
-    playGameTone(critical ? 'critical' : 'hit');
+    playGameTone(critical ? 'critical' : 'hit', dayKey);
     return;
   }
 
@@ -1981,9 +1968,9 @@ export function onGameCallSaved(call, source = 'manual', options = {}) {
   maybeShowRecord(call);
   if (defeatedNow) {
     triggerGameEvent('gameArena', 'clear', 1000);
-    playGameTone('clear');
+    playGameTone('clear', dayKey);
   } else {
-    playGameTone(critical ? 'critical' : 'hit');
+    playGameTone(critical ? 'critical' : 'hit', dayKey);
   }
 }
 
@@ -2423,13 +2410,13 @@ function stageClearMarkup(dayKey, entry) {
   </div>`;
 }
 
-function openStageClear(dayKey, entry) {
+function openStageClear(dayKey, entry, { celebrate = false, leveledUp = false } = {}) {
   const root = document.getElementById('stageClearContent');
   if (!root) return;
   root.innerHTML = stageClearMarkup(dayKey, entry);
   openModal('stageClearModal');
   pixelBurst(root, 'clear');
-  playGameTone('clear');
+  if (celebrate) playGameTone(leveledUp ? 'level' : 'stage', dayKey);
 }
 
 export function onGameShiftEnded(dayKey = currentGameDayKey()) {
@@ -2445,10 +2432,11 @@ export function onGameShiftEnded(dayKey = currentGameDayKey()) {
   const justClosedTrackedDay = Number.isFinite(trackedStart.getTime()) && Number.isFinite(trackedEnd.getTime())
     && trackedEnd.getTime() >= trackedStart.getTime() && trackedEnd.getTime() <= Date.now()
     && todayCallDateKey(trackedStart) === normalizedDayKey && todayCallDateKey(trackedEnd) === todayCallDateKey();
+  const oldLevel = state.game.level;
   const entry = freezeGameDay(normalizedDayKey, { projectStreak: normalizedDayKey === currentGameDayKey() || justClosedTrackedDay });
   saveStateOnly();
   renderGame();
-  if (!alreadyFinalized && gameEnabled()) openStageClear(normalizedDayKey, entry);
+  if (!alreadyFinalized && gameEnabled()) openStageClear(normalizedDayKey, entry, { celebrate: true, leveledUp: state.game.level > oldLevel });
   onPositiveRewardWindow('shift-end');
 }
 
@@ -2491,8 +2479,8 @@ function openPendingChest(todayKey, { allowSameDay = false } = {}) {
   if (granted) {
     queueGameToast(ui`🎁 Cofre abierto · ${displayReward}`, 'loot');
     if (state.game.level > oldLevel) queueGameToast(ui`NIVEL ${state.game.level} DESBLOQUEADO`, 'record');
+    playGameSound(state.game.level > oldLevel ? 'level' : 'loot');
   }
-  playGameTone('clear');
   return true;
 }
 
@@ -2516,7 +2504,7 @@ export function onGamePauseEnded(pauseRecord, { onTime = false } = {}) {
       const bonus = onTime ? grantDayBonusReceipt(dayKey, 5) : { gross: 0, applied: 0 };
       state.game.ledger[key] = { type: 'pause', dayKey, onTime, endedAt: pauseRecord.endedAt, ...bonus };
       saveStateOnly();
-      if (onTime) notifyReinforcement(reinforcementText('pause', { pause: pauseRecord.type === 'lunch' ? translateText('Lunch') : translateText('Break'), xp: bonus.applied ? ` · +${bonus.applied} XP` : '' }, pauseRecord.startedAt), { channel: 'either' });
+      if (onTime) notifyReinforcement(reinforcementText('pause', { pause: pauseRecord.type === 'lunch' ? translateText('Lunch') : translateText('Break'), xp: bonus.applied ? ` · +${bonus.applied} XP` : '' }, pauseRecord.startedAt), { channel: 'either', sound: 'pause', dayKey });
     }
   }
   if (gameEnabled()) renderGame();
@@ -2550,6 +2538,7 @@ export function equipAccessory(accessoryLabel) {
   saveStateOnly();
   renderGame();
   announceGameStatus(state.game.equipment[item.slot] ? ui`${translateText(item.label)} equipado` : ui`${translateText(item.label)} retirado`);
+  playGameSound('equip');
   return true;
 }
 
@@ -2598,6 +2587,7 @@ export function onGameBackupExported() {
   if (state.game.shields < GAME_SHIELD_CAP) {
     state.game.shields++;
     queueGameToast(translateText('◆ Escudo ganado por tu backup semanal'), 'loot');
+    playGameSound('reward');
   } else {
     queueGameToast(translateText('Backup semanal listo · ya tienes 3 escudos'));
   }
@@ -2623,6 +2613,7 @@ export function initGame() {
   gameInitialized = true;
   ensureGameSettings();
   ensureGameState();
+  initGameAudio();
   Object.keys(state.game.days).concat(currentGameDayKey()).forEach((key) => {
     const snapshot = computeGameDay(key);
     onGameMonetaryProgress(key, snapshot.stats.earnings, snapshot.goal.usd, { silent: true });
@@ -2652,6 +2643,26 @@ export function initGame() {
       renderGame();
     });
   }
+  document.getElementById('sidebarGameSoundInput')?.addEventListener('change', (event) => {
+    settings.game.soundEnabled = !!event.target.checked;
+    syncGameAudio();
+    saveSettingsOnly();
+    renderSettingsProfile();
+  });
+  document.getElementById('gameSoundVolumeInput')?.addEventListener('input', (event) => {
+    settings.game.soundVolume = Math.max(0, Math.min(100, Number(event.target.value) || 0));
+    syncGameAudio();
+    saveSettingsOnly();
+    renderSettingsProfile();
+  });
+  document.getElementById('gameSoundPreviewBtn')?.addEventListener('click', () => {
+    playGameSound('loot');
+    const status = document.getElementById('gameSoundStatus');
+    if (status) status.textContent = !settings.game.enabled ? translateText('Activa Logros para escuchar los efectos.')
+      : !settings.game.soundEnabled ? translateText('Activa Sonidos arcade en el menú lateral.')
+      : !settings.game.soundVolume || Number(settings.masterVolume) === 0 ? translateText('Sube el volumen de Logros y el volumen general para escuchar los efectos.') : '';
+  });
+  document.addEventListener('input', (event) => { if (event.target?.id === 'masterVolumeInput') syncGameAudio(); });
   document.getElementById('monsterNameSaveBtn')?.addEventListener('click', () => {
     const input = document.getElementById('monsterNameInput');
     if (!input) return;

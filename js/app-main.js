@@ -809,7 +809,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
         // prioridad) cada vez que se guarda una llamada, en vez de exigir "Aplicar" manual en cada
         // fila.
         financeAutoFill: false,
-        game: { enabled: false, intensity: 'arcade' },
+        game: { enabled: false, intensity: 'arcade', soundEnabled: true, soundVolume: 40 },
       };
     }
 
@@ -996,6 +996,9 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
       if (!settings.game || typeof settings.game !== 'object' || Array.isArray(settings.game)) settings.game = { ...fallback.game };
       if (typeof settings.game.enabled !== 'boolean') settings.game.enabled = fallback.game.enabled;
       settings.game.intensity = 'arcade';
+      if (typeof settings.game.soundEnabled !== 'boolean') settings.game.soundEnabled = true;
+      const gameSoundVolume = Number(settings.game.soundVolume);
+      settings.game.soundVolume = Number.isFinite(gameSoundVolume) ? Math.max(0, Math.min(100, gameSoundVolume)) : 40;
       // Cada cola (Gastos, Metas) queda con prioridades únicas 1..n, conservando el orden actual. El
       // "tipo" de cada fila (Gasto vs Meta) ya no se deduce de su categoría — una Meta puede tener
       // cualquier categoría desde que se permitió elegirla libremente — así que se decide por

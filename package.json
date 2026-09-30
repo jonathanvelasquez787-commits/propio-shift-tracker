@@ -1,6 +1,6 @@
 {
   "name": "propio-shift-tracker",
-  "version": "580.0.0",
+  "version": "581.0.0",
   "private": true,
   "description": "Registro personal de turnos, llamadas y ganancias — con cuentas y respaldo en la nube.",
   "type": "module",

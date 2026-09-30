@@ -222,9 +222,9 @@ function evaluateCallRewards(call, dayKey, { silent = false } = {}) {
     notifyReinforcement(reinforcementText('reward-earned', {
       icon: first.icon, window: WINDOW_LABELS[first.window], name: first.name,
       extra: earned.length > 1 ? ui` · +${earned.length - 1} más` : '',
-    }, call.id), { channel: 'personal' });
+    }, call.id), { channel: 'personal', sound: 'reward', dayKey });
   } else if (!silent && recovered) {
-    notifyReinforcement(reinforcementText('recovery', {}, call.id), { channel: 'personal' });
+    notifyReinforcement(reinforcementText('recovery', {}, call.id), { channel: 'personal', sound: 'pause', dayKey });
   }
   return earned;
 }
@@ -365,7 +365,7 @@ function claimReward(id) {
   const remaining = availableForWindow(item.window);
   if (remaining.length) renderClaimWindow(item.window);
   else closeModal('physicalRewardClaimModal');
-  notifyReinforcement(reinforcementText('reward-claimed', { icon: item.icon, name: item.name }, item.id), { channel: 'personal' });
+  notifyReinforcement(reinforcementText('reward-claimed', { icon: item.icon, name: item.name }, item.id), { channel: 'personal', sound: 'reward' });
 }
 
 function swapReward(id) {

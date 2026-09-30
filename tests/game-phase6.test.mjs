@@ -117,7 +117,7 @@ test('state y settings conservan defaults y normalización de Fase 6', () => {
   assert.doesNotMatch(game, /intensity === 'off'\) settings\.game\.enabled = false/);
   assert.match(appMain, /game: createDefaultGameState\(\)/);
   assert.match(appMain, /game: normalizeGameState\(src\.game\)/);
-  assert.match(appMain, /game: \{ enabled: false, intensity: 'arcade' \}/);
+  assert.match(appMain, /game: \{ enabled: false, intensity: 'arcade', soundEnabled: true, soundVolume: 40 \}/);
   assert.match(game, /if \(typeof settings\.game\.enabled !== 'boolean'\) settings\.game\.enabled = false/);
 });
 
@@ -572,7 +572,9 @@ test('consistencia de gamificación se mantiene aunque esté apagada', () => {
 test('Arcade fijo y reduced-motion solo elimina movimiento', () => {
   const game = read('js/game.js');
   const tone = between(game, 'function playGameTone', '\nconst gameEventVersions');
-  assert.match(tone, /if \(!arcadeEnabled\(\)\) return/);
+  assert.match(tone, /arcadeEnabled\(\)/);
+  assert.match(tone, /dayKey === currentGameDayKey\(\)/);
+  assert.match(tone, /playGameSound\(kind, \{ allowed \}\)/);
   assert.doesNotMatch(tone, /prefers-reduced-motion/);
 });
 

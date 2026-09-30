@@ -50,8 +50,8 @@ test('la superficie dinámica mantiene controles, recibos, accesibilidad y Audio
   for (const action of ['equip-accessory', 'claim-chest', 'choose-cycle-reward']) assert.match(game, new RegExp(`data-game-action=\\"${action}\\"`));
   assert.match(game, /gross, applied/);
   assert.match(game, /repairBonusReceipt/);
-  assert.match(game, /let gameAudioContext = null/);
-  assert.equal((game.match(/new AudioContextCtor\(\)/g) || []).length, 1);
+  assert.match(game, /from '\.\/game-audio\.js'/);
+  assert.equal((read('js/game-audio.js').match(/new Constructor\(\)/g) || []).length, 1);
   assert.match(game, /gameStatusLive/);
   assert.doesNotMatch(surface, /choose-mission|gameDailyFocus/);
   assert.match(game, /item\.unlockLevel > state\.game\.level/);

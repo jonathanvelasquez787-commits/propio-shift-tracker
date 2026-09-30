@@ -76,10 +76,12 @@ export const REINFORCEMENT_TEXTS = Object.freeze({
 
 let queueToast = null;
 let triggerEffect = null;
+let playSound = null;
 
 export function configureReinforcementFeedback(context = {}) {
   queueToast = typeof context.queueToast === 'function' ? context.queueToast : null;
   triggerEffect = typeof context.triggerEffect === 'function' ? context.triggerEffect : null;
+  playSound = typeof context.playSound === 'function' ? context.playSound : null;
 }
 
 function variantIndex(seed, count) {
@@ -101,10 +103,11 @@ export function reinforcementFeedbackEnabled(channel = 'game') {
   return channel === 'either' ? game || personal : channel === 'personal' ? personal : channel === 'game' ? game : false;
 }
 
-export function notifyReinforcement(message, { channel = 'game', effect = false } = {}) {
+export function notifyReinforcement(message, { channel = 'game', effect = false, sound = '', dayKey } = {}) {
   const text = String(message ?? '').trim();
   if (!text || !reinforcementFeedbackEnabled(channel) || !queueToast) return false;
   queueToast(text, effect ? 'record' : '', { channel });
+  if (sound && playSound) playSound(sound, dayKey);
   if (effect && settings.game?.enabled === true && triggerEffect
       && !globalThis.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches) triggerEffect(text);
   return true;
@@ -140,4 +143,5 @@ export function chooseCallFeedback(call, { previousCalls = [], bonus = 0, money,
 export function resetFeedbackForTests() {
   queueToast = null;
   triggerEffect = null;
+  playSound = null;
 }
