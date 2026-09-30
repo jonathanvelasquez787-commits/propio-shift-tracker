@@ -7,7 +7,8 @@ import { setAppCalls, setAppSettings, setAppState } from '../js/app-context.js';
 import {
   PHYSICAL_REWARD_PRESETS, configurePositiveReinforcementContext, createDefaultReinforcementState,
   initPositiveReinforcement, migratePositiveCallIdReferences, normalizeReinforcementSettings,
-  normalizeReinforcementState, onPositiveCallSaved, reconcilePositiveCalls,
+  normalizeReinforcementState, onPositiveCallSaved, onPositiveRewardWindow, reconcilePositiveCalls,
+  reopenPositiveReflection, clearPositiveReinforcementTransients,
 } from '../js/positive-reinforcement.js';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -30,7 +31,7 @@ test('premios personales y catálogo normalizan límites sin introducir puntos n
   assert.deepEqual(normalizeReinforcementState({ recoveries: [{}], pendingRewards: [{ name: '<bad>', window: 'other' }] }).pendingRewards, []);
 });
 
-test('llamadas difíciles, premios acumulables, ventana segura y presupuesto conservan el premio', () => {
+test('llamadas difíciles, premios acumulables, ventana segura y presupuesto conservan el premio', async () => {
   const dayKey = currentDayKey();
   const callRows = [];
   const currentState = { game: { reinforcement: createDefaultReinforcementState() } };
@@ -128,6 +129,34 @@ test('llamadas difíciles, premios acumulables, ventana segura y presupuesto con
   assert.equal(currentState.game.reinforcement.reflections['modal-official'].callId, 'modal-official');
   assert.equal(currentState.game.reinforcement.recoveryPending.callId, 'modal-official');
   assert.equal(currentState.game.reinforcement.recoveryPending.endISO, correctedEndISO);
+
+  const demoReflectionCall = { id: 'qa-reflection', customerId: 'QA-01', callDate: dayKey, endISO: new Date(Date.now() - 10000).toISOString() };
+  const reinforcementBeforeReopen = structuredClone(currentState.game.reinforcement);
+  callRows.push(demoReflectionCall);
+  assert.equal(reopenPositiveReflection(demoReflectionCall, dayKey), true);
+  assert.equal(opened.at(-1), 'positiveReflectionModal');
+  assert.deepEqual(currentState.game.reinforcement, reinforcementBeforeReopen, 'reabrir reflexión no evalúa premios ni progreso');
+
+  currentSettings.reinforcement.enabled = false;
+  assert.equal(reopenPositiveReflection(demoReflectionCall, dayKey), false, 'el refuerzo apagado no reabre la reflexión');
+  currentSettings.reinforcement.enabled = true;
+  assert.equal(reopenPositiveReflection({ ...demoReflectionCall, endISO: new Date(Date.now() + 60000).toISOString() }, dayKey), false, 'una llamada aún abierta no admite reflexión');
+
+  const stageClearModal = { open: true, classList: { contains: (name) => name === 'open' && stageClearModal.open } };
+  nodes.set('stageClearModal', stageClearModal);
+  currentState.shiftEndedAt = new Date().toISOString();
+  currentState.activePause = null;
+  currentState.game.reinforcement.pendingRewards.push({
+    id: 'qa-shift-reward', rewardId: 'tea', sourceRewardId: 'tea', name: 'Té', icon: '☕', window: 'shift-end',
+    dayKey, triggerKey: `calls:${dayKey}:qa`, earnedAt: new Date().toISOString(), costUsd: 0, durationMin: 0,
+  });
+  assert.equal(onPositiveRewardWindow('shift-end'), true, 'el premio se difiere mientras el modal de cierre está abierto');
+  clearPositiveReinforcementTransients();
+  const openCountBeforeCloseEvent = opened.length;
+  stageClearModal.open = false;
+  listeners.get('app:modal-closed')({ detail: { id: 'stageClearModal' } });
+  await new Promise((resolve) => setTimeout(resolve, 10));
+  assert.equal(opened.length, openCountBeforeCloseEvent, 'limpiar transitorios evita reabrir premios tras cerrar el modal de cierre');
 });
 
 test('reemplazar una llamada live migra las referencias de refuerzo antes de reconciliar', () => {

@@ -227,6 +227,13 @@ let editingRewardId = null;
 let editingTemplateId = null;
 let deferredWindow = null;
 
+export function clearPositiveReinforcementTransients() {
+  reflectionCall = null;
+  editingRewardId = null;
+  editingTemplateId = null;
+  deferredWindow = null;
+}
+
 function renderReflectionModal(call, dayKey) {
   reflectionCall = { callId: String(call.id), dayKey, endISO: call.endISO };
   const note = document.getElementById('positiveReflectionNote');
@@ -254,6 +261,15 @@ export function onPositiveCallSaved(call, source, dayKey) {
   if (!silent && settings.reinforcement.askAfterCall && !state.game.reinforcement.reflections[call.id]) {
     renderReflectionModal(call, normalizedDay);
   }
+}
+
+export function reopenPositiveReflection(call, dayKey) {
+  if (!reinforcementEnabled() || !call?.id) return false;
+  const normalizedDay = callDateKeyFromValue(dayKey) || callDateKeyFromValue(call.callDate) || currentPositiveDayKey();
+  const endTime = new Date(call.endISO).getTime();
+  if (normalizedDay !== currentPositiveDayKey() || !Number.isFinite(endTime) || endTime > Date.now()) return false;
+  renderReflectionModal(call, normalizedDay);
+  return true;
 }
 
 function saveReflection(outcome) {

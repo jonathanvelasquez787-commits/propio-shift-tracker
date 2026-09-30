@@ -1,3 +1,10 @@
+import {
+  createQaWalkthroughCall,
+  QA_WALKTHROUGH_CALL_DURATION_MIN,
+  QA_WALKTHROUGH_CALL_RATE,
+  QA_WALKTHROUGH_TOTAL_CALLS,
+} from './qa-walkthrough.js';
+
 function localDay(date) {
   return `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}/${date.getFullYear()}`;
 }
@@ -5,6 +12,24 @@ function localDay(date) {
 function dayAt(now, offset) {
   const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset, 9, 0, 0, 0);
   return date;
+}
+
+function qaWeeklySchedule() {
+  const day = () => ({
+    off: false,
+    start: '07:00',
+    end: '15:00',
+    blocks: [
+      { type: 'work', start: '07:00', dur: 130, goalMin: 30 },
+      { type: 'break', start: '09:10', dur: 20 },
+      { type: 'work', start: '09:30', dur: 130, goalMin: 30 },
+      { type: 'break', start: '11:40', dur: 20 },
+      { type: 'work', start: '12:00', dur: 60, goalMin: 20 },
+      { type: 'lunch', start: '13:00', dur: 55 },
+      { type: 'work', start: '13:55', dur: 65, goalMin: 20 },
+    ],
+  });
+  return Object.fromEntries(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map((dayKey) => [dayKey, day()]));
 }
 
 function sampleCalls(now, days = 6, callsPerDay = 5) {
@@ -19,7 +44,7 @@ function sampleCalls(now, days = 6, callsPerDay = 5) {
       const end = new Date(start.getTime() + durationMin * 60000);
       const callDate = localDay(base);
       rows.push({
-        id: `qa-${callDate.replaceAll('/', '')}-${index}`,
+        id: `qa-${callDate.replaceAll('/', '')}-${dayOffset}-${index}`,
         customerId: `QA${Math.abs(dayOffset)}${index + 1}`,
         callDate,
         calendarCallDate: callDate,
@@ -61,11 +86,12 @@ function finalizedDay(dayKey, index) {
   };
 }
 
-function gameFixture(now, scenario) {
-  const today = localDay(now);
+function gameFixture(now, scenario, activeDayKey = localDay(now)) {
+  const today = activeDayKey;
   const days = {};
   for (let offset = -5; offset < 0; offset++) {
     const key = localDay(dayAt(now, offset));
+    if (scenario === 'tour' && key === activeDayKey) continue;
     days[key] = finalizedDay(key, offset + 5);
   }
   const game = {
@@ -81,7 +107,7 @@ function gameFixture(now, scenario) {
     equipment: { head: 'Corona del ciclo', neck: 'Bufanda de racha', back: null, body: 'Armadura cian', face: null },
     days,
     ledger: {},
-    live: { dayKey: today, combo: scenario === 'near-win' ? 7 : 5, shiftAlarmAt: null },
+    live: { dayKey: today, combo: scenario === 'tour' ? 0 : scenario === 'near-win' ? 7 : 5, shiftAlarmAt: null },
   };
   if (scenario === 'rewards') {
     game.chest = { pending: true, sealedOn: localDay(dayAt(now, -1)) };
@@ -97,8 +123,16 @@ function gameFixture(now, scenario) {
   return game;
 }
 
+export const QA_TOUR_PRODUCTIVE_GOAL_MIN = 17;
+export const QA_TOUR_EARNINGS_GOAL = Number((QA_TOUR_PRODUCTIVE_GOAL_MIN * QA_WALKTHROUGH_CALL_RATE).toFixed(2));
+export const QA_TOUR_REWARDS = Object.freeze([
+  Object.freeze({ id: 'qa-tour-call-reward', name: 'Pausa para celebrar', icon: '☕', window: 'break', trigger: 'calls', every: 5, maxPerDay: 1, accumulationTarget: 1, durationMin: 2, costUsd: 0.05, enabled: true }),
+  Object.freeze({ id: 'qa-tour-recovery-reward', name: 'Un momento al aire', icon: '🌤️', window: 'break', trigger: 'recovery', every: 1, maxPerDay: 1, accumulationTarget: 1, durationMin: 2, costUsd: 0.05, enabled: true }),
+  Object.freeze({ id: 'qa-tour-goal-reward', name: 'Cerrar con calma', icon: '🌙', window: 'shift-end', trigger: 'daily-goal', every: 1, maxPerDay: 1, accumulationTarget: 1, durationMin: 5, costUsd: 0.1, enabled: true }),
+]);
+
 export const QA_SCENARIOS = Object.freeze([
-  { id: 'tour', label: 'Recorrido completo' },
+  { id: 'tour', label: 'Recorrido guiado' },
   { id: 'near-win', label: 'Victoria próxima' },
   { id: 'rewards', label: 'Cofres y recompensas' },
 ]);
@@ -106,29 +140,56 @@ export const QA_SCENARIOS = Object.freeze([
 export function createQaSnapshot(source, scenario = 'tour', now = new Date()) {
   const selected = QA_SCENARIOS.some((item) => item.id === scenario) ? scenario : 'tour';
   const allCalls = sampleCalls(now, 6, 5);
-  const calls = selected === 'near-win' ? allCalls.slice(0, -3) : allCalls;
+  const today = localDay(now);
+  const tourAnchor = selected === 'tour'
+    ? createQaWalkthroughCall({ ordinal: 1, dayKey: today, now, totalCalls: QA_WALKTHROUGH_TOTAL_CALLS })
+    : null;
+  const firstTourCallStart = tourAnchor ? new Date(tourAnchor.startISO).getTime() : Number.NaN;
+  const shiftStartedAt = Number.isFinite(firstTourCallStart) ? new Date(firstTourCallStart - 60000).toISOString() : null;
+  const accountingDayKey = shiftStartedAt ? localDay(new Date(shiftStartedAt)) : today;
+  const calls = selected === 'near-win'
+    ? allCalls.slice(0, -3)
+    : selected === 'tour'
+      ? allCalls.filter((call) => call.callDate !== accountingDayKey)
+      : allCalls;
+  const inheritedState = selected === 'tour' ? {} : (source.state || {});
+  const inheritedSettings = selected === 'tour' ? {} : (source.settings || {});
   const state = {
-    ...(source.state || {}),
-    shiftStartedAt: null,
+    ...inheritedState,
+    shiftStartedAt,
     shiftEndedAt: null,
     activePause: null,
     activeCall: null,
     pendingLiveCallBackup: null,
-    lastCallEndedAt: calls.at(-1)?.endISO || null,
+    lastCallEndedAt: selected === 'tour' ? null : calls.at(-1)?.endISO || null,
     pauseHistory: [],
     events: [],
-    activeDayKey: localDay(now),
     gapAnnotations: {},
     dayNotes: { [localDay(dayAt(now, -2))]: { category: 'other', note: 'Dato de ejemplo del modo QA' } },
     dayInterruptions: {},
-    game: gameFixture(now, selected),
+    game: gameFixture(now, selected, accountingDayKey),
+    lastCalendarDay: null,
+    qaWalkthrough: selected === 'tour'
+      ? { version: 1, step: 0, completed: false, sessionId: `qa-tour-${new Date(now).getTime().toString(36)}`, nextCallOrdinal: 1, generatedCallIds: [] }
+      : null,
+    activeDayKey: selected === 'tour' ? accountingDayKey : calls.at(-1)?.callDate || today,
   };
   const settings = {
-    ...(source.settings || {}),
+    ...inheritedSettings,
     onboarded: true,
-    productiveGoalMin: 45,
-    earningsGoal: 7.08,
-    game: { ...((source.settings || {}).game || {}), enabled: true, intensity: 'arcade' },
+    productiveGoalMin: selected === 'tour' ? QA_TOUR_PRODUCTIVE_GOAL_MIN : 45,
+    earningsGoal: selected === 'tour' ? QA_TOUR_EARNINGS_GOAL : 7.08,
+    rate: QA_WALKTHROUGH_CALL_RATE,
+    weeklySchedule: qaWeeklySchedule(),
+    scheduleOverridesByWeek: {},
+    scheduleHistoryByDay: {},
+    dailyGoalOverrides: {},
+    goalHistoryByDay: {},
+    lateArrivalMode: 'anchor',
+    game: { enabled: true, intensity: 'arcade' },
+    reinforcement: selected === 'tour'
+      ? { enabled: true, askAfterCall: true, weeklyBudgetUsd: 1, rewards: QA_TOUR_REWARDS.map((reward) => ({ ...reward })) }
+      : { enabled: false, askAfterCall: false, weeklyBudgetUsd: 0, rewards: [] },
   };
   return { state, calls, settings };
 }

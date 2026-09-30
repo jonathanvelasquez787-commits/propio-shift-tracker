@@ -94,9 +94,20 @@ function boundedGameNumber(value, max, integer = false) {
   return Math.max(0, Math.min(max, integer ? Math.floor(number) : number));
 }
 
+function gameDayDateFromKey(value) {
+  const match = String(value ?? '').trim().match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (!match) return null;
+  const month = Number(match[1]);
+  const day = Number(match[2]);
+  const year = Number(match[3]);
+  if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+  const parsed = new Date(year, month - 1, day, 0, 0, 0, 0);
+  return parsed.getMonth() === month - 1 && parsed.getDate() === day ? parsed : null;
+}
+
 function validGameDayKey(value) {
   const key = String(value ?? '');
-  return callDateToDate(key) ? key : null;
+  return gameDayDateFromKey(key) ? key : null;
 }
 
 function normalizeGameDayEntry(rawEntry) {
@@ -188,7 +199,7 @@ export function normalizeGameState(raw) {
   const days = Object.fromEntries(Object.entries(rawDays)
     .map(([key, value]) => [validGameDayKey(key), value])
     .filter(([key]) => key)
-    .sort((a, b) => (callDateToDate(b[0])?.getTime() || 0) - (callDateToDate(a[0])?.getTime() || 0))
+    .sort((a, b) => (gameDayDateFromKey(b[0])?.getTime() || 0) - (gameDayDateFromKey(a[0])?.getTime() || 0))
     .slice(0, GAME_DAY_LIMIT)
     .flatMap(([key, value]) => {
       const entry = normalizeGameDayEntry(value);
@@ -268,11 +279,19 @@ export function levelForXp(totalXp) {
   return level;
 }
 
+function sanitizeMonsterName(value) {
+  if (typeof value !== 'string') return '';
+  return Array.from(value.replace(/[\u0000-\u001f\u007f-\u009f]/g, '').trim()).slice(0, 60).join('').trim();
+}
+
 function ensureGameSettings() {
   if (!settings.game || typeof settings.game !== 'object' || Array.isArray(settings.game)) settings.game = {};
   if (typeof settings.game.enabled !== 'boolean') settings.game.enabled = false;
   if (!['subtle', 'arcade', 'off'].includes(settings.game.intensity)) settings.game.intensity = 'arcade';
   if (settings.game.intensity === 'off') settings.game.enabled = false;
+  const monsterName = sanitizeMonsterName(settings.game.monsterName);
+  if (monsterName) settings.game.monsterName = monsterName;
+  else delete settings.game.monsterName;
   return settings.game;
 }
 
@@ -581,6 +600,8 @@ function yesterdayShadowPct() {
 }
 
 let lastArenaRenderKey = '';
+let monsterNameDraftDirty = false;
+let lastSettingsMonsterName = null;
 
 function renderArena() {
   const root = document.getElementById('gameArena');
@@ -604,19 +625,24 @@ function renderArena() {
   const monsterState = monsterStateFor(day);
   const monsterPhase = day.phase || monsterPhaseFor(day);
   const variant = monsterVariantFor(day);
+  const customName = sanitizeMonsterName(settings.game.monsterName);
+  const displayName = customName || day.species.name;
   const shadow = yesterdayShadowPct();
   const damage = Math.max(0, day.goal.usd - day.stats.earnings);
-  const renderKey = [dayKey, subtle, monsterState, monsterPhase, variant, day.stats.earnings.toFixed(2), Math.round(day.hpPct * 10), Math.round((shadow ?? -1) * 10), day.missions.map((mission) => mission.ok ? 1 : 0).join(''), Object.values(state.game.equipment || {}).join('|')].join(':');
+  const renderKey = [dayKey, subtle, monsterState, monsterPhase, variant, displayName, day.stats.earnings.toFixed(2), Math.round(day.hpPct * 10), Math.round((shadow ?? -1) * 10), day.missions.map((mission) => mission.ok ? 1 : 0).join(''), Object.values(state.game.equipment || {}).join('|')].join(':');
   if (renderKey === lastArenaRenderKey) return;
   lastArenaRenderKey = renderKey;
   root.className = `game-arena ${subtle ? 'game-arena--subtle' : 'game-arena--arcade'} game-${escapeHtml(monsterState)}`;
   root.dataset.gameState = monsterState;
   root.dataset.gamePhase = monsterPhase;
   root.dataset.gameIntensity = subtle ? 'subtle' : 'arcade';
+  const monsterImageLabel = `${displayName}${customName ? `, ${day.species.name}` : ''}, ${PHASE_LABELS[monsterPhase] || monsterPhase}, ${Math.round(day.hpPct)}% de vida`;
+  const sprite = monsterSvg({ species: day.species.id, state: monsterState, variant, hpPct: day.hpPct, sizeClass: subtle ? 'sm' : 'lg', equipment: state.game.equipment })
+    .replace(/ role="img" aria-label="[^"]*"/, ' aria-hidden="true"');
   root.innerHTML = `
     <div class="game-arena-copy">
       <div class="game-kicker">MONSTRUO DEL DÍA</div>
-      <div class="game-arena-title-row"><h3>${escapeHtml(day.species.name)}</h3><span class="game-combo-badge">x${state.game.live.combo || 0}</span></div>
+      <div class="game-arena-title-row"><h3>${escapeHtml(displayName)}</h3><span class="game-combo-badge">x${state.game.live.combo || 0}</span></div>
       <div class="game-phase-meter" data-phase="${escapeHtml(monsterPhase)}" role="status" aria-label="Fase del monstruo: ${escapeHtml(PHASE_LABELS[monsterPhase] || monsterPhase)}"><span>${escapeHtml(PHASE_LABELS[monsterPhase] || monsterPhase)}</span><small>Las ganancias y la vida financiera no cambian por la fase.</small></div>
       <p class="game-monster-phrase">“${escapeHtml(day.species.phrase)}”</p>
       <div class="game-hp-label"><span>VIDA</span><strong>${Math.round(day.hpPct)}%</strong></div>
@@ -626,7 +652,7 @@ function renderArena() {
       </div>
       <div class="game-hp-foot"><span>${withConversion(damage)} de vida restante</span><span>${day.defeated ? 'Botín extra: las ganancias siguen, el XP no' : `${withConversion(day.stats.earnings)} de daño`}</span></div>
     </div>
-    <div class="game-monster-stage">${monsterSvg({ species: day.species.id, state: monsterState, variant, hpPct: day.hpPct, sizeClass: subtle ? 'sm' : 'lg', equipment: state.game.equipment })}</div>`;
+    <div class="game-monster-stage" role="img" aria-label="${escapeHtml(monsterImageLabel)}">${sprite}</div>`;
 }
 
 function renderMissions() {
@@ -659,6 +685,10 @@ function renderDailyFocus() {
   const day = computeGameDay(dayKey);
   const focus = state.game.days[dayKey]?.missionChoice || 'balanced';
   const locked = day.eligibleCalls.length > 0;
+  const hint = root.querySelector('[data-game-role="daily-focus-hint"]');
+  if (hint) hint.textContent = locked
+    ? 'La primera llamada elegible ya fijó este enfoque para hoy; mañana podrás elegir otro.'
+    : 'Elige antes de tu primera llamada; luego queda fijado para el día.';
   const options = root.querySelector('[data-game-role="daily-focus-options"]');
   if (!options) return;
   options.classList.toggle('is-locked', locked);
@@ -1060,13 +1090,20 @@ function renderAchievements() {
 function renderSettingsProfile() {
   const enabled = document.getElementById('gameEnabledInput');
   const intensity = document.getElementById('gameIntensityInput');
+  const monsterName = document.getElementById('monsterNameInput');
   const profile = document.getElementById('gameSettingsProfile');
   const level = gameLevelProgress();
   if (enabled) enabled.checked = gameEnabled();
   if (intensity) {
-    intensity.value = settings.game.intensity;
+    intensity.value = settings.game.intensity === 'off' ? 'subtle' : settings.game.intensity;
     intensity.disabled = !gameEnabled();
   }
+  const savedMonsterName = sanitizeMonsterName(settings.game.monsterName);
+  if (lastSettingsMonsterName !== savedMonsterName) {
+    monsterNameDraftDirty = false;
+    lastSettingsMonsterName = savedMonsterName;
+  }
+  if (monsterName && !monsterNameDraftDirty && document.activeElement !== monsterName) monsterName.value = savedMonsterName;
   if (!profile) return;
   const { seen } = bestiarySnapshot();
   const values = {
@@ -1327,9 +1364,9 @@ function triggerGameEvent(rootId, eventName, duration = 900) {
 }
 
 function grantDayBonus(dayKey, amount) {
+  const before = computeGameDay(dayKey).xp;
   const entry = dayEntry(dayKey);
   if (entry.finalized || Number.isFinite(Number(entry.xpLocked))) return 0;
-  const before = computeGameDay(dayKey).xp;
   if (before >= GAME_DAILY_XP_CAP) return 0;
   const previousBonus = Number(entry.bonusXp) || 0;
   entry.bonusXp = Math.min(GAME_DAILY_XP_CAP, Math.max(0, previousBonus + Math.max(0, Number(amount) || 0)));
@@ -2046,11 +2083,15 @@ function stageClearMarkup(dayKey, entry) {
   const nextLevelXp = Math.max(totalXpAfter, Number(entry.nextLevelXp) || xpThresholdForLevel(levelAfter + 1));
   const xpToNext = Math.max(0, nextLevelXp - totalXpAfter);
   const monster = entry.monster || { defeated: false, hpPct: fallback.hpPct };
+  const monsterName = sanitizeMonsterName(settings.game.monsterName) || fallback.species.name;
+  const monsterOutcome = monster.defeated
+    ? `Monstruo derrotado: ${monsterName}`
+    : `Escapó con ${Math.round(monster.hpPct)}% de vida: ${monsterName}`;
 
   return `<div class="game-stage-clear">
     <span class="game-kicker">STAGE CLEAR</span>
     <h2>${'★'.repeat(entry.stars || 1)}${'☆'.repeat(Math.max(0, 3 - (entry.stars || 0)))}</h2>
-    <p>${monster.defeated ? 'Monstruo derrotado' : `El monstruo escapó con ${Math.round(monster.hpPct)}% de vida`} · ${withConversion(earnings)}</p>
+    <p>${escapeHtml(monsterOutcome)} · ${withConversion(earnings)}</p>
     <div class="game-stage-score"><strong>+${entry.xp} XP</strong><span>Tope diario ${GAME_DAILY_XP_CAP}</span></div>
     <div class="game-stage-comparisons">
       <div><span>Ayer</span><strong>${yesterdayText}</strong></div>
@@ -2274,10 +2315,28 @@ export function initGame() {
   });
   document.getElementById('gameIntensityInput')?.addEventListener('change', (event) => {
     const value = event.target.value;
-    settings.game.intensity = ['subtle', 'arcade', 'off'].includes(value) ? value : 'arcade';
-    settings.game.enabled = settings.game.intensity !== 'off';
+    settings.game.intensity = ['subtle', 'arcade'].includes(value) ? value : 'arcade';
+    settings.game.enabled = true;
     saveSettingsOnly();
     renderGame();
+  });
+  document.getElementById('monsterNameSaveBtn')?.addEventListener('click', () => {
+    const input = document.getElementById('monsterNameInput');
+    if (!input) return;
+    const name = sanitizeMonsterName(input.value);
+    const config = ensureGameSettings();
+    if (name) config.monsterName = name;
+    else delete config.monsterName;
+    monsterNameDraftDirty = false;
+    saveSettingsOnly();
+    const status = document.getElementById('monsterNameSaveStatus');
+    if (status) status.textContent = name ? `Nombre guardado: ${name}.` : 'Se usarán los nombres del catálogo.';
+    renderGame();
+  });
+  document.getElementById('monsterNameInput')?.addEventListener('input', () => {
+    monsterNameDraftDirty = true;
+    const status = document.getElementById('monsterNameSaveStatus');
+    if (status) status.textContent = '';
   });
   document.getElementById('resetGameProgressBtn')?.addEventListener('click', resetGameProgress);
   document.getElementById('stageClearCloseBtn')?.addEventListener('click', () => closeModal('stageClearModal'));

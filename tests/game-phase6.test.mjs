@@ -3,7 +3,9 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createDefaultReinforcementState, normalizeReinforcementState } from '../js/positive-reinforcement.js';
+import { setAppCalls, setAppSettings, setAppState } from '../js/app-context.js';
+import { computeGameDay, configureGameContext, createDefaultGameState, normalizeGameState, onGameCallSaved, onGameCallsChanged } from '../js/game.js';
+import { configurePositiveReinforcementContext, createDefaultReinforcementState, normalizeReinforcementState } from '../js/positive-reinforcement.js';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
@@ -70,6 +72,51 @@ test('HTML integra la ruta de Logros, el arena, las misiones, ajustes y modales 
   assert.match(appMain, /onGameGapSaved/);
 });
 
+test('Logros agrupa los ajustes, conserva el enfoque diario y admite nombre personalizado seguro', () => {
+  const html = read('app.html');
+  const achievements = between(html, '<div class="app-page game-achievements-page"', '</div><!-- /pageAchievements -->');
+  const gameEditor = between(achievements, '<details class="game-panel game-settings-accordion" id="gameSettingsAccordion">', '<details class="game-panel game-settings-accordion" id="positiveSettingsAccordion">');
+  const qaEditor = between(achievements, '<details class="game-panel game-settings-accordion" id="qaModeAccordion">', '</details>');
+  const settingsModal = between(html, '<div aria-hidden="true" class="modal-overlay" id="goalsModal">', '<div aria-hidden="true" class="modal-overlay game-modal-overlay" id="stageClearModal">');
+  const allIds = [...html.matchAll(/\bid="([^"]+)"/g)].map((match) => match[1]);
+  assert.deepEqual(allIds.filter((id, index) => allIds.indexOf(id) !== index), []);
+  assert.match(gameEditor, /id="gameDailyFocus"/);
+  assert.match(gameEditor, /id="gameEnabledInput"/);
+  assert.match(gameEditor, /id="monsterNameInput"[^>]*maxlength="60"/);
+  assert.match(gameEditor, /id="monsterNameSaveBtn"/);
+  assert.equal((gameEditor.match(/<option\b/g) || []).length, 2);
+  assert.doesNotMatch(gameEditor, /<option\s+value="off"/);
+  for (const id of [
+    'gameEnabledInput', 'gameIntensityInput', 'gameSettingsProfile', 'positiveReinforcementEnabledInput',
+    'positiveAskAfterCallInput', 'positiveWeeklyBudgetInput', 'physicalRewardSelected', 'physicalRewardCatalog',
+    'qaModeSection', 'qaModePanel', 'qaScenarioInput', 'qaLoadBtn', 'qaRestoreBtn',
+  ]) assert.doesNotMatch(settingsModal, new RegExp(`\\bid="${id}"`), `#${id} should be under Logros`);
+  assert.match(qaEditor, /id="qaModeSection"[\s\S]*id="qaScenarioInput"[\s\S]*id="qaLoadBtn"[\s\S]*id="qaRestoreBtn"/);
+
+  const banner = between(html, '<div class="storage-conflict-banner qa-mode-banner" id="qaModeBanner"', '<div id="bootGate"');
+  for (const id of ['qaWalkthroughPanel', 'qaWalkthroughProgress', 'qaWalkthroughTitle', 'qaWalkthroughDescription', 'qaWalkthroughResult', 'qaWalkthroughNextBtn', 'qaWalkthroughRestartBtn', 'qaBannerRestoreBtn']) {
+    assert.match(banner, new RegExp(`\\bid="${id}"`), `missing #${id}`);
+  }
+  assert.match(banner, /id="qaWalkthroughPanel" hidden/);
+  assert.match(banner, /SIMULACIÓN LOCAL · NADA SUBE A LA NUBE/);
+
+  const game = read('js/game.js');
+  const sanitizerSource = between(game, 'function sanitizeMonsterName(value)', '\n\nfunction ensureGameSettings');
+  const sanitize = new Function(`${sanitizerSource}; return sanitizeMonsterName;`)();
+  assert.equal(sanitize('  Ogre\u0001<script>  '), 'Ogre<script>');
+  assert.equal(sanitize('😀'.repeat(70)), '😀'.repeat(60));
+  assert.equal(sanitize({ name: 'no' }), '');
+  assert.match(game, /settings\.game\.intensity === 'off'\) settings\.game\.enabled = false/);
+  assert.match(game, /config\.monsterName = name/);
+  assert.match(game, /saveSettingsOnly\(\);[\s\S]*renderGame\(\);/);
+  assert.match(game, /monsterNameInput'\)\?\.addEventListener\('input'/);
+  assert.match(game, /lastSettingsMonsterName !== savedMonsterName/);
+  assert.match(game, /monsterName && !monsterNameDraftDirty && document\.activeElement !== monsterName/);
+  assert.match(game, /variant, displayName, day\.stats\.earnings/);
+  assert.match(game, /Monstruo derrotado: \$\{monsterName\}/);
+  assert.match(game, /monsterImageLabel/);
+});
+
 test('state y settings conservan defaults y normalización de Fase 6', () => {
   const game = read('js/game.js');
   const appMain = read('js/app-main.js');
@@ -112,6 +159,137 @@ test('después de derrotar no entra XP nuevo pero sí se muestra botín extra', 
   assert.match(handler, /if \(currentDay\.defeated && xpLocked\)/);
   assert.match(handler, /showCallFx\(call, 0, critical, 'extra'\)/);
   assert.match(game, /xpLocked: Number\(entry\.xpLocked\)/);
+});
+
+test('el hook real conserva el botín XP de la quinta llamada al reconciliar y recargar', () => {
+  const keyFor = (date = new Date()) => `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}/${date.getFullYear()}`;
+  const parseDayKey = (value) => {
+    const match = String(value ?? '').match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    if (!match) return null;
+    const date = new Date(Number(match[3]), Number(match[1]) - 1, Number(match[2]));
+    return date.getFullYear() === Number(match[3]) && date.getMonth() === Number(match[1]) - 1 && date.getDate() === Number(match[2]) ? date : null;
+  };
+  const dayKeyFromValue = (value) => {
+    const raw = String(value ?? '').trim();
+    if (parseDayKey(raw)) return raw;
+    const date = new Date(value);
+    return Number.isFinite(date.getTime()) ? keyFor(date) : null;
+  };
+  let currentState;
+  let callRows = [];
+  const currentSettings = {
+    game: { enabled: true, intensity: 'subtle' },
+    reinforcement: { enabled: false, askAfterCall: false, rewards: [] },
+    adherenceGoalPct: 95,
+  };
+  const callsForDay = (dayKey) => callRows.filter((call) => dayKeyFromValue(call.shiftDayKey || call.callDate) === dayKey);
+  const importedCallStats = (calls = []) => ({
+    productive: calls.reduce((total, call) => total + (Number(call.durationMin) || 0), 0),
+    total: calls.length, zeroCount: 0, dropped: 0, gapTotal: 0,
+    earnings: calls.reduce((total, call) => total + (Number(call.pay) || 0), 0),
+  });
+  const effectiveDailyGoal = () => ({ min: 1000, usd: 10000 });
+  const convertedAmountText = () => '';
+  const escapeHtml = (value) => String(value);
+  const saveStateOnly = () => {};
+  const saveSettingsOnly = () => {};
+  const toast = () => {};
+  const previousDocument = globalThis.document;
+  globalThis.document = {
+    activeElement: null,
+    documentElement: { classList: { toggle() {} } },
+    getElementById: () => null,
+    querySelector: () => null,
+    querySelectorAll: () => [],
+  };
+  setAppSettings(currentSettings);
+  configureGameContext({
+    callDateKeyFromValue: dayKeyFromValue,
+    callsForDay,
+    cycleEarningsForOffset: () => ({ earnings: 0, start: new Date(), end: new Date() }),
+    effectiveCycleGoal: () => 1000,
+    dayAdherence: () => ({ scorePct: 0, checkpoints: [] }),
+    dayConfigFor: () => ({ blocks: [] }),
+    effectiveDailyGoal,
+    formatCallDayLabel: (value) => String(value),
+    formatMinutes: (value) => String(value),
+    computeComplianceStreak: () => ({ days: 0 }),
+    higherRateBonusForCall: () => null,
+    higherRateLiveStatus: () => ({ active: false }),
+    importedCallStats,
+    parseMoney: (value) => Number(value) || 0,
+    saveStateOnly,
+    todayCallDateKey: keyFor,
+    weekdayKeyForDayKey: () => 'mon',
+  });
+  configurePositiveReinforcementContext({
+    callDateKeyFromValue: dayKeyFromValue, callsForDay, closeModal: () => {}, convertedAmountText,
+    effectiveDailyGoal, escapeHtml, importedCallStats, openModal: () => {}, saveSettingsOnly,
+    saveStateOnly, toast, todayCallDateKey: keyFor,
+  });
+
+  const resetScenario = ({ bonusXp = 0, xpLocked } = {}) => {
+    const game = createDefaultGameState();
+    game.accessories = ['Corona del ciclo', 'Cuernos dorados', 'Bufanda de racha', 'Alas pixel', 'Armadura cian', 'Ojo de rubí'];
+    game.days[keyFor()] = { bonusXp, ...(xpLocked === undefined ? {} : { xpLocked }) };
+    currentState = { game, gapAnnotations: {} };
+    callRows = [];
+    setAppState(currentState);
+    setAppCalls(callRows);
+    const baseNow = Date.now() - 240000;
+    for (let index = 0; index < 5; index++) {
+      const start = baseNow + index * 20000;
+      const end = start + 10000;
+      const call = {
+        id: `loot-call-${index + 1}`,
+        callDate: keyFor(),
+        shiftDayKey: keyFor(),
+        billable: 'Yes',
+        dropped: 'No',
+        countsAsProductive: true,
+        durationMin: 1,
+        pay: 0,
+        startISO: new Date(start).toISOString(),
+        endISO: new Date(end).toISOString(),
+        importedAt: new Date(end + 1000).toISOString(),
+      };
+      callRows.push(call);
+      setAppCalls(callRows);
+      onGameCallSaved(call, 'manual');
+    }
+    return keyFor();
+  };
+
+  try {
+    const dayKey = resetScenario();
+    const lootKey = `loot:${dayKey}:5`;
+    const receipt = currentState.game.ledger[lootKey];
+    assert.equal(receipt.type, 'bonusXp');
+    assert.ok(receipt.applied > 0, 'la quinta llamada debe aplicar XP por debajo del tope diario');
+    assert.equal(currentState.game.days[dayKey].bonusXp, receipt.applied);
+    assert.ok(computeGameDay(dayKey).xp < 150);
+
+    currentState = { ...currentState, game: normalizeGameState(JSON.parse(JSON.stringify(currentState.game))) };
+    setAppState(currentState);
+    onGameCallsChanged(dayKey);
+    assert.equal(currentState.game.ledger[lootKey].applied, receipt.applied);
+    assert.equal(currentState.game.days[dayKey].bonusXp, receipt.applied);
+    assert.equal(Object.keys(currentState.game.ledger).filter((key) => key.startsWith(`loot:${dayKey}:`)).length, 1);
+
+    const lockedDay = resetScenario({ xpLocked: 80 });
+    assert.equal(currentState.game.ledger[`loot:${lockedDay}:5`].applied, 0);
+    assert.equal(currentState.game.days[lockedDay].bonusXp, 0);
+
+    const cappedDay = resetScenario({ bonusXp: 150 });
+    assert.equal(currentState.game.ledger[`loot:${cappedDay}:5`].applied, 0);
+    assert.equal(currentState.game.days[cappedDay].bonusXp, 150);
+  } finally {
+    setAppState(null);
+    setAppCalls([]);
+    setAppSettings({});
+    if (previousDocument === undefined) delete globalThis.document;
+    else globalThis.document = previousDocument;
+  }
 });
 
 test('el bono manual de Higher Rate no se suma dos veces y los tiles conservan su efecto fuera de ventana', () => {
@@ -256,6 +434,10 @@ test('CSS de juego cubre motion reducido, layout estrecho y responsive', () => {
   assert.match(css, /@media\s*\(max-width:\s*520px\)/);
   assert.match(css, /min-width:\s*0/);
   assert.match(css, /overflow-wrap:\s*anywhere/);
+  assert.match(css, /#qaModePanel \.goals-backup-row\s*\{[^}]*flex-wrap:\s*wrap/);
+  assert.match(css, /#qaModePanel \.goals-backup-row > button:focus-visible/);
+  assert.match(css, /#qaModePanel \.goals-backup-row > button:disabled/);
+  assert.match(css, /#qaModePanel \.goals-backup-row > button\[hidden\]/);
 });
 
 test('build mantiene módulos fuente fuera de public y el worker precarga el CSS de juego', () => {

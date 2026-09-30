@@ -275,12 +275,45 @@ La aplicación funciona en producción con estas bases vigentes:
   global, backup diario, exportación y borrado de cuenta permanecen activos.
 - Turnos, llamadas, Horario, Higher Rate, Finanzas, Reportes, Calendario,
   Adherencia y la gamificación «El Monstruo» están integrados.
-- La versión actual es 571. Las mejoras nuevas se documentan como pendientes
+- La versión actual es 572. Las mejoras nuevas se documentan como pendientes
   actuales.
 
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v572** — Configuración en Logros y laboratorio guiado.
+
+- Gamificación, refuerzo positivo y Laboratorio QA se agrupan en paneles
+  plegables de Logros, fuera de Ajustes. «Plan del día» vive dentro del
+  editor de gamificación, conserva el bloqueo tras la primera llamada y
+  permanece oculto cuando el juego está apagado.
+- El interruptor de gamificación es la única opción de activación; la
+  intensidad conserva Sutil y Arcade y sigue reconociendo backups antiguos
+  con intensidad `off`.
+- Se puede guardar un nombre personal para el monstruo diario. Dejarlo
+  vacío conserva los nombres del catálogo; las especies, accesorios,
+  cálculos y recompensas no cambian.
+- QA usa horarios de demostración independientes, IDs únicos y un día
+  activo con llamadas progresivas e historial precargado. Se corrigió el escenario que aparecía vacío cerca
+  de medianoche por seleccionar hoy aunque sus muestras pertenecían a ayer.
+- El recorrido guiado demuestra llamadas, cierre positivo, recuperación,
+  constancia, pausas, premios y cierre del turno mediante los motores
+  existentes. Sus preferencias y progreso son locales al namespace QA;
+  reiniciar o salir recarga la app para descartar callbacks transitorios.
+- La normalización de fechas del juego ya no depende del contexto que se
+  configura después de cargar el estado. Un historial guardado podía lanzar
+  un error durante el arranque y activar el fallback vacío; ahora se conserva
+  al cargar y recargar. Las sesiones QA antiguas muestran cómo abrir la guía.
+- Se corrigió el bono de XP que escribía una entrada obsoleta después de
+  recalcular el día. Conserva las reglas de bloqueo y tope; las cajas ya
+  registran el bono concedido en la entrada vigente sin duplicarlo.
+- Verificados 120 tests, contratos/ciclos de 19 módulos, wiring de UI y
+  build de producción sin sourcemaps; auditoría de dependencias sin alertas.
+  En una demostración local aislada se comprobó el recorrido completo,
+  recarga sin duplicados, bono de caja persistente, pausa/premios, cierre
+  del turno y salida/restauración. Controles QA y guía revisados en móvil;
+  esta comprobación no usó una cuenta autenticada de producción.
 
 **v571** — Refuerzo positivo personal y elección explícita de gamificación.
 
@@ -329,23 +362,3 @@ La aplicación funciona en producción con estas bases vigentes:
   enfoque activo y las tres armaduras, reduciendo competencia visual.
 - Verificados 100 tests, aislamiento/restauración QA, contratos/ciclos de 16
   módulos, wiring de UI y build de producción sin sourcemaps.
-
-**v569** — Gamificación profunda, conectada y satisfactoria.
-
-- El combo ahora tiene hitos idempotentes en x3, x5 y x8; conserva la caja de
-  cinco llamadas y añade feedback y loot mejorado sin premiar horas extra ni
-  saltarse pausas.
-- El monstruo ganó fases Guardado/Furia/Vulnerable/Derrotado, tres placas de
-  armadura ligadas a misiones, reacciones puntuales y avisos accesibles.
-- Las misiones ofrecen enfoques Equilibrio/Calidad/Cuidado, se fijan con la
-  primera llamada elegible y entregan XP individual con feedback al completar.
-- Cofres y cajas muestran rareza, recibos reversibles y recompensas
-  deterministas; el jefe del ciclo permite elegir XP o accesorio sin duplicar
-  premios.
-- Los niveles muestran próximos desbloqueos y gobiernan accesorios equipables
-  que se reflejan sobre el SVG del monstruo; Logros integra equipo y cofres en
-  sus paneles reales, sin duplicados.
-- Toasts priorizados, XP flotante sin layout shift, sonidos con volumen maestro,
-  animaciones transitorias y cobertura completa de movimiento reducido.
-- Verificados 98 tests, contratos/ciclos de 14 módulos, wiring de UI, build sin
-  sourcemaps y arranque limpio del build en navegador sin errores de consola.
