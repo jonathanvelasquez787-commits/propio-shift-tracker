@@ -111,7 +111,7 @@ function financeMetaRowsSorted() {
   return rows.sort((a, b) => (Number(a.priority) || 0) - (Number(b.priority) || 0));
 }
 
-function financeIsRowPagado(row) {
+export function financeIsRowPagado(row) {
   return row.manualPaid === true || (Number(row.assignedAmount) >= Number(row.targetAmount) && Number(row.targetAmount) > 0);
 }
 

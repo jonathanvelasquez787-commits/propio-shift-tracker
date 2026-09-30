@@ -1,0 +1,117 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+import { APP_KEYS, writeLocalSnapshot } from '../js/sync.js';
+
+const source = fs.readFileSync(new URL('../js/app-main.js', import.meta.url), 'utf8');
+
+function storageHarness() {
+  const state = { game: { ledger: {} } }, calls = [], settings = { goal: 10 };
+  const values = new Map([['state', JSON.stringify(state)], ['calls', '[]'], ['settings', JSON.stringify(settings)]]);
+  let reject = () => false;
+  const warnings = [];
+  const context = vm.createContext({ state, calls, settings, STORAGE_KEY: 'state', CALLS_KEY: 'calls', SETTINGS_KEY: 'settings',
+    localStorage: {
+      getItem: (key) => values.get(key) ?? null,
+      setItem(key, value) { if (reject(key, value)) throw new Error('QuotaExceededError'); values.set(key, value); },
+      removeItem: (key) => values.delete(key),
+    }, toast: (message) => warnings.push(message), render: () => {},
+  });
+  const body = source.slice(source.indexOf('    function safeLocalStorageSet('), source.indexOf('    export function pad(')).replaceAll('export function ', 'function ');
+  vm.runInContext(body, context);
+  return { state, calls, settings, values, warnings, reject: (fn) => { reject = fn; }, run: (code) => vm.runInContext(code, context) };
+}
+
+test('una cuota agotada no persiste recompensas de llamadas que no llegaron al disco; un reintento guarda todo', () => {
+  const h = storageHarness();
+  const before = new Map(h.values);
+  h.calls.push({ id: 'pending-call' });
+  h.reject((key, value) => key === 'calls' && value !== '[]');
+  assert.equal(h.run('saveAll()'), false);
+  h.state.game.ledger['reward:pending-call'] = true;
+  assert.equal(h.run('saveStateOnly()'), false);
+  h.settings.goal = 20;
+  assert.equal(h.run('saveSettingsOnly()'), false);
+  assert.deepEqual(h.values, before);
+  h.reject(() => false);
+  assert.equal(h.run('saveSettingsOnly()'), true);
+  assert.deepEqual(JSON.parse(h.values.get('calls')), h.calls);
+  assert.deepEqual(JSON.parse(h.values.get('state')), h.state);
+  assert.deepEqual(JSON.parse(h.values.get('settings')), h.settings);
+});
+
+test('un almacenamiento que rechaza escrituras conserva las claves previas sin borrarlas', () => {
+  const h = storageHarness();
+  const before = new Map(h.values);
+  h.reject(() => true);
+  h.calls.push({ id: 'blocked' });
+  assert.equal(h.run('saveAll()'), false);
+  assert.deepEqual(h.values, before);
+});
+
+test('un fallo al guardar solo estado obliga a guardar el siguiente snapshot completo', () => {
+  const h = storageHarness();
+  h.reject(() => true);
+  h.state.game.ledger.pending = true;
+  assert.equal(h.run('saveStateOnly()'), false);
+  h.calls.push({ id: 'new-call' });
+  h.reject(() => false);
+  assert.equal(h.run('saveStateOnly()'), true);
+  assert.deepEqual(JSON.parse(h.values.get('calls')), h.calls);
+  assert.deepEqual(JSON.parse(h.values.get('state')), h.state);
+});
+
+test('el JSON descargado incluye el recibo y escudo del mismo respaldo', () => {
+  let downloaded;
+  const state = { game: { shields: 0, ledger: {} } };
+  const context = vm.createContext({ state, calls: [], settings: {}, Date,
+    onGameBackupExported() {
+      if (!state.game.ledger['backup-shield:week']) { state.game.shields++; state.game.ledger['backup-shield:week'] = true; }
+    },
+    Blob: class { constructor(parts) { downloaded = JSON.parse(parts[0]); } },
+    URL: { createObjectURL: () => 'blob:backup', revokeObjectURL() {} },
+    document: { createElement: () => ({ click() {} }) },
+  });
+  const body = source.slice(source.indexOf('    function exportJSON()'), source.indexOf('    // Exportación para contabilidad/impuestos'));
+  vm.runInContext(body + '\nexportJSON();', context);
+  assert.deepEqual(downloaded.state, state);
+  assert.equal(downloaded.state.game.shields, 1);
+  vm.runInContext('exportJSON();', context);
+  assert.equal(downloaded.state.game.shields, 1);
+});
+
+test('una exportación de dos años conserva los días y las llamadas después del día 400', () => {
+  const lastCall = { id: 'last-day', startISO: '2026-12-31T12:00:00Z', pay: 15 };
+  const context = vm.createContext({ Date,
+    todayCallDateKey: (d) => `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`,
+    callsForDay: (key) => key === '2026-12-31' ? [lastCall] : [],
+    importedCallStats: (calls) => ({ earnings: calls.reduce((sum, call) => sum + call.pay, 0) }),
+    dayIsEffectivelyOff: () => true, dayAdherence: () => null, productiveMinutesForDay: () => 0,
+  });
+  const body = source.slice(source.indexOf('    function accountingExportDays('), source.indexOf('    function csvField('));
+  const days = vm.runInContext(body + '\naccountingExportDays({start: new Date(2025, 0, 1), end: new Date(2026, 11, 31)});', context);
+  assert.equal(days.length, 730);
+  assert.equal(days.at(-1).dayKey, '2026-12-31');
+  assert.equal(days.at(-1).dayCalls[0].id, 'last-day');
+  assert.equal(days.reduce((sum, day) => sum + day.stats.earnings, 0), 15);
+});
+
+for (const failure of ['all', 'calls']) {
+  test(`la hidratación de nube conserva los datos locales si falla ${failure}`, (t) => {
+    const originalWindow = globalThis.window;
+    t.after(() => { if (originalWindow === undefined) delete globalThis.window; else globalThis.window = originalWindow; });
+    const values = new Map(Object.values(APP_KEYS).map((key) => [key, '{"original":true}']));
+    const previous = new Map(values);
+    globalThis.window = { localStorage: {
+      getItem: (key) => values.get(key) ?? null,
+      setItem(key, value) {
+        if (failure === 'all' || (key === APP_KEYS.calls && value !== previous.get(key))) throw new Error('Rejected write');
+        values.set(key, value);
+      },
+      removeItem: (key) => values.delete(key),
+    } };
+    assert.throws(() => writeLocalSnapshot({ state: { cloud: true }, calls: [{ id: 'cloud' }], settings: {} }), /No hay espacio local suficiente/);
+    assert.deepEqual(values, previous);
+  });
+}

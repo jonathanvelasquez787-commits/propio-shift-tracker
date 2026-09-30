@@ -8,6 +8,7 @@ import {
   renderGame, renderGameLive, rewardSurpriseForCall, onGameShiftEnded, onGameShiftStarted,
 } from '../js/game.js';
 import { configurePositiveReinforcementContext } from '../js/positive-reinforcement.js';
+import { financeRowIsMeta } from '../js/finance.js';
 
 function harness(t, { at = new Date(2026, 8, 29, 12).getTime(), goal = 10000, streak = 3, compliance = 'failed', surface = false } = {}) {
   const NativeDate = globalThis.Date;
@@ -90,7 +91,7 @@ function harness(t, { at = new Date(2026, 8, 29, 12).getTime(), goal = 10000, st
     closeModal: () => {}, openModal: () => {},
   };
   configureGameContext({
-    ...shared, appConfirm: async () => true, callDateToDate: parseDay, computeComplianceStreak: () => ({ days: streak }),
+    ...shared, financeRowIsMeta, appConfirm: async () => true, callDateToDate: parseDay, computeComplianceStreak: () => ({ days: streak }),
     cycleEarningsForOffset: () => ({ earnings: 0, start: new FixedDate(), end: new FixedDate() }), effectiveCycleGoal: () => 1000,
     dayAdherence: () => ({ scorePct: 0, checkpoints: [] }), dayConfigFor: () => ({ blocks: [] }),
     dayComplianceStatus: () => compliance, dayIsEffectivelyOff: () => false,
@@ -125,6 +126,41 @@ function harness(t, { at = new Date(2026, 8, 29, 12).getTime(), goal = 10000, st
     ledger(prefix) { return Object.entries(currentState.game.ledger).filter(([key]) => key.startsWith(prefix)); },
   };
 }
+
+test('Finanzas concede y revoca el premio en el mes local aunque UTC ya esté en el siguiente', (t) => {
+  const previousTimezone = process.env.TZ;
+  process.env.TZ = 'America/Tegucigalpa';
+  t.after(() => { if (previousTimezone === undefined) delete process.env.TZ; else process.env.TZ = previousTimezone; });
+  const h = harness(t, { at: new Date('2026-10-01T01:00:00Z').getTime() });
+  const row = { id: 'rent', name: 'Renta', kind: 'gasto', recurring: true, manualPaid: true };
+  h.config.financeCategories = { casa: { rows: [row] } };
+  renderGame();
+  assert.equal(h.ledger('finance-paid:').length, 1);
+  assert.ok(h.state.game.ledger['finance-paid:rent:2026-09']);
+  assert.equal(h.state.game.ledger['finance-paid:rent:2026-10'], undefined);
+  h.reload(); renderGame();
+  assert.equal(h.ledger('finance-paid:').length, 1);
+  row.manualPaid = false; renderGame();
+  assert.equal(h.ledger('finance-paid:').length, 0);
+  row.manualPaid = true;
+  h.setNow(new Date('2026-10-01T06:01:00Z').getTime());
+  renderGame();
+  assert.ok(h.state.game.ledger['finance-paid:rent:2026-10']);
+});
+
+test('completar el monto de un gasto recurrente concede su recibo mensual y reiniciarlo lo revoca', (t) => {
+  const h = harness(t);
+  const row = { id: 'bill', name: 'Internet', kind: 'gasto', recurring: true, manualPaid: false, targetAmount: 10, assignedAmount: 10 };
+  h.config.financeCategories = { servicios: { rows: [row] } };
+  renderGame();
+  assert.equal(h.ledger('finance-paid:bill:').length, 1);
+  h.reload(); renderGame();
+  assert.equal(h.ledger('finance-paid:bill:').length, 1);
+  row.assignedAmount = 0; renderGame();
+  assert.equal(h.ledger('finance-paid:bill:').length, 0);
+  row.assignedAmount = 10; renderGame();
+  assert.equal(h.ledger('finance-paid:bill:').length, 1);
+});
 
 test('pegar ayer derrota su monstruo y cambiar el día no daña al monstruo actual ni concede XP histórico', (t) => {
   const h = harness(t, { surface: true, goal: 10 });

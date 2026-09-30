@@ -1245,14 +1245,23 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
     }
 
     const STORAGE_QUOTA_TOAST = '⚠️ No se pudo guardar — el almacenamiento del navegador está lleno. Tu cambio se mantiene en esta sesión, pero no quedará guardado hasta que liberes espacio (borra llamadas muy viejas o un sonido personalizado en Avisos).';
+    let storageSnapshotPending = false;
 
     export function saveAll() {
+      const ok = persistFullSnapshot();
+      render();
+      return ok;
+    }
+
+    function persistFullSnapshot() {
       const keys = [STORAGE_KEY, CALLS_KEY, SETTINGS_KEY];
       const previous = {};
       try {
         keys.forEach(key => { previous[key] = localStorage.getItem(key); });
       } catch {
-        keys.forEach(key => { previous[key] = null; });
+        storageSnapshotPending = true;
+        toast(STORAGE_QUOTA_TOAST);
+        return false;
       }
 
       const next = {
@@ -1261,33 +1270,39 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
         [SETTINGS_KEY]: JSON.stringify(settings),
       };
       let ok = true;
+      const written = [];
       for (const key of keys) {
         if (!safeLocalStorageSet(key, next[key])) {
           ok = false;
           break;
         }
+        written.push(key);
       }
 
+      storageSnapshotPending = !ok;
       if (!ok) {
-        // state/calls/settings describen un solo snapshot. Nunca dejar una mezcla parcial en disco
-        // si la cuota se llena a mitad del guardado.
-        try { keys.forEach(key => localStorage.removeItem(key)); } catch {}
-        keys.forEach(key => {
+        // Restaura solo las claves escritas; no borres datos intactos si tampoco se pueden reescribir.
+        written.forEach(key => {
           if (previous[key] !== null) safeLocalStorageSet(key, previous[key]);
+          else { try { localStorage.removeItem(key); } catch {} }
         });
         toast(STORAGE_QUOTA_TOAST);
       }
-      render();
       return ok;
     }
 
     export function saveStateOnly() {
-      if (!safeLocalStorageSet(STORAGE_KEY, JSON.stringify(state))) toast(STORAGE_QUOTA_TOAST);
+      // Tras un fallo, cualquier guardado debe incluir también las llamadas y ajustes pendientes.
+      if (storageSnapshotPending) return persistFullSnapshot();
+      const ok = safeLocalStorageSet(STORAGE_KEY, JSON.stringify(state));
+      if (!ok) { storageSnapshotPending = true; toast(STORAGE_QUOTA_TOAST); }
+      return ok;
     }
 
     export function saveSettingsOnly() {
+      if (storageSnapshotPending) return persistFullSnapshot();
       const ok = safeLocalStorageSet(SETTINGS_KEY, JSON.stringify(settings));
-      if (!ok) toast(STORAGE_QUOTA_TOAST);
+      if (!ok) { storageSnapshotPending = true; toast(STORAGE_QUOTA_TOAST); }
       return ok;
     }
 
@@ -4760,6 +4775,7 @@ function renderPayDatesSection() {
     }
 
     function exportJSON() {
+      onGameBackupExported();
       const payload = { schemaVersion: 2, state, calls, settings, exportedAt: new Date().toISOString() };
       const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
@@ -4768,7 +4784,6 @@ function renderPayDatesSection() {
       a.download = 'propio-shift-tracker-export.json';
       a.click();
       URL.revokeObjectURL(url);
-      onGameBackupExported();
     }
 
     // Exportación para contabilidad/impuestos ---- Distinta de exportJSON (backup completo de
@@ -4811,15 +4826,13 @@ function renderPayDatesSection() {
       const days = [];
       const cursor = new Date(range.start.getFullYear(), range.start.getMonth(), range.start.getDate());
       const endDate = new Date(range.end.getFullYear(), range.end.getMonth(), range.end.getDate());
-      let guard = 0;
-      while (cursor <= endDate && guard < 400) {
+      while (cursor <= endDate) {
         const dayKey = todayCallDateKey(cursor);
         const dayCalls = [...callsForDay(dayKey)].sort((a, b) => new Date(a.startISO) - new Date(b.startISO));
         const stats = importedCallStats(dayCalls, dayKey);
         const adherence = dayIsEffectivelyOff(dayKey) ? null : dayAdherence(dayKey);
         days.push({ dayKey, dayCalls, stats, adherence, productive: productiveMinutesForDay(dayKey) });
         cursor.setDate(cursor.getDate() + 1);
-        guard++;
       }
       return days;
     }
@@ -6402,7 +6415,7 @@ export function render() {
 
     export function toast(msg) {
       const el = document.getElementById('toast');
-      el.textContent = msg;
+      el.textContent = storageSnapshotPending ? STORAGE_QUOTA_TOAST : msg;
       el.classList.add('show');
       clearTimeout(toast.timer);
       toast.timer = setTimeout(() => el.classList.remove('show'), 2200);

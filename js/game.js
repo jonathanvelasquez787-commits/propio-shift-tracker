@@ -1,4 +1,5 @@
 import { calls, settings, state } from './app-context.js';
+import { financeIsRowPagado } from './finance.js';
 import { activeWorkSinceLastCall, monetaryMilestones, supportiveDayEvidence, surpriseDecision } from './reinforcement-rules.js';
 import { chooseCallFeedback, configureReinforcementFeedback, notifyReinforcement, reinforcementText } from './reinforcement-feedback.js';
 let appConfirm, callDateKeyFromValue, callDateToDate, callsForDay, closeModal, computeComplianceStreak, convertedAmountText;
@@ -1227,7 +1228,8 @@ function syncFinanceRewards() {
   const enabled = gameEnabled();
   if (state.game.days[currentGameDayKey()]?.finalized) return false;
   let changed = false;
-  const month = new Date().toISOString().slice(0, 7);
+  const now = new Date();
+  const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   const validMetaKeys = new Set();
   const validPaidKeys = new Set();
 
@@ -1256,8 +1258,9 @@ function syncFinanceRewards() {
 
       if (row.recurring) {
         const key = `finance-paid:${row.id}:${month}`;
-        if (row.manualPaid) validPaidKeys.add(key);
-        if (!row.manualPaid || state.game.ledger[key] || !enabled) return;
+        const paid = financeIsRowPagado(row);
+        if (paid) validPaidKeys.add(key);
+        if (!paid || state.game.ledger[key] || !enabled) return;
         const dayKey = todayCallDateKey();
         const bonus = grantDayBonusReceipt(dayKey, 5);
         const granted = bonus.applied;

@@ -63,6 +63,7 @@ export async function beginQaMode(userId) {
   if (readMeta().dirty) {
     const pushed = await pushSnapshot();
     if (!pushed.ok) return pushed.conflict ? { conflict: true } : { error: pushed.error || new Error('SYNC_FAILED') };
+    if (pushed.pending) return { error: new Error('Tus cambios aún se están sincronizando. Abre QA cuando termine el guardado.') };
   }
   try {
     window.localStorage.setItem(QA_KEY, JSON.stringify({ version: 1, userId: userId || readMeta().userId || null, startedAt: new Date().toISOString() }));
@@ -93,18 +94,24 @@ export function restoreQaMode() {
 
 export function writeQaSnapshot(snapshot, scenario = 'tour') {
   if (!isQaModeActive()) throw new Error('QA_NOT_ACTIVE');
+  const session = readQaSession();
+  const next = {
+    [QA_APP_KEYS.state]: JSON.stringify(snapshot.state ?? {}),
+    [QA_APP_KEYS.calls]: JSON.stringify(snapshot.calls ?? []),
+    [QA_APP_KEYS.settings]: JSON.stringify(snapshot.settings ?? {}),
+    [QA_KEY]: JSON.stringify({ ...session, scenario: String(scenario || 'tour') }),
+  };
   const previous = {};
-  Object.values(QA_APP_KEYS).forEach((key) => { previous[key] = window.localStorage.getItem(key); });
+  Object.keys(next).forEach((key) => { previous[key] = window.localStorage.getItem(key); });
+  const written = [];
   hydrating = true;
   try {
-    window.localStorage.setItem(QA_APP_KEYS.state, JSON.stringify(snapshot.state ?? {}));
-    window.localStorage.setItem(QA_APP_KEYS.calls, JSON.stringify(snapshot.calls ?? []));
-    window.localStorage.setItem(QA_APP_KEYS.settings, JSON.stringify(snapshot.settings ?? {}));
-    const session = readQaSession();
-    window.localStorage.setItem(QA_KEY, JSON.stringify({ ...session, scenario: String(scenario || 'tour') }));
+    Object.entries(next).forEach(([key, value]) => {
+      window.localStorage.setItem(key, value);
+      written.push(key);
+    });
   } catch (error) {
-    Object.values(QA_APP_KEYS).forEach((key) => window.localStorage.removeItem(key));
-    Object.entries(previous).forEach(([key, value]) => restoreRawKey(key, value));
+    written.forEach((key) => { try { restoreRawKey(key, previous[key]); } catch {} });
     throw error;
   } finally {
     hydrating = false;
@@ -255,14 +262,19 @@ export function writeLocalSnapshot(snapshot) {
   });
 
   hydrating = true;
+  const written = [];
   try {
-    Object.entries(next).forEach(([key, value]) => window.localStorage.setItem(key, value));
+    Object.entries(next).forEach(([key, value]) => {
+      window.localStorage.setItem(key, value);
+      written.push(key);
+    });
   } catch (err) {
-    // Las tres llaves forman un solo snapshot. Si una falla por cuota/Storage, no se deja una
-    // mezcla (ej. state nuevo + settings viejos): se libera lo escrito y se restaura todo lo previo.
-    Object.values(APP_KEYS).forEach((key) => window.localStorage.removeItem(key));
-    Object.entries(previous).forEach(([key, value]) => {
-      if (value !== null) window.localStorage.setItem(key, value);
+    // No borres claves intactas si el navegador también rechaza su restauración.
+    written.forEach((key) => {
+      try {
+        if (previous[key] === null) window.localStorage.removeItem(key);
+        else window.localStorage.setItem(key, previous[key]);
+      } catch {}
     });
     const error = new Error('No hay espacio local suficiente para descargar tus datos de la nube.');
     error.cause = err;
@@ -416,14 +428,16 @@ export async function pushSnapshot({ force = false } = {}) {
       return { conflict: true, updatedAt: data.updated_at };
     }
 
+    const pending = !sameSnapshot(snapshot, readLocalSnapshot());
     writeMeta({
       lastSyncedUpdatedAt: data ? data.updated_at : null,
-      dirty: false,
+      dirty: pending,
       lastPushAt: new Date().toISOString(),
     });
     cloudCallHashes = delta.current;
     emit('pushed', { updatedAt: data ? data.updated_at : null });
-    return { ok: true, updatedAt: data ? data.updated_at : null };
+    if (pending) markDirty();
+    return { ok: true, pending, updatedAt: data ? data.updated_at : null };
   } catch (err) {
     emit('error', { error: err });
     return { error: err };

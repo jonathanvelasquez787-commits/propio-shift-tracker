@@ -114,8 +114,9 @@ test('auditoría profunda: hidratar desde nube restaura snapshot anterior si loc
   const end = sync.indexOf('export function applyLightThemeDefault', start);
   const body = sync.slice(start, end);
   assert.match(body, /const previous = \{\}/);
-  assert.match(body, /Object\.values\(APP_KEYS\)\.forEach\(\(key\) => window\.localStorage\.removeItem\(key\)\)/);
-  assert.match(body, /Object\.entries\(previous\)\.forEach/);
+  assert.match(body, /written\.forEach\(\(key\)/);
+  assert.match(body, /window\.localStorage\.removeItem\(key\)/);
+  assert.match(body, /window\.localStorage\.setItem\(key, previous\[key\]\)/);
   assert.match(body, /No hay espacio local suficiente para descargar tus datos de la nube/);
   assert.match(body, /throw error/);
 });
@@ -142,6 +143,7 @@ test('auditoría profunda: saveAll es atómico entre state calls y settings', ()
   assert.match(body, /const keys = \[STORAGE_KEY, CALLS_KEY, SETTINGS_KEY\]/);
   assert.match(body, /const previous = \{\}/);
   assert.match(body, /if \(!safeLocalStorageSet\(key, next\[key\]\)\)/);
+  assert.match(body, /written\.forEach\(key/);
   assert.match(body, /localStorage\.removeItem\(key\)/);
   assert.match(body, /safeLocalStorageSet\(key, previous\[key\]\)/);
   assert.match(body, /return ok/);

@@ -317,6 +317,12 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
+La auditoría profunda de v576 quedó cerrada: 31 días simulados, 108 llamadas,
+ambos recorridos QA y siete fallos reparados de persistencia, sincronización,
+Finanzas y exportaciones. No quedan fallos reproducidos pendientes de esa
+auditoría. La nube se probó con respuestas controladas, sin certificar una
+sesión real en dos dispositivos. Véase `docs/auditoria-profunda-2026-09-30.md`.
+
 No quedan tareas abiertas del refuerzo positivo enumerado en la versión
 anterior. Los siete requisitos se completaron en v573; las limitaciones
 del apartado siguiente conservan su alcance deliberado.
@@ -347,8 +353,10 @@ de Logros. La guía deja espacio al final de todas las páginas que utiliza.
 Recarga, reinicio y salida/restauración se verifican en el namespace QA aislado.
 
 El protocolo permanente de auditoría profunda se recuperó íntegro del commit
-0d68200; d238d3c lo había eliminado al retirar el roadmap. Esta revisión QA no
-activa la auditoría integral: sigue requiriendo su comando explícito.
+0d68200; d238d3c lo había eliminado al retirar el roadmap.
+La auditoría integral se activó después por el comando
+explícito del usuario y terminó en v576; el protocolo conserva su activación
+estricta para futuras sesiones.
 
 **Criterios vigentes y verificación de los siete requisitos:**
 
@@ -489,12 +497,31 @@ La aplicación funciona en producción con estas bases vigentes:
   global, backup diario, exportación y borrado de cuenta permanecen activos.
 - Turnos, llamadas, Horario, Higher Rate, Finanzas, Reportes, Calendario,
   Adherencia y la gamificación «El Monstruo» están integrados.
-- La versión actual es 575. Los siete pendientes de refuerzo positivo y
-  la revisión de Logros están terminados; sus criterios figuran arriba.
+- La versión actual es 576. Refuerzo positivo, Logros y auditoría profunda
+  están terminados. Los siete fallos de la auditoría se corrigieron con
+  regresiones; cobertura y límites constan en
+  `docs/auditoria-profunda-2026-09-30.md`.
 
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v576** — Auditoría profunda: persistencia, Finanzas y exportaciones.
+
+- Mes local para premios mensuales; gastos recurrentes completos usan el
+  mismo criterio de pago que Finanzas. Recibos idempotentes y revocables.
+- Un fallo de cuota obliga a guardar estado, llamadas y ajustes juntos en
+  el siguiente intento y conserva el aviso de error. Restauración local,
+  nube y QA no borran claves intactas cuando falla una escritura.
+- Backup incluye el escudo y recibo ganados en esa exportación. CSV/PDF
+  recorren el rango completo, sin truncamiento silencioso a 400 días.
+- Cambios durante una subida permanecen pendientes, con otro delta sobre
+  la nueva base. QA espera si esa subida todavía dejó datos reales pendientes.
+- 187 pruebas, 13 regresiones nuevas; imports/ciclos y wiring de 21 módulos,
+  build y nueve dependencias de producción sin alertas. Chrome: 31 días y
+  108 llamadas, recargas, casos extremos y ambos recorridos QA; ocho páginas
+  en claro/oscuro y 320–1365 px. Sin excepciones ni overflow del documento.
+  Informe completo: docs/auditoria-profunda-2026-09-30.md.
 
 **v575** — Fecha del monstruo, controles de Logros, guía QA y fila móvil.
 
@@ -534,25 +561,3 @@ La aplicación funciona en producción con estas bases vigentes:
   rutas reales: formulario manual, guardado automático y textarea de pegado,
   además de ambos temas, escritorio/tablet/móvil y movimiento reducido.
   La revisión usa datos QA aislados, no una sesión autenticada de producción.
-
-**v573** — Refuerzo positivo completo e idempotente.
-
-- Completados los siete requisitos: micro-feedback, hitos monetarios,
-  regreso puntual, apoyo automático, sorpresa, cierre con evidencia e
-  intensidad/accesibilidad comunes. Los motores financieros, metas y
-  adherencia conservan sus cálculos.
-- Nuevos módulos pequeños de textos/notificaciones y reglas de refuerzo;
-  recibos persistentes con migración de identidad provisional/oficial,
-  normalización para backups anteriores y correcciones sin premios repetidos.
-- Corregidos los casos de pausas reabiertas, regreso mediante llamada en
-  vivo, sorteo al tope, horarios nocturnos y referencias de entradas del día
-  durante la normalización. El modo Off conserva el progreso interno.
-- QA incorpora Refuerzo completo (trece pasos) y mantiene el tour original.
-  Los eventos posteriores a la pausa tienen fechas reales posteriores a ella;
-  el azar controlado existe únicamente en este escenario local.
-- Verificadas 166 pruebas, build y wiring de 21 módulos. Revisión local en
-  Chrome: temas claro/oscuro, móvil/escritorio, teclado, movimiento reducido,
-  todos los hitos, recuperación, cofre, cierre y recarga sin duplicados.
-  La revisión visual fue sintética/local, no autenticada en producción.
-- Por indicación del usuario, cualquier delegación futura usa únicamente
-  Sol 6.1 con razonamiento Alto, salvo que indique otra cosa.
