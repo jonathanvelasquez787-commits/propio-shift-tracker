@@ -206,6 +206,22 @@ No quedan tareas abiertas del refuerzo positivo enumerado en la versión
 anterior. Los siete requisitos se completaron en v573; las limitaciones
 del apartado siguiente conservan su alcance deliberado.
 
+La revisión de Logros solicitada después quedó terminada en v574: monstruo
+y misiones están agrupados en Logros, con tarjetas compactas y todo su
+contenido. Inicio conserva las ganancias, la meta y los indicadores del juego.
+El texto de estado accesible queda oculto visualmente; los avisos temporales
+sí desaparecen. El combo visible y las animaciones reaccionan sin perderse
+al repintar ni por timers de llamadas anteriores. Se verifica cada ruta real
+manual/automática/pegado en Chrome local con el modelo aislado QA.
+
+Una llamada del día registrada tarde también actualiza vida y tiene impacto
+visual, pero conserva la regla existente de no sumar XP si se importa más de
+30 minutos después de terminar. El recibo visual se exporta/sincroniza y se
+migra a la llamada oficial; no repite efectos al reimportar o recargar.
+Históricos, llamadas futuras y Dropped no disparan ese impacto. Off, Sutil
+y movimiento reducido mantienen sus límites. Los recorridos QA apuntan al
+monstruo en Logros.
+
 **Criterios vigentes y verificación de los siete requisitos:**
 
 1. Micro-feedback: mensajes de llamada normal, larga, Higher Rate y mejor
@@ -264,7 +280,7 @@ de 400. El escenario **Refuerzo completo** añade una guía de trece pasos con
 llamadas sintéticas, resultados de azar controlados y restauración del estado
 real; conserva el recorrido original de ocho pasos.
 
-Verificación: 166 pruebas, contratos/ciclos de 21 módulos, wiring y build de
+Verificación actual: 172 pruebas, contratos/ciclos de 21 módulos, wiring y build de
 producción sin sourcemaps. Auditoría de dependencias de producción sin alertas.
 Chrome local con datos QA: recorrido completo, claro/oscuro, 390 y 1365 px sin
 overflow, foco de teclado, movimiento reducido y recarga sin cambiar recibos.
@@ -343,12 +359,32 @@ La aplicación funciona en producción con estas bases vigentes:
   global, backup diario, exportación y borrado de cuenta permanecen activos.
 - Turnos, llamadas, Horario, Higher Rate, Finanzas, Reportes, Calendario,
   Adherencia y la gamificación «El Monstruo» están integrados.
-- La versión actual es 573. Los siete pendientes de refuerzo positivo se
-  completaron y sus criterios están documentados arriba.
+- La versión actual es 574. Los siete pendientes de refuerzo positivo y
+  la revisión de Logros están terminados; sus criterios figuran arriba.
 
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v574** — Logros compacto y reacción visible del monstruo.
+
+- Monstruo y misiones agrupados debajo del resumen de Logros. Menos altura,
+  sprite y placas pequeños, recompensa individual en texto y paneles con
+  espaciado compacto; se conserva el contenido y la misma vista responsive.
+- Corregida la región accesible que mostraba permanentemente «Armadura rota»
+  arriba de la app. El anuncio queda disponible al lector de pantalla y los
+  toasts visibles desaparecen. El encabezado ya no desborda en tablet por
+  el ancho intrínseco de su celda.
+- Los efectos usan el SVG vigente. Combo incluido en la clave del render,
+  impacto preservado al repintar y timers protegidos para llamadas seguidas.
+  Apagar la intensidad retira cualquier impacto pendiente.
+- Llamadas actuales tardías tienen evidencia visual sin XP nuevo; recibo
+  idempotente y migrable a la oficial. Se conservan elegibilidad, tope,
+  ganancias, metas y adherencia. Históricos/futuros/Dropped no simulan daño.
+- Verificadas 172 pruebas, build y wiring de 21 módulos. Chrome local con
+  rutas reales: formulario manual, guardado automático y textarea de pegado,
+  además de ambos temas, escritorio/tablet/móvil y movimiento reducido.
+  La revisión usa datos QA aislados, no una sesión autenticada de producción.
 
 **v573** — Refuerzo positivo completo e idempotente.
 
@@ -404,32 +440,3 @@ La aplicación funciona en producción con estas bases vigentes:
   recarga sin duplicados, bono de caja persistente, pausa/premios, cierre
   del turno y salida/restauración. Controles QA y guía revisados en móvil;
   esta comprobación no usó una cuenta autenticada de producción.
-
-**v571** — Refuerzo positivo personal y elección explícita de gamificación.
-
-- Las cuentas nuevas arrancan con «El Monstruo» y el refuerzo positivo
-  desactivados. Ambas preferencias se guardan por usuario; las elecciones
-  existentes de gamificación se conservan.
-- Inicio muestra evidencia de llamadas completadas, cierres positivos,
-  aprendizajes y recuperaciones cuando se activa el refuerzo. Al guardar una
-  llamada manual o en vivo se puede registrar un cierre breve sin puntos
-  negativos; las importaciones se cuentan sin abrir un modal por fila.
-- El catálogo ofrece 16 premios de Break, Lunch y fin del turno, incluido
-  progreso acumulable. Cada usuario puede agregar o editar premios con
-  disparador, frecuencia, hitos, duración, costo y límite diario.
-- Los premios se ganan con llamadas, recuperación o meta diaria y esperan a
-  una ventana segura. Se pueden realizar, cambiar o guardar; el presupuesto
-  semanal opcional impide marcar como realizado un premio que lo exceda.
-  Logros muestra el historial y un botón en Inicio permite reabrir premios
-  durante la pausa o después del turno.
-- «Plan del día» ya respeta `hidden` al apagar la gamificación; sus controles
-  quedan inactivos. Reiniciar solo la gamificación preserva premios personales.
-- ACW deja de ser una tarjeta de resumen y se muestra como tiempo en la línea
-  final de cada bloque de trabajo, junto a los minutos usados, sin barra propia.
-  Se excluyen pausas y huecos clasificados como «Otro».
-- Sustituir una llamada en vivo por su importación oficial conserva su evidencia
-  positiva. La recuperación exige una llamada posterior; realizar o cambiar un
-  premio vuelve a validar la pausa/fin del turno y conserva el límite de origen.
-- Verificados 108 tests, normalización, recompensas idempotentes, presupuesto,
-  ventanas seguras, cálculo ACW, contratos/ciclos de 18 módulos, wiring de UI y
-  build de producción sin sourcemaps; auditoría de dependencias sin alertas.

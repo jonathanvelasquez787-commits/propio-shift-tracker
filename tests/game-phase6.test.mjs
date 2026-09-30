@@ -112,7 +112,7 @@ test('Logros agrupa los ajustes, conserva el enfoque diario y admite nombre pers
   assert.match(game, /monsterNameInput'\)\?\.addEventListener\('input'/);
   assert.match(game, /lastSettingsMonsterName !== savedMonsterName/);
   assert.match(game, /monsterName && !monsterNameDraftDirty && document\.activeElement !== monsterName/);
-  assert.match(game, /variant, displayName, day\.stats\.earnings/);
+  assert.match(game, /variant, displayName, day\.combo, day\.stats\.earnings/);
   assert.match(game, /Monstruo derrotado: \$\{monsterName\}/);
   assert.match(game, /monsterImageLabel/);
 });
@@ -368,7 +368,7 @@ test('derrota no debe seguir produciendo golpes/recompensas posteriores', () => 
   const game = read('js/game.js');
   const handler = game.slice(game.indexOf('export function onGameCallSaved'), game.indexOf('export function onGameGapSaved'));
   const defeatGuard = handler.indexOf('currentDay.defeated');
-  const fx = handler.indexOf('showCallFx');
+  const fx = handler.indexOf('showCallFx(call, grantedXp');
   const reward = handler.indexOf('rewardLootBox');
   assert.ok(defeatGuard >= 0, 'onGameCallSaved debe reconocer el estado derrotado');
   assert.ok(defeatGuard < fx, 'la derrota debe bloquear el feedback de golpe');

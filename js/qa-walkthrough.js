@@ -420,7 +420,7 @@ function runNextReinforcementStep(model) {
     step: model.step + 1, callFactory: createQaReinforcementCall, result, surpriseRandom,
   });
   if (model.step === 0) {
-    walkthroughContext.navigate?.('home', 'gameArena');
+    walkthroughContext.navigate?.('achievements', 'gameArena');
     return advance('Escenario preparado. Los resultados ganadores y no ganadores del sorteo solo se fuerzan en esta guía QA.');
   }
   if (model.step === 1) return add(1, 'live', 'Llamada larga guardada: 30 minutos. Revisa el mensaje y el primer hito monetario.');
@@ -486,7 +486,7 @@ function runNextStep() {
   }
 
   if (model.step === 1) {
-    walkthroughContext.navigate?.('home', 'gameArena');
+    walkthroughContext.navigate?.('achievements', 'gameArena');
     return addTourCall(1, 'manual', {
       step: 2,
       phase: 'awaiting-reflection-1',

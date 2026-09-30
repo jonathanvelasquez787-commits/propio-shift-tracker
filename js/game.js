@@ -655,7 +655,7 @@ function renderArena() {
   const day = computeGameDay(dayKey);
   const active = gameEnabled() && day.goal.usd > 0;
   root.hidden = !active;
-  classic.style.display = active && settings.game.intensity === 'arcade' ? 'none' : '';
+  classic.style.display = '';
   if (!active) {
     lastArenaRenderKey = '';
     root.className = 'game-arena';
@@ -673,10 +673,12 @@ function renderArena() {
   const displayName = customName || day.species.name;
   const shadow = yesterdayShadowPct();
   const damage = Math.max(0, day.goal.usd - day.stats.earnings);
-  const renderKey = [dayKey, subtle, monsterState, monsterPhase, variant, displayName, day.stats.earnings.toFixed(2), Math.round(day.hpPct * 10), Math.round((shadow ?? -1) * 10), day.missions.map((mission) => mission.ok ? 1 : 0).join(''), Object.values(state.game.equipment || {}).join('|')].join(':');
+  const renderKey = [dayKey, subtle, monsterState, monsterPhase, variant, displayName, day.combo, day.stats.earnings.toFixed(2), Math.round(day.hpPct * 10), Math.round((shadow ?? -1) * 10), day.missions.map((mission) => mission.ok ? 1 : 0).join(''), Object.values(state.game.equipment || {}).join('|')].join(':');
   if (renderKey === lastArenaRenderKey) return;
   lastArenaRenderKey = renderKey;
+  const impactClasses = ['is-hit', 'is-critical-hit'].filter((name) => root.classList.contains(name));
   root.className = `game-arena ${subtle ? 'game-arena--subtle' : 'game-arena--arcade'} game-${escapeHtml(monsterState)}`;
+  root.classList.add(...impactClasses);
   root.dataset.gameState = monsterState;
   root.dataset.gamePhase = monsterPhase;
   root.dataset.gameIntensity = subtle ? 'subtle' : 'arcade';
@@ -1264,6 +1266,10 @@ function syncFinanceRewards() {
 }
 
 function clearTransientGameUi() {
+  callFxVersion += 1;
+  const arena = document.getElementById('gameArena');
+  arena?.classList.remove('is-hit', 'is-critical-hit');
+  arena?.removeAttribute('data-game-event');
   const loot = document.getElementById('gameLootBox');
   if (loot) {
     loot.hidden = true;
@@ -1406,16 +1412,20 @@ function playGameTone(kind = 'hit') {
   } catch {}
 }
 
+const gameEventVersions = new WeakMap();
+
 function triggerGameEvent(rootId, eventName, duration = 900) {
   if (!arcadeEnabled()) return;
   if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
   const root = document.getElementById(rootId);
   if (!root) return;
+  const version = (gameEventVersions.get(root) || 0) + 1;
+  gameEventVersions.set(root, version);
   root.removeAttribute('data-game-event');
   void root.offsetWidth;
   root.dataset.gameEvent = eventName;
   setTimeout(() => {
-    if (root.dataset.gameEvent === eventName) root.removeAttribute('data-game-event');
+    if (gameEventVersions.get(root) === version && root.dataset.gameEvent === eventName) root.removeAttribute('data-game-event');
   }, duration);
 }
 
@@ -1437,16 +1447,21 @@ function grantDayBonusReceipt(dayKey, grossAmount) {
   return { gross, applied: Math.max(0, Math.min(gross, applied)), amount: Math.max(0, Math.min(gross, applied)) };
 }
 
+let callFxVersion = 0;
+
 function showCallFx(call, xp, critical, mode = 'xp') {
   const root = document.getElementById('gameCallFx');
   if (!root) return;
+  const version = ++callFxVersion;
   if (!arcadeEnabled() || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
     root.innerHTML = '';
     document.querySelectorAll('.game-live-xp-float').forEach((node) => node.remove());
     return;
   }
   const amount = parseMoney(call.pay) + higherRateBonusAmount(call);
-  const message = mode === 'extra'
+  const message = mode === 'recorded'
+    ? `LLAMADA REGISTRADA · ${withConversion(amount)} · sin XP por esta llamada`
+    : mode === 'extra'
     ? `BOTÍN EXTRA · ${withConversion(amount)}`
     : xp > 0
       ? `+${xp} XP · ${withConversion(amount)}`
@@ -1467,8 +1482,9 @@ function showCallFx(call, xp, critical, mode = 'xp') {
     arena.classList.add(critical ? 'is-critical-hit' : 'is-hit');
   }
   setTimeout(() => {
-    root.innerHTML = '';
     liveFx?.remove();
+    if (version !== callFxVersion) return;
+    root.innerHTML = '';
     arena?.classList.remove('is-hit', 'is-critical-hit');
   }, 2100);
 }
@@ -1812,6 +1828,21 @@ function processCallReinforcement(call, source, dayKey, options) {
   return true;
 }
 
+function claimCallVisualFeedback(call, dayKey, firstEvent) {
+  if (!gameEnabled() || dayKey !== currentGameDayKey() || String(call.dropped).toLowerCase() === 'yes') return false;
+  const started = new Date(call.startISO).getTime();
+  const ended = new Date(call.endISO).getTime();
+  const imported = new Date(call.importedAt).getTime();
+  if (!(Number(call.durationMin) > 0) || !Number.isFinite(started) || !Number.isFinite(ended)
+    || !Number.isFinite(imported) || ended <= started || imported < ended || imported > Date.now()) return false;
+  const key = reinforcementCallKey(call, dayKey);
+  const receipt = state.game.ledger[key] || {};
+  // Los recibos anteriores ya presentaron su feedback; migrarlos no debe repetirlo.
+  if (receipt.visual || (!firstEvent && receipt.feedback)) return false;
+  state.game.ledger[key] = { ...receipt, dayKey, visual: true };
+  return true;
+}
+
 export function onGameCallSaved(call, source = 'manual', options = {}) {
   if (!call || !['manual', 'live', 'import'].includes(source)) return;
   const dayKey = callDateKeyFromValue(call.shiftDayKey)
@@ -1824,11 +1855,21 @@ export function onGameCallSaved(call, source = 'manual', options = {}) {
     saveStateOnly();
     return;
   }
-  if (!firstEvent) return;
+  const firstVisualEvent = claimCallVisualFeedback(call, dayKey, firstEvent);
+  if (!firstEvent) {
+    if (firstVisualEvent) {
+      saveStateOnly();
+      renderGame();
+      showCallFx(call, 0, higherRateBonusAmount(call) > 0, 'recorded');
+      playGameTone('hit');
+    }
+    return;
+  }
   if (!callIsXpEligible(call, dayKey)) return;
   ensureGameState(dayKey);
   if (state.game.days[dayKey]?.finalized) {
     onGameCallsChanged(dayKey);
+    if (firstVisualEvent) showCallFx(call, 0, higherRateBonusAmount(call) > 0, 'recorded');
     return;
   }
   const currentDay = computeGameDay(dayKey);
@@ -1839,7 +1880,7 @@ export function onGameCallSaved(call, source = 'manual', options = {}) {
   if (currentDay.defeated && xpLocked) {
     saveStateOnly();
     renderGame();
-    showCallFx(call, 0, critical, 'extra');
+    if (firstVisualEvent) showCallFx(call, 0, critical, 'extra');
     maybeShowRecord(call);
     playGameTone(critical ? 'critical' : 'hit');
     return;
@@ -1879,7 +1920,7 @@ export function onGameCallSaved(call, source = 'manual', options = {}) {
   saveStateOnly();
   renderGame();
 
-  showCallFx(call, grantedXp, critical);
+  if (firstVisualEvent) showCallFx(call, grantedXp, critical);
   maybeShowRecord(call);
   if (defeatedNow) {
     triggerGameEvent('gameArena', 'clear', 1000);

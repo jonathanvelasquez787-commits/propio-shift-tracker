@@ -9,7 +9,7 @@ import {
 } from '../js/game.js';
 import { configurePositiveReinforcementContext } from '../js/positive-reinforcement.js';
 
-function harness(t, { at = new Date(2026, 8, 29, 12).getTime(), goal = 10000, streak = 3, compliance = 'failed' } = {}) {
+function harness(t, { at = new Date(2026, 8, 29, 12).getTime(), goal = 10000, streak = 3, compliance = 'failed', surface = false } = {}) {
   const NativeDate = globalThis.Date;
   const original = Object.fromEntries(['document', 'window', 'requestAnimationFrame', 'setTimeout', 'clearTimeout'].map((key) => [key, globalThis[key]]));
   let now = at;
@@ -48,9 +48,22 @@ function harness(t, { at = new Date(2026, 8, 29, 12).getTime(), goal = 10000, st
   };
   const announcements = [];
   const live = { set textContent(value) { if (value) announcements.push(value); }, get textContent() { return announcements.at(-1) || ''; } };
+  const nodes = new Map();
+  if (surface) {
+    for (const id of ['gameArena', 'classicDailyGoalCard', 'gameCallFx', 'gameMissions']) {
+      const classes = new Set();
+      nodes.set(id, {
+        dataset: {}, style: {}, innerHTML: '', hidden: false, offsetWidth: 400,
+        get className() { return [...classes].join(' '); },
+        set className(value) { classes.clear(); String(value).split(/\s+/).forEach((name) => classes.add(name)); },
+        classList: { add(...names) { names.forEach((name) => classes.add(name)); }, remove(...names) { names.forEach((name) => classes.delete(name)); }, contains: (name) => classes.has(name) },
+        removeAttribute(name) { if (name === 'data-game-event') delete this.dataset.gameEvent; },
+      });
+    }
+  }
   globalThis.document = {
     activeElement: null, documentElement: { classList: classList() },
-    getElementById: (id) => id === 'gameToastStack' ? stack : id === 'gameStatusLive' ? live : null,
+    getElementById: (id) => nodes.get(id) || (id === 'gameToastStack' ? stack : id === 'gameStatusLive' ? live : null),
     querySelector: () => null,
     querySelectorAll: (selector) => selector.startsWith('#gameToastStack') ? stack.children : [],
     createElement: () => ({ dataset: {}, classList: classList(), remove() { if (this.parent) this.parent.children = this.parent.children.filter((node) => node !== this); } }),
@@ -106,12 +119,99 @@ function harness(t, { at = new Date(2026, 8, 29, 12).getTime(), goal = 10000, st
     return call;
   };
   return {
-    get state() { return currentState; }, config, rows, stack, announcements, add, keyFor, iso, advance,
+    get state() { return currentState; }, config, rows, stack, announcements, nodes, add, keyFor, iso, advance,
     get now() { return now; }, setNow: (value) => { now = value; }, setGoal: (value) => { dailyGoal = value; },
     reload() { currentState = JSON.parse(JSON.stringify(currentState)); currentState.game = normalizeGameState(currentState.game); setAppState(currentState); },
     ledger(prefix) { return Object.entries(currentState.game.ledger).filter(([key]) => key.startsWith(prefix)); },
   };
 }
+
+test('el combo visible reacciona a una llamada sin pago y el impacto sobrevive al render', (t) => {
+  const h = harness(t, { surface: true });
+  h.config.game.intensity = 'arcade';
+  const arena = h.nodes.get('gameArena');
+  const first = h.add('first-paid');
+  onGameCallSaved(first, 'manual', { random: () => 0.99 });
+  assert.match(arena.innerHTML, /game-combo-badge">x1</);
+  const zero = h.add('zero-pay', { pay: 0 });
+  onGameCallSaved(zero, 'manual', { random: () => 0.99 });
+  onGameCallsChanged(zero.shiftDayKey);
+  assert.equal(h.state.game.live.combo, 2);
+  assert.match(arena.innerHTML, /game-combo-badge">x2</);
+  h.setGoal(20000);
+  renderGame();
+  assert.equal(arena.classList.contains('is-hit'), true);
+  assert.equal(h.nodes.get('classicDailyGoalCard').style.display, '');
+});
+
+test('los timers de una llamada anterior no retiran el impacto de la llamada nueva', (t) => {
+  const h = harness(t, { surface: true });
+  h.config.game.intensity = 'arcade';
+  onGameCallSaved(h.add('first'), 'manual', { random: () => 0.99 });
+  h.advance(1000);
+  onGameCallSaved(h.add('second', { pay: 2 }), 'live', { random: () => 0.99 });
+  h.advance(1100);
+  assert.match(h.nodes.get('gameCallFx').innerHTML, /\$2\.00/);
+  assert.equal(h.nodes.get('gameArena').classList.contains('is-hit'), true);
+  h.advance(1000);
+  assert.equal(h.nodes.get('gameCallFx').innerHTML, '');
+  assert.equal(h.nodes.get('gameArena').classList.contains('is-hit'), false);
+  onGameCallSaved(h.add('off-during-hit', { pay: 3 }), 'manual', { random: () => 0.99 });
+  h.config.game.intensity = 'off';
+  renderGame();
+  assert.equal(h.nodes.get('gameArena').classList.contains('is-hit'), false);
+  assert.equal(h.nodes.get('gameCallFx').innerHTML, '');
+  h.config.game.intensity = 'arcade';
+  renderGame();
+  h.advance(2100);
+  assert.equal(h.nodes.get('gameArena').classList.contains('is-hit'), false);
+});
+
+for (const source of ['manual', 'live', 'import']) {
+  test(`una llamada ${source} tardía actualiza vida y muestra evidencia una vez sin conceder XP`, (t) => {
+    const h = harness(t, { surface: true, goal: 10 });
+    h.config.game.intensity = 'arcade';
+    const call = h.add('late', { pay: 2, startISO: h.iso(h.now - 32 * 60000), endISO: h.iso(h.now - 31 * 60000), importedAt: h.iso(h.now) });
+    onGameCallSaved(call, source, { random: () => { throw new Error('sin sorteo para llamadas tardías'); } });
+    onGameCallsChanged(call.shiftDayKey);
+    const snapshot = computeGameDay(call.shiftDayKey);
+    assert.equal(snapshot.hpPct, 80);
+    assert.equal(snapshot.xp, 0);
+    assert.equal(snapshot.eligibleCalls.length, 0);
+    assert.equal(h.state.game.live.combo, 0);
+    assert.match(h.nodes.get('gameCallFx').innerHTML, /LLAMADA REGISTRADA.*\$2\.00.*≈ L 50\.00.*sin XP/);
+    assert.doesNotMatch(h.nodes.get('gameCallFx').innerHTML, /SELLADO/);
+    assert.equal(h.nodes.get('gameArena').classList.contains('is-hit'), true);
+    const key = `reinforce-call:${call.shiftDayKey}:late`;
+    assert.equal(h.state.game.ledger[key].visual, true);
+    assert.equal(h.state.game.ledger[key].surprise, undefined);
+    assert.equal(h.ledger('loot:').length, 0);
+    h.reload();
+    migrateGameCallReferences('late', 'official');
+    call.id = 'official';
+    h.nodes.get('gameCallFx').innerHTML = '';
+    onGameCallSaved(call, source);
+    assert.equal(h.nodes.get('gameCallFx').innerHTML, '');
+    assert.equal(h.state.game.ledger[key], undefined);
+    assert.equal(h.state.game.ledger[`reinforce-call:${call.shiftDayKey}:official`].visual, true);
+  });
+}
+
+test('llamadas históricas, futuras y caídas no activan un impacto visual', (t) => {
+  const h = harness(t, { surface: true });
+  h.config.game.intensity = 'arcade';
+  const variants = [
+    { id: 'historic', props: { callDate: '09/28/2026', shiftDayKey: '09/28/2026', startISO: h.iso(h.now - 86400000), endISO: h.iso(h.now - 86340000) } },
+    { id: 'future', props: { startISO: h.iso(h.now + 60000), endISO: h.iso(h.now + 120000) } },
+    { id: 'dropped', props: { dropped: 'Yes', countsAsProductive: false } },
+  ];
+  for (const { id, props } of variants) {
+    const call = h.add(id, props);
+    onGameCallSaved(call, 'import');
+    assert.equal(h.nodes.get('gameCallFx').innerHTML, '');
+    assert.notEqual(h.state.game.ledger[`reinforce-call:${call.shiftDayKey}:${id}`]?.visual, true);
+  }
+});
 
 test('hooks manual/live/import guardan una decisión por llamada y migran la oficial sin reintentar azar', (t) => {
   const h = harness(t);

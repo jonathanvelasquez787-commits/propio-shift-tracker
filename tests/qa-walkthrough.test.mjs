@@ -162,7 +162,7 @@ test('recorrido de ocho pasos usa hooks una vez, respeta reflexiones, modales y 
   assert.equal(h.effects.addCall[0].source, 'manual');
   assert.equal(h.effects.addCall[0].stepAtHook, 2);
   assert.equal(h.effects.addCall[0].generatedBeforeHook, true);
-  assert.deepEqual(h.effects.navigate.at(-1), { page: 'home', targetId: 'gameArena' });
+  assert.deepEqual(h.effects.navigate.at(-1), { page: 'achievements', targetId: 'gameArena' });
   const firstCall = h.calls[0];
   assert.equal(h.state.qaWalkthrough.reflectionCallId, firstCall.id);
   click(h, 'qaWalkthroughNextBtn', true);

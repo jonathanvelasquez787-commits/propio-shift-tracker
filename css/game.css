@@ -3,6 +3,19 @@
 :root { --tier-gold-rgb: 255, 215, 110; }
 html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 
+/* El estado se anuncia al lector de pantalla sin ocupar espacio en el shell. */
+#gameStatusLive {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* El atributo hidden debe ganar sobre los display:flex/grid de la capa de juego. */
 .game-chip[hidden],
 .game-loot-box[hidden],
@@ -180,7 +193,7 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 .game-arena-stats,
 .game-arena-mission-hint { min-width: 0; }
 
-.game-arena-copy { display: grid; gap: 11px; }
+.game-arena-copy { display: grid; gap: 6px; }
 .game-arena-kicker,
 .game-panel-eyebrow,
 .game-page-kicker {
@@ -195,7 +208,7 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 .game-arena-kicker { display: flex; align-items: center; gap: 7px; color: var(--tier-gold); }
 .game-arena-pulse { width: 7px; height: 7px; border-radius: 1px; background: currentColor; box-shadow: 4px 4px 0 rgba(var(--tier-gold-rgb, 255, 215, 110), .26); }
 .game-arena-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
-.game-arena-title-row h3 { min-width: 0; margin: 0; color: var(--text); font-size: clamp(17px, 2.4vw, 23px); line-height: 1.05; letter-spacing: -.045em; overflow-wrap: anywhere; }
+.game-arena-title-row h3 { min-width: 0; margin: 0; color: var(--text); font-size: clamp(16px, 2vw, 19px); line-height: 1.15; letter-spacing: -.045em; overflow-wrap: anywhere; }
 .game-arena-title-row p { min-width: 0; margin: 5px 0 0; color: var(--muted); font-size: 12px; line-height: 1.35; overflow-wrap: anywhere; }
 .game-arena-state,
 .game-cycle-label { flex: 0 0 auto; border: 1px solid rgba(var(--cyan-rgb), .35); border-radius: 7px; padding: 5px 7px; color: var(--cyan); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 9px; font-weight: 950; letter-spacing: .08em; }
@@ -226,7 +239,7 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 .game-arena-mission-hint { display: flex; align-items: flex-start; gap: 6px; color: var(--muted); font-size: 11px; line-height: 1.35; }
 .game-arena-mission-hint .ic-svg { width: 14px; height: 14px; flex: 0 0 auto; color: var(--good); }
 
-.game-monster-stage { position: relative; display: grid; place-items: center; align-self: stretch; min-height: 190px; padding: 8px; }
+.game-monster-stage { position: relative; display: grid; place-items: center; align-self: center; min-height: 118px; padding: 0; }
 .game-monster-sprite { position: relative; z-index: 1; display: grid; place-items: center; width: min(100%, 206px); aspect-ratio: 1; color: var(--rpt-purple); filter: drop-shadow(0 13px 0 rgba(var(--rpt-purple-rgb), .18)); }
 .game-monster-svg { display: block; width: 100%; height: 100%; overflow: visible; image-rendering: pixelated; }
 .game-monster-face rect { transition: none; }
@@ -256,7 +269,7 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 
 /* Clases emitidas por game.js al convertir la arena en su estado vivo. */
 .game-arena--arcade,
-.game-arena--subtle { display: grid; grid-template-columns: minmax(0, 1fr) minmax(142px, 34%); align-items: center; gap: clamp(12px, 3vw, 28px); width: 100%; padding: clamp(14px, 3vw, 22px); }
+.game-arena--subtle { display: grid; grid-template-columns: minmax(0, 1fr) 118px; align-items: center; gap: 12px; width: 100%; padding: 14px; }
 .game-arena--subtle { border-color: rgba(var(--cyan-rgb), .26); background: var(--panel-navy); }
 .game-arena--arcade > .game-arena-copy,
 .game-arena--subtle > .game-arena-copy,
@@ -282,15 +295,15 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 .game-arena--arcade .game-kicker { color: var(--tier-gold); }
 .game-combo-badge { flex: 0 0 auto; padding: 5px 8px; border: 1px solid rgba(var(--pink-rgb), .44); border-radius: 7px; color: var(--pink); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 11px; font-weight: 950; }
 .game-monster-phrase { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.35; }
-.game-hp-label { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 9px; color: var(--muted-3); font-size: 9px; font-weight: 950; letter-spacing: .12em; }
+.game-hp-label { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 2px; color: var(--muted-3); font-size: 9px; font-weight: 950; letter-spacing: .12em; }
 .game-hp-label strong { color: var(--text); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 11px; letter-spacing: 0; }
-.game-hp-track { position: relative; min-width: 0; height: 13px; margin-top: 6px; overflow: visible; border: 1px solid var(--line-2); border-radius: 4px; background: var(--line); }
+.game-hp-track { position: relative; min-width: 0; height: 10px; margin-top: 0; overflow: visible; border: 1px solid var(--line-2); border-radius: 4px; background: var(--line); }
 .game-hp-fill { display: block; width: 0; height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--bad), var(--warn), var(--good)); }
 .game-hp-fill--boss { background: linear-gradient(90deg, var(--tier-gold), var(--rpt-purple)); }
 .game-shadow-marker { position: absolute; top: -4px; bottom: -4px; width: 2px; border-radius: 1px; background: var(--muted-3); box-shadow: 0 0 0 2px rgba(var(--muted-3-rgb, 111, 127, 158), .18); }
-.game-hp-foot { display: flex; justify-content: space-between; gap: 8px; margin-top: 6px; color: var(--muted-3); font-size: 10px; line-height: 1.3; }
+.game-hp-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 8px; margin-top: 0; color: var(--muted-3); font-size: 10px; line-height: 1.3; }
 .game-monster-stage { display: grid; align-items: center; justify-items: center; }
-.game-monster-stage .monster-svg { display: block; width: min(100%, 206px); height: auto; overflow: visible; image-rendering: pixelated; }
+.game-monster-stage .monster-svg { display: block; width: min(100%, 118px); height: auto; overflow: visible; image-rendering: pixelated; }
 .game-arena.game-awake .monster-svg { color: var(--rpt-purple); }
 .monster-svg .monster-layer--outline { opacity: .72; }
 .monster-svg .monster-layer--shadow { opacity: .24; }
@@ -309,7 +322,7 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 .game-arcade .game-arena--arcade.game-angry .monster-svg { animation-name: game-monster-angry; animation-duration: .66s; }
 .game-arcade .game-arena--arcade.game-wounded .monster-svg { animation-name: game-monster-hurt; animation-duration: .5s; }
 .game-arcade .game-arena--arcade.game-defeated .monster-svg { animation: none; }
-.game-arcade .game-arena--arcade.is-hit .monster-svg { animation: game-monster-hit .28s steps(2, end); }
+.game-arcade .game-arena--arcade.is-hit .monster-svg { animation: game-monster-hit .55s steps(2, end); }
 .game-arcade .game-arena--arcade.is-critical-hit .monster-svg { animation: game-monster-critical .42s steps(2, end); }
 .game-xp-float { display: inline-block; color: var(--good); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 15px; font-weight: 950; letter-spacing: .02em; }
 .game-xp-float.is-critical { color: var(--tier-gold); }
@@ -392,14 +405,16 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 .game-mission.is-complete .game-mission-check { border-color: var(--good); background: var(--good); color: var(--panel-navy); }
 .game-mission.is-frozen { opacity: .8; }
 .game-section-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; min-width: 0; }
+.game-section-head .game-kicker { display: block; }
 .game-section-head h3 { margin: 4px 0 0; color: var(--text); font-size: 16px; letter-spacing: -.035em; overflow-wrap: anywhere; }
 .game-section-head > strong { flex: 0 0 auto; color: var(--rpt-purple); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 12px; }
 .game-mission-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 11px; }
 .game-mission-grid .game-mission { grid-template-columns: auto minmax(0, 1fr); }
-.game-mission-grid .game-mission > div { display: grid; gap: 3px; min-width: 0; }
+.game-mission-grid .game-mission > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; min-width: 0; }
 .game-mission-grid .game-mission b,
 .game-mission-grid .game-mission span { min-width: 0; overflow-wrap: anywhere; }
-.game-mission-grid .game-mission b { color: var(--text); font-size: 11px; line-height: 1.2; }
+.game-mission-grid .game-mission b { flex-basis: 100%; color: var(--text); font-size: 11px; line-height: 1.2; }
+.game-mission-grid .game-mission small { margin-top: 0; }
 .game-mission-grid .game-mission > div > span { color: var(--muted); font-size: 10px; line-height: 1.25; }
 .game-armor { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 7px; background: rgba(var(--rpt-purple-rgb), .14); color: var(--rpt-purple); font-size: 13px; }
 .game-mission-grid .game-mission.is-complete .game-armor { background: rgba(var(--good-rgb), .17); color: var(--good); }
@@ -438,27 +453,32 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 .game-cycle-boss-sprite .monster-svg--defeated { color: var(--muted-3); }
 
 /* Página Logros. */
-.game-achievements-page { display: grid; gap: 14px; padding-bottom: 18px; }
+.game-achievements-page { display: grid; gap: 10px; padding-bottom: 18px; }
+.game-achievements-today { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 10px; min-width: 0; align-items: stretch; }
+.game-achievements-today:empty { display: none; }
+.game-achievements-today > :is(.game-arena, .game-missions) { margin: 0; min-width: 0; }
+.game-achievements-today .game-mission-grid { grid-template-columns: 1fr; margin-top: 8px; gap: 6px; }
+.game-achievements-today .game-monster-stage { align-self: center; }
 .game-achievements-hero,
 .game-panel { border: 1px solid var(--card-line); border-radius: var(--radius); background: var(--panel-navy); box-shadow: var(--shadow); }
-.game-achievements-hero { padding: clamp(16px, 3vw, 24px); background: radial-gradient(circle at 88% 10%, rgba(var(--rpt-purple-rgb), .16), transparent 35%), var(--panel-navy); }
+.game-achievements-hero { padding: 14px; background: radial-gradient(circle at 88% 10%, rgba(var(--rpt-purple-rgb), .16), transparent 35%), var(--panel-navy); }
 .game-page-kicker { display: flex; align-items: center; gap: 7px; }
 .game-page-kicker .ic-svg { width: 15px; height: 15px; color: var(--tier-gold); }
 .game-achievements-hero-row { align-items: end; margin-top: 8px; }
-.game-achievements-hero h1 { margin: 0; font-size: clamp(25px, 4vw, 38px); letter-spacing: -.055em; }
+.game-achievements-hero h1 { margin: 0; font-size: clamp(23px, 3vw, 28px); letter-spacing: -.055em; }
 .game-achievements-hero p { margin: 6px 0 0; color: var(--muted); font-size: 13px; line-height: 1.45; }
 .game-achievements-season { display: grid; gap: 3px; flex: 0 0 auto; min-width: 110px; padding: 9px 11px; border: 1px solid rgba(var(--tier-gold-rgb, 255, 215, 110), .33); border-radius: 10px; text-align: right; }
 .game-achievements-season span { color: var(--muted-3); font-size: 9px; font-weight: 950; letter-spacing: .09em; text-transform: uppercase; }
 .game-achievements-season strong { color: var(--tier-gold); font-size: 12px; }
-.game-achievements-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 18px; }
+.game-achievements-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
 .game-summary-stat { display: grid; gap: 4px; min-width: 0; padding: 10px 11px; border: 1px solid var(--line); border-radius: 12px; background: rgba(var(--rpt-purple-rgb), .055); }
 .game-summary-stat span { color: var(--muted-3); font-size: 9px; font-weight: 950; letter-spacing: .08em; text-transform: uppercase; }
 .game-summary-stat strong { color: var(--text); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 15px; overflow-wrap: anywhere; }
-.game-achievements-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.game-achievements-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .game-achievements-grid-top { align-items: stretch; }
 .game-achievements-grid-collection { align-items: start; }
 .game-achievements-grid-bottom { align-items: stretch; }
-.game-panel { padding: clamp(14px, 2.5vw, 20px); overflow: hidden; }
+.game-panel { padding: 14px; overflow: hidden; }
 .game-panel-head { align-items: start; }
 .game-panel-head h2 { font-size: 18px; }
 .game-panel-head-icon { width: 20px; height: 20px; color: var(--tier-gold); }
@@ -672,7 +692,13 @@ body:has(#qaModeBanner.show .qa-walkthrough-panel:not([hidden])) #pageAchievemen
 .game-chest-icon { color: var(--tier-gold); font-size: 48px; line-height: 1; }
 @keyframes game-modal-pop { 0% { transform: scale(.96); opacity: .5; } 55% { transform: scale(1.04); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
 
+@media (max-width: 1000px) {
+  .game-achievements-today { grid-template-columns: 1fr; }
+  .game-achievements-today .game-mission-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
 @media (max-width: 760px) {
+  .game-achievements-today .game-mission-grid { grid-template-columns: 1fr; }
   .game-achievements-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .game-mission-list { grid-template-columns: 1fr; }
   .game-mission-grid { grid-template-columns: 1fr; }
@@ -694,7 +720,7 @@ body:has(#qaModeBanner.show .qa-walkthrough-panel:not([hidden])) #pageAchievemen
   .game-arena-title-row h3 { font-size: 16px; }
   .game-arena-title-row p { font-size: 10.5px; }
   .game-arena-state { font-size: 8px; }
-  .game-monster-stage { min-height: 155px; padding: 3px; }
+  .game-monster-stage { min-height: 94px; padding: 0; }
   .game-monster-sprite { width: min(100%, 150px); }
   .game-arena-stats span { padding: 6px; }
   .game-arena-stats small { font-size: 7px; }
@@ -723,7 +749,8 @@ body:has(#qaModeBanner.show .qa-walkthrough-panel:not([hidden])) #pageAchievemen
   .game-arena-stats { gap: 4px; }
   .game-arena-stats span { padding: 5px; }
   .game-arena-stats small { letter-spacing: 0; }
-  .game-monster-stage { min-height: 138px; }
+  .game-monster-stage { min-height: 84px; }
+  .game-next-goals > div { grid-template-columns: 1fr; }
   .game-monster-sprite { width: 78px; }
   .game-stage-placeholder-grid { gap: 5px; }
   .game-stage-placeholder-grid div { padding: 8px 5px; }
@@ -866,7 +893,7 @@ body:has(#qaModeBanner.show .qa-walkthrough-panel:not([hidden])) #pageAchievemen
 .game-arcade .game-live-xp-float { animation: game-xp-rise 1.9s steps(5, end) forwards; }
 @keyframes game-xp-rise { from { transform: translate(-50%, 8px); opacity: 0; } 16% { opacity: 1; } to { transform: translate(-50%, -30px); opacity: 0; } }
 
-.game-phase-meter { display: grid; gap: 7px; padding: 10px 11px; border: 1px solid var(--line); border-radius: 11px; background: rgba(var(--rpt-purple-rgb), .045); }
+.game-phase-meter { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 6px 8px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 9px; background: rgba(var(--rpt-purple-rgb), .045); }
 .game-phase-meter-head,
 .game-phase-meter-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: var(--muted); font-size: 10px; }
 .game-phase-meter-head strong,
@@ -890,7 +917,7 @@ body:has(#qaModeBanner.show .qa-walkthrough-panel:not([hidden])) #pageAchievemen
 .game-phase-meter[data-phase="clear"] .game-phase-meter-track > span { background: var(--good); }
 
 .game-armor-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
-.game-armor-plate { position: relative; display: grid; gap: 4px; min-width: 0; min-height: 56px; align-content: center; padding: 8px; border: 1px solid rgba(var(--tier-gold-rgb, 255, 215, 110), .44); border-radius: 10px; background: rgba(var(--tier-gold-rgb, 255, 215, 110), .08); color: var(--text); overflow-wrap: anywhere; }
+.game-armor-plate { position: relative; display: flex; align-items: center; justify-content: center; gap: 5px; min-width: 0; min-height: 28px; padding: 4px 6px; border: 1px solid rgba(var(--tier-gold-rgb, 255, 215, 110), .44); border-radius: 7px; background: rgba(var(--tier-gold-rgb, 255, 215, 110), .08); color: var(--text); font-size: 10px; overflow-wrap: anywhere; }
 .game-armor-plate::before { display: none; content: ""; }
 .game-armor-plate > span { color: var(--tier-gold); font-size: 15px; line-height: 1; }
 .game-armor-plate strong { color: var(--text); font-size: 10px; line-height: 1.2; }
@@ -908,7 +935,10 @@ body:has(#qaModeBanner.show .qa-walkthrough-panel:not([hidden])) #pageAchievemen
 .game-armor-plate.is-complete > span,
 .game-armor-plate[data-state="complete"] > span { color: var(--good); }
 
-.game-next-goals { display: grid; gap: 7px; }
+.game-next-goals { display: grid; grid-column: 1 / -1; gap: 7px; }
+.game-next-goals > strong { color: var(--text); font-size: 11px; }
+.game-next-goals > div { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.game-next-goals .game-next-goal { padding: 6px 8px; color: var(--muted); font-size: 10px; overflow-wrap: anywhere; }
 .game-next-goal { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px; min-width: 0; padding: 9px 10px; border: 1px solid var(--line); border-radius: 10px; background: rgba(var(--rpt-purple-rgb), .045); }
 .game-next-goal-icon { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 7px; background: rgba(var(--cyan-rgb), .12); color: var(--cyan); }
 .game-next-goal-copy { display: grid; gap: 2px; min-width: 0; }
@@ -952,7 +982,7 @@ body:has(#qaModeBanner.show .qa-walkthrough-panel:not([hidden])) #pageAchievemen
 .game-daily-focus-options button:disabled { cursor: not-allowed; opacity: .7; }
 .game-missions-status { display: flex; align-items: center; gap: 10px; }
 .game-missions-status > span { color: var(--muted); font-size: 9px; font-weight: 800; }
-.game-mission-reward { display: flex; align-items: center; gap: 7px; min-width: 0; padding: 8px 10px; border: 1px solid rgba(var(--tier-gold-rgb, 255, 215, 110), .42); border-radius: 9px; background: rgba(var(--tier-gold-rgb, 255, 215, 110), .08); color: var(--tier-gold); font-size: 10px; overflow-wrap: anywhere; }
+.game-mission-reward { display: flex; align-items: center; gap: 7px; min-width: 0; padding: 0; border: 0; background: transparent; color: var(--tier-gold); font-size: 10px; overflow-wrap: anywhere; }
 .game-mission-reward strong { color: var(--text); }
 
 .game-equipment-panel { display: grid; gap: 0; }
@@ -1035,8 +1065,10 @@ body:has(#qaModeBanner.show .qa-walkthrough-panel:not([hidden])) #pageAchievemen
 .game-arcade .game-arena--arcade:not(.game-angry):not(.game-wounded):not(.is-hit):not(.is-critical-hit):not(.game-defeated):not([data-game-event]) .monster-svg,
 .game-arcade .game-arena:not([data-game-event]):not(.game-angry):not(.game-wounded):not(.is-hit):not(.is-critical-hit):not(.game-defeated) .game-monster-sprite { animation: none; }
 
+.game-arcade [data-game-event="hit"].game-arena .monster-svg,
 .game-arcade [data-game-event="hit"] .game-monster-sprite,
-.game-arcade [data-game-event="hit"].game-arena .game-monster-sprite { animation: game-monster-hit .28s steps(2, end); }
+.game-arcade [data-game-event="hit"].game-arena .game-monster-sprite { animation: game-monster-hit .55s steps(2, end); }
+.game-arcade [data-game-event="critical"].game-arena .monster-svg,
 .game-arcade [data-game-event="critical"] .game-monster-sprite,
 .game-arcade [data-game-event="critical"].game-arena .game-monster-sprite { animation: game-monster-critical .42s steps(2, end); }
 .game-arcade [data-game-event="combo"] .game-combo-badge { animation: game-feedback-pop .55s steps(3, end); }
@@ -1067,7 +1099,7 @@ body:has(#qaModeBanner.show .qa-walkthrough-panel:not([hidden])) #pageAchievemen
   .game-toast { grid-template-columns: auto minmax(0, 1fr); padding: 10px 11px; }
   .game-xp-float,
   .game-live-xp-float { max-width: calc(100vw - 24px); white-space: normal; text-align: center; }
-  .game-armor-row { grid-template-columns: 1fr; }
+  .game-armor-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .game-mission-choice { grid-template-columns: 1fr; }
   .game-mission-choice > span { color: var(--muted-3); font-size: 9px; font-weight: 950; letter-spacing: .08em; text-transform: uppercase; }
   .game-equipment-grid,
