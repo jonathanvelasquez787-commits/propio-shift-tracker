@@ -127,6 +127,30 @@ function harness(t, { at = new Date(2026, 8, 29, 12).getTime(), goal = 10000, st
   };
 }
 
+test('Arcade sustituye intensidades antiguas sin activar Logros ni modificar XP guardado', (t) => {
+  const h = harness(t);
+  h.state.game.totalXp = 321;
+  h.config.game.enabled = false;
+  for (const old of ['off', 'subtle', 'arcade']) {
+    h.config.game.intensity = old;
+    renderGame();
+    assert.equal(h.config.game.intensity, 'arcade');
+    assert.equal(h.config.game.enabled, false);
+    assert.equal(h.state.game.totalXp, 321);
+  }
+});
+
+test('misiones abiertas son automáticas y los enfoques de resultados sellados se conservan', (t) => {
+  const h = harness(t);
+  const key = h.keyFor();
+  h.state.game.days[key] = { bonusXp: 0, missionChoice: 'care' };
+  assert.deepEqual(computeGameDay(key).missions.map(m => m.id), ['productive', 'breaks', 'adherence']);
+  h.state.game.days[key].xpLocked = 20;
+  assert.deepEqual(computeGameDay(key).missions.map(m => m.id), ['breaks', 'care', 'adherence']);
+  h.reload();
+  assert.deepEqual(computeGameDay(key).missions.map(m => m.id), ['breaks', 'care', 'adherence']);
+});
+
 test('Finanzas concede y revoca el premio en el mes local aunque UTC ya esté en el siguiente', (t) => {
   const previousTimezone = process.env.TZ;
   process.env.TZ = 'America/Tegucigalpa';
@@ -250,11 +274,11 @@ test('los timers de una llamada anterior no retiran el impacto de la llamada nue
   assert.equal(h.nodes.get('gameCallFx').innerHTML, '');
   assert.equal(h.nodes.get('gameArena').classList.contains('is-hit'), false);
   onGameCallSaved(h.add('off-during-hit', { pay: 3 }), 'manual', { random: () => 0.99 });
-  h.config.game.intensity = 'off';
+  h.config.game.enabled = false;
   renderGame();
   assert.equal(h.nodes.get('gameArena').classList.contains('is-hit'), false);
   assert.equal(h.nodes.get('gameCallFx').innerHTML, '');
-  h.config.game.intensity = 'arcade';
+  h.config.game.enabled = true;
   renderGame();
   h.advance(2100);
   assert.equal(h.nodes.get('gameArena').classList.contains('is-hit'), false);
@@ -582,7 +606,9 @@ test('cola real limita a tres toasts y no repite el último texto después de ex
   queueGameToast('Anuncio personal', '', { channel: 'personal' });
   renderGameLive();
   assert.equal(h.stack.children[0].textContent, 'Anuncio personal');
-  h.config.game.intensity = 'off';
+  renderGame();
+  assert.equal(h.stack.children[0].textContent, 'Anuncio personal');
+  h.config.reinforcement.enabled = false;
   queueGameToast('Apagado', '', { channel: 'personal' });
   assert.equal(h.announcements.at(-1), 'Anuncio personal');
 });

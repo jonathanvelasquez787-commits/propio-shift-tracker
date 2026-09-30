@@ -57,7 +57,7 @@ test('HTML integra la ruta de Logros, el arena, las misiones, ajustes y modales 
     'gameArena', 'gameMissions', 'gameCycleBoss', 'gameCycleBossAchievements',
     'gameAchievementsSummary', 'gameStreakPanel', 'gameLevelPanel', 'gameBestiary',
     'gameTrophies', 'gameRecords', 'gameLastStageClear', 'gameToastStack',
-    'gameEnabledInput', 'gameIntensityInput', 'gameSettingsProfile',
+    'gameEnabledInput', 'sidebarAchievementsInput', 'gameSettingsProfile',
     'stageClearModal', 'stageClearContent', 'chestModal', 'chestContent',
   ]) assert.match(html, new RegExp(`\\bid="${id}"`), `missing #${id}`);
   assert.match(html, /<link rel="stylesheet" href="\/css\/game\.css"\s*\/>/);
@@ -72,19 +72,18 @@ test('HTML integra la ruta de Logros, el arena, las misiones, ajustes y modales 
   assert.match(appMain, /onGameGapSaved/);
 });
 
-test('Logros agrupa los ajustes, conserva el enfoque diario y admite nombre personalizado seguro', () => {
+test('Logros simplifica ajustes, comparte activación lateral y admite nombre personalizado seguro', () => {
   const html = read('app.html');
   const achievements = between(html, '<div class="app-page game-achievements-page"', '</div><!-- /pageAchievements -->');
   const gameEditor = between(achievements, '<details class="game-panel game-settings-accordion" id="gameSettingsAccordion" open>', '<details class="game-panel game-settings-accordion" id="positiveSettingsAccordion" open>');
   const settingsModal = between(html, '<div aria-hidden="true" class="modal-overlay" id="goalsModal">', '<div aria-hidden="true" class="modal-overlay game-modal-overlay" id="stageClearModal">');
   const allIds = [...html.matchAll(/\bid="([^"]+)"/g)].map((match) => match[1]);
   assert.deepEqual(allIds.filter((id, index) => allIds.indexOf(id) !== index), []);
-  assert.match(gameEditor, /id="gameDailyFocus"/);
+  assert.doesNotMatch(achievements, /gameDailyFocus|gameIntensityInput|positiveWeeklyBudgetInput/);
   assert.match(achievements, /id="gameEnabledInput"/);
   assert.match(gameEditor, /id="monsterNameInput"[^>]*maxlength="60"/);
   assert.match(gameEditor, /id="monsterNameSaveBtn"/);
-  assert.equal((gameEditor.match(/<option\b/g) || []).length, 3);
-  assert.match(gameEditor, /<option\s+value="off"/);
+  assert.equal((gameEditor.match(/<option\b/g) || []).length, 0);
   for (const id of [
     'gameEnabledInput', 'gameIntensityInput', 'gameSettingsProfile', 'positiveReinforcementEnabledInput',
     'positiveAskAfterCallInput', 'positiveWeeklyBudgetInput', 'physicalRewardSelected', 'physicalRewardCatalog',
@@ -184,6 +183,8 @@ test('el hook real conserva el botín XP de la quinta llamada al reconciliar y r
   const saveSettingsOnly = () => {};
   const toast = () => {};
   const previousDocument = globalThis.document;
+  const previousWindow = globalThis.window;
+  globalThis.window = { matchMedia: () => ({ matches: true }) };
   globalThis.document = {
     activeElement: null,
     documentElement: { classList: { toggle() {} } },
@@ -278,6 +279,8 @@ test('el hook real conserva el botín XP de la quinta llamada al reconciliar y r
     setAppSettings({});
     if (previousDocument === undefined) delete globalThis.document;
     else globalThis.document = previousDocument;
+    if (previousWindow === undefined) delete globalThis.window;
+    else globalThis.window = previousWindow;
   }
 });
 
@@ -465,7 +468,7 @@ test('gamificación apagada respeta hidden y el render conserva la estructura vi
   assert.doesNotMatch(game, /element\.innerHTML = html/);
   assert.match(game, /profile\.querySelector/);
   assert.match(game, /root\.dataset\.gameState = monsterState/);
-  assert.match(game, /root\.dataset\.gameIntensity = subtle \? 'subtle' : 'arcade'/);
+  assert.match(game, /root\.dataset\.gameIntensity = 'arcade'/);
   assert.match(game, /root\.removeAttribute\('data-game-state'\)/);
 });
 
@@ -565,7 +568,7 @@ test('consistencia de gamificación se mantiene aunque esté apagada', () => {
   assert.match(started, /revokeStageClear\(dayKey, \{ silent: !enabled \}\)/);
 });
 
-test('modo sutil no reproduce pop ni sonido y reduced-motion solo elimina movimiento', () => {
+test('Arcade fijo y reduced-motion solo elimina movimiento', () => {
   const game = read('js/game.js');
   const tone = between(game, 'function playGameTone', '\nconst gameEventVersions');
   assert.match(tone, /if \(!arcadeEnabled\(\)\) return/);

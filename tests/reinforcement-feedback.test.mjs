@@ -11,7 +11,7 @@ import {
   initPositiveReinforcement, onPositiveCallSaved, onPositiveRewardWindow,
 } from '../js/positive-reinforcement.js';
 
-test('los dos interruptores y la intensidad deciden cada canal sin cambiar preferencias', () => {
+test('los dos interruptores deciden cada canal incluso con intensidad antigua guardada', () => {
   for (const game of [false, true]) {
     for (const personal of [false, true]) {
       for (const intensity of ['off', 'subtle', 'arcade']) {
@@ -21,11 +21,11 @@ test('los dos interruptores y la intensidad deciden cada canal sin cambiar prefe
         const queued = [];
         configureReinforcementFeedback({ queueToast: (...args) => queued.push(args) });
         for (const [channel, active] of [['game', game], ['personal', personal], ['either', game || personal]]) {
-          const expected = intensity !== 'off' && active;
+          const expected = active;
           assert.equal(reinforcementFeedbackEnabled(channel), expected);
           assert.equal(notifyReinforcement(channel, { channel }), expected);
         }
-        assert.equal(queued.length, intensity === 'off' ? 0 : Number(game) + Number(personal) + Number(game || personal));
+        assert.equal(queued.length, Number(game) + Number(personal) + Number(game || personal));
         assert.deepEqual(config, { game: { enabled: game, intensity }, reinforcement: { enabled: personal } });
       }
     }
@@ -34,25 +34,24 @@ test('los dos interruptores y la intensidad deciden cada canal sin cambiar prefe
   assert.equal(notifyReinforcement('   ', { channel: 'either' }), false);
 });
 
-test('subtle y movimiento reducido conservan anuncios sin partículas; arcade celebra hitos', () => {
-  const config = { game: { enabled: true, intensity: 'subtle' }, reinforcement: { enabled: false } };
+test('Arcade celebra hitos y movimiento reducido conserva anuncios sin partículas', () => {
+  const config = { game: { enabled: true, intensity: 'arcade' }, reinforcement: { enabled: false } };
   setAppSettings(config);
   const queued = [];
   const effects = [];
   configureReinforcementFeedback({ queueToast: (...args) => queued.push(args), triggerEffect: (text) => effects.push(text) });
   notifyReinforcement('Hito', { effect: true });
   assert.deepEqual(queued[0], ['Hito', 'record', { channel: 'game' }]);
-  assert.deepEqual(effects, []);
-  config.game.intensity = 'arcade';
+  assert.deepEqual(effects, ['Hito']);
   notifyReinforcement('Llamada normal');
-  assert.deepEqual(effects, [], 'las llamadas normales no disparan partículas');
+  assert.deepEqual(effects, ['Hito'], 'las llamadas normales no disparan partículas');
   notifyReinforcement('Récord', { effect: true });
-  assert.deepEqual(effects, ['Récord']);
+  assert.deepEqual(effects, ['Hito', 'Récord']);
   const previousMatchMedia = globalThis.matchMedia;
   try {
     globalThis.matchMedia = () => ({ matches: true });
     notifyReinforcement('Otro hito', { effect: true });
-    assert.deepEqual(effects, ['Récord']);
+    assert.deepEqual(effects, ['Hito', 'Récord']);
     assert.equal(queued.at(-1)[0], 'Otro hito');
   } finally {
     if (previousMatchMedia === undefined) delete globalThis.matchMedia;
@@ -104,7 +103,7 @@ test('mejor llamada compara el bono real de las anteriores y excluye el mismo ev
   assert.match(corrected, /mejor|mayor pago/);
 });
 
-test('off conserva premios internos, silencia modales automáticos y permite consultar premios explícitamente', () => {
+test('refuerzo personal funciona con Logros apagado y una intensidad antigua sin silenciarlo', () => {
   const dayKey = '09/29/2026';
   const call = { id: 'personal-call', callDate: dayKey, startISO: new Date(Date.now() - 120000).toISOString(), endISO: new Date(Date.now() - 60000).toISOString() };
   const rows = [call];
@@ -127,15 +126,13 @@ test('off conserva premios internos, silencia modales automáticos y permite con
   });
   onPositiveCallSaved(call, 'manual', dayKey);
   assert.equal(currentState.game.reinforcement.pendingRewards.length, 1);
-  assert.deepEqual(messages, []);
-  assert.deepEqual(opened, []);
-  assert.equal(onPositiveRewardWindow('break'), false);
+  assert.ok(messages.length > 0);
+  assert.deepEqual(opened, ['positiveReflectionModal']);
+  assert.equal(onPositiveRewardWindow('break'), true);
   assert.equal(onPositiveRewardWindow('break', { manual: true }), true);
   assert.equal(opened.at(-1), 'physicalRewardClaimModal');
-  config.game.intensity = 'subtle';
   initPositiveReinforcement();
-  onPositiveCallSaved(call, 'manual', dayKey);
-  assert.equal(opened.at(-1), 'positiveReflectionModal');
+  assert.equal(opened.filter(id => id === 'positiveReflectionModal').length, 1);
   globalThis.Element = class { closest() { return this; } };
   const button = new Element();
   button.dataset = { positiveOutcome: 'good' };

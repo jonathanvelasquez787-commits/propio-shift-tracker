@@ -27,7 +27,6 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 .game-toast-stack[hidden],
 .game-chest-claim[hidden],
 .game-modal-overlay[hidden],
-.game-daily-focus[hidden],
 .positive-evidence-card[hidden],
 #earningsMilestoneMarkers[hidden],
 #earningsNextMilestone[hidden] {
@@ -609,8 +608,6 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 .game-settings-toggle:has(input:checked) .game-settings-switch { border-color: transparent; background: linear-gradient(135deg, var(--cyan), var(--rpt-purple)); }
 .game-settings-toggle:has(input:checked) .game-settings-switch > span { transform: translateX(18px); background: #fff; }
 .game-settings-toggle:focus-within { border-color: rgba(var(--cyan-rgb), .58); box-shadow: 0 0 0 2px rgba(var(--cyan-rgb), .14); }
-.game-settings-intensity-field { max-width: 270px; }
-.game-settings-intensity-field select { width: 100%; min-width: 0; }
 .game-settings-profile { display: grid; gap: 8px; padding: 11px 12px; border: 1px solid var(--line); border-radius: 13px; background: var(--surface-sunken, rgba(var(--rpt-purple-rgb), .04)); }
 .game-settings-profile-label { color: var(--muted-3); font-size: 9px; font-weight: 950; letter-spacing: .1em; text-transform: uppercase; }
 .game-settings-profile-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
@@ -622,7 +619,6 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 
 .game-settings-disclosures,
 .game-advanced-settings { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 10px; min-width: 0; }
-.game-settings-disclosures .game-daily-focus { grid-template-columns: 1fr; padding: 9px; margin: 0; gap: 7px; }
 .game-reward-settings { border: 1px solid var(--line); border-radius: 10px; }
 .game-reward-settings .game-settings-accordion-summary { padding: 9px; }
 .positive-rewards-body { display: grid; gap: 10px; }
@@ -975,16 +971,6 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 .game-mission-choice-button.is-locked,
 .game-mission-choice-button:disabled { border-color: var(--line); background: var(--panel-navy); color: var(--muted-3); cursor: not-allowed; opacity: .64; }
 .game-mission-choice [data-game-role="mission-choice-label"] { min-width: 0; overflow-wrap: anywhere; }
-.game-daily-focus { display: grid; grid-template-columns: minmax(190px, .8fr) minmax(300px, 1.7fr); align-items: center; gap: 12px; margin: 12px 0; padding: 12px; border: 1px solid rgba(var(--cyan-rgb), .34); border-radius: 14px; background: linear-gradient(135deg, rgba(var(--cyan-rgb), .08), rgba(var(--rpt-purple-rgb), .06)); }
-.game-daily-focus-copy { display: grid; gap: 3px; min-width: 0; }
-.game-daily-focus-copy > span { color: var(--cyan); font-family: var(--font-mono); font-size: 9px; font-weight: 950; letter-spacing: .12em; }
-.game-daily-focus-copy > strong { color: var(--text); font-size: 13px; }
-.game-daily-focus-copy > small { color: var(--muted); font-size: 9.5px; line-height: 1.35; }
-.game-daily-focus-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
-.game-daily-focus-options button { min-width: 0; padding: 10px 8px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel-navy); color: var(--text); cursor: pointer; font-weight: 800; }
-.game-daily-focus-options button:hover, .game-daily-focus-options button:focus-visible { border-color: rgba(var(--cyan-rgb), .66); outline: none; }
-.game-daily-focus-options button.is-selected { border-color: rgba(var(--good-rgb), .64); background: rgba(var(--good-rgb), .1); color: var(--good); }
-.game-daily-focus-options button:disabled { cursor: not-allowed; opacity: .7; }
 .game-missions-status { display: flex; align-items: center; gap: 10px; }
 .game-missions-status > span { color: var(--muted); font-size: 9px; font-weight: 800; }
 .game-mission-reward { display: flex; align-items: center; gap: 7px; min-width: 0; padding: 0; border: 0; background: transparent; color: var(--tier-gold); font-size: 10px; overflow-wrap: anywhere; }
@@ -1102,8 +1088,6 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
   .game-settings-accordion > summary { gap: 8px; padding: 12px; }
   .game-monster-name-controls { grid-template-columns: minmax(0, 1fr); }
   .game-monster-name-controls > button { justify-self: start; }
-  .game-daily-focus { grid-template-columns: 1fr; }
-  .game-daily-focus-options { grid-template-columns: 1fr; }
   .game-toast-stack { max-height: calc(100dvh - 86px); overflow: hidden; }
   .game-toast { grid-template-columns: auto minmax(0, 1fr); padding: 10px 11px; }
   .game-xp-float,
@@ -1169,9 +1153,6 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 .positive-evidence-rewards > button:disabled { cursor: default; opacity: .5; }
 
 .positive-settings-section { display: grid; gap: 12px; }
-.positive-budget-field { max-width: 300px; }
-.positive-budget-field input { width: 100%; min-width: 0; }
-.positive-budget-field > small { color: var(--muted); font-size: 10px; }
 .positive-settings-block { display: grid; gap: 9px; min-width: 0; padding-top: 11px; border-top: 1px solid var(--line); }
 .positive-settings-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 0; }
 .positive-settings-heading > span { display: grid; gap: 3px; min-width: 0; }
@@ -1286,7 +1267,6 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 .physical-reward-claim > button:focus-visible,
 .physical-reward-claim > select:focus-visible { box-shadow: 0 0 0 2px rgba(var(--cyan-rgb), .15); }
 .physical-reward-claim > button:disabled { cursor: not-allowed; opacity: .55; }
-.physical-reward-budget-note { grid-column: 2 / -1; color: var(--muted); font-size: 9px; line-height: 1.35; }
 .positive-reward-editor-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
 .positive-reward-editor-grid > .goals-field { min-width: 0; }
 .positive-reward-editor-grid > .goals-field[hidden] { display: none !important; }
@@ -1421,7 +1401,7 @@ html.theme-light {
 .game-achievements-page { gap: 14px; }
 .game-settings-disclosures, .game-achievements-grid { gap: 14px; }
 .game-advanced-settings { grid-template-columns: 1fr; }
-.game-achievements-page :is(.game-settings-switch, .game-settings-switch > span, .game-settings-accordion-chevron, .game-level-emblem, .game-level-ladder span, .game-streak-day, .game-streak-day em, .game-summary-stat, .game-next-goal, .game-equipment-card, .game-unlock-item, .game-chest-claim, .game-trophy, .game-bestiary-card, .game-achievements-season, .game-settings-profile, .game-daily-focus, .game-reward-settings, .game-last-clear-content, .game-settings-toggle, .game-monster-name-controls > input),
+.game-achievements-page :is(.game-settings-switch, .game-settings-switch > span, .game-settings-accordion-chevron, .game-level-emblem, .game-level-ladder span, .game-streak-day, .game-streak-day em, .game-summary-stat, .game-next-goal, .game-equipment-card, .game-unlock-item, .game-chest-claim, .game-trophy, .game-bestiary-card, .game-achievements-season, .game-settings-profile, .game-reward-settings, .game-last-clear-content, .game-settings-toggle, .game-monster-name-controls > input),
 .game-modal-card :is(.game-stage-score, .game-stage-breakdown span, .game-stage-missions span, .game-sealed-chest) { border-radius: 0; }
 .game-settings-toggle:has(input:checked) .game-settings-switch { background: var(--cyan); }
 .game-achievements-page :is(button, select, input[type="text"]) { border-radius: 2px; }

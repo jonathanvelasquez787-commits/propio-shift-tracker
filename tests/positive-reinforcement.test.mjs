@@ -25,13 +25,13 @@ test('premios personales y catálogo normalizan límites sin introducir puntos n
   const config = normalizeReinforcementSettings({ weeklyBudgetUsd: -2, rewards: [{ id: 'personal', name: '<Mi premio>', every: 500, maxPerDay: 99, accumulationTarget: 50, durationMin: 300, costUsd: -1 }] });
   assert.equal(config.enabled, false);
   assert.equal(normalizeReinforcementSettings({ enabled: true }).enabled, true);
-  assert.equal(config.weeklyBudgetUsd, 0);
+  assert.equal(Object.hasOwn(config, 'weeklyBudgetUsd'), false);
   assert.deepEqual({ every: config.rewards[0].every, maxPerDay: config.rewards[0].maxPerDay, accumulationTarget: config.rewards[0].accumulationTarget, durationMin: config.rewards[0].durationMin, costUsd: config.rewards[0].costUsd }, { every: 100, maxPerDay: 10, accumulationTarget: 30, durationMin: 240, costUsd: 0 });
   assert.equal(config.rewards[0].name, 'Mi premio');
   assert.deepEqual(normalizeReinforcementState({ recoveries: [{}], pendingRewards: [{ name: '<bad>', window: 'other' }] }).pendingRewards, []);
 });
 
-test('llamadas difíciles, premios acumulables, ventana segura y presupuesto conservan el premio', async () => {
+test('premios acumulables conservan ventana e idempotencia sin el presupuesto antiguo', async () => {
   const dayKey = currentDayKey();
   const callRows = [];
   const currentState = { game: { reinforcement: createDefaultReinforcementState() } };
@@ -111,9 +111,7 @@ test('llamadas difíciles, premios acumulables, ventana segura y presupuesto con
   assert.equal(currentState.game.reinforcement.claims.length, 0);
   currentState.activePause = { type: 'break' };
   listeners.get('click')({ target: claimButton });
-  assert.equal(currentState.game.reinforcement.pendingRewards.length, 1);
-  assert.equal(currentState.game.reinforcement.claims.length, 0);
-  currentSettings.reinforcement.weeklyBudgetUsd = 3;
+  assert.equal(currentState.game.reinforcement.claims.length, 1, 'un presupuesto antiguo de $2 no bloquea el premio de $3');
   listeners.get('click')({ target: claimButton });
   assert.equal(currentState.game.reinforcement.pendingRewards.length, 0);
   assert.equal(currentState.game.reinforcement.claims.length, 1);
@@ -308,13 +306,15 @@ test('dropped repetidas no abren reflexión ni ganan premios y una recuperación
   assert.equal(currentState.game.reinforcement.pendingRewards.length, 1);
 });
 
-test('Plan del día se oculta de verdad al apagar gamificación', () => {
-  const css = fs.readFileSync(path.join(root, 'css/game.css'), 'utf8');
+test('Logros elimina plan, intensidad y presupuesto sin dejar controles ni listeners', () => {
+  const html = fs.readFileSync(path.join(root, 'app.html'), 'utf8');
   const game = fs.readFileSync(path.join(root, 'js/game.js'), 'utf8');
-  assert.match(css, /\.positive-reward-editor-grid > \.goals-field\[hidden\]\s*\{\s*display:\s*none\s*!important/);
   const positive = fs.readFileSync(path.join(root, 'js/positive-reinforcement.js'), 'utf8');
+  const css = fs.readFileSync(path.join(root, 'css/game.css'), 'utf8');
+  assert.match(css, /\.positive-reward-editor-grid > \.goals-field\[hidden\]\s*\{\s*display:\s*none\s*!important/);
   assert.match(positive, /reinforcement\.pendingRewards\.length >= 100/);
   assert.match(positive, /settings\.reinforcement\.rewards\.length >= 60[\s\S]*toast\('Ya tienes el máximo de 60 premios\.'\)/);
-  assert.match(css, /\.game-daily-focus\[hidden\][\s\S]*?display:\s*none\s*!important/);
-  assert.match(game, /function renderDailyFocus\(\)[\s\S]*?root\.hidden = !gameEnabled\(\)/);
+  assert.doesNotMatch(html + game + positive, /gameDailyFocus|gameIntensityInput|positiveWeeklyBudgetInput|choose-mission/);
+  assert.match(html, /id="sidebarAchievementsInput"/);
+  assert.match(html, /Activar Logros/);
 });

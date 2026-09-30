@@ -988,7 +988,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
       if (typeof settings.financeAutoFill !== 'boolean') settings.financeAutoFill = false;
       if (!settings.game || typeof settings.game !== 'object' || Array.isArray(settings.game)) settings.game = { ...fallback.game };
       if (typeof settings.game.enabled !== 'boolean') settings.game.enabled = fallback.game.enabled;
-      if (!['subtle', 'arcade', 'off'].includes(settings.game.intensity)) settings.game.intensity = fallback.game.intensity;
+      settings.game.intensity = 'arcade';
       // Cada cola (Gastos, Metas) queda con prioridades únicas 1..n, conservando el orden actual. El
       // "tipo" de cada fila (Gasto vs Meta) ya no se deduce de su categoría — una Meta puede tener
       // cualquier categoría desde que se permitió elegirla libremente — así que se decide por

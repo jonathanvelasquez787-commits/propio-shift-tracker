@@ -44,16 +44,16 @@ test('la superficie dinámica mantiene controles, recibos, accesibilidad y Audio
   const html = read('app.html');
   const css = read('css/game.css');
   const surface = `${game}\n${html}`;
-  for (const className of ['game-phase-meter', 'game-armor-row', 'game-armor-plate', 'game-next-goals', 'game-next-goal', 'game-daily-focus', 'game-mission-reward', 'game-equipment-grid', 'game-equipment-item', 'game-unlock-roadmap', 'game-cycle-choice']) {
+  for (const className of ['game-phase-meter', 'game-armor-row', 'game-armor-plate', 'game-next-goals', 'game-next-goal', 'game-mission-reward', 'game-equipment-grid', 'game-equipment-item', 'game-unlock-roadmap', 'game-cycle-choice']) {
     assert.match(surface, new RegExp(className.replaceAll('-', '\\-')));
   }
-  for (const action of ['choose-mission', 'equip-accessory', 'claim-chest', 'choose-cycle-reward']) assert.match(game, new RegExp(`data-game-action=\\"${action}\\"`));
+  for (const action of ['equip-accessory', 'claim-chest', 'choose-cycle-reward']) assert.match(game, new RegExp(`data-game-action=\\"${action}\\"`));
   assert.match(game, /gross, applied/);
   assert.match(game, /repairBonusReceipt/);
   assert.match(game, /let gameAudioContext = null/);
   assert.equal((game.match(/new AudioContextCtor\(\)/g) || []).length, 1);
   assert.match(game, /gameStatusLive/);
-  assert.match(game, /const locked = day\.eligibleCalls\.length > 0/);
+  assert.doesNotMatch(surface, /choose-mission|gameDailyFocus/);
   assert.match(game, /item\.unlockLevel > state\.game\.level/);
   assert.match(game, /document\.getElementById\('gameEquipmentPanel'\)/);
   assert.match(game, /data-game-role="chest-claim"/);

@@ -336,10 +336,13 @@ Los días cerrados conservan su XP congelado. Las animaciones de hoy no pasan
 al cambiar a otra fecha.
 
 La distribución de Logros aprobada después de la auditoría quedó aplicada en
-v577: activación visible en la cabecera y preferencias abiertas al principio;
+v577, simplificada en v579: «Activar Logros» visible en cabecera y menú lateral;
 nivel/XP y racha/escudos juntos, sin duplicar el perfil; jefe del ciclo, última
 victoria/cofre y récords; equipo, bestiario/trofeos e historial positivo.
-Presupuesto/premios y desbloqueos por nivel son desplegables con todo su contenido.
+Mis premios y desbloqueos por nivel son desplegables con todo su contenido.
+Se retiraron presupuesto, intensidad y Plan del día. Arcade es fijo; las
+misiones evalúan automáticamente productividad, pausas y adherencia. Los
+resultados sellados conservan sus enfoques anteriores por compatibilidad.
 El reinicio queda al final; el Laboratorio QA se retiró en v578 por petición
 del usuario. Los hitos de ganancias quedan justo
 debajo de Misiones en Inicio, con cuatro marcadores conectados, hitos registrados
@@ -349,13 +352,13 @@ Shift, Break y Lunch se ven en una sola fila también en móvil, con todo su tex
 El estado accesible queda oculto visualmente y los avisos temporales desaparecen.
 Manual, automático y pegado actuales actualizan vida, combo y efectos; importar
 más de 30 minutos después de terminar no concede XP. Históricos, futuros y
-Dropped no disparan golpes sobre el monstruo actual. Off, Sutil y movimiento
-reducido conservan sus límites.
+Dropped no disparan golpes sobre el monstruo actual. Desactivar Logros retira
+sus efectos sin borrar progreso; el movimiento reducido elimina animaciones.
 
 El mockup HTML pixel art quedó aprobado y aplicado en v578: marcos escalonados,
 sprites e iconos SVG nítidos, vida segmentada, armaduras e hitos cuadrados,
 cofres y estrellas. Efectos breves de daño, misión, victoria y apertura;
-Sutil/Off y movimiento reducido no generan partículas. Se mantienen cálculos,
+Desde v579 Arcade es fijo y movimiento reducido no genera partículas. Se mantienen cálculos,
 recompensas, recibos, controles, contenido y ubicación del monstruo en Inicio.
 Se eliminaron el laboratorio, los recorridos y su código de la tool. Al
 actualizar se retiran únicamente sus cuatro claves antiguas de simulación;
@@ -410,29 +413,25 @@ estricta para futuras sesiones.
    El cierre nocturno conserva la proyección del día contable; las correcciones
    históricas no proyectan rachas nuevas. Cerrar siete días, restaurar backup
    y reabrir el turno conserva y revoca correctamente XP/escudo/metadatos.
-7. Intensidad/accesibilidad: catálogo común de variantes y canal de mensajes
-   personales/juego compartido. Sutil no usa partículas; Arcade conserva
-   efectos en hitos/récords; Off silencia avisos, efectos, región accesible y
-   modales automáticos, manteniendo progreso interno. Cambiar intensidad no
-   activa/desactiva los interruptores ni modifica preferencias por sorpresa.
-   Máximo tres toasts visibles; no se repite el último texto consecutivo en
-   cola ni en presentación. Movimiento reducido y foco visible respetados.
+7. Accesibilidad: catálogo común de variantes y canales personales/juego
+   independientes. Arcade es el modo fijo. Movimiento reducido conserva
+   mensajes y resultados sin partículas ni animaciones. Máximo tres toasts;
+   no se repite el último texto consecutivo. Apagar Logros conserva llamadas,
+   XP, recibos y refuerzo personal. El interruptor lateral y el de Logros
+   comparten el mismo ajuste y guardado, independiente del tema.
 
 Todo estado nuevo vive en el modelo game exportable/sincronizado, normalizado
-para backups antiguos; QA mantiene el namespace aislado y la nube bloqueada.
-El ledger admite hasta 30.000 recibos y los días conservan su límite existente
-de 400. El escenario **Refuerzo completo** añade una guía de trece pasos con
-llamadas sintéticas, resultados de azar controlados y restauración del estado
-real; conserva el recorrido original de ocho pasos.
+para backups antiguos. El ledger admite hasta 30.000 recibos y los días
+conservan su límite de 400. El Laboratorio QA y sus recorridos se retiraron.
+Mis premios conserva catálogo, personalización, ventanas seguras, historial,
+costos informativos e idempotencia; no existe límite semanal de presupuesto.
 
-Verificación actual: 174 pruebas, contratos/ciclos de 21 módulos, wiring y build de
-producción sin sourcemaps. Auditoría de dependencias de producción sin alertas.
-Chrome local con datos QA: recorridos original y Refuerzo completo; claro/oscuro,
-320, 390, 768 y 1365 px sin overflow; rutas manual/automática/pegado, importación
-de ayer y duplicados, foco de teclado, movimiento reducido y recarga sin cambiar
-recibos. Reinicio y salida del recorrido original comprobados en móvil/escritorio.
-Esto **no** certifica una sesión autenticada de producción. No se reprodujo
-un mockup externo no disponible: se reutilizaron componentes y tokens existentes.
+Verificación actual: 173 pruebas, contratos/ciclos de 19 módulos, wiring y build
+de producción sin sourcemaps. Chrome aislado en claro/oscuro a 320, 390, 768
+y 1365 px: Inicio/Logros sin overflow, llamadas manual/live/pegado/ayer/duplicado,
+derrota, cierre, cofre idempotente, activación en ambas ubicaciones, progreso
+conservado y movimiento reducido. Las pruebas no certifican una sesión real
+autenticada en dos dispositivos. El mockup pixel art fue aprobado por el usuario.
 
 **LIMITACIONES CONOCIDAS** (alcance reducido a propósito, no son bugs)
 
@@ -506,7 +505,7 @@ La aplicación funciona en producción con estas bases vigentes:
   global, backup diario, exportación y borrado de cuenta permanecen activos.
 - Turnos, llamadas, Horario, Higher Rate, Finanzas, Reportes, Calendario,
   Adherencia y la gamificación «El Monstruo» están integrados.
-- La versión actual es 578. Refuerzo positivo, Logros y auditoría profunda
+- La versión actual es 579. Refuerzo positivo, Logros y auditoría profunda
   están terminados. Los siete fallos de la auditoría se corrigieron con
   regresiones; cobertura y límites constan en
   `docs/auditoria-profunda-2026-09-30.md`.
@@ -514,6 +513,21 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v579** — Ajustes simples y activación de Logros desde el menú lateral.
+
+- «Activar Logros» reemplaza «Activar El Monstruo»; interruptores sincronizados
+  en cabecera y menú lateral, junto a Modo oscuro, con un solo ajuste persistente.
+  Desactivar/reactivar conserva XP, llamadas y recibos; el tema es independiente.
+- Retirados selector de intensidad y Plan del día. Arcade fijo, también para
+  preferencias antiguas. Misiones automáticas de productividad, pausas y
+  adherencia; enfoques antiguos de resultados sellados se conservan.
+- Mis premios pierde presupuesto y límites de gasto; preferencias antiguas
+  no bloquean premios. Permanecen costo informativo, catálogo, personalización,
+  acumulación, límites diarios, ventanas seguras e historial idempotente.
+- 173 pruebas y build/wiring de 19 módulos correctos. Chrome en claro/oscuro,
+  320–1365 px; controles reales de ambas ubicaciones, progreso intacto,
+  llamadas y efectos pixel art, cierre/cofre y movimiento reducido verificados.
 
 **v578** — Gamificación pixel art aprobada y retirada del Laboratorio QA.
 
@@ -546,20 +560,3 @@ La aplicación funciona en producción con estas bases vigentes:
   320, 390, 768 y 1365 px sin overflow; controles, despliegue de premios y
   desbloqueos, llamadas manual/automática/pegado/ayer/duplicado y ambos recorridos
   QA comprobados con datos aislados, incluyendo recarga, reinicio y restauración.
-
-**v576** — Auditoría profunda: persistencia, Finanzas y exportaciones.
-
-- Mes local para premios mensuales; gastos recurrentes completos usan el
-  mismo criterio de pago que Finanzas. Recibos idempotentes y revocables.
-- Un fallo de cuota obliga a guardar estado, llamadas y ajustes juntos en
-  el siguiente intento y conserva el aviso de error. Restauración local,
-  nube y QA no borran claves intactas cuando falla una escritura.
-- Backup incluye el escudo y recibo ganados en esa exportación. CSV/PDF
-  recorren el rango completo, sin truncamiento silencioso a 400 días.
-- Cambios durante una subida permanecen pendientes, con otro delta sobre
-  la nueva base. QA espera si esa subida todavía dejó datos reales pendientes.
-- 187 pruebas, 13 regresiones nuevas; imports/ciclos y wiring de 21 módulos,
-  build y nueve dependencias de producción sin alertas. Chrome: 31 días y
-  108 llamadas, recargas, casos extremos y ambos recorridos QA; ocho páginas
-  en claro/oscuro y 320–1365 px. Sin excepciones ni overflow del documento.
-  Informe completo: docs/auditoria-profunda-2026-09-30.md.

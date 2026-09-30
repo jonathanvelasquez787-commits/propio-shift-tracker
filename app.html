@@ -8244,6 +8244,14 @@
 </button>
 <div class="sidebar-footer">
 <div class="sidebar-darkmode-row">
+<span class="sidebar-darkmode-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8v5a4 4 0 0 1-8 0V3Z"/><path d="M8 5H4v2a4 4 0 0 0 4 4M16 5h4v2a4 4 0 0 1-4 4M12 12v6M8 21h8M9 18h6"/></svg></span>
+<span>Activar Logros</span>
+<label class="sidebar-switch" title="Activar o desactivar Logros">
+<input aria-label="Activar Logros" id="sidebarAchievementsInput" type="checkbox"/>
+<span class="sidebar-switch-track"><span class="sidebar-switch-thumb"></span></span>
+</label>
+</div>
+<div class="sidebar-darkmode-row">
 <span class="sidebar-darkmode-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z"/></svg></span>
 <span>Modo oscuro</span>
 <label class="sidebar-switch" title="Cambiar entre modo claro y oscuro">
@@ -8975,13 +8983,13 @@
     </div>
     <div class="game-achievements-season" data-game-role="season-status"><span>Temporada</span><strong data-game-role="season-label">Ciclo actual</strong></div>
   </div>
-  <div class="game-achievements-toolbar"><label class="game-settings-toggle" for="gameEnabledInput"><span><strong>Activar El Monstruo</strong><small>Racha, XP, misiones y colección sin cambiar tus ganancias.</small></span><input id="gameEnabledInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label></div>
+  <div class="game-achievements-toolbar"><label class="game-settings-toggle" for="gameEnabledInput"><span><strong>Activar Logros</strong><small>Racha, XP, misiones y colección sin cambiar tus ganancias.</small></span><input id="gameEnabledInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label></div>
 </section>
 
-<section class="game-settings-disclosures" aria-label="Preferencias de El Monstruo">
+<section class="game-settings-disclosures" aria-label="Preferencias de Logros">
 <details class="game-panel game-settings-accordion" id="gameSettingsAccordion" open>
     <summary class="game-settings-accordion-summary">
-      <span class="game-settings-accordion-copy"><span class="game-panel-eyebrow">PERSONALIZACIÓN</span><strong>Gamificación</strong><small>Nombre, enfoque del día e intensidad.</small></span>
+      <span class="game-settings-accordion-copy"><span class="game-panel-eyebrow">PERSONALIZACIÓN</span><strong>Gamificación</strong><small>Personaliza el nombre del monstruo. Las misiones se calculan automáticamente.</small></span>
       <span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
     </summary>
     <div class="game-settings-accordion-body">
@@ -8991,18 +8999,6 @@
           <div class="game-monster-name-controls"><input id="monsterNameInput" type="text" maxlength="60" autocomplete="off" aria-describedby="monsterNameHelp monsterNameSaveStatus" placeholder="Usar nombre del catálogo"/><button class="mc-btn-primary cyan" id="monsterNameSaveBtn" type="button">Guardar nombre</button></div>
           <small id="monsterNameHelp">Un solo nombre para el monstruo diario. Déjalo vacío para usar los nombres del catálogo.</small>
           <span class="game-monster-name-status" id="monsterNameSaveStatus" role="status" aria-live="polite"></span>
-        </div>
-        <div class="game-daily-focus" hidden id="gameDailyFocus">
-          <div class="game-daily-focus-copy"><span>PLAN DEL DÍA</span><strong>¿Qué quieres reforzar hoy?</strong><small data-game-role="daily-focus-hint">Elige antes de tu primera llamada; luego queda fijado para el día.</small></div>
-          <div class="game-daily-focus-options" data-game-role="daily-focus-options" role="group" aria-label="Enfoque del día"></div>
-        </div>
-        <div class="goals-field game-settings-intensity-field">
-          <label for="gameIntensityInput">Intensidad</label>
-          <select id="gameIntensityInput">
-            <option value="off">Sin notificaciones de refuerzo</option>
-            <option value="subtle">Solo sutil</option>
-            <option value="arcade">Arcade · efectos pixel art</option>
-          </select>
         </div>
       </div>
     </div>
@@ -9017,12 +9013,8 @@
         <label class="game-settings-toggle" for="positiveReinforcementEnabledInput"><span><strong>Celebrar llamadas completadas</strong><small>Convierte constancia, recuperación y metas en evidencia positiva y premios seguros.</small></span><input id="positiveReinforcementEnabledInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label>
         <label class="game-settings-toggle" for="positiveAskAfterCallInput"><span><strong>Cierre breve después de cada llamada</strong><small>Marca si cerró bien, si cumpliste aunque fue difícil o si te dejó un aprendizaje.</small></span><input id="positiveAskAfterCallInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label>
         <details class="game-settings-accordion game-reward-settings" id="positiveRewardsAccordion">
-          <summary class="game-settings-accordion-summary"><span class="game-settings-accordion-copy"><strong>Presupuesto y mis premios</strong><small>Presupuesto semanal, premios físicos y catálogo sugerido.</small></span><span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></summary>
-          <div class="game-settings-accordion-body positive-rewards-body"><div class="goals-field positive-budget-field">
-          <label for="positiveWeeklyBudgetInput">Presupuesto semanal opcional ($)</label>
-          <input id="positiveWeeklyBudgetInput" inputmode="decimal" min="0" step="0.01" type="number" placeholder="Sin límite"/>
-          <small id="positiveWeeklyBudgetConverted">Sin límite de presupuesto</small>
-        </div>
+          <summary class="game-settings-accordion-summary"><span class="game-settings-accordion-copy"><strong>Mis premios</strong><small>Premios físicos y catálogo sugerido.</small></span><span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></summary>
+          <div class="game-settings-accordion-body positive-rewards-body">
         <div class="positive-settings-block">
           <div class="positive-settings-heading"><span><strong>Mis premios físicos</strong><small>Se guardan hasta tu próximo Break, Lunch o fin del turno.</small></span><button type="button" data-positive-action="new-reward">Crear mi premio</button></div>
           <div class="physical-reward-selected-list" id="physicalRewardSelected"></div>

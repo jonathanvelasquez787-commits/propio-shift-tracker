@@ -77,7 +77,6 @@ export function normalizeReinforcementSettings(raw) {
   return {
     enabled: source.enabled === true,
     askAfterCall: source.askAfterCall !== false,
-    weeklyBudgetUsd: Math.max(0, Math.min(100000, Number(source.weeklyBudgetUsd) || 0)),
     rewards,
   };
 }
@@ -297,21 +296,6 @@ function saveReflection(outcome) {
   notifyReinforcement(message, { channel: 'personal' });
 }
 
-function budgetUsedThisWeek() {
-  const now = new Date();
-  const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - ((now.getDay() + 6) % 7));
-  monday.setHours(0, 0, 0, 0);
-  return state.game.reinforcement.claims.reduce((sum, claim) => {
-    const date = new Date(claim.claimedAt);
-    return Number.isFinite(date.getTime()) && date >= monday ? sum + (Number(claim.costUsd) || 0) : sum;
-  }, 0);
-}
-
-function canClaimCost(costUsd) {
-  const budget = Number(settings.reinforcement.weeklyBudgetUsd) || 0;
-  return budget <= 0 || budgetUsedThisWeek() + (Number(costUsd) || 0) <= budget;
-}
-
 function availableForWindow(windowName) {
   return state.game.reinforcement.pendingRewards.filter((item) => item.window === windowName);
 }
@@ -332,14 +316,12 @@ function renderClaimWindow(windowName) {
   title.textContent = windowName === 'shift-end' ? 'Premios para cerrar tu turno' : `Premios para tu ${windowName === 'lunch' ? 'Lunch' : 'Break'}`;
   const alternatives = settings.reinforcement.rewards.filter((reward) => reward.enabled && reward.window === windowName);
   root.innerHTML = available.map((item) => {
-    const canClaim = canClaimCost(item.costUsd);
     const swaps = alternatives.filter((reward) => reward.id !== item.rewardId);
     return `<article class="physical-reward-claim" data-earned-reward="${escapeHtml(item.id)}">
       <span class="physical-reward-claim-icon" aria-hidden="true">${escapeHtml(item.icon)}</span>
       <div><strong>${escapeHtml(item.name)}</strong><small>Lo ganaste con ${escapeHtml(TRIGGER_LABELS[item.triggerKey.split(':')[0]] || 'tu constancia')}${item.durationMin > 0 ? ` · ${item.durationMin} min` : ''}${item.costUsd > 0 ? ` · $${item.costUsd.toFixed(2)} ${escapeHtml(convertedAmountText(item.costUsd))}` : ''}</small></div>
-      <button type="button" data-positive-action="claim" data-earned-id="${escapeHtml(item.id)}" ${canClaim ? '' : 'disabled title="Supera tu presupuesto semanal"'}>Realizado</button>
+      <button type="button" data-positive-action="claim" data-earned-id="${escapeHtml(item.id)}">Realizado</button>
       ${swaps.length ? `<select aria-label="Cambiar premio" data-reward-swap="${escapeHtml(item.id)}">${swaps.map((reward) => `<option value="${escapeHtml(reward.id)}">${escapeHtml(reward.icon)} ${escapeHtml(reward.name)}</option>`).join('')}</select><button type="button" data-positive-action="swap" data-earned-id="${escapeHtml(item.id)}">Cambiar</button>` : ''}
-      ${canClaim ? '' : '<small class="physical-reward-budget-note">Guárdalo: alcanzaste tu presupuesto semanal.</small>'}
     </article>`;
   }).join('');
   return true;
@@ -374,7 +356,6 @@ function claimReward(id) {
     toast('La ventana terminó; el premio sigue guardado para después.');
     return;
   }
-  if (!canClaimCost(item.costUsd)) return;
   state.game.reinforcement.pendingRewards.splice(index, 1);
   state.game.reinforcement.claims.push({ ...item, claimedAt: new Date().toISOString() });
   state.game.reinforcement.claims = state.game.reinforcement.claims.slice(-400);
@@ -481,12 +462,8 @@ function renderSettingsRewards() {
   const selected = document.getElementById('physicalRewardSelected');
   const enabled = document.getElementById('positiveReinforcementEnabledInput');
   const ask = document.getElementById('positiveAskAfterCallInput');
-  const budget = document.getElementById('positiveWeeklyBudgetInput');
-  const budgetConverted = document.getElementById('positiveWeeklyBudgetConverted');
   if (enabled) enabled.checked = settings.reinforcement.enabled;
   if (ask) ask.checked = settings.reinforcement.askAfterCall;
-  if (budget && document.activeElement !== budget) budget.value = settings.reinforcement.weeklyBudgetUsd || '';
-  if (budgetConverted) budgetConverted.textContent = settings.reinforcement.weeklyBudgetUsd > 0 ? convertedAmountText(settings.reinforcement.weeklyBudgetUsd) : 'Sin límite de presupuesto';
   if (catalog) catalog.innerHTML = PHYSICAL_REWARD_PRESETS.map((preset) => {
     const added = settings.reinforcement.rewards.find((reward) => reward.templateId === preset.id);
     return `<article class="physical-reward-template"><span>${escapeHtml(preset.icon)}</span><div><strong>${escapeHtml(preset.name)}</strong><small>${escapeHtml(WINDOW_LABELS[preset.window])} · ${escapeHtml(TRIGGER_LABELS[preset.trigger])}${preset.accumulationTarget > 1 ? ` · ${preset.accumulationTarget} hitos` : ''}${preset.durationMin ? ` · ${preset.durationMin} min` : ''}</small></div><button type="button" data-positive-action="${added ? 'edit-reward' : 'add-preset'}" data-reward-id="${escapeHtml(added?.id || '')}" data-template-id="${escapeHtml(preset.id)}">${added ? 'Editar' : 'Agregar'}</button></article>`;
@@ -643,11 +620,6 @@ export function initPositiveReinforcement() {
   document.getElementById('positiveAskAfterCallInput')?.addEventListener('change', (event) => {
     settings.reinforcement.askAfterCall = !!event.target.checked;
     saveSettingsOnly();
-  });
-  document.getElementById('positiveWeeklyBudgetInput')?.addEventListener('change', (event) => {
-    settings.reinforcement.weeklyBudgetUsd = Math.max(0, Number(event.target.value) || 0);
-    saveSettingsOnly();
-    renderPositiveReinforcement();
   });
   document.addEventListener('app:modal-closed', (event) => {
     if (event.detail?.id === 'positiveReflectionModal') reflectionCall = null;
