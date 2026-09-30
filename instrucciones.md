@@ -201,7 +201,141 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
-Ninguno conocido.
+**Completar el prompt de refuerzo positivo — implementación parcial, NO cerrado.**
+
+El usuario pidió dejar estas tareas documentadas para retomarlas en otro chat.
+Esta actualización es solo documentación: no implementa los pendientes ni
+cambia la versión funcional 572. Los 120 tests de esa versión verifican lo
+que cubren, NO certifican que el prompt completo esté implementado.
+
+Objetivo: extender «El Monstruo» y el refuerzo personal existentes para
+reforzar tomar llamadas y seguir tomándolas, sin reescribir la app ni cambiar
+los cálculos de ganancias, adherencia o metas. UI en español consistente,
+comparación solo con uno mismo, mensajes específicos y sin culpa.
+
+**Base ya terminada — conservar, no volver a implementar:**
+
+- Gamificación y refuerzo personal apagados por defecto para cuentas nuevas;
+  se conservan las preferencias guardadas.
+- Gamificación, refuerzo positivo y Laboratorio QA en paneles plegables de
+  Logros, fuera de Ajustes. Plan del día dentro de gamificación, oculto al
+  apagarla y bloqueado tras la primera llamada elegible; nombre del monstruo
+  editable y sanitizado.
+- Premios personales configurables y catálogo de 16 opciones, con ventanas
+  Break/Lunch/fin del turno, presupuesto opcional, realizar/cambiar/guardar,
+  historial y progreso acumulable.
+- Evidencia en Inicio y reflexión tras llamadas manuales/en vivo: cierre
+  positivo, difícil o aprendizaje, y recuperación con una llamada posterior.
+  Las importaciones no abren un modal por cada fila.
+- XP, combo, misiones, récords, cajas por hitos de llamadas y STAGE CLEAR con
+  comparación contra ayer y récord personal. Eso NO sustituye los requisitos
+  adicionales enumerados abajo.
+- QA aislado de datos reales y nube, con recorrido guiado de ocho pasos y
+  restauración/reinicio. ACW en el texto final de cada bloque de trabajo,
+  sin tarjeta ni barra propia.
+
+**Trabajo restante y criterios para darlo por terminado:**
+
+1. **Micro-feedback tras guardar cada llamada (parcial).** Existen XP, efectos
+   y récords, pero falta la familia completa de toasts breves y específicos:
+   llamada normal, larga, con bono Higher Rate y mejor llamada del día por
+   pago. Reconocer la acción concreta, no solo «¡genial!». Integrar con
+   `onGameCallSaved` en `js/game.js` y con `onPositiveCallSaved` en
+   `js/positive-reinforcement.js`; no conceder XP/combo dos veces. Definir el
+   criterio de «larga» explícitamente; no inventar un umbral como si ya
+   estuviera acordado. Probar manual, en vivo, importación y reemplazo de
+   llamada provisional por la oficial, respetando elegibilidad, bloqueo y
+   tope de XP existentes.
+
+2. **Hitos monetarios diarios (pendiente).** Celebrar al cruzar 25%, 50%, 75%
+   y 100% de la meta diaria, una sola vez por hito y día contable. Agregar
+   marcas visibles en el progreso de Ganancias de hoy y la línea «Próximo
+   hito: X% · te faltan $Y», con moneda secundaria. Persistir los hitos usando
+   el modelo exportable/sincronizado existente; recargar o reimportar no debe
+   volver a celebrarlos. Definir y probar cruce de varios hitos en una sola
+   acción, cambio de meta, corrección/borrado de llamadas, meta cero y turno
+   nocturno. Usar `effectiveDailyGoal` y el render de ganancias de
+   `js/app-main.js`; no modificar su cálculo financiero.
+
+3. **Vuelta puntual de Break/Lunch (pendiente).** Dar un mensaje específico
+   y XP al volver dentro de la ventana correspondiente. Reiniciar combo al
+   pausar, NUNCA la racha. Actualmente `onGamePauseStarted` abre la ventana
+   del premio personal y `onGamePauseEnded` solo repinta: no implementan todo
+   este comportamiento. Enganchar las acciones reales de pausa en
+   `js/app-main.js` y `js/game.js`, usando la puntualidad existente y sin
+   inventar tolerancias nuevas. Hacer el premio idempotente y respetar
+   bloqueo/tope. Revisar la reconciliación del combo: hoy puede reconstruirse
+   desde llamadas elegibles y no debe deshacer el reset de la pausa.
+
+4. **Días difíciles sin castigo (pendiente automático).** Ante una llamada
+   `dropped` o una hora sin llamadas, mostrar apoyo sin rojo, culpa ni pérdida
+   de racha/combo causada por ese evento; XP mínimo o cero, sin premiar errores
+   repetidamente. La reflexión manual «difícil/aprendizaje» ya existe, pero
+   NO sustituye la detección automática. No contar pausas, turno cerrado o
+   tiempo sin trabajar como una hora de inactividad laboral. Evitar spam y
+   duplicados al recargar; probar llamadas posteriores y medianoche. No
+   alterar silenciosamente las reglas generales de adherencia/racha: separar
+   el mensaje de apoyo de esos cálculos y señalar cualquier conflicto real.
+
+5. **Recompensa variable (pendiente).** Integrar un cofre sorpresa de baja
+   probabilidad, aproximadamente 15%, con XP extra tras una llamada. Las
+   cajas actuales son por hitos (cada cinco llamadas y otros hitos de impulso),
+   no esa recompensa aleatoria. Reutilizar cofres/recibos/ledger existentes,
+   definir cómo convive con ellos y no reemplazarlos inadvertidamente.
+   Persistir la decisión por evento elegible para impedir reintentos de azar
+   al recargar/reimportar; evitar doble recompensa y respetar lock/tope.
+   Probar resultados con azar controlado, no con tests probabilísticos frágiles.
+
+6. **Cierre amable del día (parcial).** STAGE CLEAR y la comparación personal
+   ya existen. Falta un resumen con «tres cosas que hiciste bien hoy», usando
+   evidencia real: llamadas/ganancias, comparación amable con ayer, mejor
+   llamada, pausa puntual o recuperación. Incluir cuánto llegará la racha
+   mañana si corresponde, dejando claro que es una proyección condicional,
+   no una concesión anticipada. Un día flojo o sin comparación debe tener
+   lenguaje positivo y sin culpa; no inventar logros para llenar tres frases.
+   Extender el cierre existente (`freezeGameDay`, comparación y STAGE CLEAR
+   en `js/game.js`); no abrir resúmenes duplicados ni competir con el modal
+   de premio físico. Mantener comparación SOLO contra ayer/mejor día propio,
+   nunca otros agentes.
+
+7. **Intensidad, textos y accesibilidad comunes (parcial).** Centralizar los
+   textos de refuerzo en un objeto con varias variantes por situación.
+   `subtle`: toasts pequeños sin partículas; `arcade`: toasts y ráfagas en
+   hitos/récords; `off`: ninguna notificación de refuerzo, aunque el progreso
+   interno siga calculándose. Armonizar esto con los dos interruptores
+   actuales (juego/refuerzo personal): hoy son independientes y los mensajes
+   de reflexión usan el toast general. No asumir que esa combinación ya
+   cumple el prompt ni cambiar preferencias existentes por sorpresa.
+   Reutilizar `#gameToastStack`, `#gameStatusLive`, `#gameCallFx`,
+   `#gameLootBox` y `#gameRecordBanner`. Anunciar también los mensajes
+   personales por la región accesible adecuada; máximo tres toasts y no
+   repetir el mismo texto consecutivamente incluso después de desaparecer.
+   La cola actual elimina duplicados en cola/visibles, no garantiza esta
+   última condición. Respetar `prefers-reduced-motion`, contraste en ambos
+   temas y foco visible; sin dependencias externas ni librerías de confeti.
+
+**Persistencia, pruebas y cierre de los pendientes:**
+
+- Todo estado nuevo debe tener defaults para backups antiguos y conservarse
+  en export/import JSON y sincronización; jamás escribir datos QA a la nube.
+- Mantener la capa de refuerzo separada de dinero/adherencia/metas y no
+  reescribir motores existentes. Archivos principales: `js/game.js`,
+  `js/positive-reinforcement.js`, `js/app-main.js`, `app.html`, `css/game.css`;
+  `js/qa-mode.js`/`js/qa-walkthrough.js` para ampliar la demostración.
+- El usuario mencionó `refuerzo-positivo-mockup.html` en el prompt, pero su
+  contenido no estuvo disponible en esta implementación. No afirmar que se
+  reprodujo el mockup; pedirlo si hace falta para decisiones visuales y
+  respetar el protocolo de layout de este archivo.
+- Agregar pruebas de cada requisito, idempotencia, cambio de día/nocturno,
+  recarga, correcciones/importación, intensidad y backups antiguos. Ampliar
+  QA para demostrar los comportamientos nuevos: el recorrido actual NO
+  demuestra todas las funciones de la app ni todo el prompt.
+- Ejecutar suite/build y revisar claro/oscuro, móvil, teclado y movimiento
+  reducido. La comprobación visual de v572 fue local con datos sintéticos,
+  no una sesión autenticada de producción; no presentarla como tal.
+- Al cerrar, informar por requisito qué está completo, qué se verificó y
+  qué falta. Quitar de PENDIENTES solo las tareas realmente terminadas;
+  no volver a escribir «Ninguno conocido» mientras estas sigan abiertas.
 
 **LIMITACIONES CONOCIDAS** (alcance reducido a propósito, no son bugs)
 
