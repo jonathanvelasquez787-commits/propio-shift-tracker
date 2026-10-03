@@ -493,3 +493,20 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 :root.theme-dark .calls-status-card:not(.live) {
   background: rgba(255, 255, 255, .035);
 }
+
+.support-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 12px;
+  margin-bottom: 12px;
+}
+
+.support-footer .support-link {
+  padding: 10px 14px;
+  min-height: 40px;
+  max-width: 100%;
+  font-size: 13px;
+  text-decoration: none;
+}

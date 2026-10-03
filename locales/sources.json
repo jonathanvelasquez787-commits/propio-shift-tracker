@@ -2128,6 +2128,13 @@
       "js/schedule.js"
     ]
   },
+  "s_2eca4db5": {
+    "source": "Invítame un café en Ko-fi (se abre en una pestaña nueva)",
+    "files": [
+      "app.html",
+      "index.html"
+    ]
+  },
   "s_2ee3e77c": {
     "source": "Cuándo ofrecerlo",
     "files": [
@@ -4149,10 +4156,23 @@
       "app.html"
     ]
   },
+  "s_57494302": {
+    "source": "Invítame un café",
+    "files": [
+      "app.html",
+      "index.html"
+    ]
+  },
   "s_574e0475": {
     "source": "Transporte",
     "files": [
       "js/finance.js"
+    ]
+  },
+  "s_58485f56": {
+    "source": "Si esta tool te ayuda, puedes apoyar su desarrollo.",
+    "files": [
+      "app.html"
     ]
   },
   "s_584dcf45": {

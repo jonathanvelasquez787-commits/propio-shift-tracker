@@ -324,11 +324,6 @@ No se conoce el estado real de indexación ni se prometen posiciones. Las URLs
 por idioma y nuevas guías públicas son mejoras posteriores, no implementadas.
 Ver docs/seo.md.
 
-Botón de apoyo al final de la tool: el usuario aún compara proveedores y no
-entregó un enlace propio. Falta elegir la plataforma y recibir su URL real;
-no crear una cuenta ni publicar un destino de cobro ficticio. Usar el estilo de
-botones existente, texto ES/EN y aporte voluntario sin condicionar funciones.
-
 La auditoría profunda de v576 quedó cerrada: 31 días simulados, 108 llamadas,
 ambos recorridos QA y siete fallos reparados de persistencia, sincronización,
 Finanzas y exportaciones. No quedan fallos reproducidos pendientes de esa
@@ -455,7 +450,7 @@ Selector lateral «Temas y colores»: Original claro/oscuro y siete paletas
 aprobadas, cada una en claro y oscuro. Se guardan junto a los ajustes de la
 cuenta; cambiar a Original elimina únicamente las variables de la paleta.
 Español e inglés completos sin API, incluidos interfaz, avisos, ayuda y
-reportes; 2.004 textos comprobados. Cambiar idioma vuelve a la misma página,
+reportes; 2.007 textos comprobados. Cambiar idioma vuelve a la misma página,
 sin modificar llamadas, nombres personales, recibos ni progreso. Mensajes
 de juego guardados se presentan en el idioma seleccionado sin reescribirlos.
 La PWA incluye ambos idiomas y el CSS de apariencia.
@@ -486,6 +481,12 @@ extrae el CSS a app-core.css y el marcado a app-view.js, cargado antes de boot.
 app.html fuente sigue siendo la única verdad editable. No es ocultación ni
 protección criptográfica: los archivos descargados siguen siendo inspeccionables.
 CSS y vista nuevos están versionados y en la precarga de la PWA.
+
+Desde v585, «Invítame un café»/«Buy me a coffee» al final compartido de la
+app y de la landing, enlazado a https://ko-fi.com/jonathanvelasquez0624.
+Abre en otra pestaña, reutiliza los botones existentes y adapta los temas.
+Es apoyo voluntario; no condiciona funciones ni registra pagos en Finanzas.
+No hay widgets, SDK externos ni procesamiento de pagos dentro de la tool.
 
 **LIMITACIONES CONOCIDAS** (alcance reducido a propósito, no son bugs)
 
@@ -559,7 +560,7 @@ La aplicación funciona en producción con estas bases vigentes:
   global, backup diario, exportación y borrado de cuenta permanecen activos.
 - Turnos, llamadas, Horario, Higher Rate, Finanzas, Reportes, Calendario,
   Adherencia y la gamificación «El Monstruo» están integrados.
-- La versión actual es 584. Refuerzo positivo, Logros y auditoría profunda
+- La versión actual es 585. Refuerzo positivo, Logros y auditoría profunda
   están terminados. Los siete fallos de la auditoría se corrigieron con
   regresiones; cobertura y límites constan en
   `docs/auditoria-profunda-2026-09-30.md`.
@@ -567,6 +568,18 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v585** — Apoyo voluntario con Ko-fi.
+
+- Botón «Invítame un café»/«Buy me a coffee» con el enlace real del usuario,
+  al final de la landing y de cualquier sección de la app. En flujo normal,
+  sin banner fijo; apertura en otra pestaña con noopener/noreferrer.
+- Botones secundarios existentes, texto y nombre accesible ES/EN, temas
+  claro/oscuro. Sin scripts externos, compras, recibos ni cambios de cuenta.
+- 210 pruebas, 2.007 textos ES/EN, 28 módulos, wiring y build correctos.
+  Chrome: 32 combinaciones de página/idioma/tema y 320, 390, 768 y 1365 px;
+  sin overflow, enlace visible, destino correcto y llamadas intactas al abrirlo.
+  La validación usa sesiones/destino aislados y no prueba un pago real.
 
 **v584** — Base de descubrimiento e indexación pública.
 
@@ -590,19 +603,3 @@ La aplicación funciona en producción con estas bases vigentes:
   y sesión simulada/no iniciada, sin overflow ni controles recortados.
 - 210 pruebas, 2.004 textos ES/EN, 28 módulos, wiring y build correctos.
   Recarga y campos intactos comprobados; autenticación aislada de cuentas reales.
-
-**v582** — Inglés inicial, selector en login y HTML publicado compacto.
-
-- EN por defecto; ES explícito se conserva. Selector junto a Entrar, con
-  cambio inmediato, campos/vista intactos y mensajes traducidos al navegar.
-- Selección antes del login separada de datos de cuenta, aplicada después de
-  nube/reset sin perder llamadas, ajustes o base de sincronización. Idioma
-  alineado tras hidratación y recarga; Logros nuevo continúa apagado.
-- HTML de producción reducido de unas 10.500 líneas a 25 y ~2,1 KB. Vista
-  externa minificada, CSS externo en el mismo orden y ambos en la PWA.
-  Fuente editable intacta; el código público continúa inspeccionable.
-- 210 pruebas, 28 módulos, wiring y build correctos. Chrome ES/EN en claro
-  y oscuro a 320–1365 px; login/registro/recuperación, campos preservados,
-  recarga, hidratación controlada, cuenta nueva EN/Logros apagado y arranque
-  desde el HTML compacto verificados. Shell/vista/CSS recuperados sin conexión
-  desde la caché real de la PWA. Nube/autenticación aisladas de cuentas reales.
