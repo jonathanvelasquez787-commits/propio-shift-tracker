@@ -23,6 +23,7 @@ import {
   describeSnapshot,
   readLocalSnapshot,
   applyLightThemeDefault,
+  applyLoginLanguagePreference,
   syncThemeClass,
   retireLegacyQaStorage,
 } from './sync.js';
@@ -550,6 +551,7 @@ async function boot() {
 
   // Después de hidratar y antes de montar: la app lee el tema al ejecutarse,
   // así que si esto corriera después ya se habría dibujado en oscuro.
+  applyLoginLanguagePreference();
   applyLightThemeDefault();
   syncThemeClass();
   if (setLanguage(readLocalSnapshot().settings.language, { documentTranslation: true })) {

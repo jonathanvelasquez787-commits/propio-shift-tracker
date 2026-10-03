@@ -1,5 +1,6 @@
 import { ui, translateText, translateMarkup, displayLocale } from '../js/i18n.js';
 import { applySavedColors } from '../js/appearance-colors.js';
+import { readLanguagePreference } from '../js/language-preference.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -19,11 +20,12 @@ for (const [name, raw, expected] of [
 ]) {
   test(`theme initialization: ${name}`, () => {
     const classes = new Set(['theme-dark', 'theme-light']);
+    const storage = {
+      getItem() { if (raw instanceof Error) throw raw; return raw; },
+      setItem() { assert.fail('Theme initialization must not overwrite settings'); },
+    };
     vm.runInNewContext(themeSource, { ui, translateText, translateMarkup, displayLocale, applySavedColors,
-      localStorage: {
-        getItem() { if (raw instanceof Error) throw raw; return raw; },
-        setItem() { assert.fail('Theme initialization must not overwrite settings'); },
-      },
+      readLanguagePreference: () => readLanguagePreference(storage), localStorage: storage,
       document: { documentElement: { dataset: {}, style: { setProperty() {}, removeProperty() {} }, classList: {
         toggle(name, on) { if (on) classes.add(name); else classes.delete(name); },
       } } },

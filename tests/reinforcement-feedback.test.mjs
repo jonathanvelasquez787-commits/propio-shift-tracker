@@ -1,15 +1,18 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { setLanguage } from '../js/i18n.js';
 import { setAppCalls, setAppSettings, setAppState } from '../js/app-context.js';
-import {
+// Feedback variants are translated once when their module loads.
+setLanguage('es');
+const {
   LONG_CALL_MINUTES, REINFORCEMENT_TEXTS, chooseCallFeedback,
   configureReinforcementFeedback, notifyReinforcement, reinforcementFeedbackEnabled,
   reinforcementText, resetFeedbackForTests,
-} from '../js/reinforcement-feedback.js';
-import {
+} = await import('../js/reinforcement-feedback.js');
+const {
   configurePositiveReinforcementContext, createDefaultReinforcementState,
   initPositiveReinforcement, onPositiveCallSaved, onPositiveRewardWindow,
-} from '../js/positive-reinforcement.js';
+} = await import('../js/positive-reinforcement.js');
 
 test('los dos interruptores deciden cada canal incluso con intensidad antigua guardada', () => {
   for (const game of [false, true]) {
@@ -75,6 +78,7 @@ test('textos centrales tienen variantes estables y no dejan variables sin reempl
 });
 
 test('feedback reconoce llamada normal, umbral largo, bono y mejor pago con moneda secundaria', () => {
+  setLanguage('es');
   assert.equal(LONG_CALL_MINUTES, 30);
   const format = { money: (value) => `$${value.toFixed(2)}`, convertedAmountText: (value) => `≈ L ${(value * 25).toFixed(2)}` };
   const normal = { id: 'normal', durationMin: 29.9, pay: '$5.00' };
@@ -94,6 +98,7 @@ test('feedback reconoce llamada normal, umbral largo, bono y mejor pago con mone
 });
 
 test('mejor llamada compara el bono real de las anteriores y excluye el mismo evento', () => {
+  setLanguage('es');
   const call = { id: 'current', durationMin: 5, pay: 10, extra: 2 };
   const prior = { id: 'prior', pay: 9, extra: 5 };
   const feedback = chooseCallFeedback(call, { previousCalls: [prior, { ...call }], bonus: (item) => item.extra || 0 });
@@ -104,6 +109,7 @@ test('mejor llamada compara el bono real de las anteriores y excluye el mismo ev
 });
 
 test('refuerzo personal funciona con Logros apagado y una intensidad antigua sin silenciarlo', () => {
+  setLanguage('es');
   const dayKey = '09/29/2026';
   const call = { id: 'personal-call', callDate: dayKey, startISO: new Date(Date.now() - 120000).toISOString(), endISO: new Date(Date.now() - 60000).toISOString() };
   const rows = [call];

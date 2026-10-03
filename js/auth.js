@@ -202,7 +202,7 @@ export class AuthError extends Error {
   }
 }
 
-const MESSAGES = {
+const MESSAGES = () => ({
   LOGIN_FAILED: translateText('Usuario o contraseña incorrectos.'),
   INVALID_CREDENTIALS: translateText('Usuario o contraseña incorrectos.'),
   EMAIL_INVALID: translateText('Ese correo no parece válido.'),
@@ -217,25 +217,26 @@ const MESSAGES = {
   NETWORK: translateText('No se pudo conectar. Revisa tu internet y vuelve a intentar.'),
   NOT_CONFIGURED:
     translateText('La app todavía no está conectada a su base de datos (falta configurar js/config.js).'),
-};
+});
 
 export function authErrorMessage(err) {
-  if (!err) return MESSAGES.LOGIN_FAILED;
-  if (err instanceof AuthError && MESSAGES[err.code]) return MESSAGES[err.code];
+  const messages = MESSAGES();
+  if (!err) return messages.LOGIN_FAILED;
+  if (err instanceof AuthError && messages[err.code]) return messages[err.code];
 
   const raw = String(err.message || err.error_description || err).toLowerCase();
 
-  if (raw.includes(translateText('sin configurar'))) return MESSAGES.NOT_CONFIGURED;
-  if (raw.includes('failed to fetch') || raw.includes('networkerror')) return MESSAGES.NETWORK;
-  if (raw.includes('invalid login credentials')) return MESSAGES.INVALID_CREDENTIALS;
-  if (raw.includes('email not confirmed')) return MESSAGES.EMAIL_NOT_CONFIRMED;
+  if (raw.includes(translateText('sin configurar'))) return messages.NOT_CONFIGURED;
+  if (raw.includes('failed to fetch') || raw.includes('networkerror')) return messages.NETWORK;
+  if (raw.includes('invalid login credentials')) return messages.INVALID_CREDENTIALS;
+  if (raw.includes('email not confirmed')) return messages.EMAIL_NOT_CONFIRMED;
   if (raw.includes('user already registered') || raw.includes('already been registered')) {
-    return MESSAGES.EMAIL_TAKEN;
+    return messages.EMAIL_TAKEN;
   }
-  if (raw.includes('password should be at least')) return MESSAGES.PASSWORD_TOO_SHORT;
-  if (raw.includes('rate limit') || raw.includes('too many requests')) return MESSAGES.RATE_LIMITED;
-  if (raw.includes('username_taken')) return MESSAGES.USERNAME_TAKEN;
-  if (raw.includes('username_invalid')) return MESSAGES.USERNAME_INVALID;
+  if (raw.includes('password should be at least')) return messages.PASSWORD_TOO_SHORT;
+  if (raw.includes('rate limit') || raw.includes('too many requests')) return messages.RATE_LIMITED;
+  if (raw.includes('username_taken')) return messages.USERNAME_TAKEN;
+  if (raw.includes('username_invalid')) return messages.USERNAME_INVALID;
 
-  return MESSAGES.LOGIN_FAILED;
+  return messages.LOGIN_FAILED;
 }

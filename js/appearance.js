@@ -1,6 +1,7 @@
 import { PALETTES } from './theme-palettes.js';
 import { applySavedColors } from './appearance-colors.js';
 import { setLanguage, translateText } from './i18n.js';
+import { normalizeLanguage, saveLanguagePreference } from './language-preference.js';
 
 export function applyAppearance(settings) {
   const root = document.documentElement;
@@ -10,6 +11,7 @@ export function applyAppearance(settings) {
     : settings.theme === 'dark' ? 'dark' : 'light';
   applySavedColors({ ...settings, theme: mode }, root);
   setLanguage(settings.language);
+  saveLanguagePreference(settings.language);
   document.querySelectorAll('[data-palette-choice]').forEach(button => {
     const active = button.dataset.paletteChoice === palette.id;
     button.setAttribute('aria-checked', String(active));
@@ -34,7 +36,7 @@ export function applyAppearance(settings) {
     }));
   });
   const language = document.getElementById('appearanceLanguage');
-  if (language) language.value = settings.language === 'en' ? 'en' : 'es';
+  if (language) language.value = normalizeLanguage(settings.language);
   const source = document.getElementById('appearanceSource');
   if (source) {
     source.hidden = !palette.code;
@@ -68,12 +70,13 @@ export function wireAppearance({ getSettings, save, applyTheme }) {
   document.getElementById('appearanceLanguage').addEventListener('change', event => {
     if (getSettings().language === event.target.value) return;
     const previous = getSettings().language;
-    getSettings().language = event.target.value === 'en' ? 'en' : 'es';
+    getSettings().language = normalizeLanguage(event.target.value);
     if (save() === false) {
       getSettings().language = previous;
-      event.target.value = previous === 'en' ? 'en' : 'es';
+      event.target.value = normalizeLanguage(previous);
       return;
     }
+    saveLanguagePreference(getSettings().language);
     try {
       const page = document.querySelector('.app-page:not([hidden])')?.dataset.page;
       if (page) sessionStorage.setItem('propio_appearance_return_page', page);

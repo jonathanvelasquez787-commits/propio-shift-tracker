@@ -1,4 +1,5 @@
 import { PALETTES, paletteTokens } from './theme-palettes.js';
+import { normalizeLanguage } from './language-preference.js';
 
 export function applySavedColors(settings, root = document.documentElement) {
   const palette = PALETTES.find(item => item.id === settings.palette) || PALETTES[0];
@@ -10,5 +11,5 @@ export function applySavedColors(settings, root = document.documentElement) {
   }
   root.dataset.palette = palette.id;
   for (const [name, value] of Object.entries(paletteTokens(palette, mode))) root.style.setProperty(name, value);
-  root.lang = settings.language === 'en' ? 'en' : 'es';
+  root.lang = normalizeLanguage(settings.language);
 }

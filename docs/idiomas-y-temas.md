@@ -1,5 +1,12 @@
 # Idiomas y temas
 
+La tool comienza en **English** cuando no existe una preferencia válida. El
+selector junto al título del login cambia entre English y Español al instante,
+sin borrar campos ni cambiar entre registro, recuperación y entrada. La elección
+se conserva al recargar y se aplica después de hidratar la cuenta, sin sustituir
+llamadas, horarios ni otras preferencias. Un idioma previamente elegido sigue
+vigente. La selección pública no crea datos de cuenta ni conflictos de nube.
+
 En el menú lateral, **Temas y colores** permite elegir Español o English,
 Claro u Oscuro y Original o una de las siete paletas aprobadas. Las preferencias
 se guardan y sincronizan con los ajustes existentes. Cambiar idioma recarga la

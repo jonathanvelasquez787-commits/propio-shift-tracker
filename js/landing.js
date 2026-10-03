@@ -1,5 +1,6 @@
-import { ui, translateText, translateMarkup, displayLocale, translateDocument } from './i18n.js';
+import { ui, translateText, translateStoredText, translateMarkup, displayLocale, translateDocument, setLanguage } from './i18n.js';
 translateDocument();
+window.addEventListener('propio-language-change', event => setLanguage(event.detail, { documentTranslation: true }));
 // Landing: decide qué mostrar (formularios, sesión ya abierta, o "pon una
 // contraseña nueva") y ejecuta los 3 métodos de entrada.
 
@@ -92,7 +93,7 @@ function clearMessage() {
   msgEl.className = 'form-msg';
 }
 
-const VIEWS = {
+const VIEWS = () => ({
   login: { title: translateText('Entrar'), sub: translateText('Usa tu correo o tu nombre de usuario.'), tabs: true },
   signup: {
     title: translateText('Crear cuenta'),
@@ -109,14 +110,15 @@ const VIEWS = {
     sub: translateText('Escribe la contraseña que vas a usar de ahora en adelante.'),
     tabs: false,
   },
-};
+});
 
 function showView(name) {
   clearMessage();
   Object.entries(forms).forEach(([key, form]) => {
     if (form) form.hidden = key !== name;
   });
-  const view = VIEWS[name] || VIEWS.login;
+  const views = VIEWS();
+  const view = views[name] || views.login;
   if (titleEl) titleEl.textContent = view.title;
   if (subEl) subEl.textContent = view.sub;
   if (tabRow) tabRow.style.display = view.tabs ? '' : 'none';
@@ -141,9 +143,9 @@ function setBusy(button, busy, busyLabel) {
   if (!label) return;
   if (busy) {
     label.dataset.idle = label.dataset.idle || label.textContent;
-    label.textContent = busyLabel || 'Un momento…';
+    label.textContent = busyLabel || translateText('Un momento…');
   } else if (label.dataset.idle) {
-    label.textContent = label.dataset.idle;
+    label.textContent = translateStoredText(label.dataset.idle);
   }
 }
 
@@ -277,7 +279,7 @@ forms.login?.addEventListener('submit', async (e) => {
     return;
   }
   const btn = $('loginSubmit');
-  setBusy(btn, true, 'Entrando…');
+  setBusy(btn, true, translateText('Entrando…'));
   try {
     sessionStorage.setItem(PENDING_KEY, '1');
     await signInWithIdentifier(identifier, password);
@@ -297,7 +299,7 @@ forms.signup?.addEventListener('submit', async (e) => {
   const email = $('signupEmail').value.trim();
   const password = $('signupPassword').value;
   const btn = $('signupSubmit');
-  setBusy(btn, true, 'Creando…');
+  setBusy(btn, true, translateText('Creando…'));
   try {
     sessionStorage.setItem(PENDING_KEY, '1');
     const result = await signUp({ email, username, password });
@@ -324,7 +326,7 @@ forms.forgot?.addEventListener('submit', async (e) => {
   e.preventDefault();
   clearMessage();
   const btn = $('forgotSubmit');
-  setBusy(btn, true, 'Enviando…');
+  setBusy(btn, true, translateText('Enviando…'));
   try {
     await requestPasswordReset($('forgotEmail').value);
     showMessage(
@@ -342,7 +344,7 @@ forms.reset?.addEventListener('submit', async (e) => {
   e.preventDefault();
   clearMessage();
   const btn = $('resetSubmit');
-  setBusy(btn, true, 'Guardando…');
+  setBusy(btn, true, translateText('Guardando…'));
   try {
     await updatePassword($('resetPassword').value);
     recoveryMode = false;

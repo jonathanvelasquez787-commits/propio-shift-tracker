@@ -771,7 +771,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
         // 'light'/'dark' fuerzan el tema sin importar el sistema. Ver applyTheme/themeToggleBtn.
         theme: 'auto',
         palette: 'original',
-        language: 'es',
+        language: 'en',
         // Volumen maestro (0-100) que escala TODOS los sonidos del programa desde un solo lugar.
         masterVolume: 100,
         // Estado abierto/cerrado de cada <details> con id propio, para que sobreviva a la recarga.
@@ -834,6 +834,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
     // ensureWeeklySchedule ya usa).
     export function ensureCurrencySettings() {
       const fallback = defaultSettings();
+      if (!['en', 'es'].includes(settings.language)) settings.language = fallback.language;
       if (!Number.isFinite(Number(settings.rate)) || Number(settings.rate) <= 0) settings.rate = fallback.rate;
       if (!Number.isFinite(Number(settings.exchangeRate)) || Number(settings.exchangeRate) < 0) settings.exchangeRate = fallback.exchangeRate;
       if (typeof settings.currencyLabel !== 'string') settings.currencyLabel = fallback.currencyLabel;

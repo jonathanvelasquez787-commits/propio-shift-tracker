@@ -12,6 +12,7 @@ const SHELL = [
   '/css/landing.css',
   '/css/legal.css',
   '/css/app-shell.css',
+  `/css/app-core.css?v=${BUILD_VERSION}`,
   '/css/game.css',
   '/css/appearance.css',
   `/assets/theme-init.js?v=${BUILD_VERSION}`,
@@ -20,6 +21,7 @@ const SHELL = [
   `/assets/landing-ui.js?v=${BUILD_VERSION}`,
   `/assets/landing.js?v=${BUILD_VERSION}`,
   `/assets/boot.js?v=${BUILD_VERSION}`,
+  `/assets/app-view.js?v=${BUILD_VERSION}`,
   `/assets/monitoring.js?v=${BUILD_VERSION}`,
   `/assets/register-sw.js?v=${BUILD_VERSION}`,
 ];

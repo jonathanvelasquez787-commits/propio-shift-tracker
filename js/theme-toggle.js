@@ -1,5 +1,7 @@
 import { translateText, translateDocument } from './i18n.js';
 import { applySavedColors } from './appearance-colors.js';
+import { currentLanguage, setLanguage } from './i18n.js';
+import { LANGUAGE_PREFERENCE_KEY, readLanguagePreference, saveLanguagePreference } from './language-preference.js';
 translateDocument();
 // Interruptor claro/oscuro de las páginas públicas.
 //
@@ -43,7 +45,7 @@ function applyTheme(theme) {
   root.classList.toggle('theme-light', theme !== 'dark');
   let settings = {};
   try { settings = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}') || {}; } catch {}
-  applySavedColors({ ...settings, theme }, root);
+  applySavedColors({ ...settings, theme, language: currentLanguage() }, root);
 }
 
 function syncButtons(theme) {
@@ -59,6 +61,20 @@ const current = readTheme();
 applyTheme(current);
 syncButtons(current);
 
+function syncLanguage(value) {
+  setLanguage(value, { documentTranslation: true });
+  document.querySelectorAll('[data-language-select]').forEach(select => { select.value = currentLanguage(); });
+  syncButtons(readTheme());
+}
+
+syncLanguage(readLanguagePreference());
+document.addEventListener('change', event => {
+  if (!(event.target instanceof Element) || !event.target.matches('[data-language-select]')) return;
+  const language = saveLanguagePreference(event.target.value, { pendingLogin: true });
+  syncLanguage(language);
+  window.dispatchEvent(new CustomEvent('propio-language-change', { detail: language }));
+});
+
 document.addEventListener('click', (e) => {
   const btn = e.target instanceof Element ? e.target.closest('[data-theme-toggle]') : null;
   if (!btn) return;
@@ -70,7 +86,9 @@ document.addEventListener('click', (e) => {
 
 // Otra pestaña del sitio (o la propia app) cambió el tema: seguirla en vivo.
 window.addEventListener('storage', (e) => {
-  if (e.key !== null && e.key !== SETTINGS_KEY) return;
+  if (e.key !== null && e.key !== SETTINGS_KEY && e.key !== LANGUAGE_PREFERENCE_KEY) return;
+  syncLanguage(readLanguagePreference());
+  window.dispatchEvent(new CustomEvent('propio-language-change', { detail: currentLanguage() }));
   const theme = readTheme();
   applyTheme(theme);
   syncButtons(theme);

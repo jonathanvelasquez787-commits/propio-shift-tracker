@@ -1,13 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { setLanguage } from '../js/i18n.js';
 import { setAppCalls, setAppSettings, setAppState } from '../js/app-context.js';
-import {
+// Game feedback variants are translated once when their module loads.
+setLanguage('es');
+const {
   checkReinforcementInactivity, computeGameDay, configureGameContext, createDefaultGameState,
   migrateGameCallReferences, normalizeGameState, onGameCallSaved, onGameCallsChanged,
   onGameMonetaryProgress, onGamePauseEnded, onGamePauseStarted, queueGameToast,
   renderGame, renderGameLive, rewardSurpriseForCall, onGameShiftEnded, onGameShiftStarted,
-} from '../js/game.js';
-import { configurePositiveReinforcementContext } from '../js/positive-reinforcement.js';
+} = await import('../js/game.js');
+const { configurePositiveReinforcementContext } = await import('../js/positive-reinforcement.js');
 import { financeRowIsMeta } from '../js/finance.js';
 
 function harness(t, { at = new Date(2026, 8, 29, 12).getTime(), goal = 10000, streak = 3, compliance = 'failed', surface = false } = {}) {
@@ -286,6 +289,7 @@ test('los timers de una llamada anterior no retiran el impacto de la llamada nue
 
 for (const source of ['manual', 'live', 'import']) {
   test(`una llamada ${source} tardía actualiza vida y muestra evidencia una vez sin conceder XP`, (t) => {
+    setLanguage('es');
     const h = harness(t, { surface: true, goal: 10 });
     h.config.game.intensity = 'arcade';
     const call = h.add('late', { pay: 2, startISO: h.iso(h.now - 32 * 60000), endISO: h.iso(h.now - 31 * 60000), importedAt: h.iso(h.now) });
@@ -492,6 +496,7 @@ test('Break reinicia combo y reconciliación lo conserva; retorno puntual conced
 });
 
 test('pausa tardía y retorno con XP bloqueado no conceden bonus; dropped conserva combo sin premiar errores', (t) => {
+  setLanguage('es');
   const h = harness(t);
   const first = h.add('good-call');
   onGameCallSaved(first, 'manual', { random: () => 0.99 });
@@ -676,6 +681,7 @@ test('metadatos de cierre importados validan dinero, fechas y rollback antes de 
 });
 
 test('cierre nocturno cumplido proyecta la racha del día contable y las correcciones históricas no la proyectan de nuevo', (t) => {
+  setLanguage('es');
   const at = new Date(2026, 8, 30, 0, 20).getTime();
   const h = harness(t, { at, streak: 3, compliance: 'compliant' });
   const call = h.add('night-projection');

@@ -1,4 +1,4 @@
-import { ui, translateText, translateMarkup, displayLocale } from '../js/i18n.js';
+import { ui, translateText, translateMarkup, displayLocale, setLanguage } from '../js/i18n.js';
 import { applySavedColors } from '../js/appearance-colors.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -101,6 +101,7 @@ test('una exportación de dos años conserva los días y las llamadas después d
 
 for (const failure of ['all', 'calls']) {
   test(`la hidratación de nube conserva los datos locales si falla ${failure}`, (t) => {
+    setLanguage('es');
     const originalWindow = globalThis.window;
     t.after(() => { if (originalWindow === undefined) delete globalThis.window; else globalThis.window = originalWindow; });
     const values = new Map(Object.values(APP_KEYS).map((key) => [key, '{"original":true}']));

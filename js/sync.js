@@ -13,6 +13,7 @@ import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 import { getSupabase } from './supabase-client.js';
 import { applySavedColors } from './appearance-colors.js';
 import { DATA_SCHEMA_VERSION, SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
+import { normalizeLanguage, saveLanguagePreference, readPendingLoginLanguage, clearPendingLoginLanguage } from './language-preference.js';
 
 export const APP_KEYS = {
   state: 'propio_shift_tracker_state_es_v4',
@@ -266,6 +267,23 @@ export function syncThemeClass() {
   root.classList.toggle('theme-dark', theme === 'dark');
   root.classList.toggle('theme-light', theme !== 'dark');
   applySavedColors({ ...appearance, theme }, root);
+}
+
+export function applyLoginLanguagePreference() {
+  const snapshot = readLocalSnapshot();
+  let session;
+  try { session = window.sessionStorage; } catch {}
+  const pending = readPendingLoginLanguage(session);
+  if (pending && snapshot.settings.language !== pending) {
+    hydrating = true;
+    try {
+      window.localStorage.setItem(APP_KEYS.settings, JSON.stringify({ ...snapshot.settings, language: pending }));
+    } finally { hydrating = false; }
+    snapshot.settings.language = pending;
+    writeMeta({ dirty: true });
+  }
+  saveLanguagePreference(normalizeLanguage(snapshot.settings.language), { storage: window.localStorage });
+  if (pending) clearPendingLoginLanguage(session);
 }
 
 export function clearLocalAppData() {

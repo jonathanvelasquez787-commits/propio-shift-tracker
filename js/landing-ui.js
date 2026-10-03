@@ -1,4 +1,5 @@
-import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
+import { ui, translateText, translateMarkup, displayLocale, setLanguage } from './i18n.js';
+window.addEventListener('propio-language-change', event => setLanguage(event.detail));
 // Movimiento de la landing. Nada de esto toca la autenticación: si este módulo
 // falla, la página se ve estática pero entra igual (ver la regla
 // `html:not(.js-reveal) .reveal` en landing.css).

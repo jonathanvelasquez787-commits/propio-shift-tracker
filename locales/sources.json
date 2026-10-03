@@ -890,6 +890,12 @@
       "js/finance.js"
     ]
   },
+  "s_12a814ea": {
+    "source": "Guardando…",
+    "files": [
+      "js/landing.js"
+    ]
+  },
   "s_12c5c78c": {
     "source": "Te mandamos un enlace al correo con el que te registraste.",
     "files": [
@@ -1215,7 +1221,8 @@
   "s_19f0b05e": {
     "source": "Español",
     "files": [
-      "app.html"
+      "app.html",
+      "index.html"
     ]
   },
   "s_1a02da56": {
@@ -1234,6 +1241,12 @@
     "source": "#462C7D",
     "files": [
       "app.html"
+    ]
+  },
+  "s_1a47e039": {
+    "source": "Creando…",
+    "files": [
+      "js/landing.js"
     ]
   },
   "s_1a569dfb": {
@@ -1329,7 +1342,8 @@
   "s_1b9ae0bb": {
     "source": "English",
     "files": [
-      "app.html"
+      "app.html",
+      "index.html"
     ]
   },
   "s_1bd9f03f": {
@@ -2262,6 +2276,12 @@
       "js/calls.js"
     ]
   },
+  "s_313cd694": {
+    "source": "Entrando…",
+    "files": [
+      "js/landing.js"
+    ]
+  },
   "s_3151ba56": {
     "source": "desde {{v0}}",
     "files": [
@@ -2451,7 +2471,8 @@
   "s_34f7bda2": {
     "source": "Idioma de la tool",
     "files": [
-      "app.html"
+      "app.html",
+      "index.html"
     ]
   },
   "s_35249ea0": {
@@ -9028,6 +9049,12 @@
       "js/landing-ui.js"
     ]
   },
+  "s_bd791753": {
+    "source": "Un momento…",
+    "files": [
+      "js/landing.js"
+    ]
+  },
   "s_bd8b5121": {
     "source": "Bloqueado",
     "files": [
@@ -10692,6 +10719,12 @@
     "files": [
       "index.html",
       "js/app-main.js"
+    ]
+  },
+  "s_e01e70f1": {
+    "source": "Enviando…",
+    "files": [
+      "js/landing.js"
     ]
   },
   "s_e022ec6b": {

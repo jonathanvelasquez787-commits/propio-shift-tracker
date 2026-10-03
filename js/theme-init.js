@@ -1,4 +1,5 @@
 import { applySavedColors } from './appearance-colors.js';
+import { readLanguagePreference } from './language-preference.js';
 // El build genera un script bloqueante para aplicar los colores antes de pintar.
 (() => {
   let theme = 'light';
@@ -12,5 +13,5 @@ import { applySavedColors } from './appearance-colors.js';
   }
   document.documentElement.classList.toggle('theme-dark', theme === 'dark');
   document.documentElement.classList.toggle('theme-light', theme !== 'dark');
-  applySavedColors({ ...appearance, theme }, document.documentElement);
+  applySavedColors({ ...appearance, theme, language: readLanguagePreference() }, document.documentElement);
 })();

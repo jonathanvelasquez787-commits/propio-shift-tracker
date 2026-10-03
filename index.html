@@ -83,7 +83,13 @@
     <!-- ===== Panel de entrada ===== -->
     <div class="auth-card reveal" style="--delay:120ms">
       <div class="auth-head">
-        <h2 id="authTitle">Entrar</h2>
+        <div class="auth-heading-row">
+          <h2 id="authTitle">Entrar</h2>
+          <select class="login-language-select" id="loginLanguage" data-language-select aria-label="Idioma de la tool">
+            <option value="en" lang="en">English</option>
+            <option value="es" lang="es">Español</option>
+          </select>
+        </div>
         <p id="authSub">Usa tu correo o tu nombre de usuario.</p>
       </div>
 
@@ -197,10 +203,10 @@
       <!-- Sesión ya abierta -->
       <div class="session-card" id="sessionCard">
         <div class="session-row">
-          <span class="session-avatar" id="sessionAvatar" aria-hidden="true">?</span>
+          <span class="session-avatar" id="sessionAvatar" aria-hidden="true" data-user-content>?</span>
           <div>
-            <div class="session-name" id="sessionName">Tu cuenta</div>
-            <div class="session-handle" id="sessionHandle"></div>
+            <div class="session-name" id="sessionName" data-user-content>Tu cuenta</div>
+            <div class="session-handle" id="sessionHandle" data-user-content></div>
           </div>
         </div>
         <div class="session-actions">

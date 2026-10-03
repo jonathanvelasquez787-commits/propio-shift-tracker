@@ -5,6 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { IMPULSE_MILESTONES, LOOT_RARITIES, armorPlatesForDay, configureGameContext, lootRarityFor, monsterPhaseFor } from '../js/game.js';
 import { monsterSvg } from '../js/monsters.js';
+import { setLanguage } from '../js/i18n.js';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
@@ -30,6 +31,7 @@ test('Higher Rate vivo solo activa furia en el día actual', () => {
 });
 
 test('loot transparente y equipamiento SVG son deterministas y accesibles', () => {
+  setLanguage('es');
   assert.equal(new Set(LOOT_RARITIES.map((item) => item.id)).size, 4);
   assert.equal(lootRarityFor('same-seed'), lootRarityFor('same-seed'));
   assert.notEqual(lootRarityFor('same-seed', true), 'common');

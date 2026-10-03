@@ -443,7 +443,7 @@ Selector lateral «Temas y colores»: Original claro/oscuro y siete paletas
 aprobadas, cada una en claro y oscuro. Se guardan junto a los ajustes de la
 cuenta; cambiar a Original elimina únicamente las variables de la paleta.
 Español e inglés completos sin API, incluidos interfaz, avisos, ayuda y
-reportes; 1.989 textos comprobados. Cambiar idioma vuelve a la misma página,
+reportes; 2.002 textos comprobados. Cambiar idioma vuelve a la misma página,
 sin modificar llamadas, nombres personales, recibos ni progreso. Mensajes
 de juego guardados se presentan en el idioma seleccionado sin reescribirlos.
 La PWA incluye ambos idiomas y el CSS de apariencia.
@@ -457,6 +457,23 @@ cambio de idioma y conservación de llamadas/progreso verificados. Build
 real comprobado con autenticación y nube simuladas: preferencias antes de
 pintar, persistencia tras recarga, idioma y regreso a Logros. No certifica
 una sesión real en dos dispositivos ni una cuenta Locize activa.
+
+Desde v582 el idioma inicial es English cuando no hay preferencia válida;
+Español elegido anteriormente se conserva. Selector English/Español en la
+cabecera del panel de login: cambia en vivo sin borrar campos ni cambiar la
+vista activa de entrada, registro o recuperación. Preferencia pública y selección
+pendiente viven fuera del snapshot de cuenta; la selección explícita se aplica
+solo a language después de hidratar y conserva la base de sincronización.
+Se alinean preferencias al entrar y cambiar idioma dentro de la app, sin bucles
+de recarga ni conflictos causados por usar el selector antes del login.
+Los mensajes dinámicos y sus valores personales cambian en ambos sentidos.
+Logros permanece desactivado por defecto para cuentas nuevas.
+
+El build de v582 publica app.html como shell pequeño: gate y scripts externos;
+extrae el CSS a app-core.css y el marcado a app-view.js, cargado antes de boot.
+app.html fuente sigue siendo la única verdad editable. No es ocultación ni
+protección criptográfica: los archivos descargados siguen siendo inspeccionables.
+CSS y vista nuevos están versionados y en la precarga de la PWA.
 
 **LIMITACIONES CONOCIDAS** (alcance reducido a propósito, no son bugs)
 
@@ -539,6 +556,22 @@ La aplicación funciona en producción con estas bases vigentes:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v582** — Inglés inicial, selector en login y HTML publicado compacto.
+
+- EN por defecto; ES explícito se conserva. Selector junto a Entrar, con
+  cambio inmediato, campos/vista intactos y mensajes traducidos al navegar.
+- Selección antes del login separada de datos de cuenta, aplicada después de
+  nube/reset sin perder llamadas, ajustes o base de sincronización. Idioma
+  alineado tras hidratación y recarga; Logros nuevo continúa apagado.
+- HTML de producción reducido de unas 10.500 líneas a 25 y ~1,8 KB. Vista
+  externa minificada, CSS externo en el mismo orden y ambos en la PWA.
+  Fuente editable intacta; el código público continúa inspeccionable.
+- 210 pruebas, 28 módulos, wiring y build correctos. Chrome ES/EN en claro
+  y oscuro a 320–1365 px; login/registro/recuperación, campos preservados,
+  recarga, hidratación controlada, cuenta nueva EN/Logros apagado y arranque
+  desde el HTML compacto verificados. Shell/vista/CSS recuperados sin conexión
+  desde la caché real de la PWA. Nube/autenticación aisladas de cuentas reales.
+
 **v581** — Sonidos arcade para Logros.
 
 - 14 efectos Web Audio con melodías, impactos y capas breves para llamadas,
@@ -569,18 +602,3 @@ La aplicación funciona en producción con estas bases vigentes:
   320–1365 px, todas las paletas, controles, importación histórica, derrotas,
   cofre y movimiento reducido. Build real con sesión/nube controladas,
   preferencias tras recarga y cambio de idioma sin perder llamadas.
-
-**v579** — Ajustes simples y activación de Logros desde el menú lateral.
-
-- «Activar Logros» reemplaza «Activar El Monstruo»; interruptores sincronizados
-  en cabecera y menú lateral, junto a Modo oscuro, con un solo ajuste persistente.
-  Desactivar/reactivar conserva XP, llamadas y recibos; el tema es independiente.
-- Retirados selector de intensidad y Plan del día. Arcade fijo, también para
-  preferencias antiguas. Misiones automáticas de productividad, pausas y
-  adherencia; enfoques antiguos de resultados sellados se conservan.
-- Mis premios pierde presupuesto y límites de gasto; preferencias antiguas
-  no bloquean premios. Permanecen costo informativo, catálogo, personalización,
-  acumulación, límites diarios, ventanas seguras e historial idempotente.
-- 173 pruebas y build/wiring de 19 módulos correctos. Chrome en claro/oscuro,
-  320–1365 px; controles reales de ambas ubicaciones, progreso intacto,
-  llamadas y efectos pixel art, cierre/cofre y movimiento reducido verificados.

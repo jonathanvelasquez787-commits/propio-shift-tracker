@@ -56,6 +56,12 @@ tests/security-preparation.test.mjs  Pruebas de seguridad, PWA y datos
 tests/game-phase6.test.mjs           Contratos y límites de la Fase 6
 ```
 
+El build conserva `app.html` como fuente editable y publica un HTML pequeño:
+el gate de arranque y referencias a `assets/app-view.js`, `assets/boot.js` y
+`css/app-core.css`. La vista se inserta antes del arranque y ambos archivos nuevos
+se incluyen en la PWA. Esto reduce el código visible en «Ver código fuente»;
+los recursos que recibe el navegador siguen siendo inspeccionables.
+
 ---
 
 ## Cómo se edita `app.html`

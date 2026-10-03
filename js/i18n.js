@@ -1,14 +1,16 @@
 import i18next from 'i18next';
 import { resources } from './locales.generated.js';
 import { translationKey } from './i18n-key.js';
+import { normalizeLanguage, readLanguagePreference } from './language-preference.js';
 
 const instance = i18next.createInstance();
-let language = 'es';
-try { language = JSON.parse(globalThis.localStorage?.getItem('propio_shift_tracker_settings_es_v1') || '{}').language === 'en' ? 'en' : 'es'; } catch {}
+let language = readLanguagePreference();
 instance.init({ resources, lng: language, fallbackLng: 'es', supportedLngs: ['es', 'en'], initImmediate: false,
   keySeparator: false, nsSeparator: false, interpolation: { escapeValue: false } });
-const textSources = new WeakMap();
-const attributeSources = new WeakMap();
+const sourceKey = Symbol.for('propio.i18n.documentSources');
+const documentSources = globalThis[sourceKey] || (globalThis[sourceKey] = { text: new WeakMap(), attributes: new WeakMap() });
+const textSources = documentSources.text;
+const attributeSources = documentSources.attributes;
 export function currentLanguage() { return language; }
 export function displayLocale() { return language === 'en' ? 'en-US' : 'es-MX'; }
 export function translateText(source) {
@@ -20,7 +22,7 @@ export function translateText(source) {
 }
 let storedMessages;
 // Only for app-authored saved messages, never personal names or notes.
-export function translateStoredText(source) {
+export function translateStoredText(source, targetLanguage = language) {
   if (typeof source !== 'string') return source;
   if (!storedMessages) {
     const exact = new Map(), patterns = [];
@@ -38,7 +40,7 @@ export function translateStoredText(source) {
     }
     storedMessages = { exact, patterns: patterns.sort((a, b) => b.authoredLength - a.authoredLength) };
   }
-  const catalog = resources[language].translation;
+  const catalog = resources[normalizeLanguage(targetLanguage)].translation;
   const key = storedMessages.exact.get(source);
   if (key) return catalog[key] ?? source;
   for (const pattern of storedMessages.patterns) {
@@ -62,21 +64,37 @@ export function ui(parts, ...values) {
   return translateMarkup(pattern).replace(/\{\{v(\d+)\}\}/g, (_, index) => String(values[Number(index)]));
 }
 export function translateDocument(root = document) {
+  const authoredSource = (value, targetLanguage = 'es') => {
+    const core = value.trim();
+    return core ? value.replace(core, () => translateStoredText(core, targetLanguage)) : value;
+  };
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
   while (walker.nextNode()) {
     const node = walker.currentNode;
     if (node.parentElement?.closest('script,style,textarea,code,[data-user-content]')) continue;
-    if (!textSources.has(node)) textSources.set(node, node.nodeValue);
-    node.nodeValue = translateText(textSources.get(node));
+    let entry = textSources.get(node);
+    if (!entry || node.nodeValue !== entry.translated) entry = { source: authoredSource(node.nodeValue) };
+    entry.translated = authoredSource(entry.source, language);
+    textSources.set(node, entry);
+    node.nodeValue = entry.translated;
   }
   root.querySelectorAll('[title],[aria-label],[placeholder],[alt]').forEach(element => {
-    if (!attributeSources.has(element)) attributeSources.set(element, Object.fromEntries(
-      ['title', 'aria-label', 'placeholder', 'alt'].filter(name => element.hasAttribute(name)).map(name => [name, element.getAttribute(name)])));
-    for (const [name, value] of Object.entries(attributeSources.get(element))) element.setAttribute(name, translateText(value));
+    if (element.closest('[data-user-content]')) return;
+    const entries = attributeSources.get(element) || {};
+    for (const name of ['title', 'aria-label', 'placeholder', 'alt']) {
+      if (!element.hasAttribute(name)) continue;
+      const value = element.getAttribute(name);
+      let entry = entries[name];
+      if (!entry || value !== entry.translated) entry = { source: authoredSource(value) };
+      entry.translated = authoredSource(entry.source, language);
+      entries[name] = entry;
+      element.setAttribute(name, entry.translated);
+    }
+    attributeSources.set(element, entries);
   });
 }
 export function setLanguage(value, { documentTranslation = false } = {}) {
-  const next = value === 'en' ? 'en' : 'es';
+  const next = normalizeLanguage(value);
   const changed = next !== language;
   language = next;
   if (changed) instance.changeLanguage(language);

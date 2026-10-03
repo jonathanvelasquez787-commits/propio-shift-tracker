@@ -3,6 +3,7 @@ import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { minify } from 'terser';
 import { cp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { createAppShell } from './production-shell.mjs';
 
 const root = process.cwd();
 const out = path.join(root, 'public');
@@ -93,6 +94,12 @@ for (const name of ['index.html', 'app.html', 'privacidad.html', 'terminos.html'
   html = html.replace('</head>', `<script src="/assets/monitoring.js?v=${release}"></script>\n</head>`);
   html = html.replace('</head>', '<link rel="manifest" href="/manifest.webmanifest">\n<meta name="theme-color" content="#07111f">\n</head>');
   html = html.replace('</body>', `<script src="/assets/register-sw.js?v=${release}" defer></script>\n</body>`);
+  if (name === 'app.html') {
+    const shell = createAppShell(html, release);
+    await writeFile(path.join(out, 'css/app-core.css'), shell.css);
+    await minifyFile(path.join(assets, 'app-view.js'), shell.viewScript);
+    html = shell.html;
+  }
   await writeFile(path.join(out, name), html);
 }
 

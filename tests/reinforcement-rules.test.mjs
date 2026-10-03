@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { setLanguage } from '../js/i18n.js';
 import { monetaryMilestones, activeWorkSinceLastCall, supportiveDayEvidence, surpriseDecision } from '../js/reinforcement-rules.js';
 
 const MINUTE = 60000;
@@ -101,6 +102,7 @@ test('scheduled work intersects the real overnight shift rather than calendar da
 });
 
 test('supportive closure uses up to three factual positives and conditional tomorrow projection', () => {
+  setLanguage('es');
   const result = supportiveDayEvidence({
     callCount: 5, earnings: 10, bestCallAmount: 4, yesterdayEarnings: 8, yesterdayHasData: true,
     onTimePauses: 1, recoveries: 1, streak: 3, compliant: true,
@@ -114,6 +116,7 @@ test('supportive closure uses up to three factual positives and conditional tomo
 });
 
 test('sparse and difficult days never manufacture achievements or money without currency formatting', () => {
+  setLanguage('es');
   assert.deepEqual(supportiveDayEvidence(), { things: [], projection: null });
   const empty = supportiveDayEvidence({ callCount: 0, earnings: 50, bestCallAmount: 12, recoveries: 2, streak: 5, compliant: true });
   assert.deepEqual(empty, { things: [], projection: null });
@@ -123,6 +126,7 @@ test('sparse and difficult days never manufacture achievements or money without 
 });
 
 test('closure comparisons stay personal and best call uses the provided money formatter', () => {
+  setLanguage('es');
   const result = supportiveDayEvidence({ callCount: 2, earnings: 20, yesterdayEarnings: 10, yesterdayHasData: true, bestCallAmount: 12, formatAmount: (n) => `${n} USD · ${n * 25} HNL` });
   assert.match(result.things[1], /respecto a tu propio día/);
   assert.match(result.things[2], /12 USD · 300 HNL/);
