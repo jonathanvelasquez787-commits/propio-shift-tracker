@@ -12,6 +12,7 @@ const {
 } = await import('../js/game.js');
 const { configurePositiveReinforcementContext } = await import('../js/positive-reinforcement.js');
 import { financeRowIsMeta } from '../js/finance.js';
+import { stopBattle } from '../js/game-battle.js';
 
 function harness(t, { at = new Date(2026, 8, 29, 12).getTime(), goal = 10000, streak = 3, compliance = 'failed', surface = false } = {}) {
   const NativeDate = globalThis.Date;
@@ -53,26 +54,60 @@ function harness(t, { at = new Date(2026, 8, 29, 12).getTime(), goal = 10000, st
   const announcements = [];
   const live = { set textContent(value) { if (value) announcements.push(value); }, get textContent() { return announcements.at(-1) || ''; } };
   const nodes = new Map();
+  const surfaceNode = () => {
+    const classes = new Set();
+    return {
+      dataset: {}, style: { setProperty(name, value) { this[name] = value; } }, innerHTML: '', textContent: '', hidden: false, offsetWidth: 400,
+      isConnected: true, get ownerDocument() { return globalThis.document; },
+      get className() { return [...classes].join(' '); },
+      set className(value) { classes.clear(); String(value).split(/\s+/).filter(Boolean).forEach((name) => classes.add(name)); },
+      classList: { add(...names) { names.forEach((name) => classes.add(name)); }, remove(...names) { names.forEach((name) => classes.delete(name)); }, contains: (name) => classes.has(name) },
+      querySelector: () => null, querySelectorAll: () => [],
+      getBoundingClientRect: () => ({ width: 400, height: 280 }),
+      getClientRects() { return this.hidden ? [] : [this.getBoundingClientRect()]; },
+      setAttribute(name, value) { this[name] = String(value); },
+      removeAttribute(name) { if (name.startsWith('data-')) delete this.dataset[name.slice(5).replace(/-([a-z])/g, (_, letter) => letter.toUpperCase())]; },
+    };
+  };
   if (surface) {
     for (const id of ['gameArena', 'classicDailyGoalCard', 'gameCallFx', 'gameMissions']) {
-      const classes = new Set();
-      nodes.set(id, {
-        dataset: {}, style: { setProperty(name, value) { this[name] = value; } }, innerHTML: '', hidden: false, offsetWidth: 400,
-        get className() { return [...classes].join(' '); },
-        set className(value) { classes.clear(); String(value).split(/\s+/).forEach((name) => classes.add(name)); },
-        classList: { add(...names) { names.forEach((name) => classes.add(name)); }, remove(...names) { names.forEach((name) => classes.delete(name)); }, contains: (name) => classes.has(name) },
-        removeAttribute(name) { if (name === 'data-game-event') delete this.dataset.gameEvent; },
-      });
+      nodes.set(id, surfaceNode());
     }
+    const arena = nodes.get('gameArena');
+    let markup = '', battle = null;
+    const slots = new Map();
+    Object.defineProperty(arena, 'innerHTML', {
+      get: () => markup,
+      set(value) {
+        markup = String(value);
+        slots.clear();
+        for (const match of markup.matchAll(/\b(data-battle-[a-z-]+)(?=[\s>])/g)) slots.set(`[${match[1]}]`, surfaceNode());
+        battle = markup.includes('class="game-battle"') ? surfaceNode() : null;
+        if (!battle) return;
+        battle.className = 'game-battle';
+        battle.closest = selector => selector === '[hidden]' && arena.hidden ? arena : null;
+        const hero = surfaceNode();
+        battle.querySelector = selector => selector === '[data-battle-action="hero"]' ? hero : slots.get(selector) || null;
+        slots.get('[data-battle-canvas]').getContext = () => null;
+      },
+    });
+    arena.querySelector = selector => selector === '.game-battle' ? battle : slots.get(selector) || null;
   }
+  const browser = {
+    matchMedia: () => ({ matches: false }),
+    getComputedStyle: () => ({ visibility: 'visible', getPropertyValue: () => '' }),
+    setTimeout: (...args) => globalThis.setTimeout(...args),
+    clearTimeout: (...args) => globalThis.clearTimeout(...args),
+  };
   globalThis.document = {
+    defaultView: browser, hidden: false,
     activeElement: null, documentElement: { classList: classList() },
     getElementById: (id) => nodes.get(id) || (id === 'gameToastStack' ? stack : id === 'gameStatusLive' ? live : null),
     querySelector: () => null,
     querySelectorAll: (selector) => selector.startsWith('#gameToastStack') ? stack.children : [],
     createElement: () => ({ dataset: {}, classList: classList(), remove() { if (this.parent) this.parent.children = this.parent.children.filter((node) => node !== this); } }),
   };
-  globalThis.window = { matchMedia: () => ({ matches: false }) };
+  globalThis.window = browser;
   globalThis.requestAnimationFrame = (callback) => callback();
   let currentState = { game: createDefaultGameState(), gapAnnotations: {}, pauseHistory: [], dayInterruptions: {}, shiftStartedAt: iso(now - 3 * 3600000), shiftEndedAt: null };
   const rows = [];
@@ -107,6 +142,7 @@ function harness(t, { at = new Date(2026, 8, 29, 12).getTime(), goal = 10000, st
   renderGame();
   config.game.enabled = true;
   t.after(() => {
+    stopBattle();
     setAppState(null); setAppCalls([]); setAppSettings({});
     globalThis.Date = NativeDate;
     for (const [key, value] of Object.entries(original)) {
@@ -253,16 +289,67 @@ test('el combo visible reacciona a una llamada sin pago y el impacto sobrevive a
   const arena = h.nodes.get('gameArena');
   const first = h.add('first-paid');
   onGameCallSaved(first, 'manual', { random: () => 0.99 });
-  assert.match(arena.innerHTML, /game-combo-badge">x1</);
+  assert.match(arena.querySelector('[data-battle-summary]').innerHTML, /class="game-combo-badge"[^>]*>x1</);
   const zero = h.add('zero-pay', { pay: 0 });
   onGameCallSaved(zero, 'manual', { random: () => 0.99 });
   onGameCallsChanged(zero.shiftDayKey);
   assert.equal(h.state.game.live.combo, 2);
-  assert.match(arena.innerHTML, /game-combo-badge">x2</);
+  assert.match(arena.querySelector('[data-battle-summary]').innerHTML, /class="game-combo-badge"[^>]*>x2</);
   h.setGoal(20000);
   renderGame();
   assert.equal(arena.classList.contains('is-hit'), true);
   assert.equal(h.nodes.get('classicDailyGoalCard').style.display, '');
+});
+
+test('guardar con arena visible, ausente o Logros apagado conserva dinero y HP sin duplicar recibos', async (t) => {
+  const results = [];
+  for (const mode of ['visible', 'absent', 'disabled']) {
+    await t.test(mode, (subtest) => {
+      const h = harness(subtest, { surface: mode !== 'absent', goal: 100 });
+      h.config.game.enabled = mode !== 'disabled';
+      renderGame();
+      const arena = h.nodes.get('gameArena');
+      const battle = arena?.querySelector('.game-battle');
+      if (mode === 'visible') {
+        assert.ok(battle, 'la representación de batalla debe estar montada');
+        assert.equal(arena.hidden, false);
+        for (const slot of ['summary', 'health-slot', 'stats', 'mission-hint']) assert.ok(arena.querySelector(`[data-battle-${slot}]`));
+      } else if (mode === 'absent') assert.equal(arena, undefined);
+      else assert.equal(arena.hidden, true);
+
+      const call = h.add('same-official-call', { pay: 20, bonus: 5 });
+      const originalCall = structuredClone(call);
+      onGameCallSaved(call, 'manual', { random: () => .99 });
+      onGameCallsChanged(call.shiftDayKey);
+      const first = computeGameDay(call.shiftDayKey);
+      assert.equal(first.hpPct, 75);
+      assert.equal(first.stats.earnings, 25);
+      const receipts = h.ledger(`reinforce-call:${call.shiftDayKey}:`);
+      assert.equal(receipts.length, 1);
+      const receipt = structuredClone(receipts[0][1]);
+      if (mode === 'visible') {
+        assert.equal(battle.dataset.battleHp, '75');
+        assert.match(battle.querySelector('[data-battle-banner]').textContent, /−\$25\.00/);
+        assert.strictEqual(arena.querySelector('.game-battle'), battle, 'guardar actualiza slots sin remontar la escena');
+      }
+
+      h.reload();
+      for (const source of ['manual', 'live', 'import']) {
+        onGameCallSaved(call, source, { random: () => { throw new Error('un recibo guardado no debe volver a sortearse'); } });
+        onGameCallsChanged(call.shiftDayKey);
+      }
+      renderGame();
+      const repeated = computeGameDay(call.shiftDayKey);
+      assert.equal(repeated.hpPct, first.hpPct);
+      assert.equal(repeated.stats.earnings, first.stats.earnings);
+      assert.equal(repeated.xp, first.xp);
+      assert.equal(h.ledger(`reinforce-call:${call.shiftDayKey}:`).length, 1);
+      assert.deepEqual(h.ledger(`reinforce-call:${call.shiftDayKey}:`)[0][1], receipt);
+      assert.deepEqual(h.rows, [originalCall], 'los efectos visuales no deben editar ni duplicar llamadas');
+      results.push({ hp: repeated.hpPct, earnings: repeated.stats.earnings });
+    });
+  }
+  assert.deepEqual(results, [{ hp: 75, earnings: 25 }, { hp: 75, earnings: 25 }, { hp: 75, earnings: 25 }]);
 });
 
 test('los timers de una llamada anterior no retiran el impacto de la llamada nueva', (t) => {

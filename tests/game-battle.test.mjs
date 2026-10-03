@@ -1,0 +1,183 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { BATTLE_WEAPONS, normalizeBattleWeapon, createBattleQueue, battleMarkup, syncBattle, playBattleCall, stopBattle } from '../js/game-battle.js';
+
+function harness({ reduced = false, canvasAvailable = true } = {}) {
+  let now = 1000, sequence = 0;
+  const frames = new Map(), timers = new Map(), observers = [], sounds = [], changes = [], pauses = [];
+  class Node {
+    constructor(button = false) { this.dataset = {}; this.style = {}; this.listeners = new Map(); this.hidden = false; this.textContent = ''; this.innerHTML = ''; this.attributes = {}; this.button = button; }
+    addEventListener(type, fn) { const list = this.listeners.get(type) || new Set(); list.add(fn); this.listeners.set(type, list); }
+    removeEventListener(type, fn) { this.listeners.get(type)?.delete(fn); }
+    dispatch(type, props = {}) { const event = { key: '', target: this, preventDefault() {}, ...props }; for (const fn of this.listeners.get(type) || []) fn(event); }
+    setAttribute(name, value) { this.attributes[name] = value; }
+    removeAttribute(name) { delete this.attributes[name]; if (name === 'data-battle-hit') delete this.dataset.battleHit; }
+    closest(selector) { return selector === 'button' && this.button ? this : null; }
+    getClientRects() { return this.hidden ? [] : [this.getBoundingClientRect()]; }
+    getBoundingClientRect() { return { width: 320, height: 265 }; }
+    focus() { this.focused = true; }
+  }
+  const doc = new Node(), host = new Node(), element = new Node(), nodes = {};
+  doc.documentElement = new Node(); doc.body = new Node(); doc.defaultView = host; doc.hidden = false;
+  element.ownerDocument = doc; element.isConnected = true;
+  element.matches = selector => selector === '.game-battle'; element.contains = node => node === element || Object.values(nodes).includes(node);
+  const names = ['stage','canvas','monster','hero-label','monster-label','monster-name','feed','notice','notice-text','banner','victory','selected','live','motion-note'];
+  for (const name of names) nodes[name] = new Node();
+  nodes.hero = new Node(true); nodes.hero.dataset.battleAction = 'hero';
+  const weapons = BATTLE_WEAPONS.map(w => { const node = new Node(true); node.dataset.battleWeapon = w.id; return node; });
+  element.querySelector = selector => selector.includes('data-battle-action') ? nodes.hero : nodes[selector.match(/data-battle-([\w-]+)/)?.[1]];
+  element.querySelectorAll = selector => selector === '[data-battle-weapon]' ? weapons : [];
+  host.devicePixelRatio = 1; host.performance = { now: () => now };
+  host.getComputedStyle = () => ({ visibility: 'visible', getPropertyValue: () => '#123456' });
+  host.requestAnimationFrame = fn => { const id = ++sequence; frames.set(id, fn); return id; };
+  host.cancelAnimationFrame = id => frames.delete(id);
+  host.setTimeout = fn => { const id = ++sequence; timers.set(id, fn); return id; };
+  host.clearTimeout = id => timers.delete(id);
+  const motion = new Node(); motion.matches = reduced; host.matchMedia = () => motion;
+  const context = new Proxy({}, { get(target, name) { return name in target ? target[name] : () => {}; } });
+  nodes.canvas.getContext = () => canvasAvailable ? context : null;
+  class Observer {
+    constructor(fn) { this.fn = fn; this.disconnected = false; observers.push(this); }
+    observe() {}
+    disconnect() { this.disconnected = true; }
+  }
+  host.ResizeObserver = Observer; host.IntersectionObserver = Observer; host.MutationObserver = Observer;
+  const view = { dayKey: '10/03/2026', weapon: 'pistol', enabled: true, hpPct: 63, defeated: false, monsterMarkup: '<svg data-species="existing"></svg>' };
+  const callbacks = { onSound: kind => sounds.push(kind), onWeaponChange: id => changes.push(id), onPause: () => pauses.push(true) };
+  const mount = () => syncBattle(element, view, callbacks);
+  const practice = () => { now += 200; element.dispatch('click', { target: nodes.hero }); };
+  const tick = (milliseconds = 40) => { now += milliseconds; const current = [...frames.values()]; frames.clear(); current.forEach(fn => fn(now)); };
+  const event = (extra = {}) => ({ dayKey: view.dayKey, amountText: '$1.40 · ≈ L 36.40', xp: 3, ...extra });
+  return { element, doc, host, nodes, motion, weapons, view, mount, practice, tick, event, frames, timers, observers, sounds, changes, pauses,
+    listenerCount: () => [element, doc, host, motion, ...Object.values(nodes)].reduce((count, node) => count + [...node.listeners.values()].reduce((n, list) => n+list.size, 0), 0) };
+}
+
+test('weapon selection normalizes only cosmetic catalog ids; imports work without DOM', () => {
+  assert.equal(BATTLE_WEAPONS.length, 10);
+  assert.deepEqual(BATTLE_WEAPONS.map(w => w.key), ['1','2','3','4','5','6','7','8','9','0']);
+  for (const w of BATTLE_WEAPONS) { assert.equal(normalizeBattleWeapon(w.id), w.id); assert.ok(Object.isFrozen(w)); }
+  for (const value of ['grenade','invalid',null,{},'__proto__']) assert.equal(normalizeBattleWeapon(value), 'pistol');
+  stopBattle(); assert.equal(playBattleCall({ dayKey: 'x' }), false);
+  const markup = battleMarkup();
+  assert.equal((markup.match(/data-battle-weapon=/g) || []).length, 10);
+  assert.ok(markup.indexOf('data-battle-health-slot') > markup.indexOf('data-battle-canvas'));
+  assert.ok(markup.indexOf('data-battle-health-slot') < markup.indexOf('game-battle-controls'));
+  assert.match(markup, /aria-live="polite"/);
+  assert.doesNotMatch(markup, /data-battle-action="(?:simulate|reset)"/);
+});
+
+test('large imports remain one representation and excess events coalesce at six rows', () => {
+  const queue = createBattleQueue(), input = Object.freeze({ dayKey: 'd', count: 5000, amountText: '$7000 · ≈ L 182000', xp: 150, critical: true });
+  queue.push(input); assert.equal(queue.size, 1); assert.deepEqual(queue.shift(), input);
+  for (let i = 0; i < 100; i++) queue.push({ dayKey: 'd', count: 1, xp: 2, amountText: '$1', critical: i === 99 });
+  assert.equal(queue.size, 6);
+  const result = []; while (queue.size) result.push(queue.shift());
+  assert.equal(result.reduce((sum, event) => sum+event.count, 0), 100);
+  assert.equal(result.reduce((sum, event) => sum+event.xp, 0), 200);
+  assert.equal(result.at(-1).amountText, ''); assert.equal(result.at(-1).critical, true);
+  queue.push({ dayKey: 'd', xp: -5, count: NaN, amountText: 'a'.repeat(1000) });
+  const safe = queue.shift(); assert.equal(safe.xp, 0); assert.equal(safe.count, 1); assert.equal(safe.amountText.length, 160);
+  queue.push(input); queue.clear(); assert.equal(queue.size, 0);
+});
+
+test('reduced motion practice preserves HP and reports each third activation, not pellets', () => {
+  const h = harness({ reduced: true });
+  try {
+    h.view.weapon = 'flame'; h.mount(); const snapshot = JSON.stringify(h.view);
+    assert.equal(h.frames.size, 0);
+    h.practice(); assert.equal(h.nodes.notice.hidden, true);
+    assert.equal(h.nodes['notice-text'].textContent, '');
+    h.practice(); assert.equal(h.nodes['notice-text'].textContent, '');
+    h.practice(); assert.ok(h.nodes['notice-text'].textContent.length > 10); assert.equal(h.nodes.notice.hidden, false);
+    assert.equal(h.sounds.filter(kind => kind === 'shoot-flame').length, 3);
+    assert.equal(h.sounds.filter(kind => kind === 'practice-hit').length, 3);
+    assert.equal(JSON.stringify(h.view), snapshot); assert.equal(h.element.dataset.battleHp, '63'); assert.equal(h.changes.length, 0);
+    assert.equal(h.frames.size, 0); assert.equal(h.timers.size, 1);
+    assert.equal(playBattleCall(h.event({ count: 800, xp: 150, critical: true })), true);
+    assert.match(h.nodes.banner.textContent, /800/); assert.match(h.nodes.banner.textContent, /150 XP/);
+    assert.ok(h.sounds.includes('critical')); assert.equal(h.frames.size, 0);
+    h.doc.hidden = true; h.doc.dispatch('visibilitychange'); assert.equal(h.timers.size, 0); assert.equal(playBattleCall(h.event()), false);
+  } finally { stopBattle(); }
+  assert.equal(h.listenerCount(), 0); assert.ok(h.observers.every(observer => observer.disconnected));
+});
+
+test('canvas fallback remains usable and rejects wrong dates without sound or queued work', () => {
+  const h = harness({ canvasAvailable: false });
+  try {
+    h.mount(); assert.equal(h.element.dataset.battleCanvas, 'fallback'); assert.equal(h.frames.size, 0);
+    assert.equal(playBattleCall(h.event({ dayKey: 'wrong' })), false); assert.equal(h.sounds.length, 0);
+    assert.equal(playBattleCall(h.event()), true); assert.match(h.nodes.banner.textContent, /1\.40/);
+    for (let i=0;i<3;i++) h.practice(); assert.ok(h.nodes['notice-text'].textContent);
+    h.element.dispatch('keydown', { key: '0', target: h.nodes.stage }); assert.deepEqual(h.changes, ['wand']);
+    h.doc.dispatch('keydown', { key: '1', target: h.nodes.stage }); assert.deepEqual(h.changes, ['wand']);
+  } finally { stopBattle(); }
+  assert.equal(h.listenerCount(), 0); assert.equal(h.timers.size, 0);
+});
+
+test('visibility/date changes cancel pending visual calls and unmount releases animation observers', () => {
+  const h = harness();
+  try {
+    h.mount(); assert.equal(h.frames.size, 1);
+    assert.equal(playBattleCall(h.event()), true); h.tick(); assert.ok(h.sounds.includes('shoot-pistol'));
+    h.view.dayKey = '10/04/2026'; h.mount();
+    for (let i=0;i<35;i++) h.tick(); assert.equal(h.sounds.filter(kind => kind === 'hit').length, 0);
+    assert.equal(playBattleCall(h.event()), true);
+    const intersection = h.observers[1]; intersection.fn([{ isIntersecting: false }]);
+    assert.equal(h.frames.size, 0); assert.equal(h.element.dataset.battlePaused, 'true'); assert.equal(playBattleCall(h.event()), false);
+    const pauseCount = h.pauses.length; h.doc.dispatch('visibilitychange'); intersection.fn([{ isIntersecting: false }]); assert.equal(h.pauses.length, pauseCount);
+    intersection.fn([{ isIntersecting: true }]); assert.equal(h.frames.size, 1);
+    for (let i=0;i<35;i++) h.tick(); assert.equal(h.sounds.filter(kind => kind === 'hit').length, 0);
+    h.element.isConnected = false; h.observers[2].fn();
+    assert.equal(h.frames.size, 0); assert.equal(h.listenerCount(), 0); assert.ok(h.observers.every(observer => observer.disconnected));
+    assert.equal(playBattleCall(h.event()), false);
+  } finally { stopBattle(); }
+});
+
+test('switching reduced motion or disabling an active scene cancels every pending effect', () => {
+  const h = harness();
+  try {
+    h.mount(); playBattleCall(h.event()); h.tick();
+    assert.equal(h.frames.size, 1);
+    h.motion.matches = true; h.motion.dispatch('change');
+    assert.equal(h.frames.size, 0); assert.equal(h.nodes['motion-note'].hidden, false);
+    assert.equal(h.sounds.filter(kind => kind === 'hit').length, 0);
+    h.practice(); assert.ok(h.sounds.includes('practice-hit'));
+    syncBattle(h.element, { ...h.view, enabled: false });
+    const soundCount = h.sounds.length;
+    h.practice(); h.element.dispatch('keydown', { key: '0', target: h.nodes.stage });
+    assert.equal(h.sounds.length, soundCount); assert.equal(h.changes.length, 0);
+    assert.equal(h.listenerCount(), 0); assert.equal(h.timers.size, 0); assert.equal(playBattleCall(h.event()), false);
+  } finally { stopBattle(); }
+});
+
+test('same-day edits, deletions and goal changes cancel pending hits while additions preserve the batch', () => {
+  const h = harness();
+  const waitForImpact = () => { for (let i=0;i<35;i++) h.tick(); };
+  const hitCount = () => h.sounds.filter(kind => kind === 'hit').length;
+  try {
+    h.view.callSignatures = { call1: JSON.stringify({ pay: 1.4, start: '10:00', end: '10:10' }) };
+    h.view.goalUsd = 28; h.mount();
+    assert.equal(h.pauses.length, 0);
+    playBattleCall(h.event()); h.tick();
+    h.view.callSignatures.call2 = JSON.stringify({ pay: 2.8, start: '10:10', end: '10:30' });
+    h.mount();
+    assert.equal(h.pauses.length, 0);
+    playBattleCall(h.event({ amountText: '$2.80 · ≈ L 72.80' }));
+    waitForImpact(); assert.equal(hitCount(), 2); assert.match(h.nodes.banner.textContent, /2\.80/);
+
+    playBattleCall(h.event()); h.tick();
+    h.view.callSignatures.call1 = JSON.stringify({ pay: 1.96, start: '10:00', end: '10:14' });
+    h.mount(); waitForImpact();
+    assert.equal(hitCount(), 2); assert.equal(h.pauses.length, 1); assert.equal(h.nodes.banner.hidden, true);
+
+    playBattleCall(h.event()); h.tick();
+    delete h.view.callSignatures.call1;
+    h.mount(); waitForImpact();
+    assert.equal(hitCount(), 2); assert.equal(h.pauses.length, 2); assert.equal(h.nodes.banner.hidden, true);
+
+    playBattleCall(h.event()); h.tick();
+    h.view.goalUsd = 40; h.mount(); waitForImpact();
+    assert.equal(hitCount(), 2); assert.equal(h.pauses.length, 3);
+    assert.equal(h.view.goalUsd, 40); assert.equal(Object.keys(h.view.callSignatures).length, 1);
+  } finally { stopBattle(); }
+});

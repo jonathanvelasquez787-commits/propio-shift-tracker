@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createGameAudio } from '../js/game-audio.js';
 
-function harness({ resumeMode = 'running', available = true } = {}) {
+function harness({ resumeMode = 'running', available = true, delayedEnded = false } = {}) {
   const config = { masterVolume: 100, game: { enabled: true, soundEnabled: true, soundVolume: 40 } };
   const timers = new Map(), documentListeners = new Map(), hostListeners = new Map(), contexts = [];
   let timerId = 0;
@@ -27,7 +27,7 @@ function harness({ resumeMode = 'running', available = true } = {}) {
     connect(target) { this.connections.push(target); return target; }
     disconnect() { this.disconnects++; }
     start(at) { this.starts.push(at); }
-    stop(at) { this.stops.push(at); if (at === undefined) this.end(); }
+    stop(at) { this.stops.push(at); if (at === undefined && !delayedEnded) this.end(); }
     end() { if (!this.ended) { this.ended = true; this.onended?.(); } }
   }
   class AudioContext {
@@ -101,6 +101,203 @@ test('inicializar o recargar no crea contexto ni reproduce eventos anteriores', 
     await h.flush();
     assert.equal(h.sources.length, 0, 'el primer gesto no recupera celebraciones anteriores');
   }
+});
+
+const WEAPON_CUES = ['shoot-pistol', 'shoot-smg', 'shoot-shotgun', 'shoot-rocket', 'shoot-railgun', 'shoot-flame', 'shoot-too-much', 'shoot-drone', 'shoot-psr', 'shoot-wand', 'shoot-grenade'];
+
+test('las once armas tienen timbres distintos, breves y con recursos finitos', async () => {
+  const signatures = new Set();
+  for (const kind of WEAPON_CUES) {
+    const h = harness();
+    h.unlock();
+    assert.equal(h.audio.play(kind), true, kind);
+    await h.flush();
+    assert.ok(h.sources.length >= 2 && h.sources.length <= 5, kind);
+    const start = h.contexts[0].currentTime;
+    const signature = h.sources.map(source => ({
+      kind: source.kind,
+      wave: source.type,
+      frequencies: source.frequency.events,
+      starts: source.starts,
+      stops: source.stops,
+    }));
+    signatures.add(JSON.stringify(signature));
+    for (const source of h.sources) {
+      assert.ok(source.starts[0] >= start && source.stops[0] <= start + .25, kind);
+      assert.ok(source.stops[0] > source.starts[0], kind);
+      for (const event of [...source.frequency.events, ...source.connections[0].gain.events]) {
+        assert.ok(Number.isFinite(event.value) && event.value > 0, kind);
+        assert.ok(Number.isFinite(event.at), kind);
+      }
+      assert.ok(source.connections[0].gain.events.every(event => event.value <= .09), kind);
+      if (source.kind === 'noise') assert.ok(source.buffer.getChannelData(0).every(value => value >= -1 && value <= 1));
+    }
+    h.contexts[0].finishVoices();
+    assert.ok(h.sources.every(source => source.disconnects === 1 && source.connections[0].disconnects === 1), kind);
+  }
+  assert.equal(signatures.size, WEAPON_CUES.length);
+});
+
+test('la práctica agrupa ráfagas y limita repeticiones sin acumular una cola', async () => {
+  const h = harness();
+  h.unlock();
+  for (let i = 0; i < 30; i++) h.audio.play('shoot-smg');
+  assert.equal(h.timers.size, 1);
+  await h.flush();
+  assert.equal(h.sources.length, 4);
+  for (let i = 0; i < 10; i++) {
+    h.audio.play('shoot-smg');
+    await h.flush();
+  }
+  assert.equal(h.sources.length, 4, 'los disparos durante el efecto activo se descartan');
+  assert.equal(h.timers.size, 0);
+  h.contexts[0].currentTime += .3;
+  await h.flush();
+  assert.equal(h.sources.length, 4, 'el tiempo no reproduce disparos descartados');
+  h.audio.play('shoot-smg');
+  await h.flush();
+  assert.equal(h.sources.length, 8, 'un disparo nuevo vuelve a sonar al terminar el límite');
+});
+
+test('misiones y victorias prevalecen sobre práctica tanto pendiente como activa', async () => {
+  for (const kind of ['mission', 'clear']) {
+    const h = harness();
+    h.unlock();
+    h.audio.play('shoot-shotgun');
+    h.audio.play(kind);
+    h.audio.play('shoot-wand');
+    await h.flush();
+    const celebration = [...h.sources];
+    assert.equal(celebration[0].frequency.events[0].value, kind === 'mission' ? 880 : 523);
+    for (const weapon of WEAPON_CUES) h.audio.play(weapon);
+    await h.flush();
+    assert.equal(h.sources.length, celebration.length);
+    assert.ok(celebration.every(source => !source.ended));
+
+    const practice = harness();
+    practice.unlock();
+    practice.audio.play('shoot-smg');
+    await practice.flush();
+    const shots = [...practice.sources];
+    practice.audio.play(kind);
+    await practice.flush();
+    assert.ok(practice.sources.length > shots.length);
+    assert.ok(shots.every(source => source.disconnects === 1 && source.connections[0].disconnects === 1));
+  }
+});
+
+test('stop desconecta inmediatamente voces futuras aun cuando ended llegue después', async () => {
+  const h = harness({ delayedEnded: true });
+  h.unlock();
+  h.audio.play('shoot-smg');
+  await h.flush();
+  const shots = [...h.sources];
+  assert.ok(shots.some(source => source.starts[0] > h.contexts[0].currentTime + .04));
+  h.audio.play('shoot-rocket');
+  h.audio.stop();
+  assert.equal(h.timers.size, 0);
+  assert.ok(shots.every(source => source.stops.includes(undefined) && source.disconnects === 1 && source.connections[0].disconnects === 1));
+  h.audio.stop();
+  h.contexts[0].finishVoices();
+  assert.ok(shots.every(source => source.disconnects === 1 && source.connections[0].disconnects === 1));
+  await h.flush();
+  assert.equal(h.sources.length, shots.length);
+});
+
+test('silenciar o apagar gamificación cancela ráfagas futuras y práctica pendiente', async () => {
+  for (const disable of [
+    h => { h.config.masterVolume = 0; },
+    h => { h.config.game.soundVolume = 0; },
+    h => { h.config.game.soundEnabled = false; },
+    h => { h.config.game.enabled = false; },
+  ]) {
+    const h = harness({ delayedEnded: true });
+    h.unlock();
+    h.audio.play('shoot-too-much');
+    await h.flush();
+    const shots = [...h.sources];
+    h.audio.play('shoot-rocket');
+    disable(h);
+    h.audio.sync();
+    assert.equal(h.timers.size, 0);
+    assert.ok(shots.every(source => source.stops.includes(undefined) && source.disconnects === 1 && source.connections[0].disconnects === 1));
+    for (const kind of WEAPON_CUES) assert.equal(h.audio.play(kind), false);
+    h.config.masterVolume = 100;
+    Object.assign(h.config.game, { enabled: true, soundEnabled: true, soundVolume: 40 });
+    h.audio.sync();
+    await h.flush();
+    assert.equal(h.sources.length, shots.length);
+  }
+});
+
+test('los disparos respetan gesto real, gamificación apagada y volúmenes', async () => {
+  const locked = harness();
+  locked.audio.init();
+  locked.dispatch('pointerdown', { isTrusted: undefined });
+  locked.dispatch('click', { isTrusted: false });
+  for (const kind of WEAPON_CUES) assert.equal(locked.audio.play(kind), false);
+  assert.equal(locked.contexts.length, 0);
+  for (const disable of [
+    h => { h.config.masterVolume = 0; },
+    h => { h.config.game.soundVolume = 0; },
+    h => { h.config.game.soundEnabled = false; },
+    h => { h.config.game.enabled = false; },
+  ]) {
+    const h = harness();
+    disable(h);
+    h.unlock();
+    for (const kind of WEAPON_CUES) assert.equal(h.audio.play(kind), false);
+    assert.equal(h.contexts.length, 0);
+    await h.flush();
+    assert.equal(h.sources.length, 0);
+  }
+  const scaled = harness();
+  scaled.config.masterVolume = 50;
+  scaled.config.game.soundVolume = 20;
+  scaled.unlock();
+  scaled.audio.play('shoot-pistol');
+  await scaled.flush();
+  assert.equal(scaled.contexts[0].nodes[0].gain.events.at(-1).value, .1);
+});
+
+test('cambiar fecha u ocultar cancela disparos pendientes y voces futuras', async () => {
+  for (const invalidate of [
+    (h, state) => { state.day = 'yesterday'; h.audio.sync(); },
+    h => { h.doc.hidden = true; h.dispatch('visibilitychange'); },
+  ]) {
+    const pending = harness();
+    const pendingState = { day: 'today' };
+    pending.unlock();
+    pending.audio.play('shoot-rocket', { allowed: () => pendingState.day === 'today' });
+    invalidate(pending, pendingState);
+    await pending.flush();
+    assert.equal(pending.sources.length, 0);
+
+    const active = harness({ delayedEnded: true });
+    const state = { day: 'today' };
+    active.unlock();
+    active.audio.play('shoot-smg', { allowed: () => state.day === 'today' });
+    await active.flush();
+    invalidate(active, state);
+    assert.ok(active.sources.every(source => source.stops.includes(undefined) && source.disconnects === 1 && source.connections[0].disconnects === 1));
+    state.day = 'today';
+    active.doc.hidden = false;
+    active.audio.sync();
+    await active.flush();
+    assert.equal(active.sources.length, 4);
+  }
+});
+
+test('la guarda de fecha descarta disparos mientras resume espera', async () => {
+  const h = harness({ resumeMode: 'defer' });
+  let selectedDay = 'today';
+  h.unlock();
+  h.audio.play('shoot-smg', { allowed: () => selectedDay === 'today' });
+  const flushed = h.beginFlush();
+  selectedDay = 'yesterday';
+  h.contexts[0].resolvers.forEach(resolve => resolve());
+  await flushed;
+  assert.equal(h.sources.length, 0);
 });
 
 test('init es idempotente y gestos válidos reutilizan un único contexto', async () => {

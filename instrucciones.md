@@ -440,7 +440,7 @@ conservan su límite de 400. El Laboratorio QA y sus recorridos se retiraron.
 Mis premios conserva catálogo, personalización, ventanas seguras, historial,
 costos informativos e idempotencia; no existe límite semanal de presupuesto.
 
-Verificación actual: 213 pruebas, contratos/ciclos de 28 módulos, wiring y build
+Verificación actual: 232 pruebas, contratos/ciclos de 29 módulos, wiring y build
 de producción sin sourcemaps. Chrome aislado en claro/oscuro a 320, 390, 768
 y 1365 px: Inicio/Logros sin overflow, llamadas manual/live/pegado/ayer/duplicado,
 derrota, cierre, cofre idempotente, activación en ambas ubicaciones, progreso
@@ -452,7 +452,7 @@ aprobadas, cada una en claro y oscuro. Se guardan junto a los ajustes de la
 cuenta; cambiar a Original elimina únicamente las variables de la paleta.
 Idioma en Ajustes → Tu perfil; Temas y colores contiene solo apariencia.
 Español e inglés completos sin API, incluidos interfaz, avisos, ayuda y
-reportes; 2.008 textos comprobados. Cambiar idioma vuelve a la misma página,
+reportes; 2.064 textos comprobados. Cambiar idioma vuelve a la misma página,
 sin modificar llamadas, nombres personales, recibos ni progreso. Mensajes
 de juego guardados se presentan en el idioma seleccionado sin reescribirlos.
 La PWA incluye ambos idiomas y el CSS de apariencia.
@@ -491,6 +491,33 @@ Desde v586 el botón usa texto y espaciado compactos; se retiró del pie el
 mensaje obsoleto que afirmaba que todos los datos permanecían solo locales.
 Es apoyo voluntario; no condiciona funciones ni registra pagos en Finanzas.
 No hay widgets, SDK externos ni procesamiento de pagos dentro de la tool.
+
+Desde v587 la batalla aprobada aparece en Inicio: ciudad pixel art, héroe,
+monstruo existente con sus especies/fases/accesorios, vida financiera,
+controles y diez armas; indicadores reales del día y Misiones/hitos debajo.
+Pistola, Subfusil, Escopeta, Lanzacohetes, Railgun, Lanzallamas, Too Much,
+Dron, PSR B0531+21 y Varita mágica son selecciones visuales persistidas en
+settings.game.weapon; Granada es una acción de práctica. Tocar al héroe,
+Enter y los controles táctiles disparan sin cambiar llamadas, dinero, vida,
+combo, productividad ni XP. Cada tres activaciones muestra un aviso breve;
+una ráfaga cuenta como una. Los atajos numéricos actúan solo con foco dentro
+de la batalla, sin interceptar formularios de la tool.
+Manual/live/pegado usan recibos existentes y registran datos antes del
+ataque visual. Históricos, correcciones, duplicados y sellado conservan sus
+reglas. La cola agrupa importaciones grandes en hasta seis representaciones;
+editar/borrar llamadas, cambiar meta/fecha o desactivar/ocultar cancela efectos
+viejos y sonidos pendientes.
+Sonidos de once armas sintetizados, con prioridad inferior a celebraciones,
+volúmenes existentes y cancelación inmediata de voces activas/programadas.
+El componente pausa rAF fuera de vista, libera listeners/observadores y tiene
+límites de partículas. Movimiento reducido y fallback sin canvas conservan
+resultados estáticos. La PWA incluye el CSS nuevo. Inglés sigue por defecto
+y Logros desactivado para cuentas nuevas. Véase docs/heroe-y-batalla.md.
+Chrome aislado: recorridos manual/live/pegado/ayer/duplicado/editar/borrar,
+200 llamadas importadas y práctica sin cambios contables; matriz final de
+128 combinaciones ES/EN, 320/390/768/1365, ocho paletas y ambos temas sin
+overflow. 141 comprobaciones finales de layout/lifecycle y capturas correctas.
+Auth y nube usan fixtures; no certifica sincronización real en dos dispositivos.
 
 **LIMITACIONES CONOCIDAS** (alcance reducido a propósito, no son bugs)
 
@@ -564,7 +591,7 @@ La aplicación funciona en producción con estas bases vigentes:
   global, backup diario, exportación y borrado de cuenta permanecen activos.
 - Turnos, llamadas, Horario, Higher Rate, Finanzas, Reportes, Calendario,
   Adherencia y la gamificación «El Monstruo» están integrados.
-- La versión actual es 586. Refuerzo positivo, Logros y auditoría profunda
+- La versión actual es 587. Refuerzo positivo, Logros y auditoría profunda
   están terminados. Los siete fallos de la auditoría se corrigieron con
   regresiones; cobertura y límites constan en
   `docs/auditoria-profunda-2026-09-30.md`.
@@ -572,6 +599,20 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v587** — Héroe y batalla pixel art del mockup aprobado.
+
+- Ciudad, héroe, armas/práctica y monstruos existentes en Inicio; vida e
+  indicadores conectados a datos reales, Misiones/hitos debajo. Diez armas
+  guardadas con la cuenta, granada y aviso cada tres activaciones.
+- Registro de llamadas independiente de proyectiles. Recibos/XP/ganancias
+  conservados; cola visual agrupada, cancelación al cambiar fecha/desactivar,
+  pausa fuera de vista, limpieza de recursos y movimiento reducido estático.
+- Once sonidos breves, diferenciados y sintetizados; cancelación de voces
+  activas/futuras y prioridades. ES/EN, paletas y precarga PWA actualizados.
+- 232 pruebas, 2.064 textos, 29 módulos, wiring/build correctos. Chrome:
+  recorridos reales de controles con auth/nube aislados, importación de 200
+  llamadas, práctica conservando datos y 128 combinaciones visuales finales.
 
 **v586** — Idioma en Ajustes y desactivación completa de Logros.
 
@@ -599,14 +640,3 @@ La aplicación funciona en producción con estas bases vigentes:
   Chrome: 32 combinaciones de página/idioma/tema y 320, 390, 768 y 1365 px;
   sin overflow, enlace visible, destino correcto y llamadas intactas al abrirlo.
   La validación usa sesiones/destino aislados y no prueba un pago real.
-
-**v584** — Base de descubrimiento e indexación pública.
-
-- Canonical en landing y páginas legales; og:url de la landing. Robots permite
-  rastreo y declara sitemap con las tres URLs públicas; el build publica ambos.
-- /app y /app.html con noindex en HTML y cabecera, sin bloquear su rastreo
-  para que Google lea la regla. Autenticación y RLS continúan siendo el control
-  de acceso; noindex solo controla aparición en buscadores.
-- 210 pruebas, 2.004 textos ES/EN, 28 módulos, wiring y build correctos.
-  Sitemap XML, canonicals y marcado noindex verificados en artefactos de build.
-  Search Console y posiciones no verificadas; instrucciones en docs/seo.md.

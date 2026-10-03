@@ -1,6 +1,7 @@
 import { ui, translateText, translateStoredText, translateMarkup, displayLocale } from './i18n.js';
 import { calls, settings, state } from './app-context.js';
-import { initGameAudio, playGameSound, syncGameAudio } from './game-audio.js';
+import { initGameAudio, playGameSound, syncGameAudio, stopGameSounds } from './game-audio.js';
+import { battleMarkup, syncBattle, playBattleCall, stopBattle, normalizeBattleWeapon } from './game-battle.js';
 import { financeIsRowPagado } from './finance.js';
 import { activeWorkSinceLastCall, monetaryMilestones, supportiveDayEvidence, surpriseDecision } from './reinforcement-rules.js';
 import { chooseCallFeedback, configureReinforcementFeedback, notifyReinforcement, reinforcementText } from './reinforcement-feedback.js';
@@ -327,6 +328,7 @@ function ensureGameSettings() {
   if (!settings.game || typeof settings.game !== 'object' || Array.isArray(settings.game)) settings.game = {};
   if (typeof settings.game.enabled !== 'boolean') settings.game.enabled = false;
   settings.game.intensity = 'arcade';
+  settings.game.weapon = normalizeBattleWeapon(settings.game.weapon);
   if (typeof settings.game.soundEnabled !== 'boolean') settings.game.soundEnabled = true;
   if (!settings.game.enabled) settings.game.soundEnabled = false;
   const soundVolume = Number(settings.game.soundVolume);
@@ -672,6 +674,7 @@ function renderArena() {
   root.hidden = !active;
   classic.style.display = '';
   if (!active) {
+    stopBattle();
     lastArenaRenderKey = '';
     root.className = 'game-arena';
     root.removeAttribute('data-game-state');
@@ -687,14 +690,17 @@ function renderArena() {
   const displayName = customName || translateText(day.species.name);
   const shadow = yesterdayShadowPct(dayKey);
   const damage = Math.max(0, day.goal.usd - day.stats.earnings);
-  const renderKey = [dayKey, monsterState, monsterPhase, variant, displayName, day.combo, day.stats.earnings.toFixed(2), Math.round(day.hpPct * 10), Math.round((shadow ?? -1) * 10), day.missions.map((mission) => mission.ok ? 1 : 0).join(''), Object.values(state.game.equipment || {}).join('|')].join(':');
+  const dayCalls = callsForDay(dayKey);
+  const completedCalls = dayCalls.filter((call) => String(call.dropped).toLowerCase() !== 'yes' && new Date(call.endISO).getTime() <= Date.now()).length;
+  const callSignatures = Object.fromEntries(dayCalls.map((call) => [String(call.id), JSON.stringify([call.pay, higherRateBonusAmount(call), call.durationMin, call.startISO, call.endISO, call.billable, call.dropped])]));
+  const renderKey = [dayKey, monsterState, monsterPhase, variant, displayName, day.combo, day.stats.earnings.toFixed(2), Math.round(day.hpPct * 10), Math.round((shadow ?? -1) * 10), day.missions.map((mission) => mission.ok ? 1 : 0).join(''), Object.values(state.game.equipment || {}).join('|'), completedCalls, day.xp, settings.game.weapon, settings.currencyLabel, settings.exchangeRate, displayLocale(), day.goal.usd, JSON.stringify(callSignatures)].join(':');
   if (renderKey === lastArenaRenderKey) return;
   lastArenaRenderKey = renderKey;
   const impactClasses = root.dataset.gameDayKey === dayKey
     ? ['is-hit', 'is-critical-hit'].filter((name) => root.classList.contains(name)) : [];
   const previousHp = root.dataset.gameDayKey === dayKey ? Number(root.dataset.gameHp) : day.hpPct;
   if (root.dataset.gameDayKey && root.dataset.gameDayKey !== dayKey) delete root.dataset.gameEvent;
-  root.className = `game-arena game-arena--arcade game-${escapeHtml(monsterState)}`;
+  root.className = `game-arena game-arena--arcade game-arena--battle game-${escapeHtml(monsterState)}`;
   root.classList.add(...impactClasses);
   root.dataset.gameState = monsterState;
   root.dataset.gameDayKey = dayKey;
@@ -706,22 +712,41 @@ function renderArena() {
   const monsterImageLabel = ui`${displayName}${customName ? `, ${translateText(day.species.name)}` : ''}, ${PHASE_LABELS[monsterPhase] || monsterPhase}, ${Math.round(day.hpPct)}% de vida`;
   const sprite = monsterSvg({ species: day.species.id, state: monsterState, variant, hpPct: day.hpPct, sizeClass: 'lg', equipment: state.game.equipment })
     .replace(/ role="img" aria-label="[^"]*"/, ' aria-hidden="true"');
-  root.innerHTML = ui`
-    <div class="game-arena-copy">
+  if (!root.querySelector('.game-battle')) {
+    stopBattle();
+    root.innerHTML = `<div data-battle-summary></div>${battleMarkup()}<div data-battle-stats></div><div class="game-pixel-arena-hint" data-battle-mission-hint></div>`;
+  }
+  root.querySelector('[data-battle-summary]').innerHTML = ui`
       <div class="game-kicker">MONSTRUO DEL DÍA · ${escapeHtml(formatCallDayLabel(dayKey))}</div>
-      <div class="game-arena-title-row"><h3>${escapeHtml(displayName)}</h3><span class="game-combo-badge">x${day.combo || 0}</span></div>
-      <div class="game-phase-meter" data-phase="${escapeHtml(monsterPhase)}" role="status" aria-label="Fase del monstruo: ${escapeHtml(PHASE_LABELS[monsterPhase] || monsterPhase)}"><span>${escapeHtml(PHASE_LABELS[monsterPhase] || monsterPhase)}</span><small>Las ganancias y la vida financiera no cambian por la fase.</small></div>
-      <p class="game-monster-phrase">“${escapeHtml(translateText(day.species.phrase))}”</p>
+      <div class="game-arena-title-row"><h3>${escapeHtml(displayName)}</h3><div class="game-battle-badges"><span class="game-combo-badge" title="Llamadas consecutivas del turno; se reinicia al tomar una pausa.">x${day.combo || 0}</span><span class="game-phase-meter" data-phase="${escapeHtml(monsterPhase)}" role="status" aria-label="Fase del monstruo: ${escapeHtml(PHASE_LABELS[monsterPhase] || monsterPhase)}" title="Las ganancias y la vida financiera no cambian por la fase.">${escapeHtml(PHASE_LABELS[monsterPhase] || monsterPhase)}</span></div></div>
+      <p class="game-monster-phrase">“${escapeHtml(translateText(day.species.phrase))}”</p>`;
+  root.querySelector('[data-battle-health-slot]').innerHTML = ui`
       <div class="game-hp-label"><span>VIDA</span><strong>${Math.round(day.hpPct)}%</strong></div>
       <div class="game-hp-track" role="progressbar" aria-label="Vida del monstruo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(day.hpPct)}">
         <div class="game-hp-damage-trail" style="width:${day.hpPct}%" aria-hidden="true"></div>
         <div class="game-hp-fill" style="width:${day.hpPct}%"></div>
         ${shadow === null ? '' : ui`<span class="game-shadow-marker" style="left:${shadow}%" title="Ayer a esta hora: ${Math.round(shadow)}% de la meta"></span>`}
       </div>
-      <div class="game-hp-foot"><span>${withConversion(damage)} de vida restante</span><span>${day.defeated ? translateText('Botín extra: las ganancias siguen, el XP no') : ui`${withConversion(day.stats.earnings)} de daño`}</span></div>
-    </div>
-    <div class="game-monster-stage" role="img" aria-label="${escapeHtml(monsterImageLabel)}">${sprite}</div>
-    <div class="game-pixel-arena-hint">${gamePixelIcon('shield')}<span>${day.defeated ? translateText('Meta alcanzada. Las ganancias extra siguen contando.') : ui`${day.missions.filter((mission) => mission.applies !== false && !mission.ok).length} armaduras pendientes · completa tus misiones del día.`}</span></div>`;
+      <div class="game-hp-foot"><span>${withConversion(damage)} de vida restante</span><span>${day.defeated ? translateText('Botín extra: las ganancias siguen, el XP no') : ui`${withConversion(day.stats.earnings)} de daño`}</span></div>`;
+  root.querySelector('[data-battle-stats]').innerHTML = ui`
+    <div><span>Ganancias del día</span><strong>${withConversion(day.stats.earnings)}</strong></div>
+    <div><span>Llamadas completadas</span><strong>${completedCalls}</strong></div>
+    <div title="El XP del día viene de tus llamadas y misiones. Se incorpora al nivel al cerrar el turno."><span>XP del día</span><strong>${day.xp} XP</strong></div>`;
+  root.querySelector('[data-battle-mission-hint]').innerHTML = `${gamePixelIcon('shield')}<span>${day.defeated ? translateText('Meta alcanzada. Las ganancias extra siguen contando.') : ui`${day.missions.filter((mission) => mission.applies !== false && !mission.ok).length} armaduras pendientes · completa tus misiones del día.`}</span>`;
+  syncBattle(root, { dayKey, enabled: active, weapon: settings.game.weapon, callSignatures, goalUsd: day.goal.usd, monsterMarkup: sprite, monsterLabel: translateText('MONSTRUO DEL DÍA'), monsterDescription: monsterImageLabel, monsterName: displayName, heroLabel: translateText('Centinela'), defeated: day.defeated, hpPct: day.hpPct }, {
+    onWeaponChange: (weapon) => {
+      settings.game.weapon = normalizeBattleWeapon(weapon);
+      saveSettingsOnly();
+    },
+    onSound: (kind) => {
+      if (kind === 'practice-hit') return;
+      playGameSound(kind, { allowed: () => {
+        const bounds = root.querySelector('.game-battle')?.getBoundingClientRect();
+        return gameEnabled() && dayKey === displayedGameDayKey() && !root.hidden && !!root.getClientRects().length && !!bounds && bounds.bottom > 0 && bounds.top < window.innerHeight;
+      } });
+    },
+    onPause: stopGameSounds,
+  });
 }
 
 function renderMissions() {
@@ -1301,6 +1326,7 @@ function syncFinanceRewards() {
 }
 
 function clearTransientGameUi() {
+  stopBattle();
   callFxVersion += 1;
   const arena = document.getElementById('gameArena');
   arena?.classList.remove('is-hit', 'is-critical-hit');
@@ -1494,14 +1520,16 @@ let callFxVersion = 0;
 
 function showCallFx(call, xp, critical, mode = 'xp') {
   const root = document.getElementById('gameCallFx');
-  if (!root) return;
+  if (!root) return false;
   const version = ++callFxVersion;
+  const amount = parseMoney(call.pay) + higherRateBonusAmount(call);
+  const dayKey = callDateKeyFromValue(call.shiftDayKey) || callDateKeyFromValue(call.callDate) || currentGameDayKey();
+  const battlePlayed = dayKey === currentGameDayKey() && dayKey === displayedGameDayKey() && playBattleCall({ dayKey, amountText: ui`−${money(amount)} ${convertedAmountText(amount)}`.trim(), xp, critical });
   if (!arcadeEnabled() || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
     root.innerHTML = '';
     document.querySelectorAll('.game-live-xp-float').forEach((node) => node.remove());
-    return;
+    return battlePlayed;
   }
-  const amount = parseMoney(call.pay) + higherRateBonusAmount(call);
   const message = mode === 'recorded'
     ? ui`LLAMADA REGISTRADA · ${withConversion(amount)} · sin XP por esta llamada`
     : mode === 'extra'
@@ -1523,7 +1551,7 @@ function showCallFx(call, xp, critical, mode = 'xp') {
     arena.classList.remove('is-hit', 'is-critical-hit');
     void arena.offsetWidth;
     arena.classList.add(critical ? 'is-critical-hit' : 'is-hit');
-    pixelBurst(arena, critical ? 'critical' : 'hit', `−${money(amount)}`);
+    if (!battlePlayed) pixelBurst(arena, critical ? 'critical' : 'hit', `−${money(amount)}`);
   }
   setTimeout(() => {
     liveFx?.remove();
@@ -1531,6 +1559,7 @@ function showCallFx(call, xp, critical, mode = 'xp') {
     root.innerHTML = '';
     arena?.classList.remove('is-hit', 'is-critical-hit');
   }, 2100);
+  return battlePlayed;
 }
 
 function nextUnownedAccessory(seed) {
@@ -1907,8 +1936,8 @@ export function onGameCallSaved(call, source = 'manual', options = {}) {
     if (firstVisualEvent) {
       saveStateOnly();
       renderGame();
-      showCallFx(call, 0, higherRateBonusAmount(call) > 0, 'recorded');
-      playGameTone('hit', dayKey);
+      const battlePlayed = showCallFx(call, 0, higherRateBonusAmount(call) > 0, 'recorded');
+      if (!battlePlayed) playGameTone('hit', dayKey);
     }
     return;
   }
@@ -1927,9 +1956,9 @@ export function onGameCallSaved(call, source = 'manual', options = {}) {
   if (currentDay.defeated && xpLocked) {
     saveStateOnly();
     renderGame();
-    if (firstVisualEvent) showCallFx(call, 0, critical, 'extra');
+    const battlePlayed = firstVisualEvent && showCallFx(call, 0, critical, 'extra');
     maybeShowRecord(call);
-    playGameTone(critical ? 'critical' : 'hit', dayKey);
+    if (!battlePlayed) playGameTone(critical ? 'critical' : 'hit', dayKey);
     return;
   }
 
@@ -1967,12 +1996,12 @@ export function onGameCallSaved(call, source = 'manual', options = {}) {
   saveStateOnly();
   renderGame();
 
-  if (firstVisualEvent) showCallFx(call, grantedXp, critical);
+  const battlePlayed = firstVisualEvent && showCallFx(call, grantedXp, critical);
   maybeShowRecord(call);
   if (defeatedNow) {
     triggerGameEvent('gameArena', 'clear', 1000);
     playGameTone('clear', dayKey);
-  } else {
+  } else if (!battlePlayed) {
     playGameTone(critical ? 'critical' : 'hit', dayKey);
   }
 }

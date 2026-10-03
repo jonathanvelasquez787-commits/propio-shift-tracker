@@ -1,6 +1,7 @@
 import { ui, translateText, translateMarkup, displayLocale, translateDocument } from './i18n.js';
 import { applyAppearance, wireAppearance } from './appearance.js';
 import { wireAchievementHelp } from './help-tooltips.js';
+import { normalizeBattleWeapon } from './game-battle.js';
 // Cuerpo principal de la app (Inicio, Horario, Llamadas, Higher Rate, Finanzas, Reportes,
 // Calendario, Ajustes...). Vive como módulo ES aparte para no ser parte del documento HTML: lo
 // carga js/boot.js con un import() dinámico recién cuando la sesión y los datos están listos
@@ -999,6 +1000,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
       if (!settings.game || typeof settings.game !== 'object' || Array.isArray(settings.game)) settings.game = { ...fallback.game };
       if (typeof settings.game.enabled !== 'boolean') settings.game.enabled = fallback.game.enabled;
       settings.game.intensity = 'arcade';
+      settings.game.weapon = normalizeBattleWeapon(settings.game.weapon);
       if (typeof settings.game.soundEnabled !== 'boolean') settings.game.soundEnabled = true;
       const gameSoundVolume = Number(settings.game.soundVolume);
       settings.game.soundVolume = Number.isFinite(gameSoundVolume) ? Math.max(0, Math.min(100, gameSoundVolume)) : 40;

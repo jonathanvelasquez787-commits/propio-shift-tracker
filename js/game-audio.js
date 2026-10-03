@@ -3,6 +3,17 @@ import { settings } from './app-context.js';
 const note = (frequency, at, duration, gain = .14, wave = 'square', slide = 0) => ({ frequency, at, duration, gain, wave, slide });
 const melody = (frequencies, step = .09, wave = 'square') => frequencies.map((frequency, index) => note(frequency, index * step, step * .85, .12, wave));
 const CUES = Object.freeze({
+  'shoot-pistol': { priority: .5, notes: [note(920, 0, .035, .075, 'square', 190), note(145, .012, .055, .055, 'triangle')], noise: .025 },
+  'shoot-smg': { priority: .5, notes: [0, .035, .07].map(at => note(710, at, .022, .055, 'square', 230)), noise: .018 },
+  'shoot-shotgun': { priority: .5, notes: [note(165, 0, .11, .09, 'sawtooth', 48), note(340, .008, .055, .045, 'square', 90)], noise: .075 },
+  'shoot-rocket': { priority: .5, notes: [note(95, 0, .2, .085, 'sawtooth', 38), note(280, .025, .15, .045, 'triangle', 65)], noise: .12 },
+  'shoot-railgun': { priority: .5, notes: [note(2400, 0, .13, .055, 'sine', 350), note(1200, .015, .11, .04, 'triangle', 175)] },
+  'shoot-flame': { priority: .5, notes: [note(130, 0, .18, .045, 'sawtooth', 240), note(210, .06, .13, .035, 'sawtooth', 100)], noise: .19, noiseGain: .03 },
+  'shoot-too-much': { priority: .5, notes: [480, 240, 720, 120].map((frequency, index) => note(frequency, index * .045, .035, .055, 'square', frequency / 2)), noise: .035 },
+  'shoot-drone': { priority: .5, notes: [note(420, 0, .075, .05, 'sine', 620), note(840, .065, .08, .045, 'sine', 1240)] },
+  'shoot-psr': { priority: .5, notes: [note(1700, 0, .045, .06, 'square', 280), note(260, .02, .12, .06, 'triangle', 65)], noise: .02 },
+  'shoot-wand': { priority: .5, notes: [note(660, 0, .075, .055, 'sine', 1320), note(990, .065, .095, .045, 'triangle', 1980)] },
+  'shoot-grenade': { priority: .5, notes: [note(390, 0, .07, .045, 'triangle', 90), note(85, .07, .11, .085, 'sine', 35)], noise: .065 },
   hit: { priority: 1, notes: [note(660, 0, .07, .16, 'square', 165), note(220, .02, .09, .13, 'triangle')], noise: .045 },
   critical: { priority: 3, notes: [note(1047, 0, .12, .13, 'triangle', 523), ...melody([1047, 1319, 1568], .055)], noise: .035 },
   equip: { priority: 2, notes: melody([392, 784], .065, 'triangle') },
@@ -27,20 +38,24 @@ export function createGameAudio({ readSettings, host = globalThis, doc = host.do
   let context = null, output = null, initialized = false, unlocked = false;
   let pending = null, timer = null, generation = 0, activePriority = 0, activeUntil = 0;
   let activeAllowed = () => true;
-  const voices = new Set();
+  const voices = new Map();
   const volume = () => {
     const config = readSettings?.() || {};
     return config.game?.enabled === true && config.game?.soundEnabled !== false && !doc?.hidden
       ? fraction(config.masterVolume, 100) * fraction(config.game?.soundVolume, 40) : 0;
   };
+  function stopVoices() {
+    for (const [voice, cleanup] of [...voices]) {
+      try { voice.stop(); } catch {}
+      cleanup();
+    }
+  }
   function stop() {
     generation++;
     if (timer != null) host.clearTimeout(timer);
     timer = null;
     pending = null;
-    for (const voice of voices) {
-      try { voice.stop(); } catch {}
-    }
+    stopVoices();
     activePriority = 0;
     activeUntil = 0;
     activeAllowed = () => true;
@@ -51,7 +66,7 @@ export function createGameAudio({ readSettings, host = globalThis, doc = host.do
     if (output && context) output.gain.setTargetAtTime(gain, context.currentTime, .012);
   }
   function unlock(event) {
-    if (event?.isTrusted === false || doc?.hidden) return;
+    if (event?.isTrusted !== true || doc?.hidden) return;
     if (event?.type === 'keydown' && (event.ctrlKey || event.metaKey || event.altKey)) return;
     if (!volume()) return;
     try {
@@ -83,18 +98,26 @@ export function createGameAudio({ readSettings, host = globalThis, doc = host.do
     envelope.gain.exponentialRampToValueAtTime(level, at + .004);
     envelope.gain.exponentialRampToValueAtTime(.0001, at + duration);
     source.connect(envelope).connect(output);
-    voices.add(source);
-    source.onended = () => { voices.delete(source); source.disconnect(); envelope.disconnect(); };
+    let disconnected = false;
+    const cleanup = () => {
+      if (disconnected) return;
+      disconnected = true;
+      voices.delete(source);
+      source.disconnect();
+      envelope.disconnect();
+    };
+    voices.set(source, cleanup);
+    source.onended = cleanup;
     source.start(at);
     source.stop(at + duration + .01);
   }
   function synthesize(cue, allowed) {
-    for (const voice of voices) { try { voice.stop(); } catch {} }
+    stopVoices();
     activeAllowed = allowed;
     sync();
     const start = context.currentTime + .008;
     activePriority = cue.priority;
-    activeUntil = start + Math.max(...cue.notes.map(n => n.at + n.duration)) + .08;
+    activeUntil = start + Math.max(cue.noise || 0, ...cue.notes.map(n => n.at + n.duration)) + .08;
     for (const n of cue.notes) {
       const oscillator = context.createOscillator();
       oscillator.type = n.wave;
@@ -109,7 +132,7 @@ export function createGameAudio({ readSettings, host = globalThis, doc = host.do
       for (let index = 0; index < channel.length; index++) channel[index] = Math.random() * 2 - 1;
       const source = context.createBufferSource();
       source.buffer = buffer;
-      connectVoice(source, context.createGain(), start, duration, .045);
+      connectVoice(source, context.createGain(), start, duration, cue.noiseGain ?? .045);
     }
   }
   async function flush() {

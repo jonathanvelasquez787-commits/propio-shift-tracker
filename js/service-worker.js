@@ -14,6 +14,7 @@ const SHELL = [
   '/css/app-shell.css',
   `/css/app-core.css?v=${BUILD_VERSION}`,
   '/css/game.css',
+  '/css/game-battle.css',
   '/css/appearance.css',
   `/assets/theme-init.js?v=${BUILD_VERSION}`,
   `/assets/theme-toggle.js?v=${BUILD_VERSION}`,
