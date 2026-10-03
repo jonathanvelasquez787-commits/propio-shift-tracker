@@ -317,6 +317,18 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
+Visibilidad en Google: base técnica publicada desde v584. Falta verificar la
+propiedad real en Search Console y enviar sitemap/inspeccionar la landing;
+requiere la cuenta de Google del propietario y su método/código de verificación.
+No se conoce el estado real de indexación ni se prometen posiciones. Las URLs
+por idioma y nuevas guías públicas son mejoras posteriores, no implementadas.
+Ver docs/seo.md.
+
+Botón de apoyo al final de la tool: el usuario aún compara proveedores y no
+entregó un enlace propio. Falta elegir la plataforma y recibir su URL real;
+no crear una cuenta ni publicar un destino de cobro ficticio. Usar el estilo de
+botones existente, texto ES/EN y aporte voluntario sin condicionar funciones.
+
 La auditoría profunda de v576 quedó cerrada: 31 días simulados, 108 llamadas,
 ambos recorridos QA y siete fallos reparados de persistencia, sincronización,
 Finanzas y exportaciones. No quedan fallos reproducidos pendientes de esa
@@ -547,7 +559,7 @@ La aplicación funciona en producción con estas bases vigentes:
   global, backup diario, exportación y borrado de cuenta permanecen activos.
 - Turnos, llamadas, Horario, Higher Rate, Finanzas, Reportes, Calendario,
   Adherencia y la gamificación «El Monstruo» están integrados.
-- La versión actual es 583. Refuerzo positivo, Logros y auditoría profunda
+- La versión actual es 584. Refuerzo positivo, Logros y auditoría profunda
   están terminados. Los siete fallos de la auditoría se corrigieron con
   regresiones; cobertura y límites constan en
   `docs/auditoria-profunda-2026-09-30.md`.
@@ -555,6 +567,17 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v584** — Base de descubrimiento e indexación pública.
+
+- Canonical en landing y páginas legales; og:url de la landing. Robots permite
+  rastreo y declara sitemap con las tres URLs públicas; el build publica ambos.
+- /app y /app.html con noindex en HTML y cabecera, sin bloquear su rastreo
+  para que Google lea la regla. Autenticación y RLS continúan siendo el control
+  de acceso; noindex solo controla aparición en buscadores.
+- 210 pruebas, 2.004 textos ES/EN, 28 módulos, wiring y build correctos.
+  Sitemap XML, canonicals y marcado noindex verificados en artefactos de build.
+  Search Console y posiciones no verificadas; instrucciones en docs/seo.md.
 
 **v583** — Idioma junto al tema en la barra superior.
 
@@ -583,19 +606,3 @@ La aplicación funciona en producción con estas bases vigentes:
   recarga, hidratación controlada, cuenta nueva EN/Logros apagado y arranque
   desde el HTML compacto verificados. Shell/vista/CSS recuperados sin conexión
   desde la caché real de la PWA. Nube/autenticación aisladas de cuentas reales.
-
-**v581** — Sonidos arcade para Logros.
-
-- 14 efectos Web Audio con melodías, impactos y capas breves para llamadas,
-  Higher Rate, armaduras, combos, fases, premios, equipo, cofres, derrota,
-  jefe del ciclo, nivel y cierre. Audio local, sin archivos externos.
-- «Sonidos arcade» en el menú; volumen propio y botón de prueba en Logros →
-  Gamificación. 40% inicial, combinado con el volumen maestro; preferencias
-  persistentes y textos nuevos en español/inglés.
-- Un solo contexto desbloqueado por gesto. Cada lote conserva el evento de
-  mayor prioridad; ocultar, silenciar o cambiar fecha cancela los pendientes.
-  Recargas, llamadas repetidas, históricos y reapertura de STAGE CLEAR no
-  repiten fanfarrias. Cofres y premios conservan sus recibos idempotentes.
-- 195 pruebas, 27 módulos, wiring y build correctos. Chrome ES/EN en claro y
-  oscuro a 320–1365 px; controles, volumen, llamadas, victoria, cierre/cofre
-  y movimiento reducido. Los 14 efectos renderizados sin saturación.

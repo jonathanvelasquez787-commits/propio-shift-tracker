@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://propio-shift-tracker.vercel.app/sitemap.xml

@@ -77,6 +77,9 @@ await minifyFile(path.join(out, 'sw.js'), worker);
 await cp(path.join(root, 'css'), path.join(out, 'css'), { recursive: true });
 await cp(path.join(root, 'manifest.webmanifest'), path.join(out, 'manifest.webmanifest'));
 await cp(path.join(root, 'icons/app-icon.svg'), path.join(out, 'icons/app-icon.svg'));
+for (const name of ['robots.txt', 'sitemap.xml']) {
+  await cp(path.join(root, name), path.join(out, name));
+}
 
 for (const name of ['index.html', 'app.html', 'privacidad.html', 'terminos.html']) {
   let html = await readFile(path.join(root, name), 'utf8');
