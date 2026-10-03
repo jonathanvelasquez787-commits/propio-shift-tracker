@@ -443,7 +443,7 @@ Selector lateral «Temas y colores»: Original claro/oscuro y siete paletas
 aprobadas, cada una en claro y oscuro. Se guardan junto a los ajustes de la
 cuenta; cambiar a Original elimina únicamente las variables de la paleta.
 Español e inglés completos sin API, incluidos interfaz, avisos, ayuda y
-reportes; 2.002 textos comprobados. Cambiar idioma vuelve a la misma página,
+reportes; 2.004 textos comprobados. Cambiar idioma vuelve a la misma página,
 sin modificar llamadas, nombres personales, recibos ni progreso. Mensajes
 de juego guardados se presentan en el idioma seleccionado sin reescribirlos.
 La PWA incluye ambos idiomas y el CSS de apariencia.
@@ -459,8 +459,8 @@ pintar, persistencia tras recarga, idioma y regreso a Logros. No certifica
 una sesión real en dos dispositivos ni una cuenta Locize activa.
 
 Desde v582 el idioma inicial es English cuando no hay preferencia válida;
-Español elegido anteriormente se conserva. Selector English/Español en la
-cabecera del panel de login: cambia en vivo sin borrar campos ni cambiar la
+Español elegido anteriormente se conserva. Desde v583, botón EN/ES en la
+barra superior junto al modo claro/oscuro: cambia en vivo sin borrar campos ni cambiar la
 vista activa de entrada, registro o recuperación. Preferencia pública y selección
 pendiente viven fuera del snapshot de cuenta; la selección explícita se aplica
 solo a language después de hidratar y conserva la base de sincronización.
@@ -547,7 +547,7 @@ La aplicación funciona en producción con estas bases vigentes:
   global, backup diario, exportación y borrado de cuenta permanecen activos.
 - Turnos, llamadas, Horario, Higher Rate, Finanzas, Reportes, Calendario,
   Adherencia y la gamificación «El Monstruo» están integrados.
-- La versión actual es 581. Refuerzo positivo, Logros y auditoría profunda
+- La versión actual es 583. Refuerzo positivo, Logros y auditoría profunda
   están terminados. Los siete fallos de la auditoría se corrigieron con
   regresiones; cobertura y límites constan en
   `docs/auditoria-profunda-2026-09-30.md`.
@@ -556,6 +556,18 @@ La aplicación funciona en producción con estas bases vigentes:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v583** — Idioma junto al tema en la barra superior.
+
+- Botón circular EN/ES con el mismo estilo del control claro/oscuro, antes
+  de Entrar. Retirados el selector nativo del panel y sus estilos sin uso.
+- Cambio con ratón, Enter o espacio, nombre accesible traducido y
+  persistencia. Campos del login y preferencia pendiente se conservan.
+- Barra compacta en celular, tanto con Entrar como con Abrir la app.
+  Chrome: 32 combinaciones de 320, 390, 768 y 1365 px, ES/EN, claro/oscuro
+  y sesión simulada/no iniciada, sin overflow ni controles recortados.
+- 210 pruebas, 2.004 textos ES/EN, 28 módulos, wiring y build correctos.
+  Recarga y campos intactos comprobados; autenticación aislada de cuentas reales.
+
 **v582** — Inglés inicial, selector en login y HTML publicado compacto.
 
 - EN por defecto; ES explícito se conserva. Selector junto a Entrar, con
@@ -563,7 +575,7 @@ La aplicación funciona en producción con estas bases vigentes:
 - Selección antes del login separada de datos de cuenta, aplicada después de
   nube/reset sin perder llamadas, ajustes o base de sincronización. Idioma
   alineado tras hidratación y recarga; Logros nuevo continúa apagado.
-- HTML de producción reducido de unas 10.500 líneas a 25 y ~1,8 KB. Vista
+- HTML de producción reducido de unas 10.500 líneas a 25 y ~2,1 KB. Vista
   externa minificada, CSS externo en el mismo orden y ambos en la PWA.
   Fuente editable intacta; el código público continúa inspeccionable.
 - 210 pruebas, 28 módulos, wiring y build correctos. Chrome ES/EN en claro
@@ -587,18 +599,3 @@ La aplicación funciona en producción con estas bases vigentes:
 - 195 pruebas, 27 módulos, wiring y build correctos. Chrome ES/EN en claro y
   oscuro a 320–1365 px; controles, volumen, llamadas, victoria, cierre/cofre
   y movimiento reducido. Los 14 efectos renderizados sin saturación.
-
-**v580** — Temas, español/inglés y Logros compactos.
-
-- Original claro/oscuro más siete paletas aprobadas con nombres, muestras,
-  teclado y persistencia; selector lateral junto a activación de Logros.
-- 1.989 textos ES/EN offline y en PWA. Validación bloquea inglés faltante,
-  variables rotas o HTML añadido; integración Locize lista sin credenciales.
-  Las notas y nombres personales permanecen intactos.
-- Logros ordenado por progreso, temporada, victoria/récords, equipo,
-  colecciones, historial y preferencias. Tooltips accesibles, tarjetas sin
-  huecos de columnas desiguales; 16 premios sugeridos en lista con editor.
-- 179 pruebas, 26 módulos, wiring y build correctos. Chrome ES/EN a
-  320–1365 px, todas las paletas, controles, importación histórica, derrotas,
-  cofre y movimiento reducido. Build real con sesión/nube controladas,
-  preferencias tras recarga y cambio de idioma sin perder llamadas.

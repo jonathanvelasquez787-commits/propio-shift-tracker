@@ -1221,8 +1221,7 @@
   "s_19f0b05e": {
     "source": "Español",
     "files": [
-      "app.html",
-      "index.html"
+      "app.html"
     ]
   },
   "s_1a02da56": {
@@ -1342,8 +1341,7 @@
   "s_1b9ae0bb": {
     "source": "English",
     "files": [
-      "app.html",
-      "index.html"
+      "app.html"
     ]
   },
   "s_1bd9f03f": {
@@ -1550,6 +1548,12 @@
     "source": "Por encontrar",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_20cc144a": {
+    "source": "EN",
+    "files": [
+      "index.html"
     ]
   },
   "s_20dd05b7": {
@@ -2471,8 +2475,7 @@
   "s_34f7bda2": {
     "source": "Idioma de la tool",
     "files": [
-      "app.html",
-      "index.html"
+      "app.html"
     ]
   },
   "s_35249ea0": {
@@ -11726,6 +11729,12 @@
     "source": "{{v0}} Hoy: objetivos y progreso",
     "files": [
       "js/reports.js"
+    ]
+  },
+  "s_f573b8d0": {
+    "source": "Cambiar a español",
+    "files": [
+      "index.html"
     ]
   },
   "s_f5792ea2": {

@@ -64,6 +64,13 @@ syncButtons(current);
 function syncLanguage(value) {
   setLanguage(value, { documentTranslation: true });
   document.querySelectorAll('[data-language-select]').forEach(select => { select.value = currentLanguage(); });
+  document.querySelectorAll('[data-language-toggle]').forEach(button => {
+    button.dataset.language = currentLanguage();
+    button.querySelector('[data-language-label]').textContent = currentLanguage().toUpperCase();
+    const action = translateText(currentLanguage() === 'en' ? 'Cambiar a español' : 'Cambiar a inglés');
+    button.setAttribute('aria-label', action);
+    button.title = action;
+  });
   syncButtons(readTheme());
 }
 
@@ -76,6 +83,13 @@ document.addEventListener('change', event => {
 });
 
 document.addEventListener('click', (e) => {
+  const languageButton = e.target instanceof Element ? e.target.closest('[data-language-toggle]') : null;
+  if (languageButton) {
+    const language = saveLanguagePreference(currentLanguage() === 'en' ? 'es' : 'en', { pendingLogin: true });
+    syncLanguage(language);
+    window.dispatchEvent(new CustomEvent('propio-language-change', { detail: language }));
+    return;
+  }
   const btn = e.target instanceof Element ? e.target.closest('[data-theme-toggle]') : null;
   if (!btn) return;
   const next = readTheme() === 'dark' ? 'light' : 'dark';

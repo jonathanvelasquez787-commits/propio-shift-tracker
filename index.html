@@ -35,6 +35,7 @@
         <svg class="ic-svg ic-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z"/></svg>
         <svg class="ic-svg ic-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.4M12 19.6V22M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2 12h2.4M19.6 12H22M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7"/></svg>
       </button>
+      <button class="theme-toggle language-toggle" id="headerLanguageBtn" type="button" data-language-toggle aria-label="Cambiar a español" title="Cambiar a español"><span data-language-label data-user-content>EN</span></button>
       <a class="header-cta" id="topEnterBtn" href="#entrar">Entrar</a>
     </nav>
   </div>
@@ -83,13 +84,7 @@
     <!-- ===== Panel de entrada ===== -->
     <div class="auth-card reveal" style="--delay:120ms">
       <div class="auth-head">
-        <div class="auth-heading-row">
-          <h2 id="authTitle">Entrar</h2>
-          <select class="login-language-select" id="loginLanguage" data-language-select aria-label="Idioma de la tool">
-            <option value="en" lang="en">English</option>
-            <option value="es" lang="es">Español</option>
-          </select>
-        </div>
+        <h2 id="authTitle">Entrar</h2>
         <p id="authSub">Usa tu correo o tu nombre de usuario.</p>
       </div>
 

@@ -1,7 +1,7 @@
 # Idiomas y temas
 
 La tool comienza en **English** cuando no existe una preferencia válida. El
-selector junto al título del login cambia entre English y Español al instante,
+botón EN/ES de la barra superior, junto al modo claro/oscuro, cambia de idioma al instante,
 sin borrar campos ni cambiar entre registro, recuperación y entrada. La elección
 se conserva al recargar y se aplica después de hidratar la cuenta, sin sustituir
 llamadas, horarios ni otras preferencias. Un idioma previamente elegido sigue
