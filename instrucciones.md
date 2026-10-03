@@ -419,18 +419,19 @@ estricta para futuras sesiones.
    El reemplazo provisional/oficial migra el recibo. Pruebas con azar fijo.
 6. Cierre: el modal existente incluye hasta tres evidencias reales y una
    proyección de racha solo si corresponde, condicionada a cumplir mañana.
-   Si hay menos evidencia, no se inventan frases. El refuerzo personal solo
-   muestra su cierre amable cuando el juego está apagado. No hay cierres
+   Si hay menos evidencia, no se inventan frases. Apagar Logros suspende
+   también los cierres y premios del refuerzo personal. No hay cierres
    automáticos duplicados y el premio físico espera a cerrar el resumen.
    Los importes del resumen usan la moneda secundaria vigente al consultarlo.
    El cierre nocturno conserva la proyección del día contable; las correcciones
    históricas no proyectan rachas nuevas. Cerrar siete días, restaurar backup
    y reabrir el turno conserva y revoca correctamente XP/escudo/metadatos.
 7. Accesibilidad: catálogo común de variantes y canales personales/juego
-   independientes. Arcade es el modo fijo. Movimiento reducido conserva
+   sujetos al interruptor maestro de Logros. Arcade es el modo fijo. Movimiento reducido conserva
    mensajes y resultados sin partículas ni animaciones. Máximo tres toasts;
    no se repite el último texto consecutivo. Apagar Logros conserva llamadas,
-   XP, recibos y refuerzo personal. El interruptor lateral y el de Logros
+   XP, recibos, configuración e historial personal; oculta sus bloques,
+   cierra sus modales y suspende avisos, efectos y sonidos arcade. El interruptor lateral y el de Logros
    comparten el mismo ajuste y guardado, independiente del tema.
 
 Todo estado nuevo vive en el modelo game exportable/sincronizado, normalizado
@@ -439,7 +440,7 @@ conservan su límite de 400. El Laboratorio QA y sus recorridos se retiraron.
 Mis premios conserva catálogo, personalización, ventanas seguras, historial,
 costos informativos e idempotencia; no existe límite semanal de presupuesto.
 
-Verificación actual: 179 pruebas, contratos/ciclos de 26 módulos, wiring y build
+Verificación actual: 213 pruebas, contratos/ciclos de 28 módulos, wiring y build
 de producción sin sourcemaps. Chrome aislado en claro/oscuro a 320, 390, 768
 y 1365 px: Inicio/Logros sin overflow, llamadas manual/live/pegado/ayer/duplicado,
 derrota, cierre, cofre idempotente, activación en ambas ubicaciones, progreso
@@ -449,8 +450,9 @@ autenticada en dos dispositivos. El mockup pixel art fue aprobado por el usuario
 Selector lateral «Temas y colores»: Original claro/oscuro y siete paletas
 aprobadas, cada una en claro y oscuro. Se guardan junto a los ajustes de la
 cuenta; cambiar a Original elimina únicamente las variables de la paleta.
+Idioma en Ajustes → Tu perfil; Temas y colores contiene solo apariencia.
 Español e inglés completos sin API, incluidos interfaz, avisos, ayuda y
-reportes; 2.007 textos comprobados. Cambiar idioma vuelve a la misma página,
+reportes; 2.008 textos comprobados. Cambiar idioma vuelve a la misma página,
 sin modificar llamadas, nombres personales, recibos ni progreso. Mensajes
 de juego guardados se presentan en el idioma seleccionado sin reescribirlos.
 La PWA incluye ambos idiomas y el CSS de apariencia.
@@ -485,6 +487,8 @@ CSS y vista nuevos están versionados y en la precarga de la PWA.
 Desde v585, «Invítame un café»/«Buy me a coffee» al final compartido de la
 app y de la landing, enlazado a https://ko-fi.com/jonathanvelasquez0624.
 Abre en otra pestaña, reutiliza los botones existentes y adapta los temas.
+Desde v586 el botón usa texto y espaciado compactos; se retiró del pie el
+mensaje obsoleto que afirmaba que todos los datos permanecían solo locales.
 Es apoyo voluntario; no condiciona funciones ni registra pagos en Finanzas.
 No hay widgets, SDK externos ni procesamiento de pagos dentro de la tool.
 
@@ -560,7 +564,7 @@ La aplicación funciona en producción con estas bases vigentes:
   global, backup diario, exportación y borrado de cuenta permanecen activos.
 - Turnos, llamadas, Horario, Higher Rate, Finanzas, Reportes, Calendario,
   Adherencia y la gamificación «El Monstruo» están integrados.
-- La versión actual es 585. Refuerzo positivo, Logros y auditoría profunda
+- La versión actual es 586. Refuerzo positivo, Logros y auditoría profunda
   están terminados. Los siete fallos de la auditoría se corrigieron con
   regresiones; cobertura y límites constan en
   `docs/auditoria-profunda-2026-09-30.md`.
@@ -568,6 +572,21 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v586** — Idioma en Ajustes y desactivación completa de Logros.
+
+- Selector ES/EN al inicio de Ajustes → Tu perfil; eliminado de Temas y
+  colores. Conserva preferencias, guardado y regreso a la página activa.
+- Apagar Logros desde cualquiera de sus interruptores oculta inmediatamente
+  monstruo, misiones, hitos y prueba positiva; cierra modales, limpia avisos
+  y efectos, apaga y deshabilita el selector de sonidos arcade. No se borran
+  llamadas, XP, recibos, premios pendientes ni historial personal.
+- Refuerzo personal, recompensas y reflexión quedan sujetos a Logros;
+  reconciliar referencias de llamadas conserva su funcionamiento al apagarlo.
+- Botón Ko-fi más compacto y retirada del texto local obsoleto del pie.
+- 213 pruebas, 2.008 textos ES/EN, 28 módulos, wiring y build correctos.
+  Chrome: botón visible y compacto en 32 combinaciones; validación de Logros
+  e idioma en sesiones aisladas y capturas con datos de demostración.
 
 **v585** — Apoyo voluntario con Ko-fi.
 
@@ -591,15 +610,3 @@ La aplicación funciona en producción con estas bases vigentes:
 - 210 pruebas, 2.004 textos ES/EN, 28 módulos, wiring y build correctos.
   Sitemap XML, canonicals y marcado noindex verificados en artefactos de build.
   Search Console y posiciones no verificadas; instrucciones en docs/seo.md.
-
-**v583** — Idioma junto al tema en la barra superior.
-
-- Botón circular EN/ES con el mismo estilo del control claro/oscuro, antes
-  de Entrar. Retirados el selector nativo del panel y sus estilos sin uso.
-- Cambio con ratón, Enter o espacio, nombre accesible traducido y
-  persistencia. Campos del login y preferencia pendiente se conservan.
-- Barra compacta en celular, tanto con Entrar como con Abrir la app.
-  Chrome: 32 combinaciones de 320, 390, 768 y 1365 px, ES/EN, claro/oscuro
-  y sesión simulada/no iniciada, sin overflow ni controles recortados.
-- 210 pruebas, 2.004 textos ES/EN, 28 módulos, wiring y build correctos.
-  Recarga y campos intactos comprobados; autenticación aislada de cuentas reales.

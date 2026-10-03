@@ -298,12 +298,6 @@
       "js/theme-palettes.js"
     ]
   },
-  "s_083c5425": {
-    "source": "Todo queda local en el navegador hasta que exportes o descargues el archivo.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_08419093": {
     "source": "Lunch tomado fuera de horario",
     "files": [
@@ -2237,6 +2231,12 @@
     "source": "27 de septiembre de 2026",
     "files": [
       "privacidad.html"
+    ]
+  },
+  "s_2ff6d2e3": {
+    "source": "Abre Temas y colores en el menú lateral para elegir modo y paleta.",
+    "files": [
+      "app.html"
     ]
   },
   "s_300b99b7": {
@@ -4953,12 +4953,6 @@
       "js/game.js"
     ]
   },
-  "s_69c4b480": {
-    "source": "Abre Temas y colores en el menú lateral para elegir modo, paleta e idioma.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_69e71112": {
     "source": "Agregar premio",
     "files": [
@@ -6868,12 +6862,6 @@
   },
   "s_8f1f222f": {
     "source": "+ Agregar gasto",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_8f266b28": {
-    "source": "Perfil, meta, tasa y ciclo de pago.",
     "files": [
       "app.html"
     ]
@@ -10035,6 +10023,12 @@
       "js/positive-reinforcement.js"
     ]
   },
+  "s_d17d4f4d": {
+    "source": "Perfil, idioma, meta, tasa y ciclo de pago.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_d1a06e73": {
     "source": "Nivel",
     "files": [
@@ -10069,6 +10063,12 @@
     "source": "Poco común",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_d275b043": {
+    "source": "para elegir Español o English.",
+    "files": [
+      "app.html"
     ]
   },
   "s_d2a5e860": {
@@ -10545,6 +10545,12 @@
     "source": "Categoría \"{{v0}}\" creada",
     "files": [
       "js/finance.js"
+    ]
+  },
+  "s_dceb8b40": {
+    "source": "Ajustes → Tu perfil → Idioma de la tool",
+    "files": [
+      "app.html"
     ]
   },
   "s_dcf1c3f4": {

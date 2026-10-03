@@ -145,6 +145,7 @@ import {
   updateCurrencySettings,
   updateRate,
   wireEmojiPicker,
+  wireSettingsLanguage,
   configureSettingsContext,
 } from './settings.js';
 
@@ -613,6 +614,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
     translateDocument();
     applyTheme();
     wireAppearance({ getSettings: () => settings, save: saveSettingsOnly, applyTheme });
+    wireSettingsLanguage({ getSettings: () => settings, save: saveSettingsOnly });
     // La hora es clickeable — al tocarla se oculta (muestra un placeholder enmascarado en vez del
     // valor real) y al volver a tocarla se muestra de nuevo. Visible por defecto. Vive en memoria,
     // no en localStorage.
@@ -5185,7 +5187,7 @@ function renderPayDatesSection() {
       dayIsEffectivelyOff, effectiveCycleGoal, effectiveDailyGoal, escapeHtml, financeConvertedInline,
       financeRowIsMeta, formatCallDayLabel, formatMinutes, higherRateBonusForCall, higherRateLiveStatus,
       importedCallStats, money, openModal, parseMoney, productiveMinutesForDay, saveSettingsOnly,
-      saveStateOnly, todayCallDateKey, toast, weekdayKeyForDayKey,
+      saveStateOnly, todayCallDateKey, toast, weekdayKeyForDayKey, renderHeader,
       getReinforcementWorkIntervals: (dayKey) => {
         return reinforcementScheduleIntervals(dayKey).filter((slot) => String(slot.type).toLowerCase() === 'work');
       },
@@ -5718,17 +5720,18 @@ function renderHeader() {
   const goalMin = dayGoal.min;
   const goalUsd = dayGoal.usd;
   const goalPct = goalUsd > 0 ? Math.min(100, (stats.earnings / goalUsd) * 100) : 0;
-  const milestoneProgress = onGameMonetaryProgress(dayKey, stats.earnings, goalUsd, { silent: true, record: false });
+  const milestonesEnabled = settings.game?.enabled === true && goalUsd > 0;
+  const milestoneProgress = milestonesEnabled ? onGameMonetaryProgress(dayKey, stats.earnings, goalUsd, { silent: true, record: false }) : null;
   const milestoneRow = document.getElementById('earningsMilestoneMarkers');
   if (milestoneRow) {
-    milestoneRow.hidden = !(goalUsd > 0);
-    milestoneRow.innerHTML = [25, 50, 75, 100].map((pct) => ui`<span class="gh-goal-subitem" aria-label="${pct}%${milestoneProgress.claimed.includes(pct) ? ', hito registrado' : ''}">${milestoneProgress.claimed.includes(pct) ? '✓ ' : ''}${pct}%</span>`).join('');
+    milestoneRow.hidden = !milestonesEnabled;
+    milestoneRow.innerHTML = milestonesEnabled ? [25, 50, 75, 100].map((pct) => ui`<span class="gh-goal-subitem" aria-label="${pct}%${milestoneProgress.claimed.includes(pct) ? ', hito registrado' : ''}">${milestoneProgress.claimed.includes(pct) ? '✓ ' : ''}${pct}%</span>`).join('') : '';
   }
   const nextMilestone = document.getElementById('earningsNextMilestone');
   if (nextMilestone) {
-    nextMilestone.hidden = !(goalUsd > 0);
-    const next = milestoneProgress.next;
-    nextMilestone.textContent = next ? ui`Próximo hito: ${next.pct}% · te faltan ${money(next.remaining)}${convertedAmountText(next.remaining) ? ` (${convertedAmountText(next.remaining)})` : ''}` : translateText('100% de tu meta diaria alcanzado');
+    nextMilestone.hidden = !milestonesEnabled;
+    const next = milestoneProgress?.next;
+    nextMilestone.textContent = !milestonesEnabled ? '' : next ? ui`Próximo hito: ${next.pct}% · te faltan ${money(next.remaining)}${convertedAmountText(next.remaining) ? ` (${convertedAmountText(next.remaining)})` : ''}` : translateText('100% de tu meta diaria alcanzado');
   }
   // Si aplica un bono de Higher Rate en las llamadas de hoy, lograr la meta debería tomar MENOS
   // minutos.

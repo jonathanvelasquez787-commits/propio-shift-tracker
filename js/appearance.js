@@ -1,7 +1,7 @@
 import { PALETTES } from './theme-palettes.js';
 import { applySavedColors } from './appearance-colors.js';
 import { setLanguage, translateText } from './i18n.js';
-import { normalizeLanguage, saveLanguagePreference } from './language-preference.js';
+import { saveLanguagePreference } from './language-preference.js';
 
 export function applyAppearance(settings) {
   const root = document.documentElement;
@@ -35,8 +35,6 @@ export function applyAppearance(settings) {
       return swatch;
     }));
   });
-  const language = document.getElementById('appearanceLanguage');
-  if (language) language.value = normalizeLanguage(settings.language);
   const source = document.getElementById('appearanceSource');
   if (source) {
     source.hidden = !palette.code;
@@ -67,29 +65,6 @@ export function wireAppearance({ getSettings, save, applyTheme }) {
   });
   document.querySelectorAll('[data-preview-theme]').forEach(button =>
     button.addEventListener('click', () => change({ theme: button.dataset.previewTheme })));
-  document.getElementById('appearanceLanguage').addEventListener('change', event => {
-    if (getSettings().language === event.target.value) return;
-    const previous = getSettings().language;
-    getSettings().language = normalizeLanguage(event.target.value);
-    if (save() === false) {
-      getSettings().language = previous;
-      event.target.value = normalizeLanguage(previous);
-      return;
-    }
-    saveLanguagePreference(getSettings().language);
-    try {
-      const page = document.querySelector('.app-page:not([hidden])')?.dataset.page;
-      if (page) sessionStorage.setItem('propio_appearance_return_page', page);
-    } catch {}
-    window.location.reload();
-  });
-  setTimeout(() => {
-    try {
-      const page = sessionStorage.getItem('propio_appearance_return_page');
-      sessionStorage.removeItem('propio_appearance_return_page');
-      if (page) document.querySelector(`.sidebar-link[data-page="${page.replace(/[^a-z]/g, '')}"]`)?.click();
-    } catch {}
-  }, 0);
   document.querySelectorAll('[data-open-appearance]').forEach(button =>
     button.addEventListener('click', () => { if (!dialog.open) dialog.showModal(); }));
   document.querySelectorAll('[data-close-appearance]').forEach(button =>

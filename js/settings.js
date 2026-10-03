@@ -1,6 +1,7 @@
 import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 import { authErrorMessage, getProfile, getUser, updateEmail, updateUsername } from './auth.js';
 import { settings, state } from './app-context.js';
+import { normalizeLanguage, saveLanguagePreference } from './language-preference.js';
 
 let DEFAULT_USER_EMOJI, EMOJI_CHOICES, RATE, closeModal, convertedAmountText;
 let currencyCeilFromUsdAmount, effectiveCycleGoal, effectiveDailyGoal, ensureCurrencySettings, escapeHtml;
@@ -15,6 +16,37 @@ export function configureSettingsContext(context) {
     formatMinutes, getActiveDayKey, getDailyGoalOverride, iconHtml, money, onGameDayMetadataChanged, openModal, render,
     saveSettingsOnly, saveStateOnly, snapshotHistoricalPlanning, setDailyGoalOverride, toast, todayCallDateKey,
     usdCeilFromCurrencyAmount } = context);
+}
+
+export function wireSettingsLanguage({ getSettings, save }) {
+  const language = document.getElementById('settingsLanguage');
+  if (!language || language.dataset.wired) return;
+  language.dataset.wired = 'true';
+  language.value = normalizeLanguage(getSettings().language);
+  language.addEventListener('change', event => {
+    const next = normalizeLanguage(event.target.value);
+    if (getSettings().language === next) return;
+    const previous = getSettings().language;
+    getSettings().language = next;
+    if (save() === false) {
+      getSettings().language = previous;
+      event.target.value = normalizeLanguage(previous);
+      return;
+    }
+    saveLanguagePreference(next);
+    try {
+      const page = document.querySelector('.app-page:not([hidden])')?.dataset.page;
+      if (page) sessionStorage.setItem('propio_appearance_return_page', page);
+    } catch {}
+    window.location.reload();
+  });
+  setTimeout(() => {
+    try {
+      const page = sessionStorage.getItem('propio_appearance_return_page');
+      sessionStorage.removeItem('propio_appearance_return_page');
+      if (page) document.querySelector(`.sidebar-link[data-page="${page.replace(/[^a-z]/g, '')}"]`)?.click();
+    } catch {}
+  }, 0);
 }
 
 let syncingGoals = false;
@@ -243,6 +275,8 @@ let syncingGoals = false;
       render();
     }
     export function formatGoalFields() {
+      const languageInput = document.getElementById('settingsLanguage');
+      if (languageInput && document.activeElement !== languageInput) languageInput.value = normalizeLanguage(settings.language);
       const minInput = document.getElementById('productiveGoalInput');
       const usdInput = document.getElementById('earningsGoalInput');
       const nameInput = document.getElementById('userNameInput');

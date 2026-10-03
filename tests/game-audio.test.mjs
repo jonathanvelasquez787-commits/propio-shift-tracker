@@ -178,6 +178,37 @@ test('silenciar antes de reproducir cancela el lote incluso si después se resta
   assert.equal(h.sources.length, 0);
 });
 
+test('apagar Logros cancela sonidos personales y pruebas pendientes sin reproducirlos al reactivar', async () => {
+  const h = harness();
+  h.config.reinforcement = { enabled: true };
+  h.unlock();
+  assert.equal(h.audio.play('reward'), true);
+  assert.equal(h.audio.play('loot'), true, 'la prueba de arcade entra en el mismo lote');
+  h.config.game.enabled = false;
+  h.audio.sync();
+  assert.equal(h.timers.size, 0);
+  assert.equal(h.audio.play('pause'), false);
+  assert.equal(h.audio.play('loot'), false);
+  h.config.game.enabled = true;
+  h.audio.sync();
+  await h.flush();
+  assert.equal(h.sources.length, 0);
+});
+
+test('apagar Logros durante resume cancela audio aunque refuerzo personal permanezca activado', async () => {
+  const h = harness({ resumeMode: 'defer' });
+  h.config.reinforcement = { enabled: true };
+  h.unlock();
+  h.audio.play('reward');
+  const flushed = h.beginFlush();
+  h.config.game.enabled = false;
+  h.audio.sync();
+  h.config.game.enabled = true;
+  h.contexts[0].resolvers.forEach(resolve => resolve());
+  await flushed;
+  assert.equal(h.sources.length, 0);
+});
+
 test('silenciar durante una fanfarria detiene y desconecta todas las voces', async () => {
   for (const disable of [
     h => { h.config.masterVolume = 0; },

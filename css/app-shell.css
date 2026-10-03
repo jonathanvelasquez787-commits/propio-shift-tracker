@@ -504,9 +504,9 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 }
 
 .support-footer .support-link {
-  padding: 10px 14px;
-  min-height: 40px;
+  padding: 4px 8px;
+  gap: 4px;
   max-width: 100%;
-  font-size: 13px;
+  font-size: 11px;
   text-decoration: none;
 }

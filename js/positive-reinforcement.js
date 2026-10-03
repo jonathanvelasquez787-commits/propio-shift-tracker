@@ -129,7 +129,7 @@ function ensurePositiveState() {
 
 function reinforcementEnabled() {
   ensurePositiveState();
-  return settings.reinforcement.enabled;
+  return settings.game?.enabled === true && settings.reinforcement.enabled;
 }
 
 function makeId(prefix = 'reward') {
@@ -281,7 +281,7 @@ export function reopenPositiveReflection(call, dayKey) {
 }
 
 function saveReflection(outcome) {
-  if (!reflectionCall || !OUTCOMES.has(outcome)) return;
+  if (!reinforcementEnabled() || !reflectionCall || !OUTCOMES.has(outcome)) return;
   const note = cleanText(document.getElementById('positiveReflectionNote')?.value, 240);
   state.game.reinforcement.reflections[reflectionCall.callId] = {
     callId: reflectionCall.callId, outcome, note, dayKey: reflectionCall.dayKey, savedAt: new Date().toISOString(),
@@ -308,7 +308,7 @@ function currentRewardWindow() {
 }
 
 function renderClaimWindow(windowName) {
-  if (currentRewardWindow() !== windowName) return false;
+  if (!reinforcementEnabled() || currentRewardWindow() !== windowName) return false;
   const root = document.getElementById('physicalRewardClaimList');
   const title = document.getElementById('physicalRewardClaimTitle');
   if (!root || !title) return false;
@@ -340,6 +340,7 @@ export function onPositiveRewardWindow(windowName, { manual = false } = {}) {
 }
 
 function openPendingRewardsNow() {
+  if (!reinforcementEnabled()) return;
   const windowName = currentRewardWindow();
   if (!windowName) {
     toast(translateText('Tus premios esperan al próximo Break, Lunch o fin del turno.'));
@@ -349,6 +350,7 @@ function openPendingRewardsNow() {
 }
 
 function claimReward(id) {
+  if (!reinforcementEnabled()) return;
   const index = state.game.reinforcement.pendingRewards.findIndex((item) => item.id === id);
   if (index < 0) return;
   const item = state.game.reinforcement.pendingRewards[index];
@@ -369,6 +371,7 @@ function claimReward(id) {
 }
 
 function swapReward(id) {
+  if (!reinforcementEnabled()) return;
   const item = state.game.reinforcement.pendingRewards.find((entry) => entry.id === id);
   if (!item) return;
   if (currentRewardWindow() !== item.window) {
@@ -411,6 +414,7 @@ function syncRewardEditorConditional() {
 }
 
 function openRewardEditor(reward = null, template = null) {
+  if (settings.game?.enabled !== true) return;
   const source = reward || template || { icon: '🎁', name: '', window: 'break', trigger: 'calls', every: 5, maxPerDay: 1, accumulationTarget: 1, durationMin: 0, costUsd: 0 };
   editingRewardId = reward?.id || null;
   editingTemplateId = reward?.templateId || template?.id || null;
@@ -430,6 +434,7 @@ function openRewardEditor(reward = null, template = null) {
 }
 
 function saveRewardEditor() {
+  if (settings.game?.enabled !== true) return;
   const reward = rewardEditorValues();
   if (!reward) {
     toast(translateText('Escribe un nombre para el premio.'));
@@ -451,7 +456,7 @@ function saveRewardEditor() {
 }
 
 function deleteRewardEditor() {
-  if (!editingRewardId) return;
+  if (settings.game?.enabled !== true || !editingRewardId) return;
   settings.reinforcement.rewards = settings.reinforcement.rewards.filter((item) => item.id !== editingRewardId);
   saveSettingsOnly();
   closeModal('physicalRewardEditorModal');
@@ -493,7 +498,7 @@ function syncPresetSelection() {
 function renderEvidence() {
   const root = document.getElementById('positiveEvidenceCard');
   if (!root) return;
-  root.hidden = !settings.reinforcement.enabled;
+  root.hidden = !reinforcementEnabled();
   if (root.hidden) return;
   const dayKey = currentPositiveDayKey();
   const dayReflections = Object.values(state.game.reinforcement.reflections).filter((item) => item.dayKey === dayKey);
@@ -534,6 +539,12 @@ function renderHistory() {
 
 export function renderPositiveReinforcement() {
   ensurePositiveState();
+  if (settings.game?.enabled !== true) {
+    clearPositiveReinforcementTransients();
+    for (const id of ['positiveReflectionModal', 'physicalRewardClaimModal', 'physicalRewardEditorModal']) {
+      if (document.getElementById(id)?.classList?.contains?.('open')) closeModal(id);
+    }
+  }
   renderSettingsRewards();
   renderEvidence();
   renderHistory();
@@ -613,7 +624,7 @@ export function initPositiveReinforcement() {
   ensurePositiveState();
   document.addEventListener('click', (event) => {
     const target = event.target instanceof Element ? event.target.closest('[data-positive-action], [data-positive-outcome]') : null;
-    if (!target) return;
+    if (!target || settings.game?.enabled !== true) return;
     if (target.dataset.positiveOutcome) return saveReflection(target.dataset.positiveOutcome);
     const action = target.dataset.positiveAction;
     if (action === 'skip-reflection') { reflectionCall = null; closeModal('positiveReflectionModal'); }

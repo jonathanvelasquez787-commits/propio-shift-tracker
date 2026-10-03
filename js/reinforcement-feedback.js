@@ -99,8 +99,8 @@ export function reinforcementText(kind, vars = {}, variantSeed = 0) {
 
 export function reinforcementFeedbackEnabled(channel = 'game') {
   const game = settings.game?.enabled === true;
-  const personal = settings.reinforcement?.enabled === true;
-  return channel === 'either' ? game || personal : channel === 'personal' ? personal : channel === 'game' ? game : false;
+  const personal = game && settings.reinforcement?.enabled === true;
+  return channel === 'either' ? game : channel === 'personal' ? personal : channel === 'game' ? game : false;
 }
 
 export function notifyReinforcement(message, { channel = 'game', effect = false, sound = '', dayKey } = {}) {

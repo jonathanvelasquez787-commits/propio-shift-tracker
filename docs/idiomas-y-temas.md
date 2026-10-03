@@ -7,7 +7,8 @@ se conserva al recargar y se aplica después de hidratar la cuenta, sin sustitui
 llamadas, horarios ni otras preferencias. Un idioma previamente elegido sigue
 vigente. La selección pública no crea datos de cuenta ni conflictos de nube.
 
-En el menú lateral, **Temas y colores** permite elegir Español o English,
+En **Ajustes → Tu perfil**, el selector **Idioma de la tool** permite elegir
+Español o English. En el menú lateral, **Temas y colores** permite elegir
 Claro u Oscuro y Original o una de las siete paletas aprobadas. Las preferencias
 se guardan y sincronizan con los ajustes existentes. Cambiar idioma recarga la
 vista y vuelve a la misma página; llamadas, temporizadores y progreso se conservan.

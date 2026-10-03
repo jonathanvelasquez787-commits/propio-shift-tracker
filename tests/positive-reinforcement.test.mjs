@@ -35,7 +35,7 @@ test('premios acumulables conservan ventana e idempotencia sin el presupuesto an
   const dayKey = currentDayKey();
   const callRows = [];
   const currentState = { game: { reinforcement: createDefaultReinforcementState() } };
-  const currentSettings = { reinforcement: { enabled: true, askAfterCall: false, weeklyBudgetUsd: 2, rewards: [{ id: 'tea', name: 'Té especial', icon: '☕', window: 'break', trigger: 'calls', every: 2, accumulationTarget: 2, maxPerDay: 1, costUsd: 3 }] } };
+  const currentSettings = { game: { enabled: true }, reinforcement: { enabled: true, askAfterCall: false, weeklyBudgetUsd: 2, rewards: [{ id: 'tea', name: 'Té especial', icon: '☕', window: 'break', trigger: 'calls', every: 2, accumulationTarget: 2, maxPerDay: 1, costUsd: 3 }] } };
   setAppState(currentState);
   setAppCalls(callRows);
   setAppSettings(currentSettings);
@@ -157,7 +157,7 @@ test('premios acumulables conservan ventana e idempotencia sin el presupuesto an
   assert.equal(opened.length, openCountBeforeCloseEvent, 'limpiar transitorios evita reabrir premios tras cerrar el modal de cierre');
 });
 
-test('reemplazar una llamada live migra las referencias de refuerzo antes de reconciliar', () => {
+test('reemplazar una llamada live migra las referencias antes de reconciliar incluso con Logros apagado', () => {
   const dayKey = currentDayKey();
   const currentState = { game: { reinforcement: {
     ...createDefaultReinforcementState(),
@@ -169,7 +169,7 @@ test('reemplazar una llamada live migra las referencias de refuerzo antes de rec
   const prior = { id: 'priorId', callDate: dayKey, startISO: '2026-09-29T11:58:00.000Z', endISO: '2026-09-29T11:58:30.000Z' };
   setAppState(currentState);
   setAppCalls([prior, official]);
-  setAppSettings({ reinforcement: { enabled: true, askAfterCall: false, rewards: [] } });
+  setAppSettings({ game: { enabled: false }, reinforcement: { enabled: true, askAfterCall: false, rewards: [] } });
   configurePositiveReinforcementContext({
     callDateKeyFromValue: (value) => value === dayKey ? value : '',
     callsForDay: (value) => value === dayKey ? [prior, official] : [],
@@ -186,6 +186,10 @@ test('reemplazar una llamada live migra las referencias de refuerzo antes de rec
   assert.equal(currentState.game.reinforcement.recoveries[0].fromCallId, 'priorId');
   assert.equal(currentState.game.reinforcement.recoveryPending.callId, 'officialId');
   assert.equal(currentState.game.reinforcement.recoveryPending.endISO, '2026-09-29T12:00:00.000Z');
+  currentState.game.reinforcement.reflections.deleted = { callId: 'deleted', outcome: 'good', note: 'Retirada', dayKey, savedAt: '2026-09-29T12:02:00.000Z' };
+  assert.equal(reconcilePositiveCalls(dayKey), true, 'Logros apagado permite reconciliar una llamada retirada');
+  assert.equal(currentState.game.reinforcement.reflections.deleted, undefined);
+  assert.equal(currentState.game.reinforcement.reflections.officialId.callId, 'officialId');
   const appMain = fs.readFileSync(path.join(root, 'js/app-main.js'), 'utf8');
   const importBody = appMain.slice(appMain.indexOf('function importCalls()'), appMain.indexOf('function clearCallInputBox'));
   assert.ok(importBody.indexOf('migratePositiveCallIdReferences') < importBody.indexOf('onGameCallsChanged'));
@@ -204,7 +208,7 @@ test('una llamada anterior a la difícil no consume la recuperación pendiente',
   const currentState = { game: { reinforcement: { ...createDefaultReinforcementState(), recoveryPending: { callId: 'difficult', dayKey, endISO: new Date(originEnd - 60000).toISOString() } } } };
   setAppState(currentState);
   setAppCalls(callRows);
-  setAppSettings({ reinforcement: { enabled: true, askAfterCall: false, rewards: [] } });
+  setAppSettings({ game: { enabled: true }, reinforcement: { enabled: true, askAfterCall: false, rewards: [] } });
   configurePositiveReinforcementContext({
     callDateKeyFromValue: (value) => value === dayKey ? value : '',
     callsForDay: (value) => value === dayKey ? callRows : [],
@@ -236,7 +240,7 @@ test('una cola llena conserva el progreso acumulado sin descartar premios previo
   const currentState = { game: { reinforcement: { ...createDefaultReinforcementState(), pendingRewards: fullQueue } } };
   setAppState(currentState);
   setAppCalls(callRows);
-  setAppSettings({ reinforcement: { enabled: true, askAfterCall: false, rewards: [{ id: 'snack', name: 'Snack', window: 'break', trigger: 'calls', every: 1, accumulationTarget: 1, maxPerDay: 10 }] } });
+  setAppSettings({ game: { enabled: true }, reinforcement: { enabled: true, askAfterCall: false, rewards: [{ id: 'snack', name: 'Snack', window: 'break', trigger: 'calls', every: 1, accumulationTarget: 1, maxPerDay: 10 }] } });
   configurePositiveReinforcementContext({
     callDateKeyFromValue: (value) => value === dayKey ? value : '',
     callsForDay: (value) => value === dayKey ? callRows : [],
@@ -268,7 +272,7 @@ test('dropped repetidas no abren reflexión ni ganan premios y una recuperación
   const currentState = { game: { reinforcement: { ...createDefaultReinforcementState(), recoveryPending: { callId: origin.id, dayKey, endISO: origin.endISO } } } };
   setAppState(currentState);
   setAppCalls(rows);
-  setAppSettings({ game: { enabled: false, intensity: 'subtle' }, reinforcement: { enabled: true, askAfterCall: true, rewards: [
+  setAppSettings({ game: { enabled: true, intensity: 'subtle' }, reinforcement: { enabled: true, askAfterCall: true, rewards: [
     { id: 'calls', name: 'Cada cinco llamadas', window: 'break', trigger: 'calls', every: 5 },
     { id: 'recovery', name: 'Premio por retomar', window: 'break', trigger: 'recovery' },
   ] } });

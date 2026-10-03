@@ -9,7 +9,7 @@ let cycleBoundsForOffset, cycleEarningsForOffset, dayAdherence, dayComplianceSta
 let dayIsEffectivelyOff, effectiveCycleGoal, effectiveDailyGoal, escapeHtml, financeConvertedInline;
 let financeRowIsMeta, formatCallDayLabel, formatMinutes, higherRateBonusForCall, higherRateLiveStatus;
 let importedCallStats, money, openModal, parseMoney, productiveMinutesForDay, saveSettingsOnly;
-let saveStateOnly, todayCallDateKey, toast, weekdayKeyForDayKey, getReinforcementWorkIntervals;
+let saveStateOnly, todayCallDateKey, toast, weekdayKeyForDayKey, getReinforcementWorkIntervals, renderHeader;
 
 export function configureGameContext(context) {
   ({ appConfirm, callDateKeyFromValue, callDateToDate, callsForDay, closeModal, computeComplianceStreak, convertedAmountText,
@@ -17,7 +17,7 @@ export function configureGameContext(context) {
     dayIsEffectivelyOff, effectiveCycleGoal, effectiveDailyGoal, escapeHtml, financeConvertedInline,
     financeRowIsMeta, formatCallDayLabel, formatMinutes, higherRateBonusForCall, higherRateLiveStatus,
     importedCallStats, money, openModal, parseMoney, productiveMinutesForDay, saveSettingsOnly,
-    saveStateOnly, todayCallDateKey, toast, weekdayKeyForDayKey, getReinforcementWorkIntervals } = context);
+    saveStateOnly, todayCallDateKey, toast, weekdayKeyForDayKey, getReinforcementWorkIntervals, renderHeader } = context);
   configureReinforcementFeedback({ queueToast: queueGameToast, triggerEffect: () => triggerGameEvent('gameArena', 'clear', 900), playSound: playGameTone });
 }
 import { MONSTER_CATALOG, monsterForWeekday, monsterSvg, gamePixelIcon, gamePixelChest } from './monsters.js';
@@ -328,6 +328,7 @@ function ensureGameSettings() {
   if (typeof settings.game.enabled !== 'boolean') settings.game.enabled = false;
   settings.game.intensity = 'arcade';
   if (typeof settings.game.soundEnabled !== 'boolean') settings.game.soundEnabled = true;
+  if (!settings.game.enabled) settings.game.soundEnabled = false;
   const soundVolume = Number(settings.game.soundVolume);
   settings.game.soundVolume = Number.isFinite(soundVolume) ? Math.max(0, Math.min(100, soundVolume)) : 40;
   const monsterName = sanitizeMonsterName(settings.game.monsterName);
@@ -825,6 +826,7 @@ export function equipmentForState(equipment = state.game?.equipment) {
 }
 
 export function chooseCycleReward(choiceId) {
+  if (!gameEnabled()) return false;
   ensureGameState();
   const pending = state.game.cycleReward;
   if (!pending?.pending || !pending.cycleKey) return false;
@@ -1167,7 +1169,10 @@ function renderSettingsProfile() {
   const sidebarEnabled = document.getElementById('sidebarAchievementsInput');
   if (sidebarEnabled) sidebarEnabled.checked = gameEnabled();
   const soundEnabled = document.getElementById('sidebarGameSoundInput');
-  if (soundEnabled) soundEnabled.checked = settings.game.soundEnabled;
+  if (soundEnabled) {
+    soundEnabled.checked = gameEnabled() && settings.game.soundEnabled;
+    soundEnabled.disabled = !gameEnabled();
+  }
   const soundVolume = document.getElementById('gameSoundVolumeInput');
   if (soundVolume && document.activeElement !== soundVolume) soundVolume.value = settings.game.soundVolume;
   const soundValue = document.getElementById('gameSoundVolumeValue');
@@ -1295,7 +1300,7 @@ function syncFinanceRewards() {
   return changed;
 }
 
-function clearTransientGameUi({ keepPersonal = false } = {}) {
+function clearTransientGameUi() {
   callFxVersion += 1;
   const arena = document.getElementById('gameArena');
   arena?.classList.remove('is-hit', 'is-critical-hit');
@@ -1312,14 +1317,13 @@ function clearTransientGameUi({ keepPersonal = false } = {}) {
   document.querySelectorAll('.game-pixel-fx-layer').forEach((node) => node.remove());
   document.querySelectorAll('.game-live-xp-float').forEach((node) => node.remove());
   const stack = document.getElementById('gameToastStack');
-  if (stack) {
-    if (keepPersonal) Array.from(stack.children).filter((node) => !['personal', 'either'].includes(node.dataset.gameToastChannel)).forEach((node) => node.remove());
-    else stack.replaceChildren();
-  }
+  if (stack) stack.replaceChildren();
   const live = document.getElementById('gameStatusLive');
-  if (live && !keepPersonal) live.textContent = '';
-  const retained = keepPersonal ? gameToastQueue.filter((item) => ['personal', 'either'].includes(item.channel)) : [];
-  gameToastQueue.splice(0, gameToastQueue.length, ...retained);
+  if (live) live.textContent = '';
+  gameToastQueue.length = 0;
+  for (const id of ['stageClearModal', 'chestModal']) {
+    if (document.getElementById(id)?.classList.contains('open')) closeModal(id);
+  }
 }
 
 export function renderGame() {
@@ -1330,7 +1334,7 @@ export function renderGame() {
   document.documentElement.classList.toggle('game-arcade', arcadeEnabled());
   document.documentElement.classList.toggle('game-subtle', false);
 
-  if (!enabled) clearTransientGameUi({ keepPersonal: settings.reinforcement?.enabled === true });
+  if (!enabled) clearTransientGameUi();
 
   const financeChanged = syncFinanceRewards();
   const bossDefeatedNow = syncCycleBossAchievement();
@@ -1364,6 +1368,7 @@ let lastDisplayedToastText = '';
 const TOAST_PRIORITIES = Object.freeze({ record: 4, loot: 3, impulse: 2, critical: 2, '': 1 });
 
 export function announceGameStatus(message) {
+  if (!gameEnabled()) return;
   const live = document.getElementById('gameStatusLive');
   if (!live || !message) return;
   live.textContent = '';
@@ -1373,8 +1378,7 @@ export function announceGameStatus(message) {
 export function queueGameToast(message, tone = '', options = {}) {
   const text = String(message ?? '').trim();
   const channel = options.channel || 'game';
-  const allowed = channel === 'personal' ? settings.reinforcement?.enabled
-    : channel === 'either' ? (settings.game?.enabled || settings.reinforcement?.enabled) : settings.game?.enabled;
+  const allowed = gameEnabled() && (channel !== 'personal' || settings.reinforcement?.enabled === true);
   if (!text || !allowed || text === lastGameToastText) return;
   const key = `${tone}:${text}`;
   if (gameToastQueue.some((item) => item.key === key) || Array.from(document.querySelectorAll('#gameToastStack [data-game-toast-key]')).some((node) => node.dataset.gameToastKey === key)) return;
@@ -1391,8 +1395,7 @@ function drainGameToasts() {
   if (!stack || document.querySelector('.modal-overlay.open')) return;
   while (gameToastQueue.length && stack.children.length < 3) {
     const item = gameToastQueue.shift();
-    const allowed = item.channel === 'personal' ? settings.reinforcement?.enabled
-      : item.channel === 'either' ? (settings.game?.enabled || settings.reinforcement?.enabled) : settings.game?.enabled;
+    const allowed = gameEnabled() && (item.channel !== 'personal' || settings.reinforcement?.enabled === true);
     if (!allowed) continue;
     if (item.message === lastDisplayedToastText) continue;
     lastDisplayedToastText = item.message;
@@ -2411,6 +2414,7 @@ function stageClearMarkup(dayKey, entry) {
 }
 
 function openStageClear(dayKey, entry, { celebrate = false, leveledUp = false } = {}) {
+  if (!gameEnabled()) return;
   const root = document.getElementById('stageClearContent');
   if (!root) return;
   root.innerHTML = stageClearMarkup(dayKey, entry);
@@ -2420,10 +2424,7 @@ function openStageClear(dayKey, entry, { celebrate = false, leveledUp = false } 
 }
 
 export function onGameShiftEnded(dayKey = currentGameDayKey()) {
-  if (!gameEnabled() && !settings.reinforcement?.enabled) {
-    onPositiveRewardWindow('shift-end');
-    return;
-  }
+  if (!gameEnabled()) return;
   const normalizedDayKey = callDateKeyFromValue(dayKey) || currentGameDayKey();
   ensureGameState(normalizedDayKey);
   const alreadyFinalized = state.game.days[normalizedDayKey]?.finalized;
@@ -2453,7 +2454,7 @@ function chestReward(sealedOn) {
 }
 
 function openPendingChest(todayKey, { allowSameDay = false } = {}) {
-  if (!allowSameDay && !gameEnabled()) return false;
+  if (!gameEnabled()) return false;
   if (!state.game.chest.pending || !state.game.chest.sealedOn || (!allowSameDay && state.game.chest.sealedOn === todayKey)) return false;
   const sealedOn = state.game.chest.sealedOn;
   const key = `chest:${sealedOn}`;
@@ -2529,6 +2530,7 @@ export function onGamePauseStarted(type) {
 }
 
 export function equipAccessory(accessoryLabel) {
+  if (!gameEnabled()) return false;
   ensureGameState();
   const value = String(accessoryLabel ?? '');
   const item = ACCESSORY_BY_LABEL[value] || ACCESSORY_BY_ID[value];
@@ -2639,12 +2641,14 @@ export function initGame() {
   for (const id of ['gameEnabledInput', 'sidebarAchievementsInput']) {
     document.getElementById(id)?.addEventListener('change', (event) => {
       settings.game.enabled = !!event.target.checked;
+      if (!settings.game.enabled) settings.game.soundEnabled = false;
       saveSettingsOnly();
       renderGame();
+      renderHeader?.();
     });
   }
   document.getElementById('sidebarGameSoundInput')?.addEventListener('change', (event) => {
-    settings.game.soundEnabled = !!event.target.checked;
+    settings.game.soundEnabled = gameEnabled() && !!event.target.checked;
     syncGameAudio();
     saveSettingsOnly();
     renderSettingsProfile();

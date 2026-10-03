@@ -12,9 +12,10 @@ const {
 const {
   configurePositiveReinforcementContext, createDefaultReinforcementState,
   initPositiveReinforcement, onPositiveCallSaved, onPositiveRewardWindow,
+  renderPositiveReinforcement, reopenPositiveReflection,
 } = await import('../js/positive-reinforcement.js');
 
-test('los dos interruptores deciden cada canal incluso con intensidad antigua guardada', () => {
+test('Logros es maestro y el interruptor personal decide su canal incluso con intensidad antigua', () => {
   for (const game of [false, true]) {
     for (const personal of [false, true]) {
       for (const intensity of ['off', 'subtle', 'arcade']) {
@@ -23,12 +24,12 @@ test('los dos interruptores deciden cada canal incluso con intensidad antigua gu
         resetFeedbackForTests();
         const queued = [];
         configureReinforcementFeedback({ queueToast: (...args) => queued.push(args) });
-        for (const [channel, active] of [['game', game], ['personal', personal], ['either', game || personal]]) {
+        for (const [channel, active] of [['game', game], ['personal', game && personal], ['either', game]]) {
           const expected = active;
           assert.equal(reinforcementFeedbackEnabled(channel), expected);
           assert.equal(notifyReinforcement(channel, { channel }), expected);
         }
-        assert.equal(queued.length, Number(game) + Number(personal) + Number(game || personal));
+        assert.equal(queued.length, Number(game) + Number(game && personal) + Number(game));
         assert.deepEqual(config, { game: { enabled: game, intensity }, reinforcement: { enabled: personal } });
       }
     }
@@ -108,7 +109,7 @@ test('mejor llamada compara el bono real de las anteriores y excluye el mismo ev
   assert.match(corrected, /mejor|mayor pago/);
 });
 
-test('refuerzo personal funciona con Logros apagado y una intensidad antigua sin silenciarlo', () => {
+test('Logros apagado bloquea premios y reflexión, y cierra modales sin borrar el progreso al desactivar', () => {
   setLanguage('es');
   const dayKey = '09/29/2026';
   const call = { id: 'personal-call', callDate: dayKey, startISO: new Date(Date.now() - 120000).toISOString(), endISO: new Date(Date.now() - 60000).toISOString() };
@@ -119,17 +120,32 @@ test('refuerzo personal funciona con Logros apagado y una intensidad antigua sin
   setAppCalls(rows);
   setAppSettings(config);
   const opened = [];
+  const closed = [];
   const messages = [];
   const listeners = new Map();
   const nodes = new Map([['physicalRewardClaimList', { innerHTML: '' }], ['physicalRewardClaimTitle', { textContent: '' }]]);
+  for (const id of ['positiveReflectionModal', 'physicalRewardClaimModal', 'physicalRewardEditorModal']) {
+    const modal = { open: false };
+    modal.classList = { contains: name => name === 'open' && modal.open };
+    nodes.set(id, modal);
+  }
   globalThis.document = { getElementById: (id) => nodes.get(id) || null, addEventListener: (type, callback) => listeners.set(type, callback) };
   configureReinforcementFeedback({ queueToast: (...args) => messages.push(args) });
   configurePositiveReinforcementContext({
     callDateKeyFromValue: (value) => value === dayKey ? value : '', callsForDay: () => rows,
-    closeModal: () => {}, convertedAmountText: () => '', effectiveDailyGoal: () => ({ usd: 0 }),
-    escapeHtml: String, importedCallStats: () => ({ earnings: 0 }), openModal: (id) => opened.push(id),
+    closeModal: (id) => { closed.push(id); nodes.get(id).open = false; }, convertedAmountText: () => '', effectiveDailyGoal: () => ({ usd: 0 }),
+    escapeHtml: String, importedCallStats: () => ({ earnings: 0 }), openModal: (id) => { opened.push(id); nodes.get(id).open = true; },
     saveSettingsOnly: () => {}, saveStateOnly: () => {}, toast: () => {}, todayCallDateKey: () => dayKey,
   });
+  onPositiveCallSaved(call, 'manual', dayKey);
+  assert.equal(currentState.game.reinforcement.pendingRewards.length, 0);
+  assert.deepEqual(currentState.game.reinforcement.reflections, {});
+  assert.equal(messages.length, 0);
+  assert.deepEqual(opened, []);
+  assert.equal(reopenPositiveReflection(call, dayKey), false);
+  assert.equal(onPositiveRewardWindow('break', { manual: true }), false);
+
+  config.game.enabled = true;
   onPositiveCallSaved(call, 'manual', dayKey);
   assert.equal(currentState.game.reinforcement.pendingRewards.length, 1);
   assert.ok(messages.length > 0);
@@ -146,4 +162,21 @@ test('refuerzo personal funciona con Logros apagado y una intensidad antigua sin
   assert.equal(messages.at(-1)[2].channel, 'personal');
   assert.match(messages.at(-1)[0], /positivo|salió bien|cerró bien/);
   assert.equal(currentState.game.reinforcement.reflections[call.id].outcome, 'good');
+  assert.equal(reopenPositiveReflection(call, dayKey), true);
+  nodes.get('physicalRewardEditorModal').open = true;
+  const saved = structuredClone(currentState.game.reinforcement);
+  const messagesBeforeDisable = messages.length;
+  closed.length = 0;
+  config.game.enabled = false;
+  renderPositiveReinforcement();
+  for (const id of ['positiveReflectionModal', 'physicalRewardClaimModal', 'physicalRewardEditorModal']) {
+    assert.ok(closed.includes(id), `${id} se cierra al apagar Logros`);
+    assert.equal(nodes.get(id).open, false);
+  }
+  assert.deepEqual(currentState.game.reinforcement, saved);
+  assert.equal(reopenPositiveReflection(call, dayKey), false);
+  assert.equal(onPositiveRewardWindow('break', { manual: true }), false);
+  listeners.get('click')({ target: button });
+  assert.equal(messages.length, messagesBeforeDisable);
+  assert.deepEqual(currentState.game.reinforcement, saved);
 });

@@ -5,7 +5,7 @@ import { setAppCalls, setAppSettings, setAppState } from '../js/app-context.js';
 // Game feedback variants are translated once when their module loads.
 setLanguage('es');
 const {
-  checkReinforcementInactivity, computeGameDay, configureGameContext, createDefaultGameState,
+  announceGameStatus, checkReinforcementInactivity, chooseCycleReward, claimPendingChest, computeGameDay, configureGameContext, createDefaultGameState, equipAccessory,
   migrateGameCallReferences, normalizeGameState, onGameCallSaved, onGameCallsChanged,
   onGameMonetaryProgress, onGamePauseEnded, onGamePauseStarted, queueGameToast,
   renderGame, renderGameLive, rewardSurpriseForCall, onGameShiftEnded, onGameShiftStarted,
@@ -87,11 +87,12 @@ function harness(t, { at = new Date(2026, 8, 29, 12).getTime(), goal = 10000, st
     dropped: items.filter((call) => call.dropped === 'Yes').length, zeroCount: 0, gapTotal: 0,
   });
   let dailyGoal = goal;
+  const openedModals = [], closedModals = [];
   const shared = {
     callDateKeyFromValue: dayFrom, callsForDay, convertedAmountText: (value) => `≈ L ${(value * 25).toFixed(2)}`,
     effectiveDailyGoal: () => ({ min: 1000, usd: dailyGoal }), escapeHtml: String, importedCallStats,
     saveStateOnly: () => {}, saveSettingsOnly: () => {}, todayCallDateKey: keyFor, toast: () => {},
-    closeModal: () => {}, openModal: () => {},
+    closeModal: (id) => closedModals.push(id), openModal: (id) => openedModals.push(id),
   };
   configureGameContext({
     ...shared, financeRowIsMeta, appConfirm: async () => true, callDateToDate: parseDay, computeComplianceStreak: () => ({ days: streak }),
@@ -123,7 +124,7 @@ function harness(t, { at = new Date(2026, 8, 29, 12).getTime(), goal = 10000, st
     return call;
   };
   return {
-    get state() { return currentState; }, config, rows, stack, announcements, nodes, add, keyFor, iso, advance,
+    get state() { return currentState; }, config, rows, stack, announcements, nodes, openedModals, closedModals, add, keyFor, iso, advance,
     get now() { return now; }, setNow: (value) => { now = value; }, setGoal: (value) => { dailyGoal = value; },
     reload() { currentState = JSON.parse(JSON.stringify(currentState)); currentState.game = normalizeGameState(currentState.game); setAppState(currentState); },
     ledger(prefix) { return Object.entries(currentState.game.ledger).filter(([key]) => key.startsWith(prefix)); },
@@ -610,12 +611,71 @@ test('cola real limita a tres toasts y no repite el último texto después de ex
   h.config.reinforcement.enabled = true;
   queueGameToast('Anuncio personal', '', { channel: 'personal' });
   renderGameLive();
-  assert.equal(h.stack.children[0].textContent, 'Anuncio personal');
+  assert.equal(h.stack.children.length, 0);
   renderGame();
-  assert.equal(h.stack.children[0].textContent, 'Anuncio personal');
+  assert.equal(h.stack.children.length, 0);
   h.config.reinforcement.enabled = false;
   queueGameToast('Apagado', '', { channel: 'personal' });
-  assert.equal(h.announcements.at(-1), 'Anuncio personal');
+  assert.equal(h.announcements.at(-1), 'Cola cuatro');
+});
+
+test('apagar Logros limpia refuerzo visible, apaga el selector arcade y conserva premios e historial guardados', (t) => {
+  const h = harness(t, { surface: true });
+  h.config.reinforcement.enabled = true;
+  h.config.reinforcement.askAfterCall = true;
+  h.config.game.soundEnabled = true;
+  const selector = { checked: true, disabled: false };
+  h.nodes.set('sidebarGameSoundInput', selector);
+  for (const id of ['stageClearModal', 'chestModal']) h.nodes.set(id, { classList: { contains: (name) => name === 'open' } });
+  h.state.game = normalizeGameState({
+    ...h.state.game,
+    totalXp: 450, level: 3, shields: 2, bestStreak: 5,
+    accessories: ['Armadura cian'], equipment: { body: 'Armadura cian' },
+    trophies: [{ id: 'saved-trophy', label: 'Primer día', earnedOn: '09/28/2026' }],
+    chest: { pending: true, sealedOn: '09/28/2026' },
+    cycleReward: { pending: true, cycleKey: '09/28/2026', options: [{ id: 'xp', label: '35 XP', type: 'xp', amount: 35 }] },
+    reinforcement: {
+      ...h.state.game.reinforcement,
+      progress: { coffee: 2 },
+      pendingRewards: [{ id: 'saved-reward', rewardId: 'coffee', name: 'Café', window: 'break', dayKey: '09/28/2026' }],
+      reflections: { saved: { outcome: 'good', dayKey: '09/28/2026', note: 'Guardado' } },
+    },
+  });
+  const persisted = structuredClone(h.state.game);
+  const preference = structuredClone(h.config.reinforcement);
+  queueGameToast('Personal visible antes de apagar', '', { channel: 'personal' });
+  queueGameToast('Compartido visible antes de apagar', '', { channel: 'either' });
+  queueGameToast('Arcade visible antes de apagar');
+  queueGameToast('Personal pendiente antes de apagar', '', { channel: 'personal' });
+  assert.equal(h.stack.children.length, 3);
+  const announcementsBefore = h.announcements.length;
+  h.config.game.enabled = false;
+  renderGame();
+  assert.equal(selector.checked, false);
+  assert.equal(selector.disabled, true);
+  assert.equal(h.config.game.soundEnabled, false);
+  assert.equal(h.nodes.get('gameArena').hidden, true);
+  assert.equal(h.nodes.get('gameMissions').hidden, true);
+  assert.equal(h.nodes.get('gameCallFx').innerHTML, '');
+  assert.equal(h.stack.children.length, 0);
+  assert.deepEqual(h.closedModals, ['stageClearModal', 'chestModal']);
+  for (const channel of ['game', 'personal', 'either']) queueGameToast(`Off ${channel}`, '', { channel });
+  announceGameStatus('Off anuncio');
+  assert.equal(h.announcements.length, announcementsBefore);
+  assert.equal(claimPendingChest(), false);
+  assert.equal(chooseCycleReward('xp'), false);
+  assert.equal(equipAccessory('Armadura cian'), false);
+  onGameShiftEnded(h.keyFor());
+  assert.deepEqual(h.state.game, persisted);
+  assert.deepEqual(h.config.reinforcement, preference);
+  assert.deepEqual(h.openedModals, []);
+  h.config.game.enabled = true;
+  renderGame();
+  h.advance(6000);
+  assert.equal(selector.checked, false, 'reactivar Logros conserva Sonidos arcade apagado');
+  assert.equal(selector.disabled, false);
+  assert.equal(h.stack.children.length, 0, 'reactivar no recupera anuncios pendientes');
+  assert.deepEqual(h.state.game, persisted);
 });
 
 test('cierre de racha semanal conserva rollback y comparaciones al recargar y revoca el escudo al reabrir', (t) => {
