@@ -317,9 +317,9 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
-Visibilidad en Google: base técnica publicada desde v584. Falta verificar la
-propiedad real en Search Console y enviar sitemap/inspeccionar la landing;
-requiere la cuenta de Google del propietario y su método/código de verificación.
+Visibilidad en Google: base técnica publicada desde v584. Desde v591 el head
+incluye la etiqueta real de Search Console obtenida en la cuenta del propietario.
+Falta terminar la validación en Google y enviar sitemap/inspeccionar la landing.
 No se conoce el estado real de indexación ni se prometen posiciones. Desde v590
 hay URLs públicas por idioma (`/` en inglés y `/es` en español), contenido,
 metadatos, hreflang y datos estructurados coherentes. Nuevas guías públicas y
@@ -602,7 +602,7 @@ La aplicación funciona en producción con estas bases vigentes:
 - Landing bilingüe estática, canonical/hreflang y sitemap de cuatro páginas,
   preguntas frecuentes e imagen social. Un bundle público evita cargar tres
   copias de las traducciones; las fuentes no bloquean el primer render.
-- La versión actual es 590. Refuerzo positivo, Logros y auditoría profunda
+- La versión actual es 591. Refuerzo positivo, Logros y auditoría profunda
   están terminados. Los siete fallos de la auditoría se corrigieron con
   regresiones; cobertura y límites constan en
   `docs/auditoria-profunda-2026-09-30.md`.
@@ -610,6 +610,14 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v591** — Verificación de Google Search Console.
+
+- Incorporada la etiqueta real de la propiedad `https://propio-shift-tracker.vercel.app/`
+  creada en la cuenta de Google del propietario. El build la conserva en ambos
+  idiomas; debe mantenerse para conservar la verificación.
+- Validación y envío de sitemap desde Search Console en curso; estado en
+  `docs/seo.md`.
 
 **v590** — SEO público bilingüe y carga de la landing.
 
@@ -633,16 +641,3 @@ La aplicación funciona en producción con estas bases vigentes:
 - La portada pública, su canonical, sitemap y contenido indexable permanecen
   en `/`. Recuperación, acceso, cierre de sesión y precarga PWA conservados.
 - 235 pruebas y build correctos; regresión de dirección y limpieza del freno.
-
-**v588** — Gamificación compacta y ruta limpia de la app.
-
-- Integrado el diseño compacto: armas y misiones desplegables, hitos dentro
-  del indicador de vida y resumen positivo reducido. Aviso de movimiento
-  reducido accesible incluso con los detalles cerrados; controles conservados.
-- `/app` es la URL pública. `/app.html` redirige permanentemente; login y
-  marcadores antiguos conservan parámetros y fragmentos. El inicio de la PWA
-  usa `/app` manteniendo la identidad anterior de las instalaciones existentes.
-- La PWA precarga la ruta limpia y redirige también navegaciones antiguas
-  sin conexión. Sin cambios en los datos de cuenta ni en Supabase.
-- 234 pruebas y build correctos; navegación, redirección de enlaces antiguos
-  y acceso offline cubiertos por regresiones.

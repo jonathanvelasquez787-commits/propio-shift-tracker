@@ -46,8 +46,10 @@ auditoría y sus límites figura en `seo-audit-2026-10-04.md`.
 4. Solicitar indexación si corresponde y revisar errores, impresiones, clics y
    consultas en los informes. Repetir solicitudes no acelera el rastreo.
 
-La verificación y solicitud no están hechas: requieren acceso a la propiedad
-real. La ausencia en una búsqueda pública no prueba que el sitio no esté indexado.
+El 4 de octubre de 2026 se creó la propiedad real en la cuenta del propietario
+y se obtuvo su etiqueta HTML. Desde v591 está incluida en ambas portadas;
+no quitarla tras verificar. Validación, sitemap e inspección en curso.
+La ausencia en una búsqueda pública no prueba que el sitio no esté indexado.
 
 ## Próximas mejoras de contenido
 
