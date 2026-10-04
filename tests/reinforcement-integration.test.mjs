@@ -63,6 +63,7 @@ function harness(t, { at = new Date(2026, 8, 29, 12).getTime(), goal = 10000, st
       set className(value) { classes.clear(); String(value).split(/\s+/).filter(Boolean).forEach((name) => classes.add(name)); },
       classList: { add(...names) { names.forEach((name) => classes.add(name)); }, remove(...names) { names.forEach((name) => classes.delete(name)); }, contains: (name) => classes.has(name) },
       querySelector: () => null, querySelectorAll: () => [],
+      replaceChildren() { this.innerHTML = ''; },
       getBoundingClientRect: () => ({ width: 400, height: 280 }),
       getClientRects() { return this.hidden ? [] : [this.getBoundingClientRect()]; },
       setAttribute(name, value) { this[name] = String(value); },
@@ -178,6 +179,33 @@ test('Arcade sustituye intensidades antiguas sin activar Logros ni modificar XP 
     assert.equal(h.config.game.enabled, false);
     assert.equal(h.state.game.totalXp, 321);
   }
+});
+
+test('el modo tranquilo sigue las llamadas en vivo y difiere feedback sin perder recompensas', (t) => {
+  const h = harness(t, { surface: true });
+  renderGame();
+  const battle = () => h.nodes.get('gameArena').querySelector('.game-battle');
+  assert.equal(battle().dataset.battleWork, 'ready');
+  h.state.activeCall = { startedAt: h.iso(h.now) };
+  renderGameLive();
+  assert.equal(battle().dataset.battleWork, 'call');
+  assert.equal(h.stack.hidden, true);
+  const announcements = h.announcements.length;
+  queueGameToast('Premio pendiente de prueba');
+  assert.equal(h.stack.children.length, 0);
+  assert.equal(h.announcements.length, announcements);
+  const call = h.add('quiet-import');
+  onGameCallSaved(call, 'import', { random: () => .99 });
+  assert.equal(h.nodes.get('gameCallFx').innerHTML, '');
+  const rewards = JSON.stringify(h.state.game);
+  h.state.activeCall = null;
+  h.state.activePause = { type: 'break', startedAt: h.iso(h.now) };
+  renderGameLive();
+  assert.equal(battle().dataset.battleWork, 'break');
+  assert.equal(h.stack.hidden, false);
+  assert.ok(h.stack.children.length > 0);
+  assert.equal(JSON.stringify(h.state.game), rewards);
+  assert.equal(h.rows.length, 1);
 });
 
 test('misiones abiertas son automáticas y los enfoques de resultados sellados se conservan', (t) => {

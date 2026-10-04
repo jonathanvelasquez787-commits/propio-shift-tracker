@@ -22,12 +22,14 @@ function harness({ reduced = false, canvasAvailable = true } = {}) {
   doc.documentElement = new Node(); doc.body = new Node(); doc.defaultView = host; doc.hidden = false;
   element.ownerDocument = doc; element.isConnected = true;
   element.matches = selector => selector === '.game-battle'; element.contains = node => node === element || Object.values(nodes).includes(node);
-  const names = ['stage','canvas','monster','hero-label','monster-label','monster-name','feed','notice','notice-text','banner','victory','selected','live','motion-note'];
+  const names = ['stage','canvas','monster','hero-label','monster-label','monster-name','feed','notice','notice-text','banner','victory','selected','live','motion-note','duel-hud','touch','shortcuts','duel-button','work-note','hearts','time','points','best','duel-fill','duel-health','duel-hp','start','duel-message'];
   for (const name of names) nodes[name] = new Node();
+  for (const name of ['auto','duel','start','attack','grenade','jump']) { nodes[name] = new Node(true); nodes[name].dataset.battleAction = name; }
+  nodes['duel-button'] = nodes.duel;
   nodes.hero = new Node(true); nodes.hero.dataset.battleAction = 'hero';
   const weapons = BATTLE_WEAPONS.map(w => { const node = new Node(true); node.dataset.battleWeapon = w.id; return node; });
   element.querySelector = selector => selector.includes('data-battle-action') ? nodes.hero : nodes[selector.match(/data-battle-([\w-]+)/)?.[1]];
-  element.querySelectorAll = selector => selector === '[data-battle-weapon]' ? weapons : [];
+  element.querySelectorAll = selector => selector === '[data-battle-weapon]' ? weapons : selector === '[data-battle-touch] button' ? [nodes.attack,nodes.grenade,nodes.jump] : selector.includes('data-battle-action') ? [nodes.auto,nodes.duel] : [];
   host.devicePixelRatio = 1; host.performance = { now: () => now };
   host.getComputedStyle = () => ({ visibility: 'visible', getPropertyValue: () => '#123456' });
   host.requestAnimationFrame = fn => { const id = ++sequence; frames.set(id, fn); return id; };
@@ -46,11 +48,13 @@ function harness({ reduced = false, canvasAvailable = true } = {}) {
   const view = { dayKey: '10/03/2026', weapon: 'pistol', enabled: true, hpPct: 63, defeated: false, monsterMarkup: '<svg data-species="existing"></svg>' };
   const callbacks = { onSound: kind => sounds.push(kind), onWeaponChange: id => changes.push(id), onPause: () => pauses.push(true) };
   const mount = () => syncBattle(element, view, callbacks);
+  const click = name => element.dispatch('click', { target: nodes[name] });
+  const begin = () => { view.workMode = 'break'; mount(); click('duel'); click('start'); };
   const practice = () => { now += 200; element.dispatch('click', { target: nodes.hero }); };
   const tick = (milliseconds = 40) => { now += milliseconds; const current = [...frames.values()]; frames.clear(); current.forEach(fn => fn(now)); };
   const event = (extra = {}) => ({ dayKey: view.dayKey, amountText: '$1.40 · ≈ L 36.40', xp: 3, ...extra });
   return { element, doc, host, nodes, motion, weapons, view, mount, practice, tick, event, frames, timers, observers, sounds, changes, pauses,
-    listenerCount: () => [element, doc, host, motion, ...Object.values(nodes)].reduce((count, node) => count + [...node.listeners.values()].reduce((n, list) => n+list.size, 0), 0) };
+    click, begin, listenerCount: () => [element, doc, host, motion, ...Object.values(nodes)].reduce((count, node) => count + [...node.listeners.values()].reduce((n, list) => n+list.size, 0), 0) };
 }
 
 test('weapon selection normalizes only cosmetic catalog ids; imports work without DOM', () => {
@@ -84,44 +88,78 @@ test('large imports remain one representation and excess events coalesce at six 
   queue.push(input); queue.clear(); assert.equal(queue.size, 0);
 });
 
-test('reduced motion practice preserves HP and reports each third activation, not pellets', () => {
+test('the automatic shot runs briefly and releases its animation loop after impact', () => {
+  const h = harness();
+  try {
+    h.mount(); assert.equal(h.frames.size, 0);
+    assert.equal(playBattleCall(h.event()), true); assert.equal(h.frames.size, 1);
+    for(let i=0;i<120;i++) h.tick();
+    assert.ok(h.sounds.includes('hit'));
+    assert.equal(h.frames.size, 0); assert.equal(h.nodes.banner.hidden, true);
+    assert.equal(h.element.dataset.battleHp, '63');
+  } finally { stopBattle(); }
+});
+
+test('automatic default stays still and manual inputs never alter real HP or call data', () => {
   const h = harness({ reduced: true });
   try {
-    h.view.weapon = 'flame'; h.mount(); const snapshot = JSON.stringify(h.view);
-    assert.equal(h.frames.size, 0);
-    h.practice(); assert.equal(h.nodes.notice.hidden, true);
-    assert.equal(h.nodes['notice-text'].textContent, '');
-    h.practice(); assert.equal(h.nodes['notice-text'].textContent, '');
-    h.practice(); assert.ok(h.nodes['notice-text'].textContent.length > 10); assert.equal(h.nodes.notice.hidden, false);
-    assert.equal(h.sounds.filter(kind => kind === 'shoot-flame').length, 3);
-    assert.equal(h.sounds.filter(kind => kind === 'practice-hit').length, 3);
-    assert.equal(JSON.stringify(h.view), snapshot); assert.equal(h.element.dataset.battleHp, '63'); assert.equal(h.changes.length, 0);
-    assert.equal(h.frames.size, 0); assert.equal(h.timers.size, 1);
+    h.mount(); const snapshot = JSON.stringify(h.view);
+    h.practice(); h.click('attack'); h.click('grenade'); h.click('duel');
+    assert.equal(h.frames.size, 0); assert.equal(h.sounds.length, 0);
+    assert.equal(h.element.dataset.battleMode, 'auto'); assert.equal(h.nodes['duel-hud'].hidden, true);
+    assert.equal(JSON.stringify(h.view), snapshot); assert.equal(h.element.dataset.battleHp, '63');
     assert.equal(playBattleCall(h.event({ count: 800, xp: 150, critical: true })), true);
     assert.match(h.nodes.banner.textContent, /800/); assert.match(h.nodes.banner.textContent, /150 XP/);
     assert.ok(h.sounds.includes('critical')); assert.equal(h.frames.size, 0);
-    h.doc.hidden = true; h.doc.dispatch('visibilitychange'); assert.equal(h.timers.size, 0); assert.equal(playBattleCall(h.event()), false);
+    h.doc.hidden = true; h.doc.dispatch('visibilitychange'); assert.equal(h.timers.size, 0);
+    assert.equal(playBattleCall(h.event()), false);
   } finally { stopBattle(); }
   assert.equal(h.listenerCount(), 0); assert.ok(h.observers.every(observer => observer.disconnected));
 });
 
-test('canvas fallback remains usable and rejects wrong dates without sound or queued work', () => {
+test('canvas fallback presents automatic results and disables the optional duel', () => {
   const h = harness({ canvasAvailable: false });
   try {
-    h.mount(); assert.equal(h.element.dataset.battleCanvas, 'fallback'); assert.equal(h.frames.size, 0);
+    h.view.workMode = 'off'; h.mount();
+    assert.equal(h.element.dataset.battleCanvas, 'fallback'); assert.equal(h.frames.size, 0);
+    h.click('duel'); assert.equal(h.element.dataset.battleMode, 'auto');
     assert.equal(playBattleCall(h.event({ dayKey: 'wrong' })), false); assert.equal(h.sounds.length, 0);
     assert.equal(playBattleCall(h.event()), true); assert.match(h.nodes.banner.textContent, /1\.40/);
-    for (let i=0;i<3;i++) h.practice(); assert.ok(h.nodes['notice-text'].textContent);
     h.element.dispatch('keydown', { key: '0', target: h.nodes.stage }); assert.deepEqual(h.changes, ['wand']);
-    h.doc.dispatch('keydown', { key: '1', target: h.nodes.stage }); assert.deepEqual(h.changes, ['wand']);
   } finally { stopBattle(); }
   assert.equal(h.listenerCount(), 0); assert.equal(h.timers.size, 0);
+});
+
+test('work calls interrupt the duel immediately and returning to break requires explicit resume', () => {
+  const h = harness();
+  try {
+    h.begin(); h.practice(); for(let i=0;i<20;i++) h.tick();
+    const time = h.nodes.time.textContent, points = h.nodes.points.textContent, view = JSON.stringify(h.view);
+    assert.equal(h.element.dataset.duelStatus, 'running'); assert.equal(h.frames.size, 1);
+    h.view.workMode = 'call'; h.mount();
+    assert.equal(h.element.dataset.battleMode, 'auto'); assert.equal(h.frames.size, 0);
+    assert.equal(h.element.dataset.duelStatus, 'paused'); assert.equal(h.timers.size, 0);
+    const sounds = h.sounds.length;
+    h.practice(); h.click('attack'); h.click('grenade'); h.click('jump'); h.click('duel');
+    h.element.dispatch('keydown', { key: '0', target: h.nodes.stage });
+    assert.equal(playBattleCall(h.event()), true); h.tick(5000);
+    assert.equal(h.sounds.length, sounds); assert.equal(h.nodes.time.textContent, time);
+    assert.equal(h.nodes.points.textContent, points); assert.equal(h.element.dataset.battleHp, '63');
+    h.view.workMode = 'break'; h.mount(); h.click('duel');
+    assert.equal(h.frames.size, 0); assert.equal(h.element.dataset.duelStatus, 'paused');
+    h.click('start'); assert.equal(h.frames.size, 1); assert.equal(h.element.dataset.duelStatus, 'running');
+    assert.equal(JSON.stringify(h.view), view);
+    h.doc.hidden = true; h.doc.dispatch('visibilitychange'); assert.equal(h.frames.size, 0);
+    h.doc.hidden = false; h.doc.dispatch('visibilitychange'); assert.equal(h.frames.size, 0);
+    assert.equal(h.element.dataset.duelStatus, 'paused');
+  } finally { stopBattle(); }
+  assert.equal(h.listenerCount(), 0);
 });
 
 test('visibility/date changes cancel pending visual calls and unmount releases animation observers', () => {
   const h = harness();
   try {
-    h.mount(); assert.equal(h.frames.size, 1);
+    h.mount(); assert.equal(h.frames.size, 0);
     assert.equal(playBattleCall(h.event()), true); h.tick(); assert.ok(h.sounds.includes('shoot-pistol'));
     h.view.dayKey = '10/04/2026'; h.mount();
     for (let i=0;i<35;i++) h.tick(); assert.equal(h.sounds.filter(kind => kind === 'hit').length, 0);
@@ -129,7 +167,7 @@ test('visibility/date changes cancel pending visual calls and unmount releases a
     const intersection = h.observers[1]; intersection.fn([{ isIntersecting: false }]);
     assert.equal(h.frames.size, 0); assert.equal(h.element.dataset.battlePaused, 'true'); assert.equal(playBattleCall(h.event()), false);
     const pauseCount = h.pauses.length; h.doc.dispatch('visibilitychange'); intersection.fn([{ isIntersecting: false }]); assert.equal(h.pauses.length, pauseCount);
-    intersection.fn([{ isIntersecting: true }]); assert.equal(h.frames.size, 1);
+    intersection.fn([{ isIntersecting: true }]); assert.equal(h.frames.size, 0);
     for (let i=0;i<35;i++) h.tick(); assert.equal(h.sounds.filter(kind => kind === 'hit').length, 0);
     h.element.isConnected = false; h.observers[2].fn();
     assert.equal(h.frames.size, 0); assert.equal(h.listenerCount(), 0); assert.ok(h.observers.every(observer => observer.disconnected));
@@ -145,7 +183,7 @@ test('switching reduced motion or disabling an active scene cancels every pendin
     h.motion.matches = true; h.motion.dispatch('change');
     assert.equal(h.frames.size, 0); assert.equal(h.nodes['motion-note'].hidden, false);
     assert.equal(h.sounds.filter(kind => kind === 'hit').length, 0);
-    h.practice(); assert.ok(h.sounds.includes('practice-hit'));
+    h.practice(); assert.ok(!h.sounds.includes('practice-hit'));
     syncBattle(h.element, { ...h.view, enabled: false });
     const soundCount = h.sounds.length;
     h.practice(); h.element.dispatch('keydown', { key: '0', target: h.nodes.stage });

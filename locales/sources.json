@@ -115,6 +115,12 @@
       "index.html"
     ]
   },
+  "s_044dda93": {
+    "source": "Dispará al monstruo",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_044df40e": {
     "source": "{{v0}}{{v1}}",
     "files": [
@@ -426,6 +432,12 @@
       "js/app-main.js"
     ]
   },
+  "s_0a65df8f": {
+    "source": "Onda baja · saltá",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_0a67ca33": {
     "source": "{{v1}} · {{v2}}",
     "files": [
@@ -575,12 +587,6 @@
     "source": "Reclamar:",
     "files": [
       "privacidad.html"
-    ]
-  },
-  "s_0d190e92": {
-    "source": "Controles de práctica",
-    "files": [
-      "js/game-battle.js"
     ]
   },
   "s_0d32876e": {
@@ -940,6 +946,12 @@
       "js/schedule.js"
     ]
   },
+  "s_133add0a": {
+    "source": "60 segundos · 3 vidas · esquivá y dispará",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_1352d41e": {
     "source": "Min antes",
     "files": [
@@ -979,6 +991,12 @@
       "app.html"
     ]
   },
+  "s_147c4534": {
+    "source": "¡Duelo ganado!",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_1516d7c5": {
     "source": "Reclamar ahora",
     "files": [
@@ -989,6 +1007,12 @@
     "source": "empezó antes {{v0}}",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_1542ef4f": {
+    "source": "Concentrate en tu llamada",
+    "files": [
+      "js/game-battle.js"
     ]
   },
   "s_154b78c3": {
@@ -1346,12 +1370,6 @@
       "js/app-main.js"
     ]
   },
-  "s_1b61f15c": {
-    "source": "Práctica",
-    "files": [
-      "js/game-battle.js"
-    ]
-  },
   "s_1b690e90": {
     "source": "Fases, equipo y mejoras disponibles en cada nivel.",
     "files": [
@@ -1556,6 +1574,12 @@
     "files": [
       "js/app-main.js",
       "js/calls.js"
+    ]
+  },
+  "s_1fe5fab3": {
+    "source": "Granada · {{v0}} s",
+    "files": [
+      "js/game-battle.js"
     ]
   },
   "s_20190e8d": {
@@ -1851,6 +1875,12 @@
       "js/app-main.js"
     ]
   },
+  "s_2757cfbc": {
+    "source": "Jugá solo si tenés tiempo libre",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_2783c7e5": {
     "source": "Falta el campo \"state\" (o no es válido) en el archivo.",
     "files": [
@@ -1970,12 +2000,6 @@
     "source": "Asignación automática activada — tu Disponible ya se repartió en orden de prioridad",
     "files": [
       "js/finance.js"
-    ]
-  },
-  "s_29c35018": {
-    "source": "Disparo de práctica. Tu progreso se conserva.",
-    "files": [
-      "js/game-battle.js"
     ]
   },
   "s_29f9fc78": {
@@ -2771,6 +2795,12 @@
       "privacidad.html"
     ]
   },
+  "s_393f2252": {
+    "source": "Movimiento reducido: sin destellos ni sacudidas.",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_39461426": {
     "source": "Editar",
     "files": [
@@ -2936,6 +2966,12 @@
       "js/settings.js"
     ]
   },
+  "s_3cc4cde4": {
+    "source": "Duelo · 60 s",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_3cee2a30": {
     "source": "#{{v0}} · {{v1}} {{v2}} — Termina en el futuro: no se importó",
     "files": [
@@ -3072,6 +3108,12 @@
     "source": "📅 Volviste a Hoy",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_41641aef": {
+    "source": "Otra ronda",
+    "files": [
+      "js/game-battle.js"
     ]
   },
   "s_41965f4b": {
@@ -3862,6 +3904,12 @@
       "js/app-main.js"
     ]
   },
+  "s_502e212d": {
+    "source": "Duelo pausado · continuá cuando estés libre",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_504ebe73": {
     "source": "Ese día vuelve a usar tu meta general",
     "files": [
@@ -3879,12 +3927,6 @@
     "files": [
       "js/calls.js",
       "js/reinforcement-rules.js"
-    ]
-  },
-  "s_509eaafb": {
-    "source": "¡Tomá una llamada! Tu héroe necesita tu esfuerzo para vencer.",
-    "files": [
-      "js/game-battle.js"
     ]
   },
   "s_50aea7dd": {
@@ -4179,6 +4221,12 @@
       "app.html"
     ]
   },
+  "s_54c099c7": {
+    "source": "Puntos de juego · tus ganancias y XP se conservan.",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_54c53860": {
     "source": "Desde",
     "files": [
@@ -4194,6 +4242,7 @@
   "s_550ed4a2": {
     "source": "Mejor: {{v0}}",
     "files": [
+      "js/game-battle.js",
       "js/game.js"
     ]
   },
@@ -5210,6 +5259,12 @@
       "terminos.html"
     ]
   },
+  "s_6af1c7b9": {
+    "source": "Continuar duelo",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_6affc195": {
     "source": "No se pudo leer el archivo.",
     "files": [
@@ -5342,12 +5397,6 @@
     "source": "Ranura {{v4}} · nivel {{v5}}",
     "files": [
       "js/game.js"
-    ]
-  },
-  "s_6e711f9b": {
-    "source": "Tocar al héroe para disparar en modo práctica",
-    "files": [
-      "js/game-battle.js"
     ]
   },
   "s_6e806508": {
@@ -5720,12 +5769,6 @@
       "index.html"
     ]
   },
-  "s_75712b65": {
-    "source": "Tu héroe necesita llamadas reales para dañar al monstruo.",
-    "files": [
-      "js/game-battle.js"
-    ]
-  },
   "s_7580ebfa": {
     "source": "Exporta un respaldo completo en JSON desde",
     "files": [
@@ -6012,6 +6055,12 @@
     "source": "Martillo Tuerto",
     "files": [
       "js/monsters.js"
+    ]
+  },
+  "s_7a623b48": {
+    "source": "Controles del duelo",
+    "files": [
+      "js/game-battle.js"
     ]
   },
   "s_7a80cfd2": {
@@ -6363,12 +6412,6 @@
       "privacidad.html"
     ]
   },
-  "s_8169299b": {
-    "source": "Batalla: A y D para caminar, espacio para saltar, Enter para practicar y G para granada",
-    "files": [
-      "js/game-battle.js"
-    ]
-  },
   "s_817367bc": {
     "source": "{{v0}} Historial ({{v1}} {{v2}})",
     "files": [
@@ -6606,6 +6649,12 @@
       "app.html"
     ]
   },
+  "s_8584b0f5": {
+    "source": "Duelo disponible durante el descanso",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_85a9387d": {
     "source": "Armas",
     "files": [
@@ -6672,12 +6721,6 @@
     "source": "— nunca se reinicia solo cada mes. Vos decidís cuándo la das por cumplida.",
     "files": [
       "app.html"
-    ]
-  },
-  "s_871e9260": {
-    "source": "El daño viene de tu trabajo: completá una llamada real.",
-    "files": [
-      "js/game-battle.js"
     ]
   },
   "s_872f19df": {
@@ -6780,6 +6823,12 @@
     "source": "1 llamada duró 0 min",
     "files": [
       "js/calls.js"
+    ]
+  },
+  "s_889f2c2a": {
+    "source": "Vidas del héroe",
+    "files": [
+      "js/game-battle.js"
     ]
   },
   "s_88f59ed1": {
@@ -7021,6 +7070,12 @@
     "source": "Meta solo de este día",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_8d78c659": {
+    "source": "En llamada · modo tranquilo",
+    "files": [
+      "js/game-battle.js"
     ]
   },
   "s_8d8726c3": {
@@ -8364,6 +8419,12 @@
       "app.html"
     ]
   },
+  "s_a705378d": {
+    "source": "Vida del duelo",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_a724fd64": {
     "source": "Restan",
     "files": [
@@ -8662,6 +8723,12 @@
       "app.html"
     ]
   },
+  "s_add22ec0": {
+    "source": "Embestida · esquivá o saltá",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_add972a8": {
     "source": "· {{v0}} traslapada(s) omitida(s)",
     "files": [
@@ -8684,6 +8751,12 @@
     "source": "Refuerzo positivo",
     "files": [
       "app.html"
+    ]
+  },
+  "s_af3748d9": {
+    "source": "Tocar al héroe para disparar en el duelo",
+    "files": [
+      "js/game-battle.js"
     ]
   },
   "s_af6005d5": {
@@ -8727,6 +8800,12 @@
     "files": [
       "app.html",
       "js/app-main.js"
+    ]
+  },
+  "s_afc9929c": {
+    "source": "Batalla: A y D para caminar, espacio para saltar, Enter para disparar y G para granada",
+    "files": [
+      "js/game-battle.js"
     ]
   },
   "s_aff863ad": {
@@ -9044,6 +9123,12 @@
     "source": "{{v0}} {{v1}}–{{v2}} cruza la medianoche{{v3}} — todavía no se soporta. Divide el bloque en dos (ej. {{v4}}–11:59 PM y 12:00–{{v5}} AM del día siguiente) o ajusta la hora.",
     "files": [
       "js/schedule.js"
+    ]
+  },
+  "s_b559c2cf": {
+    "source": "Disparo dirigido · movete",
+    "files": [
+      "js/game-battle.js"
     ]
   },
   "s_b5662af6": {
@@ -9495,6 +9580,12 @@
     "source": "Los archivos de la app. No guarda tus datos personales.",
     "files": [
       "privacidad.html"
+    ]
+  },
+  "s_bfaa0b8d": {
+    "source": "Tu héroe ataca al completar una llamada",
+    "files": [
+      "js/game-battle.js"
     ]
   },
   "s_bfc156a0": {
@@ -10025,6 +10116,12 @@
       "app.html"
     ]
   },
+  "s_c9cf97c2": {
+    "source": "Jugar",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_c9da0419": {
     "source": "Activa Sonidos arcade en el menú lateral.",
     "files": [
@@ -10096,6 +10193,12 @@
     "source": "\"{{v0}}\" ya está ocupado.",
     "files": [
       "js/landing.js"
+    ]
+  },
+  "s_cb7cb5dc": {
+    "source": "{{v0}} puntos · combo x{{v1}}",
+    "files": [
+      "js/game-battle.js"
     ]
   },
   "s_cb83a982": {
@@ -10266,12 +10369,6 @@
       "app.html"
     ]
   },
-  "s_cf2b1457": {
-    "source": "Movimiento reducido: la batalla muestra el resultado sin animación.",
-    "files": [
-      "js/game-battle.js"
-    ]
-  },
   "s_cf65724e": {
     "source": "Día guardado",
     "files": [
@@ -10404,6 +10501,12 @@
     "source": "Original + 7 paletas",
     "files": [
       "app.html"
+    ]
+  },
+  "s_d259eba8": {
+    "source": "Disponible en descanso o fuera del turno",
+    "files": [
+      "js/game-battle.js"
     ]
   },
   "s_d2631abd": {
@@ -11003,6 +11106,12 @@
       "app.html"
     ]
   },
+  "s_ddb5c56a": {
+    "source": "{{v0}} vidas del héroe",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_ddc98c6f": {
     "source": "¿Quitar la personalización de esta semana y volver a usar la plantilla? El horario propio de esta semana se borra — no afecta la plantilla ni otras semanas.",
     "files": [
@@ -11094,6 +11203,12 @@
     "source": "Volumen",
     "files": [
       "app.html"
+    ]
+  },
+  "s_df989aac": {
+    "source": "Vida del monstruo en el duelo",
+    "files": [
+      "js/game-battle.js"
     ]
   },
   "s_dfbb548d": {
@@ -11945,7 +12060,8 @@
   "s_f1ddb571": {
     "source": "Automático",
     "files": [
-      "app.html"
+      "app.html",
+      "js/game-battle.js"
     ]
   },
   "s_f1ed2046": {
@@ -12007,6 +12123,12 @@
     "source": "Cuerpo",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_f3387f0a": {
+    "source": "Ronda terminada · probá otra vez",
+    "files": [
+      "js/game-battle.js"
     ]
   },
   "s_f35a3aed": {
@@ -12405,6 +12527,12 @@
       "js/calls.js"
     ]
   },
+  "s_f9d1bc59": {
+    "source": "Disparar",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_fa366392": {
     "source": "${{v4}}/min",
     "files": [
@@ -12593,6 +12721,12 @@
     "source": "Bronce (+$0.01)",
     "files": [
       "js/higher-rate.js"
+    ]
+  },
+  "s_fef0ec5d": {
+    "source": "Modo de juego",
+    "files": [
+      "js/game-battle.js"
     ]
   },
   "s_ff194c81": {

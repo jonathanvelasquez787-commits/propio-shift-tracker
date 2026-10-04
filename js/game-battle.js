@@ -1,4 +1,5 @@
 import { ui, translateText } from './i18n.js';
+import { createDuel, canPlayDuel } from './game-duel.js';
 
 export const BATTLE_WEAPONS = Object.freeze([
   { id: 'pistol', name: 'Pistola', key: '1', hint: 'disparo simple', effect: 'bullet', pellets: 1, delay: 0, travel: .46 },
@@ -93,27 +94,38 @@ function fallbackHero() {
 }
 export function battleMarkup() {
   return ui`<section class="game-battle" aria-label="Batalla del héroe">
-    <div class="game-battle-stage" data-battle-stage tabindex="0" role="group" aria-label="Batalla: A y D para caminar, espacio para saltar, Enter para practicar y G para granada">
+    <div class="game-battle-stage" data-battle-stage tabindex="0" role="group" aria-label="Batalla: A y D para caminar, espacio para saltar, Enter para disparar y G para granada">
       <canvas data-battle-canvas aria-hidden="true"></canvas>
       <div class="game-battle-label game-battle-label--hero"><span>HÉROE</span><b data-battle-hero-label>Tu esfuerzo</b></div>
       <div class="game-battle-label game-battle-label--monster"><span data-battle-monster-label>MONSTRUO DEL DÍA</span><b data-battle-monster-name></b></div>
       <p class="game-battle-feed" data-battle-feed>Listo para tu próxima llamada</p>
       <div class="game-battle-monster" data-battle-monster></div>
-      <button type="button" class="game-battle-hero-target" data-battle-action="hero" aria-label="Tocar al héroe para disparar en modo práctica">${fallbackHero()}</button>
+      <button type="button" class="game-battle-hero-target" data-battle-action="hero" aria-label="Tocar al héroe para disparar en el duelo">${fallbackHero()}</button>
       <div class="game-battle-notice" data-battle-notice hidden><strong>HÉROE</strong><span data-battle-notice-text></span></div>
       <p class="game-battle-banner" data-battle-banner hidden></p>
       <div class="game-battle-victory" data-battle-victory hidden><span>★ ★ ★</span><strong>VICTORIA</strong><small>Tu esfuerzo cuenta</small></div>
     </div>
     <div class="game-battle-health" data-battle-health-slot><div data-battle-stats></div></div>
+    <div class="game-battle-mode-row">
+      <div class="game-battle-modes" role="group" aria-label="Modo de juego"><button type="button" data-battle-action="auto" aria-pressed="true">Automático</button><button type="button" data-battle-action="duel" aria-pressed="false" data-battle-duel-button>Duelo · 60 s</button></div>
+      <small data-battle-work-note></small>
+    </div>
+    <div class="game-battle-duel-hud" data-battle-duel-hud hidden>
+      <strong data-battle-hearts aria-label="Vidas del héroe"></strong><span data-battle-time></span><span data-battle-points></span><span data-battle-best></span>
+      <button type="button" data-battle-action="start" data-battle-start>Jugar</button>
+      <div class="game-battle-duel-health"><span>Vida del duelo</span><div role="progressbar" aria-label="Vida del monstruo en el duelo" aria-valuemin="0" aria-valuemax="100" data-battle-duel-health><i data-battle-duel-fill></i></div><b data-battle-duel-hp></b></div>
+      <p data-battle-duel-message role="status" aria-live="polite"></p>
+      <small>Puntos de juego · tus ganancias y XP se conservan.</small>
+    </div>
     <div class="game-battle-tools">
-    <div class="game-battle-controls"><details class="game-battle-shortcuts"><summary>Teclas</summary><div class="game-battle-keys"><span><kbd>A D</kbd> Caminar</span><span><kbd>Espacio</kbd> Saltar</span><span><kbd>Enter</kbd> Práctica</span><span><kbd>G / RMB</kbd> Granada</span></div></details>
-      <div class="game-battle-touch" role="group" aria-label="Controles de práctica"><button type="button" data-battle-direction="a" aria-label="Caminar a la izquierda">←</button><button type="button" data-battle-direction="d" aria-label="Caminar a la derecha">→</button><button type="button" data-battle-action="jump" aria-label="Saltar">↑</button><button type="button" data-battle-action="attack">Práctica</button><button type="button" data-battle-action="grenade">Granada</button></div>
+    <div class="game-battle-controls"><details class="game-battle-shortcuts" data-battle-shortcuts hidden><summary>Teclas</summary><div class="game-battle-keys"><span><kbd>A D</kbd> Caminar</span><span><kbd>Espacio</kbd> Saltar</span><span><kbd>Enter</kbd> Disparar</span><span><kbd>G / RMB</kbd> Granada</span></div></details>
+      <div class="game-battle-touch" data-battle-touch hidden role="group" aria-label="Controles del duelo"><button type="button" data-battle-direction="a" aria-label="Caminar a la izquierda">←</button><button type="button" data-battle-direction="d" aria-label="Caminar a la derecha">→</button><button type="button" data-battle-action="jump" aria-label="Saltar">↑</button><button type="button" data-battle-action="attack">Disparar</button><button type="button" data-battle-action="grenade">Granada</button></div>
     </div>
     <details class="game-battle-armory"><summary class="game-battle-armory-head"><span>Armas</span><small data-battle-selected></small></summary>
       <div class="game-battle-weapons" role="group" aria-label="Elegir arma del héroe">${BATTLE_WEAPONS.map(w => `<button type="button" class="game-battle-weapon" data-battle-weapon="${w.id}" aria-pressed="${w.id === 'pistol'}" title="${escape(weaponHint(w.id))}">${weaponIcon(w.id)}<span>${escape(weaponName(w.id))}</span><kbd>${w.key}</kbd></button>`).join('')}</div>
     </details>
     </div>
-    <p class="game-battle-motion-note" data-battle-motion-note hidden>Movimiento reducido: la batalla muestra el resultado sin animación.</p>
+    <p class="game-battle-motion-note" data-battle-motion-note hidden>Movimiento reducido: sin destellos ni sacudidas.</p>
     <p class="game-battle-live" data-battle-live role="status" aria-live="polite" aria-atomic="true"></p>
   </section>`;
 }
@@ -136,16 +148,18 @@ function createBattle(element) {
   let ctx = null;
   try { ctx = canvas.getContext?.('2d') || null; } catch {}
   element.dataset.battleCanvas = ctx ? 'ready' : 'fallback';
+  const duel = createDuel();
+  let mode = 'auto', work = 'ready', lastDuelAnnouncement = '';
   const queue = createBattleQueue(), keys = new Set(), cleanup = [], observers = [];
   const motion = host.matchMedia?.('(prefers-reduced-motion: reduce)');
   let reduced = !!motion?.matches, view = {}, callbacks = {}, colors = {}, world = { w: 600, h: 280, floor: 240 };
   let hero = { x: 96, jump: 0, vy: 0, walk: 0, recoil: 0, face: 1 };
   let bullets = [], particles = [], active = null, weapon = 'pistol', raf = 0, lastTime = 0, clock = 0, destroyed = false, intersecting = true, running = false, lastMonsterMarkup, hasSynced = false;
-  let bannerUntil = 0, noticeUntil = 0, hitUntil = 0, droneUntil = 0, flash = 0, practiceCount = 0, lastPractice = -1, staticTimer = 0, soundPending = false;
+  let bannerUntil = 0, noticeUntil = 0, hitUntil = 0, droneUntil = 0, flash = 0, staticTimer = 0, soundPending = false;
   const listen = (node, type, handler, options) => { node?.addEventListener?.(type, handler, options); cleanup.push(() => node?.removeEventListener?.(type, handler, options)); };
   const boss = () => ({ x: world.w - (world.w < 500 ? 65 : 104), y: world.floor - (world.w < 500 ? 52 : 66) });
   const visible = () => !destroyed && element.isConnected && !doc.hidden && intersecting && !element.closest('[hidden]') && element.getClientRects().length > 0 && host.getComputedStyle(element).visibility !== 'hidden';
-  const sound = kind => { if (visible() && callbacks.onSound) { soundPending = true; callbacks.onSound(kind); } };
+  const sound = kind => { if (work !== 'call' && visible() && callbacks.onSound) { soundPending = true; callbacks.onSound(kind); } };
   function clearEffects() {
     queue.clear(); active = null; bullets = []; particles = []; keys.clear(); flash = 0; hitUntil = 0; droneUntil = 0;
     bannerUntil = 0; noticeUntil = 0; $('banner').hidden = true; $('notice').hidden = true;
@@ -154,6 +168,7 @@ function createBattle(element) {
     soundPending = false;
   }
   function pause() {
+    duel.pause(); updateDuel();
     const notify = element.dataset.battlePaused !== 'true' || soundPending;
     if (raf) host.cancelAnimationFrame?.(raf);
     raf = 0; running = false; lastTime = 0; keys.clear();
@@ -166,8 +181,13 @@ function createBattle(element) {
     if (!element.isConnected) { destroy(); if (mounted?.element === element) mounted = null; return; }
     if (!visible()) { if (element.dataset.battlePaused !== 'true') pause(); return; }
     element.dataset.battlePaused = 'false';
-    if (reduced || !ctx || !host.requestAnimationFrame) { draw(); return; }
-    if (!raf) { running = true; lastTime = 0; raf = host.requestAnimationFrame(frame); }
+    const manual = mode === 'duel' && duel.snapshot().status === 'running' && canPlayDuel(work);
+    const effects = !reduced && ctx && (queue.size || active || bullets.length || particles.length || bannerUntil || noticeUntil);
+    if (work === 'call' || (!manual && !effects) || !host.requestAnimationFrame) {
+      if (raf) host.cancelAnimationFrame?.(raf);
+      raf = 0; running = false; lastTime = 0; draw(); return;
+    }
+    if (!raf) { if (!running) lastTime = 0; running = true; raf = host.requestAnimationFrame(frame); }
   }
   function refresh() {
     if (destroyed) return;
@@ -236,23 +256,64 @@ function createBattle(element) {
     if (last) last.event = event;
     else if (!event.practice) impact(event, id);
   }
-  function practice(id = weapon) {
-    const now = (host.performance?.now?.() ?? Date.now()) / 1000;
-    if (!visible() || now-lastPractice < .16) return;
-    lastPractice = now; practiceCount++;
-    emit({ practice: true }, id);
-    $('feed').textContent = `${translateText('Práctica')} · ${weaponName(id)}`;
-    if (practiceCount%3 === 0) {
-      const messages = [translateText('Tu héroe necesita llamadas reales para dañar al monstruo.'), translateText('El daño viene de tu trabajo: completá una llamada real.'), translateText('¡Tomá una llamada! Tu héroe necesita tu esfuerzo para vencer.')];
-      const text = messages[(practiceCount/3-1)%messages.length];
-      $('notice-text').textContent = text; $('notice').hidden = false; noticeUntil = clock+3.4; announce(text);
-      if (reduced || !ctx) { host.clearTimeout?.(staticTimer); staticTimer = host.setTimeout?.(() => { if (!destroyed) $('notice').hidden = true; }, 3400) || 0; }
-    } else announce(translateText('Disparo de práctica. Tu progreso se conserva.'));
-    reconcile();
+  function updateDuel() {
+    const d = duel.snapshot(), manual = mode === 'duel';
+    element.dataset.battleMode = mode;
+    element.dataset.battleWork = work;
+    element.dataset.duelStatus = d.status;
+    $('duel-hud').hidden = !manual;
+    $('touch').hidden = !manual;
+    $('shortcuts').hidden = !manual;
+    target.disabled = !manual || d.status !== 'running';
+    $('duel-button').disabled = !canPlayDuel(work) || !ctx;
+    $('duel-button').title = translateText('Disponible en descanso o fuera del turno');
+    element.querySelectorAll('[data-battle-action="auto"], [data-battle-action="duel"]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.battleAction === mode)));
+    $('work-note').textContent = work === 'call' ? translateText('En llamada · modo tranquilo') : work === 'ready' ? translateText('Duelo disponible durante el descanso') : translateText('Jugá solo si tenés tiempo libre');
+    $('hearts').textContent = '♥'.repeat(d.lives) + '♡'.repeat(3-d.lives);
+    $('hearts').setAttribute('aria-label', ui`${d.lives} vidas del héroe`);
+    $('time').textContent = `${Math.ceil(d.time)} s`;
+    $('points').textContent = ui`${d.points} puntos · combo x${d.combo}`;
+    $('best').textContent = ui`Mejor: ${d.best}`;
+    $('duel-fill').style.width = `${d.hp}%`;
+    $('duel-health').setAttribute('aria-valuenow', String(d.hp));
+    $('duel-hp').textContent = `${d.hp}%`;
+    $('start').hidden = d.status === 'running';
+    $('start').textContent = d.status === 'paused' ? translateText('Continuar duelo') : d.status === 'ready' ? translateText('Jugar') : translateText('Otra ronda');
+    $('start').disabled = !canPlayDuel(work) || !ctx;
+    for (const button of element.querySelectorAll('[data-battle-touch] button')) {
+      button.disabled = d.status !== 'running' || (button.dataset.battleAction === 'grenade' && d.grenade > 0);
+      if (button.dataset.battleAction === 'grenade') button.textContent = d.grenade > 0 ? ui`Granada · ${Math.ceil(d.grenade)} s` : translateText('Granada');
+    }
+    const attack = d.attacks.find(item => item.age <= item.warning);
+    const message = d.status === 'won' ? translateText('¡Duelo ganado!') : d.status === 'lost' ? translateText('Ronda terminada · probá otra vez') : d.status === 'paused' ? translateText('Duelo pausado · continuá cuando estés libre') : d.status === 'ready' ? translateText('60 segundos · 3 vidas · esquivá y dispará') : attack?.kind === 'wave' ? translateText('Onda baja · saltá') : attack?.kind === 'projectile' ? translateText('Disparo dirigido · movete') : attack?.kind === 'charge' ? translateText('Embestida · esquivá o saltá') : translateText('Dispará al monstruo');
+    if (message !== lastDuelAnnouncement) { $('duel-message').textContent = message; lastDuelAnnouncement = message; }
+    if (!manual && !bannerUntil) $('feed').textContent = work === 'call' ? translateText('Concentrate en tu llamada') : translateText('Tu héroe ataca al completar una llamada');
   }
-  function jump() { if (!reduced && ctx && visible() && hero.jump === 0) hero.vy = 340; }
+  function changeMode(next) {
+    if (next === 'duel' && (!canPlayDuel(work) || !ctx)) return;
+    duel.pause(); clearEffects(); callbacks.onPause?.(); mode = next;
+    hero.jump = 0; hero.vy = 0; updateDuel(); draw(); reconcile();
+  }
+  function beginDuel() {
+    if (mode !== 'duel' || !canPlayDuel(work) || !visible() || !ctx) return;
+    const resumed = duel.snapshot().status === 'paused';
+    clearEffects();
+    if (resumed) duel.resume(work); else { duel.start(work); hero.x = Math.min(96, world.w*.22); }
+    updateDuel(); stage.focus({ preventScroll: true }); reconcile();
+  }
+  function practice(id = weapon) {
+    if (!visible() || mode !== 'duel' || !canPlayDuel(work)) return;
+    const w = weaponFor(id);
+    const damage = ['rocket','too-much'].includes(id) ? 6 : ['railgun','shotgun','psr'].includes(id) ? 4 : ['smg','flame'].includes(id) ? 2 : 3;
+    const cooldown = ['rocket','too-much'].includes(id) ? .7 : ['railgun','shotgun','psr'].includes(id) ? .5 : ['smg','flame'].includes(id) ? .25 : .38;
+    if (!duel.shoot(work, { grenade: id === 'grenade', damage, cooldown })) return;
+    emit({ practice: true }, w.id); updateDuel(); reconcile();
+  }
+  function jump() { if (mode === 'duel' && duel.snapshot().status === 'running' && canPlayDuel(work) && visible() && hero.jump === 0) { hero.vy = 340; reconcile(); } }
   function play(event) {
     if (destroyed || String(event.dayKey ?? '') !== String(view.dayKey ?? '') || !visible()) return false;
+    if (work === 'call') return true;
+    if (mode === 'duel') changeMode('auto');
     queue.push(event, active ? MAX_QUEUE-1 : MAX_QUEUE);
     if (reduced || !ctx) { const next = queue.shift(); emit(next, weapon); }
     reconcile(); return true;
@@ -274,7 +335,7 @@ function createBattle(element) {
     rect(world.w*.29,world.floor-67,world.w*.13,5,'floor'); rect(world.w*.6,world.floor-106,world.w*.1,5,'floor');
   }
   function drawHero() {
-    const walking=keys.size>0, stride=walking ? Math.sin(hero.walk)*5 : 0, idle=reduced ? 0 : Math.sin(clock*2)*.6;
+    const walking=keys.size>0, stride=!reduced && walking ? Math.sin(hero.walk)*5 : 0, idle=0;
     ctx.save(); ctx.translate(Math.round(hero.x),Math.round(world.floor-hero.jump+idle)); ctx.scale(hero.face,1);
     const p=(x,y,w,h,c)=>rect(x*2,y*2,w*2,h*2,c);
     ctx.globalAlpha=.2; rect(-22,0,48,6,'ink'); ctx.globalAlpha=1;
@@ -301,7 +362,21 @@ function createBattle(element) {
   function draw() {
     if (destroyed) return;
     if (ctx) {
-      skyline(); drawHero();
+      skyline();
+      const d = duel.snapshot();
+      if (mode === 'duel') for (const attack of d.attacks) {
+        const warning = attack.age <= attack.warning;
+        if (warning) {
+          const x = (attack.kind === 'wave' ? .5 : attack.target) * world.w;
+          rect(x-16, world.floor-4, 32, 4, 'gold');
+          if (attack.kind !== 'wave') { rect(x-1, world.floor-48, 2, 28, 'gold'); rect(x-1, world.floor-14, 2, 3, 'gold'); }
+        } else if (!reduced) {
+          const x = attack.x * world.w;
+          if (attack.kind === 'wave') { rect(x-10,world.floor-20,20,20,'monster-light'); rect(x-6,world.floor-25,12,5,'monster-shadow'); }
+          else if (attack.kind === 'projectile') { rect(x-6,world.floor-38,12,8,'monster-light'); rect(x+5,world.floor-36,18,4,'monster-shadow'); }
+        }
+      }
+      drawHero();
       if (clock<droneUntil&&!reduced) {
         const x=hero.x+42,y=world.floor-hero.jump-109+Math.sin(clock*6)*3;
         rect(x-15,y-4,30,3,'ink'); rect(x-19,y-7,13,2,'hero-light'); rect(x+6,y-7,13,2,'hero-light'); rect(x-7,y-3,14,10,'hero-dark'); rect(x-4,y-2,8,5,'hero'); rect(x-1,y+5,3,5,'monster-light');
@@ -315,17 +390,26 @@ function createBattle(element) {
     target.style.transform=`translate(${Math.round(hero.x-24)}px,${Math.round(world.floor-hero.jump-70)}px)`;
     $('notice').style.left=`${Math.max(124,Math.min(world.w-124,hero.x+50))}px`;
     $('notice').style.top=`${Math.max(64,world.floor-hero.jump-147)}px`;
-    monster.style.transform=!reduced&&clock<hitUntil ? `translateX(${Math.sin(clock*120)*4}px)` : '';
+    const charge = mode === 'duel' && duel.snapshot().attacks.find(attack => attack.kind === 'charge' && attack.age > attack.warning);
+    monster.style.transform = charge && !reduced ? `translateX(${Math.round(charge.x*world.w-boss().x)}px)` : !reduced&&clock<hitUntil ? `translateX(${Math.sin(clock*120)*4}px)` : '';
     if (clock>=hitUntil) monster.removeAttribute('data-battle-hit');
   }
   function frame(time) {
     raf=0;
     if (!visible()) { pause(); return; }
+    if (work === 'call') { clearEffects(); draw(); return; }
     const dt=Math.min(lastTime?(time-lastTime)/1000:.016,.04); lastTime=time; clock+=dt;
     const left=keys.has('a')||keys.has('arrowleft'), right=keys.has('d')||keys.has('arrowright');
     if (left||right) { hero.x=Math.max(32,Math.min(boss().x-82,hero.x+(right?1:-1)*150*dt)); hero.face=right?1:-1; hero.walk+=dt*13; }
     if (hero.vy||hero.jump) { hero.jump=Math.max(0,hero.jump+hero.vy*dt); hero.vy-=880*dt; if (hero.jump===0) hero.vy=0; }
     hero.recoil=Math.max(0,hero.recoil-dt); flash=Math.max(0,flash-dt);
+    if (mode === 'duel') {
+      const before = duel.snapshot();
+      const next = duel.step(dt, { x: hero.x/world.w, jump: hero.jump }, work);
+      if (next.lives < before.lives) { flash = .12; sound('hit'); }
+      if (next.status !== 'running') { keys.clear(); hero.jump = 0; hero.vy = 0; }
+      updateDuel();
+    }
     if (!active&&queue.size) { active=queue.shift(); emit(active,weapon); }
     const impacts=[];
     bullets=bullets.filter(b=>{ b.elapsed+=dt; if (b.elapsed<b.travel) return true; if (b.event) impacts.push([b.event,b.id]); return false; });
@@ -333,7 +417,7 @@ function createBattle(element) {
     particles=particles.filter(p=>{ p.age+=dt; p.x+=p.vx*dt; p.y+=p.vy*dt; p.vy+=360*dt; return p.age<p.life; });
     if (bannerUntil&&clock>bannerUntil) { $('banner').hidden=true; bannerUntil=0; }
     if (noticeUntil&&clock>noticeUntil) { $('notice').hidden=true; noticeUntil=0; }
-    draw(); raf=host.requestAnimationFrame(frame);
+    draw(); reconcile();
   }
   function sync(next, handlers) {
     if (destroyed) return;
@@ -341,8 +425,14 @@ function createBattle(element) {
     const signatures = next.callSignatures || {};
     const stale = hasSynced && !dayChanged && (view.goalUsd !== next.goalUsd || Object.entries(view.callSignatures).some(([id, signature]) => !Object.hasOwn(signatures, id) || signatures[id] !== signature));
     if (dayChanged || stale) {
-      clearEffects(); callbacks.onPause?.(); $('feed').textContent=translateText('Listo para tu próxima llamada'); $('live').textContent='';
-      if (dayChanged) { hero.x=Math.min(96,world.w*.22); practiceCount=0; lastPractice=-1; }
+      duel.reset(); mode = 'auto'; clearEffects(); callbacks.onPause?.(); $('feed').textContent=translateText('Listo para tu próxima llamada'); $('live').textContent='';
+      if (dayChanged) hero.x=Math.min(96,world.w*.22);
+    }
+    const nextWork = ['call','ready','break','off'].includes(next.workMode) ? next.workMode : 'ready';
+    if (nextWork !== work) {
+      duel.pause();
+      if (!canPlayDuel(nextWork)) { mode = 'auto'; clearEffects(); callbacks.onPause?.(); }
+      work = nextWork;
     }
     view={ ...next, callSignatures: { ...signatures } }; hasSynced=true; callbacks={ ...handlers }; selection(next.weapon);
     const markup = String(next.monsterMarkup??'');
@@ -351,7 +441,7 @@ function createBattle(element) {
     $('hero-label').textContent=next.heroLabel||translateText('Tu esfuerzo'); $('monster-label').textContent=next.monsterLabel||translateText('MONSTRUO DEL DÍA'); $('monster-name').textContent=next.monsterName||'';
     element.dataset.battleDefeated=String(next.defeated===true); element.dataset.battleHp=String(Math.max(0,Math.min(100,Number(next.hpPct)||0)));
     $('victory').hidden=next.defeated!==true; $('motion-note').hidden=!reduced;
-    resize(); refresh();
+    updateDuel(); resize(); refresh();
   }
   function destroy() {
     if (destroyed) return;
@@ -359,22 +449,27 @@ function createBattle(element) {
   }
   listen(element,'click',event=>{
     const button=event.target.closest?.('button'); if (!button||!element.contains(button)) return;
-    if (button.dataset.battleWeapon) selection(button.dataset.battleWeapon,true);
-    if (button.dataset.battleDirection&&event.detail===0&&!reduced&&ctx&&visible()) {
+    if (button.disabled) return;
+    if (button.dataset.battleWeapon && work !== 'call') selection(button.dataset.battleWeapon,true);
+    if (button.dataset.battleDirection&&event.detail===0&&mode==='duel'&&duel.snapshot().status==='running'&&canPlayDuel(work)&&ctx&&visible()) {
       const direction=button.dataset.battleDirection==='d'?1:-1;
       hero.x=Math.max(32,Math.min(boss().x-82,hero.x+direction*22)); hero.face=direction; draw();
     }
     const action=button.dataset.battleAction;
-    if (action==='attack'||action==='hero'||action==='grenade') { practice(action==='grenade'?'grenade':weapon); if (action==='hero') stage.focus({ preventScroll:true }); }
+    if (action === 'auto' || action === 'duel') changeMode(action);
+    else if (action === 'start') beginDuel();
+    else if (action==='attack'||action==='hero'||action==='grenade') { practice(action==='grenade'?'grenade':weapon); if (action==='hero') stage.focus({ preventScroll:true }); }
     else if (action==='jump') jump();
   });
   listen(stage,'contextmenu',event=>{ event.preventDefault(); practice('grenade'); });
   listen(stage,'pointerdown',event=>{ if (event.button===0&&event.target===canvas) stage.focus({ preventScroll:true }); });
   listen(element,'keydown',event=>{
     if (event.altKey||event.ctrlKey||event.metaKey||event.target.closest('input,textarea,select,[contenteditable="true"]')||!visible()) return;
+    if (work === 'call') return;
     const key=event.key.toLowerCase(), w=BATTLE_WEAPONS.find(item=>item.key===key);
     if (w) { event.preventDefault(); if (!event.repeat) selection(w.id,true); return; }
-    if (['a','d','arrowleft','arrowright'].includes(key)) { event.preventDefault(); if (!reduced) keys.add(key); }
+    if (mode !== 'duel' || duel.snapshot().status !== 'running' || !canPlayDuel(work)) return;
+    if (['a','d','arrowleft','arrowright'].includes(key)) { event.preventDefault(); keys.add(key); }
     else if ([' ','arrowup','w','enter','g'].includes(key)) {
       // Buttons and disclosures keep native Enter/Space activation.
       if ((key==='enter'||key===' ')&&(event.target.closest('button')||event.target.closest('summary'))) return;
@@ -385,7 +480,7 @@ function createBattle(element) {
   listen(host,'keyup',event=>keys.delete(event.key.toLowerCase())); listen(host,'blur',()=>keys.clear());
   listen(element,'focusout',event=>{ if (!element.contains(event.relatedTarget)) keys.clear(); });
   for (const button of element.querySelectorAll('[data-battle-direction]')) {
-    listen(button,'pointerdown',event=>{ if (!reduced&&visible()) { event.preventDefault(); button.focus({ preventScroll:true }); keys.add(button.dataset.battleDirection); button.setPointerCapture?.(event.pointerId); } });
+    listen(button,'pointerdown',event=>{ if (mode==='duel'&&duel.snapshot().status==='running'&&canPlayDuel(work)&&visible()) { event.preventDefault(); button.focus({ preventScroll:true }); keys.add(button.dataset.battleDirection); button.setPointerCapture?.(event.pointerId); } });
     for (const type of ['pointerup','pointercancel','lostpointercapture']) listen(button,type,()=>keys.delete(button.dataset.battleDirection));
   }
   listen(doc,'visibilitychange',reconcile);
