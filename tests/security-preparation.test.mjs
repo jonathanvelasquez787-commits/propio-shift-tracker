@@ -180,6 +180,32 @@ test('clean app route preserves legacy links and login navigation', () => {
   assert.match(read('js/boot.js'), /window\.location\.replace\('\/\?next=\/app'\)/);
 });
 
+test('verified app sessions display the root URL without reloading or losing URL state', () => {
+  const source = read('js/boot.js');
+  const normalize = source.match(/^function normalizeAppAddress\(\) \{[\s\S]*?^\}/m)?.[0];
+  assert.ok(normalize);
+  for (const path of ['/app', '/app.html', '/app?from=bookmark#main']) {
+    const state = { position: 3 };
+    let replaced, cleared;
+    vm.runInNewContext(`${normalize}\nnormalizeAppAddress()`, {
+      sessionStorage: { removeItem(key) { cleared = key; } },
+      URL, window: { location: { href: 'https://app.example' + path },
+        history: { state, replaceState(nextState, title, url) { replaced = { nextState, title, url }; } } },
+    });
+    assert.equal(replaced.nextState, state);
+    assert.equal(cleared, 'ps_auto_enter_at');
+    const expected = new URL('https://app.example' + path);
+    expected.pathname = '/';
+    assert.equal(replaced.url, expected.href);
+  }
+  vm.runInNewContext(`${normalize}\nnormalizeAppAddress()`, {
+    URL, window: { location: { href: 'https://app.example/?recuperar=1' },
+      history: { replaceState() { assert.fail('Only the loaded app entry route should be normalized'); } } },
+  });
+  const boot = source.slice(source.indexOf('async function boot()'));
+  assert.ok(boot.indexOf('normalizeAppAddress();') > boot.indexOf('if (!(await mountApp())) return;'));
+});
+
 test('PWA launches the clean route offline and redirects legacy navigations', async () => {
   const handlers = new Map();
   let precached = [], responsePromise, networkCalls = 0;
