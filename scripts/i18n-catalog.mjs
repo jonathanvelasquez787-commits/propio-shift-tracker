@@ -27,7 +27,7 @@ export function collectCatalog(root = process.cwd()) {
   };
   for (const file of ['app.html', 'index.html', 'privacidad.html', 'terminos.html']) {
     function htmlWalk(node, ignored = false) {
-      const skip = ignored || ['script', 'style', 'textarea', 'code'].includes(node.tagName);
+      const skip = ignored || ['script', 'style', 'textarea', 'code', 'noscript'].includes(node.tagName);
       if (node.nodeName === '#text' && !skip) add(node.value, file);
       if (!skip) for (const attr of node.attrs || []) if (['title', 'aria-label', 'placeholder', 'alt'].includes(attr.name)) add(attr.value, file);
       for (const child of node.childNodes || []) htmlWalk(child, skip);

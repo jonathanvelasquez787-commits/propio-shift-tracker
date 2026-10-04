@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#07111f"/>
+  <path d="M64 80H1136" stroke="#21354b" stroke-width="2"/>
+  <g fill="none" stroke="#22d3ee" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="96" cy="153" r="31"/><path d="M96 134v19l13 8"/>
+  </g>
+  <g font-family="Segoe UI,Arial,sans-serif" fill="#f0f6ff">
+    <text x="150" y="168" font-size="38" font-weight="700">Propio Shift Tracker</text>
+    <text x="64" y="294" font-size="62" font-weight="700">Your shift.</text>
+    <text x="64" y="371" font-size="62" font-weight="700">Your calls.</text>
+    <text x="64" y="448" font-size="62" font-weight="700" fill="#22d3ee">Your earnings.</text>
+    <text x="64" y="548" font-size="27" fill="#a7b7cc">Free tools for remote interpreters</text>
+  </g>
+  <g font-family="Segoe UI,Arial,sans-serif" font-size="26">
+    <rect x="790" y="246" width="346" height="72" rx="12" fill="#102136" stroke="#21354b"/>
+    <rect x="790" y="342" width="346" height="72" rx="12" fill="#102136" stroke="#21354b"/>
+    <rect x="790" y="438" width="346" height="72" rx="12" fill="#102136" stroke="#21354b"/>
+    <g fill="#f0f6ff"><text x="820" y="292">Shift tracking</text><text x="820" y="388">Schedule adherence</text><text x="820" y="484">Pay-cycle reports</text></g>
+  </g>
+</svg>

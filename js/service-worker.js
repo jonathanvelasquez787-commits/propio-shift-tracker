@@ -3,6 +3,7 @@ const CACHE = `propio-${BUILD_VERSION}`;
 const SHELL = [
   '/',
   '/index.html',
+  '/es',
   '/app',
   '/privacidad.html',
   '/terminos.html',
@@ -61,7 +62,7 @@ self.addEventListener('fetch', (event) => {
         .catch(() =>
           caches.open(CACHE).then(async (cache) =>
             (await cache.match(request)) ||
-            (url.pathname === '/app' && await cache.match('/app')) ||
+            (['/app', '/es'].includes(url.pathname) && await cache.match(url.pathname)) ||
             cache.match('/index.html')
           )
         )

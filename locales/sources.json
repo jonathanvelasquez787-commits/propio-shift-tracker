@@ -84,6 +84,13 @@
       "terminos.html"
     ]
   },
+  "s_032f5cdf": {
+    "source": "Cambiar a inglés",
+    "files": [
+      "index.html",
+      "js/theme-toggle.js"
+    ]
+  },
   "s_033ebcdd": {
     "source": "Emoji",
     "files": [
@@ -744,6 +751,12 @@
       "app.html"
     ]
   },
+  "s_0fc26bf2": {
+    "source": "Control de turnos, llamadas y ganancias para intérpretes",
+    "files": [
+      "index.html"
+    ]
+  },
   "s_0fdeb278": {
     "source": "Perfil guardado",
     "files": [
@@ -1308,12 +1321,6 @@
       "js/app-main.js"
     ]
   },
-  "s_1ac996bd": {
-    "source": "Tu turno, tus llamadas",
-    "files": [
-      "index.html"
-    ]
-  },
   "s_1ac9c063": {
     "source": "Que las llamadas de hoy vengan con buena energía.",
     "files": [
@@ -1580,12 +1587,6 @@
       "js/game.js"
     ]
   },
-  "s_20cc144a": {
-    "source": "EN",
-    "files": [
-      "index.html"
-    ]
-  },
   "s_20dd05b7": {
     "source": "Cumplir la meta diaria",
     "files": [
@@ -1768,6 +1769,12 @@
     "source": "Asignación automática activada — se repartirá con tu próxima llamada guardada",
     "files": [
       "js/finance.js"
+    ]
+  },
+  "s_25cc1c29": {
+    "source": "ES",
+    "files": [
+      "index.html"
     ]
   },
   "s_26093968": {
@@ -2175,6 +2182,12 @@
       "js/reports.js"
     ]
   },
+  "s_2ebc52f2": {
+    "source": "Antes de empezar tu turno",
+    "files": [
+      "index.html"
+    ]
+  },
   "s_2ebf6c74": {
     "source": "Almuerzo / Descanso largo",
     "files": [
@@ -2520,6 +2533,13 @@
       "app.html"
     ]
   },
+  "s_340c1eae": {
+    "source": "sjonathanvelasquez@gmail.com",
+    "files": [
+      "privacidad.html",
+      "terminos.html"
+    ]
+  },
   "s_3436d468": {
     "source": "Sin cambio vs ayer",
     "files": [
@@ -2561,6 +2581,12 @@
     "source": "{{v15}} / {{v16}} · {{v17}}%",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_3566913d": {
+    "source": "¿Es gratis y funciona en el teléfono?",
+    "files": [
+      "index.html"
     ]
   },
   "s_35795c47": {
@@ -2705,6 +2731,12 @@
     "source": "Próxima ventana",
     "files": [
       "js/higher-rate.js"
+    ]
+  },
+  "s_384fbd4f": {
+    "source": "Cómo registrar tu turno de interpretación",
+    "files": [
+      "index.html"
     ]
   },
   "s_387cf6e3": {
@@ -2979,6 +3011,12 @@
     "source": "{{v0}} acciones registradas",
     "files": [
       "js/sync.js"
+    ]
+  },
+  "s_3f27984c": {
+    "source": "Lleva tus turnos de interpretación remota en un solo lugar. Registra\n        llamadas y minutos facturables, calcula tus ganancias según tu tarifa\n        y compara tus pausas con tu horario, sin depender de hojas de cálculo.",
+    "files": [
+      "index.html"
     ]
   },
   "s_3f563c9d": {
@@ -3649,8 +3687,8 @@
       "app.html"
     ]
   },
-  "s_4d68d65c": {
-    "source": "[TU CORREO DE CONTACTO]",
+  "s_4d0b3a92": {
+    "source": "Jonathan Velasquez",
     "files": [
       "privacidad.html",
       "terminos.html"
@@ -3755,6 +3793,12 @@
     "files": [
       "app.html",
       "js/app-main.js"
+    ]
+  },
+  "s_4f11a481": {
+    "source": "tus llamadas y",
+    "files": [
+      "index.html"
     ]
   },
   "s_4f1437b3": {
@@ -4826,12 +4870,6 @@
       "js/landing.js"
     ]
   },
-  "s_63d2864b": {
-    "source": "Deja de llevar la cuenta en la cabeza y en tres hojas de cálculo. Marca\n        tu turno, pega tus llamadas y mira al instante cuánto llevas ganado,\n        qué tan pegado vas a tu horario y cuánto te falta para tu meta.",
-    "files": [
-      "index.html"
-    ]
-  },
   "s_63d91128": {
     "source": ", llenando pago, minutos, si es facturable y si se cayó.",
     "files": [
@@ -4975,6 +5013,12 @@
     "source": "XP diario ya sellado",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_66bec934": {
+    "source": "Sí. Puedes pegar tu exportación de llamadas de Propio, agregar llamadas manualmente o registrarlas en vivo. Propio Shift Tracker es una herramienta independiente y no sustituye los registros oficiales.",
+    "files": [
+      "index.html"
     ]
   },
   "s_66e1447c": {
@@ -5427,12 +5471,6 @@
       "js/game.js"
     ]
   },
-  "s_7075ead8": {
-    "source": "Propio Shift Tracker — tu turno, tus llamadas y tus ganancias en un solo lugar",
-    "files": [
-      "index.html"
-    ]
-  },
   "s_70868d7e": {
     "source": "ACW",
     "files": [
@@ -5607,6 +5645,12 @@
     "source": "Menú",
     "files": [
       "app.html"
+    ]
+  },
+  "s_742929fc": {
+    "source": "Qué puedes registrar y cómo usar los números de tu jornada.",
+    "files": [
+      "index.html"
     ]
   },
   "s_7463cd99": {
@@ -5937,12 +5981,6 @@
     "files": [
       "app.html",
       "js/boot.js"
-    ]
-  },
-  "s_79d5084a": {
-    "source": "Todo lo que ya anotas, pero calculado solo",
-    "files": [
-      "index.html"
     ]
   },
   "s_7a39d114": {
@@ -6351,6 +6389,12 @@
     "source": "Bloque de Trabajo {{v0}}",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_81d4ddca": {
+    "source": "Sí. La herramienta es gratuita y funciona desde el navegador de tu computadora o teléfono. Crea tu cuenta para sincronizar tus registros; también puedes exportarlos a JSON, CSV o PDF.",
+    "files": [
+      "index.html"
     ]
   },
   "s_81d7af75": {
@@ -6802,6 +6846,12 @@
       "privacidad.html"
     ]
   },
+  "s_8a24f625": {
+    "source": "Configura tu tarifa por minuto y registra tus llamadas. La app reúne los minutos facturables y sus importes para mostrar tus ganancias del día y del ciclo. Los pagos definitivos dependen de tu plataforma o empleador.",
+    "files": [
+      "index.html"
+    ]
+  },
   "s_8a78b923": {
     "source": "Importar JSON",
     "files": [
@@ -6884,6 +6934,12 @@
     "source": "Activar sonido",
     "files": [
       "app.html"
+    ]
+  },
+  "s_8bd118be": {
+    "source": "¿Puedo importar mis llamadas de Propio?",
+    "files": [
+      "index.html"
     ]
   },
   "s_8bde25c1": {
@@ -8402,6 +8458,12 @@
       "index.html"
     ]
   },
+  "s_aa20c414": {
+    "source": "Preguntas frecuentes",
+    "files": [
+      "index.html"
+    ]
+  },
   "s_aa33e520": {
     "source": "Ahora puedes editar cada día.",
     "files": [
@@ -9360,13 +9422,6 @@
       "terminos.html"
     ]
   },
-  "s_be324831": {
-    "source": "[TU NOMBRE O RAZÓN SOCIAL]",
-    "files": [
-      "privacidad.html",
-      "terminos.html"
-    ]
-  },
   "s_be5b33ad": {
     "source": "Sus {{v0}} fila(s) no se borran: pasan a la categoría \"Otro\".",
     "files": [
@@ -10241,6 +10296,12 @@
       "index.html"
     ]
   },
+  "s_d06e87b9": {
+    "source": "¿Cómo calculo mis ganancias por minuto?",
+    "files": [
+      "index.html"
+    ]
+  },
   "s_d0a8f98f": {
     "source": "Horario fijo que la app ya conoce.",
     "files": [
@@ -10391,12 +10452,6 @@
       "js/calls.js"
     ]
   },
-  "s_d3c57703": {
-    "source": "Listo en lo que dura un café",
-    "files": [
-      "index.html"
-    ]
-  },
   "s_d4073926": {
     "source": "Minutos productivos",
     "files": [
@@ -10479,6 +10534,12 @@
     "source": "S",
     "files": [
       "app.html"
+    ]
+  },
+  "s_d60e8399": {
+    "source": "Tu turno de intérprete,",
+    "files": [
+      "index.html"
     ]
   },
   "s_d65c2a56": {
@@ -11744,6 +11805,12 @@
       "js/game-battle.js"
     ]
   },
+  "s_ef8a8316": {
+    "source": "Turnos y ganancias para intérpretes | Propio Shift Tracker",
+    "files": [
+      "index.html"
+    ]
+  },
   "s_efc3ceb5": {
     "source": "Ver Bloques o Llamadas",
     "files": [
@@ -12080,7 +12147,7 @@
   "s_f573b8d0": {
     "source": "Cambiar a español",
     "files": [
-      "index.html"
+      "js/theme-toggle.js"
     ]
   },
   "s_f5792ea2": {
@@ -12383,12 +12450,6 @@
     "source": "{{v2}} Reiniciar mes",
     "files": [
       "js/finance.js"
-    ]
-  },
-  "s_fc0c4ef4": {
-    "source": "y",
-    "files": [
-      "index.html"
     ]
   },
   "s_fc107c60": {

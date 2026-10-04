@@ -2,6 +2,10 @@ import { applySavedColors } from './appearance-colors.js';
 import { readLanguagePreference } from './language-preference.js';
 // El build genera un script bloqueante para aplicar los colores antes de pintar.
 (() => {
+  (document.querySelectorAll?.('[data-deferred-fonts]') || []).forEach(link => {
+    if (link.sheet) link.media = 'all';
+    else link.addEventListener('load', () => { link.media = 'all'; }, { once: true });
+  });
   let theme = 'light';
   let appearance = {};
   try {

@@ -2,6 +2,7 @@ import { translateText, translateDocument } from './i18n.js';
 import { applySavedColors } from './appearance-colors.js';
 import { currentLanguage, setLanguage } from './i18n.js';
 import { LANGUAGE_PREFERENCE_KEY, readLanguagePreference, saveLanguagePreference } from './language-preference.js';
+import { syncLandingMetadata } from './landing-meta.js';
 translateDocument();
 // Interruptor claro/oscuro de las páginas públicas.
 //
@@ -63,11 +64,12 @@ syncButtons(current);
 
 function syncLanguage(value) {
   setLanguage(value, { documentTranslation: true });
+  syncLandingMetadata(currentLanguage());
   document.querySelectorAll('[data-language-select]').forEach(select => { select.value = currentLanguage(); });
   document.querySelectorAll('[data-language-toggle]').forEach(button => {
     button.dataset.language = currentLanguage();
     button.querySelector('[data-language-label]').textContent = currentLanguage().toUpperCase();
-    const action = translateText(currentLanguage() === 'en' ? 'Cambiar a español' : 'Cambiar a inglés');
+    const action = currentLanguage() === 'en' ? translateText('Cambiar a español') : translateText('Cambiar a inglés');
     button.setAttribute('aria-label', action);
     button.title = action;
   });
@@ -85,6 +87,7 @@ document.addEventListener('change', event => {
 document.addEventListener('click', (e) => {
   const languageButton = e.target instanceof Element ? e.target.closest('[data-language-toggle]') : null;
   if (languageButton) {
+    e.preventDefault();
     const language = saveLanguagePreference(currentLanguage() === 'en' ? 'es' : 'en', { pendingLogin: true });
     syncLanguage(language);
     window.dispatchEvent(new CustomEvent('propio-language-change', { detail: language }));

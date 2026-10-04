@@ -320,8 +320,10 @@ futura opera bajo esto, sin excepción:
 Visibilidad en Google: base técnica publicada desde v584. Falta verificar la
 propiedad real en Search Console y enviar sitemap/inspeccionar la landing;
 requiere la cuenta de Google del propietario y su método/código de verificación.
-No se conoce el estado real de indexación ni se prometen posiciones. Las URLs
-por idioma y nuevas guías públicas son mejoras posteriores, no implementadas.
+No se conoce el estado real de indexación ni se prometen posiciones. Desde v590
+hay URLs públicas por idioma (`/` en inglés y `/es` en español), contenido,
+metadatos, hreflang y datos estructurados coherentes. Nuevas guías públicas y
+difusión en comunidades pertinentes siguen siendo mejoras posteriores.
 Ver docs/seo.md.
 
 La auditoría profunda de v576 quedó cerrada: 31 días simulados, 108 llamadas,
@@ -597,7 +599,10 @@ La aplicación funciona en producción con estas bases vigentes:
   detecta la sesión y reabre la app. La PWA mantiene su identidad y precarga.
 - Gamificación compacta: batalla y refuerzo positivo reducidos, armas y misiones
   desplegables e hitos integrados en el indicador de vida, sin retirar funciones.
-- La versión actual es 589. Refuerzo positivo, Logros y auditoría profunda
+- Landing bilingüe estática, canonical/hreflang y sitemap de cuatro páginas,
+  preguntas frecuentes e imagen social. Un bundle público evita cargar tres
+  copias de las traducciones; las fuentes no bloquean el primer render.
+- La versión actual es 590. Refuerzo positivo, Logros y auditoría profunda
   están terminados. Los siete fallos de la auditoría se corrigieron con
   regresiones; cobertura y límites constan en
   `docs/auditoria-profunda-2026-09-30.md`.
@@ -605,6 +610,19 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v590** — SEO público bilingüe y carga de la landing.
+
+- `/` entrega inglés y `/es` español sin necesitar JavaScript; selector conserva
+  los formularios y sincroniza dirección, canonical, metadatos y JSON-LD.
+- Contenido dirigido a intérpretes, preguntas frecuentes, hreflang recíproco,
+  sitemap e imagen para compartir. Duplicados HTML redirigen permanentemente.
+- Un bundle público, fuentes diferidas y hero visible desde el primer render.
+  App privada con noindex, acceso y precarga PWA conservados.
+- Restaurados Jonathan Velasquez y su correo público anterior en las páginas
+  legales. 241 pruebas, build y 16 casos de idioma/tema/tamaño correctos.
+- Search Console requiere la propiedad real; detalles en `docs/seo.md` y
+  `docs/seo-audit-2026-10-04.md`.
 
 **v589** — Dirección principal visible al usar la app.
 
@@ -628,17 +646,3 @@ La aplicación funciona en producción con estas bases vigentes:
   sin conexión. Sin cambios en los datos de cuenta ni en Supabase.
 - 234 pruebas y build correctos; navegación, redirección de enlaces antiguos
   y acceso offline cubiertos por regresiones.
-
-**v587** — Héroe y batalla pixel art del mockup aprobado.
-
-- Ciudad, héroe, armas/práctica y monstruos existentes en Inicio; vida e
-  indicadores conectados a datos reales, Misiones/hitos debajo. Diez armas
-  guardadas con la cuenta, granada y aviso cada tres activaciones.
-- Registro de llamadas independiente de proyectiles. Recibos/XP/ganancias
-  conservados; cola visual agrupada, cancelación al cambiar fecha/desactivar,
-  pausa fuera de vista, limpieza de recursos y movimiento reducido estático.
-- Once sonidos breves, diferenciados y sintetizados; cancelación de voces
-  activas/futuras y prioridades. ES/EN, paletas y precarga PWA actualizados.
-- 232 pruebas, 2.064 textos, 29 módulos, wiring/build correctos. Chrome:
-  recorridos reales de controles con auth/nube aislados, importación de 200
-  llamadas, práctica conservando datos y 128 combinaciones visuales finales.

@@ -4,6 +4,7 @@ import { minify } from 'terser';
 import { cp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { createAppShell } from './production-shell.mjs';
+import { createLocalizedLanding } from './landing-pages.mjs';
 
 const root = process.cwd();
 const out = path.join(root, 'public');
@@ -17,7 +18,7 @@ await mkdir(path.join(out, 'icons'), { recursive: true });
 const entries = {
   'theme-init': 'js/theme-init.js',
   boot: 'js/boot.js',
-  landing: 'js/landing.js',
+  landing: 'js/landing-entry.js',
   'landing-ui': 'js/landing-ui.js',
   'theme-toggle': 'js/theme-toggle.js',
 };
@@ -77,12 +78,14 @@ await minifyFile(path.join(out, 'sw.js'), worker);
 await cp(path.join(root, 'css'), path.join(out, 'css'), { recursive: true });
 await cp(path.join(root, 'manifest.webmanifest'), path.join(out, 'manifest.webmanifest'));
 await cp(path.join(root, 'icons/app-icon.svg'), path.join(out, 'icons/app-icon.svg'));
+await cp(path.join(root, 'icons/social-preview.png'), path.join(out, 'icons/social-preview.png'));
 for (const name of ['robots.txt', 'sitemap.xml']) {
   await cp(path.join(root, name), path.join(out, name));
 }
 
 for (const name of ['index.html', 'app.html', 'privacidad.html', 'terminos.html']) {
   let html = await readFile(path.join(root, name), 'utf8');
+  if (name === 'index.html') html = html.replace(/<script type="module" src="js\/(?:theme-toggle|landing-ui)\.js"><\/script>\r?\n/g, '');
   html = html
     .replaceAll('/js/theme-init.js', `/assets/theme-init.js?v=${release}`)
     .replaceAll('/js/footer-year.js', `/assets/footer-year.js?v=${release}`)
@@ -102,6 +105,10 @@ for (const name of ['index.html', 'app.html', 'privacidad.html', 'terminos.html'
     await writeFile(path.join(out, 'css/app-core.css'), shell.css);
     await minifyFile(path.join(assets, 'app-view.js'), shell.viewScript);
     html = shell.html;
+  }
+  if (name === 'index.html') {
+    await writeFile(path.join(out, 'es.html'), createLocalizedLanding(html, 'es'));
+    html = createLocalizedLanding(html, 'en');
   }
   await writeFile(path.join(out, name), html);
 }

@@ -79,9 +79,12 @@
     }
   ],
   "redirects": [
-    { "source": "/app.html", "destination": "/app", "permanent": true }
+    { "source": "/app.html", "destination": "/app", "permanent": true },
+    { "source": "/index.html", "destination": "/", "permanent": true },
+    { "source": "/es.html", "destination": "/es", "permanent": true }
   ],
   "rewrites": [
+    { "source": "/es", "destination": "/es.html" },
     {
       "source": "/app",
       "destination": "/app.html"
