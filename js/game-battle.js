@@ -108,10 +108,10 @@ export function battleMarkup() {
     <div class="game-battle-controls"><div class="game-battle-keys"><span><kbd>A D</kbd> Caminar</span><span><kbd>Espacio</kbd> Saltar</span><span><kbd>Enter</kbd> Práctica</span><span><kbd>G / RMB</kbd> Granada</span></div>
       <div class="game-battle-touch" role="group" aria-label="Controles de práctica"><button type="button" data-battle-direction="a" aria-label="Caminar a la izquierda">←</button><button type="button" data-battle-direction="d" aria-label="Caminar a la derecha">→</button><button type="button" data-battle-action="jump" aria-label="Saltar">↑</button><button type="button" data-battle-action="attack">Práctica</button><button type="button" data-battle-action="grenade">Granada</button></div>
     </div>
-    <div class="game-battle-armory"><div class="game-battle-armory-head"><span>ARMA DEL HÉROE</span><small data-battle-selected></small></div>
+    <details class="game-battle-armory"><summary class="game-battle-armory-head"><span>ARMA DEL HÉROE</span><small data-battle-selected></small></summary>
       <div class="game-battle-weapons" role="group" aria-label="Elegir arma del héroe">${BATTLE_WEAPONS.map(w => `<button type="button" class="game-battle-weapon" data-battle-weapon="${w.id}" aria-pressed="${w.id === 'pistol'}" title="${escape(weaponHint(w.id))}">${weaponIcon(w.id)}<span>${escape(weaponName(w.id))}</span><kbd>${w.key}</kbd></button>`).join('')}</div>
       <p class="game-battle-motion-note" data-battle-motion-note hidden>Movimiento reducido: la batalla muestra el resultado sin animación.</p>
-    </div><p class="game-battle-live" data-battle-live role="status" aria-live="polite" aria-atomic="true"></p>
+    </details><p class="game-battle-live" data-battle-live role="status" aria-live="polite" aria-atomic="true"></p>
   </section>`;
 }
 
@@ -373,8 +373,8 @@ function createBattle(element) {
     if (w) { event.preventDefault(); if (!event.repeat) selection(w.id,true); return; }
     if (['a','d','arrowleft','arrowright'].includes(key)) { event.preventDefault(); if (!reduced) keys.add(key); }
     else if ([' ','arrowup','w','enter','g'].includes(key)) {
-      // Enter/Space on a DOM button use its native click; movement remains available in the scene.
-      if ((key==='enter'||key===' ')&&event.target.closest('button')) return;
+      // Buttons and disclosures keep native Enter/Space activation.
+      if ((key==='enter'||key===' ')&&(event.target.closest('button')||event.target.closest('summary'))) return;
       event.preventDefault(); if (event.repeat) return;
       if (key==='enter'||key==='g') practice(key==='g'?'grenade':weapon); else jump();
     }

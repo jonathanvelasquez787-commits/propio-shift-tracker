@@ -23,14 +23,14 @@
 .game-battle [hidden] { display: none !important; }
 .game-battle button { appearance: none; cursor: pointer; touch-action: manipulation; font-family: inherit; color: var(--text); }
 .game-battle :is(button, [tabindex]):focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
-.game-battle-stage { position: relative; width: 100%; height: 290px; overflow: hidden; background: var(--battle-sky); isolation: isolate; }
+.game-battle-stage { position: relative; width: 100%; height: 176px; overflow: hidden; background: var(--battle-sky); isolation: isolate; }
 .game-battle-stage > canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
 .game-battle-label { position: absolute; z-index: 2; top: 14px; max-width: 35%; pointer-events: none; overflow-wrap: anywhere; color: var(--muted); font: 800 9px/1.4 ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: .08em; }
 .game-battle-label b { display: block; color: var(--text); font-size: 12px; letter-spacing: 0; margin-top: 3px; }
 .game-battle-label--hero { left: 16px; }
 .game-battle-label--monster { right: 16px; text-align: right; }
 .game-battle-feed { position: absolute; z-index: 2; top: 60px; left: 12px; right: 12px; margin: 0; text-align: center; color: var(--muted); font: 750 10px/1.5 ui-monospace, SFMono-Regular, Consolas, monospace; overflow-wrap: anywhere; pointer-events: none; }
-.game-battle-monster { position: absolute; z-index: 1; bottom: 38px; right: 30px; width: 148px; height: 148px; display: grid; place-items: end center; pointer-events: none; color: var(--rpt-purple); }
+.game-battle-monster { position: absolute; z-index: 1; bottom: 38px; right: 30px; width: 104px; height: 104px; display: grid; place-items: end center; pointer-events: none; color: var(--rpt-purple); }
 .game-battle .game-battle-monster .monster-svg { display: block; width: 100%; max-width: 148px; height: auto; max-height: 148px; animation: none !important; image-rendering: pixelated; }
 .game-battle-monster[data-battle-hit] { filter: brightness(1.25); }
 .game-battle-monster[data-battle-hit="critical"] { filter: brightness(1.6); }
@@ -48,8 +48,8 @@
 .game-battle-victory span { color: var(--tier-gold); font: 22px ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: 3px; }
 .game-battle-victory strong { font: 900 27px ui-monospace, SFMono-Regular, Consolas, monospace; }
 .game-battle-victory small { font-size: 12px; color: var(--muted); }
-.game-battle-controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 16px; border-top: 1px solid var(--line); }
-.game-battle-health { display: grid; gap: 8px; padding: 14px 16px 16px; }
+.game-battle-controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px; padding: 6px 12px; border-top: 1px solid var(--line); }
+.game-battle-health { display: grid; gap: 5px; padding: 8px 12px; }
 .game-battle-health:empty { display: none; }
 .game-battle-health .game-hp-label { margin: 0; }
 .game-battle-health .game-hp-foot { gap: 5px 12px; }
@@ -62,8 +62,14 @@
 .game-battle-touch [data-battle-action="attack"] { color: var(--cyan); }
 .game-battle-touch [data-battle-action="grenade"] { color: var(--tier-gold); }
 .game-battle-touch button:hover { border-color: var(--cyan); }
-.game-battle-armory { padding: 13px 16px 14px; border-top: 1px solid var(--line); }
-.game-battle-armory-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 5px 8px; margin-bottom: 9px; }
+.game-battle-armory { padding: 0 12px; border-top: 1px solid var(--line); }
+.game-battle-armory-head { display: flex; align-items: center; gap: 5px 8px; min-height: 36px; padding: 5px 0; cursor: pointer; list-style: none; }
+.game-battle-armory-head::-webkit-details-marker { display: none; }
+.game-battle-armory-head small { margin-left: auto; text-align: right; }
+.game-battle-armory-head::after { content: "⌄"; flex: 0 0 auto; color: var(--muted); }
+.game-battle-armory[open] > summary::after { transform: rotate(180deg); }
+.game-battle-armory > summary:focus-visible { outline: 2px solid var(--cyan); outline-offset: -2px; }
+.game-battle-armory[open] { padding-bottom: 8px; }
 .game-battle-armory-head > span { font: 800 9px ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: .1em; color: var(--muted); }
 .game-battle-armory-head small { color: var(--cyan); font-size: 11px; overflow-wrap: anywhere; }
 .game-battle-weapons { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
@@ -79,18 +85,18 @@
 #gameArena.game-arena--battle { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; padding: 0; }
 #gameArena.game-arena--battle > * { min-width: 0; grid-column: 1; }
 #gameArena.game-arena--battle > .game-battle { margin-top: 0; border-left: 0; border-right: 0; border-bottom: 0; }
-#gameArena.game-arena--battle [data-battle-summary] { display: grid; gap: 7px; padding: 17px 18px; }
+#gameArena.game-arena--battle [data-battle-summary] { display: grid; gap: 4px; padding: 10px 12px; }
 #gameArena.game-arena--battle .game-arena-title-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; }
 #gameArena.game-arena--battle .game-arena-title-row h3 { flex: 1 1 130px; }
 #gameArena.game-arena--battle .game-battle-badges { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
 #gameArena.game-arena--battle .game-battle-badges .game-phase-meter { display: inline-block; padding: 5px 7px; border: 1px solid currentColor; font: 800 10px ui-monospace, SFMono-Regular, Consolas, monospace; }
-#gameArena.game-arena--battle [data-battle-stats] { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; padding: 12px 16px; border-top: 1px solid var(--line); }
-#gameArena.game-arena--battle [data-battle-stats] > div { display: grid; gap: 5px; min-width: 0; padding: 8px 10px; border: 1px solid var(--line); background: var(--accordion-bg); }
+#gameArena.game-arena--battle [data-battle-stats] { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 8px 12px; border-top: 1px solid var(--line); }
+#gameArena.game-arena--battle [data-battle-stats] > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; min-width: 0; padding: 0; border: 0; background: transparent; }
 #gameArena.game-arena--battle [data-battle-stats] span { min-width: 0; color: var(--muted); font-size: 10px; overflow-wrap: anywhere; }
 #gameArena.game-arena--battle [data-battle-stats] strong { min-width: 0; font: 800 14px/1.4 ui-monospace, SFMono-Regular, Consolas, monospace; overflow-wrap: anywhere; }
 #gameArena.game-arena--battle [data-battle-stats] > div:first-child strong { color: var(--good); }
 #gameArena.game-arena--battle [data-battle-stats] > div:last-child strong { color: var(--tier-gold); }
-#gameArena.game-arena--battle [data-battle-mission-hint] { padding: 10px 16px; }
+#gameArena.game-arena--battle [data-battle-mission-hint] { padding: 6px 12px; }
 #gameHomeDay:has(.game-arena--battle) .game-mission-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; }
 #gameHomeDay:has(.game-arena--battle) .game-mission { grid-template-columns: 24px minmax(0, 1fr); align-content: start; border-top: 0; border-right: 1px solid var(--line); padding: 4px 12px; }
 #gameHomeDay:has(.game-arena--battle) .game-mission:last-child { border-right: 0; }
@@ -102,27 +108,32 @@
   .game-battle-weapon kbd { position: absolute; top: 6px; right: 6px; }
 }
 @media (max-width: 700px) {
-  .game-battle-stage { height: 265px; }
-  .game-battle-controls, .game-battle-armory { padding: 10px 11px; }
-  .game-battle-health { padding: 12px 11px; }
+  .game-battle-stage { height: 180px; }
+  .game-battle-controls { padding: 6px 10px; }
+  .game-battle-armory { padding: 0 10px; }
+  .game-battle-health { padding: 8px 10px; }
   .game-battle-label { font-size: 8px; max-width: 43%; }
   .game-battle-label--hero { left: 11px; }
   .game-battle-label--monster { right: 11px; }
   .game-battle-label b { font-size: 11px; }
-  .game-battle-feed { font-size: 9px; top: 63px; }
-  .game-battle-monster { right: 11px; width: 108px; height: 108px; }
+  .game-battle-feed { font-size: 9px; top: 48px; }
+  .game-battle-monster { right: 11px; width: 90px; height: 90px; }
   .game-battle-weapons { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
   .game-battle-weapon { display: grid; grid-template-columns: minmax(0, 1fr) auto; justify-items: center; text-align: center; gap: 2px; min-height: 66px; padding: 5px; }
   .game-battle-weapon svg { grid-column: 1 / -1; width: 40px; height: 27px; }
   .game-battle-weapon span { font-size: 10px; }
   .game-battle-weapon kbd { font-size: 8px; }
   .game-battle-armory-head small { font-size: 10px; }
-  #gameArena.game-arena--battle [data-battle-summary] { padding: 13px; }
-  #gameArena.game-arena--battle [data-battle-stats] { gap: 5px; padding: 10px 11px; }
-  #gameArena.game-arena--battle [data-battle-stats] > div { padding: 6px; }
+  #gameArena.game-arena--battle [data-battle-summary] { padding: 8px 10px; }
+  #gameArena.game-arena--battle [data-battle-stats] { gap: 5px; padding: 8px 10px; }
   #gameArena.game-arena--battle [data-battle-stats] strong { font-size: 11px; }
   #gameHomeDay:has(.game-arena--battle) .game-mission-grid { grid-template-columns: minmax(0, 1fr); }
-  #gameHomeDay:has(.game-arena--battle) .game-mission { padding: 10px 0; border-right: 0; border-top: 1px solid var(--line); }
+  #gameHomeDay:has(.game-arena--battle) .game-mission { grid-template-columns: 20px minmax(0, 1fr) minmax(60px, 100px); gap: 6px; padding: 7px 0; border-right: 0; border-top: 1px solid var(--line); }
+  #gameHomeDay:has(.game-arena--battle) .game-mission small.game-mission-reward { grid-column: 3; text-align: right; }
+}
+@media (pointer: coarse) {
+  .game-battle-touch button, .game-battle-weapon, .game-battle-armory-head { min-height: 44px; }
+  .game-battle-touch button { min-width: 44px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .game-battle *, .game-battle *::before, .game-battle *::after { animation: none !important; transition: none !important; }
