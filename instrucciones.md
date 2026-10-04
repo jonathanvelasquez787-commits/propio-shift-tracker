@@ -602,12 +602,13 @@ La aplicación funciona en producción con estas bases vigentes:
   `/app` sigue siendo el punto de carga y `/app.html` redirige conservando
   parámetros. La raíz conserva la landing pública indexable; al recargar,
   detecta la sesión y reabre la app. La PWA mantiene su identidad y precarga.
-- Gamificación compacta: batalla y refuerzo positivo reducidos, armas y misiones
-  desplegables e hitos integrados en el indicador de vida, sin retirar funciones.
+- Gamificación compacta: modo automático tranquilo durante llamadas, ataque al
+  guardar una llamada y duelo opcional solo en descanso o fuera del turno. Las
+  diez armas, misiones, hitos y progreso financiero se conservan.
 - Landing bilingüe estática, canonical/hreflang y sitemap de cuatro páginas,
   preguntas frecuentes e imagen social. Un bundle público evita cargar tres
   copias de las traducciones; las fuentes no bloquean el primer render.
-- La versión actual es 592. Refuerzo positivo, Logros y auditoría profunda
+- La versión actual es 593. Refuerzo positivo, Logros y auditoría profunda
   están terminados. Los siete fallos de la auditoría se corrigieron con
   regresiones; cobertura y límites constan en
   `docs/auditoria-profunda-2026-09-30.md`.
@@ -615,6 +616,22 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v593** — Gamificación automática y duelo opcional.
+
+- Integrado el mock aprobado: sin controles, efectos ni sonidos del juego durante
+  llamadas. Ataque automático breve al guardar una llamada validada; sin loop
+  de animación continuo cuando la arena está quieta.
+- Duelo voluntario de hasta 60 segundos, 3 vidas, onda baja, disparo dirigido y
+  embestida, combo, récord de sesión y granada con recarga de 8 segundos. La
+  vida del duelo y los puntos no modifican dinero, XP, llamadas ni recibos.
+- Solo se juega en Break/Lunch o fuera del turno. Iniciar una llamada, volver
+  al trabajo o esconder la escena pausa la ronda; continuar exige un clic.
+- 249 pruebas, imports/wiring y build correctos. Ambos idiomas y temas, de
+  320 a 1280 px, táctil, movimiento reducido, victoria/derrota, pausa/continuación
+  y guardado real en la app con una llamada simulada en navegador local.
+- La conexión con el portal real de Propio queda como tarea posterior; esta
+  versión usa las llamadas registradas en el tracker.
 
 **v592** — Gamificación en una sola tarjeta compacta.
 
@@ -637,16 +654,3 @@ La aplicación funciona en producción con estas bases vigentes:
   en el informe; solicitud de indexación bloqueada por cuota diaria de Google.
 - Reintento único autorizado para el 5/10 a las 13:00 de Tegucigalpa; detalles
   en `docs/seo.md`. Build correcto y etiqueta publicada en ambos idiomas.
-
-**v590** — SEO público bilingüe y carga de la landing.
-
-- `/` entrega inglés y `/es` español sin necesitar JavaScript; selector conserva
-  los formularios y sincroniza dirección, canonical, metadatos y JSON-LD.
-- Contenido dirigido a intérpretes, preguntas frecuentes, hreflang recíproco,
-  sitemap e imagen para compartir. Duplicados HTML redirigen permanentemente.
-- Un bundle público, fuentes diferidas y hero visible desde el primer render.
-  App privada con noindex, acceso y precarga PWA conservados.
-- Restaurados Jonathan Velasquez y su correo público anterior en las páginas
-  legales. 241 pruebas, build y 16 casos de idioma/tema/tamaño correctos.
-- Search Console requiere la propiedad real; detalles en `docs/seo.md` y
-  `docs/seo-audit-2026-10-04.md`.

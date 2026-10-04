@@ -1,6 +1,7 @@
 import { ui, translateText, translateStoredText, translateMarkup, displayLocale } from './i18n.js';
 import { calls, settings, state } from './app-context.js';
 import { initGameAudio, playGameSound, syncGameAudio, stopGameSounds } from './game-audio.js';
+import { battleWorkMode } from './game-duel.js';
 import { battleMarkup, syncBattle, playBattleCall, stopBattle, normalizeBattleWeapon } from './game-battle.js';
 import { financeIsRowPagado } from './finance.js';
 import { activeWorkSinceLastCall, monetaryMilestones, supportiveDayEvidence, surpriseDecision } from './reinforcement-rules.js';
@@ -703,7 +704,17 @@ function renderArena() {
   const dayCalls = callsForDay(dayKey);
   const completedCalls = dayCalls.filter((call) => String(call.dropped).toLowerCase() !== 'yes' && new Date(call.endISO).getTime() <= Date.now()).length;
   const callSignatures = Object.fromEntries(dayCalls.map((call) => [String(call.id), JSON.stringify([call.pay, higherRateBonusAmount(call), call.durationMin, call.startISO, call.endISO, call.billable, call.dropped])]));
-  const renderKey = [dayKey, monsterState, monsterPhase, variant, displayName, day.combo, day.stats.earnings.toFixed(2), Math.round(day.hpPct * 10), Math.round((shadow ?? -1) * 10), day.missions.map((mission) => mission.ok ? 1 : 0).join(''), Object.values(state.game.equipment || {}).join('|'), completedCalls, day.xp, settings.game.weapon, settings.currencyLabel, settings.exchangeRate, displayLocale(), day.goal.usd, JSON.stringify(callSignatures)].join(':');
+  const workMode = battleWorkMode(state);
+  const toastStack = document.getElementById('gameToastStack');
+  if (toastStack) toastStack.hidden = workMode === 'call';
+  if (workMode === 'call') {
+    stopGameSounds();
+    root.classList.remove('is-hit', 'is-critical-hit');
+    root.removeAttribute('data-game-event');
+    document.getElementById('gameCallFx')?.replaceChildren();
+    document.querySelectorAll('.game-pixel-fx-layer, .game-live-xp-float').forEach(node => node.remove());
+  }
+  const renderKey = [workMode, dayKey, monsterState, monsterPhase, variant, displayName, day.combo, day.stats.earnings.toFixed(2), Math.round(day.hpPct * 10), Math.round((shadow ?? -1) * 10), day.missions.map((mission) => mission.ok ? 1 : 0).join(''), Object.values(state.game.equipment || {}).join('|'), completedCalls, day.xp, settings.game.weapon, settings.currencyLabel, settings.exchangeRate, displayLocale(), day.goal.usd, JSON.stringify(callSignatures)].join(':');
   if (renderKey === lastArenaRenderKey) return;
   lastArenaRenderKey = renderKey;
   const impactClasses = root.dataset.gameDayKey === dayKey
@@ -743,7 +754,7 @@ function renderArena() {
     <div title="El XP del día viene de tus llamadas y misiones. Se incorpora al nivel al cerrar el turno."><span>XP</span><strong>${day.xp} XP</strong></div>
     <div class="game-hp-label"><span>VIDA</span><strong>${Math.round(day.hpPct)}%</strong></div>`;
   root.querySelector('[data-battle-mission-hint]').innerHTML = `${gamePixelIcon('shield')}<span>${day.defeated ? translateText('Meta alcanzada. Las ganancias extra siguen contando.') : ui`${day.missions.filter((mission) => mission.applies !== false && !mission.ok).length} armaduras pendientes · completa tus misiones del día.`}</span>`;
-  syncBattle(root, { dayKey, enabled: active, weapon: settings.game.weapon, callSignatures, goalUsd: day.goal.usd, monsterMarkup: sprite, monsterLabel: translateText('MONSTRUO DEL DÍA'), monsterDescription: monsterImageLabel, monsterName: displayName, heroLabel: translateText('Centinela'), defeated: day.defeated, hpPct: day.hpPct }, {
+  syncBattle(root, { dayKey, workMode, enabled: active, weapon: settings.game.weapon, callSignatures, goalUsd: day.goal.usd, monsterMarkup: sprite, monsterLabel: translateText('MONSTRUO DEL DÍA'), monsterDescription: monsterImageLabel, monsterName: displayName, heroLabel: translateText('Centinela'), defeated: day.defeated, hpPct: day.hpPct }, {
     onWeaponChange: (weapon) => {
       settings.game.weapon = normalizeBattleWeapon(weapon);
       saveSettingsOnly();
@@ -752,7 +763,7 @@ function renderArena() {
       if (kind === 'practice-hit') return;
       playGameSound(kind, { allowed: () => {
         const bounds = root.querySelector('.game-battle')?.getBoundingClientRect();
-        return gameEnabled() && dayKey === displayedGameDayKey() && !root.hidden && !!root.getClientRects().length && !!bounds && bounds.bottom > 0 && bounds.top < window.innerHeight;
+        return !state.activeCall && gameEnabled() && dayKey === displayedGameDayKey() && !root.hidden && !!root.getClientRects().length && !!bounds && bounds.bottom > 0 && bounds.top < window.innerHeight;
       } });
     },
     onPause: stopGameSounds,
@@ -1406,7 +1417,7 @@ let lastDisplayedToastText = '';
 const TOAST_PRIORITIES = Object.freeze({ record: 4, loot: 3, impulse: 2, critical: 2, '': 1 });
 
 export function announceGameStatus(message) {
-  if (!gameEnabled()) return;
+  if (!gameEnabled() || state.activeCall) return;
   const live = document.getElementById('gameStatusLive');
   if (!live || !message) return;
   live.textContent = '';
@@ -1430,7 +1441,7 @@ export function queueGameToast(message, tone = '', options = {}) {
 
 function drainGameToasts() {
   const stack = document.getElementById('gameToastStack');
-  if (!stack || document.querySelector('.modal-overlay.open')) return;
+  if (!stack || state.activeCall || document.querySelector('.modal-overlay.open')) return;
   while (gameToastQueue.length && stack.children.length < 3) {
     const item = gameToastQueue.shift();
     const allowed = gameEnabled() && (item.channel !== 'personal' || settings.reinforcement?.enabled === true);
@@ -1455,7 +1466,7 @@ function drainGameToasts() {
 }
 
 function playGameTone(kind = 'hit', dayKey = currentGameDayKey()) {
-  const allowed = () => arcadeEnabled() && dayKey === currentGameDayKey() && dayKey === displayedGameDayKey();
+  const allowed = () => !state.activeCall && arcadeEnabled() && dayKey === currentGameDayKey() && dayKey === displayedGameDayKey();
   if (!allowed()) return false;
   return playGameSound(kind, { allowed });
 }
@@ -1463,7 +1474,7 @@ function playGameTone(kind = 'hit', dayKey = currentGameDayKey()) {
 const gameEventVersions = new WeakMap();
 
 function pixelBurst(root, kind, damageText = '') {
-  if (!arcadeEnabled() || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+  if (state.activeCall || !arcadeEnabled() || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
   if (!root || root.hidden || typeof document.createElement !== 'function' || typeof root.appendChild !== 'function') return;
   const host = root.querySelector('.game-monster-stage') || root;
   if (host.getClientRects && !host.getClientRects().length) return;
@@ -1493,7 +1504,7 @@ function pixelBurst(root, kind, damageText = '') {
 }
 
 function triggerGameEvent(rootId, eventName, duration = 900) {
-  if (!arcadeEnabled()) return;
+  if (!arcadeEnabled() || state.activeCall) return;
   if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
   const root = document.getElementById(rootId);
   if (!root) return;
@@ -1534,6 +1545,7 @@ function showCallFx(call, xp, critical, mode = 'xp') {
   const root = document.getElementById('gameCallFx');
   if (!root) return false;
   const version = ++callFxVersion;
+  if (state.activeCall) return true;
   const amount = parseMoney(call.pay) + higherRateBonusAmount(call);
   const dayKey = callDateKeyFromValue(call.shiftDayKey) || callDateKeyFromValue(call.callDate) || currentGameDayKey();
   const battlePlayed = dayKey === currentGameDayKey() && dayKey === displayedGameDayKey() && playBattleCall({ dayKey, amountText: ui`−${money(amount)} ${convertedAmountText(amount)}`.trim(), xp, critical });
@@ -1774,7 +1786,7 @@ function reconcileMissionEvents(dayKey, snapshot, { allowFeedback = true } = {})
 let gameRecordBannerTimer = null;
 
 function showGameRecordBanner(message) {
-  if (!gameEnabled()) return;
+  if (!gameEnabled() || state.activeCall) return;
   const root = document.getElementById('gameRecordBanner');
   if (!root || !message) return;
   if (gameRecordBannerTimer) clearTimeout(gameRecordBannerTimer);

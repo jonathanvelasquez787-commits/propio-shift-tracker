@@ -21,6 +21,30 @@
 }
 .game-battle, .game-battle * { box-sizing: border-box; min-width: 0; }
 .game-battle [hidden] { display: none !important; }
+#gameToastStack[hidden] { display: none !important; }
+.game-battle-mode-row { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 12px; padding: 5px 12px; border-top: 1px solid var(--line); }
+.game-battle-modes { display: flex; gap: 4px; }
+.game-battle-mode-row button, .game-battle-duel-hud button { min-height: 30px; padding: 4px 8px; border: 1px solid var(--line-2); border-radius: 4px; background: var(--accordion-bg); font-size: 10px; font-weight: 800; }
+.game-battle-modes [aria-pressed="true"] { color: var(--cyan); border-color: var(--cyan); }
+.game-battle button:disabled { opacity: .5; cursor: default; }
+.game-battle-mode-row small { color: var(--muted); font-size: 10px; overflow-wrap: anywhere; }
+.game-battle-duel-hud { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; padding: 6px 12px; border-top: 1px solid var(--line); font: 700 10px/1.4 ui-monospace, SFMono-Regular, Consolas, monospace; }
+.game-battle-duel-hud > strong { color: var(--bad, var(--rpt-purple)); font-size: 15px; letter-spacing: 2px; }
+.game-battle-duel-hud > small { flex-basis: 100%; color: var(--muted); font-size: 10px; }
+.game-battle-duel-hud > p { flex-basis: 100%; color: var(--cyan); margin: 0; }
+.game-battle-duel-health { display: flex; align-items: center; gap: 8px; flex: 1 1 200px; }
+.game-battle-duel-health > div { height: 5px; flex: 1; background: var(--line); overflow: hidden; }
+.game-battle-duel-health i { display: block; height: 100%; background: var(--rpt-purple); }
+.game-battle[data-battle-mode="duel"] .game-battle-feed, .game-battle[data-battle-mode="duel"] .game-battle-victory { display: none; }
+.game-battle[data-battle-mode="duel"] .game-battle-monster { opacity: 1; }
+.game-battle[data-battle-mode="duel"] .game-battle-stage { height: 180px; }
+.game-battle[data-battle-mode="auto"] .game-battle-hero-target { pointer-events: none; border: 0; opacity: 1; }
+.game-battle[data-battle-work="call"] .game-battle-armory { display: none; }
+.game-battle[data-battle-mode="auto"] .game-battle-tools { display: block; }
+.game-battle[data-battle-mode="auto"] .game-battle-controls { display: none; }
+@media (pointer: coarse), (max-width: 600px) {
+  .game-battle-mode-row button, .game-battle-duel-hud button { min-height: 44px; }
+}
 .game-battle button { appearance: none; cursor: pointer; touch-action: manipulation; font-family: inherit; color: var(--text); }
 .game-battle :is(button, [tabindex]):focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
 .game-battle-stage { position: relative; width: 100%; height: 176px; overflow: hidden; background: var(--battle-sky); isolation: isolate; }
