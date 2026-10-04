@@ -673,6 +673,16 @@ function renderArena() {
   const active = gameEnabled() && day.goal.usd > 0;
   root.hidden = !active;
   classic.style.display = '';
+  const progressHome = classic.querySelector('[data-game-progress-home]');
+  const milestoneDetails = document.getElementById('gameMilestones');
+  const progress = document.getElementById('earningsBar')?.closest('.earnings-goal-progress');
+  const nextMilestone = document.getElementById('earningsNextMilestone');
+  if (progressHome && milestoneDetails && progress && nextMilestone) {
+    const progressTarget = active ? milestoneDetails.querySelector('[data-game-milestone-progress]') : progressHome;
+    const nextTarget = active ? milestoneDetails.querySelector('[data-game-milestone-next]') : progressHome;
+    if (progress.parentElement !== progressTarget) progressTarget.append(progress);
+    if (nextMilestone.parentElement !== nextTarget) nextTarget.append(nextMilestone);
+  }
   if (!active) {
     stopBattle();
     lastArenaRenderKey = '';
@@ -714,14 +724,13 @@ function renderArena() {
     .replace(/ role="img" aria-label="[^"]*"/, ' aria-hidden="true"');
   if (!root.querySelector('.game-battle')) {
     stopBattle();
-    root.innerHTML = `<div data-battle-summary></div>${battleMarkup()}<div data-battle-stats></div><div class="game-pixel-arena-hint" data-battle-mission-hint></div>`;
+    root.innerHTML = `<div data-battle-summary></div>${battleMarkup()}<div class="game-pixel-arena-hint" data-battle-mission-hint></div>`;
   }
   root.querySelector('[data-battle-summary]').innerHTML = ui`
-      <div class="game-kicker">MONSTRUO DEL DÍA · ${escapeHtml(formatCallDayLabel(dayKey))}</div>
-      <div class="game-arena-title-row"><h3>${escapeHtml(displayName)}</h3><div class="game-battle-badges"><span class="game-combo-badge" title="Llamadas consecutivas del turno; se reinicia al tomar una pausa.">x${day.combo || 0}</span><span class="game-phase-meter" data-phase="${escapeHtml(monsterPhase)}" role="status" aria-label="Fase del monstruo: ${escapeHtml(PHASE_LABELS[monsterPhase] || monsterPhase)}" title="Las ganancias y la vida financiera no cambian por la fase.">${escapeHtml(PHASE_LABELS[monsterPhase] || monsterPhase)}</span></div></div>
-      <p class="game-monster-phrase">“${escapeHtml(translateText(day.species.phrase))}”</p>`;
+      <div class="game-arena-title-row"><h3>${escapeHtml(displayName)}</h3><span class="game-phase-meter" data-phase="${escapeHtml(monsterPhase)}" role="status" aria-label="Fase del monstruo: ${escapeHtml(PHASE_LABELS[monsterPhase] || monsterPhase)}" title="Las ganancias y la vida financiera no cambian por la fase.">${escapeHtml(PHASE_LABELS[monsterPhase] || monsterPhase)}</span><span class="game-combo-badge" title="Llamadas consecutivas del turno; se reinicia al tomar una pausa.">x${day.combo || 0}</span></div>
+      <div class="game-battle-caption"><span class="game-kicker">MONSTRUO DEL DÍA · ${escapeHtml(formatCallDayLabel(dayKey))}</span><span class="game-monster-phrase">“${escapeHtml(translateText(day.species.phrase))}”</span></div>`;
   root.querySelector('[data-battle-health-slot]').innerHTML = ui`
-      <div class="game-hp-label"><span>VIDA</span><strong>${Math.round(day.hpPct)}%</strong></div>
+      <div data-battle-stats></div>
       <div class="game-hp-track" role="progressbar" aria-label="Vida del monstruo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(day.hpPct)}">
         <div class="game-hp-damage-trail" style="width:${day.hpPct}%" aria-hidden="true"></div>
         <div class="game-hp-fill" style="width:${day.hpPct}%"></div>
@@ -729,9 +738,10 @@ function renderArena() {
       </div>
       <div class="game-hp-foot"><span>${withConversion(damage)} de vida restante</span><span>${day.defeated ? translateText('Botín extra: las ganancias siguen, el XP no') : ui`${withConversion(day.stats.earnings)} de daño`}</span></div>`;
   root.querySelector('[data-battle-stats]').innerHTML = ui`
-    <div><span>Ganancias del día</span><strong>${withConversion(day.stats.earnings)}</strong></div>
-    <div><span>Llamadas completadas</span><strong>${completedCalls}</strong></div>
-    <div title="El XP del día viene de tus llamadas y misiones. Se incorpora al nivel al cerrar el turno."><span>XP del día</span><strong>${day.xp} XP</strong></div>`;
+    <div><span>Ganancias</span><strong>${withConversion(day.stats.earnings)}</strong></div>
+    <div><span>Llamadas</span><strong>${completedCalls}</strong></div>
+    <div title="El XP del día viene de tus llamadas y misiones. Se incorpora al nivel al cerrar el turno."><span>XP</span><strong>${day.xp} XP</strong></div>
+    <div class="game-hp-label"><span>VIDA</span><strong>${Math.round(day.hpPct)}%</strong></div>`;
   root.querySelector('[data-battle-mission-hint]').innerHTML = `${gamePixelIcon('shield')}<span>${day.defeated ? translateText('Meta alcanzada. Las ganancias extra siguen contando.') : ui`${day.missions.filter((mission) => mission.applies !== false && !mission.ok).length} armaduras pendientes · completa tus misiones del día.`}</span>`;
   syncBattle(root, { dayKey, enabled: active, weapon: settings.game.weapon, callSignatures, goalUsd: day.goal.usd, monsterMarkup: sprite, monsterLabel: translateText('MONSTRUO DEL DÍA'), monsterDescription: monsterImageLabel, monsterName: displayName, heroLabel: translateText('Centinela'), defeated: day.defeated, hpPct: day.hpPct }, {
     onWeaponChange: (weapon) => {
@@ -761,7 +771,7 @@ function renderMissions() {
   const day = computeGameDay(dayKey);
   const plates = armorPlatesForDay(day);
   root.innerHTML = ui`
-    <summary class="game-missions-summary"><span>Misiones del día</span><strong>${day.missions.filter((mission) => mission.ok).length}/3</strong></summary>
+    <summary class="game-missions-summary"><span>Misiones</span><strong>${day.missions.filter((mission) => mission.ok).length}/3</strong><small>${day.missions.filter((mission) => mission.applies !== false && !mission.ok).length} armaduras pendientes</small></summary>
     <div class="game-missions-body">
     <div class="game-section-head"><span class="game-kicker">3 ARMADURAS</span><div class="game-missions-status"><span>Misiones automáticas</span>
     <div class="game-armor-row" role="list" aria-label="Placas de armadura">${plates.map((plate, index) => ui`<div class="game-armor-plate ${plate.complete ? 'is-complete' : ''} ${plate.status === 'neutral' ? 'is-neutral' : ''}" data-armor-id="${escapeHtml(plate.id)}" role="listitem" aria-label="Placa ${index + 1}: ${escapeHtml(plate.label)}. ${plate.status === 'neutral' ? translateText('Neutral') : plate.complete ? translateText('Completada') : translateText('Pendiente')}"><span aria-hidden="true">${gamePixelIcon(plate.complete ? 'check' : 'shield')}</span><b>${index + 1}</b></div>`).join('')}</div></div></div>

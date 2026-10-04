@@ -586,7 +586,8 @@
   "s_0d32876e": {
     "source": "Misiones",
     "files": [
-      "app.html"
+      "app.html",
+      "js/game.js"
     ]
   },
   "s_0d4512ac": {
@@ -1911,12 +1912,6 @@
       "app.html"
     ]
   },
-  "s_288e9efa": {
-    "source": "ARMA DEL HÉROE",
-    "files": [
-      "js/game-battle.js"
-    ]
-  },
   "s_2896ac06": {
     "source": "Escribe la contraseña que vas a usar de ahora en adelante.",
     "files": [
@@ -2242,12 +2237,6 @@
     "source": "Cerrar cofre",
     "files": [
       "app.html"
-    ]
-  },
-  "s_2f599ba6": {
-    "source": "Fase del monstruo: {{v4}}",
-    "files": [
-      "js/game.js"
     ]
   },
   "s_2f5aa0de": {
@@ -2659,6 +2648,12 @@
     "source": "#{{v1}}",
     "files": [
       "js/calls.js"
+    ]
+  },
+  "s_36c195a4": {
+    "source": "Hitos",
+    "files": [
+      "app.html"
     ]
   },
   "s_36c6e861": {
@@ -3249,6 +3244,12 @@
     "source": "Si editas la fecha o el horario de una ventana, el bono ya ganado por llamadas que calificaban antes del cambio se conserva — nunca se pierde retroactivamente por editar la ventana.",
     "files": [
       "app.html"
+    ]
+  },
+  "s_44980761": {
+    "source": "{{v1}} armaduras pendientes",
+    "files": [
+      "js/game.js"
     ]
   },
   "s_44a0cab3": {
@@ -4369,6 +4370,12 @@
       "app.html"
     ]
   },
+  "s_588ce5a1": {
+    "source": "x{{v4}}",
+    "files": [
+      "js/game.js"
+    ]
+  },
   "s_58a5a0a4": {
     "source": "Ayer",
     "files": [
@@ -4452,12 +4459,6 @@
     "source": "Llamada agregada",
     "files": [
       "js/calls.js"
-    ]
-  },
-  "s_5a426917": {
-    "source": "{{v5}} de vida restante",
-    "files": [
-      "js/game.js"
     ]
   },
   "s_5af5d3d4": {
@@ -4732,12 +4733,6 @@
       "js/game.js"
     ]
   },
-  "s_61743d69": {
-    "source": "Ganancias del día",
-    "files": [
-      "js/game.js"
-    ]
-  },
   "s_618438af": {
     "source": "Volver al año",
     "files": [
@@ -4837,6 +4832,12 @@
     "files": [
       "app.html",
       "js/theme-palettes.js"
+    ]
+  },
+  "s_63ae4485": {
+    "source": "Teclas",
+    "files": [
+      "js/game-battle.js"
     ]
   },
   "s_63ba1e3c": {
@@ -5501,6 +5502,12 @@
       "js/reports.js"
     ]
   },
+  "s_7113f555": {
+    "source": "XP",
+    "files": [
+      "js/game.js"
+    ]
+  },
   "s_7119e320": {
     "source": "Racha de los últimos siete días",
     "files": [
@@ -6012,6 +6019,7 @@
     "files": [
       "app.html",
       "js/app-main.js",
+      "js/game.js",
       "js/reports.js"
     ]
   },
@@ -6031,12 +6039,6 @@
     "source": "Eliminar meta",
     "files": [
       "js/finance.js"
-    ]
-  },
-  "s_7b71d363": {
-    "source": "x{{v2}}",
-    "files": [
-      "js/game.js"
     ]
   },
   "s_7b7f96b5": {
@@ -6602,6 +6604,12 @@
     "source": "El navegador bloqueó el sonido de los avisos — toca \"Activar sonido\" para permitirlo mientras esta pestaña siga abierta.",
     "files": [
       "app.html"
+    ]
+  },
+  "s_85a9387d": {
+    "source": "Armas",
+    "files": [
+      "js/game-battle.js"
     ]
   },
   "s_85b22c65": {
@@ -8254,6 +8262,12 @@
       "app.html"
     ]
   },
+  "s_a4f6c56e": {
+    "source": "{{v4}} de vida restante",
+    "files": [
+      "js/game.js"
+    ]
+  },
   "s_a51c9500": {
     "source": "Luz",
     "files": [
@@ -8630,6 +8644,12 @@
       "js/app-main.js"
     ]
   },
+  "s_ada2cd2b": {
+    "source": "MONSTRUO DEL DÍA · {{v5}}",
+    "files": [
+      "js/game.js"
+    ]
+  },
   "s_adac5096": {
     "source": "Un paso a la vez, un turno a la vez.",
     "files": [
@@ -8773,6 +8793,12 @@
     "source": "Copiar este horario a Sábado-Domingo",
     "files": [
       "app.html"
+    ]
+  },
+  "s_b0e05ab5": {
+    "source": "{{v3}}%",
+    "files": [
+      "js/game.js"
     ]
   },
   "s_b0f0f7cd": {
@@ -9170,6 +9196,12 @@
     "source": "No se pudo abrir la app",
     "files": [
       "js/boot.js"
+    ]
+  },
+  "s_b9119a78": {
+    "source": "Fase del monstruo: {{v2}}",
+    "files": [
+      "js/game.js"
     ]
   },
   "s_b91cb47c": {
@@ -9593,8 +9625,7 @@
   "s_c1c41846": {
     "source": "{{v0}}%",
     "files": [
-      "js/app-main.js",
-      "js/game.js"
+      "js/app-main.js"
     ]
   },
   "s_c1f3e040": {
@@ -9736,6 +9767,7 @@
     "files": [
       "app.html",
       "js/app-main.js",
+      "js/game.js",
       "js/reports.js"
     ]
   },
@@ -10965,12 +10997,6 @@
       "js/app-main.js"
     ]
   },
-  "s_dd95c766": {
-    "source": "XP del día",
-    "files": [
-      "js/game.js"
-    ]
-  },
   "s_dda83e49": {
     "source": "A diferencia de un gasto recurrente, lo que asignás a una meta se",
     "files": [
@@ -11983,12 +12009,6 @@
       "js/game.js"
     ]
   },
-  "s_f347ab68": {
-    "source": "MONSTRUO DEL DÍA · {{v0}}",
-    "files": [
-      "js/game.js"
-    ]
-  },
   "s_f35a3aed": {
     "source": "Ya tienes el máximo de 60 premios.",
     "files": [
@@ -12130,12 +12150,6 @@
     "source": "Cuenta creada. Te mandamos un correo a {{v0}} para confirmarla — ábrelo y ya puedes entrar.",
     "files": [
       "js/landing.js"
-    ]
-  },
-  "s_f566e6eb": {
-    "source": "Llamadas completadas",
-    "files": [
-      "js/game.js"
     ]
   },
   "s_f56ab548": {
