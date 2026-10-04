@@ -761,14 +761,16 @@ function renderMissions() {
   const day = computeGameDay(dayKey);
   const plates = armorPlatesForDay(day);
   root.innerHTML = ui`
-    <div class="game-section-head"><div><span class="game-kicker">3 ARMADURAS</span><h3>Misiones del día</h3></div><div class="game-missions-status"><span>Misiones automáticas</span><strong>${day.missions.filter((mission) => mission.ok).length}/3</strong>
+    <summary class="game-missions-summary"><span>Misiones del día</span><strong>${day.missions.filter((mission) => mission.ok).length}/3</strong></summary>
+    <div class="game-missions-body">
+    <div class="game-section-head"><span class="game-kicker">3 ARMADURAS</span><div class="game-missions-status"><span>Misiones automáticas</span>
     <div class="game-armor-row" role="list" aria-label="Placas de armadura">${plates.map((plate, index) => ui`<div class="game-armor-plate ${plate.complete ? 'is-complete' : ''} ${plate.status === 'neutral' ? 'is-neutral' : ''}" data-armor-id="${escapeHtml(plate.id)}" role="listitem" aria-label="Placa ${index + 1}: ${escapeHtml(plate.label)}. ${plate.status === 'neutral' ? translateText('Neutral') : plate.complete ? translateText('Completada') : translateText('Pendiente')}"><span aria-hidden="true">${gamePixelIcon(plate.complete ? 'check' : 'shield')}</span><b>${index + 1}</b></div>`).join('')}</div></div></div>
     <div class="game-mission-grid" role="list" aria-label="Misiones del día">${day.missions.map((mission, index) => ui`
       <div class="game-mission ${mission.ok ? 'is-complete' : ''} ${mission.status === 'neutral' ? 'is-neutral' : ''}" role="listitem" aria-label="${escapeHtml(ui`Misión ${index + 1}: ${mission.label}. ${mission.status === 'neutral' ? translateText('Neutral') : mission.ok ? translateText('Completada') : translateText('Pendiente')}. ${mission.detail}`)}">
         <span class="game-armor" aria-hidden="true">${gamePixelIcon(mission.ok ? 'check' : index === 0 ? 'sword' : index === 1 ? 'cup' : 'shield')}</span>
         <div><b>${index + 1}. ${escapeHtml(mission.label)}</b><span>${escapeHtml(translateStoredText(mission.detail))}</span></div>
         <small class="game-mission-reward">${mission.status === 'neutral' ? translateText('Sin recompensa: no aplica') : ui`Recompensa individual · ${mission.rewardXp} XP`}</small>
-      </div>`).join('')}</div>`;
+      </div>`).join('')}</div></div>`;
 }
 
 function renderHeroChips() {
