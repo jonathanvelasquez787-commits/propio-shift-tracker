@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://propio-shift-tracker.vercel.app/</loc></url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://propio-shift-tracker.vercel.app/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://propio-shift-tracker.vercel.app/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://propio-shift-tracker.vercel.app/es"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://propio-shift-tracker.vercel.app/"/>
+  </url>
+  <url>
+    <loc>https://propio-shift-tracker.vercel.app/es</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://propio-shift-tracker.vercel.app/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://propio-shift-tracker.vercel.app/es"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://propio-shift-tracker.vercel.app/"/>
+  </url>
   <url><loc>https://propio-shift-tracker.vercel.app/privacidad.html</loc></url>
   <url><loc>https://propio-shift-tracker.vercel.app/terminos.html</loc></url>
 </urlset>

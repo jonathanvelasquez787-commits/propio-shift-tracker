@@ -1,8 +1,14 @@
 # Visibilidad en Google
 
-La página pública es https://propio-shift-tracker.vercel.app/. La landing y las
-páginas legales declaran su URL canonical; robots.txt permite rastreo y apunta
-al sitemap.xml con esas tres páginas. El build copia ambos archivos a public/.
+La página pública es https://propio-shift-tracker.vercel.app/ en inglés y
+https://propio-shift-tracker.vercel.app/es en español. El build genera HTML
+completo por idioma, con títulos, descripciones, canonical y hreflang recíproco
+en/es/x-default. El selector conserva el formulario de acceso y sincroniza la
+dirección y los metadatos. Una preferencia guardada puede abrir la portada en
+español; `/es` siempre elige español, incluso sin almacenamiento disponible.
+Las páginas legales también declaran canonical. robots.txt permite rastreo y
+apunta al sitemap.xml con esas cuatro páginas; ambos se copian a public/.
+`/index.html` y `/es.html` redirigen permanentemente a sus direcciones públicas.
 La app de cuenta (/app) lleva noindex en HTML y cabecera HTTP; /app.html redirige
 permanentemente a /app y conserva los parámetros. La app no se
 incluye en el sitemap. Noindex no reemplaza la autenticación ni RLS.
@@ -15,6 +21,19 @@ Así la raíz conserva la portada pública indexable para visitas sin sesión.
 Estas ayudas no garantizan indexación ni posiciones. La landing ya entrega
 contenido estático, título, descripción y enlaces sin necesitar una sesión.
 Google puede cambiar el título y la descripción que muestra en resultados.
+
+Desde v590 el contenido describe turnos de interpretación, minutos facturables,
+ganancias estimadas y adherencia. Tres preguntas frecuentes explican cálculo,
+importación y uso gratuito en móvil. WebSite/WebApplication en JSON-LD describen
+la herramienta sin inventar reseñas, estrellas ni afiliación oficial; no se
+declara elegibilidad para resultados enriquecidos. Open Graph y Twitter usan
+una imagen local de 1200 × 630. Las páginas legales recuperan el responsable y
+correo público que el propietario había proporcionado.
+
+La landing carga un bundle compartido en lugar de tres copias de i18n. Las
+fuentes externas se cargan sin bloquear el primer render, con fallback sin
+JavaScript. El hero queda visible desde el HTML inicial. El detalle de la
+auditoría y sus límites figura en `seo-audit-2026-10-04.md`.
 
 ## Search Console
 
@@ -32,13 +51,8 @@ real. La ausencia en una búsqueda pública no prueba que el sitio no esté inde
 
 ## Próximas mejoras de contenido
 
-- Describir claramente el uso para intérpretes: llamadas, ganancias estimadas,
-  ciclos, calendario y reportes. Usar frases naturales, sin repetir palabras clave.
 - Publicar guías útiles sobre esos flujos y enlazarlas desde la landing cuando
   el usuario apruebe su contenido y presentación.
-- Para SEO bilingüe estable, servir URLs separadas con contenido de cada idioma
-  y hreflang real. El selector actual cambia ES/EN en la misma URL; no declarar
-  alternates ficticios ni prometer que Google indexe ambas versiones.
 - Compartir enlaces auténticos en comunidades pertinentes. No comprar enlaces
   ni crear reseñas, estrellas, afiliación oficial o datos estructurados falsos.
 

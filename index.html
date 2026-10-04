@@ -1,20 +1,32 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-public-landing>
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-<title>Propio Shift Tracker — tu turno, tus llamadas y tus ganancias en un solo lugar</title>
-<meta name="description" content="Registra turnos, pausas y llamadas; mira tu adherencia minuto a minuto, tus ganancias por ciclo y a dónde se va cada dólar. Hecho para intérpretes remotos."/>
+<title>Turnos y ganancias para intérpretes | Propio Shift Tracker</title>
+<meta name="description" content="Registra turnos, llamadas y pausas como intérprete remoto. Calcula ganancias por minuto, controla tu adherencia y exporta tus reportes. Gratis y sin anuncios."/>
 <link rel="canonical" href="https://propio-shift-tracker.vercel.app/"/>
+<link rel="alternate" hreflang="en" href="https://propio-shift-tracker.vercel.app/"/>
+<link rel="alternate" hreflang="es" href="https://propio-shift-tracker.vercel.app/es"/>
+<link rel="alternate" hreflang="x-default" href="https://propio-shift-tracker.vercel.app/"/>
 <meta name="theme-color" content="#6366f1"/>
 <meta property="og:title" content="Propio Shift Tracker"/>
 <meta property="og:description" content="Tu turno, tus llamadas y tus ganancias en un solo lugar."/>
 <meta property="og:type" content="website"/>
 <meta property="og:url" content="https://propio-shift-tracker.vercel.app/"/>
+<meta property="og:locale" content="es_ES"/>
+<meta property="og:image" content="https://propio-shift-tracker.vercel.app/icons/social-preview.png"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Propio Shift Tracker"/>
+<meta name="twitter:description" content="Turnos, llamadas y ganancias para intérpretes remotos."/>
+<meta name="twitter:image" content="https://propio-shift-tracker.vercel.app/icons/social-preview.png"/>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%236366F1'/%3E%3Ccircle cx='32' cy='34' r='19' fill='none' stroke='white' stroke-width='4'/%3E%3Cpath d='M32 23v11l8 5' fill='none' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" media="print" data-deferred-fonts/>
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap"/></noscript>
 <link rel="stylesheet" href="css/tokens.css"/>
 <link rel="stylesheet" href="css/landing.css"/>
 <script type="module" src="/js/theme-init.js"></script>
@@ -37,7 +49,7 @@
         <svg class="ic-svg ic-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z"/></svg>
         <svg class="ic-svg ic-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.4M12 19.6V22M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2 12h2.4M19.6 12H22M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7"/></svg>
       </button>
-      <button class="theme-toggle language-toggle" id="headerLanguageBtn" type="button" data-language-toggle aria-label="Cambiar a español" title="Cambiar a español"><span data-language-label data-user-content>EN</span></button>
+      <a class="theme-toggle language-toggle" id="headerLanguageBtn" href="/" hreflang="en" data-language-toggle aria-label="Cambiar a inglés" title="Cambiar a inglés"><span data-language-label data-user-content>ES</span></a>
       <a class="header-cta" id="topEnterBtn" href="#entrar">Entrar</a>
     </nav>
   </div>
@@ -48,18 +60,18 @@
   <div class="aurora" aria-hidden="true"><span></span><span></span><span></span></div>
 
   <div class="wrap hero-grid">
-    <div class="reveal">
+    <div class="reveal is-visible">
       <span class="eyebrow">
         <svg class="ic-svg" viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/></svg>
         Hecho para intérpretes remotos
       </span>
 
-      <h1>Tu turno, tus llamadas<br/>y <span class="grad-text">tus ganancias</span><br/>en un solo lugar.</h1>
+      <h1>Tu turno de intérprete,<br/>tus llamadas y <span class="grad-text">tus ganancias</span><br/>en un solo lugar.</h1>
 
       <p class="hero-sub">
-        Deja de llevar la cuenta en la cabeza y en tres hojas de cálculo. Marca
-        tu turno, pega tus llamadas y mira al instante cuánto llevas ganado,
-        qué tan pegado vas a tu horario y cuánto te falta para tu meta.
+        Lleva tus turnos de interpretación remota en un solo lugar. Registra
+        llamadas y minutos facturables, calcula tus ganancias según tu tarifa
+        y compara tus pausas con tu horario, sin depender de hojas de cálculo.
       </p>
 
       <ul class="hero-points">
@@ -84,7 +96,7 @@
     </div>
 
     <!-- ===== Panel de entrada ===== -->
-    <div class="auth-card reveal" style="--delay:120ms">
+    <div class="auth-card reveal is-visible" style="--delay:120ms">
       <div class="auth-head">
         <h2 id="authTitle">Entrar</h2>
         <p id="authSub">Usa tu correo o tu nombre de usuario.</p>
@@ -309,7 +321,7 @@
   <div class="wrap">
     <div class="section-head reveal">
       <span class="eyebrow">Lo que hace</span>
-      <h2>Todo lo que ya anotas, pero calculado solo</h2>
+      <h2>Control de turnos, llamadas y ganancias para intérpretes</h2>
       <p>Ocho cosas que antes vivían en tu cabeza, en un cuaderno o en una hoja aparte.</p>
     </div>
 
@@ -370,7 +382,7 @@
   <div class="wrap">
     <div class="section-head reveal">
       <span class="eyebrow">En tres pasos</span>
-      <h2>Listo en lo que dura un café</h2>
+      <h2>Cómo registrar tu turno de interpretación</h2>
       <p>No hay que instalar nada ni configurar medio día antes de que sirva.</p>
     </div>
 
@@ -434,6 +446,30 @@
 </section>
 
 <!-- ================= CIERRE ================= -->
+<section class="features" id="preguntas">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">Preguntas frecuentes</span>
+      <h2>Antes de empezar tu turno</h2>
+      <p>Qué puedes registrar y cómo usar los números de tu jornada.</p>
+    </div>
+    <div class="feature-grid">
+      <article class="feature reveal">
+        <h3>¿Cómo calculo mis ganancias por minuto?</h3>
+        <p>Configura tu tarifa por minuto y registra tus llamadas. La app reúne los minutos facturables y sus importes para mostrar tus ganancias del día y del ciclo. Los pagos definitivos dependen de tu plataforma o empleador.</p>
+      </article>
+      <article class="feature reveal">
+        <h3>¿Puedo importar mis llamadas de Propio?</h3>
+        <p>Sí. Puedes pegar tu exportación de llamadas de Propio, agregar llamadas manualmente o registrarlas en vivo. Propio Shift Tracker es una herramienta independiente y no sustituye los registros oficiales.</p>
+      </article>
+      <article class="feature reveal">
+        <h3>¿Es gratis y funciona en el teléfono?</h3>
+        <p>Sí. La herramienta es gratuita y funciona desde el navegador de tu computadora o teléfono. Crea tu cuenta para sincronizar tus registros; también puedes exportarlos a JSON, CSV o PDF.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
 <section class="cta">
   <div class="wrap">
     <div class="cta-inner reveal">

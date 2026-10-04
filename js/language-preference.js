@@ -7,6 +7,7 @@ export function normalizeLanguage(value) {
 }
 
 export function readLanguagePreference(storage) {
+  if (['/es', '/es.html'].includes(globalThis.location?.pathname)) return 'es';
   try {
     const saved = storage || globalThis.localStorage;
     const preference = saved?.getItem(LANGUAGE_PREFERENCE_KEY);
