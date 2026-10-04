@@ -78,6 +78,9 @@
       ]
     }
   ],
+  "redirects": [
+    { "source": "/app.html", "destination": "/app", "permanent": true }
+  ],
   "rewrites": [
     {
       "source": "/app",

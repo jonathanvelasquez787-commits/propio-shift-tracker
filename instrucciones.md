@@ -591,7 +591,12 @@ La aplicación funciona en producción con estas bases vigentes:
   global, backup diario, exportación y borrado de cuenta permanecen activos.
 - Turnos, llamadas, Horario, Higher Rate, Finanzas, Reportes, Calendario,
   Adherencia y la gamificación «El Monstruo» están integrados.
-- La versión actual es 587. Refuerzo positivo, Logros y auditoría profunda
+- La URL de la cuenta es `/app`; `/app.html` redirige conservando parámetros.
+  Landing, autenticación y PWA usan la ruta limpia. La PWA mantiene su identidad
+  anterior para instalaciones existentes y precarga `/app` para uso offline.
+- Gamificación compacta: batalla y refuerzo positivo reducidos, armas y misiones
+  desplegables e hitos integrados en el indicador de vida, sin retirar funciones.
+- La versión actual es 588. Refuerzo positivo, Logros y auditoría profunda
   están terminados. Los siete fallos de la auditoría se corrigieron con
   regresiones; cobertura y límites constan en
   `docs/auditoria-profunda-2026-09-30.md`.
@@ -599,6 +604,19 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v588** — Gamificación compacta y ruta limpia de la app.
+
+- Integrado el diseño compacto: armas y misiones desplegables, hitos dentro
+  del indicador de vida y resumen positivo reducido. Aviso de movimiento
+  reducido accesible incluso con los detalles cerrados; controles conservados.
+- `/app` es la URL pública. `/app.html` redirige permanentemente; login y
+  marcadores antiguos conservan parámetros y fragmentos. El inicio de la PWA
+  usa `/app` manteniendo la identidad anterior de las instalaciones existentes.
+- La PWA precarga la ruta limpia y redirige también navegaciones antiguas
+  sin conexión. Sin cambios en los datos de cuenta ni en Supabase.
+- 234 pruebas y build correctos; navegación, redirección de enlaces antiguos
+  y acceso offline cubiertos por regresiones.
 
 **v587** — Héroe y batalla pixel art del mockup aprobado.
 
@@ -628,15 +646,3 @@ La aplicación funciona en producción con estas bases vigentes:
 - 213 pruebas, 2.008 textos ES/EN, 28 módulos, wiring y build correctos.
   Chrome: botón visible y compacto en 32 combinaciones; validación de Logros
   e idioma en sesiones aisladas y capturas con datos de demostración.
-
-**v585** — Apoyo voluntario con Ko-fi.
-
-- Botón «Invítame un café»/«Buy me a coffee» con el enlace real del usuario,
-  al final de la landing y de cualquier sección de la app. En flujo normal,
-  sin banner fijo; apertura en otra pestaña con noopener/noreferrer.
-- Botones secundarios existentes, texto y nombre accesible ES/EN, temas
-  claro/oscuro. Sin scripts externos, compras, recibos ni cambios de cuenta.
-- 210 pruebas, 2.007 textos ES/EN, 28 módulos, wiring y build correctos.
-  Chrome: 32 combinaciones de página/idioma/tema y 320, 390, 768 y 1365 px;
-  sin overflow, enlace visible, destino correcto y llamadas intactas al abrirlo.
-  La validación usa sesiones/destino aislados y no prueba un pago real.

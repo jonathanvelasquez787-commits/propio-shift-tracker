@@ -485,7 +485,7 @@ async function boot() {
   }
 
   if (!session) {
-    window.location.replace('/?next=/app.html');
+    window.location.replace('/?next=/app');
     return;
   }
 
