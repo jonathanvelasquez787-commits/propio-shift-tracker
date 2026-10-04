@@ -46,10 +46,27 @@ auditoría y sus límites figura en `seo-audit-2026-10-04.md`.
 4. Solicitar indexación si corresponde y revisar errores, impresiones, clics y
    consultas en los informes. Repetir solicitudes no acelera el rastreo.
 
-El 4 de octubre de 2026 se creó la propiedad real en la cuenta del propietario
-y se obtuvo su etiqueta HTML. Desde v591 está incluida en ambas portadas;
-no quitarla tras verificar. Validación, sitemap e inspección en curso.
-La ausencia en una búsqueda pública no prueba que el sitio no esté indexado.
+El 4 de octubre de 2026 se creó y verificó la propiedad real en la cuenta del
+propietario usando la etiqueta HTML publicada en v591. Google mostró
+«Propiedad verificada». La etiqueta permanece en ambas portadas; no quitarla.
+
+Se envió `sitemap.xml` y Google confirmó el envío. El informe mostró después
+«No se ha podido obtener». La inspección en tiempo real del propio Google
+confirmó rastreo permitido y obtención correcta del archivo, que además
+responde 200 como application/xml y contiene cuatro URLs válidas. Tras esa
+comprobación se reenvió una vez; falta confirmar su procesamiento en el informe.
+
+La inspección del índice mostró `/` y `/es` aún sin indexar («Google no reconoce
+esta URL»). Las pruebas de ambas portadas confirmaron «La URL está disponible
+para Google». Al solicitar indexación, Google rechazó la solicitud por
+«Cuota superada» y pidió reintentar mañana. No se completó una solicitud aceptada
+ni se certifica indexación o posición en resultados.
+
+El propietario autorizó un único reintento automático para el 5 de octubre de
+2026 a las 13:00, America/Tegucigalpa, en este chat. La automatización
+`reintentar-indexaci-n-de-propio-shift-tracker` revisará el sitemap, solicitará
+ambas portadas y notificará el resultado real. Si exige iniciar sesión o un
+CAPTCHA, se informará del bloqueo. No repetir solicitudes en bucle.
 
 ## Próximas mejoras de contenido
 

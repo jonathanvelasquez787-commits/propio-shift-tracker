@@ -317,10 +317,15 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
-Visibilidad en Google: base técnica publicada desde v584. Desde v591 el head
-incluye la etiqueta real de Search Console obtenida en la cuenta del propietario.
-Falta terminar la validación en Google y enviar sitemap/inspeccionar la landing.
-No se conoce el estado real de indexación ni se prometen posiciones. Desde v590
+Visibilidad en Google: propiedad real verificada por etiqueta HTML el 4/10/2026
+en Search Console. Sitemap enviado y reenviado una vez; el informe todavía
+mostró «No se ha podido obtener», aunque la prueba en tiempo real de Google
+confirmó rastreo permitido y obtención correcta del XML. `/` y `/es` figuran
+sin indexar, como URLs aún desconocidas para Google. La solicitud de la raíz
+fue rechazada por «Cuota superada», con instrucción de reintentar mañana.
+Reintento único autorizado y programado para el 5/10/2026 a las 13:00 de
+Tegucigalpa en este chat (automatización `reintentar-indexaci-n-de-propio-shift-tracker`).
+No quitar la etiqueta real de verificación ni duplicar el reintento. Desde v590
 hay URLs públicas por idioma (`/` en inglés y `/es` en español), contenido,
 metadatos, hreflang y datos estructurados coherentes. Nuevas guías públicas y
 difusión en comunidades pertinentes siguen siendo mejoras posteriores.
@@ -616,8 +621,11 @@ La aplicación funciona en producción con estas bases vigentes:
 - Incorporada la etiqueta real de la propiedad `https://propio-shift-tracker.vercel.app/`
   creada en la cuenta de Google del propietario. El build la conserva en ambos
   idiomas; debe mantenerse para conservar la verificación.
-- Validación y envío de sitemap desde Search Console en curso; estado en
-  `docs/seo.md`.
+- Propiedad verificada y sitemap enviado en Search Console. Las portadas y el XML
+  son accesibles para Google en su prueba real. Lectura del sitemap pendiente
+  en el informe; solicitud de indexación bloqueada por cuota diaria de Google.
+- Reintento único autorizado para el 5/10 a las 13:00 de Tegucigalpa; detalles
+  en `docs/seo.md`. Build correcto y etiqueta publicada en ambos idiomas.
 
 **v590** — SEO público bilingüe y carga de la landing.
 
