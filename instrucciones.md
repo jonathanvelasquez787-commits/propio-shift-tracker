@@ -320,14 +320,21 @@ futura opera bajo esto, sin excepción:
 Conexión Propio → tracker: v594 agrega una extensión MV3 propia y un receptor
 autenticado en la app. Build y recorrido completo probados con portal y eventos
 simulados en Chromium aislado; no se enviaron solicitudes a Propio/Twilio reales.
-Pendientes: instalar el paquete en Chrome del usuario con confirmación específica
-y observar una llamada normal. La compatibilidad de las señales identificadas en
+El usuario confirmó instalación y cuenta conectada en Chrome. Pendiente:
+observar una llamada normal. La compatibilidad de las señales identificadas en
 el add-on de 2023 sigue sin certificar. Empieza en observación; el registro
 automático requiere conectar la cuenta y activar el modo después de observar
 una llamada completa. No provocar una llamada real solo para probar.
 No pulsa disponibilidad/aceptar/colgar ni interpreta Offline como Break/Lunch.
 Tiempo/pago estimados, corregibles mediante importación oficial; conserva
 identidad y deduplicación tras reemplazo. Véase `extension/propio-bridge/README.md`.
+
+Resumen dentro de Propio: extensión 1.1.0 preparada con barra que suma minutos
+y Pay de las filas visibles del historial. No acumula páginas, modifica el
+tracker ni usa una tarifa estimada. Alternativa userscript generada por el mismo
+build. Probadas tablas HTML/Angular simuladas, filtros, datos pendientes,
+paginación, conversión y temas. Pendiente recargar la extensión en Chrome del
+usuario y comprobar la tabla real; aún no se verificó el historial en su sesión.
 
 Visibilidad en Google: propiedad real verificada por etiqueta HTML el 4/10/2026
 en Search Console. Sitemap enviado y reenviado una vez; el informe todavía
@@ -620,7 +627,7 @@ La aplicación funciona en producción con estas bases vigentes:
 - Landing bilingüe estática, canonical/hreflang y sitemap de cuatro páginas,
   preguntas frecuentes e imagen social. Un bundle público evita cargar tres
   copias de las traducciones; las fuentes no bloquean el primer render.
-- La versión actual es 593. Refuerzo positivo, Logros y auditoría profunda
+- La versión actual de la app es 594; la extensión es 1.1.0. Refuerzo positivo, Logros y auditoría profunda
   están terminados. Los siete fallos de la auditoría se corrigieron con
   regresiones; cobertura y límites constan en
   `docs/auditoria-profunda-2026-09-30.md`.
@@ -628,6 +635,19 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**Extensión 1.1.0** — Minutos y pago directamente en el historial de Propio.
+
+- Barra compacta con subtotal de Duration (Minutes) y Pay de la página visible,
+  actualización por cambios de tabla y encabezados reconocidos. Pago leído de
+  Propio, sin estimar tarifa. Vacíos/no reconocidos marcan total parcial.
+- Compatible con tablas HTML/Angular Material; no acumula filas entre páginas,
+  hace solicitudes ni pulsa controles. Conversión secundaria opcional guardada
+  localmente; no almacena ni lee identificadores de clientes. Sin permisos nuevos.
+- Build incluye userscript independiente del mismo código. 270 pruebas,
+  imports/wiring y build correctos; extensión y userscript verificados en Chrome
+  aislado con portal ficticio, ambos temas y 320/1000 px. Compatible en simulación;
+  actualización de Chrome habitual y tabla real todavía pendientes.
 
 **v594** — Puente entre señales de Propio y tracker.
 
@@ -643,7 +663,7 @@ La aplicación funciona en producción con estas bases vigentes:
 - 266 pruebas, imports/wiring y build correctos. Extensión desempaquetada real
   probada en perfil Chromium nuevo contra fixtures con toda la red externa
   interceptada: observación, conexión, guardado, recarga, duplicados y reemplazo
-  oficial. Instalación en Chrome habitual y señales reales aún pendientes.
+  oficial. Usuario confirmó instalación y conexión; señales reales aún pendientes.
 
 **v593** — Gamificación automática y duelo opcional.
 
@@ -660,14 +680,3 @@ La aplicación funciona en producción con estas bases vigentes:
   y guardado real en la app con una llamada simulada en navegador local.
 - La conexión con el portal real de Propio queda como tarea posterior; esta
   versión usa las llamadas registradas en el tracker.
-
-**v592** — Gamificación en una sola tarjeta compacta.
-
-- Diseño aprobado en ambos temas: arena de 120 px, cabecera reducida y una sola
-  franja de ganancias, llamadas, XP y vida. Controles y selector de armas juntos.
-- Teclas, armas, misiones e hitos se despliegan cuando hacen falta. Se conservan
-  las diez armas, los tres objetivos, las cuatro etapas y la moneda secundaria.
-- Los indicadores originales de ganancias se trasladan al desplegable y vuelven
-  a su lugar al desactivar la gamificación; no cambia el cálculo de recompensas.
-- 241 pruebas y build correctos. Verificados ambos idiomas y temas, tamaños
-  de 320 a 1280 px, diez armas, controles táctiles y movimiento reducido.
