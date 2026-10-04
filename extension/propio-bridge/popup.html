@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Conexión con Propio</title><link rel="stylesheet" href="popup.css"></head>
+<body><main><h1>Conexión con Propio</h1><p id="status" role="status">Comprobando conexión…</p><p id="detail"></p>
+<button id="open" type="button">Abrir tracker</button><button id="pair" type="button">Conectar esta cuenta</button>
+<label><input id="automatic" type="checkbox"> Registrar llamadas automáticamente</label>
+<p class="note">Primero observa una llamada durante tu jornada normal. Hasta activar el registro automático, la extensión no modifica el tracker.</p>
+<p class="note">El tiempo y el pago son estimados. El historial oficial de Propio permite corregirlos después. No registra audio, credenciales ni datos de clientes.</p>
+<details><summary>Señales recientes</summary><ul id="signals"></ul></details>
+<button id="reviewed" type="button" hidden>Descartar señales revisadas</button>
+</main><script src="popup.js"></script></body></html>

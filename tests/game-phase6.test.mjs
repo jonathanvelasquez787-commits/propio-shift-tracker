@@ -9,7 +9,7 @@ import { computeGameDay, configureGameContext, createDefaultGameState, normalize
 import { configurePositiveReinforcementContext, createDefaultReinforcementState, normalizeReinforcementState } from '../js/positive-reinforcement.js';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
-const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
+const read = (file) => fs.readFileSync(path.join(root, file), 'utf8').replaceAll('\r\n', '\n');
 const between = (source, startMarker, endMarker) => source.slice(source.indexOf(startMarker), source.indexOf(endMarker, source.indexOf(startMarker)));
 
 function validCallDate(key) {
@@ -604,7 +604,7 @@ test('simulación mensual: llamadas y Break Lunch no pueden ocupar los mismos mi
 
 test('simulación mensual: llamada no salta ventana temprana ni reescribe entrada salida manual', () => {
   const appMain = read('js/app-main.js');
-  const startCall = appMain.slice(appMain.indexOf('function startCall()'), appMain.indexOf('function endCall()'));
+  const startCall = appMain.slice(appMain.indexOf('function startCall('), appMain.indexOf('function endCall('));
   assert.doesNotMatch(startCall, /shiftStartTooEarly\(\)/);
   assert.match(startCall, /const needsAutoShift = !state\.shiftStartedAt \|\| !!state\.shiftEndedAt/);
   assert.match(appMain, /startIsAutomatic/);
@@ -801,7 +801,7 @@ test('runtime smoke: helpers de renderGame existen para Logros y Higher Rate', (
 
 test('cuarta simulación mensual: llamadas live antes y después del turno nunca quedan bloqueadas', () => {
   const appMain = read('js/app-main.js');
-  const startCall = appMain.slice(appMain.indexOf('function startCall()'), appMain.indexOf('function endCall()', appMain.indexOf('function startCall()')));
+  const startCall = appMain.slice(appMain.indexOf('function startCall('), appMain.indexOf('function endCall(', appMain.indexOf('function startCall(')));
   const disabled = appMain.slice(appMain.indexOf('function callActionDisabled()'), appMain.indexOf('function callActionTimer()', appMain.indexOf('function callActionDisabled()')));
   assert.doesNotMatch(startCall, /shiftStartTooEarly\(\)/);
   assert.match(startCall, /const needsAutoShift = !state\.shiftStartedAt \|\| !!state\.shiftEndedAt/);
@@ -897,7 +897,7 @@ test('quinta simulación mensual: editar fecha y nivel de Higher Rate sí llega 
 test('quinta simulación mensual: descartar live iniciada durante Break Lunch restaura la pausa', () => {
   const appMain = read('js/app-main.js');
   assert.match(appMain, /let interruptedPauseRollback = null/);
-  assert.match(appMain, /interruptedPauseRollback = endPause\(\{ silent: true, deferSave: true \}\)/);
+  assert.match(appMain, /interruptedPauseRollback = endPause\(\{ silent: true, deferSave: true, endedAt: nowISO \}\)/);
   assert.match(appMain, /interruptedPauseRollback,/);
   assert.match(appMain, /rollback\.pauseHistoryId/);
   assert.match(appMain, /rollback\.pauseEndEventId/);

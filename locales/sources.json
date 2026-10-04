@@ -1618,6 +1618,12 @@
       "app.html"
     ]
   },
+  "s_217fdf57": {
+    "source": "{{v7}} · {{v8}} min",
+    "files": [
+      "js/calls.js"
+    ]
+  },
   "s_21830f6d": {
     "source": "Azul suave, crema y arena",
     "files": [
@@ -3601,12 +3607,6 @@
       "js/auth.js"
     ]
   },
-  "s_4a3c9aaf": {
-    "source": "{{v2}} · {{v3}}",
-    "files": [
-      "js/calls.js"
-    ]
-  },
   "s_4a6fc298": {
     "source": "Higher Rate",
     "files": [
@@ -5295,6 +5295,12 @@
       "app.html"
     ]
   },
+  "s_6ba643fe": {
+    "source": "Tiempo y pago estimados",
+    "files": [
+      "js/calls.js"
+    ]
+  },
   "s_6ba696e1": {
     "source": "Meta cumplida: {{v0}}",
     "files": [
@@ -6853,12 +6859,6 @@
     "source": "ACW: {{v0}}",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_89212cc7": {
-    "source": "{{v6}} · {{v7}} min",
-    "files": [
-      "js/calls.js"
     ]
   },
   "s_892ac2c7": {
@@ -11677,6 +11677,12 @@
     "source": "Cancelar",
     "files": [
       "app.html"
+    ]
+  },
+  "s_ea88d3c9": {
+    "source": "{{v2}} · {{v3}}{{v4}}",
+    "files": [
+      "js/calls.js"
     ]
   },
   "s_ea8c2195": {

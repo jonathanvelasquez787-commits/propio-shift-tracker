@@ -2,6 +2,7 @@ import { ui, translateText, translateMarkup, displayLocale, translateDocument } 
 import { applyAppearance, wireAppearance } from './appearance.js';
 import { wireAchievementHelp } from './help-tooltips.js';
 import { normalizeBattleWeapon } from './game-battle.js';
+import { createPropioReceiver, ignorePropioCall } from './propio-bridge.js';
 // Cuerpo principal de la app (Inicio, Horario, Llamadas, Higher Rate, Finanzas, Reportes,
 // Calendario, Ajustes...). Vive como módulo ES aparte para no ser parte del documento HTML: lo
 // carga js/boot.js con un import() dinámico recién cuando la sesión y los datos están listos
@@ -4115,7 +4116,7 @@ function renderPayDatesSection() {
     function endPause(options = {}) {
       if (!state.activePause) return null;
       const { silent = false, deferSave = false } = options;
-      const now = new Date().toISOString();
+      const now = options.endedAt || new Date().toISOString();
       const endedPause = { ...state.activePause };
       const shiftDayKey = callDateKeyFromValue(endedPause.shiftDayKey) || currentShiftAccountingDayKey(new Date(endedPause.startedAt));
       const plannedSlot = findPlannedSlotForActivePause(shiftDayKey);
@@ -4161,15 +4162,15 @@ function renderPayDatesSection() {
       return startCall();
     }
 
-    function startCall() {
+    function startCall(options = {}) {
       if (state.activeCall) return;
 
-      const now = new Date();
+      const now = new Date(options.startedAt || Date.now());
       const nowISO = now.toISOString();
       let interruptedPauseRollback = null;
       if (state.activePause) {
         const pretty = state.activePause.type === 'lunch' ? translateText('Lunch') : translateText('Break');
-        interruptedPauseRollback = endPause({ silent: true, deferSave: true });
+        interruptedPauseRollback = endPause({ silent: true, deferSave: true, endedAt: nowISO });
         toast(ui`${pretty} terminado automáticamente al iniciar la llamada`);
       }
 
@@ -4199,19 +4200,21 @@ function renderPayDatesSection() {
         // Si esta llamada resulta accidental y se descarta, se restaura exactamente el estado de
         // juego anterior junto con el turno automático.
         gameBeforeAutoShift,
+        ...(options.propioBridge ? { propioBridge: { ...options.propioBridge } } : {}),
       };
-      saveAll();
+      const saved = saveAll();
       toast(needsAutoShift ? translateText('Llamada iniciada · turno abierto automáticamente') : translateText('Llamada iniciada'));
+      return saved;
     }
 
     // Termina la llamada en curso y la guarda SOLA (ver autoSaveLiveCall) — desde ya no abre ningún
     // modal de confirmación en el caso normal: colgar bloqueaba "Iniciar llamada" hasta resolver
     // ese modal, así que se quitó esa fricción de raíz.
-    function endCall() {
+    function endCall(options = {}) {
       if (!state.activeCall) return;
       const liveContext = state.activeCall;
       const startedAt = liveContext.startedAt;
-      const endedAt = new Date().toISOString();
+      const endedAt = options.endedAt || new Date().toISOString();
       state.activeCall = null;
       // Sin esto, el chip "ACW/Available" en vivo (ver computeCurrentAcwStart) no sabía que la
       // llamada acababa de terminar hasta que se guardaba.
@@ -4227,6 +4230,7 @@ function renderPayDatesSection() {
       if (!state.activeCall) return;
       appConfirm(translateText('¿Descartar esta llamada sin guardarla? El tiempo registrado se pierde y no queda ninguna fila en Tabla de llamadas.'), () => {
         const discarded = state.activeCall;
+        ignorePropioCall(state, discarded?.propioBridge?.callId);
         state.activeCall = null;
 
         if (discarded?.interruptedPauseRollback) {
@@ -4696,6 +4700,7 @@ function renderPayDatesSection() {
           ...(replacingExisting?.frozenHigherRateBonus
             ? { frozenHigherRateBonus: { ...replacingExisting.frozenHigherRateBonus } }
             : {}),
+          ...(replacingExisting?.propioBridge ? { propioBridge: { ...replacingExisting.propioBridge, payEstimated: false, timingEstimated: false } } : {}),
           importedAt: preserveOfficialIdentity ? (item.replaces.importedAt || importTs) : importTs,
           source: 'import',
         };
@@ -7638,3 +7643,17 @@ window.financeConvertedInline = financeConvertedInline;
 window.effectiveCycleGoal = effectiveCycleGoal;
 window.cycleGoalPace = cycleGoalPace;
 window.reportsCycleProjection = reportsCycleProjection;
+
+export const applyPropioBridgeEvent = createPropioReceiver({
+  getState: () => state,
+  getCalls: () => calls,
+  start: event => startCall({ startedAt: event.at, propioBridge: { callId: event.callId, payEstimated: true, timingEstimated: true } }),
+  end: event => endCall({ endedAt: event.at }),
+  catchUp: event => {
+    const context = { propioBridge: { callId: event.callId, payEstimated: true, timingEstimated: true } };
+    const result = autoSaveLiveCall(event.startedAt, event.at, context);
+    if (result && (!state.lastCallEndedAt || Date.parse(state.lastCallEndedAt) < Date.parse(event.at))) state.lastCallEndedAt = event.at;
+    return result;
+  },
+  save: saveAll,
+});

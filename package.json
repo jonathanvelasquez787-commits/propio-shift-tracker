@@ -1,6 +1,6 @@
 {
   "name": "propio-shift-tracker",
-  "version": "593.0.0",
+  "version": "594.0.0",
   "private": true,
   "description": "Registro personal de turnos, llamadas y ganancias — con cuentas y respaldo en la nube.",
   "type": "module",
@@ -9,6 +9,7 @@
     "node": ">=20"
   },
   "scripts": {
+    "build:extension": "node scripts/build-extension.mjs",
     "build": "node scripts/check-i18n.mjs && node scripts/check-module-exports.mjs && node scripts/check-ui-wiring.mjs && node scripts/build.mjs",
     "check:modules": "node scripts/check-module-exports.mjs",
     "test": "node scripts/check-i18n.mjs && node --test",
