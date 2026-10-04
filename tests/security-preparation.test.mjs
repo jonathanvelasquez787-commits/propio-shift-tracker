@@ -106,13 +106,14 @@ test('landing redirects only to a validated same-origin URL', () => {
     window: { location: { origin: 'https://app.example' } },
   });
 
-  assert.equal(resolve('/app.html?from=login#main'), 'https://app.example/app.html?from=login#main');
-  assert.equal(resolve('https://evil.example/path'), '/app.html');
-  assert.equal(resolve('//evil.example/path'), '/app.html');
-  assert.equal(resolve('\\\\evil.example/path'), '/app.html');
-  assert.equal(resolve('/\\\\evil.example/path'), '/app.html');
+  assert.equal(resolve('/app.html?from=login#main'), 'https://app.example/app?from=login#main');
+  assert.equal(resolve('/app?from=login#main'), 'https://app.example/app?from=login#main');
+  assert.equal(resolve('https://evil.example/path'), '/app');
+  assert.equal(resolve('//evil.example/path'), '/app');
+  assert.equal(resolve('\\\\evil.example/path'), '/app');
+  assert.equal(resolve('/\\\\evil.example/path'), '/app');
   assert.equal(resolve('https://app.example//evil.example/path'), 'https://app.example//evil.example/path');
-  assert.equal(resolve(null), '/app.html');
+  assert.equal(resolve(null), '/app');
 });
 
 test('telemetry enforces both global and per-IP limits', () => {
@@ -151,7 +152,9 @@ test('git ignores environment files while allowing explicit examples', () => {
 test('PWA shell includes a manifest and service worker with API exclusions', () => {
   const manifest = JSON.parse(read('manifest.webmanifest'));
   assert.equal(manifest.display, 'standalone');
-  assert.equal(manifest.start_url, '/app.html');
+  assert.equal(manifest.start_url, '/app');
+  // Keep the effective identity of already-installed apps when changing their launch URL.
+  assert.equal(manifest.id, '/app.html');
   const worker = read('js/service-worker.js');
   assert.match(worker, /url\.pathname\.startsWith\('\/api\/'\)/);
   assert.match(worker, /request\.mode === 'navigate'/);
@@ -165,6 +168,53 @@ test('PWA shell includes a manifest and service worker with API exclusions', () 
   const build = read('scripts/build.mjs');
   assert.match(build, /\?v=\$\{release\}/);
   assert.match(build, /name === 'monitoring'[\s\S]*replaceAll\('__BUILD_VERSION__', release\)/);
+});
+
+test('clean app route preserves legacy links and login navigation', () => {
+  const routing = JSON.parse(read('vercel.json'));
+  assert.deepEqual(routing.redirects.find(route => route.source === '/app.html'), {
+    source: '/app.html', destination: '/app', permanent: true,
+  });
+  assert.equal(routing.rewrites.find(route => route.source === '/app').destination, '/app.html');
+  assert.match(read('index.html'), /class="submit-btn" href="\/app"/);
+  assert.match(read('js/boot.js'), /window\.location\.replace\('\/\?next=\/app'\)/);
+});
+
+test('PWA launches the clean route offline and redirects legacy navigations', async () => {
+  const handlers = new Map();
+  let precached = [], responsePromise, networkCalls = 0;
+  const shell = new Response('app shell');
+  const cache = {
+    async addAll(urls) { precached = urls; },
+    async match(request) {
+      const url = request.url || request;
+      return url === 'https://app.example/app' || url === '/app' ? shell : undefined;
+    },
+  };
+  vm.runInNewContext(read('js/service-worker.js'), {
+    __BUILD_VERSION__: 'test', URL, Response,
+    self: { location: { origin: 'https://app.example' }, skipWaiting() {},
+      addEventListener(name, handler) { handlers.set(name, handler); } },
+    caches: { async open() { return cache; } },
+    async fetch() { networkCalls++; throw new Error('offline'); },
+  });
+  let installation;
+  handlers.get('install')({ waitUntil(promise) { installation = promise; } });
+  await installation;
+  assert.ok(precached.includes('/app'));
+  const navigate = url => {
+    handlers.get('fetch')({ request: { method: 'GET', mode: 'navigate', url },
+      respondWith(promise) { responsePromise = promise; } });
+    return Promise.resolve(responsePromise);
+  };
+  const legacy = await navigate('https://app.example/app.html?from=bookmark');
+  assert.equal(legacy.status, 308);
+  assert.equal(legacy.headers.get('location'), 'https://app.example/app?from=bookmark');
+  assert.equal(networkCalls, 0);
+  assert.equal(await navigate('https://app.example/app'), shell);
+  assert.equal(networkCalls, 1);
+  assert.equal(await navigate(legacy.headers.get('location')), shell);
+  assert.equal(networkCalls, 2);
 });
 
 test('footer year tolerates pages without a footer', () => {

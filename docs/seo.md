@@ -3,7 +3,8 @@
 La página pública es https://propio-shift-tracker.vercel.app/. La landing y las
 páginas legales declaran su URL canonical; robots.txt permite rastreo y apunta
 al sitemap.xml con esas tres páginas. El build copia ambos archivos a public/.
-La app de cuenta (/app y /app.html) lleva noindex en HTML y cabecera HTTP; no se
+La app de cuenta (/app) lleva noindex en HTML y cabecera HTTP; /app.html redirige
+permanentemente a /app y conserva los parámetros. La app no se
 incluye en el sitemap. Noindex no reemplaza la autenticación ni RLS.
 
 Estas ayudas no garantizan indexación ni posiciones. La landing ya entrega

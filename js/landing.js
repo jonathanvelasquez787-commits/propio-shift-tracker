@@ -68,12 +68,14 @@ function enterApp() {
 
 function nextUrl() {
   const next = params.get('next');
-  if (!next) return '/app.html';
+  if (!next) return '/app';
   try {
     const destination = new URL(next, window.location.origin);
-    return destination.origin === window.location.origin ? destination.href : '/app.html';
+    if (destination.origin !== window.location.origin) return '/app';
+    if (destination.pathname === '/app.html') destination.pathname = '/app';
+    return destination.href;
   } catch {
-    return '/app.html';
+    return '/app';
   }
 }
 
@@ -168,7 +170,7 @@ function showSessionCard(profile, user) {
   const topBtn = $('topEnterBtn');
   if (topBtn) {
     topBtn.textContent = translateText('Abrir la app');
-    topBtn.setAttribute('href', '/app.html');
+    topBtn.setAttribute('href', '/app');
   }
 }
 

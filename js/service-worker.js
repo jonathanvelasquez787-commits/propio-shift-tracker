@@ -3,7 +3,7 @@ const CACHE = `propio-${BUILD_VERSION}`;
 const SHELL = [
   '/',
   '/index.html',
-  '/app.html',
+  '/app',
   '/privacidad.html',
   '/terminos.html',
   '/manifest.webmanifest',
@@ -46,6 +46,11 @@ self.addEventListener('fetch', (event) => {
   if (url.origin !== self.location.origin || url.pathname.startsWith('/api/')) return;
 
   if (request.mode === 'navigate') {
+    if (url.pathname === '/app.html') {
+      url.pathname = '/app';
+      event.respondWith(Response.redirect(url.href, 308));
+      return;
+    }
     event.respondWith(
       fetch(request)
         .then((response) => {
@@ -54,7 +59,11 @@ self.addEventListener('fetch', (event) => {
           return response;
         })
         .catch(() =>
-          caches.open(CACHE).then(async (cache) => (await cache.match(request)) || cache.match('/index.html'))
+          caches.open(CACHE).then(async (cache) =>
+            (await cache.match(request)) ||
+            (url.pathname === '/app' && await cache.match('/app')) ||
+            cache.match('/index.html')
+          )
         )
     );
     return;
