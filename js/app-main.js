@@ -5724,6 +5724,10 @@ function renderHeader() {
   const goalPct = goalUsd > 0 ? Math.min(100, (stats.earnings / goalUsd) * 100) : 0;
   const milestonesEnabled = settings.game?.enabled === true && goalUsd > 0;
   const milestoneProgress = milestonesEnabled ? onGameMonetaryProgress(dayKey, stats.earnings, goalUsd, { silent: true, record: false }) : null;
+  const milestoneDetails = document.getElementById('gameMilestones');
+  if (milestoneDetails) milestoneDetails.hidden = !milestonesEnabled;
+  const milestoneScore = document.getElementById('gameMilestonesScore');
+  if (milestoneScore) milestoneScore.textContent = `${milestoneProgress?.claimed.length || 0}/4`;
   const milestoneRow = document.getElementById('earningsMilestoneMarkers');
   if (milestoneRow) {
     milestoneRow.hidden = !milestonesEnabled;

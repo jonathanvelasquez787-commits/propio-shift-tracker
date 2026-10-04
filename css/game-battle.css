@@ -138,3 +138,80 @@
 @media (prefers-reduced-motion: reduce) {
   .game-battle *, .game-battle *::before, .game-battle *::after { animation: none !important; transition: none !important; }
 }
+
+#gameHomeDay:has(.game-arena--battle) { gap: 0; border: 1px solid var(--line-2); border-radius: 10px; background: var(--panel-navy); overflow: hidden; }
+#gameArena.game-arena--battle { border: 0; border-radius: 0; }
+#gameArena.game-arena--battle [data-battle-summary] { gap: 3px; padding: 8px 12px; }
+#gameArena.game-arena--battle .game-arena-title-row { justify-content: flex-start; gap: 8px; }
+#gameArena.game-arena--battle .game-arena-title-row h3 { flex: 0 1 auto; font-size: 15px; line-height: 1.3; margin: 0; }
+#gameArena.game-arena--battle .game-phase-meter { padding: 3px 6px; border: 1px solid var(--line-2); border-radius: 4px; font: 700 9px ui-monospace, Consolas, monospace; }
+#gameArena.game-arena--battle .game-combo-badge { margin-left: auto; font-size: 10px; padding: 3px 6px; }
+.game-battle-caption { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; }
+.game-battle-caption .game-kicker { font-size: 9px; }
+.game-battle-caption .game-monster-phrase { margin: 0; font-size: 11px; }
+.game-battle-stage { height: 120px; }
+.game-battle-label { top: 8px; font-size: 8px; }
+.game-battle-label b { font-size: 10px; margin-top: 1px; }
+.game-battle-feed { top: 42px; font-size: 9px; }
+.game-battle-monster { height: 64px; width: 76px; bottom: 36px; right: 22px; }
+.game-battle-notice { top: 4px !important; padding: 6px 8px; width: min(180px, calc(100% - 16px)); font-size: 10px; }
+.game-battle-victory { inset: 24px 0 35px; gap: 2px; }
+.game-battle-victory span { font-size: 14px; }
+.game-battle-victory strong { font-size: 18px; }
+.game-battle-victory small { font-size: 10px; }
+.game-battle-health { padding: 7px 12px; gap: 5px; }
+#gameArena.game-arena--battle [data-battle-stats] { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 20px; padding: 0; border: 0; }
+#gameArena.game-arena--battle [data-battle-stats] > div { gap: 5px; }
+#gameArena.game-arena--battle [data-battle-stats] strong { font-size: 12px; }
+#gameArena.game-arena--battle [data-battle-stats] > div:first-child strong { font-size: 13px; }
+#gameArena.game-arena--battle [data-battle-stats] > div:nth-child(3) strong { color: var(--tier-gold); }
+#gameArena.game-arena--battle [data-battle-stats] > div:last-child { margin-left: auto; }
+#gameArena.game-arena--battle [data-battle-stats] > div:last-child strong { color: var(--text); }
+.game-battle-health .game-hp-track { height: 7px; margin: 0; }
+.game-battle-health .game-hp-foot { font-size: 10px; }
+.game-battle-tools { display: grid; grid-template-columns: minmax(0, 1fr) auto; border-top: 1px solid var(--line); }
+.game-battle-controls { border: 0; padding: 4px 12px; justify-content: flex-start; gap: 12px; }
+.game-battle-touch button { min-height: 30px; min-width: 30px; font-size: 10px; padding: 4px 8px; }
+.game-battle-armory { border: 0; padding: 0 12px; }
+.game-battle-armory-head { min-height: 38px; }
+.game-battle-armory-head small { font-size: 10px; }
+.game-battle-tools:has(.game-battle-armory[open]) { grid-template-columns: minmax(0, 1fr); }
+.game-battle-armory[open] { padding: 0 12px 10px; border-top: 1px solid var(--line); }
+.game-battle-shortcuts > summary { min-height: 30px; display: flex; align-items: center; cursor: pointer; color: var(--muted); font-size: 11px; list-style: none; }
+.game-battle-shortcuts > summary::-webkit-details-marker { display: none; }
+.game-battle-shortcuts > summary::after { content: '⌄'; margin-left: 6px; }
+.game-battle-shortcuts[open] > summary::after { transform: rotate(180deg); }
+.game-battle-shortcuts > summary:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+.game-battle-shortcuts[open] { width: 100%; }
+.game-battle-shortcuts[open] .game-battle-keys { margin: 4px 0 8px; }
+#gameArena.game-arena--battle [data-battle-mission-hint] { display: none; }
+#gameHomeDay:has(.game-arena--battle) .game-missions-column { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: 0; border-top: 1px solid var(--line); }
+#gameHomeDay:has(.game-arena--battle) .game-missions { border: 0; border-radius: 0; background: transparent; }
+.game-milestones { min-width: 0; border-left: 1px solid var(--line); }
+#gameHomeDay .game-missions-summary, .game-milestones-summary { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 8px; min-height: 38px; padding: 6px 12px; font-size: 11px; list-style: none; cursor: pointer; }
+#gameHomeDay .game-missions-summary > strong, .game-milestones-summary > strong { margin-left: 0; color: var(--cyan); font: 800 11px ui-monospace, Consolas, monospace; }
+#gameHomeDay .game-missions-summary small { font-size: 10px; font-weight: 400; color: var(--muted); }
+.game-milestones-summary > [data-game-milestone-next] { min-width: 0; flex: 1 1 150px; }
+.game-milestones-summary #earningsNextMilestone { margin: 0; font-size: 10px; color: var(--muted); font-weight: 400; }
+#gameHomeDay .game-missions-summary::after, .game-milestones-summary::after { content: '⌄'; margin-left: auto; color: var(--muted); }
+.game-milestones-summary::-webkit-details-marker { display: none; }
+.game-milestones[open] > summary::after { transform: rotate(180deg); }
+.game-milestones-summary:focus-visible { outline: 2px solid var(--cyan); outline-offset: -2px; }
+.game-milestones-body { padding: 8px 12px 12px; border-top: 1px solid var(--line); }
+#gameHomeDay:has(.game-arena--battle) .game-missions-column:has(details[open]) { grid-template-columns: minmax(0, 1fr); }
+#gameHomeDay:has(.game-arena--battle) .game-missions-column:has(details[open]) .game-milestones { border-left: 0; border-top: 1px solid var(--line); }
+@media (max-width: 600px) {
+  .game-battle-caption .game-monster-phrase { flex-basis: 100%; }
+  #gameArena.game-arena--battle [data-battle-stats] { gap: 5px 12px; }
+  #gameArena.game-arena--battle [data-battle-stats] > div:first-child { flex-basis: 100%; }
+  .game-battle-tools { grid-template-columns: minmax(0, 1fr); }
+  .game-battle-controls { justify-content: space-between; gap: 6px; }
+  .game-battle-armory { border-top: 1px solid var(--line); }
+  .game-battle-armory-head { min-height: 34px; }
+  #gameHomeDay:has(.game-arena--battle) .game-missions-column { grid-template-columns: minmax(0, 1fr); }
+  .game-milestones { border-left: 0; border-top: 1px solid var(--line); }
+}
+@media (pointer: coarse) {
+  .game-battle-touch button { min-height: 44px; min-width: 44px; }
+  .game-battle-armory-head, #gameHomeDay .game-missions-summary, .game-milestones-summary, .game-battle-shortcuts > summary { min-height: 44px; }
+}

@@ -607,7 +607,7 @@ La aplicación funciona en producción con estas bases vigentes:
 - Landing bilingüe estática, canonical/hreflang y sitemap de cuatro páginas,
   preguntas frecuentes e imagen social. Un bundle público evita cargar tres
   copias de las traducciones; las fuentes no bloquean el primer render.
-- La versión actual es 591. Refuerzo positivo, Logros y auditoría profunda
+- La versión actual es 592. Refuerzo positivo, Logros y auditoría profunda
   están terminados. Los siete fallos de la auditoría se corrigieron con
   regresiones; cobertura y límites constan en
   `docs/auditoria-profunda-2026-09-30.md`.
@@ -615,6 +615,17 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v592** — Gamificación en una sola tarjeta compacta.
+
+- Diseño aprobado en ambos temas: arena de 120 px, cabecera reducida y una sola
+  franja de ganancias, llamadas, XP y vida. Controles y selector de armas juntos.
+- Teclas, armas, misiones e hitos se despliegan cuando hacen falta. Se conservan
+  las diez armas, los tres objetivos, las cuatro etapas y la moneda secundaria.
+- Los indicadores originales de ganancias se trasladan al desplegable y vuelven
+  a su lugar al desactivar la gamificación; no cambia el cálculo de recompensas.
+- 241 pruebas y build correctos. Verificados ambos idiomas y temas, tamaños
+  de 320 a 1280 px, diez armas, controles táctiles y movimiento reducido.
 
 **v591** — Verificación de Google Search Console.
 
@@ -639,13 +650,3 @@ La aplicación funciona en producción con estas bases vigentes:
   legales. 241 pruebas, build y 16 casos de idioma/tema/tamaño correctos.
 - Search Console requiere la propiedad real; detalles en `docs/seo.md` y
   `docs/seo-audit-2026-10-04.md`.
-
-**v589** — Dirección principal visible al usar la app.
-
-- Después de verificar la sesión y montar la app, History API muestra `/`
-  conservando parámetros, fragmentos y estado de navegación, sin recargar.
-- Montar correctamente retira el freno temporal de redirección de la landing,
-  permitiendo recargar la raíz inmediatamente y volver a abrir la app.
-- La portada pública, su canonical, sitemap y contenido indexable permanecen
-  en `/`. Recuperación, acceso, cierre de sesión y precarga PWA conservados.
-- 235 pruebas y build correctos; regresión de dirección y limpieza del freno.
