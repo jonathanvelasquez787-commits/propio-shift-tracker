@@ -1,6 +1,7 @@
 import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 // app-main.js injects call helpers; app-context.js owns shared app state.
 import { calls, settings, state, setAppCalls as setCalls } from './app-context.js';
+import { ignorePropioCall } from './propio-bridge.js';
 
 let HIGHER_RATE_TIERS, MAX_CALL_DURATION_MIN, appConfirm, autoStartShiftFromCalls, callDateKeyFromValue, callDedupeKey;
 let callsForDay, callsOverlap, closeModal, connectedMinutesForDay, convertedAmountText, dayAdherence;
@@ -312,6 +313,7 @@ function openManualCallModalFromLiveCall(startedAtISO, endedAtISO, originalCandi
 function rollbackPendingLiveBackup() {
   const pending = state.pendingLiveCallBackup;
   const context = pending?.liveContext;
+  ignorePropioCall(state, pending?.candidate?.propioBridge?.callId);
 
   if (context?.interruptedPauseRollback) {
     const rollback = context.interruptedPauseRollback;
@@ -520,6 +522,7 @@ export function saveManualCall() {
       candidate = { ...candidate, source: 'live', importedAt: original.importedAt || new Date().toISOString() };
     }
   }
+  if (candidate && pendingBackup?.candidate?.propioBridge) candidate.propioBridge = { ...pendingBackup.candidate.propioBridge };
   if (candidate && new Date(candidate.endISO).getTime() > Date.now()) {
     toast(translateText('La llamada no puede terminar en el futuro'));
     return;
@@ -563,6 +566,11 @@ export function autoSaveLiveCall(startedAtISO, endedAtISO, liveContext = null) {
     dropped: 'No',
     pay,
   });
+  if (candidate && liveContext?.propioBridge?.callId) {
+    candidate.id = `propio_${liveContext.propioBridge.callId}`;
+    candidate.customerId = 'Propio';
+    candidate.propioBridge = { ...liveContext.propioBridge };
+  }
   const result = trySaveCallCandidate(candidate);
 
   if (result.ok) {
@@ -698,13 +706,14 @@ export function renderTable() {
           const droppedText = String(c.dropped).toLowerCase() === 'yes' ? translateText('Dropped') : translateText('No dropped');
           const higherRateBonus = higherRateBonusForCall(c);
           const higherRateBadge = higherRateBonus ? higherRateTierBadgeHtml(higherRateBonus.tier, higherRateBonus.amount) : '';
+          const estimated = c.propioBridge?.payEstimated || c.propioBridge?.timingEstimated ? ' · ' + translateText('Tiempo y pago estimados') : '';
 
           return ui`
             <div class="tbl-row">
               <span class="tbl-row-icon type-call">${iconHtml('phone')}</span>
               <div class="tbl-row-main">
                 <div class="tbl-row-title">#${escapeHtml(c.customerId)} <span class="tbl-type-badge type-call">Llamada</span></div>
-                <div class="tbl-row-sub">${escapeHtml(billableText)} · ${escapeHtml(droppedText)}</div>
+                <div class="tbl-row-sub">${escapeHtml(billableText)} · ${escapeHtml(droppedText)}${escapeHtml(estimated)}</div>
               </div>
               <div class="tbl-row-right">
                 <div class="tbl-row-amount">${money(parseMoney(c.pay))}</div>

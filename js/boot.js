@@ -9,6 +9,7 @@ import { ui, translateText, translateMarkup, displayLocale, setLanguage, transla
 
 import { getSupabase, isConfigured } from './supabase-client.js';
 import { getProfile, signOut } from './auth.js';
+import { installPropioBridge } from './propio-bridge.js';
 import {
   BOOT,
   resolveBoot,
@@ -503,9 +504,12 @@ async function boot() {
   }
 
   setAccessToken(session.access_token);
+  let stopPropioBridge = () => {};
+  let bridgeUserId = session.user.id;
   getSupabase().auth.onAuthStateChange((_event, next) => {
     setAccessToken(next ? next.access_token : null);
-    if (!next) window.location.replace('/');
+    bridgeUserId = next?.user?.id || null;
+    if (!next || next.user.id !== session.user.id) { stopPropioBridge(); window.location.replace('/'); }
   });
 
   const userId = session.user.id;
@@ -577,6 +581,12 @@ async function boot() {
   startAutoSync();
 
   if (!(await mountApp())) return;
+
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('pst-propio-bridge/v1:' + userId));
+  const accountScope = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('');
+  const { applyPropioBridgeEvent } = await import('./app-main.js');
+  if (bridgeUserId !== userId) return;
+  stopPropioBridge = installPropioBridge({ accountScope, receive: applyPropioBridgeEvent });
 
   normalizeAppAddress();
   wireSyncStatus();

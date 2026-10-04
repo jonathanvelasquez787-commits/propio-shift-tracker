@@ -317,6 +317,18 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
+Conexión Propio → tracker: v594 agrega una extensión MV3 propia y un receptor
+autenticado en la app. Build y recorrido completo probados con portal y eventos
+simulados en Chromium aislado; no se enviaron solicitudes a Propio/Twilio reales.
+Pendientes: instalar el paquete en Chrome del usuario con confirmación específica
+y observar una llamada normal. La compatibilidad de las señales identificadas en
+el add-on de 2023 sigue sin certificar. Empieza en observación; el registro
+automático requiere conectar la cuenta y activar el modo después de observar
+una llamada completa. No provocar una llamada real solo para probar.
+No pulsa disponibilidad/aceptar/colgar ni interpreta Offline como Break/Lunch.
+Tiempo/pago estimados, corregibles mediante importación oficial; conserva
+identidad y deduplicación tras reemplazo. Véase `extension/propio-bridge/README.md`.
+
 Visibilidad en Google: propiedad real verificada por etiqueta HTML el 4/10/2026
 en Search Console. Sitemap enviado y reenviado una vez; el informe todavía
 mostró «No se ha podido obtener», aunque la prueba en tiempo real de Google
@@ -617,6 +629,22 @@ La aplicación funciona en producción con estas bases vigentes:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v594** — Puente entre señales de Propio y tracker.
+
+- Extensión independiente con permisos limitados al portal, eventos de Twilio
+  y tracker. No conserva cuerpos HTTP, credenciales, audio ni datos de clientes.
+  Señales observadas solo después de respuesta exitosa; empieza sin modificar datos.
+- Receptor montado tras autenticar/hidratar, limitado a la cuenta conectada y una
+  sola pestaña. Cola persistente, recibos de deduplicación y respeto a descartes;
+  conflictos con llamadas manuales, respaldos y traslapes requieren revisión.
+- Inicio/final usan la ruta existente de llamadas, persistencia, ganancias y
+  gamificación. Llamadas automáticas muestran tiempo/pago estimados; la importación
+  oficial conserva su identidad sin duplicar llamadas ni XP.
+- 266 pruebas, imports/wiring y build correctos. Extensión desempaquetada real
+  probada en perfil Chromium nuevo contra fixtures con toda la red externa
+  interceptada: observación, conexión, guardado, recarga, duplicados y reemplazo
+  oficial. Instalación en Chrome habitual y señales reales aún pendientes.
+
 **v593** — Gamificación automática y duelo opcional.
 
 - Integrado el mock aprobado: sin controles, efectos ni sonidos del juego durante
@@ -643,14 +671,3 @@ La aplicación funciona en producción con estas bases vigentes:
   a su lugar al desactivar la gamificación; no cambia el cálculo de recompensas.
 - 241 pruebas y build correctos. Verificados ambos idiomas y temas, tamaños
   de 320 a 1280 px, diez armas, controles táctiles y movimiento reducido.
-
-**v591** — Verificación de Google Search Console.
-
-- Incorporada la etiqueta real de la propiedad `https://propio-shift-tracker.vercel.app/`
-  creada en la cuenta de Google del propietario. El build la conserva en ambos
-  idiomas; debe mantenerse para conservar la verificación.
-- Propiedad verificada y sitemap enviado en Search Console. Las portadas y el XML
-  son accesibles para Google en su prueba real. Lectura del sitemap pendiente
-  en el informe; solicitud de indexación bloqueada por cuota diaria de Google.
-- Reintento único autorizado para el 5/10 a las 13:00 de Tegucigalpa; detalles
-  en `docs/seo.md`. Build correcto y etiqueta publicada en ambos idiomas.
