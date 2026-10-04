@@ -320,8 +320,10 @@ futura opera bajo esto, sin excepción:
 Conexión Propio → tracker: v594 agrega una extensión MV3 propia y un receptor
 autenticado en la app. Build y recorrido completo probados con portal y eventos
 simulados en Chromium aislado; no se enviaron solicitudes a Propio/Twilio reales.
-El usuario confirmó instalación y cuenta conectada en Chrome. Pendiente:
-observar una llamada normal. La compatibilidad de las señales identificadas en
+El usuario confirmó instalación y cuenta conectada en Chrome, pero después
+quitó la extensión tras un error del que no conservó el mensaje. Pendientes:
+reinstalar el ZIP actualizado en una carpeta estable y observar una llamada
+normal. La compatibilidad de las señales identificadas en
 el add-on de 2023 sigue sin certificar. Empieza en observación; el registro
 automático requiere conectar la cuenta y activar el modo después de observar
 una llamada completa. No provocar una llamada real solo para probar.
@@ -329,11 +331,11 @@ No pulsa disponibilidad/aceptar/colgar ni interpreta Offline como Break/Lunch.
 Tiempo/pago estimados, corregibles mediante importación oficial; conserva
 identidad y deduplicación tras reemplazo. Véase `extension/propio-bridge/README.md`.
 
-Resumen dentro de Propio: extensión 1.1.0 preparada con barra que suma minutos
+Resumen dentro de Propio: extensión 1.1.1 preparada con barra que suma minutos
 y Pay de las filas visibles del historial. No acumula páginas, modifica el
 tracker ni usa una tarifa estimada. Alternativa userscript generada por el mismo
 build. Probadas tablas HTML/Angular simuladas, filtros, datos pendientes,
-paginación, conversión y temas. Pendiente recargar la extensión en Chrome del
+paginación, conversión y temas. Pendiente reinstalar la extensión en Chrome del
 usuario y comprobar la tabla real; aún no se verificó el historial en su sesión.
 
 Visibilidad en Google: propiedad real verificada por etiqueta HTML el 4/10/2026
@@ -627,7 +629,7 @@ La aplicación funciona en producción con estas bases vigentes:
 - Landing bilingüe estática, canonical/hreflang y sitemap de cuatro páginas,
   preguntas frecuentes e imagen social. Un bundle público evita cargar tres
   copias de las traducciones; las fuentes no bloquean el primer render.
-- La versión actual de la app es 594; la extensión es 1.1.0. Refuerzo positivo, Logros y auditoría profunda
+- La versión actual de la app es 594; la extensión es 1.1.1. Refuerzo positivo, Logros y auditoría profunda
   están terminados. Los siete fallos de la auditoría se corrigieron con
   regresiones; cobertura y límites constan en
   `docs/auditoria-profunda-2026-09-30.md`.
@@ -635,6 +637,19 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**Extensión 1.1.1** — Paquete explícito y recarga sin contextos inválidos.
+
+- El usuario cargó una copia cuya ubicación no se verificó; recargar Chrome
+  no descarga el paquete nuevo. Se entrega ZIP versionado para reinstalar.
+  Quitó la extensión tras un error sin conservar el texto; no se atribuye a
+  una causa específica sin evidencia.
+- Se reprodujo por separado una excepción sin capturar cuando Chrome invalida
+  el contexto durante una recarga: sendMessage podía lanzar antes del catch.
+  Ahora detiene mensajes, listeners y temporizadores pendientes; la entrega
+  normal mantiene su acuse y deduplicación.
+- 273 pruebas; regresiones de invalidación y entrega normal. El resumen y las
+  restricciones Trusted Types pasan en Chromium aislado. Portal real pendiente.
 
 **Extensión 1.1.0** — Minutos y pago directamente en el historial de Propio.
 
@@ -664,19 +679,3 @@ La aplicación funciona en producción con estas bases vigentes:
   probada en perfil Chromium nuevo contra fixtures con toda la red externa
   interceptada: observación, conexión, guardado, recarga, duplicados y reemplazo
   oficial. Usuario confirmó instalación y conexión; señales reales aún pendientes.
-
-**v593** — Gamificación automática y duelo opcional.
-
-- Integrado el mock aprobado: sin controles, efectos ni sonidos del juego durante
-  llamadas. Ataque automático breve al guardar una llamada validada; sin loop
-  de animación continuo cuando la arena está quieta.
-- Duelo voluntario de hasta 60 segundos, 3 vidas, onda baja, disparo dirigido y
-  embestida, combo, récord de sesión y granada con recarga de 8 segundos. La
-  vida del duelo y los puntos no modifican dinero, XP, llamadas ni recibos.
-- Solo se juega en Break/Lunch o fuera del turno. Iniciar una llamada, volver
-  al trabajo o esconder la escena pausa la ronda; continuar exige un clic.
-- 249 pruebas, imports/wiring y build correctos. Ambos idiomas y temas, de
-  320 a 1280 px, táctil, movimiento reducido, victoria/derrota, pausa/continuación
-  y guardado real en la app con una llamada simulada en navegador local.
-- La conexión con el portal real de Propio queda como tarea posterior; esta
-  versión usa las llamadas registradas en el tracker.
