@@ -42,6 +42,19 @@ function setBootMessage(text) {
   if (bootText) bootText.textContent = text;
 }
 
+function normalizeAppAddress() {
+  // Successful mounting ends the landing's redirect guard; refreshing / can reopen the app.
+  try {
+    sessionStorage.removeItem('ps_auto_enter_at');
+  } catch {
+    /* opening the app also works when session storage is unavailable */
+  }
+  const address = new URL(window.location.href);
+  if (address.pathname !== '/app' && address.pathname !== '/app.html') return;
+  address.pathname = '/';
+  window.history.replaceState(window.history.state, '', address.href);
+}
+
 function fail(message, { retry = true } = {}) {
   if (!bootBody) return;
   bootBody.innerHTML = ui`
@@ -565,6 +578,7 @@ async function boot() {
 
   if (!(await mountApp())) return;
 
+  normalizeAppAddress();
   wireSyncStatus();
   setSyncStatus(
     readMeta().dirty ? 'saving' : 'ok',

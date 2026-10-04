@@ -7,6 +7,11 @@ La app de cuenta (/app) lleva noindex en HTML y cabecera HTTP; /app.html redirig
 permanentemente a /app y conserva los parámetros. La app no se
 incluye en el sitemap. Noindex no reemplaza la autenticación ni RLS.
 
+Con sesión verificada, la app cambia la dirección visible a `/` mediante
+History API, conservando parámetros y fragmentos. `/app` sigue siendo su punto
+de carga; al recargar `/`, la landing detecta la sesión y vuelve a abrirla.
+Así la raíz conserva la portada pública indexable para visitas sin sesión.
+
 Estas ayudas no garantizan indexación ni posiciones. La landing ya entrega
 contenido estático, título, descripción y enlaces sin necesitar una sesión.
 Google puede cambiar el título y la descripción que muestra en resultados.

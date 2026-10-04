@@ -591,12 +591,13 @@ La aplicación funciona en producción con estas bases vigentes:
   global, backup diario, exportación y borrado de cuenta permanecen activos.
 - Turnos, llamadas, Horario, Higher Rate, Finanzas, Reportes, Calendario,
   Adherencia y la gamificación «El Monstruo» están integrados.
-- La URL de la cuenta es `/app`; `/app.html` redirige conservando parámetros.
-  Landing, autenticación y PWA usan la ruta limpia. La PWA mantiene su identidad
-  anterior para instalaciones existentes y precarga `/app` para uso offline.
+- La dirección visible de la cuenta es `/` después de montar con sesión.
+  `/app` sigue siendo el punto de carga y `/app.html` redirige conservando
+  parámetros. La raíz conserva la landing pública indexable; al recargar,
+  detecta la sesión y reabre la app. La PWA mantiene su identidad y precarga.
 - Gamificación compacta: batalla y refuerzo positivo reducidos, armas y misiones
   desplegables e hitos integrados en el indicador de vida, sin retirar funciones.
-- La versión actual es 588. Refuerzo positivo, Logros y auditoría profunda
+- La versión actual es 589. Refuerzo positivo, Logros y auditoría profunda
   están terminados. Los siete fallos de la auditoría se corrigieron con
   regresiones; cobertura y límites constan en
   `docs/auditoria-profunda-2026-09-30.md`.
@@ -604,6 +605,16 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v589** — Dirección principal visible al usar la app.
+
+- Después de verificar la sesión y montar la app, History API muestra `/`
+  conservando parámetros, fragmentos y estado de navegación, sin recargar.
+- Montar correctamente retira el freno temporal de redirección de la landing,
+  permitiendo recargar la raíz inmediatamente y volver a abrir la app.
+- La portada pública, su canonical, sitemap y contenido indexable permanecen
+  en `/`. Recuperación, acceso, cierre de sesión y precarga PWA conservados.
+- 235 pruebas y build correctos; regresión de dirección y limpieza del freno.
 
 **v588** — Gamificación compacta y ruta limpia de la app.
 
@@ -631,18 +642,3 @@ La aplicación funciona en producción con estas bases vigentes:
 - 232 pruebas, 2.064 textos, 29 módulos, wiring/build correctos. Chrome:
   recorridos reales de controles con auth/nube aislados, importación de 200
   llamadas, práctica conservando datos y 128 combinaciones visuales finales.
-
-**v586** — Idioma en Ajustes y desactivación completa de Logros.
-
-- Selector ES/EN al inicio de Ajustes → Tu perfil; eliminado de Temas y
-  colores. Conserva preferencias, guardado y regreso a la página activa.
-- Apagar Logros desde cualquiera de sus interruptores oculta inmediatamente
-  monstruo, misiones, hitos y prueba positiva; cierra modales, limpia avisos
-  y efectos, apaga y deshabilita el selector de sonidos arcade. No se borran
-  llamadas, XP, recibos, premios pendientes ni historial personal.
-- Refuerzo personal, recompensas y reflexión quedan sujetos a Logros;
-  reconciliar referencias de llamadas conserva su funcionamiento al apagarlo.
-- Botón Ko-fi más compacto y retirada del texto local obsoleto del pie.
-- 213 pruebas, 2.008 textos ES/EN, 28 módulos, wiring y build correctos.
-  Chrome: botón visible y compacto en 32 combinaciones; validación de Logros
-  e idioma en sesiones aisladas y capturas con datos de demostración.
