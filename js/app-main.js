@@ -5727,8 +5727,9 @@ function renderHeader() {
   const milestoneRow = document.getElementById('earningsMilestoneMarkers');
   if (milestoneRow) {
     milestoneRow.hidden = !milestonesEnabled;
-    milestoneRow.innerHTML = milestonesEnabled ? [25, 50, 75, 100].map((pct) => ui`<span class="gh-goal-subitem" aria-label="${pct}%${milestoneProgress.claimed.includes(pct) ? ', hito registrado' : ''}">${milestoneProgress.claimed.includes(pct) ? '✓ ' : ''}${pct}%</span>`).join('') : '';
+    milestoneRow.innerHTML = milestonesEnabled ? [25, 50, 75, 100].map((pct) => ui`<span class="earnings-milestone-mark" data-reached="${milestoneProgress.claimed.includes(pct)}" style="--milestone-position:${pct}%" aria-label="${pct}%${milestoneProgress.claimed.includes(pct) ? ', hito registrado' : ''}"><span aria-hidden="true">${milestoneProgress.claimed.includes(pct) ? '✓ ' : ''}${pct}%</span></span>`).join('') : '';
   }
+  document.getElementById('remainingText').hidden = milestonesEnabled;
   const nextMilestone = document.getElementById('earningsNextMilestone');
   if (nextMilestone) {
     nextMilestone.hidden = !milestonesEnabled;

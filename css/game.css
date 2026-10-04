@@ -39,7 +39,7 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
   outline-offset: 3px;
 }
 
-#earningsMilestoneMarkers .gh-goal-subitem,
+#earningsMilestoneMarkers .earnings-milestone-mark,
 #earningsNextMilestone {
   color: var(--text);
 }
@@ -455,21 +455,9 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 .game-day-panels { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 10px; min-width: 0; align-items: stretch; }
 .game-day-panels:empty { display: none; }
 .game-day-panels:not(:has(.game-arena:not([hidden]))) { grid-template-columns: 1fr; }
-.game-day-panels:has(.game-arena[hidden]):has(#earningsMilestoneMarkers[hidden]) { display: none; }
+.game-day-panels:not(:has(.game-arena:not([hidden]), .game-missions:not([hidden]))) { display: none; }
 .game-missions-column { display: grid; align-content: start; gap: 6px; min-width: 0; }
 .game-missions-column .game-missions { margin: 0; }
-.game-daily-milestones { min-width: 0; padding: 9px 11px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel-navy); }
-.game-daily-milestones:has(#earningsMilestoneMarkers[hidden]) { display: none; }
-.game-daily-milestones #earningsMilestoneMarkers { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; margin: 8px 0 0; }
-.game-daily-milestones .gh-goal-subitem { position: relative; display: grid; justify-items: center; gap: 4px; padding: 0; font-size: 10px; font-weight: 800; }
-.game-daily-milestones .gh-goal-subitem::before { position: relative; z-index: 1; content: ""; width: 9px; height: 9px; border: 2px solid var(--line-2); border-radius: 50%; background: var(--panel-navy); }
-.game-daily-milestones .gh-goal-subitem:not(:last-child)::after { position: absolute; content: ""; top: 5px; left: 50%; width: 100%; height: 2px; background: var(--line-2); }
-.game-daily-milestones .gh-goal-subitem[aria-label*="hito registrado"] { color: var(--good) !important; }
-.game-daily-milestones .gh-goal-subitem[aria-label*="hito registrado"]::before,
-.game-daily-milestones .gh-goal-subitem[aria-label*="hito registrado"]::after { border-color: var(--good); background: var(--good); }
-.game-daily-milestones .gh-goal-subitem:not([aria-label*="hito registrado"]):first-child::before,
-.game-daily-milestones .gh-goal-subitem[aria-label*="hito registrado"] + .gh-goal-subitem:not([aria-label*="hito registrado"])::before { border-color: var(--cyan); }
-.game-daily-milestones #earningsNextMilestone { margin-top: 7px; font-size: 11px; line-height: 1.4; overflow-wrap: anywhere; }
 .game-day-panels > :is(.game-arena, .game-missions) { margin: 0; min-width: 0; }
 .game-day-panels .game-mission-grid { grid-template-columns: 1fr; margin-top: 8px; gap: 6px; }
 .game-day-panels .game-monster-stage { align-self: center; }
@@ -1336,7 +1324,7 @@ html.theme-light {
   }
 }
 .game-arena, .game-missions, .game-panel, .game-achievements-hero,
-.game-daily-milestones, .game-modal-card, .game-toast {
+.game-modal-card, .game-toast {
   position: relative; border-width: 2px; border-radius: 0;
   background: var(--panel-navy); box-shadow: 4px 4px 0 var(--line);
 }
@@ -1344,7 +1332,7 @@ html.theme-light {
 .game-panel, .game-missions, .game-achievements-hero { padding: 13px; }
 .game-settings-accordion { padding: 0; }
 .game-arena[data-game-phase="fury"] { background: var(--panel-navy); }
-.game-arena, .game-panel, .game-missions, .game-achievements-hero, .game-daily-milestones {
+.game-arena, .game-panel, .game-missions, .game-achievements-hero {
   clip-path: polygon(6px 0, calc(100% - 6px) 0, calc(100% - 6px) 4px, 100% 4px, 100% calc(100% - 6px), calc(100% - 4px) calc(100% - 6px), calc(100% - 4px) 100%, 6px 100%, 6px calc(100% - 4px), 0 calc(100% - 4px), 0 6px, 6px 6px);
 }
 .game-day-panels { gap: 14px; }
@@ -1394,10 +1382,6 @@ html.theme-light {
 .game-armor-plate > span { display: flex; align-items: center; }
 .game-armor-plate.is-complete > span, .game-mission-grid .game-mission.is-complete .game-armor { color: var(--game-pixel-good-text); background: none; }
 .game-pixel-icon { display: inline-block; vertical-align: middle; width: 16px; height: 16px; flex-shrink: 0; image-rendering: pixelated; }
-.game-daily-milestones { padding: 10px 12px; }
-.game-daily-milestones .gh-goal-subitem::before { width: 10px; height: 10px; border-radius: 0; }
-.game-daily-milestones .gh-goal-subitem[aria-label*="hito registrado"] { color: var(--game-pixel-good-text) !important; }
-.game-daily-milestones .gh-goal-subitem:not(:last-child)::after { top: 6px; }
 .game-achievements-page { gap: 14px; }
 .game-settings-disclosures, .game-achievements-grid { gap: 14px; }
 .game-advanced-settings { grid-template-columns: 1fr; }
@@ -1478,3 +1462,69 @@ html.theme-light {
 .physical-reward-catalog > small { color: var(--muted); font-size: 10px; line-height: 1.4; }
 .physical-reward-selected-list { grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); }
 .game-achievements-page .game-collection-empty { padding: 10px 0; }
+
+/* Compact surfaces keep the pixel artwork while giving the data more space. */
+.game-arena, .game-missions,
+.game-achievements-page .game-panel, .game-achievements-hero {
+  border-width: 1px;
+  border-color: var(--line-2);
+  border-radius: 8px;
+  clip-path: none;
+  box-shadow: none;
+}
+.game-day-panels, .game-achievements-page,
+.game-achievements-page .game-achievements-grid,
+.game-achievements-page .game-settings-disclosures { gap: 8px; }
+.game-missions, .game-achievements-page .game-panel,
+.game-achievements-hero { padding: 10px 12px; }
+.game-achievements-page .game-settings-accordion { padding: 0; }
+.game-arena-title-row h3 { font-size: 17px; }
+.game-missions .game-section-head { align-items: center; flex-wrap: wrap; gap: 6px 12px; }
+.game-missions .game-section-head > div:first-child { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+.game-missions .game-section-head h3 { margin: 0; font-size: 14px; }
+.game-missions .game-kicker { font-size: 9px; letter-spacing: .08em; }
+.game-missions-status { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.game-missions-status > strong { font-size: 12px; }
+.game-missions .game-armor-row { display: flex; gap: 3px; margin: 0; }
+.game-missions .game-armor-plate { min-height: 22px; padding: 2px 4px; gap: 3px; border-radius: 4px; }
+.game-missions .game-armor-plate .game-pixel-icon { width: 12px; height: 12px; }
+.positive-evidence-card { margin: 8px 0; padding: 9px 12px; gap: 8px 12px; border-color: var(--line-2); border-radius: 8px; background: var(--panel-navy); }
+.positive-evidence-card > div:first-child { gap: 3px; }
+.positive-evidence-card > div:first-child > strong { font-size: 13px; }
+.positive-evidence-rewards { grid-template-columns: auto minmax(0, 1fr); gap: 3px 6px; min-width: 0; padding: 0 0 0 12px; border: 0; border-left: 1px solid var(--line); border-radius: 0; background: transparent; }
+.positive-evidence-rewards > b { font-size: 16px; }
+.positive-evidence-rewards > span { max-width: 90px; text-align: left; }
+.positive-evidence-rewards > button { grid-column: 1 / -1; width: 100%; min-height: 28px; }
+@media (max-width: 520px) {
+  .game-missions { padding: 8px 10px; }
+  .positive-evidence-card { padding: 8px 10px; }
+  .positive-evidence-card > div:first-child > small { font-size: 10px; }
+  .positive-evidence-rewards { padding-left: 8px; }
+}
+@media (pointer: coarse) {
+  .positive-evidence-rewards > button { min-height: 44px; }
+}
+
+/* Mission details and milestone ticks share the existing earnings surface. */
+.game-missions { padding: 0; }
+.game-missions-summary { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 8px 12px; list-style: none; cursor: pointer; color: var(--text); font-size: 12px; font-weight: 800; }
+.game-missions-summary::-webkit-details-marker { display: none; }
+.game-missions-summary > strong { margin-left: auto; color: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+.game-missions-summary::after { content: "⌄"; color: var(--muted); }
+.game-missions[open] > summary::after { transform: rotate(180deg); }
+.game-missions-summary:focus-visible { outline: 2px solid var(--cyan); outline-offset: -2px; border-radius: 8px; }
+.game-missions-body { padding: 8px 12px 10px; border-top: 1px solid var(--line); }
+.earnings-goal-progress { position: relative; margin-top: 4px; }
+.earnings-goal-progress:has(.earnings-milestone-markers:not([hidden])) { padding-bottom: 18px; }
+.earnings-milestone-markers { position: absolute; inset: 0; pointer-events: none; }
+.earnings-milestone-mark { position: absolute; top: 1px; left: var(--milestone-position); height: 10px; border-left: 1px solid var(--muted-3); }
+.earnings-milestone-mark > span { position: absolute; top: 14px; left: 0; transform: translateX(-50%); white-space: nowrap; font-size: 9px; line-height: 1.2; color: var(--muted); }
+.earnings-milestone-mark:last-child { left: calc(100% - 1px); }
+.earnings-milestone-mark:last-child > span { transform: translateX(-100%); }
+.earnings-milestone-mark[data-reached="true"] { border-color: var(--text); }
+.earnings-milestone-mark[data-reached="true"] > span { color: var(--good); }
+#earningsNextMilestone { margin-top: 5px; font-size: 10px; }
+#remainingText[hidden] { display: none; }
+@media (pointer: coarse) {
+  .game-missions-summary { min-height: 44px; }
+}

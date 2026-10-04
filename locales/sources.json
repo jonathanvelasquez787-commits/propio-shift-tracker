@@ -1794,6 +1794,12 @@
       "app.html"
     ]
   },
+  "s_266289d1": {
+    "source": "{{v4}}{{v5}}%",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_2685474e": {
     "source": "Dron",
     "files": [
@@ -2131,12 +2137,6 @@
     "source": "Mantén un ritmo sostenible",
     "files": [
       "js/game.js"
-    ]
-  },
-  "s_2e3eb952": {
-    "source": "Hitos de ganancias",
-    "files": [
-      "app.html"
     ]
   },
   "s_2e4a471e": {
@@ -2911,12 +2911,6 @@
   },
   "s_3cee2a30": {
     "source": "#{{v0}} · {{v1}} {{v2}} — Termina en el futuro: no se importó",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
-  "s_3d0bf741": {
-    "source": "{{v2}}{{v3}}%",
     "files": [
       "js/app-main.js"
     ]
@@ -5503,6 +5497,12 @@
     "source": "Próximo accesorio",
     "files": [
       "app.html"
+    ]
+  },
+  "s_719f0e97": {
+    "source": "{{v2}}%{{v3}}",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_71c0d6ab": {
@@ -9494,7 +9494,8 @@
   "s_c0c482c3": {
     "source": "MONSTRUO DEL DÍA",
     "files": [
-      "js/game-battle.js"
+      "js/game-battle.js",
+      "js/game.js"
     ]
   },
   "s_c0d5e333": {
@@ -10962,12 +10963,6 @@
     "source": "Monstruo del día, 100% de vida",
     "files": [
       "app.html"
-    ]
-  },
-  "s_deac867f": {
-    "source": "{{v0}}%{{v1}}",
-    "files": [
-      "js/app-main.js"
     ]
   },
   "s_deac8ce7": {

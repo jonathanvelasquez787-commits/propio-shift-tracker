@@ -8419,19 +8419,17 @@
 </div>
 </div>
 <div class="game-missions-column">
-<div class="game-missions" hidden id="gameMissions">
-  <div class="game-missions-head"><div><span class="game-panel-eyebrow">ARMADURA</span><h3>Misiones del día</h3></div><span data-game-role="missions-score">0 / 3</span></div>
+<details class="game-missions" hidden id="gameMissions">
+  <summary class="game-missions-summary"><span>Misiones del día</span><strong data-game-role="missions-score">0 / 3</strong></summary>
+  <div class="game-missions-body">
+  <div class="game-panel-eyebrow">ARMADURA</div>
   <div class="game-mission-list" data-game-role="mission-list">
     <div class="game-mission" data-mission-key="productive"><span class="game-mission-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M3 12h18"/></svg></span><div><strong>Minutos productivos</strong><small data-game-role="mission-progress">0 / meta</small></div><span class="game-mission-check" aria-hidden="true">✓</span></div>
     <div class="game-mission" data-mission-key="break"><span class="game-mission-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/></svg></span><div><strong>Break/Lunch a tiempo</strong><small data-game-role="mission-progress">Pendiente</small></div><span class="game-mission-check" aria-hidden="true">✓</span></div>
     <div class="game-mission" data-mission-key="adherence"><span class="game-mission-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg></span><div><strong>Adherencia del día</strong><small data-game-role="mission-progress">0% / meta</small></div><span class="game-mission-check" aria-hidden="true">✓</span></div>
   </div>
 </div>
-<div class="game-daily-milestones" aria-labelledby="earningsMilestoneTitle">
-  <span class="game-panel-eyebrow" id="earningsMilestoneTitle">Hitos de ganancias</span>
-  <div class="gh-goal-sub-row" id="earningsMilestoneMarkers" role="group" aria-label="Hitos de la meta diaria" hidden></div>
-  <div class="gh-goal-foot" id="earningsNextMilestone" hidden></div>
-</div>
+</details>
 </div>
 </section>
 <div class="gh-goal-card" id="classicDailyGoalCard">
@@ -8440,7 +8438,11 @@
 <span class="gh-goal-subitem" id="goalAmountConvertedText"></span>
 <span class="gh-goal-subitem" id="goalMinBadge">Meta 59.0 min</span>
 </div>
-<div class="progress" style="margin-top: 4px;"><div id="earningsBar"></div></div>
+<div class="earnings-goal-progress">
+  <div class="progress"><div id="earningsBar"></div></div>
+  <span class="earnings-milestone-markers" id="earningsMilestoneMarkers" role="group" aria-label="Hitos de la meta diaria" hidden></span>
+</div>
+<div class="gh-goal-foot" id="earningsNextMilestone" hidden></div>
 <div class="gh-goal-foot" id="remainingText">0 min restantes</div>
 </div>
 <div class="fin-preview" id="financePreviewBox" style="display:none;">

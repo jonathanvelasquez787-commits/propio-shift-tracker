@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { parseFragment } from 'parse5';
 import { BATTLE_WEAPONS, normalizeBattleWeapon, createBattleQueue, battleMarkup, syncBattle, playBattleCall, stopBattle } from '../js/game-battle.js';
 
 function harness({ reduced = false, canvasAvailable = true } = {}) {
@@ -64,6 +65,9 @@ test('weapon selection normalizes only cosmetic catalog ids; imports work withou
   assert.ok(markup.indexOf('data-battle-health-slot') < markup.indexOf('game-battle-controls'));
   assert.match(markup, /aria-live="polite"/);
   assert.doesNotMatch(markup, /data-battle-action="(?:simulate|reset)"/);
+  const section = parseFragment(markup).childNodes.find(node => node.tagName === 'section');
+  assert.ok(section.childNodes.some(node => node.attrs?.some(attr => attr.name === 'data-battle-motion-note')),
+    'The reduced-motion explanation must remain outside the collapsed weapon picker');
 });
 
 test('large imports remain one representation and excess events coalesce at six rows', () => {
