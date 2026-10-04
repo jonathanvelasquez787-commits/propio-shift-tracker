@@ -79,7 +79,7 @@
 .game-battle-weapon svg { flex: 0 0 44px; width: 44px; height: 30px; image-rendering: pixelated; shape-rendering: crispEdges; }
 .game-battle-weapon span { font-size: 11px; font-weight: 650; overflow-wrap: anywhere; }
 .game-battle-weapon kbd { margin-left: auto; color: var(--muted); }
-.game-battle-motion-note { color: var(--muted); font-size: 10px; margin: 8px 0 0; }
+.game-battle-motion-note { color: var(--muted); font-size: 10px; margin: 8px 12px; line-height: 1.4; }
 .game-battle-live { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 #gameHomeDay:has(.game-arena--battle) { grid-template-columns: minmax(0, 1fr); }
 #gameArena.game-arena--battle { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; padding: 0; }

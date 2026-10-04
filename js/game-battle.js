@@ -110,8 +110,9 @@ export function battleMarkup() {
     </div>
     <details class="game-battle-armory"><summary class="game-battle-armory-head"><span>ARMA DEL HÉROE</span><small data-battle-selected></small></summary>
       <div class="game-battle-weapons" role="group" aria-label="Elegir arma del héroe">${BATTLE_WEAPONS.map(w => `<button type="button" class="game-battle-weapon" data-battle-weapon="${w.id}" aria-pressed="${w.id === 'pistol'}" title="${escape(weaponHint(w.id))}">${weaponIcon(w.id)}<span>${escape(weaponName(w.id))}</span><kbd>${w.key}</kbd></button>`).join('')}</div>
-      <p class="game-battle-motion-note" data-battle-motion-note hidden>Movimiento reducido: la batalla muestra el resultado sin animación.</p>
-    </details><p class="game-battle-live" data-battle-live role="status" aria-live="polite" aria-atomic="true"></p>
+    </details>
+    <p class="game-battle-motion-note" data-battle-motion-note hidden>Movimiento reducido: la batalla muestra el resultado sin animación.</p>
+    <p class="game-battle-live" data-battle-live role="status" aria-live="polite" aria-atomic="true"></p>
   </section>`;
 }
 
