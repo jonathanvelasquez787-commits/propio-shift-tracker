@@ -57,7 +57,7 @@ export function readPortalHistory(document, visible = element => !element.hidden
       rows.push({ minutes: cells[columns.minutes].innerText ?? cells[columns.minutes].textContent,
         pay: cells[columns.pay].innerText ?? cells[columns.pay].textContent });
     }
-    return { table, summary: summarizePortalRows(rows) };
+    return { table, summary: summarizePortalRows(rows), signature: JSON.stringify(rows) };
   }
   return null;
 }

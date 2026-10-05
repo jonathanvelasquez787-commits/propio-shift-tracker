@@ -320,10 +320,10 @@ futura opera bajo esto, sin excepción:
 Conexión Propio → tracker: v594 agrega una extensión MV3 propia y un receptor
 autenticado en la app. Build y recorrido completo probados con portal y eventos
 simulados en Chromium aislado; no se enviaron solicitudes a Propio/Twilio reales.
-El usuario confirmó instalación y cuenta conectada en Chrome, pero después
-quitó la extensión tras un error del que no conservó el mensaje. Pendientes:
-reinstalar el ZIP actualizado en una carpeta estable y observar una llamada
-normal. La compatibilidad de las señales identificadas en
+El usuario confirmó instalación y cuenta conectada en Chrome, la quitó después
+de un error sin mensaje y reinstaló el paquete: la barra del historial quedó
+confirmada mediante capturas reales. Pendientes: actualizar al ZIP 1.2.0,
+conectar la cuenta si hace falta y observar una llamada normal. La compatibilidad de las señales identificadas en
 el add-on de 2023 sigue sin certificar. Empieza en observación; el registro
 automático requiere conectar la cuenta y activar el modo después de observar
 una llamada completa. No provocar una llamada real solo para probar.
@@ -331,12 +331,14 @@ No pulsa disponibilidad/aceptar/colgar ni interpreta Offline como Break/Lunch.
 Tiempo/pago estimados, corregibles mediante importación oficial; conserva
 identidad y deduplicación tras reemplazo. Véase `extension/propio-bridge/README.md`.
 
-Resumen dentro de Propio: extensión 1.1.1 preparada con barra que suma minutos
-y Pay de las filas visibles del historial. No acumula páginas, modifica el
-tracker ni usa una tarifa estimada. Alternativa userscript generada por el mismo
-build. Probadas tablas HTML/Angular simuladas, filtros, datos pendientes,
-paginación, conversión y temas. Pendiente reinstalar la extensión en Chrome del
-usuario y comprobar la tabla real; aún no se verificó el historial en su sesión.
+Resumen dentro de Propio: extensión 1.2.0 con subtotal visible y botón Sumar
+período para recorrer todas las páginas del rango elegido y restaurar la inicial.
+No modifica el tracker ni usa una tarifa estimada. Alternativa userscript del
+mismo build. Subtotal confirmado por captura del portal real (15 de 285 y 200
+filas). Recorrido completo probado en Chromium aislado con 285 filas/19 páginas,
+datos iguales, carga demorada, cancelación, cambio de filtros, conversión y temas.
+Detalles conserva contraste sobre el fondo blanco de Propio. Pendiente cargar
+el ZIP 1.2.0 y comprobar Sumar período con el historial real.
 
 Visibilidad en Google: propiedad real verificada por etiqueta HTML el 4/10/2026
 en Search Console. Sitemap enviado y reenviado una vez; el informe todavía
@@ -629,7 +631,7 @@ La aplicación funciona en producción con estas bases vigentes:
 - Landing bilingüe estática, canonical/hreflang y sitemap de cuatro páginas,
   preguntas frecuentes e imagen social. Un bundle público evita cargar tres
   copias de las traducciones; las fuentes no bloquean el primer render.
-- La versión actual de la app es 594; la extensión es 1.1.1. Refuerzo positivo, Logros y auditoría profunda
+- La versión actual de la app es 594; la extensión es 1.2.0. Refuerzo positivo, Logros y auditoría profunda
   están terminados. Los siete fallos de la auditoría se corrigieron con
   regresiones; cobertura y límites constan en
   `docs/auditoria-profunda-2026-09-30.md`.
@@ -637,6 +639,20 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**Extensión 1.2.0** — Total del período y contraste en Detalles.
+
+- Sumar período recorre únicamente el paginador del historial y vuelve a la
+  página inicial; progreso, Cancelar, rangos/filas consecutivos y protección ante
+  filtros, tamaño, orden, cantidad o intervención durante el cálculo. No se
+  deduplican llamadas por sus valores. Un error no produce un total completo.
+- El total queda en memoria, se conserva al navegar y se recalcula a pedido;
+  refleja Pay de Propio y admite conversión. Detalles tiene fondo explícito
+  en ambos temas para que el texto no desaparezca sobre el portal blanco.
+- 279 pruebas y build de extensión. Chromium aislado: 285 filas/19 páginas,
+  carga demorada, datos idénticos, restauración, cancelación, cambio de fechas,
+  ambos temas/320 y 1000 px, sin operar llamadas. Subtotal real confirmado por
+  captura; recorrido del período real pendiente. Se entrega ZIP versionado.
 
 **Extensión 1.1.1** — Paquete explícito y recarga sin contextos inválidos.
 
@@ -663,19 +679,3 @@ La aplicación funciona en producción con estas bases vigentes:
   imports/wiring y build correctos; extensión y userscript verificados en Chrome
   aislado con portal ficticio, ambos temas y 320/1000 px. Compatible en simulación;
   actualización de Chrome habitual y tabla real todavía pendientes.
-
-**v594** — Puente entre señales de Propio y tracker.
-
-- Extensión independiente con permisos limitados al portal, eventos de Twilio
-  y tracker. No conserva cuerpos HTTP, credenciales, audio ni datos de clientes.
-  Señales observadas solo después de respuesta exitosa; empieza sin modificar datos.
-- Receptor montado tras autenticar/hidratar, limitado a la cuenta conectada y una
-  sola pestaña. Cola persistente, recibos de deduplicación y respeto a descartes;
-  conflictos con llamadas manuales, respaldos y traslapes requieren revisión.
-- Inicio/final usan la ruta existente de llamadas, persistencia, ganancias y
-  gamificación. Llamadas automáticas muestran tiempo/pago estimados; la importación
-  oficial conserva su identidad sin duplicar llamadas ni XP.
-- 266 pruebas, imports/wiring y build correctos. Extensión desempaquetada real
-  probada en perfil Chromium nuevo contra fixtures con toda la red externa
-  interceptada: observación, conexión, guardado, recarga, duplicados y reemplazo
-  oficial. Usuario confirmó instalación y conexión; señales reales aún pendientes.
