@@ -31,6 +31,25 @@ Los seis checks de SEO verifican HTML legible sin JS, ambos idiomas, identidad,
 canonical/hreflang, schema y conservación del acceso. Build y revisión de
 las portadas en móvil/escritorio completados localmente.
 
+Publicación v595 confirmada: commit `a7f8336993fcc88b8cd8315c45ecc91eeb103aa5`,
+Vercel correcto y CI completa correcta. Search Console probó las URLs públicas
+el 5/10/2026 a las 9:31 (`/`) y 9:34 (`/es`), hora de Tegucigalpa: ambas disponibles
+para Google y aptas para indexar. El HTML probado contiene los títulos y
+descripciones nuevos en su idioma; en inglés también se confirmó el H1 nuevo.
+Esta comprobación externa evitó confundir la copia antigua mostrada
+en el navegador local con la versión publicada. La conexión HTTPS directa
+de este equipo falló para GitHub/Vercel; los cambios se publicaron mediante
+el conector de GitHub y la copia local quedó sincronizada conservando el commit original.
+
+Se intentó una sola solicitud para actualizar la raíz tras publicar v595.
+Google la rechazó por «Cuota superada» el 5/10/2026 y pidió volver mañana.
+No se intentó la solicitud española tras ese rechazo ni se creó una nueva
+automatización. El rastreo normal sigue permitido; una prueba en tiempo real
+no demuestra que Google ya haya actualizado su índice ni el posicionamiento.
+Evidencia en outputs: google-html-publicado-v595-en.jpg,
+google-html-publicado-v595-es.jpg, google-portada-publicada-v595-es.jpg y
+google-solicitud-v595-cuota-2026-10-05.jpg.
+
 Comprobación de búsquedas el 5/10/2026: Google muestra la raíz como primer
 resultado web al buscar `propio-shift-tracker.vercel.app`; no se encontró en
 la primera página para `propio shift tracker` ni como coincidencia exacta

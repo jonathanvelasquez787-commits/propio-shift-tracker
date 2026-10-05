@@ -381,6 +381,13 @@ en la primera página por `propio shift tracker`. Desde v595 la marca encabeza
 el título, H1, descripción y presentación en ambos idiomas; `og:site_name` y
 WebSite refuerzan su identidad. No confundir esta mejora publicada con una
 posición ya conseguida. No publicar mensajes en comunidades sin autorización.
+Vercel y CI de v595 correctos. Google probó `/` y `/es` el 5/10/2026 a las
+9:31 y 9:34 de Tegucigalpa y recibió los títulos/descripciones nuevos; ambas
+son aptas para indexar. La solicitud única de actualizar la raíz fue rechazada
+por «Cuota superada» ese mismo día. No repetir ni intentar la española tras
+el rechazo; no hay nuevo reintento automático autorizado. El rastreo normal
+sigue permitido. Evidencia en outputs: google-html-publicado-v595-en.jpg,
+google-html-publicado-v595-es.jpg y google-solicitud-v595-cuota-2026-10-05.jpg.
 Ver docs/seo.md.
 
 La auditoría profunda de v576 quedó cerrada: 31 días simulados, 108 llamadas,
@@ -674,7 +681,9 @@ La aplicación funciona en producción con estas bases vigentes:
 - Propio Shift Tracker al inicio del título y en el H1/presentación, en inglés
   y español. Descripciones, Open Graph y WebSite usan la misma identidad.
 - Seis checks SEO y build completos; revisión de traducción, acceso y ancho
-  móvil. Sin posición garantizada: Google debe volver a procesar la portada.
+  móvil. CI completa y Vercel correctos; Google confirma el HTML nuevo de
+  ambos idiomas. Solicitud de actualización rechazada por cuota, sin bucles.
+  Sin posición garantizada: Google debe volver a procesar la portada.
 
 **Resumen independiente 1.0.3** — Calculate Total, nombre definitivo.
 
