@@ -50,23 +50,26 @@ El 4 de octubre de 2026 se creó y verificó la propiedad real en la cuenta del
 propietario usando la etiqueta HTML publicada en v591. Google mostró
 «Propiedad verificada». La etiqueta permanece en ambas portadas; no quitarla.
 
-Se envió `sitemap.xml` y Google confirmó el envío. El informe mostró después
-«No se ha podido obtener». La inspección en tiempo real del propio Google
-confirmó rastreo permitido y obtención correcta del archivo, que además
-responde 200 como application/xml y contiene cuatro URLs válidas. Tras esa
-comprobación se reenvió una vez; falta confirmar su procesamiento en el informe.
+El 4/10 se envió `sitemap.xml` y Google confirmó el envío. El informe mostró
+inicialmente «No se ha podido obtener», aunque la prueba en tiempo real
+confirmó rastreo permitido y obtención correcta del XML. Se reenvió una vez.
+Las portadas entonces figuraban desconocidas para Google; una solicitud de
+indexación fue rechazada por «Cuota superada».
 
-La inspección del índice mostró `/` y `/es` aún sin indexar («Google no reconoce
-esta URL»). Las pruebas de ambas portadas confirmaron «La URL está disponible
-para Google». Al solicitar indexación, Google rechazó la solicitud por
-«Cuota superada» y pidió reintentar mañana. No se completó una solicitud aceptada
-ni se certifica indexación o posición en resultados.
+El 5 de octubre de 2026 se realizó el reintento autorizado en la cuenta real
+antes de su horario programado, a pedido del propietario. El sitemap ya figura
+«Correcto», con cuatro páginas descubiertas y última lectura el 4/10/2026.
+La inspección de `https://propio-shift-tracker.vercel.app/` y de
+`https://propio-shift-tracker.vercel.app/es` muestra «La URL está en Google»
+y «La página está indexada». Por estar ambas indexadas, no se solicitó de nuevo
+su indexación ni se reenvió el sitemap. No se certifica una posición en las
+búsquedas, volumen de impresiones ni clics.
 
-El propietario autorizó un único reintento automático para el 5 de octubre de
-2026 a las 13:00, America/Tegucigalpa, en este chat. La automatización
-`reintentar-indexaci-n-de-propio-shift-tracker` revisará el sitemap, solicitará
-ambas portadas y notificará el resultado real. Si exige iniciar sesión o un
-CAPTCHA, se informará del bloqueo. No repetir solicitudes en bucle.
+El reintento único está terminado. La automatización
+`reintentar-indexaci-n-de-propio-shift-tracker` quedó PAUSED para evitar otra
+ejecución a las 13:00 de America/Tegucigalpa. No hay un seguimiento indefinido.
+Evidencia visual guardada en los entregables del chat: `google-sitemap-correcto-2026-10-05.jpg`,
+`google-portada-en-indexada-2026-10-05.jpg` y `google-portada-es-indexada-2026-10-05.jpg`.
 
 ## Próximas mejoras de contenido
 

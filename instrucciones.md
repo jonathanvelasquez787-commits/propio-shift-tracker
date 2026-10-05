@@ -360,18 +360,22 @@ pagos ni asumir una aprobación posterior. Puede seguir usando gratis el ZIP
 ficha/capturas y política pública propia; el ZIP de tienda debe tener el
 manifest en la raíz y excluir la alternativa userscript.
 
-Visibilidad en Google: propiedad real verificada por etiqueta HTML el 4/10/2026
-en Search Console. Sitemap enviado y reenviado una vez; el informe todavía
-mostró «No se ha podido obtener», aunque la prueba en tiempo real de Google
-confirmó rastreo permitido y obtención correcta del XML. `/` y `/es` figuran
-sin indexar, como URLs aún desconocidas para Google. La solicitud de la raíz
-fue rechazada por «Cuota superada», con instrucción de reintentar mañana.
-Reintento único autorizado y programado para el 5/10/2026 a las 13:00 de
-Tegucigalpa en este chat (automatización `reintentar-indexaci-n-de-propio-shift-tracker`).
-No quitar la etiqueta real de verificación ni duplicar el reintento. Desde v590
-hay URLs públicas por idioma (`/` en inglés y `/es` en español), contenido,
-metadatos, hreflang y datos estructurados coherentes. Nuevas guías públicas y
-difusión en comunidades pertinentes siguen siendo mejoras posteriores.
+Visibilidad en Google: propiedad real verificada por etiqueta HTML el 4/10/2026.
+Comprobación real en Search Console el 5/10/2026: sitemap «Correcto», cuatro
+páginas descubiertas y última lectura el 4/10/2026. La inspección de la raíz
+inglesa `/` y de `/es` muestra «La URL está en Google» y «La página está indexada».
+No fue necesario repetir la solicitud que ayer falló por cuota; no se enviaron
+solicitudes nuevas ni se reenvió el sitemap. Este estado acredita indexación,
+no una posición garantizada ni tráfico en resultados.
+El reintento único autorizado se completó antes de la hora programada,
+a pedido del usuario. La automatización `reintentar-indexaci-n-de-propio-shift-tracker`
+quedó PAUSED para que no vuelva a ejecutarse a las 13:00 de Tegucigalpa.
+Evidencia conservada en outputs: google-sitemap-correcto-2026-10-05.jpg,
+google-portada-en-indexada-2026-10-05.jpg y google-portada-es-indexada-2026-10-05.jpg.
+No quitar la etiqueta real de verificación ni crear otro reintento sin solicitud.
+Desde v590 hay URLs públicas por idioma (`/` en inglés y `/es` en español),
+contenido, metadatos, hreflang y datos estructurados coherentes. Nuevas guías
+públicas y difusión en comunidades pertinentes siguen siendo mejoras posteriores.
 Ver docs/seo.md.
 
 La auditoría profunda de v576 quedó cerrada: 31 días simulados, 108 llamadas,
