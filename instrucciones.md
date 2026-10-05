@@ -332,8 +332,8 @@ No pulsa disponibilidad/aceptar/colgar ni interpreta Offline como Break/Lunch.
 Tiempo/pago estimados, corregibles mediante importación oficial; conserva
 identidad y deduplicación tras reemplazo. Véase `extension/propio-bridge/README.md`.
 
-Resumen dentro de Propio: extensión independiente 1.0.2 con subtotal visible y botón Calculate
-Period / Calcular período para recorrer todas las páginas del rango elegido y restaurar la inicial.
+Resumen dentro de Propio: extensión independiente 1.0.3 con subtotal visible y botón Calculate
+Total / Calcular total para recorrer todas las páginas del rango elegido y restaurar la inicial.
 No modifica el tracker ni usa una tarifa estimada. Sin permisos de Twilio,
 worker o mensajería al tracker; el puente 1.3.0 ya no incluye el resumen.
 Alternativa userscript del mismo build. Inglés por defecto; selector English /
@@ -347,7 +347,7 @@ El subtotal sigue las mutaciones de la tabla, sin forzar su actualización al
 terminar una llamada. El período completo requiere Recalculate / Recalcular
 para cambios posteriores; no se recorre automáticamente.
 Detalles conserva contraste sobre el fondo blanco de Propio. Pendiente cargar
-ambos ZIPs separados y comprobar Calcular período con el historial real.
+ambos ZIPs separados y comprobar Calcular total con el historial real.
 
 Visibilidad en Google: propiedad real verificada por etiqueta HTML el 4/10/2026
 en Search Console. Sitemap enviado y reenviado una vez; el informe todavía
@@ -640,7 +640,7 @@ La aplicación funciona en producción con estas bases vigentes:
 - Landing bilingüe estática, canonical/hreflang y sitemap de cuatro páginas,
   preguntas frecuentes e imagen social. Un bundle público evita cargar tres
   copias de las traducciones; las fuentes no bloquean el primer render.
-- La versión actual de la app es 594; el puente es 1.3.0 y el resumen independiente 1.0.2. Refuerzo positivo, Logros y auditoría profunda
+- La versión actual de la app es 594; el puente es 1.3.0 y el resumen independiente 1.0.3. Refuerzo positivo, Logros y auditoría profunda
   están terminados. Los siete fallos de la auditoría se corrigieron con
   regresiones; cobertura y límites constan en
   `docs/auditoria-profunda-2026-09-30.md`.
@@ -648,6 +648,13 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**Resumen independiente 1.0.3** — Calculate Total, nombre definitivo.
+
+- Botón, ayuda y popup usan Calculate Total / Calcular total por elección
+  explícita del usuario. Recalculate / Recalcular y el cálculo se conservan.
+- Build y verificaciones existentes de idiomas/separación; ZIP 1.0.3.
+  Solo cambia el texto, sin modificar permisos o actualización del resumen.
 
 **Resumen independiente 1.0.2** — Calculate Period.
 
@@ -665,18 +672,3 @@ La aplicación funciona en producción con estas bases vigentes:
   recarga del historial al finalizar llamadas ni inicia recorridos automáticos.
 - Build independiente y verificaciones existentes de idiomas/separación y
   subtotal reactivo en Chromium aislado. ZIP 1.0.1; puente sin cambios.
-
-**Puente 1.3.0 y resumen independiente 1.0.0** — Primera llamada y separación.
-
-- El resumen tiene paquete, permisos y almacenamiento propios, sin vínculo con
-  tracker/Twilio. El build del puente retira los archivos viejos del resumen.
-- Con cuenta conectada se permite activar automático sin llamadas observadas
-  previas, autorizado por el usuario. Incoming, rechazo o final sin aceptación
-  no crean registros; activar a mitad de llamada espera la siguiente aceptación.
-  Observación sigue siendo el modo inicial. Las señales reales siguen pendientes.
-- Details ofrece English/Español, inglés por defecto y elección persistente que
-  conserva conversión y totales. Tooltip menciona Start Date y End Date; ambos
-  paquetes incluyen privacidad clara sin prometer que el puente no guarda tiempos.
-- 285 pruebas y builds separados. Chromium aislado: primera llamada automática,
-  deduplicación, corrección oficial, resumen/userscript, idiomas persistentes,
-  recorrido de 285 filas/19 páginas, cancelación, filtros y temas/320–1000 px.
