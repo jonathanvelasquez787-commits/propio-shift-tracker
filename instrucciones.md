@@ -349,6 +349,17 @@ para cambios posteriores; no se recorre automáticamente.
 Detalles conserva contraste sobre el fondo blanco de Propio. Pendiente cargar
 ambos ZIPs separados y comprobar Calcular total con el historial real.
 
+Publicación del resumen en Chrome Web Store: solicitada el 4/10/2026.
+Se abrió el panel real y el usuario completó la verificación de inicio de
+sesión. La cuenta requiere registro de desarrollador, aceptar el acuerdo y
+pagar 5 USD una sola vez; el usuario indicó que no tiene ese monto.
+No se pagó, aceptó el acuerdo, creó un ítem ni subió/envió la extensión.
+Publicación pendiente hasta que el usuario resuelva el registro. No hacer
+pagos ni asumir una aprobación posterior. Puede seguir usando gratis el ZIP
+1.0.3 como extensión descomprimida. Para publicar después faltan iconos,
+ficha/capturas y política pública propia; el ZIP de tienda debe tener el
+manifest en la raíz y excluir la alternativa userscript.
+
 Visibilidad en Google: propiedad real verificada por etiqueta HTML el 4/10/2026
 en Search Console. Sitemap enviado y reenviado una vez; el informe todavía
 mostró «No se ha podido obtener», aunque la prueba en tiempo real de Google
