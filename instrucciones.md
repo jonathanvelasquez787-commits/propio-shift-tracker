@@ -332,8 +332,8 @@ No pulsa disponibilidad/aceptar/colgar ni interpreta Offline como Break/Lunch.
 Tiempo/pago estimados, corregibles mediante importación oficial; conserva
 identidad y deduplicación tras reemplazo. Véase `extension/propio-bridge/README.md`.
 
-Resumen dentro de Propio: extensión independiente 1.0.0 con subtotal visible y botón Sumar
-período para recorrer todas las páginas del rango elegido y restaurar la inicial.
+Resumen dentro de Propio: extensión independiente 1.0.1 con subtotal visible y botón Calculate
+total / Calcular total para recorrer todas las páginas del rango elegido y restaurar la inicial.
 No modifica el tracker ni usa una tarifa estimada. Sin permisos de Twilio,
 worker o mensajería al tracker; el puente 1.3.0 ya no incluye el resumen.
 Alternativa userscript del mismo build. Inglés por defecto; selector English /
@@ -343,8 +343,11 @@ el historial. Privacidad explica que no pide/guarda credenciales ni envía el
 historial. Subtotal confirmado por captura del portal real (15 de 285 y 200
 filas). Recorrido completo probado en Chromium aislado con 285 filas/19 páginas,
 datos iguales, carga demorada, cancelación, cambio de filtros, conversión y temas.
+El subtotal sigue las mutaciones de la tabla, sin forzar su actualización al
+terminar una llamada. El período completo requiere Recalculate / Recalcular
+para cambios posteriores; no se recorre automáticamente.
 Detalles conserva contraste sobre el fondo blanco de Propio. Pendiente cargar
-ambos ZIPs separados y comprobar Sumar período con el historial real.
+ambos ZIPs separados y comprobar Calcular total con el historial real.
 
 Visibilidad en Google: propiedad real verificada por etiqueta HTML el 4/10/2026
 en Search Console. Sitemap enviado y reenviado una vez; el informe todavía
@@ -637,7 +640,7 @@ La aplicación funciona en producción con estas bases vigentes:
 - Landing bilingüe estática, canonical/hreflang y sitemap de cuatro páginas,
   preguntas frecuentes e imagen social. Un bundle público evita cargar tres
   copias de las traducciones; las fuentes no bloquean el primer render.
-- La versión actual de la app es 594; el puente es 1.3.0 y el resumen independiente 1.0.0. Refuerzo positivo, Logros y auditoría profunda
+- La versión actual de la app es 594; el puente es 1.3.0 y el resumen independiente 1.0.1. Refuerzo positivo, Logros y auditoría profunda
   están terminados. Los siete fallos de la auditoría se corrigieron con
   regresiones; cobertura y límites constan en
   `docs/auditoria-profunda-2026-09-30.md`.
@@ -645,6 +648,16 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**Resumen independiente 1.0.1** — Nombre natural y actualización explicada.
+
+- Calculate total / Calcular total reemplaza Sum period / Sumar período en
+  botón, ayuda y popup. Recalculate / Recalcular conserva su acción posterior.
+- La ayuda distingue subtotal visible, actualizado cuando Propio cambia la
+  tabla, de total del período, que se actualiza al recalcular. No fuerza una
+  recarga del historial al finalizar llamadas ni inicia recorridos automáticos.
+- Build independiente y verificaciones existentes de idiomas/separación y
+  subtotal reactivo en Chromium aislado. ZIP 1.0.1; puente sin cambios.
 
 **Puente 1.3.0 y resumen independiente 1.0.0** — Primera llamada y separación.
 
@@ -674,16 +687,3 @@ La aplicación funciona en producción con estas bases vigentes:
   carga demorada, datos idénticos, restauración, cancelación, cambio de fechas,
   ambos temas/320 y 1000 px, sin operar llamadas. Subtotal real confirmado por
   captura; recorrido del período real pendiente. Se entrega ZIP versionado.
-
-**Extensión 1.1.1** — Paquete explícito y recarga sin contextos inválidos.
-
-- El usuario cargó una copia cuya ubicación no se verificó; recargar Chrome
-  no descarga el paquete nuevo. Se entrega ZIP versionado para reinstalar.
-  Quitó la extensión tras un error sin conservar el texto; no se atribuye a
-  una causa específica sin evidencia.
-- Se reprodujo por separado una excepción sin capturar cuando Chrome invalida
-  el contexto durante una recarga: sendMessage podía lanzar antes del catch.
-  Ahora detiene mensajes, listeners y temporizadores pendientes; la entrega
-  normal mantiene su acuse y deduplicación.
-- 273 pruebas; regresiones de invalidación y entrega normal. El resumen y las
-  restricciones Trusted Types pasan en Chromium aislado. Portal real pendiente.
