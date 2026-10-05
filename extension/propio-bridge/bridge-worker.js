@@ -113,7 +113,7 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     if (packet?.kind === 'mode') {
       const result = await transact(state => {
         if (!['observe', 'auto'].includes(packet.mode)) return { ok: false, reason: 'invalid-mode' };
-        if (packet.mode === 'auto' && (!state.accountScope || !state.completed)) return { ok: false, reason: 'observation-needed' };
+        if (packet.mode === 'auto' && !state.accountScope) return { ok: false, reason: 'account-needed' };
         if (packet.mode === 'observe' && state.mode === 'auto' && Object.values(state.tabs).some(tab => tab.active)) return { ok: false, reason: 'active-portal-call' };
         if (state.mode !== packet.mode) state.tabs = {};
         state.mode = packet.mode;

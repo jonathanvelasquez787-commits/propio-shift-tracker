@@ -3,7 +3,7 @@ const reasons = {
   'multiple-trackers': 'Dejá abierta una sola pestaña del tracker para esta cuenta.',
   'tracker-closed': 'Abrí el tracker e iniciá sesión para conectarlo.',
   'pending-account': 'Hay llamadas pendientes de la cuenta anterior. Abrila para completar el registro.',
-  'observation-needed': 'Falta observar una llamada completa y conectar tu cuenta.',
+  'account-needed': 'Abrí el tracker, iniciá sesión y conectá esta cuenta antes de activar el registro.',
   'queue-full': 'La cola está llena. El registro se pausó; revisá las llamadas pendientes.',
   'expired-event': 'Hay una señal de más de 24 horas. El registro se pausó para revisarla.',
   'event-rejected': 'Una señal no pasó la validación. El registro está pausado.',
@@ -19,7 +19,7 @@ async function refresh() {
   document.getElementById('status').textContent = state.mode === 'auto' ? 'Registro automático activo' : 'Modo de observación';
   document.getElementById('detail').textContent = feedback || reasons[state.attention] || `${state.paired ? 'Cuenta conectada' : 'Cuenta sin conectar'} · ${state.completed} llamada(s) observada(s) · ${state.queued} pendiente(s)`;
   const toggle = document.getElementById('automatic');
-  toggle.checked = state.mode === 'auto'; toggle.disabled = busy || !state.paired || !state.completed;
+  toggle.checked = state.mode === 'auto'; toggle.disabled = busy || !state.paired;
   document.getElementById('reviewed').hidden = !state.queued && !(state.mode === 'auto' && state.active);
   const list = document.getElementById('signals'); list.replaceChildren();
   for (const item of [...state.last].reverse()) {

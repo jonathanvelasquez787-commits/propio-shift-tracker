@@ -322,23 +322,29 @@ autenticado en la app. Build y recorrido completo probados con portal y eventos
 simulados en Chromium aislado; no se enviaron solicitudes a Propio/Twilio reales.
 El usuario confirmó instalación y cuenta conectada en Chrome, la quitó después
 de un error sin mensaje y reinstaló el paquete: la barra del historial quedó
-confirmada mediante capturas reales. Pendientes: actualizar al ZIP 1.2.0,
+confirmada mediante capturas reales. Pendientes: actualizar al puente ZIP 1.3.0,
 conectar la cuenta si hace falta y observar una llamada normal. La compatibilidad de las señales identificadas en
 el add-on de 2023 sigue sin certificar. Empieza en observación; el registro
-automático requiere conectar la cuenta y activar el modo después de observar
-una llamada completa. No provocar una llamada real solo para probar.
+automático requiere conectar la cuenta y activar el modo. Desde 1.3.0 permite
+activarlo antes de la primera llamada, por autorización explícita del usuario;
+no se afirma que esté activado en su navegador. No provocar una llamada real solo para probar.
 No pulsa disponibilidad/aceptar/colgar ni interpreta Offline como Break/Lunch.
 Tiempo/pago estimados, corregibles mediante importación oficial; conserva
 identidad y deduplicación tras reemplazo. Véase `extension/propio-bridge/README.md`.
 
-Resumen dentro de Propio: extensión 1.2.0 con subtotal visible y botón Sumar
+Resumen dentro de Propio: extensión independiente 1.0.0 con subtotal visible y botón Sumar
 período para recorrer todas las páginas del rango elegido y restaurar la inicial.
-No modifica el tracker ni usa una tarifa estimada. Alternativa userscript del
-mismo build. Subtotal confirmado por captura del portal real (15 de 285 y 200
+No modifica el tracker ni usa una tarifa estimada. Sin permisos de Twilio,
+worker o mensajería al tracker; el puente 1.3.0 ya no incluye el resumen.
+Alternativa userscript del mismo build. Inglés por defecto; selector English /
+Español en Details guarda solo preferencias propias de moneda, cambio e idioma.
+Tooltip y ayuda indican seleccionar Start Date y End Date y actualizar primero
+el historial. Privacidad explica que no pide/guarda credenciales ni envía el
+historial. Subtotal confirmado por captura del portal real (15 de 285 y 200
 filas). Recorrido completo probado en Chromium aislado con 285 filas/19 páginas,
 datos iguales, carga demorada, cancelación, cambio de filtros, conversión y temas.
 Detalles conserva contraste sobre el fondo blanco de Propio. Pendiente cargar
-el ZIP 1.2.0 y comprobar Sumar período con el historial real.
+ambos ZIPs separados y comprobar Sumar período con el historial real.
 
 Visibilidad en Google: propiedad real verificada por etiqueta HTML el 4/10/2026
 en Search Console. Sitemap enviado y reenviado una vez; el informe todavía
@@ -631,7 +637,7 @@ La aplicación funciona en producción con estas bases vigentes:
 - Landing bilingüe estática, canonical/hreflang y sitemap de cuatro páginas,
   preguntas frecuentes e imagen social. Un bundle público evita cargar tres
   copias de las traducciones; las fuentes no bloquean el primer render.
-- La versión actual de la app es 594; la extensión es 1.2.0. Refuerzo positivo, Logros y auditoría profunda
+- La versión actual de la app es 594; el puente es 1.3.0 y el resumen independiente 1.0.0. Refuerzo positivo, Logros y auditoría profunda
   están terminados. Los siete fallos de la auditoría se corrigieron con
   regresiones; cobertura y límites constan en
   `docs/auditoria-profunda-2026-09-30.md`.
@@ -639,6 +645,21 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**Puente 1.3.0 y resumen independiente 1.0.0** — Primera llamada y separación.
+
+- El resumen tiene paquete, permisos y almacenamiento propios, sin vínculo con
+  tracker/Twilio. El build del puente retira los archivos viejos del resumen.
+- Con cuenta conectada se permite activar automático sin llamadas observadas
+  previas, autorizado por el usuario. Incoming, rechazo o final sin aceptación
+  no crean registros; activar a mitad de llamada espera la siguiente aceptación.
+  Observación sigue siendo el modo inicial. Las señales reales siguen pendientes.
+- Details ofrece English/Español, inglés por defecto y elección persistente que
+  conserva conversión y totales. Tooltip menciona Start Date y End Date; ambos
+  paquetes incluyen privacidad clara sin prometer que el puente no guarda tiempos.
+- 285 pruebas y builds separados. Chromium aislado: primera llamada automática,
+  deduplicación, corrección oficial, resumen/userscript, idiomas persistentes,
+  recorrido de 285 filas/19 páginas, cancelación, filtros y temas/320–1000 px.
 
 **Extensión 1.2.0** — Total del período y contraste en Detalles.
 
@@ -666,16 +687,3 @@ La aplicación funciona en producción con estas bases vigentes:
   normal mantiene su acuse y deduplicación.
 - 273 pruebas; regresiones de invalidación y entrega normal. El resumen y las
   restricciones Trusted Types pasan en Chromium aislado. Portal real pendiente.
-
-**Extensión 1.1.0** — Minutos y pago directamente en el historial de Propio.
-
-- Barra compacta con subtotal de Duration (Minutes) y Pay de la página visible,
-  actualización por cambios de tabla y encabezados reconocidos. Pago leído de
-  Propio, sin estimar tarifa. Vacíos/no reconocidos marcan total parcial.
-- Compatible con tablas HTML/Angular Material; no acumula filas entre páginas,
-  hace solicitudes ni pulsa controles. Conversión secundaria opcional guardada
-  localmente; no almacena ni lee identificadores de clientes. Sin permisos nuevos.
-- Build incluye userscript independiente del mismo código. 270 pruebas,
-  imports/wiring y build correctos; extensión y userscript verificados en Chrome
-  aislado con portal ficticio, ambos temas y 320/1000 px. Compatible en simulación;
-  actualización de Chrome habitual y tabla real todavía pendientes.

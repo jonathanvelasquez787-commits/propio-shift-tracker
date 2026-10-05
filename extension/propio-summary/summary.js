@@ -1,28 +1,41 @@
 import { readPortalHistory } from '../../js/propio-history.js';
 import { readPortalPaginator, portalRangeContext, collectPortalPages } from '../../js/propio-history-pages.js';
+import { settingsKey, languageOf, copyFor, scanError } from './i18n.js';
 
-if (location.origin === 'https://interpreters.propio-ls.com' && window.top === window && !document.getElementById('pst-propio-history')) {
-  const key = 'pst-portal-summary-options-v1';
+if (location.origin === 'https://interpreters.propio-ls.com' && window.top === window && !document.getElementById('propio-summary-panel')) {
+  const key = settingsKey;
   let options = {}, last = '', mountedTable, timer, totalCache = null, running = null, scanMessage = '';
   const host = document.createElement('div');
-  host.id = 'pst-propio-history';
+  host.id = 'propio-summary-panel';
   const root = host.attachShadow({ mode: 'open' });
   root.innerHTML = `<style>
     :host{display:block;margin:8px 0;color-scheme:light dark;font:13px/1.5 system-ui,sans-serif;color:#203345}
     .bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px 18px;padding:9px 12px;border:1px solid #ccd8df;border-radius:8px;background:#f4f8fa}
     strong{font-size:16px;font-variant-numeric:tabular-nums;color:#08687b}.scope{font-size:11px;color:#516573;flex:1;min-width:140px}
     button{border:1px solid #aabbc7;border-radius:5px;background:transparent;color:inherit;cursor:pointer;padding:4px 8px;font:inherit}
-    button:focus-visible,input:focus-visible{outline:2px solid #0893b1;outline-offset:2px}.details{padding:8px 12px;font-size:12px;border:1px solid #ccd8df;border-top:0;border-radius:0 0 8px 8px;background:#f4f8fa}
+    button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #0893b1;outline-offset:2px}.details{padding:8px 12px;font-size:12px;border:1px solid #ccd8df;border-top:0;border-radius:0 0 8px 8px;background:#f4f8fa}
     [hidden]{display:none!important}form{display:flex;flex-wrap:wrap;gap:8px;align-items:end;margin:8px 0}label{display:grid;gap:3px}input{width:110px;max-width:100%;box-sizing:border-box;padding:5px;border:1px solid #aabbc7;border-radius:4px;background:transparent;color:inherit;font:inherit}
-    p{margin:0}.conversion{font-size:12px;font-weight:normal}.notice{color:#855200}output{display:block}
-    @media(prefers-color-scheme:dark){:host{color:#e4edf4}.bar{background:#121d2d;border-color:#35465b}.details{background:#121d2d;border-color:#35465b}strong{color:#52d3df}.scope{color:#b0c1d1}.notice{color:#f6c873}button,input{border-color:#5b7188}}
-  </style><section aria-label="Resumen del historial de Propio">
-    <div class="bar"><span><strong id="minutes">—</strong> min</span><span><strong id="pay">—</strong> <span class="conversion" id="converted"></span></span><span class="scope" id="scope"></span><button id="sum-period" type="button" hidden>Sumar período</button><button id="toggle" type="button" aria-expanded="false">Detalles</button></div>
-    <div class="details" id="details" hidden><p>Sumar período recorre las páginas del historial seleccionado y vuelve a tu página inicial. Usa Duration (Minutes) y Pay de Propio; no incluye llamadas en curso. Recalculá para incorporar cambios posteriores. Hasta completar el recorrido se muestra el subtotal de la página visible.</p>
-      <p class="notice" id="notice"></p><form><label>Moneda secundaria<input id="currency" placeholder="Ej.: L" maxlength="8"></label><label>Cambio por 1 USD<input id="rate" type="number" min="0.000001" max="100000" step="any" placeholder="Opcional"></label><button type="submit">Guardar</button><button id="clear" type="button">Sin conversión</button></form><output id="saved" aria-live="polite"></output>
+    p{margin:0}.conversion{font-size:12px;font-weight:normal}.notice{color:#855200}output{display:block}.language{display:flex;align-items:center;gap:8px;margin-top:8px}select{padding:5px;border:1px solid #aabbc7;border-radius:4px;background:#f4f8fa;color:inherit;font:inherit}
+    @media(prefers-color-scheme:dark){:host{color:#e4edf4}.bar{background:#121d2d;border-color:#35465b}.details{background:#121d2d;border-color:#35465b}strong{color:#52d3df}.scope{color:#b0c1d1}.notice{color:#f6c873}button,input,select{border-color:#5b7188}select{background:#121d2d}}
+  </style><section lang="en" aria-label="Propio history summary">
+    <div class="bar"><span><strong id="minutes">—</strong> min</span><span><strong id="pay">—</strong> <span class="conversion" id="converted"></span></span><span class="scope" id="scope" aria-live="polite"></span><button id="sum-period" type="button" aria-describedby="period-explanation" hidden>Sum period</button><button id="toggle" type="button" aria-expanded="false">Details</button></div>
+    <div class="details" id="details" hidden><p id="period-explanation"></p>
+      <label class="language"><span id="language-label">Language</span><select id="language"><option value="en" lang="en">English</option><option value="es" lang="es">Español</option></select></label>
+      <p class="notice" id="notice"></p><form><label><span id="currency-label"></span><input id="currency" maxlength="8"></label><label><span id="rate-label"></span><input id="rate" type="number" min="0.000001" max="100000" step="any"></label><button id="save" type="submit"></button><button id="clear" type="button"></button></form><output id="saved" aria-live="polite"></output><p id="privacy"></p>
     </div></section>`;
   const $ = id => root.getElementById(id);
-  const amount = value => value.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const locale = () => languageOf(options) === 'es' ? 'es-HN' : 'en-US';
+  const amount = value => value.toLocaleString(locale(), { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  let savedMessage = '';
+  function translate() {
+    const copy = copyFor(options), section = root.querySelector('section');
+    section.lang = languageOf(options); section.setAttribute('aria-label', copy.section);
+    for (const [id, name] of Object.entries({ 'language-label': 'language', 'currency-label': 'currency', 'rate-label': 'rate', save: 'save', clear: 'clear', privacy: 'privacy', 'period-explanation': 'explanation' })) $(id).textContent = copy[name];
+    $('language').value = languageOf(options);
+    $('currency').placeholder = copy.example; $('rate').placeholder = copy.optional;
+    $('toggle').textContent = $('details').hidden ? copy.details : copy.hide;
+    $('saved').textContent = savedMessage ? copy[savedMessage] : '';
+  }
   const isVisible = element => element.getClientRects().length > 0 && getComputedStyle(element).visibility !== 'hidden';
   function snapshot() {
     const found = location.pathname.startsWith('/portal') ? readPortalHistory(document, isVisible) : null;
@@ -37,18 +50,21 @@ if (location.origin === 'https://interpreters.propio-ls.com' && window.top === w
     if (found.table !== mountedTable || !host.isConnected) { found.table.before(host); mountedTable = found.table; }
     if (!running && totalCache && (!found.range || totalCache.context !== found.context || totalCache.total !== found.range.total || totalCache.size !== found.range.size)) totalCache = null;
     const summary = totalCache && !running ? totalCache.summary : found.summary;
-    const signature = JSON.stringify([summary, options, Boolean(totalCache), running?.progress, running?.controller.signal.aborted, scanMessage, Boolean(found.pager)]);
+    const signature = JSON.stringify([summary, options, savedMessage, Boolean(totalCache), running?.progress, running?.controller.signal.aborted, scanMessage, Boolean(found.pager)]);
     if (signature === last) return;
     last = signature;
-    $('minutes').textContent = summary.count && summary.missingMinutes === summary.count ? '—' : summary.minutes.toLocaleString('es-HN', { maximumFractionDigits: 3 });
+    translate();
+    const copy = copyFor(options);
+    $('minutes').textContent = summary.count && summary.missingMinutes === summary.count ? '—' : summary.minutes.toLocaleString(locale(), { maximumFractionDigits: 3 });
     $('pay').textContent = summary.count && summary.missingPay === summary.count ? '—' : '$' + amount(summary.pay);
     $('converted').textContent = options.rate > 0 && options.currency && (!summary.count || summary.missingPay < summary.count) ? `≈ ${options.currency} ${amount(summary.pay * options.rate)}` : '';
     $('sum-period').hidden = !found.pager;
-    $('sum-period').textContent = running ? running.controller.signal.aborted ? 'Cancelando…' : 'Cancelar' : totalCache ? 'Recalcular' : 'Sumar período';
+    $('sum-period').textContent = running ? running.controller.signal.aborted ? copy.cancelling : copy.cancel : totalCache ? copy.recalculate : copy.sum;
+    $('sum-period').title = running ? copy.cancelTooltip : copy.tooltip;
     $('sum-period').disabled = Boolean(running?.controller.signal.aborted);
-    $('scope').textContent = running ? running.controller.signal.aborted ? 'Cancelando el recorrido…' : `Sumando ${running.progress || 0}/${running.total} llamadas…` : `${totalCache ? 'Total del período' : 'Página visible'} · ${summary.count} llamada${summary.count === 1 ? '' : 's'}${summary.missingMinutes || summary.missingPay ? ' · Total parcial' : ''}`;
+    $('scope').textContent = running ? running.controller.signal.aborted ? copy.cancellingScan : copy.progress(running.progress || 0, running.total) : `${totalCache ? copy.period : copy.visible} · ${copy.calls(summary.count)}${summary.missingMinutes || summary.missingPay ? ' · ' + copy.partial : ''}`;
     if (running) { $('minutes').textContent = '—'; $('pay').textContent = '—'; $('converted').textContent = ''; }
-    $('notice').textContent = [scanMessage, summary.missingMinutes || summary.missingPay ? `Datos pendientes o no reconocidos: ${summary.missingMinutes} duración(es), ${summary.missingPay} pago(s). Se excluyen de su suma.` : ''].filter(Boolean).join(' ');
+    $('notice').textContent = [scanError(scanMessage, options), summary.missingMinutes || summary.missingPay ? copy.pending(summary.missingMinutes, summary.missingPay) : ''].filter(Boolean).join(' ');
   }
   function schedule() { if (!timer) timer = setTimeout(refresh, 120); }
   const observer = new MutationObserver(schedule);
@@ -101,33 +117,35 @@ if (location.origin === 'https://interpreters.propio-ls.com' && window.top === w
       if (!running.controller.signal.aborted && !running.external) totalCache = result;
     } catch (error) {
       scanMessage = error.message;
-      $('details').hidden = false; $('toggle').setAttribute('aria-expanded', 'true'); $('toggle').textContent = 'Ocultar';
+      $('details').hidden = false; $('toggle').setAttribute('aria-expanded', 'true');
     } finally { running = null; last = ''; refresh(); }
   });
   $('toggle').addEventListener('click', () => {
     const expanded = $('details').hidden;
     $('details').hidden = !expanded; $('toggle').setAttribute('aria-expanded', String(expanded));
-    $('toggle').textContent = expanded ? 'Ocultar' : 'Detalles';
+    translate();
   });
   const extensionStorage = typeof chrome !== 'undefined' && chrome.runtime?.id && chrome.storage?.local;
   async function save(next) {
     try {
       if (extensionStorage) await chrome.storage.local.set({ [key]: next });
       else localStorage.setItem(key, JSON.stringify(next));
-      options = next; refresh(); $('saved').textContent = 'Configuración guardada en este navegador.';
-    } catch { $('saved').textContent = 'No se pudo guardar la configuración.'; }
+      options = next; savedMessage = 'saved'; refresh();
+    } catch { savedMessage = 'failed'; translate(); }
   }
+  $('language').addEventListener('change', () => { void save({ ...options, language: $('language').value === 'es' ? 'es' : 'en' }); });
   root.querySelector('form').addEventListener('submit', event => {
     event.preventDefault();
     const currency = $('currency').value.trim(), rate = Number($('rate').value);
-    if (!currency || !Number.isFinite(rate) || rate <= 0 || rate > 100000) { $('saved').textContent = 'Ingresá moneda y cambio mayor que cero, o elegí Sin conversión.'; return; }
-    void save({ currency, rate });
+    if (!currency || !Number.isFinite(rate) || rate <= 0 || rate > 100000) { savedMessage = 'invalid'; translate(); return; }
+    void save({ currency, rate, language: languageOf(options) });
   });
-  $('clear').addEventListener('click', () => { $('currency').value = ''; $('rate').value = ''; void save({}); });
+  $('clear').addEventListener('click', () => { $('currency').value = ''; $('rate').value = ''; void save({ language: languageOf(options) }); });
   (async () => {
     try {
       const stored = extensionStorage ? (await chrome.storage.local.get(key))[key] : JSON.parse(localStorage.getItem(key) || '{}');
-      if (stored && typeof stored.currency === 'string' && stored.currency.length <= 8 && Number.isFinite(stored.rate) && stored.rate > 0 && stored.rate <= 100000) options = stored;
+      options = { language: languageOf(stored) };
+      if (stored && typeof stored.currency === 'string' && stored.currency.length <= 8 && Number.isFinite(stored.rate) && stored.rate > 0 && stored.rate <= 100000) Object.assign(options, { currency: stored.currency, rate: stored.rate });
     } catch { /* The summary still works when settings storage is unavailable. */ }
     $('currency').value = options.currency || ''; $('rate').value = options.rate || ''; refresh();
   })();

@@ -129,6 +129,29 @@ async function activate(f) {
   await f.signal('accepted-by-local'); f.advance(600000); await f.signal('disconnected-by-remote');
   assert.equal((await f.worker.message({ kind: 'mode', mode: 'auto' }, sender)).ok, true);
 }
+
+test('paired users can enable auto before the first observed call and save that first accepted pair once', async () => {
+  const f = workerFixture();
+  assert.equal((await f.worker.message({kind:'mode',mode:'auto'},sender)).reason,'account-needed');
+  f.targets([scope]); await f.worker.message({kind:'pair'},sender);
+  assert.equal((await f.worker.message({kind:'status'},sender)).completed,0);
+  assert.equal((await f.worker.message({kind:'mode',mode:'auto'},sender)).ok,true);
+  await f.signal('incoming'); await f.signal('rejected-by-local'); await f.signal('disconnected-by-remote');
+  assert.equal(f.delivered.length,0);
+  await f.signal('accepted-by-local'); f.advance(600000); await f.signal('disconnected-by-local');
+  await f.signal('disconnected-by-remote');
+  assert.deepEqual(f.delivered.map(packet=>packet.event.type),['call-start','call-end']);
+  assert.equal((await f.worker.message({kind:'status'},sender)).completed,1);
+});
+
+test('enabling before a completed observation does not fabricate an already accepted call', async()=>{
+  const f=workerFixture();f.targets([scope]);await f.worker.message({kind:'pair'},sender);
+  await f.signal('accepted-by-local');f.advance(60000);
+  await f.worker.message({kind:'mode',mode:'auto'},sender);
+  await f.signal('disconnected-by-local');assert.equal(f.delivered.length,0);
+  await f.signal('accepted-by-local');f.advance(60000);await f.signal('disconnected-by-local');
+  assert.deepEqual(f.delivered.map(packet=>packet.event.type),['call-start','call-end']);
+});
 test('activation does not fabricate the end of an already observed call; auto delivers pairs once', async () => {
   const f = workerFixture(); await activate(f);
   await f.signal('disconnected-by-remote'); assert.equal(f.delivered.length, 0);
