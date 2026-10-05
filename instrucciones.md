@@ -332,8 +332,8 @@ No pulsa disponibilidad/aceptar/colgar ni interpreta Offline como Break/Lunch.
 Tiempo/pago estimados, corregibles mediante importación oficial; conserva
 identidad y deduplicación tras reemplazo. Véase `extension/propio-bridge/README.md`.
 
-Resumen dentro de Propio: extensión independiente 1.0.1 con subtotal visible y botón Calculate
-total / Calcular total para recorrer todas las páginas del rango elegido y restaurar la inicial.
+Resumen dentro de Propio: extensión independiente 1.0.2 con subtotal visible y botón Calculate
+Period / Calcular período para recorrer todas las páginas del rango elegido y restaurar la inicial.
 No modifica el tracker ni usa una tarifa estimada. Sin permisos de Twilio,
 worker o mensajería al tracker; el puente 1.3.0 ya no incluye el resumen.
 Alternativa userscript del mismo build. Inglés por defecto; selector English /
@@ -347,7 +347,7 @@ El subtotal sigue las mutaciones de la tabla, sin forzar su actualización al
 terminar una llamada. El período completo requiere Recalculate / Recalcular
 para cambios posteriores; no se recorre automáticamente.
 Detalles conserva contraste sobre el fondo blanco de Propio. Pendiente cargar
-ambos ZIPs separados y comprobar Calcular total con el historial real.
+ambos ZIPs separados y comprobar Calcular período con el historial real.
 
 Visibilidad en Google: propiedad real verificada por etiqueta HTML el 4/10/2026
 en Search Console. Sitemap enviado y reenviado una vez; el informe todavía
@@ -640,7 +640,7 @@ La aplicación funciona en producción con estas bases vigentes:
 - Landing bilingüe estática, canonical/hreflang y sitemap de cuatro páginas,
   preguntas frecuentes e imagen social. Un bundle público evita cargar tres
   copias de las traducciones; las fuentes no bloquean el primer render.
-- La versión actual de la app es 594; el puente es 1.3.0 y el resumen independiente 1.0.1. Refuerzo positivo, Logros y auditoría profunda
+- La versión actual de la app es 594; el puente es 1.3.0 y el resumen independiente 1.0.2. Refuerzo positivo, Logros y auditoría profunda
   están terminados. Los siete fallos de la auditoría se corrigieron con
   regresiones; cobertura y límites constan en
   `docs/auditoria-profunda-2026-09-30.md`.
@@ -648,6 +648,13 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**Resumen independiente 1.0.2** — Calculate Period.
+
+- Botón, ayuda y popup usan Calculate Period, tal como pidió el usuario;
+  equivalente en español Calcular período. Recalculate / Recalcular se conserva.
+- Build y verificaciones existentes de idiomas/separación; ZIP 1.0.2.
+  No cambia el cálculo ni su comportamiento de actualización.
 
 **Resumen independiente 1.0.1** — Nombre natural y actualización explicada.
 
@@ -673,17 +680,3 @@ La aplicación funciona en producción con estas bases vigentes:
 - 285 pruebas y builds separados. Chromium aislado: primera llamada automática,
   deduplicación, corrección oficial, resumen/userscript, idiomas persistentes,
   recorrido de 285 filas/19 páginas, cancelación, filtros y temas/320–1000 px.
-
-**Extensión 1.2.0** — Total del período y contraste en Detalles.
-
-- Sumar período recorre únicamente el paginador del historial y vuelve a la
-  página inicial; progreso, Cancelar, rangos/filas consecutivos y protección ante
-  filtros, tamaño, orden, cantidad o intervención durante el cálculo. No se
-  deduplican llamadas por sus valores. Un error no produce un total completo.
-- El total queda en memoria, se conserva al navegar y se recalcula a pedido;
-  refleja Pay de Propio y admite conversión. Detalles tiene fondo explícito
-  en ambos temas para que el texto no desaparezca sobre el portal blanco.
-- 279 pruebas y build de extensión. Chromium aislado: 285 filas/19 páginas,
-  carga demorada, datos idénticos, restauración, cancelación, cambio de fechas,
-  ambos temas/320 y 1000 px, sin operar llamadas. Subtotal real confirmado por
-  captura; recorrido del período real pendiente. Se entrega ZIP versionado.
