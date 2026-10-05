@@ -376,6 +376,11 @@ No quitar la etiqueta real de verificación ni crear otro reintento sin solicitu
 Desde v590 hay URLs públicas por idioma (`/` en inglés y `/es` en español),
 contenido, metadatos, hreflang y datos estructurados coherentes. Nuevas guías
 públicas y difusión en comunidades pertinentes siguen siendo mejoras posteriores.
+El 5/10/2026 Google sí muestra la raíz al buscar el dominio, pero no apareció
+en la primera página por `propio shift tracker`. Desde v595 la marca encabeza
+el título, H1, descripción y presentación en ambos idiomas; `og:site_name` y
+WebSite refuerzan su identidad. No confundir esta mejora publicada con una
+posición ya conseguida. No publicar mensajes en comunidades sin autorización.
 Ver docs/seo.md.
 
 La auditoría profunda de v576 quedó cerrada: 31 días simulados, 108 llamadas,
@@ -655,7 +660,7 @@ La aplicación funciona en producción con estas bases vigentes:
 - Landing bilingüe estática, canonical/hreflang y sitemap de cuatro páginas,
   preguntas frecuentes e imagen social. Un bundle público evita cargar tres
   copias de las traducciones; las fuentes no bloquean el primer render.
-- La versión actual de la app es 594; el puente es 1.3.0 y el resumen independiente 1.0.3. Refuerzo positivo, Logros y auditoría profunda
+- La versión actual de la app es 595; el puente es 1.3.0 y el resumen independiente 1.0.3. Refuerzo positivo, Logros y auditoría profunda
   están terminados. Los siete fallos de la auditoría se corrigieron con
   regresiones; cobertura y límites constan en
   `docs/auditoria-profunda-2026-09-30.md`.
@@ -663,6 +668,13 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v595** — Identidad de la portada para búsquedas por nombre.
+
+- Propio Shift Tracker al inicio del título y en el H1/presentación, en inglés
+  y español. Descripciones, Open Graph y WebSite usan la misma identidad.
+- Seis checks SEO y build completos; revisión de traducción, acceso y ancho
+  móvil. Sin posición garantizada: Google debe volver a procesar la portada.
 
 **Resumen independiente 1.0.3** — Calculate Total, nombre definitivo.
 
@@ -677,13 +689,3 @@ La aplicación funciona en producción con estas bases vigentes:
   equivalente en español Calcular período. Recalculate / Recalcular se conserva.
 - Build y verificaciones existentes de idiomas/separación; ZIP 1.0.2.
   No cambia el cálculo ni su comportamiento de actualización.
-
-**Resumen independiente 1.0.1** — Nombre natural y actualización explicada.
-
-- Calculate total / Calcular total reemplaza Sum period / Sumar período en
-  botón, ayuda y popup. Recalculate / Recalcular conserva su acción posterior.
-- La ayuda distingue subtotal visible, actualizado cuando Propio cambia la
-  tabla, de total del período, que se actualiza al recalcular. No fuerza una
-  recarga del historial al finalizar llamadas ni inicia recorridos automáticos.
-- Build independiente y verificaciones existentes de idiomas/separación y
-  subtotal reactivo en Chromium aislado. ZIP 1.0.1; puente sin cambios.

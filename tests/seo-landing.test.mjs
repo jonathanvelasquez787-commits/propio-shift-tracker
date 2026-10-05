@@ -18,10 +18,14 @@ for (const language of ['en', 'es']) {
     const meta = landingMetadata(language);
     assert.equal(attr(all.find(node => node.tagName === 'html'), 'lang'), language);
     assert.equal(text(all.find(node => node.tagName === 'title')), meta.title);
+    assert.match(meta.title, /^Propio Shift Tracker \| /);
+    assert.match(meta.description, /^Propio Shift Tracker/);
+    assert.equal(attr(all.find(node => attr(node, 'property') === 'og:site_name'), 'content'), 'Propio Shift Tracker');
     assert.equal(attr(all.find(node => attr(node, 'name') === 'description'), 'content'), meta.description);
     assert.equal(attr(all.find(node => attr(node, 'rel') === 'canonical'), 'href'), meta.url);
     const h1s = all.filter(node => node.tagName === 'h1');
     assert.equal(h1s.length, 1);
+    assert.match(text(h1s[0]), /^Propio Shift Tracker:/);
     assert.match(text(h1s[0]), language === 'en' ? /interpreting shift/ : /turno de intérprete/);
     const faq = all.find(node => attr(node, 'id') === 'preguntas');
     assert.match(text(faq), language === 'en' ? /per-minute earnings/ : /ganancias por minuto/);
@@ -31,6 +35,10 @@ for (const language of ['en', 'es']) {
     assert.equal(attr(toggle, 'href'), language === 'en' ? '/es' : '/');
     assert.match(attr(toggle, 'aria-label'), language === 'en' ? /Spanish/ : /inglés/);
     const schema = JSON.parse(text(all.find(node => attr(node, 'type') === 'application/ld+json')));
+    const website = schema['@graph'].find(item => item['@type'] === 'WebSite');
+    assert.equal(website.name, 'Propio Shift Tracker');
+    assert.equal(website.url, SITE_ORIGIN + '/');
+    assert.equal(website.alternateName, new URL(SITE_ORIGIN).hostname);
     const application = schema['@graph'].find(item => item['@type'] === 'WebApplication');
     assert.equal(application.inLanguage, language);
     assert.equal(application.url, meta.url);

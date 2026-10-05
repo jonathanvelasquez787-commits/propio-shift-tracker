@@ -1394,6 +1394,12 @@
       "js/boot.js"
     ]
   },
+  "s_1c54ef8f": {
+    "source": "Propio Shift Tracker | Turnos y ganancias de intérpretes",
+    "files": [
+      "index.html"
+    ]
+  },
   "s_1c5be691": {
     "source": "Acerca de Racha semanal",
     "files": [
@@ -2195,6 +2201,12 @@
       "js/calendar.js"
     ]
   },
+  "s_2e98c56e": {
+    "source": "llamadas y ganancias.",
+    "files": [
+      "index.html"
+    ]
+  },
   "s_2ea6aa6a": {
     "source": "Vacío = se guarda como Manual",
     "files": [
@@ -2544,6 +2556,12 @@
     "source": "3. Dónde se guardan",
     "files": [
       "privacidad.html"
+    ]
+  },
+  "s_33fbceca": {
+    "source": "Propio Shift Tracker:",
+    "files": [
+      "index.html"
     ]
   },
   "s_33fc3199": {
@@ -3050,12 +3068,6 @@
       "js/sync.js"
     ]
   },
-  "s_3f27984c": {
-    "source": "Lleva tus turnos de interpretación remota en un solo lugar. Registra\n        llamadas y minutos facturables, calcula tus ganancias según tu tarifa\n        y compara tus pausas con tu horario, sin depender de hojas de cálculo.",
-    "files": [
-      "index.html"
-    ]
-  },
   "s_3f563c9d": {
     "source": "derrotado",
     "files": [
@@ -3343,12 +3355,6 @@
     "source": "PSR B0531+21",
     "files": [
       "js/game-battle.js"
-    ]
-  },
-  "s_456d7ab6": {
-    "source": "tus ganancias",
-    "files": [
-      "index.html"
     ]
   },
   "s_45e3f698": {
@@ -3681,6 +3687,12 @@
       "app.html"
     ]
   },
+  "s_4b9f7879": {
+    "source": "tu turno de intérprete,",
+    "files": [
+      "index.html"
+    ]
+  },
   "s_4ba673dc": {
     "source": "{{v0}} pagado · XP diario sellado",
     "files": [
@@ -3836,12 +3848,6 @@
     "files": [
       "app.html",
       "js/app-main.js"
-    ]
-  },
-  "s_4f11a481": {
-    "source": "tus llamadas y",
-    "files": [
-      "index.html"
     ]
   },
   "s_4f1437b3": {
@@ -5854,6 +5860,12 @@
       "js/app-main.js"
     ]
   },
+  "s_764b27aa": {
+    "source": "Propio Shift Tracker reúne tus turnos de interpretación remota,\n        llamadas y minutos facturables. Calcula tus ganancias según tu tarifa\n        y compara tus pausas con tu horario, sin hojas de cálculo.",
+    "files": [
+      "index.html"
+    ]
+  },
   "s_76889f4f": {
     "source": "Buscando tus datos…",
     "files": [
@@ -7046,12 +7058,6 @@
     "source": "Si una semana puntual es distinta a tu horario normal, usa",
     "files": [
       "app.html"
-    ]
-  },
-  "s_8d17fb83": {
-    "source": "en un solo lugar.",
-    "files": [
-      "index.html"
     ]
   },
   "s_8d273a38": {
@@ -10671,12 +10677,6 @@
       "app.html"
     ]
   },
-  "s_d60e8399": {
-    "source": "Tu turno de intérprete,",
-    "files": [
-      "index.html"
-    ]
-  },
   "s_d65c2a56": {
     "source": "Volviste a tiempo de {{v0}} {{v1}}.",
     "files": [
@@ -11950,12 +11950,6 @@
     "source": "Escopeta",
     "files": [
       "js/game-battle.js"
-    ]
-  },
-  "s_ef8a8316": {
-    "source": "Turnos y ganancias para intérpretes | Propio Shift Tracker",
-    "files": [
-      "index.html"
     ]
   },
   "s_efc3ceb5": {

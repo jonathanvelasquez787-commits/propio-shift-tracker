@@ -22,6 +22,25 @@ Estas ayudas no garantizan indexación ni posiciones. La landing ya entrega
 contenido estático, título, descripción y enlaces sin necesitar una sesión.
 Google puede cambiar el título y la descripción que muestra en resultados.
 
+Desde v595 el título comienza con Propio Shift Tracker en ambos idiomas,
+el H1 contiene el nombre completo y la presentación explica qué hace la
+herramienta. Las descripciones y `og:site_name` usan la misma identidad.
+WebSite conserva el nombre y ofrece el dominio como alternativa; no se
+declara afiliación oficial ni se agregan valoraciones o enlaces externos ficticios.
+Los seis checks de SEO verifican HTML legible sin JS, ambos idiomas, identidad,
+canonical/hreflang, schema y conservación del acceso. Build y revisión de
+las portadas en móvil/escritorio completados localmente.
+
+Comprobación de búsquedas el 5/10/2026: Google muestra la raíz como primer
+resultado web al buscar `propio-shift-tracker.vercel.app`; no se encontró en
+la primera página para `propio shift tracker` ni como coincidencia exacta
+entre comillas. Esto distingue aparición real por dirección de posicionamiento
+por nombre. La inspección confirma último rastreo el 4/10/2026 a las 14:03:12,
+obtención correcta y canonical seleccionada igual a la raíz. El informe de
+rendimiento aún no sirve para evaluar estos cambios: sus datos procesados
+llegaban al 3/10/2026. No atribuir la falta de posición a una causa comprobada
+ni prometer un plazo. Evidencia: google-resultado-por-dominio-2026-10-05.jpg.
+
 Desde v590 el contenido describe turnos de interpretación, minutos facturables,
 ganancias estimadas y adherencia. Tres preguntas frecuentes explican cálculo,
 importación y uso gratuito en móvil. WebSite/WebApplication en JSON-LD describen
