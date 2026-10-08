@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import { APP_KEYS, writeLocalSnapshot } from '../js/sync.js';
+import { createStorageRevisionGuard } from '../js/propio-bridge.js';
 
 const source = fs.readFileSync(new URL('../js/app-main.js', import.meta.url), 'utf8');
 
@@ -13,7 +14,7 @@ function storageHarness() {
   const values = new Map([['state', JSON.stringify(state)], ['calls', '[]'], ['settings', JSON.stringify(settings)]]);
   let reject = () => false;
   const warnings = [];
-  const context = vm.createContext({ ui, translateText, translateMarkup, displayLocale, applySavedColors, state, calls, settings, STORAGE_KEY: 'state', CALLS_KEY: 'calls', SETTINGS_KEY: 'settings',
+  const context = vm.createContext({ ui, translateText, translateMarkup, displayLocale, applySavedColors, createStorageRevisionGuard, state, calls, settings, STORAGE_KEY: 'state', CALLS_KEY: 'calls', SETTINGS_KEY: 'settings',
     localStorage: {
       getItem: (key) => values.get(key) ?? null,
       setItem(key, value) { if (reject(key, value)) throw new Error('QuotaExceededError'); values.set(key, value); },
@@ -21,9 +22,17 @@ function storageHarness() {
     }, toast: (message) => warnings.push(message), render: () => {},
   });
   const body = source.slice(source.indexOf('    function safeLocalStorageSet('), source.indexOf('    export function pad(')).replaceAll('export function ', 'function ');
-  vm.runInContext(body, context);
+  vm.runInContext("const localStorageRevision = createStorageRevisionGuard(localStorage, [STORAGE_KEY,CALLS_KEY,SETTINGS_KEY]);\n" + body, context);
   return { state, calls, settings, values, warnings, reject: (fn) => { reject = fn; }, run: (code) => vm.runInContext(code, context) };
 }
+
+test('guardar solo estado no vuelve vigente un tab que ya tenía llamadas externas más recientes', () => {
+  const h = storageHarness();
+  h.values.set('calls', JSON.stringify([{id:'other-tab-call'}]));
+  assert.equal(h.run('saveStateOnly()'), true);
+  assert.equal(h.run('localStorageRevision.isCurrent()'), false);
+  assert.equal(JSON.parse(h.values.get('calls'))[0].id, 'other-tab-call');
+});
 
 test('una cuota agotada no persiste recompensas de llamadas que no llegaron al disco; un reintento guarda todo', () => {
   const h = storageHarness();

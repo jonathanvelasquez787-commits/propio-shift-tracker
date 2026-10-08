@@ -308,17 +308,33 @@ export async function fetchCloud(userId) {
   if (error) throw error;
   if (!data) return null;
 
-  const { data: callRows, error: callsError } = await getSupabase()
-    .from('calls')
-    .select('call_id, payload')
-    .eq('user_id', userId);
-
-  if (callsError) {
-    // Compatibilidad durante el despliegue: antes de aplicar la migración
-    // 0003 la tabla aún no existe y las llamadas siguen dentro de user_data.
-    cloudCallHashes = hashesForCalls(data.calls || []);
-    return data;
+  const callRows = [];
+  const pageSize = 1000;
+  for (;;) {
+    const { data: page, error: callsError, count } = await getSupabase()
+      .from('calls')
+      .select('call_id, payload', { count: 'exact' })
+      .eq('user_id', userId)
+      .order('call_id')
+      .range(callRows.length, callRows.length + pageSize - 1);
+    if (callsError) {
+      // Solo una tabla ausente en la primera página permite el snapshot antiguo.
+      if (callRows.length || !['42P01', 'PGRST205'].includes(callsError.code)) throw callsError;
+      cloudCallHashes = hashesForCalls(data.calls || []);
+      return data;
+    }
+    if (!page?.length) {
+      if (Number.isFinite(count) && callRows.length < count) throw new Error('Incomplete cloud call history');
+      break;
+    }
+    callRows.push(...page);
+    if (Number.isFinite(count) && callRows.length >= count) break;
   }
+
+  const { data: latest, error: latestError } = await getSupabase()
+    .from('user_data').select('updated_at').eq('user_id', userId).maybeSingle();
+  if (latestError) throw latestError;
+  if (!latest || latest.updated_at !== data.updated_at) throw new Error('Cloud snapshot changed while loading calls');
 
   const normalizedCalls = (callRows || []).map((row) => row.payload).filter(Boolean);
   cloudCallHashes = hashesForCalls(normalizedCalls);
@@ -363,7 +379,7 @@ export async function pushSnapshot({ force = false } = {}) {
       p_device_id: deviceId(),
       p_device_label: deviceLabel(),
     });
-    if (error && /push_user_data_v2|schema cache/i.test(error.message || '')) {
+    if (error && ['42883', 'PGRST202'].includes(error.code)) {
       ({ data, error } = await getSupabase().rpc('push_user_data', {
         p_state: snapshot.state,
         p_calls: snapshot.calls,

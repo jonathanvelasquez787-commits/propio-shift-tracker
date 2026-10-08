@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readPropioSignal, createPropioReducer, validateBridgeEvent, PORTAL_ORIGIN, TRACKER_ORIGIN } from '../js/propio-bridge-rules.js';
-import { createPropioReceiver, ignorePropioCall, installPropioBridge } from '../js/propio-bridge.js';
+import { createPropioReceiver, createStorageRevisionGuard, ignorePropioCall, installPropioBridge } from '../js/propio-bridge.js';
 import { createBridgeWorker } from '../extension/propio-bridge/bridge-worker.js';
 
 const at = '2026-10-04T18:00:00.000Z', ended = '2026-10-04T18:10:00.000Z';
@@ -11,6 +11,35 @@ const end = { version: 1, id: 'test-end-123456789', type: 'call-end', callId, st
 const now = () => Date.parse(ended);
 const endpoint = 'https://eventgw.twilio.com/v4/EndpointEvents';
 const sender = { id: 'extension-id', url: 'chrome-extension://extension-id/popup.html' };
+
+test('el puente bloquea una pestaña desactualizada incluso si se descarta el aviso o vuelve el valor anterior', () => {
+  const values = new Map([['calls','[]'], ['state','{}'], ['settings','{}']]);
+  const storage = { getItem: key => values.get(key) ?? null };
+  const guard = createStorageRevisionGuard(storage, [...values.keys()]);
+  const state = {}, calls = [];
+  const receive = createPropioReceiver({ getState: () => state, getCalls: () => calls, now,
+    canReceive: () => guard.isCurrent(), start: () => assert.fail(), end: () => assert.fail(),
+    catchUp: () => { calls.push({id:'bridge'}); }, save: () => { values.set('calls', JSON.stringify(calls)); return true; } });
+  values.set('calls', '[{"id":"newer-other-tab"}]');
+  assert.equal(receive(end).reason, 'stale-tab');
+  assert.equal(values.get('calls'), '[{"id":"newer-other-tab"}]');
+  assert.deepEqual(state, {});
+  values.set('calls', '[]');
+  assert.equal(receive(end).reason, 'stale-tab');
+});
+
+test('el puente acepta escrituras propias y una nueva revisión tras recargar', () => {
+  const values = new Map([['calls','[]']]);
+  const storage = { getItem: key => values.get(key) ?? null };
+  const guard = createStorageRevisionGuard(storage, ['calls']);
+  assert.equal(guard.isCurrent(), true);
+  values.set('calls', '[{"id":"own"}]'); guard.record('calls', values.get('calls'));
+  assert.equal(guard.isCurrent(), true);
+  values.set('calls', '[{"id":"other"}]');
+  assert.equal(guard.isCurrent(), false);
+  assert.equal(createStorageRevisionGuard(storage, ['calls']).isCurrent(), true);
+  assert.equal(createStorageRevisionGuard({getItem(){throw Error('Denied');}},['calls']).isCurrent(), false);
+});
 function receiverFixture(clock = now) {
   const state = {}, calls = [], operations = [];
   let saved = true;

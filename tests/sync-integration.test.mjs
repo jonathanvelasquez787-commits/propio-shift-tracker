@@ -11,9 +11,10 @@ const source = fs.readFileSync(new URL('../js/sync.js', import.meta.url), 'utf8'
   .replace(/\bexport (?=(?:async )?(?:function|const))/g, '')
   .replace(/^export \{ DATA_SCHEMA_VERSION \};\r?$/gm, '');
 
-function harness({ cloud = null } = {}) {
+function harness({ cloud = null, callRows = null, callsError = null, callsPageError = null, maxRows = 1000, cloudAfter = cloud, includeCount = true } = {}) {
   const values = new Map(), sessionValues = new Map(), requests = [], timers = new Map(), events = [];
   let timerId = 0;
+  let cloudReads = 0;
   const context = vm.createContext({ ui, translateText, translateMarkup, displayLocale, applySavedColors,
     LANGUAGE_PREFERENCE_KEY, PENDING_LOGIN_LANGUAGE_KEY, normalizeLanguage, readLanguagePreference, saveLanguagePreference, readPendingLoginLanguage, clearPendingLoginLanguage,
     Date, Math, JSON, Map, Set, Promise, Error, navigator: { userAgent: 'Audit', platform: 'Audit' },
@@ -29,13 +30,120 @@ function harness({ cloud = null } = {}) {
     clearTimeout: (id) => timers.delete(id),
     getSupabase: () => ({
       rpc: (name, payload) => new Promise((resolve) => requests.push({ name, payload, resolve })),
-      from: () => ({ select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: cloud, error: null }) }) }) }),
+      from: (table) => ({ select: () => ({ eq: () => {
+        if (table !== 'calls') return { maybeSingle: async () => ({ data: cloudReads++ ? cloudAfter : cloud, error: null }) };
+        const rows = callRows ?? cloud?.calls?.map((payload) => ({ payload })) ?? [];
+        const query = {
+          order: () => query,
+          range: async (from, to) => ({ data: rows.slice(from, Math.min(to + 1, from + maxRows)), count: includeCount ? rows.length : null, error: from ? callsPageError : callsError }),
+          then: (resolve, reject) => Promise.resolve({ data: rows.slice(0, 1000), error: callsError }).then(resolve, reject),
+        };
+        return query;
+      } }) }),
     }),
   });
   vm.runInContext(source, context);
   vm.runInContext("onSync((type) => auditEvents.push(type));", Object.assign(context, { auditEvents: events }));
   return { values, sessionValues, requests, timers, events, run: (code) => vm.runInContext(code, context) };
 }
+
+test('un fallo de lectura de llamadas no descarga el snapshot antiguo ni altera datos locales', async () => {
+  const cloud = { state: { cloud: true }, calls: [], settings: {}, updated_at: 'cloud-base' };
+  for (const callsError of [
+    { message: 'Failed to fetch' },
+    { code: '42501', message: 'permission denied for table calls' },
+    { code: '57014', message: 'canceling statement due to statement timeout' },
+  ]) {
+    const h = harness({ cloud, callsError });
+    h.run("writeLocalSnapshot({state:{keep:true},calls:[{id:'keep'}],settings:{goal:25}}); adoptLocal('audit');");
+    const before = new Map(h.values);
+    await assert.rejects(h.run("resolveBoot('audit')"), (error) => error === callsError);
+    assert.deepEqual(h.values, before);
+  }
+});
+
+test('la compatibilidad antigua se limita a una tabla de llamadas ausente', async () => {
+  const cloud = { state: {}, calls: [{ id: 'legacy' }], settings: {}, updated_at: 'cloud-base' };
+  for (const code of ['42P01', 'PGRST205']) {
+    const h = harness({ cloud, callsError: { code, message: 'calls table missing' } });
+    const result = await h.run("fetchCloud('audit')");
+    assert.equal(result.calls[0].id, 'legacy');
+  }
+  const h = harness({ cloud, callRows: [{ payload: { id: 'normalized' } }] });
+  const result = await h.run("fetchCloud('audit')");
+  assert.equal(result.calls.length, 1);
+  assert.equal(result.calls[0].id, 'normalized');
+});
+
+test('la descarga recupera todo el historial de más de mil llamadas', async () => {
+  const callRows = Array.from({ length: 2505 }, (_, index) => ({ payload: { id: `call-${String(index).padStart(5, '0')}` } }));
+  const h = harness({ cloud: { state: {}, calls: [], settings: {}, updated_at: 'cloud-base' }, callRows });
+  const result = await h.run("fetchCloud('audit')");
+  assert.equal(result.calls.length, 2505);
+  assert.equal(result.calls.at(-1).id, 'call-02504');
+});
+
+test('la descarga respeta un límite de API menor al tamaño de página', async () => {
+  const callRows = Array.from({ length: 505 }, (_, index) => ({ payload: { id: `call-${index}` } }));
+  const h = harness({ cloud: { state: {}, calls: [], settings: {}, updated_at: 'cloud-base' }, callRows, maxRows: 200 });
+  assert.equal((await h.run("fetchCloud('audit')")).calls.length, 505);
+});
+
+test('sin conteo la descarga sigue hasta una página vacía aunque la API limite las filas', async () => {
+  const callRows = Array.from({ length: 505 }, (_, index) => ({ payload: { id: `call-${index}` } }));
+  const h = harness({ cloud: { state: {}, calls: [], settings: {}, updated_at: 'cloud-base' }, callRows, maxRows: 200, includeCount: false });
+  const result = await h.run("fetchCloud('audit')");
+  assert.equal(result.calls.length, 505);
+  assert.equal(result.calls.at(-1).id, 'call-504');
+});
+
+test('un error de la RPC vigente no utiliza la escritura antigua ni confirma los cambios', async () => {
+  const h = harness();
+  h.run("writeLocalSnapshot({state:{keep:true},calls:[{id:'keep'}],settings:{}}); adoptLocal('audit');");
+  const pending = h.run('pushSnapshot()');
+  const error = { code: '42501', message: 'permission denied for function push_user_data_v2' };
+  h.requests[0].resolve({ data: null, error });
+  await new Promise((resolve) => setImmediate(resolve));
+  if (h.requests[1]) h.requests[1].resolve({ data: { updated_at: 'legacy-saved' }, error: null });
+  const result = await pending;
+  assert.equal(h.requests.length, 1);
+  assert.equal(result.error, error);
+  assert.equal(h.run('readMeta().dirty'), true);
+});
+
+test('la escritura antigua sigue disponible únicamente cuando falta la RPC vigente', async () => {
+  for (const code of ['42883', 'PGRST202']) {
+    const h = harness();
+    h.run("writeLocalSnapshot({state:{keep:true},calls:[{id:'keep'}],settings:{}}); adoptLocal('audit');");
+    const pending = h.run('pushSnapshot()');
+    h.requests[0].resolve({ data: null, error: { code, message: 'push_user_data_v2 not found' } });
+    await new Promise((resolve) => setImmediate(resolve));
+    assert.equal(h.requests[1].name, 'push_user_data');
+    assert.equal(h.requests[1].payload.p_calls[0].id, 'keep');
+    h.requests[1].resolve({ data: { updated_at: 'legacy-base' }, error: null });
+    assert.equal((await pending).error, undefined);
+    assert.equal(h.run('readMeta().dirty'), false);
+  }
+});
+
+test('un fallo en la segunda página no adopta ni confirma un historial incompleto', async () => {
+  const error = { message: 'Failed to fetch page 2' };
+  const h = harness({ cloud: { state: {}, calls: [], settings: {}, updated_at: 'cloud-base' },
+    callRows: Array.from({ length: 1001 }, (_, index) => ({ payload: { id: `call-${index}` } })), callsPageError: error });
+  h.run("writeLocalSnapshot({state:{keep:true},calls:[{id:'keep'}],settings:{}}); adoptLocal('audit');");
+  const before = new Map(h.values);
+  await assert.rejects(h.run("resolveBoot('audit')"), (caught) => caught === error);
+  assert.deepEqual(h.values, before);
+});
+
+test('una actualización de nube durante la descarga no mezcla estado antiguo con llamadas nuevas', async () => {
+  const h = harness({ cloud: { state: { old: true }, calls: [], settings: {}, updated_at: 'old-base' },
+    cloudAfter: { updated_at: 'new-base' }, callRows: [{ payload: { id: 'new-call' } }] });
+  h.run("writeLocalSnapshot({state:{keep:true},calls:[{id:'keep'}],settings:{}}); adoptLocal('audit');");
+  const before = new Map(h.values);
+  await assert.rejects(h.run("resolveBoot('audit')"), /Cloud snapshot changed/);
+  assert.deepEqual(h.values, before);
+});
 
 test('cambios durante una subida conservan dirty y se envían en el siguiente delta', async () => {
   const h = harness();

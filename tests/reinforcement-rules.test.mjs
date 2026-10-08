@@ -34,6 +34,14 @@ test('monetary milestones reach exact boundaries and reject nonfinite money', ()
   assert.deepEqual(monetaryMilestones(-100, 100).next, { pct: 25, remaining: 25 });
 });
 
+test('sumar pagos decimales alcanza el hito exacto sin pedir cero dólares adicionales', () => {
+  const result = monetaryMilestones(1.2 + 0.6, 3.6);
+  assert.deepEqual(result.crossed, [25, 50]);
+  assert.equal(result.next.pct, 75);
+  assert.deepEqual(monetaryMilestones(0.1 + 0.2, 0.3).crossed, [25, 50, 75, 100]);
+  assert.deepEqual(monetaryMilestones(1.799, 3.6).crossed, [25]);
+});
+
 test('active work requires a real open shift and suppresses support during calls or pauses', () => {
   const input = { shiftStartedAt: time('08:00'), now: time('10:00') };
   assert.equal(activeWorkSinceLastCall(input), 120 * MINUTE);

@@ -658,14 +658,26 @@ La aplicación funciona en producción con estas bases vigentes:
 - Landing bilingüe estática, canonical/hreflang y sitemap de cuatro páginas,
   preguntas frecuentes e imagen social. Un bundle público evita cargar tres
   copias de las traducciones; las fuentes no bloquean el primer render.
-- La versión actual de la app es 595; el puente es 1.3.0 y el resumen independiente 1.0.3. Refuerzo positivo, Logros y auditoría profunda
-  están terminados. Los siete fallos de la auditoría se corrigieron con
-  regresiones; cobertura y límites constan en
-  `docs/auditoria-profunda-2026-09-30.md`.
+- La versión actual de la app es 596; el puente es 1.3.0 y el resumen independiente
+  1.0.3. Refuerzo positivo y Logros están terminados. La auditoría profunda del
+  8 de octubre corrigió seis fallos adicionales con regresiones y preservó las
+  reparaciones anteriores. Cobertura y límites constan en
+  `docs/auditoria-profunda-2026-10-08.md`. La aparición por nombre en Google sigue
+  pendiente de procesamiento externo; no se repitieron solicitudes por cuota.
 
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v596** — Auditoría profunda de integridad y uso mensual.
+
+- Nube: historial completo paginado, compatibilidad antigua solo ante tabla/RPC
+  ausente y comprobación de revisión antes de adoptar datos descargados.
+- Puente: una pestaña desactualizada bloquea eventos automáticos hasta recargar,
+  conservando llamadas nuevas. Hitos monetarios toleran errores decimales mínimos.
+- 31 días simulados, 35 comprobaciones adicionales, 48 layouts y 298 pruebas
+  correctas. Checks/build de app y extensiones pasan. Datos reales intactos;
+  autenticación/nube entre dispositivos físicos no certificadas.
 
 **v595** — Identidad de la portada para búsquedas por nombre.
 
@@ -682,10 +694,3 @@ La aplicación funciona en producción con estas bases vigentes:
   explícita del usuario. Recalculate / Recalcular y el cálculo se conservan.
 - Build y verificaciones existentes de idiomas/separación; ZIP 1.0.3.
   Solo cambia el texto, sin modificar permisos o actualización del resumen.
-
-**Resumen independiente 1.0.2** — Calculate Period.
-
-- Botón, ayuda y popup usan Calculate Period, tal como pidió el usuario;
-  equivalente en español Calcular período. Recalculate / Recalcular se conserva.
-- Build y verificaciones existentes de idiomas/separación; ZIP 1.0.2.
-  No cambia el cálculo ni su comportamiento de actualización.

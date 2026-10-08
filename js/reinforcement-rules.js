@@ -32,10 +32,14 @@ export function monetaryMilestones(earnings, goal, claimed = []) {
   const target = finiteNumber(goal);
   const earned = Math.max(0, finiteNumber(earnings));
   if (target <= 0) return { crossed: [], next: null, claimed: MONETARY_STEPS.filter((pct) => previous.has(pct)) };
-  const attained = MONETARY_STEPS.filter((pct) => earned >= target * pct / 100);
+  const reached = (pct) => {
+    const threshold = target * pct / 100;
+    return earned >= threshold || threshold - earned <= Number.EPSILON * Math.max(1, earned, threshold) * 4;
+  };
+  const attained = MONETARY_STEPS.filter(reached);
   const crossed = attained.filter((pct) => !previous.has(pct));
   crossed.forEach((pct) => previous.add(pct));
-  const nextPct = MONETARY_STEPS.find((pct) => earned < target * pct / 100);
+  const nextPct = MONETARY_STEPS.find((pct) => !reached(pct));
   return {
     crossed,
     next: nextPct == null ? null : { pct: nextPct, remaining: Math.max(0, target * nextPct / 100 - earned) },

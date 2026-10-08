@@ -2,7 +2,7 @@ import { ui, translateText, translateMarkup, displayLocale, translateDocument } 
 import { applyAppearance, wireAppearance } from './appearance.js';
 import { wireAchievementHelp } from './help-tooltips.js';
 import { normalizeBattleWeapon } from './game-battle.js';
-import { createPropioReceiver, ignorePropioCall } from './propio-bridge.js';
+import { createPropioReceiver, createStorageRevisionGuard, ignorePropioCall } from './propio-bridge.js';
 // Cuerpo principal de la app (Inicio, Horario, Llamadas, Higher Rate, Finanzas, Reportes,
 // Calendario, Ajustes...). Vive como módulo ES aparte para no ser parte del documento HTML: lo
 // carga js/boot.js con un import() dinámico recién cuando la sesión y los datos están listos
@@ -612,6 +612,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
     setAppCalls(loadCalls());
     export function setCalls(value) { setAppCalls(value); }
     setAppSettings(loadSettings());
+    const localStorageRevision = createStorageRevisionGuard(localStorage, [STORAGE_KEY, CALLS_KEY, SETTINGS_KEY]);
     ensureCurrencySettings();
     translateDocument();
     applyTheme();
@@ -1238,7 +1239,9 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
     // ~300KB cada uno.
     function safeLocalStorageSet(key, jsonValue) {
       try {
+        localStorageRevision.isCurrent();
         localStorage.setItem(key, jsonValue);
+        localStorageRevision.record(key, jsonValue);
         return true;
       } catch {
         return false;
@@ -1285,7 +1288,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
         // Restaura solo las claves escritas; no borres datos intactos si tampoco se pueden reescribir.
         written.forEach(key => {
           if (previous[key] !== null) safeLocalStorageSet(key, previous[key]);
-          else { try { localStorage.removeItem(key); } catch {} }
+          else { try { localStorage.removeItem(key); localStorageRevision.record(key, null); } catch {} }
         });
         toast(STORAGE_QUOTA_TOAST);
       }
@@ -7645,6 +7648,7 @@ window.cycleGoalPace = cycleGoalPace;
 window.reportsCycleProjection = reportsCycleProjection;
 
 export const applyPropioBridgeEvent = createPropioReceiver({
+  canReceive: () => localStorageRevision.isCurrent(),
   getState: () => state,
   getCalls: () => calls,
   start: event => startCall({ startedAt: event.at, propioBridge: { callId: event.callId, payEstimated: true, timingEstimated: true } }),

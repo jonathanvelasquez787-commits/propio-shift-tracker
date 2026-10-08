@@ -6,7 +6,22 @@ export function ignorePropioCall(state, callId, now = Date.now()) {
   state.propioBridgeIgnoredCalls = [...ignored.filter(item => item?.at >= now - 48*60*60*1000 && item.callId !== callId), { callId, at: now }].slice(-2000);
 }
 
-export function createPropioReceiver({ getState, getCalls, start, end, catchUp, save, now = () => Date.now() }) {
+export function createStorageRevisionGuard(storage, keys) {
+  const known = new Map();
+  let stale = false;
+  try { keys.forEach(key => known.set(key, storage.getItem(key))); } catch { stale = true; }
+  return {
+    isCurrent() {
+      if (!stale) {
+        try { stale = keys.some(key => storage.getItem(key) !== known.get(key)); } catch { stale = true; }
+      }
+      return !stale;
+    },
+    record(key, value) { if (known.has(key)) known.set(key, value); },
+  };
+}
+
+export function createPropioReceiver({ getState, getCalls, start, end, catchUp, save, canReceive = () => true, now = () => Date.now() }) {
   function remember(state, event) {
     const cutoff = now() - 48*60*60*1000;
     const receipts = Array.isArray(state.propioBridgeReceipts) ? state.propioBridgeReceipts : [];
@@ -16,6 +31,7 @@ export function createPropioReceiver({ getState, getCalls, start, end, catchUp, 
   return function receive(raw) {
     const event = validateBridgeEvent(raw, now());
     if (!event) return { status: 'rejected', reason: 'invalid-event' };
+    if (!canReceive()) return { status: 'blocked', reason: 'stale-tab' };
     const state = getState();
     if (!state) return { status: 'blocked', reason: 'app-not-ready' };
     if (Array.isArray(state.propioBridgeReceipts) && state.propioBridgeReceipts.some(r => r?.id === event.id)) return save() === false ? { status: 'blocked', reason: 'storage' } : { status: 'ok', duplicate: true };
