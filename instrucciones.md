@@ -325,6 +325,14 @@ infieren versiones instaladas o una URL pública de tienda. No volver a
 presentarlos como tareas abiertas. Se conserva únicamente la visibilidad por
 nombre en Google como pendiente actual.
 
+Sitemap: el 8/10/2026 se agregó lastmod 2026-10-05 a las dos portadas,
+fecha verificada del cambio de identidad de v595. La cuota de solicitud
+manual no impide el rastreo normal. Mantener fechas de cambios significativos
+reales; no actualizarlas en cada despliegue ni inventar cambios. XML válido,
+seis checks SEO y build correctos. Señal para el rastreo, sin garantía de
+plazo ni posición; no se solicitó indexación manual de nuevo. Mantener
+visibilidad por nombre como pendiente hasta comprobar resultados.
+
 Visibilidad en Google: pendiente único vigente tras la confirmación del usuario
 del 8/10/2026. Comprobación directa de Google ese día: no aparece en la primera
 página por `propio shift tracker`. Search Console confirma raíz indexada,
