@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { parseFragment } from 'parse5';
 import { BATTLE_WEAPONS, normalizeBattleWeapon, createBattleQueue, battleMarkup, syncBattle, playBattleCall, stopBattle } from '../js/game-battle.js';
 
-function harness({ reduced = false, canvasAvailable = true } = {}) {
+function harness({ reduced = false, canvasAvailable = true, currentDay = false } = {}) {
   let now = 1000, sequence = 0;
   const frames = new Map(), timers = new Map(), observers = [], sounds = [], changes = [], pauses = [];
   class Node {
@@ -22,10 +22,11 @@ function harness({ reduced = false, canvasAvailable = true } = {}) {
   doc.documentElement = new Node(); doc.body = new Node(); doc.defaultView = host; doc.hidden = false;
   element.ownerDocument = doc; element.isConnected = true;
   element.matches = selector => selector === '.game-battle'; element.contains = node => node === element || Object.values(nodes).includes(node);
-  const names = ['stage','canvas','monster','hero-label','monster-label','monster-name','feed','notice','notice-text','banner','victory','selected','live','motion-note','duel-hud','touch','shortcuts','duel-button','work-note','hearts','time','points','best','duel-fill','duel-health','duel-hp','start','duel-message'];
+  const names = ['stage','canvas','monster','hero-label','monster-label','monster-name','feed','notice','notice-text','banner','victory','selected','live','motion-note','duel-hud','touch','shortcuts','duel-button','work-note','hearts','time','points','best','duel-fill','duel-health','duel-hp','start','duel-message','auto-hud','auto-hero-hp','auto-hero-fill','auto-hp','auto-fill','round','round-state','call-overlay','round-victory','auto-pause','charge-fill','charge-label','charge','special-button','special-name','weapon-select'];
   for (const name of names) nodes[name] = new Node();
   for (const name of ['auto','duel','start','attack','grenade','jump']) { nodes[name] = new Node(true); nodes[name].dataset.battleAction = name; }
   nodes['duel-button'] = nodes.duel;
+  for (const [name, action] of [['auto-pause','pause-auto'],['special-button','special']]) { nodes[name].button = true; nodes[name].dataset.battleAction = action; }
   nodes.hero = new Node(true); nodes.hero.dataset.battleAction = 'hero';
   const weapons = BATTLE_WEAPONS.map(w => { const node = new Node(true); node.dataset.battleWeapon = w.id; return node; });
   element.querySelector = selector => selector.includes('data-battle-action') ? nodes.hero : nodes[selector.match(/data-battle-([\w-]+)/)?.[1]];
@@ -45,7 +46,7 @@ function harness({ reduced = false, canvasAvailable = true } = {}) {
     disconnect() { this.disconnected = true; }
   }
   host.ResizeObserver = Observer; host.IntersectionObserver = Observer; host.MutationObserver = Observer;
-  const view = { dayKey: '10/03/2026', weapon: 'pistol', enabled: true, hpPct: 63, defeated: false, monsterMarkup: '<svg data-species="existing"></svg>' };
+  const view = { dayKey: '10/03/2026', currentDay, weapon: 'pistol', enabled: true, hpPct: 63, defeated: false, monsterMarkup: '<svg data-species="existing"></svg>' };
   const callbacks = { onSound: kind => sounds.push(kind), onWeaponChange: id => changes.push(id), onPause: () => pauses.push(true) };
   const mount = () => syncBattle(element, view, callbacks);
   const click = name => element.dispatch('click', { target: nodes[name] });
@@ -64,7 +65,7 @@ test('weapon selection normalizes only cosmetic catalog ids; imports work withou
   for (const value of ['grenade','invalid',null,{},'__proto__']) assert.equal(normalizeBattleWeapon(value), 'pistol');
   stopBattle(); assert.equal(playBattleCall({ dayKey: 'x' }), false);
   const markup = battleMarkup();
-  assert.equal((markup.match(/data-battle-weapon=/g) || []).length, 10);
+  assert.equal((markup.match(/<option value=/g) || []).length, 10);
   assert.ok(markup.indexOf('data-battle-health-slot') > markup.indexOf('data-battle-canvas'));
   assert.ok(markup.indexOf('data-battle-health-slot') < markup.indexOf('game-battle-controls'));
   assert.match(markup, /aria-live="polite"/);
@@ -221,5 +222,44 @@ test('same-day edits, deletions and goal changes cancel pending hits while addit
     h.view.goalUsd = 40; h.mount(); waitForImpact();
     assert.equal(hitCount(), 2); assert.equal(h.pauses.length, 3);
     assert.equal(h.view.goalUsd, 40); assert.equal(Object.keys(h.view.callSignatures).length, 1);
+  } finally { stopBattle(); }
+});
+
+test('autonomous rounds and specials preserve real HP, silence ambient fire and obey lifecycle', () => {
+  const h = harness({ currentDay: true });
+  try {
+    h.mount(); const original = JSON.stringify(h.view);
+    assert.equal(h.frames.size, 1);
+    for (let i = 0; i < 1000; i++) h.tick();
+    assert.ok(Number(h.element.dataset.autoRound) > 1);
+    assert.equal(h.element.dataset.battleHp, '63'); assert.equal(JSON.stringify(h.view), original);
+    assert.equal(h.sounds.length, 0);
+    h.click('auto-pause'); assert.equal(h.frames.size, 0);
+    h.mount(); assert.equal(h.frames.size, 0);
+    h.click('auto-pause'); assert.equal(h.frames.size, 1);
+    h.doc.hidden = true; h.doc.dispatch('visibilitychange'); assert.equal(h.frames.size, 0);
+    h.doc.hidden = false; h.doc.dispatch('visibilitychange'); assert.equal(h.frames.size, 1);
+    h.view.workMode = 'call'; h.mount(); assert.equal(h.frames.size, 0); assert.equal(h.nodes['call-overlay'].hidden, false);
+    h.click('special-button'); assert.equal(h.frames.size, 0);
+    h.view.workMode = 'break'; h.mount(); assert.equal(h.frames.size, 1);
+    h.view.defeated = true; h.mount(); assert.equal(h.frames.size, 0);
+    h.view.defeated = false; h.view.currentDay = false; h.mount(); assert.equal(h.frames.size, 0);
+  } finally { stopBattle(); }
+  assert.equal(h.listenerCount(), 0); assert.ok(h.observers.every(observer => observer.disconnected));
+});
+
+test('special and reduced motion remain static without changing account progress', () => {
+  const h = harness({ currentDay: true, reduced: true });
+  try {
+    h.mount(); const original = JSON.stringify(h.view);
+    h.click('special-button'); assert.equal(h.nodes['charge-label'].textContent, '0%');
+    assert.equal(h.frames.size, 0); assert.equal(h.element.dataset.battleHp, '63');
+    assert.equal(JSON.stringify(h.view), original);
+    h.doc.hidden = true; h.doc.dispatch('visibilitychange');
+    assert.equal(playBattleCall(h.event()), false); assert.equal(h.nodes.charge.attributes['aria-valuenow'], '25');
+    assert.equal(playBattleCall(h.event({ dayKey: 'wrong' })), false); assert.equal(h.nodes.charge.attributes['aria-valuenow'], '25');
+    h.doc.hidden = false; h.doc.dispatch('visibilitychange');
+    playBattleCall(h.event({ count: 4 })); assert.equal(h.nodes.charge.attributes['aria-valuenow'], '100');
+    assert.equal(h.frames.size, 0);
   } finally { stopBattle(); }
 });

@@ -21,20 +21,39 @@ a su propio día y pueden registrar una derrota histórica; no generan un
 ataque ni XP nuevo sobre el monstruo actual. Se conservan los límites,
 elegibilidad y sellado de XP de la gamificación anterior.
 
-## Armas y práctica
+## Combate automático y armas
 
 Hay diez armas: Pistola, Subfusil, Escopeta, Lanzacohetes, Railgun,
 Lanzallamas, Too Much, Dron, PSR B0531+21 y Varita mágica. Se seleccionan en
-las tarjetas o con las teclas 1–0 cuando el foco está dentro de la batalla.
+el selector o con las teclas 1–0 cuando el foco está dentro de la batalla.
 La elección es visual y se guarda en `settings.game.weapon`, junto con los
 ajustes exportables y sincronizados de la cuenta. Backups antiguos o valores
 inválidos usan Pistola.
 
-Tocar al héroe, usar el botón Práctica o Enter dispara sin modificar dinero,
-vida, llamadas, productividad, combo ni XP. Cada tercera activación muestra
-un aviso breve que explica que el daño requiere llamadas reales. Una ráfaga
-cuenta como una activación. Granada se usa con su botón, G o click derecho
-dentro de la escena; también es práctica.
+El héroe camina, dispara y salta automáticamente para esquivar contraataques.
+Cada victoria abre otra ronda después de una celebración breve. Las vidas
+HÉROE/MONSTRUO de la escena pertenecen exclusivamente a estas rondas: no
+cambian llamadas, ganancias, XP ni recibos. La vida real de la meta permanece
+debajo, identificada como VIDA DE LA META. El nivel y la barra de XP muestran
+progreso real. Un monstruo dormido aparece despierto mientras combate,
+conservando su estado financiero.
+
+El especial comienza cargado al montar la batalla. Activarlo consume la carga
+y causa daño temporal más fuerte. Las llamadas representadas recargan 25%
+cada una, hasta 100%; los lotes usan su cantidad agrupada. El tiempo y los
+disparos ambientales no recargan el poder. Rondas y carga son temporales,
+no se exportan ni sincronizan. Pausar detiene el combate ambiental. Durante
+una llamada live entra inmediatamente en modo tranquilo; al terminar vuelve
+el combate si no se había pausado manualmente. Fechas anteriores y una meta
+derrotada conservan resultados estáticos.
+
+## Duelo opcional
+
+Duelo · 60 s conserva tres vidas, puntos temporales, movimiento, salto,
+disparos y granadas. Solo está disponible en descanso o fuera del turno.
+Una llamada lo pausa y regresar exige Continuar duelo. Tocar al héroe o Enter
+dispara; G o click derecho lanza una granada. Sus puntos no modifican dinero,
+vida financiera, llamadas, productividad, combo ni XP.
 
 A/D o las flechas permiten caminar; Espacio o el botón de salto permiten
 saltar. Los controles táctiles ofrecen las mismas acciones. Las plataformas
@@ -42,15 +61,17 @@ del fondo son decorativas.
 
 ## Preferencias y recursos
 
-Los sonidos de armas reutilizan Sonidos arcade y sus controles de volumen.
+El combate ambiental es silencioso. Los ataques por llamadas y el duelo
+reutilizan Sonidos arcade y sus controles de volumen.
 Las celebraciones importantes tienen prioridad sobre los disparos. Apagar
 Logros retira la batalla y cancela efectos, avisos y sonidos pendientes,
 conservando los datos. Silenciar cancela también las voces ya programadas.
 
-La escena pausa su bucle cuando deja de estar visible y cancela efectos al
+La escena cancela rAF cuando deja de estar visible y cancela efectos al
 cambiar de fecha. Desmontarla libera listeners, observadores y temporizadores.
 La cola de representaciones y las partículas tienen límites. Movimiento
-reducido conserva mensajes y resultados estáticos; si canvas no está
+reducido conserva mensajes y resultados estáticos, sin rondas en segundo
+plano ni simular el tiempo transcurrido al volver; si canvas no está
 disponible, quedan el héroe SVG y los controles accesibles.
 
 Los personajes y efectos usan arte original adaptado del mockup aprobado,

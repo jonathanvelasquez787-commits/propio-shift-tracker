@@ -652,13 +652,14 @@ La aplicación funciona en producción con estas bases vigentes:
   `/app` sigue siendo el punto de carga y `/app.html` redirige conservando
   parámetros. La raíz conserva la landing pública indexable; al recargar,
   detecta la sesión y reabre la app. La PWA mantiene su identidad y precarga.
-- Gamificación compacta: modo automático tranquilo durante llamadas, ataque al
-  guardar una llamada y duelo opcional solo en descanso o fuera del turno. Las
+- Gamificación: combate automático con rondas temporales, contraataques y
+  esquivas; habilidad especial recargada por llamadas. Modo tranquilo durante
+  llamadas, pausa manual y duelo opcional en descanso o fuera del turno. Las
   diez armas, misiones, hitos y progreso financiero se conservan.
 - Landing bilingüe estática, canonical/hreflang y sitemap de cuatro páginas,
   preguntas frecuentes e imagen social. Un bundle público evita cargar tres
   copias de las traducciones; las fuentes no bloquean el primer render.
-- La versión actual de la app es 597; el puente es 1.3.0 y el resumen independiente
+- La versión actual de la app es 598; el puente es 1.3.0 y el resumen independiente
   1.0.3. Refuerzo positivo y Logros están terminados. La auditoría profunda del
   8 de octubre corrigió seis fallos; la ampliación corrigió cinco más en arranque,
   concurrencia y PWA. Cobertura y límites constan en
@@ -669,6 +670,18 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v598** — Combate automático del mockup aprobado.
+
+- Héroe que camina, dispara y esquiva; monstruo que contraataca, rondas y
+  celebraciones temporales sin modificar llamadas, dinero, recibos ni XP.
+- Panel responsive en claro/oscuro con nivel real, diez armas, pausa y
+  especiales. Las llamadas cargan 25% por representación individual; los
+  lotes agrupados conservan su cantidad. Rondas y meta usan vidas separadas.
+- Combate ambiental silencioso, suspendido al entrar en llamada, fuera de
+  vista, en fechas anteriores o con movimiento reducido. Duelo conservado.
+- 324 pruebas y checks/build correctos; navegador con datos sintéticos:
+  combate, especial, llamada live, carga al guardar y móvil sin overflow.
 
 **v597** — Auditoría ampliada con SQL aislado y fallos de red.
 
@@ -691,12 +704,3 @@ La aplicación funciona en producción con estas bases vigentes:
 - 31 días simulados, 35 comprobaciones adicionales, 48 layouts y 298 pruebas
   correctas. Checks/build de app y extensiones pasan. Datos reales intactos;
   autenticación/nube entre dispositivos físicos no certificadas.
-
-**v595** — Identidad de la portada para búsquedas por nombre.
-
-- Propio Shift Tracker al inicio del título y en el H1/presentación, en inglés
-  y español. Descripciones, Open Graph y WebSite usan la misma identidad.
-- Seis checks SEO y build completos; revisión de traducción, acceso y ancho
-  móvil. CI completa y Vercel correctos; Google confirma el HTML nuevo de
-  ambos idiomas. Solicitud de actualización rechazada por cuota, sin bucles.
-  Sin posición garantizada: Google debe volver a procesar la portada.

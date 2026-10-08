@@ -714,7 +714,7 @@ function renderArena() {
     document.getElementById('gameCallFx')?.replaceChildren();
     document.querySelectorAll('.game-pixel-fx-layer, .game-live-xp-float').forEach(node => node.remove());
   }
-  const renderKey = [workMode, dayKey, monsterState, monsterPhase, variant, displayName, day.combo, day.stats.earnings.toFixed(2), Math.round(day.hpPct * 10), Math.round((shadow ?? -1) * 10), day.missions.map((mission) => mission.ok ? 1 : 0).join(''), Object.values(state.game.equipment || {}).join('|'), completedCalls, day.xp, settings.game.weapon, settings.currencyLabel, settings.exchangeRate, displayLocale(), day.goal.usd, JSON.stringify(callSignatures)].join(':');
+  const renderKey = [workMode, dayKey, monsterState, monsterPhase, variant, displayName, day.combo, day.stats.earnings.toFixed(2), Math.round(day.hpPct * 10), Math.round((shadow ?? -1) * 10), day.missions.map((mission) => mission.ok ? 1 : 0).join(''), Object.values(state.game.equipment || {}).join('|'), completedCalls, day.xp, state.game.totalXp, settings.game.weapon, settings.currencyLabel, settings.exchangeRate, displayLocale(), day.goal.usd, JSON.stringify(callSignatures)].join(':');
   if (renderKey === lastArenaRenderKey) return;
   lastArenaRenderKey = renderKey;
   const impactClasses = root.dataset.gameDayKey === dayKey
@@ -731,14 +731,18 @@ function renderArena() {
   root.dataset.gamePhase = monsterPhase;
   root.dataset.gameIntensity = 'arcade';
   const monsterImageLabel = ui`${displayName}${customName ? `, ${translateText(day.species.name)}` : ''}, ${PHASE_LABELS[monsterPhase] || monsterPhase}, ${Math.round(day.hpPct)}% de vida`;
-  const sprite = monsterSvg({ species: day.species.id, state: monsterState, variant, hpPct: day.hpPct, sizeClass: 'lg', equipment: state.game.equipment })
+  const battleMonsterState = monsterState === 'sleeping' && dayKey === currentGameDayKey() && workMode !== 'call' ? 'angry' : monsterState;
+  const sprite = monsterSvg({ species: day.species.id, state: battleMonsterState, variant, hpPct: day.hpPct, sizeClass: 'lg', equipment: state.game.equipment })
     .replace(/ role="img" aria-label="[^"]*"/, ' aria-hidden="true"');
   if (!root.querySelector('.game-battle')) {
     stopBattle();
     root.innerHTML = `<div data-battle-summary></div>${battleMarkup()}<div class="game-pixel-arena-hint" data-battle-mission-hint></div>`;
   }
+  const level = gameLevelProgress();
   root.querySelector('[data-battle-summary]').innerHTML = ui`
-      <div class="game-arena-title-row"><h3>${escapeHtml(displayName)}</h3><span class="game-phase-meter" data-phase="${escapeHtml(monsterPhase)}" role="status" aria-label="Fase del monstruo: ${escapeHtml(PHASE_LABELS[monsterPhase] || monsterPhase)}" title="Las ganancias y la vida financiera no cambian por la fase.">${escapeHtml(PHASE_LABELS[monsterPhase] || monsterPhase)}</span><span class="game-combo-badge" title="Llamadas consecutivas del turno; se reinicia al tomar una pausa.">x${day.combo || 0}</span></div>
+      <div class="game-battle-heading"><span class="game-kicker">TU COMPAÑERO DE TURNO</span><div><h3>El héroe pelea por vos.</h3><span class="game-battle-auto-badge">Automático</span></div></div>
+      <div class="game-battle-profile"><strong>NV. ${level.level}</strong><div><span>Tu héroe <small>${level.current} / ${level.ceiling} XP</small></span><div role="progressbar" aria-label="Progreso de nivel del héroe" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(level.pct)}"><i style="width:${level.pct}%"></i></div></div></div>
+      <div class="game-arena-title-row"><span class="game-battle-day-name">${escapeHtml(displayName)}</span><span class="game-phase-meter" data-phase="${escapeHtml(monsterPhase)}" role="status" aria-label="Fase del monstruo: ${escapeHtml(PHASE_LABELS[monsterPhase] || monsterPhase)}" title="Las ganancias y la vida financiera no cambian por la fase.">${escapeHtml(PHASE_LABELS[monsterPhase] || monsterPhase)}</span><span class="game-combo-badge" title="Llamadas consecutivas del turno; se reinicia al tomar una pausa.">x${day.combo || 0}</span></div>
       <div class="game-battle-caption"><span class="game-kicker">MONSTRUO DEL DÍA · ${escapeHtml(formatCallDayLabel(dayKey))}</span><span class="game-monster-phrase">“${escapeHtml(translateText(day.species.phrase))}”</span></div>`;
   root.querySelector('[data-battle-health-slot]').innerHTML = ui`
       <div data-battle-stats></div>
@@ -752,9 +756,9 @@ function renderArena() {
     <div><span>Ganancias</span><strong>${withConversion(day.stats.earnings)}</strong></div>
     <div><span>Llamadas</span><strong>${completedCalls}</strong></div>
     <div title="El XP del día viene de tus llamadas y misiones. Se incorpora al nivel al cerrar el turno."><span>XP</span><strong>${day.xp} XP</strong></div>
-    <div class="game-hp-label"><span>VIDA</span><strong>${Math.round(day.hpPct)}%</strong></div>`;
+    <div class="game-hp-label"><span>VIDA DE LA META</span><strong>${Math.round(day.hpPct)}%</strong></div>`;
   root.querySelector('[data-battle-mission-hint]').innerHTML = `${gamePixelIcon('shield')}<span>${day.defeated ? translateText('Meta alcanzada. Las ganancias extra siguen contando.') : ui`${day.missions.filter((mission) => mission.applies !== false && !mission.ok).length} armaduras pendientes · completa tus misiones del día.`}</span>`;
-  syncBattle(root, { dayKey, workMode, enabled: active, weapon: settings.game.weapon, callSignatures, goalUsd: day.goal.usd, monsterMarkup: sprite, monsterLabel: translateText('MONSTRUO DEL DÍA'), monsterDescription: monsterImageLabel, monsterName: displayName, heroLabel: translateText('Centinela'), defeated: day.defeated, hpPct: day.hpPct }, {
+  syncBattle(root, { dayKey, currentDay: dayKey === currentGameDayKey(), workMode, enabled: active, weapon: settings.game.weapon, callSignatures, goalUsd: day.goal.usd, monsterMarkup: sprite, monsterLabel: translateText('MONSTRUO DEL DÍA'), monsterDescription: monsterImageLabel, monsterName: displayName, heroLabel: translateText('Centinela'), defeated: day.defeated, hpPct: day.hpPct }, {
     onWeaponChange: (weapon) => {
       settings.game.weapon = normalizeBattleWeapon(weapon);
       saveSettingsOnly();

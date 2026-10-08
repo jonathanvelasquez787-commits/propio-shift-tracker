@@ -1,5 +1,6 @@
 import { ui, translateText } from './i18n.js';
 import { createDuel, canPlayDuel } from './game-duel.js';
+import { createAutoBattle } from './game-auto.js';
 
 export const BATTLE_WEAPONS = Object.freeze([
   { id: 'pistol', name: 'Pistola', key: '1', hint: 'disparo simple', effect: 'bullet', pellets: 1, delay: 0, travel: .46 },
@@ -46,6 +47,20 @@ function weaponHint(id) {
     case 'psr': return translateText('pulso violeta');
     case 'wand': return translateText('estela de estrellas');
     default: return translateText('disparo simple');
+  }
+}
+function specialName(id) {
+  switch (id) {
+    case 'smg': return translateText('Lluvia de balas');
+    case 'shotgun': return translateText('Disparo triple');
+    case 'rocket': return translateText('Cohete doble');
+    case 'railgun': return translateText('Rayo cargado');
+    case 'flame': return translateText('Tormenta de fuego');
+    case 'too-much': return translateText('Doble núcleo');
+    case 'drone': return translateText('Escuadrón aéreo');
+    case 'psr': return translateText('Pulso estelar');
+    case 'wand': return translateText('Lluvia de estrellas');
+    default: return translateText('Disparo preciso');
   }
 }
 
@@ -96,6 +111,11 @@ export function battleMarkup() {
   return ui`<section class="game-battle" aria-label="Batalla del héroe">
     <div class="game-battle-stage" data-battle-stage tabindex="0" role="group" aria-label="Batalla: A y D para caminar, espacio para saltar, Enter para disparar y G para granada">
       <canvas data-battle-canvas aria-hidden="true"></canvas>
+      <div class="game-battle-auto-hud" data-battle-auto-hud>
+        <div><span>HÉROE <b data-battle-auto-hero-hp>100%</b></span><div class="game-battle-round-track"><i data-battle-auto-hero-fill></i></div></div>
+        <div class="game-battle-round"><span data-battle-round></span><strong data-battle-round-state></strong></div>
+        <div><span>MONSTRUO <b data-battle-auto-hp>72%</b></span><div class="game-battle-round-track game-battle-round-track--enemy"><i data-battle-auto-fill></i></div></div>
+      </div>
       <div class="game-battle-label game-battle-label--hero"><span>HÉROE</span><b data-battle-hero-label>Tu esfuerzo</b></div>
       <div class="game-battle-label game-battle-label--monster"><span data-battle-monster-label>MONSTRUO DEL DÍA</span><b data-battle-monster-name></b></div>
       <p class="game-battle-feed" data-battle-feed>Listo para tu próxima llamada</p>
@@ -103,12 +123,15 @@ export function battleMarkup() {
       <button type="button" class="game-battle-hero-target" data-battle-action="hero" aria-label="Tocar al héroe para disparar en el duelo">${fallbackHero()}</button>
       <div class="game-battle-notice" data-battle-notice hidden><strong>HÉROE</strong><span data-battle-notice-text></span></div>
       <p class="game-battle-banner" data-battle-banner hidden></p>
+      <div class="game-battle-call-overlay" data-battle-call-overlay hidden><strong>Vos atendé. Él te acompaña.</strong><span>Modo tranquilo durante la llamada</span></div>
+      <div class="game-battle-round-victory" data-battle-round-victory hidden><span>✦ VICTORIA ✦</span><strong>¡Otra ronda ganada!</strong><small>Tu héroe se prepara para la siguiente.</small></div>
       <div class="game-battle-victory" data-battle-victory hidden><span>★ ★ ★</span><strong>VICTORIA</strong><small>Tu esfuerzo cuenta</small></div>
     </div>
     <div class="game-battle-health" data-battle-health-slot><div data-battle-stats></div></div>
     <div class="game-battle-mode-row">
       <div class="game-battle-modes" role="group" aria-label="Modo de juego"><button type="button" data-battle-action="auto" aria-pressed="true">Automático</button><button type="button" data-battle-action="duel" aria-pressed="false" data-battle-duel-button>Duelo · 60 s</button></div>
       <small data-battle-work-note></small>
+      <button type="button" data-battle-action="pause-auto" data-battle-auto-pause aria-pressed="false">Pausar</button>
     </div>
     <div class="game-battle-duel-hud" data-battle-duel-hud hidden>
       <strong data-battle-hearts aria-label="Vidas del héroe"></strong><span data-battle-time></span><span data-battle-points></span><span data-battle-best></span>
@@ -121,10 +144,11 @@ export function battleMarkup() {
     <div class="game-battle-controls"><details class="game-battle-shortcuts" data-battle-shortcuts hidden><summary>Teclas</summary><div class="game-battle-keys"><span><kbd>A D</kbd> Caminar</span><span><kbd>Espacio</kbd> Saltar</span><span><kbd>Enter</kbd> Disparar</span><span><kbd>G / RMB</kbd> Granada</span></div></details>
       <div class="game-battle-touch" data-battle-touch hidden role="group" aria-label="Controles del duelo"><button type="button" data-battle-direction="a" aria-label="Caminar a la izquierda">←</button><button type="button" data-battle-direction="d" aria-label="Caminar a la derecha">→</button><button type="button" data-battle-action="jump" aria-label="Saltar">↑</button><button type="button" data-battle-action="attack">Disparar</button><button type="button" data-battle-action="grenade">Granada</button></div>
     </div>
-    <details class="game-battle-armory"><summary class="game-battle-armory-head"><span>Armas</span><small data-battle-selected></small></summary>
-      <div class="game-battle-weapons" role="group" aria-label="Elegir arma del héroe">${BATTLE_WEAPONS.map(w => `<button type="button" class="game-battle-weapon" data-battle-weapon="${w.id}" aria-pressed="${w.id === 'pistol'}" title="${escape(weaponHint(w.id))}">${weaponIcon(w.id)}<span>${escape(weaponName(w.id))}</span><kbd>${w.key}</kbd></button>`).join('')}</div>
-    </details>
+    <div class="game-battle-loadout"><div><label for="gameBattleWeapon">ARMA EQUIPADA</label><select id="gameBattleWeapon" data-battle-weapon-select>${BATTLE_WEAPONS.map(w => `<option value="${w.id}">${escape(weaponName(w.id))}</option>`).join('')}</select><small data-battle-selected></small></div>
+      <div class="game-battle-special"><div><span>Habilidad especial</span><strong data-battle-charge-label>Lista</strong></div><div class="game-battle-charge-track" role="progressbar" aria-label="Carga de la habilidad especial" aria-valuemin="0" aria-valuemax="100" data-battle-charge><i data-battle-charge-fill></i></div><button type="button" data-battle-action="special" data-battle-special-button><span data-battle-special-name></span></button></div>
     </div>
+    </div>
+    <div class="game-battle-footer"><span>Tus llamadas cargan el poder del héroe.</span><span>Rondas de juego · tus ganancias y XP se conservan.</span></div>
     <p class="game-battle-motion-note" data-battle-motion-note hidden>Movimiento reducido: sin destellos ni sacudidas.</p>
     <p class="game-battle-live" data-battle-live role="status" aria-live="polite" aria-atomic="true"></p>
   </section>`;
@@ -149,6 +173,8 @@ function createBattle(element) {
   try { ctx = canvas.getContext?.('2d') || null; } catch {}
   element.dataset.battleCanvas = ctx ? 'ready' : 'fallback';
   const duel = createDuel();
+  const auto = createAutoBattle();
+  let autoPaused = false;
   let mode = 'auto', work = 'ready', lastDuelAnnouncement = '';
   const queue = createBattleQueue(), keys = new Set(), cleanup = [], observers = [];
   const motion = host.matchMedia?.('(prefers-reduced-motion: reduce)');
@@ -159,6 +185,7 @@ function createBattle(element) {
   const listen = (node, type, handler, options) => { node?.addEventListener?.(type, handler, options); cleanup.push(() => node?.removeEventListener?.(type, handler, options)); };
   const boss = () => ({ x: world.w - (world.w < 500 ? 65 : 104), y: world.floor - (world.w < 500 ? 52 : 66) });
   const visible = () => !destroyed && element.isConnected && !doc.hidden && intersecting && !element.closest('[hidden]') && element.getClientRects().length > 0 && host.getComputedStyle(element).visibility !== 'hidden';
+  const canAuto = () => mode === 'auto' && work !== 'call' && view.currentDay !== false && !view.defeated && !autoPaused && !reduced && !!ctx;
   const sound = kind => { if (work !== 'call' && visible() && callbacks.onSound) { soundPending = true; callbacks.onSound(kind); } };
   function clearEffects() {
     queue.clear(); active = null; bullets = []; particles = []; keys.clear(); flash = 0; hitUntil = 0; droneUntil = 0;
@@ -183,7 +210,7 @@ function createBattle(element) {
     element.dataset.battlePaused = 'false';
     const manual = mode === 'duel' && duel.snapshot().status === 'running' && canPlayDuel(work);
     const effects = !reduced && ctx && (queue.size || active || bullets.length || particles.length || bannerUntil || noticeUntil);
-    if (work === 'call' || (!manual && !effects) || !host.requestAnimationFrame) {
+    if (work === 'call' || (!manual && !canAuto() && !effects) || !host.requestAnimationFrame) {
       if (raf) host.cancelAnimationFrame?.(raf);
       raf = 0; running = false; lastTime = 0; draw(); return;
     }
@@ -208,12 +235,36 @@ function createBattle(element) {
   function selection(id, notify = false) {
     weapon = normalizeBattleWeapon(id);
     const w = weaponFor(weapon);
-    $('selected').textContent = `${weaponName(w.id)} · ${weaponHint(w.id)}`;
+    $('selected').textContent = weaponHint(w.id);
+    $('weapon-select').value = weapon;
+    $('special-name').textContent = specialName(weapon);
     element.querySelectorAll('[data-battle-weapon]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.battleWeapon === weapon)));
     if (notify) callbacks.onWeaponChange?.(weapon);
     draw();
   }
   function announce(text) { $('live').textContent = text; }
+  function updateAuto() {
+    const a = auto.snapshot(), manual = mode === 'duel';
+    const text = (name, value) => { if ($(name).textContent !== value) $(name).textContent = value; };
+    const hidden = (name, value) => { if ($(name).hidden !== value) $(name).hidden = value; };
+    hidden('auto-hud', manual); hidden('auto-pause', manual);
+    hidden('call-overlay', work !== 'call');
+    hidden('round-victory', manual || work === 'call' || view.defeated || a.status !== 'victory');
+    text('round', ui`RONDA ${a.round}`);
+    text('round-state', work === 'call' ? translateText('Modo tranquilo') : view.currentDay === false ? translateText('Día anterior') : autoPaused ? translateText('En pausa') : a.status === 'victory' || view.defeated ? translateText('Victoria') : translateText('En combate'));
+    text('auto-hero-hp', `${a.hp}%`); text('auto-hp', `${a.enemyHp}%`);
+    $('auto-hero-fill').style.width = `${a.hp}%`; $('auto-fill').style.width = `${a.enemyHp}%`;
+    $('charge-fill').style.width = `${a.charge}%`; $('charge').setAttribute('aria-valuenow', String(a.charge));
+    text('charge-label', a.charge === 100 ? translateText('Lista') : `${a.charge}%`);
+    $('special-button').disabled = a.charge < 100 || manual || work === 'call' || view.currentDay === false || !!view.defeated || a.status === 'victory';
+    $('auto-pause').disabled = work === 'call' || reduced || !ctx || view.currentDay === false || !!view.defeated;
+    $('auto-pause').setAttribute('aria-pressed', String(autoPaused));
+    text('auto-pause', autoPaused ? translateText('Continuar') : translateText('Pausar'));
+    if (!manual) text('work-note', work === 'call' ? translateText('En llamada · modo tranquilo') : autoPaused ? translateText('En pausa') : translateText('El héroe esquiva, dispara y sigue adelante.'));
+    $('weapon-select').disabled = work === 'call';
+    element.dataset.autoRound = String(a.round); element.dataset.autoHp = String(a.enemyHp);
+    element.dataset.autoState = a.status;
+  }
   function message(event) {
     const call = event.count > 1 ? ui`${event.count} llamadas validadas` : translateText('Llamada completada');
     return [call, event.amountText, event.xp ? `+${event.xp} XP` : '', event.critical ? translateText('¡Crítico!') : ''].filter(Boolean).join(' · ');
@@ -236,13 +287,13 @@ function createBattle(element) {
         particles.push({ x: b.x, y: b.y, vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed-50, age: 0, life: .45+Math.random()*.25, color: ['magic','pulse','beam'].includes(w.effect) ? 'monster-light' : i%2 ? 'hero-light' : 'helmet', size: 3+Math.floor(Math.random()*3) });
       }
     }
-    sound(event.practice ? 'practice-hit' : event.critical ? 'critical' : 'hit');
+    if (!event.ambient) sound(event.practice ? 'practice-hit' : event.critical ? 'critical' : 'hit');
     if (!event.practice) { banner(message(event)); active = null; }
   }
   function emit(event, id) {
     const w = weaponFor(id), b = boss();
     hero.face = 1;
-    sound(`shoot-${id}`);
+    if (!event.ambient) sound(`shoot-${id}`);
     if (reduced || !ctx) { impact(event, id); return; }
     hero.recoil = .14; flash = .09;
     const from = { x: hero.x + 38, y: world.floor - 40 - hero.jump };
@@ -287,7 +338,8 @@ function createBattle(element) {
     const attack = d.attacks.find(item => item.age <= item.warning);
     const message = d.status === 'won' ? translateText('¡Duelo ganado!') : d.status === 'lost' ? translateText('Ronda terminada · probá otra vez') : d.status === 'paused' ? translateText('Duelo pausado · continuá cuando estés libre') : d.status === 'ready' ? translateText('60 segundos · 3 vidas · esquivá y dispará') : attack?.kind === 'wave' ? translateText('Onda baja · saltá') : attack?.kind === 'projectile' ? translateText('Disparo dirigido · movete') : attack?.kind === 'charge' ? translateText('Embestida · esquivá o saltá') : translateText('Dispará al monstruo');
     if (message !== lastDuelAnnouncement) { $('duel-message').textContent = message; lastDuelAnnouncement = message; }
-    if (!manual && !bannerUntil) $('feed').textContent = work === 'call' ? translateText('Concentrate en tu llamada') : translateText('Tu héroe ataca al completar una llamada');
+    if (!manual && !bannerUntil) $('feed').textContent = work === 'call' ? translateText('Concentrate en tu llamada') : translateText('El héroe esquiva, dispara y sigue adelante.');
+    updateAuto();
   }
   function changeMode(next) {
     if (next === 'duel' && (!canPlayDuel(work) || !ctx)) return;
@@ -311,7 +363,9 @@ function createBattle(element) {
   }
   function jump() { if (mode === 'duel' && duel.snapshot().status === 'running' && canPlayDuel(work) && visible() && hero.jump === 0) { hero.vy = 340; reconcile(); } }
   function play(event) {
-    if (destroyed || String(event.dayKey ?? '') !== String(view.dayKey ?? '') || !visible()) return false;
+    if (destroyed || String(event.dayKey ?? '') !== String(view.dayKey ?? '')) return false;
+    if (view.currentDay !== false) { auto.recordCall(event.count); updateAuto(); }
+    if (!visible()) return false;
     if (work === 'call') return true;
     if (mode === 'duel') changeMode('auto');
     queue.push(event, active ? MAX_QUEUE-1 : MAX_QUEUE);
@@ -335,7 +389,7 @@ function createBattle(element) {
     rect(world.w*.29,world.floor-67,world.w*.13,5,'floor'); rect(world.w*.6,world.floor-106,world.w*.1,5,'floor');
   }
   function drawHero() {
-    const walking=keys.size>0, stride=!reduced && walking ? Math.sin(hero.walk)*5 : 0, idle=0;
+    const walking=keys.size>0 || canAuto(), stride=!reduced && walking ? Math.sin(hero.walk)*5 : 0, idle=0;
     ctx.save(); ctx.translate(Math.round(hero.x),Math.round(world.floor-hero.jump+idle)); ctx.scale(hero.face,1);
     const p=(x,y,w,h,c)=>rect(x*2,y*2,w*2,h*2,c);
     ctx.globalAlpha=.2; rect(-22,0,48,6,'ink'); ctx.globalAlpha=1;
@@ -348,6 +402,7 @@ function createBattle(element) {
   }
   function projectile(b,q) {
     const x=b.x+(b.tx-b.x)*q; let y=b.y+(b.ty-b.y)*q;
+    if (b.effect === 'counter') { rect(x-6,y-4,12,8,'monster-light'); rect(x+7,y-2,14,4,'monster-shadow'); return; }
     if (b.effect==='grenade') y-=Math.sin(q*Math.PI)*85;
     if (b.effect==='beam') { ctx.strokeStyle=colors['monster-light']; ctx.lineWidth=5; ctx.beginPath(); ctx.moveTo(b.x,b.y); ctx.lineTo(x,y); ctx.stroke(); ctx.strokeStyle=colors['hero-light']; ctx.lineWidth=2; ctx.stroke(); rect(x-3,y-5,6,10,'hero-light'); }
     else if (b.effect==='rocket') { rect(x-24,y-1,10,2,'gold'); rect(x-17,y-3,12,6,'helmet'); rect(x-7,y-5,15,10,'ink'); rect(x-5,y-3,11,6,'floor'); rect(x+6,y-1,5,2,'helmet'); }
@@ -377,7 +432,7 @@ function createBattle(element) {
         }
       }
       drawHero();
-      if (clock<droneUntil&&!reduced) {
+      if ((clock<droneUntil || canAuto() && weapon === 'drone')&&!reduced) {
         const x=hero.x+42,y=world.floor-hero.jump-109+Math.sin(clock*6)*3;
         rect(x-15,y-4,30,3,'ink'); rect(x-19,y-7,13,2,'hero-light'); rect(x+6,y-7,13,2,'hero-light'); rect(x-7,y-3,14,10,'hero-dark'); rect(x-4,y-2,8,5,'hero'); rect(x-1,y+5,3,5,'monster-light');
       }
@@ -391,7 +446,7 @@ function createBattle(element) {
     $('notice').style.left=`${Math.max(124,Math.min(world.w-124,hero.x+50))}px`;
     $('notice').style.top=`${Math.max(64,world.floor-hero.jump-147)}px`;
     const charge = mode === 'duel' && duel.snapshot().attacks.find(attack => attack.kind === 'charge' && attack.age > attack.warning);
-    monster.style.transform = charge && !reduced ? `translateX(${Math.round(charge.x*world.w-boss().x)}px)` : !reduced&&clock<hitUntil ? `translateX(${Math.sin(clock*120)*4}px)` : '';
+    monster.style.transform = charge && !reduced ? `translateX(${Math.round(charge.x*world.w-boss().x)}px)` : !reduced&&clock<hitUntil ? `translateX(${Math.sin(clock*120)*4}px)` : canAuto() ? `translateY(${Math.sin(clock*3)*2}px)` : '';
     if (clock>=hitUntil) monster.removeAttribute('data-battle-hit');
   }
   function frame(time) {
@@ -399,9 +454,17 @@ function createBattle(element) {
     if (!visible()) { pause(); return; }
     if (work === 'call') { clearEffects(); draw(); return; }
     const dt=Math.min(lastTime?(time-lastTime)/1000:.016,.04); lastTime=time; clock+=dt;
+    if (canAuto()) {
+      for (const event of auto.step(dt, weapon)) {
+        if (event === 'shot') emit({ practice: true, ambient: true }, weapon);
+        else if (event === 'counter' && bullets.length < MAX_EFFECTS) bullets.push({ x: boss().x, y: boss().y, tx: hero.x, ty: world.floor-32, elapsed: 0, travel: .8, effect: 'counter' });
+      }
+      const a = auto.snapshot(); hero.x = Math.max(32, Math.min(boss().x-82, a.x*world.w)); hero.jump = a.jump; hero.face = 1; hero.walk += dt*8;
+      updateAuto();
+    }
     const left=keys.has('a')||keys.has('arrowleft'), right=keys.has('d')||keys.has('arrowright');
     if (left||right) { hero.x=Math.max(32,Math.min(boss().x-82,hero.x+(right?1:-1)*150*dt)); hero.face=right?1:-1; hero.walk+=dt*13; }
-    if (hero.vy||hero.jump) { hero.jump=Math.max(0,hero.jump+hero.vy*dt); hero.vy-=880*dt; if (hero.jump===0) hero.vy=0; }
+    if (mode === 'duel' && (hero.vy||hero.jump)) { hero.jump=Math.max(0,hero.jump+hero.vy*dt); hero.vy-=880*dt; if (hero.jump===0) hero.vy=0; }
     hero.recoil=Math.max(0,hero.recoil-dt); flash=Math.max(0,flash-dt);
     if (mode === 'duel') {
       const before = duel.snapshot();
@@ -425,7 +488,7 @@ function createBattle(element) {
     const signatures = next.callSignatures || {};
     const stale = hasSynced && !dayChanged && (view.goalUsd !== next.goalUsd || Object.entries(view.callSignatures).some(([id, signature]) => !Object.hasOwn(signatures, id) || signatures[id] !== signature));
     if (dayChanged || stale) {
-      duel.reset(); mode = 'auto'; clearEffects(); callbacks.onPause?.(); $('feed').textContent=translateText('Listo para tu próxima llamada'); $('live').textContent='';
+      duel.reset(); auto.reset(); mode = 'auto'; clearEffects(); callbacks.onPause?.(); $('feed').textContent=translateText('Listo para tu próxima llamada'); $('live').textContent='';
       if (dayChanged) hero.x=Math.min(96,world.w*.22);
     }
     const nextWork = ['call','ready','break','off'].includes(next.workMode) ? next.workMode : 'ready';
@@ -457,10 +520,16 @@ function createBattle(element) {
     }
     const action=button.dataset.battleAction;
     if (action === 'auto' || action === 'duel') changeMode(action);
+    else if (action === 'pause-auto' && mode === 'auto') { autoPaused = !autoPaused; clearEffects(); callbacks.onPause?.(); updateAuto(); draw(); reconcile(); }
+    else if (action === 'special' && mode === 'auto' && work !== 'call' && view.currentDay !== false && !view.defeated && visible() && auto.special()) {
+      autoPaused = false; emit({ practice: true, ambient: true }, weapon); emit({ practice: true, ambient: true }, weapon); emit({ practice: true, ambient: true }, weapon);
+      banner(specialName(weapon)); updateAuto(); reconcile();
+    }
     else if (action === 'start') beginDuel();
     else if (action==='attack'||action==='hero'||action==='grenade') { practice(action==='grenade'?'grenade':weapon); if (action==='hero') stage.focus({ preventScroll:true }); }
     else if (action==='jump') jump();
   });
+  listen($('weapon-select'),'change',()=>selection($('weapon-select').value,true));
   listen(stage,'contextmenu',event=>{ event.preventDefault(); practice('grenade'); });
   listen(stage,'pointerdown',event=>{ if (event.button===0&&event.target===canvas) stage.focus({ preventScroll:true }); });
   listen(element,'keydown',event=>{

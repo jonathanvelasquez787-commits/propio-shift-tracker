@@ -492,12 +492,6 @@
       "js/positive-reinforcement.js"
     ]
   },
-  "s_0b943917": {
-    "source": "VIDA",
-    "files": [
-      "js/game.js"
-    ]
-  },
   "s_0b96feb6": {
     "source": "Saltar",
     "files": [
@@ -587,6 +581,12 @@
     "source": "Reclamar:",
     "files": [
       "privacidad.html"
+    ]
+  },
+  "s_0d0de6fb": {
+    "source": "Vos atendé. Él te acompaña.",
+    "files": [
+      "js/game-battle.js"
     ]
   },
   "s_0d32876e": {
@@ -1153,6 +1153,12 @@
       "app.html"
     ]
   },
+  "s_17672089": {
+    "source": "NV. {{v0}}",
+    "files": [
+      "js/game.js"
+    ]
+  },
   "s_179a5a16": {
     "source": "Cargando…",
     "files": [
@@ -1193,6 +1199,12 @@
     "source": "Esta semana ya pasó — queda protegida, solo lectura.",
     "files": [
       "app.html"
+    ]
+  },
+  "s_1858f3f7": {
+    "source": "RONDA {{v0}}",
+    "files": [
+      "js/game-battle.js"
     ]
   },
   "s_188379e2": {
@@ -1485,6 +1497,12 @@
       "terminos.html"
     ]
   },
+  "s_1e364e99": {
+    "source": "Cohete doble",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_1e684c40": {
     "source": "Nombre",
     "files": [
@@ -1723,6 +1741,12 @@
       "app.html"
     ]
   },
+  "s_23e3db89": {
+    "source": "MONSTRUO DEL DÍA · {{v10}}",
+    "files": [
+      "js/game.js"
+    ]
+  },
   "s_23e9fe02": {
     "source": "Meta (%)",
     "files": [
@@ -1948,6 +1972,12 @@
       "js/app-main.js"
     ]
   },
+  "s_282a5030": {
+    "source": "Tu héroe se prepara para la siguiente.",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_28697b71": {
     "source": "Progreso del día",
     "files": [
@@ -2109,6 +2139,12 @@
     "source": "Contraer bloques al terminar",
     "files": [
       "app.html"
+    ]
+  },
+  "s_2bb22b91": {
+    "source": "Rondas de juego · tus ganancias y XP se conservan.",
+    "files": [
+      "js/game-battle.js"
     ]
   },
   "s_2be6362d": {
@@ -2371,12 +2407,6 @@
     "source": "Llamada completada · sumaste {amount} a tu día",
     "files": [
       "js/reinforcement-feedback.js"
-    ]
-  },
-  "s_3114261a": {
-    "source": "Elegir arma del héroe",
-    "files": [
-      "js/game-battle.js"
     ]
   },
   "s_313081ca": {
@@ -2674,6 +2704,12 @@
       "app.html"
     ]
   },
+  "s_364c83ca": {
+    "source": "VIDA DE LA META",
+    "files": [
+      "js/game.js"
+    ]
+  },
   "s_364d8fdb": {
     "source": "·\n      Responsable del tratamiento:",
     "files": [
@@ -2801,6 +2837,12 @@
       "js/app-main.js"
     ]
   },
+  "s_38de2db6": {
+    "source": "Tormenta de fuego",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_39096e35": {
     "source": "Progreso contra el jefe del ciclo",
     "files": [
@@ -2891,6 +2933,12 @@
     "source": "Campanita",
     "files": [
       "app.html"
+    ]
+  },
+  "s_3a7aad31": {
+    "source": "{{v1}} / {{v2}} XP",
+    "files": [
+      "js/game.js"
     ]
   },
   "s_3a9899b4": {
@@ -3126,6 +3174,12 @@
     "source": "📅 Volviste a Hoy",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_416399c5": {
+    "source": "En combate",
+    "files": [
+      "js/game-battle.js"
     ]
   },
   "s_41641aef": {
@@ -3788,6 +3842,12 @@
       "js/finance.js"
     ]
   },
+  "s_4dfa2947": {
+    "source": "Modo tranquilo",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_4e0828b1": {
     "source": "Usado",
     "files": [
@@ -3850,6 +3910,12 @@
       "js/app-main.js"
     ]
   },
+  "s_4ee72ce6": {
+    "source": "Lluvia de estrellas",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_4f1437b3": {
     "source": "Meta alcanzada",
     "files": [
@@ -3878,6 +3944,12 @@
     "source": "Guardaste evidencia de una llamada que cerró bien",
     "files": [
       "js/reinforcement-feedback.js"
+    ]
+  },
+  "s_4fa9181c": {
+    "source": "Disparo preciso",
+    "files": [
+      "js/game-battle.js"
     ]
   },
   "s_4fc93013": {
@@ -4352,6 +4424,12 @@
       "app.html"
     ]
   },
+  "s_56b7619d": {
+    "source": "Disparo triple",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_56ba7a49": {
     "source": "Otro: {{v0}}",
     "files": [
@@ -4419,16 +4497,16 @@
       "js/monsters.js"
     ]
   },
+  "s_58753978": {
+    "source": "✦ VICTORIA ✦",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_588ccd07": {
     "source": "Un resumen por día (llamadas, minutos productivos, adherencia, ganancias) más el detalle de cada llamada del período — pensado para declarar ingresos, no reemplaza el respaldo JSON de arriba. El PDF se abre listo para \"Imprimir → Guardar como PDF\" desde tu navegador.",
     "files": [
       "app.html"
-    ]
-  },
-  "s_588ce5a1": {
-    "source": "x{{v4}}",
-    "files": [
-      "js/game.js"
     ]
   },
   "s_58a5a0a4": {
@@ -4490,6 +4568,12 @@
     "source": "Enfrentaste una llamada difícil · tu esfuerzo cuenta",
     "files": [
       "js/reinforcement-feedback.js"
+    ]
+  },
+  "s_599b419c": {
+    "source": "ARMA EQUIPADA",
+    "files": [
+      "js/game-battle.js"
     ]
   },
   "s_59cbdf10": {
@@ -4586,6 +4670,12 @@
   },
   "s_5c644885": {
     "source": "Las ganancias y la vida financiera no cambian por la fase.",
+    "files": [
+      "js/game.js"
+    ]
+  },
+  "s_5c96f3dc": {
+    "source": "“{{v11}}”",
     "files": [
       "js/game.js"
     ]
@@ -5563,6 +5653,12 @@
       "js/reports.js"
     ]
   },
+  "s_70f3e63b": {
+    "source": "Fase del monstruo: {{v7}}",
+    "files": [
+      "js/game.js"
+    ]
+  },
   "s_7113f555": {
     "source": "XP",
     "files": [
@@ -5766,6 +5862,12 @@
       "js/game.js",
       "js/positive-reinforcement.js",
       "js/schedule.js"
+    ]
+  },
+  "s_74e64e64": {
+    "source": "En pausa",
+    "files": [
+      "js/game-battle.js"
     ]
   },
   "s_7527928a": {
@@ -6228,6 +6330,12 @@
       "js/app-main.js"
     ]
   },
+  "s_7d3dc90c": {
+    "source": "MONSTRUO",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_7d55762e": {
     "source": "La app nunca compra nada ni interrumpe una llamada. Tú decides cuándo realizar, guardar o cambiar cada premio.",
     "files": [
@@ -6421,7 +6529,8 @@
   "s_81496bac": {
     "source": "Victoria",
     "files": [
-      "app.html"
+      "app.html",
+      "js/game-battle.js"
     ]
   },
   "s_8159f1c5": {
@@ -6631,6 +6740,12 @@
       "js/calendar.js"
     ]
   },
+  "s_845bab6d": {
+    "source": "Tu héroe",
+    "files": [
+      "js/game.js"
+    ]
+  },
   "s_8497d1bd": {
     "source": "No se pudo verificar tu sesión.",
     "files": [
@@ -6669,12 +6784,6 @@
   },
   "s_8584b0f5": {
     "source": "Duelo disponible durante el descanso",
-    "files": [
-      "js/game-battle.js"
-    ]
-  },
-  "s_85a9387d": {
-    "source": "Armas",
     "files": [
       "js/game-battle.js"
     ]
@@ -7571,6 +7680,12 @@
       "js/reinforcement-rules.js"
     ]
   },
+  "s_96edb2a3": {
+    "source": "Rayo cargado",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_96f89138": {
     "source": "{{v0}} {{v1}}",
     "files": [
@@ -7763,6 +7878,12 @@
     "source": "Subiendo {{v0}}…",
     "files": [
       "js/boot.js"
+    ]
+  },
+  "s_9ac07b53": {
+    "source": "¡Otra ronda ganada!",
+    "files": [
+      "js/game-battle.js"
     ]
   },
   "s_9acf49fd": {
@@ -8076,6 +8197,12 @@
     "source": "{{v6}}%",
     "files": [
       "js/reports.js"
+    ]
+  },
+  "s_a0957f26": {
+    "source": "x{{v9}}",
+    "files": [
+      "js/game.js"
     ]
   },
   "s_a098978e": {
@@ -8567,7 +8694,8 @@
   "s_aa8357e3": {
     "source": "Día anterior",
     "files": [
-      "app.html"
+      "app.html",
+      "js/game-battle.js"
     ]
   },
   "s_aaa0f5ae": {
@@ -8681,6 +8809,12 @@
       "js/calendar.js"
     ]
   },
+  "s_acd0c56d": {
+    "source": "Tus llamadas cargan el poder del héroe.",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_ace1ba22": {
     "source": "Despensa",
     "files": [
@@ -8705,16 +8839,16 @@
       "js/positive-reinforcement.js"
     ]
   },
+  "s_ad580403": {
+    "source": "Escuadrón aéreo",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_ad75d38b": {
     "source": "Ganancias del ciclo",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_ada2cd2b": {
-    "source": "MONSTRUO DEL DÍA · {{v5}}",
-    "files": [
-      "js/game.js"
     ]
   },
   "s_adac5096": {
@@ -8940,6 +9074,12 @@
     "source": "Todo",
     "files": [
       "app.html"
+    ]
+  },
+  "s_b2910d4e": {
+    "source": "Pulso estelar",
+    "files": [
+      "js/game-battle.js"
     ]
   },
   "s_b2aa3051": {
@@ -9289,12 +9429,6 @@
       "js/boot.js"
     ]
   },
-  "s_b9119a78": {
-    "source": "Fase del monstruo: {{v2}}",
-    "files": [
-      "js/game.js"
-    ]
-  },
   "s_b91cb47c": {
     "source": "Lun",
     "files": [
@@ -9323,7 +9457,8 @@
   "s_b9c116de": {
     "source": "Continuar",
     "files": [
-      "app.html"
+      "app.html",
+      "js/game-battle.js"
     ]
   },
   "s_b9dce0f5": {
@@ -9509,6 +9644,12 @@
       "js/app-main.js"
     ]
   },
+  "s_bdd1aadc": {
+    "source": "Lluvia de balas",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_bdd858a5": {
     "source": "Quitar",
     "files": [
@@ -9586,12 +9727,6 @@
     "source": "Los archivos de la app. No guarda tus datos personales.",
     "files": [
       "privacidad.html"
-    ]
-  },
-  "s_bfaa0b8d": {
-    "source": "Tu héroe ataca al completar una llamada",
-    "files": [
-      "js/game-battle.js"
     ]
   },
   "s_bfc156a0": {
@@ -10096,6 +10231,12 @@
     "source": "L",
     "files": [
       "app.html"
+    ]
+  },
+  "s_c91a8758": {
+    "source": "TU COMPAÑERO DE TURNO",
+    "files": [
+      "js/game.js"
     ]
   },
   "s_c9263b18": {
@@ -10690,6 +10831,12 @@
       "js/game.js"
     ]
   },
+  "s_d72bc9b1": {
+    "source": "Modo tranquilo durante la llamada",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_d74ea73f": {
     "source": "Registra tu jornada en vivo — inicio, breaks, lunch y llamadas — y calcula tu",
     "files": [
@@ -10735,6 +10882,12 @@
   },
   "s_d899c380": {
     "source": "Lo que hiciste bien hoy",
+    "files": [
+      "js/game.js"
+    ]
+  },
+  "s_d8aa350b": {
+    "source": "Progreso de nivel del héroe",
     "files": [
       "js/game.js"
     ]
@@ -10919,6 +11072,12 @@
       "js/positive-reinforcement.js"
     ]
   },
+  "s_dbd21aa1": {
+    "source": "El héroe esquiva, dispara y sigue adelante.",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_dbeb1d32": {
     "source": "Todos dentro de su ventana",
     "files": [
@@ -10935,6 +11094,12 @@
     "source": "Si ese correo tiene una cuenta, ya va en camino el enlace para cambiar la contraseña. Revisa también el spam.",
     "files": [
       "js/landing.js"
+    ]
+  },
+  "s_dc1d8f69": {
+    "source": "Pausar",
+    "files": [
+      "js/game-battle.js"
     ]
   },
   "s_dc28c284": {
@@ -11350,6 +11515,12 @@
       "app.html"
     ]
   },
+  "s_e2b17799": {
+    "source": "El héroe pelea por vos.",
+    "files": [
+      "js/game.js"
+    ]
+  },
   "s_e2b7d4a6": {
     "source": "Deuda",
     "files": [
@@ -11551,6 +11722,12 @@
       "js/reports.js"
     ]
   },
+  "s_e7ac49b4": {
+    "source": "Doble núcleo",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_e7dbf50a": {
     "source": "{{v1}}\n      {{v2}}\n      {{v3}}\n      {{v4}}\n      {{v5}}\n      {{v6}}",
     "files": [
@@ -11653,6 +11830,12 @@
     "source": "¿Seguro?",
     "files": [
       "app.html"
+    ]
+  },
+  "s_e9d5b49d": {
+    "source": "Habilidad especial",
+    "files": [
+      "js/game-battle.js"
     ]
   },
   "s_e9e36c21": {
@@ -12061,7 +12244,8 @@
     "source": "Automático",
     "files": [
       "app.html",
-      "js/game-battle.js"
+      "js/game-battle.js",
+      "js/game.js"
     ]
   },
   "s_f1ed2046": {
@@ -12424,6 +12608,12 @@
       "js/app-main.js"
     ]
   },
+  "s_f7e2c340": {
+    "source": "Lista",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_f8148ce9": {
     "source": "Ganado",
     "files": [
@@ -12563,6 +12753,12 @@
       "app.html"
     ]
   },
+  "s_fb1d12bd": {
+    "source": "Carga de la habilidad especial",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_fb792567": {
     "source": "Llamada completada",
     "files": [
@@ -12574,12 +12770,6 @@
     "source": "Descanso por productividad: cada {{v0}} min productivos = {{v1}} min de descanso",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_fb98a97a": {
-    "source": "“{{v6}}”",
-    "files": [
-      "js/game.js"
     ]
   },
   "s_fbf212b6": {
