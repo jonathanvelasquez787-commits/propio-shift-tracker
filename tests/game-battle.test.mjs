@@ -22,10 +22,10 @@ function harness({ reduced = false, canvasAvailable = true, currentDay = false }
   doc.documentElement = new Node(); doc.body = new Node(); doc.defaultView = host; doc.hidden = false;
   element.ownerDocument = doc; element.isConnected = true;
   element.matches = selector => selector === '.game-battle'; element.contains = node => node === element || Object.values(nodes).includes(node);
-  const names = ['stage','canvas','monster','hero-label','monster-label','monster-name','feed','notice','notice-text','banner','victory','selected','live','motion-note','duel-hud','touch','shortcuts','duel-button','work-note','hearts','time','points','best','duel-fill','duel-health','duel-hp','start','duel-message','auto-hud','auto-hero-hp','auto-hero-fill','auto-hp','auto-fill','round','round-state','call-overlay','round-victory','auto-pause','charge-fill','charge-label','charge','special-button','special-name','weapon-select'];
+  const names = ['stage','canvas','monster','hero-label','monster-label','monster-name','feed','notice','notice-text','banner','victory','selected','live','motion-note','duel-hud','touch','shortcuts','duel-button','work-note','hearts','time','points','best','duel-fill','duel-health','duel-hp','start','duel-message','auto-hud','auto-hero-hp','auto-hero-fill','auto-hp','auto-fill','round','round-state','call-overlay','round-victory','auto-pause','charge-fill','charge-label','charge','special-button','special-name','weapon-select','pause-icon','sound','sound-icon','collection','collection-summary','collection-toggle'];
   for (const name of names) nodes[name] = new Node();
-  for (const name of ['auto','duel','start','attack','grenade','jump']) { nodes[name] = new Node(true); nodes[name].dataset.battleAction = name; }
-  nodes['duel-button'] = nodes.duel;
+  for (const name of ['auto','duel','start','attack','grenade','jump','collection-toggle','sound']) { nodes[name] = new Node(true); nodes[name].dataset.battleAction = name; }
+  nodes['duel-button'] = nodes.duel; nodes['collection-toggle'].dataset.battleAction = 'collection'; nodes.sound.dataset.battleAction = 'toggle-sound';
   for (const [name, action] of [['auto-pause','pause-auto'],['special-button','special']]) { nodes[name].button = true; nodes[name].dataset.battleAction = action; }
   nodes.hero = new Node(true); nodes.hero.dataset.battleAction = 'hero';
   const weapons = BATTLE_WEAPONS.map(w => { const node = new Node(true); node.dataset.battleWeapon = w.id; return node; });
@@ -47,14 +47,15 @@ function harness({ reduced = false, canvasAvailable = true, currentDay = false }
   }
   host.ResizeObserver = Observer; host.IntersectionObserver = Observer; host.MutationObserver = Observer;
   const view = { dayKey: '10/03/2026', currentDay, weapon: 'pistol', enabled: true, hpPct: 63, defeated: false, monsterMarkup: '<svg data-species="existing"></svg>' };
-  const callbacks = { onSound: kind => sounds.push(kind), onWeaponChange: id => changes.push(id), onPause: () => pauses.push(true) };
+  const toggles = [];
+  const callbacks = { onToggleSound: () => toggles.push(true), onSound: kind => sounds.push(kind), onWeaponChange: id => changes.push(id), onPause: () => pauses.push(true) };
   const mount = () => syncBattle(element, view, callbacks);
   const click = name => element.dispatch('click', { target: nodes[name] });
   const begin = () => { view.workMode = 'break'; mount(); click('duel'); click('start'); };
   const practice = () => { now += 200; element.dispatch('click', { target: nodes.hero }); };
   const tick = (milliseconds = 40) => { now += milliseconds; const current = [...frames.values()]; frames.clear(); current.forEach(fn => fn(now)); };
   const event = (extra = {}) => ({ dayKey: view.dayKey, amountText: '$1.40 · ≈ L 36.40', xp: 3, ...extra });
-  return { element, doc, host, nodes, motion, weapons, view, mount, practice, tick, event, frames, timers, observers, sounds, changes, pauses,
+  return { element, doc, host, nodes, motion, weapons, view, mount, practice, tick, event, frames, timers, observers, sounds, changes, pauses, toggles,
     click, begin, listenerCount: () => [element, doc, host, motion, ...Object.values(nodes)].reduce((count, node) => count + [...node.listeners.values()].reduce((n, list) => n+list.size, 0), 0) };
 }
 
@@ -69,10 +70,20 @@ test('weapon selection normalizes only cosmetic catalog ids; imports work withou
   assert.ok(markup.indexOf('data-battle-health-slot') > markup.indexOf('data-battle-canvas'));
   assert.ok(markup.indexOf('data-battle-health-slot') < markup.indexOf('game-battle-controls'));
   assert.match(markup, /aria-live="polite"/);
-  assert.doesNotMatch(markup, /data-battle-action="(?:simulate|reset)"/);
+  assert.doesNotMatch(markup, /data-battle-action="(?:simulate|reset|special)"/);
+  assert.doesNotMatch(markup, /data-battle-(?:charge|auto-hud|round)/);
   const section = parseFragment(markup).childNodes.find(node => node.tagName === 'section');
   assert.ok(section.childNodes.some(node => node.attrs?.some(attr => attr.name === 'data-battle-motion-note')),
     'The reduced-motion explanation must remain outside the collapsed weapon picker');
+  const collection = section.childNodes.find(node => node.attrs?.some(attr => attr.name === 'data-battle-collection'));
+  assert.ok(collection.attrs.some(attr => attr.name === 'hidden'));
+  const bars = [];
+  function visit(node, inHiddenCollection = false) {
+    inHiddenCollection ||= node === collection;
+    if (node.attrs?.some(attr => attr.name === 'role' && attr.value === 'progressbar')) bars.push(inHiddenCollection);
+    for (const child of node.childNodes || []) visit(child, inHiddenCollection);
+  }
+  visit(section); assert.deepEqual(bars, [true], 'Only the optional duel owns a secondary progress bar, inside the hidden collection');
 });
 
 test('large imports remain one representation and excess events coalesce at six rows', () => {
@@ -87,6 +98,9 @@ test('large imports remain one representation and excess events coalesce at six 
   queue.push({ dayKey: 'd', xp: -5, count: NaN, amountText: 'a'.repeat(1000) });
   const safe = queue.shift(); assert.equal(safe.xp, 0); assert.equal(safe.count, 1); assert.equal(safe.amountText.length, 160);
   queue.push(input); queue.clear(); assert.equal(queue.size, 0);
+  for (let i=0;i<10;i++) queue.push({ dayKey: 'd', specialCount: 2, count: 6 });
+  let specialCount=0; while (queue.size) specialCount += queue.shift().specialCount || 0;
+  assert.equal(specialCount, 20, 'Queue coalescing preserves every batched special threshold');
 });
 
 test('the automatic shot runs briefly and releases its animation loop after impact', () => {
@@ -110,7 +124,7 @@ test('automatic default stays still and manual inputs never alter real HP or cal
     assert.equal(h.element.dataset.battleMode, 'auto'); assert.equal(h.nodes['duel-hud'].hidden, true);
     assert.equal(JSON.stringify(h.view), snapshot); assert.equal(h.element.dataset.battleHp, '63');
     assert.equal(playBattleCall(h.event({ count: 800, xp: 150, critical: true })), true);
-    assert.match(h.nodes.banner.textContent, /800/); assert.match(h.nodes.banner.textContent, /150 XP/);
+    assert.match(h.nodes.banner.textContent, /crítico|critical/i);
     assert.ok(h.sounds.includes('critical')); assert.equal(h.frames.size, 0);
     h.doc.hidden = true; h.doc.dispatch('visibilitychange'); assert.equal(h.timers.size, 0);
     assert.equal(playBattleCall(h.event()), false);
@@ -125,7 +139,7 @@ test('canvas fallback presents automatic results and disables the optional duel'
     assert.equal(h.element.dataset.battleCanvas, 'fallback'); assert.equal(h.frames.size, 0);
     h.click('duel'); assert.equal(h.element.dataset.battleMode, 'auto');
     assert.equal(playBattleCall(h.event({ dayKey: 'wrong' })), false); assert.equal(h.sounds.length, 0);
-    assert.equal(playBattleCall(h.event()), true); assert.match(h.nodes.banner.textContent, /1\.40/);
+    assert.equal(playBattleCall(h.event()), true); assert.match(h.nodes.banner.textContent, /Llamada|Call/);
     h.element.dispatch('keydown', { key: '0', target: h.nodes.stage }); assert.deepEqual(h.changes, ['wand']);
   } finally { stopBattle(); }
   assert.equal(h.listenerCount(), 0); assert.equal(h.timers.size, 0);
@@ -206,7 +220,7 @@ test('same-day edits, deletions and goal changes cancel pending hits while addit
     h.mount();
     assert.equal(h.pauses.length, 0);
     playBattleCall(h.event({ amountText: '$2.80 · ≈ L 72.80' }));
-    waitForImpact(); assert.equal(hitCount(), 2); assert.match(h.nodes.banner.textContent, /2\.80/);
+    waitForImpact(); assert.equal(hitCount(), 2); assert.match(h.nodes.banner.textContent, /Llamada|Call/);
 
     playBattleCall(h.event()); h.tick();
     h.view.callSignatures.call1 = JSON.stringify({ pay: 1.96, start: '10:00', end: '10:14' });
@@ -225,41 +239,98 @@ test('same-day edits, deletions and goal changes cancel pending hits while addit
   } finally { stopBattle(); }
 });
 
-test('autonomous rounds and specials preserve real HP, silence ambient fire and obey lifecycle', () => {
+test('idle breathing never attacks and pauses for live calls, hidden scenes and victories', () => {
   const h = harness({ currentDay: true });
   try {
     h.mount(); const original = JSON.stringify(h.view);
     assert.equal(h.frames.size, 1);
     for (let i = 0; i < 1000; i++) h.tick();
-    assert.ok(Number(h.element.dataset.autoRound) > 1);
+    assert.equal(h.element.dataset.battleSpecials, '0');
     assert.equal(h.element.dataset.battleHp, '63'); assert.equal(JSON.stringify(h.view), original);
-    assert.equal(h.sounds.length, 0);
+    assert.equal(h.sounds.length, 0); assert.equal(h.nodes.banner.textContent, '');
     h.click('auto-pause'); assert.equal(h.frames.size, 0);
     h.mount(); assert.equal(h.frames.size, 0);
     h.click('auto-pause'); assert.equal(h.frames.size, 1);
     h.doc.hidden = true; h.doc.dispatch('visibilitychange'); assert.equal(h.frames.size, 0);
     h.doc.hidden = false; h.doc.dispatch('visibilitychange'); assert.equal(h.frames.size, 1);
     h.view.workMode = 'call'; h.mount(); assert.equal(h.frames.size, 0); assert.equal(h.nodes['call-overlay'].hidden, false);
-    h.click('special-button'); assert.equal(h.frames.size, 0);
+    const sounds = h.sounds.length;
+    playBattleCall(h.event({ count: 3 }));
+    for (let i = 0; i < 40; i++) h.tick();
+    assert.equal(h.frames.size, 0); assert.equal(h.sounds.length, sounds);
     h.view.workMode = 'break'; h.mount(); assert.equal(h.frames.size, 1);
+    for (let i = 0; i < 40; i++) h.tick();
+    assert.equal(h.sounds.length, sounds, 'Leaving a live call must not replay suspended attacks');
     h.view.defeated = true; h.mount(); assert.equal(h.frames.size, 0);
     h.view.defeated = false; h.view.currentDay = false; h.mount(); assert.equal(h.frames.size, 0);
   } finally { stopBattle(); }
   assert.equal(h.listenerCount(), 0); assert.ok(h.observers.every(observer => observer.disconnected));
 });
 
-test('special and reduced motion remain static without changing account progress', () => {
+test('every third eligible represented call triggers one automatic special including batched counts', () => {
   const h = harness({ currentDay: true, reduced: true });
   try {
     h.mount(); const original = JSON.stringify(h.view);
-    h.click('special-button'); assert.equal(h.nodes['charge-label'].textContent, '0%');
+    playBattleCall(h.event({ count: 2 })); assert.equal(h.element.dataset.battleSpecials, '0');
+    assert.doesNotMatch(h.nodes.banner.textContent, /especial|special/i);
+    playBattleCall(h.event()); assert.equal(h.element.dataset.battleSpecials, '1');
+    assert.match(h.nodes.banner.textContent, /especial|special/i);
+    playBattleCall(h.event({ count: 8 })); assert.equal(h.element.dataset.battleSpecials, '3');
+    playBattleCall(h.event()); assert.equal(h.element.dataset.battleSpecials, '4');
+    assert.equal(playBattleCall(h.event({ dayKey: 'wrong', count: 9 })), false);
+    assert.equal(h.element.dataset.battleSpecials, '4');
     assert.equal(h.frames.size, 0); assert.equal(h.element.dataset.battleHp, '63');
     assert.equal(JSON.stringify(h.view), original);
-    h.doc.hidden = true; h.doc.dispatch('visibilitychange');
-    assert.equal(playBattleCall(h.event()), false); assert.equal(h.nodes.charge.attributes['aria-valuenow'], '25');
-    assert.equal(playBattleCall(h.event({ dayKey: 'wrong' })), false); assert.equal(h.nodes.charge.attributes['aria-valuenow'], '25');
-    h.doc.hidden = false; h.doc.dispatch('visibilitychange');
-    playBattleCall(h.event({ count: 4 })); assert.equal(h.nodes.charge.attributes['aria-valuenow'], '100');
+    h.view.currentDay = false; h.mount(); playBattleCall(h.event({ count: 3 }));
+    assert.equal(h.element.dataset.battleSpecials, '4');
+  } finally { stopBattle(); }
+});
+
+test('compact collection stays collapsed across sync until toggled, with real root-owned slots', () => {
+  const h = harness();
+  try {
+    h.view.collectionMarkup = '<strong>Level 3 · real collection</strong>';
+    h.nodes.victory.innerHTML = '<button data-game-action="open-daily-chest">Open</button>';
+    h.mount(); assert.equal(h.nodes.collection.hidden, true);
+    assert.equal(h.nodes['collection-toggle'].attributes['aria-expanded'], 'false');
+    h.click('collection-toggle'); h.mount();
+    assert.equal(h.nodes.collection.hidden, false); assert.equal(h.element.dataset.battleCollectionOpen, 'true');
+    assert.equal(h.nodes['collection-summary'].innerHTML, h.view.collectionMarkup);
+    assert.match(h.nodes.victory.innerHTML, /open-daily-chest/);
+    h.click('sound'); assert.equal(h.toggles.length, 1);
+    h.view.soundEnabled = false; h.mount(); playBattleCall(h.event());
+    for (let i=0;i<40;i++) h.tick(); assert.equal(h.sounds.length, 0);
+    h.click('collection-toggle'); assert.equal(h.nodes.collection.hidden, true);
+  } finally { stopBattle(); }
+});
+
+test('winning shot precedes cofre and changed dates never reveal a stale cofre', () => {
+  const h = harness();
+  try {
+    h.mount(); h.view.defeated = true; h.mount();
+    playBattleCall(h.event()); assert.equal(h.nodes.victory.hidden, true);
+    h.tick(); assert.ok(h.sounds.includes('shoot-pistol')); assert.equal(h.nodes.victory.hidden, true);
+    for (let i=0;i<30;i++) h.tick(); assert.equal(h.nodes.victory.hidden, false);
+    playBattleCall(h.event()); h.tick();
+    h.view.dayKey = '10/04/2026'; h.view.defeated = false; h.mount();
+    for (let i=0;i<100;i++) h.tick(); assert.equal(h.nodes.victory.hidden, true);
+  } finally { stopBattle(); }
+});
+
+test('paused call feedback stays static across sync and reduced feedback returns to real goal status', () => {
+  const h = harness({ currentDay: true });
+  try {
+    h.view.goalStatus = 'Current real goal'; h.mount(); h.click('auto-pause');
+    playBattleCall(h.event({ count: 3 })); h.mount();
+    assert.equal(h.frames.size, 0, 'Sync must not restart paused effects');
+    assert.equal(h.nodes.monster.dataset.battleHit, undefined);
+    assert.match(h.nodes.feed.textContent, /especial|special/i);
+    for (const fn of h.timers.values()) fn(); h.timers.clear();
+    assert.match(h.nodes.feed.textContent, /Paused|En pausa/);
+    h.click('auto-pause'); h.motion.matches = true; h.motion.dispatch('change');
+    playBattleCall(h.event());
+    for (const fn of h.timers.values()) fn(); h.timers.clear();
+    assert.equal(h.nodes.feed.textContent, 'Current real goal');
     assert.equal(h.frames.size, 0);
   } finally { stopBattle(); }
 });

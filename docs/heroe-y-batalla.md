@@ -1,80 +1,79 @@
 # Héroe y batalla del día
 
-La batalla aparece en Inicio al activar Logros y tener una meta diaria de
-ganancias mayor que cero. Usa las llamadas, metas, misiones y XP reales de
-la aplicación. Logros conserva su valor inicial desactivado para cuentas
-nuevas.
+La tarjeta compacta aparece en Inicio al activar Logros y tener una meta diaria
+positiva. Una misma composición funciona en móvil y escritorio, con los temas
+y paletas de la app. Logros sigue desactivado para cuentas nuevas.
 
 ## Llamadas y progreso
 
-Manual, en vivo y pegado producen un ataque al registrar una llamada válida.
-El registro y los cálculos ocurren antes de la animación: cerrar la escena,
-silenciarla o usar movimiento reducido conserva el mismo dinero y progreso.
-Los recibos existentes evitan repetir recompensas y ataques al reimportar.
-Las importaciones grandes agrupan representaciones visuales y mantienen todas
-las llamadas guardadas.
+La única barra representa ganancias reales frente a la meta del día seleccionado.
+No hay rondas ambientales, contraataques ni vidas independientes. El héroe
+acompaña el trabajo; entre llamadas permanece tranquilo.
 
-La vida procede de la relación entre ganancias y meta del día seleccionado.
-Editar o borrar llamadas vuelve a calcularla y cancela sus efectos pendientes,
-igual que cambiar la meta del día. Las llamadas históricas afectan
-a su propio día y pueden registrar una derrota histórica; no generan un
-ataque ni XP nuevo sobre el monstruo actual. Se conservan los límites,
-elegibilidad y sellado de XP de la gamificación anterior.
+Manual, live y pegado animan un ataque por llamada válida guardada del día
+actual. Higher Rate produce un crítico. Cada tres llamadas representadas
+activan automáticamente el especial del arma; los lotes agrupados conservan
+su cantidad. No hay botón manual de especial ni carga visible.
 
-## Combate automático y armas
+La app guarda y calcula antes de animar. Los recibos evitan repetir ataques y
+premios por duplicados, correcciones o reimportaciones. Los lotes limitan las
+representaciones visuales sin perder llamadas. Editar/borrar llamadas o cambiar
+meta/fecha recalcula el progreso y cancela efectos pendientes. Los históricos
+actualizan su propio día sin atacar al monstruo actual ni conceder XP nuevo.
+Las reglas de elegibilidad, límites y sellado de XP permanecen vigentes.
 
-Hay diez armas: Pistola, Subfusil, Escopeta, Lanzacohetes, Railgun,
-Lanzallamas, Too Much, Dron, PSR B0531+21 y Varita mágica. Se seleccionan en
-el selector o con las teclas 1–0 cuando el foco está dentro de la batalla.
-La elección es visual y se guarda en `settings.game.weapon`, junto con los
-ajustes exportables y sincronizados de la cuenta. Backups antiguos o valores
-inválidos usan Pistola.
+## Cofre de la meta
 
-El héroe camina, dispara y salta automáticamente para esquivar contraataques.
-Cada victoria abre otra ronda después de una celebración breve. Las vidas
-HÉROE/MONSTRUO de la escena pertenecen exclusivamente a estas rondas: no
-cambian llamadas, ganancias, XP ni recibos. La vida real de la meta permanece
-debajo, identificada como VIDA DE LA META. El nivel y la barra de XP muestran
-progreso real. Un monstruo dormido aparece despierto mientras combate,
-conservando su estado financiero.
+Al cumplir la meta del día actual, la escena muestra «¡Cofre ganado!» y permite
+abrirlo sin modal. Requiere Logros activo y ninguna llamada live en curso. El
+premio se guarda inmediatamente en el único recibo `chest:fecha` de ese día.
+Repetir, recargar, cerrar el turno o continuarlo no concede otro cofre diario.
+Una meta cero y los días históricos no habilitan esta apertura.
 
-El especial comienza cargado al montar la batalla. Activarlo consume la carga
-y causa daño temporal más fuerte. Las llamadas representadas recargan 25%
-cada una, hasta 100%; los lotes usan su cantidad agrupada. El tiempo y los
-disparos ambientales no recargan el poder. Rondas y carga son temporales,
-no se exportan ni sincronizan. Pausar detiene el combate ambiental. Durante
-una llamada live entra inmediatamente en modo tranquilo; al terminar vuelve
-el combate si no se había pausado manualmente. Fechas anteriores y una meta
-derrotada conservan resultados estáticos.
+El primer premio es Visor violeta si aún no está obtenido; se puede equipar en
+la cara desde nivel 1. Después se concede un cosmético no obtenido disponible
+por nivel o 25 XP si no hay ninguno. Abrir el cofre deja un aviso compacto con
+el premio real y permite ver al héroe con su equipo.
 
-## Duelo opcional
+Si una corrección, borrado o cambio de meta elimina el cumplimiento, se revoca
+solo el recibo de meta y su accesorio/equipo o XP. Volver a cumplir permite
+recuperar el premio sin acumular XP por alternar correcciones. Los recibos y
+cofres pendientes anteriores conservan su comportamiento y bloquean premios
+duplicados del mismo día. Ninguna recompensa modifica las ganancias.
 
-Duelo · 60 s conserva tres vidas, puntos temporales, movimiento, salto,
-disparos y granadas. Solo está disponible en descanso o fuera del turno.
-Una llamada lo pausa y regresar exige Continuar duelo. Tocar al héroe o Enter
-dispara; G o click derecho lanza una granada. Sus puntos no modifican dinero,
-vida financiera, llamadas, productividad, combo ni XP.
+## Logros, armas y duelo
 
-A/D o las flechas permiten caminar; Espacio o el botón de salto permiten
-saltar. Los controles táctiles ofrecen las mismas acciones. Las plataformas
-del fondo son decorativas.
+El botón Logros abre un panel inicialmente cerrado con nivel y XP reales,
+colección, equipo, selector de arma y acceso a Logros completos. Misiones e
+hitos se consultan en Logros completos; no añaden barras ni indicadores al
+encabezado de Inicio.
+
+Las diez armas son Pistola, Subfusil, Escopeta, Lanzacohetes, Railgun,
+Lanzallamas, Too Much, Dron, PSR B0531+21 y Varita mágica. La selección visual
+se guarda en `settings.game.weapon`, junto con los ajustes exportables y
+sincronizados. Las teclas 1–0 funcionan con foco en la batalla. Los valores
+antiguos o inválidos usan Pistola.
+
+Duelo · 60 s es opcional, disponible en descanso o fuera del turno. Conserva
+vidas, puntos temporales, movimiento, salto, disparos y granadas; muestra sus
+controles solo al seleccionarlo. Una llamada lo pausa y regresar exige
+Continuar duelo. A/D o flechas mueven, Espacio salta, Enter o tocar al héroe
+dispara, y G o click derecho lanza granada. Los controles táctiles equivalen a
+las teclas. El duelo no modifica llamadas, dinero, productividad, combo ni XP.
 
 ## Preferencias y recursos
 
-El combate ambiental es silencioso. Los ataques por llamadas y el duelo
-reutilizan Sonidos arcade y sus controles de volumen.
-Las celebraciones importantes tienen prioridad sobre los disparos. Apagar
-Logros retira la batalla y cancela efectos, avisos y sonidos pendientes,
-conservando los datos. Silenciar cancela también las voces ya programadas.
+La cabecera permite pausar la animación y cambiar Sonidos arcade. Durante una
+llamada live la escena entra en modo tranquilo inmediatamente. Los ataques y
+el duelo respetan los volúmenes existentes; las celebraciones tienen prioridad.
+Silenciar cancela voces activas y programadas. Apagar Logros cancela efectos,
+avisos y sonidos pendientes y conserva los datos.
 
-La escena cancela rAF cuando deja de estar visible y cancela efectos al
-cambiar de fecha. Desmontarla libera listeners, observadores y temporizadores.
-La cola de representaciones y las partículas tienen límites. Movimiento
-reducido conserva mensajes y resultados estáticos, sin rondas en segundo
-plano ni simular el tiempo transcurrido al volver; si canvas no está
-disponible, quedan el héroe SVG y los controles accesibles.
+Fuera de vista se suspende rAF; desmontar libera listeners, observadores y
+temporizadores. La cola y las partículas tienen límites. Movimiento reducido
+mantiene mensajes y resultados estáticos sin recuperar animaciones atrasadas.
+Si canvas no está disponible, quedan héroe SVG y controles accesibles.
 
-Los personajes y efectos usan arte original adaptado del mockup aprobado,
-sin assets remotos ni una nueva dependencia de juego. Se conservan especies,
-fases y accesorios del monstruo existente. La interfaz usa los temas y
-paletas de la aplicación y sus catálogos español/inglés.
+Se mantienen las especies, fases y accesorios originales del monstruo, con
+arte pixel adaptado del mockup aprobado, sin assets remotos ni dependencias
+nuevas. La interfaz usa los catálogos español/inglés de la aplicación.

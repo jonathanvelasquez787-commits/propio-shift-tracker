@@ -43,6 +43,7 @@ const ACCESSORIES = Object.freeze([
   'Alas pixel',
   'Armadura cian',
   'Ojo de rubí',
+  'Visor violeta',
 ]);
 
 export const ACCESSORY_CATALOG = Object.freeze([
@@ -52,6 +53,7 @@ export const ACCESSORY_CATALOG = Object.freeze([
   { id: 'alas-pixel', label: 'Alas pixel', slot: 'back', unlockLevel: 6 },
   { id: 'armadura-cian', label: 'Armadura cian', slot: 'body', unlockLevel: 2 },
   { id: 'ojo-de-rubi', label: 'Ojo de rubí', slot: 'face', unlockLevel: 9 },
+  { id: 'visor-violeta', label: 'Visor violeta', slot: 'face', unlockLevel: 1 },
 ]);
 const ACCESSORY_BY_LABEL = Object.freeze(Object.fromEntries(ACCESSORY_CATALOG.map((item) => [item.label, item])));
 const ACCESSORY_BY_ID = Object.freeze(Object.fromEntries(ACCESSORY_CATALOG.map((item) => [item.id, item])));
@@ -127,6 +129,7 @@ function normalizeGameDayEntry(rawEntry) {
     ['corona-del-ciclo', 'Corona del ciclo', 'head'], ['cuernos-dorados', 'Cuernos dorados', 'head'],
     ['bufanda-de-racha', 'Bufanda de racha', 'neck'], ['alas-pixel', 'Alas pixel', 'back'],
     ['armadura-cian', 'Armadura cian', 'body'], ['ojo-de-rubi', 'Ojo de rubí', 'face'],
+    ['visor-violeta', 'Visor violeta', 'face'],
   ];
   const validEquipment = new Map(equipmentItems.flatMap(([id, label, slot]) => [[id, { label, slot }], [label, { label, slot }]]));
   const entry = { bonusXp: boundedGameNumber(rawEntry.bonusXp, GAME_DAILY_XP_CAP) };
@@ -230,8 +233,8 @@ function normalizeGameDayEntry(rawEntry) {
 
 export function normalizeGameState(raw) {
   const equipmentSlots = ['head', 'neck', 'back', 'body', 'face'];
-  const accessoryIds = new Set(['corona-del-ciclo', 'cuernos-dorados', 'bufanda-de-racha', 'alas-pixel', 'armadura-cian', 'ojo-de-rubi']);
-  const accessoryLabels = new Set(['Corona del ciclo', 'Cuernos dorados', 'Bufanda de racha', 'Alas pixel', 'Armadura cian', 'Ojo de rubí']);
+  const accessoryIds = new Set(['corona-del-ciclo', 'cuernos-dorados', 'bufanda-de-racha', 'alas-pixel', 'armadura-cian', 'ojo-de-rubi', 'visor-violeta']);
+  const accessoryLabels = new Set(['Corona del ciclo', 'Cuernos dorados', 'Bufanda de racha', 'Alas pixel', 'Armadura cian', 'Ojo de rubí', 'Visor violeta']);
   const fallback = createDefaultGameState();
   const source = raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
   const chest = source.chest && typeof source.chest === 'object' ? source.chest : {};
@@ -271,7 +274,7 @@ export function normalizeGameState(raw) {
   const equipment = Object.fromEntries(equipmentSlots.map((slot) => {
     const value = equipmentSource[slot];
     const token = String(value ?? '').trim();
-    const item = accessoryIds.has(token) ? { label: ({ 'corona-del-ciclo': 'Corona del ciclo', 'cuernos-dorados': 'Cuernos dorados', 'bufanda-de-racha': 'Bufanda de racha', 'alas-pixel': 'Alas pixel', 'armadura-cian': 'Armadura cian', 'ojo-de-rubi': 'Ojo de rubí' })[token] } : accessoryLabels.has(token) ? { label: token } : null;
+    const item = accessoryIds.has(token) ? { label: ({ 'corona-del-ciclo': 'Corona del ciclo', 'cuernos-dorados': 'Cuernos dorados', 'bufanda-de-racha': 'Bufanda de racha', 'alas-pixel': 'Alas pixel', 'armadura-cian': 'Armadura cian', 'ojo-de-rubi': 'Ojo de rubí', 'visor-violeta': 'Visor violeta' })[token] } : accessoryLabels.has(token) ? { label: token } : null;
     return [slot, item ? item.label : null];
   }));
   const cycleRewardSource = source.cycleReward && typeof source.cycleReward === 'object' ? source.cycleReward : {};
@@ -665,6 +668,30 @@ let lastArenaRenderKey = '';
 let monsterNameDraftDirty = false;
 let lastSettingsMonsterName = null;
 
+function compactCollectionMarkup(dayKey) {
+  const level = gameLevelProgress();
+  const receipt = state.game.ledger[`chest:${dayKey}`];
+  const latest = ACCESSORY_BY_LABEL[receipt?.accessory] || ACCESSORY_BY_LABEL[state.game.accessories.at(-1)] || ACCESSORY_BY_ID['visor-violeta'];
+  const owned = state.game.accessories.includes(latest.label);
+  const available = owned && latest.unlockLevel <= level.level;
+  const equipped = state.game.equipment[latest.slot] === latest.label;
+  const victories = Object.keys(state.game.ledger).filter(key => key.startsWith('monster-defeat:')).length;
+  return ui`<div class="game-compact-collection-head"><h4>Tu colección</h4><span>Nivel ${level.level} · ${state.game.totalXp} XP</span></div>
+    <div class="game-compact-collection-item"><span class="game-compact-collection-icon" aria-hidden="true">${gamePixelIcon('gem')}</span><div class="game-compact-collection-copy"><strong>${escapeHtml(translateText(latest.label))}</strong><small>${equipped ? translateText('Equipado') : available ? translateText('Desbloqueado') : owned ? ui`Disponible en nivel ${latest.unlockLevel}` : translateText('En el próximo cofre')}</small></div><button type="button" data-game-action="equip-accessory" data-accessory="${latest.id}" aria-pressed="${equipped}" ${available ? '' : 'disabled'}>${equipped ? translateText('Quitar') : translateText('Equipar')}</button></div>
+    <div class="game-compact-collection-item"><span class="game-compact-collection-icon" aria-hidden="true">${gamePixelIcon('sword')}</span><div class="game-compact-collection-copy"><strong>Monstruos vencidos</strong><small>Tu colección de victorias</small></div><b>${victories}</b></div>
+    <button type="button" class="game-compact-view-all" data-game-nav>Ver todos mis Logros →</button>`;
+}
+
+function compactVictoryMarkup(day) {
+  if (!day.defeated) return '';
+  const receipt = state.game.ledger[`chest:${day.dayKey}`];
+  if (receipt) {
+    const reward = receipt.accessory ? translateText(receipt.accessory) : ui`+${Number(receipt.gross) || 0} XP`;
+    return ui`<div class="game-compact-reward-open"><strong>${escapeHtml(reward)}</strong><small>Cofre abierto · recompensa guardada</small></div>`;
+  }
+  return ui`<span class="game-compact-win-label">META CUMPLIDA</span><strong>¡Cofre ganado!</strong>${day.dayKey === currentGameDayKey() ? ui`<button type="button" data-game-action="open-daily-chest" data-game-day="${day.dayKey}" ${state.activeCall ? 'disabled' : ''}>${gamePixelChest()} Abrir cofre</button>` : ui`<button type="button" data-game-nav>Ver mis Logros</button>`}`;
+}
+
 function renderArena() {
   const root = document.getElementById('gameArena');
   const classic = document.getElementById('classicDailyGoalCard');
@@ -673,7 +700,7 @@ function renderArena() {
   const day = computeGameDay(dayKey);
   const active = gameEnabled() && day.goal.usd > 0;
   root.hidden = !active;
-  classic.style.display = '';
+  classic.style.display = active ? 'none' : '';
   const progressHome = classic.querySelector('[data-game-progress-home]');
   const milestoneDetails = document.getElementById('gameMilestones');
   const progress = document.getElementById('earningsBar')?.closest('.earnings-goal-progress');
@@ -699,12 +726,11 @@ function renderArena() {
   const variant = monsterVariantFor(day);
   const customName = sanitizeMonsterName(settings.game.monsterName);
   const displayName = customName || translateText(day.species.name);
-  const shadow = yesterdayShadowPct(dayKey);
-  const damage = Math.max(0, day.goal.usd - day.stats.earnings);
+  const remaining = Math.max(0, day.goal.usd - day.stats.earnings);
   const dayCalls = callsForDay(dayKey);
-  const completedCalls = dayCalls.filter((call) => String(call.dropped).toLowerCase() !== 'yes' && new Date(call.endISO).getTime() <= Date.now()).length;
-  const callSignatures = Object.fromEntries(dayCalls.map((call) => [String(call.id), JSON.stringify([call.pay, higherRateBonusAmount(call), call.durationMin, call.startISO, call.endISO, call.billable, call.dropped])]));
+  const callSignatures = Object.fromEntries(dayCalls.map(call => [String(call.id), JSON.stringify([call.pay, higherRateBonusAmount(call), call.durationMin, call.startISO, call.endISO, call.billable, call.dropped])]));
   const workMode = battleWorkMode(state);
+  const receipt = state.game.ledger[`chest:${dayKey}`];
   const toastStack = document.getElementById('gameToastStack');
   if (toastStack) toastStack.hidden = workMode === 'call';
   if (workMode === 'call') {
@@ -714,56 +740,43 @@ function renderArena() {
     document.getElementById('gameCallFx')?.replaceChildren();
     document.querySelectorAll('.game-pixel-fx-layer, .game-live-xp-float').forEach(node => node.remove());
   }
-  const renderKey = [workMode, dayKey, monsterState, monsterPhase, variant, displayName, day.combo, day.stats.earnings.toFixed(2), Math.round(day.hpPct * 10), Math.round((shadow ?? -1) * 10), day.missions.map((mission) => mission.ok ? 1 : 0).join(''), Object.values(state.game.equipment || {}).join('|'), completedCalls, day.xp, state.game.totalXp, settings.game.weapon, settings.currencyLabel, settings.exchangeRate, displayLocale(), day.goal.usd, JSON.stringify(callSignatures)].join(':');
+  const victories = Object.keys(state.game.ledger).filter(key => key.startsWith('monster-defeat:')).length;
+  const renderKey = [workMode, dayKey, monsterState, monsterPhase, variant, displayName, day.combo, day.stats.earnings.toFixed(2), Math.round(day.hpPct * 10), Object.values(state.game.equipment || {}).join('|'), day.xp, state.game.totalXp, victories, state.game.accessories.join('|'), JSON.stringify(receipt), settings.game.weapon, settings.game.soundEnabled, settings.currencyLabel, settings.exchangeRate, displayLocale(), day.goal.usd, JSON.stringify(callSignatures)].join(':');
   if (renderKey === lastArenaRenderKey) return;
   lastArenaRenderKey = renderKey;
-  const impactClasses = root.dataset.gameDayKey === dayKey
-    ? ['is-hit', 'is-critical-hit'].filter((name) => root.classList.contains(name)) : [];
-  const previousHp = root.dataset.gameDayKey === dayKey ? Number(root.dataset.gameHp) : day.hpPct;
   if (root.dataset.gameDayKey && root.dataset.gameDayKey !== dayKey) delete root.dataset.gameEvent;
   root.className = `game-arena game-arena--arcade game-arena--battle game-${escapeHtml(monsterState)}`;
-  root.classList.add(...impactClasses);
   root.dataset.gameState = monsterState;
   root.dataset.gameDayKey = dayKey;
   root.dataset.gameHp = String(day.hpPct);
-  root.style.setProperty('--game-hp-before', `${Number.isFinite(previousHp) ? previousHp : day.hpPct}%`);
-  root.style.setProperty('--game-hp-after', `${day.hpPct}%`);
   root.dataset.gamePhase = monsterPhase;
   root.dataset.gameIntensity = 'arcade';
-  const monsterImageLabel = ui`${displayName}${customName ? `, ${translateText(day.species.name)}` : ''}, ${PHASE_LABELS[monsterPhase] || monsterPhase}, ${Math.round(day.hpPct)}% de vida`;
+  const monsterImageLabel = ui`${displayName}, ${Math.round(100 - day.hpPct)}% de la meta completada`;
   const battleMonsterState = monsterState === 'sleeping' && dayKey === currentGameDayKey() && workMode !== 'call' ? 'angry' : monsterState;
   const sprite = monsterSvg({ species: day.species.id, state: battleMonsterState, variant, hpPct: day.hpPct, sizeClass: 'lg', equipment: state.game.equipment })
     .replace(/ role="img" aria-label="[^"]*"/, ' aria-hidden="true"');
   if (!root.querySelector('.game-battle')) {
     stopBattle();
-    root.innerHTML = `<div data-battle-summary></div>${battleMarkup()}<div class="game-pixel-arena-hint" data-battle-mission-hint></div>`;
+    root.innerHTML = battleMarkup();
   }
-  const level = gameLevelProgress();
-  root.querySelector('[data-battle-summary]').innerHTML = ui`
-      <div class="game-battle-heading"><span class="game-kicker">TU COMPAÑERO DE TURNO</span><div><h3>El héroe pelea por vos.</h3><span class="game-battle-auto-badge">Automático</span></div></div>
-      <div class="game-battle-profile"><strong>NV. ${level.level}</strong><div><span>Tu héroe <small>${level.current} / ${level.ceiling} XP</small></span><div role="progressbar" aria-label="Progreso de nivel del héroe" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(level.pct)}"><i style="width:${level.pct}%"></i></div></div></div>
-      <div class="game-arena-title-row"><span class="game-battle-day-name">${escapeHtml(displayName)}</span><span class="game-phase-meter" data-phase="${escapeHtml(monsterPhase)}" role="status" aria-label="Fase del monstruo: ${escapeHtml(PHASE_LABELS[monsterPhase] || monsterPhase)}" title="Las ganancias y la vida financiera no cambian por la fase.">${escapeHtml(PHASE_LABELS[monsterPhase] || monsterPhase)}</span><span class="game-combo-badge" title="Llamadas consecutivas del turno; se reinicia al tomar una pausa.">x${day.combo || 0}</span></div>
-      <div class="game-battle-caption"><span class="game-kicker">MONSTRUO DEL DÍA · ${escapeHtml(formatCallDayLabel(dayKey))}</span><span class="game-monster-phrase">“${escapeHtml(translateText(day.species.phrase))}”</span></div>`;
+  const heading = root.querySelector('[data-battle-heading]');
+  heading.innerHTML = ui`<span class="game-kicker">${dayKey === currentGameDayKey() ? translateText('TU RETO DE HOY') : formatCallDayLabel(dayKey)}</span><h3>${escapeHtml(displayName)}</h3>`;
+  const converted = convertedAmountText(day.stats.earnings);
+  const convertedGoal = convertedAmountText(day.goal.usd);
+  const convertedRemaining = convertedAmountText(remaining);
+  const status = day.defeated ? receipt ? translateText('Cofre abierto. ¡Seguí sumando!') : translateText('Meta alcanzada. Este cofre es tuyo.') : translateText('Cada llamada te acerca al cofre.');
   root.querySelector('[data-battle-health-slot]').innerHTML = ui`
-      <div data-battle-stats></div>
-      <div class="game-hp-track" role="progressbar" aria-label="Vida del monstruo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(day.hpPct)}">
-        <div class="game-hp-damage-trail" style="width:${day.hpPct}%" aria-hidden="true"></div>
-        <div class="game-hp-fill" style="width:${day.hpPct}%"></div>
-        ${shadow === null ? '' : ui`<span class="game-shadow-marker" style="left:${shadow}%" title="Ayer a esta hora: ${Math.round(shadow)}% de la meta"></span>`}
-      </div>
-      <div class="game-hp-foot"><span>${withConversion(damage)} de vida restante</span><span>${day.defeated ? translateText('Botín extra: las ganancias siguen, el XP no') : ui`${withConversion(day.stats.earnings)} de daño`}</span></div>`;
-  root.querySelector('[data-battle-stats]').innerHTML = ui`
-    <div><span>Ganancias</span><strong>${withConversion(day.stats.earnings)}</strong></div>
-    <div><span>Llamadas</span><strong>${completedCalls}</strong></div>
-    <div title="El XP del día viene de tus llamadas y misiones. Se incorpora al nivel al cerrar el turno."><span>XP</span><strong>${day.xp} XP</strong></div>
-    <div class="game-hp-label"><span>VIDA DE LA META</span><strong>${Math.round(day.hpPct)}%</strong></div>`;
-  root.querySelector('[data-battle-mission-hint]').innerHTML = `${gamePixelIcon('shield')}<span>${day.defeated ? translateText('Meta alcanzada. Las ganancias extra siguen contando.') : ui`${day.missions.filter((mission) => mission.applies !== false && !mission.ok).length} armaduras pendientes · completa tus misiones del día.`}</span>`;
-  syncBattle(root, { dayKey, currentDay: dayKey === currentGameDayKey(), workMode, enabled: active, weapon: settings.game.weapon, callSignatures, goalUsd: day.goal.usd, monsterMarkup: sprite, monsterLabel: translateText('MONSTRUO DEL DÍA'), monsterDescription: monsterImageLabel, monsterName: displayName, heroLabel: translateText('Centinela'), defeated: day.defeated, hpPct: day.hpPct }, {
-    onWeaponChange: (weapon) => {
-      settings.game.weapon = normalizeBattleWeapon(weapon);
-      saveSettingsOnly();
-    },
-    onSound: (kind) => {
+    <div class="game-compact-goal-line"><span>${dayKey === currentGameDayKey() ? translateText('Meta de hoy') : translateText('Meta de este día')}</span><strong>${money(day.stats.earnings)} <small>/ ${money(day.goal.usd)}</small></strong></div>
+    <div class="game-compact-goal-track" role="progressbar" aria-label="Avance hacia la meta y el cofre" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(100 - day.hpPct)}"><i class="game-compact-goal-fill" style="width:${100 - day.hpPct}%"></i><span class="game-compact-goal-chest" aria-hidden="true">${gamePixelChest(!!receipt)}</span></div>
+    <div class="game-compact-goal-foot"><span>${converted ? ui`${escapeHtml(converted)} / ${escapeHtml(convertedGoal)}` : ''}</span><span>${day.defeated ? receipt ? translateText('Recompensa guardada') : translateText('Cofre conseguido') : ui`Te faltan ${money(remaining)}${convertedRemaining ? ` (${escapeHtml(convertedRemaining)})` : ''}`}</span></div>`;
+  const victory = root.querySelector('[data-battle-victory]');
+  const victoryMarkup = compactVictoryMarkup(day);
+  if (victory.innerHTML !== victoryMarkup) victory.innerHTML = victoryMarkup;
+  victory.dataset.rewardOpened = String(!!receipt);
+  syncBattle(root, { dayKey, currentDay: dayKey === currentGameDayKey(), workMode, enabled: active, weapon: settings.game.weapon, callSignatures, goalUsd: day.goal.usd, monsterMarkup: sprite, monsterLabel: translateText('Tu meta de hoy'), monsterDescription: monsterImageLabel, monsterName: displayName, heroLabel: translateText('Tu héroe'), heroEquipment: equipmentForState(), soundEnabled: settings.game.soundEnabled, goalStatus: status, collectionMarkup: compactCollectionMarkup(dayKey), defeated: day.defeated, hpPct: day.hpPct }, {
+    onWeaponChange: weapon => { settings.game.weapon = normalizeBattleWeapon(weapon); saveSettingsOnly(); },
+    onToggleSound: () => { settings.game.soundEnabled = !settings.game.soundEnabled; syncGameAudio(); saveSettingsOnly(); lastArenaRenderKey = ''; renderGame(); },
+    onSound: kind => {
       if (kind === 'practice-hit') return;
       playGameSound(kind, { allowed: () => {
         const bounds = root.querySelector('.game-battle')?.getBoundingClientRect();
@@ -773,6 +786,7 @@ function renderArena() {
     onPause: stopGameSounds,
   });
 }
+
 
 function renderMissions() {
   const root = document.getElementById('gameMissions');
@@ -799,7 +813,6 @@ function renderMissions() {
 }
 
 function renderHeroChips() {
-  const enabled = gameEnabled();
   const streak = gameStreak();
   const level = gameLevelProgress();
   const combo = state.game.live.combo || 0;
@@ -808,11 +821,11 @@ function renderHeroChips() {
     ['gameComboChip', 'gameComboValue', `x${combo}`, combo > 0],
     ['gameLevelChip', 'gameLevelValue', String(level.level), true],
   ];
-  chips.forEach(([chipId, valueId, value, visible]) => {
+  chips.forEach(([chipId, valueId, value]) => {
     const chip = document.getElementById(chipId);
     const valueNode = document.getElementById(valueId);
     if (valueNode) valueNode.textContent = value;
-    if (chip) chip.hidden = !enabled || !visible;
+    if (chip) chip.hidden = true;
   });
 }
 function cycleBossSnapshot() {
@@ -1290,6 +1303,13 @@ function rollbackChestReward(dayKey) {
   return true;
 }
 
+function reconcileGoalChest(dayKey, snapshot) {
+  if (snapshot.defeated || state.game.ledger[`chest:${dayKey}`]?.goalReward !== true) return false;
+  rollbackChestReward(dayKey);
+  state.game.level = levelForXp(state.game.totalXp);
+  return true;
+}
+
 function syncFinanceRewards() {
   if (!settings.financeCategories) return false;
   const enabled = gameEnabled();
@@ -1553,6 +1573,11 @@ function showCallFx(call, xp, critical, mode = 'xp') {
   const amount = parseMoney(call.pay) + higherRateBonusAmount(call);
   const dayKey = callDateKeyFromValue(call.shiftDayKey) || callDateKeyFromValue(call.callDate) || currentGameDayKey();
   const battlePlayed = dayKey === currentGameDayKey() && dayKey === displayedGameDayKey() && playBattleCall({ dayKey, amountText: ui`−${money(amount)} ${convertedAmountText(amount)}`.trim(), xp, critical });
+  if (battlePlayed) {
+    root.innerHTML = '';
+    document.querySelectorAll('.game-live-xp-float').forEach(node => node.remove());
+    return true;
+  }
   if (!arcadeEnabled() || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
     root.innerHTML = '';
     document.querySelectorAll('.game-live-xp-float').forEach((node) => node.remove());
@@ -2077,6 +2102,7 @@ export function onGameCallsChanged(dayKey) {
   }
 
   const beforeRewards = computeGameDay(normalizedDayKey, { ignoreLock: true });
+  reconcileGoalChest(normalizedDayKey, beforeRewards);
   onGameMonetaryProgress(normalizedDayKey, beforeRewards.stats.earnings, beforeRewards.goal.usd, { silent: normalizedDayKey !== currentGameDayKey() });
   if (!entry?.finalized) reconcileLiveComboAndLoot(normalizedDayKey, beforeRewards, { allowRewards: enabled });
   const raw = computeGameDay(normalizedDayKey, { ignoreLock: true });
@@ -2194,6 +2220,7 @@ export function onGameDayMetadataChanged(dayKey) {
   ensureGameState();
   const normalized = String(dayKey || '');
   const progressDay = computeGameDay(normalized);
+  reconcileGoalChest(normalized, progressDay);
   onGameMonetaryProgress(normalized, progressDay.stats.earnings, progressDay.goal.usd, { silent: normalized !== currentGameDayKey() });
   const entry = state.game.days[normalized];
   if (entry?.finalized) {
@@ -2408,7 +2435,7 @@ function freezeGameDay(dayKey, { projectStreak = false } = {}) {
   }
   if (state.game.level > oldLevel) queueGameToast(ui`NIVEL ${state.game.level} DESBLOQUEADO`, 'record');
   if (snapshot.stats.total || snapshot.eligibleCalls.length) {
-    state.game.chest = { pending: true, sealedOn: dayKey };
+    if (!state.game.ledger[`chest:${dayKey}`]) state.game.chest = { pending: true, sealedOn: dayKey };
   }
   pruneGameDays();
   return entry;
@@ -2466,7 +2493,7 @@ function stageClearMarkup(dayKey, entry) {
     <div class="game-stage-breakdown"><span>Productividad +${breakdown.productivityXp}</span><span>Llamadas +${breakdown.callsXp}</span><span>Adherencia +${breakdown.adherenceXp}</span><span>Puntualidad +${breakdown.punctualityXp}</span><span>Misiones +${breakdown.missionXp}</span></div>
     <div class="game-stage-missions">${entry.missions.map((mission) => ui`<span class="${mission.ok ? 'is-complete' : ''}">${mission.ok ? '✓' : '○'} ${escapeHtml(translateStoredText(mission.detail))}</span>`).join('')}</div>
     <div class="game-stage-next-level"><span>Nivel ${levelAfter}</span><strong>${xpToNext > 0 ? ui`${xpToNext} XP para nivel ${levelAfter + 1}` : translateText('Nivel completado')}</strong></div>
-    <div class="game-sealed-chest">${gamePixelChest()}<span>Cofre sellado · reclámalo en Logros o al iniciar tu próximo día</span></div>
+    <div class="game-sealed-chest">${gamePixelChest(!!state.game.ledger[`chest:${dayKey}`])}<span>${state.game.ledger[`chest:${dayKey}`] ? translateText('Cofre abierto · recompensa guardada') : translateText('Cofre sellado · reclámalo en Logros o al iniciar tu próximo día')}</span></div>
   </div>`;
 }
 
@@ -2498,7 +2525,13 @@ export function onGameShiftEnded(dayKey = currentGameDayKey()) {
   onPositiveRewardWindow('shift-end');
 }
 
-function chestReward(sealedOn) {
+function chestReward(sealedOn, { goalReward = false } = {}) {
+  if (goalReward) {
+    const visor = ACCESSORY_BY_ID['visor-violeta'];
+    const cosmetic = !state.game.accessories.includes(visor.label) ? visor : ACCESSORY_CATALOG.find(item => item.unlockLevel <= state.game.level && !state.game.accessories.includes(item.label));
+    if (cosmetic) return { type: 'accessory', label: cosmetic.label, rarity: 'rare' };
+    return { type: 'xp', amount: 25, label: translateText('25 monedas de XP'), rarity: 'common' };
+  }
   const roll = hashText(`chest:${sealedOn}`) % 3;
   const rarity = lootRarityFor(`chest:${sealedOn}`);
   if (roll === 0) {
@@ -2510,26 +2543,25 @@ function chestReward(sealedOn) {
   return { type: 'xp', amount, label: ui`${amount} monedas de XP`, rarity };
 }
 
-function openPendingChest(todayKey, { allowSameDay = false } = {}) {
-  if (!gameEnabled()) return false;
-  if (!state.game.chest.pending || !state.game.chest.sealedOn || (!allowSameDay && state.game.chest.sealedOn === todayKey)) return false;
-  const sealedOn = state.game.chest.sealedOn;
+function grantChestReward(sealedOn, { goalReward = false, showModal = true } = {}) {
   const key = `chest:${sealedOn}`;
-  const reward = chestReward(sealedOn);
+  const existing = state.game.ledger[key];
+  if (existing) return false;
+  const reward = chestReward(sealedOn, { goalReward });
   const displayReward = `${lootRarityLabel(reward.rarity)} · ${translateStoredText(reward.label)}`;
   const oldLevel = state.game.level;
   let granted = false;
   if (!state.game.ledger[key]) {
-    state.game.ledger[key] = { type: 'chest', sealedOn, rarity: reward.rarity, gross: reward.type === 'xp' ? reward.amount : 0, applied: reward.type === 'xp' ? reward.amount : 0, accessory: reward.type === 'accessory' ? reward.label : null };
+    state.game.ledger[key] = { type: 'chest', sealedOn, goalReward, rarity: reward.rarity, gross: reward.type === 'xp' ? reward.amount : 0, applied: reward.type === 'xp' ? reward.amount : 0, accessory: reward.type === 'accessory' ? reward.label : null };
     granted = true;
     if (reward.type === 'xp') state.game.totalXp += reward.amount;
     else if (!state.game.accessories.includes(reward.label)) state.game.accessories.push(reward.label);
     state.game.level = levelForXp(state.game.totalXp);
   }
-  state.game.chest = { pending: false, sealedOn: null };
+  if (state.game.chest.sealedOn === sealedOn) state.game.chest = { pending: false, sealedOn: null };
 
   const root = document.getElementById('chestContent');
-  if (root) {
+  if (root && showModal) {
     root.innerHTML = ui`<div class="game-chest-open"><span class="game-kicker">COFRE ABIERTO</span><div class="game-chest-icon">${gamePixelChest(true)}</div><h2>${escapeHtml(displayReward)}</h2><p>${reward.type === 'xp' ? translateText('Se sumó a tu perfil.') : translateText('Ya está disponible en tu bestiario.')}</p></div>`;
     openModal('chestModal');
     pixelBurst(root, 'loot');
@@ -2539,6 +2571,24 @@ function openPendingChest(todayKey, { allowSameDay = false } = {}) {
     if (state.game.level > oldLevel) queueGameToast(ui`NIVEL ${state.game.level} DESBLOQUEADO`, 'record');
     playGameSound(state.game.level > oldLevel ? 'level' : 'loot');
   }
+  return true;
+}
+
+function openPendingChest(todayKey, { allowSameDay = false } = {}) {
+  if (!gameEnabled()) return false;
+  if (!state.game.chest.pending || !state.game.chest.sealedOn || (!allowSameDay && state.game.chest.sealedOn === todayKey)) return false;
+  const sealedOn = state.game.chest.sealedOn;
+  if (state.game.ledger[`chest:${sealedOn}`]) { state.game.chest = { pending: false, sealedOn: null }; return true; }
+  return grantChestReward(sealedOn);
+}
+
+export function openDailyGoalChest(dayKey = currentGameDayKey()) {
+  if (!gameEnabled() || state.activeCall || dayKey !== currentGameDayKey()) return false;
+  ensureGameState(dayKey);
+  if (!computeGameDay(dayKey).defeated) return false;
+  if (!grantChestReward(dayKey, { goalReward: true, showModal: false })) return false;
+  saveStateOnly();
+  renderGame();
   return true;
 }
 
@@ -2686,6 +2736,7 @@ export function initGame() {
       const actionName = action.dataset.gameAction;
       if (['equip-accessory', 'equip'].includes(actionName)) equipAccessory(action.dataset.accessory);
       if (['claim-chest', 'claim-coffer'].includes(actionName)) claimPendingChest();
+      if (actionName === 'open-daily-chest') openDailyGoalChest(action.dataset.gameDay);
       if (['choose-cycle-reward', 'claim-cycle-reward'].includes(actionName)) chooseCycleReward(action.dataset.cycleReward);
     }
     const reopen = event.target instanceof Element ? event.target.closest('[data-reopen-stage], [data-game-action="open-last-clear"]') : null;
@@ -2709,6 +2760,7 @@ export function initGame() {
     syncGameAudio();
     saveSettingsOnly();
     renderSettingsProfile();
+    renderArena();
   });
   document.getElementById('gameSoundVolumeInput')?.addEventListener('input', (event) => {
     settings.game.soundVolume = Math.max(0, Math.min(100, Number(event.target.value) || 0));

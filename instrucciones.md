@@ -652,14 +652,23 @@ La aplicación funciona en producción con estas bases vigentes:
   `/app` sigue siendo el punto de carga y `/app.html` redirige conservando
   parámetros. La raíz conserva la landing pública indexable; al recargar,
   detecta la sesión y reabre la app. La PWA mantiene su identidad y precarga.
-- Gamificación: combate automático con rondas temporales, contraataques y
-  esquivas; habilidad especial recargada por llamadas. Modo tranquilo durante
-  llamadas, pausa manual y duelo opcional en descanso o fuera del turno. Las
-  diez armas, misiones, hitos y progreso financiero se conservan.
+- Gamificación: tarjeta compacta aprobada con una sola barra de ganancias
+  reales hacia la meta y el cofre. Cada llamada válida guardada anima un ataque;
+  Higher Rate muestra un crítico y cada tres llamadas representadas activa el
+  especial automáticamente, incluidos los lotes. Sin rondas ambientales ni
+  vidas independientes. Modo tranquilo en llamada, pausa y sonidos configurables.
+  El panel Logros, cerrado inicialmente, contiene equipo, diez armas, duelo
+  opcional y acceso a Logros completos. Misiones e hitos viven en Logros; el XP
+  conserva sus reglas y no ocupa indicadores en el encabezado de Inicio.
+- El cofre de la meta del día actual concede primero Visor violeta si no está
+  obtenido; después, un cosmético disponible por nivel o 25 XP. Un solo recibo
+  `chest:fecha` por día conserva la compatibilidad con cofres anteriores y evita
+  otro premio al cerrar o continuar. Se guarda inmediatamente; corregir/borrar
+  llamadas o aumentar la meta revoca el premio si deja de estar cumplida.
 - Landing bilingüe estática, canonical/hreflang y sitemap de cuatro páginas,
   preguntas frecuentes e imagen social. Un bundle público evita cargar tres
   copias de las traducciones; las fuentes no bloquean el primer render.
-- La versión actual de la app es 598; el puente es 1.3.0 y el resumen independiente
+- La versión actual de la app es 599; el puente es 1.3.0 y el resumen independiente
   1.0.3. Refuerzo positivo y Logros están terminados. La auditoría profunda del
   8 de octubre corrigió seis fallos; la ampliación corrigió cinco más en arranque,
   concurrencia y PWA. Cobertura y límites constan en
@@ -670,6 +679,22 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v599** — Gamificación compacta y cofre de la meta diaria.
+
+- Una composición responsive en ambos modos: héroe y monstruo, una barra
+  financiera real, estado breve y Logros opcionales. Misiones/hitos se consultan
+  en Logros completos; nivel y XP conservan sus datos fuera del encabezado.
+- Ataques por llamadas guardadas, crítico Higher Rate y especial automático
+  cada tres llamadas representadas, incluidos lotes. Pausa, modo tranquilo,
+  sonido, diez armas, movimiento reducido y duelo opcional se conservan.
+- Cofre inmediato sin modal: visor inicial o cosmético elegible/25 XP; recibo
+  único diario persistido, sin segundo premio al cerrar/continuar. Correcciones
+  y cambios de meta revocan accesorios/equipo o XP para impedir premios inválidos.
+  Los cofres heredados y el dinero de las llamadas conservan sus reglas.
+- Verificación final: 340 pruebas y builds de app y extensiones correctos.
+  Navegador local: llamadas manuales/live, especial, cofre, equipo y recarga;
+  tarjeta sin desbordamiento a 320/390 px, modos claro/oscuro y español/inglés.
 
 **v598** — Combate automático del mockup aprobado.
 
@@ -694,13 +719,3 @@ La aplicación funciona en producción con estas bases vigentes:
   Navegador real con SQL local: conflicto, offline, reconexión y respuesta perdida.
   Sin entorno Supabase de pruebas; OAuth, cron alojado y dispositivos físicos
   siguen fuera de la certificación. Datos reales intactos.
-
-**v596** — Auditoría profunda de integridad y uso mensual.
-
-- Nube: historial completo paginado, compatibilidad antigua solo ante tabla/RPC
-  ausente y comprobación de revisión antes de adoptar datos descargados.
-- Puente: una pestaña desactualizada bloquea eventos automáticos hasta recargar,
-  conservando llamadas nuevas. Hitos monetarios toleran errores decimales mínimos.
-- 31 días simulados, 35 comprobaciones adicionales, 48 layouts y 298 pruebas
-  correctas. Checks/build de app y extensiones pasan. Datos reales intactos;
-  autenticación/nube entre dispositivos físicos no certificadas.

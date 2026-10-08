@@ -6,7 +6,7 @@ import { setAppCalls, setAppSettings, setAppState } from '../js/app-context.js';
 setLanguage('es');
 const {
   announceGameStatus, checkReinforcementInactivity, chooseCycleReward, claimPendingChest, computeGameDay, configureGameContext, createDefaultGameState, equipAccessory,
-  migrateGameCallReferences, normalizeGameState, onGameCallSaved, onGameCallsChanged,
+  migrateGameCallReferences, normalizeGameState, onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged, openDailyGoalChest,
   onGameMonetaryProgress, onGamePauseEnded, onGamePauseStarted, queueGameToast,
   renderGame, renderGameLive, rewardSurpriseForCall, onGameShiftEnded, onGameShiftStarted,
 } = await import('../js/game.js');
@@ -123,11 +123,11 @@ function harness(t, { at = new Date(2026, 8, 29, 12).getTime(), goal = 10000, st
     dropped: items.filter((call) => call.dropped === 'Yes').length, zeroCount: 0, gapTotal: 0,
   });
   let dailyGoal = goal;
-  const openedModals = [], closedModals = [];
+  const openedModals = [], closedModals = [], savedStates = [];
   const shared = {
     callDateKeyFromValue: dayFrom, callsForDay, convertedAmountText: (value) => `≈ L ${(value * 25).toFixed(2)}`,
     effectiveDailyGoal: () => ({ min: 1000, usd: dailyGoal }), escapeHtml: String, importedCallStats,
-    saveStateOnly: () => {}, saveSettingsOnly: () => {}, todayCallDateKey: keyFor, toast: () => {},
+    saveStateOnly: () => savedStates.push(structuredClone(currentState)), saveSettingsOnly: () => {}, todayCallDateKey: keyFor, toast: () => {},
     closeModal: (id) => closedModals.push(id), openModal: (id) => openedModals.push(id),
   };
   configureGameContext({
@@ -161,7 +161,7 @@ function harness(t, { at = new Date(2026, 8, 29, 12).getTime(), goal = 10000, st
     return call;
   };
   return {
-    get state() { return currentState; }, config, rows, stack, announcements, nodes, openedModals, closedModals, add, keyFor, iso, advance,
+    get state() { return currentState; }, config, rows, stack, announcements, nodes, openedModals, closedModals, savedStates, add, keyFor, iso, advance,
     get now() { return now; }, setNow: (value) => { now = value; }, setGoal: (value) => { dailyGoal = value; },
     reload() { currentState = JSON.parse(JSON.stringify(currentState)); currentState.game = normalizeGameState(currentState.game); setAppState(currentState); },
     ledger(prefix) { return Object.entries(currentState.game.ledger).filter(([key]) => key.startsWith(prefix)); },
@@ -311,22 +311,25 @@ test('corregir un día cerrado derrota su monstruo sin reabrir XP y retirar dine
   assert.equal(h.state.game.totalXp, totalXp);
 });
 
-test('el combo visible reacciona a una llamada sin pago y el impacto sobrevive al render', (t) => {
+test('el combo reacciona a una llamada sin pago sin duplicar el feedback compacto', (t) => {
   const h = harness(t, { surface: true });
   h.config.game.intensity = 'arcade';
   const arena = h.nodes.get('gameArena');
   const first = h.add('first-paid');
   onGameCallSaved(first, 'manual', { random: () => 0.99 });
-  assert.match(arena.querySelector('[data-battle-summary]').innerHTML, /class="game-combo-badge"[^>]*>x1</);
+  assert.equal(h.state.game.live.combo, 1);
+  assert.match(arena.querySelector('[data-battle-health-slot]').innerHTML, /\$1\.00/);
   const zero = h.add('zero-pay', { pay: 0 });
   onGameCallSaved(zero, 'manual', { random: () => 0.99 });
   onGameCallsChanged(zero.shiftDayKey);
   assert.equal(h.state.game.live.combo, 2);
-  assert.match(arena.querySelector('[data-battle-summary]').innerHTML, /class="game-combo-badge"[^>]*>x2</);
+  assert.match(arena.querySelector('[data-battle-health-slot]').innerHTML, /\$1\.00/);
+  assert.equal(arena.classList.contains('is-hit'), false);
+  assert.equal(h.nodes.get('gameCallFx').innerHTML, '');
   h.setGoal(20000);
   renderGame();
-  assert.equal(arena.classList.contains('is-hit'), true);
-  assert.equal(h.nodes.get('classicDailyGoalCard').style.display, '');
+  assert.equal(arena.classList.contains('is-hit'), false, 'cambiar la meta cancela el impacto del progreso anterior');
+  assert.equal(h.nodes.get('classicDailyGoalCard').style.display, 'none');
 });
 
 test('guardar con arena visible, ausente o Logros apagado conserva dinero y HP sin duplicar recibos', async (t) => {
@@ -341,7 +344,7 @@ test('guardar con arena visible, ausente o Logros apagado conserva dinero y HP s
       if (mode === 'visible') {
         assert.ok(battle, 'la representación de batalla debe estar montada');
         assert.equal(arena.hidden, false);
-        for (const slot of ['summary', 'health-slot', 'stats', 'mission-hint']) assert.ok(arena.querySelector(`[data-battle-${slot}]`));
+        for (const slot of ['heading', 'health-slot', 'feed', 'collection-summary']) assert.ok(arena.querySelector(`[data-battle-${slot}]`));
       } else if (mode === 'absent') assert.equal(arena, undefined);
       else assert.equal(arena.hidden, true);
 
@@ -357,7 +360,8 @@ test('guardar con arena visible, ausente o Logros apagado conserva dinero y HP s
       const receipt = structuredClone(receipts[0][1]);
       if (mode === 'visible') {
         assert.equal(battle.dataset.battleHp, '75');
-        assert.match(battle.querySelector('[data-battle-banner]').textContent, /−\$25\.00/);
+        assert.match(battle.querySelector('[data-battle-banner]').textContent, /Higher Rate/);
+        assert.match(arena.querySelector('[data-battle-health-slot]').innerHTML, /\$25\.00/);
         assert.strictEqual(arena.querySelector('.game-battle'), battle, 'guardar actualiza slots sin remontar la escena');
       }
 
@@ -380,15 +384,20 @@ test('guardar con arena visible, ausente o Logros apagado conserva dinero y HP s
   assert.deepEqual(results, [{ hp: 75, earnings: 25 }, { hp: 75, earnings: 25 }, { hp: 75, earnings: 25 }]);
 });
 
-test('los timers de una llamada anterior no retiran el impacto de la llamada nueva', (t) => {
+test('timers de llamadas sucesivas no duplican feedback ni alteran sus recibos en la batalla compacta', (t) => {
   const h = harness(t, { surface: true });
   h.config.game.intensity = 'arcade';
   onGameCallSaved(h.add('first'), 'manual', { random: () => 0.99 });
   h.advance(1000);
   onGameCallSaved(h.add('second', { pay: 2 }), 'live', { random: () => 0.99 });
+  const receipts = structuredClone(h.ledger('reinforce-call:'));
+  const xp = computeGameDay(h.keyFor()).xp;
   h.advance(1100);
-  assert.match(h.nodes.get('gameCallFx').innerHTML, /\$2\.00/);
-  assert.equal(h.nodes.get('gameArena').classList.contains('is-hit'), true);
+  assert.equal(h.nodes.get('gameCallFx').innerHTML, '');
+  assert.equal(h.nodes.get('gameArena').classList.contains('is-hit'), false);
+  assert.equal(computeGameDay(h.keyFor()).stats.earnings, 3);
+  assert.equal(computeGameDay(h.keyFor()).xp, xp);
+  assert.deepEqual(h.ledger('reinforce-call:'), receipts);
   h.advance(1000);
   assert.equal(h.nodes.get('gameCallFx').innerHTML, '');
   assert.equal(h.nodes.get('gameArena').classList.contains('is-hit'), false);
@@ -416,9 +425,9 @@ for (const source of ['manual', 'live', 'import']) {
     assert.equal(snapshot.xp, 0);
     assert.equal(snapshot.eligibleCalls.length, 0);
     assert.equal(h.state.game.live.combo, 0);
-    assert.match(h.nodes.get('gameCallFx').innerHTML, /LLAMADA REGISTRADA.*\$2\.00.*≈ L 50\.00.*sin XP/);
-    assert.doesNotMatch(h.nodes.get('gameCallFx').innerHTML, /SELLADO/);
-    assert.equal(h.nodes.get('gameArena').classList.contains('is-hit'), true);
+    assert.equal(h.nodes.get('gameCallFx').innerHTML, '');
+    assert.match(h.nodes.get('gameArena').querySelector('[data-battle-health-slot]').innerHTML, /\$2\.00/);
+    assert.equal(h.nodes.get('gameArena').classList.contains('is-hit'), false);
     const key = `reinforce-call:${call.shiftDayKey}:late`;
     assert.equal(h.state.game.ledger[key].visual, true);
     assert.equal(h.state.game.ledger[key].surprise, undefined);
@@ -878,4 +887,211 @@ test('cierre nocturno cumplido proyecta la racha del día contable y las correcc
   assert.equal(h.state.game.days[day].comparisons.earnings, 2);
   h.reload();
   assert.equal(h.state.game.days[day].closingEvidence.projection, null);
+});
+
+test('cofre de meta exige dinero suficiente, meta positiva, día actual, Logros y ninguna llamada activa', async (t) => {
+  const cases = [
+    { name: 'debajo de la meta', pay: 9.99 },
+    { name: 'sin dinero', pay: 0 },
+    { name: 'meta cero', pay: 10, goal: 0 },
+    { name: 'histórico derrotado', pay: 10, historical: true },
+    { name: 'llamada activa', pay: 10, live: true },
+    { name: 'Logros apagado', pay: 10, disabled: true },
+  ];
+  for (const scenario of cases) await t.test(scenario.name, (subtest) => {
+    const h = harness(subtest, { goal: scenario.goal ?? 10 });
+    const day = scenario.historical ? h.keyFor(new Date(h.now - 86400000)) : h.keyFor();
+    h.add('eligibility', { pay: scenario.pay, callDate: day, shiftDayKey: day });
+    if (scenario.live) h.state.activeCall = { startedAt: h.iso(h.now) };
+    if (scenario.disabled) h.config.game.enabled = false;
+    const calls = structuredClone(h.rows), profileXp = h.state.game.totalXp;
+    const saves = h.savedStates.length;
+    assert.equal(openDailyGoalChest(day), false);
+    assert.equal(h.state.game.ledger[`chest:${day}`], undefined);
+    assert.deepEqual(h.state.game.accessories, []);
+    assert.equal(h.state.game.totalXp, profileXp);
+    assert.equal(h.savedStates.length, saves);
+    assert.deepEqual(h.rows, calls);
+    assert.equal(computeGameDay(day).stats.earnings, scenario.pay);
+    assert.deepEqual(h.openedModals, []);
+  });
+});
+
+test('cofre de meta exacta guarda el primer visor inmediatamente y repetir o recargar conserva un solo premio', (t) => {
+  const h = harness(t, { goal: 10, surface: true });
+  const day = h.keyFor();
+  h.add('exact-goal', { pay: 10 });
+  const calls = structuredClone(h.rows), saves = h.savedStates.length;
+  assert.equal(openDailyGoalChest(), true);
+  const receipt = structuredClone(h.state.game.ledger[`chest:${day}`]);
+  assert.equal(receipt.goalReward, true);
+  assert.equal(receipt.accessory, 'Visor violeta');
+  assert.equal(receipt.applied, 0);
+  assert.deepEqual(h.state.game.accessories, ['Visor violeta']);
+  assert.equal(h.state.game.totalXp, 0);
+  assert.ok(h.savedStates.length > saves);
+  assert.deepEqual(h.savedStates.at(-1).game.ledger[`chest:${day}`], receipt);
+  assert.deepEqual(h.savedStates.at(-1).game.accessories, ['Visor violeta']);
+  assert.deepEqual(h.openedModals, []);
+  for (let attempt = 0; attempt < 3; attempt++) {
+    h.reload();
+    assert.equal(openDailyGoalChest(day), false);
+    onGameCallsChanged(day);
+    assert.deepEqual(h.state.game.ledger[`chest:${day}`], receipt);
+    assert.equal(h.ledger('chest:').length, 1);
+    assert.deepEqual(h.state.game.accessories, ['Visor violeta']);
+    assert.equal(h.state.game.totalXp, 0);
+  }
+  assert.deepEqual(h.rows, calls);
+  assert.equal(computeGameDay(day).stats.earnings, 10);
+});
+
+test('cerrar y continuar el turno conserva el cofre de meta sin sellar ni conceder un segundo premio', (t) => {
+  const h = harness(t, { goal: 10 });
+  const day = h.keyFor();
+  h.add('close-goal', { pay: 12 });
+  assert.equal(openDailyGoalChest(), true);
+  const receipt = structuredClone(h.state.game.ledger[`chest:${day}`]);
+  for (let cycle = 0; cycle < 2; cycle++) {
+    h.state.shiftEndedAt = h.iso(h.now);
+    onGameShiftEnded(day);
+    const sealedXp = h.state.game.days[day].xp;
+    assert.equal(h.state.game.totalXp, sealedXp);
+    assert.equal(h.state.game.chest.pending, false);
+    assert.equal(claimPendingChest(), false);
+    assert.equal(openDailyGoalChest(day), false);
+    h.reload();
+    h.state.shiftEndedAt = null;
+    onGameShiftStarted({ continued: true });
+    assert.equal(h.state.game.totalXp, 0);
+    assert.equal(h.state.game.days[day].finalized, undefined);
+    assert.deepEqual(h.state.game.ledger[`chest:${day}`], receipt);
+    assert.equal(h.state.game.chest.pending, false);
+    assert.equal(openDailyGoalChest(), false);
+    assert.equal(h.ledger('chest:').length, 1);
+  }
+  assert.deepEqual(h.state.game.accessories, ['Visor violeta']);
+  assert.equal(computeGameDay(day).stats.earnings, 12);
+});
+
+test('corregir y borrar llamadas revoca el visor y su equipo; alcanzar la meta otra vez lo recupera sin sumar XP', (t) => {
+  const h = harness(t, { goal: 10 });
+  const day = h.keyFor(), call = h.add('correct-goal', { pay: 10 });
+  assert.equal(openDailyGoalChest(), true);
+  assert.equal(equipAccessory('visor-violeta'), true);
+  assert.equal(h.state.game.equipment.face, 'Visor violeta');
+  h.reload();
+  call.pay = 4;
+  onGameCallsChanged(day);
+  assert.equal(h.state.game.ledger[`chest:${day}`], undefined);
+  assert.equal(h.state.game.equipment.face, null);
+  assert.deepEqual(h.state.game.accessories, []);
+  assert.equal(openDailyGoalChest(), false);
+  call.pay = 10;
+  onGameCallsChanged(day);
+  assert.equal(openDailyGoalChest(), true);
+  assert.equal(equipAccessory('Visor violeta'), true);
+  h.rows.splice(0, 1);
+  onGameCallsChanged(day);
+  assert.equal(h.state.game.ledger[`chest:${day}`], undefined);
+  assert.equal(h.state.game.equipment.face, null);
+  assert.deepEqual(h.state.game.accessories, []);
+  assert.equal(computeGameDay(day).stats.earnings, 0);
+  h.reload();
+  h.rows.push(call);
+  onGameCallsChanged(day);
+  assert.equal(openDailyGoalChest(), true);
+  assert.deepEqual(h.state.game.accessories, ['Visor violeta']);
+  assert.equal(h.state.game.totalXp, 0);
+  assert.equal(h.ledger('chest:').length, 1);
+  assert.equal(call.pay, 10);
+});
+
+test('premio de 25 XP se reembolsa por corrección y meta nueva sin permitir cultivar XP al repetir', (t) => {
+  const h = harness(t, { goal: 10 });
+  const day = h.keyFor(), call = h.add('xp-goal', { pay: 10 });
+  h.state.game.accessories = ['Visor violeta'];
+  for (let cycle = 0; cycle < 3; cycle++) {
+    assert.equal(openDailyGoalChest(), true);
+    assert.equal(h.state.game.ledger[`chest:${day}`].applied, 25);
+    assert.equal(h.state.game.totalXp, 25);
+    h.reload();
+    assert.equal(openDailyGoalChest(), false);
+    call.pay = 9;
+    onGameCallsChanged(day);
+    assert.equal(h.state.game.totalXp, 0);
+    assert.equal(h.state.game.level, 1);
+    assert.equal(h.state.game.ledger[`chest:${day}`], undefined);
+    assert.deepEqual(h.state.game.accessories, ['Visor violeta']);
+    call.pay = 10;
+    onGameCallsChanged(day);
+  }
+  assert.equal(openDailyGoalChest(), true);
+  h.setGoal(11);
+  onGameDayMetadataChanged(day);
+  assert.equal(h.state.game.totalXp, 0);
+  assert.equal(h.state.game.ledger[`chest:${day}`], undefined);
+  assert.equal(openDailyGoalChest(), false);
+  h.setGoal(10);
+  onGameDayMetadataChanged(day);
+  assert.equal(openDailyGoalChest(), true);
+  h.reload();
+  assert.equal(h.state.game.totalXp, 25);
+  assert.equal(openDailyGoalChest(), false);
+  assert.equal(computeGameDay(day).stats.earnings, 10);
+  assert.equal(h.ledger('chest:').length, 1);
+});
+
+test('cofres heredados conservan su recibo al corregir dinero o meta y bloquean un premio diario duplicado', (t) => {
+  const h = harness(t, { goal: 10 });
+  const day = h.keyFor(), call = h.add('legacy-goal', { pay: 10 });
+  const legacy = { type: 'chest', sealedOn: day, applied: 25, gross: 25, rarity: 'common' };
+  h.state.game.totalXp = 25;
+  h.state.game.ledger[`chest:${day}`] = legacy;
+  h.state.game.chest = { pending: true, sealedOn: day };
+  assert.equal(openDailyGoalChest(), false);
+  assert.equal(claimPendingChest(), true);
+  assert.equal(h.state.game.chest.pending, false);
+  call.pay = 0;
+  onGameCallsChanged(day);
+  h.setGoal(20);
+  onGameDayMetadataChanged(day);
+  h.reload();
+  assert.deepEqual(h.state.game.ledger[`chest:${day}`], legacy);
+  assert.equal(h.state.game.totalXp, 25);
+  assert.equal(claimPendingChest(), false);
+  const yesterday = h.keyFor(new Date(h.now - 86400000));
+  h.state.game.chest = { pending: true, sealedOn: yesterday };
+  assert.equal(claimPendingChest(), true);
+  const receipt = structuredClone(h.state.game.ledger[`chest:${yesterday}`]);
+  assert.equal(receipt.goalReward, false);
+  onGameCallsChanged(yesterday);
+  h.reload();
+  assert.deepEqual(h.state.game.ledger[`chest:${yesterday}`], receipt);
+  assert.equal(claimPendingChest(), false);
+  assert.equal(computeGameDay(day).stats.earnings, 0);
+});
+
+test('visor desbloqueado en nivel uno conserva equipo facial y snapshot cerrado al normalizar y recargar', (t) => {
+  const h = harness(t, { goal: 10 });
+  const day = h.keyFor();
+  h.add('visor-normalization', { pay: 10 });
+  assert.equal(openDailyGoalChest(), true);
+  assert.equal(equipAccessory('visor-violeta'), true);
+  assert.equal(h.state.game.level, 1);
+  h.state.shiftEndedAt = h.iso(h.now);
+  onGameShiftEnded(day);
+  h.state.game.equipment.face = 'visor-violeta';
+  h.state.game.days[day].monster.equipment.face = 'visor-violeta';
+  h.reload();
+  renderGame();
+  assert.equal(h.state.game.equipment.face, 'Visor violeta');
+  assert.equal(h.state.game.days[day].monster.equipment.face, 'Visor violeta');
+  assert.deepEqual(h.state.game.accessories, ['Visor violeta']);
+  assert.equal(h.state.game.ledger[`chest:${day}`].goalReward, true);
+  const normalized = structuredClone(h.state.game);
+  h.reload();
+  assert.deepEqual(h.state.game, normalized);
+  assert.equal(openDailyGoalChest(), false);
+  assert.equal(computeGameDay(day).stats.earnings, 10);
 });

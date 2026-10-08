@@ -82,6 +82,7 @@ const EQUIPMENT_LABELS = Object.freeze({
   'alas-pixel': 'Alas pixel',
   'armadura-cian': 'Armadura cian',
   'ojo-de-rubi': 'Ojo de rubí',
+  'visor-violeta': 'Visor violeta',
 });
 
 function equipmentEntries(value) {
@@ -287,6 +288,7 @@ function renderEquipment(value) {
       ${ids.has('alas-pixel') ? '<path class="monster-equipment monster-equipment--wings" d="M37 62 12 50l17 27m94-15 25-12-17 27" fill="none"/>' : ''}
       ${ids.has('armadura-cian') ? '<path class="monster-equipment monster-equipment--armor" d="M48 94h64v14H48Z" fill="none"/>' : ''}
       ${ids.has('ojo-de-rubi') ? translateMarkup('<rect class="monster-equipment monster-equipment--ruby" x="75" y="57" width="12" height="17"/>') : ''}
+      ${ids.has('visor-violeta') ? '<path class="monster-equipment monster-equipment--visor" d="M49 55h62v21H49Z" fill="none"/>' : ''}
     </g>`;
 }
 

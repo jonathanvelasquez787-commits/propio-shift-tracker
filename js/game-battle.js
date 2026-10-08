@@ -49,21 +49,6 @@ function weaponHint(id) {
     default: return translateText('disparo simple');
   }
 }
-function specialName(id) {
-  switch (id) {
-    case 'smg': return translateText('Lluvia de balas');
-    case 'shotgun': return translateText('Disparo triple');
-    case 'rocket': return translateText('Cohete doble');
-    case 'railgun': return translateText('Rayo cargado');
-    case 'flame': return translateText('Tormenta de fuego');
-    case 'too-much': return translateText('Doble núcleo');
-    case 'drone': return translateText('Escuadrón aéreo');
-    case 'psr': return translateText('Pulso estelar');
-    case 'wand': return translateText('Lluvia de estrellas');
-    default: return translateText('Disparo preciso');
-  }
-}
-
 // This queue carries display data only; the caller has already committed the real call.
 export function createBattleQueue() {
   const events = [];
@@ -71,12 +56,14 @@ export function createBattleQueue() {
     get size() { return events.length; },
     push(value, limit = MAX_QUEUE) {
       const event = { dayKey: String(value.dayKey ?? ''), amountText: String(value.amountText ?? '').slice(0, 160), xp: number(value.xp), critical: value.critical === true, count: Math.max(1, Math.floor(number(value.count) || 1)) };
+      if (value.specialCount) event.specialCount = Math.floor(number(value.specialCount));
       if (events.length < Math.max(1, Math.min(MAX_QUEUE, limit))) events.push(event);
       else {
         const last = events[events.length - 1];
         last.count = Math.min(1e9, last.count + event.count);
         last.xp = Math.min(1e9, last.xp + event.xp);
         last.critical ||= event.critical;
+        if (event.specialCount) last.specialCount = number(last.specialCount) + event.specialCount;
         last.amountText = '';
       }
       return events.length;
@@ -99,56 +86,42 @@ function weaponArt(r, id) {
   if (id === 'psr') { r(2,-6,34,13,'ink'); r(4,-4,25,9,'hero'); r(7,-4,3,8,'hero-light'); r(13,-4,3,8,'hero-dark'); r(28,-6,9,13,'monster-shadow'); r(31,-3,5,6,'monster-light'); r(8,7,5,5,'ink'); return 38; }
   r(7,-4,20,7,'hero-dark'); return 28;
 }
-function weaponIcon(id) {
-  const pixels = [];
-  weaponArt((x,y,w,h,c) => pixels.push(`<rect x="${x}" y="${y+12}" width="${w}" height="${h}" fill="var(--battle-${c})"/>`), id);
-  return `<svg viewBox="0 0 44 30" aria-hidden="true" focusable="false">${pixels.join('')}</svg>`;
-}
 function fallbackHero() {
-  return '<svg class="game-battle-fallback-hero" viewBox="0 0 40 64" aria-hidden="true"><g fill="var(--battle-ink)"><path d="M8 0h24v22H8zM10 22h18v24H10zM8 46h10v18H8zM22 46h10v18H22z"/></g><path fill="var(--battle-helmet)" d="M10 2h20v14H10z"/><path fill="var(--battle-hero-dark)" d="M12 10h18v6H12zM12 44h4v16h-4zM24 44h4v16h-4z"/><path fill="var(--battle-hero)" d="M12 24h14v18H12z"/><path fill="var(--battle-hero-light)" d="M12 24h4v16h-4zM24 12h4v4h-4zM26 28h14v6H26z"/></svg>';
+  return '<svg class="game-battle-fallback-hero" viewBox="0 0 40 64" aria-hidden="true"><g fill="var(--battle-ink)"><path d="M8 0h24v22H8zM10 22h18v24H10zM8 46h10v18H8zM22 46h10v18H22z"/></g><path fill="var(--battle-helmet)" d="M10 2h20v14H10z"/><path fill="var(--battle-hero-dark)" d="M12 44h4v16h-4zM24 44h4v16h-4z"/><path data-battle-fallback-visor fill="var(--battle-hero-dark)" d="M12 10h18v6H12z"/><path fill="var(--battle-hero)" d="M12 24h14v18H12z"/><path fill="var(--battle-hero-light)" d="M12 24h4v16h-4zM24 12h4v4h-4zM26 28h14v6H26z"/></svg>';
 }
 export function battleMarkup() {
   return ui`<section class="game-battle" aria-label="Batalla del héroe">
-    <div class="game-battle-stage" data-battle-stage tabindex="0" role="group" aria-label="Batalla: A y D para caminar, espacio para saltar, Enter para disparar y G para granada">
+    <div class="game-battle-head"><div class="game-battle-heading" data-battle-heading></div><div class="game-battle-head-tools">
+      <button type="button" data-battle-action="pause-auto" data-battle-auto-pause aria-pressed="false" aria-label="Pausar animación"><svg viewBox="0 0 24 24" aria-hidden="true"><path data-battle-pause-icon d="M8 5v14M16 5v14" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
+      <button type="button" data-battle-action="toggle-sound" data-battle-sound aria-pressed="false" aria-label="Activar sonidos"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z" fill="none" stroke="currentColor" stroke-width="2"/><path data-battle-sound-icon d="m16 9 5 6m0-6-5 6" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
+    </div></div>
+    <div class="game-battle-stage" data-battle-stage tabindex="0" role="group" aria-label="Batalla del héroe">
       <canvas data-battle-canvas aria-hidden="true"></canvas>
-      <div class="game-battle-auto-hud" data-battle-auto-hud>
-        <div><span>HÉROE <b data-battle-auto-hero-hp>100%</b></span><div class="game-battle-round-track"><i data-battle-auto-hero-fill></i></div></div>
-        <div class="game-battle-round"><span data-battle-round></span><strong data-battle-round-state></strong></div>
-        <div><span>MONSTRUO <b data-battle-auto-hp>72%</b></span><div class="game-battle-round-track game-battle-round-track--enemy"><i data-battle-auto-fill></i></div></div>
-      </div>
-      <div class="game-battle-label game-battle-label--hero"><span>HÉROE</span><b data-battle-hero-label>Tu esfuerzo</b></div>
-      <div class="game-battle-label game-battle-label--monster"><span data-battle-monster-label>MONSTRUO DEL DÍA</span><b data-battle-monster-name></b></div>
-      <p class="game-battle-feed" data-battle-feed>Listo para tu próxima llamada</p>
+      <div class="game-battle-label game-battle-label--hero"><b data-battle-hero-label>Tu héroe</b></div>
+      <div class="game-battle-label game-battle-label--monster"><b data-battle-monster-label>Tu meta de hoy</b></div>
       <div class="game-battle-monster" data-battle-monster></div>
       <button type="button" class="game-battle-hero-target" data-battle-action="hero" aria-label="Tocar al héroe para disparar en el duelo">${fallbackHero()}</button>
-      <div class="game-battle-notice" data-battle-notice hidden><strong>HÉROE</strong><span data-battle-notice-text></span></div>
+      <div class="game-battle-notice" data-battle-notice hidden><span data-battle-notice-text></span></div>
       <p class="game-battle-banner" data-battle-banner hidden></p>
       <div class="game-battle-call-overlay" data-battle-call-overlay hidden><strong>Vos atendé. Él te acompaña.</strong><span>Modo tranquilo durante la llamada</span></div>
-      <div class="game-battle-round-victory" data-battle-round-victory hidden><span>✦ VICTORIA ✦</span><strong>¡Otra ronda ganada!</strong><small>Tu héroe se prepara para la siguiente.</small></div>
-      <div class="game-battle-victory" data-battle-victory hidden><span>★ ★ ★</span><strong>VICTORIA</strong><small>Tu esfuerzo cuenta</small></div>
+      <div class="game-battle-victory" data-battle-victory hidden></div>
     </div>
-    <div class="game-battle-health" data-battle-health-slot><div data-battle-stats></div></div>
-    <div class="game-battle-mode-row">
-      <div class="game-battle-modes" role="group" aria-label="Modo de juego"><button type="button" data-battle-action="auto" aria-pressed="true">Automático</button><button type="button" data-battle-action="duel" aria-pressed="false" data-battle-duel-button>Duelo · 60 s</button></div>
-      <small data-battle-work-note></small>
-      <button type="button" data-battle-action="pause-auto" data-battle-auto-pause aria-pressed="false">Pausar</button>
-    </div>
-    <div class="game-battle-duel-hud" data-battle-duel-hud hidden>
-      <strong data-battle-hearts aria-label="Vidas del héroe"></strong><span data-battle-time></span><span data-battle-points></span><span data-battle-best></span>
-      <button type="button" data-battle-action="start" data-battle-start>Jugar</button>
-      <div class="game-battle-duel-health"><span>Vida del duelo</span><div role="progressbar" aria-label="Vida del monstruo en el duelo" aria-valuemin="0" aria-valuemax="100" data-battle-duel-health><i data-battle-duel-fill></i></div><b data-battle-duel-hp></b></div>
-      <p data-battle-duel-message role="status" aria-live="polite"></p>
-      <small>Puntos de juego · tus ganancias y XP se conservan.</small>
-    </div>
-    <div class="game-battle-tools">
-    <div class="game-battle-controls"><details class="game-battle-shortcuts" data-battle-shortcuts hidden><summary>Teclas</summary><div class="game-battle-keys"><span><kbd>A D</kbd> Caminar</span><span><kbd>Espacio</kbd> Saltar</span><span><kbd>Enter</kbd> Disparar</span><span><kbd>G / RMB</kbd> Granada</span></div></details>
-      <div class="game-battle-touch" data-battle-touch hidden role="group" aria-label="Controles del duelo"><button type="button" data-battle-direction="a" aria-label="Caminar a la izquierda">←</button><button type="button" data-battle-direction="d" aria-label="Caminar a la derecha">→</button><button type="button" data-battle-action="jump" aria-label="Saltar">↑</button><button type="button" data-battle-action="attack">Disparar</button><button type="button" data-battle-action="grenade">Granada</button></div>
-    </div>
-    <div class="game-battle-loadout"><div><label for="gameBattleWeapon">ARMA EQUIPADA</label><select id="gameBattleWeapon" data-battle-weapon-select>${BATTLE_WEAPONS.map(w => `<option value="${w.id}">${escape(weaponName(w.id))}</option>`).join('')}</select><small data-battle-selected></small></div>
-      <div class="game-battle-special"><div><span>Habilidad especial</span><strong data-battle-charge-label>Lista</strong></div><div class="game-battle-charge-track" role="progressbar" aria-label="Carga de la habilidad especial" aria-valuemin="0" aria-valuemax="100" data-battle-charge><i data-battle-charge-fill></i></div><button type="button" data-battle-action="special" data-battle-special-button><span data-battle-special-name></span></button></div>
-    </div>
-    </div>
-    <div class="game-battle-footer"><span>Tus llamadas cargan el poder del héroe.</span><span>Rondas de juego · tus ganancias y XP se conservan.</span></div>
+    <div class="game-battle-health" data-battle-health-slot></div>
+    <div class="game-battle-footer"><p class="game-battle-feed" data-battle-feed>Cada llamada te acerca al cofre.</p><button type="button" data-battle-action="collection" data-battle-collection-toggle aria-expanded="false" aria-controls="gameBattleCollection">Logros <span aria-hidden="true">⌄</span></button></div>
+    <section id="gameBattleCollection" class="game-battle-collection" data-battle-collection hidden aria-label="Logros">
+      <div data-battle-collection-summary></div>
+      <div class="game-battle-loadout"><div><label for="gameBattleWeapon">ARMA EQUIPADA</label><select id="gameBattleWeapon" data-battle-weapon-select>${BATTLE_WEAPONS.map(w => `<option value="${w.id}">${escape(weaponName(w.id))}</option>`).join('')}</select><small data-battle-selected></small></div></div>
+      <div class="game-battle-mode-row"><div class="game-battle-modes" role="group" aria-label="Modo de juego"><button type="button" data-battle-action="auto" aria-pressed="true">Automático</button><button type="button" data-battle-action="duel" aria-pressed="false" data-battle-duel-button>Duelo · 60 s</button></div><small data-battle-work-note></small></div>
+      <div class="game-battle-duel-hud" data-battle-duel-hud hidden>
+        <strong data-battle-hearts aria-label="Vidas del héroe"></strong><span data-battle-time></span><span data-battle-points></span><span data-battle-best></span>
+        <button type="button" data-battle-action="start" data-battle-start>Jugar</button>
+        <div class="game-battle-duel-health"><span>Vida del duelo</span><div role="progressbar" aria-label="Vida del monstruo en el duelo" aria-valuemin="0" aria-valuemax="100" data-battle-duel-health><i data-battle-duel-fill></i></div><b data-battle-duel-hp></b></div>
+        <p data-battle-duel-message role="status" aria-live="polite"></p><small>Puntos de juego · tus ganancias y XP se conservan.</small>
+      </div>
+      <div class="game-battle-controls"><details class="game-battle-shortcuts" data-battle-shortcuts hidden><summary>Teclas</summary><div class="game-battle-keys"><span><kbd>A D</kbd> Caminar</span><span><kbd>Espacio</kbd> Saltar</span><span><kbd>Enter</kbd> Disparar</span><span><kbd>G / RMB</kbd> Granada</span></div></details>
+        <div class="game-battle-touch" data-battle-touch hidden role="group" aria-label="Controles del duelo"><button type="button" data-battle-direction="a" aria-label="Caminar a la izquierda">←</button><button type="button" data-battle-direction="d" aria-label="Caminar a la derecha">→</button><button type="button" data-battle-action="jump" aria-label="Saltar">↑</button><button type="button" data-battle-action="attack">Disparar</button><button type="button" data-battle-action="grenade">Granada</button></div>
+      </div>
+    </section>
     <p class="game-battle-motion-note" data-battle-motion-note hidden>Movimiento reducido: sin destellos ni sacudidas.</p>
     <p class="game-battle-live" data-battle-live role="status" aria-live="polite" aria-atomic="true"></p>
   </section>`;
@@ -174,33 +147,35 @@ function createBattle(element) {
   element.dataset.battleCanvas = ctx ? 'ready' : 'fallback';
   const duel = createDuel();
   const auto = createAutoBattle();
-  let autoPaused = false;
+  let autoPaused = false, collectionOpen = false, victoryAt = 0;
   let mode = 'auto', work = 'ready', lastDuelAnnouncement = '';
   const queue = createBattleQueue(), keys = new Set(), cleanup = [], observers = [];
   const motion = host.matchMedia?.('(prefers-reduced-motion: reduce)');
-  let reduced = !!motion?.matches, view = {}, callbacks = {}, colors = {}, world = { w: 600, h: 280, floor: 240 };
+  let reduced = !!motion?.matches, view = {}, callbacks = {}, colors = {}, world = { w: 600, h: 154, floor: 128 };
   let hero = { x: 96, jump: 0, vy: 0, walk: 0, recoil: 0, face: 1 };
   let bullets = [], particles = [], active = null, weapon = 'pistol', raf = 0, lastTime = 0, clock = 0, destroyed = false, intersecting = true, running = false, lastMonsterMarkup, hasSynced = false;
   let bannerUntil = 0, noticeUntil = 0, hitUntil = 0, droneUntil = 0, flash = 0, staticTimer = 0, soundPending = false;
   const listen = (node, type, handler, options) => { node?.addEventListener?.(type, handler, options); cleanup.push(() => node?.removeEventListener?.(type, handler, options)); };
-  const boss = () => ({ x: world.w - (world.w < 500 ? 65 : 104), y: world.floor - (world.w < 500 ? 52 : 66) });
+  const boss = () => ({ x: world.w < 500 ? world.w * .93 - 47 : world.w * .89 - 55, y: world.floor - (world.w < 500 ? 37 : 43) });
   const visible = () => !destroyed && element.isConnected && !doc.hidden && intersecting && !element.closest('[hidden]') && element.getClientRects().length > 0 && host.getComputedStyle(element).visibility !== 'hidden';
   const canAuto = () => mode === 'auto' && work !== 'call' && view.currentDay !== false && !view.defeated && !autoPaused && !reduced && !!ctx;
-  const sound = kind => { if (work !== 'call' && visible() && callbacks.onSound) { soundPending = true; callbacks.onSound(kind); } };
+  const sound = kind => { if (work !== 'call' && view.soundEnabled !== false && visible() && callbacks.onSound) { soundPending = true; callbacks.onSound(kind); } };
   function clearEffects() {
     queue.clear(); active = null; bullets = []; particles = []; keys.clear(); flash = 0; hitUntil = 0; droneUntil = 0;
-    bannerUntil = 0; noticeUntil = 0; $('banner').hidden = true; $('notice').hidden = true;
+    bannerUntil = 0; noticeUntil = 0; victoryAt = 0; $('banner').hidden = true; $('notice').hidden = true;
     hero.jump = 0; hero.vy = 0; hero.recoil = 0; monster.style.transform = ''; monster.removeAttribute('data-battle-hit');
     host.clearTimeout?.(staticTimer); staticTimer = 0;
     soundPending = false;
+    $('victory').hidden = !view.defeated;
   }
   function pause() {
-    duel.pause(); updateDuel();
+    duel.pause();
     const notify = element.dataset.battlePaused !== 'true' || soundPending;
     if (raf) host.cancelAnimationFrame?.(raf);
     raf = 0; running = false; lastTime = 0; keys.clear();
     // Hidden scenes discard effects so returning never replays stale sounds or import bursts.
     clearEffects();
+    updateDuel();
     element.dataset.battlePaused = 'true';
     if (notify) callbacks.onPause?.();
   }
@@ -209,7 +184,7 @@ function createBattle(element) {
     if (!visible()) { if (element.dataset.battlePaused !== 'true') pause(); return; }
     element.dataset.battlePaused = 'false';
     const manual = mode === 'duel' && duel.snapshot().status === 'running' && canPlayDuel(work);
-    const effects = !reduced && ctx && (queue.size || active || bullets.length || particles.length || bannerUntil || noticeUntil);
+    const effects = !reduced && ctx && !(autoPaused && mode === 'auto') && (queue.size || active || bullets.length || particles.length || bannerUntil || noticeUntil);
     if (work === 'call' || (!manual && !canAuto() && !effects) || !host.requestAnimationFrame) {
       if (raf) host.cancelAnimationFrame?.(raf);
       raf = 0; running = false; lastTime = 0; draw(); return;
@@ -226,7 +201,7 @@ function createBattle(element) {
     const rect = stage.getBoundingClientRect();
     if (rect.width < 1) return;
     const ratio = Math.min(host.devicePixelRatio || 1, 2);
-    world = { w: rect.width, h: rect.height || 280, floor: (rect.height || 280) - 40 };
+    world = { w: rect.width, h: rect.height || 154, floor: (rect.height || 154) - 26 };
     canvas.width = Math.round(world.w * ratio); canvas.height = Math.round(world.h * ratio);
     ctx?.setTransform(ratio, 0, 0, ratio, 0, 0);
     if (ctx) ctx.imageSmoothingEnabled = false;
@@ -237,48 +212,39 @@ function createBattle(element) {
     const w = weaponFor(weapon);
     $('selected').textContent = weaponHint(w.id);
     $('weapon-select').value = weapon;
-    $('special-name').textContent = specialName(weapon);
     element.querySelectorAll('[data-battle-weapon]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.battleWeapon === weapon)));
     if (notify) callbacks.onWeaponChange?.(weapon);
     draw();
   }
   function announce(text) { $('live').textContent = text; }
   function updateAuto() {
-    const a = auto.snapshot(), manual = mode === 'duel';
-    const text = (name, value) => { if ($(name).textContent !== value) $(name).textContent = value; };
-    const hidden = (name, value) => { if ($(name).hidden !== value) $(name).hidden = value; };
-    hidden('auto-hud', manual); hidden('auto-pause', manual);
-    hidden('call-overlay', work !== 'call');
-    hidden('round-victory', manual || work === 'call' || view.defeated || a.status !== 'victory');
-    text('round', ui`RONDA ${a.round}`);
-    text('round-state', work === 'call' ? translateText('Modo tranquilo') : view.currentDay === false ? translateText('Día anterior') : autoPaused ? translateText('En pausa') : a.status === 'victory' || view.defeated ? translateText('Victoria') : translateText('En combate'));
-    text('auto-hero-hp', `${a.hp}%`); text('auto-hp', `${a.enemyHp}%`);
-    $('auto-hero-fill').style.width = `${a.hp}%`; $('auto-fill').style.width = `${a.enemyHp}%`;
-    $('charge-fill').style.width = `${a.charge}%`; $('charge').setAttribute('aria-valuenow', String(a.charge));
-    text('charge-label', a.charge === 100 ? translateText('Lista') : `${a.charge}%`);
-    $('special-button').disabled = a.charge < 100 || manual || work === 'call' || view.currentDay === false || !!view.defeated || a.status === 'victory';
-    $('auto-pause').disabled = work === 'call' || reduced || !ctx || view.currentDay === false || !!view.defeated;
+    $('call-overlay').hidden = work !== 'call';
+    $('auto-pause').disabled = mode === 'duel' || work === 'call' || reduced || !ctx || view.currentDay === false || !!view.defeated;
     $('auto-pause').setAttribute('aria-pressed', String(autoPaused));
-    text('auto-pause', autoPaused ? translateText('Continuar') : translateText('Pausar'));
-    if (!manual) text('work-note', work === 'call' ? translateText('En llamada · modo tranquilo') : autoPaused ? translateText('En pausa') : translateText('El héroe esquiva, dispara y sigue adelante.'));
+    $('auto-pause').setAttribute('aria-label', autoPaused ? translateText('Reanudar animación') : translateText('Pausar animación'));
+    $('pause-icon').setAttribute('d', autoPaused ? 'm8 5 11 7-11 7z' : 'M8 5v14M16 5v14');
+    $('sound').setAttribute('aria-pressed', String(view.soundEnabled === true));
+    $('sound').setAttribute('aria-label', view.soundEnabled === true ? translateText('Silenciar sonidos') : translateText('Activar sonidos'));
+    $('sound-icon').setAttribute('d', view.soundEnabled === true ? 'M15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14' : 'm16 9 5 6m0-6-5 6');
     $('weapon-select').disabled = work === 'call';
-    element.dataset.autoRound = String(a.round); element.dataset.autoHp = String(a.enemyHp);
-    element.dataset.autoState = a.status;
+    element.dataset.battleSpecials = String(Math.floor(auto.snapshot().calls / 3));
+    element.dataset.autoState = work === 'call' ? 'call' : autoPaused ? 'paused' : 'idle';
   }
   function message(event) {
-    const call = event.count > 1 ? ui`${event.count} llamadas validadas` : translateText('Llamada completada');
-    return [call, event.amountText, event.xp ? `+${event.xp} XP` : '', event.critical ? translateText('¡Crítico!') : ''].filter(Boolean).join(' · ');
+    if (event.specialCount) return translateText('¡Especial automático! Vos seguí a lo tuyo.');
+    if (event.critical) return translateText('Higher Rate · ¡golpe crítico!');
+    return event.count > 1 ? ui`${event.count} llamadas completadas · buen golpe.` : translateText('Llamada completada · buen golpe.');
   }
   function banner(text) {
     $('banner').textContent = text; $('banner').hidden = false; $('feed').textContent = text; bannerUntil = clock + 2.2; announce(text);
-    if (reduced || !ctx) {
+    if (reduced || !ctx || autoPaused) {
       host.clearTimeout?.(staticTimer);
-      staticTimer = host.setTimeout?.(() => { if (!destroyed) { $('banner').hidden = true; $('notice').hidden = true; } }, 3400) || 0;
+      staticTimer = host.setTimeout?.(() => { if (!destroyed) { staticTimer = 0; bannerUntil = 0; $('banner').hidden = true; $('notice').hidden = true; updateDuel(); } }, 3400) || 0;
     }
   }
   function impact(event, id) {
     const w = weaponFor(id), b = boss();
-    if (!reduced && ctx) {
+    if (!reduced && ctx && !(autoPaused && mode === 'auto')) {
       hitUntil = clock + (event.critical ? .25 : .15);
       monster.dataset.battleHit = event.critical ? 'critical' : 'true';
       const heavy = ['rocket','heavy','grenade','pulse'].includes(w.effect), n = heavy ? 24 : 12;
@@ -288,7 +254,10 @@ function createBattle(element) {
       }
     }
     if (!event.ambient) sound(event.practice ? 'practice-hit' : event.critical ? 'critical' : 'hit');
-    if (!event.practice) { banner(message(event)); active = null; }
+    if (!event.practice) {
+      banner(message(event)); active = null;
+      if (view.defeated && !queue.size) { victoryAt = 0; $('victory').hidden = false; }
+    }
   }
   function emit(event, id) {
     const w = weaponFor(id), b = boss();
@@ -299,8 +268,9 @@ function createBattle(element) {
     const from = { x: hero.x + 38, y: world.floor - 40 - hero.jump };
     if (id === 'drone') { from.x = hero.x+42; from.y -= 69; droneUntil = clock+1.3; }
     let last = null;
-    for (let i = 0; i < w.pellets && bullets.length < MAX_EFFECTS; i++) {
-      const spread = (i - (w.pellets-1)/2)*(w.effect === 'pellet' ? 6 : w.effect === 'flame' ? 4 : 2);
+    const pellets = event.specialCount ? Math.min(MAX_EFFECTS, Math.max(w.pellets, 5)) : w.pellets;
+    for (let i = 0; i < pellets && bullets.length < MAX_EFFECTS; i++) {
+      const spread = (i - (pellets-1)/2)*(w.effect === 'pellet' ? 6 : w.effect === 'flame' ? 4 : 2);
       last = { ...from, tx: b.x, ty: b.y+spread, elapsed: -i*w.delay, travel: w.travel, effect: w.effect, id, event: null };
       bullets.push(last);
     }
@@ -338,7 +308,7 @@ function createBattle(element) {
     const attack = d.attacks.find(item => item.age <= item.warning);
     const message = d.status === 'won' ? translateText('¡Duelo ganado!') : d.status === 'lost' ? translateText('Ronda terminada · probá otra vez') : d.status === 'paused' ? translateText('Duelo pausado · continuá cuando estés libre') : d.status === 'ready' ? translateText('60 segundos · 3 vidas · esquivá y dispará') : attack?.kind === 'wave' ? translateText('Onda baja · saltá') : attack?.kind === 'projectile' ? translateText('Disparo dirigido · movete') : attack?.kind === 'charge' ? translateText('Embestida · esquivá o saltá') : translateText('Dispará al monstruo');
     if (message !== lastDuelAnnouncement) { $('duel-message').textContent = message; lastDuelAnnouncement = message; }
-    if (!manual && !bannerUntil) $('feed').textContent = work === 'call' ? translateText('Concentrate en tu llamada') : translateText('El héroe esquiva, dispara y sigue adelante.');
+    if (!manual && !bannerUntil) $('feed').textContent = work === 'call' ? translateText('En llamada · todo tranquilo.') : autoPaused ? translateText('En pausa') : view.goalStatus || translateText('Cada llamada te acerca al cofre.');
     updateAuto();
   }
   function changeMode(next) {
@@ -364,11 +334,14 @@ function createBattle(element) {
   function jump() { if (mode === 'duel' && duel.snapshot().status === 'running' && canPlayDuel(work) && visible() && hero.jump === 0) { hero.vy = 340; reconcile(); } }
   function play(event) {
     if (destroyed || String(event.dayKey ?? '') !== String(view.dayKey ?? '')) return false;
-    if (view.currentDay !== false) { auto.recordCall(event.count); updateAuto(); }
+    const specialCount = view.currentDay !== false ? auto.recordCall(event.count) : 0;
+    updateAuto();
     if (!visible()) return false;
     if (work === 'call') return true;
     if (mode === 'duel') changeMode('auto');
-    queue.push(event, active ? MAX_QUEUE-1 : MAX_QUEUE);
+    queue.push({ ...event, specialCount }, active ? MAX_QUEUE-1 : MAX_QUEUE);
+    if (view.defeated && !reduced && ctx && !autoPaused) { victoryAt = clock + 1.4; $('victory').hidden = true; }
+    if (autoPaused) { const next = queue.shift(); impact(next, weapon); return true; }
     if (reduced || !ctx) { const next = queue.shift(); emit(next, weapon); }
     reconcile(); return true;
   }
@@ -376,7 +349,7 @@ function createBattle(element) {
   function skyline() {
     rect(0,0,world.w,world.h,'sky');
     for (let i=0;i<11;i++) {
-      const x=(i*107+29)%Math.ceil(world.w+80), h=28+(i*31)%84;
+      const x=(i*107+29)%Math.ceil(world.w+80), h=18+(i*31)%42;
       rect(x,world.floor-h-30,50+(i%3)*10,h+30,'building');
       if (i%2===0) rect(x+20,world.floor-h-48,5,18,'building');
       for (let j=0;j<3;j++) rect(x+8+j*13,world.floor-h-17,3,4,'building-near');
@@ -386,16 +359,21 @@ function createBattle(element) {
     for (let i=0;i<23;i++) rect((i*67+21)%Math.max(1,Math.floor(world.w)),35+(i*29)%110,2,2,'stage-muted');
     ctx.globalAlpha=1; rect(0,world.floor,world.w,4,'floor'); rect(0,world.floor+4,world.w,40,'building-near');
     for (let i=0;i<world.w;i+=32) rect(i,world.floor+11,21,2,'floor');
-    rect(world.w*.29,world.floor-67,world.w*.13,5,'floor'); rect(world.w*.6,world.floor-106,world.w*.1,5,'floor');
   }
   function drawHero() {
-    const walking=keys.size>0 || canAuto(), stride=!reduced && walking ? Math.sin(hero.walk)*5 : 0, idle=0;
+    const walking=keys.size>0 || canAuto(), stride=!reduced && walking ? Math.sin(hero.walk)*1.2 : 0, idle=0;
     ctx.save(); ctx.translate(Math.round(hero.x),Math.round(world.floor-hero.jump+idle)); ctx.scale(hero.face,1);
     const p=(x,y,w,h,c)=>rect(x*2,y*2,w*2,h*2,c);
     ctx.globalAlpha=.2; rect(-22,0,48,6,'ink'); ctx.globalAlpha=1;
     p(-4,-21,9,11,'ink'); p(-3,-20,7,8,'hero'); p(-3,-20,2,7,'hero-light'); p(-3,-12,7,2,'hero-dark');
     p(-4,-10,4,8,'ink'); p(1,-10,4,8,'ink'); p(-3,-9,2,6+stride/2,'hero-dark'); p(2,-9,2,6-stride/2,'hero-dark'); p(-4,-3+stride/2,4,3,'hero'); p(1,-3-stride/2,5,3,'hero');
-    p(-5,-31,12,11,'ink'); p(-4,-30,10,8,'helmet'); p(-4,-30,9,2,'skin'); p(-3,-26,9,3,'hero-dark'); p(3,-26,2,2,'hero-light'); p(-5,-22,5,4,'hero-dark'); p(1,-19,7,3,'hero-light'); p(5,-19,3,3,'skin');
+    p(-5,-31,12,11,'ink'); p(-4,-30,10,8,'helmet'); p(-4,-30,9,2,'skin'); p(-3,-26,9,3,view.heroEquipment?.face === 'Visor violeta' ? 'monster-light' : 'hero-dark'); p(3,-26,2,2,'hero-light'); p(-5,-22,5,4,'hero-dark'); p(1,-19,7,3,'hero-light'); p(5,-19,3,3,'skin');
+    if (view.heroEquipment?.head) { p(-5,-34,12,3,'gold'); p(-3,-36,3,3,'gold'); p(2,-36,3,3,'gold'); }
+    if (view.heroEquipment?.neck) { p(-4,-22,8,2,'monster-light'); p(-5,-21,2,8,'monster-light'); }
+    if (view.heroEquipment?.face === 'Ojo de rubí') rect(6,-52,4,4,'monster-shadow');
+    if (view.heroEquipment?.back) { p(-8,-21,3,19,'monster-shadow'); }
+    if (view.heroEquipment?.aura) { ctx.globalAlpha=.4; rect(-22,-5,48,3,'good'); ctx.globalAlpha=1; }
+    if (view.heroEquipment?.body) { p(-3,-18,7,2,'gold'); }
     ctx.save(); ctx.translate(8+(hero.recoil>0?-3:0),-38); const muzzle=weaponArt(rect,weapon);
     if (flash>0&&!reduced) { rect(muzzle,-4,8,7,weapon==='wand'?'monster-light':'hero-light'); rect(muzzle+5,-2,7,3,'gold'); }
     ctx.restore(); ctx.restore();
@@ -455,11 +433,8 @@ function createBattle(element) {
     if (work === 'call') { clearEffects(); draw(); return; }
     const dt=Math.min(lastTime?(time-lastTime)/1000:.016,.04); lastTime=time; clock+=dt;
     if (canAuto()) {
-      for (const event of auto.step(dt, weapon)) {
-        if (event === 'shot') emit({ practice: true, ambient: true }, weapon);
-        else if (event === 'counter' && bullets.length < MAX_EFFECTS) bullets.push({ x: boss().x, y: boss().y, tx: hero.x, ty: world.floor-32, elapsed: 0, travel: .8, effect: 'counter' });
-      }
-      const a = auto.snapshot(); hero.x = Math.max(32, Math.min(boss().x-82, a.x*world.w)); hero.jump = a.jump; hero.face = 1; hero.walk += dt*8;
+      auto.step(dt);
+      const a = auto.snapshot(); hero.x = Math.max(32, Math.min(boss().x-82, a.x*world.w)); hero.jump = a.jump; hero.face = 1; hero.walk += dt*5;
       updateAuto();
     }
     const left=keys.has('a')||keys.has('arrowleft'), right=keys.has('d')||keys.has('arrowright');
@@ -478,7 +453,8 @@ function createBattle(element) {
     bullets=bullets.filter(b=>{ b.elapsed+=dt; if (b.elapsed<b.travel) return true; if (b.event) impacts.push([b.event,b.id]); return false; });
     impacts.forEach(([event,id])=>impact(event,id));
     particles=particles.filter(p=>{ p.age+=dt; p.x+=p.vx*dt; p.y+=p.vy*dt; p.vy+=360*dt; return p.age<p.life; });
-    if (bannerUntil&&clock>bannerUntil) { $('banner').hidden=true; bannerUntil=0; }
+    if (bannerUntil&&clock>bannerUntil) { $('banner').hidden=true; bannerUntil=0; updateDuel(); }
+    if (victoryAt && clock >= victoryAt) { victoryAt = 0; $('victory').hidden = !view.defeated; }
     if (noticeUntil&&clock>noticeUntil) { $('notice').hidden=true; noticeUntil=0; }
     draw(); reconcile();
   }
@@ -498,12 +474,18 @@ function createBattle(element) {
       work = nextWork;
     }
     view={ ...next, callSignatures: { ...signatures } }; hasSynced=true; callbacks={ ...handlers }; selection(next.weapon);
+    $('fallback-visor')?.setAttribute('fill', next.heroEquipment?.face === 'Visor violeta' ? 'var(--battle-monster-light)' : next.heroEquipment?.face === 'Ojo de rubí' ? 'var(--battle-monster-shadow)' : 'var(--battle-hero-dark)');
     const markup = String(next.monsterMarkup??'');
     if (lastMonsterMarkup!==markup) { monster.innerHTML=markup; lastMonsterMarkup=markup; }
     monster.setAttribute('role','img'); monster.setAttribute('aria-label',next.monsterDescription||next.monsterName||translateText('MONSTRUO DEL DÍA'));
-    $('hero-label').textContent=next.heroLabel||translateText('Tu esfuerzo'); $('monster-label').textContent=next.monsterLabel||translateText('MONSTRUO DEL DÍA'); $('monster-name').textContent=next.monsterName||'';
+    $('hero-label').textContent=next.heroLabel||translateText('Tu héroe'); $('monster-label').textContent=next.monsterLabel||translateText('Tu meta de hoy');
     element.dataset.battleDefeated=String(next.defeated===true); element.dataset.battleHp=String(Math.max(0,Math.min(100,Number(next.hpPct)||0)));
-    $('victory').hidden=next.defeated!==true; $('motion-note').hidden=!reduced;
+    $('victory').hidden=next.defeated!==true || !!victoryAt;
+    $('motion-note').hidden=!reduced;
+    if (typeof next.collectionMarkup === 'string' && $('collection-summary').innerHTML !== next.collectionMarkup) $('collection-summary').innerHTML = next.collectionMarkup;
+    $('collection').hidden = !collectionOpen;
+    element.dataset.battleCollectionOpen = String(collectionOpen);
+    $('collection-toggle').setAttribute('aria-expanded', String(collectionOpen));
     updateDuel(); resize(); refresh();
   }
   function destroy() {
@@ -521,9 +503,13 @@ function createBattle(element) {
     const action=button.dataset.battleAction;
     if (action === 'auto' || action === 'duel') changeMode(action);
     else if (action === 'pause-auto' && mode === 'auto') { autoPaused = !autoPaused; clearEffects(); callbacks.onPause?.(); updateAuto(); draw(); reconcile(); }
-    else if (action === 'special' && mode === 'auto' && work !== 'call' && view.currentDay !== false && !view.defeated && visible() && auto.special()) {
-      autoPaused = false; emit({ practice: true, ambient: true }, weapon); emit({ practice: true, ambient: true }, weapon); emit({ practice: true, ambient: true }, weapon);
-      banner(specialName(weapon)); updateAuto(); reconcile();
+    else if (action === 'toggle-sound') callbacks.onToggleSound?.();
+    else if (action === 'collection') {
+      collectionOpen = !collectionOpen;
+      if (!collectionOpen && mode === 'duel') changeMode('auto');
+      $('collection').hidden = !collectionOpen;
+      element.dataset.battleCollectionOpen = String(collectionOpen);
+      $('collection-toggle').setAttribute('aria-expanded', String(collectionOpen));
     }
     else if (action === 'start') beginDuel();
     else if (action==='attack'||action==='hero'||action==='grenade') { practice(action==='grenade'?'grenade':weapon); if (action==='hero') stage.focus({ preventScroll:true }); }

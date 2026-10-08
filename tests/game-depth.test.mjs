@@ -46,7 +46,7 @@ test('la superficie dinámica mantiene controles, recibos, accesibilidad y Audio
   const html = read('app.html');
   const css = read('css/game.css');
   const surface = `${game}\n${html}`;
-  for (const className of ['game-phase-meter', 'game-armor-row', 'game-armor-plate', 'game-next-goals', 'game-next-goal', 'game-mission-reward', 'game-equipment-grid', 'game-equipment-item', 'game-unlock-roadmap', 'game-cycle-choice']) {
+  for (const className of ['game-compact-goal-track', 'game-compact-collection-item', 'game-armor-row', 'game-armor-plate', 'game-next-goals', 'game-next-goal', 'game-mission-reward', 'game-equipment-grid', 'game-equipment-item', 'game-unlock-roadmap', 'game-cycle-choice']) {
     assert.match(surface, new RegExp(className.replaceAll('-', '\\-')));
   }
   for (const action of ['equip-accessory', 'claim-chest', 'choose-cycle-reward']) assert.match(game, new RegExp(`data-game-action=\\"${action}\\"`));

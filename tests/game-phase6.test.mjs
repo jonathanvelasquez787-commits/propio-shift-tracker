@@ -415,7 +415,8 @@ test('cierre y cofre son idempotentes, y el dinero secundario aparece en la expe
   assert.match(game, /function withConversion/);
   assert.match(game, /withConversion\(parseMoney\(call\.pay\)\)/);
   assert.match(game, /withConversion\(earnings\)/);
-  assert.match(game, /withConversion\(day\.stats\.earnings\)/);
+  assert.match(game, /money\(day\.stats\.earnings\)/);
+  assert.match(game, /convertedAmountText\(day\.stats\.earnings\)/);
 });
 
 test('CSS de juego cubre motion reducido, layout estrecho y responsive', () => {
