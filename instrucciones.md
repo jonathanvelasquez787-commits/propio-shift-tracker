@@ -332,6 +332,11 @@ reales; no actualizarlas en cada despliegue ni inventar cambios. XML válido,
 seis checks SEO y build correctos. Señal para el rastreo, sin garantía de
 plazo ni posición; no se solicitó indexación manual de nuevo. Mantener
 visibilidad por nombre como pendiente hasta comprobar resultados.
+Publicación confirmada: bb70132, Vercel y CI correctos; sitemap público con
+ambas fechas. Se reenvió una sola vez el sitemap actualizado en Search Console
+y Google confirmó «Se ha enviado el sitemap correctamente», sin error de
+cuota. Esto acredita el envío, no nuevo rastreo ni mejora de posición.
+Evidencia: outputs/google-sitemap-enviado-2026-10-08.jpg de este chat.
 
 Visibilidad en Google: pendiente único vigente tras la confirmación del usuario
 del 8/10/2026. Comprobación directa de Google ese día: no aparece en la primera
