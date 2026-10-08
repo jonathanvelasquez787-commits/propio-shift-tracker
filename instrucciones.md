@@ -317,48 +317,26 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
-Conexión Propio → tracker: v594 agrega una extensión MV3 propia y un receptor
-autenticado en la app. Build y recorrido completo probados con portal y eventos
-simulados en Chromium aislado; no se enviaron solicitudes a Propio/Twilio reales.
-El usuario confirmó instalación y cuenta conectada en Chrome, la quitó después
-de un error sin mensaje y reinstaló el paquete: la barra del historial quedó
-confirmada mediante capturas reales. Pendientes: actualizar al puente ZIP 1.3.0,
-conectar la cuenta si hace falta y observar una llamada normal. La compatibilidad de las señales identificadas en
-el add-on de 2023 sigue sin certificar. Empieza en observación; el registro
-automático requiere conectar la cuenta y activar el modo. Desde 1.3.0 permite
-activarlo antes de la primera llamada, por autorización explícita del usuario;
-no se afirma que esté activado en su navegador. No provocar una llamada real solo para probar.
-No pulsa disponibilidad/aceptar/colgar ni interpreta Offline como Break/Lunch.
-Tiempo/pago estimados, corregibles mediante importación oficial; conserva
-identidad y deduplicación tras reemplazo. Véase `extension/propio-bridge/README.md`.
+El 8/10/2026 el usuario confirmó que todos los pendientes anteriores ajenos
+a Google ya quedaron resueltos, incluidos la conexión Propio → tracker, los
+ZIPs del puente/resumen y la publicación en Chrome Web Store. Esta es una
+confirmación del usuario; no se verificaron nuevamente estos pasos ni se
+infieren versiones instaladas o una URL pública de tienda. No volver a
+presentarlos como tareas abiertas. Se conserva únicamente la visibilidad por
+nombre en Google como pendiente actual.
 
-Resumen dentro de Propio: extensión independiente 1.0.3 con subtotal visible y botón Calculate
-Total / Calcular total para recorrer todas las páginas del rango elegido y restaurar la inicial.
-No modifica el tracker ni usa una tarifa estimada. Sin permisos de Twilio,
-worker o mensajería al tracker; el puente 1.3.0 ya no incluye el resumen.
-Alternativa userscript del mismo build. Inglés por defecto; selector English /
-Español en Details guarda solo preferencias propias de moneda, cambio e idioma.
-Tooltip y ayuda indican seleccionar Start Date y End Date y actualizar primero
-el historial. Privacidad explica que no pide/guarda credenciales ni envía el
-historial. Subtotal confirmado por captura del portal real (15 de 285 y 200
-filas). Recorrido completo probado en Chromium aislado con 285 filas/19 páginas,
-datos iguales, carga demorada, cancelación, cambio de filtros, conversión y temas.
-El subtotal sigue las mutaciones de la tabla, sin forzar su actualización al
-terminar una llamada. El período completo requiere Recalculate / Recalcular
-para cambios posteriores; no se recorre automáticamente.
-Detalles conserva contraste sobre el fondo blanco de Propio. Pendiente cargar
-ambos ZIPs separados y comprobar Calcular total con el historial real.
-
-Publicación del resumen en Chrome Web Store: solicitada el 4/10/2026.
-Se abrió el panel real y el usuario completó la verificación de inicio de
-sesión. La cuenta requiere registro de desarrollador, aceptar el acuerdo y
-pagar 5 USD una sola vez; el usuario indicó que no tiene ese monto.
-No se pagó, aceptó el acuerdo, creó un ítem ni subió/envió la extensión.
-Publicación pendiente hasta que el usuario resuelva el registro. No hacer
-pagos ni asumir una aprobación posterior. Puede seguir usando gratis el ZIP
-1.0.3 como extensión descomprimida. Para publicar después faltan iconos,
-ficha/capturas y política pública propia; el ZIP de tienda debe tener el
-manifest en la raíz y excluir la alternativa userscript.
+Visibilidad en Google: pendiente único vigente tras la confirmación del usuario
+del 8/10/2026. Comprobación directa de Google ese día: no aparece en la primera
+página por `propio shift tracker`. Search Console confirma raíz indexada,
+rastreo/indexación permitidos, obtención correcta y canonical seleccionada
+igual a la raíz. Último rastreo sigue siendo el 4/10/2026 a las 14:03:12;
+el HTML guardado conserva el título anterior «Interpreter Shift & Earnings
+Tracker | Propio Shift Tracker», anterior a v595. Esto confirma que todavía
+no procesó la portada nueva, sin establecer la causa completa de la falta
+de posición por nombre. Se intentó una sola actualización durante esta revisión:
+rechazada de nuevo por «Cuota superada». No se repitió, no se solicitó /es ni
+se creó automatización. Evidencia en outputs de este chat:
+google-cuota-2026-10-08.jpg. Las verificaciones del 5/10 siguientes son historial.
 
 Visibilidad en Google: propiedad real verificada por etiqueta HTML el 4/10/2026.
 Comprobación real en Search Console el 5/10/2026: sitemap «Correcto», cuatro
