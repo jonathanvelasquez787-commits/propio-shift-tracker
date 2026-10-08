@@ -526,6 +526,7 @@ async function boot() {
     return;
   }
 
+  let shouldPushLocal = false;
   try {
     switch (decision.action) {
       case BOOT.OTHER_ACCOUNT:
@@ -533,6 +534,7 @@ async function boot() {
         // cuenta nueva: se descartan y se baja lo que corresponda.
         resetForUser(userId);
         if (decision.cloud) adoptCloud(decision.cloud, userId);
+        else adoptLocal(userId, null);
         break;
 
       case BOOT.USE_CLOUD:
@@ -541,11 +543,13 @@ async function boot() {
         break;
 
       case BOOT.USE_LOCAL:
-        adoptLocal(userId);
+        if (decision.offline) adoptLocal(userId);
+        else adoptLocal(userId, decision.cloud);
+        shouldPushLocal = true;
         break;
 
       case BOOT.FRESH:
-        adoptLocal(userId);
+        adoptLocal(userId, decision.cloud);
         break;
 
       case BOOT.CONFLICT: {
@@ -553,7 +557,8 @@ async function boot() {
         if (choice === 'cloud') {
           adoptCloud(decision.cloud, userId);
         } else {
-          adoptLocal(userId);
+          adoptLocal(userId, decision.cloud);
+          shouldPushLocal = true;
         }
         break;
       }
@@ -606,10 +611,10 @@ async function boot() {
 
   // Primera subida del dispositivo: si lo local era lo bueno, que quede en la
   // nube sin esperar a la próxima edición.
-  if (decision.action === BOOT.USE_LOCAL && readMeta().dirty) {
+  if (shouldPushLocal && readMeta().dirty) {
     const snapshot = readLocalSnapshot();
     setSyncStatus('saving', ui`Subiendo ${describeSnapshot(snapshot)}…`);
-    await pushSnapshot({ force: true });
+    await pushSnapshot();
   }
 }
 

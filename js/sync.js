@@ -540,7 +540,21 @@ export const BOOT = {
 export async function resolveBoot(userId) {
   retireLegacyQaStorage();
   const meta = readMeta();
-  const cloud = await fetchCloud(userId);
+  if (navigator.onLine === false && meta.userId === userId && localHasData()) {
+    return { action: BOOT.USE_LOCAL, offline: true };
+  }
+  let cloud;
+  try {
+    cloud = await fetchCloud(userId);
+  } catch (error) {
+    const networkFailure = !error?.code && /^(?:TypeError: )?(?:Failed to fetch|NetworkError when attempting to fetch resource\.?|Load failed)$/i.test(error?.message || '');
+    // Sin red solo se abre una copia cuyo propietario está identificado.
+    // Conservamos su base: desconocer la nube no equivale a una fila vacía.
+    if (networkFailure && meta.userId === userId && localHasData()) {
+      return { action: BOOT.USE_LOCAL, offline: true };
+    }
+    throw error;
+  }
   const local = localHasData();
   const belongsToSomeoneElse = Boolean(meta.userId && meta.userId !== userId);
 
@@ -611,8 +625,12 @@ export function adoptCloud(cloud, userId) {
   writeMeta({ userId, lastSyncedUpdatedAt: cloud.updated_at, dirty: false });
 }
 
-export function adoptLocal(userId) {
-  writeMeta({ userId, dirty: true });
+export function adoptLocal(userId, cloud) {
+  const patch = { userId, dirty: true };
+  // La copia elegida reemplaza solo la revisión observada, nunca una posterior.
+  // Una base imposible protege también el caso de una fila aún inexistente.
+  if (arguments.length > 1) patch.lastSyncedUpdatedAt = cloud?.updated_at || new Date(0).toISOString();
+  writeMeta(patch);
 }
 
 export function resetForUser(userId) {

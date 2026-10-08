@@ -57,7 +57,12 @@ test('un fallo de lectura de llamadas no descarga el snapshot antiguo ni altera 
     const h = harness({ cloud, callsError });
     h.run("writeLocalSnapshot({state:{keep:true},calls:[{id:'keep'}],settings:{goal:25}}); adoptLocal('audit');");
     const before = new Map(h.values);
-    await assert.rejects(h.run("resolveBoot('audit')"), (error) => error === callsError);
+    await assert.rejects(h.run("fetchCloud('audit')"), (error) => error === callsError);
+    if (!callsError.code) {
+      const decision = await h.run("resolveBoot('audit')");
+      assert.equal(decision.offline, true);
+      assert.equal(decision.cloud, undefined);
+    } else await assert.rejects(h.run("resolveBoot('audit')"), (error) => error === callsError);
     assert.deepEqual(h.values, before);
   }
 });
@@ -73,6 +78,15 @@ test('la compatibilidad antigua se limita a una tabla de llamadas ausente', asyn
   const result = await h.run("fetchCloud('audit')");
   assert.equal(result.calls.length, 1);
   assert.equal(result.calls[0].id, 'normalized');
+});
+
+test('descargar cien mil llamadas conserva cantidad e identificadores en cien páginas', async () => {
+  const rows = Array.from({ length: 100000 }, (_, i) => ({ payload: { id: `stress-${String(i).padStart(6, '0')}`, durationMin: 1, pay: '0.12' } }));
+  const h = harness({ cloud: { state: {}, settings: {}, calls: [], updated_at: 'large-base' }, callRows: rows });
+  const snapshot = await h.run("fetchCloud('audit')");
+  assert.equal(snapshot.calls.length, 100000);
+  assert.equal(new Set(snapshot.calls.map(c => c.id)).size, 100000);
+  assert.equal(snapshot.calls[99999].id, 'stress-099999');
 });
 
 test('la descarga recupera todo el historial de más de mil llamadas', async () => {

@@ -54,9 +54,9 @@ self.addEventListener('fetch', (event) => {
     }
     event.respondWith(
       fetch(request)
-        .then((response) => {
+        .then(async (response) => {
           const copy = response.clone();
-          caches.open(CACHE).then((cache) => cache.put(request, copy));
+          await caches.open(CACHE).then((cache) => cache.put(request, copy)).catch(() => {});
           return response;
         })
         .catch(() =>
@@ -73,11 +73,15 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.open(CACHE).then((cache) =>
       cache.match(request).then((cached) => {
-        const fresh = fetch(request).then((response) => {
-          if (response.ok) cache.put(request, response.clone());
+        const fresh = fetch(request).then(async (response) => {
+          if (response.ok) await cache.put(request, response.clone()).catch(() => {});
           return response;
         });
-        return cached || fresh;
+        if (cached) {
+          event.waitUntil(fresh.catch(() => {}));
+          return cached;
+        }
+        return fresh;
       })
     )
   );

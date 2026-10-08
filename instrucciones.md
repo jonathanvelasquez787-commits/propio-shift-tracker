@@ -658,16 +658,29 @@ La aplicación funciona en producción con estas bases vigentes:
 - Landing bilingüe estática, canonical/hreflang y sitemap de cuatro páginas,
   preguntas frecuentes e imagen social. Un bundle público evita cargar tres
   copias de las traducciones; las fuentes no bloquean el primer render.
-- La versión actual de la app es 596; el puente es 1.3.0 y el resumen independiente
+- La versión actual de la app es 597; el puente es 1.3.0 y el resumen independiente
   1.0.3. Refuerzo positivo y Logros están terminados. La auditoría profunda del
-  8 de octubre corrigió seis fallos adicionales con regresiones y preservó las
-  reparaciones anteriores. Cobertura y límites constan en
-  `docs/auditoria-profunda-2026-10-08.md`. La aparición por nombre en Google sigue
+  8 de octubre corrigió seis fallos; la ampliación corrigió cinco más en arranque,
+  concurrencia y PWA. Cobertura y límites constan en
+  `docs/auditoria-profunda-2026-10-08.md` y
+  `docs/auditoria-ampliada-2026-10-08.md`. La aparición por nombre en Google sigue
   pendiente de procesamiento externo; no se repitieron solicitudes por cuota.
 
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v597** — Auditoría ampliada con SQL aislado y fallos de red.
+
+- Arranque: subidas con revisión, base protegida para cuentas nuevas y elección
+  local que completa la subida sin pisar escrituras posteriores.
+- PWA: reabre la copia local de la misma cuenta sin red, conserva la base y
+  gestiona fallos de actualización/cuota de caché sin rechazos sin manejar.
+- 319 pruebas, 17.000 casos contra modelos independientes, 15 escenarios SQL,
+  500 llamadas en trabajador/receptor y descarga simulada de 100.000 llamadas.
+  Navegador real con SQL local: conflicto, offline, reconexión y respuesta perdida.
+  Sin entorno Supabase de pruebas; OAuth, cron alojado y dispositivos físicos
+  siguen fuera de la certificación. Datos reales intactos.
 
 **v596** — Auditoría profunda de integridad y uso mensual.
 
@@ -687,10 +700,3 @@ La aplicación funciona en producción con estas bases vigentes:
   móvil. CI completa y Vercel correctos; Google confirma el HTML nuevo de
   ambos idiomas. Solicitud de actualización rechazada por cuota, sin bucles.
   Sin posición garantizada: Google debe volver a procesar la portada.
-
-**Resumen independiente 1.0.3** — Calculate Total, nombre definitivo.
-
-- Botón, ayuda y popup usan Calculate Total / Calcular total por elección
-  explícita del usuario. Recalculate / Recalcular y el cálculo se conservan.
-- Build y verificaciones existentes de idiomas/separación; ZIP 1.0.3.
-  Solo cambia el texto, sin modificar permisos o actualización del resumen.
