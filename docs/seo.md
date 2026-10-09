@@ -7,7 +7,8 @@ en/es/x-default. El selector conserva el formulario de acceso y sincroniza la
 dirección y los metadatos. Una preferencia guardada puede abrir la portada en
 español; `/es` siempre elige español, incluso sin almacenamiento disponible.
 Las páginas legales también declaran canonical. robots.txt permite rastreo y
-apunta al sitemap.xml con esas cuatro páginas; ambos se copian a public/.
+apunta al sitemap.xml con seis páginas públicas, incluidas las dos versiones
+de la guía para intérpretes; ambos se copian a public/.
 `/index.html` y `/es.html` redirigen permanentemente a sus direcciones públicas.
 La app de cuenta (/app) lleva noindex en HTML y cabecera HTTP; /app.html redirige
 permanentemente a /app y conserva los parámetros. La app no se
@@ -109,10 +110,46 @@ ejecución a las 13:00 de America/Tegucigalpa. No hay un seguimiento indefinido.
 Evidencia visual guardada en los entregables del chat: `google-sitemap-correcto-2026-10-05.jpg`,
 `google-portada-en-indexada-2026-10-05.jpg` y `google-portada-es-indexada-2026-10-05.jpg`.
 
+## Guía pública para intérpretes (v601)
+
+El propietario autorizó publicar la guía y añadir enlaces reales desde su
+extensión y perfiles públicos el 9/10/2026. Las rutas de la guía son:
+
+- Español: https://propio-shift-tracker.vercel.app/es/guias/turnos-de-interprete
+- Inglés: https://propio-shift-tracker.vercel.app/guides/interpreter-shifts
+
+El build entrega un artículo completo sin sesión ni traducción en JavaScript:
+horario y tarifa, registro de llamadas, pausas, ganancias por minuto,
+adherencia, cierre, exportaciones y dudas frecuentes. Reutiliza el diseño y las
+paletas existentes; conserva el idioma de su URL aunque la cuenta tenga otro
+guardado. El cambio de tema conserva los demás ajustes, incluso ante fallos de
+almacenamiento. Cada versión tiene canonical propio, hreflang recíproco,
+Article en JSON-LD, fecha real de publicación e imagen social. La portada
+enlaza la versión correspondiente desde su pie; el sitemap incluye ambas.
+
+Cinco regresiones nuevas elevan la suite a 393 pruebas: contenido, idioma,
+enlaces, tema y conservación de ajustes, rutas y sitemap. La aparición por
+nombre no se certifica con esta publicación. El 9/10 Google mostró ambas
+portadas al buscar por dominio, pero no se encontró la herramienta en la
+primera página de la búsqueda `propio shift tracker`. No se repitieron
+solicitudes manuales ni se reenvió el sitemap.
+
+Revisión local real: ES/EN, modos claro/oscuro, anchuras de 320, 390 y 1.365
+píxeles sin overflow, selector de idioma visible, índice con destinos válidos
+y enlace de la portada que cambia de ruta junto con el idioma.
+
+El propietario completó los accesos solicitados. Ko-fi confirmó el guardado
+del enlace a la portada; el enlace adicional a la guía espera su despliegue.
+Chrome Web Store muestra el registro inicial de desarrollador con acuerdo y
+cuota de USD 5 en la cuenta abierta, sin ficha editable. No se aceptó ese
+acuerdo ni se pagó la cuota. Falta confirmar si existe una ficha de la extensión
+en otra cuenta. No se usó como propia una extensión de terceros del README.
+
 ## Próximas mejoras de contenido
 
-- Publicar guías útiles sobre esos flujos y enlazarlas desde la landing cuando
-  el usuario apruebe su contenido y presentación.
+- Ampliar la guía cuando cambien los flujos, conservando pasos y datos reales.
+- Completar el enlace a la guía en Ko-fi tras verificar el despliegue y su
+  resultado público; el enlace en Chrome Web Store depende de una ficha real.
 - Compartir enlaces auténticos en comunidades pertinentes. No comprar enlaces
   ni crear reseñas, estrellas, afiliación oficial o datos estructurados falsos.
 

@@ -79,11 +79,15 @@
     }
   ],
   "redirects": [
+    { "source": "/guides/interpreter-shifts.html", "destination": "/guides/interpreter-shifts", "permanent": true },
+    { "source": "/es/guias/turnos-de-interprete.html", "destination": "/es/guias/turnos-de-interprete", "permanent": true },
     { "source": "/app.html", "destination": "/app", "permanent": true },
     { "source": "/index.html", "destination": "/", "permanent": true },
     { "source": "/es.html", "destination": "/es", "permanent": true }
   ],
   "rewrites": [
+    { "source": "/guides/interpreter-shifts", "destination": "/guides/interpreter-shifts.html" },
+    { "source": "/es/guias/turnos-de-interprete", "destination": "/es/guias/turnos-de-interprete.html" },
     { "source": "/es", "destination": "/es.html" },
     {
       "source": "/app",

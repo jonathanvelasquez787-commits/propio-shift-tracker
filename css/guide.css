@@ -1,0 +1,30 @@
+.guide-page .header-inner { justify-content: space-between; flex-wrap: wrap; }
+.guide-page .header-nav { flex-wrap: wrap; }
+.guide-page .header-nav a.guide-language { display: inline-flex; align-items: center; min-height: 44px; }
+.guide-main { max-width: 900px; padding-block: clamp(32px, 7vw, 72px); }
+.guide-intro h1 { max-width: 780px; font-size: clamp(32px, 5vw, 52px); line-height: 1.1; letter-spacing: -.035em; margin: 16px 0 24px; }
+.guide-lead { font-size: 19px; line-height: 1.75; max-width: 760px; color: var(--muted); }
+.guide-meta { color: var(--muted); font-size: 13px; margin-top: 24px; }
+.guide-toc { border-block: 1px solid var(--line); padding-block: 24px; margin-block: 36px; }
+.guide-toc h2 { margin: 0 0 12px; font-size: 17px; }
+.guide-toc ol { margin: 0; padding-left: 22px; columns: 2; column-gap: 40px; }
+.guide-toc li { padding-block: 7px; break-inside: avoid; }
+.guide-prose { max-width: 740px; font-size: 17px; line-height: 1.85; }
+.guide-prose section { scroll-margin-top: 110px; margin-block: 48px; }
+.guide-prose h2 { font-size: clamp(24px, 3vw, 30px); line-height: 1.3; letter-spacing: -.02em; margin: 0 0 20px; }
+.guide-prose h3 { font-size: 19px; line-height: 1.4; margin: 28px 0 12px; }
+.guide-prose p { margin: 0 0 18px; }
+.guide-example { background: var(--bg-soft); border-left: 3px solid var(--accent); padding: 22px; margin-block: 24px; }
+.guide-example h3 { margin-top: 0; }
+.guide-example p:last-child { margin-bottom: 0; font-size: 15px; color: var(--muted); }
+.guide-close { border-top: 1px solid var(--line); padding-top: 32px; }
+.guide-prose .header-cta { display: inline-flex; min-height: 44px; align-items: center; white-space: normal; text-align: center; }
+.guide-independent { max-width: 740px; color: var(--muted); font-size: 14px; }
+.guide-page .footer-links { flex-wrap: wrap; }
+@media (max-width: 560px) {
+  .guide-toc ol { columns: 1; }
+  .guide-page .header-inner { gap: 8px; }
+  .guide-page .header-nav { margin-left: 0; gap: 14px; }
+  .guide-lead { font-size: 17px; }
+  .guide-prose { font-size: 16px; }
+}

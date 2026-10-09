@@ -665,10 +665,17 @@ La aplicación funciona en producción con estas bases vigentes:
   `chest:fecha` por día conserva la compatibilidad con cofres anteriores y evita
   otro premio al cerrar o continuar. Se guarda inmediatamente; corregir/borrar
   llamadas o aumentar la meta revoca el premio si deja de estar cumplida.
-- Landing bilingüe estática, canonical/hreflang y sitemap de cuatro páginas,
+- Landing bilingüe estática, canonical/hreflang y sitemap de seis páginas,
   preguntas frecuentes e imagen social. Un bundle público evita cargar tres
   copias de las traducciones; las fuentes no bloquean el primer render.
-- La versión actual de la app es 600; el puente es 1.3.0 y el resumen independiente
+- Guía pública para intérpretes en español e inglés, con pasos reales sobre
+  turnos, llamadas, pausas, ganancias, adherencia y reportes. HTML estático,
+  canonical/hreflang, Article y enlaces desde ambas portadas; su idioma se
+  conserva ante ajustes de cuenta distintos y el tema preserva los datos.
+  Ko-fi confirmó el guardado del enlace a la portada; falta verificarlo público
+  y completar el enlace a la guía tras su despliegue. Chrome Web Store muestra
+  registro inicial de desarrollador, sin ficha editable. Detalle en `docs/seo.md`.
+- La versión actual de la app es 601; el puente es 1.3.0 y el resumen independiente
   1.0.3. Refuerzo positivo y Logros están terminados. La auditoría profunda del
   8 de octubre corrigió seis fallos; la ampliación corrigió cinco más en arranque,
   concurrencia y PWA. Cobertura y límites constan en
@@ -692,6 +699,23 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v601** — Guía pública para intérpretes y enlaces de contenido.
+
+- Artículo útil ES/EN: horario, llamadas, pausas, ganancias, adherencia,
+  cierre y exportaciones. Ejemplo ilustrativo con USD y moneda secundaria,
+  sin presentar tarifas oficiales ni afiliación con Propio.
+- Rutas limpias, redirecciones permanentes, canonical/hreflang recíproco,
+  Article, imagen social y sitemap de seis páginas. Enlaces localizados
+  desde la portada y navegación entre idiomas sin modificar el artículo.
+- Tema claro/oscuro y paletas existentes; el idioma de la URL sobrevive a
+  una preferencia de cuenta distinta. Cambiar el tema preserva los ajustes
+  y sigue funcionando con almacenamiento bloqueado.
+- 393 pruebas correctas, 2.110 textos ES/EN y build/guardas correctos.
+  Navegador: ES/EN, claro/oscuro, 320/390/1.365 px sin overflow, índice y
+  enlace localizado en portada. Ko-fi guardó el enlace de la herramienta;
+  Chrome Web Store muestra registro inicial, sin ficha editable.
+  no se afirma una mejora de posición en Google por publicar la guía.
 
 **v600** — Auditoría super profunda de integridad y uso mensual.
 
@@ -735,15 +759,3 @@ La aplicación funciona en producción con estas bases vigentes:
 - Verificación final: 340 pruebas y builds de app y extensiones correctos.
   Navegador local: llamadas manuales/live, especial, cofre, equipo y recarga;
   tarjeta sin desbordamiento a 320/390 px, modos claro/oscuro y español/inglés.
-
-**v598** — Combate automático del mockup aprobado.
-
-- Héroe que camina, dispara y esquiva; monstruo que contraataca, rondas y
-  celebraciones temporales sin modificar llamadas, dinero, recibos ni XP.
-- Panel responsive en claro/oscuro con nivel real, diez armas, pausa y
-  especiales. Las llamadas cargan 25% por representación individual; los
-  lotes agrupados conservan su cantidad. Rondas y meta usan vidas separadas.
-- Combate ambiental silencioso, suspendido al entrar en llamada, fuera de
-  vista, en fechas anteriores o con movimiento reducido. Duelo conservado.
-- 324 pruebas y checks/build correctos; navegador con datos sintéticos:
-  combate, especial, llamada live, carga al guardar y móvil sin overflow.

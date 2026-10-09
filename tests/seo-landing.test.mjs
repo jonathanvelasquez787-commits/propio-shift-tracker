@@ -68,6 +68,7 @@ test('language changes align visible URL, metadata and schema while retaining lo
     assert.equal(window.location.hash, '#entrar');
     assert.equal(get('link[rel="canonical"]').href, landingMetadata(language).url);
     assert.equal(JSON.parse(get('script[type="application/ld+json"]').textContent)['@graph'][1].inLanguage, language);
+    assert.equal(get('[data-interpreter-guide]').href, language === 'es' ? '/es/guias/turnos-de-interprete' : '/guides/interpreter-shifts');
   }
 });
 

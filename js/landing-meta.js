@@ -1,4 +1,5 @@
 export const SITE_ORIGIN = 'https://propio-shift-tracker.vercel.app';
+export const INTERPRETER_GUIDE_PATHS = { en: '/guides/interpreter-shifts', es: '/es/guias/turnos-de-interprete' };
 
 export function landingMetadata(language) {
   const spanish = language === 'es';
@@ -31,6 +32,7 @@ export function syncLandingMetadata(language) {
   const toggle = document.querySelector('[data-language-toggle]');
   toggle?.setAttribute('href', language === 'en' ? '/es' : '/');
   toggle?.setAttribute('hreflang', language === 'en' ? 'es' : 'en');
+  document.querySelector('[data-interpreter-guide]')?.setAttribute('href', INTERPRETER_GUIDE_PATHS[language === 'es' ? 'es' : 'en']);
   if (['/', '/index.html', '/es', '/es.html'].includes(window.location.pathname)) {
     const address = new URL(window.location.href);
     address.pathname = language === 'es' ? '/es' : '/';

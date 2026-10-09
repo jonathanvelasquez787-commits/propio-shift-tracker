@@ -1,7 +1,7 @@
 import { parse, parseFragment, serialize } from 'parse5';
 import { resources } from '../js/locales.generated.js';
 import { translationKey } from '../js/i18n-key.js';
-import { landingMetadata, landingStructuredData } from '../js/landing-meta.js';
+import { landingMetadata, landingStructuredData, INTERPRETER_GUIDE_PATHS } from '../js/landing-meta.js';
 
 export function createLocalizedLanding(source, language) {
   const tree = parse(source);
@@ -24,6 +24,7 @@ export function createLocalizedLanding(source, language) {
     if (node.nodeName === '#text' && !skip) node.value = translate(node.value);
     if (!skip) for (const item of node.attrs || []) if (['title', 'aria-label', 'placeholder', 'alt'].includes(item.name)) item.value = translate(item.value);
     if (node.tagName === 'link' && attr('rel')?.value === 'canonical') set('href', meta.url);
+    if (attr('data-interpreter-guide')) set('href', INTERPRETER_GUIDE_PATHS[language]);
     if (node.tagName === 'meta') {
       const name = attr('name')?.value || attr('property')?.value;
       const value = { description: meta.description, 'og:title': meta.title, 'og:description': meta.description,

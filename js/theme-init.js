@@ -17,5 +17,7 @@ import { readLanguagePreference } from './language-preference.js';
   }
   document.documentElement.classList.toggle('theme-dark', theme === 'dark');
   document.documentElement.classList.toggle('theme-light', theme !== 'dark');
-  applySavedColors({ ...appearance, theme, language: readLanguagePreference() }, document.documentElement);
+  const language = document.documentElement.hasAttribute?.('data-public-guide')
+    ? document.documentElement.lang : readLanguagePreference();
+  applySavedColors({ ...appearance, theme, language }, document.documentElement);
 })();

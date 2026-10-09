@@ -5,6 +5,8 @@ import { cp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { createAppShell } from './production-shell.mjs';
 import { createLocalizedLanding } from './landing-pages.mjs';
+import { createInterpreterGuide } from './interpreter-guide.mjs';
+import { INTERPRETER_GUIDE_PATHS } from '../js/landing-meta.js';
 
 const root = process.cwd();
 const out = path.join(root, 'public');
@@ -21,6 +23,7 @@ const entries = {
   landing: 'js/landing-entry.js',
   'landing-ui': 'js/landing-ui.js',
   'theme-toggle': 'js/theme-toggle.js',
+  'guide-theme': 'js/guide-theme.js',
 };
 
 // Cada entrypoint queda autocontenido. Además de evitar peticiones extra en el
@@ -41,7 +44,7 @@ for (const [name, input] of Object.entries(entries)) {
   });
   await bundle.write({
     file: path.join(assets, `${name}.js`),
-    format: ['boot', 'landing', 'theme-init'].includes(name) ? 'iife' : 'es',
+    format: ['boot', 'landing', 'theme-init', 'guide-theme'].includes(name) ? 'iife' : 'es',
     inlineDynamicImports: true,
     sourcemap: false,
   });
@@ -59,7 +62,7 @@ async function minifyTree(dir) {
     const file = path.join(dir, entry.name);
     if (entry.isDirectory()) await minifyTree(file);
     else if (entry.name.endsWith('.js')) {
-      const isModule = !['boot.js', 'landing.js', 'theme-init.js'].includes(entry.name);
+      const isModule = !['boot.js', 'landing.js', 'theme-init.js', 'guide-theme.js'].includes(entry.name);
       await minifyFile(file, await readFile(file, 'utf8'), isModule);
     }
   }
@@ -113,4 +116,9 @@ for (const name of ['index.html', 'app.html', 'privacidad.html', 'terminos.html'
   await writeFile(path.join(out, name), html);
 }
 
+for (const language of ['en', 'es']) {
+  const target = path.join(out, INTERPRETER_GUIDE_PATHS[language].slice(1) + '.html');
+  await mkdir(path.dirname(target), { recursive: true });
+  await writeFile(target, createInterpreterGuide(language, release));
+}
 console.log('Build listo en public/ sin sourcemaps ni módulos fuente.');
