@@ -672,9 +672,10 @@ La aplicación funciona en producción con estas bases vigentes:
   turnos, llamadas, pausas, ganancias, adherencia y reportes. HTML estático,
   canonical/hreflang, Article y enlaces desde ambas portadas; su idioma se
   conserva ante ajustes de cuenta distintos y el tema preserva los datos.
-  Ko-fi confirmó el guardado del enlace a la portada; falta verificarlo público
-  y completar el enlace a la guía tras su despliegue. Chrome Web Store muestra
-  registro inicial de desarrollador, sin ficha editable. Detalle en `docs/seo.md`.
+  Ko-fi tiene enlaces a la portada y a la guía española en el perfil público;
+  el de la guía es nofollow. La extensión se instala desde archivo según el
+  propietario, por lo que no hay ficha propia de Chrome Web Store que editar.
+  Detalle en `docs/seo.md`.
 - La versión actual de la app es 601; el puente es 1.3.0 y el resumen independiente
   1.0.3. Refuerzo positivo y Logros están terminados. La auditoría profunda del
   8 de octubre corrigió seis fallos; la ampliación corrigió cinco más en arranque,
@@ -713,8 +714,10 @@ La aplicación funciona en producción con estas bases vigentes:
   y sigue funcionando con almacenamiento bloqueado.
 - 393 pruebas correctas, 2.110 textos ES/EN y build/guardas correctos.
   Navegador: ES/EN, claro/oscuro, 320/390/1.365 px sin overflow, índice y
-  enlace localizado en portada. Ko-fi guardó el enlace de la herramienta;
-  Chrome Web Store muestra registro inicial, sin ficha editable.
+  enlace localizado en portada. Ko-fi muestra los enlaces públicos guardados;
+  el paso de Chrome Web Store no aplica porque la extensión es local.
+  Corregida una prueba que dependía de `public/` antes de ejecutar el build;
+  la publicación se verifica por HTTP y por SHA independientemente de la suite.
   no se afirma una mejora de posición en Google por publicar la guía.
 
 **v600** — Auditoría super profunda de integridad y uso mensual.

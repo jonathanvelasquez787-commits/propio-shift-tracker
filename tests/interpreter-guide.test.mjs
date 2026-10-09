@@ -59,7 +59,7 @@ for (const language of ['es','en']) {
   });
 }
 
-test('both guide routes have canonical redirects, public files and reciprocal sitemap entries', () => {
+test('both guide routes have canonical redirects and reciprocal sitemap entries', () => {
   const routing=JSON.parse(read('vercel.json')), sitemap=read('sitemap.xml');
   for(const language of ['es','en']) {
     const route=INTERPRETER_GUIDE_PATHS[language];
@@ -68,7 +68,6 @@ test('both guide routes have canonical redirects, public files and reciprocal si
     assert.equal(redirect.destination,route);assert.equal(redirect.permanent,true);
     assert(sitemap.includes(`<loc>${SITE_ORIGIN+route}</loc>`));
     assert.equal(sitemap.split(`hreflang="${language}" href="${SITE_ORIGIN+route}"`).length-1,2);
-    assert(fs.existsSync(new URL('../public'+route+'.html',import.meta.url)));
   }
   assert.doesNotMatch(sitemap,/<loc>[^<]*\/app/);
 });

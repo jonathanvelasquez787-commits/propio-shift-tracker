@@ -139,17 +139,28 @@ píxeles sin overflow, selector de idioma visible, índice con destinos válidos
 y enlace de la portada que cambia de ruta junto con el idioma.
 
 El propietario completó los accesos solicitados. Ko-fi confirmó el guardado
-del enlace a la portada; el enlace adicional a la guía espera su despliegue.
+del enlace a la portada y del enlace adicional a la guía española, visible en
+su página pública. El enlace de la guía lleva `nofollow` según la política de
+Ko-fi: sirve para navegación, sin atribuirle una mejora de posición.
 Chrome Web Store muestra el registro inicial de desarrollador con acuerdo y
 cuota de USD 5 en la cuenta abierta, sin ficha editable. No se aceptó ese
-acuerdo ni se pagó la cuota. Falta confirmar si existe una ficha de la extensión
-en otra cuenta. No se usó como propia una extensión de terceros del README.
+acuerdo ni se pagó la cuota. El propietario confirmó que instala la extensión
+desde el archivo descargado; no existe una ficha propia que editar. Este paso
+no aplica y no requiere publicar una extensión. No se usó como propia una
+extensión de terceros del README.
+
+Despliegue inicial v601 verificado por SHA en ambas guías y portadas, con HTTP
+200, assets correctos, redirecciones 308, sitemap de seis páginas y `/app`
+con noindex. La primera CI detectó una prueba que exigía archivos de `public/`
+antes del build; se corrigió para comprobar rutas y sitemap desde sus fuentes.
+El contenido generado se valida por separado en las pruebas del artículo y
+en las comprobaciones HTTP del despliegue, sin depender de un build previo.
 
 ## Próximas mejoras de contenido
 
 - Ampliar la guía cuando cambien los flujos, conservando pasos y datos reales.
-- Completar el enlace a la guía en Ko-fi tras verificar el despliegue y su
-  resultado público; el enlace en Chrome Web Store depende de una ficha real.
+- Revisar resultados de búsqueda cuando Google procese el contenido nuevo;
+  no repetir solicitudes manuales por cuota ni prometer un plazo.
 - Compartir enlaces auténticos en comunidades pertinentes. No comprar enlaces
   ni crear reseñas, estrellas, afiliación oficial o datos estructurados falsos.
 
