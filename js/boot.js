@@ -503,13 +503,18 @@ async function boot() {
     return;
   }
 
-  setAccessToken(session.access_token);
+  setAccessToken(session.access_token, session.user.id);
   let stopPropioBridge = () => {};
   let bridgeUserId = session.user.id;
   getSupabase().auth.onAuthStateChange((_event, next) => {
-    setAccessToken(next ? next.access_token : null);
     bridgeUserId = next?.user?.id || null;
-    if (!next || next.user.id !== session.user.id) { stopPropioBridge(); window.location.replace('/'); }
+    if (bridgeUserId !== session.user.id) {
+      setAccessToken(null, null);
+      stopPropioBridge();
+      window.location.replace('/');
+      return;
+    }
+    setAccessToken(next.access_token, bridgeUserId);
   });
 
   const userId = session.user.id;
@@ -519,12 +524,14 @@ async function boot() {
   try {
     decision = await resolveBoot(userId);
   } catch (err) {
+    if (bridgeUserId !== userId) return;
     fail(
       translateText('No se pudieron leer tus datos guardados. ') +
         (err && err.message ? err.message : translateText('Revisa tu conexión.'))
     );
     return;
   }
+  if (bridgeUserId !== userId) return;
 
   let shouldPushLocal = false;
   try {
@@ -554,6 +561,7 @@ async function boot() {
 
       case BOOT.CONFLICT: {
         const choice = await askConflict(decision);
+        if (bridgeUserId !== userId) return;
         if (choice === 'cloud') {
           adoptCloud(decision.cloud, userId);
         } else {
@@ -585,7 +593,7 @@ async function boot() {
   setBootMessage(translateText('Abriendo tu turno…'));
   startAutoSync();
 
-  if (!(await mountApp())) return;
+  if (!(await mountApp()) || bridgeUserId !== userId) return;
 
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('pst-propio-bridge/v1:' + userId));
   const accountScope = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('');
@@ -602,8 +610,10 @@ async function boot() {
 
   try {
     const profile = await getProfile();
+    if (bridgeUserId !== userId) return;
     injectAccountPanel(profile, session.user.email);
   } catch {
+    if (bridgeUserId !== userId) return;
     injectAccountPanel(null, session.user.email);
   }
   injectDeleteAccount();

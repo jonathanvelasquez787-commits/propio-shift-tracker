@@ -549,8 +549,8 @@ export function computeGameDay(dayKey = todayCallDateKey(), { ignoreLock = false
   const xp = Number.isFinite(lockedXp) ? Math.min(rawXp, lockedXp) : rawXp;
   const completedMissions = missions.filter((mission) => mission.ok).length;
   const stars = eligibleCalls.length ? Math.max(1, completedMissions) : 0;
-  const hpPct = goal.usd > 0 ? Math.max(0, Math.min(100, (1 - stats.earnings / goal.usd) * 100)) : 100;
-  const defeated = goal.usd > 0 && hpPct <= 0;
+  const defeated = goal.usd > 0 && monetaryMilestones(stats.earnings, goal.usd).claimed.includes(100);
+  const hpPct = defeated ? 0 : goal.usd > 0 ? Math.max(0, Math.min(100, (1 - stats.earnings / goal.usd) * 100)) : 100;
   const snapshot = {
     dayKey,
     stats,
@@ -831,9 +831,9 @@ function renderHeroChips() {
 function cycleBossSnapshot() {
   const cycle = cycleEarningsForOffset(0);
   const goal = effectiveCycleGoal(0);
-  const pct = goal > 0 ? Math.max(0, Math.min(100, (cycle.earnings / goal) * 100)) : 0;
+  const defeated = goal > 0 && monetaryMilestones(cycle.earnings, goal).claimed.includes(100);
+  const pct = defeated ? 100 : goal > 0 ? Math.max(0, Math.min(100, (cycle.earnings / goal) * 100)) : 0;
   const hp = Math.max(0, 100 - pct);
-  const defeated = goal > 0 && pct >= 100;
   const stateName = defeated ? 'defeated' : hp <= 25 ? 'wounded' : hp <= 50 ? 'angry' : 'awake';
   return { cycle, goal, pct, hp, defeated, stateName };
 }
@@ -1740,7 +1740,7 @@ function reconcileLiveComboAndLoot(dayKey, snapshot, { allowRewards = true } = {
     .forEach((key) => {
       const count = Number(key.slice(prefix.length).replace(':improved', ''));
       const isImproved = key.endsWith(':improved');
-      if ((isImproved ? count !== 8 : !validMilestones.has(count))) rollbackLootReceipt(dayKey, key);
+      if ((isImproved ? count !== 8 || eligible.length < 8 : !validMilestones.has(count))) rollbackLootReceipt(dayKey, key);
     });
 
   const impulsePrefix = `impulse:${dayKey}:`;
@@ -2184,12 +2184,12 @@ export function onGameDayReset(dayKey) {
 
   if (entry?.finalized) {
     state.game.totalXp = Math.max(0, state.game.totalXp - (Number(entry.xp) || 0));
-    if (entry.shieldUsed && state.game.shields < GAME_SHIELD_CAP) state.game.shields++;
     const awardedKey = entry.rollback?.streakShieldAwardedKey;
     if (awardedKey && state.game.ledger[awardedKey]) {
       delete state.game.ledger[awardedKey];
       if (state.game.shields > 0) state.game.shields--;
     }
+    if (entry.shieldUsed && state.game.shields < GAME_SHIELD_CAP) state.game.shields++;
   }
 
   const prefixes = [
@@ -2261,9 +2261,11 @@ function revokeStageClear(dayKey, { silent = false } = {}) {
   state.game.totalXp = Math.max(0, state.game.totalXp - (Number(entry.xp) || 0));
 
   const rollback = entry.rollback && typeof entry.rollback === 'object' ? entry.rollback : {};
-  if (Number.isFinite(Number(rollback.shieldsBefore))) {
-    state.game.shields = Math.max(0, Math.min(GAME_SHIELD_CAP, Number(rollback.shieldsBefore)));
-  } else if (entry.shieldUsed) {
+  // Reverse this closing receipt, preserving shields earned or restored after closing.
+  if (rollback.streakShieldAwardedKey && state.game.ledger[rollback.streakShieldAwardedKey]) {
+    state.game.shields = Math.max(0, state.game.shields - 1);
+  }
+  if (entry.shieldUsed) {
     state.game.shields = Math.min(GAME_SHIELD_CAP, state.game.shields + 1);
   }
   if (rollback.streakShieldAwardedKey) delete state.game.ledger[rollback.streakShieldAwardedKey];
@@ -2296,6 +2298,7 @@ export function onGameShiftStarted({ continued = false } = {}) {
   // apagar gamificación, reabrir turno y volverla a encender deja XP/cofre/finalizado congelados.
   if (hadFinalizedDay) {
     revokeStageClear(dayKey, { silent: !enabled });
+    onGameCallsChanged(dayKey);
     if (enabled) queueGameToast(translateText('STAGE CLEAR reabierto · el nuevo turno se sumará al cierre de hoy'));
   }
 
@@ -2665,7 +2668,7 @@ function recordPreviousCycleOutcome() {
   if (!(goal > 0)) return false;
   state.game.ledger[key] = true;
   const pct = Math.max(0, Math.min(100, (cycle.earnings / goal) * 100));
-  if (pct >= 100) {
+  if (monetaryMilestones(cycle.earnings, goal).claimed.includes(100)) {
     if (state.game.ledger[`cycle-defeat:${endKey}`]) return true;
     state.game.ledger[`cycle-defeat:${endKey}`] = true;
     state.game.cycleReward = { pending: true, cycleKey: endKey, options: cycleRewardOptionsFor(endKey) };

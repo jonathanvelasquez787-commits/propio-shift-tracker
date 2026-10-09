@@ -4618,6 +4618,9 @@ function renderPayDatesSection() {
           return { ...call, calendarCallDate: call.callDate, callDate: activeShiftDayKey, shiftDayKey: activeShiftDayKey };
         });
       }
+      const exactOfficialCallsFor = (rows, incomingCall) => rows.filter(existingCall =>
+        sameImportedCallIdentity(existingCall, incomingCall)
+        && new Date(existingCall.startISO).getTime() === new Date(incomingCall.startISO).getTime());
       const existing = new Set(calls.filter(c => !isReplaceableLiveCall(c)).map(callDedupeKey));
       const skippedDuplicates = [];
       const futureRows = [];
@@ -4629,8 +4632,11 @@ function renderPayDatesSection() {
             return false;
           }
           if (existing.has(callDedupeKey(c))) {
-            skippedDuplicates.push(c);
-            return false;
+            const officialIdentity = exactOfficialCallsFor(calls, c);
+            if (!(officialIdentity.length > 1 && officialIdentity.some(call => Number(call.durationMin) === 0))) {
+              skippedDuplicates.push(c);
+              return false;
+            }
           }
           return true;
         })
@@ -4643,34 +4649,75 @@ function renderPayDatesSection() {
       const replacedIds = new Set();
       const skippedOverlaps = [];
       let overlapSkipped = 0;
+      const correctedDuplicateDays = new Set();
+
+      const replaceAcceptedCall = (call, previous, kind) => {
+        const stagedIndex = accepted.findIndex(item => item.call.id === previous.id);
+        const staged = stagedIndex >= 0 ? accepted.splice(stagedIndex, 1)[0] : null;
+        const replaces = staged ? staged.replaces : previous;
+        const replacementKind = staged ? staged.replacementKind : kind;
+        replacedIds.add(previous.id);
+        const index = overlapCheckSet.findIndex(item => item.id === previous.id);
+        if (index >= 0) overlapCheckSet.splice(index, 1);
+        overlapCheckSet.push({ ...call, source: 'import' });
+        accepted.push({ call, replaces, replacementKind });
+        for (const list of [replacedLive, correctedOfficial]) {
+          const priorIndex = list.findIndex(item => item.call.id === previous.id);
+          if (priorIndex >= 0) list.splice(priorIndex, 1);
+        }
+        if (replacementKind === 'live') replacedLive.push({ call, provisional: replaces });
+        if (replacementKind === 'import') correctedOfficial.push({ call, previous: replaces });
+      };
 
       for (const c of deduped) {
         const overlaps = overlapCheckSet.filter(existingCall => callsOverlap(existingCall, c));
+        const exactOfficialCalls = exactOfficialCallsFor(overlapCheckSet, c);
+        const unrelatedOverlap = exactOfficialCalls.length && overlaps.find(call => !exactOfficialCalls.includes(call));
+        if (unrelatedOverlap) {
+          overlapSkipped++;
+          skippedOverlaps.push({ ...c, withCustomerId: unrelatedOverlap.customerId, withCallStart: unrelatedOverlap.callStart });
+          continue;
+        }
+        // Earlier zero-minute corrections could leave a second official row beside the original.
+        // Collapse only this corrected identity, and only when no unrelated call blocks it.
+        if (exactOfficialCalls.length > 1 && exactOfficialCalls.some(call => Number(call.durationMin) === 0)
+          && overlaps.every(call => exactOfficialCalls.includes(call))) {
+          const primary = exactOfficialCalls.find(call => Number(call.durationMin) > 0) || exactOfficialCalls[0];
+          exactOfficialCalls.filter(call => call !== primary).forEach(call => {
+            replacedIds.add(call.id);
+            const index = overlapCheckSet.findIndex(item => item.id === call.id);
+            if (index >= 0) overlapCheckSet.splice(index, 1);
+            const dayKey = callDateKeyFromValue(call.callDate);
+            if (dayKey) correctedDuplicateDays.add(dayKey);
+          });
+          replaceAcceptedCall(c, primary, 'import');
+          continue;
+        }
+        // Zero-length calls do not overlap a call at their start, but an exact official identity
+        // still represents a correction of that record.
+        const zeroCorrection = !overlaps.length && overlapCheckSet.find(existingCall =>
+          sameImportedCallIdentity(existingCall, c)
+          && (Number(existingCall.durationMin) === 0 || Number(c.durationMin) === 0)
+          && new Date(existingCall.startISO).getTime() === new Date(c.startISO).getTime());
+        if (zeroCorrection) {
+          replaceAcceptedCall(c, zeroCorrection, 'import');
+          continue;
+        }
         if (!overlaps.length) {
-          overlapCheckSet.push(c);
+          overlapCheckSet.push({ ...c, source: 'import' });
           accepted.push({ call: c, replaces: null, replacementKind: null });
           continue;
         }
 
         if (overlaps.length === 1 && isReplaceableLiveCall(overlaps[0])) {
           const provisional = overlaps[0];
-          replacedIds.add(provisional.id);
-          const index = overlapCheckSet.findIndex(item => item.id === provisional.id);
-          if (index >= 0) overlapCheckSet.splice(index, 1);
-          overlapCheckSet.push(c);
-          accepted.push({ call: c, replaces: provisional, replacementKind: 'live' });
-          replacedLive.push({ call: c, provisional });
+          replaceAcceptedCall(c, provisional, 'live');
           continue;
         }
 
         if (overlaps.length === 1 && sameImportedCallIdentity(overlaps[0], c)) {
           const previous = overlaps[0];
-          replacedIds.add(previous.id);
-          const index = overlapCheckSet.findIndex(item => item.id === previous.id);
-          if (index >= 0) overlapCheckSet.splice(index, 1);
-          overlapCheckSet.push(c);
-          accepted.push({ call: c, replaces: previous, replacementKind: 'import' });
-          correctedOfficial.push({ call: c, previous });
+          replaceAcceptedCall(c, previous, 'import');
           continue;
         }
 
@@ -4710,7 +4757,7 @@ function renderPayDatesSection() {
         return { ...item, call };
       });
 
-      const importedDates = new Set();
+      const importedDates = new Set(correctedDuplicateDays);
       importedRows.forEach(item => {
         if (item.replacementKind === 'live') {
           migratePositiveCallIdReferences(item.replaces?.id, item.call.id, item.call.endISO);

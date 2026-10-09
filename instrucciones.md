@@ -668,17 +668,57 @@ La aplicación funciona en producción con estas bases vigentes:
 - Landing bilingüe estática, canonical/hreflang y sitemap de cuatro páginas,
   preguntas frecuentes e imagen social. Un bundle público evita cargar tres
   copias de las traducciones; las fuentes no bloquean el primer render.
-- La versión actual de la app es 599; el puente es 1.3.0 y el resumen independiente
+- La versión actual de la app es 600; el puente es 1.3.0 y el resumen independiente
   1.0.3. Refuerzo positivo y Logros están terminados. La auditoría profunda del
   8 de octubre corrigió seis fallos; la ampliación corrigió cinco más en arranque,
   concurrencia y PWA. Cobertura y límites constan en
   `docs/auditoria-profunda-2026-10-08.md` y
-  `docs/auditoria-ampliada-2026-10-08.md`. La aparición por nombre en Google sigue
+  `docs/auditoria-ampliada-2026-10-08.md`. La auditoría super profunda del 9 de
+  octubre corrigió 20 grupos de fallos de juego, contabilidad, importación,
+  Finanzas, identidad de cuenta, sincronización, PWA y login; suite local de
+  388 pruebas correcta, build de app y ambas extensiones correcto, 31 días
+  contables con 161 comprobaciones y cuatro escenarios SQL locales nuevos.
+  Navegador local: 31 días (1/9–1/10/2026), 62 llamadas (31 live y 31 manuales),
+  $111,60, 31 cofres, 32 pausas, 2.992 XP y 355 recibos; recarga final idéntica
+  y cero errores. Responsive real: siete páginas en dos anchuras, 14 vistas
+  activas verificadas y raíz sin overflow horizontal. Publicación/CI/deploy
+  requieren evidencia separada por SHA; no se infieren desde los checks locales.
+  Detalle, regresiones y límites en `docs/auditoria-super-profunda-2026-10-09.md`.
+  Sin Supabase staging: OAuth, cron alojado, conexiones simultáneas SQL reales
+  y dispositivos físicos siguen fuera de certificación; datos reales intactos.
+  La aparición por nombre en Google sigue
   pendiente de procesamiento externo; no se repitieron solicitudes por cuota.
 
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v600** — Auditoría super profunda de integridad y uso mensual.
+
+- Seis fallos de juego: revocación del loot mejorado al bajar de ocho llamadas,
+  continuación que conserva escudos posteriores, reconciliación al reabrir un
+  día sellado, reinicio en el tope de escudos y metas decimales diarias/de ciclo.
+- Siete fallos contables: correcciones oficiales a cero y duplicados heredados,
+  versiones sucesivas del mismo pegado, recuperación live nocturna, últimos
+  centavos disponibles, cascadas de más de 500 filas, gastos de objetivo cero
+  y protección de una live ajena ante ampliación de una oficial cero.
+- Seis fallos de sincronización/PWA: base de bajas después de reabrir offline,
+  identidad durante operaciones asíncronas/arranque, persistencia obligatoria
+  de metadata, respuestas tardías entre pestañas, HTTP de error que pisaba el
+  shell válido y limpieza de cachés ajenas. Login conserva respuesta y límite
+  local si el limitador persistente falla o devuelve un contrato inválido.
+- Verificación local: 388 pruebas sin fallos, 2.109 textos ES/EN, guardas de
+  33 módulos y wiring correctos, builds de app/puente/resumen correctos.
+  Simulación de 31 días: 161 puntos contables, 72 llamadas finales y 31
+  conciliaciones de exportación; 17.000 escenarios de modelos independientes
+  conservados. Cuatro escenarios SQL locales nuevos pasan; sin datos reales.
+- Navegador local: 31 días consecutivos, dos llamadas/día, $111,60 acumulados,
+  31 cofres, 16 Break y 16 Lunch, 2.992 XP y 355 recibos. Recarga final conserva
+  llamadas/XP/ledger, sin errores. Responsive: siete páginas × dos anchuras,
+  14 vistas activas y raíz sin overflow; no implica QA de cada control individual.
+  Publicación/CI/deploy se verifican por SHA separado. No se certifican
+  OAuth/cron alojados, concurrencia SQL real ni
+  dispositivos físicos. Ver `docs/auditoria-super-profunda-2026-10-09.md`.
 
 **v599** — Gamificación compacta y cofre de la meta diaria.
 
@@ -707,15 +747,3 @@ La aplicación funciona en producción con estas bases vigentes:
   vista, en fechas anteriores o con movimiento reducido. Duelo conservado.
 - 324 pruebas y checks/build correctos; navegador con datos sintéticos:
   combate, especial, llamada live, carga al guardar y móvil sin overflow.
-
-**v597** — Auditoría ampliada con SQL aislado y fallos de red.
-
-- Arranque: subidas con revisión, base protegida para cuentas nuevas y elección
-  local que completa la subida sin pisar escrituras posteriores.
-- PWA: reabre la copia local de la misma cuenta sin red, conserva la base y
-  gestiona fallos de actualización/cuota de caché sin rechazos sin manejar.
-- 319 pruebas, 17.000 casos contra modelos independientes, 15 escenarios SQL,
-  500 llamadas en trabajador/receptor y descarga simulada de 100.000 llamadas.
-  Navegador real con SQL local: conflicto, offline, reconexión y respuesta perdida.
-  Sin entorno Supabase de pruebas; OAuth, cron alojado y dispositivos físicos
-  siguen fuera de la certificación. Datos reales intactos.

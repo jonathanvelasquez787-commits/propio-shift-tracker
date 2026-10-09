@@ -35,17 +35,22 @@ function throttled(ip) {
 
 async function persistentlyThrottled(ip) {
   const key = createHash('sha256').update(`${SERVICE_KEY}:${ip}`).digest('hex');
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/consume_rate_limit`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      apikey: SERVICE_KEY,
-      Authorization: `Bearer ${SERVICE_KEY}`,
-    },
-    body: JSON.stringify({ p_key: `login:${key}`, p_limit: MAX_ATTEMPTS, p_window_seconds: 60 }),
-  });
-  if (!response.ok) return throttled(ip);
-  return !(await response.json());
+  try {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/consume_rate_limit`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        apikey: SERVICE_KEY,
+        Authorization: `Bearer ${SERVICE_KEY}`,
+      },
+      body: JSON.stringify({ p_key: `login:${key}`, p_limit: MAX_ATTEMPTS, p_window_seconds: 60 }),
+    });
+    if (response.ok) {
+      const allowed = await response.json();
+      if (typeof allowed === 'boolean') return !allowed;
+    }
+  } catch {}
+  return throttled(ip);
 }
 
 async function readBody(req) {

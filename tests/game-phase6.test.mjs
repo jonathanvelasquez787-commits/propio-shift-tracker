@@ -387,8 +387,9 @@ test('STAGE CLEAR bloquea recompensas posteriores y solo vuelve a habilitarse al
   assert.match(game, /earnings: Number\(snapshot\.stats\.earnings\) \|\| 0/);
   assert.match(game, /xpBreakdown: \{ \.\.\.snapshot\.xpBreakdown \}/);
   assert.match(game, /const breakdown = entry\.xpBreakdown \|\| fallback\.xpBreakdown/);
-  assert.match(game, /if \(Number\.isFinite\(Number\(rollback\.shieldsBefore\)\)\)/);
-  assert.match(game, /else if \(entry\.shieldUsed\) \{\s*state\.game\.shields = Math\.min\(GAME_SHIELD_CAP, state\.game\.shields \+ 1\)/);
+  assert.match(game, /rollback\.streakShieldAwardedKey && state\.game\.ledger\[rollback\.streakShieldAwardedKey\]/);
+  assert.match(game, /if \(entry\.shieldUsed\) \{\s*state\.game\.shields = Math\.min\(GAME_SHIELD_CAP, state\.game\.shields \+ 1\)/);
+  assert.doesNotMatch(game, /state\.game\.shields = Math\.max\(0, Math\.min\(GAME_SHIELD_CAP, Number\(rollback\.shieldsBefore\)\)\)/);
 });
 
 test('barras, misiones y racha exponen estado accesible', () => {
@@ -658,7 +659,7 @@ test('segunda simulación mensual: caja y combo se reconcilian al corregir una l
 test('segunda simulación mensual: Propio puede corregir una llamada ya importada', () => {
   const appMain = read('js/app-main.js');
   assert.match(appMain, /sameImportedCallIdentity/);
-  assert.match(appMain, /replacementKind: 'import'/);
+  assert.match(appMain, /replaceAcceptedCall\(c, previous, 'import'\)/);
   assert.match(appMain, /item\.replaces\.importedAt \|\| importTs/);
   assert.match(appMain, /oficial\(es\) corregida\(s\)/);
 });

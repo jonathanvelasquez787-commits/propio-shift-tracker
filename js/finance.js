@@ -463,7 +463,7 @@ export function financeApplySignedAmount(catId, rowId, rawAmount, sign) {
     return;
   }
 
-  if (monto > financeAvailableBalance()) {
+  if (monto - financeAvailableBalance() > 1e-9) {
     toast(translateText('No tienes suficiente disponible para asignar esa cantidad'));
     return;
   }
@@ -518,17 +518,17 @@ function financeTrimAssignmentsToEarnings() {
 function financeFillAvailableByPriority() {
   if (!settings.financeAutoFill) return false;
   let changed = false;
-  let guard = 0;
-  while (guard++ < 500) {
-    const available = financeAvailableBalance();
+  let available = financeAvailableBalance();
+  const queue = [...financeGastoRowsSorted().filter(r => !financeIsRowPagado(r)), ...financeMetaRowsSorted()];
+  for (const nextRow of queue) {
     if (available <= 0.004) break;
-    const nextRow = financeGastoRowsSorted().find(r => !financeIsRowPagado(r))
-      || financeMetaRowsSorted().find(r => (Number(r.assignedAmount) || 0) < (Number(r.targetAmount) || 0) - 0.004);
-    if (!nextRow) break;
     const remaining = Math.max(0, (Number(nextRow.targetAmount) || 0) - (Number(nextRow.assignedAmount) || 0));
+    if (remaining <= 1e-9 || (financeRowIsMeta(nextRow) && remaining <= 0.004)) continue;
     const applyAmount = Math.min(available, remaining);
-    if (applyAmount <= 0) break;
-    nextRow.assignedAmount = (Number(nextRow.assignedAmount) || 0) + applyAmount;
+    nextRow.assignedAmount = applyAmount === remaining
+      ? Number(nextRow.targetAmount)
+      : (Number(nextRow.assignedAmount) || 0) + applyAmount;
+    available -= applyAmount;
     changed = true;
   }
   return changed;

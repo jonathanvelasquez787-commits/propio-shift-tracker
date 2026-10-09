@@ -35,7 +35,7 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => Promise.all(keys.filter((key) => key !== CACHE).map((key) => caches.delete(key))))
+    caches.keys().then((keys) => Promise.all(keys.filter((key) => key.startsWith('propio-') && key !== CACHE).map((key) => caches.delete(key))))
   );
   self.clients.claim();
 });
@@ -55,8 +55,10 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(request)
         .then(async (response) => {
-          const copy = response.clone();
-          await caches.open(CACHE).then((cache) => cache.put(request, copy)).catch(() => {});
+          if (response.ok) {
+            const copy = response.clone();
+            await caches.open(CACHE).then((cache) => cache.put(request, copy)).catch(() => {});
+          }
           return response;
         })
         .catch(() =>

@@ -30,6 +30,23 @@ let maxWaitTimer = null;
 let pushing = false;
 let listeners = [];
 let cloudCallHashes = new Map();
+let cloudCallOwner = null;
+let cloudCallRevision = null;
+let authenticatedUserId;
+let syncEpoch = 0;
+
+function canSync(userId) {
+  return authenticatedUserId === undefined || Boolean(cachedToken && authenticatedUserId === userId);
+}
+
+function sameSyncContext(userId, epoch, base) {
+  const meta = readMeta();
+  return syncEpoch === epoch && meta.userId === userId && meta.lastSyncedUpdatedAt === base && canSync(userId);
+}
+
+function hasCallBaseline(meta) {
+  return cloudCallOwner === meta.userId && cloudCallRevision === meta.lastSyncedUpdatedAt;
+}
 
 export function activeAppKeys() {
   return APP_KEYS;
@@ -79,11 +96,12 @@ function emptyMeta() {
   };
 }
 
-function writeMeta(patch) {
+function writeMeta(patch, { required = false } = {}) {
   const next = { ...readMeta(), ...patch };
   try {
     window.localStorage.setItem(META_KEY, JSON.stringify(next));
-  } catch {
+  } catch (error) {
+    if (required) throw error;
     /* cuota llena: la app ya avisa por su cuenta */
   }
   return next;
@@ -306,7 +324,12 @@ export async function fetchCloud(userId) {
     .eq('user_id', userId)
     .maybeSingle();
   if (error) throw error;
-  if (!data) return null;
+  if (!data) {
+    cloudCallHashes = new Map();
+    cloudCallOwner = userId;
+    cloudCallRevision = new Date(0).toISOString();
+    return null;
+  }
 
   const callRows = [];
   const pageSize = 1000;
@@ -321,6 +344,8 @@ export async function fetchCloud(userId) {
       // Solo una tabla ausente en la primera página permite el snapshot antiguo.
       if (callRows.length || !['42P01', 'PGRST205'].includes(callsError.code)) throw callsError;
       cloudCallHashes = hashesForCalls(data.calls || []);
+      cloudCallOwner = userId;
+      cloudCallRevision = data.updated_at;
       return data;
     }
     if (!page?.length) {
@@ -338,6 +363,8 @@ export async function fetchCloud(userId) {
 
   const normalizedCalls = (callRows || []).map((row) => row.payload).filter(Boolean);
   cloudCallHashes = hashesForCalls(normalizedCalls);
+  cloudCallOwner = userId;
+  cloudCallRevision = data.updated_at;
   return { ...data, calls: normalizedCalls };
 }
 
@@ -366,10 +393,16 @@ function callDelta(callList) {
 export async function pushSnapshot({ force = false } = {}) {
   if (pushing) return { skipped: true };
   const meta = readMeta();
-  const snapshot = readLocalSnapshot();
-  const delta = callDelta(snapshot.calls);
+  if (!canSync(meta.userId)) return { skipped: true };
+  const epoch = syncEpoch;
   pushing = true;
   try {
+    // Tras reabrir sin red no quedan los hashes en memoria; recupéralos antes
+    // de calcular bajas, conservando la revisión local para detectar conflictos.
+    if (!hasCallBaseline(meta) && meta.lastSyncedUpdatedAt) await fetchCloud(meta.userId);
+    if (!sameSyncContext(meta.userId, epoch, meta.lastSyncedUpdatedAt)) return { skipped: true };
+    const snapshot = readLocalSnapshot();
+    const delta = callDelta(snapshot.calls);
     let { data, error } = await getSupabase().rpc('push_user_data_v2', {
       p_state: snapshot.state,
       p_settings: snapshot.settings,
@@ -379,6 +412,7 @@ export async function pushSnapshot({ force = false } = {}) {
       p_device_id: deviceId(),
       p_device_label: deviceLabel(),
     });
+    if (!sameSyncContext(meta.userId, epoch, meta.lastSyncedUpdatedAt)) return { skipped: true };
     if (error && ['42883', 'PGRST202'].includes(error.code)) {
       ({ data, error } = await getSupabase().rpc('push_user_data', {
         p_state: snapshot.state,
@@ -389,6 +423,7 @@ export async function pushSnapshot({ force = false } = {}) {
         p_device_label: deviceLabel(),
       }));
     }
+    if (!sameSyncContext(meta.userId, epoch, meta.lastSyncedUpdatedAt)) return { skipped: true };
     if (error) throw error;
 
     if (data && data.conflict) {
@@ -401,12 +436,15 @@ export async function pushSnapshot({ force = false } = {}) {
       lastSyncedUpdatedAt: data ? data.updated_at : null,
       dirty: pending,
       lastPushAt: new Date().toISOString(),
-    });
+    }, { required: true });
     cloudCallHashes = delta.current;
+    cloudCallOwner = meta.userId;
+    cloudCallRevision = data ? data.updated_at : null;
     emit('pushed', { updatedAt: data ? data.updated_at : null });
     if (pending) markDirty();
     return { ok: true, pending, updatedAt: data ? data.updated_at : null };
   } catch (err) {
+    if (!sameSyncContext(meta.userId, epoch, meta.lastSyncedUpdatedAt)) return { skipped: true };
     emit('error', { error: err });
     return { error: err };
   } finally {
@@ -423,6 +461,7 @@ export async function pushSnapshot({ force = false } = {}) {
 function flushOnExit() {
   const meta = readMeta();
   if (!meta.dirty) return;
+  if (!canSync(meta.userId) || (meta.lastSyncedUpdatedAt && !hasCallBaseline(meta))) return;
   const token = currentAccessToken();
   if (!token) return;
   const snapshot = readLocalSnapshot();
@@ -452,8 +491,18 @@ function flushOnExit() {
 }
 
 let cachedToken = null;
-export function setAccessToken(token) {
+export function setAccessToken(token, userId) {
   cachedToken = token || null;
+  if (arguments.length > 1) {
+    const nextUserId = token ? userId : null;
+    if (authenticatedUserId !== nextUserId) syncEpoch++;
+    authenticatedUserId = nextUserId;
+    if (!canSync(readMeta().userId)) {
+      if (pushTimer) clearTimeout(pushTimer);
+      if (maxWaitTimer) clearTimeout(maxWaitTimer);
+      pushTimer = maxWaitTimer = null;
+    }
+  }
 }
 function currentAccessToken() {
   return cachedToken;
@@ -617,12 +666,22 @@ function isEmptyCloud(cloud) {
 }
 
 export function adoptCloud(cloud, userId) {
-  writeLocalSnapshot({
-    state: cloud.state ?? {},
-    calls: cloud.calls ?? [],
-    settings: cloud.settings ?? {},
-  });
-  writeMeta({ userId, lastSyncedUpdatedAt: cloud.updated_at, dirty: false });
+  const previousMeta = window.localStorage.getItem(META_KEY);
+  writeMeta({ userId, lastSyncedUpdatedAt: cloud.updated_at, dirty: false }, { required: true });
+  try {
+    writeLocalSnapshot({
+      state: cloud.state ?? {},
+      calls: cloud.calls ?? [],
+      settings: cloud.settings ?? {},
+    });
+  } catch (error) {
+    try { restoreRawKey(META_KEY, previousMeta); } catch {}
+    throw error;
+  }
+  syncEpoch++;
+  cloudCallHashes = hashesForCalls(cloud.calls ?? []);
+  cloudCallOwner = userId;
+  cloudCallRevision = cloud.updated_at;
 }
 
 export function adoptLocal(userId, cloud) {
@@ -630,11 +689,14 @@ export function adoptLocal(userId, cloud) {
   // La copia elegida reemplaza solo la revisión observada, nunca una posterior.
   // Una base imposible protege también el caso de una fila aún inexistente.
   if (arguments.length > 1) patch.lastSyncedUpdatedAt = cloud?.updated_at || new Date(0).toISOString();
-  writeMeta(patch);
+  writeMeta(patch, { required: true });
 }
 
 export function resetForUser(userId) {
+  syncEpoch++;
   cloudCallHashes = new Map();
+  cloudCallOwner = null;
+  cloudCallRevision = null;
   clearLocalAppData();
   try {
     window.localStorage.removeItem(META_KEY);
@@ -642,7 +704,7 @@ export function resetForUser(userId) {
   } catch {
     /* ignorar */
   }
-  writeMeta({ userId, lastSyncedUpdatedAt: null, dirty: false });
+  writeMeta({ userId, lastSyncedUpdatedAt: null, dirty: false }, { required: true });
 }
 
 export { DATA_SCHEMA_VERSION };

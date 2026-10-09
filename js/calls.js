@@ -511,7 +511,9 @@ export function saveManualCall() {
       const exactEnd = new Date(originalStart.getTime() + duration * 60000);
       candidate = {
         ...candidate,
-        ...callAccountingFields(originalStart, originalCalendarDate),
+        callDate: original.callDate,
+        shiftDayKey: original.shiftDayKey,
+        calendarCallDate: original.calendarCallDate,
         id: original.id || candidate.id,
         startISO: originalStart.toISOString(),
         endISO: exactEnd.toISOString(),
