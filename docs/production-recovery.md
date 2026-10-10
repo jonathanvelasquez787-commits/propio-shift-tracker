@@ -32,6 +32,16 @@ Para recuperación operativa: elegir un proyecto Supabase vacío, aplicar las mi
 node scripts/restore-portable-backup.mjs backup.encrypted.json propio-recovery-private-key.pem --empty-recovery-target
 ```
 
-El script rechaza el identificador del proyecto de producción actual y cualquier destino con usuarios o datos. Usa una transacción; valida los conteos y revierte todo si falla. Se mantienen las identidades, payloads, ajustes y backups; las cuotas se derivan mediante los triggers. No restaura sesiones activas, secretos de proveedores, archivos de servicios externos o métricas. El operador debe verificar login Google, RLS, horario y ganancias en ese destino antes de promoverlo. RTO de un desastre alojado no está medido: la prueba local mide sólo la reconstrucción de datos.
+El script rechaza el identificador del proyecto de producción actual y cualquier destino con usuarios o datos. Usa una transacción; valida los conteos y revierte todo si falla. Se mantienen las identidades, payloads, ajustes y backups; las cuotas se derivan mediante los triggers. No restaura sesiones activas, secretos de proveedores, archivos de servicios externos o métricas. El operador debe verificar login Google, RLS, horario y ganancias en ese destino antes de promoverlo. El RTO del servicio completo sigue sin medirse; el ensayo siguiente acredita la recuperación de esquema y datos alojados.
 
 El historial `0001`–`0004` se registró como baseline tras comparar funciones y columnas de producción; no se reaplicaron esas migraciones a datos reales. Las cuatro migraciones posteriores usan las mismas versiones que Supabase. Cambios nuevos siempre van en un archivo nuevo.
+
+## Ensayo alojado completado: 10 de octubre de 2026
+
+Destino vacío: `propio-recovery-drill` (`qcvdexkkrwfkbxkmnohl`), PostgreSQL 17.11, en la misma organización Free con límite de gasto activado. Se reconstruyeron las ocho migraciones y se restauró el backup cifrado real del 10/10 a las 19:15:23 UTC mediante una única transacción SQL usando las consultas de la librería de restauración. La clave privada permaneció local.
+
+Resultado: una cuenta, una identidad, un perfil, una fila de datos, cero llamadas normalizadas y 13 snapshots. Las 14 llamadas del blob heredado se conservaron. Se compararon las columnas no generadas y los payloads; las revisiones `updated_at` de la aplicación se regeneran durante el restore. El propietario pudo leer sus datos bajo RLS y otra identidad no pudo leerlos. La API anónima rechazó perfiles, datos y exportación privada con HTTP 401.
+
+Duración observada: 6 min 26 s para reconstruir, importar y comprobar mediante el conector, incluidos los reintentos del script de ensayo; la transacción final y su ida/vuelta duraron 1,67 s. Estos tiempos excluyen aprovisionar el proyecto, configurar OAuth, cambiar Vercel y validar login; no son el RTO de todo el servicio.
+
+Los cron del ensayo se retiraron con `cron.unschedule(jobid)`, para evitar trabajos automáticos o solicitudes al monitor de producción. En Supabase alojado, modificar directamente `cron.job` requiere permisos que el rol de operación no tiene. Al recrear un destino de ensayo, retirar sus jobs dentro de la migración que los crea. Para una recuperación operativa, configurar los secretos y destinos antes de programarlos de nuevo. El ensayo no modificó datos de producción.
