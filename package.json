@@ -21,13 +21,16 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "2.117.2",
+    "@vercel/blob": "2.8.1",
     "i18next": "26.4.2"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "0.5.8",
     "@rollup/plugin-node-resolve": "15.2.3",
     "acorn": "8.15.0",
     "locize-cli": "12.8.3",
     "parse5": "7.3.0",
+    "pg": "8.16.3",
     "rollup": "3.30.0",
     "terser": "5.44.0"
   }

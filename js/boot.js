@@ -10,6 +10,7 @@ import { ui, translateText, translateMarkup, displayLocale, setLanguage, transla
 import { getSupabase, isConfigured } from './supabase-client.js';
 import { getProfile, signOut } from './auth.js';
 import { installPropioBridge } from './propio-bridge.js';
+import { SUPABASE_URL } from './config.js';
 import {
   BOOT,
   resolveBoot,
@@ -27,6 +28,11 @@ import {
   applyLoginLanguagePreference,
   syncThemeClass,
   retireLegacyQaStorage,
+  preserveRecoveryCopy,
+  listRecoveryCopies,
+  restoreRecoveryCopy,
+  forgetRecoveryCopies,
+  localHasData,
 } from './sync.js';
 
 // Antes que nada: el gate hereda los tokens de la app y por defecto son los
@@ -113,7 +119,7 @@ function askConflict({ localSummary, cloudSummary, cloud }) {
         <p class="boot-card-text">
           Este dispositivo tiene cambios sin subir, y en la nube hay una versión
           guardada${desde} el ${escapeHtml(cuando)}. No se mezclan solas: elige
-          cuál se queda. La otra se pierde.
+          cuál se queda. La versión reemplazada queda en las copias recuperables de Ajustes.
         </p>
         <div class="boot-choice-grid">
           <button class="boot-choice" id="bootUseLocal" type="button">
@@ -195,10 +201,19 @@ function injectAccountPanel(profile, email) {
   footer.appendChild(wrap);
 
   document.getElementById('sidebarLogoutBtn').addEventListener('click', async () => {
+    if (window.flushLocalChanges && !window.flushLocalChanges()) return;
     const meta = readMeta();
     if (meta.dirty) {
       setSyncStatus('saving', translateText('Guardando antes de salir…'));
-      await pushSnapshot();
+      const result = await pushSnapshot();
+      if (!result.ok || result.pending || readMeta().dirty) {
+        try { preserveRecoveryCopy(meta.userId, readLocalSnapshot(), 'account-switch'); }
+        catch (error) {
+          setSyncStatus('error', error.message);
+          if (typeof window.toast === 'function') window.toast(error.message);
+          return;
+        }
+      }
     }
     try {
       await signOut();
@@ -207,6 +222,86 @@ function injectAccountPanel(profile, email) {
     }
     window.location.replace('/');
   });
+}
+
+function injectRecoveryCopies(userId) {
+  const copies = listRecoveryCopies(userId);
+  if (!copies.length) return;
+  const card = document.querySelector('#goalsModal .modal-card');
+  if (!card) return;
+  const section = document.createElement('div');
+  section.innerHTML = ui`<div class="divider"></div>
+    <h3>Copias recuperables de este navegador</h3>
+    <p>Se conservan antes de reemplazar datos o cambiar de cuenta. Restaurar también guarda la copia que estás usando ahora.</p>
+    <select id="recoveryCopySelect" aria-label="Copia a recuperar"></select>
+    <button class="mc-btn-primary cyan" id="restoreRecoveryCopyBtn" type="button">Restaurar copia</button>`;
+  card.insertBefore(section, card.querySelector('.modal-actions'));
+  const select = document.getElementById('recoveryCopySelect');
+  copies.toReversed().forEach(copy => {
+    const option = document.createElement('option');
+    option.value = copy.id;
+    option.textContent = `${new Date(copy.createdAt).toLocaleString(displayLocale())} · ${describeSnapshot(copy.snapshot)}`;
+    select.appendChild(option);
+  });
+  document.getElementById('restoreRecoveryCopyBtn').addEventListener('click', () => {
+    const restore = () => {
+      try { restoreRecoveryCopy(select.value, userId); window.location.reload(); }
+      catch (error) { if (typeof window.toast === 'function') window.toast(error.message); }
+    };
+    window.appConfirm(translateText('¿Restaurar esta copia? Los datos actuales también quedarán conservados en este navegador.'), restore);
+  });
+}
+
+// Cached identity permits reading this device's own data, never remote access.
+// Capture it before the SDK attempts an expired-token refresh and drops it.
+function readOfflineOwner() {
+  try {
+    const ref = new URL(SUPABASE_URL).hostname.split('.')[0];
+    const saved = JSON.parse(window.localStorage.getItem(`sb-${ref}-auth-token`));
+    if (saved?.user?.id === readMeta().userId && saved?.access_token && readMeta().userId
+      && localHasData()) return saved.user;
+  } catch {}
+  return null;
+}
+
+async function mountOfflineApp(user) {
+  setAccessToken(null, null);
+  applyLoginLanguagePreference();
+  syncThemeClass();
+  startAutoSync();
+  if (!(await mountApp())) return;
+  normalizeAppAddress();
+  injectAccountPanel(null, user.email);
+  setSyncStatus('error', translateText('Sin conexión — cambios guardados en este navegador'));
+  onSync(() => setSyncStatus('error', translateText('Sin conexión — cambios guardados en este navegador')));
+  window.addEventListener('online', () => window.location.reload(), { once: true });
+  const footer = document.querySelector('#sidebarNav .sidebar-footer');
+  const reconnect = document.createElement('button');
+  reconnect.type = 'button'; reconnect.className = 'sidebar-logout-btn';
+  reconnect.textContent = translateText('Reconectar y sincronizar');
+  reconnect.addEventListener('click', () => window.location.reload());
+  footer?.appendChild(reconnect);
+}
+
+function watchProductionHealth() {
+  const footer = document.querySelector('#sidebarNav .sidebar-footer');
+  if (!footer) return;
+  const notice = document.createElement('p');
+  notice.className = 'sidebar-handle'; notice.setAttribute('role', 'status');
+  notice.hidden = true; footer.appendChild(notice);
+  async function check() {
+    if (navigator.onLine === false) return;
+    try {
+      const response = await fetch('/api/health', { cache: 'no-store', signal: AbortSignal.timeout(12000) });
+      const healthy = response.ok && (await response.json()).ok === true;
+      notice.hidden = healthy;
+      notice.textContent = translateText('El respaldo o la conexión con el servidor necesita atención. Conserva tus cambios en este navegador.');
+    } catch {
+      notice.hidden = false;
+      notice.textContent = translateText('No se pudo verificar el servidor. Conserva tus cambios en este navegador.');
+    }
+  }
+  void check(); window.setInterval(check, 5 * 60 * 1000);
 }
 
 // La política de privacidad promete que la cuenta se puede borrar; esto lo
@@ -267,6 +362,7 @@ function injectDeleteAccount() {
           }
           return;
         }
+        forgetRecoveryCopies(session.user.id);
         resetForUser(null);
         try {
           await signOut();
@@ -486,16 +582,23 @@ async function boot() {
   setBootMessage(translateText('Verificando tu sesión…'));
 
   let session = null;
+  const offlineOwner = readOfflineOwner();
   try {
     const { data, error } = await getSupabase().auth.getSession();
     if (error) throw error;
     session = data.session;
   } catch (err) {
+    if (offlineOwner && (navigator.onLine === false || err?.name === 'AuthRetryableFetchError'
+      || /failed to fetch|networkerror|load failed/i.test(err?.message || ''))) {
+      await mountOfflineApp(offlineOwner);
+      return;
+    }
     fail(translateText('No se pudo verificar tu sesión. ') + (err && err.message ? err.message : ''));
     return;
   }
 
   if (!session) {
+    if (offlineOwner && navigator.onLine === false) { await mountOfflineApp(offlineOwner); return; }
     window.location.replace('/?next=/app');
     return;
   }
@@ -562,6 +665,8 @@ async function boot() {
         if (choice === 'cloud') {
           adoptCloud(decision.cloud, userId);
         } else {
+          preserveRecoveryCopy(userId, { state: decision.cloud.state, calls: decision.cloud.calls,
+            settings: decision.cloud.settings }, 'conflict-cloud');
           adoptLocal(userId, decision.cloud);
           shouldPushLocal = true;
         }
@@ -614,6 +719,8 @@ async function boot() {
     injectAccountPanel(null, session.user.email);
   }
   injectDeleteAccount();
+  injectRecoveryCopies(userId);
+  watchProductionHealth();
   injectCycleProjection();
 
   // Primera subida del dispositivo: si lo local era lo bueno, que quede en la

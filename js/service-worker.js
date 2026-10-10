@@ -18,6 +18,7 @@ const SHELL = [
   '/css/game-battle.css',
   '/css/appearance.css',
   `/assets/theme-init.js?v=${BUILD_VERSION}`,
+  `/assets/locales.js?v=${BUILD_VERSION}`,
   `/assets/theme-toggle.js?v=${BUILD_VERSION}`,
   `/assets/footer-year.js?v=${BUILD_VERSION}`,
   `/assets/landing-ui.js?v=${BUILD_VERSION}`,

@@ -3,6 +3,7 @@ import { applyAppearance, wireAppearance } from './appearance.js';
 import { wireAchievementHelp } from './help-tooltips.js';
 import { normalizeBattleWeapon } from './game-battle.js';
 import { createPropioReceiver, createStorageRevisionGuard, ignorePropioCall } from './propio-bridge.js';
+import { settingsWithinBudget } from './sync.js';
 // Cuerpo principal de la app (Inicio, Horario, Llamadas, Higher Rate, Finanzas, Reportes,
 // Calendario, Ajustes...). Vive como módulo ES aparte para no ser parte del documento HTML: lo
 // carga js/boot.js con un import() dinámico recién cuando la sesión y los datos están listos
@@ -1258,6 +1259,10 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
     }
 
     function persistFullSnapshot() {
+      if (!settingsWithinBudget(settings)) {
+        toast(translateText('Tus ajustes superan el espacio permitido para sincronizar. Reduce un sonido personalizado o el tamaño de tus ajustes antes de guardar.'));
+        return false;
+      }
       const keys = [STORAGE_KEY, CALLS_KEY, SETTINGS_KEY];
       const previous = {};
       try {
@@ -1304,6 +1309,10 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
     }
 
     export function saveSettingsOnly() {
+      if (!settingsWithinBudget(settings)) {
+        toast(translateText('Tus ajustes superan el espacio permitido para sincronizar. Reduce un sonido personalizado o el tamaño de tus ajustes antes de guardar.'));
+        return false;
+      }
       if (storageSnapshotPending) return persistFullSnapshot();
       const ok = safeLocalStorageSet(SETTINGS_KEY, JSON.stringify(settings));
       if (!ok) { storageSnapshotPending = true; toast(STORAGE_QUOTA_TOAST); }
@@ -5449,6 +5458,11 @@ function renderPayDatesSection() {
       }
       const reader = new FileReader();
       reader.onload = () => {
+        if (!settingsWithinBudget({ ...settings, productiveBreakCustomSoundDataUrl: String(reader.result || ''),
+          productiveBreakCustomSoundName: file.name, productiveBreakSound: 'custom' })) {
+          toast(translateText('Este sonido supera el espacio disponible para tus ajustes. Usa un archivo más pequeño o elimina otro sonido personalizado.'));
+          return;
+        }
         const previous = {
           dataUrl: settings.productiveBreakCustomSoundDataUrl,
           name: settings.productiveBreakCustomSoundName,
@@ -5615,6 +5629,11 @@ function renderPayDatesSection() {
           name: settings[cfg.nameKey],
           sound: settings[cfg.soundKey],
         };
+        if (!settingsWithinBudget({ ...settings, [cfg.urlKey]: String(reader.result || ''),
+          [cfg.nameKey]: file.name, [cfg.soundKey]: 'custom' })) {
+          toast(translateText('Este sonido supera el espacio disponible para tus ajustes. Usa un archivo más pequeño o elimina otro sonido personalizado.'));
+          return;
+        }
         settings[cfg.urlKey] = String(reader.result || '');
         settings[cfg.nameKey] = file.name;
         settings[cfg.soundKey] = 'custom';
@@ -7685,6 +7704,7 @@ export function render() {
 // funciones desde window: como <script> clásico las heredaba gratis (top-level = global), como
 // módulo hay que exponerlas a mano — un módulo nunca cuelga sus declaraciones de window.
 window.toast = toast;
+window.flushLocalChanges = persistFullSnapshot;
 window.appConfirm = appConfirm;
 window.iconHtml = iconHtml;
 window.money = money;

@@ -21,6 +21,7 @@ export const APP_KEYS = {
   settings: 'propio_shift_tracker_settings_es_v1',
 };
 const META_KEY = 'propio_sync_meta_v1';
+const RECOVERY_KEY = 'propio_recovery_copies_v1';
 const DEBOUNCE_MS = 6000;
 const MAX_WAIT_MS = 45000; // aunque siga escribiendo sin parar, sube igual cada 45 s
 
@@ -148,6 +149,81 @@ export function readLocalSnapshot() {
     calls: parseKey(APP_KEYS.calls, []),
     settings: parseKey(APP_KEYS.settings, {}),
   };
+}
+
+// Private local copies are shown only to their owner after sign-in. If there
+// is no room for a backup, never destroy the source to make room for it.
+function recoveryCopies() {
+  const value = parseKey(RECOVERY_KEY, []);
+  return (Array.isArray(value) ? value : []).filter(copy => copy?.userId && copy?.snapshot);
+}
+
+export function preserveRecoveryCopy(userId, snapshot = readLocalSnapshot(), reason = 'conflict-local', meta = readMeta()) {
+  if (!userId) throw new Error('RECOVERY_OWNER_REQUIRED');
+  const copies = recoveryCopies();
+  const duplicate = copies.find(copy => copy.userId === userId && copy.reason === reason && sameSnapshot(copy.snapshot, snapshot));
+  if (duplicate) return duplicate.id;
+  const copy = { id: `${Date.now()}-${Math.random().toString(36).slice(2)}`, userId,
+    createdAt: new Date().toISOString(), reason, snapshot, meta: { ...meta, userId } };
+  try { window.localStorage.setItem(RECOVERY_KEY, JSON.stringify([...copies, copy])); }
+  catch (cause) {
+    const error = new Error(translateText('No hay espacio para conservar la copia anterior. Exporta tu JSON antes de reemplazar datos o cambiar de cuenta.'));
+    error.cause = cause;
+    throw error;
+  }
+  return copy.id;
+}
+
+export function listRecoveryCopies(userId) {
+  if (authenticatedUserId !== undefined && authenticatedUserId !== userId) return [];
+  return recoveryCopies().filter(copy => copy.userId === userId);
+}
+
+export function forgetRecoveryCopies(userId) {
+  window.localStorage.setItem(RECOVERY_KEY, JSON.stringify(recoveryCopies().filter(copy => copy.userId !== userId)));
+}
+
+export function restoreRecoveryCopy(id, userId) {
+  const copy = listRecoveryCopies(userId).find(item => item.id === id);
+  if (!copy || readMeta().userId !== userId) throw new Error('RECOVERY_NOT_AVAILABLE');
+  preserveRecoveryCopy(userId, readLocalSnapshot(), 'before-restore');
+  const before = window.localStorage.getItem(META_KEY);
+  writeMeta({ dirty: true }, { required: true });
+  try { writeLocalSnapshot(copy.snapshot); }
+  catch (error) { restoreRawKey(META_KEY, before); throw error; }
+}
+
+// JSONB's text encoding adds a space after structural commas and colons.
+// Count UTF-8 and those spaces so client admission agrees with SQL limits.
+export function jsonbBytes(value) {
+  const text = JSON.stringify(value);
+  let quoted = false, escaped = false, spaces = 0;
+  for (const char of text) {
+    if (escaped) { escaped = false; continue; }
+    if (quoted && char === '\\') { escaped = true; continue; }
+    if (char === '"') quoted = !quoted;
+    else if (!quoted && (char === ',' || char === ':')) spaces++;
+  }
+  return encodeURIComponent(text).replace(/%[0-9A-F]{2}|./g, 'x').length + spaces;
+}
+
+export function settingsWithinBudget(settings) { return jsonbBytes(settings) <= 1048576; }
+
+function callBatches(upserts, deletes) {
+  const batches = []; let batch = { upserts: [], deletes: [] }, bytes = 2;
+  for (const call of upserts) {
+    const size = jsonbBytes(call) + 2;
+    if (size > 4 * 1024 * 1024) throw new Error('CALL_TOO_LARGE');
+    if (bytes + size > 4 * 1024 * 1024) { batches.push(batch); batch = { upserts: [], deletes: [] }; bytes = 2; }
+    batch.upserts.push(call); bytes += size;
+  }
+  for (const id of deletes) {
+    const size = jsonbBytes(id) + 2;
+    if (bytes + size > 4 * 1024 * 1024) { batches.push(batch); batch = { upserts: [], deletes: [] }; bytes = 2; }
+    batch.deletes.push(id); bytes += size;
+  }
+  if (batch.upserts.length || batch.deletes.length || !batches.length) batches.push(batch);
+  return batches;
 }
 
 export function localHasData() {
@@ -402,18 +478,27 @@ export async function pushSnapshot({ force = false } = {}) {
     if (!hasCallBaseline(meta) && meta.lastSyncedUpdatedAt) await fetchCloud(meta.userId);
     if (!sameSyncContext(meta.userId, epoch, meta.lastSyncedUpdatedAt)) return { skipped: true };
     const snapshot = readLocalSnapshot();
+    if (!settingsWithinBudget(snapshot.settings)) throw new Error('SETTINGS_TOO_LARGE');
+    if (jsonbBytes(snapshot.state) > 2097152) throw new Error('STATE_TOO_LARGE');
     const delta = callDelta(snapshot.calls);
-    let { data, error } = await getSupabase().rpc('push_user_data_v2', {
+    const batches = callBatches(delta.upserts, delta.deletes);
+    let expected = meta.lastSyncedUpdatedAt;
+    let data, error, legacy = false;
+    for (let index = 0; index < batches.length; index++) {
+    const batch = batches[index];
+    if (!sameSyncContext(meta.userId, epoch, expected)) return { skipped: true };
+    ({ data, error } = await getSupabase().rpc('push_user_data_v2', {
       p_state: snapshot.state,
       p_settings: snapshot.settings,
-      p_call_upserts: delta.upserts,
-      p_call_deletes: delta.deletes,
-      p_expected_updated_at: force ? null : meta.lastSyncedUpdatedAt,
+      p_call_upserts: batch.upserts,
+      p_call_deletes: batch.deletes,
+      p_expected_updated_at: force && index === 0 ? null : expected,
       p_device_id: deviceId(),
       p_device_label: deviceLabel(),
-    });
-    if (!sameSyncContext(meta.userId, epoch, meta.lastSyncedUpdatedAt)) return { skipped: true };
+    }));
+    if (!sameSyncContext(meta.userId, epoch, expected)) return { skipped: true };
     if (error && ['42883', 'PGRST202'].includes(error.code)) {
+      legacy = true;
       ({ data, error } = await getSupabase().rpc('push_user_data', {
         p_state: snapshot.state,
         p_calls: snapshot.calls,
@@ -423,12 +508,22 @@ export async function pushSnapshot({ force = false } = {}) {
         p_device_label: deviceLabel(),
       }));
     }
-    if (!sameSyncContext(meta.userId, epoch, meta.lastSyncedUpdatedAt)) return { skipped: true };
+    if (!sameSyncContext(meta.userId, epoch, expected)) return { skipped: true };
     if (error) throw error;
 
     if (data && data.conflict) {
       emit('conflict', { cloudUpdatedAt: data.updated_at });
       return { conflict: true, updatedAt: data.updated_at };
+    }
+
+    if (!data?.updated_at) throw new Error('INVALID_SYNC_RESPONSE');
+    expected = data.updated_at;
+    writeMeta({ lastSyncedUpdatedAt: expected, dirty: true }, { required: true });
+    batch.upserts.forEach(call => cloudCallHashes.set(String(call.id), stableJson(call)));
+    batch.deletes.forEach(id => cloudCallHashes.delete(id));
+    cloudCallOwner = meta.userId;
+    cloudCallRevision = expected;
+    if (legacy) break;
     }
 
     const pending = !sameSnapshot(snapshot, readLocalSnapshot());
@@ -444,7 +539,7 @@ export async function pushSnapshot({ force = false } = {}) {
     if (pending) markDirty();
     return { ok: true, pending, updatedAt: data ? data.updated_at : null };
   } catch (err) {
-    if (!sameSyncContext(meta.userId, epoch, meta.lastSyncedUpdatedAt)) return { skipped: true };
+    if (syncEpoch !== epoch || readMeta().userId !== meta.userId || !canSync(meta.userId)) return { skipped: true };
     emit('error', { error: err });
     return { error: err };
   } finally {
@@ -466,6 +561,14 @@ function flushOnExit() {
   if (!token) return;
   const snapshot = readLocalSnapshot();
   const delta = callDelta(snapshot.calls);
+  const body = JSON.stringify({
+    p_state: snapshot.state, p_settings: snapshot.settings,
+    p_call_upserts: delta.upserts, p_call_deletes: delta.deletes,
+    p_expected_updated_at: meta.lastSyncedUpdatedAt, p_device_id: deviceId(), p_device_label: deviceLabel(),
+  });
+  // Browsers reject keepalive bodies over their shared 64 KiB quota. Leave
+  // larger work dirty for normal batched synchronization on the next visit.
+  if (jsonbBytes(body) > 60000) return;
   try {
     fetch(`${SUPABASE_URL}/rest/v1/rpc/push_user_data_v2`, {
       method: 'POST',
@@ -475,15 +578,7 @@ function flushOnExit() {
         apikey: SUPABASE_ANON_KEY,
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({
-        p_state: snapshot.state,
-        p_settings: snapshot.settings,
-        p_call_upserts: delta.upserts,
-        p_call_deletes: delta.deletes,
-        p_expected_updated_at: meta.lastSyncedUpdatedAt,
-        p_device_id: deviceId(),
-        p_device_label: deviceLabel(),
-      }),
+      body,
     }).catch(() => {});
   } catch {
     /* la pestaña se está cerrando: no hay a quién avisarle */
@@ -588,6 +683,21 @@ export const BOOT = {
 
 export async function resolveBoot(userId) {
   retireLegacyQaStorage();
+  if (readMeta().userId !== userId || !localHasData()) {
+    const pending = listRecoveryCopies(userId).filter(copy => copy.reason === 'account-switch').at(-1);
+    if (pending) {
+      const current = readMeta();
+      if (current.userId && current.userId !== userId && current.dirty && localHasData())
+        preserveRecoveryCopy(current.userId, readLocalSnapshot(), 'account-switch', current);
+      const previousMeta = window.localStorage.getItem(META_KEY);
+      writeMeta({ ...pending.meta, userId, dirty: true }, { required: true });
+      try { writeLocalSnapshot(pending.snapshot); }
+      catch (error) { restoreRawKey(META_KEY, previousMeta); throw error; }
+      syncEpoch++;
+      window.localStorage.setItem(RECOVERY_KEY, JSON.stringify(recoveryCopies().map(copy =>
+        copy.userId === userId && copy.reason === 'account-switch' ? { ...copy, reason: 'recovered-account' } : copy)));
+    }
+  }
   const meta = readMeta();
   if (navigator.onLine === false && meta.userId === userId && localHasData()) {
     return { action: BOOT.USE_LOCAL, offline: true };
@@ -666,6 +776,10 @@ function isEmptyCloud(cloud) {
 }
 
 export function adoptCloud(cloud, userId) {
+  const meta = readMeta();
+  if (meta.dirty && meta.userId === userId && !sameSnapshot(readLocalSnapshot(), cloud)) {
+    preserveRecoveryCopy(userId);
+  }
   const previousMeta = window.localStorage.getItem(META_KEY);
   writeMeta({ userId, lastSyncedUpdatedAt: cloud.updated_at, dirty: false }, { required: true });
   try {
@@ -693,6 +807,10 @@ export function adoptLocal(userId, cloud) {
 }
 
 export function resetForUser(userId) {
+  const meta = readMeta();
+  if (userId && meta.userId && meta.userId !== userId && meta.dirty && localHasData()) {
+    preserveRecoveryCopy(meta.userId, readLocalSnapshot(), 'account-switch', meta);
+  }
   syncEpoch++;
   cloudCallHashes = new Map();
   cloudCallOwner = null;

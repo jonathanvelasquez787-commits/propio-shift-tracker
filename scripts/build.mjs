@@ -1,7 +1,7 @@
 import { rollup } from 'rollup';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { minify } from 'terser';
-import { cp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
+import { cp, mkdir, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { createAppShell } from './production-shell.mjs';
 import { createLocalizedLanding } from './landing-pages.mjs';
@@ -13,10 +13,13 @@ const root = process.cwd();
 const out = path.join(root, 'public');
 const assets = path.join(out, 'assets');
 const release = process.env.VERCEL_GIT_COMMIT_SHA || 'local';
+const catalogModule = path.join(root, 'js/locales.generated.js');
 
 await rm(out, { recursive: true, force: true });
 await mkdir(assets, { recursive: true });
 await mkdir(path.join(out, 'icons'), { recursive: true });
+await minifyFile(path.join(assets, 'locales.js'),
+  (await readFile(catalogModule, 'utf8')).replace('export const resources =', 'window.pstLocaleResources ='));
 
 const entries = {
   'theme-init': 'js/theme-init.js',
@@ -37,7 +40,10 @@ for (const [name, input] of Object.entries(entries)) {
     input: path.join(root, input),
     external: options.external,
     makeAbsoluteExternalsRelative: options.makeAbsoluteExternalsRelative,
-    plugins: [nodeResolve({ browser: true })],
+    plugins: [nodeResolve({ browser: true }), {
+      name: 'shared-locale-data',
+      load(id) { if (id === catalogModule) return 'export const resources = window.pstLocaleResources;'; },
+    }],
     onwarn(warning, warn) {
       if (warning.code === 'CIRCULAR_DEPENDENCY') {
         const ownCycle = (warning.ids || []).some(id => !id.includes('/node_modules/') && !id.includes('\\node_modules\\'));
@@ -91,6 +97,7 @@ for (const name of ['robots.txt', 'sitemap.xml']) {
 
 for (const name of ['index.html', 'app.html', 'privacidad.html', 'terminos.html']) {
   let html = await readFile(path.join(root, name), 'utf8');
+  html = html.replace('<head>', `<head>\n<script src="/assets/locales.js?v=${release}"></script>`);
   if (name === 'index.html') html = html.replace(/<script type="module" src="js\/(?:theme-toggle|landing-ui)\.js"><\/script>\r?\n/g, '');
   html = html
     .replaceAll('/js/theme-init.js', `/assets/theme-init.js?v=${release}`)
@@ -122,6 +129,11 @@ for (const name of ['index.html', 'app.html', 'privacidad.html', 'terminos.html'
 for (const language of ['en', 'es']) {
   const target = path.join(out, INTERPRETER_GUIDE_PATHS[language].slice(1) + '.html');
   await mkdir(path.dirname(target), { recursive: true });
-  await writeFile(target, createInterpreterGuide(language, release));
+  await writeFile(target, createInterpreterGuide(language, release).replace('<head>',
+    `<head>\n<script src="/assets/locales.js?v=${release}"></script>`));
 }
-console.log('Build listo en public/ sin sourcemaps ni módulos fuente.');
+for (const [file, limit] of Object.entries({ 'boot.js':350000, 'app-main.js':800000, 'locales.js':230000 })) {
+  const size = (await stat(path.join(assets, file))).size;
+  if (size > limit) throw new Error(`Bundle ${file} exceeds its reviewed byte budget: ${size} > ${limit}`);
+}
+console.log('Build listo en public/ sin sourcemaps ni módulos fuente. Presupuestos de tamaño verificados.');

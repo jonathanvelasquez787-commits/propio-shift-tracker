@@ -622,7 +622,7 @@ export function openFinanceRowModal(kind, existingRow = null) {
   const targetInput = document.getElementById('financeRowTargetInput');
   const isMeta = financeRowModalKind === 'meta';
   if (nameInput) nameInput.value = existingRow ? existingRow.name : '';
-  const defaultCatId = isMeta ? 'ahorro' : translateText('casa');
+  const defaultCatId = isMeta ? 'ahorro' : 'casa';
   if (categoryInput) categoryInput.value = existingRow ? existingRow.categoryId : defaultCatId;
   closeFinanceNewCatPanel();
   renderFinanceCategoryChips(categoryInput ? categoryInput.value : defaultCatId);

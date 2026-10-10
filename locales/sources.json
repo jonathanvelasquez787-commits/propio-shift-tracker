@@ -813,6 +813,12 @@
       "js/finance.js"
     ]
   },
+  "s_104f5391": {
+    "source": "No se pudo enviar el enlace ahora. Espera un momento y vuelve a intentar.",
+    "files": [
+      "js/auth.js"
+    ]
+  },
   "s_10552d19": {
     "source": "Salida",
     "files": [
@@ -830,6 +836,12 @@
     "source": "Activar Logros",
     "files": [
       "app.html"
+    ]
+  },
+  "s_106da2b3": {
+    "source": "¿Restaurar esta copia? Los datos actuales también quedarán conservados en este navegador.",
+    "files": [
+      "js/boot.js"
     ]
   },
   "s_10938061": {
@@ -2069,12 +2081,6 @@
       "js/landing.js"
     ]
   },
-  "s_2ab106db": {
-    "source": "Este dispositivo tiene cambios sin subir, y en la nube hay una versión\n          guardada{{v0}} el {{v1}}. No se mezclan solas: elige\n          cuál se queda. La otra se pierde.",
-    "files": [
-      "js/boot.js"
-    ]
-  },
   "s_2abecbb6": {
     "source": "🏆 Recompensa del ciclo · {{v0}}",
     "files": [
@@ -2256,6 +2262,12 @@
     "source": "Cuándo ofrecerlo",
     "files": [
       "app.html"
+    ]
+  },
+  "s_2efcde17": {
+    "source": "Tus ajustes superan el espacio permitido para sincronizar. Reduce un sonido personalizado o el tamaño de tus ajustes antes de guardar.",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_2f2a4771": {
@@ -2789,6 +2801,12 @@
       "js/higher-rate.js"
     ]
   },
+  "s_3827c09d": {
+    "source": "No hay espacio para conservar la copia anterior. Exporta tu JSON antes de reemplazar datos o cambiar de cuenta.",
+    "files": [
+      "js/sync.js"
+    ]
+  },
   "s_384fbd4f": {
     "source": "Cómo registrar tu turno de interpretación",
     "files": [
@@ -2969,6 +2987,12 @@
   },
   "s_3badfe44": {
     "source": "Sincronizado",
+    "files": [
+      "js/boot.js"
+    ]
+  },
+  "s_3bd044df": {
+    "source": "El respaldo o la conexión con el servidor necesita atención. Conserva tus cambios en este navegador.",
     "files": [
       "js/boot.js"
     ]
@@ -3200,6 +3224,12 @@
     "source": "Ojo de rubí",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_4295cc6a": {
+    "source": "No se pudo verificar el servidor. Conserva tus cambios en este navegador.",
+    "files": [
+      "js/boot.js"
     ]
   },
   "s_42a06111": {
@@ -4329,6 +4359,12 @@
     "source": "Bebida favorita",
     "files": [
       "js/positive-reinforcement.js"
+    ]
+  },
+  "s_55944819": {
+    "source": "Este dispositivo tiene cambios sin subir, y en la nube hay una versión\n          guardada{{v0}} el {{v1}}. No se mezclan solas: elige\n          cuál se queda. La versión reemplazada queda en las copias recuperables de Ajustes.",
+    "files": [
+      "js/boot.js"
     ]
   },
   "s_561d14c9": {
@@ -5600,6 +5636,12 @@
       "privacidad.html"
     ]
   },
+  "s_70db0ee6": {
+    "source": "Copias recuperables de este navegador",
+    "files": [
+      "js/boot.js"
+    ]
+  },
   "s_70dcbac3": {
     "source": "{{v0}} estable",
     "files": [
@@ -5985,6 +6027,12 @@
     "source": "Si mañana completas otro día que cumpla tu plan, tu racha llegará a {{v0}} días.",
     "files": [
       "js/reinforcement-rules.js"
+    ]
+  },
+  "s_7829299e": {
+    "source": "Reconectar y sincronizar",
+    "files": [
+      "js/boot.js"
     ]
   },
   "s_784c1cf0": {
@@ -6862,6 +6910,12 @@
       "js/schedule.js"
     ]
   },
+  "s_881adcbf": {
+    "source": "Copia a recuperar",
+    "files": [
+      "js/boot.js"
+    ]
+  },
   "s_885e114b": {
     "source": "11:40 – 12:00 · tomado a tiempo",
     "files": [
@@ -7614,6 +7668,12 @@
       "js/game.js"
     ]
   },
+  "s_962ed7ff": {
+    "source": "Entra o crea tu cuenta con Google. No necesitas una contraseña de esta app.",
+    "files": [
+      "js/landing.js"
+    ]
+  },
   "s_96385b4c": {
     "source": "No hay llamadas que borrar en este día.",
     "files": [
@@ -7691,12 +7751,6 @@
     "source": "Miércoles",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_97e5a60d": {
-    "source": "Si no estás seguro: elige la de la nube y, si te faltaba algo, todavía\n          tienes el respaldo local hasta que vuelvas a guardar.",
-    "files": [
-      "js/boot.js"
     ]
   },
   "s_97eee13d": {
@@ -8056,12 +8110,6 @@
       "app.html"
     ]
   },
-  "s_9f253efd": {
-    "source": "casa",
-    "files": [
-      "js/finance.js"
-    ]
-  },
   "s_9f46cc86": {
     "source": "Break:",
     "files": [
@@ -8347,6 +8395,12 @@
     "source": "Día siguiente",
     "files": [
       "app.html"
+    ]
+  },
+  "s_a3d18467": {
+    "source": "Sin conexión — cambios guardados en este navegador",
+    "files": [
+      "js/boot.js"
     ]
   },
   "s_a3d71e45": {
@@ -9241,6 +9295,12 @@
       "privacidad.html"
     ]
   },
+  "s_b6828ebe": {
+    "source": "Entra con Google",
+    "files": [
+      "js/landing.js"
+    ]
+  },
   "s_b690cfe5": {
     "source": "Reintentar",
     "files": [
@@ -10013,6 +10073,12 @@
       "js/app-main.js"
     ]
   },
+  "s_c6527057": {
+    "source": "Este sonido supera el espacio disponible para tus ajustes. Usa un archivo más pequeño o elimina otro sonido personalizado.",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_c655711a": {
     "source": "Trabajado: se exige Adherencia y suma a tu meta del ciclo, aunque tu horario diga que es libre.",
     "files": [
@@ -10683,6 +10749,12 @@
       "js/game.js"
     ]
   },
+  "s_d47fc576": {
+    "source": "Restaurar copia",
+    "files": [
+      "js/boot.js"
+    ]
+  },
   "s_d4a6e1b2": {
     "source": "Esta llamada no cae en ninguna ventana de Higher Rate, así que no lleva bono. El nivel se calcula solo desde tus ventanas: agrégala o ajústala en \"Higher Rate\" (botón del header) y el bono se suma solo a esta llamada.",
     "files": [
@@ -11085,6 +11157,12 @@
     "source": "El cambio aplica de inmediato a la adherencia del día activo.",
     "files": [
       "app.html"
+    ]
+  },
+  "s_dcdc1221": {
+    "source": "Se conservan antes de reemplazar datos o cambiar de cuenta. Restaurar también guarda la copia que estás usando ahora.",
+    "files": [
+      "js/boot.js"
     ]
   },
   "s_dce456ba": {

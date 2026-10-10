@@ -13,7 +13,16 @@ async function probe() {
       body: '{}',
     });
     const result = response.ok ? await response.json() : null;
-    const ok = result?.ok === true;
+    let operationsOk = true;
+    if (process.env.BACKUP_PUBLIC_KEY && process.env.CRON_SECRET) {
+      const operations = await fetch(`${SUPABASE_URL}/rest/v1/rpc/operations_readiness`, {
+        method: 'POST', signal: AbortSignal.timeout(5000),
+        headers: { 'Content-Type': 'application/json', apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` }, body: '{}',
+      });
+      const status = operations.ok ? await operations.json() : null;
+      operationsOk = status?.monitor === true && status?.external_backup === true;
+    }
+    const ok = result?.ok === true && operationsOk;
     if (!ok) console.error('health: readiness check failed');
     return ok;
   } catch {

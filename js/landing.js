@@ -21,6 +21,7 @@ import {
 } from './auth.js';
 
 const $ = (id) => document.getElementById(id);
+import { EMAIL_AUTH_READY } from './config.js';
 
 const forms = {
   login: $('loginForm'),
@@ -115,6 +116,7 @@ const VIEWS = () => ({
 });
 
 function showView(name) {
+  if (!EMAIL_AUTH_READY && !recoveryMode) name = 'login';
   clearMessage();
   Object.entries(forms).forEach(([key, form]) => {
     if (form) form.hidden = key !== name;
@@ -129,6 +131,13 @@ function showView(name) {
   const showGoogle = name === 'login' || name === 'signup';
   if (googleBtn) googleBtn.style.display = showGoogle ? '' : 'none';
   if (divider) divider.style.display = showGoogle ? '' : 'none';
+  if (!EMAIL_AUTH_READY && !recoveryMode) {
+    if (forms.login) forms.login.hidden = true;
+    if (tabRow) tabRow.style.display = 'none';
+    if (divider) divider.style.display = 'none';
+    if (titleEl) titleEl.textContent = translateText('Entra con Google');
+    if (subEl) subEl.textContent = translateText('Entra o crea tu cuenta con Google. No necesitas una contraseña de esta app.');
+  }
 
   $('tabLogin')?.setAttribute('aria-selected', String(name === 'login'));
   $('tabSignup')?.setAttribute('aria-selected', String(name === 'signup'));

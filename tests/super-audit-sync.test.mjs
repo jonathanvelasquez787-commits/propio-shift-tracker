@@ -126,6 +126,7 @@ function bootHarness(cloud) {
     crypto: webcrypto, TextEncoder, installPropioBridge: () => { actions.push('bridge'); return noop; },
     normalizeAppAddress: noop, wireSyncStatus: noop, setSyncStatus: noop, getProfile: async () => ({}),
     injectAccountPanel: () => actions.push('panel'), injectDeleteAccount: noop, injectCycleProjection: noop,
+    injectRecoveryCopies: noop, readOfflineOwner: () => null, watchProductionHealth: noop,
   });
   h.context.window.location = { replace: () => actions.push('redirect'), reload: noop };
   h.run('applyLoginLanguagePreference = () => {}; applyLightThemeDefault = () => {}; syncThemeClass = () => {};');

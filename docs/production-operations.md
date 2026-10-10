@@ -1,5 +1,7 @@
 # Operación de producción
 
+La operación vigente, el monitor cada cinco minutos, el backup Blob automático y la recuperación portable están en [production-recovery.md](production-recovery.md). Las secciones de copia DPAPI siguientes documentan la copia histórica, reemplazada como respaldo diario por RSA/AES.
+
 ## Salud y alertas
 
 `GET /api/health` devuelve solo `ok` y el SHA del despliegue; nunca devuelve claves, cuentas ni detalles de SQL.
@@ -21,7 +23,7 @@ La planificación de GitHub puede retrasarse; no equivale a vigilancia continua.
 
 ## Restauración de una cuenta
 
-La migración 0005 incorpora `restore_user_backup(uuid,date,timestamptz)`.
+La migración `20261010021737_production_operations` incorpora `restore_user_backup(uuid,date,timestamptz)`.
 Solo el operador/backend puede ejecutarla. Se bloquea la fila del usuario y se
 requiere su revisión exacta vigente. Una revisión distinta devuelve conflicto.
 Se valida el snapshot y las llamadas; borrado, inserción y estado se restauran

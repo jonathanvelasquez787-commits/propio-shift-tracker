@@ -2,6 +2,7 @@ import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 import { authErrorMessage, getProfile, getUser, updateEmail, updateUsername } from './auth.js';
 import { settings, state } from './app-context.js';
 import { normalizeLanguage, saveLanguagePreference } from './language-preference.js';
+import { EMAIL_AUTH_READY } from './config.js';
 
 let DEFAULT_USER_EMOJI, EMOJI_CHOICES, RATE, closeModal, convertedAmountText;
 let currencyCeilFromUsdAmount, effectiveCycleGoal, effectiveDailyGoal, ensureCurrencySettings, escapeHtml;
@@ -341,6 +342,7 @@ let syncingGoals = false;
 export async function syncAccountProfileFields() {
   const usernameInput = document.getElementById('accountUsernameInput');
   const emailInput = document.getElementById('accountEmailInput');
+  if (emailInput) emailInput.readOnly = !EMAIL_AUTH_READY;
   const status = document.getElementById('accountProfileStatus');
   if (status) status.textContent = translateText('Cargando los datos de la cuenta…');
   try {
@@ -371,7 +373,7 @@ export async function saveAccountProfile() {
   try {
     const [profile, user] = await Promise.all([getProfile(), getUser()]);
     if (username !== String(profile?.username || '')) await updateUsername(username);
-    const emailChanged = email.toLowerCase() !== String(user?.email || '').toLowerCase();
+    const emailChanged = EMAIL_AUTH_READY && email.toLowerCase() !== String(user?.email || '').toLowerCase();
     if (emailChanged) await updateEmail(email);
     if (status) status.textContent = emailChanged
       ? translateText('Perfil guardado. Revisa tu correo para confirmar la nueva dirección.')
