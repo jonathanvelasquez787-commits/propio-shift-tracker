@@ -1,0 +1,36 @@
+name: Production health
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: production-health
+  cancel-in-progress: false
+jobs:
+  readiness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Check production readiness and security headers
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --retry 2 --retry-delay 10 --max-time 15 \
+            https://propio-shift-tracker.vercel.app/api/health > health.json
+          node -e "const h=require('./health.json'); if(h.ok !== true) process.exit(1); console.log('Production ready:', h.release)"
+          curl --fail --silent --show-error --max-time 15 -D headers.txt \
+            https://propio-shift-tracker.vercel.app/app -o /dev/null
+          grep -qi '^content-security-policy:' headers.txt
+          grep -qi '^strict-transport-security:' headers.txt
+          grep -qi '^cache-control:.*no-store' headers.txt
+      - name: Retain minimal health evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-health
+          path: |
+            health.json
+            headers.txt
+          retention-days: 7
