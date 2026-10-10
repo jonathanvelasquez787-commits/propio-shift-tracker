@@ -7,6 +7,7 @@ import { createAppShell } from './production-shell.mjs';
 import { createLocalizedLanding } from './landing-pages.mjs';
 import { createInterpreterGuide } from './interpreter-guide.mjs';
 import { INTERPRETER_GUIDE_PATHS } from '../js/landing-meta.js';
+import { entryBundleOptions } from './bundle-entry.mjs';
 
 const root = process.cwd();
 const out = path.join(root, 'public');
@@ -20,18 +21,22 @@ await mkdir(path.join(out, 'icons'), { recursive: true });
 const entries = {
   'theme-init': 'js/theme-init.js',
   boot: 'js/boot.js',
+  'app-main': 'js/app-main.js',
   landing: 'js/landing-entry.js',
   'landing-ui': 'js/landing-ui.js',
   'theme-toggle': 'js/theme-toggle.js',
   'guide-theme': 'js/guide-theme.js',
 };
 
-// Cada entrypoint queda autocontenido. Además de evitar peticiones extra en el
-// gate de acceso, esto impide que un service worker viejo mezcle un entrypoint
-// nuevo con un chunk compartido de otra versión durante una actualización.
+// Cada entrypoint queda autocontenido; la app se importa únicamente después de
+// verificar la sesión e hidratar los datos. Ambos archivos llevan la misma
+// versión para que el service worker no mezcle releases.
 for (const [name, input] of Object.entries(entries)) {
+  const options = entryBundleOptions(root, name, release);
   const bundle = await rollup({
     input: path.join(root, input),
+    external: options.external,
+    makeAbsoluteExternalsRelative: options.makeAbsoluteExternalsRelative,
     plugins: [nodeResolve({ browser: true })],
     onwarn(warning, warn) {
       if (warning.code === 'CIRCULAR_DEPENDENCY') {
@@ -44,9 +49,7 @@ for (const [name, input] of Object.entries(entries)) {
   });
   await bundle.write({
     file: path.join(assets, `${name}.js`),
-    format: ['boot', 'landing', 'theme-init', 'guide-theme'].includes(name) ? 'iife' : 'es',
-    inlineDynamicImports: true,
-    sourcemap: false,
+    ...options.output,
   });
   await bundle.close();
 }
@@ -99,7 +102,7 @@ for (const name of ['index.html', 'app.html', 'privacidad.html', 'terminos.html'
     .replace(/<script type="module" src="(\/assets\/theme-init\.js\?v=[^"]+)"><\/script>/g, '<script src="$1"></script>')
     .replace(/<script type="module" src="(\/assets\/(?:landing|boot)\.js\?v=[^"]+)"><\/script>/g, '<script src="$1" defer></script>')
     .replace(/^<link rel="modulepreload" href="\/js\/.*?"\/>\r?\n/gm, '');
-  if (name === 'app.html') html = html.replace('</head>', `<link rel="modulepreload" href="/assets/boot.js?v=${release}">\n</head>`);
+  if (name === 'app.html') html = html.replace('</head>', `<link rel="modulepreload" href="/assets/app-main.js?v=${release}">\n</head>`);
   html = html.replace('</head>', `<script src="/assets/monitoring.js?v=${release}"></script>\n</head>`);
   html = html.replace('</head>', '<link rel="manifest" href="/manifest.webmanifest">\n<meta name="theme-color" content="#07111f">\n</head>');
   html = html.replace('</body>', `<script src="/assets/register-sw.js?v=${release}" defer></script>\n</body>`);

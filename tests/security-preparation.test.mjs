@@ -76,9 +76,10 @@ test('production build pins and bundles Supabase without source maps', () => {
   assert.equal(vercel.outputDirectory, 'public');
   assert.match(read('js/supabase-client.js'), /from '@supabase\/supabase-js'/);
   const build = read('scripts/build.mjs');
-  assert.match(build, /sourcemap:\s*false/);
-  assert.match(build, /inlineDynamicImports:\s*true/);
-  assert.match(build, /format: \[.*'boot'.*'landing'.*'theme-init'.*\]\.includes\(name\) \? 'iife' : 'es'/);
+  const bundleOptions = read('scripts/bundle-entry.mjs');
+  assert.match(bundleOptions, /sourcemap:\s*false/);
+  assert.match(bundleOptions, /inlineDynamicImports:\s*true/);
+  assert.match(bundleOptions, /format: \[.*'boot'.*'landing'.*'theme-init'.*\]\.includes\(name\) \? 'iife' : 'es'/);
   assert.doesNotMatch(build, /chunkFileNames/);
   assert.match(build, /if \(ownCycle\) throw new Error\(warning\.message\)/);
   assert.match(build, /minify\(/);

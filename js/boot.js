@@ -127,10 +127,6 @@ function askConflict({ localSummary, cloudSummary, cloud }) {
             <span class="boot-choice-note">Se baja y reemplaza la de este dispositivo</span>
           </button>
         </div>
-        <p class="boot-card-hint">
-          Si no estás seguro: elige la de la nube y, si te faltaba algo, todavía
-          tienes el respaldo local hasta que vuelvas a guardar.
-        </p>
       </div>`;
 
     document.getElementById('bootUseLocal').addEventListener('click', () => resolve('local'));
@@ -439,7 +435,8 @@ function wireSyncStatus() {
     if (type === 'dirty') setSyncStatus('saving', translateText('Cambios sin subir…'));
     if (type === 'pushed') {
       lastPush = new Date();
-      setSyncStatus('ok', translateText('Guardado en la nube'));
+      setSyncStatus(readMeta().dirty ? 'saving' : 'ok',
+        readMeta().dirty ? translateText('Cambios sin subir…') : translateText('Guardado en la nube'));
     }
     if (type === 'error') setSyncStatus('error', translateText('Sin conexión — se guardó local'));
     if (type === 'conflict') {
