@@ -435,8 +435,9 @@ test('CSS de juego cubre motion reducido, layout estrecho y responsive', () => {
 test('build mantiene módulos fuente fuera de public y el worker precarga el CSS de juego', () => {
   const build = read('scripts/build.mjs');
   const worker = read('js/service-worker.js');
-  assert.match(build, /sourcemap:\s*false/);
-  assert.match(build, /inlineDynamicImports:\s*true/);
+  const bundleOptions = read('scripts/bundle-entry.mjs');
+  assert.match(bundleOptions, /sourcemap:\s*false/);
+  assert.match(bundleOptions, /inlineDynamicImports:\s*true/);
   assert.match(build, /Build listo en public\/ sin sourcemaps ni módulos fuente/);
   assert.match(build, /cp\(path\.join\(root, 'css'\), path\.join\(out, 'css'\)/);
   assert.match(worker, /const SHELL = \[/);
