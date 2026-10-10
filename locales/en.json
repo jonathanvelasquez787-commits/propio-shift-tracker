@@ -2224,5 +2224,11 @@
   "s_b6828ebe": "Sign in with Google",
   "s_c6527057": "This sound exceeds the space available for your settings. Use a smaller file or remove another custom sound.",
   "s_d47fc576": "Restore copy",
-  "s_dcdc1221": "Copies are preserved before replacing data or switching accounts. Restoring also saves the copy you are using now."
+  "s_dcdc1221": "Copies are preserved before replacing data or switching accounts. Restoring also saves the copy you are using now.",
+  "s_18b75844": "While your account is open. If you delete it, your account, active data and internal snapshots are removed immediately. Historical external copies remain encrypted until their daily rotation, with an expected retention of 31 days. They are not used to sign in or reactivate a deleted account. Internal snapshots for active accounts are kept for 30 days. Technical diagnostics are removed automatically according to the service retention limits.",
+  "s_a82811f0": "Deletes your account and active data: calls, shifts, breaks, schedule, goals and finances. Historical encrypted copies are removed by rotation, with an expected retention of 31 days. Export your JSON first if you want to keep anything.",
+  "s_c1cc1f9b": "Delete your account forever? Your account and active data will be removed. Historical encrypted copies are removed by rotation, with an expected retention of 31 days. This cannot be undone.",
+  "s_d0bcff73": "The app files and private, encrypted backups. The decryption key is kept outside Vercel.",
+  "s_f7d54964": "October 10, 2026",
+  "s_fff1384d": "Settings → \"Delete my account\" removes your account and active data. Historical encrypted copies are removed by the rotation described above. \"Delete all data\" clears only this browser."
 }

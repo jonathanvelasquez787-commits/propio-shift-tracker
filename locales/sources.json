@@ -1232,6 +1232,12 @@
       "app.html"
     ]
   },
+  "s_18b75844": {
+    "source": "Mientras tengas la cuenta abierta. Si la borras, se eliminan de inmediato tu\n    cuenta, tus datos activos y sus snapshots internos. Las copias históricas\n    externas permanecen cifradas hasta su rotación diaria, con una retención\n    prevista de 31 días. No se usan para iniciar sesión ni para volver a activar\n    una cuenta eliminada. Los snapshots internos de cuentas activas se conservan\n    30 días. Los diagnósticos técnicos se eliminan automáticamente según los\n    límites de retención del servicio.",
+    "files": [
+      "privacidad.html"
+    ]
+  },
   "s_18bf4da6": {
     "source": "{{v0}} usados",
     "files": [
@@ -2354,12 +2360,6 @@
     "source": "Guardar y empezar",
     "files": [
       "app.html"
-    ]
-  },
-  "s_2fe4c008": {
-    "source": "27 de septiembre de 2026",
-    "files": [
-      "privacidad.html"
     ]
   },
   "s_2ff6d2e3": {
@@ -4592,12 +4592,6 @@
     "source": "Llamada agregada",
     "files": [
       "js/calls.js"
-    ]
-  },
-  "s_5af5d3d4": {
-    "source": "Mientras tengas la cuenta abierta. Si la borras, se eliminan de inmediato tu\n    cuenta y todos tus datos asociados. Las copias diarias de la app se conservan\n    30 días; los respaldos automáticos del proveedor pueden conservar copias por\n    un período corto adicional antes de rotarse. Los diagnósticos técnicos se\n    conservan mientras sean necesarios para investigar y corregir fallos.",
-    "files": [
-      "privacidad.html"
     ]
   },
   "s_5af8171c": {
@@ -7954,12 +7948,6 @@
       "js/game.js"
     ]
   },
-  "s_9c8a0755": {
-    "source": "Borra tu cuenta y TODO lo que tiene dentro, en este navegador y en la nube:\n        llamadas, turnos, pausas, horario, metas y finanzas. Exporta tu JSON antes\n        si quieres conservar algo.",
-    "files": [
-      "js/boot.js"
-    ]
-  },
   "s_9c90f5e4": {
     "source": "{{v1}} {{v2}} vs ayer",
     "files": [
@@ -8581,6 +8569,12 @@
     "source": "cohete y explosión",
     "files": [
       "js/game-battle.js"
+    ]
+  },
+  "s_a82811f0": {
+    "source": "Borra tu cuenta y sus datos activos: llamadas, turnos, pausas, horario,\n        metas y finanzas. Las copias históricas cifradas se retiran por rotación,\n        con una retención prevista de 31 días. Exporta tu JSON antes si quieres\n        conservar algo.",
+    "files": [
+      "js/boot.js"
     ]
   },
   "s_a84134d8": {
@@ -9698,12 +9692,6 @@
       "app.html"
     ]
   },
-  "s_bf8a2163": {
-    "source": "Los archivos de la app. No guarda tus datos personales.",
-    "files": [
-      "privacidad.html"
-    ]
-  },
   "s_bfc156a0": {
     "source": "{{v17}}\n          {{v18}}",
     "files": [
@@ -9838,6 +9826,12 @@
     "source": "{{v0}}%",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_c1cc1f9b": {
+    "source": "¿Borrar tu cuenta para siempre? Se eliminan la cuenta y sus datos activos. Las copias históricas cifradas se retiran por rotación, con una retención prevista de 31 días. No se puede deshacer.",
+    "files": [
+      "js/boot.js"
     ]
   },
   "s_c1f3e040": {
@@ -10567,6 +10561,12 @@
     "source": "Horario fijo que la app ya conoce.",
     "files": [
       "app.html"
+    ]
+  },
+  "s_d0bcff73": {
+    "source": "Los archivos de la app y copias de seguridad privadas y cifradas. La clave para descifrarlas se conserva fuera de Vercel.",
+    "files": [
+      "privacidad.html"
     ]
   },
   "s_d0c44b25": {
@@ -11731,12 +11731,6 @@
       "js/reports.js"
     ]
   },
-  "s_e84102d8": {
-    "source": "¿Borrar tu cuenta para siempre? Se elimina todo: llamadas, turnos, horario, metas y finanzas, en este dispositivo y en la nube. No se puede deshacer.",
-    "files": [
-      "js/boot.js"
-    ]
-  },
   "s_e8438e2a": {
     "source": "Cerrar",
     "files": [
@@ -12514,12 +12508,6 @@
       "app.html"
     ]
   },
-  "s_f652bc4a": {
-    "source": "Ajustes → \"Borrar mi cuenta\" elimina la cuenta y todo su contenido. También existe \"Borrar todos los datos\", que limpia solo este navegador.",
-    "files": [
-      "privacidad.html"
-    ]
-  },
   "s_f660b997": {
     "source": "Monto objetivo en {{v0}}",
     "files": [
@@ -12584,6 +12572,12 @@
     "source": "No importa lo lento que vayas, siempre y cuando no te detengas. — Confucio",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_f7d54964": {
+    "source": "10 de octubre de 2026",
+    "files": [
+      "privacidad.html"
     ]
   },
   "s_f8148ce9": {
@@ -12940,6 +12934,12 @@
     "source": "#D2C4B4",
     "files": [
       "app.html"
+    ]
+  },
+  "s_fff1384d": {
+    "source": "Ajustes → \"Borrar mi cuenta\" elimina la cuenta y sus datos activos. Las copias históricas cifradas se retiran por la rotación descrita arriba. También existe \"Borrar todos los datos\", que limpia solo este navegador.",
+    "files": [
+      "privacidad.html"
     ]
   }
 }

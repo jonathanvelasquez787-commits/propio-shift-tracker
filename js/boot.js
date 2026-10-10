@@ -323,9 +323,10 @@ function injectDeleteAccount() {
         <span class="danger-card-title">Borrar mi cuenta</span>
       </div>
       <p class="danger-card-desc">
-        Borra tu cuenta y TODO lo que tiene dentro, en este navegador y en la nube:
-        llamadas, turnos, pausas, horario, metas y finanzas. Exporta tu JSON antes
-        si quieres conservar algo.
+        Borra tu cuenta y sus datos activos: llamadas, turnos, pausas, horario,
+        metas y finanzas. Las copias históricas cifradas se retiran por rotación,
+        con una retención prevista de 31 días. Exporta tu JSON antes si quieres
+        conservar algo.
       </p>
       <span class="danger-card-badge">Irreversible</span>
       <button class="mc-btn-solid-full bad" id="deleteAccountBtn" type="button">Borrar cuenta y datos</button>
@@ -342,7 +343,7 @@ function injectDeleteAccount() {
             if (window.confirm(msg)) ok();
           };
     ask(
-      translateText('¿Borrar tu cuenta para siempre? Se elimina todo: llamadas, turnos, horario, metas y finanzas, en este dispositivo y en la nube. No se puede deshacer.'),
+      translateText('¿Borrar tu cuenta para siempre? Se eliminan la cuenta y sus datos activos. Las copias históricas cifradas se retiran por rotación, con una retención prevista de 31 días. No se puede deshacer.'),
       async () => {
         const { data } = await getSupabase().auth.getSession();
         const token = data.session ? data.session.access_token : null;
