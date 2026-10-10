@@ -4,7 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
-import { APP_KEYS, writeLocalSnapshot } from '../js/sync.js';
+import { APP_KEYS, writeLocalSnapshot, settingsWithinBudget } from '../js/sync.js';
 import { createStorageRevisionGuard } from '../js/propio-bridge.js';
 
 const source = fs.readFileSync(new URL('../js/app-main.js', import.meta.url), 'utf8');
@@ -14,7 +14,7 @@ function storageHarness() {
   const values = new Map([['state', JSON.stringify(state)], ['calls', '[]'], ['settings', JSON.stringify(settings)]]);
   let reject = () => false;
   const warnings = [];
-  const context = vm.createContext({ ui, translateText, translateMarkup, displayLocale, applySavedColors, createStorageRevisionGuard, state, calls, settings, STORAGE_KEY: 'state', CALLS_KEY: 'calls', SETTINGS_KEY: 'settings',
+  const context = vm.createContext({ ui, translateText, translateMarkup, displayLocale, applySavedColors, createStorageRevisionGuard, settingsWithinBudget, state, calls, settings, STORAGE_KEY: 'state', CALLS_KEY: 'calls', SETTINGS_KEY: 'settings',
     localStorage: {
       getItem: (key) => values.get(key) ?? null,
       setItem(key, value) { if (reject(key, value)) throw new Error('QuotaExceededError'); values.set(key, value); },

@@ -2208,5 +2208,21 @@
   "s_fa24e14d": "Automatic special! Keep doing your thing.",
   "s_fce6dd5f": "{{v0}}{{v1}} to go",
   "s_8d24ed8a": "Interpreter guide",
-  "s_af856ba7": "Sign-in is temporarily unavailable. Wait a minute and try again."
+  "s_af856ba7": "Sign-in is temporarily unavailable. Wait a minute and try again.",
+  "s_104f5391": "The link could not be sent right now. Wait a moment and try again.",
+  "s_106da2b3": "Restore this copy? Your current data will also be preserved in this browser.",
+  "s_2efcde17": "Your settings exceed the space allowed for syncing. Reduce a custom sound or the size of your settings before saving.",
+  "s_3827c09d": "There is no space to preserve the previous copy. Export your JSON before replacing data or switching accounts.",
+  "s_3bd044df": "The backup or server connection needs attention. Keep your changes in this browser.",
+  "s_4295cc6a": "The server could not be verified. Keep your changes in this browser.",
+  "s_55944819": "This device has changes that have not been uploaded, and the cloud has a version saved{{v0}} on {{v1}}. They are not merged automatically: choose which one to keep. The replaced version is kept in recoverable copies in Settings.",
+  "s_70db0ee6": "Recoverable copies in this browser",
+  "s_7829299e": "Reconnect and sync",
+  "s_881adcbf": "Copy to recover",
+  "s_962ed7ff": "Sign in or create your account with Google. You do not need an app password.",
+  "s_a3d18467": "Offline — changes saved in this browser",
+  "s_b6828ebe": "Sign in with Google",
+  "s_c6527057": "This sound exceeds the space available for your settings. Use a smaller file or remove another custom sound.",
+  "s_d47fc576": "Restore copy",
+  "s_dcdc1221": "Copies are preserved before replacing data or switching accounts. Restoring also saves the copy you are using now."
 }

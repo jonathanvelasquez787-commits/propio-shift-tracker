@@ -135,9 +135,12 @@ export async function signUp({ email, username, password, displayName }) {
 export async function requestPasswordReset(email) {
   const cleanEmail = String(email || '').trim().toLowerCase();
   if (!looksLikeEmail(cleanEmail)) throw new AuthError('EMAIL_INVALID');
-  await getSupabase().auth.resetPasswordForEmail(cleanEmail, {
+  const { error } = await getSupabase().auth.resetPasswordForEmail(cleanEmail, {
     redirectTo: `${window.location.origin}/?recuperar=1`,
   });
+  // Never surface account-existence errors. Operational failures are a safe,
+  // generic retry message instead of an untrue delivery confirmation.
+  if (error) throw new AuthError('RESET_UNAVAILABLE');
   return true;
 }
 
@@ -216,6 +219,7 @@ const MESSAGES = () => ({
   RATE_LIMITED: translateText('Demasiados intentos seguidos. Espera un minuto y vuelve a probar.'),
   LOGIN_UNAVAILABLE: translateText('El acceso no está disponible temporalmente. Espera un minuto y vuelve a intentar.'),
   NETWORK: translateText('No se pudo conectar. Revisa tu internet y vuelve a intentar.'),
+  RESET_UNAVAILABLE: translateText('No se pudo enviar el enlace ahora. Espera un momento y vuelve a intentar.'),
   NOT_CONFIGURED:
     translateText('La app todavía no está conectada a su base de datos (falta configurar js/config.js).'),
 });

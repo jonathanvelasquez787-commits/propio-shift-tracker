@@ -3,6 +3,7 @@
   "buildCommand": "pnpm run build",
   "outputDirectory": "public",
   "trailingSlash": false,
+  "crons": [{ "path": "/api/operations", "schedule": "27 5 * * *" }],
   "headers": [
     {
       "source": "/(.*)",

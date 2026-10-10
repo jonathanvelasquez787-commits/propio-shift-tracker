@@ -15,11 +15,11 @@ const bootBody = bootSource.slice(bootSource.indexOf('async function boot()'), b
 const oldBase = '2026-10-08T10:00:00Z', observedBase = '2026-10-08T10:01:00Z', laterBase = '2026-10-08T10:02:00Z';
 const noop = () => {};
 
-function harness({ divergent = false, empty = false, absent = false, choice = 'local', race = false, readError = null, owner = 'audit', online } = {}) {
+function harness({ divergent = false, empty = false, absent = false, choice = 'local', race = false, readError = null, sessionError = null, cachedOwner = null, owner = 'audit', online } = {}) {
   const values = new Map(), requests = [];
   let cloud = absent ? null : { state: empty ? {} : { remote: true }, settings: {}, calls: empty ? [] : [{ id: 'remote' }], updated_at: divergent ? observedBase : oldBase };
   const storage = { getItem: k => values.get(k) ?? null, setItem: (k, v) => values.set(k, v), removeItem: k => values.delete(k) };
-  const backend = { auth: { getSession: async () => ({ data: { session: { user: { id: 'audit', email: 'audit@example.invalid' }, access_token: 'synthetic' } } }), onAuthStateChange: noop },
+  const backend = { auth: { getSession: async () => ({ data: { session: { user: { id: 'audit', email: 'audit@example.invalid' }, access_token: 'synthetic' } }, error: sessionError }), onAuthStateChange: noop },
     from: table => ({ select: () => ({ eq: () => {
       if (table !== 'calls') return { maybeSingle: async () => ({ data: readError ? null : cloud, error: readError }) };
       const query = { order: () => query, range: async (from, to) => ({ data: (cloud?.calls || []).slice(from, to + 1).map(payload => ({ payload })), count: cloud?.calls.length || 0, error: null }) };
@@ -45,6 +45,8 @@ function harness({ divergent = false, empty = false, absent = false, choice = 'l
     mountApp: async () => { if (race) cloud = { state: { newer: true }, settings: {}, calls: [{ id: 'newer' }], updated_at: laterBase }; return true; },
     installPropioBridge: () => noop, normalizeAppAddress: noop, wireSyncStatus: noop, setSyncStatus: noop,
     getProfile: async () => ({}), injectAccountPanel: noop, injectDeleteAccount: noop, injectCycleProjection: noop,
+    injectRecoveryCopies: noop, readOfflineOwner: () => cachedOwner, watchProductionHealth: noop,
+    mountOfflineApp: async user => { context.offlineMounted = user.id; },
   });
   vm.runInContext(syncSource, context);
   vm.runInContext('startAutoSync = () => {}; applyLoginLanguagePreference = () => {}; applyLightThemeDefault = () => {}; syncThemeClass = () => {};', context);
@@ -54,6 +56,12 @@ function harness({ divergent = false, empty = false, absent = false, choice = 'l
   vm.runInContext(`writeMeta({userId:${JSON.stringify(owner)}});`, context);
   return { requests, run: code => vm.runInContext(code, context), boot: () => vm.runInContext(bootBody + '\nboot()', context), cloud: () => cloud };
 }
+
+test('expired-session refresh network failure mounts only the cached local owner without an upload', async () => {
+  const h = harness({ sessionError: { name:'AuthRetryableFetchError',message:'network unavailable' }, cachedOwner:{id:'audit'},online:true });
+  await h.boot(); assert.equal(h.run('offlineMounted'),'audit'); assert.equal(h.requests.length,0);
+  assert.equal(h.run('readLocalSnapshot().state.local'),true);
+});
 
 test('arranque local detecta una escritura entre la lectura y el montaje sin sobrescribirla', async () => {
   const h = harness({ race: true }); await h.boot();

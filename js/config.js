@@ -21,6 +21,9 @@ export const APP_NAME = 'Propio Shift Tracker';
 // Versión del formato del blob que se sube a user_data. Subirla solo si
 // alguna vez cambia la forma de state/calls/settings de manera incompatible.
 export const DATA_SCHEMA_VERSION = 2;
+// Public onboarding uses the configured Google provider. Enable email only
+// after SMTP delivery, confirmation and recovery have been verified.
+export const EMAIL_AUTH_READY = false;
 
 export function isConfigured() {
   return (
