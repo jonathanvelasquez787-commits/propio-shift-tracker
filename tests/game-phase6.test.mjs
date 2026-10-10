@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { setAppCalls, setAppSettings, setAppState } from '../js/app-context.js';
-import { computeGameDay, configureGameContext, createDefaultGameState, normalizeGameState, onGameCallSaved, onGameCallsChanged } from '../js/game.js';
+import { ACCESSORY_CATALOG, computeGameDay, configureGameContext, createDefaultGameState, normalizeGameState, onGameCallSaved, onGameCallsChanged } from '../js/game.js';
 import { configurePositiveReinforcementContext, createDefaultReinforcementState, normalizeReinforcementState } from '../js/positive-reinforcement.js';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -221,7 +221,8 @@ test('el hook real conserva el botín XP de la quinta llamada al reconciliar y r
 
   const resetScenario = ({ bonusXp = 0, xpLocked } = {}) => {
     const game = createDefaultGameState();
-    game.accessories = ['Corona del ciclo', 'Cuernos dorados', 'Bufanda de racha', 'Alas pixel', 'Armadura cian', 'Ojo de rubí'];
+    // Owning the entire catalog guarantees XP even on dates whose loot is cosmetic.
+    game.accessories = ACCESSORY_CATALOG.map(item => item.label);
     game.days[keyFor()] = { bonusXp, ...(xpLocked === undefined ? {} : { xpLocked }) };
     currentState = { game, gapAnnotations: {} };
     callRows = [];

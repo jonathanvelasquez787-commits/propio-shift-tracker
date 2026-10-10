@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 let sequence = 0;
+const initializedTests = new WeakSet();
 async function harness(t, limiter) {
   const keys = ['SUPABASE_URL', 'SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_ROLE_KEY'];
   const prior = Object.fromEntries(keys.map(key => [key, process.env[key]]));
@@ -13,10 +14,13 @@ async function harness(t, limiter) {
     if (url.includes('/auth/v1/token')) { authRequests++; return { ok: false, status: 401, json: async () => ({ error: 'invalid_credentials' }) }; }
     throw new Error(`Unexpected synthetic request ${url}`);
   };
-  t.after(() => {
-    globalThis.fetch = previousFetch;
-    for (const key of keys) if (prior[key] === undefined) delete process.env[key]; else process.env[key] = prior[key];
-  });
+  if (!initializedTests.has(t)) {
+    initializedTests.add(t);
+    t.after(() => {
+      globalThis.fetch = previousFetch;
+      for (const key of keys) if (prior[key] === undefined) delete process.env[key]; else process.env[key] = prior[key];
+    });
+  }
   const { default: handler } = await import(`../api/login.js?super-audit=${++sequence}`);
   return {
     get authRequests() { return authRequests; },

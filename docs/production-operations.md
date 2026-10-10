@@ -92,8 +92,12 @@ volverlo privado desactiva esta protección.
 - Los avisos restantes de username_available y wipe_my_data autenticado son
   funciones intencionalmente expuestas; tablas internas sin políticas deniegan
   acceso a clientes. La protección de contraseñas filtradas está desactivada.
-- SMTP, confirmación/recuperación de correo, carga esperada, dispositivos físicos
-  y recuperación de un proyecto completo permanecen sujetos a verificación específica.
+- Se confirmó que SMTP personalizado está desactivado y no hay dominio propio en
+  Vercel. El correo predeterminado de Supabase solo sirve para pruebas con correos
+  autorizados del equipo. Registro y recuperación externos requieren configurar
+  un proveedor y verificar un dominio de envío; no se desactivó la confirmación.
+- Carga esperada, dispositivos físicos y recuperación de un proyecto completo
+  permanecen sujetos a verificación específica.
 
 Referencias: [backups Supabase](https://supabase.com/docs/guides/platform/backups),
 [SMTP para producción](https://supabase.com/docs/guides/auth/auth-smtp),
