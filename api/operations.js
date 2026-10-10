@@ -18,7 +18,10 @@ async function rpc(name, body = {}) {
     body: JSON.stringify(body),
   });
   if (!response.ok) throw new Error('OPERATIONS_DATABASE_UNAVAILABLE');
-  return response.json();
+  // PostgREST returns 204 for a void SQL function such as record_operation.
+  // A successful empty response must not flip the committed status to failure.
+  const bodyText = await response.text();
+  return bodyText ? JSON.parse(bodyText) : null;
 }
 
 export default async function handler(req, res) {

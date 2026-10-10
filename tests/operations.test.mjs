@@ -22,7 +22,7 @@ test('monitor verifies database readiness and the live app headers, records fail
     globalThis.fetch=async(url,options)=>{
       if(String(url).endsWith('/app'))return {ok:healthy,headers:new Headers({'content-security-policy':"default-src 'self'",'strict-transport-security':'max-age=31536000'})};
       if(String(url).endsWith('/record_operation'))records.push(JSON.parse(options.body));
-      return {ok:true,json:async()=>({ok:true})};
+      return {ok:true,text:async()=>String(url).endsWith('/record_operation')?'':JSON.stringify({ok:true})};
     };
     const res=response();await handler({method:'GET',headers:{authorization:'Bearer test-only-operations'},query:{mode:'monitor'}},res);
     assert.equal(res.result.status,healthy?200:503);
