@@ -5,8 +5,10 @@
 `GET /api/health` devuelve solo `ok` y el SHA del despliegue; nunca devuelve claves, cuentas ni detalles de SQL.
 Responde 503 si faltan variables, la RPC falla, RLS o permisos no son correctos,
 el backup diario lleva más de 26 horas sin éxito, la limpieza más de 20 minutos
-sin éxito, falta un backup reciente para una cuenta de más de 26 horas o hay
-10 errores de ejecución en 15 minutos. Las comprobaciones están en
+sin éxito o falta un backup reciente para una cuenta de más de 26 horas.
+La telemetría pública no afecta readiness: un cliente puede falsificar reportes.
+Los fallos de funciones se investigan por separado en los logs de Vercel.
+Las comprobaciones están en
 `public.production_readiness()`, ejecutable solo por `service_role`.
 El endpoint limita consultas mediante caché breve por instancia y deduplica
 peticiones simultáneas; esto es un control de coste, no un limitador de login.
@@ -91,7 +93,8 @@ volverlo privado desactiva esta protección.
   un conflicto previo entre copia local y nube; no se eligió ninguna versión.
 - Los avisos restantes de username_available y wipe_my_data autenticado son
   funciones intencionalmente expuestas; tablas internas sin políticas deniegan
-  acceso a clientes. La protección de contraseñas filtradas está desactivada.
+  acceso a clientes. La protección de contraseñas filtradas está desactivada y
+  el dashboard confirma que requiere plan Pro; no se cambió la suscripción.
 - Se confirmó que SMTP personalizado está desactivado y no hay dominio propio en
   Vercel. El correo predeterminado de Supabase solo sirve para pruebas con correos
   autorizados del equipo. Registro y recuperación externos requieren configurar

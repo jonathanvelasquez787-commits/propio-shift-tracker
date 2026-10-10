@@ -2,6 +2,7 @@
 node_modules/
 public/
 .vercel/
+supabase/.temp/
 .DS_Store
 
 # Nunca versionar configuración de entorno real.
