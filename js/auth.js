@@ -214,6 +214,7 @@ const MESSAGES = () => ({
   NOT_AUTHENTICATED: translateText('Tu sesión expiró. Vuelve a entrar.'),
   EMAIL_NOT_CONFIRMED: translateText('Falta confirmar tu correo. Revisa la bandeja de entrada.'),
   RATE_LIMITED: translateText('Demasiados intentos seguidos. Espera un minuto y vuelve a probar.'),
+  LOGIN_UNAVAILABLE: translateText('El acceso no está disponible temporalmente. Espera un minuto y vuelve a intentar.'),
   NETWORK: translateText('No se pudo conectar. Revisa tu internet y vuelve a intentar.'),
   NOT_CONFIGURED:
     translateText('La app todavía no está conectada a su base de datos (falta configurar js/config.js).'),

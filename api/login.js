@@ -17,27 +17,14 @@ const SUPABASE_URL = process.env.SUPABASE_URL;
 const ANON_KEY = process.env.SUPABASE_ANON_KEY;
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-const attempts = new Map();
-const WINDOW_MS = 60_000;
 const MAX_ATTEMPTS = 12;
-
-function throttled(ip) {
-  const now = Date.now();
-  const entry = attempts.get(ip);
-  if (!entry || now - entry.start > WINDOW_MS) {
-    attempts.set(ip, { start: now, count: 1 });
-    return false;
-  }
-  entry.count += 1;
-  if (attempts.size > 500) attempts.clear();
-  return entry.count > MAX_ATTEMPTS;
-}
 
 async function persistentlyThrottled(ip) {
   const key = createHash('sha256').update(`${SERVICE_KEY}:${ip}`).digest('hex');
   try {
     const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/consume_rate_limit`, {
       method: 'POST',
+      signal: AbortSignal.timeout(5000),
       headers: {
         'Content-Type': 'application/json',
         apikey: SERVICE_KEY,
@@ -50,7 +37,9 @@ async function persistentlyThrottled(ip) {
       if (typeof allowed === 'boolean') return !allowed;
     }
   } catch {}
-  return throttled(ip);
+  // A per-instance fallback cannot enforce a shared serverless limit.
+  // null means unavailable, distinct from an exhausted quota.
+  return null;
 }
 
 async function readBody(req) {
@@ -109,7 +98,15 @@ export default async function handler(req, res) {
     req.socket?.remoteAddress ||
     'desconocida';
 
-  if (await persistentlyThrottled(ip)) {
+  const limited = await persistentlyThrottled(ip);
+  if (limited === null) {
+    console.error('login: shared rate limiter unavailable');
+    res.setHeader('Retry-After', '60');
+    res.status(503).json({ error: 'LOGIN_UNAVAILABLE' });
+    return;
+  }
+  if (limited) {
+    res.setHeader('Retry-After', '60');
     res.status(429).json({ error: 'RATE_LIMITED' });
     return;
   }
