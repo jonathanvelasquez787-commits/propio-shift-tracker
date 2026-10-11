@@ -24,8 +24,78 @@ function storageHarness() {
   });
   const body = source.slice(source.indexOf('    function safeLocalStorageSet('), source.indexOf('    export function pad(')).replaceAll('export function ', 'function ');
   vm.runInContext("const localStorageRevision = createStorageRevisionGuard(localStorage, [STORAGE_KEY,CALLS_KEY,SETTINGS_KEY]);\n" + body, context);
-  return { state, calls, settings, values, warnings, reject: (fn) => { reject = fn; }, run: (code) => vm.runInContext(code, context) };
+  return { state, calls, settings, values, warnings, context, reject: (fn) => { reject = fn; }, run: (code) => vm.runInContext(code, context) };
 }
+
+function resetHarness() {
+  const h = storageHarness(), opened = [], closed = [];
+  Object.assign(h.context, {
+    setAppState: value => { h.context.state = value; },
+    setAppCalls: value => { h.context.calls = value; },
+    setAppSettings: value => { h.context.settings = value; },
+    defaultState: () => ({ game: { ledger: {} } }),
+    defaultSettings: () => ({ productiveGoalMin: 360, onboarded: false }),
+    ensureCurrencySettings() {}, setContextScheduleEditDay() {}, resetCallEditorState() {},
+    weekViewOffset: 3, cycleViewOffset: 2, editingGapContext: 'editing',
+    appConfirm: (message, callback) => { h.context.confirmReset = callback; },
+    closeModal: name => closed.push(name), openModal: name => opened.push(name),
+    document: { getElementById: () => null }, DEFAULT_USER_EMOJI: 'test', renderEmojiPicker() {},
+  });
+  h.calls.push({ id: 'keep' });
+  h.state.saved = true;
+  assert.equal(h.run('saveAll()'), true);
+  h.warnings.length = 0;
+  vm.runInContext(source.slice(source.indexOf('    function eraseAllData()'), source.indexOf('    function resetDay()')), h.context);
+  return { ...h, opened, closed };
+}
+
+test('confirmed full reset writes an empty snapshot without mistaking its own changes for another tab', () => {
+  const h = resetHarness();
+  h.run('eraseAllData(); confirmReset();');
+  assert.deepEqual(JSON.parse(h.values.get('calls')), []);
+  assert.equal(JSON.parse(h.values.get('settings')).onboarded, false);
+  assert.equal(h.run('localStorageRevision.isCurrent()'), true);
+  assert.equal(getLocalPersistenceFailure(), null);
+  assert.deepEqual(h.opened, ['onboardingModal']);
+  assert.deepEqual(h.closed, ['resetModal']);
+  assert.ok(h.warnings.includes(translateText('Todos los datos fueron borrados')));
+});
+
+test('a reset confirmation cannot delete a newer snapshot written while its dialog was open', () => {
+  const h = resetHarness();
+  h.run('eraseAllData();');
+  h.values.set('calls', JSON.stringify([{ id: 'newer-tab' }]));
+  const disk = new Map(h.values), memory = h.run('JSON.stringify({state,calls,settings})');
+  h.run('confirmReset();');
+  assert.deepEqual(h.values, disk);
+  assert.equal(h.run('JSON.stringify({state,calls,settings})'), memory);
+  assert.equal(getLocalPersistenceFailure(), 'stale');
+  assert.deepEqual(h.opened, []);
+});
+
+test('a rejected full reset preserves disk and memory without success; retry can reset completely', () => {
+  const h = resetHarness();
+  const disk = new Map(h.values), memory = h.run('JSON.stringify({state,calls,settings})');
+  h.reject(key => key === 'calls');
+  h.run('eraseAllData(); confirmReset();');
+  assert.deepEqual(h.values, disk);
+  assert.equal(h.run('JSON.stringify({state,calls,settings})'), memory);
+  assert.deepEqual(h.opened, []);
+  assert.equal(h.context.weekViewOffset, 3);
+  assert.ok(!h.warnings.includes(translateText('Todos los datos fueron borrados')));
+  h.reject(() => false);
+  h.run('eraseAllData(); confirmReset();');
+  assert.deepEqual(JSON.parse(h.values.get('calls')), []);
+  assert.equal(getLocalPersistenceFailure(), null);
+  assert.deepEqual(h.opened, ['onboardingModal']);
+});
+
+test('opening a full reset confirmation without accepting leaves all saved data intact', () => {
+  const h = resetHarness(), disk = new Map(h.values);
+  h.run('eraseAllData();');
+  assert.deepEqual(h.values, disk);
+  assert.deepEqual(h.opened, []);
+});
 
 test('guardar solo estado no vuelve vigente un tab que ya tenía llamadas externas más recientes', () => {
   const h = storageHarness();

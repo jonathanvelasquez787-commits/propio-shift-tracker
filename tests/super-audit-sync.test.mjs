@@ -56,6 +56,21 @@ function harness({ values = new Map(), online = true, cloud = null } = {}) {
 
 const initialCloud = () => ({ state: { saved: true }, settings: {}, calls: [{ id: 'keep' }, { id: 'delete' }], updated_at: 'revision-1' });
 
+test('a saved full reset removes prior cloud calls and a fresh session cannot bring them back', async () => {
+  const h=harness({cloud:initialCloud()});
+  h.run(`adoptCloud(${JSON.stringify(initialCloud())},'account-a'); startAutoSync();`);
+  h.run("window.localStorage.setItem(APP_KEYS.state,'{}'); window.localStorage.setItem(APP_KEYS.calls,'[]'); window.localStorage.setItem(APP_KEYS.settings,JSON.stringify({productiveGoalMin:360,onboarded:false}));");
+  assert.equal((await h.run('pushSnapshot()')).ok,true);
+  assert.deepEqual([...h.requests.at(-1).payload.p_call_deletes],['keep','delete']);
+  assert.deepEqual(h.cloud().calls,[]);
+  const fresh=harness({cloud:h.cloud()});
+  const decision=await fresh.run("resolveBoot('account-a')");
+  assert.equal(decision.action,'use-cloud');
+  fresh.run(`adoptCloud(${JSON.stringify(decision.cloud)},'account-a');`);
+  assert.equal(fresh.run('readLocalSnapshot().calls.length'),0);
+  assert.equal(fresh.run('readLocalSnapshot().settings.onboarded'),false);
+});
+
 test('sharing a browser identity does not authorize an older divergent tab to overwrite newer cloud calls', async () => {
   const first=harness({cloud:initialCloud()});
   first.run(`adoptCloud(${JSON.stringify(initialCloud())},'account-a'); deviceId(); markDirty();`);
