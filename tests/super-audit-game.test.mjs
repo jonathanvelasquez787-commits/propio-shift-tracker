@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { setAppCalls, setAppSettings, setAppState } from '../js/app-context.js';
 import { ACCESSORY_CATALOG, configureGameContext, createDefaultGameState, normalizeGameState, computeGameDay,
@@ -6,6 +7,10 @@ import { ACCESSORY_CATALOG, configureGameContext, createDefaultGameState, normal
   onGameDayMetadataChanged, openDailyGoalChest, claimPendingChest, equipAccessory, onGameDayReset,
   onGamePauseEnded, onGamePauseStarted, onGameDayRollover, chooseCycleReward, renderGame } from '../js/game.js';
 import { configurePositiveReinforcementContext } from '../js/positive-reinforcement.js';
+
+// Relative call timestamps must stay on the same day as the fixture's key,
+// including CI runs during the first ten minutes after UTC midnight.
+beforeEach(t => t.mock.timers.enable({ apis: ['Date'], now: new Date('2026-10-10T18:00:00Z') }));
 
 function fixture({ owned = false, goal = 10000, shields = 0, status = 'compliant', streak = 0,
   cycleGoal = 1000, cycleEarnings = 0 } = {}) {
