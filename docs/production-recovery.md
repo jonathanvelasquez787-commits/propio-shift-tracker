@@ -1,12 +1,14 @@
 # Operación y recuperación
 
-El acceso público usa Google. Email está desactivado en Supabase y `EMAIL_AUTH_READY=false`: no hay registro, recuperación ni cambios de correo que prometan mensajes sin SMTP. Para añadirlos, primero configurar y verificar SMTP y después activar ambos lados. No hace falta comprar un dominio para la versión que usa Google.
+El acceso público usa Google. Por decisión del propietario del 10/10/2026, Email permanece desactivado en Supabase y `EMAIL_AUTH_READY=false`. Registro y recuperación por correo quedan fuera del alcance de lanzamiento; SMTP no es un pendiente del producto actual. No hace falta comprar un dominio para la versión que usa Google.
 
 ## Monitor
 
 Supabase cron llama cada cinco minutos a `/api/operations?mode=monitor`, autenticado con un secreto de Vault que coincide con `CRON_SECRET` en Vercel. Comprueba readiness de SQL y la app pública con CSP/HSTS. Un segundo cron recoge cada minuto las respuestas fallidas o ausentes y evita que un fallo antiguo borre un éxito posterior. `/api/health` devuelve 503 si el monitor lleva más de 15 minutos sin éxito o el backup externo más de 26 horas. La app consulta ese estado y muestra un aviso cuando falla. GitHub Actions conserva una segunda comprobación y sus notificaciones de fallo; su scheduler no garantiza la cadencia del monitor principal.
 
-No se garantiza entrega por correo o SMS ni vigilancia independiente de una caída simultánea de Supabase y Vercel. El aviso en la app y el estado HTTP público sí están implementados. Configurar un destinatario externo requiere que el propietario elija ese canal.
+El propietario eligió avisos externos en Codex. Un heartbeat local activo comprueba cada quince minutos el estado público y la app, independientemente de los jobs de Supabase/Vercel. Confirma un fallo con un segundo intento después de diez segundos; informa fallos nuevos o diferentes y recuperaciones, y evita avisos repetidos. No envía datos de usuarios ni necesita SMTP. Depende de que Codex y el equipo estén disponibles; no garantiza vigilancia cuando estén apagados, ni entrega por correo/SMS. GitHub continúa como control secundario.
+
+La comprobación reproducible es `node scripts/external-monitor.mjs /ruta/absoluta/privada/monitor-state.json`. Conserva sólo fecha, estado, versión pública y categorías de fallo. Sus pruebas incluyen fallo de readiness con HTTP 200, errores de gateway, fallo de red, reintento transitorio, deduplicación y recuperación.
 
 ## Backup externo
 
@@ -33,6 +35,8 @@ node scripts/restore-portable-backup.mjs backup.encrypted.json propio-recovery-p
 ```
 
 El script rechaza el identificador del proyecto de producción actual y cualquier destino con usuarios o datos. Usa una transacción; valida los conteos y revierte todo si falla. Se mantienen las identidades, payloads, ajustes y backups; las cuotas se derivan mediante los triggers. No restaura sesiones activas, secretos de proveedores, archivos de servicios externos o métricas. El operador debe verificar login Google, RLS, horario y ganancias en ese destino antes de promoverlo. El RTO del servicio completo sigue sin medirse; el ensayo siguiente acredita la recuperación de esquema y datos alojados.
+
+Para reconstruir también el despliegue, `scripts/prepare-recovery-deployment.mjs` recibe el ref de destino, su clave publicable y una carpeta absoluta nueva fuera del repositorio. Copia exclusivamente archivos Git rastreados, rechaza secretos y enlaces simbólicos, cambia la configuración pública y CSP al destino y elimina los cron del ensayo. Verifica que Email y acceso anónimo estén desactivados. No copia claves administrativas, secretos OAuth ni la clave privada del backup. Configure Google, redirects y secretos de servidor exclusivamente para ese proyecto antes de validar el servicio completo.
 
 El historial `0001`–`0004` se registró como baseline tras comparar funciones y columnas de producción; no se reaplicaron esas migraciones a datos reales. Las cuatro migraciones posteriores usan las mismas versiones que Supabase. Cambios nuevos siempre van en un archivo nuevo.
 
