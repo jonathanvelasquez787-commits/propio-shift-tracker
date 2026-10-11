@@ -63,7 +63,7 @@ de recargar. No se ejecutó el borrado de la cuenta del propietario.
 
 ## Evidencia previa que sigue vigente
 
-La siguiente auditoría de controles pasó 494 pruebas y añadió recorridos
+La siguiente auditoría de controles pasó 500 pruebas y añadió recorridos
 con cuenta ficticia y recuperación JSON; ver
 [button-audit-2026-10-11.md](button-audit-2026-10-11.md) para correcciones,
 inventario, evidencia y límites. Las cifras 455/460 anteriores corresponden

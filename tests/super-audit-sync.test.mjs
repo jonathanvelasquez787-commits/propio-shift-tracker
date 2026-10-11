@@ -133,6 +133,67 @@ test('edits made during an in-flight visibility upload still receive a later aut
   await h.advance(2000);assert.equal(h.requests.length,2);assert.equal(h.timers.size,0);
 });
 
+test('failed visibility upload retries without another edit and cancels retries after success', async () => {
+  const h=harness({cloud:initialCloud()});
+  h.run(`adoptCloud(${JSON.stringify(initialCloud())},'account-a'); startAutoSync(); window.localStorage.setItem(APP_KEYS.state,'{"value":1}');`);
+  let fail=true;h.hook(()=>{if(fail)throw new TypeError('transient server error');});
+  h.context.document.visibilityState='hidden';h.handlers.visibilitychange();
+  await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(h.requests.length,1);assert.equal(h.run('readMeta().dirty'),true);
+  fail=false;await h.advance(4999);assert.equal(h.requests.length,1);
+  await h.advance(1);assert.equal(h.requests.length,2);assert.equal(h.run('readMeta().dirty'),false);
+  await h.advance(60000);assert.equal(h.requests.length,2);assert.equal(h.timers.size,0);
+});
+
+test('failed call-baseline fetch retries before calculating deletions', async () => {
+  const h=harness({cloud:initialCloud()});
+  h.run(`adoptCloud(${JSON.stringify(initialCloud())},'account-a'); startAutoSync(); cloudCallOwner=null; window.localStorage.setItem(APP_KEYS.calls,'[{"id":"keep"}]');`);
+  let fail=true;h.readHook(()=>{if(fail)throw new TypeError('transient read error');});
+  await h.advance(250);assert.equal(h.requests.length,0);assert.equal(h.run('readMeta().dirty'),true);
+  fail=false;await h.advance(5000);assert.equal(h.requests.length,1);
+  assert.deepEqual([...h.requests[0].payload.p_call_deletes],['delete']);
+  assert.equal(h.run('readMeta().dirty'),false);
+});
+
+test('repeated upload failures back off to a maximum frequency of one retry per thirty seconds', async () => {
+  const h=harness({cloud:initialCloud()});
+  h.run(`adoptCloud(${JSON.stringify(initialCloud())},'account-a'); startAutoSync(); window.localStorage.setItem(APP_KEYS.state,'{"value":1}');`);
+  h.hook(()=>{throw new TypeError('server unavailable');});
+  await h.advance(250);assert.equal(h.requests.length,1);
+  for(const [delay,count] of [[5000,2],[10000,3],[20000,4],[30000,5],[30000,6]]) {
+    await h.advance(delay-1);assert.equal(h.requests.length,count-1);
+    await h.advance(1);assert.equal(h.requests.length,count);
+    assert.equal(h.timers.size,1);
+  }
+});
+
+test('signing out cancels a pending retry and never uploads the departed account', async () => {
+  const h=harness({cloud:initialCloud()});
+  h.run(`setAccessToken('token-a','account-a'); adoptCloud(${JSON.stringify(initialCloud())},'account-a'); startAutoSync(); window.localStorage.setItem(APP_KEYS.state,'{"value":1}');`);
+  h.hook(()=>{throw new TypeError('server unavailable');});
+  await h.advance(250);assert.equal(h.requests.length,1);
+  h.run("setAccessToken(null,null)");await h.advance(60000);
+  assert.equal(h.requests.length,1);assert.equal(h.timers.size,0);
+});
+
+test('a cloud conflict ends automatic retries without forcing an overwrite', async () => {
+  const h=harness({cloud:initialCloud()});
+  h.run(`adoptCloud(${JSON.stringify(initialCloud())},'account-a'); startAutoSync(); window.localStorage.setItem(APP_KEYS.state,'{"value":1}');`);
+  let fail=true;h.hook(()=>{if(fail)throw new TypeError('server unavailable');});
+  await h.advance(250);fail=false;h.cloud().updated_at='newer-remote-revision';
+  await h.advance(5000);assert.equal(h.requests.length,2);assert.ok(h.events.includes('conflict'));
+  assert.equal(h.requests[1].payload.p_expected_updated_at,'revision-1');
+  await h.advance(60000);assert.equal(h.requests.length,2);assert.equal(h.timers.size,0);
+});
+
+test('local persistence failures do not create an automatic retry loop', async () => {
+  const h=harness({cloud:initialCloud()});
+  h.run(`adoptCloud(${JSON.stringify(initialCloud())},'account-a'); startAutoSync(); window.localStorage.setItem(APP_KEYS.state,'{"value":1}'); reportLocalPersistenceFailure('quota');`);
+  h.hook(()=>{throw new TypeError('server unavailable');});
+  await h.advance(250);await h.advance(60000);
+  assert.equal(h.requests.length,1);assert.equal(h.timers.size,0);
+});
+
 test('a saved full reset removes prior cloud calls and a fresh session cannot bring them back', async () => {
   const h=harness({cloud:initialCloud()});
   h.run(`adoptCloud(${JSON.stringify(initialCloud())},'account-a'); startAutoSync();`);

@@ -317,7 +317,7 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
-Auditoría de controles del 11/10/2026: 494 pruebas, 2129 textos ES/EN,
+Auditoría de controles del 11/10/2026: 500 pruebas, 2129 textos ES/EN,
 329 controles estáticos inventariados y matriz de 17 áreas/56 módulos/51 suites.
 Corregidos guardados rechazados en Calendario, Logros, premios y Higher Rate;
 días libres y estado laboral explícito; color rojo de llamada en claro; orden

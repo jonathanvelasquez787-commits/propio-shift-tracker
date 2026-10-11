@@ -33,6 +33,8 @@ No se borraron ni reemplazaron los datos de la cuenta del propietario.
 - Sync: espera 250 ms desde el último cambio y un máximo de 1500 ms de edición
   continua. Evita la segunda subida del debounce después de guardar al ocultar
   la pestaña y conserva cambios nuevos ocurridos durante una subida.
+  Un error transitorio reintenta a los 5 segundos, luego 10, 20 y como máximo
+  cada 30 segundos. No fuerza conflictos ni sigue subiendo tras cerrar sesión.
 
 ## Horario y meta
 
@@ -51,7 +53,7 @@ día y se comprobó 55; se restauró 60 mediante el mismo control.
 - Wiring, contratos y matriz: 17 áreas, 56 módulos y 51 suites. Se revisan
   también controles creados en tiempo de ejecución; el inventario estático
   no incluye todos los elementos generados por JavaScript.
-- Suite completa: 494 pruebas. Incluye rechazo/reintento, aislamiento de datos,
+- Suite completa: 500 pruebas. Incluye rechazo/reintento, aislamiento de datos,
   migraciones/RLS, contabilidad, importaciones y conflictos de sincronización.
 - Navegador: navegación de todas las páginas principales; edición/guardado
   de horario y metas; nota de día laboral; iniciar y guardar llamada en vivo;
