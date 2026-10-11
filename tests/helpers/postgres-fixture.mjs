@@ -3,7 +3,7 @@ import fs from 'node:fs/promises';
 
 // Postgres executes the real application migrations. Only Supabase-managed
 // Auth identities and the background extension interfaces are fixtures.
-export async function applicationDatabase() {
+export async function applicationDatabase({ transformMigration = sql => sql } = {}) {
   const db = new PGlite();
   await db.exec(`
     create role anon; create role authenticated; create role service_role bypassrls;
@@ -28,7 +28,7 @@ export async function applicationDatabase() {
   `);
   const root = new URL('../../supabase/migrations/',import.meta.url);
   for (const name of (await fs.readdir(root)).filter(n=>n.endsWith('.sql')).sort()) {
-    const sql = (await fs.readFile(new URL(name,root),'utf8'))
+    const sql = transformMigration(await fs.readFile(new URL(name,root),'utf8'))
       .replace(/^create extension if not exists pg_(?:cron|net) with schema extensions;\r?$/gm,'');
     await db.exec('begin;');
     try { await db.exec(sql); await db.exec('commit;'); }
