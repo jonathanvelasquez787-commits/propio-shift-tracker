@@ -743,20 +743,9 @@ export async function resolveBoot(userId) {
     return { action: BOOT.USE_CLOUD, cloud };
   }
 
-  // Desde acá hay divergencia APARENTE. Dos casos no son un conflicto real y
-  // no deben preguntarle nada al usuario:
-
-  // 1. Los dos lados tienen exactamente el mismo dato. Pasa cada vez que la
-  //    subida de cierre de pestaña llega al servidor: la marca local queda
-  //    vieja aunque el contenido sea idéntico.
+  // Una subida al cerrar puede dejar la revisión local antigua aunque el contenido coincida.
   if (sameSnapshot(readLocalSnapshot(), cloud)) {
     return { action: BOOT.USE_CLOUD, cloud };
-  }
-
-  // 2. La versión de la nube la subió ESTE mismo navegador. Lo local es esa
-  //    misma versión más lo que se haya editado después, nunca menos.
-  if (cloud.device_id && cloud.device_id === deviceId()) {
-    return { action: BOOT.USE_LOCAL, cloud };
   }
 
   return {

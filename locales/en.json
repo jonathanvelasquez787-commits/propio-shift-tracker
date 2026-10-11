@@ -2230,5 +2230,8 @@
   "s_c1cc1f9b": "Delete your account forever? Your account and active data will be removed. Historical encrypted copies are removed by rotation, with an expected retention of 31 days. This cannot be undone.",
   "s_d0bcff73": "The app files and private, encrypted backups. The decryption key is kept outside Vercel.",
   "s_f7d54964": "October 10, 2026",
-  "s_fff1384d": "Settings → \"Delete my account\" removes your account and active data. Historical encrypted copies are removed by the rotation described above. \"Delete all data\" clears only this browser."
+  "s_fff1384d": "Settings → \"Delete my account\" removes your account and active data. Historical encrypted copies are removed by the rotation described above. \"Delete all data\" clears only this browser.",
+  "s_26d66b15": "That value is too large to calculate the goal.",
+  "s_bcc9a0aa": "Another tab saved more recent changes. Reload before saving; your saved data was preserved.",
+  "s_eb8b17fb": "The backup contains invalid calls. Your current data was not changed."
 }

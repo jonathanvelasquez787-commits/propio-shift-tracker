@@ -56,6 +56,17 @@ function harness({ values = new Map(), online = true, cloud = null } = {}) {
 
 const initialCloud = () => ({ state: { saved: true }, settings: {}, calls: [{ id: 'keep' }, { id: 'delete' }], updated_at: 'revision-1' });
 
+test('sharing a browser identity does not authorize an older divergent tab to overwrite newer cloud calls', async () => {
+  const first=harness({cloud:initialCloud()});
+  first.run(`adoptCloud(${JSON.stringify(initialCloud())},'account-a'); deviceId(); markDirty();`);
+  const newer={...initialCloud(),calls:[{id:'keep'},{id:'delete'},{id:'newer-tab'}],updated_at:'revision-2',device_id:first.run('deviceId()')};
+  const reopened=harness({values:first.values,cloud:newer});
+  const decision=await reopened.run("resolveBoot('account-a')");
+  assert.equal(decision.action,'conflict');
+  assert.equal(reopened.requests.length,0);
+  assert.deepEqual(reopened.cloud().calls,newer.calls);
+});
+
 test('offline reopening and deleting a saved call sends its deletion after reconnecting without another reload', async () => {
   const first = harness({ cloud: initialCloud() });
   first.run(`adoptCloud(${JSON.stringify(initialCloud())}, 'account-a')`);

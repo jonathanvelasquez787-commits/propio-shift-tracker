@@ -711,7 +711,7 @@ test('tercera simulación mensual: Finanzas nunca queda sobreasignada al bajar g
   assert.match(finance, /reverseAllocationOrder/);
   assert.match(finance, /export function financeReconcileAssignmentsToEarnings/);
   assert.match(finance, /const trimmed = financeTrimAssignmentsToEarnings\(\)/);
-  assert.match(calls, /financeRunAutoFillCascade\(\);[\s\S]*saveAll\(\);[\s\S]*onGameCallsChanged/);
+  assert.match(calls, /financeRunAutoFillCascade\(\);[\s\S]*if \(saveAll\(\) === false\) return false;[\s\S]*onGameCallsChanged/);
   assert.match(appMain, /function applyImportedPayload[\s\S]*financeRunAutoFillCascade\(\)/);
 });
 

@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import { parse } from 'acorn';
 import { settings, state, calls, setAppSettings, setAppState, setAppCalls } from '../js/app-context.js';
-import { configureSettingsContext, requestGoalChange, applyPendingGoalChange, clearActiveDayGoalOverride } from '../js/settings.js';
+import { configureSettingsContext, requestGoalChange, applyPendingGoalChange, clearActiveDayGoalOverride, updateRate } from '../js/settings.js';
 import { ui, translateText, setLanguage } from '../js/i18n.js';
 
 const source=fs.readFileSync(new URL('../js/app-main.js',import.meta.url),'utf8');
@@ -34,7 +34,7 @@ function harness(t) {
   configureSettingsContext({...h,ui,translateText,closeModal(){},convertedAmountText:()=>'',currencyCeilFromUsdAmount:(usd,rate)=>Math.ceil(usd*rate*100)/100,
     effectiveCycleGoal:()=>0,ensureCurrencySettings(){},escapeHtml:String,formatCallDayLabel:String,formatMinutes:n=>String(Math.round(n*10)/10),iconHtml:()=>'',money:n=>n.toFixed(2),onGameDayMetadataChanged(){},openModal:id=>{opened=id;},render(){},saveSettingsOnly:save,saveStateOnly:save,toast(){},usdCeilFromCurrencyAmount:(amount,rate)=>Math.ceil(amount/rate*100)/100});
   const edit=(scope,min)=>{element('productiveGoalInput').value=String(min);element('earningsGoalInput').value=String(h.effectiveDailyGoal().usd);requestGoalChange('minutes');assert.equal(opened,'goalScopeModal');applyPendingGoalChange(scope);};
-  return {h,element,edit,reload(){const data=JSON.parse(persisted);setAppSettings(data.settings);setAppState(data.state);setAppCalls(data.calls);}};
+  return {h,element,edit,opened:()=>opened,reload(){const data=JSON.parse(persisted);setAppSettings(data.settings);setAppState(data.state);setAppCalls(data.calls);}};
 }
 
 test('new accounts start at 06:00–14:00 with the requested blocks and 360-minute goal',t=>{
@@ -74,4 +74,24 @@ test('day-only goals leave the general goal intact and using general updates the
   settings.productiveGoalMin=300;settings.earningsGoal=36;clearActiveDayGoalOverride();
   assert.equal(x.h.effectiveDailyGoal().min,300);assert.equal(x.h.effectiveDailyGoal('09/30/2026').min,250.7);
   assert.equal(x.element('productiveGoalInput').value,'300');x.reload();assert.equal(x.h.effectiveDailyGoal().min,300);
+});
+
+test('editing the rate while viewing a special past goal preserves the general minutes and daily exception',t=>{
+  const x=harness(t);x.edit('day',90);
+  const override=copy(settings.dailyGoalOverrides['09/29/2026']);
+  x.element('rateInput').value='0.20';updateRate();
+  assert.equal(settings.productiveGoalMin,250.7);
+  assert.ok(Math.abs(settings.earningsGoal-50.14)<1e-9);
+  assert.deepEqual(copy(settings.dailyGoalOverrides['09/29/2026']),override);
+  assert.equal(x.h.effectiveDailyGoal('09/29/2026').min,90);
+  x.reload();assert.equal(settings.productiveGoalMin,250.7);assert.equal(x.h.effectiveDailyGoal().min,90);
+});
+
+test('overflowing converted goals and rates do not persist non-finite values',t=>{
+  const x=harness(t);x.element('productiveGoalInput').value='250.7';x.element('earningsGoalInput').value='1e308';
+  requestGoalChange('dollars');
+  assert.equal(x.opened(),undefined);
+  assert.equal(settings.productiveGoalMin,250.7);assert.equal(settings.earningsGoal,30.08);
+  x.element('rateInput').value='1e308';updateRate();
+  assert.equal(settings.rate,.12);assert.equal(settings.earningsGoal,30.08);
 });

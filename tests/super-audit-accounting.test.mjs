@@ -33,12 +33,14 @@ function harness(t) {
   setAppState({ shiftStartedAt: null, shiftEndedAt: null, events: [], pauseHistory: [], activeDayKey: '09/01/2025', pendingLiveCallBackup: null });
   setAppCalls([]);
   setAppSettings({ rate: .12, productiveGoalMin: 40, earningsGoal: 4.8, higherRateWindows: [], financeAutoFill: true, financeCategories: { otro: { rows: [] } }, customFinanceCategories: [] });
-  const save = () => { persisted = JSON.stringify({ calls, settings, state }); saves++; return true; };
+  let rejectSave=false;
+  const messages=[];
+  const save = () => { if(rejectSave)return false; persisted = JSON.stringify({ calls, settings, state }); saves++; return true; };
   const h = { Date: ClockDate, ui, translateText, document, MAX_CALL_DURATION_MIN: 1440, CONNECTED_LIVE_GRACE_MIN: 90,
     makeLocalId: () => `id-${++sequence}`, setAppCalls, higherRateBonusForCall, higherRateBonusForCalls, higherRateBonusBreakdownForCalls,
     callsForDay: key => calls.filter(c => c.callDate === key),
     getActiveDayKey: () => state.activeDayKey, defaultActiveDayKey: () => h.todayCallDateKey(),
-    toast() {}, saveAll: save, financeRunAutoFillCascade, autoStartShiftFromCalls() {},
+    toast:message=>messages.push(message), saveAll: save, financeRunAutoFillCascade, autoStartShiftFromCalls() {},
     migratePositiveCallIdReferences() {}, migrateGameCallReferences() {}, onGameCallSaved: call => gameSaved.push(call.id), onGameCallsChanged() {},
     setEvent: (...args) => state.events.push(args), renderImportSkippedSummary() {}, callImportFlag: () => null,
     dayIsEffectivelyOff: key => new Date(h.callDateToDate(key)).getDay() === 0, dayAdherence: () => null,
@@ -49,10 +51,10 @@ function harness(t) {
   vm.createContext(h);
   vm.runInContext(functions.map(name => { assert.ok(declarations.has(name), name); return declarations.get(name); }).join('\n'), h);
   configureHigherRateContext({ ...h, HIGHER_RATE_TIERS: tiers, HIGHER_RATE_EARLY_GRACE_MIN: 5 });
-  configureFinanceContext({ parseMoney: h.parseMoney, higherRateBonusForCalls, saveSettingsOnly: save, render() {}, money: x => x.toFixed(2), convertedAmountText: () => '', toast() {} });
+  configureFinanceContext({ parseMoney: h.parseMoney, higherRateBonusForCalls, saveSettingsOnly: save, render() {}, money: x => x.toFixed(2), convertedAmountText: () => '', toast:h.toast });
   configureCallsContext({ ...h, HIGHER_RATE_TIERS: tiers, MAX_CALL_DURATION_MIN: 1440, money: x => x.toFixed(2), convertedAmountText: () => '', financeConvertedInline: () => '', formatDuration: x => String(x), rateTilePerMin: () => settings.rate, renderRateTiles() {}, formatCallDayLabel: x => x,
     closeModal() {}, openModal() {}, appConfirm: (_message, fn) => fn() });
-  return { h, inputs, element, gameSaved,
+  return { h, inputs, element, gameSaved, messages, rejectSave:()=>{rejectSave=true;},
     advance: date => { clock = date.getTime(); }, saves: () => saves,
     reload() { const snap = JSON.parse(persisted); setAppCalls(snap.calls); setAppState(snap.state); setAppSettings(snap.settings); },
     import(rows) { element('callInput').value = rows.map(row => row.join('\t')).join('\n'); h.importCalls(); },
@@ -62,6 +64,20 @@ function harness(t) {
     },
   };
 }
+
+test('a rejected manual call save does not announce success or award its reward',t=>{
+  const x=harness(t);x.advance(at(2,'19:00'));x.rejectSave();
+  x.manual('09/01/2025','08:00',10);
+  assert.equal(x.saves(),0);assert.deepEqual(x.gameSaved,[]);
+  assert.equal(calls.length,1);assert.deepEqual(x.messages,[]);
+});
+
+test('a rejected finance allocation save does not report Aplicado',t=>{
+  const x=harness(t);setAppCalls([{id:'income',pay:'20'}]);
+  settings.financeCategories.otro.rows=[{id:'blocked',targetAmount:20,assignedAmount:0,kind:'meta'}];
+  x.rejectSave();assert.equal(financeApplySignedAmount('otro','blocked','12,50','plus'),false);
+  assert.equal(x.saves(),0);assert.deepEqual(x.messages,[]);
+});
 
 test('official correction to zero minutes replaces the original and preserves its identity and frozen bonus', t => {
   const x = harness(t); x.advance(at(2, '19:00'));
@@ -125,6 +141,18 @@ test('manual allocation accepts the exact final displayed ten cents without allo
   assert.ok(Math.abs(row.assignedAmount - .3) < 1e-12);
   financeApplySignedAmount('otro', 'rent', '.01', 'plus');
   assert.ok(Math.abs(row.assignedAmount - .3) < 1e-12);
+});
+
+test('manual finance allocation interprets decimal commas without multiplying the amount and rejects malformed numbers',t=>{
+  harness(t);
+  const row={id:'decimal',categoryId:'otro',kind:'meta',targetAmount:3000,assignedAmount:0,priority:1};
+  settings.financeCategories.otro.rows.push(row);setAppCalls([{pay:3000}]);
+  financeApplySignedAmount('otro','decimal','12,50','plus');assert.equal(row.assignedAmount,12.5);
+  financeApplySignedAmount('otro','decimal','1,234.50','plus');assert.equal(row.assignedAmount,1247);
+  financeApplySignedAmount('otro','decimal','12,50','minus');assert.equal(row.assignedAmount,1234.5);
+  for(const invalid of ['1e3','12abc50','1,2,3','12.50.00','Infinity']){
+    financeApplySignedAmount('otro','decimal',invalid,'plus');assert.equal(row.assignedAmount,1234.5,invalid);
+  }
 });
 
 test('automatic allocation covers all 601 rows and bypasses zero-target legacy expenses', t => {

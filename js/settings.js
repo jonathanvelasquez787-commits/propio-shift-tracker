@@ -84,6 +84,7 @@ let syncingGoals = false;
       // campo.
       minutes = Math.max(0, minutes);
       dollars = Math.max(0, dollars);
+      if (!Number.isFinite(minutes) || !Number.isFinite(dollars)) return null;
       return { minutes: Number(minutes), dollars: Number(dollars) };
     }
 
@@ -99,9 +100,9 @@ let syncingGoals = false;
         state.productiveGoalMin = settings.productiveGoalMin;
         state.earningsGoal = settings.earningsGoal;
         setDailyGoalOverride(dayKey, null);
-        saveStateOnly();
+        if (saveStateOnly() === false) return false;
       }
-      saveSettingsOnly();
+      if (saveSettingsOnly() === false) return false;
       onGameDayMetadataChanged(dayKey);
       refreshGoalInputs();
       render();
@@ -119,20 +120,19 @@ let syncingGoals = false;
       if (currencyInput && exchangeRate > 0) currencyInput.value = currencyCeilFromUsdAmount(goal.usd, exchangeRate).toFixed(2);
     }
 
-    function syncGoals(source) {
-      if (syncingGoals) return;
-      syncingGoals = true;
-      const { minutes, dollars } = computeGoalsFromInputs(source);
-      applyGoalValues(minutes, dollars, 'global', getActiveDayKey());
-      syncingGoals = false;
-    }
-
     let pendingGoalChange = null;
 
     export function requestGoalChange(source) {
       if (syncingGoals) return;
       const dayKey = getActiveDayKey();
-      const { minutes, dollars } = computeGoalsFromInputs(source);
+      const computed = computeGoalsFromInputs(source);
+      if (!computed) {
+        pendingGoalChange = null;
+        refreshGoalInputs();
+        toast(translateText('Ese valor es demasiado grande para calcular la meta.'));
+        return;
+      }
+      const { minutes, dollars } = computed;
       const current = effectiveDailyGoal(dayKey);
       if (Math.abs(current.min - minutes) < 0.005 && Math.abs(current.usd - dollars) < 0.005) {
         refreshGoalInputs();
@@ -155,7 +155,7 @@ let syncingGoals = false;
       const { minutes, dollars, dayKey } = pendingGoalChange;
       pendingGoalChange = null;
       closeModal('goalScopeModal');
-      applyGoalValues(minutes, dollars, scope, dayKey);
+      if (applyGoalValues(minutes, dollars, scope, dayKey) === false) return;
       toast(scope === 'day'
         ? ui`Meta de ${dayKey === todayCallDateKey() ? translateText('hoy') : formatCallDayLabel(dayKey)}: ${formatMinutes(minutes)} min · ${money(dollars)}${convertedAmountText(dollars) ? ` (${convertedAmountText(dollars)})` : ''}`
         : ui`Meta general: ${formatMinutes(minutes)} min · ${money(dollars)}${convertedAmountText(dollars) ? ` (${convertedAmountText(dollars)})` : ''}`);
@@ -180,16 +180,25 @@ let syncingGoals = false;
       toast(translateText('Ese día vuelve a usar tu meta general'));
     }
 
-    // Cuando se edita la tasa por minuto en Metas: se guarda la nueva tasa y se recalcula la Meta
-    // en dólares a partir de la Meta en minutos ya guardada (mismo criterio que el flujo existente
-    // de "source==='minutes'" en syncGoals)
+    // La tarifa recalcula la meta general; conserva las metas especiales y el historial.
     export function updateRate() {
       const rateInput = document.getElementById('rateInput');
       let rate = Number(rateInput?.value);
       if (!Number.isFinite(rate) || rate <= 0) rate = settings.rate || RATE;
+      const dollars = Number(settings.productiveGoalMin) * rate;
+      if (!Number.isFinite(dollars)) {
+        if (rateInput) rateInput.value = String(settings.rate || RATE);
+        toast(translateText('Ese valor es demasiado grande para calcular la meta.'));
+        return;
+      }
+      snapshotHistoricalPlanning();
       settings.rate = rate;
-      saveSettingsOnly();
-      syncGoals('minutes');
+      settings.earningsGoal = dollars;
+      state.earningsGoal = dollars;
+      if (saveStateOnly() === false || saveSettingsOnly() === false) return false;
+      onGameDayMetadataChanged(todayCallDateKey());
+      refreshGoalInputs();
+      render();
     }
 
     // Cambios de moneda secundaria (símbolo + tasa de cambio), editables en Metas.

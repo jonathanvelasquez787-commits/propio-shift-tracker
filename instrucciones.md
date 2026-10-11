@@ -317,6 +317,20 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
+Auditoría integral del 11/10/2026: ocho grupos nuevos corregidos (pestañas
+antiguas, divergencias del mismo navegador, tarifa/metas, overflow, decimales
+de Finanzas, validación y mensajes de importación, propagación de guardados
+rechazados). 446 pruebas; simulación de 31 días, 161 reconciliaciones y 31
+snapshots/exportaciones; 33 módulos, wiring y 2126 textos ES/EN. Interfaz con
+cuenta ficticia y backend local: cambios de horario/finanzas recibidos en otra
+sesión y siete páginas a 1365/390 px; navegación móvil por teclado. Ver
+docs/auditoria-super-profunda-2026-10-11.md para evidencia y límites.
+Producción y ensayo alojado tienen nueve migraciones. Google está activo;
+Email/SMTP permanece deshabilitado por decisión del usuario. Monitor externo
+de Codex activo, dependiente del equipo disponible. La recuperación de contenido
+real se comprobó sin cambiar Auth; no se afirma un RTO total ni dos usuarios
+Google reales. Respaldo cifrado y detalles de la cuenta permanecen fuera de Git.
+
 El 8/10/2026 el usuario confirmó que todos los pendientes anteriores ajenos
 a Google ya quedaron resueltos, incluidos la conexión Propio → tracker, los
 ZIPs del puente/resumen y la publicación en Chrome Web Store. Esta es una
@@ -617,9 +631,9 @@ Auth y nube usan fixtures; no certifica sincronización real en dos dispositivos
   sin clampear negativos (a diferencia del editor/modal manual, que sí lo
   hacen) — no se tocó a propósito porque cambiaría `callDedupeKey` y con eso
   la detección de duplicados de llamadas ya guardadas.
-- `parseMoney` trata la coma como separador de miles: `"12,50"` da 1250, no
-  12.50. Alcanzable en los campos de texto de Finanzas; en la práctica casi
-  siempre lo frena el tope de Disponible.
+- `parseMoney` conserva la semántica de los pagos antiguos importados para no
+  cambiar su deduplicación. Las entradas manuales de asignación de Finanzas
+  usan otro parser estricto: `"12,50"` corresponde a 12.50, también en moneda local.
 - Higher Rate: editar la fecha o el horario de una ventana congela el bono ya
   ganado por las llamadas que calificaban antes del cambio (a propósito).
   Efecto secundario: corregir una hora mal tecleada deja el bono viejo
@@ -639,7 +653,8 @@ Auth y nube usan fixtures; no certifica sincronización real en dos dispositivos
 La aplicación funciona en producción con estas bases vigentes:
 
 - Cuenta, datos y llamadas sincronizados con Supabase bajo RLS; el repositorio
-  de GitHub es privado y Vercel publica únicamente el build de `public/`.
+  de GitHub es público por decisión del usuario, con main protegida. Vercel
+  publica únicamente el build de `public/`; no se versionan claves ni backups.
 - `app.html`, `js/app-main.js` y `js/boot.js` son la fuente principal;
   `js/app-context.js` concentra el estado compartido y los módulos de página
   reciben sus dependencias sin ciclos. Rollup/Terser genera el bundle sin
