@@ -3826,8 +3826,7 @@ function renderPayDatesSection() {
 
 
     function todayIsOff() {
-      const cfg = dayConfigFor(todayCallDateKey());
-      return !!(cfg && cfg.off);
+      return liveCallDayIsOff();
     }
 
     // Si no hay un turno en curso (o el de hoy ya se cerró), el próximo click en "Iniciar/Finalizar
@@ -3914,9 +3913,13 @@ function renderPayDatesSection() {
     // A diferencia de pauseActionDisabled (Break/Lunch), iniciar una llamada NO exige que ya haya
     // llamadas de ese día para anclar el auto-inicio del turno.
     function callActionDisabled() {
-      // Las llamadas reales pueden ocurrir antes del turno planeado o después de un cierre previo.
-      // El único bloqueo válido es estar viendo un día distinto de Hoy.
-      return !isViewingToday();
+      return !isViewingToday() || (!state.activeCall && liveCallDayIsOff());
+    }
+
+    function liveCallDayIsOff() {
+      const day = todayCallDateKey();
+      const forced = getDayNote(day)?.forcedStatus;
+      return forced === 'off' || (forced !== 'work' && !!dayConfigFor(day)?.off);
     }
 
     function callActionTimer() {
@@ -3936,7 +3939,7 @@ function renderPayDatesSection() {
       // shiftActionDisabled), pero se protege por si se dispara de otra forma. Solo aplica al
       // INICIAR un turno nuevo.
       if (shiftWouldStartNew() && todayIsOff()) {
-        toast(translateText('Hoy está marcado como día libre en tu horario — no se puede iniciar un turno manualmente. Si trabajaste, pega tus llamadas y la app lo detecta sola.'));
+        toast(translateText('Hoy está marcado como día libre. Márcalo como Trabajado en Resumen semanal → Editar día para iniciar el turno o una llamada.'));
         return;
       }
       // Misma defensa para la restricción de los 5 minutos — el botón ya debería estar
@@ -4203,6 +4206,10 @@ function renderPayDatesSection() {
 
     function startCall(options = {}) {
       if (state.activeCall) return;
+      if (liveCallDayIsOff()) {
+        toast(translateText('Hoy es tu día libre'));
+        return false;
+      }
 
       const now = new Date(options.startedAt || Date.now());
       const nowISO = now.toISOString();
@@ -4461,7 +4468,7 @@ function renderPayDatesSection() {
         toast(translateText('Guarda o descarta la llamada pendiente antes de reiniciar este día.'));
         return;
       }
-      appConfirm(ui`¿Reiniciar ${formatCallDayLabel(dayKey)}? Se borran llamadas, pausas, huecos, la nota del día y log de ese día.`, () => {
+      appConfirm(ui`¿Reiniciar ${formatCallDayLabel(dayKey)}? Se borran llamadas, pausas, huecos, la nota, el log y la gamificación de ese día.`, () => {
         const trackedShiftStart = state.shiftStartedAt ? new Date(state.shiftStartedAt) : null;
         const trackedShiftEnd = state.shiftEndedAt ? new Date(state.shiftEndedAt) : new Date();
         const trackedShiftDayKey = trackedShiftStart && Number.isFinite(trackedShiftStart.getTime())
@@ -5823,7 +5830,9 @@ function renderHeader() {
   const callLabel = document.getElementById('callControlLabel');
   const callTimer = document.getElementById('callControlTimer');
   callLabel.textContent = callActionLabel();
-  callTimer.textContent = viewingToday ? callActionTimer() : translateText("Solo en 'Hoy'");
+  callTimer.textContent = viewingToday
+    ? (!state.activeCall && liveCallDayIsOff() ? translateText('Hoy es tu día libre') : callActionTimer())
+    : translateText("Solo en 'Hoy'");
   callBtn.disabled = callActionDisabled();
   const callActive = !!state.activeCall;
   callBtn.classList.toggle('is-active', callActive);

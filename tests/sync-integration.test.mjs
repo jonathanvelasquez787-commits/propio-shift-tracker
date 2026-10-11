@@ -168,7 +168,8 @@ test('cambios durante una subida conservan dirty y se envían en el siguiente de
   h.requests[0].resolve({ data: { updated_at: '2026-09-30T12:00:00Z' }, error: null });
   await first;
   assert.equal(h.run('readMeta().dirty'), true);
-  assert.ok([...h.timers.values()].some((timer) => timer.delay === 6000));
+  assert.ok([...h.timers.values()].some((timer) => timer.delay === 250));
+  assert.ok([...h.timers.values()].some((timer) => timer.delay === 1500));
   const second = h.run('pushSnapshot()');
   assert.equal(h.requests[1].payload.p_call_upserts.length, 1);
   assert.equal(h.requests[1].payload.p_call_upserts[0].id, 'second');

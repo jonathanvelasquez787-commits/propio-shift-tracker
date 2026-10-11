@@ -60,6 +60,63 @@ function fixture({ owned = false, goal = 10000, shields = 0, status = 'compliant
   };
 }
 
+test('resetting one day removes its reinforcement receipts and rewards while preserving other days and preferences', () => {
+  const f = fixture();
+  try {
+    f.add();
+    const yesterday = '10/09/2026';
+    f.config.reinforcement = { enabled: true, askAfterCall: true, rewards: [{ id: 'tea', name: 'Té', window: 'break', trigger: 'calls', every: 1, accumulationTarget: 3 }] };
+    const reward = dayKey => ({ id: `reward-${dayKey}`, rewardId: 'tea', name: 'Té', window: 'break', dayKey });
+    f.current.game.reinforcement = {
+      reflections: { today: { outcome: 'good', dayKey: f.key }, yesterday: { outcome: 'good', dayKey: yesterday } },
+      recoveries: [{ callId: 'today', fromCallId: 'other', dayKey: f.key }, { callId: 'yesterday', fromCallId: 'earlier', dayKey: yesterday }],
+      pendingRewards: [reward(f.key), reward(yesterday)], claims: [reward(f.key), reward(yesterday)],
+      earnedKeys: Object.fromEntries([f.key, yesterday].flatMap(day => Array.from({ length: 7 }, (_, i) => [`calls:${day}:${i}:tea`, true]))),
+      progress: { tea: 2 }, recoveryPending: { callId: 'today', dayKey: f.key },
+    };
+    for (const prefix of ['reinforce-call', 'money-hit', 'pause-return', 'idle-support']) {
+      f.current.game.ledger[`${prefix}:${f.key}:id`] = true;
+      f.current.game.ledger[`${prefix}:${yesterday}:id`] = true;
+    }
+    const preferences = structuredClone(f.config.reinforcement);
+    f.rows.length = 0;
+    onGameDayReset(f.key);
+    const positive = f.current.game.reinforcement;
+    assert.equal(positive.pendingRewards.length, 1);
+    assert.equal(positive.pendingRewards[0].dayKey, yesterday);
+    assert.equal(positive.claims.length, 1);
+    assert.equal(positive.claims[0].dayKey, yesterday);
+    assert.deepEqual(Object.keys(positive.reflections), ['yesterday']);
+    assert.equal(positive.recoveries.length, 1);
+    assert.equal(positive.recoveryPending, null);
+    assert.equal(Object.keys(positive.earnedKeys).length, 7);
+    assert.ok(Object.keys(positive.earnedKeys).every(key => key.includes(`:${yesterday}:`)));
+    assert.equal(positive.progress.tea, 1);
+    assert.equal(f.config.reinforcement.enabled, preferences.enabled);
+    assert.equal(f.config.reinforcement.rewards[0].name, preferences.rewards[0].name);
+    for (const prefix of ['reinforce-call', 'money-hit', 'pause-return', 'idle-support']) {
+      assert.equal(f.current.game.ledger[`${prefix}:${f.key}:id`], undefined);
+      assert.ok(f.current.game.ledger[`${prefix}:${yesterday}:id`]);
+    }
+  } finally { f.dispose(); }
+});
+
+test('resetting an unrelated day preserves accumulated rewards held by the daily limit', () => {
+  const f = fixture();
+  try {
+    f.config.reinforcement = { rewards: [{ id: 'tea', name: 'Té', window: 'break', trigger: 'calls', accumulationTarget: 3, maxPerDay: 1 }] };
+    f.current.game.reinforcement.pendingRewards = [{ id: 'reward', rewardId: 'tea', name: 'Té', window: 'break', dayKey: f.key }];
+    f.current.game.reinforcement.earnedKeys = Object.fromEntries(Array.from({ length: 6 }, (_, i) => [`calls:${f.key}:${i}:tea`, true]));
+    f.current.game.reinforcement.progress.tea = 3;
+    onGameDayReset('10/08/2026');
+    assert.equal(f.current.game.reinforcement.progress.tea, 3);
+    assert.equal(f.current.game.reinforcement.pendingRewards.length, 1);
+    onGameDayReset(f.key);
+    assert.equal(f.current.game.reinforcement.progress.tea, 0);
+    assert.equal(f.current.game.reinforcement.pendingRewards.length, 0);
+  } finally { f.dispose(); }
+});
+
 test('correction below eight calls revokes improved loot and requalifying grants it exactly once', () => {
   const f = fixture({ owned: true });
   try {

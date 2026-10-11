@@ -58,9 +58,7 @@ html:root[data-palette]:not([data-palette="original"]) .action-btn[data-accent="
 html:root[data-palette]:not([data-palette="original"]) .action-btn[data-accent="bad"] { --palette-active-ink:var(--palette-on-bad); }
 html:root[data-palette]:not([data-palette="original"]) .action-btn.is-active { --icon-mono:var(--palette-active-ink); }
 html:root[data-palette]:not([data-palette="original"]) .action-btn.is-active :is(.action-label,.action-sub) { color:var(--palette-active-ink); }
-html:root[data-palette]:not([data-palette="original"]) :is(#callControlBtn,.fin-mini-btn-primary,.mc-btn-primary.cyan) { background:var(--palette-primary); color:var(--palette-on-primary); border-color:var(--palette-primary); --icon-mono:var(--palette-on-primary); }
-html:root[data-palette]:not([data-palette="original"]) #callControlBtn * { color:var(--palette-on-primary) !important; }
-html:root[data-palette]:not([data-palette="original"]) #callControlBtn .action-ripple { background:var(--palette-primary); }
+html:root[data-palette]:not([data-palette="original"]) :is(.fin-mini-btn-primary,.mc-btn-primary.cyan) { background:var(--palette-primary); color:var(--palette-on-primary); border-color:var(--palette-primary); --icon-mono:var(--palette-on-primary); }
 html:root[data-palette]:not([data-palette="original"]) :is(#pasteCallsBtn,#addCallManualBtn) { background:var(--palette-card-tint); border-color:rgba(var(--palette-primary-rgb),.23); }
 html:root[data-palette]:not([data-palette="original"]) :is(.blocks-view-btn,.earnings-mode-btn,.fin-tab-btn,.table-filter-btn,.day-tab).active { background:var(--palette-primary); color:var(--palette-on-primary); }
 html:root[data-palette]:not([data-palette="original"]) .mc-pill-btn[aria-pressed="true"] { background:var(--palette-primary); color:var(--palette-on-primary); }

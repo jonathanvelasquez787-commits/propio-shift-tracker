@@ -704,6 +704,9 @@ export function configureHigherRateContext(context) {
         return;
       }
       appConfirm(ui`¿Vaciar el historial completo (${pastWindows.length} ventana(s) de Higher Rate ya terminadas)? Las que siguen activas o futuras no se tocan. Las llamadas que ya recibieron un bono de esas ventanas conservan su bono ganado. No se puede deshacer.`, () => {
+        const previousWindows = settings.higherRateWindows;
+        const previousCategories = settings.financeCategories === undefined ? undefined : JSON.parse(JSON.stringify(settings.financeCategories));
+        const previousBonuses = calls.map(call => [call, call.frozenHigherRateBonus]);
         // Sin esto, purgar borraba las ventanas pasadas de golpe y el bono que ya habían generado
         // desaparecía retroactivamente de las ganancias de esos días/ciclo.
         const pastIds = pastWindows.map(w => w.id);
@@ -712,10 +715,19 @@ export function configureHigherRateContext(context) {
         const remaining = current.filter(w => !isPast(w));
         settings.higherRateWindows = remaining;
         financeRunAutoFillCascade();
-        reconcileHigherRateGameChanges(gameBefore);
         // SaveAll en vez de saveSettingsOnly: también hay que persistir `calls` (varias pueden
         // haber quedado con frozenHigherRateBonus).
-        saveAll();
+        if (saveAll() === false) {
+          settings.higherRateWindows = previousWindows;
+          if (previousCategories === undefined) delete settings.financeCategories;
+          else settings.financeCategories = previousCategories;
+          previousBonuses.forEach(([call, bonus]) => {
+            if (bonus === undefined) delete call.frozenHigherRateBonus;
+            else call.frozenHigherRateBonus = bonus;
+          });
+          return false;
+        }
+        reconcileHigherRateGameChanges(gameBefore);
         renderHigherRateWindowsEditor(remaining);
         toast(ui`${pastWindows.length} ventana(s) borrada(s) del historial — el bono ya ganado por esas llamadas se conserva.`);
       });

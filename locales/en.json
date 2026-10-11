@@ -2236,5 +2236,8 @@
   "s_eb8b17fb": "The backup contains invalid calls. Your current data was not changed.",
   "s_1f1b2bef": "Could not save — reload this tab",
   "s_58e15b14": "Could not save — reduce the size of your settings",
-  "s_e2cab854": "Could not save — storage is full"
+  "s_e2cab854": "Could not save — storage is full",
+  "s_4d39cf22": "Reset {{v0}}? Calls, pauses, gaps, the note, log and gamification for that day will be deleted.",
+  "s_a367b689": "Today is marked as a day off. Mark it as Worked in Weekly summary → Edit day to start the shift or a call.",
+  "s_aeca0c44": "Deletes calls, pauses, gaps, the note, log and gamification ONLY for the active day ("
 }

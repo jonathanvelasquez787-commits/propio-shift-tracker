@@ -807,7 +807,7 @@ test('runtime smoke: helpers de renderGame existen para Logros y Higher Rate', (
 });
 
 
-test('cuarta simulación mensual: llamadas live antes y después del turno nunca quedan bloqueadas', () => {
+test('cuarta simulación mensual: llamadas live antes y después del turno permiten días laborales y bloquean nuevos inicios en días libres', () => {
   const appMain = read('js/app-main.js');
   const startCall = appMain.slice(appMain.indexOf('function startCall('), appMain.indexOf('function endCall(', appMain.indexOf('function startCall(')));
   const disabled = appMain.slice(appMain.indexOf('function callActionDisabled()'), appMain.indexOf('function callActionTimer()', appMain.indexOf('function callActionDisabled()')));
@@ -815,6 +815,7 @@ test('cuarta simulación mensual: llamadas live antes y después del turno nunca
   assert.match(startCall, /const needsAutoShift = !state\.shiftStartedAt \|\| !!state\.shiftEndedAt/);
   assert.match(startCall, /Shift iniciado automáticamente por llamada/);
   assert.doesNotMatch(disabled, /state\.shiftEndedAt/);
+  assert.match(disabled, /!state\.activeCall && liveCallDayIsOff\(\)/);
 });
 
 test('cuarta simulación mensual: descartar la primera live revierte el turno que esa llamada abrió', () => {

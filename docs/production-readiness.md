@@ -63,6 +63,12 @@ de recargar. No se ejecutó el borrado de la cuenta del propietario.
 
 ## Evidencia previa que sigue vigente
 
+La siguiente auditoría de controles pasó 500 pruebas y añadió recorridos
+con cuenta ficticia y recuperación JSON; ver
+[button-audit-2026-10-11.md](button-audit-2026-10-11.md) para correcciones,
+inventario, evidencia y límites. Las cifras 455/460 anteriores corresponden
+a sus cierres históricos.
+
 La [auditoría del 11 de octubre](auditoria-super-profunda-2026-10-11.md) documenta
 los ocho grupos de fallos corregidos, 31 días cronológicos, 161 reconciliaciones,
 31 exportaciones/snapshots y 17.000 casos independientes. Esas pruebas vuelven

@@ -166,7 +166,7 @@ function earnReward(reward, dayKey, triggerKey) {
   return earned;
 }
 
-function evaluateCallRewards(call, dayKey, { silent = false } = {}) {
+function evaluateCallRewards(call, dayKey) {
   const reinforcement = state.game.reinforcement;
   const dayCalls = callsForDay(dayKey).filter((item) => String(item?.dropped).toLowerCase() !== 'yes'
     && item?.endISO && new Date(item.endISO).getTime() <= Date.now());
@@ -217,25 +217,30 @@ function evaluateCallRewards(call, dayKey, { silent = false } = {}) {
     });
   }
 
-  if (!silent && earned.length) {
+  return { earned, recovered };
+}
+
+function announceCallRewards(call, dayKey, { earned, recovered }) {
+  if (earned.length) {
     const first = earned[0];
     notifyReinforcement(reinforcementText('reward-earned', {
       icon: first.icon, window: WINDOW_LABELS[first.window], name: first.name,
       extra: earned.length > 1 ? ui` · +${earned.length - 1} más` : '',
     }, call.id), { channel: 'personal', sound: 'reward', dayKey });
-  } else if (!silent && recovered) {
+  } else if (recovered) {
     notifyReinforcement(reinforcementText('recovery', {}, call.id), { channel: 'personal', sound: 'pause', dayKey });
   }
-  return earned;
 }
 
 let reflectionCall = null;
+let reflectionQueue = [];
 let editingRewardId = null;
 let editingTemplateId = null;
 let deferredWindow = null;
 
 export function clearPositiveReinforcementTransients() {
   reflectionCall = null;
+  reflectionQueue = [];
   editingRewardId = null;
   editingTemplateId = null;
   deferredWindow = null;
@@ -248,6 +253,18 @@ function renderReflectionModal(call, dayKey) {
   const title = document.getElementById('positiveReflectionCall');
   if (title) title.textContent = ui`Llamada #${call.customerId || 'completada'}`;
   openModal('positiveReflectionModal');
+}
+
+function drainReflectionQueue() {
+  if (reflectionCall || !reinforcementEnabled() || document.querySelector?.('.modal-overlay.open')) return;
+  if (!settings.reinforcement.askAfterCall) { reflectionQueue = []; return; }
+  while (reflectionQueue.length) {
+    const next = reflectionQueue.shift();
+    const call = callsForDay(next.dayKey).find(item => String(item.id) === String(next.call.id));
+    if (!call || state.game.reinforcement.reflections[call.id] || String(call.dropped).toLowerCase() === 'yes') continue;
+    renderReflectionModal(call, next.dayKey);
+    break;
+  }
 }
 
 function currentPositiveDayKey() {
@@ -263,11 +280,18 @@ export function onPositiveCallSaved(call, source, dayKey) {
   const endTime = new Date(call.endISO).getTime();
   if (normalizedDay !== currentPositiveDayKey() || !Number.isFinite(endTime) || endTime > Date.now()) return;
   const silent = source === 'import';
-  evaluateCallRewards(call, normalizedDay, { silent });
-  saveStateOnly();
+  const previous = structuredClone(state.game.reinforcement);
+  const feedback = evaluateCallRewards(call, normalizedDay);
+  if (saveStateOnly() === false) {
+    state.game.reinforcement = previous;
+    return false;
+  }
+  if (!silent) announceCallRewards(call, normalizedDay, feedback);
   renderPositiveReinforcement();
-  if (!silent && reinforcementFeedbackEnabled('personal') && settings.reinforcement.askAfterCall && !state.game.reinforcement.reflections[call.id]) {
-    renderReflectionModal(call, normalizedDay);
+  if (reinforcementFeedbackEnabled('personal') && settings.reinforcement.askAfterCall && !state.game.reinforcement.reflections[call.id]
+      && reflectionCall?.callId !== String(call.id) && !reflectionQueue.some(item => String(item.call.id) === String(call.id))) {
+    reflectionQueue.push({ call, dayKey: normalizedDay });
+    drainReflectionQueue();
   }
 }
 
@@ -282,6 +306,7 @@ export function reopenPositiveReflection(call, dayKey) {
 
 function saveReflection(outcome) {
   if (!reinforcementEnabled() || !reflectionCall || !OUTCOMES.has(outcome)) return;
+  const previous = structuredClone(state.game.reinforcement);
   const note = cleanText(document.getElementById('positiveReflectionNote')?.value, 240);
   state.game.reinforcement.reflections[reflectionCall.callId] = {
     callId: reflectionCall.callId, outcome, note, dayKey: reflectionCall.dayKey, savedAt: new Date().toISOString(),
@@ -290,8 +315,11 @@ function saveReflection(outcome) {
     state.game.reinforcement.recoveryPending = { callId: reflectionCall.callId, dayKey: reflectionCall.dayKey, endISO: reflectionCall.endISO };
   }
   const message = reinforcementText(`reflection-${outcome}`, {}, reflectionCall.callId);
+  if (saveStateOnly() === false) {
+    state.game.reinforcement = previous;
+    return false;
+  }
   reflectionCall = null;
-  saveStateOnly();
   closeModal('positiveReflectionModal');
   renderPositiveReinforcement();
   notifyReinforcement(message, { channel: 'personal' });
@@ -359,10 +387,14 @@ function claimReward(id) {
     toast(translateText('La ventana terminó; el premio sigue guardado para después.'));
     return;
   }
+  const previous = structuredClone(state.game.reinforcement);
   state.game.reinforcement.pendingRewards.splice(index, 1);
   state.game.reinforcement.claims.push({ ...item, claimedAt: new Date().toISOString() });
   state.game.reinforcement.claims = state.game.reinforcement.claims.slice(-400);
-  saveStateOnly();
+  if (saveStateOnly() === false) {
+    state.game.reinforcement = previous;
+    return false;
+  }
   renderPositiveReinforcement();
   const remaining = availableForWindow(item.window);
   if (remaining.length) renderClaimWindow(item.window);
@@ -382,8 +414,12 @@ function swapReward(id) {
   const select = Array.from(document.querySelectorAll('[data-reward-swap]')).find((node) => node.dataset.rewardSwap === id);
   const replacement = settings.reinforcement.rewards.find((reward) => reward.id === select?.value && reward.enabled && reward.window === item.window);
   if (!replacement) return;
+  const previous = { ...item };
   Object.assign(item, { rewardId: replacement.id, name: replacement.name, icon: replacement.icon, costUsd: replacement.costUsd, durationMin: replacement.durationMin });
-  saveStateOnly();
+  if (saveStateOnly() === false) {
+    Object.assign(item, previous);
+    return false;
+  }
   renderClaimWindow(item.window);
 }
 
@@ -440,6 +476,7 @@ function saveRewardEditor() {
     toast(translateText('Escribe un nombre para el premio.'));
     return;
   }
+  const previous = structuredClone(settings.reinforcement.rewards);
   const index = settings.reinforcement.rewards.findIndex((item) => item.id === editingRewardId);
   if (index >= 0) settings.reinforcement.rewards[index] = reward;
   else {
@@ -449,7 +486,10 @@ function saveRewardEditor() {
     }
     settings.reinforcement.rewards.push(reward);
   }
-  saveSettingsOnly();
+  if (saveSettingsOnly() === false) {
+    settings.reinforcement.rewards = previous;
+    return false;
+  }
   closeModal('physicalRewardEditorModal');
   renderPositiveReinforcement();
   toast(translateText('Premio guardado'));
@@ -457,8 +497,12 @@ function saveRewardEditor() {
 
 function deleteRewardEditor() {
   if (settings.game?.enabled !== true || !editingRewardId) return;
+  const previous = settings.reinforcement.rewards;
   settings.reinforcement.rewards = settings.reinforcement.rewards.filter((item) => item.id !== editingRewardId);
-  saveSettingsOnly();
+  if (saveSettingsOnly() === false) {
+    settings.reinforcement.rewards = previous;
+    return false;
+  }
   closeModal('physicalRewardEditorModal');
   renderPositiveReinforcement();
 }
@@ -642,16 +686,26 @@ export function initPositiveReinforcement() {
   document.getElementById('physicalRewardTriggerInput')?.addEventListener('change', syncRewardEditorConditional);
   document.getElementById('physicalRewardCostInput')?.addEventListener('input', syncRewardEditorConditional);
   document.getElementById('positiveReinforcementEnabledInput')?.addEventListener('change', (event) => {
+    const previous = settings.reinforcement.enabled;
     settings.reinforcement.enabled = !!event.target.checked;
-    saveSettingsOnly();
+    if (saveSettingsOnly() === false) {
+      settings.reinforcement.enabled = previous;
+      event.target.checked = previous;
+      return;
+    }
     renderPositiveReinforcement();
   });
   document.getElementById('positiveAskAfterCallInput')?.addEventListener('change', (event) => {
+    const previous = settings.reinforcement.askAfterCall;
     settings.reinforcement.askAfterCall = !!event.target.checked;
-    saveSettingsOnly();
+    if (saveSettingsOnly() === false) {
+      settings.reinforcement.askAfterCall = previous;
+      event.target.checked = previous;
+    }
   });
   document.addEventListener('app:modal-closed', (event) => {
     if (event.detail?.id === 'positiveReflectionModal') reflectionCall = null;
+    setTimeout(drainReflectionQueue, 0);
     if (event.detail?.id === 'stageClearModal' && deferredWindow) {
       const { windowName, manual } = deferredWindow;
       deferredWindow = null;
@@ -659,4 +713,26 @@ export function initPositiveReinforcement() {
     }
   });
   renderPositiveReinforcement();
+}
+
+export function resetPositiveDay(dayKey) {
+  reconcilePositiveCalls(dayKey);
+  const reinforcement = ensurePositiveState();
+  const removedRewards = [...reinforcement.pendingRewards, ...reinforcement.claims].filter(item => item.dayKey === dayKey);
+  const removedKeys = Object.keys(reinforcement.earnedKeys).filter(key => key.includes(`:${dayKey}:`));
+  reinforcement.pendingRewards = reinforcement.pendingRewards.filter(item => item.dayKey !== dayKey);
+  reinforcement.claims = reinforcement.claims.filter(item => item.dayKey !== dayKey);
+  for (const key of Object.keys(reinforcement.earnedKeys)) {
+    if (key.includes(`:${dayKey}:`)) delete reinforcement.earnedKeys[key];
+  }
+  for (const reward of settings.reinforcement.rewards) {
+    const earned = removedKeys.filter(key => key.endsWith(`:${reward.id}`)).length;
+    const completed = removedRewards.filter(item => (item.sourceRewardId || item.rewardId) === reward.id).length;
+    reinforcement.progress[reward.id] = Math.max(0, (reinforcement.progress[reward.id] || 0) - earned + completed * reward.accumulationTarget);
+  }
+  reflectionQueue = reflectionQueue.filter(item => item.dayKey !== dayKey);
+  if (reflectionCall?.dayKey === dayKey) {
+    reflectionCall = null;
+    closeModal('positiveReflectionModal');
+  }
 }

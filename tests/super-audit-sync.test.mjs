@@ -11,7 +11,7 @@ const source = fs.readFileSync(new URL('../js/sync.js', import.meta.url), 'utf8'
 
 function harness({ values = new Map(), online = true, cloud = null } = {}) {
   const requests = [], handlers = {}, timers = new Map(), events = [];
-  let nextTimer = 0, reads = 0, rpcHook = null, readHook = null;
+  let nextTimer = 0, reads = 0, rpcHook = null, readHook = null, clockMs = 0;
   class Storage {
     getItem(key) { return values.get(key) ?? null; }
     setItem(key, value) { values.set(key, String(value)); }
@@ -44,17 +44,155 @@ function harness({ values = new Map(), online = true, cloud = null } = {}) {
     Storage, window: { localStorage: storage, addEventListener: (name, fn) => { handlers[name] = fn; } },
     document: { addEventListener: (name, fn) => { handlers[name] = fn; } },
     navigator: { onLine: online, userAgent: 'Audit' }, getSupabase: () => backend,
-    setTimeout: (fn, delay) => { timers.set(++nextTimer, { fn, delay }); return nextTimer; }, clearTimeout: id => timers.delete(id),
+    setTimeout: (fn, delay) => { timers.set(++nextTimer, { fn, delay, at: clockMs + delay }); return nextTimer; }, clearTimeout: id => timers.delete(id),
     auditEvents: events, fetch: (...args) => { requests.push({ exit: args }); return Promise.resolve(); },
   });
   vm.runInContext(source, context);
   vm.runInContext('onSync(type => auditEvents.push(type))', context);
   return { run: code => vm.runInContext(code, context), context, values, requests, timers, events,
     cloud: () => cloud, reads: () => reads, online: value => { online = value; context.navigator.onLine = value; },
-    hook: fn => { rpcHook = fn; }, readHook: fn => { readHook = fn; }, handlers };
+    hook: fn => { rpcHook = fn; }, readHook: fn => { readHook = fn; }, handlers,
+    async advance(milliseconds) {
+      const target = clockMs + milliseconds;
+      while (true) {
+        const next = [...timers].filter(([, timer]) => timer.at <= target).sort((a,b) => a[1].at - b[1].at || a[0] - b[0])[0];
+        if (!next) break;
+        clockMs = next[1].at;
+        timers.delete(next[0]);
+        next[1].fn();
+        await new Promise(resolve => setImmediate(resolve));
+      }
+      clockMs = target;
+    },
+  };
 }
 
 const initialCloud = () => ({ state: { saved: true }, settings: {}, calls: [{ id: 'keep' }, { id: 'delete' }], updated_at: 'revision-1' });
+
+test('autosync groups rapid state, call and settings edits into one latest snapshot after 250 ms of quiet',async()=>{
+  const h=harness({cloud:initialCloud()});
+  h.run(`adoptCloud(${JSON.stringify(initialCloud())},'account-a'); startAutoSync();`);
+  h.run("window.localStorage.setItem(APP_KEYS.state,JSON.stringify({edited:true}));");
+  await h.advance(100);
+  h.run("window.localStorage.setItem(APP_KEYS.calls,JSON.stringify([{id:'keep'},{id:'added'}]));");
+  await h.advance(100);
+  h.run("window.localStorage.setItem(APP_KEYS.settings,JSON.stringify({theme:'light'}));");
+  await h.advance(249);assert.equal(h.requests.length,0);
+  await h.advance(1);assert.equal(h.requests.length,1);
+  const payload=h.requests[0].payload;
+  assert.equal(payload.p_state.edited,true);assert.equal(payload.p_settings.theme,'light');
+  assert.deepEqual([...payload.p_call_upserts].map(call=>call.id),['added']);
+  assert.deepEqual([...payload.p_call_deletes],['delete']);
+  assert.equal(h.run('readMeta().dirty'),false);
+  await h.advance(2500);assert.equal(h.requests.length,1);assert.equal(h.timers.size,0);
+});
+
+test('autosync bounds continuous editing at 1500 ms and cancels the paired debounce to avoid duplicate snapshots',async()=>{
+  const h=harness({cloud:initialCloud()});
+  h.run(`adoptCloud(${JSON.stringify(initialCloud())},'account-a'); startAutoSync();`);
+  const edit=value=>h.run(`window.localStorage.setItem(APP_KEYS.state,JSON.stringify({value:${value}}));`);
+  edit(0);
+  for(let value=1;value<=14;value++){await h.advance(100);edit(value);}
+  await h.advance(99);assert.equal(h.requests.length,0);
+  await h.advance(1);assert.equal(h.requests.length,1);assert.equal(h.requests[0].payload.p_state.value,14);
+  assert.equal(h.timers.size,0);
+  edit(15);
+  for(let value=16;value<=24;value++){await h.advance(100);edit(value);}
+  await h.advance(249);assert.equal(h.requests.length,1);
+  await h.advance(1);assert.equal(h.requests.length,2);assert.equal(h.requests[1].payload.p_state.value,24);
+  assert.equal(h.run('readMeta().dirty'),false);
+  await h.advance(3000);assert.equal(h.requests.length,2);assert.equal(h.timers.size,0);
+});
+
+test('visibility upload cancels pending autosync timers without repeating its clean snapshot',async()=>{
+  const h=harness({cloud:initialCloud()});
+  h.run(`adoptCloud(${JSON.stringify(initialCloud())},'account-a'); startAutoSync(); window.localStorage.setItem(APP_KEYS.state,JSON.stringify({value:1}));`);
+  h.context.document.visibilityState='hidden';h.handlers.visibilitychange();
+  await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(h.requests.length,1);assert.equal(h.requests[0].payload.p_state.value,1);
+  assert.equal(h.run('readMeta().dirty'),false);assert.equal(h.timers.size,0);
+  await h.advance(2500);assert.equal(h.requests.length,1);
+  assert.equal((await h.run('pushSnapshot()')).ok,true);
+  assert.equal(h.requests.length,2);
+});
+
+test('edits made during an in-flight visibility upload still receive a later autosync snapshot',async()=>{
+  const h=harness({cloud:initialCloud()});
+  h.run(`adoptCloud(${JSON.stringify(initialCloud())},'account-a'); startAutoSync(); window.localStorage.setItem(APP_KEYS.state,JSON.stringify({value:1}));`);
+  let release;const blocked=new Promise(resolve=>{release=resolve;});
+  h.hook(()=>blocked);h.context.document.visibilityState='hidden';h.handlers.visibilitychange();
+  await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(h.requests.length,1);assert.equal(h.requests[0].payload.p_state.value,1);
+  h.run("window.localStorage.setItem(APP_KEYS.state,JSON.stringify({value:2}));");
+  await h.advance(250);assert.equal(h.requests.length,1);assert.equal(h.run('readMeta().dirty'),true);
+  release();await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(h.run('readMeta().dirty'),true);
+  await h.advance(249);assert.equal(h.requests.length,1);
+  await h.advance(1);assert.equal(h.requests.length,2);assert.equal(h.requests[1].payload.p_state.value,2);
+  assert.equal(h.run('readMeta().dirty'),false);
+  await h.advance(2000);assert.equal(h.requests.length,2);assert.equal(h.timers.size,0);
+});
+
+test('failed visibility upload retries without another edit and cancels retries after success', async () => {
+  const h=harness({cloud:initialCloud()});
+  h.run(`adoptCloud(${JSON.stringify(initialCloud())},'account-a'); startAutoSync(); window.localStorage.setItem(APP_KEYS.state,'{"value":1}');`);
+  let fail=true;h.hook(()=>{if(fail)throw new TypeError('transient server error');});
+  h.context.document.visibilityState='hidden';h.handlers.visibilitychange();
+  await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(h.requests.length,1);assert.equal(h.run('readMeta().dirty'),true);
+  fail=false;await h.advance(4999);assert.equal(h.requests.length,1);
+  await h.advance(1);assert.equal(h.requests.length,2);assert.equal(h.run('readMeta().dirty'),false);
+  await h.advance(60000);assert.equal(h.requests.length,2);assert.equal(h.timers.size,0);
+});
+
+test('failed call-baseline fetch retries before calculating deletions', async () => {
+  const h=harness({cloud:initialCloud()});
+  h.run(`adoptCloud(${JSON.stringify(initialCloud())},'account-a'); startAutoSync(); cloudCallOwner=null; window.localStorage.setItem(APP_KEYS.calls,'[{"id":"keep"}]');`);
+  let fail=true;h.readHook(()=>{if(fail)throw new TypeError('transient read error');});
+  await h.advance(250);assert.equal(h.requests.length,0);assert.equal(h.run('readMeta().dirty'),true);
+  fail=false;await h.advance(5000);assert.equal(h.requests.length,1);
+  assert.deepEqual([...h.requests[0].payload.p_call_deletes],['delete']);
+  assert.equal(h.run('readMeta().dirty'),false);
+});
+
+test('repeated upload failures back off to a maximum frequency of one retry per thirty seconds', async () => {
+  const h=harness({cloud:initialCloud()});
+  h.run(`adoptCloud(${JSON.stringify(initialCloud())},'account-a'); startAutoSync(); window.localStorage.setItem(APP_KEYS.state,'{"value":1}');`);
+  h.hook(()=>{throw new TypeError('server unavailable');});
+  await h.advance(250);assert.equal(h.requests.length,1);
+  for(const [delay,count] of [[5000,2],[10000,3],[20000,4],[30000,5],[30000,6]]) {
+    await h.advance(delay-1);assert.equal(h.requests.length,count-1);
+    await h.advance(1);assert.equal(h.requests.length,count);
+    assert.equal(h.timers.size,1);
+  }
+});
+
+test('signing out cancels a pending retry and never uploads the departed account', async () => {
+  const h=harness({cloud:initialCloud()});
+  h.run(`setAccessToken('token-a','account-a'); adoptCloud(${JSON.stringify(initialCloud())},'account-a'); startAutoSync(); window.localStorage.setItem(APP_KEYS.state,'{"value":1}');`);
+  h.hook(()=>{throw new TypeError('server unavailable');});
+  await h.advance(250);assert.equal(h.requests.length,1);
+  h.run("setAccessToken(null,null)");await h.advance(60000);
+  assert.equal(h.requests.length,1);assert.equal(h.timers.size,0);
+});
+
+test('a cloud conflict ends automatic retries without forcing an overwrite', async () => {
+  const h=harness({cloud:initialCloud()});
+  h.run(`adoptCloud(${JSON.stringify(initialCloud())},'account-a'); startAutoSync(); window.localStorage.setItem(APP_KEYS.state,'{"value":1}');`);
+  let fail=true;h.hook(()=>{if(fail)throw new TypeError('server unavailable');});
+  await h.advance(250);fail=false;h.cloud().updated_at='newer-remote-revision';
+  await h.advance(5000);assert.equal(h.requests.length,2);assert.ok(h.events.includes('conflict'));
+  assert.equal(h.requests[1].payload.p_expected_updated_at,'revision-1');
+  await h.advance(60000);assert.equal(h.requests.length,2);assert.equal(h.timers.size,0);
+});
+
+test('local persistence failures do not create an automatic retry loop', async () => {
+  const h=harness({cloud:initialCloud()});
+  h.run(`adoptCloud(${JSON.stringify(initialCloud())},'account-a'); startAutoSync(); window.localStorage.setItem(APP_KEYS.state,'{"value":1}'); reportLocalPersistenceFailure('quota');`);
+  h.hook(()=>{throw new TypeError('server unavailable');});
+  await h.advance(250);await h.advance(60000);
+  assert.equal(h.requests.length,1);assert.equal(h.timers.size,0);
+});
 
 test('a saved full reset removes prior cloud calls and a fresh session cannot bring them back', async () => {
   const h=harness({cloud:initialCloud()});

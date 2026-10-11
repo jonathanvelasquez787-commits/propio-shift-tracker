@@ -109,7 +109,7 @@ test('mejor llamada compara el bono real de las anteriores y excluye el mismo ev
   assert.match(corrected, /mejor|mayor pago/);
 });
 
-test('Logros apagado bloquea premios y reflexión, y cierra modales sin borrar el progreso al desactivar', () => {
+test('Logros controls gate feedback and queue current pasted reflections after the import dialog closes', async () => {
   setLanguage('es');
   const dayKey = '09/29/2026';
   const call = { id: 'personal-call', callDate: dayKey, startISO: new Date(Date.now() - 120000).toISOString(), endISO: new Date(Date.now() - 60000).toISOString() };
@@ -129,14 +129,16 @@ test('Logros apagado bloquea premios y reflexión, y cierra modales sin borrar e
     modal.classList = { contains: name => name === 'open' && modal.open };
     nodes.set(id, modal);
   }
-  globalThis.document = { getElementById: (id) => nodes.get(id) || null, addEventListener: (type, callback) => listeners.set(type, callback) };
+  globalThis.document = { getElementById: (id) => nodes.get(id) || null, addEventListener: (type, callback) => listeners.set(type, callback),
+    querySelector: () => [...nodes.values()].find(node => node.open) || null };
   configureReinforcementFeedback({ queueToast: (...args) => messages.push(args) });
-  configurePositiveReinforcementContext({
+  const positiveContext = {
     callDateKeyFromValue: (value) => value === dayKey ? value : '', callsForDay: () => rows,
     closeModal: (id) => { closed.push(id); nodes.get(id).open = false; }, convertedAmountText: () => '', effectiveDailyGoal: () => ({ usd: 0 }),
     escapeHtml: String, importedCallStats: () => ({ earnings: 0 }), openModal: (id) => { opened.push(id); nodes.get(id).open = true; },
     saveSettingsOnly: () => {}, saveStateOnly: () => {}, toast: () => {}, todayCallDateKey: () => dayKey,
-  });
+  };
+  configurePositiveReinforcementContext(positiveContext);
   onPositiveCallSaved(call, 'manual', dayKey);
   assert.equal(currentState.game.reinforcement.pendingRewards.length, 0);
   assert.deepEqual(currentState.game.reinforcement.reflections, {});
@@ -162,7 +164,51 @@ test('Logros apagado bloquea premios y reflexión, y cierra modales sin borrar e
   assert.equal(messages.at(-1)[2].channel, 'personal');
   assert.match(messages.at(-1)[0], /positivo|salió bien|cerró bien/);
   assert.equal(currentState.game.reinforcement.reflections[call.id].outcome, 'good');
+  const imported = { ...call, id: 'pasted-1' };
+  const imported2 = { ...call, id: 'pasted-2' };
+  nodes.get('physicalRewardClaimModal').open = false;
+  rows.push(imported, imported2);
+  nodes.set('callsModal', { open: true });
+  const beforePaste = opened.length;
+  onPositiveCallSaved(imported, 'import', dayKey);
+  onPositiveCallSaved(imported, 'import', dayKey);
+  onPositiveCallSaved(imported2, 'import', dayKey);
+  assert.equal(opened.length, beforePaste, 'import waits instead of opening beneath the paste dialog');
+  nodes.get('callsModal').open = false;
+  listeners.get('app:modal-closed')({ detail: { id: 'callsModal' } });
+  await new Promise(resolve => setTimeout(resolve, 5));
+  assert.equal(opened.length, beforePaste + 1);
+  listeners.get('click')({ target: button });
+  listeners.get('app:modal-closed')({ detail: { id: 'positiveReflectionModal' } });
+  await new Promise(resolve => setTimeout(resolve, 5));
+  assert.equal(currentState.game.reinforcement.reflections[imported.id].outcome, 'good');
+  assert.equal(opened.length, beforePaste + 2, 'second imported call prompts after first closure');
+  listeners.get('click')({ target: button });
+  listeners.get('app:modal-closed')({ detail: { id: 'positiveReflectionModal' } });
+  await new Promise(resolve => setTimeout(resolve, 5));
+  assert.equal(opened.length, beforePaste + 2, 'duplicate import cannot add another reflection');
+  const disabledQueued = { ...call, id: 'disabled-queued' };
+  rows.push(disabledQueued);
+  nodes.get('callsModal').open = true;
+  onPositiveCallSaved(disabledQueued, 'import', dayKey);
+  config.reinforcement.askAfterCall = false;
+  nodes.get('callsModal').open = false;
+  listeners.get('app:modal-closed')({ detail: { id: 'callsModal' } });
+  await new Promise(resolve => setTimeout(resolve, 5));
+  assert.equal(opened.length, beforePaste + 2, 'turning off brief closure cancels queued prompts');
+  config.reinforcement.askAfterCall = true;
+  const beforeFailure = structuredClone(currentState.game.reinforcement);
+  const failed = { ...call, id: 'failed-save' };
+  rows.push(failed);
+  configurePositiveReinforcementContext({ ...positiveContext, saveStateOnly: () => false });
+  const messagesBeforeFailure = messages.length;
+  onPositiveCallSaved(failed, 'manual', dayKey);
+  assert.deepEqual(currentState.game.reinforcement, beforeFailure);
+  assert.equal(messages.length, messagesBeforeFailure, 'rejected write cannot announce a reward');
+  assert.equal(opened.length, beforePaste + 2);
+  configurePositiveReinforcementContext(positiveContext);
   assert.equal(reopenPositiveReflection(call, dayKey), true);
+  nodes.get('physicalRewardClaimModal').open = true;
   nodes.get('physicalRewardEditorModal').open = true;
   const saved = structuredClone(currentState.game.reinforcement);
   const messagesBeforeDisable = messages.length;

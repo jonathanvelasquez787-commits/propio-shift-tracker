@@ -22,12 +22,14 @@ export const APP_KEYS = {
 };
 const META_KEY = 'propio_sync_meta_v1';
 const RECOVERY_KEY = 'propio_recovery_copies_v1';
-const DEBOUNCE_MS = 6000;
-const MAX_WAIT_MS = 45000; // aunque siga escribiendo sin parar, sube igual cada 45 s
+const DEBOUNCE_MS = 250;
+const MAX_WAIT_MS = 1500; // Bound continuous editing without uploading each keystroke.
 
 let hydrating = false;
 let pushTimer = null;
 let maxWaitTimer = null;
+let retryTimer = null;
+let retryAttempts = 0;
 let pushing = false;
 let listeners = [];
 let localPersistenceFailure = null;
@@ -486,6 +488,11 @@ export async function pushSnapshot({ force = false } = {}) {
   if (pushing) return { skipped: true };
   const meta = readMeta();
   if (!canSync(meta.userId)) return { skipped: true };
+  if (pushTimer) clearTimeout(pushTimer);
+  if (maxWaitTimer) clearTimeout(maxWaitTimer);
+  if (retryTimer) clearTimeout(retryTimer);
+  retryTimer = null;
+  pushTimer = maxWaitTimer = null;
   const epoch = syncEpoch;
   pushing = true;
   try {
@@ -552,11 +559,23 @@ export async function pushSnapshot({ force = false } = {}) {
     cloudCallOwner = meta.userId;
     cloudCallRevision = data ? data.updated_at : null;
     emit('pushed', { updatedAt: data ? data.updated_at : null });
+    retryAttempts = 0;
     if (pending) markDirty();
     return { ok: true, pending, updatedAt: data ? data.updated_at : null };
   } catch (err) {
     if (syncEpoch !== epoch || readMeta().userId !== meta.userId || !canSync(meta.userId)) return { skipped: true };
     emit('error', { error: err });
+    // Retry transient failures without requiring another edit. Keep retries
+    // bounded in frequency and never carry them into another account/context.
+    if (readMeta().dirty && !getLocalPersistenceFailure() &&
+        !['SETTINGS_TOO_LARGE', 'STATE_TOO_LARGE'].includes(err?.message)) {
+      const delay = Math.min(30000, 5000 * 2 ** Math.min(retryAttempts++, 3));
+      retryTimer = setTimeout(() => {
+        retryTimer = null;
+        if (syncEpoch === epoch && readMeta().userId === meta.userId &&
+            canSync(meta.userId) && readMeta().dirty) pushSnapshot();
+      }, delay);
+    }
     return { error: err };
   } finally {
     pushing = false;
@@ -611,6 +630,9 @@ export function setAccessToken(token, userId) {
     if (!canSync(readMeta().userId)) {
       if (pushTimer) clearTimeout(pushTimer);
       if (maxWaitTimer) clearTimeout(maxWaitTimer);
+      if (retryTimer) clearTimeout(retryTimer);
+      retryTimer = null;
+      retryAttempts = 0;
       pushTimer = maxWaitTimer = null;
     }
   }
