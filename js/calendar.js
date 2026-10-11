@@ -228,12 +228,18 @@ function effectiveCalYearGoal(offset = calYearOffset) {
 }
 
 function setCalYearGoalOverride(offset, amount) {
-  if (!settings.yearGoalOverrides) settings.yearGoalOverrides = {};
+  const previous = settings.yearGoalOverrides;
+  settings.yearGoalOverrides = { ...previous };
   const key = calYearGoalKey(offset);
   const num = Number(amount);
   if (Number.isFinite(num) && num > 0) settings.yearGoalOverrides[key] = num;
   else delete settings.yearGoalOverrides[key];
-  saveSettingsOnly();
+  if (saveSettingsOnly() === false) {
+    if (previous === undefined) delete settings.yearGoalOverrides;
+    else settings.yearGoalOverrides = previous;
+    return false;
+  }
+  return true;
 }
 
 // Modal propio en vez de window.prompt, que algunos webviews/PWA ignoran en silencio (mismo motivo
@@ -251,14 +257,14 @@ export function saveCalYearGoalModal() {
     toast(translateText('Valor inválido — la meta anual no se modificó'));
     return;
   }
-  setCalYearGoalOverride(calYearOffset, amount);
+  if (setCalYearGoalOverride(calYearOffset, amount) === false) return false;
   closeModal('calYearGoalModal');
   renderCalYear();
   toast(ui`Meta anual: ${money(amount)}${convertedAmountText(amount) ? ` (${convertedAmountText(amount)})` : ''}`);
 }
 
 export function useAutoCalYearGoalModal() {
-  setCalYearGoalOverride(calYearOffset, null);
+  if (setCalYearGoalOverride(calYearOffset, null) === false) return false;
   closeModal('calYearGoalModal');
   renderCalYear();
   toast(translateText('Meta anual vuelve a calcularse automáticamente'));
@@ -271,12 +277,22 @@ export function openHistoryStartDateEditor() {
   openModal('calHistoryStartModal');
 }
 
+function setCalHistoryStartOverride(value) {
+  const previous = settings.historyStartDateOverride;
+  settings.historyStartDateOverride = value;
+  if (saveSettingsOnly() === false) {
+    if (previous === undefined) delete settings.historyStartDateOverride;
+    else settings.historyStartDateOverride = previous;
+    return false;
+  }
+  return true;
+}
+
 export function saveCalHistoryStartModal() {
   const input = document.getElementById('calHistoryStartDateInput');
   const trimmed = String(input?.value || '').trim();
   if (!trimmed) {
-    settings.historyStartDateOverride = '';
-    saveSettingsOnly();
+    if (setCalHistoryStartOverride('') === false) return false;
     closeModal('calHistoryStartModal');
     renderCalYear();
     toast(translateText('Historial vuelve a calcularse desde tu llamada más antigua'));
@@ -286,16 +302,14 @@ export function saveCalHistoryStartModal() {
     toast(translateText('Fecha inválida'));
     return;
   }
-  settings.historyStartDateOverride = trimmed;
-  saveSettingsOnly();
+  if (setCalHistoryStartOverride(trimmed) === false) return false;
   closeModal('calHistoryStartModal');
   renderCalYear();
   toast(ui`Historial desde: ${trimmed}`);
 }
 
 export function useAutoCalHistoryStartModal() {
-  settings.historyStartDateOverride = '';
-  saveSettingsOnly();
+  if (setCalHistoryStartOverride('') === false) return false;
   closeModal('calHistoryStartModal');
   renderCalYear();
   toast(translateText('Historial vuelve a calcularse desde tu llamada más antigua'));

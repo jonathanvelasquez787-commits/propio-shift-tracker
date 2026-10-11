@@ -22,8 +22,8 @@ export const APP_KEYS = {
 };
 const META_KEY = 'propio_sync_meta_v1';
 const RECOVERY_KEY = 'propio_recovery_copies_v1';
-const DEBOUNCE_MS = 6000;
-const MAX_WAIT_MS = 45000; // aunque siga escribiendo sin parar, sube igual cada 45 s
+const DEBOUNCE_MS = 250;
+const MAX_WAIT_MS = 1500; // Bound continuous editing without uploading each keystroke.
 
 let hydrating = false;
 let pushTimer = null;
@@ -486,6 +486,9 @@ export async function pushSnapshot({ force = false } = {}) {
   if (pushing) return { skipped: true };
   const meta = readMeta();
   if (!canSync(meta.userId)) return { skipped: true };
+  if (pushTimer) clearTimeout(pushTimer);
+  if (maxWaitTimer) clearTimeout(maxWaitTimer);
+  pushTimer = maxWaitTimer = null;
   const epoch = syncEpoch;
   pushing = true;
   try {

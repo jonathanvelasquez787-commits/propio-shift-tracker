@@ -317,6 +317,17 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
+Auditoría de controles del 11/10/2026: 494 pruebas, 2129 textos ES/EN,
+329 controles estáticos inventariados y matriz de 17 áreas/56 módulos/51 suites.
+Corregidos guardados rechazados en Calendario, Logros, premios y Higher Rate;
+días libres y estado laboral explícito; color rojo de llamada en claro; orden
+de Logros; cierres de llamadas pegadas; reinicio diario de gamificación y
+sincronización de 250 ms con límite de 1500 ms y sin subida duplicada al ocultar.
+Recorridos con cuenta ficticia incluyen respaldo, reinicio, nube local,
+recarga y restauración de siete llamadas. Alcance y límites documentados en
+docs/button-audit-2026-10-11.md. CI y SHA de publicación se comprueban aparte;
+no se acredita haber pulsado todas las combinaciones del inventario.
+
 Cierre de preparación del 11/10/2026: matriz permanente de 17 áreas, 56 módulos
 y 51 suites en docs/production-criteria.json; el build valida trazabilidad.
 460 pruebas y 2129 textos ES/EN. Corregido el indicador de nube ante rechazo

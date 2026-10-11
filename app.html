@@ -8983,7 +8983,69 @@
 
 
 <section class="game-achievements-grid game-achievements-grid-top" id="gameAchievementsSummary" aria-label="Tu progreso">
-  <div class="game-progress-profile" id="gameSettingsProfile" aria-live="polite">
+  <section class="game-settings-disclosures" aria-label="Preferencias de Logros">
+<details class="game-panel game-settings-accordion" id="gameSettingsAccordion">
+    <summary class="game-settings-accordion-summary">
+      <span class="game-settings-accordion-copy"><span class="game-panel-eyebrow">PERSONALIZACIÓN</span><strong>Gamificación</strong><small>Nombre del monstruo y sonidos arcade. Las misiones se calculan automáticamente.</small></span>
+      <span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+    </summary>
+    <div class="game-settings-accordion-body">
+      <div class="game-settings-section">
+        <div class="game-monster-name-setting">
+          <label for="monsterNameInput">Nombre del monstruo del día</label>
+          <div class="game-monster-name-controls"><input id="monsterNameInput" type="text" maxlength="60" autocomplete="off" aria-describedby="monsterNameHelp monsterNameSaveStatus" placeholder="Usar nombre del catálogo"/><button class="mc-btn-primary cyan" id="monsterNameSaveBtn" type="button">Guardar nombre</button></div>
+          <small id="monsterNameHelp">Un solo nombre para el monstruo diario. Déjalo vacío para usar los nombres del catálogo.</small>
+          <span class="game-monster-name-status" id="monsterNameSaveStatus" role="status" aria-live="polite"></span>
+        </div>
+        <div class="game-monster-name-setting">
+          <label for="gameSoundVolumeInput">Volumen de Logros</label>
+          <div class="volume-row"><input id="gameSoundVolumeInput" type="range" min="0" max="100" step="1" value="40" aria-describedby="gameSoundHelp"/><span class="volume-value" id="gameSoundVolumeValue">40%</span><button class="sched-compact-test-btn" id="gameSoundPreviewBtn" type="button" aria-label="Probar sonidos arcade"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polygon points="4 9 8 9 12 5 12 19 8 15 4 15"/><path d="M17 8a5 5 0 0 1 0 8"/></svg></button></div>
+          <small id="gameSoundHelp">Golpes, armaduras, combos, premios y victorias con efectos breves. Se combinan con el volumen general de Ajustes → Alarmas. Puedes silenciarlos en el menú lateral.</small>
+          <span class="game-monster-name-status" id="gameSoundStatus" role="status" aria-live="polite"></span>
+        </div>
+      </div>
+    </div>
+  </details>
+<details class="game-panel game-settings-accordion" id="positiveSettingsAccordion">
+    <summary class="game-settings-accordion-summary">
+      <span class="game-settings-accordion-copy"><span class="game-panel-eyebrow">CUIDADO PERSONAL</span><strong>Refuerzo positivo</strong><small>Reconoce llamadas, recuperación, metas y premios elegidos por ti.</small></span>
+      <span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+    </summary>
+    <div class="game-settings-accordion-body">
+      <div class="positive-settings-section game-settings-section">
+        <label class="game-settings-toggle" for="positiveReinforcementEnabledInput"><span><strong>Celebrar llamadas completadas</strong><small>Convierte constancia, recuperación y metas en evidencia positiva y premios seguros.</small></span><input id="positiveReinforcementEnabledInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label>
+        <label class="game-settings-toggle" for="positiveAskAfterCallInput"><span><strong>Cierre breve después de cada llamada</strong><small>Marca si cerró bien, si cumpliste aunque fue difícil o si te dejó un aprendizaje.</small></span><input id="positiveAskAfterCallInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label>
+        <details class="game-settings-accordion game-reward-settings" id="positiveRewardsAccordion">
+          <summary class="game-settings-accordion-summary"><span class="game-settings-accordion-copy"><strong>Mis premios</strong><small>Premios físicos y catálogo sugerido.</small></span><span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></summary>
+          <div class="game-settings-accordion-body positive-rewards-body">
+        <div class="positive-settings-block">
+          <div class="positive-settings-heading"><span><strong>Mis premios físicos</strong><small>Se guardan hasta tu próximo Break, Lunch o fin del turno.</small></span><button type="button" data-positive-action="new-reward">Crear mi premio</button></div>
+          <div class="physical-reward-selected-list" id="physicalRewardSelected"></div>
+        </div>
+        <div class="positive-settings-block">
+          <div class="positive-settings-heading"><span><strong>Catálogo sugerido</strong><small>Agrega una idea y personalízala a tu gusto.</small></span></div>
+          <div class="physical-reward-catalog" id="physicalRewardCatalog"><label for="physicalRewardPresetSelect">Elegir un premio sugerido</label><div class="game-monster-name-controls"><select id="physicalRewardPresetSelect"></select><button type="button" id="physicalRewardPresetAdd" data-positive-action="add-preset">Agregar premio</button></div><small id="physicalRewardPresetDescription"></small></div>
+        </div>
+        <p class="note" style="margin:0;">La app nunca compra nada ni interrumpe una llamada. Tú decides cuándo realizar, guardar o cambiar cada premio.</p></div>
+        </details>
+      </div>
+    </div>
+  </details>
+</section>
+
+<section class="game-advanced-settings" aria-label="Herramientas avanzadas">
+
+  <details class="game-panel game-settings-accordion" id="gameResetAccordion">
+    <summary class="game-settings-accordion-summary"><span class="game-settings-accordion-copy"><span class="game-panel-eyebrow">PROGRESO DE JUEGO</span><strong>Reiniciar progreso</strong><small>Revisa qué se borra antes de confirmar.</small></span><span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></summary>
+    <div class="game-settings-accordion-body"><div class="danger-card tone-bad game-settings-danger">
+          <div class="danger-card-head"><span class="danger-card-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 15 9 15 3"/></svg></span><span class="danger-card-title">Reiniciar progreso</span></div>
+          <p class="danger-card-desc">Borra nivel, XP, racha, trofeos, accesorios y monstruos derrotados. Tus llamadas, turnos, metas y finanzas no se tocan.</p>
+          <button class="mc-btn-solid-full bad" id="resetGameProgressBtn" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 15 9 15 3"/></svg> Reiniciar progreso</button>
+        </div></div>
+  </details>
+</section>
+
+<div class="game-progress-profile" id="gameSettingsProfile" aria-live="polite">
 <article class="game-panel game-level-panel" id="gameLevelPanel">
     <div class="game-panel-head"><div><span class="game-panel-eyebrow">Progreso</span><h2>Nivel <strong data-game-role="level" data-game-stat="level">1</strong></h2><span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Nivel y XP" aria-describedby="levelInfo">i</button><span class="sched-help-tooltip" id="levelInfo" role="tooltip">XP son puntos de experiencia. Los obtienes al completar llamadas, misiones y objetivos; suben tu nivel y desbloquean equipo. No son dinero ni cambian tu pago.</span></span></div><span class="game-level-emblem" data-game-role="level-emblem">1</span></div>
     <div class="game-level-track" role="progressbar" aria-label="Progreso hacia el siguiente nivel" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span data-game-role="level-progress" style="width:0%;"></span></div>
@@ -9081,67 +9143,6 @@
   </article>
 </section>
 
-<section class="game-settings-disclosures" aria-label="Preferencias de Logros">
-<details class="game-panel game-settings-accordion" id="gameSettingsAccordion">
-    <summary class="game-settings-accordion-summary">
-      <span class="game-settings-accordion-copy"><span class="game-panel-eyebrow">PERSONALIZACIÓN</span><strong>Gamificación</strong><small>Nombre del monstruo y sonidos arcade. Las misiones se calculan automáticamente.</small></span>
-      <span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
-    </summary>
-    <div class="game-settings-accordion-body">
-      <div class="game-settings-section">
-        <div class="game-monster-name-setting">
-          <label for="monsterNameInput">Nombre del monstruo del día</label>
-          <div class="game-monster-name-controls"><input id="monsterNameInput" type="text" maxlength="60" autocomplete="off" aria-describedby="monsterNameHelp monsterNameSaveStatus" placeholder="Usar nombre del catálogo"/><button class="mc-btn-primary cyan" id="monsterNameSaveBtn" type="button">Guardar nombre</button></div>
-          <small id="monsterNameHelp">Un solo nombre para el monstruo diario. Déjalo vacío para usar los nombres del catálogo.</small>
-          <span class="game-monster-name-status" id="monsterNameSaveStatus" role="status" aria-live="polite"></span>
-        </div>
-        <div class="game-monster-name-setting">
-          <label for="gameSoundVolumeInput">Volumen de Logros</label>
-          <div class="volume-row"><input id="gameSoundVolumeInput" type="range" min="0" max="100" step="1" value="40" aria-describedby="gameSoundHelp"/><span class="volume-value" id="gameSoundVolumeValue">40%</span><button class="sched-compact-test-btn" id="gameSoundPreviewBtn" type="button" aria-label="Probar sonidos arcade"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polygon points="4 9 8 9 12 5 12 19 8 15 4 15"/><path d="M17 8a5 5 0 0 1 0 8"/></svg></button></div>
-          <small id="gameSoundHelp">Golpes, armaduras, combos, premios y victorias con efectos breves. Se combinan con el volumen general de Ajustes → Alarmas. Puedes silenciarlos en el menú lateral.</small>
-          <span class="game-monster-name-status" id="gameSoundStatus" role="status" aria-live="polite"></span>
-        </div>
-      </div>
-    </div>
-  </details>
-<details class="game-panel game-settings-accordion" id="positiveSettingsAccordion">
-    <summary class="game-settings-accordion-summary">
-      <span class="game-settings-accordion-copy"><span class="game-panel-eyebrow">CUIDADO PERSONAL</span><strong>Refuerzo positivo</strong><small>Reconoce llamadas, recuperación, metas y premios elegidos por ti.</small></span>
-      <span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
-    </summary>
-    <div class="game-settings-accordion-body">
-      <div class="positive-settings-section game-settings-section">
-        <label class="game-settings-toggle" for="positiveReinforcementEnabledInput"><span><strong>Celebrar llamadas completadas</strong><small>Convierte constancia, recuperación y metas en evidencia positiva y premios seguros.</small></span><input id="positiveReinforcementEnabledInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label>
-        <label class="game-settings-toggle" for="positiveAskAfterCallInput"><span><strong>Cierre breve después de cada llamada</strong><small>Marca si cerró bien, si cumpliste aunque fue difícil o si te dejó un aprendizaje.</small></span><input id="positiveAskAfterCallInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label>
-        <details class="game-settings-accordion game-reward-settings" id="positiveRewardsAccordion">
-          <summary class="game-settings-accordion-summary"><span class="game-settings-accordion-copy"><strong>Mis premios</strong><small>Premios físicos y catálogo sugerido.</small></span><span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></summary>
-          <div class="game-settings-accordion-body positive-rewards-body">
-        <div class="positive-settings-block">
-          <div class="positive-settings-heading"><span><strong>Mis premios físicos</strong><small>Se guardan hasta tu próximo Break, Lunch o fin del turno.</small></span><button type="button" data-positive-action="new-reward">Crear mi premio</button></div>
-          <div class="physical-reward-selected-list" id="physicalRewardSelected"></div>
-        </div>
-        <div class="positive-settings-block">
-          <div class="positive-settings-heading"><span><strong>Catálogo sugerido</strong><small>Agrega una idea y personalízala a tu gusto.</small></span></div>
-          <div class="physical-reward-catalog" id="physicalRewardCatalog"><label for="physicalRewardPresetSelect">Elegir un premio sugerido</label><div class="game-monster-name-controls"><select id="physicalRewardPresetSelect"></select><button type="button" id="physicalRewardPresetAdd" data-positive-action="add-preset">Agregar premio</button></div><small id="physicalRewardPresetDescription"></small></div>
-        </div>
-        <p class="note" style="margin:0;">La app nunca compra nada ni interrumpe una llamada. Tú decides cuándo realizar, guardar o cambiar cada premio.</p></div>
-        </details>
-      </div>
-    </div>
-  </details>
-</section>
-
-<section class="game-advanced-settings" aria-label="Herramientas avanzadas">
-
-  <details class="game-panel game-settings-accordion" id="gameResetAccordion">
-    <summary class="game-settings-accordion-summary"><span class="game-settings-accordion-copy"><span class="game-panel-eyebrow">PROGRESO DE JUEGO</span><strong>Reiniciar progreso</strong><small>Revisa qué se borra antes de confirmar.</small></span><span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></summary>
-    <div class="game-settings-accordion-body"><div class="danger-card tone-bad game-settings-danger">
-          <div class="danger-card-head"><span class="danger-card-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 15 9 15 3"/></svg></span><span class="danger-card-title">Reiniciar progreso</span></div>
-          <p class="danger-card-desc">Borra nivel, XP, racha, trofeos, accesorios y monstruos derrotados. Tus llamadas, turnos, metas y finanzas no se tocan.</p>
-          <button class="mc-btn-solid-full bad" id="resetGameProgressBtn" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 15 9 15 3"/></svg> Reiniciar progreso</button>
-        </div></div>
-  </details>
-</section>
 </div><!-- /pageAchievements -->
 
 <div class="app-page" data-page="help" hidden id="pageHelp">
@@ -9863,7 +9864,7 @@
 
 <div class="danger-card tone-warn">
 <div class="danger-card-head"><span class="danger-card-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 21 9 15 9"/></svg></span><span class="danger-card-title">Reiniciar día</span></div>
-<p class="danger-card-desc">Borra llamadas, pausas, huecos, la nota y el log SOLO del día activo (<strong id="resetDayLabel">—</strong>). Tu horario, metas y el resto de tus días no se tocan.</p>
+<p class="danger-card-desc">Borra llamadas, pausas, huecos, la nota, el log y la gamificación SOLO del día activo (<strong id="resetDayLabel">—</strong>). Tu horario, metas y el resto de tus días no se tocan.</p>
 <button class="mc-btn-solid-full warn" id="resetDayBtn" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 21 9 15 9"/></svg> Reiniciar día activo</button>
 </div>
 

@@ -101,6 +101,10 @@
         {
           "file": "tests/super-audit-sync.test.mjs",
           "namedCases": [
+            "autosync groups rapid state, call and settings edits into one latest snapshot after 250 ms of quiet",
+            "autosync bounds continuous editing at 1500 ms and cancels the paired debounce to avoid duplicate snapshots",
+            "visibility upload cancels pending autosync timers without repeating its clean snapshot",
+            "edits made during an in-flight visibility upload still receive a later autosync snapshot",
             "a saved full reset removes prior cloud calls and a fresh session cannot bring them back",
             "sharing a browser identity does not authorize an older divergent tab to overwrite newer cloud calls",
             "offline reopening and deleting a saved call sends its deletion after reconnecting without another reload",
@@ -163,7 +167,13 @@
             "starting a live call does not announce success after its snapshot is rejected",
             "removing a special daily goal does not announce success or award metadata after rejection",
             "cycle goal editors keep their dialog and omit success when persistence rejects",
-            "day note editors keep their dialog and omit success and rewards when persistence rejects"
+            "day note editors keep their dialog and omit success and rewards when persistence rejects",
+            "annual calendar goal can be retried after persistence recovers",
+            "monster name retains its draft and original setting when saving rejects, then permits retry",
+            "game reset preserves progress and omits success after rejected persistence",
+            "equipment is rolled back and can be retried without a false success",
+            "a previously awarded pending chest is preserved if clearing its stale pending flag cannot persist",
+            "Higher Rate purge restores windows, frozen bonuses and finance assignments when persistence rejects"
           ]
         },
         {
@@ -487,7 +497,7 @@
             "tercera simulación mensual: pegar llamadas de hoy vuelve a auto iniciar el turno",
             "tercera simulación mensual: editar estado manual del día reconcilia gamificación",
             "runtime smoke: helpers de renderGame existen para Logros y Higher Rate",
-            "cuarta simulación mensual: llamadas live antes y después del turno nunca quedan bloqueadas",
+            "cuarta simulación mensual: llamadas live antes y después del turno permiten días laborales y bloquean nuevos inicios en días libres",
             "cuarta simulación mensual: descartar la primera live revierte el turno que esa llamada abrió",
             "cuarta simulación mensual: llamada manual de hoy auto inicia turno igual que pegar llamadas",
             "cuarta simulación mensual: backup JSON realmente incluye y restaura settings",
@@ -582,6 +592,8 @@
         {
           "file": "tests/super-audit-game.test.mjs",
           "namedCases": [
+            "resetting one day removes its reinforcement receipts and rewards while preserving other days and preferences",
+            "resetting an unrelated day preserves accumulated rewards held by the daily limit",
             "correction below eight calls revokes improved loot and requalifying grants it exactly once",
             "correction removes improved cosmetic and equipment before requalifying",
             "continue preserves a backup shield earned after closing the shift",
@@ -679,7 +691,7 @@
             "textos centrales tienen variantes estables y no dejan variables sin reemplazar",
             "feedback reconoce llamada normal, umbral largo, bono y mejor pago con moneda secundaria",
             "mejor llamada compara el bono real de las anteriores y excluye el mismo evento",
-            "Logros apagado bloquea premios y reflexión, y cierra modales sin borrar el progreso al desactivar"
+            "Logros controls gate feedback and queue current pasted reflections after the import dialog closes"
           ]
         }
       ]
@@ -868,6 +880,10 @@
         {
           "file": "tests/super-audit-sync.test.mjs",
           "namedCases": [
+            "autosync groups rapid state, call and settings edits into one latest snapshot after 250 ms of quiet",
+            "autosync bounds continuous editing at 1500 ms and cancels the paired debounce to avoid duplicate snapshots",
+            "visibility upload cancels pending autosync timers without repeating its clean snapshot",
+            "edits made during an in-flight visibility upload still receive a later autosync snapshot",
             "a saved full reset removes prior cloud calls and a fresh session cannot bring them back",
             "sharing a browser identity does not authorize an older divergent tab to overwrite newer cloud calls",
             "offline reopening and deleting a saved call sends its deletion after reconnecting without another reload",

@@ -729,12 +729,6 @@
       "js/reinforcement-feedback.js"
     ]
   },
-  "s_0eee0e3b": {
-    "source": "Borra llamadas, pausas, huecos, la nota y el log SOLO del día activo (",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_0f078100": {
     "source": "Llamadas {{v14}}%",
     "files": [
@@ -3816,6 +3810,12 @@
       "terminos.html"
     ]
   },
+  "s_4d39cf22": {
+    "source": "¿Reiniciar {{v0}}? Se borran llamadas, pausas, huecos, la nota, el log y la gamificación de ese día.",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_4dbb712f": {
     "source": "+ Agregar",
     "files": [
@@ -6691,12 +6691,6 @@
       "app.html"
     ]
   },
-  "s_8396b023": {
-    "source": "¿Reiniciar {{v0}}? Se borran llamadas, pausas, huecos, la nota del día y log de ese día.",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
   "s_839f60d7": {
     "source": "La meta de dólares usa la tasa por minuto de arriba — súbela si tu pago por minuto aumenta. La tasa de cambio y la moneda secundaria muestran un equivalente junto a tus ganancias (ej. Lempiras); déjala en 0 o vacía para ocultarlo.",
     "files": [
@@ -8379,6 +8373,12 @@
       "js/game-battle.js"
     ]
   },
+  "s_a367b689": {
+    "source": "Hoy está marcado como día libre. Márcalo como Trabajado en Resumen semanal → Editar día para iniciar el turno o una llamada.",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_a3686b19": {
     "source": "Guarda cada llamada — pago, duración, si fue facturable o se cayó — y las usa para calcular tus ganancias del día y del ciclo.",
     "files": [
@@ -8871,6 +8871,12 @@
   },
   "s_ae98bba2": {
     "source": "Refuerzo positivo",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_aeca0c44": {
+    "source": "Borra llamadas, pausas, huecos, la nota, el log y la gamificación SOLO del día activo (",
     "files": [
       "app.html"
     ]
@@ -10402,12 +10408,6 @@
   },
   "s_cd679911": {
     "source": "Martes",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
-  "s_cd8463b6": {
-    "source": "Hoy está marcado como día libre en tu horario — no se puede iniciar un turno manualmente. Si trabajaste, pega tus llamadas y la app lo detecta sola.",
     "files": [
       "js/app-main.js"
     ]

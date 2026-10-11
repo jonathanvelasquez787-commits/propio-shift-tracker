@@ -30,6 +30,7 @@ import {
   onPositiveCallSaved,
   onPositiveRewardWindow,
   reconcilePositiveCalls,
+  resetPositiveDay,
   renderPositiveReinforcement,
 } from './positive-reinforcement.js';
 
@@ -902,6 +903,7 @@ export function chooseCycleReward(choiceId) {
   }
   const option = (pending.options || []).find((item) => item.id === String(choiceId));
   if (!option) return false;
+  const previous = { totalXp: state.game.totalXp, level: state.game.level, accessories: [...state.game.accessories], cycleReward: pending };
   const oldLevel = state.game.level;
   let applied = 0;
   if (option.type === 'accessory' && option.accessory) {
@@ -914,8 +916,12 @@ export function chooseCycleReward(choiceId) {
   state.game.level = levelForXp(state.game.totalXp);
   state.game.ledger[key] = { type: 'cycle-reward', cycleKey: pending.cycleKey, choiceId: option.id, gross: Number(option.amount) || 0, applied, accessory: option.accessory || null };
   state.game.cycleReward = { pending: false, cycleKey: null, options: [] };
+  if (saveStateOnly() === false) {
+    Object.assign(state.game, previous);
+    delete state.game.ledger[key];
+    return false;
+  }
   queueGameToast(ui`🏆 Recompensa del ciclo · ${option.label}`, 'loot');
-  saveStateOnly();
   renderGame();
   playGameSound(state.game.level > oldLevel ? 'level' : 'reward');
   return true;
@@ -2174,7 +2180,7 @@ export function onGameCallsChanged(dayKey) {
 export function onGameDayReset(dayKey) {
   ensureGameState();
   const normalized = String(dayKey || '');
-  reconcilePositiveCalls(normalized);
+  resetPositiveDay(normalized);
   const entry = state.game.days[normalized];
 
   Object.keys(state.game.ledger)
@@ -2200,6 +2206,11 @@ export function onGameDayReset(dayKey) {
     `phase:${normalized}:`,
     `reflex:${normalized}`,
     `streak-shield:${normalized}:`,
+    `reinforce-call:${normalized}:`,
+    `money-hit:${normalized}:`,
+    `pause-return:${normalized}:`,
+    `idle-support:${normalized}:`,
+    `dropped-support:${normalized}`,
   ];
   Object.keys(state.game.ledger).forEach((key) => {
     if (prefixes.some((prefix) => key.startsWith(prefix))) delete state.game.ledger[key];
@@ -2553,6 +2564,7 @@ function grantChestReward(sealedOn, { goalReward = false, showModal = true } = {
   const reward = chestReward(sealedOn, { goalReward });
   const displayReward = `${lootRarityLabel(reward.rarity)} · ${translateStoredText(reward.label)}`;
   const oldLevel = state.game.level;
+  const previous = { totalXp: state.game.totalXp, level: oldLevel, accessories: [...state.game.accessories], chest: state.game.chest };
   let granted = false;
   if (!state.game.ledger[key]) {
     state.game.ledger[key] = { type: 'chest', sealedOn, goalReward, rarity: reward.rarity, gross: reward.type === 'xp' ? reward.amount : 0, applied: reward.type === 'xp' ? reward.amount : 0, accessory: reward.type === 'accessory' ? reward.label : null };
@@ -2562,6 +2574,11 @@ function grantChestReward(sealedOn, { goalReward = false, showModal = true } = {
     state.game.level = levelForXp(state.game.totalXp);
   }
   if (state.game.chest.sealedOn === sealedOn) state.game.chest = { pending: false, sealedOn: null };
+  if (saveStateOnly() === false) {
+    Object.assign(state.game, previous);
+    delete state.game.ledger[key];
+    return false;
+  }
 
   const root = document.getElementById('chestContent');
   if (root && showModal) {
@@ -2581,7 +2598,12 @@ function openPendingChest(todayKey, { allowSameDay = false } = {}) {
   if (!gameEnabled()) return false;
   if (!state.game.chest.pending || !state.game.chest.sealedOn || (!allowSameDay && state.game.chest.sealedOn === todayKey)) return false;
   const sealedOn = state.game.chest.sealedOn;
-  if (state.game.ledger[`chest:${sealedOn}`]) { state.game.chest = { pending: false, sealedOn: null }; return true; }
+  if (state.game.ledger[`chest:${sealedOn}`]) {
+    const previous = state.game.chest;
+    state.game.chest = { pending: false, sealedOn: null };
+    if (saveStateOnly() === false) { state.game.chest = previous; return false; }
+    return true;
+  }
   return grantChestReward(sealedOn);
 }
 
@@ -2590,7 +2612,6 @@ export function openDailyGoalChest(dayKey = currentGameDayKey()) {
   ensureGameState(dayKey);
   if (!computeGameDay(dayKey).defeated) return false;
   if (!grantChestReward(dayKey, { goalReward: true, showModal: false })) return false;
-  saveStateOnly();
   renderGame();
   return true;
 }
@@ -2598,7 +2619,6 @@ export function openDailyGoalChest(dayKey = currentGameDayKey()) {
 export function claimPendingChest() {
   const claimed = openPendingChest(currentGameDayKey(), { allowSameDay: true });
   if (claimed) {
-    saveStateOnly();
     renderGame();
   }
   return claimed;
@@ -2647,7 +2667,11 @@ export function equipAccessory(accessoryLabel) {
   if (!item || !state.game.accessories.includes(item.label) || item.unlockLevel > state.game.level) return false;
   const currently = state.game.equipment[item.slot];
   state.game.equipment[item.slot] = currently === item.label ? null : item.label;
-  saveStateOnly();
+  if (saveStateOnly() === false) {
+    if (currently === undefined) delete state.game.equipment[item.slot];
+    else state.game.equipment[item.slot] = currently;
+    return false;
+  }
   renderGame();
   announceGameStatus(state.game.equipment[item.slot] ? ui`${translateText(item.label)} equipado` : ui`${translateText(item.label)} retirado`);
   playGameSound('equip');
@@ -2709,13 +2733,33 @@ export function onGameBackupExported() {
 
 function resetGameProgress() {
   appConfirm(translateText('¿Reiniciar todo el progreso de gamificación? Se borran XP, niveles, rachas, escudos, cofres, accesorios, trofeos y bestiario. Tus llamadas, turnos y finanzas no se tocan.'), () => {
+    const previous = state.game;
     const reinforcement = normalizeReinforcementState(state.game?.reinforcement);
     state.game = { ...createDefaultGameState(), reinforcement };
     ensureGameState();
-    saveStateOnly();
+    if (saveStateOnly() === false) { state.game = previous; return false; }
     renderGame();
     toast(translateText('Progreso de gamificación reiniciado'));
   });
+}
+
+function saveMonsterName() {
+  const input = document.getElementById('monsterNameInput');
+  if (!input) return;
+  const name = sanitizeMonsterName(input.value);
+  const config = ensureGameSettings();
+  const previous = config.monsterName;
+  if (name) config.monsterName = name;
+  else delete config.monsterName;
+  if (saveSettingsOnly() === false) {
+    if (previous === undefined) delete config.monsterName;
+    else config.monsterName = previous;
+    return false;
+  }
+  monsterNameDraftDirty = false;
+  const status = document.getElementById('monsterNameSaveStatus');
+  if (status) status.textContent = name ? ui`Nombre guardado: ${name}.` : translateText('Se usarán los nombres del catálogo.');
+  renderGame();
 }
 
 let gameInitialized = false;
@@ -2779,19 +2823,7 @@ export function initGame() {
       : !settings.game.soundVolume || Number(settings.masterVolume) === 0 ? translateText('Sube el volumen de Logros y el volumen general para escuchar los efectos.') : '';
   });
   document.addEventListener('input', (event) => { if (event.target?.id === 'masterVolumeInput') syncGameAudio(); });
-  document.getElementById('monsterNameSaveBtn')?.addEventListener('click', () => {
-    const input = document.getElementById('monsterNameInput');
-    if (!input) return;
-    const name = sanitizeMonsterName(input.value);
-    const config = ensureGameSettings();
-    if (name) config.monsterName = name;
-    else delete config.monsterName;
-    monsterNameDraftDirty = false;
-    saveSettingsOnly();
-    const status = document.getElementById('monsterNameSaveStatus');
-    if (status) status.textContent = name ? ui`Nombre guardado: ${name}.` : translateText('Se usarán los nombres del catálogo.');
-    renderGame();
-  });
+  document.getElementById('monsterNameSaveBtn')?.addEventListener('click', saveMonsterName);
   document.getElementById('monsterNameInput')?.addEventListener('input', () => {
     monsterNameDraftDirty = true;
     const status = document.getElementById('monsterNameSaveStatus');

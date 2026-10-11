@@ -474,6 +474,12 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
   border-color: rgba(var(--accent-rgb), .3);
 }
 
+:root.theme-light #callControlBtn:not(.is-active) {
+  --accent: var(--danger-red);
+  --accent-rgb: var(--danger-red-rgb);
+  --accent-pale: var(--danger-red);
+}
+
 :root.theme-light .storage-conflict-dismiss-btn {
   background: var(--surface-control);
 }
