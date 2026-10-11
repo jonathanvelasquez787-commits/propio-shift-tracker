@@ -12,6 +12,7 @@
 // Sin dependencias: fetch y crypto son nativos de Node 20.
 
 import { createHash } from 'node:crypto';
+import { readJsonObject, RequestBodyError } from '../lib/request-body.js';
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const ANON_KEY = process.env.SUPABASE_ANON_KEY;
@@ -42,30 +43,12 @@ async function persistentlyThrottled(ip) {
   return null;
 }
 
-async function readBody(req) {
-  if (req.body && typeof req.body === 'object') return req.body;
-  if (typeof req.body === 'string') {
-    try {
-      return JSON.parse(req.body);
-    } catch {
-      return null;
-    }
-  }
-  const chunks = [];
-  for await (const chunk of req) chunks.push(chunk);
-  if (!chunks.length) return null;
-  try {
-    return JSON.parse(Buffer.concat(chunks).toString('utf8'));
-  } catch {
-    return null;
-  }
-}
-
 async function emailForIdentifier(identifier) {
   if (identifier.includes('@')) return identifier;
 
   const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/email_for_login_identifier`, {
     method: 'POST',
+    signal: AbortSignal.timeout(5000),
     headers: {
       'Content-Type': 'application/json',
       apikey: SERVICE_KEY,
@@ -111,11 +94,15 @@ export default async function handler(req, res) {
     return;
   }
 
-  const body = await readBody(req);
-  const identifier = String((body && body.identifier) || '').trim().toLowerCase();
-  const password = String((body && body.password) || '');
+  let body;
+  try { body = await readJsonObject(req, 8 * 1024); }
+  catch (error) {
+    return res.status(error instanceof RequestBodyError ? error.status : 400).json({ error: 'LOGIN_FAILED' });
+  }
+  const identifier = typeof body.identifier === 'string' ? body.identifier.trim().toLowerCase() : '';
+  const password = typeof body.password === 'string' ? body.password : '';
 
-  if (!identifier || !password) {
+  if (!identifier || identifier.length > 254 || !password || password.length > 1024) {
     res.status(400).json({ error: 'LOGIN_FAILED' });
     return;
   }
@@ -131,6 +118,7 @@ export default async function handler(req, res) {
 
     const authRes = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
       method: 'POST',
+      signal: AbortSignal.timeout(10000),
       headers: {
         'Content-Type': 'application/json',
         apikey: ANON_KEY,
@@ -141,13 +129,6 @@ export default async function handler(req, res) {
     const payload = await authRes.json().catch(() => null);
 
     if (!authRes.ok || !payload || !payload.access_token) {
-      const code = String((payload && (payload.error_code || payload.error)) || '').toLowerCase();
-      const desc = String((payload && (payload.msg || payload.error_description)) || '').toLowerCase();
-
-      if (code.includes('email_not_confirmed') || desc.includes('email not confirmed')) {
-        res.status(401).json({ error: 'EMAIL_NOT_CONFIRMED' });
-        return;
-      }
       if (authRes.status === 429) {
         res.status(429).json({ error: 'RATE_LIMITED' });
         return;
@@ -161,8 +142,8 @@ export default async function handler(req, res) {
       refresh_token: payload.refresh_token,
       expires_in: payload.expires_in,
     });
-  } catch (err) {
-    console.error('login: error inesperado', err);
+  } catch {
+    console.error('login: unexpected upstream failure');
     res.status(500).json({ error: 'LOGIN_FAILED' });
   }
 }

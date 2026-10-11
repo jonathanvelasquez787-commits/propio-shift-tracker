@@ -4902,8 +4902,11 @@ function renderPayDatesSection() {
     }
 
     function csvField(value) {
-      const s = String(value ?? '');
-      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+      let s = String(value ?? '');
+      // CSV quoting alone does not stop spreadsheet formulas. Keep numeric
+      // amounts intact, but export formula-like text as a literal cell.
+      if (!/^-?\d+(?:\.\d+)?$/.test(s) && /^(?:\s*[=+@-]|[\t\r\n])/.test(s)) s = "'" + s;
+      return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
     }
 
     function exportAccountingCsv() {

@@ -15,6 +15,12 @@ supabase/.temp/
 !*.env.example
 !*.env.*.example
 
+# Recovery credentials and exported account backups belong outside Git.
+*.pem
+*.key
+*.secret
+*.encrypted.json
+
 # Pruebas
 tests/__pycache__/
 tests/.pytest_cache/

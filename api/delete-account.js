@@ -36,6 +36,7 @@ export default async function handler(req, res) {
 
   try {
     const meRes = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      signal: AbortSignal.timeout(5000),
       headers: { apikey: ANON_KEY, Authorization: `Bearer ${token}` },
     });
     if (!meRes.ok) {
@@ -50,19 +51,19 @@ export default async function handler(req, res) {
 
     const delRes = await fetch(`${SUPABASE_URL}/auth/v1/admin/users/${me.id}`, {
       method: 'DELETE',
+      signal: AbortSignal.timeout(10000),
       headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` },
     });
 
     if (!delRes.ok) {
-      const detail = await delRes.text().catch(() => '');
-      console.error('delete-account: fallo al borrar', delRes.status, detail);
+      console.error('delete-account: upstream delete failed', delRes.status);
       res.status(500).json({ error: 'DELETE_FAILED' });
       return;
     }
 
     res.status(200).json({ ok: true });
-  } catch (err) {
-    console.error('delete-account: error inesperado', err);
+  } catch {
+    console.error('delete-account: unexpected upstream failure');
     res.status(500).json({ error: 'DELETE_FAILED' });
   }
 }
