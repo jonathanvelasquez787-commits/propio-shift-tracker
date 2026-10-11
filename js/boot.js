@@ -51,15 +51,15 @@ function setBootMessage(text) {
 }
 
 function normalizeAppAddress() {
-  // Successful mounting ends the landing's redirect guard; refreshing / can reopen the app.
+  // Keep the private app URL so reloads request its shell, without flashing the landing.
   try {
     sessionStorage.removeItem('ps_auto_enter_at');
   } catch {
     /* opening the app also works when session storage is unavailable */
   }
   const address = new URL(window.location.href);
-  if (address.pathname !== '/app' && address.pathname !== '/app.html') return;
-  address.pathname = '/';
+  if (address.pathname !== '/app.html') return;
+  address.pathname = '/app';
   window.history.replaceState(window.history.state, '', address.href);
 }
 
