@@ -22,6 +22,7 @@ import {
   setAccessToken,
   onSync,
   readMeta,
+  getLocalPersistenceFailure,
   describeSnapshot,
   readLocalSnapshot,
   applyLightThemeDefault,
@@ -522,6 +523,13 @@ function setSyncStatus(kind, text) {
   const dot = document.getElementById('sidebarSyncDot');
   const label = document.getElementById('sidebarSyncText');
   if (!dot || !label) return;
+  const failure = getLocalPersistenceFailure();
+  if (failure) {
+    kind = 'error';
+    text = failure === 'stale' ? translateText('No se pudo guardar — recarga esta pestaña')
+      : failure === 'budget' ? translateText('No se pudo guardar — reduce el tamaño de tus ajustes')
+      : translateText('No se pudo guardar — almacenamiento lleno');
+  }
   dot.dataset.state = kind;
   label.textContent = text;
 }
@@ -529,6 +537,7 @@ function setSyncStatus(kind, text) {
 function wireSyncStatus() {
   let lastPush = null;
   onSync((type) => {
+    if (type === 'local-persistence') setSyncStatus('saving', translateText('Cambios sin subir…'));
     if (type === 'dirty') setSyncStatus('saving', translateText('Cambios sin subir…'));
     if (type === 'pushed') {
       lastPush = new Date();
@@ -552,6 +561,7 @@ function wireSyncStatus() {
 
   window.addEventListener('offline', () => setSyncStatus('error', translateText('Sin conexión')));
   window.addEventListener('online', () => setSyncStatus('saving', 'Reconectando…'));
+  window.addEventListener('propio-local-persistence', () => setSyncStatus('saving', translateText('Cambios sin subir…')));
 }
 
 // La app ya trae este banner para el conflicto entre pestañas; el conflicto

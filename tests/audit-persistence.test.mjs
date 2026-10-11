@@ -4,7 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
-import { APP_KEYS, writeLocalSnapshot, settingsWithinBudget } from '../js/sync.js';
+import { APP_KEYS, writeLocalSnapshot, settingsWithinBudget, reportLocalPersistenceFailure, getLocalPersistenceFailure } from '../js/sync.js';
 import { createStorageRevisionGuard } from '../js/propio-bridge.js';
 
 const source = fs.readFileSync(new URL('../js/app-main.js', import.meta.url), 'utf8');
@@ -14,7 +14,8 @@ function storageHarness() {
   const values = new Map([['state', JSON.stringify(state)], ['calls', '[]'], ['settings', JSON.stringify(settings)]]);
   let reject = () => false;
   const warnings = [];
-  const context = vm.createContext({ ui, translateText, translateMarkup, displayLocale, applySavedColors, createStorageRevisionGuard, settingsWithinBudget, state, calls, settings, STORAGE_KEY: 'state', CALLS_KEY: 'calls', SETTINGS_KEY: 'settings',
+  reportLocalPersistenceFailure(null);
+  const context = vm.createContext({ ui, translateText, translateMarkup, displayLocale, applySavedColors, createStorageRevisionGuard, settingsWithinBudget, reportLocalPersistenceFailure, state, calls, settings, STORAGE_KEY: 'state', CALLS_KEY: 'calls', SETTINGS_KEY: 'settings',
     localStorage: {
       getItem: (key) => values.get(key) ?? null,
       setItem(key, value) { if (reject(key, value)) throw new Error('QuotaExceededError'); values.set(key, value); },
@@ -31,6 +32,7 @@ test('guardar solo estado no vuelve vigente un tab que ya tenía llamadas extern
   h.values.set('calls', JSON.stringify([{id:'other-tab-call'}]));
   assert.equal(h.run('saveStateOnly()'), false);
   assert.equal(h.run('localStorageRevision.isCurrent()'), false);
+  assert.equal(getLocalPersistenceFailure(), 'stale');
   assert.equal(JSON.parse(h.values.get('calls'))[0].id, 'other-tab-call');
 });
 
@@ -50,6 +52,7 @@ test('una cuota agotada no persiste recompensas de llamadas que no llegaron al d
   h.calls.push({ id: 'pending-call' });
   h.reject((key, value) => key === 'calls' && value !== '[]');
   assert.equal(h.run('saveAll()'), false);
+  assert.equal(getLocalPersistenceFailure(), 'quota');
   h.state.game.ledger['reward:pending-call'] = true;
   assert.equal(h.run('saveStateOnly()'), false);
   h.settings.goal = 20;
@@ -57,9 +60,27 @@ test('una cuota agotada no persiste recompensas de llamadas que no llegaron al d
   assert.deepEqual(h.values, before);
   h.reject(() => false);
   assert.equal(h.run('saveSettingsOnly()'), true);
+  assert.equal(getLocalPersistenceFailure(), null);
   assert.deepEqual(JSON.parse(h.values.get('calls')), h.calls);
   assert.deepEqual(JSON.parse(h.values.get('state')), h.state);
   assert.deepEqual(JSON.parse(h.values.get('settings')), h.settings);
+});
+
+test('oversized settings keep all pending changes and their failure until a complete retry succeeds', () => {
+  const h = storageHarness();
+  const before = new Map(h.values);
+  h.settings.large = 'x'.repeat(1024 * 1024 + 1);
+  h.calls.push({ id: 'pending-call' });
+  assert.equal(h.run('saveSettingsOnly()'), false);
+  assert.equal(getLocalPersistenceFailure(), 'budget');
+  h.state.game.ledger.pending = true;
+  assert.equal(h.run('saveStateOnly()'), false);
+  assert.deepEqual(h.values, before);
+  delete h.settings.large;
+  assert.equal(h.run('saveStateOnly()'), true);
+  assert.equal(getLocalPersistenceFailure(), null);
+  assert.deepEqual(JSON.parse(h.values.get('calls')), h.calls);
+  assert.deepEqual(JSON.parse(h.values.get('state')), h.state);
 });
 
 test('un almacenamiento que rechaza escrituras conserva las claves previas sin borrarlas', () => {

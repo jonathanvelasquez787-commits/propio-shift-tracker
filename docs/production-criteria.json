@@ -1,0 +1,1024 @@
+{
+  "schema": 1,
+  "scope": "Google; Email/SMTP deshabilitados; sin compras ni funciones nuevas",
+  "criteria": [
+    {
+      "id": "identity",
+      "area": "Acceso y aislamiento de cuentas",
+      "acceptance": "Google exclusivo; hidratar antes de montar; ninguna cuenta adopta datos ni respuestas de otra.",
+      "sources": [
+        "js/auth.js",
+        "js/supabase-client.js",
+        "js/config.js",
+        "js/boot.js",
+        "js/language-preference.js"
+      ],
+      "tests": [
+        {
+          "file": "tests/boot-sync.test.mjs",
+          "namedCases": [
+            "expired-session refresh network failure mounts only the cached local owner without an upload",
+            "arranque local detecta una escritura entre la lectura y el montaje sin sobrescribirla",
+            "elegir copia local en un conflicto sube contra la revisión mostrada y elimina filas remotas reemplazadas",
+            "otra escritura posterior a elegir local vuelve a exigir resolver el conflicto",
+            "elegir copia de nube conserva sus datos sin subir la copia local",
+            "cuenta vacía conserva la revisión consultada para proteger la primera subida",
+            "snapshot ausente utiliza una base no nula y no pisa una fila creada mientras se monta",
+            "sin red monta la copia de la misma cuenta y conserva su base y cambios pendientes",
+            "la señal offline del navegador abre los datos propios sin esperar una descarga",
+            "sin red rechaza una copia ajena o sin propietario identificado",
+            "sin red no crea una cuenta vacía si no hay una copia local",
+            "fallos de permisos o servidor no se ocultan como desconexiones"
+          ]
+        },
+        {
+          "file": "tests/offline-identity.test.mjs",
+          "namedCases": [
+            "offline identity accepts settings/call-only histories for the cached owner"
+          ]
+        },
+        {
+          "file": "tests/language-preference.test.mjs",
+          "namedCases": [
+            "English is the default while an explicit Spanish preference remains Spanish",
+            "public language has priority and valid saved account languages remain compatible",
+            "malformed, missing and unusable account settings use English without throwing",
+            "login selection uses independent keys and clearing pending preserves the public language and account data",
+            "ordinary preference updates create no login override and pending values must be valid",
+            "default storage resolution tolerates browsers whose storage property access throws"
+          ]
+        },
+        {
+          "file": "tests/production-boot-order.test.mjs",
+          "namedCases": [
+            "production gate retains a versioned native app import and never evaluates app modules eagerly",
+            "two isolated storage contexts initialize from cloud after the gate and preserve later edits"
+          ]
+        },
+        {
+          "file": "tests/recovery-deployment.test.mjs",
+          "namedCases": [
+            "recovery deployment rejects production, private keys and unsafe destination paths",
+            "prepared real migrations schedule no jobs and cannot call the production monitor",
+            "deployment bytes come from the recorded commit even when tracked working files are edited"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sync",
+      "area": "Sincronización y conflictos",
+      "acceptance": "Revisión esperada, páginas completas, reintentos y acuses tardíos sin borrar cambios de otro dispositivo.",
+      "sources": [
+        "js/sync.js",
+        "js/app-context.js"
+      ],
+      "tests": [
+        {
+          "file": "tests/sync-integration.test.mjs",
+          "namedCases": [
+            "un fallo de lectura de llamadas no descarga el snapshot antiguo ni altera datos locales",
+            "la compatibilidad antigua se limita a una tabla de llamadas ausente",
+            "descargar cien mil llamadas conserva cantidad e identificadores en cien páginas",
+            "la descarga recupera todo el historial de más de mil llamadas",
+            "la descarga respeta un límite de API menor al tamaño de página",
+            "sin conteo la descarga sigue hasta una página vacía aunque la API limite las filas",
+            "un error de la RPC vigente no utiliza la escritura antigua ni confirma los cambios",
+            "la escritura antigua sigue disponible únicamente cuando falta la RPC vigente",
+            "un fallo en la segunda página no adopta ni confirma un historial incompleto",
+            "una actualización de nube durante la descarga no mezcla estado antiguo con llamadas nuevas",
+            "cambios durante una subida conservan dirty y se envían en el siguiente delta",
+            "un conflicto conserva los cambios locales y un error permite reintentar sin omitir llamadas",
+            "retirar el laboratorio conserva el snapshot real y elimina solo sus cuatro claves de prueba",
+            "una clave QA antigua ilegible o imposible de borrar nunca selecciona datos simulados",
+            "elegir idioma en login no crea datos locales ni cambia la decisión de descargar la nube",
+            "la selección explícita ES del login prevalece sobre nube EN conservando datos y base de sincronización",
+            "sin selección pendiente la nube ES se conserva y alinea el idioma público antes de recargar",
+            "cambiar de cuenta retira datos anteriores sin perder la elección pendiente del login",
+            "cuota insuficiente conserva selección pendiente, ajustes y metadata para reintentar"
+          ]
+        },
+        {
+          "file": "tests/super-audit-sync.test.mjs",
+          "namedCases": [
+            "sharing a browser identity does not authorize an older divergent tab to overwrite newer cloud calls",
+            "offline reopening and deleting a saved call sends its deletion after reconnecting without another reload",
+            "changing account then adopting the downloaded cloud keeps the baseline for call deletion",
+            "a late response for the previous account cannot mark the new account clean or change its base",
+            "changing authentication identity blocks a pending snapshot from being sent as the next account",
+            "an offline reconnect against a later cloud revision preserves the other device and reports conflict",
+            "switching authentication while cloud is loading aborts the previous account before adoption and mount",
+            "switching account while the conflict prompt is open cannot adopt or upload the old selection",
+            "refreshing a token for the same account keeps its pending upload available",
+            "a failed server navigation does not replace the cached app needed for a later offline reopening",
+            "worker activation retires only this app caches and preserves another cache on the same origin",
+            "cloud adoption cannot replace a snapshot if its ownership metadata cannot be persisted",
+            "failed snapshot hydration restores its previous metadata along with its previous data",
+            "local adoption reports failed ownership persistence instead of silently starting the app",
+            "a delayed acknowledgement cannot regress a newer sync revision persisted by another tab",
+            "an old tab refreshes its call baseline when another tab advanced the shared revision"
+          ]
+        },
+        {
+          "file": "tests/production-audit-recovery.test.mjs",
+          "namedCases": [
+            "choosing cloud retains the discarded local version and restoring it retains the current version",
+            "a different account cannot see pending copies; returning to the owner restores its pending work",
+            "quota exhaustion blocks destructive adoption and account switching without touching the only copy",
+            "four allowed sound files are rejected by the aggregate budget before persistence",
+            "large histories upload in bounded batches with a new expected revision at each commit",
+            "a failed later batch keeps confirmed calls and revision so retry sends only unfinished work",
+            "portable backups round trip with an offline private key and reject ciphertext tampering"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "storage",
+      "area": "Guardado local",
+      "acceptance": "Cuota, presupuesto y pestaña antigua: rechazo visible y persistente; reintento completo; sin éxito ni premios falsos.",
+      "sources": [],
+      "tests": [
+        {
+          "file": "tests/audit-persistence.test.mjs",
+          "namedCases": [
+            "guardar solo estado no vuelve vigente un tab que ya tenía llamadas externas más recientes",
+            "una pestaña antigua no reemplaza el historial guardado por otra pestaña",
+            "una cuota agotada no persiste recompensas de llamadas que no llegaron al disco; un reintento guarda todo",
+            "oversized settings keep all pending changes and their failure until a complete retry succeeds",
+            "un almacenamiento que rechaza escrituras conserva las claves previas sin borrarlas",
+            "un fallo al guardar solo estado obliga a guardar el siguiente snapshot completo",
+            "el JSON descargado incluye el recibo y escudo del mismo respaldo",
+            "una exportación de dos años conserva los días y las llamadas después del día 400"
+          ]
+        },
+        {
+          "file": "tests/audit-save-feedback.test.mjs",
+          "namedCases": [
+            "starting a live call does not announce success after its snapshot is rejected",
+            "removing a special daily goal does not announce success or award metadata after rejection",
+            "cycle goal editors keep their dialog and omit success when persistence rejects",
+            "day note editors keep their dialog and omit success and rewards when persistence rejects"
+          ]
+        },
+        {
+          "file": "tests/local-save-status.test.mjs",
+          "namedCases": [
+            "a local rejection remains visible after cloud acknowledgments, timers and reconnect events",
+            "separate boot and app module instances share local failures without writing storage or sync metadata"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calls",
+      "area": "Llamadas y contabilidad diaria",
+      "acceptance": "Manual, en vivo, importación, edición, cero, duplicados y borrado reconciliados contra libro independiente.",
+      "sources": [
+        "js/calls.js",
+        "js/app-main.js"
+      ],
+      "tests": [
+        {
+          "file": "tests/super-audit-accounting.test.mjs",
+          "namedCases": [
+            "a rejected manual call save does not announce success or award its reward",
+            "a rejected finance allocation save does not report Aplicado",
+            "official correction to zero minutes replaces the original and preserves its identity and frozen bonus",
+            "successive corrections in one paste produce one final record, including live replacement migration",
+            "restored overnight live backup retains the original accounting date after a different shift",
+            "manual allocation accepts the exact final displayed ten cents without allowing overspending",
+            "manual finance allocation interprets decimal commas without multiplying the amount and rejects malformed numbers",
+            "automatic allocation covers all 601 rows and bypasses zero-target legacy expenses",
+            "multiple explicit sessions plus calls outside them count each real connected minute once",
+            "a corrected zero-minute official call cannot expand across a different customer call",
+            "a correction collapses only legacy zero-minute duplicates of its exact official identity",
+            "reimporting the existing official zero row heals legacy duplicates and rolls back current XP exactly once",
+            "an exact zero-minute official correction cannot replace an unrelated overlapping live call",
+            "31 chronological days preserve an independent ledger through imports, manual/live calls, corrections, deletion, goals, and reloads"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "goals",
+      "area": "Metas y cuentas nuevas",
+      "acceptance": "06:00–14:00, siete bloques, 360 min; excepciones e historia conservadas al cambiar tasa.",
+      "sources": [
+        "js/settings.js"
+      ],
+      "tests": [
+        {
+          "file": "tests/goals-and-default-schedule.test.mjs",
+          "namedCases": [
+            "new accounts start at 06:00–14:00 with the requested blocks and 360-minute goal",
+            "loading an existing customized schedule keeps its times, goals and days off",
+            "editing the general goal from a historical day changes that day, persists and leaves other history intact",
+            "day-only goals leave the general goal intact and using general updates the selected historical day",
+            "editing the rate while viewing a special past goal preserves the general minutes and daily exception",
+            "overflowing converted goals and rates do not persist non-finite values"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "schedule",
+      "area": "Horario, pausas y ACW",
+      "acceptance": "Trabajo real y pausas, cruces de medianoche, turnos libres y cambios de bloques sin mutación parcial.",
+      "sources": [
+        "js/schedule.js",
+        "js/block-acw.js"
+      ],
+      "tests": [
+        {
+          "file": "tests/block-acw.test.mjs",
+          "namedCases": [
+            "ACW de bloque recorta gaps entre bloques, resta pausas y excluye gaps Other",
+            "Bloques del día usa los gaps etiquetados y muestra ACW en las dos variantes de progreso Work"
+          ]
+        },
+        {
+          "file": "tests/reinforcement-schedule.test.mjs",
+          "namedCases": [
+            "actual schedule helper unfolds a midnight crossing and following break into next-day dates",
+            "real sorted schedule blocks retain the accounting-day anchor across midnight",
+            "an effective late-arrival shift carries all wrapped slots forward by the same delay",
+            "daytime and effective shifted schedules use their real configured intervals",
+            "inactivity production guard suppresses scheduled break and off-duty delivery despite prior work",
+            "silent real return when starting a live call receives punctuality while shift closure does not",
+            "actual endPause uses next-day absolute pause times and existing duration tolerance"
+          ]
+        },
+        {
+          "file": "tests/deep-audit.test.mjs",
+          "namedCases": [
+            "auditoría profunda: Higher Rate usa bonus.amount para crítico, XP y FX monetario",
+            "auditoría profunda: editar Higher Rate reconcilia días de gamificación cuyo bono cambió",
+            "auditoría profunda: ajustar turno completo no deja Inicio Fin mutados si no hay bloques",
+            "auditoría profunda: reiniciar día protege llamada activa o respaldo live pendiente",
+            "auditoría profunda: pegar solo duplicados omitidos no crea evento falso ni ensucia estado",
+            "auditoría profunda: cambios de horario y metas reconcilian metadata del juego",
+            "auditoría profunda: cambiar reglas de racha refresca juego además del reporte",
+            "auditoría profunda: sonidos personalizados detectan fallo real de persistencia y revierten",
+            "auditoría profunda: corrección oficial preserva día contable y bono Higher Rate congelado",
+            "auditoría profunda: hidratar desde nube restaura snapshot anterior si localStorage falla a mitad",
+            "auditoría profunda: descartar una pausa continuada elimina sus artefactos de interrupción",
+            "auditoría profunda: saveAll es atómico entre state calls y settings"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "finance",
+      "area": "Finanzas y Higher Rate",
+      "acceptance": "Importes decimales estrictos, asignaciones conservadas y corregidas, prioridad y bonos históricos sin sobreasignación.",
+      "sources": [
+        "js/finance.js",
+        "js/higher-rate.js"
+      ],
+      "tests": [
+        {
+          "file": "tests/model-invariants.test.mjs",
+          "namedCases": [
+            "10,000 seeded money cases agree with an independent integer-cent milestone oracle",
+            "2,000 overlapping work and pause cases agree with a minute-by-minute activity oracle",
+            "3,000 Higher Rate windows agree with an independent numeric-clock oracle across midnight and grace",
+            "2,000 finance cascades conserve earnings in cents and preserve expense-first priority after corrections"
+          ]
+        },
+        {
+          "file": "tests/super-audit-accounting.test.mjs",
+          "namedCases": [
+            "a rejected manual call save does not announce success or award its reward",
+            "a rejected finance allocation save does not report Aplicado",
+            "official correction to zero minutes replaces the original and preserves its identity and frozen bonus",
+            "successive corrections in one paste produce one final record, including live replacement migration",
+            "restored overnight live backup retains the original accounting date after a different shift",
+            "manual allocation accepts the exact final displayed ten cents without allowing overspending",
+            "manual finance allocation interprets decimal commas without multiplying the amount and rejects malformed numbers",
+            "automatic allocation covers all 601 rows and bypasses zero-target legacy expenses",
+            "multiple explicit sessions plus calls outside them count each real connected minute once",
+            "a corrected zero-minute official call cannot expand across a different customer call",
+            "a correction collapses only legacy zero-minute duplicates of its exact official identity",
+            "reimporting the existing official zero row heals legacy duplicates and rolls back current XP exactly once",
+            "an exact zero-minute official correction cannot replace an unrelated overlapping live call",
+            "31 chronological days preserve an independent ledger through imports, manual/live calls, corrections, deletion, goals, and reloads"
+          ]
+        },
+        {
+          "file": "tests/finance-category-language.test.mjs",
+          "namedCases": [
+            "expense and savings category IDs remain valid while the form labels change language"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "reports",
+      "area": "Reportes, calendario y exportación",
+      "acceptance": "Día contable, ciclos y rangos históricos; totales consistentes; CSV neutraliza fórmulas; no recortar años.",
+      "sources": [
+        "js/reports.js",
+        "js/calendar.js"
+      ],
+      "tests": [
+        {
+          "file": "tests/super-audit-accounting.test.mjs",
+          "namedCases": [
+            "a rejected manual call save does not announce success or award its reward",
+            "a rejected finance allocation save does not report Aplicado",
+            "official correction to zero minutes replaces the original and preserves its identity and frozen bonus",
+            "successive corrections in one paste produce one final record, including live replacement migration",
+            "restored overnight live backup retains the original accounting date after a different shift",
+            "manual allocation accepts the exact final displayed ten cents without allowing overspending",
+            "manual finance allocation interprets decimal commas without multiplying the amount and rejects malformed numbers",
+            "automatic allocation covers all 601 rows and bypasses zero-target legacy expenses",
+            "multiple explicit sessions plus calls outside them count each real connected minute once",
+            "a corrected zero-minute official call cannot expand across a different customer call",
+            "a correction collapses only legacy zero-minute duplicates of its exact official identity",
+            "reimporting the existing official zero row heals legacy duplicates and rolls back current XP exactly once",
+            "an exact zero-minute official correction cannot replace an unrelated overlapping live call",
+            "31 chronological days preserve an independent ledger through imports, manual/live calls, corrections, deletion, goals, and reloads"
+          ]
+        },
+        {
+          "file": "tests/audit-persistence.test.mjs",
+          "namedCases": [
+            "guardar solo estado no vuelve vigente un tab que ya tenía llamadas externas más recientes",
+            "una pestaña antigua no reemplaza el historial guardado por otra pestaña",
+            "una cuota agotada no persiste recompensas de llamadas que no llegaron al disco; un reintento guarda todo",
+            "oversized settings keep all pending changes and their failure until a complete retry succeeds",
+            "un almacenamiento que rechaza escrituras conserva las claves previas sin borrarlas",
+            "un fallo al guardar solo estado obliga a guardar el siguiente snapshot completo",
+            "el JSON descargado incluye el recibo y escudo del mismo respaldo",
+            "una exportación de dos años conserva los días y las llamadas después del día 400"
+          ]
+        },
+        {
+          "file": "tests/launch-security.test.mjs",
+          "namedCases": [
+            "request limits reject oversized streams before reading their remainder and count UTF-8 bytes",
+            "diagnostics remove tokens, credentials and URL parameters before truncating",
+            "actual CSV export neutralizes formula cells and keeps ordinary amounts and quoted fields",
+            "secret scan allows publishable credentials but detects service-role JWTs and private PEM headers",
+            "login rejects malformed inputs before Auth and makes unconfirmed and unknown accounts indistinguishable",
+            "least-privilege grants deny anonymous data and RPCs while preserving owner sync, triggers and wipe"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "backup",
+      "area": "Respaldo y restauración",
+      "acceptance": "JSON validado antes de sustituir; copias del propietario; cifrado autenticado; destino no vacío protegido.",
+      "sources": [
+        "lib/recovery-crypto.js",
+        "lib/restore-recovery.js"
+      ],
+      "tests": [
+        {
+          "file": "tests/audit-backup-validation.test.mjs",
+          "namedCases": [
+            "invalid backup call records are rejected before changing the existing account",
+            "backup normalization failure leaves both current state and calls untouched",
+            "backup import does not announce success when its local snapshot cannot be saved"
+          ]
+        },
+        {
+          "file": "tests/production-audit-recovery.test.mjs",
+          "namedCases": [
+            "choosing cloud retains the discarded local version and restoring it retains the current version",
+            "a different account cannot see pending copies; returning to the owner restores its pending work",
+            "quota exhaustion blocks destructive adoption and account switching without touching the only copy",
+            "four allowed sound files are rejected by the aggregate budget before persistence",
+            "large histories upload in bounded batches with a new expected revision at each commit",
+            "a failed later batch keeps confirmed calls and revision so retry sends only unfinished work",
+            "portable backups round trip with an offline private key and reject ciphertext tampering"
+          ]
+        },
+        {
+          "file": "tests/production-postgres.test.mjs",
+          "namedCases": [
+            "fresh migrations, actual RLS, bounded histories and encrypted-backup restore run in Postgres"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "game",
+      "area": "Logros y refuerzo",
+      "acceptance": "Recibos idempotentes, correcciones y recargas; apagar Logros conserva dinero/historia; sin recompensas al fallar guardar.",
+      "sources": [
+        "js/game.js",
+        "js/game-auto.js",
+        "js/game-audio.js",
+        "js/game-battle.js",
+        "js/game-duel.js",
+        "js/monsters.js",
+        "js/positive-reinforcement.js",
+        "js/reinforcement-feedback.js",
+        "js/reinforcement-rules.js"
+      ],
+      "tests": [
+        {
+          "file": "tests/game-state-bootstrap.test.mjs",
+          "namedCases": [
+            "normalizar gamificación durante el arranque no requiere el contexto de fechas y conserva el historial persistido"
+          ]
+        },
+        {
+          "file": "tests/game-phase6.test.mjs",
+          "namedCases": [
+            "Fase 6 expone el catálogo semanal y renderiza SVG seguro para todos los estados",
+            "HTML integra la ruta de Logros, el arena, las misiones, ajustes y modales sin IDs duplicados",
+            "Logros simplifica ajustes, comparte activación lateral y admite nombre personalizado seguro",
+            "state y settings conservan defaults y normalización de Fase 6",
+            "XP solo entra por llamadas actuales y oportunas, con tope diario y lock de snapshot",
+            "después de derrotar no entra XP nuevo pero sí se muestra botín extra",
+            "el hook real conserva el botín XP de la quinta llamada al reconciliar y recargar",
+            "el bono manual de Higher Rate no se suma dos veces y los tiles conservan su efecto fuera de ventana",
+            "la hora manual vacía no se convierte en 07:00 y las horas futuras no se guardan ni reciben XP",
+            "la normalización profunda contiene xp, estrellas, misiones y monstruo corruptos importados",
+            "derrota no debe seguir produciendo golpes/recompensas posteriores",
+            "STAGE CLEAR bloquea recompensas posteriores y solo vuelve a habilitarse al revocar",
+            "barras, misiones y racha exponen estado accesible",
+            "cierre y cofre son idempotentes, y el dinero secundario aparece en la experiencia",
+            "CSS de juego cubre motion reducido, layout estrecho y responsive",
+            "build mantiene módulos fuente fuera de public y el worker precarga el CSS de juego",
+            "gamificación apagada respeta hidden y el render conserva la estructura visual",
+            "Logros conserva las tarjetas de app.html y solo actualiza sus nodos internos",
+            "edición y borrado corrigen datos sin reescribir XP ya congelado por STAGE CLEAR",
+            "STAGE CLEAR reversible restaura escudos y racha, y conserva snapshot consistente",
+            "avisos y modales de juego se recuperan al cerrar",
+            "Logros muestra accesorios y cofre pendiente, y racha de Reportes respeta escudos",
+            "XP flotante representa concesión real y distingue XP sellado",
+            "pendientes finales de Phase 6 quedan conectados a comportamiento real",
+            "consistencia de gamificación se mantiene aunque esté apagada",
+            "Arcade fijo y reduced-motion solo elimina movimiento",
+            "simulación mensual: pegar llamadas usa hooks de juego y reemplaza live provisional",
+            "simulación mensual: llamadas y Break Lunch no pueden ocupar los mismos minutos",
+            "simulación mensual: llamada no salta ventana temprana ni reescribe entrada salida manual",
+            "simulación mensual: XP solo para llamadas productivas ya terminadas",
+            "simulación mensual: llamada manual futura se rechaza y live conserva segundos",
+            "segunda simulación mensual: importaciones tardías no dan XP indirecto",
+            "segunda simulación mensual: segunda sesión reabre el cierre antes de volver a congelar",
+            "segunda simulación mensual: caja y combo se reconcilian al corregir una live",
+            "segunda simulación mensual: Propio puede corregir una llamada ya importada",
+            "segunda simulación mensual: finalizar turno no cierra si falla el guardado de la llamada",
+            "segunda simulación mensual: ninguna llamada manual editada o pegada puede terminar en el futuro",
+            "segunda simulación mensual: descartar no reinicia ACW y reemplazar live corrige su fin",
+            "segunda simulación mensual: STAGE CLEAR usa el día del inicio del turno al cruzar medianoche",
+            "tercera simulación mensual: Finanzas nunca queda sobreasignada al bajar ganancias",
+            "tercera simulación mensual: reset y vaciado limpian estados derivados sin romper XP congelado",
+            "tercera simulación mensual: gamificación apagada mantiene consistencia y filas de cero minutos no dan XP",
+            "tercera simulación mensual: turno nocturno conserva día contable y correcciones oficiales",
+            "tercera simulación mensual: horario y meta históricos quedan congelados antes de cambios globales",
+            "tercera simulación mensual: recompensas financieras son reversibles",
+            "tercera simulación mensual: ACW se recalcula al editar borrar o vaciar llamadas",
+            "tercera simulación mensual: pegar llamadas de hoy vuelve a auto iniciar el turno",
+            "tercera simulación mensual: editar estado manual del día reconcilia gamificación",
+            "runtime smoke: helpers de renderGame existen para Logros y Higher Rate",
+            "cuarta simulación mensual: llamadas live antes y después del turno nunca quedan bloqueadas",
+            "cuarta simulación mensual: descartar la primera live revierte el turno que esa llamada abrió",
+            "cuarta simulación mensual: llamada manual de hoy auto inicia turno igual que pegar llamadas",
+            "cuarta simulación mensual: backup JSON realmente incluye y restaura settings",
+            "cuarta simulación mensual: Higher Rate cruza medianoche sin perder bonos",
+            "cuarta simulación mensual: llamadas antes o después del checkpoint cuentan como presencia sin mover Entrada/Salida",
+            "cuarta simulación mensual: descartar live también revierte efectos de gamificación del auto-turno",
+            "cuarta simulación mensual: gamificación nocturna no se parte a medianoche",
+            "quinta simulación mensual: editar fecha y nivel de Higher Rate sí llega al guardado",
+            "quinta simulación mensual: descartar live iniciada durante Break Lunch restaura la pausa",
+            "quinta simulación mensual: respaldo live sobrevive refresh y descartar revierte turno ACW",
+            "quinta simulación mensual: respaldo live conserva duración decimal y día contable nocturno",
+            "quinta simulación mensual: Break Lunch y reset respetan día contable de turno nocturno"
+          ]
+        },
+        {
+          "file": "tests/game-duel.test.mjs",
+          "namedCases": [
+            "call state always takes precedence over pause, ended shift and off shift",
+            "work interruptions preserve duel time, points and health and never resume automatically",
+            "all three attacks are telegraphed and jumping or moving avoids their collision",
+            "enemy damage can end a round, while safe play still expires at sixty seconds",
+            "weapons, grenade cooldown, score and best round remain isolated in the arcade model"
+          ]
+        },
+        {
+          "file": "tests/game-depth.test.mjs",
+          "namedCases": [
+            "las fases y placas son deterministas y no mezclan HP financiero",
+            "Higher Rate vivo solo activa furia en el día actual",
+            "loot transparente y equipamiento SVG son deterministas y accesibles",
+            "la superficie dinámica mantiene controles, recibos, accesibilidad y AudioContext único"
+          ]
+        },
+        {
+          "file": "tests/game-battle.test.mjs",
+          "namedCases": [
+            "weapon selection normalizes only cosmetic catalog ids; imports work without DOM",
+            "large imports remain one representation and excess events coalesce at six rows",
+            "the automatic shot runs briefly and releases its animation loop after impact",
+            "automatic default stays still and manual inputs never alter real HP or call data",
+            "canvas fallback presents automatic results and disables the optional duel",
+            "work calls interrupt the duel immediately and returning to break requires explicit resume",
+            "visibility/date changes cancel pending visual calls and unmount releases animation observers",
+            "switching reduced motion or disabling an active scene cancels every pending effect",
+            "same-day edits, deletions and goal changes cancel pending hits while additions preserve the batch",
+            "idle breathing never attacks and pauses for live calls, hidden scenes and victories",
+            "every third eligible represented call triggers one automatic special including batched counts",
+            "compact collection stays collapsed across sync until toggled, with real root-owned slots",
+            "winning shot precedes cofre and changed dates never reveal a stale cofre",
+            "paused call feedback stays static across sync and reduced feedback returns to real goal status"
+          ]
+        },
+        {
+          "file": "tests/game-auto.test.mjs",
+          "namedCases": [
+            "idle time can only animate a tiny walk, never attack or create temporary HP",
+            "specials count exact third calls across grouped representations",
+            "time jumps and separate scenes cannot alter call cadence"
+          ]
+        },
+        {
+          "file": "tests/game-audio.test.mjs",
+          "namedCases": [
+            "inicializar o recargar no crea contexto ni reproduce eventos anteriores",
+            "las once armas tienen timbres distintos, breves y con recursos finitos",
+            "la práctica agrupa ráfagas y limita repeticiones sin acumular una cola",
+            "misiones y victorias prevalecen sobre práctica tanto pendiente como activa",
+            "stop desconecta inmediatamente voces futuras aun cuando ended llegue después",
+            "silenciar o apagar gamificación cancela ráfagas futuras y práctica pendiente",
+            "los disparos respetan gesto real, gamificación apagada y volúmenes",
+            "cambiar fecha u ocultar cancela disparos pendientes y voces futuras",
+            "la guarda de fecha descarta disparos mientras resume espera",
+            "init es idempotente y gestos válidos reutilizan un único contexto",
+            "resume rechazado y Web Audio ausente conservan silencio sin errores",
+            "volumen maestro, volumen arcade y sus interruptores impiden desbloquear audio",
+            "un lote de impacto, misión y derrota reproduce una sola fanfarria",
+            "silenciar antes de reproducir cancela el lote incluso si después se restaura el volumen",
+            "apagar Logros cancela sonidos personales y pruebas pendientes sin reproducirlos al reactivar",
+            "apagar Logros durante resume cancela audio aunque refuerzo personal permanezca activado",
+            "silenciar durante una fanfarria detiene y desconecta todas las voces",
+            "ocultar página cancela lotes y voces y volver no reproduce sonidos pendientes",
+            "cancelar mientras resume espera impide que una promesa tardía reproduzca audio",
+            "una celebración activa protege su prioridad y una mayor la reemplaza",
+            "las voces terminadas liberan sus nodos y pagehide detiene las siguientes",
+            "los catorce efectos generan notas finitas y liberan sus recursos",
+            "los volúmenes se multiplican y se normalizan sin ganancias inválidas",
+            "cambiar la fecha antes de finalizar el lote descarta el sonido de la fecha anterior",
+            "cambiar la fecha durante una fanfarria detiene voces activas",
+            "cambiar la fecha mientras resume espera impide una celebración tardía"
+          ]
+        },
+        {
+          "file": "tests/super-audit-game.test.mjs",
+          "namedCases": [
+            "correction below eight calls revokes improved loot and requalifying grants it exactly once",
+            "correction removes improved cosmetic and equipment before requalifying",
+            "continue preserves a backup shield earned after closing the shift",
+            "continue reverses only stage shield consumption, preserving later backup award",
+            "continue does not remove a shield already restored by correcting adherence",
+            "goal chest XP remains idempotent across close, continue, correction, requalification and reset",
+            "exact decimal financial goal unlocks chest, while a real shortfall cannot",
+            "continue undoes weekly streak shield without consuming later backup shield",
+            "legacy same-day chest receipts prevent duplicate rewards across reopen and changed goal",
+            "invalid pending chest day is discarded by persisted normalization",
+            "large capped reward ledger reconciles every threshold without removing unrelated bonus",
+            "duplicate saved callbacks cannot repeat surprise, loot, chest or frozen stage XP",
+            "continuing a pause revokes its return bonus once and a late return cannot restore it",
+            "reopening a corrected frozen day reconciles invalid loot before earning new XP",
+            "reopening with Logros disabled also removes loot invalidated while frozen",
+            "day reset reverses stage consumption and award in the right order at the shield cap",
+            "decimal cycle goal grants exactly one rollover reward while a real cent shortfall grants none",
+            "current cycle uses the same decimal attainment as rollover"
+          ]
+        },
+        {
+          "file": "tests/positive-reinforcement.test.mjs",
+          "namedCases": [
+            "premios personales y catálogo normalizan límites sin introducir puntos negativos",
+            "premios acumulables conservan ventana e idempotencia sin el presupuesto antiguo",
+            "reemplazar una llamada live migra las referencias antes de reconciliar incluso con Logros apagado",
+            "una llamada anterior a la difícil no consume la recuperación pendiente",
+            "una cola llena conserva el progreso acumulado sin descartar premios previos",
+            "dropped repetidas no abren reflexión ni ganan premios y una recuperación requiere llamada productiva",
+            "Logros elimina plan, intensidad y presupuesto sin dejar controles ni listeners"
+          ]
+        },
+        {
+          "file": "tests/reinforcement-integration.test.mjs",
+          "namedCases": [
+            "Arcade sustituye intensidades antiguas sin activar Logros ni modificar XP guardado",
+            "el modo tranquilo sigue las llamadas en vivo y difiere feedback sin perder recompensas",
+            "misiones abiertas son automáticas y los enfoques de resultados sellados se conservan",
+            "Finanzas concede y revoca el premio en el mes local aunque UTC ya esté en el siguiente",
+            "completar el monto de un gasto recurrente concede su recibo mensual y reiniciarlo lo revoca",
+            "pegar ayer derrota su monstruo y cambiar el día no daña al monstruo actual ni concede XP histórico",
+            "corregir un día cerrado derrota su monstruo sin reabrir XP y retirar dinero revoca esa derrota",
+            "el combo reacciona a una llamada sin pago sin duplicar el feedback compacto",
+            "guardar con arena visible, ausente o Logros apagado conserva dinero y HP sin duplicar recibos",
+            "timers de llamadas sucesivas no duplican feedback ni alteran sus recibos en la batalla compacta",
+            "llamadas históricas, futuras y caídas no activan un impacto visual",
+            "hooks manual/live/import guardan una decisión por llamada y migran la oficial sin reintentar azar",
+            "cofre sorpresa real respeta bloqueo y tope sin perder su decisión persistida",
+            "hitos monetarios múltiples, cambio de meta, corrección y recarga no repiten celebraciones",
+            "corregir o borrar la llamada revierte XP sorpresa y conserva la decisión sin nuevos sorteos",
+            "hooks llamadas y correcciones mantienen hitos en el día contable nocturno",
+            "Break reinicia combo y reconciliación lo conserva; retorno puntual concede una sola vez",
+            "pausa tardía y retorno con XP bloqueado no conceden bonus; dropped conserva combo sin premiar errores",
+            "reanudar una pausa ya premiada y terminar tarde corrige la puntualidad sin duplicar XP",
+            "inactividad excluye pausas, turno cerrado y llamada activa; persiste dedupe y se rearma tras otra llamada",
+            "inactividad nocturna deduplica a ambos lados de medianoche del mismo turno",
+            "cola real limita a tres toasts y no repite el último texto después de expirar",
+            "apagar Logros limpia refuerzo visible, apaga el selector arcade y conserva premios e historial guardados",
+            "cierre de racha semanal conserva rollback y comparaciones al recargar y revoca el escudo al reabrir",
+            "metadatos de cierre importados validan dinero, fechas y rollback antes de restaurar premios",
+            "cierre nocturno cumplido proyecta la racha del día contable y las correcciones históricas no la proyectan de nuevo",
+            "cofre de meta exige dinero suficiente, meta positiva, día actual, Logros y ninguna llamada activa",
+            "cofre de meta exacta guarda el primer visor inmediatamente y repetir o recargar conserva un solo premio",
+            "cerrar y continuar el turno conserva el cofre de meta sin sellar ni conceder un segundo premio",
+            "corregir y borrar llamadas revoca el visor y su equipo; alcanzar la meta otra vez lo recupera sin sumar XP",
+            "premio de 25 XP se reembolsa por corrección y meta nueva sin permitir cultivar XP al repetir",
+            "cofres heredados conservan su recibo al corregir dinero o meta y bloquean un premio diario duplicado",
+            "visor desbloqueado en nivel uno conserva equipo facial y snapshot cerrado al normalizar y recargar"
+          ]
+        },
+        {
+          "file": "tests/reinforcement-rules.test.mjs",
+          "namedCases": [
+            "monetary milestones cross all reached thresholds once and survive reloads",
+            "corrections, deletion and goal changes retain claims while showing actual next progress",
+            "monetary milestones reach exact boundaries and reject nonfinite money",
+            "sumar pagos decimales alcanza el hito exacto sin pedir cero dólares adicionales",
+            "active work requires a real open shift and suppresses support during calls or pauses",
+            "active work uses latest completed call including dropped and excludes future or past-shift calls",
+            "active work subtracts a clipped union of pauses and interruptions rather than double counting",
+            "active work follows the real shift across midnight without resetting inactivity",
+            "scheduled working intervals exclude off-duty time and union overlaps before subtracting pauses",
+            "scheduled work intersects the real overnight shift rather than calendar dates",
+            "supportive closure uses up to three factual positives and conditional tomorrow projection",
+            "sparse and difficult days never manufacture achievements or money without currency formatting",
+            "closure comparisons stay personal and best call uses the provided money formatter",
+            "surprise decisions use a single validated controlled draw with a fifteen percent boundary"
+          ]
+        },
+        {
+          "file": "tests/reinforcement-feedback.test.mjs",
+          "namedCases": [
+            "Logros es maestro y el interruptor personal decide su canal incluso con intensidad antigua",
+            "Arcade celebra hitos y movimiento reducido conserva anuncios sin partículas",
+            "textos centrales tienen variantes estables y no dejan variables sin reemplazar",
+            "feedback reconoce llamada normal, umbral largo, bono y mejor pago con moneda secundaria",
+            "mejor llamada compara el bono real de las anteriores y excluye el mismo evento",
+            "Logros apagado bloquea premios y reflexión, y cierra modales sin borrar el progreso al desactivar"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "appearance",
+      "area": "Apariencia, idioma y ayuda",
+      "acceptance": "ES/EN sin parámetros perdidos ni markup inseguro, contraste de paletas, preferencia explícita y movimiento reducido.",
+      "sources": [
+        "js/appearance.js",
+        "js/appearance-colors.js",
+        "js/theme-toggle.js",
+        "js/theme-init.js",
+        "js/theme-palettes.js",
+        "js/i18n.js",
+        "js/i18n-key.js",
+        "js/help-tooltips.js",
+        "js/guide-theme.js"
+      ],
+      "tests": [
+        {
+          "file": "tests/appearance-language.test.mjs",
+          "namedCases": [
+            "all custom palettes have readable normal text and restore original without removing unrelated variables",
+            "offline English translates authored text while retaining personal names and nested safe markup",
+            "catalog includes current HTML and authored JS without style or script source",
+            "new and changed strings, missing parameters and injected HTML cannot publish as valid English",
+            "saved mission messages change language without editing numbers or personal values",
+            "dynamic document messages and attributes retain personal values across language changes and independent bundles",
+            "English UI keeps saved equipment identifiers and adherence checkpoint identities"
+          ]
+        },
+        {
+          "file": "tests/language-preference.test.mjs",
+          "namedCases": [
+            "English is the default while an explicit Spanish preference remains Spanish",
+            "public language has priority and valid saved account languages remain compatible",
+            "malformed, missing and unusable account settings use English without throwing",
+            "login selection uses independent keys and clearing pending preserves the public language and account data",
+            "ordinary preference updates create no login override and pending values must be valid",
+            "default storage resolution tolerates browsers whose storage property access throws"
+          ]
+        },
+        {
+          "file": "tests/finance-category-language.test.mjs",
+          "namedCases": [
+            "expense and savings category IDs remain valid while the form labels change language"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bridge",
+      "area": "Extensiones e historial",
+      "acceptance": "Puente valida mensajes, deduplica y separa versiones; historial paginado; resumen independiente sin acceder a otra cuenta.",
+      "sources": [
+        "js/propio-bridge.js",
+        "js/propio-bridge-rules.js",
+        "js/propio-history.js",
+        "js/propio-history-pages.js"
+      ],
+      "tests": [
+        {
+          "file": "tests/bridge-chain.test.mjs",
+          "namedCases": [
+            "worker-to-receiver chain retries lost acknowledgments across 500 calls and worker restarts without duplicates"
+          ]
+        },
+        {
+          "file": "tests/propio-bridge.test.mjs",
+          "namedCases": [
+            "el puente bloquea una pestaña desactualizada incluso si se descarta el aviso o vuelve el valor anterior",
+            "el puente acepta escrituras propias y una nueva revisión tras recargar",
+            "signals require exact endpoints and allowlisted primitive names",
+            "event validation rejects future, expired, zero-length and malformed values and strips unknown data",
+            "reducer ignores incoming/rejected/unmatched ends and collapses repeated starts and ends",
+            "receiver saves offline pairs once and recognizes official replacement metadata",
+            "receiver live lifecycle blocks manual conflict, mismatched start and pending backup",
+            "storage failure blocks ack, then retry persists without replaying financial mutation",
+            "explicit discard prevents queued end from resurrecting a deleted bridge call",
+            "availability never guesses a call or a pause; corrupt receipt data is handled",
+            "a delayed acceptance cannot end a newer manual pause before it started",
+            "observation survives worker restart without writing the tracker or retaining payload data",
+            "worker ignores failed requests, foreign initiators, and non-call events",
+            "paired users can enable auto before the first observed call and save that first accepted pair once",
+            "enabling before a completed observation does not fabricate an already accepted call",
+            "activation does not fabricate the end of an already observed call; auto delivers pairs once",
+            "closed tracker queues across restart, prevents cross-account pairing and pauses expired data",
+            "multiple writable tracker tabs and rejected app acknowledgments hold queue",
+            "reviewed pending signals require a popup action and return to observation",
+            "reconnecting a paired account is idempotent; changing account or pausing cannot orphan an active call",
+            "window bridge validates source, origin, scope and nonce, and stops after logout"
+          ]
+        },
+        {
+          "file": "tests/propio-history.test.mjs",
+          "namedCases": [
+            "portal numbers recognize USD, decimal comma and grouped currencies without treating pending as zero",
+            "summary uses actual portal pay including unpaid rows and negative adjustments",
+            "pending money and invalid duration remain explicit partial totals",
+            "columns recognize reordered call history and reject unrelated tables"
+          ]
+        },
+        {
+          "file": "tests/propio-history-pages.test.mjs",
+          "namedCases": [
+            "Angular paginator range validates zero, grouped totals and English/Spanish labels",
+            "all 285 rows are counted exactly once, identical pages stay distinct and original page is restored",
+            "final partial page, one page, empty history and missing first-page button are supported",
+            "cancel returns to the initial page and never returns a completed total",
+            "changed filters or changing record count abort instead of mixing periods",
+            "a skipped, stalled or incomplete page cannot become an official full-period total"
+          ]
+        },
+        {
+          "file": "tests/propio-extension-separation.test.mjs",
+          "namedCases": [
+            "independent summary is scoped to Propio and has no call observer, tracker or messaging capabilities",
+            "bridge only installs its tracker content script and does not build or inject a history summary"
+          ]
+        },
+        {
+          "file": "tests/propio-extension-reload.test.mjs",
+          "namedCases": [
+            "reloading the extension handles synchronous context invalidation without leaving a hello loop",
+            "normal delivery still acknowledges once and clears its timeout",
+            "invalidated content stops sending and clears outstanding delivery timeouts"
+          ]
+        },
+        {
+          "file": "tests/propio-summary-i18n.test.mjs",
+          "namedCases": [
+            "summary defaults and legacy currency-only settings use English; Spanish is explicit",
+            "summary status, plural calls and scan errors follow the selected language"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "public",
+      "area": "Portada y páginas públicas",
+      "acceptance": "Idiomas, rutas, acceso a app y metadatos consistentes; sin bucles de entrada.",
+      "sources": [
+        "js/landing.js",
+        "js/landing-ui.js",
+        "js/landing-meta.js",
+        "js/landing-entry.js",
+        "js/footer-year.js"
+      ],
+      "tests": [
+        {
+          "file": "tests/seo-landing.test.mjs",
+          "namedCases": [
+            "language changes align visible URL, metadata and schema while retaining login state",
+            "explicit Spanish URLs work even when storage is blocked or English was saved",
+            "language alternates and sitemap agree, without indexing private app routes",
+            "public contact information is restored from its authored version"
+          ]
+        },
+        {
+          "file": "tests/interpreter-guide.test.mjs",
+          "namedCases": [
+            "both guide routes have canonical redirects and reciprocal sitemap entries"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "offline",
+      "area": "Caché y funcionamiento sin red",
+      "acceptance": "Worker versionado; preservar app útil ante 503; retirar sólo cachés propias; propietario identificado para copia local.",
+      "sources": [
+        "js/service-worker.js",
+        "js/register-sw.js"
+      ],
+      "tests": [
+        {
+          "file": "tests/service-worker-runtime.test.mjs",
+          "namedCases": [
+            "PWA cached assets remain usable offline and refresh failure is handled for the event lifetime",
+            "PWA uncached network failure reaches the caller",
+            "PWA cache quota does not discard a valid navigation or asset response",
+            "PWA activation removes an old release and retains the new cache"
+          ]
+        },
+        {
+          "file": "tests/super-audit-sync.test.mjs",
+          "namedCases": [
+            "sharing a browser identity does not authorize an older divergent tab to overwrite newer cloud calls",
+            "offline reopening and deleting a saved call sends its deletion after reconnecting without another reload",
+            "changing account then adopting the downloaded cloud keeps the baseline for call deletion",
+            "a late response for the previous account cannot mark the new account clean or change its base",
+            "changing authentication identity blocks a pending snapshot from being sent as the next account",
+            "an offline reconnect against a later cloud revision preserves the other device and reports conflict",
+            "switching authentication while cloud is loading aborts the previous account before adoption and mount",
+            "switching account while the conflict prompt is open cannot adopt or upload the old selection",
+            "refreshing a token for the same account keeps its pending upload available",
+            "a failed server navigation does not replace the cached app needed for a later offline reopening",
+            "worker activation retires only this app caches and preserves another cache on the same origin",
+            "cloud adoption cannot replace a snapshot if its ownership metadata cannot be persisted",
+            "failed snapshot hydration restores its previous metadata along with its previous data",
+            "local adoption reports failed ownership persistence instead of silently starting the app",
+            "a delayed acknowledgement cannot regress a newer sync revision persisted by another tab",
+            "an old tab refreshes its call baseline when another tab advanced the shared revision"
+          ]
+        },
+        {
+          "file": "tests/offline-identity.test.mjs",
+          "namedCases": [
+            "offline identity accepts settings/call-only histories for the cached owner"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "api",
+      "area": "API, datos y privacidad",
+      "acceptance": "Token verificado, dueño derivado de Auth, RLS y permisos mínimos; límites de cuerpo/cuotas y diagnósticos redactados.",
+      "sources": [
+        "js/monitoring.js",
+        "api/delete-account.js",
+        "api/login.js",
+        "api/telemetry.js",
+        "lib/request-body.js",
+        "lib/diagnostic-redaction.js"
+      ],
+      "tests": [
+        {
+          "file": "tests/super-audit-api.test.mjs",
+          "namedCases": [
+            "persistent login throttle blocks before sending authentication credentials",
+            "a healthy shared limiter permits authentication and rejects the shared quota across instances"
+          ]
+        },
+        {
+          "file": "tests/launch-security.test.mjs",
+          "namedCases": [
+            "request limits reject oversized streams before reading their remainder and count UTF-8 bytes",
+            "diagnostics remove tokens, credentials and URL parameters before truncating",
+            "actual CSV export neutralizes formula cells and keeps ordinary amounts and quoted fields",
+            "secret scan allows publishable credentials but detects service-role JWTs and private PEM headers",
+            "login rejects malformed inputs before Auth and makes unconfirmed and unknown accounts indistinguishable",
+            "least-privilege grants deny anonymous data and RPCs while preserving owner sync, triggers and wipe"
+          ]
+        },
+        {
+          "file": "tests/security-preparation.test.mjs",
+          "namedCases": [
+            "all pages load local external scripts without inline handlers",
+            "enforced CSP contains the required Supabase and asset origins",
+            "production build pins and bundles Supabase without source maps",
+            "phase 5 migration keeps private data behind RLS and persistent limits",
+            "landing redirects only to a validated same-origin URL",
+            "telemetry enforces both global and per-IP limits",
+            "security hardening migration enforces call quota and bounds telemetry storage",
+            "git ignores environment files while allowing explicit examples",
+            "PWA shell includes a manifest and service worker with API exclusions",
+            "clean app route preserves legacy links and login navigation",
+            "verified app sessions display the root URL without reloading or losing URL state",
+            "PWA launches the clean route offline and redirects legacy navigations",
+            "footer year tolerates pages without a footer",
+            "PDF report registers a click listener on its own print window"
+          ]
+        },
+        {
+          "file": "tests/production-postgres.test.mjs",
+          "namedCases": [
+            "fresh migrations, actual RLS, bounded histories and encrypted-backup restore run in Postgres"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "release",
+      "area": "Publicación e integridad del build",
+      "acceptance": "CI protegida, activos versionados, CSP/HSTS/no-store, módulos y wiring válidos; no fuentes privadas ni sourcemaps.",
+      "sources": [],
+      "tests": [
+        {
+          "file": "tests/production-shell.test.mjs",
+          "namedCases": [
+            "the small production shell reconstructs every control and authored text before boot",
+            "external styles preserve cascade order, markup attributes and literal dollars or backticks",
+            "new shell assets are available in the offline cache and unsupported source layouts fail the build"
+          ]
+        },
+        {
+          "file": "tests/production-health.test.mjs",
+          "namedCases": [
+            "health deduplicates concurrent probes and exposes only minimal status",
+            "unconfigured health returns 503 without requesting the database",
+            "health rejects mutation methods without probing"
+          ]
+        },
+        {
+          "file": "tests/production-boot-order.test.mjs",
+          "namedCases": [
+            "production gate retains a versioned native app import and never evaluates app modules eagerly",
+            "two isolated storage contexts initialize from cloud after the gate and preserve later edits"
+          ]
+        },
+        {
+          "file": "tests/ui-wiring.test.mjs",
+          "namedCases": [
+            "wiring crítico: Higher Rate y ajuste de horario importan sus helpers de UI",
+            "Higher Rate: borrar ventana actualiza settings antes de repintar resúmenes",
+            "estructura UI: no hay IDs duplicados ni targets de modal/navegación rotos",
+            "guardas de build incluyen módulos y wiring antes de generar producción"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "operations",
+      "area": "Operación y avisos",
+      "acceptance": "Backups/retención y monitor verificados; fallo confirmado tras reintento; notificar sólo fallo nuevo o recuperación.",
+      "sources": [
+        "api/health.js",
+        "api/operations.js",
+        "lib/external-monitor.js"
+      ],
+      "tests": [
+        {
+          "file": "tests/operations.test.mjs",
+          "namedCases": [
+            "operations require the independent secret before requesting private data",
+            "monitor verifies database readiness and the live app headers, records failures"
+          ]
+        },
+        {
+          "file": "tests/external-monitor.test.mjs",
+          "namedCases": [
+            "independent probe verifies health and app security headers",
+            "a 200 health response with failed readiness still raises a failure",
+            "missing headers and gateway failures are observable even with a working API",
+            "transient failure is retried and suppressed when the retry succeeds",
+            "network failure is confirmed without storing an exception or response",
+            "first failure alerts once, changed failure alerts, recovery alerts once"
+          ]
+        }
+      ]
+    }
+  ],
+  "limits": [
+    "Una cuenta Google real; políticas reales con identidades sintéticas para aislamiento.",
+    "Interfaz compilada con backend aislado; adaptación a 390 px no certifica gestos de teléfonos físicos.",
+    "Recuperación de contenido probada; tiempo completo de nueva infraestructura y DNS no medido.",
+    "Monitor local depende de Codex/equipo disponibles; backups externos diarios, retención prevista de 31 días.",
+    "Visibilidad por nombre en Google depende del buscador y no bloquea funcionamiento."
+  ]
+}

@@ -3,7 +3,7 @@ import { applyAppearance, wireAppearance } from './appearance.js';
 import { wireAchievementHelp } from './help-tooltips.js';
 import { normalizeBattleWeapon } from './game-battle.js';
 import { createPropioReceiver, createStorageRevisionGuard, ignorePropioCall } from './propio-bridge.js';
-import { settingsWithinBudget } from './sync.js';
+import { settingsWithinBudget, reportLocalPersistenceFailure } from './sync.js';
 // Cuerpo principal de la app (Inicio, Horario, Llamadas, Higher Rate, Finanzas, Reportes,
 // Calendario, Ajustes...). Vive como módulo ES aparte para no ser parte del documento HTML: lo
 // carga js/boot.js con un import() dinámico recién cuando la sesión y los datos están listos
@@ -1255,6 +1255,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
 
     function canPersistLocalChanges() {
       if (localStorageRevision.isCurrent()) return true;
+      reportLocalPersistenceFailure('stale');
       toast(translateText('Otra pestaña guardó cambios más recientes. Recarga antes de guardar; tus datos guardados se conservaron.'));
       return false;
     }
@@ -1268,6 +1269,8 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
     function persistFullSnapshot() {
       if (!canPersistLocalChanges()) return false;
       if (!settingsWithinBudget(settings)) {
+        storageSnapshotPending = true;
+        reportLocalPersistenceFailure('budget');
         toast(translateText('Tus ajustes superan el espacio permitido para sincronizar. Reduce un sonido personalizado o el tamaño de tus ajustes antes de guardar.'));
         return false;
       }
@@ -1277,6 +1280,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
         keys.forEach(key => { previous[key] = localStorage.getItem(key); });
       } catch {
         storageSnapshotPending = true;
+        reportLocalPersistenceFailure('quota');
         toast(STORAGE_QUOTA_TOAST);
         return false;
       }
@@ -1305,6 +1309,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
         });
         toast(STORAGE_QUOTA_TOAST);
       }
+      reportLocalPersistenceFailure(ok ? null : 'quota');
       return ok;
     }
 
@@ -1314,18 +1319,22 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
       if (storageSnapshotPending) return persistFullSnapshot();
       const ok = safeLocalStorageSet(STORAGE_KEY, JSON.stringify(state));
       if (!ok) { storageSnapshotPending = true; toast(STORAGE_QUOTA_TOAST); }
+      reportLocalPersistenceFailure(ok ? null : 'quota');
       return ok;
     }
 
     export function saveSettingsOnly() {
       if (!canPersistLocalChanges()) return false;
       if (!settingsWithinBudget(settings)) {
+        storageSnapshotPending = true;
+        reportLocalPersistenceFailure('budget');
         toast(translateText('Tus ajustes superan el espacio permitido para sincronizar. Reduce un sonido personalizado o el tamaño de tus ajustes antes de guardar.'));
         return false;
       }
       if (storageSnapshotPending) return persistFullSnapshot();
       const ok = safeLocalStorageSet(SETTINGS_KEY, JSON.stringify(settings));
       if (!ok) { storageSnapshotPending = true; toast(STORAGE_QUOTA_TOAST); }
+      reportLocalPersistenceFailure(ok ? null : 'quota');
       return ok;
     }
 

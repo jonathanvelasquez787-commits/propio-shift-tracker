@@ -2233,5 +2233,8 @@
   "s_fff1384d": "Settings → \"Delete my account\" removes your account and active data. Historical encrypted copies are removed by the rotation described above. \"Delete all data\" clears only this browser.",
   "s_26d66b15": "That value is too large to calculate the goal.",
   "s_bcc9a0aa": "Another tab saved more recent changes. Reload before saving; your saved data was preserved.",
-  "s_eb8b17fb": "The backup contains invalid calls. Your current data was not changed."
+  "s_eb8b17fb": "The backup contains invalid calls. Your current data was not changed.",
+  "s_1f1b2bef": "Could not save — reload this tab",
+  "s_58e15b14": "Could not save — reduce the size of your settings",
+  "s_e2cab854": "Could not save — storage is full"
 }

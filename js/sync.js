@@ -30,6 +30,22 @@ let pushTimer = null;
 let maxWaitTimer = null;
 let pushing = false;
 let listeners = [];
+let localPersistenceFailure = null;
+const LOCAL_FAILURE_KEY = Symbol.for('propio.localPersistenceFailure');
+
+export function getLocalPersistenceFailure() {
+  return typeof window === 'undefined' ? localPersistenceFailure : window[LOCAL_FAILURE_KEY] ?? null;
+}
+
+export function reportLocalPersistenceFailure(reason) {
+  localPersistenceFailure = reason;
+  // Boot and app are separate bundles; share the warning through the document's window.
+  if (typeof window !== 'undefined') {
+    window[LOCAL_FAILURE_KEY] = reason;
+    if (typeof window.dispatchEvent === 'function') window.dispatchEvent(new CustomEvent('propio-local-persistence'));
+  }
+  emit('local-persistence', { reason });
+}
 let cloudCallHashes = new Map();
 let cloudCallOwner = null;
 let cloudCallRevision = null;
