@@ -1,6 +1,10 @@
 import test from 'node:test';
+import { beforeEach } from 'node:test';
 import { translateText, ui, displayLocale } from '../js/i18n.js';
 import assert from 'node:assert/strict';
+
+// Keep Date.now() and generated call-day keys deterministic across midnight.
+beforeEach(t => t.mock.timers.enable({ apis: ['Date'], now: new Date('2026-10-10T18:00:00Z') }));
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';

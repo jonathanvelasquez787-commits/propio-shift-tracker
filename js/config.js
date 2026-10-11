@@ -13,7 +13,7 @@
 // (empieza con sb_publishable_). Las dos sirven acá — son la llave pública.
 
 export const SUPABASE_URL = 'https://ccqlvcrsoluxoymuhxnl.supabase.co';
-export const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjcWx2Y3Jzb2x1eG95bXVoeG5sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk4NDk5ODYsImV4cCI6MjEwNTQyNTk4Nn0.NXZxRqc4pPIFiDdBUruWgr2fafCXtyMwSXsIgN1OkEs';
+export const SUPABASE_ANON_KEY = 'sb_publishable_ywzE1dak_P5C2ZKxwyOa4Q_fZ_t78lu';
 
 // Nombre visible de la app (títulos, correos, textos legales).
 export const APP_NAME = 'Propio Shift Tracker';
