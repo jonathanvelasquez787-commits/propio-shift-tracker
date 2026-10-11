@@ -101,6 +101,7 @@
         {
           "file": "tests/super-audit-sync.test.mjs",
           "namedCases": [
+            "a saved full reset removes prior cloud calls and a fresh session cannot bring them back",
             "sharing a browser identity does not authorize an older divergent tab to overwrite newer cloud calls",
             "offline reopening and deleting a saved call sends its deletion after reconnecting without another reload",
             "changing account then adopting the downloaded cloud keeps the baseline for call deletion",
@@ -142,6 +143,10 @@
         {
           "file": "tests/audit-persistence.test.mjs",
           "namedCases": [
+            "confirmed full reset writes an empty snapshot without mistaking its own changes for another tab",
+            "a reset confirmation cannot delete a newer snapshot written while its dialog was open",
+            "a rejected full reset preserves disk and memory without success; retry can reset completely",
+            "opening a full reset confirmation without accepting leaves all saved data intact",
             "guardar solo estado no vuelve vigente un tab que ya tenía llamadas externas más recientes",
             "una pestaña antigua no reemplaza el historial guardado por otra pestaña",
             "una cuota agotada no persiste recompensas de llamadas que no llegaron al disco; un reintento guarda todo",
@@ -344,6 +349,10 @@
         {
           "file": "tests/audit-persistence.test.mjs",
           "namedCases": [
+            "confirmed full reset writes an empty snapshot without mistaking its own changes for another tab",
+            "a reset confirmation cannot delete a newer snapshot written while its dialog was open",
+            "a rejected full reset preserves disk and memory without success; retry can reset completely",
+            "opening a full reset confirmation without accepting leaves all saved data intact",
             "guardar solo estado no vuelve vigente un tab que ya tenía llamadas externas más recientes",
             "una pestaña antigua no reemplaza el historial guardado por otra pestaña",
             "una cuota agotada no persiste recompensas de llamadas que no llegaron al disco; un reintento guarda todo",
@@ -859,6 +868,7 @@
         {
           "file": "tests/super-audit-sync.test.mjs",
           "namedCases": [
+            "a saved full reset removes prior cloud calls and a fresh session cannot bring them back",
             "sharing a browser identity does not authorize an older divergent tab to overwrite newer cloud calls",
             "offline reopening and deleting a saved call sends its deletion after reconnecting without another reload",
             "changing account then adopting the downloaded cloud keeps the baseline for call deletion",

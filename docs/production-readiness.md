@@ -37,13 +37,29 @@ Los ajustes que exceden el presupuesto también mantienen el snapshot completo
 pendiente: guardar después sólo estado no puede omitir sus llamadas o ajustes.
 Una pestaña antigua continúa sin poder reemplazar el disco reciente. Las pruebas
 de cuota, presupuesto, reintento completo y dos instancias de módulo cubren
-estos contratos. La suite final tiene 455 pruebas sin fallos.
+estos contratos. Ese cierre pasó 455 pruebas; el siguiente incidente añadió
+cinco regresiones y la suite actual pasa 460 pruebas sin fallos.
 
 El build real se comprobó con backend aislado y cuenta ficticia: rechazar las
 escrituras muestra «No se pudo guardar — almacenamiento lleno», conserva la
 revisión de nube y deja el cambio en la sesión; permitirlas y guardar después
 sube el snapshot pendiente. La interfaz vuelve a «Guardado en la nube» sólo
 después del acuse. No se introducen datos de prueba en producción.
+
+## Reinicio completo después de la protección de pestañas
+
+El botón «Borrar todos los datos» eliminaba las tres claves antes de guardar
+los valores iniciales. El guardado detectaba ese mismo borrado como una
+revisión externa y lo rechazaba. Ahora comprueba la revisión y escribe el
+snapshot inicial mediante el escritor completo; si falla, restaura también
+el estado en memoria y no anuncia éxito ni abre la bienvenida.
+
+Cinco regresiones cubren reinicio confirmado, cambios externos durante la
+confirmación, fallo de escritura con reintento, cancelación y bajas de llamadas
+en nube al abrir una sesión nueva. El build real se verificó con una cuenta
+ficticia y backend local: exportación recuperable de dos llamadas, confirmación
+del reinicio, cero llamadas en servidor y bienvenida con cero llamadas después
+de recargar. No se ejecutó el borrado de la cuenta del propietario.
 
 ## Evidencia previa que sigue vigente
 

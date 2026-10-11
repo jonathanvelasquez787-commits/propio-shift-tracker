@@ -4400,21 +4400,23 @@ function renderPayDatesSection() {
       if (controlsGrid) controlsGrid.style.display = isLive ? 'none' : '';
     }
 
-    // A diferencia de resetDay (borra SOLO el día activo), esto borra TODO lo que la app guarda en
-    // este navegador: las 3 llaves de localStorage completas (STORAGE_KEY/CALLS_KEY/SETTINGS_KEY),
-    // sin dejar nada.
+    // Reset all three keys through the guarded snapshot writer, without a delete/write gap.
     function eraseAllData() {
       appConfirm(translateText('¿Borrar TODOS los datos del programa? Esto borra permanentemente todas las llamadas, turnos, pausas, horario semanal, metas y tu nombre/emoji guardados en este navegador. No se puede deshacer. La app queda como recién instalada (con el popup de bienvenida de nuevo).'), () => {
-        try {
-          localStorage.removeItem(STORAGE_KEY);
-          localStorage.removeItem(CALLS_KEY);
-          localStorage.removeItem(SETTINGS_KEY);
-        } catch {}
+        if (!canPersistLocalChanges()) return false;
+        const previous = { state, calls, settings };
 
         setAppState(defaultState());
         setAppCalls([]);
         setAppSettings(defaultSettings());
         ensureCurrencySettings();
+        if (persistFullSnapshot() === false) {
+          setAppState(previous.state);
+          setAppCalls(previous.calls);
+          setAppSettings(previous.settings);
+          render();
+          return false;
+        }
 
         // Vistas/edición en memoria que ya no tienen a qué apuntar tras el borrado — mismo criterio
         // de limpieza que ya usan otros flujos (ej. resetDay reacomoda activeDayKey).
@@ -4424,7 +4426,7 @@ function renderPayDatesSection() {
         editingGapContext = null;
         resetCallEditorState();
 
-        if (saveAll() === false) return false;
+        render();
         toast(translateText('Todos los datos fueron borrados'));
         closeModal('resetModal');
 
