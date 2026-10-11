@@ -28,6 +28,11 @@ test('diagnostics remove tokens, credentials and URL parameters before truncatin
   for (const secret of [token, privateKey, 'opaque-refresh-secret', 'a secret phrase', 'opaque-value', 'person@example.test', 'private-code', 'private-fragment']) assert.ok(!clean.includes(secret), secret);
   assert.equal(cleanDiagnostic({ unexpected: 'object' }, 100), '');
   assert.equal(cleanDiagnostic('password=abcdefghijklmnopqrstuvwxyz', 20), 'password=[redacted]');
+  for (const input of ['Authorization: Basic dXNlcjpwYXNz', 'password=first secret phrase, with punctuation', 'Authorization: Digest username="user", response="private-response"', 'password="first\\" second secret"']) {
+    const output = cleanDiagnostic(input, 2000);
+    for (const sensitive of ['dXNlcjpwYXNz', 'first', 'secret', 'phrase', 'punctuation', 'user', 'private-response']) assert.ok(!output.includes(sensitive), output);
+  }
+  assert.equal(cleanDiagnostic('Authorization: Basic dXNlcjpwYXNz\nrelease=v1', 2000), 'Authorization: [redacted]\nrelease=v1');
 });
 
 test('actual CSV export neutralizes formula cells and keeps ordinary amounts and quoted fields', () => {
