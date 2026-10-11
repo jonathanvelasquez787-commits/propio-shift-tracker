@@ -22,6 +22,7 @@ import {
   financeSwapPriority,
   financeFindRow,
   financeApplySignedAmount,
+  parseAllocationAmount,
   financeResetRow,
   financeToggleManualPaid,
   financeDeleteRow,
@@ -1252,6 +1253,12 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
     const STORAGE_QUOTA_TOAST = translateText('⚠️ No se pudo guardar — el almacenamiento del navegador está lleno. Tu cambio se mantiene en esta sesión, pero no quedará guardado hasta que liberes espacio (borra llamadas muy viejas o un sonido personalizado en Avisos).');
     let storageSnapshotPending = false;
 
+    function canPersistLocalChanges() {
+      if (localStorageRevision.isCurrent()) return true;
+      toast(translateText('Otra pestaña guardó cambios más recientes. Recarga antes de guardar; tus datos guardados se conservaron.'));
+      return false;
+    }
+
     export function saveAll() {
       const ok = persistFullSnapshot();
       render();
@@ -1259,6 +1266,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
     }
 
     function persistFullSnapshot() {
+      if (!canPersistLocalChanges()) return false;
       if (!settingsWithinBudget(settings)) {
         toast(translateText('Tus ajustes superan el espacio permitido para sincronizar. Reduce un sonido personalizado o el tamaño de tus ajustes antes de guardar.'));
         return false;
@@ -1301,6 +1309,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
     }
 
     export function saveStateOnly() {
+      if (!canPersistLocalChanges()) return false;
       // Tras un fallo, cualquier guardado debe incluir también las llamadas y ajustes pendientes.
       if (storageSnapshotPending) return persistFullSnapshot();
       const ok = safeLocalStorageSet(STORAGE_KEY, JSON.stringify(state));
@@ -1309,6 +1318,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
     }
 
     export function saveSettingsOnly() {
+      if (!canPersistLocalChanges()) return false;
       if (!settingsWithinBudget(settings)) {
         toast(translateText('Tus ajustes superan el espacio permitido para sincronizar. Reduce un sonido personalizado o el tamaño de tus ajustes antes de guardar.'));
         return false;
@@ -4041,7 +4051,7 @@ function renderPayDatesSection() {
           registerDayInterruption(todayCallDateKey(), 'shift', state.shiftEndedAt, nowISO);
           state.shiftEndedAt = null;
           setEvent('shift', translateText('Shift continuado (interrupción accidental)'), fmtTime(now), 'manual');
-          saveAll();
+          if (saveAll() === false) return false;
           stopShiftAlarm();
           toast(ui`Turno continuado — interrupción de ${formatMinutes(gapMin)} min registrada`);
           onGameShiftStarted({ continued: true });
@@ -4055,7 +4065,7 @@ function renderPayDatesSection() {
       state.shiftStartedAt = alreadyStarted ? state.shiftStartedAt : nowISO;
       state.shiftEndedAt = null;
       setEvent('shift', 'Shift iniciado', fmtTime(now), 'manual');
-      saveAll();
+      if (saveAll() === false) return false;
       // El aviso de "Conéctate ya" ya no tiene razón de seguir sonando — checkShiftAlarm lo
       // apagaría solo en el próximo tick (hasta 1s de retraso), pero apagarlo aquí de inmediato
       // evita ese beep extra.
@@ -4085,7 +4095,7 @@ function renderPayDatesSection() {
       const now = new Date().toISOString();
       state.shiftEndedAt = now;
       setEvent('shift', 'Shift terminado', fmtTime(new Date(now)), 'manual');
-      saveAll();
+      if (saveAll() === false) return false;
       toast('Shift terminado');
       onGameShiftEnded(shiftDayKey);
     }
@@ -4116,7 +4126,7 @@ function renderPayDatesSection() {
             continuationInterruptionId: interruption?.id || null,
             continuationEventId: continuationEvent?.id || null,
           };
-          saveAll();
+          if (saveAll() === false) return false;
           onGamePauseStarted(type);
           stopBreakStartAlarm();
           toast(ui`${pretty} continuado — interrupción de ${formatMinutes(gapMin)} min registrada`);
@@ -4126,7 +4136,7 @@ function renderPayDatesSection() {
 
       state.activePause = { type, startedAt: now.toISOString(), shiftDayKey: dayKey };
       setEvent(type, ui`${pretty} iniciado`, fmtTime(now), 'manual');
-      saveAll();
+      if (saveAll() === false) return false;
       // El aviso de "va a empezar" ya no aplica una vez que la pausa arrancó de verdad — se apaga
       // de inmediato en vez de esperar al próximo tick.
       stopBreakStartAlarm();
@@ -4404,7 +4414,7 @@ function renderPayDatesSection() {
         editingGapContext = null;
         resetCallEditorState();
 
-        saveAll();
+        if (saveAll() === false) return false;
         toast(translateText('Todos los datos fueron borrados'));
         closeModal('resetModal');
 
@@ -4482,7 +4492,7 @@ function renderPayDatesSection() {
         state.activeDayKey = normalizedDayKey || dayKey;
         onGameDayReset(normalizedDayKey || dayKey);
         financeRunAutoFillCascade();
-        saveAll();
+        if (saveAll() === false) return false;
         toast(translateText('Día reiniciado'));
       });
     }
@@ -4826,7 +4836,7 @@ function renderPayDatesSection() {
       if (importChangedData) {
         setEvent('import', translateText('Llamadas importadas'), ui`${unique.length} fila(s) · ${importNote}${overlapNote}${duplicateNote}${futureNote}${replacedNote}${correctedNote}`, 'Propio');
         financeRunAutoFillCascade();
-        saveAll();
+        if (saveAll() === false) return false;
       }
       renderImportSkippedSummary(skippedDuplicates, skippedOverlaps, futureRows, replacedLive, correctedOfficial);
 
@@ -5048,6 +5058,9 @@ function renderPayDatesSection() {
       if (!Array.isArray(payload.calls)) {
         return { ok: false, error: translateText('Falta el campo "calls" (o no es una lista) en el archivo.') };
       }
+      if (payload.calls.some(call => !call || typeof call !== 'object' || Array.isArray(call))) {
+        return { ok: false, error: translateText('El respaldo contiene llamadas inválidas. Tus datos actuales no se cambiaron.') };
+      }
       if ('settings' in payload && (!payload.settings || typeof payload.settings !== 'object' || Array.isArray(payload.settings))) {
         return { ok: false, error: translateText('El campo "settings" del respaldo no es válido.') };
       }
@@ -5057,8 +5070,10 @@ function renderPayDatesSection() {
     // Los backups nuevos restauran state + calls + settings. Los backups viejos (sin settings)
     // siguen siendo válidos y conservan la configuración actual, para no romper compatibilidad.
     function applyImportedPayload(payload) {
-      setAppState(normalizeStateObject(payload.state));
-      setAppCalls(normalizeCallsArray(payload.calls));
+      const nextState = normalizeStateObject(payload.state);
+      const nextCalls = normalizeCallsArray(payload.calls);
+      setAppState(nextState);
+      setAppCalls(nextCalls);
       if (payload.settings && typeof payload.settings === 'object' && !Array.isArray(payload.settings)) {
         const restoredSettings = { ...defaultSettings(), ...payload.settings };
         if (!('onboarded' in payload.settings)) restoredSettings.onboarded = true;
@@ -5076,7 +5091,7 @@ function renderPayDatesSection() {
         state.activeDayKey = defaultActiveDayKey();
       }
       financeRunAutoFillCascade();
-      saveAll();
+      return saveAll();
     }
 
     function handleImportJsonFile(e) {
@@ -5115,7 +5130,7 @@ function renderPayDatesSection() {
           ? translateText('También restaura tu horario, metas, Finanzas, Higher Rate, perfil y demás ajustes del respaldo.')
           : translateText('Es un backup antiguo sin settings: tu horario, metas y demás ajustes actuales se conservarán.');
         appConfirm(ui`¿Importar este archivo (exportado el ${exportedLabel} · ${callCount} llamada(s))? Esto reemplaza tus llamadas, turnos y pausas actuales. ${settingsNote} Esta acción no se puede deshacer.`, () => {
-          applyImportedPayload(payload);
+          if (applyImportedPayload(payload) === false) return;
           toast(restoresSettings
             ? ui`${callCount} llamada(s) y configuración restauradas desde el respaldo`
             : ui`${callCount} llamada(s) importada(s) desde el respaldo antiguo`);
@@ -7038,7 +7053,7 @@ export function render() {
         appConfirm(translateText('¿Quitar la personalización de esta semana y volver a usar la plantilla? El horario propio de esta semana se borra — no afecta la plantilla ni otras semanas.'), () => {
           removeScheduleWeekOverride(scheduleWeekOffset);
           onGameDayMetadataChanged(todayCallDateKey());
-          saveAll();
+          if (saveAll() === false) return false;
           syncShiftModalFields();
         });
       }
@@ -7481,13 +7496,15 @@ export function render() {
       if (e.target.matches('[data-fin-amount-input]')) {
         const sibling = actionsWrap.querySelector('[data-fin-amount-currency-input]');
         if (!sibling) return;
-        const usd = parseMoney(e.target.value);
-        sibling.value = usd > 0 ? (usd * exchangeRate).toFixed(2) : '';
+        const usd = parseAllocationAmount(e.target.value);
+        const converted = usd * exchangeRate;
+        sibling.value = usd > 0 && Number.isFinite(converted) ? converted.toFixed(2) : '';
       } else if (e.target.matches('[data-fin-amount-currency-input]')) {
         const sibling = actionsWrap.querySelector('[data-fin-amount-input]');
         if (!sibling) return;
-        const cur = parseMoney(e.target.value);
-        sibling.value = cur > 0 ? usdCeilFromCurrencyAmount(cur, exchangeRate).toFixed(2) : '';
+        const cur = parseAllocationAmount(e.target.value);
+        const converted = usdCeilFromCurrencyAmount(cur, exchangeRate);
+        sibling.value = cur > 0 && Number.isFinite(converted) ? converted.toFixed(2) : '';
       }
     });
     document.getElementById('financeSection').addEventListener('change', (e) => {

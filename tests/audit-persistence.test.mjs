@@ -29,9 +29,19 @@ function storageHarness() {
 test('guardar solo estado no vuelve vigente un tab que ya tenía llamadas externas más recientes', () => {
   const h = storageHarness();
   h.values.set('calls', JSON.stringify([{id:'other-tab-call'}]));
-  assert.equal(h.run('saveStateOnly()'), true);
+  assert.equal(h.run('saveStateOnly()'), false);
   assert.equal(h.run('localStorageRevision.isCurrent()'), false);
   assert.equal(JSON.parse(h.values.get('calls'))[0].id, 'other-tab-call');
+});
+
+test('una pestaña antigua no reemplaza el historial guardado por otra pestaña', () => {
+  const h = storageHarness();
+  h.values.set('calls', JSON.stringify([{id:'other-tab-call'}]));
+  const current = new Map(h.values);
+  h.calls.push({id:'stale-tab-call'});
+  assert.equal(h.run('saveAll()'), false);
+  assert.deepEqual(h.values, current);
+  assert.ok(h.warnings.length > 0);
 });
 
 test('una cuota agotada no persiste recompensas de llamadas que no llegaron al disco; un reintento guarda todo', () => {

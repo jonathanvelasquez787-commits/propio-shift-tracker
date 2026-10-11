@@ -425,7 +425,7 @@ export function financeSwapPriority(catIdIgnored, rowId, direction) {
   const tmp = rowA.priority;
   rowA.priority = rowB.priority;
   rowB.priority = tmp;
-  saveSettingsOnly();
+  if (saveSettingsOnly() === false) return false;
   renderFinanceSection();
 }
 
@@ -438,8 +438,19 @@ export function financeFindRow(catId, rowId) {
 // Disponible (mismo tope de siempre: no pasa del objetivo en Gastos, no pasa de lo disponible), "-"
 // devuelve dinero ya asignado a Disponible (tope: no puede restar más de lo que la fila ya tiene
 // asignado).
+export function parseAllocationAmount(value) {
+  const text = String(value ?? '').trim();
+  let normalized;
+  if (/^\d{1,3}(,\d{3})+(\.\d+)?$/.test(text)) normalized = text.replaceAll(',', '');
+  else if (/^\d{1,3}(\.\d{3})+,\d+$/.test(text)) normalized = text.replaceAll('.', '').replace(',', '.');
+  else if (/^(?:\d+(?:[.,]\d+)?|[.,]\d+)$/.test(text)) normalized = text.replace(',', '.');
+  else return NaN;
+  const amount = Number(normalized);
+  return Number.isFinite(amount) ? amount : NaN;
+}
+
 export function financeApplySignedAmount(catId, rowId, rawAmount, sign) {
-  const monto = parseMoney(rawAmount);
+  const monto = parseAllocationAmount(rawAmount);
   if (!(monto > 0)) {
     toast(translateText('Ingresa un monto mayor a 0'));
     return;
@@ -455,7 +466,7 @@ export function financeApplySignedAmount(catId, rowId, rawAmount, sign) {
       return;
     }
     row.assignedAmount = before - removed;
-    saveSettingsOnly();
+    if (saveSettingsOnly() === false) return false;
     render();
     toast(removed < monto
       ? ui`Solo se restaron ${money(removed)}${convertedAmountText(removed) ? ` (${convertedAmountText(removed)})` : ''} de ${money(monto)}${convertedAmountText(monto) ? ` (${convertedAmountText(monto)})` : ''} — la fila no tenía más asignado. El resto no se tocó.`
@@ -476,7 +487,7 @@ export function financeApplySignedAmount(catId, rowId, rawAmount, sign) {
     row.assignedAmount = Math.min(target, before + monto);
     appliedAmount = row.assignedAmount - before;
   }
-  saveSettingsOnly();
+  if (saveSettingsOnly() === false) return false;
   render();
   // Un Gasto ya no acepta más de lo que le falta para su objetivo — si el monto pedido se recortó,
   // se avisa cuánto entró de verdad en vez de un "Aplicado" genérico que dejaría creer que se
@@ -553,7 +564,7 @@ export function financeRunAutoFillCascade() {
 export function updateFinanceAutoFillSetting(checked) {
   settings.financeAutoFill = !!checked;
   const changed = settings.financeAutoFill && financeRunAutoFillCascade();
-  saveSettingsOnly();
+  if (saveSettingsOnly() === false) return false;
   render();
   if (settings.financeAutoFill) {
     toast(changed
@@ -569,7 +580,7 @@ export function financeResetRow(catId, rowId) {
   if (!row) return;
   row.assignedAmount = 0;
   row.manualPaid = false;
-  saveSettingsOnly();
+  if (saveSettingsOnly() === false) return false;
   render();
   toast(translateText('Gasto reiniciado'));
 }
@@ -578,7 +589,7 @@ export function financeToggleManualPaid(catId, rowId, checked) {
   const row = financeFindRow(catId, rowId);
   if (!row) return;
   row.manualPaid = !!checked;
-  saveSettingsOnly();
+  if (saveSettingsOnly() === false) return false;
   render();
 }
 
@@ -588,7 +599,7 @@ export function financeDeleteRow(catId, rowId) {
   appConfirm(ui`¿Eliminar "${row.name}"? Esta acción no se puede deshacer.`, () => {
     const cat = settings.financeCategories[catId];
     cat.rows = cat.rows.filter(r => r.id !== rowId);
-    saveSettingsOnly();
+    if (saveSettingsOnly() === false) return false;
     render();
     toast('Fila eliminada');
   });
@@ -763,7 +774,7 @@ export function createFinanceCategory() {
     existing.emoji = emoji;
     existing.rgb = rgb;
     const editedId = existing.id;
-    saveSettingsOnly();
+    if (saveSettingsOnly() === false) return false;
     closeFinanceNewCatPanel();
     renderFinanceCategoryChips(editedId);
     selectFinanceCategoryChip(editedId);
@@ -775,7 +786,7 @@ export function createFinanceCategory() {
   const id = `custom_${makeLocalId()}`;
   settings.customFinanceCategories.push({ id, label, emoji, rgb });
   settings.financeCategories[id] = { rows: [] };
-  saveSettingsOnly();
+  if (saveSettingsOnly() === false) return false;
   closeFinanceNewCatPanel();
   renderFinanceCategoryChips(id);
   selectFinanceCategoryChip(id);
@@ -801,7 +812,7 @@ export function financeDeleteCategory(catId) {
       delete settings.financeCategories[catId];
     }
     settings.customFinanceCategories = settings.customFinanceCategories.filter(c => c.id !== catId);
-    saveSettingsOnly();
+    if (saveSettingsOnly() === false) return false;
     if (financeEditingCatId === catId) closeFinanceNewCatPanel();
     const categoryInput = document.getElementById('financeRowCategoryInput');
     const wasSelected = categoryInput && categoryInput.value === catId;
@@ -884,7 +895,7 @@ export function saveFinanceRowModal() {
       settings.financeCategories[catId].rows.push(foundRow);
     }
     financeRunAutoFillCascade();
-    saveSettingsOnly();
+    if (saveSettingsOnly() === false) return false;
     closeModal('financeRowModal');
     render();
     toast(isMeta ? translateText('Meta actualizada') : translateText('Gasto actualizado'));
@@ -915,7 +926,7 @@ export function saveFinanceRowModal() {
   // La fila nueva entra al final de su cola (prioridad más baja) — si ya había Disponible sin
   // asignar de antes, solo le toca lo que sobre después de las filas con más prioridad.
   financeRunAutoFillCascade();
-  saveSettingsOnly();
+  if (saveSettingsOnly() === false) return false;
   closeModal('financeRowModal');
   render();
   toast(isMeta ? translateText('Meta agregada') : translateText('Gasto agregado'));

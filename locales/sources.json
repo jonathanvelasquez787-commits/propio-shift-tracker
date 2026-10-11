@@ -1900,6 +1900,12 @@
       "app.html"
     ]
   },
+  "s_26d66b15": {
+    "source": "Ese valor es demasiado grande para calcular la meta.",
+    "files": [
+      "js/settings.js"
+    ]
+  },
   "s_271ec92c": {
     "source": "Tu constancia cuenta · XP diario sellado",
     "files": [
@@ -8397,12 +8403,6 @@
       "js/app-main.js"
     ]
   },
-  "s_a41ea4d7": {
-    "source": "Otra pestaña/ventana guardó cambios más recientes aquí. Si sigues usando esta pestaña, tu próximo cambio podría sobrescribirlos.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_a45085e2": {
     "source": "#D9F9DF",
     "files": [
@@ -9550,6 +9550,13 @@
     "source": "Suena mientras la pestaña esté abierta, con una pausa REAL ya en curso. 0 min = desactivado. Variables disponibles en el mensaje:",
     "files": [
       "app.html"
+    ]
+  },
+  "s_bcc9a0aa": {
+    "source": "Otra pestaña guardó cambios más recientes. Recarga antes de guardar; tus datos guardados se conservaron.",
+    "files": [
+      "app.html",
+      "js/app-main.js"
     ]
   },
   "s_bcca4873": {
@@ -11863,6 +11870,12 @@
     "source": "Faltan",
     "files": [
       "js/finance.js"
+    ]
+  },
+  "s_eb8b17fb": {
+    "source": "El respaldo contiene llamadas inválidas. Tus datos actuales no se cambiaron.",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_eb923576": {

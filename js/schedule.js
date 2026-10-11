@@ -554,9 +554,9 @@ export function configureScheduleContext(context) {
         settings.shiftStart = cfg.start;
         settings.shiftEnd = cfg.end;
       }
-      saveSettingsOnly();
+      if (saveSettingsOnly() === false) return false;
       onGameDayMetadataChanged(todayCallDateKey());
-      saveAll();
+      if (saveAll() === false) return false;
       renderDayTabs();
       toast(scheduleViewMode === 'week'
         ? ui`Horario de ${WEEKDAY_LABELS[scheduleEditDay]} guardado para esa semana`
@@ -592,9 +592,9 @@ export function configureScheduleContext(context) {
             blocks: cfg.blocks.map(b => ({ ...b })),
           };
         });
-        saveSettingsOnly();
+        if (saveSettingsOnly() === false) return false;
         onGameDayMetadataChanged(todayCallDateKey());
-        saveAll();
+        if (saveAll() === false) return false;
         renderDayTabs();
         toast(ui`Horario copiado a Lunes-Viernes ${scope}`.trim());
       });
@@ -623,9 +623,9 @@ export function configureScheduleContext(context) {
         target[scheduleEditDay] = cfg;
         target.sat = { off: cfg.off, start: cfg.start, end: cfg.end, blocks: cfg.blocks.map(b => ({ ...b })) };
         target.sun = { off: cfg.off, start: cfg.start, end: cfg.end, blocks: cfg.blocks.map(b => ({ ...b })) };
-        saveSettingsOnly();
+        if (saveSettingsOnly() === false) return false;
         onGameDayMetadataChanged(todayCallDateKey());
-        saveAll();
+        if (saveAll() === false) return false;
         renderDayTabs();
         toast(ui`Horario copiado a Sábado y Domingo ${scope}`.trim());
       });

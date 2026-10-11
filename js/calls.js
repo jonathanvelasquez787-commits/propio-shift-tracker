@@ -167,7 +167,7 @@ export function saveCallEditor() {
   closeModal('callEditModal');
   if (affectedDayKey) reconcileLastCallEndedAt(affectedDayKey);
   financeRunAutoFillCascade();
-  saveAll();
+  if (saveAll() === false) return false;
   if (affectedDayKey) onGameCallsChanged(affectedDayKey);
   toast(translateText('Llamada actualizada'));
 }
@@ -181,7 +181,7 @@ export function deleteCallRecord(callId) {
   setCalls(calls.filter(c => c.id !== callId));
   if (affectedDayKey) reconcileLastCallEndedAt(affectedDayKey);
   financeRunAutoFillCascade();
-  saveAll();
+  if (saveAll() === false) return false;
   if (affectedDayKey) onGameCallsChanged(affectedDayKey);
   toast(translateText('Llamada eliminada'));
   return true;
@@ -202,7 +202,7 @@ export function clearActiveDayCalls() {
     setCalls(calls.filter(c => callDateKeyFromValue(c.callDate) !== dayKey));
     reconcileLastCallEndedAt(dayKey);
     financeRunAutoFillCascade();
-    saveAll();
+    if (saveAll() === false) return false;
     onGameCallsChanged(dayKey);
     toast(ui`${count} ${plural} de ${formatCallDayLabel(dayKey)} borrada(s)`);
   });
@@ -353,7 +353,7 @@ export function requestCloseManualCallModal() {
   }
   appConfirm(translateText('¿Descartar esta llamada sin guardarla? La llamada que acabas de colgar se perderá por completo — no quedará ningún registro de ese tiempo trabajado.'), () => {
     rollbackPendingLiveBackup();
-    saveAll();
+    if (saveAll() === false) return false;
     closeModal('manualCallModal');
   });
 }
@@ -546,7 +546,7 @@ export function saveManualCall() {
     autoStartShiftFromCalls(true);
   }
   financeRunAutoFillCascade();
-  saveAll();
+  if (saveAll() === false) return false;
   toast(translateText('Llamada agregada'));
   onGameCallSaved(candidate, pendingBackup ? 'live' : 'manual');
   onGameCallsChanged(affectedDayKey);
@@ -578,7 +578,7 @@ export function autoSaveLiveCall(startedAtISO, endedAtISO, liveContext = null) {
   if (result.ok) {
     state.pendingLiveCallBackup = null;
     financeRunAutoFillCascade();
-    saveAll();
+    if (saveAll() === false) return false;
     toast(ui`Llamada guardada (${formatDuration(durationMin * 60000)}) — edítala en Tabla de llamadas si hace falta`);
     onGameCallSaved(candidate, 'live');
     return true;
@@ -592,7 +592,7 @@ export function autoSaveLiveCall(startedAtISO, endedAtISO, liveContext = null) {
   };
   manualCallLiveBackupPending = true;
   // Persistir ANTES de abrir el modal: un refresh aquí ya no puede comerse la llamada.
-  saveAll();
+  if (saveAll() === false) return false;
   toast(result.reason);
   openManualCallModalFromLiveCall(startedAtISO, endedAtISO, candidate);
   return false;
