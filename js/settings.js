@@ -173,7 +173,7 @@ let syncingGoals = false;
       const dayKey = getActiveDayKey();
       if (!getDailyGoalOverride(dayKey)) return;
       setDailyGoalOverride(dayKey, null);
-      saveSettingsOnly();
+      if (saveSettingsOnly() === false) return false;
       onGameDayMetadataChanged(dayKey);
       refreshGoalInputs();
       render();
@@ -280,7 +280,7 @@ let syncingGoals = false;
       settings.userName = String(nameInput?.value || '').trim().slice(0, 40);
       settings.userEmoji = String(emojiInput?.value || '').trim().slice(0, 8);
       settings.onboarded = true;
-      saveSettingsOnly();
+      if (saveSettingsOnly() === false) return false;
       closeModal('onboardingModal');
       render();
     }

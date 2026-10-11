@@ -320,7 +320,7 @@ futura opera bajo esto, sin excepción:
 Auditoría integral del 11/10/2026: ocho grupos nuevos corregidos (pestañas
 antiguas, divergencias del mismo navegador, tarifa/metas, overflow, decimales
 de Finanzas, validación y mensajes de importación, propagación de guardados
-rechazados). 446 pruebas; simulación de 31 días, 161 reconciliaciones y 31
+rechazados). 452 pruebas; simulación de 31 días, 161 reconciliaciones y 31
 snapshots/exportaciones; 33 módulos, wiring y 2126 textos ES/EN. Interfaz con
 cuenta ficticia y backend local: cambios de horario/finanzas recibidos en otra
 sesión y siete páginas a 1365/390 px; navegación móvil por teclado. Ver

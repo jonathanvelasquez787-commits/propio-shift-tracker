@@ -1064,7 +1064,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
 
     function toggleTheme() {
       settings.theme = cycleTheme(settings.theme);
-      saveSettingsOnly();
+      if (saveSettingsOnly() === false) return false;
       applyTheme();
       toast(ui`Tema: ${themeButtonLabel(settings.theme)}`);
     }
@@ -3397,7 +3397,7 @@ function setDayNote(dayKey, { category, comment, forcedStatus }) {
   } else {
     state.dayNotes[normalized] = { category: cat, comment: note, forcedStatus: forced };
   }
-  saveStateOnly();
+  if (saveStateOnly() === false) return false;
   onGameDayMetadataChanged(normalized);
   render();
 }
@@ -3559,7 +3559,7 @@ function setCycleGoalOverride(offset, amount) {
   const num = Number(amount);
   if (Number.isFinite(num) && num > 0) settings.cycleGoalOverrides[key] = num;
   else delete settings.cycleGoalOverrides[key];
-  saveSettingsOnly();
+  return saveSettingsOnly();
 }
 
 // Editor rápido de la meta del ciclo (✎ en la tarjeta de Reportes) — mismo patrón simple que
@@ -3578,14 +3578,14 @@ function saveCycleGoalEditor() {
     toast(translateText('La meta debe ser un número mayor a 0'));
     return;
   }
-  setCycleGoalOverride(0, amount);
+  if (setCycleGoalOverride(0, amount) === false) return false;
   closeModal('cycleGoalModal');
   render();
   toast(ui`Meta del ciclo: ${money(amount)}${convertedAmountText(amount) ? ` (${convertedAmountText(amount)})` : ''}`);
 }
 
 function useAutoCycleGoal() {
-  setCycleGoalOverride(0, null);
+  if (setCycleGoalOverride(0, null) === false) return false;
   closeModal('cycleGoalModal');
   render();
   toast(translateText('Meta del ciclo vuelve a calcularse automáticamente'));
@@ -3594,7 +3594,7 @@ function useAutoCycleGoal() {
 function updateCycleGoalFromAjustes() {
   const input = document.getElementById('cycleGoalInput');
   const amount = Number(input?.value);
-  setCycleGoalOverride(0, Number.isFinite(amount) && amount > 0 ? amount : null);
+  if (setCycleGoalOverride(0, Number.isFinite(amount) && amount > 0 ? amount : null) === false) return false;
   render();
 }
 
@@ -3961,7 +3961,7 @@ function renderPayDatesSection() {
       state.shiftStartedAt = firstStart.toISOString();
       state.shiftEndedAt = null;
       setEvent('shift', translateText('Shift iniciado automáticamente'), fmtTime(firstStart), 'auto');
-      saveStateOnly();
+      if (saveStateOnly() === false) return false;
       onGameShiftStarted({ continued: false });
       if (!silent) toast(ui`Shift iniciado automáticamente desde tu primera llamada (${fmtTime(firstStart)})`);
       return true;
@@ -4158,8 +4158,7 @@ function renderPayDatesSection() {
       // El aviso de "va a terminar" ya no aplica una vez que se cerró la pausa — se apaga de
       // inmediato en vez de esperar al próximo tick.
       stopBreakEndAlarm();
-      if (deferSave) saveStateOnly();
-      else saveAll();
+      if ((deferSave ? saveStateOnly() : saveAll()) === false) return false;
       if (!silent) toast('Regresaste');
       let onTime = false;
       if (plannedSlot && !options.forShiftEnd) {
@@ -4202,6 +4201,7 @@ function renderPayDatesSection() {
       if (state.activePause) {
         const pretty = state.activePause.type === 'lunch' ? translateText('Lunch') : translateText('Break');
         interruptedPauseRollback = endPause({ silent: true, deferSave: true, endedAt: nowISO });
+        if (interruptedPauseRollback === false) return false;
         toast(ui`${pretty} terminado automáticamente al iniciar la llamada`);
       }
 
@@ -4234,6 +4234,7 @@ function renderPayDatesSection() {
         ...(options.propioBridge ? { propioBridge: { ...options.propioBridge } } : {}),
       };
       const saved = saveAll();
+      if (saved === false) return false;
       toast(needsAutoShift ? translateText('Llamada iniciada · turno abierto automáticamente') : translateText('Llamada iniciada'));
       return saved;
     }
@@ -4282,7 +4283,7 @@ function renderPayDatesSection() {
           if (discarded.gameBeforeAutoShift) state.game = discarded.gameBeforeAutoShift;
         }
 
-        saveStateOnly();
+        if (saveStateOnly() === false) return false;
         render();
         toast(discarded?.autoStartedShift ? translateText('Llamada descartada · turno automático revertido') : translateText('Llamada descartada'));
       });
@@ -4308,7 +4309,7 @@ function renderPayDatesSection() {
         state.activePause = null;
         stopBreakStartAlarm();
         stopBreakEndAlarm();
-        saveStateOnly();
+        if (saveStateOnly() === false) return false;
         render();
         toast(ui`${pretty} descartado`);
       });
@@ -5360,7 +5361,7 @@ function renderPayDatesSection() {
       let offset = Number(offsetInput?.value);
       if (Number.isFinite(offset) && offset >= 0) settings.cyclePayOffsetDays = offset;
       const movedWeeks = rekeyScheduleWeekOverrides(previousAnchor);
-      saveSettingsOnly();
+      if (saveSettingsOnly() === false) return false;
       render();
       toast(movedWeeks > 0
         ? ui`Ciclo de pago actualizado — ${movedWeeks} semana(s) personalizada(s) de Horario se re-anclaron al nuevo inicio de semana`
@@ -5383,7 +5384,7 @@ function renderPayDatesSection() {
       const input = document.getElementById('shiftAlertMinInput');
       const mins = Number(input?.value);
       if (Number.isFinite(mins) && mins >= 0) settings.alertBeforeShiftMin = mins;
-      saveSettingsOnly();
+      if (saveSettingsOnly() === false) return false;
       toast(settings.alertBeforeShiftMin > 0 ? ui`Aviso configurado: ${formatMinutes(settings.alertBeforeShiftMin)} min antes de tu turno` : translateText('Aviso de turno desactivado'));
     }
 
@@ -5397,7 +5398,7 @@ function renderPayDatesSection() {
       const endMin = Number(endInput?.value);
       if (Number.isFinite(startMin) && startMin >= 0) settings.alertBeforeBreakMin = startMin;
       if (Number.isFinite(endMin) && endMin >= 0) settings.alertBeforeBreakEndMin = endMin;
-      saveSettingsOnly();
+      if (saveSettingsOnly() === false) return false;
       toast(translateText('Aviso de Break/Lunch actualizado'));
     }
 
@@ -5435,7 +5436,7 @@ function renderPayDatesSection() {
       const awardMin = Number(awardInput?.value);
       if (Number.isFinite(earnMin) && earnMin > 0) settings.productiveBreakEarnMin = earnMin;
       if (Number.isFinite(awardMin) && awardMin >= 0) settings.productiveBreakAwardMin = awardMin;
-      saveSettingsOnly();
+      if (saveSettingsOnly() === false) return false;
       toast(ui`Descanso por productividad: cada ${formatMinutes(settings.productiveBreakEarnMin)} min productivos = ${formatMinutes(settings.productiveBreakAwardMin)} min de descanso`);
     }
 
@@ -5698,7 +5699,7 @@ function renderPayDatesSection() {
       const value = String(input?.value || '').trim();
       settings[cfg.key] = value || defaultSettings()[cfg.key];
       if (input) input.value = settings[cfg.key];
-      saveSettingsOnly();
+      if (saveSettingsOnly() === false) return false;
       toast(translateText('Mensaje del aviso actualizado'));
     }
 
@@ -6009,7 +6010,7 @@ function saveAcwGoalEditor() {
     return;
   }
   settings.acwMaxGoalMin = mins;
-  saveSettingsOnly();
+  if (saveSettingsOnly() === false) return false;
   closeModal('acwGoalModal');
   render();
   toast(ui`Meta máxima de ACW: ${formatMinutes(mins)} min`);
@@ -6121,7 +6122,7 @@ function saveDayNoteFromModal() {
   const statusInput = document.getElementById('dayNoteStatusInput');
   const categoryInput = document.getElementById('dayNoteCategoryInput');
   const commentInput = document.getElementById('dayNoteCommentInput');
-  setDayNote(editingDayNoteKey, { category: categoryInput?.value || '', comment: commentInput?.value || '', forcedStatus: statusInput?.value || '' });
+  if (setDayNote(editingDayNoteKey, { category: categoryInput?.value || '', comment: commentInput?.value || '', forcedStatus: statusInput?.value || '' }) === false) return false;
   editingDayNoteKey = null;
   closeModal('dayNoteModal');
   toast(translateText('Día guardado'));
@@ -6130,7 +6131,7 @@ function saveDayNoteFromModal() {
 function clearDayNoteFromModal() {
   if (!editingDayNoteKey) return;
   const statusInput = document.getElementById('dayNoteStatusInput');
-  setDayNote(editingDayNoteKey, { category: '', comment: '', forcedStatus: statusInput?.value || '' });
+  if (setDayNote(editingDayNoteKey, { category: '', comment: '', forcedStatus: statusInput?.value || '' }) === false) return false;
   editingDayNoteKey = null;
   closeModal('dayNoteModal');
   toast('Nota eliminada');
@@ -7045,7 +7046,7 @@ export function render() {
       if (scheduleWeekIsPast(scheduleWeekOffset)) { e.target.checked = scheduleWeekHasCustom(scheduleWeekOffset); return; }
       if (e.target.checked) {
         ensureScheduleWeekOverride(scheduleWeekOffset);
-        saveSettingsOnly();
+        if (saveSettingsOnly() === false) return false;
         toast(translateText('Semana personalizada — arrancó como copia de tu plantilla, ajústala y guarda cada día que cambie.'));
         syncShiftModalFields();
       } else {
