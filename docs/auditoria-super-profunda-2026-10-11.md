@@ -2,7 +2,7 @@
 
 La revisión encontró ocho grupos de fallos reproducibles y los corrigió. La base
 anterior pasaba 436 pruebas: estos casos escapaban a esa cobertura. La versión
-corregida pasa 446 pruebas, los contratos de 33 módulos, el wiring de controles,
+corregida pasa 452 pruebas, los contratos de 33 módulos, el wiring de controles,
 las traducciones ES/EN y el build con presupuestos de tamaño. La publicación se
 realiza mediante PR, CI y la rama protegida; la evidencia final de despliegue se
 conserva fuera de Git para no publicar información de la cuenta del propietario.
@@ -18,7 +18,7 @@ conserva fuera de Git para no publicar información de la cuenta del propietario
 | SA05 | P1 | Asignar `12,50` en Finanzas se interpretaba como 1250. Texto como `1e3` o `12abc50` se convertía silenciosamente en otro importe. La moneda secundaria compartía el parser antiguo. | Parser estricto exclusivo de las entradas de asignación: coma o punto decimal, agrupación válida y resultados finitos. Ambos campos y Aplicar comparten la interpretación. Se conserva el parser de pagos importados para no alterar identidades/deduplicación antiguas. Pruebas de sumar, restar, agrupación y rechazo de texto ambiguo o mal formado. |
 | SA06 | P2 | Un respaldo con `calls:[null]` superaba la validación; normalizarlo fallaba después de reemplazar el estado en memoria. | Se rechazan registros que no sean objetos y se normalizan estado y llamadas antes de sustituirlos. Pruebas de null, listas, números, texto y error de normalización sin cambios parciales. Los formatos antiguos válidos siguen admitidos. |
 | SA07 | P2 | Importar JSON anunciaba «restauradas» aunque `saveAll` hubiera rechazado el guardado. | La importación devuelve el resultado real y mantiene el aviso de fallo, sin éxito falso. Prueba del handler con una escritura rechazada. |
-| SA08 | P2 | Otros controles de llamadas, turnos, pausas, horario y Finanzas continuaban hacia avisos de éxito o recompensas después de fallar la escritura. | Propagación explícita de `false` antes de esas acciones posteriores. Regresiones de llamada manual sin premio/éxito y asignación sin «Aplicado»; la cobertura mensual y de gamificación sigue pasando. |
+| SA08 | P2 | Otros controles de llamadas, turnos, pausas, horario, calendario, ajustes y Finanzas continuaban hacia avisos de éxito o recompensas después de fallar la escritura. | Propagación explícita de `false` antes de esas acciones posteriores. Regresiones de llamadas manuales/en vivo, cierre de pausa con guardado completo/parcial, eliminación de excepción diaria, edición de meta del ciclo y notas del calendario. Sin premio ni éxito tras el rechazo; la cobertura mensual y de gamificación sigue pasando. |
 
 ## Contabilidad, calendario y acoples
 
