@@ -278,7 +278,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
     // opción "Sin emoji" — un botón de limpiar, no un emoji real, para poder quitar el emoji sin
     // tener que vaciar el campo de texto a mano.
     export const EMOJI_CHOICES = ['', '🙂', '😄', '😎', '🤩', '🥳', '😴', '☕', '🔥', '💪', '🚀', '⭐', '🎯', '⚡', '🌟', '🙌', '👋', '🐱', '🌮', '🎧'];
-    const DEFAULT_GOAL_MINUTES = 420;
+    const DEFAULT_GOAL_MINUTES = 360;
     const DEFAULT_GOAL_DOLLARS = Number((DEFAULT_GOAL_MINUTES * RATE).toFixed(2));
     // Tope duro de duración para una sola llamada (pegada, editada o agregada a mano) — sin esto,
     // un valor como "1e10" o negativo pasa el chequeo de Number.isFinite y genera un endISO absurdo
@@ -338,16 +338,16 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
     export function defaultDaySchedule(isWorkDay) {
       return {
         off: !isWorkDay,
-        start: '07:00',
-        end: '15:00',
+        start: '06:00',
+        end: '14:00',
         blocks: [
-          { type: 'work', start: '07:00', dur: 130, goalMin: 120 },
-          { type: 'break', start: '09:10', dur: 20 },
-          { type: 'work', start: '09:30', dur: 130, goalMin: 120 },
-          { type: 'break', start: '11:40', dur: 20 },
-          { type: 'work', start: '12:00', dur: 60, goalMin: 60 },
-          { type: 'lunch', start: '13:00', dur: 55 },
-          { type: 'work', start: '13:55', dur: 65, goalMin: 60 },
+          { type: 'work', start: '06:00', dur: 130, goalMin: 120 },
+          { type: 'break', start: '08:10', dur: 20 },
+          { type: 'work', start: '08:30', dur: 130, goalMin: 120 },
+          { type: 'break', start: '10:40', dur: 20 },
+          { type: 'work', start: '11:00', dur: 65, goalMin: 60 },
+          { type: 'lunch', start: '12:05', dur: 50 },
+          { type: 'work', start: '12:55', dur: 65, goalMin: 60 },
         ],
       };
     }
@@ -700,8 +700,8 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
       return {
         productiveGoalMin: DEFAULT_GOAL_MINUTES,
         earningsGoal: DEFAULT_GOAL_DOLLARS,
-        shiftStart: '07:00',
-        shiftEnd: '16:00',
+        shiftStart: '06:00',
+        shiftEnd: '14:00',
         lateArrivalMode: 'anchor', // 'anchor' = la hora de fin no se mueve (pierdes el tiempo) | 'shift' = se corre todo el turno.
         weeklySchedule: defaultWeeklySchedule(),
         // Horario real por SEMANA ESPECÍFICA (con su propia fecha de inicio), aparte de la
@@ -3501,6 +3501,15 @@ export function setDailyGoalOverride(dayKey, value) {
     settings.dailyGoalOverrides[normalized] = { min, usd };
   } else {
     delete settings.dailyGoalOverrides[normalized];
+    // "Usar meta general" también cambia el día histórico seleccionado.
+    // Su snapshot anterior no debe ocultar la edición explícita; los snapshots
+    // de los demás días conservan sus valores.
+    if (value === null && settings.goalHistoryByDay?.[normalized]) {
+      settings.goalHistoryByDay[normalized] = {
+        min: Number(settings.productiveGoalMin) || 0,
+        usd: Number(settings.earningsGoal) || 0,
+      };
+    }
   }
 }
 
