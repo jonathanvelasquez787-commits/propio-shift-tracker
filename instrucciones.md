@@ -317,6 +317,11 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
+Corrección de espacio en Logros: las preferencias y el reinicio son secciones
+de ancho completo antes de la cuadrícula de progreso. Evita una columna vacía
+al desplegar Refuerzo positivo/Mis premios. Recorrido local claro de escritorio
+y 390 px sin desbordamiento, con 8 px entre preferencias y reinicio.
+
 Auditoría de controles del 11/10/2026: 500 pruebas, 2129 textos ES/EN,
 329 controles estáticos inventariados y matriz de 17 áreas/56 módulos/51 suites.
 Corregidos guardados rechazados en Calendario, Logros, premios y Higher Rate;
