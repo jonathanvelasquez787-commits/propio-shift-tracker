@@ -955,7 +955,7 @@
             "git ignores environment files while allowing explicit examples",
             "PWA shell includes a manifest and service worker with API exclusions",
             "clean app route preserves legacy links and login navigation",
-            "verified app sessions display the root URL without reloading or losing URL state",
+            "verified app sessions keep the private shell URL on reload without losing URL state",
             "PWA launches the clean route offline and redirects legacy navigations",
             "footer year tolerates pages without a footer",
             "PDF report registers a click listener on its own print window"

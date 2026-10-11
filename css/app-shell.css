@@ -474,10 +474,84 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
   border-color: rgba(var(--accent-rgb), .3);
 }
 
-:root.theme-light #callControlBtn:not(.is-active) {
+:root.theme-light #callControlBtn {
   --accent: var(--danger-red);
   --accent-rgb: var(--danger-red-rgb);
   --accent-pale: var(--danger-red);
+}
+
+/* Mock aprobado: movimiento sólo en iconos, sin desplazar el botón. */
+#callsControlsGrid:has(#callControlBtn.is-active) { display: grid !important; }
+#callControlBtn { --action-icon-motion: action-call-ring 3.2s ease-in-out infinite; }
+#shiftControlBtn { --action-icon-motion: action-shift-breathe 3.6s ease-in-out infinite; }
+#pasteCallsBtn { --action-icon-motion: action-paste-lift 3.8s ease-in-out infinite; }
+#addCallManualBtn { --action-icon-motion: action-add-turn 4s cubic-bezier(.4,0,.2,1) infinite; }
+#lunchControlBtn { --action-icon-motion: action-lunch-sway 4.4s ease-in-out infinite; }
+
+:is(.action-btn.is-active:not(:disabled),
+    body:has(#callsModal.open) #pasteCallsBtn:not(:disabled),
+    body:has(#manualCallModal.open) #addCallManualBtn:not(:disabled)) .action-icon {
+  animation: var(--action-icon-motion, none);
+}
+:is(.action-btn.is-active:not(:disabled),
+    body:has(#callsModal.open) #pasteCallsBtn:not(:disabled),
+    body:has(#manualCallModal.open) #addCallManualBtn:not(:disabled)) .action-ring {
+  border-color: var(--icon-mono, var(--text));
+  animation: action-running-ring 2.8s ease-out infinite;
+}
+:is(.action-btn.is-active:not(:disabled),
+    body:has(#callsModal.open) #pasteCallsBtn:not(:disabled),
+    body:has(#manualCallModal.open) #addCallManualBtn:not(:disabled))::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: -40%;
+  bottom: -40%;
+  left: -35%;
+  width: 24%;
+  background: var(--icon-mono, var(--text));
+  opacity: 0;
+  transform: skewX(-18deg);
+  pointer-events: none;
+  animation: action-running-sheen 6s ease-in-out infinite;
+}
+:is(body:has(#callsModal.open) #pasteCallsBtn:not(:disabled),
+    body:has(#manualCallModal.open) #addCallManualBtn:not(:disabled)) .action-ripple {
+  transform: scale(1);
+  opacity: 1;
+}
+:is(body:has(#callsModal.open) #pasteCallsBtn:not(:disabled),
+    body:has(#manualCallModal.open) #addCallManualBtn:not(:disabled)) :is(.action-label, .action-sub) {
+  color: var(--palette-active-ink, var(--text));
+}
+#breakControlBtn.is-active:not(:disabled) .action-icon svg > line {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: action-break-steam 2.8s ease-in-out infinite;
+}
+#breakControlBtn.is-active:not(:disabled) .action-icon svg > line:nth-last-child(2) { animation-delay: .3s; }
+#breakControlBtn.is-active:not(:disabled) .action-icon svg > line:last-child { animation-delay: .6s; }
+#lunchControlBtn .action-icon { transform-origin: 50% 85%; }
+.action-btn.is-active:disabled .action-ring { animation: none; opacity: 0; }
+
+@keyframes action-running-ring { 0% { transform: scale(.88); opacity: .45; } 70%,100% { transform: scale(1.38); opacity: 0; } }
+@keyframes action-running-sheen { 0%,65% { left: -35%; opacity: 0; } 70% { opacity: .07; } 90% { left: 120%; opacity: .07; } 100% { left: 120%; opacity: 0; } }
+@keyframes action-call-ring { 0%,12%,100% { transform: rotate(0); } 3%,9% { transform: rotate(-9deg); } 6% { transform: rotate(9deg); } }
+@keyframes action-shift-breathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+@keyframes action-paste-lift { 0%,65%,100% { transform: translateY(0); } 35% { transform: translateY(-3px); } }
+@keyframes action-add-turn { 0%,45% { transform: rotate(0); } 65%,100% { transform: rotate(90deg); } }
+@keyframes action-break-steam { 0%,100% { transform: translateY(0); opacity: 1; } 50% { transform: translateY(-2px); opacity: .45; } }
+@keyframes action-lunch-sway { 0%,55%,100% { transform: rotate(0); } 18% { transform: rotate(-6deg); } 36% { transform: rotate(6deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .action-btn, .action-btn *, .action-btn::before, .action-btn::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .action-btn .action-ring { transform: none; opacity: 0; }
+  .action-btn.is-active:not(:disabled) .action-ring,
+  body:has(#callsModal.open) #pasteCallsBtn:not(:disabled) .action-ring,
+  body:has(#manualCallModal.open) #addCallManualBtn:not(:disabled) .action-ring { opacity: .3; }
 }
 
 :root.theme-light .storage-conflict-dismiss-btn {

@@ -690,10 +690,15 @@ La aplicación funciona en producción con estas bases vigentes:
   global, backup diario, exportación y borrado de cuenta permanecen activos.
 - Turnos, llamadas, Horario, Higher Rate, Finanzas, Reportes, Calendario,
   Adherencia y la gamificación «El Monstruo» están integrados.
-- La dirección visible de la cuenta es `/` después de montar con sesión.
+- La dirección visible de la cuenta conserva `/app` después de montar con sesión,
+  para recargar directamente el shell sin mostrar la portada pública.
   `/app` sigue siendo el punto de carga y `/app.html` redirige conservando
-  parámetros. La raíz conserva la landing pública indexable; al recargar,
-  detecta la sesión y reabre la app. La PWA mantiene su identidad y precarga.
+  parámetros. La raíz conserva la landing pública indexable y detecta la sesión
+  al visitarla. La PWA mantiene su identidad y precarga.
+- Los seis botones principales tienen las animaciones del mock aprobado:
+  iconos, anillo suave y brillo lento durante llamada, turno y pausas; pegar
+  y agregar se animan al abrir sus ventanas. Se detienen con movimiento reducido
+  o controles deshabilitados, sin cambiar los destinos ni las acciones.
 - Gamificación: tarjeta compacta aprobada con una sola barra de ganancias
   reales hacia la meta y el cofre. Cada llamada válida guardada anima un ataque;
   Higher Rate muestra un crítico y cada tres llamadas representadas activa el

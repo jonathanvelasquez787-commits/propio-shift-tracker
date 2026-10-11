@@ -181,7 +181,7 @@ test('clean app route preserves legacy links and login navigation', () => {
   assert.match(read('js/boot.js'), /window\.location\.replace\('\/\?next=\/app'\)/);
 });
 
-test('verified app sessions display the root URL without reloading or losing URL state', () => {
+test('verified app sessions keep the private shell URL on reload without losing URL state', () => {
   const source = read('js/boot.js');
   const normalize = source.match(/^function normalizeAppAddress\(\) \{[\s\S]*?^\}/m)?.[0];
   assert.ok(normalize);
@@ -193,11 +193,12 @@ test('verified app sessions display the root URL without reloading or losing URL
       URL, window: { location: { href: 'https://app.example' + path },
         history: { state, replaceState(nextState, title, url) { replaced = { nextState, title, url }; } } },
     });
-    assert.equal(replaced.nextState, state);
+    if (path === '/app.html') assert.equal(replaced.nextState, state);
+    else assert.equal(replaced, undefined);
     assert.equal(cleared, 'ps_auto_enter_at');
     const expected = new URL('https://app.example' + path);
-    expected.pathname = '/';
-    assert.equal(replaced.url, expected.href);
+    expected.pathname = '/app';
+    assert.equal(replaced?.url || 'https://app.example' + path, expected.href);
   }
   vm.runInNewContext(`${normalize}\nnormalizeAppAddress()`, {
     URL, window: { location: { href: 'https://app.example/?recuperar=1' },
