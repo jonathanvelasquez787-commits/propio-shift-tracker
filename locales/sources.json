@@ -1582,6 +1582,12 @@
       "app.html"
     ]
   },
+  "s_1f1b2bef": {
+    "source": "No se pudo guardar — recarga esta pestaña",
+    "files": [
+      "js/boot.js"
+    ]
+  },
   "s_1f444929": {
     "source": "☕ ¡Otro descanso ganado! {productivo} min productivos — llevas {descanso} min de descanso acumulados.",
     "files": [
@@ -4531,6 +4537,12 @@
     "source": "Normal",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_58e15b14": {
+    "source": "No se pudo guardar — reduce el tamaño de tus ajustes",
+    "files": [
+      "js/boot.js"
     ]
   },
   "s_58f2d1d6": {
@@ -11511,6 +11523,12 @@
     "source": "Deuda",
     "files": [
       "js/finance.js"
+    ]
+  },
+  "s_e2cab854": {
+    "source": "No se pudo guardar — almacenamiento lleno",
+    "files": [
+      "js/boot.js"
     ]
   },
   "s_e2d653d8": {

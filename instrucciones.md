@@ -317,6 +317,14 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
+Cierre de preparación del 11/10/2026: matriz permanente de 17 áreas, 56 módulos
+y 51 suites en docs/production-criteria.json; el build valida trazabilidad.
+455 pruebas y 2129 textos ES/EN. Corregido el indicador de nube ante rechazo
+local, con señal compartida entre bundles y reintento de snapshot completo.
+Ver docs/production-readiness.md para condiciones de publicación y límites.
+No quedan fallos reproducidos abiertos del cierre; publicación/CI y SHA se
+verifican aparte de los resultados locales. SMTP permanece fuera del alcance.
+
 Auditoría integral del 11/10/2026: ocho grupos nuevos corregidos (pestañas
 antiguas, divergencias del mismo navegador, tarifa/metas, overflow, decimales
 de Finanzas, validación y mensajes de importación, propagación de guardados

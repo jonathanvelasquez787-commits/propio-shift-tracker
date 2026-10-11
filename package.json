@@ -11,7 +11,7 @@
   "scripts": {
     "build:extension": "node scripts/build-extension.mjs",
     "build:summary": "node scripts/build-summary-extension.mjs",
-    "build": "node scripts/check-i18n.mjs && node scripts/check-module-exports.mjs && node scripts/check-ui-wiring.mjs && node scripts/build.mjs",
+    "build": "node scripts/check-i18n.mjs && node scripts/check-module-exports.mjs && node scripts/check-ui-wiring.mjs && node scripts/check-production-criteria.mjs && node scripts/build.mjs",
     "check:modules": "node scripts/check-module-exports.mjs",
     "test": "node scripts/check-i18n.mjs && node --test",
     "check:ui": "node scripts/check-ui-wiring.mjs",
