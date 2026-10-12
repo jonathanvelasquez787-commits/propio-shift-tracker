@@ -1,7 +1,8 @@
 import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 // app-main.js inyecta los helpers; app-context.js mantiene el estado compartido.
 import { settings, calls } from './app-context.js';
-import { configureFinancePlanning, captureFinanceDetails, financePlanningRowHtml, renderFinancePlanning } from './finance-planning.js';
+import { configureFinancePlanning, captureFinanceDetails, financePlanningRowHtml, renderFinancePlanning, financeAmountInputHtml, clearFinanceAmountDraft, financeSelectedMonth, financeReservationHtml } from './finance-planning.js';
+import { financeExpenseStatus, financeBudgetPeriod } from './finance-plan-model.js';
 
 let money, convertedAmountText, iconHtml, escapeHtml, toast, appConfirm, openModal, closeModal, render;
 let saveSettingsOnly, makeLocalId, parseMoney, usdCeilFromCurrencyAmount, higherRateBonusForCalls, renderEmojiPicker;
@@ -117,6 +118,7 @@ function financeMetaRowsSorted() {
 }
 
 export function financeIsRowPagado(row) {
+  // manualPaid conserva la exclusión automática de las filas antiguas; el ledger determina los pagos.
   return row.manualPaid === true || (Number(row.assignedAmount) >= Number(row.targetAmount) && Number(row.targetAmount) > 0);
 }
 
@@ -162,7 +164,7 @@ export function renderFinancePreview() {
         </div>
         <div class="fin-preview-right">
           <div class="fin-preview-amt">${money(assigned)}</div>
-          <div class="fin-preview-amt-label">${isMeta ? translateText('ahorrado') : translateText('asignado')}${financeConvertedInline(assigned)}</div>
+          <div class="fin-preview-amt-label">Reservado${financeConvertedInline(assigned)}</div>
         </div>
       </div>
     `;
@@ -232,28 +234,29 @@ function financeHasSecondaryCurrency() {
 
 // Arma el HTML de una fila (gasto o meta) — `opts.restanteDespues` solo aplica a gastos (ver
 // cascada en renderFinanceSection).
+function financePeriodLabel(row) {
+  const labels = { weekly: translateText('Por semana'), fortnightly: translateText('Por 2 semanas'), monthly: translateText('Por mes'), onetime: translateText('Una sola vez'), unspecified: translateText('Período sin definir') };
+  return labels[financeBudgetPeriod(row)];
+}
+
+function financeRowMetric(label, amount, badge = '') {
+  const help = label === translateText('Reservado') ? translateText('Dinero de tus ganancias que apartaste para este gasto o meta. Sigue reservado hasta que lo devuelvas al disponible. Reservar no significa pagar ni confirma un depósito bancario.') : '';
+  return ui`<div class="fin-plan-metric"><span ${help ? `data-fin-help="${escapeHtml(help)}" tabindex="0"` : ''}>${label}</span><strong>${money(amount)}</strong>${financeConvertedNote(amount)}${badge}</div>`;
+}
+
 function financeRowHtml(row, opts) {
   const cat = financeCategoryDef(row.categoryId);
   const upDisabled = opts.index === 0 ? 'disabled' : '';
   const downDisabled = opts.index === opts.count - 1 ? 'disabled' : '';
   const target = Number(row.targetAmount) || 0;
   const assigned = Number(row.assignedAmount) || 0;
-  const currencyLabelTrim = String(settings.currencyLabel || '').trim();
-  const amountLinkTitle = translateText('Escribe en cualquiera de los dos — el otro se completa solo');
-  const currencyAssignInputHtml = financeHasSecondaryCurrency()
-    ? ui`<input class="fin-mini-input" data-fin-amount-currency-input placeholder="o en ${escapeHtml(currencyLabelTrim)}" type="text" title="${amountLinkTitle}"/>`
-    : '';
-  // El pill +/- (solo símbolos, sin texto) no dejaba claro qué iba a hacer "Aplicar" — pasa a
-  // mostrar la palabra completa (mismo patrón.mc-pill-btn de Sí/No, sin lenguaje visual nuevo) +
-  // title con el detalle.
   const signPillHtml = ui`
-    <div class="mc-pill-row" role="group" aria-label="Elige si Aplicar suma o resta este monto">
-      <button class="mc-pill-btn" data-fin-sign-btn data-sign="plus" aria-pressed="true" type="button" title="Resta este monto de Disponible y lo suma a lo ya asignado de esta fila">+ Sumar</button>
-      <button class="mc-pill-btn" data-fin-sign-btn data-sign="minus" aria-pressed="false" type="button" title="Devuelve este monto de lo ya asignado de esta fila a Disponible">− Restar</button>
+    <div class="mc-pill-row" role="group" aria-label="Sumar o restar de la reserva">
+      <button class="mc-pill-btn" data-fin-sign-btn data-sign="plus" aria-pressed="true" type="button" data-fin-help="${escapeHtml(translateText('Elige Sumar para apartar el monto escrito: baja el Disponible y sube el Reservado. Después pulsa Aplicar ajuste. No registra un pago.'))}">+ Sumar</button>
+      <button class="mc-pill-btn" data-fin-sign-btn data-sign="minus" aria-pressed="false" type="button" data-fin-help="${escapeHtml(translateText('Elige Restar para devolver el monto escrito: baja el Reservado y sube el Disponible. Después pulsa Aplicar ajuste. No elimina pagos ni reduce tus ganancias.'))}">− Restar</button>
     </div>
   `;
-  const priorityTitle = translateText('Prioridad — decide el orden de la cascada de "Restante después"');
-  const restanteDespuesTitle = translateText('Lo que te queda de tu Disponible después de cubrir esta fila y todas las de más prioridad arriba (↑/↓) — no es lo que falta pagar de este gasto.');
+  const priorityTitle = translateText('Prioridad del reparto automático: primero Gastos, luego Metas.');
   const priorityHtml = ui`
     <div class="fin-priority">
       <button class="fin-priority-btn" type="button" data-fin-priority-up="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" ${upDisabled} aria-label="Subir prioridad" title="${priorityTitle}">${iconHtml('chevronUp')}</button>
@@ -263,83 +266,34 @@ function financeRowHtml(row, opts) {
     <span class="fin-cat-icon">${financeCategoryIconHtml(cat)}</span>
   `;
 
-  if (opts.isMeta) {
-    const faltante = Math.max(0, target - assigned);
-    let badgeHtml, barPct, barColor;
-    if (assigned === 0) { badgeHtml = translateMarkup('<span class="fin-badge tone-bad">Sin empezar</span>'); barPct = 0; barColor = 'var(--bad)'; }
-    else if (assigned < target) { badgeHtml = translateMarkup('<span class="fin-badge tone-warn">En progreso</span>'); barPct = target > 0 ? Math.min(100, (assigned / target) * 100) : 0; barColor = 'var(--purple)'; }
-    else { badgeHtml = translateMarkup('<span class="fin-badge tone-good">Cumplida</span>'); barPct = 100; barColor = 'var(--purple)'; }
-    return ui`
-      <div class="fin-row" data-fin-row="${escapeHtml(row.id)}" style="--cat-rgb:${cat.rgb};">
-        ${priorityHtml}
-        <div class="fin-row-main">
-          <div class="fin-row-title">${escapeHtml(row.name)}</div>
-          <div class="fin-row-sub">${escapeHtml(cat.label)}</div>
-          <div class="fin-row-amt-line">
-            <span>Ahorrado <b>${money(assigned)}</b>${financeConvertedInline(assigned)} de ${money(target)}${financeConvertedInline(target)}</span>
-            <span class="fin-row-restante-inline">Faltan <b>${money(faltante)}</b>${financeConvertedInline(faltante)}</span>
-          </div>
-          <div class="fin-progress-track"><div style="width:${barPct}%; background:${barColor};"></div></div>
-        </div>
-        <div class="fin-row-right">
-          <div class="fin-row-right-label">Faltante</div>
-          <div class="fin-row-right-val">${money(faltante)}</div>
-          ${financeConvertedNote(faltante)}
-        </div>
-        ${badgeHtml}
-        <div class="fin-row-actions">
-          <input class="fin-mini-input" data-fin-amount-input placeholder="$" type="text" title="${amountLinkTitle}"/>
-          ${currencyAssignInputHtml}
-          ${signPillHtml}
-          <button class="fin-mini-btn-primary" type="button" data-fin-apply="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}">Aplicar</button>
-          <button class="fin-ghost-btn fin-ghost-btn-icon" type="button" data-fin-edit="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" aria-label="Editar meta" title="Editar meta">${iconHtml('edit')}</button>
-          <button class="hr-window-remove-btn" type="button" data-fin-delete="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" aria-label="Eliminar meta" title="Eliminar meta">${iconHtml('trash')}</button>
-        </div>
-        ${financePlanningRowHtml(row, true)}
-      </div>
-    `;
-  }
-
-  const typeLabel = row.recurring ? translateText('Recurrente') : translateText('Puntual');
-  const isPagado = financeIsRowPagado(row);
-  const checkboxHtml = !row.recurring
-    ? ui`<label class="fin-checkbox-label"><input type="checkbox" data-fin-mark-paid="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" ${row.manualPaid ? 'checked' : ''}/> Pagado</label>`
-    : '';
-  const editBtnHtml = ui`<button class="fin-ghost-btn fin-ghost-btn-icon" type="button" data-fin-edit="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" aria-label="Editar gasto" title="Editar gasto">${iconHtml('edit')}</button>`;
-  let badgeHtml, barPct, barColor, actionsHtml;
-  if (isPagado) {
-    badgeHtml = row.manualPaid ? translateMarkup('<span class="fin-badge tone-good">Pagado</span>') : translateMarkup('<span class="fin-badge tone-good">Cubierto</span>');
-    barPct = 100; barColor = 'var(--good)';
-    actionsHtml = ui`<button class="fin-ghost-btn" type="button" data-fin-reset="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}">${iconHtml('reset')} Reiniciar mes</button>${editBtnHtml}`;
-  } else {
-    barPct = target > 0 ? Math.min(100, (assigned / target) * 100) : 0;
-    if (assigned > 0) { badgeHtml = translateMarkup('<span class="fin-badge tone-warn">Parcial</span>'); barColor = 'var(--warn)'; }
-    else { badgeHtml = translateMarkup('<span class="fin-badge tone-bad">Sin asignar</span>'); barPct = 0; barColor = 'var(--bad)'; }
-    actionsHtml = ui`${checkboxHtml}<input class="fin-mini-input" data-fin-amount-input placeholder="$" type="text" title="${amountLinkTitle}"/>${currencyAssignInputHtml}${signPillHtml}<button class="fin-mini-btn-primary" type="button" data-fin-apply="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}">Aplicar</button>${editBtnHtml}`;
-  }
+  const isMeta = opts.isMeta;
+  const remaining = Math.max(0, target - assigned);
+  const barPct = target > 0 ? Math.min(100, assigned / target * 100) : 0;
+  const reserveLabel = assigned <= 0 ? translateText('Sin reserva') : remaining > 0.004 ? translateText('Reserva parcial') : translateText('Reserva completa');
+  const reserveTone = assigned <= 0 ? 'neutral' : remaining > 0.004 ? 'warn' : 'good';
+  const status = isMeta ? null : financeExpenseStatus(row, settings.financePayments, financeSelectedMonth());
+  const paymentLabel = !status || status.paymentStatus === 'none' ? translateText('Sin pagos') : status.paymentStatus === 'partial' ? translateText('Pago parcial') : translateText('Pagado');
+  const paymentBadge = status ? ui`<span class="fin-badge tone-${status.excess > 0 ? 'warn' : status.paymentStatus === 'paid' ? 'good' : 'neutral'}">${status.excess > 0 ? translateText('Presupuesto excedido') : paymentLabel}</span>` : '';
+  const metrics = financeRowMetric(isMeta ? translateText('Objetivo') : translateText('Presupuesto'), target)
+    + financeRowMetric(translateText('Reservado'), assigned, ui`<span class="fin-badge tone-${reserveTone}">${reserveLabel}</span>${!isMeta && row.manualPaid ? ui`<span class="fin-row-sub">Reserva automática omitida</span>` : ''}`)
+    + financeRowMetric(isMeta ? translateText('Pendiente de reservar') : translateText('Pagado en el mes elegido'), isMeta ? remaining : status.paid, paymentBadge);
   return ui`
     <div class="fin-row" data-fin-row="${escapeHtml(row.id)}" style="--cat-rgb:${cat.rgb};">
       ${priorityHtml}
       <div class="fin-row-main">
         <div class="fin-row-title">${escapeHtml(row.name)}</div>
-        <div class="fin-row-sub">${escapeHtml(cat.label)} · ${escapeHtml(typeLabel)}</div>
-        <div class="fin-row-amt-line">
-          <span><b>${money(assigned)}</b>${financeConvertedInline(assigned)} de ${money(target)}${financeConvertedInline(target)} asignado</span>
-          <span class="fin-row-restante-inline" title="${restanteDespuesTitle}">Disponible <b>${money(opts.restanteDespues)}</b>${financeConvertedInline(opts.restanteDespues)}</span>
-        </div>
-        <div class="fin-progress-track"><div style="width:${barPct}%; background:${barColor};"></div></div>
+          <div class="fin-row-sub">${escapeHtml(cat.label)}${isMeta ? '' : ui` · ${financePeriodLabel(row)} · ${row.recurring ? translateText('Recurrente') : translateText('Puntual')} · ${row.expenseType === 'variable' ? translateText('Importe variable') : translateText('Importe fijo')}`}</div>
+        <div class="fin-progress-track" role="progressbar" aria-label="Progreso de la reserva" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(barPct)}"><div style="width:${barPct}%; background:${isMeta ? 'var(--purple)' : 'var(--cyan)'};"></div></div>
       </div>
-      <div class="fin-row-right" title="${restanteDespuesTitle}">
-        <div class="fin-row-right-label">Disponible</div>
-        <div class="fin-row-right-val">${money(opts.restanteDespues)}</div>
-        ${financeConvertedNote(opts.restanteDespues)}
-      </div>
-      ${badgeHtml}
-      <div class="fin-row-actions">
-        ${actionsHtml}
-        <button class="hr-window-remove-btn" type="button" data-fin-delete="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" aria-label="Eliminar gasto" title="Eliminar gasto">${iconHtml('trash')}</button>
-      </div>
-      ${financePlanningRowHtml(row, false)}
+      <div class="fin-row-metrics">${metrics}</div>
+      ${financeReservationHtml(row, ui`<div class="fin-row-actions">
+        ${financeAmountInputHtml(row, 'reservation')}${signPillHtml}
+        <button class="fin-mini-btn-primary" type="button" data-fin-apply="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" data-fin-help="${escapeHtml(translateText('Confirma el monto y la opción Sumar o Restar. Sumar usa solo dinero disponible; en gastos no supera el presupuesto. Restar devuelve como máximo lo reservado.'))}">Aplicar ajuste</button>
+        ${!isMeta && assigned > 0 ? ui`<button class="fin-ghost-btn" type="button" data-fin-reset="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" data-fin-help="${escapeHtml(translateText('Devuelve toda la reserva de este gasto al Disponible. Conserva el presupuesto, los pagos registrados y la exclusión del reparto automático.'))}">Liberar reserva</button>` : ''}
+        <button class="fin-ghost-btn fin-ghost-btn-icon" type="button" data-fin-edit="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" aria-label="Editar fila" title="Editar fila">${iconHtml('edit')}</button>
+        <button class="hr-window-remove-btn" type="button" data-fin-delete="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" aria-label="Eliminar fila" title="Eliminar fila">${iconHtml('trash')}</button>
+      </div>`)}
+      ${financePlanningRowHtml(row, isMeta)}
     </div>
   `;
 }
@@ -352,9 +306,9 @@ function financeTotalsRowHtml(label, targetTotal, assignedTotal, assignedLabel) 
     <div class="wk-total-row" style="margin-bottom: 4px;">
       <div class="wk-total-label">${escapeHtml(label)}</div>
       <div class="wk-total-metrics">
-        <div class="wk-total-metric"><span class="wk-total-metric-label">Obj.</span><strong>${money(targetTotal)}</strong>${financeConvertedInline(targetTotal)}</div>
+        <div class="wk-total-metric"><span class="wk-total-metric-label">${label === translateText('Total metas') ? translateText('Objetivo') : translateText('Presupuesto')}</span><strong>${money(targetTotal)}</strong>${financeConvertedInline(targetTotal)}</div>
         <div class="wk-total-metric"><span class="wk-total-metric-label">${escapeHtml(assignedLabel)}</span><strong>${money(assignedTotal)}</strong>${financeConvertedInline(assignedTotal)}</div>
-        <div class="wk-total-metric"><span class="wk-total-metric-label">Falta</span><strong>${money(remaining)}</strong>${financeConvertedInline(remaining)}</div>
+        <div class="wk-total-metric"><span class="wk-total-metric-label">Pendiente de reservar</span><strong>${money(remaining)}</strong>${financeConvertedInline(remaining)}</div>
       </div>
     </div>
   `;
@@ -379,25 +333,17 @@ export function renderFinanceSection() {
   const nextPriorityEl = document.getElementById('financeNextPriorityVal');
   if (nextPriorityEl) nextPriorityEl.textContent = nextPending ? nextPending.name : '—';
 
-  // Cascada "Restante después" — solo Gastos, resta assignedAmount (no targetAmount) de cada fila
-  // en orden de prioridad.
   const gastoAssignedTotal = gastoRows.reduce((sum, r) => sum + (Number(r.assignedAmount) || 0), 0);
-  let runningRemaining = available + gastoAssignedTotal;
-  const restanteMap = {};
-  gastoRows.forEach(r => {
-    runningRemaining -= Number(r.assignedAmount) || 0;
-    restanteMap[r.id] = runningRemaining;
-  });
 
   const gastosTotalRowEl = document.getElementById('financeGastosTotalRow');
   if (gastosTotalRowEl) {
     const gastoTargetTotal = gastoRows.reduce((sum, r) => sum + (Number(r.targetAmount) || 0), 0);
-    gastosTotalRowEl.innerHTML = gastoRows.length ? financeTotalsRowHtml(translateText('Total gastos'), gastoTargetTotal, gastoAssignedTotal, translateText('Asig.')) : '';
+    gastosTotalRowEl.innerHTML = gastoRows.length ? financeTotalsRowHtml(translateText('Total gastos'), gastoTargetTotal, gastoAssignedTotal, translateText('Reservado')) : '';
   }
   const gastosList = document.getElementById('financeGastosList');
   if (gastosList) {
     gastosList.innerHTML = gastoRows.length
-      ? gastoRows.map((r, i) => financeRowHtml(r, { index: i, count: gastoRows.length, isMeta: false, restanteDespues: restanteMap[r.id] })).join('')
+      ? gastoRows.map((r, i) => financeRowHtml(r, { index: i, count: gastoRows.length, isMeta: false })).join('')
       : translateMarkup('<div class="note" style="margin:0;">Sin gastos configurados. Usa "+ Agregar gasto" para empezar.</div>');
   }
 
@@ -408,7 +354,7 @@ export function renderFinanceSection() {
     const metaTargetTotal = metaRows.reduce((sum, r) => sum + (Number(r.targetAmount) || 0), 0);
     const metaAssignedTotal = metaRows.reduce((sum, r) => sum + (Number(r.assignedAmount) || 0), 0);
     metasTotalRow.innerHTML = metaRows.length
-      ? financeTotalsRowHtml(translateText('Total metas'), metaTargetTotal, metaAssignedTotal, translateText('Ahorr.')) : '';
+      ? financeTotalsRowHtml(translateText('Total metas'), metaTargetTotal, metaAssignedTotal, translateText('Reservado')) : '';
   }
   if (metasList) {
     metasList.innerHTML = metaRows.length
@@ -480,6 +426,7 @@ export function financeApplySignedAmount(catId, rowId, rawAmount, sign) {
     }
     row.assignedAmount = before - removed;
     if (saveSettingsOnly() === false) return false;
+    clearFinanceAmountDraft(rowId);
     render();
     toast(removed < monto
       ? ui`Solo se restaron ${money(removed)}${convertedAmountText(removed) ? ` (${convertedAmountText(removed)})` : ''} de ${money(monto)}${convertedAmountText(monto) ? ` (${convertedAmountText(monto)})` : ''} — la fila no tenía más asignado. El resto no se tocó.`
@@ -501,10 +448,8 @@ export function financeApplySignedAmount(catId, rowId, rawAmount, sign) {
     appliedAmount = row.assignedAmount - before;
   }
   if (saveSettingsOnly() === false) return false;
+  clearFinanceAmountDraft(rowId);
   render();
-  // Un Gasto ya no acepta más de lo que le falta para su objetivo — si el monto pedido se recortó,
-  // se avisa cuánto entró de verdad en vez de un "Aplicado" genérico que dejaría creer que se
-  // aplicó todo.
   toast(appliedAmount < monto
     ? ui`Solo se asignaron ${money(appliedAmount)}${convertedAmountText(appliedAmount) ? ` (${convertedAmountText(appliedAmount)})` : ''} de ${money(monto)}${convertedAmountText(monto) ? ` (${convertedAmountText(monto)})` : ''} — el gasto ya llegó a su objetivo. El resto sigue en Disponible.`
     : translateText('Aplicado'));
@@ -591,18 +536,20 @@ export function updateFinanceAutoFillSetting(checked) {
 export function financeResetRow(catId, rowId) {
   const row = financeFindRow(catId, rowId);
   if (!row) return;
+  const previous = row.assignedAmount;
   row.assignedAmount = 0;
-  row.manualPaid = false;
-  if (saveSettingsOnly() === false) return false;
+  if (saveSettingsOnly() === false) { row.assignedAmount = previous; return false; }
+  clearFinanceAmountDraft(rowId);
   render();
-  toast(translateText('Gasto reiniciado'));
+  toast(translateText('Reserva liberada. Los pagos registrados se conservan.'));
 }
 
 export function financeToggleManualPaid(catId, rowId, checked) {
   const row = financeFindRow(catId, rowId);
   if (!row) return;
+  const previous = row.manualPaid;
   row.manualPaid = !!checked;
-  if (saveSettingsOnly() === false) return false;
+  if (saveSettingsOnly() === false) { if (previous === undefined) delete row.manualPaid; else row.manualPaid = previous; return false; }
   render();
 }
 
@@ -683,6 +630,10 @@ export function openFinanceRowModal(kind, existingRow = null) {
   const expenseTypeInput = document.getElementById('financeRowExpenseTypeInput');
   if (expenseTypeField) expenseTypeField.style.display = isMeta ? 'none' : '';
   if (expenseTypeInput) expenseTypeInput.value = existingRow?.expenseType === 'variable' ? 'variable' : 'fixed';
+  const periodField = document.getElementById('financeRowBudgetPeriodField');
+  const periodInput = document.getElementById('financeRowBudgetPeriodInput');
+  if (periodField) periodField.style.display = isMeta ? 'none' : '';
+  if (periodInput) periodInput.value = financeBudgetPeriod(existingRow || {});
   openModal('financeRowModal');
 }
 
@@ -906,6 +857,7 @@ export function saveFinanceRowModal() {
     if (!isMeta) {
       foundRow.recurring = (typeInput?.value || 'recurring') === 'recurring';
       foundRow.expenseType = document.getElementById('financeRowExpenseTypeInput')?.value === 'variable' ? 'variable' : 'fixed';
+      foundRow.budgetPeriod = financeBudgetPeriod({budgetPeriod:document.getElementById('financeRowBudgetPeriodInput')?.value});
     }
     if (catId !== foundCatId) {
       settings.financeCategories[foundCatId].rows = settings.financeCategories[foundCatId].rows.filter(r => r.id !== foundRow.id);
@@ -939,6 +891,7 @@ export function saveFinanceRowModal() {
   if (!isMeta) {
     row.recurring = (typeInput?.value || 'recurring') === 'recurring';
     row.expenseType = document.getElementById('financeRowExpenseTypeInput')?.value === 'variable' ? 'variable' : 'fixed';
+    row.budgetPeriod = financeBudgetPeriod({budgetPeriod:document.getElementById('financeRowBudgetPeriodInput')?.value});
     row.manualPaid = false;
   }
   cat.rows.push(row);

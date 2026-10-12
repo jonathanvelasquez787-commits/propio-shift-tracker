@@ -4,8 +4,8 @@ import { setAppSettings, setAppState, setAppCalls, settings, state, calls } from
 import { setLanguage } from '../js/i18n.js';
 import { configureFinanceContext, financeResetRow, financeRunAutoFillCascade } from '../js/finance.js';
 import { configureSettingsContext, applyGoalValues } from '../js/settings.js';
-import { financePlanProjection, financeMonthTotals, financePaymentRows, validFinanceDate, financeSavingsMonthly } from '../js/finance-plan-model.js';
-import { addFinancePayment, deleteFinancePayment, saveFinancePlan, saveFinanceSavingsMonths, financePlanningRowHtml, renderFinancePlanning } from '../js/finance-planning.js';
+import { financePlanProjection, financeMonthTotals, financePaymentRows, validFinanceDate, financeSavingsMonthly, financeExpenseStatus, financeBudgetPeriod } from '../js/finance-plan-model.js';
+import { addFinancePayment, deleteFinancePayment, saveFinancePlan, saveFinanceSavingsMonths, financePlanningRowHtml, renderFinancePlanning, financeSelectedMonth, financeInputUsd } from '../js/finance-planning.js';
 
 function harness(t) {
   setLanguage('es');
@@ -148,4 +148,160 @@ test('old finance rows load without payments and retain the existing automatic e
   const h=harness(t);settings.financeAutoFill=true;financeRunAutoFillCascade();
   assert.equal(h.expense.assignedAmount,80);assert.equal(h.meta.assignedAmount,20);
   assert.equal(settings.financePayments,undefined);assert.deepEqual(financeMonthTotals([h.expense],null,'2026-10'),{budget:120,paid:0,difference:120,fixed:0,variable:0});
+});
+
+test('expense payment status follows the ledger independently of its reserved amount', t => {
+  const h = harness(t);
+  h.expense.assignedAmount = 120;
+  assert.deepEqual(financeExpenseStatus(h.expense, [], '2026-10'), {
+    paid: 0, remaining: 120, excess: 0, percentPaid: 0, paymentStatus: 'none'
+  });
+  assert.equal(addFinancePayment('otro', 'food', '30', '', '2026-10-11'), true);
+  assert.deepEqual(financeExpenseStatus(h.expense, settings.financePayments, '2026-10'), {
+    paid: 30, remaining: 90, excess: 0, percentPaid: 25, paymentStatus: 'partial'
+  });
+  h.expense.assignedAmount = 0;
+  assert.equal(addFinancePayment('otro', 'food', '90', '', '2026-10-12'), true);
+  assert.deepEqual(financeExpenseStatus(h.expense, settings.financePayments, '2026-10'), {
+    paid: 120, remaining: 0, excess: 0, percentPaid: 100, paymentStatus: 'paid'
+  });
+  assert.equal(addFinancePayment('otro', 'food', '30', '', '2026-10-13'), true);
+  assert.deepEqual(financeExpenseStatus(h.expense, settings.financePayments, '2026-10'), {
+    paid: 150, remaining: 0, excess: 30, percentPaid: 125, paymentStatus: 'paid'
+  });
+  h.reload();
+  assert.equal(financeExpenseStatus(settings.financeCategories.otro.rows[0], settings.financePayments, '2026-10').paid, 150);
+});
+
+test('expense status isolates the selected month and row and ignores duplicate or corrupt payments', t => {
+  const h = harness(t);
+  const payment = (id, rowId, usd, date) => ({ id, rowId, usd, date, name: 'Gasto', expenseType: 'variable' });
+  const records = [
+    payment('food-oct', 'food', 30, '2026-10-11'),
+    payment('food-oct', 'food', 300, '2026-10-12'),
+    payment('rent-oct', 'rent', 20, '2026-10-11'),
+    payment('food-nov', 'food', 60, '2026-11-01'),
+    payment('invalid-date', 'food', 90, '2026-10-32'),
+    payment('invalid-money', 'food', Infinity, '2026-10-11')
+  ];
+  const before = JSON.stringify(records);
+  assert.deepEqual(financePaymentRows(records, '2026-10', 'food').map(record => record.id), ['food-oct']);
+  assert.deepEqual(financeExpenseStatus(h.expense, records, '2026-10'), {
+    paid: 30, remaining: 90, excess: 0, percentPaid: 25, paymentStatus: 'partial'
+  });
+  assert.equal(financeExpenseStatus(h.expense, records, '2026-11').paid, 60);
+  assert.equal(financeExpenseStatus(h.expense, records, '2026-12').paymentStatus, 'none');
+  assert.equal(financeMonthTotals([h.expense], records, '2026-10').paid, 50);
+  assert.equal(JSON.stringify(records), before);
+});
+
+test('payment comparisons tolerate subcent rounding without hiding a missing cent', t => {
+  const h = harness(t);
+  h.expense.targetAmount = .3;
+  const payment = (id, usd) => ({ id, rowId: 'food', name: 'Comida', expenseType: 'variable', date: '2026-10-11', usd });
+  const rounded = financeExpenseStatus(h.expense, [payment('first', .1), payment('second', .2)], '2026-10');
+  assert.equal(rounded.paymentStatus, 'paid');
+  assert.ok(Math.abs(rounded.paid - .3) < 1e-12);
+  assert.ok(rounded.remaining >= 0);
+  assert.ok(rounded.excess >= 0);
+  h.expense.targetAmount = 120.003;
+  assert.equal(financeExpenseStatus(h.expense, [payment('rounded-budget', 120)], '2026-10').paymentStatus, 'paid');
+  h.expense.targetAmount = 120.01;
+  const short = financeExpenseStatus(h.expense, [payment('short-cent', 120)], '2026-10');
+  assert.equal(short.paymentStatus, 'partial');
+  assert.ok(Math.abs(short.remaining - .01) < 1e-12);
+  assert.equal(short.excess, 0);
+});
+
+test('legacy manual-paid flags exclude automatic reservation without inventing a payment history', t => {
+  const h = harness(t);
+  h.expense.manualPaid = true;
+  h.expense.assignedAmount = 120;
+  assert.deepEqual(financeExpenseStatus(h.expense, undefined, '2026-10'), {
+    paid: 0, remaining: 120, excess: 0, percentPaid: 0, paymentStatus: 'none'
+  });
+  assert.equal(settings.financePayments, undefined);
+});
+
+test('releasing a reservation preserves the automatic exclusion and recorded payments after reload', t => {
+  const h = harness(t);
+  h.expense.manualPaid = true;
+  assert.equal(addFinancePayment('otro', 'food', '40', '', '2026-10-11'), true);
+  const before = JSON.stringify({ payments: settings.financePayments, calls, target: h.expense.targetAmount, priority: h.expense.priority });
+  financeResetRow('otro', 'food');
+  assert.equal(h.expense.assignedAmount, 0);
+  assert.equal(h.expense.manualPaid, true);
+  assert.equal(JSON.stringify({ payments: settings.financePayments, calls, target: h.expense.targetAmount, priority: h.expense.priority }), before);
+  h.reload();
+  const expense = settings.financeCategories.otro.rows[0];
+  assert.equal(expense.assignedAmount, 0);
+  assert.equal(expense.manualPaid, true);
+  assert.equal(financeExpenseStatus(expense, settings.financePayments, '2026-10').paid, 40);
+  settings.financeAutoFill = true;
+  financeRunAutoFillCascade();
+  assert.equal(expense.assignedAmount, 0);
+  assert.equal(settings.financeCategories.otro.rows[1].assignedAmount, 100);
+});
+
+test('a rejected reservation release restores the assignment and preserves exclusion and payment history', t => {
+  const h = harness(t);
+  h.expense.manualPaid = true;
+  assert.equal(addFinancePayment('otro', 'food', '40', '', '2026-10-11'), true);
+  const before = JSON.stringify({ settings, state, calls });
+  const saves = h.saves();
+  h.reject();
+  assert.equal(financeResetRow('otro', 'food'), false);
+  assert.equal(JSON.stringify({ settings, state, calls }), before);
+  assert.equal(h.saves(), saves);
+  h.reload();
+  assert.equal(JSON.stringify({ settings, state, calls }), before);
+});
+
+test('savings months remain a manual estimate as the reserved balance changes', t => {
+  const h = harness(t);
+  assert.equal(saveFinanceSavingsMonths('otro', 'goal', 12), true);
+  h.meta.assignedAmount = 180;
+  assert.deepEqual(financeSavingsMonthly(h.meta), { months: 12, monthly: 10 });
+  h.meta.assignedAmount = 350;
+  assert.deepEqual(financeSavingsMonthly(h.meta), { months: 12, monthly: 0 });
+  assert.equal(h.meta.savingsMonths, 12);
+  assert.equal(settings.financePayments, undefined);
+});
+
+test('finance defaults to the current local month for its payment status', () => {
+  const now = new Date();
+  const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  assert.equal(financeSelectedMonth(), month);
+});
+
+test('currency entry uses one canonical USD amount and rejects unavailable local conversion', t => {
+  harness(t);
+  assert.equal(financeInputUsd('268', 'local'), 10);
+  assert.equal(financeInputUsd('10', 'usd'), 10);
+  assert.equal(financeInputUsd('1.005', 'usd'), 1.01);
+  assert.equal(addFinancePayment('otro','food','1.005','','2026-10-12'),true);
+  assert.equal(settings.financePayments[0].usd,1.01);
+  assert.ok(Number.isNaN(financeInputUsd('abc', 'local')));
+  settings.exchangeRate = 0;
+  assert.ok(Number.isNaN(financeInputUsd('268', 'local')));
+  assert.equal(financeInputUsd('10', 'usd'), 10);
+  settings.exchangeRate = Infinity;
+  assert.ok(Number.isNaN(financeInputUsd('268', 'local')));
+  settings.exchangeRate = 26.8; settings.currencyLabel = '';
+  assert.ok(Number.isNaN(financeInputUsd('268', 'local')));
+});
+
+test('budget periods are explicit descriptors and never inferred from names or used to multiply amounts', t => {
+  const h = harness(t); h.expense.name = 'Despensa / 2 semanas';
+  assert.equal(financeBudgetPeriod(h.expense), 'unspecified');
+  const before = JSON.stringify(h.expense);
+  assert.equal(financeMonthTotals([h.expense], [], '2026-10').budget, 120);
+  assert.equal(JSON.stringify(h.expense), before);
+  for (const period of ['weekly','fortnightly','monthly','onetime']) {
+    h.expense.budgetPeriod = period;
+    assert.equal(financeBudgetPeriod(h.expense), period);
+    assert.equal(financeMonthTotals([h.expense], [], '2026-10').budget, 120);
+  }
+  h.expense.budgetPeriod = '<script>';
+  assert.equal(financeBudgetPeriod(h.expense), 'unspecified');
 });

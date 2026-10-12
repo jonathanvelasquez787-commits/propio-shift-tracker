@@ -83,8 +83,8 @@ for (const language of ['es', 'en']) {
     vm.runInContext(declarations('../js/finance.js', ['financeTotalsRowHtml', 'renderFinanceSection'])
       + '\n' + declarations('../js/app-main.js', ['endShift']), h);
     h.renderFinanceSection(); h.endShift();
-    assert.ok(elements.get('financeGastosTotalRow').innerHTML.includes(language === 'en' ? 'Assigned' : 'Asig.'));
-    assert.ok(elements.get('financeMetasTotalRow').innerHTML.includes(language === 'en' ? 'Saved' : 'Ahorr.'));
+    assert.ok(elements.get('financeGastosTotalRow').innerHTML.includes(language === 'en' ? 'Reserved' : 'Reservado'));
+    assert.ok(elements.get('financeMetasTotalRow').innerHTML.includes(language === 'en' ? 'Reserved' : 'Reservado'));
     assert.deepEqual(messages, [language === 'en' ? 'Shift ended' : 'Shift terminado']);
   });
 }
@@ -100,8 +100,8 @@ test('finance preview localizes allocated and saved labels without translating p
   vm.runInContext(declarations('../js/finance.js', ['renderFinancePreview']), h);
   h.renderFinancePreview();
   const result = elements.get('financePreviewRows').innerHTML;
-  assert.match(result, />assigned</); assert.match(result, />saved</);
-  assert.ok(!result.includes('>asignado<') && !result.includes('>ahorrado<'));
+  assert.equal(result.split('>Reserved<').length - 1, 2);
+  assert.ok(!result.includes('>Reservado<'));
   assert.equal(result.split(personalName).length - 1, 2);
 });
 

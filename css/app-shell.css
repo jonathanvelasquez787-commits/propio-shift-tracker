@@ -16,6 +16,11 @@
 .fin-plan-split-heading{display:flex;align-items:center;gap:10px;border-top:1px solid var(--line);margin-top:18px;padding-top:16px;font-size:14px}.fin-plan-split-heading>strong{flex:1}
 #financeSplitTooltip{position:fixed;top:auto;left:auto;bottom:auto;right:auto;transform:none;width:min(320px,calc(100vw - 24px));min-width:0;max-width:calc(100vw - 24px);box-sizing:border-box;white-space:normal;opacity:0;visibility:hidden;pointer-events:none;z-index:220}
 #financeSplitTooltip.is-open{opacity:1;visibility:visible}
+#financeFieldTooltip{position:fixed;top:auto;left:auto;bottom:auto;right:auto;transform:none;min-width:0;max-width:calc(100vw - 24px);box-sizing:border-box;white-space:normal;opacity:0;visibility:hidden;pointer-events:none;z-index:220}
+#financeFieldTooltip.is-open{opacity:1;visibility:visible}
+#pageFinance [data-fin-help]{cursor:help}
+#pageFinance button[data-fin-help],#pageFinance select[data-fin-help]{cursor:pointer}
+#pageFinance input[data-fin-help]{cursor:text}
 .fin-plan-distribution{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;margin:15px 0}.fin-plan-distribution>div{display:grid;gap:10px;min-width:0}.fin-plan-distribution input{max-width:100px}.fin-plan-distribution strong{font-size:15px;color:var(--text);font-variant-numeric:tabular-nums}
 .fin-plan-error{font-size:12px;color:var(--bad)}.fin-plan-status{font-size:12px;color:var(--good)}
 .fin-plan-month-head{display:flex;justify-content:space-between;align-items:center;gap:14px;border-top:1px solid var(--line);margin-top:15px;padding-top:15px;font-size:14px}
@@ -27,6 +32,38 @@
 .fin-payment-history-all summary{padding:10px 0;font-size:12px;color:var(--cyan)}
 @media(max-width:640px){.fin-plan-inputs{grid-template-columns:1fr 1fr}.fin-plan-settings{grid-column:1/-1}.fin-plan>summary{flex-wrap:wrap}.fin-plan>summary>span:first-of-type{order:3;width:100%}.fin-plan-projection>div{flex-basis:100%}.fin-plan-distribution{grid-template-columns:1fr}.fin-plan-distribution>div{grid-template-columns:1fr 1fr;align-items:end}.fin-plan-distribution strong{padding-bottom:10px}.fin-plan-month-head{flex-wrap:wrap}.fin-plan-metrics{gap:16px}.fin-payment-controls label{flex-basis:100%}}
 @media(pointer:coarse){.fin-plan-field input{font-size:16px}.fin-plan button,.fin-plan-row button,.fin-plan summary,.fin-plan-row summary{min-height:44px}}
+
+/* Reservas y pagos comparten un layout y controles de moneda. */
+#pageFinance .fin-row{display:grid;grid-template-columns:24px 38px minmax(160px,1fr) minmax(320px,1.3fr);align-items:center;gap:12px 14px}
+#pageFinance .fin-row-main{order:initial;min-width:0;overflow-wrap:anywhere}
+#pageFinance .fin-row-sub{line-height:1.5}
+#pageFinance .fin-row-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;min-width:0}
+#pageFinance .fin-row-metrics .fin-plan-metric{font-size:11px;overflow-wrap:anywhere}
+#pageFinance .fin-row-metrics .fin-badge{justify-self:start;margin:0;order:initial;white-space:normal}
+#pageFinance .fin-row-metrics .fin-row-converted{margin:0;font-size:11px}
+#pageFinance .fin-row-actions{grid-column:3/-1;display:flex;flex-wrap:wrap;align-items:center;gap:10px;min-width:0;order:initial;margin:0}
+#pageFinance .fin-reservation-controls .fin-row-actions{grid-column:auto}
+#pageFinance .fin-plan-row{grid-column:3/-1;order:initial;margin:0;padding-top:0;width:auto}
+#pageFinance .fin-plan-row-body{max-width:760px;padding:12px 0 4px}
+.fin-amount-entry{display:grid;grid-template-columns:minmax(0,150px) minmax(0,84px);gap:6px 8px;min-width:0;max-width:100%}
+.fin-plan-field select{width:100%;min-width:0;box-sizing:border-box;border:1px solid var(--line);border-radius:11px;padding:10px 8px;background:var(--panel-navy);color:var(--text);font:inherit;font-size:14px}
+.fin-plan-field select option{background:var(--panel-navy);color:var(--text)}
+.fin-amount-equivalent{grid-column:1/-1;color:var(--muted);font-size:11px;min-height:14px;overflow-wrap:anywhere}
+.fin-payment-controls{justify-content:flex-start;align-items:center}
+.fin-payment-controls>.fin-plan-field{flex:0 1 170px}
+.fin-payment-controls>.fin-amount-entry{flex:0 1 242px}
+#pageFinance .fin-checkbox-label{margin-top:14px;white-space:normal;line-height:1.5}
+#pageFinance .fin-expense-month{border:0;margin:0;padding:0 0 8px}
+.fin-month-history{margin-bottom:16px;min-width:0}
+#pageFinance .wk-total-row{display:grid;grid-template-columns:120px minmax(0,1fr);gap:12px;align-items:start;padding:12px 0}
+#pageFinance .wk-total-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;overflow:visible;white-space:normal;mask-image:none}
+#pageFinance .wk-total-metric{display:grid;gap:4px;min-width:0;white-space:normal;overflow-wrap:anywhere}
+#pageFinance .wk-total-metric-label{display:block;font-size:11px}
+#pageFinance .wk-total-metric strong{display:block;margin:0;font-size:14px}
+#pageFinance .wk-total-row .fin-row-converted-inline{display:block;font-size:11px}
+@media(max-width:1100px){#pageFinance .fin-row{grid-template-columns:24px 38px minmax(0,1fr)}#pageFinance .fin-row-metrics{grid-column:3/-1}}
+@media(max-width:640px){#pageFinance .fin-row{gap:12px 9px}#pageFinance .fin-row-metrics,#pageFinance .fin-row-actions,#pageFinance .fin-plan-row{grid-column:1/-1}#pageFinance .fin-row-metrics{gap:10px}#pageFinance .fin-row-actions>.fin-amount-entry{flex-basis:100%;grid-template-columns:minmax(0,1fr) 84px}#pageFinance .fin-row-actions>.fin-ghost-btn:not(.fin-ghost-btn-icon){width:auto;padding:0 12px}#pageFinance .fin-row-title{font-size:14px}#pageFinance .fin-row-sub{font-size:11px}#pageFinance .wk-total-row{grid-template-columns:1fr;gap:10px}.fin-payment-controls>.fin-amount-entry{flex-basis:100%;grid-template-columns:minmax(0,1fr) 84px}.fin-payment-controls>.fin-plan-field{flex-basis:170px}.fin-plan-row-heading{flex-wrap:wrap}.fin-plan-metrics{gap:14px}.fin-expense-month>.fin-plan-field{max-width:100%}}
+@media(pointer:coarse){.fin-plan-field select{font-size:16px}#pageFinance .fin-mini-btn-primary,#pageFinance .fin-ghost-btn,#pageFinance .mc-pill-btn,#pageFinance .fin-priority-btn,#pageFinance .hr-window-remove-btn{min-height:44px}#pageFinance .fin-priority-btn{width:24px}#pageFinance .fin-row-actions>.mc-pill-row{flex-wrap:wrap;min-width:0}}
 
 /* Mientras la app no está montada, lo único visible es el gate. */
 body:not(.app-ready) > *:not(#bootGate) {

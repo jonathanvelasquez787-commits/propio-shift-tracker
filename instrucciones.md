@@ -317,6 +317,18 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
+Finanzas v603: revisión aprobada de Gastos/Metas. Presupuesto, Reservado y
+Pagado se muestran separados; solo el ledger fechado determina Pagado. La
+marca antigua manualPaid se conserva como exclusión explícita de la reserva
+automática, sin inventar importes. Liberar reserva conserva pagos y exclusión.
+Período opcional por fila, sin inferirlo del nombre ni mensualizar importes.
+Moneda seleccionable y equivalencia iguales en pagos/reservas; detalles
+compactos, mes visible y estimaciones de metas sin fecha límite automática.
+583 pruebas y builds de app/puente/resumen correctos; 2.214 textos ES/EN.
+17 controles de flujo, 24 vistas responsive y ocho controles de tooltips con
+cuenta ficticia. Ver docs/finanzas-claridad-2026-10-12.md. Publicación y release
+exacto se comprueban aparte.
+
 Segunda auditoría super profunda del 12/10/2026, v602: 13 grupos nuevos
 corregidos en identidad, conflictos, borrado, llamadas, Higher Rate, cabecera
 móvil e idioma. 573 pruebas sin fallos/omitidas (42 nuevas); recorrido adicional
@@ -795,6 +807,20 @@ La aplicación funciona en producción con estas bases vigentes:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v603 — Claridad y controles de Gastos y Metas.**
+
+- Estados independientes de reserva/pago, pagos derivados del ledger y
+  exclusión automática conservada para marcas antiguas. Liberación segura.
+- Períodos explícitos, etiquetas sin abreviaturas, comparación pendiente/exceso
+  y porcentaje del total pagado con estado vacío correcto.
+- Filas compactas con detalles de reservas/pagos, mes visible; entrada única
+  con selector USD/moneda local y equivalencia. Metas muestran reservado y
+  estimación mensual editable sin prometer depósitos ni fecha límite.
+- Campo Monto a sumar o restar y tooltips de puntero/foco/Escape para
+  importe, moneda, Reservado y acciones; equivalencia y límites explícitos.
+- 583 pruebas, 2.214 textos ES/EN y builds correctos; cuenta ficticia,
+  17 controles, 24 vistas y ocho controles de tooltips.
+
 **v602 — Segunda auditoría super profunda del 12/10/2026.**
 
 - Conserva propietario durante descarga, conflicto e import diferido; bloqueo
@@ -820,20 +846,3 @@ La aplicación funciona en producción con estas bases vigentes:
   verifica pagos independientes de llamadas y reinicios de asignación.
   Interfaz local y servidor confirman guardado; datos de prueba aislados.
   Publicación y mantenimiento SQL se verifican aparte por release/integridad.
-
-**11/10/2026 — Finanzas: planificación y pagos sobre el sistema existente.**
-
-- Sección desplegable aprobada: horas, proyección de cuatro semanas, meta
-  global/hoy, reparto personalizable y explicación accesible. Guardado de
-  meta y planificación en una instantánea; rechazo conserva estado anterior.
-- Ledger de pagos separado de asignaciones, con fecha, clasificación,
-  presupuesto frente a pagos, diferencia y porcentaje del gasto real.
-  USD canónico y entrada/conversión de moneda local usando Ajustes.
-- Plazo de metas opcional y aporte mensual orientativo; filas anteriores,
-  prioridades, ahorro y cascada mantienen su modelo. No se importan datos
-  del Excel ni se inventa historial de pagos.
-- Trece regresiones nuevas; tooltip fuera de la tarjeta para evitar el
-  recorte de su contexto de backdrop-filter. Los borradores de pagos se
-  conservan al repintar la sección. Fuente, guardas y build correctos;
-  el release publicado se acredita por separado.
-

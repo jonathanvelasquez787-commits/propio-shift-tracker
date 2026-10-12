@@ -319,7 +319,7 @@
     {
       "id": "finance",
       "area": "Finanzas y Higher Rate",
-      "acceptance": "Asignación y prioridades conservadas; proyección vinculada a meta global sin reescribir llamadas; pagos fechados en USD, moneda de Ajustes y presupuesto mensual; 50/30/20 personalizable y plazos opcionales.",
+      "acceptance": "Reservas y pagos mensuales independientes y visibles; períodos de presupuesto explícitos sin inferir historia ni mensualizar; controles de moneda compartidos; liberación conserva pagos y exclusiones; estimaciones de metas sin fecha límite automática.",
       "sources": [
         "js/finance.js",
         "js/finance-plan-model.js",
@@ -344,7 +344,11 @@
             "failed payment or savings persistence and removal leave the previous data intact",
             "unset or invalid savings deadlines have no invented contribution or prefilled term",
             "savings deadlines are optional and manual; setting one does not change existing savings or priorities",
-            "old finance rows load without payments and retain the existing automatic expense-first cascade"
+            "old finance rows load without payments and retain the existing automatic expense-first cascade",
+            "expense payment status follows the ledger independently of its reserved amount",
+            "legacy manual-paid flags exclude automatic reservation without inventing a payment history",
+            "releasing a reservation preserves the automatic exclusion and recorded payments after reload",
+            "a rejected reservation release restores the assignment and preserves exclusion and payment history"
           ]
         },
         {

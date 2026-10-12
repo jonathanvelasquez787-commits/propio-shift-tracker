@@ -1,7 +1,7 @@
 import { ui, translateText, translateMarkup, displayLocale, translateDocument } from './i18n.js';
 import { applyAppearance, wireAppearance } from './appearance.js';
 import { wireAchievementHelp } from './help-tooltips.js';
-import { wireFinancePlanning } from './finance-planning.js';
+import { wireFinancePlanning, financeInputUsd } from './finance-planning.js';
 import { normalizeBattleWeapon } from './game-battle.js';
 import { createPropioReceiver, createStorageRevisionGuard, ignorePropioCall } from './propio-bridge.js';
 import { settingsWithinBudget, reportLocalPersistenceFailure, readMeta } from './sync.js';
@@ -7515,9 +7515,7 @@ export function render() {
     });
     document.getElementById('financeRowTargetInput').addEventListener('input', () => syncFinanceRowTargetFields('usd'));
     document.getElementById('financeRowTargetCurrencyInput').addEventListener('input', () => syncFinanceRowTargetFields('currency'));
-    // Un solo listener delegado en #financeSection (tabs, prioridad ↑/↓, Reiniciar mes, Asignar,
-    // checkbox Pagado, Eliminar, + los 2 botones de agregar fila) — las filas se repintan enteras
-    // en cada cambio, no llevan listener propio.
+    // Las filas se repintan; los controles usan listeners delegados.
     document.getElementById('financeSection').addEventListener('click', (e) => {
       if (!(e.target instanceof Element)) return;
       const tabBtn = e.target.closest('[data-fin-tab]');
@@ -7548,39 +7546,17 @@ export function render() {
       const applyBtn = e.target.closest('[data-fin-apply]');
       if (applyBtn) {
         const row = applyBtn.closest('.fin-row');
-        const input = row ? row.querySelector('[data-fin-amount-input]') : null;
+        const input = row ? row.querySelector('[data-fin-reservation-input]') : null;
+        const unit = row?.querySelector('[data-fin-amount-scope="reservation"] select')?.value || 'usd';
         const activeSignBtn = row ? row.querySelector('[data-fin-sign-btn][aria-pressed="true"]') : null;
         const sign = activeSignBtn ? activeSignBtn.getAttribute('data-sign') : 'plus';
-        financeApplySignedAmount(applyBtn.getAttribute('data-fin-cat'), applyBtn.getAttribute('data-fin-apply'), input ? input.value : '', sign);
+        financeApplySignedAmount(applyBtn.getAttribute('data-fin-cat'), applyBtn.getAttribute('data-fin-apply'), input ? financeInputUsd(input.value, unit) : '', sign);
         return;
       }
       const deleteBtn = e.target.closest('[data-fin-delete]');
       if (deleteBtn) { financeDeleteRow(deleteBtn.getAttribute('data-fin-cat'), deleteBtn.getAttribute('data-fin-delete')); return; }
       if (e.target.closest('#addFinanceGastoBtn')) { openFinanceRowModal('gasto'); return; }
       if (e.target.closest('#addFinanceMetaBtn')) { openFinanceRowModal('meta'); return; }
-    });
-    // Sincroniza el monto a "Asignar" en $ ↔ en tu moneda dentro de cada fila — mismo criterio que
-    // syncFinanceRowTargetFields, pero acotado a los 2 inputs hermanos dentro de la misma `.fin-
-    // row-actions`.
-    document.getElementById('financeSection').addEventListener('input', (e) => {
-      if (!(e.target instanceof Element)) return;
-      const exchangeRate = Number(settings.exchangeRate);
-      if (!Number.isFinite(exchangeRate) || exchangeRate <= 0) return;
-      const actionsWrap = e.target.closest('.fin-row-actions');
-      if (!actionsWrap) return;
-      if (e.target.matches('[data-fin-amount-input]')) {
-        const sibling = actionsWrap.querySelector('[data-fin-amount-currency-input]');
-        if (!sibling) return;
-        const usd = parseAllocationAmount(e.target.value);
-        const converted = usd * exchangeRate;
-        sibling.value = usd > 0 && Number.isFinite(converted) ? converted.toFixed(2) : '';
-      } else if (e.target.matches('[data-fin-amount-currency-input]')) {
-        const sibling = actionsWrap.querySelector('[data-fin-amount-input]');
-        if (!sibling) return;
-        const cur = parseAllocationAmount(e.target.value);
-        const converted = usdCeilFromCurrencyAmount(cur, exchangeRate);
-        sibling.value = cur > 0 && Number.isFinite(converted) ? converted.toFixed(2) : '';
-      }
     });
     document.getElementById('financeSection').addEventListener('change', (e) => {
       const checkbox = e.target instanceof Element ? e.target.closest('[data-fin-mark-paid]') : null;
