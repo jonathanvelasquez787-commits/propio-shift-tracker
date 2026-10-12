@@ -215,6 +215,9 @@ test('returning root visits choose the gated shell while explicit public views r
   assert.equal(root.destination, '/app.html');
   assert.deepEqual(root.has, [{ type: 'cookie', key: 'ps_app_entry', value: '1' }]);
   assert.deepEqual(root.missing, [{type:'query',key:'quedarse'}, {type:'query',key:'recuperar'}]);
+  const publicRoot = routing.rewrites.find(route => route.source === '/' && !route.has);
+  assert.equal(publicRoot.destination, '/landing.html');
+  assert.ok(routing.rewrites.indexOf(root) < routing.rewrites.indexOf(publicRoot));
   const headers = routing.headers.find(route => route.source === '/');
   assert.deepEqual(headers.has, root.has);
   assert.match(headers.headers.find(header => header.key === 'Cache-Control').value, /no-store/);

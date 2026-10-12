@@ -104,6 +104,7 @@
       ],
       "destination": "/app.html"
     },
+    { "source": "/", "destination": "/landing.html" },
     { "source": "/guides/interpreter-shifts", "destination": "/guides/interpreter-shifts.html" },
     { "source": "/es/guias/turnos-de-interprete", "destination": "/es/guias/turnos-de-interprete.html" },
     { "source": "/es", "destination": "/es.html" },
