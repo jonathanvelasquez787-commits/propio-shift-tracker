@@ -2296,5 +2296,8 @@
   "s_aeca0c44": "Deletes calls, pauses, gaps, the note, log and gamification ONLY for the active day (",
   "s_06c187f8": "Money assigned to a savings goal accumulates and does not reset automatically each month. You decide when the goal is complete.",
   "s_36b85c8a": "One-time expenses: you can mark each row as Paid. Once an expense is covered or marked as paid, Reset month appears to release its allocation. The reset is manual; it does not happen when the month changes. The ↑/↓ order determines how much each expense receives.",
-  "s_50e108c9": "The deadline is optional. Save one to calculate the monthly contribution."
+  "s_50e108c9": "The deadline is optional. Save one to calculate the monthly contribution.",
+  "s_8b1d8111": "The backup contains invalid activity history. Your current data was not changed.",
+  "s_75098ce7": "Payment must be a valid number no greater than 1000000000 dollars.",
+  "s_607b1f5c": "When you start, finish, and take your daily breaks/lunch. The Daily blocks section on Home uses this plan."
 }

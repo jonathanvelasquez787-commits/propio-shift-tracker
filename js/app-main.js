@@ -2215,17 +2215,28 @@ function gapClassification(prevEnd, curStart, dayKey = getActiveDayKey(), gapKey
   const actualCovered = overlapMinutesWithIntervals(prevEnd, curStart, actualPauses);
   // El horario planeado (schedule) ya NO resta minutos del gap ni influye en la clasificación: solo
   // cuenta si realmente marcaste Break/Lunch con el botón.
-  const residual = Math.max(0, raw - actualCovered);
-  const suggested = suggestGapLabel(prevEnd, curStart, dayKey);
   const annotation = gapKey ? getGapAnnotation(dayKey, gapKey) : null;
-  const label = annotation ? String(annotation.label || suggested).toLowerCase() : suggested;
+  const sessions = annotation ? [] : mergeIntervals(dayShiftSessions(dayKey));
+  const connectedIntervals = sessions.length ? sessions.map(session => ({
+    start: new Date(Math.max(prevEnd.getTime(), session.start.getTime())),
+    end: new Date(Math.min(curStart.getTime(), session.end.getTime())),
+  })).filter(interval => interval.end > interval.start) : null;
+  const residual = connectedIntervals
+    ? connectedIntervals.reduce((sum, interval) => sum + Math.max(0,
+      (interval.end - interval.start) / 60000 - overlapMinutesWithIntervals(interval.start, interval.end, actualPauses)), 0)
+    : Math.max(0, raw - actualCovered);
+  const suggested = suggestGapLabel(prevEnd, curStart, dayKey);
+  const automaticLabel = actualCovered > 0 && residual > 1e-9
+    ? (residual > GAP_AUTO_OTHER_THRESHOLD_MIN ? 'other' : 'acw') : suggested;
+  const label = annotation ? String(annotation.label || suggested).toLowerCase() : automaticLabel;
 
   // "Posible pausa" solo tiene sentido cuando el hueco NO ha sido clasificado a mano (sin
   // anotación) Y la sugerencia automática detectó algo distinto de ACW plano (break/lunch por
   // overlap real, u "other" por ser muy largo).
-  const isUnclassifiedPause = !annotation && suggested !== 'acw' && suggested !== 'break' && suggested !== 'lunch';
+  const isUnclassifiedPause = !annotation && label === 'other';
 
-  const displayAmount = (label === 'break' || label === 'lunch') ? raw : residual;
+  const displayAmount = (label === 'break' || label === 'lunch')
+    ? (annotation ? raw : overlapMinutesWithIntervals(prevEnd, curStart, dayPauseIntervals(dayKey).filter(p => p.type === label))) : residual;
 
   return {
     raw,
@@ -2241,6 +2252,7 @@ function gapClassification(prevEnd, curStart, dayKey = getActiveDayKey(), gapKey
     note: annotation?.note || '',
     manual: !!annotation,
     actualCovered,
+    connectedIntervals,
   };
 }
 
@@ -2260,7 +2272,7 @@ export function dayGapRows(dayKey = getActiveDayKey(), sourceCalls = callsForDay
       const virtualPrev = { customerId: 'shift-start', startISO: shiftStart.toISOString(), endISO: shiftStart.toISOString() };
       const gapKey = gapKeyFor(virtualPrev, sorted[0]);
       const info = gapClassification(shiftStart, firstCallStart, normalized, gapKey);
-      if (info.raw > 0) {
+      if (info.displayAmount > 0 || info.manual) {
         rows.push({ gapKey, prev: virtualPrev, cur: sorted[0], isShiftStartGap: true, ...info });
       }
     }
@@ -2271,7 +2283,7 @@ export function dayGapRows(dayKey = getActiveDayKey(), sourceCalls = callsForDay
     const cur = sorted[i];
     const gapKey = gapKeyFor(prev, cur);
     const info = gapClassification(new Date(prev.endISO), new Date(cur.startISO), normalized, gapKey);
-    if (info.raw > 0) {
+    if (info.displayAmount > 0 || info.manual) {
       rows.push({ gapKey, prev, cur, ...info });
     }
   }
@@ -2291,10 +2303,13 @@ function dayGapTotals(dayKey = getActiveDayKey(), sourceCalls = callsForDay(dayK
     rawGapTotal += gap.raw;
     gapLongest = Math.max(gapLongest, gap.residual);
     if (gap.label === 'acw') acwTotal += gap.residual;
-    else if (gap.label === 'break') breakTotal += gap.displayAmount;
-    else if (gap.label === 'lunch') lunchTotal += gap.displayAmount;
     else if (gap.label === 'other') otherTotal += gap.residual;
-    if (!gap.manual && gap.suggested !== 'acw') possiblePauseTotal += gap.residual;
+    possiblePauseTotal += gap.possiblePause;
+  }
+  for (const pause of dayPausesForSlotStats(dayKey)) {
+    const duration = Math.max(0, (pause.end - pause.start) / 60000);
+    if (pause.type === 'break') breakTotal += duration;
+    else if (pause.type === 'lunch') lunchTotal += duration;
   }
   return { rawGapTotal, acwTotal, breakTotal, lunchTotal, otherTotal, possiblePauseTotal, gapLongest, gapCount: gaps.length };
 }
@@ -2637,9 +2652,8 @@ function manualGapPauseIntervals(dayKey, type) {
     .map(row => ({ type, startedAt: row.prev.endISO, endedAt: row.cur.startISO, source: 'gap', gapKey: row.gapKey }));
 }
 
-// Una pausa real (botón) y el mismo hueco clasificado a mano como Break/Lunch son la MISMA pausa:
-// hay que fusionarlas por tipo antes de SUMAR minutos (slotStats), o cada una descuenta por su
-// cuenta.
+// Las pausas reales conservan su tipo; una clasificación manual sólo agrega los minutos
+// restantes. Fusionar por tipo evita duplicar una pausa confirmada sobre el mismo hueco.
 function dayPausesForSlotStats(dayKey) {
   const normalized = callDateKeyFromValue(dayKey);
   const byType = {};
@@ -2647,8 +2661,21 @@ function dayPausesForSlotStats(dayKey) {
     const t = String(type || '').toLowerCase();
     (byType[t] = byType[t] || []).push({ type: t, startedAt, endedAt });
   };
-  dayPauseIntervals(normalized).forEach(p => push(p.type, p.start.toISOString(), p.end.toISOString()));
-  ['break', 'lunch'].forEach(t => manualGapPauseIntervals(normalized, t).forEach(p => push(t, p.startedAt, p.endedAt)));
+  const real = dayPauseIntervals(normalized);
+  real.forEach(p => push(p.type, p.start.toISOString(), p.end.toISOString()));
+  ['break', 'lunch'].forEach(t => manualGapPauseIntervals(normalized, t).forEach(p => {
+    let segments = [{start: new Date(p.startedAt), end: new Date(p.endedAt)}];
+    real.filter(pause => pause.type !== t).forEach(pause => {
+      segments = segments.flatMap(segment => {
+        if (pause.end <= segment.start || pause.start >= segment.end) return [segment];
+        const pieces = [];
+        if (pause.start > segment.start) pieces.push({start:segment.start,end:pause.start});
+        if (pause.end < segment.end) pieces.push({start:pause.end,end:segment.end});
+        return pieces;
+      });
+    });
+    segments.forEach(segment => push(t, segment.start.toISOString(), segment.end.toISOString()));
+  }));
   const out = [];
   Object.keys(byType).forEach(t => {
     mergeOverlappingPauseEntries(byType[t]).forEach(p => out.push({ type: t, start: new Date(p.startedAt), end: new Date(p.endedAt) }));
@@ -2691,10 +2718,7 @@ function pauseDurationExcludingCalls(startedAt, endedAt, dayKey) {
 
 function actualPauseIntervalsForDay(dayKey) {
   const normalized = callDateKeyFromValue(dayKey);
-  const real = dayPauseIntervals(normalized).map(p => ({ type: p.type, start: p.start, end: p.end }));
-  const manualBreak = manualGapPauseIntervals(normalized, 'break').map(p => ({ type: 'break', start: new Date(p.startedAt), end: new Date(p.endedAt) }));
-  const manualLunch = manualGapPauseIntervals(normalized, 'lunch').map(p => ({ type: 'lunch', start: new Date(p.startedAt), end: new Date(p.endedAt) }));
-  return [...real, ...manualBreak, ...manualLunch]
+  return dayPausesForSlotStats(normalized)
     .flatMap(interval => subtractCallsFromPauseInterval(interval, normalized));
 }
 
@@ -2720,17 +2744,9 @@ function pauseAssignmentCache(dayKey, type) {
   const normalized = callDateKeyFromValue(dayKey);
   const base = callDateToDate(normalized) || new Date();
 
-  const rawHistory = state.pauseHistory
-    .filter(p => p.type === type && sameCallDay(p.startedAt, normalized))
-    .map(p => ({ type: p.type, startedAt: p.startedAt, endedAt: p.endedAt }));
-
-  // Pausas "reales" tomadas con el botón + pausas confirmadas a mano desde el editor de huecos (ver
-  // manualGapPauseIntervals).
-  rawHistory.push(...manualGapPauseIntervals(normalized, type));
-
-  if (normalized === todayCallDateKey() && state.activePause && state.activePause.type === type && !state.shiftEndedAt) {
-    rawHistory.push({ type, startedAt: state.activePause.startedAt, endedAt: new Date().toISOString() });
-  }
+  const rawHistory = dayPausesForSlotStats(normalized)
+    .filter(p => p.type === type)
+    .map(p => ({type:p.type,startedAt:p.start.toISOString(),endedAt:p.end.toISOString()}));
 
   // Fusiona duplicados traslapados (ver mergeOverlappingPauseEntries) ANTES de emparejar contra los
   // slots — así una pausa real + un hueco manual clasificado encima cuentan como UNA sola
@@ -5075,6 +5091,22 @@ function renderPayDatesSection() {
       }
       if (!payload.state || typeof payload.state !== 'object' || Array.isArray(payload.state)) {
         return { ok: false, error: translateText('Falta el campo "state" (o no es válido) en el archivo.') };
+      }
+      const validRecord = value => value && typeof value === 'object' && !Array.isArray(value);
+      const validTimestamp = value => (typeof value === 'string' || typeof value === 'number')
+        && Number.isFinite(new Date(value).getTime());
+      for (const [key, timestamps] of [['events', ['ts']], ['pauseHistory', ['startedAt', 'endedAt']]]) {
+        if (!(key in payload.state)) continue;
+        const records = payload.state[key];
+        if (!Array.isArray(records) || records.some(record => !validRecord(record)
+          || timestamps.some(field => !validTimestamp(record[field])))) {
+          return { ok: false, error: translateText('El respaldo contiene un historial de actividad inválido. Tus datos actuales no se cambiaron.') };
+        }
+      }
+      for (const key of ['activeCall', 'activePause', 'pendingLiveCallBackup']) {
+        if (payload.state[key] != null && !validRecord(payload.state[key])) {
+          return { ok: false, error: translateText('El respaldo contiene un historial de actividad inválido. Tus datos actuales no se cambiaron.') };
+        }
       }
       if (!Array.isArray(payload.calls)) {
         return { ok: false, error: translateText('Falta el campo "calls" (o no es una lista) en el archivo.') };

@@ -199,6 +199,9 @@
           "file": "tests/super-audit-accounting.test.mjs",
           "namedCases": [
             "a rejected manual call save does not announce success or award its reward",
+            "manual and edited numeric payment inputs respect scientific notation without changing the imported-money parser",
+            "overflowing manual or edited payments cannot create or replace a call",
+            "native bad numeric input cannot masquerade as an empty payment and use the estimated fallback",
             "a rejected finance allocation save does not report Aplicado",
             "official correction to zero minutes replaces the original and preserves its identity and frozen bonus",
             "successive corrections in one paste produce one final record, including live replacement migration",
@@ -211,7 +214,8 @@
             "a correction collapses only legacy zero-minute duplicates of its exact official identity",
             "reimporting the existing official zero row heals legacy duplicates and rolls back current XP exactly once",
             "an exact zero-minute official correction cannot replace an unrelated overlapping live call",
-            "31 chronological days preserve an independent ledger through imports, manual/live calls, corrections, deletion, goals, and reloads"
+            "31 chronological days preserve an independent ledger through imports, manual/live calls, corrections, deletion, goals, and reloads",
+            "31 daily call saves, currency changes, allocation resets and payment corrections preserve an independent monthly payment ledger"
           ]
         }
       ]
@@ -281,6 +285,19 @@
             "auditoría profunda: descartar una pausa continuada elimina sus artefactos de interrupción",
             "auditoría profunda: saveAll es atómico entre state calls y settings"
           ]
+        },
+        {
+          "file": "tests/deep-gap-accounting.test.mjs",
+          "namedCases": [
+            "a short real Break inside a longer gap preserves residual ACW and counts only actual paused minutes",
+            "mixed real Break and Lunch split a gap without attributing both to the longest pause type",
+            "real pauses after the final call are still included without inventing another call",
+            "manual gap classification still spans the gap and does not duplicate the same real pause",
+            "automatic ACW excludes time outside explicit sessions even when an earlier manual call is imported",
+            "a gap entirely outside explicit work sessions creates no automatic ACW row",
+            "a manually classified Lunch gap does not duplicate a real Break in totals or adherence",
+            "pause slot assignment uses the same nonduplicated minutes as day totals"
+          ]
         }
       ]
     },
@@ -302,6 +319,7 @@
             "saving a finance plan updates the global and today goal in one snapshot, keeping old calls, schedules and historical goals",
             "failed plan persistence rolls back the goal, settings, today exception and state",
             "invalid distribution cannot save goals or assignments",
+            "saving a distribution without editing hours preserves an existing fractional-minute goal exactly",
             "blank plan fields are rejected while an explicit zero-hour goal is valid",
             "removing an erroneous payment changes spending only and survives reload",
             "payments store USD with a date and do not change existing allocations, earnings or goals",
@@ -309,6 +327,7 @@
             "resetting an expense, editing or deleting its row does not erase monthly payment history",
             "invalid payment dates, hostile imports, repeated ids, zero amounts and savings rows cannot create fictitious spending",
             "failed payment or savings persistence and removal leave the previous data intact",
+            "unset or invalid savings deadlines have no invented contribution or prefilled term",
             "savings deadlines are optional and manual; setting one does not change existing savings or priorities",
             "old finance rows load without payments and retain the existing automatic expense-first cascade"
           ]
@@ -326,6 +345,9 @@
           "file": "tests/super-audit-accounting.test.mjs",
           "namedCases": [
             "a rejected manual call save does not announce success or award its reward",
+            "manual and edited numeric payment inputs respect scientific notation without changing the imported-money parser",
+            "overflowing manual or edited payments cannot create or replace a call",
+            "native bad numeric input cannot masquerade as an empty payment and use the estimated fallback",
             "a rejected finance allocation save does not report Aplicado",
             "official correction to zero minutes replaces the original and preserves its identity and frozen bonus",
             "successive corrections in one paste produce one final record, including live replacement migration",
@@ -338,7 +360,8 @@
             "a correction collapses only legacy zero-minute duplicates of its exact official identity",
             "reimporting the existing official zero row heals legacy duplicates and rolls back current XP exactly once",
             "an exact zero-minute official correction cannot replace an unrelated overlapping live call",
-            "31 chronological days preserve an independent ledger through imports, manual/live calls, corrections, deletion, goals, and reloads"
+            "31 chronological days preserve an independent ledger through imports, manual/live calls, corrections, deletion, goals, and reloads",
+            "31 daily call saves, currency changes, allocation resets and payment corrections preserve an independent monthly payment ledger"
           ]
         },
         {
@@ -362,6 +385,9 @@
           "file": "tests/super-audit-accounting.test.mjs",
           "namedCases": [
             "a rejected manual call save does not announce success or award its reward",
+            "manual and edited numeric payment inputs respect scientific notation without changing the imported-money parser",
+            "overflowing manual or edited payments cannot create or replace a call",
+            "native bad numeric input cannot masquerade as an empty payment and use the estimated fallback",
             "a rejected finance allocation save does not report Aplicado",
             "official correction to zero minutes replaces the original and preserves its identity and frozen bonus",
             "successive corrections in one paste produce one final record, including live replacement migration",
@@ -374,7 +400,8 @@
             "a correction collapses only legacy zero-minute duplicates of its exact official identity",
             "reimporting the existing official zero row heals legacy duplicates and rolls back current XP exactly once",
             "an exact zero-minute official correction cannot replace an unrelated overlapping live call",
-            "31 chronological days preserve an independent ledger through imports, manual/live calls, corrections, deletion, goals, and reloads"
+            "31 chronological days preserve an independent ledger through imports, manual/live calls, corrections, deletion, goals, and reloads",
+            "31 daily call saves, currency changes, allocation resets and payment corrections preserve an independent monthly payment ledger"
           ]
         },
         {
@@ -420,6 +447,7 @@
           "file": "tests/audit-backup-validation.test.mjs",
           "namedCases": [
             "invalid backup call records are rejected before changing the existing account",
+            "invalid backup event and pause records are rejected before replacing the current account",
             "backup normalization failure leaves both current state and calls untouched",
             "backup import does not announce success when its local snapshot cannot be saved"
           ]

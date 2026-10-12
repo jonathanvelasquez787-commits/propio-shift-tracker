@@ -16,6 +16,26 @@ test('invalid backup call records are rejected before changing the existing acco
   assert.equal(h.validateImportPayload({state:{},calls:[],settings:{}}).ok,true);
 });
 
+test('invalid backup event and pause records are rejected before replacing the current account', () => {
+  const h = vm.createContext({translateText:value=>value});
+  vm.runInContext(fn('validateImportPayload'), h);
+  for (const key of ['events', 'pauseHistory']) {
+    for (const record of [null, [], 17, 'invalid', {}]) {
+      assert.equal(h.validateImportPayload({ state: { [key]: [record] }, calls: [] }).ok, false, key);
+    }
+    assert.equal(h.validateImportPayload({ state: { [key]: {} }, calls: [] }).ok, false);
+  }
+  for (const key of ['activeCall', 'activePause', 'pendingLiveCallBackup']) {
+    assert.equal(h.validateImportPayload({ state: { [key]: [] }, calls: [] }).ok, false);
+    assert.equal(h.validateImportPayload({ state: { [key]: null }, calls: [] }).ok, true);
+  }
+  assert.equal(h.validateImportPayload({ state: { events: [{ts:'not-a-date'}] }, calls: [] }).ok, false);
+  assert.equal(h.validateImportPayload({ state: {
+    events: [{type:'shiftStart', ts:1791807600000}],
+    pauseHistory: [{type:'break', startedAt:'2026-10-12T12:00:00Z', endedAt:'2026-10-12T12:20:00Z'}]
+  }, calls: [] }).ok, true);
+});
+
 test('backup normalization failure leaves both current state and calls untouched',()=>{
   let state={existing:true},calls=[{id:'existing'}];
   const h=vm.createContext({normalizeStateObject:value=>value,normalizeCallsArray(){throw Error('Invalid record');},

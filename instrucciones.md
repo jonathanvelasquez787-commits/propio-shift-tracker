@@ -317,6 +317,18 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
+Auditoría integral del 12/10/2026: seis fallos reproducidos corregidos en
+metas decimales, pagos numéricos, importación JSON y pausas/ACW (incluye
+superposición manual de Break/Lunch). 530 pruebas; dos recorridos de 31 días,
+17.000 casos independientes; 343 controles internos y 20 enlaces inventariados,
+35 contratos, 2.181 textos ES/EN y build de app/puente/resumen correctos.
+Matriz: 17 áreas, 53 suites, 58 fuentes. Ver docs/auditoria-profunda-2026-10-12.md.
+CI/publicación requieren evidencia separada del resultado local. PostgreSQL:
+usuario autorizó «ahora»; actualización 17.6.1.166 → 17.11.0.003 iniciada
+12/10/2026 07:14:45 Honduras, pendiente de comprobar finalización e integridad.
+Copia diaria fresca comprobada antes. Cero llamadas en nube es intencional,
+confirmado por el usuario; no restaurarlas. Email/SMTP permanece deshabilitado.
+
 Finanzas: propuesta aprobada el 11/10/2026, conservando Gastos/Metas,
 prioridades, asignación automática y controles existentes. La planificación
 vincula horas productivas con la meta global y la de hoy; mantiene la historia
@@ -769,6 +781,19 @@ La aplicación funciona en producción con estas bases vigentes:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**12/10/2026 — Auditoría integral de contabilidad, importación y Finanzas.**
+
+- Conserva la meta decimal al guardar distribución; pagos numéricos aceptan
+  notación científica válida y rechazan overflow/entrada incompleta.
+- Rechaza historiales JSON corruptos antes de cambiar datos. ACW automático
+  usa sesiones conectadas; pausas reales no absorben todo el hueco ni se
+  omiten después de la última llamada. Break/Lunch manuales no duplican
+  minutos reales; bloques, adherencia y cabecera comparten el criterio.
+- 14 regresiones nuevas; 530 pruebas correctas. Segundo recorrido mensual
+  verifica pagos independientes de llamadas y reinicios de asignación.
+  Interfaz local y servidor confirman guardado; datos de prueba aislados.
+  Publicación y mantenimiento SQL se verifican aparte por release/integridad.
+
 **11/10/2026 — Finanzas: planificación y pagos sobre el sistema existente.**
 
 - Sección desplegable aprobada: horas, proyección de cuatro semanas, meta
@@ -804,29 +829,3 @@ La aplicación funciona en producción con estas bases vigentes:
   la publicación se verifica por HTTP y por SHA independientemente de la suite.
   no se afirma una mejora de posición en Google por publicar la guía.
 
-**v600** — Auditoría super profunda de integridad y uso mensual.
-
-- Seis fallos de juego: revocación del loot mejorado al bajar de ocho llamadas,
-  continuación que conserva escudos posteriores, reconciliación al reabrir un
-  día sellado, reinicio en el tope de escudos y metas decimales diarias/de ciclo.
-- Siete fallos contables: correcciones oficiales a cero y duplicados heredados,
-  versiones sucesivas del mismo pegado, recuperación live nocturna, últimos
-  centavos disponibles, cascadas de más de 500 filas, gastos de objetivo cero
-  y protección de una live ajena ante ampliación de una oficial cero.
-- Seis fallos de sincronización/PWA: base de bajas después de reabrir offline,
-  identidad durante operaciones asíncronas/arranque, persistencia obligatoria
-  de metadata, respuestas tardías entre pestañas, HTTP de error que pisaba el
-  shell válido y limpieza de cachés ajenas. Login conserva respuesta y límite
-  local si el limitador persistente falla o devuelve un contrato inválido.
-- Verificación local: 388 pruebas sin fallos, 2.109 textos ES/EN, guardas de
-  33 módulos y wiring correctos, builds de app/puente/resumen correctos.
-  Simulación de 31 días: 161 puntos contables, 72 llamadas finales y 31
-  conciliaciones de exportación; 17.000 escenarios de modelos independientes
-  conservados. Cuatro escenarios SQL locales nuevos pasan; sin datos reales.
-- Navegador local: 31 días consecutivos, dos llamadas/día, $111,60 acumulados,
-  31 cofres, 16 Break y 16 Lunch, 2.992 XP y 355 recibos. Recarga final conserva
-  llamadas/XP/ledger, sin errores. Responsive: siete páginas × dos anchuras,
-  14 vistas activas y raíz sin overflow; no implica QA de cada control individual.
-  Publicación/CI/deploy se verifican por SHA separado. No se certifican
-  OAuth/cron alojados, concurrencia SQL real ni
-  dispositivos físicos. Ver `docs/auditoria-super-profunda-2026-10-09.md`.

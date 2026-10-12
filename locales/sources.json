@@ -5001,6 +5001,12 @@
       "js/game.js"
     ]
   },
+  "s_607b1f5c": {
+    "source": "Cuándo empiezas, cuándo terminas, y tus breaks/lunch de cada día. \"Bloques del día\", en Inicio, se dibuja sobre este plan.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_60a3ee1a": {
     "source": "Define a qué hora entras, cuándo son tus breaks y tu lunch — es la base contra la que se calcula tu adherencia y tus metas del día.",
     "files": [
@@ -6030,6 +6036,12 @@
       "js/game-battle.js"
     ]
   },
+  "s_75098ce7": {
+    "source": "El pago debe ser un número válido de hasta 1000000000 dólares.",
+    "files": [
+      "js/calls.js"
+    ]
+  },
   "s_7523ffd1": {
     "source": "Pagado este mes",
     "files": [
@@ -6347,12 +6359,6 @@
     "source": "Cabeza",
     "files": [
       "js/game.js"
-    ]
-  },
-  "s_7a55985a": {
-    "source": "Cuándo empiezas, cuándo terminas, y tus breaks/lunch de cada día. \"Bloques del día\" (su propia página, en el menú ☰) se dibuja sobre este plan.",
-    "files": [
-      "app.html"
     ]
   },
   "s_7a5e1de2": {
@@ -7294,6 +7300,12 @@
   },
   "s_8b1a3e63": {
     "source": "Hoy también vamos con todo.",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
+  "s_8b1d8111": {
+    "source": "El respaldo contiene un historial de actividad inválido. Tus datos actuales no se cambiaron.",
     "files": [
       "js/app-main.js"
     ]

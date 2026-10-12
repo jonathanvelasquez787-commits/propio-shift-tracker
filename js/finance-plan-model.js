@@ -6,8 +6,10 @@ export function validFinanceSplit(value) {
     && Math.abs(value.reduce((sum, n) => sum + n, 0) - 100) < 1e-6;
 }
 
-export function financePlanProjection(hours, days, rate, split) {
-  const minutes = Number(hours) * 60;
+export function financePlanProjection(hours, days, rate, split, existingGoalMinutes = undefined) {
+  const unchangedHours = typeof existingGoalMinutes === 'number' && Number.isFinite(existingGoalMinutes)
+    && Number(hours) === Number((existingGoalMinutes / 60).toFixed(6));
+  const minutes = unchangedHours ? existingGoalMinutes : Number(hours) * 60;
   const dollars = minutes * Number(rate);
   const projected = dollars * Number(days) * 4;
   if (!Number.isFinite(minutes) || minutes < 0 || minutes > 1440

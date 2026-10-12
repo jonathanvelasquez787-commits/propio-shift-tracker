@@ -6,7 +6,9 @@ import { parse } from 'acorn';
 import { ui, translateText, setLanguage } from '../js/i18n.js';
 import { calls, settings, state, setAppCalls, setAppSettings, setAppState } from '../js/app-context.js';
 import { configureCallsContext, saveManualCall, openCallEditor, saveCallEditor, deleteCallRecord, clearActiveDayCalls, autoSaveLiveCall, restorePendingLiveCallBackup } from '../js/calls.js';
-import { configureFinanceContext, financeRunAutoFillCascade, financeApplySignedAmount } from '../js/finance.js';
+import { configureFinanceContext, financeRunAutoFillCascade, financeApplySignedAmount, financeResetRow } from '../js/finance.js';
+import { addFinancePayment, deleteFinancePayment, saveFinanceSavingsMonths } from '../js/finance-planning.js';
+import { financeMonthTotals } from '../js/finance-plan-model.js';
 import { configureHigherRateContext, higherRateBonusForCall, higherRateBonusForCalls, higherRateBonusBreakdownForCalls } from '../js/higher-rate.js';
 import { configureGameContext, createDefaultGameState, computeGameDay, onGameCallsChanged } from '../js/game.js';
 import { configurePositiveReinforcementContext } from '../js/positive-reinforcement.js';
@@ -51,7 +53,7 @@ function harness(t) {
   vm.createContext(h);
   vm.runInContext(functions.map(name => { assert.ok(declarations.has(name), name); return declarations.get(name); }).join('\n'), h);
   configureHigherRateContext({ ...h, HIGHER_RATE_TIERS: tiers, HIGHER_RATE_EARLY_GRACE_MIN: 5 });
-  configureFinanceContext({ parseMoney: h.parseMoney, higherRateBonusForCalls, saveSettingsOnly: save, render() {}, money: x => x.toFixed(2), convertedAmountText: () => '', toast:h.toast });
+  configureFinanceContext({ parseMoney: h.parseMoney, higherRateBonusForCalls, saveSettingsOnly: save, render() {}, money: x => x.toFixed(2), convertedAmountText: () => '', toast:h.toast, makeLocalId:h.makeLocalId, appConfirm:(_message, run)=>run() });
   configureCallsContext({ ...h, HIGHER_RATE_TIERS: tiers, MAX_CALL_DURATION_MIN: 1440, money: x => x.toFixed(2), convertedAmountText: () => '', financeConvertedInline: () => '', formatDuration: x => String(x), rateTilePerMin: () => settings.rate, renderRateTiles() {}, formatCallDayLabel: x => x,
     closeModal() {}, openModal() {}, appConfirm: (_message, fn) => fn() });
   return { h, inputs, element, gameSaved, messages, rejectSave:()=>{rejectSave=true;},
@@ -70,6 +72,35 @@ test('a rejected manual call save does not announce success or award its reward'
   x.manual('09/01/2025','08:00',10);
   assert.equal(x.saves(),0);assert.deepEqual(x.gameSaved,[]);
   assert.equal(calls.length,1);assert.deepEqual(x.messages,[]);
+});
+
+test('manual and edited numeric payment inputs respect scientific notation without changing the imported-money parser', t => {
+  const x = harness(t); x.advance(at(2,'19:00'));
+  x.manual('09/01/2025','08:00',10,'1e-2');
+  assert.equal(calls[0].pay,'0.01');
+  openCallEditor(calls[0].id); x.element('callEditPayInput').value='1e3'; saveCallEditor();
+  assert.equal(calls[0].pay,'1000.00');
+  assert.equal(x.h.parseMoney('$1,234.50'),1234.5);
+});
+
+test('overflowing manual or edited payments cannot create or replace a call', t => {
+  const x = harness(t); x.advance(at(2,'19:00'));
+  x.manual('09/01/2025','08:00',10,'1e309'); assert.equal(calls.length,0);
+  x.manual('09/01/2025','08:00',10,'1.20');
+  const before=JSON.stringify(calls);
+  openCallEditor(calls[0].id); x.element('callEditPayInput').value='1e309'; saveCallEditor();
+  assert.equal(JSON.stringify(calls),before);
+});
+
+test('native bad numeric input cannot masquerade as an empty payment and use the estimated fallback', t => {
+  const x = harness(t); x.advance(at(2,'19:00'));
+  x.element('manualCallPayInput').validity={badInput:true};
+  x.manual('09/01/2025','08:00',10,''); assert.equal(calls.length,0);
+  x.element('manualCallPayInput').validity={badInput:false};
+  x.manual('09/01/2025','08:00',10,''); assert.equal(calls[0].pay,'1.20');
+  const before=JSON.stringify(calls);
+  openCallEditor(calls[0].id); x.element('callEditPayInput').value=''; x.element('callEditPayInput').validity={badInput:true};
+  saveCallEditor(); assert.equal(JSON.stringify(calls),before);
 });
 
 test('a rejected finance allocation save does not report Aplicado',t=>{
@@ -309,4 +340,48 @@ test('31 chronological days preserve an independent ledger through imports, manu
   }
   assert.ok(checks > 160, `only ${checks} checkpoints`);
   t.diagnostic(`${checks} accounting checkpoints, ${model.size} final calls, 31 persisted daily snapshots and 31 exported day reconciliations`);
+});
+
+test('31 daily call saves, currency changes, allocation resets and payment corrections preserve an independent monthly payment ledger', t => {
+  const x = harness(t), ledger = new Map();
+  settings.exchangeRate = 26.8; settings.currencyLabel = 'L';
+  settings.financeCategories.otro.rows = [
+    {id:'expense',name:'Recurring expense',categoryId:'otro',kind:'gasto',targetAmount:120,assignedAmount:0,priority:1},
+    {id:'savings',name:'Savings',categoryId:'otro',kind:'meta',targetAmount:300,assignedAmount:0,priority:1}
+  ];
+  let checks = 0;
+  for (let day = 1; day <= 31; day++) {
+    const date = new Date(2026, 9, day, 19), key = x.h.todayCallDateKey(date);
+    x.advance(date); state.activeDayKey = key;
+    x.manual(key, '08:30', 10, '20.00', `month-${day}`);
+    settings.currencyLabel = day % 2 ? 'L' : 'MX$';
+    settings.exchangeRate = day % 2 ? 26.8 : 20;
+    const row = settings.financeCategories.otro.rows[0];
+    row.expenseType = day <= 15 ? 'variable' : 'fixed';
+    const beforeAssigned = row.assignedAmount;
+    const cents = day % 2 ? 100 : 200;
+    assert.equal(addFinancePayment('otro', row.id, day % 2 ? '1' : '', day % 2 ? '' : '40', `2026-10-${String(day).padStart(2,'0')}`), true);
+    ledger.set(settings.financePayments.at(-1).id, {cents, type:row.expenseType});
+    assert.equal(row.assignedAmount, beforeAssigned);
+    if (day % 7 === 0) financeResetRow('otro', row.id);
+    if (day === 10 || day === 20) {
+      const id = settings.financePayments[0].id;
+      deleteFinancePayment(id); deleteFinancePayment(id); ledger.delete(id);
+    }
+    if (day === 16) assert.equal(saveFinanceSavingsMonths('otro','savings',12),true);
+    x.h.saveAll(); x.reload();
+    const totals = financeMonthTotals(settings.financeCategories.otro.rows.filter(r=>r.kind==='gasto'),settings.financePayments,'2026-10');
+    const expected = [...ledger.values()];
+    assert.equal(Math.round(totals.paid * 100), expected.reduce((sum,p)=>sum+p.cents,0));
+    assert.equal(Math.round(totals.variable * 100), expected.filter(p=>p.type==='variable').reduce((sum,p)=>sum+p.cents,0));
+    assert.equal(Math.round(totals.fixed * 100), expected.filter(p=>p.type==='fixed').reduce((sum,p)=>sum+p.cents,0));
+    assert.equal(settings.financePayments.length, ledger.size);
+    assert.equal(calls.length, day);
+    assert.equal(Math.round(x.h.importedCallStats(calls,key).earnings * 100), day * 2000);
+    assert.ok(settings.financeCategories.otro.rows.reduce((sum,r)=>sum+r.assignedAmount,0) <= day * 20);
+    checks++;
+  }
+  assert.equal(settings.financeCategories.otro.rows[1].savingsMonths,12);
+  assert.equal(financeMonthTotals([],settings.financePayments,'2026-11').paid,0);
+  t.diagnostic(`${checks} monthly payment reconciliations after daily persistence; ${ledger.size} retained payments and 31 real manual-call handler saves`);
 });
