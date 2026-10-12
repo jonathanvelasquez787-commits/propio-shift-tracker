@@ -31,13 +31,17 @@ deshabilitado por decisión del propietario. No se cambió el diseño de Finanza
   marcado Lunch encima de un Break real de 10 daba 70 minutos de pausas. Ahora
   conserva Break 10 y Lunch 50; totales, adherencia y asignación a bloques usan
   los mismos intervalos sin duplicarlos.
+- **DA07, P2 — Una llamada superpuesta seguía contando como pausa en cabecera.**
+  La revisión del PR detectó que una llamada manual/importada durante una pausa
+  real podía sumar los mismos minutos como productivos y descanso. Se reprodujo
+  y corrigió usando los segmentos de pausa sin llamadas, como en adherencia.
 
 Además, el texto de Horario identifica correctamente que «Bloques del día» se
 encuentra en Inicio.
 
 ## Verificación automática
 
-- 530 pruebas, cero fallos y cero omitidas; 14 casos nuevos respecto a las 516
+- 531 pruebas, cero fallos y cero omitidas; 15 casos nuevos respecto a las 516
   de la versión anterior. Cada defecto tiene una reproducción que falló antes
   de corregirlo y pasa con el cambio.
 - Uso contable cronológico de 31 días: 161 reconciliaciones, 72 llamadas

@@ -317,9 +317,9 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
-Auditoría integral del 12/10/2026: seis fallos reproducidos corregidos en
+Auditoría integral del 12/10/2026: siete fallos reproducidos corregidos en
 metas decimales, pagos numéricos, importación JSON y pausas/ACW (incluye
-superposición manual de Break/Lunch). 530 pruebas; dos recorridos de 31 días,
+superposición manual de Break/Lunch y llamadas durante pausas reales). 531 pruebas; dos recorridos de 31 días,
 17.000 casos independientes; 343 controles internos y 20 enlaces inventariados,
 35 contratos, 2.181 textos ES/EN y build de app/puente/resumen correctos.
 Matriz: 17 áreas, 53 suites, 58 fuentes. Ver docs/auditoria-profunda-2026-10-12.md.
@@ -795,7 +795,7 @@ La aplicación funciona en producción con estas bases vigentes:
   usa sesiones conectadas; pausas reales no absorben todo el hueco ni se
   omiten después de la última llamada. Break/Lunch manuales no duplican
   minutos reales; bloques, adherencia y cabecera comparten el criterio.
-- 14 regresiones nuevas; 530 pruebas correctas. Segundo recorrido mensual
+- 15 regresiones nuevas; 531 pruebas correctas. Segundo recorrido mensual
   verifica pagos independientes de llamadas y reinicios de asignación.
   Interfaz local y servidor confirman guardado; datos de prueba aislados.
   Publicación y mantenimiento SQL se verifican aparte por release/integridad.

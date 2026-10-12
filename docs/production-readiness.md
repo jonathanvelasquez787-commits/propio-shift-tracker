@@ -64,8 +64,8 @@ de recargar. No se ejecutó el borrado de la cuenta del propietario.
 ## Evidencia previa que sigue vigente
 
 La [auditoría integral del 12 de octubre](auditoria-profunda-2026-10-12.md)
-corrige seis grupos de fallos en metas, pagos, respaldos y contabilidad de
-pausas/ACW. Pasa 530 pruebas, dos recorridos cronológicos de 31 días y 17.000
+corrige siete grupos de fallos en metas, pagos, respaldos y contabilidad de
+pausas/ACW. Pasa 531 pruebas, dos recorridos cronológicos de 31 días y 17.000
 casos independientes; 2.181 textos ES/EN, build de app y ambas extensiones.
 Incluye pruebas de interfaz con cuenta ficticia y backend local. Publicación,
 CI y actualización autorizada de PostgreSQL se acreditan por separado.
