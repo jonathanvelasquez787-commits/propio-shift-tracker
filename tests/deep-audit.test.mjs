@@ -137,7 +137,7 @@ test('auditoría profunda: descartar una pausa continuada elimina sus artefactos
 
 test('auditoría profunda: saveAll es atómico entre state calls y settings', () => {
   const app = read('js/app-main.js');
-  const start = app.indexOf('export function saveAll()');
+  const start = app.indexOf('export function saveAll(');
   const end = app.indexOf('export function saveStateOnly()', start);
   const body = app.slice(start, end);
   assert.match(body, /const keys = \[STORAGE_KEY, CALLS_KEY, SETTINGS_KEY\]/);

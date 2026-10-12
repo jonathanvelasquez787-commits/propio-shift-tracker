@@ -5,7 +5,7 @@ import vm from 'node:vm';
 import { parse } from 'acorn';
 import { ui, translateText, setLanguage } from '../js/i18n.js';
 import { calls, settings, state, setAppCalls, setAppSettings, setAppState } from '../js/app-context.js';
-import { configureCallsContext, saveManualCall, openCallEditor, saveCallEditor, deleteCallRecord, clearActiveDayCalls, autoSaveLiveCall, restorePendingLiveCallBackup } from '../js/calls.js';
+import { configureCallsContext, saveManualCall, updateManualCallPreview, openCallEditor, saveCallEditor, deleteCallRecord, clearActiveDayCalls, autoSaveLiveCall, restorePendingLiveCallBackup } from '../js/calls.js';
 import { configureFinanceContext, financeRunAutoFillCascade, financeApplySignedAmount, financeResetRow } from '../js/finance.js';
 import { addFinancePayment, deleteFinancePayment, saveFinanceSavingsMonths } from '../js/finance-planning.js';
 import { financeMonthTotals } from '../js/finance-plan-model.js';
@@ -38,7 +38,7 @@ function harness(t) {
   let rejectSave=false;
   const messages=[];
   const save = () => { if(rejectSave)return false; persisted = JSON.stringify({ calls, settings, state }); saves++; return true; };
-  const h = { Date: ClockDate, ui, translateText, document, MAX_CALL_DURATION_MIN: 1440, CONNECTED_LIVE_GRACE_MIN: 90,
+  const h = { Date: ClockDate, ui, translateText, document, escapeHtml: String, MAX_CALL_DURATION_MIN: 1440, CONNECTED_LIVE_GRACE_MIN: 90,
     makeLocalId: () => `id-${++sequence}`, setAppCalls, higherRateBonusForCall, higherRateBonusForCalls, higherRateBonusBreakdownForCalls,
     callsForDay: key => calls.filter(c => c.callDate === key),
     getActiveDayKey: () => state.activeDayKey, defaultActiveDayKey: () => h.todayCallDateKey(),
@@ -101,6 +101,75 @@ test('native bad numeric input cannot masquerade as an empty payment and use the
   const before=JSON.stringify(calls);
   openCallEditor(calls[0].id); x.element('callEditPayInput').value=''; x.element('callEditPayInput').validity={badInput:true};
   saveCallEditor(); assert.equal(JSON.stringify(calls),before);
+});
+
+for (const [label, value, badInput] of [['empty', '', false], ['whitespace', ' ', false], ['native bad input', '', true]]) {
+  test(`${label} manual duration cannot create a zero-minute call, while explicit zero remains valid`, t => {
+    const x = harness(t); x.advance(at(2, '19:00'));
+    x.element('manualCallDurationInput').validity = { badInput };
+    x.manual('09/01/2025', '08:00', value);
+    assert.equal(calls.length, 0);
+    assert.equal(x.saves(), 0);
+    assert.deepEqual(x.gameSaved, []);
+    x.element('manualCallDurationInput').validity = { badInput: false };
+    x.manual('09/01/2025', '08:00', 0);
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0].durationMin, 0);
+  });
+
+  test(`${label} edited duration cannot erase an existing call duration or its earnings`, t => {
+    const x = harness(t); x.advance(at(2, '19:00'));
+    x.manual('09/01/2025', '08:00', 10, '1.20');
+    const before = JSON.stringify(calls), saves = x.saves();
+    openCallEditor(calls[0].id);
+    x.element('callEditDurationInput').value = value;
+    x.element('callEditDurationInput').validity = { badInput };
+    saveCallEditor();
+    assert.equal(JSON.stringify(calls), before);
+    assert.equal(x.saves(), saves);
+    x.element('callEditDurationInput').value = '0';
+    x.element('callEditDurationInput').validity = { badInput: false };
+    saveCallEditor();
+    assert.equal(calls[0].durationMin, 0);
+  });
+}
+
+test('manual preview leaves the payment draft intact when duration is incomplete or native-invalid', t => {
+  const x = harness(t);
+  for (const badInput of [false, true]) {
+    x.element('manualCallDurationInput').value = '';
+    x.element('manualCallDurationInput').validity = { badInput };
+    x.element('manualCallPayInput').value = '1.20';
+    updateManualCallPreview();
+    assert.equal(x.element('manualCallPayInput').value, '1.20');
+    assert.ok(!x.element('manualCallPreviewText').textContent.includes('0'));
+  }
+});
+
+test('an incomplete live-backup duration preserves its recorded candidate for correction and retry', t => {
+  const x = harness(t); x.advance(at(2, '19:00'));
+  const start = at(1, '08:00').toISOString(), end = at(1, '08:10').toISOString();
+  autoSaveLiveCall(start, end); autoSaveLiveCall(start, end); deleteCallRecord(calls[0].id);
+  assert.equal(restorePendingLiveCallBackup(), true);
+  const before = JSON.stringify(state.pendingLiveCallBackup), saves = x.saves();
+  x.element('manualCallDurationInput').value = '';
+  saveManualCall();
+  assert.equal(calls.length, 0);
+  assert.equal(JSON.stringify(state.pendingLiveCallBackup), before);
+  assert.equal(x.saves(), saves);
+  x.element('manualCallDurationInput').value = '10';
+  saveManualCall();
+  assert.equal(calls[0].durationMin, 10);
+});
+
+test('a twelve-hour clock rejects hour zero instead of importing a different canonical time', t => {
+  const x = harness(t);
+  for (const time of ['0:00 AM', '00:30 PM']) {
+    assert.equal(x.h.toDateFromInputs('09/01/2025', time), null);
+    assert.equal(x.h.parseCalls(`42\t09/01/2025\t${time}\t10\tYes\tNo\t1.20`).length, 0);
+  }
+  assert.equal(x.h.toDateFromInputs('09/01/2025', '12:00 AM').getHours(), 0);
+  assert.equal(x.h.toDateFromInputs('09/01/2025', '12:30 PM').getHours(), 12);
 });
 
 test('a rejected finance allocation save does not report Aplicado',t=>{
@@ -384,4 +453,52 @@ test('31 daily call saves, currency changes, allocation resets and payment corre
   assert.equal(settings.financeCategories.otro.rows[1].savingsMonths,12);
   assert.equal(financeMonthTotals([],settings.financePayments,'2026-11').paid,0);
   t.diagnostic(`${checks} monthly payment reconciliations after daily persistence; ${ledger.size} retained payments and 31 real manual-call handler saves`);
+});
+
+test('42 days across leap February preserve the ledger after incomplete entry, midnight imports, correction and reload', t => {
+  const x = harness(t), ledger = new Map();
+  settings.financeCategories.otro.rows = [{ id: 'reserve', categoryId: 'otro', kind: 'meta', targetAmount: 1000, assignedAmount: 0, priority: 1 }];
+  const start = new Date(2024, 1, 1);
+  for (let day = 0; day < 42; day++) {
+    const now = new Date(2024, 1, 1 + day, 19), key = x.h.todayCallDateKey(now);
+    x.advance(now); state.activeDayKey = key;
+    settings.higherRateWindows.push({ id: `leap-${day}`, date: key, start: '00:00', end: '01:00', tier: 'gold' });
+    x.import([[String(day), key, '12:00 AM', 10, 'Yes', 'No', '1.20']]);
+    ledger.set(`official-${day}`, { key, min: 10, cents: 150 });
+    const official = calls.find(call => call.customerId === String(day) && call.callDate === key);
+    x.manual(key, '08:00', 20, '2.40', `manual-leap-${day}`);
+    ledger.set(`manual-${day}`, { key, min: 20, cents: 240 });
+    const saves = x.saves(), before = JSON.stringify(calls);
+    x.manual(key, '09:00', '', '10.00', `incomplete-${day}`);
+    openCallEditor(official.id);
+    x.element('callEditDurationInput').value = '';
+    x.element('callEditDurationInput').validity = { badInput: day % 2 === 0 };
+    saveCallEditor();
+    assert.equal(JSON.stringify(calls), before);
+    assert.equal(x.saves(), saves);
+    x.element('callEditDurationInput').validity = { badInput: false };
+    if (day % 3 === 0) {
+      x.import([[String(day), key, '12:00 AM', 5, 'Yes', 'No', '.60']]);
+      ledger.set(`official-${day}`, { key, min: 5, cents: 75 });
+    }
+    if (day % 5 === 0) {
+      deleteCallRecord(calls.find(call => call.customerId === `manual-leap-${day}`).id);
+      ledger.delete(`manual-${day}`);
+    }
+    x.h.saveAll(); x.reload();
+    const expected = [...ledger.values()], stats = x.h.importedCallStats(calls, key);
+    assert.equal(calls.length, ledger.size);
+    assert.equal(stats.productive, expected.reduce((sum, entry) => sum + entry.min, 0));
+    assert.ok(Math.abs(stats.earnings * 100 - expected.reduce((sum, entry) => sum + entry.cents, 0)) < 1e-7);
+    assert.ok(Math.abs(settings.financeCategories.otro.rows[0].assignedAmount - stats.earnings) < 1e-7);
+  }
+  assert.ok(calls.some(call => call.callDate === '02/29/2024'));
+  const exported = x.h.accountingExportDays({ start, end: new Date(2024, 2, 13) });
+  assert.equal(exported.length, 42);
+  for (const day of exported) {
+    const expected = [...ledger.values()].filter(entry => entry.key === day.dayKey);
+    assert.equal(day.dayCalls.length, expected.length);
+    assert.ok(Math.abs(day.stats.earnings * 100 - expected.reduce((sum, entry) => sum + entry.cents, 0)) < 1e-7);
+  }
+  t.diagnostic(`42 persisted daily snapshots, 84 rejected incomplete entries, ${ledger.size} final calls and 42 exported day reconciliations across leap February`);
 });

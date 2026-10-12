@@ -4298,7 +4298,9 @@
       .hero, .card, .table-card, .list-card, .mini { padding: 14px; }
       .hero { margin-bottom: 10px; }
       .brand { padding: 6px 10px; font-size: 10.5px; }
-      .hero-top-row { margin-bottom: 10px; }
+      .hero-top-row { margin-bottom: 10px; flex-wrap: wrap; overflow-x: visible; }
+      /* Wrapping keeps every header control reachable when the brand fills the first row. */
+      .hero-top-actions { max-width: 100%; flex-shrink: 0; margin-left: auto; overflow-x: visible; }
       .hero-actions { gap: 5px; margin-bottom: 18px; }
       .hero-action-btn { padding: 5px 8px; font-size: 10.5px; gap: 4px; }
       .title-row { flex-direction: column; align-items: flex-start; gap: 2px; }

@@ -162,7 +162,7 @@ export function renderFinancePreview() {
         </div>
         <div class="fin-preview-right">
           <div class="fin-preview-amt">${money(assigned)}</div>
-          <div class="fin-preview-amt-label">${isMeta ? 'ahorrado' : 'asignado'}${financeConvertedInline(assigned)}</div>
+          <div class="fin-preview-amt-label">${isMeta ? translateText('ahorrado') : translateText('asignado')}${financeConvertedInline(assigned)}</div>
         </div>
       </div>
     `;
@@ -392,7 +392,7 @@ export function renderFinanceSection() {
   const gastosTotalRowEl = document.getElementById('financeGastosTotalRow');
   if (gastosTotalRowEl) {
     const gastoTargetTotal = gastoRows.reduce((sum, r) => sum + (Number(r.targetAmount) || 0), 0);
-    gastosTotalRowEl.innerHTML = gastoRows.length ? financeTotalsRowHtml(translateText('Total gastos'), gastoTargetTotal, gastoAssignedTotal, 'Asig.') : '';
+    gastosTotalRowEl.innerHTML = gastoRows.length ? financeTotalsRowHtml(translateText('Total gastos'), gastoTargetTotal, gastoAssignedTotal, translateText('Asig.')) : '';
   }
   const gastosList = document.getElementById('financeGastosList');
   if (gastosList) {
@@ -408,7 +408,7 @@ export function renderFinanceSection() {
     const metaTargetTotal = metaRows.reduce((sum, r) => sum + (Number(r.targetAmount) || 0), 0);
     const metaAssignedTotal = metaRows.reduce((sum, r) => sum + (Number(r.assignedAmount) || 0), 0);
     metasTotalRow.innerHTML = metaRows.length
-      ? financeTotalsRowHtml(translateText('Total metas'), metaTargetTotal, metaAssignedTotal, 'Ahorr.') : '';
+      ? financeTotalsRowHtml(translateText('Total metas'), metaTargetTotal, metaAssignedTotal, translateText('Ahorr.')) : '';
   }
   if (metasList) {
     metasList.innerHTML = metaRows.length

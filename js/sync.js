@@ -736,8 +736,8 @@ export async function resolveBoot(userId) {
         copy.userId === userId && copy.reason === 'account-switch' ? { ...copy, reason: 'recovered-account' } : copy)));
     }
   }
-  const meta = readMeta();
-  if (navigator.onLine === false && meta.userId === userId && localHasData()) {
+  const offlineMeta = readMeta();
+  if (navigator.onLine === false && offlineMeta.userId === userId && localHasData()) {
     return { action: BOOT.USE_LOCAL, offline: true };
   }
   let cloud;
@@ -747,11 +747,13 @@ export async function resolveBoot(userId) {
     const networkFailure = !error?.code && /^(?:TypeError: )?(?:Failed to fetch|NetworkError when attempting to fetch resource\.?|Load failed)$/i.test(error?.message || '');
     // Sin red solo se abre una copia cuyo propietario está identificado.
     // Conservamos su base: desconocer la nube no equivale a una fila vacía.
-    if (networkFailure && meta.userId === userId && localHasData()) {
+    if (networkFailure && readMeta().userId === userId && localHasData()) {
       return { action: BOOT.USE_LOCAL, offline: true };
     }
     throw error;
   }
+  // Another tab can save or change the local owner while the network is awaited.
+  const meta = readMeta();
   const local = localHasData();
   const belongsToSomeoneElse = Boolean(meta.userId && meta.userId !== userId);
 
@@ -786,10 +788,14 @@ export async function resolveBoot(userId) {
     return { action: BOOT.USE_CLOUD, cloud };
   }
 
+  const localSnapshot = readLocalSnapshot();
   return {
     action: BOOT.CONFLICT,
     cloud,
-    localSummary: describeSnapshot(readLocalSnapshot()),
+    localSnapshot,
+    localOwnerId: meta.userId,
+    localRevision: meta.lastSyncedUpdatedAt,
+    localSummary: describeSnapshot(localSnapshot),
     cloudSummary: describeSnapshot(cloud),
   };
 }

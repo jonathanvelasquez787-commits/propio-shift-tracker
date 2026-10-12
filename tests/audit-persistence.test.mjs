@@ -116,6 +116,27 @@ test('una pestaña antigua no reemplaza el historial guardado por otra pestaña'
   assert.ok(h.warnings.length > 0);
 });
 
+test('a reassigned owner with identical stored JSON still blocks writes from the prior account document', () => {
+  const h = storageHarness(), before = new Map(h.values);
+  h.context.window = { [Symbol.for('propio.expectedAppOwner')]: 'account-a' };
+  h.context.readMeta = () => ({ userId: 'account-b', lastSyncedUpdatedAt: 'new-revision' });
+  h.state.newEdit = true;
+  assert.equal(h.run('localStorageRevision.isCurrent()'), true);
+  assert.equal(h.run('saveAll()'), false);
+  assert.deepEqual(h.values, before);
+  assert.equal(getLocalPersistenceFailure(), 'stale');
+});
+
+test('the expected owner can persist after sync metadata changes without treating normal acknowledgements as stale', () => {
+  const h = storageHarness();
+  h.context.window = { [Symbol.for('propio.expectedAppOwner')]: 'account-a' };
+  h.context.readMeta = () => ({ userId: 'account-a', lastSyncedUpdatedAt: 'new-revision', dirty: false });
+  h.state.newEdit = true;
+  assert.equal(h.run('saveStateOnly()'), true);
+  assert.equal(JSON.parse(h.values.get('state')).newEdit, true);
+  assert.equal(getLocalPersistenceFailure(), null);
+});
+
 test('una cuota agotada no persiste recompensas de llamadas que no llegaron al disco; un reintento guarda todo', () => {
   const h = storageHarness();
   const before = new Map(h.values);

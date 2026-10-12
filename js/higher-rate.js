@@ -5,14 +5,14 @@ import { calls, settings } from './app-context.js';
 let HIGHER_RATE_EARLY_GRACE_MIN, HIGHER_RATE_TIERS, appConfirm, callDateKeyFromValue, callDateToDate;
 let callsForDay, dayKeyFromIsoDate, escapeHtml, financeConvertedInline, financeRunAutoFillCascade, formatBlockDurationLabel;
 let formatCallDayLabel, formatHHMM, formatMinutes, iconHtml, isoDateFromDayKey, makeLocalId;
-let mergeIntervals, minutesToHHMM, money, onGameCallsChanged, saveAll, timeLabel, toDateFromInputs, toMinutes;
+let mergeIntervals, minutesToHHMM, money, onGameCallsChanged, render, saveAll, timeLabel, toDateFromInputs, toMinutes;
 let toast, todayCallDateKey, todayRange;
 
 export function configureHigherRateContext(context) {
   ({ HIGHER_RATE_EARLY_GRACE_MIN, HIGHER_RATE_TIERS, appConfirm, callDateKeyFromValue, callDateToDate,
     callsForDay, dayKeyFromIsoDate, escapeHtml, financeConvertedInline, financeRunAutoFillCascade, formatBlockDurationLabel,
     formatCallDayLabel, formatHHMM, formatMinutes, iconHtml, isoDateFromDayKey, makeLocalId,
-    mergeIntervals, minutesToHHMM, money, onGameCallsChanged, saveAll, timeLabel, toDateFromInputs, toMinutes, toast,
+    mergeIntervals, minutesToHHMM, money, onGameCallsChanged, render, saveAll, timeLabel, toDateFromInputs, toMinutes, toast,
     todayCallDateKey, todayRange } = context);
 }
 
@@ -526,7 +526,7 @@ export function configureHigherRateContext(context) {
 
       historyList.innerHTML = sortedPast.map(renderHigherRateWindowRow).join('')
         || translateMarkup('<div class="note" style="margin:0;">Sin ventanas pasadas todavía.</div>');
-      if (historyTitle) historyTitle.innerHTML = ui`${iconHtml('history')} Historial (${sortedPast.length} ${sortedPast.length === 1 ? 'pasada' : 'pasadas'})`;
+      if (historyTitle) historyTitle.innerHTML = ui`${iconHtml('history')} Historial (${sortedPast.length} ${sortedPast.length === 1 ? translateText('pasada') : translateText('pasadas')})`;
       if (activeCountPill) activeCountPill.textContent = `${sortedActive.length} ${sortedActive.length === 1 ? translateText('próxima') : translateText('próximas')}`;
       higherRateLastPastCount = sortedPast.length;
       renderHigherRateDayStats();
@@ -554,10 +554,30 @@ export function configureHigherRateContext(context) {
       });
     }
 
+    function higherRateMutationSnapshot() {
+      return {
+        windows: settings.higherRateWindows,
+        categories: settings.financeCategories === undefined ? undefined : JSON.parse(JSON.stringify(settings.financeCategories)),
+        bonuses: calls.map(call => [call, call.frozenHigherRateBonus]),
+      };
+    }
+
+    function restoreHigherRateMutation(snapshot) {
+      if (snapshot.windows === undefined) delete settings.higherRateWindows;
+      else settings.higherRateWindows = snapshot.windows;
+      if (snapshot.categories === undefined) delete settings.financeCategories;
+      else settings.financeCategories = snapshot.categories;
+      snapshot.bonuses.forEach(([call, bonus]) => {
+        if (bonus === undefined) delete call.frozenHigherRateBonus;
+        else call.frozenHigherRateBonus = bonus;
+      });
+    }
+
     // Persiste lo que hay ahora mismo en el editor — llamada en cada cambio de campo (auto-
     // guardado, mismo patrón que el resto de settings sueltos de Horario) y al eliminar una fila.
     export function saveHigherRateWindowsFromEditor() {
       const gameBefore = higherRateGameBonusSnapshot();
+      const previous = higherRateMutationSnapshot();
       const oldWindows = settings.higherRateWindows || [];
       const oldById = new Map(oldWindows.map(w => [w.id, w]));
       const newWindows = readHigherRateWindowsFromEditor();
@@ -575,10 +595,16 @@ export function configureHigherRateContext(context) {
       retuneFrozenHigherRateTiers(newWindows);
       // Si el bono cambia, también puede bajar el dinero real disponible en Finanzas.
       financeRunAutoFillCascade();
-      reconcileHigherRateGameChanges(gameBefore);
       // SaveAll en vez de saveSettingsOnly: freezeHigherRateBonusesForWindowIds puede haber marcado
       // `calls` con `frozenHigherRateBonus` nuevo.
-      saveAll();
+      if (saveAll({ render: false }) === false) {
+        restoreHigherRateMutation(previous);
+        render();
+        renderHigherRateDayStats();
+        return false;
+      }
+      reconcileHigherRateGameChanges(gameBefore);
+      render();
       renderHigherRateLiveCard();
       // Editar una ventana ya existente (ej. su hora de fin) no refrescaba "Próximos días" — ese
       // bloque se quedaba mostrando el horario viejo hasta reabrir el modal, porque nada aquí
@@ -586,6 +612,7 @@ export function configureHigherRateContext(context) {
       renderHigherRateDayStats();
       notifyHigherRateRetroactiveMatches(changedIds);
       notifyHigherRateMidnightCrossingWindows();
+      return true;
     }
 
     // Las ventanas pueden cruzar medianoche. La única combinación inválida es Inicio === Fin,
@@ -640,6 +667,7 @@ export function configureHigherRateContext(context) {
 
     export function removeHigherRateWindowRowAt(id) {
       const gameBefore = higherRateGameBonusSnapshot();
+      const previous = higherRateMutationSnapshot();
       // Borrar UNA ventana (individual, con "✕") le quitaba retroactivamente el bono ya calculado a
       // cualquier llamada real que ya calificaba para ella.
       freezeHigherRateBonusesForWindowIds([id]);
@@ -649,12 +677,20 @@ export function configureHigherRateContext(context) {
       // hasta reabrir el modal) la ventana que acabas de borrar.
       settings.higherRateWindows = current;
       financeRunAutoFillCascade();
-      reconcileHigherRateGameChanges(gameBefore);
       // SaveAll en vez de saveSettingsOnly: ahora también hay que persistir `calls` (algunas pueden
       // haber quedado con frozenHigherRateBonus nuevo).
-      saveAll();
+      if (saveAll({ render: false }) === false) {
+        restoreHigherRateMutation(previous);
+        render();
+        renderHigherRateWindowsEditor(settings.higherRateWindows || []);
+        renderHigherRateLiveCard();
+        return false;
+      }
+      reconcileHigherRateGameChanges(gameBefore);
+      render();
       renderHigherRateWindowsEditor(current);
       renderHigherRateLiveCard();
+      return true;
     }
 
     // Congela el bono ya ganado antes de que la ventana desaparezca de settings, por cualquier vía.
@@ -717,7 +753,7 @@ export function configureHigherRateContext(context) {
         financeRunAutoFillCascade();
         // SaveAll en vez de saveSettingsOnly: también hay que persistir `calls` (varias pueden
         // haber quedado con frozenHigherRateBonus).
-        if (saveAll() === false) {
+        if (saveAll({ render: false }) === false) {
           settings.higherRateWindows = previousWindows;
           if (previousCategories === undefined) delete settings.financeCategories;
           else settings.financeCategories = previousCategories;
@@ -725,9 +761,11 @@ export function configureHigherRateContext(context) {
             if (bonus === undefined) delete call.frozenHigherRateBonus;
             else call.frozenHigherRateBonus = bonus;
           });
+          render();
           return false;
         }
         reconcileHigherRateGameChanges(gameBefore);
+        render();
         renderHigherRateWindowsEditor(remaining);
         toast(ui`${pastWindows.length} ventana(s) borrada(s) del historial — el bono ya ganado por esas llamadas se conserva.`);
       });

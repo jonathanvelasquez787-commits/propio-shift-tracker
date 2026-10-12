@@ -415,6 +415,12 @@
       "js/game.js"
     ]
   },
+  "s_0981dba9": {
+    "source": "Shift iniciado",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_09c766c1": {
     "source": "Ranura de espalda",
     "files": [
@@ -650,6 +656,12 @@
     "files": [
       "app.html",
       "js/game.js"
+    ]
+  },
+  "s_0d43587d": {
+    "source": "asignado",
+    "files": [
+      "js/finance.js"
     ]
   },
   "s_0d4512ac": {
@@ -1117,6 +1129,12 @@
     "source": ", que forma parte de estos términos.",
     "files": [
       "terminos.html"
+    ]
+  },
+  "s_15ea3b31": {
+    "source": "ahorrado",
+    "files": [
+      "js/finance.js"
     ]
   },
   "s_160f1d9d": {
@@ -1735,6 +1753,12 @@
       "app.html"
     ]
   },
+  "s_21a494b5": {
+    "source": "Ausencia/llegada tarde",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_21b50060": {
     "source": "Dos versiones distintas de tus datos",
     "files": [
@@ -2160,6 +2184,12 @@
       "js/landing.js"
     ]
   },
+  "s_2a83a30d": {
+    "source": "pasada",
+    "files": [
+      "js/higher-rate.js"
+    ]
+  },
   "s_2abecbb6": {
     "source": "🏆 Recompensa del ciclo · {{v0}}",
     "files": [
@@ -2342,6 +2372,12 @@
     "source": "Cuándo ofrecerlo",
     "files": [
       "app.html"
+    ]
+  },
+  "s_2ef9294e": {
+    "source": "Regresaste",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_2efcde17": {
@@ -3920,6 +3956,12 @@
       "app.html"
     ]
   },
+  "s_4cd85242": {
+    "source": "Shift terminado",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_4cd99f3b": {
     "source": "Exportación para contabilidad",
     "files": [
@@ -5383,7 +5425,8 @@
   "s_688eab14": {
     "source": "Completo",
     "files": [
-      "index.html"
+      "index.html",
+      "js/app-main.js"
     ]
   },
   "s_68958345": {
@@ -5542,6 +5585,12 @@
     "source": "No se pudo revisar ahora; lo confirmamos al crear la cuenta.",
     "files": [
       "js/landing.js"
+    ]
+  },
+  "s_6b3a5f5a": {
+    "source": "pasadas",
+    "files": [
+      "js/higher-rate.js"
     ]
   },
   "s_6b88ae44": {
@@ -5955,7 +6004,8 @@
   "s_732d4536": {
     "source": "No iniciado",
     "files": [
-      "app.html"
+      "app.html",
+      "js/app-main.js"
     ]
   },
   "s_733ceab0": {
@@ -7337,6 +7387,7 @@
   "s_8bce7dc0": {
     "source": "fecha desconocida",
     "files": [
+      "js/app-main.js",
       "js/boot.js"
     ]
   },
@@ -8129,6 +8180,12 @@
     "source": "Objetivo ≥ {{v0}}%",
     "files": [
       "js/calls.js"
+    ]
+  },
+  "s_9b029df9": {
+    "source": "Pega aquí la data de Propio...\n\nEjemplo:\n{{v0}}",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_9b360077": {
@@ -9249,6 +9306,7 @@
   "s_b0bac425": {
     "source": "Parcial",
     "files": [
+      "js/app-main.js",
       "js/finance.js"
     ]
   },
@@ -9983,6 +10041,12 @@
     "files": [
       "app.html",
       "js/theme-palettes.js"
+    ]
+  },
+  "s_befdd00d": {
+    "source": "Asig.",
+    "files": [
+      "js/finance.js"
     ]
   },
   "s_bf3a3491": {
@@ -11278,6 +11342,12 @@
       "js/game-battle.js"
     ]
   },
+  "s_d9e72b95": {
+    "source": "Ahorr.",
+    "files": [
+      "js/finance.js"
+    ]
+  },
   "s_da016c4f": {
     "source": "Subir contenido ilegal o que infrinja derechos de terceros.",
     "files": [
@@ -11678,6 +11748,12 @@
       "js/app-main.js"
     ]
   },
+  "s_df54f508": {
+    "source": "Working",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_df69f1d3": {
     "source": "Volumen",
     "files": [
@@ -12064,6 +12140,12 @@
     "source": "Revender, sublicenciar o redistribuir el servicio o su código.",
     "files": [
       "terminos.html"
+    ]
+  },
+  "s_e82a940e": {
+    "source": "Finalizado",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_e83216c9": {
@@ -13253,6 +13335,12 @@
     "source": "Toca cualquier llamada ya guardada en la tabla para editarla o borrarla.",
     "files": [
       "app.html"
+    ]
+  },
+  "s_ff62a41a": {
+    "source": "Omitido",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_ff69f07b": {

@@ -63,6 +63,13 @@ de recargar. No se ejecutó el borrado de la cuenta del propietario.
 
 ## Evidencia previa que sigue vigente
 
+La [segunda auditoría super profunda del 12 de octubre](auditoria-super-profunda-2026-10-12.md)
+corrige 13 grupos nuevos, conserva fixes anteriores y pasa 573 pruebas (42 nuevas),
+una simulación adicional de 42 días, 2.195 textos y builds de app y ambas
+extensiones. El recorrido de navegador verifica persistencia, restauración
+y cabecera móvil en 320/390 px claro/oscuro. Sus límites y la distinción entre
+checks locales, nube y publicación están documentados.
+
 La [auditoría integral del 12 de octubre](auditoria-profunda-2026-10-12.md)
 corrige siete grupos de fallos en metas, pagos, respaldos y contabilidad de
 pausas/ACW. Pasa 531 pruebas, dos recorridos cronológicos de 31 días y 17.000

@@ -74,3 +74,44 @@ test('two isolated storage contexts initialize from cloud after the gate and pre
   await reopened.ready();
   assert.deepEqual(reopened.mounted(), { rate: 0.33, name: 'saved from second browser' });
 });
+
+test('production delayed app evaluation rejects a reassigned owner before reading or saving its models', async () => {
+  const bootSource = fs.readFileSync(gate, 'utf8');
+  const mount = bootSource.slice(bootSource.indexOf('async function mountApp('), bootSource.indexOf('// Barra de cuenta'));
+  const appSource = fs.readFileSync(app, 'utf8');
+  const defaultStart = appSource.indexOf('    function defaultState()');
+  const defaultEnd = /\r?\n    }\r?\n/.exec(appSource.slice(defaultStart));
+  const initializationStart = defaultStart + defaultEnd.index + defaultEnd[0].length;
+  const initialization = appSource.slice(initializationStart, appSource.indexOf('    const localStorageRevision', initializationStart));
+  const sources = new Map([
+    [gate, mount + "\n(async()=>{await mountApp('account-a'); finished();})();"],
+    [app, initialization + '\ninitialized();'],
+  ]);
+  const plugin = { name: 'controlled-owner-race', load: id => sources.get(id) };
+  const bootBundle = await compile(gate, 'boot', [plugin]);
+  const appBundle = await compile(app, 'app-main', [plugin]);
+  for (const nextOwner of ['account-a', 'account-b']) {
+    let releaseImport, finish;
+    const importReady = new Promise(resolve => { releaseImport = resolve; });
+    const done = new Promise(resolve => { finish = resolve; });
+    let owner = 'account-a', modelReads = 0, modelWrites = 0, revealed = false, redirected;
+    const loadModel = () => { modelReads++; return { owner }; };
+    const context = vm.createContext({ window: { location: { replace: url => { redirected = url; } } },
+      document: { body: { classList: { add() {}, remove() {} } } }, overlay: { remove: () => { revealed = true; } },
+      readMeta: () => ({ userId: owner }), setAppEntryHint() {}, fail: message => { throw Error(message); },
+      translateText: value => value, console,
+      loadState: loadModel, loadCalls: loadModel, loadSettings: loadModel,
+      setAppState() {}, setAppCalls() {}, setAppSettings() {}, initialized: () => { modelWrites++; },
+      finished: finish,
+      loadApp: async () => { await importReady; vm.runInContext(appBundle.code.replace(/export\s*\{[^}]*\};?/, ''), context); },
+    });
+    vm.runInContext(bootBundle.code.replace(/import\('\/assets\/app-main\.js\?v=sync-regression'\)/g, 'loadApp()'), context);
+    owner = nextOwner;
+    releaseImport();
+    await done;
+    assert.equal(modelReads, nextOwner === 'account-a' ? 3 : 0);
+    assert.equal(modelWrites, nextOwner === 'account-a' ? 1 : 0);
+    assert.equal(revealed, nextOwner === 'account-a');
+    assert.equal(redirected, nextOwner === 'account-a' ? undefined : '/?next=/app');
+  }
+});

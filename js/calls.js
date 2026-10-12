@@ -124,7 +124,8 @@ export function saveCallEditor() {
   const droppedInput = document.getElementById('callEditDroppedInput');
 
   const duration = Number(durationInput?.value);
-  if (!Number.isFinite(duration) || duration < 0 || duration > MAX_CALL_DURATION_MIN) {
+  if (!String(durationInput?.value ?? '').trim() || durationInput?.validity?.badInput
+    || !Number.isFinite(duration) || duration < 0 || duration > MAX_CALL_DURATION_MIN) {
     toast(ui`La duración debe ser un número entre 0 y ${MAX_CALL_DURATION_MIN} minutos`);
     return;
   }
@@ -381,7 +382,8 @@ export function updateManualCallPreview() {
   const payInput = document.getElementById('manualCallPayInput');
   const preview = document.getElementById('manualCallPreviewText');
   const duration = Number(durationInput?.value);
-  const validDuration = Number.isFinite(duration) && duration >= 0;
+  const validDuration = !!String(durationInput?.value ?? '').trim() && !durationInput?.validity?.badInput
+    && Number.isFinite(duration) && duration >= 0 && duration <= MAX_CALL_DURATION_MIN;
 
   if (validDuration && !manualCallPayDirty && payInput) {
     payInput.value = manualCallEstimatedPay(duration, manualCallSelectedRateTile).toFixed(2);
@@ -494,7 +496,8 @@ export function saveManualCall() {
     return;
   }
   const duration = Number(durationInput?.value);
-  if (!Number.isFinite(duration) || duration < 0 || duration > MAX_CALL_DURATION_MIN) {
+  if (!String(durationInput?.value ?? '').trim() || durationInput?.validity?.badInput
+    || !Number.isFinite(duration) || duration < 0 || duration > MAX_CALL_DURATION_MIN) {
     toast(ui`La duración debe ser un número entre 0 y ${MAX_CALL_DURATION_MIN} minutos`);
     return;
   }
