@@ -55,8 +55,8 @@ export function financePlanningRowHtml(row, isMeta) {
   let body;
   if (isMeta) {
     const saving = financeSavingsMonthly(row);
-    body = ui`<div class="fin-plan-metrics">${metric(translateText('Aporte mensual orientativo'), saving.monthly)}</div>
-      <label class="fin-plan-field">Meses para completar<input type="number" min="1" max="120" step="1" value="${ctx.escapeHtml(draft.months ?? saving.months)}" data-fin-savings-months aria-label="Meses para completar"/></label>
+    body = ui`${saving.months === null ? ui`<p class="sched-hint">El plazo es opcional. Guarda uno para calcular el aporte mensual.</p>` : ui`<div class="fin-plan-metrics">${metric(translateText('Aporte mensual orientativo'), saving.monthly)}</div>`}
+      <label class="fin-plan-field">Meses para completar<input type="number" min="1" max="120" step="1" value="${ctx.escapeHtml(draft.months ?? saving.months ?? '')}" data-fin-savings-months aria-label="Meses para completar"/></label>
       <button class="fin-ghost-btn" type="button" data-fin-savings-save="${rowId}" data-fin-cat="${categoryId}">Guardar plazo</button>`;
   } else {
     const records = payments(row.id);

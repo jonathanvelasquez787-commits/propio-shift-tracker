@@ -52,6 +52,6 @@ export function financeMonthTotals(rows, records, month) {
 
 export function financeSavingsMonthly(row) {
   const months = Number(row.savingsMonths);
-  const validMonths = Number.isInteger(months) && months >= 1 && months <= 120 ? months : 6;
-  return { months: validMonths, monthly: Math.max(0, Number(row.targetAmount) - (Number(row.assignedAmount) || 0)) / validMonths };
+  if (!Number.isInteger(months) || months < 1 || months > 120) return { months: null, monthly: null };
+  return { months, monthly: Math.max(0, Number(row.targetAmount) - (Number(row.assignedAmount) || 0)) / months };
 }

@@ -4143,6 +4143,12 @@
       "app.html"
     ]
   },
+  "s_50e108c9": {
+    "source": "El plazo es opcional. Guarda uno para calcular el aporte mensual.",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
   "s_50e139e0": {
     "source": "Viernes Furioso",
     "files": [

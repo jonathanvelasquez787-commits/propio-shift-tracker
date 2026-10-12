@@ -5,7 +5,7 @@ import { setLanguage } from '../js/i18n.js';
 import { configureFinanceContext, financeResetRow, financeRunAutoFillCascade } from '../js/finance.js';
 import { configureSettingsContext, applyGoalValues } from '../js/settings.js';
 import { financePlanProjection, financeMonthTotals, financePaymentRows, validFinanceDate, financeSavingsMonthly } from '../js/finance-plan-model.js';
-import { addFinancePayment, deleteFinancePayment, saveFinancePlan, saveFinanceSavingsMonths } from '../js/finance-planning.js';
+import { addFinancePayment, deleteFinancePayment, saveFinancePlan, saveFinanceSavingsMonths, financePlanningRowHtml } from '../js/finance-planning.js';
 
 function harness(t) {
   setLanguage('es');
@@ -108,6 +108,17 @@ test('failed payment or savings persistence and removal leave the previous data 
   const h=harness(t);addFinancePayment('otro','food','10','','2026-10-11');const before=JSON.stringify(settings);h.reject();
   assert.equal(addFinancePayment('otro','food','25','','2026-10-12'),false);deleteFinancePayment(settings.financePayments[0].id);
   assert.equal(saveFinanceSavingsMonths('otro','goal',12),false);assert.equal(JSON.stringify(settings),before);
+});
+
+test('unset or invalid savings deadlines have no invented contribution or prefilled term', t => {
+  const h = harness(t);
+  for (const value of [undefined, null, '', 0, -1, 1.5, 121, Infinity]) {
+    h.meta.savingsMonths = value;
+    assert.deepEqual(financeSavingsMonthly(h.meta), { months: null, monthly: null });
+    const html = financePlanningRowHtml(h.meta, true);
+    assert.match(html, /value="" data-fin-savings-months/);
+    assert.doesNotMatch(html, /Aporte mensual orientativo/);
+  }
 });
 
 test('savings deadlines are optional and manual; setting one does not change existing savings or priorities',t=>{

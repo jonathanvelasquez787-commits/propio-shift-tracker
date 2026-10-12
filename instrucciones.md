@@ -327,7 +327,7 @@ Reiniciar mes o eliminar una fila no borra esos pagos; el historial mensual
 permite corregirlos. Presupuesto actual usa los objetivos actuales de gastos;
 no se presenta como una copia histórica del presupuesto de cada mes.
 Moneda secundaria y conversión provienen únicamente de Ajustes. Plazos de
-ahorro opcionales, sin cambiar lo ahorrado. Verificación: 515 tests, 2.178
+ahorro opcionales y vacíos hasta elegir uno, sin cambiar lo ahorrado. Verificación: 516 tests, 2.179
 textos ES/EN, 52 suites/58 módulos en la matriz. La publicación se verifica
 por CI y SHA separado antes de anunciarla.
 
