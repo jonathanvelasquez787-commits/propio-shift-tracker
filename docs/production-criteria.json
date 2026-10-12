@@ -287,12 +287,32 @@
     {
       "id": "finance",
       "area": "Finanzas y Higher Rate",
-      "acceptance": "Importes decimales estrictos, asignaciones conservadas y corregidas, prioridad y bonos históricos sin sobreasignación.",
+      "acceptance": "Asignación y prioridades conservadas; proyección vinculada a meta global sin reescribir llamadas; pagos fechados en USD, moneda de Ajustes y presupuesto mensual; 50/30/20 personalizable y plazos opcionales.",
       "sources": [
         "js/finance.js",
+        "js/finance-plan-model.js",
+        "js/finance-planning.js",
         "js/higher-rate.js"
       ],
       "tests": [
+        {
+          "file": "tests/finance-planning.test.mjs",
+          "namedCases": [
+            "projections use chosen hours and settings rate; split must sum exactly 100",
+            "saving a finance plan updates the global and today goal in one snapshot, keeping old calls, schedules and historical goals",
+            "failed plan persistence rolls back the goal, settings, today exception and state",
+            "invalid distribution cannot save goals or assignments",
+            "blank plan fields are rejected while an explicit zero-hour goal is valid",
+            "removing an erroneous payment changes spending only and survives reload",
+            "payments store USD with a date and do not change existing allocations, earnings or goals",
+            "changing local currency or rate never reprices existing USD payments",
+            "resetting an expense, editing or deleting its row does not erase monthly payment history",
+            "invalid payment dates, hostile imports, repeated ids, zero amounts and savings rows cannot create fictitious spending",
+            "failed payment or savings persistence and removal leave the previous data intact",
+            "savings deadlines are optional and manual; setting one does not change existing savings or priorities",
+            "old finance rows load without payments and retain the existing automatic expense-first cascade"
+          ]
+        },
         {
           "file": "tests/model-invariants.test.mjs",
           "namedCases": [

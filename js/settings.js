@@ -90,7 +90,7 @@ let syncingGoals = false;
 
     // Scope 'day' guarda la meta SOLO para ese día; 'global' guarda la meta de siempre y borra el
     // override de ese día, para que la nueva general también aplique ahí.
-    function applyGoalValues(minutes, dollars, scope, dayKey) {
+    export function applyGoalValues(minutes, dollars, scope, dayKey, persistSnapshot = null) {
       if (scope === 'day') {
         setDailyGoalOverride(dayKey, { min: minutes, usd: dollars });
       } else {
@@ -100,12 +100,13 @@ let syncingGoals = false;
         state.productiveGoalMin = settings.productiveGoalMin;
         state.earningsGoal = settings.earningsGoal;
         setDailyGoalOverride(dayKey, null);
-        if (saveStateOnly() === false) return false;
+        if (!persistSnapshot && saveStateOnly() === false) return false;
       }
-      if (saveSettingsOnly() === false) return false;
+      if ((persistSnapshot ? persistSnapshot() : saveSettingsOnly()) === false) return false;
       onGameDayMetadataChanged(dayKey);
       refreshGoalInputs();
       render();
+      return true;
     }
 
     // Repinta los 3 campos de meta con el valor efectivo del día activo.

@@ -1,6 +1,33 @@
 /* Gate de sesión y componentes de la app.
    Las paletas claro/oscuro se definen en los bloques de tokens de app.html. */
 
+.fin-plan{margin:18px 0;border:1px solid var(--line);border-radius:16px;background:var(--panel-navy);min-width:0}
+.fin-plan summary,.fin-plan-row summary{display:flex;align-items:center;gap:12px;list-style:none;padding:14px 16px;cursor:pointer;font-size:13px}
+.fin-plan summary::-webkit-details-marker,.fin-plan-row summary::-webkit-details-marker{display:none}
+.fin-plan summary strong,.fin-plan-row summary{color:var(--text)}
+.fin-plan summary strong{flex:1}.fin-plan summary>span{font-size:12px;color:var(--muted)}
+.fin-plan-body{border-top:1px solid var(--line);padding:16px;min-width:0}
+.fin-plan-inputs{display:grid;grid-template-columns:1fr 1fr 1.3fr;gap:14px;align-items:end;min-width:0}
+.fin-plan-field{display:grid;gap:7px;color:var(--muted);font-size:12px;min-width:0}
+.fin-plan-field input{width:100%;min-width:0;box-sizing:border-box;border:1px solid var(--line);border-radius:11px;padding:10px 12px;background:var(--panel-navy);color:var(--text);font:inherit;font-size:14px}
+.fin-plan-settings{display:grid;gap:6px;color:var(--muted);font-size:12px;padding-bottom:8px}.fin-plan-settings strong{color:var(--text)}.fin-plan-settings small{font-size:11px}
+.fin-plan-projection{display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin:20px 0 12px}.fin-plan-projection>div{display:grid;gap:5px;flex:1;min-width:0}
+.fin-plan-projection span{font-size:12px;color:var(--muted)}.fin-plan-projection strong{font-size:20px;color:var(--text);font-variant-numeric:tabular-nums}
+.fin-plan-split-heading{display:flex;align-items:center;gap:10px;border-top:1px solid var(--line);margin-top:18px;padding-top:16px;font-size:14px}.fin-plan-split-heading>strong{flex:1}
+#financeSplitTooltip{position:fixed;top:auto;left:auto;bottom:auto;right:auto;transform:none;width:min(320px,calc(100vw - 24px));min-width:0;max-width:calc(100vw - 24px);box-sizing:border-box;white-space:normal;opacity:0;visibility:hidden;pointer-events:none;z-index:220}
+#financeSplitTooltip.is-open{opacity:1;visibility:visible}
+.fin-plan-distribution{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;margin:15px 0}.fin-plan-distribution>div{display:grid;gap:10px;min-width:0}.fin-plan-distribution input{max-width:100px}.fin-plan-distribution strong{font-size:15px;color:var(--text);font-variant-numeric:tabular-nums}
+.fin-plan-error{font-size:12px;color:var(--bad)}.fin-plan-status{font-size:12px;color:var(--good)}
+.fin-plan-month-head{display:flex;justify-content:space-between;align-items:center;gap:14px;border-top:1px solid var(--line);margin-top:15px;padding-top:15px;font-size:14px}
+.fin-plan-metrics{display:flex;gap:22px;flex-wrap:wrap;padding:14px 0;min-width:0}.fin-plan-metric{display:grid;align-content:start;gap:5px;font-size:12px;color:var(--muted);min-width:0}.fin-plan-metric strong{font-size:15px;color:var(--text);font-variant-numeric:tabular-nums}.fin-plan .fin-row-converted,.fin-plan-row .fin-row-converted{font-size:11px;margin:0}
+.fin-plan-row{flex:1 1 100%;min-width:0;width:100%;border-top:1px solid var(--line);margin-top:12px}.fin-plan-row summary{padding:12px 0 0;color:var(--cyan);font-weight:700;font-size:12px}.fin-plan-row summary>span{margin-left:auto}.fin-plan-row-body{padding-top:8px;min-width:0}
+.fin-plan-row-heading{display:flex;justify-content:space-between;gap:8px;color:var(--muted);font-size:12px;margin-top:7px}
+.fin-payment-controls{display:flex;flex-wrap:wrap;align-items:end;gap:10px;min-width:0}.fin-payment-controls label{flex:1 1 130px}.fin-payment-controls button{flex:0 1 auto}.fin-plan-row-body>.sched-hint{margin:10px 0 0}
+.fin-payment-record{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--line);font-size:12px;min-width:0}.fin-payment-record>span:first-child{display:grid;gap:4px;flex:1 1 100px;min-width:0;overflow-wrap:anywhere}.fin-payment-record small{font-size:11px;color:var(--muted)}.fin-payment-record>span:nth-child(2){color:var(--text);font-variant-numeric:tabular-nums}
+.fin-payment-history-all summary{padding:10px 0;font-size:12px;color:var(--cyan)}
+@media(max-width:640px){.fin-plan-inputs{grid-template-columns:1fr 1fr}.fin-plan-settings{grid-column:1/-1}.fin-plan>summary{flex-wrap:wrap}.fin-plan>summary>span:first-of-type{order:3;width:100%}.fin-plan-projection>div{flex-basis:100%}.fin-plan-distribution{grid-template-columns:1fr}.fin-plan-distribution>div{grid-template-columns:1fr 1fr;align-items:end}.fin-plan-distribution strong{padding-bottom:10px}.fin-plan-month-head{flex-wrap:wrap}.fin-plan-metrics{gap:16px}.fin-payment-controls label{flex-basis:100%}}
+@media(pointer:coarse){.fin-plan-field input{font-size:16px}.fin-plan button,.fin-plan-row button,.fin-plan summary,.fin-plan-row summary{min-height:44px}}
+
 /* Mientras la app no está montada, lo único visible es el gate. */
 body:not(.app-ready) > *:not(#bootGate) {
   display: none !important;
