@@ -38,6 +38,9 @@ export function collectCatalog(root = process.cwd()) {
     const source = fs.readFileSync(path.join(root, 'js', file), 'utf8');
     function walk(node) {
       if (!node?.type) return;
+      if (node.type === 'FunctionDeclaration' && node.id?.name === 'currentStateLabel') {
+        for (const match of source.slice(node.start, node.end).matchAll(/\breturn\s*'([^']+)'/g)) add(match[1], `js/${file}`);
+      }
       if (node.type === 'CallExpression' && ['translateText', 'translateMarkup'].includes(node.callee.name) && typeof node.arguments[0]?.value === 'string') {
         const text = node.arguments[0].value;
         for (const message of node.callee.name === 'translateMarkup' ? markupMessages(text) : [text]) add(message, `js/${file}`);

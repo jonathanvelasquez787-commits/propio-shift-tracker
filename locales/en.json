@@ -2299,5 +2299,19 @@
   "s_50e108c9": "The deadline is optional. Save one to calculate the monthly contribution.",
   "s_8b1d8111": "The backup contains invalid activity history. Your current data was not changed.",
   "s_75098ce7": "Payment must be a valid number no greater than 1000000000 dollars.",
-  "s_607b1f5c": "When you start, finish, and take your daily breaks/lunch. The Daily blocks section on Home uses this plan."
+  "s_607b1f5c": "When you start, finish, and take your daily breaks/lunch. The Daily blocks section on Home uses this plan.",
+  "s_0981dba9": "Shift started",
+  "s_4cd85242": "Shift ended",
+  "s_2ef9294e": "You are back",
+  "s_ff62a41a": "Skipped",
+  "s_21a494b5": "Absence/late arrival",
+  "s_befdd00d": "Assigned",
+  "s_d9e72b95": "Saved",
+  "s_2a83a30d": "past",
+  "s_6b3a5f5a": "past",
+  "s_9b029df9": "Paste your Propio data here...\n\nExample:\n{{v0}}",
+  "s_15ea3b31": "saved",
+  "s_0d43587d": "assigned",
+  "s_e82a940e": "Finished",
+  "s_df54f508": "Working"
 }

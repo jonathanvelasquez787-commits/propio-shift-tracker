@@ -25,6 +25,7 @@ import {
   getLocalPersistenceFailure,
   describeSnapshot,
   readLocalSnapshot,
+  sameSnapshot,
   applyLightThemeDefault,
   applyLoginLanguagePreference,
   syncThemeClass,
@@ -162,15 +163,26 @@ function askConflict({ localSummary, cloudSummary, cloud }) {
 // consola del navegador, porque el catch de abajo lo atrapaba en silencio. Quitar el overlay solo
 // después de un import() exitoso, y mandar el error también a console.error, hace que cualquier
 // fallo futuro de este tipo sea imposible de pasar por alto.
-async function mountApp() {
+async function mountApp(expectedUserId) {
+  const rejectChangedOwner = () => {
+    if (readMeta().userId === expectedUserId) return false;
+    document.body.classList.remove('app-ready');
+    setAppEntryHint(false);
+    window.location.replace('/?next=/app');
+    return true;
+  };
+  if (rejectChangedOwner()) return false;
+  window[Symbol.for('propio.expectedAppOwner')] = expectedUserId;
   document.body.classList.add('app-ready');
   try {
     await import('./app-main.js');
   } catch (err) {
+    if (rejectChangedOwner()) return false;
     console.error('boot: no se pudo importar app-main.js', err);
     fail(translateText('No se pudo cargar la app. ') + (err && err.message ? err.message : String(err)));
     return false;
   }
+  if (rejectChangedOwner()) return false;
   if (overlay) overlay.remove();
   return true;
 }
@@ -267,11 +279,16 @@ function readOfflineOwner() {
 }
 
 async function mountOfflineApp(user) {
+  if (readMeta().userId !== user.id || !localHasData()) {
+    setAppEntryHint(false);
+    window.location.replace('/?next=/app');
+    return;
+  }
   setAccessToken(null, null);
   applyLoginLanguagePreference();
   syncThemeClass();
   startAutoSync();
-  if (!(await mountApp())) return;
+  if (!(await mountApp(user.id))) return;
   normalizeAppAddress();
   injectAccountPanel(null, user.email);
   setSyncStatus('error', translateText('Sin conexión — cambios guardados en este navegador'));
@@ -309,7 +326,7 @@ function watchProductionHealth() {
 // La política de privacidad promete que la cuenta se puede borrar; esto lo
 // hace cierto. Se inyecta dentro de Ajustes, al lado de "Backup de datos",
 // reutilizando las clases de tarjeta de peligro que ya existen.
-function injectDeleteAccount() {
+function injectDeleteAccount(userId, getCurrentUserId = () => readMeta().userId) {
   const card = document.querySelector('#goalsModal .modal-card');
   if (!card) return;
   const actions = card.querySelector('.modal-actions');
@@ -347,9 +364,19 @@ function injectDeleteAccount() {
     ask(
       translateText('¿Borrar tu cuenta para siempre? Se eliminan la cuenta y sus datos activos. Las copias históricas cifradas se retiran por rotación, con una retención prevista de 31 días. No se puede deshacer.'),
       async () => {
-        const { data } = await getSupabase().auth.getSession();
-        const token = data.session ? data.session.access_token : null;
-        if (!token) {
+        let session;
+        try {
+          const { data, error } = await getSupabase().auth.getSession();
+          if (error) throw error;
+          session = data?.session;
+        } catch {
+          if (typeof window.toast === 'function') {
+            window.toast(translateText('No se pudo borrar la cuenta. Revisa tu conexión e intenta de nuevo.'));
+          }
+          return;
+        }
+        const token = session?.access_token;
+        if (!token || session.user.id !== userId) {
           window.location.replace('/');
           return;
         }
@@ -365,8 +392,16 @@ function injectDeleteAccount() {
           }
           return;
         }
-        forgetRecoveryCopies(session.user.id);
-        resetForUser(null);
+        try { forgetRecoveryCopies(userId); } catch {}
+        const currentUserId = getCurrentUserId();
+        const localOwnerId = readMeta().userId;
+        if ((currentUserId && currentUserId !== userId) || (localOwnerId && localOwnerId !== userId)) {
+          window.location.replace('/');
+          return;
+        }
+        // A rejected local cleanup must not keep a remotely deleted identity active.
+        if (localOwnerId === userId) { try { resetForUser(null); } catch {} }
+        setAccessToken(null, null);
         try {
           await signOut();
         } catch {
@@ -676,6 +711,12 @@ async function boot() {
       case BOOT.CONFLICT: {
         const choice = await askConflict(decision);
         if (bridgeUserId !== userId) return;
+        const currentMeta = readMeta();
+        if (currentMeta.userId !== decision.localOwnerId || currentMeta.lastSyncedUpdatedAt !== decision.localRevision
+          || !sameSnapshot(decision.localSnapshot, readLocalSnapshot())) {
+          window.location.reload();
+          return;
+        }
         if (choice === 'cloud') {
           adoptCloud(decision.cloud, userId);
         } else {
@@ -709,7 +750,7 @@ async function boot() {
   setBootMessage(translateText('Abriendo tu turno…'));
   startAutoSync();
 
-  if (!(await mountApp()) || bridgeUserId !== userId) return;
+  if (!(await mountApp(userId)) || bridgeUserId !== userId) return;
 
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('pst-propio-bridge/v1:' + userId));
   const accountScope = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('');
@@ -732,7 +773,7 @@ async function boot() {
     if (bridgeUserId !== userId) return;
     injectAccountPanel(null, session.user.email);
   }
-  injectDeleteAccount();
+  injectDeleteAccount(userId, () => bridgeUserId);
   injectRecoveryCopies(userId);
   watchProductionHealth();
   injectCycleProjection();

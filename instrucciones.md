@@ -317,6 +317,14 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
+Segunda auditoría super profunda del 12/10/2026, v602: 13 grupos nuevos
+corregidos en identidad, conflictos, borrado, llamadas, Higher Rate, cabecera
+móvil e idioma. 573 pruebas sin fallos/omitidas (42 nuevas); recorrido adicional
+de 42 días, 343 controles y 20 enlaces; 2.195 textos ES/EN. App y ambas
+extensiones pasan build. Producción base y permisos alojados se comprobaron
+por separado; publicación final se verifica por CI/READY/release en la entrega.
+Ver docs/auditoria-super-profunda-2026-10-12.md. Datos reales sin modificar.
+
 Auditoría integral del 12/10/2026: siete fallos reproducidos corregidos en
 metas decimales, pagos numéricos, importación JSON y pausas/ACW (incluye
 superposición manual de Break/Lunch y llamadas durante pausas reales). 531 pruebas; dos recorridos de 31 días,
@@ -762,7 +770,7 @@ La aplicación funciona en producción con estas bases vigentes:
   el de la guía es nofollow. La extensión se instala desde archivo según el
   propietario, por lo que no hay ficha propia de Chrome Web Store que editar.
   Detalle en `docs/seo.md`.
-- La versión actual de la app es 601; el puente es 1.3.0 y el resumen independiente
+- La versión actual de la app es 602; el puente es 1.3.0 y el resumen independiente
   1.0.3. Refuerzo positivo y Logros están terminados. La auditoría profunda del
   8 de octubre corrigió seis fallos; la ampliación corrigió cinco más en arranque,
   concurrencia y PWA. Cobertura y límites constan en
@@ -786,6 +794,19 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v602 — Segunda auditoría super profunda del 12/10/2026.**
+
+- Conserva propietario durante descarga, conflicto e import diferido; bloqueo
+  de escrituras con identidad cambiada, incluso si el JSON coincide.
+- Borrado valida identidad antes/después, muestra errores de sesión y completa
+  salida aunque la limpieza local falle. No se borró la cuenta real.
+- Duración incompleta rechazada; hora cero AM/PM inválida; Higher Rate guarda
+  ajustes antes de premios y revierte bonos/Finanzas ante rechazo.
+- Avisos y Higher Rate accesibles a 320/390 px en ambos temas; textos y colores
+  de estados ES/EN, historial y ayuda de pegado corregidos sin cambiar datos.
+- 573 pruebas, 42 nuevas; 42 días extra con ledger independiente; builds de
+  app/puente/resumen correctos. Informe y límites en la auditoría nueva.
 
 **12/10/2026 — Auditoría integral de contabilidad, importación y Finanzas.**
 
@@ -815,23 +836,4 @@ La aplicación funciona en producción con estas bases vigentes:
   recorte de su contexto de backdrop-filter. Los borradores de pagos se
   conservan al repintar la sección. Fuente, guardas y build correctos;
   el release publicado se acredita por separado.
-
-**v601** — Guía pública para intérpretes y enlaces de contenido.
-
-- Artículo útil ES/EN: horario, llamadas, pausas, ganancias, adherencia,
-  cierre y exportaciones. Ejemplo ilustrativo con USD y moneda secundaria,
-  sin presentar tarifas oficiales ni afiliación con Propio.
-- Rutas limpias, redirecciones permanentes, canonical/hreflang recíproco,
-  Article, imagen social y sitemap de seis páginas. Enlaces localizados
-  desde la portada y navegación entre idiomas sin modificar el artículo.
-- Tema claro/oscuro y paletas existentes; el idioma de la URL sobrevive a
-  una preferencia de cuenta distinta. Cambiar el tema preserva los ajustes
-  y sigue funcionando con almacenamiento bloqueado.
-- 393 pruebas correctas, 2.110 textos ES/EN y build/guardas correctos.
-  Navegador: ES/EN, claro/oscuro, 320/390/1.365 px sin overflow, índice y
-  enlace localizado en portada. Ko-fi muestra los enlaces públicos guardados;
-  el paso de Chrome Web Store no aplica porque la extensión es local.
-  Corregida una prueba que dependía de `public/` antes de ejecutar el build;
-  la publicación se verifica por HTTP y por SHA independientemente de la suite.
-  no se afirma una mejora de posición en Google por publicar la guía.
 

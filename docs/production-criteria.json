@@ -15,6 +15,14 @@
       ],
       "tests": [
         {
+          "file": "tests/deep-audit-sync-identity.test.mjs",
+          "namedCases": [
+            "boot observes pending edits saved by another tab during the cloud read and asks about divergence",
+            "boot recognizes ownership changed by another tab while downloading and preserves its pending snapshot",
+            "successful account deletion clears the correct local recovery owner and finishes logout and redirect"
+          ]
+        },
+        {
           "file": "tests/boot-sync.test.mjs",
           "namedCases": [
             "routing hint without a session returns to public login before mounting account data",
@@ -250,6 +258,12 @@
         "js/block-acw.js"
       ],
       "tests": [
+        {
+          "file": "tests/higher-rate-persistence-order.test.mjs",
+          "namedCases": [
+            "a rejected Higher Rate tier edit cannot persist game receipts before its settings snapshot; retry reconciles once"
+          ]
+        },
         {
           "file": "tests/block-acw.test.mjs",
           "namedCases": [
@@ -762,6 +776,12 @@
         "js/guide-theme.js"
       ],
       "tests": [
+        {
+          "file": "tests/domain-language-render.test.mjs",
+          "namedCases": [
+            "real schedule rendering localizes skipped work and absence detail in both supported languages"
+          ]
+        },
         {
           "file": "tests/appearance-language.test.mjs",
           "namedCases": [

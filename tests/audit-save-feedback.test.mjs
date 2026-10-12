@@ -187,7 +187,7 @@ test('Higher Rate purge restores windows, frozen bonuses and finance assignments
     freezeHigherRateBonusesForWindowIds:()=>{calls[0].frozenHigherRateBonus={amount:1};},
     financeRunAutoFillCascade:()=>{settings.financeCategories.expenses.rows[0].assignedAmount=10;},
     reconcileHigherRateGameChanges:()=>messages.push('reconcile'),saveAll:()=>accepted,
-    renderHigherRateWindowsEditor:()=>messages.push('render'),toast:x=>messages.push(x)});
+    render() {},renderHigherRateWindowsEditor:()=>messages.push('render'),toast:x=>messages.push(x)});
   vm.runInContext(declaration('../js/higher-rate.js','purgePastHigherRateWindows'),h);h.purgePastHigherRateWindows();
   assert.equal(settings.higherRateWindows,windows);assert.equal(Object.hasOwn(calls[0],'frozenHigherRateBonus'),false);
   assert.equal(settings.financeCategories.expenses.rows[0].assignedAmount,5);assert.deepEqual(messages,[]);

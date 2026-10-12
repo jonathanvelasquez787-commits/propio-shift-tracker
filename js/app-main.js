@@ -4,7 +4,7 @@ import { wireAchievementHelp } from './help-tooltips.js';
 import { wireFinancePlanning } from './finance-planning.js';
 import { normalizeBattleWeapon } from './game-battle.js';
 import { createPropioReceiver, createStorageRevisionGuard, ignorePropioCall } from './propio-bridge.js';
-import { settingsWithinBudget, reportLocalPersistenceFailure } from './sync.js';
+import { settingsWithinBudget, reportLocalPersistenceFailure, readMeta } from './sync.js';
 // Cuerpo principal de la app (Inicio, Horario, Llamadas, Higher Rate, Finanzas, Reportes,
 // Calendario, Ajustes...). Vive como módulo ES aparte para no ser parte del documento HTML: lo
 // carga js/boot.js con un import() dinámico recién cuando la sesión y los datos están listos
@@ -612,10 +612,16 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
       };
     }
 
+    const expectedAppOwner = window[Symbol.for('propio.expectedAppOwner')];
+    function verifyAppOwner() {
+      if (expectedAppOwner !== undefined && readMeta().userId !== expectedAppOwner) throw new Error('APP_OWNER_CHANGED');
+    }
+    verifyAppOwner();
     setAppState(loadState());
     setAppCalls(loadCalls());
     export function setCalls(value) { setAppCalls(value); }
     setAppSettings(loadSettings());
+    verifyAppOwner();
     const localStorageRevision = createStorageRevisionGuard(localStorage, [STORAGE_KEY, CALLS_KEY, SETTINGS_KEY]);
     ensureCurrencySettings();
     translateDocument();
@@ -1256,15 +1262,17 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
     let storageSnapshotPending = false;
 
     function canPersistLocalChanges() {
-      if (localStorageRevision.isCurrent()) return true;
+      const expectedOwner = typeof window === 'undefined' ? undefined : window[Symbol.for('propio.expectedAppOwner')];
+      const ownerChanged = expectedOwner !== undefined && readMeta().userId !== expectedOwner;
+      if (!ownerChanged && localStorageRevision.isCurrent()) return true;
       reportLocalPersistenceFailure('stale');
       toast(translateText('Otra pestaña guardó cambios más recientes. Recarga antes de guardar; tus datos guardados se conservaron.'));
       return false;
     }
 
-    export function saveAll() {
+    export function saveAll(options = {}) {
       const ok = persistFullSnapshot();
-      render();
+      if (options.render !== false) render();
       return ok;
     }
 
@@ -1436,7 +1444,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
       const ampm = t[3].toUpperCase();
       // Sin este chequeo, `new Date` desborda en silencio (21/09/2026 -> septiembre de 2027) y
       // genera una llamada con una fecha que no corresponde a ningún día navegable.
-      if (month < 1 || month > 12 || day < 1 || day > 31 || hour > 12 || minute > 59) return null;
+      if (month < 1 || month > 12 || day < 1 || day > 31 || hour < 1 || hour > 12 || minute > 59) return null;
       if (ampm === 'PM' && hour !== 12) hour += 12;
       if (ampm === 'AM' && hour === 12) hour = 0;
       const parsed = new Date(year, month - 1, day, hour, minute, 0, 0);
@@ -2935,7 +2943,7 @@ function slotStats(slot, dayCalls = calls, dayPauses = dayPauseIntervals(getActi
     if (!shiftStart) {
       status = translateText('Sin shift');
     } else if (shiftStart > slotEnd) {
-      status = 'Omitido';
+      status = translateText('Omitido');
       statusTone = 'bad';
     } else if (startDelta !== null && startDelta > 1) {
       status = ui`Entrada tarde ${formatDeltaMinutes(startDelta)}`;
@@ -2947,10 +2955,10 @@ function slotStats(slot, dayCalls = calls, dayPauses = dayPauseIntervals(getActi
       status = translateText('En curso');
       statusTone = 'good';
     } else if (pct >= 95) {
-      status = 'Completo';
+      status = translateText('Completo');
       statusTone = 'good';
     } else if (filledMin > 0) {
-      status = 'Parcial';
+      status = translateText('Parcial');
       statusTone = 'warn';
     } else {
       // Un bloque de Trabajo ya pasado y sin actividad no es "Pendiente": se marca "Sin actividad".
@@ -3005,7 +3013,7 @@ function adherenceProximityScore(deltaAbsMin, falloffMin) {
 }
 
 const EXCEPTION_REASON_LABELS = {
-  ausente: 'Ausencia/llegada tarde',
+  ausente: translateText('Ausencia/llegada tarde'),
   break_extra: translateText('Break tomado fuera de horario'),
   lunch_extra: translateText('Lunch tomado fuera de horario'),
   break_perdido: translateText('Break no tomado a tiempo'),
@@ -4115,7 +4123,7 @@ function renderPayDatesSection() {
           }
         }
       }
-      toast('Shift iniciado');
+      toast(translateText('Shift iniciado'));
     }
 
     function endShift() {
@@ -4126,7 +4134,7 @@ function renderPayDatesSection() {
       state.shiftEndedAt = now;
       setEvent('shift', 'Shift terminado', fmtTime(new Date(now)), 'manual');
       if (saveAll() === false) return false;
-      toast('Shift terminado');
+      toast(translateText('Shift terminado'));
       onGameShiftEnded(shiftDayKey);
     }
 
@@ -4189,7 +4197,7 @@ function renderPayDatesSection() {
       // inmediato en vez de esperar al próximo tick.
       stopBreakEndAlarm();
       if ((deferSave ? saveStateOnly() : saveAll()) === false) return false;
-      if (!silent) toast('Regresaste');
+      if (!silent) toast(translateText('Regresaste'));
       let onTime = false;
       if (plannedSlot && !options.forShiftEnd) {
         const base = callDateToDate(shiftDayKey) || new Date(endedPause.startedAt);
@@ -5177,7 +5185,7 @@ function renderPayDatesSection() {
         const exportedDate = payload.exportedAt ? new Date(payload.exportedAt) : null;
         const exportedLabel = exportedDate && !Number.isNaN(exportedDate.getTime())
           ? `${fmtDate(exportedDate)}, ${fmtTime(exportedDate)}`
-          : 'fecha desconocida';
+          : translateText('fecha desconocida');
         const restoresSettings = !!(payload.settings && typeof payload.settings === 'object' && !Array.isArray(payload.settings));
         const settingsNote = restoresSettings
           ? translateText('También restaura tu horario, metas, Finanzas, Higher Rate, perfil y demás ajustes del respaldo.')
@@ -5317,7 +5325,7 @@ function renderPayDatesSection() {
       callsForDay, dayKeyFromIsoDate, escapeHtml, financeConvertedInline, financeRunAutoFillCascade,
       onGameCallsChanged, formatBlockDurationLabel,
       formatCallDayLabel, formatHHMM, formatMinutes, iconHtml, isoDateFromDayKey, makeLocalId,
-      mergeIntervals, minutesToHHMM, money, saveAll, timeLabel, toDateFromInputs, toMinutes, toast,
+      mergeIntervals, minutesToHHMM, money, render, saveAll, timeLabel, toDateFromInputs, toMinutes, toast,
       todayCallDateKey, todayRange,
     });
     configureSettingsContext({
@@ -6417,7 +6425,7 @@ function renderSchedule() {
         const slotAccent = slot.type === 'Work' ? 'cyan' : slot.type === 'Break' ? 'warn' : 'blue';
         const usedFillColor = slot.type === 'Work' ? 'var(--cyan)' : slot.type === 'Break' ? 'var(--warn)' : 'var(--blue)';
 
-        const badgeToneClass = statusText === 'Hecho' ? 'good' : statusText === 'Omitido' ? 'bad' : (statusText === 'Incompleto' || statusText === 'Actual') ? 'warn' : '';
+        const badgeToneClass = active ? 'warn' : done ? 'good' : isPastDay && shiftStart ? 'warn' : '';
         const icon = slot.type === 'Work' ? iconHtml('briefcase') : slot.type === 'Break' ? iconHtml('coffee') : iconHtml('utensils');
         const statusDetailLine = stats.status
           ? ui`<div class="sblk-meta-line" style="${statusClass ? `color: var(--${statusClass}); font-weight: 700;` : ''}">${escapeHtml(stats.status)}</div>`
@@ -6554,6 +6562,16 @@ function renderSchedule() {
     }
 
     
+function syncCallImportPlaceholder() {
+  const input = document.getElementById('callInput');
+  if (!input) return;
+  const example = '4576\n06/29/2026\n10:19 AM\n6\nYes\nNo\n$0.72';
+  input.placeholder = ui`Pega aquí la data de Propio...
+
+Ejemplo:
+${example}`;
+}
+
 export function render() {
       renderHeader();
       renderSchedule();
@@ -7159,6 +7177,7 @@ export function render() {
       // El resumen de filas omitidas es del ÚLTIMO import — se limpia al reabrir el modal para no
       // mostrar un detalle viejo como si fuera del pegado que se está por hacer ahora.
       renderImportSkippedSummary([], []);
+      syncCallImportPlaceholder();
       openModal('callsModal');
     });
     document.getElementById('addCallManualBtn').addEventListener('click', openManualCallModal);
