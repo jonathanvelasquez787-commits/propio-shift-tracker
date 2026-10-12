@@ -192,7 +192,21 @@ export async function updateUsername(username) {
 }
 
 export async function signOut() {
-  await getSupabase().auth.signOut();
+  try {
+    await getSupabase().auth.signOut();
+  } finally {
+    setAppEntryHint(false);
+  }
+}
+
+// A non-secret routing preference, never proof of identity or permission.
+// The app shell still verifies Supabase and hydrates only its account's data.
+export function setAppEntryHint(enabled) {
+  try {
+    document.cookie = `ps_app_entry=${enabled ? '1' : ''}; Path=/; Max-Age=${enabled ? 31536000 : 0}; SameSite=Lax; Secure`;
+  } catch {
+    /* Entry from /app still works when cookie storage is unavailable. */
+  }
 }
 
 // --- Errores en español ------------------------------------------------------

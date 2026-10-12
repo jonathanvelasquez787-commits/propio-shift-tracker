@@ -695,11 +695,13 @@ La aplicación funciona en producción con estas bases vigentes:
 - Finanzas muestra Total metas antes de sus filas, igual que Total gastos.
   El aviso aclara que Pagado se marca en gastos puntuales y Reiniciar mes
   aparece al estar cubiertos/pagados; el reinicio libera la asignación manualmente.
-- La dirección visible de la cuenta conserva `/app` después de montar con sesión,
-  para recargar directamente el shell sin mostrar la portada pública.
+- La dirección visible de la cuenta vuelve a `/` después de montar con sesión.
+  Una preferencia de ruta sin credenciales permite recargar el mismo shell en
+  la raíz sin mostrar la portada; Supabase vuelve a verificar la sesión igual.
   `/app` sigue siendo el punto de carga y `/app.html` redirige conservando
-  parámetros. La raíz conserva la landing pública indexable y detecta la sesión
-  al visitarla. La PWA mantiene su identidad y precarga.
+  parámetros. Sin esa preferencia, la raíz conserva la landing indexable.
+  La preferencia se elimina al salir o faltar sesión; la PWA conserva su identidad.
+- La portada y la app usan el mismo favicon azul de reloj, elegido por el usuario.
 - Los seis botones principales tienen las animaciones del mock aprobado:
   iconos, anillo suave y brillo lento durante llamada, turno y pausas; pegar
   y agregar se animan al abrir sus ventanas. Se detienen con movimiento reducido

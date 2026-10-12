@@ -17,6 +17,7 @@
         {
           "file": "tests/boot-sync.test.mjs",
           "namedCases": [
+            "routing hint without a session returns to public login before mounting account data",
             "expired-session refresh network failure mounts only the cached local owner without an upload",
             "arranque local detecta una escritura entre la lectura y el montaje sin sobrescribirla",
             "elegir copia local en un conflicto sube contra la revisión mostrada y elimina filas remotas reemplazadas",
@@ -955,7 +956,8 @@
             "git ignores environment files while allowing explicit examples",
             "PWA shell includes a manifest and service worker with API exclusions",
             "clean app route preserves legacy links and login navigation",
-            "verified app sessions keep the private shell URL on reload without losing URL state",
+            "verified app sessions display the root URL with a non-secret reload hint and preserve URL state",
+            "returning root visits choose the gated shell while explicit public views remain reachable",
             "PWA launches the clean route offline and redirects legacy navigations",
             "footer year tolerates pages without a footer",
             "PDF report registers a click listener on its own print window"
