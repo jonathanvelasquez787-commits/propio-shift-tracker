@@ -2239,5 +2239,7 @@
   "s_e2cab854": "Could not save — storage is full",
   "s_4d39cf22": "Reset {{v0}}? Calls, pauses, gaps, the note, log and gamification for that day will be deleted.",
   "s_a367b689": "Today is marked as a day off. Mark it as Worked in Weekly summary → Edit day to start the shift or a call.",
-  "s_aeca0c44": "Deletes calls, pauses, gaps, the note, log and gamification ONLY for the active day ("
+  "s_aeca0c44": "Deletes calls, pauses, gaps, the note, log and gamification ONLY for the active day (",
+  "s_06c187f8": "Money assigned to a savings goal accumulates and does not reset automatically each month. You decide when the goal is complete.",
+  "s_36b85c8a": "One-time expenses: you can mark each row as Paid. Once an expense is covered or marked as paid, Reset month appears to release its allocation. The reset is manual; it does not happen when the month changes. The ↑/↓ order determines how much each expense receives."
 }
