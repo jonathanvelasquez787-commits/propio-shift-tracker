@@ -690,6 +690,11 @@ La aplicación funciona en producción con estas bases vigentes:
   global, backup diario, exportación y borrado de cuenta permanecen activos.
 - Turnos, llamadas, Horario, Higher Rate, Finanzas, Reportes, Calendario,
   Adherencia y la gamificación «El Monstruo» están integrados.
+- El menú lateral sitúa Horario inmediatamente después de Finanzas, por
+  solicitud del usuario; conserva sus botones, rutas y navegación por teclado.
+- Finanzas muestra Total metas antes de sus filas, igual que Total gastos.
+  El aviso aclara que Pagado se marca en gastos puntuales y Reiniciar mes
+  aparece al estar cubiertos/pagados; el reinicio libera la asignación manualmente.
 - La dirección visible de la cuenta conserva `/app` después de montar con sesión,
   para recargar directamente el shell sin mostrar la portada pública.
   `/app` sigue siendo el punto de carga y `/app.html` redirige conservando

@@ -213,12 +213,6 @@
       "js/finance.js"
     ]
   },
-  "s_060e0d25": {
-    "source": "Se reinician cada mes — marca",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_062e5a32": {
     "source": "). Tu horario, metas y el resto de tus días no se tocan.",
     "files": [
@@ -257,6 +251,12 @@
   },
   "s_06b44bc2": {
     "source": "CLEAR",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_06c187f8": {
+    "source": "Lo que asignás a una meta se acumula y no se reinicia solo cada mes. Vos decidís cuándo la das por cumplida.",
     "files": [
       "app.html"
     ]
@@ -2534,12 +2534,6 @@
       "js/game-battle.js"
     ]
   },
-  "s_330daa99": {
-    "source": ". El orden ↑/↓ decide cuánto le toca a cada uno.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_3328a3f2": {
     "source": "Monstruo derrotado",
     "files": [
@@ -2727,6 +2721,12 @@
     "source": "#{{v1}}",
     "files": [
       "js/calls.js"
+    ]
+  },
+  "s_36b85c8a": {
+    "source": "Gastos puntuales: puedes marcar «Pagado» en cada fila. Cuando un gasto está cubierto o marcado como pagado, aparece «Reiniciar mes» para liberar su asignación. El reinicio es manual; no ocurre al cambiar de mes. El orden ↑/↓ decide cuánto le toca a cada uno.",
+    "files": [
+      "app.html"
     ]
   },
   "s_36c195a4": {
@@ -4947,12 +4947,6 @@
       "js/reports.js"
     ]
   },
-  "s_63106826": {
-    "source": "Reiniciar mes",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_6336baaf": {
     "source": "Completaste {{v0}} {{v1}}{{v2}}.",
     "files": [
@@ -6053,12 +6047,6 @@
       "app.html"
     ]
   },
-  "s_78715b8e": {
-    "source": "acumula para siempre",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_78a37972": {
     "source": "XP DIARIO SELLADO · {{v0}}",
     "files": [
@@ -6834,12 +6822,6 @@
   },
   "s_867a1c61": {
     "source": "COMBO",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_86cfb13f": {
-    "source": "— nunca se reinicia solo cada mes. Vos decidís cuándo la das por cumplida.",
     "files": [
       "app.html"
     ]
@@ -11269,12 +11251,6 @@
       "js/app-main.js"
     ]
   },
-  "s_dda83e49": {
-    "source": "A diferencia de un gasto recurrente, lo que asignás a una meta se",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_ddb5c56a": {
     "source": "{{v0}} vidas del héroe",
     "files": [
@@ -12039,12 +12015,6 @@
     "source": "Horario copiado a Lunes-Viernes {{v0}}",
     "files": [
       "js/schedule.js"
-    ]
-  },
-  "s_edb798b1": {
-    "source": "o usa",
-    "files": [
-      "app.html"
     ]
   },
   "s_edcfda5c": {
@@ -12839,7 +12809,6 @@
   "s_fd847c27": {
     "source": "Pagado",
     "files": [
-      "app.html",
       "js/app-main.js",
       "js/finance.js"
     ]

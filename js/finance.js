@@ -396,11 +396,16 @@ export function renderFinanceSection() {
 
   const metaRows = financeMetaRowsSorted();
   const metasList = document.getElementById('financeMetasList');
-  if (metasList) {
+  const metasTotalRow = document.getElementById('financeMetasTotalRow');
+  if (metasTotalRow) {
     const metaTargetTotal = metaRows.reduce((sum, r) => sum + (Number(r.targetAmount) || 0), 0);
     const metaAssignedTotal = metaRows.reduce((sum, r) => sum + (Number(r.assignedAmount) || 0), 0);
+    metasTotalRow.innerHTML = metaRows.length
+      ? financeTotalsRowHtml(translateText('Total metas'), metaTargetTotal, metaAssignedTotal, 'Ahorr.') : '';
+  }
+  if (metasList) {
     metasList.innerHTML = metaRows.length
-      ? metaRows.map((r, i) => financeRowHtml(r, { index: i, count: metaRows.length, isMeta: true })).join('') + financeTotalsRowHtml(translateText('Total metas'), metaTargetTotal, metaAssignedTotal, 'Ahorr.')
+      ? metaRows.map((r, i) => financeRowHtml(r, { index: i, count: metaRows.length, isMeta: true })).join('')
       : translateMarkup('<div class="note" style="margin:0;">Sin metas configuradas. Usa "+ Agregar meta" para empezar.</div>');
   }
 
