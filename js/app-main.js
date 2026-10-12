@@ -2306,7 +2306,7 @@ function dayGapTotals(dayKey = getActiveDayKey(), sourceCalls = callsForDay(dayK
     else if (gap.label === 'other') otherTotal += gap.residual;
     possiblePauseTotal += gap.possiblePause;
   }
-  for (const pause of dayPausesForSlotStats(dayKey)) {
+  for (const pause of actualPauseIntervalsForDay(dayKey)) {
     const duration = Math.max(0, (pause.end - pause.start) / 60000);
     if (pause.type === 'break') breakTotal += duration;
     else if (pause.type === 'lunch') lunchTotal += duration;

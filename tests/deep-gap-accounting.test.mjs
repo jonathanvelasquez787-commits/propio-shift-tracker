@@ -74,3 +74,11 @@ test('pause slot assignment uses the same nonduplicated minutes as day totals', 
   const result=h.pauseAssignmentCache('10/12/2026','lunch');
   assert.equal(result.assignment.filter(Boolean).reduce((sum,p)=>sum+p.effectiveDurationMin,0),50);
 });
+
+test('a manual or imported call overlapping a real pause is not counted as both productive and paused time', () => {
+  const h = harness([{type:'break',start:at(55),end:at(65)},{type:'lunch',start:at(67),end:at(75)}]);
+  const totals = h.dayGapTotals();
+  assert.equal(totals.breakTotal,5);
+  assert.equal(totals.lunchTotal,5);
+  assert.equal(totals.acwTotal,55);
+});

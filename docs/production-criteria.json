@@ -296,7 +296,8 @@
             "automatic ACW excludes time outside explicit sessions even when an earlier manual call is imported",
             "a gap entirely outside explicit work sessions creates no automatic ACW row",
             "a manually classified Lunch gap does not duplicate a real Break in totals or adherence",
-            "pause slot assignment uses the same nonduplicated minutes as day totals"
+            "pause slot assignment uses the same nonduplicated minutes as day totals",
+            "a manual or imported call overlapping a real pause is not counted as both productive and paused time"
           ]
         }
       ]
