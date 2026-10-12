@@ -1,13 +1,15 @@
 import { settings, state, setAppSettings, setAppState } from './app-context.js';
 import { ui, translateText, displayLocale } from './i18n.js';
 import { DEFAULT_FINANCE_SPLIT, validFinanceSplit, financePlanProjection, validFinanceDate,
-  financePaymentRows, financeMonthTotals, financeSavingsMonthly } from './finance-plan-model.js';
+  financePaymentRows, financeMonthTotals, financeSavingsMonthly, financeExpenseStatus } from './finance-plan-model.js';
 
 let ctx = {};
 let selectedMonth = '';
 let planDraft = false;
 const expandedRows = new Set();
+const expandedReservations = new Set();
 const rowDrafts = new Map();
+const amountDrafts = new Map();
 const el = id => document.getElementById(id);
 const currentMonth = () => {
   const now = new Date();
@@ -20,6 +22,8 @@ const localDate = () => {
 const metric = (label, usd) => ui`<div class="fin-plan-metric"><span>${label}</span><strong>${ctx.money(usd)}</strong>${ctx.convertedNote(usd)}</div>`;
 const rows = () => ctx.getExpenseRows();
 const selected = () => selectedMonth || currentMonth();
+export const financeSelectedMonth = () => selected();
+export const financeMonthLabel = () => new Date(`${selected()}-01T12:00:00`).toLocaleDateString(displayLocale(), { month: 'long', year: 'numeric' });
 const payments = rowId => financePaymentRows(settings.financePayments, selected(), rowId);
 const splitSettings = () => validFinanceSplit(settings.financePlanning?.split) ? settings.financePlanning.split : DEFAULT_FINANCE_SPLIT;
 const configuredDays = () => {
@@ -31,11 +35,68 @@ const configuredDays = () => {
 
 export function configureFinancePlanning(context) { ctx = context; }
 
+export function financeInputUsd(raw, unit = 'usd') {
+  const amount = ctx.parseAmount(raw);
+  const rate = Number(settings.exchangeRate);
+  if (unit === 'local' && (!String(settings.currencyLabel || '').trim() || !Number.isFinite(rate) || rate <= 0)) return NaN;
+  const usd = unit === 'local' ? amount / rate : amount;
+  return Math.round((usd + Number.EPSILON) * 100) / 100;
+}
+
+export function financeAmountInputHtml(row, scope) {
+  const key = scope === 'payment' ? `${row.id}:${selected()}` : row.id;
+  const draft = amountDrafts.get(`${scope}:${key}`);
+  const currency = String(settings.currencyLabel || '').trim();
+  const rate = Number(settings.exchangeRate);
+  const hasCurrency = currency && Number.isFinite(rate) && rate > 0;
+  const unit = draft?.unit === 'local' && hasCurrency ? 'local' : 'usd';
+  let value = draft?.value || '';
+  if (draft && draft.unit === 'local' && (!hasCurrency || draft.rate !== rate || draft.currency !== currency) && Number.isFinite(draft.usd)) {
+    value = (unit === 'local' ? draft.usd * rate : draft.usd).toFixed(2);
+  }
+  const label = scope === 'payment' ? translateText('Importe del pago') : translateText('Monto a sumar o restar');
+  const amountHelp = scope === 'payment' ? translateText('Escribe el importe que ya pagaste. Se guardará en el historial con la fecha elegida; no cambia el dinero reservado.') : translateText('Escribe cuánto quieres apartar o devolver, no el saldo total. Sumar lo toma del disponible; Restar lo devuelve. Aplicar ajuste confirma la operación.');
+  const currencyHelp = translateText('Elige la moneda del importe. La equivalencia usa el tipo de cambio de Ajustes. Cambiar de moneda conserva el mismo valor en dólares.');
+  const equivalent = value && Number.isFinite(financeInputUsd(value, unit)) ? `${ctx.money(financeInputUsd(value, unit))}${ctx.convertedInline(financeInputUsd(value, unit))}` : '';
+  return ui`<div class="fin-amount-entry" data-fin-amount-scope="${scope}">
+    <label class="fin-plan-field" data-fin-help="${ctx.escapeHtml(amountHelp)}">${label}<input data-fin-${scope}-input data-fin-help="${ctx.escapeHtml(amountHelp)}" type="text" value="${ctx.escapeHtml(value)}" inputmode="decimal" autocomplete="off"/></label>
+    <label class="fin-plan-field" data-fin-help="${ctx.escapeHtml(currencyHelp)}">Moneda<select data-fin-amount-unit data-fin-help="${ctx.escapeHtml(currencyHelp)}" aria-label="Moneda del importe"><option value="usd" ${unit === 'usd' ? 'selected' : ''}>USD</option>${hasCurrency ? ui`<option value="local" ${unit === 'local' ? 'selected' : ''}>${ctx.escapeHtml(currency)}</option>` : ''}</select></label>
+    <small class="fin-amount-equivalent" data-fin-amount-equivalent aria-live="polite">${equivalent}</small>
+  </div>`;
+}
+
+function rememberAmount(entry, convert = false) {
+  const scope = entry.getAttribute('data-fin-amount-scope');
+  const rowId = entry.closest('.fin-row').getAttribute('data-fin-row');
+  const key = `${scope}:${scope === 'payment' ? `${rowId}:${selected()}` : rowId}`;
+  const input = entry.querySelector('input');
+  const unit = entry.querySelector('select').value;
+  const previous = amountDrafts.get(key);
+  if (convert && previous && previous.unit !== unit && Number.isFinite(previous.usd)) {
+    input.value = (unit === 'local' ? previous.usd * Number(settings.exchangeRate) : previous.usd).toFixed(2);
+  }
+  const usd = financeInputUsd(input.value, unit);
+  amountDrafts.set(key, {value:input.value, unit, usd, rate:Number(settings.exchangeRate), currency:String(settings.currencyLabel || '').trim()});
+  entry.querySelector('[data-fin-amount-equivalent]').innerHTML = input.value && Number.isFinite(usd) ? `${ctx.money(usd)}${ctx.convertedInline(usd)}` : '';
+}
+
+export function clearFinanceAmountDraft(rowId, scope = 'reservation') {
+  amountDrafts.delete(`${scope}:${scope === 'payment' ? `${rowId}:${selected()}` : rowId}`);
+}
+
 export function captureFinanceDetails() {
   document.querySelectorAll('[data-fin-plan-row]').forEach(detail => {
     const id = detail.getAttribute('data-fin-plan-row');
     if (detail.open) expandedRows.add(id); else expandedRows.delete(id);
   });
+  document.querySelectorAll('[data-fin-reservation-row]').forEach(detail => {
+    const id = detail.getAttribute('data-fin-reservation-row');
+    if (detail.open) expandedReservations.add(id); else expandedReservations.delete(id);
+  });
+}
+
+export function financeReservationHtml(row, controls) {
+  return ui`<details class="fin-plan-row fin-reservation-controls" data-fin-reservation-row="${ctx.escapeHtml(row.id)}" ${expandedReservations.has(row.id) ? 'open' : ''}><summary>Apartar o devolver dinero<span aria-hidden="true">⌄</span></summary><div class="fin-plan-row-body"><p class="sched-hint">Este ajuste mueve dinero entre Disponible y Reservado. No registra un pago.</p>${controls}</div></details>`;
 }
 
 function paymentHistoryHtml(records) {
@@ -50,40 +111,33 @@ function paymentHistoryHtml(records) {
 export function financePlanningRowHtml(row, isMeta) {
   const rowId = ctx.escapeHtml(row.id);
   const categoryId = ctx.escapeHtml(row.categoryId);
-  const header = isMeta ? translateText('Plan de ahorro') : translateText('Presupuesto y pagos del mes');
+  const header = isMeta ? translateText('Estimar aporte mensual') : translateText('Registrar pago y ver historial');
   const draft = rowDrafts.get(`${row.id}:${selected()}`) || {};
   let body;
   if (isMeta) {
     const saving = financeSavingsMonthly(row);
     body = ui`${saving.months === null ? ui`<p class="sched-hint">El plazo es opcional. Guarda uno para calcular el aporte mensual.</p>` : ui`<div class="fin-plan-metrics">${metric(translateText('Aporte mensual orientativo'), saving.monthly)}</div>`}
-      <label class="fin-plan-field">Meses para completar<input type="number" min="1" max="120" step="1" value="${ctx.escapeHtml(draft.months ?? saving.months ?? '')}" data-fin-savings-months aria-label="Meses para completar"/></label>
-      <button class="fin-ghost-btn" type="button" data-fin-savings-save="${rowId}" data-fin-cat="${categoryId}">Guardar plazo</button>`;
+      <div class="fin-payment-controls"><label class="fin-plan-field">Meses usados en la estimación<input type="number" min="1" max="120" step="1" value="${ctx.escapeHtml(draft.months ?? saving.months ?? '')}" data-fin-savings-months aria-label="Meses usados en la estimación"/></label>
+      <button class="fin-ghost-btn" type="button" data-fin-savings-save="${rowId}" data-fin-cat="${categoryId}">Guardar estimación</button></div>
+      <p class="sched-hint">Se divide lo pendiente de reservar entre estos meses. Es una estimación editable; no establece una fecha límite ni descuenta meses automáticamente.</p>`;
   } else {
     const records = payments(row.id);
-    const paid = records.reduce((sum, payment) => sum + payment.usd, 0);
+    const status = financeExpenseStatus(row, settings.financePayments, selected());
+    const paid = status.paid;
     const total = financeMonthTotals(rows(), settings.financePayments, selected());
-    const percent = total.paid > 0 ? (paid / total.paid * 100).toLocaleString(displayLocale(), { maximumFractionDigits: 1 }) : '0';
+    const percent = total.paid > 0 ? `${(paid / total.paid * 100).toLocaleString(displayLocale(), { maximumFractionDigits: 1 })}%` : '—';
     const expenseType = row.expenseType === 'variable' ? translateText('Gasto variable') : translateText('Gasto fijo');
-    const currency = String(settings.currencyLabel || '').trim();
-    const hasCurrency = currency && Number(settings.exchangeRate) > 0;
-    let draftUsd = draft.usd || '', draftLocal = draft.local || '';
-    if (!draftUsd && draftLocal && Number(draft.localRate) > 0) {
-      const originalUsd = ctx.parseAmount(draftLocal) / Number(draft.localRate);
-      if (Number.isFinite(originalUsd)) {
-        if (!hasCurrency) { draftUsd = originalUsd.toFixed(2); draftLocal = ''; }
-        else if (Number(draft.localRate) !== Number(settings.exchangeRate)) draftLocal = (originalUsd * Number(settings.exchangeRate)).toFixed(2);
-      }
-    }
     const date = draft.date || (selected() === currentMonth() ? localDate() : `${selected()}-01`);
-    body = ui`<div class="fin-plan-row-heading"><span>${expenseType}</span><span>${ctx.escapeHtml(selected())}</span></div>
-      <div class="fin-plan-metrics">${metric(translateText('Presupuesto actual'), Number(row.targetAmount))}${metric(translateText('Pagado este mes'), paid)}${metric(translateText('Diferencia'), Number(row.targetAmount) - paid)}<span class="fin-plan-metric"><span>% del gasto real</span><strong>${percent}%</strong></span></div>
+    body = ui`<div class="fin-plan-row-heading"><span>${expenseType}</span><span>${ctx.escapeHtml(financeMonthLabel())}</span></div>
+      <div class="fin-plan-metrics">${metric(status.excess > 0 ? translateText('Exceso sobre el presupuesto') : translateText('Pendiente de pagar del presupuesto'), status.excess || status.remaining)}<span class="fin-plan-metric"><span>Porcentaje del total pagado este mes</span><strong>${percent}</strong></span></div>
       <div class="fin-payment-controls">
-        <label class="fin-plan-field">Pago en USD<input data-fin-payment-usd type="text" value="${ctx.escapeHtml(draftUsd)}" inputmode="decimal" autocomplete="off"/></label>
-        ${hasCurrency ? ui`<label class="fin-plan-field">Pago en ${ctx.escapeHtml(currency)}<input data-fin-payment-local type="text" value="${ctx.escapeHtml(draftLocal)}" inputmode="decimal" autocomplete="off"/></label>` : ''}
+        ${financeAmountInputHtml(row, 'payment')}
         <label class="fin-plan-field">Fecha<input data-fin-payment-date type="date" value="${ctx.escapeHtml(date)}"/></label>
         <button class="fin-mini-btn-primary" type="button" data-fin-payment-save="${rowId}" data-fin-cat="${categoryId}">Registrar pago</button>
-      </div><p class="sched-hint">Registrar un pago conserva lo asignado. No modifica tus llamadas ni ganancias.</p>
-      <div class="fin-payment-history">${paymentHistoryHtml(records)}</div>`;
+      </div><p class="sched-hint">Un pago actualiza el historial del mes de su fecha. La reserva se conserva hasta que la liberes; tus llamadas y ganancias no cambian.</p>
+      <label class="fin-checkbox-label"><input type="checkbox" data-fin-mark-paid="${rowId}" data-fin-cat="${categoryId}" ${row.manualPaid ? 'checked' : ''}/> Omitir reserva automática</label>
+      <p class="sched-hint">Este control excluye el gasto del reparto automático. No registra un pago.</p>
+      <div class="fin-payment-history">${paymentHistoryHtml(records) || ui`<p class="sched-hint">Sin pagos registrados en este mes.</p>`}</div>`;
   }
   return ui`<details class="fin-plan-row" data-fin-plan-row="${rowId}" ${expandedRows.has(row.id) ? 'open' : ''}>
     <summary>${header}<span aria-hidden="true">⌄</span></summary><div class="fin-plan-row-body">${body}</div></details>`;
@@ -125,7 +179,7 @@ export function renderFinancePlanning() {
   el('financeMonthInput').value = selected();
   const totals = financeMonthTotals(rows(), settings.financePayments, selected());
   el('financeMonthTotals').innerHTML = metric(translateText('Presupuesto actual'), totals.budget)
-    + metric(translateText('Pagos registrados'), totals.paid) + metric(translateText('Diferencia'), totals.difference);
+    + metric(translateText('Pagos registrados'), totals.paid) + metric(totals.difference < -0.004 ? translateText('Exceso sobre el presupuesto') : translateText('Pendiente de pagar del presupuesto'), Math.abs(totals.difference));
   el('financePaymentHistory').innerHTML = paymentHistoryHtml(payments()) || ui`<p class="sched-hint">Sin pagos registrados en este mes.</p>`;
   updateFinancePlanPreview();
 }
@@ -148,9 +202,8 @@ export function saveFinancePlan() {
 export function addFinancePayment(catId, rowId, rawUsd, rawLocal, date) {
   const row = ctx.findRow(catId, rowId);
   if (!row || ctx.isMeta(row)) return false;
-  let amount = ctx.parseAmount(rawUsd);
-  if (!String(rawUsd || '').trim() && String(rawLocal || '').trim() && Number(settings.exchangeRate) > 0) amount = ctx.parseAmount(rawLocal) / Number(settings.exchangeRate);
-  const usd = Math.round(amount * 100) / 100;
+  const usd = !String(rawUsd || '').trim() && String(rawLocal || '').trim()
+    ? financeInputUsd(rawLocal, 'local') : financeInputUsd(rawUsd, 'usd');
   if (!Number.isFinite(usd) || usd <= 0 || usd > 1e9 || !validFinanceDate(date)) {
     ctx.toast(translateText('Ingresa un pago mayor a cero y una fecha válida.')); return false;
   }
@@ -160,6 +213,7 @@ export function addFinancePayment(catId, rowId, rawUsd, rawLocal, date) {
   settings.financePayments = [...(Array.isArray(previous) ? previous : []), record];
   if (ctx.saveSettingsOnly() === false) { if (previous === undefined) delete settings.financePayments; else settings.financePayments = previous; return false; }
   rowDrafts.delete(`${rowId}:${selected()}`);
+  clearFinanceAmountDraft(rowId, 'payment');
   ctx.render(); ctx.toast(translateText('Pago registrado')); return true;
 }
 
@@ -183,7 +237,7 @@ export function saveFinanceSavingsMonths(catId, rowId, months) {
   row.savingsMonths = value;
   if (ctx.saveSettingsOnly() === false) { if (previous === undefined) delete row.savingsMonths; else row.savingsMonths = previous; return false; }
   rowDrafts.delete(`${rowId}:${selected()}`);
-  ctx.render(); ctx.toast(translateText('Plazo guardado')); return true;
+  ctx.render(); ctx.toast(translateText('Estimación guardada')); return true;
 }
 
 export function wireFinancePlanning() {
@@ -191,19 +245,20 @@ export function wireFinancePlanning() {
   if (!section || section.dataset.planningWired) return;
   section.dataset.planningWired = 'true';
   wireFinanceSplitHelp();
+  wireFinanceFieldHelp(section);
   section.addEventListener('input', event => {
     const target = event.target;
     if (target.matches('[data-fin-plan-input]')) { planDraft = true; el('financePlanSaveStatus').textContent = ''; updateFinancePlanPreview(); }
     const body = target.closest('.fin-plan-row-body');
-    if (body && target.matches('[data-fin-payment-usd]')) { const local = body.querySelector('[data-fin-payment-local]'); if (local) local.value = ''; }
-    if (body && target.matches('[data-fin-payment-local]')) body.querySelector('[data-fin-payment-usd]').value = '';
-    if (body && target.matches('[data-fin-payment-usd], [data-fin-payment-local], [data-fin-payment-date], [data-fin-savings-months]')) {
+    const entry = target.closest('[data-fin-amount-scope]');
+    if (entry && target.tagName === 'INPUT') rememberAmount(entry);
+    if (body && target.matches('[data-fin-payment-date], [data-fin-savings-months]')) {
       const rowId = body.closest('[data-fin-plan-row]').getAttribute('data-fin-plan-row');
-      rowDrafts.set(`${rowId}:${selected()}`, {usd:body.querySelector('[data-fin-payment-usd]')?.value || '',
-        local:body.querySelector('[data-fin-payment-local]')?.value || '',date:body.querySelector('[data-fin-payment-date]')?.value || '',months:body.querySelector('[data-fin-savings-months]')?.value,localRate:Number(settings.exchangeRate)});
+      rowDrafts.set(`${rowId}:${selected()}`, {date:body.querySelector('[data-fin-payment-date]')?.value || '',months:body.querySelector('[data-fin-savings-months]')?.value});
     }
   });
   section.addEventListener('change', event => {
+    if (event.target.matches('[data-fin-amount-unit]')) { rememberAmount(event.target.closest('[data-fin-amount-scope]'), true); return; }
     if (event.target.id !== 'financeMonthInput') return;
     const month = event.target.value;
     if (!validFinanceDate(month + '-01')) { event.target.value = selected(); return; }
@@ -217,13 +272,57 @@ export function wireFinancePlanning() {
     if (button.hasAttribute('data-fin-payment-delete')) { deleteFinancePayment(button.getAttribute('data-fin-payment-delete')); return; }
     if (button.hasAttribute('data-fin-payment-save')) {
       const body = button.closest('.fin-plan-row-body');
-      addFinancePayment(button.getAttribute('data-fin-cat'), button.getAttribute('data-fin-payment-save'), body.querySelector('[data-fin-payment-usd]').value,
-        body.querySelector('[data-fin-payment-local]')?.value || '', body.querySelector('[data-fin-payment-date]').value);
+      const entry = body.querySelector('[data-fin-amount-scope]');
+      const raw = entry.querySelector('input').value;
+      const local = entry.querySelector('select').value === 'local';
+      addFinancePayment(button.getAttribute('data-fin-cat'), button.getAttribute('data-fin-payment-save'), local ? '' : raw,
+        local ? raw : '', body.querySelector('[data-fin-payment-date]').value);
     }
     if (button.hasAttribute('data-fin-savings-save')) {
       saveFinanceSavingsMonths(button.getAttribute('data-fin-cat'), button.getAttribute('data-fin-savings-save'), button.closest('.fin-plan-row-body').querySelector('[data-fin-savings-months]').value);
     }
   });
+}
+
+function wireFinanceFieldHelp(section) {
+  const tooltip = document.createElement('span');
+  tooltip.id = 'financeFieldTooltip';
+  tooltip.className = 'sched-help-tooltip fin-help-tooltip';
+  tooltip.setAttribute('role', 'tooltip');
+  document.body.appendChild(tooltip);
+  let anchor = null;
+  let previousDescription = null;
+  const hide = () => {
+    tooltip.classList.remove('is-open');
+    if (anchor) {
+      if (previousDescription === null) anchor.removeAttribute('aria-describedby');
+      else anchor.setAttribute('aria-describedby', previousDescription);
+    }
+    anchor = null;
+  };
+  const show = target => {
+    const control = target.closest('[data-fin-help]');
+    if (!control || control === anchor) return;
+    hide(); anchor = control;
+    previousDescription = control.getAttribute('aria-describedby');
+    control.setAttribute('aria-describedby', [previousDescription, tooltip.id].filter(Boolean).join(' '));
+    tooltip.textContent = control.getAttribute('data-fin-help');
+    tooltip.style.width = `${Math.max(0, Math.min(320, innerWidth - 24))}px`;
+    tooltip.classList.add('is-open');
+    const rect = control.getBoundingClientRect(), bounds = tooltip.getBoundingClientRect();
+    tooltip.style.left = `${Math.max(12, Math.min(rect.left, innerWidth - bounds.width - 12))}px`;
+    tooltip.style.top = `${rect.bottom + bounds.height + 16 <= innerHeight ? rect.bottom + 8 : Math.max(12, rect.top - bounds.height - 8)}px`;
+  };
+  section.addEventListener('pointerover', event => show(event.target));
+  section.addEventListener('pointerout', event => {
+    if (anchor && !anchor.contains(event.relatedTarget)) hide();
+  });
+  section.addEventListener('focusin', event => show(event.target));
+  section.addEventListener('focusout', hide);
+  section.addEventListener('keydown', event => { if (event.key === 'Escape') hide(); });
+  section.addEventListener('click', hide);
+  window.addEventListener('scroll', hide, true);
+  window.addEventListener('resize', hide);
 }
 
 function wireFinanceSplitHelp() {

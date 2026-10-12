@@ -43,6 +43,12 @@
       "js/app-main.js"
     ]
   },
+  "s_0163610f": {
+    "source": "Pendiente de pagar del presupuesto",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
   "s_019c53d5": {
     "source": "Meta del ciclo",
     "files": [
@@ -122,10 +128,22 @@
       "app.html"
     ]
   },
+  "s_0381729f": {
+    "source": "Elige la moneda del importe. La equivalencia usa el tipo de cambio de Ajustes. Cambiar de moneda conserva el mismo valor en dólares.",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
   "s_0390a706": {
     "source": "Progreso de gamificación reiniciado",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_03b8a461": {
+    "source": "Importe variable",
+    "files": [
+      "js/finance.js"
     ]
   },
   "s_03d7eb0b": {
@@ -155,7 +173,14 @@
   "s_044df40e": {
     "source": "{{v0}}{{v1}}",
     "files": [
-      "js/calendar.js"
+      "js/calendar.js",
+      "js/finance.js"
+    ]
+  },
+  "s_04ace283": {
+    "source": "Exceso sobre el presupuesto",
+    "files": [
+      "js/finance-planning.js"
     ]
   },
   "s_04c0cdd1": {
@@ -250,12 +275,6 @@
       "js/app-main.js"
     ]
   },
-  "s_063612dc": {
-    "source": "Obj.",
-    "files": [
-      "js/finance.js"
-    ]
-  },
   "s_06679523": {
     "source": "Armadura abierta · el monstruo es vulnerable",
     "files": [
@@ -276,12 +295,6 @@
   },
   "s_06b44bc2": {
     "source": "CLEAR",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_06c187f8": {
-    "source": "Lo que asignás a una meta se acumula y no se reinicia solo cada mes. Vos decidís cuándo la das por cumplida.",
     "files": [
       "app.html"
     ]
@@ -427,6 +440,12 @@
       "js/game.js"
     ]
   },
+  "s_09d22d83": {
+    "source": "Escribe cuánto quieres apartar o devolver, no el saldo total. Sumar lo toma del disponible; Restar lo devuelve. Aplicar ajuste confirma la operación.",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
   "s_09d46b5d": {
     "source": "Mensaje (siguientes veces del mismo turno)",
     "files": [
@@ -493,6 +512,12 @@
       "js/finance.js"
     ]
   },
+  "s_0aeb34ff": {
+    "source": "Reservado para la meta = ganancias apartadas dentro de la app. Se acumula entre meses; no confirma depósitos en una cuenta de ahorro.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_0b02b4ec": {
     "source": "Días por semana (proyección)",
     "files": [
@@ -545,6 +570,12 @@
     "source": "Avance hacia la meta y el cofre",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_0be9309b": {
+    "source": "Se comparan los presupuestos actuales con los pagos del mes elegido. Los importes de distintos períodos se suman sin convertirlos a un presupuesto mensual.",
+    "files": [
+      "app.html"
     ]
   },
   "s_0bec8b61": {
@@ -656,12 +687,6 @@
     "files": [
       "app.html",
       "js/game.js"
-    ]
-  },
-  "s_0d43587d": {
-    "source": "asignado",
-    "files": [
-      "js/finance.js"
     ]
   },
   "s_0d4512ac": {
@@ -820,6 +845,13 @@
       "index.html"
     ]
   },
+  "s_0fcd3fa0": {
+    "source": "Por 2 semanas",
+    "files": [
+      "app.html",
+      "js/finance.js"
+    ]
+  },
   "s_0fdeb278": {
     "source": "Perfil guardado",
     "files": [
@@ -897,12 +929,6 @@
     "source": "Trabaja normal",
     "files": [
       "index.html"
-    ]
-  },
-  "s_10a91eb2": {
-    "source": "Resta este monto de Disponible y lo suma a lo ya asignado de esta fila",
-    "files": [
-      "js/finance.js"
     ]
   },
   "s_10afd3ba": {
@@ -1065,10 +1091,10 @@
       "js/game-battle.js"
     ]
   },
-  "s_15120393": {
-    "source": "Fijo",
+  "s_14b38bc7": {
+    "source": "Importe fijo",
     "files": [
-      "app.html"
+      "js/finance.js"
     ]
   },
   "s_1516d7c5": {
@@ -1129,12 +1155,6 @@
     "source": ", que forma parte de estos términos.",
     "files": [
       "terminos.html"
-    ]
-  },
-  "s_15ea3b31": {
-    "source": "ahorrado",
-    "files": [
-      "js/finance.js"
     ]
   },
   "s_160f1d9d": {
@@ -1251,12 +1271,6 @@
       "js/game.js"
     ]
   },
-  "s_17ce8590": {
-    "source": "Plazo guardado",
-    "files": [
-      "js/finance-planning.js"
-    ]
-  },
   "s_17e6ee00": {
     "source": "La fuente oficial de tu pago es siempre la de tu empleador o\n    plataforma",
     "files": [
@@ -1269,10 +1283,22 @@
       "app.html"
     ]
   },
+  "s_1816fe21": {
+    "source": "Comportamiento del importe",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_1831b4ca": {
     "source": "ARMADURA",
     "files": [
       "app.html"
+    ]
+  },
+  "s_1836b308": {
+    "source": "Período sin definir",
+    "files": [
+      "js/finance.js"
     ]
   },
   "s_18560d0c": {
@@ -1625,12 +1651,6 @@
       "js/app-main.js"
     ]
   },
-  "s_1ee5309c": {
-    "source": "Gasto reiniciado",
-    "files": [
-      "js/finance.js"
-    ]
-  },
   "s_1eea3f8b": {
     "source": "#B1D3B9",
     "files": [
@@ -1673,12 +1693,6 @@
       "js/finance.js"
     ]
   },
-  "s_1f55c6eb": {
-    "source": "Pago en USD",
-    "files": [
-      "js/finance-planning.js"
-    ]
-  },
   "s_1fa218ff": {
     "source": "XP ganado",
     "files": [
@@ -1689,6 +1703,13 @@
     "source": "Caminar",
     "files": [
       "js/game-battle.js"
+    ]
+  },
+  "s_1fb9396d": {
+    "source": "Por semana",
+    "files": [
+      "app.html",
+      "js/finance.js"
     ]
   },
   "s_1fd50d13": {
@@ -1784,6 +1805,12 @@
       "js/finance.js"
     ]
   },
+  "s_21e23cb3": {
+    "source": "Presupuesto excedido",
+    "files": [
+      "js/finance.js"
+    ]
+  },
   "s_2202e087": {
     "source": "En {{v0}} días",
     "files": [
@@ -1864,6 +1891,13 @@
       "js/calls.js"
     ]
   },
+  "s_2435ca03": {
+    "source": "Una sola vez",
+    "files": [
+      "app.html",
+      "js/finance.js"
+    ]
+  },
   "s_243e6376": {
     "source": "#FFFFFF",
     "files": [
@@ -1910,6 +1944,12 @@
     "source": "Sin ventanas pasadas todavía.",
     "files": [
       "js/higher-rate.js"
+    ]
+  },
+  "s_2580a2b2": {
+    "source": "Reservado",
+    "files": [
+      "js/finance.js"
     ]
   },
   "s_259b9958": {
@@ -2061,6 +2101,12 @@
     "source": "Resumen completo de tu rendimiento",
     "files": [
       "app.html"
+    ]
+  },
+  "s_27f46c73": {
+    "source": "Elige Sumar para apartar el monto escrito: baja el Disponible y sube el Reservado. Después pulsa Aplicar ajuste. No registra un pago.",
+    "files": [
+      "js/finance.js"
     ]
   },
   "s_27f7a8b7": {
@@ -2305,6 +2351,12 @@
       "js/game.js"
     ]
   },
+  "s_2e2d516d": {
+    "source": "Indica a qué período corresponde el importe. No multiplica el presupuesto ni programa reservas automáticas.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_2e4a471e": {
     "source": "acw",
     "files": [
@@ -2484,12 +2536,6 @@
       "app.html"
     ]
   },
-  "s_30013d2b": {
-    "source": "{{v5}}%",
-    "files": [
-      "js/finance-planning.js"
-    ]
-  },
   "s_300b99b7": {
     "source": "Toca su estado (Libre o Trabajado) para cambiarlo, o el lápiz para agregar una categoría o nota.",
     "files": [
@@ -2500,6 +2546,12 @@
     "source": "Victorias y récords",
     "files": [
       "app.html"
+    ]
+  },
+  "s_30ab622d": {
+    "source": "Sin reserva",
+    "files": [
+      "js/finance.js"
     ]
   },
   "s_30d9443f": {
@@ -2548,12 +2600,6 @@
     "source": "desde {{v0}}",
     "files": [
       "js/boot.js"
-    ]
-  },
-  "s_315dfc56": {
-    "source": "Reparte tu Disponible solo, en orden de prioridad — Gastos primero, luego Metas. Puedes seguir ajustando cualquier fila a mano con el pill +/-.",
-    "files": [
-      "app.html"
     ]
   },
   "s_317bdc74": {
@@ -2693,6 +2739,12 @@
       "app.html"
     ]
   },
+  "s_33d4dce2": {
+    "source": "Confirma el monto y la opción Sumar o Restar. Sumar usa solo dinero disponible; en gastos no supera el presupuesto. Restar devuelve como máximo lo reservado.",
+    "files": [
+      "js/finance.js"
+    ]
+  },
   "s_33e34e32": {
     "source": "Reporte de ganancias — {{v0}}",
     "files": [
@@ -2709,12 +2761,6 @@
     "source": "Propio Shift Tracker:",
     "files": [
       "index.html"
-    ]
-  },
-  "s_33fc3199": {
-    "source": "Gastos y metas que se llenan solos con cada llamada.",
-    "files": [
-      "app.html"
     ]
   },
   "s_340c1eae": {
@@ -2771,12 +2817,6 @@
     "source": "¿Es gratis y funciona en el teléfono?",
     "files": [
       "index.html"
-    ]
-  },
-  "s_35795c47": {
-    "source": "Se reparte en el orden de prioridad de cada fila (↑/↓).",
-    "files": [
-      "app.html"
     ]
   },
   "s_35a267fa": {
@@ -2845,12 +2885,6 @@
       "js/calls.js"
     ]
   },
-  "s_36b85c8a": {
-    "source": "Gastos puntuales: puedes marcar «Pagado» en cada fila. Cuando un gasto está cubierto o marcado como pagado, aparece «Reiniciar mes» para liberar su asignación. El reinicio es manual; no ocurre al cambiar de mes. El orden ↑/↓ decide cuánto le toca a cada uno.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_36c195a4": {
     "source": "Hitos",
     "files": [
@@ -2907,6 +2941,12 @@
   },
   "s_3786aa68": {
     "source": "se calcula solo a partir de tus ganancias reales, sin que tengas que anotarlo tú.",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_37a7b2b3": {
+    "source": "Fijo: importe estable",
     "files": [
       "app.html"
     ]
@@ -3000,12 +3040,6 @@
     "source": "Cambiar",
     "files": [
       "js/positive-reinforcement.js"
-    ]
-  },
-  "s_39b26c5c": {
-    "source": "Mes",
-    "files": [
-      "app.html"
     ]
   },
   "s_39bdcce7": {
@@ -3131,6 +3165,12 @@
       "js/boot.js"
     ]
   },
+  "s_3c1a6410": {
+    "source": "Liberar reserva",
+    "files": [
+      "js/finance.js"
+    ]
+  },
   "s_3c48f996": {
     "source": "Meta agregada",
     "files": [
@@ -3221,6 +3261,12 @@
       "js/higher-rate.js"
     ]
   },
+  "s_3ef512e4": {
+    "source": "Estimar aporte mensual",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
   "s_3efdd8c6": {
     "source": ">{{v0}}m · Superó meta",
     "files": [
@@ -3243,6 +3289,12 @@
     "source": "#B5BAFF",
     "files": [
       "app.html"
+    ]
+  },
+  "s_3ff91443": {
+    "source": "Importe del pago",
+    "files": [
+      "js/finance-planning.js"
     ]
   },
   "s_402319c6": {
@@ -3440,6 +3492,12 @@
       "app.html"
     ]
   },
+  "s_43cf290b": {
+    "source": "Sin pagos",
+    "files": [
+      "js/finance.js"
+    ]
+  },
   "s_440dd864": {
     "source": "política de privacidad",
     "files": [
@@ -3474,8 +3532,7 @@
     "source": "{{v2}}{{v3}}",
     "files": [
       "js/app-main.js",
-      "js/finance-planning.js",
-      "js/finance.js"
+      "js/finance-planning.js"
     ]
   },
   "s_4488538b": {
@@ -3529,12 +3586,6 @@
       "js/reports.js"
     ]
   },
-  "s_4533b073": {
-    "source": "{{v4}} · {{v5}}",
-    "files": [
-      "js/finance.js"
-    ]
-  },
   "s_455c3a0c": {
     "source": "Avisos",
     "files": [
@@ -3545,12 +3596,6 @@
     "source": "PSR B0531+21",
     "files": [
       "js/game-battle.js"
-    ]
-  },
-  "s_458b225e": {
-    "source": "Cubierto",
-    "files": [
-      "js/finance.js"
     ]
   },
   "s_45e3f698": {
@@ -3925,12 +3970,6 @@
       "js/boot.js"
     ]
   },
-  "s_4bc2c9e2": {
-    "source": "Registrar un pago conserva lo asignado. No modifica tus llamadas ni ganancias.",
-    "files": [
-      "js/finance-planning.js"
-    ]
-  },
   "s_4bd2f89c": {
     "source": "#{{v0}} · {{v1}} {{v2}} — Reemplazó la llamada en vivo provisional por los datos oficiales",
     "files": [
@@ -3956,6 +3995,12 @@
       "app.html"
     ]
   },
+  "s_4cccafad": {
+    "source": "Reserva liberada. Los pagos registrados se conservan.",
+    "files": [
+      "js/finance.js"
+    ]
+  },
   "s_4cd85242": {
     "source": "Shift terminado",
     "files": [
@@ -3973,6 +4018,12 @@
     "files": [
       "privacidad.html",
       "terminos.html"
+    ]
+  },
+  "s_4d321623": {
+    "source": "Mes de los pagos",
+    "files": [
+      "app.html"
     ]
   },
   "s_4d39cf22": {
@@ -4016,8 +4067,7 @@
   "s_4def8b60": {
     "source": "Disponible",
     "files": [
-      "app.html",
-      "js/finance.js"
+      "app.html"
     ]
   },
   "s_4e0828b1": {
@@ -4061,6 +4111,12 @@
     "source": "Actividad real: {{v0}} – {{v1}} · {{v2}} llamada(s) · {{v3}} · {{v4}}",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_4e813e1b": {
+    "source": "Monto a sumar o restar",
+    "files": [
+      "js/finance-planning.js"
     ]
   },
   "s_4eb1ea50": {
@@ -4367,6 +4423,12 @@
       "js/app-main.js"
     ]
   },
+  "s_52d1204b": {
+    "source": "Reserva el disponible en orden de prioridad: Gastos primero, luego Metas. Puedes ajustar cada reserva con Sumar o Restar.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_52e46a0b": {
     "source": "{{v0}} llamada(s) importada(s) desde el respaldo antiguo",
     "files": [
@@ -4431,12 +4493,6 @@
     "source": "Editar categoría",
     "files": [
       "js/finance.js"
-    ]
-  },
-  "s_540c485f": {
-    "source": "Presupuesto y pagos del mes",
-    "files": [
-      "js/finance-planning.js"
     ]
   },
   "s_544f2caf": {
@@ -4710,6 +4766,12 @@
       "js/game.js"
     ]
   },
+  "s_58d7562b": {
+    "source": "Porcentaje del total pagado este mes",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
   "s_58dba740": {
     "source": "Racha de {{v0}} días",
     "files": [
@@ -4863,6 +4925,12 @@
       "app.html"
     ]
   },
+  "s_5c9795a8": {
+    "source": "Editar fila",
+    "files": [
+      "js/finance.js"
+    ]
+  },
   "s_5cb4b571": {
     "source": "ventana total de hoy",
     "files": [
@@ -4873,6 +4941,13 @@
     "source": "7. Límite de responsabilidad",
     "files": [
       "terminos.html"
+    ]
+  },
+  "s_5d0e5e21": {
+    "source": "Por mes",
+    "files": [
+      "app.html",
+      "js/finance.js"
     ]
   },
   "s_5d341394": {
@@ -4975,12 +5050,6 @@
     "source": "Guardar meta diaria",
     "files": [
       "app.html"
-    ]
-  },
-  "s_5fb99825": {
-    "source": "Escribe en cualquiera de los dos — el otro se completa solo",
-    "files": [
-      "js/finance.js"
     ]
   },
   "s_5fbd0ee6": {
@@ -5368,12 +5437,6 @@
       "js/game.js"
     ]
   },
-  "s_673d6165": {
-    "source": "Presupuesto y pagos",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_67457d6c": {
     "source": "Mejor: 0",
     "files": [
@@ -5396,6 +5459,12 @@
     "source": "Meta general, todos los días",
     "files": [
       "app.html"
+    ]
+  },
+  "s_67e4da35": {
+    "source": "· {{v0}} · {{v1}} · {{v2}}",
+    "files": [
+      "js/finance.js"
     ]
   },
   "s_67e6b032": {
@@ -5502,12 +5571,6 @@
       "js/auth.js"
     ]
   },
-  "s_69f37c88": {
-    "source": "Sin asignar",
-    "files": [
-      "js/finance.js"
-    ]
-  },
   "s_6a19eada": {
     "source": "cierra tu jornada del día.",
     "files": [
@@ -5567,6 +5630,12 @@
     "source": "Continuar duelo",
     "files": [
       "js/game-battle.js"
+    ]
+  },
+  "s_6af3858c": {
+    "source": "Este ajuste mueve dinero entre Disponible y Reservado. No registra un pago.",
+    "files": [
+      "js/finance-planning.js"
     ]
   },
   "s_6affc195": {
@@ -5693,6 +5762,7 @@
   "s_6da5e4a0": {
     "source": "{{v3}}{{v4}}",
     "files": [
+      "js/finance.js",
       "js/positive-reinforcement.js"
     ]
   },
@@ -5776,6 +5846,12 @@
       "app.html"
     ]
   },
+  "s_6f9cbf3d": {
+    "source": "Apartar o devolver dinero",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
   "s_6fb42af6": {
     "source": "Borra TODAS las ventanas pasadas de un click. El bono ya ganado por llamadas reales se conserva siempre, aunque borres la ventana que lo generó.",
     "files": [
@@ -5850,12 +5926,6 @@
       "terminos.html"
     ]
   },
-  "s_70be7edc": {
-    "source": "Faltante",
-    "files": [
-      "js/finance.js"
-    ]
-  },
   "s_70d9ef71": {
     "source": "Las contraseñas se guardan solo como hash, nunca en claro.",
     "files": [
@@ -5878,12 +5948,6 @@
     "source": "Racha de los últimos siete días",
     "files": [
       "app.html"
-    ]
-  },
-  "s_7159d768": {
-    "source": "{{v10}}{{v11}}",
-    "files": [
-      "js/finance.js"
     ]
   },
   "s_7166a73f": {
@@ -5975,6 +6039,12 @@
     "source": "{{v4}} {{v5}} +{{v6}}{{v7}}",
     "files": [
       "js/higher-rate.js"
+    ]
+  },
+  "s_72aeaf7d": {
+    "source": "Objetivo",
+    "files": [
+      "js/finance.js"
     ]
   },
   "s_72c937ff": {
@@ -6092,8 +6162,8 @@
       "js/calls.js"
     ]
   },
-  "s_7523ffd1": {
-    "source": "Pagado este mes",
+  "s_750f6373": {
+    "source": "Guardar estimación",
     "files": [
       "js/finance-planning.js"
     ]
@@ -6292,12 +6362,6 @@
       "app.html"
     ]
   },
-  "s_7867e368": {
-    "source": "Plan de ahorro",
-    "files": [
-      "js/finance-planning.js"
-    ]
-  },
   "s_78a37972": {
     "source": "XP DIARIO SELLADO · {{v0}}",
     "files": [
@@ -6382,6 +6446,12 @@
       "js/schedule.js"
     ]
   },
+  "s_7994eef1": {
+    "source": "Aplicar ajuste",
+    "files": [
+      "js/finance.js"
+    ]
+  },
   "s_799ffcda": {
     "source": "Inicio",
     "files": [
@@ -6443,12 +6513,6 @@
       "js/app-main.js"
     ]
   },
-  "s_7b54493f": {
-    "source": "Eliminar meta",
-    "files": [
-      "js/finance.js"
-    ]
-  },
   "s_7b7f96b5": {
     "source": "Ventana de gracia de Adherencia: {{v0}} min",
     "files": [
@@ -6485,22 +6549,10 @@
       "index.html"
     ]
   },
-  "s_7baeadad": {
-    "source": "Meses para completar",
-    "files": [
-      "js/finance-planning.js"
-    ]
-  },
   "s_7baf7455": {
     "source": "El ajuste no puede pasar de +12h de una sola vez.",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_7bb3cffc": {
-    "source": "{{v2}}{{v3}}{{v4}}",
-    "files": [
-      "js/finance-planning.js"
     ]
   },
   "s_7bcfb42f": {
@@ -6513,12 +6565,6 @@
     "source": "Tu sesión expiró. Vuelve a entrar.",
     "files": [
       "js/auth.js"
-    ]
-  },
-  "s_7bf59325": {
-    "source": "Variable",
-    "files": [
-      "app.html"
     ]
   },
   "s_7bf8e468": {
@@ -6674,12 +6720,6 @@
       "js/reinforcement-rules.js"
     ]
   },
-  "s_7e3ffe48": {
-    "source": "Prioridad — decide el orden de la cascada de \"Restante después\"",
-    "files": [
-      "js/finance.js"
-    ]
-  },
   "s_7e57c267": {
     "source": "Tus datos se sincronizan solos cada pocos segundos mientras tengas internet.",
     "files": [
@@ -6763,6 +6803,12 @@
     "files": [
       "app.html",
       "index.html"
+    ]
+  },
+  "s_80f29e6e": {
+    "source": "Ganancias de llamadas aún sin reservar. El orden ↑/↓ decide la prioridad.",
+    "files": [
+      "app.html"
     ]
   },
   "s_80fe07c8": {
@@ -6874,12 +6920,6 @@
     "files": [
       "app.html",
       "js/app-main.js"
-    ]
-  },
-  "s_82b776e9": {
-    "source": "Guardar plazo",
-    "files": [
-      "js/finance-planning.js"
     ]
   },
   "s_82c12a9a": {
@@ -7021,6 +7061,12 @@
       "js/app-main.js"
     ]
   },
+  "s_84f77b0a": {
+    "source": "Registrar pago y ver historial",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
   "s_851fe65b": {
     "source": "{{v0}}: la meta productiva ({{v1}} min) no puede ser mayor que la duración del bloque ({{v2}} min).",
     "files": [
@@ -7135,6 +7181,12 @@
     "source": ", elige categoría (Casa, Servicios, Transporte, Comida, Deuda, Otro) — el nombre se sugiere solo según la categoría.",
     "files": [
       "app.html"
+    ]
+  },
+  "s_87a1bbab": {
+    "source": "Se divide lo pendiente de reservar entre estos meses. Es una estimación editable; no establece una fecha límite ni descuenta meses automáticamente.",
+    "files": [
+      "js/finance-planning.js"
     ]
   },
   "s_87b66d7f": {
@@ -7284,7 +7336,6 @@
   "s_89bdf692": {
     "source": "Pagos registrados",
     "files": [
-      "app.html",
       "js/finance-planning.js"
     ]
   },
@@ -7408,6 +7459,12 @@
     "files": [
       "app.html",
       "js/app-main.js"
+    ]
+  },
+  "s_8beef0c0": {
+    "source": "Presupuesto",
+    "files": [
+      "js/finance.js"
     ]
   },
   "s_8bef1651": {
@@ -7575,6 +7632,12 @@
       "privacidad.html"
     ]
   },
+  "s_8f552188": {
+    "source": "Eliminar fila",
+    "files": [
+      "js/finance.js"
+    ]
+  },
   "s_8f58a14e": {
     "source": "Constancia",
     "files": [
@@ -7642,6 +7705,18 @@
       "app.html"
     ]
   },
+  "s_905b4b76": {
+    "source": "Recurrente permite volver a reservar este gasto. Las reservas se liberan manualmente; no se reinician con el calendario.",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_90685751": {
+    "source": "Este control excluye el gasto del reparto automático. No registra un pago.",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
   "s_90899808": {
     "source": "−{{v0}} {{v1}}",
     "files": [
@@ -7706,6 +7781,12 @@
     "source": "Enfócate y hazlo contar.",
     "files": [
       "app.html"
+    ]
+  },
+  "s_91568c55": {
+    "source": "Reserva parcial",
+    "files": [
+      "js/finance.js"
     ]
   },
   "s_916a50d2": {
@@ -7802,12 +7883,6 @@
     "source": "Gastos y metas de ahorro que registras en la sección de Finanzas.",
     "files": [
       "privacidad.html"
-    ]
-  },
-  "s_9364068b": {
-    "source": "Falta",
-    "files": [
-      "js/finance.js"
     ]
   },
   "s_9382621b": {
@@ -8078,6 +8153,12 @@
       "app.html"
     ]
   },
+  "s_986c3196": {
+    "source": "Sin definir",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_9898c6a1": {
     "source": "Rosa Magenta",
     "files": [
@@ -8194,6 +8275,12 @@
       "js/landing.js"
     ]
   },
+  "s_9b6bdda7": {
+    "source": "USD",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
   "s_9b8715d7": {
     "source": "Trabajado",
     "files": [
@@ -8298,16 +8385,16 @@
       "js/app-main.js"
     ]
   },
-  "s_9d5e19e3": {
-    "source": "Aplicar",
-    "files": [
-      "js/finance.js"
-    ]
-  },
   "s_9d773438": {
     "source": "Qué tan apegado estuviste hoy a tu horario planeado",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_9d811a20": {
+    "source": "Pendiente de reservar",
+    "files": [
+      "js/finance.js"
     ]
   },
   "s_9d8e8d1e": {
@@ -8429,6 +8516,12 @@
       "terminos.html"
     ]
   },
+  "s_9fc15f18": {
+    "source": "Presupuesto = importe previsto. Reservado = ganancias apartadas. Pagado = pagos registrados con fecha.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_9ff928d7": {
     "source": "🏆 JEFE DEL CICLO DERROTADO · {{v0}}",
     "files": [
@@ -8463,12 +8556,6 @@
     "source": "Colección completa · +{{v0}} XP",
     "files": [
       "js/game.js"
-    ]
-  },
-  "s_a04ce8a7": {
-    "source": "Elige si Aplicar suma o resta este monto",
-    "files": [
-      "js/finance.js"
     ]
   },
   "s_a0512351": {
@@ -8551,12 +8638,6 @@
       "js/app-main.js"
     ]
   },
-  "s_a17748cf": {
-    "source": "% del gasto real",
-    "files": [
-      "js/finance-planning.js"
-    ]
-  },
   "s_a1a22567": {
     "source": "Elegir {{v0}}",
     "files": [
@@ -8630,12 +8711,6 @@
       "app.html"
     ]
   },
-  "s_a2cd9f41": {
-    "source": "o en {{v0}}",
-    "files": [
-      "js/finance.js"
-    ]
-  },
   "s_a2eab83e": {
     "source": "Agregar gasto",
     "files": [
@@ -8660,12 +8735,6 @@
     "source": "Correo o usuario",
     "files": [
       "index.html"
-    ]
-  },
-  "s_a33ff2dc": {
-    "source": "{{v7}} de {{v8}}{{v9}} asignado",
-    "files": [
-      "js/finance.js"
     ]
   },
   "s_a3665c34": {
@@ -8714,6 +8783,12 @@
     "source": "¿Importar este archivo (exportado el {{v0}} · {{v1}} llamada(s))? Esto reemplaza tus llamadas, turnos y pausas actuales. {{v2}} Esta acción no se puede deshacer.",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_a3ddac34": {
+    "source": "Estimación guardada",
+    "files": [
+      "js/finance-planning.js"
     ]
   },
   "s_a45085e2": {
@@ -8798,6 +8873,12 @@
     "source": "Claro original",
     "files": [
       "app.html"
+    ]
+  },
+  "s_a68af785": {
+    "source": "Sumar o restar de la reserva",
+    "files": [
+      "js/finance.js"
     ]
   },
   "s_a68dee53": {
@@ -8996,6 +9077,7 @@
   "s_aaa0f5ae": {
     "source": "{{v4}}{{v5}}",
     "files": [
+      "js/finance.js",
       "js/reports.js"
     ]
   },
@@ -9170,6 +9252,12 @@
       "js/landing.js"
     ]
   },
+  "s_ae2da05c": {
+    "source": "Un pago actualiza el historial del mes de su fecha. La reserva se conserva hasta que la liberes; tus llamadas y ganancias no cambian.",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
   "s_ae8eda95": {
     "source": "{{v1}} · generado el {{v2}}",
     "files": [
@@ -9306,8 +9394,7 @@
   "s_b0bac425": {
     "source": "Parcial",
     "files": [
-      "js/app-main.js",
-      "js/finance.js"
+      "js/app-main.js"
     ]
   },
   "s_b0cffd29": {
@@ -9358,6 +9445,12 @@
     "source": "Esa hora se traslapa con la llamada #{{v0}} ({{v1}}). Ajusta la hora o la duración.",
     "files": [
       "js/calls.js"
+    ]
+  },
+  "s_b1ff99a6": {
+    "source": "{{v10}}\n      {{v11}}",
+    "files": [
+      "js/finance.js"
     ]
   },
   "s_b2307ed9": {
@@ -9442,12 +9535,6 @@
     "source": "Gratis · sin anuncios · tus datos son solo tuyos",
     "files": [
       "index.html"
-    ]
-  },
-  "s_b37469df": {
-    "source": "Devuelve este monto de lo ya asignado de esta fila a Disponible",
-    "files": [
-      "js/finance.js"
     ]
   },
   "s_b3a43630": {
@@ -9700,6 +9787,12 @@
       "js/finance.js"
     ]
   },
+  "s_b77b52b5": {
+    "source": "Pagado en el mes elegido",
+    "files": [
+      "js/finance.js"
+    ]
+  },
   "s_b78cf5bd": {
     "source": "Elige qué tan a fondo querés empezar de nuevo.",
     "files": [
@@ -9915,6 +10008,12 @@
       "js/game.js"
     ]
   },
+  "s_bccb74b7": {
+    "source": "Período del presupuesto",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_bceb827c": {
     "source": "Préstamo",
     "files": [
@@ -10043,22 +10142,10 @@
       "js/theme-palettes.js"
     ]
   },
-  "s_befdd00d": {
-    "source": "Asig.",
-    "files": [
-      "js/finance.js"
-    ]
-  },
   "s_bf3a3491": {
     "source": "Acerca de Historial positivo",
     "files": [
       "app.html"
-    ]
-  },
-  "s_bfc156a0": {
-    "source": "{{v17}}\n          {{v18}}",
-    "files": [
-      "js/finance.js"
     ]
   },
   "s_bfdcdb6f": {
@@ -10155,6 +10242,12 @@
       "js/reports.js"
     ]
   },
+  "s_c0fbd458": {
+    "source": "Reserva automática omitida",
+    "files": [
+      "js/finance.js"
+    ]
+  },
   "s_c10bf213": {
     "source": "D",
     "files": [
@@ -10165,12 +10258,6 @@
     "source": "y define hora de entrada/salida, break y lunch para cada día de la semana.",
     "files": [
       "app.html"
-    ]
-  },
-  "s_c1a3facb": {
-    "source": "Sin empezar",
-    "files": [
-      "js/finance.js"
     ]
   },
   "s_c1b0330d": {
@@ -10243,6 +10330,12 @@
     "source": "Reconociste algo que salió bien en tu llamada",
     "files": [
       "js/reinforcement-feedback.js"
+    ]
+  },
+  "s_c2ce2507": {
+    "source": "Resumen de pagos e historial general",
+    "files": [
+      "app.html"
     ]
   },
   "s_c2eb5dea": {
@@ -10405,10 +10498,10 @@
       "js/game.js"
     ]
   },
-  "s_c61d6ed3": {
-    "source": "Diferencia",
+  "s_c6309426": {
+    "source": "Reserva completa",
     "files": [
-      "js/finance-planning.js"
+      "js/finance.js"
     ]
   },
   "s_c630f9fd": {
@@ -10573,12 +10666,6 @@
     "source": "Temporada de 14 días",
     "files": [
       "app.html"
-    ]
-  },
-  "s_c8a836f6": {
-    "source": "Eliminar gasto",
-    "files": [
-      "js/finance.js"
     ]
   },
   "s_c8f1044e": {
@@ -10748,6 +10835,12 @@
     "source": "Bloque de Trabajo 2",
     "files": [
       "index.html"
+    ]
+  },
+  "s_cd40624f": {
+    "source": "Omitir reserva automática",
+    "files": [
+      "js/finance-planning.js"
     ]
   },
   "s_cd4ec9e7": {
@@ -10978,12 +11071,6 @@
     "source": "Ver un episodio",
     "files": [
       "js/positive-reinforcement.js"
-    ]
-  },
-  "s_d160f8b2": {
-    "source": "Tipo de gasto",
-    "files": [
-      "app.html"
     ]
   },
   "s_d17d4f4d": {
@@ -11324,12 +11411,6 @@
       "js/reinforcement-feedback.js"
     ]
   },
-  "s_d9d80e9f": {
-    "source": "Tipo",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_d9da4081": {
     "source": "Llamada eliminada",
     "files": [
@@ -11340,12 +11421,6 @@
     "source": "ráfaga rápida",
     "files": [
       "js/game-battle.js"
-    ]
-  },
-  "s_d9e72b95": {
-    "source": "Ahorr.",
-    "files": [
-      "js/finance.js"
     ]
   },
   "s_da016c4f": {
@@ -11370,12 +11445,6 @@
     "source": "Too Much",
     "files": [
       "js/game-battle.js"
-    ]
-  },
-  "s_da8495ab": {
-    "source": "Pago en {{v0}}",
-    "files": [
-      "js/finance-planning.js"
     ]
   },
   "s_da9539a6": {
@@ -11488,6 +11557,18 @@
   },
   "s_dc28c284": {
     "source": "Tus accesorios aparecerán aquí al conseguirlos.",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_dc36d04d": {
+    "source": "Reservado{{v10}}",
+    "files": [
+      "js/finance.js"
+    ]
+  },
+  "s_dc3f8cfe": {
+    "source": "Reutilización del gasto",
     "files": [
       "app.html"
     ]
@@ -11653,6 +11734,12 @@
     "source": "⚠️ {{v0}} semana(s) personalizada(s) de Horario con datos inválidos se descartaron al cargar.",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_dd865c76": {
+    "source": "Pagos del mes elegido",
+    "files": [
+      "app.html"
     ]
   },
   "s_ddb5c56a": {
@@ -11845,6 +11932,12 @@
       "app.html"
     ]
   },
+  "s_e167bc5b": {
+    "source": "Moneda",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
   "s_e171c03f": {
     "source": "El servicio se ofrece gratis y tal como está, sin garantía de disponibilidad\n    continua, de ausencia de errores ni de exactitud de los cálculos. Los números\n    que muestra (adherencia, minutos productivos, ganancias, bonos) son\n    estimaciones a partir de lo que tú registras y de la configuración que tú\n    defines.",
     "files": [
@@ -11891,6 +11984,12 @@
     "source": "Ajustar turno completo",
     "files": [
       "app.html"
+    ]
+  },
+  "s_e2442455": {
+    "source": "Dinero de tus ganancias que apartaste para este gasto o meta. Sigue reservado hasta que lo devuelvas al disponible. Reservar no significa pagar ni confirma un depósito bancario.",
+    "files": [
+      "js/finance.js"
     ]
   },
   "s_e257ba66": {
@@ -11945,6 +12044,12 @@
     "source": "Acerca de STAGE CLEAR",
     "files": [
       "app.html"
+    ]
+  },
+  "s_e393413e": {
+    "source": "Pago parcial",
+    "files": [
+      "js/finance.js"
     ]
   },
   "s_e3999b44": {
@@ -12007,6 +12112,12 @@
       "index.html"
     ]
   },
+  "s_e5501c0b": {
+    "source": "Variable: importe cambiante",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_e55b882c": {
     "source": "Reconozco lo que funcionó.",
     "files": [
@@ -12023,6 +12134,12 @@
     "source": "Aviso de Break/Lunch actualizado",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_e57e5fbe": {
+    "source": "Moneda del importe",
+    "files": [
+      "js/finance-planning.js"
     ]
   },
   "s_e5823b60": {
@@ -12234,6 +12351,12 @@
       "app.html"
     ]
   },
+  "s_ea1f7ccc": {
+    "source": "Escribe el importe que ya pagaste. Se guardará en el historial con la fecha elegida; no cambia el dinero reservado.",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
   "s_ea3d2b54": {
     "source": "Cancelar",
     "files": [
@@ -12282,12 +12405,6 @@
       "js/app-main.js"
     ]
   },
-  "s_eb76da7f": {
-    "source": "Faltan",
-    "files": [
-      "js/finance.js"
-    ]
-  },
   "s_eb8b17fb": {
     "source": "El respaldo contiene llamadas inválidas. Tus datos actuales no se cambiaron.",
     "files": [
@@ -12300,16 +12417,16 @@
       "js/game-battle.js"
     ]
   },
-  "s_eb9a5910": {
-    "source": "Cumplida",
-    "files": [
-      "js/finance.js"
-    ]
-  },
   "s_ebad7b06": {
     "source": "Ver todo",
     "files": [
       "app.html"
+    ]
+  },
+  "s_ebadf6ae": {
+    "source": "Prioridad del reparto automático: primero Gastos, luego Metas.",
+    "files": [
+      "js/finance.js"
     ]
   },
   "s_ebbc4daf": {
@@ -12413,6 +12530,12 @@
     "source": "Mi historial positivo",
     "files": [
       "app.html"
+    ]
+  },
+  "s_ed45e497": {
+    "source": "Meses usados en la estimación",
+    "files": [
+      "js/finance-planning.js"
     ]
   },
   "s_ed66015e": {
@@ -12655,6 +12778,12 @@
       "js/app-main.js"
     ]
   },
+  "s_f260b464": {
+    "source": "Reserva tus ganancias para gastos y metas; registra tus pagos por separado.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_f277843f": {
     "source": "≈ L 1,988",
     "files": [
@@ -12753,12 +12882,6 @@
     "source": "En corto: la app es gratuita, es una herramienta de registro personal y no\n      sustituye al sistema oficial de tu empleador o plataforma. Úsala para\n      organizarte; para cobrar, manda siempre lo que diga la fuente oficial.",
     "files": [
       "terminos.html"
-    ]
-  },
-  "s_f46e9bf8": {
-    "source": "Lo que te queda de tu Disponible después de cubrir esta fila y todas las de más prioridad arriba (↑/↓) — no es lo que falta pagar de este gasto.",
-    "files": [
-      "js/finance.js"
     ]
   },
   "s_f47bcdc4": {
@@ -12937,8 +13060,8 @@
       "js/finance.js"
     ]
   },
-  "s_f66ede51": {
-    "source": "Ahorrado",
+  "s_f67ab282": {
+    "source": "Devuelve toda la reserva de este gasto al Disponible. Conserva el presupuesto, los pagos registrados y la exclusión del reparto automático.",
     "files": [
       "js/finance.js"
     ]
@@ -12977,12 +13100,6 @@
     "source": "(min de descanso ganados). Déjalos vacíos y guarda para volver a los mensajes de siempre.",
     "files": [
       "app.html"
-    ]
-  },
-  "s_f7701f31": {
-    "source": "{{v6}} de {{v7}}{{v8}}",
-    "files": [
-      "js/finance.js"
     ]
   },
   "s_f7934017": {
@@ -13149,6 +13266,12 @@
       "app.html"
     ]
   },
+  "s_fb35f340": {
+    "source": "Progreso de la reserva",
+    "files": [
+      "js/finance.js"
+    ]
+  },
   "s_fb792567": {
     "source": "Llamada completada",
     "files": [
@@ -13167,12 +13290,6 @@
       "app.html"
     ]
   },
-  "s_fbf8fcdc": {
-    "source": "{{v2}} Reiniciar mes",
-    "files": [
-      "js/finance.js"
-    ]
-  },
   "s_fc107c60": {
     "source": "Hoy es tu día libre",
     "files": [
@@ -13189,6 +13306,12 @@
     "source": "Registra gastos y metas de ahorro, y los llena en el orden de prioridad que tú definas con lo que vas ganando.",
     "files": [
       "app.html"
+    ]
+  },
+  "s_fc6b3f68": {
+    "source": "Elige Restar para devolver el monto escrito: baja el Reservado y sube el Disponible. Después pulsa Aplicar ajuste. No elimina pagos ni reduce tus ganancias.",
+    "files": [
+      "js/finance.js"
     ]
   },
   "s_fc874811": {
@@ -13269,12 +13392,6 @@
     "source": "próxima",
     "files": [
       "js/higher-rate.js"
-    ]
-  },
-  "s_fdf3e8d5": {
-    "source": "En progreso",
-    "files": [
-      "js/finance.js"
     ]
   },
   "s_fdfb1cba": {

@@ -8920,7 +8920,7 @@
       <div class="fin-header-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12V8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h13a1 1 0 0 0 1-1v-4"/><path d="M20 12a2 2 0 0 1 0 4h-3a2 2 0 0 1 0-4Z"/></svg></div>
       <div>
         <div class="fin-title">Finanzas</div>
-        <div class="fin-sub">Gastos y metas que se llenan solos con cada llamada.</div>
+        <div class="fin-sub">Reserva tus ganancias para gastos y metas; registra tus pagos por separado.</div>
       </div>
     </div>
     <div class="fin-date-pill">Asignación por prioridad</div>
@@ -8931,7 +8931,7 @@
       <div class="fin-available-label">Disponible para asignar</div>
       <div class="fin-available-amt" id="financeAvailableAmt">$0.00</div>
       <div class="fin-available-converted" id="financeAvailableConverted"></div>
-      <div class="fin-available-note">Se reparte en el orden de prioridad de cada fila (↑/↓).</div>
+      <div class="fin-available-note">Ganancias de llamadas aún sin reservar. El orden ↑/↓ decide la prioridad.</div>
     </div>
     <div class="fin-available-stat">
       <div class="fin-available-stat-label">Siguiente prioridad</div>
@@ -8942,7 +8942,7 @@
   <label class="sched-checkbox-row" style="margin-bottom:4px;">
     <input id="financeAutoFillInput" type="checkbox"/> Asignar disponible automáticamente
   </label>
-  <p class="sched-hint" style="margin:0 0 16px;">Reparte tu Disponible solo, en orden de prioridad — Gastos primero, luego Metas. Puedes seguir ajustando cualquier fila a mano con el pill +/-.</p>
+  <p class="sched-hint" style="margin:0 0 16px;">Reserva el disponible en orden de prioridad: Gastos primero, luego Metas. Puedes ajustar cada reserva con Sumar o Restar.</p>
 
   <details class="fin-plan" id="financePlanDetails">
     <summary><strong>Planificar presupuesto</strong><span id="financePlanSummary"></span><span aria-hidden="true">⌄</span></summary>
@@ -8967,9 +8967,6 @@
       <p class="sched-hint" id="financePlanSplitTotal" aria-live="polite"></p>
       <p class="fin-plan-error" id="financePlanError" role="alert" hidden></p>
       <p class="fin-plan-status" id="financePlanSaveStatus" role="status" aria-live="polite"></p>
-      <div class="fin-plan-month-head"><strong>Presupuesto y pagos</strong><label class="fin-plan-field" for="financeMonthInput">Mes<input id="financeMonthInput" type="month"/></label></div>
-      <div class="fin-plan-metrics" id="financeMonthTotals" aria-live="polite"></div>
-      <details class="fin-payment-history-all"><summary>Pagos registrados</summary><div id="financePaymentHistory"></div></details>
     </div>
   </details>
 
@@ -8981,8 +8978,10 @@
   <div id="financeGastosView">
     <div class="fin-info-box fin-info-box-compact">
       <svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-      <span>Gastos puntuales: puedes marcar «Pagado» en cada fila. Cuando un gasto está cubierto o marcado como pagado, aparece «Reiniciar mes» para liberar su asignación. El reinicio es manual; no ocurre al cambiar de mes. El orden ↑/↓ decide cuánto le toca a cada uno.</span>
+      <span>Presupuesto = importe previsto. Reservado = ganancias apartadas. Pagado = pagos registrados con fecha.</span>
     </div>
+    <div class="fin-plan-month-head fin-expense-month"><strong>Pagos del mes elegido</strong><label class="fin-plan-field" for="financeMonthInput">Mes de los pagos<input id="financeMonthInput" type="month"/></label></div>
+    <details class="fin-payment-history-all fin-month-history"><summary>Resumen de pagos e historial general</summary><div class="fin-plan-metrics" id="financeMonthTotals" aria-live="polite"></div><p class="sched-hint">Se comparan los presupuestos actuales con los pagos del mes elegido. Los importes de distintos períodos se suman sin convertirlos a un presupuesto mensual.</p><div id="financePaymentHistory"></div></details>
     <div id="financeGastosTotalRow"></div>
     <div class="fin-list" id="financeGastosList"></div>
     <button class="sched-add-block-btn" id="addFinanceGastoBtn" type="button">+ Agregar gasto</button>
@@ -8991,7 +8990,7 @@
   <div id="financeMetasView" style="display:none;">
     <div class="fin-info-box">
       <svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-      <span>Lo que asignás a una meta se acumula y no se reinicia solo cada mes. Vos decidís cuándo la das por cumplida.</span>
+      <span>Reservado para la meta = ganancias apartadas dentro de la app. Se acumula entre meses; no confirma depósitos en una cuenta de ahorro.</span>
     </div>
     <div id="financeMetasTotalRow"></div>
     <div class="fin-list" id="financeMetasList"></div>
@@ -10070,15 +10069,21 @@ $0.72"></textarea>
 </div>
 </div>
 <div class="goals-field" id="financeRowTypeField">
-<label for="financeRowTypeInput">Tipo</label>
+<label for="financeRowTypeInput">Reutilización del gasto</label>
 <select id="financeRowTypeInput">
 <option value="recurring">Recurrente</option>
 <option value="onetime">Puntual</option>
 </select>
+<p class="sched-hint">Recurrente permite volver a reservar este gasto. Las reservas se liberan manualmente; no se reinician con el calendario.</p>
+</div>
+<div class="goals-field" id="financeRowBudgetPeriodField">
+<label for="financeRowBudgetPeriodInput">Período del presupuesto</label>
+<select id="financeRowBudgetPeriodInput"><option value="unspecified">Sin definir</option><option value="weekly">Por semana</option><option value="fortnightly">Por 2 semanas</option><option value="monthly">Por mes</option><option value="onetime">Una sola vez</option></select>
+<p class="sched-hint">Indica a qué período corresponde el importe. No multiplica el presupuesto ni programa reservas automáticas.</p>
 </div>
 <div class="goals-field" id="financeRowExpenseTypeField">
-<label for="financeRowExpenseTypeInput">Tipo de gasto</label>
-<select id="financeRowExpenseTypeInput"><option value="fixed">Fijo</option><option value="variable">Variable</option></select>
+<label for="financeRowExpenseTypeInput">Comportamiento del importe</label>
+<select id="financeRowExpenseTypeInput"><option value="fixed">Fijo: importe estable</option><option value="variable">Variable: importe cambiante</option></select>
 </div>
 <div class="goals-field">
 <label for="financeRowTargetInput">Monto objetivo ($)</label>

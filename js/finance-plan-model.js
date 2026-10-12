@@ -52,6 +52,23 @@ export function financeMonthTotals(rows, records, month) {
   return { budget, paid, difference: budget - paid, fixed, variable: paid - fixed };
 }
 
+export function financeExpenseStatus(row, records, month) {
+  const budget = Math.max(0, Number(row.targetAmount) || 0);
+  const paid = financePaymentRows(records, month, row.id).reduce((sum, payment) => sum + payment.usd, 0);
+  const difference = budget - paid;
+  return {
+    paid,
+    remaining: difference > 0.004 ? difference : 0,
+    excess: difference < -0.004 ? -difference : 0,
+    percentPaid: budget > 0 ? paid / budget * 100 : null,
+    paymentStatus: paid <= 0 ? 'none' : difference > 0.004 ? 'partial' : 'paid',
+  };
+}
+
+export function financeBudgetPeriod(row) {
+  return ['weekly', 'fortnightly', 'monthly', 'onetime'].includes(row.budgetPeriod) ? row.budgetPeriod : 'unspecified';
+}
+
 export function financeSavingsMonthly(row) {
   const months = Number(row.savingsMonths);
   if (!Number.isInteger(months) || months < 1 || months > 120) return { months: null, monthly: null };
