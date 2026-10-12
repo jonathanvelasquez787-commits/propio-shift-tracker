@@ -8,7 +8,7 @@ import { ui, translateText, translateMarkup, displayLocale, setLanguage, transla
 // correctos: la app nunca llega a montarse con datos de nadie más ni con datos viejos.
 
 import { getSupabase, isConfigured } from './supabase-client.js';
-import { getProfile, signOut } from './auth.js';
+import { getProfile, signOut, setAppEntryHint } from './auth.js';
 import { installPropioBridge } from './propio-bridge.js';
 import { SUPABASE_URL } from './config.js';
 import {
@@ -51,15 +51,16 @@ function setBootMessage(text) {
 }
 
 function normalizeAppAddress() {
-  // Keep the private app URL so reloads request its shell, without flashing the landing.
+  // Returning visits to / load the same verified shell through the routing hint.
+  setAppEntryHint(true);
   try {
     sessionStorage.removeItem('ps_auto_enter_at');
   } catch {
     /* opening the app also works when session storage is unavailable */
   }
   const address = new URL(window.location.href);
-  if (address.pathname !== '/app.html') return;
-  address.pathname = '/app';
+  if (address.pathname !== '/app' && address.pathname !== '/app.html') return;
+  address.pathname = '/';
   window.history.replaceState(window.history.state, '', address.href);
 }
 
@@ -610,6 +611,7 @@ async function boot() {
 
   if (!session) {
     if (offlineOwner && navigator.onLine === false) { await mountOfflineApp(offlineOwner); return; }
+    setAppEntryHint(false);
     window.location.replace('/?next=/app');
     return;
   }
@@ -622,6 +624,7 @@ async function boot() {
     if (bridgeUserId !== session.user.id) {
       setAccessToken(null, null);
       stopPropioBridge();
+      setAppEntryHint(false);
       window.location.replace('/');
       return;
     }

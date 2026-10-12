@@ -123,7 +123,8 @@ for (const name of ['index.html', 'app.html', 'privacidad.html', 'terminos.html'
     await writeFile(path.join(out, 'es.html'), createLocalizedLanding(html, 'es'));
     html = createLocalizedLanding(html, 'en');
   }
-  await writeFile(path.join(out, name), html);
+  // A physical root index takes precedence over Vercel's conditional rewrite.
+  await writeFile(path.join(out, name === 'index.html' ? 'landing.html' : name), html);
 }
 
 for (const language of ['en', 'es']) {

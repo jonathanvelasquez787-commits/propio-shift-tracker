@@ -49,7 +49,7 @@ test('all pages load local external scripts without inline handlers', () => {
 });
 
 test('enforced CSP contains the required Supabase and asset origins', () => {
-  const headers = JSON.parse(read('vercel.json')).headers[0].headers;
+  const headers = JSON.parse(read('vercel.json')).headers.find(rule => rule.source === '/(.*)').headers;
   assert.ok(!headers.some(h => h.key === 'Content-Security-Policy-Report-Only'));
   const policy = headers.find(h => h.key === 'Content-Security-Policy').value;
   const directives = Object.fromEntries(policy.split(';').map(part => {
@@ -181,31 +181,52 @@ test('clean app route preserves legacy links and login navigation', () => {
   assert.match(read('js/boot.js'), /window\.location\.replace\('\/\?next=\/app'\)/);
 });
 
-test('verified app sessions keep the private shell URL on reload without losing URL state', () => {
+test('verified app sessions display the root URL with a non-secret reload hint and preserve URL state', () => {
   const source = read('js/boot.js');
   const normalize = source.match(/^function normalizeAppAddress\(\) \{[\s\S]*?^\}/m)?.[0];
   assert.ok(normalize);
   for (const path of ['/app', '/app.html', '/app?from=bookmark#main']) {
     const state = { position: 3 };
-    let replaced, cleared;
+    let replaced, cleared, entryHint;
     vm.runInNewContext(`${normalize}\nnormalizeAppAddress()`, {
       sessionStorage: { removeItem(key) { cleared = key; } },
+      setAppEntryHint(enabled) { entryHint = enabled; },
       URL, window: { location: { href: 'https://app.example' + path },
         history: { state, replaceState(nextState, title, url) { replaced = { nextState, title, url }; } } },
     });
-    if (path === '/app.html') assert.equal(replaced.nextState, state);
-    else assert.equal(replaced, undefined);
+    assert.equal(replaced.nextState, state);
+    assert.equal(entryHint, true);
     assert.equal(cleared, 'ps_auto_enter_at');
     const expected = new URL('https://app.example' + path);
-    expected.pathname = '/app';
-    assert.equal(replaced?.url || 'https://app.example' + path, expected.href);
+    expected.pathname = '/';
+    assert.equal(replaced.url, expected.href);
   }
   vm.runInNewContext(`${normalize}\nnormalizeAppAddress()`, {
-    URL, window: { location: { href: 'https://app.example/?recuperar=1' },
+    setAppEntryHint() {}, URL, window: { location: { href: 'https://app.example/?recuperar=1' },
       history: { replaceState() { assert.fail('Only the loaded app entry route should be normalized'); } } },
   });
   const boot = source.slice(source.indexOf('async function boot()'));
   assert.ok(boot.indexOf('normalizeAppAddress();') > boot.indexOf('if (!(await mountApp())) return;'));
+});
+
+test('returning root visits choose the gated shell while explicit public views remain reachable', () => {
+  const routing = JSON.parse(read('vercel.json'));
+  const root = routing.rewrites.find(route => route.source === '/');
+  assert.equal(root.destination, '/app.html');
+  assert.deepEqual(root.has, [{ type: 'cookie', key: 'ps_app_entry', value: '1' }]);
+  assert.deepEqual(root.missing, [{type:'query',key:'quedarse'}, {type:'query',key:'recuperar'}]);
+  const publicRoot = routing.rewrites.find(route => route.source === '/' && !route.has);
+  assert.equal(publicRoot.destination, '/landing.html');
+  assert.ok(routing.rewrites.indexOf(root) < routing.rewrites.indexOf(publicRoot));
+  const headers = routing.headers.find(route => route.source === '/');
+  assert.deepEqual(headers.has, root.has);
+  assert.match(headers.headers.find(header => header.key === 'Cache-Control').value, /no-store/);
+  const helper = read('js/auth.js').match(/export function setAppEntryHint\(enabled\) \{[\s\S]*?^\}/m)[0].replace('export ', '');
+  const document = {};
+  vm.runInNewContext(helper + '\nsetAppEntryHint(true)', {document});
+  assert.equal(document.cookie, 'ps_app_entry=1; Path=/; Max-Age=31536000; SameSite=Lax; Secure');
+  vm.runInNewContext(helper + '\nsetAppEntryHint(false)', {document});
+  assert.equal(document.cookie, 'ps_app_entry=; Path=/; Max-Age=0; SameSite=Lax; Secure');
 });
 
 test('PWA launches the clean route offline and redirects legacy navigations', async () => {

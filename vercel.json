@@ -6,6 +6,14 @@
   "crons": [{ "path": "/api/operations", "schedule": "27 5 * * *" }],
   "headers": [
     {
+      "source": "/",
+      "has": [{ "type": "cookie", "key": "ps_app_entry", "value": "1" }],
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, must-revalidate" },
+        { "key": "X-Robots-Tag", "value": "noindex" }
+      ]
+    },
+    {
       "source": "/(.*)",
       "headers": [
         {
@@ -87,6 +95,16 @@
     { "source": "/es.html", "destination": "/es", "permanent": true }
   ],
   "rewrites": [
+    {
+      "source": "/",
+      "has": [{ "type": "cookie", "key": "ps_app_entry", "value": "1" }],
+      "missing": [
+        { "type": "query", "key": "quedarse" },
+        { "type": "query", "key": "recuperar" }
+      ],
+      "destination": "/app.html"
+    },
+    { "source": "/", "destination": "/landing.html" },
     { "source": "/guides/interpreter-shifts", "destination": "/guides/interpreter-shifts.html" },
     { "source": "/es/guias/turnos-de-interprete", "destination": "/es/guias/turnos-de-interprete.html" },
     { "source": "/es", "destination": "/es.html" },

@@ -15,11 +15,11 @@ const bootBody = bootSource.slice(bootSource.indexOf('async function boot()'), b
 const oldBase = '2026-10-08T10:00:00Z', observedBase = '2026-10-08T10:01:00Z', laterBase = '2026-10-08T10:02:00Z';
 const noop = () => {};
 
-function harness({ divergent = false, empty = false, absent = false, choice = 'local', race = false, readError = null, sessionError = null, cachedOwner = null, owner = 'audit', online } = {}) {
+function harness({ divergent = false, empty = false, absent = false, choice = 'local', race = false, readError = null, sessionError = null, signedOut = false, cachedOwner = null, owner = 'audit', online } = {}) {
   const values = new Map(), requests = [];
   let cloud = absent ? null : { state: empty ? {} : { remote: true }, settings: {}, calls: empty ? [] : [{ id: 'remote' }], updated_at: divergent ? observedBase : oldBase };
   const storage = { getItem: k => values.get(k) ?? null, setItem: (k, v) => values.set(k, v), removeItem: k => values.delete(k) };
-  const backend = { auth: { getSession: async () => ({ data: { session: { user: { id: 'audit', email: 'audit@example.invalid' }, access_token: 'synthetic' } }, error: sessionError }), onAuthStateChange: noop },
+  const backend = { auth: { getSession: async () => ({ data: { session: signedOut ? null : { user: { id: 'audit', email: 'audit@example.invalid' }, access_token: 'synthetic' } }, error: sessionError }), onAuthStateChange: noop },
     from: table => ({ select: () => ({ eq: () => {
       if (table !== 'calls') return { maybeSingle: async () => ({ data: readError ? null : cloud, error: readError }) };
       const query = { order: () => query, range: async (from, to) => ({ data: (cloud?.calls || []).slice(from, to + 1).map(payload => ({ payload })), count: cloud?.calls.length || 0, error: null }) };
@@ -38,12 +38,13 @@ function harness({ divergent = false, empty = false, absent = false, choice = 'l
     LANGUAGE_PREFERENCE_KEY, PENDING_LOGIN_LANGUAGE_KEY, normalizeLanguage, readLanguagePreference, saveLanguagePreference, readPendingLoginLanguage, clearPendingLoginLanguage,
     Date, Math, JSON, Map, Set, Promise, Error, navigator: { userAgent: 'Audit', platform: 'Audit', onLine: online },
     DATA_SCHEMA_VERSION: 2, SUPABASE_URL: 'https://audit.invalid', SUPABASE_ANON_KEY: 'audit',
-    window: { localStorage: storage, sessionStorage: storage, location: { replace: noop, reload: noop } },
+    window: { localStorage: storage, sessionStorage: storage, location: { replace: url => { context.redirected = url; }, reload: noop } },
     setTimeout: () => 1, clearTimeout: noop, getSupabase: () => backend,
     crypto: webcrypto, TextEncoder, isConfigured: () => true, setBootMessage: noop, fail: message => { throw new Error(message); },
     askConflict: async () => choice, setLanguage: () => false,
     mountApp: async () => { if (race) cloud = { state: { newer: true }, settings: {}, calls: [{ id: 'newer' }], updated_at: laterBase }; return true; },
     installPropioBridge: () => noop, normalizeAppAddress: noop, wireSyncStatus: noop, setSyncStatus: noop,
+    setAppEntryHint: enabled => { context.entryHint = enabled; },
     getProfile: async () => ({}), injectAccountPanel: noop, injectDeleteAccount: noop, injectCycleProjection: noop,
     injectRecoveryCopies: noop, readOfflineOwner: () => cachedOwner, watchProductionHealth: noop,
     mountOfflineApp: async user => { context.offlineMounted = user.id; },
@@ -56,6 +57,15 @@ function harness({ divergent = false, empty = false, absent = false, choice = 'l
   vm.runInContext(`writeMeta({userId:${JSON.stringify(owner)}});`, context);
   return { requests, run: code => vm.runInContext(code, context), boot: () => vm.runInContext(bootBody + '\nboot()', context), cloud: () => cloud };
 }
+
+test('routing hint without a session returns to public login before mounting account data', async () => {
+  const h = harness({ signedOut: true });
+  await h.boot();
+  assert.equal(h.run('redirected'), '/?next=/app');
+  assert.equal(h.run('entryHint'), false);
+  assert.equal(h.requests.length, 0);
+  assert.equal(h.run('readLocalSnapshot().state.local'), true);
+});
 
 test('expired-session refresh network failure mounts only the cached local owner without an upload', async () => {
   const h = harness({ sessionError: { name:'AuthRetryableFetchError',message:'network unavailable' }, cachedOwner:{id:'audit'},online:true });
