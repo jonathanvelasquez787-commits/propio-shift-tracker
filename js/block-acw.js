@@ -12,11 +12,14 @@ export function acwMinutesForBlock(gaps, windowStart, windowEnd, actualPauses, o
     const start = Math.max(blockStart, gapStart);
     const end = Math.min(blockEnd, gapEnd);
     if (end <= start) return total;
-    const startDate = new Date(start);
-    const endDate = new Date(end);
-    const paused = typeof overlapMinutesWithIntervals === 'function'
-      ? overlapMinutesWithIntervals(startDate, endDate, actualPauses)
-      : 0;
-    return total + Math.max(0, (end - start) / 60000 - paused);
+    const intervals = Array.isArray(gap.connectedIntervals) ? gap.connectedIntervals : [{ start, end }];
+    return total + intervals.reduce((minutes, interval) => {
+      const from = Math.max(start, new Date(interval.start).getTime());
+      const to = Math.min(end, new Date(interval.end).getTime());
+      if (!Number.isFinite(from) || !Number.isFinite(to) || to <= from) return minutes;
+      const paused = typeof overlapMinutesWithIntervals === 'function'
+        ? overlapMinutesWithIntervals(new Date(from), new Date(to), actualPauses) : 0;
+      return minutes + Math.max(0, (to - from) / 60000 - paused);
+    }, 0);
   }, 0);
 }

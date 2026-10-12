@@ -5,7 +5,7 @@ import { setLanguage } from '../js/i18n.js';
 import { configureFinanceContext, financeResetRow, financeRunAutoFillCascade } from '../js/finance.js';
 import { configureSettingsContext, applyGoalValues } from '../js/settings.js';
 import { financePlanProjection, financeMonthTotals, financePaymentRows, validFinanceDate, financeSavingsMonthly } from '../js/finance-plan-model.js';
-import { addFinancePayment, deleteFinancePayment, saveFinancePlan, saveFinanceSavingsMonths, financePlanningRowHtml } from '../js/finance-planning.js';
+import { addFinancePayment, deleteFinancePayment, saveFinancePlan, saveFinanceSavingsMonths, financePlanningRowHtml, renderFinancePlanning } from '../js/finance-planning.js';
 
 function harness(t) {
   setLanguage('es');
@@ -57,6 +57,22 @@ test('failed plan persistence rolls back the goal, settings, today exception and
 test('invalid distribution cannot save goals or assignments',t=>{
   const h=harness(t),before=JSON.stringify(settings);h.input('financePlanSavingsInput').value='20';
   assert.equal(saveFinancePlan(),false);assert.equal(JSON.stringify(settings),before);assert.equal(h.saves(),0);
+});
+
+test('saving a distribution without editing hours preserves an existing fractional-minute goal exactly', t => {
+  const h = harness(t);
+  settings.productiveGoalMin = 250.7;
+  settings.earningsGoal = 30.084;
+  state.productiveGoalMin = 250.7;
+  renderFinancePlanning();
+  h.input('financePlanFixedInput').value = '60';
+  h.input('financePlanVariableInput').value = '25';
+  h.input('financePlanSavingsInput').value = '15';
+  assert.equal(saveFinancePlan(), true);
+  assert.equal(settings.productiveGoalMin, 250.7);
+  assert.ok(Math.abs(settings.earningsGoal - 30.084) < 1e-12);
+  h.reload();
+  assert.equal(settings.productiveGoalMin, 250.7);
 });
 
 test('blank plan fields are rejected while an explicit zero-hour goal is valid',t=>{

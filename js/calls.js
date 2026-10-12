@@ -111,6 +111,11 @@ export function openCallEditor(callId) {
   openModal('callEditModal');
 }
 
+function readNumericCallPay(value, fallback = 0) {
+  const amount = Number(String(value ?? '').trim() || fallback);
+  return Number.isFinite(amount) && amount <= 1e9 ? Math.max(0, amount) : null;
+}
+
 export function saveCallEditor() {
   if (!editingCallId) return;
   const durationInput = document.getElementById('callEditDurationInput');
@@ -123,9 +128,13 @@ export function saveCallEditor() {
     toast(ui`La duración debe ser un número entre 0 y ${MAX_CALL_DURATION_MIN} minutos`);
     return;
   }
-  // ParseMoney preserva el signo '-' a propósito (para poder leer valores ya negativos de datos
-  // viejos/importados), así que un valor negativo tecleado a mano se guardaba tal cual.
-  const pay = Math.max(0, parseMoney(payInput?.value)).toFixed(2);
+  // Los campos numéricos del editor no usan el parser de las exportaciones importadas.
+  const amount = readNumericCallPay(payInput?.value);
+  if (payInput?.validity?.badInput || amount === null) {
+    toast(translateText('El pago debe ser un número válido de hasta 1000000000 dólares.'));
+    return false;
+  }
+  const pay = amount.toFixed(2);
   const billable = billableInput?.value === 'Yes' ? translateText('Yes') : translateText('No');
   const dropped = droppedInput?.value === 'Yes' ? translateText('Yes') : translateText('No');
 
@@ -496,7 +505,12 @@ export function saveManualCall() {
   }
   const billable = billableInput?.value === 'Yes' ? translateText('Yes') : translateText('No');
   const dropped = droppedInput?.value === 'Yes' ? translateText('Yes') : translateText('No');
-  const pay = Math.max(0, parseMoney(payInput?.value || manualCallEstimatedPay(duration))).toFixed(2);
+  const amount = readNumericCallPay(payInput?.value, manualCallEstimatedPay(duration));
+  if (payInput?.validity?.badInput || amount === null) {
+    toast(translateText('El pago debe ser un número válido de hasta 1000000000 dólares.'));
+    return false;
+  }
+  const pay = amount.toFixed(2);
   const customerId = customerIdInput?.value || '';
 
   const pendingBackup = manualCallLiveBackupPending ? state.pendingLiveCallBackup : null;

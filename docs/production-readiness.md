@@ -19,7 +19,7 @@ por decisión del propietario. No exige comprar un dominio ni activar correo.
   backup externo. La cuenta conserva su contenido después de publicar.
 
 [production-criteria.json](production-criteria.json) relaciona 17 áreas con
-criterios concretos, 56 módulos de navegador/API/librerías y 51 suites con
+criterios concretos, 58 módulos de navegador/API/librerías y 53 suites con
 nombres de regresiones reales. El build rechaza módulos o suites sin asignar y
 referencias a pruebas retiradas. Este control comprueba la trazabilidad: no
 sustituye las pruebas ni acredita todas las combinaciones de la interfaz.
@@ -62,6 +62,13 @@ del reinicio, cero llamadas en servidor y bienvenida con cero llamadas después
 de recargar. No se ejecutó el borrado de la cuenta del propietario.
 
 ## Evidencia previa que sigue vigente
+
+La [auditoría integral del 12 de octubre](auditoria-profunda-2026-10-12.md)
+corrige seis grupos de fallos en metas, pagos, respaldos y contabilidad de
+pausas/ACW. Pasa 530 pruebas, dos recorridos cronológicos de 31 días y 17.000
+casos independientes; 2.181 textos ES/EN, build de app y ambas extensiones.
+Incluye pruebas de interfaz con cuenta ficticia y backend local. Publicación,
+CI y actualización autorizada de PostgreSQL se acreditan por separado.
 
 La siguiente auditoría de controles pasó 500 pruebas y añadió recorridos
 con cuenta ficticia y recuperación JSON; ver

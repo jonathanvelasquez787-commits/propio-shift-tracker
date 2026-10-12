@@ -92,14 +92,14 @@ export function financePlanningRowHtml(row, isMeta) {
 function projectionFromInputs() {
   if (['financePlanHoursInput', 'financePlanDaysInput', 'financePlanFixedInput', 'financePlanVariableInput', 'financePlanSavingsInput'].some(id => !String(el(id).value).trim())) return null;
   return financePlanProjection(Number(el('financePlanHoursInput').value), Number(el('financePlanDaysInput').value), Number(settings.rate),
-    ['financePlanFixedInput', 'financePlanVariableInput', 'financePlanSavingsInput'].map(id => Number(el(id).value)));
+    ['financePlanFixedInput', 'financePlanVariableInput', 'financePlanSavingsInput'].map(id => Number(el(id).value)), Number(settings.productiveGoalMin));
 }
 
 export function updateFinancePlanPreview() {
   const split = ['financePlanFixedInput', 'financePlanVariableInput', 'financePlanSavingsInput'].map(id => Number(el(id).value));
   const total = split.reduce((sum, number) => sum + number, 0);
   const projection = projectionFromInputs();
-  const minutes = Number(el('financePlanHoursInput').value) * 60;
+  const minutes = projection?.minutes ?? Number(el('financePlanHoursInput').value) * 60;
   el('financePlanSummary').textContent = ui`${Number.isFinite(minutes) ? minutes : '—'} min · meta diaria`;
   el('financePlanDailyValue').textContent = Number.isFinite(minutes) && minutes >= 0 && minutes <= 1440 ? ui`${minutes} min` : '—';
   el('financePlanProjectedValue').innerHTML = projection ? `${ctx.money(projection.projected)}${ctx.convertedNote(projection.projected)}` : '—';
