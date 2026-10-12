@@ -317,6 +317,20 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
+Finanzas: propuesta aprobada el 11/10/2026, conservando Gastos/Metas,
+prioridades, asignación automática y controles existentes. La planificación
+vincula horas productivas con la meta global y la de hoy; mantiene la historia
+de los demás días y los bloques de horario. Reparto 50/30/20 editable y validado.
+Pagos manuales fechados en USD dentro de settings.financePayments; no se
+infieren pagos antiguos a partir de asignaciones o del checkbox Pagado.
+Reiniciar mes o eliminar una fila no borra esos pagos; el historial mensual
+permite corregirlos. Presupuesto actual usa los objetivos actuales de gastos;
+no se presenta como una copia histórica del presupuesto de cada mes.
+Moneda secundaria y conversión provienen únicamente de Ajustes. Plazos de
+ahorro opcionales y vacíos hasta elegir uno, sin cambiar lo ahorrado. Verificación: 516 tests, 2.179
+textos ES/EN, 52 suites/58 módulos en la matriz. La publicación se verifica
+por CI y SHA separado antes de anunciarla.
+
 Corrección de espacio en Logros: las preferencias y el reinicio son secciones
 de ancho completo antes de la cuadrícula de progreso. Evita una columna vacía
 al desplegar Refuerzo positivo/Mis premios. Recorrido local claro de escritorio
@@ -755,6 +769,22 @@ La aplicación funciona en producción con estas bases vigentes:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**11/10/2026 — Finanzas: planificación y pagos sobre el sistema existente.**
+
+- Sección desplegable aprobada: horas, proyección de cuatro semanas, meta
+  global/hoy, reparto personalizable y explicación accesible. Guardado de
+  meta y planificación en una instantánea; rechazo conserva estado anterior.
+- Ledger de pagos separado de asignaciones, con fecha, clasificación,
+  presupuesto frente a pagos, diferencia y porcentaje del gasto real.
+  USD canónico y entrada/conversión de moneda local usando Ajustes.
+- Plazo de metas opcional y aporte mensual orientativo; filas anteriores,
+  prioridades, ahorro y cascada mantienen su modelo. No se importan datos
+  del Excel ni se inventa historial de pagos.
+- Trece regresiones nuevas; tooltip fuera de la tarjeta para evitar el
+  recorte de su contexto de backdrop-filter. Los borradores de pagos se
+  conservan al repintar la sección. Fuente, guardas y build correctos;
+  el release publicado se acredita por separado.
+
 **v601** — Guía pública para intérpretes y enlaces de contenido.
 
 - Artículo útil ES/EN: horario, llamadas, pausas, ganancias, adherencia,
@@ -800,19 +830,3 @@ La aplicación funciona en producción con estas bases vigentes:
   Publicación/CI/deploy se verifican por SHA separado. No se certifican
   OAuth/cron alojados, concurrencia SQL real ni
   dispositivos físicos. Ver `docs/auditoria-super-profunda-2026-10-09.md`.
-
-**v599** — Gamificación compacta y cofre de la meta diaria.
-
-- Una composición responsive en ambos modos: héroe y monstruo, una barra
-  financiera real, estado breve y Logros opcionales. Misiones/hitos se consultan
-  en Logros completos; nivel y XP conservan sus datos fuera del encabezado.
-- Ataques por llamadas guardadas, crítico Higher Rate y especial automático
-  cada tres llamadas representadas, incluidos lotes. Pausa, modo tranquilo,
-  sonido, diez armas, movimiento reducido y duelo opcional se conservan.
-- Cofre inmediato sin modal: visor inicial o cosmético elegible/25 XP; recibo
-  único diario persistido, sin segundo premio al cerrar/continuar. Correcciones
-  y cambios de meta revocan accesorios/equipo o XP para impedir premios inválidos.
-  Los cofres heredados y el dinero de las llamadas conservan sus reglas.
-- Verificación final: 340 pruebas y builds de app y extensiones correctos.
-  Navegador local: llamadas manuales/live, especial, cofre, equipo y recarga;
-  tarjeta sin desbordamiento a 320/390 px, modos claro/oscuro y español/inglés.

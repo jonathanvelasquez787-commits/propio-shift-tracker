@@ -1,6 +1,7 @@
 import { ui, translateText, translateMarkup, displayLocale, translateDocument } from './i18n.js';
 import { applyAppearance, wireAppearance } from './appearance.js';
 import { wireAchievementHelp } from './help-tooltips.js';
+import { wireFinancePlanning } from './finance-planning.js';
 import { normalizeBattleWeapon } from './game-battle.js';
 import { createPropioReceiver, createStorageRevisionGuard, ignorePropioCall } from './propio-bridge.js';
 import { settingsWithinBudget, reportLocalPersistenceFailure } from './sync.js';
@@ -135,6 +136,7 @@ import {
 
 import {
   applyPendingGoalChange,
+  applyGoalValues,
   cancelPendingGoalChange,
   clearActiveDayGoalOverride,
   finishOnboarding,
@@ -5245,6 +5247,7 @@ function renderPayDatesSection() {
       money, convertedAmountText, iconHtml, escapeHtml, toast, appConfirm, openModal, closeModal,
       saveSettingsOnly, makeLocalId, parseMoney, usdCeilFromCurrencyAmount, higherRateBonusForCalls,
       renderEmojiPicker, render,
+      applyGoalValues, todayCallDateKey, saveAll,
     });
     configureReportsContext({
       CYCLE_LENGTH_DAYS, RATE, callDateToDate, callsForDay, connectedMinutesForDay, convertedAmountText,
@@ -7534,6 +7537,7 @@ export function render() {
       financeToggleManualPaid(checkbox.getAttribute('data-fin-cat'), checkbox.getAttribute('data-fin-mark-paid'), checkbox.checked);
     });
     document.getElementById('financeAutoFillInput').addEventListener('change', (e) => updateFinanceAutoFillSetting(e.target.checked));
+    wireFinancePlanning();
     document.getElementById('saveDayNoteBtn').addEventListener('click', saveDayNoteFromModal);
     document.getElementById('clearDayNoteBtn').addEventListener('click', clearDayNoteFromModal);
     document.getElementById('saveCallEditBtn').addEventListener('click', saveCallEditor);

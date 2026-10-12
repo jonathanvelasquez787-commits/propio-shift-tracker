@@ -9,7 +9,7 @@ test('expense and savings category IDs remain valid while the form labels change
   const category={value:''},name={value:''},fields={financeRowCategoryInput:category,financeRowNameInput:name};
   for(const language of ['es','en']){
     setLanguage(language);
-    const context=vm.createContext({ui,translateText,translateMarkup,displayLocale,
+    const context=vm.createContext({ui,translateText,translateMarkup,displayLocale,configureFinancePlanning(){},
       settings:{customFinanceCategories:[],currencyLabel:'',exchangeRate:0},calls:[],
       document:{getElementById:id=>fields[id]||null}});
     vm.runInContext(source,context);

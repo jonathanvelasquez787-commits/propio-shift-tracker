@@ -1,6 +1,7 @@
 import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 // app-main.js inyecta los helpers; app-context.js mantiene el estado compartido.
 import { settings, calls } from './app-context.js';
+import { configureFinancePlanning, captureFinanceDetails, financePlanningRowHtml, renderFinancePlanning } from './finance-planning.js';
 
 let money, convertedAmountText, iconHtml, escapeHtml, toast, appConfirm, openModal, closeModal, render;
 let saveSettingsOnly, makeLocalId, parseMoney, usdCeilFromCurrencyAmount, higherRateBonusForCalls, renderEmojiPicker;
@@ -9,6 +10,9 @@ export function configureFinanceContext(context) {
   ({ money, convertedAmountText, iconHtml, escapeHtml, toast, appConfirm, openModal, closeModal,
     saveSettingsOnly, makeLocalId, parseMoney, usdCeilFromCurrencyAmount, higherRateBonusForCalls,
     renderEmojiPicker, render } = context);
+  configureFinancePlanning({ ...context, getExpenseRows: financeGastoRowsSorted, findRow: financeFindRow,
+    isMeta: financeRowIsMeta, convertedInline: financeConvertedInline, convertedNote: financeConvertedNote,
+    parseAmount: parseAllocationAmount, renderFinanceSection });
 }
 
     export const FINANCE_CATEGORIES = {
@@ -291,6 +295,7 @@ function financeRowHtml(row, opts) {
           <button class="fin-ghost-btn fin-ghost-btn-icon" type="button" data-fin-edit="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" aria-label="Editar meta" title="Editar meta">${iconHtml('edit')}</button>
           <button class="hr-window-remove-btn" type="button" data-fin-delete="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" aria-label="Eliminar meta" title="Eliminar meta">${iconHtml('trash')}</button>
         </div>
+        ${financePlanningRowHtml(row, true)}
       </div>
     `;
   }
@@ -303,7 +308,7 @@ function financeRowHtml(row, opts) {
   const editBtnHtml = ui`<button class="fin-ghost-btn fin-ghost-btn-icon" type="button" data-fin-edit="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" aria-label="Editar gasto" title="Editar gasto">${iconHtml('edit')}</button>`;
   let badgeHtml, barPct, barColor, actionsHtml;
   if (isPagado) {
-    badgeHtml = translateMarkup('<span class="fin-badge tone-good">Pagado</span>');
+    badgeHtml = row.manualPaid ? translateMarkup('<span class="fin-badge tone-good">Pagado</span>') : translateMarkup('<span class="fin-badge tone-good">Cubierto</span>');
     barPct = 100; barColor = 'var(--good)';
     actionsHtml = ui`<button class="fin-ghost-btn" type="button" data-fin-reset="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}">${iconHtml('reset')} Reiniciar mes</button>${editBtnHtml}`;
   } else {
@@ -334,6 +339,7 @@ function financeRowHtml(row, opts) {
         ${actionsHtml}
         <button class="hr-window-remove-btn" type="button" data-fin-delete="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" aria-label="Eliminar gasto" title="Eliminar gasto">${iconHtml('trash')}</button>
       </div>
+      ${financePlanningRowHtml(row, false)}
     </div>
   `;
 }
@@ -357,6 +363,7 @@ function financeTotalsRowHtml(label, targetTotal, assignedTotal, assignedLabel) 
 export function renderFinanceSection() {
   const availableAmtElGuard = document.getElementById('financeAvailableAmt');
   if (!availableAmtElGuard) return;
+  captureFinanceDetails();
 
   const available = financeAvailableBalance();
   const availableAmtEl = availableAmtElGuard;
@@ -410,6 +417,7 @@ export function renderFinanceSection() {
   }
 
   renderFinancePreview();
+  renderFinancePlanning();
   updateFinanceTotalsScrollHint();
 }
 
@@ -671,6 +679,10 @@ export function openFinanceRowModal(kind, existingRow = null) {
   // La categoría ya no se esconde en Metas: "Meta de ahorro" es una categoría más entre las que se
   // puede elegir, no un caso aparte forzado a 'ahorro'.
   if (typeField) typeField.style.display = isMeta ? 'none' : '';
+  const expenseTypeField = document.getElementById('financeRowExpenseTypeField');
+  const expenseTypeInput = document.getElementById('financeRowExpenseTypeInput');
+  if (expenseTypeField) expenseTypeField.style.display = isMeta ? 'none' : '';
+  if (expenseTypeInput) expenseTypeInput.value = existingRow?.expenseType === 'variable' ? 'variable' : 'fixed';
   openModal('financeRowModal');
 }
 
@@ -893,6 +905,7 @@ export function saveFinanceRowModal() {
     foundRow.kind = isMeta ? 'meta' : 'gasto';
     if (!isMeta) {
       foundRow.recurring = (typeInput?.value || 'recurring') === 'recurring';
+      foundRow.expenseType = document.getElementById('financeRowExpenseTypeInput')?.value === 'variable' ? 'variable' : 'fixed';
     }
     if (catId !== foundCatId) {
       settings.financeCategories[foundCatId].rows = settings.financeCategories[foundCatId].rows.filter(r => r.id !== foundRow.id);
@@ -925,6 +938,7 @@ export function saveFinanceRowModal() {
   };
   if (!isMeta) {
     row.recurring = (typeInput?.value || 'recurring') === 'recurring';
+    row.expenseType = document.getElementById('financeRowExpenseTypeInput')?.value === 'variable' ? 'variable' : 'fixed';
     row.manualPaid = false;
   }
   cat.rows.push(row);

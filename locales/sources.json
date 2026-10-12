@@ -11,6 +11,12 @@
       "app.html"
     ]
   },
+  "s_00433042": {
+    "source": "Pago registrado",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
   "s_004e5e8e": {
     "source": "Automatizar el uso de forma que degrade el servicio para otras personas.",
     "files": [
@@ -27,7 +33,8 @@
     "source": "Fecha",
     "files": [
       "app.html",
-      "js/app-main.js"
+      "js/app-main.js",
+      "js/finance-planning.js"
     ]
   },
   "s_01496928": {
@@ -52,6 +59,12 @@
     "source": "Pausar animación",
     "files": [
       "js/game-battle.js"
+    ]
+  },
+  "s_01e4ceff": {
+    "source": "Usa entre 0 y 24 horas, entre 1 y 7 días y una tarifa válida en Ajustes.",
+    "files": [
+      "js/finance-planning.js"
     ]
   },
   "s_01ed35ea": {
@@ -97,6 +110,12 @@
       "js/theme-toggle.js"
     ]
   },
+  "s_0330c379": {
+    "source": "Al guardar se actualizan tu meta general y la de hoy. Tus llamadas, ganancias anteriores y bloques de horario se conservan.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_033ebcdd": {
     "source": "Emoji",
     "files": [
@@ -119,6 +138,12 @@
     "source": "Ganado hoy",
     "files": [
       "index.html"
+    ]
+  },
+  "s_041f465c": {
+    "source": "Asignación por prioridad",
+    "files": [
+      "app.html"
     ]
   },
   "s_044dda93": {
@@ -462,6 +487,12 @@
       "js/finance.js"
     ]
   },
+  "s_0b02b4ec": {
+    "source": "Días por semana (proyección)",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_0b0df769": {
     "source": "Avanzar un hobby pequeño",
     "files": [
@@ -508,6 +539,12 @@
     "source": "Avance hacia la meta y el cofre",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_0bec8b61": {
+    "source": "¿Eliminar este pago del historial? La asignación del gasto se conserva.",
+    "files": [
+      "js/finance-planning.js"
     ]
   },
   "s_0bf2fc94": {
@@ -1016,6 +1053,12 @@
       "js/game-battle.js"
     ]
   },
+  "s_15120393": {
+    "source": "Fijo",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_1516d7c5": {
     "source": "Reclamar ahora",
     "files": [
@@ -1190,6 +1233,12 @@
       "js/game.js"
     ]
   },
+  "s_17ce8590": {
+    "source": "Plazo guardado",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
   "s_17e6ee00": {
     "source": "La fuente oficial de tu pago es siempre la de tu empleador o\n    plataforma",
     "files": [
@@ -1291,6 +1340,12 @@
     "source": "Términos de uso — Propio Shift Tracker",
     "files": [
       "terminos.html"
+    ]
+  },
+  "s_19e22b94": {
+    "source": "Meta diaria y distribución guardadas: {{v0}} min.",
+    "files": [
+      "js/finance-planning.js"
     ]
   },
   "s_19f0b05e": {
@@ -1598,6 +1653,12 @@
     "source": "Casa",
     "files": [
       "js/finance.js"
+    ]
+  },
+  "s_1f55c6eb": {
+    "source": "Pago en USD",
+    "files": [
+      "js/finance-planning.js"
     ]
   },
   "s_1fa218ff": {
@@ -1930,6 +1991,12 @@
       "js/game-battle.js"
     ]
   },
+  "s_278307a9": {
+    "source": "Horas productivas por día",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_2783c7e5": {
     "source": "Falta el campo \"state\" (o no es válido) en el archivo.",
     "files": [
@@ -2217,7 +2284,8 @@
   "s_2e576937": {
     "source": "{{v0}} min",
     "files": [
-      "js/app-main.js"
+      "js/app-main.js",
+      "js/finance-planning.js"
     ]
   },
   "s_2e9445f7": {
@@ -2324,6 +2392,12 @@
       "js/game.js"
     ]
   },
+  "s_2f721278": {
+    "source": "Total: {{v0}}%",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
   "s_2f798660": {
     "source": "+{{v4}} XP",
     "files": [
@@ -2372,6 +2446,12 @@
     "source": "Abre Temas y colores en el menú lateral para elegir modo y paleta.",
     "files": [
       "app.html"
+    ]
+  },
+  "s_30013d2b": {
+    "source": "{{v5}}%",
+    "files": [
+      "js/finance-planning.js"
     ]
   },
   "s_300b99b7": {
@@ -2489,6 +2569,12 @@
     "source": "Siguiente ›",
     "files": [
       "app.html"
+    ]
+  },
+  "s_321ab12b": {
+    "source": "Eliminar pago",
+    "files": [
+      "js/finance-planning.js"
     ]
   },
   "s_322ba665": {
@@ -2880,6 +2966,12 @@
       "js/positive-reinforcement.js"
     ]
   },
+  "s_39b26c5c": {
+    "source": "Mes",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_39bdcce7": {
     "source": "¿Descartar esta llamada sin guardarla? El tiempo registrado se pierde y no queda ninguna fila en Tabla de llamadas.",
     "files": [
@@ -3190,6 +3282,12 @@
       "js/theme-palettes.js"
     ]
   },
+  "s_41d35686": {
+    "source": "Presupuesto actual",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
   "s_41ec6447": {
     "source": "Ese archivo pesa demasiado ({{v0}}MB, máximo {{v1}}MB) — no parece un backup válido de esta app. Revisa que sea el archivo correcto.",
     "files": [
@@ -3340,6 +3438,7 @@
     "source": "{{v2}}{{v3}}",
     "files": [
       "js/app-main.js",
+      "js/finance-planning.js",
       "js/finance.js"
     ]
   },
@@ -3412,6 +3511,12 @@
       "js/game-battle.js"
     ]
   },
+  "s_458b225e": {
+    "source": "Cubierto",
+    "files": [
+      "js/finance.js"
+    ]
+  },
   "s_45e3f698": {
     "source": "Tema: {{v0}}",
     "files": [
@@ -3441,6 +3546,12 @@
     "files": [
       "js/app-main.js",
       "js/finance.js"
+    ]
+  },
+  "s_465b78d5": {
+    "source": "Gasto variable",
+    "files": [
+      "js/finance-planning.js"
     ]
   },
   "s_467d0cba": {
@@ -3614,6 +3725,12 @@
       "app.html"
     ]
   },
+  "s_4960f4b3": {
+    "source": "Gastos variables (%)",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_497b8cb3": {
     "source": "Personalizar el horario de esta semana (distinto a la plantilla)",
     "files": [
@@ -3770,6 +3887,12 @@
     "source": "Revisa tu conexión.",
     "files": [
       "js/boot.js"
+    ]
+  },
+  "s_4bc2c9e2": {
+    "source": "Registrar un pago conserva lo asignado. No modifica tus llamadas ni ganancias.",
+    "files": [
+      "js/finance-planning.js"
     ]
   },
   "s_4bd2f89c": {
@@ -4020,6 +4143,12 @@
       "app.html"
     ]
   },
+  "s_50e108c9": {
+    "source": "El plazo es opcional. Guarda uno para calcular el aporte mensual.",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
   "s_50e139e0": {
     "source": "Viernes Furioso",
     "files": [
@@ -4262,10 +4391,22 @@
       "js/finance.js"
     ]
   },
+  "s_540c485f": {
+    "source": "Presupuesto y pagos del mes",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
   "s_544f2caf": {
     "source": "La base de datos lo impide a nivel de fila, no solo en la pantalla.",
     "files": [
       "index.html"
+    ]
+  },
+  "s_5452bd03": {
+    "source": "Gasto fijo",
+    "files": [
+      "js/finance-planning.js"
     ]
   },
   "s_54741f50": {
@@ -4612,6 +4753,12 @@
       "js/calls.js"
     ]
   },
+  "s_5a6c802a": {
+    "source": "Meta diaria de la tool",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_5af8171c": {
     "source": "Fecha inválida",
     "files": [
@@ -4778,6 +4925,12 @@
   },
   "s_5f895d21": {
     "source": "Historial desde",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_5fb22a58": {
+    "source": "Guardar meta diaria",
     "files": [
       "app.html"
     ]
@@ -5167,6 +5320,12 @@
       "js/game.js"
     ]
   },
+  "s_673d6165": {
+    "source": "Presupuesto y pagos",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_67457d6c": {
     "source": "Mejor: 0",
     "files": [
@@ -5267,6 +5426,12 @@
     "source": "O pega tu exportación de Propio en",
     "files": [
       "app.html"
+    ]
+  },
+  "s_6975415f": {
+    "source": "Tarifa de Ajustes: {{v0}}/min",
+    "files": [
+      "js/finance-planning.js"
     ]
   },
   "s_69e71112": {
@@ -5745,6 +5910,12 @@
       "app.html"
     ]
   },
+  "s_728ca331": {
+    "source": "Ingreso proyectado · 4 semanas",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_729c1602": {
     "source": "{{v4}} {{v5}} +{{v6}}{{v7}}",
     "files": [
@@ -5857,6 +6028,12 @@
     "source": "En pausa",
     "files": [
       "js/game-battle.js"
+    ]
+  },
+  "s_7523ffd1": {
+    "source": "Pagado este mes",
+    "files": [
+      "js/finance-planning.js"
     ]
   },
   "s_7527928a": {
@@ -5993,6 +6170,12 @@
       "app.html"
     ]
   },
+  "s_77134979": {
+    "source": "Los porcentajes deben sumar 100% y estar entre 0 y 100.",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
   "s_77134f0e": {
     "source": "+ Nota",
     "files": [
@@ -6045,6 +6228,12 @@
     "source": "Si olvidas cerrar el turno antes de medianoche, la app lo empareja igual al abrir uno nuevo al día siguiente.",
     "files": [
       "app.html"
+    ]
+  },
+  "s_7867e368": {
+    "source": "Plan de ahorro",
+    "files": [
+      "js/finance-planning.js"
     ]
   },
   "s_78a37972": {
@@ -6240,10 +6429,22 @@
       "index.html"
     ]
   },
+  "s_7baeadad": {
+    "source": "Meses para completar",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
   "s_7baf7455": {
     "source": "El ajuste no puede pasar de +12h de una sola vez.",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_7bb3cffc": {
+    "source": "{{v2}}{{v3}}{{v4}}",
+    "files": [
+      "js/finance-planning.js"
     ]
   },
   "s_7bcfb42f": {
@@ -6258,6 +6459,12 @@
       "js/auth.js"
     ]
   },
+  "s_7bf59325": {
+    "source": "Variable",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_7bf8e468": {
     "source": "Aquí está todo lo que necesitas para tu turno.",
     "files": [
@@ -6268,6 +6475,12 @@
     "source": "Bestiario",
     "files": [
       "app.html"
+    ]
+  },
+  "s_7c77d239": {
+    "source": "Usa un plazo entre 1 y 120 meses.",
+    "files": [
+      "js/finance-planning.js"
     ]
   },
   "s_7c7f8c13": {
@@ -6607,6 +6820,12 @@
       "js/app-main.js"
     ]
   },
+  "s_82b776e9": {
+    "source": "Guardar plazo",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
   "s_82c12a9a": {
     "source": "Acerca de Jefe del ciclo",
     "files": [
@@ -6838,6 +7057,12 @@
       "js/reports.js"
     ]
   },
+  "s_875390d7": {
+    "source": "Aporte mensual orientativo",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
   "s_8773eafe": {
     "source": "Antes -{{v0}}m",
     "files": [
@@ -6998,6 +7223,13 @@
     "source": "Ajustes generales",
     "files": [
       "app.html"
+    ]
+  },
+  "s_89bdf692": {
+    "source": "Pagos registrados",
+    "files": [
+      "app.html",
+      "js/finance-planning.js"
     ]
   },
   "s_89d6158b": {
@@ -7447,6 +7679,12 @@
     "source": "{{v0}} continuado — interrupción de {{v1}} min registrada",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_9279758f": {
+    "source": "{{v0}} min · meta diaria",
+    "files": [
+      "js/finance-planning.js"
     ]
   },
   "s_928a27e2": {
@@ -8056,6 +8294,12 @@
       "js/game.js"
     ]
   },
+  "s_9e788d51": {
+    "source": "Planificar presupuesto",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_9ea91247": {
     "source": "Ya está disponible en tu bestiario.",
     "files": [
@@ -8236,6 +8480,12 @@
     "source": "en curso",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_a17748cf": {
+    "source": "% del gasto real",
+    "files": [
+      "js/finance-planning.js"
     ]
   },
   "s_a1a22567": {
@@ -8680,6 +8930,12 @@
       "js/reports.js"
     ]
   },
+  "s_aaa63ae5": {
+    "source": "Sin pagos registrados en este mes.",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
   "s_aab88b42": {
     "source": "Detalle de llamadas",
     "files": [
@@ -8942,6 +9198,12 @@
       "js/calls.js"
     ]
   },
+  "s_b051fe8c": {
+    "source": "Las conversiones usan tu moneda y tipo de cambio configurados.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_b0593d06": {
     "source": "Ancla:",
     "files": [
@@ -9042,6 +9304,12 @@
   },
   "s_b285539d": {
     "source": "Todo",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_b29ffc2d": {
+    "source": "Gastos fijos (%)",
     "files": [
       "app.html"
     ]
@@ -9343,6 +9611,12 @@
       "js/reinforcement-rules.js"
     ]
   },
+  "s_b74dd511": {
+    "source": "Tarifa y moneda de Ajustes",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_b75010cd": {
     "source": "Sábado-Domingo",
     "files": [
@@ -9477,6 +9751,12 @@
     "files": [
       "index.html",
       "js/landing.js"
+    ]
+  },
+  "s_bb2b59dc": {
+    "source": "Ahorro (%)",
+    "files": [
+      "app.html"
     ]
   },
   "s_bb360e5a": {
@@ -10049,6 +10329,12 @@
       "js/game.js"
     ]
   },
+  "s_c61d6ed3": {
+    "source": "Diferencia",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
   "s_c630f9fd": {
     "source": "100% de tu meta diaria alcanzado",
     "files": [
@@ -10197,6 +10483,12 @@
   },
   "s_c87c64f6": {
     "source": "Acerca de Equipo",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_c88ccac5": {
+    "source": "El método 50-30-20 propone destinar 50% a necesidades, 30% a gustos y 20% al ahorro. Es una referencia: puedes elegir otros porcentajes que sumen 100%. No cambia tus prioridades de asignación.",
     "files": [
       "app.html"
     ]
@@ -10612,6 +10904,12 @@
       "js/positive-reinforcement.js"
     ]
   },
+  "s_d160f8b2": {
+    "source": "Tipo de gasto",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_d17d4f4d": {
     "source": "Perfil, idioma, meta, tasa y ciclo de pago.",
     "files": [
@@ -10682,6 +10980,12 @@
     "source": "4. Cuánto tiempo se conservan",
     "files": [
       "privacidad.html"
+    ]
+  },
+  "s_d2ca54cd": {
+    "source": "Registrar pago",
+    "files": [
+      "js/finance-planning.js"
     ]
   },
   "s_d2fa7170": {
@@ -10986,6 +11290,12 @@
       "js/game-battle.js"
     ]
   },
+  "s_da8495ab": {
+    "source": "Pago en {{v0}}",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
   "s_da9539a6": {
     "source": "{icon} Premio realizado: {name}",
     "files": [
@@ -11028,6 +11338,12 @@
       "privacidad.html"
     ]
   },
+  "s_db206f2a": {
+    "source": "Pago eliminado",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
   "s_db2b6c14": {
     "source": "Perfil guardado. Revisa tu correo para confirmar la nueva dirección.",
     "files": [
@@ -11038,6 +11354,12 @@
     "source": "Una vez. A qué hora entras, cuándo son tus breaks y tu lunch. Si una semana es distinta, la cambias solo para esa semana.",
     "files": [
       "index.html"
+    ]
+  },
+  "s_db93d69d": {
+    "source": "Ingresa un pago mayor a cero y una fecha válida.",
+    "files": [
+      "js/finance-planning.js"
     ]
   },
   "s_db994404": {
@@ -11551,6 +11873,12 @@
   },
   "s_e3e8494c": {
     "source": "Cerrar menú",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_e3f95ff5": {
+    "source": "Qué es el método 50-30-20",
     "files": [
       "app.html"
     ]
@@ -12683,6 +13011,12 @@
     "source": "Disparar",
     "files": [
       "js/game-battle.js"
+    ]
+  },
+  "s_f9f78dba": {
+    "source": "Distribución del ingreso",
+    "files": [
+      "app.html"
     ]
   },
   "s_fa24e14d": {
