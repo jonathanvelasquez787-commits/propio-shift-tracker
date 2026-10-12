@@ -70,6 +70,15 @@ casos independientes; 2.181 textos ES/EN, build de app y ambas extensiones.
 Incluye pruebas de interfaz con cuenta ficticia y backend local. Publicación,
 CI y actualización autorizada de PostgreSQL se acreditan por separado.
 
+Actualización autorizada del 12/10 completada: PostgreSQL 17.11.0.003,
+`ACTIVE_HEALTHY`, SQL 17.11, nueve tablas RLS y nueve migraciones conservadas.
+Comparación contra copia fresca previa conserva perfil, ajustes y estado salvo
+una nueva llamada activa posterior al respaldo. Readiness, monitor y backup
+externo correctos; 18/18 controles públicos posteriores al mantenimiento.
+Las correcciones del PR 41 quedaron publicadas con release exacto `5956cc7`:
+Vercel READY, health 200/ok=true, bundles 200 y CSP/HSTS/no-store correctos.
+La evidencia HTTP se registró el 12/10/2026 a las 07:31:55 de Honduras.
+
 La siguiente auditoría de controles pasó 500 pruebas y añadió recorridos
 con cuenta ficticia y recuperación JSON; ver
 [button-audit-2026-10-11.md](button-audit-2026-10-11.md) para correcciones,

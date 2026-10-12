@@ -104,8 +104,14 @@ La compatibilidad revisada no usa ltree, btree_gist, operadores de selectividad
 personalizados ni funciones PGP de la app. Referencias oficiales:
 [cambios de 17.11](https://supabase.com/changelog/postgres-15-19-17-11-breaking-changes)
 y [procedimiento de actualización](https://supabase.com/docs/guides/platform/upgrading).
-La versión y recuperación del servicio se verifican después del mantenimiento;
-iniciar una actualización no acredita que haya terminado.
+La actualización terminó: el conector informa `ACTIVE_HEALTHY` y versión
+17.11.0.003; SQL confirma PostgreSQL 17.11. Perfil idéntico, ajustes y todo el
+estado previo salvo `activeCall` coinciden con la copia fresca. Esa variación
+corresponde a una llamada iniciada a las 07:20:12 y una escritura posterior a
+las 07:22:27 de Honduras; no se reemplaza actividad nueva por la copia previa.
+Los conteos de llamadas, nueve tablas RLS y nueve migraciones se conservan.
+Readiness, monitor y backup externo correctos; 18/18 controles públicos pasan
+de nuevo. Las huellas y marcas de tiempo se guardan fuera del repositorio.
 
 ## Límites
 
@@ -117,5 +123,16 @@ de PWA no acreditan cada teléfono; el monitor local requiere equipo y Codex
 disponibles. No se promete ausencia absoluta de bugs ni pérdida cero entre
 copias diarias. La visibilidad por nombre en Google sigue siendo externa.
 
-CI, revisión del PR, SHA publicado, estado de la actualización y controles
-públicos posteriores se registran por separado de la validación local.
+El [PR 41](https://github.com/jonathanvelasquez787-commits/propio-shift-tracker/pull/41)
+pasó CI sobre `289cea3a5a0f0283a3ac77f4453c84f6ca3db131` y quedó integrado en
+`5956cc7d202c0e82b9689a87bdbd3c107d518fd1`. Los controles HTTP y release público
+se registran por separado: aprobar CI no acredita por sí solo la publicación.
+
+Publicación de las correcciones verificada a las 07:31:55 de Honduras: Vercel
+`READY`, entorno producción, health HTTP 200/ok=true y release exacto `5956cc7`.
+`/app` y raíz de entrada de cuenta tienen CSP, HSTS y no-store; la raíz sin
+señal de cuenta conserva la portada pública. Todos los bundles referenciados
+responden HTTP 200 y la comprobación pública de seguridad vuelve a pasar 18/18.
+El primer despliegue automático falló antes del build con «Git information
+retrieval failed»; el reintento del mismo commit por CLI quedó READY. No se
+atribuyó ese error a la app ni se publicó un commit antiguo como alternativa.

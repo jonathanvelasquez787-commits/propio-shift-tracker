@@ -323,11 +323,17 @@ superposición manual de Break/Lunch). 530 pruebas; dos recorridos de 31 días,
 17.000 casos independientes; 343 controles internos y 20 enlaces inventariados,
 35 contratos, 2.181 textos ES/EN y build de app/puente/resumen correctos.
 Matriz: 17 áreas, 53 suites, 58 fuentes. Ver docs/auditoria-profunda-2026-10-12.md.
-CI/publicación requieren evidencia separada del resultado local. PostgreSQL:
-usuario autorizó «ahora»; actualización 17.6.1.166 → 17.11.0.003 iniciada
-12/10/2026 07:14:45 Honduras, pendiente de comprobar finalización e integridad.
-Copia diaria fresca comprobada antes. Cero llamadas en nube es intencional,
-confirmado por el usuario; no restaurarlas. Email/SMTP permanece deshabilitado.
+CI del PR 41 pasó; integración 5956cc7 y publicación verificada 12/10 07:31:55
+Honduras: Vercel READY, health 200/ok=true/release exacto, bundles 200,
+CSP/HSTS/no-store correctos. El primer despliegue automático falló antes del
+build por recuperación de información Git; reintento del mismo commit READY.
+PostgreSQL 17.11.0.003 ACTIVE_HEALTHY, SQL 17.11, nueve migraciones
+y nueve tablas RLS conservadas; readiness, monitor y backup externo correctos.
+Copia fresca previa comparada: perfil, ajustes y estado intactos salvo una
+llamada activa posterior a la copia. No sobrescribir actividad nueva. Cero
+llamadas guardadas en nube es intencional, confirmado por el usuario; no
+restaurarlas. Seguridad pública posterior al mantenimiento 18/18 correcta.
+Email/SMTP permanece deshabilitado.
 
 Finanzas: propuesta aprobada el 11/10/2026, conservando Gastos/Metas,
 prioridades, asignación automática y controles existentes. La planificación
