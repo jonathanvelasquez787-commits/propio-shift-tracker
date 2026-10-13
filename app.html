@@ -8354,12 +8354,6 @@
 <button class="calls-status-btn-end" id="callsStatusEndBtn" type="button">Descartar</button>
 </div>
 </div>
-<div class="game-call-fx" id="gameCallFx" aria-hidden="true"></div>
-<div class="game-loot-box" hidden id="gameLootBox" aria-live="polite"></div>
-<div class="game-record-banner" hidden id="gameRecordBanner" role="status"></div>
-
-<div class="positive-evidence-card" hidden id="positiveEvidenceCard" aria-live="polite"></div>
-
 <div class="controls-grid" id="callsControlsGrid">
 <button class="action-btn" id="callControlBtn" type="button" data-accent="pink">
 <span class="action-ripple"></span>
@@ -8400,30 +8394,7 @@
 </div>
 </div>
 <div class="table-tags" id="earningsTagsRow"></div>
-<section class="game-day-panels" aria-label="Progreso del día" id="gameHomeDay">
-<div class="game-arena" hidden id="gameArena">
-<div class="game-arena-inner" data-game-role="arena">
-  <div class="game-arena-copy">
-    <div class="game-arena-kicker"><span class="game-arena-pulse" aria-hidden="true"></span> ARENA DEL DÍA <span data-game-role="monster-day">—</span></div>
-    <div class="game-arena-title-row"><div><h3 data-game-role="monster-name">Monstruo del día</h3><p data-game-role="monster-quip">La meta está viva. Cada llamada cuenta.</p></div><span class="game-arena-state" data-game-role="monster-state">DORMIDO</span></div>
-    <div class="game-arena-hp" data-game-role="hp-panel">
-      <div class="game-arena-hp-head"><span>VIDA DEL JEFE</span><strong data-game-role="monster-hp-label">$0.00 / $0.00</strong></div>
-      <div class="game-arena-hp-track" role="progressbar" aria-label="Vida del monstruo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><span data-game-role="monster-hp-bar" style="width:100%;"></span><i data-game-role="ghost-marker" title="Sombra de ayer"></i></div>
-      <div class="game-arena-hp-foot"><span data-game-role="monster-hp-pct">100% de vida</span><span data-game-role="ghost-label">Ayer —</span></div>
-    </div>
-    <div class="game-arena-stats"><span><small>COMBO</small><b data-game-role="combo">x0</b></span><span><small>GOLPE ACTUAL</small><b data-game-role="last-hit">—</b></span><span><small>BOTÍN EXTRA</small><b data-game-role="loot">$0.00</b></span></div>
-    <div class="game-arena-mission-hint" data-game-role="mission-hint"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg><span>Completa misiones para romper su armadura.</span></div>
-  </div>
-  <div class="game-monster-stage" data-game-role="monster" role="img" aria-label="Monstruo del día, 100% de vida">
-    <div class="game-monster-sprite" data-game-role="monster-sprite">
-      <svg class="game-monster-svg" viewBox="0 0 160 160" aria-hidden="true"><g fill="currentColor"><rect x="32" y="28" width="22" height="18"/><rect x="106" y="28" width="22" height="18"/><rect x="24" y="44" width="112" height="82" rx="8"/><rect x="40" y="126" width="24" height="14"/><rect x="96" y="126" width="24" height="14"/><rect x="14" y="70" width="16" height="34"/><rect x="130" y="70" width="16" height="34"/></g><g class="game-monster-face"><rect x="48" y="66" width="20" height="14" fill="var(--panel-navy)"/><rect x="92" y="66" width="20" height="14" fill="var(--panel-navy)"/><rect x="64" y="98" width="32" height="10" fill="var(--panel-navy)"/></g></svg>
-      <span class="game-monster-armor" aria-hidden="true"></span><span class="game-monster-crack crack-a" aria-hidden="true"></span><span class="game-monster-crack crack-b" aria-hidden="true"></span>
-    </div>
-    <span class="game-monster-z" data-game-role="monster-z" aria-hidden="true">Zzz</span><span class="game-monster-shadow" aria-hidden="true"></span>
-  </div>
-</div>
-</div>
-</section>
+
 <div class="gh-goal-card" id="classicDailyGoalCard">
 <div class="gh-goal-top"><span id="goalDailyLabel">Meta diaria</span><b id="goalAmountBadge">Meta $0.00</b></div>
 <div class="gh-goal-sub-row">
@@ -8452,6 +8423,37 @@
 <div class="hr-live-title" id="earningsHigherRateLiveTitle">—</div>
 <div class="hr-live-sub" id="earningsHigherRateLiveSub"></div>
 </div>
+
+</div>
+<div id="gameHomeGroup">
+<section class="game-day-panels" aria-label="Progreso del día" id="gameHomeDay">
+<div class="game-arena" hidden id="gameArena">
+<div class="game-arena-inner" data-game-role="arena">
+  <div class="game-arena-copy">
+    <div class="game-arena-kicker"><span class="game-arena-pulse" aria-hidden="true"></span> ARENA DEL DÍA <span data-game-role="monster-day">—</span></div>
+    <div class="game-arena-title-row"><div><h3 data-game-role="monster-name">Monstruo del día</h3><p data-game-role="monster-quip">La meta está viva. Cada llamada cuenta.</p></div><span class="game-arena-state" data-game-role="monster-state">DORMIDO</span></div>
+    <div class="game-arena-hp" data-game-role="hp-panel">
+      <div class="game-arena-hp-head"><span>VIDA DEL JEFE</span><strong data-game-role="monster-hp-label">$0.00 / $0.00</strong></div>
+      <div class="game-arena-hp-track" role="progressbar" aria-label="Vida del monstruo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><span data-game-role="monster-hp-bar" style="width:100%;"></span><i data-game-role="ghost-marker" title="Sombra de ayer"></i></div>
+      <div class="game-arena-hp-foot"><span data-game-role="monster-hp-pct">100% de vida</span><span data-game-role="ghost-label">Ayer —</span></div>
+    </div>
+    <div class="game-arena-stats"><span><small>COMBO</small><b data-game-role="combo">x0</b></span><span><small>GOLPE ACTUAL</small><b data-game-role="last-hit">—</b></span><span><small>BOTÍN EXTRA</small><b data-game-role="loot">$0.00</b></span></div>
+    <div class="game-arena-mission-hint" data-game-role="mission-hint"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg><span>Completa misiones para romper su armadura.</span></div>
+  </div>
+  <div class="game-monster-stage" data-game-role="monster" role="img" aria-label="Monstruo del día, 100% de vida">
+    <div class="game-monster-sprite" data-game-role="monster-sprite">
+      <svg class="game-monster-svg" viewBox="0 0 160 160" aria-hidden="true"><g fill="currentColor"><rect x="32" y="28" width="22" height="18"/><rect x="106" y="28" width="22" height="18"/><rect x="24" y="44" width="112" height="82" rx="8"/><rect x="40" y="126" width="24" height="14"/><rect x="96" y="126" width="24" height="14"/><rect x="14" y="70" width="16" height="34"/><rect x="130" y="70" width="16" height="34"/></g><g class="game-monster-face"><rect x="48" y="66" width="20" height="14" fill="var(--panel-navy)"/><rect x="92" y="66" width="20" height="14" fill="var(--panel-navy)"/><rect x="64" y="98" width="32" height="10" fill="var(--panel-navy)"/></g></svg>
+      <span class="game-monster-armor" aria-hidden="true"></span><span class="game-monster-crack crack-a" aria-hidden="true"></span><span class="game-monster-crack crack-b" aria-hidden="true"></span>
+    </div>
+    <span class="game-monster-z" data-game-role="monster-z" aria-hidden="true">Zzz</span><span class="game-monster-shadow" aria-hidden="true"></span>
+  </div>
+</div>
+</div>
+</section>
+<div class="positive-evidence-card" hidden id="positiveEvidenceCard" aria-live="polite"></div>
+<div class="game-loot-box" hidden id="gameLootBox" aria-live="polite"></div>
+<div class="game-record-banner" hidden id="gameRecordBanner" role="status"></div>
+<div class="game-call-fx" id="gameCallFx" aria-hidden="true"></div>
 </div>
 </div>
 </div>
