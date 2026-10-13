@@ -7,7 +7,7 @@ const manifest = JSON.parse(await readFile(path.join(source, 'manifest.json'), '
 const out = path.resolve(process.argv[2] || 'work/propio-summary');
 if (out === root || out.startsWith(path.join(root, 'js') + path.sep)) throw new Error('Invalid summary output');
 await mkdir(out, { recursive: true });
-const bundle = await rollup({ input: path.join(source, 'summary.js') });
+const bundle = await rollup({ input: path.join(source, 'summary-entry.js') });
 await bundle.write({ file: path.join(out, 'summary.js'), format: 'iife', inlineDynamicImports: true });
 const header = `// ==UserScript==\n// @name         Propio · Minutos y ganancias\n// @namespace    propio-summary\n// @version      ${manifest.version}\n// @description  Resumen local del historial de Propio, independiente de otras apps.\n// @match        https://interpreters.propio-ls.com/*\n// @grant        none\n// @run-at       document-idle\n// ==/UserScript==\n`;
 await bundle.write({ file: path.join(out, 'propio-resumen.user.js'), format: 'iife', inlineDynamicImports: true, banner: header });

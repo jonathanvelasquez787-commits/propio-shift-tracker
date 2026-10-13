@@ -2,10 +2,12 @@ import { readPortalHistory } from '../../js/propio-history.js';
 import { readPortalPaginator, portalRangeContext, collectPortalPages } from '../../js/propio-history-pages.js';
 import { settingsKey, languageOf, copyFor, scanError } from './i18n.js';
 import { createSummaryMount } from './layout.js';
+import { normalizeSummaryOptions } from './options.js';
 
-if (location.origin === 'https://interpreters.propio-ls.com' && window.top === window && !document.getElementById('propio-summary-panel')) {
+export function installPortalSummary({ enabledByDefault = true } = {}) {
+  if (location.origin !== 'https://interpreters.propio-ls.com' || window.top !== window || document.getElementById('propio-summary-panel')) return;
   const key = settingsKey;
-  let options = {}, last = '', timer, totalCache = null, running = null, scanMessage = '';
+  let options = normalizeSummaryOptions(null, enabledByDefault), last = '', timer, totalCache = null, running = null, scanMessage = '', initialized = false, settingsRevision = 0;
   const host = document.createElement('div');
   host.id = 'propio-summary-panel';
   const placement = createSummaryMount(host);
@@ -47,6 +49,12 @@ if (location.origin === 'https://interpreters.propio-ls.com' && window.top === w
   }
   function refresh() {
     timer = null;
+    if (!initialized || !options.enabled) {
+      setWatching(false);
+      if (running) running.controller.abort();
+      placement.clear(); last = ''; totalCache = null; return;
+    }
+    setWatching(true);
     const found = snapshot();
     if (!found) { placement.clear(); last = ''; totalCache = null; return; }
     placement.mount(found.table);
@@ -68,9 +76,9 @@ if (location.origin === 'https://interpreters.propio-ls.com' && window.top === w
     if (running) { $('minutes').textContent = '—'; $('pay').textContent = '—'; $('converted').textContent = ''; }
     $('notice').textContent = [scanError(scanMessage, options), summary.missingMinutes || summary.missingPay ? copy.pending(summary.missingMinutes, summary.missingPay) : ''].filter(Boolean).join(' ');
   }
-  function schedule() { if (!timer) timer = setTimeout(refresh, 120); }
+  function schedule() { if (initialized && options.enabled && !timer) timer = setTimeout(refresh, 120); }
   const observer = new MutationObserver(schedule);
-  observer.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['hidden', 'style', 'class'] });
+  let watching = false;
   const pause = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
   async function movePage(action, { restoring }) {
     const before = snapshot(), run = running;
@@ -97,6 +105,7 @@ if (location.origin === 'https://interpreters.propio-ls.com' && window.top === w
     } finally { watch.disconnect(); }
   }
   function invalidate(event) {
+    if (!initialized || !options.enabled) return;
     if (event.composedPath().includes(host)) return;
     const pager = snapshot()?.pager?.element;
     if (running) {
@@ -105,7 +114,14 @@ if (location.origin === 'https://interpreters.propio-ls.com' && window.top === w
     }
     if ((event.type !== 'click' && !pager?.contains(event.target)) || event.target.closest?.('th, mat-header-cell, [role="columnheader"]')) { totalCache = null; scanMessage = ''; schedule(); }
   }
-  for (const name of ['input', 'change', 'click']) document.addEventListener(name, invalidate, true);
+  function setWatching(enabled) {
+    if (watching === enabled) return;
+    watching = enabled;
+    for (const name of ['input', 'change', 'click']) document[enabled ? 'addEventListener' : 'removeEventListener'](name, invalidate, true);
+    for (const name of ['popstate', 'pageshow']) window[enabled ? 'addEventListener' : 'removeEventListener'](name, schedule);
+    if (enabled) observer.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['hidden', 'style', 'class'] });
+    else { observer.disconnect(); clearTimeout(timer); timer = null; }
+  }
   $('sum-period').addEventListener('click', async () => {
     if (running) { running.controller.abort(); refresh(); return; }
     const initial = snapshot();
@@ -140,17 +156,23 @@ if (location.origin === 'https://interpreters.propio-ls.com' && window.top === w
     event.preventDefault();
     const currency = $('currency').value.trim(), rate = Number($('rate').value);
     if (!currency || !Number.isFinite(rate) || rate <= 0 || rate > 100000) { savedMessage = 'invalid'; translate(); return; }
-    void save({ currency, rate, language: languageOf(options) });
+    void save({ ...options, currency, rate, language: languageOf(options) });
   });
-  $('clear').addEventListener('click', () => { $('currency').value = ''; $('rate').value = ''; void save({ language: languageOf(options) }); });
+  $('clear').addEventListener('click', () => { $('currency').value = ''; $('rate').value = ''; void save({ enabled: options.enabled, language: languageOf(options) }); });
+  const settingsChanged = (changes, area) => {
+    if (area !== 'local' || !changes[key]) return;
+    settingsRevision++;
+    options = normalizeSummaryOptions(changes[key].newValue, enabledByDefault);
+    $('currency').value = options.currency || ''; $('rate').value = options.rate || ''; refresh();
+  };
+  if (extensionStorage) chrome.storage.onChanged.addListener(settingsChanged);
+  const initialSettingsRevision = settingsRevision;
   (async () => {
     try {
       const stored = extensionStorage ? (await chrome.storage.local.get(key))[key] : JSON.parse(localStorage.getItem(key) || '{}');
-      options = { language: languageOf(stored) };
-      if (stored && typeof stored.currency === 'string' && stored.currency.length <= 8 && Number.isFinite(stored.rate) && stored.rate > 0 && stored.rate <= 100000) Object.assign(options, { currency: stored.currency, rate: stored.rate });
+      if (initialSettingsRevision === settingsRevision) options = normalizeSummaryOptions(stored, enabledByDefault);
     } catch { /* The summary still works when settings storage is unavailable. */ }
+    initialized = true;
     $('currency').value = options.currency || ''; $('rate').value = options.rate || ''; refresh();
   })();
-  window.addEventListener('popstate', schedule);
-  window.addEventListener('pageshow', schedule);
 }

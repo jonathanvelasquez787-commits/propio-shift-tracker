@@ -13,9 +13,17 @@ test('independent summary is scoped to Propio and has no call observer, tracker 
  assert.match(source,/aria-describedby="period-explanation"/);assert.match(source,/sum-period'\)\.title/);
  assert.match(read('extension/propio-summary/i18n.js'),/Elegí Start Date y End Date en Propio y actualizá el historial/);
 });
-test('bridge observes session and call controls without building or injecting a history summary',()=>{
+test('unified extension packages independent session detection and an optional local summary without adding permissions',()=>{
  const manifest=JSON.parse(read('extension/propio-bridge/manifest.json'));
  assert.deepEqual(manifest.content_scripts.map(s=>s.matches),[['https://interpreters.propio-ls.com/*'],['https://propio-shift-tracker.vercel.app/*']]);
- assert.doesNotMatch(read('scripts/build-extension.mjs'),/rollup\(\{ input:.*summary|portal-history.*input/);
+ assert.deepEqual(manifest.content_scripts[0].js,['portal-content.js','summary-content.js']);
+ assert.deepEqual(manifest.permissions,['storage','webRequest','alarms','webNavigation']);
+ assert.match(read('extension/propio-bridge/summary-content.js'),/enabledByDefault: false/);
+ assert.match(read('scripts/build-extension.mjs'),/summary-content\.js/);
+ for(const size of [16,32,48,128]) {
+   assert.equal(manifest.icons[size],`icons/icon-${size}.png`);
+   const png=fs.readFileSync(new URL(`../extension/propio-bridge/icons/icon-${size}.png`,import.meta.url));
+   assert.equal(png.readUInt32BE(16),size);assert.equal(png.readUInt32BE(20),size);
+ }
  assert.equal(fs.existsSync(new URL('../extension/propio-bridge/portal-history.js',import.meta.url)),false);
 });

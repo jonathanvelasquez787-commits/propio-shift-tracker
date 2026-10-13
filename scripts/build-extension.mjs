@@ -12,9 +12,17 @@ await bundle.close();
 const portal = await rollup({ input: path.join(root, 'extension/propio-bridge/portal-content.js') });
 await portal.write({ file: path.join(out, 'portal-content.js'), format: 'iife', inlineDynamicImports: true });
 await portal.close();
-for (const name of ['manifest.json', 'tracker-content.js', 'popup.html', 'popup.css', 'popup.js', 'README.md']) {
+const summary = await rollup({ input: path.join(root, 'extension/propio-bridge/summary-content.js') });
+await summary.write({ file: path.join(out, 'summary-content.js'), format: 'iife', inlineDynamicImports: true });
+await summary.close();
+const popup = await rollup({ input: path.join(root, 'extension/propio-bridge/popup.js') });
+await popup.write({ file: path.join(out, 'popup.js'), format: 'iife', inlineDynamicImports: true });
+await popup.close();
+for (const name of ['manifest.json', 'tracker-content.js', 'popup.html', 'popup.css', 'README.md']) {
   await copyFile(path.join(root, 'extension/propio-bridge', name), path.join(out, name));
 }
+await mkdir(path.join(out, 'icons'), { recursive: true });
+for (const size of [16, 32, 48, 128]) await copyFile(path.join(root, `extension/propio-bridge/icons/icon-${size}.png`), path.join(out, `icons/icon-${size}.png`));
 const version = JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8')).version;
 const manifest = JSON.parse(await readFile(path.join(out, 'manifest.json'), 'utf8'));
 await writeFile(path.join(out, 'release.json'), JSON.stringify({ appVersion: version, extensionVersion: manifest.version }, null, 2));
