@@ -886,4 +886,3 @@ La aplicación funciona en producción con estas bases vigentes:
   interactivas de integridad, 24 vistas y tooltips ES/EN. Build y escaneo OK.
 - Informe y límites: docs/auditoria-finanzas-2026-10-13.md; publicación
   comprobada por CI, Vercel y release en la evidencia final.
-
