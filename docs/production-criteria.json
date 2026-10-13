@@ -783,12 +783,12 @@
         {
           "file": "tests/reinforcement-feedback.test.mjs",
           "namedCases": [
-            "Logros es maestro y el interruptor personal decide su canal incluso con intensidad antigua",
+            "Logros y refuerzo positivo controlan sus propios canales incluso con intensidad antigua",
             "Arcade celebra hitos y movimiento reducido conserva anuncios sin partículas",
             "textos centrales tienen variantes estables y no dejan variables sin reemplazar",
             "feedback reconoce llamada normal, umbral largo, bono y mejor pago con moneda secundaria",
             "mejor llamada compara el bono real de las anteriores y excluye el mismo evento",
-            "Logros controls gate feedback and queue current pasted reflections after the import dialog closes"
+            "Refuerzo positivo funciona con Logros apagado y espera el cierre del diálogo de importación"
           ]
         }
       ]

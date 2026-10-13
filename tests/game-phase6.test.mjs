@@ -580,9 +580,9 @@ test('consistencia de gamificación se mantiene aunque esté apagada', () => {
 test('Arcade fijo y reduced-motion solo elimina movimiento', () => {
   const game = read('js/game.js');
   const tone = between(game, 'function playGameTone', '\nconst gameEventVersions');
-  assert.match(tone, /arcadeEnabled\(\)/);
+  assert.match(tone, /reinforcementFeedbackEnabled\(channel\)/);
   assert.match(tone, /dayKey === currentGameDayKey\(\)/);
-  assert.match(tone, /playGameSound\(kind, \{ allowed \}\)/);
+  assert.match(tone, /playGameSound\(kind, \{ allowed, channel \}\)/);
   assert.doesNotMatch(tone, /prefers-reduced-motion/);
 });
 

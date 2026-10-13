@@ -2,8 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createGameAudio, createGameAudioPreview } from '../js/game-audio.js';
 
-function harness({ resumeMode = 'running', available = true, delayedEnded = false, preview = false } = {}) {
-  const config = { masterVolume: 100, game: { enabled: true, soundEnabled: true, soundVolume: 40 } };
+function harness({ resumeMode = 'running', available = true, delayedEnded = false, preview = false, channel = 'game' } = {}) {
+  const config = { masterVolume: 100, game: { enabled: true, soundEnabled: true, soundVolume: 40 }, reinforcement: { enabled: true } };
   const timers = new Map(), documentListeners = new Map(), hostListeners = new Map(), contexts = [];
   let timerId = 0;
   const addListener = (map, name, callback) => map.set(name, [...(map.get(name) || []), callback]);
@@ -69,7 +69,7 @@ function harness({ resumeMode = 'running', available = true, delayedEnded = fals
     setTimeout(callback, delay) { const id = ++timerId; timers.set(id, { callback, delay }); return id; },
     clearTimeout(id) { timers.delete(id); },
   };
-  const audio = (preview ? createGameAudioPreview : createGameAudio)({ readSettings: () => config, host, doc });
+  const audio = (preview ? createGameAudioPreview : createGameAudio)({ readSettings: () => config, host, doc, channel });
   const dispatch = (name, props = {}) => {
     for (const callback of documentListeners.get(name) || []) callback({ type: name, isTrusted: true, ...props });
   };
@@ -104,6 +104,37 @@ test('inicializar o recargar no crea contexto ni reproduce eventos anteriores', 
 });
 
 const WEAPON_CUES = ['shoot-pistol', 'shoot-smg', 'shoot-shotgun', 'shoot-rocket', 'shoot-railgun', 'shoot-flame', 'shoot-too-much', 'shoot-drone', 'shoot-psr', 'shoot-wand', 'shoot-grenade'];
+
+test('el audio personal funciona con Logros apagado y respeta su interruptor y volúmenes', async () => {
+  const h = harness({ channel: 'personal', delayedEnded: true });
+  h.config.game.enabled = false;
+  h.config.masterVolume = 50;
+  h.config.game.soundVolume = 20;
+  h.unlock();
+  assert.equal(h.audio.play('reward'), true);
+  await h.flush();
+  assert.ok(h.sources.length > 0);
+  assert.equal(h.contexts[0].nodes[0].gain.events.at(-1).value, .1);
+  h.config.game.enabled = true;
+  h.audio.sync();
+  h.config.game.enabled = false;
+  h.audio.sync();
+  assert.equal(h.sources.some(source => source.stops.includes(undefined)), false);
+  h.config.reinforcement.enabled = false;
+  h.audio.sync();
+  assert.ok(h.sources.every(source => source.stops.includes(undefined)));
+  assert.equal(h.audio.play('reward'), false);
+});
+
+test('Logros encendido no activa audio personal cuando el refuerzo está apagado', async () => {
+  const h = harness({ channel: 'personal' });
+  h.config.reinforcement.enabled = false;
+  h.unlock();
+  assert.equal(h.contexts.length, 0);
+  assert.equal(h.audio.play('reward'), false);
+  await h.flush();
+  assert.equal(h.sources.length, 0);
+});
 
 test('la prueba explícita suena con Logros apagado sin activar ni cambiar preferencias', async () => {
   const h = harness({ preview: true });

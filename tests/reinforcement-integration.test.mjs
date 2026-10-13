@@ -168,6 +168,20 @@ function harness(t, { at = new Date(2026, 8, 29, 12).getTime(), goal = 10000, st
   };
 }
 
+test('los premios de fin de turno se ofrecen con Logros apagado sin abrir STAGE CLEAR', (t) => {
+  const h = harness(t);
+  h.config.game.enabled = false;
+  h.config.reinforcement.enabled = true;
+  h.state.shiftEndedAt = h.iso(h.now);
+  h.state.game.reinforcement.pendingRewards = [{ id: 'end-tea', rewardId: 'tea', name: 'Té', icon: '☕', window: 'shift-end', dayKey: h.keyFor() }];
+  h.nodes.set('physicalRewardClaimList', { innerHTML: '' });
+  h.nodes.set('physicalRewardClaimTitle', { textContent: '' });
+  const xp = h.state.game.totalXp;
+  assert.equal(onGameShiftEnded(h.keyFor()), true);
+  assert.deepEqual(h.openedModals, ['physicalRewardClaimModal']);
+  assert.equal(h.state.game.totalXp, xp);
+});
+
 test('Arcade sustituye intensidades antiguas sin activar Logros ni modificar XP guardado', (t) => {
   const h = harness(t);
   h.state.game.totalXp = 321;
@@ -745,12 +759,14 @@ test('cola real limita a tres toasts y no repite el último texto después de ex
   h.config.reinforcement.enabled = true;
   queueGameToast('Anuncio personal', '', { channel: 'personal' });
   renderGameLive();
-  assert.equal(h.stack.children.length, 0);
+  assert.equal(h.stack.children.length, 1);
   renderGame();
-  assert.equal(h.stack.children.length, 0);
+  assert.equal(h.stack.children.length, 1);
   h.config.reinforcement.enabled = false;
+  renderGame();
   queueGameToast('Apagado', '', { channel: 'personal' });
-  assert.equal(h.announcements.at(-1), 'Cola cuatro');
+  assert.equal(h.stack.children.length, 0);
+  assert.equal(h.announcements.at(-1), 'Anuncio personal');
 });
 
 test('apagar Logros limpia refuerzo visible y conserva preferencias de sonido, premios e historial guardados', (t) => {
@@ -791,11 +807,11 @@ test('apagar Logros limpia refuerzo visible y conserva preferencias de sonido, p
   assert.equal(h.nodes.get('gameArena').hidden, true);
   assert.equal(h.nodes.get('gameMissions').hidden, true);
   assert.equal(h.nodes.get('gameCallFx').innerHTML, '');
-  assert.equal(h.stack.children.length, 0);
+  assert.equal(h.stack.children.length, 3, 'los avisos personales permanecen visibles aunque Logros esté apagado');
   assert.deepEqual(h.closedModals, ['stageClearModal', 'chestModal']);
   for (const channel of ['game', 'personal', 'either']) queueGameToast(`Off ${channel}`, '', { channel });
   announceGameStatus('Off anuncio');
-  assert.equal(h.announcements.length, announcementsBefore);
+  assert.equal(h.announcements.length, announcementsBefore + 2, 'se anuncian solo los canales personal y compartido');
   assert.equal(claimPendingChest(), false);
   assert.equal(chooseCycleReward('xp'), false);
   assert.equal(equipAccessory('Armadura cian'), false);

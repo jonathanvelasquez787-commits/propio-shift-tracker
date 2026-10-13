@@ -5,7 +5,7 @@ import { battleWorkMode } from './game-duel.js';
 import { battleMarkup, syncBattle, playBattleCall, stopBattle, normalizeBattleWeapon } from './game-battle.js';
 import { financeReservationComplete } from './finance.js';
 import { activeWorkSinceLastCall, monetaryMilestones, supportiveDayEvidence, surpriseDecision } from './reinforcement-rules.js';
-import { chooseCallFeedback, configureReinforcementFeedback, notifyReinforcement, reinforcementText } from './reinforcement-feedback.js';
+import { chooseCallFeedback, configureReinforcementFeedback, notifyReinforcement, reinforcementFeedbackEnabled, reinforcementText } from './reinforcement-feedback.js';
 let appConfirm, callDateKeyFromValue, callDateToDate, callsForDay, closeModal, computeComplianceStreak, convertedAmountText;
 let cycleBoundsForOffset, cycleEarningsForOffset, dayAdherence, dayComplianceStatus, dayConfigFor;
 let dayIsEffectivelyOff, effectiveCycleGoal, effectiveDailyGoal, escapeHtml, financeConvertedInline;
@@ -1394,11 +1394,8 @@ function clearTransientGameUi() {
   if (fx) fx.innerHTML = '';
   document.querySelectorAll('.game-pixel-fx-layer').forEach((node) => node.remove());
   document.querySelectorAll('.game-live-xp-float').forEach((node) => node.remove());
-  const stack = document.getElementById('gameToastStack');
-  if (stack) stack.replaceChildren();
   const live = document.getElementById('gameStatusLive');
-  if (live) live.textContent = '';
-  gameToastQueue.length = 0;
+  if (live && !reinforcementFeedbackEnabled('either')) live.textContent = '';
   for (const id of ['stageClearModal', 'chestModal']) {
     if (document.getElementById(id)?.classList.contains('open')) closeModal(id);
   }
@@ -1411,6 +1408,8 @@ export function renderGame() {
   const enabled = gameEnabled();
   document.documentElement.classList.toggle('game-arcade', arcadeEnabled());
   document.documentElement.classList.toggle('game-subtle', false);
+
+  pruneDisabledGameToasts();
 
   if (!enabled) clearTransientGameUi();
 
@@ -1445,8 +1444,8 @@ let lastGameToastText = '';
 let lastDisplayedToastText = '';
 const TOAST_PRIORITIES = Object.freeze({ record: 4, loot: 3, impulse: 2, critical: 2, '': 1 });
 
-export function announceGameStatus(message) {
-  if (!gameEnabled() || state.activeCall) return;
+export function announceGameStatus(message, { channel = 'game' } = {}) {
+  if (!reinforcementFeedbackEnabled(channel) || state.activeCall) return;
   const live = document.getElementById('gameStatusLive');
   if (!live || !message) return;
   live.textContent = '';
@@ -1456,7 +1455,7 @@ export function announceGameStatus(message) {
 export function queueGameToast(message, tone = '', options = {}) {
   const text = String(message ?? '').trim();
   const channel = options.channel || 'game';
-  const allowed = gameEnabled() && (channel !== 'personal' || settings.reinforcement?.enabled === true);
+  const allowed = reinforcementFeedbackEnabled(channel);
   if (!text || !allowed || text === lastGameToastText) return;
   const key = `${tone}:${text}`;
   if (gameToastQueue.some((item) => item.key === key) || Array.from(document.querySelectorAll('#gameToastStack [data-game-toast-key]')).some((node) => node.dataset.gameToastKey === key)) return;
@@ -1464,16 +1463,27 @@ export function queueGameToast(message, tone = '', options = {}) {
   lastGameToastText = text;
   gameToastQueue.push({ key, message: text, tone, priority, channel });
   gameToastQueue.sort((a, b) => b.priority - a.priority);
-  if (options.announce !== false) announceGameStatus(text);
+  if (options.announce !== false) announceGameStatus(text, { channel });
   drainGameToasts();
+}
+
+function pruneDisabledGameToasts() {
+  const stack = document.getElementById('gameToastStack');
+  for (const node of Array.from(stack?.children || [])) {
+    if (!reinforcementFeedbackEnabled(node.dataset.gameToastChannel || 'game')) node.remove();
+  }
+  for (let index = gameToastQueue.length - 1; index >= 0; index--) {
+    if (!reinforcementFeedbackEnabled(gameToastQueue[index].channel)) gameToastQueue.splice(index, 1);
+  }
 }
 
 function drainGameToasts() {
   const stack = document.getElementById('gameToastStack');
+  if (stack) stack.hidden = !!state.activeCall;
   if (!stack || state.activeCall || document.querySelector('.modal-overlay.open')) return;
   while (gameToastQueue.length && stack.children.length < 3) {
     const item = gameToastQueue.shift();
-    const allowed = gameEnabled() && (item.channel !== 'personal' || settings.reinforcement?.enabled === true);
+    const allowed = reinforcementFeedbackEnabled(item.channel);
     if (!allowed) continue;
     if (item.message === lastDisplayedToastText) continue;
     lastDisplayedToastText = item.message;
@@ -1494,10 +1504,11 @@ function drainGameToasts() {
   }
 }
 
-function playGameTone(kind = 'hit', dayKey = currentGameDayKey()) {
-  const allowed = () => !state.activeCall && arcadeEnabled() && dayKey === currentGameDayKey() && dayKey === displayedGameDayKey();
+function playGameTone(kind = 'hit', dayKey = currentGameDayKey(), channel = 'game') {
+  const allowed = () => !state.activeCall && reinforcementFeedbackEnabled(channel) && dayKey === currentGameDayKey()
+    && (channel === 'personal' || dayKey === displayedGameDayKey());
   if (!allowed()) return false;
-  return playGameSound(kind, { allowed });
+  return playGameSound(kind, { allowed, channel });
 }
 
 const gameEventVersions = new WeakMap();
@@ -2521,7 +2532,7 @@ function openStageClear(dayKey, entry, { celebrate = false, leveledUp = false } 
 }
 
 export function onGameShiftEnded(dayKey = currentGameDayKey()) {
-  if (!gameEnabled()) return;
+  if (!gameEnabled()) return onPositiveRewardWindow('shift-end');
   const normalizedDayKey = callDateKeyFromValue(dayKey) || currentGameDayKey();
   ensureGameState(normalizedDayKey);
   const alreadyFinalized = state.game.days[normalizedDayKey]?.finalized;
