@@ -215,10 +215,12 @@ test('Logros controls gate feedback and queue current pasted reflections after t
   closed.length = 0;
   config.game.enabled = false;
   renderPositiveReinforcement();
-  for (const id of ['positiveReflectionModal', 'physicalRewardClaimModal', 'physicalRewardEditorModal']) {
+  for (const id of ['positiveReflectionModal', 'physicalRewardClaimModal']) {
     assert.ok(closed.includes(id), `${id} se cierra al apagar Logros`);
     assert.equal(nodes.get(id).open, false);
   }
+  assert.equal(nodes.get('physicalRewardEditorModal').open, true, 'el editor de preferencias sigue disponible con Logros apagado');
+  assert.equal(closed.includes('physicalRewardEditorModal'), false);
   assert.deepEqual(currentState.game.reinforcement, saved);
   assert.equal(reopenPositiveReflection(call, dayKey), false);
   assert.equal(onPositiveRewardWindow('break', { manual: true }), false);

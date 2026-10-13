@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createGameAudio } from '../js/game-audio.js';
+import { createGameAudio, createGameAudioPreview } from '../js/game-audio.js';
 
-function harness({ resumeMode = 'running', available = true, delayedEnded = false } = {}) {
+function harness({ resumeMode = 'running', available = true, delayedEnded = false, preview = false } = {}) {
   const config = { masterVolume: 100, game: { enabled: true, soundEnabled: true, soundVolume: 40 } };
   const timers = new Map(), documentListeners = new Map(), hostListeners = new Map(), contexts = [];
   let timerId = 0;
@@ -69,7 +69,7 @@ function harness({ resumeMode = 'running', available = true, delayedEnded = fals
     setTimeout(callback, delay) { const id = ++timerId; timers.set(id, { callback, delay }); return id; },
     clearTimeout(id) { timers.delete(id); },
   };
-  const audio = createGameAudio({ readSettings: () => config, host, doc });
+  const audio = (preview ? createGameAudioPreview : createGameAudio)({ readSettings: () => config, host, doc });
   const dispatch = (name, props = {}) => {
     for (const callback of documentListeners.get(name) || []) callback({ type: name, isTrusted: true, ...props });
   };
@@ -104,6 +104,46 @@ test('inicializar o recargar no crea contexto ni reproduce eventos anteriores', 
 });
 
 const WEAPON_CUES = ['shoot-pistol', 'shoot-smg', 'shoot-shotgun', 'shoot-rocket', 'shoot-railgun', 'shoot-flame', 'shoot-too-much', 'shoot-drone', 'shoot-psr', 'shoot-wand', 'shoot-grenade'];
+
+test('la prueba explícita suena con Logros apagado sin activar ni cambiar preferencias', async () => {
+  const h = harness({ preview: true });
+  Object.assign(h.config.game, { enabled: false, soundEnabled: false, soundVolume: 20 });
+  h.config.masterVolume = 50;
+  const before = structuredClone(h.config);
+  assert.equal(h.audio.play('loot'), false);
+  assert.equal(h.audio.play('loot', { type: 'click', isTrusted: false }), false);
+  assert.equal(h.contexts.length, 0);
+  assert.equal(h.audio.play('loot', { type: 'click', isTrusted: true }), true);
+  await h.flush();
+  assert.ok(h.sources.length > 0);
+  assert.equal(h.contexts[0].nodes[0].gain.events.at(-1).value, .1);
+  assert.deepEqual(h.config, before);
+  const count = h.sources.length;
+  h.dispatch('pointerdown');
+  h.dispatch('click');
+  await h.flush();
+  assert.equal(h.sources.length, count);
+  assert.equal(h.audio.play('loot'), false);
+});
+
+test('la prueba de sonido respeta volumen cero y cancela voces al ocultar la pestaña', async () => {
+  for (const mute of [h => { h.config.masterVolume = 0; }, h => { h.config.game.soundVolume = 0; }]) {
+    const h = harness({ preview: true });
+    h.config.game.enabled = false;
+    mute(h);
+    assert.equal(h.audio.play('loot', { type: 'click', isTrusted: true }), false);
+    await h.flush();
+    assert.equal(h.contexts.length, 0);
+    assert.equal(h.sources.length, 0);
+  }
+  const h = harness({ preview: true, delayedEnded: true });
+  h.config.game.enabled = false;
+  h.audio.play('loot', { type: 'click', isTrusted: true });
+  await h.flush();
+  h.doc.hidden = true;
+  h.dispatch('visibilitychange');
+  assert.ok(h.sources.every(source => source.stops.includes(undefined)));
+});
 
 test('las once armas tienen timbres distintos, breves y con recursos finitos', async () => {
   const signatures = new Set();

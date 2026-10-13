@@ -238,11 +238,13 @@ let editingRewardId = null;
 let editingTemplateId = null;
 let deferredWindow = null;
 
-export function clearPositiveReinforcementTransients() {
+export function clearPositiveReinforcementTransients({ keepEditor = false } = {}) {
   reflectionCall = null;
   reflectionQueue = [];
-  editingRewardId = null;
-  editingTemplateId = null;
+  if (!keepEditor) {
+    editingRewardId = null;
+    editingTemplateId = null;
+  }
   deferredWindow = null;
 }
 
@@ -450,7 +452,6 @@ function syncRewardEditorConditional() {
 }
 
 function openRewardEditor(reward = null, template = null) {
-  if (settings.game?.enabled !== true) return;
   const source = reward || template || { icon: '🎁', name: '', window: 'break', trigger: 'calls', every: 5, maxPerDay: 1, accumulationTarget: 1, durationMin: 0, costUsd: 0 };
   editingRewardId = reward?.id || null;
   editingTemplateId = reward?.templateId || template?.id || null;
@@ -470,7 +471,6 @@ function openRewardEditor(reward = null, template = null) {
 }
 
 function saveRewardEditor() {
-  if (settings.game?.enabled !== true) return;
   const reward = rewardEditorValues();
   if (!reward) {
     toast(translateText('Escribe un nombre para el premio.'));
@@ -496,7 +496,7 @@ function saveRewardEditor() {
 }
 
 function deleteRewardEditor() {
-  if (settings.game?.enabled !== true || !editingRewardId) return;
+  if (!editingRewardId) return;
   const previous = settings.reinforcement.rewards;
   settings.reinforcement.rewards = settings.reinforcement.rewards.filter((item) => item.id !== editingRewardId);
   if (saveSettingsOnly() === false) {
@@ -584,8 +584,8 @@ function renderHistory() {
 export function renderPositiveReinforcement() {
   ensurePositiveState();
   if (settings.game?.enabled !== true) {
-    clearPositiveReinforcementTransients();
-    for (const id of ['positiveReflectionModal', 'physicalRewardClaimModal', 'physicalRewardEditorModal']) {
+    clearPositiveReinforcementTransients({ keepEditor: true });
+    for (const id of ['positiveReflectionModal', 'physicalRewardClaimModal']) {
       if (document.getElementById(id)?.classList?.contains?.('open')) closeModal(id);
     }
   }
@@ -668,7 +668,9 @@ export function initPositiveReinforcement() {
   ensurePositiveState();
   document.addEventListener('click', (event) => {
     const target = event.target instanceof Element ? event.target.closest('[data-positive-action], [data-positive-outcome]') : null;
-    if (!target || settings.game?.enabled !== true) return;
+    if (!target) return;
+    const settingsAction = ['add-preset', 'edit-reward', 'new-reward', 'toggle-history'].includes(target.dataset.positiveAction);
+    if (settings.game?.enabled !== true && !settingsAction) return;
     if (target.dataset.positiveOutcome) return saveReflection(target.dataset.positiveOutcome);
     const action = target.dataset.positiveAction;
     if (action === 'skip-reflection') { reflectionCall = null; closeModal('positiveReflectionModal'); }

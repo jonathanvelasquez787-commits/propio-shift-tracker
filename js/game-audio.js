@@ -85,10 +85,10 @@ export function createGameAudio({ readSettings, host = globalThis, doc = host.do
       context.resume?.()?.catch?.(() => {});
     } catch { unlocked = false; }
   }
-  function init() {
+  function init({ unlockOnGesture = true } = {}) {
     if (initialized || !doc?.addEventListener) return;
     initialized = true;
-    for (const event of ['pointerdown', 'keydown', 'click']) doc.addEventListener(event, unlock, true);
+    if (unlockOnGesture) for (const event of ['pointerdown', 'keydown', 'click']) doc.addEventListener(event, unlock, true);
     doc.addEventListener('visibilitychange', () => { if (doc.hidden) stop(); });
     host.addEventListener?.('pagehide', stop);
   }
@@ -159,11 +159,30 @@ export function createGameAudio({ readSettings, host = globalThis, doc = host.do
     if (timer == null) timer = host.setTimeout(flush, 45);
     return true;
   }
-  return { init, play, stop, sync };
+  return { init, play, stop, sync, unlock };
+}
+
+export function createGameAudioPreview({ readSettings = () => settings, ...environment } = {}) {
+  const audio = createGameAudio({ ...environment, readSettings: () => {
+    const config = readSettings() || {};
+    return { ...config, game: { ...config.game, enabled: true, soundEnabled: true } };
+  } });
+  return {
+    play(kind, event) {
+      if (event?.isTrusted !== true) return false;
+      audio.init({ unlockOnGesture: false });
+      audio.unlock(event);
+      return audio.play(kind);
+    },
+    stop: audio.stop,
+    sync: audio.sync,
+  };
 }
 
 const gameAudio = createGameAudio({ readSettings: () => settings });
+const gameAudioPreview = createGameAudioPreview();
 export function initGameAudio() { gameAudio.init(); }
 export function playGameSound(kind, options) { return gameAudio.play(kind, options); }
-export function syncGameAudio() { gameAudio.sync(); }
-export function stopGameSounds() { gameAudio.stop(); }
+export function previewGameSound(kind, event) { return gameAudioPreview.play(kind, event); }
+export function syncGameAudio() { gameAudio.sync(); gameAudioPreview.sync(); }
+export function stopGameSounds() { gameAudio.stop(); gameAudioPreview.stop(); }
