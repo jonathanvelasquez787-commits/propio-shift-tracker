@@ -2,13 +2,15 @@
 // credentials, client details and arbitrary portal text are never serialized.
 const normalize = value => String(value || '').replace(/\s+/g, ' ').trim().toLowerCase();
 const labels = {
+  signout: /^(sign\s*out|log\s*out|cerrar sesi[oó]n|salir)$/,
   accept: /^(accept( call)?|answer( call)?|aceptar( llamada)?|contestar( llamada)?)$/,
   reject: /^(reject( call)?|decline( call)?|rechazar( llamada)?)$/,
   hangup: /^(hang ?up|end call|disconnect call|colgar|finalizar llamada|terminar llamada)$/,
   idle: /^(start calls|stop calls|iniciar llamadas|detener llamadas)$/,
 };
 export function controlKind(element) {
-  for (const value of [element?.getAttribute?.('aria-label'), element?.getAttribute?.('title'), element?.textContent]) {
+  const buttonValue = element?.matches?.('input[type="button"],input[type="submit"]') ? element.value : null;
+  for (const value of [element?.getAttribute?.('aria-label'), element?.getAttribute?.('title'), element?.textContent, buttonValue]) {
     const label = normalize(value);
     for (const [kind, pattern] of Object.entries(labels)) if (pattern.test(label)) return kind;
   }
@@ -45,6 +47,15 @@ export function createPortalObserver({ document, send, documentId, now = () => D
     const target = event.target?.closest?.('button,[role="button"],input,a');
     if (!visible(target) || readPortalObservation(document).session !== 'authenticated') return;
     const kind = controlKind(target);
+    if (kind === 'signout') {
+      // Send during capture, before the portal navigates away and destroys this
+      // document. The worker waits for the resulting public-site navigation.
+      try {
+        Promise.resolve(send({ kind: 'portal-sign-out', documentId })).catch(error => {
+          if (/extension context invalidated/i.test(String(error?.message))) stop();
+        });
+      } catch { /* A failed message never closes the shift. */ }
+    }
     if (kind === 'accept') armedUntil = now() + 30000;
     if (kind === 'reject') pendingSignal = 'rejected';
   }

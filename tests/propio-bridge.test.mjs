@@ -78,6 +78,17 @@ test('opening the extension during a visible call or synthetic answer click cann
   baseline.stop();
 });
 
+test('trusted Sign out sends intent before navigation while synthetic, hidden and unauthenticated clicks do not', async () => {
+  const f = portalDocument(), sent = [];
+  f.document.welcome = f.element('Welcome, Synthetic User (12345)'); f.document.controls = [f.element('SIGN OUT')];
+  const observer = createPortalObserver({ document: f.document, documentId: 'signout-document-123', send: packet => { sent.push(packet); return Promise.resolve({ ok: true }); } });
+  f.click(false); assert.equal(sent.length, 0);
+  f.click(true); assert.deepEqual(sent, [{ kind: 'portal-sign-out', documentId: 'signout-document-123' }]);
+  f.document.controls = [f.element('Sign out', false)]; f.click(true); assert.equal(sent.length, 1);
+  f.document.controls = [f.element('Sign out')]; f.document.welcome = null; f.click(true); assert.equal(sent.length, 1);
+  observer.stop();
+});
+
 test('el puente bloquea una pestaña desactualizada incluso si se descarta el aviso o vuelve el valor anterior', () => {
   const values = new Map([['calls','[]'], ['state','{}'], ['settings','{}']]);
   const storage = { getItem: key => values.get(key) ?? null };
@@ -139,6 +150,8 @@ function workerFixture() {
 
 const portalSender = { id: 'extension-id', frameId: 0, tab: { id: 1 }, url: PORTAL_ORIGIN + '/' };
 const portalPacket = (session, extra = {}) => ({ kind: 'portal-observation', documentId: 'portal-document-12345', session, call: 'unknown', ...extra });
+const signOutPacket = { kind: 'portal-sign-out', documentId: 'portal-document-12345' };
+const publicRedirect = { tabId: 1, frameId: 0, url: 'https://propio.com/', transitionType: 'link', transitionQualifiers: ['server_redirect'] };
 async function enablePortal(f) {
   f.targets([scope]); await f.worker.message({ kind: 'pair' }, sender);
   await f.worker.message({ kind: 'mode', mode: 'auto' }, sender);
@@ -156,6 +169,57 @@ test('portal login and confirmed logout queue shift events once across reload an
   assert.deepEqual(f.delivered.map(x => x.event.type), ['session-start', 'session-end']);
   assert.equal(f.delivered[1].event.sessionId, f.delivered[0].event.sessionId);
   assert.equal(f.delivered[1].event.startedAt, f.delivered[0].event.at);
+});
+
+test('Sign out completes on a public-site redirect without revisiting Login, persists across restart and closes calls first', async () => {
+  const f = workerFixture(); await enablePortal(f);
+  await f.worker.message(portalPacket('authenticated', { call: 'connected', signal: 'accepted' }), portalSender);
+  assert.equal((await f.worker.message(signOutPacket, portalSender)).ok, true);
+  assert.deepEqual(f.delivered.map(p => p.event.type), ['session-start', 'call-start']);
+  f.advance(60000); f.restart();
+  await f.worker.navigationCommitted({ ...publicRedirect, url: 'https://www.propio.com/?private-token=do-not-retain' });
+  assert.deepEqual(f.delivered.map(p => p.event.type), ['session-start', 'call-start', 'call-end', 'session-end']);
+  await f.worker.navigationCommitted(publicRedirect);
+  await f.worker.message(portalPacket('authenticated'), portalSender);
+  await f.worker.message(portalPacket('logged-out'), portalSender);
+  assert.equal(f.delivered.filter(p => p.event.type === 'session-end').length, 1);
+  assert.equal(f.delivered.filter(p => p.event.type === 'session-start').length, 1);
+  assert.doesNotMatch(JSON.stringify(f.data), /private-token|do-not-retain|https:\/\//);
+});
+
+test('public navigation never closes a session without matching recent intent in the same authenticated tab', async () => {
+  const f = workerFixture(); await enablePortal(f);
+  await f.worker.message(portalPacket('authenticated'), portalSender);
+  await f.worker.navigationCommitted(publicRedirect); assert.equal(f.delivered.length, 1);
+  for (const badSender of [{ ...portalSender, frameId: 1 }, { ...portalSender, url: 'https://propio.com/' }, { ...portalSender, id: 'other-extension' }])
+    assert.equal(await f.worker.message(signOutPacket, badSender), null);
+  assert.equal((await f.worker.message({ ...signOutPacket, documentId: 'stale-document-1234' }, portalSender)).ok, false);
+  await f.worker.message(signOutPacket, portalSender);
+  for (const navigation of [{ ...publicRedirect, tabId: 2 }, { ...publicRedirect, frameId: 1 },
+    { ...publicRedirect, url: 'https://propio.com.evil.test/' }, { ...publicRedirect, url: 'http://propio.com/' },
+    { ...publicRedirect, transitionType: 'typed', transitionQualifiers: ['from_address_bar'] },
+    { ...publicRedirect, transitionType: 'reload', transitionQualifiers: [] },
+    { ...publicRedirect, transitionQualifiers: ['forward_back'] }]) await f.worker.navigationCommitted(navigation);
+  assert.equal(f.delivered.length, 1);
+  f.advance(60001); await f.worker.navigationCommitted(publicRedirect); assert.equal(f.delivered.length, 1);
+});
+
+test('a renewed portal document cancels old Sign out intent and ordinary navigation cannot reuse it', async () => {
+  const f = workerFixture(); await enablePortal(f);
+  await f.worker.message(portalPacket('authenticated'), portalSender);
+  await f.worker.message(signOutPacket, portalSender);
+  await f.worker.message(portalPacket('authenticated', { documentId: 'new-portal-document-123' }), portalSender);
+  await f.worker.navigationCommitted(publicRedirect);
+  assert.deepEqual(f.delivered.map(p => p.event.type), ['session-start']);
+});
+
+test('an intermediate unknown logout page preserves Sign out intent until the public redirect commits', async () => {
+  const f = workerFixture(); await enablePortal(f);
+  await f.worker.message(portalPacket('authenticated'), portalSender);
+  await f.worker.message(signOutPacket, portalSender);
+  await f.worker.message(portalPacket('unknown', { documentId: 'intermediate-document-123' }), portalSender);
+  f.advance(1000); await f.worker.navigationCommitted(publicRedirect);
+  assert.deepEqual(f.delivered.map(p => p.event.type), ['session-start', 'session-end']);
 });
 test('portal observations reject untrusted frames and never retain supplied personal data', async () => {
   const f = workerFixture(); await enablePortal(f);
