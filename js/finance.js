@@ -1,11 +1,44 @@
 import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 // app-main.js inyecta los helpers; app-context.js mantiene el estado compartido.
 import { settings, calls } from './app-context.js';
-import { configureFinancePlanning, captureFinanceDetails, financePlanningRowHtml, renderFinancePlanning, financeAmountInputHtml, clearFinanceAmountDraft, financeSelectedMonth, financeReservationHtml } from './finance-planning.js';
-import { financeExpenseStatus, financeBudgetPeriod } from './finance-plan-model.js';
+import { configureFinancePlanning, captureFinanceDetails, financePlanningRowHtml, renderFinancePlanning, financeAmountInputHtml, clearFinanceAmountDraft, financeReservationHtml, prepareFinanceMonthRender, financeCurrentExpenseStatus, financeReservationSign, financeInputUsd, financeInputValue } from './finance-planning.js';
+import { financeBudgetPeriod, financeCanCompareMonthlyBudget } from './finance-plan-model.js';
 
 let money, convertedAmountText, iconHtml, escapeHtml, toast, appConfirm, openModal, closeModal, render;
 let saveSettingsOnly, makeLocalId, parseMoney, usdCeilFromCurrencyAmount, higherRateBonusForCalls, renderEmojiPicker;
+
+function financeMutationSnapshot() {
+  const root = settings;
+  const map = settings.financeCategories;
+  const categories = Object.entries(map).map(([id, category]) => ({id, ref:category, value:{...category}, rows:category.rows, items:category.rows.slice()}));
+  const custom = settings.customFinanceCategories;
+  const customItems = Array.isArray(custom) ? custom.slice() : [];
+  const records = categories.flatMap(category => category.items).concat(customItems).map(ref => ({ref, value:{...ref}}));
+  return {root, map, categories, custom, customItems, records, auto:settings.financeAutoFill, hasAuto:Object.hasOwn(settings, 'financeAutoFill')};
+}
+
+function saveFinanceMutation(snapshot) {
+  if (saveSettingsOnly() !== false) return true;
+  // No restaures un snapshot en una cuenta que el escritor haya reemplazado.
+  if (settings !== snapshot.root) return false;
+  for (const {ref, value} of snapshot.records) {
+    Object.keys(ref).forEach(key => { if (!Object.hasOwn(value, key)) delete ref[key]; });
+    Object.assign(ref, value);
+  }
+  Object.keys(snapshot.map).forEach(key => { delete snapshot.map[key]; });
+  for (const category of snapshot.categories) {
+    category.rows.splice(0, category.rows.length, ...category.items);
+    Object.assign(category.ref, category.value, {rows:category.rows});
+    Object.defineProperty(snapshot.map, category.id, {value:category.ref,enumerable:true,writable:true,configurable:true});
+  }
+  settings.financeCategories = snapshot.map;
+  if (Array.isArray(snapshot.custom)) snapshot.custom.splice(0, snapshot.custom.length, ...snapshot.customItems);
+  if (snapshot.custom === undefined) delete settings.customFinanceCategories; else settings.customFinanceCategories = snapshot.custom;
+  if (snapshot.hasAuto) settings.financeAutoFill = snapshot.auto; else delete settings.financeAutoFill;
+  render();
+  toast(translateText('No se aplicó el ajuste de Finanzas porque no se pudo guardar. Tus valores anteriores se conservaron.'), {persistenceFailure:true});
+  return false;
+}
 
 export function configureFinanceContext(context) {
   ({ money, convertedAmountText, iconHtml, escapeHtml, toast, appConfirm, openModal, closeModal,
@@ -86,16 +119,17 @@ function financeTotalAssigned() {
   return total;
 }
 function financeAvailableBalance() {
-  return financeTotalEarningsAllTime() - financeTotalAssigned();
+  const available = financeTotalEarningsAllTime() - financeTotalAssigned();
+  return available < 0 && available >= -0.004 ? 0 : available;
 }
 
 // Todas las categorías con filas guardadas: las 7 fijas + las propias del usuario. Ya no alcanza
 // con Object.keys(FINANCE_CATEGORIES) para recorrer settings.financeCategories, porque una
 // categoría propia también vive ahí.
 function financeAllCategoryIds() {
-  return Object.keys(FINANCE_CATEGORIES).concat(
-    (Array.isArray(settings.customFinanceCategories) ? settings.customFinanceCategories : []).map(c => c.id)
-  );
+  return [...new Set([...Object.keys(FINANCE_CATEGORIES),
+    ...(Array.isArray(settings.customFinanceCategories) ? settings.customFinanceCategories : []).map(c => c.id),
+    ...Object.keys(settings.financeCategories || {})])];
 }
 
 // Todas las filas de Gastos (de cualquier categoría, ver financeRowIsMeta) en UNA sola cola
@@ -119,7 +153,13 @@ function financeMetaRowsSorted() {
 
 export function financeIsRowPagado(row) {
   // manualPaid conserva la exclusión automática de las filas antiguas; el ledger determina los pagos.
-  return row.manualPaid === true || (Number(row.assignedAmount) >= Number(row.targetAmount) && Number(row.targetAmount) > 0);
+  return row.manualPaid === true || financeReservationComplete(row);
+}
+
+export function financeReservationComplete(row) {
+  const target = Number(row.targetAmount);
+  const assigned = Number(row.assignedAmount) || 0;
+  return Number.isFinite(target) && target > 0 && Number.isFinite(assigned) && assigned > 0 && assigned >= target - 0.004;
 }
 
 // Próximos 2 gastos/metas pendientes (Gastos primero por prioridad, saltando Pagados; si no
@@ -128,7 +168,7 @@ export function financeIsRowPagado(row) {
 function financePendingPreviewItems(limit = 2) {
   const pending = [];
   financeGastoRowsSorted().forEach(r => {
-    if (!financeIsRowPagado(r)) pending.push({ row: r, isMeta: false });
+    if (Number(r.targetAmount) > 0 && !financeIsRowPagado(r)) pending.push({ row: r, isMeta: false });
   });
   if (pending.length < limit) {
     financeMetaRowsSorted().forEach(r => {
@@ -240,7 +280,10 @@ function financePeriodLabel(row) {
 }
 
 function financeRowMetric(label, amount, badge = '') {
-  const help = label === translateText('Reservado') ? translateText('Dinero de tus ganancias que apartaste para este gasto o meta. Sigue reservado hasta que lo devuelvas al disponible. Reservar no significa pagar ni confirma un depósito bancario.') : '';
+  let help = label === translateText('Reservado') ? translateText('Dinero de tus ganancias que apartaste para este gasto o meta. Sigue reservado hasta que lo devuelvas al disponible. Reservar no significa pagar ni confirma un depósito bancario.') : '';
+  if (help && Math.abs(amount * 100 - Math.round(amount * 100)) > 1e-6) {
+    help += ui` Valor interno: ${financeInputValue(amount)} USD${convertedAmountText(amount) ? ` (${convertedAmountText(amount)})` : ''}. La pantalla redondea a centavos.`;
+  }
   return ui`<div class="fin-plan-metric"><span ${help ? `data-fin-help="${escapeHtml(help)}" tabindex="0"` : ''}>${label}</span><strong>${money(amount)}</strong>${financeConvertedNote(amount)}${badge}</div>`;
 }
 
@@ -250,10 +293,11 @@ function financeRowHtml(row, opts) {
   const downDisabled = opts.index === opts.count - 1 ? 'disabled' : '';
   const target = Number(row.targetAmount) || 0;
   const assigned = Number(row.assignedAmount) || 0;
+  const sign = financeReservationSign(row.id);
   const signPillHtml = ui`
     <div class="mc-pill-row" role="group" aria-label="Sumar o restar de la reserva">
-      <button class="mc-pill-btn" data-fin-sign-btn data-sign="plus" aria-pressed="true" type="button" data-fin-help="${escapeHtml(translateText('Elige Sumar para apartar el monto escrito: baja el Disponible y sube el Reservado. Después pulsa Aplicar ajuste. No registra un pago.'))}">+ Sumar</button>
-      <button class="mc-pill-btn" data-fin-sign-btn data-sign="minus" aria-pressed="false" type="button" data-fin-help="${escapeHtml(translateText('Elige Restar para devolver el monto escrito: baja el Reservado y sube el Disponible. Después pulsa Aplicar ajuste. No elimina pagos ni reduce tus ganancias.'))}">− Restar</button>
+      <button class="mc-pill-btn" data-fin-sign-btn data-sign="plus" aria-pressed="${sign === 'plus'}" type="button" data-fin-help="${escapeHtml(translateText('Elige Sumar para apartar el monto escrito: baja el Disponible y sube el Reservado. Después pulsa Aplicar ajuste. No registra un pago.'))}">+ Sumar</button>
+      <button class="mc-pill-btn" data-fin-sign-btn data-sign="minus" aria-pressed="${sign === 'minus'}" type="button" data-fin-help="${escapeHtml(translateText('Elige Restar para devolver el monto escrito: baja el Reservado y sube el Disponible. Después pulsa Aplicar ajuste. No elimina pagos ni reduce tus ganancias.'))}">− Restar</button>
     </div>
   `;
   const priorityTitle = translateText('Prioridad del reparto automático: primero Gastos, luego Metas.');
@@ -271,9 +315,10 @@ function financeRowHtml(row, opts) {
   const barPct = target > 0 ? Math.min(100, assigned / target * 100) : 0;
   const reserveLabel = assigned <= 0 ? translateText('Sin reserva') : remaining > 0.004 ? translateText('Reserva parcial') : translateText('Reserva completa');
   const reserveTone = assigned <= 0 ? 'neutral' : remaining > 0.004 ? 'warn' : 'good';
-  const status = isMeta ? null : financeExpenseStatus(row, settings.financePayments, financeSelectedMonth());
+  const status = isMeta ? null : financeCurrentExpenseStatus(row);
+  const monthlyBudget = financeCanCompareMonthlyBudget(row);
   const paymentLabel = !status || status.paymentStatus === 'none' ? translateText('Sin pagos') : status.paymentStatus === 'partial' ? translateText('Pago parcial') : translateText('Pagado');
-  const paymentBadge = status ? ui`<span class="fin-badge tone-${status.excess > 0 ? 'warn' : status.paymentStatus === 'paid' ? 'good' : 'neutral'}">${status.excess > 0 ? translateText('Presupuesto excedido') : paymentLabel}</span>` : '';
+  const paymentBadge = status ? ui`<span class="fin-badge tone-${!monthlyBudget ? 'neutral' : status.excess > 0 ? 'warn' : status.paymentStatus === 'paid' ? 'good' : 'neutral'}">${!monthlyBudget && status.paid > 0 ? translateText('Pagos registrados') : monthlyBudget && status.excess > 0 ? translateText('Presupuesto excedido') : monthlyBudget ? paymentLabel : translateText('Sin pagos')}</span>` : '';
   const metrics = financeRowMetric(isMeta ? translateText('Objetivo') : translateText('Presupuesto'), target)
     + financeRowMetric(translateText('Reservado'), assigned, ui`<span class="fin-badge tone-${reserveTone}">${reserveLabel}</span>${!isMeta && row.manualPaid ? ui`<span class="fin-row-sub">Reserva automática omitida</span>` : ''}`)
     + financeRowMetric(isMeta ? translateText('Pendiente de reservar') : translateText('Pagado en el mes elegido'), isMeta ? remaining : status.paid, paymentBadge);
@@ -288,7 +333,7 @@ function financeRowHtml(row, opts) {
       <div class="fin-row-metrics">${metrics}</div>
       ${financeReservationHtml(row, ui`<div class="fin-row-actions">
         ${financeAmountInputHtml(row, 'reservation')}${signPillHtml}
-        <button class="fin-mini-btn-primary" type="button" data-fin-apply="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" data-fin-help="${escapeHtml(translateText('Confirma el monto y la opción Sumar o Restar. Sumar usa solo dinero disponible; en gastos no supera el presupuesto. Restar devuelve como máximo lo reservado.'))}">Aplicar ajuste</button>
+        <button class="fin-mini-btn-primary ${sign === 'minus' ? 'mode-minus' : ''}" type="button" data-fin-apply="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" data-fin-help="${escapeHtml(translateText('Confirma el monto y la opción Sumar o Restar. Sumar usa solo dinero disponible; en gastos no supera el presupuesto. Restar devuelve como máximo lo reservado.'))}">Aplicar ajuste</button>
         ${!isMeta && assigned > 0 ? ui`<button class="fin-ghost-btn" type="button" data-fin-reset="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" data-fin-help="${escapeHtml(translateText('Devuelve toda la reserva de este gasto al Disponible. Conserva el presupuesto, los pagos registrados y la exclusión del reparto automático.'))}">Liberar reserva</button>` : ''}
         <button class="fin-ghost-btn fin-ghost-btn-icon" type="button" data-fin-edit="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" aria-label="Editar fila" title="Editar fila">${iconHtml('edit')}</button>
         <button class="hr-window-remove-btn" type="button" data-fin-delete="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" aria-label="Eliminar fila" title="Eliminar fila">${iconHtml('trash')}</button>
@@ -300,8 +345,8 @@ function financeRowHtml(row, opts) {
 
 // Fila de total de una lista de Finanzas — mismo patrón visual que.wk-total-row de Resumen semanal,
 // sin lenguaje nuevo.
-function financeTotalsRowHtml(label, targetTotal, assignedTotal, assignedLabel) {
-  const remaining = Math.max(0, targetTotal - assignedTotal);
+function financeTotalsRowHtml(label, targetTotal, assignedTotal, assignedLabel, pendingTotal = undefined) {
+  const remaining = pendingTotal ?? Math.max(0, targetTotal - assignedTotal);
   return ui`
     <div class="wk-total-row" style="margin-bottom: 4px;">
       <div class="wk-total-label">${escapeHtml(label)}</div>
@@ -329,7 +374,8 @@ export function renderFinanceSection() {
   if (autoFillInput) autoFillInput.checked = !!settings.financeAutoFill;
 
   const gastoRows = financeGastoRowsSorted();
-  const nextPending = gastoRows.find(r => !financeIsRowPagado(r));
+  prepareFinanceMonthRender(gastoRows);
+  const nextPending = gastoRows.find(r => Number(r.targetAmount) > 0 && !financeIsRowPagado(r));
   const nextPriorityEl = document.getElementById('financeNextPriorityVal');
   if (nextPriorityEl) nextPriorityEl.textContent = nextPending ? nextPending.name : '—';
 
@@ -338,7 +384,8 @@ export function renderFinanceSection() {
   const gastosTotalRowEl = document.getElementById('financeGastosTotalRow');
   if (gastosTotalRowEl) {
     const gastoTargetTotal = gastoRows.reduce((sum, r) => sum + (Number(r.targetAmount) || 0), 0);
-    gastosTotalRowEl.innerHTML = gastoRows.length ? financeTotalsRowHtml(translateText('Total gastos'), gastoTargetTotal, gastoAssignedTotal, translateText('Reservado')) : '';
+    const gastoPendingTotal = gastoRows.reduce((sum, r) => sum + Math.max(0, (Number(r.targetAmount) || 0) - (Number(r.assignedAmount) || 0)), 0);
+    gastosTotalRowEl.innerHTML = gastoRows.length ? financeTotalsRowHtml(translateText('Total gastos'), gastoTargetTotal, gastoAssignedTotal, translateText('Reservado'), gastoPendingTotal) : '';
   }
   const gastosList = document.getElementById('financeGastosList');
   if (gastosList) {
@@ -353,8 +400,9 @@ export function renderFinanceSection() {
   if (metasTotalRow) {
     const metaTargetTotal = metaRows.reduce((sum, r) => sum + (Number(r.targetAmount) || 0), 0);
     const metaAssignedTotal = metaRows.reduce((sum, r) => sum + (Number(r.assignedAmount) || 0), 0);
+    const metaPendingTotal = metaRows.reduce((sum, r) => sum + Math.max(0, (Number(r.targetAmount) || 0) - (Number(r.assignedAmount) || 0)), 0);
     metasTotalRow.innerHTML = metaRows.length
-      ? financeTotalsRowHtml(translateText('Total metas'), metaTargetTotal, metaAssignedTotal, translateText('Reservado')) : '';
+      ? financeTotalsRowHtml(translateText('Total metas'), metaTargetTotal, metaAssignedTotal, translateText('Reservado'), metaPendingTotal) : '';
   }
   if (metasList) {
     metasList.innerHTML = metaRows.length
@@ -363,7 +411,7 @@ export function renderFinanceSection() {
   }
 
   renderFinancePreview();
-  renderFinancePlanning();
+  renderFinancePlanning({prepared:true});
   updateFinanceTotalsScrollHint();
 }
 
@@ -381,10 +429,11 @@ export function financeSwapPriority(catIdIgnored, rowId, direction) {
   const b = list[swapIdx];
   const rowA = settings.financeCategories[a.categoryId].rows.find(r => r.id === a.id);
   const rowB = settings.financeCategories[b.categoryId].rows.find(r => r.id === b.id);
+  const previous = financeMutationSnapshot();
   const tmp = rowA.priority;
   rowA.priority = rowB.priority;
   rowB.priority = tmp;
-  if (saveSettingsOnly() === false) return false;
+  if (!saveFinanceMutation(previous)) return false;
   renderFinanceSection();
 }
 
@@ -416,6 +465,7 @@ export function financeApplySignedAmount(catId, rowId, rawAmount, sign) {
   }
   const row = financeFindRow(catId, rowId);
   if (!row) return;
+  const previous = financeMutationSnapshot();
 
   if (sign === 'minus') {
     const before = Number(row.assignedAmount) || 0;
@@ -425,32 +475,35 @@ export function financeApplySignedAmount(catId, rowId, rawAmount, sign) {
       return;
     }
     row.assignedAmount = before - removed;
-    if (saveSettingsOnly() === false) return false;
+    if (!saveFinanceMutation(previous)) return false;
     clearFinanceAmountDraft(rowId);
     render();
-    toast(removed < monto
+    toast(Math.round(removed * 100) < Math.round(monto * 100)
       ? ui`Solo se restaron ${money(removed)}${convertedAmountText(removed) ? ` (${convertedAmountText(removed)})` : ''} de ${money(monto)}${convertedAmountText(monto) ? ` (${convertedAmountText(monto)})` : ''} — la fila no tenía más asignado. El resto no se tocó.`
       : translateText('Aplicado'));
     return;
   }
 
-  if (monto - financeAvailableBalance() > 1e-9) {
+  const required = financeRowIsMeta(row) ? monto : Math.min(monto, Math.max(0, Number(row.targetAmount) - (Number(row.assignedAmount) || 0)));
+  const available = financeAvailableBalance();
+  if (required - available > 1e-9 && Math.round(required * 100) > Math.round(available * 100)) {
     toast(translateText('No tienes suficiente disponible para asignar esa cantidad'));
     return;
   }
-  let appliedAmount = monto;
+  const funded = Math.min(required, Math.max(0, available));
+  let appliedAmount = funded;
   if (financeRowIsMeta(row)) {
-    row.assignedAmount = (Number(row.assignedAmount) || 0) + monto;
+    row.assignedAmount = (Number(row.assignedAmount) || 0) + funded;
   } else {
     const target = Number(row.targetAmount) || 0;
     const before = Number(row.assignedAmount) || 0;
-    row.assignedAmount = Math.min(target, before + monto);
+    row.assignedAmount = Math.min(target, before + funded);
     appliedAmount = row.assignedAmount - before;
   }
-  if (saveSettingsOnly() === false) return false;
+  if (!saveFinanceMutation(previous)) return false;
   clearFinanceAmountDraft(rowId);
   render();
-  toast(appliedAmount < monto
+  toast(Math.round(appliedAmount * 100) < Math.round(monto * 100)
     ? ui`Solo se asignaron ${money(appliedAmount)}${convertedAmountText(appliedAmount) ? ` (${convertedAmountText(appliedAmount)})` : ''} de ${money(monto)}${convertedAmountText(monto) ? ` (${convertedAmountText(monto)})` : ''} — el gasto ya llegó a su objetivo. El resto sigue en Disponible.`
     : translateText('Aplicado'));
 }
@@ -520,9 +573,10 @@ export function financeRunAutoFillCascade() {
 // Checkbox "Asignar disponible automáticamente" (ver #financeAutoFillInput en el HTML) — al
 // activarlo, reparte de inmediato cualquier Disponible que ya hubiera quedado sin asignar de antes.
 export function updateFinanceAutoFillSetting(checked) {
+  const previous = financeMutationSnapshot();
   settings.financeAutoFill = !!checked;
   const changed = settings.financeAutoFill && financeRunAutoFillCascade();
-  if (saveSettingsOnly() === false) return false;
+  if (!saveFinanceMutation(previous)) return false;
   render();
   if (settings.financeAutoFill) {
     toast(changed
@@ -538,7 +592,10 @@ export function financeResetRow(catId, rowId) {
   if (!row) return;
   const previous = row.assignedAmount;
   row.assignedAmount = 0;
-  if (saveSettingsOnly() === false) { row.assignedAmount = previous; return false; }
+  if (saveSettingsOnly() === false) {
+    row.assignedAmount = previous; render();
+    toast(translateText('No se liberó la reserva porque no se pudo guardar.'), {persistenceFailure:true}); return false;
+  }
   clearFinanceAmountDraft(rowId);
   render();
   toast(translateText('Reserva liberada. Los pagos registrados se conservan.'));
@@ -549,7 +606,10 @@ export function financeToggleManualPaid(catId, rowId, checked) {
   if (!row) return;
   const previous = row.manualPaid;
   row.manualPaid = !!checked;
-  if (saveSettingsOnly() === false) { if (previous === undefined) delete row.manualPaid; else row.manualPaid = previous; return false; }
+  if (saveSettingsOnly() === false) {
+    if (previous === undefined) delete row.manualPaid; else row.manualPaid = previous;
+    render(); toast(translateText('No se cambió la exclusión automática porque no se pudo guardar.'), {persistenceFailure:true}); return false;
+  }
   render();
 }
 
@@ -557,9 +617,12 @@ export function financeDeleteRow(catId, rowId) {
   const row = financeFindRow(catId, rowId);
   if (!row) return;
   appConfirm(ui`¿Eliminar "${row.name}"? Esta acción no se puede deshacer.`, () => {
-    const cat = settings.financeCategories[catId];
+    const current = financeAllCategoryIds().map(id => financeFindRow(id, rowId)).find(Boolean);
+    if (!current) return;
+    const previous = financeMutationSnapshot();
+    const cat = settings.financeCategories[current.categoryId];
     cat.rows = cat.rows.filter(r => r.id !== rowId);
-    if (saveSettingsOnly() === false) return false;
+    if (!saveFinanceMutation(previous)) return false;
     render();
     toast('Fila eliminada');
   });
@@ -620,7 +683,7 @@ export function openFinanceRowModal(kind, existingRow = null) {
   if (title) title.textContent = existingRow ? (isMeta ? translateText('Editar meta') : translateText('Editar gasto')) : (isMeta ? translateText('Agregar meta') : translateText('Agregar gasto'));
   if (subtitle) {
     subtitle.textContent = existingRow
-      ? translateText('Corrige nombre, categoría/tipo o monto objetivo. Para sumar o restar el monto asignado, usa el pill +/- de la fila.')
+      ? translateText('Corrige nombre, categoría o monto objetivo. Para mover dinero, abre «Apartar o devolver dinero» en la fila.')
       : translateText('Se agrega al final de la cola de prioridad — puedes reordenarla después con las flechas ↑/↓.');
   }
   // La categoría ya no se esconde en Metas: "Meta de ahorro" es una categoría más entre las que se
@@ -733,6 +796,7 @@ export function createFinanceCategory() {
   }
   const emoji = String(emojiInput?.value || '').trim() || '🏷️';
   const rgb = FINANCE_CUSTOM_CATEGORY_PALETTE.includes(colorInput?.value) ? colorInput.value : FINANCE_CUSTOM_CATEGORY_PALETTE[0];
+  const previous = financeMutationSnapshot();
   if (!Array.isArray(settings.customFinanceCategories)) settings.customFinanceCategories = [];
 
   if (financeEditingCatId) {
@@ -742,7 +806,7 @@ export function createFinanceCategory() {
     existing.emoji = emoji;
     existing.rgb = rgb;
     const editedId = existing.id;
-    if (saveSettingsOnly() === false) return false;
+    if (!saveFinanceMutation(previous)) return false;
     closeFinanceNewCatPanel();
     renderFinanceCategoryChips(editedId);
     selectFinanceCategoryChip(editedId);
@@ -754,7 +818,7 @@ export function createFinanceCategory() {
   const id = `custom_${makeLocalId()}`;
   settings.customFinanceCategories.push({ id, label, emoji, rgb });
   settings.financeCategories[id] = { rows: [] };
-  if (saveSettingsOnly() === false) return false;
+  if (!saveFinanceMutation(previous)) return false;
   closeFinanceNewCatPanel();
   renderFinanceCategoryChips(id);
   selectFinanceCategoryChip(id);
@@ -773,14 +837,18 @@ export function financeDeleteCategory(catId) {
     ? ui` Sus ${rowCount} fila(s) no se borran: pasan a la categoría "Otro".`
     : '';
   appConfirm(ui`¿Borrar la categoría "${cat.label}"?${warning} Esta acción no se puede deshacer.`, () => {
+    const currentCategory = settings.customFinanceCategories.find(category => category.id === catId);
+    if (!currentCategory) return;
+    const currentRows = settings.financeCategories[catId]?.rows || [];
+    const previous = financeMutationSnapshot();
     if (settings.financeCategories[catId]) {
-      catRows.forEach(row => { row.categoryId = 'otro'; });
+      currentRows.forEach(row => { row.categoryId = 'otro'; });
       if (!settings.financeCategories.otro) settings.financeCategories.otro = { rows: [] };
-      settings.financeCategories.otro.rows.push(...catRows);
+      settings.financeCategories.otro.rows.push(...currentRows);
       delete settings.financeCategories[catId];
     }
     settings.customFinanceCategories = settings.customFinanceCategories.filter(c => c.id !== catId);
-    if (saveSettingsOnly() === false) return false;
+    if (!saveFinanceMutation(previous)) return false;
     if (financeEditingCatId === catId) closeFinanceNewCatPanel();
     const categoryInput = document.getElementById('financeRowCategoryInput');
     const wasSelected = categoryInput && categoryInput.value === catId;
@@ -814,18 +882,22 @@ export function saveFinanceRowModal() {
       targetInput.value = usdCeilFromCurrencyAmount(curVal, exchangeRate).toFixed(2);
     }
   }
-  const target = Number(targetInput?.value);
+  const rawTarget = Number(targetInput?.value);
+  const original = financeEditingRowId ? Object.values(settings.financeCategories).flatMap(category => category.rows).find(row => row.id === financeEditingRowId) : null;
+  const unchanged = original && rawTarget === Number(original.targetAmount);
+  const target = unchanged ? rawTarget : financeInputUsd(rawTarget);
   if (!name) {
     toast(translateText('Ponle un nombre a la fila'));
     return;
   }
-  if (!Number.isFinite(target) || target <= 0) {
-    toast(translateText('El monto objetivo debe ser mayor a 0'));
+  if (!Number.isFinite(rawTarget) || rawTarget <= 0 || (!unchanged && rawTarget < .01) || rawTarget > 1e9) {
+    toast(translateText('Usa un monto objetivo de al menos un centavo y de hasta mil millones de dólares.'));
     return;
   }
   const isMeta = financeRowModalKind === 'meta';
   const chosenCatId = String(categoryInput?.value || '');
   const catId = financeAllCategories().some(c => c.id === chosenCatId) ? chosenCatId : (isMeta ? 'ahorro' : 'otro');
+  const previous = financeMutationSnapshot();
 
   if (financeEditingRowId) {
     // Una fila puede vivir en cualquier categoría (fija o propia) — ya no se restringe la búsqueda
@@ -865,7 +937,7 @@ export function saveFinanceRowModal() {
       settings.financeCategories[catId].rows.push(foundRow);
     }
     financeRunAutoFillCascade();
-    if (saveSettingsOnly() === false) return false;
+    if (!saveFinanceMutation(previous)) return false;
     closeModal('financeRowModal');
     render();
     toast(isMeta ? translateText('Meta actualizada') : translateText('Gasto actualizado'));
@@ -898,7 +970,7 @@ export function saveFinanceRowModal() {
   // La fila nueva entra al final de su cola (prioridad más baja) — si ya había Disponible sin
   // asignar de antes, solo le toca lo que sobre después de las filas con más prioridad.
   financeRunAutoFillCascade();
-  if (saveSettingsOnly() === false) return false;
+  if (!saveFinanceMutation(previous)) return false;
   closeModal('financeRowModal');
   render();
   toast(isMeta ? translateText('Meta agregada') : translateText('Gasto agregado'));

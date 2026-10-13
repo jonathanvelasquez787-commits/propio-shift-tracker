@@ -3,13 +3,14 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import { parse } from 'acorn';
+import { validFinanceSettings } from '../js/finance-plan-model.js';
 
 const source=fs.readFileSync(new URL('../js/app-main.js',import.meta.url),'utf8');
 const declarations=parse(source,{ecmaVersion:'latest',sourceType:'module'}).body.map(n=>n.declaration||n);
 const fn=name=>{const node=declarations.find(n=>n.type==='FunctionDeclaration'&&n.id.name===name);return source.slice(node.start,node.end);};
 
 test('invalid backup call records are rejected before changing the existing account',()=>{
-  const h=vm.createContext({translateText:value=>value});
+  const h=vm.createContext({translateText:value=>value,validFinanceSettings});
   vm.runInContext(fn('validateImportPayload'),h);
   for(const call of [null,[],17,'invalid']) assert.equal(h.validateImportPayload({state:{},calls:[call]}).ok,false);
   assert.equal(h.validateImportPayload({state:{},calls:[{id:'legacy',durationMin:15}]}).ok,true);
@@ -17,7 +18,7 @@ test('invalid backup call records are rejected before changing the existing acco
 });
 
 test('invalid backup event and pause records are rejected before replacing the current account', () => {
-  const h = vm.createContext({translateText:value=>value});
+  const h = vm.createContext({translateText:value=>value,validFinanceSettings});
   vm.runInContext(fn('validateImportPayload'), h);
   for (const key of ['events', 'pauseHistory']) {
     for (const record of [null, [], 17, 'invalid', {}]) {

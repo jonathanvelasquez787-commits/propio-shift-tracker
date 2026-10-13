@@ -287,6 +287,12 @@
       "app.html"
     ]
   },
+  "s_069786ca": {
+    "source": "No se registró el pago porque no se pudo guardar.",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
   "s_06a81af4": {
     "source": "Desbloqueos por nivel",
     "files": [
@@ -937,12 +943,6 @@
       "js/app-main.js"
     ]
   },
-  "s_10cff341": {
-    "source": "Corrige nombre, categoría/tipo o monto objetivo. Para sumar o restar el monto asignado, usa el pill +/- de la fila.",
-    "files": [
-      "js/finance.js"
-    ]
-  },
   "s_11002277": {
     "source": "Llamada terminada: {{v0}} – {{v1}} ({{v2}}). Ajusta lo que haga falta antes de guardarla.",
     "files": [
@@ -959,6 +959,12 @@
     "source": "Iniciar Break",
     "files": [
       "app.html"
+    ]
+  },
+  "s_11528b65": {
+    "source": "No se guardó la estimación. Tu plazo anterior se conservó.",
+    "files": [
+      "js/finance-planning.js"
     ]
   },
   "s_11631015": {
@@ -1835,6 +1841,12 @@
       "app.html"
     ]
   },
+  "s_22849a1c": {
+    "source": "Usa un tipo de cambio de cero o mayor que permita convertir tus importes.",
+    "files": [
+      "js/settings.js"
+    ]
+  },
   "s_230f195c": {
     "source": "Bloques del día (Trabajo, Break, Lunch)",
     "files": [
@@ -1902,6 +1914,12 @@
     "source": "#FFFFFF",
     "files": [
       "app.html"
+    ]
+  },
+  "s_244b41c1": {
+    "source": "No se aplicó el ajuste de Finanzas porque no se pudo guardar. Tus valores anteriores se conservaron.",
+    "files": [
+      "js/finance.js"
     ]
   },
   "s_2486313b": {
@@ -2847,6 +2865,12 @@
     "source": "Día activo",
     "files": [
       "app.html"
+    ]
+  },
+  "s_35ebfa32": {
+    "source": "No se eliminó el pago porque no se pudo guardar.",
+    "files": [
+      "js/finance-planning.js"
     ]
   },
   "s_36306148": {
@@ -3886,6 +3910,12 @@
       "js/finance.js"
     ]
   },
+  "s_4a806e6d": {
+    "source": "Estimación eliminada",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
   "s_4aa12764": {
     "source": "Próximo Break",
     "files": [
@@ -3950,12 +3980,6 @@
     "source": "tu turno de intérprete,",
     "files": [
       "index.html"
-    ]
-  },
-  "s_4ba673dc": {
-    "source": "{{v0}} pagado · XP diario sellado",
-    "files": [
-      "js/game.js"
     ]
   },
   "s_4ba8a1e5": {
@@ -4269,12 +4293,6 @@
     "source": "Tasa de cambio (moneda por $1)",
     "files": [
       "app.html"
-    ]
-  },
-  "s_511a06a0": {
-    "source": "El monto objetivo debe ser mayor a 0",
-    "files": [
-      "js/finance.js"
     ]
   },
   "s_51260306": {
@@ -4618,6 +4636,12 @@
       "js/boot.js"
     ]
   },
+  "s_55eee410": {
+    "source": "Corrige nombre, categoría o monto objetivo. Para mover dinero, abre «Apartar o devolver dinero» en la fila.",
+    "files": [
+      "js/finance.js"
+    ]
+  },
   "s_561d14c9": {
     "source": "en furia",
     "files": [
@@ -4740,6 +4764,12 @@
     "source": "enojado",
     "files": [
       "js/monsters.js"
+    ]
+  },
+  "s_588aa12b": {
+    "source": "No se cambió la exclusión automática porque no se pudo guardar.",
+    "files": [
+      "js/finance.js"
     ]
   },
   "s_588ccd07": {
@@ -4923,6 +4953,12 @@
     "source": "Racha, XP, misiones y colección sin cambiar tus ganancias.",
     "files": [
       "app.html"
+    ]
+  },
+  "s_5c925686": {
+    "source": "Usa un monto objetivo de al menos un centavo y de hasta mil millones de dólares.",
+    "files": [
+      "js/finance.js"
     ]
   },
   "s_5c9795a8": {
@@ -5116,6 +5152,12 @@
     "source": "Cuándo empiezas, cuándo terminas, y tus breaks/lunch de cada día. \"Bloques del día\", en Inicio, se dibuja sobre este plan.",
     "files": [
       "app.html"
+    ]
+  },
+  "s_608afca6": {
+    "source": "⚠️ No se pudo guardar — el almacenamiento del navegador está lleno. Libera espacio (por ejemplo, un sonido personalizado en Avisos) y vuelve a intentar el cambio.",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_60a3ee1a": {
@@ -6633,12 +6675,6 @@
       "index.html"
     ]
   },
-  "s_7d39e748": {
-    "source": "⚠️ No se pudo guardar — el almacenamiento del navegador está lleno. Tu cambio se mantiene en esta sesión, pero no quedará guardado hasta que liberes espacio (borra llamadas muy viejas o un sonido personalizado en Avisos).",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
   "s_7d55762e": {
     "source": "La app nunca compra nada ni interrumpe una llamada. Tú decides cuándo realizar, guardar o cambiar cada premio.",
     "files": [
@@ -7336,7 +7372,8 @@
   "s_89bdf692": {
     "source": "Pagos registrados",
     "files": [
-      "js/finance-planning.js"
+      "js/finance-planning.js",
+      "js/finance.js"
     ]
   },
   "s_89d6158b": {
@@ -8869,6 +8906,12 @@
       "js/app-main.js"
     ]
   },
+  "s_a63737e5": {
+    "source": "{{v0}} con reserva completa · XP diario sellado",
+    "files": [
+      "js/game.js"
+    ]
+  },
   "s_a673358d": {
     "source": "Claro original",
     "files": [
@@ -9385,12 +9428,6 @@
       "privacidad.html"
     ]
   },
-  "s_b09f4db5": {
-    "source": "+{{v0}} XP · {{v1}} pagado a tiempo",
-    "files": [
-      "js/game.js"
-    ]
-  },
   "s_b0bac425": {
     "source": "Parcial",
     "files": [
@@ -9867,6 +9904,12 @@
       "app.html"
     ]
   },
+  "s_b9c16341": {
+    "source": "Valor interno: {{v0}} USD{{v1}}. La pantalla redondea a centavos.",
+    "files": [
+      "js/finance.js"
+    ]
+  },
   "s_b9dce0f5": {
     "source": "Sin ventanas configuradas",
     "files": [
@@ -10127,6 +10170,12 @@
     "source": "Pago: —",
     "files": [
       "app.html"
+    ]
+  },
+  "s_bec3b54d": {
+    "source": "+{{v0}} XP · {{v1}} con reserva completa",
+    "files": [
+      "js/game.js"
     ]
   },
   "s_bee55c0f": {
@@ -11019,6 +11068,12 @@
       "index.html"
     ]
   },
+  "s_d06fae33": {
+    "source": "No se liberó la reserva porque no se pudo guardar.",
+    "files": [
+      "js/finance.js"
+    ]
+  },
   "s_d0a8f98f": {
     "source": "Horario fijo que la app ya conoce.",
     "files": [
@@ -11095,6 +11150,12 @@
     "source": "Cofre abierto. ¡Seguí sumando!",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_d2261096": {
+    "source": "No se aplicó la moneda porque no se pudo guardar.",
+    "files": [
+      "js/settings.js"
     ]
   },
   "s_d24a6da6": {
@@ -11896,6 +11957,12 @@
       "js/app-main.js"
     ]
   },
+  "s_e09ab272": {
+    "source": "No se compara el saldo mensual cuando hay períodos distintos o pagos de gastos eliminados.",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
   "s_e0ae472f": {
     "source": "{{v0}} fila(s) omitida(s) · {{v1}} llamada(s) actualizada(s)",
     "files": [
@@ -12062,6 +12129,12 @@
     "source": "{{v24}}\n                {{v25}}",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_e3e7c209": {
+    "source": "No se aplicó la tarifa porque no se pudo guardar.",
+    "files": [
+      "js/settings.js"
     ]
   },
   "s_e3e8494c": {
@@ -12660,6 +12733,12 @@
       "js/app-main.js"
     ]
   },
+  "s_f044b74e": {
+    "source": "Este presupuesto no es mensual o conserva fracciones de centavo. Los pagos se agrupan por su fecha; no se calcula un saldo mensual pendiente ni un exceso.",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
   "s_f090197f": {
     "source": "Ver premios",
     "files": [
@@ -12695,6 +12774,12 @@
     "source": "Subir sonido (MP3/WAV/OGG, máx. 300KB)",
     "files": [
       "app.html"
+    ]
+  },
+  "s_f1155d75": {
+    "source": "El respaldo contiene datos de Finanzas inválidos o duplicados. Tus datos actuales no se cambiaron.",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_f11d7428": {
@@ -12845,6 +12930,12 @@
     "source": "Turno en vivo",
     "files": [
       "index.html"
+    ]
+  },
+  "s_f3901ba5": {
+    "source": "El importe es demasiado grande para convertirlo. Se conservó la moneda anterior.",
+    "files": [
+      "js/finance-planning.js"
     ]
   },
   "s_f3a37f77": {
@@ -13416,6 +13507,12 @@
     "source": "Agrega una idea y personalízala a tu gusto.",
     "files": [
       "app.html"
+    ]
+  },
+  "s_fe709478": {
+    "source": "No se guardó el plan. Tus metas anteriores se conservaron.",
+    "files": [
+      "js/finance-planning.js"
     ]
   },
   "s_fee72da9": {

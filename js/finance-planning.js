@@ -1,7 +1,7 @@
 import { settings, state, setAppSettings, setAppState } from './app-context.js';
 import { ui, translateText, displayLocale } from './i18n.js';
 import { DEFAULT_FINANCE_SPLIT, validFinanceSplit, financePlanProjection, validFinanceDate,
-  financePaymentRows, financeMonthTotals, financeSavingsMonthly, financeExpenseStatus } from './finance-plan-model.js';
+  financePaymentRows, financeMonthTotalsFromPayments, financeSavingsMonthly, financeExpenseStatusFromPaid, financeCanCompareMonthlyBudget } from './finance-plan-model.js';
 
 let ctx = {};
 let selectedMonth = '';
@@ -9,7 +9,10 @@ let planDraft = false;
 const expandedRows = new Set();
 const expandedReservations = new Set();
 const rowDrafts = new Map();
+const savingsDrafts = new Map();
 const amountDrafts = new Map();
+let hideFieldHelp = () => {};
+let monthIndex = null;
 const el = id => document.getElementById(id);
 const currentMonth = () => {
   const now = new Date();
@@ -20,11 +23,11 @@ const localDate = () => {
   return `${currentMonth()}-${String(now.getDate()).padStart(2, '0')}`;
 };
 const metric = (label, usd) => ui`<div class="fin-plan-metric"><span>${label}</span><strong>${ctx.money(usd)}</strong>${ctx.convertedNote(usd)}</div>`;
-const rows = () => ctx.getExpenseRows();
+const rows = () => currentMonthIndex().rows;
 const selected = () => selectedMonth || currentMonth();
 export const financeSelectedMonth = () => selected();
 export const financeMonthLabel = () => new Date(`${selected()}-01T12:00:00`).toLocaleDateString(displayLocale(), { month: 'long', year: 'numeric' });
-const payments = rowId => financePaymentRows(settings.financePayments, selected(), rowId);
+const payments = rowId => rowId ? currentMonthIndex().byRow.get(rowId) || [] : currentMonthIndex().payments;
 const splitSettings = () => validFinanceSplit(settings.financePlanning?.split) ? settings.financePlanning.split : DEFAULT_FINANCE_SPLIT;
 const configuredDays = () => {
   const stored = Number(settings.financePlanning?.daysPerWeek);
@@ -33,14 +36,51 @@ const configuredDays = () => {
   return count >= 1 && count <= 7 ? count : 5;
 };
 
-export function configureFinancePlanning(context) { ctx = context; }
+export function configureFinancePlanning(context) { ctx = context; monthIndex = null; }
+
+export function prepareFinanceMonthRender(expenseRows = ctx.getExpenseRows()) {
+  const records = financePaymentRows(settings.financePayments, selected());
+  const byRow = new Map(), paidByRow = new Map();
+  for (const payment of records) {
+    if (!byRow.has(payment.rowId)) byRow.set(payment.rowId, []);
+    byRow.get(payment.rowId).push(payment);
+    paidByRow.set(payment.rowId, (paidByRow.get(payment.rowId) || 0) + payment.usd);
+  }
+  const rowIds = new Set(expenseRows.map(row => row.id));
+  monthIndex = {owner:settings, source:settings.financePayments, month:selected(), rows:expenseRows, payments:records, byRow, paidByRow,
+    totals:financeMonthTotalsFromPayments(expenseRows, records),
+    comparable:expenseRows.length > 0 && expenseRows.every(financeCanCompareMonthlyBudget) && records.every(payment => rowIds.has(payment.rowId))};
+}
+
+function currentMonthIndex() {
+  if (!monthIndex || monthIndex.owner !== settings || monthIndex.source !== settings.financePayments || monthIndex.month !== selected()) prepareFinanceMonthRender();
+  return monthIndex;
+}
+
+export function financeCurrentExpenseStatus(row) {
+  return financeExpenseStatusFromPaid(row, currentMonthIndex().paidByRow.get(row.id) || 0);
+}
 
 export function financeInputUsd(raw, unit = 'usd') {
   const amount = ctx.parseAmount(raw);
   const rate = Number(settings.exchangeRate);
   if (unit === 'local' && (!String(settings.currencyLabel || '').trim() || !Number.isFinite(rate) || rate <= 0)) return NaN;
   const usd = unit === 'local' ? amount / rate : amount;
-  return Math.round((usd + Number.EPSILON) * 100) / 100;
+  const cents = usd * 100;
+  return Math.round(cents + Number.EPSILON * Math.max(1, Math.abs(cents))) / 100;
+}
+
+export function financeInputValue(amount) {
+  if (!Number.isFinite(amount) || amount < 0) return '';
+  const text = Number(amount.toPrecision(16)).toString();
+  const [coefficient, power = '0'] = text.split('e');
+  const [whole, fraction = ''] = coefficient.split('.');
+  const digits = whole + fraction, point = whole.length + Number(power);
+  let plain = point <= 0 ? `0.${'0'.repeat(-point)}${digits}`
+    : point >= digits.length ? digits + '0'.repeat(point - digits.length)
+    : `${digits.slice(0, point)}.${digits.slice(point)}`;
+  const [integer, decimals = ''] = plain.split('.');
+  return `${integer}.${decimals.padEnd(2, '0')}`;
 }
 
 export function financeAmountInputHtml(row, scope) {
@@ -52,7 +92,7 @@ export function financeAmountInputHtml(row, scope) {
   const unit = draft?.unit === 'local' && hasCurrency ? 'local' : 'usd';
   let value = draft?.value || '';
   if (draft && draft.unit === 'local' && (!hasCurrency || draft.rate !== rate || draft.currency !== currency) && Number.isFinite(draft.usd)) {
-    value = (unit === 'local' ? draft.usd * rate : draft.usd).toFixed(2);
+    value = financeInputValue(unit === 'local' ? draft.usd * rate : draft.usd);
   }
   const label = scope === 'payment' ? translateText('Importe del pago') : translateText('Monto a sumar o restar');
   const amountHelp = scope === 'payment' ? translateText('Escribe el importe que ya pagaste. Se guardará en el historial con la fecha elegida; no cambia el dinero reservado.') : translateText('Escribe cuánto quieres apartar o devolver, no el saldo total. Sumar lo toma del disponible; Restar lo devuelve. Aplicar ajuste confirma la operación.');
@@ -73,10 +113,15 @@ function rememberAmount(entry, convert = false) {
   const unit = entry.querySelector('select').value;
   const previous = amountDrafts.get(key);
   if (convert && previous && previous.unit !== unit && Number.isFinite(previous.usd)) {
-    input.value = (unit === 'local' ? previous.usd * Number(settings.exchangeRate) : previous.usd).toFixed(2);
+    const converted = unit === 'local' ? previous.usd * Number(settings.exchangeRate) : previous.usd;
+    if (!Number.isFinite(converted)) {
+      entry.querySelector('select').value = previous.unit;
+      ctx.toast(translateText('El importe es demasiado grande para convertirlo. Se conservó la moneda anterior.')); return;
+    }
+    input.value = financeInputValue(converted);
   }
   const usd = financeInputUsd(input.value, unit);
-  amountDrafts.set(key, {value:input.value, unit, usd, rate:Number(settings.exchangeRate), currency:String(settings.currencyLabel || '').trim()});
+  amountDrafts.set(key, {value:input.value, unit, usd, sign:previous?.sign || 'plus', rate:Number(settings.exchangeRate), currency:String(settings.currencyLabel || '').trim()});
   entry.querySelector('[data-fin-amount-equivalent]').innerHTML = input.value && Number.isFinite(usd) ? `${ctx.money(usd)}${ctx.convertedInline(usd)}` : '';
 }
 
@@ -84,7 +129,12 @@ export function clearFinanceAmountDraft(rowId, scope = 'reservation') {
   amountDrafts.delete(`${scope}:${scope === 'payment' ? `${rowId}:${selected()}` : rowId}`);
 }
 
+export function financeReservationSign(rowId) {
+  return amountDrafts.get(`reservation:${rowId}`)?.sign === 'minus' ? 'minus' : 'plus';
+}
+
 export function captureFinanceDetails() {
+  hideFieldHelp();
   document.querySelectorAll('[data-fin-plan-row]').forEach(detail => {
     const id = detail.getAttribute('data-fin-plan-row');
     if (detail.open) expandedRows.add(id); else expandedRows.delete(id);
@@ -112,7 +162,7 @@ export function financePlanningRowHtml(row, isMeta) {
   const rowId = ctx.escapeHtml(row.id);
   const categoryId = ctx.escapeHtml(row.categoryId);
   const header = isMeta ? translateText('Estimar aporte mensual') : translateText('Registrar pago y ver historial');
-  const draft = rowDrafts.get(`${row.id}:${selected()}`) || {};
+  const draft = (isMeta ? savingsDrafts.get(row.id) : rowDrafts.get(`${row.id}:${selected()}`)) || {};
   let body;
   if (isMeta) {
     const saving = financeSavingsMonthly(row);
@@ -122,14 +172,16 @@ export function financePlanningRowHtml(row, isMeta) {
       <p class="sched-hint">Se divide lo pendiente de reservar entre estos meses. Es una estimación editable; no establece una fecha límite ni descuenta meses automáticamente.</p>`;
   } else {
     const records = payments(row.id);
-    const status = financeExpenseStatus(row, settings.financePayments, selected());
+    const status = financeCurrentExpenseStatus(row);
+    const monthlyBudget = financeCanCompareMonthlyBudget(row);
     const paid = status.paid;
-    const total = financeMonthTotals(rows(), settings.financePayments, selected());
+    const total = currentMonthIndex().totals;
     const percent = total.paid > 0 ? `${(paid / total.paid * 100).toLocaleString(displayLocale(), { maximumFractionDigits: 1 })}%` : '—';
     const expenseType = row.expenseType === 'variable' ? translateText('Gasto variable') : translateText('Gasto fijo');
     const date = draft.date || (selected() === currentMonth() ? localDate() : `${selected()}-01`);
     body = ui`<div class="fin-plan-row-heading"><span>${expenseType}</span><span>${ctx.escapeHtml(financeMonthLabel())}</span></div>
-      <div class="fin-plan-metrics">${metric(status.excess > 0 ? translateText('Exceso sobre el presupuesto') : translateText('Pendiente de pagar del presupuesto'), status.excess || status.remaining)}<span class="fin-plan-metric"><span>Porcentaje del total pagado este mes</span><strong>${percent}</strong></span></div>
+      ${!monthlyBudget ? ui`<p class="sched-hint">Este presupuesto no es mensual o conserva fracciones de centavo. Los pagos se agrupan por su fecha; no se calcula un saldo mensual pendiente ni un exceso.</p>` : ''}
+      <div class="fin-plan-metrics">${monthlyBudget ? metric(status.excess > 0 ? translateText('Exceso sobre el presupuesto') : translateText('Pendiente de pagar del presupuesto'), status.excess || status.remaining) : ''}<span class="fin-plan-metric"><span>Porcentaje del total pagado este mes</span><strong>${percent}</strong></span></div>
       <div class="fin-payment-controls">
         ${financeAmountInputHtml(row, 'payment')}
         <label class="fin-plan-field">Fecha<input data-fin-payment-date type="date" value="${ctx.escapeHtml(date)}"/></label>
@@ -168,8 +220,9 @@ export function updateFinancePlanPreview() {
   el('saveFinancePlanBtn').disabled = !projection;
 }
 
-export function renderFinancePlanning() {
+export function renderFinancePlanning({prepared = false} = {}) {
   if (!el('financePlanHoursInput')) return;
+  if (!prepared) prepareFinanceMonthRender();
   if (!planDraft) {
     el('financePlanHoursInput').value = Number((Number(settings.productiveGoalMin || 0) / 60).toFixed(6));
     el('financePlanDaysInput').value = configuredDays();
@@ -177,9 +230,9 @@ export function renderFinancePlanning() {
   }
   el('financePlanRate').textContent = ui`Tarifa de Ajustes: ${ctx.money(Number(settings.rate))}/min`;
   el('financeMonthInput').value = selected();
-  const totals = financeMonthTotals(rows(), settings.financePayments, selected());
+  const {totals, comparable} = currentMonthIndex();
   el('financeMonthTotals').innerHTML = metric(translateText('Presupuesto actual'), totals.budget)
-    + metric(translateText('Pagos registrados'), totals.paid) + metric(totals.difference < -0.004 ? translateText('Exceso sobre el presupuesto') : translateText('Pendiente de pagar del presupuesto'), Math.abs(totals.difference));
+    + metric(translateText('Pagos registrados'), totals.paid) + (comparable ? metric(totals.difference < -0.004 ? translateText('Exceso sobre el presupuesto') : translateText('Pendiente de pagar del presupuesto'), Math.abs(totals.difference)) : ui`<p class="sched-hint">No se compara el saldo mensual cuando hay períodos distintos o pagos de gastos eliminados.</p>`);
   el('financePaymentHistory').innerHTML = paymentHistoryHtml(payments()) || ui`<p class="sched-hint">Sin pagos registrados en este mes.</p>`;
   updateFinancePlanPreview();
 }
@@ -189,12 +242,18 @@ export function saveFinancePlan() {
   if (!projection) { updateFinancePlanPreview(); return false; }
   const previousSettings = JSON.parse(JSON.stringify(settings));
   const previousState = JSON.parse(JSON.stringify(state));
+  const ownerSettings = settings, ownerState = state;
   settings.financePlanning = { daysPerWeek: Number(el('financePlanDaysInput').value), split: ['financePlanFixedInput', 'financePlanVariableInput', 'financePlanSavingsInput'].map(id => Number(el(id).value)) };
   if (ctx.applyGoalValues(projection.minutes, projection.dollars, 'global', ctx.todayCallDateKey(), ctx.saveAll) === false) {
-    setAppSettings(previousSettings); setAppState(previousState); ctx.render(); return false;
+    if (settings === ownerSettings) setAppSettings(previousSettings);
+    if (state === ownerState) setAppState(previousState);
+    ctx.render();
+    el('financePlanSaveStatus').style.color = 'var(--bad)';
+    el('financePlanSaveStatus').textContent = translateText('No se guardó el plan. Tus metas anteriores se conservaron.'); return false;
   }
   planDraft = false;
   ctx.render();
+  el('financePlanSaveStatus').style.color = '';
   el('financePlanSaveStatus').textContent = ui`Meta diaria y distribución guardadas: ${projection.minutes} min.`;
   return true;
 }
@@ -208,10 +267,14 @@ export function addFinancePayment(catId, rowId, rawUsd, rawLocal, date) {
     ctx.toast(translateText('Ingresa un pago mayor a cero y una fecha válida.')); return false;
   }
   const previous = settings.financePayments;
+  const owner = settings;
   const record = { id: ctx.makeLocalId(), rowId, name: String(row.name).slice(0, 200), categoryId: catId,
     expenseType: row.expenseType === 'variable' ? 'variable' : 'fixed', date, usd };
   settings.financePayments = [...(Array.isArray(previous) ? previous : []), record];
-  if (ctx.saveSettingsOnly() === false) { if (previous === undefined) delete settings.financePayments; else settings.financePayments = previous; return false; }
+  if (ctx.saveSettingsOnly() === false) {
+    if (settings === owner) { if (previous === undefined) delete settings.financePayments; else settings.financePayments = previous; }
+    ctx.toast(translateText('No se registró el pago porque no se pudo guardar.'), {persistenceFailure:true}); return false;
+  }
   rowDrafts.delete(`${rowId}:${selected()}`);
   clearFinanceAmountDraft(rowId, 'payment');
   ctx.render(); ctx.toast(translateText('Pago registrado')); return true;
@@ -222,22 +285,30 @@ export function deleteFinancePayment(id) {
   if (!record) return;
   ctx.appConfirm(translateText('¿Eliminar este pago del historial? La asignación del gasto se conserva.'), () => {
     const previous = settings.financePayments;
+    if (!Array.isArray(previous) || !previous.some(payment => payment?.id === id)) return;
+    const owner = settings;
     settings.financePayments = previous.filter(payment => payment?.id !== id);
-    if (ctx.saveSettingsOnly() === false) { settings.financePayments = previous; return false; }
+    if (ctx.saveSettingsOnly() === false) {
+      if (settings === owner) settings.financePayments = previous;
+      ctx.toast(translateText('No se eliminó el pago porque no se pudo guardar.'), {persistenceFailure:true}); return false;
+    }
     ctx.render(); ctx.toast(translateText('Pago eliminado'));
   });
 }
 
 export function saveFinanceSavingsMonths(catId, rowId, months) {
-  const row = ctx.findRow(catId, rowId), value = Number(months);
-  if (!row || !ctx.isMeta(row) || !Number.isInteger(value) || value < 1 || value > 120) {
+  const row = ctx.findRow(catId, rowId), clear = typeof months === 'string' && !months.trim(), value = Number(months);
+  if (!row || !ctx.isMeta(row) || (!clear && (!Number.isInteger(value) || value < 1 || value > 120))) {
     ctx.toast(translateText('Usa un plazo entre 1 y 120 meses.')); return false;
   }
   const previous = row.savingsMonths;
-  row.savingsMonths = value;
-  if (ctx.saveSettingsOnly() === false) { if (previous === undefined) delete row.savingsMonths; else row.savingsMonths = previous; return false; }
-  rowDrafts.delete(`${rowId}:${selected()}`);
-  ctx.render(); ctx.toast(translateText('Estimación guardada')); return true;
+  if (clear) delete row.savingsMonths; else row.savingsMonths = value;
+  if (ctx.saveSettingsOnly() === false) {
+    if (previous === undefined) delete row.savingsMonths; else row.savingsMonths = previous;
+    ctx.toast(translateText('No se guardó la estimación. Tu plazo anterior se conservó.'), {persistenceFailure:true}); return false;
+  }
+  savingsDrafts.delete(rowId);
+  ctx.render(); ctx.toast(clear ? translateText('Estimación eliminada') : translateText('Estimación guardada')); return true;
 }
 
 export function wireFinancePlanning() {
@@ -254,7 +325,8 @@ export function wireFinancePlanning() {
     if (entry && target.tagName === 'INPUT') rememberAmount(entry);
     if (body && target.matches('[data-fin-payment-date], [data-fin-savings-months]')) {
       const rowId = body.closest('[data-fin-plan-row]').getAttribute('data-fin-plan-row');
-      rowDrafts.set(`${rowId}:${selected()}`, {date:body.querySelector('[data-fin-payment-date]')?.value || '',months:body.querySelector('[data-fin-savings-months]')?.value});
+      if (target.matches('[data-fin-savings-months]')) savingsDrafts.set(rowId, {months:target.value});
+      else rowDrafts.set(`${rowId}:${selected()}`, {date:target.value});
     }
   });
   section.addEventListener('change', event => {
@@ -268,6 +340,11 @@ export function wireFinancePlanning() {
   section.addEventListener('click', event => {
     const button = event.target.closest('button');
     if (!button) return;
+    if (button.hasAttribute('data-fin-sign-btn')) {
+      const rowId = button.closest('.fin-row').getAttribute('data-fin-row'), key = `reservation:${rowId}`;
+      amountDrafts.set(key, {...amountDrafts.get(key), sign:button.getAttribute('data-sign')});
+      return;
+    }
     if (button.id === 'saveFinancePlanBtn') { saveFinancePlan(); return; }
     if (button.hasAttribute('data-fin-payment-delete')) { deleteFinancePayment(button.getAttribute('data-fin-payment-delete')); return; }
     if (button.hasAttribute('data-fin-payment-save')) {
@@ -300,6 +377,7 @@ function wireFinanceFieldHelp(section) {
     }
     anchor = null;
   };
+  hideFieldHelp = hide;
   const show = target => {
     const control = target.closest('[data-fin-help]');
     if (!control || control === anchor) return;

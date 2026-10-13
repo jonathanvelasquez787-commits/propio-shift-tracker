@@ -176,7 +176,9 @@ test('a rejected finance allocation save does not report Aplicado',t=>{
   const x=harness(t);setAppCalls([{id:'income',pay:'20'}]);
   settings.financeCategories.otro.rows=[{id:'blocked',targetAmount:20,assignedAmount:0,kind:'meta'}];
   x.rejectSave();assert.equal(financeApplySignedAmount('otro','blocked','12,50','plus'),false);
-  assert.equal(x.saves(),0);assert.deepEqual(x.messages,[]);
+  assert.equal(x.saves(),0);assert.equal(settings.financeCategories.otro.rows[0].assignedAmount,0);
+  assert.match(x.messages.at(-1),/could not be saved|no se pudo guardar/);
+  assert.ok(x.messages.every(message=>!['Aplicado','Applied'].includes(message)));
 });
 
 test('official correction to zero minutes replaces the original and preserves its identity and frozen bonus', t => {

@@ -1,13 +1,13 @@
 import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 import { authErrorMessage, getProfile, getUser, updateEmail, updateUsername } from './auth.js';
-import { settings, state } from './app-context.js';
+import { settings, state, setAppSettings, setAppState } from './app-context.js';
 import { normalizeLanguage, saveLanguagePreference } from './language-preference.js';
 import { EMAIL_AUTH_READY } from './config.js';
 
 let DEFAULT_USER_EMOJI, EMOJI_CHOICES, RATE, closeModal, convertedAmountText;
 let currencyCeilFromUsdAmount, effectiveCycleGoal, effectiveDailyGoal, ensureCurrencySettings, escapeHtml;
 let formatCallDayLabel, formatMinutes, getActiveDayKey, getDailyGoalOverride, iconHtml, money;
-let onGameDayMetadataChanged, openModal, render, saveSettingsOnly, saveStateOnly, snapshotHistoricalPlanning;
+let onGameDayMetadataChanged, openModal, render, saveSettingsOnly, saveStateOnly, saveAll, snapshotHistoricalPlanning;
 let setDailyGoalOverride, toast;
 let todayCallDateKey, usdCeilFromCurrencyAmount;
 
@@ -15,7 +15,7 @@ export function configureSettingsContext(context) {
   ({ DEFAULT_USER_EMOJI, EMOJI_CHOICES, RATE, closeModal, convertedAmountText, currencyCeilFromUsdAmount,
     effectiveCycleGoal, effectiveDailyGoal, ensureCurrencySettings, escapeHtml, formatCallDayLabel,
     formatMinutes, getActiveDayKey, getDailyGoalOverride, iconHtml, money, onGameDayMetadataChanged, openModal, render,
-    saveSettingsOnly, saveStateOnly, snapshotHistoricalPlanning, setDailyGoalOverride, toast, todayCallDateKey,
+    saveSettingsOnly, saveStateOnly, saveAll, snapshotHistoricalPlanning, setDailyGoalOverride, toast, todayCallDateKey,
     usdCeilFromCurrencyAmount } = context);
 }
 
@@ -192,11 +192,18 @@ let syncingGoals = false;
         toast(translateText('Ese valor es demasiado grande para calcular la meta.'));
         return;
       }
+      const ownerSettings = settings, ownerState = state;
+      const previousSettings = JSON.parse(JSON.stringify(settings)), previousState = JSON.parse(JSON.stringify(state));
       snapshotHistoricalPlanning();
       settings.rate = rate;
       settings.earningsGoal = dollars;
       state.earningsGoal = dollars;
-      if (saveStateOnly() === false || saveSettingsOnly() === false) return false;
+      if (saveAll({render:false}) === false) {
+        if (settings === ownerSettings) setAppSettings(previousSettings);
+        if (state === ownerState) setAppState(previousState);
+        if (rateInput) rateInput.value = String(settings.rate);
+        render(); toast(translateText('No se aplicó la tarifa porque no se pudo guardar.'), {persistenceFailure:true}); return false;
+      }
       onGameDayMetadataChanged(todayCallDateKey());
       refreshGoalInputs();
       render();
@@ -206,11 +213,22 @@ let syncingGoals = false;
     export function updateCurrencySettings() {
       const exchangeInput = document.getElementById('exchangeRateInput');
       const labelInput = document.getElementById('currencyLabelInput');
+      const owner = settings;
+      const previousRate = settings.exchangeRate, previousLabel = settings.currencyLabel;
       let exchangeRate = Number(exchangeInput?.value);
-      if (!Number.isFinite(exchangeRate) || exchangeRate < 0) exchangeRate = settings.exchangeRate || 0;
+      if (!Number.isFinite(exchangeRate) || exchangeRate < 0 || !Number.isFinite(exchangeRate * 1e9)) {
+        if (exchangeInput) exchangeInput.value = String(previousRate);
+        if (labelInput) labelInput.value = String(previousLabel || '');
+        toast(translateText('Usa un tipo de cambio de cero o mayor que permita convertir tus importes.')); return false;
+      }
       settings.exchangeRate = exchangeRate;
       settings.currencyLabel = String(labelInput?.value || '').trim().slice(0, 6);
-      saveSettingsOnly();
+      if (saveSettingsOnly() === false) {
+        if (settings === owner) { settings.exchangeRate = previousRate; settings.currencyLabel = previousLabel; }
+        if (exchangeInput) exchangeInput.value = String(settings.exchangeRate);
+        if (labelInput) labelInput.value = String(settings.currencyLabel || '');
+        render(); toast(translateText('No se aplicó la moneda porque no se pudo guardar.'), {persistenceFailure:true}); return false;
+      }
       render();
     }
     // Guarda nombre + emoji capturados en el popup de bienvenida (ver onboardingModal) y marca

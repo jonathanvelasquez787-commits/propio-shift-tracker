@@ -319,7 +319,7 @@
     {
       "id": "finance",
       "area": "Finanzas y Higher Rate",
-      "acceptance": "Reservas y pagos mensuales independientes y visibles; períodos de presupuesto explícitos sin inferir historia ni mensualizar; controles de moneda compartidos; liberación conserva pagos y exclusiones; estimaciones de metas sin fecha límite automática.",
+      "acceptance": "Reservas y pagos independientes; guardados financieros atómicos y rechazo sin fugas de memoria; comparación mensual solo con períodos compatibles; totales por fila, conversiones/bonos finitos, respaldo íntegro, estimaciones opcionales y premios por reserva real. Simulación de 35 días con oráculo independiente en centavos.",
       "sources": [
         "js/finance.js",
         "js/finance-plan-model.js",
@@ -387,6 +387,23 @@
           "file": "tests/finance-category-language.test.mjs",
           "namedCases": [
             "expense and savings category IDs remain valid while the form labels change language"
+          ]
+        },
+        {
+          "file": "tests/finance-deep-audit.test.mjs",
+          "namedCases": [
+            "rejected automatic allocation restores the checkbox and every affected reserve",
+            "rejected new row and row move restore amounts, categories and allocation cascade",
+            "a completed overfunded savings goal cannot hide the amount needed by another goal",
+            "nonmonthly budgets do not claim monthly overspending or an unpaid monthly bill",
+            "backup finance validation preserves legacy rows and orphan payments but rejects corrupt or ambiguous money",
+            "35 days across two months agree with an independent cent ledger after earnings, payments, corrections and reloads",
+            "confirmed category deletion moves the latest rows and cannot resurrect an older snapshot",
+            "legacy frozen bonus amounts are numeric and cannot concatenate fictitious finance earnings",
+            "rejected payment creation never restores an older ledger into a replacement settings owner",
+            "explicit rollback feedback survives a pending storage failure without showing success",
+            "currency input formatting preserves dollar cents for tiny rates and expands exponent notation",
+            "assigning the displayed available cents conserves fractional bonus income instead of rejecting or inventing money"
           ]
         }
       ]
