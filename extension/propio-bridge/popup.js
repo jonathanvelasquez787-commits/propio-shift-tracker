@@ -1,4 +1,5 @@
 const reasons = {
+  'portal-closed': 'La pestaña de Propio se cerró durante una llamada. Revisá su final en el tracker.',
   'active-portal-call': 'Esperá a que termine la llamada para pausar o cambiar de cuenta. Para detener la conexión de inmediato, descartá las señales y revisá la llamada activa en el tracker.',
   'multiple-trackers': 'Dejá abierta una sola pestaña del tracker para esta cuenta.',
   'tracker-closed': 'Abrí el tracker e iniciá sesión para conectarlo.',
@@ -10,7 +11,7 @@ const reasons = {
   'tracker-needs-review': 'El tracker requiere revisión: puede haber una llamada manual, un traslape o un problema al guardar.',
   storage: 'No se pudo guardar el estado. Reintentá la conexión.',
 };
-const labels = { incoming: 'Llamada entrante', accepted: 'Llamada aceptada', rejected: 'Llamada rechazada', disconnected: 'Llamada terminada', available: 'Disponible', unavailable: 'Fuera de línea' };
+const labels = { 'session-start': 'Sesión iniciada · Shift', 'session-end': 'Sesión cerrada · Shift', incoming: 'Llamada entrante', accepted: 'Llamada aceptada', rejected: 'Llamada rechazada', disconnected: 'Llamada terminada', available: 'Disponible', unavailable: 'Fuera de línea' };
 const send = packet => chrome.runtime.sendMessage(packet);
 let busy = false, feedback = '';
 async function refresh() {
@@ -19,6 +20,8 @@ async function refresh() {
   document.getElementById('status').textContent = state.mode === 'auto' ? 'Registro automático activo' : 'Modo de observación';
   document.getElementById('detail').textContent = feedback || reasons[state.attention] || `${state.paired ? 'Cuenta conectada' : 'Cuenta sin conectar'} · ${state.completed} llamada(s) observada(s) · ${state.queued} pendiente(s)`;
   const toggle = document.getElementById('automatic');
+  const callStatus = state.active ? 'Llamada activa detectada.' : state.call === 'connected' ? 'Hay una llamada visible cuyo inicio no se observó; revisala en el tracker.' : state.call === 'incoming' ? 'Llamada entrante visible.' : state.call === 'idle' ? 'Controles de llamadas reconocidos.' : 'Controles de llamadas sin confirmar.';
+  document.getElementById('portalStatus').textContent = state.portal === 'authenticated' ? `Sesión de Propio reconocida. ${callStatus}` : state.portal === 'logged-out' ? 'Propio muestra el formulario de login.' : 'Sesión de Propio sin confirmar. Recargá el portal y comprobá el acceso de la extensión al sitio.';
   toggle.checked = state.mode === 'auto'; toggle.disabled = busy || !state.paired;
   document.getElementById('reviewed').hidden = !state.queued && !(state.mode === 'auto' && state.active);
   const list = document.getElementById('signals'); list.replaceChildren();

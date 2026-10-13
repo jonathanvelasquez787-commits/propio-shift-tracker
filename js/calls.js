@@ -462,7 +462,10 @@ function trySaveCallCandidate(candidate) {
     return { ok: false, reason: ui`Esa hora se traslapa con la llamada #${overlapsWith.customerId} (${overlapsWith.callStart}). Ajusta la hora o la duración.` };
   }
   const key = callDedupeKey(candidate);
-  if (calls.some(c => callDedupeKey(c) === key)) {
+  // Different bridge call IDs can have the same displayed minute, duration and
+  // estimated pay. Their precise intervals above still protect against overlaps.
+  if (calls.some(c => candidate.propioBridge?.callId && c.propioBridge?.callId
+    ? c.propioBridge.callId === candidate.propioBridge.callId : callDedupeKey(c) === key)) {
     return { ok: false, reason: translateText('Ya existe una llamada idéntica guardada (mismo cliente, fecha, hora, duración, pago, billable y dropped).') };
   }
   setCalls([...calls, candidate].sort((a, b) => new Date(a.startISO) - new Date(b.startISO)));

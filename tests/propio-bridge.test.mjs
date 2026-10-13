@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readPropioSignal, readPropioRequestBody, propioRequestKind, TWILIO_EVENT_ORIGINS, createPropioReducer, validateBridgeEvent, PORTAL_ORIGIN, TRACKER_ORIGIN } from '../js/propio-bridge-rules.js';
 import { createPropioReceiver, createStorageRevisionGuard, ignorePropioCall, installPropioBridge } from '../js/propio-bridge.js';
 import { createBridgeWorker } from '../extension/propio-bridge/bridge-worker.js';
+import { createPortalObserver, readPortalObservation } from '../extension/propio-bridge/portal-observer.js';
 
 const at = '2026-10-04T18:00:00.000Z', ended = '2026-10-04T18:10:00.000Z';
 const scope = 'a'.repeat(64), other = 'b'.repeat(64), callId = 'test-call-123456789';
@@ -11,6 +12,71 @@ const end = { version: 1, id: 'test-end-123456789', type: 'call-end', callId, st
 const now = () => Date.parse(ended);
 const endpoint = 'https://eventgw.twilio.com/v4/EndpointEvents';
 const sender = { id: 'extension-id', url: 'chrome-extension://extension-id/popup.html' };
+
+function portalDocument() {
+  const listeners = new Map(), view = { getComputedStyle: () => ({ visibility: 'visible', display: 'block' }) };
+  const document = { welcome: null, login: null, controls: [], statuses: [], defaultView: view,
+    querySelector: () => document.login,
+    querySelectorAll: selector => selector.startsWith('h1') ? document.welcome ? [document.welcome] : [] : selector.startsWith('button') ? document.controls : document.statuses,
+    addEventListener: (kind, fn) => listeners.set(kind, fn), removeEventListener: kind => listeners.delete(kind) };
+  const element = (text, shown = true) => ({ textContent: text, ownerDocument: document, hidden: !shown,
+    getClientRects: () => shown ? [{}] : [], closest: selector => selector.startsWith('button') ? document.controls[0] : null, getAttribute: () => null });
+  return { document, element, click: isTrusted => listeners.get('click')?.({ isTrusted, target: document.controls[0] }) };
+}
+test('portal UI requires visible authentication and explicit call evidence; availability alone never becomes a call', () => {
+  const f = portalDocument(); f.document.welcome = f.element('Welcome, Synthetic User (12345)', false);
+  f.document.login = f.element('Interpreter Login', false);
+  assert.deepEqual(readPortalObservation(f.document), { session: 'unknown', call: 'unknown' });
+  f.document.login = f.element('Interpreter Login');
+  assert.equal(readPortalObservation(f.document).session, 'logged-out');
+  f.document.login = null; f.document.welcome = f.element('Welcome, Synthetic User (12345)');
+  f.document.controls = [f.element('Start Calls')];
+  assert.equal(readPortalObservation(f.document).call, 'idle');
+  f.document.controls = [f.element('Accept'), f.element('Reject')];
+  assert.equal(readPortalObservation(f.document).call, 'incoming');
+  f.document.controls = [f.element('End Call')]; f.document.statuses = [f.element('Available')];
+  assert.equal(readPortalObservation(f.document).call, 'unknown');
+  f.document.statuses = [f.element('Call in progress')];
+  assert.equal(readPortalObservation(f.document).call, 'connected');
+  f.document.controls = []; f.document.statuses = [f.element('Call ended')];
+  assert.equal(readPortalObservation(f.document).call, 'idle');
+});
+test('portal observer waits for connection after a trusted answer and stops after extension invalidation', async () => {
+  const f = portalDocument(), sent = []; let clock = 10000;
+  f.document.welcome = f.element('Welcome, Synthetic User (12345)');
+  f.document.controls = [f.element('Accept'), f.element('Reject')];
+  const observer = createPortalObserver({ document: f.document, documentId: 'observer-document-123', now: () => clock,
+    send: async packet => { sent.push(packet); return { ok: true }; } });
+  const stable = async () => { await observer.sample(); clock += 1000; await observer.sample(); };
+  await stable(); f.click(true); await stable();
+  assert.equal(sent.some(p => p.signal === 'accepted'), false);
+  f.document.controls = [f.element('End Call')]; await stable();
+  assert.equal(sent.filter(p => p.signal === 'accepted').length, 1);
+  f.document.controls = []; f.document.statuses = [f.element('Call ended')]; await stable();
+  assert.equal(sent.filter(p => p.signal === 'disconnected').length, 1);
+  assert.doesNotMatch(JSON.stringify(sent), /Synthetic User|12345/);
+  observer.stop(); const count = sent.length; await stable(); assert.equal(sent.length, count);
+  const invalidated = createPortalObserver({ document: f.document, documentId: 'invalidated-document-123', now: () => clock,
+    send: async () => { throw Error('Extension context invalidated.'); } });
+  await invalidated.sample(); clock += 1000; await invalidated.sample(); assert.equal(invalidated.isStopped(), true);
+});
+test('opening the extension during a visible call or synthetic answer click cannot fabricate an acceptance', async () => {
+  const f = portalDocument(), sent = []; let clock = 10000;
+  f.document.welcome = f.element('Welcome, Synthetic User (12345)');
+  f.document.controls = [f.element('Accept'), f.element('Reject')];
+  const observer = createPortalObserver({ document: f.document, documentId: 'baseline-document-123', now: () => clock,
+    send: async packet => { sent.push(packet); return { ok: true }; } });
+  f.click(false); f.document.controls = [f.element('End Call')];
+  await observer.sample(); clock += 1000; await observer.sample();
+  assert.equal(sent.some(p => p.signal === 'accepted'), false);
+  observer.stop();
+  f.document.statuses = [f.element('Call in progress')];
+  const baseline = createPortalObserver({ document: f.document, documentId: 'in-call-document-123', now: () => clock,
+    send: async packet => { sent.push(packet); return { ok: true }; } });
+  await baseline.sample(); clock += 1000; await baseline.sample();
+  assert.equal(sent.some(p => p.signal === 'accepted'), false);
+  baseline.stop();
+});
 
 test('el puente bloquea una pestaña desactualizada incluso si se descarta el aviso o vuelve el valor anterior', () => {
   const values = new Map([['calls','[]'], ['state','{}'], ['settings','{}']]);
@@ -70,6 +136,84 @@ function workerFixture() {
     ack: value => { ack = value; }, advance: milliseconds => { clock += milliseconds; },
     restart() { worker = createBridgeWorker(api, { now: () => clock, randomId: () => `generated-id-${String(++n).padStart(12,'0')}` }); } };
 }
+
+const portalSender = { id: 'extension-id', frameId: 0, tab: { id: 1 }, url: PORTAL_ORIGIN + '/' };
+const portalPacket = (session, extra = {}) => ({ kind: 'portal-observation', documentId: 'portal-document-12345', session, call: 'unknown', ...extra });
+async function enablePortal(f) {
+  f.targets([scope]); await f.worker.message({ kind: 'pair' }, sender);
+  await f.worker.message({ kind: 'mode', mode: 'auto' }, sender);
+}
+test('portal login and confirmed logout queue shift events once across reload and worker restart', async () => {
+  const f = workerFixture(); await enablePortal(f);
+  await f.worker.message(portalPacket('authenticated'), portalSender);
+  f.restart(); f.advance(1000);
+  await f.worker.message(portalPacket('authenticated', { documentId: 'reloaded-document-1234' }), portalSender);
+  await f.worker.message(portalPacket('unknown'), portalSender);
+  assert.deepEqual(f.delivered.map(x => x.event.type), ['session-start']);
+  f.advance(60000);
+  await f.worker.message(portalPacket('logged-out'), portalSender);
+  await f.worker.message(portalPacket('logged-out'), portalSender);
+  assert.deepEqual(f.delivered.map(x => x.event.type), ['session-start', 'session-end']);
+  assert.equal(f.delivered[1].event.sessionId, f.delivered[0].event.sessionId);
+  assert.equal(f.delivered[1].event.startedAt, f.delivered[0].event.at);
+});
+test('portal observations reject untrusted frames and never retain supplied personal data', async () => {
+  const f = workerFixture(); await enablePortal(f);
+  const packet = portalPacket('authenticated', { name: 'private-interpreter-name', token: 'private-token' });
+  for (const sender of [{ ...portalSender, frameId: 1 }, { ...portalSender, url: 'https://evil.test/' }, { ...portalSender, id: 'other' }])
+    assert.equal(await f.worker.message(packet, sender), null);
+  assert.equal(f.delivered.length, 0);
+  await f.worker.message(packet, portalSender);
+  assert.doesNotMatch(JSON.stringify(f.data), /private-interpreter-name|private-token/);
+});
+test('UI and network share call IDs; confirmed logout closes calls before the shift and stale tabs cannot reopen it', async () => {
+  const f = workerFixture(); await enablePortal(f);
+  await f.worker.message(portalPacket('authenticated', { call: 'idle' }), portalSender);
+  const secondSender = { ...portalSender, tab: { id: 2 } };
+  await f.worker.message(portalPacket('authenticated', { documentId: 'second-document-12345' }), secondSender);
+  await f.worker.message(portalPacket('authenticated', { call: 'connected', signal: 'accepted' }), portalSender);
+  await f.signal('accepted-by-local');
+  f.advance(60000);
+  await f.worker.message(portalPacket('logged-out'), portalSender);
+  await f.worker.message(portalPacket('authenticated', { documentId: 'second-document-12345' }), secondSender);
+  await f.signal('disconnected-by-remote');
+  assert.deepEqual(f.delivered.map(x => x.event.type), ['session-start', 'call-start', 'call-end', 'session-end']);
+  assert.equal((await f.worker.message({ kind: 'status' }, sender)).completed, 1);
+  f.advance(1000);
+  await f.worker.message(portalPacket('authenticated', { documentId: 'fresh-document-12345' }), secondSender);
+  assert.equal(f.delivered.at(-1).event.type, 'session-start');
+});
+test('auto activation during an existing portal session starts the shift on the next observation', async () => {
+  const f = workerFixture(); f.targets([scope]);
+  await f.worker.message(portalPacket('authenticated'), portalSender);
+  assert.equal(f.delivered.length, 0);
+  await enablePortal(f);
+  await f.worker.message(portalPacket('authenticated'), portalSender);
+  assert.deepEqual(f.delivered.map(x => x.event.type), ['session-start']);
+});
+test('session receiver starts and closes linked shifts at observed times and protects newer manual shifts', () => {
+  const state = {}, calls = [], sessionId = 'portal-session-123456';
+  const receive = createPropioReceiver({ getState: () => state, getCalls: () => calls, save: () => true, now,
+    startSession: e => { state.shiftStartedAt = e.at; state.shiftEndedAt = null; }, endSession: e => { state.shiftEndedAt = e.at; } });
+  const login = { version: 1, id: 'portal-login-123456', type: 'session-start', sessionId, at };
+  const logout = { version: 1, id: 'portal-logout-123456', type: 'session-end', sessionId, startedAt: at, at: ended };
+  assert.equal(receive(login).status, 'ok'); assert.equal(state.shiftStartedAt, at);
+  assert.equal(receive(login).duplicate, true);
+  state.activeCall = { manual: true };
+  assert.equal(receive(logout).reason, 'another-active-call'); assert.equal(state.shiftEndedAt, null);
+  state.activeCall = null;
+  assert.equal(receive(logout).status, 'ok'); assert.equal(state.shiftEndedAt, ended);
+  state.shiftStartedAt = '2026-10-04T18:09:00.000Z'; state.shiftEndedAt = null;
+  assert.equal(receive({ ...login, id: 'late-login-123456789' }).status, 'ok');
+  assert.equal(receive({ ...logout, id: 'late-logout-12345678' }).status, 'ok');
+  assert.equal(state.shiftEndedAt, null);
+});
+test('network acceptance completed after a UI end cannot resurrect an earlier call', () => {
+  const reduce = createPropioReducer({ randomId: () => 'generated-call-12345' });
+  const active = reduce(null, 'accepted', at).state;
+  const closed = reduce(active, 'disconnected', ended).state;
+  assert.equal(reduce(closed, 'accepted', at).event, null);
+});
 
 test('signals require exact endpoints and allowlisted primitive names', () => {
   assert.equal(readPropioSignal(endpoint, { name: 'accepted-by-local' }), 'accepted');

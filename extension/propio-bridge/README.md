@@ -1,27 +1,34 @@
-# Conexión con Propio
+# Conexión con Propio · 1.5.0
 
-Puente de llamadas MV3 propio, separado de Propio · Minutos y ganancias. Este paquete no inyecta barras en Propio, suma páginas ni incluye un userscript de historial. Observa únicamente solicitudes exitosas de disponibilidad en el portal y señales de llamadas en el endpoint de eventos de Twilio iniciadas por ese portal. No pulsa disponibilidad/aceptar/colgar, graba audio ni envía información a terceros. No necesita credenciales ni datos de clientes. Guarda localmente tipos de señal, tiempos, identificadores aleatorios de llamada y la cola pendiente; la cuenta del tracker se identifica por un hash.
+Extensión independiente de Propio · Minutos y ganancias. Conectá una sola pestaña del tracker a tu cuenta y activá Registrar llamadas automáticamente. En observación muestra señales sin modificar el tracker.
 
-## Preparar el registro desde la primera llamada
+## Sesión y Shift
 
-Abrir una sola pestaña del tracker e iniciar sesión. En el popup, pulsar Conectar esta cuenta y activar Registrar llamadas automáticamente. Desde 1.3.0 no exige observar una llamada previamente: el usuario puede dejarlo activado antes de trabajar. Por defecto sigue en observación, que no modifica registros. Activar a mitad de una llamada descarta el estado observado y espera la siguiente aceptación; no convierte un final suelto en una llamada nueva.
+Reconoce localmente el encabezado visible «Welcome, … (ID)» del portal. Con automático activado, la primera detección inicia el Shift; si ya estaba abierto, conserva su hora. Volver al formulario visible `#loginform` confirma el cierre de sesión y termina el Shift vinculado. Una llamada automática pendiente se cierra antes del turno con tiempo estimado hasta esa detección. No cierra llamadas manuales sin revisión.
 
-Con automático activado: una señal de aceptación inicia el contador del tracker; un final coincidente guarda la llamada usando la ruta existente de persistencia, ganancias y gamificación. Incoming, Start Calls y rechazos no crean llamadas. Repetir un final, recargar o sustituir por importación oficial conserva la deduplicación. El tiempo y pago automáticos son estimados con la tarifa del tracker; importar el historial oficial corrige ambos sin duplicar la llamada ni su progreso.
+Si activás la extensión con Propio ya conectado, registra desde la detección, sin inventar la hora anterior de login. Recargar, cerrar pestañas, ocultar ventanas, perder conexión o cambiar disponibilidad no equivale a salir. Un cierre atrasado tampoco termina un Shift manual posterior. Las observaciones desconocidas no modifican la sesión.
 
-Las señales se identificaron en el add-on público de 2023. Su compatibilidad con Propio actual queda pendiente hasta observarlas durante una llamada normal. El código puede prepararse antes, pero las pruebas simuladas no certifican una llamada real. No provocar una llamada únicamente para probar. No interpreta disponibilidad como estar en llamada ni Offline como Break/Lunch.
+## Llamadas
 
-## Persistencia y revisión
+Combina las solicitudes exitosas allowlisted del portal/Twilio con una alternativa desde controles visibles en inglés/español: aceptar/contestar y rechazar, colgar/finalizar llamada, y estados explícitos de llamada conectada/terminada. Un clic en aceptar necesita confirmación posterior de conexión; Start Calls, disponibilidad, un rechazo y un final suelto nunca crean una llamada. El detector espera evidencia estable, ignora controles ocultos y no pulsa nada.
 
-Entrega a una única pestaña de la cuenta conectada. Conserva hasta 200 eventos y reintenta cuando vuelve la app. Las señales mayores de 24 horas pausan y requieren revisión. Una llamada manual activa, un traslape, varias pestañas o un respaldo pendiente bloquean la entrega. Cambiar de cuenta con pendientes exige resolverlos primero. El reducer y la cola sobreviven al reinicio del worker; una solicitud HTTP en vuelo al detenerse el worker puede perderse y requerir revisión.
+Ambas fuentes comparten el mismo estado e identificador aleatorio para evitar duplicados. Un inicio observado empieza el contador; su final guarda por la ruta existente de llamadas, ganancias y refuerzo positivo. Activar en mitad de una llamada no inventa su inicio. Tiempo y pago son estimados: el historial oficial permite corregirlos sin duplicar progreso. Offline no se interpreta como Break/Lunch.
 
-Reconectar la misma cuenta mantiene el modo. Pausar o cambiar de cuenta durante una llamada automática exige esperar el final, o descartar explícitamente señales revisadas y revisar la llamada activa en el tracker. El popup permite ese descarte con confirmación. La recarga que invalida scripts anteriores detiene sus mensajes/listeners/temporizadores pendientes sin una excepción no capturada.
+La compatibilidad con el diseño de una llamada real en tu portal aún debe comprobarse durante tu trabajo habitual: las pruebas simuladas cubren controles reconocidos, no certifican variantes que Propio no nos ha mostrado. No provocar llamadas para probar. El popup muestra sesión reconocida, señales, solicitudes y pendientes; si un control tiene un formato desconocido, no inventa registros.
 
-## Instalación y actualización
+## Privacidad y persistencia
 
-La versión 1.4.0 admite formularios y los gateways documentados de Twilio `eventgw.us1`, `eventgw.ie1` y `eventgw.au1`. Chrome puede pedir acceso a esos tres hosts al actualizar. El popup distingue solicitudes observadas de señales reconocidas, incluso cuando el portal usa un formato que aún no entendemos. El diagnóstico guarda solo categorías, formato, hora y resultado HTTP; nunca URLs, headers ni cuerpos. Esta mejora no certifica la compatibilidad con el portal actual: se confirma al observar una llamada normal. El Shift sigue siendo manual en el tracker; login/logout del portal no se interpreta como inicio/fin del turno.
+No recoge usuario/contraseña, nombres, ID del intérprete, clientes, audio, URLs, headers, tokens o cuerpos para diagnóstico. Solo guarda clasificaciones, tiempos, identificadores aleatorios y cola local. La cuenta del tracker se vincula por hash. No incorpora barras, sumas de historial ni el userscript de la otra extensión.
 
-El botón de recargar de Chrome relee la carpeta instalada; no descarga archivos. Reemplazar primero el contenido de esa carpeta por el paquete actualizado, después recargar la extensión y las pestañas del portal y tracker. Esto conserva la configuración existente. Si se eliminó la extensión, cargar de nuevo la carpeta que contiene manifest.json mediante Cargar descomprimida y conectar la cuenta.
+La cola y sesión sobreviven al reinicio del worker. Entrega a una sola pestaña de la cuenta conectada, conserva hasta 200 eventos y reintenta cuando vuelve el tracker. Eventos de más de 24 horas requieren revisión. Una llamada manual, un respaldo pendiente, traslapes, varias pestañas o errores de almacenamiento bloquean la entrega. Cambiar de cuenta con pendientes exige resolverlos primero. Pausar durante una llamada requiere esperar o descartar expresamente las señales revisadas. Si cerrás Propio durante una llamada, revisá su final en el tracker.
 
-Build: node scripts/build-extension.mjs <salida>. El usuario confirmó instalación y conexión originales, luego reinstaló; el estado actual de vinculación/automático necesita comprobarse en su popup. La nueva autorización permite activar desde la primera llamada sin validación previa. Build, entrega, guardado, recarga, duplicados y corrección oficial se prueban en Chromium aislado con toda la red externa interceptada.
+## Actualizar la extensión existente
 
-Referencias: [observación HTTP de Chrome](https://developer.chrome.com/docs/extensions/reference/api/webRequest), [mensajería](https://developer.chrome.com/docs/extensions/develop/concepts/messaging) y [add-on público usado para identificar endpoints](https://chromewebstore.google.com/detail/propio-add-on-for-interpr/kmcnnnjpeldhklebpdgjibbpillbcplp). No se copió código ni se usa su servicio de Bilingual.
+1. Extraé el ZIP 1.5.0 y reemplazá los archivos de la carpeta que Chrome tiene instalada, incluida `portal-content.js`.
+2. En `chrome://extensions`, recargá Shift Tracker Bridge. Chrome puede solicitar los permisos regionales añadidos en 1.4.0.
+3. Recargá las pestañas de Propio y del tracker. Dejando la misma carpeta y extensión se mantiene la configuración. Comprobá «Diagnóstico del detector · 1.5.0» y «Sesión de Propio reconocida».
+4. Si estaba sin conectar: abrí el tracker, iniciá sesión, pulsá Conectar esta cuenta y activá el registro automático.
+
+Recargar la versión anterior sin reemplazar los archivos no instala la actualización. Si la extensión fue eliminada, usá Cargar descomprimida con la carpeta que contiene `manifest.json` y conectá la cuenta de nuevo.
+
+Build: `node scripts/build-extension.mjs <salida>`. Se prueban sesión, entrega, duplicados, reinicio, bloqueos y guardado; la comprobación del navegador usa un portal y cuenta ficticios en Chromium aislado.

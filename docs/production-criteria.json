@@ -849,10 +849,12 @@
     {
       "id": "bridge",
       "area": "Extensiones e historial",
-      "acceptance": "Puente valida mensajes, deduplica y separa versiones; historial paginado; resumen independiente sin acceder a otra cuenta.",
+      "acceptance": "Puente valida mensajes, conecta sesión confirmada con Shift, detecta llamadas por controles o red y deduplica; historial paginado y resumen independiente sin acceder a otra cuenta.",
       "sources": [
         "js/propio-bridge.js",
         "js/propio-bridge-rules.js",
+        "extension/propio-bridge/portal-observer.js",
+        "extension/propio-bridge/portal-content.js",
         "js/propio-history.js",
         "js/propio-history-pages.js"
       ],
@@ -869,6 +871,14 @@
             "el puente bloquea una pestaña desactualizada incluso si se descarta el aviso o vuelve el valor anterior",
             "el puente acepta escrituras propias y una nueva revisión tras recargar",
             "signals require exact endpoints and allowlisted primitive names",
+            "portal UI requires visible authentication and explicit call evidence; availability alone never becomes a call",
+            "portal observer waits for connection after a trusted answer and stops after extension invalidation",
+            "opening the extension during a visible call or synthetic answer click cannot fabricate an acceptance",
+            "portal login and confirmed logout queue shift events once across reload and worker restart",
+            "portal observations reject untrusted frames and never retain supplied personal data",
+            "UI and network share call IDs; confirmed logout closes calls before the shift and stale tabs cannot reopen it",
+            "auto activation during an existing portal session starts the shift on the next observation",
+            "session receiver starts and closes linked shifts at observed times and protects newer manual shifts",
             "event validation rejects future, expired, zero-length and malformed values and strips unknown data",
             "reducer ignores incoming/rejected/unmatched ends and collapses repeated starts and ends",
             "receiver saves offline pairs once and recognizes official replacement metadata",
@@ -913,7 +923,7 @@
           "file": "tests/propio-extension-separation.test.mjs",
           "namedCases": [
             "independent summary is scoped to Propio and has no call observer, tracker or messaging capabilities",
-            "bridge only installs its tracker content script and does not build or inject a history summary"
+            "bridge observes session and call controls without building or injecting a history summary"
           ]
         },
         {

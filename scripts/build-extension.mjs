@@ -9,6 +9,9 @@ for (const legacy of ['portal-history.js', 'propio-resumen.user.js']) await rm(p
 const bundle = await rollup({ input: path.join(root, 'extension/propio-bridge/worker.js') });
 await bundle.write({ file: path.join(out, 'worker.js'), format: 'es', inlineDynamicImports: true });
 await bundle.close();
+const portal = await rollup({ input: path.join(root, 'extension/propio-bridge/portal-content.js') });
+await portal.write({ file: path.join(out, 'portal-content.js'), format: 'iife', inlineDynamicImports: true });
+await portal.close();
 for (const name of ['manifest.json', 'tracker-content.js', 'popup.html', 'popup.css', 'popup.js', 'README.md']) {
   await copyFile(path.join(root, 'extension/propio-bridge', name), path.join(out, name));
 }
