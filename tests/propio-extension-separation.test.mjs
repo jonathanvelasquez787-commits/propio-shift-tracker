@@ -13,9 +13,9 @@ test('independent summary is scoped to Propio and has no call observer, tracker 
  assert.match(source,/aria-describedby="period-explanation"/);assert.match(source,/sum-period'\)\.title/);
  assert.match(read('extension/propio-summary/i18n.js'),/Elegí Start Date y End Date en Propio y actualizá el historial/);
 });
-test('bridge only installs its tracker content script and does not build or inject a history summary',()=>{
+test('bridge observes session and call controls without building or injecting a history summary',()=>{
  const manifest=JSON.parse(read('extension/propio-bridge/manifest.json'));
- assert.deepEqual(manifest.content_scripts.map(s=>s.matches),[['https://propio-shift-tracker.vercel.app/*']]);
+ assert.deepEqual(manifest.content_scripts.map(s=>s.matches),[['https://interpreters.propio-ls.com/*'],['https://propio-shift-tracker.vercel.app/*']]);
  assert.doesNotMatch(read('scripts/build-extension.mjs'),/rollup\(\{ input:.*summary|portal-history.*input/);
  assert.equal(fs.existsSync(new URL('../extension/propio-bridge/portal-history.js',import.meta.url)),false);
 });

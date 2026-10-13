@@ -1,8 +1,8 @@
-import { PORTAL_ORIGIN, TRACKER_ORIGIN, accountScopeValid, readPropioSignal, validateBridgeEvent, createPropioReducer } from '../../js/propio-bridge-rules.js';
+import { PORTAL_ORIGIN, TRACKER_ORIGIN, TWILIO_EVENT_ORIGINS, accountScopeValid, readPropioSignal, readPropioRequestBody, propioRequestKind, validateBridgeEvent, createPropioReducer } from '../../js/propio-bridge-rules.js';
 
 const KEY = 'bridge-v1';
-const URLS = [`${PORTAL_ORIGIN}/api/Interpreter/UpdateInterpreterStatus*`, 'https://eventgw.twilio.com/v4/EndpointEvents*'];
-const fresh = () => ({ mode: 'observe', accountScope: null, tabs: {}, queue: [], completed: 0, last: [], attention: null });
+const URLS = [`${PORTAL_ORIGIN}/*`, ...TWILIO_EVENT_ORIGINS.map(origin => `${origin}/v4/EndpointEvents*`)];
+const fresh = () => ({ mode: 'observe', accountScope: null, tabs: {}, session: null, queue: [], completed: 0, last: [], attention: null });
 export function createBridgeWorker(api, { now = () => Date.now(), randomId = () => crypto.randomUUID() } = {}) {
   const reduce = createPropioReducer({ randomId }), pending = new Map();
   let serial = Promise.resolve(), flushing = null;
@@ -28,33 +28,44 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     }));
     return results.filter(Boolean);
   }
+  function record(state, signal, at, event) {
+    state.last = [...state.last, { signal, at }].slice(-20);
+    if (state.mode === 'auto' && state.accountScope && event) {
+      if (state.queue.length >= 200) { state.mode = 'observe'; state.attention = 'queue-full'; }
+      else state.queue.push({ accountScope: state.accountScope, event });
+    }
+  }
+  function callSignal(state, tabId, signal, at) {
+    const { state: reduced, event } = reduce(state.tabs[tabId], signal, at);
+    state.tabs[tabId] = { ...state.tabs[tabId], ...reduced };
+    if (event?.type === 'call-end' && validateBridgeEvent(event, now())) state.completed++;
+    record(state, signal, at, event);
+  }
   function beforeRequest(details) {
-    if (details.method !== 'POST' || details.tabId < 0) return;
+    const kind = propioRequestKind(details.url);
+    if (!kind || details.tabId < 0 || pending.size >= 200) return;
+    if (kind === 'portal-api' && details.method !== 'POST' && !['xmlhttprequest', 'websocket'].includes(details.type)) return;
     try { if (new URL(details.initiator).origin !== PORTAL_ORIGIN) return; } catch { return; }
-    const raw = details.requestBody?.raw;
-    if (!Array.isArray(raw) || !raw.length || raw.some(part => !part.bytes)) return;
-    const parts = raw.map(part => new Uint8Array(part.bytes));
-    const length = parts.reduce((n, part) => n + part.length, 0);
-    if (length > 65536) return;
+    // Other portal APIs contribute only a counter; never inspect their bodies.
+    let signal = null, format = 'not-read';
     try {
-      const bytes = new Uint8Array(length); let offset = 0;
-      for (const part of parts) { bytes.set(part, offset); offset += part.length; }
-      const signal = readPropioSignal(details.url, JSON.parse(new TextDecoder().decode(bytes)));
-      if (signal && pending.size < 200) pending.set(details.requestId, { signal, tabId: details.tabId, at: new Date(details.timeStamp).toISOString() });
-    } catch { /* Unknown payloads are ignored; raw bodies are never retained. */ }
+      if (kind !== 'portal-api' && details.method === 'POST') {
+        const parsed = readPropioRequestBody(details.requestBody);
+        format = parsed.format; signal = readPropioSignal(details.url, parsed.body);
+      }
+      pending.set(details.requestId, { signal, kind, format, tabId: details.tabId, at: new Date(details.timeStamp).toISOString() });
+    } catch { /* Raw bodies, headers and URLs are never retained. */ }
   }
   async function completed(details) {
     const item = pending.get(details.requestId); pending.delete(details.requestId);
-    if (!item || details.statusCode < 200 || details.statusCode >= 300) return;
+    if (!item) return;
     await transact(state => {
-      const { state: reduced, event } = reduce(state.tabs[item.tabId], item.signal, item.at);
-      state.tabs[item.tabId] = reduced;
-      if (event?.type === 'call-end' && validateBridgeEvent(event, now())) state.completed++;
-      state.last = [...state.last, { signal: item.signal, at: item.at }].slice(-20);
-      if (state.mode === 'auto' && state.accountScope && event) {
-        if (state.queue.length >= 200) { state.mode = 'observe'; state.attention = 'queue-full'; }
-        else state.queue.push({ accountScope: state.accountScope, event });
-      }
+      const diagnostic = state.diagnostic || { requests: 0, recognized: 0, last: [] };
+      const success = details.statusCode >= 200 && details.statusCode < 300;
+      state.diagnostic = { requests: Math.min(1000000, diagnostic.requests + 1), recognized: Math.min(1000000, diagnostic.recognized + Number(success && !!item.signal)),
+        last: [...diagnostic.last, { kind: item.kind, format: item.format, status: details.statusCode, result: !success ? 'http-error' : item.signal ? 'recognized' : 'unknown', at: item.at }].slice(-20) };
+      if (!success || !item.signal) return;
+      callSignal(state, item.tabId, item.signal, item.at);
     });
     await flush();
   }
@@ -89,6 +100,35 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
   }
   async function message(packet, sender) {
     if (sender.id !== api.runtime.id) return null;
+    if (packet?.kind === 'portal-observation') {
+      if (sender.frameId !== 0 || !sender.tab || !Number.isInteger(sender.tab.id) || sender.tab.id < 0) return null;
+      try { if (new URL(sender.url).origin !== PORTAL_ORIGIN) return null; } catch { return null; }
+      if (!/^[\w-]{12,100}$/.test(packet.documentId || '') || !['authenticated', 'logged-out', 'unknown'].includes(packet.session) ||
+          !['connected', 'idle', 'incoming', 'unknown'].includes(packet.call) ||
+          (packet.signal && !['incoming', 'accepted', 'rejected', 'disconnected'].includes(packet.signal))) return null;
+      const at = new Date(now()).toISOString();
+      await transact(state => {
+        const tabId = sender.tab.id, previous = state.tabs[tabId] || {};
+        const blocked = previous.blockedDocument === packet.documentId;
+        state.tabs[tabId] = { ...previous, documentId: packet.documentId, session: packet.session, call: packet.call, seenAt: at };
+        if (packet.session === 'authenticated' && !blocked && !state.session) {
+          state.session = { sessionId: randomId(), startedAt: at };
+          record(state, 'session-start', at, { version: 1, id: randomId(), type: 'session-start', ...state.session, at });
+        } else if (packet.session === 'logged-out' && state.session) {
+          // The visible login form confirms session termination. Closing a tab, a hidden
+          // window, availability and a network failure never count as logging out.
+          for (const [id, tab] of Object.entries(state.tabs)) {
+            if (tab.active) callSignal(state, id, 'disconnected', at);
+            state.tabs[id].blockedDocument = tab.documentId;
+          }
+          const session = state.session; state.session = null;
+          record(state, 'session-end', at, { version: 1, id: randomId(), type: 'session-end', ...session, at });
+        }
+        if (packet.session === 'logged-out') delete state.tabs[tabId].blockedDocument;
+        if (packet.session === 'authenticated' && !blocked && packet.signal) callSignal(state, tabId, packet.signal, at);
+      });
+      await flush(); return { ok: true };
+    }
     if (packet?.kind === 'tracker-ready') {
       if (sender.frameId !== 0 || !sender.tab || !accountScopeValid(packet.accountScope)) return null;
       try { if (new URL(sender.url).origin !== TRACKER_ORIGIN) return null; } catch { return null; }
@@ -97,7 +137,10 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     if (sender.url !== api.runtime.getURL('popup.html')) return null;
     if (packet?.kind === 'status') {
       const state = await transact(state => ({ ...state }));
-      return { mode: state.mode, paired: !!state.accountScope, active: Object.values(state.tabs).some(tab => tab.active), completed: state.completed, queued: state.queue.length, last: state.last, attention: state.attention };
+      const portals = Object.values(state.tabs).filter(tab => now() - Date.parse(tab.seenAt) < 15000);
+      const authenticated = portals.filter(tab => tab.session === 'authenticated' && tab.blockedDocument !== tab.documentId);
+      const call = ['connected', 'incoming', 'idle'].find(kind => authenticated.some(tab => tab.call === kind)) || 'unknown';
+      return { mode: state.mode, paired: !!state.accountScope, active: Object.values(state.tabs).some(tab => tab.active), completed: state.completed, queued: state.queue.length, last: state.last, attention: state.attention, call, portal: authenticated.length ? 'authenticated' : portals.some(tab => tab.session === 'logged-out') ? 'logged-out' : 'unknown', diagnostic: state.diagnostic || { requests: 0, recognized: 0, last: [] } };
     }
     if (packet?.kind === 'pair') {
       const targets = await trackers();
@@ -106,7 +149,7 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
         if (state.accountScope === targets[0].accountScope) return { ok: true };
         if (state.queue.length && state.accountScope !== targets[0].accountScope) return { ok: false, reason: 'pending-account' };
         if (state.mode === 'auto' && Object.values(state.tabs).some(tab => tab.active)) return { ok: false, reason: 'active-portal-call' };
-        state.accountScope = targets[0].accountScope; state.mode = 'observe'; state.tabs = {}; state.attention = null;
+        state.accountScope = targets[0].accountScope; state.mode = 'observe'; state.tabs = {}; state.session = null; state.attention = null;
         return { ok: true };
       });
     }
@@ -115,7 +158,7 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
         if (!['observe', 'auto'].includes(packet.mode)) return { ok: false, reason: 'invalid-mode' };
         if (packet.mode === 'auto' && !state.accountScope) return { ok: false, reason: 'account-needed' };
         if (packet.mode === 'observe' && state.mode === 'auto' && Object.values(state.tabs).some(tab => tab.active)) return { ok: false, reason: 'active-portal-call' };
-        if (state.mode !== packet.mode) state.tabs = {};
+        if (state.mode !== packet.mode) { state.tabs = {}; state.session = null; }
         state.mode = packet.mode;
         return { ok: true };
       });
@@ -123,20 +166,23 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     }
     if (packet?.kind === 'open-tracker') { await api.tabs.create({ url: `${TRACKER_ORIGIN}/` }); return { ok: true }; }
     if (packet?.kind === 'clear-reviewed') return transact(state => {
-      state.mode = 'observe'; state.queue = []; state.tabs = {}; state.attention = null; return { ok: true };
+      state.mode = 'observe'; state.queue = []; state.tabs = {}; state.session = null; state.attention = null; return { ok: true };
     });
     return null;
   }
   function install() {
     api.webRequest.onBeforeRequest.addListener(beforeRequest, { urls: URLS }, ['requestBody']);
     api.webRequest.onCompleted.addListener(details => { completed(details).catch(() => {}); }, { urls: URLS });
-    api.webRequest.onErrorOccurred.addListener(details => pending.delete(details.requestId), { urls: URLS });
+    api.webRequest.onErrorOccurred.addListener(details => { completed({ ...details, statusCode: 0 }).catch(() => {}); }, { urls: URLS });
     api.runtime.onMessage.addListener((packet, sender, respond) => {
       message(packet, sender).then(respond, () => respond({ ok: false, reason: 'storage' })); return true;
     });
     api.alarms.create('retry-bridge', { periodInMinutes: 0.5 });
     api.alarms.onAlarm.addListener(alarm => { if (alarm.name === 'retry-bridge') flush().catch(() => {}); });
-    api.tabs.onRemoved.addListener(tabId => { transact(state => { delete state.tabs[tabId]; }).catch(() => {}); });
+    api.tabs.onRemoved.addListener(tabId => { transact(state => {
+      if (state.tabs[tabId]?.active) state.attention = 'portal-closed';
+      delete state.tabs[tabId];
+    }).catch(() => {}); });
   }
   return { install, beforeRequest, completed, message, flush };
 }

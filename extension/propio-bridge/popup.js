@@ -1,4 +1,5 @@
 const reasons = {
+  'portal-closed': 'La pestaña de Propio se cerró durante una llamada. Revisá su final en el tracker.',
   'active-portal-call': 'Esperá a que termine la llamada para pausar o cambiar de cuenta. Para detener la conexión de inmediato, descartá las señales y revisá la llamada activa en el tracker.',
   'multiple-trackers': 'Dejá abierta una sola pestaña del tracker para esta cuenta.',
   'tracker-closed': 'Abrí el tracker e iniciá sesión para conectarlo.',
@@ -10,7 +11,7 @@ const reasons = {
   'tracker-needs-review': 'El tracker requiere revisión: puede haber una llamada manual, un traslape o un problema al guardar.',
   storage: 'No se pudo guardar el estado. Reintentá la conexión.',
 };
-const labels = { incoming: 'Llamada entrante', accepted: 'Llamada aceptada', rejected: 'Llamada rechazada', disconnected: 'Llamada terminada', available: 'Disponible', unavailable: 'Fuera de línea' };
+const labels = { 'session-start': 'Sesión iniciada · Shift', 'session-end': 'Sesión cerrada · Shift', incoming: 'Llamada entrante', accepted: 'Llamada aceptada', rejected: 'Llamada rechazada', disconnected: 'Llamada terminada', available: 'Disponible', unavailable: 'Fuera de línea' };
 const send = packet => chrome.runtime.sendMessage(packet);
 let busy = false, feedback = '';
 async function refresh() {
@@ -19,12 +20,27 @@ async function refresh() {
   document.getElementById('status').textContent = state.mode === 'auto' ? 'Registro automático activo' : 'Modo de observación';
   document.getElementById('detail').textContent = feedback || reasons[state.attention] || `${state.paired ? 'Cuenta conectada' : 'Cuenta sin conectar'} · ${state.completed} llamada(s) observada(s) · ${state.queued} pendiente(s)`;
   const toggle = document.getElementById('automatic');
+  const callStatus = state.active ? 'Llamada activa detectada.' : state.call === 'connected' ? 'Hay una llamada visible cuyo inicio no se observó; revisala en el tracker.' : state.call === 'incoming' ? 'Llamada entrante visible.' : state.call === 'idle' ? 'Controles de llamadas reconocidos.' : 'Controles de llamadas sin confirmar.';
+  document.getElementById('portalStatus').textContent = state.portal === 'authenticated' ? `Sesión de Propio reconocida. ${callStatus}` : state.portal === 'logged-out' ? 'Propio muestra el formulario de login.' : 'Sesión de Propio sin confirmar. Recargá el portal y comprobá el acceso de la extensión al sitio.';
   toggle.checked = state.mode === 'auto'; toggle.disabled = busy || !state.paired;
   document.getElementById('reviewed').hidden = !state.queued && !(state.mode === 'auto' && state.active);
   const list = document.getElementById('signals'); list.replaceChildren();
   for (const item of [...state.last].reverse()) {
     const li = document.createElement('li');
     li.textContent = `${labels[item.signal] || 'Señal'} · ${new Date(item.at).toLocaleTimeString('es')}`; list.append(li);
+  }
+  if (!state.last.length) { const li = document.createElement('li'); li.textContent = 'Todavía no se detectaron señales compatibles.'; list.append(li); }
+  const diagnostic = state.diagnostic || { requests: 0, recognized: 0, last: [] };
+  document.getElementById('detectorStatus').textContent = diagnostic.requests
+    ? `${diagnostic.requests} solicitud(es) observada(s) · ${diagnostic.recognized} señal(es) reconocida(s)`
+    : 'Sin solicitudes observadas. Recargá Propio después de actualizar la extensión y comprobá su acceso a este sitio.';
+  const requests = document.getElementById('detectorRequests'); requests.replaceChildren();
+  const kinds = { status: 'Estado de Propio', twilio: 'Evento de llamadas', 'portal-api': 'Otra solicitud del portal' };
+  const formats = { json: 'JSON', form: 'Formulario', missing: 'Cuerpo no disponible', oversized: 'Cuerpo demasiado grande', unreadable: 'Formato no reconocido', 'not-read': 'Cuerpo no leído' };
+  for (const item of [...diagnostic.last].reverse()) {
+    const li = document.createElement('li');
+    li.textContent = `${kinds[item.kind] || 'Solicitud'} · ${formats[item.format] || 'Sin formato'} · HTTP ${item.status} · ${item.result === 'recognized' ? 'Señal reconocida' : item.result === 'http-error' ? 'Solicitud fallida' : 'Sin señal compatible'}`;
+    requests.append(li);
   }
 }
 async function act(packet) {

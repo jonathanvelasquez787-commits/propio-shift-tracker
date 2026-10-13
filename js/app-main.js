@@ -4100,12 +4100,12 @@ function renderPayDatesSection() {
       return todayCallDateKey(fallbackDate);
     }
 
-    function setEvent(type, title, detail, meta = '') {
+    function setEvent(type, title, detail, meta = '', at = new Date().toISOString()) {
       const trackedType = ['shift', 'break', 'lunch'].includes(type);
       const shiftDayKey = trackedType && state.shiftStartedAt ? currentShiftAccountingDayKey() : '';
       const event = {
         id: makeLocalId(),
-        ts: new Date().toISOString(),
+        ts: at,
         type,
         title,
         detail,
@@ -4117,14 +4117,15 @@ function renderPayDatesSection() {
       return event;
     }
 
-    function startShift() {
-      const now = new Date();
+    function startShift(options = {}) {
+      if (!options.propio) state.propioBridgeSession = null;
+      const now = new Date(options.at || Date.now());
       const nowISO = now.toISOString();
 
       // Si "Finalizar shift" se presionó por accidente (el turno no había terminado de verdad) y se
       // vuelve a dar "Iniciar shift" dentro de la ventana de gracia, esto es una CONTINUACIÓN del
       // mismo turno.
-      if (state.shiftStartedAt && state.shiftEndedAt && sameCallDay(state.shiftEndedAt, todayCallDateKey())) {
+      if (!options.propio && state.shiftStartedAt && state.shiftEndedAt && sameCallDay(state.shiftEndedAt, todayCallDateKey())) {
         const gapMin = (now.getTime() - new Date(state.shiftEndedAt).getTime()) / 60000;
         if (gapMin >= 0 && gapMin <= ACCIDENTAL_TOGGLE_GRACE_MIN) {
           registerDayInterruption(todayCallDateKey(), 'shift', state.shiftEndedAt, nowISO);
@@ -4143,7 +4144,7 @@ function renderPayDatesSection() {
       const alreadyStarted = !!state.shiftStartedAt && !state.shiftEndedAt;
       state.shiftStartedAt = alreadyStarted ? state.shiftStartedAt : nowISO;
       state.shiftEndedAt = null;
-      setEvent('shift', 'Shift iniciado', fmtTime(now), 'manual');
+      setEvent('shift', 'Shift iniciado', fmtTime(now), options.propio ? 'Propio' : 'manual', nowISO);
       if (saveAll() === false) return false;
       // El aviso de "Conéctate ya" ya no tiene razón de seguir sonando — checkShiftAlarm lo
       // apagaría solo en el próximo tick (hasta 1s de retraso), pero apagarlo aquí de inmediato
@@ -4167,13 +4168,14 @@ function renderPayDatesSection() {
       toast(translateText('Shift iniciado'));
     }
 
-    function endShift() {
+    function endShift(options = {}) {
       if (!state.shiftStartedAt || state.shiftEndedAt) return;
+      if (!options.propio) state.propioBridgeSession = null;
       const shiftDayKey = todayCallDateKey(new Date(state.shiftStartedAt));
-      if (state.activePause) endPause({ silent: true, deferSave: true, forShiftEnd: true });
-      const now = new Date().toISOString();
+      const now = options.at || new Date().toISOString();
+      if (state.activePause && endPause({ silent: true, deferSave: true, forShiftEnd: true, endedAt: now }) === false) return false;
       state.shiftEndedAt = now;
-      setEvent('shift', 'Shift terminado', fmtTime(new Date(now)), 'manual');
+      setEvent('shift', 'Shift terminado', fmtTime(new Date(now)), options.propio ? 'Propio' : 'manual', now);
       if (saveAll() === false) return false;
       toast(translateText('Shift terminado'));
       onGameShiftEnded(shiftDayKey);
@@ -7907,6 +7909,8 @@ export const applyPropioBridgeEvent = createPropioReceiver({
   canReceive: () => localStorageRevision.isCurrent(),
   getState: () => state,
   getCalls: () => calls,
+  startSession: event => startShift({ at: event.at, propio: true }),
+  endSession: event => endShift({ at: event.at, propio: true }),
   start: event => startCall({ startedAt: event.at, propioBridge: { callId: event.callId, payEstimated: true, timingEstimated: true } }),
   end: event => endCall({ endedAt: event.at }),
   catchUp: event => {

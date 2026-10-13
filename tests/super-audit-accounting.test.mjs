@@ -83,6 +83,21 @@ test('manual and live save sounds fire after persistence and never for duplicate
   x.reload();assert.deepEqual(x.soundEvents,['callManual','callEnded']);
 });
 
+test('distinct bridge calls in the same displayed minute save separately while overlaps and repeated IDs still block', t => {
+  const x = harness(t), base = at(1, '09:00').getTime();
+  const iso = seconds => new Date(base + seconds * 1000).toISOString();
+  const context = id => ({ propioBridge: { callId: id, timingEstimated: true, payEstimated: true } });
+  assert.equal(autoSaveLiveCall(iso(0), iso(20), context('first-bridge-call-123')), true);
+  assert.equal(autoSaveLiveCall(iso(30), iso(50), context('second-bridge-call-123')), true);
+  assert.equal(calls.length, 2); assert.equal(calls[0].callStart, calls[1].callStart);
+  assert.equal(state.pendingLiveCallBackup, null);
+  x.reload(); assert.equal(calls.length, 2);
+  assert.equal(autoSaveLiveCall(iso(35), iso(55), context('overlapping-call-123')), false);
+  state.pendingLiveCallBackup = null;
+  assert.equal(autoSaveLiveCall(iso(70), iso(90), context('first-bridge-call-123')), false);
+  assert.equal(calls.length, 2);
+});
+
 test('a pasted batch sounds once only after a changed import is saved',t=>{
   const x=harness(t);x.advance(at(2,'19:00'));
   const batch=[['one','09/01/2025','08:00 AM','10','Yes','No','$1.20'],['two','09/01/2025','08:30 AM','10','Yes','No','$1.20']];
