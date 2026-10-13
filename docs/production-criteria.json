@@ -855,6 +855,8 @@
         "js/propio-bridge-rules.js",
         "extension/propio-bridge/portal-observer.js",
         "extension/propio-bridge/portal-content.js",
+        "extension/propio-bridge/summary-content.js",
+        "extension/propio-summary/options.js",
         "js/propio-history.js",
         "js/propio-history-pages.js"
       ],
@@ -928,7 +930,7 @@
           "file": "tests/propio-extension-separation.test.mjs",
           "namedCases": [
             "independent summary is scoped to Propio and has no call observer, tracker or messaging capabilities",
-            "bridge observes session and call controls without building or injecting a history summary"
+            "unified extension packages independent session detection and an optional local summary without adding permissions"
           ]
         },
         {
@@ -943,6 +945,7 @@
           "file": "tests/propio-summary-i18n.test.mjs",
           "namedCases": [
             "summary defaults and legacy currency-only settings use English; Spanish is explicit",
+            "unified summary is opt-in and preference updates preserve enabled state and valid conversion",
             "summary status, plural calls and scan errors follow the selected language"
           ]
         }

@@ -1,6 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { languageOf, copyFor, scanError } from '../extension/propio-summary/i18n.js';
+import { normalizeSummaryOptions } from '../extension/propio-summary/options.js';
+test('unified summary is opt-in and preference updates preserve enabled state and valid conversion', () => {
+  assert.deepEqual(normalizeSummaryOptions(null, false), { enabled: false, language: 'en' });
+  assert.equal(normalizeSummaryOptions(null).enabled, true);
+  const enabled = normalizeSummaryOptions({ enabled: true, language: 'es', currency: 'L', rate: 26.8 }, false);
+  assert.deepEqual(enabled, { enabled: true, language: 'es', currency: 'L', rate: 26.8 });
+  assert.deepEqual(normalizeSummaryOptions({ ...enabled, enabled: false }, false), { ...enabled, enabled: false });
+  assert.deepEqual(normalizeSummaryOptions({ ...enabled, currency: null, rate: null }, false), { enabled: true, language: 'es' });
+  assert.deepEqual(normalizeSummaryOptions({ enabled: 'true', language: 'bad', currency: '<script>alert(1)</script>', rate: Infinity }, false), { enabled: false, language: 'en' });
+});
 test('summary defaults and legacy currency-only settings use English; Spanish is explicit', () => {
   for (const options of [undefined, {}, { currency: 'L', rate: 26.68 }, { language: 'fr' }]) {
     assert.equal(languageOf(options), 'en');

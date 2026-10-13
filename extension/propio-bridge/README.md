@@ -1,6 +1,14 @@
-# Conexión con Propio · 1.5.1
+# Propio · Tracker y resumen · 2.0.0
 
-Extensión independiente de Propio · Minutos y ganancias. Conectá una sola pestaña del tracker a tu cuenta y activá Registrar llamadas automáticamente. En observación muestra señales sin modificar el tracker.
+Una sola extensión reúne la conexión al tracker y la barra de llamadas, minutos y ganancias en Propio. «Registrar en mi tracker» y «Mostrar resumen en Propio» son controles independientes. El resumen empieza oculto y no exige cuenta vinculada; encenderlo o apagarlo se aplica a las pestañas abiertas sin recargar. La conexión conserva su modo y cuenta al actualizar la carpeta existente.
+
+## Resumen opcional e interfaz
+
+En el historial, la barra muestra el subtotal de la página visible: cantidad de llamadas, minutos y pago oficial. «Calcular total» recorre todas las páginas del rango elegido y vuelve a la página inicial. Ocultarlo mientras suma cancela el recorrido y restaura la página. La barra conserva la colocación compacta junto a los encabezados. Filtros, datos pendientes y errores de paginación mantienen sus verificaciones.
+
+El popup tiene tarjetas de conexión y resumen, controles separados, cuenta vinculada, llamadas detectadas y pendientes, actividad y diagnóstico desplegables. Las preferencias del resumen permiten English/Español y conversión opcional; se guardan localmente y se reflejan en la barra. Usan el mismo icono de reloj de la tool, preparado a 16, 32, 48 y 128 px. Los temas claro/oscuro siguen la preferencia del navegador.
+
+El resumen no inicia turnos, registra llamadas, ni comparte filas con el tracker. El registro puede funcionar con la barra oculta, y el resumen con el registro apagado. No se añaden permisos respecto de 1.5.1.
 
 ## Sesión y Shift
 
@@ -18,16 +26,16 @@ La compatibilidad con el diseño de una llamada real en tu portal aún debe comp
 
 ## Privacidad y persistencia
 
-No recoge usuario/contraseña, nombres, ID del intérprete, clientes, audio, URLs, headers, tokens o cuerpos para diagnóstico. Solo guarda clasificaciones, tiempos, identificadores aleatorios y cola local. La cuenta del tracker se vincula por hash. No incorpora barras, sumas de historial ni el userscript de la otra extensión.
+No recoge usuario/contraseña, nombres, ID del intérprete, clientes, audio, URLs, headers, tokens o cuerpos para diagnóstico. La conexión guarda clasificaciones, tiempos, identificadores aleatorios y cola local; el resumen guarda solo visibilidad, idioma y conversión, con los totales en memoria. La cuenta del tracker se vincula por hash. El historial se suma localmente y no se envía a otro servicio.
 
 La cola y sesión sobreviven al reinicio del worker. Entrega a una sola pestaña de la cuenta conectada, conserva hasta 200 eventos y reintenta cuando vuelve el tracker. Eventos de más de 24 horas requieren revisión. Una llamada manual, un respaldo pendiente, traslapes, varias pestañas o errores de almacenamiento bloquean la entrega. Cambiar de cuenta con pendientes exige resolverlos primero. Pausar durante una llamada requiere esperar o descartar expresamente las señales revisadas. Si cerrás Propio durante una llamada, revisá su final en el tracker.
 
 ## Actualizar la extensión existente
 
-1. Extraé el ZIP 1.5.1 y reemplazá los archivos de la carpeta que Chrome tiene instalada, incluida `portal-content.js`.
-2. En `chrome://extensions`, recargá Shift Tracker Bridge. La versión 1.5.1 añade webNavigation para confirmar la redirección de Sign out; si Chrome solicita habilitarlo, aceptá para completar la actualización.
-3. Recargá las pestañas de Propio y del tracker. Dejando la misma carpeta y extensión se mantiene la configuración. Comprobá «Diagnóstico del detector · 1.5.1» y «Sesión de Propio reconocida».
-4. Si estaba sin conectar: abrí el tracker, iniciá sesión, pulsá Conectar esta cuenta y activá el registro automático.
+1. Reemplazá los archivos de la carpeta de conexión instalada por el paquete 2.0.0, incluidos `summary-content.js` y la carpeta `icons`. Usar esa misma carpeta conserva cuenta vinculada, registro automático, sesión y cola.
+2. En `chrome://extensions`, recargá la extensión de conexión: ahora se llama «Propio · Tracker y resumen». Desactivá la extensión anterior «Propio · Minutos y ganancias» y cualquier userscript de resumen para usar solo una barra.
+3. Recargá Propio y el tracker. El popup muestra 2.0.0 y el icono de la tool. Activá «Mostrar resumen en Propio» si querés verlo en el historial.
+4. Si estaba sin vincular: abrí el tracker, iniciá sesión y pulsá Vincular cuenta. Moneda/idioma de la extensión de resumen anterior se configuran una vez en el nuevo popup: Chrome separa el almacenamiento de las dos extensiones antiguas.
 
 Recargar la versión anterior sin reemplazar los archivos no instala la actualización. Si la extensión fue eliminada, usá Cargar descomprimida con la carpeta que contiene `manifest.json` y conectá la cuenta de nuevo.
 

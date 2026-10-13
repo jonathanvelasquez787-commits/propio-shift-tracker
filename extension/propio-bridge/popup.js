@@ -1,3 +1,5 @@
+import { settingsKey } from '../propio-summary/i18n.js';
+import { normalizeSummaryOptions } from '../propio-summary/options.js';
 const reasons = {
   'portal-closed': 'La pestaña de Propio se cerró durante una llamada. Revisá su final en el tracker.',
   'active-portal-call': 'Esperá a que termine la llamada para pausar o cambiar de cuenta. Para detener la conexión de inmediato, descartá las señales y revisá la llamada activa en el tracker.',
@@ -17,12 +19,20 @@ let busy = false, feedback = '';
 async function refresh() {
   const state = await send({ kind: 'status' });
   if (!state || state.ok === false) throw new Error('status');
-  document.getElementById('status').textContent = state.mode === 'auto' ? 'Registro automático activo' : 'Modo de observación';
-  document.getElementById('detail').textContent = feedback || reasons[state.attention] || `${state.paired ? 'Cuenta conectada' : 'Cuenta sin conectar'} · ${state.completed} llamada(s) observada(s) · ${state.queued} pendiente(s)`;
+  document.getElementById('status').textContent = state.mode === 'auto' ? 'Registro automático activo' : state.paired ? 'Listo para registrar' : 'Conectá tu cuenta';
+  document.getElementById('detail').textContent = feedback || reasons[state.attention] || (state.paired ? state.mode === 'auto' ? 'El registro automático está activo.' : 'Activá el registro cuando quieras comenzar.' : 'Abrí el tracker e iniciá sesión para vincularlo.');
+  document.getElementById('detail').classList.toggle('error', Boolean(feedback || state.attention));
+  const badge = document.getElementById('connectionBadge'); badge.textContent = state.paired ? 'Vinculada' : 'Sin vincular'; badge.classList.toggle('connected', state.paired);
+  document.getElementById('observedCount').textContent = String(state.completed);
+  document.getElementById('pendingCount').textContent = String(state.queued);
+  document.getElementById('pair').textContent = state.paired ? 'Volver a vincular' : 'Vincular cuenta';
+  document.getElementById('pair').classList.toggle('primary', !state.paired);
+  document.getElementById('open').classList.toggle('primary', state.paired);
   const toggle = document.getElementById('automatic');
   const callStatus = state.active ? 'Llamada activa detectada.' : state.call === 'connected' ? 'Hay una llamada visible cuyo inicio no se observó; revisala en el tracker.' : state.call === 'incoming' ? 'Llamada entrante visible.' : state.call === 'idle' ? 'Controles de llamadas reconocidos.' : 'Controles de llamadas sin confirmar.';
-  document.getElementById('portalStatus').textContent = state.portal === 'authenticated' ? `Sesión de Propio reconocida. ${callStatus}` : state.portal === 'logged-out' ? 'Cierre de sesión confirmado en Propio.' : 'Sesión de Propio sin confirmar. Recargá el portal y comprobá el acceso de la extensión al sitio.';
+  document.getElementById('portalStatus').textContent = !state.paired ? 'Vinculá tu cuenta para habilitar el registro. El resumen funciona por separado.' : state.portal === 'authenticated' ? `Sesión reconocida. ${callStatus}` : state.portal === 'logged-out' ? 'Cierre de sesión confirmado en Propio.' : 'Abrí Propio para reconocer tu sesión.';
   toggle.checked = state.mode === 'auto'; toggle.disabled = busy || !state.paired;
+  for (const id of ['pair', 'open']) document.getElementById(id).disabled = busy;
   document.getElementById('reviewed').hidden = !state.queued && !(state.mode === 'auto' && state.active);
   const list = document.getElementById('signals'); list.replaceChildren();
   for (const item of [...state.last].reverse()) {
@@ -58,3 +68,50 @@ document.getElementById('reviewed').addEventListener('click', () => {
 });
 refresh().catch(() => { document.getElementById('status').textContent = reasons.storage; });
 setInterval(() => { if (!busy) refresh().catch(() => {}); }, 2000);
+
+let summaryOptions = normalizeSummaryOptions(null, false), summaryBusy = false, summaryRevision = 0, pendingSummaryEnabled = null;
+function renderSummary(fillFields = false) {
+  const toggle = document.getElementById('summaryEnabled');
+  toggle.checked = pendingSummaryEnabled ?? summaryOptions.enabled; toggle.disabled = summaryBusy;
+  document.getElementById('summaryStatus').textContent = summaryOptions.enabled
+    ? 'Visible en el historial. «Calcular total» suma todas las páginas del rango.'
+    : 'Oculto. Activá esta opción para verlo en el historial, sin recargar.';
+  if (fillFields) {
+    document.getElementById('summaryLanguage').value = summaryOptions.language;
+    document.getElementById('summaryCurrency').value = summaryOptions.currency || '';
+    document.getElementById('summaryRate').value = summaryOptions.rate || '';
+  }
+  for (const button of document.querySelectorAll('#summaryForm button')) button.disabled = summaryBusy;
+}
+async function saveSummary(patch) {
+  if (summaryBusy) return;
+  summaryBusy = true; pendingSummaryEnabled = typeof patch.enabled === 'boolean' ? patch.enabled : null; renderSummary();
+  const feedback = document.getElementById('summaryFeedback'); feedback.textContent = ''; feedback.classList.remove('error');
+  try {
+    const stored = (await chrome.storage.local.get(settingsKey))[settingsKey];
+    const next = normalizeSummaryOptions({ ...normalizeSummaryOptions(stored, false), ...patch }, false);
+    await chrome.storage.local.set({ [settingsKey]: next });
+    summaryOptions = next; renderSummary(true); feedback.textContent = 'Preferencias guardadas. Se aplican en tus pestañas de Propio.';
+  } catch { feedback.textContent = 'No se pudo guardar. Reintentá.'; feedback.classList.add('error'); }
+  finally { summaryBusy = false; pendingSummaryEnabled = null; renderSummary(); }
+}
+document.getElementById('summaryEnabled').addEventListener('change', event => { void saveSummary({ enabled: event.target.checked }); });
+document.getElementById('summaryForm').addEventListener('submit', event => {
+  event.preventDefault();
+  const currency = document.getElementById('summaryCurrency').value.trim(), rate = Number(document.getElementById('summaryRate').value);
+  const feedback = document.getElementById('summaryFeedback');
+  if ((currency || rate) && (!currency || !Number.isFinite(rate) || rate <= 0 || rate > 100000)) {
+    feedback.textContent = 'Ingresá una moneda y un cambio mayor que cero, o usá «Sin conversión».'; feedback.classList.add('error'); return;
+  }
+  void saveSummary({ language: document.getElementById('summaryLanguage').value, currency: currency || null, rate: currency ? rate : null });
+});
+document.getElementById('clearConversion').addEventListener('click', () => { void saveSummary({ currency: null, rate: null }); });
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area !== 'local' || !changes[settingsKey]) return;
+  summaryRevision++; summaryOptions = normalizeSummaryOptions(changes[settingsKey].newValue, false); renderSummary(true);
+});
+const initialSummaryRevision = summaryRevision;
+chrome.storage.local.get(settingsKey).then(stored => {
+  if (initialSummaryRevision === summaryRevision) summaryOptions = normalizeSummaryOptions(stored[settingsKey], false);
+  renderSummary(true);
+}).catch(() => { document.getElementById('summaryStatus').textContent = 'No se pudo leer la preferencia del resumen. Reintentá al abrir la extensión.'; });

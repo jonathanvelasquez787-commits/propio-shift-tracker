@@ -1,15 +1,23 @@
 <!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Conexión con Propio</title><link rel="stylesheet" href="popup.css"></head>
-<body><main><h1>Conexión con Propio</h1><p id="status" role="status">Comprobando conexión…</p><p id="detail"></p>
-<button id="open" type="button">Abrir tracker</button><button id="pair" type="button">Conectar esta cuenta</button>
-<label><input id="automatic" type="checkbox"> Registrar llamadas automáticamente</label>
-<p class="note">En observación no agrega registros. Conectá tu cuenta y activá el registro para guardar desde la próxima llamada aceptada y terminada, sin esperar una llamada de prueba.</p>
-<p class="note">Podés dejarlo activado antes de trabajar. La compatibilidad de las señales se comprobará con tu próxima llamada normal.</p>
-<p class="note">Funciona con la sesión de Propio que ya tenés abierta. No pide ni guarda tu usuario o contraseña, ni graba audio o conserva información de clientes. Solo recuerda configuración y señales de llamadas para registrarlas en tu tracker cuando activás el registro.</p>
-<p class="note">El tiempo y el pago automáticos son estimados. El historial oficial de Propio permite corregirlos después.</p>
-<p id="portalStatus" class="note" role="status"></p>
-<p class="note">Con automático activado, reconocer tu sesión de Propio inicia el Shift. Sign out seguido de la redirección a propio.com lo termina; el formulario de login también confirma el cierre. Recargar o cerrar una pestaña no termina el Shift. Si ya estabas conectado al activar, cuenta desde el momento de detección.</p>
-<details><summary>Señales recientes</summary><ul id="signals"></ul></details>
-<details open><summary>Diagnóstico del detector · 1.5.1</summary><p class="note" id="detectorStatus"></p><ul id="detectorRequests"></ul><p class="note">Solo muestra tipos de solicitud, formato y resultado. No guarda direcciones, cuerpos, tokens ni datos de clientes.</p></details>
-<button id="reviewed" type="button" hidden>Descartar señales revisadas</button>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Propio · Tracker y resumen</title><link rel="stylesheet" href="popup.css"></head>
+<body><main>
+<header class="brand"><div class="brand-icon" aria-hidden="true"><img src="icons/icon-128.png" width="42" height="42" alt=""></div><div><h1>Propio</h1><p>Tracker y resumen, juntos.</p></div><span class="version">2.0.0</span></header>
+<section class="card connection" aria-label="Conexión">
+<div class="card-heading"><span class="eyebrow">TU TRACKER</span><span id="connectionBadge" class="badge">Comprobando</span></div>
+<p id="status" class="status" role="status">Comprobando conexión…</p><p id="detail" class="muted" aria-live="polite"></p>
+<div class="actions"><button id="pair" class="primary" type="button">Vincular cuenta</button><button id="open" type="button">Abrir tracker ↗</button></div>
+<div class="stats"><div><strong id="observedCount">—</strong><span>Llamadas detectadas</span></div><div><strong id="pendingCount">—</strong><span>Por sincronizar</span></div></div>
+</section>
+<section class="card" aria-label="Registro automático"><label class="toggle-row" for="automatic"><span><span class="title">Registrar en mi tracker</span><span class="muted">Shift y llamadas automáticamente.</span></span><span class="switch"><input id="automatic" type="checkbox" role="switch"><span class="switch-track"></span></span></label><p id="portalStatus" class="helper" role="status"></p></section>
+<section class="card" aria-label="Resumen del historial"><label class="toggle-row" for="summaryEnabled"><span><span class="title">Mostrar resumen en Propio</span><span class="muted">Llamadas, minutos y ganancias del historial.</span></span><span class="switch"><input id="summaryEnabled" type="checkbox" role="switch"><span class="switch-track"></span></span></label><p id="summaryStatus" class="helper" aria-live="polite">Comprobando preferencia…</p>
+<div class="summary-links"><a href="https://interpreters.propio-ls.com/portal" target="_blank" rel="noopener">Abrir Propio ↗</a><span>Sin cuenta del tracker</span></div>
+<details id="summaryPreferences"><summary>Preferencias del resumen</summary><form id="summaryForm">
+<label class="field" for="summaryLanguage">Idioma de la barra<select id="summaryLanguage"><option value="es">Español</option><option value="en">English</option></select></label>
+<div class="fields"><label class="field" for="summaryCurrency">Moneda opcional<input id="summaryCurrency" maxlength="8" placeholder="Ej.: L"></label><label class="field" for="summaryRate">Cambio por 1 USD<input id="summaryRate" type="number" min="0.000001" max="100000" step="any" placeholder="Ej.: 26.8"></label></div>
+<div class="actions"><button type="submit" class="primary">Guardar preferencias</button><button id="clearConversion" type="button">Sin conversión</button></div><p id="summaryFeedback" class="helper" role="status"></p></form></details>
+</section>
+<details class="disclosure"><summary>Actividad reciente</summary><ul id="signals" class="timeline"></ul></details>
+<details class="disclosure"><summary>Diagnóstico de conexión</summary><p class="muted" id="detectorStatus"></p><ul id="detectorRequests" class="diagnostics"></ul><button id="reviewed" class="danger" type="button" hidden>Descartar señales revisadas</button></details>
+<details class="disclosure"><summary>Cómo funciona</summary><div class="help-copy"><p>Vinculá una sola pestaña del tracker y activá el registro. La sesión reconocida inicia el Shift; Sign out con redirección a propio.com o volver a Login lo termina.</p><p>En el historial de Propio, la barra muestra la página visible. «Calcular total» suma todas las páginas del rango seleccionado y vuelve a la página inicial.</p><p>Tiempo y pago registrados automáticamente son estimados. El historial oficial permite corregirlos después.</p><p>Si todavía tenés «Propio · Minutos y ganancias», desactivá esa extensión anterior para usar solo esta.</p></div></details>
+<footer>Tu sesión sigue en Propio. No guardamos contraseñas, audio ni datos de clientes.</footer>
 </main><script src="popup.js"></script></body></html>
