@@ -1,7 +1,7 @@
 (() => {
   const protocol = 'pst-propio-bridge/v1', origin = 'https://propio-shift-tracker.vercel.app';
   if (location.origin !== origin || window.top !== window) return;
-  let ready = null, stopped = false, heartbeat;
+  let ready = null, stopped = false, heartbeat, lastAnnounced = 0, announcing = false;
   const pending = new Map();
   function alive() { try { return !stopped && Boolean(chrome.runtime.id); } catch { return false; } }
   function stop() {
@@ -17,8 +17,11 @@
     window.postMessage({ protocol, direction: 'extension', kind: 'hello' }, origin);
   };
   async function announce(packet) {
-    try { await chrome.runtime.sendMessage(packet); }
+    if (announcing) return;
+    announcing = true;
+    try { const result = await chrome.runtime.sendMessage(packet); if (result?.ok) lastAnnounced = Date.now(); }
     catch (error) { if (!alive() || /extension context invalidated/i.test(String(error?.message))) stop(); }
+    finally { announcing = false; }
   }
   function respondSafely(respond, result) { if (alive()) { try { respond(result); } catch { /* The receiving page may have closed. */ } } }
   function onAppMessage(message) {
@@ -27,6 +30,9 @@
     const packet = message.data;
     if (packet.kind === 'ready' && /^[a-f0-9]{64}$/.test(packet.accountScope || '') && /^[\w-]{12,100}$/.test(packet.nonce || '')) {
       const plan = packet.plan && typeof packet.plan.startAt === 'string' && typeof packet.plan.endAt === 'string' ? { startAt: packet.plan.startAt, endAt: packet.plan.endAt, hasCall: packet.plan.hasCall === true, ended: packet.plan.ended === true } : null;
+      if (plan) plan.scheduledPauses = Array.isArray(packet.plan.scheduledPauses) && packet.plan.scheduledPauses.length <= 100
+        ? packet.plan.scheduledPauses.map(slot => ({ type: slot?.type, startedAt: slot?.startedAt, endedAt: slot?.endedAt })) : [];
+      if (plan) plan.scheduleVerified = Array.isArray(packet.plan.scheduledPauses) && packet.plan.scheduledPauses.length <= 100;
       if (plan) for (const key of ['pause','lastPause']) {
         const pause = packet.plan[key];
         plan[key] = pause && ['break','lunch'].includes(pause.type) && typeof pause.startedAt === 'string'
@@ -34,7 +40,7 @@
       }
       const changed = ready?.accountScope !== packet.accountScope || ready?.nonce !== packet.nonce || JSON.stringify(ready?.plan) !== JSON.stringify(plan);
       ready = { accountScope: packet.accountScope, nonce: packet.nonce, plan };
-      if (changed) void announce({ kind: 'tracker-ready', ...ready });
+      if (changed || Date.now() - lastAnnounced >= 10000) void announce({ kind: 'tracker-ready', ...ready });
     } else if (packet.kind === 'ack' && ready && packet.nonce === ready.nonce && packet.accountScope === ready.accountScope) {
       const item = pending.get(packet.requestId);
       if (item) { clearTimeout(item.timer); respondSafely(item.respond, packet.result); pending.delete(packet.requestId); }

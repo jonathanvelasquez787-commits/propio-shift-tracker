@@ -10,6 +10,14 @@ export function validateBridgePlan(value, now = Date.now()) {
   if (!value || typeof value !== 'object' || typeof value.startAt !== 'string' || typeof value.endAt !== 'string') return null;
   const start = Date.parse(value.startAt), end = Date.parse(value.endAt);
   if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start || end - start > BRIDGE_MAX_AGE || Math.abs(start - now) > BRIDGE_MAX_AGE) return null;
+  if (value.scheduledPauses !== undefined && (!Array.isArray(value.scheduledPauses) || value.scheduledPauses.length > 100)) return null;
+  const scheduledPauses = (value.scheduledPauses || []).map(input => {
+    if (!input || !['break','lunch'].includes(input.type) || typeof input.startedAt !== 'string' || typeof input.endedAt !== 'string') return null;
+    const from = Date.parse(input.startedAt), to = Date.parse(input.endedAt);
+    return Number.isFinite(from) && Number.isFinite(to) && from >= start && to <= end && from < to
+      ? { type: input.type, startedAt: new Date(from).toISOString(), endedAt: new Date(to).toISOString() } : null;
+  });
+  if (scheduledPauses.some(slot => !slot)) return null;
   const pause = (input, completed) => {
     if (!input || !['break','lunch'].includes(input.type) || typeof input.startedAt !== 'string') return null;
     const started = Date.parse(input.startedAt), ended = Date.parse(completed ? input.endedAt : input.endsAt);
@@ -18,6 +26,7 @@ export function validateBridgePlan(value, now = Date.now()) {
       [completed ? 'endedAt' : 'endsAt']: Number.isFinite(ended) && ended > started && ended - started <= BRIDGE_MAX_AGE && (!completed || ended <= now) ? new Date(ended).toISOString() : null };
   };
   return { startAt: new Date(start).toISOString(), endAt: new Date(end).toISOString(), hasCall: value.hasCall === true, ended: value.ended === true,
+    scheduledPauses, scheduleVerified: Array.isArray(value.scheduledPauses) && value.scheduleVerified !== false,
     pause: pause(value.pause, false), lastPause: pause(value.lastPause, true) };
 }
 export function validateBridgeEvent(value, now = Date.now()) {

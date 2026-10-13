@@ -19,6 +19,23 @@ const functions = ['pad', 'dateKey', 'todayRange', 'todayCallDateKey', 'callDate
 const at = (day, clock = '12:00') => new Date(`2025-09-${String(day).padStart(2, '0')}T${clock}:00`);
 const tiers = { bronze: { bonusPerMin: .01 }, silver: { bonusPerMin: .02 }, gold: { bonusPerMin: .03 } };
 
+test('the actual tool plan exports planned Break/Lunch even with no active pause, respects shifted planning and midnight', t => {
+  const x=harness(t); x.advance(at(1,'09:05'));
+  const h=x.h; h.localStorageRevision={isCurrent:()=>true}; h.getDayNote=()=>null; h.referenceDurationMinForActivePause=()=>null;
+  let config={off:false,start:'06:00',end:'14:00',blocks:[{type:'break',start:'09:00',dur:15},{type:'lunch',start:'12:00',dur:60}]};
+  h.dayConfigFor=()=>config;
+  vm.runInContext(['getPropioBridgePlan','getShiftWindow','dateAtTime','getEffectiveScheduleForDay','reinforcementScheduleIntervals','buildPlannedSlots'].map(name=>declarations.get(name)).join('\n'),h);
+  const periods=()=>JSON.parse(JSON.stringify(h.getPropioBridgePlan().scheduledPauses));
+  assert.deepEqual(periods(),[{type:'break',startedAt:at(1,'09:00').toISOString(),endedAt:at(1,'09:15').toISOString()},
+    {type:'lunch',startedAt:at(1,'12:00').toISOString(),endedAt:at(1,'13:00').toISOString()}]);
+  assert.equal(Boolean(state.activePause),false);
+  state.shiftStartedAt=at(1,'09:00').toISOString(); settings.lateArrivalMode='shift';
+  assert.equal(periods()[0].startedAt,at(1,'12:00').toISOString());
+  settings.lateArrivalMode='anchor'; config={off:false,start:'22:00',end:'06:00',blocks:[{type:'lunch',start:'23:45',dur:30}]};
+  state.shiftStartedAt=at(1,'22:00').toISOString(); x.advance(at(2,'00:00'));
+  assert.deepEqual(periods(),[{type:'lunch',startedAt:at(1,'23:45').toISOString(),endedAt:at(2,'00:15').toISOString()}]);
+});
+
 test('background official recovery preserves drafts and selected day, imports zero rows once and updates the same corrected identity', t => {
   const x = harness(t); x.advance(at(2,'19:00'));
   x.element('callInput').value = 'unfinished manual paste'; state.activeDayKey = '08/31/2025';

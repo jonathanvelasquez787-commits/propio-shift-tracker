@@ -6,4 +6,5 @@ details{font-size:12px}summary{cursor:pointer;font-weight:600;min-height:34px;di
 @media(prefers-color-scheme:dark){:root{--bg:#0c1424;--card:#142035;--text:#ecf3fc;--muted:#acb9cd;--line:#293951;--accent:#32c5c0;--soft:#173e43;--focus:#7abcff;--danger:#ffa9b9}button.primary{color:#08272c}.brand-icon{color:#08272c}}
 .brand-icon{background:transparent}.brand-icon img{display:block;width:42px;height:42px}
 .prepare{padding-top:12px;margin-top:12px}.toggle-row>span:first-child{min-width:0}
+.automation-intro{margin:4px 0 10px}.help-copy strong{color:var(--text)}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}

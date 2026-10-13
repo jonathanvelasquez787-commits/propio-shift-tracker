@@ -20,10 +20,10 @@ let busy = false, feedback = '';
 async function refresh() {
   const state = await send({ kind: 'status' });
   if (!state || state.ok === false) throw new Error('status');
-  document.getElementById('status').textContent = state.mode === 'auto' ? 'Registro automático activo' : state.paired ? 'Listo para registrar' : 'Conectá tu cuenta';
-  document.getElementById('detail').textContent = feedback || reasons[state.attention] || (state.paired ? state.mode === 'auto' ? 'El registro automático está activo.' : 'Activá el registro cuando quieras comenzar.' : 'Abrí el tracker e iniciá sesión para vincularlo.');
+  document.getElementById('status').textContent = state.mode === 'auto' ? 'Registro automático activo' : state.paired ? 'Listo para registrar' : 'Buscando tu tracker';
+  document.getElementById('detail').textContent = feedback || reasons[state.attention] || (state.paired ? state.mode === 'auto' ? 'El registro automático está activo.' : 'Activá el registro cuando quieras comenzar.' : 'Se vincula automáticamente al reconocer tu sesión en el tracker.');
   document.getElementById('detail').classList.toggle('error', Boolean(feedback || state.attention));
-  const badge = document.getElementById('connectionBadge'); badge.textContent = state.paired ? 'Vinculada' : 'Sin vincular'; badge.classList.toggle('connected', state.paired);
+  const badge = document.getElementById('connectionBadge'); badge.textContent = state.paired ? 'Conectada' : 'Esperando'; badge.classList.toggle('connected', state.paired);
   document.getElementById('observedCount').textContent = String(state.completed);
   document.getElementById('historyCount').textContent = state.history ? String(state.history.count) : '—';
   document.getElementById('historyScope').textContent = state.history?.coverage === 'range' ? 'En el historial de hoy' : 'En la página del historial';
@@ -31,30 +31,35 @@ async function refresh() {
     ? `${state.history.invalid ? `${state.history.invalid} fila(s) pendiente(s) de datos válidos. ` : ''}Última lectura: ${new Date(state.history.at).toLocaleTimeString('es')}.${state.mode !== 'auto' ? ' Activá el registro para sincronizarlas.' : ''}`
     : 'Abrí el historial de Propio para leer y recuperar sus llamadas.';
   document.getElementById('pendingCount').textContent = String(state.queued);
-  document.getElementById('pair').textContent = state.paired ? 'Volver a vincular' : 'Vincular cuenta';
+  document.getElementById('pair').textContent = state.paired ? 'Revisar conexión' : 'Reintentar conexión';
   document.getElementById('pair').classList.toggle('primary', !state.paired);
   document.getElementById('open').classList.toggle('primary', state.paired);
   const toggle = document.getElementById('automatic');
-  const callStatus = state.active ? 'Llamada activa detectada.' : state.call === 'connected' ? 'Hay una llamada visible cuyo inicio no se observó; revisala en el tracker.' : state.call === 'incoming' ? 'Llamada entrante visible.' : state.call === 'idle' ? 'Controles de llamadas reconocidos.' : 'Controles de llamadas sin confirmar.';
-  document.getElementById('portalStatus').textContent = !state.paired ? 'Vinculá tu cuenta para habilitar el registro. El resumen funciona por separado.' : state.portal === 'authenticated' ? `Sesión reconocida. ${callStatus}` : state.portal === 'logged-out' ? 'Cierre de sesión confirmado en Propio.' : 'Abrí Propio para reconocer tu sesión.';
+  const callStatus = state.active ? 'Registrando tu llamada actual.' : state.call === 'connected' ? 'Hay una llamada en curso cuyo inicio no se observó; revisala en el tracker.' : state.call === 'incoming' ? 'Tenés una llamada entrante; vos decidís si aceptarla.' : 'Esperando la próxima llamada.';
+  document.getElementById('portalStatus').textContent = !state.paired ? 'Esperando tu sesión en el tracker para vincularla automáticamente. El resumen funciona por separado.' : state.portal === 'authenticated' ? `Sesión reconocida. ${callStatus}` : state.portal === 'logged-out' ? 'Cierre de sesión confirmado en Propio.' : 'Abrí Propio para reconocer tu sesión.';
   toggle.checked = state.mode === 'auto'; toggle.disabled = busy || !state.paired;
   const prep = state.preparation, prepToggle = document.getElementById('prepareFirst');
   prepToggle.checked = prep?.enabled === true; prepToggle.disabled = busy || !state.paired;
   const plan = prep?.plan;
-  document.getElementById('prepareStatus').textContent = !prep?.enabled ? 'Opcional. Se detiene cuando conectás la primera llamada.'
+  const plannedPause = plan?.scheduledPauses?.filter(slot => Date.now() >= Date.parse(slot.startedAt) && Date.now() < Date.parse(slot.endedAt))
+    .sort((a, b) => Date.parse(b.endedAt) - Date.parse(a.endedAt))[0];
+  document.getElementById('prepareStatus').textContent = !prep?.enabled ? 'Apagado. Vos pulsás «Start Calls» para comenzar.'
     : state.mode !== 'auto' ? 'Activá «Registrar en mi tracker» para usar esta opción.'
-    : !plan ? 'Abrí tu tracker para leer el horario de hoy; en día libre no se activa.'
-    : prep.doneFor === plan.startAt || plan.hasCall ? 'Primera llamada tomada. No volverá a pulsar Start Calls en este turno.'
-    : plan.ended || Date.now() >= Date.parse(plan.endAt) ? 'Turno terminado. No se vuelve a poner disponible.'
-    : `Desde ${new Date(plan.startAt).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })}: pulsa Start Calls solo con Offline confirmado. Nunca acepta llamadas. Apagalo si querés permanecer Offline.`;
+    : !plan ? 'Esperando un horario de trabajo del tracker. En día libre no se activa.'
+    : !plan.scheduleVerified ? 'Tu tracker tiene una versión anterior abierta. Recargá su pestaña para reconocer también tus descansos.'
+    : plan.ended || Date.now() >= Date.parse(plan.endAt) ? 'Tu turno terminó. Esperará al siguiente.'
+    : prep.doneFor === plan.startAt || plan.hasCall ? 'El arranque de este turno ya terminó. La opción queda encendida para el siguiente turno.'
+    : plannedPause ? `Ahora corresponde ${plannedPause.type === 'lunch' ? 'Lunch' : 'Break'}. Esperará hasta ${new Date(plannedPause.endedAt).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })} para empezar.`
+    : Date.now() < Date.parse(plan.startAt) ? `Esperará hasta ${new Date(plan.startAt).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })} para ponerte disponible.`
+    : 'Tu turno ya empezó. Te pondrá disponible hasta que conectés tu primera llamada.';
   const resume = prep?.resume || { break: false, lunch: false, mode: 'manual' };
   for (const [id, name] of [['resumeBreak','break'],['resumeLunch','lunch']]) {
     const input = document.getElementById(id); input.checked = resume[name]; input.disabled = busy || !state.paired;
   }
   document.getElementById('resumeMode').value = resume.mode; document.getElementById('resumeMode').disabled = busy || !state.paired;
   document.getElementById('resumeStatus').textContent = resume.mode === 'timed'
-    ? 'Cierra la pausa en la tool al cumplirse su duración, después pulsa Start Calls con Offline confirmado. Requiere el tracker abierto para confirmar el cierre.'
-    : 'Espera a que terminés la pausa en la tool. Vuelve a poner disponible hasta tu siguiente llamada; vos la aceptás.';
+    ? 'Al cumplir la duración de tu horario, cierra la pausa y te pone disponible. Mantené el tracker abierto para que pueda guardar ese cierre.'
+    : 'Vos terminás la pausa en tu tool. Después, la extensión te pone disponible automáticamente.';
   for (const id of ['pair', 'open']) document.getElementById(id).disabled = busy;
   document.getElementById('reviewed').hidden = !state.queued && !(state.mode === 'auto' && state.active);
   const list = document.getElementById('signals'); list.replaceChildren();
@@ -64,9 +69,12 @@ async function refresh() {
   }
   if (!state.last.length) { const li = document.createElement('li'); li.textContent = 'Todavía no se detectaron señales compatibles.'; list.append(li); }
   const diagnostic = state.diagnostic || { requests: 0, recognized: 0, last: [] };
+  document.getElementById('connectionHealth').textContent = reasons[state.attention] || (!state.paired ? 'Esperando tu sesión del tracker para conectar.'
+    : state.portal === 'authenticated' ? `Propio está abierto y tu sesión fue reconocida. ${callStatus}`
+    : state.portal === 'logged-out' ? 'Saliste de Propio. Esperando que vuelvas a entrar.' : 'Tu tracker está vinculado. Esperando que Propio confirme tu sesión.');
   document.getElementById('detectorStatus').textContent = diagnostic.requests
     ? `${diagnostic.requests} solicitud(es) observada(s) · ${diagnostic.recognized} señal(es) reconocida(s)`
-    : 'Sin solicitudes observadas. Recargá Propio después de actualizar la extensión y comprobá su acceso a este sitio.';
+    : 'Todavía no se observaron solicitudes del portal.';
   const requests = document.getElementById('detectorRequests'); requests.replaceChildren();
   const kinds = { status: 'Estado de Propio', twilio: 'Evento de llamadas', 'portal-api': 'Otra solicitud del portal' };
   const formats = { json: 'JSON', form: 'Formulario', missing: 'Cuerpo no disponible', oversized: 'Cuerpo demasiado grande', unreadable: 'Formato no reconocido', 'not-read': 'Cuerpo no leído' };

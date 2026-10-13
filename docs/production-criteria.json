@@ -911,7 +911,11 @@
             "preparation is opt-in and holds outside the shift, after tool completion, with duplicate portal tabs or missing schedule",
             "portal preparation clicks only an explicit Offline Start Calls button and never Accept or ambiguous controls",
             "Break and Lunch resume independently after manual completion or acknowledged timed closure; unknown duration and disabled choices hold",
-            "turning off timed resume cancels undelivered pause closure and an unknown pause duration cannot trigger it"
+            "turning off timed resume cancels undelivered pause closure and an unknown pause duration cannot trigger it",
+            "late first-call preparation waits through scheduled Break and Lunch even without an active tool pause, then resumes at the boundary",
+            "a sole signed-in tracker automatically pairs a fresh extension and prepares startup while preserving later user choices across restart",
+            "automatic pairing requires one authenticated target in the announcing tab and never replaces another account or pending queue",
+            "a cached older tracker plan cannot start the first call until its scheduled pauses are confirmed"
           ]
         },
         {
@@ -946,7 +950,8 @@
           "namedCases": [
             "reloading the extension handles synchronous context invalidation without leaving a hello loop",
             "normal delivery still acknowledges once and clears its timeout",
-            "invalidated content stops sending and clears outstanding delivery timeouts"
+            "invalidated content stops sending and clears outstanding delivery timeouts",
+            "tracker readiness retries a transient startup failure without a user pairing action and periodically rechecks the link"
           ]
         },
         {
@@ -964,7 +969,8 @@
             "official history validates seven fields, preserves zero-minute rows and strips unrelated client data",
             "history events are bounded, revalidate rows in the tracker and cannot hide bad fields in a batch",
             "history delivery respects account revision and active-call review, retries storage rejection and receipts prevent replay",
-            "scheduled pause end closes only its matching pause, blocks calls and never closes a newer pause or a finished shift"
+            "scheduled pause end closes only its matching pause, blocks calls and never closes a newer pause or a finished shift",
+            "scheduled pause metadata is bounded to the shift and rejects malformed ranges while stripping unrelated data"
           ]
         }
       ]

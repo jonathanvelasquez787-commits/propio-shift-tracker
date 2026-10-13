@@ -1,8 +1,12 @@
-# Propio · Tracker y resumen · 2.1.0
+# Propio · Tracker y resumen · 2.1.1
 
 Una sola extensión reúne la conexión al tracker y la barra de llamadas, minutos y ganancias en Propio. «Registrar en mi tracker» y «Mostrar resumen en Propio» son controles independientes. El resumen empieza oculto y no exige cuenta vinculada; encenderlo o apagarlo se aplica a las pestañas abiertas sin recargar. La conexión conserva su modo y cuenta al actualizar la carpeta existente.
 
 ## Resumen opcional e interfaz
+
+La conexión inicial es automática: una sola pestaña del tracker con sesión lista vincula la cuenta, activa el registro y prepara el inicio de turno. Al volver a abrir Chrome conserva la cuenta y tus elecciones; si apagaste registro o arranque, no los vuelve a encender. Varias pestañas/cuentas o datos pendientes de otro propietario impiden adivinar una cuenta. El anuncio del tracker reintenta fallos transitorios y comprueba el vínculo cada diez segundos.
+
+El popup explica «Ponerme disponible automáticamente» y diferencia comenzar turno, terminar Break y terminar Lunch. El estado principal de conexión usa lenguaje simple. El volumen de tráfico normal que se observa en Propio y sus códigos HTTP queda dentro de «Detalles para soporte», cerrado por defecto; esas cifras no equivalen a acciones o llamadas de la extensión.
 
 En el historial, la barra muestra el subtotal de la página visible: cantidad de llamadas, minutos y pago oficial. «Calcular total» recorre todas las páginas del rango elegido y vuelve a la página inicial. Ocultarlo mientras suma cancela el recorrido y restaura la página. La barra conserva la colocación compacta junto a los encabezados. Filtros, datos pendientes y errores de paginación mantienen sus verificaciones.
 
@@ -12,7 +16,7 @@ El resumen no inicia turnos, registra llamadas, ni comparte filas con el tracker
 
 ## Sesión y Shift
 
-«Start Calls hasta la primera llamada» es una opción separada, apagada por defecto. Lee el horario de la cuenta vinculada cuando el tracker está abierto y conserva ese plan hasta su fin. Con registro activo, sesión reconocida y un solo portal, a partir de la hora de inicio pulsa únicamente Start Calls si el botón habilitado y el estado Offline están confirmados. Sirve también al entrar tarde, mientras el turno no haya terminado. Si dejás pasar una llamada y volvés a Offline, reintenta con un intervalo mínimo de 15 segundos. Al conectar la primera llamada, registra la finalización de esta preparación y no la reactiva al recargar ni al apagar/encender la opción durante el mismo turno. Nunca pulsa Accept, Reject, Stop Calls ni controles de video/terceros; vos elegís qué tomar. Para permanecer Offline antes de la primera llamada, apagá la opción. No actúa con estado ambiguo, llamada activa, horarios faltantes o finalizados, día libre ni varias pestañas del portal.
+«Al comenzar mi turno» es una opción separada; el primer vínculo automático la prepara y después conserva tu elección. Lee el horario de la cuenta vinculada cuando el tracker está abierto y conserva ese plan hasta su fin. Con registro activo, sesión reconocida y un solo portal, a partir de la hora de inicio pulsa únicamente Start Calls si el botón habilitado y el estado Offline están confirmados. Sirve también al entrar tarde, mientras el turno no haya terminado. Respeta los Break/Lunch programados aunque no hayas iniciado una pausa en la tool; al terminar el intervalo puede comenzar la preparación pendiente. Exige que el tracker transmita el horario completo de pausas; con una versión anterior abierta espera a que se recargue. Si dejás pasar una llamada y volvés a Offline, reintenta con un intervalo mínimo de 15 segundos. Al conectar la primera llamada, registra la finalización de esta preparación y no la reactiva al recargar ni al apagar/encender la opción durante el mismo turno. Nunca pulsa Accept, Reject, Stop Calls ni controles de video/terceros; vos elegís qué tomar. Para permanecer Offline antes de la primera llamada, apagá la opción. No actúa con estado ambiguo, llamada activa, horarios faltantes o finalizados, día libre ni varias pestañas del portal.
 
 Reconoce localmente el encabezado visible «Welcome, … (ID)» del portal. Con automático activado, la primera detección inicia el Shift; si ya estaba abierto, conserva su hora. Desde 1.5.1, pulsar Sign out y completar la redirección de esa pestaña a propio.com o www.propio.com termina el Shift vinculado, sin tener que abrir Login otra vez. El clic se comunica antes de abandonar el portal; el worker confirma la navegación aun cuando desaparece el script de la página. Usa webNavigation con filtros para esos dos hosts y no persiste direcciones. Un clic sin redirección, una visita desde la barra de direcciones, Back, recargar u otra pestaña no termina el turno. Volver al formulario visible `#loginform` sigue confirmando el cierre si la sesión expiró. Una llamada automática pendiente se cierra antes del turno con tiempo estimado hasta esa detección. No cierra llamadas manuales sin revisión.
 
@@ -20,7 +24,7 @@ Si activás la extensión con Propio ya conectado, registra desde la detección,
 
 ## Llamadas
 
-Combina las solicitudes exitosas allowlisted del portal/Twilio con una alternativa desde controles visibles en inglés/español: aceptar/contestar y rechazar, colgar/finalizar llamada, y estados explícitos de llamada conectada/terminada. Un clic en aceptar necesita confirmación posterior de conexión; Start Calls, disponibilidad, un rechazo y un final suelto nunca crean una llamada. El detector espera evidencia estable, ignora controles ocultos y no pulsa nada.
+Combina las solicitudes exitosas allowlisted del portal/Twilio con una alternativa desde controles visibles en inglés/español: aceptar/contestar y rechazar, colgar/finalizar llamada, y estados explícitos de llamada conectada/terminada. Un clic en aceptar necesita confirmación posterior de conexión; Start Calls, disponibilidad, un rechazo y un final suelto nunca crean una llamada. El detector espera evidencia estable e ignora controles ocultos. La opción de disponibilidad solo puede pulsar Start Calls.
 
 Ambas fuentes comparten el mismo estado e identificador aleatorio para evitar duplicados. Un inicio observado empieza el contador; su final guarda por la ruta existente de llamadas, ganancias y refuerzo positivo. Activar en mitad de una llamada no inventa su inicio. Tiempo y pago son estimados: el historial oficial permite corregirlos sin duplicar progreso. Offline no se interpreta como Break/Lunch.
 
@@ -42,9 +46,9 @@ La cola y sesión sobreviven al reinicio del worker. Entrega a una sola pestaña
 
 ## Actualizar la extensión existente
 
-1. Reemplazá los archivos de la carpeta de conexión instalada por el paquete 2.1.0, incluidos `summary-content.js` y la carpeta `icons`. Usar esa misma carpeta conserva cuenta vinculada, registro automático, sesión y cola.
+1. Reemplazá los archivos de la carpeta de conexión instalada por el paquete 2.1.1, incluidos `summary-content.js` y la carpeta `icons`. Usar esa misma carpeta conserva cuenta vinculada, registro automático, sesión y cola.
 2. En `chrome://extensions`, recargá la extensión de conexión: ahora se llama «Propio · Tracker y resumen». Desactivá la extensión anterior «Propio · Minutos y ganancias» y cualquier userscript de resumen para usar solo una barra.
-3. Recargá Propio y el tracker. El popup muestra 2.1.0 y el icono de la tool. Activá «Mostrar resumen en Propio» si querés verlo en el historial.
+3. Recargá Propio y el tracker. El popup muestra 2.1.1 y el icono de la tool. Activá «Mostrar resumen en Propio» si querés verlo en el historial.
 4. Si estaba sin vincular: abrí el tracker, iniciá sesión y pulsá Vincular cuenta. Moneda/idioma de la extensión de resumen anterior se configuran una vez en el nuevo popup: Chrome separa el almacenamiento de las dos extensiones antiguas.
 
 Recargar la versión anterior sin reemplazar los archivos no instala la actualización. Si la extensión fue eliminada, usá Cargar descomprimida con la carpeta que contiene `manifest.json` y conectá la cuenta de nuevo.

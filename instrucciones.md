@@ -317,6 +317,26 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
+v607 / extensión 2.1.1: el primer tracker autenticado y único se vincula solo,
+activa registro y prepara el arranque solicitado. El anuncio reintenta fallos
+transitorios y reconfirma cada 10s. Reiniciar Chrome no exige volver a vincular;
+apagar registro/arranque se respeta y nunca cambia de cuenta con datos pendientes.
+La primera llamada espera también durante Break/Lunch del horario efectivo,
+aunque el usuario abra todo tarde y no haya iniciado una pausa manual. Horario
+completo validado, intervalos acotados al turno y cruce de medianoche cubierto;
+un tracker anterior sin pausas confirmadas bloquea el arranque y pide recargar.
+Las opciones de regresar después de pausas conservan la elección manual/duración.
+Popup con rótulos directos, explicación de que solo pulsa Start Calls y estado
+comprensible; solicitudes/códigos HTTP quedan en Detalles para soporte cerrado.
+674 pruebas, builds correctos. Chromium aislado con app/boot/content/worker reales:
+vinculación sin botón, reapertura misma cuenta, Break programado sin pausa activa
+bloquea y horario laboral libera disponibilidad. Preferencias/ambos temas y 752
+solicitudes invisibles en estado normal, disponibles al abrir soporte, correctos.
+Los archivos se actualizan en Downloads/extensiones/propio-bridge. La recarga
+nativa de Chrome quedó pendiente por bloqueo de Computer Use al no poder verificar
+la URL activa. Capturas de llamada/Save reales siguen pendientes del usuario;
+no confundir los recorridos ficticios con certificación del portal real.
+
 v606 y extensión unificada 2.1.0: popup de 400px con ancho fijado en la raíz;
 contador oficial separado de llamadas observadas. Recupera siete columnas
 validadas del historial (también cero minutos), vuelve a validar en la tool,
@@ -327,7 +347,7 @@ inventan datos; cambios de filtro cancelan el recorrido. La cola conserva hasta
 200 eventos por 24h y se sincroniza al volver a la cuenta vinculada. No consulta
 historiales que Propio no haya cargado ni endpoints privados de llamadas.
 
-Disponibilidad automática opcional, apagada por defecto: primera llamada desde
+Disponibilidad automática opcional: primera llamada desde
 el horario (también entrando tarde), Break y Lunch con interruptores separados.
 El regreso de pausas puede esperar al cierre manual o cerrar por duración
 programada; en ese modo confirma primero el cierre en la tool. Solo pulsa
@@ -874,6 +894,19 @@ La aplicación funciona en producción con estas bases vigentes:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v607 / extensión 2.1.1 — Arranque automático y mensajes claros.**
+
+- Vincula un tracker autenticado único al abrirlo; registro/arranque preparados
+  en el primer vínculo y preferencias conservadas después de reiniciar.
+- Anuncio con reintento y reconfirmación; sin elegir entre varias cuentas ni
+  cambiar un propietario con datos pendientes.
+- Primera llamada respeta pausas del horario, aun sin pausa activa; fechas,
+  medianoche y planes anteriores incompletos validados antes de Start Calls.
+- Controles en lenguaje directo, ayuda corta y contadores HTTP solo en soporte.
+- 674 pruebas y builds correctos; handshake completo ficticio, llegada durante
+  Break, reapertura, preferencias, 752 solicitudes y ambos temas verificados.
+  Pantallas reales de llamada/Save y recarga nativa de Chrome pendientes.
+
 **v606 / extensión 2.1.0 — Historial y disponibilidad opcional.**
 
 - Root del popup fija 400px; contador oficial distingue filas de detección live.
@@ -902,14 +935,3 @@ La aplicación funciona en producción con estas bases vigentes:
   filas ni mantiene trabajo de actualización cuando está oculto.
 - 655 pruebas, builds app/extensiones y recorridos Chromium aislados correctos.
   Carpeta anterior de conexión repuesta con el paquete; no cambia su ruta.
-
-**v605 — Sonidos de llamadas en Avisos.**
-
-- Sonido por llamada terminada, lote pegado o llamada manual guardada;
-  interruptores independientes, presets y archivos propios de hasta 300KB.
-- Prueba, eliminación de archivo, volumen general y persistencia con
-  reversión ante rechazo; lecturas tardías no cruzan propietario/elección.
-- Sin sonidos por duplicados, edición o recarga. Pegado suena una vez por lote.
-  Previews de Avisos se ajustan a móvil sin perder contenido.
-- 631 pruebas, diez nuevas; once flujos Chrome y doce vistas ES/EN;
-  2.243 textos y builds app/puente/resumen correctos. Release se verifica aparte.
