@@ -753,7 +753,7 @@ test('cola real limita a tres toasts y no repite el último texto después de ex
   assert.equal(h.announcements.at(-1), 'Cola cuatro');
 });
 
-test('apagar Logros limpia refuerzo visible, apaga el selector arcade y conserva premios e historial guardados', (t) => {
+test('apagar Logros limpia refuerzo visible y conserva preferencias de sonido, premios e historial guardados', (t) => {
   const h = harness(t, { surface: true });
   h.config.reinforcement.enabled = true;
   h.config.reinforcement.askAfterCall = true;
@@ -785,9 +785,9 @@ test('apagar Logros limpia refuerzo visible, apaga el selector arcade y conserva
   const announcementsBefore = h.announcements.length;
   h.config.game.enabled = false;
   renderGame();
-  assert.equal(selector.checked, false);
-  assert.equal(selector.disabled, true);
-  assert.equal(h.config.game.soundEnabled, false);
+  assert.equal(selector.checked, true);
+  assert.equal(selector.disabled, false);
+  assert.equal(h.config.game.soundEnabled, true);
   assert.equal(h.nodes.get('gameArena').hidden, true);
   assert.equal(h.nodes.get('gameMissions').hidden, true);
   assert.equal(h.nodes.get('gameCallFx').innerHTML, '');
@@ -806,7 +806,7 @@ test('apagar Logros limpia refuerzo visible, apaga el selector arcade y conserva
   h.config.game.enabled = true;
   renderGame();
   h.advance(6000);
-  assert.equal(selector.checked, false, 'reactivar Logros conserva Sonidos arcade apagado');
+  assert.equal(selector.checked, true, 'reactivar Logros conserva la preferencia de Sonidos arcade');
   assert.equal(selector.disabled, false);
   assert.equal(h.stack.children.length, 0, 'reactivar no recupera anuncios pendientes');
   assert.deepEqual(h.state.game, persisted);

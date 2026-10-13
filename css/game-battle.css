@@ -165,3 +165,46 @@
 @media (prefers-reduced-motion: reduce) {
   .game-battle *, .game-battle *::before, .game-battle *::after { animation: none !important; transition: none !important; }
 }
+
+/* Keep the daily challenge close to the size of the finance preview. */
+.game-battle[data-battle-mode="auto"] { display: grid; grid-template-columns: minmax(110px, .9fr) minmax(0, 1.6fr); }
+.game-battle[data-battle-mode="auto"] > :not(.game-battle-stage, .game-battle-health) { grid-column: 1 / -1; }
+.game-battle[data-battle-mode="auto"] .game-battle-head { padding: 6px 12px; gap: 8px; }
+.game-battle[data-battle-mode="auto"] .game-battle-heading { display: flex; align-items: baseline; flex-wrap: wrap; gap: 3px 8px; }
+.game-battle[data-battle-mode="auto"] .game-battle-heading > .game-kicker { margin: 0; font-size: 10px; }
+.game-battle[data-battle-mode="auto"] .game-battle-heading h3 { font-size: 15px; }
+.game-battle[data-battle-mode="auto"] .game-battle-stage { height: 82px; align-self: center; }
+.game-battle[data-battle-mode="auto"] .game-battle-monster { width: 58px; height: 46px; bottom: 14px; right: 8%; }
+.game-battle[data-battle-mode="auto"] .game-battle-label { bottom: 2px; font-size: 8px; }
+.game-battle[data-battle-mode="auto"] .game-battle-label--hero { left: 8%; }
+.game-battle[data-battle-mode="auto"] .game-battle-health { align-self: center; padding: 8px 12px; }
+.game-battle[data-battle-mode="auto"] .game-compact-goal-line { gap: 3px 6px; margin-bottom: 6px; font-size: 11px; }
+.game-battle[data-battle-mode="auto"] .game-compact-goal-line strong { font-size: 14px; }
+.game-battle[data-battle-mode="auto"] .game-compact-goal-line strong small { font-size: 11px; }
+.game-battle[data-battle-mode="auto"] .game-compact-goal-foot { margin-top: 6px; gap: 2px 8px; font-size: 10px; }
+.game-battle[data-battle-mode="auto"] .game-battle-footer { min-height: 33px; padding: 2px 12px; gap: 8px; }
+.game-battle[data-battle-mode="auto"] .game-battle-feed { font-size: 11px; }
+.game-battle[data-battle-mode="auto"] .game-battle-footer > button { min-height: 28px; }
+.game-battle[data-battle-mode="auto"] .game-battle-call-overlay { top: 3px; left: 4px; right: 4px; font-size: 9px; }
+.game-battle[data-battle-mode="auto"] .game-battle-call-overlay strong { font-size: 9px; }
+.game-battle[data-battle-mode="auto"] .game-battle-call-overlay span { display: none; }
+.game-battle[data-battle-mode="auto"] .game-battle-victory { gap: 2px; padding: 3px; }
+.game-battle[data-battle-mode="auto"] .game-battle-victory > strong,
+.game-battle[data-battle-mode="auto"] .game-compact-reward-open strong { font-size: 12px; }
+.game-battle[data-battle-mode="auto"] .game-battle-victory > span,
+.game-battle[data-battle-mode="auto"] .game-battle-victory small { font-size: 9px; }
+.game-battle[data-battle-mode="auto"] .game-battle-victory button { min-height: 28px; padding: 4px 6px; font-size: 10px; }
+.game-battle[data-battle-mode="auto"] .game-battle-victory[data-reward-opened="true"] { inset: 3px; }
+.game-battle[data-battle-mode="auto"] .game-battle-banner { bottom: 16px; padding: 3px; font-size: 9px; }
+.game-battle[data-battle-mode="auto"] .game-battle-notice { width: calc(100% - 8px); padding: 3px; font-size: 9px; }
+.game-battle[data-battle-mode="auto"] .game-battle-fallback-hero { width: 22px; height: 34px; }
+@media (pointer: coarse) {
+  .game-battle[data-battle-mode="auto"] .game-battle-footer > button,
+  .game-battle[data-battle-mode="auto"] .game-battle-victory button { min-height: 44px; }
+}
+
+#gameHomeGroup { display: grid; gap: 8px; margin-top: 10px; }
+#gameHomeGroup > .positive-evidence-card { margin: 0; }
+#gameHomeGroup > .game-call-fx:empty { display: none; }
+#gameHomeDay:has(> .game-arena[hidden]),
+#gameHomeGroup:not(:has(#gameArena:not([hidden]), #positiveEvidenceCard:not([hidden]), #gameLootBox:not([hidden]), #gameRecordBanner:not([hidden]), #gameCallFx:not(:empty))) { display: none; }

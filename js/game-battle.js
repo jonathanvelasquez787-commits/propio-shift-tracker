@@ -151,7 +151,7 @@ function createBattle(element) {
   let mode = 'auto', work = 'ready', lastDuelAnnouncement = '';
   const queue = createBattleQueue(), keys = new Set(), cleanup = [], observers = [];
   const motion = host.matchMedia?.('(prefers-reduced-motion: reduce)');
-  let reduced = !!motion?.matches, view = {}, callbacks = {}, colors = {}, world = { w: 600, h: 154, floor: 128 };
+  let reduced = !!motion?.matches, view = {}, callbacks = {}, colors = {}, world = { w: 600, h: 154, floor: 128 }, stageScale = 1;
   let hero = { x: 96, jump: 0, vy: 0, walk: 0, recoil: 0, face: 1 };
   let bullets = [], particles = [], active = null, weapon = 'pistol', raf = 0, lastTime = 0, clock = 0, destroyed = false, intersecting = true, running = false, lastMonsterMarkup, hasSynced = false;
   let bannerUntil = 0, noticeUntil = 0, hitUntil = 0, droneUntil = 0, flash = 0, staticTimer = 0, soundPending = false;
@@ -201,9 +201,11 @@ function createBattle(element) {
     const rect = stage.getBoundingClientRect();
     if (rect.width < 1) return;
     const ratio = Math.min(host.devicePixelRatio || 1, 2);
-    world = { w: rect.width, h: rect.height || 154, floor: (rect.height || 154) - 26 };
-    canvas.width = Math.round(world.w * ratio); canvas.height = Math.round(world.h * ratio);
-    ctx?.setTransform(ratio, 0, 0, ratio, 0, 0);
+    const height = rect.height || 154;
+    stageScale = mode === 'auto' ? Math.min(1, height / 154) : 1;
+    world = { w: rect.width / stageScale, h: height / stageScale, floor: height / stageScale - 26 };
+    canvas.width = Math.round(rect.width * ratio); canvas.height = Math.round(height * ratio);
+    ctx?.setTransform(ratio * stageScale, 0, 0, ratio * stageScale, 0, 0);
     if (ctx) ctx.imageSmoothingEnabled = false;
     hero.x = Math.max(32, Math.min(boss().x - 82, hero.x)); draw(); reconcile();
   }
@@ -420,8 +422,8 @@ function createBattle(element) {
         ctx.globalAlpha=1;
       }
     }
-    target.style.transform=`translate(${Math.round(hero.x-24)}px,${Math.round(world.floor-hero.jump-70)}px)`;
-    $('notice').style.left=`${Math.max(124,Math.min(world.w-124,hero.x+50))}px`;
+    target.style.transform=`translate(${Math.round((hero.x-24)*stageScale)}px,${Math.round((world.floor-hero.jump-70)*stageScale)}px)`;
+    $('notice').style.left = mode === 'auto' ? '50%' : `${Math.max(124,Math.min(world.w-124,hero.x+50))}px`;
     $('notice').style.top=`${Math.max(64,world.floor-hero.jump-147)}px`;
     const charge = mode === 'duel' && duel.snapshot().attacks.find(attack => attack.kind === 'charge' && attack.age > attack.warning);
     monster.style.transform = charge && !reduced ? `translateX(${Math.round(charge.x*world.w-boss().x)}px)` : !reduced&&clock<hitUntil ? `translateX(${Math.sin(clock*120)*4}px)` : canAuto() ? `translateY(${Math.sin(clock*3)*2}px)` : '';

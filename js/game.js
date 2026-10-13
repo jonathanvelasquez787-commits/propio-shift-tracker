@@ -1,6 +1,6 @@
 import { ui, translateText, translateStoredText, translateMarkup, displayLocale } from './i18n.js';
 import { calls, settings, state } from './app-context.js';
-import { initGameAudio, playGameSound, syncGameAudio, stopGameSounds } from './game-audio.js';
+import { initGameAudio, playGameSound, previewGameSound, syncGameAudio, stopGameSounds } from './game-audio.js';
 import { battleWorkMode } from './game-duel.js';
 import { battleMarkup, syncBattle, playBattleCall, stopBattle, normalizeBattleWeapon } from './game-battle.js';
 import { financeReservationComplete } from './finance.js';
@@ -335,7 +335,6 @@ function ensureGameSettings() {
   settings.game.intensity = 'arcade';
   settings.game.weapon = normalizeBattleWeapon(settings.game.weapon);
   if (typeof settings.game.soundEnabled !== 'boolean') settings.game.soundEnabled = true;
-  if (!settings.game.enabled) settings.game.soundEnabled = false;
   const soundVolume = Number(settings.game.soundVolume);
   settings.game.soundVolume = Number.isFinite(soundVolume) ? Math.max(0, Math.min(100, soundVolume)) : 40;
   const monsterName = sanitizeMonsterName(settings.game.monsterName);
@@ -1241,8 +1240,8 @@ function renderSettingsProfile() {
   if (sidebarEnabled) sidebarEnabled.checked = gameEnabled();
   const soundEnabled = document.getElementById('sidebarGameSoundInput');
   if (soundEnabled) {
-    soundEnabled.checked = gameEnabled() && settings.game.soundEnabled;
-    soundEnabled.disabled = !gameEnabled();
+    soundEnabled.checked = settings.game.soundEnabled;
+    soundEnabled.disabled = false;
   }
   const soundVolume = document.getElementById('gameSoundVolumeInput');
   if (soundVolume && document.activeElement !== soundVolume) soundVolume.value = settings.game.soundVolume;
@@ -2796,14 +2795,13 @@ export function initGame() {
   for (const id of ['gameEnabledInput', 'sidebarAchievementsInput']) {
     document.getElementById(id)?.addEventListener('change', (event) => {
       settings.game.enabled = !!event.target.checked;
-      if (!settings.game.enabled) settings.game.soundEnabled = false;
       saveSettingsOnly();
       renderGame();
       renderHeader?.();
     });
   }
   document.getElementById('sidebarGameSoundInput')?.addEventListener('change', (event) => {
-    settings.game.soundEnabled = gameEnabled() && !!event.target.checked;
+    settings.game.soundEnabled = !!event.target.checked;
     syncGameAudio();
     saveSettingsOnly();
     renderSettingsProfile();
@@ -2815,12 +2813,10 @@ export function initGame() {
     saveSettingsOnly();
     renderSettingsProfile();
   });
-  document.getElementById('gameSoundPreviewBtn')?.addEventListener('click', () => {
-    playGameSound('loot');
+  document.getElementById('gameSoundPreviewBtn')?.addEventListener('click', (event) => {
+    previewGameSound('loot', event);
     const status = document.getElementById('gameSoundStatus');
-    if (status) status.textContent = !settings.game.enabled ? translateText('Activa Logros para escuchar los efectos.')
-      : !settings.game.soundEnabled ? translateText('Activa Sonidos arcade en el menú lateral.')
-      : !settings.game.soundVolume || Number(settings.masterVolume) === 0 ? translateText('Sube el volumen de Logros y el volumen general para escuchar los efectos.') : '';
+    if (status) status.textContent = !settings.game.soundVolume || Number(settings.masterVolume) === 0 ? translateText('Sube el volumen de Logros y el volumen general para escuchar los efectos.') : '';
   });
   document.addEventListener('input', (event) => { if (event.target?.id === 'masterVolumeInput') syncGameAudio(); });
   document.getElementById('monsterNameSaveBtn')?.addEventListener('click', saveMonsterName);

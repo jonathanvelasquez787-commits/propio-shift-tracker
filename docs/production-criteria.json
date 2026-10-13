@@ -748,7 +748,7 @@
             "inactividad excluye pausas, turno cerrado y llamada activa; persiste dedupe y se rearma tras otra llamada",
             "inactividad nocturna deduplica a ambos lados de medianoche del mismo turno",
             "cola real limita a tres toasts y no repite el último texto después de expirar",
-            "apagar Logros limpia refuerzo visible, apaga el selector arcade y conserva premios e historial guardados",
+            "apagar Logros limpia refuerzo visible y conserva preferencias de sonido, premios e historial guardados",
             "cierre de racha semanal conserva rollback y comparaciones al recargar y revoca el escudo al reabrir",
             "metadatos de cierre importados validan dinero, fechas y rollback antes de restaurar premios",
             "cierre nocturno cumplido proyecta la racha del día contable y las correcciones históricas no la proyectan de nuevo",
