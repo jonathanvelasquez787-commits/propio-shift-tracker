@@ -21,7 +21,7 @@ async function refresh() {
   document.getElementById('detail').textContent = feedback || reasons[state.attention] || `${state.paired ? 'Cuenta conectada' : 'Cuenta sin conectar'} · ${state.completed} llamada(s) observada(s) · ${state.queued} pendiente(s)`;
   const toggle = document.getElementById('automatic');
   const callStatus = state.active ? 'Llamada activa detectada.' : state.call === 'connected' ? 'Hay una llamada visible cuyo inicio no se observó; revisala en el tracker.' : state.call === 'incoming' ? 'Llamada entrante visible.' : state.call === 'idle' ? 'Controles de llamadas reconocidos.' : 'Controles de llamadas sin confirmar.';
-  document.getElementById('portalStatus').textContent = state.portal === 'authenticated' ? `Sesión de Propio reconocida. ${callStatus}` : state.portal === 'logged-out' ? 'Propio muestra el formulario de login.' : 'Sesión de Propio sin confirmar. Recargá el portal y comprobá el acceso de la extensión al sitio.';
+  document.getElementById('portalStatus').textContent = state.portal === 'authenticated' ? `Sesión de Propio reconocida. ${callStatus}` : state.portal === 'logged-out' ? 'Cierre de sesión confirmado en Propio.' : 'Sesión de Propio sin confirmar. Recargá el portal y comprobá el acceso de la extensión al sitio.';
   toggle.checked = state.mode === 'auto'; toggle.disabled = busy || !state.paired;
   document.getElementById('reviewed').hidden = !state.queued && !(state.mode === 'auto' && state.active);
   const list = document.getElementById('signals'); list.replaceChildren();

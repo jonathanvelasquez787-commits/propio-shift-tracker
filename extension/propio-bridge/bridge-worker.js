@@ -2,6 +2,7 @@ import { PORTAL_ORIGIN, TRACKER_ORIGIN, TWILIO_EVENT_ORIGINS, accountScopeValid,
 
 const KEY = 'bridge-v1';
 const URLS = [`${PORTAL_ORIGIN}/*`, ...TWILIO_EVENT_ORIGINS.map(origin => `${origin}/v4/EndpointEvents*`)];
+const SIGN_OUT_DESTINATIONS = new Set(['https://propio.com', 'https://www.propio.com']);
 const fresh = () => ({ mode: 'observe', accountScope: null, tabs: {}, session: null, queue: [], completed: 0, last: [], attention: null });
 export function createBridgeWorker(api, { now = () => Date.now(), randomId = () => crypto.randomUUID() } = {}) {
   const reduce = createPropioReducer({ randomId }), pending = new Map();
@@ -40,6 +41,33 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     state.tabs[tabId] = { ...state.tabs[tabId], ...reduced };
     if (event?.type === 'call-end' && validateBridgeEvent(event, now())) state.completed++;
     record(state, signal, at, event);
+  }
+  function closeSession(state, at) {
+    if (!state.session) return;
+    for (const [id, tab] of Object.entries(state.tabs)) {
+      if (tab.active) callSignal(state, id, 'disconnected', at);
+      state.tabs[id].blockedDocument = tab.documentId;
+      delete state.tabs[id].signOutPending;
+    }
+    const session = state.session; state.session = null;
+    record(state, 'session-end', at, { version: 1, id: randomId(), type: 'session-end', ...session, at });
+  }
+  async function navigationCommitted(details) {
+    if (details.frameId !== 0 || details.tabId < 0) return;
+    try { if (!SIGN_OUT_DESTINATIONS.has(new URL(details.url).origin)) return; } catch { return; }
+    // Address-bar visits, bookmarks, reloads and Back are not sign-out evidence.
+    if (!['link', 'form_submit'].includes(details.transitionType) &&
+        !details.transitionQualifiers?.some(value => ['client_redirect', 'server_redirect'].includes(value))) return;
+    if (details.transitionQualifiers?.some(value => ['from_address_bar', 'forward_back'].includes(value))) return;
+    await transact(state => {
+      const tab = state.tabs[details.tabId], intent = tab?.signOutPending;
+      if (!intent || !state.session || intent.sessionId !== state.session.sessionId ||
+          now() - intent.at > 60000 || now() < intent.at) return;
+      const at = new Date(now()).toISOString();
+      closeSession(state, at);
+      state.tabs[details.tabId] = { ...state.tabs[details.tabId], session: 'logged-out', call: 'unknown', seenAt: at };
+    });
+    await flush();
   }
   function beforeRequest(details) {
     const kind = propioRequestKind(details.url);
@@ -100,6 +128,16 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
   }
   async function message(packet, sender) {
     if (sender.id !== api.runtime.id) return null;
+    if (packet?.kind === 'portal-sign-out') {
+      if (sender.frameId !== 0 || !sender.tab || !Number.isInteger(sender.tab.id) || sender.tab.id < 0 || !/^[\w-]{12,100}$/.test(packet.documentId || '')) return null;
+      try { if (new URL(sender.url).origin !== PORTAL_ORIGIN) return null; } catch { return null; }
+      return transact(state => {
+        const tab = state.tabs[sender.tab.id];
+        if (!state.session || tab?.session !== 'authenticated' || tab.documentId !== packet.documentId || tab.blockedDocument === packet.documentId) return { ok: false, reason: 'session-not-confirmed' };
+        tab.signOutPending = { documentId: packet.documentId, sessionId: state.session.sessionId, at: now() };
+        return { ok: true };
+      });
+    }
     if (packet?.kind === 'portal-observation') {
       if (sender.frameId !== 0 || !sender.tab || !Number.isInteger(sender.tab.id) || sender.tab.id < 0) return null;
       try { if (new URL(sender.url).origin !== PORTAL_ORIGIN) return null; } catch { return null; }
@@ -111,18 +149,15 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
         const tabId = sender.tab.id, previous = state.tabs[tabId] || {};
         const blocked = previous.blockedDocument === packet.documentId;
         state.tabs[tabId] = { ...previous, documentId: packet.documentId, session: packet.session, call: packet.call, seenAt: at };
+        // A logout page can briefly load inside the portal before the public
+        // redirect. Unknown UI keeps the intent; a new authenticated document cancels it.
+        if (previous.documentId !== packet.documentId && packet.session === 'authenticated') delete state.tabs[tabId].signOutPending;
         if (packet.session === 'authenticated' && !blocked && !state.session) {
           state.session = { sessionId: randomId(), startedAt: at };
           record(state, 'session-start', at, { version: 1, id: randomId(), type: 'session-start', ...state.session, at });
         } else if (packet.session === 'logged-out' && state.session) {
-          // The visible login form confirms session termination. Closing a tab, a hidden
-          // window, availability and a network failure never count as logging out.
-          for (const [id, tab] of Object.entries(state.tabs)) {
-            if (tab.active) callSignal(state, id, 'disconnected', at);
-            state.tabs[id].blockedDocument = tab.documentId;
-          }
-          const session = state.session; state.session = null;
-          record(state, 'session-end', at, { version: 1, id: randomId(), type: 'session-end', ...session, at });
+          // Login remains a fallback when the session expires without a click.
+          closeSession(state, at);
         }
         if (packet.session === 'logged-out') delete state.tabs[tabId].blockedDocument;
         if (packet.session === 'authenticated' && !blocked && packet.signal) callSignal(state, tabId, packet.signal, at);
@@ -171,6 +206,8 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     return null;
   }
   function install() {
+    api.webNavigation.onCommitted.addListener(details => { navigationCommitted(details).catch(() => {}); },
+      { url: [{ schemes: ['https'], hostEquals: 'propio.com' }, { schemes: ['https'], hostEquals: 'www.propio.com' }] });
     api.webRequest.onBeforeRequest.addListener(beforeRequest, { urls: URLS }, ['requestBody']);
     api.webRequest.onCompleted.addListener(details => { completed(details).catch(() => {}); }, { urls: URLS });
     api.webRequest.onErrorOccurred.addListener(details => { completed({ ...details, statusCode: 0 }).catch(() => {}); }, { urls: URLS });
@@ -184,5 +221,5 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
       delete state.tabs[tabId];
     }).catch(() => {}); });
   }
-  return { install, beforeRequest, completed, message, flush };
+  return { install, beforeRequest, completed, message, navigationCommitted, flush };
 }

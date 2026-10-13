@@ -1,10 +1,10 @@
-# Conexión con Propio · 1.5.0
+# Conexión con Propio · 1.5.1
 
 Extensión independiente de Propio · Minutos y ganancias. Conectá una sola pestaña del tracker a tu cuenta y activá Registrar llamadas automáticamente. En observación muestra señales sin modificar el tracker.
 
 ## Sesión y Shift
 
-Reconoce localmente el encabezado visible «Welcome, … (ID)» del portal. Con automático activado, la primera detección inicia el Shift; si ya estaba abierto, conserva su hora. Volver al formulario visible `#loginform` confirma el cierre de sesión y termina el Shift vinculado. Una llamada automática pendiente se cierra antes del turno con tiempo estimado hasta esa detección. No cierra llamadas manuales sin revisión.
+Reconoce localmente el encabezado visible «Welcome, … (ID)» del portal. Con automático activado, la primera detección inicia el Shift; si ya estaba abierto, conserva su hora. Desde 1.5.1, pulsar Sign out y completar la redirección de esa pestaña a propio.com o www.propio.com termina el Shift vinculado, sin tener que abrir Login otra vez. El clic se comunica antes de abandonar el portal; el worker confirma la navegación aun cuando desaparece el script de la página. Usa webNavigation con filtros para esos dos hosts y no persiste direcciones. Un clic sin redirección, una visita desde la barra de direcciones, Back, recargar u otra pestaña no termina el turno. Volver al formulario visible `#loginform` sigue confirmando el cierre si la sesión expiró. Una llamada automática pendiente se cierra antes del turno con tiempo estimado hasta esa detección. No cierra llamadas manuales sin revisión.
 
 Si activás la extensión con Propio ya conectado, registra desde la detección, sin inventar la hora anterior de login. Recargar, cerrar pestañas, ocultar ventanas, perder conexión o cambiar disponibilidad no equivale a salir. Un cierre atrasado tampoco termina un Shift manual posterior. Las observaciones desconocidas no modifican la sesión.
 
@@ -24,9 +24,9 @@ La cola y sesión sobreviven al reinicio del worker. Entrega a una sola pestaña
 
 ## Actualizar la extensión existente
 
-1. Extraé el ZIP 1.5.0 y reemplazá los archivos de la carpeta que Chrome tiene instalada, incluida `portal-content.js`.
-2. En `chrome://extensions`, recargá Shift Tracker Bridge. Chrome puede solicitar los permisos regionales añadidos en 1.4.0.
-3. Recargá las pestañas de Propio y del tracker. Dejando la misma carpeta y extensión se mantiene la configuración. Comprobá «Diagnóstico del detector · 1.5.0» y «Sesión de Propio reconocida».
+1. Extraé el ZIP 1.5.1 y reemplazá los archivos de la carpeta que Chrome tiene instalada, incluida `portal-content.js`.
+2. En `chrome://extensions`, recargá Shift Tracker Bridge. La versión 1.5.1 añade webNavigation para confirmar la redirección de Sign out; si Chrome solicita habilitarlo, aceptá para completar la actualización.
+3. Recargá las pestañas de Propio y del tracker. Dejando la misma carpeta y extensión se mantiene la configuración. Comprobá «Diagnóstico del detector · 1.5.1» y «Sesión de Propio reconocida».
 4. Si estaba sin conectar: abrí el tracker, iniciá sesión, pulsá Conectar esta cuenta y activá el registro automático.
 
 Recargar la versión anterior sin reemplazar los archivos no instala la actualización. Si la extensión fue eliminada, usá Cargar descomprimida con la carpeta que contiene `manifest.json` y conectá la cuenta de nuevo.
