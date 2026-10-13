@@ -3,9 +3,121 @@ import assert from 'node:assert/strict';
 import { readPropioSignal, readPropioRequestBody, propioRequestKind, TWILIO_EVENT_ORIGINS, createPropioReducer, validateBridgeEvent, PORTAL_ORIGIN, TRACKER_ORIGIN } from '../js/propio-bridge-rules.js';
 import { createPropioReceiver, createStorageRevisionGuard, ignorePropioCall, installPropioBridge } from '../js/propio-bridge.js';
 import { createBridgeWorker } from '../extension/propio-bridge/bridge-worker.js';
-import { createPortalObserver, readPortalObservation } from '../extension/propio-bridge/portal-observer.js';
+import { createPortalObserver, readPortalObservation, offlineStartButton } from '../extension/propio-bridge/portal-observer.js';
+
+test('official history count works in observation; automatic records survive a closed tracker, reconcile once and isolate accounts', async () => {
+  const f = workerFixture();
+  const record = { customerId: '91434', callDate: '10/04/2026', callStart: '1:00 AM', durationMin: 0, billable: 'Yes', dropped: 'No', pay: '$0.00' };
+  const packet = { kind: 'portal-history', documentId: 'portal-document-12345', count: 2, invalid: 0, coverage: 'page', records: [record] };
+  await f.worker.message(portalPacket('authenticated'), portalSender);
+  assert.equal((await f.worker.message(packet, portalSender)).ok, true);
+  assert.equal((await f.worker.message({kind:'status'},sender)).history.count, 2);
+  assert.equal(f.data['bridge-v1'].queue.length, 0);
+  await enablePortal(f); await f.worker.message(portalPacket('authenticated'), portalSender);
+  f.targets([]);
+  await f.worker.message(packet, portalSender); await f.worker.message(packet, portalSender);
+  assert.equal(f.data['bridge-v1'].queue.length, 1);
+  f.restart(); f.targets([scope]); await f.worker.flush();
+  assert.equal(f.delivered.filter(p => p.event.type === 'history-records').length, 1);
+  await f.worker.message(packet, portalSender);
+  assert.equal(f.delivered.filter(p => p.event.type === 'history-records').length, 1);
+  await f.worker.message({...packet,records:[{...record,durationMin:5,pay:'$0.60'}]},portalSender);
+  assert.equal(f.delivered.filter(p => p.event.type === 'history-records').length, 2);
+  assert.equal(await f.worker.message(packet,{...portalSender,url:'https://evil.invalid/'}),null);
+  assert.equal((await f.worker.message({...packet,documentId:'other-document-1234'},portalSender)).ok,false);
+  f.targets([other]); await f.worker.message({kind:'pair'},sender);
+  assert.equal((await f.worker.message({kind:'status'},sender)).history,null);
+  assert.deepEqual(f.data['bridge-v1'].historySeen,[]);
+});
 
 const at = '2026-10-04T18:00:00.000Z', ended = '2026-10-04T18:10:00.000Z';
+
+test('first-call preparation waits for the schedule, supports late arrival, retries only confirmed Offline and stops after manual connection across restart', async () => {
+  const f = workerFixture();
+  f.plan({ startAt: '2026-10-04T19:00:00.000Z', endAt: '2026-10-05T01:00:00.000Z', hasCall: false, ended: false });
+  await enablePortal(f);
+  await f.worker.message({kind:'prepare-first',enabled:true},sender);
+  const observe = extra => f.worker.message(portalPacket('authenticated',{call:'idle',offline:true,...extra}),portalSender);
+  assert.equal((await observe()).prepare,false);
+  f.advance(2*3600000); // Late arrival is still inside the planned window.
+  assert.equal((await observe()).prepare,true);
+  assert.equal((await observe()).prepare,false);
+  f.advance(16000); assert.equal((await observe({offline:false})).prepare,false);
+  assert.equal((await observe({call:'incoming'})).prepare,false);
+  assert.equal((await observe()).prepare,true);
+  f.advance(16000);
+  await observe({call:'connected',offline:false,signal:'accepted'});
+  f.advance(60000); await observe({signal:'disconnected'}); f.restart();
+  assert.equal((await observe()).prepare,false);
+  await f.worker.message({kind:'prepare-first',enabled:false},sender);
+  await f.worker.message({kind:'prepare-first',enabled:true},sender);
+  assert.equal((await observe()).prepare,false);
+});
+
+test('Break and Lunch resume independently after manual completion or acknowledged timed closure; unknown duration and disabled choices hold', async () => {
+  const f=workerFixture(); const startedAt='2026-10-04T18:10:00.000Z', endsAt='2026-10-04T18:20:00.000Z';
+  const plan={startAt:at,endAt:'2026-10-04T22:00:00.000Z',hasCall:true,ended:false};
+  await enablePortal(f); f.advance(600000); f.plan({...plan,pause:{type:'break',startedAt,endsAt}});
+  await f.worker.message({kind:'resume-options',break:true,lunch:false,mode:'manual'},sender);
+  const observe=extra=>f.worker.message(portalPacket('authenticated',{call:'idle',offline:true,...extra}),portalSender);
+  assert.equal((await observe()).prepare,false);
+  f.advance(600000);assert.equal((await observe()).prepare,false);
+  f.plan({...plan,lastPause:{type:'break',startedAt,endedAt:endsAt}});await f.worker.message({kind:'pair'},sender);
+  assert.equal((await observe()).prepare,true);
+  await observe({call:'connected',offline:false,signal:'accepted'});f.advance(60000);await observe({signal:'disconnected'});f.restart();
+  assert.equal((await observe()).prepare,false);
+  const lunchStart='2026-10-04T18:21:00.000Z', lunchEnd='2026-10-04T18:31:00.000Z';
+  f.plan({...plan,pause:{type:'lunch',startedAt:lunchStart,endsAt:lunchEnd}});await f.worker.message({kind:'pair'},sender);
+  f.advance(600000);assert.equal((await observe()).prepare,false);
+  await f.worker.message({kind:'resume-options',break:false,lunch:true,mode:'timed'},sender);
+  f.ack({status:'blocked'});assert.equal((await observe()).prepare,false);
+  assert.equal(f.data['bridge-v1'].queue.filter(item=>item.event.type==='pause-end').length,1);
+  f.ack({status:'ok'});await f.worker.flush();assert.equal((await observe()).prepare,true);
+  assert.equal(f.delivered.filter(event=>event.event.type==='pause-end').length,2);
+  await f.worker.message({kind:'resume-options',break:false,lunch:false,mode:'manual'},sender);
+  f.advance(16000);assert.equal((await observe()).prepare,false);
+});
+
+test('turning off timed resume cancels undelivered pause closure and an unknown pause duration cannot trigger it', async () => {
+  const f=workerFixture();await enablePortal(f);f.advance(600000);
+  const pause={type:'lunch',startedAt:at,endsAt:null};
+  f.plan({startAt:at,endAt:'2026-10-04T22:00:00.000Z',hasCall:true,ended:false,pause});
+  await f.worker.message({kind:'resume-options',break:false,lunch:true,mode:'timed'},sender);
+  const observe=()=>f.worker.message(portalPacket('authenticated',{call:'idle',offline:true}),portalSender);
+  assert.equal((await observe()).prepare,false);assert.equal(f.data['bridge-v1'].queue.length,0);
+  f.plan({...f.data['bridge-v1'].preparation.plan,pause:{...pause,endsAt:ended}});await f.worker.message({kind:'pair'},sender);
+  f.targets([]);await observe();assert.equal(f.data['bridge-v1'].queue.length,1);
+  await f.worker.message({kind:'resume-options',break:false,lunch:false,mode:'manual'},sender);
+  assert.equal(f.data['bridge-v1'].queue.length,0);
+});
+
+test('preparation is opt-in and holds outside the shift, after tool completion, with duplicate portal tabs or missing schedule', async () => {
+  const f=workerFixture();await enablePortal(f);
+  const observe = () => f.worker.message(portalPacket('authenticated',{call:'idle',offline:true}),portalSender);
+  assert.equal((await observe()).prepare,false);
+  await f.worker.message({kind:'prepare-first',enabled:true},sender);assert.equal((await observe()).prepare,false);
+  f.plan({startAt:at,endAt:ended,hasCall:false,ended:false});await f.worker.message({kind:'pair'},sender);
+  await f.worker.message(portalPacket('authenticated',{call:'idle',offline:true,documentId:'other-portal-123456'}),{...portalSender,tab:{id:2}});
+  assert.equal((await observe()).prepare,false);
+  f.advance(610000);assert.equal((await observe()).prepare,false);
+  f.plan({startAt:at,endAt:'2026-10-04T22:00:00.000Z',hasCall:true,ended:false});await f.worker.message({kind:'pair'},sender);
+  assert.equal((await observe()).prepare,false);
+});
+
+test('portal preparation clicks only an explicit Offline Start Calls button and never Accept or ambiguous controls', async () => {
+  const f=portalDocument();f.document.welcome=f.element('Welcome, Synthetic User (12345)');
+  const button=f.element('Start Calls');let starts=0, accepts=0;button.click=()=>starts++;
+  f.document.controls=[button];f.document.statuses=[f.element('Offline')];
+  assert.equal(offlineStartButton(f.document),button);
+  let clock=10000;const observer=createPortalObserver({document:f.document,documentId:'prepare-document-1234',now:()=>clock,send:async()=>({ok:true,prepare:true})});
+  await observer.sample();clock+=1000;await observer.sample();assert.equal(starts,1);
+  const accept=f.element('Accept');accept.click=()=>accepts++;
+  f.document.controls=[accept,f.element('Reject')];assert.equal(offlineStartButton(f.document),null);
+  await observer.sample();clock+=1000;await observer.sample();assert.equal(accepts,0);
+  f.document.controls=[button];f.document.statuses=[f.element('Available')];assert.equal(offlineStartButton(f.document),null);
+  f.document.statuses=[f.element('Offline')];f.document.controls=[button,f.element('Start Calls')];assert.equal(offlineStartButton(f.document),null);
+  observer.stop();
+});
 const scope = 'a'.repeat(64), other = 'b'.repeat(64), callId = 'test-call-123456789';
 const start = { version: 1, id: 'test-start-12345678', type: 'call-start', callId, at };
 const end = { version: 1, id: 'test-end-123456789', type: 'call-end', callId, startedAt: at, at: ended };
@@ -129,11 +241,11 @@ function receiverFixture(clock = now) {
 }
 function workerFixture() {
   const data = {}, delivered = [];
-  let targets = [], ack = { status: 'ok' }, clock = Date.parse(at), n = 0;
+  let targets = [], plan = null, ack = { status: 'ok' }, clock = Date.parse(at), n = 0;
   const api = { runtime: { id: 'extension-id', getURL: name => `chrome-extension://extension-id/${name}` },
     storage: { local: { async get(key) { return { [key]: structuredClone(data[key]) }; }, async set(update) { Object.assign(data, structuredClone(update)); } } },
     tabs: { async query() { return targets.map((s, i) => ({ id: i + 10 })); }, async sendMessage(id, message) {
-      if (message.kind === 'identify-tracker') return { accountScope: targets[id - 10] };
+      if (message.kind === 'identify-tracker') return { accountScope: targets[id - 10], plan };
       delivered.push(message); return ack;
     }, async create() {} } };
   let worker = createBridgeWorker(api, { now: () => clock, randomId: () => `generated-id-${String(++n).padStart(12,'0')}` });
@@ -144,7 +256,7 @@ function workerFixture() {
     await worker.completed({ requestId, statusCode: options.statusCode || 200 });
   }
   return { data, delivered, signal, get worker() { return worker; }, targets: value => { targets = value; },
-    ack: value => { ack = value; }, advance: milliseconds => { clock += milliseconds; },
+    ack: value => { ack = value; }, plan: value => { plan = value; }, advance: milliseconds => { clock += milliseconds; },
     restart() { worker = createBridgeWorker(api, { now: () => clock, randomId: () => `generated-id-${String(++n).padStart(12,'0')}` }); } };
 }
 

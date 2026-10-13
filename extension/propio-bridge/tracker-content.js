@@ -26,8 +26,14 @@
     if (message.source !== window || message.origin !== origin || message.data?.protocol !== protocol || message.data.direction !== 'app') return;
     const packet = message.data;
     if (packet.kind === 'ready' && /^[a-f0-9]{64}$/.test(packet.accountScope || '') && /^[\w-]{12,100}$/.test(packet.nonce || '')) {
-      const changed = ready?.accountScope !== packet.accountScope || ready?.nonce !== packet.nonce;
-      ready = { accountScope: packet.accountScope, nonce: packet.nonce };
+      const plan = packet.plan && typeof packet.plan.startAt === 'string' && typeof packet.plan.endAt === 'string' ? { startAt: packet.plan.startAt, endAt: packet.plan.endAt, hasCall: packet.plan.hasCall === true, ended: packet.plan.ended === true } : null;
+      if (plan) for (const key of ['pause','lastPause']) {
+        const pause = packet.plan[key];
+        plan[key] = pause && ['break','lunch'].includes(pause.type) && typeof pause.startedAt === 'string'
+          ? { type: pause.type, startedAt: pause.startedAt, [key === 'pause' ? 'endsAt' : 'endedAt']: key === 'pause' ? pause.endsAt : pause.endedAt } : null;
+      }
+      const changed = ready?.accountScope !== packet.accountScope || ready?.nonce !== packet.nonce || JSON.stringify(ready?.plan) !== JSON.stringify(plan);
+      ready = { accountScope: packet.accountScope, nonce: packet.nonce, plan };
       if (changed) void announce({ kind: 'tracker-ready', ...ready });
     } else if (packet.kind === 'ack' && ready && packet.nonce === ready.nonce && packet.accountScope === ready.accountScope) {
       const item = pending.get(packet.requestId);

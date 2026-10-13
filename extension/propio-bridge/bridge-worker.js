@@ -1,9 +1,12 @@
-import { PORTAL_ORIGIN, TRACKER_ORIGIN, TWILIO_EVENT_ORIGINS, accountScopeValid, readPropioSignal, readPropioRequestBody, propioRequestKind, validateBridgeEvent, createPropioReducer } from '../../js/propio-bridge-rules.js';
+import { PORTAL_ORIGIN, TRACKER_ORIGIN, TWILIO_EVENT_ORIGINS, accountScopeValid, readPropioSignal, readPropioRequestBody, propioRequestKind, validateBridgeEvent, validateBridgePlan, createPropioReducer } from '../../js/propio-bridge-rules.js';
+import { validatePortalRecord, portalRecordKey } from '../../js/propio-history-records.js';
 
 const KEY = 'bridge-v1';
 const URLS = [`${PORTAL_ORIGIN}/*`, ...TWILIO_EVENT_ORIGINS.map(origin => `${origin}/v4/EndpointEvents*`)];
 const SIGN_OUT_DESTINATIONS = new Set(['https://propio.com', 'https://www.propio.com']);
-const fresh = () => ({ mode: 'observe', accountScope: null, tabs: {}, session: null, queue: [], completed: 0, last: [], attention: null });
+const fresh = () => ({ mode: 'observe', accountScope: null, tabs: {}, session: null, queue: [], completed: 0, last: [], attention: null,
+  preparation: { enabled: false, plan: null, doneFor: null, lastAttemptAt: 0,
+    resume: { break: false, lunch: false, mode: 'manual' }, pendingPause: null, resumedPauses: [] } });
 export function createBridgeWorker(api, { now = () => Date.now(), randomId = () => crypto.randomUUID() } = {}) {
   const reduce = createPropioReducer({ randomId }), pending = new Map();
   let serial = Promise.resolve(), flushing = null;
@@ -11,6 +14,7 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     const result = serial.then(async () => {
       const stored = (await api.storage.local.get(KEY))[KEY];
       const state = stored?.schema === 1 ? { ...fresh(), ...stored } : fresh();
+      state.preparation = { ...fresh().preparation, ...state.preparation, resume: { ...fresh().preparation.resume, ...state.preparation?.resume } };
       const before = JSON.stringify(state);
       const output = await operation(state);
       if (stored?.schema !== 1 || before !== JSON.stringify(state)) await api.storage.local.set({ [KEY]: { ...state, schema: 1 } });
@@ -24,7 +28,7 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     const results = await Promise.all(tabs.map(async tab => {
       try {
         const ready = await api.tabs.sendMessage(tab.id, { kind: 'identify-tracker' }, { frameId: 0 });
-        return accountScopeValid(ready?.accountScope) ? { tabId: tab.id, accountScope: ready.accountScope } : null;
+        return accountScopeValid(ready?.accountScope) ? { tabId: tab.id, accountScope: ready.accountScope, plan: validateBridgePlan(ready.plan, now()) } : null;
       } catch { return null; }
     }));
     return results.filter(Boolean);
@@ -39,8 +43,58 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
   function callSignal(state, tabId, signal, at) {
     const { state: reduced, event } = reduce(state.tabs[tabId], signal, at);
     state.tabs[tabId] = { ...state.tabs[tabId], ...reduced };
+    if (signal === 'accepted' && state.preparation.plan) {
+      state.preparation.doneFor = state.preparation.plan.startAt;
+      if (state.preparation.pendingPause) finishResume(state);
+    }
     if (event?.type === 'call-end' && validateBridgeEvent(event, now())) state.completed++;
     record(state, signal, at, event);
+  }
+  function finishResume(state) {
+    const prep = state.preparation;
+    if (prep.pendingPause) prep.resumedPauses = [...prep.resumedPauses, prep.pendingPause.startedAt].slice(-100);
+    prep.pendingPause = null;
+  }
+  function updatePlan(state, plan) {
+    const prep = state.preparation;
+    prep.plan = plan;
+    if (!plan || plan.ended) { prep.pendingPause = null; return; }
+    const active = plan.pause;
+    if (active) {
+      if (!prep.resume[active.type] || prep.resumedPauses.includes(active.startedAt)) { prep.pendingPause = null; return; }
+      if (prep.pendingPause?.startedAt !== active.startedAt) prep.pendingPause = { ...active, endedAt: null, requestId: null };
+      else prep.pendingPause.endsAt = active.endsAt;
+    } else if (prep.pendingPause) {
+      if (plan.lastPause?.startedAt === prep.pendingPause.startedAt && plan.lastPause.endedAt) prep.pendingPause.endedAt = plan.lastPause.endedAt;
+      else if (!prep.pendingPause.endedAt) prep.pendingPause = null;
+    }
+  }
+  function schedulePauseEnd(state, packet) {
+    const prep = state.preparation, pause = prep.pendingPause, plan = validateBridgePlan(prep.plan, now());
+    if (!pause || prep.resume.mode !== 'timed' || !prep.resume[pause.type] || pause.requestId || pause.endedAt ||
+        !pause.endsAt || now() < Date.parse(pause.endsAt) || state.mode !== 'auto' || !state.accountScope || !state.session ||
+        !plan || plan.ended || now() < Date.parse(plan.startAt) || now() >= Date.parse(plan.endAt) || plan.pause?.startedAt !== pause.startedAt ||
+        packet.session !== 'authenticated' || packet.call !== 'idle' || Object.values(state.tabs).some(tab => tab.active)) return;
+    const at = new Date(now()).toISOString(), id = randomId();
+    record(state, 'pause-end', at, { version: 1, id, type: 'pause-end', at, startedAt: pause.startedAt, pauseType: pause.type });
+    if (state.queue.some(item => item.event.id === id)) pause.requestId = id;
+  }
+  function prepareFirst(state, tabId, packet) {
+    const prep = state.preparation, plan = validateBridgePlan(prep.plan, now());
+    if (plan?.hasCall || plan?.ended || state.tabs[tabId]?.call === 'connected') { if (plan) prep.doneFor = plan.startAt; }
+    if (state.tabs[tabId]?.call === 'connected') { if (prep.pendingPause) finishResume(state); return false; }
+    const pending = prep.pendingPause;
+    const resumeReady = pending?.endedAt && prep.resume[pending.type] && (prep.resume.mode === 'manual' || (pending.endsAt && now() >= Date.parse(pending.endsAt)));
+    const firstReady = prep.enabled && plan && prep.doneFor !== plan.startAt && !plan.hasCall;
+    if ((!firstReady && !resumeReady) || (plan?.pause && !pending?.endedAt) || state.mode !== 'auto' || !state.accountScope || !state.session || !plan || plan.ended ||
+        now() < Date.parse(plan.startAt) || now() >= Date.parse(plan.endAt) ||
+        state.attention === 'multiple-trackers' || state.attention === 'tracker-needs-review' ||
+        packet.session !== 'authenticated' || packet.call !== 'idle' || packet.offline !== true || now() - prep.lastAttemptAt < 15000) return false;
+    const portals = Object.entries(state.tabs).filter(([, tab]) => tab.session === 'authenticated' && tab.blockedDocument !== tab.documentId && now() - Date.parse(tab.seenAt) < 15000);
+    if (portals.length !== 1 || portals[0][0] !== String(tabId) || Object.values(state.tabs).some(tab => tab.active)) return false;
+    prep.lastAttemptAt = now();
+    record(state, 'start-calls', new Date(now()).toISOString(), null);
+    return true;
   }
   function closeSession(state, at) {
     if (!state.session) return;
@@ -116,7 +170,14 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     catch { ack = { status: 'blocked', reason: 'tracker-closed' }; }
     return transact(state => {
       if (state.queue[0]?.event.id !== queued.item.event.id || state.accountScope !== queued.item.accountScope) return false;
-      if (ack?.status === 'ok') { state.queue.shift(); state.attention = null; return true; }
+      if (ack?.status === 'ok') {
+        if (queued.item.event.type === 'history-records') state.historySeen = [...(state.historySeen || []), ...queued.item.event.records.map(row => ({ key: portalRecordKey(row), signature: JSON.stringify(row), at: now() }))].slice(-2000);
+        if (queued.item.event.type === 'pause-end' && state.preparation.pendingPause?.requestId === queued.item.event.id) {
+          if (ack.superseded) finishResume(state);
+          else state.preparation.pendingPause.endedAt = queued.item.event.at;
+        }
+        state.queue.shift(); state.attention = null; return true;
+      }
       state.attention = ack?.status === 'rejected' ? 'event-rejected' : 'tracker-needs-review';
       if (ack?.status === 'rejected') state.mode = 'observe';
       return false;
@@ -161,12 +222,44 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
         }
         if (packet.session === 'logged-out') delete state.tabs[tabId].blockedDocument;
         if (packet.session === 'authenticated' && !blocked && packet.signal) callSignal(state, tabId, packet.signal, at);
+        if (!blocked) schedulePauseEnd(state, packet);
       });
-      await flush(); return { ok: true };
+      await flush();
+      return transact(state => ({ ok: true, prepare: prepareFirst(state, sender.tab.id, packet), historyEnabled: state.mode === 'auto' && !!state.accountScope && packet.session === 'authenticated' && packet.call !== 'connected' && !Object.values(state.tabs).some(tab => tab.active) }));
+    }
+    if (packet?.kind === 'portal-history') {
+      if (sender.frameId !== 0 || !sender.tab || !Number.isInteger(sender.tab.id) || sender.tab.id < 0) return null;
+      try { if (new URL(sender.url).origin !== PORTAL_ORIGIN) return null; } catch { return null; }
+      if (!Number.isSafeInteger(packet.count) || packet.count < 0 || packet.count > 1000000 ||
+          !Number.isSafeInteger(packet.invalid) || packet.invalid < 0 || packet.invalid > 1000000 ||
+          !Array.isArray(packet.records) || packet.records.length > 100) return null;
+      const result = await transact(state => {
+        const tab = state.tabs[sender.tab.id];
+        if (!tab || tab.documentId !== packet.documentId || tab.session !== 'authenticated' || tab.blockedDocument === packet.documentId) return { ok: false, reason: 'session-not-confirmed' };
+        state.history = { count: packet.count, invalid: packet.invalid, at: new Date(now()).toISOString(), coverage: packet.coverage === 'range' ? 'range' : 'page' };
+        if (state.mode !== 'auto' || !state.accountScope || tab.call === 'connected' || Object.values(state.tabs).some(tab => tab.active)) return { ok: true };
+        const records = packet.records.map(record => validatePortalRecord(record, now()));
+        if (records.some(record => !record)) return { ok: false, reason: 'invalid-record' };
+        state.historySeen = (state.historySeen || []).filter(item => now() - item.at < 86400000).slice(-2000);
+        const freshRecords = records.filter(record => {
+          const key = portalRecordKey(record), signature = JSON.stringify(record);
+          return !state.historySeen.some(item => item.key === key && item.signature === signature) &&
+            !state.queue.some(item => item.event.type === 'history-records' && item.event.records.some(row => portalRecordKey(row) === key && JSON.stringify(row) === signature));
+        });
+        if (freshRecords.length) record(state, 'history', new Date(now()).toISOString(), { version: 1, id: randomId(), type: 'history-records', at: new Date(now()).toISOString(), records: freshRecords });
+        return { ok: true };
+      });
+      await flush(); return result;
     }
     if (packet?.kind === 'tracker-ready') {
       if (sender.frameId !== 0 || !sender.tab || !accountScopeValid(packet.accountScope)) return null;
       try { if (new URL(sender.url).origin !== TRACKER_ORIGIN) return null; } catch { return null; }
+      const targets = await trackers();
+      await transact(state => {
+        const matched = targets.filter(target => target.accountScope === state.accountScope);
+        if (matched.length === 1 && packet.accountScope === state.accountScope) updatePlan(state, matched[0].plan);
+        else if (matched.length > 1) { updatePlan(state, null); state.attention = 'multiple-trackers'; }
+      });
       await flush(); return { ok: true };
     }
     if (sender.url !== api.runtime.getURL('popup.html')) return null;
@@ -175,16 +268,17 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
       const portals = Object.values(state.tabs).filter(tab => now() - Date.parse(tab.seenAt) < 15000);
       const authenticated = portals.filter(tab => tab.session === 'authenticated' && tab.blockedDocument !== tab.documentId);
       const call = ['connected', 'incoming', 'idle'].find(kind => authenticated.some(tab => tab.call === kind)) || 'unknown';
-      return { mode: state.mode, paired: !!state.accountScope, active: Object.values(state.tabs).some(tab => tab.active), completed: state.completed, queued: state.queue.length, last: state.last, attention: state.attention, call, portal: authenticated.length ? 'authenticated' : portals.some(tab => tab.session === 'logged-out') ? 'logged-out' : 'unknown', diagnostic: state.diagnostic || { requests: 0, recognized: 0, last: [] } };
+      return { mode: state.mode, paired: !!state.accountScope, active: Object.values(state.tabs).some(tab => tab.active), completed: state.completed, history: state.history || null, preparation: state.preparation, queued: state.queue.length, last: state.last, attention: state.attention, call, portal: authenticated.length ? 'authenticated' : portals.some(tab => tab.session === 'logged-out') ? 'logged-out' : 'unknown', diagnostic: state.diagnostic || { requests: 0, recognized: 0, last: [] } };
     }
     if (packet?.kind === 'pair') {
       const targets = await trackers();
       if (targets.length !== 1) return { ok: false, reason: targets.length ? 'multiple-trackers' : 'tracker-closed' };
       return transact(state => {
-        if (state.accountScope === targets[0].accountScope) return { ok: true };
+        if (state.accountScope === targets[0].accountScope) { updatePlan(state, targets[0].plan); return { ok: true }; }
         if (state.queue.length && state.accountScope !== targets[0].accountScope) return { ok: false, reason: 'pending-account' };
         if (state.mode === 'auto' && Object.values(state.tabs).some(tab => tab.active)) return { ok: false, reason: 'active-portal-call' };
-        state.accountScope = targets[0].accountScope; state.mode = 'observe'; state.tabs = {}; state.session = null; state.attention = null;
+        state.accountScope = targets[0].accountScope; state.mode = 'observe'; state.tabs = {}; state.session = null; state.attention = null; state.history = null; state.historySeen = [];
+        state.preparation = { ...fresh().preparation, plan: targets[0].plan };
         return { ok: true };
       });
     }
@@ -198,6 +292,31 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
         return { ok: true };
       });
       await flush(); return result;
+    }
+    if (packet?.kind === 'prepare-first') {
+      if (typeof packet.enabled !== 'boolean') return { ok: false, reason: 'invalid-mode' };
+      const targets = await trackers();
+      return transact(state => {
+        if (!state.accountScope) return { ok: false, reason: 'account-needed' };
+        state.preparation.enabled = packet.enabled;
+        const matched = targets.filter(target => target.accountScope === state.accountScope);
+        if (matched.length === 1) updatePlan(state, matched[0].plan);
+        else if (matched.length > 1) updatePlan(state, null);
+        return { ok: true };
+      });
+    }
+    if (packet?.kind === 'resume-options') {
+      if (typeof packet.break !== 'boolean' || typeof packet.lunch !== 'boolean' || !['manual','timed'].includes(packet.mode)) return { ok: false, reason: 'invalid-mode' };
+      const targets = await trackers();
+      return transact(state => {
+        if (!state.accountScope) return { ok: false, reason: 'account-needed' };
+        state.preparation.resume = { break: packet.break, lunch: packet.lunch, mode: packet.mode };
+        state.queue = state.queue.filter(item => item.event.type !== 'pause-end' || (packet.mode === 'timed' && packet[item.event.pauseType]));
+        if (state.preparation.pendingPause?.requestId && !state.queue.some(item => item.event.id === state.preparation.pendingPause.requestId)) state.preparation.pendingPause.requestId = null;
+        const matched = targets.filter(target => target.accountScope === state.accountScope);
+        updatePlan(state, matched.length === 1 ? matched[0].plan : null);
+        return { ok: true };
+      });
     }
     if (packet?.kind === 'open-tracker') { await api.tabs.create({ url: `${TRACKER_ORIGIN}/` }); return { ok: true }; }
     if (packet?.kind === 'clear-reviewed') return transact(state => {

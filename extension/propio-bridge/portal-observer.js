@@ -21,6 +21,17 @@ function visible(element) {
   const style = element.ownerDocument.defaultView.getComputedStyle(element);
   return style.visibility !== 'hidden' && style.display !== 'none';
 }
+export function offlineStartButton(document) {
+  const observation = readPortalObservation(document);
+  if (observation.session !== 'authenticated' || observation.call !== 'idle') return null;
+  const offline = [...document.querySelectorAll('[role="status"],.call-status,#callStatus,[data-call-status],span,p,strong')]
+    .some(element => visible(element) && /^(offline|call status:? offline|fuera de l[ií]nea|desconectado)$/.test(normalize(element.textContent)));
+  if (!offline) return null;
+  const controls = [...document.querySelectorAll('button,[role="button"],input[type="button"],input[type="submit"]')];
+  const matches = controls.filter(element => visible(element) && !element.disabled && element.getAttribute('aria-disabled') !== 'true' &&
+    /^(start calls|iniciar llamadas)$/.test(normalize(element.textContent || element.value || element.getAttribute('aria-label'))));
+  return matches.length === 1 ? matches[0] : null;
+}
 export function readPortalObservation(document, armed = false) {
   const headings = [...document.querySelectorAll('h1,h2,h3,h4,strong,b,[role="heading"],header,nav,span,p,div,label')];
   const welcome = headings.some(element => visible(element) && /^welcome,\s+.{1,180}\s*\(\d{1,12}\)$/i.test(element.textContent.trim()));
@@ -77,8 +88,11 @@ export function createPortalObserver({ document, send, documentId, now = () => D
       committed = key;
     }
     try {
-      const result = await send({ kind: 'portal-observation', documentId, ...observation, ...(pendingSignal ? { signal: pendingSignal } : {}) });
+      const offline = Boolean(offlineStartButton(document));
+      const result = await send({ kind: 'portal-observation', documentId, ...observation, offline, ...(pendingSignal ? { signal: pendingSignal } : {}) });
       if (result?.ok) pendingSignal = null;
+      if (result?.prepare === true && offline) offlineStartButton(document)?.click();
+      return result;
     } catch (error) {
       if (/extension context invalidated/i.test(String(error?.message))) stop();
     }

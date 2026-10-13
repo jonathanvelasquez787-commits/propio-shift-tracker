@@ -191,7 +191,7 @@ test('reemplazar una llamada live migra las referencias antes de reconciliar inc
   assert.equal(currentState.game.reinforcement.reflections.deleted, undefined);
   assert.equal(currentState.game.reinforcement.reflections.officialId.callId, 'officialId');
   const appMain = fs.readFileSync(path.join(root, 'js/app-main.js'), 'utf8');
-  const importBody = appMain.slice(appMain.indexOf('function importCalls()'), appMain.indexOf('function clearCallInputBox'));
+  const importBody = appMain.slice(appMain.indexOf('function importCalls('), appMain.indexOf('function clearCallInputBox'));
   assert.ok(importBody.indexOf('migratePositiveCallIdReferences') < importBody.indexOf('onGameCallsChanged'));
   assert.ok(importBody.indexOf('migrateGameCallReferences') < importBody.indexOf('onGameCallsChanged'));
   assert.match(importBody, /item\.replacementKind === 'live'\)\s*\{?\s*migratePositiveCallIdReferences\(item\.replaces\?\.id, item\.call\.id, item\.call\.endISO\)/);

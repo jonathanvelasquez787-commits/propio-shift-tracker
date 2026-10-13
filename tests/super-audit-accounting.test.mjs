@@ -19,6 +19,26 @@ const functions = ['pad', 'dateKey', 'todayRange', 'todayCallDateKey', 'callDate
 const at = (day, clock = '12:00') => new Date(`2025-09-${String(day).padStart(2, '0')}T${clock}:00`);
 const tiers = { bronze: { bonusPerMin: .01 }, silver: { bonusPerMin: .02 }, gold: { bonusPerMin: .03 } };
 
+test('background official recovery preserves drafts and selected day, imports zero rows once and updates the same corrected identity', t => {
+  const x = harness(t); x.advance(at(2,'19:00'));
+  x.element('callInput').value = 'unfinished manual paste'; state.activeDayKey = '08/31/2025';
+  const raw = '91434\t09/01/2025\t11:54 AM\t0\tYes\tNo\t$0.00\n72601\t09/01/2025\t11:52 AM\t0\tYes\tNo\t$0.00';
+  assert.equal(x.h.importCalls(raw),true); assert.equal(calls.length,2);
+  const original = calls.find(call=>call.customerId==='91434').id;
+  assert.equal(x.element('callInput').value,'unfinished manual paste'); assert.equal(state.activeDayKey,'08/31/2025');
+  assert.equal(x.h.importCalls(raw),true); assert.equal(calls.length,2); assert.deepEqual(x.messages,[]);
+  assert.equal(x.h.importCalls('91434\t09/01/2025\t11:54 AM\t5\tYes\tNo\t$0.60'),true);
+  assert.equal(calls.length,2); assert.equal(calls.find(call=>call.customerId==='91434').id,original);
+  x.reload(); assert.equal(calls.length,2); assert.equal(calls.find(call=>call.customerId==='91434').durationMin,5);
+});
+
+test('background recovery holds a whole conflicting batch without partially importing or clearing the draft', t => {
+  const x = harness(t); x.advance(at(2,'19:00')); x.manual('09/01/2025','08:00',10,'1.20','manual');
+  x.element('callInput').value = 'draft'; const before = JSON.stringify(calls);
+  assert.equal(x.h.importCalls('1\t09/01/2025\t9:00 AM\t5\tYes\tNo\t$0.60\n2\t09/01/2025\t8:05 AM\t5\tYes\tNo\t$0.60'),false);
+  assert.equal(JSON.stringify(calls),before); assert.equal(x.element('callInput').value,'draft');
+});
+
 function harness(t) {
   setLanguage('en');
   const previousDocument = globalThis.document;

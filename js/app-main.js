@@ -5,6 +5,7 @@ import { wireFinancePlanning, financeInputUsd } from './finance-planning.js';
 import { validFinanceSettings } from './finance-plan-model.js';
 import { normalizeBattleWeapon } from './game-battle.js';
 import { createPropioReceiver, createStorageRevisionGuard, ignorePropioCall } from './propio-bridge.js';
+import { portalRecordsText } from './propio-history-records.js';
 import { settingsWithinBudget, reportLocalPersistenceFailure, readMeta } from './sync.js';
 // Cuerpo principal de la app (Inicio, Horario, Llamadas, Higher Rate, Finanzas, Reportes,
 // Calendario, Ajustes...). Vive como módulo ES aparte para no ser parte del documento HTML: lo
@@ -4711,12 +4712,13 @@ function renderPayDatesSection() {
       return Number.isFinite(a) && Number.isFinite(b) && Math.abs(a - b) <= 2 * 60000;
     }
 
-    function importCalls() {
+    function importCalls(rawText) {
       const ta = document.getElementById('callInput');
-      let parsed = parseCalls(ta.value);
+      const background = typeof rawText === 'string';
+      let parsed = parseCalls(background ? rawText : ta.value);
       if (!parsed.length) {
-        toast(translateText('No se pudo leer la data'));
-        return;
+        if (!background) toast(translateText('No se pudo leer la data'));
+        return false;
       }
 
       const importTs = new Date().toISOString();
@@ -4819,6 +4821,17 @@ function renderPayDatesSection() {
           replaceAcceptedCall(c, zeroCorrection, 'import');
           continue;
         }
+        const zeroLiveMatches = !overlaps.length && Number(c.durationMin) === 0 ? overlapCheckSet.filter(existingCall =>
+          isReplaceableLiveCall(existingCall) && Math.floor(Date.parse(existingCall.startISO) / 60000) === Math.floor(Date.parse(c.startISO) / 60000)) : [];
+        if (zeroLiveMatches.length === 1) {
+          replaceAcceptedCall(c, zeroLiveMatches[0], 'live');
+          continue;
+        }
+        if (zeroLiveMatches.length > 1) {
+          overlapSkipped++;
+          skippedOverlaps.push({ ...c, withCustomerId: zeroLiveMatches[0].customerId, withCallStart: zeroLiveMatches[0].callStart });
+          continue;
+        }
         if (!overlaps.length) {
           overlapCheckSet.push({ ...c, source: 'import' });
           accepted.push({ call: c, replaces: null, replacementKind: null });
@@ -4842,6 +4855,7 @@ function renderPayDatesSection() {
         skippedOverlaps.push({ ...c, withCustomerId: overlapsWith.customerId, withCallStart: overlapsWith.callStart });
       }
 
+      if (background && (overlapSkipped || futureRows.length)) return false;
       if (replacedIds.size) setAppCalls(calls.filter(c => !replacedIds.has(c.id)));
 
       const importedRows = accepted.map(item => {
@@ -4905,9 +4919,9 @@ function renderPayDatesSection() {
       const preferredDay = importedDateList.includes(todayKey)
         ? todayKey
         : importedDateList[importedDateList.length - 1] || defaultActiveDayKey();
-      if (importedRows.length) state.activeDayKey = preferredDay;
+      if (importedRows.length && !background) state.activeDayKey = preferredDay;
 
-      ta.value = '';
+      if (!background) ta.value = '';
       const unique = importedRows.map(item => item.call);
       const lateCount = unique.filter(c => callImportFlag(c)?.cls === 'imported-late').length;
       const historicCount = unique.filter(c => callImportFlag(c)?.cls === 'imported-historic').length;
@@ -4927,6 +4941,7 @@ function renderPayDatesSection() {
         if (saveAll() === false) return false;
         playCallSavedSound('callPasted');
       }
+      if (background) return !overlapSkipped && !futureRows.length;
       renderImportSkippedSummary(skippedDuplicates, skippedOverlaps, futureRows, replacedLive, correctedOfficial);
 
       if (!unique.length && (overlapSkipped || skippedDuplicates.length || futureRows.length)) {
@@ -7919,5 +7934,27 @@ export const applyPropioBridgeEvent = createPropioReceiver({
     if (result && (!state.lastCallEndedAt || Date.parse(state.lastCallEndedAt) < Date.parse(event.at))) state.lastCallEndedAt = event.at;
     return result;
   },
+  importHistory: records => importCalls(portalRecordsText(records)),
+  endScheduledPause: () => endPause({ endedAt: new Date().toISOString(), silent: true }),
   save: saveAll,
 });
+
+export function getPropioBridgePlan() {
+  if (!localStorageRevision.isCurrent()) return null;
+  const day = new Date(), accountingDay = state.shiftStartedAt && !state.shiftEndedAt ? todayCallDateKey(new Date(state.shiftStartedAt)) : todayCallDateKey(day);
+  const planned = getShiftWindow(accountingDay), forced = getDayNote(accountingDay)?.forcedStatus;
+  if (forced === 'off' || (planned.off && forced !== 'work')) return null;
+  const base = callDateToDate(accountingDay) || day, start = dateAtTime(base, planned.start), end = dateAtTime(base, planned.end);
+  if (end <= start) end.setDate(end.getDate() + 1);
+  const activeStart = state.shiftStartedAt && !state.shiftEndedAt ? Date.parse(state.shiftStartedAt) : NaN;
+  const since = Number.isFinite(activeStart) && activeStart < end.getTime() ? Math.min(activeStart, start.getTime()) : start.getTime();
+  const pauseDuration = state.activePause ? referenceDurationMinForActivePause(currentShiftAccountingDayKey(day)) : null;
+  const lastPause = state.pauseHistory.filter(pause => Date.parse(pause.endedAt) >= since && Date.parse(pause.endedAt) <= day.getTime())
+    .sort((a, b) => Date.parse(b.endedAt) - Date.parse(a.endedAt))[0];
+  return { startAt: start.toISOString(), endAt: end.toISOString(),
+    hasCall: Boolean(state.activeCall) || calls.some(call => Date.parse(call.startISO) >= since && Date.parse(call.startISO) < end.getTime()),
+    ended: Boolean(state.shiftEndedAt && Date.parse(state.shiftEndedAt) >= start.getTime()),
+    pause: state.activePause ? { type: state.activePause.type, startedAt: state.activePause.startedAt,
+      endsAt: Number.isFinite(pauseDuration) && pauseDuration > 0 ? new Date(Date.parse(state.activePause.startedAt) + pauseDuration * 60000).toISOString() : null } : null,
+    lastPause: lastPause ? { type: lastPause.type, startedAt: lastPause.startedAt, endedAt: lastPause.endedAt } : null };
+}

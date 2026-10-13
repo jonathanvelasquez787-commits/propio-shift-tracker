@@ -21,7 +21,7 @@ export function createStorageRevisionGuard(storage, keys) {
   };
 }
 
-export function createPropioReceiver({ getState, getCalls, start, end, catchUp, startSession, endSession, save, canReceive = () => true, now = () => Date.now() }) {
+export function createPropioReceiver({ getState, getCalls, start, end, catchUp, startSession, endSession, endScheduledPause, importHistory, save, canReceive = () => true, now = () => Date.now() }) {
   function remember(state, event) {
     const cutoff = now() - 48*60*60*1000;
     const receipts = Array.isArray(state.propioBridgeReceipts) ? state.propioBridgeReceipts : [];
@@ -35,6 +35,21 @@ export function createPropioReceiver({ getState, getCalls, start, end, catchUp, 
     const state = getState();
     if (!state) return { status: 'blocked', reason: 'app-not-ready' };
     if (Array.isArray(state.propioBridgeReceipts) && state.propioBridgeReceipts.some(r => r?.id === event.id)) return save() === false ? { status: 'blocked', reason: 'storage' } : { status: 'ok', duplicate: true };
+    if (event.type === 'pause-end') {
+      if (!endScheduledPause) return { status: 'blocked', reason: 'update-tracker' };
+      if (state.activeCall || state.pendingLiveCallBackup) return { status: 'blocked', reason: 'pending-call-review' };
+      if (state.activePause?.type !== event.pauseType || state.activePause?.startedAt !== event.startedAt || state.shiftEndedAt) {
+        return { ...remember(state, event), superseded: true };
+      }
+      if (endScheduledPause(event) === false) return { status: 'blocked', reason: 'storage' };
+      return remember(getState(), event);
+    }
+    if (event.type === 'history-records') {
+      if (!importHistory) return { status: 'blocked', reason: 'update-tracker' };
+      if (state.activeCall || state.pendingLiveCallBackup) return { status: 'blocked', reason: 'pending-call-review' };
+      if (importHistory(event.records) === false) return { status: 'blocked', reason: 'history-needs-review' };
+      return remember(getState(), event);
+    }
     if (event.type.startsWith('session-')) {
       if (!startSession || !endSession) return { status: 'blocked', reason: 'update-tracker' };
       if (state.pendingLiveCallBackup) return { status: 'blocked', reason: 'pending-call-review' };
@@ -73,7 +88,7 @@ export function createPropioReceiver({ getState, getCalls, start, end, catchUp, 
   };
 }
 
-export function installPropioBridge({ host = globalThis.window, accountScope, receive }) {
+export function installPropioBridge({ host = globalThis.window, accountScope, receive, getPlan = () => null }) {
   if (!host || !accountScopeValid(accountScope)) return () => {};
   const nonce = host.crypto.randomUUID();
   let queue = Promise.resolve(), closed = false;
@@ -81,7 +96,7 @@ export function installPropioBridge({ host = globalThis.window, accountScope, re
   const listener = message => {
     if (message.source !== host || message.origin !== host.location.origin || message.data?.protocol !== BRIDGE_PROTOCOL || message.data.direction !== 'extension') return;
     const packet = message.data;
-    if (packet.kind === 'hello') { post({ kind: 'ready' }); return; }
+    if (packet.kind === 'hello') { post({ kind: 'ready', plan: getPlan() }); return; }
     if (packet.kind !== 'event' || packet.nonce !== nonce || packet.accountScope !== accountScope || !bridgeId(packet.requestId)) return;
     queue = queue.then(async () => {
       if (closed) return;
@@ -94,6 +109,6 @@ export function installPropioBridge({ host = globalThis.window, accountScope, re
     });
   };
   host.addEventListener('message', listener);
-  post({ kind: 'ready' });
+  post({ kind: 'ready', plan: getPlan() });
   return () => { closed = true; host.removeEventListener('message', listener); };
 }
