@@ -780,7 +780,7 @@ test('tercera simulación mensual: ACW se recalcula al editar borrar o vaciar ll
 
 test('tercera simulación mensual: pegar llamadas de hoy vuelve a auto iniciar el turno', () => {
   const appMain = read('js/app-main.js');
-  const importing = appMain.slice(appMain.indexOf('function importCalls()'), appMain.indexOf('function clearCallInputBox'));
+  const importing = appMain.slice(appMain.indexOf('function importCalls('), appMain.indexOf('function clearCallInputBox'));
   assert.match(importing, /autoStartShiftFromCalls\(true\)/);
   assert.match(importing, /!state\.shiftStartedAt && !state\.shiftEndedAt/);
 });

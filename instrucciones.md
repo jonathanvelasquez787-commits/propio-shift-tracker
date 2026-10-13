@@ -317,20 +317,42 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
-Extensión unificada 2.0.0: conexión al tracker y resumen opcional en un mismo
-paquete. Dos interruptores independientes; resumen oculto por defecto, sin
-necesidad de vincular cuenta, con idioma/conversión configurables y cambio
-en vivo. Popup nuevo en claro/oscuro e icono original de la tool. Conserva
-la conexión y la cola al recargar la misma carpeta; no añade permisos.
-654 pruebas y builds correctos. Chromium aislado verificó preferencias,
-total paginado, ocultar durante cálculo/restaurar página, iconos, ambas
-paletas y sesión/llamadas/cierre con backend ficticio sobre la tool publicada.
-La carpeta que el usuario indicó, Downloads/extensiones, estaba vacía; se
-repuso el paquete en su ruta anterior propio-bridge. Falta recargar esa
-extensión en Chrome y desactivar el resumen separado si continúa habilitado.
-El inicio de sesión real fue confirmado por el usuario; variantes de señales
-de llamadas y la redirección de salida se validaron con simulación, no con una
-llamada real del portal. CI/publicación del cambio se verifican por SHA aparte.
+v606 y extensión unificada 2.1.0: popup de 400px con ancho fijado en la raíz;
+contador oficial separado de llamadas observadas. Recupera siete columnas
+validadas del historial (también cero minutos), vuelve a validar en la tool,
+deduplica/corrige por la importación existente y preserva borradores/día activo.
+Las filas visibles se guardan con el resumen oculto; en filtros explícitos de
+hoy recorre hasta 2.000 filas y restaura página. Filas pendientes/futuras no
+inventan datos; cambios de filtro cancelan el recorrido. La cola conserva hasta
+200 eventos por 24h y se sincroniza al volver a la cuenta vinculada. No consulta
+historiales que Propio no haya cargado ni endpoints privados de llamadas.
+
+Disponibilidad automática opcional, apagada por defecto: primera llamada desde
+el horario (también entrando tarde), Break y Lunch con interruptores separados.
+El regreso de pausas puede esperar al cierre manual o cerrar por duración
+programada; en ese modo confirma primero el cierre en la tool. Solo pulsa
+Start Calls con sesión/Offline/botón habilitado confirmados y un portal; no
+acepta, rechaza ni elige llamadas. Reintenta cada 15s hasta conexión manual;
+recargar/apagar y encender no repite la primera llamada ni una pausa terminada.
+Horario de la misma cuenta transmitido por handshake, sin nombres ni tokens;
+no actúa fuera del turno, durante llamada/pausa sin cerrar ni con estado dudoso.
+El login temprano mantiene el inicio real del Shift: el margen de 10 minutos
+solo limita el botón manual. OPI/video/third party quedan a elección del usuario;
+la propuesta anterior de aceptar OPI automáticamente fue reemplazada por esto.
+
+667 pruebas y builds app/puente/resumen correctos. Chromium aislado: dos filas
+cero, datos incompletos, paginación/restauración, tracker cerrado/reinicio,
+corrección con misma identidad, recarga; popup desde viewport 260 a raíz 400px,
+ambos temas y preferencias. Horario real de la tool a worker, Start Calls al
+entrar tarde, no Accept automático, vuelta a Offline, aceptación manual detiene
+preparación, Lunch por duración cerrado por receptor real y recarga persistente.
+Resumen conserva separación de 8px en seis layouts/anchuras y cálculo paginado.
+Falta validar controles de una llamada real y Save con capturas del usuario,
+previstas para mañana. El login real fue confirmado; cierre redirigido y señales
+siguen probados en simulación. Archivos se entregan en la carpeta existente
+Downloads/extensiones/propio-bridge; Chrome requiere cargar la versión 2.1.0
+para activarla. No se restauró una segunda extensión separada. CI/publicación
+se confirman por SHA en la evidencia de cierre.
 
 Avisos v605: tres sonidos independientes al guardar una llamada terminada
 (incluido puente/respaldo live), un lote pegado o una manual nueva. Apagados
@@ -852,6 +874,20 @@ La aplicación funciona en producción con estas bases vigentes:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v606 / extensión 2.1.0 — Historial y disponibilidad opcional.**
+
+- Root del popup fija 400px; contador oficial distingue filas de detección live.
+- Historial de siete campos validado en extensión y tool, colas con tracker
+  cerrado, cero minutos, correcciones sin duplicados y paginación de hoy.
+- Importación de fondo respeta borrador/día activo y retiene lotes conflictivos.
+- Primera llamada, Break y Lunch opcionales; pausas con regreso manual o por
+  duración. Solo Start Calls/Offline confirmado; jamás Accept automático.
+- Horario vinculado, llegada tarde y cierre de pausa confirmado antes de
+  disponibilidad. No reanuda una pausa nueva por una señal vieja ni se repite
+  después de conectar; apagar cancela cierres aún no entregados.
+- 667 pruebas, builds y recorridos ficticios correctos. Pantallas nativas de
+  llamada/Save pendientes de captura; entrega/publicación se verifican aparte.
+
 **Extensión 2.0.0 — Tracker y resumen unidos.**
 
 - Visibilidad del resumen independiente del registro automático; preferencias
@@ -864,7 +900,7 @@ La aplicación funciona en producción con estas bases vigentes:
   el aviso fuera del desplegable, para que siempre sea visible.
 - Apagar el resumen retira observadores y listeners del portal; no consulta
   filas ni mantiene trabajo de actualización cuando está oculto.
-- 654 pruebas, builds app/extensiones y recorridos Chromium aislados correctos.
+- 655 pruebas, builds app/extensiones y recorridos Chromium aislados correctos.
   Carpeta anterior de conexión repuesta con el paquete; no cambia su ruta.
 
 **v605 — Sonidos de llamadas en Avisos.**
@@ -877,16 +913,3 @@ La aplicación funciona en producción con estas bases vigentes:
   Previews de Avisos se ajustan a móvil sin perder contenido.
 - 631 pruebas, diez nuevas; once flujos Chrome y doce vistas ES/EN;
   2.243 textos y builds app/puente/resumen correctos. Release se verifica aparte.
-
-**v604 — Auditoría profunda de Finanzas del 12–13/10/2026.**
-
-- Reservas/filas/categorías/colas rechazadas vuelven al estado anterior;
-  tarifa y meta se guardan juntas, sin reemplazar propietarios ganadores.
-- Pagos, comparaciones mensuales y pendientes por fila coherentes;
-  confirmaciones actuales, respaldos validados y categorías antiguas visibles.
-- Centavos y cambios de moneda conservan el valor; bonos de texto no
-  concatenan ganancias. Estimaciones opcionales y premios por reserva real.
-- 621 pruebas, 35 días con oráculo independiente, diez comprobaciones
-  interactivas de integridad, 24 vistas y tooltips ES/EN. Build y escaneo OK.
-- Informe y límites: docs/auditoria-finanzas-2026-10-13.md; publicación
-  comprobada por CI, Vercel y release en la evidencia final.

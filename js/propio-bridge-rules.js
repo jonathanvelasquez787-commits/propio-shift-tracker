@@ -1,3 +1,4 @@
+import { validatePortalRecord } from './propio-history-records.js';
 export const BRIDGE_PROTOCOL = 'pst-propio-bridge/v1';
 export const TRACKER_ORIGIN = 'https://propio-shift-tracker.vercel.app';
 export const PORTAL_ORIGIN = 'https://interpreters.propio-ls.com';
@@ -5,12 +6,36 @@ export const TWILIO_EVENT_ORIGINS = Object.freeze(['https://eventgw.twilio.com',
 export const BRIDGE_MAX_AGE = 24 * 60 * 60 * 1000;
 export const bridgeId = value => typeof value === 'string' && /^[a-zA-Z0-9_-]{12,100}$/.test(value);
 export const accountScopeValid = value => typeof value === 'string' && /^[a-f0-9]{64}$/.test(value);
+export function validateBridgePlan(value, now = Date.now()) {
+  if (!value || typeof value !== 'object' || typeof value.startAt !== 'string' || typeof value.endAt !== 'string') return null;
+  const start = Date.parse(value.startAt), end = Date.parse(value.endAt);
+  if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start || end - start > BRIDGE_MAX_AGE || Math.abs(start - now) > BRIDGE_MAX_AGE) return null;
+  const pause = (input, completed) => {
+    if (!input || !['break','lunch'].includes(input.type) || typeof input.startedAt !== 'string') return null;
+    const started = Date.parse(input.startedAt), ended = Date.parse(completed ? input.endedAt : input.endsAt);
+    if (!Number.isFinite(started) || started > now || now - started > BRIDGE_MAX_AGE) return null;
+    return { type: input.type, startedAt: new Date(started).toISOString(),
+      [completed ? 'endedAt' : 'endsAt']: Number.isFinite(ended) && ended > started && ended - started <= BRIDGE_MAX_AGE && (!completed || ended <= now) ? new Date(ended).toISOString() : null };
+  };
+  return { startAt: new Date(start).toISOString(), endAt: new Date(end).toISOString(), hasCall: value.hasCall === true, ended: value.ended === true,
+    pause: pause(value.pause, false), lastPause: pause(value.lastPause, true) };
+}
 export function validateBridgeEvent(value, now = Date.now()) {
   if (!value || typeof value !== 'object' || Array.isArray(value) || value.version !== 1 || !bridgeId(value.id)) return null;
-  if (!['call-start','call-end','session-start','session-end','available','unavailable'].includes(value.type)) return null;
+  if (!['call-start','call-end','session-start','session-end','available','unavailable','history-records','pause-end'].includes(value.type)) return null;
   const time = typeof value.at === 'string' ? Date.parse(value.at) : NaN;
   if (!Number.isFinite(time) || time > now + 10000 || now - time > BRIDGE_MAX_AGE) return null;
   const event = { version: 1, id: value.id, type: value.type, at: new Date(time).toISOString() };
+  if (value.type === 'pause-end') {
+    const start = typeof value.startedAt === 'string' ? Date.parse(value.startedAt) : NaN;
+    if (!['break','lunch'].includes(value.pauseType) || !Number.isFinite(start) || start >= time || now - start > BRIDGE_MAX_AGE) return null;
+    event.pauseType = value.pauseType; event.startedAt = new Date(start).toISOString();
+  }
+  if (value.type === 'history-records') {
+    if (!Array.isArray(value.records) || !value.records.length || value.records.length > 100) return null;
+    event.records = value.records.map(record => validatePortalRecord(record, now));
+    if (event.records.some(record => !record)) return null;
+  }
   if (value.type.startsWith('session-')) {
     if (!bridgeId(value.sessionId)) return null;
     event.sessionId = value.sessionId;

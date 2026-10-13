@@ -53,7 +53,7 @@ test('auditoría profunda: reiniciar día protege llamada activa o respaldo live
 
 test('auditoría profunda: pegar solo duplicados omitidos no crea evento falso ni ensucia estado', () => {
   const app = read('js/app-main.js');
-  const start = app.indexOf('function importCalls()');
+  const start = app.indexOf('function importCalls(');
   const end = app.indexOf('function clearCallInputBox', start);
   const body = app.slice(start, end);
   assert.match(body, /const importChangedData = unique\.length \|\| replacedLive\.length \|\| correctedOfficial\.length/);

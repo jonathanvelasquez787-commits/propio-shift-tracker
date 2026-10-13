@@ -128,6 +128,7 @@ export function installPortalSummary({ enabledByDefault = true } = {}) {
     if (!initial?.pager) return;
     totalCache = null; scanMessage = '';
     running = { controller: new AbortController(), context: initial.context, total: initial.range.total, size: initial.range.size, progress: 0, external: false };
+    document.documentElement.dataset.propioHistoryScan = 'summary';
     refresh();
     try {
       const result = await collectPortalPages({ read: snapshot, move: movePage, signal: running.controller.signal,
@@ -136,7 +137,7 @@ export function installPortalSummary({ enabledByDefault = true } = {}) {
     } catch (error) {
       scanMessage = error.message;
       $('details').hidden = false; $('toggle').setAttribute('aria-expanded', 'true');
-    } finally { running = null; last = ''; refresh(); }
+    } finally { if (document.documentElement.dataset.propioHistoryScan === 'summary') delete document.documentElement.dataset.propioHistoryScan; running = null; last = ''; refresh(); }
   });
   $('toggle').addEventListener('click', () => {
     const expanded = $('details').hidden;

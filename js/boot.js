@@ -754,9 +754,9 @@ async function boot() {
 
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('pst-propio-bridge/v1:' + userId));
   const accountScope = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('');
-  const { applyPropioBridgeEvent } = await import('./app-main.js');
+  const { applyPropioBridgeEvent, getPropioBridgePlan } = await import('./app-main.js');
   if (bridgeUserId !== userId) return;
-  stopPropioBridge = installPropioBridge({ accountScope, receive: applyPropioBridgeEvent });
+  stopPropioBridge = installPropioBridge({ accountScope, receive: applyPropioBridgeEvent, getPlan: getPropioBridgePlan });
 
   normalizeAppAddress();
   wireSyncStatus();

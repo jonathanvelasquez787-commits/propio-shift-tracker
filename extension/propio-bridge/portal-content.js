@@ -1,16 +1,18 @@
 import { createPortalObserver } from './portal-observer.js';
+import { createHistoryObserver } from './history-observer.js';
 if (location.origin === 'https://interpreters.propio-ls.com' && window.top === window) {
-  const observer = createPortalObserver({ document, documentId: crypto.randomUUID(), send: packet => chrome.runtime.sendMessage(packet) });
+  const context = { document, documentId: crypto.randomUUID(), send: packet => chrome.runtime.sendMessage(packet) };
+  const observer = createPortalObserver(context), history = createHistoryObserver(context);
   let inFlight = false;
   const tick = async () => {
-    if (observer.isStopped()) { clearInterval(timer); return; }
+    if (observer.isStopped()) { history.stop(); clearInterval(timer); return; }
     try {
-      if (!chrome.runtime.id) { observer.stop(); clearInterval(timer); return; }
-      if (!inFlight) { inFlight = true; await observer.sample(); }
-    } catch { observer.stop(); clearInterval(timer); }
+      if (!chrome.runtime.id) { observer.stop(); history.stop(); clearInterval(timer); return; }
+      if (!inFlight) { inFlight = true; const reply = await observer.sample(); await history.sample(reply?.historyEnabled); }
+    } catch { observer.stop(); history.stop(); clearInterval(timer); }
     finally { inFlight = false; }
   };
   const timer = setInterval(tick, 1000);
-  window.addEventListener('pagehide', event => { if (!event.persisted) { observer.stop(); clearInterval(timer); } });
+  window.addEventListener('pagehide', event => { if (!event.persisted) { observer.stop(); history.stop(); clearInterval(timer); } });
   void tick();
 }

@@ -858,7 +858,9 @@
         "extension/propio-bridge/summary-content.js",
         "extension/propio-summary/options.js",
         "js/propio-history.js",
-        "js/propio-history-pages.js"
+        "js/propio-history-pages.js",
+        "js/propio-history-records.js",
+        "extension/propio-bridge/history-observer.js"
       ],
       "tests": [
         {
@@ -903,7 +905,13 @@
             "multiple writable tracker tabs and rejected app acknowledgments hold queue",
             "reviewed pending signals require a popup action and return to observation",
             "reconnecting a paired account is idempotent; changing account or pausing cannot orphan an active call",
-            "window bridge validates source, origin, scope and nonce, and stops after logout"
+            "window bridge validates source, origin, scope and nonce, and stops after logout",
+            "official history count works in observation; automatic records survive a closed tracker, reconcile once and isolate accounts",
+            "first-call preparation waits for the schedule, supports late arrival, retries only confirmed Offline and stops after manual connection across restart",
+            "preparation is opt-in and holds outside the shift, after tool completion, with duplicate portal tabs or missing schedule",
+            "portal preparation clicks only an explicit Offline Start Calls button and never Accept or ambiguous controls",
+            "Break and Lunch resume independently after manual completion or acknowledged timed closure; unknown duration and disabled choices hold",
+            "turning off timed resume cancels undelivered pause closure and an unknown pause duration cannot trigger it"
           ]
         },
         {
@@ -948,6 +956,15 @@
             "unified summary is opt-in and preference updates preserve enabled state and valid conversion",
             "disabled summary has no portal observers, interaction listeners or history reads and releases them after toggling off",
             "summary status, plural calls and scan errors follow the selected language"
+          ]
+        },
+        {
+          "file": "tests/propio-history-records.test.mjs",
+          "namedCases": [
+            "official history validates seven fields, preserves zero-minute rows and strips unrelated client data",
+            "history events are bounded, revalidate rows in the tracker and cannot hide bad fields in a batch",
+            "history delivery respects account revision and active-call review, retries storage rejection and receipts prevent replay",
+            "scheduled pause end closes only its matching pause, blocks calls and never closes a newer pause or a finished shift"
           ]
         }
       ]

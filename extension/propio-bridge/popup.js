@@ -13,8 +13,9 @@ const reasons = {
   'tracker-needs-review': 'El tracker requiere revisión: puede haber una llamada manual, un traslape o un problema al guardar.',
   storage: 'No se pudo guardar el estado. Reintentá la conexión.',
 };
-const labels = { 'session-start': 'Sesión iniciada · Shift', 'session-end': 'Sesión cerrada · Shift', incoming: 'Llamada entrante', accepted: 'Llamada aceptada', rejected: 'Llamada rechazada', disconnected: 'Llamada terminada', available: 'Disponible', unavailable: 'Fuera de línea' };
+const labels = { history: 'Historial oficial recuperado', 'session-start': 'Sesión iniciada · Shift', 'session-end': 'Sesión cerrada · Shift', incoming: 'Llamada entrante', accepted: 'Llamada aceptada', rejected: 'Llamada rechazada', disconnected: 'Llamada terminada', available: 'Disponible', unavailable: 'Fuera de línea' };
 const send = packet => chrome.runtime.sendMessage(packet);
+labels['start-calls'] = 'Disponibilidad automática · Start Calls'; labels['pause-end'] = 'Fin de pausa programado';
 let busy = false, feedback = '';
 async function refresh() {
   const state = await send({ kind: 'status' });
@@ -24,6 +25,11 @@ async function refresh() {
   document.getElementById('detail').classList.toggle('error', Boolean(feedback || state.attention));
   const badge = document.getElementById('connectionBadge'); badge.textContent = state.paired ? 'Vinculada' : 'Sin vincular'; badge.classList.toggle('connected', state.paired);
   document.getElementById('observedCount').textContent = String(state.completed);
+  document.getElementById('historyCount').textContent = state.history ? String(state.history.count) : '—';
+  document.getElementById('historyScope').textContent = state.history?.coverage === 'range' ? 'En el historial de hoy' : 'En la página del historial';
+  document.getElementById('historyStatus').textContent = state.history
+    ? `${state.history.invalid ? `${state.history.invalid} fila(s) pendiente(s) de datos válidos. ` : ''}Última lectura: ${new Date(state.history.at).toLocaleTimeString('es')}.${state.mode !== 'auto' ? ' Activá el registro para sincronizarlas.' : ''}`
+    : 'Abrí el historial de Propio para leer y recuperar sus llamadas.';
   document.getElementById('pendingCount').textContent = String(state.queued);
   document.getElementById('pair').textContent = state.paired ? 'Volver a vincular' : 'Vincular cuenta';
   document.getElementById('pair').classList.toggle('primary', !state.paired);
@@ -32,6 +38,23 @@ async function refresh() {
   const callStatus = state.active ? 'Llamada activa detectada.' : state.call === 'connected' ? 'Hay una llamada visible cuyo inicio no se observó; revisala en el tracker.' : state.call === 'incoming' ? 'Llamada entrante visible.' : state.call === 'idle' ? 'Controles de llamadas reconocidos.' : 'Controles de llamadas sin confirmar.';
   document.getElementById('portalStatus').textContent = !state.paired ? 'Vinculá tu cuenta para habilitar el registro. El resumen funciona por separado.' : state.portal === 'authenticated' ? `Sesión reconocida. ${callStatus}` : state.portal === 'logged-out' ? 'Cierre de sesión confirmado en Propio.' : 'Abrí Propio para reconocer tu sesión.';
   toggle.checked = state.mode === 'auto'; toggle.disabled = busy || !state.paired;
+  const prep = state.preparation, prepToggle = document.getElementById('prepareFirst');
+  prepToggle.checked = prep?.enabled === true; prepToggle.disabled = busy || !state.paired;
+  const plan = prep?.plan;
+  document.getElementById('prepareStatus').textContent = !prep?.enabled ? 'Opcional. Se detiene cuando conectás la primera llamada.'
+    : state.mode !== 'auto' ? 'Activá «Registrar en mi tracker» para usar esta opción.'
+    : !plan ? 'Abrí tu tracker para leer el horario de hoy; en día libre no se activa.'
+    : prep.doneFor === plan.startAt || plan.hasCall ? 'Primera llamada tomada. No volverá a pulsar Start Calls en este turno.'
+    : plan.ended || Date.now() >= Date.parse(plan.endAt) ? 'Turno terminado. No se vuelve a poner disponible.'
+    : `Desde ${new Date(plan.startAt).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })}: pulsa Start Calls solo con Offline confirmado. Nunca acepta llamadas. Apagalo si querés permanecer Offline.`;
+  const resume = prep?.resume || { break: false, lunch: false, mode: 'manual' };
+  for (const [id, name] of [['resumeBreak','break'],['resumeLunch','lunch']]) {
+    const input = document.getElementById(id); input.checked = resume[name]; input.disabled = busy || !state.paired;
+  }
+  document.getElementById('resumeMode').value = resume.mode; document.getElementById('resumeMode').disabled = busy || !state.paired;
+  document.getElementById('resumeStatus').textContent = resume.mode === 'timed'
+    ? 'Cierra la pausa en la tool al cumplirse su duración, después pulsa Start Calls con Offline confirmado. Requiere el tracker abierto para confirmar el cierre.'
+    : 'Espera a que terminés la pausa en la tool. Vuelve a poner disponible hasta tu siguiente llamada; vos la aceptás.';
   for (const id of ['pair', 'open']) document.getElementById(id).disabled = busy;
   document.getElementById('reviewed').hidden = !state.queued && !(state.mode === 'auto' && state.active);
   const list = document.getElementById('signals'); list.replaceChildren();
@@ -63,6 +86,9 @@ async function act(packet) {
 document.getElementById('open').addEventListener('click', () => act({ kind: 'open-tracker' }));
 document.getElementById('pair').addEventListener('click', () => act({ kind: 'pair' }));
 document.getElementById('automatic').addEventListener('change', event => act({ kind: 'mode', mode: event.target.checked ? 'auto' : 'observe' }));
+document.getElementById('prepareFirst').addEventListener('change', event => act({ kind: 'prepare-first', enabled: event.target.checked }));
+for (const id of ['resumeBreak','resumeLunch','resumeMode']) document.getElementById(id).addEventListener('change', () => act({ kind: 'resume-options',
+  break: document.getElementById('resumeBreak').checked, lunch: document.getElementById('resumeLunch').checked, mode: document.getElementById('resumeMode').value }));
 document.getElementById('reviewed').addEventListener('click', () => {
   if (window.confirm('¿Ya revisaste o registraste estas llamadas en el tracker? Se descartarán las señales pendientes y volverá el modo de observación. Una llamada activa en el tracker requiere revisión allí.')) act({ kind: 'clear-reviewed' });
 });
