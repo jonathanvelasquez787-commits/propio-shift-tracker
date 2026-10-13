@@ -10,7 +10,7 @@ let financeConvertedNote, financeRunAutoFillCascade, formatCallDayLabel, formatD
 let formatMinutes, gapLabelText, getActiveDayKey, higherRateBonusForCall, higherRateTierBadgeHtml;
 let iconHtml, importedCallStats, isoDateFromDayKey, makeLocalId, money, onGameCallSaved, onGameCallsChanged, openModal;
 let pad, parseMoney, rateTilePerMin, renderRateTiles, sameCallDay, saveAll, timeLabelFromDate;
-let toDateFromInputs, toast, todayCallDateKey;
+let toDateFromInputs, toast, todayCallDateKey, playCallSavedSound;
 
 export function configureCallsContext(context) {
   ({ HIGHER_RATE_TIERS, MAX_CALL_DURATION_MIN, appConfirm, autoStartShiftFromCalls, callDateKeyFromValue, callDedupeKey,
@@ -20,7 +20,7 @@ export function configureCallsContext(context) {
     formatMinutes, gapLabelText, getActiveDayKey, higherRateBonusForCall, higherRateTierBadgeHtml,
     iconHtml, importedCallStats, isoDateFromDayKey, makeLocalId, money, onGameCallSaved, onGameCallsChanged, openModal,
     pad, parseMoney, rateTilePerMin, renderRateTiles, sameCallDay, saveAll, timeLabelFromDate,
-    toDateFromInputs, toast, todayCallDateKey } = context);
+    toDateFromInputs, toast, todayCallDateKey, playCallSavedSound } = context);
 }
 
 let editingCallId = null;
@@ -565,6 +565,7 @@ export function saveManualCall() {
   financeRunAutoFillCascade();
   if (saveAll() === false) return false;
   toast(translateText('Llamada agregada'));
+  playCallSavedSound?.(pendingBackup ? 'callEnded' : 'callManual');
   onGameCallSaved(candidate, pendingBackup ? 'live' : 'manual');
   onGameCallsChanged(affectedDayKey);
 }
@@ -597,6 +598,7 @@ export function autoSaveLiveCall(startedAtISO, endedAtISO, liveContext = null) {
     financeRunAutoFillCascade();
     if (saveAll() === false) return false;
     toast(ui`Llamada guardada (${formatDuration(durationMin * 60000)}) — edítala en Tabla de llamadas si hace falta`);
+    playCallSavedSound?.('callEnded');
     onGameCallSaved(candidate, 'live');
     return true;
   }

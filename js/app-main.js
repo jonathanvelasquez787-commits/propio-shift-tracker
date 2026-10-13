@@ -753,6 +753,18 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
         breakEndAlarmCustomSoundDataUrl: '',
         breakEndAlarmCustomSoundName: '',
         breakEndAlarmMessage: '⏰ Tu {tipo} termina pronto ({hora})',
+        callEndedSoundEnabled: false,
+        callEndedAlarmSound: 'classic',
+        callEndedAlarmCustomSoundDataUrl: '',
+        callEndedAlarmCustomSoundName: '',
+        callPastedSoundEnabled: false,
+        callPastedAlarmSound: 'classic',
+        callPastedAlarmCustomSoundDataUrl: '',
+        callPastedAlarmCustomSoundName: '',
+        callManualSoundEnabled: false,
+        callManualAlarmSound: 'classic',
+        callManualAlarmCustomSoundDataUrl: '',
+        callManualAlarmCustomSoundName: '',
         // Adherencia estilo Calabrio (minuto a minuto, ver computeMinuteAdherence) con ventana de
         // gracia configurable alrededor de cada transición planeada (inicio/fin de Trabajo/
         // Break/Lunch).
@@ -891,6 +903,14 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
         if (typeof settings[nameKey] !== 'string') settings[nameKey] = fallback[nameKey];
         if (settings[soundKey] === 'custom' && !settings[urlKey]) settings[soundKey] = 'classic';
         if (typeof settings[msgKey] !== 'string' || !settings[msgKey].trim()) settings[msgKey] = fallback[msgKey];
+      });
+      ['callEnded', 'callPasted', 'callManual'].forEach(kind => {
+        const soundKey = `${kind}AlarmSound`, urlKey = `${kind}AlarmCustomSoundDataUrl`, nameKey = `${kind}AlarmCustomSoundName`;
+        if (typeof settings[`${kind}SoundEnabled`] !== 'boolean') settings[`${kind}SoundEnabled`] = false;
+        if (!['classic','chime','custom'].includes(settings[soundKey])) settings[soundKey] = 'classic';
+        if (typeof settings[urlKey] !== 'string' || settings[urlKey].length > 411000 || (settings[urlKey] && !/^data:audio\/[^;,]+;base64,[A-Za-z0-9+/]+={0,2}$/.test(settings[urlKey]))) settings[urlKey] = '';
+        if (typeof settings[nameKey] !== 'string') settings[nameKey] = '';
+        if (settings[soundKey] === 'custom' && !settings[urlKey]) settings[soundKey] = 'classic';
       });
       // Se descarta cualquier ventana mal formada (sin fecha/horario válido o nivel desconocido).
       if (!settings.scheduleOverridesByWeek || typeof settings.scheduleOverridesByWeek !== 'object' || Array.isArray(settings.scheduleOverridesByWeek)) {
@@ -1771,6 +1791,7 @@ function renderAlertTemplate(template, vars) {
 
 // Reproduce el sonido configurado para uno de los 3 avisos de turno/Break/Lunch.
 function playConfiguredAlarmSound(sound, customSoundDataUrl) {
+  if (getMasterVolumeFraction() === 0) return;
   if (sound === 'custom' && customSoundDataUrl) {
     try {
       const audio = new Audio(customSoundDataUrl);
@@ -1784,6 +1805,12 @@ function playConfiguredAlarmSound(sound, customSoundDataUrl) {
   }
   if (sound === 'chime') playProductiveBreakChimeTone();
   else playShiftAlarmBeep();
+}
+
+function playCallSavedSound(kind) {
+  const cfg = ALARM_SOUND_CONFIGS[kind];
+  if (!cfg?.enabledKey || settings[cfg.enabledKey] !== true || getMasterVolumeFraction() === 0) return;
+  playConfiguredAlarmSound(settings[cfg.soundKey], settings[cfg.urlKey]);
 }
 
 // Revisa cada segundo si entramos a la ventana [hora planeada − alertBeforeShiftMin, hora
@@ -4896,6 +4923,7 @@ function renderPayDatesSection() {
         setEvent('import', translateText('Llamadas importadas'), ui`${unique.length} fila(s) · ${importNote}${overlapNote}${duplicateNote}${futureNote}${replacedNote}${correctedNote}`, 'Propio');
         financeRunAutoFillCascade();
         if (saveAll() === false) return false;
+        playCallSavedSound('callPasted');
       }
       renderImportSkippedSummary(skippedDuplicates, skippedOverlaps, futureRows, replacedLive, correctedOfficial);
 
@@ -5335,7 +5363,7 @@ function renderPayDatesSection() {
       formatMinutes, gapLabelText, getActiveDayKey, higherRateBonusForCall, higherRateTierBadgeHtml,
       iconHtml, importedCallStats, isoDateFromDayKey, makeLocalId, money, onGameCallSaved, onGameCallsChanged, openModal,
       pad, parseMoney, rateTilePerMin, renderRateTiles, sameCallDay, saveAll, timeLabelFromDate,
-      toDateFromInputs, toast, todayCallDateKey,
+      toDateFromInputs, toast, todayCallDateKey, playCallSavedSound,
     });
     configureHigherRateContext({
       HIGHER_RATE_EARLY_GRACE_MIN, HIGHER_RATE_TIERS, appConfirm, callDateKeyFromValue, callDateToDate,
@@ -5394,6 +5422,7 @@ function renderPayDatesSection() {
         const cfg = ALARM_SOUND_CONFIGS[kind];
         const select = document.getElementById(cfg.selectId);
         if (select && document.activeElement !== select) select.value = settings[cfg.soundKey] || 'classic';
+        if (cfg.toggleId) document.getElementById(cfg.toggleId).checked = settings[cfg.enabledKey] === true;
         syncAlarmCustomSoundUI(kind);
       });
       // Los 5 campos "Mensaje" dejaron de ser editables (ver MESSAGE_PREVIEW_CONFIGS/syncMessagePreview más abajo)
@@ -5616,7 +5645,23 @@ function renderPayDatesSection() {
         soundKey: 'breakEndAlarmSound', urlKey: 'breakEndAlarmCustomSoundDataUrl', nameKey: 'breakEndAlarmCustomSoundName',
         selectId: 'breakEndAlarmSoundInput', sectionId: 'breakEndAlarmCustomSoundSection', statusId: 'breakEndAlarmSoundFileStatus', fileInputId: 'breakEndAlarmSoundFile',
       },
+      callEnded: {
+        soundKey:'callEndedAlarmSound', urlKey:'callEndedAlarmCustomSoundDataUrl', nameKey:'callEndedAlarmCustomSoundName', enabledKey:'callEndedSoundEnabled',
+        selectId:'callEndedAlarmSoundInput', sectionId:'callEndedAlarmCustomSoundSection', statusId:'callEndedAlarmSoundFileStatus', fileInputId:'callEndedAlarmSoundFile',
+        toggleId:'callEndedSoundEnabledInput', testId:'testCallEndedSoundBtn', clearId:'clearCallEndedSoundBtn',
+      },
+      callPasted: {
+        soundKey:'callPastedAlarmSound', urlKey:'callPastedAlarmCustomSoundDataUrl', nameKey:'callPastedAlarmCustomSoundName', enabledKey:'callPastedSoundEnabled',
+        selectId:'callPastedAlarmSoundInput', sectionId:'callPastedAlarmCustomSoundSection', statusId:'callPastedAlarmSoundFileStatus', fileInputId:'callPastedAlarmSoundFile',
+        toggleId:'callPastedSoundEnabledInput', testId:'testCallPastedSoundBtn', clearId:'clearCallPastedSoundBtn',
+      },
+      callManual: {
+        soundKey:'callManualAlarmSound', urlKey:'callManualAlarmCustomSoundDataUrl', nameKey:'callManualAlarmCustomSoundName', enabledKey:'callManualSoundEnabled',
+        selectId:'callManualAlarmSoundInput', sectionId:'callManualAlarmCustomSoundSection', statusId:'callManualAlarmSoundFileStatus', fileInputId:'callManualAlarmSoundFile',
+        toggleId:'callManualSoundEnabledInput', testId:'testCallManualSoundBtn', clearId:'clearCallManualSoundBtn',
+      },
     };
+    const alarmSoundReadVersions = new Map();
 
     // Plantillas de mensaje editables — separado del mapa de sonido porque "Descanso por productividad" SÍ participa aquí (2 mensajes propios, primera vez / repeticiones) aunque su sonido siga con sus funci…
     const ALARM_MESSAGE_CONFIGS = {
@@ -5701,6 +5746,11 @@ function renderPayDatesSection() {
           ? ui`Archivo guardado: ${settings[cfg.nameKey] || 'sonido personalizado'}`
           : translateText('Ningún archivo propio guardado — usando el beep clásico mientras tanto.');
       }
+      if (cfg.clearId) {
+        const button = document.getElementById(cfg.clearId);
+        button.disabled = !settings[cfg.urlKey];
+        button.style.display = settings[cfg.urlKey] ? '' : 'none';
+      }
     }
 
     function updateAlarmSound(kind) {
@@ -5708,8 +5758,40 @@ function renderPayDatesSection() {
       if (!cfg) return;
       const input = document.getElementById(cfg.selectId);
       const value = input ? input.value : 'classic';
+      const owner = settings, previous = settings[cfg.soundKey];
+      alarmSoundReadVersions.set(kind, (alarmSoundReadVersions.get(kind) || 0) + 1);
       if (['classic', 'chime', 'custom'].includes(value)) settings[cfg.soundKey] = value;
-      saveSettingsOnly();
+      if (saveSettingsOnly() === false) {
+        if (settings === owner) settings[cfg.soundKey] = previous;
+        if (input) input.value = settings[cfg.soundKey];
+        toast(translateText('No se cambió el sonido porque no se pudo guardar.'), {persistenceFailure:true});
+      }
+      syncAlarmCustomSoundUI(kind);
+    }
+
+    function updateCallSoundEnabled(kind) {
+      const cfg = ALARM_SOUND_CONFIGS[kind];
+      if (!cfg?.enabledKey) return;
+      const owner = settings, previous = settings[cfg.enabledKey], input = document.getElementById(cfg.toggleId);
+      settings[cfg.enabledKey] = input.checked;
+      if (saveSettingsOnly() === false) {
+        if (settings === owner) settings[cfg.enabledKey] = previous;
+        input.checked = settings[cfg.enabledKey] === true;
+        toast(translateText('No se cambió el aviso de llamada porque no se pudo guardar.'), {persistenceFailure:true});
+      }
+    }
+
+    function clearAlarmCustomSound(kind) {
+      const cfg = ALARM_SOUND_CONFIGS[kind];
+      if (!cfg?.clearId) return;
+      alarmSoundReadVersions.set(kind, (alarmSoundReadVersions.get(kind) || 0) + 1);
+      const owner = settings, previous = {url:settings[cfg.urlKey], name:settings[cfg.nameKey], sound:settings[cfg.soundKey]};
+      settings[cfg.urlKey] = ''; settings[cfg.nameKey] = ''; settings[cfg.soundKey] = 'classic';
+      if (saveSettingsOnly() === false) {
+        if (settings === owner) { settings[cfg.urlKey] = previous.url; settings[cfg.nameKey] = previous.name; settings[cfg.soundKey] = previous.sound; }
+        toast(translateText('No se quitó el sonido porque no se pudo guardar.'), {persistenceFailure:true});
+      } else toast(translateText('Sonido personalizado eliminado. Se usará el beep clásico.'));
+      document.getElementById(cfg.selectId).value = settings[cfg.soundKey];
       syncAlarmCustomSoundUI(kind);
     }
 
@@ -5729,7 +5811,11 @@ function renderPayDatesSection() {
         return;
       }
       const reader = new FileReader();
+      const owner = settings;
+      const readVersion = (alarmSoundReadVersions.get(kind) || 0) + 1;
+      alarmSoundReadVersions.set(kind, readVersion);
       reader.onload = () => {
+        if (settings !== owner || alarmSoundReadVersions.get(kind) !== readVersion) return;
         const previous = {
           dataUrl: settings[cfg.urlKey],
           name: settings[cfg.nameKey],
@@ -5744,11 +5830,13 @@ function renderPayDatesSection() {
         settings[cfg.nameKey] = file.name;
         settings[cfg.soundKey] = 'custom';
         if (!saveSettingsOnly()) {
-          settings[cfg.urlKey] = previous.dataUrl;
-          settings[cfg.nameKey] = previous.name;
-          settings[cfg.soundKey] = previous.sound;
-          saveSettingsOnly();
-          toast(translateText('No se pudo guardar el sonido — el almacenamiento del navegador está lleno.'));
+          if (settings === owner) {
+            settings[cfg.urlKey] = previous.dataUrl;
+            settings[cfg.nameKey] = previous.name;
+            settings[cfg.soundKey] = previous.sound;
+          }
+          document.getElementById(cfg.selectId).value = settings[cfg.soundKey];
+          toast(translateText('No se pudo guardar el sonido. Tu archivo anterior se conservó.'), {persistenceFailure:true});
           syncAlarmCustomSoundUI(kind);
           return;
         }
@@ -7401,6 +7489,9 @@ export function render() {
       const cfg = ALARM_SOUND_CONFIGS[kind];
       document.getElementById(cfg.selectId).addEventListener('change', () => updateAlarmSound(kind));
       document.getElementById(cfg.fileInputId).addEventListener('change', (e) => handleAlarmSoundFile(kind, e));
+      if (cfg.toggleId) document.getElementById(cfg.toggleId).addEventListener('change', () => updateCallSoundEnabled(kind));
+      if (cfg.testId) document.getElementById(cfg.testId).addEventListener('click', () => testAlarmSound(kind));
+      if (cfg.clearId) document.getElementById(cfg.clearId).addEventListener('click', () => clearAlarmCustomSound(kind));
     });
     document.getElementById('testShiftAlarmSoundBtn').addEventListener('click', () => testAlarmSound('shift'));
     document.getElementById('testBreakStartAlarmSoundBtn').addEventListener('click', () => testAlarmSound('breakStart'));

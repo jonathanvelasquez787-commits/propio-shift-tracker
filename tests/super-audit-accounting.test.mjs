@@ -28,7 +28,7 @@ function harness(t) {
   const document = { getElementById: element, querySelectorAll: () => [] };
   globalThis.document = document;
   let clock = at(1, '19:00').getTime(), sequence = 0, persisted, saves = 0;
-  const gameSaved = [];
+  const gameSaved = [], soundEvents = [];
   Date.now = () => clock;
   t.after(() => { Date.now = originalNow; if (previousDocument === undefined) delete globalThis.document; else globalThis.document = previousDocument; });
   class ClockDate extends Date { constructor(...args) { super(...(args.length ? args : [clock])); } static now() { return clock; } }
@@ -42,7 +42,7 @@ function harness(t) {
     makeLocalId: () => `id-${++sequence}`, setAppCalls, higherRateBonusForCall, higherRateBonusForCalls, higherRateBonusBreakdownForCalls,
     callsForDay: key => calls.filter(c => c.callDate === key),
     getActiveDayKey: () => state.activeDayKey, defaultActiveDayKey: () => h.todayCallDateKey(),
-    toast:message=>messages.push(message), saveAll: save, financeRunAutoFillCascade, autoStartShiftFromCalls() {},
+    toast:message=>messages.push(message), saveAll: save, financeRunAutoFillCascade, autoStartShiftFromCalls() {}, playCallSavedSound:kind=>soundEvents.push(kind),
     migratePositiveCallIdReferences() {}, migrateGameCallReferences() {}, onGameCallSaved: call => gameSaved.push(call.id), onGameCallsChanged() {},
     setEvent: (...args) => state.events.push(args), renderImportSkippedSummary() {}, callImportFlag: () => null,
     dayIsEffectivelyOff: key => new Date(h.callDateToDate(key)).getDay() === 0, dayAdherence: () => null,
@@ -56,7 +56,7 @@ function harness(t) {
   configureFinanceContext({ parseMoney: h.parseMoney, higherRateBonusForCalls, saveSettingsOnly: save, render() {}, money: x => x.toFixed(2), convertedAmountText: () => '', toast:h.toast, makeLocalId:h.makeLocalId, appConfirm:(_message, run)=>run() });
   configureCallsContext({ ...h, HIGHER_RATE_TIERS: tiers, MAX_CALL_DURATION_MIN: 1440, money: x => x.toFixed(2), convertedAmountText: () => '', financeConvertedInline: () => '', formatDuration: x => String(x), rateTilePerMin: () => settings.rate, renderRateTiles() {}, formatCallDayLabel: x => x,
     closeModal() {}, openModal() {}, appConfirm: (_message, fn) => fn() });
-  return { h, inputs, element, gameSaved, messages, rejectSave:()=>{rejectSave=true;},
+  return { h, inputs, element, gameSaved, messages, soundEvents, rejectSave:()=>{rejectSave=true;},
     advance: date => { clock = date.getTime(); }, saves: () => saves,
     reload() { const snap = JSON.parse(persisted); setAppCalls(snap.calls); setAppState(snap.state); setAppSettings(snap.settings); },
     import(rows) { element('callInput').value = rows.map(row => row.join('\t')).join('\n'); h.importCalls(); },
@@ -72,6 +72,30 @@ test('a rejected manual call save does not announce success or award its reward'
   x.manual('09/01/2025','08:00',10);
   assert.equal(x.saves(),0);assert.deepEqual(x.gameSaved,[]);
   assert.equal(calls.length,1);assert.deepEqual(x.messages,[]);
+  assert.deepEqual(x.soundEvents,[]);
+});
+
+test('manual and live save sounds fire after persistence and never for duplicates or edits',t=>{
+  const x=harness(t);x.advance(at(2,'19:00'));x.manual('09/01/2025','08:00',10,'1.20');assert.deepEqual(x.soundEvents,['callManual']);
+  x.manual('09/01/2025','08:00',10,'1.20');assert.deepEqual(x.soundEvents,['callManual']);
+  openCallEditor(calls[0].id);x.element('callEditPayInput').value='2';saveCallEditor();assert.deepEqual(x.soundEvents,['callManual']);
+  autoSaveLiveCall(at(1,'09:00').toISOString(),at(1,'09:10').toISOString());assert.deepEqual(x.soundEvents,['callManual','callEnded']);
+  x.reload();assert.deepEqual(x.soundEvents,['callManual','callEnded']);
+});
+
+test('a pasted batch sounds once only after a changed import is saved',t=>{
+  const x=harness(t);x.advance(at(2,'19:00'));
+  const batch=[['one','09/01/2025','08:00 AM','10','Yes','No','$1.20'],['two','09/01/2025','08:30 AM','10','Yes','No','$1.20']];
+  x.import(batch);assert.equal(calls.length,2);assert.deepEqual(x.soundEvents,['callPasted']);
+  x.import(batch);assert.deepEqual(x.soundEvents,['callPasted']);
+  x.rejectSave();x.import([['three','09/01/2025','09:00 AM','10','Yes','No','$1.20']]);assert.deepEqual(x.soundEvents,['callPasted']);
+});
+
+test('live save rejection and backup wait are silent while a saved live backup uses the ended sound',t=>{
+  const x=harness(t);x.advance(at(2,'19:00'));x.manual('09/01/2025','08:00',10,'1.20');x.soundEvents.length=0;
+  autoSaveLiveCall(at(1,'08:05').toISOString(),at(1,'08:15').toISOString());assert.deepEqual(x.soundEvents,[]);assert.ok(state.pendingLiveCallBackup);
+  x.manual('09/01/2025','10:00',10,'1.20');assert.deepEqual(x.soundEvents,['callEnded']);
+  x.rejectSave();autoSaveLiveCall(at(1,'11:00').toISOString(),at(1,'11:10').toISOString());assert.deepEqual(x.soundEvents,['callEnded']);
 });
 
 test('manual and edited numeric payment inputs respect scientific notation without changing the imported-money parser', t => {
