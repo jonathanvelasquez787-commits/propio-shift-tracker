@@ -69,13 +69,14 @@ document.getElementById('reviewed').addEventListener('click', () => {
 refresh().catch(() => { document.getElementById('status').textContent = reasons.storage; });
 setInterval(() => { if (!busy) refresh().catch(() => {}); }, 2000);
 
-let summaryOptions = normalizeSummaryOptions(null, false), summaryBusy = false, summaryRevision = 0, pendingSummaryEnabled = null;
+let summaryOptions = normalizeSummaryOptions(null, false), summaryBusy = false, summaryRevision = 0, pendingSummaryEnabled = null, summaryError = '';
 function renderSummary(fillFields = false) {
   const toggle = document.getElementById('summaryEnabled');
   toggle.checked = pendingSummaryEnabled ?? summaryOptions.enabled; toggle.disabled = summaryBusy;
-  document.getElementById('summaryStatus').textContent = summaryOptions.enabled
+  document.getElementById('summaryStatus').classList.toggle('error', Boolean(summaryError));
+  document.getElementById('summaryStatus').textContent = summaryError || (summaryOptions.enabled
     ? 'Visible en el historial. «Calcular total» suma todas las páginas del rango.'
-    : 'Oculto. Activá esta opción para verlo en el historial, sin recargar.';
+    : 'Oculto. Activá esta opción para verlo en el historial, sin recargar.');
   if (fillFields) {
     document.getElementById('summaryLanguage').value = summaryOptions.language;
     document.getElementById('summaryCurrency').value = summaryOptions.currency || '';
@@ -85,14 +86,14 @@ function renderSummary(fillFields = false) {
 }
 async function saveSummary(patch) {
   if (summaryBusy) return;
-  summaryBusy = true; pendingSummaryEnabled = typeof patch.enabled === 'boolean' ? patch.enabled : null; renderSummary();
+  summaryBusy = true; summaryError = ''; pendingSummaryEnabled = typeof patch.enabled === 'boolean' ? patch.enabled : null; renderSummary();
   const feedback = document.getElementById('summaryFeedback'); feedback.textContent = ''; feedback.classList.remove('error');
   try {
     const stored = (await chrome.storage.local.get(settingsKey))[settingsKey];
     const next = normalizeSummaryOptions({ ...normalizeSummaryOptions(stored, false), ...patch }, false);
     await chrome.storage.local.set({ [settingsKey]: next });
     summaryOptions = next; renderSummary(true); feedback.textContent = 'Preferencias guardadas. Se aplican en tus pestañas de Propio.';
-  } catch { feedback.textContent = 'No se pudo guardar. Reintentá.'; feedback.classList.add('error'); }
+  } catch { summaryError = 'No se pudo guardar. Se conserva la preferencia anterior; reintentá.'; feedback.textContent = summaryError; feedback.classList.add('error'); }
   finally { summaryBusy = false; pendingSummaryEnabled = null; renderSummary(); }
 }
 document.getElementById('summaryEnabled').addEventListener('change', event => { void saveSummary({ enabled: event.target.checked }); });

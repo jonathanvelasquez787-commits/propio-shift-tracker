@@ -860,6 +860,8 @@ La aplicación funciona en producción con estas bases vigentes:
   Se conserva la colocación compacta del caption y la separación de datos.
 - Popup con tarjetas, estados, contadores, actividad y diagnóstico desplegables;
   icono original de reloj en Chrome/popup y temas claro/oscuro.
+- Un rechazo al guardar el resumen conserva la preferencia anterior y muestra
+  el aviso fuera del desplegable, para que siempre sea visible.
 - 654 pruebas, builds app/extensiones y recorridos Chromium aislados correctos.
   Carpeta anterior de conexión repuesta con el paquete; no cambia su ruta.
 
