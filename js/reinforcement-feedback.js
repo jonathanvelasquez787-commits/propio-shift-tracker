@@ -99,15 +99,15 @@ export function reinforcementText(kind, vars = {}, variantSeed = 0) {
 
 export function reinforcementFeedbackEnabled(channel = 'game') {
   const game = settings.game?.enabled === true;
-  const personal = game && settings.reinforcement?.enabled === true;
-  return channel === 'either' ? game : channel === 'personal' ? personal : channel === 'game' ? game : false;
+  const personal = settings.reinforcement?.enabled === true;
+  return channel === 'either' ? game || personal : channel === 'personal' ? personal : channel === 'game' ? game : false;
 }
 
 export function notifyReinforcement(message, { channel = 'game', effect = false, sound = '', dayKey } = {}) {
   const text = String(message ?? '').trim();
   if (!text || !reinforcementFeedbackEnabled(channel) || !queueToast) return false;
   queueToast(text, effect ? 'record' : '', { channel });
-  if (sound && playSound) playSound(sound, dayKey);
+  if (sound && playSound) playSound(sound, dayKey, channel === 'personal' || (channel === 'either' && settings.game?.enabled !== true) ? 'personal' : 'game');
   if (effect && settings.game?.enabled === true && triggerEffect
       && !globalThis.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches) triggerEffect(text);
   return true;

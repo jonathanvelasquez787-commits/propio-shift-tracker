@@ -15,7 +15,7 @@ const {
   renderPositiveReinforcement, reopenPositiveReflection,
 } = await import('../js/positive-reinforcement.js');
 
-test('Logros es maestro y el interruptor personal decide su canal incluso con intensidad antigua', () => {
+test('Logros y refuerzo positivo controlan sus propios canales incluso con intensidad antigua', () => {
   for (const game of [false, true]) {
     for (const personal of [false, true]) {
       for (const intensity of ['off', 'subtle', 'arcade']) {
@@ -24,12 +24,12 @@ test('Logros es maestro y el interruptor personal decide su canal incluso con in
         resetFeedbackForTests();
         const queued = [];
         configureReinforcementFeedback({ queueToast: (...args) => queued.push(args) });
-        for (const [channel, active] of [['game', game], ['personal', game && personal], ['either', game]]) {
+        for (const [channel, active] of [['game', game], ['personal', personal], ['either', game || personal]]) {
           const expected = active;
           assert.equal(reinforcementFeedbackEnabled(channel), expected);
           assert.equal(notifyReinforcement(channel, { channel }), expected);
         }
-        assert.equal(queued.length, Number(game) + Number(game && personal) + Number(game));
+        assert.equal(queued.length, Number(game) + Number(personal) + Number(game || personal));
         assert.deepEqual(config, { game: { enabled: game, intensity }, reinforcement: { enabled: personal } });
       }
     }
@@ -109,13 +109,13 @@ test('mejor llamada compara el bono real de las anteriores y excluye el mismo ev
   assert.match(corrected, /mejor|mayor pago/);
 });
 
-test('Logros controls gate feedback and queue current pasted reflections after the import dialog closes', async () => {
+test('Refuerzo positivo funciona con Logros apagado y espera el cierre del diálogo de importación', async () => {
   setLanguage('es');
   const dayKey = '09/29/2026';
   const call = { id: 'personal-call', callDate: dayKey, startISO: new Date(Date.now() - 120000).toISOString(), endISO: new Date(Date.now() - 60000).toISOString() };
   const rows = [call];
   const currentState = { game: { reinforcement: createDefaultReinforcementState() }, activePause: { type: 'break' } };
-  const config = { game: { enabled: false, intensity: 'off' }, reinforcement: { enabled: true, askAfterCall: true, rewards: [{ id: 'tea', name: 'Té', icon: '☕', window: 'break', trigger: 'calls', every: 1 }] } };
+  const config = { game: { enabled: false, intensity: 'off' }, reinforcement: { enabled: false, askAfterCall: true, rewards: [{ id: 'tea', name: 'Té', icon: '☕', window: 'break', trigger: 'calls', every: 1 }] } };
   setAppState(currentState);
   setAppCalls(rows);
   setAppSettings(config);
@@ -147,7 +147,7 @@ test('Logros controls gate feedback and queue current pasted reflections after t
   assert.equal(reopenPositiveReflection(call, dayKey), false);
   assert.equal(onPositiveRewardWindow('break', { manual: true }), false);
 
-  config.game.enabled = true;
+  config.reinforcement.enabled = true;
   onPositiveCallSaved(call, 'manual', dayKey);
   assert.equal(currentState.game.reinforcement.pendingRewards.length, 1);
   assert.ok(messages.length > 0);
@@ -213,10 +213,10 @@ test('Logros controls gate feedback and queue current pasted reflections after t
   const saved = structuredClone(currentState.game.reinforcement);
   const messagesBeforeDisable = messages.length;
   closed.length = 0;
-  config.game.enabled = false;
+  config.reinforcement.enabled = false;
   renderPositiveReinforcement();
   for (const id of ['positiveReflectionModal', 'physicalRewardClaimModal']) {
-    assert.ok(closed.includes(id), `${id} se cierra al apagar Logros`);
+    assert.ok(closed.includes(id), `${id} se cierra al apagar el refuerzo`);
     assert.equal(nodes.get(id).open, false);
   }
   assert.equal(nodes.get('physicalRewardEditorModal').open, true, 'el editor de preferencias sigue disponible con Logros apagado');

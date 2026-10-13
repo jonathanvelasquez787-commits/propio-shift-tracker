@@ -129,7 +129,7 @@ function ensurePositiveState() {
 
 function reinforcementEnabled() {
   ensurePositiveState();
-  return settings.game?.enabled === true && settings.reinforcement.enabled;
+  return settings.reinforcement.enabled;
 }
 
 function makeId(prefix = 'reward') {
@@ -583,7 +583,7 @@ function renderHistory() {
 
 export function renderPositiveReinforcement() {
   ensurePositiveState();
-  if (settings.game?.enabled !== true) {
+  if (!reinforcementEnabled()) {
     clearPositiveReinforcementTransients({ keepEditor: true });
     for (const id of ['positiveReflectionModal', 'physicalRewardClaimModal']) {
       if (document.getElementById(id)?.classList?.contains?.('open')) closeModal(id);
@@ -670,7 +670,7 @@ export function initPositiveReinforcement() {
     const target = event.target instanceof Element ? event.target.closest('[data-positive-action], [data-positive-outcome]') : null;
     if (!target) return;
     const settingsAction = ['add-preset', 'edit-reward', 'new-reward', 'toggle-history'].includes(target.dataset.positiveAction);
-    if (settings.game?.enabled !== true && !settingsAction) return;
+    if (!reinforcementEnabled() && !settingsAction) return;
     if (target.dataset.positiveOutcome) return saveReflection(target.dataset.positiveOutcome);
     const action = target.dataset.positiveAction;
     if (action === 'skip-reflection') { reflectionCall = null; closeModal('positiveReflectionModal'); }
