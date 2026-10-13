@@ -85,7 +85,8 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     if (state.tabs[tabId]?.call === 'connected') { if (prep.pendingPause) finishResume(state); return false; }
     const pending = prep.pendingPause;
     const resumeReady = pending?.endedAt && prep.resume[pending.type] && (prep.resume.mode === 'manual' || (pending.endsAt && now() >= Date.parse(pending.endsAt)));
-    const firstReady = prep.enabled && plan && prep.doneFor !== plan.startAt && !plan.hasCall;
+    const plannedPause = plan?.scheduledPauses.some(slot => now() >= Date.parse(slot.startedAt) && now() < Date.parse(slot.endedAt));
+    const firstReady = prep.enabled && plan?.scheduleVerified && prep.doneFor !== plan.startAt && !plan.hasCall && !plannedPause;
     if ((!firstReady && !resumeReady) || (plan?.pause && !pending?.endedAt) || state.mode !== 'auto' || !state.accountScope || !state.session || !plan || plan.ended ||
         now() < Date.parse(plan.startAt) || now() >= Date.parse(plan.endAt) ||
         state.attention === 'multiple-trackers' || state.attention === 'tracker-needs-review' ||
@@ -256,6 +257,13 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
       try { if (new URL(sender.url).origin !== TRACKER_ORIGIN) return null; } catch { return null; }
       const targets = await trackers();
       await transact(state => {
+        if (!state.accountScope && targets.length > 1) state.attention = 'multiple-trackers';
+        if (!state.accountScope && !state.queue.length && targets.length === 1 && targets[0].accountScope === packet.accountScope && targets[0].tabId === sender.tab.id) {
+          state.accountScope = targets[0].accountScope;
+          state.mode = state.recordingPreference === false ? 'observe' : 'auto';
+          state.preparation.enabled = state.firstCallPreference !== false;
+          state.tabs = {}; state.session = null; state.attention = null; state.history = null; state.historySeen = [];
+        }
         const matched = targets.filter(target => target.accountScope === state.accountScope);
         if (matched.length === 1 && packet.accountScope === state.accountScope) updatePlan(state, matched[0].plan);
         else if (matched.length > 1) { updatePlan(state, null); state.attention = 'multiple-trackers'; }
@@ -288,7 +296,7 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
         if (packet.mode === 'auto' && !state.accountScope) return { ok: false, reason: 'account-needed' };
         if (packet.mode === 'observe' && state.mode === 'auto' && Object.values(state.tabs).some(tab => tab.active)) return { ok: false, reason: 'active-portal-call' };
         if (state.mode !== packet.mode) { state.tabs = {}; state.session = null; }
-        state.mode = packet.mode;
+        state.mode = packet.mode; state.recordingPreference = packet.mode === 'auto';
         return { ok: true };
       });
       await flush(); return result;
@@ -298,7 +306,7 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
       const targets = await trackers();
       return transact(state => {
         if (!state.accountScope) return { ok: false, reason: 'account-needed' };
-        state.preparation.enabled = packet.enabled;
+        state.preparation.enabled = packet.enabled; state.firstCallPreference = packet.enabled;
         const matched = targets.filter(target => target.accountScope === state.accountScope);
         if (matched.length === 1) updatePlan(state, matched[0].plan);
         else if (matched.length > 1) updatePlan(state, null);
@@ -320,7 +328,7 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     }
     if (packet?.kind === 'open-tracker') { await api.tabs.create({ url: `${TRACKER_ORIGIN}/` }); return { ok: true }; }
     if (packet?.kind === 'clear-reviewed') return transact(state => {
-      state.mode = 'observe'; state.queue = []; state.tabs = {}; state.session = null; state.attention = null; return { ok: true };
+      state.mode = 'observe'; state.recordingPreference = false; state.queue = []; state.tabs = {}; state.session = null; state.attention = null; return { ok: true };
     });
     return null;
   }

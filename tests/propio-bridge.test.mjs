@@ -32,6 +32,33 @@ test('official history count works in observation; automatic records survive a c
 
 const at = '2026-10-04T18:00:00.000Z', ended = '2026-10-04T18:10:00.000Z';
 
+test('a sole signed-in tracker automatically pairs a fresh extension and prepares startup while preserving later user choices across restart', async () => {
+  const f=workerFixture(), ready={id:'extension-id',url:TRACKER_ORIGIN+'/',frameId:0,tab:{id:10}};
+  f.targets([scope]);
+  await f.worker.message({kind:'tracker-ready',accountScope:scope},ready);
+  let status=await f.worker.message({kind:'status'},sender);
+  assert.equal(status.paired,true);assert.equal(status.mode,'auto');assert.equal(status.preparation.enabled,true);
+  await f.worker.message({kind:'mode',mode:'observe'},sender);await f.worker.message({kind:'prepare-first',enabled:false},sender);
+  f.restart();await f.worker.message({kind:'tracker-ready',accountScope:scope},ready);
+  status=await f.worker.message({kind:'status'},sender);
+  assert.equal(status.paired,true);assert.equal(status.mode,'observe');assert.equal(status.preparation.enabled,false);
+});
+
+test('automatic pairing requires one authenticated target in the announcing tab and never replaces another account or pending queue', async () => {
+  const f=workerFixture(), ready={id:'extension-id',url:TRACKER_ORIGIN+'/',frameId:0,tab:{id:10}};
+  f.targets([scope,other]);await f.worker.message({kind:'tracker-ready',accountScope:scope},ready);
+  assert.equal((await f.worker.message({kind:'status'},sender)).paired,false);
+  assert.equal((await f.worker.message({kind:'status'},sender)).attention,'multiple-trackers');
+  f.targets([scope]);await f.worker.message({kind:'tracker-ready',accountScope:scope},{...ready,tab:{id:11}});
+  assert.equal((await f.worker.message({kind:'status'},sender)).paired,false);
+  await f.worker.message({kind:'tracker-ready',accountScope:scope},ready);
+  f.targets([other]);await f.worker.message({kind:'tracker-ready',accountScope:other},ready);
+  assert.equal(f.data['bridge-v1'].accountScope,scope);
+  f.data['bridge-v1'].accountScope=null;f.data['bridge-v1'].queue=[{accountScope:scope,event:start}];
+  await f.worker.message({kind:'tracker-ready',accountScope:other},ready);
+  assert.equal(f.data['bridge-v1'].accountScope,null);assert.equal(f.data['bridge-v1'].queue.length,1);
+});
+
 test('first-call preparation waits for the schedule, supports late arrival, retries only confirmed Offline and stops after manual connection across restart', async () => {
   const f = workerFixture();
   f.plan({ startAt: '2026-10-04T19:00:00.000Z', endAt: '2026-10-05T01:00:00.000Z', hasCall: false, ended: false });
@@ -52,6 +79,31 @@ test('first-call preparation waits for the schedule, supports late arrival, retr
   await f.worker.message({kind:'prepare-first',enabled:false},sender);
   await f.worker.message({kind:'prepare-first',enabled:true},sender);
   assert.equal((await observe()).prepare,false);
+});
+
+test('late first-call preparation waits through scheduled Break and Lunch even without an active tool pause, then resumes at the boundary', async () => {
+  const f = workerFixture(); f.advance(-6*3600000-15*60000);
+  const plan = { startAt: '2026-10-04T12:00:00.000Z', endAt: '2026-10-04T20:00:00.000Z', hasCall: false, ended: false,
+    scheduledPauses: [{type:'break',startedAt:'2026-10-04T15:00:00.000Z',endedAt:'2026-10-04T15:15:00.000Z'},
+      {type:'lunch',startedAt:'2026-10-04T18:00:00.000Z',endedAt:'2026-10-04T19:00:00.000Z'}] };
+  f.plan(plan); await enablePortal(f); await f.worker.message({kind:'prepare-first',enabled:true},sender);
+  const observe = () => f.worker.message(portalPacket('authenticated',{call:'idle',offline:true}),portalSender);
+  assert.equal((await observe()).prepare,false);
+  f.advance(15*60000); assert.equal((await observe()).prepare,true);
+  f.advance(3*3600000); f.restart(); assert.equal((await observe()).prepare,false);
+  f.advance(15*60000-1); assert.equal((await observe()).prepare,false);
+  f.advance(1); assert.equal((await observe()).prepare,true);
+  f.advance(2*3600000+45*60000); assert.equal((await observe()).prepare,false);
+  f.advance(3600000); assert.equal((await observe()).prepare,true);
+  f.advance(3600000); assert.equal((await observe()).prepare,false);
+});
+
+test('a cached older tracker plan cannot start the first call until its scheduled pauses are confirmed', async () => {
+  const f=workerFixture(),plan={startAt:at,endAt:'2026-10-04T22:00:00.000Z',hasCall:false,ended:false};
+  f.plan({...plan,scheduleVerified:false});await enablePortal(f);await f.worker.message({kind:'prepare-first',enabled:true},sender);
+  const observe=()=>f.worker.message(portalPacket('authenticated',{call:'idle',offline:true}),portalSender);
+  assert.equal((await observe()).prepare,false);f.restart();assert.equal((await observe()).prepare,false);
+  f.plan(plan);await f.worker.message({kind:'pair'},sender);assert.equal((await observe()).prepare,true);
 });
 
 test('Break and Lunch resume independently after manual completion or acknowledged timed closure; unknown duration and disabled choices hold', async () => {
@@ -256,7 +308,7 @@ function workerFixture() {
     await worker.completed({ requestId, statusCode: options.statusCode || 200 });
   }
   return { data, delivered, signal, get worker() { return worker; }, targets: value => { targets = value; },
-    ack: value => { ack = value; }, plan: value => { plan = value; }, advance: milliseconds => { clock += milliseconds; },
+    ack: value => { ack = value; }, plan: value => { plan = value ? {scheduledPauses:[],...value} : null; }, advance: milliseconds => { clock += milliseconds; },
     restart() { worker = createBridgeWorker(api, { now: () => clock, randomId: () => `generated-id-${String(++n).padStart(12,'0')}` }); } };
 }
 

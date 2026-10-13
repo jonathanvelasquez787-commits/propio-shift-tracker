@@ -1,12 +1,25 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { validatePortalRecord, portalRecordsText } from '../js/propio-history-records.js';
-import { validateBridgeEvent } from '../js/propio-bridge-rules.js';
+import { validateBridgeEvent, validateBridgePlan } from '../js/propio-bridge-rules.js';
 import { createPropioReceiver } from '../js/propio-bridge.js';
 
 const now = new Date(2026, 9, 13, 14).getTime();
 const row = { customerId: '91434', callDate: '10/13/2026', callStart: '11:54 AM', durationMin: '0', billable: 'Yes', dropped: 'No', pay: '$0.00' };
 const event = { version: 1, id: 'official-history-12345', type: 'history-records', at: new Date(now).toISOString(), records: [row] };
+
+test('scheduled pause metadata is bounded to the shift and rejects malformed ranges while stripping unrelated data', () => {
+  const startAt = new Date(now-3600000).toISOString(), endAt = new Date(now+3600000).toISOString();
+  const slot = {type:'break',startedAt:new Date(now).toISOString(),endedAt:new Date(now+900000).toISOString()};
+  const plan = {startAt,endAt,scheduledPauses:[{...slot,customer:'must-not-leave'}]};
+  assert.deepEqual(validateBridgePlan(plan,now).scheduledPauses,[slot]);
+  for(const scheduledPauses of [null,{},Array(101).fill(slot),[{...slot,type:'work'}],[{...slot,endedAt:slot.startedAt}],
+    [{...slot,startedAt:new Date(now-7200000).toISOString()}],[{...slot,endedAt:new Date(now+7200000).toISOString()}]]) assert.equal(validateBridgePlan({...plan,scheduledPauses},now),null);
+  assert.deepEqual(validateBridgePlan({startAt,endAt},now).scheduledPauses,[]);
+  assert.equal(validateBridgePlan({startAt,endAt},now).scheduleVerified,false);
+  assert.equal(validateBridgePlan(validateBridgePlan({startAt,endAt},now),now).scheduleVerified,false);
+  assert.equal(validateBridgePlan(plan,now).scheduleVerified,true);
+});
 
 test('official history validates seven fields, preserves zero-minute rows and strips unrelated client data', () => {
   const valid = validatePortalRecord({ ...row, name: 'must-not-leave', notes: 'must-not-leave', token: 'must-not-leave' }, now);

@@ -7951,7 +7951,12 @@ export function getPropioBridgePlan() {
   const pauseDuration = state.activePause ? referenceDurationMinForActivePause(currentShiftAccountingDayKey(day)) : null;
   const lastPause = state.pauseHistory.filter(pause => Date.parse(pause.endedAt) >= since && Date.parse(pause.endedAt) <= day.getTime())
     .sort((a, b) => Date.parse(b.endedAt) - Date.parse(a.endedAt))[0];
+  const scheduledPauses = reinforcementScheduleIntervals(accountingDay).filter(slot => ['break','lunch'].includes(String(slot.type).toLowerCase()))
+    .map(slot => ({ type: String(slot.type).toLowerCase(), startedAt: Math.max(start.getTime(), Date.parse(slot.startedAt)), endedAt: Math.min(end.getTime(), Date.parse(slot.endedAt)) }))
+    .filter(slot => slot.startedAt < slot.endedAt)
+    .map(slot => ({ type: slot.type, startedAt: new Date(slot.startedAt).toISOString(), endedAt: new Date(slot.endedAt).toISOString() }));
   return { startAt: start.toISOString(), endAt: end.toISOString(),
+    scheduledPauses,
     hasCall: Boolean(state.activeCall) || calls.some(call => Date.parse(call.startISO) >= since && Date.parse(call.startISO) < end.getTime()),
     ended: Boolean(state.shiftEndedAt && Date.parse(state.shiftEndedAt) >= start.getTime()),
     pause: state.activePause ? { type: state.activePause.type, startedAt: state.activePause.startedAt,
