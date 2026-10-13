@@ -50,9 +50,11 @@ export function installPortalSummary({ enabledByDefault = true } = {}) {
   function refresh() {
     timer = null;
     if (!initialized || !options.enabled) {
+      setWatching(false);
       if (running) running.controller.abort();
       placement.clear(); last = ''; totalCache = null; return;
     }
+    setWatching(true);
     const found = snapshot();
     if (!found) { placement.clear(); last = ''; totalCache = null; return; }
     placement.mount(found.table);
@@ -74,9 +76,9 @@ export function installPortalSummary({ enabledByDefault = true } = {}) {
     if (running) { $('minutes').textContent = '—'; $('pay').textContent = '—'; $('converted').textContent = ''; }
     $('notice').textContent = [scanError(scanMessage, options), summary.missingMinutes || summary.missingPay ? copy.pending(summary.missingMinutes, summary.missingPay) : ''].filter(Boolean).join(' ');
   }
-  function schedule() { if (!timer) timer = setTimeout(refresh, 120); }
+  function schedule() { if (initialized && options.enabled && !timer) timer = setTimeout(refresh, 120); }
   const observer = new MutationObserver(schedule);
-  observer.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['hidden', 'style', 'class'] });
+  let watching = false;
   const pause = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
   async function movePage(action, { restoring }) {
     const before = snapshot(), run = running;
@@ -103,6 +105,7 @@ export function installPortalSummary({ enabledByDefault = true } = {}) {
     } finally { watch.disconnect(); }
   }
   function invalidate(event) {
+    if (!initialized || !options.enabled) return;
     if (event.composedPath().includes(host)) return;
     const pager = snapshot()?.pager?.element;
     if (running) {
@@ -111,7 +114,14 @@ export function installPortalSummary({ enabledByDefault = true } = {}) {
     }
     if ((event.type !== 'click' && !pager?.contains(event.target)) || event.target.closest?.('th, mat-header-cell, [role="columnheader"]')) { totalCache = null; scanMessage = ''; schedule(); }
   }
-  for (const name of ['input', 'change', 'click']) document.addEventListener(name, invalidate, true);
+  function setWatching(enabled) {
+    if (watching === enabled) return;
+    watching = enabled;
+    for (const name of ['input', 'change', 'click']) document[enabled ? 'addEventListener' : 'removeEventListener'](name, invalidate, true);
+    for (const name of ['popstate', 'pageshow']) window[enabled ? 'addEventListener' : 'removeEventListener'](name, schedule);
+    if (enabled) observer.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['hidden', 'style', 'class'] });
+    else { observer.disconnect(); clearTimeout(timer); timer = null; }
+  }
   $('sum-period').addEventListener('click', async () => {
     if (running) { running.controller.abort(); refresh(); return; }
     const initial = snapshot();
@@ -165,6 +175,4 @@ export function installPortalSummary({ enabledByDefault = true } = {}) {
     initialized = true;
     $('currency').value = options.currency || ''; $('rate').value = options.rate || ''; refresh();
   })();
-  window.addEventListener('popstate', schedule);
-  window.addEventListener('pageshow', schedule);
 }

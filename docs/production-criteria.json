@@ -946,6 +946,7 @@
           "namedCases": [
             "summary defaults and legacy currency-only settings use English; Spanish is explicit",
             "unified summary is opt-in and preference updates preserve enabled state and valid conversion",
+            "disabled summary has no portal observers, interaction listeners or history reads and releases them after toggling off",
             "summary status, plural calls and scan errors follow the selected language"
           ]
         }
