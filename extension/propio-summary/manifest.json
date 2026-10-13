@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Propio · Minutos y ganancias",
   "description": "Suma los minutos y el pago del historial de Propio. Herramienta independiente y local.",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "minimum_chrome_version": "120",
   "permissions": ["storage"],
   "host_permissions": ["https://interpreters.propio-ls.com/*"],

@@ -1,12 +1,14 @@
 import { readPortalHistory } from '../../js/propio-history.js';
 import { readPortalPaginator, portalRangeContext, collectPortalPages } from '../../js/propio-history-pages.js';
 import { settingsKey, languageOf, copyFor, scanError } from './i18n.js';
+import { createSummaryMount } from './layout.js';
 
 if (location.origin === 'https://interpreters.propio-ls.com' && window.top === window && !document.getElementById('propio-summary-panel')) {
   const key = settingsKey;
-  let options = {}, last = '', mountedTable, timer, totalCache = null, running = null, scanMessage = '';
+  let options = {}, last = '', timer, totalCache = null, running = null, scanMessage = '';
   const host = document.createElement('div');
   host.id = 'propio-summary-panel';
+  const placement = createSummaryMount(host);
   const root = host.attachShadow({ mode: 'open' });
   root.innerHTML = `<style>
     :host{display:block;margin:8px 0;color-scheme:light dark;font:13px/1.5 system-ui,sans-serif;color:#203345}
@@ -46,8 +48,8 @@ if (location.origin === 'https://interpreters.propio-ls.com' && window.top === w
   function refresh() {
     timer = null;
     const found = snapshot();
-    if (!found) { host.remove(); mountedTable = null; last = ''; totalCache = null; return; }
-    if (found.table !== mountedTable || !host.isConnected) { found.table.before(host); mountedTable = found.table; }
+    if (!found) { placement.clear(); last = ''; totalCache = null; return; }
+    placement.mount(found.table);
     if (!running && totalCache && (!found.range || totalCache.context !== found.context || totalCache.total !== found.range.total || totalCache.size !== found.range.size)) totalCache = null;
     const summary = totalCache && !running ? totalCache.summary : found.summary;
     const signature = JSON.stringify([summary, options, savedMessage, Boolean(totalCache), running?.progress, running?.controller.signal.aborted, scanMessage, Boolean(found.pager)]);

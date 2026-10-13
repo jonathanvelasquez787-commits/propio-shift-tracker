@@ -10,6 +10,8 @@ Solo lee encabezados, duración/pago, fechas seleccionadas y metadatos del pagin
 
 ## Instalación
 
+La versión 1.0.4 coloca la barra dentro del caption de las tablas HTML, pegada a sus encabezados, para evitar el espacio que el layout del portal repartía entre la barra y la tabla. Conserva captions existentes, filas, filtros y paginación; en tablas Material sin elemento table agrupa barra y tabla en un solo bloque. Para actualizar, reemplazar los archivos de la carpeta instalada, recargar esta extensión y recargar Propio.
+
 Descomprimir el ZIP en una carpeta que se vaya a conservar. En chrome://extensions, activar Modo de desarrollador, elegir Cargar descomprimida y seleccionar propio-summary, que contiene manifest.json. Recargar el portal. La extensión anterior que combinaba tracker y resumen debe actualizarse al puente 1.3.0 para que desaparezca su barra al recargar Propio.
 
 El paquete incluye propio-resumen.user.js como alternativa para quien ya use un gestor de userscripts. Usar extensión o userscript, no ambos. El userscript guarda su configuración con una clave local propia de Propio. No descarga código ni envía datos a servidores. Un gestor como Tampermonkey es una extensión; esa alternativa tampoco funciona por sí sola desde otro sitio web.
