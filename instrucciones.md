@@ -317,6 +317,21 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
+Extensión unificada 2.0.0: conexión al tracker y resumen opcional en un mismo
+paquete. Dos interruptores independientes; resumen oculto por defecto, sin
+necesidad de vincular cuenta, con idioma/conversión configurables y cambio
+en vivo. Popup nuevo en claro/oscuro e icono original de la tool. Conserva
+la conexión y la cola al recargar la misma carpeta; no añade permisos.
+654 pruebas y builds correctos. Chromium aislado verificó preferencias,
+total paginado, ocultar durante cálculo/restaurar página, iconos, ambas
+paletas y sesión/llamadas/cierre con backend ficticio sobre la tool publicada.
+La carpeta que el usuario indicó, Downloads/extensiones, estaba vacía; se
+repuso el paquete en su ruta anterior propio-bridge. Falta recargar esa
+extensión en Chrome y desactivar el resumen separado si continúa habilitado.
+El inicio de sesión real fue confirmado por el usuario; variantes de señales
+de llamadas y la redirección de salida se validaron con simulación, no con una
+llamada real del portal. CI/publicación del cambio se verifican por SHA aparte.
+
 Avisos v605: tres sonidos independientes al guardar una llamada terminada
 (incluido puente/respaldo live), un lote pegado o una manual nueva. Apagados
 por defecto, beep/campanita/archivo propio por acción, prueba y quitar archivo;
@@ -811,8 +826,9 @@ La aplicación funciona en producción con estas bases vigentes:
   el de la guía es nofollow. La extensión se instala desde archivo según el
   propietario, por lo que no hay ficha propia de Chrome Web Store que editar.
   Detalle en `docs/seo.md`.
-- La versión actual de la app es 602; el puente es 1.3.0 y el resumen independiente
-  1.0.3. Refuerzo positivo y Logros están terminados. La auditoría profunda del
+- La versión actual de la app es 605; la extensión unificada es 2.0.0. El build
+  del resumen independiente 1.0.4 queda compatible para instalaciones anteriores.
+  Refuerzo positivo puede funcionar con Logros apagados. La auditoría profunda del
   8 de octubre corrigió seis fallos; la ampliación corrigió cinco más en arranque,
   concurrencia y PWA. Cobertura y límites constan en
   `docs/auditoria-profunda-2026-10-08.md` y
@@ -835,6 +851,17 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**Extensión 2.0.0 — Tracker y resumen unidos.**
+
+- Visibilidad del resumen independiente del registro automático; preferencias
+  de idioma y conversión en popup y barra, persistidas localmente.
+- Ocultar la barra durante un cálculo cancela y restaura la página original.
+  Se conserva la colocación compacta del caption y la separación de datos.
+- Popup con tarjetas, estados, contadores, actividad y diagnóstico desplegables;
+  icono original de reloj en Chrome/popup y temas claro/oscuro.
+- 654 pruebas, builds app/extensiones y recorridos Chromium aislados correctos.
+  Carpeta anterior de conexión repuesta con el paquete; no cambia su ruta.
 
 **v605 — Sonidos de llamadas en Avisos.**
 
@@ -860,16 +887,3 @@ La aplicación funciona en producción con estas bases vigentes:
 - Informe y límites: docs/auditoria-finanzas-2026-10-13.md; publicación
   comprobada por CI, Vercel y release en la evidencia final.
 
-**v603 — Claridad y controles de Gastos y Metas.**
-
-- Estados independientes de reserva/pago, pagos derivados del ledger y
-  exclusión automática conservada para marcas antiguas. Liberación segura.
-- Períodos explícitos, etiquetas sin abreviaturas, comparación pendiente/exceso
-  y porcentaje del total pagado con estado vacío correcto.
-- Filas compactas con detalles de reservas/pagos, mes visible; entrada única
-  con selector USD/moneda local y equivalencia. Metas muestran reservado y
-  estimación mensual editable sin prometer depósitos ni fecha límite.
-- Campo Monto a sumar o restar y tooltips de puntero/foco/Escape para
-  importe, moneda, Reservado y acciones; equivalencia y límites explícitos.
-- 583 pruebas, 2.214 textos ES/EN y builds correctos; cuenta ficticia,
-  17 controles, 24 vistas y ocho controles de tooltips.
