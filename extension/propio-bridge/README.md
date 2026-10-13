@@ -18,6 +18,8 @@ Reconectar la misma cuenta mantiene el modo. Pausar o cambiar de cuenta durante 
 
 ## Instalación y actualización
 
+La versión 1.4.0 admite formularios y los gateways documentados de Twilio `eventgw.us1`, `eventgw.ie1` y `eventgw.au1`. Chrome puede pedir acceso a esos tres hosts al actualizar. El popup distingue solicitudes observadas de señales reconocidas, incluso cuando el portal usa un formato que aún no entendemos. El diagnóstico guarda solo categorías, formato, hora y resultado HTTP; nunca URLs, headers ni cuerpos. Esta mejora no certifica la compatibilidad con el portal actual: se confirma al observar una llamada normal. El Shift sigue siendo manual en el tracker; login/logout del portal no se interpreta como inicio/fin del turno.
+
 El botón de recargar de Chrome relee la carpeta instalada; no descarga archivos. Reemplazar primero el contenido de esa carpeta por el paquete actualizado, después recargar la extensión y las pestañas del portal y tracker. Esto conserva la configuración existente. Si se eliminó la extensión, cargar de nuevo la carpeta que contiene manifest.json mediante Cargar descomprimida y conectar la cuenta.
 
 Build: node scripts/build-extension.mjs <salida>. El usuario confirmó instalación y conexión originales, luego reinstaló; el estado actual de vinculación/automático necesita comprobarse en su popup. La nueva autorización permite activar desde la primera llamada sin validación previa. Build, entrega, guardado, recarga, duplicados y corrección oficial se prueban en Chromium aislado con toda la red externa interceptada.

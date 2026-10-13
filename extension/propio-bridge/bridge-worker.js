@@ -1,7 +1,7 @@
-import { PORTAL_ORIGIN, TRACKER_ORIGIN, accountScopeValid, readPropioSignal, validateBridgeEvent, createPropioReducer } from '../../js/propio-bridge-rules.js';
+import { PORTAL_ORIGIN, TRACKER_ORIGIN, TWILIO_EVENT_ORIGINS, accountScopeValid, readPropioSignal, readPropioRequestBody, propioRequestKind, validateBridgeEvent, createPropioReducer } from '../../js/propio-bridge-rules.js';
 
 const KEY = 'bridge-v1';
-const URLS = [`${PORTAL_ORIGIN}/api/Interpreter/UpdateInterpreterStatus*`, 'https://eventgw.twilio.com/v4/EndpointEvents*'];
+const URLS = [`${PORTAL_ORIGIN}/*`, ...TWILIO_EVENT_ORIGINS.map(origin => `${origin}/v4/EndpointEvents*`)];
 const fresh = () => ({ mode: 'observe', accountScope: null, tabs: {}, queue: [], completed: 0, last: [], attention: null });
 export function createBridgeWorker(api, { now = () => Date.now(), randomId = () => crypto.randomUUID() } = {}) {
   const reduce = createPropioReducer({ randomId }), pending = new Map();
@@ -29,24 +29,29 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     return results.filter(Boolean);
   }
   function beforeRequest(details) {
-    if (details.method !== 'POST' || details.tabId < 0) return;
+    const kind = propioRequestKind(details.url);
+    if (!kind || details.tabId < 0 || pending.size >= 200) return;
+    if (kind === 'portal-api' && details.method !== 'POST' && !['xmlhttprequest', 'websocket'].includes(details.type)) return;
     try { if (new URL(details.initiator).origin !== PORTAL_ORIGIN) return; } catch { return; }
-    const raw = details.requestBody?.raw;
-    if (!Array.isArray(raw) || !raw.length || raw.some(part => !part.bytes)) return;
-    const parts = raw.map(part => new Uint8Array(part.bytes));
-    const length = parts.reduce((n, part) => n + part.length, 0);
-    if (length > 65536) return;
+    // Other portal APIs contribute only a counter; never inspect their bodies.
+    let signal = null, format = 'not-read';
     try {
-      const bytes = new Uint8Array(length); let offset = 0;
-      for (const part of parts) { bytes.set(part, offset); offset += part.length; }
-      const signal = readPropioSignal(details.url, JSON.parse(new TextDecoder().decode(bytes)));
-      if (signal && pending.size < 200) pending.set(details.requestId, { signal, tabId: details.tabId, at: new Date(details.timeStamp).toISOString() });
-    } catch { /* Unknown payloads are ignored; raw bodies are never retained. */ }
+      if (kind !== 'portal-api' && details.method === 'POST') {
+        const parsed = readPropioRequestBody(details.requestBody);
+        format = parsed.format; signal = readPropioSignal(details.url, parsed.body);
+      }
+      pending.set(details.requestId, { signal, kind, format, tabId: details.tabId, at: new Date(details.timeStamp).toISOString() });
+    } catch { /* Raw bodies, headers and URLs are never retained. */ }
   }
   async function completed(details) {
     const item = pending.get(details.requestId); pending.delete(details.requestId);
-    if (!item || details.statusCode < 200 || details.statusCode >= 300) return;
+    if (!item) return;
     await transact(state => {
+      const diagnostic = state.diagnostic || { requests: 0, recognized: 0, last: [] };
+      const success = details.statusCode >= 200 && details.statusCode < 300;
+      state.diagnostic = { requests: Math.min(1000000, diagnostic.requests + 1), recognized: Math.min(1000000, diagnostic.recognized + Number(success && !!item.signal)),
+        last: [...diagnostic.last, { kind: item.kind, format: item.format, status: details.statusCode, result: !success ? 'http-error' : item.signal ? 'recognized' : 'unknown', at: item.at }].slice(-20) };
+      if (!success || !item.signal) return;
       const { state: reduced, event } = reduce(state.tabs[item.tabId], item.signal, item.at);
       state.tabs[item.tabId] = reduced;
       if (event?.type === 'call-end' && validateBridgeEvent(event, now())) state.completed++;
@@ -97,7 +102,7 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     if (sender.url !== api.runtime.getURL('popup.html')) return null;
     if (packet?.kind === 'status') {
       const state = await transact(state => ({ ...state }));
-      return { mode: state.mode, paired: !!state.accountScope, active: Object.values(state.tabs).some(tab => tab.active), completed: state.completed, queued: state.queue.length, last: state.last, attention: state.attention };
+      return { mode: state.mode, paired: !!state.accountScope, active: Object.values(state.tabs).some(tab => tab.active), completed: state.completed, queued: state.queue.length, last: state.last, attention: state.attention, diagnostic: state.diagnostic || { requests: 0, recognized: 0, last: [] } };
     }
     if (packet?.kind === 'pair') {
       const targets = await trackers();
@@ -130,7 +135,7 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
   function install() {
     api.webRequest.onBeforeRequest.addListener(beforeRequest, { urls: URLS }, ['requestBody']);
     api.webRequest.onCompleted.addListener(details => { completed(details).catch(() => {}); }, { urls: URLS });
-    api.webRequest.onErrorOccurred.addListener(details => pending.delete(details.requestId), { urls: URLS });
+    api.webRequest.onErrorOccurred.addListener(details => { completed({ ...details, statusCode: 0 }).catch(() => {}); }, { urls: URLS });
     api.runtime.onMessage.addListener((packet, sender, respond) => {
       message(packet, sender).then(respond, () => respond({ ok: false, reason: 'storage' })); return true;
     });

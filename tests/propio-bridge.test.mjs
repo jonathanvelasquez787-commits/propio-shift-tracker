@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readPropioSignal, createPropioReducer, validateBridgeEvent, PORTAL_ORIGIN, TRACKER_ORIGIN } from '../js/propio-bridge-rules.js';
+import { readPropioSignal, readPropioRequestBody, propioRequestKind, TWILIO_EVENT_ORIGINS, createPropioReducer, validateBridgeEvent, PORTAL_ORIGIN, TRACKER_ORIGIN } from '../js/propio-bridge-rules.js';
 import { createPropioReceiver, createStorageRevisionGuard, ignorePropioCall, installPropioBridge } from '../js/propio-bridge.js';
 import { createBridgeWorker } from '../extension/propio-bridge/bridge-worker.js';
 
@@ -85,6 +85,46 @@ test('event validation rejects future, expired, zero-length and malformed values
   for (const value of [null, [], { ...end, version: 2 }, { ...end, id: '__proto__' }, { ...end, at: at },
     { ...end, at: '2026-10-04T18:11:00Z' }, { ...end, startedAt: '2026-10-01T18:00:00Z' }]) assert.equal(validateBridgeEvent(value, now()), null);
 });
+test('formularios y regiones documentadas conservan el ciclo de llamada y rechazan destinos ajenos', async () => {
+  for (const origin of TWILIO_EVENT_ORIGINS) {
+    const f = workerFixture();
+    await f.signal('ignored', { url: origin + '/v4/EndpointEvents', requestBody: { formData: { name: ['accepted-by-local'], token: ['secret-not-retained'] } } });
+    f.advance(60000);
+    await f.signal('ignored', { url: origin + '/v4/EndpointEvents', requestBody: { raw: [{ bytes: new TextEncoder().encode('name=disconnected-by-local&token=secret-not-retained').buffer }] } });
+    const status = await f.worker.message({ kind: 'status' }, sender);
+    assert.equal(status.completed, 1);
+    assert.equal(status.diagnostic.recognized, 2);
+    assert.equal(JSON.stringify(f.data).includes('secret-not-retained'), false);
+    assert.equal(readPropioSignal(origin + '.evil.test/v4/EndpointEvents', { name: 'accepted-by-local' }), null);
+    assert.equal(readPropioSignal(origin + '/v4/EndpointEvents/extra', { name: 'accepted-by-local' }), null);
+  }
+  assert.deepEqual(readPropioRequestBody({ formData: { status: ['AV'], password: ['never-read'] } }), { body: { status: 'AV' }, format: 'form' });
+  assert.equal(readPropioSignal(`${PORTAL_ORIGIN}/api/Interpreter/UpdateInterpreterStatus`, readPropioRequestBody({ formData: { status: ['AV', 'LO'] } }).body), null);
+  assert.equal(readPropioRequestBody({ raw: [{ bytes: new Uint8Array(65537).buffer }] }).format, 'oversized');
+});
+
+test('el diagnóstico no lee otras API del portal ni guarda cuerpos, rutas o credenciales', async () => {
+  const f = workerFixture();
+  const request = { requestId: 'private-request', method: 'POST', initiator: PORTAL_ORIGIN, url: PORTAL_ORIGIN + '/api/Login?token=private-value', tabId: 1, timeStamp: Date.parse(at) };
+  Object.defineProperty(request, 'requestBody', { get() { assert.fail('No debe leer el cuerpo del login'); } });
+  f.worker.beforeRequest(request);
+  await f.worker.completed({ requestId: request.requestId, statusCode: 200 });
+  await f.signal('unsupported-event');
+  const status = await f.worker.message({ kind: 'status' }, sender);
+  assert.equal(status.diagnostic.requests, 2);
+  assert.equal(status.diagnostic.recognized, 0);
+  assert.equal(status.diagnostic.last[0].kind, 'portal-api');
+  assert.equal(status.completed, 0);
+  assert.equal(status.queued, 0);
+  assert.equal(JSON.stringify(f.data).includes('private-value'), false);
+  assert.equal(JSON.stringify(f.data).includes('unsupported-event'), false);
+  assert.equal(propioRequestKind('https://evil.test/api/Login'), null);
+  const before = JSON.stringify(f.data);
+  f.worker.beforeRequest({ ...request, requestId: 'wrong-origin', initiator: 'https://evil.test', requestBody: {} });
+  await f.worker.completed({ requestId: 'wrong-origin', statusCode: 200 });
+  assert.equal(JSON.stringify(f.data), before);
+});
+
 test('reducer ignores incoming/rejected/unmatched ends and collapses repeated starts and ends', () => {
   const reduce = createPropioReducer({ randomId: () => 'generated-call-id' });
   let state;

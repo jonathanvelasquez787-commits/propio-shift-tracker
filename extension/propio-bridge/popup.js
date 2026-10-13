@@ -26,6 +26,19 @@ async function refresh() {
     const li = document.createElement('li');
     li.textContent = `${labels[item.signal] || 'Señal'} · ${new Date(item.at).toLocaleTimeString('es')}`; list.append(li);
   }
+  if (!state.last.length) { const li = document.createElement('li'); li.textContent = 'Todavía no se detectaron señales compatibles.'; list.append(li); }
+  const diagnostic = state.diagnostic || { requests: 0, recognized: 0, last: [] };
+  document.getElementById('detectorStatus').textContent = diagnostic.requests
+    ? `${diagnostic.requests} solicitud(es) observada(s) · ${diagnostic.recognized} señal(es) reconocida(s)`
+    : 'Sin solicitudes observadas. Recargá Propio después de actualizar la extensión y comprobá su acceso a este sitio.';
+  const requests = document.getElementById('detectorRequests'); requests.replaceChildren();
+  const kinds = { status: 'Estado de Propio', twilio: 'Evento de llamadas', 'portal-api': 'Otra solicitud del portal' };
+  const formats = { json: 'JSON', form: 'Formulario', missing: 'Cuerpo no disponible', oversized: 'Cuerpo demasiado grande', unreadable: 'Formato no reconocido', 'not-read': 'Cuerpo no leído' };
+  for (const item of [...diagnostic.last].reverse()) {
+    const li = document.createElement('li');
+    li.textContent = `${kinds[item.kind] || 'Solicitud'} · ${formats[item.format] || 'Sin formato'} · HTTP ${item.status} · ${item.result === 'recognized' ? 'Señal reconocida' : item.result === 'http-error' ? 'Solicitud fallida' : 'Sin señal compatible'}`;
+    requests.append(li);
+  }
 }
 async function act(packet) {
   if (busy) return;
