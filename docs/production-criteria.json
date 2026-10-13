@@ -225,6 +225,18 @@
             "31 chronological days preserve an independent ledger through imports, manual/live calls, corrections, deletion, goals, and reloads",
             "31 daily call saves, currency changes, allocation resets and payment corrections preserve an independent monthly payment ledger"
           ]
+        },
+        {
+          "file": "tests/call-sounds.test.mjs",
+          "namedCases": [
+            "call sounds are independent and opt-in with previews and master-volume mute",
+            "custom call playback scales volume and falls back when browser audio rejects",
+            "rejected call toggle selector and file removal restore their persisted controls",
+            "call audio upload rejects nonaudio oversized files and total settings overflow",
+            "rejected call audio upload preserves the previous file and failure feedback",
+            "async audio uploads cannot cross owners or overtake newer files or sound selections",
+            "upload and removal keep the independent enabled switch and update the custom file UI"
+          ]
         }
       ]
     },

@@ -317,6 +317,20 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
+Avisos v605: tres sonidos independientes al guardar una llamada terminada
+(incluido puente/respaldo live), un lote pegado o una manual nueva. Apagados
+por defecto, beep/campanita/archivo propio por acción, prueba y quitar archivo;
+máximo 300KB por audio y presupuesto global de ajustes respetado. Volumen
+general 0 silencia los avisos de llamadas y sus pruebas. No suena al editar,
+pegar sin importar, recargar, rechazar un guardado ni reimportar duplicados.
+Lotes guardados suenan una sola vez. Guardados rechazados revierten controles,
+lecturas de archivo validan propietario y última elección. Vista previa de
+mensajes en Avisos se ajusta a móvil sin recortar texto.
+631 pruebas (diez nuevas), 2.243 textos ES/EN, builds app/puente/resumen;
+Chrome con cuenta ficticia verifica once flujos y doce vistas ES/EN,
+claro/oscuro y 1440/390/320px. No se mide un dispositivo de audio físico.
+CI y publicación se confirman por commit y release en la evidencia final.
+
 Finanzas v604: auditoría profunda específica iniciada el 12 y cerrada el
 13/10/2026. Reversión completa de ajustes rechazados y propietarios protegidos;
 confirmaciones consultan filas/pagos actuales. Tarifa/meta en un snapshot,
@@ -822,6 +836,17 @@ La aplicación funciona en producción con estas bases vigentes:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v605 — Sonidos de llamadas en Avisos.**
+
+- Sonido por llamada terminada, lote pegado o llamada manual guardada;
+  interruptores independientes, presets y archivos propios de hasta 300KB.
+- Prueba, eliminación de archivo, volumen general y persistencia con
+  reversión ante rechazo; lecturas tardías no cruzan propietario/elección.
+- Sin sonidos por duplicados, edición o recarga. Pegado suena una vez por lote.
+  Previews de Avisos se ajustan a móvil sin perder contenido.
+- 631 pruebas, diez nuevas; once flujos Chrome y doce vistas ES/EN;
+  2.243 textos y builds app/puente/resumen correctos. Release se verifica aparte.
+
 **v604 — Auditoría profunda de Finanzas del 12–13/10/2026.**
 
 - Reservas/filas/categorías/colas rechazadas vuelven al estado anterior;
@@ -848,16 +873,3 @@ La aplicación funciona en producción con estas bases vigentes:
   importe, moneda, Reservado y acciones; equivalencia y límites explícitos.
 - 583 pruebas, 2.214 textos ES/EN y builds correctos; cuenta ficticia,
   17 controles, 24 vistas y ocho controles de tooltips.
-
-**v602 — Segunda auditoría super profunda del 12/10/2026.**
-
-- Conserva propietario durante descarga, conflicto e import diferido; bloqueo
-  de escrituras con identidad cambiada, incluso si el JSON coincide.
-- Borrado valida identidad antes/después, muestra errores de sesión y completa
-  salida aunque la limpieza local falle. No se borró la cuenta real.
-- Duración incompleta rechazada; hora cero AM/PM inválida; Higher Rate guarda
-  ajustes antes de premios y revierte bonos/Finanzas ante rechazo.
-- Avisos y Higher Rate accesibles a 320/390 px en ambos temas; textos y colores
-  de estados ES/EN, historial y ayuda de pegado corregidos sin cambiar datos.
-- 573 pruebas, 42 nuevas; 42 días extra con ledger independiente; builds de
-  app/puente/resumen correctos. Informe y límites en la auditoría nueva.

@@ -2212,6 +2212,12 @@
       "js/finance.js"
     ]
   },
+  "s_29e1faa8": {
+    "source": "Al guardar llamadas pegadas",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_29f9fc78": {
     "source": "Marca inicio, break, lunch y llamadas con un toque. Una barra fija arriba te dice qué está corriendo y cuánto llevas.",
     "files": [
@@ -2265,6 +2271,12 @@
     "files": [
       "app.html",
       "js/game.js"
+    ]
+  },
+  "s_2af05f71": {
+    "source": "Suena cuando la llamada terminada queda guardada, incluida una llamada del puente de Propio.",
+    "files": [
+      "app.html"
     ]
   },
   "s_2b0ccc28": {
@@ -2349,6 +2361,12 @@
     "source": "¿Vaciar el historial completo ({{v0}} ventana(s) de Higher Rate ya terminadas)? Las que siguen activas o futuras no se tocan. Las llamadas que ya recibieron un bono de esas ventanas conservan su bono ganado. No se puede deshacer.",
     "files": [
       "js/higher-rate.js"
+    ]
+  },
+  "s_2d6bba04": {
+    "source": "No se quitó el sonido porque no se pudo guardar.",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_2d8dc169": {
@@ -2792,6 +2810,12 @@
     "source": "Sin cambio vs ayer",
     "files": [
       "js/reports.js"
+    ]
+  },
+  "s_344657e4": {
+    "source": "No se cambió el aviso de llamada porque no se pudo guardar.",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_346da58d": {
@@ -3810,6 +3834,12 @@
     "source": "En la máxima medida permitida por la ley, el titular no responde por pérdidas\n    de ingresos, de datos o de oportunidad derivadas del uso del servicio, ni por\n    diferencias entre lo que la app calcula y lo que efectivamente te pague un\n    tercero. Se recomienda exportar respaldos periódicos.",
     "files": [
       "terminos.html"
+    ]
+  },
+  "s_48a7bff7": {
+    "source": "Un solo control para TODOS los sonidos: Logros, llamadas guardadas, turno/Break/Lunch y descanso por productividad, incluidos tus archivos personalizados. 0% = silencioso; los avisos escritos siguen apareciendo.",
+    "files": [
+      "app.html"
     ]
   },
   "s_48d567d8": {
@@ -5950,6 +5980,12 @@
       "app.html"
     ]
   },
+  "s_703c53ed": {
+    "source": "Quitar archivo",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_70403e9f": {
     "source": "Backup semanal listo · ya tienes 3 escudos",
     "files": [
@@ -7766,6 +7802,12 @@
       "js/game-battle.js"
     ]
   },
+  "s_909e1722": {
+    "source": "Suena una sola vez por lote guardado. Pegar texto sin importarlo o importar solo duplicados no reproduce el sonido.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_909f57a6": {
     "source": "Trabajo:",
     "files": [
@@ -8442,12 +8484,6 @@
   },
   "s_9d942cda": {
     "source": "Azul Real: Azul noche, intenso y celeste",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_9d9a9181": {
-    "source": "Un solo control para TODOS los sonidos del programa: efectos de Logros, avisos de turno/Break/Lunch y descanso por productividad (incluye tu sonido personalizado, si subiste uno). 0% = silencioso, los avisos siguen mostrándose igual como toast, solo sin sonido.",
     "files": [
       "app.html"
     ]
@@ -9709,6 +9745,12 @@
       "privacidad.html"
     ]
   },
+  "s_b5699c97": {
+    "source": "No se pudo guardar el sonido. Tu archivo anterior se conservó.",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_b56ab8eb": {
     "source": "Cada franja de tu turno es un bloque. Agrega uno por cada Trabajo, Break o Lunch que planees, con su hora de inicio y de fin — el resto del turno que no cubras con ningún bloque simplemente queda sin plan, sin afectar tu Adherencia. Un bloque de Trabajo puede llevar además una \"meta productiva\": cuántos minutos en llamada esperas lograr en ese bloque.",
     "files": [
@@ -10602,6 +10644,12 @@
       "js/app-main.js"
     ]
   },
+  "s_c6b0fa79": {
+    "source": "No se cambió el sonido porque no se pudo guardar.",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_c6bc844c": {
     "source": "¿Eliminar la llamada #{{v0}} ({{v1}} · {{v2}})? Esta acción no se puede deshacer.",
     "files": [
@@ -10914,6 +10962,12 @@
     "source": "Adherencia +{{v10}}",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_cde3f117": {
+    "source": "Suena después de guardar una llamada nueva. Editar una llamada existente no reproduce este aviso.",
+    "files": [
+      "app.html"
     ]
   },
   "s_cdecbf52": {
@@ -11242,6 +11296,12 @@
       "js/positive-reinforcement.js"
     ]
   },
+  "s_d3818c16": {
+    "source": "Quitar sonido personalizado",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_d3872b03": {
     "source": ". Déjalo vacío y guarda para volver al mensaje de siempre.",
     "files": [
@@ -11318,6 +11378,12 @@
     "source": "Tienes una llamada en curso. Al finalizar el turno se guardará esa llamada con la duración transcurrida hasta ahora y luego se cerrará el turno. ¿Finalizar de todos modos?",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_d54b8e2d": {
+    "source": "Al agregar una llamada manual",
+    "files": [
+      "app.html"
     ]
   },
   "s_d557261c": {
@@ -11870,6 +11936,12 @@
       "js/finance.js"
     ]
   },
+  "s_deed570c": {
+    "source": "Al finalizar una llamada",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_df0fba41": {
     "source": "Ha pasado una hora de trabajo sin llamadas · puedes retomar a tu ritmo",
     "files": [
@@ -12027,6 +12099,12 @@
     "source": "Nota opcional",
     "files": [
       "app.html"
+    ]
+  },
+  "s_e1e00705": {
+    "source": "Sonido personalizado eliminado. Se usará el beep clásico.",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_e1ebab3d": {

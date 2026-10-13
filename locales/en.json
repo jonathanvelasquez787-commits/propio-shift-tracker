@@ -2415,5 +2415,19 @@
   "s_b9c16341": "Internal value: {{v0}} USD{{v1}}. The screen rounds to cents.",
   "s_608afca6": "⚠️ Could not save — browser storage is full. Free up space (for example, a custom sound in Notifications) and try the change again.",
   "s_d06fae33": "The reservation was not released because it could not be saved.",
-  "s_588aa12b": "The automatic-allocation exclusion was not changed because it could not be saved."
+  "s_588aa12b": "The automatic-allocation exclusion was not changed because it could not be saved.",
+  "s_deed570c": "When a call ends",
+  "s_29e1faa8": "When saving pasted calls",
+  "s_d54b8e2d": "When adding a manual call",
+  "s_2af05f71": "Plays when the completed call is saved, including a call from the Propio bridge.",
+  "s_909e1722": "Plays once per saved batch. Pasting text without importing it or importing only duplicates does not play the sound.",
+  "s_cde3f117": "Plays after saving a new call. Editing an existing call does not play this notification.",
+  "s_d3818c16": "Remove custom sound",
+  "s_48a7bff7": "One control for ALL sounds: Achievements, saved calls, shift/Break/Lunch and productivity rest, including your custom files. 0% = silent; written notifications still appear.",
+  "s_c6b0fa79": "The sound was not changed because it could not be saved.",
+  "s_344657e4": "The call notification was not changed because it could not be saved.",
+  "s_2d6bba04": "The sound was not removed because it could not be saved.",
+  "s_e1e00705": "Custom sound removed. The classic beep will be used.",
+  "s_b5699c97": "The sound could not be saved. Your previous file was preserved.",
+  "s_703c53ed": "Remove file"
 }

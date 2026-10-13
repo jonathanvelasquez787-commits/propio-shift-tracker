@@ -5251,6 +5251,7 @@
     }
     .sched-compact-field {
       display: grid;
+      grid-template-columns: minmax(0, 1fr);
       gap: 3px;
       min-width: 0;
     }
@@ -7380,12 +7381,13 @@
 
     .msg-preview-row {
       display: flex;
+      min-width: 0;
       align-items: center;
       justify-content: space-between;
       gap: 8px;
       margin: 0 0 4px;
     }
-    .msg-preview-row label { margin: 0; }
+    .msg-preview-row label { margin: 0; min-width: 0; white-space: normal; }
     .msg-preview-tooltip-label {
       display: block;
       color: var(--muted);
@@ -7396,6 +7398,8 @@
       margin-bottom: 4px;
     }
     .msg-preview-box {
+      min-width: 0;
+      overflow-wrap: anywhere;
       padding: 8px 10px;
       border-radius: 10px;
       border: 1px dashed var(--line-2);
@@ -7404,8 +7408,7 @@
       font-size: 12.5px;
       line-height: 1.4;
       min-height: 32px;
-      display: flex;
-      align-items: center;
+      display: block;
     }
     .msg-preview-var {
       color: var(--cyan);
@@ -9438,7 +9441,7 @@
 <div class="sched-compact-title"><span class="sched-compact-title-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polygon points="4 9 8 9 12 5 12 19 8 15 4 15"/><path d="M17 8a5 5 0 0 1 0 8"/><path d="M19.5 5.5a9 9 0 0 1 0 13"/></svg></span>Volumen</div>
 <div class="sched-help-wrap">
 <button class="sched-compact-info-btn" type="button" aria-describedby="masterVolumeInfoTooltip">i</button>
-<div class="sched-help-tooltip" id="masterVolumeInfoTooltip" role="tooltip">Un solo control para TODOS los sonidos del programa: efectos de Logros, avisos de turno/Break/Lunch y descanso por productividad (incluye tu sonido personalizado, si subiste uno). 0% = silencioso, los avisos siguen mostrándose igual como toast, solo sin sonido.</div>
+<div class="sched-help-tooltip" id="masterVolumeInfoTooltip" role="tooltip">Un solo control para TODOS los sonidos: Logros, llamadas guardadas, turno/Break/Lunch y descanso por productividad, incluidos tus archivos personalizados. 0% = silencioso; los avisos escritos siguen apareciendo.</div>
 </div>
 </div>
 <div class="volume-row">
@@ -9447,6 +9450,88 @@
 <button class="sched-compact-test-btn" id="testMasterVolumeBtn" type="button" aria-label="Probar sonido"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polygon points="4 9 8 9 12 5 12 19 8 15 4 15"/><path d="M17 8a5 5 0 0 1 0 8"/><path d="M19.5 5.5a9 9 0 0 1 0 13"/></svg></button>
 </div>
 </div>
+
+<div class="sched-compact-card">
+<div class="sched-compact-head">
+<div class="sched-compact-title"><span class="sched-compact-title-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7 12.8 12.8 0 0 0 .7 2.8 2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5 12.8 12.8 0 0 0 2.8.7 2 2 0 0 1 1.8 2.1Z"/></svg></span>Al finalizar una llamada</div>
+</div>
+<label class="sched-checkbox-row"><input id="callEndedSoundEnabledInput" type="checkbox"/> Activar sonido</label>
+<p class="alert-hint" id="callEndedSoundHint">Suena cuando la llamada terminada queda guardada, incluida una llamada del puente de Propio.</p>
+<div class="sched-compact-row">
+<div class="sched-compact-field">
+<label for="callEndedAlarmSoundInput">Sonido</label>
+<select id="callEndedAlarmSoundInput" aria-describedby="callEndedSoundHint">
+<option value="classic">Beep clásico</option>
+<option value="chime">Campanita</option>
+<option value="custom">Sonido personalizado</option>
+</select>
+</div>
+<button class="sched-compact-test-btn" id="testCallEndedSoundBtn" type="button" aria-label="Probar sonido"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polygon points="4 9 8 9 12 5 12 19 8 15 4 15"/><path d="M17 8a5 5 0 0 1 0 8"/></svg></button>
+</div>
+<div id="callEndedAlarmCustomSoundSection" style="display:none;">
+<div class="sched-compact-field">
+<label for="callEndedAlarmSoundFile">Subir sonido (MP3/WAV/OGG, máx. 300KB)</label>
+<input accept="audio/*" id="callEndedAlarmSoundFile" type="file"/>
+</div>
+<p class="alert-hint" id="callEndedAlarmSoundFileStatus" role="status" aria-live="polite">Ningún archivo propio guardado — usando el beep clásico mientras tanto.</p>
+<button class="mc-btn-warn-pill" id="clearCallEndedSoundBtn" type="button" title="Quitar sonido personalizado" disabled>Quitar archivo</button>
+</div>
+</div>
+
+<div class="sched-compact-card">
+<div class="sched-compact-head">
+<div class="sched-compact-title"><span class="sched-compact-title-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7 12.8 12.8 0 0 0 .7 2.8 2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5 12.8 12.8 0 0 0 2.8.7 2 2 0 0 1 1.8 2.1Z"/></svg></span>Al guardar llamadas pegadas</div>
+</div>
+<label class="sched-checkbox-row"><input id="callPastedSoundEnabledInput" type="checkbox"/> Activar sonido</label>
+<p class="alert-hint" id="callPastedSoundHint">Suena una sola vez por lote guardado. Pegar texto sin importarlo o importar solo duplicados no reproduce el sonido.</p>
+<div class="sched-compact-row">
+<div class="sched-compact-field">
+<label for="callPastedAlarmSoundInput">Sonido</label>
+<select id="callPastedAlarmSoundInput" aria-describedby="callPastedSoundHint">
+<option value="classic">Beep clásico</option>
+<option value="chime">Campanita</option>
+<option value="custom">Sonido personalizado</option>
+</select>
+</div>
+<button class="sched-compact-test-btn" id="testCallPastedSoundBtn" type="button" aria-label="Probar sonido"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polygon points="4 9 8 9 12 5 12 19 8 15 4 15"/><path d="M17 8a5 5 0 0 1 0 8"/></svg></button>
+</div>
+<div id="callPastedAlarmCustomSoundSection" style="display:none;">
+<div class="sched-compact-field">
+<label for="callPastedAlarmSoundFile">Subir sonido (MP3/WAV/OGG, máx. 300KB)</label>
+<input accept="audio/*" id="callPastedAlarmSoundFile" type="file"/>
+</div>
+<p class="alert-hint" id="callPastedAlarmSoundFileStatus" role="status" aria-live="polite">Ningún archivo propio guardado — usando el beep clásico mientras tanto.</p>
+<button class="mc-btn-warn-pill" id="clearCallPastedSoundBtn" type="button" title="Quitar sonido personalizado" disabled>Quitar archivo</button>
+</div>
+</div>
+
+<div class="sched-compact-card">
+<div class="sched-compact-head">
+<div class="sched-compact-title"><span class="sched-compact-title-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7 12.8 12.8 0 0 0 .7 2.8 2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5 12.8 12.8 0 0 0 2.8.7 2 2 0 0 1 1.8 2.1Z"/></svg></span>Al agregar una llamada manual</div>
+</div>
+<label class="sched-checkbox-row"><input id="callManualSoundEnabledInput" type="checkbox"/> Activar sonido</label>
+<p class="alert-hint" id="callManualSoundHint">Suena después de guardar una llamada nueva. Editar una llamada existente no reproduce este aviso.</p>
+<div class="sched-compact-row">
+<div class="sched-compact-field">
+<label for="callManualAlarmSoundInput">Sonido</label>
+<select id="callManualAlarmSoundInput" aria-describedby="callManualSoundHint">
+<option value="classic">Beep clásico</option>
+<option value="chime">Campanita</option>
+<option value="custom">Sonido personalizado</option>
+</select>
+</div>
+<button class="sched-compact-test-btn" id="testCallManualSoundBtn" type="button" aria-label="Probar sonido"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polygon points="4 9 8 9 12 5 12 19 8 15 4 15"/><path d="M17 8a5 5 0 0 1 0 8"/></svg></button>
+</div>
+<div id="callManualAlarmCustomSoundSection" style="display:none;">
+<div class="sched-compact-field">
+<label for="callManualAlarmSoundFile">Subir sonido (MP3/WAV/OGG, máx. 300KB)</label>
+<input accept="audio/*" id="callManualAlarmSoundFile" type="file"/>
+</div>
+<p class="alert-hint" id="callManualAlarmSoundFileStatus" role="status" aria-live="polite">Ningún archivo propio guardado — usando el beep clásico mientras tanto.</p>
+<button class="mc-btn-warn-pill" id="clearCallManualSoundBtn" type="button" title="Quitar sonido personalizado" disabled>Quitar archivo</button>
+</div>
+</div>
+
 
 <div class="sched-compact-card">
 <div class="sched-compact-head">
