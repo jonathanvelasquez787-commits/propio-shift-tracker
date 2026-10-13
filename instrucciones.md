@@ -317,6 +317,21 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
+Finanzas v604: auditoría profunda específica iniciada el 12 y cerrada el
+13/10/2026. Reversión completa de ajustes rechazados y propietarios protegidos;
+confirmaciones consultan filas/pagos actuales. Tarifa/meta en un snapshot,
+pendiente por fila, precisión monetaria, cambios de moneda extremos, bonos
+históricos y respaldos financieros validados. Comparación mensual solo con
+base compatible; categorías heredadas accesibles, estimaciones opcionales,
+premios por reserva real y mensajes que explican el rechazo. Índice de pagos
+por renderizado: 885 Date frente a 65.684 en 40 filas/400 pagos.
+621 pruebas (38 nuevas), simulación de 35 días con ledger independiente,
+2.230 textos ES/EN y builds app/puente/resumen correctos. Chrome ficticio:
+17 comprobaciones de flujo, diez de integridad, 24 vistas responsive y
+nueve controles de tooltips en cada idioma. Sin datos reales modificados.
+Informe: docs/auditoria-finanzas-2026-10-13.md. CI y publicación exacta se
+verifican aparte en la evidencia de cierre.
+
 Finanzas v603: revisión aprobada de Gastos/Metas. Presupuesto, Reservado y
 Pagado se muestran separados; solo el ledger fechado determina Pagado. La
 marca antigua manualPaid se conserva como exclusión explícita de la reserva
@@ -807,6 +822,19 @@ La aplicación funciona en producción con estas bases vigentes:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v604 — Auditoría profunda de Finanzas del 12–13/10/2026.**
+
+- Reservas/filas/categorías/colas rechazadas vuelven al estado anterior;
+  tarifa y meta se guardan juntas, sin reemplazar propietarios ganadores.
+- Pagos, comparaciones mensuales y pendientes por fila coherentes;
+  confirmaciones actuales, respaldos validados y categorías antiguas visibles.
+- Centavos y cambios de moneda conservan el valor; bonos de texto no
+  concatenan ganancias. Estimaciones opcionales y premios por reserva real.
+- 621 pruebas, 35 días con oráculo independiente, diez comprobaciones
+  interactivas de integridad, 24 vistas y tooltips ES/EN. Build y escaneo OK.
+- Informe y límites: docs/auditoria-finanzas-2026-10-13.md; publicación
+  comprobada por CI, Vercel y release en la evidencia final.
+
 **v603 — Claridad y controles de Gastos y Metas.**
 
 - Estados independientes de reserva/pago, pagos derivados del ledger y
@@ -833,16 +861,3 @@ La aplicación funciona en producción con estas bases vigentes:
   de estados ES/EN, historial y ayuda de pegado corregidos sin cambiar datos.
 - 573 pruebas, 42 nuevas; 42 días extra con ledger independiente; builds de
   app/puente/resumen correctos. Informe y límites en la auditoría nueva.
-
-**12/10/2026 — Auditoría integral de contabilidad, importación y Finanzas.**
-
-- Conserva la meta decimal al guardar distribución; pagos numéricos aceptan
-  notación científica válida y rechazan overflow/entrada incompleta.
-- Rechaza historiales JSON corruptos antes de cambiar datos. ACW automático
-  usa sesiones conectadas; pausas reales no absorben todo el hueco ni se
-  omiten después de la última llamada. Break/Lunch manuales no duplican
-  minutos reales; bloques, adherencia y cabecera comparten el criterio.
-- 15 regresiones nuevas; 531 pruebas correctas. Segundo recorrido mensual
-  verifica pagos independientes de llamadas y reinicios de asignación.
-  Interfaz local y servidor confirman guardado; datos de prueba aislados.
-  Publicación y mantenimiento SQL se verifican aparte por release/integridad.

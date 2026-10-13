@@ -224,7 +224,7 @@ test('Finanzas concede y revoca el premio en el mes local aunque UTC ya esté en
   process.env.TZ = 'America/Tegucigalpa';
   t.after(() => { if (previousTimezone === undefined) delete process.env.TZ; else process.env.TZ = previousTimezone; });
   const h = harness(t, { at: new Date('2026-10-01T01:00:00Z').getTime() });
-  const row = { id: 'rent', name: 'Renta', kind: 'gasto', recurring: true, manualPaid: true };
+  const row = { id: 'rent', name: 'Renta', kind: 'gasto', recurring: true, manualPaid: true, targetAmount:10, assignedAmount:10 };
   h.config.financeCategories = { casa: { rows: [row] } };
   renderGame();
   assert.equal(h.ledger('finance-paid:').length, 1);
@@ -232,9 +232,9 @@ test('Finanzas concede y revoca el premio en el mes local aunque UTC ya esté en
   assert.equal(h.state.game.ledger['finance-paid:rent:2026-10'], undefined);
   h.reload(); renderGame();
   assert.equal(h.ledger('finance-paid:').length, 1);
-  row.manualPaid = false; renderGame();
+  row.assignedAmount = 0; renderGame();
   assert.equal(h.ledger('finance-paid:').length, 0);
-  row.manualPaid = true;
+  row.assignedAmount = 10;
   h.setNow(new Date('2026-10-01T06:01:00Z').getTime());
   renderGame();
   assert.ok(h.state.game.ledger['finance-paid:rent:2026-10']);
@@ -252,6 +252,16 @@ test('completar el monto de un gasto recurrente concede su recibo mensual y rein
   assert.equal(h.ledger('finance-paid:bill:').length, 0);
   row.assignedAmount = 10; renderGame();
   assert.equal(h.ledger('finance-paid:bill:').length, 1);
+});
+
+test('omitir reserva automática no concede un premio ni declara un pago sin dinero reservado', t => {
+  const h = harness(t);
+  const row = {id:'excluded',name:'Excluido',kind:'gasto',recurring:true,manualPaid:true,targetAmount:10,assignedAmount:0};
+  h.config.financeCategories = {otro:{rows:[row]}};
+  renderGame(); assert.equal(h.ledger('finance-paid:excluded:').length,0);
+  row.assignedAmount=10;renderGame();assert.equal(h.ledger('finance-paid:excluded:').length,1);
+  row.manualPaid=false;renderGame();assert.equal(h.ledger('finance-paid:excluded:').length,1);
+  h.reload();renderGame();assert.equal(h.ledger('finance-paid:excluded:').length,1);
 });
 
 test('pegar ayer derrota su monstruo y cambiar el día no daña al monstruo actual ni concede XP histórico', (t) => {

@@ -46,6 +46,10 @@ export function financePaymentRows(records, month, rowId = null) {
 
 export function financeMonthTotals(rows, records, month) {
   const payments = financePaymentRows(records, month);
+  return financeMonthTotalsFromPayments(rows, payments);
+}
+
+export function financeMonthTotalsFromPayments(rows, payments) {
   const budget = rows.reduce((sum, row) => sum + Math.max(0, Number(row.targetAmount) || 0), 0);
   const paid = payments.reduce((sum, payment) => sum + payment.usd, 0);
   const fixed = payments.filter(p => p.expenseType === 'fixed').reduce((sum, p) => sum + p.usd, 0);
@@ -53,8 +57,12 @@ export function financeMonthTotals(rows, records, month) {
 }
 
 export function financeExpenseStatus(row, records, month) {
-  const budget = Math.max(0, Number(row.targetAmount) || 0);
   const paid = financePaymentRows(records, month, row.id).reduce((sum, payment) => sum + payment.usd, 0);
+  return financeExpenseStatusFromPaid(row, paid);
+}
+
+export function financeExpenseStatusFromPaid(row, paid) {
+  const budget = Math.max(0, Number(row.targetAmount) || 0);
   const difference = budget - paid;
   return {
     paid,
@@ -67,6 +75,59 @@ export function financeExpenseStatus(row, records, month) {
 
 export function financeBudgetPeriod(row) {
   return ['weekly', 'fortnightly', 'monthly', 'onetime'].includes(row.budgetPeriod) ? row.budgetPeriod : 'unspecified';
+}
+
+export function financeCanCompareMonthlyBudget(row) {
+  const target = Number(row.targetAmount);
+  return financeBudgetPeriod(row) === 'monthly' && Number.isFinite(target)
+    && Math.abs(target * 100 - Math.round(target * 100)) < 1e-6;
+}
+
+export function validFinanceSettings(config) {
+  const record = value => value && typeof value === 'object' && !Array.isArray(value);
+  const fixed = ['casa','servicios','transporte','comida','deuda','ahorro','otro'];
+  const unsafe = id => ['__proto__','constructor','prototype'].includes(id);
+  const categoryIds = new Set(fixed);
+  if ('customFinanceCategories' in config) {
+    if (!Array.isArray(config.customFinanceCategories)) return false;
+    for (const category of config.customFinanceCategories) {
+      if (!record(category) || typeof category.id !== 'string' || !category.id.trim() || unsafe(category.id)
+        || categoryIds.has(category.id) || typeof category.label !== 'string' || !category.label.trim()) return false;
+      categoryIds.add(category.id);
+    }
+  }
+  const rowIds = new Set();
+  if (config.exchangeRate != null && (!Number.isFinite(Number(config.exchangeRate)) || Number(config.exchangeRate) < 0 || !Number.isFinite(Number(config.exchangeRate) * 1e9))) return false;
+  if ('financeCategories' in config) {
+    if (!record(config.financeCategories)) return false;
+    for (const [id, category] of Object.entries(config.financeCategories)) {
+      if (unsafe(id) || !record(category) || !Array.isArray(category.rows)) return false;
+      for (const row of category.rows) {
+        if (!record(row) || typeof row.id !== 'string' || !row.id.trim() || rowIds.has(row.id)
+          || typeof row.name !== 'string' || !row.name.trim()) return false;
+        const target = Number(row.targetAmount);
+        if (!['number','string'].includes(typeof row.targetAmount) || String(row.targetAmount).trim() === ''
+          || !Number.isFinite(target) || target < 0 || target > 1e9) return false;
+        if (row.assignedAmount != null && row.assignedAmount !== '' && (!['number','string'].includes(typeof row.assignedAmount)
+          || !Number.isFinite(Number(row.assignedAmount)) || Number(row.assignedAmount) < 0)) return false;
+        if (row.kind != null && !['gasto','meta'].includes(row.kind)) return false;
+        if (row.manualPaid != null && typeof row.manualPaid !== 'boolean') return false;
+        rowIds.add(row.id);
+      }
+    }
+  }
+  if ('financePayments' in config) {
+    if (!Array.isArray(config.financePayments)) return false;
+    const ids = new Set();
+    for (const payment of config.financePayments) {
+      if (!validFinancePayment(payment) || ids.has(payment.id)) return false;
+      ids.add(payment.id);
+    }
+  }
+  if (config.financePlanning != null && (!record(config.financePlanning)
+    || (config.financePlanning.split != null && !validFinanceSplit(config.financePlanning.split))
+    || (config.financePlanning.daysPerWeek != null && (!Number.isInteger(Number(config.financePlanning.daysPerWeek)) || config.financePlanning.daysPerWeek < 1 || config.financePlanning.daysPerWeek > 7)))) return false;
+  return true;
 }
 
 export function financeSavingsMonthly(row) {

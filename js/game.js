@@ -3,7 +3,7 @@ import { calls, settings, state } from './app-context.js';
 import { initGameAudio, playGameSound, syncGameAudio, stopGameSounds } from './game-audio.js';
 import { battleWorkMode } from './game-duel.js';
 import { battleMarkup, syncBattle, playBattleCall, stopBattle, normalizeBattleWeapon } from './game-battle.js';
-import { financeIsRowPagado } from './finance.js';
+import { financeReservationComplete } from './finance.js';
 import { activeWorkSinceLastCall, monetaryMilestones, supportiveDayEvidence, surpriseDecision } from './reinforcement-rules.js';
 import { chooseCallFeedback, configureReinforcementFeedback, notifyReinforcement, reinforcementText } from './reinforcement-feedback.js';
 let appConfirm, callDateKeyFromValue, callDateToDate, callsForDay, closeModal, computeComplianceStreak, convertedAmountText;
@@ -1333,7 +1333,7 @@ function syncFinanceRewards() {
 
       if (financeRowIsMeta(row)) {
         const key = `finance-meta:${row.id}`;
-        const complete = target > 0 && assigned >= target - 0.004;
+        const complete = target > 0 && assigned > 0 && assigned >= target - 0.004;
         if (complete) validMetaKeys.add(key);
         if (!complete || state.game.ledger[key] || !enabled) return;
 
@@ -1351,7 +1351,7 @@ function syncFinanceRewards() {
 
       if (row.recurring) {
         const key = `finance-paid:${row.id}:${month}`;
-        const paid = financeIsRowPagado(row);
+        const paid = financeReservationComplete(row);
         if (paid) validPaidKeys.add(key);
         if (!paid || state.game.ledger[key] || !enabled) return;
         const dayKey = todayCallDateKey();
@@ -1359,7 +1359,7 @@ function syncFinanceRewards() {
         const granted = bonus.applied;
         state.game.ledger[key] = { type: 'finance-paid', dayKey, bonusXp: granted, gross: bonus.gross, applied: bonus.applied };
         changed = true;
-        queueGameToast(granted > 0 ? ui`+${granted} XP · ${row.name} pagado a tiempo` : ui`${row.name} pagado · XP diario sellado`);
+        queueGameToast(granted > 0 ? ui`+${granted} XP · ${row.name} con reserva completa` : ui`${row.name} con reserva completa · XP diario sellado`);
       }
     });
   });

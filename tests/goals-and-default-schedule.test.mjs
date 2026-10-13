@@ -32,7 +32,7 @@ function harness(t) {
   let persisted,opened;
   const save=()=>{persisted=JSON.stringify({settings,state,calls});};
   configureSettingsContext({...h,ui,translateText,closeModal(){},convertedAmountText:()=>'',currencyCeilFromUsdAmount:(usd,rate)=>Math.ceil(usd*rate*100)/100,
-    effectiveCycleGoal:()=>0,ensureCurrencySettings(){},escapeHtml:String,formatCallDayLabel:String,formatMinutes:n=>String(Math.round(n*10)/10),iconHtml:()=>'',money:n=>n.toFixed(2),onGameDayMetadataChanged(){},openModal:id=>{opened=id;},render(){},saveSettingsOnly:save,saveStateOnly:save,toast(){},usdCeilFromCurrencyAmount:(amount,rate)=>Math.ceil(amount/rate*100)/100});
+    effectiveCycleGoal:()=>0,ensureCurrencySettings(){},escapeHtml:String,formatCallDayLabel:String,formatMinutes:n=>String(Math.round(n*10)/10),iconHtml:()=>'',money:n=>n.toFixed(2),onGameDayMetadataChanged(){},openModal:id=>{opened=id;},render(){},saveSettingsOnly:save,saveStateOnly:save,saveAll:save,toast(){},usdCeilFromCurrencyAmount:(amount,rate)=>Math.ceil(amount/rate*100)/100});
   const edit=(scope,min)=>{element('productiveGoalInput').value=String(min);element('earningsGoalInput').value=String(h.effectiveDailyGoal().usd);requestGoalChange('minutes');assert.equal(opened,'goalScopeModal');applyPendingGoalChange(scope);};
   return {h,element,edit,opened:()=>opened,reload(){const data=JSON.parse(persisted);setAppSettings(data.settings);setAppState(data.state);setAppCalls(data.calls);}};
 }

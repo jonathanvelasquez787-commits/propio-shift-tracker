@@ -75,7 +75,7 @@ for (const language of ['es', 'en']) {
       captureFinanceDetails() {}, financeAvailableBalance: () => 0,
       financeGastoRowsSorted: () => [{ id: 'expense', targetAmount: 10, assignedAmount: 5 }],
       financeMetaRowsSorted: () => [{ id: 'savings', targetAmount: 10, assignedAmount: 2 }],
-      financeIsRowPagado: () => false, renderFinancePreview() {}, renderFinancePlanning() {}, updateFinanceTotalsScrollHint() {},
+      financeIsRowPagado: () => false, prepareFinanceMonthRender() {}, renderFinancePreview() {}, renderFinancePlanning() {}, updateFinanceTotalsScrollHint() {},
       money: value => `$${value}`, financeConvertedInline: () => '', escapeHtml: String,
       todayCallDateKey: key, setEvent() {}, fmtTime: String, saveAll: () => true,
       onGameShiftEnded() {}, toast: message => messages.push(message),

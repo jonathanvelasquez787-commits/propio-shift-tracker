@@ -2,6 +2,7 @@ import { ui, translateText, translateMarkup, displayLocale, translateDocument } 
 import { applyAppearance, wireAppearance } from './appearance.js';
 import { wireAchievementHelp } from './help-tooltips.js';
 import { wireFinancePlanning, financeInputUsd } from './finance-planning.js';
+import { validFinanceSettings } from './finance-plan-model.js';
 import { normalizeBattleWeapon } from './game-battle.js';
 import { createPropioReceiver, createStorageRevisionGuard, ignorePropioCall } from './propio-bridge.js';
 import { settingsWithinBudget, reportLocalPersistenceFailure, readMeta } from './sync.js';
@@ -851,7 +852,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
       const fallback = defaultSettings();
       if (!['en', 'es'].includes(settings.language)) settings.language = fallback.language;
       if (!Number.isFinite(Number(settings.rate)) || Number(settings.rate) <= 0) settings.rate = fallback.rate;
-      if (!Number.isFinite(Number(settings.exchangeRate)) || Number(settings.exchangeRate) < 0) settings.exchangeRate = fallback.exchangeRate;
+      if (!Number.isFinite(Number(settings.exchangeRate)) || Number(settings.exchangeRate) < 0 || !Number.isFinite(Number(settings.exchangeRate) * 1e9)) settings.exchangeRate = fallback.exchangeRate;
       if (typeof settings.currencyLabel !== 'string') settings.currencyLabel = fallback.currencyLabel;
       if (!/^\d{4}-\d{2}-\d{2}$/.test(String(settings.cycleAnchorDate || ''))) settings.cycleAnchorDate = fallback.cycleAnchorDate;
       if (!Number.isFinite(Number(settings.cyclePayOffsetDays)) || Number(settings.cyclePayOffsetDays) < 0) settings.cyclePayOffsetDays = fallback.cyclePayOffsetDays;
@@ -987,7 +988,12 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
       if (!Array.isArray(settings.customFinanceCategories)) settings.customFinanceCategories = [];
       settings.customFinanceCategories = settings.customFinanceCategories.filter(c =>
         c && typeof c === 'object' && String(c.id || '').trim() && String(c.label || '').trim()
-      );
+      ).map(category => ({...category,id:String(category.id),label:String(category.label)}));
+      const seenFinanceCategories = new Set(Object.keys(FINANCE_CATEGORIES));
+      settings.customFinanceCategories = settings.customFinanceCategories.filter(category => {
+        if (seenFinanceCategories.has(category.id) || ['__proto__','constructor','prototype'].includes(category.id)) return false;
+        seenFinanceCategories.add(category.id); return true;
+      });
       settings.customFinanceCategories.forEach((c) => {
         c.emoji = String(c.emoji || '').trim() || '🏷️';
         if (!FINANCE_CUSTOM_CATEGORY_PALETTE.includes(c.rgb)) c.rgb = FINANCE_CUSTOM_CATEGORY_PALETTE[0];
@@ -999,7 +1005,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
       if (!settings.financeCategories || typeof settings.financeCategories !== 'object' || Array.isArray(settings.financeCategories)) {
         settings.financeCategories = {};
       }
-      const allFinCategoryIds = Object.keys(FINANCE_CATEGORIES).concat(settings.customFinanceCategories.map(c => c.id));
+      const allFinCategoryIds = [...new Set([...Object.keys(FINANCE_CATEGORIES), ...settings.customFinanceCategories.map(c => c.id), ...Object.keys(settings.financeCategories)])];
       allFinCategoryIds.forEach((catId) => {
         const cat = settings.financeCategories[catId];
         if (!cat || typeof cat !== 'object' || Array.isArray(cat) || !Array.isArray(cat.rows)) {
@@ -1007,6 +1013,13 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
           return;
         }
         cat.rows = cat.rows.filter(r => r && typeof r === 'object' && String(r.id || '').trim() && String(r.name || '').trim() && Number.isFinite(Number(r.targetAmount)) && Number(r.targetAmount) >= 0);
+        cat.rows.forEach(row => {
+          row.id = String(row.id);
+          row.name = String(row.name);
+          row.categoryId = catId;
+          const assigned = Number(row.assignedAmount);
+          row.assignedAmount = Number.isFinite(assigned) && assigned >= 0 ? assigned : 0;
+        });
       });
       if (typeof settings.financeAutoFill !== 'boolean') settings.financeAutoFill = false;
       if (!settings.game || typeof settings.game !== 'object' || Array.isArray(settings.game)) settings.game = { ...fallback.game };
@@ -1126,6 +1139,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
       const label = String(settings.currencyLabel || '').trim();
       if (!Number.isFinite(rate) || rate <= 0 || !label) return '';
       const converted = (Number.isFinite(usdAmount) ? usdAmount : 0) * rate;
+      if (!Number.isFinite(converted)) return `≈ ${label} —`;
       // Redondeado a unidades enteras: el monto real vive en dólares, y convertirlo de vuelta con 2
       // decimales expone un desfase de centavos que confunde sin aportar nada.
       return `≈ ${label} ${Math.round(converted)}`;
@@ -1258,7 +1272,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
       }
     }
 
-    const STORAGE_QUOTA_TOAST = translateText('⚠️ No se pudo guardar — el almacenamiento del navegador está lleno. Tu cambio se mantiene en esta sesión, pero no quedará guardado hasta que liberes espacio (borra llamadas muy viejas o un sonido personalizado en Avisos).');
+    const STORAGE_QUOTA_TOAST = translateText('⚠️ No se pudo guardar — el almacenamiento del navegador está lleno. Libera espacio (por ejemplo, un sonido personalizado en Avisos) y vuelve a intentar el cambio.');
     let storageSnapshotPending = false;
 
     function canPersistLocalChanges() {
@@ -5125,6 +5139,9 @@ function renderPayDatesSection() {
       if ('settings' in payload && (!payload.settings || typeof payload.settings !== 'object' || Array.isArray(payload.settings))) {
         return { ok: false, error: translateText('El campo "settings" del respaldo no es válido.') };
       }
+      if (payload.settings && !validFinanceSettings(payload.settings)) {
+        return { ok: false, error: translateText('El respaldo contiene datos de Finanzas inválidos o duplicados. Tus datos actuales no se cambiaron.') };
+      }
       return { ok: true };
     }
 
@@ -5332,7 +5349,7 @@ function renderPayDatesSection() {
       DEFAULT_USER_EMOJI, EMOJI_CHOICES, RATE, closeModal, convertedAmountText, currencyCeilFromUsdAmount,
       effectiveCycleGoal, effectiveDailyGoal, ensureCurrencySettings, escapeHtml, formatCallDayLabel,
       formatMinutes, getActiveDayKey, getDailyGoalOverride, iconHtml, money, openModal, render,
-      onGameDayMetadataChanged, saveSettingsOnly, saveStateOnly, snapshotHistoricalPlanning,
+      onGameDayMetadataChanged, saveSettingsOnly, saveStateOnly, saveAll, snapshotHistoricalPlanning,
       setDailyGoalOverride, toast, todayCallDateKey,
       usdCeilFromCurrencyAmount,
     });
@@ -6594,9 +6611,9 @@ export function render() {
       renderGame();
     }
 
-    export function toast(msg) {
+    export function toast(msg, { persistenceFailure = false } = {}) {
       const el = document.getElementById('toast');
-      el.textContent = storageSnapshotPending ? STORAGE_QUOTA_TOAST : msg;
+      el.textContent = storageSnapshotPending && !persistenceFailure ? STORAGE_QUOTA_TOAST : msg;
       el.classList.add('show');
       clearTimeout(toast.timer);
       toast.timer = setTimeout(() => el.classList.remove('show'), 2200);

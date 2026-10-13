@@ -46,9 +46,17 @@ export function configureHigherRateContext(context) {
       // existe, pero el nivel que calificó se conserva.
       if (call.frozenHigherRateBonus) {
         const frozenTierMeta = HIGHER_RATE_TIERS[call.frozenHigherRateBonus.tier];
-        if (!frozenTierMeta) return call.frozenHigherRateBonus;
+        if (!frozenTierMeta) {
+          const raw = call.frozenHigherRateBonus.amount;
+          if (!['number','string'].includes(typeof raw) || (typeof raw === 'string' && !/^\d+(?:\.\d+)?(?:e[+-]?\d+)?$/i.test(raw.trim()))) return null;
+          const amount = Number(raw);
+          return Number.isFinite(amount) && amount >= 0 ? {...call.frozenHigherRateBonus, amount} : null;
+        }
+        if (!['number','string'].includes(typeof call.durationMin)) return null;
+        const duration = Number(call.durationMin);
+        if (!Number.isFinite(duration) || duration < 0) return null;
         return {
-          amount: frozenTierMeta.bonusPerMin * (Number(call.durationMin) || 0),
+          amount: frozenTierMeta.bonusPerMin * duration,
           tier: call.frozenHigherRateBonus.tier,
           windowId: call.frozenHigherRateBonus.windowId,
         };
