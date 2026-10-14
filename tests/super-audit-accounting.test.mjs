@@ -94,7 +94,7 @@ function harness(t) {
   const previousDocument = globalThis.document;
   const originalNow = Date.now;
   const inputs = new Map();
-  const element = id => { if (!inputs.has(id)) inputs.set(id, { value: '', style: {}, classList: { contains: () => false, add() {}, remove() {} }, setAttribute() {} }); return inputs.get(id); };
+  const element = id => { if (!inputs.has(id)) inputs.set(id, { value: '', dataset: {}, style: {}, classList: { contains: () => false, add() {}, remove() {} }, setAttribute() {} }); return inputs.get(id); };
   const document = { getElementById: element, querySelectorAll: () => [] };
   globalThis.document = document;
   let clock = at(1, '19:00').getTime(), sequence = 0, persisted, saves = 0;

@@ -1,6 +1,6 @@
 import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 import { settings, state } from './app-context.js';
-import { notifyReinforcement, reinforcementFeedbackEnabled, reinforcementText } from './reinforcement-feedback.js';
+import { normalizeInactivityMessage, notifyReinforcement, reinforcementFeedbackEnabled, reinforcementText } from './reinforcement-feedback.js';
 import { callFeedbackSilenced } from './call-feedback.js';
 
 let callDateKeyFromValue, callsForDay, closeModal, convertedAmountText, effectiveDailyGoal;
@@ -79,6 +79,7 @@ export function normalizeReinforcementSettings(raw) {
   return {
     enabled: source.enabled === true,
     askAfterCall: source.askAfterCall !== false,
+    inactivityMessage: normalizeInactivityMessage(source.inactivityMessage),
     rewards,
   };
 }
@@ -508,6 +509,34 @@ function deleteRewardEditor() {
   renderPositiveReinforcement();
 }
 
+let inactivityMessageDraftOwner = null;
+export function saveInactivityMessage() {
+  ensurePositiveState();
+  const input = document.getElementById('positiveInactivityMessageInput');
+  if (!input) return false;
+  const owner = settings;
+  const previous = owner.reinforcement.inactivityMessage;
+  const message = normalizeInactivityMessage(input.value);
+  owner.reinforcement.inactivityMessage = message;
+  const saved = saveSettingsOnly() !== false;
+  if (settings !== owner) {
+    inactivityMessageDraftOwner = null;
+    renderPositiveReinforcement();
+    return false;
+  }
+  const status = document.getElementById('positiveInactivityMessageStatus');
+  if (!saved) {
+    owner.reinforcement.inactivityMessage = previous;
+    if (status) status.textContent = translateText('No se pudo guardar el mensaje.');
+    return false;
+  }
+  input.value = message;
+  delete input.dataset.dirty;
+  inactivityMessageDraftOwner = owner;
+  if (status) status.textContent = translateText(message ? 'Mensaje guardado' : 'Mensaje original restaurado');
+  return true;
+}
+
 function renderSettingsRewards() {
   const catalog = document.getElementById('physicalRewardCatalog');
   const selected = document.getElementById('physicalRewardSelected');
@@ -515,6 +544,17 @@ function renderSettingsRewards() {
   const ask = document.getElementById('positiveAskAfterCallInput');
   if (enabled) enabled.checked = settings.reinforcement.enabled;
   if (ask) ask.checked = settings.reinforcement.askAfterCall;
+  const inactivityInput = document.getElementById('positiveInactivityMessageInput');
+  if (inactivityInput) {
+    if (inactivityMessageDraftOwner !== settings) {
+      delete inactivityInput.dataset.dirty;
+      inactivityInput.value = settings.reinforcement.inactivityMessage;
+      const status = document.getElementById('positiveInactivityMessageStatus');
+      if (status) status.textContent = '';
+      inactivityMessageDraftOwner = settings;
+    } else if (document.activeElement !== inactivityInput && inactivityInput.dataset.dirty !== 'true') inactivityInput.value = settings.reinforcement.inactivityMessage;
+    inactivityInput.placeholder = translateText('Ha pasado una hora de trabajo sin llamadas · puedes retomar a tu ritmo');
+  }
   const picker = document.getElementById('physicalRewardPresetSelect');
   if (catalog && picker) {
     const previous = picker.value;
@@ -684,6 +724,16 @@ export function initPositiveReinforcement() {
     if (action === 'toggle-history') { historyExpanded = !historyExpanded; renderHistory(); }
   });
   document.getElementById('physicalRewardPresetSelect')?.addEventListener('change', syncPresetSelection);
+  document.getElementById('positiveInactivityMessageInput')?.addEventListener('input', (event) => {
+    event.target.dataset.dirty = 'true';
+    inactivityMessageDraftOwner = settings;
+    const status = document.getElementById('positiveInactivityMessageStatus');
+    if (status) status.textContent = '';
+  });
+  document.getElementById('positiveInactivityMessageInput')?.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') { event.preventDefault(); saveInactivityMessage(); }
+  });
+  document.getElementById('positiveInactivityMessageSaveBtn')?.addEventListener('click', saveInactivityMessage);
   document.getElementById('savePhysicalRewardBtn')?.addEventListener('click', saveRewardEditor);
   document.getElementById('deletePhysicalRewardBtn')?.addEventListener('click', deleteRewardEditor);
   document.getElementById('physicalRewardTriggerInput')?.addEventListener('change', syncRewardEditorConditional);

@@ -742,6 +742,26 @@ test('inactividad nocturna deduplica a ambos lados de medianoche del mismo turno
   assert.equal(h.ledger('idle-support:09/30/2026:').length, 0);
 });
 
+test('custom inactivity notification uses saved text with achievements off and preserves threshold and dedupe', (t) => {
+  const h = harness(t);
+  h.config.game.enabled = false;
+  h.config.reinforcement.enabled = true;
+  h.config.reinforcement.inactivityMessage = 'Un paso a la vez <3';
+  h.state.shiftStartedAt = h.iso(h.now - 59 * 60000);
+  const xp = h.state.game.totalXp;
+  assert.equal(checkReinforcementInactivity(h.now), false);
+  h.advance(60000);
+  assert.equal(checkReinforcementInactivity(h.now), true);
+  assert.equal(h.stack.children.at(-1).textContent, 'Un paso a la vez <3');
+  assert.equal(h.state.game.totalXp, xp);
+  assert.equal(h.rows.length, 0);
+  h.config.reinforcement.inactivityMessage = 'Otro mensaje';
+  assert.equal(checkReinforcementInactivity(h.now), false);
+  h.reload();
+  assert.equal(checkReinforcementInactivity(h.now), false);
+  assert.equal(h.ledger('idle-support:').length, 1);
+});
+
 test('cola real limita a tres toasts y no repite el último texto después de expirar', (t) => {
   const h = harness(t);
   for (const message of ['Cola uno', 'Cola dos', 'Cola tres', 'Cola cuatro']) queueGameToast(message);

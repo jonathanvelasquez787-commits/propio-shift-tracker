@@ -922,7 +922,7 @@ La aplicación funciona en producción con estas bases vigentes:
   el de la guía es nofollow. La extensión se instala desde archivo según el
   propietario, por lo que no hay ficha propia de Chrome Web Store que editar.
   Detalle en `docs/seo.md`.
-- La versión actual de la app es 612; la extensión unificada es 2.1.8. El build
+- La versión actual de la app es 613; la extensión unificada es 2.1.8. El build
   del resumen independiente 1.0.5 queda compatible para instalaciones anteriores.
   Refuerzo positivo puede funcionar con Logros apagados. La auditoría profunda del
   8 de octubre corrigió seis fallos; la ampliación corrigió cinco más en arranque,
@@ -947,6 +947,26 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v613 — Mensaje editable de apoyo tras una hora sin llamadas.**
+
+- Logros → Refuerzo positivo incorpora mensaje de inactividad editable,
+  Guardar/Enter y confirmación de guardado. Usa el patrón del editor de nombre.
+- Preferencia por cuenta en reinforcement.inactivityMessage; máximo 240
+  caracteres, texto plano. Vacío o ajustes antiguos usan el mensaje original.
+- Conserva borrador durante render y ante guardado rechazado; no mezcla
+  mensajes si cambia la cuenta. Puede configurarse con Logros apagados.
+- Umbral de 60 minutos de trabajo, exclusión de pausas, canales y dedupe
+  permanecen iguales. Editar el texto no vuelve a generar un aviso ya recibido.
+- 729 pruebas y build correctos, cuatro regresiones nuevas. App compilada:
+  44 comprobaciones ES/EN en ambos temas, guardado mediante RPC/lectura de
+  ajustes ficticios, recarga, Enter, borrador, notificación real del texto,
+  restauración y cuatro anchuras 320–1365 px sin overflow ni errores. HTML
+  escrito en el mensaje se muestra como texto; no se ejecuta. Cuenta/nube
+  ficticias; sin cambios de esquema, API o RLS, ni pruebas con cuenta real.
+- Extensión continúa en 2.1.8. Arranque real y regla oficial de segundos de
+  Propio siguen pendientes. CI/publicación se confirman por SHA separado.
+
 
 **v612 / extensión 2.1.8 — Encabezado y explicación de espera.**
 
@@ -989,23 +1009,3 @@ La aplicación funciona en producción con estas bases vigentes:
 - Worker empaquetado en Chromium aislado: default antiguo reemplazado por
   revisión personal, cuenta ficticia conservada al reabrir, fallo de API nativa
   libera preparación y reutiliza helper. Chromium 151, no perfil del usuario.
-
-
-**v610 / extensión 2.1.5 — Registro discreto y ajustes solicitados.**
-
-- Llamadas válidas guardadas por el puente, recuperadas y sincronizadas no
-  anuncian éxito, abren reflexión ni generan sonidos/efectos/toasts/banners.
-  XP, hitos y premios siguen calculándose y guardándose; acciones manuales
-  conservan su feedback. Errores y respaldo de una llamada que no pudo
-  guardarse mantienen su recuperación, sin ocultar una pérdida de datos.
-- Moneda grande sin ≈: el símbolo permanece en la línea pequeña al alternar.
-- Móvil claro reutiliza el fondo oscuro del reloj y su hora blanca.
-- Móvil muestra ACW y mantiene el Día activo junto a ese contador; conserva
-  fecha/flechas y nombre completo en escritorio, con compactación a 320 px.
-- Resumen del historial aclara ganancias sin bonos de Surge Hours, en ES/EN,
-  sin modificar sumas. Unificada 2.1.5 e independiente 1.0.5.
-- 718 pruebas y builds correctos. Cuatro regresiones nuevas; ledger idéntico
-  con/sin feedback, sonidos restaurados, ambos canales y guardado live.
-  App compilada: 24 comprobaciones ES/EN y ambos temas, aviso/reflexión/FX
-  ausentes para puente y conservados para manual; ≈ abajo, pareja ACW/fecha
-  en cinco anchuras. Fixtures de cuenta/portal; Chrome real no certificado.

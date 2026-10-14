@@ -9,13 +9,26 @@ setLanguage('es');
 const {
   LONG_CALL_MINUTES, REINFORCEMENT_TEXTS, chooseCallFeedback,
   configureReinforcementFeedback, notifyReinforcement, reinforcementFeedbackEnabled,
-  reinforcementText, resetFeedbackForTests,
+  reinforcementText, resetFeedbackForTests, normalizeInactivityMessage,
 } = await import('../js/reinforcement-feedback.js');
 const {
   configurePositiveReinforcementContext, createDefaultReinforcementState,
   initPositiveReinforcement, onPositiveCallSaved, onPositiveRewardWindow,
   renderPositiveReinforcement, reopenPositiveReflection,
 } = await import('../js/positive-reinforcement.js');
+
+test('custom inactivity message is bounded plain text and empty restores the default', () => {
+  const message = 'Respirá <3 y tomá la próxima cuando estés listo.';
+  assert.equal(normalizeInactivityMessage(null), '');
+  assert.equal(normalizeInactivityMessage({ text: message }), '');
+  assert.equal(normalizeInactivityMessage('  Hola\ncompa\u0000  '), 'Hola compa');
+  assert.equal(normalizeInactivityMessage('x'.repeat(500)).length, 240);
+  setAppSettings({ reinforcement: { inactivityMessage: message } });
+  assert.equal(reinforcementText('idle'), message);
+  assert.equal(reinforcementText('dropped'), REINFORCEMENT_TEXTS.dropped[0]);
+  setAppSettings({ reinforcement: { inactivityMessage: '   ' } });
+  assert.equal(reinforcementText('idle'), REINFORCEMENT_TEXTS.idle[0]);
+});
 
 test('automatic call feedback suppresses both notification channels without disabling preferences', () => {
   const config = { game: { enabled: true, intensity: 'arcade' }, reinforcement: { enabled: true } };

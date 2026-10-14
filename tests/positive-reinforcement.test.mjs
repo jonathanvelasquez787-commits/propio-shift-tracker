@@ -3,12 +3,14 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { translateText } from '../js/i18n.js';
 import { setAppCalls, setAppSettings, setAppState } from '../js/app-context.js';
 import {
   PHYSICAL_REWARD_PRESETS, configurePositiveReinforcementContext, createDefaultReinforcementState,
   initPositiveReinforcement, migratePositiveCallIdReferences, normalizeReinforcementSettings,
   normalizeReinforcementState, onPositiveCallSaved, onPositiveRewardWindow, reconcilePositiveCalls,
   reopenPositiveReflection, clearPositiveReinforcementTransients,
+  renderPositiveReinforcement, saveInactivityMessage,
 } from '../js/positive-reinforcement.js';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -29,6 +31,53 @@ test('premios personales y catálogo normalizan límites sin introducir puntos n
   assert.deepEqual({ every: config.rewards[0].every, maxPerDay: config.rewards[0].maxPerDay, accumulationTarget: config.rewards[0].accumulationTarget, durationMin: config.rewards[0].durationMin, costUsd: config.rewards[0].costUsd }, { every: 100, maxPerDay: 10, accumulationTarget: 30, durationMin: 240, costUsd: 0 });
   assert.equal(config.rewards[0].name, 'Mi premio');
   assert.deepEqual(normalizeReinforcementState({ recoveries: [{}], pendingRewards: [{ name: '<bad>', window: 'other' }] }).pendingRewards, []);
+});
+
+test('inactivity editor preserves drafts, rolls back rejected saves and restores defaults with achievements off', (t) => {
+  const previousDocument = globalThis.document;
+  t.after(() => { globalThis.document = previousDocument; setAppState(null); setAppSettings({}); setAppCalls([]); });
+  const config = { game: { enabled: false }, reinforcement: { enabled: true, inactivityMessage: 'Anterior', rewards: [] } };
+  setAppSettings(config); setAppCalls([]); setAppState({ game: { reinforcement: createDefaultReinforcementState() } });
+  const input = { value: '', dataset: {} }, status = { textContent: '' };
+  globalThis.document = { activeElement: null, getElementById: id => id === 'positiveInactivityMessageInput' ? input : id === 'positiveInactivityMessageStatus' ? status : null };
+  let accepted = true;
+  const saved = [];
+  configurePositiveReinforcementContext({ saveSettingsOnly: () => { if (accepted) saved.push(structuredClone(config.reinforcement)); return accepted; } });
+  renderPositiveReinforcement();
+  assert.equal(input.value, 'Anterior');
+  input.value = '  Mi mensaje <3  '; input.dataset.dirty = 'true';
+  renderPositiveReinforcement();
+  assert.equal(input.value, '  Mi mensaje <3  ');
+  assert.equal(saveInactivityMessage(), true);
+  assert.equal(config.reinforcement.inactivityMessage, 'Mi mensaje <3');
+  assert.equal(saved.at(-1).inactivityMessage, 'Mi mensaje <3');
+  assert.equal(input.dataset.dirty, undefined);
+  input.value = 'Reintentar'; input.dataset.dirty = 'true'; accepted = false;
+  assert.equal(saveInactivityMessage(), false);
+  assert.equal(config.reinforcement.inactivityMessage, 'Mi mensaje <3');
+  renderPositiveReinforcement();
+  assert.equal(input.value, 'Reintentar');
+  assert.equal(status.textContent, translateText('No se pudo guardar el mensaje.'));
+  accepted = true; input.value = '  ';
+  assert.equal(saveInactivityMessage(), true);
+  assert.equal(config.reinforcement.inactivityMessage, '');
+  assert.equal(config.game.enabled, false);
+});
+
+test('inactivity editor cannot copy a previous account message into a new settings owner', (t) => {
+  const previousDocument = globalThis.document;
+  t.after(() => { globalThis.document = previousDocument; setAppState(null); setAppSettings({}); setAppCalls([]); });
+  const previous = { reinforcement: { enabled: true, inactivityMessage: 'Cuenta anterior' } };
+  const incoming = { reinforcement: { enabled: true, inactivityMessage: 'Otra cuenta' } };
+  const input = { value: '', dataset: {} }, status = { textContent: '' };
+  globalThis.document = { activeElement: null, getElementById: id => id === 'positiveInactivityMessageInput' ? input : id === 'positiveInactivityMessageStatus' ? status : null };
+  setAppSettings(previous); setAppCalls([]); setAppState({ game: { reinforcement: createDefaultReinforcementState() } });
+  configurePositiveReinforcementContext({ saveSettingsOnly: () => { setAppSettings(incoming); return false; } });
+  renderPositiveReinforcement(); input.value = 'Borrador anterior'; input.dataset.dirty = 'true';
+  assert.equal(saveInactivityMessage(), false);
+  assert.equal(incoming.reinforcement.inactivityMessage, 'Otra cuenta');
+  assert.equal(input.value, 'Otra cuenta');
+  assert.equal(input.dataset.dirty, undefined);
 });
 
 test('premios acumulables conservan ventana e idempotencia sin el presupuesto antiguo', async () => {

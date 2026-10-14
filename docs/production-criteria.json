@@ -723,6 +723,8 @@
           "file": "tests/positive-reinforcement.test.mjs",
           "namedCases": [
             "premios personales y catálogo normalizan límites sin introducir puntos negativos",
+            "inactivity editor preserves drafts, rolls back rejected saves and restores defaults with achievements off",
+            "inactivity editor cannot copy a previous account message into a new settings owner",
             "premios acumulables conservan ventana e idempotencia sin el presupuesto antiguo",
             "reemplazar una llamada live migra las referencias antes de reconciliar incluso con Logros apagado",
             "una llamada anterior a la difícil no consume la recuperación pendiente",
@@ -754,6 +756,7 @@
             "pausa tardía y retorno con XP bloqueado no conceden bonus; dropped conserva combo sin premiar errores",
             "reanudar una pausa ya premiada y terminar tarde corrige la puntualidad sin duplicar XP",
             "inactividad excluye pausas, turno cerrado y llamada activa; persiste dedupe y se rearma tras otra llamada",
+            "custom inactivity notification uses saved text with achievements off and preserves threshold and dedupe",
             "inactividad nocturna deduplica a ambos lados de medianoche del mismo turno",
             "cola real limita a tres toasts y no repite el último texto después de expirar",
             "apagar Logros limpia refuerzo visible y conserva preferencias de sonido, premios e historial guardados",
