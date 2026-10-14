@@ -23,6 +23,12 @@
       "terminos.html"
     ]
   },
+  "s_008c41c1": {
+    "source": "No cuenta Break/Lunch. Déjalo vacío y guarda para volver al mensaje original.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_00965780": {
     "source": "Preferencias de la interfaz: tema, avisos, sonidos.",
     "files": [
@@ -205,6 +211,12 @@
     "source": "Neutral: no hay pausas programadas",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_053775fc": {
+    "source": "No se pudo guardar el mensaje.",
+    "files": [
+      "js/positive-reinforcement.js"
     ]
   },
   "s_055484ce": {
@@ -2397,6 +2409,12 @@
     "source": "Mantén un ritmo sostenible",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_2de24b9f": {
+    "source": "Mensaje tras una hora sin llamadas",
+    "files": [
+      "app.html"
     ]
   },
   "s_2e2d516d": {
@@ -10478,6 +10496,12 @@
       "app.html"
     ]
   },
+  "s_c3b8e64c": {
+    "source": "Guardar mensaje",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_c3c6bed4": {
     "source": "Cuánto llevas, cuánto te falta, qué tan pegado vas al plan y cuánto cae el día de pago.",
     "files": [
@@ -11963,6 +11987,7 @@
   "s_df0fba41": {
     "source": "Ha pasado una hora de trabajo sin llamadas · puedes retomar a tu ritmo",
     "files": [
+      "js/positive-reinforcement.js",
       "js/reinforcement-feedback.js"
     ]
   },

@@ -9054,6 +9054,12 @@
       <div class="positive-settings-section game-settings-section">
         <label class="game-settings-toggle" for="positiveReinforcementEnabledInput"><span><strong>Celebrar llamadas completadas</strong><small>Convierte constancia, recuperación y metas en evidencia positiva y premios seguros.</small></span><input id="positiveReinforcementEnabledInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label>
         <label class="game-settings-toggle" for="positiveAskAfterCallInput"><span><strong>Cierre breve después de cada llamada</strong><small>Marca si cerró bien, si cumpliste aunque fue difícil o si te dejó un aprendizaje.</small></span><input id="positiveAskAfterCallInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label>
+        <div class="game-monster-name-setting">
+          <label for="positiveInactivityMessageInput">Mensaje tras una hora sin llamadas</label>
+          <div class="game-monster-name-controls"><input id="positiveInactivityMessageInput" type="text" maxlength="240" autocomplete="off" aria-describedby="positiveInactivityMessageHelp positiveInactivityMessageStatus"/><button class="mc-btn-primary cyan" id="positiveInactivityMessageSaveBtn" type="button">Guardar mensaje</button></div>
+          <small id="positiveInactivityMessageHelp">No cuenta Break/Lunch. Déjalo vacío y guarda para volver al mensaje original.</small>
+          <span class="game-monster-name-status" id="positiveInactivityMessageStatus" role="status" aria-live="polite"></span>
+        </div>
         <details class="game-settings-accordion game-reward-settings" id="positiveRewardsAccordion">
           <summary class="game-settings-accordion-summary"><span class="game-settings-accordion-copy"><strong>Mis premios</strong><small>Premios físicos y catálogo sugerido.</small></span><span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></summary>
           <div class="game-settings-accordion-body positive-rewards-body">

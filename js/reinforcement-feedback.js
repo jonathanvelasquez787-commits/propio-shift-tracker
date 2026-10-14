@@ -93,9 +93,17 @@ function variantIndex(seed, count) {
 }
 
 export function reinforcementText(kind, vars = {}, variantSeed = 0) {
+  if (kind === 'idle') {
+    const custom = normalizeInactivityMessage(settings.reinforcement?.inactivityMessage);
+    if (custom) return custom;
+  }
   const variants = REINFORCEMENT_TEXTS[kind];
   if (!variants?.length) return '';
   return variants[variantIndex(variantSeed, variants.length)].replace(/\{([a-zA-Z]+)\}/g, (_, key) => String(vars[key] ?? ''));
+}
+
+export function normalizeInactivityMessage(value) {
+  return typeof value === 'string' ? value.replace(/[\u0000-\u001f\u007f]/g, ' ').trim().slice(0, 240) : '';
 }
 
 export function reinforcementFeedbackEnabled(channel = 'game') {
