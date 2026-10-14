@@ -2429,5 +2429,6 @@
   "s_2d6bba04": "The sound was not removed because it could not be saved.",
   "s_e1e00705": "Custom sound removed. The classic beep will be used.",
   "s_b5699c97": "The sound could not be saved. Your previous file was preserved.",
-  "s_703c53ed": "Remove file"
+  "s_703c53ed": "Remove file",
+  "s_93ce1938": "ACW/Available measures the current stretch without a call or an active Break/Lunch, starting when your shift begins, your last call ends, or you return from a pause. If you finish at 9:30:40, the live timer starts then. Propio may display only 9:30; that does not confirm how it calculates seconds for payment. This timer shows the current stretch, not the daily total."
 }

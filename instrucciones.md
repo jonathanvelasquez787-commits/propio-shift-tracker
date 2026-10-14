@@ -903,7 +903,7 @@ La aplicación funciona en producción con estas bases vigentes:
   el de la guía es nofollow. La extensión se instala desde archivo según el
   propietario, por lo que no hay ficha propia de Chrome Web Store que editar.
   Detalle en `docs/seo.md`.
-- La versión actual de la app es 607; la extensión unificada es 2.1.3. El build
+- La versión actual de la app es 608; la extensión unificada es 2.1.3. El build
   del resumen independiente 1.0.4 queda compatible para instalaciones anteriores.
   Refuerzo positivo puede funcionar con Logros apagados. La auditoría profunda del
   8 de octubre corrigió seis fallos; la ampliación corrigió cinco más en arranque,
@@ -929,6 +929,19 @@ La aplicación funciona en producción con estas bases vigentes:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v608 — Sincronización silenciosa y explicación de ACW.**
+
+- El historial automático de la extensión guarda y corrige sin repetir el
+  sonido de llamada guardada ni generar sonidos de refuerzo o batalla.
+- Las animaciones importadas conservan su silencio después de salir de la
+  importación; sonidos live y pegado manual conservan su configuración.
+- Tooltip ES/EN de ACW explica tramo actual, fin con segundos y diferencia
+  de presentación en Propio, sin afirmar una regla de facturación.
+- No modifica cálculos de ACW, fechas, duración, pagos ni reconciliación.
+- 706 pruebas, cinco regresiones nuevas y build correctos. App compilada en
+  navegador aislado ES/EN y claro/oscuro: hover, traducción, segundos del
+  contador y cero errores. Cuenta/nube simuladas; audio físico no certificado.
+
 **Extensión 2.1.3 — Apertura por perfil y acceso de Windows sin .vbs.**
 
 - Prepara la primera ventana normal del perfil y su reapertura, sin repetir
@@ -952,16 +965,3 @@ La aplicación funciona en producción con estas bases vigentes:
   Chrome 155, SuInterpreter identificado sin consultar contenido ni audio.
 - 14 regresiones y suite de 688 correctas. Perfil real/reinicio físico pendientes
   de verificación; no inferirlos desde APIs ficticias ni Chromium 151.
-
-**v607 / extensión 2.1.1 — Arranque automático y mensajes claros.**
-
-- Vincula un tracker autenticado único al abrirlo; registro/arranque preparados
-  en el primer vínculo y preferencias conservadas después de reiniciar.
-- Anuncio con reintento y reconfirmación; sin elegir entre varias cuentas ni
-  cambiar un propietario con datos pendientes.
-- Primera llamada respeta pausas del horario, aun sin pausa activa; fechas,
-  medianoche y planes anteriores incompletos validados antes de Start Calls.
-- Controles en lenguaje directo, ayuda corta y contadores HTTP solo en soporte.
-- 674 pruebas y builds correctos; handshake completo ficticio, llegada durante
-  Break, reapertura, preferencias, 752 solicitudes y ambos temas verificados.
-  Pantallas reales de llamada/Save y recarga nativa de Chrome pendientes.

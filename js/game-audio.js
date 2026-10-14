@@ -1,5 +1,13 @@
 import { settings } from './app-context.js';
 
+let silentOperations = 0;
+export function gameSoundsSilenced() { return silentOperations > 0; }
+// Scope only synchronous history updates; queued animations capture their own sound policy.
+export function withGameSoundsSilenced(operation) {
+  silentOperations++;
+  try { return operation(); } finally { silentOperations--; }
+}
+
 const note = (frequency, at, duration, gain = .14, wave = 'square', slide = 0) => ({ frequency, at, duration, gain, wave, slide });
 const melody = (frequencies, step = .09, wave = 'square') => frequencies.map((frequency, index) => note(frequency, index * step, step * .85, .12, wave));
 const CUES = Object.freeze({
@@ -152,6 +160,7 @@ export function createGameAudio({ readSettings, host = globalThis, doc = host.do
     } catch {}
   }
   function play(kind = 'hit', { allowed = () => true } = {}) {
+    if (gameSoundsSilenced()) return false;
     const cue = CUES[kind];
     if (!cue || !unlocked || !context || !volume()) return false;
     // Una importación puede generar muchos eventos; se oye solo el más significativo.

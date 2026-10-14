@@ -12,12 +12,34 @@ import { financeMonthTotals } from '../js/finance-plan-model.js';
 import { configureHigherRateContext, higherRateBonusForCall, higherRateBonusForCalls, higherRateBonusBreakdownForCalls } from '../js/higher-rate.js';
 import { configureGameContext, createDefaultGameState, computeGameDay, onGameCallsChanged } from '../js/game.js';
 import { configurePositiveReinforcementContext } from '../js/positive-reinforcement.js';
+import { withGameSoundsSilenced, gameSoundsSilenced } from '../js/game-audio.js';
 
 const source = fs.readFileSync(new URL('../js/app-main.js', import.meta.url), 'utf8');
 const declarations = new Map(parse(source, { ecmaVersion: 'latest', sourceType: 'module' }).body.map(node => node.declaration || node).filter(node => node.type === 'FunctionDeclaration').map(node => [node.id.name, source.slice(node.start, node.end)]));
 const functions = ['pad', 'dateKey', 'todayRange', 'todayCallDateKey', 'callDateKeyFromValue', 'callDateToDate', 'dayKeyFromIsoDate', 'isoDateFromDayKey', 'sameCallDay', 'toDateFromInputs', 'toMinutes', 'formatHHMM', 'timeLabel', 'timeLabelFromDate', 'parseMoney', 'callsOverlap', 'callDedupeKey', 'parseCalls', 'isReplaceableLiveCall', 'sameImportedCallIdentity', 'importCalls', 'importedCallStats', 'accountingExportDays', 'getDailyGoalOverride', 'effectiveDailyGoal', 'setDailyGoalOverride', 'dayEvents', 'dayShiftBounds', 'dayShiftSessions', 'previousCalendarDay', 'mergeIntervals', 'connectedMinutesForDay'];
 const at = (day, clock = '12:00') => new Date(`2025-09-${String(day).padStart(2, '0')}T${clock}:00`);
 const tiers = { bronze: { bonusPerMin: .01 }, silver: { bonusPerMin: .02 }, gold: { bonusPerMin: .03 } };
+
+test('official bridge synchronization is silent while the live finish and manual paste retain their sounds', t => {
+  const x = harness(t); x.advance(at(2, '19:00'));
+  autoSaveLiveCall(at(1, '09:00').toISOString(), at(1, '09:10').toISOString());
+  assert.deepEqual(x.soundEvents, ['callEnded']);
+  const tree = parse(source, { ecmaVersion: 'latest', sourceType: 'module' });
+  const receiver = tree.body.find(node => node.declaration?.declarations?.[0]?.id.name === 'applyPropioBridgeEvent');
+  const callback = receiver.declaration.declarations[0].init.arguments[0].properties.find(node => node.key.name === 'importHistory').value;
+  const muted = [];
+  x.h.withGameSoundsSilenced = withGameSoundsSilenced; x.h.portalRecordsText = value => value;
+  x.h.onGameCallsChanged = () => muted.push(gameSoundsSilenced());
+  const importHistory = vm.runInContext(`(${source.slice(callback.start, callback.end)})`, x.h);
+  const row = '91434\t09/01/2025\t09:00 AM\t10\tYes\tNo\t$1.20';
+  assert.equal(importHistory(row), true); assert.equal(calls.length, 1);
+  assert.equal(importHistory(row), true); assert.equal(calls.length, 1);
+  assert.equal(importHistory(row.replace('$1.20', '$1.25')), true); assert.equal(calls.length, 1);
+  assert.deepEqual(x.soundEvents, ['callEnded']); assert.ok(muted.length > 0); assert.ok(muted.every(Boolean));
+  assert.equal(gameSoundsSilenced(), false);
+  x.import([['two', '09/01/2025', '09:30 AM', '10', 'Yes', 'No', '$1.20']]);
+  assert.deepEqual(x.soundEvents, ['callEnded', 'callPasted']); assert.equal(muted.at(-1), false);
+});
 
 test('the actual tool plan exports planned Break/Lunch even with no active pause, respects shifted planning and midnight', t => {
   const x=harness(t); x.advance(at(1,'09:05'));

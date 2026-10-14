@@ -6,6 +6,7 @@ import { validFinanceSettings } from './finance-plan-model.js';
 import { normalizeBattleWeapon } from './game-battle.js';
 import { createPropioReceiver, createStorageRevisionGuard, ignorePropioCall } from './propio-bridge.js';
 import { portalRecordsText } from './propio-history-records.js';
+import { withGameSoundsSilenced } from './game-audio.js';
 import { settingsWithinBudget, reportLocalPersistenceFailure, readMeta } from './sync.js';
 // Cuerpo principal de la app (Inicio, Horario, Llamadas, Higher Rate, Finanzas, Reportes,
 // Calendario, Ajustes...). Vive como módulo ES aparte para no ser parte del documento HTML: lo
@@ -4939,7 +4940,7 @@ function renderPayDatesSection() {
         setEvent('import', translateText('Llamadas importadas'), ui`${unique.length} fila(s) · ${importNote}${overlapNote}${duplicateNote}${futureNote}${replacedNote}${correctedNote}`, 'Propio');
         financeRunAutoFillCascade();
         if (saveAll() === false) return false;
-        playCallSavedSound('callPasted');
+        if (!background) playCallSavedSound('callPasted');
       }
       if (background) return !overlapSkipped && !futureRows.length;
       renderImportSkippedSummary(skippedDuplicates, skippedOverlaps, futureRows, replacedLive, correctedOfficial);
@@ -7934,7 +7935,7 @@ export const applyPropioBridgeEvent = createPropioReceiver({
     if (result && (!state.lastCallEndedAt || Date.parse(state.lastCallEndedAt) < Date.parse(event.at))) state.lastCallEndedAt = event.at;
     return result;
   },
-  importHistory: records => importCalls(portalRecordsText(records)),
+  importHistory: records => withGameSoundsSilenced(() => importCalls(portalRecordsText(records))),
   endScheduledPause: () => endPause({ endedAt: new Date().toISOString(), silent: true }),
   save: saveAll,
 });
