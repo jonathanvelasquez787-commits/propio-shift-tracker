@@ -1189,7 +1189,7 @@
       "id": "windows-workspace",
       "area": "Espacio de trabajo optativo",
       "acceptance": "La página interna reutiliza páginas conocidas, divide Propio/SuInterpreter y coloca el tracker aparte dentro de 05:45–14:00 en Honduras; las cuentas ambiguas y APIs ausentes no alteran las pestañas.",
-      "sources": ["extension/propio-bridge/workspace.js", "extension/propio-bridge/workspace-page.js"],
+      "sources": ["extension/propio-bridge/workspace.js", "extension/propio-bridge/workspace-page.js", "extension/propio-bridge/workspace-profile.js"],
       "tests": [{
         "file": "tests/workspace-startup.test.mjs",
         "namedCases": [
@@ -1199,6 +1199,16 @@
           "existing split is preserved on repeated launches without duplicate pages",
           "incorrect tracker/portal split is separated before moving either window",
           "missing native API fails before changing user tabs"
+        ]
+      }, {
+        "file": "tests/workspace-profile.test.mjs",
+        "namedCases": [
+          "profile startup creates one own workspace page without requiring workday hours",
+          "simultaneous startup and first window events serialize to one preparation",
+          "closing every normal window and reopening prepares the profile again",
+          "Windows launch page is reused and changed to profile mode without another tab",
+          "explicitly disabled choice survives an enabled installation default",
+          "public installation defaults to no automatic workspace and profile state stays isolated"
         ]
       }]
     }

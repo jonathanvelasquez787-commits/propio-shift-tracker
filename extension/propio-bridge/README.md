@@ -1,4 +1,4 @@
-# Propio · Tracker y resumen · 2.1.1
+# Propio · Tracker y resumen · 2.1.3
 
 Una sola extensión reúne la conexión al tracker y la barra de llamadas, minutos y ganancias en Propio. «Registrar en mi tracker» y «Mostrar resumen en Propio» son controles independientes. El resumen empieza oculto y no exige cuenta vinculada; encenderlo o apagarlo se aplica a las pestañas abiertas sin recargar. La conexión conserva su modo y cuenta al actualizar la carpeta existente.
 
@@ -12,7 +12,7 @@ En el historial, la barra muestra el subtotal de la página visible: cantidad de
 
 El popup tiene tarjetas de conexión y resumen, controles separados, cuenta vinculada, llamadas detectadas y pendientes, actividad y diagnóstico desplegables. Las preferencias del resumen permiten English/Español y conversión opcional; se guardan localmente y se reflejan en la barra. Usan el mismo icono de reloj de la tool, preparado a 16, 32, 48 y 128 px. Los temas claro/oscuro siguen la preferencia del navegador.
 
-El resumen no inicia turnos, registra llamadas, ni comparte filas con el tracker. El registro puede funcionar con la barra oculta, y el resumen con el registro apagado. No se añaden permisos respecto de 1.5.1.
+El resumen no inicia turnos, registra llamadas, ni comparte filas con el tracker. El registro puede funcionar con la barra oculta, y el resumen con el registro apagado. El espacio de trabajo añade únicamente el permiso acotado de SuInterpreter descrito abajo; la apertura por perfil no añade permisos nuevos.
 
 ## Sesión y Shift
 
@@ -46,15 +46,33 @@ La cola y sesión sobreviven al reinicio del worker. Entrega a una sola pestaña
 
 ## Actualizar la extensión existente
 
-1. Reemplazá los archivos de la carpeta de conexión instalada por el paquete 2.1.1, incluidos `summary-content.js` y la carpeta `icons`. Usar esa misma carpeta conserva cuenta vinculada, registro automático, sesión y cola.
+1. Reemplazá los archivos de la carpeta de conexión instalada por el paquete 2.1.3, incluidos `summary-content.js` y la carpeta `icons`. Usar esa misma carpeta conserva cuenta vinculada, registro automático, sesión y cola.
 2. En `chrome://extensions`, recargá la extensión de conexión: ahora se llama «Propio · Tracker y resumen». Desactivá la extensión anterior «Propio · Minutos y ganancias» y cualquier userscript de resumen para usar solo una barra.
-3. Recargá Propio y el tracker. El popup muestra 2.1.1 y el icono de la tool. Activá «Mostrar resumen en Propio» si querés verlo en el historial.
+3. Recargá Propio y el tracker. El popup muestra 2.1.3 y el icono de la tool. Activá «Mostrar resumen en Propio» si querés verlo en el historial.
 4. Si estaba sin vincular: abrí el tracker, iniciá sesión y pulsá Vincular cuenta. Moneda/idioma de la extensión de resumen anterior se configuran una vez en el nuevo popup: Chrome separa el almacenamiento de las dos extensiones antiguas.
 
 Recargar la versión anterior sin reemplazar los archivos no instala la actualización. Si la extensión fue eliminada, usá Cargar descomprimida con la carpeta que contiene `manifest.json` y conectá la cuenta de nuevo.
 
 Build: `node scripts/build-extension.mjs <salida>`. Se prueban sesión, entrega, duplicados, reinicio, bloqueos y guardado; la comprobación del navegador usa un portal y cuenta ficticios en Chromium aislado.
 ## Espacio de trabajo al iniciar Windows
+
+La apertura por perfil es independiente del horario de Windows. Con la opción
+activada en ese perfil, abrir su primera ventana normal prepara el espacio a
+cualquier hora. Abrir ventanas adicionales no repite la preparación; cerrar
+todas y volver a entrar al perfil sí. Incógnito y ventanas emergentes se ignoran,
+y un worker reiniciado conserva el estado de esa sesión. El acceso de Windows
+se reutiliza cuando llega junto al evento del perfil para evitar otra pestaña.
+
+La distribución pública tiene `workspace-preferences.json` desactivado. Una
+instalación personal expresamente configurada puede inicializarlo activado;
+después se guarda en `chrome.storage.local`, separado por perfil y respetando
+una elección desactivada previa. La instalación de Jonathan está presente
+solo en Default, no en su perfil Ocio. No se añaden permisos para esta apertura.
+
+El acceso personal de Windows ahora contiene directamente una instrucción
+corta de PowerShell oculto; ya no apunta a un `.vbs` externo. La comprobación
+horaria sigue en UTC-6 y conserva el perfil Default. No cambia la política de
+ejecución, el inicio de sesión ni ajustes de seguridad de Windows.
 
 La página interna `workspace.html#startup` organiza Propio y SuInterpreter en una
 vista dividida dentro de la ventana izquierda (dos tercios de la pantalla), y el

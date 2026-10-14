@@ -317,6 +317,26 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
+Extensión 2.1.3: apertura optativa al entrar a un perfil y al reabrir su primera
+ventana después de cerrar todas. Preparación única por sesión, sin bucles por
+ventanas del tracker, worker reiniciado, incógnito o popups. Reutiliza la página
+del acceso de Windows. Perfil manual puede organizar a cualquier hora; Windows
+sigue limitado a 05:45–14:00 Honduras. Preferencia en storage.local por perfil;
+distribución pública desactivada, instalación personal de Jonathan inicializada
+activada. Extensión comprobada en Default/Jonathan y ausente en Profile 1/Ocio.
+No se añaden permisos. 27 regresiones de espacio/perfil; suite de 701 correcta.
+Chromium 151 aislado con el worker empaquetado real: preferencia personal
+inicializada, un solo organizador por perfil y nueva ventana sin duplicarlo;
+API dividida ausente muestra error visible. Se identifican páginas propias con
+runtime.getContexts porque Chrome oculta su URL en tabs.query sin permisos extra.
+La captura del 14/10 informó que WScript no encontró el .vbs al iniciar; ahora
+ese archivo existe, sin evidencia del motivo de la ausencia durante el boot.
+Acceso personal sustituido por PowerShell oculto con instrucción interna corta,
+sin .vbs, archivos de apoyo ni cambios de política de ejecución. Lectura del
+acceso y seis límites horarios ejecutados en Windows PowerShell con Start-Process
+simulado, sin abrir Chrome. Perfil real y reinicio físico siguen sin certificar
+por bloqueo de Computer Use al no poder identificar la URL activa de Chrome.
+
 Extensión 2.1.2 / espacio de trabajo de Windows: página interna optativa
 workspace.html#startup, llamada solamente por el acceso personal de inicio.
 Reutiliza Propio/SuInterpreter y los divide nativamente a la izquierda; tracker
@@ -883,7 +903,7 @@ La aplicación funciona en producción con estas bases vigentes:
   el de la guía es nofollow. La extensión se instala desde archivo según el
   propietario, por lo que no hay ficha propia de Chrome Web Store que editar.
   Detalle en `docs/seo.md`.
-- La versión actual de la app es 607; la extensión unificada es 2.1.2. El build
+- La versión actual de la app es 607; la extensión unificada es 2.1.3. El build
   del resumen independiente 1.0.4 queda compatible para instalaciones anteriores.
   Refuerzo positivo puede funcionar con Logros apagados. La auditoría profunda del
   8 de octubre corrigió seis fallos; la ampliación corrigió cinco más en arranque,
@@ -909,6 +929,19 @@ La aplicación funciona en producción con estas bases vigentes:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**Extensión 2.1.3 — Apertura por perfil y acceso de Windows sin .vbs.**
+
+- Prepara la primera ventana normal del perfil y su reapertura, sin repetir
+  por ventanas adicionales ni reinicios del worker; preferencia aislada y
+  distribución pública desactivada, instalación personal optativa activada.
+- Abrir el perfil manualmente no exige franja; el inicio de Windows mantiene
+  05:45–14:00 Honduras. Reutilización del organizador y errores visibles.
+- Se elimina la dependencia del .vbs que Windows no encontró; acceso con
+  instrucción interna de 399 caracteres, lectura de vuelta y seis límites
+  horarios comprobados con apertura simulada. Sin cambiar seguridad/auth.
+- Suite de 701, 27 regresiones de espacio/perfil y builds correctos. Recarga,
+  distribución nativa real y boot físico continúan pendientes de verificar.
+
 **Extensión 2.1.2 — Distribución fija de trabajo.**
 
 - Página optativa para inicio de Windows dentro de 05:45–14:00 en Honduras;
@@ -932,17 +965,3 @@ La aplicación funciona en producción con estas bases vigentes:
 - 674 pruebas y builds correctos; handshake completo ficticio, llegada durante
   Break, reapertura, preferencias, 752 solicitudes y ambos temas verificados.
   Pantallas reales de llamada/Save y recarga nativa de Chrome pendientes.
-
-**v606 / extensión 2.1.0 — Historial y disponibilidad opcional.**
-
-- Root del popup fija 400px; contador oficial distingue filas de detección live.
-- Historial de siete campos validado en extensión y tool, colas con tracker
-  cerrado, cero minutos, correcciones sin duplicados y paginación de hoy.
-- Importación de fondo respeta borrador/día activo y retiene lotes conflictivos.
-- Primera llamada, Break y Lunch opcionales; pausas con regreso manual o por
-  duración. Solo Start Calls/Offline confirmado; jamás Accept automático.
-- Horario vinculado, llegada tarde y cierre de pausa confirmado antes de
-  disponibilidad. No reanuda una pausa nueva por una señal vieja ni se repite
-  después de conectar; apagar cancela cierres aún no entregados.
-- 667 pruebas, builds y recorridos ficticios correctos. Pantallas nativas de
-  llamada/Save pendientes de captura; entrega/publicación se verifican aparte.
