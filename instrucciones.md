@@ -322,7 +322,7 @@ no se prepara al abrir Chrome ni al encender el PC. SIGUE SIN RESOLVERSE en
 su instalación real; acceso reescrito y pruebas simuladas no acreditan éxito.
 Revisarlo al final por instrucción expresa. Último boot observado 07:48:41
 Honduras; acceso existe, sin entrada StartupApproved deshabilitada. Carpeta
-Default/Jonathan actualizada a 2.1.6 y configuración personal de distribución
+Default/Jonathan actualizada a 2.1.7 y configuración personal de distribución
 con revisión única para aplicar su pedido incluso sobre un default antiguo.
 Recarga del worker, división nativa real y reinicio físico no certificados.
 El acceso incluye log local de resultado en LocalAppData/Propio Shift Tracker/
@@ -922,7 +922,7 @@ La aplicación funciona en producción con estas bases vigentes:
   el de la guía es nofollow. La extensión se instala desde archivo según el
   propietario, por lo que no hay ficha propia de Chrome Web Store que editar.
   Detalle en `docs/seo.md`.
-- La versión actual de la app es 612; la extensión unificada es 2.1.6. El build
+- La versión actual de la app es 612; la extensión unificada es 2.1.7. El build
   del resumen independiente 1.0.5 queda compatible para instalaciones anteriores.
   Refuerzo positivo puede funcionar con Logros apagados. La auditoría profunda del
   8 de octubre corrigió seis fallos; la ampliación corrigió cinco más en arranque,
@@ -948,7 +948,14 @@ La aplicación funciona en producción con estas bases vigentes:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
-**v612 — Fecha completa y orden de controles del encabezado.**
+**v612 / extensión 2.1.7 — Encabezado y explicación de espera.**
+
+- Ayuda de espera entre llamadas aclara que la extensión pulsa Stop Calls
+  para pausar la recepción y Start Calls para volver a estar disponible.
+  Aceptación manual y respeto de pausas/turno explícitos; misma funcionalidad.
+  Build de extensión y lectura en ambos temas correctos; mismos controles y
+  hashes idénticos en los cinco bundles de comportamiento. Carpeta actualizada
+  con respaldo, sin tocar la revisión personal ni el almacenamiento de cuenta.
 
 - Fecha en una sola línea debajo del reloj móvil, sin limitarla al ancho de
   la hora. Hora y fecha siguen alineadas a la derecha; fondo oscuro en tema claro.
