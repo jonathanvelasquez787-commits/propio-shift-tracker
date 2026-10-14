@@ -317,6 +317,21 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
+Extensión 2.1.2 / espacio de trabajo de Windows: página interna optativa
+workspace.html#startup, llamada solamente por el acceso personal de inicio.
+Reutiliza Propio/SuInterpreter y los divide nativamente a la izquierda; tracker
+a la derecha. Franja 05:45 inclusive–14:00 exclusiva, Honduras UTC-6, todos los
+días; no cierra Chrome ni altera llamadas o pausas. Chrome 155 requerido para
+esta organización; puente/resumen conservan compatibilidad anterior. Permiso
+acotado de SuInterpreter solo para identificar su pestaña, sin content scripts.
+Varias pestañas de una página bloquean antes de mutar, se conservan las demás;
+pantalla pequeña/API ausente/incógnito dan un error claro. Lock de sesión y
+excepción manual no persistente cubiertos. 14 pruebas de regresión; suite 688
+correcta. La distribución nativa en el perfil real y el reinicio físico siguen
+pendientes de comprobación; Chromium aislado disponible es 151, sin estas APIs.
+El acceso personal de Jonathan debe apuntar al ID de su extensión conservando
+la carpeta existente y el filtro horario de Windows; no añadir otra extensión.
+
 v607 / extensión 2.1.1: el primer tracker autenticado y único se vincula solo,
 activa registro y prepara el arranque solicitado. El anuncio reintenta fallos
 transitorios y reconfirma cada 10s. Reiniciar Chrome no exige volver a vincular;
@@ -868,7 +883,7 @@ La aplicación funciona en producción con estas bases vigentes:
   el de la guía es nofollow. La extensión se instala desde archivo según el
   propietario, por lo que no hay ficha propia de Chrome Web Store que editar.
   Detalle en `docs/seo.md`.
-- La versión actual de la app es 605; la extensión unificada es 2.0.0. El build
+- La versión actual de la app es 607; la extensión unificada es 2.1.2. El build
   del resumen independiente 1.0.4 queda compatible para instalaciones anteriores.
   Refuerzo positivo puede funcionar con Logros apagados. La auditoría profunda del
   8 de octubre corrigió seis fallos; la ampliación corrigió cinco más en arranque,
@@ -893,6 +908,17 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**Extensión 2.1.2 — Distribución fija de trabajo.**
+
+- Página optativa para inicio de Windows dentro de 05:45–14:00 en Honduras;
+  Propio/SuInterpreter divididos a la izquierda y tracker a la derecha.
+- Reutilización de pestañas, grupos/pins/splits anteriores tratados, cuenta
+  ambigua bloqueada sin cambiar nada y otras páginas preservadas.
+- Acceso existente conserva perfil/carpeta y filtro horario; API nativa de
+  Chrome 155, SuInterpreter identificado sin consultar contenido ni audio.
+- 14 regresiones y suite de 688 correctas. Perfil real/reinicio físico pendientes
+  de verificación; no inferirlos desde APIs ficticias ni Chromium 151.
 
 **v607 / extensión 2.1.1 — Arranque automático y mensajes claros.**
 
@@ -920,18 +946,3 @@ La aplicación funciona en producción con estas bases vigentes:
   después de conectar; apagar cancela cierres aún no entregados.
 - 667 pruebas, builds y recorridos ficticios correctos. Pantallas nativas de
   llamada/Save pendientes de captura; entrega/publicación se verifican aparte.
-
-**Extensión 2.0.0 — Tracker y resumen unidos.**
-
-- Visibilidad del resumen independiente del registro automático; preferencias
-  de idioma y conversión en popup y barra, persistidas localmente.
-- Ocultar la barra durante un cálculo cancela y restaura la página original.
-  Se conserva la colocación compacta del caption y la separación de datos.
-- Popup con tarjetas, estados, contadores, actividad y diagnóstico desplegables;
-  icono original de reloj en Chrome/popup y temas claro/oscuro.
-- Un rechazo al guardar el resumen conserva la preferencia anterior y muestra
-  el aviso fuera del desplegable, para que siempre sea visible.
-- Apagar el resumen retira observadores y listeners del portal; no consulta
-  filas ni mantiene trabajo de actualización cuando está oculto.
-- 655 pruebas, builds app/extensiones y recorridos Chromium aislados correctos.
-  Carpeta anterior de conexión repuesta con el paquete; no cambia su ruta.
