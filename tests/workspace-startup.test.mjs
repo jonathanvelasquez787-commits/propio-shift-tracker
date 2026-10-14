@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { arrangeWorkspace, withinWorkday, workspaceBounds } from '../extension/propio-bridge/workspace.js';
+import { arrangeWorkspace, workspaceBounds } from '../extension/propio-bridge/workspace.js';
 
 const screen = { availWidth: 1920, availHeight: 1040, availLeft: 0, availTop: 0 };
 const opts = { at: Date.parse('2026-10-14T12:00:00Z'), wait: async () => {} };
@@ -21,7 +21,7 @@ function fake(existing = []) {
     tabs: {
       getCurrent: async () => ({ ...tabs.get(99) }),
       get: async id => ({ ...tabs.get(id) }),
-      query: async ({ url }) => [...tabs.values()].filter(tab => tab.url?.startsWith(url.slice(0, -1))).map(tab => ({ ...tab })),
+      query: async ({ url }) => [...tabs.values()].filter(tab => (Array.isArray(url) ? url : [url]).some(pattern => tab.url?.startsWith(pattern.slice(0, -1)))).map(tab => ({ ...tab })),
       create: async properties => {
         mutations.push(['create', properties]);
         const tab = { id: nextTab++, index: tabs.size, pinned: false, groupId: -1, splitViewId: -1, ...properties };
@@ -60,39 +60,42 @@ function fake(existing = []) {
   return { api, tabs, windows, storage, mutations };
 }
 const portal = { id: 1, windowId: 1, index: 0, url: 'https://interpreters.propio-ls.com/portal' };
-const interpreter = { id: 2, windowId: 2, index: 1, url: 'https://app.suinterpreter.com/' };
+const interpreter = { id: 2, windowId: 2, index: 1, url: 'https://app.useinterpreter.com/' };
 const tracker = { id: 3, windowId: 2, index: 0, url: 'https://propio-shift-tracker.vercel.app/' };
+const dictionary = { id: 5, windowId: 2, index: 1, url: 'https://www.linguee.es/' };
 
-test('Honduras: before start and at cutoff blocked, boundaries inside allowed', () => {
-  for (const [time, allowed] of [['11:44:59', false], ['11:45:00', true], ['12:00:00', true], ['19:59:59', true], ['20:00:00', false], ['00:00:00', false]]) {
-    assert.equal(withinWorkday(`2026-10-14T${time}Z`), allowed, time);
+test('automatic workspace startup works at any hour with no workday gate', async () => {
+  for (const time of ['11:44:59', '11:45:00', '12:00:00', '19:59:59', '20:00:00', '00:00:00']) {
+    const f = fake([portal, interpreter, tracker]);
+    assert.equal((await arrangeWorkspace(f.api, screen, { ...opts, at: Date.parse(`2026-10-14T${time}Z`) })).status, 'ready', time);
   }
-  assert.equal(withinWorkday('invalid'), false);
 });
 test('two windows cover work area, including monitors with negative coordinates', () => {
   const bounds = workspaceBounds({ ...screen, availLeft: -1920 });
-  assert.equal(bounds.left.width, 1280); assert.equal(bounds.right.width, 640);
-  assert.equal(bounds.left.left, -1920); assert.equal(bounds.right.left, -640);
+  assert.equal(bounds.left.width, 1320); assert.equal(bounds.right.width, 616);
+  assert.equal(bounds.left.left, -1920); assert.equal(bounds.right.left, -616);
+  assert.equal(bounds.right.left + 8, bounds.left.left + bounds.left.width - 8);
+  assert.equal(bounds.left.height - 8, screen.availHeight);
   assert.throws(() => workspaceBounds({ availWidth: 600, availHeight: 400 }));
-});
-test('out of hours does not query or change tabs', async () => {
-  const result = await arrangeWorkspace({}, {}, { at: Date.parse('2026-10-14T20:00:00Z') });
-  assert.equal(result.status, 'outside-hours');
 });
 test('reboot screenshot: moves existing interpreter into native split, reuses tracker', async () => {
   const other = { id: 4, windowId: 1, index: 1, url: 'chrome://settings/onStartup' };
-  const f = fake([portal, interpreter, tracker, other]);
+  const f = fake([portal, interpreter, tracker, dictionary, other]);
   const result = await arrangeWorkspace(f.api, screen, opts);
   assert.equal(result.status, 'ready'); assert.equal(f.tabs.get(2).windowId, 1);
   assert.equal(f.tabs.get(1).splitViewId, f.tabs.get(2).splitViewId);
-  assert.equal(f.windows.get(1).width, 1280); assert.equal(f.windows.get(2).left, 1280);
+  assert.equal(f.windows.get(1).width, 1320); assert.equal(f.windows.get(2).left, 1304);
   assert.equal(f.mutations.filter(m => m[0] === 'create').length, 0);
   assert.equal(f.tabs.get(4).url, other.url);
 });
-test('fresh browser creates exactly three work pages', async () => {
+test('fresh browser creates exactly four work pages with Linguee after tracker', async () => {
   const f = fake(); await arrangeWorkspace(f.api, screen, opts);
-  assert.equal(f.mutations.filter(m => m[0] === 'create').length, 3);
+  assert.equal(f.mutations.filter(m => m[0] === 'create').length, 4);
   assert.equal([...f.tabs.values()].filter(tab => tab.url === tracker.url).length, 1);
+  const actualTracker = [...f.tabs.values()].find(tab => tab.url === tracker.url);
+  const actualDictionary = [...f.tabs.values()].find(tab => tab.url === dictionary.url);
+  assert.equal(actualDictionary.windowId, actualTracker.windowId);
+  assert.equal(actualTracker.index, 0); assert.equal(actualDictionary.index, 1);
 });
 test('all work tabs in one window moves tracker into separate right window', async () => {
   const f = fake([portal, { ...interpreter, windowId: 1, index: 1 }, { ...tracker, windowId: 1, index: 2 }]);
@@ -101,7 +104,7 @@ test('all work tabs in one window moves tracker into separate right window', asy
   assert.equal(f.tabs.get(1).windowId, f.tabs.get(2).windowId);
 });
 test('existing split is preserved on repeated launches without duplicate pages', async () => {
-  const f = fake([{ ...portal, splitViewId: 10 }, { ...interpreter, windowId: 1, index: 1, splitViewId: 10 }, tracker]);
+  const f = fake([{ ...portal, splitViewId: 10 }, { ...interpreter, windowId: 1, index: 1, splitViewId: 10 }, tracker, dictionary]);
   await arrangeWorkspace(f.api, screen, opts); await arrangeWorkspace(f.api, screen, opts);
   assert.equal(f.mutations.filter(m => ['create', 'split', 'unsplit'].includes(m[0])).length, 0);
 });
@@ -133,10 +136,36 @@ test('concurrent launchers are held by active session lock', async () => {
 test('incognito work pages are not reused', async () => {
   const f = fake([{ ...tracker, incognito: true }]); await arrangeWorkspace(f.api, screen, opts);
   assert.equal(f.tabs.get(3).incognito, true);
-  assert.equal(f.mutations.filter(m => m[0] === 'create').length, 3);
+  assert.equal(f.mutations.filter(m => m[0] === 'create').length, 4);
 });
-test('manual setup can arrange at night, automatic startup cannot', async () => {
+test('manual setup and automatic startup both arrange at night', async () => {
   const f = fake([portal, interpreter, tracker]);
   const result = await arrangeWorkspace(f.api, screen, { ...opts, startup: false, at: Date.parse('2026-10-14T23:00:00Z') });
   assert.equal(result.status, 'ready');
+});
+
+test('a reversed existing split is rebuilt with Propio before UseInterpreter', async () => {
+  const f = fake([{ ...portal, index: 1, splitViewId: 10 }, { ...interpreter, windowId: 1, index: 0, splitViewId: 10 }, tracker]);
+  await arrangeWorkspace(f.api, screen, opts);
+  assert.equal(f.tabs.get(1).index, 0); assert.equal(f.tabs.get(2).index, 1);
+  assert.deepEqual(f.mutations.filter(m => m[0] === 'split')[0][1], [1, 2]);
+});
+
+test('existing Linguee dictionary moves beside tracker without navigating or duplicating it', async () => {
+  const saved = { ...dictionary, windowId: 3, url: 'https://www.linguee.com/english-spanish/search?source=auto&query=hello' };
+  const f = fake([portal, interpreter, tracker, saved]);
+  await arrangeWorkspace(f.api, screen, opts);
+  assert.equal(f.tabs.get(saved.id).url, saved.url);
+  assert.equal(f.tabs.get(saved.id).windowId, f.tabs.get(tracker.id).windowId);
+  assert.equal(f.tabs.get(saved.id).index, 1);
+  assert.equal(f.mutations.filter(m => m[0] === 'create').length, 0);
+});
+
+test('frame compensation meets at visible edges for the requested widths without excess overlap', () => {
+  for (const width of [900, 1366, 1920, 2560]) for (const inset of [0, 8, 12]) {
+    const bounds = workspaceBounds({ ...screen, availWidth: width }, inset);
+    assert.equal(bounds.left.left + bounds.left.width - inset, bounds.right.left + inset);
+    assert.equal(bounds.right.left + bounds.right.width, width);
+    assert.equal(bounds.right.height - inset, screen.availHeight);
+  }
 });

@@ -1,4 +1,4 @@
-# Propio · Tracker y resumen · 2.1.8
+# Propio · Tracker y resumen · 2.2.0
 
 Una sola extensión reúne la conexión al tracker y la barra de llamadas, minutos y ganancias en Propio. «Registrar en mi tracker» y «Mostrar resumen en Propio» son controles independientes. El resumen empieza oculto y no exige cuenta vinculada; encenderlo o apagarlo se aplica a las pestañas abiertas sin recargar. La conexión conserva su modo y cuenta al actualizar la carpeta existente.
 
@@ -12,7 +12,7 @@ En el historial, la barra muestra el subtotal de la página visible: cantidad de
 
 El popup tiene tarjetas de conexión y resumen, controles separados, cuenta vinculada, llamadas detectadas y pendientes, actividad y diagnóstico desplegables. Las preferencias del resumen permiten English/Español y conversión opcional; se guardan localmente y se reflejan en la barra. Usan el mismo icono de reloj de la tool, preparado a 16, 32, 48 y 128 px. Los temas claro/oscuro siguen la preferencia del navegador.
 
-El resumen no inicia turnos, registra llamadas, ni comparte filas con el tracker. El registro puede funcionar con la barra oculta, y el resumen con el registro apagado. El espacio de trabajo añade únicamente el permiso acotado de SuInterpreter descrito abajo; la apertura por perfil no añade permisos nuevos.
+El resumen no inicia turnos, registra llamadas, ni comparte filas con el tracker. El registro puede funcionar con la barra oculta, y el resumen con el registro apagado. El espacio de trabajo añade únicamente el permiso acotado de UseInterpreter descrito abajo; la apertura por perfil no añade permisos nuevos.
 
 ## Sesión y Shift
 
@@ -87,32 +87,33 @@ las elecciones posteriores. Actualizar la extensión vuelve a comprobar las
 ventanas abiertas; un fallo de distribución libera el intento y muestra Reintentar. La instalación de Jonathan está presente
 solo en Default, no en su perfil Ocio. No se añaden permisos para esta apertura.
 
-El acceso personal de Windows ahora contiene directamente una instrucción
-corta de PowerShell oculto; ya no apunta a un `.vbs` externo. La comprobación
-horaria sigue en UTC-6 y conserva el perfil Default. No cambia la política de
-ejecución, el inicio de sesión ni ajustes de seguridad de Windows.
+El acceso personal de Windows abre Chrome directamente en Default/Jonathan
+con la página del organizador. No depende de PowerShell ni de un `.vbs`,
+y no aplica franjas horarias. No cambia el inicio de sesión ni ajustes
+de seguridad de Windows.
 
-La página interna `workspace.html#startup` organiza Propio y SuInterpreter en una
-vista dividida dentro de la ventana izquierda (dos tercios de la pantalla), y el
-tracker en la ventana derecha. Reutiliza las pestañas existentes sin navegar ni
+La página interna `workspace.html#startup` organiza Propio y UseInterpreter en una
+vista dividida dentro de la ventana izquierda, más ancha. El tracker y Linguee
+son dos pestañas normales, en ese orden, dentro de la ventana derecha. Se
+compensan los bordes invisibles de Windows para quitar huecos entre ventanas
+y bajo ellas, usando la distribución de la captura aprobada. Reutiliza las pestañas existentes sin navegar ni
 recargar sus sesiones. Si falta una página la abre; si hay varias de una página
 se detiene antes de cambiar la distribución para no elegir entre cuentas.
 
-Solo organiza de 05:45 inclusive hasta antes de 14:00, hora de Honduras, todos
-los días. No cierra Chrome al terminar esa franja ni modifica Break/Lunch,
-preferencias de registro o aceptación de llamadas. La página no se ejecuta
-al abrir cualquier popup: requiere el acceso de inicio de Windows configurado
-expresamente para este espacio. Ese acceso se ejecuta al iniciar sesión en
-Windows, no antes del login.
+Organiza a cualquier hora al abrir Jonathan o iniciar sesión en Windows.
+Reutiliza las páginas del perfil; no modifica Break/Lunch, preferencias de
+registro ni aceptación de llamadas. El acceso de Windows se ejecuta después
+del login y abre ese perfil directamente, sin pasar por el selector.
 
 La división usa `chrome.tabs.createSplit` y `chrome.tabs.unsplit`, disponibles
 desde Chrome 155. Chrome anterior conserva el puente y el resumen, pero no puede
-organizar esta vista. El permiso adicional de `app.suinterpreter.com` permite
+organizar esta vista. El permiso adicional de `app.useinterpreter.com` permite
 identificar su pestaña para moverla; no se inyectan scripts ni se lee su contenido,
-audio o credenciales. Las demás pestañas permanecen abiertas.
+audio o credenciales. Los permisos acotados de www.linguee.es y www.linguee.com
+permiten reutilizar una pestaña existente sin navegar ni leer su contenido.
+Las demás pestañas permanecen abiertas.
 
-`workspace.html#setup` permite una configuración manual puntual fuera de horario;
-el marcador se reemplaza por `#startup` para que una restauración posterior no
-repita esa excepción. La página se cierra al completar la organización. Los
+`workspace.html#setup` permite organizar manualmente. Todos los marcadores
+del organizador aplican la misma distribución sin comprobar la hora. La página se cierra al completar la organización. Los
 errores se muestran con opción de reintentar y un bloqueo corto evita dos
 organizaciones simultáneas. No configura auto-login en Windows ni en Propio.

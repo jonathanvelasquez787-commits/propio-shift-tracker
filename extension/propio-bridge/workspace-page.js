@@ -12,14 +12,13 @@ async function prepare() {
       status.textContent = 'La apertura automática del espacio de trabajo está desactivada para este perfil.';
       return;
     }
-    const startup = location.hash !== '#setup' && !profile;
-    if (location.hash === '#setup') history.replaceState(null, '', '#startup');
-    const result = await arrangeWorkspace(chrome, window.screen, { startup });
-    if (result.status === 'outside-hours') status.textContent = 'El arranque automático está fuera de horario. Tus ventanas quedan como están.';
-    else if (result.status === 'already-running') status.textContent = 'Otra pestaña ya está preparando tus ventanas.';
+    const minimumInset = /Win/i.test(globalThis.navigator?.platform || '') ? 8 : 0;
+    const frameInset = Math.max(minimumInset, Math.min(16, (window.outerWidth - window.innerWidth) / 2));
+    const result = await arrangeWorkspace(chrome, window.screen, { frameInset });
+    if (result.status === 'already-running') status.textContent = 'Otra pestaña ya está preparando tus ventanas.';
     else {
       await chrome.storage.session.set({ 'workspace-profile-session': { prepared: true, phase: 'ready' } });
-      status.textContent = 'Todo listo. Vos aceptás tu primera llamada cuando llegue.';
+      status.textContent = 'Tus ventanas están listas.';
       const tab = await chrome.tabs.getCurrent();
       await chrome.tabs.remove(tab.id);
     }

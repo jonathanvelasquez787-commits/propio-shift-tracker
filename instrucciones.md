@@ -317,17 +317,23 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
-Arranque de Windows y apertura del perfil: el usuario confirmó el 14/10 que
-no se prepara al abrir Chrome ni al encender el PC. SIGUE SIN RESOLVERSE en
-su instalación real; acceso reescrito y pruebas simuladas no acreditan éxito.
-Revisarlo al final por instrucción expresa. Último boot observado 07:48:41
-Honduras; acceso existe, sin entrada StartupApproved deshabilitada. Carpeta
-Default/Jonathan actualizada a 2.1.8 y configuración personal de distribución
-con revisión única para aplicar su pedido incluso sobre un default antiguo.
-Recarga del worker, división nativa real y reinicio físico no certificados.
-El acceso incluye log local de resultado en LocalAppData/Propio Shift Tracker/
-startup/launch.log, sin dependencia de scripts externos. Argumentos 760
-caracteres verificados por lectura del acceso; franja UTC-6 conservada.
+Arranque y distribución son la prioridad actual por petición del usuario.
+El 14/10 quitó todas las franjas: abrir Jonathan al iniciar sesión en Windows
+y organizar también al abrirlo manualmente, a cualquier hora. URL correcta
+confirmada por el usuario: https://app.useinterpreter.com/.
+Accesos de Inicio y escritorio apuntan directamente a chrome.exe, Default,
+restore-last-session y el organizador, sin PowerShell/VBS. Lectura verificada.
+Carpeta real actualizada a 2.2.0 con respaldo y preferencia personal activada;
+cuenta vinculada intacta. División real y siguiente reinicio aún por comprobar.
+Chrome aislado instalado se cerró antes de ofrecer service worker; no acredita
+la distribución. Computer Use había bloqueado la captura del selector de perfil
+por no identificar una URL; ese selector apareció al abrir Chrome genérico.
+La captura real confirma Propio/UseInterpreter divididos, pero faltaba Linguee
+y sobraban huecos entre ventanas/abajo. La segunda captura del usuario es
+el objetivo: izquierda más ancha, tracker seguido de Linguee a la derecha.
+2.2.0 añade Linguee y compensa bordes; resultado real actualizado pendiente. No declarar resuelto sin evidencia real.
+El usuario confirmó que al terminar Break regresó la recepción de llamadas:
+ese iniciador funciona en su sesión real. No modificar iniciadores en esta tarea.
 
 Propio y segundos: pendiente confirmar con evidencia si los segundos del
 último minuto incompleto se incluyen en la duración y pago oficiales. No
@@ -335,41 +341,6 @@ cambiar ACW ni alargar llamadas basándose en el formato visible de hora.
 La búsqueda pública del 14/10 solo encontró reportes expresados en minutos,
 sin una regla oficial sobre fracciones finales; sigue pendiente de evidencia.
 
-
-Extensión 2.1.3: apertura optativa al entrar a un perfil y al reabrir su primera
-ventana después de cerrar todas. Preparación única por sesión, sin bucles por
-ventanas del tracker, worker reiniciado, incógnito o popups. Reutiliza la página
-del acceso de Windows. Perfil manual puede organizar a cualquier hora; Windows
-sigue limitado a 05:45–14:00 Honduras. Preferencia en storage.local por perfil;
-distribución pública desactivada, instalación personal de Jonathan inicializada
-activada. Extensión comprobada en Default/Jonathan y ausente en Profile 1/Ocio.
-No se añaden permisos. 27 regresiones de espacio/perfil; suite de 701 correcta.
-Chromium 151 aislado con el worker empaquetado real: preferencia personal
-inicializada, un solo organizador por perfil y nueva ventana sin duplicarlo;
-API dividida ausente muestra error visible. Se identifican páginas propias con
-runtime.getContexts porque Chrome oculta su URL en tabs.query sin permisos extra.
-La captura del 14/10 informó que WScript no encontró el .vbs al iniciar; ahora
-ese archivo existe, sin evidencia del motivo de la ausencia durante el boot.
-Acceso personal sustituido por PowerShell oculto con instrucción interna corta,
-sin .vbs, archivos de apoyo ni cambios de política de ejecución. Lectura del
-acceso y seis límites horarios ejecutados en Windows PowerShell con Start-Process
-simulado, sin abrir Chrome. Perfil real y reinicio físico siguen sin certificar
-por bloqueo de Computer Use al no poder identificar la URL activa de Chrome.
-
-Extensión 2.1.2 / espacio de trabajo de Windows: página interna optativa
-workspace.html#startup, llamada solamente por el acceso personal de inicio.
-Reutiliza Propio/SuInterpreter y los divide nativamente a la izquierda; tracker
-a la derecha. Franja 05:45 inclusive–14:00 exclusiva, Honduras UTC-6, todos los
-días; no cierra Chrome ni altera llamadas o pausas. Chrome 155 requerido para
-esta organización; puente/resumen conservan compatibilidad anterior. Permiso
-acotado de SuInterpreter solo para identificar su pestaña, sin content scripts.
-Varias pestañas de una página bloquean antes de mutar, se conservan las demás;
-pantalla pequeña/API ausente/incógnito dan un error claro. Lock de sesión y
-excepción manual no persistente cubiertos. 14 pruebas de regresión; suite 688
-correcta. La distribución nativa en el perfil real y el reinicio físico siguen
-pendientes de comprobación; Chromium aislado disponible es 151, sin estas APIs.
-El acceso personal de Jonathan debe apuntar al ID de su extensión conservando
-la carpeta existente y el filtro horario de Windows; no añadir otra extensión.
 
 v607 / extensión 2.1.1: el primer tracker autenticado y único se vincula solo,
 activa registro y prepara el arranque solicitado. El anuncio reintenta fallos
@@ -922,7 +893,7 @@ La aplicación funciona en producción con estas bases vigentes:
   el de la guía es nofollow. La extensión se instala desde archivo según el
   propietario, por lo que no hay ficha propia de Chrome Web Store que editar.
   Detalle en `docs/seo.md`.
-- La versión actual de la app es 614; la extensión unificada es 2.1.8. El build
+- La versión actual de la app es 614; la extensión unificada es 2.2.0. El build
   del resumen independiente 1.0.5 queda compatible para instalaciones anteriores.
   Refuerzo positivo puede funcionar con Logros apagados. La auditoría profunda del
   8 de octubre corrigió seis fallos; la ampliación corrigió cinco más en arranque,
@@ -947,6 +918,32 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**Extensión 2.2.0 — Distribución exacta, Linguee y arranque sin horarios.**
+
+- Todas las entradas del organizador funcionan a cualquier hora. Eliminada
+  la franja 05:45–14:00 y el texto correspondiente. La app sigue en 614.
+- URL y permiso acotado corregidos a app.useinterpreter.com por petición
+  expresa. No se inyectan scripts ni se leen audio o credenciales en esa página.
+- Una división existente al revés se reconstruye con Propio antes de
+  UseInterpreter; se conservan páginas y sesiones. Vista a la izquierda,
+  tracker y Linguee en dos pestañas de la ventana derecha. La izquierda
+  crece según la captura; se compensan bordes invisibles laterales e inferiores.
+  Linguee .es/.com existente se reutiliza y conserva su página/búsqueda.
+  Permisos acotados para identificar esas pestañas, sin leer su contenido.
+- Inicio de Windows y acceso Jonathan del escritorio abren Chrome directamente
+  con Default y el organizador. Sin script externo, PowerShell ni selector.
+  Ambos accesos respaldados y verificados por lectura del destino/argumentos.
+- 36 regresiones de distribución/perfil, 737 pruebas completas y build correctos.
+  Build de extensión correcto; archivos instalados con comparación de hashes,
+  respaldo y preferencia personal independiente de la distribución pública.
+- Ejecución nativa y reinicio físico pendientes. Intento aislado con Chrome
+  instalado cerrado antes de obtener worker; no se interpreta como éxito.
+- Usuario confirma regreso automático después de Break en una llamada real.
+  Iniciadores y vinculación quedan fuera del cambio actual. Siguiente pedido:
+  basar la espera entre llamadas en el ACW visible del tracker, manteniendo
+  las opciones de primera llamada y retorno de pausas; propuesta explicada.
+
 
 **v614 — Frecuencia y repetición del aviso de apoyo sin llamadas.**
 
@@ -988,26 +985,3 @@ La aplicación funciona en producción con estas bases vigentes:
   ficticias; sin cambios de esquema, API o RLS, ni pruebas con cuenta real.
 - Extensión continúa en 2.1.8. Arranque real y regla oficial de segundos de
   Propio siguen pendientes. CI/publicación se confirman por SHA separado.
-
-
-**v612 / extensión 2.1.8 — Encabezado y explicación de espera.**
-
-- Ayuda de espera entre llamadas aclara que la extensión pulsa Stop Calls
-  para pausar la recepción y Start Calls para volver a estar disponible.
-  Aceptación manual y respeto de pausas/turno explícitos; misma funcionalidad.
-  Build de extensión y lectura en ambos temas correctos; mismos controles y
-  hashes idénticos en los cinco bundles de comportamiento. Carpeta actualizada
-  con respaldo, sin tocar la revisión personal ni el almacenamiento de cuenta.
-
-- Fecha en una sola línea debajo del reloj móvil, sin limitarla al ancho de
-  la hora. Hora y fecha siguen alineadas a la derecha; fondo oscuro en tema claro.
-- Día activo vuelve al grupo de estado en escritorio, antes de los botones
-  del turno. La agrupación móvil de ACW/Día activo conserva su posición.
-- Hasta 360 px, saludo arriba y reloj debajo a la derecha evitan comprimir
-  el saludo en una columna demasiado angosta. Sin cambios de funciones.
-- Build y controles de traducción/módulos/wiring correctos. App compilada:
-  40 comprobaciones ES/EN, claro/oscuro y siete anchuras 320–1800 px; fecha
-  de una línea, sin solapar saludo ni overflow, posición durante Break/Lunch
-  y pareja ACW/Día activo móvil correctas. Cuenta/nube ficticias; cero errores.
-- Publicación y CI se confirman por SHA separado. Arranque real y regla
-  oficial de segundos de Propio siguen pendientes, sin cambios en esta versión.
