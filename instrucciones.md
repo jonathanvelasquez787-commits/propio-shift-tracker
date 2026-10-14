@@ -922,7 +922,7 @@ La aplicación funciona en producción con estas bases vigentes:
   el de la guía es nofollow. La extensión se instala desde archivo según el
   propietario, por lo que no hay ficha propia de Chrome Web Store que editar.
   Detalle en `docs/seo.md`.
-- La versión actual de la app es 611; la extensión unificada es 2.1.6. El build
+- La versión actual de la app es 612; la extensión unificada es 2.1.6. El build
   del resumen independiente 1.0.5 queda compatible para instalaciones anteriores.
   Refuerzo positivo puede funcionar con Logros apagados. La auditoría profunda del
   8 de octubre corrigió seis fallos; la ampliación corrigió cinco más en arranque,
@@ -947,6 +947,22 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v612 — Fecha completa y orden de controles del encabezado.**
+
+- Fecha en una sola línea debajo del reloj móvil, sin limitarla al ancho de
+  la hora. Hora y fecha siguen alineadas a la derecha; fondo oscuro en tema claro.
+- Día activo vuelve al grupo de estado en escritorio, antes de los botones
+  del turno. La agrupación móvil de ACW/Día activo conserva su posición.
+- Hasta 360 px, saludo arriba y reloj debajo a la derecha evitan comprimir
+  el saludo en una columna demasiado angosta. Sin cambios de funciones.
+- Build y controles de traducción/módulos/wiring correctos. App compilada:
+  40 comprobaciones ES/EN, claro/oscuro y siete anchuras 320–1800 px; fecha
+  de una línea, sin solapar saludo ni overflow, posición durante Break/Lunch
+  y pareja ACW/Día activo móvil correctas. Cuenta/nube ficticias; cero errores.
+- Publicación y CI se confirman por SHA separado. Arranque real y regla
+  oficial de segundos de Propio siguen pendientes, sin cambios en esta versión.
+
 
 **v611 / extensión 2.1.6 — Recuperación del arranque y fecha bajo el reloj.**
 
@@ -986,25 +1002,3 @@ La aplicación funciona en producción con estas bases vigentes:
   App compilada: 24 comprobaciones ES/EN y ambos temas, aviso/reflexión/FX
   ausentes para puente y conservados para manual; ≈ abajo, pareja ACW/fecha
   en cinco anchuras. Fixtures de cuenta/portal; Chrome real no certificado.
-
-
-**v609 / extensión 2.1.4 — Disponibilidad, reloj y moneda principal.**
-
-- Espera optativa de 1–60 minutos desde el fin real observado o confirmado
-  en el plan: Stop Calls entre llamadas y Start Calls al cumplirla, sin
-  aceptación/rechazo automático. Guarda preferencias y respeta pausas/turno.
-- Regreso manual de Break/Lunch confirmado permite iniciar aunque esté
-  elegido modo por duración; recupera una pausa finalizada no observada.
-- Detector admite encabezados de estado e iconos decorativos; popup explica
-  el motivo de espera y permite actualizar la única pestaña del tracker.
-- Reloj móvil a la derecha y frase con acento, aprobados en ambos temas.
-  Nombre ACW/AfterCallWork y tooltip corto sobre fin con segundos: el trato
-  de segundos en la duración oficial de Propio sigue por investigar.
-- Hoy/ciclo intercambian USD y moneda secundaria por toque, Enter o Espacio;
-  preferencia guardada/sincronizada con la cuenta, sin modificar pagos/metas.
-- 714 pruebas, ocho regresiones nuevas y builds correctos. App compilada
-  ES/EN en ambos temas: 24 comprobaciones de moneda, guardado de cuenta,
-  recarga/contexto nuevo y cinco anchuras sin overflow. Portal empaquetado
-  real con fixture h5/mat-icon: primer inicio, aceptación manual, Stop Calls,
-  espera de dos minutos/reinicio y desactivación. Cuenta/portal simulados;
-  instalación real de Chrome y boot siguen pendientes de certificación.
