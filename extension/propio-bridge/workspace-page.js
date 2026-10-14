@@ -12,7 +12,9 @@ async function prepare() {
       status.textContent = 'La apertura automática del espacio de trabajo está desactivada para este perfil.';
       return;
     }
-    const result = await arrangeWorkspace(chrome, window.screen);
+    const minimumInset = /Win/i.test(globalThis.navigator?.platform || '') ? 8 : 0;
+    const frameInset = Math.max(minimumInset, Math.min(16, (window.outerWidth - window.innerWidth) / 2));
+    const result = await arrangeWorkspace(chrome, window.screen, { frameInset });
     if (result.status === 'already-running') status.textContent = 'Otra pestaña ya está preparando tus ventanas.';
     else {
       await chrome.storage.session.set({ 'workspace-profile-session': { prepared: true, phase: 'ready' } });

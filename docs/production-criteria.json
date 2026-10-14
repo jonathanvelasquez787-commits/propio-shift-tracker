@@ -1219,7 +1219,7 @@
     ,{
       "id": "windows-workspace",
       "area": "Espacio de trabajo optativo",
-      "acceptance": "La página interna reutiliza páginas conocidas, divide Propio/UseInterpreter y coloca el tracker aparte a cualquier hora; las cuentas ambiguas y APIs ausentes no alteran las pestañas.",
+      "acceptance": "La página interna reutiliza páginas conocidas, divide Propio/UseInterpreter y coloca tracker/Linguee en la ventana derecha sin huecos a cualquier hora; las cuentas ambiguas y APIs ausentes no alteran las pestañas.",
       "sources": ["extension/propio-bridge/workspace.js", "extension/propio-bridge/workspace-page.js", "extension/propio-bridge/workspace-profile.js"],
       "tests": [{
         "file": "tests/workspace-startup.test.mjs",
@@ -1229,6 +1229,8 @@
           "duplicate tracker accounts stop before mutations and release lock",
           "existing split is preserved on repeated launches without duplicate pages",
           "a reversed existing split is rebuilt with Propio before UseInterpreter",
+          "existing Linguee dictionary moves beside tracker without navigating or duplicating it",
+          "frame compensation meets at visible edges for the requested widths without excess overlap",
           "incorrect tracker/portal split is separated before moving either window",
           "missing native API fails before changing user tabs"
         ]

@@ -1,4 +1,4 @@
-# Propio · Tracker y resumen · 2.1.9
+# Propio · Tracker y resumen · 2.2.0
 
 Una sola extensión reúne la conexión al tracker y la barra de llamadas, minutos y ganancias en Propio. «Registrar en mi tracker» y «Mostrar resumen en Propio» son controles independientes. El resumen empieza oculto y no exige cuenta vinculada; encenderlo o apagarlo se aplica a las pestañas abiertas sin recargar. La conexión conserva su modo y cuenta al actualizar la carpeta existente.
 
@@ -93,8 +93,10 @@ y no aplica franjas horarias. No cambia el inicio de sesión ni ajustes
 de seguridad de Windows.
 
 La página interna `workspace.html#startup` organiza Propio y UseInterpreter en una
-vista dividida dentro de la ventana izquierda (dos tercios de la pantalla), y el
-tracker en la ventana derecha. Reutiliza las pestañas existentes sin navegar ni
+vista dividida dentro de la ventana izquierda, más ancha. El tracker y Linguee
+son dos pestañas normales, en ese orden, dentro de la ventana derecha. Se
+compensan los bordes invisibles de Windows para quitar huecos entre ventanas
+y bajo ellas, usando la distribución de la captura aprobada. Reutiliza las pestañas existentes sin navegar ni
 recargar sus sesiones. Si falta una página la abre; si hay varias de una página
 se detiene antes de cambiar la distribución para no elegir entre cuentas.
 
@@ -107,7 +109,9 @@ La división usa `chrome.tabs.createSplit` y `chrome.tabs.unsplit`, disponibles
 desde Chrome 155. Chrome anterior conserva el puente y el resumen, pero no puede
 organizar esta vista. El permiso adicional de `app.useinterpreter.com` permite
 identificar su pestaña para moverla; no se inyectan scripts ni se lee su contenido,
-audio o credenciales. Las demás pestañas permanecen abiertas.
+audio o credenciales. Los permisos acotados de www.linguee.es y www.linguee.com
+permiten reutilizar una pestaña existente sin navegar ni leer su contenido.
+Las demás pestañas permanecen abiertas.
 
 `workspace.html#setup` permite organizar manualmente. Todos los marcadores
 del organizador aplican la misma distribución sin comprobar la hora. La página se cierra al completar la organización. Los

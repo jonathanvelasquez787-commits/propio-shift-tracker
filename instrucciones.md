@@ -323,13 +323,15 @@ y organizar también al abrirlo manualmente, a cualquier hora. URL correcta
 confirmada por el usuario: https://app.useinterpreter.com/.
 Accesos de Inicio y escritorio apuntan directamente a chrome.exe, Default,
 restore-last-session y el organizador, sin PowerShell/VBS. Lectura verificada.
-Carpeta real actualizada a 2.1.9 con respaldo y preferencia personal activada;
+Carpeta real actualizada a 2.2.0 con respaldo y preferencia personal activada;
 cuenta vinculada intacta. División real y siguiente reinicio aún por comprobar.
 Chrome aislado instalado se cerró antes de ofrecer service worker; no acredita
 la distribución. Computer Use había bloqueado la captura del selector de perfil
 por no identificar una URL; ese selector apareció al abrir Chrome genérico.
-El usuario cree que ya se organiza, pero no confirmó aún la distribución final
-con la URL corregida. No declarar resuelto sin evidencia real.
+La captura real confirma Propio/UseInterpreter divididos, pero faltaba Linguee
+y sobraban huecos entre ventanas/abajo. La segunda captura del usuario es
+el objetivo: izquierda más ancha, tracker seguido de Linguee a la derecha.
+2.2.0 añade Linguee y compensa bordes; resultado real actualizado pendiente. No declarar resuelto sin evidencia real.
 El usuario confirmó que al terminar Break regresó la recepción de llamadas:
 ese iniciador funciona en su sesión real. No modificar iniciadores en esta tarea.
 
@@ -891,7 +893,7 @@ La aplicación funciona en producción con estas bases vigentes:
   el de la guía es nofollow. La extensión se instala desde archivo según el
   propietario, por lo que no hay ficha propia de Chrome Web Store que editar.
   Detalle en `docs/seo.md`.
-- La versión actual de la app es 614; la extensión unificada es 2.1.9. El build
+- La versión actual de la app es 614; la extensión unificada es 2.2.0. El build
   del resumen independiente 1.0.5 queda compatible para instalaciones anteriores.
   Refuerzo positivo puede funcionar con Logros apagados. La auditoría profunda del
   8 de octubre corrigió seis fallos; la ampliación corrigió cinco más en arranque,
@@ -917,7 +919,7 @@ La aplicación funciona en producción con estas bases vigentes:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
-**Extensión 2.1.9 — Arranque sin horarios y URL correcta de UseInterpreter.**
+**Extensión 2.2.0 — Distribución exacta, Linguee y arranque sin horarios.**
 
 - Todas las entradas del organizador funcionan a cualquier hora. Eliminada
   la franja 05:45–14:00 y el texto correspondiente. La app sigue en 614.
@@ -925,17 +927,22 @@ La aplicación funciona en producción con estas bases vigentes:
   expresa. No se inyectan scripts ni se leen audio o credenciales en esa página.
 - Una división existente al revés se reconstruye con Propio antes de
   UseInterpreter; se conservan páginas y sesiones. Vista a la izquierda,
-  tracker aparte a la derecha; otras pestañas siguen abiertas.
+  tracker y Linguee en dos pestañas de la ventana derecha. La izquierda
+  crece según la captura; se compensan bordes invisibles laterales e inferiores.
+  Linguee .es/.com existente se reutiliza y conserva su página/búsqueda.
+  Permisos acotados para identificar esas pestañas, sin leer su contenido.
 - Inicio de Windows y acceso Jonathan del escritorio abren Chrome directamente
   con Default y el organizador. Sin script externo, PowerShell ni selector.
   Ambos accesos respaldados y verificados por lectura del destino/argumentos.
-- 34 regresiones de distribución/perfil y 735 pruebas completas correctas.
+- 36 regresiones de distribución/perfil, 737 pruebas completas y build correctos.
   Build de extensión correcto; archivos instalados con comparación de hashes,
   respaldo y preferencia personal independiente de la distribución pública.
 - Ejecución nativa y reinicio físico pendientes. Intento aislado con Chrome
   instalado cerrado antes de obtener worker; no se interpreta como éxito.
 - Usuario confirma regreso automático después de Break en una llamada real.
-  Iniciadores y vinculación quedan fuera del cambio actual.
+  Iniciadores y vinculación quedan fuera del cambio actual. Siguiente pedido:
+  basar la espera entre llamadas en el ACW visible del tracker, manteniendo
+  las opciones de primera llamada y retorno de pausas; propuesta explicada.
 
 
 **v614 — Frecuencia y repetición del aviso de apoyo sin llamadas.**
