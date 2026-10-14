@@ -2,6 +2,7 @@ import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 // app-main.js injects call helpers; app-context.js owns shared app state.
 import { calls, settings, state, setAppCalls as setCalls } from './app-context.js';
 import { ignorePropioCall } from './propio-bridge.js';
+import { callFeedbackSilenced, withSilentCallFeedback } from './call-feedback.js';
 
 let HIGHER_RATE_TIERS, MAX_CALL_DURATION_MIN, appConfirm, autoStartShiftFromCalls, callDateKeyFromValue, callDedupeKey;
 let callsForDay, callsOverlap, closeModal, connectedMinutesForDay, convertedAmountText, dayAdherence;
@@ -577,6 +578,7 @@ export function saveManualCall() {
 // dejaba" — el modal de "Guardar llamada" cubre toda la pantalla y bloquea el click a "Iniciar
 // llamada" hasta resolverlo.
 export function autoSaveLiveCall(startedAtISO, endedAtISO, liveContext = null) {
+  if (liveContext?.propioBridge && !callFeedbackSilenced()) return withSilentCallFeedback(() => autoSaveLiveCall(startedAtISO, endedAtISO, liveContext));
   const elapsedMs = Math.max(0, new Date(endedAtISO).getTime() - new Date(startedAtISO).getTime());
   const durationMin = Math.round((elapsedMs / 60000) * 100) / 100;
   const pay = manualCallEstimatedPay(durationMin, 'normal').toFixed(2);
@@ -600,8 +602,10 @@ export function autoSaveLiveCall(startedAtISO, endedAtISO, liveContext = null) {
     state.pendingLiveCallBackup = null;
     financeRunAutoFillCascade();
     if (saveAll() === false) return false;
-    toast(ui`Llamada guardada (${formatDuration(durationMin * 60000)}) — edítala en Tabla de llamadas si hace falta`);
-    playCallSavedSound?.('callEnded');
+    if (!callFeedbackSilenced()) {
+      toast(ui`Llamada guardada (${formatDuration(durationMin * 60000)}) — edítala en Tabla de llamadas si hace falta`);
+      playCallSavedSound?.('callEnded');
+    }
     onGameCallSaved(candidate, 'live');
     return true;
   }

@@ -48,6 +48,8 @@ test('summary defaults and legacy currency-only settings use English; Spanish is
   assert.match(copyFor({ language: 'es' }).tooltip, /Start Date y End Date/);
 });
 test('summary status, plural calls and scan errors follow the selected language', () => {
+  assert.equal(copyFor({}).earningsBasis, '(Earnings excluding Surge Hours bonuses)');
+  assert.equal(copyFor({ language: 'es' }).earningsBasis, '(Ganancias sin bonos de Surge Hours)');
   assert.equal(copyFor({}).calls(1), '1 call');
   assert.equal(copyFor({}).calls(2), '2 calls');
   assert.equal(copyFor({ language: 'es' }).calls(1), '1 llamada');

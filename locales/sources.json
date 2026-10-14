@@ -9976,6 +9976,12 @@
       "js/game.js"
     ]
   },
+  "s_baa7ff16": {
+    "source": "ACW/AfterCallWork",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_baabed62": {
     "source": "(el día activo). Las acciones de la tabla (Shift/Break/Lunch/ACW) no se tocan — son un registro, no se borran desde aquí. Para reiniciar también turno/pausas/horario de ese día, usa \"Reiniciar día\" en el botón ♻️ Reiniciar del header.",
     "files": [
@@ -12105,12 +12111,6 @@
     "source": "estela de estrellas",
     "files": [
       "js/game-battle.js"
-    ]
-  },
-  "s_e1980460": {
-    "source": "⏱️ ACW/AfterCallWork",
-    "files": [
-      "app.html"
     ]
   },
   "s_e1c47e30": {

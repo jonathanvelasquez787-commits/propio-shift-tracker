@@ -26,11 +26,11 @@ test('one currency preference swaps both earnings cards and survives serialized 
   const f = fixture(); f.h.render();
   assert.equal(f.elements.get('earningsValue').textContent, '$14.32');
   f.h.toggleEarningsCurrency();
-  assert.equal(f.elements.get('earningsValue').textContent, '≈ L 384');
-  assert.equal(f.elements.get('earningsConvertedText').textContent, '$14.32');
-  assert.equal(f.elements.get('cycleEarningsValue').textContent, '≈ L 768');
-  assert.equal(f.elements.get('cycleEarningsConvertedText').textContent, '$28.64');
-  f.reload(); assert.equal(f.elements.get('earningsValue').textContent, '≈ L 384');
+  assert.equal(f.elements.get('earningsValue').textContent, 'L 384');
+  assert.equal(f.elements.get('earningsConvertedText').textContent, '≈ $14.32');
+  assert.equal(f.elements.get('cycleEarningsValue').textContent, 'L 768');
+  assert.equal(f.elements.get('cycleEarningsConvertedText').textContent, '≈ $28.64');
+  f.reload(); assert.equal(f.elements.get('earningsValue').textContent, 'L 384');
   f.h.toggleEarningsCurrency(); f.reload(); assert.equal(f.elements.get('earningsValue').textContent, '$14.32');
 });
 
@@ -43,6 +43,6 @@ test('missing conversion keeps USD usable without erasing preference and rejecte
   f.h.settings.currencyLabel = 'L'; f.h.render();
   f.rejectSave(); f.h.toggleEarningsCurrency();
   assert.equal(f.h.settings.earningsPreferSecondary, true);
-  assert.equal(f.elements.get('earningsValue').textContent, '≈ L 384');
-  f.h.settings.exchangeRate = 30; f.h.render(); assert.equal(f.elements.get('earningsValue').textContent, '≈ L 430');
+  assert.equal(f.elements.get('earningsValue').textContent, 'L 384');
+  f.h.settings.exchangeRate = 30; f.h.render(); assert.equal(f.elements.get('earningsValue').textContent, 'L 430');
 });

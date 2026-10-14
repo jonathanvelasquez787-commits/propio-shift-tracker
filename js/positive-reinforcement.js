@@ -1,6 +1,7 @@
 import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 import { settings, state } from './app-context.js';
 import { notifyReinforcement, reinforcementFeedbackEnabled, reinforcementText } from './reinforcement-feedback.js';
+import { callFeedbackSilenced } from './call-feedback.js';
 
 let callDateKeyFromValue, callsForDay, closeModal, convertedAmountText, effectiveDailyGoal;
 let escapeHtml, importedCallStats, openModal, saveSettingsOnly, saveStateOnly, toast, todayCallDateKey;
@@ -281,7 +282,7 @@ export function onPositiveCallSaved(call, source, dayKey) {
   const normalizedDay = callDateKeyFromValue(dayKey) || callDateKeyFromValue(call.callDate) || currentPositiveDayKey();
   const endTime = new Date(call.endISO).getTime();
   if (normalizedDay !== currentPositiveDayKey() || !Number.isFinite(endTime) || endTime > Date.now()) return;
-  const silent = source === 'import';
+  const silent = source === 'import' || callFeedbackSilenced();
   const previous = structuredClone(state.game.reinforcement);
   const feedback = evaluateCallRewards(call, normalizedDay);
   if (saveStateOnly() === false) {
@@ -290,7 +291,7 @@ export function onPositiveCallSaved(call, source, dayKey) {
   }
   if (!silent) announceCallRewards(call, normalizedDay, feedback);
   renderPositiveReinforcement();
-  if (reinforcementFeedbackEnabled('personal') && settings.reinforcement.askAfterCall && !state.game.reinforcement.reflections[call.id]
+  if (!callFeedbackSilenced() && reinforcementFeedbackEnabled('personal') && settings.reinforcement.askAfterCall && !state.game.reinforcement.reflections[call.id]
       && reflectionCall?.callId !== String(call.id) && !reflectionQueue.some(item => String(item.call.id) === String(call.id))) {
     reflectionQueue.push({ call, dayKey: normalizedDay });
     drainReflectionQueue();

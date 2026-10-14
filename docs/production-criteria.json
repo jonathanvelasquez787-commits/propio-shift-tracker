@@ -206,6 +206,7 @@
         {
           "file": "tests/super-audit-accounting.test.mjs",
           "namedCases": [
+            "extension live saves and catch-up are discreet while ordinary live and manual saves keep feedback",
             "a rejected manual call save does not announce success or award its reward",
             "official bridge synchronization is silent while the live finish and manual paste retain their sounds",
             "manual and edited numeric payment inputs respect scientific notation without changing the imported-money parser",
@@ -661,6 +662,7 @@
         {
           "file": "tests/game-audio.test.mjs",
           "namedCases": [
+            "discreet call feedback restores after nested failures and does not replay suppressed audio",
             "inicializar o recargar no crea contexto ni reproduce eventos anteriores",
             "silent history updates neither enqueue sounds nor cancel the live celebration",
             "silent history scope restores audio after nested updates and failures",
@@ -694,6 +696,7 @@
         {
           "file": "tests/super-audit-game.test.mjs",
           "namedCases": [
+            "discreet automatic feedback preserves identical XP, milestone and surprise reward receipts",
             "resetting one day removes its reinforcement receipts and rewards while preserving other days and preferences",
             "resetting an unrelated day preserves accumulated rewards held by the daily limit",
             "correction below eight calls revokes improved loot and requalifying grants it exactly once",
@@ -788,6 +791,7 @@
         {
           "file": "tests/reinforcement-feedback.test.mjs",
           "namedCases": [
+            "automatic call feedback suppresses both notification channels without disabling preferences",
             "Logros y refuerzo positivo controlan sus propios canales incluso con intensidad antigua",
             "Arcade celebra hitos y movimiento reducido conserva anuncios sin partículas",
             "textos centrales tienen variantes estables y no dejan variables sin reemplazar",
@@ -864,6 +868,7 @@
       "acceptance": "Puente valida mensajes, conecta sesión confirmada con Shift, detecta llamadas por controles o red y deduplica; historial paginado y resumen independiente sin acceder a otra cuenta.",
       "sources": [
         "js/propio-bridge.js",
+        "js/call-feedback.js",
         "js/propio-bridge-rules.js",
         "extension/propio-bridge/portal-observer.js",
         "extension/propio-bridge/portal-content.js",

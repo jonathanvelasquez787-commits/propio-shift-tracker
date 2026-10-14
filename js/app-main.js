@@ -6,7 +6,7 @@ import { validFinanceSettings } from './finance-plan-model.js';
 import { normalizeBattleWeapon } from './game-battle.js';
 import { createPropioReceiver, createStorageRevisionGuard, ignorePropioCall } from './propio-bridge.js';
 import { portalRecordsText } from './propio-history-records.js';
-import { withGameSoundsSilenced } from './game-audio.js';
+import { callFeedbackSilenced, withSilentCallFeedback } from './call-feedback.js';
 import { settingsWithinBudget, reportLocalPersistenceFailure, readMeta } from './sync.js';
 // Cuerpo principal de la app (Inicio, Horario, Llamadas, Higher Rate, Finanzas, Reportes,
 // Calendario, Ajustes...). Vive como módulo ES aparte para no ser parte del documento HTML: lo
@@ -1174,8 +1174,8 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
       const converted = convertedAmountText(usdAmount);
       const canSwitch = !!converted && !converted.endsWith('—');
       const secondary = canSwitch && settings.earningsPreferSecondary === true;
-      value.textContent = secondary ? converted : money(usdAmount);
-      if (other) other.textContent = secondary ? money(usdAmount) : converted;
+      value.textContent = secondary ? converted.replace(/^≈\s*/, '') : money(usdAmount);
+      if (other) other.textContent = secondary ? `≈ ${money(usdAmount)}` : converted;
       const control = value.closest('[data-earnings-currency]');
       if (!control) return;
       const label = secondary ? translateText('Mostrar dólares como moneda principal') : ui`Mostrar ${String(settings.currencyLabel || '').trim()} como moneda principal`;
@@ -1837,6 +1837,7 @@ function playConfiguredAlarmSound(sound, customSoundDataUrl) {
 }
 
 function playCallSavedSound(kind) {
+  if (callFeedbackSilenced()) return;
   const cfg = ALARM_SOUND_CONFIGS[kind];
   if (!cfg?.enabledKey || settings[cfg.enabledKey] !== true || getMasterVolumeFraction() === 0) return;
   playConfiguredAlarmSound(settings[cfg.soundKey], settings[cfg.urlKey]);
@@ -7958,14 +7959,14 @@ export const applyPropioBridgeEvent = createPropioReceiver({
   startSession: event => startShift({ at: event.at, propio: true }),
   endSession: event => endShift({ at: event.at, propio: true }),
   start: event => startCall({ startedAt: event.at, propioBridge: { callId: event.callId, payEstimated: true, timingEstimated: true } }),
-  end: event => endCall({ endedAt: event.at }),
-  catchUp: event => {
+  end: event => withSilentCallFeedback(() => endCall({ endedAt: event.at })),
+  catchUp: event => withSilentCallFeedback(() => {
     const context = { propioBridge: { callId: event.callId, payEstimated: true, timingEstimated: true } };
     const result = autoSaveLiveCall(event.startedAt, event.at, context);
     if (result && (!state.lastCallEndedAt || Date.parse(state.lastCallEndedAt) < Date.parse(event.at))) state.lastCallEndedAt = event.at;
     return result;
-  },
-  importHistory: records => withGameSoundsSilenced(() => importCalls(portalRecordsText(records))),
+  }),
+  importHistory: records => withSilentCallFeedback(() => importCalls(portalRecordsText(records))),
   endScheduledPause: () => endPause({ endedAt: new Date().toISOString(), silent: true }),
   save: saveAll,
 });

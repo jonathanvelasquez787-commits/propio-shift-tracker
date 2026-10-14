@@ -1,4 +1,5 @@
 import { ui, translateText, translateStoredText, translateMarkup, displayLocale } from './i18n.js';
+import { callFeedbackSilenced } from './call-feedback.js';
 import { calls, settings, state } from './app-context.js';
 import { initGameAudio, playGameSound, previewGameSound, syncGameAudio, stopGameSounds, gameSoundsSilenced } from './game-audio.js';
 import { battleWorkMode } from './game-duel.js';
@@ -1445,6 +1446,7 @@ let lastDisplayedToastText = '';
 const TOAST_PRIORITIES = Object.freeze({ record: 4, loot: 3, impulse: 2, critical: 2, '': 1 });
 
 export function announceGameStatus(message, { channel = 'game' } = {}) {
+  if (callFeedbackSilenced()) return;
   if (!reinforcementFeedbackEnabled(channel) || state.activeCall) return;
   const live = document.getElementById('gameStatusLive');
   if (!live || !message) return;
@@ -1453,6 +1455,7 @@ export function announceGameStatus(message, { channel = 'game' } = {}) {
 }
 
 export function queueGameToast(message, tone = '', options = {}) {
+  if (callFeedbackSilenced()) return;
   const text = String(message ?? '').trim();
   const channel = options.channel || 'game';
   const allowed = reinforcementFeedbackEnabled(channel);
@@ -1544,6 +1547,7 @@ function pixelBurst(root, kind, damageText = '') {
 }
 
 function triggerGameEvent(rootId, eventName, duration = 900) {
+  if (callFeedbackSilenced()) return;
   if (!arcadeEnabled() || state.activeCall) return;
   if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
   const root = document.getElementById(rootId);
@@ -1582,6 +1586,7 @@ function grantDayBonusReceipt(dayKey, grossAmount) {
 let callFxVersion = 0;
 
 function showCallFx(call, xp, critical, mode = 'xp') {
+  if (callFeedbackSilenced()) return true;
   const root = document.getElementById('gameCallFx');
   if (!root) return false;
   const version = ++callFxVersion;
@@ -1831,6 +1836,7 @@ function reconcileMissionEvents(dayKey, snapshot, { allowFeedback = true } = {})
 let gameRecordBannerTimer = null;
 
 function showGameRecordBanner(message) {
+  if (callFeedbackSilenced()) return;
   if (!gameEnabled() || state.activeCall) return;
   const root = document.getElementById('gameRecordBanner');
   if (!root || !message) return;
@@ -1905,7 +1911,7 @@ export function rewardSurpriseForCall(call, dayKey, { random = Math.random } = {
   if (surprise) {
     const bonus = grantDayBonusReceipt(dayKey, 5);
     state.game.ledger[key] = { ...state.game.ledger[key], ...bonus };
-    if (gameEnabled()) {
+    if (gameEnabled() && !callFeedbackSilenced()) {
       const root = document.getElementById('gameLootBox');
       if (root) {
         root.hidden = false;
