@@ -7,6 +7,20 @@ import { ACCESSORY_CATALOG, configureGameContext, createDefaultGameState, normal
   onGameDayMetadataChanged, openDailyGoalChest, claimPendingChest, equipAccessory, onGameDayReset,
   onGamePauseEnded, onGamePauseStarted, onGameDayRollover, chooseCycleReward, renderGame } from '../js/game.js';
 import { configurePositiveReinforcementContext } from '../js/positive-reinforcement.js';
+import { withSilentCallFeedback } from '../js/call-feedback.js';
+
+test('discreet automatic feedback preserves identical XP, milestone and surprise reward receipts', () => {
+  const snapshots = [];
+  for (const silent of [false, true]) {
+    const f = fixture({ goal: 3 });
+    try {
+      const save = () => { f.add(5, 1, () => 0); onGameCallsChanged(f.key); };
+      if (silent) withSilentCallFeedback(save); else save();
+      snapshots.push(structuredClone(f.current.game));
+    } finally { f.dispose(); }
+  }
+  assert.deepEqual(snapshots[1], snapshots[0]);
+});
 
 // Relative call timestamps must stay on the same day as the fixture's key,
 // including CI runs during the first ten minutes after UTC midnight.
@@ -46,12 +60,12 @@ function fixture({ owned = false, goal = 10000, shields = 0, status = 'compliant
   };
   configureGameContext(common); configurePositiveReinforcementContext(common);
   return { key, rows, current, config,
-    add(count = 1, pay = 0) { for (let i = 0; i < count; i++) {
+    add(count = 1, pay = 0, random = () => .99) { for (let i = 0; i < count; i++) {
       const now = Date.now() - 600000 + rows.length * 1000;
       const call = { id: `audit-${rows.length}`, callDate: key, shiftDayKey: key, billable: 'Yes', dropped: 'No',
         countsAsProductive: true, durationMin: 1, pay, startISO: new Date(now).toISOString(),
         endISO: new Date(now + 5000).toISOString(), importedAt: new Date(now + 6000).toISOString() };
-      rows.push(call); onGameCallSaved(call, 'manual', { random: () => .99 });
+      rows.push(call); onGameCallSaved(call, 'manual', { random });
     } },
     reload() { current.game = normalizeGameState(JSON.parse(JSON.stringify(current.game))); },
     setStatus(value) { status = value; }, setGoal(value) { goal = value; },

@@ -1,6 +1,18 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createGameAudio, createGameAudioPreview, withGameSoundsSilenced, gameSoundsSilenced } from '../js/game-audio.js';
+import { withSilentCallFeedback, callFeedbackSilenced } from '../js/call-feedback.js';
+
+test('discreet call feedback restores after nested failures and does not replay suppressed audio', async () => {
+  const h = harness(); h.unlock(); await h.flush();
+  assert.throws(() => withSilentCallFeedback(() => {
+    assert.equal(withSilentCallFeedback(() => h.audio.play('clear')), false);
+    assert.equal(callFeedbackSilenced(), true);
+    throw new Error('failed save');
+  }), /failed save/);
+  assert.equal(callFeedbackSilenced(), false); assert.equal(h.timers.size, 0);
+  assert.equal(h.audio.play('hit'), true); await h.flush(); assert.ok(h.sources.length > 0);
+});
 
 test('silent history updates neither enqueue sounds nor cancel the live celebration', async () => {
   for (const channel of ['game', 'personal']) {

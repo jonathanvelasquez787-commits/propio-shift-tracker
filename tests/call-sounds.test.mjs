@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
+import { callFeedbackSilenced, withSilentCallFeedback } from '../js/call-feedback.js';
 import {parse} from 'acorn';
 import {ui,translateText,setLanguage} from '../js/i18n.js';
 const source=fs.readFileSync(new URL('../js/app-main.js',import.meta.url),'utf8');
@@ -11,7 +12,7 @@ const config=nodes.find(n=>n.type==='VariableDeclaration'&&n.declarations.some(d
 function harness(){
   setLanguage('es');const fields=new Map(),played=[],readers=[],messages=[];let failed=false,budget=true;
   const field=id=>{if(!fields.has(id))fields.set(id,{value:'classic',checked:false,disabled:false,style:{},textContent:''});return fields.get(id);};
-  const context=vm.createContext({settings:{masterVolume:60,callEndedSoundEnabled:false,callEndedAlarmSound:'classic',callEndedAlarmCustomSoundDataUrl:'',callEndedAlarmCustomSoundName:''},ui,translateText,document:{getElementById:field},saveSettingsOnly:()=>!failed,settingsWithinBudget:()=>budget,toast:(m,o)=>messages.push({message:m,options:o}),playShiftAlarmBeep:()=>played.push('classic'),playProductiveBreakChimeTone:()=>played.push('chime'),MAX_CUSTOM_SOUND_BYTES:300*1024,Audio:class{constructor(url){this.url=url;}play(){played.push({url:this.url,volume:this.volume});return Promise.resolve();}},FileReader:class{constructor(){readers.push(this);}readAsDataURL(file){this.file=file;}}});
+  const context=vm.createContext({callFeedbackSilenced,settings:{masterVolume:60,callEndedSoundEnabled:false,callEndedAlarmSound:'classic',callEndedAlarmCustomSoundDataUrl:'',callEndedAlarmCustomSoundName:''},ui,translateText,document:{getElementById:field},saveSettingsOnly:()=>!failed,settingsWithinBudget:()=>budget,toast:(m,o)=>messages.push({message:m,options:o}),playShiftAlarmBeep:()=>played.push('classic'),playProductiveBreakChimeTone:()=>played.push('chime'),MAX_CUSTOM_SOUND_BYTES:300*1024,Audio:class{constructor(url){this.url=url;}play(){played.push({url:this.url,volume:this.volume});return Promise.resolve();}},FileReader:class{constructor(){readers.push(this);}readAsDataURL(file){this.file=file;}}});
   const names=['getMasterVolumeFraction','playConfiguredAlarmSound','playCallSavedSound','syncAlarmCustomSoundUI','updateAlarmSound','updateCallSoundEnabled','clearAlarmCustomSound','handleAlarmSoundFile','testAlarmSound'];
   vm.runInContext(source.slice(config.start,config.end)+'\nconst alarmSoundReadVersions=new Map();\n'+names.map(n=>declarations.get(n)).join('\n'),context);
   const run=code=>vm.runInContext(code,context);
@@ -23,6 +24,7 @@ test('call sounds are independent and opt-in with previews and master-volume mut
   const h=harness();h.run("playCallSavedSound('callEnded'); playCallSavedSound('callPasted')");assert.deepEqual(h.played,[]);
   h.run("testAlarmSound('callEnded')");assert.deepEqual(h.played,['classic']);h.played.length=0;
   h.context.settings.callEndedSoundEnabled=true;h.context.settings.callEndedAlarmSound='chime';h.run("playCallSavedSound('callPasted'); playCallSavedSound('callEnded')");assert.deepEqual(h.played,['chime']);
+  withSilentCallFeedback(()=>h.run("playCallSavedSound('callEnded')"));assert.deepEqual(h.played,['chime']);
   h.context.settings.masterVolume=0;h.run("playCallSavedSound('callEnded'); testAlarmSound('callEnded')");assert.deepEqual(h.played,['chime']);
 });
 test('custom call playback scales volume and falls back when browser audio rejects',async()=>{

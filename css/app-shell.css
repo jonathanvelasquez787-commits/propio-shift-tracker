@@ -680,3 +680,29 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 [data-earnings-currency][aria-disabled="true"] { cursor: default; }
 [data-earnings-currency]:focus-visible { outline: 2px solid var(--cyan); outline-offset: 4px; border-radius: 6px; }
 [data-earnings-currency] .earnings-big { overflow-wrap: anywhere; }
+
+.acw-day-pair { display: contents; }
+.acw-label-short { display: none; }
+.chips .game-chip { order: 1; }
+.chips .summary-pill { order: 2; }
+@media (max-width: 760px) {
+  .acw-day-pair { display: inline-flex; align-items: center; gap: 6px; min-width: 0; max-width: 100%; }
+  .acw-label-full { display: none; }
+  .acw-label-short { display: inline; }
+}
+@media (max-width: 360px) {
+  .acw-day-pair { gap: 4px; }
+  .acw-day-pair .chip { padding-inline: 4px; gap: 4px; font-size: 9px; }
+  .acw-day-pair .summary-pill { padding-inline: 4px; gap: 3px; font-size: 9px; }
+  .acw-day-pair .day-nav-btn { width: 16px; height: 18px; }
+  .acw-day-pair #daySelector { width: 76px; max-width: 76px; }
+}
+
+@media (max-width: 760px) {
+  :root.theme-light .title-row #clockNow {
+    background: var(--black-badge);
+    color: #fff;
+    padding: 9px 12px;
+    border-radius: 16px;
+  }
+}

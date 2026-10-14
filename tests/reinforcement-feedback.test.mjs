@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { setLanguage } from '../js/i18n.js';
 import { setAppCalls, setAppSettings, setAppState } from '../js/app-context.js';
+import { withSilentCallFeedback } from '../js/call-feedback.js';
+
 // Feedback variants are translated once when their module loads.
 setLanguage('es');
 const {
@@ -15,6 +17,19 @@ const {
   renderPositiveReinforcement, reopenPositiveReflection,
 } = await import('../js/positive-reinforcement.js');
 
+test('automatic call feedback suppresses both notification channels without disabling preferences', () => {
+  const config = { game: { enabled: true, intensity: 'arcade' }, reinforcement: { enabled: true } };
+  setAppSettings(config); resetFeedbackForTests();
+  const feedback = [];
+  configureReinforcementFeedback({ queueToast: (...args) => feedback.push(args), triggerEffect: () => feedback.push('effect'), playSound: () => feedback.push('sound') });
+  withSilentCallFeedback(() => {
+    assert.equal(notifyReinforcement('Automatic', { channel: 'game', effect: true, sound: 'hit' }), false);
+    assert.equal(notifyReinforcement('Automatic', { channel: 'personal', sound: 'reward' }), false);
+  });
+  assert.deepEqual(feedback, []);
+  assert.equal(notifyReinforcement('Manual', { channel: 'game' }), true); assert.equal(feedback.length, 1);
+  assert.deepEqual(config, { game: { enabled: true, intensity: 'arcade' }, reinforcement: { enabled: true } });
+});
 test('Logros y refuerzo positivo controlan sus propios canales incluso con intensidad antigua', () => {
   for (const game of [false, true]) {
     for (const personal of [false, true]) {

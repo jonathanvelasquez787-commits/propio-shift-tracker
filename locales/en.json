@@ -2437,5 +2437,6 @@
   "s_b4e6e325": "Show US dollars as the main currency",
   "s_bcf3a194": "ACW/AfterCallWork counts how long you have been waiting for your next call, excluding Break/Lunch. If you hang up at 9:30:40, the timer starts at 00:00. We are investigating whether Propio includes the last 40 seconds of that call in its recorded duration.",
   "s_c93a51ea": "Set your secondary currency in Goals to switch currencies",
-  "s_e1980460": "⏱️ ACW/AfterCallWork"
+  "s_e1980460": "⏱️ ACW/AfterCallWork",
+  "s_baa7ff16": "ACW/AfterCallWork"
 }

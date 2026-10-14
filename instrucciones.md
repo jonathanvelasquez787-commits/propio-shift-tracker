@@ -923,8 +923,8 @@ La aplicación funciona en producción con estas bases vigentes:
   el de la guía es nofollow. La extensión se instala desde archivo según el
   propietario, por lo que no hay ficha propia de Chrome Web Store que editar.
   Detalle en `docs/seo.md`.
-- La versión actual de la app es 609; la extensión unificada es 2.1.4. El build
-  del resumen independiente 1.0.4 queda compatible para instalaciones anteriores.
+- La versión actual de la app es 610; la extensión unificada es 2.1.5. El build
+  del resumen independiente 1.0.5 queda compatible para instalaciones anteriores.
   Refuerzo positivo puede funcionar con Logros apagados. La auditoría profunda del
   8 de octubre corrigió seis fallos; la ampliación corrigió cinco más en arranque,
   concurrencia y PWA. Cobertura y límites constan en
@@ -948,6 +948,26 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v610 / extensión 2.1.5 — Registro discreto y ajustes solicitados.**
+
+- Llamadas válidas guardadas por el puente, recuperadas y sincronizadas no
+  anuncian éxito, abren reflexión ni generan sonidos/efectos/toasts/banners.
+  XP, hitos y premios siguen calculándose y guardándose; acciones manuales
+  conservan su feedback. Errores y respaldo de una llamada que no pudo
+  guardarse mantienen su recuperación, sin ocultar una pérdida de datos.
+- Moneda grande sin ≈: el símbolo permanece en la línea pequeña al alternar.
+- Móvil claro reutiliza el fondo oscuro del reloj y su hora blanca.
+- Móvil muestra ACW y mantiene el Día activo junto a ese contador; conserva
+  fecha/flechas y nombre completo en escritorio, con compactación a 320 px.
+- Resumen del historial aclara ganancias sin bonos de Surge Hours, en ES/EN,
+  sin modificar sumas. Unificada 2.1.5 e independiente 1.0.5.
+- 718 pruebas y builds correctos. Cuatro regresiones nuevas; ledger idéntico
+  con/sin feedback, sonidos restaurados, ambos canales y guardado live.
+  App compilada: 24 comprobaciones ES/EN y ambos temas, aviso/reflexión/FX
+  ausentes para puente y conservados para manual; ≈ abajo, pareja ACW/fecha
+  en cinco anchuras. Fixtures de cuenta/portal; Chrome real no certificado.
+
 
 **v609 / extensión 2.1.4 — Disponibilidad, reloj y moneda principal.**
 
@@ -983,16 +1003,3 @@ La aplicación funciona en producción con estas bases vigentes:
 - 706 pruebas, cinco regresiones nuevas y build correctos. App compilada en
   navegador aislado ES/EN y claro/oscuro: hover, traducción, segundos del
   contador y cero errores. Cuenta/nube simuladas; audio físico no certificado.
-
-**Extensión 2.1.3 — Apertura por perfil y acceso de Windows sin .vbs.**
-
-- Prepara la primera ventana normal del perfil y su reapertura, sin repetir
-  por ventanas adicionales ni reinicios del worker; preferencia aislada y
-  distribución pública desactivada, instalación personal optativa activada.
-- Abrir el perfil manualmente no exige franja; el inicio de Windows mantiene
-  05:45–14:00 Honduras. Reutilización del organizador y errores visibles.
-- Se elimina la dependencia del .vbs que Windows no encontró; acceso con
-  instrucción interna de 399 caracteres, lectura de vuelta y seis límites
-  horarios comprobados con apertura simulada. Sin cambiar seguridad/auth.
-- Suite de 701, 27 regresiones de espacio/perfil y builds correctos. Recarga,
-  distribución nativa real y boot físico continúan pendientes de verificar.

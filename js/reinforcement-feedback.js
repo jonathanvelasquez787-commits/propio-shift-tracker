@@ -1,5 +1,6 @@
 import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 import { settings } from './app-context.js';
+import { callFeedbackSilenced } from './call-feedback.js';
 
 export const LONG_CALL_MINUTES = 30;
 
@@ -104,6 +105,7 @@ export function reinforcementFeedbackEnabled(channel = 'game') {
 }
 
 export function notifyReinforcement(message, { channel = 'game', effect = false, sound = '', dayKey } = {}) {
+  if (callFeedbackSilenced()) return false;
   const text = String(message ?? '').trim();
   if (!text || !reinforcementFeedbackEnabled(channel) || !queueToast) return false;
   queueToast(text, effect ? 'record' : '', { channel });

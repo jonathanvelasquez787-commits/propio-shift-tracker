@@ -1,4 +1,5 @@
 import { settings } from './app-context.js';
+import { callFeedbackSilenced } from './call-feedback.js';
 
 let silentOperations = 0;
 export function gameSoundsSilenced() { return silentOperations > 0; }
@@ -160,7 +161,7 @@ export function createGameAudio({ readSettings, host = globalThis, doc = host.do
     } catch {}
   }
   function play(kind = 'hit', { allowed = () => true } = {}) {
-    if (gameSoundsSilenced()) return false;
+    if (gameSoundsSilenced() || callFeedbackSilenced()) return false;
     const cue = CUES[kind];
     if (!cue || !unlocked || !context || !volume()) return false;
     // Una importación puede generar muchos eventos; se oye solo el más significativo.
