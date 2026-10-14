@@ -6,7 +6,7 @@ import { battleWorkMode } from './game-duel.js';
 import { battleMarkup, syncBattle, playBattleCall, stopBattle, normalizeBattleWeapon } from './game-battle.js';
 import { financeReservationComplete } from './finance.js';
 import { activeWorkSinceLastCall, monetaryMilestones, supportiveDayEvidence, surpriseDecision } from './reinforcement-rules.js';
-import { chooseCallFeedback, configureReinforcementFeedback, notifyReinforcement, reinforcementFeedbackEnabled, reinforcementText } from './reinforcement-feedback.js';
+import { chooseCallFeedback, configureReinforcementFeedback, normalizeInactivityMinutes, notifyReinforcement, reinforcementFeedbackEnabled, reinforcementText } from './reinforcement-feedback.js';
 let appConfirm, callDateKeyFromValue, callDateToDate, callsForDay, closeModal, computeComplianceStreak, convertedAmountText;
 let cycleBoundsForOffset, cycleEarningsForOffset, dayAdherence, dayComplianceStatus, dayConfigFor;
 let dayIsEffectivelyOff, effectiveCycleGoal, effectiveDailyGoal, escapeHtml, financeConvertedInline;
@@ -1459,12 +1459,12 @@ export function queueGameToast(message, tone = '', options = {}) {
   const text = String(message ?? '').trim();
   const channel = options.channel || 'game';
   const allowed = reinforcementFeedbackEnabled(channel);
-  if (!text || !allowed || text === lastGameToastText) return;
+  if (!text || !allowed || (options.repeat !== true && text === lastGameToastText)) return;
   const key = `${tone}:${text}`;
   if (gameToastQueue.some((item) => item.key === key) || Array.from(document.querySelectorAll('#gameToastStack [data-game-toast-key]')).some((node) => node.dataset.gameToastKey === key)) return;
   const priority = Number.isFinite(Number(options.priority)) ? Number(options.priority) : (TOAST_PRIORITIES[tone] || 1);
   lastGameToastText = text;
-  gameToastQueue.push({ key, message: text, tone, priority, channel });
+  gameToastQueue.push({ key, message: text, tone, priority, channel, repeat: options.repeat === true });
   gameToastQueue.sort((a, b) => b.priority - a.priority);
   if (options.announce !== false) announceGameStatus(text, { channel });
   drainGameToasts();
@@ -1488,7 +1488,7 @@ function drainGameToasts() {
     const item = gameToastQueue.shift();
     const allowed = reinforcementFeedbackEnabled(item.channel);
     if (!allowed) continue;
-    if (item.message === lastDisplayedToastText) continue;
+    if (!item.repeat && item.message === lastDisplayedToastText) continue;
     lastDisplayedToastText = item.message;
     const toastElement = document.createElement('div');
     toastElement.className = `game-toast ${item.tone ? `game-toast--${item.tone}` : ''}`;
@@ -1935,16 +1935,27 @@ export function checkReinforcementInactivity(now = Date.now()) {
   const workIntervals = getReinforcementWorkIntervals?.(currentGameDayKey());
   if (Array.isArray(workIntervals) && !workIntervals.some((interval) => new Date(interval.startedAt).getTime() <= Number(now) && new Date(interval.endedAt).getTime() > Number(now))) return false;
   const elapsed = activeWorkSinceLastCall({ ...state, calls, now, workIntervals, pauseHistory: [...(state.pauseHistory || []), ...interruptions] });
-  if (elapsed < 3600000) return false;
+  const interval = normalizeInactivityMinutes(settings.reinforcement?.inactivityMinutes) * 60000;
+  if (elapsed < interval) return false;
   const lastCall = calls.filter((call) => new Date(call.endISO).getTime() <= Number(now))
     .filter((call) => new Date(call.endISO).getTime() >= new Date(state.shiftStartedAt).getTime())
     .sort((a, b) => new Date(b.endISO) - new Date(a.endISO))[0];
   const dayKey = currentGameDayKey();
   const key = `idle-support:${dayKey}:${hashText(lastCall?.endISO || state.shiftStartedAt)}`;
-  if (state.game.ledger[key]) return false;
-  state.game.ledger[key] = true;
+  const previous = state.game.ledger[key];
+  if (previous) {
+    if (settings.reinforcement?.inactivityRepeat !== true) return false;
+    // Legacy receipts have no delivery time; establish a baseline without replaying them.
+    if (previous === true || !Number.isFinite(previous.elapsedMs) || elapsed < previous.elapsedMs) {
+      state.game.ledger[key] = { elapsedMs: elapsed };
+      saveStateOnly();
+      return false;
+    }
+    if (elapsed - previous.elapsedMs < interval) return false;
+  }
+  state.game.ledger[key] = { elapsedMs: elapsed };
   saveStateOnly();
-  notifyReinforcement(reinforcementText('idle'), { channel: 'either' });
+  notifyReinforcement(reinforcementText('idle'), { channel: 'either', repeat: settings.reinforcement?.inactivityRepeat === true });
   return true;
 }
 

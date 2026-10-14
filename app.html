@@ -9055,8 +9055,11 @@
         <label class="game-settings-toggle" for="positiveReinforcementEnabledInput"><span><strong>Celebrar llamadas completadas</strong><small>Convierte constancia, recuperación y metas en evidencia positiva y premios seguros.</small></span><input id="positiveReinforcementEnabledInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label>
         <label class="game-settings-toggle" for="positiveAskAfterCallInput"><span><strong>Cierre breve después de cada llamada</strong><small>Marca si cerró bien, si cumpliste aunque fue difícil o si te dejó un aprendizaje.</small></span><input id="positiveAskAfterCallInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label>
         <div class="game-monster-name-setting">
-          <label for="positiveInactivityMessageInput">Mensaje tras una hora sin llamadas</label>
-          <div class="game-monster-name-controls"><input id="positiveInactivityMessageInput" type="text" maxlength="240" autocomplete="off" aria-describedby="positiveInactivityMessageHelp positiveInactivityMessageStatus"/><button class="mc-btn-primary cyan" id="positiveInactivityMessageSaveBtn" type="button">Guardar mensaje</button></div>
+          <label for="positiveInactivityMinutesInput">Avisar tras estos minutos de trabajo sin llamadas</label>
+          <div class="game-monster-name-controls"><input id="positiveInactivityMinutesInput" type="number" min="1" max="240" step="1" inputmode="numeric" aria-describedby="positiveInactivityMessageHelp positiveInactivityMessageStatus"/></div>
+          <label class="game-settings-toggle" for="positiveInactivityRepeatInput"><span><strong>Repetir mientras siga sin llamadas</strong><small>Vuelve a avisar cada vez que transcurran esos minutos de trabajo. Apagado: una sola vez hasta la siguiente llamada.</small></span><input id="positiveInactivityRepeatInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label>
+          <label for="positiveInactivityMessageInput">Mensaje de apoyo sin llamadas</label>
+          <div class="game-monster-name-controls"><input id="positiveInactivityMessageInput" type="text" maxlength="240" autocomplete="off" aria-describedby="positiveInactivityMessageHelp positiveInactivityMessageStatus"/><button class="mc-btn-primary cyan" id="positiveInactivityMessageSaveBtn" type="button">Guardar aviso</button></div>
           <small id="positiveInactivityMessageHelp">No cuenta Break/Lunch. Déjalo vacío y guarda para volver al mensaje original.</small>
           <span class="game-monster-name-status" id="positiveInactivityMessageStatus" role="status" aria-live="polite"></span>
         </div>
