@@ -815,6 +815,13 @@
       ],
       "tests": [
         {
+          "file": "tests/earnings-currency.test.mjs",
+          "namedCases": [
+            "one currency preference swaps both earnings cards and survives serialized account settings",
+            "missing conversion keeps USD usable without erasing preference and rejected saves restore the previous display"
+          ]
+        },
+        {
           "file": "tests/domain-language-render.test.mjs",
           "namedCases": [
             "real schedule rendering localizes skipped work and absence detail in both supported languages"
@@ -877,6 +884,12 @@
         {
           "file": "tests/propio-bridge.test.mjs",
           "namedCases": [
+            "spacing waits from confirmed call end, stops availability once and survives restart without touching the next accepted call",
+            "spacing respects planned and active pauses, shift boundaries, disabled preferences and invalid intervals",
+            "manual pause completion resumes timed mode even with unknown duration and missed active-pause observation",
+            "portal cooldown stops only a unique Available Stop Calls control and preserves incoming calls",
+            "decorative icon text cannot hide exact call controls and heading statuses are observed",
+            "connection refresh reloads only its single paired tracker and holds during calls, offers or ambiguous accounts",
             "el puente bloquea una pestaña desactualizada incluso si se descarta el aviso o vuelve el valor anterior",
             "el puente acepta escrituras propias y una nueva revisión tras recargar",
             "signals require exact endpoints and allowlisted primitive names",

@@ -733,6 +733,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
         // (unidades de esa moneda por $1), ambos editables en Metas.
         currencyLabel: 'L',
         exchangeRate: 26.80,
+        earningsPreferSecondary: false,
         cycleAnchorDate: '2025-05-03',
         cyclePayOffsetDays: 5,
         // Aviso con sonido X minutos antes de la hora de inicio planeada de hoy, si todavía no
@@ -1167,6 +1168,32 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
       return `≈ ${label} ${Math.round(converted)}`;
     }
 
+    function renderEarningsCurrency(valueId, convertedId, usdAmount) {
+      const value = document.getElementById(valueId), other = document.getElementById(convertedId);
+      if (!value) return;
+      const converted = convertedAmountText(usdAmount);
+      const canSwitch = !!converted && !converted.endsWith('—');
+      const secondary = canSwitch && settings.earningsPreferSecondary === true;
+      value.textContent = secondary ? converted : money(usdAmount);
+      if (other) other.textContent = secondary ? money(usdAmount) : converted;
+      const control = value.closest('[data-earnings-currency]');
+      if (!control) return;
+      const label = secondary ? translateText('Mostrar dólares como moneda principal') : ui`Mostrar ${String(settings.currencyLabel || '').trim()} como moneda principal`;
+      control.setAttribute('aria-label', label);
+      control.setAttribute('title', canSwitch ? label : translateText('Configura tu moneda secundaria en Metas para intercambiarla'));
+      control.setAttribute('aria-disabled', String(!canSwitch));
+      control.tabIndex = canSwitch ? 0 : -1;
+    }
+
+    function toggleEarningsCurrency() {
+      const rate = Number(settings.exchangeRate), label = String(settings.currencyLabel || '').trim();
+      if (!label || !Number.isFinite(rate) || rate <= 0) return;
+      const previous = settings.earningsPreferSecondary;
+      settings.earningsPreferSecondary = previous !== true;
+      if (saveSettingsOnly() === false) settings.earningsPreferSecondary = previous;
+      render();
+    }
+
     // Cada ciclo dura 14 días fijos; solo el ancla (cycleAnchorDate) y los días hasta el pago son
     // editables.
     export const CYCLE_LENGTH_DAYS = 14;
@@ -1518,7 +1545,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
       return 'Working';
     }
 
-    // Indicador en vivo de cuánto tiempo llevas AHORA MISMO en "ACW/Available" (disponible, sin
+    // Indicador en vivo de cuánto tiempo llevas AHORA MISMO en "ACW/AfterCallWork" (disponible, sin
     // llamada activa ni Break/ Lunch activo)
     function computeCurrentAcwStart() {
       const dayKey = todayCallDateKey();
@@ -4335,7 +4362,7 @@ function renderPayDatesSection() {
       const startedAt = liveContext.startedAt;
       const endedAt = options.endedAt || new Date().toISOString();
       state.activeCall = null;
-      // Sin esto, el chip "ACW/Available" en vivo (ver computeCurrentAcwStart) no sabía que la
+      // Sin esto, el chip "ACW/AfterCallWork" en vivo (ver computeCurrentAcwStart) no sabía que la
       // llamada acababa de terminar hasta que se guardaba.
       state.lastCallEndedAt = endedAt;
       saveStateOnly();
@@ -5901,7 +5928,7 @@ function renderHeader() {
   document.getElementById('clockDate').textContent = fmtDate(now);
   document.getElementById('stateText').textContent = translateText(currentStateLabel());
 
-  // Chip de ACW/Available en vivo — visible solo mientras aplica (computeCurrentAcwStart ya filtra
+  // Chip de ACW/AfterCallWork en vivo — visible solo mientras aplica (computeCurrentAcwStart ya filtra
   // turno no iniciado/terminado y llamada/pausa activa).
   const acwLiveChip = document.getElementById('acwLiveChip');
   const acwLiveTimer = document.getElementById('acwLiveTimer');
@@ -6034,9 +6061,7 @@ function renderHeader() {
   const higherRateBonusMinEquivalent = rateForGoal > 0 ? (stats.higherRateBonus || 0) / rateForGoal : 0;
   const remainingMin = Math.max(0, goalMin - productive - higherRateBonusMinEquivalent);
 
-  document.getElementById('earningsValue').textContent = money(stats.earnings);
-  const earningsConvertedEl = document.getElementById('earningsConvertedText');
-  if (earningsConvertedEl) earningsConvertedEl.textContent = convertedAmountText(stats.earnings);
+  renderEarningsCurrency('earningsValue', 'earningsConvertedText', stats.earnings);
   document.getElementById('goalPctBadge').textContent = `${Math.round(goalPct)}%`;
   // Anillo circular de % (reemplaza la vieja escala de puntos 0/25/ 50/75/100%, ver más abajo) —
   // mismo patrón conic-gradient que ya usa `.sidebar-progress-ring`, con su propia variable
@@ -6069,10 +6094,7 @@ function renderHeader() {
 
   // Ciclo mostrado ahora mismo, independiente de "Día activo".
   const cycle = cycleEarningsForOffset(cycleViewOffset);
-  const cycleValueEl = document.getElementById('cycleEarningsValue');
-  if (cycleValueEl) cycleValueEl.textContent = money(cycle.earnings);
-  const cycleConvertedEl = document.getElementById('cycleEarningsConvertedText');
-  if (cycleConvertedEl) cycleConvertedEl.textContent = convertedAmountText(cycle.earnings);
+  renderEarningsCurrency('cycleEarningsValue', 'cycleEarningsConvertedText', cycle.earnings);
   const cycleRangeEl = document.getElementById('cycleRangeBadge');
   if (cycleRangeEl) cycleRangeEl.textContent = ui`Ciclo: ${formatCallDayLabel(todayCallDateKey(cycle.start))} – ${formatCallDayLabel(todayCallDateKey(cycle.end))}${cycleViewOffset === 0 ? ' (actual)' : ''}`;
   const cyclePayEl = document.getElementById('cyclePayDateBadge');
@@ -6132,7 +6154,7 @@ function renderHeader() {
     ui`<span class="tag" title="Cantidad de llamadas registradas hoy">Total: ${dayCalls.length}</span>`,
     ui`<span class="tag" title="Llamadas marcadas como Billable hoy">Billable: ${stats.billable}</span>`,
     ui`<span class="tag" title="Llamadas marcadas como Dropped hoy">Dropped: ${stats.dropped}</span>`,
-    ui`<span class="tag good" title="Tiempo de ACW/Available acumulado hoy (huecos entre llamadas sin clasificar como Break/Lunch/Otro)">ACW: ${formatDuration(stats.gapTotal * 60000)}</span>`,
+    ui`<span class="tag good" title="Tiempo de ACW/AfterCallWork acumulado hoy (huecos entre llamadas sin clasificar como Break/Lunch/Otro)">ACW: ${formatDuration(stats.gapTotal * 60000)}</span>`,
     stats.breakGapTotal > 0 ? ui`<span class="tag warn" title="Tiempo de Break tomado hoy">Break: ${formatDuration(stats.breakGapTotal * 60000)}</span>` : '',
     stats.lunchGapTotal > 0 ? ui`<span class="tag cyan" title="Tiempo de Lunch tomado hoy">Lunch: ${formatDuration(stats.lunchGapTotal * 60000)}</span>` : '',
     stats.otherGapTotal > 0 ? ui`<span class="tag" title="Tiempo clasificado como Otro (huecos largos sin Break/Lunch real)">Otro: ${formatDuration(stats.otherGapTotal * 60000)}</span>` : '',
@@ -7208,6 +7230,14 @@ export function render() {
     if (audioBlockedDismissBtn) audioBlockedDismissBtn.addEventListener('click', hideAudioBlockedBanner);
 
     document.getElementById('shiftControlBtn').addEventListener('click', toggleShift);
+    document.querySelectorAll('[data-earnings-currency]').forEach(control => {
+      control.addEventListener('click', toggleEarningsCurrency);
+      control.addEventListener('keydown', event => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        event.preventDefault();
+        toggleEarningsCurrency();
+      });
+    });
     document.getElementById('clockNow').addEventListener('click', () => {
       clockTimeVisible = !clockTimeVisible;
       renderHeader();
@@ -7958,6 +7988,9 @@ export function getPropioBridgePlan() {
     .map(slot => ({ type: slot.type, startedAt: new Date(slot.startedAt).toISOString(), endedAt: new Date(slot.endedAt).toISOString() }));
   return { startAt: start.toISOString(), endAt: end.toISOString(),
     scheduledPauses,
+    lastCallEndedAt: [state.lastCallEndedAt, ...calls.map(call => call.endISO)]
+      .filter(value => Date.parse(value) >= since && Date.parse(value) <= Math.min(day.getTime(), end.getTime()))
+      .sort((a, b) => Date.parse(b) - Date.parse(a))[0] || null,
     hasCall: Boolean(state.activeCall) || calls.some(call => Date.parse(call.startISO) >= since && Date.parse(call.startISO) < end.getTime()),
     ended: Boolean(state.shiftEndedAt && Date.parse(state.shiftEndedAt) >= start.getTime()),
     pause: state.activePause ? { type: state.activePause.type, startedAt: state.activePause.startedAt,

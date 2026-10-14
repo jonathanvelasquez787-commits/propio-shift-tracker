@@ -317,6 +317,26 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
+Antepenúltimo pendiente, por orden expreso del usuario: registro automático
+discreto desde la extensión. Guardar/actualizar la llamada y los montos sin
+avisos, banners, modales ni celebraciones en la tool. Incluye el cierre
+detectado por el puente y la sincronización del historial de Propio; conservar
+datos, contabilidad y progreso sin anunciar su guardado. El silencio de
+historial de v608 ya está aplicado; esta ampliación visual sigue pendiente.
+
+Arranque de Windows y apertura del perfil: el usuario confirmó el 14/10 que
+no se prepara al abrir Chrome ni al encender el PC. SIGUE SIN RESOLVERSE en
+su instalación real; acceso reescrito y pruebas simuladas no acreditan éxito.
+Revisarlo al final por instrucción expresa. Último boot observado 07:48:41
+Honduras; acceso existe, sin entrada StartupApproved deshabilitada. Carpeta
+Default/Jonathan mantiene puente 2.1.3 y preferencia de distribución verdadera;
+el estado real guardado del worker y su recarga no están certificados.
+
+Propio y segundos: pendiente confirmar con evidencia si los segundos del
+último minuto incompleto se incluyen en la duración y pago oficiales. No
+cambiar ACW ni alargar llamadas basándose en el formato visible de hora.
+
+
 Extensión 2.1.3: apertura optativa al entrar a un perfil y al reabrir su primera
 ventana después de cerrar todas. Preparación única por sesión, sin bucles por
 ventanas del tracker, worker reiniciado, incógnito o popups. Reutiliza la página
@@ -903,7 +923,7 @@ La aplicación funciona en producción con estas bases vigentes:
   el de la guía es nofollow. La extensión se instala desde archivo según el
   propietario, por lo que no hay ficha propia de Chrome Web Store que editar.
   Detalle en `docs/seo.md`.
-- La versión actual de la app es 608; la extensión unificada es 2.1.3. El build
+- La versión actual de la app es 609; la extensión unificada es 2.1.4. El build
   del resumen independiente 1.0.4 queda compatible para instalaciones anteriores.
   Refuerzo positivo puede funcionar con Logros apagados. La auditoría profunda del
   8 de octubre corrigió seis fallos; la ampliación corrigió cinco más en arranque,
@@ -928,6 +948,28 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v609 / extensión 2.1.4 — Disponibilidad, reloj y moneda principal.**
+
+- Espera optativa de 1–60 minutos desde el fin real observado o confirmado
+  en el plan: Stop Calls entre llamadas y Start Calls al cumplirla, sin
+  aceptación/rechazo automático. Guarda preferencias y respeta pausas/turno.
+- Regreso manual de Break/Lunch confirmado permite iniciar aunque esté
+  elegido modo por duración; recupera una pausa finalizada no observada.
+- Detector admite encabezados de estado e iconos decorativos; popup explica
+  el motivo de espera y permite actualizar la única pestaña del tracker.
+- Reloj móvil a la derecha y frase con acento, aprobados en ambos temas.
+  Nombre ACW/AfterCallWork y tooltip corto sobre fin con segundos: el trato
+  de segundos en la duración oficial de Propio sigue por investigar.
+- Hoy/ciclo intercambian USD y moneda secundaria por toque, Enter o Espacio;
+  preferencia guardada/sincronizada con la cuenta, sin modificar pagos/metas.
+- 714 pruebas, ocho regresiones nuevas y builds correctos. App compilada
+  ES/EN en ambos temas: 24 comprobaciones de moneda, guardado de cuenta,
+  recarga/contexto nuevo y cinco anchuras sin overflow. Portal empaquetado
+  real con fixture h5/mat-icon: primer inicio, aceptación manual, Stop Calls,
+  espera de dos minutos/reinicio y desactivación. Cuenta/portal simulados;
+  instalación real de Chrome y boot siguen pendientes de certificación.
+
 
 **v608 — Sincronización silenciosa y explicación de ACW.**
 
@@ -954,14 +996,3 @@ La aplicación funciona en producción con estas bases vigentes:
   horarios comprobados con apertura simulada. Sin cambiar seguridad/auth.
 - Suite de 701, 27 regresiones de espacio/perfil y builds correctos. Recarga,
   distribución nativa real y boot físico continúan pendientes de verificar.
-
-**Extensión 2.1.2 — Distribución fija de trabajo.**
-
-- Página optativa para inicio de Windows dentro de 05:45–14:00 en Honduras;
-  Propio/SuInterpreter divididos a la izquierda y tracker a la derecha.
-- Reutilización de pestañas, grupos/pins/splits anteriores tratados, cuenta
-  ambigua bloqueada sin cambiar nada y otras páginas preservadas.
-- Acceso existente conserva perfil/carpeta y filtro horario; API nativa de
-  Chrome 155, SuInterpreter identificado sin consultar contenido ni audio.
-- 14 regresiones y suite de 688 correctas. Perfil real/reinicio físico pendientes
-  de verificación; no inferirlos desde APIs ficticias ni Chromium 151.

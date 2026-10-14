@@ -3,7 +3,106 @@ import assert from 'node:assert/strict';
 import { readPropioSignal, readPropioRequestBody, propioRequestKind, TWILIO_EVENT_ORIGINS, createPropioReducer, validateBridgeEvent, PORTAL_ORIGIN, TRACKER_ORIGIN } from '../js/propio-bridge-rules.js';
 import { createPropioReceiver, createStorageRevisionGuard, ignorePropioCall, installPropioBridge } from '../js/propio-bridge.js';
 import { createBridgeWorker } from '../extension/propio-bridge/bridge-worker.js';
-import { createPortalObserver, readPortalObservation, offlineStartButton } from '../extension/propio-bridge/portal-observer.js';
+import { createPortalObserver, readPortalObservation, offlineStartButton, availableStopButton, controlKind } from '../extension/propio-bridge/portal-observer.js';
+
+test('decorative icon text cannot hide exact call controls and heading statuses are observed', () => {
+  const f = portalDocument(); f.document.welcome = f.element('Welcome, Synthetic User (12345)');
+  const control = f.element('call START CALLS');
+  control.cloneNode = () => { const clean = { textContent: 'call START CALLS', querySelectorAll: () => [{ remove() { clean.textContent = 'START CALLS'; } }] }; return clean; };
+  f.document.controls = [control]; f.document.statuses = [f.element('OFFLINE')];
+  const query = f.document.querySelectorAll;
+  f.document.querySelectorAll = selector => selector.startsWith('[role="status"]') && !selector.split(',').includes('h5') ? [] : query(selector);
+  assert.equal(controlKind(control), 'idle'); assert.equal(offlineStartButton(f.document), control);
+  f.document.controls = [f.element('Start Calls tomorrow')]; assert.equal(offlineStartButton(f.document), null);
+});
+
+test('connection refresh reloads only its single paired tracker and holds during calls, offers or ambiguous accounts', async () => {
+  const f = workerFixture(); f.plan({ startAt: at, endAt: '2026-10-04T22:00:00.000Z', scheduleVerified: false });
+  await enablePortal(f);
+  assert.equal((await f.worker.message({ kind: 'refresh-tracker' }, sender)).ok, true); assert.deepEqual(f.reloads, [10]);
+  f.targets([scope, scope]); assert.equal((await f.worker.message({ kind: 'refresh-tracker' }, sender)).reason, 'multiple-trackers');
+  f.targets([other]); assert.equal((await f.worker.message({ kind: 'refresh-tracker' }, sender)).reason, 'tracker-closed');
+  f.targets([scope]);
+  for (const call of ['incoming', 'connected']) {
+    await f.worker.message(portalPacket('authenticated', { call }), portalSender);
+    assert.equal((await f.worker.message({ kind: 'refresh-tracker' }, sender)).reason, 'active-portal-call');
+  }
+  assert.deepEqual(f.reloads, [10]);
+});
+
+test('spacing waits from confirmed call end, stops availability once and survives restart without touching the next accepted call', async () => {
+  const f = workerFixture(); f.plan({ startAt: at, endAt: '2026-10-04T22:00:00.000Z', hasCall: true });
+  await enablePortal(f);
+  await f.worker.message({ kind: 'spacing', enabled: true, minutes: 2 }, sender);
+  const observe = extra => f.worker.message(portalPacket('authenticated', { call: 'idle', offline: true, ...extra }), portalSender);
+  assert.equal((await observe()).prepare, false);
+  await observe({ call: 'connected', offline: false, signal: 'accepted' });
+  f.advance(60000);
+  let result = await observe({ signal: 'disconnected', offline: false, available: true });
+  assert.equal(result.prepare, false); assert.equal(result.stopCalls, true);
+  assert.equal((await observe({ offline: false, available: true })).stopCalls, false);
+  f.restart(); f.advance(119000); assert.equal((await observe()).prepare, false);
+  f.advance(1000); assert.equal((await observe()).prepare, true);
+  await observe({ call: 'incoming', offline: false });
+  assert.equal((await observe({ call: 'incoming', offline: false })).prepare, false);
+  result = await observe({ call: 'connected', offline: false, available: true, signal: 'accepted' });
+  assert.equal(result.prepare, false); assert.equal(result.stopCalls, false);
+  assert.equal(f.data['bridge-v1'].preparation.spacing.enabled, true);
+});
+
+test('spacing respects planned and active pauses, shift boundaries, disabled preferences and invalid intervals', async () => {
+  const f = workerFixture(), plan = { startAt: at, endAt: '2026-10-04T22:00:00.000Z', hasCall: true, lastCallEndedAt: at };
+  f.plan(plan); await enablePortal(f);
+  for (const minutes of [0, -1, 1.5, 61, NaN, '2']) assert.equal((await f.worker.message({ kind: 'spacing', enabled: true, minutes }, sender)).ok, false);
+  await f.worker.message({ kind: 'spacing', enabled: true, minutes: 1 }, sender);
+  const observe = extra => f.worker.message(portalPacket('authenticated', { call: 'idle', offline: true, ...extra }), portalSender);
+  f.advance(60000);
+  f.plan({ ...plan, scheduledPauses: [{ type: 'lunch', startedAt: '2026-10-04T18:01:00.000Z', endedAt: '2026-10-04T18:10:00.000Z' }] });
+  await f.worker.message({ kind: 'pair' }, sender); assert.equal((await observe()).prepare, false);
+  assert.equal(f.data['bridge-v1'].preparation.waitReason, 'pause');
+  f.plan({ ...plan, pause: { type: 'break', startedAt: '2026-10-04T18:01:00.000Z' } });
+  await f.worker.message({ kind: 'pair' }, sender); assert.equal((await observe()).prepare, false);
+  f.plan(plan); await f.worker.message({ kind: 'pair' }, sender);
+  assert.equal((await observe()).prepare, true);
+  await f.worker.message({ kind: 'spacing', enabled: false, minutes: 1 }, sender);
+  f.advance(16000); assert.equal((await observe()).prepare, false);
+  await f.worker.message({ kind: 'spacing', enabled: true, minutes: 1 }, sender);
+  f.plan({ ...plan, ended: true }); await f.worker.message({ kind: 'pair' }, sender);
+  assert.equal((await observe()).prepare, false);
+  assert.equal(f.data['bridge-v1'].preparation.waitReason, 'shift-ended');
+});
+
+test('manual pause completion resumes timed mode even with unknown duration and missed active-pause observation', async () => {
+  for (const observed of [true, false]) {
+    const f = workerFixture(), plan = { startAt: at, endAt: '2026-10-04T22:00:00.000Z', hasCall: true };
+    await enablePortal(f); f.advance(60000);
+    const startedAt = '2026-10-04T18:01:00.000Z';
+    f.plan({ ...plan, ...(observed ? { pause: { type: 'break', startedAt } } : {}) });
+    await f.worker.message({ kind: 'resume-options', break: true, lunch: true, mode: 'timed' }, sender);
+    const observe = extra => f.worker.message(portalPacket('authenticated', { call: 'idle', offline: true, ...extra }), portalSender);
+    assert.equal((await observe()).prepare, false);
+    f.advance(60000);
+    f.plan({ ...plan, lastPause: { type: 'break', startedAt, endedAt: '2026-10-04T18:02:00.000Z' } });
+    await f.worker.message({ kind: 'pair' }, sender); assert.equal((await observe()).prepare, true);
+    await observe({ call: 'connected', signal: 'accepted', offline: false });
+    f.advance(60000); await observe({ signal: 'disconnected' }); f.restart();
+    await f.worker.message({ kind: 'pair' }, sender); assert.equal((await observe()).prepare, false);
+  }
+});
+
+test('portal cooldown stops only a unique Available Stop Calls control and preserves incoming calls', async () => {
+  const f = portalDocument(); f.document.welcome = f.element('Welcome, Synthetic User (12345)');
+  const stop = f.element('Stop Calls'); let stops = 0; stop.click = () => stops++;
+  f.document.controls = [stop]; f.document.statuses = [f.element('Available')];
+  assert.equal(availableStopButton(f.document), stop);
+  let clock = 10000;
+  const observer = createPortalObserver({ document: f.document, documentId: 'spacing-document-1234', now: () => clock, send: async () => ({ ok: true, stopCalls: true }) });
+  await observer.sample(); clock += 1000; await observer.sample(); assert.equal(stops, 1);
+  f.document.controls = [f.element('Accept'), f.element('Reject'), stop]; assert.equal(availableStopButton(f.document), null);
+  await observer.sample(); clock += 1000; await observer.sample(); assert.equal(stops, 1);
+  f.document.controls = [stop, f.element('Stop Calls')]; assert.equal(availableStopButton(f.document), null);
+  observer.stop();
+});
 
 test('official history count works in observation; automatic records survive a closed tracker, reconcile once and isolate accounts', async () => {
   const f = workerFixture();
@@ -292,14 +391,14 @@ function receiverFixture(clock = now) {
   return { state, calls, operations, receive, setSaved: value => { saved = value; } };
 }
 function workerFixture() {
-  const data = {}, delivered = [];
+  const data = {}, delivered = [], reloads = [];
   let targets = [], plan = null, ack = { status: 'ok' }, clock = Date.parse(at), n = 0;
   const api = { runtime: { id: 'extension-id', getURL: name => `chrome-extension://extension-id/${name}` },
     storage: { local: { async get(key) { return { [key]: structuredClone(data[key]) }; }, async set(update) { Object.assign(data, structuredClone(update)); } } },
     tabs: { async query() { return targets.map((s, i) => ({ id: i + 10 })); }, async sendMessage(id, message) {
       if (message.kind === 'identify-tracker') return { accountScope: targets[id - 10], plan };
       delivered.push(message); return ack;
-    }, async create() {} } };
+    }, async create() {}, async reload(id) { reloads.push(id); } } };
   let worker = createBridgeWorker(api, { now: () => clock, randomId: () => `generated-id-${String(++n).padStart(12,'0')}` });
   async function signal(name, options = {}) {
     const requestId = `request-${++n}`;
@@ -307,7 +406,7 @@ function workerFixture() {
       requestBody: { raw: [{ bytes: new TextEncoder().encode(JSON.stringify({ name, username: 'never-retained', token: 'never-retained' })).buffer }] }, ...options });
     await worker.completed({ requestId, statusCode: options.statusCode || 200 });
   }
-  return { data, delivered, signal, get worker() { return worker; }, targets: value => { targets = value; },
+  return { data, delivered, reloads, signal, get worker() { return worker; }, targets: value => { targets = value; },
     ack: value => { ack = value; }, plan: value => { plan = value ? {scheduledPauses:[],...value} : null; }, advance: milliseconds => { clock += milliseconds; },
     restart() { worker = createBridgeWorker(api, { now: () => clock, randomId: () => `generated-id-${String(++n).padStart(12,'0')}` }); } };
 }

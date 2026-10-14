@@ -654,3 +654,29 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
   font-size: 11px;
   text-decoration: none;
 }
+
+#greetingSubtitle { color: var(--cyan); }
+@media (max-width: 760px) {
+  .title-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px 12px;
+    align-items: center;
+  }
+  .title-row > div:first-child { grid-column: 1; grid-row: 1; min-width: 0; }
+  .title-row .clockbox { display: contents; }
+  .title-row #clockNow {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+    font-size: clamp(20px, 4.6vw, 28px);
+    letter-spacing: -.04em;
+    white-space: nowrap;
+  }
+  .title-row #clockDate { grid-column: 1 / -1; grid-row: 2; margin-top: 0; text-align: left; }
+}
+
+[data-earnings-currency] { cursor: pointer; min-width: 0; }
+[data-earnings-currency][aria-disabled="true"] { cursor: default; }
+[data-earnings-currency]:focus-visible { outline: 2px solid var(--cyan); outline-offset: 4px; border-radius: 6px; }
+[data-earnings-currency] .earnings-big { overflow-wrap: anywhere; }

@@ -1,4 +1,4 @@
-# Propio · Tracker y resumen · 2.1.3
+# Propio · Tracker y resumen · 2.1.4
 
 Una sola extensión reúne la conexión al tracker y la barra de llamadas, minutos y ganancias en Propio. «Registrar en mi tracker» y «Mostrar resumen en Propio» son controles independientes. El resumen empieza oculto y no exige cuenta vinculada; encenderlo o apagarlo se aplica a las pestañas abiertas sin recargar. La conexión conserva su modo y cuenta al actualizar la carpeta existente.
 
@@ -29,6 +29,21 @@ Combina las solicitudes exitosas allowlisted del portal/Twilio con una alternati
 Ambas fuentes comparten el mismo estado e identificador aleatorio para evitar duplicados. Un inicio observado empieza el contador; su final guarda por la ruta existente de llamadas, ganancias y refuerzo positivo. Activar en mitad de una llamada no inventa su inicio. Tiempo y pago son estimados: el historial oficial permite corregirlos sin duplicar progreso. Offline no se interpreta como Break/Lunch.
 
 La compatibilidad con el diseño de una llamada real en tu portal aún debe comprobarse durante tu trabajo habitual: las pruebas simuladas cubren controles reconocidos, no certifican variantes que Propio no nos ha mostrado. No provocar llamadas para probar. El popup muestra sesión reconocida, señales, solicitudes y pendientes; si un control tiene un formato desconocido, no inventa registros.
+
+## Espera entre llamadas
+
+«Esperar entre llamadas» es optativo y empieza apagado. Se configura de 1 a
+60 minutos desde el fin confirmado de cada llamada. Si Propio queda Available,
+pulsa Stop Calls solo con un control único y sin llamada activa o entrante.
+Al terminar la espera, pulsa Start Calls y reintenta si volvés a Offline, hasta
+que vos aceptés. Break/Lunch activos y descansos programados tienen prioridad;
+no inicia fuera del turno. La primera llamada conserva su propia opción y
+volver de una pausa confirmada respeta la espera restante, si todavía existe.
+No acepta ni rechaza llamadas. La preferencia y el fin observado sobreviven
+al reinicio del worker, sin atribuir a otra cuenta un intervalo anterior.
+Terminar una pausa en el tracker permite volver aun con regreso por duración
+activado. Si la conexión no confirma descansos, el popup ofrece actualizar
+la única pestaña del tracker; no la recarga durante una llamada o una oferta.
 
 ## Recuperación del historial
 

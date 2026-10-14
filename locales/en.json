@@ -2430,5 +2430,12 @@
   "s_e1e00705": "Custom sound removed. The classic beep will be used.",
   "s_b5699c97": "The sound could not be saved. Your previous file was preserved.",
   "s_703c53ed": "Remove file",
-  "s_93ce1938": "ACW/Available measures the current stretch without a call or an active Break/Lunch, starting when your shift begins, your last call ends, or you return from a pause. If you finish at 9:30:40, the live timer starts then. Propio may display only 9:30; that does not confirm how it calculates seconds for payment. This timer shows the current stretch, not the daily total."
+  "s_93ce1938": "ACW/Available measures the current stretch without a call or an active Break/Lunch, starting when your shift begins, your last call ends, or you return from a pause. If you finish at 9:30:40, the live timer starts then. Propio may display only 9:30; that does not confirm how it calculates seconds for payment. This timer shows the current stretch, not the daily total.",
+  "s_0398bcd2": "Switch main currency",
+  "s_2308e9af": "Today's accumulated ACW/AfterCallWork (gaps not classified as Break/Lunch/Other)",
+  "s_56fc8285": "Show {{v0}} as the main currency",
+  "s_b4e6e325": "Show US dollars as the main currency",
+  "s_bcf3a194": "ACW/AfterCallWork counts how long you have been waiting for your next call, excluding Break/Lunch. If you hang up at 9:30:40, the timer starts at 00:00. We are investigating whether Propio includes the last 40 seconds of that call in its recorded duration.",
+  "s_c93a51ea": "Set your secondary currency in Goals to switch currencies",
+  "s_e1980460": "⏱️ ACW/AfterCallWork"
 }

@@ -12,10 +12,24 @@ const reasons = {
   'event-rejected': 'Una señal no pasó la validación. El registro está pausado.',
   'tracker-needs-review': 'El tracker requiere revisión: puede haber una llamada manual, un traslape o un problema al guardar.',
   storage: 'No se pudo guardar el estado. Reintentá la conexión.',
+  'invalid-spacing': 'Elegí un número entero de 1 a 60 minutos.',
 };
 const labels = { history: 'Historial oficial recuperado', 'session-start': 'Sesión iniciada · Shift', 'session-end': 'Sesión cerrada · Shift', incoming: 'Llamada entrante', accepted: 'Llamada aceptada', rejected: 'Llamada rechazada', disconnected: 'Llamada terminada', available: 'Disponible', unavailable: 'Fuera de línea' };
 const send = packet => chrome.runtime.sendMessage(packet);
 labels['start-calls'] = 'Disponibilidad automática · Start Calls'; labels['pause-end'] = 'Fin de pausa programado';
+labels['spacing-stop'] = 'Espera entre llamadas · Stop Calls';
+const availabilityReasons = {
+  connection: 'Esperando la conexión con Propio y el tracker.', schedule: 'La pestaña del tracker todavía no confirma el horario y los descansos.',
+  'shift-ended': 'Fuera del turno: no pulsa Start Calls.', 'before-shift': 'Esperando la hora de inicio de tu turno.',
+  review: 'La conexión necesita revisión antes de empezar.', 'in-call': 'Estás en llamada; no toca los controles.',
+  incoming: 'Hay una llamada entrante. Vos elegís si aceptarla.', 'portal-state': 'Esperando un estado claro de Propio.',
+  'multiple-portals': 'Hay más de una pestaña de Propio, o todavía no se confirma la única pestaña.',
+  pause: 'Esperando que termine tu Break o Lunch.', spacing: 'Respetando tu espera entre llamadas.',
+  'first-done': 'La primera llamada ya fue tomada. El regreso de Break/Lunch sigue funcionando si está encendido.',
+  off: 'No hay un iniciador pendiente.', available: 'Ya estás disponible en Propio.',
+  'offline-control': 'No se reconoce un estado Offline con un único botón Start Calls disponible.',
+  retry: 'Esperando un momento antes de reintentar Start Calls.', starting: 'Pulsando Start Calls para ponerte disponible.',
+};
 let busy = false, feedback = '';
 async function refresh() {
   const state = await send({ kind: 'status' });
@@ -39,14 +53,29 @@ async function refresh() {
   document.getElementById('portalStatus').textContent = !state.paired ? 'Esperando tu sesión en el tracker para vincularla automáticamente. El resumen funciona por separado.' : state.portal === 'authenticated' ? `Sesión reconocida. ${callStatus}` : state.portal === 'logged-out' ? 'Cierre de sesión confirmado en Propio.' : 'Abrí Propio para reconocer tu sesión.';
   toggle.checked = state.mode === 'auto'; toggle.disabled = busy || !state.paired;
   const prep = state.preparation, prepToggle = document.getElementById('prepareFirst');
+  document.getElementById('availabilityStatus').textContent = availabilityReasons[prep?.waitReason] || 'Comprobando cuándo ponerte disponible.';
+  const spacing = prep?.spacing || { enabled: false, minutes: 2 };
+  document.getElementById('spacingEnabled').checked = spacing.enabled === true;
+  document.getElementById('spacingEnabled').disabled = busy || !state.paired;
+  const minutesInput = document.getElementById('spacingMinutes');
+  if (document.activeElement !== minutesInput) minutesInput.value = spacing.minutes;
+  minutesInput.disabled = busy || !state.paired;
+  const remaining = Math.max(0, Math.ceil((Date.parse(spacing.waitUntil) - Date.now()) / 1000));
+  document.getElementById('spacingStatus').textContent = !spacing.enabled ? 'Apagado. No agrega esperas entre llamadas.'
+    : prep?.waitReason === 'pause' ? 'La espera no interrumpe tu Break o Lunch.'
+    : prep?.waitReason === 'spacing' && remaining > 0 ? `Faltan ${Math.floor(remaining / 60)}:${String(remaining % 60).padStart(2, '0')} para volver a estar disponible.`
+    : `Espera ${spacing.minutes} minuto(s) desde el fin de cada llamada. La primera llamada y el regreso de pausas mantienen sus opciones.`;
   prepToggle.checked = prep?.enabled === true; prepToggle.disabled = busy || !state.paired;
   const plan = prep?.plan;
+  const refreshTracker = document.getElementById('refreshTracker');
+  refreshTracker.hidden = !state.paired || !plan || plan.scheduleVerified === true;
+  refreshTracker.disabled = busy || state.active || state.call === 'connected' || state.call === 'incoming';
   const plannedPause = plan?.scheduledPauses?.filter(slot => Date.now() >= Date.parse(slot.startedAt) && Date.now() < Date.parse(slot.endedAt))
     .sort((a, b) => Date.parse(b.endedAt) - Date.parse(a.endedAt))[0];
   document.getElementById('prepareStatus').textContent = !prep?.enabled ? 'Apagado. Vos pulsás «Start Calls» para comenzar.'
     : state.mode !== 'auto' ? 'Activá «Registrar en mi tracker» para usar esta opción.'
     : !plan ? 'Esperando un horario de trabajo del tracker. En día libre no se activa.'
-    : !plan.scheduleVerified ? 'Tu tracker tiene una versión anterior abierta. Recargá su pestaña para reconocer también tus descansos.'
+    : !plan.scheduleVerified ? 'La conexión de esta pestaña todavía no confirma tus descansos. Actualizá el tracker para reconectarlo.'
     : plan.ended || Date.now() >= Date.parse(plan.endAt) ? 'Tu turno terminó. Esperará al siguiente.'
     : prep.doneFor === plan.startAt || plan.hasCall ? 'El arranque de este turno ya terminó. La opción queda encendida para el siguiente turno.'
     : plannedPause ? `Ahora corresponde ${plannedPause.type === 'lunch' ? 'Lunch' : 'Break'}. Esperará hasta ${new Date(plannedPause.endedAt).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })} para empezar.`
@@ -58,7 +87,7 @@ async function refresh() {
   }
   document.getElementById('resumeMode').value = resume.mode; document.getElementById('resumeMode').disabled = busy || !state.paired;
   document.getElementById('resumeStatus').textContent = resume.mode === 'timed'
-    ? 'Al cumplir la duración de tu horario, cierra la pausa y te pone disponible. Mantené el tracker abierto para que pueda guardar ese cierre.'
+    ? 'Al cumplir la duración de tu horario, cierra la pausa y te pone disponible. También podés terminarla vos en tu tool. Mantené el tracker abierto.'
     : 'Vos terminás la pausa en tu tool. Después, la extensión te pone disponible automáticamente.';
   for (const id of ['pair', 'open']) document.getElementById(id).disabled = busy;
   document.getElementById('reviewed').hidden = !state.queued && !(state.mode === 'auto' && state.active);
@@ -95,6 +124,10 @@ document.getElementById('open').addEventListener('click', () => act({ kind: 'ope
 document.getElementById('pair').addEventListener('click', () => act({ kind: 'pair' }));
 document.getElementById('automatic').addEventListener('change', event => act({ kind: 'mode', mode: event.target.checked ? 'auto' : 'observe' }));
 document.getElementById('prepareFirst').addEventListener('change', event => act({ kind: 'prepare-first', enabled: event.target.checked }));
+document.getElementById('refreshTracker').addEventListener('click', () => act({ kind: 'refresh-tracker' }));
+const saveSpacing = () => act({ kind: 'spacing', enabled: document.getElementById('spacingEnabled').checked, minutes: Number(document.getElementById('spacingMinutes').value) });
+document.getElementById('spacingEnabled').addEventListener('change', saveSpacing);
+document.getElementById('spacingMinutes').addEventListener('change', saveSpacing);
 for (const id of ['resumeBreak','resumeLunch','resumeMode']) document.getElementById(id).addEventListener('change', () => act({ kind: 'resume-options',
   break: document.getElementById('resumeBreak').checked, lunch: document.getElementById('resumeLunch').checked, mode: document.getElementById('resumeMode').value }));
 document.getElementById('reviewed').addEventListener('click', () => {
