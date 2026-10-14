@@ -762,6 +762,74 @@ test('custom inactivity notification uses saved text with achievements off and p
   assert.equal(h.ledger('idle-support:').length, 1);
 });
 
+test('configurable inactivity repeats use work time, survive reload and reset after a call without catch-up bursts', (t) => {
+  const h = harness(t);
+  h.config.game.enabled = false; h.config.reinforcement.enabled = true;
+  Object.assign(h.config.reinforcement, { inactivityMinutes: 10, inactivityRepeat: true });
+  h.state.shiftStartedAt = h.iso(h.now);
+  h.advance(9 * 60000); assert.equal(checkReinforcementInactivity(h.now), false);
+  h.advance(60000); assert.equal(checkReinforcementInactivity(h.now), true);
+  const pauseStart = h.now; h.state.activePause = { type: 'break' };
+  h.advance(30 * 60000); assert.equal(checkReinforcementInactivity(h.now), false);
+  h.state.activePause = null; h.state.pauseHistory = [{ startedAt: h.iso(pauseStart), endedAt: h.iso(h.now) }];
+  assert.equal(checkReinforcementInactivity(h.now), false);
+  h.advance(9 * 60000); h.reload(); assert.equal(checkReinforcementInactivity(h.now), false);
+  h.advance(60000); assert.equal(checkReinforcementInactivity(h.now), true);
+  h.advance(55 * 60000); assert.equal(checkReinforcementInactivity(h.now), true);
+  assert.equal(checkReinforcementInactivity(h.now), false, 'missed intervals deliver only one reminder');
+  h.reload(); assert.equal(checkReinforcementInactivity(h.now), false);
+  h.advance(9 * 60000); assert.equal(checkReinforcementInactivity(h.now), false);
+  h.advance(60000); assert.equal(checkReinforcementInactivity(h.now), true);
+  h.add('reset-idle', { endISO: h.iso(h.now) });
+  h.advance(9 * 60000); assert.equal(checkReinforcementInactivity(h.now), false);
+  h.advance(60000); assert.equal(checkReinforcementInactivity(h.now), true);
+  assert.equal(h.ledger('idle-support:').length, 2);
+  assert.equal(h.state.game.totalXp, 0);
+});
+
+test('inactivity once-only and changed intervals preserve the last delivery instead of replaying a notice', (t) => {
+  const h = harness(t);
+  Object.assign(h.config.reinforcement, { inactivityMinutes: 5, inactivityRepeat: false });
+  h.state.shiftStartedAt = h.iso(h.now - 5 * 60000);
+  assert.equal(checkReinforcementInactivity(h.now), true);
+  h.advance(60000); h.config.reinforcement.inactivityMinutes = 1;
+  assert.equal(checkReinforcementInactivity(h.now), false, 'once-only remains delivered after frequency edits');
+  h.config.reinforcement.inactivityMinutes = 10; h.config.reinforcement.inactivityRepeat = true;
+  h.advance(8 * 60000); assert.equal(checkReinforcementInactivity(h.now), false);
+  h.advance(60000); assert.equal(checkReinforcementInactivity(h.now), true);
+  h.config.reinforcement.inactivityRepeat = false;
+  h.advance(60 * 60000); assert.equal(checkReinforcementInactivity(h.now), false);
+});
+
+test('legacy inactivity receipts establish a repeat baseline and corrected pauses cannot replay delivery', (t) => {
+  const h = harness(t);
+  h.state.shiftStartedAt = h.iso(h.now - 60 * 60000);
+  assert.equal(checkReinforcementInactivity(h.now), true);
+  const key = h.ledger('idle-support:')[0][0];
+  h.state.game.ledger[key] = true;
+  Object.assign(h.config.reinforcement, { inactivityMinutes: 5, inactivityRepeat: true });
+  h.reload(); assert.equal(checkReinforcementInactivity(h.now), false);
+  h.advance(5 * 60000); assert.equal(checkReinforcementInactivity(h.now), true);
+  h.state.pauseHistory = [{ startedAt: h.iso(h.now - 20 * 60000), endedAt: h.iso(h.now) }];
+  assert.equal(checkReinforcementInactivity(h.now), false);
+  h.reload(); assert.equal(checkReinforcementInactivity(h.now), false);
+  h.advance(5 * 60000); assert.equal(checkReinforcementInactivity(h.now), true);
+});
+
+test('repeating inactivity actually redisplays identical messages after expiry without weakening ordinary toast dedupe', (t) => {
+  const h = harness(t);
+  Object.assign(h.config.reinforcement, { inactivityMinutes: 1, inactivityRepeat: true, inactivityMessage: 'Apoyo repetido' });
+  h.state.shiftStartedAt = h.iso(h.now - 60000);
+  assert.equal(checkReinforcementInactivity(h.now), true);
+  assert.equal(h.stack.children.at(-1).textContent, 'Apoyo repetido');
+  h.advance(60000); assert.equal(h.stack.children.length, 0);
+  assert.equal(checkReinforcementInactivity(h.now), true);
+  assert.equal(h.stack.children.at(-1).textContent, 'Apoyo repetido');
+  assert.equal(h.announcements.filter(text => text === 'Apoyo repetido').length, 2);
+  queueGameToast('Apoyo repetido', '', { channel: 'either' });
+  assert.equal(h.stack.children.length, 1);
+});
+
 test('cola real limita a tres toasts y no repite el último texto después de expirar', (t) => {
   const h = harness(t);
   for (const message of ['Cola uno', 'Cola dos', 'Cola tres', 'Cola cuatro']) queueGameToast(message);

@@ -922,7 +922,7 @@ La aplicación funciona en producción con estas bases vigentes:
   el de la guía es nofollow. La extensión se instala desde archivo según el
   propietario, por lo que no hay ficha propia de Chrome Web Store que editar.
   Detalle en `docs/seo.md`.
-- La versión actual de la app es 613; la extensión unificada es 2.1.8. El build
+- La versión actual de la app es 614; la extensión unificada es 2.1.8. El build
   del resumen independiente 1.0.5 queda compatible para instalaciones anteriores.
   Refuerzo positivo puede funcionar con Logros apagados. La auditoría profunda del
   8 de octubre corrigió seis fallos; la ampliación corrigió cinco más en arranque,
@@ -947,6 +947,28 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v614 — Frecuencia y repetición del aviso de apoyo sin llamadas.**
+
+- Logros → Refuerzo positivo permite elegir 1–240 minutos de trabajo y
+  repetición opcional. Guardar aviso/Enter guarda mensaje y frecuencia juntos.
+- Ajustes por cuenta: reinforcement.inactivityMinutes e inactivityRepeat.
+  Cuentas anteriores conservan 60 minutos y una sola vez hasta otra llamada.
+- La repetición cuenta trabajo entre avisos, excluye pausas/interrupciones,
+  llamadas activas y tiempo fuera del horario. Recarga conserva la entrega;
+  saltos de tiempo muestran solo un aviso y recibos antiguos no se reproducen.
+- El texto original refleja los minutos elegidos; el texto personal se respeta.
+  Un permiso de repetición explícito permite volver a mostrar el mismo mensaje
+  después de expirar, manteniendo el filtro de duplicados de los otros avisos.
+- Validación de enteros, borradores, rechazo de guardado y separación de cuentas
+  cubiertos. 735 pruebas y build correctos, seis regresiones nuevas.
+- App compilada: 84 comprobaciones ES/EN en claro/oscuro, cuatro anchuras
+  320–1365 px sin overflow, RPC/lectura de ajustes ficticios, recarga, Enter,
+  aviso antes/después del intervalo, repetición, desactivación y texto original.
+  Cero errores; cuenta/nube ficticias, sin cambios de esquema, API o RLS.
+- Extensión conserva 2.1.8. Arranque real y regla oficial de segundos de
+  Propio siguen pendientes. CI/publicación se confirman por SHA separado.
+
 
 **v613 — Mensaje editable de apoyo tras una hora sin llamadas.**
 
@@ -989,23 +1011,3 @@ La aplicación funciona en producción con estas bases vigentes:
   y pareja ACW/Día activo móvil correctas. Cuenta/nube ficticias; cero errores.
 - Publicación y CI se confirman por SHA separado. Arranque real y regla
   oficial de segundos de Propio siguen pendientes, sin cambios en esta versión.
-
-
-**v611 / extensión 2.1.6 — Recuperación del arranque y fecha bajo el reloj.**
-
-- Actualizar la extensión comprueba de nuevo las ventanas abiertas; una
-  configuración personal autorizada con revisión aplica el arranque una vez
-  sobre defaults antiguos y respeta decisiones posteriores. No borra cuentas.
-- La preparación tiene fases: solo queda lista después de organizar; fallos
-  permiten reintentar y reutilizan el mismo helper, sin recargar Propio.
-- Fecha debajo del reloj en móvil, en ambos temas. En claro, hora y fecha
-  reutilizan el fondo oscuro del reloj. Escritorio conserva su disposición.
-- 725 pruebas y builds correctos; siete regresiones nuevas de configuración,
-  actualización, fallos y reintentos. App compilada: 20 comprobaciones ES/EN,
-  claro/oscuro y cinco anchuras, fecha alineada abajo, sin overflow ni errores.
-- Archivos 2.1.6 copiados a la carpeta real con comparación de hashes y backup;
-  revisión personal activada. Acceso de Windows con log y sin script externo.
-  Runtime real de Chrome, distribución nativa y reinicio físico pendientes.
-- Worker empaquetado en Chromium aislado: default antiguo reemplazado por
-  revisión personal, cuenta ficticia conservada al reabrir, fallo de API nativa
-  libera preparación y reutiliza helper. Chromium 151, no perfil del usuario.

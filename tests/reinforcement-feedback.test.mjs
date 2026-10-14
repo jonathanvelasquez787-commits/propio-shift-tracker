@@ -9,7 +9,7 @@ setLanguage('es');
 const {
   LONG_CALL_MINUTES, REINFORCEMENT_TEXTS, chooseCallFeedback,
   configureReinforcementFeedback, notifyReinforcement, reinforcementFeedbackEnabled,
-  reinforcementText, resetFeedbackForTests, normalizeInactivityMessage,
+  reinforcementText, resetFeedbackForTests, normalizeInactivityMessage, normalizeInactivityMinutes,
 } = await import('../js/reinforcement-feedback.js');
 const {
   configurePositiveReinforcementContext, createDefaultReinforcementState,
@@ -28,6 +28,16 @@ test('custom inactivity message is bounded plain text and empty restores the def
   assert.equal(reinforcementText('dropped'), REINFORCEMENT_TEXTS.dropped[0]);
   setAppSettings({ reinforcement: { inactivityMessage: '   ' } });
   assert.equal(reinforcementText('idle'), REINFORCEMENT_TEXTS.idle[0]);
+});
+
+test('inactivity frequency defaults and bounds are safe and default wording follows the chosen minutes', () => {
+  for (const value of [undefined, null, '', ' ', true, [], {}, NaN, Infinity, 'bad']) assert.equal(normalizeInactivityMinutes(value), 60);
+  for (const [value, expected] of [[0, 1], [-5, 1], [900, 240], ['15', 15], [15.9, 15]]) assert.equal(normalizeInactivityMinutes(value), expected);
+  setAppSettings({ reinforcement: { inactivityMinutes: 15 } });
+  assert.match(reinforcementText('idle'), /15 minutos/);
+  assert.doesNotMatch(reinforcementText('idle'), /una hora/);
+  setAppSettings({ reinforcement: { inactivityMinutes: 15, inactivityMessage: 'Mi apoyo' } });
+  assert.equal(reinforcementText('idle'), 'Mi apoyo');
 });
 
 test('automatic call feedback suppresses both notification channels without disabling preferences', () => {

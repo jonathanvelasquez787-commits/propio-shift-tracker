@@ -96,6 +96,8 @@ export function reinforcementText(kind, vars = {}, variantSeed = 0) {
   if (kind === 'idle') {
     const custom = normalizeInactivityMessage(settings.reinforcement?.inactivityMessage);
     if (custom) return custom;
+    const minutes = normalizeInactivityMinutes(settings.reinforcement?.inactivityMinutes);
+    if (minutes !== 60) return translateText('Han pasado {minutes} minutos de trabajo sin llamadas · puedes retomar a tu ritmo').replace('{minutes}', String(minutes));
   }
   const variants = REINFORCEMENT_TEXTS[kind];
   if (!variants?.length) return '';
@@ -106,17 +108,23 @@ export function normalizeInactivityMessage(value) {
   return typeof value === 'string' ? value.replace(/[\u0000-\u001f\u007f]/g, ' ').trim().slice(0, 240) : '';
 }
 
+export function normalizeInactivityMinutes(value) {
+  if (!['number', 'string'].includes(typeof value) || String(value).trim() === '') return 60;
+  const minutes = Number(value);
+  return Number.isFinite(minutes) ? Math.max(1, Math.min(240, Math.trunc(minutes))) : 60;
+}
+
 export function reinforcementFeedbackEnabled(channel = 'game') {
   const game = settings.game?.enabled === true;
   const personal = settings.reinforcement?.enabled === true;
   return channel === 'either' ? game || personal : channel === 'personal' ? personal : channel === 'game' ? game : false;
 }
 
-export function notifyReinforcement(message, { channel = 'game', effect = false, sound = '', dayKey } = {}) {
+export function notifyReinforcement(message, { channel = 'game', effect = false, sound = '', dayKey, repeat = false } = {}) {
   if (callFeedbackSilenced()) return false;
   const text = String(message ?? '').trim();
   if (!text || !reinforcementFeedbackEnabled(channel) || !queueToast) return false;
-  queueToast(text, effect ? 'record' : '', { channel });
+  queueToast(text, effect ? 'record' : '', { channel, ...(repeat ? { repeat: true } : {}) });
   if (sound && playSound) playSound(sound, dayKey, channel === 'personal' || (channel === 'either' && settings.game?.enabled !== true) ? 'personal' : 'game');
   if (effect && settings.game?.enabled === true && triggerEffect
       && !globalThis.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches) triggerEffect(text);

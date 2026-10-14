@@ -1859,6 +1859,12 @@
       "app.html"
     ]
   },
+  "s_22610b32": {
+    "source": "Vuelve a avisar cada vez que transcurran esos minutos de trabajo. Apagado: una sola vez hasta la siguiente llamada.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_22849a1c": {
     "source": "Usa un tipo de cambio de cero o mayor que permita convertir tus importes.",
     "files": [
@@ -2409,12 +2415,6 @@
     "source": "Mantén un ritmo sostenible",
     "files": [
       "js/game.js"
-    ]
-  },
-  "s_2de24b9f": {
-    "source": "Mensaje tras una hora sin llamadas",
-    "files": [
-      "app.html"
     ]
   },
   "s_2e2d516d": {
@@ -3132,6 +3132,12 @@
       "app.html"
     ]
   },
+  "s_39e82d05": {
+    "source": "Avisar tras estos minutos de trabajo sin llamadas",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_39f30811": {
     "source": "Hora de fin",
     "files": [
@@ -3519,6 +3525,12 @@
     "files": [
       "app.html",
       "js/app-main.js"
+    ]
+  },
+  "s_42f3c560": {
+    "source": "Mensaje de apoyo sin llamadas",
+    "files": [
+      "app.html"
     ]
   },
   "s_430509ec": {
@@ -5756,6 +5768,13 @@
     "source": "pasadas",
     "files": [
       "js/higher-rate.js"
+    ]
+  },
+  "s_6b75c5eb": {
+    "source": "Han pasado {minutes} minutos de trabajo sin llamadas · puedes retomar a tu ritmo",
+    "files": [
+      "js/positive-reinforcement.js",
+      "js/reinforcement-feedback.js"
     ]
   },
   "s_6b88ae44": {
@@ -8270,6 +8289,12 @@
       "js/reports.js"
     ]
   },
+  "s_98ca10b0": {
+    "source": "Repetir mientras siga sin llamadas",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_98ce6844": {
     "source": "Tres cosas que hiciste bien hoy",
     "files": [
@@ -9341,6 +9366,12 @@
     "source": "· {{v0}} traslapada(s) omitida(s)",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_adf04ef1": {
+    "source": "Guardar aviso",
+    "files": [
+      "app.html"
     ]
   },
   "s_adf8b61a": {
@@ -10492,12 +10523,6 @@
   },
   "s_c3a93343": {
     "source": "Mes siguiente",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_c3b8e64c": {
-    "source": "Guardar mensaje",
     "files": [
       "app.html"
     ]
@@ -12792,6 +12817,12 @@
     "source": "Pago",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_ee55e877": {
+    "source": "Elige un número entero entre 1 y 240 minutos.",
+    "files": [
+      "js/positive-reinforcement.js"
     ]
   },
   "s_ee6034f6": {

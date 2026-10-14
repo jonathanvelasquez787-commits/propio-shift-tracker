@@ -2442,5 +2442,12 @@
   "s_008c41c1": "Break/Lunch time does not count. Leave blank and save to restore the original message.",
   "s_053775fc": "The message could not be saved.",
   "s_2de24b9f": "Message after an hour without calls",
-  "s_c3b8e64c": "Save message"
+  "s_c3b8e64c": "Save message",
+  "s_22610b32": "Notify me again after each interval of work time. Off: only once until the next call.",
+  "s_39e82d05": "Notify me after this many minutes of work without calls",
+  "s_42f3c560": "Support message while I am without calls",
+  "s_6b75c5eb": "{minutes} minutes of work have passed without calls · you can resume at your own pace",
+  "s_98ca10b0": "Repeat while I remain without calls",
+  "s_adf04ef1": "Save reminder",
+  "s_ee55e877": "Choose a whole number between 1 and 240 minutes."
 }

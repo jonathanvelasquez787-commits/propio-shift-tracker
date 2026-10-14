@@ -1,6 +1,6 @@
 import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 import { settings, state } from './app-context.js';
-import { normalizeInactivityMessage, notifyReinforcement, reinforcementFeedbackEnabled, reinforcementText } from './reinforcement-feedback.js';
+import { normalizeInactivityMessage, normalizeInactivityMinutes, notifyReinforcement, reinforcementFeedbackEnabled, reinforcementText } from './reinforcement-feedback.js';
 import { callFeedbackSilenced } from './call-feedback.js';
 
 let callDateKeyFromValue, callsForDay, closeModal, convertedAmountText, effectiveDailyGoal;
@@ -80,6 +80,8 @@ export function normalizeReinforcementSettings(raw) {
     enabled: source.enabled === true,
     askAfterCall: source.askAfterCall !== false,
     inactivityMessage: normalizeInactivityMessage(source.inactivityMessage),
+    inactivityMinutes: normalizeInactivityMinutes(source.inactivityMinutes),
+    inactivityRepeat: source.inactivityRepeat === true,
     rewards,
   };
 }
@@ -510,28 +512,40 @@ function deleteRewardEditor() {
 }
 
 let inactivityMessageDraftOwner = null;
+function inactivityEditorControls() {
+  return [document.getElementById('positiveInactivityMessageInput'), document.getElementById('positiveInactivityMinutesInput'), document.getElementById('positiveInactivityRepeatInput')].filter(Boolean);
+}
 export function saveInactivityMessage() {
   ensurePositiveState();
   const input = document.getElementById('positiveInactivityMessageInput');
   if (!input) return false;
   const owner = settings;
-  const previous = owner.reinforcement.inactivityMessage;
+  const minutesInput = document.getElementById('positiveInactivityMinutesInput');
+  const repeatInput = document.getElementById('positiveInactivityRepeatInput');
+  const status = document.getElementById('positiveInactivityMessageStatus');
+  const minutes = minutesInput ? Number(minutesInput.value) : owner.reinforcement.inactivityMinutes;
+  if (!Number.isInteger(minutes) || minutes < 1 || minutes > 240) {
+    if (status) status.textContent = translateText('Elige un número entero entre 1 y 240 minutos.');
+    minutesInput?.focus();
+    return false;
+  }
+  const previous = { inactivityMessage: owner.reinforcement.inactivityMessage, inactivityMinutes: owner.reinforcement.inactivityMinutes, inactivityRepeat: owner.reinforcement.inactivityRepeat };
   const message = normalizeInactivityMessage(input.value);
-  owner.reinforcement.inactivityMessage = message;
+  Object.assign(owner.reinforcement, { inactivityMessage: message, inactivityMinutes: minutes, inactivityRepeat: repeatInput ? repeatInput.checked === true : owner.reinforcement.inactivityRepeat });
   const saved = saveSettingsOnly() !== false;
   if (settings !== owner) {
     inactivityMessageDraftOwner = null;
     renderPositiveReinforcement();
     return false;
   }
-  const status = document.getElementById('positiveInactivityMessageStatus');
   if (!saved) {
-    owner.reinforcement.inactivityMessage = previous;
+    Object.assign(owner.reinforcement, previous);
     if (status) status.textContent = translateText('No se pudo guardar el mensaje.');
     return false;
   }
   input.value = message;
-  delete input.dataset.dirty;
+  if (minutesInput) minutesInput.value = String(minutes);
+  for (const control of inactivityEditorControls()) delete control.dataset.dirty;
   inactivityMessageDraftOwner = owner;
   if (status) status.textContent = translateText(message ? 'Mensaje guardado' : 'Mensaje original restaurado');
   return true;
@@ -546,14 +560,22 @@ function renderSettingsRewards() {
   if (ask) ask.checked = settings.reinforcement.askAfterCall;
   const inactivityInput = document.getElementById('positiveInactivityMessageInput');
   if (inactivityInput) {
-    if (inactivityMessageDraftOwner !== settings) {
-      delete inactivityInput.dataset.dirty;
-      inactivityInput.value = settings.reinforcement.inactivityMessage;
+    const changedOwner = inactivityMessageDraftOwner !== settings;
+    for (const control of inactivityEditorControls()) {
+      if (changedOwner) delete control.dataset.dirty;
+      if (changedOwner || (document.activeElement !== control && control.dataset.dirty !== 'true')) {
+        if (control.id === 'positiveInactivityRepeatInput') control.checked = settings.reinforcement.inactivityRepeat;
+        else control.value = control === inactivityInput ? settings.reinforcement.inactivityMessage : String(settings.reinforcement.inactivityMinutes);
+      }
+    }
+    if (changedOwner) {
       const status = document.getElementById('positiveInactivityMessageStatus');
       if (status) status.textContent = '';
       inactivityMessageDraftOwner = settings;
-    } else if (document.activeElement !== inactivityInput && inactivityInput.dataset.dirty !== 'true') inactivityInput.value = settings.reinforcement.inactivityMessage;
-    inactivityInput.placeholder = translateText('Ha pasado una hora de trabajo sin llamadas · puedes retomar a tu ritmo');
+    }
+    inactivityInput.placeholder = settings.reinforcement.inactivityMinutes === 60
+      ? translateText('Ha pasado una hora de trabajo sin llamadas · puedes retomar a tu ritmo')
+      : translateText('Han pasado {minutes} minutos de trabajo sin llamadas · puedes retomar a tu ritmo').replace('{minutes}', String(settings.reinforcement.inactivityMinutes));
   }
   const picker = document.getElementById('physicalRewardPresetSelect');
   if (catalog && picker) {
@@ -724,15 +746,18 @@ export function initPositiveReinforcement() {
     if (action === 'toggle-history') { historyExpanded = !historyExpanded; renderHistory(); }
   });
   document.getElementById('physicalRewardPresetSelect')?.addEventListener('change', syncPresetSelection);
-  document.getElementById('positiveInactivityMessageInput')?.addEventListener('input', (event) => {
+  const markInactivityDraft = (event) => {
     event.target.dataset.dirty = 'true';
     inactivityMessageDraftOwner = settings;
     const status = document.getElementById('positiveInactivityMessageStatus');
     if (status) status.textContent = '';
-  });
-  document.getElementById('positiveInactivityMessageInput')?.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter') { event.preventDefault(); saveInactivityMessage(); }
-  });
+  };
+  for (const control of inactivityEditorControls()) {
+    control.addEventListener(control.type === 'checkbox' ? 'change' : 'input', markInactivityDraft);
+    if (control.type !== 'checkbox') control.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') { event.preventDefault(); saveInactivityMessage(); }
+    });
+  }
   document.getElementById('positiveInactivityMessageSaveBtn')?.addEventListener('click', saveInactivityMessage);
   document.getElementById('savePhysicalRewardBtn')?.addEventListener('click', saveRewardEditor);
   document.getElementById('deletePhysicalRewardBtn')?.addEventListener('click', deleteRewardEditor);

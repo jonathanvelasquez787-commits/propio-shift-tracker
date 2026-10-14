@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import { activeWorkSinceLastCall } from '../js/reinforcement-rules.js';
+import { normalizeInactivityMinutes } from '../js/reinforcement-feedback.js';
 
 const appSource = fs.readFileSync(new URL('../js/app-main.js', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
 const gameSource = fs.readFileSync(new URL('../js/game.js', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
@@ -109,7 +110,7 @@ test('inactivity production guard suppresses scheduled break and off-duty delive
   const state = { shiftStartedAt: new Date(localTime(29, 8)).toISOString(), shiftEndedAt: null, pauseHistory: [], dayInterruptions: {}, game: { ledger: {} } };
   const context = vm.createContext({ ui, translateText, translateMarkup, displayLocale, applySavedColors, Date, state, calls: [], ensureGameState: () => {},
     getReinforcementWorkIntervals: provider, currentGameDayKey: () => dayKey,
-    activeWorkSinceLastCall, saveStateOnly: () => {}, notifyReinforcement: () => {}, reinforcementText: () => 'apoyo', hashText: String,
+    activeWorkSinceLastCall, settings: {}, normalizeInactivityMinutes, saveStateOnly: () => {}, notifyReinforcement: () => {}, reinforcementText: () => 'apoyo', hashText: String,
   });
   const check = vm.runInContext(`(${sourceFunction(gameSource, 'checkReinforcementInactivity', '')})`, context);
   assert.equal(check(localTime(29, 9, 20)), false);
@@ -117,6 +118,10 @@ test('inactivity production guard suppresses scheduled break and off-duty delive
   assert.equal(check(localTime(29, 7, 30)), false);
   assert.equal(check(localTime(29, 9, 40)), true);
   assert.equal(check(localTime(29, 9, 40)), false);
+  context.settings.reinforcement = { inactivityMinutes: 10, inactivityRepeat: true };
+  assert.equal(check(localTime(29, 9, 49)), false);
+  assert.equal(check(localTime(29, 9, 50)), true);
+  assert.equal(check(localTime(29, 10, 20)), false);
 });
 
 function pauseHarness({ at, startedAt, planned, absoluteSlots, effectiveDurationMin } = {}) {

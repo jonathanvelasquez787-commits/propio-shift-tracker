@@ -80,6 +80,44 @@ test('inactivity editor cannot copy a previous account message into a new settin
   assert.equal(input.dataset.dirty, undefined);
 });
 
+test('inactivity frequency editor saves atomically, validates minutes and preserves or clears account drafts', (t) => {
+  const previousDocument = globalThis.document;
+  t.after(() => { globalThis.document = previousDocument; setAppState(null); setAppSettings({}); setAppCalls([]); });
+  let config = { game: { enabled: false }, reinforcement: { enabled: true, inactivityMessage: 'Anterior' } };
+  setAppSettings(config); setAppCalls([]); setAppState({ game: { reinforcement: createDefaultReinforcementState() } });
+  const nodes = new Map([
+    ['positiveInactivityMessageInput', { value: '', dataset: {} }],
+    ['positiveInactivityMinutesInput', { value: '', dataset: {}, focus() {} }],
+    ['positiveInactivityRepeatInput', { checked: false, dataset: {}, id: 'positiveInactivityRepeatInput' }],
+    ['positiveInactivityMessageStatus', { textContent: '' }],
+  ]);
+  globalThis.document = { activeElement: null, getElementById: id => nodes.get(id) || null };
+  let accepted = true, saves = 0;
+  configurePositiveReinforcementContext({ saveSettingsOnly: () => { saves++; return accepted; } });
+  renderPositiveReinforcement();
+  const input = nodes.get('positiveInactivityMessageInput'), minutes = nodes.get('positiveInactivityMinutesInput'), repeat = nodes.get('positiveInactivityRepeatInput');
+  assert.equal(minutes.value, '60'); assert.equal(repeat.checked, false);
+  input.value = 'Nuevo'; minutes.value = '15'; repeat.checked = true;
+  for (const control of [input, minutes, repeat]) control.dataset.dirty = 'true';
+  renderPositiveReinforcement(); assert.equal(minutes.value, '15'); assert.equal(repeat.checked, true);
+  const before = structuredClone(config.reinforcement);
+  accepted = false; assert.equal(saveInactivityMessage(), false); assert.deepEqual(config.reinforcement, before);
+  renderPositiveReinforcement(); assert.equal(minutes.value, '15'); assert.equal(input.value, 'Nuevo'); assert.equal(repeat.checked, true);
+  accepted = true;
+  for (const invalid of ['', '0', '241', '1.5', 'bad']) {
+    minutes.value = invalid; const attempts = saves;
+    assert.equal(saveInactivityMessage(), false); assert.equal(saves, attempts); assert.deepEqual(config.reinforcement, before);
+  }
+  minutes.value = '15'; assert.equal(saveInactivityMessage(), true);
+  assert.equal(config.reinforcement.inactivityMinutes, 15); assert.equal(config.reinforcement.inactivityRepeat, true);
+  assert.equal(input.dataset.dirty, undefined); assert.equal(minutes.dataset.dirty, undefined); assert.equal(repeat.dataset.dirty, undefined);
+  minutes.value = '30'; minutes.dataset.dirty = 'true'; repeat.checked = false; repeat.dataset.dirty = 'true';
+  config = { reinforcement: { enabled: true, inactivityMinutes: 10, inactivityRepeat: true, inactivityMessage: 'Otra cuenta' } };
+  setAppSettings(config); renderPositiveReinforcement();
+  assert.equal(minutes.value, '10'); assert.equal(repeat.checked, true); assert.equal(input.value, 'Otra cuenta');
+  assert.equal(minutes.dataset.dirty, undefined); assert.equal(repeat.dataset.dirty, undefined);
+});
+
 test('premios acumulables conservan ventana e idempotencia sin el presupuesto antiguo', async () => {
   const dayKey = currentDayKey();
   const callRows = [];
