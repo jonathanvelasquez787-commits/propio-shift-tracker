@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Propio · Tracker y resumen</title><link rel="stylesheet" href="popup.css"></head>
 <body><main>
-<header class="brand"><div class="brand-icon" aria-hidden="true"><img src="icons/icon-128.png" width="42" height="42" alt=""></div><div><h1>Propio</h1><p>Tracker y resumen, juntos.</p></div><span class="version">2.1.7</span></header>
+<header class="brand"><div class="brand-icon" aria-hidden="true"><img src="icons/icon-128.png" width="42" height="42" alt=""></div><div><h1>Propio</h1><p>Tracker y resumen, juntos.</p></div><span class="version">2.1.8</span></header>
 <section class="card connection" aria-label="Conexión">
 <div class="card-heading"><span class="eyebrow">TU TRACKER</span><span id="connectionBadge" class="badge">Comprobando</span></div>
 <p id="status" class="status" role="status">Comprobando conexión…</p><p id="detail" class="muted" aria-live="polite"></p>
@@ -16,7 +16,7 @@
 <label class="field" for="resumeMode">¿Cómo querés terminar esas pausas?<select id="resumeMode"><option value="manual">Yo pulso «Terminar Break/Lunch» en mi tool</option><option value="timed">Que terminen solas al cumplir su duración</option></select></label><p id="resumeStatus" class="helper" role="status"></p>
 <label class="toggle-row prepare" for="spacingEnabled"><span><span class="title">Esperar entre llamadas</span><span class="muted">Descansar un momento antes de volver a estar disponible.</span></span><span class="switch"><input id="spacingEnabled" type="checkbox" role="switch"><span class="switch-track"></span></span></label>
 <label class="field" for="spacingMinutes">Minutos de espera después de cada llamada<input id="spacingMinutes" type="number" min="1" max="60" step="1" value="2"></label><p id="spacingStatus" class="helper" role="status"></p>
-<p class="helper">La extensión pausa las nuevas llamadas con «Stop Calls» durante los minutos que elegiste. Después usa «Start Calls» para volver a ponerte disponible. Vos aceptás la llamada que quieras. Durante Break/Lunch o fuera de tu turno, espera.</p><p class="helper">Si dejás pasar una llamada y Propio vuelve a Offline, te pone disponible otra vez. Se detiene cuando conectás una llamada.</p></details></section>
+<p class="helper">La extensión pausa las nuevas llamadas con «Stop Calls» durante los minutos que elegiste. Después, esta extensión usa «Start Calls» para volver a ponerte disponible. Vos aceptás la llamada que quieras. Durante Break o Lunch, espera y no te pone disponible. Fuera de tu turno tampoco.</p><p class="helper">Si dejás pasar una llamada y Propio vuelve a Offline, te pone disponible otra vez. Se detiene cuando conectás una llamada.</p></details></section>
 <section class="card" aria-label="Resumen del historial"><label class="toggle-row" for="summaryEnabled"><span><span class="title">Mostrar resumen en Propio</span><span class="muted">Llamadas, minutos y ganancias del historial.</span></span><span class="switch"><input id="summaryEnabled" type="checkbox" role="switch"><span class="switch-track"></span></span></label><p id="summaryStatus" class="helper" aria-live="polite">Comprobando preferencia…</p>
 <div class="summary-links"><a href="https://interpreters.propio-ls.com/portal" target="_blank" rel="noopener">Abrir Propio ↗</a><span>Sin cuenta del tracker</span></div>
 <details id="summaryPreferences"><summary>Preferencias del resumen</summary><form id="summaryForm">
