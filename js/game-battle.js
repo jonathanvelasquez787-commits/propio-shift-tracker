@@ -57,12 +57,14 @@ export function createBattleQueue() {
     push(value, limit = MAX_QUEUE) {
       const event = { dayKey: String(value.dayKey ?? ''), amountText: String(value.amountText ?? '').slice(0, 160), xp: number(value.xp), critical: value.critical === true, count: Math.max(1, Math.floor(number(value.count) || 1)) };
       if (value.specialCount) event.specialCount = Math.floor(number(value.specialCount));
+      if (value.silentSound === true) event.silentSound = true;
       if (events.length < Math.max(1, Math.min(MAX_QUEUE, limit))) events.push(event);
       else {
         const last = events[events.length - 1];
         last.count = Math.min(1e9, last.count + event.count);
         last.xp = Math.min(1e9, last.xp + event.xp);
         last.critical ||= event.critical;
+        if (event.silentSound !== true) delete last.silentSound;
         if (event.specialCount) last.specialCount = number(last.specialCount) + event.specialCount;
         last.amountText = '';
       }
@@ -255,7 +257,7 @@ function createBattle(element) {
         particles.push({ x: b.x, y: b.y, vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed-50, age: 0, life: .45+Math.random()*.25, color: ['magic','pulse','beam'].includes(w.effect) ? 'monster-light' : i%2 ? 'hero-light' : 'helmet', size: 3+Math.floor(Math.random()*3) });
       }
     }
-    if (!event.ambient) sound(event.practice ? 'practice-hit' : event.critical ? 'critical' : 'hit');
+    if (!event.ambient && !event.silentSound) sound(event.practice ? 'practice-hit' : event.critical ? 'critical' : 'hit');
     if (!event.practice) {
       banner(message(event)); active = null;
       if (view.defeated && !queue.size) { victoryAt = 0; $('victory').hidden = false; }
@@ -264,7 +266,7 @@ function createBattle(element) {
   function emit(event, id) {
     const w = weaponFor(id), b = boss();
     hero.face = 1;
-    if (!event.ambient) sound(`shoot-${id}`);
+    if (!event.ambient && !event.silentSound) sound(`shoot-${id}`);
     if (reduced || !ctx) { impact(event, id); return; }
     hero.recoil = .14; flash = .09;
     const from = { x: hero.x + 38, y: world.floor - 40 - hero.jump };

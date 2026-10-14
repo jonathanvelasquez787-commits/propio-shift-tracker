@@ -1,6 +1,34 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createGameAudio, createGameAudioPreview } from '../js/game-audio.js';
+import { createGameAudio, createGameAudioPreview, withGameSoundsSilenced, gameSoundsSilenced } from '../js/game-audio.js';
+
+test('silent history updates neither enqueue sounds nor cancel the live celebration', async () => {
+  for (const channel of ['game', 'personal']) {
+    const h = harness({ channel }); h.unlock(); await h.flush();
+    assert.equal(h.audio.play('hit'), true);
+    assert.equal(withGameSoundsSilenced(() => h.audio.play('clear')), false);
+    assert.equal(h.timers.size, 1);
+    await h.flush(); assert.ok(h.sources.length > 0);
+    const stops = h.sources.map(source => source.stops.length);
+    withGameSoundsSilenced(() => h.audio.play('reward'));
+    assert.deepEqual(h.sources.map(source => source.stops.length), stops);
+    assert.equal(h.timers.size, 0);
+    h.audio.stop();
+    assert.equal(h.audio.play('clear'), true);
+    await h.flush(); assert.ok(h.sources.length > stops.length);
+  }
+});
+
+test('silent history scope restores audio after nested updates and failures', () => {
+  assert.equal(gameSoundsSilenced(), false);
+  assert.throws(() => withGameSoundsSilenced(() => {
+    assert.equal(gameSoundsSilenced(), true);
+    assert.equal(withGameSoundsSilenced(() => 42), 42);
+    assert.equal(gameSoundsSilenced(), true);
+    throw new Error('storage failed');
+  }), /storage failed/);
+  assert.equal(gameSoundsSilenced(), false);
+});
 
 function harness({ resumeMode = 'running', available = true, delayedEnded = false, preview = false, channel = 'game' } = {}) {
   const config = { masterVolume: 100, game: { enabled: true, soundEnabled: true, soundVolume: 40 }, reinforcement: { enabled: true } };

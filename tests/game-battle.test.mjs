@@ -3,6 +3,38 @@ import assert from 'node:assert/strict';
 import { parseFragment } from 'parse5';
 import { BATTLE_WEAPONS, normalizeBattleWeapon, createBattleQueue, battleMarkup, syncBattle, playBattleCall, stopBattle } from '../js/game-battle.js';
 
+test('history battle animations stay silent after enqueue and later live calls still sound', () => {
+  for (const options of [{}, { reduced: true }, { canvasAvailable: false }]) {
+    const h = harness(options);
+    try {
+      h.mount();
+      assert.equal(playBattleCall(h.event({ silentSound: true, count: 3, xp: 15 })), true);
+      for (let i = 0; i < 120; i++) h.tick();
+      assert.deepEqual(h.sounds, []);
+      assert.match(h.nodes.banner.textContent, /llamada|call/i);
+      assert.equal(h.element.dataset.battleHp, '63');
+      assert.equal(playBattleCall(h.event()), true);
+      for (let i = 0; i < 120; i++) h.tick();
+      assert.ok(h.sounds.includes('shoot-pistol')); assert.ok(h.sounds.includes('hit'));
+    } finally { stopBattle(); }
+  }
+});
+
+test('coalesced history animations preserve totals and sound only when a live event is included', () => {
+  for (const audibleFirst of [false, true]) {
+    const queue = createBattleQueue();
+    queue.push({ dayKey: 'd', xp: 2, silentSound: !audibleFirst }, 1);
+    for (let i = 0; i < 20; i++) queue.push({ dayKey: 'd', xp: 2, silentSound: true }, 1);
+    let event = queue.shift();
+    assert.equal(event.count, 21); assert.equal(event.xp, 42);
+    assert.equal(event.silentSound === true, !audibleFirst);
+    queue.push({ ...event, silentSound: true }, 1);
+    queue.push({ dayKey: 'd', xp: 2 }, 1);
+    event = queue.shift(); assert.equal(event.silentSound === true, false);
+    assert.equal(event.count, 22); assert.equal(event.xp, 44);
+  }
+});
+
 function harness({ reduced = false, canvasAvailable = true, currentDay = false } = {}) {
   let now = 1000, sequence = 0;
   const frames = new Map(), timers = new Map(), observers = [], sounds = [], changes = [], pauses = [];

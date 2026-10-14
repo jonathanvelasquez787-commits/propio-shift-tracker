@@ -207,6 +207,7 @@
           "file": "tests/super-audit-accounting.test.mjs",
           "namedCases": [
             "a rejected manual call save does not announce success or award its reward",
+            "official bridge synchronization is silent while the live finish and manual paste retain their sounds",
             "manual and edited numeric payment inputs respect scientific notation without changing the imported-money parser",
             "overflowing manual or edited payments cannot create or replace a call",
             "native bad numeric input cannot masquerade as an empty payment and use the estimated fallback",
@@ -632,6 +633,8 @@
           "file": "tests/game-battle.test.mjs",
           "namedCases": [
             "weapon selection normalizes only cosmetic catalog ids; imports work without DOM",
+            "history battle animations stay silent after enqueue and later live calls still sound",
+            "coalesced history animations preserve totals and sound only when a live event is included",
             "large imports remain one representation and excess events coalesce at six rows",
             "the automatic shot runs briefly and releases its animation loop after impact",
             "automatic default stays still and manual inputs never alter real HP or call data",
@@ -659,6 +662,8 @@
           "file": "tests/game-audio.test.mjs",
           "namedCases": [
             "inicializar o recargar no crea contexto ni reproduce eventos anteriores",
+            "silent history updates neither enqueue sounds nor cancel the live celebration",
+            "silent history scope restores audio after nested updates and failures",
             "las once armas tienen timbres distintos, breves y con recursos finitos",
             "la práctica agrupa ráfagas y limita repeticiones sin acumular una cola",
             "misiones y victorias prevalecen sobre práctica tanto pendiente como activa",

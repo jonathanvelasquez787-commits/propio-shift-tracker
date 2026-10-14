@@ -7982,6 +7982,12 @@
       "js/sync.js"
     ]
   },
+  "s_93ce1938": {
+    "source": "ACW/Available mide este tramo sin llamada ni Break/Lunch activo, desde el inicio del turno, el fin de la última llamada o el regreso de una pausa. Si terminás a las 9:30:40, en vivo cuenta desde ese momento. Propio puede mostrar solo 9:30; eso no confirma cómo calcula los segundos para el pago. Este contador muestra el tramo actual, no el total del día.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_93d51f48": {
     "source": "STAGE CLEAR",
     "files": [
@@ -12639,12 +12645,6 @@
     "source": "Muy buena",
     "files": [
       "js/reports.js"
-    ]
-  },
-  "s_ec9ee41a": {
-    "source": "Tiempo que llevas disponible/en ACW ahora mismo — sin llamada activa ni Break/Lunch activo.",
-    "files": [
-      "app.html"
     ]
   },
   "s_ecc1c141": {

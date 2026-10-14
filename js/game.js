@@ -1,6 +1,6 @@
 import { ui, translateText, translateStoredText, translateMarkup, displayLocale } from './i18n.js';
 import { calls, settings, state } from './app-context.js';
-import { initGameAudio, playGameSound, previewGameSound, syncGameAudio, stopGameSounds } from './game-audio.js';
+import { initGameAudio, playGameSound, previewGameSound, syncGameAudio, stopGameSounds, gameSoundsSilenced } from './game-audio.js';
 import { battleWorkMode } from './game-duel.js';
 import { battleMarkup, syncBattle, playBattleCall, stopBattle, normalizeBattleWeapon } from './game-battle.js';
 import { financeReservationComplete } from './finance.js';
@@ -1588,7 +1588,7 @@ function showCallFx(call, xp, critical, mode = 'xp') {
   if (state.activeCall) return true;
   const amount = parseMoney(call.pay) + higherRateBonusAmount(call);
   const dayKey = callDateKeyFromValue(call.shiftDayKey) || callDateKeyFromValue(call.callDate) || currentGameDayKey();
-  const battlePlayed = dayKey === currentGameDayKey() && dayKey === displayedGameDayKey() && playBattleCall({ dayKey, amountText: ui`−${money(amount)} ${convertedAmountText(amount)}`.trim(), xp, critical });
+  const battlePlayed = dayKey === currentGameDayKey() && dayKey === displayedGameDayKey() && playBattleCall({ dayKey, amountText: ui`−${money(amount)} ${convertedAmountText(amount)}`.trim(), xp, critical, silentSound: gameSoundsSilenced() });
   if (battlePlayed) {
     root.innerHTML = '';
     document.querySelectorAll('.game-live-xp-float').forEach(node => node.remove());
