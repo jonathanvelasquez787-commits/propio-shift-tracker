@@ -946,4 +946,3 @@ La aplicación funciona en producción con estas bases vigentes:
   después de conectar; apagar cancela cierres aún no entregados.
 - 667 pruebas, builds y recorridos ficticios correctos. Pantallas nativas de
   llamada/Save pendientes de captura; entrega/publicación se verifican aparte.
-

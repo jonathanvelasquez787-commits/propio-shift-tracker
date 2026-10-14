@@ -80,4 +80,3 @@ el marcador se reemplaza por `#startup` para que una restauración posterior no
 repita esa excepción. La página se cierra al completar la organización. Los
 errores se muestran con opción de reintentar y un bloqueo corto evita dos
 organizaciones simultáneas. No configura auto-login en Windows ni en Propio.
-

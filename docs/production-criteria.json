@@ -1185,6 +1185,23 @@
         }
       ]
     }
+    ,{
+      "id": "windows-workspace",
+      "area": "Espacio de trabajo optativo",
+      "acceptance": "La página interna reutiliza páginas conocidas, divide Propio/SuInterpreter y coloca el tracker aparte dentro de 05:45–14:00 en Honduras; las cuentas ambiguas y APIs ausentes no alteran las pestañas.",
+      "sources": ["extension/propio-bridge/workspace.js", "extension/propio-bridge/workspace-page.js"],
+      "tests": [{
+        "file": "tests/workspace-startup.test.mjs",
+        "namedCases": [
+          "Honduras: before start and at cutoff blocked, boundaries inside allowed",
+          "reboot screenshot: moves existing interpreter into native split, reuses tracker",
+          "duplicate tracker accounts stop before mutations and release lock",
+          "existing split is preserved on repeated launches without duplicate pages",
+          "incorrect tracker/portal split is separated before moving either window",
+          "missing native API fails before changing user tabs"
+        ]
+      }]
+    }
   ],
   "limits": [
     "Una cuenta Google real; políticas reales con identidades sintéticas para aislamiento.",
