@@ -125,10 +125,11 @@ test('extension update preserves disabled choice and browser updates do not rear
   assert.equal(f.changes.length, 0);
 });
 
-async function workspacePage(result) {
+async function workspacePage(result, preferences = {}) {
   const session = { 'workspace-profile-session': { prepared: true, phase: 'preparing' } };
-  const status = {}, retry = { addEventListener() {} }, changes = [];
+  const status = {}, retry = { addEventListener() {} }, changes = [], options = [];
   const chrome = {
+    runtime: { getURL: file => `chrome-extension://fixture/${file}` },
     storage: { local: { get: async () => ({ 'workspace-profile-enabled': true }) }, session: {
       set: async values => Object.assign(session, values), remove: async key => { delete session[key]; }
     } },
@@ -137,10 +138,11 @@ async function workspacePage(result) {
   const source = readFileSync(new URL('../extension/propio-bridge/workspace-page.js', import.meta.url), 'utf8').replace("import { arrangeWorkspace } from './workspace.js';", '');
   await runInNewContext(source, {
     document: { getElementById: id => id === 'workspace-status' ? status : retry },
-    chrome, window: { screen: {} }, location: { hash: '#profile' },
-    arrangeWorkspace: async () => { if (result instanceof Error) throw result; return result; }
+    chrome, window: { screen: {}, outerWidth: 800, innerWidth: 800 }, navigator: { platform: 'Win32' }, location: { hash: '#profile' },
+    fetch: async url => { assert.match(url, /workspace-preferences.json$/); if (preferences instanceof Error) throw preferences; return { ok: true, json: async () => preferences }; },
+    arrangeWorkspace: async (api, screen, values) => { options.push(values); if (result instanceof Error) throw result; return result; }
   });
-  return { session, status, retry, changes };
+  return { session, status, retry, changes, options };
 }
 
 test('failed workspace arrangement releases profile preparation and shows retry', async () => {
@@ -156,6 +158,18 @@ test('completed workspace marks ready only after arranging and closes its helper
   const f = await workspacePage({ status: 'ready' });
   assert.equal(f.session['workspace-profile-session'].phase, 'ready');
   assert.deepEqual(f.changes, [['remove', 7]]);
+});
+
+test('workspace launcher uses the personal top-pane height and falls back when preferences cannot load', async () => {
+  const personal = await workspacePage({ status: 'ready' }, { rightPaneHeightRatio: .61 });
+  assert.equal(personal.options[0].rightPaneHeightRatio, .61);
+  assert.equal(personal.options[0].frameInset, 8, 'maximized Windows still needs border compensation after restoring');
+  const unavailable = await workspacePage({ status: 'ready' }, new Error('Unavailable preferences'));
+  assert.equal(unavailable.options[0].rightPaneHeightRatio, undefined);
+  assert.equal(unavailable.session['workspace-profile-session'].phase, 'ready');
+  const invalid = await workspacePage({ status: 'ready' }, null);
+  assert.equal(invalid.options[0].rightPaneHeightRatio, undefined);
+  assert.equal(invalid.session['workspace-profile-session'].phase, 'ready');
 });
 
 test('a failed existing launcher is retried without another helper or portal reload', async () => {

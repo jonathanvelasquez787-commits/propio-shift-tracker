@@ -1,4 +1,4 @@
-# Propio · Tracker y resumen · 2.2.0
+# Propio · Tracker y resumen · 2.2.1
 
 Una sola extensión reúne la conexión al tracker y la barra de llamadas, minutos y ganancias en Propio. «Registrar en mi tracker» y «Mostrar resumen en Propio» son controles independientes. El resumen empieza oculto y no exige cuenta vinculada; encenderlo o apagarlo se aplica a las pestañas abiertas sin recargar. La conexión conserva su modo y cuenta al actualizar la carpeta existente.
 
@@ -61,9 +61,9 @@ La cola y sesión sobreviven al reinicio del worker. Entrega a una sola pestaña
 
 ## Actualizar la extensión existente
 
-1. Reemplazá los archivos de la carpeta de conexión instalada por el paquete 2.1.3, incluidos `summary-content.js` y la carpeta `icons`. Usar esa misma carpeta conserva cuenta vinculada, registro automático, sesión y cola.
+1. Reemplazá los archivos de la carpeta de conexión instalada por el paquete 2.2.1, incluidos `summary-content.js` y la carpeta `icons`. Usar esa misma carpeta conserva cuenta vinculada, registro automático, sesión y cola.
 2. En `chrome://extensions`, recargá la extensión de conexión: ahora se llama «Propio · Tracker y resumen». Desactivá la extensión anterior «Propio · Minutos y ganancias» y cualquier userscript de resumen para usar solo una barra.
-3. Recargá Propio y el tracker. El popup muestra 2.1.3 y el icono de la tool. Activá «Mostrar resumen en Propio» si querés verlo en el historial.
+3. Recargá Propio y el tracker. El popup muestra 2.2.1 y el icono de la tool. Activá «Mostrar resumen en Propio» si querés verlo en el historial.
 4. Si estaba sin vincular: abrí el tracker, iniciá sesión y pulsá Vincular cuenta. Moneda/idioma de la extensión de resumen anterior se configuran una vez en el nuevo popup: Chrome separa el almacenamiento de las dos extensiones antiguas.
 
 Recargar la versión anterior sin reemplazar los archivos no instala la actualización. Si la extensión fue eliminada, usá Cargar descomprimida con la carpeta que contiene `manifest.json` y conectá la cuenta de nuevo.
@@ -117,3 +117,10 @@ Las demás pestañas permanecen abiertas.
 del organizador aplican la misma distribución sin comprobar la hora. La página se cierra al completar la organización. Los
 errores se muestran con opción de reintentar y un bloqueo corto evita dos
 organizaciones simultáneas. No configura auto-login en Windows ni en Propio.
+
+Una instalación personal puede elegir `rightPaneHeightRatio` entre 0.4 y 1 en
+`workspace-preferences.json`: reserva la parte inferior derecha para otra
+aplicación y mantiene la izquierda de altura completa. La distribución pública
+usa 1. Un valor inválido o archivo inaccesible conserva esa altura completa.
+El organizador no abre ni lee archivos personales; abrir un archivo de notas
+al iniciar Windows se configura por separado mediante un acceso de Inicio.
