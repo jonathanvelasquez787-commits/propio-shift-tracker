@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Propio · Tracker y resumen",
   "description": "Conecta tu Shift Tracker y muestra, cuando quieras, llamadas, minutos y ganancias en el historial de Propio.",
-  "version": "2.1.5",
+  "version": "2.1.6",
   "minimum_chrome_version": "120",
   "permissions": ["storage", "webRequest", "alarms", "webNavigation"],
   "host_permissions": ["https://interpreters.propio-ls.com/*", "https://app.suinterpreter.com/*", "https://eventgw.twilio.com/*", "https://eventgw.us1.twilio.com/*", "https://eventgw.ie1.twilio.com/*", "https://eventgw.au1.twilio.com/*", "https://propio-shift-tracker.vercel.app/*"],

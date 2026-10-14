@@ -1,5 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { runInNewContext } from 'node:vm';
 import { installProfileWorkspace } from '../extension/propio-bridge/workspace-profile.js';
 
 function fixture({ normal = [{ id: 1, type: 'normal' }], preference, readDefault = async () => true, launchers = [] } = {}) {
@@ -16,13 +18,14 @@ function fixture({ normal = [{ id: 1, type: 'normal' }], preference, readDefault
     runtime: {
       getURL: page => `chrome-extension://fixture/${page}`,
       getContexts: async () => launchers.map(tab => ({ contextType: 'TAB', tabId: tab.id, documentUrl: tab.url, incognito: tab.incognito || false })),
-      onStartup: event('startup')
+      onStartup: event('startup'), onInstalled: event('installed')
     },
     storage: { local: storage(local), session: storage(session) },
     windows: { getAll: async () => windows.map(window => ({ ...window })), onCreated: event('created'), onRemoved: event('removed') },
     tabs: {
       query: async () => { throw new Error('Tab URL metadata is unavailable without extra permissions'); },
       create: async values => { changes.push({ kind: 'create', ...values }); return { id: 4, ...values }; },
+      reload: async id => { changes.push({ kind: 'reload', id }); },
       update: async (id, values) => { changes.push({ kind: 'update', id, ...values }); Object.assign(launchers.find(tab => tab.id === id), values); }
     }
   };
@@ -94,4 +97,76 @@ test('failure to create a tab releases preparation so a later window can retry',
   await assert.rejects(f.handlers.startup(), /transient failure/);
   f.api.tabs.create = create; await f.handlers.created({ id: 2, type: 'normal' });
   assert.equal(f.changes.length, 1);
+});
+
+test('authorized personal setup replaces an old initialized default only once', async () => {
+  const f = fixture({ preference: false, readDefault: async () => ({ openOnProfileStart: true, profileSetupRevision: 'personal-setup' }) });
+  assert.equal((await f.handlers.startup()).status, 'opened');
+  assert.equal(f.local['workspace-profile-enabled'], true);
+  f.local['workspace-profile-enabled'] = false;
+  assert.equal((await f.handlers.startup()).status, 'disabled');
+  assert.equal(f.changes.length, 1);
+});
+
+test('extension update retries a stale prepared session without resetting account preferences', async () => {
+  const f = fixture();
+  f.session['workspace-profile-session'] = { prepared: true };
+  f.local.account = 'linked-fixture';
+  assert.equal((await f.handlers.installed({ reason: 'update' })).status, 'opened');
+  assert.equal(f.session['workspace-profile-session'].phase, 'preparing');
+  assert.equal(f.local.account, 'linked-fixture');
+  assert.ok(f.listeners.installed);
+});
+
+test('extension update preserves disabled choice and browser updates do not rearrange', async () => {
+  const f = fixture({ preference: false });
+  assert.equal((await f.handlers.installed({ reason: 'update' })).status, 'disabled');
+  assert.equal((await f.handlers.installed({ reason: 'chrome_update' })).status, 'ignored-install');
+  assert.equal(f.changes.length, 0);
+});
+
+async function workspacePage(result) {
+  const session = { 'workspace-profile-session': { prepared: true, phase: 'preparing' } };
+  const status = {}, retry = { addEventListener() {} }, changes = [];
+  const chrome = {
+    storage: { local: { get: async () => ({ 'workspace-profile-enabled': true }) }, session: {
+      set: async values => Object.assign(session, values), remove: async key => { delete session[key]; }
+    } },
+    tabs: { getCurrent: async () => ({ id: 7 }), remove: async id => changes.push(['remove', id]), update: async (id, values) => changes.push(['update', id, values]) }
+  };
+  const source = readFileSync(new URL('../extension/propio-bridge/workspace-page.js', import.meta.url), 'utf8').replace("import { arrangeWorkspace } from './workspace.js';", '');
+  await runInNewContext(source, {
+    document: { getElementById: id => id === 'workspace-status' ? status : retry },
+    chrome, window: { screen: {} }, location: { hash: '#profile' },
+    arrangeWorkspace: async () => { if (result instanceof Error) throw result; return result; }
+  });
+  return { session, status, retry, changes };
+}
+
+test('failed workspace arrangement releases profile preparation and shows retry', async () => {
+  const f = await workspacePage(new Error('Native split unavailable'));
+  assert.equal(f.session['workspace-profile-session'].prepared, false);
+  assert.equal(f.session['workspace-profile-session'].phase, 'failed');
+  assert.equal(f.status.textContent, 'Native split unavailable');
+  assert.equal(f.retry.hidden, false);
+  assert.deepEqual(JSON.parse(JSON.stringify(f.changes)), [['update', 7, { active: true }]]);
+});
+
+test('completed workspace marks ready only after arranging and closes its helper', async () => {
+  const f = await workspacePage({ status: 'ready' });
+  assert.equal(f.session['workspace-profile-session'].phase, 'ready');
+  assert.deepEqual(f.changes, [['remove', 7]]);
+});
+
+test('a failed existing launcher is retried without another helper or portal reload', async () => {
+  const f = fixture({ launchers: [{ id: 8, url: 'chrome-extension://fixture/workspace.html#profile' }] });
+  f.session['workspace-profile-session'] = { prepared: false, phase: 'failed' };
+  assert.equal((await f.handlers.created({ id: 2, type: 'normal' })).status, 'reused');
+  assert.deepEqual(f.changes, [{ kind: 'reload', id: 8 }]);
+});
+
+test('extension update reloads only an existing helper to execute the new setup', async () => {
+  const f = fixture({ launchers: [{ id: 8, url: 'chrome-extension://fixture/workspace.html#profile' }] });
+  assert.equal((await f.handlers.installed({ reason: 'update' })).status, 'reused');
+  assert.deepEqual(f.changes, [{ kind: 'reload', id: 8 }]);
 });

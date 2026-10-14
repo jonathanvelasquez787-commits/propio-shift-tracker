@@ -1231,7 +1231,14 @@
           "closing every normal window and reopening prepares the profile again",
           "Windows launch page is reused and changed to profile mode without another tab",
           "explicitly disabled choice survives an enabled installation default",
-          "public installation defaults to no automatic workspace and profile state stays isolated"
+          "public installation defaults to no automatic workspace and profile state stays isolated",
+            "authorized personal setup replaces an old initialized default only once",
+            "extension update retries a stale prepared session without resetting account preferences",
+            "extension update preserves disabled choice and browser updates do not rearrange",
+            "failed workspace arrangement releases profile preparation and shows retry",
+            "completed workspace marks ready only after arranging and closes its helper",
+            "a failed existing launcher is retried without another helper or portal reload",
+            "extension update reloads only an existing helper to execute the new setup"
         ]
       }]
     }
