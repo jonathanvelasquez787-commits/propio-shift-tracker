@@ -176,7 +176,8 @@ test('personal top-right pane reserves the lower area for notes without changing
   assert.deepEqual(top.left, full.left);
   assert.equal(top.right.height - 8, Math.round(screen.availHeight * .61));
   assert.equal(top.right.left, full.right.left); assert.equal(top.right.width, full.right.width);
-  for (const invalid of [undefined, null, 'small', NaN, Infinity]) assert.equal(workspaceBounds(screen, 8, invalid).right.height, full.right.height);
+  for (const invalid of [undefined, null, 'small', NaN, Infinity, 0, -1, .39, 1.01]) assert.equal(workspaceBounds(screen, 8, invalid).right.height, full.right.height);
+  assert.equal(workspaceBounds(screen, 8, .4).right.height, Math.round(screen.availHeight * .4) + 8);
   const f = fake([portal, interpreter, tracker, dictionary]);
   await arrangeWorkspace(f.api, screen, { ...opts, rightPaneHeightRatio: .61 });
   assert.equal(f.windows.get(2).height, top.right.height);

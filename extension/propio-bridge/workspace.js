@@ -15,7 +15,7 @@ export function workspaceBounds(screen, frameInset = 8, rightPaneHeightRatio = 1
   const inset = Number.isFinite(frameInset) ? Math.max(0, Math.min(16, frameInset)) : 8;
   const rightContentWidth = Math.max(320, Math.round(width * 5 / 16));
   const rightWidth = rightContentWidth + 2 * inset;
-  const ratio = typeof rightPaneHeightRatio === 'number' && Number.isFinite(rightPaneHeightRatio) ? Math.max(.4, Math.min(1, rightPaneHeightRatio)) : 1;
+  const ratio = typeof rightPaneHeightRatio === 'number' && Number.isFinite(rightPaneHeightRatio) && rightPaneHeightRatio >= .4 && rightPaneHeightRatio <= 1 ? rightPaneHeightRatio : 1;
   // Overlap invisible side borders and extend the bottom border past the work area.
   return {
     left: { left, top, width: width - rightContentWidth, height: height + inset },
