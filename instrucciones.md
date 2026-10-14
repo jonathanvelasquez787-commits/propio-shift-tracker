@@ -951,7 +951,7 @@ La aplicación funciona en producción con estas bases vigentes:
 **v612 — Fecha completa y orden de controles del encabezado.**
 
 - Fecha en una sola línea debajo del reloj móvil, sin limitarla al ancho de
-  la hora. Hora y fecha siguen alineadas a la derecha; conserva el fondo claro.
+  la hora. Hora y fecha siguen alineadas a la derecha; fondo oscuro en tema claro.
 - Día activo vuelve al grupo de estado en escritorio, antes de los botones
   del turno. La agrupación móvil de ACW/Día activo conserva su posición.
 - Hasta 360 px, saludo arriba y reloj debajo a la derecha evitan comprimir
