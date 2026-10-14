@@ -671,19 +671,19 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
     flex-direction: column;
     align-items: flex-end;
     gap: 4px;
-    width: min-content;
+    width: max-content;
     min-width: 0;
     text-align: right;
   }
   .title-row #clockNow {
     grid-column: 2;
     grid-row: 1;
-    align-self: center;
+    align-self: flex-end;
     font-size: clamp(20px, 4.6vw, 28px);
     letter-spacing: -.04em;
     white-space: nowrap;
   }
-  .title-row #clockDate { width: 100%; margin-top: 0; text-align: right; white-space: normal; line-height: 1.35; font-size: 10px; }
+  .title-row #clockDate { width: 100%; margin-top: 0; text-align: right; white-space: nowrap; line-height: 1.35; font-size: 10px; }
 }
 
 [data-earnings-currency] { cursor: pointer; min-width: 0; }
@@ -695,12 +695,15 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 .acw-label-short { display: none; }
 .chips .game-chip { order: 1; }
 .chips .summary-pill { order: 2; }
+.chips > .hero-shift-actions { order: 3; }
 @media (max-width: 760px) {
   .acw-day-pair { display: inline-flex; align-items: center; gap: 6px; min-width: 0; max-width: 100%; }
   .acw-label-full { display: none; }
   .acw-label-short { display: inline; }
 }
 @media (max-width: 360px) {
+  .title-row { grid-template-columns: minmax(0, 1fr); }
+  .title-row .clockbox { grid-column: 1; grid-row: 2; justify-self: end; }
   .acw-day-pair { gap: 4px; }
   .acw-day-pair .chip { padding-inline: 4px; gap: 4px; font-size: 9px; }
   .acw-day-pair .summary-pill { padding-inline: 4px; gap: 3px; font-size: 9px; }
