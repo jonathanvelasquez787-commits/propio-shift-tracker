@@ -664,7 +664,17 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
     align-items: center;
   }
   .title-row > div:first-child { grid-column: 1; grid-row: 1; min-width: 0; }
-  .title-row .clockbox { display: contents; }
+  .title-row .clockbox {
+    grid-column: 2;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    width: min-content;
+    min-width: 0;
+    text-align: right;
+  }
   .title-row #clockNow {
     grid-column: 2;
     grid-row: 1;
@@ -673,7 +683,7 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
     letter-spacing: -.04em;
     white-space: nowrap;
   }
-  .title-row #clockDate { grid-column: 1 / -1; grid-row: 2; margin-top: 0; text-align: left; }
+  .title-row #clockDate { width: 100%; margin-top: 0; text-align: right; white-space: normal; line-height: 1.35; font-size: 10px; }
 }
 
 [data-earnings-currency] { cursor: pointer; min-width: 0; }
@@ -699,10 +709,12 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 }
 
 @media (max-width: 760px) {
-  :root.theme-light .title-row #clockNow {
+  :root.theme-light .title-row .clockbox {
     background: var(--black-badge);
     color: #fff;
     padding: 9px 12px;
     border-radius: 16px;
   }
+  :root.theme-light .title-row #clockNow { color: #fff; }
+  :root.theme-light .title-row #clockDate { color: rgba(255,255,255,.68); }
 }

@@ -1,4 +1,4 @@
-# Propio · Tracker y resumen · 2.1.5
+# Propio · Tracker y resumen · 2.1.6
 
 Una sola extensión reúne la conexión al tracker y la barra de llamadas, minutos y ganancias en Propio. «Registrar en mi tracker» y «Mostrar resumen en Propio» son controles independientes. El resumen empieza oculto y no exige cuenta vinculada; encenderlo o apagarlo se aplica a las pestañas abiertas sin recargar. La conexión conserva su modo y cuenta al actualizar la carpeta existente.
 
@@ -81,7 +81,10 @@ se reutiliza cuando llega junto al evento del perfil para evitar otra pestaña.
 La distribución pública tiene `workspace-preferences.json` desactivado. Una
 instalación personal expresamente configurada puede inicializarlo activado;
 después se guarda en `chrome.storage.local`, separado por perfil y respetando
-una elección desactivada previa. La instalación de Jonathan está presente
+una elección desactivada previa. Una configuración personal autorizada puede
+incluir `profileSetupRevision`: se aplica una sola vez por revisión y conserva
+las elecciones posteriores. Actualizar la extensión vuelve a comprobar las
+ventanas abiertas; un fallo de distribución libera el intento y muestra Reintentar. La instalación de Jonathan está presente
 solo en Default, no en su perfil Ocio. No se añaden permisos para esta apertura.
 
 El acceso personal de Windows ahora contiene directamente una instrucción

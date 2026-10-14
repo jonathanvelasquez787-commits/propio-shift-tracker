@@ -317,24 +317,23 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
-Antepenúltimo pendiente, por orden expreso del usuario: registro automático
-discreto desde la extensión. Guardar/actualizar la llamada y los montos sin
-avisos, banners, modales ni celebraciones en la tool. Incluye el cierre
-detectado por el puente y la sincronización del historial de Propio; conservar
-datos, contabilidad y progreso sin anunciar su guardado. El silencio de
-historial de v608 ya está aplicado; esta ampliación visual sigue pendiente.
-
 Arranque de Windows y apertura del perfil: el usuario confirmó el 14/10 que
 no se prepara al abrir Chrome ni al encender el PC. SIGUE SIN RESOLVERSE en
 su instalación real; acceso reescrito y pruebas simuladas no acreditan éxito.
 Revisarlo al final por instrucción expresa. Último boot observado 07:48:41
 Honduras; acceso existe, sin entrada StartupApproved deshabilitada. Carpeta
-Default/Jonathan mantiene puente 2.1.3 y preferencia de distribución verdadera;
-el estado real guardado del worker y su recarga no están certificados.
+Default/Jonathan actualizada a 2.1.6 y configuración personal de distribución
+con revisión única para aplicar su pedido incluso sobre un default antiguo.
+Recarga del worker, división nativa real y reinicio físico no certificados.
+El acceso incluye log local de resultado en LocalAppData/Propio Shift Tracker/
+startup/launch.log, sin dependencia de scripts externos. Argumentos 760
+caracteres verificados por lectura del acceso; franja UTC-6 conservada.
 
 Propio y segundos: pendiente confirmar con evidencia si los segundos del
 último minuto incompleto se incluyen en la duración y pago oficiales. No
 cambiar ACW ni alargar llamadas basándose en el formato visible de hora.
+La búsqueda pública del 14/10 solo encontró reportes expresados en minutos,
+sin una regla oficial sobre fracciones finales; sigue pendiente de evidencia.
 
 
 Extensión 2.1.3: apertura optativa al entrar a un perfil y al reabrir su primera
@@ -923,7 +922,7 @@ La aplicación funciona en producción con estas bases vigentes:
   el de la guía es nofollow. La extensión se instala desde archivo según el
   propietario, por lo que no hay ficha propia de Chrome Web Store que editar.
   Detalle en `docs/seo.md`.
-- La versión actual de la app es 610; la extensión unificada es 2.1.5. El build
+- La versión actual de la app es 611; la extensión unificada es 2.1.6. El build
   del resumen independiente 1.0.5 queda compatible para instalaciones anteriores.
   Refuerzo positivo puede funcionar con Logros apagados. La auditoría profunda del
   8 de octubre corrigió seis fallos; la ampliación corrigió cinco más en arranque,
@@ -948,6 +947,26 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v611 / extensión 2.1.6 — Recuperación del arranque y fecha bajo el reloj.**
+
+- Actualizar la extensión comprueba de nuevo las ventanas abiertas; una
+  configuración personal autorizada con revisión aplica el arranque una vez
+  sobre defaults antiguos y respeta decisiones posteriores. No borra cuentas.
+- La preparación tiene fases: solo queda lista después de organizar; fallos
+  permiten reintentar y reutilizan el mismo helper, sin recargar Propio.
+- Fecha debajo del reloj en móvil, en ambos temas. En claro, hora y fecha
+  reutilizan el fondo oscuro del reloj. Escritorio conserva su disposición.
+- 725 pruebas y builds correctos; siete regresiones nuevas de configuración,
+  actualización, fallos y reintentos. App compilada: 20 comprobaciones ES/EN,
+  claro/oscuro y cinco anchuras, fecha alineada abajo, sin overflow ni errores.
+- Archivos 2.1.6 copiados a la carpeta real con comparación de hashes y backup;
+  revisión personal activada. Acceso de Windows con log y sin script externo.
+  Runtime real de Chrome, distribución nativa y reinicio físico pendientes.
+- Worker empaquetado en Chromium aislado: default antiguo reemplazado por
+  revisión personal, cuenta ficticia conservada al reabrir, fallo de API nativa
+  libera preparación y reutiliza helper. Chromium 151, no perfil del usuario.
+
 
 **v610 / extensión 2.1.5 — Registro discreto y ajustes solicitados.**
 
@@ -989,17 +1008,3 @@ La aplicación funciona en producción con estas bases vigentes:
   real con fixture h5/mat-icon: primer inicio, aceptación manual, Stop Calls,
   espera de dos minutos/reinicio y desactivación. Cuenta/portal simulados;
   instalación real de Chrome y boot siguen pendientes de certificación.
-
-
-**v608 — Sincronización silenciosa y explicación de ACW.**
-
-- El historial automático de la extensión guarda y corrige sin repetir el
-  sonido de llamada guardada ni generar sonidos de refuerzo o batalla.
-- Las animaciones importadas conservan su silencio después de salir de la
-  importación; sonidos live y pegado manual conservan su configuración.
-- Tooltip ES/EN de ACW explica tramo actual, fin con segundos y diferencia
-  de presentación en Propio, sin afirmar una regla de facturación.
-- No modifica cálculos de ACW, fechas, duración, pagos ni reconciliación.
-- 706 pruebas, cinco regresiones nuevas y build correctos. App compilada en
-  navegador aislado ES/EN y claro/oscuro: hover, traducción, segundos del
-  contador y cero errores. Cuenta/nube simuladas; audio físico no certificado.

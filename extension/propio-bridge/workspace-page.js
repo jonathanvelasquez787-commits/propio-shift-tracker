@@ -18,11 +18,13 @@ async function prepare() {
     if (result.status === 'outside-hours') status.textContent = 'El arranque automático está fuera de horario. Tus ventanas quedan como están.';
     else if (result.status === 'already-running') status.textContent = 'Otra pestaña ya está preparando tus ventanas.';
     else {
+      await chrome.storage.session.set({ 'workspace-profile-session': { prepared: true, phase: 'ready' } });
       status.textContent = 'Todo listo. Vos aceptás tu primera llamada cuando llegue.';
       const tab = await chrome.tabs.getCurrent();
       await chrome.tabs.remove(tab.id);
     }
   } catch (error) {
+    await chrome.storage.session.set({ 'workspace-profile-session': { prepared: false, phase: 'failed' } });
     status.textContent = error.message || 'No se pudieron organizar las ventanas. Podés reintentar.';
     retry.hidden = false;
     try {
