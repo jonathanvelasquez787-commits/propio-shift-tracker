@@ -1,16 +1,9 @@
 const pages = {
   portal: 'https://interpreters.propio-ls.com/portal',
-  interpreter: 'https://app.suinterpreter.com/',
+  interpreter: 'https://app.useinterpreter.com/',
   tracker: 'https://propio-shift-tracker.vercel.app/'
 };
 const lockKey = 'workday-workspace-lock';
-
-export function withinWorkday(at = Date.now()) {
-  const time = new Date(at);
-  if (!Number.isFinite(time.getTime())) return false;
-  const minutes = (time.getUTCHours() * 60 + time.getUTCMinutes() + 1080) % 1440;
-  return minutes >= 345 && minutes < 840;
-}
 
 export function workspaceBounds(screen) {
   const width = Math.round(screen.availWidth), height = Math.round(screen.availHeight);
@@ -25,8 +18,7 @@ export function workspaceBounds(screen) {
   };
 }
 
-export async function arrangeWorkspace(api, screen, { at = Date.now(), startup = true, wait = ms => new Promise(resolve => setTimeout(resolve, ms)) } = {}) {
-  if (startup && !withinWorkday(at)) return { status: 'outside-hours' };
+export async function arrangeWorkspace(api, screen, { at = Date.now(), wait = ms => new Promise(resolve => setTimeout(resolve, ms)) } = {}) {
   if (typeof api.tabs.createSplit !== 'function' || typeof api.tabs.unsplit !== 'function') {
     throw new Error('Chrome necesita tener disponible la vista dividida para extensiones (versión 155 o posterior).');
   }
@@ -59,7 +51,7 @@ export async function arrangeWorkspace(api, screen, { at = Date.now(), startup =
       tracker = tracker ? await api.tabs.get(tracker.id) : right.tabs[0];
     }
     if (!interpreter) interpreter = await api.tabs.create({ windowId: leftId, url: pages.interpreter, active: false });
-    const alreadySplit = portal.windowId === interpreter.windowId && portal.splitViewId >= 0 && portal.splitViewId === interpreter.splitViewId;
+    const alreadySplit = portal.windowId === interpreter.windowId && portal.splitViewId >= 0 && portal.splitViewId === interpreter.splitViewId && interpreter.index === portal.index + 1;
     if (!alreadySplit) {
       const splits = new Set([portal.splitViewId, interpreter.splitViewId].filter(id => Number.isInteger(id) && id >= 0));
       for (const split of splits) await api.tabs.unsplit(split);

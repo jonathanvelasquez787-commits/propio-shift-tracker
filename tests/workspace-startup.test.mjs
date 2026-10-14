@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { arrangeWorkspace, withinWorkday, workspaceBounds } from '../extension/propio-bridge/workspace.js';
+import { arrangeWorkspace, workspaceBounds } from '../extension/propio-bridge/workspace.js';
 
 const screen = { availWidth: 1920, availHeight: 1040, availLeft: 0, availTop: 0 };
 const opts = { at: Date.parse('2026-10-14T12:00:00Z'), wait: async () => {} };
@@ -60,24 +60,20 @@ function fake(existing = []) {
   return { api, tabs, windows, storage, mutations };
 }
 const portal = { id: 1, windowId: 1, index: 0, url: 'https://interpreters.propio-ls.com/portal' };
-const interpreter = { id: 2, windowId: 2, index: 1, url: 'https://app.suinterpreter.com/' };
+const interpreter = { id: 2, windowId: 2, index: 1, url: 'https://app.useinterpreter.com/' };
 const tracker = { id: 3, windowId: 2, index: 0, url: 'https://propio-shift-tracker.vercel.app/' };
 
-test('Honduras: before start and at cutoff blocked, boundaries inside allowed', () => {
-  for (const [time, allowed] of [['11:44:59', false], ['11:45:00', true], ['12:00:00', true], ['19:59:59', true], ['20:00:00', false], ['00:00:00', false]]) {
-    assert.equal(withinWorkday(`2026-10-14T${time}Z`), allowed, time);
+test('automatic workspace startup works at any hour with no workday gate', async () => {
+  for (const time of ['11:44:59', '11:45:00', '12:00:00', '19:59:59', '20:00:00', '00:00:00']) {
+    const f = fake([portal, interpreter, tracker]);
+    assert.equal((await arrangeWorkspace(f.api, screen, { ...opts, at: Date.parse(`2026-10-14T${time}Z`) })).status, 'ready', time);
   }
-  assert.equal(withinWorkday('invalid'), false);
 });
 test('two windows cover work area, including monitors with negative coordinates', () => {
   const bounds = workspaceBounds({ ...screen, availLeft: -1920 });
   assert.equal(bounds.left.width, 1280); assert.equal(bounds.right.width, 640);
   assert.equal(bounds.left.left, -1920); assert.equal(bounds.right.left, -640);
   assert.throws(() => workspaceBounds({ availWidth: 600, availHeight: 400 }));
-});
-test('out of hours does not query or change tabs', async () => {
-  const result = await arrangeWorkspace({}, {}, { at: Date.parse('2026-10-14T20:00:00Z') });
-  assert.equal(result.status, 'outside-hours');
 });
 test('reboot screenshot: moves existing interpreter into native split, reuses tracker', async () => {
   const other = { id: 4, windowId: 1, index: 1, url: 'chrome://settings/onStartup' };
@@ -135,8 +131,15 @@ test('incognito work pages are not reused', async () => {
   assert.equal(f.tabs.get(3).incognito, true);
   assert.equal(f.mutations.filter(m => m[0] === 'create').length, 3);
 });
-test('manual setup can arrange at night, automatic startup cannot', async () => {
+test('manual setup and automatic startup both arrange at night', async () => {
   const f = fake([portal, interpreter, tracker]);
   const result = await arrangeWorkspace(f.api, screen, { ...opts, startup: false, at: Date.parse('2026-10-14T23:00:00Z') });
   assert.equal(result.status, 'ready');
+});
+
+test('a reversed existing split is rebuilt with Propio before UseInterpreter', async () => {
+  const f = fake([{ ...portal, index: 1, splitViewId: 10 }, { ...interpreter, windowId: 1, index: 0, splitViewId: 10 }, tracker]);
+  await arrangeWorkspace(f.api, screen, opts);
+  assert.equal(f.tabs.get(1).index, 0); assert.equal(f.tabs.get(2).index, 1);
+  assert.deepEqual(f.mutations.filter(m => m[0] === 'split')[0][1], [1, 2]);
 });
