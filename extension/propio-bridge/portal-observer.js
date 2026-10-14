@@ -1,6 +1,7 @@
 // Only fixed classifications leave this isolated content script. Names, IDs,
 // credentials, client details and arbitrary portal text are never serialized.
 const normalize = value => String(value || '').replace(/\s+/g, ' ').trim().toLowerCase();
+const STATUS_ELEMENTS = '[role="status"],.call-status,#callStatus,[data-call-status],h1,h2,h3,h4,h5,h6,span,p,strong,div,label';
 const labels = {
   signout: /^(sign\s*out|log\s*out|cerrar sesi[oó]n|salir)$/,
   accept: /^(accept( call)?|answer( call)?|aceptar( llamada)?|contestar( llamada)?)$/,
@@ -9,12 +10,17 @@ const labels = {
   idle: /^(start calls|stop calls|iniciar llamadas|detener llamadas)$/,
 };
 export function controlKind(element) {
-  const buttonValue = element?.matches?.('input[type="button"],input[type="submit"]') ? element.value : null;
-  for (const value of [element?.getAttribute?.('aria-label'), element?.getAttribute?.('title'), element?.textContent, buttonValue]) {
+  for (const value of controlTexts(element)) {
     const label = normalize(value);
     for (const [kind, pattern] of Object.entries(labels)) if (pattern.test(label)) return kind;
   }
   return null;
+}
+function controlTexts(element) {
+  const clean = element?.cloneNode?.(true);
+  clean?.querySelectorAll?.('svg,mat-icon,.material-icons,.material-icons-outlined,[aria-hidden="true"]')?.forEach(icon => icon.remove());
+  const value = element?.matches?.('input[type="button"],input[type="submit"]') ? element.value : null;
+  return [element?.getAttribute?.('aria-label'), element?.getAttribute?.('title'), clean?.textContent ?? element?.textContent, value];
 }
 function visible(element) {
   if (!element || element.hidden || element.closest('[hidden],[aria-hidden="true"]') || !element.getClientRects().length) return false;
@@ -24,12 +30,22 @@ function visible(element) {
 export function offlineStartButton(document) {
   const observation = readPortalObservation(document);
   if (observation.session !== 'authenticated' || observation.call !== 'idle') return null;
-  const offline = [...document.querySelectorAll('[role="status"],.call-status,#callStatus,[data-call-status],span,p,strong')]
+  const offline = [...document.querySelectorAll(STATUS_ELEMENTS)]
     .some(element => visible(element) && /^(offline|call status:? offline|fuera de l[ií]nea|desconectado)$/.test(normalize(element.textContent)));
   if (!offline) return null;
   const controls = [...document.querySelectorAll('button,[role="button"],input[type="button"],input[type="submit"]')];
   const matches = controls.filter(element => visible(element) && !element.disabled && element.getAttribute('aria-disabled') !== 'true' &&
-    /^(start calls|iniciar llamadas)$/.test(normalize(element.textContent || element.value || element.getAttribute('aria-label'))));
+    controlTexts(element).some(value => /^(start calls|iniciar llamadas)$/.test(normalize(value))));
+  return matches.length === 1 ? matches[0] : null;
+}
+export function availableStopButton(document) {
+  const observation = readPortalObservation(document);
+  if (observation.session !== 'authenticated' || observation.call !== 'idle') return null;
+  const available = [...document.querySelectorAll(STATUS_ELEMENTS)].some(element => visible(element) && /^(available|ready|disponible)$/.test(normalize(element.textContent)));
+  if (!available) return null;
+  const controls = [...document.querySelectorAll('button,[role="button"],input[type="button"],input[type="submit"]')];
+  const matches = controls.filter(element => visible(element) && !element.disabled && element.getAttribute('aria-disabled') !== 'true' &&
+    controlTexts(element).some(value => /^(stop calls|detener llamadas)$/.test(normalize(value))));
   return matches.length === 1 ? matches[0] : null;
 }
 export function readPortalObservation(document, armed = false) {
@@ -41,7 +57,7 @@ export function readPortalObservation(document, armed = false) {
   const controls = [...document.querySelectorAll('button,[role="button"],input[type="button"],input[type="submit"],a[title],a[aria-label]')]
     .filter(element => visible(element) && !element.disabled && element.getAttribute('aria-disabled') !== 'true');
   const kinds = controls.map(controlKind);
-  const statuses = [...document.querySelectorAll('[role="status"],.call-status,#callStatus,[data-call-status],span,p,strong')]
+  const statuses = [...document.querySelectorAll(STATUS_ELEMENTS)]
     .filter(visible).map(element => normalize(element.textContent));
   const connected = statuses.some(text => /^(call in progress|call connected|in call|llamada en curso|llamada conectada|en llamada)$/.test(text));
   const ended = statuses.some(text => /^(call ended|call disconnected|call completed|llamada terminada|llamada finalizada|llamada desconectada)$/.test(text));
@@ -89,9 +105,11 @@ export function createPortalObserver({ document, send, documentId, now = () => D
     }
     try {
       const offline = Boolean(offlineStartButton(document));
-      const result = await send({ kind: 'portal-observation', documentId, ...observation, offline, ...(pendingSignal ? { signal: pendingSignal } : {}) });
+      const available = Boolean(availableStopButton(document));
+      const result = await send({ kind: 'portal-observation', documentId, ...observation, offline, available, ...(pendingSignal ? { signal: pendingSignal } : {}) });
       if (result?.ok) pendingSignal = null;
       if (result?.prepare === true && offline) offlineStartButton(document)?.click();
+      else if (result?.stopCalls === true && available) availableStopButton(document)?.click();
       return result;
     } catch (error) {
       if (/extension context invalidated/i.test(String(error?.message))) stop();

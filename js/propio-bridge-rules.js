@@ -26,6 +26,7 @@ export function validateBridgePlan(value, now = Date.now()) {
       [completed ? 'endedAt' : 'endsAt']: Number.isFinite(ended) && ended > started && ended - started <= BRIDGE_MAX_AGE && (!completed || ended <= now) ? new Date(ended).toISOString() : null };
   };
   return { startAt: new Date(start).toISOString(), endAt: new Date(end).toISOString(), hasCall: value.hasCall === true, ended: value.ended === true,
+    lastCallEndedAt: typeof value.lastCallEndedAt === 'string' && Date.parse(value.lastCallEndedAt) >= start && Date.parse(value.lastCallEndedAt) <= Math.min(now, end) ? new Date(value.lastCallEndedAt).toISOString() : null,
     scheduledPauses, scheduleVerified: Array.isArray(value.scheduledPauses) && value.scheduleVerified !== false,
     pause: pause(value.pause, false), lastPause: pause(value.lastPause, true) };
 }

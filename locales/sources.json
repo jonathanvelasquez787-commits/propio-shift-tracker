@@ -140,6 +140,12 @@
       "js/game.js"
     ]
   },
+  "s_0398bcd2": {
+    "source": "Cambiar moneda principal",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_03b8a461": {
     "source": "Importe variable",
     "files": [
@@ -1845,6 +1851,12 @@
     "source": "Usa un tipo de cambio de cero o mayor que permita convertir tus importes.",
     "files": [
       "js/settings.js"
+    ]
+  },
+  "s_2308e9af": {
+    "source": "Tiempo de ACW/AfterCallWork acumulado hoy (huecos entre llamadas sin clasificar como Break/Lunch/Otro)",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_230f195c": {
@@ -3707,12 +3719,6 @@
       "app.html"
     ]
   },
-  "s_46e3a90a": {
-    "source": "Activa Logros para escuchar los efectos.",
-    "files": [
-      "js/game.js"
-    ]
-  },
   "s_4705a0e1": {
     "source": "Lunes-Viernes",
     "files": [
@@ -4699,12 +4705,6 @@
       "js/higher-rate.js"
     ]
   },
-  "s_567b40a0": {
-    "source": "⏱️ ACW/Available",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_568aa89a": {
     "source": "— la app la reconoce y la acomoda sola, sin duplicar llamadas ya guardadas.",
     "files": [
@@ -4733,6 +4733,12 @@
     "source": "No se recoge tu ubicación, tu libreta de contactos ni nada de tu dispositivo.",
     "files": [
       "privacidad.html"
+    ]
+  },
+  "s_56fc8285": {
+    "source": "Mostrar {{v0}} como moneda principal",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_570bfc7d": {
@@ -6585,12 +6591,6 @@
       "js/reports.js"
     ]
   },
-  "s_7b26c773": {
-    "source": "Tiempo de ACW/Available acumulado hoy (huecos entre llamadas sin clasificar como Break/Lunch/Otro)",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
   "s_7b7f96b5": {
     "source": "Ventana de gracia de Adherencia: {{v0}} min",
     "files": [
@@ -7980,12 +7980,6 @@
     "source": "No hay espacio local suficiente para descargar tus datos de la nube.",
     "files": [
       "js/sync.js"
-    ]
-  },
-  "s_93ce1938": {
-    "source": "ACW/Available mide este tramo sin llamada ni Break/Lunch activo, desde el inicio del turno, el fin de la última llamada o el regreso de una pausa. Si terminás a las 9:30:40, en vivo cuenta desde ese momento. Propio puede mostrar solo 9:30; eso no confirma cómo calcula los segundos para el pago. Este contador muestra el tramo actual, no el total del día.",
-    "files": [
-      "app.html"
     ]
   },
   "s_93d51f48": {
@@ -9715,6 +9709,12 @@
       "js/calls.js"
     ]
   },
+  "s_b4e6e325": {
+    "source": "Mostrar dólares como moneda principal",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_b4fa04f7": {
     "source": "{{v0}} · {{v1}} llamada(s){{v2}}",
     "files": [
@@ -10109,6 +10109,12 @@
     "source": "Préstamo",
     "files": [
       "js/finance.js"
+    ]
+  },
+  "s_bcf3a194": {
+    "source": "ACW/AfterCallWork cuenta cuánto llevás esperando la próxima llamada, sin Break/Lunch. Si colgás a las 9:30:40, el contador empieza en 00:00. Estamos investigando si Propio incluye los últimos 40 segundos de esa llamada en la duración registrada.",
+    "files": [
+      "app.html"
     ]
   },
   "s_bcfd8af7": {
@@ -10789,6 +10795,12 @@
       "app.html"
     ]
   },
+  "s_c93a51ea": {
+    "source": "Configura tu moneda secundaria en Metas para intercambiarla",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_c974220a": {
     "source": "Inicia una llamada, pega tu exportación de Propio o agrega una manual.",
     "files": [
@@ -10811,12 +10823,6 @@
     "source": "Jugar",
     "files": [
       "js/game-battle.js"
-    ]
-  },
-  "s_c9da0419": {
-    "source": "Activa Sonidos arcade en el menú lateral.",
-    "files": [
-      "js/game.js"
     ]
   },
   "s_ca0bcc33": {
@@ -12099,6 +12105,12 @@
     "source": "estela de estrellas",
     "files": [
       "js/game-battle.js"
+    ]
+  },
+  "s_e1980460": {
+    "source": "⏱️ ACW/AfterCallWork",
+    "files": [
+      "app.html"
     ]
   },
   "s_e1c47e30": {
