@@ -1,4 +1,4 @@
-# Propio · Tracker y resumen · 2.1.7
+# Propio · Tracker y resumen · 2.1.8
 
 Una sola extensión reúne la conexión al tracker y la barra de llamadas, minutos y ganancias en Propio. «Registrar en mi tracker» y «Mostrar resumen en Propio» son controles independientes. El resumen empieza oculto y no exige cuenta vinculada; encenderlo o apagarlo se aplica a las pestañas abiertas sin recargar. La conexión conserva su modo y cuenta al actualizar la carpeta existente.
 
