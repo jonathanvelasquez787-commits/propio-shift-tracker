@@ -1231,6 +1231,7 @@
           "a reversed existing split is rebuilt with Propio before UseInterpreter",
           "existing Linguee dictionary moves beside tracker without navigating or duplicating it",
           "frame compensation meets at visible edges for the requested widths without excess overlap",
+          "personal top-right pane reserves the lower area for notes without changing the left split or tab order",
           "incorrect tracker/portal split is separated before moving either window",
           "missing native API fails before changing user tabs"
         ]
@@ -1248,6 +1249,7 @@
             "extension update preserves disabled choice and browser updates do not rearrange",
             "failed workspace arrangement releases profile preparation and shows retry",
             "completed workspace marks ready only after arranging and closes its helper",
+            "workspace launcher uses the personal top-pane height and falls back when preferences cannot load",
             "a failed existing launcher is retried without another helper or portal reload",
             "extension update reloads only an existing helper to execute the new setup"
         ]

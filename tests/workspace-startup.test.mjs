@@ -169,3 +169,16 @@ test('frame compensation meets at visible edges for the requested widths without
     assert.equal(bounds.right.height - inset, screen.availHeight);
   }
 });
+
+test('personal top-right pane reserves the lower area for notes without changing the left split or tab order', async () => {
+  const full = workspaceBounds(screen, 8);
+  const top = workspaceBounds(screen, 8, .61);
+  assert.deepEqual(top.left, full.left);
+  assert.equal(top.right.height - 8, Math.round(screen.availHeight * .61));
+  assert.equal(top.right.left, full.right.left); assert.equal(top.right.width, full.right.width);
+  for (const invalid of [undefined, null, 'small', NaN, Infinity]) assert.equal(workspaceBounds(screen, 8, invalid).right.height, full.right.height);
+  const f = fake([portal, interpreter, tracker, dictionary]);
+  await arrangeWorkspace(f.api, screen, { ...opts, rightPaneHeightRatio: .61 });
+  assert.equal(f.windows.get(2).height, top.right.height);
+  assert.equal(f.tabs.get(tracker.id).index, 0); assert.equal(f.tabs.get(dictionary.id).index, 1);
+});

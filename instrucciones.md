@@ -323,15 +323,15 @@ y organizar también al abrirlo manualmente, a cualquier hora. URL correcta
 confirmada por el usuario: https://app.useinterpreter.com/.
 Accesos de Inicio y escritorio apuntan directamente a chrome.exe, Default,
 restore-last-session y el organizador, sin PowerShell/VBS. Lectura verificada.
-Carpeta real actualizada a 2.2.0 con respaldo y preferencia personal activada;
-cuenta vinculada intacta. División real y siguiente reinicio aún por comprobar.
-Chrome aislado instalado se cerró antes de ofrecer service worker; no acredita
-la distribución. Computer Use había bloqueado la captura del selector de perfil
-por no identificar una URL; ese selector apareció al abrir Chrome genérico.
-La captura real confirma Propio/UseInterpreter divididos, pero faltaba Linguee
-y sobraban huecos entre ventanas/abajo. La segunda captura del usuario es
-el objetivo: izquierda más ancha, tracker seguido de Linguee a la derecha.
-2.2.0 añade Linguee y compensa bordes; resultado real actualizado pendiente. No declarar resuelto sin evidencia real.
+El usuario confirmó con captura que la distribución 2.2.0 quedó correcta:
+Propio/UseInterpreter a la izquierda y tracker/Linguee a la derecha, sin huecos.
+Ahora pidió tracker/Linguee arriba a la derecha y sus notas abajo, también al
+iniciar Windows. Notas abiertas en la aplicación real, con origen (1313,627)
+coincidente con su referencia, sin leer ni modificar contenido. Acceso de Inicio
+para ese archivo creado y verificado por destino/argumentos, autorizado el 14/10.
+2.2.1 permite altura personal de la ventana derecha; pública conserva altura
+completa. Instalación real respaldada y todos los archivos comparados por hash.
+Aplicación real de la nueva altura se verifica en el cierre. Siguiente reinicio físico sigue pendiente; no inferirlo desde los tests.
 El usuario confirmó que al terminar Break regresó la recepción de llamadas:
 ese iniciador funciona en su sesión real. No modificar iniciadores en esta tarea.
 
@@ -893,7 +893,7 @@ La aplicación funciona en producción con estas bases vigentes:
   el de la guía es nofollow. La extensión se instala desde archivo según el
   propietario, por lo que no hay ficha propia de Chrome Web Store que editar.
   Detalle en `docs/seo.md`.
-- La versión actual de la app es 614; la extensión unificada es 2.2.0. El build
+- La versión actual de la app es 614; la extensión unificada es 2.2.1. El build
   del resumen independiente 1.0.5 queda compatible para instalaciones anteriores.
   Refuerzo positivo puede funcionar con Logros apagados. La auditoría profunda del
   8 de octubre corrigió seis fallos; la ampliación corrigió cinco más en arranque,
@@ -919,6 +919,23 @@ La aplicación funciona en producción con estas bases vigentes:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**Extensión 2.2.1 — Tracker arriba y notas abajo en la instalación personal.**
+
+- Altura opcional `rightPaneHeightRatio` entre 0.4 y 1: izquierda completa,
+  tracker/Linguee arriba; altura pública completa por defecto. Preferencias
+  inválidas o inaccesibles conservan el comportamiento anterior.
+- Lectura de preferencias sin caché y compensación Windows incluso si el
+  organizador empieza maximizado. Sin permisos adicionales ni cambios al puente.
+- Dos regresiones nuevas de geometría, orden y carga de preferencias; 38
+  pruebas de distribución/perfil, 739 pruebas completas y build correctos.
+  Archivos reales instalados con respaldo y hashes; no acredita un reinicio.
+- Archivo de notas personal abierto en Bloc de notas en la ubicación pedida.
+  Usuario autorizó su inicio junto a Chrome; acceso de Inicio verificado por
+  lectura. Rutas personales y archivo no se distribuyen en el repositorio.
+- Usuario confirmó la distribución 2.2.0 en pantalla. Aplicación real de la
+  nueva altura y siguiente arranque de Windows se comprueban por separado.
+
+
 **Extensión 2.2.0 — Distribución exacta, Linguee y arranque sin horarios.**
 
 - Todas las entradas del organizador funcionan a cualquier hora. Eliminada
@@ -937,7 +954,8 @@ La aplicación funciona en producción con estas bases vigentes:
 - 36 regresiones de distribución/perfil, 737 pruebas completas y build correctos.
   Build de extensión correcto; archivos instalados con comparación de hashes,
   respaldo y preferencia personal independiente de la distribución pública.
-- Ejecución nativa y reinicio físico pendientes. Intento aislado con Chrome
+- Distribución nativa confirmada por captura y usuario. Reinicio físico pendiente.
+  Intento aislado con Chrome
   instalado cerrado antes de obtener worker; no se interpreta como éxito.
 - Usuario confirma regreso automático después de Break en una llamada real.
   Iniciadores y vinculación quedan fuera del cambio actual. Siguiente pedido:
@@ -964,24 +982,4 @@ La aplicación funciona en producción con estas bases vigentes:
   aviso antes/después del intervalo, repetición, desactivación y texto original.
   Cero errores; cuenta/nube ficticias, sin cambios de esquema, API o RLS.
 - Extensión conserva 2.1.8. Arranque real y regla oficial de segundos de
-  Propio siguen pendientes. CI/publicación se confirman por SHA separado.
-
-
-**v613 — Mensaje editable de apoyo tras una hora sin llamadas.**
-
-- Logros → Refuerzo positivo incorpora mensaje de inactividad editable,
-  Guardar/Enter y confirmación de guardado. Usa el patrón del editor de nombre.
-- Preferencia por cuenta en reinforcement.inactivityMessage; máximo 240
-  caracteres, texto plano. Vacío o ajustes antiguos usan el mensaje original.
-- Conserva borrador durante render y ante guardado rechazado; no mezcla
-  mensajes si cambia la cuenta. Puede configurarse con Logros apagados.
-- Umbral de 60 minutos de trabajo, exclusión de pausas, canales y dedupe
-  permanecen iguales. Editar el texto no vuelve a generar un aviso ya recibido.
-- 729 pruebas y build correctos, cuatro regresiones nuevas. App compilada:
-  44 comprobaciones ES/EN en ambos temas, guardado mediante RPC/lectura de
-  ajustes ficticios, recarga, Enter, borrador, notificación real del texto,
-  restauración y cuatro anchuras 320–1365 px sin overflow ni errores. HTML
-  escrito en el mensaje se muestra como texto; no se ejecuta. Cuenta/nube
-  ficticias; sin cambios de esquema, API o RLS, ni pruebas con cuenta real.
-- Extensión continúa en 2.1.8. Arranque real y regla oficial de segundos de
   Propio siguen pendientes. CI/publicación se confirman por SHA separado.

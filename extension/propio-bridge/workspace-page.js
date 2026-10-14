@@ -14,7 +14,15 @@ async function prepare() {
     }
     const minimumInset = /Win/i.test(globalThis.navigator?.platform || '') ? 8 : 0;
     const frameInset = Math.max(minimumInset, Math.min(16, (window.outerWidth - window.innerWidth) / 2));
-    const result = await arrangeWorkspace(chrome, window.screen, { frameInset });
+    let preferences = {};
+    try {
+      const response = await fetch(chrome.runtime.getURL('workspace-preferences.json'), { cache: 'no-store' });
+      if (response.ok) {
+        const loaded = await response.json();
+        if (loaded && typeof loaded === 'object') preferences = loaded;
+      }
+    } catch {}
+    const result = await arrangeWorkspace(chrome, window.screen, { frameInset, rightPaneHeightRatio: preferences.rightPaneHeightRatio });
     if (result.status === 'already-running') status.textContent = 'Otra pestaña ya está preparando tus ventanas.';
     else {
       await chrome.storage.session.set({ 'workspace-profile-session': { prepared: true, phase: 'ready' } });

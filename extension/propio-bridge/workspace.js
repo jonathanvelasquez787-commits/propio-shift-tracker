@@ -6,7 +6,7 @@ const pages = {
 };
 const lockKey = 'workday-workspace-lock';
 
-export function workspaceBounds(screen, frameInset = 8) {
+export function workspaceBounds(screen, frameInset = 8, rightPaneHeightRatio = 1) {
   const width = Math.round(screen.availWidth), height = Math.round(screen.availHeight);
   if (!Number.isFinite(width) || !Number.isFinite(height) || width < 900 || height < 500) {
     throw new Error('Necesitás una pantalla de al menos 900 × 500 para esta distribución.');
@@ -15,18 +15,19 @@ export function workspaceBounds(screen, frameInset = 8) {
   const inset = Number.isFinite(frameInset) ? Math.max(0, Math.min(16, frameInset)) : 8;
   const rightContentWidth = Math.max(320, Math.round(width * 5 / 16));
   const rightWidth = rightContentWidth + 2 * inset;
+  const ratio = typeof rightPaneHeightRatio === 'number' && Number.isFinite(rightPaneHeightRatio) ? Math.max(.4, Math.min(1, rightPaneHeightRatio)) : 1;
   // Overlap invisible side borders and extend the bottom border past the work area.
   return {
     left: { left, top, width: width - rightContentWidth, height: height + inset },
-    right: { left: left + width - rightWidth, top, width: rightWidth, height: height + inset }
+    right: { left: left + width - rightWidth, top, width: rightWidth, height: Math.round(height * ratio) + inset }
   };
 }
 
-export async function arrangeWorkspace(api, screen, { at = Date.now(), frameInset = 8, wait = ms => new Promise(resolve => setTimeout(resolve, ms)) } = {}) {
+export async function arrangeWorkspace(api, screen, { at = Date.now(), frameInset = 8, rightPaneHeightRatio = 1, wait = ms => new Promise(resolve => setTimeout(resolve, ms)) } = {}) {
   if (typeof api.tabs.createSplit !== 'function' || typeof api.tabs.unsplit !== 'function') {
     throw new Error('Chrome necesita tener disponible la vista dividida para extensiones (versión 155 o posterior).');
   }
-  const bounds = workspaceBounds(screen, frameInset);
+  const bounds = workspaceBounds(screen, frameInset, rightPaneHeightRatio);
   const launcher = await api.tabs.getCurrent();
   if (!launcher || launcher.incognito) throw new Error('Abrí el espacio de trabajo en tu perfil habitual de Chrome.');
   const owner = `${launcher.id}:${at}`;
