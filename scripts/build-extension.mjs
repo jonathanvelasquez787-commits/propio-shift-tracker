@@ -18,7 +18,7 @@ await summary.close();
 const popup = await rollup({ input: path.join(root, 'extension/propio-bridge/popup.js') });
 await popup.write({ file: path.join(out, 'popup.js'), format: 'iife', inlineDynamicImports: true });
 await popup.close();
-for (const name of ['manifest.json', 'tracker-content.js', 'popup.html', 'popup.css', 'README.md']) {
+for (const name of ['manifest.json', 'tracker-content.js', 'popup.html', 'popup.css', 'README.md', 'workspace.html', 'workspace.css', 'workspace.js', 'workspace-page.js']) {
   await copyFile(path.join(root, 'extension/propio-bridge', name), path.join(out, name));
 }
 await mkdir(path.join(out, 'icons'), { recursive: true });

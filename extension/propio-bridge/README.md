@@ -54,3 +54,30 @@ La cola y sesión sobreviven al reinicio del worker. Entrega a una sola pestaña
 Recargar la versión anterior sin reemplazar los archivos no instala la actualización. Si la extensión fue eliminada, usá Cargar descomprimida con la carpeta que contiene `manifest.json` y conectá la cuenta de nuevo.
 
 Build: `node scripts/build-extension.mjs <salida>`. Se prueban sesión, entrega, duplicados, reinicio, bloqueos y guardado; la comprobación del navegador usa un portal y cuenta ficticios en Chromium aislado.
+## Espacio de trabajo al iniciar Windows
+
+La página interna `workspace.html#startup` organiza Propio y SuInterpreter en una
+vista dividida dentro de la ventana izquierda (dos tercios de la pantalla), y el
+tracker en la ventana derecha. Reutiliza las pestañas existentes sin navegar ni
+recargar sus sesiones. Si falta una página la abre; si hay varias de una página
+se detiene antes de cambiar la distribución para no elegir entre cuentas.
+
+Solo organiza de 05:45 inclusive hasta antes de 14:00, hora de Honduras, todos
+los días. No cierra Chrome al terminar esa franja ni modifica Break/Lunch,
+preferencias de registro o aceptación de llamadas. La página no se ejecuta
+al abrir cualquier popup: requiere el acceso de inicio de Windows configurado
+expresamente para este espacio. Ese acceso se ejecuta al iniciar sesión en
+Windows, no antes del login.
+
+La división usa `chrome.tabs.createSplit` y `chrome.tabs.unsplit`, disponibles
+desde Chrome 155. Chrome anterior conserva el puente y el resumen, pero no puede
+organizar esta vista. El permiso adicional de `app.suinterpreter.com` permite
+identificar su pestaña para moverla; no se inyectan scripts ni se lee su contenido,
+audio o credenciales. Las demás pestañas permanecen abiertas.
+
+`workspace.html#setup` permite una configuración manual puntual fuera de horario;
+el marcador se reemplaza por `#startup` para que una restauración posterior no
+repita esa excepción. La página se cierra al completar la organización. Los
+errores se muestran con opción de reintentar y un bloqueo corto evita dos
+organizaciones simultáneas. No configura auto-login en Windows ni en Propio.
+
