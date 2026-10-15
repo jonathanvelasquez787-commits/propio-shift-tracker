@@ -215,6 +215,27 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
   }
   async function message(packet, sender) {
     if (sender.id !== api.runtime.id) return null;
+    if (packet?.kind === 'apply-portal-layout') {
+      if (sender.frameId !== 0 || !sender.tab || !Number.isInteger(sender.tab.id)) return null;
+      try { if (new URL(sender.url).origin !== PORTAL_ORIGIN) return null; } catch { return null; }
+      return transact(async state => {
+        const preferences = (await api.storage.local.get('propio-original-layout-v1'))['propio-original-layout-v1'];
+        if (!preferences || preferences.revision !== packet.revision || typeof preferences.enabled !== 'boolean') return { ok: false, reason: 'layout-stale' };
+        const tab = state.tabs[sender.tab.id];
+        const elapsed = now() - Date.parse(tab?.seenAt);
+        if (!tab || tab.session !== 'authenticated' || tab.blockedDocument === tab.documentId || tab.call !== 'idle' || !tab.offline || !Number.isFinite(elapsed) || elapsed < 0 || elapsed > 3000 ||
+            Object.values(state.tabs).some(item => item.active || ['connected', 'incoming'].includes(item.call)) ||
+            (state.preparation.waitReason === 'starting' && now() - state.preparation.lastAttemptAt < 3000)) return { ok: false, reason: 'portal-busy' };
+        const portals = await api.tabs.query({ url: `${PORTAL_ORIGIN}/*` });
+        if (portals.length !== 1 || portals[0].id !== sender.tab.id) return { ok: false, reason: 'multiple-portals' };
+        const previous = (await api.storage.local.get('propio-original-layout-reload'))['propio-original-layout-reload'];
+        if (previous?.revision === packet.revision && previous.tabId === sender.tab.id) return { ok: true, alreadyApplied: true };
+        await api.storage.local.set({ 'propio-original-layout-reload': { revision: packet.revision, tabId: sender.tab.id } });
+        try { await api.tabs.reload(sender.tab.id); }
+        catch { await api.storage.local.set({ 'propio-original-layout-reload': previous || null }); return { ok: false, reason: 'layout-reload-failed' }; }
+        return { ok: true };
+      });
+    }
     if (packet?.kind === 'portal-sign-out') {
       if (sender.frameId !== 0 || !sender.tab || !Number.isInteger(sender.tab.id) || sender.tab.id < 0 || !/^[\w-]{12,100}$/.test(packet.documentId || '')) return null;
       try { if (new URL(sender.url).origin !== PORTAL_ORIGIN) return null; } catch { return null; }
@@ -235,7 +256,7 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
       await transact(state => {
         const tabId = sender.tab.id, previous = state.tabs[tabId] || {};
         const blocked = previous.blockedDocument === packet.documentId;
-        state.tabs[tabId] = { ...previous, documentId: packet.documentId, session: packet.session, call: packet.call, seenAt: at };
+        state.tabs[tabId] = { ...previous, documentId: packet.documentId, session: packet.session, call: packet.call, offline: packet.offline === true, seenAt: at };
         // A logout page can briefly load inside the portal before the public
         // redirect. Unknown UI keeps the intent; a new authenticated document cancels it.
         if (previous.documentId !== packet.documentId && packet.session === 'authenticated') delete state.tabs[tabId].signOutPending;
