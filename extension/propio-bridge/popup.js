@@ -141,8 +141,8 @@ function renderLayout(value) {
   toggle.checked = value?.enabled === true;
   toggle.disabled = layoutBusy;
   document.getElementById('originalLayoutStatus').textContent = toggle.checked
-    ? 'Activada. Propio usa su barra turquesa y sus totales originales.'
-    : 'Desactivada. Propio elige su vista habitual.';
+    ? 'Activada. Se recuerda en este perfil.'
+    : 'Desactivada. Se recuerda en este perfil.';
 }
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area !== 'local' || !changes[layoutKey]) return;
@@ -158,7 +158,7 @@ document.getElementById('originalLayout').addEventListener('change', async event
   layoutBusy = true; event.target.disabled = true;
   try {
     await chrome.storage.local.set({ [layoutKey]: { enabled, revision: crypto.randomUUID() } });
-    document.getElementById('originalLayoutStatus').textContent = 'Guardado. Propio se actualizará al quedar Offline, sin llamada ni oferta. Si hay varias pestañas de Propio, conservá una.';
+    document.getElementById('originalLayoutStatus').textContent = 'Guardado. Propio se actualizará cuando esté Offline.';
   } catch {
     try { const values = await chrome.storage.local.get(layoutKey); renderLayout(values[layoutKey]); } catch {}
     document.getElementById('originalLayoutStatus').textContent = 'No se pudo guardar. Se conserva la elección anterior; reintentá.';
