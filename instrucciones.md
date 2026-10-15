@@ -334,8 +334,9 @@ certificar cambios arbitrarios de hora/zona. Usar iniciadores en una sola PC.
 No afirmar que se probaron llamadas reales adicionales o todas sus variantes.
 
 Chrome oficial volvió a responder el 15/10: cuatro páginas correctas y altura
-derecha reducida observadas, vista original intacta. El tracker mostraba aviso
-de otra pestaña más reciente y Lunch activo; no se sobrescribieron datos.
+derecha reducida observadas, vista original intacta. Tracker en Lunch, sin llamada
+activa. El contenedor del aviso de conflicto existe, pero no tiene clase show:
+no es un aviso activo. No se sobrescribieron datos.
 
 Arranque y distribución: configuración anterior conservada.
 El 14/10 quitó todas las franjas: abrir Jonathan al iniciar sesión en Windows
@@ -951,14 +952,15 @@ La aplicación funciona en producción con estas bases vigentes:
   pendiente no omite otra pausa programada. ACW futuro no autoriza iniciar.
 - Pausar cancela cierres de pausa no entregados, conservando eventos de llamadas.
   Revisión de los 54 casos documenta las decisiones y límites de dos PCs/reloj.
-- 786 pruebas completas y 78 enfocadas anteriores correctas; 18 regresiones
-  nuevas en total. Build app/puente y 2.260 textos correctos, 21 criterios,
+- 786 pruebas completas correctas; 18 regresiones nuevas en total. Build app/puente y 2.260 textos correctos, 21 criterios,
   67 suites y 73 módulos fuente. Navegador aislado: ciclo completo con ACW 00:50,
   reinicio, Stop manual persistido y Start manual; popup conserva elección y
   vista original en ambos temas, sin errores ni overflow. CI/deploy por SHA.
 - La conexión oficial rechaza chrome://extensions por su política de URL.
-  No eludir por CDP, Sky ni otras superficies; recarga de la extensión queda
-  a cargo del usuario una vez copiados/verificados los archivos con respaldo.
+  No eludir por CDP, Sky ni otras superficies. Se copiaron y verificaron 19
+  archivos con respaldo y preferencias personales intactas. Usuario confirmó
+  recarga de extensión, Propio y tracker; se observa portal Offline y sin aviso
+  activo de conflicto en el tracker. No se provocaron llamadas reales.
 
 
 **v616 — Conexión anticipada separada del trabajo y ACW.**
