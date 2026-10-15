@@ -21,6 +21,7 @@ function fixture() {
     reinforcementScheduleIntervals: () => [], callsForDay: () => h.calls,
     dayShiftBounds: () => ({ live: !h.state.shiftEndedAt, start: new Date(h.state.shiftStartedAt) }),
     dayPauseIntervals: () => h.state.pauseHistory.map(p => ({ start: new Date(p.startedAt), end: new Date(p.endedAt) })) };
+  h.dayWorkBounds = () => h.dayShiftBounds();
   vm.createContext(h); vm.runInContext(['computeCurrentAcwStart', 'getPropioBridgePlan'].map(name => declarations.get(name)).join('\n'), h);
   return { h, now: () => clock, time: value => { clock = Date.parse(iso(value)); } };
 }
@@ -40,12 +41,14 @@ test('bridge plan shares the visible ACW anchor with elapsed seconds and reconci
 test('early login ACW stays distinct from scheduled shift and active calls or pauses publish no ACW', () => {
   const f = fixture(); f.h.calls = []; f.h.state.lastCallEndedAt = null;
   f.h.getShiftWindow = () => ({ start: '18:30', end: '22:00' });
+  f.h.dayWorkBounds = () => ({ live: f.now() >= Date.parse(iso('18:30:00')), start: new Date(iso('18:30:00')) });
   let plan = f.h.getPropioBridgePlan();
-  assert.equal(plan.startAt, iso('18:30:00')); assert.equal(plan.acw.startedAt, iso('18:00:00')); assert.equal(plan.hasCall, false);
+  assert.equal(plan.startAt, iso('18:30:00')); assert.equal(plan.acw, null); assert.equal(plan.hasCall, false);
   assert.equal(validateBridgePlan(plan, f.now()).acwVerified, true);
   f.h.state.activeCall = { startedAt: iso('18:10:00') }; assert.equal(f.h.getPropioBridgePlan().acw, null);
   f.h.state.activeCall = null; f.h.state.activePause = { type: 'break', startedAt: iso('18:10:00') };
   assert.equal(f.h.getPropioBridgePlan().acw, null);
+  f.h.dayWorkBounds = () => f.h.dayShiftBounds();
   f.h.state.activePause = null; f.h.state.pauseHistory = [{ type: 'break', startedAt: iso('18:05:00'), endedAt: iso('18:10:20') }];
   assert.equal(f.h.getPropioBridgePlan().acw.startedAt, iso('18:10:20'));
 });

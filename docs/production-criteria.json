@@ -871,6 +871,19 @@
       ]
     },
     {
+      "id": "connection-work-time",
+      "area": "Conexión y tiempo de turno",
+      "acceptance": "La conexión anticipada conserva su hora y duración; el trabajo y ACW empiezan al horario o a una llamada real anticipada. Llegadas tardías, inicios manuales y anotaciones conservan su significado.",
+      "sources": ["js/app-main.js", "js/calls.js"],
+      "tests": [{ "file": "tests/connection-work-time.test.mjs", "namedCases": [
+        "early Propio connection preserves raw presence but starts work and first-call ACW at schedule",
+        "connection before work has no ACW or worked minutes and late arrival is never backdated",
+        "a real early call starts work at that call, preserving its pay and subsequent ACW",
+        "manual starts, off days and existing gap annotations keep their explicit meaning",
+        "closing before the scheduled start creates no work session and overnight projection clips daily minutes"
+      ] }]
+    },
+    {
       "id": "bridge",
       "area": "Extensiones e historial",
       "acceptance": "Puente valida mensajes, conecta sesión confirmada con Shift, detecta llamadas por controles o red y deduplica; historial paginado y resumen independiente sin acceder a otra cuenta.",

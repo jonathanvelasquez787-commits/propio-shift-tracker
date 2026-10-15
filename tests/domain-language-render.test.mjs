@@ -40,6 +40,8 @@ function scheduleHarness({ day = 12, now = at(12, 19), start = at(12, 10), end =
     timeLabel: value => value, timeLabelFromDate: String, escapeHtml: String, iconHtml: () => '',
     renderBlockSummaryStrip() {}, sameCallDay: () => true,
   });
+  h.dayWorkSessions = () => h.dayShiftSessions();
+  h.workingMinutesForDay = h.connectedMinutesForDay;
   vm.runInContext(declarations('../js/app-main.js', ['dateAtTime', 'toMinutes', 'overlapMinutes',
     'EXCEPTION_REASON_LABELS', 'dominantExceptionReason', 'slotStats', 'renderSchedule']), h);
   h.renderSchedule();

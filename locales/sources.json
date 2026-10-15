@@ -494,6 +494,12 @@
       "app.html"
     ]
   },
+  "s_09fa5f7d": {
+    "source": "Conectado",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_0a1bb318": {
     "source": "Reanudar animación",
     "files": [
@@ -4459,6 +4465,12 @@
       "js/reinforcement-feedback.js"
     ]
   },
+  "s_520ef3ad": {
+    "source": "Conexión a Propio detectada",
+    "files": [
+      "js/calls.js"
+    ]
+  },
   "s_5219cc6b": {
     "source": "Disponible para asignar",
     "files": [
@@ -5807,6 +5819,12 @@
       "app.html"
     ]
   },
+  "s_6be44c9c": {
+    "source": "Conexión",
+    "files": [
+      "js/calls.js"
+    ]
+  },
   "s_6c561e70": {
     "source": ". CSV y PDF son reportes para contabilidad; no sustituyen el backup JSON.",
     "files": [
@@ -6445,12 +6463,6 @@
     "source": "{{v0}}% de {{v1}}%",
     "files": [
       "js/game.js"
-    ]
-  },
-  "s_77acb5eb": {
-    "source": "Tiempo transcurrido desde que iniciaste tu turno hoy",
-    "files": [
-      "js/app-main.js"
     ]
   },
   "s_77b7f5fb": {
@@ -8925,6 +8937,12 @@
       "app.html"
     ]
   },
+  "s_a4b9c851": {
+    "source": "Conexión a Propio finalizada",
+    "files": [
+      "js/calls.js"
+    ]
+  },
   "s_a4d68262": {
     "source": "Marca tu turno y tus pausas con un toque, o pega tu exportación de Propio y se acomoda todo solo.",
     "files": [
@@ -10358,7 +10376,8 @@
   "s_c05b13d5": {
     "source": "Inicio de turno",
     "files": [
-      "js/app-main.js"
+      "js/app-main.js",
+      "js/calls.js"
     ]
   },
   "s_c07cf564": {
@@ -10440,6 +10459,12 @@
     "source": "¿Borrar tu cuenta para siempre? Se eliminan la cuenta y sus datos activos. Las copias históricas cifradas se retiran por rotación, con una retención prevista de 31 días. No se puede deshacer.",
     "files": [
       "js/boot.js"
+    ]
+  },
+  "s_c1e967e9": {
+    "source": "En turno: {{v1}}",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_c1f3e040": {
@@ -10713,6 +10738,12 @@
   },
   "s_c6b0fa79": {
     "source": "No se cambió el sonido porque no se pudo guardar.",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
+  "s_c6b748d4": {
+    "source": "Tiempo de conexión, incluida la conexión anticipada",
     "files": [
       "js/app-main.js"
     ]
@@ -13283,6 +13314,12 @@
     "source": "Configura primero tu horario semanal en",
     "files": [
       "app.html"
+    ]
+  },
+  "s_f62e7856": {
+    "source": "Tiempo de turno, sin la conexión anticipada",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_f6321177": {

@@ -1542,16 +1542,14 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
       // "Iniciar llamada") siempre caía en el genérico 'Working'. Se revisa DESPUÉS de Break/Lunch
       // a propósito.
       if (state.activeCall) return 'En llamada';
+      if (bounds.live && !dayWorkBounds(todayCallDateKey()).live) return 'Conectado';
       return 'Working';
     }
 
-    // Indicador en vivo de cuánto tiempo llevas AHORA MISMO en "ACW/AfterCallWork" (disponible, sin
-    // llamada activa ni Break/ Lunch activo)
+    // ACW uses work time; opening an authenticated portal early is only a connection.
     function computeCurrentAcwStart() {
       const dayKey = todayCallDateKey();
-      // Este chip exigía `state.shiftStartedAt` directo — solo se llenaba si de verdad diste click
-      // en "Iniciar shift" (o usaste "Iniciar llamada", que lo auto-inicia).
-      const bounds = dayShiftBounds(dayKey);
+      const bounds = dayWorkBounds(dayKey);
       if (!bounds.live) return null;
       if (state.activePause) return null;
       if (state.activeCall) return null;
@@ -2292,11 +2290,11 @@ function gapClassification(prevEnd, curStart, dayKey = getActiveDayKey(), gapKey
 
   const actualPauses = mergeIntervals(dayPauseIntervals(dayKey));
   const actualCovered = overlapMinutesWithIntervals(prevEnd, curStart, actualPauses);
-  // El horario planeado (schedule) ya NO resta minutos del gap ni influye en la clasificación: solo
-  // cuenta si realmente marcaste Break/Lunch con el botón.
+  // Scheduled pauses do not subtract time; only real pauses and work presence do.
   const annotation = gapKey ? getGapAnnotation(dayKey, gapKey) : null;
-  const sessions = annotation ? [] : mergeIntervals(dayShiftSessions(dayKey));
-  const connectedIntervals = sessions.length ? sessions.map(session => ({
+  const connections = annotation ? [] : dayShiftSessions(dayKey);
+  const sessions = annotation ? [] : mergeIntervals(dayWorkSessions(dayKey));
+  const connectedIntervals = connections.length ? sessions.map(session => ({
     start: new Date(Math.max(prevEnd.getTime(), session.start.getTime())),
     end: new Date(Math.min(curStart.getTime(), session.end.getTime())),
   })).filter(interval => interval.end > interval.start) : null;
@@ -2305,7 +2303,7 @@ function gapClassification(prevEnd, curStart, dayKey = getActiveDayKey(), gapKey
       (interval.end - interval.start) / 60000 - overlapMinutesWithIntervals(interval.start, interval.end, actualPauses)), 0)
     : Math.max(0, raw - actualCovered);
   const suggested = suggestGapLabel(prevEnd, curStart, dayKey);
-  const automaticLabel = actualCovered > 0 && residual > 1e-9
+  const automaticLabel = residual > 1e-9
     ? (residual > GAP_AUTO_OTHER_THRESHOLD_MIN ? 'other' : 'acw') : suggested;
   const label = annotation ? String(annotation.label || suggested).toLowerCase() : automaticLabel;
 
@@ -2340,15 +2338,13 @@ export function dayGapRows(dayKey = getActiveDayKey(), sourceCalls = callsForDay
   const sorted = [...sourceCalls].sort((a, b) => new Date(a.startISO) - new Date(b.startISO));
   const rows = [];
 
-  // El lapso entre el click de "Iniciar shift" (o el turno estimado, ver dayShiftBounds) y el
-  // inicio de tu PRIMERA llamada del día nunca se contaba como ACW en ningún lado.
   if (sorted.length) {
-    const shiftStart = dayShiftSessions(normalized)[0]?.start;
+    const connectionStart = dayShiftSessions(normalized)[0]?.start;
+    const shiftStart = dayWorkSessions(normalized)[0]?.start;
     const firstCallStart = new Date(sorted[0].startISO);
     if (shiftStart && shiftStart.getTime() < firstCallStart.getTime()) {
-      // EndISO = su propio startISO a propósito: es un evento puntual (el click/estimado de
-      // "Iniciar shift"), sin duración propia.
-      const virtualPrev = { customerId: 'shift-start', startISO: shiftStart.toISOString(), endISO: shiftStart.toISOString() };
+      // Keep the original key so existing gap annotations survive the work-time projection.
+      const virtualPrev = { customerId: 'shift-start', startISO: (connectionStart || shiftStart).toISOString(), endISO: shiftStart.toISOString() };
       const gapKey = gapKeyFor(virtualPrev, sorted[0]);
       const info = gapClassification(shiftStart, firstCallStart, normalized, gapKey);
       if (info.displayAmount > 0 || info.manual) {
@@ -2642,9 +2638,62 @@ function dayShiftSessions(dayKey = getActiveDayKey()) {
   return [{ start: bounds.start, end, live: bounds.live }];
 }
 
-// Convierte una lista de sesiones {start,end,live} (Date objects) a intervalos de "presencia" en
-// minuto-del-día, para un `normalizedDayKey` concreto — usado por computeMinuteAdherence vía
-// minuteAdherenceForDay/slotMinuteAdherence.
+function workStartForConnection(connectionStart, sessionEnd = new Date()) {
+  const dayKey = todayCallDateKey(connectionStart);
+  const manual = dayEvents(dayKey).some(event => event.type === 'shift' && /iniciado/i.test(event.title || '') &&
+    Date.parse(event.ts) === connectionStart.getTime() && String(event.meta || '').toLowerCase() === 'manual');
+  if (manual) return new Date(connectionStart);
+  const windowFor = key => {
+    const cfg = dayConfigFor(key), forced = getDayNote(key)?.forcedStatus;
+    if (!cfg || forced === 'off' || (cfg.off && forced !== 'work')) return null;
+    const base = callDateToDate(key);
+    if (!base) return null;
+    const start = dateAtTime(base, formatHHMM(cfg.start)), end = dateAtTime(base, formatHHMM(cfg.end));
+    if (!Number.isFinite(start.getTime()) || !Number.isFinite(end.getTime())) return null;
+    if (end <= start) end.setDate(end.getDate() + 1);
+    return { start, end };
+  };
+  const previousKey = todayCallDateKey(previousCalendarDay(connectionStart));
+  const previous = windowFor(previousKey);
+  const planned = previous && previous.start <= connectionStart && previous.end > connectionStart
+    ? previous : windowFor(dayKey);
+  if (!planned) return new Date(connectionStart);
+  let start = Math.max(connectionStart.getTime(), planned.start.getTime());
+  const evidence = [...calls, ...(state.activeCall ? [state.activeCall] : [])];
+  for (const call of evidence) {
+    const from = Date.parse(call.startISO || call.startedAt), to = Date.parse(call.endISO || new Date().toISOString());
+    if (Number.isFinite(from) && Number.isFinite(to) && to > connectionStart.getTime() && from <= sessionEnd.getTime() &&
+        from < planned.start.getTime() && to >= from) start = Math.min(start, Math.max(connectionStart.getTime(), from));
+  }
+  return new Date(start);
+}
+
+function dayWorkSessions(dayKey = getActiveDayKey()) {
+  return dayShiftSessions(dayKey).map(session => ({ ...session, connectionStart: session.start, start: workStartForConnection(session.start, session.end) }))
+    .filter(session => session.end > session.start || (session.live && session.end.getTime() === session.start.getTime()));
+}
+
+function dayWorkBounds(dayKey = getActiveDayKey()) {
+  const bounds = dayShiftBounds(dayKey);
+  if (!bounds.start) return bounds;
+  const start = workStartForConnection(bounds.start, bounds.end || new Date());
+  if (bounds.end && bounds.end < start) return { ...bounds, start: null, live: false };
+  return { ...bounds, start, live: bounds.live && new Date() >= start };
+}
+
+function workingMinutesForDay(dayKey = getActiveDayKey()) {
+  const base = callDateToDate(dayKey);
+  if (!base) return 0;
+  const end = new Date(base); end.setDate(end.getDate() + 1);
+  const sessions = dayWorkSessions(dayKey).map(session => ({
+    start: new Date(Math.max(base.getTime(), session.start.getTime())), end: new Date(Math.min(end.getTime(), session.end.getTime())),
+  }));
+  callsForDay(dayKey).forEach(call => sessions.push({
+    start: new Date(Math.max(base.getTime(), Date.parse(call.startISO))), end: new Date(Math.min(end.getTime(), Date.parse(call.endISO))),
+  }));
+  return mergeIntervals(sessions).reduce((total, session) => total + (session.end - session.start) / 60000, 0);
+}
+
 function sessionsToPresenceIntervals(sessions, normalizedDayKey) {
   const minuteOfDay = (date) => date.getHours() * 60 + date.getMinutes();
   return sessions.map(s => {
@@ -3252,7 +3301,7 @@ export function dayAdherence(dayKey) {
 
   // Usa todas las sesiones del día: con 2+ sesiones, Entrada y Salida deben comparar contra la
   // primera y la última.
-  const sessions = dayShiftSessions(normalized);
+  const sessions = dayWorkSessions(normalized);
   const isToday = normalized === todayCallDateKey();
   const base = callDateToDate(normalized) || new Date();
 
@@ -3349,7 +3398,7 @@ function now_isBefore(date) { return new Date() < date; }
 function dayProductivityGoalTotals(dayKey = getActiveDayKey()) {
   const dayCalls = callsForDay(dayKey);
   const dayPauses = dayPausesForSlotStats(dayKey);
-  const { start: shiftStart, end: shiftEnd } = dayShiftBounds(dayKey);
+  const { start: shiftStart, end: shiftEnd } = dayWorkBounds(dayKey);
   const plannedSlots = getEffectiveScheduleForDay(dayKey);
   const firstWorkIndex = plannedSlots.findIndex(s => s.type === 'Work');
   let lastWorkIndex = -1;
@@ -5404,7 +5453,7 @@ function renderPayDatesSection() {
     configureCallsContext({
       HIGHER_RATE_TIERS, MAX_CALL_DURATION_MIN, appConfirm, autoStartShiftFromCalls, callDateKeyFromValue, callDedupeKey,
       callsForDay, callsOverlap, closeModal, connectedMinutesForDay, convertedAmountText, dayAdherence,
-      dayEvents, dayGapRows, dayKeyFromIsoDate, dayShiftBounds, escapeHtml, financeConvertedInline,
+      dayEvents, dayGapRows, dayKeyFromIsoDate, dayShiftBounds, dayWorkSessions, escapeHtml, financeConvertedInline,
       financeConvertedNote, financeRunAutoFillCascade, formatCallDayLabel, formatDuration, formatHHMM,
       formatMinutes, gapLabelText, getActiveDayKey, higherRateBonusForCall, higherRateTierBadgeHtml,
       iconHtml, importedCallStats, isoDateFromDayKey, makeLocalId, money, onGameCallSaved, onGameCallsChanged, openModal,
@@ -6150,7 +6199,8 @@ function renderHeader() {
   if (cycleGoalEditBtnEl) cycleGoalEditBtnEl.style.display = cycleViewOffset === 0 ? '' : 'none';
   const adherenceForTag = dayAdherence(dayKey);
   const earningsTagsParts = [
-    ui`<span class="tag ${hasShift ? 'good' : ''}" title="Tiempo transcurrido desde que iniciaste tu turno hoy">Conectado: ${hasShift ? formatDuration(connected * 60000) : '—'}</span>`,
+    ui`<span class="tag ${hasShift ? 'good' : ''}" title="Tiempo de conexión, incluida la conexión anticipada">Conectado: ${hasShift ? formatDuration(connected * 60000) : '—'}</span>`,
+    ui`<span class="tag ${hasShift ? 'good' : ''}" title="Tiempo de turno, sin la conexión anticipada">En turno: ${hasShift ? formatDuration(workingMinutesForDay(dayKey) * 60000) : '—'}</span>`,
     ui`<span class="tag good" title="Tiempo total que llevas en llamada hoy">Llamadas: ${formatCallTimeLabel(stats.total)}</span>`,
     ui`<span class="tag" title="Cantidad de llamadas registradas hoy">Total: ${dayCalls.length}</span>`,
     ui`<span class="tag" title="Llamadas marcadas como Billable hoy">Billable: ${stats.billable}</span>`,
@@ -6408,7 +6458,7 @@ function renderSchedule() {
       // las cuenten.
       const dayPauses = dayPausesForSlotStats(dayKey);
       // shiftStart/shiftEnd salen de dayShiftSessions (todas las sesiones), no de dayShiftBounds.
-      const shiftSessions = dayShiftSessions(dayKey);
+      const shiftSessions = dayWorkSessions(dayKey);
       const shiftStart = shiftSessions[0]?.start || null;
       const lastShiftSessionForBounds = shiftSessions[shiftSessions.length - 1] || null;
       const shiftEnd = lastShiftSessionForBounds && !lastShiftSessionForBounds.live ? lastShiftSessionForBounds.end : null;
@@ -6630,7 +6680,7 @@ function renderSchedule() {
       // comparado contra el plan en vez de mostrarse en crudo.
       const shiftWindowForCard = getShiftWindow(dayKey);
       const plannedShiftMin = Math.max(0, toMinutes(shiftWindowForCard.end) - toMinutes(shiftWindowForCard.start));
-      const shiftConnectedMin = shiftStart ? connectedMinutesForDay(dayKey) : 0;
+      const shiftConnectedMin = shiftStart ? workingMinutesForDay(dayKey) : 0;
       const shiftPct = plannedShiftMin > 0 ? Math.min(100, (shiftConnectedMin / plannedShiftMin) * 100) : 0;
       summaryCards.push({
         name: translateText('Shift'),
