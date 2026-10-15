@@ -1,5 +1,3 @@
-import { settingsKey } from '../propio-summary/i18n.js';
-import { normalizeSummaryOptions } from '../propio-summary/options.js';
 const reasons = {
   'portal-closed': 'La pestaña de Propio se cerró durante una llamada. Revisá su final en el tracker.',
   'active-portal-call': 'Esperá a que termine la llamada para pausar o cambiar de cuenta. Para detener la conexión de inmediato, descartá las señales y revisá la llamada activa en el tracker.',
@@ -50,7 +48,7 @@ async function refresh() {
   document.getElementById('open').classList.toggle('primary', state.paired);
   const toggle = document.getElementById('automatic');
   const callStatus = state.active ? 'Registrando tu llamada actual.' : state.call === 'connected' ? 'Hay una llamada en curso cuyo inicio no se observó; revisala en el tracker.' : state.call === 'incoming' ? 'Tenés una llamada entrante; vos decidís si aceptarla.' : 'Esperando la próxima llamada.';
-  document.getElementById('portalStatus').textContent = !state.paired ? 'Esperando tu sesión en el tracker para vincularla automáticamente. El resumen funciona por separado.' : state.portal === 'authenticated' ? `Sesión reconocida. ${callStatus}` : state.portal === 'logged-out' ? 'Cierre de sesión confirmado en Propio.' : 'Abrí Propio para reconocer tu sesión.';
+  document.getElementById('portalStatus').textContent = !state.paired ? 'Esperando tu sesión en el tracker para vincularla automáticamente. La vista original funciona por separado.' : state.portal === 'authenticated' ? `Sesión reconocida. ${callStatus}` : state.portal === 'logged-out' ? 'Cierre de sesión confirmado en Propio.' : 'Abrí Propio para reconocer tu sesión.';
   toggle.checked = state.mode === 'auto'; toggle.disabled = busy || !state.paired;
   const prep = state.preparation, prepToggle = document.getElementById('prepareFirst');
   document.getElementById('availabilityStatus').textContent = availabilityReasons[prep?.waitReason] || 'Comprobando cuándo ponerte disponible.';
@@ -136,50 +134,33 @@ document.getElementById('reviewed').addEventListener('click', () => {
 refresh().catch(() => { document.getElementById('status').textContent = reasons.storage; });
 setInterval(() => { if (!busy) refresh().catch(() => {}); }, 2000);
 
-let summaryOptions = normalizeSummaryOptions(null, false), summaryBusy = false, summaryRevision = 0, pendingSummaryEnabled = null, summaryError = '';
-function renderSummary(fillFields = false) {
-  const toggle = document.getElementById('summaryEnabled');
-  toggle.checked = pendingSummaryEnabled ?? summaryOptions.enabled; toggle.disabled = summaryBusy;
-  document.getElementById('summaryStatus').classList.toggle('error', Boolean(summaryError));
-  document.getElementById('summaryStatus').textContent = summaryError || (summaryOptions.enabled
-    ? 'Visible en el historial. «Calcular total» suma todas las páginas del rango.'
-    : 'Oculto. Activá esta opción para verlo en el historial, sin recargar.');
-  if (fillFields) {
-    document.getElementById('summaryLanguage').value = summaryOptions.language;
-    document.getElementById('summaryCurrency').value = summaryOptions.currency || '';
-    document.getElementById('summaryRate').value = summaryOptions.rate || '';
-  }
-  for (const button of document.querySelectorAll('#summaryForm button')) button.disabled = summaryBusy;
+const layoutKey = 'propio-original-layout-v1';
+let layoutBusy = false, layoutRevision = 0;
+function renderLayout(value) {
+  const toggle = document.getElementById('originalLayout');
+  toggle.checked = value?.enabled === true;
+  toggle.disabled = layoutBusy;
+  document.getElementById('originalLayoutStatus').textContent = toggle.checked
+    ? 'Activada. Se recuerda en este perfil.'
+    : 'Desactivada. Se recuerda en este perfil.';
 }
-async function saveSummary(patch) {
-  if (summaryBusy) return;
-  summaryBusy = true; summaryError = ''; pendingSummaryEnabled = typeof patch.enabled === 'boolean' ? patch.enabled : null; renderSummary();
-  const feedback = document.getElementById('summaryFeedback'); feedback.textContent = ''; feedback.classList.remove('error');
-  try {
-    const stored = (await chrome.storage.local.get(settingsKey))[settingsKey];
-    const next = normalizeSummaryOptions({ ...normalizeSummaryOptions(stored, false), ...patch }, false);
-    await chrome.storage.local.set({ [settingsKey]: next });
-    summaryOptions = next; renderSummary(true); feedback.textContent = 'Preferencias guardadas. Se aplican en tus pestañas de Propio.';
-  } catch { summaryError = 'No se pudo guardar. Se conserva la preferencia anterior; reintentá.'; feedback.textContent = summaryError; feedback.classList.add('error'); }
-  finally { summaryBusy = false; pendingSummaryEnabled = null; renderSummary(); }
-}
-document.getElementById('summaryEnabled').addEventListener('change', event => { void saveSummary({ enabled: event.target.checked }); });
-document.getElementById('summaryForm').addEventListener('submit', event => {
-  event.preventDefault();
-  const currency = document.getElementById('summaryCurrency').value.trim(), rate = Number(document.getElementById('summaryRate').value);
-  const feedback = document.getElementById('summaryFeedback');
-  if ((currency || rate) && (!currency || !Number.isFinite(rate) || rate <= 0 || rate > 100000)) {
-    feedback.textContent = 'Ingresá una moneda y un cambio mayor que cero, o usá «Sin conversión».'; feedback.classList.add('error'); return;
-  }
-  void saveSummary({ language: document.getElementById('summaryLanguage').value, currency: currency || null, rate: currency ? rate : null });
-});
-document.getElementById('clearConversion').addEventListener('click', () => { void saveSummary({ currency: null, rate: null }); });
 chrome.storage.onChanged.addListener((changes, area) => {
-  if (area !== 'local' || !changes[settingsKey]) return;
-  summaryRevision++; summaryOptions = normalizeSummaryOptions(changes[settingsKey].newValue, false); renderSummary(true);
+  if (area !== 'local' || !changes[layoutKey]) return;
+  layoutRevision++; renderLayout(changes[layoutKey].newValue);
 });
-const initialSummaryRevision = summaryRevision;
-chrome.storage.local.get(settingsKey).then(stored => {
-  if (initialSummaryRevision === summaryRevision) summaryOptions = normalizeSummaryOptions(stored[settingsKey], false);
-  renderSummary(true);
-}).catch(() => { document.getElementById('summaryStatus').textContent = 'No se pudo leer la preferencia del resumen. Reintentá al abrir la extensión.'; });
+const initialLayoutRevision = layoutRevision;
+chrome.storage.local.get(layoutKey).then(values => {
+  if (layoutRevision === initialLayoutRevision) renderLayout(values[layoutKey]);
+}).catch(() => { document.getElementById('originalLayoutStatus').textContent = 'No se pudo leer la preferencia. Reintentá al abrir la extensión.'; });
+document.getElementById('originalLayout').addEventListener('change', async event => {
+  if (layoutBusy) return;
+  const enabled = event.target.checked;
+  layoutBusy = true; event.target.disabled = true;
+  try {
+    await chrome.storage.local.set({ [layoutKey]: { enabled, revision: crypto.randomUUID() } });
+    document.getElementById('originalLayoutStatus').textContent = 'Guardado. Propio se actualizará cuando esté Offline.';
+  } catch {
+    try { const values = await chrome.storage.local.get(layoutKey); renderLayout(values[layoutKey]); } catch {}
+    document.getElementById('originalLayoutStatus').textContent = 'No se pudo guardar. Se conserva la elección anterior; reintentá.';
+  } finally { layoutBusy = false; event.target.disabled = false; }
+});

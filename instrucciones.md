@@ -317,7 +317,15 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
-Arranque y distribución son la prioridad actual por petición del usuario.
+Vista original nativa de Propio recuperada y comprobada en Chrome Jonathan,
+con interruptor persistente y sin la barra de resumen unificada. Casos
+ACW fueron pospuestos por el usuario («no no no mejor no»); no implementarlos.
+La inspección de Windows fallaba por reconocimiento de URL; navegador integrado
+y conexión oficial Chrome Jonathan ya permiten leer el portal real. No insistir
+en Sky para páginas del navegador. Usuario recargó y activó la opción; DOM y
+captura real confirman app-daily-rollup, turquesa e iconos nativos, sin resumen.
+
+Arranque y distribución: configuración anterior conservada.
 El 14/10 quitó todas las franjas: abrir Jonathan al iniciar sesión en Windows
 y organizar también al abrirlo manualmente, a cualquier hora. URL correcta
 confirmada por el usuario: https://app.useinterpreter.com/.
@@ -893,7 +901,7 @@ La aplicación funciona en producción con estas bases vigentes:
   el de la guía es nofollow. La extensión se instala desde archivo según el
   propietario, por lo que no hay ficha propia de Chrome Web Store que editar.
   Detalle en `docs/seo.md`.
-- La versión actual de la app es 614; la extensión unificada es 2.2.1. El build
+- La versión actual de la app es 614; la extensión unificada es 2.2.2. El build
   del resumen independiente 1.0.5 queda compatible para instalaciones anteriores.
   Refuerzo positivo puede funcionar con Logros apagados. La auditoría profunda del
   8 de octubre corrigió seis fallos; la ampliación corrigió cinco más en arranque,
@@ -918,6 +926,30 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**Extensión 2.2.2 — Vista original opcional y retiro del resumen unificado.**
+
+- Interruptor del popup, por perfil y apagado por defecto, para elegir la vista
+  nativa antigua que Propio todavía distribuye. Sin recrear HTML/CSS ni totales.
+- Se sustituye solo la lectura de una opción de interfaz reconocida; serializar
+  conserva su valor real. Cachés nativos, otras opciones y datos de llamadas
+  quedan intactos. Formatos desconocidos conservan el comportamiento del portal.
+- Recarga pospuesta hasta Offline confirmado, sin llamadas/ofertas, un portal y
+  observación reciente. Revisión guardada por pestaña evita repetir una recarga.
+- Retirados barra/cálculo/preferencias del resumen unificado. Historial, cola,
+  vínculo y registro continúan independientes. Paquete antiguo separado intacto.
+- Nombre visible actualizado a «Propio · Tracker y vista original»; ancho, icono
+  y temas conservados. Reconocimiento del encabezado original angosto confirma
+  nombre visible y saludo coincidentes dentro de app-header.
+- 754 pruebas completas, 70 comprobaciones finales del área y builds correctos.
+  Popup compilado: persistencia, ambas elecciones, rechazo de guardado y ambos
+  temas sin overflow ni errores. Archivos preparados con respaldo y hashes,
+  resumen viejo archivado. Usuario recargó la extensión y activó la opción.
+  Chrome real confirma barra turquesa nativa, Calls/Minutes/Pay, iconos e historial;
+  sin resumen anterior, Start Calls habilitado en Offline y demás controles
+  deshabilitados como corresponde. No se provocó una llamada para verificar.
+  Publicación se cierra con CI y despliegue verificados por SHA.
+
 
 **Extensión 2.2.1 — Tracker arriba y notas abajo en la instalación personal.**
 
@@ -961,25 +993,3 @@ La aplicación funciona en producción con estas bases vigentes:
   Iniciadores y vinculación quedan fuera del cambio actual. Siguiente pedido:
   basar la espera entre llamadas en el ACW visible del tracker, manteniendo
   las opciones de primera llamada y retorno de pausas; propuesta explicada.
-
-
-**v614 — Frecuencia y repetición del aviso de apoyo sin llamadas.**
-
-- Logros → Refuerzo positivo permite elegir 1–240 minutos de trabajo y
-  repetición opcional. Guardar aviso/Enter guarda mensaje y frecuencia juntos.
-- Ajustes por cuenta: reinforcement.inactivityMinutes e inactivityRepeat.
-  Cuentas anteriores conservan 60 minutos y una sola vez hasta otra llamada.
-- La repetición cuenta trabajo entre avisos, excluye pausas/interrupciones,
-  llamadas activas y tiempo fuera del horario. Recarga conserva la entrega;
-  saltos de tiempo muestran solo un aviso y recibos antiguos no se reproducen.
-- El texto original refleja los minutos elegidos; el texto personal se respeta.
-  Un permiso de repetición explícito permite volver a mostrar el mismo mensaje
-  después de expirar, manteniendo el filtro de duplicados de los otros avisos.
-- Validación de enteros, borradores, rechazo de guardado y separación de cuentas
-  cubiertos. 735 pruebas y build correctos, seis regresiones nuevas.
-- App compilada: 84 comprobaciones ES/EN en claro/oscuro, cuatro anchuras
-  320–1365 px sin overflow, RPC/lectura de ajustes ficticios, recarga, Enter,
-  aviso antes/después del intervalo, repetición, desactivación y texto original.
-  Cero errores; cuenta/nube ficticias, sin cambios de esquema, API o RLS.
-- Extensión conserva 2.1.8. Arranque real y regla oficial de segundos de
-  Propio siguen pendientes. CI/publicación se confirman por SHA separado.

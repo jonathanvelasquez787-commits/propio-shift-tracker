@@ -1,18 +1,41 @@
-# Propio · Tracker y resumen · 2.2.1
+# Propio · Tracker y vista original · 2.2.2
 
-Una sola extensión reúne la conexión al tracker y la barra de llamadas, minutos y ganancias en Propio. «Registrar en mi tracker» y «Mostrar resumen en Propio» son controles independientes. El resumen empieza oculto y no exige cuenta vinculada; encenderlo o apagarlo se aplica a las pestañas abiertas sin recargar. La conexión conserva su modo y cuenta al actualizar la carpeta existente.
+La extensión conecta tu tracker con la sesión y el historial de Propio. Su
+registro de llamadas funciona independientemente de la apariencia del portal.
 
-## Resumen opcional e interfaz
+## Vista original de Propio
 
-La conexión inicial es automática: una sola pestaña del tracker con sesión lista vincula la cuenta, activa el registro y prepara el inicio de turno. Al volver a abrir Chrome conserva la cuenta y tus elecciones; si apagaste registro o arranque, no los vuelve a encender. Varias pestañas/cuentas o datos pendientes de otro propietario impiden adivinar una cuenta. El anuncio del tracker reintenta fallos transitorios y comprueba el vínculo cada diez segundos.
+«Usar la vista original de Propio» recupera la vista nativa que todavía incluye
+el portal: barra turquesa, Calls, Minutes, Pay e iconos. Apagado por defecto,
+guarda la elección en el perfil de Chrome. Al apagarlo vuelve a la selección
+normal de Propio. No crea una barra alternativa ni calcula totales propios.
+La anterior barra de la extensión y sus controles de cálculo/conversión fueron
+retirados; el paquete independiente para instalaciones antiguas se conserva.
 
-El popup explica «Ponerme disponible automáticamente» y diferencia comenzar turno, terminar Break y terminar Lunch. El estado principal de conexión usa lenguaje simple. El volumen de tráfico normal que se observa en Propio y sus códigos HTTP queda dentro de «Detalles para soporte», cerrado por defecto; esas cifras no equivalen a acciones o llamadas de la extensión.
+Cambiar la elección solicita una recarga únicamente con un portal, estado
+Offline confirmado y sin llamada activa ni oferta. Si está ocupado, espera;
+no pulsa Start Calls, Stop Calls, Accept ni Reactivate para aplicar el diseño.
+La comprobación se repite con el controlador de sesión y el worker. Una revisión
+se recarga una sola vez por pestaña para evitar bucles. Varias pestañas del
+portal bloquean la recarga hasta resolver la ambigüedad.
 
-En el historial, la barra muestra el subtotal de la página visible: cantidad de llamadas, minutos y pago oficial. «Calcular total» recorre todas las páginas del rango elegido y vuelve a la página inicial. Ocultarlo mientras suma cancela el recorrido y restaura la página. La barra conserva la colocación compacta junto a los encabezados. Filtros, datos pendientes y errores de paginación mantienen sus verificaciones.
+`classic-portal.js` se ejecuta antes del código del portal en su contexto
+principal; `original-portal-content.js` comunica la elección desde el
+almacenamiento aislado de la extensión. El único valor sustituido durante la
+lectura es la opción de interfaz nativa
+`enable-analytics-block-AT-415-interpreter-portal`. Su valor real se conserva al
+serializar el objeto de esa opción, conservando los cachés nativos de ese objeto.
+Otras opciones,
+respuestas de llamadas y formatos desconocidos permanecen intactos. No cambia
+permisos, llamadas, cuentas ni datos del tracker.
 
-El popup tiene tarjetas de conexión y resumen, controles separados, cuenta vinculada, llamadas detectadas y pendientes, actividad y diagnóstico desplegables. Las preferencias del resumen permiten English/Español y conversión opcional; se guardan localmente y se reflejan en la barra. Usan el mismo icono de reloj de la tool, preparado a 16, 32, 48 y 128 px. Los temas claro/oscuro siguen la preferencia del navegador.
+Esta opción depende de que Propio conserve el componente y el formato de esa
+opción; si los cambia, debe revisarse la compatibilidad. La selección corresponde
+a la vista antigua completa, incluidos Call Status y la colocación de Feedback.
 
-El resumen no inicia turnos, registra llamadas, ni comparte filas con el tracker. El registro puede funcionar con la barra oculta, y el resumen con el registro apagado. El espacio de trabajo añade únicamente el permiso acotado de UseInterpreter descrito abajo; la apertura por perfil no añade permisos nuevos.
+La conexión inicial sigue siendo automática con una sola pestaña del tracker
+con sesión lista. Reabrir Chrome conserva cuenta y preferencias. El popup mantiene
+el diagnóstico técnico dentro de Detalles para soporte, cerrado por defecto.
 
 ## Sesión y Shift
 
@@ -51,24 +74,23 @@ El contador del popup distingue filas oficiales de llamadas observadas en vivo. 
 
 Con el registro activo, se recuperan las filas visibles aunque el resumen esté oculto. En un historial filtrado explícitamente a hoy, recorre hasta 2.000 filas, vuelve a la página inicial y sincroniza todas las páginas confirmadas. Si cambiás filtros o intervenís durante el recorrido, cancela sin mezclar rangos. Otros filtros recuperan solo las páginas que se carguen; no consulta endpoints privados ni historiales que no estén abiertos. La cola funciona con el tracker cerrado y se entrega al volver a la misma cuenta dentro de 24 horas. No se importan filas durante una llamada activa.
 
-El popup tiene ancho propio de 400 px en la raíz; ya no depende del viewport inicial de Chrome para calcular su tamaño. Sus controles conservan los temas claro/oscuro y el icono de la tool.
+El popup tiene ancho propio de 400 px, temas claro/oscuro y el icono de la tool.
 
 ## Privacidad y persistencia
 
-No recoge usuario/contraseña, nombres, ID del intérprete, notas, audio, URLs, headers, tokens o cuerpos para diagnóstico. El registro automático lee únicamente las siete columnas del historial: Customer ID numérico, fecha, inicio, duración, Billable, Dropped y Pay. Esas filas se conservan en la cola local y se entregan a tu cuenta del tracker; sus comprobantes evitan repetirlas. El resumen visual sigue calculando solo duración y pago localmente. La cuenta del tracker se vincula por hash.
+No recoge usuario/contraseña, nombres, ID del intérprete, notas, audio, URLs, headers, tokens o cuerpos para diagnóstico. El registro automático lee únicamente las siete columnas del historial: Customer ID numérico, fecha, inicio, duración, Billable, Dropped y Pay. Esas filas se conservan en la cola local y se entregan a tu cuenta del tracker; sus comprobantes evitan repetirlas. La vista original usa el componente nativo de totales de Propio; la extensión no los calcula. La cuenta del tracker se vincula por hash.
 
 La cola y sesión sobreviven al reinicio del worker. Entrega a una sola pestaña de la cuenta conectada, conserva hasta 200 eventos y reintenta cuando vuelve el tracker. Eventos de más de 24 horas requieren revisión. Una llamada manual, un respaldo pendiente, traslapes, varias pestañas o errores de almacenamiento bloquean la entrega. Cambiar de cuenta con pendientes exige resolverlos primero. Pausar durante una llamada requiere esperar o descartar expresamente las señales revisadas. Si cerrás Propio durante una llamada, revisá su final en el tracker.
 
 ## Actualizar la extensión existente
 
-1. Reemplazá los archivos de la carpeta de conexión instalada por el paquete 2.2.1, incluidos `summary-content.js` y la carpeta `icons`. Usar esa misma carpeta conserva cuenta vinculada, registro automático, sesión y cola.
-2. En `chrome://extensions`, recargá la extensión de conexión: ahora se llama «Propio · Tracker y resumen». Desactivá la extensión anterior «Propio · Minutos y ganancias» y cualquier userscript de resumen para usar solo una barra.
-3. Recargá Propio y el tracker. El popup muestra 2.2.1 y el icono de la tool. Activá «Mostrar resumen en Propio» si querés verlo en el historial.
-4. Si estaba sin vincular: abrí el tracker, iniciá sesión y pulsá Vincular cuenta. Moneda/idioma de la extensión de resumen anterior se configuran una vez en el nuevo popup: Chrome separa el almacenamiento de las dos extensiones antiguas.
+El agente reemplaza los archivos de la misma carpeta instalada, conservando su
+almacenamiento y cuenta vinculada. El build elimina el antiguo
+`summary-content.js`; no debe volver a incluirlo en el manifest. Se recarga la
+extensión y, con Propio libre, su página para activar los nuevos scripts.
+Build: `node scripts/build-extension.mjs <salida>`. App y paquete independiente
+mantienen sus verificaciones propias.
 
-Recargar la versión anterior sin reemplazar los archivos no instala la actualización. Si la extensión fue eliminada, usá Cargar descomprimida con la carpeta que contiene `manifest.json` y conectá la cuenta de nuevo.
-
-Build: `node scripts/build-extension.mjs <salida>`. Se prueban sesión, entrega, duplicados, reinicio, bloqueos y guardado; la comprobación del navegador usa un portal y cuenta ficticios en Chromium aislado.
 ## Espacio de trabajo al iniciar Windows
 
 La apertura por perfil es independiente del horario de Windows. Con la opción

@@ -880,7 +880,6 @@
         "js/propio-bridge-rules.js",
         "extension/propio-bridge/portal-observer.js",
         "extension/propio-bridge/portal-content.js",
-        "extension/propio-bridge/summary-content.js",
         "extension/propio-summary/options.js",
         "js/propio-history.js",
         "js/propio-history-pages.js",
@@ -973,7 +972,7 @@
           "file": "tests/propio-extension-separation.test.mjs",
           "namedCases": [
             "independent summary is scoped to Propio and has no call observer, tracker or messaging capabilities",
-            "unified extension packages independent session detection and an optional local summary without adding permissions"
+            "unified extension keeps session detection separate from original layout and removes its custom summary"
           ]
         },
         {
@@ -1215,6 +1214,40 @@
           ]
         }
       ]
+    }
+    ,{
+      "id": "original-portal",
+      "area": "Vista original nativa de Propio",
+      "acceptance": "Elección optativa por perfil; solo la opción nativa de interfaz cambia al leerla y su valor real se conserva al serializar. La recarga exige Offline reciente, portal único y ausencia de llamadas u ofertas; el resumen unificado se retira sin afectar el registro.",
+      "sources": ["extension/propio-bridge/classic-portal.js", "extension/propio-bridge/original-portal-content.js", "extension/propio-bridge/original-portal-entry.js", "extension/propio-bridge/bridge-worker.js", "extension/propio-bridge/popup.js"],
+      "tests": [{
+        "file": "tests/classic-portal.test.mjs",
+        "namedCases": [
+          "original portal selects the vendor legacy layout while preserving every unrelated feature",
+          "original portal supports the vendor stream put and single-flag patch without editing other stream paths",
+          "original portal ignores unknown schemas and arbitrary portal or call payloads",
+          "original portal preserves native parser errors and reviver semantics",
+          "original portal is scoped to the top-level portal and never hooks login or other sites",
+          "original portal repeated injection does not stack parsers or change native false flags",
+          "original portal choice defaults off, can switch back, and never poisons vendor cache serialization",
+          "original portal build has unchanged permissions, scoped start scripts and no custom summary"
+        ]
+      }, {
+        "file": "tests/original-portal-controller.test.mjs",
+        "namedCases": [
+          "original layout controller restores the saved choice without reloading a matching native view",
+          "original layout controller waits for safe Offline and applies both choices once",
+          "original layout controller can retry a busy portal and does not lose a changed preference to a stale read",
+          "original layout controller allows one recovery for a missing native legacy view and stops on invalidation"
+        ]
+      }, {
+        "file": "tests/propio-bridge.test.mjs",
+        "namedCases": [
+          "original layout reload requires fresh Offline, one portal and no calls or offers; bridge data stays intact",
+          "original layout rejects stale choices, foreign origins and frames without reloading",
+          "original narrow header authenticates only its matching visible name and keeps call detection"
+        ]
+      }]
     }
     ,{
       "id": "windows-workspace",

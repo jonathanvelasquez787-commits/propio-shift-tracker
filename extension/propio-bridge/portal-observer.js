@@ -50,7 +50,11 @@ export function availableStopButton(document) {
 }
 export function readPortalObservation(document, armed = false) {
   const headings = [...document.querySelectorAll('h1,h2,h3,h4,strong,b,[role="heading"],header,nav,span,p,div,label')];
-  const welcome = headings.some(element => visible(element) && /^welcome,\s+.{1,180}\s*\(\d{1,12}\)$/i.test(element.textContent.trim()));
+  const originalName = document.querySelector('app-header .app-interpreter-name');
+  const originalWelcome = document.querySelector('app-header .header-welcome-message');
+  const originalSession = visible(originalName) && /^.{1,180}\s*\(\d{1,12}\)$/.test(originalName.textContent.trim()) &&
+    normalize(originalWelcome?.textContent) === normalize('Welcome, ' + originalName.textContent);
+  const welcome = originalSession || headings.some(element => visible(element) && /^welcome,\s+.{1,180}\s*\(\d{1,12}\)$/i.test(element.textContent.trim()));
   const login = document.querySelector('#loginform');
   const session = welcome ? 'authenticated' : visible(login) ? 'logged-out' : 'unknown';
   if (session !== 'authenticated') return { session, call: 'unknown' };

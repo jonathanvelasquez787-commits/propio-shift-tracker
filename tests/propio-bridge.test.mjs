@@ -392,10 +392,10 @@ function receiverFixture(clock = now) {
 }
 function workerFixture() {
   const data = {}, delivered = [], reloads = [];
-  let targets = [], plan = null, ack = { status: 'ok' }, clock = Date.parse(at), n = 0;
+  let targets = [], portalTargets = [1], plan = null, ack = { status: 'ok' }, clock = Date.parse(at), n = 0;
   const api = { runtime: { id: 'extension-id', getURL: name => `chrome-extension://extension-id/${name}` },
     storage: { local: { async get(key) { return { [key]: structuredClone(data[key]) }; }, async set(update) { Object.assign(data, structuredClone(update)); } } },
-    tabs: { async query() { return targets.map((s, i) => ({ id: i + 10 })); }, async sendMessage(id, message) {
+    tabs: { async query(options) { return options?.url?.startsWith(PORTAL_ORIGIN) ? portalTargets.map(id => ({ id })) : targets.map((s, i) => ({ id: i + 10 })); }, async sendMessage(id, message) {
       if (message.kind === 'identify-tracker') return { accountScope: targets[id - 10], plan };
       delivered.push(message); return ack;
     }, async create() {}, async reload(id) { reloads.push(id); } } };
@@ -406,7 +406,7 @@ function workerFixture() {
       requestBody: { raw: [{ bytes: new TextEncoder().encode(JSON.stringify({ name, username: 'never-retained', token: 'never-retained' })).buffer }] }, ...options });
     await worker.completed({ requestId, statusCode: options.statusCode || 200 });
   }
-  return { data, delivered, reloads, signal, get worker() { return worker; }, targets: value => { targets = value; },
+  return { data, delivered, reloads, signal, get worker() { return worker; }, targets: value => { targets = value; }, portals: value => { portalTargets = value; },
     ack: value => { ack = value; }, plan: value => { plan = value ? {scheduledPauses:[],...value} : null; }, advance: milliseconds => { clock += milliseconds; },
     restart() { worker = createBridgeWorker(api, { now: () => clock, randomId: () => `generated-id-${String(++n).padStart(12,'0')}` }); } };
 }
@@ -748,4 +748,46 @@ test('window bridge validates source, origin, scope and nonce, and stops after l
   dispatch({ source: host, origin: TRACKER_ORIGIN, data: packet }); await new Promise(resolve => setTimeout(resolve, 0));
   assert.equal(applied, 1); assert.equal(posted.at(-1).kind, 'ack');
   stop(); dispatch({ source: host, origin: TRACKER_ORIGIN, data: packet }); assert.equal(applied, 1);
+});
+
+test('original layout reload requires fresh Offline, one portal and no calls or offers; bridge data stays intact', async () => {
+  const f = workerFixture(); await enablePortal(f);
+  const revision = 'layout-revision-12345';
+  f.data['propio-original-layout-v1'] = { enabled: true, revision };
+  const apply = () => f.worker.message({ kind: 'apply-portal-layout', revision }, portalSender);
+  for (const observation of [{ call: 'connected', offline: false }, { call: 'incoming', offline: false }, { call: 'unknown', offline: true }, { call: 'idle', offline: false }]) {
+    await f.worker.message(portalPacket('authenticated', observation), portalSender);
+    assert.equal((await apply()).reason, 'portal-busy');
+  }
+  await f.worker.message(portalPacket('authenticated', { call: 'idle', offline: true }), portalSender);
+  f.advance(4000); assert.equal((await apply()).reason, 'portal-busy');
+  await f.worker.message(portalPacket('authenticated', { call: 'idle', offline: true }), portalSender);
+  f.portals([1, 2]); assert.equal((await apply()).reason, 'multiple-portals');
+  f.portals([1]); const bridgeBefore = JSON.stringify(f.data['bridge-v1']);
+  assert.equal((await apply()).ok, true); assert.deepEqual(f.reloads, [1]);
+  assert.equal(JSON.stringify(f.data['bridge-v1']), bridgeBefore);
+  f.restart(); assert.equal((await apply()).alreadyApplied, true); assert.deepEqual(f.reloads, [1]);
+});
+
+test('original layout rejects stale choices, foreign origins and frames without reloading', async () => {
+  const f = workerFixture(); await enablePortal(f);
+  f.data['propio-original-layout-v1'] = { enabled: false, revision: 'current-layout-1234' };
+  await f.worker.message(portalPacket('authenticated', { call: 'idle', offline: true }), portalSender);
+  const packet = { kind: 'apply-portal-layout', revision: 'previous-layout-1234' };
+  assert.equal((await f.worker.message(packet, portalSender)).reason, 'layout-stale');
+  assert.equal(await f.worker.message(packet, { ...portalSender, frameId: 1 }), null);
+  assert.equal(await f.worker.message(packet, { ...portalSender, url: 'https://other.test/' }), null);
+  assert.equal(await f.worker.message(packet, sender), null);
+  assert.deepEqual(f.reloads, []);
+});
+
+test('original narrow header authenticates only its matching visible name and keeps call detection', () => {
+  const f = portalDocument(); const name = f.element('Synthetic User (12345)'), welcome = f.element('Welcome, Synthetic User (12345)', false);
+  f.document.welcome = welcome; f.document.controls = [f.element('Start Calls')]; f.document.statuses = [f.element('OFFLINE')];
+  const query = f.document.querySelector;
+  f.document.querySelector = selector => selector === 'app-header .app-interpreter-name' ? name : selector === 'app-header .header-welcome-message' ? welcome : query(selector);
+  assert.equal(readPortalObservation(f.document).session, 'authenticated');
+  assert.equal(offlineStartButton(f.document), f.document.controls[0]);
+  name.textContent = 'Different User (12345)'; assert.equal(readPortalObservation(f.document).session, 'unknown');
+  name.textContent = 'Synthetic User (12345)'; name.hidden = true; assert.equal(readPortalObservation(f.document).session, 'unknown');
 });

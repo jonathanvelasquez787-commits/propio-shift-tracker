@@ -1,16 +1,18 @@
 {
   "manifest_version": 3,
-  "name": "Propio · Tracker y resumen",
-  "description": "Conecta tu Shift Tracker y muestra, cuando quieras, llamadas, minutos y ganancias en el historial de Propio.",
-  "version": "2.2.1",
+  "name": "Propio · Tracker y vista original",
+  "description": "Conecta tu Shift Tracker y permite volver a la vista original de Propio.",
+  "version": "2.2.2",
   "minimum_chrome_version": "120",
   "permissions": ["storage", "webRequest", "alarms", "webNavigation"],
   "host_permissions": ["https://interpreters.propio-ls.com/*", "https://app.useinterpreter.com/*", "https://www.linguee.es/*", "https://www.linguee.com/*", "https://eventgw.twilio.com/*", "https://eventgw.us1.twilio.com/*", "https://eventgw.ie1.twilio.com/*", "https://eventgw.au1.twilio.com/*", "https://propio-shift-tracker.vercel.app/*"],
   "background": { "service_worker": "worker.js", "type": "module" },
   "icons": { "16": "icons/icon-16.png", "32": "icons/icon-32.png", "48": "icons/icon-48.png", "128": "icons/icon-128.png" },
-  "action": { "default_title": "Propio · Tracker y resumen", "default_popup": "popup.html", "default_icon": { "16": "icons/icon-16.png", "32": "icons/icon-32.png" } },
+  "action": { "default_title": "Propio · Tracker y vista original", "default_popup": "popup.html", "default_icon": { "16": "icons/icon-16.png", "32": "icons/icon-32.png" } },
   "content_scripts": [
-    { "matches": ["https://interpreters.propio-ls.com/*"], "js": ["portal-content.js", "summary-content.js"], "run_at": "document_idle" },
+    { "matches": ["https://interpreters.propio-ls.com/portal*"], "js": ["classic-portal.js"], "run_at": "document_start", "world": "MAIN" },
+    { "matches": ["https://interpreters.propio-ls.com/portal*"], "js": ["original-portal-content.js"], "run_at": "document_start" },
+    { "matches": ["https://interpreters.propio-ls.com/*"], "js": ["portal-content.js"], "run_at": "document_idle" },
     { "matches": ["https://propio-shift-tracker.vercel.app/*"], "js": ["tracker-content.js"], "run_at": "document_start" }
   ],
   "content_security_policy": { "extension_pages": "script-src 'self'; object-src 'none'" }
