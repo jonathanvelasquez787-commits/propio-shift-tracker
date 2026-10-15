@@ -75,11 +75,24 @@ export function readPortalObservation(document, armed = false) {
 
 export function createPortalObserver({ document, send, documentId, now = () => Date.now(), trustedClick = event => event.isTrusted }) {
   let stopped = false, armedUntil = 0, previousCall = null, candidate = null, candidateAt = 0, committed = null, pendingSignal = null;
+  let pendingAvailability = null, availabilityRevision = 0;
+  async function sendManualAvailability() {
+    const intent = pendingAvailability;
+    if (!intent) return;
+    try {
+      const result = await send({ kind: 'portal-manual-availability', documentId, action: intent.action });
+      if (result?.ok && pendingAvailability === intent) pendingAvailability = null;
+    } catch { /* Retry a native choice after the next confirmed observation. */ }
+  }
   function click(event) {
     if (!trustedClick(event)) return;
     const target = event.target?.closest?.('button,[role="button"],input,a');
     if (!visible(target) || readPortalObservation(document).session !== 'authenticated') return;
     const kind = controlKind(target);
+    if (kind === 'idle' && (target === offlineStartButton(document) || target === availableStopButton(document))) {
+      pendingAvailability = { action: target === availableStopButton(document) ? 'stop' : 'start', revision: ++availabilityRevision };
+      void sendManualAvailability();
+    }
     if (kind === 'signout') {
       // Send during capture, before the portal navigates away and destroys this
       // document. The worker waits for the resulting public-site navigation.
@@ -112,8 +125,11 @@ export function createPortalObserver({ document, send, documentId, now = () => D
     try {
       const offline = Boolean(offlineStartButton(document));
       const available = Boolean(availableStopButton(document));
+      const revision = availabilityRevision;
       const result = await send({ kind: 'portal-observation', documentId, ...observation, offline, available, ...(pendingSignal ? { signal: pendingSignal } : {}) });
       if (result?.ok) pendingSignal = null;
+      if (pendingAvailability) { await sendManualAvailability(); return result; }
+      if (revision !== availabilityRevision) return result;
       if (result?.prepare === true && offline) offlineStartButton(document)?.click();
       else if (result?.stopCalls === true && available) availableStopButton(document)?.click();
       return result;
