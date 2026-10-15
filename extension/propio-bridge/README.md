@@ -39,7 +39,7 @@ el diagnóstico técnico dentro de Detalles para soporte, cerrado por defecto.
 
 ## Sesión y Shift
 
-«Al comenzar mi turno» es una opción separada; el primer vínculo automático la prepara y después conserva tu elección. Lee el horario de la cuenta vinculada cuando el tracker está abierto y conserva ese plan hasta su fin. Con registro activo, sesión reconocida y un solo portal, a partir de la hora de inicio pulsa únicamente Start Calls si el botón habilitado y el estado Offline están confirmados. Sirve también al entrar tarde, mientras el turno no haya terminado. Respeta los Break/Lunch programados aunque no hayas iniciado una pausa en la tool; al terminar el intervalo puede comenzar la preparación pendiente. Exige que el tracker transmita el horario completo de pausas; con una versión anterior abierta espera a que se recargue. Si dejás pasar una llamada y volvés a Offline, reintenta con un intervalo mínimo de 15 segundos. Al conectar la primera llamada, registra la finalización de esta preparación y no la reactiva al recargar ni al apagar/encender la opción durante el mismo turno. Nunca pulsa Accept, Reject, Stop Calls ni controles de video/terceros; vos elegís qué tomar. Para permanecer Offline antes de la primera llamada, apagá la opción. No actúa con estado ambiguo, llamada activa, horarios faltantes o finalizados, día libre ni varias pestañas del portal.
+«Al comenzar mi turno» es una opción separada; el primer vínculo automático la prepara y después conserva tu elección. Lee el horario de la cuenta vinculada cuando el tracker está abierto y conserva ese plan hasta su fin. Con registro activo, sesión reconocida y un solo portal, a partir de la hora de inicio pulsa únicamente Start Calls si el botón habilitado y el estado Offline están confirmados. Sirve también al entrar tarde, mientras el turno no haya terminado. Respeta los Break/Lunch programados aunque no hayas iniciado una pausa en la tool; al terminar el intervalo puede comenzar la preparación pendiente. Exige que el tracker transmita el horario completo de pausas; con una versión anterior abierta espera a que se recargue. Si dejás pasar una llamada y volvés a Offline, reintenta con un intervalo mínimo de 15 segundos. Al conectar la primera llamada, registra la finalización de esta preparación y no la reactiva al recargar ni al apagar/encender la opción durante el mismo turno. Nunca pulsa Accept, Reject ni controles de video/terceros; vos elegís qué tomar. Stop Calls se usa únicamente al esperar entre llamadas. Un Stop manual pausa los automatismos. No actúa con estado ambiguo, llamada activa, horarios faltantes o finalizados, día libre ni varias pestañas del portal.
 
 Reconoce localmente el encabezado visible «Welcome, … (ID)» del portal. Con automático activado, la primera detección inicia el Shift; si ya estaba abierto, conserva su hora. Desde 1.5.1, pulsar Sign out y completar la redirección de esa pestaña a propio.com o www.propio.com termina el Shift vinculado, sin tener que abrir Login otra vez. El clic se comunica antes de abandonar el portal; el worker confirma la navegación aun cuando desaparece el script de la página. Usa webNavigation con filtros para esos dos hosts y no persiste direcciones. Un clic sin redirección, una visita desde la barra de direcciones, Back, recargar u otra pestaña no termina el turno. Volver al formulario visible `#loginform` sigue confirmando el cierre si la sesión expiró. Una llamada automática pendiente se cierra antes del turno con tiempo estimado hasta esa detección. No cierra llamadas manuales sin revisión.
 
@@ -47,7 +47,7 @@ Si activás la extensión con Propio ya conectado, registra desde la detección,
 
 ## Llamadas
 
-Combina las solicitudes exitosas allowlisted del portal/Twilio con una alternativa desde controles visibles en inglés/español: aceptar/contestar y rechazar, colgar/finalizar llamada, y estados explícitos de llamada conectada/terminada. Un clic en aceptar necesita confirmación posterior de conexión; Start Calls, disponibilidad, un rechazo y un final suelto nunca crean una llamada. El detector espera evidencia estable e ignora controles ocultos. La opción de disponibilidad solo puede pulsar Start Calls.
+Combina las solicitudes exitosas allowlisted del portal/Twilio con una alternativa desde controles visibles en inglés/español: aceptar/contestar y rechazar, colgar/finalizar llamada, y estados explícitos de llamada conectada/terminada. Un clic en aceptar necesita confirmación posterior de conexión; Start Calls, disponibilidad, un rechazo y un final suelto nunca crean una llamada. El detector espera evidencia estable e ignora controles ocultos. La disponibilidad usa Start Calls y, durante la espera, Stop Calls; nunca acepta llamadas.
 
 Ambas fuentes comparten el mismo estado e identificador aleatorio para evitar duplicados. Un inicio observado empieza el contador; su final guarda por la ruta existente de llamadas, ganancias y refuerzo positivo. Activar en mitad de una llamada no inventa su inicio. Tiempo y pago son estimados: el historial oficial permite corregirlos sin duplicar progreso. Offline no se interpreta como Break/Lunch.
 
@@ -71,6 +71,18 @@ Con tracker viejo, cerrado o sin lectura reciente, mantiene la espera y muestra
 el motivo. La selección y la barrera de desconexión sobreviven al worker.
 No acepta ni rechaza llamadas. Si una oferta pasa y vuelve a Not Available,
 reintenta Start Calls sin comenzar otra espera. La tool debe permanecer abierta.
+
+Un regreso de Break/Lunch apagado no es reemplazado por la espera. El regreso
+habilitado tiene prioridad sobre un ACW recién iniciado. Terminar temprano una
+pausa reconoce únicamente su bloque, sin omitir otra pausa distinta.
+
+Si pulsás Stop Calls manualmente, se pausa la disponibilidad automática, pero
+el registro continúa. Para reanudar, usá Start Calls manualmente o apagá
+«Pausar disponibilidad automática» en el popup. Esta elección se conserva al
+reiniciar. El interruptor pausa clics; no modifica la disponibilidad actual.
+Un tracker cerrado, antiguo o de otra cuenta no autoriza nuevos inicios.
+No hay coordinación global entre dos PCs: activá los iniciadores solo en una.
+Las decisiones de los 54 escenarios constan en docs/disponibilidad-casos-cotidianos.md.
 
 ## Recuperación del historial
 

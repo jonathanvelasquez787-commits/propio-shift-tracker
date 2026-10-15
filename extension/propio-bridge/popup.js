@@ -16,6 +16,7 @@ const labels = { history: 'Historial oficial recuperado', 'session-start': 'Sesi
 const send = packet => chrome.runtime.sendMessage(packet);
 labels['start-calls'] = 'Disponibilidad automática · Start Calls'; labels['pause-end'] = 'Fin de pausa programado';
 labels['spacing-stop'] = 'Espera entre llamadas · Stop Calls';
+labels['manual-stop'] = 'Pausaste la disponibilidad automática'; labels['manual-start'] = 'Reanudaste con Start Calls';
 const availabilityReasons = {
   connection: 'Esperando la conexión con Propio y el tracker.', schedule: 'La pestaña del tracker todavía no confirma el horario y los descansos.',
   'shift-ended': 'Fuera del turno: no pulsa Start Calls.', 'before-shift': 'Esperando la hora de inicio de tu turno.',
@@ -25,6 +26,8 @@ const availabilityReasons = {
   pause: 'Esperando que termine tu Break o Lunch.', spacing: 'Respetando tu espera entre llamadas.',
   'acw-update': 'Actualizá el tracker para usar su contador ACW.',
   'acw-pending': 'Esperando el ACW actualizado de tu tracker.',
+  'manual-paused': 'Disponibilidad automática pausada por vos. El registro de llamadas continúa.',
+  'pause-return-off': 'El regreso de esta pausa está apagado. Vos pulsás Start Calls para volver.',
   'first-done': 'La primera llamada ya fue tomada. El regreso de Break/Lunch sigue funcionando si está encendido.',
   off: 'No hay un iniciador pendiente.', available: 'Ya estás disponible en Propio.',
   'offline-control': 'Esperando Offline o Not Available con Start Calls disponible.',
@@ -53,6 +56,8 @@ async function refresh() {
   document.getElementById('portalStatus').textContent = !state.paired ? 'Esperando tu sesión en el tracker para vincularla automáticamente. La vista original funciona por separado.' : state.portal === 'authenticated' ? `Sesión reconocida. ${callStatus}` : state.portal === 'logged-out' ? 'Cierre de sesión confirmado en Propio.' : 'Abrí Propio para reconocer tu sesión.';
   toggle.checked = state.mode === 'auto'; toggle.disabled = busy || !state.paired;
   const prep = state.preparation, prepToggle = document.getElementById('prepareFirst');
+  document.getElementById('availabilityPaused').checked = prep?.availabilityPaused === true;
+  document.getElementById('availabilityPaused').disabled = busy || !state.paired;
   document.getElementById('availabilityStatus').textContent = availabilityReasons[prep?.waitReason] || 'Comprobando cuándo ponerte disponible.';
   const spacing = prep?.spacing || { enabled: false, minutes: 2 };
   document.getElementById('spacingEnabled').checked = spacing.enabled === true;
@@ -62,6 +67,8 @@ async function refresh() {
   minutesInput.disabled = busy || !state.paired;
   const remaining = Math.max(0, Math.ceil((Date.parse(spacing.waitUntil) - Date.now()) / 1000));
   document.getElementById('spacingStatus').textContent = !spacing.enabled ? 'Apagado. No agrega esperas entre llamadas.'
+    : prep?.availabilityPaused ? 'La disponibilidad automática está pausada por vos.'
+    : prep?.waitReason === 'pause-return-off' ? 'El regreso de esta pausa está apagado. Vos decidís cuándo volver.'
     : prep?.waitReason === 'pause' ? 'La espera no interrumpe tu Break o Lunch.'
     : prep?.waitReason === 'spacing' && remaining > 0 ? `Faltan ${Math.floor(remaining / 60)}:${String(remaining % 60).padStart(2, '0')} para volver a estar disponible.`
     : `Vuelve a estar disponible cuando el ACW de tu tracker llega a ${spacing.minutes} minuto(s).`;
@@ -124,6 +131,7 @@ document.getElementById('open').addEventListener('click', () => act({ kind: 'ope
 document.getElementById('pair').addEventListener('click', () => act({ kind: 'pair' }));
 document.getElementById('automatic').addEventListener('change', event => act({ kind: 'mode', mode: event.target.checked ? 'auto' : 'observe' }));
 document.getElementById('prepareFirst').addEventListener('change', event => act({ kind: 'prepare-first', enabled: event.target.checked }));
+document.getElementById('availabilityPaused').addEventListener('change', event => act({ kind: 'pause-availability', paused: event.target.checked }));
 document.getElementById('refreshTracker').addEventListener('click', () => act({ kind: 'refresh-tracker' }));
 const saveSpacing = () => act({ kind: 'spacing', enabled: document.getElementById('spacingEnabled').checked, minutes: Number(document.getElementById('spacingMinutes').value) });
 document.getElementById('spacingEnabled').addEventListener('change', saveSpacing);

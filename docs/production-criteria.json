@@ -1314,6 +1314,40 @@
             "extension update reloads only an existing helper to execute the new setup"
         ]
       }]
+    },
+    {
+      "id": "availability-day-cases",
+      "area": "Prioridades de disponibilidad durante la jornada",
+      "acceptance": "Horario, pausas y elección manual preceden a ACW; tracker ausente no conserva autorización; ofertas y llamadas no se interrumpen.",
+      "sources": [
+        "extension/propio-bridge/bridge-worker.js",
+        "extension/propio-bridge/portal-observer.js",
+        "extension/propio-bridge/popup.js"
+      ],
+      "tests": [
+        {
+          "file": "tests/availability-day-cases.test.mjs",
+          "namedCases": [
+            "disabled Break and Lunch return cannot be bypassed by elapsed ACW or a first-call initiator",
+            "enabled pause return wins over a short ACW but cannot skip a different scheduled pause",
+            "explicitly ending a matching pause early overrides that scheduled block only",
+            "manual Stop pauses availability across reload and worker restart without stopping call recording",
+            "explicit popup pause preserves all preferences and blocks timed pause completion until resumed",
+            "manual availability messages require this authenticated top-level portal document",
+            "pausing availability cancels an undelivered timed pause closure while preserving call events",
+            "closing or switching the tracker discards cached readiness even with an empty delivery queue",
+            "changing cooldown minutes uses the same ACW and disabling it performs no availability action",
+            "rejected offers do not restart elapsed ACW and accepted calls are never interrupted",
+            "resume after suspension checks the current shift, pauses and clock before one action",
+            "future ACW snapshots cannot advance availability after the PC clock moves backward",
+            "a real early call consumes first-call preparation but never overrides the planned shift boundary",
+            "manual acceptance during cooldown creates one new wait after that call ends",
+            "closing and reopening the same scheduled shift does not repeat its first-call initiator",
+            "overnight cooldown survives midnight and a late pause return still respects shift end",
+            "official-history changes follow the visible ACW instead of an independent elapsed timer"
+          ]
+        }
+      ]
     }
   ],
   "limits": [

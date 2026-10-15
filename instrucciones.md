@@ -317,19 +317,26 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
-Vista original nativa de Propio recuperada y comprobada en Chrome Jonathan,
-con interruptor persistente y sin la barra de resumen unificada. El 15/10 el
-usuario priorizó corregir Stop Calls tras colgar y basar la espera entre llamadas
-en el ACW visible, incluso si ya lleva segundos. Esta tarea queda autorizada;
-la revisión completa de los otros casos cotidianos sigue pendiente. El usuario
-confirmó después que las llamadas automáticas ya funcionan en su sesión real.
-Autorizó separar conexión anticipada y trabajo: horario o primera llamada real
-anticipada, conservando conexión, llamadas y ganancias; inicios manuales explícitos
-conservan su hora. Esta corrección se entrega en v616 sin cambiar la extensión.
-La inspección de Windows fallaba por reconocimiento de URL; navegador integrado
-y conexión oficial Chrome Jonathan ya permiten leer el portal real. No insistir
-en Sky para páginas del navegador. Usuario recargó y activó la opción; DOM y
-captura real confirman app-daily-rollup, turquesa e iconos nativos, sin resumen.
+Vista original nativa recuperada y confirmada en Chrome Jonathan; el usuario
+confirmó también las llamadas automáticas en su sesión real. App 616 publicada:
+conexión anticipada separada de trabajo y ACW, con llamada real temprana y
+sesiones manuales conservadas.
+
+El 15/10 pidió terminar lo pendiente. Revisión acotada de los 54 casos de
+la disponibilidad completada en docs/disponibilidad-casos-cotidianos.md;
+no activa el protocolo de auditoría profunda. Extensión 2.2.4 corrige regreso
+apagado de pausas, plan guardado con tracker cerrado, cierre temprano frente
+a pausas ajenas y Stop manual. Pausa persistente de disponibilidad en popup,
+sin detener el registro ni cambiar las otras preferencias. El regreso de
+pausa habilitado sigue teniendo prioridad sobre una espera nueva.
+Límites explícitos: no hay exclusión entre dos PCs, ni reloj servidor para
+certificar cambios arbitrarios de hora/zona. Usar iniciadores en una sola PC.
+No afirmar que se probaron llamadas reales adicionales o todas sus variantes.
+
+Chrome oficial volvió a responder el 15/10: cuatro páginas correctas y altura
+derecha reducida observadas, vista original intacta. Tracker en Lunch, sin llamada
+activa. El contenedor del aviso de conflicto existe, pero no tiene clase show:
+no es un aviso activo. No se sobrescribieron datos.
 
 Arranque y distribución: configuración anterior conservada.
 El 14/10 quitó todas las franjas: abrir Jonathan al iniciar sesión en Windows
@@ -345,7 +352,7 @@ coincidente con su referencia, sin leer ni modificar contenido. Acceso de Inicio
 para ese archivo creado y verificado por destino/argumentos, autorizado el 14/10.
 2.2.1 permite altura personal de la ventana derecha; pública conserva altura
 completa. Instalación real respaldada y todos los archivos comparados por hash.
-Aplicación real de la nueva altura se verifica en el cierre. Siguiente reinicio físico sigue pendiente; no inferirlo desde los tests.
+El 15/10 se observó ventana derecha de 532 px frente a izquierda de 860 px y las cuatro URLs correctas. Accesos de Inicio/escritorio verificados de nuevo por destino y argumentos, sin VBS. Siguiente reinicio físico y ubicación nativa de notas en ese arranque siguen pendientes; no inferirlos desde tests ni provocar un reinicio durante la jornada.
 El usuario confirmó que al terminar Break regresó la recepción de llamadas:
 ese iniciador funciona en su sesión real. No modificar iniciadores en esta tarea.
 
@@ -907,7 +914,7 @@ La aplicación funciona en producción con estas bases vigentes:
   el de la guía es nofollow. La extensión se instala desde archivo según el
   propietario, por lo que no hay ficha propia de Chrome Web Store que editar.
   Detalle en `docs/seo.md`.
-- La versión actual de la app es 616; la extensión unificada es 2.2.3. El build
+- La versión actual de la app es 617; la extensión unificada es 2.2.4. El build
   del resumen independiente 1.0.5 queda compatible para instalaciones anteriores.
   Refuerzo positivo puede funcionar con Logros apagados. La auditoría profunda del
   8 de octubre corrigió seis fallos; la ampliación corrigió cinco más en arranque,
@@ -932,6 +939,29 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v617 / Extensión 2.2.4 — Prioridades y elección manual en disponibilidad.**
+
+- Un regreso de Break/Lunch apagado bloquea también primera llamada y spacing
+  hasta una llamada real posterior. Regreso habilitado conserva su prioridad.
+- Stop Calls manual pausa automatismos, sin confundir los clics sintéticos de
+  la extensión. Start manual o interruptor del popup reanudan; pausa persistida
+  y registro conservado. Respuestas atrasadas no deshacen una decisión manual.
+- Sin tracker actual/único se descarta el plan guardado, incluso sin cola.
+  Cierre anticipado de pausa solo omite su bloque correspondiente; un regreso
+  pendiente no omite otra pausa programada. ACW futuro no autoriza iniciar.
+- Pausar cancela cierres de pausa no entregados, conservando eventos de llamadas.
+  Revisión de los 54 casos documenta las decisiones y límites de dos PCs/reloj.
+- 786 pruebas completas correctas; 18 regresiones nuevas en total. Build app/puente y 2.260 textos correctos, 21 criterios,
+  67 suites y 73 módulos fuente. Navegador aislado: ciclo completo con ACW 00:50,
+  reinicio, Stop manual persistido y Start manual; popup conserva elección y
+  vista original en ambos temas, sin errores ni overflow. CI/deploy por SHA.
+- La conexión oficial rechaza chrome://extensions por su política de URL.
+  No eludir por CDP, Sky ni otras superficies. Se copiaron y verificaron 19
+  archivos con respaldo y preferencias personales intactas. Usuario confirmó
+  recarga de extensión, Propio y tracker; se observa portal Offline y sin aviso
+  activo de conflicto en el tracker. No se provocaron llamadas reales.
+
 
 **v616 — Conexión anticipada separada del trabajo y ACW.**
 
@@ -976,28 +1006,3 @@ La aplicación funciona en producción con estas bases vigentes:
 - Verificación en Chrome personal bloqueada por fallo de la conexión del navegador
   al cargar su política de solicitudes; no se provocaron llamadas reales. Archivos
   se actualizan con respaldo, sin cambiar almacenamiento ni preferencias personales.
-
-
-
-**Extensión 2.2.2 — Vista original opcional y retiro del resumen unificado.**
-
-- Interruptor del popup, por perfil y apagado por defecto, para elegir la vista
-  nativa antigua que Propio todavía distribuye. Sin recrear HTML/CSS ni totales.
-- Se sustituye solo la lectura de una opción de interfaz reconocida; serializar
-  conserva su valor real. Cachés nativos, otras opciones y datos de llamadas
-  quedan intactos. Formatos desconocidos conservan el comportamiento del portal.
-- Recarga pospuesta hasta Offline confirmado, sin llamadas/ofertas, un portal y
-  observación reciente. Revisión guardada por pestaña evita repetir una recarga.
-- Retirados barra/cálculo/preferencias del resumen unificado. Historial, cola,
-  vínculo y registro continúan independientes. Paquete antiguo separado intacto.
-- Nombre visible actualizado a «Propio · Tracker y vista original»; ancho, icono
-  y temas conservados. Reconocimiento del encabezado original angosto confirma
-  nombre visible y saludo coincidentes dentro de app-header.
-- 754 pruebas completas, 70 comprobaciones finales del área y builds correctos.
-  Popup compilado: persistencia, ambas elecciones, rechazo de guardado y ambos
-  temas sin overflow ni errores. Archivos preparados con respaldo y hashes,
-  resumen viejo archivado. Usuario recargó la extensión y activó la opción.
-  Chrome real confirma barra turquesa nativa, Calls/Minutes/Pay, iconos e historial;
-  sin resumen anterior, Start Calls habilitado en Offline y demás controles
-  deshabilitados como corresponde. No se provocó una llamada para verificar.
-  Publicación se cierra con CI y despliegue verificados por SHA.

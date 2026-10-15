@@ -374,6 +374,21 @@ function portalDocument() {
     getClientRects: () => shown ? [{}] : [], closest: selector => selector.startsWith('button') ? document.controls[0] : null, getAttribute: () => null });
   return { document, element, click: isTrusted => listeners.get('click')?.({ isTrusted, target: document.controls[0] }) };
 }
+
+test('only a trusted native availability click pauses automation and delayed replies cannot undo it', async () => {
+  const f = portalDocument(), sent = []; let clock = 10000, resolveObservation;
+  f.document.welcome = f.element('Welcome, Synthetic User (12345)');
+  const stop = f.element('Stop Calls'); f.document.controls = [stop]; f.document.statuses = [f.element('Available')];
+  const observer = createPortalObserver({ document: f.document, documentId: 'manual-observer-doc-123', now: () => clock,
+    send: async packet => { sent.push(packet); return packet.kind === 'portal-observation' ? new Promise(resolve => { resolveObservation = resolve; }) : { ok: true }; } });
+  f.click(false); assert.equal(sent.length, 0);
+  await observer.sample(); clock += 1000;
+  const pending = observer.sample(); f.click(true);
+  assert.equal(sent.filter(packet => packet.kind === 'portal-manual-availability' && packet.action === 'stop').length, 1);
+  let clicks = 0; stop.click = () => clicks++;
+  resolveObservation({ ok: true, stopCalls: true }); await pending;
+  assert.equal(clicks, 0); observer.stop();
+});
 test('portal UI requires visible authentication and explicit call evidence; availability alone never becomes a call', () => {
   const f = portalDocument(); f.document.welcome = f.element('Welcome, Synthetic User (12345)', false);
   f.document.login = f.element('Interpreter Login', false);
