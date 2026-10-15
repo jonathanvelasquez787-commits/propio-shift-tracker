@@ -34,6 +34,8 @@
         ? packet.plan.scheduledPauses.map(slot => ({ type: slot?.type, startedAt: slot?.startedAt, endedAt: slot?.endedAt })) : [];
       if (plan) plan.scheduleVerified = Array.isArray(packet.plan.scheduledPauses) && packet.plan.scheduledPauses.length <= 100;
       if (plan) plan.lastCallEndedAt = typeof packet.plan.lastCallEndedAt === 'string' ? packet.plan.lastCallEndedAt : null;
+      if (plan && Object.prototype.hasOwnProperty.call(packet.plan, 'acw')) plan.acw = packet.plan.acw === null ? null
+        : { startedAt: packet.plan.acw?.startedAt, observedAt: packet.plan.acw?.observedAt };
       if (plan) for (const key of ['pause','lastPause']) {
         const pause = packet.plan[key];
         plan[key] = pause && ['break','lunch'].includes(pause.type) && typeof pause.startedAt === 'string'

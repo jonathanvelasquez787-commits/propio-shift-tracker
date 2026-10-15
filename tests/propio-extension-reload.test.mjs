@@ -10,7 +10,8 @@ function fixture() {
   window.top = window;
   const runtime = { get id() { return alive ? 'test-extension' : undefined; }, sendMessage() { announcements++; if (throwSend) throw new Error('Extension context invalidated.'); if (transient) { transient = false; throw Error('Worker still starting'); } return Promise.resolve({ok:true}); }, onMessage: { addListener: fn => { contentListener = fn; }, removeListener: () => { contentListener = null; } } };
   vm.runInNewContext(source, { Date: {now:()=>clock}, window, location: { origin: 'https://propio-shift-tracker.vercel.app' }, chrome: { runtime }, crypto: { randomUUID: () => 'request-12345678' }, setInterval: fn => { interval = fn; return 1; }, clearInterval: () => { interval = null; }, setTimeout: fn => { const id = timeouts.size + 1; timeouts.set(id, fn); return id; }, clearTimeout: id => timeouts.delete(id) });
-  return { ready() { listener?.({ source: window, origin: 'https://propio-shift-tracker.vercel.app', data: { protocol: 'pst-propio-bridge/v1', direction: 'app', kind: 'ready', accountScope: 'a'.repeat(64), nonce: 'nonce-1234567890' } }); },
+  return { ready(plan) { listener?.({ source: window, origin: 'https://propio-shift-tracker.vercel.app', data: { protocol: 'pst-propio-bridge/v1', direction: 'app', kind: 'ready', accountScope: 'a'.repeat(64), nonce: 'nonce-1234567890', plan } }); },
+    identify() { let result; contentListener?.({ kind: 'identify-tracker' }, { id: 'test-extension' }, value => { result = value; }); return JSON.parse(JSON.stringify(result)); },
     reload() { throwSend = true; }, invalidate() { alive = false; }, hello() { interval?.(); },
     transientOnce() { transient = true; }, advance(ms) { clock += ms; }, get announcements() { return announcements; },
     deliver(respond) { contentListener?.({ kind:'deliver-event', accountScope:'a'.repeat(64) }, { id:'test-extension' }, respond); },
@@ -25,6 +26,15 @@ test('tracker readiness retries a transient startup failure without a user pairi
   f.ready();await settle();assert.equal(f.announcements,2);
   f.ready();assert.equal(f.announcements,2);
   f.advance(10000);f.ready();await settle();assert.equal(f.announcements,3);
+});
+
+test('tracker content forwards only ACW timestamps and distinguishes an older plan from an inactive counter', () => {
+  const f = fixture(), plan = { startAt: '2026-10-15T12:00:00.000Z', endAt: '2026-10-15T20:00:00.000Z', scheduledPauses: [], hasCall: true };
+  const acw = { startedAt: '2026-10-15T13:30:00.000Z', observedAt: '2026-10-15T13:30:50.000Z' };
+  f.ready({ ...plan, acw: { ...acw, unexpected: 'discard-this' } });
+  assert.deepEqual(f.identify().plan.acw, acw);
+  f.ready({ ...plan, acw: null }); assert.equal(f.identify().plan.acw, null);
+  f.ready(plan); assert.equal(Object.hasOwn(f.identify().plan, 'acw'), false);
 });
 test('reloading the extension handles synchronous context invalidation without leaving a hello loop', async () => {
   const f = fixture(); f.reload(); assert.doesNotThrow(() => f.ready());

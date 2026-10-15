@@ -7987,8 +7987,10 @@ export function getPropioBridgePlan() {
     .map(slot => ({ type: String(slot.type).toLowerCase(), startedAt: Math.max(start.getTime(), Date.parse(slot.startedAt)), endedAt: Math.min(end.getTime(), Date.parse(slot.endedAt)) }))
     .filter(slot => slot.startedAt < slot.endedAt)
     .map(slot => ({ type: slot.type, startedAt: new Date(slot.startedAt).toISOString(), endedAt: new Date(slot.endedAt).toISOString() }));
+  const acwStart = computeCurrentAcwStart();
   return { startAt: start.toISOString(), endAt: end.toISOString(),
     scheduledPauses,
+    acw: acwStart ? { startedAt: acwStart.toISOString(), observedAt: day.toISOString() } : null,
     lastCallEndedAt: [state.lastCallEndedAt, ...calls.map(call => call.endISO)]
       .filter(value => Date.parse(value) >= since && Date.parse(value) <= Math.min(day.getTime(), end.getTime()))
       .sort((a, b) => Date.parse(b) - Date.parse(a))[0] || null,
