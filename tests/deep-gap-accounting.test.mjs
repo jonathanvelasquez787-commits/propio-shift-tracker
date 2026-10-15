@@ -21,6 +21,7 @@ function harness(pauses = [], annotation = null) {
     'gapClassification', 'dayGapRows', 'dayGapTotals', 'manualGapPauseIntervals',
     'mergeOverlappingPauseEntries', 'dayPausesForSlotStats', 'subtractCallsFromPauseInterval',
     'actualPauseIntervalsForDay', 'pauseDurationExcludingCalls', 'pauseAssignmentCache'].map(name => declarations.get(name)).join('\n'), h);
+  h.dayWorkSessions = () => h.dayShiftSessions();
   return h;
 }
 test('a short real Break inside a longer gap preserves residual ACW and counts only actual paused minutes', () => {

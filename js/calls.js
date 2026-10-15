@@ -6,7 +6,7 @@ import { callFeedbackSilenced, withSilentCallFeedback } from './call-feedback.js
 
 let HIGHER_RATE_TIERS, MAX_CALL_DURATION_MIN, appConfirm, autoStartShiftFromCalls, callDateKeyFromValue, callDedupeKey;
 let callsForDay, callsOverlap, closeModal, connectedMinutesForDay, convertedAmountText, dayAdherence;
-let dayEvents, dayGapRows, dayKeyFromIsoDate, dayShiftBounds, escapeHtml, financeConvertedInline;
+let dayEvents, dayGapRows, dayKeyFromIsoDate, dayShiftBounds, dayWorkSessions, escapeHtml, financeConvertedInline;
 let financeConvertedNote, financeRunAutoFillCascade, formatCallDayLabel, formatDuration, formatHHMM;
 let formatMinutes, gapLabelText, getActiveDayKey, higherRateBonusForCall, higherRateTierBadgeHtml;
 let iconHtml, importedCallStats, isoDateFromDayKey, makeLocalId, money, onGameCallSaved, onGameCallsChanged, openModal;
@@ -16,7 +16,7 @@ let toDateFromInputs, toast, todayCallDateKey, playCallSavedSound;
 export function configureCallsContext(context) {
   ({ HIGHER_RATE_TIERS, MAX_CALL_DURATION_MIN, appConfirm, autoStartShiftFromCalls, callDateKeyFromValue, callDedupeKey,
     callsForDay, callsOverlap, closeModal, connectedMinutesForDay, convertedAmountText, dayAdherence,
-    dayEvents, dayGapRows, dayKeyFromIsoDate, dayShiftBounds, escapeHtml, financeConvertedInline,
+    dayEvents, dayGapRows, dayKeyFromIsoDate, dayShiftBounds, dayWorkSessions, escapeHtml, financeConvertedInline,
     financeConvertedNote, financeRunAutoFillCascade, formatCallDayLabel, formatDuration, formatHHMM,
     formatMinutes, gapLabelText, getActiveDayKey, higherRateBonusForCall, higherRateTierBadgeHtml,
     iconHtml, importedCallStats, isoDateFromDayKey, makeLocalId, money, onGameCallSaved, onGameCallsChanged, openModal,
@@ -648,16 +648,25 @@ function dayActionRows(dayKey) {
         durationMin = Math.max(0, (new Date(best.endedAt).getTime() - new Date(best.startedAt).getTime()) / 60000);
       }
     }
+    const connection = e.type === 'shift' && String(e.meta || '').toLowerCase() === 'propio';
     rows.push({
       ts: e.ts,
-      badgeLabel: e.type === 'shift' ? translateText('Shift') : e.type === 'break' ? translateText('Break') : e.type === 'lunch' ? translateText('Lunch') : translateText('Importación'),
+      badgeLabel: connection ? translateText('Conexión') : e.type === 'shift' ? translateText('Shift') : e.type === 'break' ? translateText('Break') : e.type === 'lunch' ? translateText('Lunch') : translateText('Importación'),
       badgeClass: `type-${e.type}`,
-      detail: e.title,
+      detail: connection ? (/iniciado/i.test(e.title) ? translateText('Conexión a Propio detectada') : translateText('Conexión a Propio finalizada')) : e.title,
       note: '',
       durationMin,
       editable: false,
       gapKey: null,
     });
+  });
+
+  const connectionStarts = dayEvents(normalized).filter(event => event.type === 'shift' && /iniciado/i.test(event.title || '') &&
+    String(event.meta || '').toLowerCase() === 'propio').map(event => Date.parse(event.ts));
+  if (connectionStarts.length) dayWorkSessions(normalized).forEach(session => {
+    if (!connectionStarts.includes(session.connectionStart.getTime())) return;
+    rows.push({ ts: session.start.toISOString(), badgeLabel: translateText('Shift'), badgeClass: 'type-shift',
+      detail: translateText('Inicio de turno'), note: '', durationMin: null, editable: false, gapKey: null });
   });
 
   dayGapRows(normalized).forEach(g => {

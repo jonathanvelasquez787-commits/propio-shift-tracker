@@ -2449,5 +2449,12 @@
   "s_6b75c5eb": "{minutes} minutes of work have passed without calls · you can resume at your own pace",
   "s_98ca10b0": "Repeat while I remain without calls",
   "s_adf04ef1": "Save reminder",
-  "s_ee55e877": "Choose a whole number between 1 and 240 minutes."
+  "s_ee55e877": "Choose a whole number between 1 and 240 minutes.",
+  "s_09fa5f7d": "Connected",
+  "s_520ef3ad": "Propio connection detected",
+  "s_6be44c9c": "Connection",
+  "s_a4b9c851": "Propio connection ended",
+  "s_c1e967e9": "On shift: {{v1}}",
+  "s_c6b748d4": "Connection time, including early connection",
+  "s_f62e7856": "Shift time, excluding early connection"
 }

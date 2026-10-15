@@ -321,7 +321,11 @@ Vista original nativa de Propio recuperada y comprobada en Chrome Jonathan,
 con interruptor persistente y sin la barra de resumen unificada. El 15/10 el
 usuario priorizó corregir Stop Calls tras colgar y basar la espera entre llamadas
 en el ACW visible, incluso si ya lleva segundos. Esta tarea queda autorizada;
-la revisión completa de los otros casos cotidianos sigue pendiente.
+la revisión completa de los otros casos cotidianos sigue pendiente. El usuario
+confirmó después que las llamadas automáticas ya funcionan en su sesión real.
+Autorizó separar conexión anticipada y trabajo: horario o primera llamada real
+anticipada, conservando conexión, llamadas y ganancias; inicios manuales explícitos
+conservan su hora. Esta corrección se entrega en v616 sin cambiar la extensión.
 La inspección de Windows fallaba por reconocimiento de URL; navegador integrado
 y conexión oficial Chrome Jonathan ya permiten leer el portal real. No insistir
 en Sky para páginas del navegador. Usuario recargó y activó la opción; DOM y
@@ -903,7 +907,7 @@ La aplicación funciona en producción con estas bases vigentes:
   el de la guía es nofollow. La extensión se instala desde archivo según el
   propietario, por lo que no hay ficha propia de Chrome Web Store que editar.
   Detalle en `docs/seo.md`.
-- La versión actual de la app es 615; la extensión unificada es 2.2.3. El build
+- La versión actual de la app es 616; la extensión unificada es 2.2.3. El build
   del resumen independiente 1.0.5 queda compatible para instalaciones anteriores.
   Refuerzo positivo puede funcionar con Logros apagados. La auditoría profunda del
   8 de octubre corrigió seis fallos; la ampliación corrigió cinco más en arranque,
@@ -928,6 +932,28 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v616 — Conexión anticipada separada del trabajo y ACW.**
+
+- La sesión de Propio conserva timestamps/eventos/duración de conexión. El trabajo
+  empieza al mayor entre conexión e inicio programado; una llamada real anticipada
+  acredita trabajo desde su inicio. Un inicio manual explícito conserva su intención.
+- ACW en vivo y exportado al puente, huecos de llamadas, adherencia y progreso de
+  turno usan sesiones de trabajo. Conectado conserva las sesiones originales y
+  llamadas externas. En turno muestra presencia laboral sin duplicar intervalos.
+- Historial distingue Conexión a Propio e Inicio de turno usando filas existentes;
+  el primer hueco usa el inicio laboral y conserva su clave para no perder notas.
+  Recalcula los registros ya guardados sin cambiar datos, ingresos ni recibos.
+- Cierre antes del horario no inventa trabajo. Días libres sin turno planeado,
+  llegada tardía, medianoche y turnos múltiples mantienen sus reglas y límites.
+  Primera llamada automática sigue esperando el horario; extensión sigue 2.2.3.
+- 768 pruebas completas y 26 enfocadas correctas, incluidas cinco regresiones
+  nuevas sobre conexión/trabajo. Traducciones ES/EN actualizadas. App compilada:
+  cinco combinaciones ES/EN, oscuro/claro y 390/560/1280 px, incluyendo llamada
+  anticipada, correctas; conexión, ingresos y datos originales conservados, sin
+  errores ni overflow horizontal. Publicación y despliegue se cierran por SHA.
+
+
 
 **v615 / Extensión 2.2.3 — Espera desde ACW y controles nativos de disponibilidad.**
 
@@ -975,20 +1001,3 @@ La aplicación funciona en producción con estas bases vigentes:
   sin resumen anterior, Start Calls habilitado en Offline y demás controles
   deshabilitados como corresponde. No se provocó una llamada para verificar.
   Publicación se cierra con CI y despliegue verificados por SHA.
-
-
-**Extensión 2.2.1 — Tracker arriba y notas abajo en la instalación personal.**
-
-- Altura opcional `rightPaneHeightRatio` entre 0.4 y 1: izquierda completa,
-  tracker/Linguee arriba; altura pública completa por defecto. Preferencias
-  inválidas o inaccesibles conservan el comportamiento anterior.
-- Lectura de preferencias sin caché y compensación Windows incluso si el
-  organizador empieza maximizado. Sin permisos adicionales ni cambios al puente.
-- Dos regresiones nuevas de geometría, orden y carga de preferencias; 38
-  pruebas de distribución/perfil, 739 pruebas completas y build correctos.
-  Archivos reales instalados con respaldo y hashes; no acredita un reinicio.
-- Archivo de notas personal abierto en Bloc de notas en la ubicación pedida.
-  Usuario autorizó su inicio junto a Chrome; acceso de Inicio verificado por
-  lectura. Rutas personales y archivo no se distribuyen en el repositorio.
-- Usuario confirmó la distribución 2.2.0 en pantalla. Aplicación real de la
-  nueva altura y siguiente arranque de Windows se comprueban por separado.
