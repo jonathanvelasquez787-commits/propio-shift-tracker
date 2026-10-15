@@ -352,7 +352,7 @@ coincidente con su referencia, sin leer ni modificar contenido. Acceso de Inicio
 para ese archivo creado y verificado por destino/argumentos, autorizado el 14/10.
 2.2.1 permite altura personal de la ventana derecha; pública conserva altura
 completa. Instalación real respaldada y todos los archivos comparados por hash.
-El 15/10 se observó ventana derecha de 532 px frente a izquierda de 860 px y las cuatro URLs correctas. Accesos de Inicio/escritorio verificados de nuevo por destino y argumentos, sin VBS. Siguiente reinicio físico y ubicación nativa de notas en ese arranque siguen pendientes; no inferirlos desde tests ni provocar un reinicio durante la jornada.
+El 15/10 se observó ventana derecha de 532 px frente a izquierda de 860 px y las cuatro URLs correctas. Accesos de Inicio/escritorio verificados de nuevo por destino y argumentos, sin VBS. El usuario confirmó después que funciona bien al reiniciar. El arranque queda cerrado por su confirmación, sin atribuir al agente una prueba física adicional.
 El usuario confirmó que al terminar Break regresó la recepción de llamadas:
 ese iniciador funciona en su sesión real. No modificar iniciadores en esta tarea.
 
@@ -914,7 +914,7 @@ La aplicación funciona en producción con estas bases vigentes:
   el de la guía es nofollow. La extensión se instala desde archivo según el
   propietario, por lo que no hay ficha propia de Chrome Web Store que editar.
   Detalle en `docs/seo.md`.
-- La versión actual de la app es 617; la extensión unificada es 2.2.4. El build
+- La versión actual de la app es 617; la extensión unificada es 2.2.5. El build
   del resumen independiente 1.0.5 queda compatible para instalaciones anteriores.
   Refuerzo positivo puede funcionar con Logros apagados. La auditoría profunda del
   8 de octubre corrigió seis fallos; la ampliación corrigió cinco más en arranque,
@@ -939,6 +939,20 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**Extensión 2.2.5 — Pausa visible y opciones de automatización.**
+
+- Pausar disponibilidad automática y su estado quedan fuera del desplegable,
+  visibles cuando está cerrado. Se renombra a Más opciones de automatización.
+- Reordenamiento solicitado por el usuario; mismos ids, listeners, preferencias
+  y lógica. No cambia el worker, las llamadas ni la distribución de ventanas.
+- 81 pruebas enfocadas y build del puente correctos. Popup compilado en claro
+  y oscuro: pausa visible con opciones cerradas, apertura de opciones,
+  persistencia, rechazo de guardado de vista original y cero errores/overflow.
+- Archivos se actualizan con respaldo, conservando preferencias personales.
+  La conexión bloquea chrome://extensions; no eludir y no recargar páginas de
+  llamadas para este cambio de popup. Activación nativa requiere recarga manual.
+
 
 **v617 / Extensión 2.2.4 — Prioridades y elección manual en disponibilidad.**
 
@@ -982,27 +996,3 @@ La aplicación funciona en producción con estas bases vigentes:
   cinco combinaciones ES/EN, oscuro/claro y 390/560/1280 px, incluyendo llamada
   anticipada, correctas; conexión, ingresos y datos originales conservados, sin
   errores ni overflow horizontal. Publicación y despliegue se cierran por SHA.
-
-
-
-**v615 / Extensión 2.2.3 — Espera desde ACW y controles nativos de disponibilidad.**
-
-- Se reconoce Call Status: Available/Wrap Up para Stop Calls y Offline/Not
-  Available para Start Calls. Ringing/Enter Code no permiten tocar controles.
-- La tool anuncia el mismo inicio que usa computeCurrentAcwStart para el chip;
-  no se lee ni reinicia el texto del reloj. Umbral >= minutos configurados:
-  ACW 00:50 con tres minutos deja 02:10; saltar a 03:01 también permite iniciar.
-- Horario real y pausas se evalúan antes; el ACW de un login temprano no adelanta
-  la primera llamada ni agrega minutos al inicio programado. El regreso de pausa
-  activado conserva su prioridad. Solo la espera posterior a llamadas usa ACW.
-- Snapshot reciente del tracker y posterior a la última desconexión observado;
-  uno viejo, faltante o inválido mantiene Stop Calls sin inventar otro contador.
-  Plan actualizado también durante la entrega de eventos, sin perder preferencias,
-  cuenta, cola, vista original ni datos. Popup ofrece refrescar tracker antiguo.
-- Pruebas nuevas de estados nativos, ACW adelantado, cruces de umbral, horario,
-  pausa, plan real, whitelisting y snapshots. QA compilado aislado: login temprano,
-  primer Start a horario, llamada sintética, Stop tras Wrap Up, Not Available,
-  ACW 00:50 y siguiente Start tras 02:10, con reinicio del worker y cero errores.
-- Verificación en Chrome personal bloqueada por fallo de la conexión del navegador
-  al cargar su política de solicitudes; no se provocaron llamadas reales. Archivos
-  se actualizan con respaldo, sin cambiar almacenamiento ni preferencias personales.
