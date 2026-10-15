@@ -25,7 +25,13 @@ export function validateBridgePlan(value, now = Date.now()) {
     return { type: input.type, startedAt: new Date(started).toISOString(),
       [completed ? 'endedAt' : 'endsAt']: Number.isFinite(ended) && ended > started && ended - started <= BRIDGE_MAX_AGE && (!completed || ended <= now) ? new Date(ended).toISOString() : null };
   };
+  const acwStart = Date.parse(value.acw?.startedAt), acwObserved = Date.parse(value.acw?.observedAt);
+  const acw = typeof value.acw?.startedAt === 'string' && typeof value.acw?.observedAt === 'string' &&
+    Number.isFinite(acwStart) && Number.isFinite(acwObserved) && acwStart >= start - BRIDGE_MAX_AGE && acwStart <= acwObserved &&
+    acwStart < end && acwObserved <= now + 1000 && now - acwObserved <= BRIDGE_MAX_AGE
+      ? { startedAt: new Date(acwStart).toISOString(), observedAt: new Date(acwObserved).toISOString() } : null;
   return { startAt: new Date(start).toISOString(), endAt: new Date(end).toISOString(), hasCall: value.hasCall === true, ended: value.ended === true,
+    acw, acwVerified: value.acwVerified !== false && (value.acw === null || !!acw),
     lastCallEndedAt: typeof value.lastCallEndedAt === 'string' && Date.parse(value.lastCallEndedAt) >= start && Date.parse(value.lastCallEndedAt) <= Math.min(now, end) ? new Date(value.lastCallEndedAt).toISOString() : null,
     scheduledPauses, scheduleVerified: Array.isArray(value.scheduledPauses) && value.scheduleVerified !== false,
     pause: pause(value.pause, false), lastPause: pause(value.lastPause, true) };

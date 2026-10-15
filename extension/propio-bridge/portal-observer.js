@@ -1,6 +1,7 @@
 // Only fixed classifications leave this isolated content script. Names, IDs,
 // credentials, client details and arbitrary portal text are never serialized.
 const normalize = value => String(value || '').replace(/\s+/g, ' ').trim().toLowerCase();
+const statusText = value => normalize(value).replace(/^call status\s*:?\s*/, '');
 const STATUS_ELEMENTS = '[role="status"],.call-status,#callStatus,[data-call-status],h1,h2,h3,h4,h5,h6,span,p,strong,div,label';
 const labels = {
   signout: /^(sign\s*out|log\s*out|cerrar sesi[oó]n|salir)$/,
@@ -31,7 +32,7 @@ export function offlineStartButton(document) {
   const observation = readPortalObservation(document);
   if (observation.session !== 'authenticated' || observation.call !== 'idle') return null;
   const offline = [...document.querySelectorAll(STATUS_ELEMENTS)]
-    .some(element => visible(element) && /^(offline|call status:? offline|fuera de l[ií]nea|desconectado)$/.test(normalize(element.textContent)));
+    .some(element => visible(element) && /^(offline|not available|no disponible|fuera de l[ií]nea|desconectado)$/.test(statusText(element.textContent)));
   if (!offline) return null;
   const controls = [...document.querySelectorAll('button,[role="button"],input[type="button"],input[type="submit"]')];
   const matches = controls.filter(element => visible(element) && !element.disabled && element.getAttribute('aria-disabled') !== 'true' &&
@@ -41,7 +42,7 @@ export function offlineStartButton(document) {
 export function availableStopButton(document) {
   const observation = readPortalObservation(document);
   if (observation.session !== 'authenticated' || observation.call !== 'idle') return null;
-  const available = [...document.querySelectorAll(STATUS_ELEMENTS)].some(element => visible(element) && /^(available|ready|disponible)$/.test(normalize(element.textContent)));
+  const available = [...document.querySelectorAll(STATUS_ELEMENTS)].some(element => visible(element) && /^(available|ready|disponible|wrap up|unavailable|line busy|rejected|call dropped)$/.test(statusText(element.textContent)));
   if (!available) return null;
   const controls = [...document.querySelectorAll('button,[role="button"],input[type="button"],input[type="submit"]')];
   const matches = controls.filter(element => visible(element) && !element.disabled && element.getAttribute('aria-disabled') !== 'true' &&
@@ -62,10 +63,11 @@ export function readPortalObservation(document, armed = false) {
     .filter(element => visible(element) && !element.disabled && element.getAttribute('aria-disabled') !== 'true');
   const kinds = controls.map(controlKind);
   const statuses = [...document.querySelectorAll(STATUS_ELEMENTS)]
-    .filter(visible).map(element => normalize(element.textContent));
+    .filter(visible).map(element => statusText(element.textContent));
   const connected = statuses.some(text => /^(call in progress|call connected|in call|llamada en curso|llamada conectada|en llamada)$/.test(text));
   const ended = statuses.some(text => /^(call ended|call disconnected|call completed|llamada terminada|llamada finalizada|llamada desconectada)$/.test(text));
   if (kinds.includes('hangup') && (connected || armed)) return { session, call: 'connected' };
+  if (statuses.some(text => /^(ringing|enter code|sonando)$/.test(text))) return { session, call: 'incoming' };
   if (kinds.includes('accept') && kinds.includes('reject') && !kinds.includes('hangup')) return { session, call: 'incoming' };
   if (!kinds.includes('hangup') && (ended || kinds.includes('idle'))) return { session, call: 'idle' };
   return { session, call: 'unknown' };

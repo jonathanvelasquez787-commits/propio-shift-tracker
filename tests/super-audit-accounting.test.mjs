@@ -55,6 +55,7 @@ test('extension live saves and catch-up are discreet while ordinary live and man
 test('the actual tool plan exports planned Break/Lunch even with no active pause, respects shifted planning and midnight', t => {
   const x=harness(t); x.advance(at(1,'09:05'));
   const h=x.h; h.localStorageRevision={isCurrent:()=>true}; h.getDayNote=()=>null; h.referenceDurationMinForActivePause=()=>null;
+  h.computeCurrentAcwStart=()=>null;
   let config={off:false,start:'06:00',end:'14:00',blocks:[{type:'break',start:'09:00',dur:15},{type:'lunch',start:'12:00',dur:60}]};
   h.dayConfigFor=()=>config;
   vm.runInContext(['getPropioBridgePlan','getShiftWindow','dateAtTime','getEffectiveScheduleForDay','reinforcementScheduleIntervals','buildPlannedSlots'].map(name=>declarations.get(name)).join('\n'),h);

@@ -1,4 +1,4 @@
-# Propio · Tracker y vista original · 2.2.2
+# Propio · Tracker y vista original · 2.2.3
 
 La extensión conecta tu tracker con la sesión y el historial de Propio. Su
 registro de llamadas funciona independientemente de la apariencia del portal.
@@ -56,17 +56,21 @@ La compatibilidad con el diseño de una llamada real en tu portal aún debe comp
 ## Espera entre llamadas
 
 «Esperar entre llamadas» es optativo y empieza apagado. Se configura de 1 a
-60 minutos desde el fin confirmado de cada llamada. Si Propio queda Available,
-pulsa Stop Calls solo con un control único y sin llamada activa o entrante.
-Al terminar la espera, pulsa Start Calls y reintenta si volvés a Offline, hasta
-que vos aceptés. Break/Lunch activos y descansos programados tienen prioridad;
-no inicia fuera del turno. La primera llamada conserva su propia opción y
-volver de una pausa confirmada respeta la espera restante, si todavía existe.
-No acepta ni rechaza llamadas. La preferencia y el fin observado sobreviven
-al reinicio del worker, sin atribuir a otra cuenta un intervalo anterior.
-Terminar una pausa en el tracker permite volver aun con regreso por duración
-activado. Si la conexión no confirma descansos, el popup ofrece actualizar
-la única pestaña del tracker; no la recarga durante una llamada o una oferta.
+60 minutos del ACW actual de la tool, usando el mismo inicio que su contador.
+No necesita observar 00:00 ni un segundo exacto: con ACW 00:50 y espera de tres
+minutos faltan 02:10; si la siguiente lectura llega a 03:01, ya puede iniciar.
+Reconoce Available y Wrap Up con el prefijo Call Status de la vista original,
+para pulsar Stop Calls después de colgar, y Offline/Not Available para regresar.
+Solo actúa con controles únicos habilitados y sin llamada/oferta activa.
+
+Horario y pausas bloquean el inicio. La primera llamada espera al inicio real
+del turno y no acumula una espera desde el login temprano. El regreso de pausas
+activado conserva su prioridad. Después de las llamadas usa un ACW actualizado
+del mismo tracker; una captura previa a la desconexión nunca autoriza el regreso.
+Con tracker viejo, cerrado o sin lectura reciente, mantiene la espera y muestra
+el motivo. La selección y la barrera de desconexión sobreviven al worker.
+No acepta ni rechaza llamadas. Si una oferta pasa y vuelve a Not Available,
+reintenta Start Calls sin comenzar otra espera. La tool debe permanecer abierta.
 
 ## Recuperación del historial
 

@@ -87,6 +87,7 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
   }
   function prepareFirst(state, tabId, packet) {
     const prep = state.preparation, plan = validateBridgePlan(prep.plan, now());
+    prep.spacing.waitUntil = null;
     if (plan?.hasCall || plan?.ended || state.tabs[tabId]?.call === 'connected') { if (plan) prep.doneFor = plan.startAt; }
     const hold = reason => { prep.waitReason = reason; return { prepare: false, stopCalls: false }; };
     if (state.tabs[tabId]?.call === 'connected') { if (prep.pendingPause) finishResume(state); return hold('in-call'); }
@@ -104,12 +105,17 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     if (portals.length !== 1 || portals[0][0] !== String(tabId)) return hold('multiple-portals');
     const spacing = prep.spacing;
     const lastEnded = Math.max(Date.parse(spacing.lastEndedAt) || 0, Date.parse(plan.lastCallEndedAt) || 0);
-    const spacingReady = spacing.enabled === true && lastEnded >= Date.parse(plan.startAt) && lastEnded <= now();
-    const waitUntil = spacingReady ? lastEnded + spacing.minutes * 60000 : null;
-    prep.spacing.waitUntil = waitUntil ? new Date(waitUntil).toISOString() : null;
+    const spacingReady = spacing.enabled === true && !firstReady && !resumeReady &&
+      (plan.hasCall || (lastEnded >= Date.parse(plan.startAt) && lastEnded <= now()));
     if ((plan.pause && !pending?.endedAt) || (plannedPause && !resumeReady)) return hold('pause');
-    if (waitUntil && now() < waitUntil) {
-      prep.waitReason = 'spacing';
+    const acw = plan.acw;
+    // A snapshot from before the call ended cannot resume availability afterward.
+    const acwFresh = acw && now() - Date.parse(acw.observedAt) <= 15000 &&
+      (!spacing.lastEndedAt || Date.parse(acw.observedAt) >= Date.parse(spacing.lastEndedAt));
+    const waitUntil = spacingReady && acwFresh ? Date.parse(acw.startedAt) + spacing.minutes * 60000 : null;
+    prep.spacing.waitUntil = waitUntil ? new Date(waitUntil).toISOString() : null;
+    if (spacingReady && (!acwFresh || now() < waitUntil)) {
+      prep.waitReason = acwFresh ? 'spacing' : plan.acwVerified ? 'acw-pending' : 'acw-update';
       if (packet.available !== true || now() - (prep.lastStopAttemptAt || 0) < 15000) return { prepare: false, stopCalls: false };
       prep.lastStopAttemptAt = now(); record(state, 'spacing-stop', new Date(now()).toISOString(), null);
       return { prepare: false, stopCalls: true };
@@ -181,8 +187,13 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     const targets = await trackers();
     // Hold delivery while an account has multiple writable app tabs open.
     const queued = await transact(state => {
-      if (state.mode !== 'auto' || !state.queue.length) return null;
+      if (state.mode !== 'auto') return null;
       const matched = targets.filter(target => target.accountScope === state.accountScope);
+      if (matched.length === 1) {
+        updatePlan(state, matched[0].plan);
+        if (['multiple-trackers', 'tracker-closed'].includes(state.attention)) state.attention = null;
+      } else if (matched.length > 1) { updatePlan(state, null); state.attention = 'multiple-trackers'; }
+      if (!state.queue.length) return null;
       if (matched.length !== 1) { state.attention = matched.length ? 'multiple-trackers' : 'tracker-closed'; return null; }
       const item = state.queue[0];
       if (item.accountScope !== state.accountScope || !validateBridgeEvent(item.event, now())) {

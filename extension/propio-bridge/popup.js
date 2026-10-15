@@ -23,9 +23,11 @@ const availabilityReasons = {
   incoming: 'Hay una llamada entrante. Vos elegís si aceptarla.', 'portal-state': 'Esperando un estado claro de Propio.',
   'multiple-portals': 'Hay más de una pestaña de Propio, o todavía no se confirma la única pestaña.',
   pause: 'Esperando que termine tu Break o Lunch.', spacing: 'Respetando tu espera entre llamadas.',
+  'acw-update': 'Actualizá el tracker para usar su contador ACW.',
+  'acw-pending': 'Esperando el ACW actualizado de tu tracker.',
   'first-done': 'La primera llamada ya fue tomada. El regreso de Break/Lunch sigue funcionando si está encendido.',
   off: 'No hay un iniciador pendiente.', available: 'Ya estás disponible en Propio.',
-  'offline-control': 'No se reconoce un estado Offline con un único botón Start Calls disponible.',
+  'offline-control': 'Esperando Offline o Not Available con Start Calls disponible.',
   retry: 'Esperando un momento antes de reintentar Start Calls.', starting: 'Pulsando Start Calls para ponerte disponible.',
 };
 let busy = false, feedback = '';
@@ -62,11 +64,11 @@ async function refresh() {
   document.getElementById('spacingStatus').textContent = !spacing.enabled ? 'Apagado. No agrega esperas entre llamadas.'
     : prep?.waitReason === 'pause' ? 'La espera no interrumpe tu Break o Lunch.'
     : prep?.waitReason === 'spacing' && remaining > 0 ? `Faltan ${Math.floor(remaining / 60)}:${String(remaining % 60).padStart(2, '0')} para volver a estar disponible.`
-    : `Espera ${spacing.minutes} minuto(s) desde el fin de cada llamada. La primera llamada y el regreso de pausas mantienen sus opciones.`;
+    : `Vuelve a estar disponible cuando el ACW de tu tracker llega a ${spacing.minutes} minuto(s).`;
   prepToggle.checked = prep?.enabled === true; prepToggle.disabled = busy || !state.paired;
   const plan = prep?.plan;
   const refreshTracker = document.getElementById('refreshTracker');
-  refreshTracker.hidden = !state.paired || !plan || plan.scheduleVerified === true;
+  refreshTracker.hidden = !state.paired || !plan || (plan.scheduleVerified === true && !(spacing.enabled && plan.acwVerified === false));
   refreshTracker.disabled = busy || state.active || state.call === 'connected' || state.call === 'incoming';
   const plannedPause = plan?.scheduledPauses?.filter(slot => Date.now() >= Date.parse(slot.startedAt) && Date.now() < Date.parse(slot.endedAt))
     .sort((a, b) => Date.parse(b.endedAt) - Date.parse(a.endedAt))[0];

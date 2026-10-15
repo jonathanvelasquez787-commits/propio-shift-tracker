@@ -318,8 +318,10 @@ futura opera bajo esto, sin excepción:
 **PENDIENTES**
 
 Vista original nativa de Propio recuperada y comprobada en Chrome Jonathan,
-con interruptor persistente y sin la barra de resumen unificada. Casos
-ACW fueron pospuestos por el usuario («no no no mejor no»); no implementarlos.
+con interruptor persistente y sin la barra de resumen unificada. El 15/10 el
+usuario priorizó corregir Stop Calls tras colgar y basar la espera entre llamadas
+en el ACW visible, incluso si ya lleva segundos. Esta tarea queda autorizada;
+la revisión completa de los otros casos cotidianos sigue pendiente.
 La inspección de Windows fallaba por reconocimiento de URL; navegador integrado
 y conexión oficial Chrome Jonathan ya permiten leer el portal real. No insistir
 en Sky para páginas del navegador. Usuario recargó y activó la opción; DOM y
@@ -901,7 +903,7 @@ La aplicación funciona en producción con estas bases vigentes:
   el de la guía es nofollow. La extensión se instala desde archivo según el
   propietario, por lo que no hay ficha propia de Chrome Web Store que editar.
   Detalle en `docs/seo.md`.
-- La versión actual de la app es 614; la extensión unificada es 2.2.2. El build
+- La versión actual de la app es 615; la extensión unificada es 2.2.3. El build
   del resumen independiente 1.0.5 queda compatible para instalaciones anteriores.
   Refuerzo positivo puede funcionar con Logros apagados. La auditoría profunda del
   8 de octubre corrigió seis fallos; la ampliación corrigió cinco más en arranque,
@@ -926,6 +928,30 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v615 / Extensión 2.2.3 — Espera desde ACW y controles nativos de disponibilidad.**
+
+- Se reconoce Call Status: Available/Wrap Up para Stop Calls y Offline/Not
+  Available para Start Calls. Ringing/Enter Code no permiten tocar controles.
+- La tool anuncia el mismo inicio que usa computeCurrentAcwStart para el chip;
+  no se lee ni reinicia el texto del reloj. Umbral >= minutos configurados:
+  ACW 00:50 con tres minutos deja 02:10; saltar a 03:01 también permite iniciar.
+- Horario real y pausas se evalúan antes; el ACW de un login temprano no adelanta
+  la primera llamada ni agrega minutos al inicio programado. El regreso de pausa
+  activado conserva su prioridad. Solo la espera posterior a llamadas usa ACW.
+- Snapshot reciente del tracker y posterior a la última desconexión observado;
+  uno viejo, faltante o inválido mantiene Stop Calls sin inventar otro contador.
+  Plan actualizado también durante la entrega de eventos, sin perder preferencias,
+  cuenta, cola, vista original ni datos. Popup ofrece refrescar tracker antiguo.
+- Pruebas nuevas de estados nativos, ACW adelantado, cruces de umbral, horario,
+  pausa, plan real, whitelisting y snapshots. QA compilado aislado: login temprano,
+  primer Start a horario, llamada sintética, Stop tras Wrap Up, Not Available,
+  ACW 00:50 y siguiente Start tras 02:10, con reinicio del worker y cero errores.
+- Verificación en Chrome personal bloqueada por fallo de la conexión del navegador
+  al cargar su política de solicitudes; no se provocaron llamadas reales. Archivos
+  se actualizan con respaldo, sin cambiar almacenamiento ni preferencias personales.
+
+
 
 **Extensión 2.2.2 — Vista original opcional y retiro del resumen unificado.**
 
@@ -966,30 +992,3 @@ La aplicación funciona en producción con estas bases vigentes:
   lectura. Rutas personales y archivo no se distribuyen en el repositorio.
 - Usuario confirmó la distribución 2.2.0 en pantalla. Aplicación real de la
   nueva altura y siguiente arranque de Windows se comprueban por separado.
-
-
-**Extensión 2.2.0 — Distribución exacta, Linguee y arranque sin horarios.**
-
-- Todas las entradas del organizador funcionan a cualquier hora. Eliminada
-  la franja 05:45–14:00 y el texto correspondiente. La app sigue en 614.
-- URL y permiso acotado corregidos a app.useinterpreter.com por petición
-  expresa. No se inyectan scripts ni se leen audio o credenciales en esa página.
-- Una división existente al revés se reconstruye con Propio antes de
-  UseInterpreter; se conservan páginas y sesiones. Vista a la izquierda,
-  tracker y Linguee en dos pestañas de la ventana derecha. La izquierda
-  crece según la captura; se compensan bordes invisibles laterales e inferiores.
-  Linguee .es/.com existente se reutiliza y conserva su página/búsqueda.
-  Permisos acotados para identificar esas pestañas, sin leer su contenido.
-- Inicio de Windows y acceso Jonathan del escritorio abren Chrome directamente
-  con Default y el organizador. Sin script externo, PowerShell ni selector.
-  Ambos accesos respaldados y verificados por lectura del destino/argumentos.
-- 36 regresiones de distribución/perfil, 737 pruebas completas y build correctos.
-  Build de extensión correcto; archivos instalados con comparación de hashes,
-  respaldo y preferencia personal independiente de la distribución pública.
-- Distribución nativa confirmada por captura y usuario. Reinicio físico pendiente.
-  Intento aislado con Chrome
-  instalado cerrado antes de obtener worker; no se interpreta como éxito.
-- Usuario confirma regreso automático después de Break en una llamada real.
-  Iniciadores y vinculación quedan fuera del cambio actual. Siguiente pedido:
-  basar la espera entre llamadas en el ACW visible del tracker, manteniendo
-  las opciones de primera llamada y retorno de pausas; propuesta explicada.

@@ -16,6 +16,94 @@ test('decorative icon text cannot hide exact call controls and heading statuses 
   f.document.controls = [f.element('Start Calls tomorrow')]; assert.equal(offlineStartButton(f.document), null);
 });
 
+test('native old and new portal statuses support stopping availability and restarting from Not Available', () => {
+  const f = portalDocument(); f.document.welcome = f.element('Welcome, Synthetic User (12345)');
+  const start = f.element('Start Calls'), stop = f.element('Stop Calls');
+  f.document.controls = [stop];
+  for (const text of ['Available', 'Call Status: Available', 'Wrap Up', 'Call Status: Wrap Up']) {
+    f.document.statuses = [f.element(text)]; assert.equal(availableStopButton(f.document), stop, text);
+  }
+  f.document.controls = [start];
+  for (const text of ['Offline', 'Not Available', 'Call Status: Not Available']) {
+    f.document.statuses = [f.element(text)]; assert.equal(offlineStartButton(f.document), start, text);
+  }
+  f.document.controls = [stop]; f.document.statuses = [f.element('Ringing')];
+  assert.equal(availableStopButton(f.document), null);
+  f.document.controls = [start]; assert.equal(offlineStartButton(f.document), null);
+});
+
+test('spacing follows an already running ACW through the threshold without waiting for a zero tick', async () => {
+  for (const elapsed of [1000, 50000, 180001]) {
+    const f = workerFixture();
+    f.advance(elapsed);
+    const sync = () => f.plan({ startAt: at, endAt: '2026-10-04T22:00:00.000Z', hasCall: true,
+      lastCallEndedAt: new Date(f.now()).toISOString(), acw: { startedAt: at, observedAt: new Date(f.now()).toISOString() } });
+    sync(); await enablePortal(f);
+    await f.worker.message({ kind: 'spacing', enabled: true, minutes: 3 }, sender);
+    const observe = extra => f.worker.message(portalPacket('authenticated', { call: 'idle', offline: true, ...extra }), portalSender);
+    let result = await observe({ offline: false, available: true });
+    assert.equal(result.stopCalls, elapsed < 180000);
+    if (elapsed < 180000) {
+      f.advance(180000 - elapsed - 1); sync(); assert.equal((await observe()).prepare, false);
+      f.advance(2); sync();
+    }
+    assert.equal((await observe()).prepare, true);
+    f.restart(); assert.equal((await observe()).prepare, false, 'no duplicate start after restart');
+  }
+});
+
+test('early login ACW never overrides the first-call schedule or adds a cooldown at shift start', async () => {
+  const f = workerFixture(), scheduled = '2026-10-04T18:30:00.000Z';
+  f.plan({ startAt: scheduled, endAt: '2026-10-04T22:00:00.000Z', hasCall: false,
+    acw: { startedAt: at, observedAt: at } });
+  await enablePortal(f); await f.worker.message({ kind: 'prepare-first', enabled: true }, sender);
+  await f.worker.message({ kind: 'spacing', enabled: true, minutes: 3 }, sender);
+  const observe = () => f.worker.message(portalPacket('authenticated', { call: 'idle', offline: true }), portalSender);
+  f.advance(180000); assert.equal((await observe()).prepare, false);
+  f.advance(27 * 60000 - 1); assert.equal((await observe()).prepare, false);
+  f.advance(1); assert.equal((await observe()).prepare, true);
+  assert.equal(f.data['bridge-v1'].preparation.spacing.waitUntil, null);
+});
+
+test('spacing stops availability but never starts with stale, missing or pre-disconnection ACW snapshots', async () => {
+  const f = workerFixture(), base = { startAt: at, endAt: '2026-10-04T22:00:00.000Z', hasCall: true };
+  f.plan({ ...base, acw: null }); await enablePortal(f);
+  await f.worker.message({ kind: 'spacing', enabled: true, minutes: 3 }, sender);
+  const observe = extra => f.worker.message(portalPacket('authenticated', { call: 'idle', offline: true, ...extra }), portalSender);
+  const sync = acw => f.plan({ ...base, acw });
+  f.advance(240000);
+  for (const acw of [undefined, null, { startedAt: at, observedAt: at }]) {
+    sync(acw); const reply = await observe({ offline: false, available: true });
+    assert.equal(reply.stopCalls, true); assert.equal((await observe()).prepare, false); f.advance(16000);
+  }
+  const beforeEnd = new Date(f.now()).toISOString();
+  sync({ startedAt: at, observedAt: beforeEnd });
+  await observe({ call: 'connected', signal: 'accepted', offline: false }); f.advance(1000);
+  assert.equal((await observe({ signal: 'disconnected', offline: false, available: true })).stopCalls, true);
+  assert.equal((await observe()).prepare, false);
+  sync({ startedAt: at, observedAt: new Date(f.now()).toISOString() });
+  assert.equal((await observe()).prepare, true, 'a new snapshot can resume even when the counter began earlier');
+  for (const call of ['incoming', 'connected', 'unknown']) {
+    const reply = await observe({ call, offline: false, available: true });
+    assert.equal(reply.prepare, false); assert.equal(reply.stopCalls, false);
+  }
+});
+
+test('spacing pause and schedule guards dominate elapsed ACW while explicit pause return keeps its priority', async () => {
+  const f = workerFixture(), base = { startAt: at, endAt: '2026-10-04T22:00:00.000Z', hasCall: true };
+  await enablePortal(f); await f.worker.message({ kind: 'spacing', enabled: true, minutes: 3 }, sender);
+  f.advance(600000);
+  const observe = () => f.worker.message(portalPacket('authenticated', { call: 'idle', offline: true }), portalSender);
+  const pause = { type: 'break', startedAt: '2026-10-04T18:09:00.000Z', endsAt: '2026-10-04T18:20:00.000Z' };
+  f.plan({ ...base, acw: { startedAt: at, observedAt: new Date(f.now()).toISOString() }, pause });
+  await f.worker.message({ kind: 'resume-options', break: true, lunch: false, mode: 'manual' }, sender);
+  assert.equal((await observe()).prepare, false);
+  f.plan({ ...base, lastPause: { ...pause, endedAt: new Date(f.now()).toISOString() },
+    acw: { startedAt: new Date(f.now()).toISOString(), observedAt: new Date(f.now()).toISOString() } });
+  assert.equal((await observe()).prepare, true);
+  f.plan({ ...base, ended: true }); f.advance(16000); assert.equal((await observe()).prepare, false);
+});
+
 test('connection refresh reloads only its single paired tracker and holds during calls, offers or ambiguous accounts', async () => {
   const f = workerFixture(); f.plan({ startAt: at, endAt: '2026-10-04T22:00:00.000Z', scheduleVerified: false });
   await enablePortal(f);
@@ -396,7 +484,12 @@ function workerFixture() {
   const api = { runtime: { id: 'extension-id', getURL: name => `chrome-extension://extension-id/${name}` },
     storage: { local: { async get(key) { return { [key]: structuredClone(data[key]) }; }, async set(update) { Object.assign(data, structuredClone(update)); } } },
     tabs: { async query(options) { return options?.url?.startsWith(PORTAL_ORIGIN) ? portalTargets.map(id => ({ id })) : targets.map((s, i) => ({ id: i + 10 })); }, async sendMessage(id, message) {
-      if (message.kind === 'identify-tracker') return { accountScope: targets[id - 10], plan };
+      if (message.kind === 'identify-tracker') {
+        const bridge = data['bridge-v1'], latest = bridge?.preparation?.spacing?.lastEndedAt || plan?.lastCallEndedAt || plan?.startAt;
+        const acw = plan?.pause || Object.values(bridge?.tabs || {}).some(tab => tab.active) ? null
+          : { startedAt: plan?.lastPause?.endedAt || latest, observedAt: new Date(clock).toISOString() };
+        return { accountScope: targets[id - 10], plan: plan && !Object.hasOwn(plan, 'acw') ? { ...plan, acw } : plan };
+      }
       delivered.push(message); return ack;
     }, async create() {}, async reload(id) { reloads.push(id); } } };
   let worker = createBridgeWorker(api, { now: () => clock, randomId: () => `generated-id-${String(++n).padStart(12,'0')}` });
@@ -407,7 +500,7 @@ function workerFixture() {
     await worker.completed({ requestId, statusCode: options.statusCode || 200 });
   }
   return { data, delivered, reloads, signal, get worker() { return worker; }, targets: value => { targets = value; }, portals: value => { portalTargets = value; },
-    ack: value => { ack = value; }, plan: value => { plan = value ? {scheduledPauses:[],...value} : null; }, advance: milliseconds => { clock += milliseconds; },
+    ack: value => { ack = value; }, plan: value => { plan = value ? {scheduledPauses:[],...value} : null; }, advance: milliseconds => { clock += milliseconds; }, now: () => clock,
     restart() { worker = createBridgeWorker(api, { now: () => clock, randomId: () => `generated-id-${String(++n).padStart(12,'0')}` }); } };
 }
 

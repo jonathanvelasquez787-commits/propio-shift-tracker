@@ -880,6 +880,7 @@
         "js/propio-bridge-rules.js",
         "extension/propio-bridge/portal-observer.js",
         "extension/propio-bridge/portal-content.js",
+        "extension/propio-bridge/tracker-content.js",
         "extension/propio-summary/options.js",
         "js/propio-history.js",
         "js/propio-history-pages.js",
@@ -894,8 +895,21 @@
           ]
         },
         {
+          "file": "tests/propio-acw-plan.test.mjs",
+          "namedCases": [
+            "bridge plan shares the visible ACW anchor with elapsed seconds and reconciled history",
+            "early login ACW stays distinct from scheduled shift and active calls or pauses publish no ACW",
+            "ACW validation distinguishes old trackers, idle absence, malformed clocks and future timestamps"
+          ]
+        },
+        {
           "file": "tests/propio-bridge.test.mjs",
           "namedCases": [
+            "native old and new portal statuses support stopping availability and restarting from Not Available",
+            "spacing follows an already running ACW through the threshold without waiting for a zero tick",
+            "early login ACW never overrides the first-call schedule or adds a cooldown at shift start",
+            "spacing stops availability but never starts with stale, missing or pre-disconnection ACW snapshots",
+            "spacing pause and schedule guards dominate elapsed ACW while explicit pause return keeps its priority",
             "spacing waits from confirmed call end, stops availability once and survives restart without touching the next accepted call",
             "spacing respects planned and active pauses, shift boundaries, disabled preferences and invalid intervals",
             "manual pause completion resumes timed mode even with unknown duration and missed active-pause observation",
