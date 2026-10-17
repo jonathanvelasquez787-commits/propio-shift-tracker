@@ -410,7 +410,7 @@ Estas opciones están en el popup de la extensión. **Registrar llamadas y poner
 
 - **Qué hace:** en tu PC configurada, abre Chrome con el perfil Jonathan y organiza las páginas de trabajo; abre también el archivo de notas que elegiste.
 - **Qué configurás:** es la preparación local que dejamos instalada: Propio y app.useinterpreter.com a la izquierda; tracker y Linguee en la ventana derecha, con notas debajo.
-- **Ejemplo:** iniciás Windows y aparece tu espacio de trabajo. También podés abrir «Jonathan - Chrome» del escritorio para abrir Chrome y ese mismo archivo de notas. Abrir las páginas no concede disponibilidad antes de tu horario. Ya confirmaste que el arranque funcionó después de reiniciar; esta preparación no se instala sola al entrar desde otra PC.
+- **Ejemplo:** iniciás Windows y aparece tu espacio de trabajo. También podés abrir «Jonathan - Chrome» del escritorio para abrir Chrome y ese mismo archivo de notas, acomodado debajo del tracker incluso si ya estaba abierto. Abrir las páginas no concede disponibilidad antes de tu horario. Ya confirmaste que el arranque funcionó después de reiniciar; esta preparación no se instala sola al entrar desde otra PC.
 
 ## 12. Cuenta, guardado y respaldo
 
