@@ -362,11 +362,15 @@ y el organizador. El acceso de escritorio se amplió el 17/10: ejecutable local
 Open-Chrome-And-Notes.exe abre el mismo archivo de notas y luego el Chrome original
 con argumentos idénticos. No usa PowerShell/VBS al abrir. Código e instalador
 en windows/Open-Chrome-And-Notes.cs y scripts/install-desktop-workspace.ps1.
-Configuración personal y binario viven en LocalAppData/Propio Shift Tracker/startup;
+Configuración personal y binario viven en Documents/Propio Workspace, evitando
+la redirección de LocalAppData de aplicaciones MSIX;
 acceso original respaldado. Se evita otra ventana de notas si su título ya coincide.
-Los dos accesos de Inicio de Windows conservan hashes idénticos. No se leyó ni
-modificó el contenido del archivo de notas. Compilación, --verify e invocación
-de ambos programas/ruta con espacios probados con ejecutables ficticios.
+El acceso de inicio de Chrome permanece directo e intacto. El de Notas usa el
+mismo iniciador con --notes-only: abre o reutiliza la ventana y la acomoda abajo
+a la derecha según el ancho 5/16 y la proporción .612 de la ventana del tracker.
+No se modifica el contenido de notas ni se reinicia Chrome para acomodarlas.
+Compilación, --verify, 32 geometrías frente a workspaceBounds y posición real
+verificada con --check-notes-layout correctos; 38 pruebas de workspace correctas.
 El usuario confirmó con captura que la distribución 2.2.0 quedó correcta:
 Propio/UseInterpreter a la izquierda y tracker/Linguee a la derecha, sin huecos.
 Ahora pidió tracker/Linguee arriba a la derecha y sus notas abajo, también al
@@ -968,7 +972,10 @@ La aplicación funciona en producción con estas bases vigentes:
 - El acceso de escritorio solo abría Chrome; Notas dependía del inicio de Windows.
 - Iniciador nativo local abre las notas y preserva perfil, URLs, argumentos e icono
   de Chrome. Configuración validada antes de reemplazar el acceso y respaldo guardado.
-- El inicio de Windows se conserva idéntico por hash; app/extensión sin cambios.
+- Notas se posiciona debajo del tracker en apertura nueva y al reutilizar ventana;
+  el acceso de inicio de Notas comparte --notes-only. Chrome/app/extensión sin cambios.
+- Iniciador en Documents/Propio Workspace evita redirección MSIX de LocalAppData.
+  32 geometrías alineadas al organizador y posición real de Notas comprobadas.
 - Prueba aislada de ambos programas y argumentos con espacios, configuración inválida
   rechazada y --verify real correcto. No se cerró Chrome ni se provocaron llamadas.
 
