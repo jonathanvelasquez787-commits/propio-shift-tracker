@@ -86,3 +86,26 @@ test('closing before the scheduled start creates no work session and overnight p
   f.time('2026-10-16T00:30:00'); assert.equal(h.workingMinutesForDay(), 30);
   assert.equal(h.dayWorkBounds().start.toISOString(), iso('22:00'));
 });
+
+test('a zero-duration historical row before the shift cannot create ten minutes of work or ACW', () => {
+  const f = fixture(); f.call('07:50', '07:50'); f.time('08:05');
+  assert.equal(f.h.dayWorkBounds().start.toISOString(), iso('08:00'));
+  assert.equal(f.h.workingMinutesForDay(), 5);
+  assert.equal(f.h.computeCurrentAcwStart().toISOString(), iso('08:00'));
+  f.h.state.activeCall = { startedAt: iso('07:50') }; f.time('07:50');
+  assert.equal(f.h.dayWorkBounds().start.toISOString(), iso('07:50'), 'a confirmed active call counts immediately');
+});
+
+test('the accounting day of an open overnight shift remains live without a fabricated exit or future missed pause', () => {
+  const f=fixture(),h=f.h;h.state.shiftStartedAt=iso('22:00');h.state.events[0].ts=iso('22:00');
+  h.dayConfigFor=()=>({start:'22:00',end:'06:00',off:false});f.time('2026-10-16T00:30:00');
+  const sessions=h.dayWorkSessions('10/15/2026');assert.equal(sessions.length,1);assert.equal(sessions[0].live,true);
+  assert.equal(sessions[0].end.toISOString(),new Date('2026-10-16T00:30:00').toISOString());
+  Object.assign(h,{settings:{},ui:(parts,...values)=>parts.reduce((out,p,i)=>out+p+(values[i]??''),''),
+    dayIsEffectivelyOff:()=>false,getEffectiveScheduleForDay:()=>[{type:'Break',name:'Break 1',start:'01:00',end:'01:15',startMin:1500,endMin:1515}],
+    pauseForSlot:()=>null,minuteAdherenceForDay:()=>({pct:100,reasons:{}}),formatDeltaMinutes:String,formatMinutes:String,
+    ADHERENCE_TOLERANCE_MIN:5,ADHERENCE_FALLOFF_SHIFT_MIN:60,ADHERENCE_FALLOFF_PAUSE_MIN:30});
+  vm.runInContext(['dayAdherence','adherenceProximityScore','now_isBefore'].map(name=>app.get(name)).join('\n'),h);
+  const report=h.dayAdherence('10/15/2026');assert.equal(report.checkpoints.length,1);assert.equal(report.checkpoints[0].label,'Entrada');
+  h.state.shiftStartedAt=null;assert.equal(h.dayWorkSessions('10/15/2026').length,0,'an orphan historical session must not become live');
+});

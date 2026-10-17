@@ -9,6 +9,7 @@ import { normalizeInactivityMinutes } from '../js/reinforcement-feedback.js';
 
 const appSource = fs.readFileSync(new URL('../js/app-main.js', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
 const gameSource = fs.readFileSync(new URL('../js/game.js', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
+const scheduleSource = fs.readFileSync(new URL('../js/schedule.js', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
 function sourceFunction(source, name, indentation = '    ') {
   const start = source.indexOf(`function ${name}(`);
   assert.ok(start >= 0, `${name} exists in production source`);
@@ -29,7 +30,7 @@ function scheduleHarness(config, { mode = 'anchor', actualStart = '23:30', slots
     Date, settings: { lateArrivalMode: mode }, callDateToDate: (key) => key === dayKey ? new Date(base) : null,
     dayConfigFor: () => config, dayIsEffectivelyOff: () => false,
     getActiveDayKey: () => dayKey, formatHHMM: (value) => value, toMinutes,
-    dayShiftBounds: () => ({ start: dateAtTime(base, actualStart) }), dateAtTime,
+    dayShiftBounds: () => ({ start: actualStart instanceof Date ? actualStart : dateAtTime(base, actualStart) }), dateAtTime,
     pad: (value) => String(value).padStart(2, '0'),
   });
   context.buildPlannedSlots = vm.runInContext(`(${sourceFunction(appSource, 'buildPlannedSlots')})`, context);
@@ -100,6 +101,36 @@ test('daytime and effective shifted schedules use their real configured interval
   const shifted = scheduleHarness(config, { mode: 'shift', actualStart: '08:30' });
   assert.equal(new Date(shifted.intervals(dayKey)[0].startedAt).getTime(), localTime(29, 8, 30));
   assert.equal(new Date(shifted.intervals(dayKey)[2].endedAt).getTime(), localTime(29, 10, 30));
+});
+
+test('arrival after midnight shifts the night slots by elapsed dates rather than subtracting wall-clock hours', () => {
+  const {intervals}=scheduleHarness({start:'23:00',end:'02:00',blocks:[
+    {type:'work',start:'23:00',dur:90},{type:'break',start:'00:30',dur:15},{type:'work',start:'00:45',dur:75}
+  ]},{mode:'shift',actualStart:new Date(localTime(30,0,30))});
+  const result=intervals(dayKey);
+  assert.equal(Date.parse(result[0].startedAt),localTime(30,0,30));
+  assert.equal(Date.parse(result[1].startedAt),localTime(30,2));
+  assert.equal(Date.parse(result[2].endedAt),localTime(30,3,30));
+});
+
+test('the production schedule editor reads and validates midnight blocks while rejecting overlaps and out-of-shift work',()=>{
+  const blocks=[{type:'work',start:'22:00',end:'01:00',goalMin:30},{type:'break',start:'01:00',end:'01:15'},{type:'work',start:'01:15',end:'06:00',goalMin:30}];
+  const h=vm.createContext({ui,translateText,Date,formatHHMM:String,toMinutes,timeLabel:String,formatMinutes:String,
+    minutesToHHMM:n=>`${String(Math.floor(n/60)%24).padStart(2,'0')}:${String(n%60).padStart(2,'0')}`,
+    BLOCK_TYPE_LABELS:{work:'Trabajo',break:'Break',lunch:'Lunch'},document:{querySelectorAll:()=>blocks.map(b=>({querySelector:s=>({value:s.includes('type')?b.type:s.includes('start')?b.start:s.includes('end')?b.end:b.goalMin||0})}))}});
+  for(const name of ['normalizeBlockForCompare','readBlocksFromEditor','validateDayConfig'])h[name]=vm.runInContext(`(${sourceFunction(scheduleSource,name)})`,h);
+  const parsed=h.readBlocksFromEditor();assert.equal(parsed[0].dur,180);assert.equal(parsed[2].dur,285);
+  const config={start:'22:00',end:'06:00',blocks:parsed};assert.equal(h.validateDayConfig(config).valid,true);
+  assert.equal(h.validateDayConfig({...config,blocks:[...parsed,{type:'break',start:'00:55',dur:20}]}).valid,false);
+  assert.equal(h.validateDayConfig({...config,blocks:[{type:'work',start:'05:45',dur:30}]}).valid,false);
+  assert.equal(h.validateDayConfig({...config,end:'22:00'}).valid,false);
+});
+
+test('a call-estimated live shift uses todays alarm plan when the stored explicit shift already ended',()=>{
+  const queried=[];const h=vm.createContext({Date,settings:{alertBeforeBreakMin:10},state:{shiftStartedAt:'2026-09-28T08:00:00',shiftEndedAt:'2026-09-28T16:00:00'},
+    todayCallDateKey:()=>dayKey,currentShiftAccountingDayKey:()=> '09/28/2026',dayShiftBounds:()=>({live:true}),
+    getEffectiveScheduleForDay:key=>{queried.push(key);return[];},callDateToDate:()=>base,stopBreakStartAlarm(){}});
+  vm.runInContext(`(${sourceFunction(appSource,'checkBreakStartAlarm','')})`,h)();assert.deepEqual(queried,[dayKey]);
 });
 
 test('inactivity production guard suppresses scheduled break and off-duty delivery despite prior work', () => {

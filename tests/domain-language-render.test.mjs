@@ -48,6 +48,58 @@ function scheduleHarness({ day = 12, now = at(12, 19), start = at(12, 10), end =
   return elements.get('scheduleList').innerHTML;
 }
 
+test('night work blocks preserve chronological order, duration and next-day call coverage', () => {
+  const h=vm.createContext({Date,ui,translateText,translateMarkup,state:{shiftEndedAt:null},calls:[],
+    formatHHMM:String,pad:n=>String(n).padStart(2,'0'),pauseForSlot:()=>null,
+    todayCallDateKey:()=>key(at(12,0)),formatDuration:String,formatMinutes:String,formatDeltaMinutes:String});
+  vm.runInContext(declarations('../js/app-main.js',['buildPlannedSlots','toMinutes','dateAtTime','overlapMinutes','slotStats']),h);
+  const slots=h.buildPlannedSlots({start:'22:00',end:'06:00',blocks:[
+    {type:'work',start:'22:00',dur:180},{type:'break',start:'01:00',dur:15},{type:'work',start:'01:15',dur:285} ]});
+  assert.deepEqual(Array.from(slots,s=>s.start),['22:00','01:00','01:15']);
+  h.callDateToDate=()=>at(12,0);
+  const call={startISO:at(13,0,10).toISOString(),endISO:at(13,0,20).toISOString()};
+  const stats=h.slotStats(slots[0],[call],[],null,null,key(at(12,0)));
+  assert.equal(stats.durationMin,180);assert.equal(stats.callMin,10);
+  const pause=h.slotStats(slots[1],[],[],null,null,key(at(12,0)));
+  assert.equal(pause.slotStart.getTime(),at(13,1).getTime());assert.equal(pause.durationMin,15);
+});
+
+test('night adherence counts full dated minutes and next-day pauses instead of a zero-length clock range', () => {
+  let clock=at(13,7),pauses=[{type:'break',start:at(13,1),end:at(13,1,15)}];
+  const dayKey=key(at(12,0)),base=at(12,0);
+  const h=vm.createContext({Date:class extends Date{constructor(...args){super(...(args.length?args:[clock]));}},
+    ui,translateText,translateMarkup,settings:{adherenceGraceMin:0},calls:[],state:{shiftStartedAt:at(12,22).toISOString()},
+    formatHHMM:String,pad:n=>String(n).padStart(2,'0'),callDateKeyFromValue:String,
+    callDateToDate:()=>base,todayCallDateKey:()=>key(clock),currentShiftAccountingDayKey:()=>dayKey,
+    todayRange:()=>at(13,0),dayIsEffectivelyOff:()=>false,actualPauseIntervalsForDay:()=>pauses,
+    dateKey:key,sameCallDay:(date,k)=>key(new Date(date))===k,EXCEPTION_REASON_MAP:{'work|none':'absent','break|work':'break-missed'}});
+  vm.runInContext(declarations('../js/app-main.js',['buildPlannedSlots','toMinutes','dateAtTime','computeMinuteAdherence',
+    'sessionsToPresenceIntervals','callPresenceIntervalsForDay','presenceIntervalsForDay','pauseIntervalsToMinuteRanges',
+    'plannedMinuteSlots','minuteAdherenceForDay','slotMinuteAdherence','isRightNowOutOfAdherence','checkBreakStartAlarm']),h);
+  const slots=h.buildPlannedSlots({start:'22:00',end:'06:00',blocks:[{type:'work',start:'22:00',dur:180},{type:'break',start:'01:00',dur:15},{type:'work',start:'01:15',dur:285}]});
+  h.originalPlannedSlotsForDay=()=>slots;
+  const sessions=[{start:at(12,22),end:at(13,6),live:false}];
+  assert.equal(h.minuteAdherenceForDay(dayKey,sessions).total,480);
+  assert.equal(h.minuteAdherenceForDay(dayKey,sessions).exceptionMinutes,0);
+  assert.equal(h.slotMinuteAdherence(dayKey,slots[2],sessions).total,285);
+  pauses=[];assert.equal(h.minuteAdherenceForDay(dayKey,sessions).exceptionMinutes,14);
+  clock=at(12,23,30);const live=[{start:at(12,22),end:clock,live:true}];
+  assert.equal(h.minuteAdherenceForDay(dayKey,live).total,90);
+  assert.equal(h.slotMinuteAdherence(dayKey,slots[0],live).total,90);
+  clock=at(13,1,5);assert.equal(h.isRightNowOutOfAdherence(),true);
+  const alarms=[];clock=at(13,0,55);h.settings.alertBeforeBreakMin=10;
+  Object.assign(h,{dayShiftBounds:()=>({live:true}),getEffectiveScheduleForDay:()=>slots,pauseForSlot:()=>null,
+    breakStartAlarmActiveKey:null,breakStartAlarmFiredKeys:new Set(),startBreakStartAlarm:k=>alarms.push(k),
+    stopBreakStartAlarm(){},toast(){},renderAlertTemplate:()=>'',timeLabel:String});
+  h.checkBreakStartAlarm();assert.equal(alarms.length,1);assert.ok(alarms[0].startsWith(dayKey+'|'));
+});
+
+test('elapsed work after an early shift closure is incomplete rather than upcoming in both languages',t=>{
+  t.after(()=>setLanguage('es'));
+  for(const language of ['es','en']){setLanguage(language);const html=scheduleHarness({now:at(12,12),start:at(12,8),end:at(12,8,30)});
+    assert.ok(html.includes(language==='es'?'Incompleto':'Incomplete'));}
+});
+
 for (const language of ['es', 'en']) {
   test('real schedule rendering localizes skipped work and absence detail in both supported languages', t => {
     setLanguage(language); t.after(() => setLanguage('es'));

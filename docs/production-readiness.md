@@ -18,8 +18,8 @@ por decisión del propietario. No exige comprar un dominio ni activar correo.
 - Readiness alojada confirma RLS, privilegios, copias, retención, monitor y
   backup externo. La cuenta conserva su contenido después de publicar.
 
-[production-criteria.json](production-criteria.json) relaciona 17 áreas con
-criterios concretos, 58 módulos de navegador/API/librerías y 53 suites con
+[production-criteria.json](production-criteria.json) relaciona 22 áreas con
+criterios concretos, 73 módulos de navegador/API/librerías y 67 suites con
 nombres de regresiones reales. El build rechaza módulos o suites sin asignar y
 referencias a pruebas retiradas. Este control comprueba la trazabilidad: no
 sustituye las pruebas ni acredita todas las combinaciones de la interfaz.

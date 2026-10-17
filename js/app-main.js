@@ -563,18 +563,20 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
       });
       // El nombre ("Break 1", "Lunch 2", "Bloque de Trabajo 3") se asigna DESPUÉS de ordenar
       // cronológicamente, no según el orden del arreglo.
-      points.sort((a, b) => toMinutes(a.start) - toMinutes(b.start));
+      const anchor = toMinutes(formatHHMM(dayConfig.start));
+      const offset = time => (toMinutes(time) - anchor + 1440) % 1440 + anchor;
+      points.sort((a, b) => offset(a.start) - offset(b.start));
 
       let breakIdx = 1, lunchIdx = 1, workIdx = 1;
       const toHHMM = (mins) => { const m = ((mins % 1440) + 1440) % 1440; return `${pad(Math.floor(m / 60))}:${pad(m % 60)}`; };
 
       return points.map(p => {
-        const pStart = toMinutes(p.start);
+        const pStart = offset(p.start);
         let type, name;
         if (p.rawType === 'break') { type = 'Break'; name = `Break ${breakIdx++}`; }
         else if (p.rawType === 'lunch') { type = 'Lunch'; name = `Lunch ${lunchIdx++}`; }
         else { type = 'Work'; name = ui`Bloque de Trabajo ${workIdx++}`; }
-        const slot = { type, name, start: toHHMM(pStart), end: toHHMM(pStart + p.dur) };
+        const slot = { type, name, start: toHHMM(pStart), end: toHHMM(pStart + p.dur), startMin: pStart, endMin: pStart + p.dur };
         // Meta de Productividad configurable POR BLOQUE (minutos productivos que ese bloque de
         // Trabajo debe alcanzar, reemplaza al viejo ratio global de "Margen"). Solo los bloques de
         // Work la llevan.
@@ -1914,7 +1916,7 @@ function checkBreakStartAlarm() {
     return;
   }
 
-  const dayKey = todayCallDateKey();
+  const dayKey = state.shiftStartedAt && !state.shiftEndedAt ? currentShiftAccountingDayKey() : todayCallDateKey();
   const planned = getEffectiveScheduleForDay(dayKey).filter(s => s.type === 'Break' || s.type === 'Lunch');
   const base = callDateToDate(dayKey) || new Date();
   const now = new Date();
@@ -1923,6 +1925,7 @@ function checkBreakStartAlarm() {
   for (const slot of planned) {
     if (pauseForSlot(slot, dayKey)) continue; // Ya tomado, no avisar.
     const slotStart = dateAtTime(base, slot.start);
+    slotStart.setDate(slotStart.getDate() + Math.floor((slot.startMin ?? 0) / 1440));
     if (now >= slotStart) continue; // Ya pasó, se cede a "no tomado"
     const alertTime = new Date(slotStart.getTime() - alertMin * 60000);
     if (now >= alertTime) {
@@ -2598,8 +2601,9 @@ function dayShiftSessions(dayKey = getActiveDayKey()) {
   });
 
   if (openStart) {
-    if (isToday && !state.shiftEndedAt) {
-      // Turno en curso hoy, sin cerrar todavía.
+    const matchesActiveShift = state.shiftStartedAt && !state.shiftEndedAt && Date.parse(state.shiftStartedAt) === openStart.getTime();
+    if ((isToday || matchesActiveShift) && !state.shiftEndedAt) {
+      // El turno activo conserva su día contable después de medianoche.
       allSessions.push({ start: openStart, end: new Date(), live: true });
     } else if (!isToday) {
       // Turno de un día pasado que nunca se cerró — estimar fin desde la última llamada real de ese
@@ -2663,7 +2667,7 @@ function workStartForConnection(connectionStart, sessionEnd = new Date()) {
   for (const call of evidence) {
     const from = Date.parse(call.startISO || call.startedAt), to = Date.parse(call.endISO || new Date().toISOString());
     if (Number.isFinite(from) && Number.isFinite(to) && to > connectionStart.getTime() && from <= sessionEnd.getTime() &&
-        from < planned.start.getTime() && to >= from) start = Math.min(start, Math.max(connectionStart.getTime(), from));
+        from < planned.start.getTime() && (to > from || (call === state.activeCall && to === from))) start = Math.min(start, Math.max(connectionStart.getTime(), from));
   }
   return new Date(start);
 }
@@ -2727,15 +2731,27 @@ function callPresenceIntervalsForDay(dayKey) {
   }).filter(Boolean);
 }
 
-function presenceIntervalsForDay(dayKey, sessions) {
+function presenceIntervalsForDay(dayKey, sessions, rangeEnd = 1440) {
   const normalized = callDateKeyFromValue(dayKey);
+  if (rangeEnd > 1440) {
+    const base = callDateToDate(normalized);
+    if (!base) return [];
+    return [...sessions, ...calls.map(call => ({ start: new Date(call.startISO), end: new Date(call.endISO) }))]
+      .map(interval => ({ startMin: Math.max(0, Math.floor((interval.start - base) / 60000)),
+        endMin: Math.min(rangeEnd, Math.floor((interval.end - base) / 60000)) }))
+      .filter(interval => interval.endMin > interval.startMin);
+  }
   return [...sessionsToPresenceIntervals(sessions, normalized), ...callPresenceIntervalsForDay(normalized)];
 }
 
-// Mismo criterio que sessionsToPresenceIntervals: una pausa real (Break/ Lunch o hueco clasificado
-// a mano) que cruza medianoche pierde el día al convertirse a minuto-del-día con
-// getHours/getMinutes — sin este recorte, start > end y la pausa deja de matchear cualquier minuto.
-function pauseIntervalsToMinuteRanges(pauses, normalizedDayKey) {
+// El rango diario conserva su recorte; un plan nocturno puede incluir minutos del día siguiente.
+function pauseIntervalsToMinuteRanges(pauses, normalizedDayKey, rangeEnd = 1440) {
+  if (rangeEnd > 1440) {
+    const base = callDateToDate(normalizedDayKey);
+    if (!base) return [];
+    return pauses.map(p => ({ type: p.type, startMin: Math.max(0, Math.floor((p.start - base) / 60000)),
+      endMin: Math.min(rangeEnd, Math.floor((p.end - base) / 60000)) })).filter(interval => interval.endMin > interval.startMin);
+  }
   return pauses.map(p => {
     const startMin = dateKey(p.start) === normalizedDayKey ? p.start.getHours() * 60 + p.start.getMinutes() : 0;
     const endMin = dateKey(p.end) === normalizedDayKey ? p.end.getHours() * 60 + p.end.getMinutes() : 1440;
@@ -2890,7 +2906,11 @@ function pauseAssignmentCache(dayKey, type) {
   const assignment = new Array(matchingSlots.length).fill(null);
   if (!history.length || !matchingSlots.length) return { matchingSlots, assignment };
 
-  const slotStarts = matchingSlots.map(s => dateAtTime(base, s.start).getTime());
+  const slotStarts = matchingSlots.map(s => {
+    const start = dateAtTime(base, s.start);
+    start.setDate(start.getDate() + Math.floor((s.startMin ?? 0) / 1440));
+    return start.getTime();
+  });
   const pairs = [];
   matchingSlots.forEach((s, si) => {
     history.forEach((p, pi) => {
@@ -2929,6 +2949,9 @@ function slotStats(slot, dayCalls = calls, dayPauses = dayPauseIntervals(getActi
   const base = callDateToDate(dayKey) || new Date();
   const slotStart = dateAtTime(base, slot.start);
   const slotEnd = dateAtTime(base, slot.end);
+  slotStart.setDate(slotStart.getDate() + Math.floor((slot.startMin ?? 0) / 1440));
+  slotEnd.setDate(slotEnd.getDate() + Math.floor((slot.endMin ?? 0) / 1440));
+  if (slotEnd <= slotStart) slotEnd.setDate(slotEnd.getDate() + 1);
   const durationMin = Math.max(0, (slotEnd.getTime() - slotStart.getTime()) / 60000);
   const sortedCalls = [...dayCalls].sort((a, b) => new Date(a.startISO) - new Date(b.startISO));
 
@@ -3209,6 +3232,10 @@ function originalPlannedSlotsForDay(dayKey) {
   return buildPlannedSlots(effectiveCfg);
 }
 
+function plannedMinuteSlots(slots) {
+  return slots.map(slot => ({ type: slot.type.toLowerCase(), startMin: slot.startMin ?? toMinutes(slot.start), endMin: slot.endMin ?? toMinutes(slot.end) }));
+}
+
 // Arma los inputs de computeMinuteAdherence a partir del estado real de la app para un día dado —
 // separado de dayAdherence para poder probarse (y reutilizarse) sin depender de todo el flujo de
 // checkpoints.
@@ -3222,16 +3249,15 @@ function minuteAdherenceForDay(dayKey, sessions) {
   const plannedRaw = originalPlannedSlotsForDay(normalized);
   if (!plannedRaw.length) return null;
 
-  const plannedSlots = plannedRaw.map(s => ({ type: s.type.toLowerCase(), startMin: toMinutes(s.start), endMin: toMinutes(s.end) }));
-  const minuteOfDay = (date) => date.getHours() * 60 + date.getMinutes();
-
-  const actualIntervals = pauseIntervalsToMinuteRanges(actualPauseIntervalsForDay(normalized), normalized);
-  const presenceIntervals = presenceIntervalsForDay(normalized, sessions);
-
+  const plannedSlots = plannedMinuteSlots(plannedRaw);
   const rangeStart = plannedSlots[0].startMin;
   const lastSlotEnd = plannedSlots[plannedSlots.length - 1].endMin;
+  const base = callDateToDate(normalized) || new Date();
+  const minuteOfDay = date => Math.floor((date - base) / 60000);
+  const actualIntervals = pauseIntervalsToMinuteRanges(actualPauseIntervalsForDay(normalized), normalized, lastSlotEnd);
+  const presenceIntervals = presenceIntervalsForDay(normalized, sessions, lastSlotEnd);
   const anySessionLive = sessions.some(s => s.live);
-  const rangeEnd = (isToday && anySessionLive) ? Math.min(minuteOfDay(new Date()), lastSlotEnd) : lastSlotEnd;
+  const rangeEnd = anySessionLive ? Math.min(minuteOfDay(new Date()), lastSlotEnd) : lastSlotEnd;
 
   const graceMin = Number.isFinite(Number(settings.adherenceGraceMin)) && Number(settings.adherenceGraceMin) >= 0 ? Number(settings.adherenceGraceMin) : 3;
   return computeMinuteAdherence({ plannedSlots, actualIntervals, presenceIntervals, rangeStart, rangeEnd, graceMin });
@@ -3241,20 +3267,21 @@ function minuteAdherenceForDay(dayKey, sessions) {
 // el % acumulado del día.
 function isRightNowOutOfAdherence() {
   if (!state.shiftStartedAt || state.shiftEndedAt) return false;
-  const dayKey = todayCallDateKey();
+  const dayKey = currentShiftAccountingDayKey();
   // Un día forzado a Libre desde "Editar día" (Resumen semanal) ya no exige Adherencia.
   if (dayIsEffectivelyOff(dayKey)) return false;
   const plannedRaw = originalPlannedSlotsForDay(dayKey);
   if (!plannedRaw.length) return false;
 
-  const plannedSlots = plannedRaw.map(s => ({ type: s.type.toLowerCase(), startMin: toMinutes(s.start), endMin: toMinutes(s.end) }));
-  const minuteOfDay = (date) => date.getHours() * 60 + date.getMinutes();
-  const actualIntervals = pauseIntervalsToMinuteRanges(actualPauseIntervalsForDay(dayKey), dayKey);
-  // Si el turno empezó ayer y sigue abierto, se trata como presente desde el minuto 0 de hoy.
+  const plannedSlots = plannedMinuteSlots(plannedRaw);
+  const base = callDateToDate(dayKey) || new Date();
+  const minuteOfDay = date => Math.floor((date - base) / 60000);
+  const endMin = Math.max(1440, ...plannedSlots.map(slot => slot.endMin));
+  const actualIntervals = pauseIntervalsToMinuteRanges(actualPauseIntervalsForDay(dayKey), dayKey, endMin);
   const realStartMin = sameCallDay(state.shiftStartedAt, dayKey) ? minuteOfDay(new Date(state.shiftStartedAt)) : 0;
   const nowMin = minuteOfDay(new Date());
   const graceMin = Number.isFinite(Number(settings.adherenceGraceMin)) && Number(settings.adherenceGraceMin) >= 0 ? Number(settings.adherenceGraceMin) : 3;
-  const presenceIntervals = [{ startMin: realStartMin, endMin: 1440 }];
+  const presenceIntervals = [{ startMin: realStartMin, endMin }];
 
   const result = computeMinuteAdherence({ plannedSlots, actualIntervals, presenceIntervals, rangeStart: nowMin, rangeEnd: nowMin + 1, graceMin });
   return !!(result && result.exceptionMinutes > 0);
@@ -3276,17 +3303,18 @@ function slotMinuteAdherence(dayKey, originalSlot, sessions) {
   const plannedRaw = originalPlannedSlotsForDay(normalized);
   if (!plannedRaw.length) return null;
 
-  const plannedSlots = plannedRaw.map(s => ({ type: s.type.toLowerCase(), startMin: toMinutes(s.start), endMin: toMinutes(s.end) }));
-  const minuteOfDay = (date) => date.getHours() * 60 + date.getMinutes();
+  const plannedSlots = plannedMinuteSlots(plannedRaw);
+  const minuteOfDay = date => Math.floor((date - base) / 60000);
+  const lastSlotEnd = plannedSlots[plannedSlots.length - 1].endMin;
 
-  const actualIntervals = pauseIntervalsToMinuteRanges(actualPauseIntervalsForDay(normalized), normalized);
-  const presenceIntervals = presenceIntervalsForDay(normalized, sessions);
+  const actualIntervals = pauseIntervalsToMinuteRanges(actualPauseIntervalsForDay(normalized), normalized, lastSlotEnd);
+  const presenceIntervals = presenceIntervalsForDay(normalized, sessions, lastSlotEnd);
 
-  const slotStartMin = toMinutes(originalSlot.start);
-  const slotEndMin = toMinutes(originalSlot.end);
+  const slotStartMin = originalSlot.startMin ?? toMinutes(originalSlot.start);
+  const slotEndMin = originalSlot.endMin ?? toMinutes(originalSlot.end);
   const rangeStart = slotStartMin;
   const anySessionLive = sessions.some(s => s.live);
-  const rangeEnd = (isToday && anySessionLive) ? Math.min(minuteOfDay(new Date()), slotEndMin) : slotEndMin;
+  const rangeEnd = anySessionLive ? Math.min(minuteOfDay(new Date()), slotEndMin) : slotEndMin;
   if (!(rangeEnd > rangeStart)) return null; // El bloque aún no empieza.
 
   const graceMin = Number.isFinite(Number(settings.adherenceGraceMin)) && Number(settings.adherenceGraceMin) >= 0 ? Number(settings.adherenceGraceMin) : 3;
@@ -3331,6 +3359,8 @@ export function dayAdherence(dayKey) {
   if (!lastSession.live) {
     const effectiveEnd = planned.length ? planned[planned.length - 1].end : formatHHMM(cfg.end);
     const plannedEnd = dateAtTime(base, effectiveEnd);
+    plannedEnd.setDate(plannedEnd.getDate() + Math.floor((planned.at(-1)?.endMin ?? 0) / 1440));
+    if (plannedEnd <= plannedStart) plannedEnd.setDate(plannedEnd.getDate() + 1);
     const endDelta = (lastSession.end.getTime() - plannedEnd.getTime()) / 60000;
     checkpoints.push({
       label: 'Salida',
@@ -3338,7 +3368,7 @@ export function dayAdherence(dayKey) {
       score: adherenceProximityScore(Math.abs(endDelta), ADHERENCE_FALLOFF_SHIFT_MIN),
       note: endDelta < -ADHERENCE_TOLERANCE_MIN ? ui`Temprano ${formatDeltaMinutes(endDelta)}` : endDelta > ADHERENCE_TOLERANCE_MIN ? ui`Tarde +${formatMinutes(endDelta)}m` : translateText('A tiempo'),
     });
-  } else if (!isToday) {
+  } else if (!isToday && !(state.shiftStartedAt && !state.shiftEndedAt && sameCallDay(state.shiftStartedAt, normalized))) {
     // Día pasado sin hora de fin registrada ni llamadas para estimarla: cuenta como checkpoint
     // fallado.
     checkpoints.push({ label: 'Salida', ok: false, score: 0, note: translateText('No se registró la salida') });
@@ -3348,12 +3378,15 @@ export function dayAdherence(dayKey) {
     if (slot.type === 'Work') continue;
     const slotStart = dateAtTime(base, slot.start);
     const slotEnd = dateAtTime(base, slot.end);
+    slotStart.setDate(slotStart.getDate() + Math.floor((slot.startMin ?? 0) / 1440));
+    slotEnd.setDate(slotEnd.getDate() + Math.floor((slot.endMin ?? 0) / 1440));
+    if (slotEnd <= slotStart) slotEnd.setDate(slotEnd.getDate() + 1);
     const plannedDur = (slotEnd.getTime() - slotStart.getTime()) / 60000;
     const actual = pauseForSlot(slot, normalized);
 
     if (!actual) {
-      const skip = lastSession.live && isToday && now_isBefore(slotEnd);
-      if (skip) continue; // Todavía no le tocaba, no penalizar aún Sin puntaje parcial aquí a propósito: "No tomado" es binario (o se marcó con el botón/se clasificó el hueco, o no) — no hay una noción de "casi tomaste tu break" que tenga sentido dar crédito parcial.
+      const skip = lastSession.live && now_isBefore(slotEnd);
+      if (skip) continue; // No penalizar una pausa futura del turno abierto.
       checkpoints.push({ label: slot.name, ok: false, score: 0, note: translateText('No tomado') });
       continue;
     }
@@ -5385,9 +5418,8 @@ function renderPayDatesSection() {
 
       const bounds = dayShiftBounds(dayKey);
       if (!bounds.start || !cfg.start) return planned;
-      const plannedStartMin = toMinutes(formatHHMM(cfg.start));
-      const actualStartMin = bounds.start.getHours() * 60 + bounds.start.getMinutes();
-      const delay = actualStartMin - plannedStartMin;
+      const plannedStart = dateAtTime(callDateToDate(dayKey) || new Date(), formatHHMM(cfg.start));
+      const delay = Math.floor((bounds.start.getTime() - plannedStart.getTime()) / 60000);
       if (delay <= 0) return planned;
 
       const toHHMM = (mins) => { const m = ((mins % 1440) + 1440) % 1440; return `${pad(Math.floor(m / 60))}:${pad(m % 60)}`; };
@@ -5395,6 +5427,8 @@ function renderPayDatesSection() {
         ...slot,
         start: toHHMM(toMinutes(slot.start) + delay),
         end: toHHMM(toMinutes(slot.end) + delay),
+        startMin: slot.startMin + delay,
+        endMin: slot.endMin + delay,
       }));
     }
 
@@ -5406,12 +5440,14 @@ function renderPayDatesSection() {
       const actualStart = settings.lateArrivalMode === 'shift' ? dayShiftBounds(dayKey).start : null;
       const anchor = actualStart ? Math.max(plannedAnchor, actualStart.getHours() * 60 + actualStart.getMinutes()) : plannedAnchor;
       let previousStart = base.getTime();
-      const slots = [...getEffectiveScheduleForDay(dayKey)].sort((a, b) => ((toMinutes(a.start) - anchor + 1440) % 1440) - ((toMinutes(b.start) - anchor + 1440) % 1440));
+      const slots = [...getEffectiveScheduleForDay(dayKey)].sort((a, b) => (a.startMin ?? ((toMinutes(a.start) - anchor + 1440) % 1440)) - (b.startMin ?? ((toMinutes(b.start) - anchor + 1440) % 1440)));
       return slots.map((slot) => {
         const start = dateAtTime(base, slot.start);
-        if (toMinutes(slot.start) < anchor) start.setDate(start.getDate() + 1);
+        if (Number.isFinite(slot.startMin)) start.setDate(start.getDate() + Math.floor(slot.startMin / 1440));
+        else if (toMinutes(slot.start) < anchor) start.setDate(start.getDate() + 1);
         while (start.getTime() < previousStart) start.setDate(start.getDate() + 1);
         const end = dateAtTime(base, slot.end);
+        if (Number.isFinite(slot.endMin)) end.setDate(end.getDate() + Math.floor(slot.endMin / 1440));
         while (end.getTime() <= start.getTime()) end.setDate(end.getDate() + 1);
         previousStart = start.getTime();
         return { ...slot, startedAt: start.toISOString(), endedAt: end.toISOString() };
@@ -6464,7 +6500,6 @@ function renderSchedule() {
       const shiftEnd = lastShiftSessionForBounds && !lastShiftSessionForBounds.live ? lastShiftSessionForBounds.end : null;
       const live = !!(lastShiftSessionForBounds && lastShiftSessionForBounds.live);
       const now = new Date();
-      const t = now.getHours() * 60 + now.getMinutes();
       const wrap = document.getElementById('scheduleList');
       const subtitle = document.getElementById('scheduleSubtitle');
       const dayCfg = dayConfigFor(dayKey);
@@ -6523,12 +6558,11 @@ function renderSchedule() {
       const blockGaps = dayGapRows(dayKey, dayCalls);
       const blockPauseIntervals = mergeIntervals(dayPauses);
       const slotRows = plannedSlots.map((slot, slotIdx) => {
-        const s = toMinutes(slot.start), e = toMinutes(slot.end);
-        const active = t >= s && t < e && dayKey === todayCallDateKey();
-        const done = dayKey === todayCallDateKey() ? t >= e : !!(shiftEnd && shiftEnd >= dateAtTime(callDateToDate(dayKey) || new Date(), slot.end));
         const extendStart = slotIdx === firstWorkIndex ? shiftStart : null;
         const extendEnd = slotIdx === lastWorkIndex ? shiftEnd : null;
         const stats = slotStats(slot, dayCalls, dayPauses, shiftStart, shiftEnd, dayKey, extendStart, extendEnd);
+        const active = now >= stats.slotStart && now < stats.slotEnd;
+        const done = live ? now >= stats.slotEnd : !!(shiftEnd && shiftEnd >= stats.slotEnd);
         const blockAcwMin = slot.type === 'Work'
           ? acwMinutesForBlock(blockGaps, stats.callWindowStart, stats.callWindowEnd, blockPauseIntervals, overlapMinutesWithIntervals)
           : 0;
@@ -6549,7 +6583,7 @@ function renderSchedule() {
         const isFutureDay = (callDateToDate(dayKey) || new Date()) > todayRange();
         // Un día pasado con salida temprana dentro del bloque no es "Próximo": se marca
         // "Incompleto".
-        const statusText = active ? translateText('Actual') : done ? translateText('Hecho') : (isPastDay ? (shiftStart ? translateText('Incompleto') : translateText('Sin actividad')) : translateText('Próximo'));
+        const statusText = active ? translateText('Actual') : done ? translateText('Hecho') : ((isPastDay || now >= stats.slotEnd) ? (shiftStart ? translateText('Incompleto') : translateText('Sin actividad')) : translateText('Próximo'));
         const statusClass = stats.statusTone === 'good' ? 'good' : stats.statusTone === 'warn' ? 'warn' : stats.statusTone === 'bad' ? 'bad' : '';
         const usedProgressLabel = ui`${formatDuration(stats.filledMin * 60000)} usados`;
         const acwProgressLabel = `ACW ${formatDuration(blockAcwMin * 60000)}`;
@@ -6679,7 +6713,8 @@ function renderSchedule() {
       // turno (getShiftWindow) — mismo criterio que ya usa "Conectado" en el resto de la app, solo
       // comparado contra el plan en vez de mostrarse en crudo.
       const shiftWindowForCard = getShiftWindow(dayKey);
-      const plannedShiftMin = Math.max(0, toMinutes(shiftWindowForCard.end) - toMinutes(shiftWindowForCard.start));
+      let plannedShiftMin = toMinutes(shiftWindowForCard.end) - toMinutes(shiftWindowForCard.start);
+      if (plannedShiftMin <= 0) plannedShiftMin += 1440;
       const shiftConnectedMin = shiftStart ? workingMinutesForDay(dayKey) : 0;
       const shiftPct = plannedShiftMin > 0 ? Math.min(100, (shiftConnectedMin / plannedShiftMin) * 100) : 0;
       summaryCards.push({
@@ -8029,6 +8064,11 @@ export function getPropioBridgePlan() {
   const base = callDateToDate(accountingDay) || day, start = dateAtTime(base, planned.start), end = dateAtTime(base, planned.end);
   if (end <= start) end.setDate(end.getDate() + 1);
   const activeStart = state.shiftStartedAt && !state.shiftEndedAt ? Date.parse(state.shiftStartedAt) : NaN;
+  const effectiveStart = settings.lateArrivalMode === 'shift' ? dayShiftBounds(accountingDay).start?.getTime() : NaN;
+  if (Number.isFinite(effectiveStart) && effectiveStart > start.getTime()) {
+    const delay = Math.floor((effectiveStart - start.getTime()) / 60000) * 60000;
+    start.setTime(start.getTime() + delay); end.setTime(end.getTime() + delay);
+  }
   const since = Number.isFinite(activeStart) && activeStart < end.getTime() ? Math.min(activeStart, start.getTime()) : start.getTime();
   const pauseDuration = state.activePause ? referenceDurationMinForActivePause(currentShiftAccountingDayKey(day)) : null;
   const lastPause = state.pauseHistory.filter(pause => Date.parse(pause.endedAt) >= since && Date.parse(pause.endedAt) <= day.getTime())
