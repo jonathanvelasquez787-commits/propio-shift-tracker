@@ -490,3 +490,16 @@ Estas opciones están en el popup de la extensión. **Registrar llamadas y poner
 - No obtiene promociones de Higher Rate de tu correo automáticamente.
 - No compra premios, paga gastos ni comprueba depósitos bancarios.
 - Abrir Chrome y acomodar ventanas es una configuración local de tu PC; el encendido automático de la PC lo configurás vos.
+
+## Usar otras pestañas durante el turno
+
+Podés dejar el tracker abierto y consultar Linguee u otra pestaña. La extensión
+protege el tracker, Propio y UseInterpreter contra el descarte automático por
+memoria y añade una revisión de respaldo cada 30 segundos. Primero solicita el
+ACW actual; mantiene las prioridades de horario, Break/Lunch y Stop manual.
+
+No tenés que configurar un contador nuevo. Por ejemplo, si dejaste ACW en 00:50,
+el umbral sigue siendo 03:00 aunque estés mirando Linguee. Una comprobación puede
+llegar después del umbral: no se garantiza exactitud al segundo en segundo plano.
+Si Chrome congela la página o la PC entra en suspensión, la extensión no inventa
+un ACW actualizado ni pulsa Start Calls con una lectura antigua.

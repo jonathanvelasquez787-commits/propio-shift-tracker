@@ -6,12 +6,16 @@ const source = fs.readFileSync(new URL('../extension/propio-bridge/tracker-conte
 function fixture() {
   let listener, contentListener, interval, alive = true, messages = 0, throwSend = false, transient = false, announcements = 0, clock = 20000;
   const timeouts = new Map();
-  const window = { top: null, postMessage: () => messages++, addEventListener: (name, fn) => { if (name === 'message') listener = fn; }, removeEventListener: () => { listener = null; } };
+  const lifecycle = new Map();
+  const document = { addEventListener: (name, fn) => lifecycle.set(name, fn), removeEventListener: name => lifecycle.delete(name) };
+  const window = { top: null, postMessage: () => messages++, addEventListener: (name, fn) => { if (name === 'message') listener = fn; else lifecycle.set(name, fn); }, removeEventListener: name => { if (name === 'message') listener = null; else lifecycle.delete(name); } };
   window.top = window;
   const runtime = { get id() { return alive ? 'test-extension' : undefined; }, sendMessage() { announcements++; if (throwSend) throw new Error('Extension context invalidated.'); if (transient) { transient = false; throw Error('Worker still starting'); } return Promise.resolve({ok:true}); }, onMessage: { addListener: fn => { contentListener = fn; }, removeListener: () => { contentListener = null; } } };
-  vm.runInNewContext(source, { Date: {now:()=>clock}, window, location: { origin: 'https://propio-shift-tracker.vercel.app' }, chrome: { runtime }, crypto: { randomUUID: () => 'request-12345678' }, setInterval: fn => { interval = fn; return 1; }, clearInterval: () => { interval = null; }, setTimeout: fn => { const id = timeouts.size + 1; timeouts.set(id, fn); return id; }, clearTimeout: id => timeouts.delete(id) });
+  vm.runInNewContext(source, { Date: {now:()=>clock}, window, document, location: { origin: 'https://propio-shift-tracker.vercel.app' }, chrome: { runtime }, crypto: { randomUUID: () => 'request-12345678' }, setInterval: fn => { interval = fn; return 1; }, clearInterval: () => { interval = null; }, setTimeout: fn => { const id = timeouts.size + 1; timeouts.set(id, fn); return id; }, clearTimeout: id => timeouts.delete(id) });
   return { ready(plan) { listener?.({ source: window, origin: 'https://propio-shift-tracker.vercel.app', data: { protocol: 'pst-propio-bridge/v1', direction: 'app', kind: 'ready', accountScope: 'a'.repeat(64), nonce: 'nonce-1234567890', plan } }); },
     identify() { let result; contentListener?.({ kind: 'identify-tracker' }, { id: 'test-extension' }, value => { result = value; }); return JSON.parse(JSON.stringify(result)); },
+    refresh(respond) { return contentListener?.({kind:'identify-tracker',refresh:true},{id:'test-extension'},respond); },
+    timeout() { [...timeouts.values()].forEach(fn=>fn()); timeouts.clear(); }, lifecycle(name) { lifecycle.get(name)?.(); },
     reload() { throwSend = true; }, invalidate() { alive = false; }, hello() { interval?.(); },
     transientOnce() { transient = true; }, advance(ms) { clock += ms; }, get announcements() { return announcements; },
     deliver(respond) { contentListener?.({ kind:'deliver-event', accountScope:'a'.repeat(64) }, { id:'test-extension' }, respond); },
@@ -35,6 +39,22 @@ test('tracker content forwards only ACW timestamps and distinguishes an older pl
   assert.deepEqual(f.identify().plan.acw, acw);
   f.ready({ ...plan, acw: null }); assert.equal(f.identify().plan.acw, null);
   f.ready(plan); assert.equal(Object.hasOwn(f.identify().plan, 'acw'), false);
+});
+
+test('worker refresh waits for a new app snapshot and shares it across concurrent requests without reannouncing', async () => {
+  const f=fixture();f.ready({startAt:'2026-10-15T12:00:00Z',endAt:'2026-10-15T20:00:00Z'});
+  await new Promise(resolve=>setImmediate(resolve));const before=f.announcements,replies=[];
+  assert.equal(f.refresh(x=>replies.push(x)),true);f.refresh(x=>replies.push(x));assert.equal(replies.length,0);
+  f.ready({startAt:'2026-10-16T12:00:00Z',endAt:'2026-10-16T20:00:00Z'});
+  assert.equal(replies.length,2);assert.equal(replies[0].plan.startAt,'2026-10-16T12:00:00Z');
+  assert.equal(f.announcements,before);assert.equal(f.pending,0);
+});
+
+test('a nonresponding background app returns no plan instead of relabeling an old snapshot as current', () => {
+  const f=fixture();f.ready({startAt:'2026-10-15T12:00:00Z',endAt:'2026-10-15T20:00:00Z'});
+  const replies=[];f.refresh(x=>replies.push(x));f.timeout();assert.deepEqual(replies,[null]);
+  const before=f.messages;for(const name of ['pageshow','visibilitychange','resume'])f.lifecycle(name);
+  assert.equal(f.messages,before+3);
 });
 test('reloading the extension handles synchronous context invalidation without leaving a hello loop', async () => {
   const f = fixture(); f.reload(); assert.doesNotThrow(() => f.ready());

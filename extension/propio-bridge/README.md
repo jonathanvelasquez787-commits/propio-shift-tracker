@@ -162,3 +162,22 @@ aplicación y mantiene la izquierda de altura completa. La distribución públic
 usa 1. Un valor inválido o archivo inaccesible conserva esa altura completa.
 El organizador no abre ni lee archivos personales; abrir un archivo de notas
 al iniciar Windows se configura por separado mediante un acceso de Inicio.
+
+## Trabajo con otra pestaña al frente
+
+La extensión protege las pestañas abiertas del tracker, Propio y UseInterpreter
+contra el descarte automático por memoria (`autoDiscardable: false`). No activa,
+recarga ni mueve esas pestañas. Al navegar a otro sitio devuelve el indicador
+solo si lo cambió ella; conserva las exclusiones previas ajenas.
+
+Una alarma de Chrome solicita una comprobación adicional cada 30 segundos,
+además de los temporizadores normales. Pide un plan nuevo al tracker y una
+observación del portal, pasando por los mismos bloqueos de horario, pausa,
+llamada entrante/activa y Stop manual. El script también reconecta al volver a
+la página o reanudarse. Si el tracker no responde, no recicla el ACW anterior.
+
+Esto no garantiza ejecución al segundo: Chrome puede retrasar alarmas o congelar
+una página, y no funciona mientras la PC duerme o Chrome está cerrado. No usa
+audio silencioso, permisos nuevos ni cambios globales del ahorro de energía.
+Las páginas ya descartadas no se recargan automáticamente para no interrumpir
+una sesión; se recuperan cuando el usuario las abre.

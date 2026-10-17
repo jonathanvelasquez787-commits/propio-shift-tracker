@@ -25,11 +25,18 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     serial = result.catch(() => {});
     return result;
   };
+  async function sendToTab(tabId, packet) {
+    let timer;
+    try {
+      return await Promise.race([api.tabs.sendMessage(tabId, packet, { frameId: 0 }),
+        new Promise(resolve => { timer = setTimeout(() => resolve(null), 4000); })]);
+    } finally { clearTimeout(timer); }
+  }
   async function trackers() {
     const tabs = await api.tabs.query({ url: `${TRACKER_ORIGIN}/*` });
     const results = await Promise.all(tabs.map(async tab => {
       try {
-        const ready = await api.tabs.sendMessage(tab.id, { kind: 'identify-tracker' }, { frameId: 0 });
+        const ready = await sendToTab(tab.id, { kind: 'identify-tracker', refresh: true });
         return accountScopeValid(ready?.accountScope) ? { tabId: tab.id, accountScope: ready.accountScope, plan: validateBridgePlan(ready.plan, now()) } : null;
       } catch { return null; }
     }));
@@ -247,6 +254,12 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
   function flush() {
     if (!flushing) flushing = (async () => { for (let i = 0; i < 200 && await flushOnce(); i++) {} })().finally(() => { flushing = null; });
     return flushing;
+  }
+  async function refreshBackground() {
+    await flush();
+    const portals = await api.tabs.query({ url: `${PORTAL_ORIGIN}/*` });
+    await Promise.allSettled(portals.filter(tab => !tab.discarded && !tab.frozen)
+      .map(tab => sendToTab(tab.id, { kind: 'sample-portal' })));
   }
   async function message(packet, sender) {
     if (sender.id !== api.runtime.id) return null;
@@ -467,5 +480,5 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
       delete state.tabs[tabId];
     }).catch(() => {}); });
   }
-  return { install, beforeRequest, completed, message, navigationCommitted, flush };
+  return { install, beforeRequest, completed, message, navigationCommitted, flush, refreshBackground };
 }
