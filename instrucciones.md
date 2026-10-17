@@ -327,7 +327,8 @@ de la extensión 2.2.6, Propio y tracker.
 
 Extensión 2.2.7: refuerzo de trabajo en segundo plano instalado con respaldo; protección
 autoDiscardable de los tres sitios, plan nuevo bajo demanda y muestreo extra
-del portal cada 30 segundos. Publicación por SHA y recarga nativa se verifican aparte;
+del portal cada 30 segundos. PR #74 integrado en adcf24d12e0f3c2ae63a69ca55e50caeff4d9c74,
+CI 206 correcto y recarga 2.2.7 confirmada por el usuario;
 no se garantiza precisión al segundo, páginas congeladas ni PC suspendida.
 
 
@@ -356,8 +357,16 @@ Arranque y distribución: configuración anterior conservada.
 El 14/10 quitó todas las franjas: abrir Jonathan al iniciar sesión en Windows
 y organizar también al abrirlo manualmente, a cualquier hora. URL correcta
 confirmada por el usuario: https://app.useinterpreter.com/.
-Accesos de Inicio y escritorio apuntan directamente a chrome.exe, Default,
-restore-last-session y el organizador, sin PowerShell/VBS. Lectura verificada.
+Acceso de Inicio apunta directamente a chrome.exe, Default, restore-last-session
+y el organizador. El acceso de escritorio se amplió el 17/10: ejecutable local
+Open-Chrome-And-Notes.exe abre el mismo archivo de notas y luego el Chrome original
+con argumentos idénticos. No usa PowerShell/VBS al abrir. Código e instalador
+en windows/Open-Chrome-And-Notes.cs y scripts/install-desktop-workspace.ps1.
+Configuración personal y binario viven en LocalAppData/Propio Shift Tracker/startup;
+acceso original respaldado. Se evita otra ventana de notas si su título ya coincide.
+Los dos accesos de Inicio de Windows conservan hashes idénticos. No se leyó ni
+modificó el contenido del archivo de notas. Compilación, --verify e invocación
+de ambos programas/ruta con espacios probados con ejecutables ficticios.
 El usuario confirmó con captura que la distribución 2.2.0 quedó correcta:
 Propio/UseInterpreter a la izquierda y tracker/Linguee a la derecha, sin huecos.
 Ahora pidió tracker/Linguee arriba a la derecha y sus notas abajo, también al
@@ -954,6 +963,16 @@ La aplicación funciona en producción con estas bases vigentes:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**Configuración local, 17/10 — Notas al abrir Chrome desde el escritorio.**
+
+- El acceso de escritorio solo abría Chrome; Notas dependía del inicio de Windows.
+- Iniciador nativo local abre las notas y preserva perfil, URLs, argumentos e icono
+  de Chrome. Configuración validada antes de reemplazar el acceso y respaldo guardado.
+- El inicio de Windows se conserva idéntico por hash; app/extensión sin cambios.
+- Prueba aislada de ambos programas y argumentos con espacios, configuración inválida
+  rechazada y --verify real correcto. No se cerró Chrome ni se provocaron llamadas.
+
+
 **Extensión 2.2.7 — Respaldo para pestañas en segundo plano.**
 
 - Protección contra descarte automático solo en tracker, Propio y UseInterpreter;
@@ -987,17 +1006,3 @@ La aplicación funciona en producción con estas bases vigentes:
   recargas/reaperturas conservan datos. Flujo compilado ACW 00:50 y popup probado.
 - Inventario estructural de 403 controles; no implica clic individual en todos.
   Sin datos reales modificados. CI y publicación exacta documentadas por separado.
-
-
-**Extensión 2.2.5 — Pausa visible y opciones de automatización.**
-
-- Pausar disponibilidad automática y su estado quedan fuera del desplegable,
-  visibles cuando está cerrado. Se renombra a Más opciones de automatización.
-- Reordenamiento solicitado por el usuario; mismos ids, listeners, preferencias
-  y lógica. No cambia el worker, las llamadas ni la distribución de ventanas.
-- 81 pruebas enfocadas y build del puente correctos. Popup compilado en claro
-  y oscuro: pausa visible con opciones cerradas, apertura de opciones,
-  persistencia, rechazo de guardado de vista original y cero errores/overflow.
-- Archivos se actualizan con respaldo, conservando preferencias personales.
-  La conexión bloquea chrome://extensions; no eludir y no recargar páginas de
-  llamadas para este cambio de popup. Activación nativa requiere recarga manual.
