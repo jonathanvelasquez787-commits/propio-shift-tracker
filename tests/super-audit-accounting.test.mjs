@@ -65,6 +65,8 @@ test('the actual tool plan exports planned Break/Lunch even with no active pause
   assert.equal(Boolean(state.activePause),false);
   state.shiftStartedAt=at(1,'09:00').toISOString(); settings.lateArrivalMode='shift';
   assert.equal(periods()[0].startedAt,at(1,'12:00').toISOString());
+  assert.equal(h.getPropioBridgePlan().startAt,at(1,'09:00').toISOString());
+  assert.equal(h.getPropioBridgePlan().endAt,at(1,'17:00').toISOString());
   settings.lateArrivalMode='anchor'; config={off:false,start:'22:00',end:'06:00',blocks:[{type:'lunch',start:'23:45',dur:30}]};
   state.shiftStartedAt=at(1,'22:00').toISOString(); x.advance(at(2,'00:00'));
   assert.deepEqual(periods(),[{type:'lunch',startedAt:at(1,'23:45').toISOString(),endedAt:at(2,'00:15').toISOString()}]);

@@ -86,3 +86,12 @@ test('closing before the scheduled start creates no work session and overnight p
   f.time('2026-10-16T00:30:00'); assert.equal(h.workingMinutesForDay(), 30);
   assert.equal(h.dayWorkBounds().start.toISOString(), iso('22:00'));
 });
+
+test('a zero-duration historical row before the shift cannot create ten minutes of work or ACW', () => {
+  const f = fixture(); f.call('07:50', '07:50'); f.time('08:05');
+  assert.equal(f.h.dayWorkBounds().start.toISOString(), iso('08:00'));
+  assert.equal(f.h.workingMinutesForDay(), 5);
+  assert.equal(f.h.computeCurrentAcwStart().toISOString(), iso('08:00'));
+  f.h.state.activeCall = { startedAt: iso('07:50') }; f.time('07:50');
+  assert.equal(f.h.dayWorkBounds().start.toISOString(), iso('07:50'), 'a confirmed active call counts immediately');
+});

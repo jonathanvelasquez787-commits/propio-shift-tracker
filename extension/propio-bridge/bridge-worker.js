@@ -45,7 +45,7 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
   function callSignal(state, tabId, signal, at) {
     const { state: reduced, event } = reduce(state.tabs[tabId], signal, at);
     state.tabs[tabId] = { ...state.tabs[tabId], ...reduced };
-    if (signal === 'accepted' && state.preparation.plan) {
+    if (event?.type === 'call-start' && state.preparation.plan) {
       state.preparation.doneFor = state.preparation.plan.startAt;
       if (state.preparation.pendingPause) finishResume(state);
     }
@@ -66,17 +66,28 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
   }
   function updatePlan(state, plan) {
     const prep = state.preparation;
+    const cancelPending = () => {
+      const requestId = prep.pendingPause?.requestId;
+      if (requestId) state.queue = state.queue.filter(item => item.event.id !== requestId);
+      prep.pendingPause = null;
+    };
     prep.plan = plan;
     if (!plan) return;
-    if (plan.ended) { prep.pendingPause = null; return; }
+    if (plan.ended) { cancelPending(); return; }
     const active = plan.pause;
+    const pending = prep.pendingPause;
+    const pendingEnd = pending?.endedAt || pending?.endsAt || pending?.startedAt;
+    if (pending && (Date.parse(pending.startedAt) >= Date.parse(plan.endAt) ||
+        (active?.startedAt !== pending.startedAt && Date.parse(pendingEnd) <= Date.parse(plan.startAt)))) cancelPending();
     if (active) {
-      if (!prep.resume[active.type] || prep.resumedPauses.includes(active.startedAt)) { prep.pendingPause = null; return; }
-      if (prep.pendingPause?.startedAt !== active.startedAt) prep.pendingPause = { ...active, endedAt: null, requestId: null };
-      else prep.pendingPause.endsAt = active.endsAt;
+      if (!prep.resume[active.type] || prep.resumedPauses.includes(active.startedAt)) { cancelPending(); return; }
+      if (prep.pendingPause?.startedAt !== active.startedAt || prep.pendingPause.endsAt !== active.endsAt) {
+        cancelPending();
+        prep.pendingPause = { ...active, endedAt: null, requestId: null };
+      }
     } else if (prep.pendingPause) {
       if (plan.lastPause?.startedAt === prep.pendingPause.startedAt && plan.lastPause.endedAt) prep.pendingPause.endedAt = plan.lastPause.endedAt;
-      else if (!prep.pendingPause.endedAt) prep.pendingPause = null;
+      else if (!prep.pendingPause.endedAt) cancelPending();
     } else if (plan.lastPause?.endedAt && prep.resume[plan.lastPause.type] && !prep.resumedPauses.includes(plan.lastPause.startedAt) &&
         now() - Date.parse(plan.lastPause.endedAt) <= 300000 && (!plan.lastCallEndedAt || Date.parse(plan.lastCallEndedAt) <= Date.parse(plan.lastPause.endedAt))) {
       prep.pendingPause = { ...plan.lastPause, endsAt: null, requestId: null };

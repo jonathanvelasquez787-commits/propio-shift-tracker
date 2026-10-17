@@ -29,7 +29,7 @@ function scheduleHarness(config, { mode = 'anchor', actualStart = '23:30', slots
     Date, settings: { lateArrivalMode: mode }, callDateToDate: (key) => key === dayKey ? new Date(base) : null,
     dayConfigFor: () => config, dayIsEffectivelyOff: () => false,
     getActiveDayKey: () => dayKey, formatHHMM: (value) => value, toMinutes,
-    dayShiftBounds: () => ({ start: dateAtTime(base, actualStart) }), dateAtTime,
+    dayShiftBounds: () => ({ start: actualStart instanceof Date ? actualStart : dateAtTime(base, actualStart) }), dateAtTime,
     pad: (value) => String(value).padStart(2, '0'),
   });
   context.buildPlannedSlots = vm.runInContext(`(${sourceFunction(appSource, 'buildPlannedSlots')})`, context);
@@ -100,6 +100,16 @@ test('daytime and effective shifted schedules use their real configured interval
   const shifted = scheduleHarness(config, { mode: 'shift', actualStart: '08:30' });
   assert.equal(new Date(shifted.intervals(dayKey)[0].startedAt).getTime(), localTime(29, 8, 30));
   assert.equal(new Date(shifted.intervals(dayKey)[2].endedAt).getTime(), localTime(29, 10, 30));
+});
+
+test('arrival after midnight shifts the night slots by elapsed dates rather than subtracting wall-clock hours', () => {
+  const {intervals}=scheduleHarness({start:'23:00',end:'02:00',blocks:[
+    {type:'work',start:'23:00',dur:90},{type:'break',start:'00:30',dur:15},{type:'work',start:'00:45',dur:75}
+  ]},{mode:'shift',actualStart:new Date(localTime(30,0,30))});
+  const result=intervals(dayKey);
+  assert.equal(Date.parse(result[0].startedAt),localTime(30,0,30));
+  assert.equal(Date.parse(result[1].startedAt),localTime(30,2));
+  assert.equal(Date.parse(result[2].endedAt),localTime(30,3,30));
 });
 
 test('inactivity production guard suppresses scheduled break and off-duty delivery despite prior work', () => {

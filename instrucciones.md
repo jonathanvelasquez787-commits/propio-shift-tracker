@@ -317,6 +317,14 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
+Auditoría profunda solicitada explícitamente: v618 / extensión 2.2.6.
+Seis grupos corregidos, 794 pruebas completas correctas y simulación de 32 días
+con cuenta ficticia. Informe en docs/auditoria-profunda-2026-10-17.md.
+Guía práctica de 73 funciones en docs/guia-practica-tool-y-extension.md.
+CI/publicación y activación nativa se verifican aparte por SHA y versión;
+no confundir archivos preparados con extensión ya recargada en Chrome.
+
+
 Vista original nativa recuperada y confirmada en Chrome Jonathan; el usuario
 confirmó también las llamadas automáticas en su sesión real. App 616 publicada:
 conexión anticipada separada de trabajo y ACW, con llamada real temprana y
@@ -914,7 +922,7 @@ La aplicación funciona en producción con estas bases vigentes:
   el de la guía es nofollow. La extensión se instala desde archivo según el
   propietario, por lo que no hay ficha propia de Chrome Web Store que editar.
   Detalle en `docs/seo.md`.
-- La versión actual de la app es 617; la extensión unificada es 2.2.5. El build
+- La versión actual de la app es 618; la extensión unificada es 2.2.6. El build
   del resumen independiente 1.0.5 queda compatible para instalaciones anteriores.
   Refuerzo positivo puede funcionar con Logros apagados. La auditoría profunda del
   8 de octubre corrigió seis fallos; la ampliación corrigió cinco más en arranque,
@@ -939,6 +947,22 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v618 / Extensión 2.2.6 — Auditoría profunda de disponibilidad y bloques.**
+
+- Filas históricas cero no adelantan trabajo; llamadas activas cuentan desde conexión.
+- Regresos viejos no pasan a otro horario; extender/reemplazar pausas cancela
+  cierres no entregados, sin retirar registros de llamadas. Señales de aceptación
+  rechazadas por el reductor no consumen la primera llamada de otro plan.
+- Plan del puente coincide con límites y precisión del horario desplazado.
+  Bloques nocturnos conservan orden, fechas y duración; llegada tras medianoche
+  desplaza por fechas completas. Se mantienen límites de reconstrucción diaria.
+- 794 pruebas, 2.260 textos, 38 contratos de módulos, wiring y builds correctos.
+  Simulación aislada de 32 días: 96 llamadas, 736 minutos, $88.32 y 64 pausas;
+  recargas/reaperturas conservan datos. Flujo compilado ACW 00:50 y popup probado.
+- Inventario estructural de 403 controles; no implica clic individual en todos.
+  Sin datos reales modificados. CI y publicación exacta documentadas por separado.
+
 
 **Extensión 2.2.5 — Pausa visible y opciones de automatización.**
 
@@ -975,24 +999,3 @@ La aplicación funciona en producción con estas bases vigentes:
   archivos con respaldo y preferencias personales intactas. Usuario confirmó
   recarga de extensión, Propio y tracker; se observa portal Offline y sin aviso
   activo de conflicto en el tracker. No se provocaron llamadas reales.
-
-
-**v616 — Conexión anticipada separada del trabajo y ACW.**
-
-- La sesión de Propio conserva timestamps/eventos/duración de conexión. El trabajo
-  empieza al mayor entre conexión e inicio programado; una llamada real anticipada
-  acredita trabajo desde su inicio. Un inicio manual explícito conserva su intención.
-- ACW en vivo y exportado al puente, huecos de llamadas, adherencia y progreso de
-  turno usan sesiones de trabajo. Conectado conserva las sesiones originales y
-  llamadas externas. En turno muestra presencia laboral sin duplicar intervalos.
-- Historial distingue Conexión a Propio e Inicio de turno usando filas existentes;
-  el primer hueco usa el inicio laboral y conserva su clave para no perder notas.
-  Recalcula los registros ya guardados sin cambiar datos, ingresos ni recibos.
-- Cierre antes del horario no inventa trabajo. Días libres sin turno planeado,
-  llegada tardía, medianoche y turnos múltiples mantienen sus reglas y límites.
-  Primera llamada automática sigue esperando el horario; extensión sigue 2.2.3.
-- 768 pruebas completas y 26 enfocadas correctas, incluidas cinco regresiones
-  nuevas sobre conexión/trabajo. Traducciones ES/EN actualizadas. App compilada:
-  cinco combinaciones ES/EN, oscuro/claro y 390/560/1280 px, incluyendo llamada
-  anticipada, correctas; conexión, ingresos y datos originales conservados, sin
-  errores ni overflow horizontal. Publicación y despliegue se cierran por SHA.

@@ -1348,6 +1348,56 @@
           ]
         }
       ]
+    },
+    {
+      "id": "deep-audit-618",
+      "area": "Auditoría de disponibilidad y bloques nocturnos",
+      "acceptance": "Filas cero no adelantan trabajo; pausas viejas o extendidas y señales rechazadas no autorizan disponibilidad; puente y bloques conservan el horario efectivo.",
+      "sources": [
+        "js/app-main.js",
+        "extension/propio-bridge/bridge-worker.js"
+      ],
+      "tests": [
+        {
+          "file": "tests/connection-work-time.test.mjs",
+          "namedCases": [
+            "a zero-duration historical row before the shift cannot create ten minutes of work or ACW"
+          ]
+        },
+        {
+          "file": "tests/propio-bridge.test.mjs",
+          "namedCases": [
+            "an old completed pause cannot trigger availability in the next shift after tracker absence",
+            "extending an active timed pause cancels its older undelivered closure",
+            "a rejected late network acceptance cannot consume the first call of a different plan"
+          ]
+        },
+        {
+          "file": "tests/propio-acw-plan.test.mjs",
+          "namedCases": [
+            "shifted bridge boundaries use the same shift bounds and minute precision as the displayed schedule"
+          ]
+        },
+        {
+          "file": "tests/super-audit-accounting.test.mjs",
+          "namedCases": [
+            "the actual tool plan exports planned Break/Lunch even with no active pause, respects shifted planning and midnight"
+          ]
+        },
+        {
+          "file": "tests/domain-language-render.test.mjs",
+          "namedCases": [
+            "night work blocks preserve chronological order, duration and next-day call coverage",
+          "night adherence counts full dated minutes and next-day pauses instead of a zero-length clock range"
+          ]
+        },
+        {
+          "file": "tests/reinforcement-schedule.test.mjs",
+          "namedCases": [
+            "arrival after midnight shifts the night slots by elapsed dates rather than subtracting wall-clock hours"
+          ]
+        }
+      ]
     }
   ],
   "limits": [

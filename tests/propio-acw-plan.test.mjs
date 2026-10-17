@@ -13,7 +13,7 @@ function fixture() {
   let clock = Date.parse(iso('18:10:50'));
   const h = { Date: class extends Date { constructor(...args) { super(...(args.length ? args : [clock])); } },
     state: { shiftStartedAt: iso('18:00:00'), shiftEndedAt: null, activeCall: null, activePause: null, pauseHistory: [], lastCallEndedAt: iso('18:10:00') },
-    calls: [{ startISO: iso('18:01:00'), endISO: iso('18:10:00') }],
+    calls: [{ startISO: iso('18:01:00'), endISO: iso('18:10:00') }], settings: { lateArrivalMode: 'anchor' },
     localStorageRevision: { isCurrent: () => true }, todayCallDateKey: () => '10/15/2026',
     getShiftWindow: () => ({ start: '18:00', end: '22:00' }), getDayNote: () => null,
     callDateToDate: () => new Date(iso('00:00:00')), dateAtTime: (date, time) => new Date(iso(time + ':00')),
@@ -64,4 +64,14 @@ test('ACW validation distinguishes old trackers, idle absence, malformed clocks 
     const plan = validateBridgePlan({ ...base, acw }, f.now());
     assert.equal(plan.acw, null); assert.equal(plan.acwVerified, false);
   }
+});
+
+test('shifted bridge boundaries use the same shift bounds and minute precision as the displayed schedule', () => {
+  const f=fixture();f.h.settings.lateArrivalMode='shift';
+  f.h.state.shiftStartedAt=iso('18:20:50');
+  f.h.dayShiftBounds=()=>({start:new Date(iso('18:10:30')),live:true});
+  const plan=f.h.getPropioBridgePlan();
+  assert.equal(plan.startAt,iso('18:10:00'));assert.equal(plan.endAt,iso('22:10:00'));
+  f.h.settings.lateArrivalMode='anchor';
+  assert.equal(f.h.getPropioBridgePlan().startAt,iso('18:00:00'));
 });

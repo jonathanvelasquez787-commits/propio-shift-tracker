@@ -527,6 +527,33 @@ async function enablePortal(f) {
   f.targets([scope]); await f.worker.message({ kind: 'pair' }, sender);
   await f.worker.message({ kind: 'mode', mode: 'auto' }, sender);
 }
+
+test('an old completed pause cannot trigger availability in the next shift after tracker absence', async () => {
+  const f = workerFixture(); await enablePortal(f);
+  await f.worker.message({kind:'resume-options',break:true,lunch:true,mode:'manual'},sender);
+  const original = {startAt:at,endAt:'2026-10-04T22:00:00.000Z',hasCall:true};
+  f.advance(600000); f.plan({...original,lastPause:{type:'break',startedAt:at,endedAt:new Date(f.now()).toISOString()}});
+  await f.worker.message({kind:'pair'},sender);
+  f.targets([]); await f.worker.flush(); f.advance(86400000);
+  f.targets([scope]);f.plan({startAt:'2026-10-05T18:00:00.000Z',endAt:'2026-10-05T22:00:00.000Z',hasCall:false});
+  const reply=await f.worker.message(portalPacket('authenticated',{call:'idle',offline:true}),portalSender);
+  assert.equal(reply.prepare,false);assert.equal(f.data['bridge-v1'].preparation.pendingPause,null);
+});
+
+test('extending an active timed pause cancels its older undelivered closure', async () => {
+  const f=workerFixture();await enablePortal(f);f.advance(600000);
+  const base={startAt:at,endAt:'2026-10-04T22:00:00.000Z',hasCall:true};
+  const pause={type:'break',startedAt:at,endsAt:new Date(f.now()).toISOString()};
+  f.plan({...base,pause});await f.worker.message({kind:'resume-options',break:true,lunch:true,mode:'timed'},sender);
+  f.ack({status:'blocked'});
+  await f.worker.message(portalPacket('authenticated',{call:'idle',offline:true}),portalSender);
+  assert.equal(f.data['bridge-v1'].queue.filter(item=>item.event.type==='pause-end').length,1);
+  f.plan({...base,pause:{...pause,endsAt:new Date(f.now()+600000).toISOString()}});f.ack({status:'ok'});
+  await f.worker.flush();
+  assert.equal(f.data['bridge-v1'].queue.some(item=>item.event.type==='pause-end'),false);
+  assert.equal(f.data['bridge-v1'].preparation.pendingPause.requestId,null);
+  assert.equal(f.data['bridge-v1'].preparation.pendingPause.endedAt,null);
+});
 test('portal login and confirmed logout queue shift events once across reload and worker restart', async () => {
   const f = workerFixture(); await enablePortal(f);
   await f.worker.message(portalPacket('authenticated'), portalSender);
@@ -648,6 +675,18 @@ test('network acceptance completed after a UI end cannot resurrect an earlier ca
   const active = reduce(null, 'accepted', at).state;
   const closed = reduce(active, 'disconnected', ended).state;
   assert.equal(reduce(closed, 'accepted', at).event, null);
+});
+
+test('a rejected late network acceptance cannot consume the first call of a different plan', async () => {
+  const f = workerFixture(); await enablePortal(f);
+  f.plan({startAt:at,endAt:'2026-10-04T22:00:00.000Z',hasCall:false});
+  await f.worker.message({kind:'prepare-first',enabled:true},sender);
+  await f.signal('accepted-by-local'); f.advance(60000); await f.signal('disconnected-by-local');
+  const nextStart='2026-10-04T18:05:00.000Z'; f.advance(9*60000);
+  f.plan({startAt:nextStart,endAt:'2026-10-04T22:00:00.000Z',hasCall:false}); await f.worker.flush();
+  await f.signal('accepted-by-local',{timeStamp:Date.parse(at)});
+  assert.notEqual(f.data['bridge-v1'].preparation.doneFor,nextStart);
+  assert.equal(f.data['bridge-v1'].tabs[1].active,null);
 });
 
 test('signals require exact endpoints and allowlisted primitive names', () => {

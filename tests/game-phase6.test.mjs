@@ -861,7 +861,7 @@ test('cuarta simulación mensual: llamadas antes o después del checkpoint cuent
   const appMain = read('js/app-main.js');
   assert.match(appMain, /function callPresenceIntervalsForDay/);
   assert.match(appMain, /function presenceIntervalsForDay/);
-  assert.match(appMain, /presenceIntervalsForDay\(normalized, sessions\)/);
+  assert.match(appMain, /presenceIntervalsForDay\(normalized, sessions, lastSlotEnd\)/);
   assert.match(appMain, /callsForDay\(normalized\)\.forEach\(call =>/);
   assert.match(appMain, /return mergeIntervals\(intervals\)\.reduce/);
   assert.match(appMain, /function callPresenceIntervalsForDay/);
