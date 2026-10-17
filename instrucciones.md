@@ -321,8 +321,14 @@ Auditoría profunda solicitada explícitamente: v618 / extensión 2.2.6.
 Siete grupos corregidos, 798 pruebas completas correctas y simulación de 32 días
 con cuenta ficticia. Informe en docs/auditoria-profunda-2026-10-17.md.
 Guía práctica de 73 funciones en docs/guia-practica-tool-y-extension.md.
-CI/publicación y activación nativa se verifican aparte por SHA y versión;
-no confundir archivos preparados con extensión ya recargada en Chrome.
+CI y publicación de la auditoría verificadas en PR #73 y main
+2f9d5e0e1bbd25e86d6167c3f00b31cccae32f42. El usuario confirmó la recarga
+de la extensión 2.2.6, Propio y tracker.
+
+Extensión 2.2.7: refuerzo de trabajo en segundo plano instalado con respaldo; protección
+autoDiscardable de los tres sitios, plan nuevo bajo demanda y muestreo extra
+del portal cada 30 segundos. Publicación por SHA y recarga nativa se verifican aparte;
+no se garantiza precisión al segundo, páginas congeladas ni PC suspendida.
 
 
 Vista original nativa recuperada y confirmada en Chrome Jonathan; el usuario
@@ -922,7 +928,7 @@ La aplicación funciona en producción con estas bases vigentes:
   el de la guía es nofollow. La extensión se instala desde archivo según el
   propietario, por lo que no hay ficha propia de Chrome Web Store que editar.
   Detalle en `docs/seo.md`.
-- La versión actual de la app es 618; la extensión unificada es 2.2.6. El build
+- La versión actual de la app es 618; la extensión unificada es 2.2.7. El build
   del resumen independiente 1.0.5 queda compatible para instalaciones anteriores.
   Refuerzo positivo puede funcionar con Logros apagados. La auditoría profunda del
   8 de octubre corrigió seis fallos; la ampliación corrigió cinco más en arranque,
@@ -947,6 +953,21 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**Extensión 2.2.7 — Respaldo para pestañas en segundo plano.**
+
+- Protección contra descarte automático solo en tracker, Propio y UseInterpreter;
+  devuelve indicadores propios al navegar fuera, sin recargar ni traer al frente.
+- Lectura nueva del plan antes de evaluar disponibilidad; sin respuesta no usa
+  ACW antiguo. Comprobación extra desde alarma cada 30 s y al reanudar página.
+- Muestreo del portal coalescido conserva guards, Stop manual y estabilidad
+  de evidencia. Plazos limitados evitan bloquear el worker ante una página dormida.
+- 805 pruebas correctas; flujo compilado con intervalos de páginas anulados:
+  horario temprano bloqueado, Stop tras llamada, ACW 00:50 + 02:10, reinicio
+  del worker y Stop manual persistido. Cuenta ficticia, sin llamadas reales.
+- Chrome puede demorar alarmas o congelar páginas; no funciona con PC suspendida.
+  Permisos y composición visual intactos. Activación nativa requiere recarga.
+
 
 **v618 / Extensión 2.2.6 — Auditoría profunda de disponibilidad y bloques.**
 
@@ -980,26 +1001,3 @@ La aplicación funciona en producción con estas bases vigentes:
 - Archivos se actualizan con respaldo, conservando preferencias personales.
   La conexión bloquea chrome://extensions; no eludir y no recargar páginas de
   llamadas para este cambio de popup. Activación nativa requiere recarga manual.
-
-
-**v617 / Extensión 2.2.4 — Prioridades y elección manual en disponibilidad.**
-
-- Un regreso de Break/Lunch apagado bloquea también primera llamada y spacing
-  hasta una llamada real posterior. Regreso habilitado conserva su prioridad.
-- Stop Calls manual pausa automatismos, sin confundir los clics sintéticos de
-  la extensión. Start manual o interruptor del popup reanudan; pausa persistida
-  y registro conservado. Respuestas atrasadas no deshacen una decisión manual.
-- Sin tracker actual/único se descarta el plan guardado, incluso sin cola.
-  Cierre anticipado de pausa solo omite su bloque correspondiente; un regreso
-  pendiente no omite otra pausa programada. ACW futuro no autoriza iniciar.
-- Pausar cancela cierres de pausa no entregados, conservando eventos de llamadas.
-  Revisión de los 54 casos documenta las decisiones y límites de dos PCs/reloj.
-- 786 pruebas completas correctas; 18 regresiones nuevas en total. Build app/puente y 2.260 textos correctos, 21 criterios,
-  67 suites y 73 módulos fuente. Navegador aislado: ciclo completo con ACW 00:50,
-  reinicio, Stop manual persistido y Start manual; popup conserva elección y
-  vista original en ambos temas, sin errores ni overflow. CI/deploy por SHA.
-- La conexión oficial rechaza chrome://extensions por su política de URL.
-  No eludir por CDP, Sky ni otras superficies. Se copiaron y verificaron 19
-  archivos con respaldo y preferencias personales intactas. Usuario confirmó
-  recarga de extensión, Propio y tracker; se observa portal Offline y sin aviso
-  activo de conflicto en el tracker. No se provocaron llamadas reales.

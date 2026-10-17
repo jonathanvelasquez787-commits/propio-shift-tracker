@@ -1402,6 +1402,36 @@
           ]
         }
       ]
+    },
+    {
+      "id": "background-work-tabs",
+      "acceptance": "Open work tabs are protected from automatic discard without focus or reload; background maintenance requests fresh tracker state before using unchanged availability guards, and restores only flags owned by this extension when navigating away. Frozen or nonresponding pages do not authorize actions.",
+      "sources": [
+        "extension/propio-bridge/background-tabs.js",
+        "extension/propio-bridge/tracker-content.js",
+        "extension/propio-bridge/portal-content.js",
+        "extension/propio-bridge/bridge-worker.js"
+      ],
+      "tests": [
+        {
+          "file": "tests/background-tabs.test.mjs",
+          "namedCases": [
+            "background protection changes only exact work origins without activating, reloading or widening permissions",
+            "protection restores only owned flags after navigation and survives a service-worker restart",
+            "a failed restoration remains owned for retry rather than leaving unrelated tabs protected",
+            "background refresh requests current tracker data and samples hidden portals, skipping discarded/frozen ones",
+            "portal can sample from an extension message with its interval stopped and coalesces overlapping requests"
+          ]
+        },
+        {
+          "file": "tests/propio-extension-reload.test.mjs",
+          "namedCases": [
+            "worker refresh waits for a new app snapshot and shares it across concurrent requests without reannouncing",
+            "a nonresponding background app returns no plan instead of relabeling an old snapshot as current"
+          ]
+        }
+      ],
+      "area": "Trabajo con pestañas en segundo plano"
     }
   ],
   "limits": [

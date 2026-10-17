@@ -3,13 +3,18 @@
   if (location.origin !== origin || window.top !== window) return;
   let ready = null, stopped = false, heartbeat, lastAnnounced = 0, announcing = false;
   const pending = new Map();
+  let refreshing = null;
   function alive() { try { return !stopped && Boolean(chrome.runtime.id); } catch { return false; } }
   function stop() {
     if (stopped) return;
     stopped = true; clearInterval(heartbeat);
     for (const item of pending.values()) clearTimeout(item.timer);
     pending.clear(); ready = null;
+    if (refreshing) { clearTimeout(refreshing.timer); refreshing.responders.forEach(respond => respond(null)); refreshing = null; }
     window.removeEventListener('message', onAppMessage);
+    window.removeEventListener('pageshow', hello);
+    document.removeEventListener('visibilitychange', hello);
+    document.removeEventListener('resume', hello);
     try { chrome.runtime.onMessage.removeListener(onExtensionMessage); } catch { /* Chrome may already have invalidated this content script. */ }
   }
   const hello = () => {
@@ -43,7 +48,9 @@
       }
       const changed = ready?.accountScope !== packet.accountScope || ready?.nonce !== packet.nonce || JSON.stringify(ready?.plan) !== JSON.stringify(plan);
       ready = { accountScope: packet.accountScope, nonce: packet.nonce, plan };
-      if (changed || Date.now() - lastAnnounced >= 10000) void announce({ kind: 'tracker-ready', ...ready });
+      if (refreshing) {
+        const current = refreshing; refreshing = null; clearTimeout(current.timer); current.responders.forEach(respond => respond(ready));
+      } else if (changed || Date.now() - lastAnnounced >= 10000) void announce({ kind: 'tracker-ready', ...ready });
     } else if (packet.kind === 'ack' && ready && packet.nonce === ready.nonce && packet.accountScope === ready.accountScope) {
       const item = pending.get(packet.requestId);
       if (item) { clearTimeout(item.timer); respondSafely(item.respond, packet.result); pending.delete(packet.requestId); }
@@ -52,7 +59,17 @@
   function onExtensionMessage(message, sender, respond) {
     if (!alive()) { stop(); return; }
     if (sender.id !== chrome.runtime.id) return;
-    if (message?.kind === 'identify-tracker') { respond(ready); return; }
+    if (message?.kind === 'identify-tracker') {
+      if (!message.refresh) { respond(ready); return; }
+      if (refreshing) {
+        if (refreshing.responders.length >= 8) { respond(null); return; }
+        refreshing.responders.push(value => respondSafely(respond, value)); return true;
+      }
+      const timer = setTimeout(() => { const current = refreshing; refreshing = null; current?.responders.forEach(reply => reply(null)); }, 2500);
+      refreshing = { timer, responders: [value => respondSafely(respond, value)] };
+      hello();
+      return true;
+    }
     if (message?.kind !== 'deliver-event' || !ready || message.accountScope !== ready.accountScope) return;
     const requestId = crypto.randomUUID();
     const timer = setTimeout(() => { pending.delete(requestId); respondSafely(respond, { status: 'blocked', reason: 'app-timeout' }); }, 8000);
@@ -61,6 +78,9 @@
     return true;
   }
   window.addEventListener('message', onAppMessage);
+  window.addEventListener('pageshow', hello);
+  document.addEventListener('visibilitychange', hello);
+  document.addEventListener('resume', hello);
   chrome.runtime.onMessage.addListener(onExtensionMessage);
   heartbeat = setInterval(hello, 5000); hello();
 })();
