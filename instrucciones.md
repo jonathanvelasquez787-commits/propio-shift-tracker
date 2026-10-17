@@ -318,7 +318,7 @@ futura opera bajo esto, sin excepción:
 **PENDIENTES**
 
 Auditoría profunda solicitada explícitamente: v618 / extensión 2.2.6.
-Seis grupos corregidos, 794 pruebas completas correctas y simulación de 32 días
+Siete grupos corregidos, 794 pruebas completas correctas y simulación de 32 días
 con cuenta ficticia. Informe en docs/auditoria-profunda-2026-10-17.md.
 Guía práctica de 73 funciones en docs/guia-practica-tool-y-extension.md.
 CI/publicación y activación nativa se verifican aparte por SHA y versión;
@@ -957,6 +957,8 @@ La aplicación funciona en producción con estas bases vigentes:
 - Plan del puente coincide con límites y precisión del horario desplazado.
   Bloques nocturnos conservan orden, fechas y duración; llegada tras medianoche
   desplaza por fechas completas. Se mantienen límites de reconstrucción diaria.
+- Botones de llamadas en móvil conservan contador y subtítulos completos,
+  reutilizando composición vertical; sin quitar textos ni cambiar handlers.
 - 794 pruebas, 2.260 textos, 38 contratos de módulos, wiring y builds correctos.
   Simulación aislada de 32 días: 96 llamadas, 736 minutos, $88.32 y 64 pausas;
   recargas/reaperturas conservan datos. Flujo compilado ACW 00:50 y popup probado.

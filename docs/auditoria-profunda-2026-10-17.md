@@ -44,6 +44,12 @@ Parte de main `6b001ae3238a60f0133228b1e4ea591728646060`, sin modificar datos re
    corrigen el rango de adherencia que quedaba en cero, su indicador después de
    medianoche, los avisos de pausa y el denominador del progreso del turno.
 
+7. **Los botones de llamadas recortaban texto en móvil.** El layout horizontal
+   conservaba icono, título y subtítulo en la misma fila dentro de tres columnas.
+   Se reutiliza su composición vertical existente para mostrar también el
+   contador y los subtítulos completos. Se comprueban los rectángulos de cada
+   línea de texto dentro de su botón; medir solo el ancho de la página no bastaba.
+
 ## Regresiones y controles automáticos
 
 - Base: 786 pruebas. Resultado final: **794 pruebas correctas, cero fallos y
