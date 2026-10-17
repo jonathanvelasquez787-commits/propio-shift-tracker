@@ -229,7 +229,7 @@ export function configureScheduleContext(context) {
       }).join('') || translateMarkup('<div class="note" style="margin:0;">Sin bloques configurados. Usa "+ Agregar bloque" para empezar (Trabajo también es un bloque explícito ahora).</div>');
     }
 
-    // Lee todas las filas .block-row actualmente en el DOM (en el mismo orden en que se renderizaron) y arma el arreglo `blocks` — reemplaza a los editores separados de Break/Lunch que había antes. Pedido del usuario:
+    // Conserva el orden del editor y despliega los finales que caen después de medianoche.
     function readBlocksFromEditor() {
       const rows = document.querySelectorAll('#blocksEditorList .block-row');
       return Array.from(rows).map(row => {
@@ -240,13 +240,13 @@ export function configureScheduleContext(context) {
         const type = BLOCK_TYPE_LABELS[typeInput ? typeInput.value : ''] ? typeInput.value : 'work';
         const start = formatHHMM(startInput ? startInput.value : '09:00');
         const end = formatHHMM(endInput ? endInput.value : start);
-        const dur = Math.max(0, toMinutes(end) - toMinutes(start));
+        const dur = (toMinutes(end) - toMinutes(start) + 1440) % 1440;
         return normalizeBlockForCompare({ type, start, dur, goalMin: goalInput ? goalInput.value : 0 });
       });
     }
 
-    // BUG-005 (QA ) — Antes, un bloque con Fin <= Inicio (cruza medianoche, ej. 22:00–06:00, o Fin igual a Inicio por error de tecleo) se descartaba EN SILENCIO:
-    function blockRowsCrossingMidnight() {
+    // Inicio y fin iguales son ambiguos; un final anterior representa el día siguiente.
+    function blockRowsWithEqualTimes() {
       const rows = document.querySelectorAll('#blocksEditorList .block-row');
       const offenders = [];
       Array.from(rows).forEach((row, i) => {
@@ -256,7 +256,7 @@ export function configureScheduleContext(context) {
         if (!startInput || !endInput) return;
         const start = formatHHMM(startInput.value);
         const end = formatHHMM(endInput.value);
-        if (toMinutes(end) <= toMinutes(start)) {
+        if (toMinutes(end) === toMinutes(start)) {
           const type = BLOCK_TYPE_LABELS[typeInput ? typeInput.value : ''] ? typeInput.value : 'work';
           offenders.push({ index: i, typeLabel: BLOCK_TYPE_LABELS[type], start, end });
         }
@@ -264,10 +264,10 @@ export function configureScheduleContext(context) {
       return offenders;
     }
 
-    function blockCrossingMidnightMessage(offenders) {
+    function blockEqualTimesMessage(offenders) {
       const first = offenders[0];
       const extra = offenders.length > 1 ? ui` (y ${offenders.length - 1} más)` : '';
-      return ui`${first.typeLabel} ${timeLabel(first.start)}–${timeLabel(first.end)} cruza la medianoche${extra} — todavía no se soporta. Divide el bloque en dos (ej. ${timeLabel(first.start)}–11:59 PM y 12:00–${timeLabel(first.end)} AM del día siguiente) o ajusta la hora.`;
+      return ui`${first.typeLabel} ${timeLabel(first.start)}–${timeLabel(first.end)} tiene inicio y fin iguales${extra}. Ajusta una de las dos horas.`;
     }
 
     // "+ Agregar bloque": toma lo que ya está en el formulario (para no perder ediciones a medio hacer en filas existentes) y le agrega una fila nueva al final. Pedido del usuario :
@@ -285,10 +285,12 @@ export function configureScheduleContext(context) {
         const dayEndVal = document.getElementById('dayEndInput')?.value;
         if (dayStartVal && dayEndVal) {
           const startMin = toMinutes(formatHHMM(dayStartVal));
-          const endMin = toMinutes(formatHHMM(dayEndVal));
+          let endMin = toMinutes(formatHHMM(dayEndVal));
+          if (endMin < startMin) endMin += 1440;
           if (endMin > startMin) {
             const midpointMin = startMin + (endMin - startMin) / 2;
-            if (toMinutes(newStart) >= midpointMin) return 'lunch';
+            const nextMin = toMinutes(newStart) < startMin ? toMinutes(newStart) + 1440 : toMinutes(newStart);
+            if (nextMin >= midpointMin) return 'lunch';
           }
         }
       }
@@ -300,8 +302,11 @@ export function configureScheduleContext(context) {
     // recorte para no sugerir pasarse del fin del turno).
     function suggestNextBlockDuration(type, newStart) {
       const dayEndVal = document.getElementById('dayEndInput')?.value;
-      const dayEndMin = dayEndVal ? toMinutes(formatHHMM(dayEndVal)) : null;
-      const remainingMin = dayEndMin !== null ? dayEndMin - toMinutes(newStart) : null;
+      const dayStartMin = toMinutes(formatHHMM(document.getElementById('dayStartInput')?.value || '00:00'));
+      let dayEndMin = dayEndVal ? toMinutes(formatHHMM(dayEndVal)) : null;
+      if (dayEndMin !== null && dayEndMin < dayStartMin) dayEndMin += 1440;
+      const nextMin = toMinutes(newStart) < dayStartMin ? toMinutes(newStart) + 1440 : toMinutes(newStart);
+      const remainingMin = dayEndMin !== null ? dayEndMin - nextMin : null;
       let dur = type === 'lunch' ? 50 : type === 'break' ? 15 : 130;
       if (remainingMin !== null && remainingMin > 0) dur = Math.min(dur, remainingMin);
       return dur;
@@ -313,8 +318,10 @@ export function configureScheduleContext(context) {
       let lastEndingBlock = null;
       if (current.length) {
         let maxEnd = -Infinity;
+        const anchor = toMinutes(formatHHMM(document.getElementById('dayStartInput')?.value || '00:00'));
         current.forEach(b => {
-          const end = toMinutes(b.start) + b.dur;
+          const start = toMinutes(b.start) < anchor ? toMinutes(b.start) + 1440 : toMinutes(b.start);
+          const end = start + b.dur;
           if (end > maxEnd) { maxEnd = end; lastEndingBlock = b; }
         });
         newStart = minutesToHHMM(maxEnd);
@@ -482,11 +489,12 @@ export function configureScheduleContext(context) {
       if (!cfg || cfg.off) return { valid: true, errors };
 
       const dayStart = toMinutes(formatHHMM(cfg.start));
-      const dayEnd = toMinutes(formatHHMM(cfg.end));
-      if (dayEnd <= dayStart) {
+      let dayEnd = toMinutes(formatHHMM(cfg.end));
+      if (dayEnd === dayStart) {
         errors.push(translateText('La hora de fin debe ser después del inicio del turno.'));
         return { valid: false, errors };
       }
+      if (dayEnd < dayStart) dayEnd += 1440;
 
       const typeLabel = { work: 'Trabajo', break: 'Break', lunch: 'Lunch' };
       const counters = { work: 0, break: 0, lunch: 0 };
@@ -496,7 +504,8 @@ export function configureScheduleContext(context) {
         const type = String(b.type || '').toLowerCase();
         if (!typeLabel[type]) return;
         counters[type] += 1;
-        const s = toMinutes(formatHHMM(b.start));
+        const clockStart = toMinutes(formatHHMM(b.start));
+        const s = clockStart < dayStart ? clockStart + 1440 : clockStart;
         const label = `${typeLabel[type]} ${counters[type]}`;
         segments.push({ label, start: s, end: s + Number(b.dur) });
         // Pedido del usuario: Meta de Productividad por bloque no puede ser
@@ -531,10 +540,9 @@ export function configureScheduleContext(context) {
     // Pedido del usuario : "Guardar día" debe guardar SOLO el día que se está editando
     export function saveShiftWindow() {
       if (scheduleViewMode === 'week' && scheduleWeekIsPast(scheduleWeekOffset)) return; // protegido, no debería llegar aquí (botón deshabilitado)
-      // BUG-005 (QA ) — ver blockRowsCrossingMidnight: antes de leer los bloques (y perder la hora de Fin al colapsarla a `dur`), se revisa si alguno cruza medianoche y se bloquea el guardado con un mensaje e…
-      const midnightOffenders = blockRowsCrossingMidnight();
+      const midnightOffenders = blockRowsWithEqualTimes();
       if (midnightOffenders.length) {
-        toast(blockCrossingMidnightMessage(midnightOffenders));
+        toast(blockEqualTimesMessage(midnightOffenders));
         return;
       }
       const cfg = readScheduleFormAsConfig();
@@ -566,10 +574,9 @@ export function configureScheduleContext(context) {
     // Pedido del usuario: "Copiar a todos los días" pasa a significar SOLO Lunes-Viernes
     export function copyDayToAll() {
       if (scheduleViewMode === 'week' && scheduleWeekIsPast(scheduleWeekOffset)) return;
-      // BUG-005 — ver comentario en saveShiftWindow().
-      const midnightOffendersAll = blockRowsCrossingMidnight();
+      const midnightOffendersAll = blockRowsWithEqualTimes();
       if (midnightOffendersAll.length) {
-        toast(blockCrossingMidnightMessage(midnightOffendersAll));
+        toast(blockEqualTimesMessage(midnightOffendersAll));
         return;
       }
       const cfg = readScheduleFormAsConfig();
@@ -603,10 +610,9 @@ export function configureScheduleContext(context) {
     // Pedido del usuario : botón propio "Copiar a Sábado-Domingo", mismo patrón/nivel que "Copiar a Lunes-Viernes" (copyDayToAll)
     export function copyDayToWeekend() {
       if (scheduleViewMode === 'week' && scheduleWeekIsPast(scheduleWeekOffset)) return;
-      // BUG-005 — ver comentario en saveShiftWindow().
-      const midnightOffendersWeekend = blockRowsCrossingMidnight();
+      const midnightOffendersWeekend = blockRowsWithEqualTimes();
       if (midnightOffendersWeekend.length) {
-        toast(blockCrossingMidnightMessage(midnightOffendersWeekend));
+        toast(blockEqualTimesMessage(midnightOffendersWeekend));
         return;
       }
       const cfg = readScheduleFormAsConfig();

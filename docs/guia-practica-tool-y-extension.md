@@ -188,7 +188,7 @@ Estas opciones están en el popup de la extensión. **Registrar llamadas y poner
 
 - **Qué hace:** define la jornada habitual de cada día, incluidos días libres y bloques de trabajo, Break y Lunch.
 - **Qué configurás:** entradas, salidas, comienzos y duraciones; cada bloque de trabajo puede tener su meta productiva.
-- **Ejemplo:** de lunes a viernes trabajás de 8:00 a 16:00 y el domingo es libre. La tool usa esa plantilla sin que la repitás cada semana.
+- **Ejemplo:** de lunes a viernes trabajás de 8:00 a 16:00 y el domingo es libre. La tool usa esa plantilla sin que la repitás cada semana. Un horario 22:00–06:00 termina a las 6:00 del día siguiente.
 
 ### 30. Semana específica y copia de horarios
 

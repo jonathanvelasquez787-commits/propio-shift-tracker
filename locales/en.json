@@ -1589,7 +1589,6 @@
   "s_b4fa04f7": "{{v0}} · {{v1}} call(s){{v2}}",
   "s_b50e8da9": "Day {{v1}} of {{v2}} · {{v3}}{{v4}}{{v5}} vs your goal",
   "s_b52459fa": "Edit reward",
-  "s_b53fb325": "{{v0}} {{v1}}–{{v2}} crosses midnight{{v3}} — not supported yet. Split it in two (e.g. {{v4}}–11:59 PM and 12:00–{{v5}} AM next day) or adjust time.",
   "s_b5662af6": "Vercel Inc. — hosting provider",
   "s_b56ab8eb": "Each part of your shift is a block. Add each planned Work, Break or Lunch with start/end times. Uncovered shift time stays unplanned without affecting Adherence. Work blocks may also have a productive goal: expected minutes on calls in that block.",
   "s_b595cca8": "Friday counts too",
@@ -2456,5 +2455,6 @@
   "s_a4b9c851": "Propio connection ended",
   "s_c1e967e9": "On shift: {{v1}}",
   "s_c6b748d4": "Connection time, including early connection",
-  "s_f62e7856": "Shift time, excluding early connection"
+  "s_f62e7856": "Shift time, excluding early connection",
+  "s_2e69692c": "{{v0}} {{v1}}–{{v2}} has identical start and end times{{v3}}. Adjust one of the times."
 }

@@ -2442,6 +2442,12 @@
       "js/finance-planning.js"
     ]
   },
+  "s_2e69692c": {
+    "source": "{{v0}} {{v1}}–{{v2}} tiene inicio y fin iguales{{v3}}. Ajusta una de las dos horas.",
+    "files": [
+      "js/schedule.js"
+    ]
+  },
   "s_2e9445f7": {
     "source": "Min",
     "files": [
@@ -9798,12 +9804,6 @@
     "source": "Editar premio",
     "files": [
       "js/positive-reinforcement.js"
-    ]
-  },
-  "s_b53fb325": {
-    "source": "{{v0}} {{v1}}–{{v2}} cruza la medianoche{{v3}} — todavía no se soporta. Divide el bloque en dos (ej. {{v4}}–11:59 PM y 12:00–{{v5}} AM del día siguiente) o ajusta la hora.",
-    "files": [
-      "js/schedule.js"
     ]
   },
   "s_b559c2cf": {

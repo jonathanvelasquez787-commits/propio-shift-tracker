@@ -1361,7 +1361,8 @@
         {
           "file": "tests/connection-work-time.test.mjs",
           "namedCases": [
-            "a zero-duration historical row before the shift cannot create ten minutes of work or ACW"
+            "a zero-duration historical row before the shift cannot create ten minutes of work or ACW",
+          "the accounting day of an open overnight shift remains live without a fabricated exit or future missed pause"
           ]
         },
         {
@@ -1388,13 +1389,16 @@
           "file": "tests/domain-language-render.test.mjs",
           "namedCases": [
             "night work blocks preserve chronological order, duration and next-day call coverage",
-          "night adherence counts full dated minutes and next-day pauses instead of a zero-length clock range"
+          "night adherence counts full dated minutes and next-day pauses instead of a zero-length clock range",
+          "elapsed work after an early shift closure is incomplete rather than upcoming in both languages"
           ]
         },
         {
           "file": "tests/reinforcement-schedule.test.mjs",
           "namedCases": [
-            "arrival after midnight shifts the night slots by elapsed dates rather than subtracting wall-clock hours"
+            "arrival after midnight shifts the night slots by elapsed dates rather than subtracting wall-clock hours",
+          "the production schedule editor reads and validates midnight blocks while rejecting overlaps and out-of-shift work",
+          "a call-estimated live shift uses todays alarm plan when the stored explicit shift already ended"
           ]
         }
       ]

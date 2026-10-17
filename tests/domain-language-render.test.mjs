@@ -94,6 +94,12 @@ test('night adherence counts full dated minutes and next-day pauses instead of a
   h.checkBreakStartAlarm();assert.equal(alarms.length,1);assert.ok(alarms[0].startsWith(dayKey+'|'));
 });
 
+test('elapsed work after an early shift closure is incomplete rather than upcoming in both languages',t=>{
+  t.after(()=>setLanguage('es'));
+  for(const language of ['es','en']){setLanguage(language);const html=scheduleHarness({now:at(12,12),start:at(12,8),end:at(12,8,30)});
+    assert.ok(html.includes(language==='es'?'Incompleto':'Incomplete'));}
+});
+
 for (const language of ['es', 'en']) {
   test('real schedule rendering localizes skipped work and absence detail in both supported languages', t => {
     setLanguage(language); t.after(() => setLanguage('es'));

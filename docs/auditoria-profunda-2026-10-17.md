@@ -50,10 +50,23 @@ Parte de main `6b001ae3238a60f0133228b1e4ea591728646060`, sin modificar datos re
    contador y los subtítulos completos. Se comprueban los rectángulos de cada
    línea de texto dentro de su botón; medir solo el ancho de la página no bastaba.
 
+## Casos adicionales cerrados durante la revisión
+
+- El día contable anterior conserva la sesión viva cuando coincide con el
+  inicio del turno todavía abierto. No inventa una salida ni penaliza pausas
+  futuras; los registros huérfanos históricos conservan su comportamiento.
+- El editor permite guardar horarios como 22:00–06:00 y bloques que cruzan
+  medianoche; normaliza duración, orden de sugerencias y validación de límites.
+  Sigue rechazando horas iguales, solapamientos y bloques fuera del turno.
+- Un bloque ya transcurrido después de salir temprano se muestra Incompleto,
+  en lugar de permanecer Próximo. Se comprueba en ES/EN y en la app compilada.
+- Si llamadas recientes producen un turno estimado de hoy, una sesión explícita
+  ya cerrada de ayer no desvía hacia ayer sus avisos de Break/Lunch.
+
 ## Regresiones y controles automáticos
 
-- Base: 786 pruebas. Resultado final: **794 pruebas correctas, cero fallos y
-  cero omitidas**. Ocho casos nuevos, más dos aserciones en el caso existente
+- Base: 786 pruebas. Resultado final: **798 pruebas correctas, cero fallos y
+  cero omitidas**. Doce casos nuevos, más dos aserciones en el caso existente
   que compara el plan real con el horario desplazado.
 - Nuevos casos en `connection-work-time`, `propio-bridge`, `propio-acw-plan`,
   `domain-language-render` y `reinforcement-schedule`; ampliación de
@@ -71,7 +84,7 @@ Parte de main `6b001ae3238a60f0133228b1e4ea591728646060`, sin modificar datos re
   Es un control estructural conservador, no una prueba de todas las ramas.
 - Escaneo del árbol e historial: 1.846 archivos/blobs, sin hallazgos.
   `pnpm audit --audit-level high`: sin vulnerabilidades conocidas.
-- El bundle final de app mide 801.247 bytes. Se revisó el aumento necesario
+- El bundle final de app mide 801.666 bytes. Se revisó el aumento necesario
   para estas correcciones y se ajustó únicamente su presupuesto de 800.000 a
   802.000 bytes; los otros límites permanecen. El build conserva la comprobación.
 
@@ -102,9 +115,11 @@ comprueban también cambio de moneda principal, nombre, sonido de llamada,
 desplazamiento del horario completo, alta de gasto y texto/minutos/repetición
 del aviso sin llamadas. Ajustes y llamadas originales permanecen al reabrir.
 
-Chrome compilado comprueba además dos turnos nocturnos (abierto y cerrado al
-día siguiente): orden de tres bloques, duración de tres horas del primero,
-adherencia 90/90 en vivo y 180/180 y 285/285 al cerrar, sin errores ni overflow.
+Chrome compilado comprueba además tres momentos nocturnos (antes y después de
+medianoche con turno abierto, y cerrado al día siguiente): orden de tres bloques,
+duración de tres horas del primero, adherencia 90/90 y 150/150 en vivo, y 180/180
+y 285/285 al cerrar. Agrega un bloque en el editor, guarda 22:00–06:00 con una
+meta modificada y conserva sus duraciones al reabrir. Sin errores ni overflow.
 
 ## Disponibilidad y popup compilados
 

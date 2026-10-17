@@ -1916,7 +1916,7 @@ function checkBreakStartAlarm() {
     return;
   }
 
-  const dayKey = currentShiftAccountingDayKey();
+  const dayKey = state.shiftStartedAt && !state.shiftEndedAt ? currentShiftAccountingDayKey() : todayCallDateKey();
   const planned = getEffectiveScheduleForDay(dayKey).filter(s => s.type === 'Break' || s.type === 'Lunch');
   const base = callDateToDate(dayKey) || new Date();
   const now = new Date();
@@ -2601,8 +2601,9 @@ function dayShiftSessions(dayKey = getActiveDayKey()) {
   });
 
   if (openStart) {
-    if (isToday && !state.shiftEndedAt) {
-      // Turno en curso hoy, sin cerrar todavía.
+    const matchesActiveShift = state.shiftStartedAt && !state.shiftEndedAt && Date.parse(state.shiftStartedAt) === openStart.getTime();
+    if ((isToday || matchesActiveShift) && !state.shiftEndedAt) {
+      // El turno activo conserva su día contable después de medianoche.
       allSessions.push({ start: openStart, end: new Date(), live: true });
     } else if (!isToday) {
       // Turno de un día pasado que nunca se cerró — estimar fin desde la última llamada real de ese
@@ -3367,7 +3368,7 @@ export function dayAdherence(dayKey) {
       score: adherenceProximityScore(Math.abs(endDelta), ADHERENCE_FALLOFF_SHIFT_MIN),
       note: endDelta < -ADHERENCE_TOLERANCE_MIN ? ui`Temprano ${formatDeltaMinutes(endDelta)}` : endDelta > ADHERENCE_TOLERANCE_MIN ? ui`Tarde +${formatMinutes(endDelta)}m` : translateText('A tiempo'),
     });
-  } else if (!isToday) {
+  } else if (!isToday && !(state.shiftStartedAt && !state.shiftEndedAt && sameCallDay(state.shiftStartedAt, normalized))) {
     // Día pasado sin hora de fin registrada ni llamadas para estimarla: cuenta como checkpoint
     // fallado.
     checkpoints.push({ label: 'Salida', ok: false, score: 0, note: translateText('No se registró la salida') });
@@ -3384,8 +3385,8 @@ export function dayAdherence(dayKey) {
     const actual = pauseForSlot(slot, normalized);
 
     if (!actual) {
-      const skip = lastSession.live && isToday && now_isBefore(slotEnd);
-      if (skip) continue; // Todavía no le tocaba, no penalizar aún Sin puntaje parcial aquí a propósito: "No tomado" es binario (o se marcó con el botón/se clasificó el hueco, o no) — no hay una noción de "casi tomaste tu break" que tenga sentido dar crédito parcial.
+      const skip = lastSession.live && now_isBefore(slotEnd);
+      if (skip) continue; // No penalizar una pausa futura del turno abierto.
       checkpoints.push({ label: slot.name, ok: false, score: 0, note: translateText('No tomado') });
       continue;
     }
@@ -6582,7 +6583,7 @@ function renderSchedule() {
         const isFutureDay = (callDateToDate(dayKey) || new Date()) > todayRange();
         // Un día pasado con salida temprana dentro del bloque no es "Próximo": se marca
         // "Incompleto".
-        const statusText = active ? translateText('Actual') : done ? translateText('Hecho') : (isPastDay ? (shiftStart ? translateText('Incompleto') : translateText('Sin actividad')) : translateText('Próximo'));
+        const statusText = active ? translateText('Actual') : done ? translateText('Hecho') : ((isPastDay || now >= stats.slotEnd) ? (shiftStart ? translateText('Incompleto') : translateText('Sin actividad')) : translateText('Próximo'));
         const statusClass = stats.statusTone === 'good' ? 'good' : stats.statusTone === 'warn' ? 'warn' : stats.statusTone === 'bad' ? 'bad' : '';
         const usedProgressLabel = ui`${formatDuration(stats.filledMin * 60000)} usados`;
         const acwProgressLabel = `ACW ${formatDuration(blockAcwMin * 60000)}`;
