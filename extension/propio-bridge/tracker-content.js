@@ -3,7 +3,7 @@
   if (location.origin !== origin || window.top !== window) return;
   let ready = null, stopped = false, heartbeat, lastAnnounced = 0, announcing = false;
   const pending = new Map();
-  let refreshing = null;
+  let refreshing = null, statusPending = false, lastStatusRequested = -Infinity;
   function alive() { try { return !stopped && Boolean(chrome.runtime.id); } catch { return false; } }
   function stop() {
     if (stopped) return;
@@ -28,6 +28,18 @@
     catch (error) { if (!alive() || /extension context invalidated/i.test(String(error?.message))) stop(); }
     finally { announcing = false; }
   }
+  async function announceStatus() {
+    if (!ready || statusPending || Date.now() - lastStatusRequested < 1000) return;
+    statusPending = true; lastStatusRequested = Date.now();
+    const owner = { accountScope: ready.accountScope, nonce: ready.nonce };
+    try {
+      const status = await chrome.runtime.sendMessage({ kind: 'tracker-status', accountScope: owner.accountScope });
+      if (alive() && ready?.nonce === owner.nonce && ready.accountScope === owner.accountScope) {
+        window.postMessage({ protocol, direction: 'extension', kind: 'automation-status', ...owner, status }, origin);
+      }
+    } catch { if (!alive()) stop(); }
+    finally { statusPending = false; }
+  }
   function respondSafely(respond, result) { if (alive()) { try { respond(result); } catch { /* The receiving page may have closed. */ } } }
   function onAppMessage(message) {
     if (!alive()) { stop(); return; }
@@ -48,6 +60,7 @@
       }
       const changed = ready?.accountScope !== packet.accountScope || ready?.nonce !== packet.nonce || JSON.stringify(ready?.plan) !== JSON.stringify(plan);
       ready = { accountScope: packet.accountScope, nonce: packet.nonce, plan };
+      void announceStatus();
       if (refreshing) {
         const current = refreshing; refreshing = null; clearTimeout(current.timer); current.responders.forEach(respond => respond(ready));
       } else if (changed || Date.now() - lastAnnounced >= 10000) void announce({ kind: 'tracker-ready', ...ready });

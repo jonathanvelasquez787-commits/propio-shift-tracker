@@ -99,7 +99,7 @@ test('production delayed app evaluation rejects a reassigned owner before readin
     const context = vm.createContext({ window: { location: { replace: url => { redirected = url; } } },
       document: { body: { classList: { add() {}, remove() {} } } }, overlay: { remove: () => { revealed = true; } },
       readMeta: () => ({ userId: owner }), setAppEntryHint() {}, fail: message => { throw Error(message); },
-      translateText: value => value, console,
+      translateText: value => value, console, automationUi: null, installAutomationStatusUi: () => ({ stop() {} }),
       loadState: loadModel, loadCalls: loadModel, loadSettings: loadModel,
       setAppState() {}, setAppCalls() {}, setAppSettings() {}, initialized: () => { modelWrites++; },
       finished: finish,

@@ -1,5 +1,6 @@
 import { PORTAL_ORIGIN, TRACKER_ORIGIN, TWILIO_EVENT_ORIGINS, accountScopeValid, readPropioSignal, readPropioRequestBody, propioRequestKind, validateBridgeEvent, validateBridgePlan, createPropioReducer } from '../../js/propio-bridge-rules.js';
 import { validatePortalRecord, portalRecordKey } from '../../js/propio-history-records.js';
+import { createAutomationStatus } from '../../js/automation-status.js';
 
 const KEY = 'bridge-v1';
 const URLS = [`${PORTAL_ORIGIN}/*`, ...TWILIO_EVENT_ORIGINS.map(origin => `${origin}/v4/EndpointEvents*`)];
@@ -357,6 +358,11 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
         return { ok: true };
       });
       await flush(); return result;
+    }
+    if (packet?.kind === 'tracker-status') {
+      if (sender.frameId !== 0 || !Number.isInteger(sender.tab?.id) || !accountScopeValid(packet.accountScope)) return null;
+      try { if (new URL(sender.url).origin !== TRACKER_ORIGIN) return null; } catch { return null; }
+      return transact(state => state.accountScope === packet.accountScope ? createAutomationStatus(state, now()) : null);
     }
     if (packet?.kind === 'tracker-ready') {
       if (sender.frameId !== 0 || !sender.tab || !accountScopeValid(packet.accountScope)) return null;

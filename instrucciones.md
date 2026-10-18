@@ -317,6 +317,11 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
+- **Mejoras integrales aprobadas el 18/10:** ejecutar las recomendaciones de la
+  evaluación de 79 funciones por fases; alcance y estado completo en
+  [plan de mejoras](docs/plan-mejoras-integrales.md). Primera fase: estado de
+  disponibilidad y preparación en Inicio. No perder las fases posteriores al
+  entregar una parte ni considerar pendiente la instalación ya confirmada.
 - **Segundos oficiales de Propio:** confirmar con evidencia si el último minuto
   incompleto se incluye en duración y pago. El formato de hora visible no lo demuestra.
   No cambiar ACW ni alargar llamadas por esa suposición.
@@ -426,7 +431,7 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
-- App 621; extensión unificada 2.2.7. Resumen independiente retirado, sin build
+- App 622; extensión unificada 2.2.8 (recarga local por confirmar). Resumen independiente retirado, sin build
   mantenido. El historial oficial compartido y las funciones del tracker siguen
   activos. Guía de 73 funciones en docs/guia-practica-tool-y-extension.md.
 - Google es la entrada pública. Formularios deshabilitados de login/registro y
@@ -453,6 +458,17 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v622 — Disponibilidad visible y seguimiento completo.**
+
+- Primera sección de disponibilidad en Inicio, con motivo dominante, cuenta
+  regresiva del worker y preparación plegada; diseño claro/oscuro aprobado.
+- Estado de solo lectura por cuenta/nonce/origen, descartando lecturas viejas y
+  respuestas de otro documento. No cambia prioridades ni acepta llamadas.
+- Lista individual de 79 mejoras con estado y evidencia, sin cerrar un punto
+  compuesto por entregar una parte. Alcance en docs/plan-mejoras-integrales.md.
+- 829 pruebas, once casos nuevos, flujo integrado ficticio y 224 vistas.
+  ES/EN, builds y presupuestos correctos; recarga local se confirma aparte.
+
 **v621 — Auditoría de persistencia e identidad.**
 
 - Metas y las tres acciones de guardar/copiar Horario usan snapshot completo y
@@ -475,14 +491,3 @@ futura opera bajo esto, sin excepción:
   protecciones vigentes conservadas. Traducciones generadas fuera de Git.
 - 804 pruebas correctas, sin fallos ni omitidas. Matriz: 23 criterios, 68 suites
   y 74 módulos. Checkout limpio, recorridos, CI y publicación se registran en el PR.
-
-**Mantenimiento, 18/10 — Limpieza del repositorio aprobada.**
-
-- Diez informes antiguos consolidados en la auditoría del 17/10, con enlaces
-  inmutables a sus originales completos en Git; sin reescribir historial.
-- Resumen independiente retirado junto con build y cinco pruebas exclusivas;
-  historial oficial, extensión activa, migraciones y demás regresiones conservados.
-- README actualizado a Google como entrada pública y arquitectura actual. CI y
-  matriz comprueban únicamente la extensión mantenida. Versiones sin cambio.
-- 800 pruebas correctas, sin fallos ni omitidas; builds de app y extensión activa
-  correctos. Matriz: 23 criterios, 67 suites y 73 módulos. Publicación por PR.

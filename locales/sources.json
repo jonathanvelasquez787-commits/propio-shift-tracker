@@ -43,6 +43,12 @@
       "js/finance-planning.js"
     ]
   },
+  "s_013781d1": {
+    "source": "Registro automático apagado",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_01496928": {
     "source": "Meta del ciclo: {{v0}}{{v1}}",
     "files": [
@@ -372,6 +378,12 @@
       "js/game.js"
     ]
   },
+  "s_07eb37e7": {
+    "source": "Hay varias pestañas de Propio",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_082c97f7": {
     "source": "Morado Neón",
     "files": [
@@ -407,6 +419,12 @@
     "source": "El ciclo siempre dura 14 días desde la fecha que pongas arriba. Se guarda solo. Ajusta esto si tus ciclos reales no coinciden con \"Ganancias del ciclo\".",
     "files": [
       "app.html"
+    ]
+  },
+  "s_08be9c06": {
+    "source": "apagado",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_08beb73f": {
@@ -1047,6 +1065,12 @@
       "js/settings.js"
     ]
   },
+  "s_12beabc4": {
+    "source": "apagada",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_12d0f603": {
     "source": "Jueves Jadeante",
     "files": [
@@ -1169,6 +1193,13 @@
       "terminos.html"
     ]
   },
+  "s_15efa16e": {
+    "source": "Conectá la extensión para ver su próxima acción. Los controles manuales siguen disponibles.",
+    "files": [
+      "app.html",
+      "js/automation-ui.js"
+    ]
+  },
   "s_160f1d9d": {
     "source": "Llamada guardada ({{v0}}) — edítala en Tabla de llamadas si hace falta",
     "files": [
@@ -1183,6 +1214,12 @@
   },
   "s_1632734c": {
     "source": "Fecha de inicio",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_163832bc": {
+    "source": "Disponibilidad automática",
     "files": [
       "app.html"
     ]
@@ -1233,6 +1270,12 @@
     "source": "{{v0}} fila(s) · {{v1}}{{v2}}{{v3}}{{v4}}{{v5}}{{v6}}",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_1742b002": {
+    "source": "Próximo intento de disponibilidad",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_174c8eb2": {
@@ -1488,6 +1531,12 @@
       "js/game.js"
     ]
   },
+  "s_1aeb8665": {
+    "source": "La próxima llamada queda a tu elección. La extensión no acepta llamadas por vos.",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_1afb30bc": {
     "source": "Anota la ventana con bono y el extra se suma solo a cada llamada que califique — incluso a las que ya habías registrado.",
     "files": [
@@ -1691,6 +1740,12 @@
     "source": "Casa",
     "files": [
       "js/finance.js"
+    ]
+  },
+  "s_1f5608c5": {
+    "source": "Ver preparación del turno",
+    "files": [
+      "app.html"
     ]
   },
   "s_1fa218ff": {
@@ -1952,6 +2007,12 @@
       "js/game.js"
     ]
   },
+  "s_24c9d5fe": {
+    "source": "En Lunch",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_24f21481": {
     "source": "(+{{v1}}/min), así que ya suma",
     "files": [
@@ -2016,6 +2077,13 @@
     "source": "{{v4}}{{v5}}%",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_2679a0fc": {
+    "source": "Esperando información de la extensión",
+    "files": [
+      "app.html",
+      "js/automation-ui.js"
     ]
   },
   "s_2685474e": {
@@ -2162,6 +2230,12 @@
       "app.html"
     ]
   },
+  "s_291c0e5e": {
+    "source": "activado",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_292f69bb": {
     "source": "Fecha de la ventana",
     "files": [
@@ -2172,6 +2246,12 @@
     "source": "Sin actividad",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_295d560f": {
+    "source": "Esperando una lectura reciente",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_2989230d": {
@@ -2651,6 +2731,12 @@
       "js/app-main.js"
     ]
   },
+  "s_31b3c8a2": {
+    "source": "{{v0}} minutos de ACW",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_31c94df5": {
     "source": "Nota (opcional)",
     "files": [
@@ -2746,6 +2832,13 @@
     "source": "Cuánto ganaste en cada ventana, día por día",
     "files": [
       "app.html"
+    ]
+  },
+  "s_336f3a12": {
+    "source": "Esperando confirmar la conexión de la extensión",
+    "files": [
+      "app.html",
+      "js/automation-ui.js"
     ]
   },
   "s_337ded88": {
@@ -3337,6 +3430,12 @@
       "app.html"
     ]
   },
+  "s_3fde747f": {
+    "source": "Al alcanzar {{v0}} minutos de ACW, esta extensión intentará pulsar Start Calls.",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_3ff91443": {
     "source": "Importe del pago",
     "files": [
@@ -3475,6 +3574,12 @@
     "files": [
       "app.html",
       "js/app-main.js"
+    ]
+  },
+  "s_42dde52a": {
+    "source": "La extensión necesita una lectura reciente del contador antes de volver a ponerte disponible.",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_42f3c560": {
@@ -3643,6 +3748,12 @@
     "source": "Tema: {{v0}}",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_45f33874": {
+    "source": "La extensión deja un intervalo entre intentos de disponibilidad.",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_46022981": {
@@ -3931,6 +4042,12 @@
     "source": "Estimación eliminada",
     "files": [
       "js/finance-planning.js"
+    ]
+  },
+  "s_4a8585a0": {
+    "source": "La extensión no inicia disponibilidad después de finalizar el turno o su horario.",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_4aa12764": {
@@ -4224,6 +4341,12 @@
     "source": "Tiempo y bono por día",
     "files": [
       "app.html"
+    ]
+  },
+  "s_500bb902": {
+    "source": "Propio debe confirmar Offline o Not Available y habilitar el botón antes del próximo intento.",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_5018aff4": {
@@ -4721,6 +4844,12 @@
       "app.html"
     ]
   },
+  "s_574313b3": {
+    "source": "Recargá el tracker cuando estés libre para compartir su ACW actual con la extensión.",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_57494302": {
     "source": "Invítame un café",
     "files": [
@@ -4792,6 +4921,13 @@
     "source": "JEFE DERROTADO",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_58d22760": {
+    "source": "Horario y descansos pendientes de confirmar",
+    "files": [
+      "app.html",
+      "js/automation-ui.js"
     ]
   },
   "s_58d7562b": {
@@ -4901,6 +5037,12 @@
     "source": "Listo para tu próxima llamada",
     "files": [
       "js/game-battle.js"
+    ]
+  },
+  "s_5b80a29c": {
+    "source": "Inicio del turno ya utilizado",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_5ba07c42": {
@@ -5134,6 +5276,12 @@
       "privacidad.html"
     ]
   },
+  "s_602a2d48": {
+    "source": "Horario y descansos confirmados",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_6043fcbb": {
     "source": "Lo que ganes de aquí en adelante es extra.",
     "files": [
@@ -5182,6 +5330,12 @@
       "js/game.js"
     ]
   },
+  "s_61482c8a": {
+    "source": "Esperando tu sesión de Propio",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_618438af": {
     "source": "Volver al año",
     "files": [
@@ -5199,6 +5353,12 @@
     "source": "Tienes cambios sin guardar. ¿Descartarlos y cambiar de vista?",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_61e1c748": {
+    "source": "La extensión ha solicitado Start Calls. Esperamos la confirmación de Propio.",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_61e6be1a": {
@@ -5287,6 +5447,12 @@
     "source": "Teclas",
     "files": [
       "js/game-battle.js"
+    ]
+  },
+  "s_63b676ff": {
+    "source": "La extensión espera un estado claro antes de tocar Start Calls o Stop Calls.",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_63ba1e3c": {
@@ -5438,6 +5604,12 @@
     "source": "Primer registro",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_65dd4016": {
+    "source": "Esperando confirmar tu horario",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_65eae46f": {
@@ -5800,6 +5972,12 @@
       "js/reports.js"
     ]
   },
+  "s_6d987bb5": {
+    "source": "En Break",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_6da5e4a0": {
     "source": "{{v3}}{{v4}}",
     "files": [
@@ -5929,6 +6107,12 @@
     "source": "Ciclo",
     "files": [
       "app.html"
+    ]
+  },
+  "s_7009060d": {
+    "source": "El inicio del turno ya se utilizó. Los regresos de pausas y la espera conservan sus opciones independientes.",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_7021505e": {
@@ -6251,6 +6435,12 @@
     "source": "Zona de peligro",
     "files": [
       "app.html"
+    ]
+  },
+  "s_75c420bb": {
+    "source": "Esperando el control Start Calls",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_75e38baa": {
@@ -6651,6 +6841,12 @@
       "app.html"
     ]
   },
+  "s_7d6eab8b": {
+    "source": "Abrí Propio con tu sesión para que la extensión pueda confirmar la disponibilidad.",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_7d81145d": {
     "source": "Tu racha, tu nivel y cada criatura que ya venciste.",
     "files": [
@@ -6796,6 +6992,12 @@
     "source": "usuario",
     "files": [
       "app.html"
+    ]
+  },
+  "s_806540d2": {
+    "source": "Espera entre llamadas: {{v0}}",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_80f29e6e": {
@@ -7017,6 +7219,12 @@
       "js/positive-reinforcement.js"
     ]
   },
+  "s_84258390": {
+    "source": "Estás en llamada",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_843bcd9f": {
     "source": "{{v0}} min productivos — meta cumplida",
     "files": [
@@ -7198,6 +7406,12 @@
     "source": "Récords",
     "files": [
       "app.html"
+    ]
+  },
+  "s_87e672c3": {
+    "source": "Antes del horario de disponibilidad",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_87ebc219": {
@@ -7400,6 +7614,12 @@
       "app.html"
     ]
   },
+  "s_8b332daf": {
+    "source": "Confirmando la próxima acción",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_8b97f1f7": {
     "source": "No se pudo borrar la cuenta. Revisa tu conexión e intenta de nuevo.",
     "files": [
@@ -7546,6 +7766,12 @@
     "source": "con un toque al tomarlos, y otra vez al volver.",
     "files": [
       "app.html"
+    ]
+  },
+  "s_8dfe7b00": {
+    "source": "Esperando que termine tu pausa",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_8e1f1480": {
@@ -7788,6 +8014,12 @@
     "source": "#F3E3D0",
     "files": [
       "app.html"
+    ]
+  },
+  "s_9191de26": {
+    "source": "Dejá una sola pestaña del portal para evitar actuar sobre la sesión equivocada.",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_91c20a20": {
@@ -8034,6 +8266,12 @@
       "js/boot.js"
     ]
   },
+  "s_9665bdd8": {
+    "source": "El tracker necesita actualizarse",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_9668738b": {
     "source": "Ciclo de pago",
     "files": [
@@ -8065,6 +8303,12 @@
       "app.html"
     ]
   },
+  "s_9755ec80": {
+    "source": "La conexión necesita revisión",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_976ae214": {
     "source": "Fantasma de Fin de Semana",
     "files": [
@@ -8081,6 +8325,12 @@
     "source": "Hoy, {{v0}}",
     "files": [
       "js/weekly-summary.js"
+    ]
+  },
+  "s_9777dc94": {
+    "source": "Vos pulsás Start Calls cuando quieras estar disponible. Podés revisar tus opciones en la extensión.",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_97b283ee": {
@@ -8129,6 +8379,12 @@
     "source": "Sin definir",
     "files": [
       "app.html"
+    ]
+  },
+  "s_9893a0a9": {
+    "source": "La extensión registra la actividad y no toca los controles de una llamada conectada.",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_9898c6a1": {
@@ -8410,6 +8666,12 @@
       "js/game.js"
     ]
   },
+  "s_9dffd315": {
+    "source": "La extensión debe confirmar el estado de Propio antes de mostrar la próxima acción.",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_9e65b22e": {
     "source": "CAJA {{v0}}",
     "files": [
@@ -8420,6 +8682,12 @@
     "source": "Planificar presupuesto",
     "files": [
       "app.html"
+    ]
+  },
+  "s_9e7c2627": {
+    "source": "Sesión de Propio reconocida",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_9ea91247": {
@@ -8646,6 +8914,12 @@
       "js/app-main.js"
     ]
   },
+  "s_a23a537f": {
+    "source": "Inicio automático del turno: {{v0}}",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_a289a14b": {
     "source": "Viernes",
     "files": [
@@ -8793,6 +9067,13 @@
       "app.html"
     ]
   },
+  "s_a565e966": {
+    "source": "Esperando tus opciones actuales",
+    "files": [
+      "app.html",
+      "js/automation-ui.js"
+    ]
+  },
   "s_a5738f80": {
     "source": "Ya existe una cuenta con ese correo.",
     "files": [
@@ -8895,6 +9176,12 @@
       "js/game-battle.js"
     ]
   },
+  "s_a70b2629": {
+    "source": "La disponibilidad respeta tu descanso y la opción de regreso que elegiste.",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_a724fd64": {
     "source": "Restan",
     "files": [
@@ -8905,6 +9192,12 @@
     "source": "¡Meta alcanzada!",
     "files": [
       "js/reports.js"
+    ]
+  },
+  "s_a74e92c0": {
+    "source": "El registro de llamadas continúa. Reanudá la disponibilidad desde la extensión o con Start Calls en Propio.",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_a7c10551": {
@@ -9034,6 +9327,12 @@
       "js/game.js"
     ]
   },
+  "s_aa7bb217": {
+    "source": "El inicio automático del turno está apagado. Los regresos de pausas y la espera entre llamadas conservan sus opciones.",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_aa8357e3": {
     "source": "Día anterior",
     "files": [
@@ -9125,6 +9424,12 @@
     "source": "Editar llamada · #{{v0}}",
     "files": [
       "js/calls.js"
+    ]
+  },
+  "s_ac1e51f5": {
+    "source": "Intentando ponerte disponible",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_ac52bfaf": {
@@ -9351,6 +9656,12 @@
       "js/app-main.js"
     ]
   },
+  "s_b0beee40": {
+    "source": "Esperando confirmar el estado de Propio",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_b0cffd29": {
     "source": "Copiar este horario a Sábado-Domingo",
     "files": [
@@ -9459,6 +9770,12 @@
     "source": "Mejor: {{v21}} · Peor: {{v22}}",
     "files": [
       "js/reports.js"
+    ]
+  },
+  "s_b3087cca": {
+    "source": "La extensión necesita el horario y los descansos actuales antes de actuar.",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_b319e612": {
@@ -9828,6 +10145,12 @@
       "js/finance.js"
     ]
   },
+  "s_b9d0fe4e": {
+    "source": "Activá Registrar en mi tracker en la extensión para usar sus automatismos.",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_b9dce0f5": {
     "source": "Sin ventanas configuradas",
     "files": [
@@ -10102,6 +10425,12 @@
       "app.html"
     ]
   },
+  "s_be7d2b8c": {
+    "source": "Pulsá Start Calls en Propio cuando quieras volver. La espera entre llamadas no sustituye esta elección.",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_bec3b54d": {
     "source": "+{{v0}} XP · {{v1}} con reserva completa",
     "files": [
@@ -10158,6 +10487,12 @@
       "app.html"
     ]
   },
+  "s_c025febd": {
+    "source": "Ya se alcanzó la hora prevista. La extensión vuelve a comprobar las condiciones antes de actuar.",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_c02785d2": {
     "source": "· {{v0}} pausa",
     "files": [
@@ -10207,6 +10542,12 @@
       "app.html",
       "js/app-main.js",
       "js/reports.js"
+    ]
+  },
+  "s_c0c471a5": {
+    "source": "Tiempo para el próximo intento",
+    "files": [
+      "app.html"
     ]
   },
   "s_c0c482c3": {
@@ -10437,6 +10778,12 @@
       "js/app-main.js"
     ]
   },
+  "s_c5772eb6": {
+    "source": "Tracker y cuenta reconocidos",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_c58a10f3": {
     "source": "Ej. L, HNL, MXN...",
     "files": [
@@ -10643,6 +10990,12 @@
       "app.html"
     ]
   },
+  "s_c885bc89": {
+    "source": "Aunque Propio ya esté abierto, la disponibilidad espera tu horario.",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_c88ccac5": {
     "source": "El método 50-30-20 propone destinar 50% a necesidades, 30% a gustos y 20% al ahorro. Es una referencia: puedes elegir otros porcentajes que sumen 100%. No cambia tus prioridades de asignación.",
     "files": [
@@ -10812,6 +11165,13 @@
       "app.html"
     ]
   },
+  "s_cd0c0ff0": {
+    "source": "Sesión de Propio pendiente de confirmar",
+    "files": [
+      "app.html",
+      "js/automation-ui.js"
+    ]
+  },
   "s_cd222191": {
     "source": "Bloque de Trabajo 2",
     "files": [
@@ -10930,6 +11290,12 @@
     "source": "{{v1}} sin datos",
     "files": [
       "js/reports.js"
+    ]
+  },
+  "s_ceb52df3": {
+    "source": "Pausada por vos",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_cedfd7e6": {
@@ -11066,6 +11432,12 @@
       "js/positive-reinforcement.js"
     ]
   },
+  "s_d16e5c11": {
+    "source": "Esperando confirmar tu ACW",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_d17d4f4d": {
     "source": "Perfil, idioma, meta, tasa y ciclo de pago.",
     "files": [
@@ -11198,6 +11570,12 @@
       "js/calls.js"
     ]
   },
+  "s_d3e89b61": {
+    "source": "Regreso de esta pausa en manual",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_d4073926": {
     "source": "Minutos productivos",
     "files": [
@@ -11280,6 +11658,12 @@
     "source": "propio-shift-tracker.app",
     "files": [
       "index.html"
+    ]
+  },
+  "s_d59b31d5": {
+    "source": "Tenés una llamada entrante",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_d5e075c4": {
@@ -11968,6 +12352,12 @@
       "js/game-battle.js"
     ]
   },
+  "s_e1b00897": {
+    "source": "El estado se actualiza desde la extensión. Si la lectura deja de ser reciente, se muestra la espera de confirmación.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_e1c47e30": {
     "source": "Nota opcional",
     "files": [
@@ -12321,10 +12711,22 @@
       "js/app-main.js"
     ]
   },
+  "s_e8e2d7ae": {
+    "source": "Abrí el estado de conexión de la extensión para ver qué necesita atención. El inicio automático espera.",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_e925b413": {
     "source": "{icon} Premio disponible para tu {window}: {name}{extra}",
     "files": [
       "js/reinforcement-feedback.js"
+    ]
+  },
+  "s_e929a18c": {
+    "source": "Fuera de tu turno",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_e9330778": {
@@ -12545,6 +12947,12 @@
       "js/app-main.js"
     ]
   },
+  "s_ed176108": {
+    "source": "Esperando para reintentar",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_ed210b1b": {
     "source": "Mi historial positivo",
     "files": [
@@ -12579,6 +12987,12 @@
     "source": "Tu horario semanal, por defecto y por excepción",
     "files": [
       "app.html"
+    ]
+  },
+  "s_ede551aa": {
+    "source": "Vos elegís si aceptarla. La extensión espera tu decisión.",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_edf3f673": {
@@ -12770,6 +13184,12 @@
     "files": [
       "app.html",
       "js/calls.js"
+    ]
+  },
+  "s_f1912a3c": {
+    "source": "Ya estás disponible en Propio",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_f1aed197": {
@@ -13061,6 +13481,12 @@
       "js/reports.js"
     ]
   },
+  "s_f5ebe8bc": {
+    "source": "Sin inicio automático pendiente",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_f5f55e76": {
     "source": "Exportar JSON",
     "files": [
@@ -13303,6 +13729,12 @@
       "js/app-main.js"
     ]
   },
+  "s_fb9c9b90": {
+    "source": "Esperando el inicio de tu turno",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_fbf212b6": {
     "source": "Reconoce llamadas, recuperación, metas y premios elegidos por ti.",
     "files": [
@@ -13405,6 +13837,12 @@
     "source": "próxima",
     "files": [
       "js/higher-rate.js"
+    ]
+  },
+  "s_fde1998f": {
+    "source": "Regreso automático: Break {{v0}} · Lunch {{v1}}",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_fdfb1cba": {

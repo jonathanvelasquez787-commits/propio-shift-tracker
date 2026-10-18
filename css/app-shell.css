@@ -722,3 +722,16 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
   :root.theme-light .title-row #clockNow { color: #fff; }
   :root.theme-light .title-row #clockDate { color: rgba(255,255,255,.68); }
 }
+.automation-panel{margin-top:18px;padding-top:17px;border-top:1px solid var(--line);min-width:0}
+.automation-panel[hidden]{display:none}
+.automation-heading{display:flex;gap:14px;justify-content:space-between;align-items:center;min-width:0}
+.automation-heading>div{min-width:0}
+.automation-label{margin:0 0 6px;color:var(--muted);font-size:12px}
+.automation-title{margin:0;font-size:17px;font-weight:700;line-height:1.4;overflow-wrap:anywhere}
+.automation-countdown{flex-shrink:0;font-size:26px;color:var(--cyan);font-variant-numeric:tabular-nums;white-space:nowrap}
+.automation-detail{margin:8px 0 12px;color:var(--muted);font-size:13px;line-height:1.6;overflow-wrap:anywhere}
+.automation-checks{font-size:12px;color:var(--muted);line-height:1.6}
+.automation-checks summary{cursor:pointer;min-height:36px;padding:8px 0;color:var(--text)}
+.automation-checks ul{margin:5px 0 0;padding-left:18px}
+.automation-checks li:empty{display:none}
+@media(max-width:420px){.automation-countdown{font-size:23px}}

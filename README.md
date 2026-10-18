@@ -12,6 +12,7 @@ Start Calls o Stop Calls bajo sus condiciones; no acepta ni rechaza llamadas.
 
 ## Documentación
 
+- [Lista de mejoras aprobadas](docs/plan-mejoras-integrales.md): estado individual y evidencia de cada entrega.
 - [Guía práctica de funciones](docs/guia-practica-tool-y-extension.md): qué hace
   cada función, qué se configura y un ejemplo real.
 - [Extensión actual](extension/propio-bridge/README.md): instalación, permisos,

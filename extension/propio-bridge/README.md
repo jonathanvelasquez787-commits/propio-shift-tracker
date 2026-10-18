@@ -1,4 +1,4 @@
-# Propio · Tracker y vista original · 2.2.3
+# Propio · Tracker y vista original · 2.2.8
 
 La extensión conecta tu tracker con la sesión y el historial de Propio. Su
 registro de llamadas funciona independientemente de la apariencia del portal.
@@ -10,7 +10,7 @@ el portal: barra turquesa, Calls, Minutes, Pay e iconos. Apagado por defecto,
 guarda la elección en el perfil de Chrome. Al apagarlo vuelve a la selección
 normal de Propio. No crea una barra alternativa ni calcula totales propios.
 La anterior barra de la extensión y sus controles de cálculo/conversión fueron
-retirados; el paquete independiente para instalaciones antiguas se conserva.
+retirados; solo se mantiene la extensión unificada.
 
 Cambiar la elección solicita una recarga únicamente con un portal, estado
 Offline confirmado y sin llamada activa ni oferta. Si está ocupado, espera;
@@ -104,8 +104,7 @@ El agente reemplaza los archivos de la misma carpeta instalada, conservando su
 almacenamiento y cuenta vinculada. El build elimina el antiguo
 `summary-content.js`; no debe volver a incluirlo en el manifest. Se recarga la
 extensión y, con Propio libre, su página para activar los nuevos scripts.
-Build: `node scripts/build-extension.mjs <salida>`. App y paquete independiente
-mantienen sus verificaciones propias.
+Build: `node scripts/build-extension.mjs <salida>`. App y extensión unificada mantienen sus verificaciones propias.
 
 ## Espacio de trabajo al iniciar Windows
 
@@ -144,7 +143,7 @@ registro ni aceptación de llamadas. El acceso de Windows se ejecuta después
 del login y abre ese perfil directamente, sin pasar por el selector.
 
 La división usa `chrome.tabs.createSplit` y `chrome.tabs.unsplit`, disponibles
-desde Chrome 155. Chrome anterior conserva el puente y el resumen, pero no puede
+desde Chrome 155. Chrome anterior conserva el puente, pero no puede
 organizar esta vista. El permiso adicional de `app.useinterpreter.com` permite
 identificar su pestaña para moverla; no se inyectan scripts ni se lee su contenido,
 audio o credenciales. Los permisos acotados de www.linguee.es y www.linguee.com
@@ -181,3 +180,20 @@ una página, y no funciona mientras la PC duerme o Chrome está cerrado. No usa
 audio silencioso, permisos nuevos ni cambios globales del ahorro de energía.
 Las páginas ya descartadas no se recargan automáticamente para no interrumpir
 una sesión; se recuperan cuando el usuario las abre.
+
+## Estado de disponibilidad dentro del tracker
+
+La app muestra en Inicio la próxima acción confirmada por el worker, una cuenta
+regresiva cuando corresponde y el motivo de espera. Los detalles reúnen cuenta,
+sesión del portal, horario e iniciadores. Es una lectura de estado: no concede
+permisos para cambiar ajustes ni pulsar controles desde mensajes de la página.
+
+La respuesta requiere el origen del tracker, marco principal y cuenta vinculada.
+Solo transmite indicadores/opciones y tiempos, sin filas de llamadas, tokens,
+nombres ni diagnósticos de solicitudes. La página valida su nonce y cuenta y
+retira el contador si la lectura deja de ser reciente. Llegar a cero espera
+confirmación: no afirma disponibilidad antes de observarla en Propio.
+
+Actualizar requiere recargar la extensión y las páginas cuando no haya llamada
+pendiente. Una versión anterior conserva el registro y sus automatismos, pero
+la nueva sección no recibe ese estado hasta actualizar el contenido.

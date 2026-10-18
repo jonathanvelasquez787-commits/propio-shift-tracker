@@ -88,7 +88,7 @@ export function createPropioReceiver({ getState, getCalls, start, end, catchUp, 
   };
 }
 
-export function installPropioBridge({ host = globalThis.window, accountScope, receive, getPlan = () => null }) {
+export function installPropioBridge({ host = globalThis.window, accountScope, receive, getPlan = () => null, onStatus = () => {} }) {
   if (!host || !accountScopeValid(accountScope)) return () => {};
   const nonce = host.crypto.randomUUID();
   let queue = Promise.resolve(), closed = false;
@@ -97,6 +97,10 @@ export function installPropioBridge({ host = globalThis.window, accountScope, re
     if (message.source !== host || message.origin !== host.location.origin || message.data?.protocol !== BRIDGE_PROTOCOL || message.data.direction !== 'extension') return;
     const packet = message.data;
     if (packet.kind === 'hello') { post({ kind: 'ready', plan: getPlan() }); return; }
+    if (packet.kind === 'automation-status') {
+      if (!closed && packet.nonce === nonce && packet.accountScope === accountScope) onStatus(packet.status);
+      return;
+    }
     if (packet.kind !== 'event' || packet.nonce !== nonce || packet.accountScope !== accountScope || !bridgeId(packet.requestId)) return;
     queue = queue.then(async () => {
       if (closed) return;
