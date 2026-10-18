@@ -1,15 +1,19 @@
 param(
     [Parameter(Mandatory = $true)][string]$ShortcutPath,
     [Parameter(Mandatory = $true)][string]$NotesFile,
-    [Parameter(Mandatory = $true)][string]$BackupDirectory
+    [Parameter(Mandatory = $true)][string]$BackupDirectory,
+    [ValidateRange(.4, .85)][double]$RightPaneHeightRatio = .612,
+    [string]$NotesStartupShortcut
 )
 $ErrorActionPreference = 'Stop'
 $source = Join-Path $PSScriptRoot '../windows/Open-Chrome-And-Notes.cs'
 $compiler = Join-Path $env:WINDIR 'Microsoft.NET/Framework64/v4.0.30319/csc.exe'
-$installDirectory = Join-Path $env:LOCALAPPDATA 'Propio Shift Tracker/startup'
+$installDirectory = [System.IO.Path]::GetFullPath((Join-Path $env:USERPROFILE 'Documents/Propio Workspace'))
 $launcherPath = Join-Path $installDirectory 'Open-Chrome-And-Notes.exe'
 $configPath = "$launcherPath.config"
-foreach ($required in @($ShortcutPath, $NotesFile, $source, $compiler)) {
+$requiredFiles = @($ShortcutPath, $NotesFile, $source, $compiler)
+if ($NotesStartupShortcut) { $requiredFiles += $NotesStartupShortcut }
+foreach ($required in $requiredFiles) {
     if (!(Test-Path -LiteralPath $required -PathType Leaf)) { throw "Falta el archivo: $required" }
 }
 $shortcutShell = New-Object -ComObject WScript.Shell
@@ -17,8 +21,8 @@ $shortcut = $shortcutShell.CreateShortcut((Resolve-Path -LiteralPath $ShortcutPa
 $chromePath = $shortcut.TargetPath
 $chromeArguments = $shortcut.Arguments
 $chromeWorkingDirectory = $shortcut.WorkingDirectory
-if ($chromePath -eq $launcherPath) {
-    [xml]$previousConfiguration = Get-Content -LiteralPath $configPath -Raw
+if ((Split-Path -Leaf $chromePath) -eq 'Open-Chrome-And-Notes.exe') {
+    [xml]$previousConfiguration = Get-Content -LiteralPath "$chromePath.config" -Raw
     $previousValues = @{}
     foreach ($entry in $previousConfiguration.configuration.appSettings.add) { $previousValues[$entry.key] = $entry.value }
     $chromePath = $previousValues.ChromePath
@@ -35,7 +39,7 @@ foreach ($existing in @($launcherPath, $configPath)) {
     if (Test-Path -LiteralPath $existing) { Copy-Item -LiteralPath $existing -Destination $BackupDirectory }
 }
 $candidatePath = Join-Path $installDirectory 'Open-Chrome-And-Notes.new.exe'
-& $compiler /nologo /codepage:65001 /target:winexe /reference:System.Configuration.dll /reference:System.Windows.Forms.dll "/out:$candidatePath" $source
+& $compiler /nologo /codepage:65001 /target:winexe /reference:System.Configuration.dll /reference:System.Windows.Forms.dll /reference:System.Drawing.dll "/out:$candidatePath" $source
 if ($LASTEXITCODE -ne 0) { throw 'No se pudo compilar el iniciador.' }
 $settings = @{
     ChromePath = $chromePath
@@ -43,6 +47,7 @@ $settings = @{
     ChromeWorkingDirectory = $chromeWorkingDirectory
     NotesExecutable = (Join-Path $env:WINDIR 'System32/notepad.exe')
     NotesFile = (Resolve-Path -LiteralPath $NotesFile).Path
+    RightPaneHeightRatio = $RightPaneHeightRatio.ToString([System.Globalization.CultureInfo]::InvariantCulture)
 }
 $writer = [System.Xml.XmlWriter]::Create("$candidatePath.config", (New-Object System.Xml.XmlWriterSettings -Property @{ Indent = $true }))
 try {
@@ -61,4 +66,12 @@ $shortcut.Arguments = ''
 $shortcut.Save()
 $saved = $shortcutShell.CreateShortcut((Resolve-Path -LiteralPath $ShortcutPath).Path)
 if ($saved.TargetPath -ne $launcherPath -or $saved.Arguments -ne '') { throw 'No se pudo verificar el acceso guardado.' }
+if ($NotesStartupShortcut) {
+    Copy-Item -LiteralPath $NotesStartupShortcut -Destination (Join-Path $BackupDirectory (Split-Path -Leaf $NotesStartupShortcut))
+    $notesStartup = $shortcutShell.CreateShortcut((Resolve-Path -LiteralPath $NotesStartupShortcut).Path)
+    $notesStartup.TargetPath = $launcherPath
+    $notesStartup.Arguments = '--notes-only'
+    $notesStartup.IconLocation = "$($settings.NotesExecutable),0"
+    $notesStartup.Save()
+}
 [pscustomobject]@{ Shortcut = $ShortcutPath; Target = $saved.TargetPath; ChromeArgumentsPreserved = $chromeArguments; NotesFile = $settings.NotesFile; Backup = $BackupDirectory } | ConvertTo-Json
