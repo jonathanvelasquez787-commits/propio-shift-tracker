@@ -1473,30 +1473,6 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
       return emoji ? `${base}, ${name} ${emoji}` : `${base}, ${name}`;
     }
 
-    // "Cosas variadas más" — el subtítulo bajo el saludo ya no es un solo texto fijo, sino una de
-    // varias frases elegida al azar una sola vez por carga de página (no en cada render, que corre
-    // cada segundo — eso se vería parpadeando).
-    const GREETING_SUBTITLES = [
-      translateText('Jornada, pausas, llamadas y ganancias en un solo lugar.'),
-      translateText('Hoy también vamos con todo.'),
-      translateText('Un día más, una meta más cerca.'),
-      translateText('Aquí está todo lo que necesitas para tu turno.'),
-      translateText('Vamos a que este día cuente.'),
-      translateText('Tu jornada, organizada y clara.'),
-      translateText('Un paso a la vez, un turno a la vez.'),
-      translateText('Que las llamadas de hoy vengan con buena energía.'),
-      translateText('Aunque nadie puede volver atrás y lograr un nuevo comienzo, cualquiera puede empezar ahora y lograr un nuevo final. — Carl Bard'),
-      translateText('Un capítulo termina, otro comienza.'),
-      translateText('Todo tiene un final, pero cada final significa un nuevo comienzo.'),
-      translateText('El primer paso no te lleva a donde quieres ir, pero te saca de donde estás.'),
-      translateText('Nunca es demasiado tarde para empezar de nuevo. No se está perdido, simplemente se está comenzando de nuevo desde la experiencia.'),
-      translateText('Un viaje de mil millas comienza con un solo paso. — Lao Tse'),
-      translateText('Si empiezas, tienes la oportunidad de evolucionar y corregir... Si no empiezas nada, nunca tendrás esa oportunidad. — Seth Godin'),
-      translateText('El éxito se da cuando vas de fracaso en fracaso sin perder tu entusiasmo. — Winston Churchill'),
-      translateText('No importa lo lento que vayas, siempre y cuando no te detengas. — Confucio'),
-    ];
-    const greetingSubtitleText = GREETING_SUBTITLES[Math.floor(Math.random() * GREETING_SUBTITLES.length)];
-
     export function toDateFromInputs(dateStr, timeStr) {
       const d = String(dateStr).trim().match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
       const t = String(timeStr).trim().match(/^(\d{1,2}):(\d{2})\s*([AP]M)$/i);
@@ -6030,6 +6006,7 @@ function renderHeader() {
 
   const greetingTitleEl = document.getElementById('greetingTitle');
   if (greetingTitleEl) greetingTitleEl.textContent = greetingText(now);
+  const greetingSubtitleText = translateText('Jamás negocio con mis excusas: no hacer nada también es una. Doy el primer paso y avanzo hasta lograr lo que me propongo.');
   const greetingSubtitleEl = document.getElementById('greetingSubtitle');
   if (greetingSubtitleEl && greetingSubtitleEl.textContent !== greetingSubtitleText) {
     greetingSubtitleEl.textContent = greetingSubtitleText;

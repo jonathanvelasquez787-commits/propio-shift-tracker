@@ -369,6 +369,7 @@ El acceso de inicio de Chrome permanece directo e intacto. El de Notas usa el
 mismo iniciador con --notes-only: abre o reutiliza la ventana y la acomoda abajo
 a la derecha según el ancho 5/16 y la proporción .612 de la ventana del tracker.
 No se modifica el contenido de notas ni se reinicia Chrome para acomodarlas.
+PR #76 integrado en eef71dc8dbc201a936740e3cdce45b1ebd20c186; CI 211 correcto.
 Compilación, --verify, 32 geometrías frente a workspaceBounds y posición real
 verificada con --check-notes-layout correctos; 38 pruebas de workspace correctas.
 El usuario confirmó con captura que la distribución 2.2.0 quedó correcta:
@@ -941,7 +942,7 @@ La aplicación funciona en producción con estas bases vigentes:
   el de la guía es nofollow. La extensión se instala desde archivo según el
   propietario, por lo que no hay ficha propia de Chrome Web Store que editar.
   Detalle en `docs/seo.md`.
-- La versión actual de la app es 618; la extensión unificada es 2.2.7. El build
+- La versión actual de la app es 619; la extensión unificada es 2.2.7. El build
   del resumen independiente 1.0.5 queda compatible para instalaciones anteriores.
   Refuerzo positivo puede funcionar con Logros apagados. La auditoría profunda del
   8 de octubre corrigió seis fallos; la ampliación corrigió cinco más en arranque,
@@ -966,6 +967,17 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v619 — Frase fija debajo del saludo.**
+
+- Se retiró la selección aleatoria de 17 frases; se conserva únicamente la frase
+  solicitada sobre excusas, primer paso y constancia. Mismo texto al recargar.
+- Texto inicial y render usan la misma frase; traducción ES/EN se evalúa al pintar
+  para respetar el cambio de idioma. Frase blanca en oscuro y negra en claro,
+  por pedido explícito del usuario; distribución y controles conservados.
+- 2.244 textos, build y 19 pruebas de idiomas/render correctos; ocho vistas
+  ES/EN, claro/oscuro, móvil/escritorio y recarga estables, sin overflow ni errores.
+
 
 **Configuración local, 17/10 — Notas al abrir Chrome desde el escritorio.**
 
@@ -997,23 +1009,3 @@ La aplicación funciona en producción con estas bases vigentes:
   del worker y Stop manual persistido. Cuenta ficticia, sin llamadas reales.
 - Chrome puede demorar alarmas o congelar páginas; no funciona con PC suspendida.
   Permisos y composición visual intactos. Activación nativa requiere recarga.
-
-
-**v618 / Extensión 2.2.6 — Auditoría profunda de disponibilidad y bloques.**
-
-- Filas históricas cero no adelantan trabajo; llamadas activas cuentan desde conexión.
-- Regresos viejos no pasan a otro horario; extender/reemplazar pausas cancela
-  cierres no entregados, sin retirar registros de llamadas. Señales de aceptación
-  rechazadas por el reductor no consumen la primera llamada de otro plan.
-- Plan del puente coincide con límites y precisión del horario desplazado.
-  Bloques nocturnos conservan orden, fechas y duración; llegada tras medianoche
-  desplaza por fechas completas. El turno abierto conserva su día contable vivo;
-  editor nocturno, bloques vencidos tras salida temprana y avisos estimados de
-  hoy corregidos. Registros huérfanos conservan sus límites.
-- Botones de llamadas en móvil conservan contador y subtítulos completos,
-  reutilizando composición vertical; sin quitar textos ni cambiar handlers.
-- 798 pruebas, 2.260 textos, 38 contratos de módulos, wiring y builds correctos.
-  Simulación aislada de 32 días: 96 llamadas, 736 minutos, $88.32 y 64 pausas;
-  recargas/reaperturas conservan datos. Flujo compilado ACW 00:50 y popup probado.
-- Inventario estructural de 403 controles; no implica clic individual en todos.
-  Sin datos reales modificados. CI y publicación exacta documentadas por separado.

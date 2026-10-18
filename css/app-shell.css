@@ -655,7 +655,8 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
   text-decoration: none;
 }
 
-#greetingSubtitle { color: var(--cyan); }
+#greetingSubtitle { color: #fff; }
+:root.theme-light #greetingSubtitle { color: #000; }
 @media (max-width: 760px) {
   .title-row {
     display: grid;
