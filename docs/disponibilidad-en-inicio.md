@@ -1,7 +1,7 @@
 # Disponibilidad visible en Inicio
 
 Primera entrega del [plan integral](plan-mejoras-integrales.md), aprobada con
-vista previa claro/oscuro. App 622 y extensión 2.2.8.
+vista previa claro/oscuro. App 623 y extensión 2.2.9.
 
 ## Qué cambia
 
@@ -9,6 +9,19 @@ Debajo de los controles del turno aparece el estado confirmado por la extensión
 horario, espera por ACW, pausa manual, Break/Lunch, llamada activa/entrante,
 disponibilidad o necesidad de revisar la conexión. «Ver preparación del turno»
 reúne cuenta, portal, horario, iniciador, espera y regresos de las pausas.
+
+La preparación distingue la hora en que la extensión detectó la conexión a
+Propio del comienzo laboral calculado por la tool. Entrar a las 7:42 para un
+turno de las 8:00 muestra ambas horas; ese tiempo previo no suma trabajo ni
+ACW. Una llamada real a las 7:50 adelanta el comienzo laboral a esa llamada.
+Un inicio manual conserva la hora elegida. Cerrar antes del comienzo laboral
+se identifica sin inventar minutos trabajados. No se modifica la contabilidad.
+
+Durante Break o Lunch se muestra el final previsto y si la pausa se termina
+manualmente o si la extensión intentará cerrarla. Sin duración configurada se
+pide terminarla en la tool; con regreso apagado se indica Start Calls manual.
+Una pausa solo programada se distingue de una pausa activa. Al vencer la
+duración se espera la confirmación del tracker, sin anunciar un cierre ficticio.
 
 El contador es una presentación del límite calculado por el worker. No concede
 disponibilidad: al llegar a cero espera la comprobación y confirmación del
@@ -34,17 +47,24 @@ controles y sigue siendo quien permite elegir las opciones.
 
 ## Evidencia
 
-- Once pruebas nuevas en [automation-status.test.mjs](../tests/automation-status.test.mjs):
+- Pruebas en [automation-status.test.mjs](../tests/automation-status.test.mjs):
   límites de datos, prioridades, cero sin inventar disponibilidad, observación
-  vieja, autorización, cuenta/documento cambiado, render, navegación y limpieza.
+  vieja, autorización, cuenta/documento cambiado, render, navegación, limpieza,
+  conexión, pausas reales/programadas y modos de cierre. Los paquetes anteriores
+  siguen siendo válidos aunque no incluyan los detalles nuevos.
+- [connection-work-time.test.mjs](../tests/connection-work-time.test.mjs) verifica
+  el resumen de trabajo sin escrituras, inicio manual, llamada anticipada y pestaña
+  obsoleta. [appearance-language.test.mjs](../tests/appearance-language.test.mjs)
+  comprueba que el empaquetado sin textos duplicados reconstruye ambos idiomas
+  exactamente, con todos sus parámetros y diccionarios independientes.
 - Fixtures existentes de recarga y arranque actualizados para conservar sus
   comprobaciones originales con la nueva lectura independiente.
-- 829 pruebas completas; build, ES/EN, imports, wiring y matriz correctos.
+- 835 pruebas completas; build, ES/EN, imports, wiring y matriz correctos.
   Matriz de 23 criterios, 70 suites y 76 módulos. Presupuestos conservados.
 - Recorrido con app compilada, content scripts y worker reales, autenticación
   ficticia y backend local: horario temprano, llamada, ACW ya iniciado, Stop/Start,
   pausa manual, Break y pérdida de lectura. Ninguna llamada real provocada.
-- 224 vistas: catorce situaciones, ES/EN, claro/oscuro y 320/390/768/1.365 px.
+- 320 vistas: veinte situaciones, ES/EN, claro/oscuro y 320/390/768/1.365 px.
   Sin overflow ni texto cortado; plegado de detalles y navegación fuera de Inicio.
 
 Los artefactos de navegador quedan fuera de Git. CI y despliegue del commit se

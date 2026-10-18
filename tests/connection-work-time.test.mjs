@@ -17,7 +17,7 @@ function fixture() {
   const h = { Date: class extends Date { constructor(...args) { super(...(args.length ? args : [clock])); } },
     state: { shiftStartedAt: iso('07:42'), shiftEndedAt: null, activeCall: null, activePause: null, pauseHistory: [],
       events: [{ type: 'shift', title: 'Shift iniciado', meta: 'Propio', ts: iso('07:42') }] },
-    calls: [], annotations: null, dateKey, CONNECTED_LIVE_GRACE_MIN: 90, GAP_AUTO_OTHER_THRESHOLD_MIN: 90,
+    calls: [], annotations: null, localStorageRevision:{isCurrent:()=>true}, dateKey, CONNECTED_LIVE_GRACE_MIN: 90, GAP_AUTO_OTHER_THRESHOLD_MIN: 90,
     getActiveDayKey: () => dateKey(clock), todayCallDateKey: date => dateKey(date ?? clock), callDateKeyFromValue: key => key,
     sameCallDay: (date, key) => dateKey(date) === key,
     callDateToDate: key => { const [m, d, y] = key.split('/').map(Number); return new Date(y, m - 1, d); },
@@ -29,7 +29,7 @@ function fixture() {
   vm.createContext(h);
   const names = ['dayEvents', 'dayShiftBounds', 'dayShiftSessions', 'workStartForConnection', 'dayWorkSessions', 'dayWorkBounds',
     'workingMinutesForDay', 'connectedMinutesForDay', 'mergeIntervals', 'overlapMinutesWithIntervals', 'gapKeyFor', 'suggestGapLabel',
-    'gapClassification', 'dayGapRows', 'computeCurrentAcwStart', 'todayShiftBounds', 'currentStateLabel'];
+    'gapClassification', 'dayGapRows', 'computeCurrentAcwStart', 'todayShiftBounds', 'currentStateLabel', 'getWorkSessionStatus'];
   vm.runInContext(names.map(name => app.get(name)).join('\n') + '\n' + table.get('dayActionRows'), h);
   return { h, time: value => { clock = Date.parse(value.includes('T') ? value : iso(value)); },
     call(from, to) { const c = { customerId: String(h.calls.length + 1), callDate: '10/15/2026', startISO: iso(from), endISO: iso(to), durationMin: (Date.parse(iso(to)) - Date.parse(iso(from))) / 60000, pay: '$0.60' }; h.calls.push(c); return c; } };
@@ -45,6 +45,16 @@ test('early Propio connection preserves raw presence but starts work and first-c
   assert.equal(rows.find(row => row.detail === 'Conexión a Propio detectada').ts, iso('07:42'));
   assert.equal(rows.find(row => row.detail === 'Inicio de turno').ts, iso('08:00'));
   assert.equal(h.computeCurrentAcwStart().toISOString(), iso('08:10'));
+});
+
+test('read-only work summary follows real early work and explicit manual starts, never an obsolete tab',()=>{
+ const f=fixture(),h=f.h;f.time('07:50');const before=JSON.stringify(h.state);
+ assert.equal(h.getWorkSessionStatus().startedAt,iso('08:00'));assert.equal(h.getWorkSessionStatus().manual,false);
+ assert.equal(JSON.stringify(h.state),before);
+ f.call('07:50','07:55');assert.equal(h.getWorkSessionStatus().startedAt,iso('07:50'));assert.equal(h.getWorkSessionStatus().callAtStart,true);
+ h.state.events[0].meta='manual';assert.equal(h.getWorkSessionStatus().startedAt,iso('07:42'));assert.equal(h.getWorkSessionStatus().manual,true);
+ h.localStorageRevision.isCurrent=()=>false;assert.equal(h.getWorkSessionStatus(),null);
+ h.localStorageRevision.isCurrent=()=>true;h.state.shiftStartedAt=null;assert.equal(h.getWorkSessionStatus(),null);
 });
 
 test('connection before work has no ACW or worked minutes and late arrival is never backdated', () => {

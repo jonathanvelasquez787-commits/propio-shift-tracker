@@ -7809,6 +7809,21 @@ export const applyPropioBridgeEvent = createPropioReceiver({
   save: saveAll,
 });
 
+export function getWorkSessionStatus() {
+  if (!localStorageRevision.isCurrent() || !state.shiftStartedAt) return null;
+  const connection = new Date(state.shiftStartedAt), end = new Date(state.shiftEndedAt || Date.now());
+  if (!Number.isFinite(connection.getTime()) || !Number.isFinite(end.getTime())) return null;
+  const start = workStartForConnection(connection, end);
+  const manual = dayEvents(todayCallDateKey(connection)).some(event => event.type === 'shift' && /iniciado/i.test(event.title || '') &&
+    Date.parse(event.ts) === connection.getTime() && String(event.meta || '').toLowerCase() === 'manual');
+  const callAtStart = [...calls, ...(state.activeCall ? [state.activeCall] : [])].some(call => {
+    const from = Date.parse(call.startISO || call.startedAt), to = Date.parse(call.endISO || end.toISOString());
+    return Number.isFinite(from) && Number.isFinite(to) && from <= end.getTime() && to > connection.getTime() &&
+      (to > from || call === state.activeCall) && Math.max(connection.getTime(), from) === start.getTime();
+  });
+  return { startedAt: start.toISOString(), endedAt: state.shiftEndedAt || null, manual, callAtStart };
+}
+
 export function getPropioBridgePlan() {
   if (!localStorageRevision.isCurrent()) return null;
   const day = new Date(), accountingDay = state.shiftStartedAt && !state.shiftEndedAt ? todayCallDateKey(new Date(state.shiftStartedAt)) : todayCallDateKey(day);

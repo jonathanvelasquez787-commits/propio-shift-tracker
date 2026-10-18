@@ -8,6 +8,7 @@ import { createLocalizedLanding } from './landing-pages.mjs';
 import { createInterpreterGuide } from './interpreter-guide.mjs';
 import { INTERPRETER_GUIDE_PATHS } from '../js/landing-meta.js';
 import { entryBundleOptions } from './bundle-entry.mjs';
+import { localeResourceScript } from './locale-bundle.mjs';
 
 const root = process.cwd();
 const out = path.join(root, 'public');
@@ -18,8 +19,8 @@ const catalogModule = path.join(root, 'js/locales.generated.js');
 await rm(out, { recursive: true, force: true });
 await mkdir(assets, { recursive: true });
 await mkdir(path.join(out, 'icons'), { recursive: true });
-await minifyFile(path.join(assets, 'locales.js'),
-  (await readFile(catalogModule, 'utf8')).replace('export const resources =', 'window.pstLocaleResources ='));
+const resources = JSON.parse((await readFile(catalogModule, 'utf8')).slice('export const resources = '.length).trim().replace(/;$/, ''));
+await minifyFile(path.join(assets, 'locales.js'), localeResourceScript(resources));
 
 const entries = {
   'theme-init': 'js/theme-init.js',

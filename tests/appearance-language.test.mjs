@@ -1,11 +1,26 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import vm from 'node:vm';
+import { minify } from 'terser';
+import { resources } from '../js/locales.generated.js';
+import { localeResourceScript } from '../scripts/locale-bundle.mjs';
 import { PALETTES, paletteTokens, contrast } from '../js/theme-palettes.js';
 import { applySavedColors } from '../js/appearance-colors.js';
 import { currentLanguage, setLanguage, translateDocument, translateText, translateStoredText, translateMarkup, ui } from '../js/i18n.js';
 import { collectCatalog, markupMessages } from '../scripts/i18n-catalog.mjs';
 import { validateTranslations } from '../scripts/i18n-validation.mjs';
+
+test('production locale deduplication reconstructs every translation and placeholder without sharing mutable dictionaries',async()=>{
+  const source=localeResourceScript(resources),compiled=await minify(source),context=vm.createContext({window:{}});
+  vm.runInContext(compiled.code,context);
+  assert.deepEqual(JSON.parse(JSON.stringify(context.window.pstLocaleResources)),resources);
+  assert.ok(Buffer.byteLength(compiled.code)<230000);
+  const es=context.window.pstLocaleResources.es.translation,en=context.window.pstLocaleResources.en.translation;
+  assert.notEqual(es,en);const key=Object.keys(es).find(key=>es[key]===en[key]),original=en[key];es[key]='modified';assert.equal(en[key],original);
+  const partial={es:{translation:{common:'same',onlyEs:'solo'}},en:{translation:{common:'same',onlyEn:'English'}}};
+  vm.runInContext(localeResourceScript(partial),context);assert.deepEqual(JSON.parse(JSON.stringify(context.window.pstLocaleResources)),partial);
+});
 
 test('all custom palettes have readable normal text and restore original without removing unrelated variables', () => {
   const properties = new Map([['--user-test', 'keep']]);

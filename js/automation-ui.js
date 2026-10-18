@@ -1,5 +1,31 @@
 import { ui, translateText, displayLocale } from './i18n.js';
-import { validateAutomationStatus, automationStatusView } from './automation-status.js';
+import { AUTOMATION_STATUS_MAX_AGE, validateAutomationStatus, automationStatusView } from './automation-status.js';
+
+function momentLabel(value, now) {
+  if (typeof value !== 'string' || !Number.isFinite(Date.parse(value))) return '';
+  const date = new Date(value), today = new Date(now);
+  return date.toLocaleString(displayLocale(), { hour:'2-digit', minute:'2-digit',
+    ...(date.toDateString() === today.toDateString() ? {} : { month:'short', day:'numeric' }) });
+}
+
+function pauseDescription(snapshot, now) {
+  const type = snapshot.pauseType === 'break' ? 'Break' : snapshot.pauseType === 'lunch' ? 'Lunch' : null;
+  const mode = snapshot.options.timed
+    ? translateText('Cierre automático solo para pausas con regreso activado y duración configurada.')
+    : translateText('Las pausas terminan cuando vos pulsás Terminar Break o Terminar Lunch en la tool.');
+  if (!type || snapshot.reason !== 'pause' || snapshot.pauseActual === null) return mode;
+  const end = momentLabel(snapshot.pauseEndsAt, now);
+  if (!snapshot.pauseActual) return end
+    ? ui`${type} programado hasta ${end}. No hay una pausa activa registrada en la tool; se respeta el horario.` : mode;
+  const auto = snapshot.options.timed && snapshot.options[snapshot.pauseType] && end;
+  if (auto && Date.parse(snapshot.pauseEndsAt) <= now) return ui`La duración prevista de ${type} ya se cumplió. Esperando confirmar su cierre en el tracker.`;
+  const timing = end ? ui`Duración prevista de ${type}: hasta ${end}. ` : ui`${type} sin duración prevista confirmada. `;
+  return timing + (auto
+    ? translateText('La extensión intentará cerrar la pausa y volver a disponibilidad si el turno y la conexión lo permiten.')
+    : (snapshot.options[snapshot.pauseType]
+      ? translateText('Terminá la pausa en la tool; después la extensión intentará ponerte disponible dentro del turno.')
+      : translateText('Terminá la pausa en la tool y pulsá Start Calls en Propio cuando quieras volver.')));
+}
 
 function statusMessages(key, snapshot) {
   const messages = {
@@ -34,7 +60,7 @@ function statusMessages(key, snapshot) {
   return messages[key] || messages['portal-state'];
 }
 
-export function installAutomationStatusUi({ host = window, document = host.document, now = () => Date.now() } = {}) {
+export function installAutomationStatusUi({ host = window, document = host.document, now = () => Date.now(), getWorkSession = () => null } = {}) {
   const panel = document.getElementById('automationPanel');
   if (!panel) return { update() {}, stop() {} };
   let snapshot = null, closed = false;
@@ -44,20 +70,33 @@ export function installAutomationStatusUi({ host = window, document = host.docum
     if (closed) return;
     panel.hidden = document.getElementById('pageHome')?.hidden === true;
     const current = automationStatusView(snapshot, now()), [title, detail] = statusMessages(current.key, snapshot);
-    setText('automationTitle', title); setText('automationDetail', detail);
+    setText('automationTitle', title); setText('automationDetail', current.key === 'pause' ? pauseDescription(snapshot, now()) : detail);
     const timer = element('automationCountdown');
     timer.hidden = current.seconds === null && current.key !== 'before-shift';
     const clock = current.seconds !== null ? `${Math.floor(current.seconds / 60)}:${String(current.seconds % 60).padStart(2, '0')}`
       : current.key === 'before-shift' && snapshot.startAt ? new Date(snapshot.startAt).toLocaleTimeString(displayLocale(), { hour:'2-digit', minute:'2-digit' }) : '';
     setText('automationCountdown', clock);
-    const recent = snapshot && now() >= Date.parse(snapshot.reportedAt) && now() - Date.parse(snapshot.reportedAt) <= 15000;
-    const observed = recent && snapshot.observedAt && now() >= Date.parse(snapshot.observedAt) && now() - Date.parse(snapshot.observedAt) <= 15000;
+    const recent = snapshot && now() >= Date.parse(snapshot.reportedAt) && now() - Date.parse(snapshot.reportedAt) <= AUTOMATION_STATUS_MAX_AGE;
+    const observed = recent && snapshot.observedAt && now() >= Date.parse(snapshot.observedAt) && now() - Date.parse(snapshot.observedAt) <= AUTOMATION_STATUS_MAX_AGE;
     setText('automationTrackerCheck', recent ? translateText('Tracker y cuenta reconocidos') : translateText('Esperando confirmar la conexión de la extensión'));
     setText('automationPortalCheck', observed && snapshot.portal === 'authenticated' ? translateText('Sesión de Propio reconocida') : translateText('Sesión de Propio pendiente de confirmar'));
     setText('automationScheduleCheck', recent && snapshot.scheduleVerified ? translateText('Horario y descansos confirmados') : translateText('Horario y descansos pendientes de confirmar'));
     setText('automationOptionsCheck', recent ? ui`Espera entre llamadas: ${snapshot.options.spacing ? ui`${snapshot.options.minutes} minutos de ACW` : translateText('apagada')}` : translateText('Esperando tus opciones actuales'));
     setText('automationFirstCheck', recent ? ui`Inicio automático del turno: ${snapshot.options.first ? translateText('activado') : translateText('apagado')}` : '');
     setText('automationReturnsCheck', recent ? ui`Regreso automático: Break ${snapshot.options.break ? translateText('activado') : translateText('apagado')} · Lunch ${snapshot.options.lunch ? translateText('activado') : translateText('apagado')}` : '');
+    setText('automationPauseCheck', recent ? pauseDescription(snapshot, now()) : '');
+    setText('automationConnectionCheck', observed && snapshot.portal === 'authenticated' && snapshot.connectionAt
+      ? ui`Conexión a Propio detectada: ${momentLabel(snapshot.connectionAt, now())}` : '');
+    let work;
+    try { work = getWorkSession(); } catch { work = null; }
+    const at = momentLabel(work?.startedAt, now()), end = momentLabel(work?.endedAt, now());
+    const workText = !at ? '' : end && Date.parse(work.endedAt) < Date.parse(work.startedAt)
+      ? translateText('Esta sesión se cerró antes del comienzo laboral; no sumó tiempo de trabajo.')
+      : Date.parse(work.startedAt) > now() ? ui`Inicio laboral previsto: ${at}. La conexión anterior no suma ACW ni tiempo de trabajo.`
+      : work.manual ? ui`Inicio laboral manual: ${at}.`
+      : work.callAtStart && recent && snapshot.startAt && Date.parse(work.startedAt) < Date.parse(snapshot.startAt)
+        ? ui`Inicio laboral: ${at}; se registró una llamada antes del horario.` : ui`Inicio laboral: ${at}.`;
+    setText('automationWorkCheck', workText + (end && Date.parse(work.endedAt) >= Date.parse(work.startedAt) ? ui` Cierre de sesión: ${end}.` : ''));
   }
   const timer = host.setInterval(render, 1000);
   const observer = new host.MutationObserver(render);

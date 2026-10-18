@@ -60,7 +60,10 @@ Estas opciones están en el popup de la extensión. **Registrar llamadas y poner
 
 Inicio muestra también la próxima acción confirmada por la extensión: espera,
 pausa manual, horario, llamada o revisión. Si la lectura queda atrasada retira
-la cuenta regresiva hasta confirmarla. «Ver preparación del turno» reúne cuenta,
+la cuenta regresiva hasta confirmarla. «Ver preparación del turno» muestra la
+conexión detectada y el comienzo laboral por separado, además del final previsto
+y la modalidad de cierre de Break/Lunch. Entrar antes del horario no agrega
+trabajo ni ACW; una llamada real anterior sí acredita trabajo. También reúne cuenta,
 portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 
 ### 9. Regreso automático de Break

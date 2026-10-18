@@ -176,8 +176,9 @@ async function mountApp(expectedUserId) {
   if (rejectChangedOwner()) return false;
   window[Symbol.for('propio.expectedAppOwner')] = expectedUserId;
   document.body.classList.add('app-ready');
+  let appModule;
   try {
-    await import('./app-main.js');
+    appModule = await import('./app-main.js');
   } catch (err) {
     if (rejectChangedOwner()) return false;
     console.error('boot: no se pudo importar app-main.js', err);
@@ -186,7 +187,7 @@ async function mountApp(expectedUserId) {
   }
   if (rejectChangedOwner()) return false;
   automationUi?.stop();
-  automationUi = installAutomationStatusUi();
+  automationUi = installAutomationStatusUi({ getWorkSession: appModule?.getWorkSessionStatus });
   if (overlay) overlay.remove();
   return true;
 }

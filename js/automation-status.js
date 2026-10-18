@@ -18,7 +18,9 @@ export function validateAutomationStatus(value, now = Date.now()) {
     portal: value.portal, call: value.call, review: value.review === true,
     scheduleVerified: value.scheduleVerified === true, startAt: timestamp(value.startAt), endAt: timestamp(value.endAt),
     waitUntil: timestamp(value.waitUntil), acwObservedAt: timestamp(value.acwObservedAt),
+    connectionAt: timestamp(value.connectionAt) && Date.parse(value.connectionAt) <= now ? value.connectionAt : null,
     pauseType: ['break','lunch'].includes(value.pauseType) ? value.pauseType : null,
+    pauseActual: typeof value.pauseActual === 'boolean' ? value.pauseActual : null, pauseEndsAt: timestamp(value.pauseEndsAt),
     queued: Number.isInteger(value.queued) ? Math.max(0, Math.min(200, value.queued)) : 0,
     options: Object.fromEntries(['first','spacing','break','lunch','timed','minutes'].map(key => [key, options[key]])),
   };
@@ -52,14 +54,18 @@ export function createAutomationStatus(state, now = Date.now()) {
   const recent = portals.filter(tab => fresh(tab.seenAt, now));
   const authenticated = recent.filter(tab => tab.session === 'authenticated' && tab.blockedDocument !== tab.documentId);
   const observedAt = portals.sort((a,b) => Date.parse(b.seenAt) - Date.parse(a.seenAt))[0]?.seenAt || null;
-  const pause = plan?.pause || plan?.scheduledPauses?.find(slot => now >= Date.parse(slot.startedAt) && now < Date.parse(slot.endedAt));
+  const completed = prep.pendingPause?.endedAt ? prep.pendingPause : plan?.lastPause;
+  const pause = plan?.pause || plan?.scheduledPauses?.find(slot => now >= Date.parse(slot.startedAt) && now < Date.parse(slot.endedAt) &&
+    !(completed?.type === slot.type && Date.parse(completed.startedAt) < Date.parse(slot.endedAt) && Date.parse(completed.endedAt) > Date.parse(slot.startedAt)));
   return validateAutomationStatus({ version: 1, reportedAt: new Date(now).toISOString(), observedAt,
     reason: prep.waitReason, recording: state.mode === 'auto', paused: prep.availabilityPaused === true,
     portal: authenticated.length ? 'authenticated' : recent.some(tab => tab.session === 'logged-out') ? 'logged-out' : 'unknown',
     call: ['connected','incoming','idle'].find(kind => authenticated.some(tab => tab.call === kind)) || 'unknown',
     review: Boolean(state.attention && !['tracker-closed'].includes(state.attention)),
     scheduleVerified: plan?.scheduleVerified === true, startAt: plan?.startAt, endAt: plan?.endAt,
-    waitUntil: prep.spacing.waitUntil, acwObservedAt: plan?.acw?.observedAt, pauseType: pause?.type, queued: state.queue.length,
+    waitUntil: prep.spacing.waitUntil, acwObservedAt: plan?.acw?.observedAt,
+    connectionAt: authenticated.length ? state.session?.startedAt : null,
+    pauseType: pause?.type, pauseActual: Boolean(plan?.pause), pauseEndsAt: plan?.pause ? pause.endsAt : pause?.endedAt, queued: state.queue.length,
     options: { first: prep.enabled === true, spacing: prep.spacing.enabled === true, minutes: prep.spacing.minutes,
       break: prep.resume.break === true, lunch: prep.resume.lunch === true, timed: prep.resume.mode === 'timed' },
   }, now);
