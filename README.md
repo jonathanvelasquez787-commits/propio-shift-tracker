@@ -1,148 +1,100 @@
 # Propio Shift Tracker
 
-Registro personal de turnos, pausas, llamadas y ganancias, con adherencia
-minuto a minuto, Higher Rate, finanzas, calendario de productividad y la
-gamificación opcional «El Monstruo».
+Registro personal de turnos, pausas, llamadas y ganancias para intérpretes.
+Incluye adherencia, Higher Rate, finanzas, calendario, reportes y gamificación
+opcional. La entrada pública usa **Google**; correo/contraseña y usuario/contraseña
+no están habilitados como métodos públicos de acceso.
 
-Esta versión es el salto de "un archivo HTML en localStorage" a
-"producto con cuentas y respaldo en la nube".
+La extensión unificada conecta el portal de Propio con el tracker, sincroniza
+llamadas e historial oficial y permite configurar disponibilidad automática,
+vista original del portal y distribución de ventanas. La disponibilidad pulsa
+Start Calls o Stop Calls bajo sus condiciones; no acepta ni rechaza llamadas.
 
----
+## Documentación
 
-## Qué hay aquí
+- [Guía práctica de funciones](docs/guia-practica-tool-y-extension.md): qué hace
+  cada función, qué se configura y un ejemplo real.
+- [Extensión actual](extension/propio-bridge/README.md): instalación, permisos,
+  automatismos, prioridades y límites.
+- [Instrucciones del proyecto](instrucciones.md): protocolos y pendientes.
+- [Auditoría y antecedentes consolidados](docs/auditoria-profunda-2026-10-17.md):
+  evidencia fechada, correcciones y límites.
+- [Criterios de publicación](docs/production-readiness.md),
+  [operación](docs/production-operations.md),
+  [recuperación](docs/production-recovery.md) y
+  [política de seguridad](docs/security-policy.md).
 
-```
-index.html            Landing pública + los 3 métodos de entrada
-app.html               Marcado y estilos fuente de la app
-privacidad.html        Política de privacidad
-terminos.html          Términos de uso
+## Organización y fuentes
 
-css/
-  tokens.css            Paleta y tipografía, claro y oscuro
-  landing.css           Landing y panel de entrada
-  legal.css             Páginas legales
-  app-shell.css         Gate de arranque y panel de cuenta dentro de la app
-
-js/
-  theme-init.js         Tema inicial antes de pintar, sin scripts inline
-  footer-year.js        Año del pie de las páginas públicas
-  config.js             URL y anon key de Supabase  ← se edita a mano
-  supabase-client.js     Cliente único y compartido
-  auth.js                Google · correo/contraseña · usuario/contraseña
-  landing.js              Pestañas, registro, recuperación, sesión activa
-  sync.js                 localStorage ↔ Supabase, con control de conflictos
-  boot.js                 Gate de sesión, hidratación y montaje de la app
-  monitoring.js           Captura errores sin enviar datos a terceros
-  game.js                 XP, racha, misiones, cofres y jefes de ciclo
-  monsters.js             Bestiario SVG determinista, sin dependencias
-  service-worker.js       PWA y caché offline del shell
-
-css/
-  game.css                Arena, Logros y estados responsive claro/oscuro
-
-api/
-  login.js               Traduce usuario → correo del lado del servidor
-  telemetry.js           Recibe errores saneados y limitados por IP
-  delete-account.js      Borra la cuenta entera (necesita service_role)
-
-supabase/migrations/
-  0001_init.sql          Tablas, RLS, triggers y funciones. Se corre una vez.
-  0002_verificar_seguridad.sql  Refuerza y verifica RLS y permisos sensibles.
-  0003_phase_5.sql       Llamadas, límites, telemetría y backup diario
-  0004_security_hardening.sql  Cuotas y retención añadidas tras la auditoría.
-
-scripts/build.mjs         Bundle Rollup + minificación Terser, sin sourcemaps
-tests/security-preparation.test.mjs  Pruebas de seguridad, PWA y datos
-tests/game-phase6.test.mjs           Contratos y límites de la Fase 6
+```text
+index.html                Fuente de las portadas públicas ES/EN
+app.html                  Marcado y estilos fuente de la app
+css/                      Temas, shell y estilos de las páginas
+js/                       Lógica, autenticación, sincronización e idiomas
+api/, lib/                Funciones del servidor y utilidades compartidas
+extension/propio-bridge/   Única extensión mantenida
+windows/                  Iniciador nativo de Chrome y Notas
+scripts/                  Build, instalación local y verificaciones
+supabase/migrations/      Historial SQL y políticas de acceso
+tests/                    Regresiones, integración y simulaciones
+docs/                     Guías y referencias de mantenimiento
 ```
 
-El build conserva `app.html` como fuente editable y publica un HTML pequeño:
-el gate de arranque y referencias a `assets/app-view.js`, `assets/boot.js` y
-`css/app-core.css`. La vista se inserta antes del arranque y ambos archivos nuevos
-se incluyen en la PWA. Esto reduce el código visible en «Ver código fuente»;
-los recursos que recibe el navegador siguen siendo inspeccionables.
+`app.html`, `js/app-main.js` y `js/boot.js` son las fuentes de la app. El build
+usa Rollup y Terser para generar `public/`, sin sourcemaps públicos. Solo esa
+carpeta se publica; es un resultado generado y no se incluye en Git. Los recursos
+que recibe el navegador siguen siendo inspeccionables.
 
----
+El arranque verifica la sesión y prepara los datos de su cuenta antes de montar
+la aplicación. El tema se aplica antes de pintar. No se mantiene una copia
+congelada del HTML ni una segunda extensión de resumen independiente.
 
-## Cómo se edita `app.html`
+## Desarrollo y comprobaciones
 
-`app.html` sigue siendo la fuente de verdad del marcado y los estilos. Los
-módulos de `js/` son la fuente de verdad de la lógica. Vercel ejecuta
-`scripts/build.mjs`: Rollup empaqueta el cliente de Supabase y la app, y Terser
-minifica el resultado sin sourcemaps. Solo `public/` se publica; los módulos
-fuente no quedan expuestos como archivos navegables.
+El agente realiza los cambios, las verificaciones y la publicación. La persona
+usuaria no necesita editar archivos ni ejecutar comandos. Referencia técnica:
 
-El agente trabaja directamente en el repositorio, ejecuta las verificaciones,
-crea los commits y publica el build cuando la tarea lo requiere. La persona
-usuaria no necesita editar archivos ni ejecutar comandos manualmente.
-
-### Por qué el script principal no se autoejecuta al abrir `/app`
-
-La app lee `localStorage` y se dibuja entera en cuanto se ejecuta. Si la
-descarga desde la nube llegara después, habría que recargar la página — o
-peor, alguien podría ver por un instante los datos de la cuenta anterior en
-el mismo navegador.
-
-`js/boot.js` importa `js/app-main.js` recién cuando hay sesión y
-`localStorage` ya contiene los datos de esa cuenta. Las precargas de módulos
-no ejecutan la aplicación. `js/theme-init.js` aplica el tema antes de pintar,
-sin esperar al cliente de autenticación.
-
-### Por qué existe `/api/login`
-
-Entrar con nombre de usuario exige traducir el username a su correo. Si esa
-traducción ocurriera en el navegador, cualquiera con la anon key podría
-convertir una lista de usernames en una lista de correos. La función de
-servidor hace la traducción con la `service_role`, y al navegador solo le
-devuelve la sesión.
-
-Por eso también el error de login es **siempre el mismo**, exista o no la
-cuenta: responder distinto sería el mismo problema por otra puerta.
-
-### Cómo se guardan los datos
-
-`user_data` guarda `state` y `settings`; cada llamada vive en `calls` con RLS.
-El navegador conserva las tres claves de `localStorage` para trabajar offline,
-pero la sincronización calcula deltas y solo sube llamadas nuevas, modificadas
-o eliminadas. Estado, ajustes, lotes y filas tienen topes de tamaño.
-
-### Por qué nunca hay merge automático
-
-Dos dispositivos con versiones divergentes son dos verdades distintas sobre el
-mismo día de trabajo. Mezclarlas automáticamente inventaría un día que no
-existió. El usuario elige cuál se queda, y el guardado usa control de
-concurrencia (`push_user_data` compara el `updated_at` que el cliente creía
-vigente) para que nadie pise a nadie en silencio a mitad de sesión.
-
----
-
-## Trabajar sobre esto
-
-```bash
-# Comprobaciones automáticas (las ejecuta el agente)
-npm test
-npm run check:modules
-npm run build
+```sh
+pnpm install --frozen-lockfile
+pnpm test
+pnpm build
+pnpm build:extension
 ```
 
-Para probar en local hace falta un servidor HTTP de verdad: los módulos ES no
-cargan desde `file://`.
+El build comprueba traducciones, exports, controles y la
+[matriz de criterios](docs/production-criteria.json). CI añade escaneo de
+credenciales en el historial y auditoría de dependencias, y compila la app y
+la extensión activa. La salida predeterminada de esta última es
+`work/propio-bridge/`, también excluida de Git.
 
-```bash
-python3 -m http.server 3000 --directory public
-# luego: http://localhost:3000 (después de npm run build)
-```
+Para servir el resultado localmente se necesita HTTP: los módulos no cargan
+desde `file://`. Un servidor estático permite revisar `public/`; las funciones
+de `api/` requieren un entorno como `vercel dev`.
 
-Las funciones de `api/` **no** corren con `http.server`. Para probarlas en
-local: `npx vercel dev`.
+## Datos y seguridad
 
----
+El servidor guarda estado y ajustes en `user_data`, y llamadas en `calls`, con
+políticas de acceso por cuenta. La copia local conserva su propietario y permite
+recuperación limitada sin red. No garantiza funcionamiento con la PC suspendida
+ni evita que el navegador demore tareas en segundo plano.
+
+La sincronización compara revisiones y envía cambios de llamadas. Si dos copias
+divergen, solicita elegir una; no mezcla silenciosamente estados. Un guardado
+rechazado debe conservar su error y no anunciar éxito por un acuse anterior.
+Las migraciones y regresiones se conservan aunque se consoliden informes antiguos.
+
+`js/config.js` contiene URL y clave pública del cliente. Las claves privilegiadas
+solo corresponden al entorno del servidor y nunca al repositorio ni al navegador.
+El código conservado de acceso por correo/usuario no habilita esos métodos en la
+portada actual. CSP y demás controles se documentan en la política de seguridad.
+
+## Configuración local de Windows
+
+`scripts/install-desktop-workspace.ps1` configura el iniciador de `windows/`
+con el perfil, accesos y archivo de notas de esa PC. Abrir la web no instala ni
+cambia accesos de Windows. Esta configuración es independiente del despliegue
+de Vercel y de los datos de la cuenta.
 
 ## Licencia
 
 Software propietario. Ver [LICENSE](LICENSE).
-
-## Política de seguridad
-
-CSP está activa. Alcance, orígenes permitidos y validación realizada:
-[política de seguridad](docs/security-policy.md).

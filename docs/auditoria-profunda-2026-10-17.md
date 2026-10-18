@@ -163,3 +163,26 @@ Siguen externos o fuera del alcance implementado: regla oficial de segundos y
 pago de Propio, procesamiento del nombre en Google, exclusión global entre PCs
 y reloj servidor independiente. Ninguna de las correcciones añade autoaceptación,
 pagos, compras ni acceso al audio.
+
+## Antecedentes consolidados · 18/10/2026
+
+Los diez informes anteriores se consolidan aquí para reducir archivos del árbol
+actual. Cada enlace conserva el original completo en una revisión inmutable de
+Git, incluidos sus resultados, límites y evidencia fechada. Las correcciones y
+regresiones siguen en el proyecto; esta consolidación no repite esas auditorías.
+
+- **[30/09 · Auditoría profunda](https://github.com/jonathanvelasquez787-commits/propio-shift-tracker/blob/6b10046837a821ef9f37cbcebb4eed31c3ad4106/docs/auditoria-profunda-2026-09-30.md)**: Persistencia atómica de llamadas y premios, cierres mensuales con zona horaria, respaldos y exportaciones extensas, y protección frente a acuses de nube atrasados.
+- **[04/10 · SEO](https://github.com/jonathanvelasquez787-commits/propio-shift-tracker/blob/6b10046837a821ef9f37cbcebb4eed31c3ad4106/docs/seo-audit-2026-10-04.md)**: HTML por idioma, canonical/hreflang, redirecciones y recursos públicos. Las mediciones de laboratorio no acreditan posiciones en Google; indexación y cuotas de Search Console dependen del servicio externo.
+- **[08/10 · Auditoría profunda](https://github.com/jonathanvelasquez787-commits/propio-shift-tracker/blob/6b10046837a821ef9f37cbcebb4eed31c3ad4106/docs/auditoria-profunda-2026-10-08.md)**: Paginación de nube, revisión coherente de estado y llamadas, confirmaciones reales de escritura, protección de pestañas antiguas y precisión de importes.
+- **[08/10 · Ampliación](https://github.com/jonathanvelasquez787-commits/propio-shift-tracker/blob/6b10046837a821ef9f37cbcebb4eed31c3ad4106/docs/auditoria-ampliada-2026-10-08.md)**: Arranque y conflictos con control de concurrencia, cuenta nueva con revisión observada, copia offline solo del propietario y manejo de caché PWA ante fallos de red/cuota.
+- **[09/10 · Auditoría super profunda](https://github.com/jonathanvelasquez787-commits/propio-shift-tracker/blob/6b10046837a821ef9f37cbcebb4eed31c3ad4106/docs/auditoria-super-profunda-2026-10-09.md)**: Veinte grupos en premios revocables e idempotentes, correcciones oficiales, finanzas, identidad, bajas de llamadas, revisiones de nube, cachés y contrato de login. Simulaciones y PostgreSQL local no equivalen a una sesión humana alojada.
+- **[11/10 · Auditoría super profunda](https://github.com/jonathanvelasquez787-commits/propio-shift-tracker/blob/6b10046837a821ef9f37cbcebb4eed31c3ad4106/docs/auditoria-super-profunda-2026-10-11.md)**: Ocho grupos en revisiones de pestañas, cambios de tarifa y metas, validación numérica y de respaldos, y rechazo de falsos éxitos al guardar/restaurar. Evidencia pública y alojada conserva su fecha original.
+- **[11/10 · Controles](https://github.com/jonathanvelasquez787-commits/propio-shift-tracker/blob/6b10046837a821ef9f37cbcebb4eed31c3ad4106/docs/button-audit-2026-10-11.md)**: Rollback de calendario, metas, premios y Higher Rate; guardas de días libres, controles en tema claro y cierres deduplicados. Sincronización agrupada y reintentos con espera conservan conflictos. El inventario estático no acredita clic en cada control.
+- **[12/10 · Auditoría profunda](https://github.com/jonathanvelasquez787-commits/propio-shift-tracker/blob/6b10046837a821ef9f37cbcebb4eed31c3ad4106/docs/auditoria-profunda-2026-10-12.md)**: Siete grupos en metas decimales, ACW y pausas por intervalos, respaldos validados antes de mutar y pagos manuales. Conserva simulaciones mensuales y evidencia separada de publicación y mantenimiento SQL.
+- **[12/10 · Auditoría super profunda](https://github.com/jonathanvelasquez787-commits/propio-shift-tracker/blob/6b10046837a821ef9f37cbcebb4eed31c3ad4106/docs/auditoria-super-profunda-2026-10-12.md)**: Trece grupos en identidad durante callbacks y borrado, lectura offline, conflictos, validación de horas y duración, guardado de Higher Rate y controles móviles ES/EN. Recorrido de 42 días y backend controlado; no certifica hardware, OAuth humano ni todas las descargas.
+- **[13/10 · Finanzas](https://github.com/jonathanvelasquez787-commits/propio-shift-tracker/blob/6b10046837a821ef9f37cbcebb4eed31c3ad4106/docs/auditoria-finanzas-2026-10-13.md)**: Dieciocho grupos en escrituras atómicas, reservas y pagos independientes, importes y conversiones finitos, comparaciones mensuales, respaldos y premios por reserva real. Reservar no transfiere dinero y las fechas estimadas no prometen depósitos.
+
+El 18/10 se retira el resumen independiente y su build, por aprobación del
+propietario. Las referencias históricas a «ambas extensiones» describen el estado
+de cada auditoría, no la composición actual. Se mantiene la extensión unificada,
+el historial oficial compartido y sus pruebas. No se modifican datos ni migraciones.
