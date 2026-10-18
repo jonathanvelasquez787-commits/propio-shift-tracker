@@ -16,6 +16,12 @@ internal static class DesktopWorkspace
     [DllImport("user32.dll")] private static extern bool ShowWindow(IntPtr window, int command);
     [DllImport("user32.dll", SetLastError = true)] private static extern bool SetWindowPos(IntPtr window, IntPtr after, int x, int y, int width, int height, uint flags);
     [DllImport("user32.dll")] private static extern bool GetWindowRect(IntPtr window, out NativeRect rect);
+    private delegate bool WindowVisitor(IntPtr window, IntPtr parameter);
+    [DllImport("user32.dll")] private static extern bool EnumWindows(WindowVisitor visitor, IntPtr parameter);
+    [DllImport("user32.dll")] private static extern bool IsWindowVisible(IntPtr window);
+    [DllImport("user32.dll")] private static extern IntPtr GetForegroundWindow();
+    [DllImport("user32.dll")] private static extern uint GetWindowThreadProcessId(IntPtr window, out uint processId);
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)] private static extern int GetWindowText(IntPtr window, StringBuilder title, int maximum);
     [StructLayout(LayoutKind.Sequential)] private struct NativeRect { public int Left, Top, Right, Bottom; }
 
     internal static Rectangle NotesBounds(Rectangle area, double ratio)
@@ -26,17 +32,45 @@ internal static class DesktopWorkspace
         return new Rectangle(area.Right - width, top, width, area.Bottom - top + 8);
     }
 
-    private static Rectangle DesiredNotesBounds()
+    private static Screen WorkspaceScreen(IntPtr notesWindow)
+    {
+        IntPtr tracker = IntPtr.Zero, activeChrome = IntPtr.Zero, workChrome = IntPtr.Zero;
+        IntPtr foreground = GetForegroundWindow();
+        EnumWindows(delegate(IntPtr window, IntPtr parameter)
+        {
+            if (!IsWindowVisible(window)) return true;
+            uint processId; GetWindowThreadProcessId(window, out processId);
+            try
+            {
+                using (Process process = Process.GetProcessById((int)processId))
+                {
+                    if (!process.ProcessName.Equals("chrome", StringComparison.OrdinalIgnoreCase)) return true;
+                    if (window == foreground) activeChrome = window;
+                    StringBuilder title = new StringBuilder(512); GetWindowText(window, title, title.Capacity);
+                    if (title.ToString().IndexOf("Propio Shift Tracker", StringComparison.OrdinalIgnoreCase) >= 0) tracker = window;
+                    else if (title.ToString().IndexOf("Interpreters", StringComparison.OrdinalIgnoreCase) >= 0) workChrome = window;
+                }
+            }
+            catch (ArgumentException) { }
+            catch (InvalidOperationException) { }
+            catch (System.ComponentModel.Win32Exception) { }
+            return true;
+        }, IntPtr.Zero);
+        IntPtr owner = tracker != IntPtr.Zero ? tracker : activeChrome != IntPtr.Zero ? activeChrome : workChrome != IntPtr.Zero ? workChrome : notesWindow;
+        return owner != IntPtr.Zero ? Screen.FromHandle(owner) : Screen.PrimaryScreen;
+    }
+
+    private static Rectangle DesiredNotesBounds(IntPtr notesWindow)
     {
         double ratio;
         if (!Double.TryParse(ConfigurationManager.AppSettings["RightPaneHeightRatio"], NumberStyles.Float, CultureInfo.InvariantCulture, out ratio)) ratio = .612;
-        return NotesBounds(Screen.PrimaryScreen.WorkingArea, ratio);
+        return NotesBounds(WorkspaceScreen(notesWindow).WorkingArea, ratio);
     }
 
     private static void PositionNotes(IntPtr window)
     {
         if (window == IntPtr.Zero) throw new IOException("No pude encontrar la ventana de tus notas.");
-        Rectangle bounds = DesiredNotesBounds();
+        Rectangle bounds = DesiredNotesBounds(window);
         ShowWindow(window, 4);
         if (!SetWindowPos(window, IntPtr.Zero, bounds.Left, bounds.Top, bounds.Width, bounds.Height, 0x0004 | 0x0010 | 0x0040))
             throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
@@ -122,11 +156,11 @@ internal static class DesktopWorkspace
                 IntPtr window = FindNotesWindow(RequiredFile("NotesExecutable"), RequiredFile("NotesFile"));
                 NativeRect actual;
                 if (window == IntPtr.Zero || !GetWindowRect(window, out actual)) return 3;
-                Rectangle expected = DesiredNotesBounds();
+                Rectangle expected = DesiredNotesBounds(window);
                 return Math.Abs(actual.Left - expected.Left) <= 2 && Math.Abs(actual.Top - expected.Top) <= 2 &&
                     Math.Abs(actual.Right - actual.Left - expected.Width) <= 2 && Math.Abs(actual.Bottom - actual.Top - expected.Height) <= 2 ? 0 : 3;
             }
-            string chrome = RequiredFile("ChromePath");
+            string chrome = notesOnly ? null : RequiredFile("ChromePath");
             string chromeArguments = ConfigurationManager.AppSettings["ChromeArguments"] ?? "";
             string workingDirectory = ConfigurationManager.AppSettings["ChromeWorkingDirectory"];
             if (verify) { RequiredFile("NotesExecutable"); RequiredFile("NotesFile"); return 0; }

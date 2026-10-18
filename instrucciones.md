@@ -976,6 +976,10 @@ La aplicación funciona en producción con estas bases vigentes:
   el acceso de inicio de Notas comparte --notes-only. Chrome/app/extensión sin cambios.
 - Iniciador en Documents/Propio Workspace evita redirección MSIX de LocalAppData.
   32 geometrías alineadas al organizador y posición real de Notas comprobadas.
+- Selección de monitor desde las ventanas de trabajo de Chrome; notes-only no
+  depende de que Chrome siga instalado. Acceso de inicio opcional se valida antes
+  de cambiar archivos. Rechazo sin mutaciones y Chrome inexistente probados;
+  segundo monitor físico y reinicio físico no se probaron.
 - Prueba aislada de ambos programas y argumentos con espacios, configuración inválida
   rechazada y --verify real correcto. No se cerró Chrome ni se provocaron llamadas.
 

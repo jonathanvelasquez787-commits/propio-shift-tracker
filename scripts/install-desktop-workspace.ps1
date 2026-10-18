@@ -11,7 +11,9 @@ $compiler = Join-Path $env:WINDIR 'Microsoft.NET/Framework64/v4.0.30319/csc.exe'
 $installDirectory = [System.IO.Path]::GetFullPath((Join-Path $env:USERPROFILE 'Documents/Propio Workspace'))
 $launcherPath = Join-Path $installDirectory 'Open-Chrome-And-Notes.exe'
 $configPath = "$launcherPath.config"
-foreach ($required in @($ShortcutPath, $NotesFile, $source, $compiler)) {
+$requiredFiles = @($ShortcutPath, $NotesFile, $source, $compiler)
+if ($NotesStartupShortcut) { $requiredFiles += $NotesStartupShortcut }
+foreach ($required in $requiredFiles) {
     if (!(Test-Path -LiteralPath $required -PathType Leaf)) { throw "Falta el archivo: $required" }
 }
 $shortcutShell = New-Object -ComObject WScript.Shell
@@ -65,7 +67,6 @@ $shortcut.Save()
 $saved = $shortcutShell.CreateShortcut((Resolve-Path -LiteralPath $ShortcutPath).Path)
 if ($saved.TargetPath -ne $launcherPath -or $saved.Arguments -ne '') { throw 'No se pudo verificar el acceso guardado.' }
 if ($NotesStartupShortcut) {
-    if (!(Test-Path -LiteralPath $NotesStartupShortcut -PathType Leaf)) { throw 'No se encuentra el acceso de inicio de Notas.' }
     Copy-Item -LiteralPath $NotesStartupShortcut -Destination (Join-Path $BackupDirectory (Split-Path -Leaf $NotesStartupShortcut))
     $notesStartup = $shortcutShell.CreateShortcut((Resolve-Path -LiteralPath $NotesStartupShortcut).Path)
     $notesStartup.TargetPath = $launcherPath
