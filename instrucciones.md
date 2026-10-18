@@ -431,7 +431,9 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
-- App 623; extensión unificada 2.2.9 (recarga local confirmada por el propietario).
+- App 623; extensión unificada 2.2.10 (corrección del rótulo del popup; recarga por confirmar).
+  La recarga de 2.2.9 está confirmada. El panel de disponibilidad está en la tool;
+  el popup de Chrome configura la extensión y esta transmite el estado a la web.
   Resumen independiente retirado, sin build
   mantenido. El historial oficial compartido y las funciones del tracker siguen
   activos. Guía de 73 funciones en docs/guia-practica-tool-y-extension.md.
@@ -459,6 +461,17 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**Extensión 2.2.10 — Versión real del popup y ubicación de funciones.**
+
+- El rótulo 2.2.6 estaba fijo en el HTML aunque el manifest instalado era 2.2.9.
+  El popup lee ahora chrome.runtime.getManifest().version, la misma fuente que
+  usa Chrome. La app web continúa en 623; sus pantallas no se trasladan al popup.
+- Guía y documentación distinguen panel informativo de la tool y controles de
+  la extensión. El contador de 79 mejoras corresponde al sistema completo.
+- Prueba del popup compilado con versiones distintas y worker desconectado;
+  836 pruebas correctas, builds y revisión visual claro/oscuro. No cambia las
+  decisiones de llamadas, permisos ni preferencias personales.
+
 **v623 — Conexión, trabajo y cierre de pausas visibles.**
 
 - Preparación distingue detección de conexión y comienzo laboral, usando el
@@ -482,15 +495,3 @@ futura opera bajo esto, sin excepción:
   compuesto por entregar una parte. Alcance en docs/plan-mejoras-integrales.md.
 - 829 pruebas, once casos nuevos, flujo integrado ficticio y 224 vistas.
   ES/EN, builds y presupuestos correctos; recarga local se confirma aparte.
-
-**v621 — Auditoría de persistencia e identidad.**
-
-- Metas y las tres acciones de guardar/copiar Horario usan snapshot completo y
-  restauran memoria e historial ante rechazo. Una confirmación antigua no cambia
-  el día/semana actual. Finanzas conserva su transacción externa.
-- Perfil protege borradores, solicitudes solapadas y cuenta original; exige fila
-  confirmada antes de anunciar éxito y restablece el botón al reabrir Ajustes.
-  Recuperación ligada a su cuenta, conservando Google y los enlaces válidos.
-- 818 pruebas, 32 días/96 llamadas/736 minutos/$88.32, 112 vistas y recorridos de
-  cuota, perfil, edición/borrado, exportación, medianoche y disponibilidad.
-  Alcance y límites en [auditoría 18/10](docs/auditoria-profunda-2026-10-18.md).

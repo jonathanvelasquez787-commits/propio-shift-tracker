@@ -12,6 +12,11 @@ no se considera rota por esa razón.
 turno usa app 623 y extensión 2.2.9, con publicación comprobada y recarga de la
 extensión, Propio y tracker confirmada por el propietario.
 
+Estas 79 mejoras corresponden al sistema completo. El panel de disponibilidad
+y preparación se ve en la **tool web**; el popup de la **extensión de Chrome**
+conserva sus controles y transmite los datos a ese panel. La corrección 2.2.10
+sincroniza el rótulo de versión del popup con Chrome; no suma otra casilla cerrada.
+
 Estados: **Pendiente**, **En curso**, **Probado** (sin publicar), **Publicado**.
 Una casilla solo se marca cuando todos los criterios del punto están resueltos
 y su evidencia está enlazada. Se conservan las comprobaciones y decisiones de

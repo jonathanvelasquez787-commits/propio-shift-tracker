@@ -3,6 +3,11 @@
 Primera entrega del [plan integral](plan-mejoras-integrales.md), aprobada con
 vista previa claro/oscuro. App 623 y extensión 2.2.9.
 
+**Ubicación:** esta sección está en la tool web. La extensión le proporciona
+los datos; sus opciones se siguen configurando en el popup de Chrome. En 2.2.8
+se agregó la lectura de estado y en 2.2.9 se ampliaron los datos de conexión y
+pausas. Esas versiones de la extensión no representan pantallas nuevas en su popup.
+
 ## Qué cambia
 
 Debajo de los controles del turno aparece el estado confirmado por la extensión:

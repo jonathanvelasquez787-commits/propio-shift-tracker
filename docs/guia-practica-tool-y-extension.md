@@ -4,6 +4,10 @@ Revisión: 18 de octubre de 2026. Esta guía explica las funciones que existen e
 
 La **tool** lleva tus registros, cálculos y ajustes. La **extensión** conecta esos registros con Propio y puede pulsar Start Calls o Stop Calls según tus preferencias. La aceptación de una llamada sigue siendo tuya.
 
+- **En la tool:** Inicio → «Disponibilidad automática» muestra el estado y la preparación que informa la extensión. Es un panel informativo de la web.
+- **En la extensión:** el popup de su icono en Chrome permite configurar los iniciadores, la espera, los regresos de pausas y la vista original de Propio.
+- **Versiones:** el número del popup corresponde a la extensión instalada y coincide con Administrar extensiones. La app web tiene su propia versión; actualizar una parte no implica rediseñar la otra.
+
 ## 1. Empezar y terminar tu jornada
 
 ### 1. Registro automático de la conexión a Propio
