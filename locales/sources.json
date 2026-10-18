@@ -1506,12 +1506,6 @@
       "js/app-main.js"
     ]
   },
-  "s_1ac9c063": {
-    "source": "Que las llamadas de hoy vengan con buena energía.",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
   "s_1ae4d467": {
     "source": "Nivel completado",
     "files": [
@@ -1896,12 +1890,6 @@
       "js/app-main.js"
     ]
   },
-  "s_233518b1": {
-    "source": "Nunca es demasiado tarde para empezar de nuevo. No se está perdido, simplemente se está comenzando de nuevo desde la experiencia.",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
   "s_234f9fab": {
     "source": "Sin emoji",
     "files": [
@@ -2064,13 +2052,6 @@
     "source": "#AEE2FF",
     "files": [
       "app.html"
-    ]
-  },
-  "s_269c1b7c": {
-    "source": "Jornada, pausas, llamadas y ganancias en un solo lugar.",
-    "files": [
-      "app.html",
-      "js/app-main.js"
     ]
   },
   "s_26b62d39": {
@@ -3417,12 +3398,6 @@
       "js/reports.js"
     ]
   },
-  "s_40e954d6": {
-    "source": "El primer paso no te lleva a donde quieres ir, pero te saca de donde estás.",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
   "s_411234a6": {
     "source": "Importación",
     "files": [
@@ -4433,12 +4408,6 @@
     "source": "La llamada no puede terminar en el futuro",
     "files": [
       "js/calls.js"
-    ]
-  },
-  "s_51d6ff6b": {
-    "source": "Un viaje de mil millas comienza con un solo paso. — Lao Tse",
-    "files": [
-      "js/app-main.js"
     ]
   },
   "s_51da8406": {
@@ -6700,12 +6669,6 @@
       "js/auth.js"
     ]
   },
-  "s_7bf8e468": {
-    "source": "Aquí está todo lo que necesitas para tu turno.",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
   "s_7c0ee4cd": {
     "source": "Bestiario",
     "files": [
@@ -6770,12 +6733,6 @@
     "source": "La app nunca compra nada ni interrumpe una llamada. Tú decides cuándo realizar, guardar o cambiar cada premio.",
     "files": [
       "app.html"
-    ]
-  },
-  "s_7d66d258": {
-    "source": "Aunque nadie puede volver atrás y lograr un nuevo comienzo, cualquiera puede empezar ahora y lograr un nuevo final. — Carl Bard",
-    "files": [
-      "js/app-main.js"
     ]
   },
   "s_7d81145d": {
@@ -6851,12 +6808,6 @@
     "source": "Tus datos se sincronizan solos cada pocos segundos mientras tengas internet.",
     "files": [
       "app.html"
-    ]
-  },
-  "s_7e644b8d": {
-    "source": "Un día más, una meta más cerca.",
-    "files": [
-      "js/app-main.js"
     ]
   },
   "s_7e6e482d": {
@@ -6978,12 +6929,6 @@
     "source": "Morado Neón: Violeta, fucsia, coral y amarillo",
     "files": [
       "app.html"
-    ]
-  },
-  "s_81a31d6f": {
-    "source": "Un capítulo termina, otro comienza.",
-    "files": [
-      "js/app-main.js"
     ]
   },
   "s_81c08233": {
@@ -7525,12 +7470,6 @@
     "source": ", equipado con {{v0}}",
     "files": [
       "js/monsters.js"
-    ]
-  },
-  "s_8b1a3e63": {
-    "source": "Hoy también vamos con todo.",
-    "files": [
-      "js/app-main.js"
     ]
   },
   "s_8b1d8111": {
@@ -8820,12 +8759,6 @@
       "js/app-main.js"
     ]
   },
-  "s_a2b05f11": {
-    "source": "Si empiezas, tienes la oportunidad de evolucionar y corregir... Si no empiezas nada, nunca tendrás esa oportunidad. — Seth Godin",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
   "s_a2b14871": {
     "source": "Suena mientras la pestaña esté abierta, si aún no le diste a \"Iniciar shift\". 0 min = desactivado. Variable disponible en el mensaje:",
     "files": [
@@ -9364,12 +9297,6 @@
   },
   "s_ad75d38b": {
     "source": "Ganancias del ciclo",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
-  "s_adac5096": {
-    "source": "Un paso a la vez, un turno a la vez.",
     "files": [
       "js/app-main.js"
     ]
@@ -10942,12 +10869,6 @@
       "app.html"
     ]
   },
-  "s_cad25cb9": {
-    "source": "Todo tiene un final, pero cada final significa un nuevo comienzo.",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
   "s_cad90e4e": {
     "source": "meta diaria",
     "files": [
@@ -12344,12 +12265,6 @@
       "js/finance.js"
     ]
   },
-  "s_e4675ecd": {
-    "source": "El éxito se da cuando vas de fracaso en fracaso sin perder tu entusiasmo. — Winston Churchill",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
   "s_e49d517c": {
     "source": "Bono ganado hoy{{v7}}",
     "files": [
@@ -12722,6 +12637,13 @@
       "privacidad.html"
     ]
   },
+  "s_ec2ef78d": {
+    "source": "Jamás negocio con mis excusas: no hacer nada también es una. Doy el primer paso y avanzo hasta lograr lo que me propongo.",
+    "files": [
+      "app.html",
+      "js/app-main.js"
+    ]
+  },
   "s_ec60a9c7": {
     "source": "{{v1}} – {{v2}}",
     "files": [
@@ -12792,12 +12714,6 @@
     "source": "pulso violeta",
     "files": [
       "js/game-battle.js"
-    ]
-  },
-  "s_ed905361": {
-    "source": "Tu jornada, organizada y clara.",
-    "files": [
-      "js/app-main.js"
     ]
   },
   "s_eda38b05": {
@@ -13382,12 +13298,6 @@
       "privacidad.html"
     ]
   },
-  "s_f7bb4dab": {
-    "source": "No importa lo lento que vayas, siempre y cuando no te detengas. — Confucio",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
   "s_f7d54964": {
     "source": "10 de octubre de 2026",
     "files": [
@@ -13398,12 +13308,6 @@
     "source": "Ganado",
     "files": [
       "js/game.js"
-    ]
-  },
-  "s_f819c2c6": {
-    "source": "Vamos a que este día cuente.",
-    "files": [
-      "js/app-main.js"
     ]
   },
   "s_f819f303": {
