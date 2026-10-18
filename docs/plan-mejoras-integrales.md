@@ -8,27 +8,26 @@ no se considera rota por esa razón.
 
 ## Lista de control completa
 
-**8 de 79 mejoras publicadas.** 4 probadas sin publicar, 2 en curso y 65 pendientes.
-La primera entrega está en producción y su recarga 2.2.8 está confirmada. La
-continuación de preparación del turno usa app 623 y extensión 2.2.9; su recarga
-local se confirma aparte.
+**12 de 79 mejoras publicadas.** 2 en curso y 65 pendientes. La preparación del
+turno usa app 623 y extensión 2.2.9, con publicación comprobada y recarga de la
+extensión, Propio y tracker confirmada por el propietario.
 
 Estados: **Pendiente**, **En curso**, **Probado** (sin publicar), **Publicado**.
 Una casilla solo se marca cuando todos los criterios del punto están resueltos
 y su evidencia está enlazada. Se conservan las comprobaciones y decisiones de
 no ampliar alcance. Un cambio parcial no cierra la función completa.
 
-- [ ] **1. Registro automático de la conexión a Propio — Probado.** Hora de conexión detectada en la preparación, sin afirmar que es el momento exacto de login. [Evidencia](disponibilidad-en-inicio.md).
-- [ ] **2. Diferencia entre estar conectado y empezar a trabajar — Probado.** Conexión y comienzo laboral separados, incluyendo trabajo anticipado real, inicio manual y cierre antes del horario. [Evidencia](disponibilidad-en-inicio.md).
+- [x] **1. Registro automático de la conexión a Propio — Publicado.** Hora de conexión detectada en la preparación, sin afirmar que es el momento exacto de login. [Evidencia](disponibilidad-en-inicio.md).
+- [x] **2. Diferencia entre estar conectado y empezar a trabajar — Publicado.** Conexión y comienzo laboral separados, incluyendo trabajo anticipado real, inicio manual y cierre antes del horario. [Evidencia](disponibilidad-en-inicio.md).
 - [ ] **3. Inicio y cierre manual de turno — Pendiente.** Confirmación de cierre con alcance y actividades pendientes.
 - [ ] **4. Continuar después de un cierre accidental — Pendiente.** Distinguir continuación del turno y sesión nueva.
 - [ ] **5. Día activo e historial de acciones — Pendiente.** Hacer evidente Hoy frente a una fecha histórica antes de acciones.
 - [x] **6. Vinculación con tu cuenta — Publicado.** Resumen de preparación: cuenta, tracker, Propio y automatismos. [Evidencia](disponibilidad-en-inicio.md).
 - [x] **7. Ponerte disponible al comenzar el turno — Publicado.** Mostrar en Inicio la espera hasta el horario de entrada. [Evidencia](disponibilidad-en-inicio.md).
 - [x] **8. Esperar entre llamadas usando el ACW de la tool — Publicado.** Cuenta regresiva del ACW confirmada por la extensión en Inicio. [Evidencia](disponibilidad-en-inicio.md).
-- [ ] **9. Regreso automático de Break — Probado.** Indica si terminar Break intentará volver a disponibilidad o si hace falta Start Calls manual. [Evidencia](disponibilidad-en-inicio.md).
+- [x] **9. Regreso automático de Break — Publicado.** Indica si terminar Break intentará volver a disponibilidad o si hace falta Start Calls manual. [Evidencia](disponibilidad-en-inicio.md).
 - [x] **10. Regreso automático de Lunch — Publicado.** Mostrar por separado la preferencia de regreso de Lunch. [Evidencia](disponibilidad-en-inicio.md).
-- [ ] **11. Elegir cómo terminan las pausas — Probado.** Modalidad y final previsto visibles para pausas activas; distingue horarios programados, duración ausente y cierre por confirmar. [Evidencia](disponibilidad-en-inicio.md).
+- [x] **11. Elegir cómo terminan las pausas — Publicado.** Modalidad y final previsto visibles para pausas activas; distingue horarios programados, duración ausente y cierre por confirmar. [Evidencia](disponibilidad-en-inicio.md).
 - [x] **12. Pausar todos los automatismos de disponibilidad — Publicado.** Estado de pausa manual y forma de reanudar visibles en la tool. [Evidencia](disponibilidad-en-inicio.md).
 - [x] **13. Reintento cuando no tomás una oferta — Publicado.** Explicar reintento y condición que lo detiene sin interruptores adicionales. [Evidencia](disponibilidad-en-inicio.md).
 - [ ] **14. Prioridades que frenan los clics automáticos — En curso.** Motivo dominante del bloqueo y coordinación antes de uso simultáneo en PCs.
@@ -100,6 +99,12 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 
 ## Entregas verificadas
 
+- [PR #84](https://github.com/jonathanvelasquez787-commits/propio-shift-tracker/pull/84),
+  commit `93d4392c121db17829d7a68f6e022d9cc46c3433`: 835 pruebas, builds y
+  320 vistas; CI del PR y de main correctos. Producción READY y lectura pública
+  del mismo commit comprobada. Archivos 2.2.9 instalados con respaldo, permisos
+  y preferencias conservados; el propietario confirmó «Ya recargué todo».
+  Cierra 1, 2, 9 y 11 sin cerrar otras fases ni la coordinación multi-PC.
 - [PR #81](https://github.com/jonathanvelasquez787-commits/propio-shift-tracker/pull/81),
   commit `3eba5f8ef7869a98a0dd1ece1c5afd39572a5bf1`: CI del PR correcto,
   829 pruebas, builds y 224 vistas. Vercel producción READY en ese mismo SHA;
@@ -111,11 +116,13 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 
 ## Orden de ejecución
 
-1. **Disponibilidad en Inicio y preparación del turno — en curso.** Estado
+1. **Disponibilidad en Inicio y preparación del turno — parte de Inicio publicada.** Estado
    dominante, próxima acción, cuenta regresiva ligada al worker, lectura reciente,
    conexión/turno diferenciados y detalles de preparación. Cubre 1–2, 6–14, 71,
    74 y parte de 78. Vista previa en claro/oscuro aprobada; lógica de transporte
-   sin modificar decisiones de Start/Stop ni aceptación de llamadas.
+   sin modificar decisiones de Start/Stop ni aceptación de llamadas. Los puntos
+   14 y 74 conservan abierta su parte de coordinación entre PCs en la fase 12;
+   la consistencia de la barra de actividad del punto 78 sigue pendiente.
 2. **Corrección de Higher Rate — pendiente.** Separar corregir/recalcular de
    archivar/conservar, vista previa de llamadas/importes y protección de
    beneficios históricos. Desglose base/bono/estimación y tasa/moneda: 33–37.

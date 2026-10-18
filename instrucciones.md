@@ -319,8 +319,8 @@ futura opera bajo esto, sin excepción:
 
 - **Mejoras integrales aprobadas el 18/10:** ejecutar las recomendaciones de la
   evaluación de 79 funciones por fases; alcance y estado completo en
-  [plan de mejoras](docs/plan-mejoras-integrales.md). Primera fase: estado de
-  disponibilidad y preparación en Inicio. No perder las fases posteriores al
+  [plan de mejoras](docs/plan-mejoras-integrales.md). Inicio y preparación publicados:
+  12 mejoras cerradas; sigue el bloque de Higher Rate. No perder las fases posteriores al
   entregar una parte ni considerar pendiente la instalación ya confirmada.
 - **Segundos oficiales de Propio:** confirmar con evidencia si el último minuto
   incompleto se incluye en duración y pago. El formato de hora visible no lo demuestra.
@@ -338,7 +338,7 @@ futura opera bajo esto, sin excepción:
 **CONFIRMACIONES Y CONFIGURACIÓN LOCAL VIGENTES**
 
 - El usuario confirmó inicio automático de llamadas, regreso tras Break y arranque
-  correcto después de reiniciar. La extensión 2.2.8 y la recarga de Propio/tracker
+  correcto después de reiniciar. La extensión 2.2.9 y la recarga de Propio/tracker
   están confirmadas; no volver a presentarlas como instalación pendiente.
 - Chrome Jonathan se abre al iniciar Windows y se organiza también al abrirlo
   manualmente, a cualquier hora. Propio y https://app.useinterpreter.com/ quedan
@@ -431,8 +431,8 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
-- App 623; extensión unificada 2.2.9 (recarga local por confirmar). La recarga
-  de 2.2.8 está confirmada. Resumen independiente retirado, sin build
+- App 623; extensión unificada 2.2.9 (recarga local confirmada por el propietario).
+  Resumen independiente retirado, sin build
   mantenido. El historial oficial compartido y las funciones del tracker siguen
   activos. Guía de 73 funciones en docs/guia-practica-tool-y-extension.md.
 - Google es la entrada pública. Formularios deshabilitados de login/registro y
