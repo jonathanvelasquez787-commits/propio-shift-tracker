@@ -72,7 +72,8 @@ correo público que el propietario había proporcionado.
 La landing carga un bundle compartido en lugar de tres copias de i18n. Las
 fuentes externas se cargan sin bloquear el primer render, con fallback sin
 JavaScript. El hero queda visible desde el HTML inicial. El detalle de la
-auditoría y sus límites figura en `seo-audit-2026-10-04.md`.
+auditoría y sus límites figura en [informe original del 04/10](https://github.com/jonathanvelasquez787-commits/propio-shift-tracker/blob/6b10046837a821ef9f37cbcebb4eed31c3ad4106/docs/seo-audit-2026-10-04.md),
+consolidado en [antecedentes](auditoria-profunda-2026-10-17.md#antecedentes-consolidados--18102026).
 
 ## Search Console
 

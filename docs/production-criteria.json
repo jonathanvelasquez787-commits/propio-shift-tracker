@@ -886,7 +886,7 @@
     {
       "id": "bridge",
       "area": "Extensiones e historial",
-      "acceptance": "Puente valida mensajes, conecta sesión confirmada con Shift, detecta llamadas por controles o red y deduplica; historial paginado y resumen independiente sin acceder a otra cuenta.",
+      "acceptance": "Puente valida mensajes, conecta sesión confirmada con Shift, detecta llamadas por controles o red y deduplica; historial oficial paginado sin acceder a otra cuenta.",
       "sources": [
         "js/propio-bridge.js",
         "js/call-feedback.js",
@@ -894,7 +894,6 @@
         "extension/propio-bridge/portal-observer.js",
         "extension/propio-bridge/portal-content.js",
         "extension/propio-bridge/tracker-content.js",
-        "extension/propio-summary/options.js",
         "js/propio-history.js",
         "js/propio-history-pages.js",
         "js/propio-history-records.js",
@@ -998,7 +997,6 @@
         {
           "file": "tests/propio-extension-separation.test.mjs",
           "namedCases": [
-            "independent summary is scoped to Propio and has no call observer, tracker or messaging capabilities",
             "unified extension keeps session detection separate from original layout and removes its custom summary"
           ]
         },
@@ -1009,15 +1007,6 @@
             "normal delivery still acknowledges once and clears its timeout",
             "invalidated content stops sending and clears outstanding delivery timeouts",
             "tracker readiness retries a transient startup failure without a user pairing action and periodically rechecks the link"
-          ]
-        },
-        {
-          "file": "tests/propio-summary-i18n.test.mjs",
-          "namedCases": [
-            "summary defaults and legacy currency-only settings use English; Spanish is explicit",
-            "unified summary is opt-in and preference updates preserve enabled state and valid conversion",
-            "disabled summary has no portal observers, interaction listeners or history reads and releases them after toggling off",
-            "summary status, plural calls and scan errors follow the selected language"
           ]
         },
         {

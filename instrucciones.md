@@ -474,7 +474,7 @@ por renderizado: 885 Date frente a 65.684 en 40 filas/400 pagos.
 2.230 textos ES/EN y builds app/puente/resumen correctos. Chrome ficticio:
 17 comprobaciones de flujo, diez de integridad, 24 vistas responsive y
 nueve controles de tooltips en cada idioma. Sin datos reales modificados.
-Informe: docs/auditoria-finanzas-2026-10-13.md. CI y publicación exacta se
+Informe: [antecedentes consolidados](docs/auditoria-profunda-2026-10-17.md#antecedentes-consolidados--18102026). CI y publicación exacta se
 verifican aparte en la evidencia de cierre.
 
 Finanzas v603: revisión aprobada de Gastos/Metas. Presupuesto, Reservado y
@@ -495,14 +495,14 @@ móvil e idioma. 573 pruebas sin fallos/omitidas (42 nuevas); recorrido adiciona
 de 42 días, 343 controles y 20 enlaces; 2.195 textos ES/EN. App y ambas
 extensiones pasan build. Producción base y permisos alojados se comprobaron
 por separado; publicación final se verifica por CI/READY/release en la entrega.
-Ver docs/auditoria-super-profunda-2026-10-12.md. Datos reales sin modificar.
+Ver [antecedentes consolidados](docs/auditoria-profunda-2026-10-17.md#antecedentes-consolidados--18102026). Datos reales sin modificar.
 
 Auditoría integral del 12/10/2026: siete fallos reproducidos corregidos en
 metas decimales, pagos numéricos, importación JSON y pausas/ACW (incluye
 superposición manual de Break/Lunch y llamadas durante pausas reales). 531 pruebas; dos recorridos de 31 días,
 17.000 casos independientes; 343 controles internos y 20 enlaces inventariados,
 35 contratos, 2.181 textos ES/EN y build de app/puente/resumen correctos.
-Matriz: 17 áreas, 53 suites, 58 fuentes. Ver docs/auditoria-profunda-2026-10-12.md.
+Matriz: 17 áreas, 53 suites, 58 fuentes. Ver [antecedentes consolidados](docs/auditoria-profunda-2026-10-17.md#antecedentes-consolidados--18102026).
 CI del PR 41 pasó; integración 5956cc7 y publicación verificada 12/10 07:31:55
 Honduras: Vercel READY, health 200/ok=true/release exacto, bundles 200,
 CSP/HSTS/no-store correctos. El primer despliegue automático falló antes del
@@ -542,7 +542,7 @@ de Logros; cierres de llamadas pegadas; reinicio diario de gamificación y
 sincronización de 250 ms con límite de 1500 ms y sin subida duplicada al ocultar.
 Recorridos con cuenta ficticia incluyen respaldo, reinicio, nube local,
 recarga y restauración de siete llamadas. Alcance y límites documentados en
-docs/button-audit-2026-10-11.md. CI y SHA de publicación se comprueban aparte;
+[antecedentes consolidados](docs/auditoria-profunda-2026-10-17.md#antecedentes-consolidados--18102026). CI y SHA de publicación se comprueban aparte;
 no se acredita haber pulsado todas las combinaciones del inventario.
 
 Cierre de preparación del 11/10/2026: matriz permanente de 17 áreas, 56 módulos
@@ -563,7 +563,7 @@ rechazados). 452 pruebas; simulación de 31 días, 161 reconciliaciones y 31
 snapshots/exportaciones; 33 módulos, wiring y 2126 textos ES/EN. Interfaz con
 cuenta ficticia y backend local: cambios de horario/finanzas recibidos en otra
 sesión y siete páginas a 1365/390 px; navegación móvil por teclado. Ver
-docs/auditoria-super-profunda-2026-10-11.md para evidencia y límites.
+[antecedentes consolidados](docs/auditoria-profunda-2026-10-17.md#antecedentes-consolidados--18102026) para evidencia y límites.
 Producción y ensayo alojado tienen nueve migraciones. Google está activo;
 Email/SMTP permanece deshabilitado por decisión del usuario. Monitor externo
 de Codex activo, dependiente del equipo disponible. La recuperación de contenido
@@ -638,7 +638,7 @@ La auditoría profunda de v576 quedó cerrada: 31 días simulados, 108 llamadas,
 ambos recorridos QA y siete fallos reparados de persistencia, sincronización,
 Finanzas y exportaciones. No quedan fallos reproducidos pendientes de esa
 auditoría. La nube se probó con respuestas controladas, sin certificar una
-sesión real en dos dispositivos. Véase `docs/auditoria-profunda-2026-09-30.md`.
+sesión real en dos dispositivos. Véase [antecedentes consolidados](docs/auditoria-profunda-2026-10-17.md#antecedentes-consolidados--18102026).
 
 No quedan tareas abiertas del refuerzo positivo enumerado en la versión
 anterior. Los siete requisitos se completaron en v573; las limitaciones
@@ -942,13 +942,14 @@ La aplicación funciona en producción con estas bases vigentes:
   el de la guía es nofollow. La extensión se instala desde archivo según el
   propietario, por lo que no hay ficha propia de Chrome Web Store que editar.
   Detalle en `docs/seo.md`.
-- La versión actual de la app es 619; la extensión unificada es 2.2.7. El build
-  del resumen independiente 1.0.5 queda compatible para instalaciones anteriores.
+- La versión actual de la app es 619; la extensión unificada es 2.2.7. El
+  resumen independiente se retiró del repositorio el 18/10 por petición aprobada;
+  no tiene build ni compatibilidad mantenida. El historial oficial compartido sigue activo.
   Refuerzo positivo puede funcionar con Logros apagados. La auditoría profunda del
   8 de octubre corrigió seis fallos; la ampliación corrigió cinco más en arranque,
   concurrencia y PWA. Cobertura y límites constan en
-  `docs/auditoria-profunda-2026-10-08.md` y
-  `docs/auditoria-ampliada-2026-10-08.md`. La auditoría super profunda del 9 de
+  [antecedentes consolidados](docs/auditoria-profunda-2026-10-17.md#antecedentes-consolidados--18102026) y
+  [antecedentes consolidados](docs/auditoria-profunda-2026-10-17.md#antecedentes-consolidados--18102026). La auditoría super profunda del 9 de
   octubre corrigió 20 grupos de fallos de juego, contabilidad, importación,
   Finanzas, identidad de cuenta, sincronización, PWA y login; suite local de
   388 pruebas correcta, build de app y ambas extensiones correcto, 31 días
@@ -958,7 +959,7 @@ La aplicación funciona en producción con estas bases vigentes:
   y cero errores. Responsive real: siete páginas en dos anchuras, 14 vistas
   activas verificadas y raíz sin overflow horizontal. Publicación/CI/deploy
   requieren evidencia separada por SHA; no se infieren desde los checks locales.
-  Detalle, regresiones y límites en `docs/auditoria-super-profunda-2026-10-09.md`.
+  Detalle, regresiones y límites en [antecedentes consolidados](docs/auditoria-profunda-2026-10-17.md#antecedentes-consolidados--18102026).
   Sin Supabase staging: OAuth, cron alojado, conexiones simultáneas SQL reales
   y dispositivos físicos siguen fuera de certificación; datos reales intactos.
   La aparición por nombre en Google sigue
@@ -967,6 +968,18 @@ La aplicación funciona en producción con estas bases vigentes:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**Mantenimiento, 18/10 — Limpieza del repositorio aprobada.**
+
+- Diez informes antiguos consolidados en la auditoría del 17/10, con enlaces
+  inmutables a sus originales completos en Git; sin reescribir historial.
+- Resumen independiente retirado junto con build y cinco pruebas exclusivas;
+  historial oficial, extensión activa, migraciones y demás regresiones conservados.
+- README actualizado a Google como entrada pública y arquitectura actual. CI y
+  matriz comprueban únicamente la extensión mantenida. Versiones sin cambio.
+- 800 pruebas correctas, sin fallos ni omitidas; builds de app y extensión activa
+  correctos. Matriz: 23 criterios, 67 suites y 73 módulos. Publicación por PR.
+
 
 **v619 — Frase fija debajo del saludo.**
 
@@ -994,18 +1007,3 @@ La aplicación funciona en producción con estas bases vigentes:
   segundo monitor físico y reinicio físico no se probaron.
 - Prueba aislada de ambos programas y argumentos con espacios, configuración inválida
   rechazada y --verify real correcto. No se cerró Chrome ni se provocaron llamadas.
-
-
-**Extensión 2.2.7 — Respaldo para pestañas en segundo plano.**
-
-- Protección contra descarte automático solo en tracker, Propio y UseInterpreter;
-  devuelve indicadores propios al navegar fuera, sin recargar ni traer al frente.
-- Lectura nueva del plan antes de evaluar disponibilidad; sin respuesta no usa
-  ACW antiguo. Comprobación extra desde alarma cada 30 s y al reanudar página.
-- Muestreo del portal coalescido conserva guards, Stop manual y estabilidad
-  de evidencia. Plazos limitados evitan bloquear el worker ante una página dormida.
-- 805 pruebas correctas; flujo compilado con intervalos de páginas anulados:
-  horario temprano bloqueado, Stop tras llamada, ACW 00:50 + 02:10, reinicio
-  del worker y Stop manual persistido. Cuenta ficticia, sin llamadas reales.
-- Chrome puede demorar alarmas o congelar páginas; no funciona con PC suspendida.
-  Permisos y composición visual intactos. Activación nativa requiere recarga.
