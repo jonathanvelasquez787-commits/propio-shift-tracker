@@ -805,26 +805,14 @@ export function renderDayStatsCards() {
   const dayKey = getActiveDayKey();
   const dayCalls = callsForDay(dayKey);
   const stats = importedCallStats(dayCalls, dayKey);
-  const adherence = dayAdherence(dayKey);
 
   const setText = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
 
-  setText('resumenDiaLlamadas', String(dayCalls.length));
-  setText('resumenDiaProductivo', formatDuration(stats.productive * 60000));
-  setText('resumenDiaACW', formatDuration(stats.gapTotal * 60000));
-  setText('resumenDiaAdherencia', adherence ? `${adherence.scorePct}%` : '—');
-  const goalPct = Number.isFinite(Number(settings.adherenceGoalPct)) ? Number(settings.adherenceGoalPct) : 95;
-  setText('resumenDiaAdherenciaGoal', ui`Objetivo ≥ ${goalPct}%`);
-
   setText('statsShortest', dayCalls.length ? formatDuration(stats.shortest * 60000) : '—');
-  // Nota aclaratoria cuando "Más corta" da 0 min por una llamada real de inicio=fin — sin esto se
-  // veía como un error de la app.
+  // Una llamada real de cero minutos no debe confundirse con un error del contador.
   const shortestNoteEl = document.getElementById('statsShortestNote');
   if (shortestNoteEl) {
     if (dayCalls.length && stats.shortest === 0 && stats.zeroCount > 0 && stats.shortestNonZero !== null) {
-      // El texto anterior ("Hubo 1 llamada de 0 min — siguiente: 00:01:00") no dejaba claro qué
-      // relación tenía ese "siguiente" con el 00:00:00 de arriba. Se reescribe para que quede
-      // explícito.
       const intro = stats.zeroCount === 1 ? translateText('1 llamada duró 0 min') : ui`${stats.zeroCount} llamadas duraron 0 min`;
       shortestNoteEl.textContent = ui`${intro} — sin contar esa(s), la más corta fue ${formatDuration(stats.shortestNonZero * 60000)}`;
       shortestNoteEl.style.display = '';
@@ -835,29 +823,11 @@ export function renderDayStatsCards() {
   setText('statsLongest', dayCalls.length ? formatDuration(stats.longest * 60000) : '—');
   setText('statsAvg', dayCalls.length ? formatDuration(stats.avg * 60000) : '—');
 
-  // Desglose Break/Lunch/Otro + bono de Higher Rate en "Resumen del día"
-  setText('resumenDiaBreak', formatDuration(stats.breakGapTotal * 60000));
-  setText('resumenDiaLunch', formatDuration(stats.lunchGapTotal * 60000));
-  setText('resumenDiaOtro', formatDuration(stats.otherGapTotal * 60000));
-  setText('resumenDiaHigherRate', money(stats.higherRateBonus || 0));
-
-  // Conectado/Tiempo llamadas/ Billable/Dropped, mismos datos que ya alimentan las píldoras de
-  // "Ganancias de hoy" (renderHeader)
-  const dayShiftBoundsForStats = dayShiftBounds(dayKey);
-  const hasShiftForStats = !!dayShiftBoundsForStats.start;
-  setText('resumenDiaConectado', hasShiftForStats ? formatDuration(connectedMinutesForDay(dayKey) * 60000) : '—');
-  setText('resumenDiaTiempoLlamadas', formatDuration(stats.total * 60000));
-  setText('resumenDiaBillable', String(stats.billable));
-  setText('resumenDiaDropped', String(stats.dropped));
-
-  // Hueco más largo/promedio (ya calculados por importedCallStats) + pago promedio por llamada
-  // (Ganancias ÷ Total de llamadas).
   setText('statsGapLongest', stats.gapLongest > 0 ? formatDuration(stats.gapLongest * 60000) : '—');
   setText('statsGapAvg', stats.gapAvg > 0 ? formatDuration(stats.gapAvg * 60000) : '—');
   const avgPay = dayCalls.length ? stats.earnings / dayCalls.length : 0;
   setText('statsAvgPay', dayCalls.length ? `${money(avgPay)}${convertedAmountText(avgPay) ? ` (${convertedAmountText(avgPay)})` : ''}` : '—');
 }
-
 
 export function setTableFilterMode(value) { tableFilterMode = value || 'all'; }
 export function markManualCallPayDirty() { manualCallPayDirty = true; }

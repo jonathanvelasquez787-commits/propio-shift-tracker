@@ -19,6 +19,25 @@ function declarations(file, names) {
 
 const key = date => `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}/${date.getFullYear()}`;
 const at = (day, hour, minute = 0) => new Date(2026, 9, day, hour, minute);
+
+test('visible day statistics keep zero-minute explanations, averages and currency without removed summary targets', () => {
+  const ids=['dayStatsGrid','statsShortest','statsShortestNote','statsLongest','statsAvg','statsGapLongest','statsGapAvg','statsAvgPay'];
+  const elements=Object.fromEntries(ids.map(id=>[id,{textContent:'',style:{}}]));
+  let calls=[{}];
+  const h=vm.createContext({ui,translateText,document:{getElementById:id=>{assert.ok(ids.includes(id),id);return elements[id];}},
+    getActiveDayKey:()=> '10/18/2026',callsForDay:()=>calls,
+    importedCallStats:()=>({shortest:0,zeroCount:1,shortestNonZero:5,longest:5,avg:2.5,gapLongest:1,gapAvg:1,earnings:0.6}),
+    formatDuration:value=>String(value),money:value=>`$${value.toFixed(2)}`,convertedAmountText:()=> '≈ L 15',
+  });
+  vm.runInContext(declarations('../js/calls.js',['renderDayStatsCards']),h);
+  h.renderDayStatsCards();
+  assert.equal(elements.statsAvgPay.textContent,'$0.60 (≈ L 15)');
+  assert.equal(elements.statsShortestNote.style.display,'');
+  assert.equal(elements.statsAvg.textContent,'150000');
+  calls=[];h.renderDayStatsCards();
+  assert.equal(elements.statsAvgPay.textContent,'—');
+  assert.equal(elements.statsShortestNote.style.display,'none');
+});
 function scheduleHarness({ day = 12, now = at(12, 19), start = at(12, 10), end = at(12, 11) } = {}) {
   const elements = new Map([['scheduleList', { innerHTML: '' }]]);
   const dayKey = key(at(day, 0)), todayKey = key(now);

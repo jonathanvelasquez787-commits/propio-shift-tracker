@@ -1,39 +1,26 @@
-import { ui, translateText, translateStoredText, translateMarkup, displayLocale, translateDocument, setLanguage } from './i18n.js';
+import { ui, translateText, translateStoredText, translateDocument, setLanguage } from './i18n.js';
 translateDocument();
 window.addEventListener('propio-language-change', event => setLanguage(event.detail, { documentTranslation: true }));
-// Landing: decide qué mostrar (formularios, sesión ya abierta, o "pon una
-// contraseña nueva") y ejecuta los 3 métodos de entrada.
+// Entrada Google, sesión existente y recuperación de enlaces ya emitidos.
 
 import {
   isConfigured,
   getSession,
   onAuthChange,
   signInWithGoogle,
-  signInWithIdentifier,
-  signUp,
-  requestPasswordReset,
   updatePassword,
-  isUsernameAvailable,
   getProfile,
   signOut,
   authErrorMessage,
-  USERNAME_RE,
 } from './auth.js';
 
 const $ = (id) => document.getElementById(id);
-import { EMAIL_AUTH_READY } from './config.js';
 
-const forms = {
-  login: $('loginForm'),
-  signup: $('signupForm'),
-  forgot: $('forgotForm'),
-  reset: $('resetForm'),
-};
+const forms = { reset: $('resetForm') };
 
 const msgEl = $('authMsg');
 const titleEl = $('authTitle');
 const subEl = $('authSub');
-const tabRow = document.querySelector('.tab-row');
 const authForms = $('authForms');
 const sessionCard = $('sessionCard');
 
@@ -96,54 +83,17 @@ function clearMessage() {
   msgEl.className = 'form-msg';
 }
 
-const VIEWS = () => ({
-  login: { title: translateText('Entrar'), sub: translateText('Usa tu correo o tu nombre de usuario.'), tabs: true },
-  signup: {
-    title: translateText('Crear cuenta'),
-    sub: translateText('Elige cómo te vas a llamar aquí dentro.'),
-    tabs: true,
-  },
-  forgot: {
-    title: translateText('Recuperar contraseña'),
-    sub: translateText('Te mandamos un enlace al correo con el que te registraste.'),
-    tabs: false,
-  },
-  reset: {
-    title: translateText('Contraseña nueva'),
-    sub: translateText('Escribe la contraseña que vas a usar de ahora en adelante.'),
-    tabs: false,
-  },
-});
-
 function showView(name) {
-  if (!EMAIL_AUTH_READY && !recoveryMode) name = 'login';
   clearMessage();
-  Object.entries(forms).forEach(([key, form]) => {
-    if (form) form.hidden = key !== name;
-  });
-  const views = VIEWS();
-  const view = views[name] || views.login;
-  if (titleEl) titleEl.textContent = view.title;
-  if (subEl) subEl.textContent = view.sub;
-  if (tabRow) tabRow.style.display = view.tabs ? '' : 'none';
+  const resetting = name === 'reset';
+  if (forms.reset) forms.reset.hidden = !resetting;
+  if (titleEl) titleEl.textContent = resetting ? translateText('Contraseña nueva') : translateText('Entra con Google');
+  if (subEl) subEl.textContent = resetting
+    ? translateText('Escribe la contraseña que vas a usar de ahora en adelante.')
+    : translateText('Entra o crea tu cuenta con Google. No necesitas una contraseña de esta app.');
   const googleBtn = $('googleBtn');
-  const divider = document.querySelector('.divider-row');
-  const showGoogle = name === 'login' || name === 'signup';
-  if (googleBtn) googleBtn.style.display = showGoogle ? '' : 'none';
-  if (divider) divider.style.display = showGoogle ? '' : 'none';
-  if (!EMAIL_AUTH_READY && !recoveryMode) {
-    if (forms.login) forms.login.hidden = true;
-    if (tabRow) tabRow.style.display = 'none';
-    if (divider) divider.style.display = 'none';
-    if (titleEl) titleEl.textContent = translateText('Entra con Google');
-    if (subEl) subEl.textContent = translateText('Entra o crea tu cuenta con Google. No necesitas una contraseña de esta app.');
-  }
-
-  $('tabLogin')?.setAttribute('aria-selected', String(name === 'login'));
-  $('tabSignup')?.setAttribute('aria-selected', String(name === 'signup'));
-
-  const firstInput = forms[name]?.querySelector('input');
-  if (firstInput && name !== 'login') setTimeout(() => firstInput.focus(), 40);
+  if (googleBtn) googleBtn.style.display = resetting ? 'none' : '';
+  if (resetting) setTimeout(() => forms.reset?.querySelector('input')?.focus(), 40);
 }
 
 function setBusy(button, busy, busyLabel) {
@@ -260,15 +210,6 @@ async function init() {
 // Eventos
 // ---------------------------------------------------------------------------
 
-$('tabLogin')?.addEventListener('click', () => showView('login'));
-$('tabSignup')?.addEventListener('click', () => showView('signup'));
-$('forgotBtn')?.addEventListener('click', () => {
-  const typed = $('loginIdentifier')?.value || '';
-  if (typed.includes('@')) $('forgotEmail').value = typed.trim();
-  showView('forgot');
-});
-$('backToLoginBtn')?.addEventListener('click', () => showView('login'));
-
 $('googleBtn')?.addEventListener('click', async () => {
   clearMessage();
   sessionStorage.setItem(PENDING_KEY, '1');
@@ -277,77 +218,6 @@ $('googleBtn')?.addEventListener('click', async () => {
   } catch (err) {
     sessionStorage.removeItem(PENDING_KEY);
     showMessage(authErrorMessage(err), 'error');
-  }
-});
-
-forms.login?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  clearMessage();
-  const identifier = $('loginIdentifier').value.trim();
-  const password = $('loginPassword').value;
-  if (!identifier || !password) {
-    showMessage(translateText('Faltan datos para entrar.'), 'error');
-    return;
-  }
-  const btn = $('loginSubmit');
-  setBusy(btn, true, translateText('Entrando…'));
-  try {
-    sessionStorage.setItem(PENDING_KEY, '1');
-    await signInWithIdentifier(identifier, password);
-    sessionStorage.removeItem(PENDING_KEY);
-    enterApp();
-  } catch (err) {
-    sessionStorage.removeItem(PENDING_KEY);
-    showMessage(authErrorMessage(err), 'error');
-    setBusy(btn, false);
-  }
-});
-
-forms.signup?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  clearMessage();
-  const username = $('signupUsername').value.trim();
-  const email = $('signupEmail').value.trim();
-  const password = $('signupPassword').value;
-  const btn = $('signupSubmit');
-  setBusy(btn, true, translateText('Creando…'));
-  try {
-    sessionStorage.setItem(PENDING_KEY, '1');
-    const result = await signUp({ email, username, password });
-    if (result.needsEmailConfirmation) {
-      sessionStorage.removeItem(PENDING_KEY);
-      setBusy(btn, false);
-      showView('login');
-      showMessage(
-        ui`Cuenta creada. Te mandamos un correo a ${email} para confirmarla — ábrelo y ya puedes entrar.`,
-        'ok'
-      );
-      return;
-    }
-    sessionStorage.removeItem(PENDING_KEY);
-    enterApp();
-  } catch (err) {
-    sessionStorage.removeItem(PENDING_KEY);
-    showMessage(authErrorMessage(err), 'error');
-    setBusy(btn, false);
-  }
-});
-
-forms.forgot?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  clearMessage();
-  const btn = $('forgotSubmit');
-  setBusy(btn, true, translateText('Enviando…'));
-  try {
-    await requestPasswordReset($('forgotEmail').value);
-    showMessage(
-      translateText('Si ese correo tiene una cuenta, ya va en camino el enlace para cambiar la contraseña. Revisa también el spam.'),
-      'ok'
-    );
-  } catch (err) {
-    showMessage(authErrorMessage(err), 'error');
-  } finally {
-    setBusy(btn, false);
   }
 });
 
@@ -377,39 +247,6 @@ $('signOutBtn')?.addEventListener('click', async () => {
     /* ignorar */
   }
   window.location.replace('/');
-});
-
-// Disponibilidad del username mientras se escribe: mejor enterarse acá que
-// después de llenar todo el formulario.
-let usernameTimer = null;
-$('signupUsername')?.addEventListener('input', (e) => {
-  const hint = $('usernameHint');
-  const value = e.target.value.trim();
-  if (usernameTimer) clearTimeout(usernameTimer);
-
-  if (!value) {
-    hint.className = 'field-hint';
-    hint.textContent = translateText('3 a 24 caracteres: letras, números, guion bajo o punto.');
-    return;
-  }
-  if (!USERNAME_RE.test(value)) {
-    hint.className = 'field-hint bad';
-    hint.textContent = translateText('Solo letras, números, guion bajo y punto — entre 3 y 24 caracteres.');
-    return;
-  }
-
-  hint.className = 'field-hint';
-  hint.textContent = translateText('Revisando disponibilidad…');
-  usernameTimer = setTimeout(async () => {
-    try {
-      const free = await isUsernameAvailable(value);
-      hint.className = `field-hint ${free ? 'ok' : 'bad'}`;
-      hint.textContent = free ? ui`"${value}" está libre.` : ui`"${value}" ya está ocupado.`;
-    } catch {
-      hint.className = 'field-hint';
-      hint.textContent = translateText('No se pudo revisar ahora; lo confirmamos al crear la cuenta.');
-    }
-  }, 450);
 });
 
 init();

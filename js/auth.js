@@ -1,13 +1,5 @@
-import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
-// Autenticación — los 3 métodos de entrada.
-//
-// Google y correo/contraseña los resuelve Supabase Auth directo desde el
-// navegador. "Usuario y contraseña" NO se puede resolver acá: haría falta
-// traducir el username a su correo, y exponer esa traducción al navegador
-// convertiría cualquier lista de usernames en una lista de correos. Por eso
-// ese caso pasa por /api/login (ver api/login.js), que hace la traducción del
-// lado del servidor y devuelve únicamente la sesión ya creada.
-
+import { translateText } from './i18n.js';
+// Google y gestión de la cuenta; conserva el cambio de contraseña de enlaces existentes.
 import { getSupabase, isConfigured } from './supabase-client.js';
 
 export { isConfigured };
@@ -46,102 +38,6 @@ export async function signInWithGoogle(redirectTo) {
     },
   });
   if (error) throw error;
-}
-
-// --- Correo o usuario + contraseña -----------------------------------------
-
-// Un solo campo "identifier" acepta las dos formas. El correo se podría
-// resolver acá mismo, pero se manda todo por /api/login para que el mensaje de
-// error sea idéntico en ambos casos: distinguir "ese usuario no existe" de
-// "contraseña incorrecta" es justo lo que permite averiguar quién tiene cuenta.
-export async function signInWithIdentifier(identifier, password) {
-  const res = await fetch('/api/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ identifier: String(identifier || '').trim(), password }),
-  });
-
-  let payload = null;
-  try {
-    payload = await res.json();
-  } catch {
-    payload = null;
-  }
-
-  if (!res.ok || !payload || !payload.access_token) {
-    const code = (payload && payload.error) || 'LOGIN_FAILED';
-    throw new AuthError(code);
-  }
-
-  const { data, error } = await getSupabase().auth.setSession({
-    access_token: payload.access_token,
-    refresh_token: payload.refresh_token,
-  });
-  if (error) throw error;
-  return data.session;
-}
-
-// --- Registro ---------------------------------------------------------------
-
-export async function isUsernameAvailable(username) {
-  const clean = String(username || '').trim();
-  if (!USERNAME_RE.test(clean)) return false;
-  const { data, error } = await getSupabase().rpc('username_available', {
-    p_username: clean,
-  });
-  if (error) throw error;
-  return data === true;
-}
-
-export async function signUp({ email, username, password, displayName }) {
-  const cleanEmail = String(email || '').trim().toLowerCase();
-  const cleanUsername = String(username || '').trim();
-
-  if (!looksLikeEmail(cleanEmail)) throw new AuthError('EMAIL_INVALID');
-  if (!USERNAME_RE.test(cleanUsername)) throw new AuthError('USERNAME_INVALID');
-  if (String(password || '').length < 8) throw new AuthError('PASSWORD_TOO_SHORT');
-
-  const available = await isUsernameAvailable(cleanUsername);
-  if (!available) throw new AuthError('USERNAME_TAKEN');
-
-  const { data, error } = await getSupabase().auth.signUp({
-    email: cleanEmail,
-    password,
-    options: {
-      // El trigger handle_new_user() lee este metadata para crear la fila de
-      // profiles en el mismo instante en que nace la cuenta.
-      data: {
-        username: cleanUsername,
-        display_name: String(displayName || '').trim() || cleanUsername,
-      },
-      emailRedirectTo: `${window.location.origin}/`,
-    },
-  });
-  if (error) throw error;
-
-  return {
-    session: data.session || null,
-    // Con "Confirm email" activado en Supabase no hay sesión hasta que el
-    // usuario abra el correo; la UI tiene que decirlo en vez de quedarse
-    // girando.
-    needsEmailConfirmation: !data.session,
-  };
-}
-
-// --- Contraseña olvidada ----------------------------------------------------
-
-// Siempre resuelve sin error aunque el correo no exista: confirmar que un
-// correo está registrado es la misma fuga que se evita en el login.
-export async function requestPasswordReset(email) {
-  const cleanEmail = String(email || '').trim().toLowerCase();
-  if (!looksLikeEmail(cleanEmail)) throw new AuthError('EMAIL_INVALID');
-  const { error } = await getSupabase().auth.resetPasswordForEmail(cleanEmail, {
-    redirectTo: `${window.location.origin}/?recuperar=1`,
-  });
-  // Never surface account-existence errors. Operational failures are a safe,
-  // generic retry message instead of an untrue delivery confirmation.
-  if (error) throw new AuthError('RESET_UNAVAILABLE');
-  return true;
 }
 
 export async function updatePassword(newPassword) {

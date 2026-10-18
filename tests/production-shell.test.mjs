@@ -15,7 +15,7 @@ const attr = (node, name) => node.attrs?.find(value => value.name === name)?.val
 const source = fs.readFileSync(new URL('../app.html', import.meta.url), 'utf8').replace('type="module" src="/js/boot.js"', 'src="/assets/boot.js?v=test" defer');
 
 test('the small production shell reconstructs every control and authored text before boot', () => {
-  const result = createAppShell(source, 'test');
+  const result = createAppShell(source, 'test', fs.readFileSync(new URL('../css/app-core.css', import.meta.url), 'utf8'));
   assert.ok(result.html.length < 8000);
   assert.ok(!result.html.includes('<style>'));
   assert.ok(!result.html.includes('id="callControlBtn"'));
@@ -52,4 +52,15 @@ test('new shell assets are available in the offline cache and unsupported source
   assert.ok(worker.includes('/css/app-core.css?v=${BUILD_VERSION}'));
   assert.ok(worker.includes('/assets/app-view.js?v=${BUILD_VERSION}'));
   assert.throws(() => createAppShell('<html><body>Hello</body></html>', 'test'), /requires/);
+});
+
+test('external app styles retain cascade position and require an explicit unambiguous stylesheet', () => {
+  const fixture = '<html><head><link href="before.css"><link rel="stylesheet" href="/css/app-core.css"><link href="after.css"></head><body><div id="bootGate">Loading</div><script src="/assets/boot.js"></script></body></html>';
+  const result = createAppShell(fixture, 'test', '.panel{color:red}');
+  assert.equal(result.css, '.panel{color:red}');
+  assert.ok(result.html.indexOf('before.css') < result.html.indexOf('app-core.css?v=test'));
+  assert.ok(result.html.indexOf('app-core.css?v=test') < result.html.indexOf('after.css'));
+  assert.throws(() => createAppShell(fixture, 'test'), /requires/);
+  assert.throws(() => createAppShell(fixture, 'test', ' '), /requires/);
+  assert.throws(() => createAppShell(fixture.replace('</head>', '<style>.other{}</style></head>'), 'test', '.panel{}'), /requires/);
 });
