@@ -17,7 +17,7 @@ Start Calls o Stop Calls bajo sus condiciones; no acepta ni rechaza llamadas.
 - [Extensión actual](extension/propio-bridge/README.md): instalación, permisos,
   automatismos, prioridades y límites.
 - [Instrucciones del proyecto](instrucciones.md): protocolos y pendientes.
-- [Auditoría y antecedentes consolidados](docs/auditoria-profunda-2026-10-17.md):
+- [Auditoría actual y antecedentes](docs/auditoria-profunda-2026-10-18.md):
   evidencia fechada, correcciones y límites.
 - [Criterios de publicación](docs/production-readiness.md),
   [operación](docs/production-operations.md),

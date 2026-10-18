@@ -38,6 +38,8 @@ test('starting a live call does not announce success after its snapshot is rejec
 test('removing a special daily goal does not announce success or award metadata after rejection',()=>{
   let rewards=0;const messages=[];
   const h=vm.createContext({getActiveDayKey:()=> '10/11/2026',getDailyGoalOverride:()=>({min:90}),setDailyGoalOverride(){},
+    settings:{dailyGoalOverrides:{}},state:{},saveAll:()=>false,
+    setAppSettings:value=>{h.settings=value;},setAppState:value=>{h.state=value;},refreshGoalInputs(){},render(){},
     saveSettingsOnly:()=>false,onGameDayMetadataChanged:()=>{rewards++;},toast:x=>messages.push(x)});
   vm.runInContext(declaration('../js/settings.js','clearActiveDayGoalOverride'),h);
   assert.equal(h.clearActiveDayGoalOverride(),false);

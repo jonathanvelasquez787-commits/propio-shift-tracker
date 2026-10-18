@@ -14,6 +14,7 @@
         "js/language-preference.js"
       ],
       "tests": [
+        { "file": "tests/profile-goal-integrity.test.mjs", "namedCases": ["rejected general goal update preserves settings, state and the complete persisted snapshot", "profile save never applies the old form after the active account changes while reading", "late profile reads cannot replace a newer account or a username edited during loading", "username update requires the matching returned row and preserves uniqueness errors", "recovery password update requires its original account and never writes for another session"] },
         {
           "file": "tests/deep-audit-sync-identity.test.mjs",
           "namedCases": [

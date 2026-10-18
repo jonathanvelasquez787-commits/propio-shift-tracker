@@ -8,17 +8,18 @@ import {
   scheduleViewMode,
   scheduleWeekOffset,
   settings,
+  state,
 } from './app-context.js';
 
 let WEEKDAYS, WEEKDAY_LABELS, WEEKDAY_LABELS_SHORT, appConfirm, defaultDaySchedule;
 let ensureWeeklySchedule, formatHHMM, formatMinutes, formatWeekRangeLabel, iconHtml, isScheduleWeekPast;
-let minutesToHHMM, onGameDayMetadataChanged, pad, saveAll, saveSettingsOnly, snapshotHistoricalPlanning;
+let minutesToHHMM, onGameDayMetadataChanged, pad, saveAll, snapshotHistoricalPlanning;
 let startOfCycleWeek, timeLabel, toMinutes, toast, todayCallDateKey, weekStartKeyFromDate;
 
 export function configureScheduleContext(context) {
   ({ WEEKDAYS, WEEKDAY_LABELS, WEEKDAY_LABELS_SHORT, appConfirm, defaultDaySchedule, ensureWeeklySchedule,
     formatHHMM, formatMinutes, formatWeekRangeLabel, iconHtml, isScheduleWeekPast, minutesToHHMM,
-    onGameDayMetadataChanged, pad, saveAll, saveSettingsOnly, snapshotHistoricalPlanning,
+    onGameDayMetadataChanged, pad, saveAll, snapshotHistoricalPlanning,
     startOfCycleWeek, timeLabel, toMinutes, toast, todayCallDateKey, weekStartKeyFromDate } = context);
 }
 
@@ -537,7 +538,23 @@ export function configureScheduleContext(context) {
       return { valid: errors.length === 0, errors };
     }
 
-    // Pedido del usuario : "Guardar día" debe guardar SOLO el día que se está editando
+    function persistScheduleMutation(change) {
+      const ownerSettings = settings, ownerState = state;
+      const previousSettings = JSON.parse(JSON.stringify(settings)), previousState = JSON.parse(JSON.stringify(state));
+      change();
+      if (saveAll({render:false}) === false) {
+        for (const [current, owner, previous] of [[settings, ownerSettings, previousSettings], [state, ownerState, previousState]]) {
+          if (current !== owner) continue;
+          Object.keys(owner).forEach(key => delete owner[key]);
+          Object.assign(owner, previous);
+        }
+        return false;
+      }
+      onGameDayMetadataChanged(todayCallDateKey());
+      return true;
+    }
+
+    // Guardar día modifica únicamente el día seleccionado.
     export function saveShiftWindow() {
       if (scheduleViewMode === 'week' && scheduleWeekIsPast(scheduleWeekOffset)) return; // protegido, no debería llegar aquí (botón deshabilitado)
       const midnightOffenders = blockRowsWithEqualTimes();
@@ -552,19 +569,18 @@ export function configureScheduleContext(context) {
         toast(check.errors[0]);
         return;
       }
-      snapshotHistoricalPlanning();
-      const target = activeScheduleTarget({ createIfMissing: true });
-      target[scheduleEditDay] = cfg;
-      if (scheduleViewMode === 'template') {
-        const lateSelect = document.getElementById('lateArrivalModeInput');
-        if (lateSelect) settings.lateArrivalMode = lateSelect.value;
-        // mantiene shiftStart/shiftEnd viejos sincronizados por compatibilidad, sin usarlos ya para dibujar bloques
-        settings.shiftStart = cfg.start;
-        settings.shiftEnd = cfg.end;
-      }
-      if (saveSettingsOnly() === false) return false;
-      onGameDayMetadataChanged(todayCallDateKey());
-      if (saveAll() === false) return false;
+      if (!persistScheduleMutation(() => {
+        snapshotHistoricalPlanning();
+        const target = activeScheduleTarget({ createIfMissing: true });
+        target[scheduleEditDay] = cfg;
+        if (scheduleViewMode === 'template') {
+          const lateSelect = document.getElementById('lateArrivalModeInput');
+          if (lateSelect) settings.lateArrivalMode = lateSelect.value;
+          // Conserva los campos heredados para los consumidores de datos anteriores.
+          settings.shiftStart = cfg.start;
+          settings.shiftEnd = cfg.end;
+        }
+      })) return false;
       renderDayTabs();
       toast(scheduleViewMode === 'week'
         ? ui`Horario de ${WEEKDAY_LABELS[scheduleEditDay]} guardado para esa semana`
@@ -587,21 +603,22 @@ export function configureScheduleContext(context) {
         return;
       }
       const scope = scheduleViewMode === 'week' ? translateText('de esa semana') : '';
+      const owner = settings, editDay = scheduleEditDay, view = scheduleViewMode, week = scheduleWeekOffset;
       appConfirm(ui`¿Copiar este horario (${WEEKDAY_LABELS[scheduleEditDay]}) a Lunes-Viernes ${scope}? Esto sobreescribe Lunes a Viernes — Sábado y Domingo no se tocan.`, () => {
-        snapshotHistoricalPlanning();
-      const target = activeScheduleTarget({ createIfMissing: true });
-        target[scheduleEditDay] = cfg;
-        WEEKDAYS.filter(k => k !== 'sat' && k !== 'sun').forEach(k => {
-          target[k] = {
-            off: cfg.off,
-            start: cfg.start,
-            end: cfg.end,
-            blocks: cfg.blocks.map(b => ({ ...b })),
-          };
-        });
-        if (saveSettingsOnly() === false) return false;
-        onGameDayMetadataChanged(todayCallDateKey());
-        if (saveAll() === false) return false;
+        if (settings !== owner || scheduleEditDay !== editDay || scheduleViewMode !== view || scheduleWeekOffset !== week) return false;
+        if (!persistScheduleMutation(() => {
+          snapshotHistoricalPlanning();
+          const target = activeScheduleTarget({ createIfMissing: true });
+          target[scheduleEditDay] = cfg;
+          WEEKDAYS.filter(k => k !== 'sat' && k !== 'sun').forEach(k => {
+            target[k] = {
+              off: cfg.off,
+              start: cfg.start,
+              end: cfg.end,
+              blocks: cfg.blocks.map(b => ({ ...b })),
+            };
+          });
+        })) return false;
         renderDayTabs();
         toast(ui`Horario copiado a Lunes-Viernes ${scope}`.trim());
       });
@@ -623,15 +640,16 @@ export function configureScheduleContext(context) {
         return;
       }
       const scope = scheduleViewMode === 'week' ? translateText('de esa semana') : '';
+      const owner = settings, editDay = scheduleEditDay, view = scheduleViewMode, week = scheduleWeekOffset;
       appConfirm(ui`¿Copiar este horario (${WEEKDAY_LABELS[scheduleEditDay]}) a Sábado y Domingo ${scope}? Esto sobreescribe Sábado y Domingo — el resto de los días no se tocan.`, () => {
-        snapshotHistoricalPlanning();
-      const target = activeScheduleTarget({ createIfMissing: true });
-        target[scheduleEditDay] = cfg;
-        target.sat = { off: cfg.off, start: cfg.start, end: cfg.end, blocks: cfg.blocks.map(b => ({ ...b })) };
-        target.sun = { off: cfg.off, start: cfg.start, end: cfg.end, blocks: cfg.blocks.map(b => ({ ...b })) };
-        if (saveSettingsOnly() === false) return false;
-        onGameDayMetadataChanged(todayCallDateKey());
-        if (saveAll() === false) return false;
+        if (settings !== owner || scheduleEditDay !== editDay || scheduleViewMode !== view || scheduleWeekOffset !== week) return false;
+        if (!persistScheduleMutation(() => {
+          snapshotHistoricalPlanning();
+          const target = activeScheduleTarget({ createIfMissing: true });
+          target[scheduleEditDay] = cfg;
+          target.sat = { off: cfg.off, start: cfg.start, end: cfg.end, blocks: cfg.blocks.map(b => ({ ...b })) };
+          target.sun = { off: cfg.off, start: cfg.start, end: cfg.end, blocks: cfg.blocks.map(b => ({ ...b })) };
+        })) return false;
         renderDayTabs();
         toast(ui`Horario copiado a Sábado y Domingo ${scope}`.trim());
       });

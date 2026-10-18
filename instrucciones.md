@@ -426,7 +426,7 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
-- App 620; extensión unificada 2.2.7. Resumen independiente retirado, sin build
+- App 621; extensión unificada 2.2.7. Resumen independiente retirado, sin build
   mantenido. El historial oficial compartido y las funciones del tracker siguen
   activos. Guía de 73 funciones en docs/guia-practica-tool-y-extension.md.
 - Google es la entrada pública. Formularios deshabilitados de login/registro y
@@ -453,6 +453,18 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v621 — Auditoría de persistencia e identidad.**
+
+- Metas y las tres acciones de guardar/copiar Horario usan snapshot completo y
+  restauran memoria e historial ante rechazo. Una confirmación antigua no cambia
+  el día/semana actual. Finanzas conserva su transacción externa.
+- Perfil protege borradores, solicitudes solapadas y cuenta original; exige fila
+  confirmada antes de anunciar éxito y restablece el botón al reabrir Ajustes.
+  Recuperación ligada a su cuenta, conservando Google y los enlaces válidos.
+- 818 pruebas, 32 días/96 llamadas/736 minutos/$88.32, 112 vistas y recorridos de
+  cuota, perfil, edición/borrado, exportación, medianoche y disponibilidad.
+  Alcance y límites en [auditoría 18/10](docs/auditoria-profunda-2026-10-18.md).
+
 **v620 — Segunda limpieza y separación de responsabilidades.**
 
 - README duplicado retirado; pendientes separados de confirmaciones, límites y
@@ -474,14 +486,3 @@ futura opera bajo esto, sin excepción:
   matriz comprueban únicamente la extensión mantenida. Versiones sin cambio.
 - 800 pruebas correctas, sin fallos ni omitidas; builds de app y extensión activa
   correctos. Matriz: 23 criterios, 67 suites y 73 módulos. Publicación por PR.
-
-
-**v619 — Frase fija debajo del saludo.**
-
-- Se retiró la selección aleatoria de 17 frases; se conserva únicamente la frase
-  solicitada sobre excusas, primer paso y constancia. Mismo texto al recargar.
-- Texto inicial y render usan la misma frase; traducción ES/EN se evalúa al pintar
-  para respetar el cambio de idioma. Frase blanca en oscuro y negra en claro,
-  por pedido explícito del usuario; distribución y controles conservados.
-- 2.244 textos, build y 19 pruebas de idiomas/render correctos; ocho vistas
-  ES/EN, claro/oscuro, móvil/escritorio y recarga estables, sin overflow ni errores.

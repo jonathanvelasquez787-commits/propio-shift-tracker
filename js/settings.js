@@ -1,5 +1,5 @@
 import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
-import { authErrorMessage, getProfile, getUser, updateEmail, updateUsername } from './auth.js';
+import { AuthError, authErrorMessage, getSession, getProfile, getUser, updateEmail, updateUsername } from './auth.js';
 import { settings, state, setAppSettings, setAppState } from './app-context.js';
 import { normalizeLanguage, saveLanguagePreference } from './language-preference.js';
 import { EMAIL_AUTH_READY } from './config.js';
@@ -7,7 +7,7 @@ import { EMAIL_AUTH_READY } from './config.js';
 let DEFAULT_USER_EMOJI, EMOJI_CHOICES, RATE, closeModal, convertedAmountText;
 let currencyCeilFromUsdAmount, effectiveCycleGoal, effectiveDailyGoal, ensureCurrencySettings, escapeHtml;
 let formatCallDayLabel, formatMinutes, getActiveDayKey, getDailyGoalOverride, iconHtml, money;
-let onGameDayMetadataChanged, openModal, render, saveSettingsOnly, saveStateOnly, saveAll, snapshotHistoricalPlanning;
+let onGameDayMetadataChanged, openModal, render, saveSettingsOnly, saveAll, snapshotHistoricalPlanning;
 let setDailyGoalOverride, toast;
 let todayCallDateKey, usdCeilFromCurrencyAmount;
 
@@ -15,7 +15,7 @@ export function configureSettingsContext(context) {
   ({ DEFAULT_USER_EMOJI, EMOJI_CHOICES, RATE, closeModal, convertedAmountText, currencyCeilFromUsdAmount,
     effectiveCycleGoal, effectiveDailyGoal, ensureCurrencySettings, escapeHtml, formatCallDayLabel,
     formatMinutes, getActiveDayKey, getDailyGoalOverride, iconHtml, money, onGameDayMetadataChanged, openModal, render,
-    saveSettingsOnly, saveStateOnly, saveAll, snapshotHistoricalPlanning, setDailyGoalOverride, toast, todayCallDateKey,
+    saveSettingsOnly, saveAll, snapshotHistoricalPlanning, setDailyGoalOverride, toast, todayCallDateKey,
     usdCeilFromCurrencyAmount } = context);
 }
 
@@ -91,6 +91,8 @@ let syncingGoals = false;
     // Scope 'day' guarda la meta SOLO para ese día; 'global' guarda la meta de siempre y borra el
     // override de ese día, para que la nueva general también aplique ahí.
     export function applyGoalValues(minutes, dollars, scope, dayKey, persistSnapshot = null) {
+      const ownerSettings = settings, ownerState = state;
+      const previousSettings = JSON.parse(JSON.stringify(settings)), previousState = JSON.parse(JSON.stringify(state));
       if (scope === 'day') {
         setDailyGoalOverride(dayKey, { min: minutes, usd: dollars });
       } else {
@@ -100,9 +102,17 @@ let syncingGoals = false;
         state.productiveGoalMin = settings.productiveGoalMin;
         state.earningsGoal = settings.earningsGoal;
         setDailyGoalOverride(dayKey, null);
-        if (!persistSnapshot && saveStateOnly() === false) return false;
       }
-      if ((persistSnapshot ? persistSnapshot() : saveSettingsOnly()) === false) return false;
+      if ((persistSnapshot ? persistSnapshot() : saveAll({render:false})) === false) {
+        // Restore in place so a surrounding finance transaction can still recognize its owner.
+        for (const [current, owner, previous] of [[settings, ownerSettings, previousSettings], [state, ownerState, previousState]]) {
+          if (current !== owner) continue;
+          Object.keys(owner).forEach(key => delete owner[key]);
+          Object.assign(owner, previous);
+        }
+        refreshGoalInputs(); render();
+        return false;
+      }
       onGameDayMetadataChanged(dayKey);
       refreshGoalInputs();
       render();
@@ -173,8 +183,15 @@ let syncingGoals = false;
     export function clearActiveDayGoalOverride() {
       const dayKey = getActiveDayKey();
       if (!getDailyGoalOverride(dayKey)) return;
+      const ownerSettings = settings, ownerState = state;
+      const previousSettings = JSON.parse(JSON.stringify(settings)), previousState = JSON.parse(JSON.stringify(state));
       setDailyGoalOverride(dayKey, null);
-      if (saveSettingsOnly() === false) return false;
+      if (saveAll({render:false}) === false) {
+        if (settings === ownerSettings) setAppSettings(previousSettings);
+        if (state === ownerState) setAppState(previousState);
+        refreshGoalInputs(); render();
+        return false;
+      }
       onGameDayMetadataChanged(dayKey);
       refreshGoalInputs();
       render();
@@ -367,19 +384,30 @@ let syncingGoals = false;
       if (cycleGoalInput && document.activeElement !== cycleGoalInput) cycleGoalInput.value = effectiveCycleGoal(0).toFixed(2);
     }
 
+let profileRequestVersion = 0;
+
 export async function syncAccountProfileFields() {
+  const owner = settings, version = ++profileRequestVersion;
+  const current = () => owner === settings && version === profileRequestVersion;
+  const saveButton = document.getElementById('saveAccountProfileBtn');
+  if (saveButton) saveButton.disabled = false;
   const usernameInput = document.getElementById('accountUsernameInput');
   const emailInput = document.getElementById('accountEmailInput');
+  const initialUsername = usernameInput?.value, initialEmail = emailInput?.value;
   if (emailInput) emailInput.readOnly = !EMAIL_AUTH_READY;
   const status = document.getElementById('accountProfileStatus');
   if (status) status.textContent = translateText('Cargando los datos de la cuenta…');
   try {
-    const [profile, user] = await Promise.all([getProfile(), getUser()]);
-    if (usernameInput && document.activeElement !== usernameInput) usernameInput.value = profile?.username || '';
-    if (emailInput && document.activeElement !== emailInput) emailInput.value = user?.email || '';
+    const session = await getSession();
+    if (!current()) return;
+    if (!session?.user?.id) throw new AuthError('NOT_AUTHENTICATED');
+    const [profile, user] = await Promise.all([getProfile(session.user.id), getUser(session.user.id)]);
+    if (!current()) return;
+    if (usernameInput && document.activeElement !== usernameInput && usernameInput.value === initialUsername) usernameInput.value = profile?.username || '';
+    if (emailInput && document.activeElement !== emailInput && emailInput.value === initialEmail) emailInput.value = user?.email || '';
     if (status) status.textContent = '';
   } catch (err) {
-    if (status) status.textContent = authErrorMessage(err);
+    if (current() && status) status.textContent = authErrorMessage(err);
   }
 }
 
@@ -390,6 +418,8 @@ export async function openSettingsModal() {
 }
 
 export async function saveAccountProfile() {
+  const owner = settings, version = ++profileRequestVersion;
+  const current = () => owner === settings && version === profileRequestVersion;
   const usernameInput = document.getElementById('accountUsernameInput');
   const emailInput = document.getElementById('accountEmailInput');
   const button = document.getElementById('saveAccountProfileBtn');
@@ -397,21 +427,29 @@ export async function saveAccountProfile() {
   const username = String(usernameInput?.value || '').trim();
   const email = String(emailInput?.value || '').trim();
   if (button) button.disabled = true;
-  if (status) status.textContent = 'Guardando…';
+  if (status) status.textContent = translateText('Guardando…');
   try {
-    const [profile, user] = await Promise.all([getProfile(), getUser()]);
-    if (username !== String(profile?.username || '')) await updateUsername(username);
+    const session = await getSession();
+    if (!current()) return false;
+    if (!session?.user?.id) throw new AuthError('NOT_AUTHENTICATED');
+    const userId = session.user.id;
+    const [profile, user] = await Promise.all([getProfile(userId), getUser(userId)]);
+    if (!current()) return false;
+    if (username !== String(profile?.username || '')) await updateUsername(username, userId);
+    if (!current()) return false;
     const emailChanged = EMAIL_AUTH_READY && email.toLowerCase() !== String(user?.email || '').toLowerCase();
-    if (emailChanged) await updateEmail(email);
+    if (emailChanged) await updateEmail(email, userId);
+    if (!current()) return false;
     if (status) status.textContent = emailChanged
       ? translateText('Perfil guardado. Revisa tu correo para confirmar la nueva dirección.')
       : translateText('Perfil guardado.');
     toast(emailChanged ? translateText('Perfil guardado — confirma el correo nuevo') : translateText('Perfil guardado'));
   } catch (err) {
+    if (!current()) return false;
     const message = authErrorMessage(err);
     if (status) status.textContent = message;
     toast(message);
   } finally {
-    if (button) button.disabled = false;
+    if (version === profileRequestVersion && button === document.getElementById('saveAccountProfileBtn')) button.disabled = false;
   }
 }
