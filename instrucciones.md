@@ -338,7 +338,7 @@ futura opera bajo esto, sin excepción:
 **CONFIRMACIONES Y CONFIGURACIÓN LOCAL VIGENTES**
 
 - El usuario confirmó inicio automático de llamadas, regreso tras Break y arranque
-  correcto después de reiniciar. La extensión 2.2.7 y la recarga de Propio/tracker
+  correcto después de reiniciar. La extensión 2.2.8 y la recarga de Propio/tracker
   están confirmadas; no volver a presentarlas como instalación pendiente.
 - Chrome Jonathan se abre al iniciar Windows y se organiza también al abrirlo
   manualmente, a cualquier hora. Propio y https://app.useinterpreter.com/ quedan
@@ -431,7 +431,7 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
-- App 622; extensión unificada 2.2.8 (recarga local por confirmar). Resumen independiente retirado, sin build
+- App 622; extensión unificada 2.2.8 (recarga local confirmada por el propietario). Resumen independiente retirado, sin build
   mantenido. El historial oficial compartido y las funciones del tracker siguen
   activos. Guía de 73 funciones en docs/guia-practica-tool-y-extension.md.
 - Google es la entrada pública. Formularios deshabilitados de login/registro y
