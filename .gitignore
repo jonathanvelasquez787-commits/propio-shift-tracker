@@ -26,3 +26,14 @@ tests/__pycache__/
 tests/.pytest_cache/
 tests/screenshots/
 .pytest_cache/
+
+# Salidas locales y paquetes de instalación generados
+/work/
+/outputs/
+/artifacts/
+/*.zip
+/*.exe
+/*.dll
+/*.pdb
+/*.log
+/js/locales.generated.js

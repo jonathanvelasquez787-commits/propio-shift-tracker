@@ -45,7 +45,8 @@ for (const language of ['en', 'es']) {
     assert.equal(application.description, meta.description);
     assert.equal(application.offers.price, '0');
     assert.equal(application.aggregateRating, undefined);
-    assert.ok(all.some(node => attr(node, 'id') === 'loginForm'));
+    assert.ok(all.some(node => attr(node, 'id') === 'googleBtn'));
+    assert.ok(!all.some(node => ['loginForm', 'signupForm', 'forgotForm'].includes(attr(node, 'id'))));
   });
 }
 

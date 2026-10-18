@@ -76,8 +76,8 @@ test('dynamic document messages and attributes retain personal values across lan
     }
     setLanguage(previousLanguage);
   });
-  const spanish = '  "Mi meta española" está libre.\n';
-  const english = '  "Mi meta española" is available.\n';
+  const spanish = '  Categoría "Mi meta española" borrada\n';
+  const english = '  Category "Mi meta española" deleted\n';
   const text = { nodeValue: spanish, parentElement: { closest: () => null } };
   const personal = { nodeValue: 'Activar Logros', parentElement: { closest: () => ({}) } };
   const attributes = new Map([['title', spanish], ['aria-label', '  Activar Logros  ']]);
@@ -108,16 +108,16 @@ test('dynamic document messages and attributes retain personal values across lan
   translateDocument(root);
   assert.equal(text.nodeValue, english);
   assert.equal(attributes.get('title'), english);
-  text.nodeValue = '  "Otra meta personal" is available.\n';
-  element.setAttribute('aria-label', '  Recuperar contraseña  ');
+  text.nodeValue = '  Category "Otra meta personal" deleted\n';
+  element.setAttribute('aria-label', '  Contraseña nueva  ');
   translateDocument(root);
-  assert.equal(text.nodeValue, '  "Otra meta personal" is available.\n');
-  assert.equal(attributes.get('aria-label'), '  Reset password  ');
+  assert.equal(text.nodeValue, '  Category "Otra meta personal" deleted\n');
+  assert.equal(attributes.get('aria-label'), '  New password  ');
   otherBundle.setLanguage('es');
   otherBundle.translateDocument(root);
-  assert.equal(text.nodeValue, '  "Otra meta personal" está libre.\n');
+  assert.equal(text.nodeValue, '  Categoría "Otra meta personal" borrada\n');
   assert.equal(attributes.get('title'), spanish);
-  assert.equal(attributes.get('aria-label'), '  Recuperar contraseña  ');
+  assert.equal(attributes.get('aria-label'), '  Contraseña nueva  ');
 });
 
 test('English UI keeps saved equipment identifiers and adherence checkpoint identities', () => {

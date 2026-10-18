@@ -657,12 +657,6 @@
       "js/theme-palettes.js"
     ]
   },
-  "s_0c77727b": {
-    "source": "Entrar o crear cuenta",
-    "files": [
-      "index.html"
-    ]
-  },
   "s_0c874c8e": {
     "source": "Pago, días después:",
     "files": [
@@ -746,7 +740,7 @@
   "s_0dcd5bb1": {
     "source": "Actual — día {{v0}} de 14",
     "files": [
-      "js/app-main.js"
+      "js/weekly-summary.js"
     ]
   },
   "s_0df3e259": {
@@ -1052,12 +1046,6 @@
       "js/landing.js"
     ]
   },
-  "s_12c5c78c": {
-    "source": "Te mandamos un enlace al correo con el que te registraste.",
-    "files": [
-      "js/landing.js"
-    ]
-  },
   "s_12d0f603": {
     "source": "Jueves Jadeante",
     "files": [
@@ -1093,8 +1081,7 @@
     "files": [
       "index.html",
       "privacidad.html",
-      "terminos.html",
-      "js/landing.js"
+      "terminos.html"
     ]
   },
   "s_13ac8f93": {
@@ -1173,12 +1160,6 @@
     "source": "fin del turno",
     "files": [
       "js/positive-reinforcement.js"
-    ]
-  },
-  "s_15e53555": {
-    "source": "usuario · correo@ejemplo.com",
-    "files": [
-      "index.html"
     ]
   },
   "s_15e99343": {
@@ -1450,12 +1431,6 @@
     "source": "Monstruos vencidos",
     "files": [
       "js/game.js"
-    ]
-  },
-  "s_1a47e039": {
-    "source": "Creando…",
-    "files": [
-      "js/landing.js"
     ]
   },
   "s_1a569dfb": {
@@ -1838,7 +1813,7 @@
   "s_2202e087": {
     "source": "En {{v0}} días",
     "files": [
-      "js/app-main.js"
+      "js/weekly-summary.js"
     ]
   },
   "s_22380468": {
@@ -2147,8 +2122,7 @@
   "s_27f7a8b7": {
     "source": "tu@correo.com",
     "files": [
-      "app.html",
-      "index.html"
+      "app.html"
     ]
   },
   "s_280fd538": {
@@ -2649,12 +2623,6 @@
       "js/calls.js"
     ]
   },
-  "s_313cd694": {
-    "source": "Entrando…",
-    "files": [
-      "js/landing.js"
-    ]
-  },
   "s_3151ba56": {
     "source": "desde {{v0}}",
     "files": [
@@ -3098,7 +3066,7 @@
   "s_39461426": {
     "source": "Editar",
     "files": [
-      "js/app-main.js"
+      "js/weekly-summary.js"
     ]
   },
   "s_3957a30c": {
@@ -3422,12 +3390,6 @@
       "js/game-battle.js"
     ]
   },
-  "s_41965f4b": {
-    "source": "Revisando disponibilidad…",
-    "files": [
-      "js/landing.js"
-    ]
-  },
   "s_41c09cd5": {
     "source": "Volví a tomar otra llamada",
     "files": [
@@ -3608,8 +3570,8 @@
   "s_4487f87e": {
     "source": "{{v2}}{{v3}}",
     "files": [
-      "js/app-main.js",
-      "js/finance-planning.js"
+      "js/finance-planning.js",
+      "js/weekly-summary.js"
     ]
   },
   "s_4488538b": {
@@ -3648,7 +3610,8 @@
       "app.html",
       "index.html",
       "js/app-main.js",
-      "js/reports.js"
+      "js/reports.js",
+      "js/weekly-summary.js"
     ]
   },
   "s_44e48060": {
@@ -4159,13 +4122,6 @@
       "js/game.js"
     ]
   },
-  "s_4e638004": {
-    "source": "3 a 24 caracteres: letras, números, guion bajo o punto.",
-    "files": [
-      "index.html",
-      "js/landing.js"
-    ]
-  },
   "s_4e66f48e": {
     "source": "Nivel de la ventana",
     "files": [
@@ -4212,7 +4168,7 @@
     "source": "Editar día",
     "files": [
       "app.html",
-      "js/app-main.js"
+      "js/weekly-summary.js"
     ]
   },
   "s_4f1437b3": {
@@ -4458,12 +4414,6 @@
       "js/landing.js"
     ]
   },
-  "s_5260bd0b": {
-    "source": "Correo",
-    "files": [
-      "index.html"
-    ]
-  },
   "s_52783691": {
     "source": "Nombre del monstruo y sonidos arcade. Las misiones se calculan automáticamente.",
     "files": [
@@ -4509,7 +4459,7 @@
   "s_52ef7275": {
     "source": "días restantes",
     "files": [
-      "js/app-main.js"
+      "js/weekly-summary.js"
     ]
   },
   "s_530cc80d": {
@@ -4582,12 +4532,6 @@
     "source": "Archivo guardado: {{v0}}",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_547606e8": {
-    "source": "Elige cómo te vas a llamar aquí dentro.",
-    "files": [
-      "js/landing.js"
     ]
   },
   "s_54846d1b": {
@@ -4717,9 +4661,9 @@
     "source": "Hoy",
     "files": [
       "app.html",
-      "js/app-main.js",
       "js/game.js",
-      "js/higher-rate.js"
+      "js/higher-rate.js",
+      "js/weekly-summary.js"
     ]
   },
   "s_568aa89a": {
@@ -4894,7 +4838,7 @@
   "s_5971e44f": {
     "source": "Ya pagado",
     "files": [
-      "js/app-main.js"
+      "js/weekly-summary.js"
     ]
   },
   "s_5977b0b2": {
@@ -5368,13 +5312,6 @@
       "js/game.js"
     ]
   },
-  "s_63d16170": {
-    "source": "Crear cuenta",
-    "files": [
-      "index.html",
-      "js/landing.js"
-    ]
-  },
   "s_63d91128": {
     "source": ", llenando pago, minutos, si es facturable y si se cayó.",
     "files": [
@@ -5571,7 +5508,7 @@
   "s_6800221e": {
     "source": "Prom./día trabajado",
     "files": [
-      "js/app-main.js"
+      "js/weekly-summary.js"
     ]
   },
   "s_686f712e": {
@@ -5700,7 +5637,8 @@
     "source": "Productivo",
     "files": [
       "index.html",
-      "js/app-main.js"
+      "js/app-main.js",
+      "js/weekly-summary.js"
     ]
   },
   "s_6abfa5bd": {
@@ -5743,12 +5681,6 @@
     "source": "Bronce",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_6b34e2d0": {
-    "source": "No se pudo revisar ahora; lo confirmamos al crear la cuenta.",
-    "files": [
-      "js/landing.js"
     ]
   },
   "s_6b3a5f5a": {
@@ -6289,12 +6221,6 @@
       "js/app-main.js"
     ]
   },
-  "s_753c3f32": {
-    "source": "Volver a entrar",
-    "files": [
-      "index.html"
-    ]
-  },
   "s_7580ebfa": {
     "source": "Exporta un respaldo completo en JSON desde",
     "files": [
@@ -6425,13 +6351,7 @@
   "s_77134f0e": {
     "source": "+ Nota",
     "files": [
-      "js/app-main.js"
-    ]
-  },
-  "s_7778705c": {
-    "source": "Tu correo",
-    "files": [
-      "index.html"
+      "js/weekly-summary.js"
     ]
   },
   "s_77789679": {
@@ -6491,7 +6411,7 @@
   "s_78b43231": {
     "source": "· Adherencia {{v0}}%",
     "files": [
-      "js/app-main.js"
+      "js/weekly-summary.js"
     ]
   },
   "s_78d0f65f": {
@@ -6504,12 +6424,6 @@
     "source": "El ajuste no puede pasar de -12h de una sola vez.",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_78f4a761": {
-    "source": "¿La olvidaste?",
-    "files": [
-      "index.html"
     ]
   },
   "s_791c7671": {
@@ -6606,7 +6520,8 @@
     "files": [
       "app.html",
       "js/app-main.js",
-      "js/reports.js"
+      "js/reports.js",
+      "js/weekly-summary.js"
     ]
   },
   "s_7b026cab": {
@@ -6879,8 +6794,7 @@
   "s_8043d60f": {
     "source": "usuario",
     "files": [
-      "app.html",
-      "index.html"
+      "app.html"
     ]
   },
   "s_80f29e6e": {
@@ -7360,7 +7274,8 @@
   "s_88f9fc5b": {
     "source": "Próximo",
     "files": [
-      "js/app-main.js"
+      "js/app-main.js",
+      "js/weekly-summary.js"
     ]
   },
   "s_88fb12d2": {
@@ -7549,13 +7464,13 @@
   "s_8c3a9094": {
     "source": "Próximo pago",
     "files": [
-      "js/app-main.js"
+      "js/weekly-summary.js"
     ]
   },
   "s_8cb6b45e": {
     "source": "{{v8}}{{v9}}",
     "files": [
-      "js/app-main.js"
+      "js/weekly-summary.js"
     ]
   },
   "s_8cc0d9af": {
@@ -7615,15 +7530,15 @@
   "s_8dd41866": {
     "source": "Sin datos",
     "files": [
-      "js/app-main.js",
       "js/game.js",
-      "js/reports.js"
+      "js/reports.js",
+      "js/weekly-summary.js"
     ]
   },
   "s_8de2d198": {
     "source": "{{v11}}\n        {{v12}}\n        {{v13}}",
     "files": [
-      "js/app-main.js"
+      "js/weekly-summary.js"
     ]
   },
   "s_8deaf1bf": {
@@ -7826,12 +7741,6 @@
       "js/game.js"
     ]
   },
-  "s_90ea0e23": {
-    "source": "Recuperar contraseña",
-    "files": [
-      "js/landing.js"
-    ]
-  },
   "s_9106723b": {
     "source": "Cuenta y sincronización",
     "files": [
@@ -7967,7 +7876,7 @@
   "s_9392db95": {
     "source": "Semana actual · {{v0}}",
     "files": [
-      "js/app-main.js"
+      "js/weekly-summary.js"
     ]
   },
   "s_9397db89": {
@@ -8108,6 +8017,7 @@
   "s_962ed7ff": {
     "source": "Entra o crea tu cuenta con Google. No necesitas una contraseña de esta app.",
     "files": [
+      "index.html",
       "js/landing.js"
     ]
   },
@@ -8154,12 +8064,6 @@
       "app.html"
     ]
   },
-  "s_9713ce36": {
-    "source": "Contraseña",
-    "files": [
-      "index.html"
-    ]
-  },
   "s_976ae214": {
     "source": "Fantasma de Fin de Semana",
     "files": [
@@ -8175,13 +8079,7 @@
   "s_9770e175": {
     "source": "Hoy, {{v0}}",
     "files": [
-      "js/app-main.js"
-    ]
-  },
-  "s_9782eb02": {
-    "source": "\"{{v0}}\" está libre.",
-    "files": [
-      "js/landing.js"
+      "js/weekly-summary.js"
     ]
   },
   "s_97b283ee": {
@@ -8336,12 +8234,6 @@
       "app.html"
     ]
   },
-  "s_9ade9143": {
-    "source": "Objetivo ≥ {{v0}}%",
-    "files": [
-      "js/calls.js"
-    ]
-  },
   "s_9b029df9": {
     "source": "Pega aquí la data de Propio...\n\nEjemplo:\n{{v0}}",
     "files": [
@@ -8364,7 +8256,7 @@
     "source": "Trabajado",
     "files": [
       "app.html",
-      "js/app-main.js"
+      "js/weekly-summary.js"
     ]
   },
   "s_9bf60754": {
@@ -8437,7 +8329,7 @@
     "source": "Ciclo actual",
     "files": [
       "app.html",
-      "js/app-main.js"
+      "js/weekly-summary.js"
     ]
   },
   "s_9d30513d": {
@@ -8664,7 +8556,7 @@
   "s_a0e17120": {
     "source": "Ciclo: {{v3}} {{v4}}",
     "files": [
-      "js/app-main.js"
+      "js/weekly-summary.js"
     ]
   },
   "s_a0f62742": {
@@ -8798,12 +8690,6 @@
       "app.html"
     ]
   },
-  "s_a329b93e": {
-    "source": "Correo o usuario",
-    "files": [
-      "index.html"
-    ]
-  },
   "s_a3665c34": {
     "source": "rayo de energía",
     "files": [
@@ -8933,7 +8819,7 @@
   "s_a627704f": {
     "source": "Cambiar estado del día",
     "files": [
-      "js/app-main.js"
+      "js/weekly-summary.js"
     ]
   },
   "s_a62ebd34": {
@@ -9325,12 +9211,6 @@
       "app.html"
     ]
   },
-  "s_adf8b61a": {
-    "source": "Faltan datos para entrar.",
-    "files": [
-      "js/landing.js"
-    ]
-  },
   "s_ae2da05c": {
     "source": "Un pago actualiza el historial del mes de su fecha. La reserva se conserva hasta que la liberes; tus llamadas y ganancias no cambian.",
     "files": [
@@ -9562,12 +9442,6 @@
       "js/reinforcement-feedback.js"
     ]
   },
-  "s_b2ae5c03": {
-    "source": "Solo letras, números, guion bajo y punto — entre 3 y 24 caracteres.",
-    "files": [
-      "js/landing.js"
-    ]
-  },
   "s_b2baea3f": {
     "source": "Meta anual vuelve a calcularse automáticamente",
     "files": [
@@ -9718,7 +9592,7 @@
   "s_b4fa04f7": {
     "source": "{{v0}} · {{v1}} llamada(s){{v2}}",
     "files": [
-      "js/app-main.js"
+      "js/weekly-summary.js"
     ]
   },
   "s_b50e8da9": {
@@ -9796,6 +9670,7 @@
   "s_b6828ebe": {
     "source": "Entra con Google",
     "files": [
+      "index.html",
       "js/landing.js"
     ]
   },
@@ -10498,12 +10373,6 @@
       "app.html"
     ]
   },
-  "s_c3ed53c7": {
-    "source": "Te sirve para entrar aunque olvides tu nombre de usuario.",
-    "files": [
-      "index.html"
-    ]
-  },
   "s_c40165ee": {
     "source": "Gold (+$0.03)",
     "files": [
@@ -10528,18 +10397,13 @@
       "js/app-main.js"
     ]
   },
-  "s_c4671beb": {
-    "source": "Mandarme el enlace",
-    "files": [
-      "index.html"
-    ]
-  },
   "s_c4681e32": {
     "source": "Ganancias",
     "files": [
       "app.html",
       "js/app-main.js",
-      "js/reports.js"
+      "js/reports.js",
+      "js/weekly-summary.js"
     ]
   },
   "s_c4939e30": {
@@ -10847,8 +10711,8 @@
   "s_ca83bbc4": {
     "source": "({{v0}})",
     "files": [
-      "js/app-main.js",
-      "js/finance.js"
+      "js/finance.js",
+      "js/weekly-summary.js"
     ]
   },
   "s_ca91a2f4": {
@@ -10878,7 +10742,7 @@
   "s_cafaf457": {
     "source": "{{v4}} {{v5}}{{v6}}{{v7}}",
     "files": [
-      "js/app-main.js"
+      "js/weekly-summary.js"
     ]
   },
   "s_cb0d16c8": {
@@ -10891,12 +10755,6 @@
     "source": "Lo ganaste con {{v3}}{{v4}}{{v5}}",
     "files": [
       "js/positive-reinforcement.js"
-    ]
-  },
-  "s_cb5a3cf1": {
-    "source": "\"{{v0}}\" ya está ocupado.",
-    "files": [
-      "js/landing.js"
     ]
   },
   "s_cb7cb5dc": {
@@ -11162,7 +11020,7 @@
   "s_d0c44b25": {
     "source": "Semana {{v0}} del ciclo",
     "files": [
-      "js/app-main.js"
+      "js/weekly-summary.js"
     ]
   },
   "s_d0de61c2": {
@@ -11695,12 +11553,6 @@
       "app.html"
     ]
   },
-  "s_dc1001ec": {
-    "source": "Si ese correo tiene una cuenta, ya va en camino el enlace para cambiar la contraseña. Revisa también el spam.",
-    "files": [
-      "js/landing.js"
-    ]
-  },
   "s_dc28c284": {
     "source": "Tus accesorios aparecerán aquí al conseguirlos.",
     "files": [
@@ -11985,7 +11837,7 @@
     "source": "14 días",
     "files": [
       "app.html",
-      "js/app-main.js"
+      "js/weekly-summary.js"
     ]
   },
   "s_df54f508": {
@@ -12035,12 +11887,6 @@
     "files": [
       "index.html",
       "js/app-main.js"
-    ]
-  },
-  "s_e01e70f1": {
-    "source": "Enviando…",
-    "files": [
-      "js/landing.js"
     ]
   },
   "s_e022ec6b": {
@@ -12451,7 +12297,7 @@
   "s_e882ec8b": {
     "source": "Del ciclo {{v1}}",
     "files": [
-      "js/app-main.js"
+      "js/weekly-summary.js"
     ]
   },
   "s_e88ae13b": {
@@ -12823,7 +12669,7 @@
   "s_f033babc": {
     "source": "Total semana",
     "files": [
-      "js/app-main.js"
+      "js/weekly-summary.js"
     ]
   },
   "s_f044b74e": {
@@ -12953,7 +12799,7 @@
   "s_f24749ce": {
     "source": "{{v2}} productivo",
     "files": [
-      "js/app-main.js"
+      "js/weekly-summary.js"
     ]
   },
   "s_f260b464": {
@@ -13015,8 +12861,8 @@
     "source": "Libre",
     "files": [
       "app.html",
-      "js/app-main.js",
-      "js/calendar.js"
+      "js/calendar.js",
+      "js/weekly-summary.js"
     ]
   },
   "s_f36cead8": {
@@ -13106,12 +12952,6 @@
       "js/calls.js"
     ]
   },
-  "s_f4d2ae1c": {
-    "source": "Tiene que ser el correo con el que te registraste.",
-    "files": [
-      "index.html"
-    ]
-  },
   "s_f4ddf954": {
     "source": "Activar sonidos",
     "files": [
@@ -13146,12 +12986,6 @@
     "source": "#AB03A9",
     "files": [
       "app.html"
-    ]
-  },
-  "s_f53d181a": {
-    "source": "Cuenta creada. Te mandamos un correo a {{v0}} para confirmarla — ábrelo y ya puedes entrar.",
-    "files": [
-      "js/landing.js"
     ]
   },
   "s_f56ab548": {
@@ -13474,12 +13308,6 @@
       "js/app-main.js"
     ]
   },
-  "s_fc1095a9": {
-    "source": "o con tu correo",
-    "files": [
-      "index.html"
-    ]
-  },
   "s_fc67bb73": {
     "source": "Registra gastos y metas de ahorro, y los llena en el orden de prioridad que tú definas con lo que vas ganando.",
     "files": [
@@ -13538,8 +13366,8 @@
   "s_fd847c27": {
     "source": "Pagado",
     "files": [
-      "js/app-main.js",
-      "js/finance.js"
+      "js/finance.js",
+      "js/weekly-summary.js"
     ]
   },
   "s_fd8d3583": {
@@ -13648,15 +13476,7 @@
     "source": "Nombre de usuario",
     "files": [
       "app.html",
-      "index.html",
       "privacidad.html"
-    ]
-  },
-  "s_ffb920c9": {
-    "source": "Usa tu correo o tu nombre de usuario.",
-    "files": [
-      "index.html",
-      "js/landing.js"
     ]
   },
   "s_ffe786bf": {

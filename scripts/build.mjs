@@ -114,7 +114,7 @@ for (const name of ['index.html', 'app.html', 'privacidad.html', 'terminos.html'
   html = html.replace('</head>', '<link rel="manifest" href="/manifest.webmanifest">\n<meta name="theme-color" content="#07111f">\n</head>');
   html = html.replace('</body>', `<script src="/assets/register-sw.js?v=${release}" defer></script>\n</body>`);
   if (name === 'app.html') {
-    const shell = createAppShell(html, release);
+    const shell = createAppShell(html, release, await readFile(path.join(root, 'css/app-core.css'), 'utf8'));
     await writeFile(path.join(out, 'css/app-core.css'), shell.css);
     await minifyFile(path.join(assets, 'app-view.js'), shell.viewScript);
     html = shell.html;

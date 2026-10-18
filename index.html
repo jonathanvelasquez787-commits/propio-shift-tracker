@@ -100,15 +100,11 @@
     <!-- ===== Panel de entrada ===== -->
     <div class="auth-card reveal is-visible" style="--delay:120ms">
       <div class="auth-head">
-        <h2 id="authTitle">Entrar</h2>
-        <p id="authSub">Usa tu correo o tu nombre de usuario.</p>
+        <h2 id="authTitle">Entra con Google</h2>
+        <p id="authSub">Entra o crea tu cuenta con Google. No necesitas una contraseña de esta app.</p>
       </div>
 
       <div id="authForms">
-        <div class="tab-row" role="tablist" aria-label="Entrar o crear cuenta">
-          <button id="tabLogin" type="button" role="tab" aria-selected="true">Entrar</button>
-          <button id="tabSignup" type="button" role="tab" aria-selected="false">Crear cuenta</button>
-        </div>
 
         <button class="google-btn" id="googleBtn" type="button">
           <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -119,72 +115,6 @@
           </svg>
           <span>Continuar con Google</span>
         </button>
-
-        <div class="divider-row">o con tu correo</div>
-
-        <!-- Entrar -->
-        <form class="auth-form" id="loginForm" novalidate>
-          <div class="field">
-            <label for="loginIdentifier">Correo o usuario</label>
-            <input id="loginIdentifier" type="text" autocomplete="username" placeholder="usuario · correo@ejemplo.com" required/>
-          </div>
-          <div class="field">
-            <div class="field-row">
-              <label for="loginPassword">Contraseña</label>
-              <button class="link-btn" id="forgotBtn" type="button">¿La olvidaste?</button>
-            </div>
-            <div class="field-input-wrap">
-              <input id="loginPassword" type="password" autocomplete="current-password" placeholder="••••••••" required/>
-              <button class="reveal-btn" type="button" data-reveal-for="loginPassword" aria-pressed="false" aria-label="Mostrar contraseña">
-                <svg class="ic-svg ic-eye" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-                <svg class="ic-svg ic-eye-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.6 5.2A9.9 9.9 0 0 1 12 5c6.5 0 10 7 10 7a18.3 18.3 0 0 1-3.2 4.2"/><path d="M6.6 6.6A18.3 18.3 0 0 0 2 12s3.5 7 10 7c1.5 0 2.8-.3 4-.8"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/><line x1="3" y1="3" x2="21" y2="21"/></svg>
-              </button>
-            </div>
-          </div>
-          <button class="submit-btn" id="loginSubmit" type="submit">
-            <span class="spinner" aria-hidden="true"></span><span>Entrar</span>
-          </button>
-        </form>
-
-        <!-- Crear cuenta -->
-        <form class="auth-form" id="signupForm" novalidate hidden>
-          <div class="field">
-            <label for="signupUsername">Nombre de usuario</label>
-            <input id="signupUsername" type="text" autocomplete="username" placeholder="usuario" required/>
-            <span class="field-hint" id="usernameHint">3 a 24 caracteres: letras, números, guion bajo o punto.</span>
-          </div>
-          <div class="field">
-            <label for="signupEmail">Correo</label>
-            <input id="signupEmail" type="email" autocomplete="email" placeholder="tu@correo.com" required/>
-          </div>
-          <div class="field">
-            <label for="signupPassword">Contraseña</label>
-            <div class="field-input-wrap">
-              <input id="signupPassword" type="password" autocomplete="new-password" placeholder="Mínimo 8 caracteres" minlength="8" required/>
-              <button class="reveal-btn" type="button" data-reveal-for="signupPassword" aria-pressed="false" aria-label="Mostrar contraseña">
-                <svg class="ic-svg ic-eye" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-                <svg class="ic-svg ic-eye-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.6 5.2A9.9 9.9 0 0 1 12 5c6.5 0 10 7 10 7a18.3 18.3 0 0 1-3.2 4.2"/><path d="M6.6 6.6A18.3 18.3 0 0 0 2 12s3.5 7 10 7c1.5 0 2.8-.3 4-.8"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/><line x1="3" y1="3" x2="21" y2="21"/></svg>
-              </button>
-            </div>
-            <span class="field-hint">Te sirve para entrar aunque olvides tu nombre de usuario.</span>
-          </div>
-          <button class="submit-btn" id="signupSubmit" type="submit">
-            <span class="spinner" aria-hidden="true"></span><span>Crear mi cuenta</span>
-          </button>
-        </form>
-
-        <!-- Recuperar -->
-        <form class="auth-form" id="forgotForm" novalidate hidden>
-          <div class="field">
-            <label for="forgotEmail">Tu correo</label>
-            <input id="forgotEmail" type="email" autocomplete="email" placeholder="tu@correo.com" required/>
-            <span class="field-hint">Tiene que ser el correo con el que te registraste.</span>
-          </div>
-          <button class="submit-btn" id="forgotSubmit" type="submit">
-            <span class="spinner" aria-hidden="true"></span><span>Mandarme el enlace</span>
-          </button>
-          <button class="ghost-btn" id="backToLoginBtn" type="button">Volver a entrar</button>
-        </form>
 
         <!-- Contraseña nueva -->
         <form class="auth-form" id="resetForm" novalidate hidden>

@@ -28,8 +28,8 @@ Start Calls o Stop Calls bajo sus condiciones; no acepta ni rechaza llamadas.
 
 ```text
 index.html                Fuente de las portadas públicas ES/EN
-app.html                  Marcado y estilos fuente de la app
-css/                      Temas, shell y estilos de las páginas
+app.html                  Marcado fuente de la app
+css/                      Estilos base, temas, shell y páginas
 js/                       Lógica, autenticación, sincronización e idiomas
 api/, lib/                Funciones del servidor y utilidades compartidas
 extension/propio-bridge/   Única extensión mantenida
@@ -61,6 +61,10 @@ pnpm build
 pnpm build:extension
 ```
 
+El catálogo de navegador `js/locales.generated.js` se genera desde `locales/`
+al ejecutar pruebas o build y no se guarda en Git. Después de un checkout nuevo,
+`pnpm test` o `pnpm build` lo preparan automáticamente.
+
 El build comprueba traducciones, exports, controles y la
 [matriz de criterios](docs/production-criteria.json). CI añade escaneo de
 credenciales en el historial y auditoría de dependencias, y compila la app y
@@ -85,8 +89,8 @@ Las migraciones y regresiones se conservan aunque se consoliden informes antiguo
 
 `js/config.js` contiene URL y clave pública del cliente. Las claves privilegiadas
 solo corresponden al entorno del servidor y nunca al repositorio ni al navegador.
-El código conservado de acceso por correo/usuario no habilita esos métodos en la
-portada actual. CSP y demás controles se documentan en la política de seguridad.
+El endpoint heredado de acceso por correo/usuario mantiene sus protecciones; los
+formularios deshabilitados se retiraron. Se conserva recuperación de enlaces emitidos. CSP y demás controles se documentan en la política de seguridad.
 
 ## Configuración local de Windows
 

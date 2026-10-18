@@ -354,51 +354,6 @@ html.theme-dark .theme-toggle .ic-moon { display: none; }
   line-height: 1.5;
 }
 
-.tab-row {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2px;
-  padding: 4px;
-  margin-bottom: 20px;
-  border-radius: 14px;
-  background: var(--bg-soft);
-  border: 1px solid var(--line);
-}
-
-/* El indicador se mueve solo según qué pestaña tiene aria-selected, que es lo
-   que ya togglea landing.js. Sin JS extra y sin estado duplicado. */
-.tab-row::after {
-  content: '';
-  position: absolute;
-  top: 4px;
-  left: 4px;
-  width: calc(50% - 4px);
-  height: calc(100% - 8px);
-  border-radius: 11px;
-  background: var(--panel);
-  box-shadow: 0 1px 3px rgba(15, 23, 42, .1);
-  transition: transform .3s var(--ease-out);
-}
-
-.tab-row:has(#tabSignup[aria-selected='true'])::after { transform: translateX(100%); }
-
-.tab-row button {
-  position: relative;
-  z-index: 1;
-  border: 0;
-  background: transparent;
-  border-radius: 11px;
-  padding: 9px 10px;
-  font-size: 13.5px;
-  font-weight: 800;
-  color: var(--muted);
-  cursor: pointer;
-  transition: color .22s ease;
-}
-
-.tab-row button[aria-selected='true'] { color: var(--text); }
-
 .google-btn {
   width: 100%;
   display: flex;
@@ -424,26 +379,6 @@ html.theme-dark .theme-toggle .ic-moon { display: none; }
 
 .google-btn:disabled { opacity: .5; cursor: not-allowed; }
 .google-btn svg { width: 18px; height: 18px; }
-
-.divider-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 18px 0;
-  color: var(--muted-3);
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-}
-
-.divider-row::before,
-.divider-row::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--line);
-}
 
 /* --- Formularios --- */
 
@@ -530,38 +465,10 @@ html.theme-dark .theme-toggle .ic-moon { display: none; }
 .reveal-btn[aria-pressed='true'] .ic-eye { display: none; }
 .reveal-btn[aria-pressed='true'] .ic-eye-off { display: block; }
 
-.field-hint {
-  font-size: 12px;
-  color: var(--muted-3);
-  line-height: 1.4;
-  min-height: 16px;
-}
 
-.field-hint.ok  { color: var(--good); font-weight: 700; }
-.field-hint.bad { color: var(--bad); font-weight: 700; }
 
-.field-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
 
-.link-btn {
-  border: 0;
-  background: transparent;
-  padding: 0;
-  color: var(--accent);
-  font-size: 12.5px;
-  font-weight: 700;
-  cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-color: transparent;
-  transition: text-decoration-color .16s ease;
-}
 
-.link-btn:hover { text-decoration-color: currentColor; }
 
 .submit-btn {
   position: relative;

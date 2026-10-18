@@ -28,13 +28,13 @@ test('ACW de bloque recorta gaps entre bloques, resta pausas y excluye gaps Othe
 
 test('Bloques del día usa los gaps etiquetados y muestra ACW en las dos variantes de progreso Work', () => {
   const app = fs.readFileSync(path.join(root, 'js/app-main.js'), 'utf8');
-  const html = fs.readFileSync(path.join(root, 'app.html'), 'utf8');
+  const styles = fs.readFileSync(path.join(root, 'css/app-core.css'), 'utf8');
   assert.match(app, /const blockGaps = dayGapRows\(dayKey, dayCalls\)/);
   assert.match(app, /const blockPauseIntervals = mergeIntervals\(dayPauses\)/);
   assert.match(app, /acwMinutesForBlock\(blockGaps, stats\.callWindowStart, stats\.callWindowEnd, blockPauseIntervals, overlapMinutesWithIntervals\)/);
   assert.match(app, /const blockAcwMin = slot\.type === 'Work'[\s\S]*?: 0;/);
   assert.match(app, /stats\.realActivityRange[\s\S]*?\$\{acwProgressLabel\}/);
   assert.doesNotMatch(app, /name: 'ACW',[\s\S]*?renderBlockSummaryStrip\(summaryCards\)/);
-  assert.match(html, /grid-template-columns: 1\.6fr 1fr 1fr;/);
-  assert.match(html, /\.block-summary-strip \{ grid-template-columns: repeat\(2, 1fr\);/);
+  assert.match(styles, /grid-template-columns: 1\.6fr 1fr 1fr;/);
+  assert.match(styles, /\.block-summary-strip \{ grid-template-columns: repeat\(2, 1fr\);/);
 });
