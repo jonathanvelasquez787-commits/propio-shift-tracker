@@ -17,9 +17,17 @@ export async function getSession() {
   return data.session || null;
 }
 
-export async function getUser() {
+function assertAccount(session, expectedUserId) {
+  const owner = typeof window === 'undefined' ? undefined : window[Symbol.for('propio.expectedAppOwner')];
+  if (!session?.user?.id || (expectedUserId && session.user.id !== expectedUserId)
+    || (owner !== undefined && session.user.id !== owner)) throw new AuthError('NOT_AUTHENTICATED');
+  return session.user.id;
+}
+
+export async function getUser(expectedUserId) {
   const { data, error } = await getSupabase().auth.getUser();
-  if (error) return null;
+  if (error) throw error;
+  if (data.user) assertAccount({user:data.user}, expectedUserId);
   return data.user || null;
 }
 
@@ -40,50 +48,59 @@ export async function signInWithGoogle(redirectTo) {
   if (error) throw error;
 }
 
-export async function updatePassword(newPassword) {
+export async function updatePassword(newPassword, expectedUserId) {
   if (String(newPassword || '').length < 8) throw new AuthError('PASSWORD_TOO_SHORT');
+  if (!expectedUserId) throw new AuthError('NOT_AUTHENTICATED');
+  assertAccount(await getSession(), expectedUserId);
   const { error } = await getSupabase().auth.updateUser({ password: newPassword });
   if (error) throw error;
+  assertAccount(await getSession(), expectedUserId);
   return true;
 }
 
 // --- Perfil -----------------------------------------------------------------
 
-export async function getProfile() {
+export async function getProfile(expectedUserId) {
   const session = await getSession();
   if (!session) return null;
+  const userId = assertAccount(session, expectedUserId);
   const { data, error } = await getSupabase()
     .from('profiles')
     .select('user_id, username, display_name')
-    .eq('user_id', session.user.id)
+    .eq('user_id', userId)
     .maybeSingle();
   if (error) throw error;
+  assertAccount(await getSession(), userId);
   return data || null;
 }
 
-export async function updateEmail(email) {
+export async function updateEmail(email, expectedUserId) {
   const clean = String(email || '').trim().toLowerCase();
   if (!looksLikeEmail(clean)) throw new AuthError('EMAIL_INVALID');
   const session = await getSession();
-  if (!session) throw new AuthError('NOT_AUTHENTICATED');
+  assertAccount(session, expectedUserId);
   const { error } = await getSupabase().auth.updateUser({ email: clean });
   if (error) throw error;
   return true;
 }
 
-export async function updateUsername(username) {
+export async function updateUsername(username, expectedUserId) {
   const clean = String(username || '').trim();
   if (!USERNAME_RE.test(clean)) throw new AuthError('USERNAME_INVALID');
   const session = await getSession();
-  if (!session) throw new AuthError('NOT_AUTHENTICATED');
-  const { error } = await getSupabase()
+  const userId = assertAccount(session, expectedUserId);
+  const { data, error } = await getSupabase()
     .from('profiles')
     .update({ username: clean })
-    .eq('user_id', session.user.id);
+    .eq('user_id', userId)
+    .select('user_id')
+    .maybeSingle();
   if (error) {
     if (String(error.code) === '23505') throw new AuthError('USERNAME_TAKEN');
     throw error;
   }
+  assertAccount(await getSession(), userId);
+  if (!data || data.user_id !== userId) throw new AuthError('PROFILE_SAVE_FAILED');
   return true;
 }
 
@@ -125,6 +142,7 @@ const MESSAGES = () => ({
   USERNAME_TAKEN: translateText('Ese nombre de usuario ya está ocupado.'),
   PASSWORD_TOO_SHORT: translateText('La contraseña necesita al menos 8 caracteres.'),
   NOT_AUTHENTICATED: translateText('Tu sesión expiró. Vuelve a entrar.'),
+  PROFILE_SAVE_FAILED: translateText('No se pudo guardar el perfil. Vuelve a intentar.'),
   EMAIL_NOT_CONFIRMED: translateText('Falta confirmar tu correo. Revisa la bandeja de entrada.'),
   RATE_LIMITED: translateText('Demasiados intentos seguidos. Espera un minuto y vuelve a probar.'),
   LOGIN_UNAVAILABLE: translateText('El acceso no está disponible temporalmente. Espera un minuto y vuelve a intentar.'),

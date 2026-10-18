@@ -20,7 +20,7 @@ del propietario. No exige comprar un dominio ni activar correo.
   se ejecutan, sin presentar evidencia histórica como una comprobación nueva.
 
 [production-criteria.json](production-criteria.json) relaciona 23 áreas con
-criterios concretos, 74 módulos fuente y 68 suites. El build rechaza módulos o
+criterios concretos, 74 módulos fuente y 69 suites. El build rechaza módulos o
 suites sin asignar y referencias a pruebas retiradas. Comprueba trazabilidad;
 no sustituye las pruebas ni acredita todas las combinaciones de la interfaz.
 
@@ -40,6 +40,8 @@ no sustituye las pruebas ni acredita todas las combinaciones de la interfaz.
 
 ## Evidencia y operación
 
+La [auditoría del 18 de octubre](auditoria-profunda-2026-10-18.md) registra
+reparaciones de persistencia y perfil y sus verificaciones actuales.
 La [auditoría del 17 de octubre y sus antecedentes consolidados](auditoria-profunda-2026-10-17.md)
 conserva correcciones, evidencia fechada y enlaces inmutables a los diez informes
 anteriores. Sus cantidades de pruebas corresponden a sus cierres originales;

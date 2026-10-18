@@ -12,6 +12,7 @@ import {
   getProfile,
   signOut,
   authErrorMessage,
+  AuthError,
 } from './auth.js';
 
 const $ = (id) => document.getElementById(id);
@@ -30,6 +31,7 @@ const PENDING_KEY = 'ps_auth_pending';
 const hadAuthParams = /[?#].*(code=|access_token=|error=|error_code=)/.test(window.location.href);
 const params = new URLSearchParams(window.location.search);
 let recoveryMode = params.has('recuperar');
+let recoveryUserId = null;
 
 // Con la sesión abierta esta página no tiene nada que ofrecer: se entra
 // directo. `?quedarse=1` la deja ver a propósito.
@@ -160,8 +162,17 @@ async function init() {
   onAuthChange((event, session) => {
     if (event === 'PASSWORD_RECOVERY') {
       recoveryMode = true;
+      recoveryUserId = session?.user?.id || null;
+      setBusy($('resetSubmit'), false);
       showView('reset');
       showMessage(translateText('Escribe tu contraseña nueva para terminar.'), 'info');
+      return;
+    }
+    if (recoveryMode && recoveryUserId && session?.user?.id !== recoveryUserId) {
+      recoveryMode = false;
+      recoveryUserId = null;
+      showView('login');
+      showMessage(authErrorMessage(new AuthError('NOT_AUTHENTICATED')));
       return;
     }
     if (event === 'SIGNED_IN' && session && !recoveryMode) {
@@ -186,6 +197,7 @@ async function init() {
   }
 
   if (recoveryMode) {
+    recoveryUserId = session.user.id;
     showView('reset');
     return;
   }
@@ -198,12 +210,13 @@ async function init() {
     return;
   }
 
-  try {
-    const profile = await getProfile();
-    showSessionCard(profile, session.user);
-  } catch {
-    showSessionCard(null, session.user);
-  }
+  let profile = null;
+  try { profile = await getProfile(session.user.id); } catch {}
+  let latestSession;
+  try { latestSession = await getSession(); }
+  catch (err) { showMessage(authErrorMessage(err), 'error'); return; }
+  if (latestSession?.user?.id !== session.user.id) return;
+  showSessionCard(profile, latestSession.user);
 }
 
 // ---------------------------------------------------------------------------
@@ -225,13 +238,18 @@ forms.reset?.addEventListener('submit', async (e) => {
   e.preventDefault();
   clearMessage();
   const btn = $('resetSubmit');
+  const userId = recoveryUserId;
   setBusy(btn, true, translateText('Guardando…'));
   try {
-    await updatePassword($('resetPassword').value);
+    if (!recoveryMode || !userId) throw new AuthError('NOT_AUTHENTICATED');
+    await updatePassword($('resetPassword').value, userId);
+    if (!recoveryMode || recoveryUserId !== userId) return;
     recoveryMode = false;
+    recoveryUserId = null;
     showMessage(translateText('Listo, contraseña actualizada. Entrando…'), 'ok');
     setTimeout(enterApp, 900);
   } catch (err) {
+    if (userId && recoveryUserId !== userId) return;
     showMessage(authErrorMessage(err), 'error');
     setBusy(btn, false);
   }

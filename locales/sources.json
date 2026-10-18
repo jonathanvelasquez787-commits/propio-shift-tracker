@@ -1043,7 +1043,8 @@
   "s_12a814ea": {
     "source": "Guardando…",
     "files": [
-      "js/landing.js"
+      "js/landing.js",
+      "js/settings.js"
     ]
   },
   "s_12d0f603": {
@@ -10676,6 +10677,12 @@
     "source": "Configura tu moneda secundaria en Metas para intercambiarla",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_c954f86e": {
+    "source": "No se pudo guardar el perfil. Vuelve a intentar.",
+    "files": [
+      "js/auth.js"
     ]
   },
   "s_c974220a": {

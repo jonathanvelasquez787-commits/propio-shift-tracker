@@ -5235,7 +5235,7 @@ function renderPayDatesSection() {
     configureScheduleContext({
       WEEKDAYS, WEEKDAY_LABELS, WEEKDAY_LABELS_SHORT, appConfirm, defaultDaySchedule, ensureWeeklySchedule,
       formatHHMM, formatMinutes, formatWeekRangeLabel, iconHtml, isScheduleWeekPast, minutesToHHMM,
-      onGameDayMetadataChanged, pad, saveAll, saveSettingsOnly, snapshotHistoricalPlanning, startOfCycleWeek,
+      onGameDayMetadataChanged, pad, saveAll, snapshotHistoricalPlanning, startOfCycleWeek,
       timeLabel, toMinutes, toast, todayCallDateKey, weekStartKeyFromDate,
     });
     configureCallsContext({
@@ -5260,7 +5260,7 @@ function renderPayDatesSection() {
       DEFAULT_USER_EMOJI, EMOJI_CHOICES, RATE, closeModal, convertedAmountText, currencyCeilFromUsdAmount,
       effectiveCycleGoal, effectiveDailyGoal, ensureCurrencySettings, escapeHtml, formatCallDayLabel,
       formatMinutes, getActiveDayKey, getDailyGoalOverride, iconHtml, money, openModal, render,
-      onGameDayMetadataChanged, saveSettingsOnly, saveStateOnly, saveAll, snapshotHistoricalPlanning,
+      onGameDayMetadataChanged, saveSettingsOnly, saveAll, snapshotHistoricalPlanning,
       setDailyGoalOverride, toast, todayCallDateKey,
       usdCeilFromCurrencyAmount,
     });
