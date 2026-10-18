@@ -77,6 +77,7 @@ La extensión anterior mantiene sus funciones, pero no transmite la nueva lectur
 La carpeta instalada se actualiza con respaldo y se conservan sus preferencias
 personales. La recarga de la extensión y de las páginas se realiza fuera de una
 llamada pendiente; instalar archivos no demuestra que Chrome ya los ejecuta.
+El propietario confirmó la recarga de 2.2.9, Propio y el tracker el 18/10/2026.
 
 Esta entrega no cierra las 79 mejoras: los puntos compuestos conservan sus
 partes pendientes y la lista distingue pruebas, publicación y recarga local.
