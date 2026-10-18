@@ -8,8 +8,9 @@ no se considera rota por esa razón.
 
 ## Lista de control completa
 
-**0 de 79 mejoras cerradas.** 8 probadas, 2 en curso y 69 pendientes. El diseño
-del primer bloque fue aprobado; la primera entrega está pendiente de publicación.
+**8 de 79 mejoras publicadas.** 2 en curso y 69 pendientes. La primera entrega
+pasó sus pruebas y está en producción. Falta confirmar la recarga local de la
+extensión 2.2.8; los archivos ya están instalados con respaldo.
 
 Estados: **Pendiente**, **En curso**, **Probado** (sin publicar), **Publicado**.
 Una casilla solo se marca cuando todos los criterios del punto están resueltos
