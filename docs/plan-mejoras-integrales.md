@@ -8,8 +8,9 @@ no se considera rota por esa razón.
 
 ## Lista de control completa
 
-**0 de 79 mejoras cerradas.** 8 probadas, 2 en curso y 69 pendientes. El diseño
-del primer bloque fue aprobado; la primera entrega está pendiente de publicación.
+**8 de 79 mejoras publicadas.** 2 en curso y 69 pendientes. La primera entrega
+pasó sus pruebas y está en producción. Falta confirmar la recarga local de la
+extensión 2.2.8; los archivos ya están instalados con respaldo.
 
 Estados: **Pendiente**, **En curso**, **Probado** (sin publicar), **Publicado**.
 Una casilla solo se marca cuando todos los criterios del punto están resueltos
@@ -21,14 +22,14 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 - [ ] **3. Inicio y cierre manual de turno — Pendiente.** Confirmación de cierre con alcance y actividades pendientes.
 - [ ] **4. Continuar después de un cierre accidental — Pendiente.** Distinguir continuación del turno y sesión nueva.
 - [ ] **5. Día activo e historial de acciones — Pendiente.** Hacer evidente Hoy frente a una fecha histórica antes de acciones.
-- [ ] **6. Vinculación con tu cuenta — Probado.** Resumen de preparación: cuenta, tracker, Propio y automatismos. [Evidencia](disponibilidad-en-inicio.md).
-- [ ] **7. Ponerte disponible al comenzar el turno — Probado.** Mostrar en Inicio la espera hasta el horario de entrada. [Evidencia](disponibilidad-en-inicio.md).
-- [ ] **8. Esperar entre llamadas usando el ACW de la tool — Probado.** Cuenta regresiva del ACW confirmada por la extensión en Inicio. [Evidencia](disponibilidad-en-inicio.md).
+- [x] **6. Vinculación con tu cuenta — Publicado.** Resumen de preparación: cuenta, tracker, Propio y automatismos. [Evidencia](disponibilidad-en-inicio.md).
+- [x] **7. Ponerte disponible al comenzar el turno — Publicado.** Mostrar en Inicio la espera hasta el horario de entrada. [Evidencia](disponibilidad-en-inicio.md).
+- [x] **8. Esperar entre llamadas usando el ACW de la tool — Publicado.** Cuenta regresiva del ACW confirmada por la extensión en Inicio. [Evidencia](disponibilidad-en-inicio.md).
 - [ ] **9. Regreso automático de Break — Pendiente.** Indicar si terminar Break intentará volver a disponibilidad.
-- [ ] **10. Regreso automático de Lunch — Probado.** Mostrar por separado la preferencia de regreso de Lunch. [Evidencia](disponibilidad-en-inicio.md).
+- [x] **10. Regreso automático de Lunch — Publicado.** Mostrar por separado la preferencia de regreso de Lunch. [Evidencia](disponibilidad-en-inicio.md).
 - [ ] **11. Elegir cómo terminan las pausas — Pendiente.** Modalidad de cierre y hora esperada visibles durante pausas.
-- [ ] **12. Pausar todos los automatismos de disponibilidad — Probado.** Estado de pausa manual y forma de reanudar visibles en la tool. [Evidencia](disponibilidad-en-inicio.md).
-- [ ] **13. Reintento cuando no tomás una oferta — Probado.** Explicar reintento y condición que lo detiene sin interruptores adicionales. [Evidencia](disponibilidad-en-inicio.md).
+- [x] **12. Pausar todos los automatismos de disponibilidad — Publicado.** Estado de pausa manual y forma de reanudar visibles en la tool. [Evidencia](disponibilidad-en-inicio.md).
+- [x] **13. Reintento cuando no tomás una oferta — Publicado.** Explicar reintento y condición que lo detiene sin interruptores adicionales. [Evidencia](disponibilidad-en-inicio.md).
 - [ ] **14. Prioridades que frenan los clics automáticos — En curso.** Motivo dominante del bloqueo y coordinación antes de uso simultáneo en PCs.
 - [ ] **15. Llamadas detectadas en vivo por la extensión — Pendiente.** Origen en vivo y carácter estimado identificables.
 - [ ] **16. Recuperación desde el historial oficial de Propio — Pendiente.** Vista concentrada de estimadas, oficiales y corregidas.
@@ -86,15 +87,25 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 - [ ] **68. Reportes CSV y PDF — Pendiente.** Explicar período/datos incluidos y diferencia con respaldo.
 - [ ] **69. Reinicios y borrados — Pendiente.** Alcances específicos y recuperación en acciones destructivas.
 - [ ] **70. App instalable y recuperación — Pendiente.** Explicar estado local, reconexión y límites de PWA.
-- [ ] **71. Estado de conexión y actividad de la extensión — Probado.** Diagnóstico inicial: qué pasa, qué sigue funcionando y qué hacer. [Evidencia](disponibilidad-en-inicio.md).
+- [x] **71. Estado de conexión y actividad de la extensión — Publicado.** Diagnóstico inicial: qué pasa, qué sigue funcionando y qué hacer. [Evidencia](disponibilidad-en-inicio.md).
 - [ ] **72. Borrar la cuenta — Pendiente.** Alcance y retención claros, ofreciendo exportar antes.
-- [ ] **73. Guías y apoyo voluntario — Probado.** Actualizar guía y README retirando descripciones desactualizadas. [Evidencia](guia-practica-tool-y-extension.md) y [README](../extension/propio-bridge/README.md).
+- [x] **73. Guías y apoyo voluntario — Publicado.** Actualizar guía y README retirando descripciones desactualizadas. [Evidencia](guia-practica-tool-y-extension.md) y [README](../extension/propio-bridge/README.md).
 - [ ] **74. Funcionamiento con otra pestaña al frente — En curso.** Lectura atrasada/reconexión visibles y coordinación futura multi-PC.
 - [ ] **75. Volumen general y sonidos propios — Pendiente.** Explicar volumen cero, avisos escritos y espacio de archivos.
 - [ ] **76. Planificador de Finanzas hacia la meta diaria — Pendiente.** Desglosar cálculo y mostrar meta propuesta antes de guardar.
 - [ ] **77. Filtros de llamadas y acciones — Pendiente.** Búsqueda Customer ID y filtros estimadas/oficiales/corregidas.
 - [ ] **78. Barra de actividad en vivo — Pendiente.** Consistencia entre barra y tarjetas incluidas llamadas pendientes.
 - [ ] **79. Accesibilidad — Pendiente.** Revisión de teclado, zoom, lector, ayudas táctiles y objetivos de controles.
+
+## Entregas verificadas
+
+- [PR #81](https://github.com/jonathanvelasquez787-commits/propio-shift-tracker/pull/81),
+  commit `3eba5f8ef7869a98a0dd1ece1c5afd39572a5bf1`: CI del PR correcto,
+  829 pruebas, builds y 224 vistas. Vercel producción READY en ese mismo SHA;
+  `/api/health` y la nueva sección pública comprobados. Guía y evidencia técnica
+  en [Disponibilidad en Inicio](disponibilidad-en-inicio.md).
+- Archivos 2.2.8 instalados con respaldo y preferencias personales conservadas.
+  Recarga local todavía no confirmada. No se marca ninguna otra fase como terminada.
 
 ## Orden de ejecución
 
