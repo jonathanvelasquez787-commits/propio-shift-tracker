@@ -1,6 +1,6 @@
 # Guía práctica de la tool y su extensión
 
-Revisión: 17 de octubre de 2026. Esta guía explica las funciones que existen en el proyecto y cómo se usan juntas. La publicación de las correcciones de la auditoría se documenta por separado.
+Revisión: 18 de octubre de 2026. Esta guía explica las funciones que existen en el proyecto y cómo se usan juntas. La publicación de las correcciones de la auditoría se documenta por separado.
 
 La **tool** lleva tus registros, cálculos y ajustes. La **extensión** conecta esos registros con Propio y puede pulsar Start Calls o Stop Calls según tus preferencias. La aceptación de una llamada sigue siendo tuya.
 
@@ -57,6 +57,11 @@ Estas opciones están en el popup de la extensión. **Registrar llamadas y poner
 - **Qué hace:** después de una llamada, pulsa Stop Calls cuando reconoce el control disponible. Espera a que el ACW que publica la tool alcance o supere el límite y después pulsa Start Calls.
 - **Qué configurás:** «Esperar entre llamadas» y de 1 a 60 minutos de ACW.
 - **Ejemplo:** elegís tres minutos y el ACW ya muestra 00:50 cuando la extensión lo recibe. Faltan 02:10. No necesita haber visto 00:00. Si cambiás el límite a cinco minutos, usa el mismo tramo de ACW, sin reiniciarlo.
+
+Inicio muestra también la próxima acción confirmada por la extensión: espera,
+pausa manual, horario, llamada o revisión. Si la lectura queda atrasada retira
+la cuenta regresiva hasta confirmarla. «Ver preparación del turno» reúne cuenta,
+portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 
 ### 9. Regreso automático de Break
 
@@ -396,7 +401,7 @@ Estas opciones están en el popup de la extensión. **Registrar llamadas y poner
 
 ### 62. Reloj, fecha, saludo y vista angosta
 
-- **Qué hace:** muestra hora y fecha junto al saludo, adapta el espacio disponible y conserva los controles del día en una presentación compacta. El texto motivador puede variar.
+- **Qué hace:** muestra hora y fecha junto al saludo, adapta el espacio disponible y conserva los controles del día en una presentación compacta. La frase del saludo es fija y se conserva al recargar.
 - **Qué configurás:** nombre y emoji del perfil, apariencia y tamaño de la ventana. El reloj también permite alternar su visibilidad con su control.
 - **Ejemplo:** dejás el tracker en una ventana angosta a la derecha y seguís viendo la hora y el día activo sin dedicarle toda la pantalla.
 

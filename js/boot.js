@@ -10,6 +10,7 @@ import { ui, translateText, translateMarkup, displayLocale, setLanguage, transla
 import { getSupabase, isConfigured } from './supabase-client.js';
 import { getProfile, signOut, setAppEntryHint } from './auth.js';
 import { installPropioBridge } from './propio-bridge.js';
+import { installAutomationStatusUi } from './automation-ui.js';
 import { SUPABASE_URL } from './config.js';
 import {
   BOOT,
@@ -46,6 +47,7 @@ translateDocument();
 const overlay = document.getElementById('bootGate');
 const bootText = document.getElementById('bootGateText');
 const bootBody = document.getElementById('bootGateBody');
+let automationUi = null;
 
 function setBootMessage(text) {
   if (bootText) bootText.textContent = text;
@@ -183,6 +185,8 @@ async function mountApp(expectedUserId) {
     return false;
   }
   if (rejectChangedOwner()) return false;
+  automationUi?.stop();
+  automationUi = installAutomationStatusUi();
   if (overlay) overlay.remove();
   return true;
 }
@@ -756,7 +760,9 @@ async function boot() {
   const accountScope = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('');
   const { applyPropioBridgeEvent, getPropioBridgePlan } = await import('./app-main.js');
   if (bridgeUserId !== userId) return;
-  stopPropioBridge = installPropioBridge({ accountScope, receive: applyPropioBridgeEvent, getPlan: getPropioBridgePlan });
+  const stopBridge = installPropioBridge({ accountScope, receive: applyPropioBridgeEvent, getPlan: getPropioBridgePlan,
+    onStatus: status => { if (bridgeUserId === userId && readMeta().userId === userId) automationUi?.update(status); } });
+  stopPropioBridge = () => { stopBridge(); automationUi?.stop(); automationUi = null; };
 
   normalizeAppAddress();
   wireSyncStatus();

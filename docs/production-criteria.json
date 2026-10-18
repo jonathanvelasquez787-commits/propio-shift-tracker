@@ -901,7 +901,9 @@
         "js/propio-history.js",
         "js/propio-history-pages.js",
         "js/propio-history-records.js",
-        "extension/propio-bridge/history-observer.js"
+        "extension/propio-bridge/history-observer.js",
+        "js/automation-status.js",
+        "js/automation-ui.js"
       ],
       "tests": [
         {
@@ -1022,7 +1024,8 @@
             "scheduled pause end closes only its matching pause, blocks calls and never closes a newer pause or a finished shift",
             "scheduled pause metadata is bounded to the shift and rejects malformed ranges while stripping unrelated data"
           ]
-        }
+        },
+        {"file":"tests/automation-status.test.mjs","namedCases":["automation status exports a bounded view without call records or account details","tracker status reads are account scoped, top-frame only and cannot invoke preparation","fresh transport cannot disguise an old portal or ACW observation"]}
       ]
     },
     {

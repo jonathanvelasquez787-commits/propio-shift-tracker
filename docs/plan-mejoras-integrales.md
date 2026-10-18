@@ -1,0 +1,156 @@
+# Mejoras integrales aprobadas
+
+Solicitud del propietario: «Me gustó todo lo que me dijiste así que haremos
+todo. Empieza». Base: app 621, extensión 2.2.7, evaluación de 79 funciones del
+18/10/2026. Esta lista conserva el alcance completo entre entregas; cada fase
+se publica con pruebas apropiadas. Una función existente marcada para mejorar
+no se considera rota por esa razón.
+
+## Lista de control completa
+
+**0 de 79 mejoras cerradas.** 8 probadas, 2 en curso y 69 pendientes. El diseño
+del primer bloque fue aprobado; la primera entrega está pendiente de publicación.
+
+Estados: **Pendiente**, **En curso**, **Probado** (sin publicar), **Publicado**.
+Una casilla solo se marca cuando todos los criterios del punto están resueltos
+y su evidencia está enlazada. Se conservan las comprobaciones y decisiones de
+no ampliar alcance. Un cambio parcial no cierra la función completa.
+
+- [ ] **1. Registro automático de la conexión a Propio — Pendiente.** Identificar claramente la conexión a Propio y su hora.
+- [ ] **2. Diferencia entre estar conectado y empezar a trabajar — Pendiente.** Presentar conexión y comienzo laboral con explicación de su diferencia.
+- [ ] **3. Inicio y cierre manual de turno — Pendiente.** Confirmación de cierre con alcance y actividades pendientes.
+- [ ] **4. Continuar después de un cierre accidental — Pendiente.** Distinguir continuación del turno y sesión nueva.
+- [ ] **5. Día activo e historial de acciones — Pendiente.** Hacer evidente Hoy frente a una fecha histórica antes de acciones.
+- [ ] **6. Vinculación con tu cuenta — Probado.** Resumen de preparación: cuenta, tracker, Propio y automatismos. [Evidencia](disponibilidad-en-inicio.md).
+- [ ] **7. Ponerte disponible al comenzar el turno — Probado.** Mostrar en Inicio la espera hasta el horario de entrada. [Evidencia](disponibilidad-en-inicio.md).
+- [ ] **8. Esperar entre llamadas usando el ACW de la tool — Probado.** Cuenta regresiva del ACW confirmada por la extensión en Inicio. [Evidencia](disponibilidad-en-inicio.md).
+- [ ] **9. Regreso automático de Break — Pendiente.** Indicar si terminar Break intentará volver a disponibilidad.
+- [ ] **10. Regreso automático de Lunch — Probado.** Mostrar por separado la preferencia de regreso de Lunch. [Evidencia](disponibilidad-en-inicio.md).
+- [ ] **11. Elegir cómo terminan las pausas — Pendiente.** Modalidad de cierre y hora esperada visibles durante pausas.
+- [ ] **12. Pausar todos los automatismos de disponibilidad — Probado.** Estado de pausa manual y forma de reanudar visibles en la tool. [Evidencia](disponibilidad-en-inicio.md).
+- [ ] **13. Reintento cuando no tomás una oferta — Probado.** Explicar reintento y condición que lo detiene sin interruptores adicionales. [Evidencia](disponibilidad-en-inicio.md).
+- [ ] **14. Prioridades que frenan los clics automáticos — En curso.** Motivo dominante del bloqueo y coordinación antes de uso simultáneo en PCs.
+- [ ] **15. Llamadas detectadas en vivo por la extensión — Pendiente.** Origen en vivo y carácter estimado identificables.
+- [ ] **16. Recuperación desde el historial oficial de Propio — Pendiente.** Vista concentrada de estimadas, oficiales y corregidas.
+- [ ] **17. Registros pendientes cuando el tracker no está abierto — Pendiente.** Pendientes próximos a vencer y acciones para resolverlos.
+- [ ] **18. Llamada en vivo con los botones de la tool — Pendiente.** Explicar tiempo medido, mínimo de registro e importe estimado.
+- [ ] **19. Agregar una llamada manual — Pendiente.** Comprobación de fecha, duración y pago antes de guardar manuales.
+- [ ] **20. Pegar llamadas de Propio — Pendiente.** Resultado de importación por fila y su motivo.
+- [ ] **21. Editar y borrar llamadas — Pendiente.** Deshacer/papelera y trazabilidad antes/después de correcciones.
+- [ ] **22. Descartar una llamada accidental — Pendiente.** Confirmación de lo que restaura descartar una llamada accidental.
+- [ ] **23. ACW en vivo y ACW acumulado — Pendiente.** Distinguir ACW actual del acumulado y explicar su origen.
+- [ ] **24. Meta máxima de ACW — Pendiente.** Distinguir máximo deseado de ACW de la espera entre llamadas.
+- [ ] **25. Break y Lunch de la tool — Pendiente.** Presentar pausa planeada y real con duración actual.
+- [ ] **26. Continuar o descartar una pausa accidental — Pendiente.** Explicar qué conserva continuar o descartar una pausa.
+- [ ] **27. Editar huecos entre llamadas — Pendiente.** Señalar intervalos clasificados manualmente.
+- [ ] **28. Adherencia al horario — Pendiente.** Desglose de minutos y causas al consultar adherencia.
+- [ ] **29. Plantilla semanal — Pendiente.** Orden y cruce de medianoche legibles en el editor.
+- [ ] **30. Semana específica y copia de horarios — Pendiente.** Alcance plantilla/semana y vista previa de días al copiar.
+- [ ] **31. Ajustar todo el turno y decidir qué pasa si llegás tarde — Pendiente.** Vista previa de jornada desplazada antes de guardar.
+- [ ] **32. Metas diarias, por fecha y del ciclo — Pendiente.** Identificar meta general, excepción o calculada desde Finanzas.
+- [ ] **33. Ganancias de hoy y del ciclo — Pendiente.** Desglose base, bonos y pagos todavía estimados.
+- [ ] **34. Moneda secundaria e intercambio del monto principal — Pendiente.** Conservar intercambio persistente y equivalencia debajo; tasa consultable.
+- [ ] **35. Tasa base por minuto — Pendiente.** Explicar qué afecta cambiar la tarifa y qué historial permanece.
+- [ ] **36. Ventanas de Higher Rate — Pendiente.** Revisar llamadas que califican y explicar gracia; evaluar carga de promociones.
+- [ ] **37. Conservar bonos ganados al editar o limpiar ventanas — Pendiente.** Separar corregir/recalcular de archivar/conservar con vista previa.
+- [ ] **38. Gastos, ahorro y categorías — Pendiente.** Distinguir objetivo, reservado, pagado y pendiente en las filas.
+- [ ] **39. Asignación manual o automática del dinero ganado — Pendiente.** Explicar destino de cada asignación manual/automática.
+- [ ] **40. Registrar pagos de gastos — Pendiente.** Separación visual de reserva y pago real registrado.
+- [ ] **41. Períodos, gastos recurrentes y reinicio — Pendiente.** Vista previa de reinicio, liberaciones, historial y período.
+- [ ] **42. Resumen de Finanzas en Inicio — Pendiente.** Identificar pendientes de Finanzas como acumulados.
+- [ ] **43. Reportes de rendimiento — Pendiente.** Conclusiones principales antes del detalle de métricas.
+- [ ] **44. Proyección del ciclo — Pendiente.** Supuestos de proyección y efecto de días/ritmo visibles.
+- [ ] **45. Fechas de pago — Pendiente.** Registrar pago recibido manual y diferencia con lo esperado.
+- [ ] **46. Calendario de productividad — Pendiente.** Leyenda que distinga sin datos, libre y meta no cumplida.
+- [ ] **47. Marcar días y agregar contexto — Pendiente.** Marcas manuales visibles y explicación del efecto histórico.
+- [ ] **48. Alarmas de turno y descansos — Pendiente.** Resumen de alarmas activas.
+- [ ] **49. Sonidos al guardar llamadas — Pendiente.** Asociación clara acción/sonido conservando reconciliación silenciosa.
+- [ ] **50. Aviso de descanso por minutos productivos — Pendiente.** Progreso hacia el aviso sin iniciar pausas automáticamente.
+- [ ] **51. Mensaje de apoyo cuando llevás tiempo sin llamadas — Pendiente.** Acceso comprensible al apoyo configurable desde Avisos.
+- [ ] **52. Cierre breve y recuperación de una llamada difícil — Pendiente.** Respuesta/cierre ágil y consulta de reflexiones guardadas.
+- [ ] **53. Activar Logros y la batalla — Pendiente.** Introducción que explique batalla y opciones.
+- [ ] **54. Armas y práctica — Pendiente.** Conservar alcance de armas/práctica y verificar separación contable.
+- [ ] **55. XP, niveles, misiones, rachas y récords — Pendiente.** Explicar reglas de XP/hitos y ajustes por correcciones.
+- [ ] **56. Cofre de la meta diaria — Pendiente.** Estados de cofre disponible, reclamado y reconciliado.
+- [ ] **57. Equipo, trofeos y bestiario — Pendiente.** Organización y vista previa de equipo disponible/equipado.
+- [ ] **58. Premios personales — Pendiente.** Simplificar creación y distinguir estados de premios personales.
+- [ ] **59. Duelo durante una pausa o fuera del turno — Pendiente.** Entrada/salida móvil y continuidad del duelo al volver al trabajo.
+- [ ] **60. Premio del ciclo completado — Pendiente.** Identificar ciclo y condición de cada premio.
+- [ ] **61. Temas, paletas e idioma — Pendiente.** Paletas legibles, revisión de contraste y vista esencial configurable.
+- [ ] **62. Reloj, fecha, saludo y vista angosta — Pendiente.** Mantener frase fija/fecha completa y revisar espacio en anchos pequeños.
+- [ ] **63. Vista original de Propio — Pendiente.** Explicar estado y dependencia del componente nativo de Propio.
+- [ ] **64. Escritorio de trabajo al iniciar Windows — Pendiente.** Configuración guiada para otras PCs de páginas/perfil/notas/tamaños.
+- [ ] **65. Cuenta y perfil — Pendiente.** Rótulos acordes con campos editables y acceso Google vigente.
+- [ ] **66. Guardado local y sincronización — Pendiente.** Detalle visible de guardado local/nube y conflictos.
+- [ ] **67. Respaldo completo JSON — Pendiente.** Comparación al restaurar y copia automática previa al reemplazo.
+- [ ] **68. Reportes CSV y PDF — Pendiente.** Explicar período/datos incluidos y diferencia con respaldo.
+- [ ] **69. Reinicios y borrados — Pendiente.** Alcances específicos y recuperación en acciones destructivas.
+- [ ] **70. App instalable y recuperación — Pendiente.** Explicar estado local, reconexión y límites de PWA.
+- [ ] **71. Estado de conexión y actividad de la extensión — Probado.** Diagnóstico inicial: qué pasa, qué sigue funcionando y qué hacer. [Evidencia](disponibilidad-en-inicio.md).
+- [ ] **72. Borrar la cuenta — Pendiente.** Alcance y retención claros, ofreciendo exportar antes.
+- [ ] **73. Guías y apoyo voluntario — Probado.** Actualizar guía y README retirando descripciones desactualizadas. [Evidencia](guia-practica-tool-y-extension.md) y [README](../extension/propio-bridge/README.md).
+- [ ] **74. Funcionamiento con otra pestaña al frente — En curso.** Lectura atrasada/reconexión visibles y coordinación futura multi-PC.
+- [ ] **75. Volumen general y sonidos propios — Pendiente.** Explicar volumen cero, avisos escritos y espacio de archivos.
+- [ ] **76. Planificador de Finanzas hacia la meta diaria — Pendiente.** Desglosar cálculo y mostrar meta propuesta antes de guardar.
+- [ ] **77. Filtros de llamadas y acciones — Pendiente.** Búsqueda Customer ID y filtros estimadas/oficiales/corregidas.
+- [ ] **78. Barra de actividad en vivo — Pendiente.** Consistencia entre barra y tarjetas incluidas llamadas pendientes.
+- [ ] **79. Accesibilidad — Pendiente.** Revisión de teclado, zoom, lector, ayudas táctiles y objetivos de controles.
+
+## Orden de ejecución
+
+1. **Disponibilidad en Inicio y preparación del turno — en curso.** Estado
+   dominante, próxima acción, cuenta regresiva ligada al worker, lectura reciente,
+   conexión/turno diferenciados y detalles de preparación. Cubre 1–2, 6–14, 71,
+   74 y parte de 78. Vista previa en claro/oscuro aprobada; lógica de transporte
+   sin modificar decisiones de Start/Stop ni aceptación de llamadas.
+2. **Corrección de Higher Rate — pendiente.** Separar corregir/recalcular de
+   archivar/conservar, vista previa de llamadas/importes y protección de
+   beneficios históricos. Desglose base/bono/estimación y tasa/moneda: 33–37.
+3. **Recuperación y trazabilidad — pendiente.** Deshacer/papelera temporal para
+   llamadas y acciones recuperables; historial antes/después; restauración con
+   comparación y copia previa; confirmaciones de alcance. Cubre 21–22, 26–27,
+   47, 67 y 69. No restaurar datos ajenos ni sobrescribir cambios posteriores.
+4. **Revisión de llamadas — pendiente.** Estimada/oficial/corregida, resultado
+   por fila de importación, cola y vencimientos, búsqueda Customer ID y filtros.
+   Cubre 15–20 y 77. Conservar silencio en reconciliación automática.
+5. **Jornada, pausas, ACW, adherencia y horario — pendiente.** Alcances visibles,
+   hoy/histórico, continuidad, plan/real, origen de metas y vista previa de
+   desplazamiento/copia. Cubre 3–5, 23–25 y 28–32.
+6. **Finanzas y pagos — pendiente.** Explicar reparto y alcance acumulado,
+   reservado/pagado, recurrencia/reinicio y planificador; pago recibido manual
+   y diferencia contra lo esperado. Cubre 38–42, 45 y 76. Sin movimientos bancarios
+   ni afirmar depósitos a partir de reservas.
+7. **Reportes y calendario — pendiente.** Conclusiones primero, supuestos de
+   proyección, leyendas de días sin datos y exportaciones comprensibles.
+   Cubre 43–44, 46 y 68.
+8. **Avisos y acompañamiento — pendiente.** Resumen de alarmas, sonido/volumen y
+   archivos, progreso hacia descanso, acceso a apoyo, reflexión fácil y consulta.
+   Cubre 48–52 y 75. Mantener elecciones y carácter voluntario.
+9. **Logros — pendiente.** Introducción, reglas y estados de premios/cofres,
+   organización de equipo, creación de premios y entrada/salida del duelo.
+   Cubre 53–60. Armas/práctica mantienen alcance; no crear productividad ficticia.
+10. **Presentación esencial y accesibilidad — pendiente.** Bloques prioritarios
+    configurables; paletas, zoom, foco, teclado, ayudas táctiles, lector y
+    movimiento reducido; reloj/frase, consistencia de actividad viva. Cubre
+    61–62, 78–79. Rediseños puramente visuales requieren su mockup aprobado según
+    instrucciones.md; funcionalidades ya aprobadas conservan sus excepciones.
+11. **Cuenta, sincronización y documentación — pendiente.** Textos de campos
+    editables, detalle de confirmación local/nube y conflictos, recuperación PWA,
+    borrado de cuenta y ayuda actualizadas. Cubre 65–66, 70, 72–73. Mantener Google
+    como entrada pública y configuración de Auth/SMTP vigente.
+12. **Compatibilidad e instalación — pendiente.** Estado de vista nativa de Propio,
+    configuración guiada de páginas/perfil/notas y tamaños para otras PCs;
+    coordinación entre dispositivos antes de permitir iniciadores simultáneos.
+    Cubre 63–64 y ampliación de 14/74. No comprar proveedores ni cambiar seguridad
+    de Windows. La instalación actual confirmada no vuelve a ser pendiente.
+
+## Criterios comunes de entrega
+
+- Conservar funciones actuales, registros, configuración y prioridades.
+- Pruebas de éxito, fallo, cuenta/revisión cambiada, reapertura y ausencia de
+  duplicados en las áreas modificadas. Confirmar CI y SHA de producción.
+- ES/EN, claro/oscuro y mismo layout responsive; montos con moneda secundaria.
+- Registrar qué quedó publicado y qué sigue pendiente en este documento.
+- Segundos oficiales de Propio, procesamiento de Google y Locize conservan su
+  condición externa. La aprobación de mejoras no demuestra reglas de pago ni
+  autoriza compras o nuevas solicitudes de indexación.
