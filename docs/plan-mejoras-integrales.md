@@ -9,8 +9,8 @@ no se considera rota por esa razón.
 ## Lista de control completa
 
 **8 de 79 mejoras publicadas.** 2 en curso y 69 pendientes. La primera entrega
-pasó sus pruebas y está en producción. Falta confirmar la recarga local de la
-extensión 2.2.8; los archivos ya están instalados con respaldo.
+pasó sus pruebas y está en producción. El propietario confirmó la recarga local
+de la extensión 2.2.8, Propio y el tracker.
 
 Estados: **Pendiente**, **En curso**, **Probado** (sin publicar), **Publicado**.
 Una casilla solo se marca cuando todos los criterios del punto están resueltos
@@ -105,7 +105,8 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
   `/api/health` y la nueva sección pública comprobados. Guía y evidencia técnica
   en [Disponibilidad en Inicio](disponibilidad-en-inicio.md).
 - Archivos 2.2.8 instalados con respaldo y preferencias personales conservadas.
-  Recarga local todavía no confirmada. No se marca ninguna otra fase como terminada.
+  El propietario confirmó «Ya recargué todo» el 18/10. No se marca ninguna otra
+  fase como terminada por esa confirmación.
 
 ## Orden de ejecución
 
