@@ -973,7 +973,8 @@ La aplicación funciona en producción con estas bases vigentes:
 - Se retiró la selección aleatoria de 17 frases; se conserva únicamente la frase
   solicitada sobre excusas, primer paso y constancia. Mismo texto al recargar.
 - Texto inicial y render usan la misma frase; traducción ES/EN se evalúa al pintar
-  para respetar el cambio de idioma. Mismos colores, distribución y controles.
+  para respetar el cambio de idioma. Frase blanca en oscuro y negra en claro,
+  por pedido explícito del usuario; distribución y controles conservados.
 - 2.244 textos, build y 19 pruebas de idiomas/render correctos; ocho vistas
   ES/EN, claro/oscuro, móvil/escritorio y recarga estables, sin overflow ni errores.
 
