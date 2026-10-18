@@ -1,4 +1,4 @@
-# Propio · Tracker y vista original · 2.2.8
+# Propio · Tracker y vista original · 2.2.9
 
 La extensión conecta tu tracker con la sesión y el historial de Propio. Su
 registro de llamadas funciona independientemente de la apariencia del portal.

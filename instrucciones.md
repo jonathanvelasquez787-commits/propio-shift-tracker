@@ -431,7 +431,8 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
-- App 622; extensión unificada 2.2.8 (recarga local confirmada por el propietario). Resumen independiente retirado, sin build
+- App 623; extensión unificada 2.2.9 (recarga local por confirmar). La recarga
+  de 2.2.8 está confirmada. Resumen independiente retirado, sin build
   mantenido. El historial oficial compartido y las funciones del tracker siguen
   activos. Guía de 73 funciones en docs/guia-practica-tool-y-extension.md.
 - Google es la entrada pública. Formularios deshabilitados de login/registro y
@@ -458,6 +459,19 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v623 — Conexión, trabajo y cierre de pausas visibles.**
+
+- Preparación distingue detección de conexión y comienzo laboral, usando el
+  cálculo existente: horario, llamada anticipada real o inicio manual. El
+  resumen no escribe registros y rechaza leer desde una pestaña obsoleta.
+- Break/Lunch muestran final previsto, regreso y cierre manual/automático.
+  Una pausa programada no se presenta como activa ni se inventa su cierre.
+- Transporte compatible con estados anteriores; conserva permisos y decisiones
+  de Start/Stop. Catálogos reconstruidos sin duplicar textos entre idiomas,
+  con equivalencia exacta y presupuestos originales.
+- 835 pruebas y recorrido integrado ficticio; revisión de 320 vistas y publicación
+  se registran en el PR. La coordinación multi-PC permanece en el plan.
+
 **v622 — Disponibilidad visible y seguimiento completo.**
 
 - Primera sección de disponibilidad en Inicio, con motivo dominante, cuenta
@@ -480,14 +494,3 @@ futura opera bajo esto, sin excepción:
 - 818 pruebas, 32 días/96 llamadas/736 minutos/$88.32, 112 vistas y recorridos de
   cuota, perfil, edición/borrado, exportación, medianoche y disponibilidad.
   Alcance y límites en [auditoría 18/10](docs/auditoria-profunda-2026-10-18.md).
-
-**v620 — Segunda limpieza y separación de responsabilidades.**
-
-- README duplicado retirado; pendientes separados de confirmaciones, límites y
-  evidencia histórica, conservando protocolos permanentes y tareas abiertas.
-- CSS fuera del HTML, renderizadores semanales separados y escrituras a 13 ids
-  inexistentes retiradas. Se eliminan adornos ocultos y CSS de formularios retirados.
-- Formularios y handlers deshabilitados eliminados; recuperación, Google y
-  protecciones vigentes conservadas. Traducciones generadas fuera de Git.
-- 804 pruebas correctas, sin fallos ni omitidas. Matriz: 23 criterios, 68 suites
-  y 74 módulos. Checkout limpio, recorridos, CI y publicación se registran en el PR.

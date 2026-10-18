@@ -106,11 +106,12 @@ test('content status response from an older document is never forwarded to a new
 function uiFixture(){
  let clock=now,tick,disconnected=false;
  const nodes=Object.fromEntries(['automationPanel','automationTitle','automationDetail','automationCountdown','automationTrackerCheck',
- 'automationPortalCheck','automationScheduleCheck','automationFirstCheck','automationOptionsCheck','automationReturnsCheck','pageHome'].map(id=>[id,{textContent:'',hidden:false}]));
+ 'automationPortalCheck','automationScheduleCheck','automationFirstCheck','automationOptionsCheck','automationReturnsCheck',
+ 'automationConnectionCheck','automationWorkCheck','automationPauseCheck','pageHome'].map(id=>[id,{textContent:'',hidden:false}]));
  const host={document:{getElementById:id=>nodes[id]},setInterval:fn=>{tick=fn;return 1;},clearInterval:()=>{tick=null;},
  MutationObserver:class{observe(){}disconnect(){disconnected=true;}},addEventListener(){},removeEventListener(){}};
- setLanguage('es');const view=installAutomationStatusUi({host,now:()=>clock});
- return {nodes,view,advance(ms){clock+=ms;tick?.();},get disconnected(){return disconnected;}};
+ let work=null;setLanguage('es');const view=installAutomationStatusUi({host,now:()=>clock,getWorkSession:()=>work});
+ return {nodes,view,setWork(value){work=value;tick?.();},advance(ms){clock+=ms;tick?.();},get disconnected(){return disconnected;}};
 }
 
 test('rendered availability ages out, hides on other pages and never saves or starts a call',()=>{
@@ -131,4 +132,54 @@ test('rendered status ignores reordered snapshots and clears immediately when ac
  x.view.update(snapshot);assert.equal(x.nodes.automationTitle.textContent,'Pausada por vos');
  x.view.update(null);assert.equal(x.nodes.automationTitle.textContent,'Esperando información de la extensión');
  assert.equal(x.nodes.automationCountdown.hidden,true);x.view.stop();
+});
+
+test('connection time is only exposed from a recognized portal and old packets remain compatible',()=>{
+ const input=state();input.session={startedAt:iso(now-600000),sessionId:'private-session-id'};
+ let snapshot=createAutomationStatus(input,now);assert.equal(snapshot.connectionAt,iso(now-600000));
+ assert.equal(JSON.stringify(snapshot).includes('private-session-id'),false);
+ input.tabs[1].session='unknown';assert.equal(createAutomationStatus(input,now).connectionAt,null);
+ for(const connectionAt of [iso(now+1),'invalid',123])assert.equal(validateAutomationStatus({...snapshot,connectionAt},now).connectionAt,null);
+ const {connectionAt,pauseActual,pauseEndsAt,...old}=snapshot;
+ snapshot=validateAutomationStatus(old,now);assert.ok(snapshot);assert.equal(snapshot.connectionAt,null);assert.equal(snapshot.pauseActual,null);
+});
+
+test('active and scheduled pauses carry their own end time without reviving a completed scheduled pause',()=>{
+ const input=state(),slot={type:'break',startedAt:iso(now-60000),endedAt:iso(now+600000)};input.preparation.plan.scheduledPauses=[slot];
+ let snapshot=createAutomationStatus(input,now);assert.equal(snapshot.pauseActual,false);assert.equal(snapshot.pauseEndsAt,slot.endedAt);
+ input.preparation.plan.pause={type:'lunch',startedAt:iso(now-30000),endsAt:iso(now+1800000)};
+ snapshot=createAutomationStatus(input,now);assert.equal(snapshot.pauseType,'lunch');assert.equal(snapshot.pauseActual,true);assert.equal(snapshot.pauseEndsAt,input.preparation.plan.pause.endsAt);
+ input.preparation.plan.pause=null;input.preparation.plan.lastPause={...slot,endedAt:iso(now-1)};
+ assert.equal(createAutomationStatus(input,now).pauseType,null);
+});
+
+test('pause explanations distinguish manual return, timed close, missing duration and scheduled-only pauses',()=>{
+ const x=uiFixture(),base={...createAutomationStatus(state(),now),reason:'pause',pauseType:'break',pauseActual:true,pauseEndsAt:iso(now+600000)};
+ x.view.update(base);assert.match(x.nodes.automationDetail.textContent,/Terminá la pausa en la tool; después/);
+ assert.match(x.nodes.automationReturnsCheck.textContent,/Break activado · Lunch apagado/);
+ const timed={...base,options:{...base.options,timed:true}};x.view.update(timed);
+ assert.match(x.nodes.automationDetail.textContent,/extensión intentará cerrar la pausa/);
+ x.view.update({...timed,pauseEndsAt:iso(now-1)});assert.match(x.nodes.automationDetail.textContent,/Esperando confirmar su cierre/);
+ x.view.update({...timed,pauseEndsAt:null});assert.match(x.nodes.automationDetail.textContent,/sin duración prevista confirmada/);
+ assert.match(x.nodes.automationDetail.textContent,/Terminá la pausa en la tool/);
+ x.view.update({...timed,pauseType:'lunch'});assert.match(x.nodes.automationDetail.textContent,/pulsá Start Calls/);
+ x.view.update({...timed,pauseActual:false});assert.match(x.nodes.automationDetail.textContent,/programado hasta/);
+ assert.match(x.nodes.automationDetail.textContent,/No hay una pausa activa/);
+ x.view.update({...timed,paused:true});assert.equal(x.nodes.automationTitle.textContent,'Pausada por vos');
+ assert.doesNotMatch(x.nodes.automationDetail.textContent,/intentará cerrar/);x.view.stop();
+});
+
+test('work start stays separate from observed connection and handles early calls, manual work and closed sessions',()=>{
+ const x=uiFixture(),snapshot={...createAutomationStatus(state(),now),connectionAt:iso(now-1200000),startAt:iso(now+600000),reason:'before-shift'};
+ x.setWork({startedAt:iso(now+600000),endedAt:null,manual:false});x.view.update(snapshot);
+ assert.match(x.nodes.automationConnectionCheck.textContent,/Conexión a Propio detectada:/);
+ assert.match(x.nodes.automationWorkCheck.textContent,/Inicio laboral previsto:/);
+ assert.match(x.nodes.automationWorkCheck.textContent,/no suma ACW ni tiempo de trabajo/);
+ x.setWork({startedAt:iso(now-60000),endedAt:null,manual:false});assert.doesNotMatch(x.nodes.automationWorkCheck.textContent,/llamada antes del horario/);
+ x.setWork({startedAt:iso(now-60000),endedAt:null,manual:false,callAtStart:true});assert.match(x.nodes.automationWorkCheck.textContent,/llamada antes del horario/);
+ x.setWork({startedAt:iso(now-60000),endedAt:null,manual:true});assert.match(x.nodes.automationWorkCheck.textContent,/Inicio laboral manual:/);
+ x.setWork({startedAt:iso(now+600000),endedAt:iso(now-1)});assert.match(x.nodes.automationWorkCheck.textContent,/no sumó tiempo de trabajo/);
+ x.setWork({startedAt:iso(now-600000),endedAt:iso(now-1)});assert.match(x.nodes.automationWorkCheck.textContent,/Cierre de sesión:/);
+ x.advance(16000);assert.equal(x.nodes.automationConnectionCheck.textContent,'');
+ x.setWork(null);assert.equal(x.nodes.automationWorkCheck.textContent,'');x.view.stop();
 });

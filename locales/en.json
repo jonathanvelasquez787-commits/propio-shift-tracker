@@ -2514,5 +2514,22 @@
   "s_a23a537f": "Automatic shift start: {{v0}}",
   "s_87e672c3": "Before your availability hours",
   "s_aa7bb217": "Automatic shift start is off. Break returns and call spacing keep their settings.",
-  "s_5b80a29c": "Shift starter already used"
+  "s_5b80a29c": "Shift starter already used",
+  "s_07934c06": "{{v0}} scheduled until {{v1}}. No active pause is recorded in the tracker; the schedule is respected.",
+  "s_0d21a8f9": "Expected {{v0}} duration: until {{v1}}.",
+  "s_224c2545": "This session closed before work began; it added no working time.",
+  "s_3e3c5557": "The expected {{v0}} duration has elapsed. Waiting for the tracker to confirm its end.",
+  "s_3ef813be": "Connection means when the extension recognized your Propio session. Work starts at your scheduled time or an earlier real call; a manual start uses the time you chose.",
+  "s_46c0ec8d": "End the pause in the tracker and press Start Calls in Propio when you want to return.",
+  "s_74931133": "Session closed: {{v0}}.",
+  "s_75cf3cfd": "Propio connection detected: {{v0}}",
+  "s_83d77db8": "No expected {{v0}} duration confirmed.",
+  "s_87c5341a": "Expected work start: {{v0}}. The earlier connection adds no ACW or working time.",
+  "s_99cffdd9": "Work start: {{v0}}; a call was recorded before the scheduled time.",
+  "s_9d889b79": "The extension will try to end the pause and restore availability if the shift and connection allow it.",
+  "s_a3d4d76d": "Work start: {{v0}}.",
+  "s_c2e88076": "Automatic closing only applies to pauses with automatic return enabled and a configured duration.",
+  "s_c59bfba5": "End the pause in the tracker; the extension will then try to make you available during your shift.",
+  "s_e509da38": "Pauses end when you press End Break or End Lunch in the tracker.",
+  "s_fd50c919": "Manual work start: {{v0}}."
 }

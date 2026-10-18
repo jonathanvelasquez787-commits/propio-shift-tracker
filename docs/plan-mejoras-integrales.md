@@ -8,26 +8,27 @@ no se considera rota por esa razón.
 
 ## Lista de control completa
 
-**8 de 79 mejoras publicadas.** 2 en curso y 69 pendientes. La primera entrega
-pasó sus pruebas y está en producción. El propietario confirmó la recarga local
-de la extensión 2.2.8, Propio y el tracker.
+**8 de 79 mejoras publicadas.** 4 probadas sin publicar, 2 en curso y 65 pendientes.
+La primera entrega está en producción y su recarga 2.2.8 está confirmada. La
+continuación de preparación del turno usa app 623 y extensión 2.2.9; su recarga
+local se confirma aparte.
 
 Estados: **Pendiente**, **En curso**, **Probado** (sin publicar), **Publicado**.
 Una casilla solo se marca cuando todos los criterios del punto están resueltos
 y su evidencia está enlazada. Se conservan las comprobaciones y decisiones de
 no ampliar alcance. Un cambio parcial no cierra la función completa.
 
-- [ ] **1. Registro automático de la conexión a Propio — Pendiente.** Identificar claramente la conexión a Propio y su hora.
-- [ ] **2. Diferencia entre estar conectado y empezar a trabajar — Pendiente.** Presentar conexión y comienzo laboral con explicación de su diferencia.
+- [ ] **1. Registro automático de la conexión a Propio — Probado.** Hora de conexión detectada en la preparación, sin afirmar que es el momento exacto de login. [Evidencia](disponibilidad-en-inicio.md).
+- [ ] **2. Diferencia entre estar conectado y empezar a trabajar — Probado.** Conexión y comienzo laboral separados, incluyendo trabajo anticipado real, inicio manual y cierre antes del horario. [Evidencia](disponibilidad-en-inicio.md).
 - [ ] **3. Inicio y cierre manual de turno — Pendiente.** Confirmación de cierre con alcance y actividades pendientes.
 - [ ] **4. Continuar después de un cierre accidental — Pendiente.** Distinguir continuación del turno y sesión nueva.
 - [ ] **5. Día activo e historial de acciones — Pendiente.** Hacer evidente Hoy frente a una fecha histórica antes de acciones.
 - [x] **6. Vinculación con tu cuenta — Publicado.** Resumen de preparación: cuenta, tracker, Propio y automatismos. [Evidencia](disponibilidad-en-inicio.md).
 - [x] **7. Ponerte disponible al comenzar el turno — Publicado.** Mostrar en Inicio la espera hasta el horario de entrada. [Evidencia](disponibilidad-en-inicio.md).
 - [x] **8. Esperar entre llamadas usando el ACW de la tool — Publicado.** Cuenta regresiva del ACW confirmada por la extensión en Inicio. [Evidencia](disponibilidad-en-inicio.md).
-- [ ] **9. Regreso automático de Break — Pendiente.** Indicar si terminar Break intentará volver a disponibilidad.
+- [ ] **9. Regreso automático de Break — Probado.** Indica si terminar Break intentará volver a disponibilidad o si hace falta Start Calls manual. [Evidencia](disponibilidad-en-inicio.md).
 - [x] **10. Regreso automático de Lunch — Publicado.** Mostrar por separado la preferencia de regreso de Lunch. [Evidencia](disponibilidad-en-inicio.md).
-- [ ] **11. Elegir cómo terminan las pausas — Pendiente.** Modalidad de cierre y hora esperada visibles durante pausas.
+- [ ] **11. Elegir cómo terminan las pausas — Probado.** Modalidad y final previsto visibles para pausas activas; distingue horarios programados, duración ausente y cierre por confirmar. [Evidencia](disponibilidad-en-inicio.md).
 - [x] **12. Pausar todos los automatismos de disponibilidad — Publicado.** Estado de pausa manual y forma de reanudar visibles en la tool. [Evidencia](disponibilidad-en-inicio.md).
 - [x] **13. Reintento cuando no tomás una oferta — Publicado.** Explicar reintento y condición que lo detiene sin interruptores adicionales. [Evidencia](disponibilidad-en-inicio.md).
 - [ ] **14. Prioridades que frenan los clics automáticos — En curso.** Motivo dominante del bloqueo y coordinación antes de uso simultáneo en PCs.

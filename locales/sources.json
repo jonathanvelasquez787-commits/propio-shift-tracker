@@ -360,6 +360,12 @@
       "js/app-main.js"
     ]
   },
+  "s_07934c06": {
+    "source": "{{v0}} programado hasta {{v1}}. No hay una pausa activa registrada en la tool; se respeta el horario.",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_07aef84d": {
     "source": "{{v0}} llamadas completadas · buen golpe.",
     "files": [
@@ -722,6 +728,12 @@
     "source": "Vos atendé. Él te acompaña.",
     "files": [
       "js/game-battle.js"
+    ]
+  },
+  "s_0d21a8f9": {
+    "source": "Duración prevista de {{v0}}: hasta {{v1}}.",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_0d32876e": {
@@ -1882,6 +1894,12 @@
     "source": "se recibe tu correo, tu nombre y la foto de perfil pública que Google comparte al iniciar sesión. No se pide acceso a tu Gmail, tu Drive, tus contactos ni a ningún otro servicio de Google.",
     "files": [
       "privacidad.html"
+    ]
+  },
+  "s_224c2545": {
+    "source": "Esta sesión se cerró antes del comienzo laboral; no sumó tiempo de trabajo.",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_225efe51": {
@@ -3376,6 +3394,12 @@
       "js/app-main.js"
     ]
   },
+  "s_3e3c5557": {
+    "source": "La duración prevista de {{v0}} ya se cumplió. Esperando confirmar su cierre en el tracker.",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_3e86ce49": {
     "source": "Ingresa un monto mayor a 0",
     "files": [
@@ -3404,6 +3428,12 @@
     "source": "Estimar aporte mensual",
     "files": [
       "js/finance-planning.js"
+    ]
+  },
+  "s_3ef813be": {
+    "source": "La conexión indica cuándo la extensión reconoció tu sesión de Propio. El inicio laboral respeta tu horario o una llamada real anterior; si lo iniciás manualmente, usa esa hora.",
+    "files": [
+      "app.html"
     ]
   },
   "s_3efdd8c6": {
@@ -3803,6 +3833,12 @@
     "source": "premios disponibles",
     "files": [
       "js/positive-reinforcement.js"
+    ]
+  },
+  "s_46c0ec8d": {
+    "source": "Terminá la pausa en la tool y pulsá Start Calls en Propio cuando quieras volver.",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_46d21443": {
@@ -6352,6 +6388,12 @@
       "index.html"
     ]
   },
+  "s_74931133": {
+    "source": "Cierre de sesión: {{v0}}.",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_74ca6265": {
     "source": "{{v0}} de ventana",
     "files": [
@@ -6439,6 +6481,12 @@
   },
   "s_75c420bb": {
     "source": "Esperando el control Start Calls",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
+  "s_75cf3cfd": {
+    "source": "Conexión a Propio detectada: {{v0}}",
     "files": [
       "js/automation-ui.js"
     ]
@@ -7207,6 +7255,12 @@
       "js/app-main.js"
     ]
   },
+  "s_83d77db8": {
+    "source": "{{v0}} sin duración prevista confirmada.",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_83f7b73e": {
     "source": "Ciclo: — – —",
     "files": [
@@ -7388,6 +7442,12 @@
     "source": "Disponible en nivel {{v0}}",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_87c5341a": {
+    "source": "Inicio laboral previsto: {{v0}}. La conexión anterior no suma ACW ni tiempo de trabajo.",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_87cc347d": {
@@ -8437,6 +8497,12 @@
       "app.html"
     ]
   },
+  "s_99cffdd9": {
+    "source": "Inicio laboral: {{v0}}; se registró una llamada antes del horario.",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_99d6adcd": {
     "source": "Derrota esta especie para revelarla",
     "files": [
@@ -8623,6 +8689,12 @@
     "source": "Pendiente de reservar",
     "files": [
       "js/finance.js"
+    ]
+  },
+  "s_9d889b79": {
+    "source": "La extensión intentará cerrar la pausa y volver a disponibilidad si el turno y la conexión lo permiten.",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_9d8e8d1e": {
@@ -9005,6 +9077,12 @@
     "source": "Sin conexión — cambios guardados en este navegador",
     "files": [
       "js/boot.js"
+    ]
+  },
+  "s_a3d4d76d": {
+    "source": "Inicio laboral: {{v0}}.",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_a3d71e45": {
@@ -10665,6 +10743,12 @@
       "app.html"
     ]
   },
+  "s_c2e88076": {
+    "source": "Cierre automático solo para pausas con regreso activado y duración configurada.",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_c2eb5dea": {
     "source": "PRUEBA POSITIVA DE HOY",
     "files": [
@@ -10794,6 +10878,12 @@
     "source": "Día libre",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_c59bfba5": {
+    "source": "Terminá la pausa en la tool; después la extensión intentará ponerte disponible dentro del turno.",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_c5a7a1c5": {
@@ -12520,6 +12610,12 @@
       "index.html"
     ]
   },
+  "s_e509da38": {
+    "source": "Las pausas terminan cuando vos pulsás Terminar Break o Terminar Lunch en la tool.",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_e5501c0b": {
     "source": "Variable: importe cambiante",
     "files": [
@@ -13788,6 +13884,12 @@
     "source": "Te faltan {{v0}}{{v1}}",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_fd50c919": {
+    "source": "Inicio laboral manual: {{v0}}.",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_fd56bd87": {
