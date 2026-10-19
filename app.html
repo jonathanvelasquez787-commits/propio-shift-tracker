@@ -156,11 +156,20 @@
 </button>
 </div>
 </div>
-<section class="automation-panel" id="automationPanel" aria-labelledby="automationLabel">
-<div class="automation-heading"><div><p class="automation-label" id="automationLabel">Disponibilidad automática</p><p class="automation-title" id="automationTitle" role="status" aria-live="polite">Esperando información de la extensión</p></div><strong class="automation-countdown" id="automationCountdown" aria-label="Tiempo para el próximo intento" hidden></strong></div>
+<details class="automation-panel" id="automationPanel" aria-labelledby="automationLabel">
+<summary class="automation-heading">
+<span class="automation-icon" aria-hidden="true"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 3v5m8-5v5M6 8h12v4a6 6 0 0 1-12 0V8Zm6 10v3"/></svg></span>
+<span class="automation-identity"><strong class="automation-label" id="automationLabel">Disponibilidad automática</strong><small>Extensión de Chrome · estado en tu tool</small></span>
+<span class="automation-state"><span class="automation-title" id="automationTitle" role="status" aria-live="polite">Esperando información de la extensión</span><strong class="automation-countdown" id="automationCountdown" aria-label="Tiempo para el próximo intento" hidden></strong></span>
+<svg class="automation-chevron" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+</summary>
+<div class="automation-body">
 <p class="automation-detail" id="automationDetail">Conectá la extensión para ver su próxima acción. Los controles manuales siguen disponibles.</p>
-<details class="automation-checks"><summary>Ver preparación del turno</summary><ul><li id="automationTrackerCheck">Esperando confirmar la conexión de la extensión</li><li id="automationPortalCheck">Sesión de Propio pendiente de confirmar</li><li id="automationConnectionCheck"></li><li id="automationWorkCheck"></li><li id="automationScheduleCheck">Horario y descansos pendientes de confirmar</li><li id="automationFirstCheck"></li><li id="automationOptionsCheck">Esperando tus opciones actuales</li><li id="automationReturnsCheck"></li><li id="automationPauseCheck"></li></ul><p>La conexión indica cuándo la extensión reconoció tu sesión de Propio. El inicio laboral respeta tu horario o una llamada real anterior; si lo iniciás manualmente, usa esa hora.</p><p>El estado se actualiza desde la extensión. Si la lectura deja de ser reciente, se muestra la espera de confirmación.</p></details>
-</section>
+<div class="automation-checks"><ul><li id="automationTrackerCheck">Esperando confirmar la conexión de la extensión</li><li id="automationPortalCheck">Sesión de Propio pendiente de confirmar</li><li id="automationConnectionCheck"></li><li id="automationWorkCheck"></li><li id="automationScheduleCheck">Horario y descansos pendientes de confirmar</li><li id="automationFirstCheck"></li><li id="automationOptionsCheck">Esperando tus opciones actuales</li><li id="automationReturnsCheck"></li><li id="automationPauseCheck"></li></ul></div>
+<p class="automation-hint">Las opciones se configuran en el popup de la extensión.</p>
+<details class="automation-help"><summary>Sobre estos horarios</summary><p>La conexión indica cuándo la extensión reconoció tu sesión de Propio. El inicio laboral respeta tu horario o una llamada real anterior; si lo iniciás manualmente, usa esa hora.</p><p>El estado se actualiza desde la extensión. Si la lectura deja de ser reciente, se muestra la espera de confirmación.</p></details>
+</div>
+</details>
 </div>
 </section>
 

@@ -1,3 +1,5 @@
+document.getElementById('extensionVersion').textContent = chrome.runtime.getManifest().version;
+
 const reasons = {
   'portal-closed': 'La pestaña de Propio se cerró durante una llamada. Revisá su final en el tracker.',
   'active-portal-call': 'Esperá a que termine la llamada para pausar o cambiar de cuenta. Para detener la conexión de inmediato, descartá las señales y revisá la llamada activa en el tracker.',

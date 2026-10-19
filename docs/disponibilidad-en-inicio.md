@@ -1,14 +1,27 @@
 # Disponibilidad visible en Inicio
 
 Primera entrega del [plan integral](plan-mejoras-integrales.md), aprobada con
-vista previa claro/oscuro. App 623 y extensión 2.2.9.
+vista previa claro/oscuro. Revisión compacta: app 624 y extensión 2.2.10.
+
+**Ubicación:** esta sección está en la tool web. La extensión le proporciona
+los datos; sus opciones se siguen configurando en el popup de Chrome. En 2.2.8
+se agregó la lectura de estado y en 2.2.9 se ampliaron los datos de conexión y
+pausas. Esas versiones de la extensión no representan pantallas nuevas en su popup.
 
 ## Qué cambia
 
 Debajo de los controles del turno aparece el estado confirmado por la extensión:
 horario, espera por ACW, pausa manual, Break/Lunch, llamada activa/entrante,
-disponibilidad o necesidad de revisar la conexión. «Ver preparación del turno»
-reúne cuenta, portal, horario, iniciador, espera y regresos de las pausas.
+disponibilidad o necesidad de revisar la conexión. El resumen está cerrado por
+defecto e identifica «Extensión de Chrome · estado en tu tool». Pulsarlo abre
+cuenta, portal, horario, iniciador, espera y regresos de las pausas en una lista
+sin viñetas vacías. «Sobre estos horarios» conserva la explicación completa.
+Las opciones se siguen configurando en el popup; la tool solo informa.
+
+Los cinco estilos de la app llevan la misma versión de publicación que el HTML
+y la precarga offline. Así una entrada antigua del caché sin versión no puede
+reemplazar los estilos nuevos. Se corrigió un riesgo confirmado en el build;
+no se inspeccionó el caché privado del navegador del propietario.
 
 La preparación distingue la hora en que la extensión detectó la conexión a
 Propio del comienzo laboral calculado por la tool. Entrar a las 7:42 para un
@@ -66,6 +79,11 @@ controles y sigue siendo quien permite elegir las opciones.
   pausa manual, Break y pérdida de lectura. Ninguna llamada real provocada.
 - 320 vistas: veinte situaciones, ES/EN, claro/oscuro y 320/390/768/1.365 px.
   Sin overflow ni texto cortado; plegado de detalles y navegación fuera de Inicio.
+- Revisión compacta aprobada en ambos temas: 336 vistas incluyen ausencia de
+  conexión, estados anteriores, apertura por teclado, cierre y controles intactos.
+  Regresiones de estilos versionados y recuperación offline en
+  [production-shell.test.mjs](../tests/production-shell.test.mjs) y
+  [service-worker-runtime.test.mjs](../tests/service-worker-runtime.test.mjs).
 
 Los artefactos de navegador quedan fuera de Git. CI y despliegue del commit se
 enlazan en el PR. Esto no certifica todas las variantes nativas de Save ni dos
@@ -77,7 +95,9 @@ La extensión anterior mantiene sus funciones, pero no transmite la nueva lectur
 La carpeta instalada se actualiza con respaldo y se conservan sus preferencias
 personales. La recarga de la extensión y de las páginas se realiza fuera de una
 llamada pendiente; instalar archivos no demuestra que Chrome ya los ejecuta.
-El propietario confirmó la recarga de 2.2.9, Propio y el tracker el 18/10/2026.
+El propietario confirmó la recarga de 2.2.9, Propio y el tracker el 18/10/2026,
+y después confirmó que el popup y Chrome muestran ambos 2.2.10. La revisión
+web 624 no exige volver a instalar o recargar la extensión.
 
 Esta entrega no cierra las 79 mejoras: los puntos compuestos conservan sus
 partes pendientes y la lista distingue pruebas, publicación y recarga local.

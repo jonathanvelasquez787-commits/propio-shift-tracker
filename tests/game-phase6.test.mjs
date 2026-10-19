@@ -445,7 +445,7 @@ test('build mantiene módulos fuente fuera de public y el worker precarga el CSS
   assert.match(build, /Build listo en public\/ sin sourcemaps ni módulos fuente/);
   assert.match(build, /cp\(path\.join\(root, 'css'\), path\.join\(out, 'css'\)/);
   assert.match(worker, /const SHELL = \[/);
-  assert.match(worker, /['"]\/css\/game\.css['"]/);
+  assert.match(worker, /`\/css\/game\.css\?v=\$\{BUILD_VERSION\}`/);
 
   const publicRoot = path.join(root, 'public');
   if (fs.existsSync(publicRoot)) {
