@@ -25,6 +25,7 @@ const SHELL = [
   `/assets/landing.js?v=${BUILD_VERSION}`,
   `/assets/boot.js?v=${BUILD_VERSION}`,
   `/assets/app-main.js?v=${BUILD_VERSION}`,
+  `/assets/detail-views.js?v=${BUILD_VERSION}`,
   `/assets/app-view.js?v=${BUILD_VERSION}`,
   `/assets/monitoring.js?v=${BUILD_VERSION}`,
   `/assets/register-sw.js?v=${BUILD_VERSION}`,

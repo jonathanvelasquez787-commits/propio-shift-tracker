@@ -339,9 +339,19 @@
         "js/finance.js",
         "js/finance-plan-model.js",
         "js/finance-planning.js",
-        "js/higher-rate.js"
+        "js/higher-rate.js",
+        "js/detail-views.js",
+        "js/detail-views-loader.js"
       ],
       "tests": [
+        {
+          "file": "tests/earnings-breakdown.test.mjs",
+          "namedCases": [
+            "earnings breakdown separates recorded and live base without double counting configured or archived bonuses",
+            "official reconciliation moves an estimate to recorded base and preserves its bonus without an extra payment",
+            "detail views stay outside the initial app bundle and retain a release-bound native import and offline entry"
+          ]
+        },
         {
           "file": "tests/higher-rate-archive.test.mjs",
           "namedCases": [

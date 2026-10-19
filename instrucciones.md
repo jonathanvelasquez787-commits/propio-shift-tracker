@@ -320,8 +320,8 @@ futura opera bajo esto, sin excepción:
 - **Mejoras integrales aprobadas el 18/10:** ejecutar las recomendaciones de la
   evaluación de 79 funciones por fases; alcance y estado completo en
   [plan de mejoras](docs/plan-mejoras-integrales.md). Inicio y preparación publicados:
-  12 mejoras cerradas; Higher Rate en curso: limpieza protegida, corrección con
-  recálculo aún pendiente. No perder las fases posteriores al
+  15 mejoras cerradas; 33–35 resueltas en orden. Higher Rate en curso: siguen 36
+  y después 37, con limpieza protegida y recálculo pendiente. No perder las fases posteriores al
   entregar una parte ni considerar pendiente la instalación ya confirmada.
 - **Segundos oficiales de Propio:** confirmar con evidencia si el último minuto
   incompleto se incluye en duración y pago. El formato de hora visible no lo demuestra.
@@ -433,7 +433,7 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
-- App 625; extensión unificada 2.2.10 (versión visible y recarga confirmadas).
+- App 626; extensión unificada 2.2.10 (versión visible y recarga confirmadas).
   Diseño compacto aprobado: resumen cerrado y preparación al pulsarlo.
   El panel de disponibilidad está en la tool;
   el popup de Chrome configura la extensión y esta transmite el estado a la web.
@@ -464,6 +464,19 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v626 — Ganancias, moneda y tarifa, en el orden aprobado.**
+
+- Desglose plegado del día/ciclo: base registrada, estimada en vivo, bono
+  Higher Rate y total. Incluye bonos conservados y se actualiza con la
+  corrección oficial, sin duplicar ni reescribir pagos.
+- Tasa manual consultable y preferencia de moneda conservada. Ajustes explica
+  el alcance de cambiar tarifa y conversión sin alterar pagos históricos.
+- Renderizadores de detalle en módulo versionado y precargado offline;
+  recuperación ante descarga fallida comprobada en Chrome aislado, sin
+  reintentos en cada actualización del reloj. Presupuestos originales intactos.
+- 854 pruebas, builds y recorridos ES/EN, claro/oscuro y cuatro anchos. Alcance
+  y evidencia en docs/ganancias-desglose.md. Siguen 36 y 37; extensión sin cambios.
+
 **v625 — Limpiar Higher Rate conserva llamadas y bonos.**
 
 - Limpieza de ventanas terminadas con vista previa de cantidades e importe
@@ -489,14 +502,3 @@ futura opera bajo esto, sin excepción:
   estilos y funcionamiento offline. No se inspeccionó el caché del usuario.
 - La extensión se conserva en 2.2.10: no es una nueva entrega de su motor.
 - 838 pruebas completas, build ES/EN, wiring y presupuestos correctos.
-
-**Extensión 2.2.10 — Versión real del popup y ubicación de funciones.**
-
-- El rótulo 2.2.6 estaba fijo en el HTML aunque el manifest instalado era 2.2.9.
-  El popup lee ahora chrome.runtime.getManifest().version, la misma fuente que
-  usa Chrome. La app web continúa en 623; sus pantallas no se trasladan al popup.
-- Guía y documentación distinguen panel informativo de la tool y controles de
-  la extensión. El contador de 79 mejoras corresponde al sistema completo.
-- Prueba del popup compilado con versiones distintas y worker desconectado;
-  836 pruebas correctas, builds y revisión visual claro/oscuro. No cambia las
-  decisiones de llamadas, permisos ni preferencias personales.

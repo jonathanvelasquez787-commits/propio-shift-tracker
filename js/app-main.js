@@ -1,6 +1,7 @@
 import { renderWeekSummary as renderWeekSummaryView, renderPayDatesSection as renderPayDatesSectionView } from './weekly-summary.js';
 import { ui, translateText, translateMarkup, displayLocale, translateDocument } from './i18n.js';
 import { applyAppearance, wireAppearance } from './appearance.js';
+import { loadDetailViews } from './detail-views-loader.js';
 import { wireAchievementHelp } from './help-tooltips.js';
 import { wireFinancePlanning, financeInputUsd } from './finance-planning.js';
 import { validFinanceSettings } from './finance-plan-model.js';
@@ -5755,7 +5756,37 @@ function renderPayDatesSection() {
 
     
 
+async function renderEarningsDetails(retry = false) {
+  const panels = ['day', 'cycle'].map(scope => ({ scope,
+    panel: document.getElementById(scope === 'day' ? 'earningsDayBreakdown' : 'earningsCycleBreakdown') }))
+    .filter(({ panel }) => panel?.open);
+  if (!panels.length) return;
+  const view = await loadDetailViews({ retry });
+  for (const { scope, panel } of panels) {
+    if (!panel.open || !panel.isConnected) continue;
+    const wrap = panel.querySelector('[data-earnings-breakdown]');
+    if (!view) {
+      const message = translateText('No se pudo cargar el detalle. Cerrá y abrí esta sección para reintentar.');
+      if (wrap.textContent !== message) wrap.textContent = message;
+      continue;
+    }
+    let sourceCalls, scopeLabel;
+    if (scope === 'day') {
+      sourceCalls = callsForDay(getActiveDayKey());
+      scopeLabel = formatCallDayLabel(getActiveDayKey());
+    } else {
+      const { start, end } = cycleBoundsForOffset();
+      sourceCalls = calls.filter(call => { const date = callDateToDate(call.callDate); return date && date >= start && date <= end; });
+      scopeLabel = ui`${formatCallDayLabel(todayCallDateKey(start))} – ${formatCallDayLabel(todayCallDateKey(end))}`;
+    }
+    view.renderEarningsBreakdown(wrap, sourceCalls, { ui, translateText, escapeHtml, money,
+      financeConvertedInline, parseMoney, higherRateBonusForCall, scopeLabel,
+      exchangeRate: settings.exchangeRate, currencyLabel: settings.currencyLabel });
+  }
+}
+
 function renderHeader() {
+      renderEarningsDetails();
   const now = new Date();
   const dayKey = getActiveDayKey();
   const dayCalls = callsForDay(dayKey);
@@ -7156,8 +7187,8 @@ export function render() {
     document.getElementById('ajustesHeaderBtn').addEventListener('click', openSettingsModal);
     document.getElementById('saveAccountProfileBtn').addEventListener('click', saveAccountProfile);
     document.getElementById('higherRateHeaderBtn').addEventListener('click', () => {
-      syncHigherRateModalFields();
       openModal('higherRateModal');
+      syncHigherRateModalFields();
     });
     // "Avisos" pasa de página del sidebar a ícono del header (a la izquierda de Higher Rate) que
     // abre su propio popup — mismo patrón que ajustesHeaderBtn/higherRateHeaderBtn de arriba.
@@ -7384,6 +7415,9 @@ export function render() {
     document.getElementById('testBreakStartAlarmSoundBtn').addEventListener('click', () => testAlarmSound('breakStart'));
     document.getElementById('testBreakEndAlarmSoundBtn').addEventListener('click', () => testAlarmSound('breakEnd'));
     document.getElementById('addHigherRateWindowBtn').addEventListener('click', addHigherRateWindowRow);
+    for (const id of ['earningsDayBreakdown', 'earningsCycleBreakdown']) {
+      document.getElementById(id).addEventListener('toggle', event => { if (event.target.open) renderEarningsDetails(true); });
+    }
     document.getElementById('purgeHigherRateWindowsBtn').addEventListener('click', purgePastHigherRateWindows);
     // Delegado en el modal completo: las filas viven en 2 listas distintas (#higherRateWindowsList
     // y #higherRateHistoryList).
