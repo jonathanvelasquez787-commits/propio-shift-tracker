@@ -70,6 +70,7 @@ import {
 
 import {
   addHigherRateWindowRow,
+  openHigherRateReview,
   higherRateBonusBreakdownForCalls,
   higherRateBonusChipsHtml,
   higherRateBonusForCall,
@@ -5255,7 +5256,7 @@ function renderPayDatesSection() {
       onGameCallsChanged, formatBlockDurationLabel,
       formatCallDayLabel, formatHHMM, formatMinutes, iconHtml, isoDateFromDayKey, makeLocalId,
       mergeIntervals, minutesToHHMM, money, render, saveAll, timeLabel, toDateFromInputs, toMinutes, toast,
-      todayCallDateKey, todayRange, canPersistLocalChanges, convertedAmountText,
+      todayCallDateKey, todayRange, canPersistLocalChanges, convertedAmountText, openModal, closeModal,
     });
     configureSettingsContext({
       DEFAULT_USER_EMOJI, EMOJI_CHOICES, RATE, closeModal, convertedAmountText, currencyCeilFromUsdAmount,
@@ -7422,6 +7423,8 @@ export function render() {
     // Delegado en el modal completo: las filas viven en 2 listas distintas (#higherRateWindowsList
     // y #higherRateHistoryList).
     document.getElementById('higherRateModal').addEventListener('click', (e) => {
+      const review = e.target instanceof Element ? e.target.closest('[data-review-hr-window]') : null;
+      if (review) { openHigherRateReview(review.closest('.hr-window-card').getAttribute('data-hr-window-id')); return; }
       // El pill de nivel escribe en el <select class="hr-window-tier-input"> oculto de siempre.
       const tierBtn = e.target instanceof Element ? e.target.closest('[data-hr-tier-btn]') : null;
       if (tierBtn) {

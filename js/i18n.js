@@ -21,6 +21,15 @@ export function translateText(source) {
   return source.slice(0, source.indexOf(core)) + translated + source.slice(source.indexOf(core) + core.length);
 }
 let storedMessages;
+export function registerDetailTranslations(extra) {
+  if (!extra) return;
+  for (const code of ['es', 'en']) {
+    const entries = extra[code]?.translation || {};
+    Object.assign(resources[code].translation, entries);
+    instance.addResourceBundle(code, 'translation', entries, true, true);
+  }
+  storedMessages = null;
+}
 // Only for app-authored saved messages, never personal names or notes.
 export function translateStoredText(source, targetLanguage = language) {
   if (typeof source !== 'string') return source;

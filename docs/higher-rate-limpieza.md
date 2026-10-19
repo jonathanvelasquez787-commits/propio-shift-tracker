@@ -32,13 +32,12 @@ limpiando y recargando. El caso conserva $1.50 de ganancias ($1.20 base más
 $0.30 de bono), la llamada y la ventana futura, sin errores JavaScript ni
 desborde de página. Datos y backend ficticios; no se modificó la cuenta humana.
 
-## Lo que sigue pendiente
+## Corrección independiente
 
-El punto 37 no está terminado: falta «Corregir y recalcular», con vista previa
-específica y confirmación explícita. Esa acción será independiente de limpiar
-el historial. El editor conserva mientras tanto su comportamiento actual de
-conservar bonos al mover fechas/horas. Los puntos 33–36 también siguen en el
-plan; no se consideran completados por mejorar esta limpieza.
+App 627 completa el punto 37 con «Corregir promoción», vista previa y
+confirmación del recálculo desde «Revisar llamadas». La edición normal de
+fecha, horas o nivel conserva los bonos registrados. Limpiar sigue siendo
+independiente y nunca recalcula. [Alcance y pruebas](higher-rate-revision.md).
 
 El alcance de conservación aquí son los bonos de llamadas ya registradas.
 No se afirma que una ventana retirada permita calcular el bono de llamadas

@@ -25,6 +25,13 @@ Este archivo tiene dos partes:
 
 **ESTILO DE LAYOUT DE LA APP (leer antes de cualquier rediseño visual)**
 
+Preferencia permanente del propietario: las interfaces deben verse cuidadas,
+atractivas y fáciles de entender. Evitar pantallas planas, bloques enormes de
+texto y controles sin jerarquía. Priorizar un resumen breve, acciones claras,
+espaciado consistente y detalles extensos plegados, sin esconder información
+necesaria. Reutilizar la identidad de la app y comprobar el resultado visual
+en móvil/escritorio y claro/oscuro; funcionar correctamente no basta.
+
 Todo rediseño 100% visual de esta app sigue el mismo protocolo:
 
 1. Mockup VISUAL (no texto/ASCII) de la sección a rediseñar, reutilizando los
@@ -320,8 +327,8 @@ futura opera bajo esto, sin excepción:
 - **Mejoras integrales aprobadas el 18/10:** ejecutar las recomendaciones de la
   evaluación de 79 funciones por fases; alcance y estado completo en
   [plan de mejoras](docs/plan-mejoras-integrales.md). Inicio y preparación publicados:
-  15 mejoras cerradas; 33–35 resueltas en orden. Higher Rate en curso: siguen 36
-  y después 37, con limpieza protegida y recálculo pendiente. No perder las fases posteriores al
+  17 mejoras cerradas; 33–37 resueltas en orden. Sigue la fase 3: recuperación
+  y trazabilidad. No perder las fases posteriores al
   entregar una parte ni considerar pendiente la instalación ya confirmada.
 - **Segundos oficiales de Propio:** confirmar con evidencia si el último minuto
   incompleto se incluye en duración y pago. El formato de hora visible no lo demuestra.
@@ -417,10 +424,10 @@ futura opera bajo esto, sin excepción:
 - `parseMoney` conserva la semántica de los pagos antiguos importados para no
   cambiar su deduplicación. Las entradas manuales de asignación de Finanzas
   usan otro parser estricto: `"12,50"` corresponde a 12.50, también en moneda local.
-- Higher Rate: editar la fecha o el horario de una ventana congela el bono ya
-  ganado por las llamadas que calificaban antes del cambio (a propósito).
-  Efecto secundario: corregir una hora mal tecleada deja el bono viejo
-  pegado además del nuevo.
+- Higher Rate: la edición normal conserva el bono ya registrado, también al
+  cambiar nivel. Una corrección de fecha/horas/nivel requiere «Revisar llamadas»
+  → «Corregir promoción», vista previa y confirmación del recálculo. Limpiar
+  conserva bonos y no reconstruye ventanas retiradas para llamadas aún ausentes.
 - Una llamada en vivo sigue redondeando a 1 min como mínimo
   (`buildLiveCallCandidate`); el importador y los modales sí aceptan 0 min.
 - Cambiar el ancla del ciclo de pago mueve el inicio de TODAS las semanas
@@ -433,7 +440,7 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
-- App 626; extensión unificada 2.2.10 (versión visible y recarga confirmadas).
+- App 627; extensión unificada 2.2.10 (versión visible y recarga confirmadas).
   Diseño compacto aprobado: resumen cerrado y preparación al pulsarlo.
   El panel de disponibilidad está en la tool;
   el popup de Chrome configura la extensión y esta transmite el estado a la web.
@@ -464,6 +471,19 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v627 — Revisar y corregir Higher Rate sin mezclarlo con limpiar.**
+
+- Revisión por ventana con llamadas, gracia, motivos y bonos conservados.
+  Fecha/horas/nivel del aviso se ingresan explícitamente; no hay lector de avisos.
+- Edición normal conserva nivel ganado. Corrección separada con vista previa
+  de llamadas e importes, confirmación y moneda secundaria. Pago base y bonos
+  de otras promociones permanecen; Finanzas/Logros siguen el resultado guardado.
+- Protección contra cambios de cuenta/datos, doble confirmación y rechazo o
+  interrupción al guardar; cancelar no modifica nada y recargar conserva el resultado.
+- Traducciones del detalle diferidas sin ampliar presupuestos iniciales;
+  detalle con presupuesto revisado a 30 KB. Pruebas y límites en
+  docs/higher-rate-revision.md. Sigue recuperación/trazabilidad. Extensión sin cambios.
+
 **v626 — Ganancias, moneda y tarifa, en el orden aprobado.**
 
 - Desglose plegado del día/ciclo: base registrada, estimada en vivo, bono
@@ -489,16 +509,3 @@ futura opera bajo esto, sin excepción:
   correctos. Evidencia y límites en docs/higher-rate-limpieza.md.
 - El recálculo explícito sigue pendiente y nunca formará parte de limpiar.
   La extensión continúa en 2.2.10; esta entrega modifica solo la tool web.
-
-**v624 — Resumen compacto y estilos de la misma publicación.**
-
-- El panel web identifica el estado de la extensión, muestra el motivo y el
-  contador sin desplegar toda la explicación. Preparación y ayuda plegadas,
-  sin perder los datos existentes; mismo JS, ids y decisiones automáticas.
-- Mockup claro/oscuro aprobado y diseño único responsive. 336 vistas aisladas
-  ES/EN, cuatro anchos y 21 estados, con apertura por teclado y sin desbordes.
-- El build versiona los cinco CSS de la app junto con HTML y precarga offline.
-  Evita reutilizar una entrada vieja sin versión; regresiones de mezcla de
-  estilos y funcionamiento offline. No se inspeccionó el caché del usuario.
-- La extensión se conserva en 2.2.10: no es una nueva entrega de su motor.
-- 838 pruebas completas, build ES/EN, wiring y presupuestos correctos.

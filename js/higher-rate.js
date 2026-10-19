@@ -7,17 +7,50 @@ let HIGHER_RATE_EARLY_GRACE_MIN, HIGHER_RATE_TIERS, appConfirm, callDateKeyFromV
 let callsForDay, dayKeyFromIsoDate, escapeHtml, financeConvertedInline, financeRunAutoFillCascade, formatBlockDurationLabel;
 let formatCallDayLabel, formatHHMM, formatMinutes, iconHtml, isoDateFromDayKey, makeLocalId;
 let mergeIntervals, minutesToHHMM, money, onGameCallsChanged, render, saveAll, timeLabel, toDateFromInputs, toMinutes;
-let toast, todayCallDateKey, todayRange, canPersistLocalChanges, convertedAmountText;
+let toast, todayCallDateKey, todayRange, canPersistLocalChanges, convertedAmountText, openModal, closeModal;
 
 export function configureHigherRateContext(context) {
   ({ HIGHER_RATE_EARLY_GRACE_MIN, HIGHER_RATE_TIERS, appConfirm, callDateKeyFromValue, callDateToDate,
     callsForDay, dayKeyFromIsoDate, escapeHtml, financeConvertedInline, financeRunAutoFillCascade, formatBlockDurationLabel,
     formatCallDayLabel, formatHHMM, formatMinutes, iconHtml, isoDateFromDayKey, makeLocalId,
     mergeIntervals, minutesToHHMM, money, onGameCallsChanged, render, saveAll, timeLabel, toDateFromInputs, toMinutes, toast,
-    todayCallDateKey, todayRange, canPersistLocalChanges, convertedAmountText } = context);
+    todayCallDateKey, todayRange, canPersistLocalChanges, convertedAmountText, openModal, closeModal } = context);
 }
 
-    function higherRateWindowBounds(window) {
+export async function openHigherRateReview(windowId) {
+  const owner = settings;
+  const view = await loadDetailViews({ retry: true });
+  if (settings !== owner) return;
+  if (!view) { toast(translateText('No se pudo cargar el detalle. Cerrá y abrí esta sección para reintentar.')); return; }
+  view.openHigherRateReview({ ui, translateText, escapeHtml, money, financeConvertedInline, displayLocale,
+    HIGHER_RATE_TIERS, HIGHER_RATE_EARLY_GRACE_MIN, higherRateBonusForCall, dayKeyFromIsoDate, isoDateFromDayKey,
+    stamp: () => ({ owner: settings, callsOwner: calls, revision: JSON.stringify([settings, calls]), used: false }),
+    apply: applyHigherRateCorrection,
+    bounds: higherRateWindowBounds, qualifies: callQualifiesForHigherRateWindow,
+    data: () => ({ owner: settings, windows: settings.higherRateWindows || [], calls }), openModal, closeModal }, windowId);
+}
+
+export async function applyHigherRateCorrection(windowId, draft, stamp) {
+  const view = await loadDetailViews();
+  if (!view || !stamp || stamp.used || !canPersistLocalChanges() || stamp.owner !== settings
+    || stamp.callsOwner !== calls || stamp.revision !== JSON.stringify([settings, calls])) return false;
+  const plan = view.higherRateCorrectionPlan(calls, settings.higherRateWindows || [], windowId, draft, {
+    HIGHER_RATE_TIERS, isoDateFromDayKey, bounds: higherRateWindowBounds, higherRateBonusForCall,
+  });
+  if (!plan || !plan.hasChanges) return false;
+  stamp.used = true;
+  const previous = higherRateMutationSnapshot(), gameBefore = higherRateGameBonusSnapshot();
+  settings.higherRateWindows = plan.windows;
+  for (const call of calls) if (call.frozenHigherRateBonus?.windowId === windowId) delete call.frozenHigherRateBonus;
+  let saved = false;
+  try { financeRunAutoFillCascade(); saved = saveAll({ render: false }) !== false; } catch { /* La revisión conserva el estado anterior ante un guardado interrumpido. */ }
+  if (!saved) { restoreHigherRateMutation(previous); render(); return false; }
+  reconcileHigherRateGameChanges(gameBefore);
+  render(); renderHigherRateWindowsEditor(settings.higherRateWindows || []);
+  return true;
+}
+
+    export function higherRateWindowBounds(window) {
       const start = toDateFromInputs(window.date, timeLabel(window.start));
       let end = toDateFromInputs(window.date, timeLabel(window.end));
       if (!start || !end) return null;
@@ -32,7 +65,7 @@ export function configureHigherRateContext(context) {
       return { start, end };
     }
 
-    function callQualifiesForHigherRateWindow(callStartISO, window) {
+    export function callQualifiesForHigherRateWindow(callStartISO, window) {
       const callStart = new Date(callStartISO);
       const bounds = higherRateWindowBounds(window);
       if (!bounds || Number.isNaN(callStart.getTime())) return false;
@@ -42,7 +75,7 @@ export function configureHigherRateContext(context) {
 
     // Bono de UNA llamada, null si no califica. Solo se comparan ventanas de la MISMA fecha; si
     // califica más de una, gana la de mayor bono por minuto.
-    export function higherRateBonusForCall(call) {
+    export function higherRateBonusForCall(call, windowOverride) {
       // Bono ya congelado (ver freezeHigherRateBonusesForWindowIds): la ventana que lo generó ya no
       // existe, pero el nivel que calificó se conserva.
       if (call.frozenHigherRateBonus) {
@@ -62,7 +95,7 @@ export function configureHigherRateContext(context) {
           windowId: call.frozenHigherRateBonus.windowId,
         };
       }
-      const windows = settings.higherRateWindows || [];
+      const windows = Array.isArray(windowOverride) ? windowOverride : settings.higherRateWindows || [];
       if (!windows.length) return null;
       const qualifying = windows.filter(w => callQualifiesForHigherRateWindow(call.startISO, w));
       if (!qualifying.length) return null;
@@ -217,6 +250,7 @@ export function configureHigherRateContext(context) {
             <option value="gold" ${tier === 'gold' ? 'selected' : ''}>Gold (+$0.03)</option>
           </select>
           <div class="hr-window-tier-row" role="group" aria-label="Nivel de la ventana">${tierButtonsHtml}</div>
+          <button type="button" class="gap-edit-btn" data-review-hr-window>Revisar llamadas</button>
         </div>
       `;
     }
@@ -455,18 +489,15 @@ export function configureHigherRateContext(context) {
       const oldWindows = settings.higherRateWindows || [];
       const oldById = new Map(oldWindows.map(w => [w.id, w]));
       const newWindows = readHigherRateWindowsFromEditor();
-      // Un cambio de nivel no entra aquí: no altera SI la ventana aplica, y congelar el bono
-      // dejaría pegado el nivel viejo.
       const changedIds = newWindows
         .filter(nw => {
           const old = oldById.get(nw.id);
-          return !old || old.date !== nw.date || old.start !== nw.start || old.end !== nw.end;
+          return !old || old.date !== nw.date || old.start !== nw.start || old.end !== nw.end || old.tier !== nw.tier;
         })
         .map(w => w.id);
       const editedIds = changedIds.filter(id => oldById.has(id));
       if (editedIds.length) freezeHigherRateBonusesForWindowIds(editedIds);
       settings.higherRateWindows = newWindows;
-      retuneFrozenHigherRateTiers(newWindows);
       // Si el bono cambia, también puede bajar el dinero real disponible en Finanzas.
       financeRunAutoFillCascade();
       // SaveAll en vez de saveSettingsOnly: freezeHigherRateBonusesForWindowIds puede haber marcado
@@ -480,9 +511,7 @@ export function configureHigherRateContext(context) {
       reconcileHigherRateGameChanges(gameBefore);
       render();
       renderHigherRateLiveCard();
-      // Editar una ventana ya existente (ej. su hora de fin) no refrescaba "Próximos días" — ese
-      // bloque se quedaba mostrando el horario viejo hasta reabrir el modal, porque nada aquí
-      // volvía a llamar a renderHigherRateDayStats.
+      // El resumen y el editor usan la misma ventana recién guardada.
       renderHigherRateDayStats();
       notifyHigherRateRetroactiveMatches(changedIds);
       notifyHigherRateMidnightCrossingWindows();
@@ -567,28 +596,7 @@ export function configureHigherRateContext(context) {
       return true;
     }
 
-    // Congela el bono ya ganado antes de que la ventana desaparezca de settings, por cualquier vía.
-    //
-    // Un cambio de NIVEL en una ventana que sigue viva (mismo id) sí debe corregir el bono de
-    // llamadas ya congeladas — para eso existe esta función. Pero solo si esa llamada TODAVÍA
-    // califica por horario contra la ventana tal como está hoy: si el bono se congeló porque la
-    // ventana se acortó/movió y la llamada quedó fuera del horario actual, un cambio de nivel
-    // posterior no debe "revivirla" con el nivel nuevo — se queda con lo que ya tenía congelado.
-    function retuneFrozenHigherRateTiers(windows) {
-      let changed = 0;
-      calls.forEach(c => {
-        const frozen = c.frozenHigherRateBonus;
-        if (!frozen) return;
-        const w = (windows || []).find(x => x.id === frozen.windowId);
-        const meta = w && HIGHER_RATE_TIERS[w.tier];
-        if (!meta || w.tier === frozen.tier) return;
-        if (!callQualifiesForHigherRateWindow(c.startISO, w)) return;
-        c.frozenHigherRateBonus = { ...frozen, tier: w.tier, amount: meta.bonusPerMin * (Number(c.durationMin) || 0) };
-        changed++;
-      });
-      return changed;
-    }
-
+    // Conserva el nivel ganado antes de editar o retirar una ventana; corregir requiere la vista previa.
     function freezeHigherRateBonusesForWindowIds(windowIds) {
       const idSet = new Set(windowIds);
       let frozenCount = 0;
@@ -614,7 +622,7 @@ export function configureHigherRateContext(context) {
         return false;
       }
       const pastIds = pastWindows.map(w => w.id);
-      const earned = calls.map(higherRateBonusForCall).filter(b => b && pastIds.includes(b.windowId));
+      const earned = calls.map(call => higherRateBonusForCall(call)).filter(b => b && pastIds.includes(b.windowId));
       const total = earned.reduce((sum, b) => sum + b.amount, 0);
       const revision = JSON.stringify([settings, calls]);
       let settled = false;

@@ -8,11 +8,12 @@ no se considera rota por esa razón.
 
 ## Lista de control completa
 
-**15 de 79 mejoras publicadas.** 3 en curso y 61 pendientes. La preparación del
+**17 de 79 mejoras publicadas.** 2 en curso y 60 pendientes. La preparación del
 turno usa app 624 y extensión 2.2.10, con publicación comprobada y recarga de la
 extensión, Propio y tracker confirmada por el propietario. App 625 refuerza la
 limpieza de Higher Rate; app 626 incorpora, en orden, el desglose de ganancias,
-consulta de conversión y alcance de tarifa. Falta cerrar ventanas/correcciones.
+consulta de conversión y alcance de tarifa. App 627 completa 36 y 37: revisión
+por ventana y corrección con vista previa, conservando bonos al editar o limpiar.
 
 Estas 79 mejoras corresponden al sistema completo. El panel de disponibilidad
 y preparación se ve en la **tool web**; el popup de la **extensión de Chrome**
@@ -61,8 +62,8 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 - [x] **33. Ganancias de hoy y del ciclo — Publicado.** Desglose plegado de base registrada, estimada en vivo, Higher Rate calculado y total; actualización tras correcciones oficiales y navegación por día/ciclo. [Evidencia](ganancias-desglose.md).
 - [x] **34. Moneda secundaria e intercambio del monto principal — Publicado.** Conserva intercambio persistente y equivalencia debajo; la tasa manual se consulta en el desglose. [Evidencia](ganancias-desglose.md).
 - [x] **35. Tasa base por minuto — Publicado.** Explica nuevas estimaciones/meta general y conservación de pagos, bonos y metas especiales; guardar mantiene su alcance anterior. [Evidencia](ganancias-desglose.md).
-- [ ] **36. Ventanas de Higher Rate — Pendiente.** Revisar llamadas que califican y explicar gracia; evaluar carga de promociones.
-- [ ] **37. Conservar bonos ganados al editar o limpiar ventanas — En curso.** La limpieza conserva los bonos registrados y muestra cantidades antes de confirmar, con protección ante cambios de cuenta/datos y fallo al guardar. Falta la acción separada de corregir/recalcular con vista previa. [Evidencia y alcance](higher-rate-limpieza.md).
+- [x] **36. Ventanas de Higher Rate — Publicado.** Revisión de llamadas por ventana, gracia y motivos; carga mediante fecha, horas y nivel comprobables del aviso. [Evidencia y alcance](higher-rate-revision.md).
+- [x] **37. Conservar bonos ganados al editar o limpiar ventanas — Publicado.** Edición normal y limpieza conservan bonos; corrección explícita con vista previa antes/después y confirmación, reversión ante fallo y protección de cuenta/revisión. [Evidencia y alcance](higher-rate-revision.md).
 - [ ] **38. Gastos, ahorro y categorías — Pendiente.** Distinguir objetivo, reservado, pagado y pendiente en las filas.
 - [ ] **39. Asignación manual o automática del dinero ganado — Pendiente.** Explicar destino de cada asignación manual/automática.
 - [ ] **40. Registrar pagos de gastos — Pendiente.** Separación visual de reserva y pago real registrado.
@@ -91,7 +92,7 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 - [ ] **63. Vista original de Propio — Pendiente.** Explicar estado y dependencia del componente nativo de Propio.
 - [ ] **64. Escritorio de trabajo al iniciar Windows — Pendiente.** Configuración guiada para otras PCs de páginas/perfil/notas/tamaños.
 - [ ] **65. Cuenta y perfil — Pendiente.** Rótulos acordes con campos editables y acceso Google vigente.
-- [ ] **66. Guardado local y sincronización — Pendiente.** Detalle visible de guardado local/nube y conflictos.
+- [ ] **66. Guardado local y sincronización — Pendiente.** Detalle visible de guardado local/nube y conflictos. Revisar el reconocimiento tras una subida al salir: QA detectó un conflicto conservador con contenido de llamadas equivalente en distinto orden y revisión local anterior; se conservaron ambas versiones. Reproducir con el orden real de la consulta antes de cambiar la comparación.
 - [ ] **67. Respaldo completo JSON — Pendiente.** Comparación al restaurar y copia automática previa al reemplazo.
 - [ ] **68. Reportes CSV y PDF — Pendiente.** Explicar período/datos incluidos y diferencia con respaldo.
 - [ ] **69. Reinicios y borrados — Pendiente.** Alcances específicos y recuperación en acciones destructivas.
@@ -142,13 +143,12 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
    sin modificar decisiones de Start/Stop ni aceptación de llamadas. Los puntos
    14 y 74 conservan abierta su parte de coordinación entre PCs en la fase 12;
    la consistencia de la barra de actividad del punto 78 sigue pendiente.
-2. **Corrección de Higher Rate — en curso.** Limpiar el historial solo quita las
+2. **Corrección de Higher Rate — publicada.** Limpiar el historial solo quita las
    ventanas de la lista: conserva los bonos ya registrados en las llamadas y
    no reasigna Finanzas. Recalcular nunca forma parte de esa limpieza.
-   Falta separar la acción explícita de corregir/recalcular de
-   archivar/conservar, vista previa de llamadas/importes y protección de
-   beneficios históricos. 33–35 publicados en orden; siguen 36 y 37. El bloque
-   completo no está cerrado hasta comprobar sus correcciones.
+   La acción explícita de corregir/recalcular muestra llamadas e importes antes
+   y después, con confirmación y protección de beneficios de otras promociones.
+   33–37 resueltos en orden. [Alcance y pruebas](higher-rate-revision.md).
 3. **Recuperación y trazabilidad — pendiente.** Deshacer/papelera temporal para
    llamadas y acciones recuperables; historial antes/después; restauración con
    comparación y copia previa; confirmaciones de alcance. Cubre 21–22, 26–27,

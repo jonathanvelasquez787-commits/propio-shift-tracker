@@ -15,9 +15,9 @@ function functions(file, names) {
   }).join('\n');
 }
 
-test('a rejected Higher Rate tier edit cannot persist game receipts before its settings snapshot; retry reconciles once', () => {
+test('a rejected retroactive Higher Rate window cannot persist game receipts before its settings snapshot; retry reconciles once', () => {
   const initialWindow = { id: 'hr', date: '2026-10-12', start: '08:00', end: '09:00', tier: 'bronze' };
-  const draft = [{ ...initialWindow, tier: 'gold' }];
+  const draft = [initialWindow, { ...initialWindow, id: 'new-gold', tier: 'gold' }];
   const settings = { higherRateWindows: [initialWindow] };
   const state = { game: { ledger: {} } };
   const calls = [{ id: 'call', callDate: '10/12/2026', startISO: new Date('2026-10-12T08:15:00').toISOString(), durationMin: 10 }];
@@ -37,7 +37,7 @@ test('a rejected Higher Rate tier edit cannot persist game receipts before its s
       removeItem: key => values.delete(key) },
     toast: message => effects.push(message),
     render() {
-      if (settings.higherRateWindows[0]?.tier === 'gold') {
+      if (settings.higherRateWindows.some(w => w.tier === 'gold')) {
         state.game.ledger['render-reward'] = true;
         h.saveStateOnly();
       }
@@ -54,7 +54,7 @@ test('a rejected Higher Rate tier edit cannot persist game receipts before its s
     ['safeLocalStorageSet', 'canPersistLocalChanges', 'saveAll', 'persistFullSnapshot', 'saveStateOnly'])
     + '\n' + functions('../js/higher-rate.js', ['higherRateWindowBounds', 'callQualifiesForHigherRateWindow',
       'higherRateBonusForCall', 'higherRateGameBonusSnapshot', 'reconcileHigherRateGameChanges',
-      'retuneFrozenHigherRateTiers', 'freezeHigherRateBonusesForWindowIds', 'higherRateMutationSnapshot',
+      'freezeHigherRateBonusesForWindowIds', 'higherRateMutationSnapshot',
       'restoreHigherRateMutation', 'saveHigherRateWindowsFromEditor']), h);
   const rejected = h.saveHigherRateWindowsFromEditor();
   assert.deepEqual(values, before);
@@ -63,11 +63,11 @@ test('a rejected Higher Rate tier edit cannot persist game receipts before its s
   assert.deepEqual(state.game.ledger, {});
   assert.ok(!effects.includes('game success') && !effects.includes('retroactive success'));
   assert.equal(settings.higherRateWindows[0].tier, 'bronze');
-  assert.equal(draft[0].tier, 'gold', 'the unsaved editor draft remains available for retry');
+  assert.equal(draft[1].tier, 'gold', 'the unsaved editor draft remains available for retry');
   accepted = true;
   assert.equal(h.saveHigherRateWindowsFromEditor(), true);
   assert.equal(reconciliations, 1);
-  assert.equal(JSON.parse(values.get('settings')).higherRateWindows[0].tier, 'gold');
+  assert.equal(JSON.parse(values.get('settings')).higherRateWindows[1].tier, 'gold');
   assert.equal(JSON.parse(values.get('state')).game.ledger['10/12/2026'], .3);
   const restored = JSON.parse(values.get('state'));
   assert.equal(restored.game.ledger['10/12/2026'], .3);
@@ -98,7 +98,7 @@ for (const action of ['saveHigherRateWindowsFromEditor', 'removeHigherRateWindow
       });
       vm.runInContext(functions('../js/higher-rate.js', ['higherRateWindowBounds', 'callQualifiesForHigherRateWindow',
         'higherRateBonusForCall', 'higherRateGameBonusSnapshot', 'reconcileHigherRateGameChanges',
-        'retuneFrozenHigherRateTiers', 'freezeHigherRateBonusesForWindowIds', 'higherRateMutationSnapshot',
+        'freezeHigherRateBonusesForWindowIds', 'higherRateMutationSnapshot',
         'restoreHigherRateMutation', action]), h);
       assert.equal(h[action]('hr'), false);
       assert.equal(JSON.stringify({ settings, call }), before);
@@ -107,7 +107,7 @@ for (const action of ['saveHigherRateWindowsFromEditor', 'removeHigherRateWindow
       accepted = true;
       assert.equal(h[action]('hr'), true);
       assert.ok(Math.abs(settings.financeCategories.otro.rows[0].assignedAmount - .3) < 1e-12);
-      assert.equal(call.frozenHigherRateBonus.tier, action === 'removeHigherRateWindowRowAt' ? 'bronze' : 'gold');
+      assert.equal(call.frozenHigherRateBonus.tier, 'bronze');
       assert.equal(settings.higherRateWindows.length, action === 'removeHigherRateWindowRowAt' ? 0 : 1);
     });
   }

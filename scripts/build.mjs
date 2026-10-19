@@ -8,7 +8,7 @@ import { createLocalizedLanding } from './landing-pages.mjs';
 import { createInterpreterGuide } from './interpreter-guide.mjs';
 import { INTERPRETER_GUIDE_PATHS } from '../js/landing-meta.js';
 import { entryBundleOptions } from './bundle-entry.mjs';
-import { localeResourceScript } from './locale-bundle.mjs';
+import { localeResourceScript, partitionLocaleResources } from './locale-bundle.mjs';
 
 const root = process.cwd();
 const out = path.join(root, 'public');
@@ -20,7 +20,8 @@ await rm(out, { recursive: true, force: true });
 await mkdir(assets, { recursive: true });
 await mkdir(path.join(out, 'icons'), { recursive: true });
 const resources = JSON.parse((await readFile(catalogModule, 'utf8')).slice('export const resources = '.length).trim().replace(/;$/, ''));
-await minifyFile(path.join(assets, 'locales.js'), localeResourceScript(resources));
+const catalogs = partitionLocaleResources(resources, JSON.parse(await readFile(path.join(root, 'locales/sources.json'), 'utf8')));
+await minifyFile(path.join(assets, 'locales.js'), localeResourceScript(catalogs.initial));
 
 const entries = {
   'theme-init': 'js/theme-init.js',
@@ -44,7 +45,11 @@ for (const [name, input] of Object.entries(entries)) {
     makeAbsoluteExternalsRelative: options.makeAbsoluteExternalsRelative,
     plugins: [nodeResolve({ browser: true }), {
       name: 'shared-locale-data',
-      load(id) { if (id === catalogModule) return 'export const resources = window.pstLocaleResources;'; },
+      async load(id) {
+        if (id === catalogModule) return 'export const resources = window.pstLocaleResources;';
+        if (id === path.join(root, 'js/detail-views.js')) return (await readFile(id, 'utf8'))
+          .replace('export const detailTranslations = null;', `export const detailTranslations = ${JSON.stringify(catalogs.details)};`);
+      },
     }],
     onwarn(warning, warn) {
       if (warning.code === 'CIRCULAR_DEPENDENCY') {
@@ -135,7 +140,7 @@ for (const language of ['en', 'es']) {
   await writeFile(target, createInterpreterGuide(language, release).replace('<head>',
     `<head>\n<script src="/assets/locales.js?v=${release}"></script>`));
 }
-for (const [file, limit] of Object.entries({ 'boot.js':350000, 'app-main.js':803000, 'locales.js':230000, 'detail-views.js':14000 })) {
+for (const [file, limit] of Object.entries({ 'boot.js':350000, 'app-main.js':803000, 'locales.js':230000, 'detail-views.js':30000 })) {
   const size = (await stat(path.join(assets, file))).size;
   if (size > limit) throw new Error(`Bundle ${file} exceeds its reviewed byte budget: ${size} > ${limit}`);
 }
