@@ -2531,5 +2531,8 @@
   "s_c2e88076": "Automatic closing only applies to pauses with automatic return enabled and a configured duration.",
   "s_c59bfba5": "End the pause in the tracker; the extension will then try to make you available during your shift.",
   "s_e509da38": "Pauses end when you press End Break or End Lunch in the tracker.",
-  "s_fd50c919": "Manual work start: {{v0}}."
+  "s_fd50c919": "Manual work start: {{v0}}.",
+  "s_24d37ec6": "Chrome extension · status in your tool",
+  "s_84c01e1e": "Configure these options in the extension popup.",
+  "s_b9729d87": "About these times"
 }

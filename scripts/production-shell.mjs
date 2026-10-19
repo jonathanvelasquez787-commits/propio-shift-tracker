@@ -27,6 +27,11 @@ export function createAppShell(source, release, externalCss) {
   const css = styles.length ? stylesheet.childNodes.map(node => node.value || '').join('') : externalCss;
   const cssLink = parseFragment(`<link rel="stylesheet" href="/css/app-core.css?v=${release}">`).childNodes[0];
   head.childNodes = head.childNodes.map(node => node === stylesheet ? cssLink : node);
+  for (const node of head.childNodes) {
+    if (node.tagName !== 'link' || attribute(node, 'rel') !== 'stylesheet') continue;
+    const href = node.attrs.find(attr => attr.name === 'href');
+    if (href && /^\/css\/[^?#]+\.css$/.test(href.value)) href.value += `?v=${encodeURIComponent(release)}`;
+  }
   const viewNodes = body.childNodes.filter(node => node !== gate && node.tagName !== 'script');
   const markup = serialize({ nodeName: '#document-fragment', childNodes: viewNodes });
   const viewScript = `(() => {\nconst view = document.createElement('template');\nview.innerHTML = ${JSON.stringify(markup)};\ndocument.body.insertBefore(view.content, document.getElementById('bootGate'));\n})();\n`;

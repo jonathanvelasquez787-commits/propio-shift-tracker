@@ -338,8 +338,9 @@ futura opera bajo esto, sin excepción:
 **CONFIRMACIONES Y CONFIGURACIÓN LOCAL VIGENTES**
 
 - El usuario confirmó inicio automático de llamadas, regreso tras Break y arranque
-  correcto después de reiniciar. La extensión 2.2.9 y la recarga de Propio/tracker
-  están confirmadas; no volver a presentarlas como instalación pendiente.
+  correcto después de reiniciar. La recarga de Propio/tracker está confirmada;
+  después confirmó 2.2.10 tanto en Chrome como en el popup. No volver a presentar
+  esa instalación como pendiente.
 - Chrome Jonathan se abre al iniciar Windows y se organiza también al abrirlo
   manualmente, a cualquier hora. Propio y https://app.useinterpreter.com/ quedan
   a la izquierda; tracker y Linguee arriba a la derecha; Notas debajo, ancho 5/16
@@ -431,8 +432,9 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
-- App 623; extensión unificada 2.2.10 (corrección del rótulo del popup; recarga por confirmar).
-  La recarga de 2.2.9 está confirmada. El panel de disponibilidad está en la tool;
+- App 624; extensión unificada 2.2.10 (versión visible y recarga confirmadas).
+  Diseño compacto aprobado: resumen cerrado y preparación al pulsarlo.
+  El panel de disponibilidad está en la tool;
   el popup de Chrome configura la extensión y esta transmite el estado a la web.
   Resumen independiente retirado, sin build
   mantenido. El historial oficial compartido y las funciones del tracker siguen
@@ -461,6 +463,19 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v624 — Resumen compacto y estilos de la misma publicación.**
+
+- El panel web identifica el estado de la extensión, muestra el motivo y el
+  contador sin desplegar toda la explicación. Preparación y ayuda plegadas,
+  sin perder los datos existentes; mismo JS, ids y decisiones automáticas.
+- Mockup claro/oscuro aprobado y diseño único responsive. 336 vistas aisladas
+  ES/EN, cuatro anchos y 21 estados, con apertura por teclado y sin desbordes.
+- El build versiona los cinco CSS de la app junto con HTML y precarga offline.
+  Evita reutilizar una entrada vieja sin versión; regresiones de mezcla de
+  estilos y funcionamiento offline. No se inspeccionó el caché del usuario.
+- La extensión se conserva en 2.2.10: no es una nueva entrega de su motor.
+- 838 pruebas completas, build ES/EN, wiring y presupuestos correctos.
+
 **Extensión 2.2.10 — Versión real del popup y ubicación de funciones.**
 
 - El rótulo 2.2.6 estaba fijo en el HTML aunque el manifest instalado era 2.2.9.
@@ -484,14 +499,3 @@ futura opera bajo esto, sin excepción:
   con equivalencia exacta y presupuestos originales.
 - 835 pruebas y recorrido integrado ficticio; revisión de 320 vistas y publicación
   se registran en el PR. La coordinación multi-PC permanece en el plan.
-
-**v622 — Disponibilidad visible y seguimiento completo.**
-
-- Primera sección de disponibilidad en Inicio, con motivo dominante, cuenta
-  regresiva del worker y preparación plegada; diseño claro/oscuro aprobado.
-- Estado de solo lectura por cuenta/nonce/origen, descartando lecturas viejas y
-  respuestas de otro documento. No cambia prioridades ni acepta llamadas.
-- Lista individual de 79 mejoras con estado y evidencia, sin cerrar un punto
-  compuesto por entregar una parte. Alcance en docs/plan-mejoras-integrales.md.
-- 829 pruebas, once casos nuevos, flujo integrado ficticio y 224 vistas.
-  ES/EN, builds y presupuestos correctos; recarga local se confirma aparte.

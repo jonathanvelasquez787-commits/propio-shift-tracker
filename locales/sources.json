@@ -1754,12 +1754,6 @@
       "js/finance.js"
     ]
   },
-  "s_1f5608c5": {
-    "source": "Ver preparación del turno",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_1fa218ff": {
     "source": "XP ganado",
     "files": [
@@ -2029,6 +2023,12 @@
     "source": "En Lunch",
     "files": [
       "js/automation-ui.js"
+    ]
+  },
+  "s_24d37ec6": {
+    "source": "Extensión de Chrome · estado en tu tool",
+    "files": [
+      "app.html"
     ]
   },
   "s_24f21481": {
@@ -7298,6 +7298,12 @@
       "js/boot.js"
     ]
   },
+  "s_84c01e1e": {
+    "source": "Las opciones se configuran en el popup de la extensión.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_84d4c8cc": {
     "source": "En llamada",
     "files": [
@@ -10209,6 +10215,12 @@
     "source": "Gastos y metas de ahorro que se llenan solas con lo que vas ganando, en el orden de prioridad que tú decidas.",
     "files": [
       "index.html"
+    ]
+  },
+  "s_b9729d87": {
+    "source": "Sobre estos horarios",
+    "files": [
+      "app.html"
     ]
   },
   "s_b9c116de": {

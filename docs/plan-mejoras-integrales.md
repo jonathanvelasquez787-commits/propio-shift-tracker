@@ -15,7 +15,9 @@ extensión, Propio y tracker confirmada por el propietario.
 Estas 79 mejoras corresponden al sistema completo. El panel de disponibilidad
 y preparación se ve en la **tool web**; el popup de la **extensión de Chrome**
 conserva sus controles y transmite los datos a ese panel. La corrección 2.2.10
-sincroniza el rótulo de versión del popup con Chrome; no suma otra casilla cerrada.
+sincroniza el rótulo de versión del popup con Chrome; el propietario confirmó que
+ambos muestran 2.2.10. App 624 compacta ese resumen con detalles plegados y etiqueta
+su procedencia. Esta revisión visual y de caché no suma otra casilla cerrada.
 
 Estados: **Pendiente**, **En curso**, **Probado** (sin publicar), **Publicado**.
 Una casilla solo se marca cuando todos los criterios del punto están resueltos
