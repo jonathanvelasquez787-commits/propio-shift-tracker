@@ -943,7 +943,7 @@ test('quinta simulación mensual: Break Lunch y reset respetan día contable de 
   const appMain = read('js/app-main.js');
   assert.match(appMain, /function currentShiftAccountingDayKey\(fallbackDate = new Date\(\)\)/);
   assert.match(appMain, /state\.activePause = \{ type, startedAt: now\.toISOString\(\), shiftDayKey: dayKey \}/);
-  assert.match(appMain, /const pauseRecord = \{ id: makeLocalId\(\), type: endedPause\.type, startedAt: endedPause\.startedAt, endedAt: now, shiftDayKey \}/);
+  assert.match(appMain, /const pauseRecord = \{ id: makeLocalId\(\), type: endedPause\.type, startedAt: endedPause\.startedAt, endedAt: now, shiftDayKey, startEventId:/);
   assert.match(appMain, /const resetsTrackedShift = trackedShiftDayKey === normalizedDayKey/);
   assert.match(appMain, /belongsToTrackedShift\(p\.startedAt\) \|\| belongsToTrackedShift\(p\.endedAt\)/);
   assert.match(appMain, /const accountingDay = callDateKeyFromValue\(e\?\.shiftDayKey\)/);

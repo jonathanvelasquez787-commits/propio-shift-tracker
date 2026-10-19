@@ -18,11 +18,13 @@ for(const deferSave of [false,true])test(`ending a pause with a rejected ${defer
     state:{activePause:{type:'break',startedAt:'2026-10-11T12:00:00Z',shiftDayKey:'10/11/2026'},pauseHistory:[]},
     callDateKeyFromValue:x=>x,findPlannedSlotForActivePause:()=>null,makeLocalId:()=> 'pause',
     setEvent:()=>({id:'event'}),fmtTime:()=> '06:20',stopBreakEndAlarm(){},
+    canPersistLocalChanges:()=>true,setAppState:value=>{h.state=value;},render(){},
     saveStateOnly:()=>{writes++;return false;},saveAll:()=>{writes++;return false;},
     toast:x=>messages.push(x),onGamePauseEnded:()=>{rewards++;}});
   vm.runInContext(declaration('../js/app-main.js','endPause'),h);
   assert.equal(h.endPause({deferSave,endedAt:'2026-10-11T12:20:00Z'}),false);
   assert.equal(writes,1);assert.equal(rewards,0);assert.deepEqual(messages,[]);
+  assert.equal(h.state.activePause.type,'break');assert.equal(h.state.pauseHistory.length,0);
 });
 
 test('starting a live call does not announce success after its snapshot is rejected',()=>{
@@ -58,7 +60,7 @@ test('cycle goal editors keep their dialog and omit success when persistence rej
 
 test('day note editors keep their dialog and omit success and rewards when persistence rejects',()=>{
   let closed=0,rewards=0;const messages=[];
-  const h=vm.createContext({editingDayNoteKey:'10/11/2026',state:{dayNotes:{}},callDateKeyFromValue:x=>x,
+  const h=vm.createContext({editingDayNoteKey:'10/11/2026',dayNoteEditValid:()=>true,state:{dayNotes:{}},callDateKeyFromValue:x=>x,
     document:{getElementById:()=>({value:'work'})},saveStateOnly:()=>false,
     onGameDayMetadataChanged:()=>{rewards++;},closeModal:()=>{closed++;},toast:x=>messages.push(x)});
   vm.runInContext(['setDayNote','saveDayNoteFromModal','clearDayNoteFromModal'].map(n=>declaration('../js/app-main.js',n)).join('\n'),h);

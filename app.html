@@ -156,6 +156,7 @@
 </button>
 </div>
 </div>
+<p class="note" id="pauseContinuationHint" hidden>Continuás la pausa anterior desde su inicio original. Si descartás esta continuación, vuelve el tramo que ya estaba terminado.</p>
 <details class="automation-panel" id="automationPanel" aria-labelledby="automationLabel">
 <summary class="automation-heading">
 <span class="automation-icon" aria-hidden="true"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 3v5m8-5v5M6 8h12v4a6 6 0 0 1-12 0V8Zm6 10v3"/></svg></span>
@@ -385,7 +386,7 @@
   <div id="callTableAccordion">
   <button class="gap-edit-btn" id="callRecoveryBtn" type="button"><span aria-hidden="true">↶</span> Historial de cambios</button>
   <button class="gap-edit-btn call-delete-btn" id="clearDayCallsBtn" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><path d="M6 7V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v3"/><path d="M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg> Vaciar llamadas del día</button>
-  <p class="alert-hint">Borra TODAS las llamadas de <strong id="clearDayCallsDayLabel">—</strong> (el día activo). Las acciones de la tabla (Shift/Break/Lunch/ACW) no se tocan — son un registro, no se borran desde aquí. Para reiniciar también turno/pausas/horario de ese día, usa "Reiniciar día" en el botón ♻️ Reiniciar del header.</p>
+  <p class="alert-hint">Vacía las llamadas de <strong id="clearDayCallsDayLabel">—</strong>. Conserva las acciones, pausas y el horario. Para borrar también la actividad de ese día, usá Reiniciar día. Podés recuperar las llamadas desde Historial de cambios.</p>
   <div class="table-filter-row" id="tableFilterRow">
     <button class="table-filter-btn active" data-table-filter="all" type="button">Todo</button>
     <button class="table-filter-btn" data-table-filter="calls" type="button">Llamadas</button>
@@ -1836,7 +1837,7 @@
 <div class="mc-header-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 21 9 15 9"/></svg></div>
 <div>
 <h3 id="resetModalTitle">Reiniciar</h3>
-<p>Elige qué tan a fondo querés empezar de nuevo.</p>
+<p>Revisá el alcance antes de confirmar. Conservamos una copia previa en este navegador.</p>
 </div>
 <button aria-label="Cerrar" class="modal-close" data-close-modal="resetModal" type="button">×</button>
 </div>
@@ -1849,10 +1850,11 @@
 
 <div class="danger-card tone-bad" style="margin-top:12px;">
 <div class="danger-card-head"><span class="danger-card-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12" y2="17.01"/></svg></span><span class="danger-card-title">Zona de peligro</span></div>
-<p class="danger-card-desc">Borra TODO lo guardado por la app en este navegador: llamadas, turnos, pausas, horario semanal, metas, nombre/emoji — de TODOS los días, no solo el activo.</p>
-<span class="danger-card-badge">Irreversible</span>
+<p class="danger-card-desc">Reinicia los datos de TODOS los días y los ajustes de la tool. El cambio se sincroniza con tu cuenta; la cuenta y las opciones de la extensión se conservan.</p>
+<span class="danger-card-badge">Con copia previa local</span>
 <button class="mc-btn-solid-full bad" id="eraseAllDataBtn" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><path d="M6 7V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v3"/><path d="M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg> Borrar todos los datos</button>
 </div>
+<div class="danger-card" style="margin-top:12px;"><div class="danger-card-head"><span class="danger-card-title">Copias recuperables</span></div><p class="danger-card-desc">Consultá la copia anterior a una restauración o reinicio. Se conserva solo en este navegador y para tu cuenta.</p><button class="mc-btn-secondary" id="snapshotRecoveryBtn" type="button">Ver copias recuperables</button></div>
 </div>
 </div>
 <div aria-hidden="true" class="modal-overlay" id="higherRateModal">
@@ -2479,6 +2481,7 @@ $0.72"></textarea>
 </div>
 <button aria-label="Cerrar" class="modal-close" data-close-modal="confirmModal" type="button">×</button>
 </div>
+<div id="confirmModalDetails"></div>
 <div class="modal-actions mc-action-row">
 <button class="mc-btn-primary warn" id="confirmModalOkBtn" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polyline points="5 12 10 17 19 6"/></svg> Sí, continuar</button>
 <button class="mc-btn-warn-pill" data-close-modal="confirmModal" type="button" style="background:transparent; border-color:var(--line); color:var(--text);">No, cancelar</button>

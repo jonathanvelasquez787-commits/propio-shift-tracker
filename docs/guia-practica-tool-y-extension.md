@@ -153,7 +153,7 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 ### 22. Descartar una llamada accidental
 
 - **Qué hace:** elimina la llamada en curso sin guardarla. Cuando esa llamada abrió un turno o interrumpió una pausa por accidente, restaura la situación previa que le corresponde.
-- **Qué configurás:** usás Descartar y confirmás la acción.
+- **Qué configurás:** usás Descartar y revisás la lista de efectos: pausa que retoma, turno que conserva o turno automático que revierte. Cancelar no cambia nada.
 - **Ejemplo:** pulsaste Iniciar llamada por error mientras estabas en Break. Descartarla evita guardar una llamada ficticia y permite recuperar la pausa anterior.
 
 ## 4. ACW, descansos y adherencia
@@ -178,13 +178,13 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 
 ### 26. Continuar o descartar una pausa accidental
 
-- **Qué hace:** reconoce continuaciones dentro del margen accidental y permite descartar una pausa iniciada por error, sin conservarla como un descanso real completo.
+- **Qué hace:** reabrir el mismo Break/Lunch dentro de cinco minutos continúa desde su inicio original. Si descartás esa continuación, devuelve el tramo que ya estaba cerrado. Una pausa nueva descartada no se registra.
 - **Qué configurás:** usás los controles de la actividad en vivo y sus confirmaciones.
 - **Ejemplo:** cerraste Break sin querer y lo reanudás enseguida. La tool puede conservar la continuación y señalar la interrupción, en vez de tratarla como dos descansos independientes.
 
 ### 27. Editar huecos entre llamadas
 
-- **Qué hace:** permite clasificar un intervalo y agregar una nota cuando el espacio entre llamadas no describe bien lo ocurrido. Conserva las anotaciones manuales.
+- **Qué hace:** permite clasificar un intervalo y agregar una nota. La tabla y el editor identifican «Clasificado por vos», para distinguirlo de una clasificación automática.
 - **Qué configurás:** abrís el editor del hueco y elegís su clasificación y comentario.
 - **Ejemplo:** hubo un corte de luz entre dos llamadas. Podés explicarlo en ese intervalo en vez de dejar todo como espera sin contexto.
 
@@ -312,7 +312,7 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 
 ### 47. Marcar días y agregar contexto
 
-- **Qué hace:** permite indicar Trabajado o Libre y guardar categoría o nota para explicar un día distinto.
+- **Qué hace:** permite indicar Trabajado o Libre y guardar categoría o nota. El estado elegido lleva «Manual» en el resumen semanal y M en el calendario; el editor explica su efecto sobre adherencia y metas, conservando las llamadas.
 - **Qué configurás:** Editar día en el resumen semanal y sus opciones.
 - **Ejemplo:** faltaste por enfermedad o hubo un corte de luz. La nota conserva el motivo; cambiar su estado afecta cómo se considera ese día en los indicadores correspondientes.
 
@@ -440,7 +440,7 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 
 ### 67. Respaldo completo JSON
 
-- **Qué hace:** exporta e importa un respaldo de los datos de la tool, incluidos ajustes y estados compatibles.
+- **Qué hace:** exporta e importa un respaldo de los datos de la tool. Antes de reemplazarlos compara llamadas, acciones y pausas, explica los ajustes que cambiarán y guarda una copia privada de lo anterior en este navegador.
 - **Qué configurás:** Exportar o Importar JSON en Ajustes; revisás las confirmaciones antes de reemplazar datos.
 - **Ejemplo:** guardás un respaldo antes de una limpieza grande y lo conservás como una copia adicional. Un CSV contable no reemplaza ese respaldo.
 
@@ -452,8 +452,8 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 
 ### 69. Reinicios y borrados
 
-- **Qué hace:** ofrece acciones para limpiar un día o los datos que indica cada opción, con confirmaciones y protección frente a llamadas pendientes.
-- **Qué configurás:** elegís expresamente la acción y revisás su alcance antes de confirmar.
+- **Qué hace:** permite reiniciar un día o toda la tool con alcance explícito y copia previa. Se sincroniza con tu cuenta; no borra tu cuenta ni el historial original de Propio. Una actividad pendiente impide reemplazar datos.
+- **Qué configurás:** elegís la acción y revisás su alcance. Reiniciar → Copias recuperables permite comparar y recuperar el conjunto completo anterior. Las copias solo están en este navegador; guardá también tu JSON.
 - **Ejemplo:** borrar un día no es lo mismo que cerrar el turno. Si solo querés terminar de trabajar, usás Finalizar shift para conservar los registros.
 
 ### 70. App instalable y recuperación

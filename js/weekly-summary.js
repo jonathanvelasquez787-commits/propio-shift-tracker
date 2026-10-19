@@ -66,7 +66,8 @@ export function renderWeekSummary({ settings, weekViewOffset, weekSummaryForOffs
       ? ui`<div class="wk-row-note" title="${escapeHtml(r.note.comment)}"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg> ${escapeHtml(r.note.comment.length > 60 ? r.note.comment.slice(0, 60) + '…' : r.note.comment)}</div>`
       : '';
 
-    const statusBadgeHtml = ui`<button type="button" class="wk-row-badge wk-row-badge-tap tone-${badgeTone}" data-day-note-edit="${escapeHtml(r.dayKey)}" data-day-note-focus="status" title="Cambiar estado del día">${escapeHtml(badgeText)}${iconHtml('chevronDown')}</button>`;
+    const manualStatus = r.note?.forcedStatus ? ui` <span class="wk-row-badge tone-neutral" title="Estado elegido por vos; reemplaza el del horario">Manual</span>` : '';
+    const statusBadgeHtml = ui`<button type="button" class="wk-row-badge wk-row-badge-tap tone-${badgeTone}" data-day-note-edit="${escapeHtml(r.dayKey)}" data-day-note-focus="status" title="Cambiar estado del día">${escapeHtml(badgeText)}${iconHtml('chevronDown')}</button>${manualStatus}`;
     // Dos ubicaciones del mismo enlace: en el título (escritorio) o en la línea secundaria (móvil),
     // alternadas por CSS.
     const addNoteBtn = (cls) => ui`<button type="button" class="wk-row-add-note ${cls}" data-day-note-edit="${escapeHtml(r.dayKey)}" data-day-note-focus="note">+ Nota</button>`;

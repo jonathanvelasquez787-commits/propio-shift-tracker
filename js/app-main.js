@@ -9,7 +9,7 @@ import { normalizeBattleWeapon } from './game-battle.js';
 import { createPropioReceiver, createStorageRevisionGuard, ignorePropioCall } from './propio-bridge.js';
 import { portalRecordsText } from './propio-history-records.js';
 import { callFeedbackSilenced, withSilentCallFeedback } from './call-feedback.js';
-import { settingsWithinBudget, reportLocalPersistenceFailure, readMeta, jsonbBytes } from './sync.js';
+import { settingsWithinBudget, reportLocalPersistenceFailure, readMeta, jsonbBytes, preserveRecoveryCopy, listRecoveryCopies } from './sync.js';
 // Boot importa este módulo solo después de verificar la sesión e hidratar sus datos.
 
 import { FINANCE_CATEGORIES, FINANCE_CUSTOM_CATEGORY_PALETTE, financeRowIsMeta, renderFinanceSection, renderFinancePreview, setFinanceTab, syncFinanceRowTargetFields, financeConvertedInline, financeConvertedNote, financeSwapPriority, financeFindRow, financeApplySignedAmount, financeResetRow, financeToggleManualPaid, financeDeleteRow, openFinanceRowModal, saveFinanceRowModal, selectFinanceCategoryChip, openFinanceNewCatPanel, closeFinanceNewCatPanel, createFinanceCategory, financeDeleteCategory, updateFinanceAutoFillSetting, updateFinanceTotalsScrollHint, financeRunAutoFillCascade, configureFinanceContext } from './finance.js';
@@ -2178,6 +2178,7 @@ function getGapAnnotation(dayKey, gapKey) {
 }
 
 function setGapAnnotation(dayKey, gapKey, patch = {}) {
+  const before = JSON.parse(JSON.stringify(state.gapAnnotations || {}));
   const normalized = callDateKeyFromValue(dayKey);
   const bucket = ensureGapBucket(normalized);
   const current = bucket[gapKey] && typeof bucket[gapKey] === 'object' ? bucket[gapKey] : {};
@@ -2185,8 +2186,9 @@ function setGapAnnotation(dayKey, gapKey, patch = {}) {
   if (!next.label) next.label = 'acw';
   if (!String(next.note || '').trim()) delete next.note;
   bucket[gapKey] = next;
-  saveStateOnly();
+  if (saveStateOnly() === false) { state.gapAnnotations = before; return false; }
   render();
+  return true;
 }
 
 function suggestGapLabel(prevEnd, curStart, dayKey = getActiveDayKey()) {
@@ -3504,6 +3506,7 @@ export function getDayNote(dayKey) {
 function setDayNote(dayKey, { category, comment, forcedStatus }) {
   const normalized = callDateKeyFromValue(dayKey);
   if (!normalized) return;
+  const before = JSON.parse(JSON.stringify(state.dayNotes || {}));
   if (!state.dayNotes || typeof state.dayNotes !== 'object') state.dayNotes = {};
   const cat = String(category || '');
   const note = String(comment || '').trim();
@@ -3515,7 +3518,7 @@ function setDayNote(dayKey, { category, comment, forcedStatus }) {
   } else {
     state.dayNotes[normalized] = { category: cat, comment: note, forcedStatus: forced };
   }
-  if (saveStateOnly() === false) return false;
+  if (saveStateOnly() === false) { state.dayNotes = before; return false; }
   onGameDayMetadataChanged(normalized);
   render();
 }
@@ -4050,12 +4053,17 @@ function renderPayDatesSection() {
 
     function startPause(type) {
       if (!state.shiftStartedAt || state.shiftEndedAt || state.activePause) return;
+      if (!canPersistLocalChanges()) return false;
+      const before = JSON.parse(JSON.stringify(state));
+      const persistPause = () => {
+        if (saveAll() !== false) return true;
+        setAppState(before); render(); return false;
+      };
       const now = new Date();
       const dayKey = currentShiftAccountingDayKey(now);
       const pretty = type === 'lunch' ? translateText('Lunch') : translateText('Break');
 
-      // Mismo criterio que startShift: reabrir el MISMO tipo dentro de la ventana de gracia
-      // continúa la pausa anterior en vez de crear otra.
+      // Reabrir el mismo tipo dentro de la gracia continúa la pausa anterior.
       const sameDayOfType = state.pauseHistory.filter(p => p.type === type && (callDateKeyFromValue(p.shiftDayKey) === dayKey || (!p.shiftDayKey && sameCallDay(p.endedAt, dayKey))));
       let lastClosed = null;
       sameDayOfType.forEach(p => {
@@ -4073,8 +4081,9 @@ function renderPayDatesSection() {
             shiftDayKey: callDateKeyFromValue(lastClosed.shiftDayKey) || dayKey,
             continuationInterruptionId: interruption?.id || null,
             continuationEventId: continuationEvent?.id || null,
+            continuationClosedPause: JSON.parse(JSON.stringify(lastClosed)),
           };
-          if (saveAll() === false) return false;
+          if (!persistPause()) return false;
           onGamePauseStarted(type);
           stopBreakStartAlarm();
           toast(ui`${pretty} continuado — interrupción de ${formatMinutes(gapMin)} min registrada`);
@@ -4083,10 +4092,8 @@ function renderPayDatesSection() {
       }
 
       state.activePause = { type, startedAt: now.toISOString(), shiftDayKey: dayKey };
-      setEvent(type, ui`${pretty} iniciado`, fmtTime(now), 'manual');
-      if (saveAll() === false) return false;
-      // El aviso de "va a empezar" ya no aplica una vez que la pausa arrancó de verdad — se apaga
-      // de inmediato en vez de esperar al próximo tick.
+      state.activePause.startEventId = setEvent(type, ui`${pretty} iniciado`, fmtTime(now), 'manual')?.id || null;
+      if (!persistPause()) return false;
       stopBreakStartAlarm();
       toast(ui`${pretty} iniciado`);
       onGamePauseStarted(type);
@@ -4094,19 +4101,19 @@ function renderPayDatesSection() {
 
     function endPause(options = {}) {
       if (!state.activePause) return null;
+      if (!canPersistLocalChanges()) return false;
+      const before = JSON.parse(JSON.stringify(state));
       const { silent = false, deferSave = false } = options;
       const now = options.endedAt || new Date().toISOString();
       const endedPause = { ...state.activePause };
       const shiftDayKey = callDateKeyFromValue(endedPause.shiftDayKey) || currentShiftAccountingDayKey(new Date(endedPause.startedAt));
       const plannedSlot = findPlannedSlotForActivePause(shiftDayKey);
-      const pauseRecord = { id: makeLocalId(), type: endedPause.type, startedAt: endedPause.startedAt, endedAt: now, shiftDayKey };
+      const pauseRecord = { id: makeLocalId(), type: endedPause.type, startedAt: endedPause.startedAt, endedAt: now, shiftDayKey, startEventId: endedPause.startEventId || endedPause.continuationClosedPause?.startEventId || null };
       state.pauseHistory.push(pauseRecord);
       const pauseEndEvent = setEvent(endedPause.type, ui`${endedPause.type === 'lunch' ? translateText('Lunch') : translateText('Break')} terminado`, fmtTime(new Date(now)), 'manual');
       state.activePause = null;
-      // El aviso de "va a terminar" ya no aplica una vez que se cerró la pausa — se apaga de
-      // inmediato en vez de esperar al próximo tick.
+      if ((deferSave ? saveStateOnly() : saveAll()) === false) { setAppState(before); render(); return false; }
       stopBreakEndAlarm();
-      if ((deferSave ? saveStateOnly() : saveAll()) === false) return false;
       if (!silent) toast(translateText('Regresaste'));
       let onTime = false;
       if (plannedSlot && !options.forShiftEnd) {
@@ -4208,11 +4215,22 @@ function renderPayDatesSection() {
       return autoSaveLiveCall(startedAt, endedAt, liveContext);
     }
 
-    // Barra fija de actividad en vivo ---- A diferencia de endCall (que SIEMPRE guarda la llamada,
-    // sola o vía el modal de respaldo), esto descarta la llamada en curso sin dejar ningún rastro.
+    function activityChangeSignature() {
+      return JSON.stringify([state.activeCall, state.activePause, state.shiftStartedAt, state.shiftEndedAt, state.pauseHistory, state.dayInterruptions]);
+    }
+
+    async function requestActivityDiscard(kind, change, done) {
+      const owner = state, preferences = settings, expected = activityChangeSignature();
+      const view = await loadDetailViews({ retry: true });
+      if (!view || state !== owner || settings !== preferences || activityChangeSignature() !== expected) return toast(translateText('No se pudo preparar el descarte. Volvé a intentarlo.'));
+      view.confirmActivityChange({ ui, translateText, escapeHtml, data: () => ({ state, settings }), signature: activityChangeSignature,
+        setState: setAppState, saveStateOnly, canPersistLocalChanges, appConfirm, render, toast }, kind, kind === 'call' ? state.activeCall : state.activePause, expected, change, done);
+    }
+
+    // Descartar restaura solamente la actividad interrumpida y el turno automático.
     function discardActiveCall() {
       if (!state.activeCall) return;
-      appConfirm(translateText('¿Descartar esta llamada sin guardarla? El tiempo registrado se pierde y no queda ninguna fila en Tabla de llamadas.'), () => {
+      return requestActivityDiscard('call', () => {
         const discarded = state.activeCall;
         ignorePropioCall(state, discarded?.propioBridge?.callId);
         state.activeCall = null;
@@ -4224,8 +4242,7 @@ function renderPayDatesSection() {
           if (rollback.pause) state.activePause = { ...rollback.pause };
         }
 
-        // Si esta llamada fue la única razón por la que se abrió una sesión nueva, descartar también
-        // revierte esa sesión automática. No toca turnos que el usuario ya tenía abiertos antes.
+        // Los turnos abiertos antes de esta llamada se conservan.
         if (discarded?.autoStartedShift) {
           if (discarded.autoShiftEventId) {
             state.events = state.events.filter(event => event?.id !== discarded.autoShiftEventId);
@@ -4235,19 +4252,16 @@ function renderPayDatesSection() {
           if (discarded.gameBeforeAutoShift) state.game = discarded.gameBeforeAutoShift;
         }
 
-        if (saveStateOnly() === false) return false;
-        render();
+      }, discarded => {
         toast(discarded?.autoStartedShift ? translateText('Llamada descartada · turno automático revertido') : translateText('Llamada descartada'));
       });
     }
 
-    // A diferencia de endPause (que SIEMPRE empuja {startedAt, endedAt} a pauseHistory), esto
-    // descarta el Break/Lunch en curso sin dejar ningún registro — como si nunca se hubiera
-    // iniciado.
+    // Una continuación descartada devuelve el tramo cerrado que ya existía.
     function discardActivePause() {
       if (!state.activePause) return;
       const pretty = state.activePause.type === 'lunch' ? translateText('Lunch') : translateText('Break');
-      appConfirm(ui`¿Descartar este ${pretty} sin guardarlo? No quedará registrado en tu historial ni en Adherencia.`, () => {
+      return requestActivityDiscard('pause', () => {
         const discarded = state.activePause;
         const accountingDay = callDateKeyFromValue(discarded?.shiftDayKey) || currentShiftAccountingDayKey(new Date(discarded?.startedAt || Date.now()));
         if (discarded?.continuationInterruptionId && Array.isArray(state.dayInterruptions?.[accountingDay])) {
@@ -4258,11 +4272,15 @@ function renderPayDatesSection() {
         if (discarded?.continuationEventId) {
           state.events = state.events.filter(event => event?.id !== discarded.continuationEventId);
         }
+        if (discarded.continuationClosedPause) {
+          if (!state.pauseHistory.some(p => p.id === discarded.continuationClosedPause.id)) state.pauseHistory.push(discarded.continuationClosedPause);
+        } else if (discarded.startEventId) {
+          state.events = state.events.filter(event => event?.id !== discarded.startEventId);
+        }
         state.activePause = null;
+      }, () => {
         stopBreakStartAlarm();
         stopBreakEndAlarm();
-        if (saveStateOnly() === false) return false;
-        render();
         toast(ui`${pretty} descartado`);
       });
     }
@@ -4345,7 +4363,7 @@ function renderPayDatesSection() {
 
     // Reset all three keys through the guarded snapshot writer, without a delete/write gap.
     function eraseAllData() {
-      appConfirm(translateText('¿Borrar TODOS los datos del programa? Esto borra permanentemente todas las llamadas, turnos, pausas, horario semanal, metas y tu nombre/emoji guardados en este navegador. No se puede deshacer. La app queda como recién instalada (con el popup de bienvenida de nuevo).'), () => {
+      return useSnapshotTools('confirmReplacement', 'reset', () => {
         if (!canPersistLocalChanges()) return false;
         const previous = { state, calls, settings };
 
@@ -4387,6 +4405,7 @@ function renderPayDatesSection() {
         if (onboardingEmojiPickerWrapReset) onboardingEmojiPickerWrapReset.classList.remove('open');
         if (toggleEmojiPickerOnboardingBtnReset) { toggleEmojiPickerOnboardingBtnReset.setAttribute('aria-expanded', 'false'); toggleEmojiPickerOnboardingBtnReset.textContent = translateText('Cambiar emoji'); }
         openModal('onboardingModal');
+        return true;
       });
     }
 
@@ -4404,7 +4423,7 @@ function renderPayDatesSection() {
         toast(translateText('Guarda o descarta la llamada pendiente antes de reiniciar este día.'));
         return;
       }
-      appConfirm(ui`¿Reiniciar ${formatCallDayLabel(dayKey)}? Se borran llamadas, pausas, huecos, la nota, el log y la gamificación de ese día.`, () => {
+      return useSnapshotTools('confirmReplacement', 'day', () => {
         const trackedShiftStart = state.shiftStartedAt ? new Date(state.shiftStartedAt) : null;
         const trackedShiftEnd = state.shiftEndedAt ? new Date(state.shiftEndedAt) : new Date();
         const trackedShiftDayKey = trackedShiftStart && Number.isFinite(trackedShiftStart.getTime())
@@ -4449,7 +4468,8 @@ function renderPayDatesSection() {
         financeRunAutoFillCascade();
         if (saveAll() === false) return false;
         toast(translateText('Día reiniciado'));
-      });
+        return true;
+      }, { dayLabel: formatCallDayLabel(dayKey) });
     }
 
     // Clave para detectar llamadas duplicadas. Usa el valor NUMÉRICO de pay (via parseMoney), no el
@@ -5017,45 +5037,6 @@ function renderPayDatesSection() {
       if (select) select.value = accountingExportPeriod;
     }
 
-    // Contraparte de exportJSON: valida que el JSON tenga la forma exacta que exportJSON produce ({ state: {...}, calls: [...], exportedAt }).
-    function validateImportPayload(payload) {
-      if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
-        return { ok: false, error: translateText('El archivo no contiene un objeto JSON válido.') };
-      }
-      if (!payload.state || typeof payload.state !== 'object' || Array.isArray(payload.state)) {
-        return { ok: false, error: translateText('Falta el campo "state" (o no es válido) en el archivo.') };
-      }
-      const validRecord = value => value && typeof value === 'object' && !Array.isArray(value);
-      const validTimestamp = value => (typeof value === 'string' || typeof value === 'number')
-        && Number.isFinite(new Date(value).getTime());
-      for (const [key, timestamps] of [['events', ['ts']], ['pauseHistory', ['startedAt', 'endedAt']]]) {
-        if (!(key in payload.state)) continue;
-        const records = payload.state[key];
-        if (!Array.isArray(records) || records.some(record => !validRecord(record)
-          || timestamps.some(field => !validTimestamp(record[field])))) {
-          return { ok: false, error: translateText('El respaldo contiene un historial de actividad inválido. Tus datos actuales no se cambiaron.') };
-        }
-      }
-      for (const key of ['activeCall', 'activePause', 'pendingLiveCallBackup']) {
-        if (payload.state[key] != null && !validRecord(payload.state[key])) {
-          return { ok: false, error: translateText('El respaldo contiene un historial de actividad inválido. Tus datos actuales no se cambiaron.') };
-        }
-      }
-      if (!Array.isArray(payload.calls)) {
-        return { ok: false, error: translateText('Falta el campo "calls" (o no es una lista) en el archivo.') };
-      }
-      if (payload.calls.some(call => !call || typeof call !== 'object' || Array.isArray(call))) {
-        return { ok: false, error: translateText('El respaldo contiene llamadas inválidas. Tus datos actuales no se cambiaron.') };
-      }
-      if ('settings' in payload && (!payload.settings || typeof payload.settings !== 'object' || Array.isArray(payload.settings))) {
-        return { ok: false, error: translateText('El campo "settings" del respaldo no es válido.') };
-      }
-      if (payload.settings && !validFinanceSettings(payload.settings)) {
-        return { ok: false, error: translateText('El respaldo contiene datos de Finanzas inválidos o duplicados. Tus datos actuales no se cambiaron.') };
-      }
-      return { ok: true };
-    }
-
     // Los backups nuevos restauran state + calls + settings. Los backups viejos (sin settings)
     // siguen siendo válidos y conservan la configuración actual, para no romper compatibilidad.
     function applyImportedPayload(payload) {
@@ -5083,52 +5064,22 @@ function renderPayDatesSection() {
       return saveAll();
     }
 
-    function handleImportJsonFile(e) {
-      const input = e.target;
-      const file = input.files && input.files[0];
-      // Se limpia de inmediato para poder volver a elegir el MISMO archivo después (ej. si se cancela la confirmación y se quiere reintentar)
-      input.value = '';
-      if (!file) return;
-      // BUG-011 (QA v361) — Rechazo temprano por tamaño, ANTES de leer el
-      // archivo — ver comentario junto a MAX_IMPORT_JSON_BYTES arriba.
-      if (file.size > MAX_IMPORT_JSON_BYTES) {
-        toast(ui`Ese archivo pesa demasiado (${(file.size / (1024 * 1024)).toFixed(1)}MB, máximo ${Math.round(MAX_IMPORT_JSON_BYTES / (1024 * 1024))}MB) — no parece un backup válido de esta app. Revisa que sea el archivo correcto.`);
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = () => {
-        let payload;
-        try {
-          payload = JSON.parse(String(reader.result || ''));
-        } catch {
-          toast(translateText('Ese archivo no es JSON válido.'));
-          return;
-        }
-        const check = validateImportPayload(payload);
-        if (!check.ok) {
-          toast(check.error);
-          return;
-        }
-        const callCount = payload.calls.length;
-        const exportedDate = payload.exportedAt ? new Date(payload.exportedAt) : null;
-        const exportedLabel = exportedDate && !Number.isNaN(exportedDate.getTime())
-          ? `${fmtDate(exportedDate)}, ${fmtTime(exportedDate)}`
-          : translateText('fecha desconocida');
-        const restoresSettings = !!(payload.settings && typeof payload.settings === 'object' && !Array.isArray(payload.settings));
-        const settingsNote = restoresSettings
-          ? translateText('También restaura tu horario, metas, Finanzas, Higher Rate, perfil y demás ajustes del respaldo.')
-          : translateText('Es un backup antiguo sin settings: tu horario, metas y demás ajustes actuales se conservarán.');
-        appConfirm(ui`¿Importar este archivo (exportado el ${exportedLabel} · ${callCount} llamada(s))? Esto reemplaza tus llamadas, turnos y pausas actuales. ${settingsNote} Esta acción no se puede deshacer.`, () => {
-          if (applyImportedPayload(payload) === false) return;
-          toast(restoresSettings
-            ? ui`${callCount} llamada(s) y configuración restauradas desde el respaldo`
-            : ui`${callCount} llamada(s) importada(s) desde el respaldo antiguo`);
-        });
-      };
-      reader.onerror = () => toast(translateText('No se pudo leer el archivo.'));
-      reader.readAsText(file);
+    async function useSnapshotTools(action, ...args) {
+      const owner = state, preferences = settings, account = readMeta().userId;
+      const view = await loadDetailViews({ retry: true });
+      if (!view || state !== owner || settings !== preferences || readMeta().userId !== account) return toast(translateText('No se pudo preparar la recuperación. Volvé a intentarlo.'));
+      return view[action]({ ui, translateText, escapeHtml, fmtDate, fmtTime, validFinanceSettings,
+        data: () => ({ state, calls, settings }), account: () => readMeta().userId,
+        restore: previous => { setAppState(previous.state); setAppCalls(previous.calls); setAppSettings(previous.settings); applyTheme(); render(); },
+        preserve: (snapshot, kind) => preserveRecoveryCopy(readMeta().userId, snapshot, `before-${kind}`),
+        copies: () => listRecoveryCopies(readMeta().userId), appConfirm, canPersistLocalChanges, applyImportedPayload, render, toast }, ...args);
     }
 
+    function handleImportJsonFile(e) {
+      const input = e.target, file = input.files?.[0];
+      input.value = '';
+      if (file) return useSnapshotTools('importBackupFile', file, MAX_IMPORT_JSON_BYTES);
+    }
 
     export function formatHHMM(value) {
       const raw = String(value || '').trim();
@@ -5799,6 +5750,8 @@ function renderHeader() {
   document.getElementById('clockNow').textContent = clockTimeVisible ? fmtTime(now) : '--:--:--';
   document.getElementById('clockDate').textContent = fmtDate(now);
   document.getElementById('stateText').textContent = translateText(currentStateLabel());
+  const continuationHint = document.getElementById('pauseContinuationHint');
+  if (continuationHint) continuationHint.hidden = !state.activePause?.continuationClosedPause;
 
   // Chip de ACW/AfterCallWork en vivo — visible solo mientras aplica (computeCurrentAcwStart ya filtra
   // turno no iniciado/terminado y llamada/pausa activa).
@@ -6061,6 +6014,14 @@ function updateChipsScrollHint() {
 const gapLabels = ['acw', 'break', 'lunch', 'other'];
 let editingGapContext = null;
 
+function metadataEditGuard(read) {
+  const owner = state, preferences = settings, expected = JSON.stringify(read());
+  return () => {
+    if (state === owner && settings === preferences && expected === JSON.stringify(read()) && canPersistLocalChanges()) return true;
+    toast(translateText('Los datos cambiaron. Cerrá el editor y revisalos antes de guardar.')); return false;
+  };
+}
+
 function findGapRow(dayKey, gapKey) {
   return dayGapRows(dayKey).find(g => g.gapKey === gapKey) || null;
 }
@@ -6117,7 +6078,7 @@ function openGapEditor(dayKey, gapKey) {
   }
   const normalizedDayKey = callDateKeyFromValue(dayKey);
   const annotation = getGapAnnotation(normalizedDayKey, gapKey);
-  editingGapContext = { dayKey: normalizedDayKey, gapKey };
+  editingGapContext = { dayKey: normalizedDayKey, gapKey, valid: metadataEditGuard(() => [findGapRow(normalizedDayKey, gapKey), getGapAnnotation(normalizedDayKey, gapKey)]) };
   const label = annotation?.label || row.label || row.suggested || 'acw';
   const note = annotation?.note || '';
   const title = document.getElementById('gapModalTitle');
@@ -6134,7 +6095,7 @@ function openGapEditor(dayKey, gapKey) {
   if (subtitle) subtitle.textContent = ui`${prevTimeLabel} → ${row.cur.callStart} · ${formatMinutes(row.residual)} min útiles`;
   if (preview) {
     preview.textContent = annotation
-      ? ui`Clasificación guardada: ${gapLabelText(label)}${note ? ui` · Nota: ${note}` : ''}`
+      ? ui`Clasificado por vos: ${gapLabelText(label)}${note ? ui` · Nota: ${note}` : ''}`
       : ui`Sugerido: ${gapLabelText(row.suggested)} · ${gapDisplayAmountUnitLabel(row.suggested)} ${gapDisplayAmountForLabel(row, row.suggested).toFixed(1)} min`;
   }
   if (labelInput) labelInput.value = label;
@@ -6144,13 +6105,13 @@ function openGapEditor(dayKey, gapKey) {
 }
 
 function saveGapEditor() {
-  if (!editingGapContext) return;
+  if (!editingGapContext || !editingGapContext.valid()) return false;
   const labelInput = document.getElementById('gapLabelInput');
   const noteInput = document.getElementById('gapNoteInput');
   const label = String(labelInput?.value || 'acw').toLowerCase();
   const note = String(noteInput?.value || '').trim();
   const savedContext = { ...editingGapContext };
-  setGapAnnotation(savedContext.dayKey, savedContext.gapKey, { label, note });
+  if (setGapAnnotation(savedContext.dayKey, savedContext.gapKey, { label, note }) === false) return false;
   editingGapContext = null;
   closeModal('gapModal');
   toast('Hueco guardado');
@@ -6159,6 +6120,7 @@ function saveGapEditor() {
 
 // Editar día (Resumen semanal)
 let editingDayNoteKey = null;
+let dayNoteEditValid = () => false;
 
 const DAY_NOTE_STATUS_HINTS = {
   '': translateText('Automático: se decide según tu horario semanal. Si hay llamadas o turno en un día libre, cuenta como trabajado.'),
@@ -6183,6 +6145,7 @@ function openDayNoteModal(dayKey, focusTarget = null) {
   const normalized = callDateKeyFromValue(dayKey);
   if (!normalized) return;
   editingDayNoteKey = normalized;
+  dayNoteEditValid = metadataEditGuard(() => getDayNote(normalized));
   const note = getDayNote(normalized);
   const titleEl = document.getElementById('dayNoteModalTitle');
   const statusInput = document.getElementById('dayNoteStatusInput');
@@ -6200,7 +6163,7 @@ function openDayNoteModal(dayKey, focusTarget = null) {
 }
 
 function saveDayNoteFromModal() {
-  if (!editingDayNoteKey) return;
+  if (!editingDayNoteKey || !dayNoteEditValid()) return false;
   const statusInput = document.getElementById('dayNoteStatusInput');
   const categoryInput = document.getElementById('dayNoteCategoryInput');
   const commentInput = document.getElementById('dayNoteCommentInput');
@@ -6211,7 +6174,7 @@ function saveDayNoteFromModal() {
 }
 
 function clearDayNoteFromModal() {
-  if (!editingDayNoteKey) return;
+  if (!editingDayNoteKey || !dayNoteEditValid()) return false;
   const statusInput = document.getElementById('dayNoteStatusInput');
   if (setDayNote(editingDayNoteKey, { category: '', comment: '', forcedStatus: statusInput?.value || '' }) === false) return false;
   editingDayNoteKey = null;
@@ -6897,6 +6860,10 @@ export function render() {
     let pendingConfirmAction = null;
     export function appConfirm(message, onConfirm) {
       pendingConfirmAction = onConfirm;
+      const heading = document.getElementById('confirmModalTitle');
+      if (heading) heading.textContent = translateText('Confirmar');
+      const details = document.getElementById('confirmModalDetails');
+      if (details) details.replaceChildren();
       const msgEl = document.getElementById('confirmModalMessage');
       if (msgEl) msgEl.textContent = message;
       openModal('confirmModal');
@@ -7190,6 +7157,7 @@ export function render() {
     });
     document.getElementById('resetDayBtn').addEventListener('click', resetDay);
     document.getElementById('eraseAllDataBtn').addEventListener('click', eraseAllData);
+    document.getElementById('snapshotRecoveryBtn').addEventListener('click', () => useSnapshotTools('openSnapshotRecovery'));
     document.getElementById('ajustesHeaderBtn').addEventListener('click', openSettingsModal);
     document.getElementById('saveAccountProfileBtn').addEventListener('click', saveAccountProfile);
     document.getElementById('higherRateHeaderBtn').addEventListener('click', () => {

@@ -6,6 +6,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import { APP_KEYS, writeLocalSnapshot, settingsWithinBudget, reportLocalPersistenceFailure, getLocalPersistenceFailure } from '../js/sync.js';
 import { createStorageRevisionGuard } from '../js/propio-bridge.js';
+import { confirmReplacement } from '../js/backup-recovery.js';
 
 const source = fs.readFileSync(new URL('../js/app-main.js', import.meta.url), 'utf8');
 
@@ -30,6 +31,12 @@ function storageHarness() {
 function resetHarness() {
   const h = storageHarness(), opened = [], closed = [];
   Object.assign(h.context, {
+    useSnapshotTools: (_action, kind, change) => { const prior = globalThis.document; globalThis.document = h.context.document; try { return confirmReplacement({
+      ui, translateText, escapeHtml: String, data:()=>({state:h.context.state,calls:h.context.calls,settings:h.context.settings}),
+      account:()=> 'owner', preserve:()=>{}, appConfirm:(_message,callback)=>{h.context.confirmReset=callback;},
+      canPersistLocalChanges:()=>h.run('canPersistLocalChanges()'), toast:message=>h.warnings.push(message),
+      restore:previous=>{Object.assign(h.context,previous);},
+    },kind,change); } finally { if (prior === undefined) delete globalThis.document; else globalThis.document = prior; } },
     setAppState: value => { h.context.state = value; },
     setAppCalls: value => { h.context.calls = value; },
     setAppSettings: value => { h.context.settings = value; },

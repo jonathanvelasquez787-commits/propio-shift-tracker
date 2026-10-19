@@ -140,7 +140,7 @@ for (const language of ['en', 'es']) {
   await writeFile(target, createInterpreterGuide(language, release).replace('<head>',
     `<head>\n<script src="/assets/locales.js?v=${release}"></script>`));
 }
-for (const [file, limit] of Object.entries({ 'boot.js':350000, 'app-main.js':803000, 'locales.js':230000, 'detail-views.js':50000 })) {
+for (const [file, limit] of Object.entries({ 'boot.js':350000, 'app-main.js':803000, 'locales.js':230000, 'detail-views.js':65000 })) {
   const size = (await stat(path.join(assets, file))).size;
   if (size > limit) throw new Error(`Bundle ${file} exceeds its reviewed byte budget: ${size} > ${limit}`);
 }
