@@ -5254,7 +5254,7 @@ function renderPayDatesSection() {
       onGameCallsChanged, formatBlockDurationLabel,
       formatCallDayLabel, formatHHMM, formatMinutes, iconHtml, isoDateFromDayKey, makeLocalId,
       mergeIntervals, minutesToHHMM, money, render, saveAll, timeLabel, toDateFromInputs, toMinutes, toast,
-      todayCallDateKey, todayRange,
+      todayCallDateKey, todayRange, canPersistLocalChanges, convertedAmountText,
     });
     configureSettingsContext({
       DEFAULT_USER_EMOJI, EMOJI_CHOICES, RATE, closeModal, convertedAmountText, currencyCeilFromUsdAmount,

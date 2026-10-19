@@ -320,7 +320,8 @@ futura opera bajo esto, sin excepción:
 - **Mejoras integrales aprobadas el 18/10:** ejecutar las recomendaciones de la
   evaluación de 79 funciones por fases; alcance y estado completo en
   [plan de mejoras](docs/plan-mejoras-integrales.md). Inicio y preparación publicados:
-  12 mejoras cerradas; sigue el bloque de Higher Rate. No perder las fases posteriores al
+  12 mejoras cerradas; Higher Rate en curso: limpieza protegida, corrección con
+  recálculo aún pendiente. No perder las fases posteriores al
   entregar una parte ni considerar pendiente la instalación ya confirmada.
 - **Segundos oficiales de Propio:** confirmar con evidencia si el último minuto
   incompleto se incluye en duración y pago. El formato de hora visible no lo demuestra.
@@ -432,7 +433,7 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
-- App 624; extensión unificada 2.2.10 (versión visible y recarga confirmadas).
+- App 625; extensión unificada 2.2.10 (versión visible y recarga confirmadas).
   Diseño compacto aprobado: resumen cerrado y preparación al pulsarlo.
   El panel de disponibilidad está en la tool;
   el popup de Chrome configura la extensión y esta transmite el estado a la web.
@@ -463,6 +464,19 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v625 — Limpiar Higher Rate conserva llamadas y bonos.**
+
+- Limpieza de ventanas terminadas con vista previa de cantidades e importe
+  conservado, incluida moneda secundaria. No altera pago base, asignaciones
+  de Finanzas ni recompensas; conserva el nivel del bono en cada llamada.
+- Confirmación ligada a los datos y cuenta actuales, guardado completo con
+  reversión ante rechazo y protección contra ejecutar dos veces el mismo clic.
+- 846 pruebas y 12 recorridos ficticios ES/EN, claro/oscuro y tres anchos,
+  con cancelar, limpiar y reabrir conservando ganancias. Build y presupuestos
+  correctos. Evidencia y límites en docs/higher-rate-limpieza.md.
+- El recálculo explícito sigue pendiente y nunca formará parte de limpiar.
+  La extensión continúa en 2.2.10; esta entrega modifica solo la tool web.
+
 **v624 — Resumen compacto y estilos de la misma publicación.**
 
 - El panel web identifica el estado de la extensión, muestra el motivo y el
@@ -486,16 +500,3 @@ futura opera bajo esto, sin excepción:
 - Prueba del popup compilado con versiones distintas y worker desconectado;
   836 pruebas correctas, builds y revisión visual claro/oscuro. No cambia las
   decisiones de llamadas, permisos ni preferencias personales.
-
-**v623 — Conexión, trabajo y cierre de pausas visibles.**
-
-- Preparación distingue detección de conexión y comienzo laboral, usando el
-  cálculo existente: horario, llamada anticipada real o inicio manual. El
-  resumen no escribe registros y rechaza leer desde una pestaña obsoleta.
-- Break/Lunch muestran final previsto, regreso y cierre manual/automático.
-  Una pausa programada no se presenta como activa ni se inventa su cierre.
-- Transporte compatible con estados anteriores; conserva permisos y decisiones
-  de Start/Stop. Catálogos reconstruidos sin duplicar textos entre idiomas,
-  con equivalencia exacta y presupuestos originales.
-- 835 pruebas y recorrido integrado ficticio; revisión de 320 vistas y publicación
-  se registran en el PR. La coordinación multi-PC permanece en el plan.

@@ -184,18 +184,19 @@ test('Higher Rate purge restores windows, frozen bonuses and finance assignments
   const windows=[{id:'old',past:true},{id:'new',past:false}],calls=[{id:'call'}];
   const settings={higherRateWindows:windows,financeCategories:{expenses:{rows:[{assignedAmount:5}]}}};
   let accepted=false;const messages=[];
-  const h=vm.createContext({ui,translateText:x=>x,settings,calls,readHigherRateWindowsFromEditor:()=>windows,
+  const h=vm.createContext({ui,translateText:x=>x,settings,calls,canPersistLocalChanges:()=>true,money:x=>String(x),convertedAmountText:()=>'',higherRateBonusForCall:()=>({amount:1,windowId:'old'}),
     higherRateGameBonusSnapshot:()=>new Map(),higherRateWindowIsPast:w=>w.past,appConfirm:(_,accept)=>accept(),
     freezeHigherRateBonusesForWindowIds:()=>{calls[0].frozenHigherRateBonus={amount:1};},
     financeRunAutoFillCascade:()=>{settings.financeCategories.expenses.rows[0].assignedAmount=10;},
     reconcileHigherRateGameChanges:()=>messages.push('reconcile'),saveAll:()=>accepted,
     render() {},renderHigherRateWindowsEditor:()=>messages.push('render'),toast:x=>messages.push(x)});
-  vm.runInContext(declaration('../js/higher-rate.js','purgePastHigherRateWindows'),h);h.purgePastHigherRateWindows();
+  vm.runInContext(['higherRateMutationSnapshot','restoreHigherRateMutation','purgePastHigherRateWindows'].map(n=>declaration('../js/higher-rate.js',n)).join('\n'),h);h.purgePastHigherRateWindows();
   assert.equal(settings.higherRateWindows,windows);assert.equal(Object.hasOwn(calls[0],'frozenHigherRateBonus'),false);
   assert.equal(settings.financeCategories.expenses.rows[0].assignedAmount,5);assert.deepEqual(messages,[]);
   accepted=true;h.purgePastHigherRateWindows();assert.equal(settings.higherRateWindows.length,1);
   assert.equal(settings.higherRateWindows[0].id,'new');assert.equal(calls[0].frozenHigherRateBonus.amount,1);
-  assert.equal(messages.length,3);
+  assert.equal(settings.financeCategories.expenses.rows[0].assignedAmount,5);
+  assert.equal(messages.length,2);
 });
 
 for(const scenario of [

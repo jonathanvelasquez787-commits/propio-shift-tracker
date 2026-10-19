@@ -343,6 +343,14 @@
       ],
       "tests": [
         {
+          "file": "tests/higher-rate-archive.test.mjs",
+          "namedCases": [
+            "cleaning Higher Rate history preserves each earned bonus, base pay and finance allocations after reload",
+            "rejected Higher Rate archive restores all windows and bonuses and can be retried without duplicate writes",
+            "canceling a Higher Rate archive or opening it from a stale tab changes nothing"
+          ]
+        },
+        {
           "file": "tests/finance-planning.test.mjs",
           "namedCases": [
             "projections use chosen hours and settings rate; split must sum exactly 100",

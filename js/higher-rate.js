@@ -6,14 +6,14 @@ let HIGHER_RATE_EARLY_GRACE_MIN, HIGHER_RATE_TIERS, appConfirm, callDateKeyFromV
 let callsForDay, dayKeyFromIsoDate, escapeHtml, financeConvertedInline, financeRunAutoFillCascade, formatBlockDurationLabel;
 let formatCallDayLabel, formatHHMM, formatMinutes, iconHtml, isoDateFromDayKey, makeLocalId;
 let mergeIntervals, minutesToHHMM, money, onGameCallsChanged, render, saveAll, timeLabel, toDateFromInputs, toMinutes;
-let toast, todayCallDateKey, todayRange;
+let toast, todayCallDateKey, todayRange, canPersistLocalChanges, convertedAmountText;
 
 export function configureHigherRateContext(context) {
   ({ HIGHER_RATE_EARLY_GRACE_MIN, HIGHER_RATE_TIERS, appConfirm, callDateKeyFromValue, callDateToDate,
     callsForDay, dayKeyFromIsoDate, escapeHtml, financeConvertedInline, financeRunAutoFillCascade, formatBlockDurationLabel,
     formatCallDayLabel, formatHHMM, formatMinutes, iconHtml, isoDateFromDayKey, makeLocalId,
     mergeIntervals, minutesToHHMM, money, onGameCallsChanged, render, saveAll, timeLabel, toDateFromInputs, toMinutes, toast,
-    todayCallDateKey, todayRange } = context);
+    todayCallDateKey, todayRange, canPersistLocalChanges, convertedAmountText } = context);
 }
 
     function higherRateWindowBounds(window) {
@@ -739,42 +739,40 @@ export function configureHigherRateContext(context) {
 
     // Vacía el historial de ventanas ya terminadas; el bono ya ganado se conserva congelado.
     export function purgePastHigherRateWindows() {
-      const current = readHigherRateWindowsFromEditor();
-      const gameBefore = higherRateGameBonusSnapshot();
-      const isPast = (w) => higherRateWindowIsPast(w);
-      const pastWindows = current.filter(isPast);
+      if (!canPersistLocalChanges()) return false;
+      const owner = settings;
+      const current = settings.higherRateWindows || [];
+      const pastWindows = current.filter(w => higherRateWindowIsPast(w));
       if (!pastWindows.length) {
         toast(translateText('El historial ya está vacío — no hay ventanas de Higher Rate que ya hayan terminado.'));
-        return;
+        return false;
       }
-      appConfirm(ui`¿Vaciar el historial completo (${pastWindows.length} ventana(s) de Higher Rate ya terminadas)? Las que siguen activas o futuras no se tocan. Las llamadas que ya recibieron un bono de esas ventanas conservan su bono ganado. No se puede deshacer.`, () => {
-        const previousWindows = settings.higherRateWindows;
-        const previousCategories = settings.financeCategories === undefined ? undefined : JSON.parse(JSON.stringify(settings.financeCategories));
-        const previousBonuses = calls.map(call => [call, call.frozenHigherRateBonus]);
-        // Sin esto, purgar borraba las ventanas pasadas de golpe y el bono que ya habían generado
-        // desaparecía retroactivamente de las ganancias de esos días/ciclo.
-        const pastIds = pastWindows.map(w => w.id);
+      const pastIds = pastWindows.map(w => w.id);
+      const earned = calls.map(higherRateBonusForCall).filter(b => b && pastIds.includes(b.windowId));
+      const total = earned.reduce((sum, b) => sum + b.amount, 0);
+      const revision = JSON.stringify([settings, calls]);
+      let settled = false;
+      appConfirm(ui`¿Limpiar el historial? Ventanas pasadas: ${pastWindows.length}. Llamadas con bono: ${earned.length} (${money(total)} ${convertedAmountText(total)}). Se conservan tus llamadas y ganancias; solo se limpia esta lista.`, () => {
+        if (settled) return false;
+        settled = true;
+        if (!canPersistLocalChanges()) return false;
+        if (settings !== owner || revision !== JSON.stringify([settings, calls])) {
+          toast(translateText('Tus datos cambiaron. Revisá de nuevo la limpieza del historial.'));
+          return false;
+        }
+        const previous = higherRateMutationSnapshot();
         freezeHigherRateBonusesForWindowIds(pastIds);
-
-        const remaining = current.filter(w => !isPast(w));
+        const remaining = current.filter(w => !pastIds.includes(w.id));
         settings.higherRateWindows = remaining;
-        financeRunAutoFillCascade();
-        // SaveAll en vez de saveSettingsOnly: también hay que persistir `calls` (varias pueden
-        // haber quedado con frozenHigherRateBonus).
+        // El archivo no cambia importes: no reasigna Finanzas ni emite recompensas.
         if (saveAll({ render: false }) === false) {
-          settings.higherRateWindows = previousWindows;
-          if (previousCategories === undefined) delete settings.financeCategories;
-          else settings.financeCategories = previousCategories;
-          previousBonuses.forEach(([call, bonus]) => {
-            if (bonus === undefined) delete call.frozenHigherRateBonus;
-            else call.frozenHigherRateBonus = bonus;
-          });
+          restoreHigherRateMutation(previous);
           render();
           return false;
         }
-        reconcileHigherRateGameChanges(gameBefore);
         render();
         renderHigherRateWindowsEditor(remaining);
-        toast(ui`${pastWindows.length} ventana(s) borrada(s) del historial — el bono ya ganado por esas llamadas se conserva.`);
+        toast(translateText('Historial de ventanas limpio. Tus llamadas y bonos se conservaron.'));
+        return true;
       });
     }

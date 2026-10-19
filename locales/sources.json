@@ -403,6 +403,12 @@
       "js/app-main.js"
     ]
   },
+  "s_0857f06e": {
+    "source": "Las ventanas terminadas se mueven aquí. Podés limpiar esta lista sin perder los bonos ya registrados en tus llamadas.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_08814f8e": {
     "source": "Productividad semanal",
     "files": [
@@ -558,6 +564,12 @@
     "source": "El aislamiento entre cuentas lo impone la base de datos, no el navegador.",
     "files": [
       "privacidad.html"
+    ]
+  },
+  "s_0ac26860": {
+    "source": "¿Limpiar el historial? Ventanas pasadas: {{v0}}. Llamadas con bono: {{v1}} ({{v2}} {{v3}}). Se conservan tus llamadas y ganancias; solo se limpia esta lista.",
+    "files": [
+      "js/higher-rate.js"
     ]
   },
   "s_0acccd67": {
@@ -2447,12 +2459,6 @@
       "js/schedule.js"
     ]
   },
-  "s_2d5321ca": {
-    "source": "¿Vaciar el historial completo ({{v0}} ventana(s) de Higher Rate ya terminadas)? Las que siguen activas o futuras no se tocan. Las llamadas que ya recibieron un bono de esas ventanas conservan su bono ganado. No se puede deshacer.",
-    "files": [
-      "js/higher-rate.js"
-    ]
-  },
   "s_2d6bba04": {
     "source": "No se quitó el sonido porque no se pudo guardar.",
     "files": [
@@ -2938,6 +2944,12 @@
     "files": [
       "app.html",
       "js/positive-reinforcement.js"
+    ]
+  },
+  "s_34c3a09c": {
+    "source": "Historial de ventanas limpio. Tus llamadas y bonos se conservaron.",
+    "files": [
+      "js/higher-rate.js"
     ]
   },
   "s_34f7bda2": {
@@ -5422,12 +5434,6 @@
       "app.html"
     ]
   },
-  "s_62280ed7": {
-    "source": "Se mueven aquí solas apenas su fecha ya pasó — la lista de arriba se queda limpia con solo hoy y lo que viene. Siguen editables o eliminables cuando quieras, no se borran solas.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_6256ec1e": {
     "source": "{{v0}} y {{v1}} se cruzan.",
     "files": [
@@ -6105,12 +6111,6 @@
     "source": "Apartar o devolver dinero",
     "files": [
       "js/finance-planning.js"
-    ]
-  },
-  "s_6fb42af6": {
-    "source": "Borra TODAS las ventanas pasadas de un click. El bono ya ganado por llamadas reales se conserva siempre, aunque borres la ventana que lo generó.",
-    "files": [
-      "app.html"
     ]
   },
   "s_6fc023f8": {
@@ -7096,6 +7096,12 @@
       "app.html"
     ]
   },
+  "s_81980738": {
+    "source": "Tus datos cambiaron. Revisá de nuevo la limpieza del historial.",
+    "files": [
+      "js/higher-rate.js"
+    ]
+  },
   "s_81c08233": {
     "source": "Bloque de Trabajo {{v0}}",
     "files": [
@@ -7577,12 +7583,6 @@
       "app.html"
     ]
   },
-  "s_89364a5e": {
-    "source": "Vaciar historial",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_894d524b": {
     "source": "Protegido con escudo",
     "files": [
@@ -7606,12 +7606,6 @@
     "files": [
       "js/finance-planning.js",
       "js/finance.js"
-    ]
-  },
-  "s_89d6158b": {
-    "source": "{{v0}} ventana(s) borrada(s) del historial — el bono ya ganado por esas llamadas se conserva.",
-    "files": [
-      "js/higher-rate.js"
     ]
   },
   "s_89f87368": {
@@ -11213,6 +11207,12 @@
       "app.html"
     ]
   },
+  "s_cb2b5007": {
+    "source": "Quita las ventanas pasadas de esta lista. Conserva las llamadas, sus bonos y las ganancias del día y del ciclo. No recalcula promociones.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_cb3db0cf": {
     "source": "Lo ganaste con {{v3}}{{v4}}{{v5}}",
     "files": [
@@ -11784,6 +11784,12 @@
     "source": "Volviste a tiempo de {{v0}} {{v1}}.",
     "files": [
       "js/reinforcement-rules.js"
+    ]
+  },
+  "s_d6b39e7c": {
+    "source": "Limpiar historial",
+    "files": [
+      "app.html"
     ]
   },
   "s_d6df135e": {
