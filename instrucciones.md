@@ -327,8 +327,8 @@ futura opera bajo esto, sin excepción:
 - **Mejoras integrales aprobadas el 18/10:** ejecutar las recomendaciones de la
   evaluación de 79 funciones por fases; alcance y estado completo en
   [plan de mejoras](docs/plan-mejoras-integrales.md). Inicio y preparación publicados:
-  17 mejoras cerradas; 33–37 resueltas en orden. Sigue la fase 3: recuperación
-  y trazabilidad. No perder las fases posteriores al
+  18 mejoras cerradas; 33–37 y 21 resueltas en orden. Fase 3 en curso:
+  sigue 22, después 26–27, 47, 67 y 69. No perder las fases posteriores al
   entregar una parte ni considerar pendiente la instalación ya confirmada.
 - **Segundos oficiales de Propio:** confirmar con evidencia si el último minuto
   incompleto se incluye en duración y pago. El formato de hora visible no lo demuestra.
@@ -440,7 +440,7 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
-- App 627; extensión unificada 2.2.10 (versión visible y recarga confirmadas).
+- App 628; extensión unificada 2.2.10 (versión visible y recarga confirmadas).
   Diseño compacto aprobado: resumen cerrado y preparación al pulsarlo.
   El panel de disponibilidad está en la tool;
   el popup de Chrome configura la extensión y esta transmite el estado a la web.
@@ -471,6 +471,20 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v628 — Historial y recuperación de ediciones y borrados de llamadas.**
+
+- Punto 21: tarjetas con antes/después y recuperación explícita, sin sustituir
+  correcciones posteriores ni duplicar filas que volvieron desde Propio.
+- Borrado individual y vaciado de llamadas del día recuperables, conservando
+  turnos/pausas/horario; vista previa antes de confirmar y conservación de bonos.
+- Guardado completo con reversión ante rechazo/interrupción; un editor fallido
+  permanece abierto. Protección de cuenta, revisión, lote y doble confirmación.
+- Hasta 50 cambios/30 días según espacio (384 KiB), en state.callRecovery y
+  respaldo JSON. Trece regresiones, 879 pruebas y recorridos ES/EN, ambos temas
+  y cuatro anchos. Descarga fallida y cuota real simuladas en Chrome aislado.
+- Carga diferida: presupuesto del detalle 50 KB, iniciales conservados. Alcance
+  y límites en docs/recuperacion-llamadas.md. Sigue 22; extensión sin cambios.
+
 **v627 — Revisar y corregir Higher Rate sin mezclarlo con limpiar.**
 
 - Revisión por ventana con llamadas, gracia, motivos y bonos conservados.
@@ -496,16 +510,3 @@ futura opera bajo esto, sin excepción:
   reintentos en cada actualización del reloj. Presupuestos originales intactos.
 - 854 pruebas, builds y recorridos ES/EN, claro/oscuro y cuatro anchos. Alcance
   y evidencia en docs/ganancias-desglose.md. Siguen 36 y 37; extensión sin cambios.
-
-**v625 — Limpiar Higher Rate conserva llamadas y bonos.**
-
-- Limpieza de ventanas terminadas con vista previa de cantidades e importe
-  conservado, incluida moneda secundaria. No altera pago base, asignaciones
-  de Finanzas ni recompensas; conserva el nivel del bono en cada llamada.
-- Confirmación ligada a los datos y cuenta actuales, guardado completo con
-  reversión ante rechazo y protección contra ejecutar dos veces el mismo clic.
-- 846 pruebas y 12 recorridos ficticios ES/EN, claro/oscuro y tres anchos,
-  con cancelar, limpiar y reabrir conservando ganancias. Build y presupuestos
-  correctos. Evidencia y límites en docs/higher-rate-limpieza.md.
-- El recálculo explícito sigue pendiente y nunca formará parte de limpiar.
-  La extensión continúa en 2.2.10; esta entrega modifica solo la tool web.

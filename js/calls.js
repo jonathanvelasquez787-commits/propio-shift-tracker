@@ -1,6 +1,7 @@
+import { loadDetailViews } from './detail-views-loader.js';
 import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 // app-main.js injects call helpers; app-context.js owns shared app state.
-import { calls, settings, state, setAppCalls as setCalls } from './app-context.js';
+import { calls, settings, state, setAppCalls as setCalls, setAppState } from './app-context.js';
 import { ignorePropioCall } from './propio-bridge.js';
 import { callFeedbackSilenced, withSilentCallFeedback } from './call-feedback.js';
 
@@ -13,7 +14,9 @@ let iconHtml, importedCallStats, isoDateFromDayKey, makeLocalId, money, onGameCa
 let pad, parseMoney, rateTilePerMin, renderRateTiles, sameCallDay, saveAll, timeLabelFromDate;
 let toDateFromInputs, toast, todayCallDateKey, playCallSavedSound;
 
+let callContext;
 export function configureCallsContext(context) {
+  callContext = context;
   ({ HIGHER_RATE_TIERS, MAX_CALL_DURATION_MIN, appConfirm, autoStartShiftFromCalls, callDateKeyFromValue, callDedupeKey,
     callsForDay, callsOverlap, closeModal, connectedMinutesForDay, convertedAmountText, dayAdherence,
     dayEvents, dayGapRows, dayKeyFromIsoDate, dayShiftBounds, dayWorkSessions, escapeHtml, financeConvertedInline,
@@ -24,7 +27,20 @@ export function configureCallsContext(context) {
     toDateFromInputs, toast, todayCallDateKey, playCallSavedSound } = context);
 }
 
-let editingCallId = null;
+let editingCallId = null, editingCallContext = null;
+
+async function useCallRecovery(action, ...args) {
+  const owner = settings;
+  const module = await loadDetailViews({ retry: true });
+  if (settings !== owner) return false;
+  if (!module) { toast(translateText('No se pudo cargar el detalle. Cerrá y abrí esta sección para reintentar.')); return false; }
+  return module[action]({ ...callContext, ui, translateText, displayLocale,
+    data: () => ({ calls, state, settings }), setCalls, setState: setAppState, reconcileLastCallEndedAt,
+    finishEdit: () => { editingCallId = null; editingCallContext = null; },
+  }, ...args);
+}
+
+export function openCallRecovery() { return useCallRecovery('openCallRecovery'); }
 
 // Filtro Todo/Llamadas/Acciones sobre la tabla fusionada "Tabla de llamadas y acciones de hoy" (ver
 // #tableFilterRow en el HTML y dayActionRows/renderTable más abajo). Vive en memoria, no en
@@ -72,6 +88,7 @@ export function openCallEditor(callId) {
     return;
   }
   editingCallId = callId;
+  editingCallContext = { owner: settings, call: JSON.stringify(call, function (_key, item) { return item && typeof item === 'object' && !Array.isArray(item) ? Object.fromEntries(Object.keys(item).sort().map(key => [key, item[key]])) : item; }) };
   const title = document.getElementById('callEditModalTitle');
   const preview = document.getElementById('callEditPreviewText');
   const durationInput = document.getElementById('callEditDurationInput');
@@ -99,7 +116,7 @@ export function openCallEditor(callId) {
     if (existingBonus) {
       const tierMeta = HIGHER_RATE_TIERS[existingBonus.tier];
       const tierLabel = tierMeta?.label || existingBonus.tier;
-      infoTextEl.innerHTML = ui`Esta llamada cae en una ventana <strong>${escapeHtml(tierLabel)}</strong> (+${money(tierMeta?.bonusPerMin || 0)}/min), así que ya suma <strong>${money(existingBonus.amount)}</strong>${financeConvertedInline(existingBonus.amount)} de bono aparte del Pago de arriba. Para cambiar el nivel, edita esa ventana en "Higher Rate" (botón del header) — no hace falta tocar el Pago.`;
+      infoTextEl.innerHTML = ui`Bono <strong>${escapeHtml(tierLabel)}</strong>: <strong>${money(existingBonus.amount)}</strong>${financeConvertedInline(existingBonus.amount)}, aparte del pago base. Para corregirlo, abrí Higher Rate → Revisar llamadas → Corregir promoción.`;
       infoEl.style.display = '';
       warningEl.style.display = 'none';
     } else {
@@ -117,107 +134,15 @@ function readNumericCallPay(value, fallback = 0) {
   return Number.isFinite(amount) && amount <= 1e9 ? Math.max(0, amount) : null;
 }
 
-export function saveCallEditor() {
-  if (!editingCallId) return;
-  const durationInput = document.getElementById('callEditDurationInput');
-  const payInput = document.getElementById('callEditPayInput');
-  const billableInput = document.getElementById('callEditBillableInput');
-  const droppedInput = document.getElementById('callEditDroppedInput');
-
-  const duration = Number(durationInput?.value);
-  if (!String(durationInput?.value ?? '').trim() || durationInput?.validity?.badInput
-    || !Number.isFinite(duration) || duration < 0 || duration > MAX_CALL_DURATION_MIN) {
-    toast(ui`La duración debe ser un número entre 0 y ${MAX_CALL_DURATION_MIN} minutos`);
-    return;
-  }
-  // Los campos numéricos del editor no usan el parser de las exportaciones importadas.
-  const amount = readNumericCallPay(payInput?.value);
-  if (payInput?.validity?.badInput || amount === null) {
-    toast(translateText('El pago debe ser un número válido de hasta 1000000000 dólares.'));
-    return false;
-  }
-  const pay = amount.toFixed(2);
-  const billable = billableInput?.value === 'Yes' ? translateText('Yes') : translateText('No');
-  const dropped = droppedInput?.value === 'Yes' ? translateText('Yes') : translateText('No');
-
-  const original = calls.find(c => c.id === editingCallId);
-  if (!original) return;
-  const affectedDayKey = callDateKeyFromValue(original.callDate);
-  const start = new Date(original.startISO);
-  const end = new Date(start.getTime() + duration * 60000);
-  if (end.getTime() > Date.now()) {
-    toast(translateText('La llamada no puede terminar en el futuro'));
-    return;
-  }
-  const candidate = { ...original, startISO: start.toISOString(), endISO: end.toISOString() };
-
-  // Alargar la duración puede encimar esta llamada con la siguiente o la anterior: se valida el
-  // traslape.
-  const overlapsWith = calls.find(c => c.id !== editingCallId && callsOverlap(c, candidate));
-  if (overlapsWith) {
-    toast(ui`Esa duración traslapa con la llamada #${overlapsWith.customerId} (${overlapsWith.callStart}). Ajusta la duración.`);
-    return;
-  }
-
-  setCalls(calls.map(c => {
-    if (c.id !== editingCallId) return c;
-    // El startISO NO cambia (por eso no se puede editar fecha/hora aquí), así que las anotaciones
-    // de gap ligadas a esta llamada (que usan startISO) siguen siendo válidas después de editar.
-    return {
-      ...c,
-      durationMin: duration,
-      pay,
-      billable,
-      dropped,
-      endISO: end.toISOString(),
-      countsAsProductive: billable === 'Yes' && dropped === 'No',
-    };
-  }));
-
-  editingCallId = null;
-  closeModal('callEditModal');
-  if (affectedDayKey) reconcileLastCallEndedAt(affectedDayKey);
-  financeRunAutoFillCascade();
-  if (saveAll() === false) return false;
-  if (affectedDayKey) onGameCallsChanged(affectedDayKey);
-  toast(translateText('Llamada actualizada'));
-}
+export function saveCallEditor() { return useCallRecovery('saveEditedCall', editingCallId, editingCallContext); }
 
 // Borra una llamada individual desde "Tabla completa" (botón "Eliminar" junto a "Editar", ver
 // renderTable).
-export function deleteCallRecord(callId) {
-  const call = calls.find(c => c.id === callId);
-  if (!call) return false;
-  const affectedDayKey = callDateKeyFromValue(call.callDate);
-  setCalls(calls.filter(c => c.id !== callId));
-  if (affectedDayKey) reconcileLastCallEndedAt(affectedDayKey);
-  financeRunAutoFillCascade();
-  if (saveAll() === false) return false;
-  if (affectedDayKey) onGameCallsChanged(affectedDayKey);
-  toast(translateText('Llamada eliminada'));
-  return true;
-}
+export function deleteCallRecord(callId, expected = calls.find(call => call.id === callId)) { return useCallRecovery('deleteRecordedCall', callId, expected); }
 
 // Botón "🗑️ Vaciar llamadas del día" dentro de "Tabla de llamadas" — distinto de "Reiniciar día"
 // (que además borra pausas/turno/huecos/nota/log de ese día).
-export function clearActiveDayCalls() {
-  const dayKey = getActiveDayKey();
-  const dayCallsList = callsForDay(dayKey);
-  if (!dayCallsList.length) {
-    toast(translateText('No hay llamadas que borrar en este día.'));
-    return;
-  }
-  const count = dayCallsList.length;
-  const plural = count === 1 ? translateText('llamada') : translateText('llamadas');
-  appConfirm(ui`¿Vaciar TODAS las ${plural} de ${formatCallDayLabel(dayKey)} (${count})? Tu turno, pausas y horario de ese día no se tocan. No se puede deshacer.`, () => {
-    setCalls(calls.filter(c => callDateKeyFromValue(c.callDate) !== dayKey));
-    reconcileLastCallEndedAt(dayKey);
-    financeRunAutoFillCascade();
-    if (saveAll() === false) return false;
-    onGameCallsChanged(dayKey);
-    toast(ui`${count} ${plural} de ${formatCallDayLabel(dayKey)} borrada(s)`);
-  });
-}
+export function clearActiveDayCalls() { return useCallRecovery('clearRecordedDay', getActiveDayKey()); }
 
 // Agregar llamada manual ---- Para llamadas que nunca llegan en la exportación de Propio (ej. una
 // llamada tomada fuera de la plataforma, o una que se te olvidó pegar).
@@ -834,4 +759,4 @@ export function markManualCallPayDirty() { manualCallPayDirty = true; }
 export function clearManualCallRateTile() { manualCallSelectedRateTile = null; }
 export function getManualCallSelectedRateTile() { return manualCallSelectedRateTile; }
 export function hasPendingManualCallBackup() { return manualCallLiveBackupPending; }
-export function resetCallEditorState() { editingCallId = null; }
+export function resetCallEditorState() { editingCallId = null; editingCallContext = null; }

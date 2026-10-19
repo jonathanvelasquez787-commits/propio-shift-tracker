@@ -20,7 +20,7 @@ const functions = ['pad', 'dateKey', 'todayRange', 'todayCallDateKey', 'callDate
 const at = (day, clock = '12:00') => new Date(`2025-09-${String(day).padStart(2, '0')}T${clock}:00`);
 const tiers = { bronze: { bonusPerMin: .01 }, silver: { bonusPerMin: .02 }, gold: { bonusPerMin: .03 } };
 
-test('official bridge synchronization is silent while the live finish and manual paste retain their sounds', t => {
+test('official bridge synchronization is silent while the live finish and manual paste retain their sounds', async t => {
   const x = harness(t); x.advance(at(2, '19:00'));
   autoSaveLiveCall(at(1, '09:00').toISOString(), at(1, '09:10').toISOString());
   assert.deepEqual(x.soundEvents, ['callEnded']);
@@ -41,7 +41,7 @@ test('official bridge synchronization is silent while the live finish and manual
   assert.deepEqual(x.soundEvents, ['callEnded', 'callPasted']); assert.equal(muted.at(-1), false);
 });
 
-test('extension live saves and catch-up are discreet while ordinary live and manual saves keep feedback', t => {
+test('extension live saves and catch-up are discreet while ordinary live and manual saves keep feedback', async t => {
   const x = harness(t); x.advance(at(2, '19:00'));
   const context = { propioBridge: { callId: 'discreet-bridge-call-123', timingEstimated: true, payEstimated: true } };
   assert.equal(autoSaveLiveCall(at(1, '09:00').toISOString(), at(1, '09:10').toISOString(), context), true);
@@ -52,7 +52,7 @@ test('extension live saves and catch-up are discreet while ordinary live and man
   assert.deepEqual(x.soundEvents, ['callEnded']); assert.equal(x.messages.length, 1);
 });
 
-test('the actual tool plan exports planned Break/Lunch even with no active pause, respects shifted planning and midnight', t => {
+test('the actual tool plan exports planned Break/Lunch even with no active pause, respects shifted planning and midnight', async t => {
   const x=harness(t); x.advance(at(1,'09:05'));
   const h=x.h; h.localStorageRevision={isCurrent:()=>true}; h.getDayNote=()=>null; h.referenceDurationMinForActivePause=()=>null;
   h.computeCurrentAcwStart=()=>null;
@@ -72,7 +72,7 @@ test('the actual tool plan exports planned Break/Lunch even with no active pause
   assert.deepEqual(periods(),[{type:'lunch',startedAt:at(1,'23:45').toISOString(),endedAt:at(2,'00:15').toISOString()}]);
 });
 
-test('background official recovery preserves drafts and selected day, imports zero rows once and updates the same corrected identity', t => {
+test('background official recovery preserves drafts and selected day, imports zero rows once and updates the same corrected identity', async t => {
   const x = harness(t); x.advance(at(2,'19:00'));
   x.element('callInput').value = 'unfinished manual paste'; state.activeDayKey = '08/31/2025';
   const raw = '91434\t09/01/2025\t11:54 AM\t0\tYes\tNo\t$0.00\n72601\t09/01/2025\t11:52 AM\t0\tYes\tNo\t$0.00';
@@ -85,7 +85,7 @@ test('background official recovery preserves drafts and selected day, imports ze
   x.reload(); assert.equal(calls.length,2); assert.equal(calls.find(call=>call.customerId==='91434').durationMin,5);
 });
 
-test('background recovery holds a whole conflicting batch without partially importing or clearing the draft', t => {
+test('background recovery holds a whole conflicting batch without partially importing or clearing the draft', async t => {
   const x = harness(t); x.advance(at(2,'19:00')); x.manual('09/01/2025','08:00',10,'1.20','manual');
   x.element('callInput').value = 'draft'; const before = JSON.stringify(calls);
   assert.equal(x.h.importCalls('1\t09/01/2025\t9:00 AM\t5\tYes\tNo\t$0.60\n2\t09/01/2025\t8:05 AM\t5\tYes\tNo\t$0.60'),false);
@@ -127,7 +127,7 @@ function harness(t) {
   vm.runInContext(functions.map(name => { assert.ok(declarations.has(name), name); return declarations.get(name); }).join('\n'), h);
   configureHigherRateContext({ ...h, HIGHER_RATE_TIERS: tiers, HIGHER_RATE_EARLY_GRACE_MIN: 5 });
   configureFinanceContext({ parseMoney: h.parseMoney, higherRateBonusForCalls, saveSettingsOnly: save, render() {}, money: x => x.toFixed(2), convertedAmountText: () => '', toast:h.toast, makeLocalId:h.makeLocalId, appConfirm:(_message, run)=>run() });
-  configureCallsContext({ ...h, HIGHER_RATE_TIERS: tiers, MAX_CALL_DURATION_MIN: 1440, money: x => x.toFixed(2), convertedAmountText: () => '', financeConvertedInline: () => '', formatDuration: x => String(x), rateTilePerMin: () => settings.rate, renderRateTiles() {}, formatCallDayLabel: x => x,
+  configureCallsContext({ ...h, HIGHER_RATE_TIERS: tiers, MAX_CALL_DURATION_MIN: 1440, canPersistLocalChanges: () => true, stateWithinBudget: () => true, render() {}, money: x => x.toFixed(2), convertedAmountText: () => '', financeConvertedInline: () => '', formatDuration: x => String(x), rateTilePerMin: () => settings.rate, renderRateTiles() {}, formatCallDayLabel: x => x,
     closeModal() {}, openModal() {}, appConfirm: (_message, fn) => fn() });
   return { h, inputs, element, gameSaved, messages, soundEvents, rejectSave:()=>{rejectSave=true;},
     advance: date => { clock = date.getTime(); }, saves: () => saves,
@@ -140,7 +140,7 @@ function harness(t) {
   };
 }
 
-test('a rejected manual call save does not announce success or award its reward',t=>{
+test('a rejected manual call save does not announce success or award its reward', async t => {
   const x=harness(t);x.advance(at(2,'19:00'));x.rejectSave();
   x.manual('09/01/2025','08:00',10);
   assert.equal(x.saves(),0);assert.deepEqual(x.gameSaved,[]);
@@ -148,15 +148,15 @@ test('a rejected manual call save does not announce success or award its reward'
   assert.deepEqual(x.soundEvents,[]);
 });
 
-test('manual and live save sounds fire after persistence and never for duplicates or edits',t=>{
+test('manual and live save sounds fire after persistence and never for duplicates or edits', async t => {
   const x=harness(t);x.advance(at(2,'19:00'));x.manual('09/01/2025','08:00',10,'1.20');assert.deepEqual(x.soundEvents,['callManual']);
   x.manual('09/01/2025','08:00',10,'1.20');assert.deepEqual(x.soundEvents,['callManual']);
-  openCallEditor(calls[0].id);x.element('callEditPayInput').value='2';saveCallEditor();assert.deepEqual(x.soundEvents,['callManual']);
+  openCallEditor(calls[0].id);x.element('callEditPayInput').value='2';await saveCallEditor();assert.deepEqual(x.soundEvents,['callManual']);
   autoSaveLiveCall(at(1,'09:00').toISOString(),at(1,'09:10').toISOString());assert.deepEqual(x.soundEvents,['callManual','callEnded']);
   x.reload();assert.deepEqual(x.soundEvents,['callManual','callEnded']);
 });
 
-test('distinct bridge calls in the same displayed minute save separately while overlaps and repeated IDs still block', t => {
+test('distinct bridge calls in the same displayed minute save separately while overlaps and repeated IDs still block', async t => {
   const x = harness(t), base = at(1, '09:00').getTime();
   const iso = seconds => new Date(base + seconds * 1000).toISOString();
   const context = id => ({ propioBridge: { callId: id, timingEstimated: true, payEstimated: true } });
@@ -171,7 +171,7 @@ test('distinct bridge calls in the same displayed minute save separately while o
   assert.equal(calls.length, 2);
 });
 
-test('a pasted batch sounds once only after a changed import is saved',t=>{
+test('a pasted batch sounds once only after a changed import is saved', async t => {
   const x=harness(t);x.advance(at(2,'19:00'));
   const batch=[['one','09/01/2025','08:00 AM','10','Yes','No','$1.20'],['two','09/01/2025','08:30 AM','10','Yes','No','$1.20']];
   x.import(batch);assert.equal(calls.length,2);assert.deepEqual(x.soundEvents,['callPasted']);
@@ -179,32 +179,32 @@ test('a pasted batch sounds once only after a changed import is saved',t=>{
   x.rejectSave();x.import([['three','09/01/2025','09:00 AM','10','Yes','No','$1.20']]);assert.deepEqual(x.soundEvents,['callPasted']);
 });
 
-test('live save rejection and backup wait are silent while a saved live backup uses the ended sound',t=>{
+test('live save rejection and backup wait are silent while a saved live backup uses the ended sound', async t => {
   const x=harness(t);x.advance(at(2,'19:00'));x.manual('09/01/2025','08:00',10,'1.20');x.soundEvents.length=0;
   autoSaveLiveCall(at(1,'08:05').toISOString(),at(1,'08:15').toISOString());assert.deepEqual(x.soundEvents,[]);assert.ok(state.pendingLiveCallBackup);
   x.manual('09/01/2025','10:00',10,'1.20');assert.deepEqual(x.soundEvents,['callEnded']);
   x.rejectSave();autoSaveLiveCall(at(1,'11:00').toISOString(),at(1,'11:10').toISOString());assert.deepEqual(x.soundEvents,['callEnded']);
 });
 
-test('manual and edited numeric payment inputs respect scientific notation without changing the imported-money parser', t => {
+test('manual and edited numeric payment inputs respect scientific notation without changing the imported-money parser', async t => {
   const x = harness(t); x.advance(at(2,'19:00'));
   x.manual('09/01/2025','08:00',10,'1e-2');
   assert.equal(calls[0].pay,'0.01');
-  openCallEditor(calls[0].id); x.element('callEditPayInput').value='1e3'; saveCallEditor();
+  openCallEditor(calls[0].id); x.element('callEditPayInput').value='1e3'; await saveCallEditor();
   assert.equal(calls[0].pay,'1000.00');
   assert.equal(x.h.parseMoney('$1,234.50'),1234.5);
 });
 
-test('overflowing manual or edited payments cannot create or replace a call', t => {
+test('overflowing manual or edited payments cannot create or replace a call', async t => {
   const x = harness(t); x.advance(at(2,'19:00'));
   x.manual('09/01/2025','08:00',10,'1e309'); assert.equal(calls.length,0);
   x.manual('09/01/2025','08:00',10,'1.20');
   const before=JSON.stringify(calls);
-  openCallEditor(calls[0].id); x.element('callEditPayInput').value='1e309'; saveCallEditor();
+  openCallEditor(calls[0].id); x.element('callEditPayInput').value='1e309'; await saveCallEditor();
   assert.equal(JSON.stringify(calls),before);
 });
 
-test('native bad numeric input cannot masquerade as an empty payment and use the estimated fallback', t => {
+test('native bad numeric input cannot masquerade as an empty payment and use the estimated fallback', async t => {
   const x = harness(t); x.advance(at(2,'19:00'));
   x.element('manualCallPayInput').validity={badInput:true};
   x.manual('09/01/2025','08:00',10,''); assert.equal(calls.length,0);
@@ -212,11 +212,11 @@ test('native bad numeric input cannot masquerade as an empty payment and use the
   x.manual('09/01/2025','08:00',10,''); assert.equal(calls[0].pay,'1.20');
   const before=JSON.stringify(calls);
   openCallEditor(calls[0].id); x.element('callEditPayInput').value=''; x.element('callEditPayInput').validity={badInput:true};
-  saveCallEditor(); assert.equal(JSON.stringify(calls),before);
+  await saveCallEditor(); assert.equal(JSON.stringify(calls),before);
 });
 
 for (const [label, value, badInput] of [['empty', '', false], ['whitespace', ' ', false], ['native bad input', '', true]]) {
-  test(`${label} manual duration cannot create a zero-minute call, while explicit zero remains valid`, t => {
+  test(`${label} manual duration cannot create a zero-minute call, while explicit zero remains valid`, async t => {
     const x = harness(t); x.advance(at(2, '19:00'));
     x.element('manualCallDurationInput').validity = { badInput };
     x.manual('09/01/2025', '08:00', value);
@@ -229,24 +229,24 @@ for (const [label, value, badInput] of [['empty', '', false], ['whitespace', ' '
     assert.equal(calls[0].durationMin, 0);
   });
 
-  test(`${label} edited duration cannot erase an existing call duration or its earnings`, t => {
+  test(`${label} edited duration cannot erase an existing call duration or its earnings`, async t => {
     const x = harness(t); x.advance(at(2, '19:00'));
     x.manual('09/01/2025', '08:00', 10, '1.20');
     const before = JSON.stringify(calls), saves = x.saves();
     openCallEditor(calls[0].id);
     x.element('callEditDurationInput').value = value;
     x.element('callEditDurationInput').validity = { badInput };
-    saveCallEditor();
+    await saveCallEditor();
     assert.equal(JSON.stringify(calls), before);
     assert.equal(x.saves(), saves);
     x.element('callEditDurationInput').value = '0';
     x.element('callEditDurationInput').validity = { badInput: false };
-    saveCallEditor();
+    await saveCallEditor();
     assert.equal(calls[0].durationMin, 0);
   });
 }
 
-test('manual preview leaves the payment draft intact when duration is incomplete or native-invalid', t => {
+test('manual preview leaves the payment draft intact when duration is incomplete or native-invalid', async t => {
   const x = harness(t);
   for (const badInput of [false, true]) {
     x.element('manualCallDurationInput').value = '';
@@ -258,10 +258,10 @@ test('manual preview leaves the payment draft intact when duration is incomplete
   }
 });
 
-test('an incomplete live-backup duration preserves its recorded candidate for correction and retry', t => {
+test('an incomplete live-backup duration preserves its recorded candidate for correction and retry', async t => {
   const x = harness(t); x.advance(at(2, '19:00'));
   const start = at(1, '08:00').toISOString(), end = at(1, '08:10').toISOString();
-  autoSaveLiveCall(start, end); autoSaveLiveCall(start, end); deleteCallRecord(calls[0].id);
+  autoSaveLiveCall(start, end); autoSaveLiveCall(start, end); await deleteCallRecord(calls[0].id);
   assert.equal(restorePendingLiveCallBackup(), true);
   const before = JSON.stringify(state.pendingLiveCallBackup), saves = x.saves();
   x.element('manualCallDurationInput').value = '';
@@ -274,7 +274,7 @@ test('an incomplete live-backup duration preserves its recorded candidate for co
   assert.equal(calls[0].durationMin, 10);
 });
 
-test('a twelve-hour clock rejects hour zero instead of importing a different canonical time', t => {
+test('a twelve-hour clock rejects hour zero instead of importing a different canonical time', async t => {
   const x = harness(t);
   for (const time of ['0:00 AM', '00:30 PM']) {
     assert.equal(x.h.toDateFromInputs('09/01/2025', time), null);
@@ -284,7 +284,7 @@ test('a twelve-hour clock rejects hour zero instead of importing a different can
   assert.equal(x.h.toDateFromInputs('09/01/2025', '12:30 PM').getHours(), 12);
 });
 
-test('a rejected finance allocation save does not report Aplicado',t=>{
+test('a rejected finance allocation save does not report Aplicado', async t => {
   const x=harness(t);setAppCalls([{id:'income',pay:'20'}]);
   settings.financeCategories.otro.rows=[{id:'blocked',targetAmount:20,assignedAmount:0,kind:'meta'}];
   x.rejectSave();assert.equal(financeApplySignedAmount('otro','blocked','12,50','plus'),false);
@@ -293,7 +293,7 @@ test('a rejected finance allocation save does not report Aplicado',t=>{
   assert.ok(x.messages.every(message=>!['Aplicado','Applied'].includes(message)));
 });
 
-test('official correction to zero minutes replaces the original and preserves its identity and frozen bonus', t => {
+test('official correction to zero minutes replaces the original and preserves its identity and frozen bonus', async t => {
   const x = harness(t); x.advance(at(2, '19:00'));
   x.import([['42', '09/01/2025', '8:00 AM', 10, 'Yes', 'No', '1.20']]);
   const id = calls[0].id;
@@ -310,7 +310,7 @@ test('official correction to zero minutes replaces the original and preserves it
   assert.equal(calls.length, 1); assert.equal(calls[0].id, id); assert.equal(calls[0].durationMin, 5);
 });
 
-test('successive corrections in one paste produce one final record, including live replacement migration', t => {
+test('successive corrections in one paste produce one final record, including live replacement migration', async t => {
   const x = harness(t); x.advance(at(2, '19:00'));
   x.import([['42', '09/01/2025', '8:00 AM', 10, 'Yes', 'No', '1.20']]);
   const id = calls[0].id;
@@ -327,14 +327,14 @@ test('successive corrections in one paste produce one final record, including li
   assert.equal(x.gameSaved.length, before + 1, 'one new call receipt for the final accepted correction');
 });
 
-test('restored overnight live backup retains the original accounting date after a different shift', t => {
+test('restored overnight live backup retains the original accounting date after a different shift', async t => {
   const x = harness(t); x.advance(at(2, '19:00'));
   state.shiftStartedAt = at(1, '23:00').toISOString();
   const start = at(2, '00:10').toISOString(), end = at(2, '00:20').toISOString();
   autoSaveLiveCall(start, end);
   assert.equal(calls[0].callDate, '09/01/2025');
   assert.equal(autoSaveLiveCall(start, end), false);
-  deleteCallRecord(calls[0].id);
+  await deleteCallRecord(calls[0].id);
   state.shiftStartedAt = at(2, '08:00').toISOString();
   state.shiftEndedAt = null;
   x.h.saveAll(); x.reload();
@@ -346,7 +346,7 @@ test('restored overnight live backup retains the original accounting date after 
   assert.equal(calls[0].shiftDayKey, '09/01/2025');
 });
 
-test('manual allocation accepts the exact final displayed ten cents without allowing overspending', t => {
+test('manual allocation accepts the exact final displayed ten cents without allowing overspending', async t => {
   harness(t);
   const row = { id: 'rent', categoryId: 'otro', kind: 'gasto', targetAmount: 1, assignedAmount: .2, priority: 1 };
   settings.financeCategories.otro.rows.push(row);
@@ -357,7 +357,7 @@ test('manual allocation accepts the exact final displayed ten cents without allo
   assert.ok(Math.abs(row.assignedAmount - .3) < 1e-12);
 });
 
-test('manual finance allocation interprets decimal commas without multiplying the amount and rejects malformed numbers',t=>{
+test('manual finance allocation interprets decimal commas without multiplying the amount and rejects malformed numbers', async t => {
   harness(t);
   const row={id:'decimal',categoryId:'otro',kind:'meta',targetAmount:3000,assignedAmount:0,priority:1};
   settings.financeCategories.otro.rows.push(row);setAppCalls([{pay:3000}]);
@@ -369,7 +369,7 @@ test('manual finance allocation interprets decimal commas without multiplying th
   }
 });
 
-test('automatic allocation covers all 601 rows and bypasses zero-target legacy expenses', t => {
+test('automatic allocation covers all 601 rows and bypasses zero-target legacy expenses', async t => {
   harness(t);
   const rows = settings.financeCategories.otro.rows;
   rows.push({ id: 'legacy-zero', categoryId: 'otro', kind: 'gasto', targetAmount: 0, assignedAmount: 0, priority: 0 });
@@ -383,7 +383,7 @@ test('automatic allocation covers all 601 rows and bypasses zero-target legacy e
   assert.equal(rows.reduce((sum, row) => sum + row.assignedAmount, 0), 601);
 });
 
-test('multiple explicit sessions plus calls outside them count each real connected minute once', t => {
+test('multiple explicit sessions plus calls outside them count each real connected minute once', async t => {
   const x = harness(t); x.advance(at(2, '19:00'));
   state.events = [['08:00', 'iniciado'], ['10:00', 'terminado'], ['12:00', 'iniciado'], ['14:00', 'terminado']]
     .map(([time, title]) => ({ type: 'shift', title: `Shift ${title}`, ts: at(1, time).toISOString(), meta: 'manual' })).reverse();
@@ -396,7 +396,7 @@ test('multiple explicit sessions plus calls outside them count each real connect
   assert.equal(x.h.productiveMinutesForDay('09/01/2025'), 40);
 });
 
-test('a corrected zero-minute official call cannot expand across a different customer call', t => {
+test('a corrected zero-minute official call cannot expand across a different customer call', async t => {
   const x = harness(t); x.advance(at(2, '19:00'));
   x.import([['1', '09/01/2025', '8:00 AM', 0, 'No', 'Yes', '0'], ['2', '09/01/2025', '8:05 AM', 10, 'Yes', 'No', '1.20']]);
   const originalIds = calls.map(c => c.id);
@@ -405,7 +405,7 @@ test('a corrected zero-minute official call cannot expand across a different cus
   assert.equal(calls[0].durationMin, 0);
 });
 
-test('a correction collapses only legacy zero-minute duplicates of its exact official identity', t => {
+test('a correction collapses only legacy zero-minute duplicates of its exact official identity', async t => {
   const x = harness(t); x.advance(at(2, '19:00'));
   x.import([['42', '09/01/2025', '8:00 AM', 3, 'Yes', 'No', '.36']]);
   const original = { ...calls[0], frozenHigherRateBonus: { tier: 'gold', windowId: 'removed', amount: .09 } };
@@ -423,7 +423,7 @@ test('a correction collapses only legacy zero-minute duplicates of its exact off
   assert.equal(calls.length, 3, 'an unrelated overlapping call prevents the correction and its deduplication');
 });
 
-test('reimporting the existing official zero row heals legacy duplicates and rolls back current XP exactly once', t => {
+test('reimporting the existing official zero row heals legacy duplicates and rolls back current XP exactly once', async t => {
   const x = harness(t); x.advance(at(1, '08:05'));
   x.import([['42', '09/01/2025', '8:00 AM', 3, 'Yes', 'No', '.36']]);
   const original = { ...calls[0], frozenHigherRateBonus: { tier: 'gold', windowId: 'removed', amount: .09 } };
@@ -459,7 +459,7 @@ test('reimporting the existing official zero row heals legacy duplicates and rol
   assert.equal(x.saves(), saves);
 });
 
-test('an exact zero-minute official correction cannot replace an unrelated overlapping live call', t => {
+test('an exact zero-minute official correction cannot replace an unrelated overlapping live call', async t => {
   const x = harness(t); x.advance(at(2, '19:00'));
   x.import([['1', '09/01/2025', '8:00 AM', 0, 'No', 'Yes', '0']]);
   autoSaveLiveCall(at(1, '08:05').toISOString(), at(1, '08:15').toISOString());
@@ -469,7 +469,7 @@ test('an exact zero-minute official correction cannot replace an unrelated overl
   assert.equal(x.saves(), saves);
 });
 
-test('31 chronological days preserve an independent ledger through imports, manual/live calls, corrections, deletion, goals, and reloads', t => {
+test('31 chronological days preserve an independent ledger through imports, manual/live calls, corrections, deletion, goals, and reloads', async t => {
   const x = harness(t), model = new Map();
   const row = { id: 'rent', categoryId: 'otro', kind: 'gasto', targetAmount: 20, assignedAmount: 0, priority: 1 };
   settings.financeCategories.otro.rows.push(row, { id: 'save', categoryId: 'otro', kind: 'meta', targetAmount: 100, assignedAmount: 0, priority: 1 });
@@ -502,12 +502,12 @@ test('31 chronological days preserve an independent ledger through imports, manu
       }
       if (day % 5 === 0) {
         const record = calls.find(c => c.customerId === `manual-${day}`);
-        openCallEditor(record.id); x.element('callEditDurationInput').value = '10'; x.element('callEditPayInput').value = '1.20'; saveCallEditor(); remember(`manual-${day}`, key, 10, 120); validate();
+        openCallEditor(record.id); x.element('callEditDurationInput').value = '10'; x.element('callEditPayInput').value = '1.20'; await saveCallEditor(); remember(`manual-${day}`, key, 10, 120); validate();
       }
       if (day % 4 === 0) {
-        deleteCallRecord(calls.find(c => c.customerId === `manual-${day}`).id); model.delete(`${key}:manual-${day}`); validate();
+        await deleteCallRecord(calls.find(c => c.customerId === `manual-${day}`).id); model.delete(`${key}:manual-${day}`); validate();
       }
-      if (day === 26) { clearActiveDayCalls(); for (const [id, entry] of model) if (entry.day === key) model.delete(id); validate(); }
+      if (day === 26) { await clearActiveDayCalls(); for (const [id, entry] of model) if (entry.day === key) model.delete(id); validate(); }
     }
     x.h.setDailyGoalOverride(key, { min: 50, usd: 6 }); assert.equal(x.h.effectiveDailyGoal(key).usd, 6);
     x.h.setDailyGoalOverride(key, null); assert.equal(x.h.effectiveDailyGoal(key).usd, 4.8);
@@ -525,7 +525,7 @@ test('31 chronological days preserve an independent ledger through imports, manu
   t.diagnostic(`${checks} accounting checkpoints, ${model.size} final calls, 31 persisted daily snapshots and 31 exported day reconciliations`);
 });
 
-test('31 daily call saves, currency changes, allocation resets and payment corrections preserve an independent monthly payment ledger', t => {
+test('31 daily call saves, currency changes, allocation resets and payment corrections preserve an independent monthly payment ledger', async t => {
   const x = harness(t), ledger = new Map();
   settings.exchangeRate = 26.8; settings.currencyLabel = 'L';
   settings.financeCategories.otro.rows = [
@@ -569,7 +569,7 @@ test('31 daily call saves, currency changes, allocation resets and payment corre
   t.diagnostic(`${checks} monthly payment reconciliations after daily persistence; ${ledger.size} retained payments and 31 real manual-call handler saves`);
 });
 
-test('42 days across leap February preserve the ledger after incomplete entry, midnight imports, correction and reload', t => {
+test('42 days across leap February preserve the ledger after incomplete entry, midnight imports, correction and reload', async t => {
   const x = harness(t), ledger = new Map();
   settings.financeCategories.otro.rows = [{ id: 'reserve', categoryId: 'otro', kind: 'meta', targetAmount: 1000, assignedAmount: 0, priority: 1 }];
   const start = new Date(2024, 1, 1);
@@ -587,7 +587,7 @@ test('42 days across leap February preserve the ledger after incomplete entry, m
     openCallEditor(official.id);
     x.element('callEditDurationInput').value = '';
     x.element('callEditDurationInput').validity = { badInput: day % 2 === 0 };
-    saveCallEditor();
+    await saveCallEditor();
     assert.equal(JSON.stringify(calls), before);
     assert.equal(x.saves(), saves);
     x.element('callEditDurationInput').validity = { badInput: false };
@@ -596,7 +596,7 @@ test('42 days across leap February preserve the ledger after incomplete entry, m
       ledger.set(`official-${day}`, { key, min: 5, cents: 75 });
     }
     if (day % 5 === 0) {
-      deleteCallRecord(calls.find(call => call.customerId === `manual-leap-${day}`).id);
+      await deleteCallRecord(calls.find(call => call.customerId === `manual-leap-${day}`).id);
       ledger.delete(`manual-${day}`);
     }
     x.h.saveAll(); x.reload();

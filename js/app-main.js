@@ -9,7 +9,7 @@ import { normalizeBattleWeapon } from './game-battle.js';
 import { createPropioReceiver, createStorageRevisionGuard, ignorePropioCall } from './propio-bridge.js';
 import { portalRecordsText } from './propio-history-records.js';
 import { callFeedbackSilenced, withSilentCallFeedback } from './call-feedback.js';
-import { settingsWithinBudget, reportLocalPersistenceFailure, readMeta } from './sync.js';
+import { settingsWithinBudget, reportLocalPersistenceFailure, readMeta, jsonbBytes } from './sync.js';
 // Boot importa este módulo solo después de verificar la sesión e hidratar sus datos.
 
 import { FINANCE_CATEGORIES, FINANCE_CUSTOM_CATEGORY_PALETTE, financeRowIsMeta, renderFinanceSection, renderFinancePreview, setFinanceTab, syncFinanceRowTargetFields, financeConvertedInline, financeConvertedNote, financeSwapPriority, financeFindRow, financeApplySignedAmount, financeResetRow, financeToggleManualPaid, financeDeleteRow, openFinanceRowModal, saveFinanceRowModal, selectFinanceCategoryChip, openFinanceNewCatPanel, closeFinanceNewCatPanel, createFinanceCategory, financeDeleteCategory, updateFinanceAutoFillSetting, updateFinanceTotalsScrollHint, financeRunAutoFillCascade, configureFinanceContext } from './finance.js';
@@ -54,6 +54,7 @@ import {
   hasPendingManualCallBackup,
   markManualCallPayDirty,
   openCallEditor,
+  openCallRecovery,
   openManualCallModal,
   renderDayStatsCards,
   renderTable,
@@ -5248,7 +5249,8 @@ function renderPayDatesSection() {
       formatMinutes, gapLabelText, getActiveDayKey, higherRateBonusForCall, higherRateTierBadgeHtml,
       iconHtml, importedCallStats, isoDateFromDayKey, makeLocalId, money, onGameCallSaved, onGameCallsChanged, openModal,
       pad, parseMoney, rateTilePerMin, renderRateTiles, sameCallDay, saveAll, timeLabelFromDate,
-      toDateFromInputs, toast, todayCallDateKey, playCallSavedSound,
+      toDateFromInputs, toast, todayCallDateKey, playCallSavedSound, canPersistLocalChanges, render,
+      stateWithinBudget: value => jsonbBytes(value) <= 2097152,
     });
     configureHigherRateContext({
       HIGHER_RATE_EARLY_GRACE_MIN, HIGHER_RATE_TIERS, appConfirm, callDateKeyFromValue, callDateToDate,
@@ -6952,7 +6954,9 @@ export function render() {
       if (!callId) return;
       const call = calls.find(c => c.id === callId);
       if (!call) return;
-      appConfirm(ui`¿Eliminar la llamada #${call.customerId} (${call.callDate} · ${call.callStart})? Esta acción no se puede deshacer.`, () => deleteCallRecord(callId));
+      const owner = settings;
+      const expected = JSON.parse(JSON.stringify(call));
+      appConfirm(ui`¿Eliminar la llamada #${call.customerId} (${call.callDate} · ${call.callStart})? Podrás recuperarla desde «Historial de cambios» hasta 30 días.`, () => settings === owner && deleteCallRecord(callId, expected));
     });
 
     // Filtro Todo/Llamadas/Acciones sobre la tabla fusionada — solo cambia `tableFilterMode` y
@@ -6992,6 +6996,7 @@ export function render() {
     });
 
     document.getElementById('clearDayCallsBtn').addEventListener('click', clearActiveDayCalls);
+    document.getElementById('callRecoveryBtn').addEventListener('click', openCallRecovery);
 
     document.addEventListener('click', (e) => {
       const row = e.target instanceof Element ? e.target.closest('[data-week-day]') : null;

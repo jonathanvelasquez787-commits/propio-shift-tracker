@@ -179,4 +179,5 @@ function draw() {
   draw();
 }
 export { openHigherRateReview, higherRateCorrectionPlan } from './higher-rate-review.js';
+export { openCallRecovery, saveEditedCall, deleteRecordedCall, clearRecordedDay } from './call-recovery.js';
 export const detailTranslations = null;

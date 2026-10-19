@@ -682,7 +682,7 @@ test('segunda simulación mensual: ninguna llamada manual editada o pegada puede
   const calls = read('js/calls.js');
   const appMain = read('js/app-main.js');
   assert.match(calls, /new Date\(candidate\.endISO\)\.getTime\(\) > Date\.now\(\)/);
-  assert.match(calls, /if \(end\.getTime\(\) > Date\.now\(\)\)/);
+  assert.match(read('js/call-recovery.js'), /end\.getTime\(\) > Date\.now\(\)/);
   assert.match(appMain, /const endsAt = new Date\(c\.endISO\)\.getTime\(\)/);
   assert.match(appMain, /endsAt > importNow/);
 });

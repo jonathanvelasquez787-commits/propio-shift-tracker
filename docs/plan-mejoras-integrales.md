@@ -8,12 +8,14 @@ no se considera rota por esa razón.
 
 ## Lista de control completa
 
-**17 de 79 mejoras publicadas.** 2 en curso y 60 pendientes. La preparación del
+**18 de 79 mejoras publicadas.** 2 en curso y 59 pendientes. La preparación del
 turno usa app 624 y extensión 2.2.10, con publicación comprobada y recarga de la
 extensión, Propio y tracker confirmada por el propietario. App 625 refuerza la
 limpieza de Higher Rate; app 626 incorpora, en orden, el desglose de ganancias,
 consulta de conversión y alcance de tarifa. App 627 completa 36 y 37: revisión
 por ventana y corrección con vista previa, conservando bonos al editar o limpiar.
+App 628 completa el punto 21 con historial antes/después y recuperación de
+ediciones, eliminaciones y vaciados de llamadas. La fase 3 sigue en curso.
 
 Estas 79 mejoras corresponden al sistema completo. El panel de disponibilidad
 y preparación se ve en la **tool web**; el popup de la **extensión de Chrome**
@@ -47,7 +49,7 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 - [ ] **18. Llamada en vivo con los botones de la tool — Pendiente.** Explicar tiempo medido, mínimo de registro e importe estimado.
 - [ ] **19. Agregar una llamada manual — Pendiente.** Comprobación de fecha, duración y pago antes de guardar manuales.
 - [ ] **20. Pegar llamadas de Propio — Pendiente.** Resultado de importación por fila y su motivo.
-- [ ] **21. Editar y borrar llamadas — Pendiente.** Deshacer/papelera y trazabilidad antes/después de correcciones.
+- [x] **21. Editar y borrar llamadas — Publicado.** Historial antes/después, deshacer edición y recuperar borrados individuales/lotes, con vista previa y protección frente a versiones posteriores y fallo al guardar. [Evidencia y límites](recuperacion-llamadas.md).
 - [ ] **22. Descartar una llamada accidental — Pendiente.** Confirmación de lo que restaura descartar una llamada accidental.
 - [ ] **23. ACW en vivo y ACW acumulado — Pendiente.** Distinguir ACW actual del acumulado y explicar su origen.
 - [ ] **24. Meta máxima de ACW — Pendiente.** Distinguir máximo deseado de ACW de la espera entre llamadas.
@@ -149,7 +151,9 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
    La acción explícita de corregir/recalcular muestra llamadas e importes antes
    y después, con confirmación y protección de beneficios de otras promociones.
    33–37 resueltos en orden. [Alcance y pruebas](higher-rate-revision.md).
-3. **Recuperación y trazabilidad — pendiente.** Deshacer/papelera temporal para
+3. **Recuperación y trazabilidad — en curso.** El punto 21 está publicado:
+   historial de ediciones y borrados de llamadas, vista previa y recuperación.
+   Siguen 22, 26–27, 47, 67 y 69 en ese orden. Deshacer/papelera temporal para
    llamadas y acciones recuperables; historial antes/después; restauración con
    comparación y copia previa; confirmaciones de alcance. Cubre 21–22, 26–27,
    47, 67 y 69. No restaurar datos ajenos ni sobrescribir cambios posteriores.
