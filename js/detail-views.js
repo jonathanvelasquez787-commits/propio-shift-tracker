@@ -178,3 +178,5 @@ function draw() {
     }
   draw();
 }
+export { openHigherRateReview, higherRateCorrectionPlan } from './higher-rate-review.js';
+export const detailTranslations = null;

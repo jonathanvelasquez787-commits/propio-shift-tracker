@@ -243,14 +243,14 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 ### 36. Ventanas de Higher Rate
 
 - **Qué hace:** agrega el bono del nivel a llamadas que califican por su hora de inicio, con la gracia inicial prevista en la tool. No lee tu correo para crear ventanas por sí sola.
-- **Qué configurás:** fecha, inicio, fin y nivel de la promoción en Higher Rate.
-- **Ejemplo:** cargás una ventana Gold que anunció Propio. Las llamadas que califican reciben el bono calculado además de su pago base.
+- **Qué configurás:** fecha, inicio, fin y nivel de la promoción en Higher Rate. «Revisar llamadas» explica cuáles califican, la gracia y los bonos conservados.
+- **Ejemplo:** cargás una ventana Gold que anunció Propio y revisás por qué una llamada califica o queda fuera. Las elegibles reciben el bono calculado además de su pago base.
 
 ### 37. Conservar bonos ganados al editar o limpiar ventanas
 
 - **Qué hace:** conserva bonos ya acreditados cuando se modifica o retira su ventana, para no perderlos retroactivamente.
-- **Qué configurás:** edición y limpieza del historial de Higher Rate.
-- **Ejemplo:** quitás ventanas antiguas para ordenar el editor y sus ganancias ya ganadas permanecen. Hay una limitación conocida: corregir una hora mal cargada puede conservar también el bono anterior; esa edición merece revisar el resultado.
+- **Qué configurás:** la edición normal y limpiar conservan bonos. Para un error, «Revisar llamadas» → «Corregir promoción» permite revisar el recálculo y confirmarlo.
+- **Ejemplo:** limpiás ventanas antiguas y sus bonos permanecen. Si una promoción tenía una hora equivocada, revisás los importes antes/después y confirmás esa corrección separada; cerrar sin confirmar no cambia nada.
 
 ## 7. Finanzas
 

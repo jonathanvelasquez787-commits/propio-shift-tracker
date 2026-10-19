@@ -40,7 +40,8 @@
     "files": [
       "app.html",
       "js/app-main.js",
-      "js/finance-planning.js"
+      "js/finance-planning.js",
+      "js/higher-rate-review.js"
     ]
   },
   "s_013781d1": {
@@ -113,6 +114,12 @@
     "source": "Pago ($)",
     "files": [
       "app.html"
+    ]
+  },
+  "s_0307f433": {
+    "source": "Fuera de esta ventana ({{v7}})",
+    "files": [
+      "js/higher-rate-review.js"
     ]
   },
   "s_030eed06": {
@@ -339,6 +346,12 @@
     "source": "pausas",
     "files": [
       "js/reinforcement-rules.js"
+    ]
+  },
+  "s_072f379a": {
+    "source": "Después: {{v2}}",
+    "files": [
+      "js/higher-rate-review.js"
     ]
   },
   "s_0749314b": {
@@ -1009,6 +1022,12 @@
       "js/app-main.js"
     ]
   },
+  "s_10c6d433": {
+    "source": "Antes del horario y de la gracia",
+    "files": [
+      "js/higher-rate-review.js"
+    ]
+  },
   "s_11002277": {
     "source": "Llamada terminada: {{v0}} – {{v1}} ({{v2}}). Ajusta lo que haga falta antes de guardarla.",
     "files": [
@@ -1037,6 +1056,12 @@
     "source": "x0",
     "files": [
       "app.html"
+    ]
+  },
+  "s_116c23f3": {
+    "source": "Esta promoción fue un error: quitarla y recalcular.",
+    "files": [
+      "js/higher-rate-review.js"
     ]
   },
   "s_11c27b19": {
@@ -1305,7 +1330,8 @@
   "s_17360e3f": {
     "source": "{{v0}} – {{v1}}",
     "files": [
-      "js/app-main.js"
+      "js/app-main.js",
+      "js/higher-rate-review.js"
     ]
   },
   "s_1742b002": {
@@ -2101,6 +2127,12 @@
     "source": "{{v1}} min",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_262ac7c8": {
+    "source": "Revisar llamadas",
+    "files": [
+      "js/higher-rate.js"
     ]
   },
   "s_262d2a5d": {
@@ -2970,6 +3002,12 @@
       "app.html"
     ]
   },
+  "s_35212722": {
+    "source": "Corregir promoción",
+    "files": [
+      "js/higher-rate-review.js"
+    ]
+  },
   "s_35249ea0": {
     "source": "6. Tus derechos",
     "files": [
@@ -3211,6 +3249,12 @@
       "js/app-main.js"
     ]
   },
+  "s_397db7aa": {
+    "source": "Confirmar recálculo",
+    "files": [
+      "js/higher-rate-review.js"
+    ]
+  },
   "s_398e440e": {
     "source": "Cambiar",
     "files": [
@@ -3238,6 +3282,7 @@
   "s_39f30811": {
     "source": "Hora de fin",
     "files": [
+      "js/higher-rate-review.js",
       "js/higher-rate.js"
     ]
   },
@@ -3857,6 +3902,12 @@
     "source": "premios disponibles",
     "files": [
       "js/positive-reinforcement.js"
+    ]
+  },
+  "s_46c08e89": {
+    "source": "Antes: {{v1}}",
+    "files": [
+      "js/higher-rate-review.js"
     ]
   },
   "s_46c0ec8d": {
@@ -4971,6 +5022,12 @@
       "app.html"
     ]
   },
+  "s_588ef5ca": {
+    "source": "Volver a revisar",
+    "files": [
+      "js/higher-rate-review.js"
+    ]
+  },
   "s_58a5a0a4": {
     "source": "Ayer",
     "files": [
@@ -5196,6 +5253,12 @@
     "source": "{{v1}} productividad",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_5d7dd203": {
+    "source": "{{v1}} · {{v2}} min",
+    "files": [
+      "js/higher-rate-review.js"
     ]
   },
   "s_5deee299": {
@@ -6389,6 +6452,12 @@
       "js/theme-palettes.js"
     ]
   },
+  "s_73c20441": {
+    "source": "Después: {{v3}}",
+    "files": [
+      "js/higher-rate-review.js"
+    ]
+  },
   "s_73c6bc63": {
     "source": "Menú",
     "files": [
@@ -6497,6 +6566,12 @@
     "files": [
       "app.html",
       "js/game.js"
+    ]
+  },
+  "s_759fcdd6": {
+    "source": "Se aplica el mayor bono de otra ventana",
+    "files": [
+      "js/higher-rate-review.js"
     ]
   },
   "s_75af7b00": {
@@ -6801,6 +6876,12 @@
       "js/weekly-summary.js"
     ]
   },
+  "s_7ae4593f": {
+    "source": "Revisar recálculo",
+    "files": [
+      "js/higher-rate-review.js"
+    ]
+  },
   "s_7b026cab": {
     "source": "{{v0}} Ganancias del ciclo",
     "files": [
@@ -6921,6 +7002,12 @@
       "index.html"
     ]
   },
+  "s_7d357a0a": {
+    "source": "Cálculo de la tool: {{v2}} min de gracia antes del inicio. El fin no se incluye. Cuenta la duración completa; en ventanas superpuestas gana el mayor bono.",
+    "files": [
+      "js/higher-rate-review.js"
+    ]
+  },
   "s_7d55762e": {
     "source": "La app nunca compra nada ni interrumpe una llamada. Tú decides cuándo realizar, guardar o cambiar cada premio.",
     "files": [
@@ -6931,6 +7018,12 @@
     "source": "Abrí Propio con tu sesión para que la extensión pueda confirmar la disponibilidad.",
     "files": [
       "js/automation-ui.js"
+    ]
+  },
+  "s_7d77b669": {
+    "source": "Bono conservado de otra ventana",
+    "files": [
+      "js/higher-rate-review.js"
     ]
   },
   "s_7d81145d": {
@@ -7330,6 +7423,12 @@
       "js/game.js"
     ]
   },
+  "s_845dc3f1": {
+    "source": "No hay cambios que aplicar.",
+    "files": [
+      "js/higher-rate-review.js"
+    ]
+  },
   "s_8497d1bd": {
     "source": "No se pudo verificar tu sesión.",
     "files": [
@@ -7432,6 +7531,12 @@
     "source": "NUEVO RÉCORD · {{v0}} min",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_86106e25": {
+    "source": "Gracia inicial",
+    "files": [
+      "js/higher-rate-review.js"
     ]
   },
   "s_867a1c61": {
@@ -7804,6 +7909,12 @@
       "app.html"
     ]
   },
+  "s_8d06aa6e": {
+    "source": "Llamadas afectadas: {{v0}}",
+    "files": [
+      "js/higher-rate-review.js"
+    ]
+  },
   "s_8d24ed8a": {
     "source": "Guía para intérpretes",
     "files": [
@@ -7882,6 +7993,7 @@
     "source": "Hora de inicio",
     "files": [
       "app.html",
+      "js/higher-rate-review.js",
       "js/higher-rate.js"
     ]
   },
@@ -8632,6 +8744,12 @@
       "app.html"
     ]
   },
+  "s_9c2243e3": {
+    "source": "Califican o conservan un bono de esta ventana ({{v5}})",
+    "files": [
+      "js/higher-rate-review.js"
+    ]
+  },
   "s_9c2a4246": {
     "source": "Premio realizado: {{v0}}",
     "files": [
@@ -9091,6 +9209,12 @@
     "source": "Guarda cada llamada — pago, duración, si fue facturable o se cayó — y las usa para calcular tus ganancias del día y del ciclo.",
     "files": [
       "app.html"
+    ]
+  },
+  "s_a36f3aa0": {
+    "source": "No se aplicó. Revisá el guardado y volvé a calcular; los datos pudieron cambiar.",
+    "files": [
+      "js/higher-rate-review.js"
     ]
   },
   "s_a37a9164": {
@@ -9669,6 +9793,12 @@
       "js/game-battle.js"
     ]
   },
+  "s_af48c788": {
+    "source": "Antes: {{v2}}",
+    "files": [
+      "js/higher-rate-review.js"
+    ]
+  },
   "s_af6005d5": {
     "source": "Misiones automáticas",
     "files": [
@@ -10124,12 +10254,6 @@
     "source": "Reintentar",
     "files": [
       "js/boot.js"
-    ]
-  },
-  "s_b69a43b6": {
-    "source": "Franjas horarias con bono extra por minuto, avisadas por Propio por correo. Configúralas aquí para que el pago se sume solo.",
-    "files": [
-      "app.html"
     ]
   },
   "s_b6a86d2e": {
@@ -10954,6 +11078,12 @@
       "js/positive-reinforcement.js"
     ]
   },
+  "s_c6064039": {
+    "source": "Califican por horario: {{v3}}",
+    "files": [
+      "js/higher-rate-review.js"
+    ]
+  },
   "s_c60abeb8": {
     "source": "Convierte constancia, recuperación y metas en evidencia positiva y premios seguros.",
     "files": [
@@ -11007,6 +11137,12 @@
     "source": "Trabajado: se exige Adherencia y suma a tu meta del ciclo, aunque tu horario diga que es libre.",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_c6623875": {
+    "source": "Bono atribuido a esta ventana: {{v4}}",
+    "files": [
+      "js/higher-rate-review.js"
     ]
   },
   "s_c683e5a6": {
@@ -11212,6 +11348,18 @@
     "source": "Suena mientras la pestaña esté abierta, si aún no le diste al botón de Break/Lunch. 0 min = desactivado. Variables disponibles en el mensaje:",
     "files": [
       "app.html"
+    ]
+  },
+  "s_ca28dfd4": {
+    "source": "#{{v0}}",
+    "files": [
+      "js/higher-rate-review.js"
+    ]
+  },
+  "s_ca54f61d": {
+    "source": "El recálculo actualiza ganancias, Finanzas y Logros. Conserva el pago base y los bonos conservados de otras promociones.",
+    "files": [
+      "js/higher-rate-review.js"
     ]
   },
   "s_ca83bbc4": {
@@ -11450,6 +11598,18 @@
       "js/automation-ui.js"
     ]
   },
+  "s_cebdfcfe": {
+    "source": "Todavía no hay llamadas registradas que califiquen.",
+    "files": [
+      "js/higher-rate-review.js"
+    ]
+  },
+  "s_cedb10b4": {
+    "source": "Revisá la fecha, las horas, el nivel y que la ventana siga disponible.",
+    "files": [
+      "js/higher-rate-review.js"
+    ]
+  },
   "s_cedfd7e6": {
     "source": "Sin bloques configurados. Usa \"+ Agregar bloque\" para empezar (Trabajo también es un bloque explícito ahora).",
     "files": [
@@ -11467,6 +11627,12 @@
     "files": [
       "js/app-main.js",
       "js/game.js"
+    ]
+  },
+  "s_cf7f407d": {
+    "source": "Usá la fecha, horas y nivel del aviso de Propio. Editar estas tarjetas conserva los bonos registrados; para corregir un error, abrí «Revisar llamadas».",
+    "files": [
+      "app.html"
     ]
   },
   "s_cf9e5cff": {
@@ -11599,7 +11765,8 @@
   "s_d1a06e73": {
     "source": "Nivel",
     "files": [
-      "app.html"
+      "app.html",
+      "js/higher-rate-review.js"
     ]
   },
   "s_d1f02f1c": {
@@ -11842,6 +12009,12 @@
       "js/reinforcement-rules.js"
     ]
   },
+  "s_d6a1eab8": {
+    "source": "La ventana cambió o ya no está disponible. Volvé a abrir Higher Rate.",
+    "files": [
+      "js/higher-rate-review.js"
+    ]
+  },
   "s_d6b39e7c": {
     "source": "Limpiar historial",
     "files": [
@@ -11914,6 +12087,12 @@
     "source": "Pon tu horario",
     "files": [
       "index.html"
+    ]
+  },
+  "s_d8f944f1": {
+    "source": "Bono conservado",
+    "files": [
+      "js/higher-rate-review.js"
     ]
   },
   "s_d9204193": {
@@ -12295,6 +12474,12 @@
       "app.html"
     ]
   },
+  "s_dd88d5e0": {
+    "source": "Dentro del horario",
+    "files": [
+      "js/higher-rate-review.js"
+    ]
+  },
   "s_ddb5c56a": {
     "source": "{{v0}} vidas del héroe",
     "files": [
@@ -12568,6 +12753,12 @@
     "source": "Placas de armadura visibles",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_e25d7555": {
+    "source": "En el fin o después de la ventana",
+    "files": [
+      "js/higher-rate-review.js"
     ]
   },
   "s_e2ac5636": {

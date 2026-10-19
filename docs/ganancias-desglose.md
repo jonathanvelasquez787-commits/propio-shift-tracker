@@ -59,6 +59,6 @@ No se modifican llamadas reales, Auth, RLS ni la base alojada.
 
 ## Siguiente paso
 
-Continúan los puntos 36 y 37: revisar llamadas elegibles por ventana y después
-la acción explícita de corregir/recalcular. «Limpiar historial» conserva los
-bonos registrados y sigue siendo independiente de esa futura corrección.
+App 627 completa 36 y 37: [revisión y corrección explícita](higher-rate-revision.md).
+«Limpiar historial» conserva los bonos registrados y permanece independiente.
+La fase siguiente es recuperación y trazabilidad, en el orden del plan.

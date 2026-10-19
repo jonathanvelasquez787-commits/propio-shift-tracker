@@ -1,4 +1,6 @@
-let pending, attempts = 0, failed = false;
+import { registerDetailTranslations } from './i18n.js';
+
+let pending, registered, attempts = 0, failed = false;
 
 export async function loadDetailViews({ retry = false } = {}) {
   if (failed && !retry) return null;
@@ -11,6 +13,7 @@ export async function loadDetailViews({ retry = false } = {}) {
       pending = attempts++ ? import(url.href) : import('./detail-views.js');
     }
     const view = await pending;
+    if (registered !== view) { registerDetailTranslations(view.detailTranslations); registered = view; }
     failed = false;
     return view;
   } catch {

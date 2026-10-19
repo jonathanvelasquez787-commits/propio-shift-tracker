@@ -276,7 +276,7 @@
         {
           "file": "tests/higher-rate-persistence-order.test.mjs",
           "namedCases": [
-            "a rejected Higher Rate tier edit cannot persist game receipts before its settings snapshot; retry reconciles once"
+              "a rejected retroactive Higher Rate window cannot persist game receipts before its settings snapshot; retry reconciles once"
           ]
         },
         {
@@ -341,9 +341,21 @@
         "js/finance-planning.js",
         "js/higher-rate.js",
         "js/detail-views.js",
-        "js/detail-views-loader.js"
+        "js/detail-views-loader.js",
+        "js/higher-rate-review.js"
       ],
       "tests": [
+        {
+          "file": "tests/higher-rate-review.test.mjs",
+          "namedCases": [
+            "Higher Rate review explains exact grace and exclusive-end boundaries using the real bonus calculation",
+            "Higher Rate review separates overlapping-window winners and preserved bonuses from current eligibility",
+              "Higher Rate review handles overnight calls and zero-duration records without manufacturing a 24-hour window",
+              "correction previews release only the selected promotion and recompute the highest remaining bonus without mutating calls",
+              "correction transactions roll back rejected finance and bonus changes, then persist exactly once and survive reload",
+              "interrupted correction storage restores promotion, finance and preserved bonuses before retry"
+          ]
+        },
         {
           "file": "tests/earnings-breakdown.test.mjs",
           "namedCases": [

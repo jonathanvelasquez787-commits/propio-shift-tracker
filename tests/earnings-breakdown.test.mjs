@@ -82,7 +82,7 @@ test('detail views stay outside the initial app bundle and retain a release-boun
   const file = path.join(root, 'js/detail-views.js');
   assert.equal(options.external('./detail-views.js'), true); assert.equal(options.external(file), true);
   assert.equal(options.output.paths(file), '/assets/detail-views.js?v=details-test');
-  const bundle = await rollup({ input: path.join(root, 'js/detail-views-loader.js'), external: options.external, makeAbsoluteExternalsRelative: false });
+  const bundle = await rollup({ input: path.join(root, 'js/detail-views-loader.js'), external: id => options.external(id) || id === './i18n.js', makeAbsoluteExternalsRelative: false });
   try {
     const { output } = await bundle.generate(options.output);
     assert.ok(!Object.keys(output[0].modules).includes(file));
@@ -93,11 +93,12 @@ test('detail views stay outside the initial app bundle and retain a release-boun
 
 test('a failed detail import is recoverable and a successful module is shared by later opens', async () => {
   const source = fs.readFileSync('js/detail-views-loader.js', 'utf8')
+    .replace(/^import[^\n]+\n/, '')
     .replace('export async function', 'async function').replaceAll('import.meta.url', '"https://example.invalid/assets/app-main.js?v=release"')
     .replace("import('./detail-views.js')", 'fetchDetails()').replace('import(url.href)', 'fetchDetails(url.href)');
   let attempts = 0;
   const module = { renderEarningsBreakdown() {} };
-  const h = vm.createContext({ URL, fetchDetails: async url => { if (++attempts === 1) throw Error('offline'); assert.equal(url, 'https://example.invalid/assets/detail-views.js?v=release#retry-1'); return module; } });
+  const h = vm.createContext({ URL, registerDetailTranslations() {}, fetchDetails: async url => { if (++attempts === 1) throw Error('offline'); assert.equal(url, 'https://example.invalid/assets/detail-views.js?v=release#retry-1'); return module; } });
   vm.runInContext(source, h);
   assert.equal(await h.loadDetailViews(), null);
   assert.equal(await h.loadDetailViews(), null, 'background renders do not repeat failed imports');

@@ -1860,7 +1860,7 @@
 <div class="mc-header-icon hr-gradient" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c2 3-1 4-1 7a3 3 0 1 0 6 0c0-1-.5-2-.5-2 2 1 3 3.5 3 6a7 7 0 1 1-14 0c0-4 2-6 3.5-8 .5 2 1 2.5 3-3Z"/></svg></div>
 <div>
 <h3 id="higherRateModalTitle">Higher Rate</h3>
-<p>Franjas horarias con bono extra por minuto, avisadas por Propio por correo. Configúralas aquí para que el pago se sume solo.</p>
+<p>Usá la fecha, horas y nivel del aviso de Propio. Editar estas tarjetas conserva los bonos registrados; para corregir un error, abrí «Revisar llamadas».</p>
 </div>
 <button aria-label="Cerrar" class="modal-close" data-close-modal="higherRateModal" type="button">×</button>
 </div>
@@ -1917,6 +1917,12 @@
 </div>
 </div>
 </div>
+<div aria-hidden="true" class="modal-overlay" id="higherRateReviewModal">
+<div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="higherRateReviewTitle">
+<div class="modal-head mc-modal-head"><div><h3 id="higherRateReviewTitle">Higher Rate</h3></div><button class="modal-close" data-close-modal="higherRateReviewModal" aria-label="Cerrar" type="button">×</button></div>
+<div id="higherRateReviewBody" class="earnings-breakdown"></div>
+<div class="modal-actions mc-action-row"><button class="mc-btn-primary cyan" data-close-modal="higherRateReviewModal" type="button">Listo</button></div>
+</div></div>
 <div aria-hidden="true" class="modal-overlay" id="callsModal">
 <div aria-labelledby="callsModalTitle" aria-modal="true" class="modal-card" role="dialog">
 <div class="modal-head mc-modal-head">
