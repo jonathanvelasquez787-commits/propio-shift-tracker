@@ -3,6 +3,19 @@
   "scope": "Google; Email/SMTP deshabilitados; sin compras ni funciones nuevas",
   "criteria": [
     {
+      "id": "call-recovery",
+      "area": "Historial y recuperación de llamadas",
+      "acceptance": "Ediciones y borrados conservan antes/después en el mismo guardado; recuperación explícita sin reemplazar cambios posteriores, duplicar llamadas ni anunciar éxito ante rechazo.",
+      "sources": ["js/call-recovery.js"],
+      "tests": [{ "file": "tests/call-recovery.test.mjs", "namedCases": [
+        "call recovery restores a deletion after reload with frozen bonus and unrelated later calls intact",
+        "failed deletion retains the actual call and records no recoverable change",
+        "recovery preview cannot replace a changed call, owner, state or later snapshot",
+        "recovering a batch refuses partial restoration when one call returned, overlaps or has a corrected version",
+        "edited call persistence stays in the editor on failure, then records before and after for a safe undo"
+      ] }]
+    },
+    {
       "id": "identity",
       "area": "Acceso y aislamiento de cuentas",
       "acceptance": "Google exclusivo; hidratar antes de montar; ninguna cuenta adopta datos ni respuestas de otra.",

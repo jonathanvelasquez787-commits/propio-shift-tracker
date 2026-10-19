@@ -165,6 +165,12 @@
       "app.html"
     ]
   },
+  "s_03b552da": {
+    "source": "Tu historial de cambios",
+    "files": [
+      "js/call-recovery.js"
+    ]
+  },
   "s_03b8a461": {
     "source": "Importe variable",
     "files": [
@@ -549,6 +555,12 @@
       "js/game-battle.js"
     ]
   },
+  "s_0a2159c5": {
+    "source": "Llamadas: {{v1}}",
+    "files": [
+      "js/call-recovery.js"
+    ]
+  },
   "s_0a3c633d": {
     "source": "Zzz",
     "files": [
@@ -570,6 +582,7 @@
   "s_0a67ca33": {
     "source": "{{v1}} · {{v2}}",
     "files": [
+      "js/call-recovery.js",
       "js/game.js"
     ]
   },
@@ -897,7 +910,7 @@
   "s_0f15eb39": {
     "source": "Esa duración traslapa con la llamada #{{v0}} ({{v1}}). Ajusta la duración.",
     "files": [
-      "js/calls.js"
+      "js/call-recovery.js"
     ]
   },
   "s_0f3fbe63": {
@@ -1130,6 +1143,12 @@
     "source": "Jueves Jadeante",
     "files": [
       "js/monsters.js"
+    ]
+  },
+  "s_12e95499": {
+    "source": "Los datos cambiaron. Revisá de nuevo antes de vaciar el día.",
+    "files": [
+      "js/call-recovery.js"
     ]
   },
   "s_12e98494": {
@@ -1515,6 +1534,12 @@
       "app.html"
     ]
   },
+  "s_19fa8bdd": {
+    "source": "Pago base",
+    "files": [
+      "js/call-recovery.js"
+    ]
+  },
   "s_1a02da56": {
     "source": "Domingo",
     "files": [
@@ -1677,10 +1702,22 @@
       "js/finance.js"
     ]
   },
+  "s_1d1c1815": {
+    "source": "Llamada caída",
+    "files": [
+      "js/call-recovery.js"
+    ]
+  },
   "s_1d28af00": {
     "source": "Colección completa · XP diario sellado",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_1d40e03f": {
+    "source": "Recuperar llamadas",
+    "files": [
+      "js/call-recovery.js"
     ]
   },
   "s_1d4811fa": {
@@ -2081,12 +2118,6 @@
       "app.html"
     ]
   },
-  "s_24f21481": {
-    "source": "(+{{v1}}/min), así que ya suma",
-    "files": [
-      "js/calls.js"
-    ]
-  },
   "s_254330de": {
     "source": "Sin ventanas pasadas todavía.",
     "files": [
@@ -2470,6 +2501,7 @@
   "s_2be6362d": {
     "source": "La duración debe ser un número entre 0 y {{v0}} minutos",
     "files": [
+      "js/call-recovery.js",
       "js/calls.js"
     ]
   },
@@ -3223,6 +3255,12 @@
     "source": "Estás en una ventana {{v0}} ahora",
     "files": [
       "js/higher-rate.js"
+    ]
+  },
+  "s_391c86eb": {
+    "source": "Ya recuperado",
+    "files": [
+      "js/call-recovery.js"
     ]
   },
   "s_391ff3c7": {
@@ -4264,6 +4302,12 @@
       "app.html"
     ]
   },
+  "s_4c721b6d": {
+    "source": "Bono",
+    "files": [
+      "js/calls.js"
+    ]
+  },
   "s_4cccafad": {
     "source": "Reserva liberada. Los pagos registrados se conservan.",
     "files": [
@@ -4336,7 +4380,8 @@
   "s_4def8b60": {
     "source": "Disponible",
     "files": [
-      "app.html"
+      "app.html",
+      "js/call-recovery.js"
     ]
   },
   "s_4e0828b1": {
@@ -4487,7 +4532,6 @@
   "s_507f2db5": {
     "source": "llamada",
     "files": [
-      "js/calls.js",
       "js/reinforcement-rules.js"
     ]
   },
@@ -4598,6 +4642,7 @@
   "s_51caf125": {
     "source": "La llamada no puede terminar en el futuro",
     "files": [
+      "js/call-recovery.js",
       "js/calls.js"
     ]
   },
@@ -4731,6 +4776,12 @@
     "source": "de tu meta {{v9}}{{v10}}{{v11}}",
     "files": [
       "js/reports.js"
+    ]
+  },
+  "s_53c8acf5": {
+    "source": "No se recuperó. Actualizá la revisión; los datos pudieron cambiar o el guardado falló.",
+    "files": [
+      "js/call-recovery.js"
     ]
   },
   "s_53f2c676": {
@@ -4980,6 +5031,12 @@
       "js/finance.js"
     ]
   },
+  "s_57dcd345": {
+    "source": "Vaciado del día",
+    "files": [
+      "js/call-recovery.js"
+    ]
+  },
   "s_58485f56": {
     "source": "Si esta tool te ayuda, puedes apoyar su desarrollo.",
     "files": [
@@ -5181,6 +5238,12 @@
       "privacidad.html"
     ]
   },
+  "s_5bbaad23": {
+    "source": "Al recuperar",
+    "files": [
+      "js/call-recovery.js"
+    ]
+  },
   "s_5bcc06af": {
     "source": "Turno",
     "files": [
@@ -5307,6 +5370,12 @@
     "source": "Racha",
     "files": [
       "app.html"
+    ]
+  },
+  "s_5ec4aed2": {
+    "source": "Las próximas ediciones y eliminaciones aparecerán aquí.",
+    "files": [
+      "js/call-recovery.js"
     ]
   },
   "s_5efd13c0": {
@@ -5478,6 +5547,12 @@
       "index.html"
     ]
   },
+  "s_61918d47": {
+    "source": "Ver antes y después",
+    "files": [
+      "js/call-recovery.js"
+    ]
+  },
   "s_61dbdff8": {
     "source": "Tienes cambios sin guardar. ¿Descartarlos y cambiar de vista?",
     "files": [
@@ -5582,12 +5657,6 @@
     "source": "Compara minuto a minuto lo que hiciste contra lo que estaba planeado, con ventana de gracia y el motivo exacto de cada desvío.",
     "files": [
       "index.html"
-    ]
-  },
-  "s_63c6c053": {
-    "source": "{{v3}} de bono aparte del Pago de arriba. Para cambiar el nivel, edita esa ventana en \"Higher Rate\" (botón del header) — no hace falta tocar el Pago.",
-    "files": [
-      "js/calls.js"
     ]
   },
   "s_63cc98fc": {
@@ -5783,12 +5852,6 @@
       "js/monsters.js"
     ]
   },
-  "s_6781c0b8": {
-    "source": "{{v0}} {{v1}} de {{v2}} borrada(s)",
-    "files": [
-      "js/calls.js"
-    ]
-  },
   "s_67b16dea": {
     "source": "Meta general, todos los días",
     "files": [
@@ -5905,6 +5968,12 @@
       "js/auth.js"
     ]
   },
+  "s_6a159f82": {
+    "source": "Revisá y recuperá llamadas sin sobrescribir cambios posteriores.",
+    "files": [
+      "js/call-recovery.js"
+    ]
+  },
   "s_6a19eada": {
     "source": "cierra tu jornada del día.",
     "files": [
@@ -5983,6 +6052,12 @@
     "source": "Bronce",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_6b345f69": {
+    "source": "Coincide con otra llamada",
+    "files": [
+      "js/call-recovery.js"
     ]
   },
   "s_6b3a5f5a": {
@@ -6087,6 +6162,7 @@
     "source": "No se pudo cargar el detalle. Cerrá y abrí esta sección para reintentar.",
     "files": [
       "js/app-main.js",
+      "js/calls.js",
       "js/higher-rate.js"
     ]
   },
@@ -6180,12 +6256,6 @@
     "source": "{{v0}} iniciado",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_6eebf20f": {
-    "source": "Esta llamada cae en una ventana",
-    "files": [
-      "js/calls.js"
     ]
   },
   "s_6effe0f0": {
@@ -6532,6 +6602,7 @@
   "s_75098ce7": {
     "source": "El pago debe ser un número válido de hasta 1000000000 dólares.",
     "files": [
+      "js/call-recovery.js",
       "js/calls.js"
     ]
   },
@@ -6843,6 +6914,12 @@
       "js/boot.js"
     ]
   },
+  "s_7a31b405": {
+    "source": "Eliminación",
+    "files": [
+      "js/call-recovery.js"
+    ]
+  },
   "s_7a39d114": {
     "source": "Cantidad de llamadas registradas hoy",
     "files": [
@@ -6874,6 +6951,12 @@
       "js/app-main.js",
       "js/reports.js",
       "js/weekly-summary.js"
+    ]
+  },
+  "s_7aa7bcf3": {
+    "source": "Deshacer edición",
+    "files": [
+      "js/call-recovery.js"
     ]
   },
   "s_7ae4593f": {
@@ -6984,6 +7067,12 @@
       "js/finance.js"
     ]
   },
+  "s_7cc1e2b3": {
+    "source": "Actualizar",
+    "files": [
+      "js/call-recovery.js"
+    ]
+  },
   "s_7cc34461": {
     "source": "para que te recuerde el inicio del turno o del break antes de que empiece.",
     "files": [
@@ -7091,7 +7180,6 @@
   "s_7e350eb2": {
     "source": "llamadas",
     "files": [
-      "js/calls.js",
       "js/reinforcement-rules.js"
     ]
   },
@@ -7231,6 +7319,12 @@
     "source": "Tus datos cambiaron. Revisá de nuevo la limpieza del historial.",
     "files": [
       "js/higher-rate.js"
+    ]
+  },
+  "s_81b30f6e": {
+    "source": "Antes",
+    "files": [
+      "js/call-recovery.js"
     ]
   },
   "s_81c08233": {
@@ -7903,6 +7997,12 @@
       "js/boot.js"
     ]
   },
+  "s_8ced8608": {
+    "source": "Revisá los datos de la llamada",
+    "files": [
+      "js/call-recovery.js"
+    ]
+  },
   "s_8d05d173": {
     "source": "Si una semana puntual es distinta a tu horario normal, usa",
     "files": [
@@ -7995,6 +8095,12 @@
       "app.html",
       "js/higher-rate-review.js",
       "js/higher-rate.js"
+    ]
+  },
+  "s_8e4897ca": {
+    "source": "Confirmar recuperación",
+    "files": [
+      "js/call-recovery.js"
     ]
   },
   "s_8eb37d12": {
@@ -8461,7 +8567,7 @@
   "s_96385b4c": {
     "source": "No hay llamadas que borrar en este día.",
     "files": [
-      "js/calls.js"
+      "js/call-recovery.js"
     ]
   },
   "s_96632326": {
@@ -8596,6 +8702,12 @@
     "files": [
       "app.html",
       "js/theme-palettes.js"
+    ]
+  },
+  "s_98b206bd": {
+    "source": "{{v9}} → {{v10}}",
+    "files": [
+      "js/call-recovery.js"
     ]
   },
   "s_98b6adcb": {
@@ -8850,7 +8962,8 @@
   "s_9d8e8d1e": {
     "source": "Llamadas: {{v0}}",
     "files": [
-      "js/app-main.js"
+      "js/app-main.js",
+      "js/call-recovery.js"
     ]
   },
   "s_9d942cda": {
@@ -8886,6 +8999,12 @@
     "source": "Faltan {{v0}} pausa(s) a tiempo",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_9dffc466": {
+    "source": "No se guardó el cambio. Tus llamadas y el historial anterior se conservaron.",
+    "files": [
+      "js/call-recovery.js"
     ]
   },
   "s_9dffd315": {
@@ -9094,6 +9213,12 @@
       "js/game.js"
     ]
   },
+  "s_a1625a26": {
+    "source": "{{v3}} → {{v4}} min",
+    "files": [
+      "js/call-recovery.js"
+    ]
+  },
   "s_a1628026": {
     "source": "en curso",
     "files": [
@@ -9259,6 +9384,12 @@
       "js/finance-planning.js"
     ]
   },
+  "s_a415fbad": {
+    "source": "Historial de cambios",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_a45085e2": {
     "source": "#D9F9DF",
     "files": [
@@ -9408,6 +9539,12 @@
     "source": "Antes de que empiece tu Break/Lunch",
     "files": [
       "app.html"
+    ]
+  },
+  "s_a6f94da2": {
+    "source": "¿Eliminar la llamada #{{v0}} ({{v1}} · {{v2}})? Podrás recuperarla desde «Historial de cambios» hasta 30 días.",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_a705378d": {
@@ -9685,10 +9822,10 @@
       "js/reports.js"
     ]
   },
-  "s_ac53521b": {
-    "source": "¿Vaciar TODAS las {{v0}} de {{v1}} ({{v2}})? Tu turno, pausas y horario de ese día no se tocan. No se puede deshacer.",
+  "s_ac6a49ff": {
+    "source": "Recuperación",
     "files": [
-      "js/calls.js"
+      "js/call-recovery.js"
     ]
   },
   "s_ac7568d3": {
@@ -10237,6 +10374,12 @@
       "js/game.js"
     ]
   },
+  "s_b620cb7c": {
+    "source": "Recuperables",
+    "files": [
+      "js/call-recovery.js"
+    ]
+  },
   "s_b65e03ea": {
     "source": "El nombre de usuario nunca se puede traducir a un correo desde el navegador: esa consulta ocurre solo del lado del servidor, para que nadie pueda convertir una lista de usuarios en una lista de correos.",
     "files": [
@@ -10290,6 +10433,12 @@
     "source": "{{v0}} momentos difíciles",
     "files": [
       "js/reinforcement-rules.js"
+    ]
+  },
+  "s_b71e8ffc": {
+    "source": "La cuenta cambió. Cerrá esta ventana.",
+    "files": [
+      "js/call-recovery.js"
     ]
   },
   "s_b74dd511": {
@@ -10389,6 +10538,12 @@
     "source": "Sobre estos horarios",
     "files": [
       "app.html"
+    ]
+  },
+  "s_b9b75854": {
+    "source": "Llamadas del día enviadas al historial recuperable",
+    "files": [
+      "js/call-recovery.js"
     ]
   },
   "s_b9c116de": {
@@ -10523,6 +10678,12 @@
     "source": "Nombre del monstruo del día",
     "files": [
       "app.html"
+    ]
+  },
+  "s_bc2e4f16": {
+    "source": "Edición",
+    "files": [
+      "js/call-recovery.js"
     ]
   },
   "s_bc3dffc9": {
@@ -11169,12 +11330,6 @@
       "js/app-main.js"
     ]
   },
-  "s_c6bc844c": {
-    "source": "¿Eliminar la llamada #{{v0}} ({{v1}} · {{v2}})? Esta acción no se puede deshacer.",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
   "s_c6d3bb1a": {
     "source": "Ciclo de pago actualizado — {{v0}} semana(s) personalizada(s) de Horario se re-anclaron al nuevo inicio de semana",
     "files": [
@@ -11353,6 +11508,7 @@
   "s_ca28dfd4": {
     "source": "#{{v0}}",
     "files": [
+      "js/call-recovery.js",
       "js/higher-rate-review.js"
     ]
   },
@@ -11415,6 +11571,12 @@
     "source": "Lo ganaste con {{v3}}{{v4}}{{v5}}",
     "files": [
       "js/positive-reinforcement.js"
+    ]
+  },
+  "s_cb570b90": {
+    "source": "Ahora",
+    "files": [
+      "js/call-recovery.js"
     ]
   },
   "s_cb7cb5dc": {
@@ -11520,6 +11682,12 @@
       "js/app-main.js"
     ]
   },
+  "s_cdf32fe1": {
+    "source": "Revisar recuperación",
+    "files": [
+      "js/call-recovery.js"
+    ]
+  },
   "s_cdf62580": {
     "source": "Bufanda de racha",
     "files": [
@@ -11530,6 +11698,12 @@
     "source": "Cosméticos de ciclo",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_ce065b21": {
+    "source": "La llamada cambió mientras la editabas. Cerrá y abrí el editor para revisar la versión actual.",
+    "files": [
+      "js/call-recovery.js"
     ]
   },
   "s_ce0cbe3f": {
@@ -11596,6 +11770,12 @@
     "source": "Pausada por vos",
     "files": [
       "js/automation-ui.js"
+    ]
+  },
+  "s_ceb90e9c": {
+    "source": "Facturable",
+    "files": [
+      "js/call-recovery.js"
     ]
   },
   "s_cebdfcfe": {
@@ -11985,6 +12165,12 @@
       "index.html"
     ]
   },
+  "s_d56ced9c": {
+    "source": "Después",
+    "files": [
+      "js/call-recovery.js"
+    ]
+  },
   "s_d59b31d5": {
     "source": "Tenés una llamada entrante",
     "files": [
@@ -12056,6 +12242,12 @@
     "source": "Terminar {{v0}}",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_d790f2e7": {
+    "source": "Total con bono",
+    "files": [
+      "js/call-recovery.js"
     ]
   },
   "s_d7cca889": {
@@ -12149,12 +12341,6 @@
       "js/reinforcement-feedback.js"
     ]
   },
-  "s_d9da4081": {
-    "source": "Llamada eliminada",
-    "files": [
-      "js/calls.js"
-    ]
-  },
   "s_d9e6ccb6": {
     "source": "ráfaga rápida",
     "files": [
@@ -12189,6 +12375,12 @@
     "source": "{icon} Premio realizado: {name}",
     "files": [
       "js/reinforcement-feedback.js"
+    ]
+  },
+  "s_da97b7cf": {
+    "source": "Llamadas recuperadas",
+    "files": [
+      "js/call-recovery.js"
     ]
   },
   "s_da9e24e0": {
@@ -12239,6 +12431,12 @@
       "js/settings.js"
     ]
   },
+  "s_db5a5bf0": {
+    "source": "No hay cambios recuperables en esta vista.",
+    "files": [
+      "js/call-recovery.js"
+    ]
+  },
   "s_db783f8e": {
     "source": "Una vez. A qué hora entras, cuándo son tus breaks y tu lunch. Si una semana es distinta, la cambias solo para esa semana.",
     "files": [
@@ -12279,6 +12477,12 @@
     "source": "Todos dentro de su ventana",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_dc02ff7e": {
+    "source": "{{v7}} → {{v8}}",
+    "files": [
+      "js/call-recovery.js"
     ]
   },
   "s_dc074137": {
@@ -12791,6 +12995,12 @@
       "index.html"
     ]
   },
+  "s_e32278ee": {
+    "source": "¿Vaciar {{v0}} llamadas de {{v1}}? Se conservarán en el historial recuperable hasta 30 días. Turno, pausas y horario permanecen.",
+    "files": [
+      "js/call-recovery.js"
+    ]
+  },
   "s_e37b6f56": {
     "source": "Customer ID",
     "files": [
@@ -12941,10 +13151,22 @@
       "js/app-main.js"
     ]
   },
+  "s_e626d5c2": {
+    "source": "Duración",
+    "files": [
+      "js/call-recovery.js"
+    ]
+  },
   "s_e6415ef3": {
     "source": "META ANUAL",
     "files": [
       "app.html"
+    ]
+  },
+  "s_e664b2cc": {
+    "source": "Se actualizarán ganancias, Finanzas y Logros.",
+    "files": [
+      "js/call-recovery.js"
     ]
   },
   "s_e68e1c6e": {
@@ -13065,6 +13287,12 @@
       "js/boot.js"
     ]
   },
+  "s_e8c61633": {
+    "source": "Este cambio supera el espacio del historial. Las llamadas se conservaron.",
+    "files": [
+      "js/call-recovery.js"
+    ]
+  },
   "s_e8dde678": {
     "source": "Meta",
     "files": [
@@ -13114,6 +13342,12 @@
       "app.html"
     ]
   },
+  "s_e9d9fe9d": {
+    "source": "Llamada enviada al historial recuperable",
+    "files": [
+      "js/call-recovery.js"
+    ]
+  },
   "s_e9e36c21": {
     "source": "Buen ritmo · 3 llamadas elegibles",
     "files": [
@@ -13141,7 +13375,8 @@
   "s_ea3d2b54": {
     "source": "Cancelar",
     "files": [
-      "app.html"
+      "app.html",
+      "js/call-recovery.js"
     ]
   },
   "s_ea63397b": {
@@ -13275,7 +13510,7 @@
   "s_ec6271ba": {
     "source": "Llamada actualizada",
     "files": [
-      "js/calls.js"
+      "js/call-recovery.js"
     ]
   },
   "s_ec8ab79f": {
@@ -13854,6 +14089,12 @@
       "js/reports.js"
     ]
   },
+  "s_f5e31faa": {
+    "source": "Todos",
+    "files": [
+      "js/call-recovery.js"
+    ]
+  },
   "s_f5ebe8bc": {
     "source": "Sin inicio automático pendiente",
     "files": [
@@ -13912,6 +14153,12 @@
     "source": "¿Descartar este {{v0}} sin guardarlo? No quedará registrado en tu historial ni en Adherencia.",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_f721b379": {
+    "source": "Hasta 50 cambios · hasta 30 días, según espacio. Incluido en tu respaldo JSON.",
+    "files": [
+      "js/call-recovery.js"
     ]
   },
   "s_f730bef3": {
@@ -13999,6 +14246,12 @@
       "js/schedule.js"
     ]
   },
+  "s_f929c800": {
+    "source": "La llamada cambió. Revisala de nuevo antes de eliminarla.",
+    "files": [
+      "js/call-recovery.js"
+    ]
+  },
   "s_f92d8013": {
     "source": "Guardado hace {{v0}} min",
     "files": [
@@ -14021,6 +14274,12 @@
     "source": "están todos en la app; además puedes descargarlos con \"Exportar JSON\" en Ajustes.",
     "files": [
       "privacidad.html"
+    ]
+  },
+  "s_f95feba2": {
+    "source": "Hay una versión posterior",
+    "files": [
+      "js/call-recovery.js"
     ]
   },
   "s_f99a6f1a": {
@@ -14106,6 +14365,12 @@
     "source": "Esperando el inicio de tu turno",
     "files": [
       "js/automation-ui.js"
+    ]
+  },
+  "s_fbe687f6": {
+    "source": "{{v2}}, aparte del pago base. Para corregirlo, abrí Higher Rate → Revisar llamadas → Corregir promoción.",
+    "files": [
+      "js/calls.js"
     ]
   },
   "s_fbf212b6": {

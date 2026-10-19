@@ -146,7 +146,7 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 
 ### 21. Editar y borrar llamadas
 
-- **Qué hace:** permite corregir duración, pago, Billable o Dropped y eliminar registros. Recalcula lo que depende de esas llamadas, como ganancias y progreso.
+- **Qué hace:** permite corregir duración, pago, Billable o Dropped y eliminar registros. «Historial de cambios» conserva el antes/después y permite deshacer o recuperar con vista previa, sin sobrescribir correcciones posteriores.
 - **Qué configurás:** abrís la acción de la fila; las acciones destructivas piden confirmación cuando corresponde.
 - **Ejemplo:** una llamada quedó con veinte minutos, pero fueron diez. La corregís y se actualizan sus totales. No es necesario borrar todo el día para arreglarla.
 
