@@ -7061,10 +7061,10 @@
 .recovery-card { min-width: 0; padding: 16px; border-radius: var(--radius-sm, 16px); border: 1px solid var(--line); background: var(--bg-soft, rgba(var(--cyan-rgb), .035)); box-shadow: var(--shadow); }
 .recovery-card-head { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: start; margin-bottom: 12px; }
 .recovery-card h4 { margin: 5px 0; font-size: 16px; }
-.recovery-tag { color: var(--cyan); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
+.recovery-tag { color: var(--text); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
 .recovery-card time { font-size: 11px; color: var(--muted); }
 .recovery-state { font-size: 11px; line-height: 1.4; padding: 5px 9px; border-radius: 20px; color: var(--muted); background: var(--panel); border: 1px solid var(--line); }
-.recovery-state.ready { color: var(--good); border-color: rgba(var(--good-rgb), .35); background: rgba(var(--good-rgb), .08); }
+.recovery-state.ready { color: var(--text); border-color: rgba(var(--good-rgb), .35); background: rgba(var(--good-rgb), .08); }
 .recovery-card summary { cursor: pointer; font-size: 12px; font-weight: 700; color: var(--muted); margin: 10px 0; }
 .recovery-card > button { margin-top: 12px; }
 .recovery-comparison { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 10px; align-items: center; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
