@@ -48,7 +48,7 @@ test('auditoría profunda: reiniciar día protege llamada activa o respaldo live
   assert.match(body, /activeCallDayKey/);
   assert.match(body, /pendingCallDayKey/);
   assert.match(body, /Guarda o descarta la llamada pendiente antes de reiniciar este día/);
-  assert.ok(body.indexOf('Guarda o descarta la llamada pendiente') < body.indexOf('appConfirm('));
+  assert.ok(body.indexOf('Guarda o descarta la llamada pendiente') < body.indexOf("useSnapshotTools('confirmReplacement'"));
 });
 
 test('auditoría profunda: pegar solo duplicados omitidos no crea evento falso ni ensucia estado', () => {

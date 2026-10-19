@@ -168,6 +168,7 @@ function pauseHarness({ at, startedAt, planned, absoluteSlots, effectiveDuration
     callDateKeyFromValue: (value) => value, currentShiftAccountingDayKey: () => dayKey,
     findPlannedSlotForActivePause: () => planned, makeLocalId: () => 'closed-pause',
     setEvent: () => ({ id: 'event' }), fmtTime: () => '', stopBreakEndAlarm: () => {},
+    canPersistLocalChanges: () => true, setAppState: value => { context.state = value; }, render() {},
     saveStateOnly: () => {}, saveAll: () => {}, toast: (message) => generalToasts.push(message),
     callDateToDate: () => new Date(base), dateAtTime,
     reinforcementScheduleIntervals: () => absoluteSlots || [],

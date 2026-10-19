@@ -8,14 +8,14 @@ no se considera rota por esa razón.
 
 ## Lista de control completa
 
-**18 de 79 mejoras publicadas.** 2 en curso y 59 pendientes. La preparación del
+**18 de 79 mejoras publicadas.** 6 probadas en la entrega web 629, 2 en curso y 53 pendientes. La preparación del
 turno usa app 624 y extensión 2.2.10, con publicación comprobada y recarga de la
 extensión, Propio y tracker confirmada por el propietario. App 625 refuerza la
 limpieza de Higher Rate; app 626 incorpora, en orden, el desglose de ganancias,
 consulta de conversión y alcance de tarifa. App 627 completa 36 y 37: revisión
 por ventana y corrección con vista previa, conservando bonos al editar o limpiar.
 App 628 completa el punto 21 con historial antes/después y recuperación de
-ediciones, eliminaciones y vaciados de llamadas. La fase 3 sigue en curso.
+ediciones, eliminaciones y vaciados de llamadas. La entrega web 629 completa la implementación de 22, 26–27, 47, 67 y 69; falta comprobar su publicación para cerrar la fase 3.
 
 Estas 79 mejoras corresponden al sistema completo. El panel de disponibilidad
 y preparación se ve en la **tool web**; el popup de la **extensión de Chrome**
@@ -50,12 +50,12 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 - [ ] **19. Agregar una llamada manual — Pendiente.** Comprobación de fecha, duración y pago antes de guardar manuales.
 - [ ] **20. Pegar llamadas de Propio — Pendiente.** Resultado de importación por fila y su motivo.
 - [x] **21. Editar y borrar llamadas — Publicado.** Historial antes/después, deshacer edición y recuperar borrados individuales/lotes, con vista previa y protección frente a versiones posteriores y fallo al guardar. [Evidencia y límites](recuperacion-llamadas.md).
-- [ ] **22. Descartar una llamada accidental — Pendiente.** Confirmación de lo que restaura descartar una llamada accidental.
+- [ ] **22. Descartar una llamada accidental — Probado (sin publicar).** Confirmación específica del turno/pausa que se restaura y guardado con reversión ante fallo. [Alcance y pruebas](recuperacion-actividades-y-respaldos.md).
 - [ ] **23. ACW en vivo y ACW acumulado — Pendiente.** Distinguir ACW actual del acumulado y explicar su origen.
 - [ ] **24. Meta máxima de ACW — Pendiente.** Distinguir máximo deseado de ACW de la espera entre llamadas.
 - [ ] **25. Break y Lunch de la tool — Pendiente.** Presentar pausa planeada y real con duración actual.
-- [ ] **26. Continuar o descartar una pausa accidental — Pendiente.** Explicar qué conserva continuar o descartar una pausa.
-- [ ] **27. Editar huecos entre llamadas — Pendiente.** Señalar intervalos clasificados manualmente.
+- [ ] **26. Continuar o descartar una pausa accidental — Probado (sin publicar).** Continuación identificada; descartarla devuelve el tramo cerrado previo, con protección de guardado. [Alcance y pruebas](recuperacion-actividades-y-respaldos.md).
+- [ ] **27. Editar huecos entre llamadas — Probado (sin publicar).** Clasificación manual visible en tabla/editor; revisión vigente y reversión ante rechazo. [Alcance y pruebas](recuperacion-actividades-y-respaldos.md).
 - [ ] **28. Adherencia al horario — Pendiente.** Desglose de minutos y causas al consultar adherencia.
 - [ ] **29. Plantilla semanal — Pendiente.** Orden y cruce de medianoche legibles en el editor.
 - [ ] **30. Semana específica y copia de horarios — Pendiente.** Alcance plantilla/semana y vista previa de días al copiar.
@@ -75,7 +75,7 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 - [ ] **44. Proyección del ciclo — Pendiente.** Supuestos de proyección y efecto de días/ritmo visibles.
 - [ ] **45. Fechas de pago — Pendiente.** Registrar pago recibido manual y diferencia con lo esperado.
 - [ ] **46. Calendario de productividad — Pendiente.** Leyenda que distinga sin datos, libre y meta no cumplida.
-- [ ] **47. Marcar días y agregar contexto — Pendiente.** Marcas manuales visibles y explicación del efecto histórico.
+- [ ] **47. Marcar días y agregar contexto — Probado (sin publicar).** Estado manual visible en semana/calendario y efecto histórico explicado; edición protegida. [Alcance y pruebas](recuperacion-actividades-y-respaldos.md).
 - [ ] **48. Alarmas de turno y descansos — Pendiente.** Resumen de alarmas activas.
 - [ ] **49. Sonidos al guardar llamadas — Pendiente.** Asociación clara acción/sonido conservando reconciliación silenciosa.
 - [ ] **50. Aviso de descanso por minutos productivos — Pendiente.** Progreso hacia el aviso sin iniciar pausas automáticamente.
@@ -95,9 +95,9 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 - [ ] **64. Escritorio de trabajo al iniciar Windows — Pendiente.** Configuración guiada para otras PCs de páginas/perfil/notas/tamaños.
 - [ ] **65. Cuenta y perfil — Pendiente.** Rótulos acordes con campos editables y acceso Google vigente.
 - [ ] **66. Guardado local y sincronización — Pendiente.** Detalle visible de guardado local/nube y conflictos. Revisar el reconocimiento tras una subida al salir: QA detectó un conflicto conservador con contenido de llamadas equivalente en distinto orden y revisión local anterior; se conservaron ambas versiones. Reproducir con el orden real de la consulta antes de cambiar la comparación.
-- [ ] **67. Respaldo completo JSON — Pendiente.** Comparación al restaurar y copia automática previa al reemplazo.
+- [ ] **67. Respaldo completo JSON — Probado (sin publicar).** Comparación actual/respaldo, copia privada previa, recuperación explícita y protección de cuenta/revisión/cuota. [Alcance y pruebas](recuperacion-actividades-y-respaldos.md).
 - [ ] **68. Reportes CSV y PDF — Pendiente.** Explicar período/datos incluidos y diferencia con respaldo.
-- [ ] **69. Reinicios y borrados — Pendiente.** Alcances específicos y recuperación en acciones destructivas.
+- [ ] **69. Reinicios y borrados — Probado (sin publicar).** Alcance específico del día/total, copia previa y recuperación consultable; rechazo conserva los datos. [Alcance y pruebas](recuperacion-actividades-y-respaldos.md).
 - [ ] **70. App instalable y recuperación — Pendiente.** Explicar estado local, reconexión y límites de PWA.
 - [x] **71. Estado de conexión y actividad de la extensión — Publicado.** Diagnóstico inicial: qué pasa, qué sigue funcionando y qué hacer. [Evidencia](disponibilidad-en-inicio.md).
 - [ ] **72. Borrar la cuenta — Pendiente.** Alcance y retención claros, ofreciendo exportar antes.
@@ -153,7 +153,7 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
    33–37 resueltos en orden. [Alcance y pruebas](higher-rate-revision.md).
 3. **Recuperación y trazabilidad — en curso.** El punto 21 está publicado:
    historial de ediciones y borrados de llamadas, vista previa y recuperación.
-   Siguen 22, 26–27, 47, 67 y 69 en ese orden. Deshacer/papelera temporal para
+   22, 26–27, 47, 67 y 69 están probados en la entrega 629, en verificación de publicación. Deshacer/papelera temporal para
    llamadas y acciones recuperables; historial antes/después; restauración con
    comparación y copia previa; confirmaciones de alcance. Cubre 21–22, 26–27,
    47, 67 y 69. No restaurar datos ajenos ni sobrescribir cambios posteriores.

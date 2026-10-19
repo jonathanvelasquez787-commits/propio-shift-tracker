@@ -180,4 +180,6 @@ function draw() {
 }
 export { openHigherRateReview, higherRateCorrectionPlan } from './higher-rate-review.js';
 export { openCallRecovery, saveEditedCall, deleteRecordedCall, clearRecordedDay } from './call-recovery.js';
+export { confirmActivityChange } from './work-actions.js';
+export { confirmReplacement, importBackupFile, openSnapshotRecovery } from './backup-recovery.js';
 export const detailTranslations = null;

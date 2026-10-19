@@ -606,7 +606,7 @@ function dayActionRows(dayKey) {
       badgeLabel: gapLabelText(g.label),
       badgeClass: `type-${g.label}`,
       detail: g.isShiftStartGap ? translateText('Inicio de turno → primera llamada') : translateText('Entre llamadas'),
-      note: g.note || '',
+      note: [g.manual ? translateText('Clasificado por vos') : '', g.note || ''].filter(Boolean).join(' · '),
       durationMin: g.displayAmount,
       editable: true,
       gapKey: g.gapKey,

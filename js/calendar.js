@@ -140,7 +140,7 @@ export function renderCalendarMonth() {
     const dayNoteForCell = getDayNote(dayKey);
     const offCategoryLabel = status === 'off' ? dayNoteCategoryMeta(dayNoteForCell?.category)?.label : null;
     const minLabel = status === 'off' ? (offCategoryLabel || translateText('Libre')) : status === 'nodata' ? '—' : String(Math.round(productiveMin));
-    const titleParts = [offCategoryLabel, dayNoteForCell?.comment].filter(Boolean);
+    const titleParts = [dayNoteForCell?.forcedStatus ? translateText('Estado elegido por vos; reemplaza el del horario') : '', offCategoryLabel, dayNoteForCell?.comment].filter(Boolean);
     const titleAttr = titleParts.length ? ` title="${escapeHtml(titleParts.join(' — '))}"` : '';
     const minLabelClass = status === 'normal' ? 'cal-day-min' : 'cal-day-min cal-day-min-label';
     // Minutos + monto en $ + monto en la otra moneda, los 3 juntos en la celda, con decimales en
@@ -154,7 +154,8 @@ export function renderCalendarMonth() {
       const amtAltHtml = calHasCurrency ? ui`<span class="cal-day-amt-alt">${escapeHtml(calCurrencyLabel)}${(dayEarningsForCell * calExchangeRate).toFixed(2)}</span>` : '';
       amtLinesHtml = `${amtHtml}${amtAltHtml}`;
     }
-    cellsHtml.push(ui`<div class="cal-day-cell ${tier}"${titleAttr}>${bonusHtml}<div class="cal-day-top-row"><span class="cal-day-num">${day}</span>${starHtml}</div><span class="${minLabelClass}">${minLabel}</span>${amtLinesHtml}</div>`);
+    const manualMark = dayNoteForCell?.forcedStatus ? ui`<span class="cal-day-manual" aria-label="Estado manual">M</span>` : '';
+    cellsHtml.push(ui`<div class="cal-day-cell ${tier}"${titleAttr}>${bonusHtml}<div class="cal-day-top-row"><span class="cal-day-num">${day}</span>${manualMark}${starHtml}</div><span class="${minLabelClass}">${minLabel}</span>${amtLinesHtml}</div>`);
   }
   // Si el offset de día de semana + los días recortados por "Historial desde" suman una o más filas
   // COMPLETAS de celdas vacías al inicio, se quitan esas filas enteras (múltiplos de 7) — así el

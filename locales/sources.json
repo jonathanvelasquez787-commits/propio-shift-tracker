@@ -165,6 +165,12 @@
       "app.html"
     ]
   },
+  "s_039ef2d7": {
+    "source": "Continuás la pausa anterior desde su inicio original. Si descartás esta continuación, vuelve el tramo que ya estaba terminado.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_03b552da": {
     "source": "Tu historial de cambios",
     "files": [
@@ -248,6 +254,12 @@
     "source": "Termina en {{v0}} min ({{v1}})",
     "files": [
       "js/higher-rate.js"
+    ]
+  },
+  "s_055d57f7": {
+    "source": "Tu turno y las llamadas guardadas se conservan.",
+    "files": [
+      "js/work-actions.js"
     ]
   },
   "s_0568a84d": {
@@ -407,6 +419,12 @@
     "source": "Hay varias pestañas de Propio",
     "files": [
       "js/automation-ui.js"
+    ]
+  },
+  "s_08112ed0": {
+    "source": "Se revierte el turno abierto por esta llamada y su progreso automático.",
+    "files": [
+      "js/work-actions.js"
     ]
   },
   "s_082c97f7": {
@@ -1029,6 +1047,12 @@
       "index.html"
     ]
   },
+  "s_10aa082f": {
+    "source": "El ACW previo y las llamadas guardadas se conservan.",
+    "files": [
+      "js/work-actions.js"
+    ]
+  },
   "s_10afd3ba": {
     "source": "Llamadas importadas",
     "files": [
@@ -1039,6 +1063,12 @@
     "source": "Antes del horario y de la gracia",
     "files": [
       "js/higher-rate-review.js"
+    ]
+  },
+  "s_10e0d712": {
+    "source": "Día que se reinicia: {{v0}}.",
+    "files": [
+      "js/backup-recovery.js"
     ]
   },
   "s_11002277": {
@@ -1359,6 +1389,12 @@
       "js/automation-ui.js"
     ]
   },
+  "s_17482183": {
+    "source": "Reinicia los datos de TODOS los días y los ajustes de la tool. El cambio se sincroniza con tu cuenta; la cuenta y las opciones de la extensión se conservan.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_174c8eb2": {
     "source": "Finanzas → +",
     "files": [
@@ -1447,6 +1483,12 @@
     "source": "Mes actual",
     "files": [
       "app.html"
+    ]
+  },
+  "s_188da0a2": {
+    "source": "La actividad cambió. Revisá de nuevo antes de descartarla.",
+    "files": [
+      "js/work-actions.js"
     ]
   },
   "s_18a451bb": {
@@ -1580,6 +1622,18 @@
     "source": "Resuelve la llamada pendiente antes de finalizar el turno",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_1a7d3892": {
+    "source": "Revisá el alcance. Podés cancelar sin cambiar nada.",
+    "files": [
+      "js/backup-recovery.js"
+    ]
+  },
+  "s_1a9f7f1c": {
+    "source": "Tu cuenta y los ajustes propios de la extensión se conservan.",
+    "files": [
+      "js/backup-recovery.js"
     ]
   },
   "s_1aabde80": {
@@ -1841,6 +1895,12 @@
       "js/finance.js"
     ]
   },
+  "s_1f7fde71": {
+    "source": "Actual → respaldo",
+    "files": [
+      "js/backup-recovery.js"
+    ]
+  },
   "s_1fa218ff": {
     "source": "XP ganado",
     "files": [
@@ -1871,6 +1931,12 @@
     "source": "Granada · {{v0}} s",
     "files": [
       "js/game-battle.js"
+    ]
+  },
+  "s_1fffcb77": {
+    "source": "Se retoma la pausa que esta llamada interrumpió, conservando su inicio.",
+    "files": [
+      "js/work-actions.js"
     ]
   },
   "s_20190e8d": {
@@ -1968,7 +2034,8 @@
   "s_22380468": {
     "source": "Confirmar",
     "files": [
-      "app.html"
+      "app.html",
+      "js/app-main.js"
     ]
   },
   "s_224a7f94": {
@@ -2191,6 +2258,12 @@
       "js/automation-ui.js"
     ]
   },
+  "s_26813a20": {
+    "source": "No se pudo conservar la copia anterior. No se cambiaron tus datos.",
+    "files": [
+      "js/backup-recovery.js"
+    ]
+  },
   "s_2685474e": {
     "source": "Dron",
     "files": [
@@ -2248,7 +2321,7 @@
   "s_2783c7e5": {
     "source": "Falta el campo \"state\" (o no es válido) en el archivo.",
     "files": [
-      "js/app-main.js"
+      "js/backup-recovery.js"
     ]
   },
   "s_2789f8fc": {
@@ -2399,6 +2472,12 @@
     "source": "Marca inicio, break, lunch y llamadas con un toque. Una barra fija arriba te dice qué está corriendo y cuánto llevas.",
     "files": [
       "index.html"
+    ]
+  },
+  "s_29ff93f1": {
+    "source": "Terminá o descartá la actividad pendiente antes de reemplazar datos.",
+    "files": [
+      "js/backup-recovery.js"
     ]
   },
   "s_2a1268fb": {
@@ -2756,6 +2835,12 @@
       "app.html"
     ]
   },
+  "s_303fe282": {
+    "source": "Se descarta esta continuación y vuelve el tramo de pausa que ya estaba terminado.",
+    "files": [
+      "js/work-actions.js"
+    ]
+  },
   "s_30a42ee4": {
     "source": "Victorias y récords",
     "files": [
@@ -2802,6 +2887,12 @@
     "source": "No hay filas de este tipo para el día activo — cambia el filtro de arriba para ver el resto.",
     "files": [
       "js/calls.js"
+    ]
+  },
+  "s_3140df12": {
+    "source": "El cambio se sincroniza con tu cuenta al reconectar. Antes se guarda una copia privada en este navegador, accesible desde Reiniciar → Copias recuperables.",
+    "files": [
+      "js/backup-recovery.js"
     ]
   },
   "s_3151ba56": {
@@ -3079,7 +3170,7 @@
   "s_35dc3c68": {
     "source": "El campo \"settings\" del respaldo no es válido.",
     "files": [
-      "js/app-main.js"
+      "js/backup-recovery.js"
     ]
   },
   "s_35e8c39f": {
@@ -3176,6 +3267,12 @@
     "source": "Moneda:",
     "files": [
       "app.html"
+    ]
+  },
+  "s_3758b709": {
+    "source": "Se reinician todos los días, llamadas, turnos, pausas, Logros, Finanzas, horario, metas y perfil de la tool.",
+    "files": [
+      "js/backup-recovery.js"
     ]
   },
   "s_3770dabd": {
@@ -3281,12 +3378,6 @@
       "js/weekly-summary.js"
     ]
   },
-  "s_3957a30c": {
-    "source": "{{v0}} llamada(s) y configuración restauradas desde el respaldo",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
   "s_397db7aa": {
     "source": "Confirmar recálculo",
     "files": [
@@ -3299,8 +3390,8 @@
       "js/positive-reinforcement.js"
     ]
   },
-  "s_39bdcce7": {
-    "source": "¿Descartar esta llamada sin guardarla? El tiempo registrado se pierde y no queda ninguna fila en Tabla de llamadas.",
+  "s_39a76cd5": {
+    "source": "Clasificado por vos: {{v0}}{{v1}}",
     "files": [
       "js/app-main.js"
     ]
@@ -3579,6 +3670,12 @@
       "js/finance-planning.js"
     ]
   },
+  "s_40070812": {
+    "source": "Todavía no hay copias recuperables para tu cuenta en este navegador.",
+    "files": [
+      "js/backup-recovery.js"
+    ]
+  },
   "s_402319c6": {
     "source": "Automático (según tu horario)",
     "files": [
@@ -3644,12 +3741,6 @@
     "source": "Presupuesto actual",
     "files": [
       "js/finance-planning.js"
-    ]
-  },
-  "s_41ec6447": {
-    "source": "Ese archivo pesa demasiado ({{v0}}MB, máximo {{v1}}MB) — no parece un backup válido de esta app. Revisa que sea el archivo correcto.",
-    "files": [
-      "js/app-main.js"
     ]
   },
   "s_420587d6": {
@@ -4339,12 +4430,6 @@
       "app.html"
     ]
   },
-  "s_4d39cf22": {
-    "source": "¿Reiniciar {{v0}}? Se borran llamadas, pausas, huecos, la nota, el log y la gamificación de ese día.",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
   "s_4dbb712f": {
     "source": "+ Agregar",
     "files": [
@@ -4424,6 +4509,12 @@
     "source": "Monto a sumar o restar",
     "files": [
       "js/finance-planning.js"
+    ]
+  },
+  "s_4e99072c": {
+    "source": "Ver copias recuperables",
+    "files": [
+      "app.html"
     ]
   },
   "s_4eb1ea50": {
@@ -4539,6 +4630,12 @@
     "source": "La barra refleja lo que llevas acumulado en el ciclo de pago actual.",
     "files": [
       "app.html"
+    ]
+  },
+  "s_50b8c494": {
+    "source": "No se pudo preparar el descarte. Volvé a intentarlo.",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_50cd6cd4": {
@@ -4728,12 +4825,6 @@
     "source": "Reserva el disponible en orden de prioridad: Gastos primero, luego Metas. Puedes ajustar cada reserva con Sumar o Restar.",
     "files": [
       "app.html"
-    ]
-  },
-  "s_52e46a0b": {
-    "source": "{{v0}} llamada(s) importada(s) desde el respaldo antiguo",
-    "files": [
-      "js/app-main.js"
     ]
   },
   "s_52ef7275": {
@@ -4937,6 +5028,12 @@
       "js/monsters.js"
     ]
   },
+  "s_561fcc7a": {
+    "source": "Revisá lo que cambiará antes de confirmar.",
+    "files": [
+      "js/work-actions.js"
+    ]
+  },
   "s_56334813": {
     "source": "{{v18}} progreso",
     "files": [
@@ -5065,6 +5162,12 @@
     "source": "enojado",
     "files": [
       "js/monsters.js"
+    ]
+  },
+  "s_58720cfe": {
+    "source": "Pausas terminadas",
+    "files": [
+      "js/backup-recovery.js"
     ]
   },
   "s_588aa12b": {
@@ -5989,7 +6092,7 @@
   "s_6a682b5f": {
     "source": "El archivo no contiene un objeto JSON válido.",
     "files": [
-      "js/app-main.js"
+      "js/backup-recovery.js"
     ]
   },
   "s_6aaf475d": {
@@ -6045,7 +6148,7 @@
   "s_6affc195": {
     "source": "No se pudo leer el archivo.",
     "files": [
-      "js/app-main.js"
+      "js/backup-recovery.js"
     ]
   },
   "s_6b1e4ed4": {
@@ -6300,7 +6403,8 @@
   "s_6ff9d9f7": {
     "source": "Reiniciar día",
     "files": [
-      "app.html"
+      "app.html",
+      "js/backup-recovery.js"
     ]
   },
   "s_7001c6e3": {
@@ -6705,12 +6809,6 @@
       "js/app-main.js"
     ]
   },
-  "s_761fdbfb": {
-    "source": "También restaura tu horario, metas, Finanzas, Higher Rate, perfil y demás ajustes del respaldo.",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
   "s_7622c0b8": {
     "source": "Semana 2: {{v0}}",
     "files": [
@@ -6831,6 +6929,12 @@
       "app.html"
     ]
   },
+  "s_78af8000": {
+    "source": "Revisá el alcance antes de confirmar. Conservamos una copia previa en este navegador.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_78b43231": {
     "source": "· Adherencia {{v0}}%",
     "files": [
@@ -6910,7 +7014,6 @@
   "s_79d15ca9": {
     "source": "Irreversible",
     "files": [
-      "app.html",
       "js/boot.js"
     ]
   },
@@ -6949,6 +7052,7 @@
     "files": [
       "app.html",
       "js/app-main.js",
+      "js/backup-recovery.js",
       "js/reports.js",
       "js/weekly-summary.js"
     ]
@@ -7180,6 +7284,7 @@
   "s_7e350eb2": {
     "source": "llamadas",
     "files": [
+      "js/backup-recovery.js",
       "js/reinforcement-rules.js"
     ]
   },
@@ -7253,6 +7358,12 @@
     "source": "Min productivos",
     "files": [
       "app.html"
+    ]
+  },
+  "s_7fa22753": {
+    "source": "Estado manual",
+    "files": [
+      "js/calendar.js"
     ]
   },
   "s_8043d60f": {
@@ -7521,6 +7632,12 @@
     "source": "No hay cambios que aplicar.",
     "files": [
       "js/higher-rate-review.js"
+    ]
+  },
+  "s_84679224": {
+    "source": "El respaldo no incluye ajustes: tu configuración actual se conserva.",
+    "files": [
+      "js/backup-recovery.js"
     ]
   },
   "s_8497d1bd": {
@@ -7896,7 +8013,7 @@
   "s_8b1d8111": {
     "source": "El respaldo contiene un historial de actividad inválido. Tus datos actuales no se cambiaron.",
     "files": [
-      "js/app-main.js"
+      "js/backup-recovery.js"
     ]
   },
   "s_8b3143db": {
@@ -7932,7 +8049,6 @@
   "s_8bce7dc0": {
     "source": "fecha desconocida",
     "files": [
-      "js/app-main.js",
       "js/boot.js"
     ]
   },
@@ -7977,6 +8093,12 @@
     "source": "Próximo pago",
     "files": [
       "js/weekly-summary.js"
+    ]
+  },
+  "s_8cae66fc": {
+    "source": "Descartar llamada",
+    "files": [
+      "js/work-actions.js"
     ]
   },
   "s_8cb6b45e": {
@@ -8350,6 +8472,12 @@
       "js/app-main.js"
     ]
   },
+  "s_920ddf2c": {
+    "source": "Restaurar respaldo",
+    "files": [
+      "js/backup-recovery.js"
+    ]
+  },
   "s_9279758f": {
     "source": "{{v0}} min · meta diaria",
     "files": [
@@ -8592,6 +8720,18 @@
     "source": "Tu mejor llamada del día aportó {{v0}}.",
     "files": [
       "js/reinforcement-rules.js"
+    ]
+  },
+  "s_96bdbba8": {
+    "source": "La llamada activa se descarta sin crear un registro ni ganancias.",
+    "files": [
+      "js/work-actions.js"
+    ]
+  },
+  "s_96e70bf5": {
+    "source": "Reiniciar todos los datos",
+    "files": [
+      "js/backup-recovery.js"
     ]
   },
   "s_96f89138": {
@@ -8877,7 +9017,8 @@
   "s_9c71d7f0": {
     "source": "Acciones",
     "files": [
-      "app.html"
+      "app.html",
+      "js/backup-recovery.js"
     ]
   },
   "s_9c85933a": {
@@ -9181,6 +9322,12 @@
       "app.html"
     ]
   },
+  "s_a113743d": {
+    "source": "Los datos cambiaron. Abrí de nuevo esta acción antes de confirmar.",
+    "files": [
+      "js/backup-recovery.js"
+    ]
+  },
   "s_a11564f8": {
     "source": "{{v0}}, {{v1}}% de la meta completada",
     "files": [
@@ -9257,12 +9404,6 @@
   },
   "s_a1f64b83": {
     "source": "Adherencia: {{v1}}%",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
-  "s_a21ff916": {
-    "source": "¿Borrar TODOS los datos del programa? Esto borra permanentemente todas las llamadas, turnos, pausas, horario semanal, metas y tu nombre/emoji guardados en este navegador. No se puede deshacer. La app queda como recién instalada (con el popup de bienvenida de nuevo).",
     "files": [
       "js/app-main.js"
     ]
@@ -9370,12 +9511,6 @@
     "source": "Inicio laboral: {{v0}}.",
     "files": [
       "js/automation-ui.js"
-    ]
-  },
-  "s_a3d71e45": {
-    "source": "¿Importar este archivo (exportado el {{v0}} · {{v1}} llamada(s))? Esto reemplaza tus llamadas, turnos y pausas actuales. {{v2}} Esta acción no se puede deshacer.",
-    "files": [
-      "js/app-main.js"
     ]
   },
   "s_a3ddac34": {
@@ -9643,6 +9778,12 @@
       "app.html"
     ]
   },
+  "s_a9027727": {
+    "source": "Se descarta la pausa activa completa; no se suma a tu historial ni a Adherencia.",
+    "files": [
+      "js/work-actions.js"
+    ]
+  },
   "s_a911f0e4": {
     "source": "Rango",
     "files": [
@@ -9659,6 +9800,12 @@
     "source": "Equipo desbloqueable",
     "files": [
       "app.html"
+    ]
+  },
+  "s_a96e09f5": {
+    "source": "Copia guardada en este navegador",
+    "files": [
+      "js/backup-recovery.js"
     ]
   },
   "s_a99b925e": {
@@ -9725,6 +9872,7 @@
   "s_aaa0f5ae": {
     "source": "{{v4}}{{v5}}",
     "files": [
+      "js/calendar.js",
       "js/finance.js",
       "js/reports.js"
     ]
@@ -9954,12 +10102,6 @@
       "js/auth.js"
     ]
   },
-  "s_af93de89": {
-    "source": "Clasificación guardada: {{v0}}{{v1}}",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
   "s_afa41e15": {
     "source": "Días restantes",
     "files": [
@@ -9983,6 +10125,13 @@
     "files": [
       "app.html",
       "js/app-main.js"
+    ]
+  },
+  "s_afec2eb7": {
+    "source": "Estado elegido por vos; reemplaza el del horario",
+    "files": [
+      "js/calendar.js",
+      "js/weekly-summary.js"
     ]
   },
   "s_aff863ad": {
@@ -10093,6 +10242,12 @@
     "source": "Crear mi cuenta",
     "files": [
       "index.html"
+    ]
+  },
+  "s_b1ebcc18": {
+    "source": "Consultá la copia anterior a una restauración o reinicio. Se conserva solo en este navegador y para tu cuenta.",
+    "files": [
+      "app.html"
     ]
   },
   "s_b1f61146": {
@@ -10289,6 +10444,12 @@
       "js/app-main.js"
     ]
   },
+  "s_b499ee09": {
+    "source": ". Conserva las acciones, pausas y el horario. Para borrar también la actividad de ese día, usá Reiniciar día. Podés recuperar las llamadas desde Historial de cambios.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_b4df5bf3": {
     "source": "Completa los campos para agregar la llamada.",
     "files": [
@@ -10318,6 +10479,13 @@
     "source": "Editar premio",
     "files": [
       "js/positive-reinforcement.js"
+    ]
+  },
+  "s_b551df05": {
+    "source": "Copias recuperables",
+    "files": [
+      "app.html",
+      "js/backup-recovery.js"
     ]
   },
   "s_b559c2cf": {
@@ -10414,7 +10582,7 @@
   "s_b6c21d45": {
     "source": "Falta el campo \"calls\" (o no es una lista) en el archivo.",
     "files": [
-      "js/app-main.js"
+      "js/backup-recovery.js"
     ]
   },
   "s_b6d7e507": {
@@ -10453,6 +10621,12 @@
       "app.html"
     ]
   },
+  "s_b751b797": {
+    "source": "No se pudo preparar la recuperación. Volvé a intentarlo.",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_b7705696": {
     "source": "Puntual",
     "files": [
@@ -10464,12 +10638,6 @@
     "source": "Pagado en el mes elegido",
     "files": [
       "js/finance.js"
-    ]
-  },
-  "s_b78cf5bd": {
-    "source": "Elige qué tan a fondo querés empezar de nuevo.",
-    "files": [
-      "app.html"
     ]
   },
   "s_b7baa774": {
@@ -10584,12 +10752,6 @@
   },
   "s_baa7ff16": {
     "source": "ACW/AfterCallWork",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_baabed62": {
-    "source": "(el día activo). Las acciones de la tabla (Shift/Break/Lunch/ACW) no se tocan — son un registro, no se borran desde aquí. Para reiniciar también turno/pausas/horario de ese día, usa \"Reiniciar día\" en el botón ♻️ Reiniciar del header.",
     "files": [
       "app.html"
     ]
@@ -10824,6 +10986,12 @@
     "source": "·\n      Titular:",
     "files": [
       "terminos.html"
+    ]
+  },
+  "s_be30ed51": {
+    "source": "Vacía las llamadas de",
+    "files": [
+      "app.html"
     ]
   },
   "s_be5b33ad": {
@@ -11191,6 +11359,12 @@
       "app.html"
     ]
   },
+  "s_c51ade12": {
+    "source": "Estas copias son locales, privadas de tu cuenta y no sustituyen un respaldo JSON descargado. Borrar los datos del navegador también las elimina.",
+    "files": [
+      "js/backup-recovery.js"
+    ]
+  },
   "s_c552cfee": {
     "source": "Tres estrellas",
     "files": [
@@ -11201,6 +11375,12 @@
     "source": "Ciclo {{v0}} – {{v1}}",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_c5767979": {
+    "source": "Se eliminan sus llamadas, pausas, huecos, nota, acciones y progreso diario. Otros días, horario y metas se conservan.",
+    "files": [
+      "js/backup-recovery.js"
     ]
   },
   "s_c5772eb6": {
@@ -11406,7 +11586,8 @@
   "s_c80bfd18": {
     "source": "M",
     "files": [
-      "app.html"
+      "app.html",
+      "js/calendar.js"
     ]
   },
   "s_c821d3c7": {
@@ -11419,6 +11600,12 @@
     "source": "El Guardián de la Quincena",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_c87af716": {
+    "source": "Respaldo restaurado. La copia anterior sigue disponible.",
+    "files": [
+      "js/backup-recovery.js"
     ]
   },
   "s_c87c64f6": {
@@ -11625,6 +11812,12 @@
     "source": "Resultado positivo de la llamada",
     "files": [
       "app.html"
+    ]
+  },
+  "s_ccf9f22c": {
+    "source": "Los datos cambiaron. Cerrá el editor y revisalos antes de guardar.",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_cd0c0ff0": {
@@ -11985,6 +12178,12 @@
       "js/app-main.js"
     ]
   },
+  "s_d2640725": {
+    "source": "Con copia previa local",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_d274640b": {
     "source": "Poco común",
     "files": [
@@ -12105,10 +12304,22 @@
       "js/boot.js"
     ]
   },
+  "s_d48cea8e": {
+    "source": "Descartar Lunch",
+    "files": [
+      "js/work-actions.js"
+    ]
+  },
   "s_d4a6e1b2": {
     "source": "Esta llamada no cae en ninguna ventana de Higher Rate, así que no lleva bono. El nivel se calcula solo desde tus ventanas: agrégala o ajústala en \"Higher Rate\" (botón del header) y el bono se suma solo a esta llamada.",
     "files": [
       "js/calls.js"
+    ]
+  },
+  "s_d4b231fe": {
+    "source": "El historial oficial de Propio no se borra; una sincronización posterior puede volver a incorporarlo.",
+    "files": [
+      "js/backup-recovery.js"
     ]
   },
   "s_d4c84061": {
@@ -12263,6 +12474,12 @@
       "js/monsters.js"
     ]
   },
+  "s_d817466c": {
+    "source": "Copia completa actual",
+    "files": [
+      "js/backup-recovery.js"
+    ]
+  },
   "s_d850b3b7": {
     "source": "{{v0}} Solo {{v1}}",
     "files": [
@@ -12351,6 +12568,12 @@
     "source": "Subir contenido ilegal o que infrinja derechos de terceros.",
     "files": [
       "terminos.html"
+    ]
+  },
+  "s_da147134": {
+    "source": "Se reemplazan también horario, metas, Finanzas, Higher Rate y perfil con los ajustes del respaldo.",
+    "files": [
+      "js/backup-recovery.js"
     ]
   },
   "s_da15522a": {
@@ -12527,12 +12750,6 @@
       "js/game.js"
     ]
   },
-  "s_dc714229": {
-    "source": "Borra TODO lo guardado por la app en este navegador: llamadas, turnos, pausas, horario semanal, metas, nombre/emoji — de TODOS los días, no solo el activo.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_dca1d129": {
     "source": "El Monstruo",
     "files": [
@@ -12652,6 +12869,12 @@
     "files": [
       "index.html",
       "privacidad.html"
+    ]
+  },
+  "s_dd5b2b85": {
+    "source": "Descartar Break",
+    "files": [
+      "js/work-actions.js"
     ]
   },
   "s_dd64d105": {
@@ -12833,10 +13056,10 @@
       "js/app-main.js"
     ]
   },
-  "s_e022ec6b": {
-    "source": "Es un backup antiguo sin settings: tu horario, metas y demás ajustes actuales se conservarán.",
+  "s_e098a646": {
+    "source": "El respaldo excede el tamaño permitido. Elegí un JSON exportado por la tool.",
     "files": [
-      "js/app-main.js"
+      "js/backup-recovery.js"
     ]
   },
   "s_e09ab272": {
@@ -12903,6 +13126,12 @@
     "source": "estela de estrellas",
     "files": [
       "js/game-battle.js"
+    ]
+  },
+  "s_e1a9e1e4": {
+    "source": "Clasificado por vos",
+    "files": [
+      "js/calls.js"
     ]
   },
   "s_e1b00897": {
@@ -13222,6 +13451,7 @@
     "source": "{{v1}}{{v2}}",
     "files": [
       "js/app-main.js",
+      "js/backup-recovery.js",
       "js/game.js",
       "js/reports.js"
     ]
@@ -13230,12 +13460,6 @@
     "source": "🔔 ¡Conéctate ya! Tu turno empieza a las {hora}",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_e7f3c1c4": {
-    "source": "Borra TODAS las llamadas de",
-    "files": [
-      "app.html"
     ]
   },
   "s_e7f90ed2": {
@@ -13336,6 +13560,12 @@
       "app.html"
     ]
   },
+  "s_e9b98273": {
+    "source": "Las llamadas, turnos, pausas, notas y Logros actuales se reemplazan por los del respaldo.",
+    "files": [
+      "js/backup-recovery.js"
+    ]
+  },
   "s_e9cd3286": {
     "source": "¿Seguro?",
     "files": [
@@ -13430,7 +13660,7 @@
   "s_eb8b17fb": {
     "source": "El respaldo contiene llamadas inválidas. Tus datos actuales no se cambiaron.",
     "files": [
-      "js/app-main.js"
+      "js/backup-recovery.js"
     ]
   },
   "s_eb923576": {
@@ -13677,6 +13907,12 @@
       "js/game.js"
     ]
   },
+  "s_ef3034f6": {
+    "source": "El respaldo contiene una actividad abierta; se restaurará con su hora de inicio original.",
+    "files": [
+      "js/backup-recovery.js"
+    ]
+  },
   "s_ef69b543": {
     "source": "Escopeta",
     "files": [
@@ -13747,7 +13983,7 @@
   "s_f1155d75": {
     "source": "El respaldo contiene datos de Finanzas inválidos o duplicados. Tus datos actuales no se cambiaron.",
     "files": [
-      "js/app-main.js"
+      "js/backup-recovery.js"
     ]
   },
   "s_f11d7428": {
@@ -13828,7 +14064,7 @@
   "s_f210e156": {
     "source": "Ese archivo no es JSON válido.",
     "files": [
-      "js/app-main.js"
+      "js/backup-recovery.js"
     ]
   },
   "s_f24749ce": {
@@ -13886,6 +14122,12 @@
       "js/game-battle.js"
     ]
   },
+  "s_f35830ef": {
+    "source": "Copia recuperada. También se conservó lo que tenías antes de restaurar.",
+    "files": [
+      "js/backup-recovery.js"
+    ]
+  },
   "s_f35a3aed": {
     "source": "Ya tienes el máximo de 60 premios.",
     "files": [
@@ -13941,6 +14183,12 @@
     "source": "Modo claro",
     "files": [
       "js/theme-toggle.js"
+    ]
+  },
+  "s_f3e66bd1": {
+    "source": "No se guardó el descarte. Tu actividad anterior se conservó.",
+    "files": [
+      "js/work-actions.js"
     ]
   },
   "s_f3e80415": {
@@ -14143,14 +14391,14 @@
       "js/reinforcement-feedback.js"
     ]
   },
-  "s_f6de68a6": {
-    "source": "Semana personalizada — arrancó como copia de tu plantilla, ajústala y guarda cada día que cambie.",
+  "s_f6d4dce4": {
+    "source": "Tu turno existente se conserva.",
     "files": [
-      "js/app-main.js"
+      "js/work-actions.js"
     ]
   },
-  "s_f6f960fb": {
-    "source": "¿Descartar este {{v0}} sin guardarlo? No quedará registrado en tu historial ni en Adherencia.",
+  "s_f6de68a6": {
+    "source": "Semana personalizada — arrancó como copia de tu plantilla, ajústala y guarda cada día que cambie.",
     "files": [
       "js/app-main.js"
     ]
@@ -14200,7 +14448,8 @@
   "s_f819f303": {
     "source": "Manual",
     "files": [
-      "app.html"
+      "app.html",
+      "js/weekly-summary.js"
     ]
   },
   "s_f83926c3": {
@@ -14264,6 +14513,12 @@
       "privacidad.html"
     ]
   },
+  "s_f9424ad4": {
+    "source": "Elegí una copia para revisar antes de restaurar. Se reemplazará el conjunto completo, no solo el día borrado.",
+    "files": [
+      "js/backup-recovery.js"
+    ]
+  },
   "s_f9466ae9": {
     "source": "{{v0}}, {{v1}}, {{v2}}% de vida{{v3}}",
     "files": [
@@ -14323,6 +14578,12 @@
     "source": "Tienes cambios sin guardar en {{v0}}. ¿Descartarlos y cambiar a {{v1}}?",
     "files": [
       "js/schedule.js"
+    ]
+  },
+  "s_fa5f3d7b": {
+    "source": "No se guardó el cambio. Tus datos anteriores se conservaron.",
+    "files": [
+      "js/backup-recovery.js"
     ]
   },
   "s_faa80647": {
@@ -14438,6 +14699,12 @@
     "source": "Inicio laboral manual: {{v0}}.",
     "files": [
       "js/automation-ui.js"
+    ]
+  },
+  "s_fd5294da": {
+    "source": "Los datos cambiaron mientras se leía el archivo. Elegilo de nuevo.",
+    "files": [
+      "js/backup-recovery.js"
     ]
   },
   "s_fd56bd87": {

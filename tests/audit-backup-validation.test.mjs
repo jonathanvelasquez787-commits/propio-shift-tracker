@@ -4,22 +4,21 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import { parse } from 'acorn';
 import { validFinanceSettings } from '../js/finance-plan-model.js';
+import { validateImportPayload, importBackupFile } from '../js/backup-recovery.js';
 
 const source=fs.readFileSync(new URL('../js/app-main.js',import.meta.url),'utf8');
 const declarations=parse(source,{ecmaVersion:'latest',sourceType:'module'}).body.map(n=>n.declaration||n);
 const fn=name=>{const node=declarations.find(n=>n.type==='FunctionDeclaration'&&n.id.name===name);return source.slice(node.start,node.end);};
 
 test('invalid backup call records are rejected before changing the existing account',()=>{
-  const h=vm.createContext({translateText:value=>value,validFinanceSettings});
-  vm.runInContext(fn('validateImportPayload'),h);
+  const h = {validateImportPayload: payload => validateImportPayload(payload, value => value, validFinanceSettings)};
   for(const call of [null,[],17,'invalid']) assert.equal(h.validateImportPayload({state:{},calls:[call]}).ok,false);
   assert.equal(h.validateImportPayload({state:{},calls:[{id:'legacy',durationMin:15}]}).ok,true);
   assert.equal(h.validateImportPayload({state:{},calls:[],settings:{}}).ok,true);
 });
 
 test('invalid backup event and pause records are rejected before replacing the current account', () => {
-  const h = vm.createContext({translateText:value=>value,validFinanceSettings});
-  vm.runInContext(fn('validateImportPayload'), h);
+  const h = {validateImportPayload: payload => validateImportPayload(payload, value => value, validFinanceSettings)};
   for (const key of ['events', 'pauseHistory']) {
     for (const record of [null, [], 17, 'invalid', {}]) {
       assert.equal(h.validateImportPayload({ state: { [key]: [record] }, calls: [] }).ok, false, key);
@@ -48,11 +47,15 @@ test('backup normalization failure leaves both current state and calls untouched
 
 test('backup import does not announce success when its local snapshot cannot be saved',()=>{
   const messages=[];
-  const h=vm.createContext({translateText:value=>value,ui:(parts,...values)=>parts.reduce((out,part,i)=>out+part+(values[i]??''),''),
-    MAX_IMPORT_JSON_BYTES:1000000,FileReader:class{readAsText(){this.result=JSON.stringify({state:{},calls:[]});this.onload();}},
-    validateImportPayload:()=>({ok:true}),appConfirm:(_message,callback)=>callback(),applyImportedPayload:()=>false,
-    toast:message=>messages.push(message)});
-  vm.runInContext(fn('handleImportJsonFile'),h);
-  h.handleImportJsonFile({target:{files:[{size:10}],value:'backup.json'}});
-  assert.deepEqual(messages,[]);
+  const before={state:{},calls:[],settings:{}}, copies=[];
+  globalThis.document={getElementById:()=>null};
+  globalThis.FileReader=class{readAsText(){this.result=JSON.stringify({state:{},calls:[]});this.onload();}};
+  const context={translateText:value=>value,ui:(parts,...values)=>parts.reduce((out,part,i)=>out+part+(values[i]??''),''),
+    escapeHtml:String, data:()=>before, account:()=> 'owner',canPersistLocalChanges:()=>true,
+    preserve:value=>copies.push(value), restore:()=>{}, validFinanceSettings,
+    appConfirm:(_message,callback)=>callback(),applyImportedPayload:()=>false,toast:message=>messages.push(message)};
+  try { importBackupFile(context,{size:10},1000000); }
+  finally {delete globalThis.document;delete globalThis.FileReader;}
+  assert.equal(copies.length,1);
+  assert.deepEqual(messages,['No se guardó el cambio. Tus datos anteriores se conservaron.']);
 });

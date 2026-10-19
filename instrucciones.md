@@ -327,8 +327,8 @@ futura opera bajo esto, sin excepción:
 - **Mejoras integrales aprobadas el 18/10:** ejecutar las recomendaciones de la
   evaluación de 79 funciones por fases; alcance y estado completo en
   [plan de mejoras](docs/plan-mejoras-integrales.md). Inicio y preparación publicados:
-  18 mejoras cerradas; 33–37 y 21 resueltas en orden. Fase 3 en curso:
-  sigue 22, después 26–27, 47, 67 y 69. No perder las fases posteriores al
+  18 mejoras publicadas; 6 probadas (22, 26–27, 47, 67 y 69), en verificación
+  de publicación web 629. Sigue fase 4: 15–20 y 77. No perder las fases posteriores al
   entregar una parte ni considerar pendiente la instalación ya confirmada.
 - **Segundos oficiales de Propio:** confirmar con evidencia si el último minuto
   incompleto se incluye en duración y pago. El formato de hora visible no lo demuestra.
@@ -471,6 +471,19 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v629 — Recuperación de actividades y respaldo previo a reemplazos (en verificación de publicación).**
+
+- Puntos 22, 26–27, 47, 67 y 69 implementados en orden: descarte con efectos
+  específicos, continuación que devuelve el tramo cerrado anterior, marcas manuales,
+  comparación JSON y copias recuperables de cuenta antes de restaurar/reiniciar.
+- Revisión de cuenta/actividad, doble confirmación, cuota y reversión ante rechazo.
+  Copias locales; no sustituyen JSON descargado ni borran historial de Propio.
+- 893 pruebas y recorridos compilados con cuenta ficticia. Detalle diferido con
+  presupuesto de 65 KB; iniciales conservados. Alcance y límites en
+  docs/recuperacion-actividades-y-respaldos.md. Extensión 2.2.10 sin cambios.
+
+
+
 **v628 — Historial y recuperación de ediciones y borrados de llamadas.**
 
 - Punto 21: tarjetas con antes/después y recuperación explícita, sin sustituir
@@ -497,16 +510,3 @@ futura opera bajo esto, sin excepción:
 - Traducciones del detalle diferidas sin ampliar presupuestos iniciales;
   detalle con presupuesto revisado a 30 KB. Pruebas y límites en
   docs/higher-rate-revision.md. Sigue recuperación/trazabilidad. Extensión sin cambios.
-
-**v626 — Ganancias, moneda y tarifa, en el orden aprobado.**
-
-- Desglose plegado del día/ciclo: base registrada, estimada en vivo, bono
-  Higher Rate y total. Incluye bonos conservados y se actualiza con la
-  corrección oficial, sin duplicar ni reescribir pagos.
-- Tasa manual consultable y preferencia de moneda conservada. Ajustes explica
-  el alcance de cambiar tarifa y conversión sin alterar pagos históricos.
-- Renderizadores de detalle en módulo versionado y precargado offline;
-  recuperación ante descarga fallida comprobada en Chrome aislado, sin
-  reintentos en cada actualización del reloj. Presupuestos originales intactos.
-- 854 pruebas, builds y recorridos ES/EN, claro/oscuro y cuatro anchos. Alcance
-  y evidencia en docs/ganancias-desglose.md. Siguen 36 y 37; extensión sin cambios.
