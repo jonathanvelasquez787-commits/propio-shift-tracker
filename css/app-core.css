@@ -7045,6 +7045,10 @@
     .fin-preview-name { font-size: 12.5px; font-weight: 800; }
     .fin-preview-sub { font-size: 10.5px; color: var(--muted); margin-top: 1px; }
     .fin-preview-right { text-align: right; flex: 0 0 auto; }
+    .earnings-breakdown { display: block; min-width: 0; }
+    .earnings-breakdown > summary { cursor: pointer; }
+    .earnings-breakdown .fin-preview-right { min-width: 0; max-width: 60%; flex: 0 1 auto; overflow-wrap: anywhere; }
+    .earnings-breakdown .fin-row-converted-inline { display: block; white-space: normal; }
     .fin-preview-amt { font-size: 12.5px; font-weight: 900; }
     .fin-preview-amt-label { font-size: 9.5px; color: var(--muted); }
     .fin-preview-bar { height: 4px; border-radius: 99px; background: rgba(255,255,255,.08); overflow: hidden; margin-top: 5px; }

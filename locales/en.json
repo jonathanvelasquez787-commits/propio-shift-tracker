@@ -2535,5 +2535,18 @@
   "s_81980738": "Your data changed. Review the history cleanup again.",
   "s_cb2b5007": "Removes past windows from this list. Keeps calls, their bonuses, and daily and cycle earnings. Does not recalculate promotions.",
   "s_d6b39e7c": "Clear history",
-  "s_0ac26860": "Clear history? Past windows: {{v0}}. Calls with a bonus: {{v1}} ({{v2}} {{v3}}). Your calls and earnings are preserved; only this list is cleared."
+  "s_0ac26860": "Clear history? Past windows: {{v0}}. Calls with a bonus: {{v1}} ({{v2}} {{v3}}). Your calls and earnings are preserved; only this list is cleared.",
+  "s_17360e3f": "{{v0}} – {{v1}}",
+  "s_669ad16a": "Calculated Higher Rate",
+  "s_6d3d784b": "The details could not load. Close and reopen this section to retry.",
+  "s_775ed9aa": "{{v0}} · Records: {{v1}} · Live estimates: {{v2}}",
+  "s_a058440b": "Tool total",
+  "s_a9437638": "Recorded base",
+  "s_b2ff322f": "Recorded base includes imports and manual amounts. Live estimates update with Propio history. Higher Rate uses your windows; the total does not confirm a received payment.",
+  "s_ede738c5": "Estimated live base",
+  "s_fc21d7a1": "Earnings breakdown",
+  "s_0bbf8b09": "Manual exchange rate: $1 = {{v0}} {{v1}}.",
+  "s_55ff5467": "Secondary currency disabled.",
+  "s_d5012e16": "The rate calculates new estimates and your general goal. Saved payments, bonuses and special goals are preserved.",
+  "s_ea63397b": "The exchange rate is manual and keeps USD amounts unchanged. Set the rate to 0 or leave the currency blank to hide conversion."
 }

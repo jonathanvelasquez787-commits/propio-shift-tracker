@@ -8,10 +8,11 @@ no se considera rota por esa razón.
 
 ## Lista de control completa
 
-**12 de 79 mejoras publicadas.** 3 en curso y 64 pendientes. La preparación del
+**15 de 79 mejoras publicadas.** 3 en curso y 61 pendientes. La preparación del
 turno usa app 624 y extensión 2.2.10, con publicación comprobada y recarga de la
 extensión, Propio y tracker confirmada por el propietario. App 625 refuerza la
-limpieza de Higher Rate; no cierra todavía el bloque de correcciones.
+limpieza de Higher Rate; app 626 incorpora, en orden, el desglose de ganancias,
+consulta de conversión y alcance de tarifa. Falta cerrar ventanas/correcciones.
 
 Estas 79 mejoras corresponden al sistema completo. El panel de disponibilidad
 y preparación se ve en la **tool web**; el popup de la **extensión de Chrome**
@@ -57,9 +58,9 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 - [ ] **30. Semana específica y copia de horarios — Pendiente.** Alcance plantilla/semana y vista previa de días al copiar.
 - [ ] **31. Ajustar todo el turno y decidir qué pasa si llegás tarde — Pendiente.** Vista previa de jornada desplazada antes de guardar.
 - [ ] **32. Metas diarias, por fecha y del ciclo — Pendiente.** Identificar meta general, excepción o calculada desde Finanzas.
-- [ ] **33. Ganancias de hoy y del ciclo — Pendiente.** Desglose base, bonos y pagos todavía estimados.
-- [ ] **34. Moneda secundaria e intercambio del monto principal — Pendiente.** Conservar intercambio persistente y equivalencia debajo; tasa consultable.
-- [ ] **35. Tasa base por minuto — Pendiente.** Explicar qué afecta cambiar la tarifa y qué historial permanece.
+- [x] **33. Ganancias de hoy y del ciclo — Publicado.** Desglose plegado de base registrada, estimada en vivo, Higher Rate calculado y total; actualización tras correcciones oficiales y navegación por día/ciclo. [Evidencia](ganancias-desglose.md).
+- [x] **34. Moneda secundaria e intercambio del monto principal — Publicado.** Conserva intercambio persistente y equivalencia debajo; la tasa manual se consulta en el desglose. [Evidencia](ganancias-desglose.md).
+- [x] **35. Tasa base por minuto — Publicado.** Explica nuevas estimaciones/meta general y conservación de pagos, bonos y metas especiales; guardar mantiene su alcance anterior. [Evidencia](ganancias-desglose.md).
 - [ ] **36. Ventanas de Higher Rate — Pendiente.** Revisar llamadas que califican y explicar gracia; evaluar carga de promociones.
 - [ ] **37. Conservar bonos ganados al editar o limpiar ventanas — En curso.** La limpieza conserva los bonos registrados y muestra cantidades antes de confirmar, con protección ante cambios de cuenta/datos y fallo al guardar. Falta la acción separada de corregir/recalcular con vista previa. [Evidencia y alcance](higher-rate-limpieza.md).
 - [ ] **38. Gastos, ahorro y categorías — Pendiente.** Distinguir objetivo, reservado, pagado y pendiente en las filas.
@@ -107,6 +108,11 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 
 ## Entregas verificadas
 
+- [PR #87](https://github.com/jonathanvelasquez787-commits/propio-shift-tracker/pull/87),
+  commit `297e02b6da0c1aa510e03ecf7a2ab122ea0e3adb`: 846 pruebas, build y
+  12 recorridos de limpieza; CI del PR y main correctos, producción READY y
+  lectura pública de código/vista/estilos del mismo commit comprobada.
+  No cierra el punto 37: su corrección explícita permanece pendiente.
 - [PR #86](https://github.com/jonathanvelasquez787-commits/propio-shift-tracker/pull/86),
   commit `ed3a4fa5dbd9c8ba91fe2d04191daad3bc1873a9`: 838 pruebas, build y
   336 vistas; CI del PR y main correctos. Producción READY y lectura pública
@@ -141,7 +147,8 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
    no reasigna Finanzas. Recalcular nunca forma parte de esa limpieza.
    Falta separar la acción explícita de corregir/recalcular de
    archivar/conservar, vista previa de llamadas/importes y protección de
-   beneficios históricos. Desglose base/bono/estimación y tasa/moneda: 33–37.
+   beneficios históricos. 33–35 publicados en orden; siguen 36 y 37. El bloque
+   completo no está cerrado hasta comprobar sus correcciones.
 3. **Recuperación y trazabilidad — pendiente.** Deshacer/papelera temporal para
    llamadas y acciones recuperables; historial antes/después; restauración con
    comparación y copia previa; confirmaciones de alcance. Cubre 21–22, 26–27,

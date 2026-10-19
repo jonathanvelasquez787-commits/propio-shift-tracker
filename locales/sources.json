@@ -638,6 +638,12 @@
       "js/game.js"
     ]
   },
+  "s_0bbf8b09": {
+    "source": "Cambio manual: $1 = {{v0}} {{v1}}.",
+    "files": [
+      "js/detail-views.js"
+    ]
+  },
   "s_0be9309b": {
     "source": "Se comparan los presupuestos actuales con los pagos del mes elegido. Los importes de distintos períodos se suman sin convertirlos a un presupuesto mensual.",
     "files": [
@@ -1296,6 +1302,12 @@
       "js/app-main.js"
     ]
   },
+  "s_17360e3f": {
+    "source": "{{v0}} – {{v1}}",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_1742b002": {
     "source": "Próximo intento de disponibilidad",
     "files": [
@@ -1425,7 +1437,7 @@
   "s_18ecec6e": {
     "source": "{{v0}} {{v1}} en llamada · +{{v2}}{{v3}}",
     "files": [
-      "js/higher-rate.js"
+      "js/detail-views.js"
     ]
   },
   "s_190b1c67": {
@@ -2639,7 +2651,7 @@
   "s_2f8a4314": {
     "source": "Sin llamadas en Higher Rate",
     "files": [
-      "js/higher-rate.js"
+      "js/detail-views.js"
     ]
   },
   "s_2f9a4ba8": {
@@ -3147,7 +3159,7 @@
   "s_387cf6e3": {
     "source": "{{v3}} {{v4}} +{{v5}}/min",
     "files": [
-      "js/higher-rate.js"
+      "js/detail-views.js"
     ]
   },
   "s_38b6c26b": {
@@ -3289,7 +3301,7 @@
   "s_3aff7202": {
     "source": "en llamada dentro de ventana",
     "files": [
-      "js/higher-rate.js"
+      "js/detail-views.js"
     ]
   },
   "s_3b3bc4d2": {
@@ -3499,7 +3511,7 @@
   "s_40b9d4e7": {
     "source": "{{v1}} Días pasados ({{v2}})",
     "files": [
-      "js/higher-rate.js"
+      "js/detail-views.js"
     ]
   },
   "s_40bf9151": {
@@ -4418,7 +4430,7 @@
   "s_506d25cc": {
     "source": "Higher Rate hoy",
     "files": [
-      "js/higher-rate.js"
+      "js/detail-views.js"
     ]
   },
   "s_507f2db5": {
@@ -4461,7 +4473,7 @@
   "s_510db506": {
     "source": "{{v10}}\n          {{v11}}",
     "files": [
-      "js/higher-rate.js"
+      "js/detail-views.js"
     ]
   },
   "s_5111640d": {
@@ -4811,6 +4823,12 @@
       "js/finance.js"
     ]
   },
+  "s_55ff5467": {
+    "source": "Moneda secundaria desactivada.",
+    "files": [
+      "js/detail-views.js"
+    ]
+  },
   "s_561d14c9": {
     "source": "en furia",
     "files": [
@@ -5122,7 +5140,7 @@
   "s_5c25abae": {
     "source": "Ventana {{v0}}",
     "files": [
-      "js/higher-rate.js"
+      "js/detail-views.js"
     ]
   },
   "s_5c27ba57": {
@@ -5158,7 +5176,7 @@
   "s_5cb4b571": {
     "source": "ventana total de hoy",
     "files": [
-      "js/higher-rate.js"
+      "js/detail-views.js"
     ]
   },
   "s_5d021bcb": {
@@ -5261,7 +5279,7 @@
   "s_5f4f9f48": {
     "source": "Hoy · {{v0}}",
     "files": [
-      "js/higher-rate.js"
+      "js/detail-views.js"
     ]
   },
   "s_5f895d21": {
@@ -5672,6 +5690,12 @@
       "js/game.js"
     ]
   },
+  "s_669ad16a": {
+    "source": "Higher Rate calculado",
+    "files": [
+      "js/detail-views.js"
+    ]
+  },
   "s_66bec934": {
     "source": "Sí. Puedes pegar tu exportación de llamadas de Propio, agregar llamadas manualmente o registrarlas en vivo. Propio Shift Tracker es una herramienta independiente y no sustituye los registros oficiales.",
     "files": [
@@ -5994,6 +6018,13 @@
     "source": "{{v0}} llamadas completadas",
     "files": [
       "js/positive-reinforcement.js"
+    ]
+  },
+  "s_6d3d784b": {
+    "source": "No se pudo cargar el detalle. Cerrá y abrí esta sección para reintentar.",
+    "files": [
+      "js/app-main.js",
+      "js/higher-rate.js"
     ]
   },
   "s_6d53c082": {
@@ -6397,7 +6428,7 @@
   "s_74ca6265": {
     "source": "{{v0}} de ventana",
     "files": [
-      "js/higher-rate.js"
+      "js/detail-views.js"
     ]
   },
   "s_74d092b6": {
@@ -6457,6 +6488,7 @@
   "s_75842ffe": {
     "source": "Termina a las {{v0}}",
     "files": [
+      "js/detail-views.js",
       "js/higher-rate.js"
     ]
   },
@@ -6591,6 +6623,12 @@
     "source": "+ Nota",
     "files": [
       "js/weekly-summary.js"
+    ]
+  },
+  "s_775ed9aa": {
+    "source": "{{v0}} · Registros: {{v1}} · Estimados en vivo: {{v2}}",
+    "files": [
+      "js/detail-views.js"
     ]
   },
   "s_77789679": {
@@ -6928,7 +6966,7 @@
   "s_7e0b9e1f": {
     "source": "{{v0}}% de la ventana aprovechada",
     "files": [
-      "js/higher-rate.js"
+      "js/detail-views.js"
     ]
   },
   "s_7e0c3b8a": {
@@ -7233,12 +7271,6 @@
   },
   "s_836ea7f7": {
     "source": "Ej. Mascota, Gimnasio, Suscripciones...",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_839f60d7": {
-    "source": "La meta de dólares usa la tasa por minuto de arriba — súbela si tu pago por minuto aumenta. La tasa de cambio y la moneda secundaria muestran un equivalente junto a tus ganancias (ej. Lempiras); déjala en 0 o vacía para ocultarlo.",
     "files": [
       "app.html"
     ]
@@ -8061,7 +8093,7 @@
   "s_916a50d2": {
     "source": "+{{v6}}",
     "files": [
-      "js/higher-rate.js"
+      "js/detail-views.js"
     ]
   },
   "s_917be80a": {
@@ -8870,6 +8902,12 @@
       "app.html"
     ]
   },
+  "s_a058440b": {
+    "source": "Total de la tool",
+    "files": [
+      "js/detail-views.js"
+    ]
+  },
   "s_a07ab211": {
     "source": "Otro dispositivo guardó después",
     "files": [
@@ -9348,6 +9386,12 @@
     "source": "Rango",
     "files": [
       "app.html"
+    ]
+  },
+  "s_a9437638": {
+    "source": "Base registrada",
+    "files": [
+      "js/detail-views.js"
     ]
   },
   "s_a94e3df8": {
@@ -9844,6 +9888,12 @@
       "js/reports.js"
     ]
   },
+  "s_b2ff322f": {
+    "source": "La base registrada incluye importaciones y montos manuales. Los estimados en vivo se actualizan con el historial de Propio. Higher Rate se calcula con tus ventanas; el total no confirma un pago recibido.",
+    "files": [
+      "js/detail-views.js"
+    ]
+  },
   "s_b3072e30": {
     "source": "Mejor: {{v21}} · Peor: {{v22}}",
     "files": [
@@ -10238,7 +10288,7 @@
   "s_b9dce0f5": {
     "source": "Sin ventanas configuradas",
     "files": [
-      "js/higher-rate.js"
+      "js/detail-views.js"
     ]
   },
   "s_b9fe5bbf": {
@@ -11385,7 +11435,7 @@
   "s_ce959d4e": {
     "source": "Ganando bono ahora",
     "files": [
-      "js/higher-rate.js"
+      "js/detail-views.js"
     ]
   },
   "s_cea922f5": {
@@ -11730,6 +11780,12 @@
     "source": "próximo Lunch",
     "files": [
       "js/positive-reinforcement.js"
+    ]
+  },
+  "s_d5012e16": {
+    "source": "La tarifa calcula nuevas estimaciones y tu meta general. Conserva pagos guardados, bonos y metas especiales.",
+    "files": [
+      "app.html"
     ]
   },
   "s_d51452df": {
@@ -12619,7 +12675,7 @@
   "s_e49d517c": {
     "source": "Bono ganado hoy{{v7}}",
     "files": [
-      "js/higher-rate.js"
+      "js/detail-views.js"
     ]
   },
   "s_e4baf720": {
@@ -12897,6 +12953,12 @@
       "app.html"
     ]
   },
+  "s_ea63397b": {
+    "source": "El cambio es manual y conserva los importes en dólares. Dejá la tasa en 0 o la moneda vacía para ocultar la conversión.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_ea88d3c9": {
     "source": "{{v2}} · {{v3}}{{v4}}",
     "files": [
@@ -13016,7 +13078,7 @@
   "s_ec60a9c7": {
     "source": "{{v1}} – {{v2}}",
     "files": [
-      "js/higher-rate.js"
+      "js/detail-views.js"
     ]
   },
   "s_ec6271ba": {
@@ -13107,6 +13169,12 @@
     "source": "Vos elegís si aceptarla. La extensión espera tu decisión.",
     "files": [
       "js/automation-ui.js"
+    ]
+  },
+  "s_ede738c5": {
+    "source": "Base estimada en vivo",
+    "files": [
+      "js/detail-views.js"
     ]
   },
   "s_edf3f673": {
@@ -13859,6 +13927,12 @@
     "source": "Hoy es tu día libre",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_fc21d7a1": {
+    "source": "Desglose de ganancias",
+    "files": [
+      "app.html"
     ]
   },
   "s_fc67bb73": {
