@@ -112,12 +112,13 @@ function harness(t) {
   const messages=[];
   const save = () => { if(rejectSave)return false; persisted = JSON.stringify({ calls, settings, state }); saves++; return true; };
   const h = { Date: ClockDate, ui, translateText, document, escapeHtml: String, MAX_CALL_DURATION_MIN: 1440, CONNECTED_LIVE_GRACE_MIN: 90,
-    makeLocalId: () => `id-${++sequence}`, setAppCalls, higherRateBonusForCall, higherRateBonusForCalls, higherRateBonusBreakdownForCalls,
+    makeLocalId: () => `id-${++sequence}`, setAppCalls, setAppState, setAppSettings, render() {}, higherRateBonusForCall, higherRateBonusForCalls, higherRateBonusBreakdownForCalls,
     callsForDay: key => calls.filter(c => c.callDate === key),
     getActiveDayKey: () => state.activeDayKey, defaultActiveDayKey: () => h.todayCallDateKey(),
     toast:message=>messages.push(message), saveAll: save, financeRunAutoFillCascade, autoStartShiftFromCalls() {}, playCallSavedSound:kind=>soundEvents.push(kind),
     migratePositiveCallIdReferences() {}, migrateGameCallReferences() {}, onGameCallSaved: call => gameSaved.push(call.id), onGameCallsChanged() {},
     setEvent: (...args) => state.events.push(args), renderImportSkippedSummary() {}, callImportFlag: () => null,
+    canPersistLocalChanges: () => true,
     dayIsEffectivelyOff: key => new Date(h.callDateToDate(key)).getDay() === 0, dayAdherence: () => null,
     productiveMinutesForDay: key => h.importedCallStats(h.callsForDay(key), key).productive,
     dayGapTotals: () => ({ acwTotal: 0, rawGapTotal: 0, possiblePauseTotal: 0, breakTotal: 0, lunchTotal: 0, otherTotal: 0, gapCount: 0, gapLongest: 0 }),
@@ -129,7 +130,7 @@ function harness(t) {
   configureFinanceContext({ parseMoney: h.parseMoney, higherRateBonusForCalls, saveSettingsOnly: save, render() {}, money: x => x.toFixed(2), convertedAmountText: () => '', toast:h.toast, makeLocalId:h.makeLocalId, appConfirm:(_message, run)=>run() });
   configureCallsContext({ ...h, HIGHER_RATE_TIERS: tiers, MAX_CALL_DURATION_MIN: 1440, canPersistLocalChanges: () => true, stateWithinBudget: () => true, render() {}, money: x => x.toFixed(2), convertedAmountText: () => '', financeConvertedInline: () => '', formatDuration: x => String(x), rateTilePerMin: () => settings.rate, renderRateTiles() {}, formatCallDayLabel: x => x,
     closeModal() {}, openModal() {}, appConfirm: (_message, fn) => fn() });
-  return { h, inputs, element, gameSaved, messages, soundEvents, rejectSave:()=>{rejectSave=true;},
+  return { h, inputs, element, gameSaved, messages, soundEvents, rejectSave:(value=true)=>{rejectSave=value;},
     advance: date => { clock = date.getTime(); }, saves: () => saves,
     reload() { const snap = JSON.parse(persisted); setAppCalls(snap.calls); setAppState(snap.state); setAppSettings(snap.settings); },
     import(rows) { element('callInput').value = rows.map(row => row.join('\t')).join('\n'); h.importCalls(); },
@@ -144,8 +145,15 @@ test('a rejected manual call save does not announce success or award its reward'
   const x=harness(t);x.advance(at(2,'19:00'));x.rejectSave();
   x.manual('09/01/2025','08:00',10);
   assert.equal(x.saves(),0);assert.deepEqual(x.gameSaved,[]);
-  assert.equal(calls.length,1);assert.deepEqual(x.messages,[]);
+  assert.equal(calls.length,0);assert.deepEqual(x.messages,[]);
   assert.deepEqual(x.soundEvents,[]);
+});
+
+test('a manual call can be retried after a rejected write without duplicating the call or its reward', async t => {
+  const x=harness(t);x.advance(at(2,'19:00'));x.rejectSave();x.manual('09/01/2025','08:00',10,'1.20');
+  assert.equal(calls.length,0);assert.equal(x.gameSaved.length,0);assert.equal(x.element('manualCallPayInput').value,'1.20');
+  x.rejectSave(false);saveManualCall();assert.equal(calls.length,1);assert.equal(x.gameSaved.length,1);assert.deepEqual(x.soundEvents,['callManual']);
+  x.reload();assert.equal(calls.length,1);
 });
 
 test('manual and live save sounds fire after persistence and never for duplicates or edits', async t => {
@@ -177,6 +185,7 @@ test('a pasted batch sounds once only after a changed import is saved', async t 
   x.import(batch);assert.equal(calls.length,2);assert.deepEqual(x.soundEvents,['callPasted']);
   x.import(batch);assert.deepEqual(x.soundEvents,['callPasted']);
   x.rejectSave();x.import([['three','09/01/2025','09:00 AM','10','Yes','No','$1.20']]);assert.deepEqual(x.soundEvents,['callPasted']);
+  assert.equal(calls.length,2);assert.match(x.element('callInput').value,/three/);
 });
 
 test('live save rejection and backup wait are silent while a saved live backup uses the ended sound', async t => {
@@ -184,6 +193,38 @@ test('live save rejection and backup wait are silent while a saved live backup u
   autoSaveLiveCall(at(1,'08:05').toISOString(),at(1,'08:15').toISOString());assert.deepEqual(x.soundEvents,[]);assert.ok(state.pendingLiveCallBackup);
   x.manual('09/01/2025','10:00',10,'1.20');assert.deepEqual(x.soundEvents,['callEnded']);
   x.rejectSave();autoSaveLiveCall(at(1,'11:00').toISOString(),at(1,'11:10').toISOString());assert.deepEqual(x.soundEvents,['callEnded']);
+});
+
+test('a rejected live save keeps a recoverable draft without adding an unsaved call or reward', async t => {
+  const x = harness(t); x.advance(at(2, '19:00'));
+  x.manual('09/01/2025', '08:00', 10, '1.20');
+  const before = JSON.stringify(calls), rewards = x.gameSaved.length;
+  x.rejectSave();
+  const start = at(1, '11:00').toISOString(), end = at(1, '11:10').toISOString();
+  assert.equal(autoSaveLiveCall(start, end), false);
+  assert.equal(JSON.stringify(calls), before);
+  assert.equal(state.pendingLiveCallBackup.startedAtISO, start);
+  assert.equal(state.pendingLiveCallBackup.candidate.durationMin, 10);
+  assert.equal(x.gameSaved.length, rewards);
+  x.rejectSave(false);
+  assert.equal(autoSaveLiveCall(start, end), true);
+  assert.equal(calls.length, 2);
+  assert.equal(state.pendingLiveCallBackup, null);
+  x.reload(); assert.equal(calls.length, 2);
+});
+
+test('ending a call persists a recovery draft before clearing its active state and restores it if storage rejects', async t => {
+  const x = harness(t), start = at(1, '09:00').toISOString(), end = at(1, '09:10').toISOString();
+  x.h.autoSaveLiveCall = () => { assert.equal(state.activeCall, null); assert.equal(state.pendingLiveCallBackup.endedAtISO, end); return true; };
+  let accept = false;
+  x.h.saveStateOnly = () => accept;
+  vm.runInContext(declarations.get('endCall'), x.h);
+  state.activeCall = { startedAt: start };
+  assert.equal(x.h.endCall({ endedAt: end }), false);
+  assert.equal(state.activeCall.startedAt, start);
+  assert.equal(state.pendingLiveCallBackup, null);
+  accept = true;
+  assert.equal(x.h.endCall({ endedAt: end }), true);
 });
 
 test('manual and edited numeric payment inputs respect scientific notation without changing the imported-money parser', async t => {

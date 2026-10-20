@@ -3,6 +3,18 @@
   "scope": "Google; Email/SMTP deshabilitados; sin compras ni funciones nuevas",
   "criteria": [
     {
+      "id": "call-review-provenance",
+      "area": "Revisión y procedencia de llamadas",
+      "acceptance": "Procedencia y correcciones explícitas, filtros combinables, diagnóstico de filas y fecha límite de señales pendientes sin descartarlas automáticamente.",
+      "sources": ["js/call-review-model.js", "js/call-review-view.js", "js/call-table-view.js"],
+      "tests": [{"file": "tests/call-review.test.mjs", "namedCases": [
+        "call review distinguishes estimates, official corrections, user corrections and unverified legacy sources",
+        "the real parser explains bad dates, duration, payment, flags and unreadable rows",
+        "pending queue deadlines use the oldest signal and stop at the existing 24-hour limit",
+        "opening the tracker reuses an existing tab rather than adding another writer"
+      ]}]
+    },
+    {
       "id": "activity-and-backup-recovery",
       "area": "Recuperación de actividades y reemplazos",
       "acceptance": "Descartar explica/restaura la actividad anterior; restaurar JSON o reiniciar exige comparación, copia privada previa y revisión vigente. Fallos y cuota preservan memoria/datos sin éxito ficticio.",

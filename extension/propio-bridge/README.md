@@ -1,4 +1,4 @@
-# Propio · Tracker y vista original · 2.2.10
+# Propio · Tracker y vista original · 2.3.0
 
 La extensión conecta tu tracker con la sesión y el historial de Propio. Su
 registro de llamadas funciona independientemente de la apariencia del portal.
@@ -7,6 +7,11 @@ El popup de Chrome contiene las opciones de la extensión; su versión se lee
 del manifest instalado, igual que en Administrar extensiones. La sección
 «Disponibilidad automática» de Inicio está en la tool y presenta los datos
 que comunica la extensión. La app web y la extensión tienen versiones separadas.
+
+La cola informa cuántos eventos faltan y cuándo vence el más antiguo (24 horas).
+Son señales de llamada, sesión o historial, no llamadas adicionales. Los vencidos
+se conservan para revisión; no se borran solos. «Abrir tracker» reutiliza su
+pestaña cuando ya existe. [Uso y límites](../../docs/revision-llamadas-e-importaciones.md).
 
 ## Vista original de Propio
 

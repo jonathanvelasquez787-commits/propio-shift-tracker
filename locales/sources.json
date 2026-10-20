@@ -195,6 +195,12 @@
       "index.html"
     ]
   },
+  "s_041de4dc": {
+    "source": "Buscar Customer ID",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_041f465c": {
     "source": "Asignación por prioridad",
     "files": [
@@ -328,6 +334,12 @@
     "source": "Armadura abierta · el monstruo es vulnerable",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_066ae0eb": {
+    "source": "Estado del registro",
+    "files": [
+      "app.html"
     ]
   },
   "s_06946982": {
@@ -1666,6 +1678,12 @@
       "js/app-main.js"
     ]
   },
+  "s_1acd3711": {
+    "source": "Sin cambios",
+    "files": [
+      "js/call-review-view.js"
+    ]
+  },
   "s_1ae4d467": {
     "source": "Nivel completado",
     "files": [
@@ -1972,7 +1990,7 @@
   "s_217fdf57": {
     "source": "{{v7}} · {{v8}} min",
     "files": [
-      "js/calls.js"
+      "js/call-table-view.js"
     ]
   },
   "s_21830f6d": {
@@ -2378,6 +2396,12 @@
       "js/app-main.js"
     ]
   },
+  "s_2841da56": {
+    "source": "{{v0}} · {{v1}} → {{v2}} · {{v3}}. Pago base: {{v4}} {{v5}}. {{v6}}",
+    "files": [
+      "js/calls.js"
+    ]
+  },
   "s_28697b71": {
     "source": "Progreso del día",
     "files": [
@@ -2498,6 +2522,18 @@
       "js/sync.js"
     ]
   },
+  "s_2a4b6b39": {
+    "source": "Revisá fecha, inicio, final y pago antes de guardar. Las llamadas manuales no son una confirmación del historial de Propio.",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_2a572ecc": {
+    "source": "Oficial corregida",
+    "files": [
+      "js/call-table-view.js"
+    ]
+  },
   "s_2a734315": {
     "source": "Beep clásico",
     "files": [
@@ -2606,6 +2642,12 @@
     "source": "Ir a Hoy",
     "files": [
       "app.html"
+    ]
+  },
+  "s_2ca64e46": {
+    "source": "Nuevo registro importado del historial.",
+    "files": [
+      "js/call-review-view.js"
     ]
   },
   "s_2ce32aec": {
@@ -2859,6 +2901,12 @@
       "js/reinforcement-rules.js"
     ]
   },
+  "s_30da288d": {
+    "source": "Corregida",
+    "files": [
+      "js/call-review-view.js"
+    ]
+  },
   "s_310608c4": {
     "source": "5. Propiedad del software",
     "files": [
@@ -2886,7 +2934,7 @@
   "s_313ad27d": {
     "source": "No hay filas de este tipo para el día activo — cambia el filtro de arriba para ver el resto.",
     "files": [
-      "js/calls.js"
+      "js/call-table-view.js"
     ]
   },
   "s_3140df12": {
@@ -3036,7 +3084,7 @@
     "source": "Editar llamada",
     "files": [
       "app.html",
-      "js/calls.js"
+      "js/call-table-view.js"
     ]
   },
   "s_33800384": {
@@ -3049,6 +3097,12 @@
     "source": "Categoría y nota son solo para tu registro. Estado sí cambia cómo se cuenta el día.",
     "files": [
       "app.html"
+    ]
+  },
+  "s_33af1166": {
+    "source": "Resultado de la última importación",
+    "files": [
+      "js/call-review-view.js"
     ]
   },
   "s_33d4dce2": {
@@ -3218,7 +3272,7 @@
   "s_36a691c3": {
     "source": "#{{v1}}",
     "files": [
-      "js/calls.js"
+      "js/call-table-view.js"
     ]
   },
   "s_36c195a4": {
@@ -3493,7 +3547,19 @@
   "s_3b425a30": {
     "source": "No dropped",
     "files": [
-      "js/calls.js"
+      "js/call-table-view.js"
+    ]
+  },
+  "s_3b6e30dc": {
+    "source": "Actualizada",
+    "files": [
+      "js/call-review-view.js"
+    ]
+  },
+  "s_3b869e85": {
+    "source": "No importada",
+    "files": [
+      "js/call-review-view.js"
     ]
   },
   "s_3b870af2": {
@@ -3556,12 +3622,6 @@
       "js/game-battle.js"
     ]
   },
-  "s_3cee2a30": {
-    "source": "#{{v0}} · {{v1}} {{v2}} — Termina en el futuro: no se importó",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
   "s_3d4ca758": {
     "source": "Estado del día",
     "files": [
@@ -3578,6 +3638,12 @@
     "source": "Escudos disponibles",
     "files": [
       "app.html"
+    ]
+  },
+  "s_3df1ce32": {
+    "source": "Oficial · importado",
+    "files": [
+      "js/call-table-view.js"
     ]
   },
   "s_3e1c0187": {
@@ -3602,6 +3668,12 @@
     "source": "Ingresa un monto mayor a 0",
     "files": [
       "js/finance.js"
+    ]
+  },
+  "s_3e8e903d": {
+    "source": "Pago inválido o fuera del límite.",
+    "files": [
+      "js/call-review-view.js"
     ]
   },
   "s_3e9b518d": {
@@ -3904,6 +3976,7 @@
   "s_4487f87e": {
     "source": "{{v2}}{{v3}}",
     "files": [
+      "js/call-review-view.js",
       "js/finance-planning.js",
       "js/weekly-summary.js"
     ]
@@ -4074,7 +4147,7 @@
     "files": [
       "app.html",
       "js/app-main.js",
-      "js/calls.js"
+      "js/call-table-view.js"
     ]
   },
   "s_472c9354": {
@@ -4093,12 +4166,6 @@
     "source": "Meta en {{v0}}",
     "files": [
       "js/settings.js"
-    ]
-  },
-  "s_4765909f": {
-    "source": "Se guardará como {{v0}} de llamada.",
-    "files": [
-      "js/calls.js"
     ]
   },
   "s_477b503d": {
@@ -4200,6 +4267,12 @@
   },
   "s_4960f4b3": {
     "source": "Gastos variables (%)",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_49663073": {
+    "source": "Customer ID del día activo",
     "files": [
       "app.html"
     ]
@@ -4308,12 +4381,6 @@
       "app.html"
     ]
   },
-  "s_4ad5c9f9": {
-    "source": "#{{v0}} · {{v1}} {{v2}} — Actualizó una llamada oficial que Propio corrigió",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
   "s_4ade772a": {
     "source": "Rostro",
     "files": [
@@ -4330,6 +4397,12 @@
     "source": "Tu propio dispositivo",
     "files": [
       "privacidad.html"
+    ]
+  },
+  "s_4b291280": {
+    "source": "Corregida por vos",
+    "files": [
+      "js/call-table-view.js"
     ]
   },
   "s_4b3c5b1d": {
@@ -4368,16 +4441,16 @@
       "js/boot.js"
     ]
   },
-  "s_4bd2f89c": {
-    "source": "#{{v0}} · {{v1}} {{v2}} — Reemplazó la llamada en vivo provisional por los datos oficiales",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
   "s_4bf8a373": {
     "source": "{{v0}} — sin contar esa(s), la más corta fue {{v1}}",
     "files": [
       "js/calls.js"
+    ]
+  },
+  "s_4c0197d9": {
+    "source": "Revisar cada fila y su motivo",
+    "files": [
+      "js/call-review-view.js"
     ]
   },
   "s_4c0a3f0d": {
@@ -5128,6 +5201,18 @@
       "js/finance.js"
     ]
   },
+  "s_574ff83e": {
+    "source": "Oficiales importadas",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_57db9e2c": {
+    "source": "No se puede guardar: termina en el futuro.",
+    "files": [
+      "js/calls.js"
+    ]
+  },
   "s_57dcd345": {
     "source": "Vaciado del día",
     "files": [
@@ -5333,6 +5418,12 @@
     "files": [
       "js/boot.js",
       "js/reports.js"
+    ]
+  },
+  "s_5bb80c8b": {
+    "source": "Fecha u hora inválida.",
+    "files": [
+      "js/call-review-view.js"
     ]
   },
   "s_5bb93946": {
@@ -5583,6 +5674,12 @@
       "js/automation-ui.js"
     ]
   },
+  "s_602ad0e2": {
+    "source": "#{{v0}} · {{v1}}",
+    "files": [
+      "js/call-review-view.js"
+    ]
+  },
   "s_6043fcbb": {
     "source": "Lo que ganes de aquí en adelante es extra.",
     "files": [
@@ -5629,6 +5726,12 @@
     "source": "Progreso del ciclo: {{v0}}%.",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_613bcbbd": {
+    "source": "Reintentar tabla",
+    "files": [
+      "app.html"
     ]
   },
   "s_61482c8a": {
@@ -6188,12 +6291,6 @@
       "app.html"
     ]
   },
-  "s_6ba643fe": {
-    "source": "Tiempo y pago estimados",
-    "files": [
-      "js/calls.js"
-    ]
-  },
   "s_6ba696e1": {
     "source": "Meta cumplida: {{v0}}",
     "files": [
@@ -6531,7 +6628,7 @@
     "source": "Editar hueco",
     "files": [
       "app.html",
-      "js/calls.js"
+      "js/call-table-view.js"
     ]
   },
   "s_71fc139f": {
@@ -6636,6 +6733,12 @@
     "source": "Menú",
     "files": [
       "app.html"
+    ]
+  },
+  "s_73fc7a29": {
+    "source": "Estimado · extensión",
+    "files": [
+      "js/call-table-view.js"
     ]
   },
   "s_742929fc": {
@@ -6777,12 +6880,6 @@
     "source": "herido",
     "files": [
       "js/monsters.js"
-    ]
-  },
-  "s_76012793": {
-    "source": "#{{v0}} · {{v1}} {{v2}} — Duplicado exacto de una llamada ya guardada",
-    "files": [
-      "js/app-main.js"
     ]
   },
   "s_7602cf89": {
@@ -6941,6 +7038,12 @@
       "js/weekly-summary.js"
     ]
   },
+  "s_78b9754a": {
+    "source": "Traslapa con #{{v0}} ({{v1}}).",
+    "files": [
+      "js/call-review-view.js"
+    ]
+  },
   "s_78d0f65f": {
     "source": "Lunch:",
     "files": [
@@ -7047,6 +7150,12 @@
       "js/game-battle.js"
     ]
   },
+  "s_7a6fed33": {
+    "source": "Manuales",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_7a80cfd2": {
     "source": "Llamadas",
     "files": [
@@ -7073,6 +7182,12 @@
     "source": "{{v0}} Ganancias del ciclo",
     "files": [
       "js/reports.js"
+    ]
+  },
+  "s_7b792083": {
+    "source": "Cómo se registra una llamada en vivo",
+    "files": [
+      "app.html"
     ]
   },
   "s_7b7f96b5": {
@@ -7199,6 +7314,12 @@
     "source": "Cálculo de la tool: {{v2}} min de gracia antes del inicio. El fin no se incluye. Cuenta la duración completa; en ventanas superpuestas gana el mayor bono.",
     "files": [
       "js/higher-rate-review.js"
+    ]
+  },
+  "s_7d52cefa": {
+    "source": "Reemplazó el registro estimado por los datos del historial de Propio.",
+    "files": [
+      "js/call-review-view.js"
     ]
   },
   "s_7d55762e": {
@@ -7399,7 +7520,7 @@
   "s_81299c55": {
     "source": "Llamada",
     "files": [
-      "js/calls.js"
+      "js/call-table-view.js"
     ]
   },
   "s_81496bac": {
@@ -7557,6 +7678,12 @@
   },
   "s_834286a8": {
     "source": "#6366F1",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_83458e02": {
+    "source": "No se pudo cargar la tabla. Tus registros siguen guardados; podés reintentar.",
     "files": [
       "app.html"
     ]
@@ -7858,6 +7985,12 @@
       "js/boot.js"
     ]
   },
+  "s_883bd696": {
+    "source": "Termina en el futuro; revisá fecha, hora y duración.",
+    "files": [
+      "js/call-review-view.js"
+    ]
+  },
   "s_885e114b": {
     "source": "11:40 – 12:00 · tomado a tiempo",
     "files": [
@@ -7986,6 +8119,12 @@
       "js/app-main.js"
     ]
   },
+  "s_8ab58258": {
+    "source": "Duplicado exacto de una llamada ya guardada.",
+    "files": [
+      "js/call-review-view.js"
+    ]
+  },
   "s_8acbc5e6": {
     "source": "Sigue así, ya vas a la mitad.",
     "files": [
@@ -8050,6 +8189,12 @@
     "source": "fecha desconocida",
     "files": [
       "js/boot.js"
+    ]
+  },
+  "s_8bcea16f": {
+    "source": "Agregada",
+    "files": [
+      "js/call-review-view.js"
     ]
   },
   "s_8bd045af": {
@@ -8502,6 +8647,12 @@
       "js/game.js"
     ]
   },
+  "s_92c174c3": {
+    "source": "La tool mide el tiempo entre iniciar y terminar. Guarda minutos con dos decimales; una llamada muy breve puede quedar en 0 min. El pago es estimado con tu tarifa. Las llamadas detectadas por la extensión también son provisionales hasta recibir el historial de Propio.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_92fd1f27": {
     "source": "{{v0}}–{{v1}}m · Cerca",
     "files": [
@@ -8574,6 +8725,12 @@
     "source": "Buenas noches",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_943080cb": {
+    "source": "Estimadas en vivo",
+    "files": [
+      "app.html"
     ]
   },
   "s_94340792": {
@@ -8653,12 +8810,6 @@
     "source": "Horarios de turno, breaks y lunch que configuras.",
     "files": [
       "privacidad.html"
-    ]
-  },
-  "s_9568b595": {
-    "source": "#{{v0}} · {{v1}} {{v2}} — Traslapa con la llamada #{{v3}} ({{v4}}) ya guardada",
-    "files": [
-      "js/app-main.js"
     ]
   },
   "s_95c1f1ce": {
@@ -9655,7 +9806,7 @@
   "s_a6a71ce8": {
     "source": "Eliminar llamada",
     "files": [
-      "js/calls.js"
+      "js/call-table-view.js"
     ]
   },
   "s_a6e29720": {
@@ -9920,6 +10071,12 @@
       "app.html"
     ]
   },
+  "s_ab842473": {
+    "source": "{{v0}} guardada(s) · {{v1}} sin importar o sin cambios",
+    "files": [
+      "js/call-review-view.js"
+    ]
+  },
   "s_ab8c9ed4": {
     "source": "Equipo",
     "files": [
@@ -10068,6 +10225,12 @@
   },
   "s_aeca0c44": {
     "source": "Borra llamadas, pausas, huecos, la nota, el log y la gamificación SOLO del día activo (",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_aefc34ac": {
+    "source": "Reintentar detalle de importación",
     "files": [
       "app.html"
     ]
@@ -10224,6 +10387,12 @@
     "files": [
       "privacidad.html",
       "terminos.html"
+    ]
+  },
+  "s_b1b4de59": {
+    "source": "Completa fecha, hora, duración y pago válidos para revisar la llamada.",
+    "files": [
+      "js/calls.js"
     ]
   },
   "s_b1c0bfcf": {
@@ -10453,8 +10622,7 @@
   "s_b4df5bf3": {
     "source": "Completa los campos para agregar la llamada.",
     "files": [
-      "app.html",
-      "js/calls.js"
+      "app.html"
     ]
   },
   "s_b4e6e325": {
@@ -11037,10 +11205,22 @@
       "js/theme-palettes.js"
     ]
   },
+  "s_bf28a551": {
+    "source": "Día activo: {{v0}} llamada(s) · Coinciden con tu búsqueda: {{v1}}",
+    "files": [
+      "js/call-table-view.js"
+    ]
+  },
   "s_bf3a3491": {
     "source": "Acerca de Historial positivo",
     "files": [
       "app.html"
+    ]
+  },
+  "s_bf6ed407": {
+    "source": "· Línea {{v0}}",
+    "files": [
+      "js/call-review-view.js"
     ]
   },
   "s_bfdcdb6f": {
@@ -11066,6 +11246,12 @@
     "source": "Próximo hito: {{v0}}% · te faltan {{v1}}{{v2}}",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_c008672a": {
+    "source": "Repetida dentro del texto pegado; se leyó una sola vez.",
+    "files": [
+      "js/call-review-view.js"
     ]
   },
   "s_c00d46a1": {
@@ -11332,6 +11518,12 @@
       "js/app-main.js"
     ]
   },
+  "s_c4676a2b": {
+    "source": "Billable y Dropped deben decir Yes o No.",
+    "files": [
+      "js/call-review-view.js"
+    ]
+  },
   "s_c4681e32": {
     "source": "Ganancias",
     "files": [
@@ -11492,6 +11684,12 @@
       "app.html"
     ]
   },
+  "s_c68b5ed8": {
+    "source": "No se puede guardar: coincide con #{{v0}}.",
+    "files": [
+      "js/calls.js"
+    ]
+  },
   "s_c68d1585": {
     "source": "Elige las fechas Desde y Hasta antes de exportar",
     "files": [
@@ -11502,6 +11700,12 @@
     "source": "No se cambió el sonido porque no se pudo guardar.",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_c6b57b30": {
+    "source": "Formato no reconocido: se esperan los siete campos de Propio.",
+    "files": [
+      "js/call-review-view.js"
     ]
   },
   "s_c6b748d4": {
@@ -11869,12 +12073,6 @@
       "app.html"
     ]
   },
-  "s_cdecbf52": {
-    "source": "{{v0}} llamada(s) actualizada(s) con datos oficiales",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
   "s_cdf32fe1": {
     "source": "Revisar recuperación",
     "files": [
@@ -11891,6 +12089,12 @@
     "source": "Cosméticos de ciclo",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_cdfc3ae0": {
+    "source": "Medido · tool; pago estimado",
+    "files": [
+      "js/call-table-view.js"
     ]
   },
   "s_ce065b21": {
@@ -12498,6 +12702,12 @@
       "index.html"
     ]
   },
+  "s_d8f89265": {
+    "source": "El registro ya terminó, pero no se pudo cargar su detalle. Podés reintentarlo.",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_d8f944f1": {
     "source": "Bono conservado",
     "files": [
@@ -12522,10 +12732,16 @@
       "js/finance.js"
     ]
   },
+  "s_d9589ae8": {
+    "source": "{{v2}} · {{v3}} · {{v4}}",
+    "files": [
+      "js/call-table-view.js"
+    ]
+  },
   "s_d95edd6e": {
     "source": "{{v6}}{{v7}}",
     "files": [
-      "js/calls.js"
+      "js/call-table-view.js"
     ]
   },
   "s_d978a575": {
@@ -12640,6 +12856,12 @@
     "source": "Ver tus datos:",
     "files": [
       "privacidad.html"
+    ]
+  },
+  "s_db0a95c2": {
+    "source": "Fecha y duración listas para guardar.",
+    "files": [
+      "js/calls.js"
     ]
   },
   "s_db206f2a": {
@@ -12772,12 +12994,6 @@
     "source": "En el próximo cofre",
     "files": [
       "js/game.js"
-    ]
-  },
-  "s_dcc442c7": {
-    "source": "{{v0}}:",
-    "files": [
-      "js/app-main.js"
     ]
   },
   "s_dccac910": {
@@ -13068,12 +13284,6 @@
       "js/finance-planning.js"
     ]
   },
-  "s_e0ae472f": {
-    "source": "{{v0}} fila(s) omitida(s) · {{v1}} llamada(s) actualizada(s)",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
   "s_e0ceb90d": {
     "source": "Después de importar, el campo se vacía y las filas se guardan localmente en el navegador.",
     "files": [
@@ -13102,6 +13312,13 @@
     "source": "Hasta",
     "files": [
       "app.html"
+    ]
+  },
+  "s_e142adda": {
+    "source": "Origen sin confirmar",
+    "files": [
+      "app.html",
+      "js/call-table-view.js"
     ]
   },
   "s_e167bc5b": {
@@ -13342,6 +13559,12 @@
     "source": "Aviso de Break/Lunch actualizado",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_e56e87da": {
+    "source": "Corregidas",
+    "files": [
+      "app.html"
     ]
   },
   "s_e57e5fbe": {
@@ -13613,12 +13836,6 @@
     "source": "El cambio es manual y conserva los importes en dólares. Dejá la tasa en 0 o la moneda vacía para ocultar la conversión.",
     "files": [
       "app.html"
-    ]
-  },
-  "s_ea88d3c9": {
-    "source": "{{v2}} · {{v3}}{{v4}}",
-    "files": [
-      "js/calls.js"
     ]
   },
   "s_ea8c2195": {
@@ -13913,6 +14130,12 @@
       "js/backup-recovery.js"
     ]
   },
+  "s_ef628b8e": {
+    "source": "El historial cambió: se actualizó la llamada que ya tenías.",
+    "files": [
+      "js/call-review-view.js"
+    ]
+  },
   "s_ef69b543": {
     "source": "Escopeta",
     "files": [
@@ -13989,7 +14212,7 @@
   "s_f11d7428": {
     "source": "No hay filas para el día activo. La vista se alimenta de las llamadas importadas, tus acciones del turno (Shift/Break/Lunch/ACW) y del día seleccionado.",
     "files": [
-      "js/calls.js"
+      "js/call-table-view.js"
     ]
   },
   "s_f1292e13": {
@@ -14028,6 +14251,12 @@
     "files": [
       "app.html",
       "js/calls.js"
+    ]
+  },
+  "s_f1628e10": {
+    "source": "Omitida",
+    "files": [
+      "js/call-review-view.js"
     ]
   },
   "s_f1912a3c": {
@@ -14202,7 +14431,7 @@
     "files": [
       "app.html",
       "js/app-main.js",
-      "js/calls.js"
+      "js/call-table-view.js"
     ]
   },
   "s_f48c473c": {
@@ -14340,6 +14569,7 @@
   "s_f5e31faa": {
     "source": "Todos",
     "files": [
+      "app.html",
       "js/call-recovery.js"
     ]
   },
@@ -14353,6 +14583,12 @@
     "source": "Exportar JSON",
     "files": [
       "app.html"
+    ]
+  },
+  "s_f60069a5": {
+    "source": "Duración inválida o fuera del límite.",
+    "files": [
+      "js/call-review-view.js"
     ]
   },
   "s_f62097b0": {
@@ -14412,7 +14648,7 @@
   "s_f730bef3": {
     "source": "No billable",
     "files": [
-      "js/calls.js"
+      "js/call-table-view.js"
     ]
   },
   "s_f731a8bb": {
@@ -14449,6 +14685,7 @@
     "source": "Manual",
     "files": [
       "app.html",
+      "js/call-table-view.js",
       "js/weekly-summary.js"
     ]
   },
