@@ -224,6 +224,7 @@ function reportsKpiData(dayKey = getActiveDayKey()) {
   const prevKey = todayCallDateKey(previousCalendarDay(base));
   const dayCalls = callsForDay(dayKey);
   const prevCalls = callsForDay(prevKey);
+  const previousHasData=prevCalls.length>0||!!dayShiftBounds(prevKey).start;
   const stats = importedCallStats(dayCalls, dayKey);
   const prevStats = importedCallStats(prevCalls, prevKey);
   const productive = productiveMinutesForDay(dayKey);
@@ -232,13 +233,13 @@ function reportsKpiData(dayKey = getActiveDayKey()) {
   const prevAdherence = dayAdherence(prevKey);
   return {
     productiveMin: productive,
-    productiveDeltaMin: productive - prevProductive,
+    productiveDeltaMin: previousHasData?productive-prevProductive:null,
     adherencePct: adherence ? adherence.scorePct : null,
     adherenceDeltaPts: (adherence && prevAdherence) ? adherence.scorePct - prevAdherence.scorePct : null,
     callCount: dayCalls.length,
-    callCountDelta: dayCalls.length - prevCalls.length,
+    callCountDelta: previousHasData?dayCalls.length-prevCalls.length:null,
     earnings: stats.earnings,
-    earningsDelta: stats.earnings - prevStats.earnings,
+    earningsDelta: previousHasData?stats.earnings-prevStats.earnings:null,
   };
 }
 
@@ -401,12 +402,21 @@ export function reportsCycleProjection() {
   const cycle = cycleEarningsForOffset(0);
   const today = todayRange();
   const daysElapsed = Math.min(CYCLE_LENGTH_DAYS, Math.max(1, Math.round((today.getTime() - cycle.start.getTime()) / 86400000) + 1));
-  const dailyAvg = cycle.earnings / daysElapsed;
+  return cycleProjectionFromCalendarDays(cycle.earnings,daysElapsed,CYCLE_LENGTH_DAYS);
+}
+
+export function cycleProjectionFromCalendarDays(earnings,elapsed,length=14) {
+  const daysElapsed=Math.min(length,Math.max(1,elapsed)),dailyAvg=earnings/daysElapsed;
   return {
-    projected: dailyAvg * CYCLE_LENGTH_DAYS,
+    projected: dailyAvg * length,
+    dailyAvg,
     daysElapsed,
-    daysRemaining: Math.max(0, CYCLE_LENGTH_DAYS - daysElapsed),
+    daysRemaining: Math.max(0,length-daysElapsed),
   };
+}
+
+export function reportDayAssessment({isOff,hasShift,callCount,productiveMin,goalMin}) {
+  return {kind:isOff?'off':!hasShift&&!callCount?'nodata':productiveMin>=goalMin?'met':'progress',remainingMin:Math.max(0,goalMin-productiveMin)};
 }
 
 function updateStreakSkipOffSetting(checked) {
@@ -441,7 +451,7 @@ export function renderReportsDashboard() {
   // Cada cabecera de sección tiene su propio id (en vez de depender del orden de aparición de
   // `.rpt-section-title` en el DOM) — más robusto ante reordenamientos futuros de esta página.
   const setSecTitle = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
-  setSecTitle('rptSecGoals', ui`${iconHtml('target')} Hoy: objetivos y progreso`);
+  setSecTitle('rptSecGoals', dayKey===todayCallDateKey()?ui`${iconHtml('target')} Hoy: objetivos y progreso`:ui`${iconHtml('target')} Día seleccionado: objetivos y progreso`);
   setSecTitle('rptSecChart', ui`${iconHtml('chart')} Productividad — últimos 14 días`);
   setSecTitle('rptSecHours', ui`${iconHtml('phone')} Llamadas por hora del día`);
   setSecTitle('rptSecQuality', ui`${iconHtml('zap')} Calidad y adherencia`);
@@ -450,6 +460,16 @@ export function renderReportsDashboard() {
   // Fusión de los 4 KPI cards (Productivo/ Adherencia/Llamadas/Ganancias, comparados contra ayer)
   // con las 3 tarjetas de "Objetivos del día" (comparadas contra tu meta)
   const kpi = reportsKpiData(dayKey);
+  const day=reportDayAssessment({isOff:dayIsEffectivelyOff(dayKey),hasShift:!!dayShiftBounds(dayKey).start,callCount:kpi.callCount,productiveMin:kpi.productiveMin,goalMin:effectiveDailyGoal(dayKey).min});
+  const notEvaluated=day.kind==='nodata'?translateText('Sin registros: meta sin evaluar'):day.kind==='off'?translateText('Día libre: meta sin evaluar'):null;
+  const conclusion=document.getElementById('rptDayConclusion');
+  if(conclusion){
+    const text=day.kind==='nodata'?translateText('Sin actividad registrada para este día. No se considera una meta incumplida.')
+      :day.kind==='off'?translateText('Día libre. La actividad registrada se conserva sin juzgar la meta del día.')
+      :day.kind==='met'?translateText('Tu meta de productividad está alcanzada.')
+      :ui`Faltan ${formatMinutes(day.remainingMin)} min productivos para la meta de este día.`;
+    conclusion.innerHTML=`<span class="rpt-conclusion-icon" aria-hidden="true">${iconHtml(day.kind==='met'?'checkCircle':day.kind==='nodata'?'info':'target')}</span><div><strong>${escapeHtml(translateText('Tu día de un vistazo'))}</strong><p>${escapeHtml(text)}</p></div>`;
+  }
   const goalsGrid = document.getElementById('rptGoalsGrid');
   if (goalsGrid) {
     const dayGoalForReports = effectiveDailyGoal(dayKey);
@@ -460,7 +480,8 @@ export function renderReportsDashboard() {
     const earningsPct = goalUsd > 0 ? Math.min(100, (kpi.earnings / goalUsd) * 100) : 0;
     const adherencePct = kpi.adherencePct === null ? 0 : Math.min(100, (kpi.adherencePct / goalAdherence) * 100);
     const deltaLine = (val, unit) => {
-      if (val === null || !Number.isFinite(val) || val === 0) return ui`<div class="rpt-goal-delta flat">Sin cambio vs ayer</div>`;
+      if (val === null || !Number.isFinite(val)) return ui`<div class="rpt-goal-delta flat">Sin comparación disponible con ayer</div>`;
+      if (val === 0) return ui`<div class="rpt-goal-delta flat">Sin cambio vs ayer</div>`;
       const up = val > 0;
       const text = unit === '$' ? `${money(Math.abs(val))}${financeConvertedInline(Math.abs(val))}` : `${Math.abs(val)}${unit}`;
       return ui`<div class="rpt-goal-delta ${up ? 'up' : 'down'}">${up ? '↑' : '↓'} ${text} vs ayer</div>`;
@@ -469,20 +490,20 @@ export function renderReportsDashboard() {
       <div class="rpt-goal-card gh-goal-card" style="margin-top:0;">
         <div class="gh-goal-top"><span>Productividad</span><b>${formatMinutes(kpi.productiveMin)}/${formatMinutes(goalMin)} min</b></div>
         <div class="rpt-goal-bar blue"><div style="width:${productivePct}%;"></div></div>
-        <div class="gh-goal-foot">${kpi.productiveMin >= goalMin ? translateText('¡Meta alcanzada!') : ui`Faltan ${formatMinutes(Math.max(0, goalMin - kpi.productiveMin))} min`}</div>
+        <div class="gh-goal-foot">${notEvaluated||(kpi.productiveMin >= goalMin ? translateText('¡Meta alcanzada!') : ui`Faltan ${formatMinutes(Math.max(0, goalMin - kpi.productiveMin))} min`)}</div>
         ${deltaLine(kpi.productiveDeltaMin, ' min')}
       </div>
       <div class="rpt-goal-card gh-goal-card" style="margin-top:0;">
         <div class="gh-goal-top"><span>Adherencia</span><b>${kpi.adherencePct === null ? '—' : kpi.adherencePct}/${goalAdherence}%</b></div>
         <div class="rpt-goal-bar good"><div style="width:${adherencePct}%;"></div></div>
-        <div class="gh-goal-foot">${kpi.adherencePct !== null && kpi.adherencePct >= goalAdherence ? translateText('¡Meta alcanzada!') : ui`Faltan ${kpi.adherencePct === null ? goalAdherence : Math.max(0, goalAdherence - kpi.adherencePct)}%`}</div>
+        <div class="gh-goal-foot">${notEvaluated||(kpi.adherencePct===null?translateText('Sin adherencia calculable para esta fecha'):kpi.adherencePct >= goalAdherence ? translateText('¡Meta alcanzada!') : ui`Faltan ${Math.max(0, goalAdherence - kpi.adherencePct)}%`)}</div>
         ${deltaLine(kpi.adherenceDeltaPts, '%')}
       </div>
       <div class="rpt-goal-card gh-goal-card" style="margin-top:0;">
         <div class="gh-goal-top"><span>Ganancias</span><b>${money(kpi.earnings)}/${money(goalUsd)}</b></div>
         ${convertedAmountText(goalUsd) ? ui`<div class="fin-row-converted">${escapeHtml(convertedAmountText(kpi.earnings))} / ${escapeHtml(convertedAmountText(goalUsd))}</div>` : ''}
         <div class="rpt-goal-bar purple"><div style="width:${earningsPct}%;"></div></div>
-        <div class="gh-goal-foot">${kpi.earnings >= goalUsd ? translateText('¡Meta alcanzada!') : ui`Faltan ${money(Math.max(0, goalUsd - kpi.earnings))}${financeConvertedInline(Math.max(0, goalUsd - kpi.earnings))}`}</div>
+        <div class="gh-goal-foot">${notEvaluated||(kpi.earnings >= goalUsd ? translateText('¡Meta alcanzada!') : ui`Faltan ${money(Math.max(0, goalUsd - kpi.earnings))}${financeConvertedInline(Math.max(0, goalUsd - kpi.earnings))}`)}</div>
         ${deltaLine(kpi.earningsDelta, '$')}
       </div>
     `;
@@ -649,12 +670,13 @@ export function renderReportsDashboard() {
       </div>
       <div class="rpt-mini-card">
         <div class="rpt-mini-title">${iconHtml('chart')} PROYECCIÓN DEL CICLO</div>
-        <div class="rpt-bw-metric"><span>Al ritmo de hoy</span><b>${money(proj.projected)}${financeConvertedInline(proj.projected)}</b></div>
+        <div class="rpt-bw-metric"><span>Con el promedio del ciclo</span><b>${money(proj.projected)}${financeConvertedInline(proj.projected)}</b></div>
         <div class="rpt-bw-metric"><span>Días transcurridos</span><b>${proj.daysElapsed}/${CYCLE_LENGTH_DAYS}</b></div>
         <div class="rpt-bw-metric"><span>Días restantes</span><b>${proj.daysRemaining}</b></div>
-        <div class="rpt-bw-metric"><span>vs tu meta del ciclo</span><b style="color:var(--${projTone});">${projDelta >= 0 ? '+' : ''}${money(projDelta)}${financeConvertedInline(Math.abs(projDelta))}</b></div>
+        <div class="rpt-bw-metric"><span>vs tu meta del ciclo</span><b style="color:var(--${projTone});">${projDelta >= 0 ? '+' : ''}${money(projDelta)}${financeConvertedInline(projDelta)}</b></div>
         <div class="rpt-bw-metric"><span>Para llegar a tu meta</span><b style="color:var(--${pace.met ? 'good' : 'text'});">${escapeHtml(paceText)}</b></div>
         <div class="rpt-act-row" style="border-bottom:none; padding-top:2px;"><span class="rpt-act-left" style="font-size:11px; line-height:1.4;">${paceSubText}</span></div>
+        <details class="review-details"><summary>Cómo se calcula la proyección</summary><div class="review-detail-body"><div class="review-line"><span>Promedio por día natural</span><strong>${money(proj.dailyAvg)}${financeConvertedInline(proj.dailyAvg)}</strong></div><p class="note">Divide las ganancias registradas del ciclo, incluido Higher Rate, entre los días naturales transcurridos y extiende ese promedio al ciclo completo. Cuenta días libres y hoy, aunque todavía esté incompleto. No predice nuevas promociones ni garantiza ese ingreso.</p><p class="note">El ritmo para llegar a la meta usa los días laborales restantes; es un cálculo distinto.</p></div></details>
       </div>
     `;
     const streakToggle = document.getElementById('streakSkipOffToggle');

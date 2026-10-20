@@ -32,7 +32,7 @@ function calTierForDay(productiveMin, goalMin) {
 
 // Distingue "Sin datos" (ningún turno ni llamada registrado ese día — no hay nada que juzgar) y
 // "Libre" (día marcado como tal en el horario) del resto de tiers de rendimiento.
-function calDayStatus(dayKey) {
+export function calDayStatus(dayKey) {
   if (dayIsEffectivelyOff(dayKey)) return 'off';
   const hasShift = !!dayShiftBounds(dayKey).start;
   const hasCalls = callsForDay(dayKey).length > 0;
@@ -140,7 +140,8 @@ export function renderCalendarMonth() {
     const dayNoteForCell = getDayNote(dayKey);
     const offCategoryLabel = status === 'off' ? dayNoteCategoryMeta(dayNoteForCell?.category)?.label : null;
     const minLabel = status === 'off' ? (offCategoryLabel || translateText('Libre')) : status === 'nodata' ? '—' : String(Math.round(productiveMin));
-    const titleParts = [dayNoteForCell?.forcedStatus ? translateText('Estado elegido por vos; reemplaza el del horario') : '', offCategoryLabel, dayNoteForCell?.comment].filter(Boolean);
+    const statusText=status==='nodata'?translateText('Sin datos: no se evalúa la meta'):status==='off'?(offCategoryLabel||translateText('Libre')):ui`${formatMinutes(productiveMin)} min productivos; meta ${formatMinutes(effectiveDailyGoal(dayKey).min)} min`;
+    const titleParts = [dayKey,statusText,dayNoteForCell?.forcedStatus ? translateText('Estado elegido por vos; reemplaza el del horario') : '', dayNoteForCell?.comment].filter(Boolean);
     const titleAttr = titleParts.length ? ` title="${escapeHtml(titleParts.join(' — '))}"` : '';
     const minLabelClass = status === 'normal' ? 'cal-day-min' : 'cal-day-min cal-day-min-label';
     // Minutos + monto en $ + monto en la otra moneda, los 3 juntos en la celda, con decimales en
@@ -380,7 +381,8 @@ export function renderCalYear() {
       // renderCalendarMonth (pinta el mes completo, sin cortar en "hoy").
       monthTotal += importedCallStats(callsForDay(dayKey), dayKey).earnings;
       const tier = calDayTier(dayKey);
-      cells.push({ empty: false, tier });
+      const status=calDayStatus(dayKey),description=status==='nodata'?translateText('Sin datos: no se evalúa la meta'):status==='off'?translateText('Libre'):ui`${formatMinutes(productiveMinutesForDay(dayKey))} min productivos; meta ${formatMinutes(effectiveDailyGoal(dayKey).min)} min`;
+      cells.push({ empty: false, tier,description:`${dayKey} · ${description}` });
     }
     yearTotal += monthTotal;
     monthTotals.push(monthTotal);
@@ -413,7 +415,7 @@ export function renderCalYear() {
   monthGrid.innerHTML = monthCellsData.map((cells, m) => {
     if (m < startMonthForYear) return ''; // Mes anterior al inicio del historial: no hay nada que mostrar.
     const isCurrentMonth = isCurrentYear && m === today.getMonth();
-    const miniHtml = cells.map(c => c.empty ? '<div class="mini-cell cal-empty"></div>' : ui`<div class="mini-cell ${c.tier}"></div>`).join('');
+    const miniHtml = cells.map(c => c.empty ? '<div class="mini-cell cal-empty"></div>' : ui`<div class="mini-cell ${c.tier}" title="${escapeHtml(c.description)}"></div>`).join('');
     return ui`
       <div class="month-card ${isCurrentMonth ? 'is-current' : ''}" data-cal-month-idx="${m}">
         <div class="month-card-head">

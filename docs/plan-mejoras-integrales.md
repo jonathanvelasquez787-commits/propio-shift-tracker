@@ -18,14 +18,14 @@ de publicar. Conservar datos y funciones; seguir después el orden de fases.
 
 ## Lista de control completa
 
-**42 de 79 mejoras publicadas.** 7 probadas sin publicar, 2 en curso y 28 pendientes. La preparación del
+**49 de 79 mejoras publicadas.** 4 probadas sin publicar, 2 en curso y 24 pendientes. La preparación del
 turno usa app 624 y extensión 2.2.10, con publicación comprobada y recarga de la
 extensión, Propio y tracker confirmada por el propietario. App 625 refuerza la
 limpieza de Higher Rate; app 626 incorpora, en orden, el desglose de ganancias,
 consulta de conversión y alcance de tarifa. App 627 completa 36 y 37: revisión
 por ventana y corrección con vista previa, conservando bonos al editar o limpiar.
 App 628 completa el punto 21 con historial antes/después y recuperación de
-ediciones, eliminaciones y vaciados de llamadas. App 629 publica 22, 26–27, 47, 67 y 69 y cierra la fase 3, con CI y producción comprobados. App 630 publica 15–20 y 77, con código de extensión 2.3.0 instalado y recarga aún sin confirmar. App 631 publica los once puntos de la fase 5, con CI y producción comprobados. Sigue fase 6: Finanzas y pagos recibidos.
+ediciones, eliminaciones y vaciados de llamadas. App 629 publica 22, 26–27, 47, 67 y 69 y cierra la fase 3, con CI y producción comprobados. App 630 publica 15–20 y 77, con código de extensión 2.3.0 instalado y recarga aún sin confirmar. App 631 publica los once puntos de la fase 5, con CI y producción comprobados. App 632 publica Finanzas y pagos recibidos con el diseño aprobado de Jornada, Reservas y Pago recibido. Sigue fase 7: Reportes, Calendario y exportaciones.
 
 Estas 79 mejoras corresponden al sistema completo. El panel de disponibilidad
 y preparación se ve en la **tool web**; el popup de la **extensión de Chrome**
@@ -76,15 +76,15 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 - [x] **35. Tasa base por minuto — Publicado.** Explica nuevas estimaciones/meta general y conservación de pagos, bonos y metas especiales; guardar mantiene su alcance anterior. [Evidencia](ganancias-desglose.md).
 - [x] **36. Ventanas de Higher Rate — Publicado.** Revisión de llamadas por ventana, gracia y motivos; carga mediante fecha, horas y nivel comprobables del aviso. [Evidencia y alcance](higher-rate-revision.md).
 - [x] **37. Conservar bonos ganados al editar o limpiar ventanas — Publicado.** Edición normal y limpieza conservan bonos; corrección explícita con vista previa antes/después y confirmación, reversión ante fallo y protección de cuenta/revisión. [Evidencia y alcance](higher-rate-revision.md).
-- [ ] **38. Gastos, ahorro y categorías — Probado (sin publicar).** Distinguir objetivo, reservado, pagado y pendiente en las filas. [Alcance y validación](finanzas-reservas-y-recepciones.md).
-- [ ] **39. Asignación manual o automática del dinero ganado — Probado (sin publicar).** Explicar destino de cada asignación manual/automática. [Alcance y validación](finanzas-reservas-y-recepciones.md).
-- [ ] **40. Registrar pagos de gastos — Probado (sin publicar).** Separación visual de reserva y pago real registrado. [Alcance y validación](finanzas-reservas-y-recepciones.md).
-- [ ] **41. Períodos, gastos recurrentes y reinicio — Probado (sin publicar).** Vista previa de reinicio, liberaciones, historial y período. [Alcance y validación](finanzas-reservas-y-recepciones.md).
-- [ ] **42. Resumen de Finanzas en Inicio — Probado (sin publicar).** Identificar pendientes de Finanzas como acumulados. [Alcance y validación](finanzas-reservas-y-recepciones.md).
-- [ ] **43. Reportes de rendimiento — Pendiente.** Conclusiones principales antes del detalle de métricas.
-- [ ] **44. Proyección del ciclo — Pendiente.** Supuestos de proyección y efecto de días/ritmo visibles.
-- [ ] **45. Fechas de pago — Probado (sin publicar).** Registrar pago recibido manual y diferencia con lo esperado. [Alcance y validación](finanzas-reservas-y-recepciones.md).
-- [ ] **46. Calendario de productividad — Pendiente.** Leyenda que distinga sin datos, libre y meta no cumplida.
+- [x] **38. Gastos, ahorro y categorías — Publicado.** Distinguir objetivo, reservado, pagado y pendiente en las filas. [Alcance y validación](finanzas-reservas-y-recepciones.md).
+- [x] **39. Asignación manual o automática del dinero ganado — Publicado.** Explicar destino de cada asignación manual/automática. [Alcance y validación](finanzas-reservas-y-recepciones.md).
+- [x] **40. Registrar pagos de gastos — Publicado.** Separación visual de reserva y pago real registrado. [Alcance y validación](finanzas-reservas-y-recepciones.md).
+- [x] **41. Períodos, gastos recurrentes y reinicio — Publicado.** Vista previa de reinicio, liberaciones, historial y período. [Alcance y validación](finanzas-reservas-y-recepciones.md).
+- [x] **42. Resumen de Finanzas en Inicio — Publicado.** Identificar pendientes de Finanzas como acumulados. [Alcance y validación](finanzas-reservas-y-recepciones.md).
+- [ ] **43. Reportes de rendimiento — Probado (sin publicar).** Conclusiones principales antes del detalle de métricas. [Alcance y límites](reportes-calendario-y-exportaciones.md).
+- [ ] **44. Proyección del ciclo — Probado (sin publicar).** Supuestos de proyección y efecto de días/ritmo visibles. [Alcance y límites](reportes-calendario-y-exportaciones.md).
+- [x] **45. Fechas de pago — Publicado.** Registrar pago recibido manual y diferencia con lo esperado. [Alcance y validación](finanzas-reservas-y-recepciones.md).
+- [ ] **46. Calendario de productividad — Probado (sin publicar).** Leyenda que distinga sin datos, libre y meta no cumplida. [Alcance y límites](reportes-calendario-y-exportaciones.md).
 - [x] **47. Marcar días y agregar contexto — Publicado.** Estado manual visible en semana/calendario y efecto histórico explicado; edición protegida. [Alcance y pruebas](recuperacion-actividades-y-respaldos.md).
 - [ ] **48. Alarmas de turno y descansos — Pendiente.** Resumen de alarmas activas.
 - [ ] **49. Sonidos al guardar llamadas — Pendiente.** Asociación clara acción/sonido conservando reconciliación silenciosa.
@@ -106,7 +106,7 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 - [ ] **65. Cuenta y perfil — Pendiente.** Rótulos acordes con campos editables y acceso Google vigente.
 - [ ] **66. Guardado local y sincronización — Pendiente.** Detalle visible de guardado local/nube y conflictos. Revisar el reconocimiento tras una subida al salir: QA detectó un conflicto conservador con contenido de llamadas equivalente en distinto orden y revisión local anterior; se conservaron ambas versiones. Reproducir con el orden real de la consulta antes de cambiar la comparación.
 - [x] **67. Respaldo completo JSON — Publicado.** Comparación actual/respaldo, copia privada previa, recuperación explícita y protección de cuenta/revisión/cuota. [Alcance y pruebas](recuperacion-actividades-y-respaldos.md).
-- [ ] **68. Reportes CSV y PDF — Pendiente.** Explicar período/datos incluidos y diferencia con respaldo.
+- [ ] **68. Reportes CSV y PDF — Probado (sin publicar).** Explicar período/datos incluidos y diferencia con respaldo. [Alcance y límites](reportes-calendario-y-exportaciones.md).
 - [x] **69. Reinicios y borrados — Publicado.** Alcance específico del día/total, copia previa y recuperación consultable; rechazo conserva los datos. [Alcance y pruebas](recuperacion-actividades-y-respaldos.md).
 - [ ] **70. App instalable y recuperación — Pendiente.** Explicar estado local, reconexión y límites de PWA.
 - [x] **71. Estado de conexión y actividad de la extensión — Publicado.** Diagnóstico inicial: qué pasa, qué sigue funcionando y qué hacer. [Evidencia](disponibilidad-en-inicio.md).
@@ -114,7 +114,7 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 - [x] **73. Guías y apoyo voluntario — Publicado.** Actualizar guía y README retirando descripciones desactualizadas. [Evidencia](guia-practica-tool-y-extension.md) y [README](../extension/propio-bridge/README.md).
 - [ ] **74. Funcionamiento con otra pestaña al frente — En curso.** Lectura atrasada/reconexión visibles y coordinación futura multi-PC.
 - [ ] **75. Volumen general y sonidos propios — Pendiente.** Explicar volumen cero, avisos escritos y espacio de archivos.
-- [ ] **76. Planificador de Finanzas hacia la meta diaria — Probado (sin publicar).** Desglosar cálculo y mostrar meta propuesta antes de guardar. [Alcance y validación](finanzas-reservas-y-recepciones.md).
+- [x] **76. Planificador de Finanzas hacia la meta diaria — Publicado.** Desglosar cálculo y mostrar meta propuesta antes de guardar. [Alcance y validación](finanzas-reservas-y-recepciones.md).
 - [x] **77. Filtros de llamadas y acciones — Publicado.** Búsqueda Customer ID y filtros de procedencia del día activo, sin cambiar totales ni registros. [Alcance](revision-llamadas-e-importaciones.md).
 - [ ] **78. Barra de actividad en vivo — Pendiente.** Consistencia entre barra y tarjetas incluidas llamadas pendientes.
 - [ ] **79. Accesibilidad — Pendiente.** Revisión de teclado, zoom, lector, ayudas táctiles y objetivos de controles.
@@ -194,11 +194,11 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 5. **Jornada, pausas, ACW, adherencia y horario — publicada.** Alcances visibles,
    hoy/histórico, continuidad, plan/real, origen de metas y vista previa de
    desplazamiento/copia. Cubre 3–5, 23–25 y 28–32.
-6. **Finanzas y pagos — probada, sin publicar.** Explicar reparto y alcance acumulado,
+6. **Finanzas y pagos — publicada.** Explicar reparto y alcance acumulado,
    reservado/pagado, recurrencia/reinicio y planificador; pago recibido manual
    y diferencia contra lo esperado. Cubre 38–42, 45 y 76. Sin movimientos bancarios
    ni afirmar depósitos a partir de reservas.
-7. **Reportes y calendario — pendiente.** Conclusiones primero, supuestos de
+7. **Reportes y calendario — probada, sin publicar.** Conclusiones primero, supuestos de
    proyección, leyendas de días sin datos y exportaciones comprensibles.
    Cubre 43–44, 46 y 68.
 8. **Avisos y acompañamiento — pendiente.** Resumen de alarmas, sonido/volumen y
@@ -221,6 +221,10 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
     coordinación entre dispositivos antes de permitir iniciadores simultáneos.
     Cubre 63–64 y ampliación de 14/74. No comprar proveedores ni cambiar seguridad
     de Windows. La instalación actual confirmada no vuelve a ser pendiente.
+
+## Entrega de Finanzas
+
+[PR #94](https://github.com/jonathanvelasquez787-commits/propio-shift-tracker/pull/94), main `37d8ee96b6c68fffa0bafc0b05bfa43858857024`: 931 pruebas, 16 recorridos compilados y caso adicional de cuota, meta propuesta y cancelación de borrado. CI del PR y main correctos, traducción correcta, producción READY y hashes públicos del mismo SHA verificados. Extensión sin cambios.
 
 ## Criterios comunes de entrega
 

@@ -326,11 +326,11 @@ futura opera bajo esto, sin excepción:
 
 - **Mejoras integrales aprobadas el 18/10:** ejecutar las recomendaciones de la
   evaluación de 79 funciones por fases; alcance y estado completo en
-  [plan de mejoras](docs/plan-mejoras-integrales.md). Inicio y preparación publicados:
-  42 mejoras publicadas; jornada y horarios cerrados con web 631.
-  Finanzas 632 está probada sin publicar: 7 mejoras y rediseño aprobado de
-  Jornada, Reservas y Pago recibido; no cerrar el resto de las fases.
-  Sigue fase 4: 15–20 y 77. No perder las fases posteriores al
+  [plan de mejoras](docs/plan-mejoras-integrales.md). 49 mejoras publicadas:
+  fases 1–6 verificadas, incluido Finanzas y el diseño aprobado de Jornada,
+  Reservas y Pago recibido. Web 633 prueba los cuatro puntos de la fase 7,
+  todavía sin publicar; siguen Avisos, Logros, accesibilidad, cuenta e instalación.
+  No perder las fases posteriores al
   entregar una parte ni considerar pendiente la instalación ya confirmada.
 - **Segundos oficiales de Propio:** confirmar con evidencia si el último minuto
   incompleto se incluye en duración y pago. El formato de hora visible no lo demuestra.
@@ -476,7 +476,20 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
-**v632 — Finanzas y presentación aprobada (sin publicar).**
+**v633 — Reportes, calendario y exportación con alcance (sin publicar).**
+
+- Puntos 43–44, 46 y 68: conclusión antes de gráficos, comparación solo con
+  datos, metas sin evaluar en días libres/sin registros y supuestos plegados
+  de la proyección por días naturales. Calendario distingue esos estados.
+- Alcance de CSV/PDF antes de exportar; base/bono/total separados, adherencia
+  desconocida sin 0% inventado, botones consistentes y documento de impresión.
+  Generación diferida; presupuesto de detalle 103 KB, inicial/idiomas conservados.
+- 941 pruebas y 16 recorridos ES/EN, temas y anchos correctos; CSV Blob y
+  ventana de impresión verificados sin modificar llamadas. Chrome aislado
+  cancela incluso un archivo mínimo ajeno a la app; guardado nativo CSV no
+  certificado, sin cambiar políticas. Ver docs/reportes-calendario-y-exportaciones.md.
+
+**v632 — Finanzas y presentación aprobada.**
 
 - Puntos 38–42, 45 y 76: reservas, pagos y pendientes separados; destino del
   reparto, liberación con vista previa, alcance global en Inicio y plan hacia
@@ -487,7 +500,8 @@ futura opera bajo esto, sin excepción:
   20/10; resumen principal, explicaciones plegadas y moneda secundaria debajo.
 - 931 pruebas y comprobaciones de módulos/UI/i18n correctas. Presupuestos
   revisados: inicial 807 KB, detalle diferido 100 KB; arranque/locales sin
-  aumentar. Extensión sin cambios. Ver docs/finanzas-reservas-y-recepciones.md.
+  aumentar. PR #94 y main con CI correcto; producción READY del mismo SHA y
+  archivos públicos verificados. Extensión sin cambios. Ver docs/finanzas-reservas-y-recepciones.md.
 
 **v631 — Revisión de jornada y horarios.**
 
@@ -502,16 +516,3 @@ futura opera bajo esto, sin excepción:
   específica. Presupuesto local contempla el SHA de producción. PR #93 y main
   con CI correcto; producción READY y archivos del SHA verificados.
   Extensión sin nuevos cambios ni otra recarga.
-
-**v630 — Revisión de llamadas e importación por fila.**
-
-- Puntos 15–20 y 77: procedencia, búsqueda Customer ID y estados, comprobación
-  manual e importación con motivo por fila. Tabla/detalles bajo carga diferida
-  y reintento explícito si falla la descarga.
-- Rechazo de guardado conserva el borrador manual; cierre en vivo respalda antes
-  de retirar la actividad y revierte filas/recompensas rechazadas.
-- Código de extensión 2.3.0: cola con vencimiento y explicación plegada; Abrir
-  tracker reutiliza pestaña. Archivos locales instalados con respaldo, conservando preferencias; recarga sin confirmar.
-- 904 pruebas, 16 recorridos ES/EN/temas/anchos, cuota, descarga y popup.
-  PR #92 y main con CI correcto; producción READY y archivos del SHA verificados. Alcance en
-  docs/revision-llamadas-e-importaciones.md. No cerrar las fases posteriores.

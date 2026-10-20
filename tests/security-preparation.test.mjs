@@ -1,6 +1,7 @@
 import { ui, translateText, translateMarkup, displayLocale } from '../js/i18n.js';
 import { applySavedColors } from '../js/appearance-colors.js';
 import { readLanguagePreference } from '../js/language-preference.js';
+import { exportAccountingDocument } from '../js/accounting-export.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -274,8 +275,6 @@ test('footer year tolerates pages without a footer', () => {
 });
 
 test('PDF report registers a click listener on its own print window', () => {
-  const source = read('js/app-main.js');
-  const fn = source.slice(source.indexOf('    function exportAccountingPdf()'), source.indexOf('    function syncAccountingExportPeriodUI()'));
   let html = '', click, printed = false;
   const popup = {
     print() { printed = true; },
@@ -287,14 +286,9 @@ test('PDF report registers a click listener on its own print window', () => {
       },
     },
   };
-  vm.runInNewContext(fn + '\nexportAccountingPdf();', { ui, translateText, translateMarkup, displayLocale, applySavedColors,
-    window: {open:()=>popup}, accountingExportRange:()=>({label:'Test period'}),
-    accountingExportDays:()=>[{dayCalls:[],dayKey:'2026-09-27',productive:0,stats:{earnings:0}}],
-    escapeHtml:String, formatCallDayLabel:String, formatMinutes:String, money:String, fmtDate:String, toast() {},
-  });
+  exportAccountingDocument({ui,translateText,displayLocale,escapeHtml:String,formatCallDayLabel:String,formatMinutes:String,money:String,fmtDate:String,toast(){}},'pdf',{label:'Test period'},[{dayCalls:[],dayKey:'2026-09-27',productive:0,stats:{earnings:0}}],popup);
   assert.doesNotMatch(html, /\son[a-z]+\s*=/i);
   assert.equal(printed, false);
   click();
   assert.equal(printed, true);
 });
-
