@@ -3432,6 +3432,7 @@ function setBlocksViewMode(mode) {
   });
   if (blocksView) blocksView.style.display = blocksViewMode === 'blocks' ? '' : 'none';
   if (callsView) callsView.style.display = blocksViewMode === 'calls' ? '' : 'none';
+  if (blocksViewMode === 'calls') renderTable();
 }
 
 // "Resumen semanal" usaba semanas Lunes-Domingo fijas, sin relación con cuándo arranca de verdad el
@@ -4206,11 +4207,13 @@ function renderPayDatesSection() {
       const liveContext = state.activeCall;
       const startedAt = liveContext.startedAt;
       const endedAt = options.endedAt || new Date().toISOString();
+      const previousState = JSON.parse(JSON.stringify(state));
       state.activeCall = null;
       // Sin esto, el chip "ACW/AfterCallWork" en vivo (ver computeCurrentAcwStart) no sabía que la
       // llamada acababa de terminar hasta que se guardaba.
       state.lastCallEndedAt = endedAt;
-      saveStateOnly();
+      state.pendingLiveCallBackup = { startedAtISO: startedAt, endedAtISO: endedAt, candidate: null, liveContext };
+      if (saveStateOnly() === false) { setAppState(previousState); render(); return false; }
       render();
       return autoSaveLiveCall(startedAt, endedAt, liveContext);
     }
@@ -4481,63 +4484,33 @@ function renderPayDatesSection() {
     function parseCalls(text) {
       const raw = String(text || '').trim();
       if (!raw) return [];
-      const lines = raw.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
-      const headers = ['customer id', 'call date', 'call start', 'duration', 'billable', 'dropped', 'pay'];
-      const clean = lines.filter(line => !headers.includes(line.toLowerCase()));
-      const rows = [];
-      const seen = new Set();
-
-      function addRow(parts) {
-        if (!parts || parts.length !== 7) return;
-        const [customerId, callDate, callStart, duration, billable, dropped, pay] = parts.map(v => String(v).trim());
-        if (!/^\d{2}\/\d{2}\/\d{4}$/.test(callDate)) return;
-        if (!/^\d{1,2}:\d{2}\s*[AP]M$/i.test(callStart)) return;
-        const dur = Number(duration);
-        // Propio sí exporta llamadas de 0 min (entró pero nunca conectó): son un registro real, y
-        // el resto de la app ya las contempla (ver stats.zeroCount).
-        if (!Number.isFinite(dur) || dur < 0 || dur > MAX_CALL_DURATION_MIN) return;
-        const start = toDateFromInputs(callDate, callStart);
-        if (!start) return;
-        const end = new Date(start.getTime() + dur * 60000);
-        const row = {
-          id: makeLocalId(),
-          customerId: String(customerId),
-          callDate,
-          callStart,
-          durationMin: dur,
-          billable,
-          dropped,
-          pay,
-          startISO: start.toISOString(),
-          endISO: end.toISOString(),
-          countsAsProductive: String(billable).toLowerCase() === 'yes' && String(dropped).toLowerCase() === 'no',
-        };
+      const headers = new Set(['customer id', 'call date', 'call start', 'duration', 'duration (minutes)', 'billable', 'dropped', 'pay']);
+      const lines = raw.split(/\r?\n/).map((text, index) => ({ text: text.trim(), line: index + 1 })).filter(row => row.text && !headers.has(row.text.toLowerCase()));
+      const rows = [], diagnostics = [], seen = new Set();
+      function addRow(parts, line) {
+        const [customerId, callDate, callStart, duration, billable, dropped, pay] = parts;
+        const dur = Number(duration), start = toDateFromInputs(callDate, callStart);
+        const amount = Number(String(pay).replace(/[$,\s]/g, ''));
+        const reason = !/^\d{2}\/\d{2}\/\d{4}$/.test(callDate) || !/^\d{1,2}:\d{2}\s*[AP]M$/i.test(callStart) || !start ? 'date-time'
+          : !Number.isFinite(dur) || dur < 0 || dur > MAX_CALL_DURATION_MIN ? 'duration'
+          : !Number.isFinite(amount) || amount < 0 || amount > 1e9 ? 'pay'
+          : !/^(yes|no)$/i.test(billable) || !/^(yes|no)$/i.test(dropped) ? 'flags' : null;
+        if (reason) { diagnostics.push({ customerId, callDate, callStart, line, reason }); return; }
+        const row = { id: makeLocalId(), customerId, callDate, callStart, durationMin: dur, billable, dropped, pay,
+          startISO: start.toISOString(), endISO: new Date(start.getTime() + dur * 60000).toISOString(),
+          countsAsProductive: billable.toLowerCase() === 'yes' && dropped.toLowerCase() === 'no' };
         const key = callDedupeKey(row);
-        if (seen.has(key)) return;
-        seen.add(key);
-        rows.push(row);
+        if (seen.has(key)) { diagnostics.push({ ...row, line, reason: 'duplicate-input' }); return; }
+        seen.add(key); rows.push(row);
       }
-
-      for (const line of clean) {
-        const parts = line.split(/\t|\s{2,}|,/).map(s => s.trim()).filter(Boolean);
-        if (parts.length === 7) addRow(parts);
+      for (let i = 0; i < lines.length; i++) {
+        const row = lines[i], parts = row.text.split(/\t|\s{2,}|,/).map(value => value.trim()).filter(Boolean);
+        if (parts.length === 7) addRow(parts, row.line);
+        else if (/^\d+$/.test(row.text) && i + 6 < lines.length && /^\d{2}\/\d{2}\/\d{4}$/.test(lines[i + 1].text)) {
+          addRow(lines.slice(i, i + 7).map(value => value.text), row.line); i += 6;
+        } else diagnostics.push({ line: row.line, reason: 'format', customerId: row.text.slice(0, 60) });
       }
-
-      for (let i = 0; i + 6 < clean.length; i++) {
-        const block = clean.slice(i, i + 7);
-        const looksLike = /^\d+$/.test(block[0]) && /^\d{2}\/\d{2}\/\d{4}$/.test(block[1]) && /^\d{1,2}:\d{2}\s*[AP]M$/i.test(block[2]);
-        if (looksLike) addRow(block);
-      }
-
-      const chunks = raw.split(/\n\s*\n/).map(s => s.trim()).filter(Boolean);
-      for (const chunk of chunks) {
-        const parts = chunk.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
-        if (parts.length === 7) addRow(parts);
-        if (parts.length === 1) {
-          const cols = parts[0].split(/\t|\s{2,}|,/).map(s => s.trim()).filter(Boolean);
-          if (cols.length === 7) addRow(cols);
-        }
-      }
+      rows.diagnostics = diagnostics;
       return rows;
     }
 
@@ -4546,40 +4519,22 @@ function renderPayDatesSection() {
       return new Date(a.startISO) < new Date(b.endISO) && new Date(b.startISO) < new Date(a.endISO);
     }
 
-    // Pinta el resumen de filas omitidas al importar (duplicados exactos + traslapes), cada una con
-    // su motivo, dentro de #importSkippedSummary — reemplaza el toast-solo-conteo de antes.
-    function renderImportSkippedSummary(duplicates, overlaps, futureRows = [], replacedLive = [], correctedOfficial = []) {
-      const el = document.getElementById('importSkippedSummary');
-      if (!el) return;
-      const total = duplicates.length + overlaps.length + futureRows.length + replacedLive.length + correctedOfficial.length;
-      if (!total) {
-        el.style.display = 'none';
-        el.innerHTML = '';
+    let importOutcomeArgs = null, importOutcomeSequence = 0;
+    async function renderImportSkippedSummary(...args) {
+      if (!args.some(rows => rows?.length)) {
+        importOutcomeArgs = null; importOutcomeSequence++;
+        const el = document.getElementById('importSkippedSummary'); if (el) { el.innerHTML = ''; el.style.display = 'none'; }
+        const retry = document.getElementById('importResultRetryBtn'); if (retry) retry.hidden = true;
         return;
       }
-      const rowsHtml = [];
-      duplicates.forEach(c => {
-        rowsHtml.push(ui`<li>#${escapeHtml(c.customerId)} · ${escapeHtml(c.callDate)} ${escapeHtml(c.callStart)} — Duplicado exacto de una llamada ya guardada</li>`);
-      });
-      overlaps.forEach(o => {
-        rowsHtml.push(ui`<li>#${escapeHtml(o.customerId)} · ${escapeHtml(o.callDate)} ${escapeHtml(o.callStart)} — Traslapa con la llamada #${escapeHtml(o.withCustomerId)} (${escapeHtml(o.withCallStart)}) ya guardada</li>`);
-      });
-      futureRows.forEach(c => {
-        rowsHtml.push(ui`<li>#${escapeHtml(c.customerId)} · ${escapeHtml(c.callDate)} ${escapeHtml(c.callStart)} — Termina en el futuro: no se importó</li>`);
-      });
-      replacedLive.forEach(item => {
-        rowsHtml.push(ui`<li>#${escapeHtml(item.call.customerId)} · ${escapeHtml(item.call.callDate)} ${escapeHtml(item.call.callStart)} — Reemplazó la llamada en vivo provisional por los datos oficiales</li>`);
-      });
-      correctedOfficial.forEach(item => {
-        rowsHtml.push(ui`<li>#${escapeHtml(item.call.customerId)} · ${escapeHtml(item.call.callDate)} ${escapeHtml(item.call.callStart)} — Actualizó una llamada oficial que Propio corrigió</li>`);
-      });
-      const omitted = duplicates.length + overlaps.length + futureRows.length;
-      const updates = replacedLive.length + correctedOfficial.length;
-      const headline = omitted
-        ? ui`${omitted} fila(s) omitida(s) · ${updates} llamada(s) actualizada(s)`
-        : ui`${updates} llamada(s) actualizada(s) con datos oficiales`;
-      el.innerHTML = ui`<strong>${headline}:</strong><ul style="margin:6px 0 0; padding-left:18px;">${rowsHtml.join('')}</ul>`;
-      el.style.display = '';
+      importOutcomeArgs = args;
+      const owner = settings, sequence = ++importOutcomeSequence;
+      const view = await loadDetailViews({ retry: true });
+      if (owner !== settings || sequence !== importOutcomeSequence) return;
+      const retry = document.getElementById('importResultRetryBtn');
+      if (retry) retry.hidden = !!view;
+      if (view) view.renderImportOutcome({ ui, translateText, escapeHtml }, ...args);
+      else toast(translateText('El registro ya terminó, pero no se pudo cargar su detalle. Podés reintentarlo.'));
     }
 
     function isReplaceableLiveCall(call) {
@@ -4599,15 +4554,19 @@ function renderPayDatesSection() {
     }
 
     function importCalls(rawText) {
+      if (!canPersistLocalChanges()) return false;
       const ta = document.getElementById('callInput');
       const background = typeof rawText === 'string';
       let parsed = parseCalls(background ? rawText : ta.value);
+      const parseDiagnostics = parsed.diagnostics || [];
       if (!parsed.length) {
+        if (!background && parseDiagnostics.length) renderImportSkippedSummary([], [], [], [], [], [], parseDiagnostics);
         if (!background) toast(translateText('No se pudo leer la data'));
         return false;
       }
 
       const importTs = new Date().toISOString();
+      const beforeImport = { calls, state: JSON.parse(JSON.stringify(state)), settings: JSON.parse(JSON.stringify(settings)) };
       const importNow = new Date(importTs).getTime();
       const activeShiftStart = state.shiftStartedAt ? new Date(state.shiftStartedAt) : null;
       const activeShiftEnd = state.shiftEndedAt ? new Date(state.shiftEndedAt) : new Date(importTs);
@@ -4769,6 +4728,7 @@ function renderPayDatesSection() {
           ...(replacingExisting?.propioBridge ? { propioBridge: { ...replacingExisting.propioBridge, payEstimated: false, timingEstimated: false } } : {}),
           importedAt: preserveOfficialIdentity ? (item.replaces.importedAt || importTs) : importTs,
           source: 'import',
+          ...(replacingExisting ? { officialCorrection: { kind: preserveOfficialIdentity ? 'corrected' : 'reconciled', at: importTs } } : {}),
         };
         return { ...item, call };
       });
@@ -4783,8 +4743,6 @@ function renderPayDatesSection() {
         const dayKey = callDateKeyFromValue(item.call.callDate);
         if (dayKey) importedDates.add(dayKey);
 
-        if (!item.replacementKind) onGameCallSaved(item.call, 'import');
-
         if (item.replacementKind === 'live' && state.lastCallEndedAt && item.replaces?.endISO) {
           const tracked = new Date(state.lastCallEndedAt).getTime();
           const provisionalEnd = new Date(item.replaces.endISO).getTime();
@@ -4794,12 +4752,6 @@ function renderPayDatesSection() {
         }
       });
 
-      const todayImportedKey = todayCallDateKey();
-      if (importedDates.has(todayImportedKey) && !state.shiftStartedAt && !state.shiftEndedAt && callsForDay(todayImportedKey).length) {
-        autoStartShiftFromCalls(true);
-      }
-      importedDates.forEach(dayKey => onGameCallsChanged(dayKey));
-
       const importedDateList = [...importedDates].sort((a, b) => callDateToDate(a) - callDateToDate(b));
       const todayKey = todayCallDateKey();
       const preferredDay = importedDateList.includes(todayKey)
@@ -4807,7 +4759,6 @@ function renderPayDatesSection() {
         : importedDateList[importedDateList.length - 1] || defaultActiveDayKey();
       if (importedRows.length && !background) state.activeDayKey = preferredDay;
 
-      if (!background) ta.value = '';
       const unique = importedRows.map(item => item.call);
       const lateCount = unique.filter(c => callImportFlag(c)?.cls === 'imported-late').length;
       const historicCount = unique.filter(c => callImportFlag(c)?.cls === 'imported-historic').length;
@@ -4824,11 +4775,18 @@ function renderPayDatesSection() {
       if (importChangedData) {
         setEvent('import', translateText('Llamadas importadas'), ui`${unique.length} fila(s) · ${importNote}${overlapNote}${duplicateNote}${futureNote}${replacedNote}${correctedNote}`, 'Propio');
         financeRunAutoFillCascade();
-        if (saveAll() === false) return false;
+        if (saveAll() === false) {
+          setAppCalls(beforeImport.calls); setAppState(beforeImport.state); setAppSettings(beforeImport.settings); render(); return false;
+        }
+        const todayImportedKey = todayCallDateKey();
+        if (importedDates.has(todayImportedKey) && !state.shiftStartedAt && !state.shiftEndedAt && callsForDay(todayImportedKey).length) autoStartShiftFromCalls(true);
+        importedRows.filter(item => !item.replacementKind).forEach(item => onGameCallSaved(item.call, 'import'));
+        importedDates.forEach(dayKey => onGameCallsChanged(dayKey));
         if (!background) playCallSavedSound('callPasted');
       }
       if (background) return !overlapSkipped && !futureRows.length;
-      renderImportSkippedSummary(skippedDuplicates, skippedOverlaps, futureRows, replacedLive, correctedOfficial);
+      ta.value = '';
+      renderImportSkippedSummary(skippedDuplicates, skippedOverlaps, futureRows, replacedLive, correctedOfficial, importedRows.filter(item => !item.replacementKind).map(item => item.call), parseDiagnostics);
 
       if (!unique.length && (overlapSkipped || skippedDuplicates.length || futureRows.length)) {
         toast(ui`Ninguna fila nueva — ${overlapSkipped + skippedDuplicates.length + futureRows.length} omitida(s). Revisa el detalle debajo del cuadro de texto.`);
@@ -7179,6 +7137,7 @@ export function render() {
     });
     document.getElementById('addCallManualBtn').addEventListener('click', openManualCallModal);
     document.getElementById('manualCallDurationInput').addEventListener('input', updateManualCallPreview);
+    for (const id of ['manualCallDateInput', 'manualCallStartInput']) document.getElementById(id).addEventListener('input', updateManualCallPreview);
     document.getElementById('manualCallPayInput').addEventListener('input', () => {
       markManualCallPayDirty();
       // Mismo criterio que callEditPayInput: editar el Pago a mano deselecciona el tile de tarifa
@@ -7187,6 +7146,7 @@ export function render() {
         clearManualCallRateTile();
         renderRateTiles('manualCallRateTiles', null);
       }
+      updateManualCallPreview();
     });
     document.getElementById('manualCallRateTiles').addEventListener('click', (e) => {
       const btn = e.target instanceof Element ? e.target.closest('[data-rate-tile]') : null;
@@ -7209,6 +7169,10 @@ export function render() {
       if (row) row.querySelectorAll('.mc-pill-btn').forEach(b => b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'));
     });
     document.getElementById('importBtn').addEventListener('click', importCalls);
+    document.getElementById('importResultRetryBtn').addEventListener('click', () => { if (importOutcomeArgs) renderImportSkippedSummary(...importOutcomeArgs); });
+    document.getElementById('callSearchInput').addEventListener('input', renderTable);
+    document.getElementById('callSourceFilter').addEventListener('change', renderTable);
+    document.getElementById('callTableRetryBtn').addEventListener('click', () => renderTable({ retry: true }));
     document.getElementById('clearCallsBtn').addEventListener('click', clearCallInputBox);
     document.getElementById('exportBtn').addEventListener('click', exportJSON);
     document.getElementById('importJsonBtn').addEventListener('click', () => document.getElementById('importJsonFile').click());

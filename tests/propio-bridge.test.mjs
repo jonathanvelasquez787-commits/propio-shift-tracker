@@ -855,6 +855,7 @@ test('closed tracker queues across restart, prevents cross-account pairing and p
   f.targets([scope]); await f.worker.flush(); assert.equal(f.delivered.length, 2);
   f.targets([]); await f.signal('accepted-by-local'); f.advance(25*60*60*1000); f.targets([scope]); await f.worker.flush();
   const status = await f.worker.message({ kind: 'status' }, sender); assert.equal(status.mode, 'observe'); assert.equal(status.attention, 'expired-event');
+  assert.equal(status.queueSummary.expired,true);assert.equal(status.queued,1);
 });
 test('multiple writable tracker tabs and rejected app acknowledgments hold queue', async () => {
   const f = workerFixture(); await activate(f); f.targets([scope, scope]);

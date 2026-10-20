@@ -7,4 +7,5 @@ details{font-size:12px}summary{cursor:pointer;font-weight:600;min-height:34px;di
 .brand-icon{background:transparent}.brand-icon img{display:block;width:42px;height:42px}
 .prepare{padding-top:12px;margin-top:12px}.toggle-row>span:first-child{min-width:0}
 .automation-intro{margin:4px 0 10px}.help-copy strong{color:var(--text)}
+.queue-detail{padding:10px 12px;margin-top:10px;border:1px solid var(--line);border-radius:10px;background:var(--soft);font-size:12px;line-height:1.5}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}

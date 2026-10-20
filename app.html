@@ -206,6 +206,7 @@
 <button class="action-btn" id="pasteCallsBtn" type="button" data-accent="cyan"><span class="action-ripple"></span><span class="action-icon-wrap"><span class="action-ring"></span><span class="action-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-3"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></svg></span></span><span class="action-label">Pegar Llamadas</span><span class="action-sub">Importar data</span></button>
 <button class="action-btn" id="addCallManualBtn" type="button" data-accent="good"><span class="action-ripple"></span><span class="action-icon-wrap"><span class="action-ring"></span><span class="action-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></span><span class="action-label">Agregar llamada</span><span class="action-sub">Manual</span></button>
 </div>
+<details class="fin-preview" style="margin-top:12px;"><summary>Cómo se registra una llamada en vivo</summary><p class="alert-hint">La tool mide el tiempo entre iniciar y terminar. Guarda minutos con dos decimales; una llamada muy breve puede quedar en 0 min. El pago es estimado con tu tarifa. Las llamadas detectadas por la extensión también son provisionales hasta recibir el historial de Propio.</p></details>
 </section>
 
 <details class="accordion-card" id="earningsAccordion" open>
@@ -392,6 +393,9 @@
     <button class="table-filter-btn" data-table-filter="calls" type="button">Llamadas</button>
     <button class="table-filter-btn" data-table-filter="actions" type="button">Acciones</button>
   </div>
+  <div class="call-review-controls"><div class="goals-field"><label for="callSearchInput">Buscar Customer ID</label><input id="callSearchInput" type="search" placeholder="Customer ID del día activo" autocomplete="off"/></div><div class="goals-field"><label for="callSourceFilter">Estado del registro</label><select id="callSourceFilter"><option value="all">Todos</option><option value="estimated">Estimadas en vivo</option><option value="official">Oficiales importadas</option><option value="corrected">Corregidas</option><option value="manual">Manuales</option><option value="unknown">Origen sin confirmar</option></select></div></div>
+  <p class="note" id="callReviewCounts" aria-live="polite"></p>
+  <p class="note" id="callTableLoadStatus" role="status" hidden>No se pudo cargar la tabla. Tus registros siguen guardados; podés reintentar.</p><button class="mc-btn-secondary" id="callTableRetryBtn" type="button" hidden>Reintentar tabla</button>
   <div class="table-wrap" id="callTableWrap"></div>
   </div>
 </div><!-- /blocksCallsView -->
@@ -1958,6 +1962,7 @@ $0.72"></textarea>
 </div>
 <div class="note">Después de importar, el campo se vacía y las filas se guardan localmente en el navegador.</div>
 <div class="note" id="importSkippedSummary" style="display:none;"></div>
+<button class="mc-btn-secondary" id="importResultRetryBtn" type="button" hidden>Reintentar detalle de importación</button>
 
 </div>
 </div>
@@ -2429,6 +2434,7 @@ $0.72"></textarea>
 </div>
 
 <p class="note" id="manualCallPreviewText" style="margin-top:14px;">Completa los campos para agregar la llamada.</p>
+<p class="alert-hint">Revisá fecha, inicio, final y pago antes de guardar. Las llamadas manuales no son una confirmación del historial de Propio.</p>
 <div class="modal-actions mc-action-row">
 <button class="mc-btn-primary good" id="saveManualCallBtn" type="button">+ Agregar</button>
 <button class="mc-btn-warn-pill" data-close-modal="manualCallModal" type="button">Cancelar</button>

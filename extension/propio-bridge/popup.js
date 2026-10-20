@@ -50,6 +50,12 @@ async function refresh() {
     ? `${state.history.invalid ? `${state.history.invalid} fila(s) pendiente(s) de datos válidos. ` : ''}Última lectura: ${new Date(state.history.at).toLocaleTimeString('es')}.${state.mode !== 'auto' ? ' Activá el registro para sincronizarlas.' : ''}`
     : 'Abrí el historial de Propio para leer y recuperar sus llamadas.';
   document.getElementById('pendingCount').textContent = String(state.queued);
+  const queueDetail = document.getElementById('pendingQueueDetail'), queueDeadline = document.getElementById('pendingQueueDeadline');
+  queueDetail.hidden = !state.queued;
+  const expires = Date.parse(state.queueSummary?.expiresAt), queueRemaining = Math.max(0, Math.ceil((expires - Date.now()) / 60000));
+  queueDeadline.textContent = !Number.isFinite(expires) ? 'Pendientes sin fecha confirmada; requieren revisión.'
+    : state.queueSummary.expired ? 'Hay señales vencidas; el registro necesita revisión.'
+    : `La señal más antigua vence en ${Math.floor(queueRemaining / 60)} h ${queueRemaining % 60} min.`;
   document.getElementById('pair').textContent = state.paired ? 'Revisar conexión' : 'Reintentar conexión';
   document.getElementById('pair').classList.toggle('primary', !state.paired);
   document.getElementById('open').classList.toggle('primary', state.paired);

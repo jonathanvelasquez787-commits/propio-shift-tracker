@@ -1,4 +1,4 @@
-import { PORTAL_ORIGIN, TRACKER_ORIGIN, TWILIO_EVENT_ORIGINS, accountScopeValid, readPropioSignal, readPropioRequestBody, propioRequestKind, validateBridgeEvent, validateBridgePlan, createPropioReducer } from '../../js/propio-bridge-rules.js';
+import { PORTAL_ORIGIN, TRACKER_ORIGIN, TWILIO_EVENT_ORIGINS, BRIDGE_MAX_AGE, accountScopeValid, readPropioSignal, readPropioRequestBody, propioRequestKind, validateBridgeEvent, validateBridgePlan, createPropioReducer } from '../../js/propio-bridge-rules.js';
 import { validatePortalRecord, portalRecordKey } from '../../js/propio-history-records.js';
 import { createAutomationStatus } from '../../js/automation-status.js';
 
@@ -9,6 +9,12 @@ const fresh = () => ({ mode: 'observe', accountScope: null, tabs: {}, session: n
   preparation: { enabled: false, availabilityPaused: false, plan: null, doneFor: null, lastAttemptAt: 0,
     spacing: { enabled: false, minutes: 2, lastEndedAt: null }, waitReason: null,
     resume: { break: false, lunch: false, mode: 'manual' }, pendingPause: null, resumedPauses: [] } });
+export function pendingQueueSummary(queue, now = Date.now()) {
+  const times = queue.map(item => Date.parse(item?.event?.at)).filter(time => Number.isFinite(time) && time >= 0 && time <= now + 10000);
+  if (!times.length) return null;
+  const oldest = Math.min(...times), expires = oldest + BRIDGE_MAX_AGE;
+  return { oldestAt: new Date(oldest).toISOString(), expiresAt: new Date(expires).toISOString(), expired: now > expires };
+}
 export function createBridgeWorker(api, { now = () => Date.now(), randomId = () => crypto.randomUUID() } = {}) {
   const reduce = createPropioReducer({ randomId }), pending = new Map();
   let serial = Promise.resolve(), flushing = null;
@@ -396,7 +402,7 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
       const portals = Object.values(state.tabs).filter(tab => now() - Date.parse(tab.seenAt) < 15000);
       const authenticated = portals.filter(tab => tab.session === 'authenticated' && tab.blockedDocument !== tab.documentId);
       const call = ['connected', 'incoming', 'idle'].find(kind => authenticated.some(tab => tab.call === kind)) || 'unknown';
-      return { mode: state.mode, paired: !!state.accountScope, active: Object.values(state.tabs).some(tab => tab.active), completed: state.completed, history: state.history || null, preparation: state.preparation, queued: state.queue.length, last: state.last, attention: state.attention, call, portal: authenticated.length ? 'authenticated' : portals.some(tab => tab.session === 'logged-out') ? 'logged-out' : 'unknown', diagnostic: state.diagnostic || { requests: 0, recognized: 0, last: [] } };
+      return { mode: state.mode, paired: !!state.accountScope, active: Object.values(state.tabs).some(tab => tab.active), completed: state.completed, history: state.history || null, preparation: state.preparation, queued: state.queue.length, queueSummary: pendingQueueSummary(state.queue, now()), last: state.last, attention: state.attention, call, portal: authenticated.length ? 'authenticated' : portals.some(tab => tab.session === 'logged-out') ? 'logged-out' : 'unknown', diagnostic: state.diagnostic || { requests: 0, recognized: 0, last: [] } };
     }
     if (packet?.kind === 'pair') {
       const targets = await trackers();
@@ -454,7 +460,14 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
         return { ok: true };
       });
     }
-    if (packet?.kind === 'open-tracker') { await api.tabs.create({ url: `${TRACKER_ORIGIN}/` }); return { ok: true }; }
+    if (packet?.kind === 'open-tracker') {
+      const existing = (await api.tabs.query({ url: `${TRACKER_ORIGIN}/*` }))[0];
+      if (existing && api.tabs.update) {
+        await api.tabs.update(existing.id, { active: true });
+        if (api.windows?.update && existing.windowId != null) await api.windows.update(existing.windowId, { focused: true });
+      } else await api.tabs.create({ url: `${TRACKER_ORIGIN}/` });
+      return { ok: true };
+    }
     if (packet?.kind === 'refresh-tracker') {
       const targets = await trackers();
       return transact(async state => {

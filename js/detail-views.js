@@ -182,4 +182,6 @@ export { openHigherRateReview, higherRateCorrectionPlan } from './higher-rate-re
 export { openCallRecovery, saveEditedCall, deleteRecordedCall, clearRecordedDay } from './call-recovery.js';
 export { confirmActivityChange } from './work-actions.js';
 export { confirmReplacement, importBackupFile, openSnapshotRecovery } from './backup-recovery.js';
+export { renderImportOutcome } from './call-review-view.js';
+export { renderCallTable } from './call-table-view.js';
 export const detailTranslations = null;

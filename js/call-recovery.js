@@ -109,7 +109,10 @@ export function saveEditedCall(context, callId, opened) {
   const next = { ...original, durationMin: duration, pay: Math.max(0, amount).toFixed(2), billable, dropped, endISO: end.toISOString(), countsAsProductive: billable === 'Yes' && dropped === 'No' };
   const overlap = calls.find(call => call.id !== callId && context.callsOverlap(call, next));
   if (overlap) { toast(ui`Esa duración traslapa con la llamada #${overlap.customerId} (${overlap.callStart}). Ajusta la duración.`); return false; }
-  if (!equal(original, next) && !transact(context, 'edit', [{ id: callId, before: original, after: next }])) return false;
+  if (!equal(original, next)) {
+    next.manualCorrectionAt = new Date().toISOString();
+    if (!transact(context, 'edit', [{ id: callId, before: original, after: next }])) return false;
+  }
   context.finishEdit(); context.closeModal('callEditModal');
   toast(translateText('Llamada actualizada')); return true;
 }

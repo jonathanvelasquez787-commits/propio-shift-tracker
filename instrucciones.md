@@ -327,8 +327,8 @@ futura opera bajo esto, sin excepción:
 - **Mejoras integrales aprobadas el 18/10:** ejecutar las recomendaciones de la
   evaluación de 79 funciones por fases; alcance y estado completo en
   [plan de mejoras](docs/plan-mejoras-integrales.md). Inicio y preparación publicados:
-  18 mejoras publicadas; 6 probadas (22, 26–27, 47, 67 y 69), en verificación
-  de publicación web 629. Sigue fase 4: 15–20 y 77. No perder las fases posteriores al
+  24 mejoras publicadas; recuperación/trazabilidad cerrada con web 629.
+  Sigue fase 4: 15–20 y 77. No perder las fases posteriores al
   entregar una parte ni considerar pendiente la instalación ya confirmada.
 - **Segundos oficiales de Propio:** confirmar con evidencia si el último minuto
   incompleto se incluye en duración y pago. El formato de hora visible no lo demuestra.
@@ -428,8 +428,9 @@ futura opera bajo esto, sin excepción:
   cambiar nivel. Una corrección de fecha/horas/nivel requiere «Revisar llamadas»
   → «Corregir promoción», vista previa y confirmación del recálculo. Limpiar
   conserva bonos y no reconstruye ventanas retiradas para llamadas aún ausentes.
-- Una llamada en vivo sigue redondeando a 1 min como mínimo
-  (`buildLiveCallCandidate`); el importador y los modales sí aceptan 0 min.
+- Una llamada en vivo usa inicio/fin precisos y duración redondeada a dos
+  decimales de minuto; una muy breve puede dar 0. El importador y los modales
+  también aceptan 0 min. No deducir de eso las reglas de facturación de Propio.
 - Cambiar el ancla del ciclo de pago mueve el inicio de TODAS las semanas
   (`startOfCycleWeek`), incluidas las claves de "Semana específica" — se
   re-anclan solas por el centro de la semana vieja, pero un movimiento grande
@@ -440,7 +441,7 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
-- App 628; extensión unificada 2.2.10 (versión visible y recarga confirmadas).
+- App 629; extensión unificada 2.2.10 (versión visible y recarga confirmadas).
   Diseño compacto aprobado: resumen cerrado y preparación al pulsarlo.
   El panel de disponibilidad está en la tool;
   el popup de Chrome configura la extensión y esta transmite el estado a la web.
@@ -471,14 +472,28 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
-**v629 — Recuperación de actividades y respaldo previo a reemplazos (en verificación de publicación).**
+**v630 — Revisión de llamadas e importación por fila (candidata).**
+
+- Puntos 15–20 y 77: procedencia, búsqueda Customer ID y estados, comprobación
+  manual e importación con motivo por fila. Tabla/detalles bajo carga diferida
+  y reintento explícito si falla la descarga.
+- Rechazo de guardado conserva el borrador manual; cierre en vivo respalda antes
+  de retirar la actividad y revierte filas/recompensas rechazadas.
+- Código de extensión 2.3.0: cola con vencimiento y explicación plegada; Abrir
+  tracker reutiliza pestaña. Instalación local aún no actualizada ni confirmada.
+- Publicación y validación final pendientes de esta entrega. Alcance en
+  docs/revision-llamadas-e-importaciones.md. No cerrar las fases posteriores.
+
+**v629 — Recuperación de actividades y respaldo previo a reemplazos.**
 
 - Puntos 22, 26–27, 47, 67 y 69 implementados en orden: descarte con efectos
   específicos, continuación que devuelve el tramo cerrado anterior, marcas manuales,
   comparación JSON y copias recuperables de cuenta antes de restaurar/reiniciar.
 - Revisión de cuenta/actividad, doble confirmación, cuota y reversión ante rechazo.
   Copias locales; no sustituyen JSON descargado ni borran historial de Propio.
-- 893 pruebas y recorridos compilados con cuenta ficticia. Detalle diferido con
+- 893 pruebas y 16 recorridos compilados; cuota/reinicio total comprobados.
+  PR #91 y main con CI correcto, producción READY del mismo SHA verificada.
+  Detalle diferido con
   presupuesto de 65 KB; iniciales conservados. Alcance y límites en
   docs/recuperacion-actividades-y-respaldos.md. Extensión 2.2.10 sin cambios.
 
@@ -497,16 +512,3 @@ futura opera bajo esto, sin excepción:
   y cuatro anchos. Descarga fallida y cuota real simuladas en Chrome aislado.
 - Carga diferida: presupuesto del detalle 50 KB, iniciales conservados. Alcance
   y límites en docs/recuperacion-llamadas.md. Sigue 22; extensión sin cambios.
-
-**v627 — Revisar y corregir Higher Rate sin mezclarlo con limpiar.**
-
-- Revisión por ventana con llamadas, gracia, motivos y bonos conservados.
-  Fecha/horas/nivel del aviso se ingresan explícitamente; no hay lector de avisos.
-- Edición normal conserva nivel ganado. Corrección separada con vista previa
-  de llamadas e importes, confirmación y moneda secundaria. Pago base y bonos
-  de otras promociones permanecen; Finanzas/Logros siguen el resultado guardado.
-- Protección contra cambios de cuenta/datos, doble confirmación y rechazo o
-  interrupción al guardar; cancelar no modifica nada y recargar conserva el resultado.
-- Traducciones del detalle diferidas sin ampliar presupuestos iniciales;
-  detalle con presupuesto revisado a 30 KB. Pruebas y límites en
-  docs/higher-rate-revision.md. Sigue recuperación/trazabilidad. Extensión sin cambios.
