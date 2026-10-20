@@ -4881,7 +4881,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
         const dayKey = todayCallDateKey(cursor);
         const dayCalls = [...callsForDay(dayKey)].sort((a, b) => new Date(a.startISO) - new Date(b.startISO));
         const stats = importedCallStats(dayCalls, dayKey);
-        const adherence = dayIsEffectivelyOff(dayKey) ? null : dayAdherence(dayKey);
+        const adherence = dayIsEffectivelyOff(dayKey)||(!dayCalls.length&&!dayShiftBounds(dayKey).start) ? null : dayAdherence(dayKey);
         days.push({ dayKey, dayCalls, stats, adherence, productive: productiveMinutesForDay(dayKey) });
         cursor.setDate(cursor.getDate() + 1);
       }
@@ -4896,113 +4896,20 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
     }
 
-    function exportAccountingCsv() {
-      const range = accountingExportRange();
-      // BUG-024 — Ver comentario junto a accountingExportRange: en modo 'custom' sin ambas fechas llenas, la función devuelve `null` en vez de un fallback silencioso a "hoy"
-      if (!range) {
-        toast(translateText('Elige las fechas Desde y Hasta antes de exportar'));
-        return;
-      }
-      const days = accountingExportDays(range);
-      if (!days.length) {
-        toast(translateText('Elige un rango de fechas válido primero.'));
-        return;
-      }
-      const rows = [];
-      rows.push([translateText('Resumen por día'), range.label].map(csvField).join(','));
-      rows.push(['Fecha', translateText('Llamadas'), 'Productivo (min)', 'Adherencia (%)', translateText('Ganancias ($)')].map(csvField).join(','));
-      let totalCalls = 0, totalProductive = 0, totalEarnings = 0;
-      days.forEach(d => {
-        totalCalls += d.dayCalls.length;
-        totalProductive += d.productive;
-        totalEarnings += d.stats.earnings;
-        rows.push([
-          formatCallDayLabel(d.dayKey),
-          d.dayCalls.length,
-          formatMinutes(d.productive),
-          d.adherence ? d.adherence.scorePct : '',
-          d.stats.earnings.toFixed(2),
-        ].map(csvField).join(','));
-      });
-      rows.push([translateText('Total'), totalCalls, formatMinutes(totalProductive), '', totalEarnings.toFixed(2)].map(csvField).join(','));
-      rows.push('');
-      rows.push([translateText('Detalle de llamadas')].map(csvField).join(','));
-      rows.push(['Fecha', 'Customer ID', translateText('Inicio'), translateText('Duración (min)'), 'Billable', 'Dropped', 'Pago ($)'].map(csvField).join(','));
-      days.forEach(d => {
-        d.dayCalls.forEach(c => {
-          rows.push([d.dayKey, c.customerId, c.callStart, c.durationMin, c.billable, c.dropped, parseMoney(c.pay).toFixed(2)].map(csvField).join(','));
-        });
-      });
-      // BOM al inicio para que Excel abra los acentos (á/é/ó...) sin romperlos.
-      const csvContent = '\uFEFF' + rows.join('\r\n');
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `ganancias_${range.label.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '')}.csv`;
-      a.click();
-      URL.revokeObjectURL(url);
-      toast('CSV exportado');
+    async function prepareAccountingExport(kind) {
+      const range=accountingExportRange();
+      if(!range){toast(translateText('Elige las fechas Desde y Hasta antes de exportar'));return;}
+      const days=structuredClone(accountingExportDays(range));
+      for(const day of days)for(const call of day.dayCalls)call.accountingBonusUsd=Number(higherRateBonusForCall(call)?.amount)||0;
+      if(!days.length){toast(translateText('Elige un rango de fechas válido primero.'));return;}
+      const owner=settings,popup=kind==='pdf'?window.open('','_blank'):null;
+      if(kind==='pdf'&&!popup){toast(translateText('El navegador bloqueó la ventana nueva — habilita ventanas emergentes para exportar a PDF.'));return;}
+      const view=await loadDetailViews({retry:true});
+      if(owner!==settings||!view){popup?.close();if(owner===settings)toast(translateText('No se pudo cargar la exportación. Tus datos se conservan; podés reintentar.'));return;}
+      return view.exportAccountingDocument({ui,translateText,displayLocale,escapeHtml,formatCallDayLabel,formatMinutes,money,fmtDate,parseMoney,higherRateBonusForCall,csvField,toast},kind,range,days,popup);
     }
-
-    // Sin librerías externas (mismo criterio "cero dependencias" que ya usa el resto de la app — SVG inline en vez de fuentes de íconos, Web Audio sintetizado en vez de archivos de sonido):
-    function exportAccountingPdf() {
-      const range = accountingExportRange();
-      // BUG-024 — Ver comentario junto a accountingExportRange() y en
-      // exportAccountingCsv(): mismo aviso explícito en vez de un fallback
-      // silencioso a "hoy" en modo 'custom' sin fechas.
-      if (!range) {
-        toast(translateText('Elige las fechas Desde y Hasta antes de exportar'));
-        return;
-      }
-      const days = accountingExportDays(range);
-      if (!days.length) {
-        toast(translateText('Elige un rango de fechas válido primero.'));
-        return;
-      }
-      let totalCalls = 0, totalProductive = 0, totalEarnings = 0;
-      const summaryRowsHtml = days.map(d => {
-        totalCalls += d.dayCalls.length;
-        totalProductive += d.productive;
-        totalEarnings += d.stats.earnings;
-        return ui`<tr><td>${escapeHtml(formatCallDayLabel(d.dayKey))}</td><td>${d.dayCalls.length}</td><td>${escapeHtml(formatMinutes(d.productive))}</td><td>${d.adherence ? d.adherence.scorePct + '%' : '—'}</td><td>${escapeHtml(money(d.stats.earnings))}</td></tr>`;
-      }).join('');
-      const detailRowsHtml = days.map(d => d.dayCalls.map(c => ui`<tr><td>${escapeHtml(d.dayKey)}</td><td>${escapeHtml(c.customerId)}</td><td>${escapeHtml(c.callStart)}</td><td>${c.durationMin}</td><td>${escapeHtml(c.billable)}</td><td>${escapeHtml(c.dropped)}</td><td>${escapeHtml(money(parseMoney(c.pay)))}</td></tr>`).join('')).join('') || translateMarkup('<tr><td colspan="7" style="text-align:center;color:#777;">Sin llamadas en este período.</td></tr>');
-      const html = ui`<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"/><title>Reporte de ganancias — ${escapeHtml(range.label)}</title>
-<style>
-  body { font-family: Arial, Helvetica, sans-serif; padding: 28px; color: #171717; }
-  h1 { font-size: 18px; margin: 0 0 4px; }
-  .sub { color: #555; font-size: 12px; margin: 0 0 18px; }
-  h2 { font-size: 13.5px; margin: 22px 0 6px; }
-  table { width: 100%; border-collapse: collapse; }
-  th, td { border: 1px solid #ccc; padding: 6px 8px; font-size: 11px; text-align: left; }
-  th { background: #f0f0f0; }
-  tfoot td { font-weight: 800; background: #fafafa; }
-  .print-btn { margin: 8px 0 4px; padding: 9px 16px; border-radius: 8px; border: 1px solid #999; background: #fff; font-weight: 700; cursor: pointer; }
-  @media print { .print-btn { display: none; } }
-</style></head><body>
-<h1>Reporte de ganancias</h1>
-<p class="sub">${escapeHtml(range.label)} · generado el ${escapeHtml(fmtDate(new Date()))}</p>
-<button class="print-btn" type="button">Imprimir / Guardar como PDF</button>
-<h2>Resumen por día</h2>
-<table><thead><tr><th>Fecha</th><th>Llamadas</th><th>Productivo</th><th>Adherencia</th><th>Ganancias</th></tr></thead>
-<tbody>${summaryRowsHtml}</tbody>
-<tfoot><tr><td>Total</td><td>${totalCalls}</td><td>${escapeHtml(formatMinutes(totalProductive))}</td><td></td><td>${escapeHtml(money(totalEarnings))}</td></tr></tfoot>
-</table>
-<h2>Detalle de llamadas</h2>
-<table><thead><tr><th>Fecha</th><th>Customer ID</th><th>Inicio</th><th>Min</th><th>Billable</th><th>Dropped</th><th>Pago</th></tr></thead>
-<tbody>${detailRowsHtml}</tbody></table>
-</body></html>`;
-      const win = window.open('', '_blank');
-      if (!win) {
-        toast(translateText('El navegador bloqueó la ventana nueva — habilita ventanas emergentes para exportar a PDF.'));
-        return;
-      }
-      win.document.write(html);
-      win.document.close();
-      win.document.querySelector('.print-btn').addEventListener('click', () => win.print());
-      toast(translateText('Reporte listo — usa "Imprimir / Guardar como PDF" en la pestaña nueva'));
-    }
+    function exportAccountingCsv() { return prepareAccountingExport('csv'); }
+    function exportAccountingPdf() { return prepareAccountingExport('pdf'); }
 
     function syncAccountingExportPeriodUI() {
       const row = document.getElementById('accountingExportPeriodRow');
@@ -5013,6 +4920,16 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       });
       if (customRow) customRow.style.display = accountingExportPeriod === 'custom' ? '' : 'none';
       if (select) select.value = accountingExportPeriod;
+      renderAccountingExportScope();
+    }
+
+    function renderAccountingExportScope() {
+      const target=document.getElementById('accountingExportScope');if(!target)return;
+      const range=accountingExportRange();
+      for(const id of ['accountingExportCsvBtn','accountingExportPdfBtn'])document.getElementById(id).disabled=!range;
+      if(!range){target.textContent=translateText('Elegí Desde y Hasta para revisar qué vas a exportar.');return;}
+      const days=accountingExportDays(range),count=days.reduce((sum,day)=>sum+day.dayCalls.length,0),earned=days.reduce((sum,day)=>sum+day.stats.earnings,0);
+      target.innerHTML=ui`<div><strong>${escapeHtml(range.label)}</strong><span>Días: ${days.length} · Llamadas: ${count}</span></div><div class="accounting-scope-amount"><strong>${money(earned)}</strong>${financeConvertedInline(earned)}</div>`;
     }
 
     // Los backups nuevos restauran state + calls + settings. Los backups viejos (sin settings)
@@ -6591,6 +6508,7 @@ export function render() {
     export function openModal(id) {
       const modal = document.getElementById(id);
       if (!modal) return;
+      if(id==='goalsModal')renderAccountingExportScope();
       modal.classList.add('open');
       modal.setAttribute('aria-hidden', 'false');
       if (!openModalStack.includes(id)) openModalStack.push(id);
@@ -7223,6 +7141,7 @@ export function render() {
     });
     document.getElementById('accountingExportCsvBtn').addEventListener('click', exportAccountingCsv);
     document.getElementById('accountingExportPdfBtn').addEventListener('click', exportAccountingPdf);
+    for(const id of ['accountingExportFromInput','accountingExportToInput'])document.getElementById(id).addEventListener('change',renderAccountingExportScope);
     syncAccountingExportPeriodUI();
     document.getElementById('callInput').addEventListener('keydown', (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') importCalls();

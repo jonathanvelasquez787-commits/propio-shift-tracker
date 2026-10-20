@@ -560,6 +560,25 @@
 
 
 <div class="app-page" data-page="reports" hidden id="pageReports">
+<div class="rpt-topbar">
+<div style="display:flex; align-items:center; gap:14px;">
+<div class="rpt-header-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><line x1="4" y1="20" x2="4" y2="10"/><line x1="10" y1="20" x2="10" y2="4"/><line x1="16" y1="20" x2="16" y2="14"/><line x1="21" y1="20" x2="3" y2="20"/></svg></div>
+<div>
+<div class="rpt-title">Reportes</div>
+<div class="rpt-sub">Resumen completo de tu rendimiento</div>
+</div>
+</div>
+<div class="rpt-date-pill" id="rptDatePill"></div>
+</div>
+
+<div class="rpt-day-conclusion" id="rptDayConclusion"></div>
+<div class="rpt-section-head">
+<div class="rpt-section-title" id="rptSecGoals"></div>
+</div>
+<div class="rpt-goals-grid" id="rptGoalsGrid"></div>
+
+
+
 <div class="rpt-section-head" style="margin-top:0;">
 <div class="rpt-section-title" id="rptSecCycle"></div>
 <div class="rpt-sel-pill">Ciclo actual</div>
@@ -594,23 +613,6 @@
 </details>
 
 <div class="rpt-dashboard" id="rptDashboard">
-<div class="rpt-topbar">
-<div style="display:flex; align-items:center; gap:14px;">
-<div class="rpt-header-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><line x1="4" y1="20" x2="4" y2="10"/><line x1="10" y1="20" x2="10" y2="4"/><line x1="16" y1="20" x2="16" y2="14"/><line x1="21" y1="20" x2="3" y2="20"/></svg></div>
-<div>
-<div class="rpt-title">Reportes</div>
-<div class="rpt-sub">Resumen completo de tu rendimiento</div>
-</div>
-</div>
-<div class="rpt-date-pill" id="rptDatePill"></div>
-</div>
-
-<div class="rpt-section-head">
-<div class="rpt-section-title" id="rptSecGoals"></div>
-</div>
-<div class="rpt-goals-grid" id="rptGoalsGrid"></div>
-
-
 <div class="rpt-section-head">
 <div class="rpt-section-title" id="rptSecChart"></div>
 <div class="rpt-sel-pill">14 días</div>
@@ -714,6 +716,8 @@
   <div class="accordion-chevron"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></div>
 </summary>
 <div class="accordion-body">
+<div class="cal-status-key" aria-label="Estados del calendario"><span><i class="cal-key-nodata" aria-hidden="true"></i>Sin datos</span><span><i class="cal-key-off" aria-hidden="true"></i>Libre</span><span><i class="cal-key-active" aria-hidden="true"></i>Con actividad</span></div>
+<details class="review-details cal-status-help"><summary>Significado de los estados</summary><div class="review-detail-body"><p class="note">Sin datos: no hay turno ni llamadas registrados. No equivale a una meta incumplida. Libre: así figura en tu horario o en el estado elegido por vos. Con actividad: el color compara los minutos con la meta guardada para esa fecha.</p><p class="note">Higher Rate añade minutos equivalentes al evaluar el color. Los minutos de llamadas y el bono se muestran por separado. La leyenda numérica del mes usa tu meta general actual; una fecha puede conservar otra meta.</p></div></details>
 <div id="calYearView">
 <div class="cal-year-nav-row">
 <div class="cal-year-nav-left">
@@ -1755,11 +1759,12 @@
 <input id="accountingExportToInput" type="date" min="1970-01-01" max="2099-12-31"/>
 </div>
 </div>
+<div class="accounting-export-scope" id="accountingExportScope" role="status" aria-live="polite"></div>
 <div class="goals-backup-row">
 <button id="accountingExportCsvBtn" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"/><polyline points="7 10 12 15 17 10"/><path d="M4 19h16"/></svg> Exportar CSV</button>
 <button id="accountingExportPdfBtn" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><polyline points="14 2 14 8 20 8"/></svg> Exportar PDF</button>
 </div>
-<div class="note" style="margin:0;">Un resumen por día (llamadas, minutos productivos, adherencia, ganancias) más el detalle de cada llamada del período — pensado para declarar ingresos, no reemplaza el respaldo JSON de arriba. El PDF se abre listo para "Imprimir → Guardar como PDF" desde tu navegador.</div>
+<details class="review-details"><summary>Qué incluye el archivo</summary><div class="review-detail-body"><p class="note">Resumen por día y detalle de llamadas del rango, en USD. El detalle separa pago base, Higher Rate y total. Incluye días sin llamadas; no predice ganancias futuras.</p><p class="note">No incluye reservas, pagos de gastos ni dinero recibido. No reemplaza el respaldo JSON. El PDF abre una pestaña lista para Imprimir o Guardar como PDF.</p></div></details>
 </div>
 
 <div class="modal-actions mc-action-row">

@@ -1616,6 +1616,33 @@
           ]
         }
       ]
+    },
+    {
+      "id": "reports-calendar-export-clarity",
+      "area": "Conclusiones, proyección, estados de calendario y alcance de exportaciones",
+      "acceptance": "Sin datos no se califica como incumplimiento; días libres y días trabajados permanecen diferenciados. La proyección explica días naturales. CSV/PDF identifica período, moneda, contenido y pagos base/bonos sin modificar registros.",
+      "sources": [
+        "js/accounting-export.js",
+        "js/reports.js",
+        "js/calendar.js"
+      ],
+      "tests": [
+        {
+          "file": "tests/report-review.test.mjs",
+          "namedCases": [
+            "daily conclusions distinguish missing records and days off from a recorded day below its goal",
+            "cycle projection uses elapsed calendar days including today rather than worked days or hours",
+            "calendar status keeps no-data days distinct from recorded zero-minute work and planned days off",
+            "report cards do not turn missing activity or a day off into missing minutes and money",
+            "accounting export leaves adherence unknown when there are no shift or call records",
+            "CSV scope separates base, bonus and total and keeps spreadsheet formulas inert",
+            "CSV translates every accounting heading when English is selected",
+            "failed lazy export or changed accounts close the placeholder without exporting another account",
+            "export snapshots call amounts and bonuses before the optional document module loads",
+            "PDF displays the selected scope, totals and safe call text without inline event handlers"
+          ]
+        }
+      ]
     }
   ],
   "limits": [
