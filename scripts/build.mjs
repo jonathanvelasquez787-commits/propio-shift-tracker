@@ -1,13 +1,13 @@
 import { rollup } from 'rollup';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { minify } from 'terser';
-import { cp, mkdir, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
+import { cp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { createAppShell } from './production-shell.mjs';
 import { createLocalizedLanding } from './landing-pages.mjs';
 import { createInterpreterGuide } from './interpreter-guide.mjs';
 import { INTERPRETER_GUIDE_PATHS } from '../js/landing-meta.js';
-import { entryBundleOptions } from './bundle-entry.mjs';
+import { entryBundleOptions, reviewedBundleSize } from './bundle-entry.mjs';
 import { localeResourceScript, partitionLocaleResources } from './locale-bundle.mjs';
 
 const root = process.cwd();
@@ -141,7 +141,7 @@ for (const language of ['en', 'es']) {
     `<head>\n<script src="/assets/locales.js?v=${release}"></script>`));
 }
 for (const [file, limit] of Object.entries({ 'boot.js':350000, 'app-main.js':803000, 'locales.js':230000, 'detail-views.js':80000 })) {
-  const size = (await stat(path.join(assets, file))).size;
+  const size = reviewedBundleSize(await readFile(path.join(assets, file), 'utf8'));
   if (size > limit) throw new Error(`Bundle ${file} exceeds its reviewed byte budget: ${size} > ${limit}`);
 }
 console.log('Build listo en public/ sin sourcemaps ni módulos fuente. Presupuestos de tamaño verificados.');

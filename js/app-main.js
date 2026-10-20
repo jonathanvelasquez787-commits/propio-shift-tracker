@@ -4205,12 +4205,11 @@ function renderPayDatesSection() {
         gameBeforeAutoShift,
         ...(options.propioBridge ? { propioBridge: { ...options.propioBridge } } : {}),
       };
-      const saved = saveAll();
-      if (saved === false) { setAppState(before); render(); return false; }
+      if (saveAll() === false) { setAppState(before); render(); return false; }
       interruptedPauseRollback?.finish?.();
       if (needsAutoShift) onGameShiftStarted({ continued: false });
       toast(needsAutoShift ? translateText('Llamada iniciada · turno abierto automáticamente') : translateText('Llamada iniciada'));
-      return saved;
+      return true;
     }
 
     // Termina la llamada en curso y la guarda SOLA (ver autoSaveLiveCall) — desde ya no abre ningún
@@ -5764,8 +5763,7 @@ function renderHeader() {
     }
   }
   const viewingToday = isViewingToday();
-  const dayLabel = document.getElementById('dayActiveLabelBtn');
-  if (dayLabel) dayLabel.textContent = viewingToday ? translateText('Hoy') : translateText('Historial');
+  document.getElementById('dayActiveLabelBtn').textContent = viewingToday ? translateText('Hoy') : translateText('Historial');
   // El título de "Ganancias de hoy"/"Ganancias del ciclo" ya no se sobreescribe aquí cuando la
   // pastilla "Hoy/Ciclo" está en modo 'cycle'.
   const earningsTitle = document.getElementById('earningsSectionTitle');

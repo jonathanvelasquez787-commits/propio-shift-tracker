@@ -1,5 +1,9 @@
 import path from 'node:path';
 
+export function reviewedBundleSize(source) {
+  return Buffer.byteLength(source.replaceAll('?v=local', `?v=${'0'.repeat(40)}`));
+}
+
 // Keep the authenticated app outside the gate bundle. Inlining a dynamic
 // import executes its module body eagerly, before boot hydrates localStorage.
 export function entryBundleOptions(root, name, release) {

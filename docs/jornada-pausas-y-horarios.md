@@ -79,3 +79,6 @@ ni se provocan llamadas para verificar estas funciones.
 
 El detalle crece de 65 a 80 KB de presupuesto revisado por sus nuevas vistas;
 los límites iniciales de la app, boot y traducciones se conservan.
+La comprobación local contabiliza también los 40 caracteres del identificador
+de producción: el primer preview reveló una diferencia de 17 bytes que el build
+local anterior no incluía. La regresión y el build con SHA real cubren ese caso.
