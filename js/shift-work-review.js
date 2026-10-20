@@ -65,6 +65,7 @@ export function schedulePreviewRows(config) {
 
 export function confirmSchedulePlan(context, plan, change) {
   const { ui, translateText, escapeHtml } = context, expected = context.signature();
+  const days = plan.days || plan.keys.map(key => ({ label: plan.labels[key], before: plan.target[key] || plan.defaultDay }));
   let settled = false;
   context.appConfirm(translateText('Revisá los días y las horas antes de aplicar.'), () => {
     if (settled) return false;
@@ -76,9 +77,9 @@ export function confirmSchedulePlan(context, plan, change) {
     + (minute>=1440 ? translateText(' (día siguiente)') : '');
   const description = cfg => cfg.off ? translateText('Día libre') : `${time(Number(cfg.start.slice(0,2))*60+Number(cfg.start.slice(3)))} → ${time(Number(cfg.end.slice(0,2))*60+Number(cfg.end.slice(3))+(cfg.end<=cfg.start?1440:0))}`;
   document.getElementById('confirmModalTitle').textContent = translateText('Revisar horario');
-  document.getElementById('confirmModalDetails').innerHTML = ui`<p class="note">${escapeHtml(plan.scope)}</p>`
-    + `<div class="recovery-card"><strong>${escapeHtml(plan.days.map(day=>day.label).join(' · '))}</strong><p class="note">${escapeHtml(translateText('Horario a aplicar'))}: ${escapeHtml(description(plan.config))}</p>`
-    + `<details><summary>${escapeHtml(translateText('Ver antes y después por día'))}</summary>${plan.days.map(day=>`<div class="import-outcome-row"><strong>${escapeHtml(day.label)}</strong><p class="note">${escapeHtml(translateText('Antes'))}: ${escapeHtml(description(day.before))}<br>${escapeHtml(translateText('Después'))}: ${escapeHtml(description(plan.config))}</p></div>`).join('')}</details></div>`
+  document.getElementById('confirmModalDetails').innerHTML = ui`<p class="note">${escapeHtml(plan.scope || translateText('Plantilla que se repite cada semana'))}</p>`
+    + `<div class="recovery-card"><strong>${escapeHtml(days.map(day=>day.label).join(' · '))}</strong><p class="note">${escapeHtml(translateText('Horario a aplicar'))}: ${escapeHtml(description(plan.config))}</p>`
+    + `<details><summary>${escapeHtml(translateText('Ver antes y después por día'))}</summary>${days.map(day=>`<div class="import-outcome-row"><strong>${escapeHtml(day.label)}</strong><p class="note">${escapeHtml(translateText('Antes'))}: ${escapeHtml(description(day.before))}<br>${escapeHtml(translateText('Después'))}: ${escapeHtml(description(plan.config))}</p></div>`).join('')}</details></div>`
     + `<details><summary>${escapeHtml(translateText('Ver bloques en orden'))}</summary>${schedulePreviewRows(plan.config).map(block=>`<p class="note">${escapeHtml(context.blockLabel(block.type))}: ${escapeHtml(time(block.startMin))} → ${escapeHtml(time(block.endMin))}</p>`).join('')}</details>`
     + ui`<p class="note">${plan.shiftLate ? translateText('Si llegás 30 minutos tarde, el plan y su final se desplazan 30 minutos.') : translateText('Si llegás tarde, el final planeado se conserva.')}</p>`
     + (plan.shiftLate ? `<details><summary>${escapeHtml(translateText('Ejemplo: llegada 30 minutos tarde'))}</summary>${schedulePreviewRows(plan.config).map(block=>`<p class="note">${escapeHtml(context.blockLabel(block.type))}: ${escapeHtml(time(block.startMin+30))} → ${escapeHtml(time(block.endMin+30))}</p>`).join('')}</details>` : '')

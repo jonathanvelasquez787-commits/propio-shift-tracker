@@ -33,13 +33,11 @@ export function configureScheduleContext(context) {
       const expected = signature(), view = await loadDetailViews({ retry: true });
       if (owner !== settings || signature() !== expected) return false;
       if (!view) { toast(translateText('No se pudo cargar el detalle. Cerrá y abrí esta sección para reintentar.')); return false; }
-      const start = scheduleWeekStartDate(scheduleWeekOffset);
-      const scope = scheduleViewMode === 'week' ? formatWeekRangeLabel(start, new Date(start.getFullYear(),start.getMonth(),start.getDate()+6))
-        : translateText('Plantilla que se repite cada semana');
       return view.confirmSchedulePlan({ ui, translateText, escapeHtml, appConfirm, signature, toast, timeLabel,
         valid: () => settings === owner && (draft || canPersistLocalChanges()) && !(scheduleViewMode === 'week' && scheduleWeekIsPast(scheduleWeekOffset)),
         blockLabel: type => BLOCK_TYPE_LABELS[type] || type },
-      { config, scope, days: dayKeys.map(key => ({ label: WEEKDAY_LABELS[key], before: activeScheduleTarget()[key] || defaultDaySchedule(true) })),
+      { config, scope: scheduleViewMode === 'week' ? document.getElementById('scheduleWeekRangeLabel').textContent : '',
+        keys: dayKeys, labels: WEEKDAY_LABELS, target: activeScheduleTarget(), defaultDay: defaultDaySchedule(true),
         shiftLate: document.getElementById('lateArrivalModeInput')?.value === 'shift', draft }, change);
     }
 
