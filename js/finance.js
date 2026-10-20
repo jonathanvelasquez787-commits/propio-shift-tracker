@@ -2,10 +2,12 @@ import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 // app-main.js inyecta los helpers; app-context.js mantiene el estado compartido.
 import { settings, calls } from './app-context.js';
 import { configureFinancePlanning, captureFinanceDetails, financePlanningRowHtml, renderFinancePlanning, financeAmountInputHtml, clearFinanceAmountDraft, financeReservationHtml, prepareFinanceMonthRender, financeCurrentExpenseStatus, financeReservationSign, financeInputUsd, financeInputValue } from './finance-planning.js';
-import { financeBudgetPeriod, financeCanCompareMonthlyBudget } from './finance-plan-model.js';
+import { financeBudgetPeriod, financeCanCompareMonthlyBudget, financeReservationPlan } from './finance-plan-model.js';
+import { loadDetailViews } from './detail-views-loader.js';
 
 let money, convertedAmountText, iconHtml, escapeHtml, toast, appConfirm, openModal, closeModal, render;
 let saveSettingsOnly, makeLocalId, parseMoney, usdCeilFromCurrencyAmount, higherRateBonusForCalls, renderEmojiPicker;
+let financeContext;
 
 function financeMutationSnapshot() {
   const root = settings;
@@ -14,7 +16,8 @@ function financeMutationSnapshot() {
   const custom = settings.customFinanceCategories;
   const customItems = Array.isArray(custom) ? custom.slice() : [];
   const records = categories.flatMap(category => category.items).concat(customItems).map(ref => ({ref, value:{...ref}}));
-  return {root, map, categories, custom, customItems, records, auto:settings.financeAutoFill, hasAuto:Object.hasOwn(settings, 'financeAutoFill')};
+  return {root, map, categories, custom, customItems, records, auto:settings.financeAutoFill, hasAuto:Object.hasOwn(settings, 'financeAutoFill'),
+    distribution:settings.financeLastDistribution,hasDistribution:Object.hasOwn(settings,'financeLastDistribution')};
 }
 
 function saveFinanceMutation(snapshot) {
@@ -35,12 +38,14 @@ function saveFinanceMutation(snapshot) {
   if (Array.isArray(snapshot.custom)) snapshot.custom.splice(0, snapshot.custom.length, ...snapshot.customItems);
   if (snapshot.custom === undefined) delete settings.customFinanceCategories; else settings.customFinanceCategories = snapshot.custom;
   if (snapshot.hasAuto) settings.financeAutoFill = snapshot.auto; else delete settings.financeAutoFill;
+  if (snapshot.hasDistribution) settings.financeLastDistribution = snapshot.distribution; else delete settings.financeLastDistribution;
   render();
   toast(translateText('No se aplicó el ajuste de Finanzas porque no se pudo guardar. Tus valores anteriores se conservaron.'), {persistenceFailure:true});
   return false;
 }
 
 export function configureFinanceContext(context) {
+  financeContext=context;
   ({ money, convertedAmountText, iconHtml, escapeHtml, toast, appConfirm, openModal, closeModal,
     saveSettingsOnly, makeLocalId, parseMoney, usdCeilFromCurrencyAmount, higherRateBonusForCalls,
     renderEmojiPicker, render } = context);
@@ -321,7 +326,9 @@ function financeRowHtml(row, opts) {
   const paymentBadge = status ? ui`<span class="fin-badge tone-${!monthlyBudget ? 'neutral' : status.excess > 0 ? 'warn' : status.paymentStatus === 'paid' ? 'good' : 'neutral'}">${!monthlyBudget && status.paid > 0 ? translateText('Pagos registrados') : monthlyBudget && status.excess > 0 ? translateText('Presupuesto excedido') : monthlyBudget ? paymentLabel : translateText('Sin pagos')}</span>` : '';
   const metrics = financeRowMetric(isMeta ? translateText('Objetivo') : translateText('Presupuesto'), target)
     + financeRowMetric(translateText('Reservado'), assigned, ui`<span class="fin-badge tone-${reserveTone}">${reserveLabel}</span>${!isMeta && row.manualPaid ? ui`<span class="fin-row-sub">Reserva automática omitida</span>` : ''}`)
-    + financeRowMetric(isMeta ? translateText('Pendiente de reservar') : translateText('Pagado en el mes elegido'), isMeta ? remaining : status.paid, paymentBadge);
+    + financeRowMetric(isMeta ? translateText('Pendiente de reservar') : translateText('Pagado en el mes elegido'), isMeta ? remaining : status.paid, paymentBadge)
+    + (!isMeta ? financeRowMetric(translateText('Pendiente de reservar'),remaining) : '')
+    + (!isMeta && monthlyBudget ? financeRowMetric(status.excess>0?translateText('Exceso pagado en el mes'):translateText('Pendiente de pagar del mes'),status.excess||status.remaining) : '');
   return ui`
     <div class="fin-row" data-fin-row="${escapeHtml(row.id)}" style="--cat-rgb:${cat.rgb};">
       ${priorityHtml}
@@ -480,7 +487,7 @@ export function financeApplySignedAmount(catId, rowId, rawAmount, sign) {
     render();
     toast(Math.round(removed * 100) < Math.round(monto * 100)
       ? ui`Solo se restaron ${money(removed)}${convertedAmountText(removed) ? ` (${convertedAmountText(removed)})` : ''} de ${money(monto)}${convertedAmountText(monto) ? ` (${convertedAmountText(monto)})` : ''} — la fila no tenía más asignado. El resto no se tocó.`
-      : translateText('Aplicado'));
+      : ui`Liberaste ${money(removed)}${convertedAmountText(removed) ? ` (${convertedAmountText(removed)})` : ''} de ${row.name} a Disponible.`);
     return;
   }
 
@@ -505,7 +512,7 @@ export function financeApplySignedAmount(catId, rowId, rawAmount, sign) {
   render();
   toast(Math.round(appliedAmount * 100) < Math.round(monto * 100)
     ? ui`Solo se asignaron ${money(appliedAmount)}${convertedAmountText(appliedAmount) ? ` (${convertedAmountText(appliedAmount)})` : ''} de ${money(monto)}${convertedAmountText(monto) ? ` (${convertedAmountText(monto)})` : ''} — el gasto ya llegó a su objetivo. El resto sigue en Disponible.`
-    : translateText('Aplicado'));
+    : ui`Reservaste ${money(appliedAmount)}${convertedAmountText(appliedAmount) ? ` (${convertedAmountText(appliedAmount)})` : ''} para ${row.name}. No es un pago.`);
 }
 
 // Reparte TODO el Disponible actual, solo, en el mismo orden de prioridad que ya usa la cascada de
@@ -539,35 +546,24 @@ function financeTrimAssignmentsToEarnings() {
 
 function financeFillAvailableByPriority() {
   if (!settings.financeAutoFill) return false;
-  let changed = false;
-  let available = financeAvailableBalance();
   const queue = [...financeGastoRowsSorted().filter(r => !financeIsRowPagado(r)), ...financeMetaRowsSorted()];
-  for (const nextRow of queue) {
-    if (available <= 0.004) break;
-    const remaining = Math.max(0, (Number(nextRow.targetAmount) || 0) - (Number(nextRow.assignedAmount) || 0));
-    if (remaining <= 1e-9 || (financeRowIsMeta(nextRow) && remaining <= 0.004)) continue;
-    const applyAmount = Math.min(available, remaining);
-    nextRow.assignedAmount = applyAmount === remaining
-      ? Number(nextRow.targetAmount)
-      : (Number(nextRow.assignedAmount) || 0) + applyAmount;
-    available -= applyAmount;
-    changed = true;
-  }
-  return changed;
+  const plan=financeReservationPlan(queue,financeAvailableBalance(),financeRowIsMeta);
+  plan.forEach(item=>{item.row.assignedAmount=item.nextAssigned;});
+  return plan.length>0;
 }
 
 export function financeReconcileAssignmentsToEarnings({ refill = true } = {}) {
+  const rows=[...financeGastoRowsSorted(),...financeMetaRowsSorted()],before=new Map(rows.map(row=>[row.id,Number(row.assignedAmount)||0]));
   const trimmed = financeTrimAssignmentsToEarnings();
   const filled = refill ? financeFillAvailableByPriority() : false;
+  if(trimmed||filled)settings.financeLastDistribution={at:new Date().toISOString(),items:rows.map(row=>({id:row.id,name:row.name,amount:(Number(row.assignedAmount)||0)-before.get(row.id)})).filter(item=>Math.abs(item.amount)>1e-9)};
   return trimmed || filled;
 }
 
 export function financeRunAutoFillCascade() {
   // Aunque auto-fill esté apagado, nunca permitimos que lo ya asignado exceda las ganancias
   // reales después de editar/borrar/corregir llamadas.
-  const trimmed = financeTrimAssignmentsToEarnings();
-  const filled = financeFillAvailableByPriority();
-  return trimmed || filled;
+  return financeReconcileAssignmentsToEarnings();
 }
 
 // Checkbox "Asignar disponible automáticamente" (ver #financeAutoFillInput en el HTML) — al
@@ -599,6 +595,25 @@ export function financeResetRow(catId, rowId) {
   clearFinanceAmountDraft(rowId);
   render();
   toast(translateText('Reserva liberada. Los pagos registrados se conservan.'));
+}
+
+export async function reviewFinanceAction(kind,catId,rowId,checked=true) {
+  if(kind==='auto'&&!checked)return updateFinanceAutoFillSetting(false);
+  const owner=settings,view=await loadDetailViews({retry:true});
+  if(settings!==owner)return false;
+  if(!view){toast(translateText('No se pudo cargar el detalle. Cerrá y abrí esta sección para reintentar.'));return false;}
+  const context={ui,translateText,escapeHtml,money,convertedInline:financeConvertedInline,appConfirm,toast,openModal,displayLocale,
+    signature:()=>JSON.stringify([settings.financeCategories,settings.financeAutoFill,settings.financePayments,financeTotalEarningsAllTime()]),
+    valid:()=>settings===owner&&financeContext.canPersistLocalChanges()};
+  if(kind==='inspect')return view.openFinanceDistribution(context,{report:settings.financeLastDistribution});
+  if(kind==='reset'){
+    const row=financeFindRow(catId,rowId);if(!row)return false;
+    return view.confirmFinanceAction(context,{kind,name:row.name,reserved:Number(row.assignedAmount)||0,period:financePeriodLabel(row),recurring:!!row.recurring,
+      paymentCount:(Array.isArray(settings.financePayments)?settings.financePayments:[]).filter(payment=>payment.rowId===rowId).length,
+      automatic:!!settings.financeAutoFill&&!row.manualPaid,isMeta:financeRowIsMeta(row)},()=>financeResetRow(catId,rowId));
+  }
+  const queue=[...financeGastoRowsSorted().filter(row=>!financeIsRowPagado(row)),...financeMetaRowsSorted()];
+  return view.confirmFinanceAction(context,{kind:'auto',available:financeAvailableBalance(),plan:financeReservationPlan(queue,financeAvailableBalance(),financeRowIsMeta)},()=>updateFinanceAutoFillSetting(true));
 }
 
 export function financeToggleManualPaid(catId, rowId, checked) {

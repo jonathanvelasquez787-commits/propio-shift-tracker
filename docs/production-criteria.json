@@ -6,52 +6,84 @@
       "id": "shift-and-schedule-review",
       "area": "Turno, pausas y horario",
       "acceptance": "Cierre con alcance explícito y rechazo recuperable, continuidad elegida, métricas del día diferenciadas y copias de horario con vista previa limitada a sus destinos.",
-      "sources": ["js/shift-work-review.js", "js/schedule.js"],
-      "tests": [{"file": "tests/shift-work-review.test.mjs", "namedCases": [
-        "shift confirmation explains active work and changes nothing before acceptance",
-        "shift resume explicitly distinguishes continuation from another session",
-        "schedule preview sorts overnight blocks on the shift day without mutating the draft",
-        "schedule confirmation preserves the draft until accepted and refuses a changed schedule",
-        "overnight editor labels and duration follow the edited inputs immediately"
-      ]}]
+      "sources": [
+        "js/shift-work-review.js",
+        "js/schedule.js"
+      ],
+      "tests": [
+        {
+          "file": "tests/shift-work-review.test.mjs",
+          "namedCases": [
+            "shift confirmation explains active work and changes nothing before acceptance",
+            "shift resume explicitly distinguishes continuation from another session",
+            "schedule preview sorts overnight blocks on the shift day without mutating the draft",
+            "schedule confirmation preserves the draft until accepted and refuses a changed schedule",
+            "overnight editor labels and duration follow the edited inputs immediately"
+          ]
+        }
+      ]
     },
     {
       "id": "call-review-provenance",
       "area": "Revisión y procedencia de llamadas",
       "acceptance": "Procedencia y correcciones explícitas, filtros combinables, diagnóstico de filas y fecha límite de señales pendientes sin descartarlas automáticamente.",
-      "sources": ["js/call-review-model.js", "js/call-review-view.js", "js/call-table-view.js"],
-      "tests": [{"file": "tests/call-review.test.mjs", "namedCases": [
-        "call review distinguishes estimates, official corrections, user corrections and unverified legacy sources",
-        "the real parser explains bad dates, duration, payment, flags and unreadable rows",
-        "pending queue deadlines use the oldest signal and stop at the existing 24-hour limit",
-        "opening the tracker reuses an existing tab rather than adding another writer"
-      ]}]
+      "sources": [
+        "js/call-review-model.js",
+        "js/call-review-view.js",
+        "js/call-table-view.js"
+      ],
+      "tests": [
+        {
+          "file": "tests/call-review.test.mjs",
+          "namedCases": [
+            "call review distinguishes estimates, official corrections, user corrections and unverified legacy sources",
+            "the real parser explains bad dates, duration, payment, flags and unreadable rows",
+            "pending queue deadlines use the oldest signal and stop at the existing 24-hour limit",
+            "opening the tracker reuses an existing tab rather than adding another writer"
+          ]
+        }
+      ]
     },
     {
       "id": "activity-and-backup-recovery",
       "area": "Recuperación de actividades y reemplazos",
       "acceptance": "Descartar explica/restaura la actividad anterior; restaurar JSON o reiniciar exige comparación, copia privada previa y revisión vigente. Fallos y cuota preservan memoria/datos sin éxito ficticio.",
-      "sources": ["js/work-actions.js", "js/backup-recovery.js"],
-      "tests": [{"file": "tests/activity-recovery.test.mjs", "namedCases": [
-        "discarding a continued pause restores its previously closed interval",
-        "rejected activity discard restores memory and does not stop pause alarms",
-        "replacement preserves a complete copy before mutation and applies only once",
-        "replacement refuses to destroy data when its previous copy cannot be saved",
-        "replacement rejects stale data, changed accounts and pending live work"
-      ]}]
+      "sources": [
+        "js/work-actions.js",
+        "js/backup-recovery.js"
+      ],
+      "tests": [
+        {
+          "file": "tests/activity-recovery.test.mjs",
+          "namedCases": [
+            "discarding a continued pause restores its previously closed interval",
+            "rejected activity discard restores memory and does not stop pause alarms",
+            "replacement preserves a complete copy before mutation and applies only once",
+            "replacement refuses to destroy data when its previous copy cannot be saved",
+            "replacement rejects stale data, changed accounts and pending live work"
+          ]
+        }
+      ]
     },
     {
       "id": "call-recovery",
       "area": "Historial y recuperación de llamadas",
       "acceptance": "Ediciones y borrados conservan antes/después en el mismo guardado; recuperación explícita sin reemplazar cambios posteriores, duplicar llamadas ni anunciar éxito ante rechazo.",
-      "sources": ["js/call-recovery.js"],
-      "tests": [{ "file": "tests/call-recovery.test.mjs", "namedCases": [
-        "call recovery restores a deletion after reload with frozen bonus and unrelated later calls intact",
-        "failed deletion retains the actual call and records no recoverable change",
-        "recovery preview cannot replace a changed call, owner, state or later snapshot",
-        "recovering a batch refuses partial restoration when one call returned, overlaps or has a corrected version",
-        "edited call persistence stays in the editor on failure, then records before and after for a safe undo"
-      ] }]
+      "sources": [
+        "js/call-recovery.js"
+      ],
+      "tests": [
+        {
+          "file": "tests/call-recovery.test.mjs",
+          "namedCases": [
+            "call recovery restores a deletion after reload with frozen bonus and unrelated later calls intact",
+            "failed deletion retains the actual call and records no recoverable change",
+            "recovery preview cannot replace a changed call, owner, state or later snapshot",
+            "recovering a batch refuses partial restoration when one call returned, overlaps or has a corrected version",
+            "edited call persistence stays in the editor on failure, then records before and after for a safe undo"
+          ]
+        }
+      ]
     },
     {
       "id": "identity",
@@ -65,7 +97,16 @@
         "js/language-preference.js"
       ],
       "tests": [
-        { "file": "tests/profile-goal-integrity.test.mjs", "namedCases": ["rejected general goal update preserves settings, state and the complete persisted snapshot", "profile save never applies the old form after the active account changes while reading", "late profile reads cannot replace a newer account or a username edited during loading", "username update requires the matching returned row and preserves uniqueness errors", "recovery password update requires its original account and never writes for another session"] },
+        {
+          "file": "tests/profile-goal-integrity.test.mjs",
+          "namedCases": [
+            "rejected general goal update preserves settings, state and the complete persisted snapshot",
+            "profile save never applies the old form after the active account changes while reading",
+            "late profile reads cannot replace a newer account or a username edited during loading",
+            "username update requires the matching returned row and preserves uniqueness errors",
+            "recovery password update requires its original account and never writes for another session"
+          ]
+        },
         {
           "file": "tests/deep-audit-sync-identity.test.mjs",
           "namedCases": [
@@ -327,7 +368,7 @@
         {
           "file": "tests/higher-rate-persistence-order.test.mjs",
           "namedCases": [
-              "a rejected retroactive Higher Rate window cannot persist game receipts before its settings snapshot; retry reconciles once"
+            "a rejected retroactive Higher Rate window cannot persist game receipts before its settings snapshot; retry reconciles once"
           ]
         },
         {
@@ -401,10 +442,10 @@
           "namedCases": [
             "Higher Rate review explains exact grace and exclusive-end boundaries using the real bonus calculation",
             "Higher Rate review separates overlapping-window winners and preserved bonuses from current eligibility",
-              "Higher Rate review handles overnight calls and zero-duration records without manufacturing a 24-hour window",
-              "correction previews release only the selected promotion and recompute the highest remaining bonus without mutating calls",
-              "correction transactions roll back rejected finance and bonus changes, then persist exactly once and survive reload",
-              "interrupted correction storage restores promotion, finance and preserved bonuses before retry"
+            "Higher Rate review handles overnight calls and zero-duration records without manufacturing a 24-hour window",
+            "correction previews release only the selected promotion and recompute the highest remaining bonus without mutating calls",
+            "correction transactions roll back rejected finance and bonus changes, then persist exactly once and survive reload",
+            "interrupted correction storage restores promotion, finance and preserved bonuses before retry"
           ]
         },
         {
@@ -956,17 +997,30 @@
       "id": "connection-work-time",
       "area": "Conexión y tiempo de turno",
       "acceptance": "La conexión anticipada conserva su hora y duración; el trabajo y ACW empiezan al horario o a una llamada real anticipada. Llegadas tardías, inicios manuales y anotaciones conservan su significado.",
-      "sources": ["js/app-main.js",
-        "js/weekly-summary.js", "js/calls.js"],
+      "sources": [
+        "js/app-main.js",
+        "js/weekly-summary.js",
+        "js/calls.js"
+      ],
       "tests": [
-        { "file": "tests/weekly-summary.test.mjs", "namedCases": ["weekly renderer uses current offset and preferences, preserves personal notes and omits future earnings", "pay-date renderer uses the supplied cycle dates and current locale on each render"] },
-        { "file": "tests/connection-work-time.test.mjs", "namedCases": [
-        "early Propio connection preserves raw presence but starts work and first-call ACW at schedule",
-        "connection before work has no ACW or worked minutes and late arrival is never backdated",
-        "a real early call starts work at that call, preserving its pay and subsequent ACW",
-        "manual starts, off days and existing gap annotations keep their explicit meaning",
-        "closing before the scheduled start creates no work session and overnight projection clips daily minutes"
-      ] }]
+        {
+          "file": "tests/weekly-summary.test.mjs",
+          "namedCases": [
+            "weekly renderer uses current offset and preferences, preserves personal notes and omits future earnings",
+            "pay-date renderer uses the supplied cycle dates and current locale on each render"
+          ]
+        },
+        {
+          "file": "tests/connection-work-time.test.mjs",
+          "namedCases": [
+            "early Propio connection preserves raw presence but starts work and first-call ACW at schedule",
+            "connection before work has no ACW or worked minutes and late arrival is never backdated",
+            "a real early call starts work at that call, preserving its pay and subsequent ACW",
+            "manual starts, off days and existing gap annotations keep their explicit meaning",
+            "closing before the scheduled start creates no work session and overnight projection clips daily minutes"
+          ]
+        }
+      ]
     },
     {
       "id": "bridge",
@@ -1106,7 +1160,14 @@
             "scheduled pause metadata is bounded to the shift and rejects malformed ranges while stripping unrelated data"
           ]
         },
-        {"file":"tests/automation-status.test.mjs","namedCases":["automation status exports a bounded view without call records or account details","tracker status reads are account scoped, top-frame only and cannot invoke preparation","fresh transport cannot disguise an old portal or ACW observation"]}
+        {
+          "file": "tests/automation-status.test.mjs",
+          "namedCases": [
+            "automation status exports a bounded view without call records or account details",
+            "tracker status reads are account scoped, top-frame only and cannot invoke preparation",
+            "fresh transport cannot disguise an old portal or ACW observation"
+          ]
+        }
       ]
     },
     {
@@ -1318,69 +1379,85 @@
           ]
         }
       ]
-    }
-    ,{
+    },
+    {
       "id": "original-portal",
       "area": "Vista original nativa de Propio",
       "acceptance": "Elección optativa por perfil; solo la opción nativa de interfaz cambia al leerla y su valor real se conserva al serializar. La recarga exige Offline reciente, portal único y ausencia de llamadas u ofertas; el resumen unificado se retira sin afectar el registro.",
-      "sources": ["extension/propio-bridge/classic-portal.js", "extension/propio-bridge/original-portal-content.js", "extension/propio-bridge/original-portal-entry.js", "extension/propio-bridge/bridge-worker.js", "extension/propio-bridge/popup.js"],
-      "tests": [{
-        "file": "tests/classic-portal.test.mjs",
-        "namedCases": [
-          "original portal selects the vendor legacy layout while preserving every unrelated feature",
-          "original portal supports the vendor stream put and single-flag patch without editing other stream paths",
-          "original portal ignores unknown schemas and arbitrary portal or call payloads",
-          "original portal preserves native parser errors and reviver semantics",
-          "original portal is scoped to the top-level portal and never hooks login or other sites",
-          "original portal repeated injection does not stack parsers or change native false flags",
-          "original portal choice defaults off, can switch back, and never poisons vendor cache serialization",
-          "original portal build has unchanged permissions, scoped start scripts and no custom summary"
-        ]
-      }, {
-        "file": "tests/original-portal-controller.test.mjs",
-        "namedCases": [
-          "original layout controller restores the saved choice without reloading a matching native view",
-          "original layout controller waits for safe Offline and applies both choices once",
-          "original layout controller can retry a busy portal and does not lose a changed preference to a stale read",
-          "original layout controller allows one recovery for a missing native legacy view and stops on invalidation"
-        ]
-      }, {
-        "file": "tests/propio-bridge.test.mjs",
-        "namedCases": [
-          "original layout reload requires fresh Offline, one portal and no calls or offers; bridge data stays intact",
-          "original layout rejects stale choices, foreign origins and frames without reloading",
-          "original narrow header authenticates only its matching visible name and keeps call detection"
-        ]
-      }]
-    }
-    ,{
+      "sources": [
+        "extension/propio-bridge/classic-portal.js",
+        "extension/propio-bridge/original-portal-content.js",
+        "extension/propio-bridge/original-portal-entry.js",
+        "extension/propio-bridge/bridge-worker.js",
+        "extension/propio-bridge/popup.js"
+      ],
+      "tests": [
+        {
+          "file": "tests/classic-portal.test.mjs",
+          "namedCases": [
+            "original portal selects the vendor legacy layout while preserving every unrelated feature",
+            "original portal supports the vendor stream put and single-flag patch without editing other stream paths",
+            "original portal ignores unknown schemas and arbitrary portal or call payloads",
+            "original portal preserves native parser errors and reviver semantics",
+            "original portal is scoped to the top-level portal and never hooks login or other sites",
+            "original portal repeated injection does not stack parsers or change native false flags",
+            "original portal choice defaults off, can switch back, and never poisons vendor cache serialization",
+            "original portal build has unchanged permissions, scoped start scripts and no custom summary"
+          ]
+        },
+        {
+          "file": "tests/original-portal-controller.test.mjs",
+          "namedCases": [
+            "original layout controller restores the saved choice without reloading a matching native view",
+            "original layout controller waits for safe Offline and applies both choices once",
+            "original layout controller can retry a busy portal and does not lose a changed preference to a stale read",
+            "original layout controller allows one recovery for a missing native legacy view and stops on invalidation"
+          ]
+        },
+        {
+          "file": "tests/propio-bridge.test.mjs",
+          "namedCases": [
+            "original layout reload requires fresh Offline, one portal and no calls or offers; bridge data stays intact",
+            "original layout rejects stale choices, foreign origins and frames without reloading",
+            "original narrow header authenticates only its matching visible name and keeps call detection"
+          ]
+        }
+      ]
+    },
+    {
       "id": "windows-workspace",
       "area": "Espacio de trabajo optativo",
       "acceptance": "La página interna reutiliza páginas conocidas, divide Propio/UseInterpreter y coloca tracker/Linguee en la ventana derecha sin huecos a cualquier hora; las cuentas ambiguas y APIs ausentes no alteran las pestañas.",
-      "sources": ["extension/propio-bridge/workspace.js", "extension/propio-bridge/workspace-page.js", "extension/propio-bridge/workspace-profile.js"],
-      "tests": [{
-        "file": "tests/workspace-startup.test.mjs",
-        "namedCases": [
-          "automatic workspace startup works at any hour with no workday gate",
-          "reboot screenshot: moves existing interpreter into native split, reuses tracker",
-          "duplicate tracker accounts stop before mutations and release lock",
-          "existing split is preserved on repeated launches without duplicate pages",
-          "a reversed existing split is rebuilt with Propio before UseInterpreter",
-          "existing Linguee dictionary moves beside tracker without navigating or duplicating it",
-          "frame compensation meets at visible edges for the requested widths without excess overlap",
-          "personal top-right pane reserves the lower area for notes without changing the left split or tab order",
-          "incorrect tracker/portal split is separated before moving either window",
-          "missing native API fails before changing user tabs"
-        ]
-      }, {
-        "file": "tests/workspace-profile.test.mjs",
-        "namedCases": [
-          "profile startup creates one own workspace page without requiring workday hours",
-          "simultaneous startup and first window events serialize to one preparation",
-          "closing every normal window and reopening prepares the profile again",
-          "Windows launch page is reused and changed to profile mode without another tab",
-          "explicitly disabled choice survives an enabled installation default",
-          "public installation defaults to no automatic workspace and profile state stays isolated",
+      "sources": [
+        "extension/propio-bridge/workspace.js",
+        "extension/propio-bridge/workspace-page.js",
+        "extension/propio-bridge/workspace-profile.js"
+      ],
+      "tests": [
+        {
+          "file": "tests/workspace-startup.test.mjs",
+          "namedCases": [
+            "automatic workspace startup works at any hour with no workday gate",
+            "reboot screenshot: moves existing interpreter into native split, reuses tracker",
+            "duplicate tracker accounts stop before mutations and release lock",
+            "existing split is preserved on repeated launches without duplicate pages",
+            "a reversed existing split is rebuilt with Propio before UseInterpreter",
+            "existing Linguee dictionary moves beside tracker without navigating or duplicating it",
+            "frame compensation meets at visible edges for the requested widths without excess overlap",
+            "personal top-right pane reserves the lower area for notes without changing the left split or tab order",
+            "incorrect tracker/portal split is separated before moving either window",
+            "missing native API fails before changing user tabs"
+          ]
+        },
+        {
+          "file": "tests/workspace-profile.test.mjs",
+          "namedCases": [
+            "profile startup creates one own workspace page without requiring workday hours",
+            "simultaneous startup and first window events serialize to one preparation",
+            "closing every normal window and reopening prepares the profile again",
+            "Windows launch page is reused and changed to profile mode without another tab",
+            "explicitly disabled choice survives an enabled installation default",
+            "public installation defaults to no automatic workspace and profile state stays isolated",
             "authorized personal setup replaces an old initialized default only once",
             "extension update retries a stale prepared session without resetting account preferences",
             "extension update preserves disabled choice and browser updates do not rearrange",
@@ -1389,8 +1466,9 @@
             "workspace launcher uses the personal top-pane height and falls back when preferences cannot load",
             "a failed existing launcher is retried without another helper or portal reload",
             "extension update reloads only an existing helper to execute the new setup"
-        ]
-      }]
+          ]
+        }
+      ]
     },
     {
       "id": "availability-day-cases",
@@ -1439,7 +1517,7 @@
           "file": "tests/connection-work-time.test.mjs",
           "namedCases": [
             "a zero-duration historical row before the shift cannot create ten minutes of work or ACW",
-          "the accounting day of an open overnight shift remains live without a fabricated exit or future missed pause"
+            "the accounting day of an open overnight shift remains live without a fabricated exit or future missed pause"
           ]
         },
         {
@@ -1466,16 +1544,16 @@
           "file": "tests/domain-language-render.test.mjs",
           "namedCases": [
             "night work blocks preserve chronological order, duration and next-day call coverage",
-          "night adherence counts full dated minutes and next-day pauses instead of a zero-length clock range",
-          "elapsed work after an early shift closure is incomplete rather than upcoming in both languages"
+            "night adherence counts full dated minutes and next-day pauses instead of a zero-length clock range",
+            "elapsed work after an early shift closure is incomplete rather than upcoming in both languages"
           ]
         },
         {
           "file": "tests/reinforcement-schedule.test.mjs",
           "namedCases": [
             "arrival after midnight shifts the night slots by elapsed dates rather than subtracting wall-clock hours",
-          "the production schedule editor reads and validates midnight blocks while rejecting overlaps and out-of-shift work",
-          "a call-estimated live shift uses todays alarm plan when the stored explicit shift already ended"
+            "the production schedule editor reads and validates midnight blocks while rejecting overlaps and out-of-shift work",
+            "a call-estimated live shift uses todays alarm plan when the stored explicit shift already ended"
           ]
         }
       ]
@@ -1509,6 +1587,35 @@
         }
       ],
       "area": "Trabajo con pestañas en segundo plano"
+    },
+    {
+      "id": "finance-reservations-receipts",
+      "area": "Reservas, proyecciones y pagos recibidos por ciclo",
+      "acceptance": "Reservar no registra pagos ni modifica llamadas; cada recepción es manual, única por ciclo, conserva el borrador si falla el guardado y compara un total recibido fijo contra las ganancias corregidas. Las confirmaciones rechazan datos obsoletos y repeticiones.",
+      "sources": [
+        "js/finance-review.js",
+        "js/pay-receipt-model.js",
+        "js/pay-receipts.js"
+      ],
+      "tests": [
+        {
+          "file": "tests/finance-review.test.mjs",
+          "namedCases": [
+            "reservation preview conserves money, follows priority and leaves original rows untouched",
+            "finance confirmation cannot apply before acceptance, after changed data, or more than once",
+            "finance settings reject malformed received-payment backups instead of silently discarding them"
+          ]
+        },
+        {
+          "file": "tests/pay-receipts.test.mjs",
+          "namedCases": [
+            "received cycle payments require explicit valid amounts and dates; calendar passage is not evidence",
+            "received money stays fixed while the comparison follows corrected call earnings",
+            "received payment rejection preserves the form and existing balances; retry stores only its manual receipt",
+            "malformed existing receipt storage is preserved instead of replaced by a new record"
+          ]
+        }
+      ]
     }
   ],
   "limits": [

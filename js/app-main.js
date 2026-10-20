@@ -1,4 +1,4 @@
-import { renderWeekSummary as renderWeekSummaryView, renderPayDatesSection as renderPayDatesSectionView } from './weekly-summary.js';
+import { renderWeekSummary as renderWeekSummaryView } from './weekly-summary.js';
 import { ui, translateText, translateMarkup, displayLocale, translateDocument } from './i18n.js';
 import { applyAppearance, wireAppearance } from './appearance.js';
 import { loadDetailViews } from './detail-views-loader.js';
@@ -12,7 +12,7 @@ import { callFeedbackSilenced, withSilentCallFeedback } from './call-feedback.js
 import { settingsWithinBudget, reportLocalPersistenceFailure, readMeta, jsonbBytes, preserveRecoveryCopy, listRecoveryCopies } from './sync.js';
 // Boot importa este módulo solo después de verificar la sesión e hidratar sus datos.
 
-import { FINANCE_CATEGORIES, FINANCE_CUSTOM_CATEGORY_PALETTE, financeRowIsMeta, renderFinanceSection, renderFinancePreview, setFinanceTab, syncFinanceRowTargetFields, financeConvertedInline, financeConvertedNote, financeSwapPriority, financeFindRow, financeApplySignedAmount, financeResetRow, financeToggleManualPaid, financeDeleteRow, openFinanceRowModal, saveFinanceRowModal, selectFinanceCategoryChip, openFinanceNewCatPanel, closeFinanceNewCatPanel, createFinanceCategory, financeDeleteCategory, updateFinanceAutoFillSetting, updateFinanceTotalsScrollHint, financeRunAutoFillCascade, configureFinanceContext } from './finance.js';
+import { FINANCE_CATEGORIES, FINANCE_CUSTOM_CATEGORY_PALETTE, financeRowIsMeta, renderFinanceSection, renderFinancePreview, setFinanceTab, syncFinanceRowTargetFields, financeConvertedInline, financeConvertedNote, financeSwapPriority, financeFindRow, financeApplySignedAmount, reviewFinanceAction, financeToggleManualPaid, financeDeleteRow, openFinanceRowModal, saveFinanceRowModal, selectFinanceCategoryChip, openFinanceNewCatPanel, closeFinanceNewCatPanel, createFinanceCategory, financeDeleteCategory, updateFinanceTotalsScrollHint, financeRunAutoFillCascade, configureFinanceContext } from './finance.js';
 
 import {
   REPORTS_MONTHLY_PAGE_SIZE,
@@ -3754,10 +3754,17 @@ function renderWeekSummary() {
   return renderWeekSummaryView({ settings, weekViewOffset, weekSummaryForOffset, formatWeekRangeLabel, cycleWeekNumberForWeekStart, callDateToDate, weekdayKeyForDayKey, WEEKDAY_LABELS, dayNoteCategoryMeta, escapeHtml, money, financeConvertedNote, formatDuration, iconHtml, convertedAmountText });
 }
 
-// Nueva página "Fechas de pago". CERO cálculo de negocio nuevo.
-function renderPayDatesSection() {
-  return renderPayDatesSectionView({ todayRange, cycleBoundsForOffset, formatCallDayLabel, todayCallDateKey, escapeHtml, iconHtml });
+async function usePayReceipts(action, value) {
+  const owner = settings, view = await loadDetailViews({ retry: action !== 'render' });
+  if (owner !== settings) return;
+  document.getElementById('payDatesLoadStatus').hidden = !!view;
+  document.getElementById('payDatesRetryBtn').hidden = !!view;
+  if (!view) { if (action !== 'render') toast(translateText('No se pudo cargar el detalle. Cerrá y abrí esta sección para reintentar.')); return; }
+  return view.payReceiptAction({ ui, translateText, displayLocale, data: () => ({settings, calls}), todayRange, cycleBoundsForOffset, formatCallDayLabel, todayCallDateKey,
+    isoDateFromDayKey, escapeHtml, iconHtml, money, financeConvertedInline, parseMoney, higherRateBonusForCall, canPersistLocalChanges,
+    makeLocalId, saveSettingsOnly, openModal, closeModal, appConfirm, render, toast }, action, value);
 }
+function renderPayDatesSection() { return usePayReceipts('render'); }
 
 // Página "Finanzas" ---- ver FINANCE_CATEGORIES arriba y el resumen.md para el modelo de datos
 // completo (settings.financeCategories, cascada de "Restante después").
@@ -5139,7 +5146,7 @@ function renderPayDatesSection() {
     configureFinanceContext({
       money, convertedAmountText, iconHtml, escapeHtml, toast, appConfirm, openModal, closeModal,
       saveSettingsOnly, makeLocalId, parseMoney, usdCeilFromCurrencyAmount, higherRateBonusForCalls,
-      renderEmojiPicker, render,
+      renderEmojiPicker, render, canPersistLocalChanges,
       applyGoalValues, todayCallDateKey, saveAll,
     });
     configureReportsContext({
@@ -5679,7 +5686,7 @@ function renderPayDatesSection() {
     }
 
 
-    
+
 
 async function renderEarningsDetails(retry = false) {
   const panels = ['day', 'cycle'].map(scope => ({ scope,
@@ -6521,7 +6528,7 @@ function renderSchedule() {
 
     }
 
-    
+
 function syncCallImportPlaceholder() {
   const input = document.getElementById('callInput');
   if (!input) return;
@@ -6842,7 +6849,8 @@ export function render() {
       const heading = document.getElementById('confirmModalTitle');
       if (heading) heading.textContent = translateText('Confirmar');
       const details = document.getElementById('confirmModalDetails');
-      if (details) details.replaceChildren();
+      if (details) { details.replaceChildren(); details.className = ''; }
+      document.getElementById('confirmModalOkBtn').textContent = translateText('Sí, continuar');
       const msgEl = document.getElementById('confirmModalMessage');
       if (msgEl) msgEl.textContent = message;
       openModal('confirmModal');
@@ -7109,6 +7117,14 @@ export function render() {
     });
     document.getElementById('copyDayToAllBtn').addEventListener('click', copyDayToAll);
     document.getElementById('workDayReviewBtn').addEventListener('click', openWorkDayReview);
+    document.getElementById('payDatesRetryBtn').addEventListener('click', () => usePayReceipts('retry'));
+    document.getElementById('payDatesBody').addEventListener('click', event => {
+      const button = event.target instanceof Element ? event.target.closest('[data-pay-receipt]') : null;
+      if (button) usePayReceipts('open', button.getAttribute('data-pay-receipt'));
+    });
+    document.getElementById('payReceiptSaveBtn').addEventListener('click', () => usePayReceipts('save'));
+    document.getElementById('payReceiptDeleteBtn').addEventListener('click', () => usePayReceipts('delete'));
+    document.getElementById('payReceiptAmount').addEventListener('input', () => usePayReceipts('preview'));
     document.getElementById('copyWeekendBtn').addEventListener('click', copyDayToWeekend);
     document.getElementById('confirmModalOkBtn').addEventListener('click', () => {
       const action = pendingConfirmAction;
@@ -7510,7 +7526,7 @@ export function render() {
       const downBtn = e.target.closest('[data-fin-priority-down]');
       if (downBtn) { financeSwapPriority(downBtn.getAttribute('data-fin-cat'), downBtn.getAttribute('data-fin-priority-down'), 1); return; }
       const resetBtn = e.target.closest('[data-fin-reset]');
-      if (resetBtn) { financeResetRow(resetBtn.getAttribute('data-fin-cat'), resetBtn.getAttribute('data-fin-reset')); return; }
+      if (resetBtn) { reviewFinanceAction('reset',resetBtn.getAttribute('data-fin-cat'), resetBtn.getAttribute('data-fin-reset')); return; }
       const signBtn = e.target.closest('[data-fin-sign-btn]');
       if (signBtn) {
         const row = signBtn.closest('.fin-row');
@@ -7540,7 +7556,8 @@ export function render() {
       if (!checkbox) return;
       financeToggleManualPaid(checkbox.getAttribute('data-fin-cat'), checkbox.getAttribute('data-fin-mark-paid'), checkbox.checked);
     });
-    document.getElementById('financeAutoFillInput').addEventListener('change', (e) => updateFinanceAutoFillSetting(e.target.checked));
+    document.getElementById('financeAutoFillInput').addEventListener('change', e => { const checked=e.target.checked;e.target.checked=!!settings.financeAutoFill;reviewFinanceAction('auto',null,null,checked); });
+    document.getElementById('financeDistributionReviewBtn').addEventListener('click',()=>reviewFinanceAction('inspect'));
     wireFinancePlanning();
     document.getElementById('saveDayNoteBtn').addEventListener('click', saveDayNoteFromModal);
     document.getElementById('clearDayNoteBtn').addEventListener('click', clearDayNoteFromModal);

@@ -30,25 +30,25 @@ export function confirmShiftTransition(context, kind, confirm, startNew) {
 
 export function renderWorkReview(context) {
   const { ui, translateText, escapeHtml, day, stats, goal, minutes, adherence } = context;
-  const row = (label, value) => `<div class="fin-preview-row"><span class="fin-preview-main">${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`;
-  const card = (title, body) => `<section class="recovery-card"><strong>${escapeHtml(title)}</strong>${body}</section>`;
+  const row = (label, value) => `<div class="review-line"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`;
   const source = goal.isOverride ? translateText('Excepción de esta fecha') : goal.isHistorical ? translateText('Meta histórica conservada')
     : context.financeGoal ? translateText('Calculada desde Finanzas') : translateText('Meta general');
-  let html = ui`<p class="note">${escapeHtml(day)} · ${context.today ? translateText('Hoy') : translateText('Consulta histórica: los controles del turno requieren volver a Hoy.')}</p>`;
-  html += card(translateText('ACW'), row(translateText('Espera actual'), context.currentAcw || '—')
-    + row(translateText('Acumulado del día'), context.duration(stats.gapTotal * 60000))
-    + ui`<details><summary>Cómo se cuenta</summary><p class="note">El actual mide este tramo sin llamada ni pausa; el acumulado reúne los huecos clasificados como ACW del día seleccionado. No son el mismo contador.</p></details>`);
-  html += card(translateText('Meta diaria'), row(source, context.formatMinutes(goal.min) + ' min')
-    + `<div class="fin-preview-row"><span>${escapeHtml(translateText('Equivalente de la meta'))}</span><strong>${context.money(goal.usd)}${context.converted(goal.usd)}</strong></div>`
-    + `<details><summary>${escapeHtml(translateText('Meta del ciclo actual'))}</summary><p class="note">${escapeHtml(context.cycleCustom ? translateText('Personalizada para este ciclo') : translateText('Suma de las metas diarias de los días laborables del ciclo'))}: ${context.money(context.cycleGoal)}${context.converted(context.cycleGoal)}</p></details>`);
-  html += card(translateText('Adherencia'), adherence ? row(translateText('Resultado'), `${adherence.scorePct}%`)
-    + (minutes ? row(translateText('Minutos evaluados'), context.formatMinutes(minutes.total))
-      + row(translateText('Dentro del plan o de la gracia'), context.formatMinutes(minutes.adherentMinutes))
-      + row(translateText('Fuera del plan'), context.formatMinutes(minutes.exceptionMinutes)) : ui`<p class="note">Todavía no hay minutos medibles; se usan los puntos de control disponibles.</p>`)
-    + `<details><summary>${escapeHtml(translateText('Ver causas y puntos de control'))}</summary>${Object.entries(adherence.reasons || {}).filter(([,min])=>min>0).map(([key,min])=>row(context.reasonLabels[key] || key,context.formatMinutes(min)+' min')).join('')}${adherence.checkpoints.map(item=>row(context.translateLabel(item.label),item.note)).join('')}</details>`
-    : ui`<p class="note">Sin adherencia calculable para esta fecha.</p>`);
-  html += card(translateText('Pausas: plan y registro'), context.pauseRows.map(pause=>row(pause.label,pause.value)).join('')
-    || ui`<p class="note">No hay pausas planeadas ni registradas para esta fecha.</p>`);
+  const score=adherence&&Number.isFinite(adherence.scorePct)?adherence.scorePct:null;
+  let html = ui`<p class="review-scope">${escapeHtml(day)} · ${context.today ? translateText('Hoy') : translateText('Consulta histórica: los controles del turno requieren volver a Hoy.')}</p>`;
+  html+=ui`<div class="review-overview"><div class="review-metric"><span>ACW actual</span><strong class="review-accent">${escapeHtml(context.currentAcw||'—')}</strong><small>Acumulado del día: ${escapeHtml(context.duration(stats.gapTotal*60000))}</small></div><div class="review-metric"><span>Adherencia</span><strong>${score===null?'—':escapeHtml(String(score))+'%'}</strong>${score===null?'':`<div class="review-progress" aria-hidden="true"><i style="width:${Math.max(0,Math.min(100,score))}%"></i></div>`}${minutes?ui`<small>Dentro del plan o de la gracia: ${escapeHtml(context.formatMinutes(minutes.adherentMinutes))} / ${escapeHtml(context.formatMinutes(minutes.total))} min</small>`:ui`<small>Sin minutos evaluados</small>`}</div></div>`;
+  html+=`<h4 class="review-heading">${escapeHtml(translateText('Meta diaria'))}<span class="review-source">${escapeHtml(source)}</span></h4>`
+    +row(translateText('Tiempo productivo'),context.formatMinutes(goal.min)+' min')
+    +`<div class="review-line"><span>${escapeHtml(translateText('Equivalente de la meta'))}</span><strong>${context.money(goal.usd)}${context.converted(goal.usd)}</strong></div>`
+    +ui`<details class="review-details"><summary>Meta del ciclo y cálculo del ACW</summary><div class="review-detail-body"><div class="review-line"><span>Meta del ciclo actual</span><strong>${context.money(context.cycleGoal)}${context.converted(context.cycleGoal)}</strong></div><p class="note">${escapeHtml(context.cycleCustom?translateText('Personalizada para este ciclo'):translateText('Suma de las metas diarias de los días laborables del ciclo'))}</p><p class="note">El actual mide este tramo sin llamada ni pausa; el acumulado reúne los huecos clasificados como ACW del día seleccionado. No son el mismo contador.</p></div></details>`;
+  html+=`<details class="review-details"><summary>${escapeHtml(translateText('Ver causas y puntos de control'))}${minutes?' · '+escapeHtml(context.formatMinutes(minutes.exceptionMinutes))+' '+escapeHtml(translateText('min fuera del plan')):''}</summary><div class="review-detail-body">`
+    +(adherence?(minutes?row(translateText('Minutos evaluados'),context.formatMinutes(minutes.total))
+      +row(translateText('Dentro del plan o de la gracia'),context.formatMinutes(minutes.adherentMinutes))
+      +row(translateText('Fuera del plan'),context.formatMinutes(minutes.exceptionMinutes)):ui`<p class="note">Todavía no hay minutos medibles; se usan los puntos de control disponibles.</p>`)
+      +Object.entries(adherence.reasons||{}).filter(([,min])=>min>0).map(([key,min])=>row(context.reasonLabels[key]||key,context.formatMinutes(min)+' min')).join('')
+      +(adherence.checkpoints||[]).map(item=>row(context.translateLabel(item.label),item.note)).join(''):ui`<p class="note">Sin adherencia calculable para esta fecha.</p>`)
+    +'</div></details>';
+  html+=`<h4 class="review-heading">${escapeHtml(translateText('Pausas: plan y registro'))}</h4>`
+    +(context.pauseRows.map(pause=>`<div class="review-pause"><strong>${escapeHtml(pause.label)}</strong><span>${escapeHtml(pause.time||pause.value)}</span>${pause.duration?`<small>${escapeHtml(pause.duration)}</small>`:''}</div>`).join('')||ui`<p class="note">No hay pausas planeadas ni registradas para esta fecha.</p>`);
   document.getElementById('workDayReviewContent').innerHTML = html;
   context.openModal('workDayReviewModal');
 }
@@ -89,12 +89,13 @@ export function confirmSchedulePlan(context, plan, change) {
 export function openWorkDayReview(context) {
   const { ui, translateText, escapeHtml, isViewingToday, computeCurrentAcwStart, effectiveDailyGoal, reinforcementScheduleIntervals, fmtTime, sameCallDay, todayCallDateKey, callDateKeyFromValue, formatDuration, pauseDurationExcludingCalls, formatCallDayLabel, importedCallStats, callsForDay, effectiveCycleGoal, getCycleGoalOverride, minuteAdherenceForDay, dayWorkSessions, dayAdherence, EXCEPTION_REASON_LABELS, formatMinutes, money, financeConvertedInline, openModal, dayKey, state, settings } = context;
   const current = isViewingToday() ? computeCurrentAcwStart() : null, goal = effectiveDailyGoal(dayKey);
+  const shortTime=value=>fmtTime(new Date(value)).replace(/(\d{1,2}:\d{2}):\d{2}/,'$1');
   const pauseRows = reinforcementScheduleIntervals(dayKey).filter(p => p.type !== 'Work').map(p => ({ label: ui`Planeado: ${p.type === 'Break' ? 'Break' : 'Lunch'}`,
-    value: `${fmtTime(new Date(p.startedAt))} → ${fmtTime(new Date(p.endedAt))}${sameCallDay(p.startedAt, todayCallDateKey(new Date(p.endedAt))) ? '' : translateText(' (día siguiente)')}` }));
+    time: `${shortTime(p.startedAt)} → ${shortTime(p.endedAt)}${sameCallDay(p.startedAt, todayCallDateKey(new Date(p.endedAt))) ? '' : translateText(' (día siguiente)')}` }));
   const real = [...state.pauseHistory, ...(state.activePause ? [{ ...state.activePause, active: true }] : [])];
   real.filter(p => (callDateKeyFromValue(p.shiftDayKey) || todayCallDateKey(new Date(p.startedAt))) === dayKey).forEach(p => {
     pauseRows.push({ label: p.active ? ui`En curso: ${p.type === 'break' ? 'Break' : 'Lunch'}` : ui`Registrado: ${p.type === 'break' ? 'Break' : 'Lunch'}`,
-      value: `${fmtTime(new Date(p.startedAt))} · ${formatDuration(pauseDurationExcludingCalls(p.startedAt, p.endedAt || new Date().toISOString(), dayKey) * 60000)}` });
+      time:shortTime(p.startedAt),duration:formatDuration(pauseDurationExcludingCalls(p.startedAt, p.endedAt || new Date().toISOString(), dayKey) * 60000) });
   });
   const provenance = settings.goalProvenance;
   renderWorkReview({ ui, translateText, escapeHtml, day: formatCallDayLabel(dayKey), today: isViewingToday(),

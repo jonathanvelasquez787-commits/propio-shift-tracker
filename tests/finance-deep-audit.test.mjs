@@ -48,6 +48,15 @@ function harness(t) {
   return {field,expense,second,goal,messages,context,reject:()=>{rejected=true;},allow:()=>{rejected=false;},save,reload:()=>setAppSettings(JSON.parse(snapshot))};
 }
 
+test('rejected automatic distribution restores reserves and the prior explanation together',t=>{
+ const h=harness(t),report={at:'2026-10-01T00:00:00Z',items:[{id:'old',name:'Previous',amount:2}]};
+ settings.financeLastDistribution=report;const before=JSON.stringify(settings);h.reject();
+ assert.equal(updateFinanceAutoFillSetting(true),false);assert.equal(JSON.stringify(settings),before);assert.equal(settings.financeLastDistribution,report);
+ h.allow();updateFinanceAutoFillSetting(true);assert.equal(settings.financeAutoFill,true);assert.ok(settings.financeLastDistribution.items.length>0);
+ assert.equal(settings.financePayments.length,0);assert.equal(calls[0].pay,200);
+ h.reload();assert.equal(settings.financeLastDistribution.items[0].name,'Comida');
+});
+
 for(const sign of ['plus','minus'])test(`rejected ${sign} reservation restores memory and cannot leak into a later save`,t=>{
   const h=harness(t),before=JSON.stringify(settings);h.reject();
   assert.equal(financeApplySignedAmount('otro','food','5',sign),false);
@@ -340,7 +349,7 @@ test('currency input formatting preserves dollar cents for tiny rates and expand
 test('assigning the displayed available cents conserves fractional bonus income instead of rejecting or inventing money',t=>{
   const h=harness(t);h.expense.assignedAmount=0;h.second.assignedAmount=0;h.goal.assignedAmount=0;setAppCalls([{pay:1.00524}]);
   financeApplySignedAmount('otro','food','1.01','plus');assert.equal(h.expense.assignedAmount,1.00524);
-  assert.ok(h.expense.assignedAmount<=Number(calls[0].pay));assert.equal(h.messages.at(-1),'Aplicado');
+  assert.ok(h.expense.assignedAmount<=Number(calls[0].pay));assert.match(h.messages.at(-1),/Reservaste \$1.01.*Comida.*No es un pago/);
 });
 
 test('new budgets use cents and reject subcent targets while unchanged legacy precision survives an edit',t=>{

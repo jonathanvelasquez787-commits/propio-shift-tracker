@@ -1,4 +1,17 @@
+import {validPayReceipts} from './pay-receipt-model.js';
 export const DEFAULT_FINANCE_SPLIT = [50, 30, 20];
+
+export function financeReservationPlan(queue,available,isMeta) {
+  const plan=[];let remainingAvailable=Math.max(0,available);
+  for(const row of queue){
+    if(remainingAvailable<=0.004)break;
+    const assigned=Number(row.assignedAmount)||0,target=Number(row.targetAmount)||0,remaining=Math.max(0,target-assigned);
+    if(remaining<=1e-9||(isMeta(row)&&remaining<=0.004))continue;
+    const amount=Math.min(remainingAvailable,remaining);
+    plan.push({row,amount,nextAssigned:amount===remaining?target:assigned+amount});remainingAvailable-=amount;
+  }
+  return plan;
+}
 
 export function validFinanceSplit(value) {
   return Array.isArray(value) && value.length === 3
@@ -84,6 +97,7 @@ export function financeCanCompareMonthlyBudget(row) {
 }
 
 export function validFinanceSettings(config) {
+  if ('payReceipts' in config && !validPayReceipts(config.payReceipts)) return false;
   const record = value => value && typeof value === 'object' && !Array.isArray(value);
   const fixed = ['casa','servicios','transporte','comida','deuda','ahorro','otro'];
   const unsafe = id => ['__proto__','constructor','prototype'].includes(id);

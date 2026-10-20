@@ -6,16 +6,26 @@ todo. Empieza». Base: app 621, extensión 2.2.7, evaluación de 79 funciones de
 se publica con pruebas apropiadas. Una función existente marcada para mejorar
 no se considera rota por esa razón.
 
+## Prioridad visual antes de continuar
+
+El 20/10 el propietario reiteró que las últimas interfaces no cumplen su
+preferencia de diseño. La revisión detectó filas del mismo peso, explicaciones
+apiladas y valores partidos en móvil. El propietario aprobó explícitamente
+la propuesta de Jornada, Reservas y Pago recibido en claro y oscuro; se aplica
+con resumen principal y detalles plegados. Maqueta: 18 vistas sin desbordes.
+La aprobación no certifica por sí sola la interfaz compilada: comprobarla antes
+de publicar. Conservar datos y funciones; seguir después el orden de fases.
+
 ## Lista de control completa
 
-**31 de 79 mejoras publicadas.** 11 probadas sin publicar, 2 en curso y 35 pendientes. La preparación del
+**42 de 79 mejoras publicadas.** 7 probadas sin publicar, 2 en curso y 28 pendientes. La preparación del
 turno usa app 624 y extensión 2.2.10, con publicación comprobada y recarga de la
 extensión, Propio y tracker confirmada por el propietario. App 625 refuerza la
 limpieza de Higher Rate; app 626 incorpora, en orden, el desglose de ganancias,
 consulta de conversión y alcance de tarifa. App 627 completa 36 y 37: revisión
 por ventana y corrección con vista previa, conservando bonos al editar o limpiar.
 App 628 completa el punto 21 con historial antes/después y recuperación de
-ediciones, eliminaciones y vaciados de llamadas. App 629 publica 22, 26–27, 47, 67 y 69 y cierra la fase 3, con CI y producción comprobados. App 630 publica 15–20 y 77, con código de extensión 2.3.0 instalado y recarga aún sin confirmar. Sigue fase 5: turno, pausas, ACW y horarios.
+ediciones, eliminaciones y vaciados de llamadas. App 629 publica 22, 26–27, 47, 67 y 69 y cierra la fase 3, con CI y producción comprobados. App 630 publica 15–20 y 77, con código de extensión 2.3.0 instalado y recarga aún sin confirmar. App 631 publica los once puntos de la fase 5, con CI y producción comprobados. Sigue fase 6: Finanzas y pagos recibidos.
 
 Estas 79 mejoras corresponden al sistema completo. El panel de disponibilidad
 y preparación se ve en la **tool web**; el popup de la **extensión de Chrome**
@@ -31,9 +41,9 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 
 - [x] **1. Registro automático de la conexión a Propio — Publicado.** Hora de conexión detectada en la preparación, sin afirmar que es el momento exacto de login. [Evidencia](disponibilidad-en-inicio.md).
 - [x] **2. Diferencia entre estar conectado y empezar a trabajar — Publicado.** Conexión y comienzo laboral separados, incluyendo trabajo anticipado real, inicio manual y cierre antes del horario. [Evidencia](disponibilidad-en-inicio.md).
-- [ ] **3. Inicio y cierre manual de turno — Probado (sin publicar).** Cierre con alcance de llamada/pausa y rechazo que conserva la actividad. [Alcance](jornada-pausas-y-horarios.md).
-- [ ] **4. Continuar después de un cierre accidental — Probado (sin publicar).** Elección explícita entre continuar y otra sesión dentro de la gracia. [Alcance](jornada-pausas-y-horarios.md).
-- [ ] **5. Día activo e historial de acciones — Probado (sin publicar).** Hoy/Historial visibles, consulta del día y protección de controles. [Alcance](jornada-pausas-y-horarios.md).
+- [x] **3. Inicio y cierre manual de turno — Publicado.** Cierre con alcance de llamada/pausa y rechazo que conserva la actividad. [Alcance](jornada-pausas-y-horarios.md).
+- [x] **4. Continuar después de un cierre accidental — Publicado.** Elección explícita entre continuar y otra sesión dentro de la gracia. [Alcance](jornada-pausas-y-horarios.md).
+- [x] **5. Día activo e historial de acciones — Publicado.** Hoy/Historial visibles, consulta del día y protección de controles. [Alcance](jornada-pausas-y-horarios.md).
 - [x] **6. Vinculación con tu cuenta — Publicado.** Resumen de preparación: cuenta, tracker, Propio y automatismos. [Evidencia](disponibilidad-en-inicio.md).
 - [x] **7. Ponerte disponible al comenzar el turno — Publicado.** Mostrar en Inicio la espera hasta el horario de entrada. [Evidencia](disponibilidad-en-inicio.md).
 - [x] **8. Esperar entre llamadas usando el ACW de la tool — Publicado.** Cuenta regresiva del ACW confirmada por la extensión en Inicio. [Evidencia](disponibilidad-en-inicio.md).
@@ -51,29 +61,29 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 - [x] **20. Pegar llamadas de Propio — Publicado.** Resultado por fila, incluidas repeticiones y errores, con motivo plegado y reintento de detalle. [Alcance](revision-llamadas-e-importaciones.md).
 - [x] **21. Editar y borrar llamadas — Publicado.** Historial antes/después, deshacer edición y recuperar borrados individuales/lotes, con vista previa y protección frente a versiones posteriores y fallo al guardar. [Evidencia y límites](recuperacion-llamadas.md).
 - [x] **22. Descartar una llamada accidental — Publicado.** Confirmación específica del turno/pausa que se restaura y guardado con reversión ante fallo. [Alcance y pruebas](recuperacion-actividades-y-respaldos.md).
-- [ ] **23. ACW en vivo y ACW acumulado — Probado (sin publicar).** Espera actual y acumulado del día diferenciados en jornada. [Alcance](jornada-pausas-y-horarios.md).
-- [ ] **24. Meta máxima de ACW — Probado (sin publicar).** Máximo diario distinguido de la espera automática de la extensión. [Alcance](jornada-pausas-y-horarios.md).
-- [ ] **25. Break y Lunch de la tool — Probado (sin publicar).** Consulta de pausas planeadas/registradas/en curso con tiempos reales. [Alcance](jornada-pausas-y-horarios.md).
+- [x] **23. ACW en vivo y ACW acumulado — Publicado.** Espera actual y acumulado del día diferenciados en jornada. [Alcance](jornada-pausas-y-horarios.md).
+- [x] **24. Meta máxima de ACW — Publicado.** Máximo diario distinguido de la espera automática de la extensión. [Alcance](jornada-pausas-y-horarios.md).
+- [x] **25. Break y Lunch de la tool — Publicado.** Consulta de pausas planeadas/registradas/en curso con tiempos reales. [Alcance](jornada-pausas-y-horarios.md).
 - [x] **26. Continuar o descartar una pausa accidental — Publicado.** Continuación identificada; descartarla devuelve el tramo cerrado previo, con protección de guardado. [Alcance y pruebas](recuperacion-actividades-y-respaldos.md).
 - [x] **27. Editar huecos entre llamadas — Publicado.** Clasificación manual visible en tabla/editor; revisión vigente y reversión ante rechazo. [Alcance y pruebas](recuperacion-actividades-y-respaldos.md).
-- [ ] **28. Adherencia al horario — Probado (sin publicar).** Minutos evaluados, adherentes y excepciones con causas plegadas. [Alcance](jornada-pausas-y-horarios.md).
-- [ ] **29. Plantilla semanal — Probado (sin publicar).** Orden desde inicio del turno, día siguiente y duración nocturna reactiva. [Alcance](jornada-pausas-y-horarios.md).
-- [ ] **30. Semana específica y copia de horarios — Probado (sin publicar).** Vista previa antes/después y copia limitada a días de destino. [Alcance](jornada-pausas-y-horarios.md).
-- [ ] **31. Ajustar todo el turno y decidir qué pasa si llegás tarde — Probado (sin publicar).** Desplazamiento del borrador y ejemplo de llegada tarde antes de aplicar. [Alcance](jornada-pausas-y-horarios.md).
-- [ ] **32. Metas diarias, por fecha y del ciclo — Probado (sin publicar).** Procedencia general/fecha/histórica/Finanzas y meta de ciclo actual consultables. [Alcance](jornada-pausas-y-horarios.md).
+- [x] **28. Adherencia al horario — Publicado.** Minutos evaluados, adherentes y excepciones con causas plegadas. [Alcance](jornada-pausas-y-horarios.md).
+- [x] **29. Plantilla semanal — Publicado.** Orden desde inicio del turno, día siguiente y duración nocturna reactiva. [Alcance](jornada-pausas-y-horarios.md).
+- [x] **30. Semana específica y copia de horarios — Publicado.** Vista previa antes/después y copia limitada a días de destino. [Alcance](jornada-pausas-y-horarios.md).
+- [x] **31. Ajustar todo el turno y decidir qué pasa si llegás tarde — Publicado.** Desplazamiento del borrador y ejemplo de llegada tarde antes de aplicar. [Alcance](jornada-pausas-y-horarios.md).
+- [x] **32. Metas diarias, por fecha y del ciclo — Publicado.** Procedencia general/fecha/histórica/Finanzas y meta de ciclo actual consultables. [Alcance](jornada-pausas-y-horarios.md).
 - [x] **33. Ganancias de hoy y del ciclo — Publicado.** Desglose plegado de base registrada, estimada en vivo, Higher Rate calculado y total; actualización tras correcciones oficiales y navegación por día/ciclo. [Evidencia](ganancias-desglose.md).
 - [x] **34. Moneda secundaria e intercambio del monto principal — Publicado.** Conserva intercambio persistente y equivalencia debajo; la tasa manual se consulta en el desglose. [Evidencia](ganancias-desglose.md).
 - [x] **35. Tasa base por minuto — Publicado.** Explica nuevas estimaciones/meta general y conservación de pagos, bonos y metas especiales; guardar mantiene su alcance anterior. [Evidencia](ganancias-desglose.md).
 - [x] **36. Ventanas de Higher Rate — Publicado.** Revisión de llamadas por ventana, gracia y motivos; carga mediante fecha, horas y nivel comprobables del aviso. [Evidencia y alcance](higher-rate-revision.md).
 - [x] **37. Conservar bonos ganados al editar o limpiar ventanas — Publicado.** Edición normal y limpieza conservan bonos; corrección explícita con vista previa antes/después y confirmación, reversión ante fallo y protección de cuenta/revisión. [Evidencia y alcance](higher-rate-revision.md).
-- [ ] **38. Gastos, ahorro y categorías — Pendiente.** Distinguir objetivo, reservado, pagado y pendiente en las filas.
-- [ ] **39. Asignación manual o automática del dinero ganado — Pendiente.** Explicar destino de cada asignación manual/automática.
-- [ ] **40. Registrar pagos de gastos — Pendiente.** Separación visual de reserva y pago real registrado.
-- [ ] **41. Períodos, gastos recurrentes y reinicio — Pendiente.** Vista previa de reinicio, liberaciones, historial y período.
-- [ ] **42. Resumen de Finanzas en Inicio — Pendiente.** Identificar pendientes de Finanzas como acumulados.
+- [ ] **38. Gastos, ahorro y categorías — Probado (sin publicar).** Distinguir objetivo, reservado, pagado y pendiente en las filas. [Alcance y validación](finanzas-reservas-y-recepciones.md).
+- [ ] **39. Asignación manual o automática del dinero ganado — Probado (sin publicar).** Explicar destino de cada asignación manual/automática. [Alcance y validación](finanzas-reservas-y-recepciones.md).
+- [ ] **40. Registrar pagos de gastos — Probado (sin publicar).** Separación visual de reserva y pago real registrado. [Alcance y validación](finanzas-reservas-y-recepciones.md).
+- [ ] **41. Períodos, gastos recurrentes y reinicio — Probado (sin publicar).** Vista previa de reinicio, liberaciones, historial y período. [Alcance y validación](finanzas-reservas-y-recepciones.md).
+- [ ] **42. Resumen de Finanzas en Inicio — Probado (sin publicar).** Identificar pendientes de Finanzas como acumulados. [Alcance y validación](finanzas-reservas-y-recepciones.md).
 - [ ] **43. Reportes de rendimiento — Pendiente.** Conclusiones principales antes del detalle de métricas.
 - [ ] **44. Proyección del ciclo — Pendiente.** Supuestos de proyección y efecto de días/ritmo visibles.
-- [ ] **45. Fechas de pago — Pendiente.** Registrar pago recibido manual y diferencia con lo esperado.
+- [ ] **45. Fechas de pago — Probado (sin publicar).** Registrar pago recibido manual y diferencia con lo esperado. [Alcance y validación](finanzas-reservas-y-recepciones.md).
 - [ ] **46. Calendario de productividad — Pendiente.** Leyenda que distinga sin datos, libre y meta no cumplida.
 - [x] **47. Marcar días y agregar contexto — Publicado.** Estado manual visible en semana/calendario y efecto histórico explicado; edición protegida. [Alcance y pruebas](recuperacion-actividades-y-respaldos.md).
 - [ ] **48. Alarmas de turno y descansos — Pendiente.** Resumen de alarmas activas.
@@ -104,12 +114,19 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 - [x] **73. Guías y apoyo voluntario — Publicado.** Actualizar guía y README retirando descripciones desactualizadas. [Evidencia](guia-practica-tool-y-extension.md) y [README](../extension/propio-bridge/README.md).
 - [ ] **74. Funcionamiento con otra pestaña al frente — En curso.** Lectura atrasada/reconexión visibles y coordinación futura multi-PC.
 - [ ] **75. Volumen general y sonidos propios — Pendiente.** Explicar volumen cero, avisos escritos y espacio de archivos.
-- [ ] **76. Planificador de Finanzas hacia la meta diaria — Pendiente.** Desglosar cálculo y mostrar meta propuesta antes de guardar.
+- [ ] **76. Planificador de Finanzas hacia la meta diaria — Probado (sin publicar).** Desglosar cálculo y mostrar meta propuesta antes de guardar. [Alcance y validación](finanzas-reservas-y-recepciones.md).
 - [x] **77. Filtros de llamadas y acciones — Publicado.** Búsqueda Customer ID y filtros de procedencia del día activo, sin cambiar totales ni registros. [Alcance](revision-llamadas-e-importaciones.md).
 - [ ] **78. Barra de actividad en vivo — Pendiente.** Consistencia entre barra y tarjetas incluidas llamadas pendientes.
 - [ ] **79. Accesibilidad — Pendiente.** Revisión de teclado, zoom, lector, ayudas táctiles y objetivos de controles.
 
 ## Entregas verificadas
+
+- [PR #93](https://github.com/jonathanvelasquez787-commits/propio-shift-tracker/pull/93),
+  commit `c178210a2ac30c4d7b46182f5be38817cebadd14`: 916 pruebas, build con
+  identificador real de producción, 16 recorridos ES/EN/temas/anchos, cuota,
+  editor nocturno y semana específica. CI del PR/main correctos, producción
+  READY del SHA y archivos públicos comprobados. Cierra 3–5, 23–25 y 28–32.
+  Extensión 2.3.0 sin cambios adicionales.
 
 - [PR #92](https://github.com/jonathanvelasquez787-commits/propio-shift-tracker/pull/92),
   commit `7900eaafce954b03317815e3a5e3adb90efd85d3`: 904 pruebas, build,
@@ -171,13 +188,13 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
    llamadas y acciones recuperables; historial antes/después; restauración con
    comparación y copia previa; confirmaciones de alcance. Cubre 21–22, 26–27,
    47, 67 y 69. No restaurar datos ajenos ni sobrescribir cambios posteriores.
-4. **Revisión de llamadas — pendiente.** Estimada/oficial/corregida, resultado
+4. **Revisión de llamadas — publicada.** Estimada/oficial/corregida, resultado
    por fila de importación, cola y vencimientos, búsqueda Customer ID y filtros.
    Cubre 15–20 y 77. Conservar silencio en reconciliación automática.
-5. **Jornada, pausas, ACW, adherencia y horario — pendiente.** Alcances visibles,
+5. **Jornada, pausas, ACW, adherencia y horario — publicada.** Alcances visibles,
    hoy/histórico, continuidad, plan/real, origen de metas y vista previa de
    desplazamiento/copia. Cubre 3–5, 23–25 y 28–32.
-6. **Finanzas y pagos — pendiente.** Explicar reparto y alcance acumulado,
+6. **Finanzas y pagos — probada, sin publicar.** Explicar reparto y alcance acumulado,
    reservado/pagado, recurrencia/reinicio y planificador; pago recibido manual
    y diferencia contra lo esperado. Cubre 38–42, 45 y 76. Sin movimientos bancarios
    ni afirmar depósitos a partir de reservas.
