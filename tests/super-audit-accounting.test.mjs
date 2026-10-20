@@ -227,6 +227,43 @@ test('ending a call persists a recovery draft before clearing its active state a
   assert.equal(x.h.endCall({ endedAt: end }), true);
 });
 
+test('closing a shift during a pause saves both changes together and preserves the pause when storage rejects',t=>{
+  const x=harness(t);x.advance(at(1,'12:10'));
+  let alarms=0,rewards=0;
+  Object.assign(x.h,{fmtTime:String,findPlannedSlotForActivePause:()=>null,currentShiftAccountingDayKey:()=> '09/01/2025',
+    saveStateOnly:()=>assert.fail('No intermediate pause save'),stopBreakEndAlarm:()=>alarms++,onGamePauseEnded:()=>rewards++,onGameShiftEnded:()=>rewards++,ADHERENCE_TOLERANCE_MIN:3});
+  vm.runInContext(['endPause','endShift'].map(name=>declarations.get(name)).join('\n'),x.h);
+  state.shiftStartedAt=at(1,'08:00').toISOString();state.activePause={type:'lunch',startedAt:at(1,'12:00').toISOString()};
+  const before=JSON.stringify(state);x.rejectSave();
+  assert.equal(x.h.endShift(),false);assert.equal(JSON.stringify(state),before);assert.equal(alarms,0);assert.equal(rewards,0);
+  x.rejectSave(false);x.h.endShift();assert.equal(state.activePause,null);assert.equal(state.pauseHistory.length,1);assert.equal(alarms,1);assert.equal(rewards,2);
+  x.reload();assert.equal(state.pauseHistory.length,1);assert.ok(state.shiftEndedAt);
+});
+
+test('starting a call during a pause rolls back rejected activity without stopping its alarm or granting rewards',t=>{
+  const x=harness(t);x.advance(at(1,'12:10'));let rewards=0,alarms=0;
+  Object.assign(x.h,{fmtTime:String,liveCallDayIsOff:()=>false,findPlannedSlotForActivePause:()=>null,currentShiftAccountingDayKey:()=> '09/01/2025',
+    saveStateOnly:()=>assert.fail('No intermediate pause save'),stopBreakEndAlarm:()=>alarms++,onGamePauseEnded:()=>rewards++,onGameShiftStarted:()=>rewards++,ADHERENCE_TOLERANCE_MIN:3});
+  vm.runInContext(['endPause','startCall'].map(name=>declarations.get(name)).join('\n'),x.h);
+  state.shiftStartedAt=at(1,'08:00').toISOString();state.activePause={type:'break',startedAt:at(1,'12:00').toISOString()};
+  const before=JSON.stringify(state);x.rejectSave();assert.equal(x.h.startCall(),false);
+  assert.equal(JSON.stringify(state),before);assert.equal(rewards,0);assert.equal(alarms,0);
+  x.rejectSave(false);assert.equal(x.h.startCall(),true);assert.equal(state.activePause,null);assert.equal(alarms,1);assert.equal(rewards,1);
+  x.reload();assert.ok(state.activeCall);assert.equal(state.pauseHistory.length,1);
+});
+
+test('manual shift reopening does not change its closed session until a continuation choice is accepted',t=>{
+  const x=harness(t);x.advance(at(1,'09:02'));let resume;
+  Object.assign(x.h,{fmtTime:String,ACCIDENTAL_TOGGLE_GRACE_MIN:5,stopShiftAlarm(){},onGameShiftStarted(){},
+    reviewShiftTransition:(_kind,continued,fresh)=>{resume={continued,fresh};}});
+  vm.runInContext(declarations.get('startShift'),x.h);
+  state.shiftStartedAt=at(1,'08:00').toISOString();state.shiftEndedAt=at(1,'09:00').toISOString();state.propioBridgeSession={sessionId:'keep'};
+  const before=JSON.stringify(state);x.h.startShift();assert.equal(JSON.stringify(state),before);
+  x.rejectSave();assert.equal(resume.fresh(),false);assert.equal(JSON.stringify(state),before);
+  x.rejectSave(false);resume.fresh();assert.equal(state.shiftStartedAt,at(1,'09:02').toISOString());assert.equal(state.shiftEndedAt,null);
+  x.reload();assert.equal(state.shiftStartedAt,at(1,'09:02').toISOString());
+});
+
 test('manual and edited numeric payment inputs respect scientific notation without changing the imported-money parser', async t => {
   const x = harness(t); x.advance(at(2,'19:00'));
   x.manual('09/01/2025','08:00',10,'1e-2');

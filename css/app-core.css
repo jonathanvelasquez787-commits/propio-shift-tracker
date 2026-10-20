@@ -8214,6 +8214,14 @@
 
     .help-card.is-hidden-by-search { display: none; }
 
+    #workDayReviewModal .modal-card { max-width: 740px; }
+    #workDayReviewContent { display: grid; gap: 12px; }
+    #workDayReviewContent > .note { margin: 0; grid-column: 1 / -1; }
+    #workDayReviewContent .recovery-card { min-width: 0; margin: 0; }
+    #workDayReviewContent .fin-preview-row { gap: 8px; }
+    #workDayReviewContent .fin-preview-row > strong { min-width: 0; text-align: right; overflow-wrap: anywhere; }
+    @media (min-width: 700px) { #workDayReviewContent { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
     @media (max-width: 900px) {
       .help-toc { display: none; }
       .help-toc-mobile { display: flex; }

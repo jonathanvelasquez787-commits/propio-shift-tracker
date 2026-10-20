@@ -1,4 +1,5 @@
 import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
+import { loadDetailViews } from './detail-views-loader.js';
 // app-main.js injects schedule helpers; app-context.js owns shared state and editor offsets.
 import {
   scheduleEditDay,
@@ -15,13 +16,32 @@ let WEEKDAYS, WEEKDAY_LABELS, WEEKDAY_LABELS_SHORT, appConfirm, defaultDaySchedu
 let ensureWeeklySchedule, formatHHMM, formatMinutes, formatWeekRangeLabel, iconHtml, isScheduleWeekPast;
 let minutesToHHMM, onGameDayMetadataChanged, pad, saveAll, snapshotHistoricalPlanning;
 let startOfCycleWeek, timeLabel, toMinutes, toast, todayCallDateKey, weekStartKeyFromDate;
+let canPersistLocalChanges, escapeHtml;
 
 export function configureScheduleContext(context) {
+  ({ canPersistLocalChanges, escapeHtml } = context);
   ({ WEEKDAYS, WEEKDAY_LABELS, WEEKDAY_LABELS_SHORT, appConfirm, defaultDaySchedule, ensureWeeklySchedule,
     formatHHMM, formatMinutes, formatWeekRangeLabel, iconHtml, isScheduleWeekPast, minutesToHHMM,
     onGameDayMetadataChanged, pad, saveAll, snapshotHistoricalPlanning,
     startOfCycleWeek, timeLabel, toMinutes, toast, todayCallDateKey, weekStartKeyFromDate } = context);
 }
+
+    async function reviewScheduleChange(config, dayKeys, change, draft = false) {
+      const owner = settings;
+      const signature = () => JSON.stringify([readScheduleFormAsConfig(), activeScheduleTarget(), scheduleEditDay, scheduleViewMode, scheduleWeekOffset,
+        scheduleOffsetMin, document.getElementById('lateArrivalModeInput')?.value]);
+      const expected = signature(), view = await loadDetailViews({ retry: true });
+      if (owner !== settings || signature() !== expected) return false;
+      if (!view) { toast(translateText('No se pudo cargar el detalle. Cerrá y abrí esta sección para reintentar.')); return false; }
+      const start = scheduleWeekStartDate(scheduleWeekOffset);
+      const scope = scheduleViewMode === 'week' ? formatWeekRangeLabel(start, new Date(start.getFullYear(),start.getMonth(),start.getDate()+6))
+        : translateText('Plantilla que se repite cada semana');
+      return view.confirmSchedulePlan({ ui, translateText, escapeHtml, appConfirm, signature, toast, timeLabel,
+        valid: () => settings === owner && (draft || canPersistLocalChanges()) && !(scheduleViewMode === 'week' && scheduleWeekIsPast(scheduleWeekOffset)),
+        blockLabel: type => BLOCK_TYPE_LABELS[type] || type },
+      { config, scope, days: dayKeys.map(key => ({ label: WEEKDAY_LABELS[key], before: activeScheduleTarget()[key] || defaultDaySchedule(true) })),
+        shiftLate: document.getElementById('lateArrivalModeInput')?.value === 'shift', draft }, change);
+    }
 
     // "+1:00" / "-0:30" / "+0:00" — mismo formato que ya usa el resto de la app para horas (ver formatDuration), pero con signo explícito y sin segundos, ya que aquí el usuario razona en pasos de 15 min.
     function formatScheduleOffsetLabel(mins) {
@@ -51,13 +71,16 @@ export function configureScheduleContext(context) {
 
       const startInput = document.getElementById('dayStartInput');
       const endInput = document.getElementById('dayEndInput');
-      if (startInput) startInput.value = minutesToHHMM(toMinutes(formatHHMM(startInput.value)) + scheduleOffsetMin);
-      if (endInput) endInput.value = minutesToHHMM(toMinutes(formatHHMM(endInput.value)) + scheduleOffsetMin);
       const shifted = current.map(b => ({ ...b, start: minutesToHHMM(toMinutes(b.start) + scheduleOffsetMin) }));
-      renderBlocksEditor(shifted);
-      toast(ui`Turno ajustado ${formatScheduleOffsetLabel(scheduleOffsetMin)} — recuerda "Guardar día" para confirmar`);
-      setScheduleOffsetMin(0);
-      syncScheduleOffsetUI();
+      const config = { off: document.getElementById('dayOffInput')?.checked || false,
+        start: minutesToHHMM(toMinutes(formatHHMM(startInput.value)) + scheduleOffsetMin),
+        end: minutesToHHMM(toMinutes(formatHHMM(endInput.value)) + scheduleOffsetMin), blocks: shifted };
+      return reviewScheduleChange(config, [scheduleEditDay], () => {
+        startInput.value = config.start; endInput.value = config.end;
+        renderBlocksEditor(shifted);
+        toast(ui`Turno ajustado ${formatScheduleOffsetLabel(scheduleOffsetMin)} — recuerda "Guardar día" para confirmar`);
+        setScheduleOffsetMin(0); syncScheduleOffsetUI();
+      }, true);
     }
 
     function scheduleWeekStartDate(offset = scheduleWeekOffset) {
@@ -182,7 +205,9 @@ export function configureScheduleContext(context) {
     export function renderBlocksEditor(blocks) {
       const list = document.getElementById('blocksEditorList');
       if (!list) return;
-      const arr = Array.isArray(blocks) ? blocks : [];
+      const anchor = toMinutes(document.getElementById('dayStartInput')?.value || '00:00');
+      const order = block => (toMinutes(formatHHMM(block.start)) - anchor + 1440) % 1440;
+      const arr = Array.isArray(blocks) ? [...blocks].sort((a,b) => order(a) - order(b)) : [];
       list.innerHTML = arr.map((b, i) => {
         const type = BLOCK_TYPE_LABELS[String(b?.type || '').toLowerCase()] ? String(b.type).toLowerCase() : 'work';
         // Pedido del usuario: mostrar "Inicio" + "Fin" (hora) en vez de "Inicio" + "Min" (duración)
@@ -195,6 +220,8 @@ export function configureScheduleContext(context) {
         // Ver comentario junto a BLOCK_TIMELINE_META/ formatBlockDurationLabel arriba: `meta`/`durationLabel` son solo para pintar la tarjeta (ícono, subtítulo, píldora de duración)
         const meta = BLOCK_TIMELINE_META[type] || BLOCK_TIMELINE_META.work;
         const durationLabel = formatBlockDurationLabel(durVal);
+        const nextDayLabel = toMinutes(startVal) < anchor ? translateText('Inicio al día siguiente')
+          : toMinutes(startVal) + durVal >= 1440 ? translateText('Fin al día siguiente') : '';
         // Ver comentario junto a `.sched-tl-hour` en el CSS: la hora de inicio se repite aquí como texto suelto a la izquierda de la línea/punto conector
         return ui`
         <div class="block-row sched-tl-item" data-block-row="${i}" data-block-type="${type}">
@@ -209,7 +236,7 @@ export function configureScheduleContext(context) {
                   <option value="break" ${type === 'break' ? 'selected' : ''}>Break</option>
                   <option value="lunch" ${type === 'lunch' ? 'selected' : ''}>Lunch</option>
                 </select>
-                <div class="sched-tl-subtitle">${meta.subtitle}</div>
+                <div class="sched-tl-subtitle">${meta.subtitle}${nextDayLabel ? ` · ${nextDayLabel}` : ''}</div>
               </div>
               <div class="sched-tl-time-inline">
                 <input type="time" class="block-start-input sched-tl-time-input" inputmode="numeric" value="${startVal}"/>
@@ -228,6 +255,20 @@ export function configureScheduleContext(context) {
         </div>
       `;
       }).join('') || translateMarkup('<div class="note" style="margin:0;">Sin bloques configurados. Usa "+ Agregar bloque" para empezar (Trabajo también es un bloque explícito ahora).</div>');
+    }
+
+    export function updateScheduleRowSummary(row) {
+      const start = formatHHMM(row.querySelector('.block-start-input')?.value || '00:00');
+      const end = formatHHMM(row.querySelector('.block-end-input')?.value || '00:00');
+      const duration = (toMinutes(end) - toMinutes(start) + 1440) % 1440;
+      const type = row.querySelector('.block-type-input')?.value || 'work', meta = BLOCK_TIMELINE_META[type] || BLOCK_TIMELINE_META.work;
+      const anchor = toMinutes(document.getElementById('dayStartInput')?.value || '00:00');
+      const note = toMinutes(start) < anchor ? translateText('Inicio al día siguiente') : toMinutes(end) < toMinutes(start) ? translateText('Fin al día siguiente') : '';
+      for (const [selector,value] of [['.sched-tl-hour',start],['.sched-tl-duration',formatBlockDurationLabel(duration)],['.sched-tl-subtitle',meta.subtitle+(note ? ` · ${note}` : '')]]) {
+        const element=row.querySelector(selector);if(element)element.textContent=value;
+      }
+      const icon=row.querySelector('.sched-tl-icon');if(icon)icon.innerHTML=iconHtml(meta.iconName);
+      return duration;
     }
 
     // Conserva el orden del editor y despliega los finales que caen después de medianoche.
@@ -569,6 +610,7 @@ export function configureScheduleContext(context) {
         toast(check.errors[0]);
         return;
       }
+      return reviewScheduleChange(cfg, [scheduleEditDay], () => {
       if (!persistScheduleMutation(() => {
         snapshotHistoricalPlanning();
         const target = activeScheduleTarget({ createIfMissing: true });
@@ -585,6 +627,7 @@ export function configureScheduleContext(context) {
       toast(scheduleViewMode === 'week'
         ? ui`Horario de ${WEEKDAY_LABELS[scheduleEditDay]} guardado para esa semana`
         : ui`Horario de ${WEEKDAY_LABELS[scheduleEditDay]} guardado`);
+      });
     }
 
     // Pedido del usuario: "Copiar a todos los días" pasa a significar SOLO Lunes-Viernes
@@ -603,13 +646,10 @@ export function configureScheduleContext(context) {
         return;
       }
       const scope = scheduleViewMode === 'week' ? translateText('de esa semana') : '';
-      const owner = settings, editDay = scheduleEditDay, view = scheduleViewMode, week = scheduleWeekOffset;
-      appConfirm(ui`¿Copiar este horario (${WEEKDAY_LABELS[scheduleEditDay]}) a Lunes-Viernes ${scope}? Esto sobreescribe Lunes a Viernes — Sábado y Domingo no se tocan.`, () => {
-        if (settings !== owner || scheduleEditDay !== editDay || scheduleViewMode !== view || scheduleWeekOffset !== week) return false;
+      return reviewScheduleChange(cfg, WEEKDAYS.filter(key => key !== 'sat' && key !== 'sun'), () => {
         if (!persistScheduleMutation(() => {
           snapshotHistoricalPlanning();
           const target = activeScheduleTarget({ createIfMissing: true });
-          target[scheduleEditDay] = cfg;
           WEEKDAYS.filter(k => k !== 'sat' && k !== 'sun').forEach(k => {
             target[k] = {
               off: cfg.off,
@@ -640,13 +680,10 @@ export function configureScheduleContext(context) {
         return;
       }
       const scope = scheduleViewMode === 'week' ? translateText('de esa semana') : '';
-      const owner = settings, editDay = scheduleEditDay, view = scheduleViewMode, week = scheduleWeekOffset;
-      appConfirm(ui`¿Copiar este horario (${WEEKDAY_LABELS[scheduleEditDay]}) a Sábado y Domingo ${scope}? Esto sobreescribe Sábado y Domingo — el resto de los días no se tocan.`, () => {
-        if (settings !== owner || scheduleEditDay !== editDay || scheduleViewMode !== view || scheduleWeekOffset !== week) return false;
+      return reviewScheduleChange(cfg, ['sat','sun'], () => {
         if (!persistScheduleMutation(() => {
           snapshotHistoricalPlanning();
           const target = activeScheduleTarget({ createIfMissing: true });
-          target[scheduleEditDay] = cfg;
           target.sat = { off: cfg.off, start: cfg.start, end: cfg.end, blocks: cfg.blocks.map(b => ({ ...b })) };
           target.sun = { off: cfg.off, start: cfg.start, end: cfg.end, blocks: cfg.blocks.map(b => ({ ...b })) };
         })) return false;

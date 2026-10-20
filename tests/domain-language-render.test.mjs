@@ -151,7 +151,7 @@ for (const language of ['es', 'en']) {
       financeIsRowPagado: () => false, prepareFinanceMonthRender() {}, renderFinancePreview() {}, renderFinancePlanning() {}, updateFinanceTotalsScrollHint() {},
       money: value => `$${value}`, financeConvertedInline: () => '', escapeHtml: String,
       todayCallDateKey: key, setEvent() {}, fmtTime: String, saveAll: () => true,
-      onGameShiftEnded() {}, toast: message => messages.push(message),
+      onGameShiftEnded() {}, canPersistLocalChanges: () => true, toast: message => messages.push(message),
     });
     vm.runInContext(declarations('../js/finance.js', ['financeTotalsRowHtml', 'renderFinanceSection'])
       + '\n' + declarations('../js/app-main.js', ['endShift']), h);

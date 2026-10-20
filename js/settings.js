@@ -90,7 +90,7 @@ let syncingGoals = false;
 
     // Scope 'day' guarda la meta SOLO para ese día; 'global' guarda la meta de siempre y borra el
     // override de ese día, para que la nueva general también aplique ahí.
-    export function applyGoalValues(minutes, dollars, scope, dayKey, persistSnapshot = null) {
+    export function applyGoalValues(minutes, dollars, scope, dayKey, persistSnapshot = null, source = 'manual') {
       const ownerSettings = settings, ownerState = state;
       const previousSettings = JSON.parse(JSON.stringify(settings)), previousState = JSON.parse(JSON.stringify(state));
       if (scope === 'day') {
@@ -99,6 +99,7 @@ let syncingGoals = false;
         snapshotHistoricalPlanning();
         settings.productiveGoalMin = Number(minutes);
         settings.earningsGoal = Number(dollars);
+        settings.goalProvenance = { source, min: Number(minutes), usd: Number(dollars) };
         state.productiveGoalMin = settings.productiveGoalMin;
         state.earningsGoal = settings.earningsGoal;
         setDailyGoalOverride(dayKey, null);

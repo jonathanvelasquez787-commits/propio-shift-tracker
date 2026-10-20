@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import {parse} from 'acorn';
+import {confirmSchedulePlan} from '../js/shift-work-review.js';
 
 const declarations=(file,names)=>{
  const source=fs.readFileSync(new URL('../'+file,import.meta.url),'utf8');
@@ -81,7 +82,17 @@ test('reopening profile cancels an older save and restores its button without st
  assert.deepEqual(x.updates,[]);assert.equal(x.elements.accountProfileStatus.textContent,'');
 });
 
-for(const name of ['saveShiftWindow','copyDayToAll','copyDayToWeekend'])test(`${name} preserves the plan and historical snapshots when storage rejects`,()=>{
+function installScheduleReview(h) {
+ h.scheduleOffsetMin=0;h.canPersistLocalChanges=()=>true;h.escapeHtml=String;h.timeLabel=String;
+ h.scheduleWeekStartDate=()=>new Date(2026,9,19);h.scheduleWeekIsPast=()=>false;h.defaultDaySchedule=()=>({off:true});
+ h.loadDetailViews=async()=>({confirmSchedulePlan:(context,plan,change)=>{
+  const prior=globalThis.document;globalThis.document={getElementById:()=>({})};
+  try{return confirmSchedulePlan(context,plan,change);}finally{if(prior===undefined)delete globalThis.document;else globalThis.document=prior;}
+ }});
+ vm.runInContext(declarations('js/schedule.js',['reviewScheduleChange']),h);
+}
+
+for(const name of ['saveShiftWindow','copyDayToAll','copyDayToWeekend'])test(`${name} preserves the plan and historical snapshots when storage rejects`,async()=>{
  const h=vm.createContext({ui,translateText:x=>x,
   settings:{weeklySchedule:{mon:{start:'06:00',end:'14:00',blocks:[]}},shiftStart:'06:00',shiftEnd:'14:00'},state:{history:'before'},
   scheduleViewMode:'template',scheduleWeekOffset:0,scheduleEditDay:'mon',WEEKDAYS:['mon','tue','wed','thu','fri','sat','sun'],WEEKDAY_LABELS:{mon:'Monday'},
@@ -91,18 +102,18 @@ for(const name of ['saveShiftWindow','copyDayToAll','copyDayToWeekend'])test(`${
   appConfirm:(_message,apply)=>apply(),renderDayTabs(){},toast(){},todayCallDateKey:()=> 'today',document:{getElementById:()=>null},
  });
  const before=copy({settings:h.settings,state:h.state});
- vm.runInContext(declarations('js/schedule.js',['persistScheduleMutation',name]),h);h[name]();
+ installScheduleReview(h);vm.runInContext(declarations('js/schedule.js',['persistScheduleMutation',name]),h);await h[name]();
  assert.deepEqual(copy({settings:h.settings,state:h.state}),before);
 });
 
-test('schedule copy confirmation does not apply an old draft after the selected day changes',()=>{
+test('schedule copy confirmation does not apply an old draft after the selected day changes',async()=>{
  for(const name of ['copyDayToAll','copyDayToWeekend']){
   let confirm,mutations=0;
-  const h=vm.createContext({ui,translateText:x=>x,settings:{},scheduleViewMode:'template',scheduleWeekOffset:0,scheduleEditDay:'mon',WEEKDAY_LABELS:{mon:'Monday'},
+  const h=vm.createContext({ui,translateText:x=>x,settings:{weeklySchedule:{}},scheduleViewMode:'template',scheduleWeekOffset:0,scheduleEditDay:'mon',WEEKDAY_LABELS:{mon:'Monday'},WEEKDAYS:['mon','tue','wed','thu','fri','sat','sun'],
    blockRowsWithEqualTimes:()=>[],readScheduleFormAsConfig:()=>({start:'08:00',end:'16:00',blocks:[]}),validateDayConfig:()=>({valid:true}),
-   appConfirm:(_message,callback)=>{confirm=callback;},persistScheduleMutation(){mutations++;},
+   appConfirm:(_message,callback)=>{confirm=callback;},persistScheduleMutation(){mutations++;},activeScheduleTarget:()=>h.settings.weeklySchedule,toast(){},document:{getElementById:()=>null},
   });
-  vm.runInContext(declarations('js/schedule.js',[name]),h);h[name]();h.scheduleEditDay='tue';confirm();assert.equal(mutations,0);
+  installScheduleReview(h);vm.runInContext(declarations('js/schedule.js',[name]),h);await h[name]();h.scheduleEditDay='tue';confirm();assert.equal(mutations,0);
  }
 });
 

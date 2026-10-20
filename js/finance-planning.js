@@ -244,7 +244,7 @@ export function saveFinancePlan() {
   const previousState = JSON.parse(JSON.stringify(state));
   const ownerSettings = settings, ownerState = state;
   settings.financePlanning = { daysPerWeek: Number(el('financePlanDaysInput').value), split: ['financePlanFixedInput', 'financePlanVariableInput', 'financePlanSavingsInput'].map(id => Number(el(id).value)) };
-  if (ctx.applyGoalValues(projection.minutes, projection.dollars, 'global', ctx.todayCallDateKey(), ctx.saveAll) === false) {
+  if (ctx.applyGoalValues(projection.minutes, projection.dollars, 'global', ctx.todayCallDateKey(), ctx.saveAll, 'finance') === false) {
     if (settings === ownerSettings) setAppSettings(previousSettings);
     if (state === ownerState) setAppState(previousState);
     ctx.render();
