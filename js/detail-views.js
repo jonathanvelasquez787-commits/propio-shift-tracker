@@ -185,4 +185,6 @@ export { confirmReplacement, importBackupFile, openSnapshotRecovery } from './ba
 export { renderImportOutcome } from './call-review-view.js';
 export { renderCallTable } from './call-table-view.js';
 export { confirmShiftTransition, openWorkDayReview, confirmSchedulePlan } from './shift-work-review.js';
+export { payReceiptAction } from './pay-receipts.js';
+export { confirmFinanceAction, openFinanceDistribution } from './finance-review.js';
 export const detailTranslations = null;

@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { renderWeekSummary, renderPayDatesSection } from '../js/weekly-summary.js';
-import { setLanguage } from '../js/i18n.js';
+import { renderWeekSummary } from '../js/weekly-summary.js';
+import { payReceiptAction } from '../js/pay-receipts.js';
+import { setLanguage,ui,translateText,displayLocale } from '../js/i18n.js';
 
 const escapeHtml = value => String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
 const money = value => `$${value.toFixed(2)}`;
@@ -45,14 +46,18 @@ test('weekly renderer uses current offset and preferences, preserves personal no
 test('pay-date renderer uses the supplied cycle dates and current locale on each render', t => {
   const elements = documentFixture(t);
   const context={
+    ui,translateText,displayLocale,
     todayRange:(date=new Date(2026,9,18))=>new Date(date.getFullYear(),date.getMonth(),date.getDate()),
     cycleBoundsForOffset:offset=>({start:new Date(2026,9,18+offset*14),end:new Date(2026,9,31+offset*14),payDate:new Date(2026,10,5+offset*14)}),
-    formatCallDayLabel:key=>key,todayCallDateKey:date=>String(date.getDate()),escapeHtml,iconHtml:()=>'',
+    formatCallDayLabel:key=>key,todayCallDateKey:date=>`${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`,
+    isoDateFromDayKey:value=>value,escapeHtml,iconHtml:()=>'',data:()=>({settings:{payReceipts:[]},calls:[]}),money,financeConvertedInline:()=>'',parseMoney:Number,higherRateBonusForCall:()=>({amount:0}),
   };
-  setLanguage('es');renderPayDatesSection(context);
-  assert.match(elements.payDatesBody.innerHTML,/Próximo pago/);
+  setLanguage('es');payReceiptAction(context,'render');
+  assert.match(elements.payDatesBody.innerHTML,/Próxima fecha de pago/);
+  assert.match(elements.payDatesBody.innerHTML,/recepción sin confirmar/);
+  assert.doesNotMatch(elements.payDatesBody.innerHTML,/Ya pagado|>Pagado</);
   assert.match(elements.payDatesBody.innerHTML,/noviembre/);
-  setLanguage('en');renderPayDatesSection(context);
-  assert.match(elements.payDatesBody.innerHTML,/Next payday/);
+  setLanguage('en');payReceiptAction(context,'render');
+  assert.match(elements.payDatesBody.innerHTML,/Next scheduled payday/);
   assert.match(elements.payDatesBody.innerHTML,/November/);
 });

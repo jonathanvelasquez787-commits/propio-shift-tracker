@@ -1,5 +1,6 @@
 import { settings, state, setAppSettings, setAppState } from './app-context.js';
 import { ui, translateText, displayLocale } from './i18n.js';
+import { loadDetailViews } from './detail-views-loader.js';
 import { DEFAULT_FINANCE_SPLIT, validFinanceSplit, financePlanProjection, validFinanceDate,
   financePaymentRows, financeMonthTotalsFromPayments, financeSavingsMonthly, financeExpenseStatusFromPaid, financeCanCompareMonthlyBudget } from './finance-plan-model.js';
 
@@ -258,6 +259,18 @@ export function saveFinancePlan() {
   return true;
 }
 
+export async function reviewFinancePlan() {
+  const owner=settings,projection=projectionFromInputs();if(!projection){updateFinancePlanPreview();return false;}
+  const ids=['financePlanHoursInput','financePlanDaysInput','financePlanFixedInput','financePlanVariableInput','financePlanSavingsInput'];
+  const signature=()=>JSON.stringify([ids.map(id=>el(id).value),settings.productiveGoalMin,settings.earningsGoal,settings.dailyGoalOverrides,settings.rate,ctx.todayCallDateKey()]);
+  const expected=signature(),view=await loadDetailViews({retry:true});
+  if(settings!==owner||signature()!==expected)return false;
+  if(!view){ctx.toast(translateText('No se pudo cargar el detalle. Cerrá y abrí esta sección para reintentar.'));return false;}
+  return view.confirmFinanceAction({ui,translateText,escapeHtml:ctx.escapeHtml,money:ctx.money,convertedInline:ctx.convertedInline,appConfirm:ctx.appConfirm,toast:ctx.toast,signature,
+    valid:()=>settings===owner&&ctx.canPersistLocalChanges()},
+  {kind:'plan',...projection,currentDollars:Number(settings.earningsGoal)||0,rate:Number(settings.rate),days:Number(el('financePlanDaysInput').value),dayOverride:!!settings.dailyGoalOverrides?.[ctx.todayCallDateKey()]},saveFinancePlan);
+}
+
 export function addFinancePayment(catId, rowId, rawUsd, rawLocal, date) {
   const row = ctx.findRow(catId, rowId);
   if (!row || ctx.isMeta(row)) return false;
@@ -345,7 +358,7 @@ export function wireFinancePlanning() {
       amountDrafts.set(key, {...amountDrafts.get(key), sign:button.getAttribute('data-sign')});
       return;
     }
-    if (button.id === 'saveFinancePlanBtn') { saveFinancePlan(); return; }
+    if (button.id === 'saveFinancePlanBtn') { reviewFinancePlan(); return; }
     if (button.hasAttribute('data-fin-payment-delete')) { deleteFinancePayment(button.getAttribute('data-fin-payment-delete')); return; }
     if (button.hasAttribute('data-fin-payment-save')) {
       const body = button.closest('.fin-plan-row-body');

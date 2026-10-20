@@ -110,6 +110,12 @@
       "privacidad.html"
     ]
   },
+  "s_02c73e3a": {
+    "source": "Esperado según tus llamadas",
+    "files": [
+      "js/pay-receipts.js"
+    ]
+  },
   "s_02d4810f": {
     "source": "Pago ($)",
     "files": [
@@ -217,7 +223,8 @@
     "source": "{{v0}}{{v1}}",
     "files": [
       "js/calendar.js",
-      "js/finance.js"
+      "js/finance.js",
+      "js/shift-work-review.js"
     ]
   },
   "s_04ace283": {
@@ -427,10 +434,22 @@
       "js/reinforcement-feedback.js"
     ]
   },
+  "s_07c951a6": {
+    "source": "Meta general actual",
+    "files": [
+      "js/finance-review.js"
+    ]
+  },
   "s_07cc8bab": {
     "source": "◆ Escudo ganado por racha semanal",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_07dc2780": {
+    "source": "Liberaste {{v0}}{{v1}} de {{v2}} a Disponible.",
+    "files": [
+      "js/finance.js"
     ]
   },
   "s_07eb37e7": {
@@ -628,6 +647,12 @@
       "js/shift-work-review.js"
     ]
   },
+  "s_0a794f56": {
+    "source": "Revisá el efecto antes de aplicar.",
+    "files": [
+      "js/finance-review.js"
+    ]
+  },
   "s_0a84bdb1": {
     "source": "El aislamiento entre cuentas lo impone la base de datos, no el navegador.",
     "files": [
@@ -742,6 +767,12 @@
       "js/reinforcement-feedback.js"
     ]
   },
+  "s_0c1e63b6": {
+    "source": "Acumulados de Finanzas, independientemente del día activo.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_0c31b2d5": {
     "source": "Se guardan hasta tu próximo Break, Lunch o fin del turno.",
     "files": [
@@ -854,12 +885,6 @@
       "js/reports.js"
     ]
   },
-  "s_0dcd5bb1": {
-    "source": "Actual — día {{v0}} de 14",
-    "files": [
-      "js/weekly-summary.js"
-    ]
-  },
   "s_0df3e259": {
     "source": "Falta confirmar tu correo. Revisa la bandeja de entrada.",
     "files": [
@@ -954,6 +979,12 @@
     "source": "Esa duración traslapa con la llamada #{{v0}} ({{v1}}). Ajusta la duración.",
     "files": [
       "js/call-recovery.js"
+    ]
+  },
+  "s_0f362289": {
+    "source": "Dentro del plan o de la gracia: {{v0}} / {{v1}} min",
+    "files": [
+      "js/shift-work-review.js"
     ]
   },
   "s_0f3fbe63": {
@@ -1274,6 +1305,12 @@
       "js/finance.js"
     ]
   },
+  "s_14cdd74b": {
+    "source": "El reparto automático puede volver a reservar para esta fila con la próxima llamada.",
+    "files": [
+      "js/finance-review.js"
+    ]
+  },
   "s_1516d7c5": {
     "source": "Reclamar ahora",
     "files": [
@@ -1290,6 +1327,12 @@
     "source": "Rompe la armadura de productividad",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_156dbb87": {
+    "source": "Pendiente de pagar del mes",
+    "files": [
+      "js/finance.js"
     ]
   },
   "s_1572a48c": {
@@ -1558,6 +1601,12 @@
       "js/monsters.js"
     ]
   },
+  "s_18e78ec2": {
+    "source": "Ahorro",
+    "files": [
+      "js/finance-review.js"
+    ]
+  },
   "s_18ecec6e": {
     "source": "{{v0}} {{v1}} en llamada · +{{v2}}{{v3}}",
     "files": [
@@ -1586,6 +1635,7 @@
     "source": "Recurrente",
     "files": [
       "app.html",
+      "js/finance-review.js",
       "js/finance.js"
     ]
   },
@@ -1593,6 +1643,12 @@
     "source": "Mi cuenta",
     "files": [
       "js/boot.js"
+    ]
+  },
+  "s_19b444f9": {
+    "source": "Registrar recibido",
+    "files": [
+      "js/pay-receipts.js"
     ]
   },
   "s_19ccdc29": {
@@ -1653,6 +1709,12 @@
     "source": "Sumar 15 minutos",
     "files": [
       "app.html"
+    ]
+  },
+  "s_1a6dd18c": {
+    "source": "Sin minutos evaluados",
+    "files": [
+      "js/shift-work-review.js"
     ]
   },
   "s_1a738200": {
@@ -1728,12 +1790,6 @@
       "index.html"
     ]
   },
-  "s_1b015f59": {
-    "source": "Tu jornada en detalle",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_1b0709d2": {
     "source": "Historial",
     "files": [
@@ -1780,6 +1836,12 @@
     "source": "Meta de Adherencia: {{v0}}%",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_1c9a112d": {
+    "source": "Ver reparto automático",
+    "files": [
+      "app.html"
     ]
   },
   "s_1cbb44a6": {
@@ -1945,6 +2007,12 @@
       "js/backup-recovery.js"
     ]
   },
+  "s_1f822df5": {
+    "source": "Si recibiste varios abonos, ingresá su total acumulado y la fecha del último. Este registro no añade ganancias ni mueve reservas; sirve para comparar lo recibido con las llamadas del ciclo.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_1fa218ff": {
     "source": "XP ganado",
     "files": [
@@ -2013,6 +2081,12 @@
       "js/game.js"
     ]
   },
+  "s_20d66fbf": {
+    "source": "Meta del ciclo y cálculo del ACW",
+    "files": [
+      "js/shift-work-review.js"
+    ]
+  },
   "s_20dd05b7": {
     "source": "Cumplir la meta diaria",
     "files": [
@@ -2073,12 +2147,6 @@
     "source": "Presupuesto excedido",
     "files": [
       "js/finance.js"
-    ]
-  },
-  "s_2202e087": {
-    "source": "En {{v0}} días",
-    "files": [
-      "js/weekly-summary.js"
     ]
   },
   "s_22380468": {
@@ -2149,6 +2217,18 @@
       "js/settings.js"
     ]
   },
+  "s_236c978a": {
+    "source": "Los datos de Finanzas cambiaron. Abrí de nuevo la vista previa.",
+    "files": [
+      "js/finance-review.js"
+    ]
+  },
+  "s_237012a1": {
+    "source": "Ver destinos en orden de prioridad",
+    "files": [
+      "js/finance-review.js"
+    ]
+  },
   "s_2380b0f4": {
     "source": "‹ Anterior",
     "files": [
@@ -2197,6 +2277,12 @@
     "source": "No se aplicó el ajuste de Finanzas porque no se pudo guardar. Tus valores anteriores se conservaron.",
     "files": [
       "js/finance.js"
+    ]
+  },
+  "s_2458dcfb": {
+    "source": "Disponible después",
+    "files": [
+      "js/finance-review.js"
     ]
   },
   "s_2486313b": {
@@ -2447,6 +2533,12 @@
       "js/calls.js"
     ]
   },
+  "s_2851e623": {
+    "source": "Ver proyección y distribución",
+    "files": [
+      "js/finance-review.js"
+    ]
+  },
   "s_28697b71": {
     "source": "Progreso del día",
     "files": [
@@ -2656,6 +2748,12 @@
     "source": "Contraer bloques al terminar",
     "files": [
       "app.html"
+    ]
+  },
+  "s_2bb8164b": {
+    "source": "Los importes negativos liberan reservas tras corregir las ganancias. Es el último ajuste automático, no un historial de pagos ni el saldo actual de cada fila.",
+    "files": [
+      "js/finance-review.js"
     ]
   },
   "s_2be6362d": {
@@ -3230,6 +3328,12 @@
       "js/higher-rate.js"
     ]
   },
+  "s_34e932ca": {
+    "source": "Recepción registrada. Tus llamadas, ganancias y reservas se conservan.",
+    "files": [
+      "js/pay-receipts.js"
+    ]
+  },
   "s_34f7bda2": {
     "source": "Idioma de la tool",
     "files": [
@@ -3372,6 +3476,12 @@
     "source": "Promedio",
     "files": [
       "app.html"
+    ]
+  },
+  "s_371f45fa": {
+    "source": "No se guardó la recepción. Tu borrador sigue abierto.",
+    "files": [
+      "js/pay-receipts.js"
     ]
   },
   "s_374d8cb3": {
@@ -3519,10 +3629,22 @@
       "app.html"
     ]
   },
+  "s_39e3298b": {
+    "source": "Destino del dinero",
+    "files": [
+      "js/finance-review.js"
+    ]
+  },
   "s_39e82d05": {
     "source": "Avisar tras estos minutos de trabajo sin llamadas",
     "files": [
       "app.html"
+    ]
+  },
+  "s_39edda14": {
+    "source": "Aplicar meta",
+    "files": [
+      "js/finance-review.js"
     ]
   },
   "s_39f30811": {
@@ -3649,6 +3771,12 @@
       "js/boot.js"
     ]
   },
+  "s_3bbd21ac": {
+    "source": "ACW actual",
+    "files": [
+      "js/shift-work-review.js"
+    ]
+  },
   "s_3bd044df": {
     "source": "El respaldo o la conexión con el servidor necesita atención. Conserva tus cambios en este navegador.",
     "files": [
@@ -3658,6 +3786,7 @@
   "s_3c1a6410": {
     "source": "Liberar reserva",
     "files": [
+      "js/finance-review.js",
       "js/finance.js"
     ]
   },
@@ -3677,6 +3806,12 @@
     "source": "Shift iniciado automáticamente por llamada",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_3cb5b522": {
+    "source": "Se calcula con {{v0}} días por semana, 4 semanas y tarifa base de {{v1}}/min. No incluye Higher Rate.",
+    "files": [
+      "js/finance-review.js"
     ]
   },
   "s_3cb707d9": {
@@ -3817,6 +3952,12 @@
       "js/backup-recovery.js"
     ]
   },
+  "s_40078e96": {
+    "source": "Cómo se reparte",
+    "files": [
+      "js/finance-review.js"
+    ]
+  },
   "s_402319c6": {
     "source": "Automático (según tu horario)",
     "files": [
@@ -3943,6 +4084,12 @@
     "files": [
       "app.html",
       "js/app-main.js"
+    ]
+  },
+  "s_42be5e53": {
+    "source": "Todavía no hay un ajuste automático registrado en esta versión.",
+    "files": [
+      "js/finance-review.js"
     ]
   },
   "s_42dde52a": {
@@ -4115,6 +4262,12 @@
       "js/reports.js"
     ]
   },
+  "s_4533b073": {
+    "source": "{{v4}} · {{v5}}",
+    "files": [
+      "js/pay-receipts.js"
+    ]
+  },
   "s_455c3a0c": {
     "source": "Avisos",
     "files": [
@@ -4212,12 +4365,6 @@
       "app.html"
     ]
   },
-  "s_470a327e": {
-    "source": "Aplicado",
-    "files": [
-      "js/finance.js"
-    ]
-  },
   "s_470e7fe8": {
     "source": "Ya existe una llamada idéntica guardada (mismo cliente, fecha, hora, duración, pago, billable y dropped).",
     "files": [
@@ -4291,6 +4438,12 @@
     "source": "Recargar",
     "files": [
       "app.html"
+    ]
+  },
+  "s_47f388e8": {
+    "source": "Vuelve a Disponible",
+    "files": [
+      "js/finance-review.js"
     ]
   },
   "s_48070ab2": {
@@ -4419,6 +4572,12 @@
       "js/auth.js"
     ]
   },
+  "s_4a3c9aaf": {
+    "source": "{{v2}} · {{v3}}",
+    "files": [
+      "js/pay-receipts.js"
+    ]
+  },
   "s_4a6fc298": {
     "source": "Higher Rate",
     "files": [
@@ -4485,12 +4644,6 @@
     "source": "Corregida por vos",
     "files": [
       "js/call-table-view.js"
-    ]
-  },
-  "s_4b323e8b": {
-    "source": "Espera actual",
-    "files": [
-      "js/shift-work-review.js"
     ]
   },
   "s_4b3c5b1d": {
@@ -4711,6 +4864,12 @@
   },
   "s_4f1f3c20": {
     "source": "+ Agregar meta",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_4f6ea0b2": {
+    "source": "Reparto automático de reservas",
     "files": [
       "app.html"
     ]
@@ -4997,7 +5156,13 @@
   "s_52ef7275": {
     "source": "días restantes",
     "files": [
-      "js/weekly-summary.js"
+      "js/pay-receipts.js"
+    ]
+  },
+  "s_52f4f9f2": {
+    "source": "Recepción registrada por vos",
+    "files": [
+      "js/pay-receipts.js"
     ]
   },
   "s_530cc80d": {
@@ -5042,6 +5207,12 @@
       "js/call-recovery.js"
     ]
   },
+  "s_53e8df43": {
+    "source": "Para evitarlo, activá Omitir reserva automática en el gasto.",
+    "files": [
+      "js/finance-review.js"
+    ]
+  },
   "s_53f2c676": {
     "source": "Agregar bloque",
     "files": [
@@ -5058,6 +5229,12 @@
     "source": "Editar categoría",
     "files": [
       "js/finance.js"
+    ]
+  },
+  "s_54454368": {
+    "source": "Repartir el disponible",
+    "files": [
+      "js/finance-review.js"
     ]
   },
   "s_544f2caf": {
@@ -5101,12 +5278,6 @@
     "source": "Tu progreso",
     "files": [
       "app.html"
-    ]
-  },
-  "s_54b73dcb": {
-    "source": "Acumulado del día",
-    "files": [
-      "js/shift-work-review.js"
     ]
   },
   "s_54c099c7": {
@@ -5448,12 +5619,6 @@
       "app.html"
     ]
   },
-  "s_5971e44f": {
-    "source": "Ya pagado",
-    "files": [
-      "js/weekly-summary.js"
-    ]
-  },
   "s_5977b0b2": {
     "source": "Comienza una nueva llamada",
     "files": [
@@ -5732,6 +5897,12 @@
     "source": "de tu meta",
     "files": [
       "app.html"
+    ]
+  },
+  "s_5fc81666": {
+    "source": "Ciclo: {{v3}}",
+    "files": [
+      "js/pay-receipts.js"
     ]
   },
   "s_5fca3183": {
@@ -6100,6 +6271,12 @@
       "app.html"
     ]
   },
+  "s_6585df2f": {
+    "source": "Comparar esperado y recibido",
+    "files": [
+      "js/pay-receipts.js"
+    ]
+  },
   "s_659521b0": {
     "source": "a tiempo",
     "files": [
@@ -6196,6 +6373,18 @@
       "js/weekly-summary.js"
     ]
   },
+  "s_68591c47": {
+    "source": "Gastos fijos",
+    "files": [
+      "js/finance-review.js"
+    ]
+  },
+  "s_685f6aa2": {
+    "source": "Activar reparto",
+    "files": [
+      "js/finance-review.js"
+    ]
+  },
   "s_686f712e": {
     "source": "usar",
     "files": [
@@ -6237,6 +6426,12 @@
     "source": "Ocho cosas que antes vivían en tu cabeza, en un cuaderno o en una hoja aparte.",
     "files": [
       "index.html"
+    ]
+  },
+  "s_68dfe19e": {
+    "source": "Tiempo productivo",
+    "files": [
+      "js/shift-work-review.js"
     ]
   },
   "s_691b3252": {
@@ -6477,6 +6672,8 @@
     "files": [
       "js/app-main.js",
       "js/calls.js",
+      "js/finance-planning.js",
+      "js/finance.js",
       "js/higher-rate.js",
       "js/schedule.js"
     ]
@@ -6505,11 +6702,18 @@
       "js/automation-ui.js"
     ]
   },
+  "s_6da13ccd": {
+    "source": "Aplicar meta desde Finanzas",
+    "files": [
+      "js/finance-review.js"
+    ]
+  },
   "s_6da5e4a0": {
     "source": "{{v3}}{{v4}}",
     "files": [
       "js/finance.js",
-      "js/positive-reinforcement.js"
+      "js/positive-reinforcement.js",
+      "js/shift-work-review.js"
     ]
   },
   "s_6dc20677": {
@@ -6670,8 +6874,7 @@
   "s_70868d7e": {
     "source": "ACW",
     "files": [
-      "app.html",
-      "js/shift-work-review.js"
+      "app.html"
     ]
   },
   "s_70a7a727": {
@@ -6738,6 +6941,12 @@
     "source": "Récords personales",
     "files": [
       "app.html"
+    ]
+  },
+  "s_71d1b7dd": {
+    "source": "Gastos variables",
+    "files": [
+      "js/finance-review.js"
     ]
   },
   "s_71daacb6": {
@@ -7378,6 +7587,12 @@
       "js/auth.js"
     ]
   },
+  "s_7bf2af24": {
+    "source": "Último ajuste automático de reservas",
+    "files": [
+      "js/finance-review.js"
+    ]
+  },
   "s_7bf7a2ca": {
     "source": "En curso: {{v0}}",
     "files": [
@@ -7504,6 +7719,12 @@
       "js/app-main.js"
     ]
   },
+  "s_7de24f9c": {
+    "source": "Próxima fecha de pago",
+    "files": [
+      "js/pay-receipts.js"
+    ]
+  },
   "s_7df9c415": {
     "source": "☀️ Claro",
     "files": [
@@ -7547,6 +7768,12 @@
     "files": [
       "js/backup-recovery.js",
       "js/reinforcement-rules.js"
+    ]
+  },
+  "s_7e481373": {
+    "source": "Reintentar pagos",
+    "files": [
+      "app.html"
     ]
   },
   "s_7e57c267": {
@@ -7804,6 +8031,12 @@
     "source": "Hitos para ganarlo",
     "files": [
       "app.html"
+    ]
+  },
+  "s_83252091": {
+    "source": "No hay un reparto inmediato; se usará el próximo disponible.",
+    "files": [
+      "js/finance-review.js"
     ]
   },
   "s_832cd197": {
@@ -8203,8 +8436,7 @@
   "s_88f9fc5b": {
     "source": "Próximo",
     "files": [
-      "js/app-main.js",
-      "js/weekly-summary.js"
+      "js/app-main.js"
     ]
   },
   "s_88fb12d2": {
@@ -8262,6 +8494,12 @@
       "index.html"
     ]
   },
+  "s_8a37b37f": {
+    "source": "Eliminar registro",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_8a78b923": {
     "source": "Importar JSON",
     "files": [
@@ -8310,12 +8548,6 @@
       "js/monsters.js"
     ]
   },
-  "s_8b1b6f9b": {
-    "source": "Cómo se cuenta",
-    "files": [
-      "js/shift-work-review.js"
-    ]
-  },
   "s_8b1d8111": {
     "source": "El respaldo contiene un historial de actividad inválido. Tus datos actuales no se cambiaron.",
     "files": [
@@ -8349,7 +8581,8 @@
   "s_8bbdd322": {
     "source": "Sí, continuar",
     "files": [
-      "app.html"
+      "app.html",
+      "js/app-main.js"
     ]
   },
   "s_8bce7dc0": {
@@ -8399,12 +8632,6 @@
     "source": "Cuadro de texto limpiado",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_8c3a9094": {
-    "source": "Próximo pago",
-    "files": [
-      "js/weekly-summary.js"
     ]
   },
   "s_8cae66fc": {
@@ -8503,6 +8730,12 @@
     "source": "con un toque al tomarlos, y otra vez al volver.",
     "files": [
       "app.html"
+    ]
+  },
+  "s_8df3ecc4": {
+    "source": "Se conservan la fila, su objetivo y sus {{v0}} pagos registrados. El período no borra ni genera pagos automáticamente.",
+    "files": [
+      "js/finance-review.js"
     ]
   },
   "s_8dfe7b00": {
@@ -8874,6 +9107,12 @@
       "privacidad.html"
     ]
   },
+  "s_9376d0d6": {
+    "source": "Fecha programada",
+    "files": [
+      "js/pay-receipts.js"
+    ]
+  },
   "s_9382621b": {
     "source": "Cómo ganarlo",
     "files": [
@@ -8997,6 +9236,12 @@
       "privacidad.html"
     ]
   },
+  "s_95b9cf35": {
+    "source": "Minutos productivos por día",
+    "files": [
+      "js/finance-review.js"
+    ]
+  },
   "s_95c1f1ce": {
     "source": "{{v0}} Calidad y adherencia",
     "files": [
@@ -9113,12 +9358,6 @@
       "app.html"
     ]
   },
-  "s_9770e175": {
-    "source": "Hoy, {{v0}}",
-    "files": [
-      "js/weekly-summary.js"
-    ]
-  },
   "s_97720557": {
     "source": "(día siguiente)",
     "files": [
@@ -9179,6 +9418,12 @@
       "app.html"
     ]
   },
+  "s_987c0fdd": {
+    "source": "Estimado para cuatro semanas",
+    "files": [
+      "js/finance-review.js"
+    ]
+  },
   "s_9893a0a9": {
     "source": "La extensión registra la actividad y no toca los controles de una llamada conectada.",
     "files": [
@@ -9233,6 +9478,12 @@
     "source": "Una cuenta es para una persona. No la compartas.",
     "files": [
       "terminos.html"
+    ]
+  },
+  "s_99b057fb": {
+    "source": "Pendientes de reservar",
+    "files": [
+      "app.html"
     ]
   },
   "s_99b2badc": {
@@ -9338,6 +9589,12 @@
       "js/weekly-summary.js"
     ]
   },
+  "s_9bb42a36": {
+    "source": "{{v0}} → {{v1}}",
+    "files": [
+      "js/pay-receipts.js"
+    ]
+  },
   "s_9bf60754": {
     "source": "¿Este día contó como Trabajado o Libre?",
     "files": [
@@ -9414,8 +9671,7 @@
   "s_9d239fd3": {
     "source": "Ciclo actual",
     "files": [
-      "app.html",
-      "js/weekly-summary.js"
+      "app.html"
     ]
   },
   "s_9d30513d": {
@@ -9664,12 +9920,6 @@
       "js/reports.js"
     ]
   },
-  "s_a0e17120": {
-    "source": "Ciclo: {{v3}} {{v4}}",
-    "files": [
-      "js/weekly-summary.js"
-    ]
-  },
   "s_a0f62742": {
     "source": "Ajustes",
     "files": [
@@ -9718,6 +9968,12 @@
     "source": "No aplica sin meta productiva",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_a15d2d82": {
+    "source": "El disponible se reserva primero para Gastos y luego para Metas, siguiendo las prioridades de cada lista. Los pagos registrados se llevan por separado.",
+    "files": [
+      "js/finance-review.js"
     ]
   },
   "s_a1625a26": {
@@ -9903,6 +10159,12 @@
       "app.html"
     ]
   },
+  "s_a49ca9de": {
+    "source": "Se reserva ahora",
+    "files": [
+      "js/finance-review.js"
+    ]
+  },
   "s_a4b9c851": {
     "source": "Conexión a Propio finalizada",
     "files": [
@@ -9962,6 +10224,12 @@
     "source": "{{v0}}\n      {{v1}}\n      {{v2}}",
     "files": [
       "js/monsters.js"
+    ]
+  },
+  "s_a5df5ae0": {
+    "source": "El esperado sigue los registros del ciclo; el recibido no se recalcula al corregir llamadas.",
+    "files": [
+      "js/pay-receipts.js"
     ]
   },
   "s_a627704f": {
@@ -10786,6 +11054,12 @@
       "js/calendar.js"
     ]
   },
+  "s_b43b1daf": {
+    "source": "La excepción de meta de hoy se quitará para usar esta meta general.",
+    "files": [
+      "js/finance-review.js"
+    ]
+  },
   "s_b43b84f2": {
     "source": "Correo electrónico.",
     "files": [
@@ -11026,6 +11300,7 @@
     "source": "Puntual",
     "files": [
       "app.html",
+      "js/finance-review.js",
       "js/finance.js"
     ]
   },
@@ -11052,12 +11327,6 @@
     "source": "\"Exportar JSON\" descarga un respaldo completo: llamadas, turnos, pausas, horario, metas, Finanzas, Higher Rate, gamificación y ajustes. \"Importar JSON\" restaura todo eso. Los backups antiguos sin configuración siguen siendo compatibles.",
     "files": [
       "app.html"
-    ]
-  },
-  "s_b8617f6a": {
-    "source": "Resultado",
-    "files": [
-      "js/shift-work-review.js"
     ]
   },
   "s_b8773d4d": {
@@ -11881,6 +12150,12 @@
       "js/game.js"
     ]
   },
+  "s_c61d6ed3": {
+    "source": "Diferencia",
+    "files": [
+      "js/pay-receipts.js"
+    ]
+  },
   "s_c6309426": {
     "source": "Reserva completa",
     "files": [
@@ -12088,10 +12363,22 @@
       "app.html"
     ]
   },
+  "s_c8f63058": {
+    "source": "Fecha pasada · recepción sin confirmar",
+    "files": [
+      "js/pay-receipts.js"
+    ]
+  },
   "s_c90bfeab": {
     "source": "L",
     "files": [
       "app.html"
+    ]
+  },
+  "s_c9143998": {
+    "source": "Esperado según la tool",
+    "files": [
+      "js/pay-receipts.js"
     ]
   },
   "s_c9263b18": {
@@ -12210,6 +12497,12 @@
       "js/positive-reinforcement.js"
     ]
   },
+  "s_cb5441e3": {
+    "source": "Reservaste {{v0}}{{v1}} para {{v2}}. No es un pago.",
+    "files": [
+      "js/finance.js"
+    ]
+  },
   "s_cb570b90": {
     "source": "Ahora",
     "files": [
@@ -12256,6 +12549,12 @@
     "source": "Temas y colores",
     "files": [
       "app.html"
+    ]
+  },
+  "s_ccdd95a7": {
+    "source": "Editar recibido",
+    "files": [
+      "js/pay-receipts.js"
     ]
   },
   "s_ccec9183": {
@@ -12464,6 +12763,12 @@
       "app.html"
     ]
   },
+  "s_cf9c492e": {
+    "source": "Los datos cambiaron. Cerrá y abrí este registro antes de guardar.",
+    "files": [
+      "js/pay-receipts.js"
+    ]
+  },
   "s_cf9e5cff": {
     "source": "Vie",
     "files": [
@@ -12525,6 +12830,12 @@
       "js/finance.js"
     ]
   },
+  "s_d07e997a": {
+    "source": "Actualiza la meta general y la distribución del plan. No asigna dinero ni registra pagos. Las metas históricas de otros días se conservan.",
+    "files": [
+      "js/finance-review.js"
+    ]
+  },
   "s_d0a8f98f": {
     "source": "Horario fijo que la app ya conoce.",
     "files": [
@@ -12561,6 +12872,12 @@
       "app.html"
     ]
   },
+  "s_d0f4673e": {
+    "source": "min fuera del plan",
+    "files": [
+      "js/shift-work-review.js"
+    ]
+  },
   "s_d0f62052": {
     "source": "Importación histórica",
     "files": [
@@ -12577,6 +12894,12 @@
     "source": "{{v0}} histórica(s)",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_d13bc89d": {
+    "source": "Total recibido en dólares",
+    "files": [
+      "app.html"
     ]
   },
   "s_d15dbac1": {
@@ -12736,6 +13059,18 @@
       "js/calls.js"
     ]
   },
+  "s_d3ad88b9": {
+    "source": "Revisá el monto y la fecha: la recepción no puede estar en el futuro.",
+    "files": [
+      "js/pay-receipts.js"
+    ]
+  },
+  "s_d3d39d07": {
+    "source": "Recepciones de otros ciclos ({{v0}})",
+    "files": [
+      "js/pay-receipts.js"
+    ]
+  },
   "s_d3e89b61": {
     "source": "Regreso de esta pausa en manual",
     "files": [
@@ -12867,6 +13202,12 @@
     "source": "Volviste a tiempo de {{v0}} {{v1}}.",
     "files": [
       "js/reinforcement-rules.js"
+    ]
+  },
+  "s_d67b433d": {
+    "source": "Si recibiste varios abonos o cambia una llamada",
+    "files": [
+      "app.html"
     ]
   },
   "s_d6a1eab8": {
@@ -13249,6 +13590,12 @@
       "js/app-main.js"
     ]
   },
+  "s_dcb9768b": {
+    "source": "Tu jornada",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_dcc378be": {
     "source": "En el próximo cofre",
     "files": [
@@ -13382,6 +13729,12 @@
       "js/higher-rate-review.js"
     ]
   },
+  "s_ddaf48c4": {
+    "source": "Acumulado del día: {{v1}}",
+    "files": [
+      "js/shift-work-review.js"
+    ]
+  },
   "s_ddb5c56a": {
     "source": "{{v0}} vidas del héroe",
     "files": [
@@ -13484,8 +13837,7 @@
   "s_df4aef17": {
     "source": "14 días",
     "files": [
-      "app.html",
-      "js/weekly-summary.js"
+      "app.html"
     ]
   },
   "s_df54f508": {
@@ -13604,6 +13956,12 @@
       "terminos.html"
     ]
   },
+  "s_e1782e75": {
+    "source": "Disponible antes",
+    "files": [
+      "js/finance-review.js"
+    ]
+  },
   "s_e17f6083": {
     "source": "Encontraste un aprendizaje en esta llamada",
     "files": [
@@ -13718,6 +14076,12 @@
       "js/call-recovery.js"
     ]
   },
+  "s_e35bc1a4": {
+    "source": "Todavía no registraste una recepción para este ciclo.",
+    "files": [
+      "js/pay-receipts.js"
+    ]
+  },
   "s_e37b6f56": {
     "source": "Customer ID",
     "files": [
@@ -13746,6 +14110,18 @@
     "source": "Orden (informativo)",
     "files": [
       "js/schedule.js"
+    ]
+  },
+  "s_e3b09ecd": {
+    "source": "Destinos y ajustes, separados de los pagos.",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_e3b7fffc": {
+    "source": "Primero Gastos, luego Metas. Reservar no registra pagos ni modifica tus ganancias.",
+    "files": [
+      "js/finance-review.js"
     ]
   },
   "s_e3db894e": {
@@ -13782,6 +14158,12 @@
     "source": "0 días",
     "files": [
       "app.html"
+    ]
+  },
+  "s_e4522c87": {
+    "source": "Diferencia con lo esperado",
+    "files": [
+      "js/pay-receipts.js"
     ]
   },
   "s_e46248d9": {
@@ -13928,6 +14310,12 @@
       "app.html"
     ]
   },
+  "s_e721de21": {
+    "source": "Recibido al {{v0}}",
+    "files": [
+      "js/pay-receipts.js"
+    ]
+  },
   "s_e7413268": {
     "source": "Iniciar llamada",
     "files": [
@@ -13953,6 +14341,7 @@
       "js/app-main.js",
       "js/backup-recovery.js",
       "js/game.js",
+      "js/pay-receipts.js",
       "js/reports.js"
     ]
   },
@@ -14001,7 +14390,7 @@
   "s_e882ec8b": {
     "source": "Del ciclo {{v1}}",
     "files": [
-      "js/weekly-summary.js"
+      "js/pay-receipts.js"
     ]
   },
   "s_e88ae13b": {
@@ -14090,8 +14479,8 @@
       "app.html"
     ]
   },
-  "s_ea0f77bd": {
-    "source": "Próximos pendientes",
+  "s_ea0d8621": {
+    "source": "Fecha de la última recepción",
     "files": [
       "app.html"
     ]
@@ -14111,6 +14500,12 @@
   },
   "s_ea63397b": {
     "source": "El cambio es manual y conserva los importes en dólares. Dejá la tasa en 0 o la moneda vacía para ocultar la conversión.",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_ea706a55": {
+    "source": "Pago recibido",
     "files": [
       "app.html"
     ]
@@ -14197,6 +14592,12 @@
     "source": "Pausa real: {{v0}} ({{v1}} – {{v2}})",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_ebf9d9fe": {
+    "source": "Guardar recibido",
+    "files": [
+      "app.html"
     ]
   },
   "s_ec052856": {
@@ -14640,6 +15041,12 @@
       "js/game.js"
     ]
   },
+  "s_f3054b61": {
+    "source": "Reservar aparta dinero en tu plan. No registra un pago ni cambia tus ganancias.",
+    "files": [
+      "js/finance-review.js"
+    ]
+  },
   "s_f3387f0a": {
     "source": "Ronda terminada · probá otra vez",
     "files": [
@@ -15003,6 +15410,12 @@
       "js/game-battle.js"
     ]
   },
+  "s_f84b63ef": {
+    "source": "¿Eliminar esta recepción manual? Las llamadas, ganancias y reservas no cambian.",
+    "files": [
+      "js/pay-receipts.js"
+    ]
+  },
   "s_f86298a2": {
     "source": "Elige tu recompensa del ciclo",
     "files": [
@@ -15085,6 +15498,12 @@
     "source": "Cumplido",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_f9a602ab": {
+    "source": "Exceso pagado en el mes",
+    "files": [
+      "js/finance.js"
     ]
   },
   "s_f9bd04e7": {
@@ -15184,6 +15603,12 @@
       "js/app-main.js"
     ]
   },
+  "s_fb991ccb": {
+    "source": "No se pudo cargar el detalle de pagos.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_fb9c9b90": {
     "source": "Esperando el inicio de tu turno",
     "files": [
@@ -15257,6 +15682,12 @@
       "js/game.js"
     ]
   },
+  "s_fd4e052f": {
+    "source": "Las fechas son programadas. Un pago se marca recibido solo cuando vos lo registrás.",
+    "files": [
+      "js/pay-receipts.js"
+    ]
+  },
   "s_fd50c919": {
     "source": "Inicio laboral manual: {{v0}}.",
     "files": [
@@ -15284,8 +15715,7 @@
   "s_fd847c27": {
     "source": "Pagado",
     "files": [
-      "js/finance.js",
-      "js/weekly-summary.js"
+      "js/finance.js"
     ]
   },
   "s_fd8d3583": {
@@ -15328,6 +15758,12 @@
     "source": "Navegación principal",
     "files": [
       "app.html"
+    ]
+  },
+  "s_fe1e975b": {
+    "source": "Nueva meta diaria",
+    "files": [
+      "js/finance-review.js"
     ]
   },
   "s_fe20ac95": {
