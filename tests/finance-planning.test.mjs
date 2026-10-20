@@ -42,6 +42,7 @@ test('saving a finance plan updates the global and today goal in one snapshot, k
   const h=harness(t);settings.weeklySchedule={mon:{start:'06:00',end:'14:00',blocks:[{goalMin:60}]}};
   const before=JSON.stringify({calls,schedule:settings.weeklySchedule,rows:settings.financeCategories});
   assert.equal(saveFinancePlan(),true);assert.equal(h.saves(),1);
+  assert.equal(settings.goalProvenance.source,'finance');
   assert.equal(settings.productiveGoalMin,420);assert.equal(state.productiveGoalMin,420);assert.equal(settings.earningsGoal,50.4);
   assert.deepEqual(settings.financePlanning,{daysPerWeek:5,split:[60,25,15]});
   assert.deepEqual(settings.goalHistoryByDay['10/10/2026'],{min:360,usd:43.2});assert.equal(settings.dailyGoalOverrides['10/11/2026'],undefined);

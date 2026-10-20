@@ -183,12 +183,13 @@ test('silent real return when starting a live call receives punctuality while sh
   const input = { at: localTime(29, 9, 30), startedAt: localTime(29, 9, 15), planned: { type: 'Break', start: '09:15', end: '09:30' } };
   const live = pauseHarness(input);
   const result = live.end({ silent: true, deferSave: true });
+  assert.equal(live.results.length,0);result.finish();
   assert.equal(live.results[0].options.onTime, true);
   assert.equal(live.generalToasts.length, 0);
   assert.equal(result.pauseHistoryId, 'closed-pause');
   assert.equal(live.state.activePause, null);
   const closing = pauseHarness(input);
-  closing.end({ silent: true, deferSave: true, forShiftEnd: true });
+  closing.end({ silent: true, deferSave: true, forShiftEnd: true }).finish();
   assert.equal(closing.results[0].options.onTime, false);
 });
 

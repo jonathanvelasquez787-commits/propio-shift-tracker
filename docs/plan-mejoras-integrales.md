@@ -8,14 +8,14 @@ no se considera rota por esa razón.
 
 ## Lista de control completa
 
-**24 de 79 mejoras publicadas.** 7 probadas sin publicar, 2 en curso y 46 pendientes. La preparación del
+**31 de 79 mejoras publicadas.** 11 probadas sin publicar, 2 en curso y 35 pendientes. La preparación del
 turno usa app 624 y extensión 2.2.10, con publicación comprobada y recarga de la
 extensión, Propio y tracker confirmada por el propietario. App 625 refuerza la
 limpieza de Higher Rate; app 626 incorpora, en orden, el desglose de ganancias,
 consulta de conversión y alcance de tarifa. App 627 completa 36 y 37: revisión
 por ventana y corrección con vista previa, conservando bonos al editar o limpiar.
 App 628 completa el punto 21 con historial antes/después y recuperación de
-ediciones, eliminaciones y vaciados de llamadas. App 629 publica 22, 26–27, 47, 67 y 69 y cierra la fase 3, con CI y producción comprobados. Sigue la fase 4: 15–20 y 77.
+ediciones, eliminaciones y vaciados de llamadas. App 629 publica 22, 26–27, 47, 67 y 69 y cierra la fase 3, con CI y producción comprobados. App 630 publica 15–20 y 77, con código de extensión 2.3.0 instalado y recarga aún sin confirmar. Sigue fase 5: turno, pausas, ACW y horarios.
 
 Estas 79 mejoras corresponden al sistema completo. El panel de disponibilidad
 y preparación se ve en la **tool web**; el popup de la **extensión de Chrome**
@@ -31,9 +31,9 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 
 - [x] **1. Registro automático de la conexión a Propio — Publicado.** Hora de conexión detectada en la preparación, sin afirmar que es el momento exacto de login. [Evidencia](disponibilidad-en-inicio.md).
 - [x] **2. Diferencia entre estar conectado y empezar a trabajar — Publicado.** Conexión y comienzo laboral separados, incluyendo trabajo anticipado real, inicio manual y cierre antes del horario. [Evidencia](disponibilidad-en-inicio.md).
-- [ ] **3. Inicio y cierre manual de turno — Pendiente.** Confirmación de cierre con alcance y actividades pendientes.
-- [ ] **4. Continuar después de un cierre accidental — Pendiente.** Distinguir continuación del turno y sesión nueva.
-- [ ] **5. Día activo e historial de acciones — Pendiente.** Hacer evidente Hoy frente a una fecha histórica antes de acciones.
+- [ ] **3. Inicio y cierre manual de turno — Probado (sin publicar).** Cierre con alcance de llamada/pausa y rechazo que conserva la actividad. [Alcance](jornada-pausas-y-horarios.md).
+- [ ] **4. Continuar después de un cierre accidental — Probado (sin publicar).** Elección explícita entre continuar y otra sesión dentro de la gracia. [Alcance](jornada-pausas-y-horarios.md).
+- [ ] **5. Día activo e historial de acciones — Probado (sin publicar).** Hoy/Historial visibles, consulta del día y protección de controles. [Alcance](jornada-pausas-y-horarios.md).
 - [x] **6. Vinculación con tu cuenta — Publicado.** Resumen de preparación: cuenta, tracker, Propio y automatismos. [Evidencia](disponibilidad-en-inicio.md).
 - [x] **7. Ponerte disponible al comenzar el turno — Publicado.** Mostrar en Inicio la espera hasta el horario de entrada. [Evidencia](disponibilidad-en-inicio.md).
 - [x] **8. Esperar entre llamadas usando el ACW de la tool — Publicado.** Cuenta regresiva del ACW confirmada por la extensión en Inicio. [Evidencia](disponibilidad-en-inicio.md).
@@ -43,24 +43,24 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 - [x] **12. Pausar todos los automatismos de disponibilidad — Publicado.** Estado de pausa manual y forma de reanudar visibles en la tool. [Evidencia](disponibilidad-en-inicio.md).
 - [x] **13. Reintento cuando no tomás una oferta — Publicado.** Explicar reintento y condición que lo detiene sin interruptores adicionales. [Evidencia](disponibilidad-en-inicio.md).
 - [ ] **14. Prioridades que frenan los clics automáticos — En curso.** Motivo dominante del bloqueo y coordinación antes de uso simultáneo en PCs.
-- [ ] **15. Llamadas detectadas en vivo por la extensión — Probado (sin publicar).** Procedencia estimada visible y conservada hasta la reconciliación oficial. [Alcance](revision-llamadas-e-importaciones.md).
-- [ ] **16. Recuperación desde el historial oficial de Propio — Probado (sin publicar).** Consulta concentrada de estimadas, oficiales y correcciones con procedencia explícita. [Alcance](revision-llamadas-e-importaciones.md).
-- [ ] **17. Registros pendientes cuando el tracker no está abierto — Probado (sin publicar).** Popup con vencimiento de eventos, revisión sin borrado automático y apertura de pestaña existente. [Alcance](revision-llamadas-e-importaciones.md).
-- [ ] **18. Llamada en vivo con los botones de la tool — Probado (sin publicar).** Medición precisa, redondeo e importe estimado explicados; cierre con respaldo previo y rechazo recuperable. [Alcance](revision-llamadas-e-importaciones.md).
-- [ ] **19. Agregar una llamada manual — Probado (sin publicar).** Vista previa de fecha, inicio/final, duración y pago; rechazo conserva formulario y evita recompensa. [Alcance](revision-llamadas-e-importaciones.md).
-- [ ] **20. Pegar llamadas de Propio — Probado (sin publicar).** Resultado por fila, incluidas repeticiones y errores, con motivo plegado y reintento de detalle. [Alcance](revision-llamadas-e-importaciones.md).
+- [x] **15. Llamadas detectadas en vivo por la extensión — Publicado.** Procedencia estimada visible y conservada hasta la reconciliación oficial. [Alcance](revision-llamadas-e-importaciones.md).
+- [x] **16. Recuperación desde el historial oficial de Propio — Publicado.** Consulta concentrada de estimadas, oficiales y correcciones con procedencia explícita. [Alcance](revision-llamadas-e-importaciones.md).
+- [x] **17. Registros pendientes cuando el tracker no está abierto — Publicado.** Popup con vencimiento de eventos, revisión sin borrado automático y apertura de pestaña existente. [Alcance](revision-llamadas-e-importaciones.md).
+- [x] **18. Llamada en vivo con los botones de la tool — Publicado.** Medición precisa, redondeo e importe estimado explicados; cierre con respaldo previo y rechazo recuperable. [Alcance](revision-llamadas-e-importaciones.md).
+- [x] **19. Agregar una llamada manual — Publicado.** Vista previa de fecha, inicio/final, duración y pago; rechazo conserva formulario y evita recompensa. [Alcance](revision-llamadas-e-importaciones.md).
+- [x] **20. Pegar llamadas de Propio — Publicado.** Resultado por fila, incluidas repeticiones y errores, con motivo plegado y reintento de detalle. [Alcance](revision-llamadas-e-importaciones.md).
 - [x] **21. Editar y borrar llamadas — Publicado.** Historial antes/después, deshacer edición y recuperar borrados individuales/lotes, con vista previa y protección frente a versiones posteriores y fallo al guardar. [Evidencia y límites](recuperacion-llamadas.md).
 - [x] **22. Descartar una llamada accidental — Publicado.** Confirmación específica del turno/pausa que se restaura y guardado con reversión ante fallo. [Alcance y pruebas](recuperacion-actividades-y-respaldos.md).
-- [ ] **23. ACW en vivo y ACW acumulado — Pendiente.** Distinguir ACW actual del acumulado y explicar su origen.
-- [ ] **24. Meta máxima de ACW — Pendiente.** Distinguir máximo deseado de ACW de la espera entre llamadas.
-- [ ] **25. Break y Lunch de la tool — Pendiente.** Presentar pausa planeada y real con duración actual.
+- [ ] **23. ACW en vivo y ACW acumulado — Probado (sin publicar).** Espera actual y acumulado del día diferenciados en jornada. [Alcance](jornada-pausas-y-horarios.md).
+- [ ] **24. Meta máxima de ACW — Probado (sin publicar).** Máximo diario distinguido de la espera automática de la extensión. [Alcance](jornada-pausas-y-horarios.md).
+- [ ] **25. Break y Lunch de la tool — Probado (sin publicar).** Consulta de pausas planeadas/registradas/en curso con tiempos reales. [Alcance](jornada-pausas-y-horarios.md).
 - [x] **26. Continuar o descartar una pausa accidental — Publicado.** Continuación identificada; descartarla devuelve el tramo cerrado previo, con protección de guardado. [Alcance y pruebas](recuperacion-actividades-y-respaldos.md).
 - [x] **27. Editar huecos entre llamadas — Publicado.** Clasificación manual visible en tabla/editor; revisión vigente y reversión ante rechazo. [Alcance y pruebas](recuperacion-actividades-y-respaldos.md).
-- [ ] **28. Adherencia al horario — Pendiente.** Desglose de minutos y causas al consultar adherencia.
-- [ ] **29. Plantilla semanal — Pendiente.** Orden y cruce de medianoche legibles en el editor.
-- [ ] **30. Semana específica y copia de horarios — Pendiente.** Alcance plantilla/semana y vista previa de días al copiar.
-- [ ] **31. Ajustar todo el turno y decidir qué pasa si llegás tarde — Pendiente.** Vista previa de jornada desplazada antes de guardar.
-- [ ] **32. Metas diarias, por fecha y del ciclo — Pendiente.** Identificar meta general, excepción o calculada desde Finanzas.
+- [ ] **28. Adherencia al horario — Probado (sin publicar).** Minutos evaluados, adherentes y excepciones con causas plegadas. [Alcance](jornada-pausas-y-horarios.md).
+- [ ] **29. Plantilla semanal — Probado (sin publicar).** Orden desde inicio del turno, día siguiente y duración nocturna reactiva. [Alcance](jornada-pausas-y-horarios.md).
+- [ ] **30. Semana específica y copia de horarios — Probado (sin publicar).** Vista previa antes/después y copia limitada a días de destino. [Alcance](jornada-pausas-y-horarios.md).
+- [ ] **31. Ajustar todo el turno y decidir qué pasa si llegás tarde — Probado (sin publicar).** Desplazamiento del borrador y ejemplo de llegada tarde antes de aplicar. [Alcance](jornada-pausas-y-horarios.md).
+- [ ] **32. Metas diarias, por fecha y del ciclo — Probado (sin publicar).** Procedencia general/fecha/histórica/Finanzas y meta de ciclo actual consultables. [Alcance](jornada-pausas-y-horarios.md).
 - [x] **33. Ganancias de hoy y del ciclo — Publicado.** Desglose plegado de base registrada, estimada en vivo, Higher Rate calculado y total; actualización tras correcciones oficiales y navegación por día/ciclo. [Evidencia](ganancias-desglose.md).
 - [x] **34. Moneda secundaria e intercambio del monto principal — Publicado.** Conserva intercambio persistente y equivalencia debajo; la tasa manual se consulta en el desglose. [Evidencia](ganancias-desglose.md).
 - [x] **35. Tasa base por minuto — Publicado.** Explica nuevas estimaciones/meta general y conservación de pagos, bonos y metas especiales; guardar mantiene su alcance anterior. [Evidencia](ganancias-desglose.md).
@@ -105,11 +105,18 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 - [ ] **74. Funcionamiento con otra pestaña al frente — En curso.** Lectura atrasada/reconexión visibles y coordinación futura multi-PC.
 - [ ] **75. Volumen general y sonidos propios — Pendiente.** Explicar volumen cero, avisos escritos y espacio de archivos.
 - [ ] **76. Planificador de Finanzas hacia la meta diaria — Pendiente.** Desglosar cálculo y mostrar meta propuesta antes de guardar.
-- [ ] **77. Filtros de llamadas y acciones — Probado (sin publicar).** Búsqueda Customer ID y filtros de procedencia del día activo, sin cambiar totales ni registros. [Alcance](revision-llamadas-e-importaciones.md).
+- [x] **77. Filtros de llamadas y acciones — Publicado.** Búsqueda Customer ID y filtros de procedencia del día activo, sin cambiar totales ni registros. [Alcance](revision-llamadas-e-importaciones.md).
 - [ ] **78. Barra de actividad en vivo — Pendiente.** Consistencia entre barra y tarjetas incluidas llamadas pendientes.
 - [ ] **79. Accesibilidad — Pendiente.** Revisión de teclado, zoom, lector, ayudas táctiles y objetivos de controles.
 
 ## Entregas verificadas
+
+- [PR #92](https://github.com/jonathanvelasquez787-commits/propio-shift-tracker/pull/92),
+  commit `7900eaafce954b03317815e3a5e3adb90efd85d3`: 904 pruebas, build,
+  16 recorridos ES/EN/temas/anchos y pruebas de cuota/descarga fallida; popup
+  en ambos temas. CI del PR y main correctos, producción READY del SHA y
+  archivos públicos comprobados. Cierra 15–20 y 77. Extensión 2.3.0 instalada
+  con respaldo y preferencias conservadas; recarga aún sin confirmar.
 
 - [PR #91](https://github.com/jonathanvelasquez787-commits/propio-shift-tracker/pull/91),
   commit `0dbc8d055a70fe6e75b7a59201ca9e7de386b6f0`: 893 pruebas, build,

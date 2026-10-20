@@ -12,7 +12,7 @@ function declaration(file,name) {
 }
 const ui=(parts,...values)=>parts.reduce((out,part,i)=>out+part+(values[i]??''),'');
 
-for(const deferSave of [false,true])test(`ending a pause with a rejected ${deferSave?'partial':'full'} write does not announce return or award progress`,()=>{
+for(const deferSave of [false,true])test(`ending a pause ${deferSave?'stages an outer transaction without writing':'with a rejected write'} does not announce return or award progress`,()=>{
   let rewards=0,writes=0;const messages=[];
   const h=vm.createContext({ui,translateText:x=>x,Date,
     state:{activePause:{type:'break',startedAt:'2026-10-11T12:00:00Z',shiftDayKey:'10/11/2026'},pauseHistory:[]},
@@ -22,16 +22,17 @@ for(const deferSave of [false,true])test(`ending a pause with a rejected ${defer
     saveStateOnly:()=>{writes++;return false;},saveAll:()=>{writes++;return false;},
     toast:x=>messages.push(x),onGamePauseEnded:()=>{rewards++;}});
   vm.runInContext(declaration('../js/app-main.js','endPause'),h);
-  assert.equal(h.endPause({deferSave,endedAt:'2026-10-11T12:20:00Z'}),false);
-  assert.equal(writes,1);assert.equal(rewards,0);assert.deepEqual(messages,[]);
-  assert.equal(h.state.activePause.type,'break');assert.equal(h.state.pauseHistory.length,0);
+  const result=h.endPause({deferSave,endedAt:'2026-10-11T12:20:00Z'});
+  assert.equal(writes,deferSave?0:1);assert.equal(rewards,0);assert.deepEqual(messages,[]);
+  if(deferSave){assert.equal(typeof result.finish,'function');assert.equal(h.state.activePause,null);assert.equal(h.state.pauseHistory.length,1);}
+  else{assert.equal(result,false);assert.equal(h.state.activePause.type,'break');assert.equal(h.state.pauseHistory.length,0);}
 });
 
 test('starting a live call does not announce success after its snapshot is rejected',()=>{
   const messages=[];
   const h=vm.createContext({Date,ui,translateText:x=>x,
     state:{shiftStartedAt:'2026-10-11T12:00:00Z',shiftEndedAt:null,activeCall:null,activePause:null},
-    liveCallDayIsOff:()=>false,saveAll:()=>false,toast:x=>messages.push(x)});
+    liveCallDayIsOff:()=>false,canPersistLocalChanges:()=>true,setAppState:value=>{h.state=value;},render(){},saveAll:()=>false,toast:x=>messages.push(x)});
   vm.runInContext(declaration('../js/app-main.js','startCall'),h);
   assert.equal(h.startCall({startedAt:'2026-10-11T12:05:00Z'}),false);
   assert.deepEqual(messages,[]);

@@ -41,7 +41,7 @@ import {
   configureCalendarContext,
 } from './calendar.js';
 
-import { BLOCK_TIMELINE_META, addBlockRow, applyScheduleOffset, copyDayToAll, copyDayToWeekend, ensureScheduleWeekOverride, formatBlockDurationLabel, removeBlockRowAt, removeScheduleWeekOverride, saveShiftWindow, scheduleFormIsDirty, scheduleWeekHasCustom, scheduleWeekIsPast, syncShiftModalFields, syncScheduleOffsetUI, configureScheduleContext } from './schedule.js';
+import { updateScheduleRowSummary, addBlockRow, applyScheduleOffset, copyDayToAll, copyDayToWeekend, ensureScheduleWeekOverride, formatBlockDurationLabel, removeBlockRowAt, removeScheduleWeekOverride, saveShiftWindow, scheduleFormIsDirty, scheduleWeekHasCustom, scheduleWeekIsPast, syncShiftModalFields, syncScheduleOffsetUI, configureScheduleContext } from './schedule.js';
 
 
 import {
@@ -3787,17 +3787,14 @@ function renderPayDatesSection() {
     }
 
     function shiftActionLabel() {
-      if (!isViewingToday()) return translateText('Iniciar shift');
-      if (!state.shiftStartedAt || state.shiftEndedAt) return translateText('Iniciar shift');
-      return translateText('Finalizar shift');
+      return isViewingToday() && !shiftWouldStartNew() ? translateText('Finalizar shift') : translateText('Iniciar shift');
     }
 
     function shiftActionTone() {
       // Mismo criterio: si el turno de hoy sigue activo pero se está viendo otro día, el botón no
       // debe pintarse en rojo/"bad" como si "Finalizar" fuera la acción lista para ejecutarse —
       // está deshabilitado.
-      if (!isViewingToday()) return 'primary';
-      return (!state.shiftStartedAt || state.shiftEndedAt) ? 'primary' : 'bad';
+      return !isViewingToday() || shiftWouldStartNew() ? 'primary' : 'bad';
     }
 
     // Mismo criterio que pauseActionDisabled: "Iniciar/Finalizar shift" opera siempre sobre
@@ -3888,17 +3885,18 @@ function renderPayDatesSection() {
         return;
       }
       if (shiftWouldStartNew()) return startShift();
-      // Si hay una llamada activa al momento de finalizar el turno, endShift no la tocaba ni
-      // advertía nada.
-      if (state.activeCall) {
-        appConfirm(translateText('Tienes una llamada en curso. Al finalizar el turno se guardará esa llamada con la duración transcurrida hasta ahora y luego se cerrará el turno. ¿Finalizar de todos modos?'), () => {
-          const saved = endCall();
-          if (saved) endShift();
-          else toast(translateText('Resuelve la llamada pendiente antes de finalizar el turno'));
-        });
-        return;
-      }
-      return endShift();
+      return reviewShiftTransition('end', () => {
+        if (state.activeCall && !endCall()) { toast(translateText('Resuelve la llamada pendiente antes de finalizar el turno')); return false; }
+        return endShift();
+      });
+    }
+
+    async function reviewShiftTransition(kind, confirm, startNew) {
+      const owner = settings, expected = activityChangeSignature(), view = await loadDetailViews({ retry: true });
+      if (owner !== settings || expected !== activityChangeSignature()) return false;
+      if (!view) { toast(translateText('No se pudo cargar el detalle. Cerrá y abrí esta sección para reintentar.')); return false; }
+      return view.confirmShiftTransition({ ui, translateText, escapeHtml, data: () => ({ state, settings }), signature: activityChangeSignature,
+        appConfirm, isViewingToday, canPersistLocalChanges, toast }, kind, confirm, startNew);
     }
 
     // Si le das a Break/Lunch sin haber dado click en "Iniciar shift" pero ya tienes llamadas
@@ -3989,20 +3987,23 @@ function renderPayDatesSection() {
     }
 
     function startShift(options = {}) {
-      if (!options.propio) state.propioBridgeSession = null;
+      if (!canPersistLocalChanges()) return false;
+      const before = JSON.parse(JSON.stringify(state));
+      const persist = () => { if (saveAll() !== false) return true; setAppState(before); render(); return false; };
       const now = new Date(options.at || Date.now());
       const nowISO = now.toISOString();
 
-      // Si "Finalizar shift" se presionó por accidente (el turno no había terminado de verdad) y se
-      // vuelve a dar "Iniciar shift" dentro de la ventana de gracia, esto es una CONTINUACIÓN del
-      // mismo turno.
-      if (!options.propio && state.shiftStartedAt && state.shiftEndedAt && sameCallDay(state.shiftEndedAt, todayCallDateKey())) {
+      // Reabrir dentro de la gracia permite elegir continuación o sesión nueva.
+      if (!options.propio && !options.newSession && state.shiftStartedAt && state.shiftEndedAt && sameCallDay(state.shiftEndedAt, todayCallDateKey())) {
         const gapMin = (now.getTime() - new Date(state.shiftEndedAt).getTime()) / 60000;
+        if (options.continueConfirmed && !(gapMin >= 0 && gapMin <= ACCIDENTAL_TOGGLE_GRACE_MIN)) { toast(translateText('La actividad cambió. Revisá de nuevo antes de confirmar.')); return false; }
         if (gapMin >= 0 && gapMin <= ACCIDENTAL_TOGGLE_GRACE_MIN) {
+          if (!options.continueConfirmed) return reviewShiftTransition('resume', () => startShift({ ...options, continueConfirmed: true }), () => startShift({ ...options, newSession: true }));
+          state.propioBridgeSession = null;
           registerDayInterruption(todayCallDateKey(), 'shift', state.shiftEndedAt, nowISO);
           state.shiftEndedAt = null;
           setEvent('shift', translateText('Shift continuado (interrupción accidental)'), fmtTime(now), 'manual');
-          if (saveAll() === false) return false;
+          if (!persist()) return false;
           stopShiftAlarm();
           toast(ui`Turno continuado — interrupción de ${formatMinutes(gapMin)} min registrada`);
           onGameShiftStarted({ continued: true });
@@ -4013,10 +4014,11 @@ function renderPayDatesSection() {
       // endShift solo pone shiftEndedAt y nunca limpia shiftStartedAt: hay que detectar el turno ya
       // cerrado antes de reusarlo.
       const alreadyStarted = !!state.shiftStartedAt && !state.shiftEndedAt;
+      if (!options.propio) state.propioBridgeSession = null;
       state.shiftStartedAt = alreadyStarted ? state.shiftStartedAt : nowISO;
       state.shiftEndedAt = null;
       setEvent('shift', 'Shift iniciado', fmtTime(now), options.propio ? 'Propio' : 'manual', nowISO);
-      if (saveAll() === false) return false;
+      if (!persist()) return false;
       // El aviso de "Conéctate ya" ya no tiene razón de seguir sonando — checkShiftAlarm lo
       // apagaría solo en el próximo tick (hasta 1s de retraso), pero apagarlo aquí de inmediato
       // evita ese beep extra.
@@ -4041,13 +4043,18 @@ function renderPayDatesSection() {
 
     function endShift(options = {}) {
       if (!state.shiftStartedAt || state.shiftEndedAt) return;
+      if (!canPersistLocalChanges()) return false;
+      if (state.pendingLiveCallBackup) { toast(translateText('Resuelve la llamada pendiente antes de finalizar el turno')); return false; }
+      const before = JSON.parse(JSON.stringify(state));
       if (!options.propio) state.propioBridgeSession = null;
       const shiftDayKey = todayCallDateKey(new Date(state.shiftStartedAt));
       const now = options.at || new Date().toISOString();
-      if (state.activePause && endPause({ silent: true, deferSave: true, forShiftEnd: true, endedAt: now }) === false) return false;
+      const closedPause = state.activePause ? endPause({ silent: true, deferSave: true, forShiftEnd: true, endedAt: now }) : null;
+      if (closedPause === false) return false;
       state.shiftEndedAt = now;
       setEvent('shift', 'Shift terminado', fmtTime(new Date(now)), options.propio ? 'Propio' : 'manual', now);
-      if (saveAll() === false) return false;
+      if (saveAll() === false) { setAppState(before); render(); return false; }
+      closedPause?.finish?.();
       toast(translateText('Shift terminado'));
       onGameShiftEnded(shiftDayKey);
     }
@@ -4113,7 +4120,7 @@ function renderPayDatesSection() {
       state.pauseHistory.push(pauseRecord);
       const pauseEndEvent = setEvent(endedPause.type, ui`${endedPause.type === 'lunch' ? translateText('Lunch') : translateText('Break')} terminado`, fmtTime(new Date(now)), 'manual');
       state.activePause = null;
-      if ((deferSave ? saveStateOnly() : saveAll()) === false) { setAppState(before); render(); return false; }
+      const finish = () => {
       stopBreakEndAlarm();
       if (!silent) toast(translateText('Regresaste'));
       let onTime = false;
@@ -4130,10 +4137,16 @@ function renderPayDatesSection() {
         onTime = Math.abs(startDelta) <= ADHERENCE_TOLERANCE_MIN && Math.abs(durationDelta) <= ADHERENCE_TOLERANCE_MIN;
       }
       onGamePauseEnded(pauseRecord, { onTime });
+      };
+      if (!deferSave) {
+        if (saveAll() === false) { setAppState(before); render(); return false; }
+        finish();
+      }
       return {
         pause: endedPause,
         pauseHistoryId: pauseRecord.id,
         pauseEndEventId: pauseEndEvent?.id || null,
+        finish,
       };
     }
 
@@ -4150,6 +4163,8 @@ function renderPayDatesSection() {
 
     function startCall(options = {}) {
       if (state.activeCall) return;
+      if (!canPersistLocalChanges()) return false;
+      const before = JSON.parse(JSON.stringify(state));
       if (liveCallDayIsOff()) {
         toast(translateText('Hoy es tu día libre'));
         return false;
@@ -4159,10 +4174,8 @@ function renderPayDatesSection() {
       const nowISO = now.toISOString();
       let interruptedPauseRollback = null;
       if (state.activePause) {
-        const pretty = state.activePause.type === 'lunch' ? translateText('Lunch') : translateText('Break');
         interruptedPauseRollback = endPause({ silent: true, deferSave: true, endedAt: nowISO });
         if (interruptedPauseRollback === false) return false;
-        toast(ui`${pretty} terminado automáticamente al iniciar la llamada`);
       }
 
       // Una llamada real puede llegar antes del horario planeado o después de haber cerrado el
@@ -4178,7 +4191,6 @@ function renderPayDatesSection() {
         state.shiftEndedAt = null;
         const event = setEvent('shift', translateText('Shift iniciado automáticamente por llamada'), fmtTime(now), 'auto');
         autoShiftEventId = event?.id || null;
-        onGameShiftStarted({ continued: false });
       }
       state.activeCall = {
         startedAt: nowISO,
@@ -4193,10 +4205,11 @@ function renderPayDatesSection() {
         gameBeforeAutoShift,
         ...(options.propioBridge ? { propioBridge: { ...options.propioBridge } } : {}),
       };
-      const saved = saveAll();
-      if (saved === false) return false;
+      if (saveAll() === false) { setAppState(before); render(); return false; }
+      interruptedPauseRollback?.finish?.();
+      if (needsAutoShift) onGameShiftStarted({ continued: false });
       toast(needsAutoShift ? translateText('Llamada iniciada · turno abierto automáticamente') : translateText('Llamada iniciada'));
-      return saved;
+      return true;
     }
 
     // Termina la llamada en curso y la guarda SOLA (ver autoSaveLiveCall) — desde ya no abre ningún
@@ -5148,7 +5161,7 @@ function renderPayDatesSection() {
       WEEKDAYS, WEEKDAY_LABELS, WEEKDAY_LABELS_SHORT, appConfirm, defaultDaySchedule, ensureWeeklySchedule,
       formatHHMM, formatMinutes, formatWeekRangeLabel, iconHtml, isScheduleWeekPast, minutesToHHMM,
       onGameDayMetadataChanged, pad, saveAll, snapshotHistoricalPlanning, startOfCycleWeek,
-      timeLabel, toMinutes, toast, todayCallDateKey, weekStartKeyFromDate,
+      timeLabel, toMinutes, toast, todayCallDateKey, weekStartKeyFromDate, canPersistLocalChanges, escapeHtml,
     });
     configureCallsContext({
       HIGHER_RATE_TIERS, MAX_CALL_DURATION_MIN, appConfirm, autoStartShiftFromCalls, callDateKeyFromValue, callDedupeKey,
@@ -5697,6 +5710,13 @@ async function renderEarningsDetails(retry = false) {
   }
 }
 
+async function openWorkDayReview() {
+  const owner = settings, dayKey = getActiveDayKey(), view = await loadDetailViews({ retry: true });
+  if (owner !== settings || dayKey !== getActiveDayKey()) return;
+  if (!view) { toast(translateText('No se pudo cargar el detalle. Cerrá y abrí esta sección para reintentar.')); return; }
+  view.openWorkDayReview({ ui, translateText, escapeHtml, isViewingToday, computeCurrentAcwStart, effectiveDailyGoal, reinforcementScheduleIntervals, fmtTime, sameCallDay, todayCallDateKey, callDateKeyFromValue, formatDuration, pauseDurationExcludingCalls, formatCallDayLabel, importedCallStats, callsForDay, effectiveCycleGoal, getCycleGoalOverride, minuteAdherenceForDay, dayWorkSessions, dayAdherence, EXCEPTION_REASON_LABELS, formatMinutes, money, financeConvertedInline, openModal, dayKey, state, settings });
+}
+
 function renderHeader() {
       renderEarningsDetails();
   const now = new Date();
@@ -5743,6 +5763,7 @@ function renderHeader() {
     }
   }
   const viewingToday = isViewingToday();
+  document.getElementById('dayActiveLabelBtn').textContent = viewingToday ? translateText('Hoy') : translateText('Historial');
   // El título de "Ganancias de hoy"/"Ganancias del ciclo" ya no se sobreescribe aquí cuando la
   // pastilla "Hoy/Ciclo" está en modo 'cycle'.
   const earningsTitle = document.getElementById('earningsSectionTitle');
@@ -7087,6 +7108,7 @@ export function render() {
       }
     });
     document.getElementById('copyDayToAllBtn').addEventListener('click', copyDayToAll);
+    document.getElementById('workDayReviewBtn').addEventListener('click', openWorkDayReview);
     document.getElementById('copyWeekendBtn').addEventListener('click', copyDayToWeekend);
     document.getElementById('confirmModalOkBtn').addEventListener('click', () => {
       const action = pendingConfirmAction;
@@ -7295,18 +7317,11 @@ export function render() {
       const goalInput = row.querySelector('.block-goal-input');
       const isWork = typeInput.value === 'work';
       if (goalField) goalField.style.display = isWork ? '' : 'none';
+      const duration = updateScheduleRowSummary(row);
       if (isWork && goalInput && !(Number(goalInput.value) > 0)) {
-        const startInput = row.querySelector('.block-start-input');
-        const endInput = row.querySelector('.block-end-input');
-        const dur = Math.max(0, toMinutes(formatHHMM(endInput?.value || '00:00')) - toMinutes(formatHHMM(startInput?.value || '00:00')));
-        goalInput.value = dur;
+        goalInput.value = duration;
       }
       row.setAttribute('data-block-type', typeInput.value);
-      const iconEl = row.querySelector('.sched-tl-icon');
-      const subtitleEl = row.querySelector('.sched-tl-subtitle');
-      const meta = BLOCK_TIMELINE_META[typeInput.value] || BLOCK_TIMELINE_META.work;
-      if (iconEl) iconEl.innerHTML = iconHtml(meta.iconName);
-      if (subtitleEl) subtitleEl.textContent = meta.subtitle;
     });
     // La píldora de duración de cada tarjeta del timeline (puramente decorativa, ver
     // formatBlockDurationLabel) se recalcula en vivo al editar Inicio/Fin, para no esperar a un
@@ -7315,16 +7330,9 @@ export function render() {
       const timeInput = e.target instanceof Element ? e.target.closest('.sched-tl-time-input') : null;
       if (!timeInput) return;
       const row = timeInput.closest('.block-row');
-      if (!row) return;
-      const startInput = row.querySelector('.block-start-input');
-      const endInput = row.querySelector('.block-end-input');
-      const durationEl = row.querySelector('.sched-tl-duration');
-      if (!startInput || !endInput || !durationEl) return;
-      const dur = Math.max(0, toMinutes(formatHHMM(endInput.value || '00:00')) - toMinutes(formatHHMM(startInput.value || '00:00')));
-      durationEl.textContent = formatBlockDurationLabel(dur);
+      if (row) updateScheduleRowSummary(row);
     });
-    // Al marcar (o desmarcar) "Día libre (sin turno)" dentro del modal de Horario, el cambio se
-    // guarda solo, sin tener que además clickear "Guardar día".
+    // Cambiar Día libre presenta la revisión de alcance antes de guardar.
     document.getElementById('dayOffInput').addEventListener('change', saveShiftWindow);
     document.getElementById('cycleAnchorInput').addEventListener('change', updateCycleSettings);
     document.getElementById('cyclePayOffsetInput').addEventListener('change', updateCycleSettings);

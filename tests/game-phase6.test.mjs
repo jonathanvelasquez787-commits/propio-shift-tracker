@@ -607,7 +607,7 @@ test('simulación mensual: llamadas y Break Lunch no pueden ocupar los mismos mi
   assert.match(appMain, /pauseDurationExcludingCalls/);
   assert.match(appMain, /if \(state\.activeCall\) return true/);
   assert.match(appMain, /Termina la llamada antes de iniciar Break\/Lunch/);
-  assert.match(appMain, /terminado automáticamente al iniciar la llamada/);
+  assert.match(appMain, /interruptedPauseRollback = endPause\(\{ silent: true, deferSave: true/);
 });
 
 test('simulación mensual: llamada no salta ventana temprana ni reescribe entrada salida manual', () => {
@@ -674,8 +674,8 @@ test('segunda simulación mensual: finalizar turno no cierra si falla el guardad
   const appMain = read('js/app-main.js');
   const calls = read('js/calls.js');
   assert.match(calls, /return true;[\s\S]*openManualCallModalFromLiveCall[\s\S]*return false;/);
-  assert.match(appMain, /const saved = endCall\(\);/);
-  assert.match(appMain, /if \(saved\) endShift\(\)/);
+  assert.match(appMain, /if \(state\.activeCall && !endCall\(\)\) \{[^}]*return false; \}/);
+  assert.match(appMain, /return endShift\(\);/);
 });
 
 test('segunda simulación mensual: ninguna llamada manual editada o pegada puede terminar en el futuro', () => {
@@ -871,7 +871,7 @@ test('cuarta simulación mensual: llamadas antes o después del checkpoint cuent
 
 test('cuarta simulación mensual: descartar live también revierte efectos de gamificación del auto-turno', () => {
   const appMain = read('js/app-main.js');
-  assert.match(appMain, /const gameBeforeAutoShift = needsAutoShift[\s\S]*onGameShiftStarted\(\{ continued: false \}\)[\s\S]*gameBeforeAutoShift,/);
+  assert.match(appMain, /const gameBeforeAutoShift = needsAutoShift[\s\S]*gameBeforeAutoShift,[\s\S]*if \(needsAutoShift\) onGameShiftStarted\(\{ continued: false \}\)/);
   assert.match(appMain, /discarded\.gameBeforeAutoShift/);
 });
 

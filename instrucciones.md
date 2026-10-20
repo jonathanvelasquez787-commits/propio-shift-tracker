@@ -441,7 +441,9 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
-- App 629; extensión unificada 2.2.10 (versión visible y recarga confirmadas).
+- App 630; archivos de extensión 2.3.0 instalados con respaldo y configuración
+  personal conservada. Recarga de 2.3.0 aún sin confirmar; la última versión
+  que el propietario confirmó en Chrome/popup fue 2.2.10.
   Diseño compacto aprobado: resumen cerrado y preparación al pulsarlo.
   El panel de disponibilidad está en la tool;
   el popup de Chrome configura la extensión y esta transmite el estado a la web.
@@ -472,7 +474,18 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
-**v630 — Revisión de llamadas e importación por fila (candidata).**
+**v631 — Revisión de jornada y horarios (candidata).**
+
+- Puntos 3–5, 23–25 y 28–32: cierre explícito, continuidad elegida, consulta de
+  jornada/ACW/adherencia/metas y alcance de horarios antes de aplicar.
+- Guardado conjunto de pausa y transición de turno/llamada. Rechazo conserva
+  actividad y alarma sin recompensa. Copiar solo modifica los días de destino.
+- Orden nocturno, duración y etiqueta de día siguiente reactivas; procedencia
+  de planes nuevos de Finanzas. Detalle bajo carga diferida; presupuesto 80 KB,
+  límites iniciales conservados. Ver docs/jornada-pausas-y-horarios.md.
+- En validación final/publicación. Extensión sin nuevos cambios ni otra recarga.
+
+**v630 — Revisión de llamadas e importación por fila.**
 
 - Puntos 15–20 y 77: procedencia, búsqueda Customer ID y estados, comprobación
   manual e importación con motivo por fila. Tabla/detalles bajo carga diferida
@@ -480,8 +493,9 @@ futura opera bajo esto, sin excepción:
 - Rechazo de guardado conserva el borrador manual; cierre en vivo respalda antes
   de retirar la actividad y revierte filas/recompensas rechazadas.
 - Código de extensión 2.3.0: cola con vencimiento y explicación plegada; Abrir
-  tracker reutiliza pestaña. Instalación local aún no actualizada ni confirmada.
-- Publicación y validación final pendientes de esta entrega. Alcance en
+  tracker reutiliza pestaña. Archivos locales instalados con respaldo, conservando preferencias; recarga sin confirmar.
+- 904 pruebas, 16 recorridos ES/EN/temas/anchos, cuota, descarga y popup.
+  PR #92 y main con CI correcto; producción READY y archivos del SHA verificados. Alcance en
   docs/revision-llamadas-e-importaciones.md. No cerrar las fases posteriores.
 
 **v629 — Recuperación de actividades y respaldo previo a reemplazos.**
@@ -496,19 +510,3 @@ futura opera bajo esto, sin excepción:
   Detalle diferido con
   presupuesto de 65 KB; iniciales conservados. Alcance y límites en
   docs/recuperacion-actividades-y-respaldos.md. Extensión 2.2.10 sin cambios.
-
-
-
-**v628 — Historial y recuperación de ediciones y borrados de llamadas.**
-
-- Punto 21: tarjetas con antes/después y recuperación explícita, sin sustituir
-  correcciones posteriores ni duplicar filas que volvieron desde Propio.
-- Borrado individual y vaciado de llamadas del día recuperables, conservando
-  turnos/pausas/horario; vista previa antes de confirmar y conservación de bonos.
-- Guardado completo con reversión ante rechazo/interrupción; un editor fallido
-  permanece abierto. Protección de cuenta, revisión, lote y doble confirmación.
-- Hasta 50 cambios/30 días según espacio (384 KiB), en state.callRecovery y
-  respaldo JSON. Trece regresiones, 879 pruebas y recorridos ES/EN, ambos temas
-  y cuatro anchos. Descarga fallida y cuota real simuladas en Chrome aislado.
-- Carga diferida: presupuesto del detalle 50 KB, iniciales conservados. Alcance
-  y límites en docs/recuperacion-llamadas.md. Sigue 22; extensión sin cambios.

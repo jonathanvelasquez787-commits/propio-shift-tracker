@@ -3,6 +3,19 @@
   "scope": "Google; Email/SMTP deshabilitados; sin compras ni funciones nuevas",
   "criteria": [
     {
+      "id": "shift-and-schedule-review",
+      "area": "Turno, pausas y horario",
+      "acceptance": "Cierre con alcance explícito y rechazo recuperable, continuidad elegida, métricas del día diferenciadas y copias de horario con vista previa limitada a sus destinos.",
+      "sources": ["js/shift-work-review.js", "js/schedule.js"],
+      "tests": [{"file": "tests/shift-work-review.test.mjs", "namedCases": [
+        "shift confirmation explains active work and changes nothing before acceptance",
+        "shift resume explicitly distinguishes continuation from another session",
+        "schedule preview sorts overnight blocks on the shift day without mutating the draft",
+        "schedule confirmation preserves the draft until accepted and refuses a changed schedule",
+        "overnight editor labels and duration follow the edited inputs immediately"
+      ]}]
+    },
+    {
       "id": "call-review-provenance",
       "area": "Revisión y procedencia de llamadas",
       "acceptance": "Procedencia y correcciones explícitas, filtros combinables, diagnóstico de filas y fecha límite de señales pendientes sin descartarlas automáticamente.",

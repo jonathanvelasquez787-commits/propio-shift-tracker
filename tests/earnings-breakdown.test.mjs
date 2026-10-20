@@ -5,7 +5,7 @@ import vm from 'node:vm';
 import path from 'node:path';
 import { rollup } from 'rollup';
 import { parse } from 'acorn';
-import { entryBundleOptions } from '../scripts/bundle-entry.mjs';
+import { entryBundleOptions, reviewedBundleSize } from '../scripts/bundle-entry.mjs';
 import { earningsBreakdownForCalls, renderEarningsBreakdown } from '../js/detail-views.js';
 import { ui, translateText, setLanguage } from '../js/i18n.js';
 
@@ -89,6 +89,13 @@ test('detail views stay outside the initial app bundle and retain a release-boun
     assert.match(output[0].code, /import\('\/assets\/detail-views\.js\?v=details-test'\)/);
   } finally { await bundle.close(); }
   assert.ok(fs.readFileSync('js/service-worker.js', 'utf8').includes('`/assets/detail-views.js?v=${BUILD_VERSION}`'));
+});
+
+test('bundle budget includes the full production commit identifier when building locally', () => {
+  const local="import('/assets/detail-views.js?v=local')", production=local.replace('local','a'.repeat(40));
+  assert.equal(reviewedBundleSize(local),Buffer.byteLength(production));
+  assert.equal(reviewedBundleSize(production),Buffer.byteLength(production));
+  assert.equal(reviewedBundleSize('á'),Buffer.byteLength('á'));
 });
 
 test('a failed detail import is recoverable and a successful module is shared by later opens', async () => {

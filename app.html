@@ -237,6 +237,7 @@
 </div>
 </div>
 <div class="table-tags" id="earningsTagsRow"></div>
+<button type="button" class="summary-pill" id="workDayReviewBtn">Ver jornada: ACW, pausas y adherencia</button>
 <details class="fin-preview earnings-breakdown" id="earningsDayBreakdown">
 <summary class="fin-preview-head"><span class="fin-preview-title">Desglose de ganancias</span><span aria-hidden="true">⌄</span></summary>
 <div data-earnings-breakdown aria-live="polite"></div>
@@ -1966,13 +1967,14 @@ $0.72"></textarea>
 
 </div>
 </div>
+<div aria-hidden="true" class="modal-overlay" id="workDayReviewModal"><div aria-labelledby="workDayReviewTitle" aria-modal="true" class="modal-card" role="dialog"><div class="modal-head mc-modal-head"><div><h3 id="workDayReviewTitle">Tu jornada en detalle</h3><p>Datos del día seleccionado, sin cambiar tus registros.</p></div><button aria-label="Cerrar" class="modal-close" data-close-modal="workDayReviewModal" type="button">×</button></div><div id="workDayReviewContent"></div></div></div>
 <div aria-hidden="true" class="modal-overlay" id="acwGoalModal">
 <div aria-labelledby="acwGoalModalTitle" aria-modal="true" class="modal-card" role="dialog">
 <div class="modal-head mc-modal-head">
 <div class="mc-header-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><line x1="10" y1="2" x2="14" y2="2"/><line x1="12" y1="6" x2="12" y2="2.5"/><circle cx="12" cy="13" r="8"/><polyline points="12 9 12 13 15 15"/></svg></div>
 <div>
 <h3 id="acwGoalModalTitle">Meta máxima de ACW</h3>
-<p>La tarjeta de ACW en "Turno de Hoy" se llena contra este número — no contra la duración de tu turno. Al llegar al máximo se ve al 100%, aunque sigas acumulando ACW después.</p>
+<p>Es tu máximo deseado de ACW acumulado del día. No cambia la espera entre llamadas de la extensión ni pulsa Start Calls. Al alcanzar el máximo, la tarjeta llega al 100% y el contador puede seguir aumentando.</p>
 </div>
 <button aria-label="Cerrar" class="modal-close" data-close-modal="acwGoalModal" type="button">×</button>
 </div>
