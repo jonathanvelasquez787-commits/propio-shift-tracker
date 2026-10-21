@@ -350,7 +350,7 @@ futura opera bajo esto, sin excepción:
   No cambiar ACW ni alargar llamadas por esa suposición.
   El 21/10 el propietario eligió para las nuevas estimaciones personales el umbral
   inclusivo de 40 s: 7:39 → 7 min y 7:40 → 8 min. Implementado en web 636,
-  con publicación en curso; conserva duración real, importes anteriores y prioridad de los
+  publicada en PR #98 (main 7cf6016a3512aaf314655e6971fcc2f86c19c1d2); conserva duración real, importes anteriores y prioridad de los
   datos importados. Ver docs/redondeo-de-estimaciones.md. La regla oficial sigue
   sin confirmar; no confundir ambos estados.
 - **Visibilidad por nombre en Google:** pendiente de procesamiento externo. La
@@ -448,9 +448,11 @@ futura opera bajo esto, sin excepción:
   cambiar nivel. Una corrección de fecha/horas/nivel requiere «Revisar llamadas»
   → «Corregir promoción», vista previa y confirmación del recálculo. Limpiar
   conserva bonos y no reconstruye ventanas retiradas para llamadas aún ausentes.
-- Una llamada en vivo usa inicio/fin precisos y duración redondeada a dos
-  decimales de minuto; una muy breve puede dar 0. El importador y los modales
-  también aceptan 0 min. No deducir de eso las reglas de facturación de Propio.
+- Una llamada en vivo conserva inicio/fin y duración observados con milisegundos.
+  La duración en minutos no se redondea a dos decimales; el umbral de 40 segundos
+  solo calcula el pago estimado. Propio pasa a ser principal al importar, con el
+  respaldo original separado. El historial puede informar 0 min; no deducir de
+  eso las reglas de facturación de Propio. Detalle en docs/registros-propio-y-tool.md.
 - Cambiar el ancla del ciclo de pago mueve el inicio de TODAS las semanas
   (`startOfCycleWeek`), incluidas las claves de "Semana específica" — se
   re-anclan solas por el centro de la semana vieja, pero un movimiento grande
@@ -461,7 +463,7 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
-- App 635 y archivos de extensión 2.3.1 instalados con respaldo y configuración
+- App 637; archivos de extensión 2.3.1 instalados con respaldo y configuración
   personal conservada. El propietario confirmó la recarga y el popup 2.3.1.
   Diseño compacto aprobado: resumen cerrado y preparación al pulsarlo.
   El panel de disponibilidad está en la tool;
@@ -493,6 +495,20 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v637 — Propio y respaldo observado separados.**
+
+- Diseño aprobado aplicado al ACW, última llamada y comparación. Duración
+  observada de 7:41 conserva 461000 ms; el pago puede estimarse con ocho minutos.
+  La importación conserva el respaldo original y usa Propio como principal.
+- Diferencias de cierre/pago visibles, historial plegado y cero distinguido de
+  ausencia. Vínculos dudosos persistidos para selección explícita, con protección
+  ante cuenta/datos cambiados, otras llamadas y fallo de guardado.
+- Sin cambios de extensión, esquema alojado ni compras. Ver
+  docs/registros-propio-y-tool.md. Las veinte mejoras del plan siguen abiertas.
+- 962 pruebas correctas, build, i18n, módulos y wiring verificados. Recorridos
+  compilados aislados ES/EN, claro/oscuro y 320/390/1200 px para precisión,
+  importación, corrección a cero, recarga y selección explícita de respaldo.
+
 **v636 — Estimaciones desde cuarenta segundos y disponibilidad compacta.**
 
 - Umbral personal inclusivo: 7:39 → 7 minutos y 7:40 → 8. Nuevas estimaciones
@@ -502,7 +518,8 @@ futura opera bajo esto, sin excepción:
 - Tooltip del ACW con explicación y ejemplos aprobados. Disponibilidad compacta
   también sin conexión; explicación y preparación plegadas. Extensión sin cambios, 2.3.1.
 - 951 pruebas y doce recorridos compilados ES/EN, temas y 320/390/1200 px.
-  Publicación en curso. Ver docs/redondeo-de-estimaciones.md.
+  PR #98 publicado, CI de PR/main y traducciones correctos; producción READY
+  y archivos del mismo SHA verificados. Ver docs/redondeo-de-estimaciones.md.
 
 **v635 — Presentación aprobada de once vistas publicada.**
 
@@ -516,14 +533,3 @@ futura opera bajo esto, sin excepción:
   2.3.1 instalada con respaldo; el propietario confirmó la recarga y su versión.
   Las veinte mejoras funcionales abiertas siguen en su plan.
   Ver docs/presentacion-aprobada.md y docs/control-visual-11-vistas.md.
-
-**v634 — Avisos y cierres breves.**
-
-- Puntos 48–52 y 75: resumen de alarmas, acción/sonido, progreso desde el mismo
-  cálculo del aviso, acceso a apoyo y notas guardadas. Sincronización de la
-  extensión silenciosa; volumen cero explícito y tamaño original del audio.
-- Nota opcional plegada y cierre sin guardar explícito. No cambia contabilidad,
-  disponibilidad ni guardado de reflexiones. Presentación de revisión reutilizada.
-- 943 pruebas, 16 recorridos ES/EN/temas/anchos y cuatro recorridos de archivo
-  propio, reflexión y consulta correctos. Detalle diferido 112 KB; límites
-  inicial/arranque/idiomas conservados. Ver docs/avisos-y-cierres-de-llamadas.md.

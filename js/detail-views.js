@@ -183,6 +183,7 @@ export { confirmActivityChange } from './work-actions.js';
 export { confirmReplacement, importBackupFile, openSnapshotRecovery } from './backup-recovery.js';
 export { renderImportOutcome } from './call-review-view.js';
 export { renderCallTable } from './call-table-view.js';
+export { openCallRecords } from './call-records-view.js';
 export { confirmShiftTransition, openWorkDayReview, confirmSchedulePlan } from './shift-work-review.js';
 export { payReceiptAction } from './pay-receipts.js';
 export { confirmFinanceAction, openFinanceDistribution } from './finance-review.js';

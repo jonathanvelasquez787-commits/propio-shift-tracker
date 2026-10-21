@@ -1,5 +1,5 @@
 export function partitionLocaleResources(resources, catalog) {
-  const lazyFiles = new Set(['js/detail-views.js', 'js/higher-rate-review.js', 'js/call-recovery.js', 'js/work-actions.js', 'js/backup-recovery.js', 'js/call-review-view.js', 'js/call-table-view.js', 'js/shift-work-review.js', 'js/pay-receipts.js', 'js/finance-review.js', 'js/accounting-export.js', 'js/notification-review.js', 'js/game-review.js']);
+  const lazyFiles = new Set(['js/detail-views.js', 'js/higher-rate-review.js', 'js/call-recovery.js', 'js/work-actions.js', 'js/backup-recovery.js', 'js/call-review-view.js', 'js/call-table-view.js', 'js/shift-work-review.js', 'js/pay-receipts.js', 'js/finance-review.js', 'js/accounting-export.js', 'js/notification-review.js', 'js/game-review.js', 'js/call-records-view.js']);
   const isLazy = key => catalog[key]?.files.length > 0 && catalog[key].files.every(file => lazyFiles.has(file));
   const subset = lazy => Object.fromEntries(Object.entries(resources).map(([language, bundle]) => [language, {
     translation: Object.fromEntries(Object.entries(bundle.translation).filter(([key]) => isLazy(key) === lazy)),

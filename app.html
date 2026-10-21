@@ -123,7 +123,7 @@
 <div class="chips">
 <div class="chip"><span class="dot-state" id="stateDot"></span><strong id="stateText">No iniciado</strong></div>
 <div class="acw-day-pair">
-<div class="chip" id="acwLiveChip" style="display:none;" title="Al colgar, el ACW cuenta cuánto esperás la siguiente llamada. Para estimar tu pago, miramos los segundos que sobran después de los minutos completos: de 0 a 39 segundos, conservamos esos minutos; de 40 a 59 segundos, sumamos un minuto. Por ejemplo: 7 minutos y 39 segundos → 7 minutos de pago estimado. Desde 7 minutos y 40 segundos → 8 minutos de pago estimado."><span aria-hidden="true">⏱️</span><span class="acw-label-full">ACW/AfterCallWork</span><span class="acw-label-short">ACW</span> <strong id="acwLiveTimer">00:00:00</strong></div>
+<button class="chip" id="acwLiveChip" style="display:none;" type="button" aria-label="Ver origen del ACW" aria-controls="callRecordsModal"><span aria-hidden="true">⏱️</span><span class="acw-label-full">ACW/AfterCallWork</span><span class="acw-label-short">ACW</span> <strong id="acwLiveTimer">00:00:00</strong><span id="acwRecordSource"></span></button><span id="acwRecordDifference" class="record-difference" hidden></span>
 <div class="summary-pill">
   <button class="day-active-label-btn" id="dayActiveLabelBtn" type="button" title="Ir a Hoy">Día activo</button>
   <button class="day-nav-btn" id="dayPrevBtn" type="button" aria-label="Día anterior" title="Día anterior">‹</button>
@@ -208,7 +208,8 @@
 <button class="action-btn" id="pasteCallsBtn" type="button" data-accent="cyan"><span class="action-ripple"></span><span class="action-icon-wrap"><span class="action-ring"></span><span class="action-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-3"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></svg></span></span><span class="action-label">Pegar Llamadas</span><span class="action-sub">Importar data</span></button>
 <button class="action-btn" id="addCallManualBtn" type="button" data-accent="good"><span class="action-ripple"></span><span class="action-icon-wrap"><span class="action-ring"></span><span class="action-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></span><span class="action-label">Agregar llamada</span><span class="action-sub">Manual</span></button>
 </div>
-<details class="fin-preview" style="margin-top:12px;"><summary>Cómo se registra una llamada en vivo</summary><p class="alert-hint">La tool mide el tiempo entre iniciar y terminar. Guarda minutos con dos decimales; una llamada muy breve puede quedar en 0 min. El pago es estimado con tu tarifa. Las llamadas detectadas por la extensión también son provisionales hasta recibir el historial de Propio.</p></details>
+<div id="latestCallRecordRow" hidden><button class="record-latest-row" id="latestCallRecordsBtn" type="button"><span class="record-latest-copy"><small>Última llamada</small><strong id="latestCallRecordLabel"></strong><span id="latestCallRecordStatus"></span></span><span class="record-latest-pay"><strong id="latestCallRecordPay"></strong><small id="latestCallRecordConverted"></small></span><span class="record-latest-open" aria-hidden="true">Ver registros</span></button></div><button class="gap-edit-btn" id="pendingCallRecordsBtn" type="button" hidden>Revisar vínculos pendientes</button>
+<details class="fin-preview" style="margin-top:12px;"><summary>Cómo se registra una llamada en vivo</summary><p class="alert-hint">La tool conserva el inicio, el final y la duración observados con milisegundos. El redondeo desde 40 segundos se usa para estimar el pago. Al llegar el historial, Propio tiene prioridad y la observación original queda como respaldo.</p></details>
 </section>
 
 <details class="accordion-card" id="earningsAccordion" open>
@@ -2286,6 +2287,12 @@ $0.72"></textarea>
 <button class="mc-btn-warn-pill" id="clearDayNoteBtn" type="button">Quitar nota</button>
 <button class="mc-btn-warn-pill" data-close-modal="dayNoteModal" type="button" style="background:transparent; border-color:var(--line); color:var(--text);">Cancelar</button>
 </div>
+</div>
+</div>
+<div aria-hidden="true" class="modal-overlay" id="callRecordsModal">
+<div aria-labelledby="callRecordsTitle" aria-modal="true" class="modal-card record-modal" role="dialog">
+<div class="mc-header"><div><h3 id="callRecordsTitle">Propio y tu respaldo</h3><p id="callRecordsSubtitle"></p></div><button aria-label="Cerrar" class="modal-close" data-close-modal="callRecordsModal" type="button">×</button></div>
+<div id="callRecordsContent"></div>
 </div>
 </div>
 <div aria-hidden="true" class="modal-overlay" id="callEditModal">

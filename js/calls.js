@@ -5,6 +5,7 @@ import { calls, settings, state, setAppCalls as setCalls, setAppState, setAppSet
 import { ignorePropioCall } from './propio-bridge.js';
 import { callFeedbackSilenced, withSilentCallFeedback } from './call-feedback.js';
 import { PAY_ESTIMATE_RULE, roundedPayMinutes, callPayMinutes } from './pay-estimate.js';
+import { observedCallRecord } from './call-records.js';
 
 let HIGHER_RATE_TIERS, MAX_CALL_DURATION_MIN, appConfirm, autoStartShiftFromCalls, callDateKeyFromValue, callDedupeKey;
 let callsForDay, callsOverlap, closeModal, connectedMinutesForDay, convertedAmountText, dayAdherence;
@@ -42,6 +43,7 @@ async function useCallRecovery(action, ...args) {
 }
 
 export function openCallRecovery() { return useCallRecovery('openCallRecovery'); }
+export function openCallRecords(callId, acwStart = null) { return useCallRecovery('openCallRecords', callId, acwStart); }
 
 // Filtro Todo/Llamadas/Acciones sobre la tabla fusionada "Tabla de llamadas y acciones de hoy" (ver
 // #tableFilterRow en el HTML y dayActionRows/renderTable más abajo). Vive en memoria, no en
@@ -74,11 +76,11 @@ function reconcileLastCallEndedAt(dayKey) {
   const now = Date.now();
   const latest = callsForDay(normalized)
     .filter(call => {
-      const end = new Date(call.endISO).getTime();
+      const end = new Date(call.records?.propio?.endISO || call.endISO).getTime();
       return Number.isFinite(end) && end <= now;
     })
-    .sort((a, b) => new Date(b.endISO) - new Date(a.endISO))[0];
-  state.lastCallEndedAt = latest ? latest.endISO : null;
+    .sort((a, b) => new Date(b.records?.propio?.endISO || b.endISO) - new Date(a.records?.propio?.endISO || a.endISO))[0];
+  state.lastCallEndedAt = latest ? latest.records?.propio?.endISO || latest.endISO : null;
 }
 
 // Editor de una llamada ya importada: corrige duración, pago, billable y dropped.
@@ -322,6 +324,8 @@ function restoreLiveBackupTiming(candidate, original, callDate, callStart) {
         : new Date(start.getTime() + candidate.durationMin * 60000).toISOString(),
     });
   }
+  if (original.records) result.records = JSON.parse(JSON.stringify(original.records));
+  result.durationMs = Math.max(0, Date.parse(result.endISO) - Date.parse(result.startISO));
   return result;
 }
 
@@ -389,8 +393,8 @@ function buildLiveCallCandidate({ customerId, startedAtISO, endedAtISO, billable
   const rawEnd = new Date(endedAtISO);
   if (Number.isNaN(start.getTime()) || Number.isNaN(rawEnd.getTime())) return null;
   const elapsedMs = Math.max(0, rawEnd.getTime() - start.getTime());
-  const durationMin = Math.round((elapsedMs / 60000) * 100) / 100;
-  // Si el fin no quedó después del inicio, se reconstruye con la duración redondeada.
+  const durationMin = elapsedMs / 60000;
+  // La duración observada conserva todos los segundos; el pago se calcula aparte.
   const end = rawEnd.getTime() > start.getTime() ? rawEnd : new Date(start.getTime() + durationMin * 60000);
   const accounting = callAccountingFields(start, todayCallDateKey(start));
   return {
@@ -401,6 +405,7 @@ function buildLiveCallCandidate({ customerId, startedAtISO, endedAtISO, billable
     // (hora/minuto), pero NO se usa para calcular startISO/endISO (ver arriba)
     callStart: callStartLabelFromHHMM(`${pad(start.getHours())}:${pad(start.getMinutes())}`),
     durationMin,
+    durationMs: elapsedMs,
     billable,
     dropped,
     pay,
@@ -520,7 +525,7 @@ export function saveManualCall() {
 export function autoSaveLiveCall(startedAtISO, endedAtISO, liveContext = null) {
   if (liveContext?.propioBridge && !callFeedbackSilenced()) return withSilentCallFeedback(() => autoSaveLiveCall(startedAtISO, endedAtISO, liveContext));
   const elapsedMs = Math.max(0, new Date(endedAtISO).getTime() - new Date(startedAtISO).getTime());
-  const durationMin = Math.round((elapsedMs / 60000) * 100) / 100;
+  const durationMin = elapsedMs / 60000;
   const pay = (roundedPayMinutes(elapsedMs / 60000) * rateTilePerMin('normal')).toFixed(2);
 
   const candidate = buildLiveCallCandidate({
@@ -536,6 +541,7 @@ export function autoSaveLiveCall(startedAtISO, endedAtISO, liveContext = null) {
     candidate.customerId = 'Propio';
     candidate.propioBridge = { ...liveContext.propioBridge };
   }
+  if (candidate) candidate.records = { tool: observedCallRecord(candidate) };
   const previous = { calls, state: JSON.parse(JSON.stringify(state)), settings: JSON.parse(JSON.stringify(settings)) };
   const result = trySaveCallCandidate(candidate);
 

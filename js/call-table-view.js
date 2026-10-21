@@ -1,4 +1,5 @@
 import { callRecordSource, matchesCallReview } from './call-review-model.js';
+import { callElapsedMs, compareCallRecords } from './call-records.js';
 
 export function renderCallTable(context) {
   const { ui, translateText, translateMarkup, getActiveDayKey, formatCallDayLabel, callsForDay, dayActionRows, tableFilterMode,
@@ -57,6 +58,9 @@ export function renderCallTable(context) {
       const rowsHtml = filtered.map(entry => {
         if (entry.kind === 'call') {
           const c = entry.call;
+          const comparison = compareCallRecords(c);
+          const seconds = Math.floor(callElapsedMs(c) / 1000);
+          const durationText = c.source === 'live' ? `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2,'0')}` : `${c.durationMin} min`;
           const billableText = String(c.billable).toLowerCase() === 'yes' ? translateText('Billable') : translateText('No billable');
           const droppedText = String(c.dropped).toLowerCase() === 'yes' ? translateText('Dropped') : translateText('No dropped');
           const higherRateBonus = higherRateBonusForCall(c);
@@ -71,11 +75,12 @@ export function renderCallTable(context) {
               <div class="tbl-row-main">
                 <div class="tbl-row-title">#${escapeHtml(c.customerId)} <span class="tbl-type-badge type-call">Llamada</span></div>
                 <div class="tbl-row-sub">${escapeHtml(billableText)} · ${escapeHtml(droppedText)} · ${escapeHtml(sourceLabel)}</div>
+                <button class="record-link" type="button" data-call-records="${escapeHtml(c.id || '')}">${comparison.propio ? comparison.tool ? translateText('Propio y respaldo') : translateText('Registro de Propio') : comparison.tool ? translateText('Respaldo · pendiente de Propio') : translateText('Ver registros')}${Math.abs(comparison.differenceMs || 0) >= 1000 ? ui` · Diferencia: ${Math.round(Math.abs(comparison.differenceMs) / 1000)} s` : ''}</button>
               </div>
               <div class="tbl-row-right">
                 <div class="tbl-row-amount">${money(parseMoney(c.pay))}</div>
                 ${financeConvertedNote(parseMoney(c.pay))}
-                <div class="tbl-row-time">${escapeHtml(c.callStart)} · ${c.durationMin} min</div>
+                <div class="tbl-row-time">${escapeHtml(c.callStart)} · ${escapeHtml(durationText)}</div>
                 ${higherRateBadge}
               </div>
               <div class="tbl-row-actions">

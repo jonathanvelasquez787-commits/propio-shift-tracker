@@ -267,8 +267,10 @@ pruebas del proyecto.
 - **Segundos oficiales de Propio:** obtener evidencia sobre duración y pago del
   último minuto incompleto. La precisión del contador de la tool no demuestra
   la regla de facturación de Propio.
-  Por decisión del propietario se prepara el umbral personal inclusivo de 40 s
-  para estimaciones nuevas; no cierra la investigación oficial. Ver
+  Por decisión del propietario se publicó el umbral personal inclusivo de 40 s
+  para estimaciones nuevas (web 636); no cierra la investigación oficial. La
+  entrega 637 conserva observación y Propio por separado; ver
+  [registros y excepciones](registros-propio-y-tool.md). Ver también
   [alcance del redondeo](redondeo-de-estimaciones.md).
 - **Visibilidad por nombre en Google:** seguimiento externo documentado en
   [SEO](seo.md). La última comprobación documentada no es una consulta actual.
