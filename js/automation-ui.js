@@ -72,16 +72,20 @@ export function installAutomationStatusUi({ host = window, document = host.docum
     const current = automationStatusView(snapshot, now()), [title, detail] = statusMessages(current.key, snapshot);
     setText('automationTitle', title); setText('automationDetail', current.key === 'pause' ? pauseDescription(snapshot, now()) : detail);
     const timer = element('automationCountdown');
+    if(timer.dataset)timer.dataset.kind=current.key;
     timer.hidden = current.seconds === null && current.key !== 'before-shift';
     const clock = current.seconds !== null ? `${Math.floor(current.seconds / 60)}:${String(current.seconds % 60).padStart(2, '0')}`
       : current.key === 'before-shift' && snapshot.startAt ? new Date(snapshot.startAt).toLocaleTimeString(displayLocale(), { hour:'2-digit', minute:'2-digit' }) : '';
     setText('automationCountdown', clock);
+    const acwProgress=element('automationAcwProgress'),acwBar=element('automationAcwProgressBar');
+    if(acwProgress){acwProgress.hidden=current.key!=='spacing';if(current.key==='spacing'){const total=snapshot.options.minutes*60,elapsed=Math.max(0,Math.min(total,total-current.seconds));if(acwBar)acwBar.value=elapsed/total*100;setText('automationAcwProgressLabel',ui`ACW actual: ${Math.floor(elapsed/60)}:${String(elapsed%60).padStart(2,'0')} de ${snapshot.options.minutes} min`);}}
     const recent = snapshot && now() >= Date.parse(snapshot.reportedAt) && now() - Date.parse(snapshot.reportedAt) <= AUTOMATION_STATUS_MAX_AGE;
     const observed = recent && snapshot.observedAt && now() >= Date.parse(snapshot.observedAt) && now() - Date.parse(snapshot.observedAt) <= AUTOMATION_STATUS_MAX_AGE;
     setText('automationTrackerCheck', recent ? translateText('Tracker y cuenta reconocidos') : translateText('Esperando confirmar la conexión de la extensión'));
     setText('automationPortalCheck', observed && snapshot.portal === 'authenticated' ? translateText('Sesión de Propio reconocida') : translateText('Sesión de Propio pendiente de confirmar'));
     setText('automationScheduleCheck', recent && snapshot.scheduleVerified ? translateText('Horario y descansos confirmados') : translateText('Horario y descansos pendientes de confirmar'));
     setText('automationOptionsCheck', recent ? ui`Espera entre llamadas: ${snapshot.options.spacing ? ui`${snapshot.options.minutes} minutos de ACW` : translateText('apagada')}` : translateText('Esperando tus opciones actuales'));
+    setText('automationHoursCheck',recent&&snapshot.scheduleVerified&&snapshot.startAt&&snapshot.endAt?`${momentLabel(snapshot.startAt,now())} – ${momentLabel(snapshot.endAt,now())}`:'');
     setText('automationFirstCheck', recent ? ui`Inicio automático del turno: ${snapshot.options.first ? translateText('activado') : translateText('apagado')}` : '');
     setText('automationReturnsCheck', recent ? ui`Regreso automático: Break ${snapshot.options.break ? translateText('activado') : translateText('apagado')} · Lunch ${snapshot.options.lunch ? translateText('activado') : translateText('apagado')}` : '');
     setText('automationPauseCheck', recent ? pauseDescription(snapshot, now()) : '');

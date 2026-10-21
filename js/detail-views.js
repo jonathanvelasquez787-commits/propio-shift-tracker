@@ -20,15 +20,14 @@ export function renderEarningsBreakdown(wrap, sourceCalls, context) {
     ? ui`Cambio manual: $1 = ${escapeHtml(label)} ${rate}.`
     : translateText('Moneda secundaria desactivada.');
   const rows = [
-    [translateText('Base registrada'), amounts.registeredBase],
-    [translateText('Base estimada en vivo'), amounts.liveBase],
-    [translateText('Higher Rate calculado'), amounts.bonus],
-    [translateText('Total de la tool'), amounts.total],
+    [translateText('Base registrada'), amounts.registeredBase, translateText('Importadas y manuales'), ''],
+    [translateText('En vivo'), amounts.liveBase, translateText('Estimación provisional'), 'is-live'],
+    [translateText('Higher Rate'), amounts.bonus, translateText('Bono calculado'), 'is-bonus'],
   ];
-  const html = ui`<p class="note" style="margin:0;">${escapeHtml(scopeLabel)} · Registros: ${amounts.count} · Estimados en vivo: ${amounts.liveCount}</p>`
-    + rows.map(([label, amount]) => ui`<div class="fin-preview-row"><span class="fin-preview-main fin-preview-name">${escapeHtml(label)}</span><span class="fin-preview-right"><strong>${money(amount)}</strong>${financeConvertedInline(amount)}</span></div>`).join('')
-    + ui`<p class="alert-hint">La base registrada incluye importaciones y montos manuales. Los estimados en vivo se actualizan con el historial de Propio. Higher Rate se calcula con tus ventanas; el total no confirma un pago recibido.</p>`
-    + `<p class="alert-hint">${conversion}</p>`;
+  const html = `<p class="review-scope">${escapeHtml(scopeLabel)}</p><div class="polished-hero"><span class="polished-eyebrow">${escapeHtml(translateText('Total de la tool'))}</span><strong class="polished-amount">${money(amounts.total)}${financeConvertedInline(amounts.total)}</strong></div>`
+    + rows.map(([label, amount, hint, tone]) => `<div class="polished-breakdown-row"><span class="polished-dot ${tone}"></span><div><strong>${escapeHtml(label)}</strong><small>${escapeHtml(hint)}</small></div><div><strong class="polished-amount">${money(amount)}</strong><span class="polished-converted">${financeConvertedInline(amount)}</span></div></div>`).join('')
+    + ui`<details class="polished-disclosure"><summary>Cómo se forma el total</summary><div class="polished-detail"><div class="review-line"><span>Registros</span><strong>${amounts.count}</strong></div><div class="review-line"><span>Estimados en vivo</span><strong>${amounts.liveCount}</strong></div><p class="note">La base registrada incluye importaciones y montos manuales. Los estimados en vivo se actualizan con el historial de Propio. Higher Rate se calcula con tus ventanas; el total no confirma un pago recibido.</p></div></details>`
+    + `<p class="polished-foot">${conversion}</p>`;
   if (wrap.innerHTML !== html) wrap.innerHTML = html;
 }
 
@@ -189,4 +188,5 @@ export { payReceiptAction } from './pay-receipts.js';
 export { confirmFinanceAction, openFinanceDistribution } from './finance-review.js';
 export { exportAccountingDocument } from './accounting-export.js';
 export { renderNotificationReview } from './notification-review.js';
+export { renderGameReview } from './game-review.js';
 export const detailTranslations = null;

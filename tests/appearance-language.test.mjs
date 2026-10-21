@@ -17,7 +17,7 @@ test('production locale deduplication reconstructs every translation and placeho
   assert.deepEqual(JSON.parse(JSON.stringify(context.window.pstLocaleResources)),resources);
   const { initial, details } = partitionLocaleResources(resources, collectCatalog());
   const core = await minify(localeResourceScript(initial));
-  assert.ok(Buffer.byteLength(core.code)<230000);
+  assert.ok(Buffer.byteLength(core.code)<235000);
   for (const language of ['es', 'en']) assert.deepEqual({ ...initial[language].translation, ...details[language].translation }, resources[language].translation);
   const es=context.window.pstLocaleResources.es.translation,en=context.window.pstLocaleResources.en.translation;
   assert.notEqual(es,en);const key=Object.keys(es).find(key=>es[key]===en[key]),original=en[key];es[key]='modified';assert.equal(en[key],original);

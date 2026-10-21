@@ -132,6 +132,7 @@ import {
   onGameShiftEnded,
   onGameShiftStarted,
   renderGame,
+  gameReviewSnapshot,
   renderGameLive,
   configureGameContext,
 } from './game.js';
@@ -5115,6 +5116,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       usdCeilFromCurrencyAmount,
     });
     configureGameContext({
+      reviewGame:refreshGameReview,
       appConfirm, callDateKeyFromValue, callDateToDate, callsForDay, closeModal, computeComplianceStreak, convertedAmountText,
       cycleBoundsForOffset, cycleEarningsForOffset, dayAdherence, dayComplianceStatus, dayConfigFor,
       dayIsEffectivelyOff, effectiveCycleGoal, effectiveDailyGoal, escapeHtml, financeConvertedInline,
@@ -5160,6 +5162,18 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       });
       // Los 5 campos "Mensaje" dejaron de ser editables (ver MESSAGE_PREVIEW_CONFIGS/syncMessagePreview más abajo)
       Object.keys(MESSAGE_PREVIEW_CONFIGS).forEach((kind) => syncMessagePreview(kind));
+    }
+
+    async function refreshGameReview(retry=false) {
+      if(document.getElementById('pageAchievements').hidden)return;
+      const owner=settings;
+      let view;
+      try{view=await loadDetailViews({retry});}catch{
+        if(owner===settings)document.getElementById('gameReviewSummary').textContent=translateText('No se pudo cargar el resumen. Volvé a abrir esta sección.');
+        return;
+      }
+      if(owner!==settings||document.getElementById('pageAchievements').hidden)return;
+      view.renderGameReview({ui,translateText,escapeHtml,model:gameReviewSnapshot(),valid:()=>owner===settings});
     }
 
     async function openNotificationReview() {
@@ -6614,6 +6628,7 @@ export function render() {
       document.querySelectorAll('.app-page').forEach(el => {
         el.hidden = el.getAttribute('data-page') !== page;
       });
+      if(page==='achievements')refreshGameReview(true);
       document.querySelectorAll('.sidebar-link').forEach(btn => {
         btn.classList.toggle('active', btn.getAttribute('data-page') === page);
       });

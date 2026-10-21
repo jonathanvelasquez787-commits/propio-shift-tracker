@@ -626,11 +626,6 @@ export function renderReportsDashboard() {
       : pace.workDaysLeft === 0
         ? translateText('Sin días laborales')
         : ui`~${pace.perDayHours.toFixed(1)} h/día`;
-    const paceSubText = pace.met
-      ? translateText('Todo lo que ganes de aquí en adelante es extra')
-      : pace.workDaysLeft === 0
-        ? ui`Faltan ${money(pace.remainingUsd)}${financeConvertedInline(pace.remainingUsd)} y ya no quedan días laborales en el ciclo`
-        : ui`Faltan ${money(pace.remainingUsd)}${financeConvertedInline(pace.remainingUsd)} en ${pace.workDaysLeft} ${pace.workDaysLeft === 1 ? translateText('día laboral') : translateText('días laborales')} — ${money(pace.perDayUsd)}${financeConvertedInline(pace.perDayUsd)} por día`;
     cycleGrid.innerHTML = ui`
       <div class="rpt-mini-card rpt-streak-card">
         <div class="rpt-mini-title">${iconHtml('flame')} RACHA DE CUMPLIMIENTO</div>
@@ -668,15 +663,12 @@ export function renderReportsDashboard() {
           <div>Higher Rate<b>${money(c.higherRate)}</b>${financeConvertedNote(c.higherRate)}</div>
         </div>
       </div>
-      <div class="rpt-mini-card">
+      <div class="rpt-mini-card polished-forecast">
         <div class="rpt-mini-title">${iconHtml('chart')} PROYECCIÓN DEL CICLO</div>
-        <div class="rpt-bw-metric"><span>Con el promedio del ciclo</span><b>${money(proj.projected)}${financeConvertedInline(proj.projected)}</b></div>
-        <div class="rpt-bw-metric"><span>Días transcurridos</span><b>${proj.daysElapsed}/${CYCLE_LENGTH_DAYS}</b></div>
-        <div class="rpt-bw-metric"><span>Días restantes</span><b>${proj.daysRemaining}</b></div>
-        <div class="rpt-bw-metric"><span>vs tu meta del ciclo</span><b style="color:var(--${projTone});">${projDelta >= 0 ? '+' : ''}${money(projDelta)}${financeConvertedInline(projDelta)}</b></div>
-        <div class="rpt-bw-metric"><span>Para llegar a tu meta</span><b style="color:var(--${pace.met ? 'good' : 'text'});">${escapeHtml(paceText)}</b></div>
-        <div class="rpt-act-row" style="border-bottom:none; padding-top:2px;"><span class="rpt-act-left" style="font-size:11px; line-height:1.4;">${paceSubText}</span></div>
-        <details class="review-details"><summary>Cómo se calcula la proyección</summary><div class="review-detail-body"><div class="review-line"><span>Promedio por día natural</span><strong>${money(proj.dailyAvg)}${financeConvertedInline(proj.dailyAvg)}</strong></div><p class="note">Divide las ganancias registradas del ciclo, incluido Higher Rate, entre los días naturales transcurridos y extiende ese promedio al ciclo completo. Cuenta días libres y hoy, aunque todavía esté incompleto. No predice nuevas promociones ni garantiza ese ingreso.</p><p class="note">El ritmo para llegar a la meta usa los días laborales restantes; es un cálculo distinto.</p></div></details>
+        <div class="polished-hero"><span class="polished-eyebrow">Con el promedio del ciclo</span><strong class="polished-amount">${money(proj.projected)}${financeConvertedInline(proj.projected)}</strong><div class="polished-days"><span>${proj.daysElapsed}/${CYCLE_LENGTH_DAYS} días transcurridos</span><span>${proj.daysRemaining} días restantes</span></div></div>
+        <div class="polished-pace"><span class="polished-eyebrow">Para llegar a tu meta</span><strong>${escapeHtml(paceText)}</strong>${!pace.met&&pace.workDaysLeft>0?ui`<span class="polished-amount">${money(pace.perDayUsd)}${financeConvertedInline(pace.perDayUsd)}</span><p>por día laboral · ${pace.workDaysLeft} restantes</p>`:pace.met?ui`<p>Todo lo que ganes de aquí en adelante es extra</p>`:ui`<p>No quedan días laborales en el ciclo.</p>`}</div>
+        <div class="polished-bento polished-pair"><div><span>Meta del ciclo</span><strong>${money(c.goal)}${financeConvertedInline(c.goal)}</strong></div><div><span>Falta para la meta</span><strong>${money(pace.remainingUsd)}${financeConvertedInline(pace.remainingUsd)}</strong></div></div>
+        <details class="polished-disclosure"><summary>Cómo se calcula la proyección</summary><div class="polished-detail"><div class="review-line"><span>Ganado en el ciclo</span><strong>${money(c.amount)}${financeConvertedInline(c.amount)}</strong></div><div class="review-line"><span>Promedio por día natural</span><strong>${money(proj.dailyAvg)}${financeConvertedInline(proj.dailyAvg)}</strong></div><div class="review-line"><span>vs tu meta del ciclo</span><strong style="color:var(--${projTone});">${projDelta >= 0 ? '+' : ''}${money(projDelta)}${financeConvertedInline(projDelta)}</strong></div><p class="note">Divide las ganancias registradas del ciclo, incluido Higher Rate, entre los días naturales transcurridos y extiende ese promedio al ciclo completo. Cuenta días libres y hoy, aunque todavía esté incompleto. No predice nuevas promociones ni garantiza ese ingreso.</p><p class="note">El ritmo para llegar a la meta usa los días laborales restantes; es un cálculo distinto.</p></div></details>
       </div>
     `;
     const streakToggle = document.getElementById('streakSkipOffToggle');

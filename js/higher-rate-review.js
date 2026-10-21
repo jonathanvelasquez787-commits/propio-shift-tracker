@@ -77,11 +77,11 @@ export function openHigherRateReview(context, windowId) {
     const result = window && higherRateWindowReview(data.calls, window, context);
     if (!result) { body.textContent = translateText('La ventana cambió o ya no está disponible. Volvé a abrir Higher Rate.'); return; }
     const row = item => ui`<div class="fin-preview-row"><div class="fin-preview-main"><strong>#${escapeHtml(item.call.customerId || item.call.id)}</strong><div class="fin-preview-sub">${escapeHtml(dateTime(item.call.startISO))} · ${escapeHtml(String(item.call.durationMin))} min</div><div class="fin-preview-sub">${escapeHtml(reasons[item.reason])}</div></div><div class="fin-preview-right"><strong>${amount(item.amount)}</strong><div class="fin-preview-sub">${escapeHtml(context.HIGHER_RATE_TIERS[item.tier]?.label || item.tier)}</div></div></div>`;
-    body.innerHTML = ui`<p class="note">${escapeHtml(dateTime(result.bounds.start))} – ${escapeHtml(dateTime(result.bounds.end))}</p>
-      <p class="alert-hint">Cálculo de la tool: ${context.HIGHER_RATE_EARLY_GRACE_MIN} min de gracia antes del inicio. El fin no se incluye. Cuenta la duración completa; en ventanas superpuestas gana el mayor bono.</p>
-      <div class="fin-preview"><div>Califican por horario: ${result.eligibleCount}</div><div>Bono atribuido a esta ventana: ${amount(result.appliedTotal)}</div></div>
-      <details open><summary>Califican o conservan un bono de esta ventana (${result.rows.length})</summary>${result.rows.map(row).join('') || ui`<p class="note">Todavía no hay llamadas registradas que califiquen.</p>`}</details>
-      <details><summary>Fuera de esta ventana (${result.excluded.length})</summary>${result.excluded.map(row).join('')}</details>
+    body.innerHTML = ui`<p class="review-scope">${escapeHtml(dateTime(result.bounds.start))} – ${escapeHtml(dateTime(result.bounds.end))}</p>
+      <div class="polished-hero"><span class="polished-tag is-good">${escapeHtml(context.HIGHER_RATE_TIERS[window.tier]?.label||window.tier)}</span><p class="polished-eyebrow">Bono atribuido a esta ventana</p><strong class="polished-amount">${amount(result.appliedTotal)}</strong><div class="polished-days"><span>Califican por horario: ${result.eligibleCount}</span><span>Fuera de esta ventana: ${result.excluded.length}</span></div></div>
+      <details class="polished-disclosure"><summary>Cómo califica una llamada</summary><div class="polished-detail"><div class="review-line"><span>Gracia antes del inicio</span><strong>${context.HIGHER_RATE_EARLY_GRACE_MIN} min</strong></div><div class="review-line"><span>Desde</span><strong>${escapeHtml(dateTime(result.grace))}</strong></div><p class="note">El fin no se incluye. Cuenta la duración completa; en ventanas superpuestas gana el mayor bono.</p></div></details>
+      <details class="polished-disclosure"><summary>Califican o conservan un bono de esta ventana (${result.rows.length})</summary><div class="polished-detail">${result.rows.map(row).join('') || ui`<p class="note">Todavía no hay llamadas registradas que califiquen.</p>`}</div></details>
+      <details class="polished-disclosure"><summary>Fuera de esta ventana (${result.excluded.length})</summary><div class="polished-detail">${result.excluded.map(row).join('')}</div></details>
       <div class="modal-actions mc-action-row"><button type="button" class="gap-edit-btn" data-hr-refresh>Volver a revisar</button><button type="button" class="gap-edit-btn" data-hr-correct>Corregir promoción</button></div>
       <div data-hr-editor hidden>
         <p class="note">El recálculo actualiza ganancias, Finanzas y Logros. Conserva el pago base y los bonos conservados de otras promociones.</p>
@@ -118,7 +118,7 @@ export function openHigherRateReview(context, windowId) {
       if (!plan) { error.textContent = translateText('Revisá la fecha, las horas, el nivel y que la ventana siga disponible.'); return; }
       if (!plan.hasChanges) { error.textContent = translateText('No hay cambios que aplicar.'); return; }
       prepared = { value, signature: JSON.stringify(value), stamp: context.stamp() };
-      impact.innerHTML = ui`<div class="fin-preview"><div>Llamadas afectadas: ${plan.rows.length}</div><div>Antes: ${amount(plan.beforeAffected)}</div><div>Después: ${amount(plan.afterAffected)}</div></div>`
+      impact.innerHTML = ui`<p class="review-scope">Llamadas afectadas: ${plan.rows.length}</p><div class="polished-comparison"><div><span>Antes</span><strong class="polished-amount">${amount(plan.beforeAffected)}</strong></div><span aria-hidden="true">→</span><div><span>Después</span><strong class="polished-amount">${amount(plan.afterAffected)}</strong></div></div>`
         + plan.rows.map(item => ui`<div class="fin-preview-row"><div class="fin-preview-main"><strong>#${escapeHtml(item.call.customerId || item.call.id)}</strong><div class="fin-preview-sub">${escapeHtml(dateTime(item.call.startISO))}</div></div><div class="fin-preview-right"><div>Antes: ${amount(item.before)}</div><div>Después: ${amount(item.after)}</div></div></div>`).join('');
       apply.hidden = false;
     };

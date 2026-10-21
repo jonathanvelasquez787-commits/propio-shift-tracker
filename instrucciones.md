@@ -324,13 +324,25 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
+- **Prioridad visual del 20/10:** el propietario rechazó el resumen de Logros
+  en preparación y señaló pantallas anteriores con texto largo y plano.
+  No publicar la fase 9 con esa presentación. Hay una nueva propuesta de
+  11 pantallas fuera de Git, incluidos Logros, Avisos, respaldos, disponibilidad,
+  ganancias, Higher Rate, proyección, popup, horario, Finanzas y borrado de cuenta.
+  Mockup completo comprobado en ambos temas y 320/390/1200 px (66 vistas y
+  22 accesos de detalle). Las once vistas fueron aprobadas explícitamente el
+  20/10 con «Aprobadas»; aplicarlas antes de continuar las fases funcionales.
+  Registrar implementación y capturas reales en
+  [control visual](docs/control-visual-11-vistas.md), sin dar por comprobada la
+  app a partir de la maqueta. No deshacer el trabajo ni los resguardos preparados.
+
 - **Mejoras integrales aprobadas el 18/10:** ejecutar las recomendaciones de la
   evaluación de 79 funciones por fases; alcance y estado completo en
-  [plan de mejoras](docs/plan-mejoras-integrales.md). 53 mejoras publicadas:
-  fases 1–7 verificadas, incluido Finanzas, el diseño aprobado y Reportes,
-  Calendario y exportaciones. Web 633 publicada con CI y producción comprobados;
-  Avisos web 634 tiene seis puntos probados sin publicar; siguen Logros,
-  accesibilidad, cuenta e instalación.
+  [plan de mejoras](docs/plan-mejoras-integrales.md). 59 mejoras publicadas:
+  fases 1–8 verificadas, incluido Finanzas, el diseño aprobado y Reportes,
+  Calendario y exportaciones. Web 634 publicada con CI,
+  producción y archivos públicos comprobados; siguen Logros, accesibilidad,
+  cuenta e instalación.
   No perder las fases posteriores al
   entregar una parte ni considerar pendiente la instalación ya confirmada.
 - **Segundos oficiales de Propio:** confirmar con evidencia si el último minuto
@@ -477,7 +489,18 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
-**v634 — Avisos y cierres breves (sin publicar).**
+**v635 — Presentación aprobada de once vistas; entrega preparada.**
+
+- Diseño aprobado aplicado a la web y al popup. Disponibilidad con contador y
+  texto en una fila compacta, según el ajuste posterior del propietario.
+- 947 pruebas correctas y doce recorridos ES/EN, claro/oscuro y 320/390/1200 px.
+  Popup comprobado en ambos temas con API de Chrome simulada. Revisión visual
+  detectó y corrigió posiciones de grid, ancho de Logros y contraste de acciones.
+- Web 635.0.0 y extensión 2.3.1 preparadas; confirmar CI, producción e instalación
+  antes de declararlas publicadas. Las veinte mejoras abiertas siguen en su plan.
+  Ver docs/presentacion-aprobada.md y docs/control-visual-11-vistas.md.
+
+**v634 — Avisos y cierres breves.**
 
 - Puntos 48–52 y 75: resumen de alarmas, acción/sonido, progreso desde el mismo
   cálculo del aviso, acceso a apoyo y notas guardadas. Sincronización de la
@@ -500,17 +523,3 @@ futura opera bajo esto, sin excepción:
   ventana de impresión verificados sin modificar llamadas. Chrome aislado
   cancela incluso un archivo mínimo ajeno a la app; guardado nativo CSV no
   certificado, sin cambiar políticas. Ver docs/reportes-calendario-y-exportaciones.md.
-
-**v632 — Finanzas y presentación aprobada.**
-
-- Puntos 38–42, 45 y 76: reservas, pagos y pendientes separados; destino del
-  reparto, liberación con vista previa, alcance global en Inicio y plan hacia
-  la meta diaria antes de guardar.
-- Recepción manual única por ciclo; esperado recalculable y recibido fijo.
-  Fallos conservan borrador, importes, pagos y datos previos inválidos.
-- Diseño de Jornada, Reservas y Pago recibido aprobado por el propietario el
-  20/10; resumen principal, explicaciones plegadas y moneda secundaria debajo.
-- 931 pruebas y comprobaciones de módulos/UI/i18n correctas. Presupuestos
-  revisados: inicial 807 KB, detalle diferido 100 KB; arranque/locales sin
-  aumentar. PR #94 y main con CI correcto; producción READY del mismo SHA y
-  archivos públicos verificados. Extensión sin cambios. Ver docs/finanzas-reservas-y-recepciones.md.

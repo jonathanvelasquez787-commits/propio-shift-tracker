@@ -240,6 +240,7 @@ let reflectionCall = null;
 let reflectionQueue = [];
 let editingRewardId = null;
 let editingTemplateId = null;
+let rewardEditorOwner=null,rewardEditorRevision='';
 let deferredWindow = null;
 
 export function clearPositiveReinforcementTransients({ keepEditor = false } = {}) {
@@ -444,7 +445,7 @@ function rewardEditorValues() {
     accumulationTarget: document.getElementById('physicalRewardAccumulationInput')?.value,
     durationMin: document.getElementById('physicalRewardDurationInput')?.value,
     costUsd: document.getElementById('physicalRewardCostInput')?.value,
-    enabled: true,
+    enabled: document.getElementById('physicalRewardEnabledInput')?.checked !== false,
   });
 }
 
@@ -458,6 +459,8 @@ function syncRewardEditorConditional() {
 }
 
 function openRewardEditor(reward = null, template = null) {
+  rewardEditorOwner=settings;
+  rewardEditorRevision=JSON.stringify(settings.reinforcement.rewards);
   const source = reward || template || { icon: '🎁', name: '', window: 'break', trigger: 'calls', every: 5, maxPerDay: 1, accumulationTarget: 1, durationMin: 0, costUsd: 0 };
   editingRewardId = reward?.id || null;
   editingTemplateId = reward?.templateId || template?.id || null;
@@ -471,12 +474,23 @@ function openRewardEditor(reward = null, template = null) {
   document.getElementById('physicalRewardAccumulationInput').value = source.accumulationTarget || 1;
   document.getElementById('physicalRewardDurationInput').value = source.durationMin || '';
   document.getElementById('physicalRewardCostInput').value = source.costUsd || '';
+  const enabled=document.getElementById('physicalRewardEnabledInput');
+  if(enabled)enabled.checked=source.enabled!==false;
+  const advanced=document.getElementById('physicalRewardAdvanced');
+  if(advanced)advanced.open=!!reward&&(source.enabled===false||source.costUsd>0||source.durationMin>0||source.accumulationTarget>1||source.maxPerDay>1);
   document.getElementById('deletePhysicalRewardBtn').hidden = !reward;
   syncRewardEditorConditional();
   openModal('physicalRewardEditorModal');
 }
 
+function rewardEditorIsCurrent() {
+  if(rewardEditorOwner===settings&&rewardEditorRevision===JSON.stringify(settings.reinforcement.rewards))return true;
+  toast(translateText('La cuenta o los premios cambiaron. Cerrá el editor y abrilo de nuevo.'));
+  return false;
+}
+
 function saveRewardEditor() {
+  if(!rewardEditorIsCurrent())return false;
   const reward = rewardEditorValues();
   if (!reward) {
     toast(translateText('Escribe un nombre para el premio.'));
@@ -497,12 +511,14 @@ function saveRewardEditor() {
     return false;
   }
   closeModal('physicalRewardEditorModal');
+  rewardEditorOwner=null;
   renderPositiveReinforcement();
   toast(translateText('Premio guardado'));
 }
 
 function deleteRewardEditor() {
   if (!editingRewardId) return;
+  if(!rewardEditorIsCurrent())return false;
   const previous = settings.reinforcement.rewards;
   settings.reinforcement.rewards = settings.reinforcement.rewards.filter((item) => item.id !== editingRewardId);
   if (saveSettingsOnly() === false) {
@@ -510,6 +526,7 @@ function deleteRewardEditor() {
     return false;
   }
   closeModal('physicalRewardEditorModal');
+  rewardEditorOwner=null;
   renderPositiveReinforcement();
 }
 
@@ -587,7 +604,13 @@ function renderSettingsRewards() {
     syncPresetSelection();
   }
   if (selected) selected.innerHTML = settings.reinforcement.rewards.length
-    ? settings.reinforcement.rewards.map((reward) => ui`<button type="button" class="physical-reward-selected" data-positive-action="edit-reward" data-reward-id="${escapeHtml(reward.id)}"><span>${escapeHtml(reward.icon)}</span><strong>${escapeHtml(reward.name)}</strong><small>${escapeHtml(WINDOW_LABELS[reward.window])}${reward.accumulationTarget > 1 ? ui` · ${Math.min(state.game.reinforcement.progress[reward.id] || 0, reward.accumulationTarget)}/${reward.accumulationTarget} hitos` : ''}</small></button>`).join('')
+    ? settings.reinforcement.rewards.map((reward) => {
+      const matches=item=>(item.sourceRewardId||item.rewardId)===reward.id;
+      const pending=state.game.reinforcement.pendingRewards.filter(matches).length;
+      const completed=state.game.reinforcement.claims.filter(matches).length;
+      const status=pending?ui`${pending} por realizar`:completed?ui`${completed} realizados`:translateText('En progreso');
+      return ui`<button type="button" class="physical-reward-selected" data-positive-action="edit-reward" data-reward-id="${escapeHtml(reward.id)}"><span>${escapeHtml(reward.icon)}</span><strong>${escapeHtml(reward.name)}</strong><small>${escapeHtml(WINDOW_LABELS[reward.window])} · ${reward.enabled===false?translateText('Pausado')+' · ':''}${escapeHtml(status)}${reward.accumulationTarget > 1 ? ui` · ${Math.min(state.game.reinforcement.progress[reward.id] || 0, reward.accumulationTarget)}/${reward.accumulationTarget} hitos` : ''}</small></button>`;
+    }).join('')
     : translateMarkup('<p class="game-collection-empty">Aún no elegiste premios. Agrega uno del catálogo o crea el tuyo.</p>');
 }
 
