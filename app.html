@@ -166,7 +166,9 @@
 </summary>
 <div class="automation-body">
 <p class="automation-detail" id="automationDetail">Conectá la extensión para ver su próxima acción. Los controles manuales siguen disponibles.</p>
-<div class="automation-checks"><ul><li id="automationTrackerCheck">Esperando confirmar la conexión de la extensión</li><li id="automationPortalCheck">Sesión de Propio pendiente de confirmar</li><li id="automationConnectionCheck"></li><li id="automationWorkCheck"></li><li id="automationScheduleCheck">Horario y descansos pendientes de confirmar</li><li id="automationFirstCheck"></li><li id="automationOptionsCheck">Esperando tus opciones actuales</li><li id="automationReturnsCheck"></li><li id="automationPauseCheck"></li></ul></div>
+<div class="automation-acw-progress" id="automationAcwProgress" hidden><progress max="100" value="0" id="automationAcwProgressBar" aria-label="Progreso de la espera entre llamadas"></progress><span id="automationAcwProgressLabel"></span></div>
+<details class="polished-disclosure"><summary>Preparación del turno</summary><div class="polished-detail automation-checks"><ul><li id="automationTrackerCheck">Esperando confirmar la conexión de la extensión</li><li id="automationPortalCheck">Sesión de Propio pendiente de confirmar</li><li id="automationConnectionCheck"></li><li id="automationWorkCheck"></li><li id="automationScheduleCheck">Horario y descansos pendientes de confirmar</li><li id="automationFirstCheck"></li><li id="automationReturnsCheck"></li><li id="automationPauseCheck"></li></ul></div></details>
+<div class="polished-days"><span id="automationOptionsCheck">Esperando tus opciones actuales</span><span id="automationHoursCheck"></span></div>
 <p class="automation-hint">Las opciones se configuran en el popup de la extensión.</p>
 <details class="automation-help"><summary>Sobre estos horarios</summary><p>La conexión indica cuándo la extensión reconoció tu sesión de Propio. El inicio laboral respeta tu horario o una llamada real anterior; si lo iniciás manualmente, usa esa hora.</p><p>El estado se actualiza desde la extensión. Si la lectura deja de ser reciente, se muestra la espera de confirmación.</p></details>
 </div>
@@ -869,7 +871,9 @@
 </div><!-- /pageFinance -->
 
 <div class="app-page game-achievements-page" data-page="achievements" hidden id="pageAchievements">
-<section class="game-achievements-hero">
+<div id="gameReviewSummary"></div>
+<details class="game-achievements-hero polished-setting">
+<summary><span>Preferencias de Logros<small>Activación, temporada y configuración</small></span></summary>
   <div class="game-page-kicker"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="5"/><path d="m8.5 12.5-2 8 5.5-3 5.5 3-2-8"/><path d="m10.2 8 1.8-2 1.8 2-1.8 1.4Z"/></svg> El Monstruo</div>
   <div class="game-achievements-hero-row">
     <div>
@@ -879,9 +883,7 @@
     <div class="game-achievements-season" data-game-role="season-status"><span>Temporada</span><strong data-game-role="season-label">Ciclo actual</strong></div>
   </div>
   <div class="game-achievements-toolbar"><label class="game-settings-toggle" for="gameEnabledInput"><span><strong>Activar Logros</strong><small>Racha, XP, misiones y colección sin cambiar tus ganancias.</small></span><input id="gameEnabledInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label></div>
-</section>
-
-
+</details>
   <section class="game-settings-disclosures" aria-label="Preferencias de Logros">
 <details class="game-panel game-settings-accordion" id="gameSettingsAccordion">
     <summary class="game-settings-accordion-summary">
@@ -1023,6 +1025,7 @@
 <section aria-labelledby="gameEquipmentTitle" class="game-panel game-equipment-panel" data-game-root="equipment-panel" id="gameEquipmentPanel">
   <div class="game-panel-head"><div><span class="game-panel-eyebrow">Personalización</span><h2 id="gameEquipmentTitle">Equipo</h2><span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Equipo" aria-describedby="equipmentInfo">i</button><span class="sched-help-tooltip" id="equipmentInfo" role="tooltip">Accesorios que desbloqueas con niveles, misiones y objetivos. Selecciona uno disponible para equiparlo o retirarlo; un accesorio bloqueado indica qué falta.</span></span></div><span class="game-panel-badge" data-game-role="equipment-count">0 / 6</span></div>
   <p class="game-panel-intro">Accesorios y mejoras que se activan al completar tus objetivos.</p>
+  <div class="goals-field"><label for="gameEquipmentFilter">Mostrar equipo</label><select id="gameEquipmentFilter"><option value="all">Todo el equipo</option><option value="owned">Obtenido</option><option value="equipped">Equipado</option><option value="available">Disponible para equipar</option><option value="locked">Por desbloquear</option></select><small id="gameEquipmentFilterStatus" role="status"></small></div>
   <div aria-label="Equipo desbloqueable" class="game-equipment-grid" data-game-role="equipment-list" data-game-root="equipment-grid" role="list">
     <article aria-label="Visor bloqueado" class="game-equipment-item is-locked" data-equipment-state="locked" data-game-role="equipment-item" role="listitem">
       <span aria-hidden="true" class="game-equipment-icon">?</span>
@@ -1326,90 +1329,7 @@
 <button class="sched-compact-test-btn" id="testMasterVolumeBtn" type="button" aria-label="Probar sonido"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polygon points="4 9 8 9 12 5 12 19 8 15 4 15"/><path d="M17 8a5 5 0 0 1 0 8"/><path d="M19.5 5.5a9 9 0 0 1 0 13"/></svg></button>
 </div>
 </div>
-
-<div class="sched-compact-card">
-<div class="sched-compact-head">
-<div class="sched-compact-title"><span class="sched-compact-title-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7 12.8 12.8 0 0 0 .7 2.8 2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5 12.8 12.8 0 0 0 2.8.7 2 2 0 0 1 1.8 2.1Z"/></svg></span>Al finalizar una llamada</div>
-</div>
-<label class="sched-checkbox-row"><input id="callEndedSoundEnabledInput" type="checkbox"/> Activar sonido</label>
-<p class="alert-hint" id="callEndedSoundHint">Suena al terminar y guardar desde la tool. La sincronización de la extensión es silenciosa.</p>
-<div class="sched-compact-row">
-<div class="sched-compact-field">
-<label for="callEndedAlarmSoundInput">Sonido</label>
-<select id="callEndedAlarmSoundInput" aria-describedby="callEndedSoundHint">
-<option value="classic">Beep clásico</option>
-<option value="chime">Campanita</option>
-<option value="custom">Sonido personalizado</option>
-</select>
-</div>
-<button class="sched-compact-test-btn" id="testCallEndedSoundBtn" type="button" aria-label="Probar sonido"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polygon points="4 9 8 9 12 5 12 19 8 15 4 15"/><path d="M17 8a5 5 0 0 1 0 8"/></svg></button>
-</div>
-<div id="callEndedAlarmCustomSoundSection" style="display:none;">
-<div class="sched-compact-field">
-<label for="callEndedAlarmSoundFile">Subir sonido (MP3/WAV/OGG, máx. 300KB)</label>
-<input accept="audio/*" id="callEndedAlarmSoundFile" type="file"/>
-</div>
-<p class="alert-hint" id="callEndedAlarmSoundFileStatus" role="status" aria-live="polite">Ningún archivo propio guardado — usando el beep clásico mientras tanto.</p>
-<button class="mc-btn-warn-pill" id="clearCallEndedSoundBtn" type="button" title="Quitar sonido personalizado" disabled>Quitar archivo</button>
-</div>
-</div>
-
-<div class="sched-compact-card">
-<div class="sched-compact-head">
-<div class="sched-compact-title"><span class="sched-compact-title-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7 12.8 12.8 0 0 0 .7 2.8 2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5 12.8 12.8 0 0 0 2.8.7 2 2 0 0 1 1.8 2.1Z"/></svg></span>Al guardar llamadas pegadas</div>
-</div>
-<label class="sched-checkbox-row"><input id="callPastedSoundEnabledInput" type="checkbox"/> Activar sonido</label>
-<p class="alert-hint" id="callPastedSoundHint">Suena una sola vez por lote guardado. Pegar texto sin importarlo o importar solo duplicados no reproduce el sonido.</p>
-<div class="sched-compact-row">
-<div class="sched-compact-field">
-<label for="callPastedAlarmSoundInput">Sonido</label>
-<select id="callPastedAlarmSoundInput" aria-describedby="callPastedSoundHint">
-<option value="classic">Beep clásico</option>
-<option value="chime">Campanita</option>
-<option value="custom">Sonido personalizado</option>
-</select>
-</div>
-<button class="sched-compact-test-btn" id="testCallPastedSoundBtn" type="button" aria-label="Probar sonido"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polygon points="4 9 8 9 12 5 12 19 8 15 4 15"/><path d="M17 8a5 5 0 0 1 0 8"/></svg></button>
-</div>
-<div id="callPastedAlarmCustomSoundSection" style="display:none;">
-<div class="sched-compact-field">
-<label for="callPastedAlarmSoundFile">Subir sonido (MP3/WAV/OGG, máx. 300KB)</label>
-<input accept="audio/*" id="callPastedAlarmSoundFile" type="file"/>
-</div>
-<p class="alert-hint" id="callPastedAlarmSoundFileStatus" role="status" aria-live="polite">Ningún archivo propio guardado — usando el beep clásico mientras tanto.</p>
-<button class="mc-btn-warn-pill" id="clearCallPastedSoundBtn" type="button" title="Quitar sonido personalizado" disabled>Quitar archivo</button>
-</div>
-</div>
-
-<div class="sched-compact-card">
-<div class="sched-compact-head">
-<div class="sched-compact-title"><span class="sched-compact-title-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7 12.8 12.8 0 0 0 .7 2.8 2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5 12.8 12.8 0 0 0 2.8.7 2 2 0 0 1 1.8 2.1Z"/></svg></span>Al agregar una llamada manual</div>
-</div>
-<label class="sched-checkbox-row"><input id="callManualSoundEnabledInput" type="checkbox"/> Activar sonido</label>
-<p class="alert-hint" id="callManualSoundHint">Suena después de guardar una llamada nueva. Editar una llamada existente no reproduce este aviso.</p>
-<div class="sched-compact-row">
-<div class="sched-compact-field">
-<label for="callManualAlarmSoundInput">Sonido</label>
-<select id="callManualAlarmSoundInput" aria-describedby="callManualSoundHint">
-<option value="classic">Beep clásico</option>
-<option value="chime">Campanita</option>
-<option value="custom">Sonido personalizado</option>
-</select>
-</div>
-<button class="sched-compact-test-btn" id="testCallManualSoundBtn" type="button" aria-label="Probar sonido"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polygon points="4 9 8 9 12 5 12 19 8 15 4 15"/><path d="M17 8a5 5 0 0 1 0 8"/></svg></button>
-</div>
-<div id="callManualAlarmCustomSoundSection" style="display:none;">
-<div class="sched-compact-field">
-<label for="callManualAlarmSoundFile">Subir sonido (MP3/WAV/OGG, máx. 300KB)</label>
-<input accept="audio/*" id="callManualAlarmSoundFile" type="file"/>
-</div>
-<p class="alert-hint" id="callManualAlarmSoundFileStatus" role="status" aria-live="polite">Ningún archivo propio guardado — usando el beep clásico mientras tanto.</p>
-<button class="mc-btn-warn-pill" id="clearCallManualSoundBtn" type="button" title="Quitar sonido personalizado" disabled>Quitar archivo</button>
-</div>
-</div>
-
-
-<div class="sched-compact-card">
+<details class="polished-setting" id="notificationScheduleGroup"><summary><span>Turno y descansos<small>Anticipación y sonidos</small></span></summary><div class="polished-setting-body"><div class="sched-compact-card">
 <div class="sched-compact-head">
 <div class="sched-compact-title"><span class="sched-compact-title-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><line x1="10" y1="2" x2="14" y2="2"/><line x1="12" y1="6" x2="12" y2="2.5"/><circle cx="12" cy="13" r="8"/><polyline points="12 9 12 13 15 15"/></svg></span>Antes de mi turno</div>
 <div class="sched-help-wrap">
@@ -1452,7 +1372,6 @@
 <p class="alert-hint" id="shiftAlarmSoundFileStatus" style="margin-top:4px;">Ningún archivo propio guardado — usando el beep clásico mientras tanto.</p>
 </div>
 </div>
-
 <div class="sched-compact-card">
 <div class="sched-compact-head">
 <div class="sched-compact-title"><span class="sched-compact-title-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg></span>Antes de que empiece tu Break/Lunch</div>
@@ -1496,7 +1415,6 @@
 <p class="alert-hint" id="breakStartAlarmSoundFileStatus" style="margin-top:4px;">Ningún archivo propio guardado — usando el beep clásico mientras tanto.</p>
 </div>
 </div>
-
 <div class="sched-compact-card">
 <div class="sched-compact-head">
 <div class="sched-compact-title"><span class="sched-compact-title-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><polyline points="12 9 12 13 14.5 14.5"/><path d="M5 3 2 6"/><path d="M22 6 19 3"/></svg></span>Antes de que termine tu Break/Lunch</div>
@@ -1539,9 +1457,86 @@
 </div>
 <p class="alert-hint" id="breakEndAlarmSoundFileStatus" style="margin-top:4px;">Ningún archivo propio guardado — usando el beep clásico mientras tanto.</p>
 </div>
+</div></div></details>
+<details class="polished-setting" id="notificationCallsGroup"><summary><span>Llamadas guardadas<small>Finalizadas, importadas y manuales</small></span></summary><div class="polished-setting-body"><div class="sched-compact-card">
+<div class="sched-compact-head">
+<div class="sched-compact-title"><span class="sched-compact-title-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7 12.8 12.8 0 0 0 .7 2.8 2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5 12.8 12.8 0 0 0 2.8.7 2 2 0 0 1 1.8 2.1Z"/></svg></span>Al finalizar una llamada</div>
 </div>
-
+<label class="sched-checkbox-row"><input id="callEndedSoundEnabledInput" type="checkbox"/> Activar sonido</label>
+<p class="alert-hint" id="callEndedSoundHint">Suena al terminar y guardar desde la tool. La sincronización de la extensión es silenciosa.</p>
+<div class="sched-compact-row">
+<div class="sched-compact-field">
+<label for="callEndedAlarmSoundInput">Sonido</label>
+<select id="callEndedAlarmSoundInput" aria-describedby="callEndedSoundHint">
+<option value="classic">Beep clásico</option>
+<option value="chime">Campanita</option>
+<option value="custom">Sonido personalizado</option>
+</select>
+</div>
+<button class="sched-compact-test-btn" id="testCallEndedSoundBtn" type="button" aria-label="Probar sonido"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polygon points="4 9 8 9 12 5 12 19 8 15 4 15"/><path d="M17 8a5 5 0 0 1 0 8"/></svg></button>
+</div>
+<div id="callEndedAlarmCustomSoundSection" style="display:none;">
+<div class="sched-compact-field">
+<label for="callEndedAlarmSoundFile">Subir sonido (MP3/WAV/OGG, máx. 300KB)</label>
+<input accept="audio/*" id="callEndedAlarmSoundFile" type="file"/>
+</div>
+<p class="alert-hint" id="callEndedAlarmSoundFileStatus" role="status" aria-live="polite">Ningún archivo propio guardado — usando el beep clásico mientras tanto.</p>
+<button class="mc-btn-warn-pill" id="clearCallEndedSoundBtn" type="button" title="Quitar sonido personalizado" disabled>Quitar archivo</button>
+</div>
+</div>
 <div class="sched-compact-card">
+<div class="sched-compact-head">
+<div class="sched-compact-title"><span class="sched-compact-title-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7 12.8 12.8 0 0 0 .7 2.8 2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5 12.8 12.8 0 0 0 2.8.7 2 2 0 0 1 1.8 2.1Z"/></svg></span>Al guardar llamadas pegadas</div>
+</div>
+<label class="sched-checkbox-row"><input id="callPastedSoundEnabledInput" type="checkbox"/> Activar sonido</label>
+<p class="alert-hint" id="callPastedSoundHint">Suena una sola vez por lote guardado. Pegar texto sin importarlo o importar solo duplicados no reproduce el sonido.</p>
+<div class="sched-compact-row">
+<div class="sched-compact-field">
+<label for="callPastedAlarmSoundInput">Sonido</label>
+<select id="callPastedAlarmSoundInput" aria-describedby="callPastedSoundHint">
+<option value="classic">Beep clásico</option>
+<option value="chime">Campanita</option>
+<option value="custom">Sonido personalizado</option>
+</select>
+</div>
+<button class="sched-compact-test-btn" id="testCallPastedSoundBtn" type="button" aria-label="Probar sonido"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polygon points="4 9 8 9 12 5 12 19 8 15 4 15"/><path d="M17 8a5 5 0 0 1 0 8"/></svg></button>
+</div>
+<div id="callPastedAlarmCustomSoundSection" style="display:none;">
+<div class="sched-compact-field">
+<label for="callPastedAlarmSoundFile">Subir sonido (MP3/WAV/OGG, máx. 300KB)</label>
+<input accept="audio/*" id="callPastedAlarmSoundFile" type="file"/>
+</div>
+<p class="alert-hint" id="callPastedAlarmSoundFileStatus" role="status" aria-live="polite">Ningún archivo propio guardado — usando el beep clásico mientras tanto.</p>
+<button class="mc-btn-warn-pill" id="clearCallPastedSoundBtn" type="button" title="Quitar sonido personalizado" disabled>Quitar archivo</button>
+</div>
+</div>
+<div class="sched-compact-card">
+<div class="sched-compact-head">
+<div class="sched-compact-title"><span class="sched-compact-title-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7 12.8 12.8 0 0 0 .7 2.8 2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5 12.8 12.8 0 0 0 2.8.7 2 2 0 0 1 1.8 2.1Z"/></svg></span>Al agregar una llamada manual</div>
+</div>
+<label class="sched-checkbox-row"><input id="callManualSoundEnabledInput" type="checkbox"/> Activar sonido</label>
+<p class="alert-hint" id="callManualSoundHint">Suena después de guardar una llamada nueva. Editar una llamada existente no reproduce este aviso.</p>
+<div class="sched-compact-row">
+<div class="sched-compact-field">
+<label for="callManualAlarmSoundInput">Sonido</label>
+<select id="callManualAlarmSoundInput" aria-describedby="callManualSoundHint">
+<option value="classic">Beep clásico</option>
+<option value="chime">Campanita</option>
+<option value="custom">Sonido personalizado</option>
+</select>
+</div>
+<button class="sched-compact-test-btn" id="testCallManualSoundBtn" type="button" aria-label="Probar sonido"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polygon points="4 9 8 9 12 5 12 19 8 15 4 15"/><path d="M17 8a5 5 0 0 1 0 8"/></svg></button>
+</div>
+<div id="callManualAlarmCustomSoundSection" style="display:none;">
+<div class="sched-compact-field">
+<label for="callManualAlarmSoundFile">Subir sonido (MP3/WAV/OGG, máx. 300KB)</label>
+<input accept="audio/*" id="callManualAlarmSoundFile" type="file"/>
+</div>
+<p class="alert-hint" id="callManualAlarmSoundFileStatus" role="status" aria-live="polite">Ningún archivo propio guardado — usando el beep clásico mientras tanto.</p>
+<button class="mc-btn-warn-pill" id="clearCallManualSoundBtn" type="button" title="Quitar sonido personalizado" disabled>Quitar archivo</button>
+</div>
+</div></div></details>
+<details class="polished-setting" id="notificationProductivityGroup"><summary><span>Descanso por productividad<small>Minutos, mensajes y sonido</small></span></summary><div class="polished-setting-body"><div class="sched-compact-card">
 <div class="sched-compact-head">
 <div class="sched-compact-title"><span class="sched-compact-title-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></span>Descanso por productividad</div>
 <div class="sched-help-wrap">
@@ -1597,7 +1592,8 @@
 </div>
 <p class="alert-hint" id="productiveBreakSoundFileStatus" style="margin-top:4px;">Ningún archivo propio guardado — usando el beep clásico mientras tanto.</p>
 </div>
-</div>
+</div></div></details>
+<div id="notificationFilesReview"></div>
 <div class="modal-actions mc-action-row">
 <button class="mc-btn-primary cyan" data-close-modal="notificationsModal" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polyline points="5 12 10 17 19 6"/></svg> Listo</button>
 </div>
@@ -1837,11 +1833,15 @@
 <div class="goals-field"><label for="physicalRewardWindowInput">Cuándo ofrecerlo</label><select id="physicalRewardWindowInput"><option value="break">Próximo Break</option><option value="lunch">Próximo Lunch</option><option value="shift-end">Fin del turno</option></select></div>
 <div class="goals-field"><label for="physicalRewardTriggerInput">Cómo ganarlo</label><select id="physicalRewardTriggerInput"><option value="calls">Completar llamadas</option><option value="recovery">Recuperarme después de una difícil</option><option value="daily-goal">Cumplir la meta diaria</option></select></div>
 <div class="goals-field" id="physicalRewardEveryRow"><label for="physicalRewardEveryInput">Cada cuántas llamadas</label><input id="physicalRewardEveryInput" inputmode="numeric" min="1" max="100" step="1" type="number" value="5"/></div>
+</div>
+<details class="review-details" id="physicalRewardAdvanced"><summary>Opciones del premio: límites, acumulación y costo</summary><div class="positive-reward-editor-grid">
+<label class="sched-checkbox-row"><input id="physicalRewardEnabledInput" type="checkbox" checked/> Premio activo para nuevos logros</label>
 <div class="goals-field"><label for="physicalRewardAccumulationInput">Hitos para ganarlo</label><input id="physicalRewardAccumulationInput" inputmode="numeric" min="1" max="30" step="1" type="number" value="1"/><small>Usa más de 1 para un premio acumulable.</small></div>
 <div class="goals-field"><label for="physicalRewardMaxInput">Máximo por día</label><input id="physicalRewardMaxInput" inputmode="numeric" min="1" max="10" step="1" type="number" value="1"/></div>
 <div class="goals-field"><label for="physicalRewardDurationInput">Duración sugerida (min)</label><input id="physicalRewardDurationInput" inputmode="numeric" min="0" max="240" step="1" type="number" placeholder="Opcional"/></div>
 <div class="goals-field"><label for="physicalRewardCostInput">Costo opcional ($)</label><input id="physicalRewardCostInput" inputmode="decimal" min="0" step="0.01" type="number" placeholder="0"/><small id="physicalRewardCostConverted"></small></div>
 </div>
+<p class="note">Pausarlo frena nuevos premios; los que ya ganaste se conservan. El costo es una referencia personal: no descuenta ganancias, no registra gastos y no compra nada.</p></details>
 <div class="modal-actions mc-action-row"><button class="mc-btn-primary cyan" id="savePhysicalRewardBtn" type="button">Guardar premio</button><button class="mc-btn-secondary" id="deletePhysicalRewardBtn" type="button">Eliminar</button><button class="mc-btn-secondary" data-close-modal="physicalRewardEditorModal" type="button">Cancelar</button></div>
 </div>
 </div>

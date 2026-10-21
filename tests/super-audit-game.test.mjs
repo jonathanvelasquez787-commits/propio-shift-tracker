@@ -207,6 +207,9 @@ test('goal chest XP remains idempotent across close, continue, correction, requa
     assert.equal(f.current.game.totalXp, 25 + stageXp);
     f.reload(); onGameShiftStarted({ continued: true }); assert.equal(f.current.game.totalXp, 25);
     f.rows[0].pay = .5; onGameCallsChanged(f.key); assert.equal(f.current.game.totalXp, 0);
+    const adjustedAt=f.current.game.days[f.key].goalChestAdjustedAt;
+    assert.ok(Number.isFinite(new Date(adjustedAt).getTime()));
+    f.reload();assert.equal(f.current.game.days[f.key].goalChestAdjustedAt,adjustedAt);
     f.rows[0].pay = 1; onGameCallsChanged(f.key); assert.equal(openDailyGoalChest(f.key), true);
     assert.equal(f.current.game.totalXp, 25); assert.ok(computeGameDay(f.key).xp <= 150);
     f.rows.length = 0; onGameDayReset(f.key); assert.equal(f.current.game.totalXp, 0);

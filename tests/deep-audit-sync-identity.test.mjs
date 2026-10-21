@@ -73,8 +73,9 @@ function deletionHarness({ owner = 'account-a', sessionOwner = owner, sessionErr
   const button = { addEventListener: (_event, handler) => { click = handler; } };
   const card = { querySelector: () => ({}), insertBefore() {}, appendChild() {} };
   const context = vm.createContext({ ui, translateText, translateMarkup, displayLocale,
+    MutationObserver: class { observe() {} disconnect() {} },
     document: { querySelector: () => card, createElement: () => ({}), getElementById: () => button },
-    window: { appConfirm: (_message, handler) => { confirmation = handler; }, location: { replace: url => actions.push(`redirect:${url}`) }, toast: text => actions.push(`toast:${text}`) },
+    window: { addEventListener() {}, appConfirm: (_message, handler) => { confirmation = handler; }, location: { replace: url => actions.push(`redirect:${url}`) }, toast: text => actions.push(`toast:${text}`) },
     getSupabase: () => ({ auth: { getSession: async () => {
       if (rejectSession) throw Error('Failed to fetch');
       return { data: { session: { user: { id: sessionOwner }, access_token: `token-${sessionOwner}` } }, error: sessionError };

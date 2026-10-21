@@ -50,7 +50,8 @@ function comparisonHtml(context, incoming) {
   const current = snapshotCounts(context.data());
   const labels = [translateText('Llamadas'), translateText('Acciones'), translateText('Pausas terminadas')];
   const next = incoming ? snapshotCounts(incoming) : null;
-  const caption = incoming ? translateText('Actual → respaldo') : translateText('Copia completa actual');
+  if(incoming)return `<div class="polished-comparison"><div><span>${escapeHtml(translateText('Ahora'))}</span><strong>${current[0]}</strong><span>${escapeHtml(translateText('Llamadas'))}</span></div><span aria-hidden="true">→</span><div><span>${escapeHtml(translateText('Con el respaldo'))}</span><strong>${next[0]}</strong><span>${escapeHtml(translateText('Llamadas'))}</span></div></div><details class="polished-disclosure"><summary>${escapeHtml(translateText('Ver alcance completo'))}</summary><div class="polished-detail">${labels.map((label,i)=>`<div class="review-line"><span>${escapeHtml(label)}</span><strong>${current[i]} → ${next[i]}</strong></div>`).join('')}</div></details>`;
+  const caption = translateText('Copia completa actual');
   return `<div class="recovery-card snapshot-comparison"><strong class="note">${escapeHtml(caption)}</strong>${labels.map((label, i) => ui`<div class="fin-preview-row"><span>${escapeHtml(label)}</span><strong>${current[i]}${next ? ` → ${next[i]}` : ''}</strong></div>`).join('')}</div>`;
 }
 
@@ -98,7 +99,15 @@ export function confirmReplacement(context, kind, change, options = {}) {
   const heading = document.getElementById('confirmModalTitle');
   if (heading) heading.textContent = kind === 'day' ? translateText('Reiniciar día') : kind === 'reset' ? translateText('Reiniciar todos los datos') : translateText('Restaurar respaldo');
   const details = document.getElementById('confirmModalDetails');
-  if (details) details.innerHTML = comparisonHtml(context, incoming) + ui`<ul class="confirmation-effects">${effects.filter(Boolean).map(line => `<li>${escapeHtml(line)}</li>`).join('')}</ul>`;
+  if (details) {
+    details.className=kind==='import'?'review-confirm polished-restore':'';
+    details.innerHTML = comparisonHtml(context, incoming)
+      +(kind==='import'?ui`<div class="polished-impact"><strong>Datos del respaldo</strong><span>Reemplazan llamadas, turnos, pausas, notas y Logros.</span></div>`+`<div class="polished-impact"><strong>${escapeHtml(translateText('Tus ajustes'))}</strong><span>${escapeHtml(effects[1])}</span></div>`
+        +(effects[2]?`<div class="review-callout">${escapeHtml(effects[2])}</div>`:'')
+        +ui`<div class="polished-impact"><strong>Copia previa protegida</strong><span>Se guarda en este navegador antes de restaurar.</span></div><details class="polished-disclosure"><summary>Sincronización y recuperación</summary><div class="polished-detail"><p class="note">${escapeHtml(effects.at(-1))}</p></div></details>`
+        :ui`<ul class="confirmation-effects">${effects.filter(Boolean).map(line => `<li>${escapeHtml(line)}</li>`).join('')}</ul>`);
+    if(kind==='import'){const button=document.getElementById('confirmModalOkBtn');if(button)button.textContent=translateText('Restaurar datos');}
+  }
 }
 
 export function importBackupFile(context, file, maxBytes) {

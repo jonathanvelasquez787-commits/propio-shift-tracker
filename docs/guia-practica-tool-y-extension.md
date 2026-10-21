@@ -130,7 +130,7 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 
 - **Qué hace:** Iniciar llamada corre el tiempo y terminarla la guarda automáticamente. Si falla el guardado normal, conserva un respaldo pendiente para recuperarlo.
 - **Qué configurás:** tu tasa y, si corresponde, las ventanas de Higher Rate. Podés usarlo sin la extensión.
-- **Ejemplo:** una llamada de cinco minutos a $0.12/min genera $0.60 de base. No tenés que volver a escribir cinco minutos al terminar. Las llamadas en vivo tienen un mínimo de un minuto en su registro; las manuales e importadas aceptan cero.
+- **Ejemplo:** una llamada de cinco minutos a $0.12/min genera $0.60 de base. No tenés que volver a escribir cinco minutos al terminar. Las llamadas en vivo guardan minutos con dos decimales; una muy breve puede quedar en cero. Las manuales e importadas también aceptan cero.
 
 ### 19. Agregar una llamada manual
 
@@ -321,7 +321,7 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 ### 48. Alarmas de turno y descansos
 
 - **Qué hace:** avisa antes del inicio del turno, comienzo de Break o final de una pausa, según lo que activés.
-- **Qué configurás:** minutos de anticipación, mensaje y sonido en Avisos. Podés probar el sonido y usar un archivo propio dentro del límite indicado.
+- **Qué configurás:** minutos de anticipación y sonido en Avisos. Podés probar el sonido y usar un archivo propio dentro del límite indicado; el mensaje se muestra como vista previa.
 - **Ejemplo:** pedís un aviso cinco minutos antes del Break para preparar el cierre de tus pendientes. Un aviso informa; no reemplaza automáticamente todos los botones de tu jornada.
 
 ### 49. Sonidos al guardar llamadas
@@ -333,7 +333,7 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 ### 50. Aviso de descanso por minutos productivos
 
 - **Qué hace:** informa cuando acumulás los minutos productivos configurados desde la última pausa real o desde el inicio del turno.
-- **Qué configurás:** minutos productivos, minutos de descanso informativos, mensajes de primera vez/repeticiones y sonido.
+- **Qué configurás:** minutos productivos, minutos de descanso informativos y sonido. Los mensajes de primera vez/repeticiones se consultan como vista previa.
 - **Ejemplo:** después de cierta cantidad de minutos en llamadas aparece tu mensaje de descanso ganado. El aviso no reserva ni descuenta esos minutos por sí mismo.
 
 ### 51. Mensaje de apoyo cuando llevás tiempo sin llamadas

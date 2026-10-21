@@ -8,6 +8,29 @@ no se considera rota por esa razón.
 
 ## Prioridad visual antes de continuar
 
+La comprobación adicional del 20/10 confirmó que el problema no se limita a
+las tres pantallas de la maqueta: detalles de Disponibilidad, desglose de
+Ganancias, revisión/corrección de Higher Rate, supuestos de proyección,
+respaldo JSON y borrado de cuenta en Ajustes y mensajes de cola del popup de
+la extensión también acumulan explicaciones planas. La proyección presenta
+además cifras y conversiones partidas en móvil. Horario y algunas confirmaciones
+de Finanzas requieren una segunda prioridad por jerarquía/ayuda repetida.
+El mockup completo externo a Git ya incluye 11 pantallas: Logros, Avisos,
+restauración, disponibilidad, ganancias, Higher Rate, proyección, popup,
+horario, meta desde Finanzas y borrado de cuenta. Se comprobaron 66 vistas
+en claro/oscuro y 320/390/1200 px, y 22 accesos de detalle. El propietario
+aprobó las once vistas el 20/10 con «Aprobadas». Corresponde trasladarlas a la
+app y al popup conservando sus funciones. No publicar la fase 9 rechazada ni
+considerar corregidas las pantallas reales por esta maqueta. El
+[control visual de la entrega](control-visual-11-vistas.md) distingue aprobación,
+implementación y comprobación real; actualmente ninguna está certificada.
+
+El 20/10 el propietario rechazó también el resumen de Logros en preparación:
+demasiado texto plano y poca jerarquía. Se frena su publicación y se prepara
+una propuesta con datos protagonistas, acciones y ayuda contextual, ampliada
+después a las 11 pantallas anteriores. Conservar las funciones
+en preparación y seguir después las 20 mejoras abiertas en el orden acordado.
+
 El 20/10 el propietario reiteró que las últimas interfaces no cumplen su
 preferencia de diseño. La revisión detectó filas del mismo peso, explicaciones
 apiladas y valores partidos en móvil. El propietario aprobó explícitamente
@@ -18,14 +41,14 @@ de publicar. Conservar datos y funciones; seguir después el orden de fases.
 
 ## Lista de control completa
 
-**53 de 79 mejoras publicadas.** 6 probadas sin publicar, 2 en curso y 18 pendientes. La preparación del
+**59 de 79 mejoras publicadas.** 2 en curso y 18 pendientes. La preparación del
 turno usa app 624 y extensión 2.2.10, con publicación comprobada y recarga de la
 extensión, Propio y tracker confirmada por el propietario. App 625 refuerza la
 limpieza de Higher Rate; app 626 incorpora, en orden, el desglose de ganancias,
 consulta de conversión y alcance de tarifa. App 627 completa 36 y 37: revisión
 por ventana y corrección con vista previa, conservando bonos al editar o limpiar.
 App 628 completa el punto 21 con historial antes/después y recuperación de
-ediciones, eliminaciones y vaciados de llamadas. App 629 publica 22, 26–27, 47, 67 y 69 y cierra la fase 3, con CI y producción comprobados. App 630 publica 15–20 y 77, con código de extensión 2.3.0 instalado y recarga aún sin confirmar. App 631 publica los once puntos de la fase 5, con CI y producción comprobados. App 632 publica Finanzas y pagos recibidos con el diseño aprobado de Jornada, Reservas y Pago recibido. App 633 publica los cuatro puntos de Reportes, Calendario y exportaciones con CI y producción comprobados. Sigue fase 8: Avisos y reflexión.
+ediciones, eliminaciones y vaciados de llamadas. App 629 publica 22, 26–27, 47, 67 y 69 y cierra la fase 3, con CI y producción comprobados. App 630 publica 15–20 y 77, con código de extensión 2.3.0 instalado y recarga aún sin confirmar. App 631 publica los once puntos de la fase 5, con CI y producción comprobados. App 632 publica Finanzas y pagos recibidos con el diseño aprobado de Jornada, Reservas y Pago recibido. App 633 publica los cuatro puntos de Reportes, Calendario y exportaciones con CI y producción comprobados. App 634 publica Avisos y reflexión con CI y producción comprobados. Sigue fase 9: Logros y batalla.
 
 Estas 79 mejoras corresponden al sistema completo. El panel de disponibilidad
 y preparación se ve en la **tool web**; el popup de la **extensión de Chrome**
@@ -86,11 +109,11 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 - [x] **45. Fechas de pago — Publicado.** Registrar pago recibido manual y diferencia con lo esperado. [Alcance y validación](finanzas-reservas-y-recepciones.md).
 - [x] **46. Calendario de productividad — Publicado.** Leyenda que distinga sin datos, libre y meta no cumplida. [Alcance y límites](reportes-calendario-y-exportaciones.md).
 - [x] **47. Marcar días y agregar contexto — Publicado.** Estado manual visible en semana/calendario y efecto histórico explicado; edición protegida. [Alcance y pruebas](recuperacion-actividades-y-respaldos.md).
-- [ ] **48. Alarmas de turno y descansos — Probado (sin publicar).** Resumen de alarmas activas. [Alcance y validación](avisos-y-cierres-de-llamadas.md).
-- [ ] **49. Sonidos al guardar llamadas — Probado (sin publicar).** Asociación clara acción/sonido conservando reconciliación silenciosa. [Alcance y validación](avisos-y-cierres-de-llamadas.md).
-- [ ] **50. Aviso de descanso por minutos productivos — Probado (sin publicar).** Progreso hacia el aviso sin iniciar pausas automáticamente. [Alcance y validación](avisos-y-cierres-de-llamadas.md).
-- [ ] **51. Mensaje de apoyo cuando llevás tiempo sin llamadas — Probado (sin publicar).** Acceso comprensible al apoyo configurable desde Avisos. [Alcance y validación](avisos-y-cierres-de-llamadas.md).
-- [ ] **52. Cierre breve y recuperación de una llamada difícil — Probado (sin publicar).** Respuesta/cierre ágil y consulta de reflexiones guardadas. [Alcance y validación](avisos-y-cierres-de-llamadas.md).
+- [x] **48. Alarmas de turno y descansos — Publicado.** Resumen de alarmas activas. [Alcance y validación](avisos-y-cierres-de-llamadas.md).
+- [x] **49. Sonidos al guardar llamadas — Publicado.** Asociación clara acción/sonido conservando reconciliación silenciosa. [Alcance y validación](avisos-y-cierres-de-llamadas.md).
+- [x] **50. Aviso de descanso por minutos productivos — Publicado.** Progreso hacia el aviso sin iniciar pausas automáticamente. [Alcance y validación](avisos-y-cierres-de-llamadas.md).
+- [x] **51. Mensaje de apoyo cuando llevás tiempo sin llamadas — Publicado.** Acceso comprensible al apoyo configurable desde Avisos. [Alcance y validación](avisos-y-cierres-de-llamadas.md).
+- [x] **52. Cierre breve y recuperación de una llamada difícil — Publicado.** Respuesta/cierre ágil y consulta de reflexiones guardadas. [Alcance y validación](avisos-y-cierres-de-llamadas.md).
 - [ ] **53. Activar Logros y la batalla — Pendiente.** Introducción que explique batalla y opciones.
 - [ ] **54. Armas y práctica — Pendiente.** Conservar alcance de armas/práctica y verificar separación contable.
 - [ ] **55. XP, niveles, misiones, rachas y récords — Pendiente.** Explicar reglas de XP/hitos y ajustes por correcciones.
@@ -113,13 +136,16 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 - [ ] **72. Borrar la cuenta — Pendiente.** Alcance y retención claros, ofreciendo exportar antes.
 - [x] **73. Guías y apoyo voluntario — Publicado.** Actualizar guía y README retirando descripciones desactualizadas. [Evidencia](guia-practica-tool-y-extension.md) y [README](../extension/propio-bridge/README.md).
 - [ ] **74. Funcionamiento con otra pestaña al frente — En curso.** Lectura atrasada/reconexión visibles y coordinación futura multi-PC.
-- [ ] **75. Volumen general y sonidos propios — Probado (sin publicar).** Explicar volumen cero, avisos escritos y espacio de archivos. [Alcance y validación](avisos-y-cierres-de-llamadas.md).
+- [x] **75. Volumen general y sonidos propios — Publicado.** Explicar volumen cero, avisos escritos y espacio de archivos. [Alcance y validación](avisos-y-cierres-de-llamadas.md).
 - [x] **76. Planificador de Finanzas hacia la meta diaria — Publicado.** Desglosar cálculo y mostrar meta propuesta antes de guardar. [Alcance y validación](finanzas-reservas-y-recepciones.md).
 - [x] **77. Filtros de llamadas y acciones — Publicado.** Búsqueda Customer ID y filtros de procedencia del día activo, sin cambiar totales ni registros. [Alcance](revision-llamadas-e-importaciones.md).
 - [ ] **78. Barra de actividad en vivo — Pendiente.** Consistencia entre barra y tarjetas incluidas llamadas pendientes.
 - [ ] **79. Accesibilidad — Pendiente.** Revisión de teclado, zoom, lector, ayudas táctiles y objetivos de controles.
 
 ## Entregas verificadas
+
+- [PR #96](https://github.com/jonathanvelasquez787-commits/propio-shift-tracker/pull/96), main `00aeb67aa042798ef1e6e10ea95b476b994fef0f`: 943 pruebas y 20 recorridos compilados con datos ficticios. CI del PR/main y traducciones correctos, producción READY y archivos públicos del mismo SHA verificados. Cierra 48–52 y 75. Extensión sin cambios.
+
 
 - [PR #95](https://github.com/jonathanvelasquez787-commits/propio-shift-tracker/pull/95), main `e04130cc20e10b6869e740c7e8cd64951d0391d7`: 941 pruebas, 16 recorridos y comprobaciones adicionales de exportación. CI del PR/main y traducciones correctos, producción READY y archivos públicos del SHA verificados. Cierra 43–44, 46 y 68. CSV Blob y documento de impresión comprobados; guardado nativo del CSV sin certificar por cancelación independiente de Chrome aislado.
 

@@ -664,6 +664,7 @@
       "acceptance": "Recibos idempotentes, correcciones y recargas; apagar Logros conserva dinero/historia; sin recompensas al fallar guardar.",
       "sources": [
         "js/game.js",
+        "js/game-review.js",
         "js/game-auto.js",
         "js/game-audio.js",
         "js/game-battle.js",
@@ -678,6 +679,20 @@
           "file": "tests/game-state-bootstrap.test.mjs",
           "namedCases": [
             "normalizar gamificación durante el arranque no requiere el contexto de fechas y conserva el historial persistido"
+          ]
+        },
+        {
+          "file": "tests/game-review.test.mjs",
+          "namedCases": [
+            "chest review distinguishes earned, claimed and corrected rewards without granting anything",
+            "chest correction context survives live and finalized state normalization",
+            "equipment filters keep equipped pieces owned while separating available and locked items"
+          ]
+        },
+        {
+          "file": "tests/reward-editor-owner.test.mjs",
+          "namedCases": [
+            "a personal reward editor cannot save or delete into a replacement owner or a newer reward revision"
           ]
         },
         {

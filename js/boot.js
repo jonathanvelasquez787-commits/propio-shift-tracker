@@ -339,25 +339,31 @@ function injectDeleteAccount(userId, getCurrentUserId = () => readMeta().userId)
   const block = document.createElement('div');
   block.innerHTML = ui`
     <div class="divider"></div>
-    <div class="danger-card tone-bad">
+    <div class="danger-card tone-bad polished-delete">
       <div class="danger-card-head">
         <span class="danger-card-icon" aria-hidden="true">
           <svg class="ic-svg" viewBox="0 0 24 24"><line x1="4" y1="7" x2="20" y2="7"/><path d="M6 7V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v3"/><path d="M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg>
         </span>
         <span class="danger-card-title">Borrar mi cuenta</span>
       </div>
-      <p class="danger-card-desc">
-        Borra tu cuenta y sus datos activos: llamadas, turnos, pausas, horario,
-        metas y finanzas. Las copias históricas cifradas se retiran por rotación,
-        con una retención prevista de 31 días. Exporta tu JSON antes si quieres
-        conservar algo.
-      </p>
       <span class="danger-card-badge">Irreversible</span>
+      <div class="polished-delete-counts"><div><strong data-delete-count="calls">—</strong><span>Llamadas</span></div><div><strong data-delete-count="pauses">—</strong><span>Pausas</span></div><div><strong data-delete-count="events">—</strong><span>Acciones</span></div></div>
+      <p class="danger-card-desc">Se eliminan tu cuenta y sus datos activos de la tool.</p>
+      <button class="polished-export-first" id="deleteAccountExportBtn" type="button"><span><strong>Guardar mi respaldo</strong><small>Exportar JSON antes de continuar</small></span><span aria-hidden="true">↗</span></button>
+      <details class="polished-disclosure"><summary>Qué se borra y qué se conserva</summary><div class="polished-detail"><div class="review-line"><span>Cuenta y datos de la tool</span><strong>Se eliminan</strong></div><div class="review-line"><span>Cuenta e historial oficial de Propio</span><strong>Se conservan</strong></div><p class="note">Incluye llamadas, turnos, pausas, horario, metas, Finanzas y progreso de juego de la tool.</p></div></details>
+      <p class="polished-retention">Las copias históricas cifradas se retiran por rotación, con una retención prevista de 31 días.</p>
       <button class="mc-btn-solid-full bad" id="deleteAccountBtn" type="button">Borrar cuenta y datos</button>
     </div>`;
 
   if (actions) card.insertBefore(block, actions);
   else card.appendChild(block);
+
+  const refreshCounts=()=>{if(getCurrentUserId()!==userId)return;let data;try{data=readLocalSnapshot();}catch{return;}const counts={calls:data.calls?.length,pauses:data.state?.pauseHistory?.length,events:data.state?.events?.length};for(const [key,value] of Object.entries(counts)){const node=block.querySelector(`[data-delete-count="${key}"]`);if(node)node.textContent=Number.isInteger(value)?String(value):'—';}};
+  refreshCounts();
+  const countObserver=new MutationObserver(()=>{if(document.getElementById('goalsModal')?.classList.contains('open'))refreshCounts();});
+  countObserver.observe(document.getElementById('goalsModal'),{attributes:true,attributeFilter:['class']});
+  window.addEventListener('pagehide',()=>countObserver.disconnect(),{once:true});
+  document.getElementById('deleteAccountExportBtn').addEventListener('click',()=>{if(getCurrentUserId()===userId)document.getElementById('exportBtn')?.click();});
 
   document.getElementById('deleteAccountBtn').addEventListener('click', () => {
     const ask =

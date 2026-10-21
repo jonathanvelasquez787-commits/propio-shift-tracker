@@ -7,7 +7,7 @@ import { battleMarkup, syncBattle, playBattleCall, stopBattle, normalizeBattleWe
 import { financeReservationComplete } from './finance.js';
 import { activeWorkSinceLastCall, monetaryMilestones, supportiveDayEvidence, surpriseDecision } from './reinforcement-rules.js';
 import { chooseCallFeedback, configureReinforcementFeedback, normalizeInactivityMinutes, notifyReinforcement, reinforcementFeedbackEnabled, reinforcementText } from './reinforcement-feedback.js';
-let appConfirm, callDateKeyFromValue, callDateToDate, callsForDay, closeModal, computeComplianceStreak, convertedAmountText;
+let reviewGame,appConfirm, callDateKeyFromValue, callDateToDate, callsForDay, closeModal, computeComplianceStreak, convertedAmountText;
 let cycleBoundsForOffset, cycleEarningsForOffset, dayAdherence, dayComplianceStatus, dayConfigFor;
 let dayIsEffectivelyOff, effectiveCycleGoal, effectiveDailyGoal, escapeHtml, financeConvertedInline;
 let financeRowIsMeta, formatCallDayLabel, formatMinutes, higherRateBonusForCall, higherRateLiveStatus;
@@ -15,6 +15,7 @@ let importedCallStats, money, openModal, parseMoney, productiveMinutesForDay, sa
 let saveStateOnly, todayCallDateKey, toast, weekdayKeyForDayKey, getReinforcementWorkIntervals, renderHeader;
 
 export function configureGameContext(context) {
+  reviewGame=context.reviewGame;
   ({ appConfirm, callDateKeyFromValue, callDateToDate, callsForDay, closeModal, computeComplianceStreak, convertedAmountText,
     cycleBoundsForOffset, cycleEarningsForOffset, dayAdherence, dayComplianceStatus, dayConfigFor,
     dayIsEffectivelyOff, effectiveCycleGoal, effectiveDailyGoal, escapeHtml, financeConvertedInline,
@@ -135,6 +136,7 @@ function normalizeGameDayEntry(rawEntry) {
   ];
   const validEquipment = new Map(equipmentItems.flatMap(([id, label, slot]) => [[id, { label, slot }], [label, { label, slot }]]));
   const entry = { bonusXp: boundedGameNumber(rawEntry.bonusXp, GAME_DAILY_XP_CAP) };
+  if(rawEntry.goalChestAdjustedAt&&Number.isFinite(new Date(rawEntry.goalChestAdjustedAt).getTime()))entry.goalChestAdjustedAt=new Date(rawEntry.goalChestAdjustedAt).toISOString();
   if (rawEntry.closingEvidence && typeof rawEntry.closingEvidence === 'object') {
     entry.closingEvidence = {
       things: (Array.isArray(rawEntry.closingEvidence.things) ? rawEntry.closingEvidence.things : []).slice(0, 3).map((text) => String(text).replace(/[<>]/g, '').slice(0, 350)),
@@ -574,6 +576,11 @@ export function computeGameDay(dayKey = todayCallDateKey(), { ignoreLock = false
   return snapshot;
 }
 
+export function gameReviewSnapshot() {
+  const day=computeGameDay(currentGameDayKey());
+  return {enabled:gameEnabled(),dayLabel:formatCallDayLabel(day.dayKey),level:gameLevelProgress(),collection:{owned:ACCESSORY_CATALOG.filter(item=>state.game.accessories.includes(item.label)).length,total:ACCESSORY_CATALOG.length},pendingRewards:state.game.reinforcement?.pendingRewards?.length||0,xp:day.xp,eligibleCalls:day.eligibleCalls.length,callCount:callsForDay(day.dayKey).length,breakdown:day.xpBreakdown,cap:GAME_DAILY_XP_CAP,workMode:battleWorkMode(state),chest:{defeated:day.defeated,claimed:!!state.game.ledger[`chest:${day.dayKey}`],adjustedAt:state.game.days[day.dayKey]?.goalChestAdjustedAt||null}};
+}
+
 function gameStreak() {
   ensureGameState();
   return Math.max(0, Number(computeComplianceStreak()?.days) || 0);
@@ -966,7 +973,7 @@ function renderCycleBosses() {
     const pending = state.game.cycleReward?.pending && state.game.cycleReward.options?.length;
     choice.className = 'game-cycle-choice';
     choice.hidden = !pending;
-    choice.innerHTML = pending ? ui`<strong>Elige tu recompensa del ciclo</strong><div>${state.game.cycleReward.options.map((option) => ui`<button type="button" data-game-action="choose-cycle-reward" data-cycle-reward="${escapeHtml(option.id)}">${escapeHtml(translateStoredText(option.label))}</button>`).join('')}</div>` : '';
+    choice.innerHTML = pending ? ui`<strong>Elige tu recompensa del ciclo</strong><small>Premio del ciclo con cierre ${escapeHtml(formatCallDayLabel(state.game.cycleReward.cycleKey))}. Cumpliste su meta; este premio de juego no confirma un pago recibido.</small><div>${state.game.cycleReward.options.map((option) => ui`<button type="button" data-game-action="choose-cycle-reward" data-cycle-reward="${escapeHtml(option.id)}">${escapeHtml(translateStoredText(option.label))}</button>`).join('')}</div>` : '';
   });
 }
 function syncCycleBossAchievement() {
@@ -1312,6 +1319,7 @@ function rollbackChestReward(dayKey) {
 function reconcileGoalChest(dayKey, snapshot) {
   if (snapshot.defeated || state.game.ledger[`chest:${dayKey}`]?.goalReward !== true) return false;
   rollbackChestReward(dayKey);
+  dayEntry(dayKey).goalChestAdjustedAt=new Date().toISOString();
   state.game.level = levelForXp(state.game.totalXp);
   return true;
 }
@@ -1425,6 +1433,7 @@ export function renderGame() {
   renderAchievements();
   renderSettingsProfile();
   renderPositiveReinforcement();
+  reviewGame?.();
 
   if (bossDefeatedNow) {
     triggerGameEvent('gameCycleBoss', 'clear', 1000);
