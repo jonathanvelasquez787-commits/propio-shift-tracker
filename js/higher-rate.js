@@ -2,6 +2,7 @@ import { loadDetailViews } from './detail-views-loader.js';
 import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 // app-main.js injects Higher Rate helpers; app-context.js owns shared app state.
 import { calls, settings } from './app-context.js';
+import { callPayMinutes } from './pay-estimate.js';
 
 let HIGHER_RATE_EARLY_GRACE_MIN, HIGHER_RATE_TIERS, appConfirm, callDateKeyFromValue, callDateToDate;
 let callsForDay, dayKeyFromIsoDate, escapeHtml, financeConvertedInline, financeRunAutoFillCascade, formatBlockDurationLabel;
@@ -90,7 +91,7 @@ export async function applyHigherRateCorrection(windowId, draft, stamp) {
         const duration = Number(call.durationMin);
         if (!Number.isFinite(duration) || duration < 0) return null;
         return {
-          amount: frozenTierMeta.bonusPerMin * duration,
+          amount: frozenTierMeta.bonusPerMin * callPayMinutes(call),
           tier: call.frozenHigherRateBonus.tier,
           windowId: call.frozenHigherRateBonus.windowId,
         };
@@ -104,7 +105,7 @@ export async function applyHigherRateCorrection(windowId, draft, stamp) {
       );
       const tierMeta = HIGHER_RATE_TIERS[best.tier];
       if (!tierMeta) return null;
-      return { amount: tierMeta.bonusPerMin * (Number(call.durationMin) || 0), tier: best.tier, windowId: best.id };
+      return { amount: tierMeta.bonusPerMin * callPayMinutes(call), tier: best.tier, windowId: best.id };
     }
 
     // Suma de bonos de un conjunto de llamadas (día, ciclo, etc.) — se reutiliza tanto en

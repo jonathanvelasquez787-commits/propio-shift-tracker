@@ -1,8 +1,7 @@
 # Presentación aprobada de la tool y el popup
 
-Entrega preparada: web 635.0.0 y extensión 2.3.1. La publicación se comprueba
-por separado; tener estos números en los archivos no confirma su despliegue
-ni la recarga de la extensión instalada en Chrome.
+Entrega publicada: web 635.0.0, PR #97 y producción del mismo commit verificada.
+Extensión 2.3.1 instalada con respaldo y recarga confirmada por el propietario.
 
 ## Qué cambia y dónde
 

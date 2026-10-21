@@ -29,6 +29,7 @@
       "acceptance": "Procedencia y correcciones explícitas, filtros combinables, diagnóstico de filas y fecha límite de señales pendientes sin descartarlas automáticamente.",
       "sources": [
         "js/call-review-model.js",
+        "js/pay-estimate.js",
         "js/call-review-view.js",
         "js/call-table-view.js"
       ],

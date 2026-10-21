@@ -1,5 +1,6 @@
 import test from 'node:test';
 import { beforeEach } from 'node:test';
+import { callPayMinutes } from '../js/pay-estimate.js';
 import { translateText, ui, displayLocale } from '../js/i18n.js';
 import assert from 'node:assert/strict';
 
@@ -293,7 +294,8 @@ test('el hook real conserva el botín XP de la quinta llamada al reconciliar y r
 test('el bono manual de Higher Rate no se suma dos veces y los tiles conservan su efecto fuera de ventana', () => {
   const calls = read('js/calls.js');
   const helper = between(calls, 'function manualCallPayWithoutDuplicateRateBonus', 'export function saveManualCall');
-  const calculate = new Function('HIGHER_RATE_TIERS', 'manualCallSelectedRateTile', 'higherRateBonusForCall', 'parseMoney', `${helper}; return manualCallPayWithoutDuplicateRateBonus;`);
+  const calculateWithMinutes = new Function('callPayMinutes', 'HIGHER_RATE_TIERS', 'manualCallSelectedRateTile', 'higherRateBonusForCall', 'parseMoney', `${helper}; return manualCallPayWithoutDuplicateRateBonus;`);
+  const calculate = (...args) => calculateWithMinutes(callPayMinutes, ...args);
   const tiers = { gold: { bonusPerMin: 0.04 } };
   const withinWindow = calculate(tiers, 'gold', () => ({ amount: 0.12 }), (value) => Number(value) || 0);
   const outsideWindow = calculate(tiers, 'gold', () => null, (value) => Number(value) || 0);
@@ -307,7 +309,7 @@ test('el bono manual de Higher Rate no se suma dos veces y los tiles conservan s
 
 test('la hora manual vacía no se convierte en 07:00 y las horas futuras no se guardan ni reciben XP', () => {
   const calls = read('js/calls.js');
-  const timeHelper = between(calls, 'function callStartLabelFromHHMM', '// Estimado de pago');
+  const timeHelper = between(calls, 'function callStartLabelFromHHMM', '// El pago estimado');
   const formatHHMM = (value) => {
     const [hour, minute] = value.split(':').map(Number);
     return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;

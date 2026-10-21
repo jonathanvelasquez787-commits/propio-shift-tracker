@@ -13,12 +13,65 @@ import { configureHigherRateContext, higherRateBonusForCall, higherRateBonusForC
 import { configureGameContext, createDefaultGameState, computeGameDay, onGameCallsChanged } from '../js/game.js';
 import { configurePositiveReinforcementContext } from '../js/positive-reinforcement.js';
 import { withSilentCallFeedback, callFeedbackSilenced } from '../js/call-feedback.js';
+import { PAY_ESTIMATE_RULE, roundedPayMinutes, callPayMinutes } from '../js/pay-estimate.js';
 
 const source = fs.readFileSync(new URL('../js/app-main.js', import.meta.url), 'utf8');
 const declarations = new Map(parse(source, { ecmaVersion: 'latest', sourceType: 'module' }).body.map(node => node.declaration || node).filter(node => node.type === 'FunctionDeclaration').map(node => [node.id.name, source.slice(node.start, node.end)]));
 const functions = ['pad', 'dateKey', 'todayRange', 'todayCallDateKey', 'callDateKeyFromValue', 'callDateToDate', 'dayKeyFromIsoDate', 'isoDateFromDayKey', 'sameCallDay', 'toDateFromInputs', 'toMinutes', 'formatHHMM', 'timeLabel', 'timeLabelFromDate', 'parseMoney', 'callsOverlap', 'callDedupeKey', 'parseCalls', 'isReplaceableLiveCall', 'sameImportedCallIdentity', 'importCalls', 'importedCallStats', 'accountingExportDays', 'getDailyGoalOverride', 'effectiveDailyGoal', 'setDailyGoalOverride', 'dayEvents', 'dayShiftBounds', 'dayShiftSessions', 'previousCalendarDay', 'mergeIntervals', 'connectedMinutesForDay'];
 const at = (day, clock = '12:00') => new Date(`2025-09-${String(day).padStart(2, '0')}T${clock}:00`);
 const tiers = { bronze: { bonusPerMin: .01 }, silver: { bonusPerMin: .02 }, gold: { bonusPerMin: .03 } };
+
+test('personal pay rounding includes second forty without changing measured time or legacy records', () => {
+  for (const [seconds, expected] of [[0,0],[39.999,0],[40,1],[40.001,1],[60,1],[459.999,7],[460,8],[480,8]]) {
+    assert.equal(roundedPayMinutes(seconds / 60), expected, String(seconds));
+  }
+  const start = at(1,'08:00').getTime(), record = { source:'live', durationMin:7.67, startISO:new Date(start).toISOString(), endISO:new Date(start+459999).toISOString() };
+  assert.equal(callPayMinutes(record),7.67);
+  const rounded = {...record,payEstimateRule:PAY_ESTIMATE_RULE};
+  assert.equal(callPayMinutes(rounded),7);
+  assert.equal(callPayMinutes({...rounded,endISO:new Date(start+460000).toISOString()}),8);
+  assert.equal(callPayMinutes({...rounded,propioBridge:{payEstimated:false}}),7.67);
+  assert.equal(record.durationMin,7.67);
+});
+
+test('new live pay and Higher Rate use the same forty-second threshold through reload and official replacement', t => {
+  const x=harness(t),start=at(1,'08:00').getTime();
+  settings.higherRateWindows=[{id:'hr',date:'09/01/2025',start:'08:00',end:'10:00',tier:'silver'}];
+  const iso=s=>new Date(start+s*1000).toISOString();
+  assert.equal(autoSaveLiveCall(iso(0),iso(459.999)),true);
+  assert.equal(calls[0].pay,'0.84');assert.equal(higherRateBonusForCall(calls[0]).amount,.14);
+  assert.equal(calls[0].endISO,iso(459.999));assert.equal(calls[0].durationMin,7.67);
+  assert.equal(autoSaveLiveCall(iso(600),iso(1060)),true);
+  assert.equal(calls[1].pay,'0.96');assert.equal(higherRateBonusForCall(calls[1]).amount,.16);
+  x.reload();assert.equal(callPayMinutes(calls[0]),7);assert.equal(callPayMinutes(calls[1]),8);
+  x.import([['official','09/01/2025','08:00 AM','7','Yes','No','$0.84']]);
+  const official=calls.find(c=>c.customerId==='official');assert.ok(official);
+  assert.equal(x.h.parseMoney(official.pay),.84);assert.equal(official.durationMin,7);assert.equal(official.payEstimateRule,undefined);
+});
+
+test('live backup preview and save retain exact seconds below the rounding threshold', async t => {
+  const x = harness(t), start = at(1, '08:00').toISOString();
+  const end = new Date(Date.parse(start) + 459999).toISOString();
+  autoSaveLiveCall(start, end); autoSaveLiveCall(start, end);
+  await deleteCallRecord(calls[0].id);
+  assert.equal(restorePendingLiveCallBackup(), true);
+  updateManualCallPreview();
+  assert.equal(x.element('manualCallPayInput').value, '0.84');
+  assert.ok(x.element('manualCallPreviewText').textContent.includes(`${translateText('Pago base:')} 0.84`)
+    || x.element('manualCallPreviewText').textContent.includes('Base pay: 0.84'));
+  saveManualCall();
+  assert.equal(calls[0].endISO, end);
+  assert.equal(calls[0].pay, '0.84');
+  assert.equal(callPayMinutes(calls[0]), 7);
+});
+
+test('manual payment estimates use forty seconds while explicit user payments are preserved', t => {
+  const x=harness(t);
+  x.manual('09/01/2025','08:00',7+40/60);
+  assert.equal(calls[0].pay,'0.96');assert.equal(calls[0].durationMin,7+40/60);
+  x.manual('09/01/2025','09:00',7+39/60,'9.99','custom');
+  assert.equal(calls[1].pay,'9.99');assert.equal(calls[1].durationMin,7+39/60);
+});
 
 test('official bridge synchronization is silent while the live finish and manual paste retain their sounds', async t => {
   const x = harness(t); x.advance(at(2, '19:00'));

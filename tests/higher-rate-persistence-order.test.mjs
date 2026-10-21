@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import { parse } from 'acorn';
+import { callPayMinutes } from '../js/pay-estimate.js';
 
 function functions(file, names) {
   const source = fs.readFileSync(new URL(file, import.meta.url), 'utf8');
@@ -24,7 +25,7 @@ test('a rejected retroactive Higher Rate window cannot persist game receipts bef
   const values = new Map([['state', JSON.stringify(state)], ['calls', JSON.stringify(calls)], ['settings', JSON.stringify(settings)]]);
   const before = new Map(values), effects = [];
   let accepted = false, reconciliations = 0;
-  const h = vm.createContext({ Date, settings, state, calls, STORAGE_KEY: 'state', CALLS_KEY: 'calls', SETTINGS_KEY: 'settings',
+  const h = vm.createContext({ Date, callPayMinutes, settings, state, calls, STORAGE_KEY: 'state', CALLS_KEY: 'calls', SETTINGS_KEY: 'settings',
     HIGHER_RATE_EARLY_GRACE_MIN: 5, HIGHER_RATE_TIERS: { bronze: { bonusPerMin: .01 }, gold: { bonusPerMin: .03 } },
     timeLabel: value => value, formatHHMM: value => value,
     toMinutes: value => Number(value.slice(0, 2)) * 60 + Number(value.slice(3)),
@@ -85,7 +86,7 @@ for (const action of ['saveHigherRateWindowsFromEditor', 'removeHigherRateWindow
       const before = JSON.stringify({ settings, call });
       const draft = [{ ...originalWindow, start: '08:10', tier: 'gold' }], effects = [];
       let accepted = false;
-      const h = vm.createContext({ Date, settings, calls: [call],
+      const h = vm.createContext({ Date, callPayMinutes, settings, calls: [call],
         HIGHER_RATE_EARLY_GRACE_MIN: 5, HIGHER_RATE_TIERS: { bronze: { bonusPerMin: .01 }, gold: { bonusPerMin: .03 } },
         timeLabel: value => value, formatHHMM: value => value,
         toMinutes: value => Number(value.slice(0, 2)) * 60 + Number(value.slice(3)),

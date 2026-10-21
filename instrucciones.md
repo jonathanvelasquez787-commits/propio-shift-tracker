@@ -331,7 +331,7 @@ futura opera bajo esto, sin excepción:
   ganancias, Higher Rate, proyección, popup, horario, Finanzas y borrado de cuenta.
   Mockup completo comprobado en ambos temas y 320/390/1200 px (66 vistas y
   22 accesos de detalle). Las once vistas fueron aprobadas explícitamente el
-  20/10 con «Aprobadas»; aplicarlas antes de continuar las fases funcionales.
+  20/10 con «Aprobadas»; aplicadas y publicadas en web 635 y popup 2.3.1.
   Registrar implementación y capturas reales en
   [control visual](docs/control-visual-11-vistas.md), sin dar por comprobada la
   app a partir de la maqueta. No deshacer el trabajo ni los resguardos preparados.
@@ -340,14 +340,19 @@ futura opera bajo esto, sin excepción:
   evaluación de 79 funciones por fases; alcance y estado completo en
   [plan de mejoras](docs/plan-mejoras-integrales.md). 59 mejoras publicadas:
   fases 1–8 verificadas, incluido Finanzas, el diseño aprobado y Reportes,
-  Calendario y exportaciones. Web 634 publicada con CI,
-  producción y archivos públicos comprobados; siguen Logros, accesibilidad,
+  Calendario y exportaciones. Web 635 publicada con las once vistas aprobadas y archivos públicos comprobados;
+  siguen las mejoras funcionales de Logros, accesibilidad,
   cuenta e instalación.
   No perder las fases posteriores al
   entregar una parte ni considerar pendiente la instalación ya confirmada.
 - **Segundos oficiales de Propio:** confirmar con evidencia si el último minuto
   incompleto se incluye en duración y pago. El formato de hora visible no lo demuestra.
   No cambiar ACW ni alargar llamadas por esa suposición.
+  El 21/10 el propietario eligió para las nuevas estimaciones personales el umbral
+  inclusivo de 40 s: 7:39 → 7 min y 7:40 → 8 min. Implementado en web 636,
+  con publicación en curso; conserva duración real, importes anteriores y prioridad de los
+  datos importados. Ver docs/redondeo-de-estimaciones.md. La regla oficial sigue
+  sin confirmar; no confundir ambos estados.
 - **Visibilidad por nombre en Google:** pendiente de procesamiento externo. La
   comprobación del 8/10 encontró la raíz indexada con canonical correcto, pero
   todavía el título anterior y sin posición en primera página por la marca.
@@ -456,9 +461,8 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
-- App 631; archivos de extensión 2.3.0 instalados con respaldo y configuración
-  personal conservada. Recarga de 2.3.0 aún sin confirmar; la última versión
-  que el propietario confirmó en Chrome/popup fue 2.2.10.
+- App 635 y archivos de extensión 2.3.1 instalados con respaldo y configuración
+  personal conservada. El propietario confirmó la recarga y el popup 2.3.1.
   Diseño compacto aprobado: resumen cerrado y preparación al pulsarlo.
   El panel de disponibilidad está en la tool;
   el popup de Chrome configura la extensión y esta transmite el estado a la web.
@@ -489,15 +493,28 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
-**v635 — Presentación aprobada de once vistas; entrega preparada.**
+**v636 — Estimaciones desde cuarenta segundos y disponibilidad compacta.**
+
+- Umbral personal inclusivo: 7:39 → 7 minutos y 7:40 → 8. Nuevas estimaciones
+  y Higher Rate coherentes, sin recalcular registros anteriores. Importaciones
+  oficiales y pagos manuales explícitos conservan prioridad. Duración real y
+  ACW sin modificar; recuperación conserva segundos exactos en preview y guardado.
+- Tooltip del ACW con explicación y ejemplos aprobados. Disponibilidad compacta
+  también sin conexión; explicación y preparación plegadas. Extensión sin cambios, 2.3.1.
+- 951 pruebas y doce recorridos compilados ES/EN, temas y 320/390/1200 px.
+  Publicación en curso. Ver docs/redondeo-de-estimaciones.md.
+
+**v635 — Presentación aprobada de once vistas publicada.**
 
 - Diseño aprobado aplicado a la web y al popup. Disponibilidad con contador y
   texto en una fila compacta, según el ajuste posterior del propietario.
 - 947 pruebas correctas y doce recorridos ES/EN, claro/oscuro y 320/390/1200 px.
   Popup comprobado en ambos temas con API de Chrome simulada. Revisión visual
   detectó y corrigió posiciones de grid, ancho de Logros y contraste de acciones.
-- Web 635.0.0 y extensión 2.3.1 preparadas; confirmar CI, producción e instalación
-  antes de declararlas publicadas. Las veinte mejoras abiertas siguen en su plan.
+- Web 635.0.0 publicada: PR #97, CI de PR/main y traducciones correctos,
+  producción READY y ocho archivos públicos del mismo SHA comprobados. Extensión
+  2.3.1 instalada con respaldo; el propietario confirmó la recarga y su versión.
+  Las veinte mejoras funcionales abiertas siguen en su plan.
   Ver docs/presentacion-aprobada.md y docs/control-visual-11-vistas.md.
 
 **v634 — Avisos y cierres breves.**
@@ -510,16 +527,3 @@ futura opera bajo esto, sin excepción:
 - 943 pruebas, 16 recorridos ES/EN/temas/anchos y cuatro recorridos de archivo
   propio, reflexión y consulta correctos. Detalle diferido 112 KB; límites
   inicial/arranque/idiomas conservados. Ver docs/avisos-y-cierres-de-llamadas.md.
-
-**v633 — Reportes, calendario y exportación con alcance.**
-
-- Puntos 43–44, 46 y 68: conclusión antes de gráficos, comparación solo con
-  datos, metas sin evaluar en días libres/sin registros y supuestos plegados
-  de la proyección por días naturales. Calendario distingue esos estados.
-- Alcance de CSV/PDF antes de exportar; base/bono/total separados, adherencia
-  desconocida sin 0% inventado, botones consistentes y documento de impresión.
-  Generación diferida; presupuesto de detalle 103 KB, inicial/idiomas conservados.
-- 941 pruebas y 16 recorridos ES/EN, temas y anchos correctos; CSV Blob y
-  ventana de impresión verificados sin modificar llamadas. Chrome aislado
-  cancela incluso un archivo mínimo ajeno a la app; guardado nativo CSV no
-  certificado, sin cambiar políticas. Ver docs/reportes-calendario-y-exportaciones.md.
