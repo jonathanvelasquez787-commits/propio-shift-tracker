@@ -766,3 +766,4 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
   .automation-body{padding-left:0}
   .automation-checks ul{gap:12px}
 }
+#notificationReview .review-line{display:grid;grid-template-columns:minmax(0,1fr) minmax(88px,auto)}#notificationReview .review-line>strong{overflow-wrap:normal;word-break:normal}#notificationReview .mc-action-row{flex-wrap:wrap;margin:16px 0 24px}#notificationReview progress{width:100%;accent-color:var(--cyan)}

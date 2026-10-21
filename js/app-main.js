@@ -5162,6 +5162,18 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       Object.keys(MESSAGE_PREVIEW_CONFIGS).forEach((kind) => syncMessagePreview(kind));
     }
 
+    async function openNotificationReview() {
+      document.getElementById('notificationReview').replaceChildren();
+      const owner=settings,view=await loadDetailViews({retry:true});
+      if(owner!==settings||!document.getElementById('notificationsModal').classList.contains('open'))return;
+      view.renderNotificationReview({ui,translateText,escapeHtml,settings,productive:minutesSinceLastProductiveBreakAnchor,soundConfigs:Object.values(ALARM_SOUND_CONFIGS),valid:()=>owner===settings,navigate:kind=>{
+        closeModal('notificationsModal');navigateToPage('achievements');
+        const target=document.getElementById(kind==='support'?'positiveSettingsAccordion':'positiveHistoryPanel');
+        if(kind==='support')target.open=true;
+        target.scrollIntoView({block:'start'});target.setAttribute('tabindex','-1');target.focus({preventScroll:true});
+      }});
+    }
+
 
     export function minutesToHHMM(mins) {
       const m = ((Math.round(mins) % 1440) + 1440) % 1440;
@@ -7083,6 +7095,13 @@ export function render() {
     document.getElementById('avisosHeaderBtn').addEventListener('click', () => {
       syncNotificationsModalFields();
       openModal('notificationsModal');
+      openNotificationReview().catch(()=>toast(translateText('No se pudo cargar el resumen. Cerrá Avisos y volvé a abrirlo.')));
+    });
+    document.addEventListener('click',event=>{
+      if(!event.target.closest?.('[data-reflection-history]'))return;
+      closeModal('positiveReflectionModal');navigateToPage('achievements');
+      const target=document.getElementById('positiveHistoryPanel');
+      target.scrollIntoView({block:'start'});target.setAttribute('tabindex','-1');target.focus({preventScroll:true});
     });
     document.getElementById('pasteCallsBtn').addEventListener('click', () => {
       // El resumen de filas omitidas es del ÚLTIMO import — se limpia al reabrir el modal para no

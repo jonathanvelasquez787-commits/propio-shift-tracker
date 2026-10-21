@@ -288,6 +288,19 @@
       ]
     },
     {
+      "id": "notification-review",
+      "area": "Resumen de avisos",
+      "acceptance": "Distingue sonido manual y sincronización silenciosa, volumen cero, audio codificado y progreso sin afirmar que disparó una alarma.",
+      "sources": ["js/notification-review.js"],
+      "tests": [{
+        "file": "tests/notification-review.test.mjs",
+        "namedCases": [
+          "custom audio size accounts for base64 padding and keeps encoded cost distinct",
+          "productive progress uses complete intervals without claiming that past notices fired"
+        ]
+      }]
+    },
+    {
       "id": "calls",
       "area": "Llamadas y contabilidad diaria",
       "acceptance": "Manual, en vivo, importación, edición, cero, duplicados y borrado reconciliados contra libro independiente.",

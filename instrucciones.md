@@ -326,10 +326,11 @@ futura opera bajo esto, sin excepción:
 
 - **Mejoras integrales aprobadas el 18/10:** ejecutar las recomendaciones de la
   evaluación de 79 funciones por fases; alcance y estado completo en
-  [plan de mejoras](docs/plan-mejoras-integrales.md). 49 mejoras publicadas:
-  fases 1–6 verificadas, incluido Finanzas y el diseño aprobado de Jornada,
-  Reservas y Pago recibido. Web 633 prueba los cuatro puntos de la fase 7,
-  todavía sin publicar; siguen Avisos, Logros, accesibilidad, cuenta e instalación.
+  [plan de mejoras](docs/plan-mejoras-integrales.md). 53 mejoras publicadas:
+  fases 1–7 verificadas, incluido Finanzas, el diseño aprobado y Reportes,
+  Calendario y exportaciones. Web 633 publicada con CI y producción comprobados;
+  Avisos web 634 tiene seis puntos probados sin publicar; siguen Logros,
+  accesibilidad, cuenta e instalación.
   No perder las fases posteriores al
   entregar una parte ni considerar pendiente la instalación ya confirmada.
 - **Segundos oficiales de Propio:** confirmar con evidencia si el último minuto
@@ -476,7 +477,18 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
-**v633 — Reportes, calendario y exportación con alcance (sin publicar).**
+**v634 — Avisos y cierres breves (sin publicar).**
+
+- Puntos 48–52 y 75: resumen de alarmas, acción/sonido, progreso desde el mismo
+  cálculo del aviso, acceso a apoyo y notas guardadas. Sincronización de la
+  extensión silenciosa; volumen cero explícito y tamaño original del audio.
+- Nota opcional plegada y cierre sin guardar explícito. No cambia contabilidad,
+  disponibilidad ni guardado de reflexiones. Presentación de revisión reutilizada.
+- 943 pruebas, 16 recorridos ES/EN/temas/anchos y cuatro recorridos de archivo
+  propio, reflexión y consulta correctos. Detalle diferido 112 KB; límites
+  inicial/arranque/idiomas conservados. Ver docs/avisos-y-cierres-de-llamadas.md.
+
+**v633 — Reportes, calendario y exportación con alcance.**
 
 - Puntos 43–44, 46 y 68: conclusión antes de gráficos, comparación solo con
   datos, metas sin evaluar en días libres/sin registros y supuestos plegados
@@ -502,17 +514,3 @@ futura opera bajo esto, sin excepción:
   revisados: inicial 807 KB, detalle diferido 100 KB; arranque/locales sin
   aumentar. PR #94 y main con CI correcto; producción READY del mismo SHA y
   archivos públicos verificados. Extensión sin cambios. Ver docs/finanzas-reservas-y-recepciones.md.
-
-**v631 — Revisión de jornada y horarios.**
-
-- Puntos 3–5, 23–25 y 28–32: cierre explícito, continuidad elegida, consulta de
-  jornada/ACW/adherencia/metas y alcance de horarios antes de aplicar.
-- Guardado conjunto de pausa y transición de turno/llamada. Rechazo conserva
-  actividad y alarma sin recompensa. Copiar solo modifica los días de destino.
-- Orden nocturno, duración y etiqueta de día siguiente reactivas; procedencia
-  de planes nuevos de Finanzas. Detalle bajo carga diferida; presupuesto 80 KB,
-  límites iniciales conservados. Ver docs/jornada-pausas-y-horarios.md.
-- 916 pruebas, 16 recorridos compilados y casos de cuota, medianoche y semana
-  específica. Presupuesto local contempla el SHA de producción. PR #93 y main
-  con CI correcto; producción READY y archivos del SHA verificados.
-  Extensión sin nuevos cambios ni otra recarga.

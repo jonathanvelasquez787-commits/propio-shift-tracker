@@ -256,6 +256,8 @@ function renderReflectionModal(call, dayKey) {
   reflectionCall = { callId: String(call.id), dayKey, endISO: call.endISO };
   const note = document.getElementById('positiveReflectionNote');
   if (note) note.value = '';
+  const noteDetails=document.getElementById('positiveReflectionNoteDetails');
+  if(noteDetails)noteDetails.open=false;
   const title = document.getElementById('positiveReflectionCall');
   if (title) title.textContent = ui`Llamada #${call.customerId || 'completada'}`;
   openModal('positiveReflectionModal');
