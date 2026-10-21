@@ -227,6 +227,12 @@
       "js/shift-work-review.js"
     ]
   },
+  "s_04519083": {
+    "source": "Sonidos y avisos de tu jornada.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_04ace283": {
     "source": "Exceso sobre el presupuesto",
     "files": [
@@ -285,7 +291,8 @@
   "s_0589440c": {
     "source": "Sonido personalizado",
     "files": [
-      "app.html"
+      "app.html",
+      "js/notification-review.js"
     ]
   },
   "s_05abb490": {
@@ -717,6 +724,12 @@
     "source": "La ventana terminó; el premio sigue guardado para después.",
     "files": [
       "js/positive-reinforcement.js"
+    ]
+  },
+  "s_0b90347e": {
+    "source": "Importar un lote pegado",
+    "files": [
+      "js/notification-review.js"
     ]
   },
   "s_0b96feb6": {
@@ -1511,6 +1524,12 @@
       "js/game.js"
     ]
   },
+  "s_17980b91": {
+    "source": "No hay archivos propios guardados.",
+    "files": [
+      "js/notification-review.js"
+    ]
+  },
   "s_179a5a16": {
     "source": "Cargando…",
     "files": [
@@ -1704,6 +1723,12 @@
     "source": "Sonido",
     "files": [
       "app.html"
+    ]
+  },
+  "s_1a21885b": {
+    "source": "Máximo 300 KiB por archivo. Se guarda como texto dentro de tus ajustes y ocupa más que el audio original. Elegir otro sonido no borra el archivo; usá Quitar archivo para liberarlo.",
+    "files": [
+      "js/notification-review.js"
     ]
   },
   "s_1a320660": {
@@ -2717,7 +2742,8 @@
   "s_2a734315": {
     "source": "Beep clásico",
     "files": [
-      "app.html"
+      "app.html",
+      "js/notification-review.js"
     ]
   },
   "s_2a7fbf99": {
@@ -2743,12 +2769,6 @@
     "files": [
       "app.html",
       "js/game.js"
-    ]
-  },
-  "s_2af05f71": {
-    "source": "Suena cuando la llamada terminada queda guardada, incluida una llamada del puente de Propio.",
-    "files": [
-      "app.html"
     ]
   },
   "s_2b0ccc28": {
@@ -2779,6 +2799,12 @@
     "source": "Ajustes → Alarmas",
     "files": [
       "app.html"
+    ]
+  },
+  "s_2b580ae6": {
+    "source": "Silenciado",
+    "files": [
+      "js/notification-review.js"
     ]
   },
   "s_2b5cb6be": {
@@ -2981,6 +3007,12 @@
     "source": "Ayer —",
     "files": [
       "app.html"
+    ]
+  },
+  "s_2f4381de": {
+    "source": "{{v0}} min antes",
+    "files": [
+      "js/notification-review.js"
     ]
   },
   "s_2f443a2a": {
@@ -3257,6 +3289,12 @@
     "source": "Monstruo derrotado",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_333fb880": {
+    "source": "Próximo descanso por productividad",
+    "files": [
+      "js/notification-review.js"
     ]
   },
   "s_335e4905": {
@@ -3600,6 +3638,12 @@
       "js/app-main.js"
     ]
   },
+  "s_38e6f698": {
+    "source": "Suena al terminar y guardar desde la tool. La sincronización de la extensión es silenciosa.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_39096e35": {
     "source": "Progreso contra el jefe del ciclo",
     "files": [
@@ -3652,6 +3696,19 @@
     "source": "Clasificado por vos: {{v0}}{{v1}}",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_39b4e137": {
+    "source": "Sonido general",
+    "files": [
+      "js/notification-review.js"
+    ]
+  },
+  "s_39cef31f": {
+    "source": "Ver cierres guardados",
+    "files": [
+      "app.html",
+      "js/notification-review.js"
     ]
   },
   "s_39d7100c": {
@@ -3726,7 +3783,8 @@
   "s_3a79aadd": {
     "source": "Campanita",
     "files": [
-      "app.html"
+      "app.html",
+      "js/notification-review.js"
     ]
   },
   "s_3a9899b4": {
@@ -4708,6 +4766,12 @@
       "app.html"
     ]
   },
+  "s_4b70c3c9": {
+    "source": "Minutos productivos registrados",
+    "files": [
+      "js/notification-review.js"
+    ]
+  },
   "s_4b786cc9": {
     "source": "Continuar con Google",
     "files": [
@@ -5104,6 +5168,12 @@
     "source": "Perfil guardado.",
     "files": [
       "js/settings.js"
+    ]
+  },
+  "s_51b39186": {
+    "source": "Cómo va el descanso por productividad",
+    "files": [
+      "js/notification-review.js"
     ]
   },
   "s_51b83c0b": {
@@ -5657,6 +5727,12 @@
       "app.html"
     ]
   },
+  "s_593cd650": {
+    "source": "Se cuenta durante un turno laboral activo y fuera de Break/Lunch. Las llamadas guardadas aportan minutos; una pausa terminada establece un nuevo comienzo.",
+    "files": [
+      "js/notification-review.js"
+    ]
+  },
   "s_59415956": {
     "source": "Tu colección de victorias",
     "files": [
@@ -5844,6 +5920,12 @@
     "source": "{{v1}} · {{v2}} min",
     "files": [
       "js/higher-rate-review.js"
+    ]
+  },
+  "s_5db9ebc6": {
+    "source": "Resumen de alarmas y sonidos",
+    "files": [
+      "js/notification-review.js"
     ]
   },
   "s_5deee299": {
@@ -6330,12 +6412,6 @@
     "source": "Finalizar shift",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_65819255": {
-    "source": "Volumen, avisos con sonido y Descanso por productividad — configuración global, no depende del día.",
-    "files": [
-      "app.html"
     ]
   },
   "s_6585df2f": {
@@ -6862,6 +6938,12 @@
       "app.html"
     ]
   },
+  "s_6f5ece4f": {
+    "source": "Volumen 0%: no suena ningún aviso. Los mensajes escritos siguen activos.",
+    "files": [
+      "js/notification-review.js"
+    ]
+  },
   "s_6f9cbf3d": {
     "source": "Apartar o devolver dinero",
     "files": [
@@ -7233,6 +7315,12 @@
     "files": [
       "app.html",
       "js/app-main.js"
+    ]
+  },
+  "s_753eb734": {
+    "source": "Archivo propio",
+    "files": [
+      "js/notification-review.js"
     ]
   },
   "s_7580ebfa": {
@@ -7789,6 +7877,12 @@
     "source": "Entre {{v0}} y {{v1}} min productivos — cerca de tu meta",
     "files": [
       "js/calendar.js"
+    ]
+  },
+  "s_7dbef63a": {
+    "source": "Terminar y guardar desde la tool",
+    "files": [
+      "js/notification-review.js"
     ]
   },
   "s_7dd34dd8": {
@@ -9156,6 +9250,12 @@
       "js/backup-recovery.js"
     ]
   },
+  "s_9235fa49": {
+    "source": "Inicio de Break/Lunch",
+    "files": [
+      "js/notification-review.js"
+    ]
+  },
   "s_9279758f": {
     "source": "{{v0}} min · meta diaria",
     "files": [
@@ -9655,6 +9755,12 @@
       "js/shift-work-review.js"
     ]
   },
+  "s_9a502971": {
+    "source": "Archivos de sonido guardados",
+    "files": [
+      "js/notification-review.js"
+    ]
+  },
   "s_9a61340a": {
     "source": "El emoji aparece junto a tu nombre en el saludo de arriba (ej. \"Buenas tardes, [tu nombre] 🙂\"). Toca uno de la lista o escribe cualquier otro en el cuadro de texto. Déjalo vacío para no mostrar ninguno.",
     "files": [
@@ -10021,6 +10127,12 @@
     "source": "Reporte de ganancias — {{v1}}",
     "files": [
       "js/accounting-export.js"
+    ]
+  },
+  "s_a0789a6e": {
+    "source": "Cerrar sin guardar",
+    "files": [
+      "app.html"
     ]
   },
   "s_a07ab211": {
@@ -10764,6 +10876,7 @@
     "source": "Faltan {{v0}} min",
     "files": [
       "js/game.js",
+      "js/notification-review.js",
       "js/reports.js"
     ]
   },
@@ -10850,6 +10963,12 @@
     "source": "Un pago actualiza el historial del mes de su fecha. La reserva se conserva hasta que la liberes; tus llamadas y ganancias no cambian.",
     "files": [
       "js/finance-planning.js"
+    ]
+  },
+  "s_ae45d3fe": {
+    "source": "Es un aviso para que decidás descansar. No inicia Break, no te pone disponible y no repite avisos anteriores al recargar.",
+    "files": [
+      "js/notification-review.js"
     ]
   },
   "s_ae98bba2": {
@@ -11017,6 +11136,12 @@
       "app.html"
     ]
   },
+  "s_b153d3d6": {
+    "source": "Configurar apoyo sin llamadas",
+    "files": [
+      "js/notification-review.js"
+    ]
+  },
   "s_b166ed55": {
     "source": "Se termina la pausa activa y se conserva en el historial.",
     "files": [
@@ -11082,6 +11207,12 @@
     "source": "Desbloqueado",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_b26751fc": {
+    "source": "La sincronización y las correcciones de la extensión son silenciosas. Pegar texto sin importar, repetir duplicados o fallar al guardar no reproduce el aviso de importación.",
+    "files": [
+      "js/notification-review.js"
     ]
   },
   "s_b285539d": {
@@ -11566,6 +11697,12 @@
       "app.html"
     ]
   },
+  "s_ba091659": {
+    "source": "No se pudo cargar el resumen. Cerrá Avisos y volvé a abrirlo.",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_ba3ae5e8": {
     "source": "Recompensa individual · {{v0}} XP",
     "files": [
@@ -11920,6 +12057,12 @@
       "js/app-main.js"
     ]
   },
+  "s_bffa28bb": {
+    "source": "Progreso del próximo aviso",
+    "files": [
+      "js/notification-review.js"
+    ]
+  },
   "s_c008672a": {
     "source": "Repetida dentro del texto pegado; se leyó una sola vez.",
     "files": [
@@ -11960,7 +12103,8 @@
     "source": "Inicio de turno",
     "files": [
       "js/app-main.js",
-      "js/calls.js"
+      "js/calls.js",
+      "js/notification-review.js"
     ]
   },
   "s_c07cf564": {
@@ -13072,6 +13216,12 @@
       "js/automation-ui.js"
     ]
   },
+  "s_d1709ae6": {
+    "source": "Tramos completos desde la última pausa",
+    "files": [
+      "js/notification-review.js"
+    ]
+  },
   "s_d17d4f4d": {
     "source": "Perfil, idioma, meta, tasa y ciclo de pago.",
     "files": [
@@ -13447,6 +13597,12 @@
     "source": "{{v0}} Solo {{v1}}",
     "files": [
       "js/settings.js"
+    ]
+  },
+  "s_d88ba666": {
+    "source": "Final de Break/Lunch",
+    "files": [
+      "js/notification-review.js"
     ]
   },
   "s_d899c380": {
@@ -13947,6 +14103,12 @@
     "source": "{{v0}} retirado",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_dec67310": {
+    "source": "Desactivado",
+    "files": [
+      "js/notification-review.js"
     ]
   },
   "s_deca50a1": {
@@ -14591,6 +14753,12 @@
       "js/automation-ui.js"
     ]
   },
+  "s_e8f0e40d": {
+    "source": "Guardar una llamada manual",
+    "files": [
+      "js/notification-review.js"
+    ]
+  },
   "s_e925b413": {
     "source": "{icon} Premio disponible para tu {window}: {name}{extra}",
     "files": [
@@ -15168,6 +15336,12 @@
     "source": "Ese archivo no es JSON válido.",
     "files": [
       "js/backup-recovery.js"
+    ]
+  },
+  "s_f237694f": {
+    "source": "Agregar nota opcional antes de elegir",
+    "files": [
+      "app.html"
     ]
   },
   "s_f24749ce": {
@@ -15791,6 +15965,12 @@
     "source": "Ver antes y después por día",
     "files": [
       "js/shift-work-review.js"
+    ]
+  },
+  "s_fb707b6c": {
+    "source": "En espera",
+    "files": [
+      "js/notification-review.js"
     ]
   },
   "s_fb792567": {
