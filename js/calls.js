@@ -4,6 +4,7 @@ import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 import { calls, settings, state, setAppCalls as setCalls, setAppState, setAppSettings } from './app-context.js';
 import { ignorePropioCall } from './propio-bridge.js';
 import { callFeedbackSilenced, withSilentCallFeedback } from './call-feedback.js';
+import { PAY_ESTIMATE_RULE, roundedPayMinutes, callPayMinutes } from './pay-estimate.js';
 
 let HIGHER_RATE_TIERS, MAX_CALL_DURATION_MIN, appConfirm, autoStartShiftFromCalls, callDateKeyFromValue, callDedupeKey;
 let callsForDay, callsOverlap, closeModal, connectedMinutesForDay, convertedAmountText, dayAdherence;
@@ -170,9 +171,12 @@ function callStartLabelFromHHMM(hhmm) {
   return `${hour12}:${pad(m)} ${suffix}`;
 }
 
-// Estimado de pago = duración × tasa del tile elegido. Es solo un punto de partida editable.
+// El pago estimado usa el umbral personal; la duración real conserva sus segundos.
 function manualCallEstimatedPay(durationMin, tileKey = 'normal') {
-  return Number((durationMin * rateTilePerMin(tileKey)).toFixed(2));
+  const original = manualCallLiveBackupPending && state.pendingLiveCallBackup?.candidate;
+  const minutes = original && Number(original.durationMin) === Number(durationMin)
+    ? callPayMinutes(original) : roundedPayMinutes(durationMin);
+  return Number((minutes * rateTilePerMin(tileKey)).toFixed(2));
 }
 
 // Prellena los campos del modal — extraído de openManualCallModal para poder reutilizarlo también
@@ -303,6 +307,24 @@ export function applyRateTileToManualCall(tileKey) {
   updateManualCallPreview();
 }
 
+function restoreLiveBackupTiming(candidate, original, callDate, callStart) {
+  if (!candidate || !original) return candidate;
+  const start = new Date(original.startISO);
+  const calendarDate = callDateKeyFromValue(original.calendarCallDate) || todayCallDateKey(start);
+  const startLabel = original.callStart || callStartLabelFromHHMM(`${pad(start.getHours())}:${pad(start.getMinutes())}`);
+  const result = { ...candidate, source: 'live', importedAt: original.importedAt || new Date().toISOString() };
+  // Sin cambios de fecha/hora, conserva los segundos y el día contable originales.
+  if (Number.isFinite(start.getTime()) && callDate === calendarDate && callStart === startLabel) {
+    Object.assign(result, {
+      callDate: original.callDate, shiftDayKey: original.shiftDayKey, calendarCallDate: original.calendarCallDate,
+      id: original.id || candidate.id, startISO: original.startISO,
+      endISO: Number(original.durationMin) === candidate.durationMin ? original.endISO
+        : new Date(start.getTime() + candidate.durationMin * 60000).toISOString(),
+    });
+  }
+  return result;
+}
+
 export function updateManualCallPreview() {
   const durationInput = document.getElementById('manualCallDurationInput');
   const payInput = document.getElementById('manualCallPayInput');
@@ -320,8 +342,10 @@ export function updateManualCallPreview() {
     const start = callDate && callStart ? toDateFromInputs(callDate, callStart) : null;
     const amount = readNumericCallPay(payInput?.value);
     if (!validDuration || !start || amount === null || payInput?.validity?.badInput) { preview.textContent = translateText('Completa fecha, hora, duración y pago válidos para revisar la llamada.'); return; }
-    const end = new Date(start.getTime() + duration * 60000);
-    const draft = { ...callAccountingFields(start, callDate), startISO: start.toISOString(), endISO: end.toISOString(), durationMin: duration };
+    const calculatedEnd = new Date(start.getTime() + duration * 60000);
+    const original = manualCallLiveBackupPending && state.pendingLiveCallBackup?.candidate;
+    const draft = restoreLiveBackupTiming({ ...callAccountingFields(start, callDate), startISO: start.toISOString(), endISO: calculatedEnd.toISOString(), durationMin: duration, payEstimateRule: PAY_ESTIMATE_RULE }, original, callDate, callStart);
+    const end = new Date(draft.endISO);
     const base = manualCallPayWithoutDuplicateRateBonus(draft, amount);
     const overlap = calls.find(call => callsOverlap(call, draft));
     const warning = end.getTime() > Date.now() ? translateText('No se puede guardar: termina en el futuro.')
@@ -352,6 +376,7 @@ function buildManualCallCandidate({ customerId, callDate, callStart, durationMin
     endISO: end.toISOString(),
     countsAsProductive: billable === 'Yes' && dropped === 'No',
     source: 'manual',
+    payEstimateRule: PAY_ESTIMATE_RULE,
     // Se marca "importada ahora" igual que una fila pegada (importCalls)
     importedAt: new Date().toISOString(),
   };
@@ -383,6 +408,7 @@ function buildLiveCallCandidate({ customerId, startedAtISO, endedAtISO, billable
     endISO: end.toISOString(),
     countsAsProductive: billable === 'Yes' && dropped === 'No',
     source: 'live',
+    payEstimateRule: PAY_ESTIMATE_RULE,
     importedAt: new Date().toISOString(),
   };
 }
@@ -413,7 +439,7 @@ function trySaveCallCandidate(candidate) {
 function manualCallPayWithoutDuplicateRateBonus(candidate, pay) {
   const tileBonus = HIGHER_RATE_TIERS[manualCallSelectedRateTile]?.bonusPerMin || 0;
   const windowBonus = higherRateBonusForCall(candidate);
-  const duration = Number(candidate.durationMin) || 0;
+  const duration = callPayMinutes(candidate);
   if (!tileBonus || !windowBonus || duration <= 0) return pay;
   const duplicate = Math.min(tileBonus, windowBonus.amount / duration) * duration;
   return Math.max(0, parseMoney(pay) - duplicate).toFixed(2);
@@ -457,29 +483,7 @@ export function saveManualCall() {
 
   const pendingBackup = manualCallLiveBackupPending ? state.pendingLiveCallBackup : null;
   let candidate = buildManualCallCandidate({ customerId, callDate, callStart, durationMin: duration, billable, dropped, pay });
-  if (candidate && pendingBackup?.candidate) {
-    const original = pendingBackup.candidate;
-    const originalStart = new Date(original.startISO);
-    const originalCalendarDate = callDateKeyFromValue(original.calendarCallDate) || todayCallDateKey(originalStart);
-    const originalStartLabel = original.callStart || callStartLabelFromHHMM(`${pad(originalStart.getHours())}:${pad(originalStart.getMinutes())}`);
-    // Si el usuario no movió fecha/hora, conserva los segundos reales de la llamada live.
-    if (Number.isFinite(originalStart.getTime()) && callDate === originalCalendarDate && callStart === originalStartLabel) {
-      const exactEnd = new Date(originalStart.getTime() + duration * 60000);
-      candidate = {
-        ...candidate,
-        callDate: original.callDate,
-        shiftDayKey: original.shiftDayKey,
-        calendarCallDate: original.calendarCallDate,
-        id: original.id || candidate.id,
-        startISO: originalStart.toISOString(),
-        endISO: exactEnd.toISOString(),
-        source: 'live',
-        importedAt: original.importedAt || new Date().toISOString(),
-      };
-    } else {
-      candidate = { ...candidate, source: 'live', importedAt: original.importedAt || new Date().toISOString() };
-    }
-  }
+  candidate = restoreLiveBackupTiming(candidate, pendingBackup?.candidate, callDate, callStart);
   if (candidate && pendingBackup?.candidate?.propioBridge) candidate.propioBridge = { ...pendingBackup.candidate.propioBridge };
   if (candidate && new Date(candidate.endISO).getTime() > Date.now()) {
     toast(translateText('La llamada no puede terminar en el futuro'));
@@ -517,7 +521,7 @@ export function autoSaveLiveCall(startedAtISO, endedAtISO, liveContext = null) {
   if (liveContext?.propioBridge && !callFeedbackSilenced()) return withSilentCallFeedback(() => autoSaveLiveCall(startedAtISO, endedAtISO, liveContext));
   const elapsedMs = Math.max(0, new Date(endedAtISO).getTime() - new Date(startedAtISO).getTime());
   const durationMin = Math.round((elapsedMs / 60000) * 100) / 100;
-  const pay = manualCallEstimatedPay(durationMin, 'normal').toFixed(2);
+  const pay = (roundedPayMinutes(elapsedMs / 60000) * rateTilePerMin('normal')).toFixed(2);
 
   const candidate = buildLiveCallCandidate({
     customerId: '',

@@ -19,11 +19,10 @@ El mockup completo externo a Git ya incluye 11 pantallas: Logros, Avisos,
 restauración, disponibilidad, ganancias, Higher Rate, proyección, popup,
 horario, meta desde Finanzas y borrado de cuenta. Se comprobaron 66 vistas
 en claro/oscuro y 320/390/1200 px, y 22 accesos de detalle. El propietario
-aprobó las once vistas el 20/10 con «Aprobadas». Corresponde trasladarlas a la
-app y al popup conservando sus funciones. No publicar la fase 9 rechazada ni
+aprobó las once vistas el 20/10 con «Aprobadas». Aplicadas a la web 635 y al popup 2.3.1 conservando sus funciones. No publicar la fase 9 rechazada ni
 considerar corregidas las pantallas reales por esta maqueta. El
 [control visual de la entrega](control-visual-11-vistas.md) distingue aprobación,
-implementación y comprobación real; actualmente ninguna está certificada.
+implementación y comprobación real; las once tienen comprobación registrada con datos ficticios.
 
 El 20/10 el propietario rechazó también el resumen de Logros en preparación:
 demasiado texto plano y poca jerarquía. Se frena su publicación y se prepara
@@ -144,6 +143,8 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 
 ## Entregas verificadas
 
+- [PR #97](https://github.com/jonathanvelasquez787-commits/propio-shift-tracker/pull/97), main `b6eda674f36d0415b6dad4c27e2aaa13d3ad86e0`: once vistas aprobadas aplicadas, incluida disponibilidad compacta. 947 pruebas y doce recorridos ES/EN, temas y anchos; popup real con API de Chrome simulada. CI de PR/main y traducciones correctos, producción READY y ocho archivos públicos del mismo SHA verificados. Extensión 2.3.1 instalada con respaldo y recarga confirmada por el propietario. Esta corrección visual no cierra por sí sola las veinte mejoras funcionales pendientes.
+
 - [PR #96](https://github.com/jonathanvelasquez787-commits/propio-shift-tracker/pull/96), main `00aeb67aa042798ef1e6e10ea95b476b994fef0f`: 943 pruebas y 20 recorridos compilados con datos ficticios. CI del PR/main y traducciones correctos, producción READY y archivos públicos del mismo SHA verificados. Cierra 48–52 y 75. Extensión sin cambios.
 
 
@@ -227,10 +228,10 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
    reservado/pagado, recurrencia/reinicio y planificador; pago recibido manual
    y diferencia contra lo esperado. Cubre 38–42, 45 y 76. Sin movimientos bancarios
    ni afirmar depósitos a partir de reservas.
-7. **Reportes y calendario — probada, sin publicar.** Conclusiones primero, supuestos de
+7. **Reportes y calendario — publicada (web 633, PR #95).** Conclusiones primero, supuestos de
    proyección, leyendas de días sin datos y exportaciones comprensibles.
    Cubre 43–44, 46 y 68.
-8. **Avisos y acompañamiento — pendiente.** Resumen de alarmas, sonido/volumen y
+8. **Avisos y acompañamiento — publicada (web 634, PR #96).** Resumen de alarmas, sonido/volumen y
    archivos, progreso hacia descanso, acceso a apoyo, reflexión fácil y consulta.
    Cubre 48–52 y 75. Mantener elecciones y carácter voluntario.
 9. **Logros — pendiente.** Introducción, reglas y estados de premios/cofres,
@@ -256,6 +257,43 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 [PR #94](https://github.com/jonathanvelasquez787-commits/propio-shift-tracker/pull/94), main `37d8ee96b6c68fffa0bafc0b05bfa43858857024`: 931 pruebas, 16 recorridos compilados y caso adicional de cuota, meta propuesta y cancelación de borrado. CI del PR y main correctos, traducción correcta, producción READY y hashes públicos del mismo SHA verificados. Extensión sin cambios.
 
 ## Criterios comunes de entrega
+
+El conteo de veinte mejoras abiertas corresponde únicamente al plan de 79.
+No es un inventario de todos los asuntos externos ni de toda la cobertura de
+pruebas del proyecto.
+
+### Asuntos adicionales fuera de ese conteo
+
+- **Segundos oficiales de Propio:** obtener evidencia sobre duración y pago del
+  último minuto incompleto. La precisión del contador de la tool no demuestra
+  la regla de facturación de Propio.
+  Por decisión del propietario se prepara el umbral personal inclusivo de 40 s
+  para estimaciones nuevas; no cierra la investigación oficial. Ver
+  [alcance del redondeo](redondeo-de-estimaciones.md).
+- **Visibilidad por nombre en Google:** seguimiento externo documentado en
+  [SEO](seo.md). La última comprobación documentada no es una consulta actual.
+  El reintento automático está pausado; no reactivarlo ni repetir solicitudes
+  sin autorización del propietario.
+- **Traducción automática opcional:** Locize preparado, sin proveedor activo
+  confirmado. Requiere decisión del propietario y configuración si se elige
+  contratarlo. ES/EN funcionan sin ese servicio.
+
+### Límites de validación que deben comunicarse
+
+- Las simulaciones no certifican todas las variantes nativas de llamada/Save,
+  OAuth humano nuevo, dos PCs físicas, otro monitor físico ni audibilidad real.
+  Parte de esta cobertura corresponde a 14, 64 y 74; no contarla dos veces.
+- CSV: contenido y nombre del archivo comprobados; guardado nativo a disco sin
+  certificar por cancelación de Chrome aislado. La vista de impresión no
+  certifica una impresión física. Ver [exportaciones](reportes-calendario-y-exportaciones.md).
+- SQL y restauración local con fixtures no certifican un ensayo completo de
+  restauración de un proyecto alojado ni la ejecución real de sus cron.
+  Ver [operación y recuperación](production-recovery.md).
+- La suspensión del equipo y los cambios arbitrarios de reloj/zona siguen
+  sujetos a los límites documentados. Una prueba correcta no implica que la
+  automatización funcione con el equipo suspendido.
+
+### Comprobación antes de cerrar una entrega
 
 - Conservar funciones actuales, registros, configuración y prioridades.
 - Pruebas de éxito, fallo, cuenta/revisión cambiada, reapertura y ausencia de

@@ -46,9 +46,9 @@ operación individual que supera ese espacio se rechaza conservando las llamadas
 Antes de guardar también se comprueba el límite existente de estado sincronizable.
 
 La conservación empieza con esta versión. No reconstruye eliminaciones
-anteriores ni reemplaza un respaldo completo. Reiniciar el día, borrar todos
-los datos y restaurar un JSON conservan todavía su alcance anterior: sus
-mejoras pertenecen a 67/69 y siguen pendientes. La extensión puede volver a
+anteriores ni reemplaza un respaldo completo. Las mejoras posteriores de
+reinicio y restauración, puntos 67/69, se publicaron en web 629; ver
+[actividades y respaldos](recuperacion-actividades-y-respaldos.md). La extensión puede volver a
 recuperar una fila oficial eliminada; el historial la reconoce y evita duplicarla.
 
 ## Validación

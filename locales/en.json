@@ -3077,5 +3077,7 @@
   "s_f75b75c4": "{{v34}}{{v35}}",
   "s_ffbe3299": "Bonus attributed to this window",
   "s_a86789a1": "Activation, season and settings",
-  "s_d0bb3c36": "Open chest"
+  "s_d0bb3c36": "Open chest",
+  "s_9d85235c": "New estimates: at 40 s or more, round up one minute. Personal rule, unconfirmed by Propio; actual duration is preserved.",
+  "s_a3806022": "After hanging up, ACW counts how long you wait for the next call. To estimate your pay, we look at the seconds left after the complete minutes: from 0 to 39 seconds, keep those minutes; from 40 to 59 seconds, add one minute. For example: 7 minutes and 39 seconds → 7 estimated paid minutes. From 7 minutes and 40 seconds → 8 estimated paid minutes."
 }

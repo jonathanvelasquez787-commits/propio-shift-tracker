@@ -64,4 +64,5 @@ Evidencia de la entrega preparada: `aprobadas-aplicadas-qa.json` (12 recorridos)
 `aprobadas-popup-qa.json` (ambos temas) y `approved-visual-tests.log`
 (947 pruebas correctas), fuera de Git. Capturas `aplicado-*` fuera de Git.
 La disponibilidad compacta es el ajuste posterior pedido por el propietario.
-Publicación y recarga de Chrome todavía se verifican por separado.
+Publicación verificada en PR #97 y producción del mismo commit. El propietario
+confirmó la recarga y el popup 2.3.1.
