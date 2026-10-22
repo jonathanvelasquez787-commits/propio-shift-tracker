@@ -831,7 +831,9 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 #earningsDetailsSection .polished-foot{text-align:left;margin:6px 0 0;font-size:11px}
 #rptGoalsGrid #workDayReviewSection{margin-top:8px;min-width:0}
 #rptGoalsGrid #workDayReviewDetails>summary{font-size:11px;padding:10px 0}
-#workDayReviewDetails>summary:after{flex:0 0 24px;width:24px;line-height:24px;text-align:center}
+.polished-disclosure>summary:after,.polished-setting>summary:after{flex:0 0 24px;width:24px;height:24px;display:grid;place-items:center;line-height:1;text-align:center}
+/* Rotated text chevrons need a little paint clearance beyond their box. */
+.polished-setting>summary{padding-right:4px}
 @media(max-width:960px){.rpt-cycle-layout{display:block}.rpt-cycle-layout>#rptCycleGrid{display:grid;margin-bottom:10px}.rpt-cycle-layout #rptCycleGrid>.polished-forecast{grid-column:auto;grid-row:auto}.rpt-cycle-layout>#earningsDetailsSection{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.rpt-cycle-layout>#earningsDetailsSection{grid-template-columns:1fr}}
 #workDayReviewDetails .polished-detail{max-width:none}

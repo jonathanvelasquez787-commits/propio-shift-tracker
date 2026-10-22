@@ -3,7 +3,7 @@
 Web 630 y código de extensión 2.3.0. La versión instalada en Chrome puede
 seguir siendo anterior hasta instalar y recargar esa entrega.
 
-## En la tool
+## En la aplicación
 
 - En Bloques del día → Llamadas, cada registro identifica su origen:
   estimado en vivo, oficial importado, corrección oficial, corrección manual,
@@ -29,8 +29,9 @@ misma fila ya guardada, se informa Sin cambios y no se suma otra llamada.
 
 ## Medición propia y recuperación
 
-La tool calcula la duración desde inicio y fin precisos, redondeada a dos
-decimales de minuto; una llamada extremadamente breve puede figurar con cero.
+La aplicación conserva inicio y final observados con milisegundos y calcula la
+duración sin redondeo decimal: 7:41 sigue siendo 461000 ms. El umbral personal
+inclusivo de 40 segundos solo estima el pago: 7:39 usa 7 minutos y 7:40 usa 8.
 El pago en vivo es una estimación según la tarifa configurada. Esto no demuestra
 cómo Propio calcula sus segundos ni modifica sus importes oficiales.
 
@@ -39,16 +40,16 @@ y fin. Si falla esa escritura, la actividad anterior se conserva. Si falla el
 guardado completo posterior, no se agrega una fila sin guardar ni una recompensa;
 el borrador sigue disponible para recuperar la llamada después de recargar.
 La detección recuperada directamente desde la extensión conserva además su cola
-sin confirmar el evento como guardado cuando la tool rechaza la escritura.
+sin confirmar el evento como guardado cuando la aplicación rechaza la escritura.
 
 ## En el popup de la extensión
 
 La cola muestra eventos pendientes, que pueden ser llamadas, sesiones o historial;
 su cantidad no equivale a llamadas adicionales. Informa cuándo vence el evento
 más antiguo, a las 24 horas. Al vencer se pausa su registro automático para revisión:
-no se borra de la cola. Abrir tracker reutiliza su pestaña si ya existe.
+no se borra de la cola. Abrir Propio Shift Tracker reutiliza su pestaña si ya existe.
 
-Ejemplo: quedan tres eventos y el más antiguo vence en una hora. Abrí el tracker
+Ejemplo: quedan tres eventos y el más antiguo vence en una hora. Abrí Propio Shift Tracker
 con la cuenta vinculada para reintentar. Si ya venció, compará con el historial de
 Propio antes de resolverlo. La fecha se calcula con el reloj del dispositivo.
 

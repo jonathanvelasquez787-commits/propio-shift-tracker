@@ -1,7 +1,7 @@
 # Historial y recuperación de llamadas
 
 App 628 inicia la fase 3 del plan y completa el punto 21. La extensión
-permanece en 2.2.10; esta entrega corresponde a la tool web.
+permanece en 2.2.10; esta entrega corresponde a la aplicación web.
 
 ## Uso
 

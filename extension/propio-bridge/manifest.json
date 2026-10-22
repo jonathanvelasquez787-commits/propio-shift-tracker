@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Propio · Tracker y vista original",
   "description": "Conecta tu Shift Tracker y permite volver a la vista original de Propio.",
-  "version": "2.3.3",
+  "version": "2.3.4",
   "minimum_chrome_version": "120",
   "permissions": ["storage", "webRequest", "alarms", "webNavigation"],
   "host_permissions": ["https://interpreters.propio-ls.com/*", "https://app.useinterpreter.com/*", "https://www.linguee.es/*", "https://www.linguee.com/*", "https://eventgw.twilio.com/*", "https://eventgw.us1.twilio.com/*", "https://eventgw.ie1.twilio.com/*", "https://eventgw.au1.twilio.com/*", "https://propio-shift-tracker.vercel.app/*"],

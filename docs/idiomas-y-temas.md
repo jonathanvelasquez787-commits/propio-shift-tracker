@@ -1,13 +1,13 @@
 # Idiomas y temas
 
-La tool comienza en **English** cuando no existe una preferencia válida. El
+La aplicación comienza en **English** cuando no existe una preferencia válida. El
 botón EN/ES de la barra superior, junto al modo claro/oscuro, cambia de idioma al instante,
 sin borrar campos ni cambiar entre registro, recuperación y entrada. La elección
 se conserva al recargar y se aplica después de hidratar la cuenta, sin sustituir
 llamadas, horarios ni otras preferencias. Un idioma previamente elegido sigue
 vigente. La selección pública no crea datos de cuenta ni conflictos de nube.
 
-En **Ajustes → Tu perfil**, el selector **Idioma de la tool** permite elegir
+En **Ajustes → Tu perfil**, el selector **Idioma de la aplicación** permite elegir
 Español o English. En el menú lateral, **Temas y colores** permite elegir
 Claro u Oscuro y Original o una de las siete paletas aprobadas. Las preferencias
 se guardan y sincronizan con los ajustes existentes. Cambiar idioma recarga la

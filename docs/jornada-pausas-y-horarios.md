@@ -1,6 +1,6 @@
 # Jornada, pausas y horarios
 
-Web 631. Los controles pertenecen a la tool; la extensión conserva su versión
+Web 631. Los controles pertenecen a la aplicación; la extensión conserva su versión
 2.3.0 y no requiere otra instalación para este bloque.
 
 ## Cerrar o volver al turno
@@ -33,7 +33,8 @@ solo después de guardar se apaga su alarma y se reconoce el progreso.
 El selector distingue **Hoy** de **Historial**. Su botón vuelve a Hoy; consultar
 otra fecha no habilita los controles para alterar el turno de esa fecha.
 
-«Ver jornada: ACW, pausas y adherencia», en Ganancias, abre tarjetas con:
+Reportes → Adherencia → «Ver jornada» abre el detalle existente. El acceso
+de Inicio lleva al mismo lugar. Las metas, causas y pausas quedan plegadas, con:
 
 - ACW actual frente al acumulado del día seleccionado. El acumulado usa los
   huecos clasificados como ACW; Break/Lunch/Otro no se convierten en ACW.

@@ -5,8 +5,8 @@ continúa en 2.2.10, sin cambios de permisos ni automatismos.
 
 ## Qué muestra
 
-En Ganancias del día y del ciclo, «Desglose de ganancias» abre un detalle
-plegado con cuatro filas:
+En Reportes → Ganancias del ciclo, el desglose del día y del ciclo ocupa
+el espacio bajo Racha y la meta, junto a Proyección. Las tres partes son:
 
 - **Base registrada:** importaciones, montos manuales y registros antiguos sin
   marca de estimación. Registrada no equivale a pago confirmado por Propio.
@@ -14,8 +14,9 @@ plegado con cuatro filas:
   que todavía no tienen una confirmación explícita de pago importado.
 - **Higher Rate calculado:** bonos calculados con las ventanas, incluidos los
   conservados en llamadas al limpiar el historial. No modifica el pago base.
-- **Total de la tool:** suma de las tres partes, con el mismo conjunto de
-  llamadas de la tarjeta. No confirma que el dinero se haya recibido.
+
+El total principal de Inicio suma esas tres partes con el mismo conjunto de
+llamadas. No confirma que el dinero se haya recibido.
 
 Una corrección oficial sustituye la estimación y se presenta en base
 registrada. El bono se calcula una vez. El día corresponde al día activo; el

@@ -9,8 +9,8 @@ los nombres del popup; los cambios de presentación y registros están en la web
 - Una llamada live conserva inicio y fin ISO con milisegundos, `durationMs`
   entero y duración en minutos sin redondeo decimal. Una observación de
   7:41 conserva 461000 ms; puede estimar el pago con 8 minutos.
-- `records.tool` guarda la observación original, el pago estimado y si la
-  detectó la extensión o la tool. La importación y las correcciones posteriores
+- `records.aplicación` guarda la observación original, el pago estimado y si la
+  detectó la extensión o la aplicación. La importación y las correcciones posteriores
   no sustituyen esa observación.
 - `records.propio` conserva el inicio, duración y pago informados, el final
   calculado y la recepción. El inicio del historial tiene precisión de minutos;
@@ -28,8 +28,9 @@ los nombres del popup; los cambios de presentación y registros están en la web
 ## Dónde verlo
 
 En Inicio → Bloques del día → Llamadas, pulsar la llamada para abrir su único
-detalle. El lápiz abre ese mismo detalle con la edición desplegada. El ACW
-lleva a la llamada que explica su cálculo, sin otra pantalla. No hay una
+detalle. El lápiz abre ese mismo detalle con la edición desplegada. El hover del ACW muestra la última llamada observada con inicio y final en
+segundos; distingue los tiempos oficiales calculados cuando no hubo observación.
+Al pulsarlo lleva a la llamada que explica su cálculo, sin otra pantalla. No hay una
 segunda tarjeta de historial. El detalle distingue Propio, respaldo,
 diferencia de cierre y pago, y muestra el historial y milisegundos plegados.
 La ayuda «Cómo se registra una llamada en vivo» se consulta en ese mismo

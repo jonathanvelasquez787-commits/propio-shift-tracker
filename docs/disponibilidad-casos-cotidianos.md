@@ -2,12 +2,12 @@
 
 Revisión del 15 de octubre de 2026. App 617, extensión 2.2.4.
 Este documento reemplaza la propuesta del 14/10 basada en un contador futuro:
-la espera ahora usa el ACW que publica la tool. No necesita ver el segundo cero.
+la espera ahora usa el ACW que publica la aplicación. No necesita ver el segundo cero.
 
 ## Prioridades aplicadas
 
 1. No tocar una llamada conectada, una oferta ni un estado desconocido.
-2. Exigir sesión, cuenta, un portal y un tracker actual y único.
+2. Exigir sesión, cuenta, un portal y un Propio Shift Tracker actual y único.
 3. Respetar el horario efectivo del día, su inicio, fin y cierre manual.
 4. Respetar una pausa manual de los automatismos, Break y Lunch.
 5. Aplicar primera llamada o regreso de pausa habilitado.
@@ -34,7 +34,7 @@ Pruebas de referencia: `tests/propio-bridge.test.mjs`,
 6. Entrada después de salida: no inicia.
 7. Chrome de madrugada: las páginas pueden abrirse; no habilita llamadas fuera del horario.
 8. Día libre: no hay plan automático; una excepción laboral usa su horario.
-9. Horario distinto: utiliza el plan efectivo enviado por la tool.
+9. Horario distinto: utiliza el plan efectivo enviado por la aplicación.
 10. Sesión desconocida: espera, sin confundir Chrome abierto con login.
 11. Available: no duplica Start Calls; durante una espera válida puede usar Stop.
 12. Oferta visible: no usa ninguno de los controles de disponibilidad.
@@ -77,11 +77,11 @@ observador de `tests/propio-bridge.test.mjs`.
 43. Tracker cerrado o cuenta distinta: elimina el plan guardado, incluso sin eventos pendientes; no inicia con datos antiguos.
 44. Recarga/reinicio: conserva selección, primera llamada consumida, pausa manual y límite del mismo ACW.
 45. Suspensión: reevalúa horario, pausas y snapshots al volver; no ejecuta acciones atrasadas en lote.
-46. Sin conexión: no puede garantizar disponibilidad. Sin tracker actual no actúa; el registro pendiente conserva su mecanismo separado.
-47. Corrección oficial: sigue el ACW recalculado que se ve en la tool; no mantiene un temporizador secreto distinto. La regla oficial de pago por segundos sigue sin confirmarse.
+46. Sin conexión: no puede garantizar disponibilidad. Sin Propio Shift Tracker actual no actúa; el registro pendiente conserva su mecanismo separado.
+47. Corrección oficial: sigue el ACW recalculado que se ve en la aplicación; no mantiene un temporizador secreto distinto. La regla oficial de pago por segundos sigue sin confirmarse.
 48. Llamada real anticipada: cuenta como trabajo y consume la primera llamada de ese horario; no permite automatismos antes de su inicio.
 49. Cerrar/reabrir el mismo turno: no repite primera llamada. Se identifica por el inicio del horario; un horario nuevo constituye otro plan.
-50. Desplazar horario al llegar tarde: utiliza el inicio, fin y pausas efectivos que publica la tool, sin sumar un desplazamiento propio.
+50. Desplazar horario al llegar tarde: utiliza el inicio, fin y pausas efectivos que publica la aplicación, sin sumar un desplazamiento propio.
 51. Medianoche: mantiene el inicio/fin del turno activo en timestamps completos; no reinicia por el cambio de fecha.
 52. Cambio de reloj/zona: el horario y ACW se recalculan con la PC. Rechaza snapshots de ACW futuros; no existe un reloj servidor independiente que certifique cambios arbitrarios del reloj del sistema.
 53. Otra PC: no hay exclusión global entre dispositivos. La protección local no la garantiza; dejar los iniciadores activos en una sola PC sigue siendo necesario.
