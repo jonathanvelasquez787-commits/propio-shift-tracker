@@ -14,6 +14,12 @@ Coinciden sus hashes normalizando únicamente finales de línea. CSP, HSTS y
 `no-store` de `/app` comprobados. El plan cierra 16 mejoras web: 75 publicadas,
 cuatro de extensión probadas e instaladas pendientes de activación.
 
+La revisión posterior de #105 encontró que una ayuda ya descartada seguía
+consumiendo Escape mientras retenía el foco. Se excluye ese estado para que
+el segundo Escape llegue al modal padre, con regresión y recorrido compilado.
+La frase conserva blanco/negro exactos en todas las paletas, según la decisión
+previa del propietario. El cierre de publicación incorpora estas correcciones.
+
 ## Cambios y conservación
 
 - **53–60, Logros:** activación reversible ante fallo de guardado, introducción
