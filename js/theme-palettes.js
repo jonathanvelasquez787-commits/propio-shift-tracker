@@ -1,5 +1,5 @@
 export const PALETTES = [
-  { id:'original',name:'Original',description:'Los colores actuales de la tool',colors:['#0D1230','#2FD5FF','#FFFFFF','#6366F1'] },
+  { id:'original',name:'Original',description:'Los colores actuales de la aplicación',colors:['#0D1230','#2FD5FF','#FFFFFF','#6366F1'] },
   { id:'neon',name:'Morado Neón',description:'Violeta, fucsia, coral y amarillo',colors:['#5003C0','#AB03A9','#FF467A','#FFD51E'],code:'5003c0ab03a9ff467affd51e',lightAccent:0,darkAccent:3,secondary:1,lightBackground:3 },
   { id:'lavender',name:'Lavanda Pastel',description:'Lavanda, celeste y menta',colors:['#9FA1FF','#B5BAFF','#AEE2FF','#D9F9DF'],code:'9fa1ffb5baffaee2ffd9f9df',lightAccent:0,darkAccent:2,secondary:1,lightBackground:3 },
   { id:'magenta',name:'Rosa Magenta',description:'Morado profundo y tonos rosados',colors:['#462C7D','#831C91','#D552A3','#FF70BF'],code:'462c7d831c91d552a3ff70bf',lightAccent:1,darkAccent:3,secondary:2,lightBackground:3 },

@@ -105,7 +105,7 @@ test('content status response from an older document is never forwarded to a new
 
 function uiFixture(){
  let clock=now,tick,disconnected=false;
- const nodes=Object.fromEntries(['automationPanel','automationTitle','automationDetail','automationCountdown','automationTrackerCheck',
+ const nodes=Object.fromEntries(['automationPanel','automationStatusBtn','automationCompactTitle','automationCompactCountdown','automationTitle','automationDetail','automationCountdown','automationTrackerCheck',
  'automationPortalCheck','automationScheduleCheck','automationFirstCheck','automationOptionsCheck','automationReturnsCheck',
  'automationConnectionCheck','automationWorkCheck','automationPauseCheck','pageHome'].map(id=>[id,{textContent:'',hidden:false}]));
  const host={document:{getElementById:id=>nodes[id]},setInterval:fn=>{tick=fn;return 1;},clearInterval:()=>{tick=null;},
@@ -116,9 +116,9 @@ function uiFixture(){
 
 test('rendered availability ages out, hides on other pages and never saves or starts a call',()=>{
  const x=uiFixture();x.view.update(createAutomationStatus(state(),now));
- assert.equal(x.nodes.automationCountdown.textContent,'2:10');assert.equal(x.nodes.automationCountdown.hidden,false);
- assert.equal(x.nodes.automationTitle.textContent,'Próximo intento de disponibilidad');
- x.nodes.pageHome.hidden=true;x.advance(1000);assert.equal(x.nodes.automationPanel.hidden,true);
+ assert.equal(x.nodes.automationCompactCountdown.textContent,'2:10');assert.equal(x.nodes.automationPanel.hidden,false);assert.equal(x.nodes.automationCountdown.textContent,'2:10');assert.equal(x.nodes.automationCountdown.hidden,false);
+ assert.equal(x.nodes.automationTitle.textContent,'Próximo intento');
+ x.nodes.pageHome.hidden=true;x.advance(1000);assert.equal(x.nodes.automationStatusBtn.hidden,true);
  x.nodes.pageHome.hidden=false;x.advance(15000);assert.equal(x.nodes.automationCountdown.hidden,true);
  assert.equal(x.nodes.automationTitle.textContent,'Esperando una lectura reciente');
  x.view.stop();assert.equal(x.disconnected,true);x.view.update(createAutomationStatus(state(),now));
@@ -130,7 +130,7 @@ test('rendered status ignores reordered snapshots and clears immediately when ac
  x.view.update(snapshot);x.advance(1000);
  x.view.update({...snapshot,reportedAt:iso(now+1000),paused:true});
  x.view.update(snapshot);assert.equal(x.nodes.automationTitle.textContent,'Pausada por vos');
- x.view.update(null);assert.equal(x.nodes.automationTitle.textContent,'Esperando información de la extensión');
+ x.view.update(null);assert.equal(x.nodes.automationTitle.textContent,'Sin conexión confirmada');
  assert.equal(x.nodes.automationCountdown.hidden,true);x.view.stop();
 });
 
@@ -155,13 +155,13 @@ test('active and scheduled pauses carry their own end time without reviving a co
 
 test('pause explanations distinguish manual return, timed close, missing duration and scheduled-only pauses',()=>{
  const x=uiFixture(),base={...createAutomationStatus(state(),now),reason:'pause',pauseType:'break',pauseActual:true,pauseEndsAt:iso(now+600000)};
- x.view.update(base);assert.match(x.nodes.automationDetail.textContent,/Terminá la pausa en la tool; después/);
+ x.view.update(base);assert.match(x.nodes.automationDetail.textContent,/Terminá la pausa en Inicio; después/);
  assert.match(x.nodes.automationReturnsCheck.textContent,/Break activado · Lunch apagado/);
  const timed={...base,options:{...base.options,timed:true}};x.view.update(timed);
  assert.match(x.nodes.automationDetail.textContent,/extensión intentará cerrar la pausa/);
  x.view.update({...timed,pauseEndsAt:iso(now-1)});assert.match(x.nodes.automationDetail.textContent,/Esperando confirmar su cierre/);
  x.view.update({...timed,pauseEndsAt:null});assert.match(x.nodes.automationDetail.textContent,/sin duración prevista confirmada/);
- assert.match(x.nodes.automationDetail.textContent,/Terminá la pausa en la tool/);
+ assert.match(x.nodes.automationDetail.textContent,/Terminá la pausa en Inicio/);
  x.view.update({...timed,pauseType:'lunch'});assert.match(x.nodes.automationDetail.textContent,/pulsá Start Calls/);
  x.view.update({...timed,pauseActual:false});assert.match(x.nodes.automationDetail.textContent,/programado hasta/);
  assert.match(x.nodes.automationDetail.textContent,/No hay una pausa activa/);

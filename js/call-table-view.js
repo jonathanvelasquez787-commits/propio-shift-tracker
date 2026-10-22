@@ -71,7 +71,7 @@ export function renderCallTable(context) {
           const droppedText = String(c.dropped).toLowerCase() === 'yes' ? translateText('Dropped') : translateText('No dropped');
           const higherRateBonus = higherRateBonusForCall(c);
           const higherRateBadge = higherRateBonus ? higherRateTierBadgeHtml(higherRateBonus.tier, higherRateBonus.amount) : '';
-          const sourceLabel = { estimated: c.propioBridge ? translateText('Estimado · extensión') : translateText('Medido · tool; pago estimado'),
+          const sourceLabel = { estimated: c.propioBridge ? translateText('Estimado · extensión') : translateText('Medición exacta · pago estimado'),
             official: translateText('Oficial · importado'), 'official-correction': translateText('Oficial corregida'),
             'manual-correction': translateText('Corregida por vos'), manual: translateText('Manual'), unknown: translateText('Origen sin confirmar') }[callRecordSource(c)];
 

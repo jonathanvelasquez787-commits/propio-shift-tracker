@@ -63,7 +63,7 @@ export function confirmReplacement(context, kind, change, options = {}) {
     ui`Día que se reinicia: ${options.dayLabel}.`,
     translateText('Se eliminan sus llamadas, pausas, huecos, nota, acciones y progreso diario. Otros días, horario y metas se conservan.'),
   ] : kind === 'reset' ? [
-    translateText('Se reinician todos los días, llamadas, turnos, pausas, Logros, Finanzas, horario, metas y perfil de la tool.'),
+    translateText('Se reinician llamadas, turnos, pausas, Logros, Finanzas, horario, metas y perfil de todos los días.'),
     translateText('Tu cuenta y los ajustes propios de la extensión se conservan.'),
   ] : [
     translateText('Las llamadas, turnos, pausas, notas y Logros actuales se reemplazan por los del respaldo.'),
@@ -112,7 +112,7 @@ export function confirmReplacement(context, kind, change, options = {}) {
 
 export function importBackupFile(context, file, maxBytes) {
   const { translateText } = context;
-  if (file.size > maxBytes) return context.toast(translateText('El respaldo excede el tamaño permitido. Elegí un JSON exportado por la tool.'));
+  if (file.size > maxBytes) return context.toast(translateText('El respaldo excede el tamaño permitido. Elegí un respaldo JSON de Propio Shift Tracker.'));
   const owner = context.data(), account = context.account(), expected = replacementSignature(owner);
   const reader = new FileReader();
   reader.onload = () => {

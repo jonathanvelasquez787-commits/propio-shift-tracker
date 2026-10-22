@@ -348,9 +348,9 @@ function injectDeleteAccount(userId, getCurrentUserId = () => readMeta().userId)
       </div>
       <span class="danger-card-badge">Irreversible</span>
       <div class="polished-delete-counts"><div><strong data-delete-count="calls">—</strong><span>Llamadas</span></div><div><strong data-delete-count="pauses">—</strong><span>Pausas</span></div><div><strong data-delete-count="events">—</strong><span>Acciones</span></div></div>
-      <p class="danger-card-desc">Se eliminan tu cuenta y sus datos activos de la tool.</p>
+      <p class="danger-card-desc">Se eliminan tu cuenta y sus datos activos de Propio Shift Tracker.</p>
       <button class="polished-export-first" id="deleteAccountExportBtn" type="button"><span><strong>Guardar mi respaldo</strong><small>Exportar JSON antes de continuar</small></span><span aria-hidden="true">↗</span></button>
-      <details class="polished-disclosure"><summary>Qué se borra y qué se conserva</summary><div class="polished-detail"><div class="review-line"><span>Cuenta y datos de la tool</span><strong>Se eliminan</strong></div><div class="review-line"><span>Cuenta e historial oficial de Propio</span><strong>Se conservan</strong></div><p class="note">Incluye llamadas, turnos, pausas, horario, metas, Finanzas y progreso de juego de la tool.</p></div></details>
+      <details class="polished-disclosure"><summary>Qué se borra y qué se conserva</summary><div class="polished-detail"><div class="review-line"><span>Cuenta y datos de Propio Shift Tracker</span><strong>Se eliminan</strong></div><div class="review-line"><span>Cuenta e historial oficial de Propio</span><strong>Se conservan</strong></div><p class="note">Incluye llamadas, turnos, pausas, horario, metas, Finanzas y Logros.</p></div></details>
       <p class="polished-retention">Las copias históricas cifradas se retiran por rotación, con una retención prevista de 31 días.</p>
       <button class="mc-btn-solid-full bad" id="deleteAccountBtn" type="button">Borrar cuenta y datos</button>
     </div>`;

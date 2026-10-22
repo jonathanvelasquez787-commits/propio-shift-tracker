@@ -15,7 +15,17 @@ test('call comparison and correction share the existing detail and pending cases
  assert.equal(ids.has('pendingCallRecordsBtn'),false);
 });
 test('workday, allocation, recovery and support reside in their existing functional destinations',()=>{
- for(const [id,parent] of [['workDayReviewContent','blocksView'],['financeDistributionContent','financeSection'],['snapshotRecoveryBtn','goalsModal'],['positiveInactivityMinutesInput','notificationsModal'],['gameReviewSummary','gameLevelPanel'],['physicalRewardSelected','pageAchievements']])assert.equal(within(id,parent),true,id);
+ for(const [id,parent] of [['workDayReviewContent','pageReports'],['financeDistributionContent','financeSection'],['snapshotRecoveryBtn','goalsModal'],['positiveInactivityMinutesInput','notificationsModal'],['gameReviewSummary','gameLevelPanel'],['physicalRewardSelected','pageAchievements']])assert.equal(within(id,parent),true,id);
  for(const id of ['workDayReviewModal','financeDistributionModal','cycleGoalInput'])assert.equal(ids.has(id),false,id);
  assert.equal(ids.has('cycleGoalAmountInput'),true);
+});
+
+test('approved placements keep the existing Home controls and one copy of each detail',()=>{
+ for(const id of ['callsSection','earningsAccordion','scheduleAccordion','blocksView','blocksCallsView'])assert.equal(within(id,'pageHome'),true,id);
+ for(const id of ['earningsDayBreakdown','earningsCycleBreakdown','workDayReviewDetails'])assert.equal(within(id,'pageReports'),true,id);
+ assert.equal(within('automationPanel','goalsModal'),true);
+ assert.equal(within('automationStatusBtn','heroSection'),true);
+ assert.equal(within('callRecordingHelp','callEditModal'),true);
+ for(const id of ['workDayReviewDetails','automationPanel','callRecordingHelp'])assert.equal(within(id,'pageHome'),false,id);
+ for(const id of ['automationPanel','workDayReviewDetails','earningsDayBreakdown','earningsCycleBreakdown'])assert.equal((html.match(new RegExp('id="'+id+'"','g'))||[]).length,1,id);
 });

@@ -170,7 +170,7 @@ export function financePlanningRowHtml(row, isMeta) {
     body = ui`${saving.months === null ? ui`<p class="sched-hint">El plazo es opcional. Guarda uno para calcular el aporte mensual.</p>` : ui`<div class="fin-plan-metrics">${metric(translateText('Aporte mensual orientativo'), saving.monthly)}</div>`}
       <div class="fin-payment-controls"><label class="fin-plan-field">Meses usados en la estimación<input type="number" min="1" max="120" step="1" value="${ctx.escapeHtml(draft.months ?? saving.months ?? '')}" data-fin-savings-months aria-label="Meses usados en la estimación"/></label>
       <button class="fin-ghost-btn" type="button" data-fin-savings-save="${rowId}" data-fin-cat="${categoryId}">Guardar estimación</button></div>
-      <p class="sched-hint">Se divide lo pendiente de reservar entre estos meses. Es una estimación editable; no establece una fecha límite ni descuenta meses automáticamente.</p>`;
+      <details class="fin-plan-help"><summary>Cómo se estima el aporte</summary><p class="sched-hint">Se divide lo pendiente de reservar entre estos meses. Es una estimación editable; no establece una fecha límite ni descuenta meses automáticamente.</p></details>`;
   } else {
     const records = payments(row.id);
     const status = financeCurrentExpenseStatus(row);
@@ -181,15 +181,15 @@ export function financePlanningRowHtml(row, isMeta) {
     const expenseType = row.expenseType === 'variable' ? translateText('Gasto variable') : translateText('Gasto fijo');
     const date = draft.date || (selected() === currentMonth() ? localDate() : `${selected()}-01`);
     body = ui`<div class="fin-plan-row-heading"><span>${expenseType}</span><span>${ctx.escapeHtml(financeMonthLabel())}</span></div>
-      ${!monthlyBudget ? ui`<p class="sched-hint">Este presupuesto no es mensual o conserva fracciones de centavo. Los pagos se agrupan por su fecha; no se calcula un saldo mensual pendiente ni un exceso.</p>` : ''}
+      ${!monthlyBudget ? ui`<p class="sched-hint">Pagos agrupados por fecha, sin saldo mensual calculado.</p>` : ''}
       <div class="fin-plan-metrics">${monthlyBudget ? metric(status.excess > 0 ? translateText('Exceso sobre el presupuesto') : translateText('Pendiente de pagar del presupuesto'), status.excess || status.remaining) : ''}<span class="fin-plan-metric"><span>Porcentaje del total pagado este mes</span><strong>${percent}</strong></span></div>
       <div class="fin-payment-controls">
         ${financeAmountInputHtml(row, 'payment')}
         <label class="fin-plan-field">Fecha<input data-fin-payment-date type="date" value="${ctx.escapeHtml(date)}"/></label>
         <button class="fin-mini-btn-primary" type="button" data-fin-payment-save="${rowId}" data-fin-cat="${categoryId}">Registrar pago</button>
-      </div><p class="sched-hint">Un pago actualiza el historial del mes de su fecha. La reserva se conserva hasta que la liberes; tus llamadas y ganancias no cambian.</p>
+      </div><p class="sched-hint">El pago se registra por fecha y no libera la reserva.</p>
       <label class="fin-checkbox-label"><input type="checkbox" data-fin-mark-paid="${rowId}" data-fin-cat="${categoryId}" ${row.manualPaid ? 'checked' : ''}/> Omitir reserva automática</label>
-      <p class="sched-hint">Este control excluye el gasto del reparto automático. No registra un pago.</p>
+      <details class="fin-plan-help"><summary>Qué cambia al registrar o reservar</summary>${!monthlyBudget ? ui`<p class="sched-hint">Este presupuesto no es mensual o conserva fracciones de centavo. Los pagos se agrupan por su fecha; no se calcula un saldo mensual pendiente ni un exceso.</p>` : ''}<p class="sched-hint">Un pago actualiza el historial del mes de su fecha. La reserva se conserva hasta que la liberes; tus llamadas y ganancias no cambian.</p><p class="sched-hint">Omitir reserva automática excluye este gasto del reparto; no registra un pago.</p></details>
       <div class="fin-payment-history">${paymentHistoryHtml(records) || ui`<p class="sched-hint">Sin pagos registrados en este mes.</p>`}</div>`;
   }
   return ui`<details class="fin-plan-row" data-fin-plan-row="${rowId}" ${expandedRows.has(row.id) ? 'open' : ''}>

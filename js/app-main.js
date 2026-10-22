@@ -5676,7 +5676,7 @@ async function renderEarningsDetails(retry = false) {
 
 async function openWorkDayReview() {
   const owner = settings, dayKey = getActiveDayKey(), view = await loadDetailViews({ retry: true });
-  if (owner !== settings || dayKey !== getActiveDayKey()) return;
+  if (owner !== settings || dayKey !== getActiveDayKey() || !document.getElementById('workDayReviewDetails').open) return;
   if (!view) { toast(translateText('No se pudo cargar el detalle. Cerrá y abrí esta sección para reintentar.')); return; }
   view.openWorkDayReview({ ui, translateText, escapeHtml, isViewingToday, computeCurrentAcwStart, effectiveDailyGoal, reinforcementScheduleIntervals, fmtTime, sameCallDay, todayCallDateKey, callDateKeyFromValue, formatDuration, pauseDurationExcludingCalls, formatCallDayLabel, importedCallStats, callsForDay, effectiveCycleGoal, getCycleGoalOverride, minuteAdherenceForDay, dayWorkSessions, dayAdherence, EXCEPTION_REASON_LABELS, formatMinutes, money, financeConvertedInline, openModal, dayKey, state, settings });
 }
@@ -5706,7 +5706,7 @@ function renderHeader() {
       acwLiveTimer.textContent = formatDuration(now.getTime() - acwStart.getTime());
       const record = acwCallRecord(callsForDay(todayCallDateKey()), acwStart.toISOString());
       const comparison = compareCallRecords(record);
-      const source = comparison.propio ? translateText('Según Propio') : comparison.tool ? translateText('Según tu tool') : translateText('Turno / pausa');
+      const source = comparison.propio ? translateText('Según Propio') : comparison.tool ? translateText('Según tu registro') : translateText('Turno / pausa');
       document.getElementById('acwRecordSource').textContent = source;
       const difference = document.getElementById('acwRecordDifference');
       difference.hidden = comparison.differenceMs === null || Math.abs(comparison.differenceMs) < 1000;
@@ -5716,6 +5716,10 @@ function renderHeader() {
     } else {
       acwLiveChip.style.display = 'none';
     }
+  }
+  const reviewAcw = document.getElementById('workDayCurrentAcw');
+  if (reviewAcw && document.getElementById('workDayReviewDetails').open) {
+    reviewAcw.textContent = isViewingToday() && acwLiveChip?.style.display !== 'none' && acwLiveTimer ? acwLiveTimer.textContent : '—';
   }
   const greetingTitleEl = document.getElementById('greetingTitle');
   if (greetingTitleEl) greetingTitleEl.textContent = greetingText(now);
@@ -6510,7 +6514,10 @@ export function render() {
       renderWeekSummary();
       // Solo se recalcula con la página de Reportes visible: recorre meses de historial día por
       // día.
-      if (currentPage === 'reports') renderReportsDashboard();
+      if (currentPage === 'reports') {
+        renderReportsDashboard();
+        if (document.getElementById('workDayReviewDetails').open) openWorkDayReview();
+      }
       if (currentPage === 'calendar') { if (calViewMode === 'year') renderCalYear(); else renderCalendarMonth(); }
       // Mismo criterio que renderReportsDashboard arriba: solo se recalcula si esa página está
       // visible ahora mismo.
@@ -6640,7 +6647,10 @@ export function render() {
       currentPage = page;
       // Render ya no recalcula renderReportsDashboard salvo que currentPage === 'reports' (ver esa
       // función)
-      if (page === 'reports') renderReportsDashboard();
+      if (page === 'reports') {
+        renderReportsDashboard();
+        if (document.getElementById('workDayReviewDetails').open) openWorkDayReview();
+      }
       if (page === 'paydates') renderPayDatesSection();
       if (page === 'finance') renderFinanceSection();
       if (page === 'achievements') renderGame();
@@ -7104,9 +7114,18 @@ export function render() {
     document.getElementById('copyDayToAllBtn').addEventListener('click', copyDayToAll);
     document.getElementById('workDayReviewBtn').addEventListener('click', () => {
       const target = document.getElementById('workDayReviewDetails');
-      target.closest('details.accordion-card').open = true;
-      setBlocksViewMode('blocks');
+      navigateToPage('reports');
       target.open = true; openWorkDayReview(); target.scrollIntoView({block:'start'}); target.querySelector('summary').focus();
+    });
+    document.getElementById('automationStatusBtn').addEventListener('click', () => {
+      const target = document.getElementById('automationPanel');
+      target.open = true;
+      openSettingsModal();
+      requestAnimationFrame(() => {
+        if (!document.getElementById('goalsModal').classList.contains('open')) return;
+        target.scrollIntoView({ block: 'nearest' });
+        target.querySelector('summary').focus();
+      });
     });
     document.getElementById('workDayReviewDetails').addEventListener('toggle', () => { if(document.getElementById('workDayReviewDetails').open) openWorkDayReview(); });
     document.getElementById('payDatesRetryBtn').addEventListener('click', () => usePayReceipts('retry'));

@@ -43,6 +43,8 @@ export function openCallRecords(context, callId, acwStart = null, reviewId = nul
   const { ui, translateText, escapeHtml: esc, money, financeConvertedInline, formatDuration } = context;
   const root = document.getElementById('callRecordsContent');
   const call = calls.find(item => item.id === callId);
+  const help = document.getElementById('callRecordingHelp');
+  if (help) help.hidden = !call;
   const comparison = compareCallRecords(call), { tool, propio } = comparison;
   const clock = value => Number.isFinite(Date.parse(value)) ? new Date(value).toLocaleTimeString(context.displayLocale(), { hour:'2-digit', minute:'2-digit', second:'2-digit' }) : '—';
   const equationClock = value => new Date(value).toLocaleTimeString(context.displayLocale(), { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false });
@@ -52,10 +54,10 @@ export function openCallRecords(context, callId, acwStart = null, reviewId = nul
   const start = acwStart || propio?.endISO || tool?.endISO;
   const elapsed = acwStart ? Math.max(0, Date.now() - Date.parse(start)) : null;
   const title = propio ? tool && acwStart ? translateText('El ACW sigue el final de Propio') : translateText('Registro informado por Propio')
-    : tool ? translateText('Tu tool conserva la llamada') : acwStart ? translateText('ACW desde el turno o una pausa') : translateText('Vínculos pendientes de revisión');
+    : tool ? translateText('La medición original sigue guardada') : acwStart ? translateText('ACW desde el turno o una pausa') : translateText('Vínculos pendientes de revisión');
   document.getElementById('callRecordsSubtitle').textContent = call ? call.callDate : translateText('Tus observaciones se conservan');
   let html = `<div class="record-explain"><strong>${esc(title)}</strong><p>${esc(propio && tool ? translateText('Propio tiene prioridad. La observación original sigue guardada como respaldo.') : tool ? translateText('La llamada aún no está confirmada en el historial de Propio. No se borra por ausencia.') : translateText('Consultá el origen de los tiempos y los registros disponibles.'))}</p></div>`;
-  if (Number.isFinite(elapsed)) html += `<div class="record-equation"><div><small>${esc(translateText('Ahora'))}</small><strong>${esc(equationClock(new Date().toISOString()))}</strong></div><span>−</span><div><small>${esc(propio ? translateText('Final de Propio*') : tool ? translateText('Final de tu tool') : translateText('Inicio del ACW'))}</small><strong>${esc(equationClock(start))}</strong></div><span>=</span><div><small>ACW</small><strong class="record-acw-value">${esc(compactDuration(elapsed))}</strong></div></div>`;
+  if (Number.isFinite(elapsed)) html += `<div class="record-equation"><div><small>${esc(translateText('Ahora'))}</small><strong>${esc(equationClock(new Date().toISOString()))}</strong></div><span>−</span><div><small>${esc(propio ? translateText('Final de Propio*') : tool ? translateText('Final observado') : translateText('Inicio del ACW'))}</small><strong>${esc(equationClock(start))}</strong></div><span>=</span><div><small>ACW</small><strong class="record-acw-value">${esc(compactDuration(elapsed))}</strong></div></div>`;
   if (comparison.differenceMs !== null && (Math.abs(comparison.differenceMs) >= 1000 || comparison.payDifference)) {
     html += `<div class="record-difference-line">${esc(ui`Diferencia de cierre: ${formatDuration(Math.abs(comparison.differenceMs))}`)}${comparison.payDifference ? ` · ${esc(translateText('Diferencia de pago'))}: ${amount(Math.abs(comparison.payDifference))}` : ''}</div>`;
   }
@@ -65,7 +67,7 @@ export function openCallRecords(context, callId, acwStart = null, reviewId = nul
     html += `<div class="record-sources"><article class="record-source is-propio"><header><strong>Propio</strong><span>${esc(propio ? translateText('PRIORIDAD') : translateText('PENDIENTE'))}</span></header>`;
     html += propio ? `<dl>${row(translateText('Inicio informado'),esc(clock(propio.startISO)))}${row(translateText('Final calculado*'),esc(clock(propio.endISO)))}${row(translateText('Duración informada'),esc(ui`${propio.durationMin} min`))}${row(translateText('Pago informado'),amount(propio.pay))}</dl><p class="record-source-note">${esc(translateText('*Inicio + duración del historial. Propio no expone aquí los segundos originales.'))}</p>`
       : `<div class="record-await"><strong>${esc(translateText('Aún no aparece'))}</strong><p>${esc(translateText('Tu respaldo se conserva mientras esperamos el historial.'))}</p></div>`;
-    html += `</article><article class="record-source"><header><strong>${esc(translateText('Tu tool'))}</strong><span>${esc(translateText('RESPALDO'))}</span></header>`;
+    html += `</article><article class="record-source"><header><strong>${esc(translateText('Medición guardada'))}</strong><span>${esc(translateText('RESPALDO'))}</span></header>`;
     html += tool ? `<dl>${row(translateText('Inicio observado'),esc(clock(tool.startISO)))}${row(translateText('Final observado'),esc(clock(tool.endISO)))}${row(translateText('Duración observada'),esc(formatDuration(tool.durationMs)))}${row(translateText('Pago estimado'),amount(tool.pay))}</dl><p class="record-source-note">${esc(translateText('Tiempos detectados; se conservan aunque el historial cambie.'))}</p>`
       : `<div class="record-await"><strong>${esc(translateText('Sin observación disponible'))}</strong><p>${esc(translateText('No reconstruimos segundos que no se registraron.'))}</p></div>`;
     html += '</article></div>';
@@ -80,7 +82,7 @@ export function openCallRecords(context, callId, acwStart = null, reviewId = nul
     }
     if (propio?.receivedAt) events.push([propio.receivedAt,translateText('Historial de Propio recibido')]);
     for (const previous of call.records?.changes || []) if(previous.receivedAt) events.push([previous.receivedAt,translateText('Versión anterior de Propio conservada')]);
-    html += `<details class="record-history"><summary>${esc(translateText('Ver cómo se actualizó esta llamada'))}</summary><ol>${events.sort((a,b)=>Date.parse(a[0])-Date.parse(b[0])).map(([at,label])=>`<li><time>${esc(clock(at))}</time><span>${esc(label)}</span></li>`).join('')}</ol>${tool ? `<div class="record-precision"><strong>${esc(translateText('Marcas observadas con milisegundos'))}</strong><code>${esc(tool.startISO)}</code><code>${esc(tool.endISO)}</code><p>${esc(ui`Duración guardada: ${tool.durationMs} ms`)}</p></div>` : ''}<p class="record-source-note">${esc(translateText('Pago estimado: de 0 a 39 segundos se conservan los minutos completos; desde 40 segundos se suma un minuto. La duración observada no se redondea.'))}</p></details>`;
+    html += `<details class="record-history"><summary>${esc(translateText('Ver cómo se actualizó esta llamada'))}</summary><ol>${events.sort((a,b)=>Date.parse(a[0])-Date.parse(b[0])).map(([at,label])=>`<li><time>${esc(clock(at))}</time><span>${esc(label)}</span></li>`).join('')}</ol>${tool ? `<div class="record-precision"><strong>${esc(translateText('Marcas observadas con milisegundos'))}</strong><code>${esc(tool.startISO)}</code><code>${esc(tool.endISO)}</code><p>${esc(ui`Duración guardada: ${tool.durationMs} ms`)}</p></div>` : ''}</details>`;
   }
   const reviews = (state.callRecordReviews || []).filter(review => reviewId ? review.id === reviewId : call && review.candidateIds.includes(call.id));
   for (const review of reviews) {

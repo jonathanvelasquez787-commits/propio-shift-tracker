@@ -12,26 +12,26 @@ function pauseDescription(snapshot, now) {
   const type = snapshot.pauseType === 'break' ? 'Break' : snapshot.pauseType === 'lunch' ? 'Lunch' : null;
   const mode = snapshot.options.timed
     ? translateText('Cierre automático solo para pausas con regreso activado y duración configurada.')
-    : translateText('Las pausas terminan cuando vos pulsás Terminar Break o Terminar Lunch en la tool.');
+    : translateText('Las pausas terminan cuando pulsás Terminar Break o Terminar Lunch en Inicio.');
   if (!type || snapshot.reason !== 'pause' || snapshot.pauseActual === null) return mode;
   const end = momentLabel(snapshot.pauseEndsAt, now);
   if (!snapshot.pauseActual) return end
-    ? ui`${type} programado hasta ${end}. No hay una pausa activa registrada en la tool; se respeta el horario.` : mode;
+    ? ui`${type} programado hasta ${end}. No hay una pausa activa registrada; se respeta el horario.` : mode;
   const auto = snapshot.options.timed && snapshot.options[snapshot.pauseType] && end;
-  if (auto && Date.parse(snapshot.pauseEndsAt) <= now) return ui`La duración prevista de ${type} ya se cumplió. Esperando confirmar su cierre en el tracker.`;
+  if (auto && Date.parse(snapshot.pauseEndsAt) <= now) return ui`La duración prevista de ${type} ya se cumplió. Esperando confirmar su cierre en Inicio.`;
   const timing = end ? ui`Duración prevista de ${type}: hasta ${end}. ` : ui`${type} sin duración prevista confirmada. `;
   return timing + (auto
     ? translateText('La extensión intentará cerrar la pausa y volver a disponibilidad si el turno y la conexión lo permiten.')
     : (snapshot.options[snapshot.pauseType]
-      ? translateText('Terminá la pausa en la tool; después la extensión intentará ponerte disponible dentro del turno.')
-      : translateText('Terminá la pausa en la tool y pulsá Start Calls en Propio cuando quieras volver.')));
+      ? translateText('Terminá la pausa en Inicio; después se intentará ponerte disponible dentro del turno.')
+      : translateText('Terminá la pausa en Inicio y pulsá Start Calls en Propio cuando quieras volver.')));
 }
 
 function statusMessages(key, snapshot) {
   const messages = {
-    missing: [translateText('Esperando información de la extensión'), translateText('Conectá la extensión para ver su próxima acción. Los controles manuales siguen disponibles.')],
+    missing: [translateText('Sin conexión confirmada'), translateText('Abrí Propio y comprobá que la extensión de Chrome esté activada. Los controles manuales siguen disponibles.')],
     stale: [translateText('Esperando una lectura reciente'), translateText('La extensión debe confirmar el estado de Propio antes de mostrar la próxima acción.')],
-    'recording-off': [translateText('Registro automático apagado'), translateText('Activá Registrar en mi tracker en la extensión para usar sus automatismos.')],
+    'recording-off': [translateText('Registro automático apagado'), translateText('Activá Registrar mi actividad en la extensión de Chrome para usar las opciones automáticas.')],
     'manual-paused': [translateText('Pausada por vos'), translateText('El registro de llamadas continúa. Reanudá la disponibilidad desde la extensión o con Start Calls en Propio.')],
     review: [translateText('La conexión necesita revisión'), translateText('Abrí el estado de conexión de la extensión para ver qué necesita atención. El inicio automático espera.')],
     connection: [translateText('Esperando tu sesión de Propio'), translateText('Abrí Propio con tu sesión para que la extensión pueda confirmar la disponibilidad.')],
@@ -45,8 +45,8 @@ function statusMessages(key, snapshot) {
     'multiple-portals': [translateText('Hay varias pestañas de Propio'), translateText('Dejá una sola pestaña del portal para evitar actuar sobre la sesión equivocada.')],
     pause: [snapshot?.pauseType === 'lunch' ? translateText('En Lunch') : snapshot?.pauseType === 'break' ? translateText('En Break') : translateText('Esperando que termine tu pausa'),
       translateText('La disponibilidad respeta tu descanso y la opción de regreso que elegiste.')],
-    spacing: [translateText('Próximo intento de disponibilidad'), ui`Al alcanzar ${snapshot?.options.minutes} minutos de ACW, esta extensión intentará pulsar Start Calls.`],
-    'acw-update': [translateText('El tracker necesita actualizarse'), translateText('Recargá el tracker cuando estés libre para compartir su ACW actual con la extensión.')],
+    spacing: [translateText('Próximo intento'), ui`Al alcanzar ${snapshot?.options.minutes} minutos de ACW, la extensión de Chrome intentará pulsar Start Calls.`],
+    'acw-update': [translateText('La aplicación necesita actualizarse'), translateText('Recargá Propio Shift Tracker cuando estés libre para compartir su ACW actual con la extensión de Chrome.')],
     'acw-pending': [translateText('Esperando confirmar tu ACW'), translateText('La extensión necesita una lectura reciente del contador antes de volver a ponerte disponible.')],
     'pause-return-off': [translateText('Regreso de esta pausa en manual'), translateText('Pulsá Start Calls en Propio cuando quieras volver. La espera entre llamadas no sustituye esta elección.')],
     'first-done': [translateText('Inicio del turno ya utilizado'), translateText('El inicio del turno ya se utilizó. Los regresos de pausas y la espera conservan sus opciones independientes.')],
@@ -68,7 +68,8 @@ export function installAutomationStatusUi({ host = window, document = host.docum
   const setText = (id, text) => { const node = element(id); if (node && node.textContent !== text) node.textContent = text; };
   function render() {
     if (closed) return;
-    panel.hidden = document.getElementById('pageHome')?.hidden === true;
+    const brief = element('automationStatusBtn');
+    if (brief) brief.hidden = document.getElementById('pageHome')?.hidden === true;
     const current = automationStatusView(snapshot, now()), [title, detail] = statusMessages(current.key, snapshot);
     setText('automationTitle', title); setText('automationDetail', current.key === 'pause' ? pauseDescription(snapshot, now()) : detail);
     const timer = element('automationCountdown');
@@ -77,11 +78,14 @@ export function installAutomationStatusUi({ host = window, document = host.docum
     const clock = current.seconds !== null ? `${Math.floor(current.seconds / 60)}:${String(current.seconds % 60).padStart(2, '0')}`
       : current.key === 'before-shift' && snapshot.startAt ? new Date(snapshot.startAt).toLocaleTimeString(displayLocale(), { hour:'2-digit', minute:'2-digit' }) : '';
     setText('automationCountdown', clock);
+    const briefTimer = element('automationCompactCountdown');
+    if (briefTimer) { briefTimer.hidden = timer.hidden; setText('automationCompactCountdown', clock); }
+    setText('automationCompactTitle', current.key === 'spacing' ? translateText('en') : current.key === 'missing' ? translateText('Sin confirmar') : title);
     const acwProgress=element('automationAcwProgress'),acwBar=element('automationAcwProgressBar');
     if(acwProgress){acwProgress.hidden=current.key!=='spacing';if(current.key==='spacing'){const total=snapshot.options.minutes*60,elapsed=Math.max(0,Math.min(total,total-current.seconds));if(acwBar)acwBar.value=elapsed/total*100;setText('automationAcwProgressLabel',ui`ACW actual: ${Math.floor(elapsed/60)}:${String(elapsed%60).padStart(2,'0')} de ${snapshot.options.minutes} min`);}}
     const recent = snapshot && now() >= Date.parse(snapshot.reportedAt) && now() - Date.parse(snapshot.reportedAt) <= AUTOMATION_STATUS_MAX_AGE;
     const observed = recent && snapshot.observedAt && now() >= Date.parse(snapshot.observedAt) && now() - Date.parse(snapshot.observedAt) <= AUTOMATION_STATUS_MAX_AGE;
-    setText('automationTrackerCheck', recent ? translateText('Tracker y cuenta reconocidos') : translateText('Esperando confirmar la conexión de la extensión'));
+    setText('automationTrackerCheck', recent ? translateText('Aplicación y cuenta reconocidas') : translateText('Esperando confirmar la conexión de la extensión'));
     setText('automationPortalCheck', observed && snapshot.portal === 'authenticated' ? translateText('Sesión de Propio reconocida') : translateText('Sesión de Propio pendiente de confirmar'));
     setText('automationScheduleCheck', recent && snapshot.scheduleVerified ? translateText('Horario y descansos confirmados') : translateText('Horario y descansos pendientes de confirmar'));
     setText('automationOptionsCheck', recent ? ui`Espera entre llamadas: ${snapshot.options.spacing ? ui`${snapshot.options.minutes} minutos de ACW` : translateText('apagada')}` : translateText('Esperando tus opciones actuales'));
