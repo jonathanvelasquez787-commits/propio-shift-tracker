@@ -42,6 +42,11 @@ mantienen; estos son pedidos directos que no quedaron correctamente cerrados.
   control visual. Para cerrar: comprobar el color contra el código histórico,
   la altura del bloque completo y la correspondencia entre capturas y versión.
   Pruebas funcionales correctas no certifican por sí solas estos pedidos visuales.
+- [x] **Guía práctica de todas las funciones — entrega 639.** La lista seguía en
+  73 apartados y no explicaba por separado el planificador y filtros nuevos;
+  el apoyo sin llamadas todavía apuntaba a Logros. Añadidos 74–79 con qué hace,
+  qué configurar y ejemplo, y corregida la ubicación a Avisos. Las funciones
+  existentes y las mejoras todavía pendientes no se confunden.
 
 Propuesta externa para los tres bloques: «propio-tres-correcciones.html», con
 referencia histórica ejecutada desde el renderer anterior, ambos temas y un

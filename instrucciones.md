@@ -329,7 +329,7 @@ futura opera bajo esto, sin excepción:
   original. No atribuirlo a caché. El azul histórico era la fecha de pago a la
   derecha, no un nuevo fondo: referencia `37d8ee9^:js/weekly-summary.js`.
   Hover de ACW incompleto en 638, corregido en la entrega independiente 639; galería visual
-  desactualizada y textos de ayuda aún técnicos. Registro de los siete pedidos
+  desactualizada y textos de ayuda aún técnicos. Registro de los ocho pedidos
   directos reabiertos en [plan](docs/plan-mejoras-integrales.md). Las veinte
   mejoras funcionales anteriores siguen abiertas. Propuesta de tres bloques
   externa a Git preparada; no aplicar su nueva compactación sin aprobación.
@@ -488,7 +488,7 @@ futura opera bajo esto, sin excepción:
   Web y extensión tienen versiones propias: web 638.0.0 y popup 2.3.3.
   Archivos 2.3.3 instalados con respaldo completo y ajustes personales conservados.
   La última recarga confirmada por el propietario es 2.3.2; no dar por recargada
-  2.3.3 por instalar sus archivos. Guía de 73 funciones en
+  2.3.3 por instalar sus archivos. Guía de 79 funciones en
   docs/guia-practica-tool-y-extension.md. Las veinte tareas funcionales siguen
   abiertas en su plan.
 - Google es la entrada pública. Formularios deshabilitados de login/registro y
