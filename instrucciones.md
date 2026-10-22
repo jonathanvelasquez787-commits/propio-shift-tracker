@@ -330,8 +330,8 @@ futura opera bajo esto, sin excepción:
   visual. Confirmar el commit público con cierre-641-production.json fuera de
   Git. Este cierre no completa las veinte mejoras funcionales del plan.
 
-- **Mejoras integrales aprobadas el 18/10:** las veinte restantes están implementadas y probadas en web 642 / extensión 2.3.5. 75 de 79 publicadas; cuatro de extensión probadas e instaladas, pendientes de activación de Chrome. Mantener el inventario y la evidencia en [plan](docs/plan-mejoras-integrales.md) y [cierre 642](docs/cierre-642.md). No convertir implementación o archivos instalados en recarga confirmada.
-- **Activación 2.3.5:** archivos instalados con respaldo y preferencias conservadas. Computer Use rechazó Google Chrome y, tras el cambio de permisos, detuvo el control al no poder verificar su URL; no se ejecutó recarga ni se confirmó la nueva versión activa. 2.3.4 fue la última confirmación humana y sigue siendo un hecho histórico válido. No pedir otra recarga por cambios solo de web.
+- **Mejoras integrales aprobadas el 18/10:** 79 de 79 publicadas. Las veinte restantes están implementadas y probadas en web 642 / extensión 2.3.5. El propietario aportó una captura del popup con 2.3.5 el 22/10; confirma su activación y cierra 14, 63, 64 y 74. Inventario y límites en [plan](docs/plan-mejoras-integrales.md) y [cierre 642](docs/cierre-642.md).
+- **Ancho del popup:** corregida la regresión responsive de 2.3.5 que permitía un popup estrecho. Se restaura el ancho intrínseco de 400 px; la versión y el worker no cambian. La corrección de CSS se instala conservando preferencias y se carga al volver a abrir el popup. No reabrir por ello los cuatro puntos ya confirmados.
 - **Segundos oficiales de Propio:** confirmar con evidencia si el último minuto
   incompleto se incluye en duración y pago. El formato de hora visible no lo demuestra.
   No cambiar ACW ni alargar llamadas por esa suposición.
@@ -351,6 +351,8 @@ futura opera bajo esto, sin excepción:
   ver [idiomas y temas](docs/idiomas-y-temas.md).
 
 **CONFIRMACIONES Y CONFIGURACIÓN LOCAL VIGENTES**
+
+- El 22/10/2026 el propietario mostró el popup real con **2.3.5**. Esta es la confirmación vigente de extensión activa y cierra la activación pendiente. Las confirmaciones anteriores permanecen como hechos históricos; no pedir otra recarga para cambios solo de web o reapertura de estilos del popup.
 
 - El 22/10/2026 el propietario confirmó «Sí, muestra 2.3.4» después de recargar
   la extensión. Popup 2.3.4 activo; no volver a pedir esta recarga ni presentarla

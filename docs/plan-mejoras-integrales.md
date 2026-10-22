@@ -151,7 +151,7 @@ de publicar. Conservar datos y funciones; seguir después el orden de fases.
 
 ## Lista de control completa
 
-**75 de 79 mejoras publicadas; cuatro probadas e instaladas pendientes de activación de Chrome.** Las veinte mejoras restantes están implementadas y comprobadas en la entrega 642. [Cierre 642](cierre-642.md).
+**79 de 79 mejoras publicadas; extensión 2.3.5 activa confirmada por captura del propietario el 22/10/2026.** Las veinte mejoras restantes están implementadas y comprobadas en la entrega 642. [Cierre 642](cierre-642.md).
 
 **Historial hasta 641 (evidencia fechada):** La preparación del
 turno usa app 624 y extensión 2.2.10, con publicación comprobada y recarga de la
@@ -162,7 +162,7 @@ por ventana y corrección con vista previa, conservando bonos al editar o limpia
 App 628 completa el punto 21 con historial antes/después y recuperación de
 ediciones, eliminaciones y vaciados de llamadas. App 629 publica 22, 26–27, 47, 67 y 69 y cierra la fase 3, con CI y producción comprobados. App 630 publica 15–20 y 77, con código de extensión 2.3.0 instalado y recarga aún sin confirmar. App 631 publica los once puntos de la fase 5, con CI y producción comprobados. App 632 publica Finanzas y pagos recibidos con el diseño aprobado de Jornada, Reservas y Pago recibido. App 633 publica los cuatro puntos de Reportes, Calendario y exportaciones con CI y producción comprobados. App 634 publica Avisos y reflexión con CI y producción comprobados. Sigue fase 9: Logros y batalla.
 
-Estado vigente de la extensión: **2.3.4 activa**, con recarga confirmada por el
+Estado vigente de la extensión: **2.3.5 activa**, confirmada por captura del popup aportada por el
 propietario el 22/10/2026. Las menciones de recargas sin confirmar en el relato
 de versiones y en las entregas verificadas describen el estado de aquella fecha;
 no son una acción pendiente actual. La web sigue su numeración independiente.
@@ -192,7 +192,7 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 - [x] **11. Elegir cómo terminan las pausas — Publicado.** Modalidad y final previsto visibles para pausas activas; distingue horarios programados, duración ausente y cierre por confirmar. [Evidencia](disponibilidad-en-inicio.md).
 - [x] **12. Pausar todos los automatismos de disponibilidad — Publicado.** Estado de pausa manual y forma de reanudar visibles en la aplicación. [Evidencia](disponibilidad-en-inicio.md).
 - [x] **13. Reintento cuando no tomás una oferta — Publicado.** Explicar reintento y condición que lo detiene sin interruptores adicionales. [Evidencia](disponibilidad-en-inicio.md).
-- [ ] **14. Prioridades que frenan los clics automáticos — Probado.** Motivo dominante, PC de solo registro y permiso exclusivo por cuenta con vencimiento servidor; rechaza órdenes y lecturas atrasadas. [Evidencia](compatibilidad-instalacion-y-disponibilidad.md). Extensión 2.3.5 instalada con respaldo; activación en Chrome sin confirmar por acceso denegado.
+- [x] **14. Prioridades que frenan los clics automáticos — Publicado.** Motivo dominante, PC de solo registro y permiso exclusivo por cuenta con vencimiento servidor; rechaza órdenes y lecturas atrasadas. [Evidencia](compatibilidad-instalacion-y-disponibilidad.md). Extensión 2.3.5 instalada con respaldo y activa confirmada por captura del propietario el 22/10/2026.
 - [x] **15. Llamadas detectadas en vivo por la extensión — Publicado.** Procedencia estimada visible y conservada hasta la reconciliación oficial. [Alcance](revision-llamadas-e-importaciones.md).
 - [x] **16. Recuperación desde el historial oficial de Propio — Publicado.** Consulta concentrada de estimadas, oficiales y correcciones con procedencia explícita. [Alcance](revision-llamadas-e-importaciones.md).
 - [x] **17. Registros pendientes cuando el tracker no está abierto — Publicado.** Popup con vencimiento de eventos, revisión sin borrado automático y apertura de pestaña existente. [Alcance](revision-llamadas-e-importaciones.md).
@@ -241,8 +241,8 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 - [x] **60. Premio del ciclo completado — Publicado.** Intervalo del ciclo, cierre propio del premio pendiente y constancia del último reclamado; sin duplicados ni depósitos inferidos. [Evidencia](logros-reglas-y-premios.md).
 - [x] **61. Temas, paletas e idioma — Publicado.** Vista esencial reversible con bloques elegibles y contraste de las siete paletas en ambos modos. [Evidencia](presentacion-esencial-y-accesibilidad.md).
 - [x] **62. Reloj, fecha, saludo y vista angosta — Publicado.** Fecha completa, frase fija y reloj adaptados al mismo layout angosto. [Evidencia](presentacion-esencial-y-accesibilidad.md).
-- [ ] **63. Vista original de Propio — Probado.** Preferencia y componente nativo presente, ausente, cargando o esperando Offline distinguidos en el popup. [Evidencia](compatibilidad-instalacion-y-disponibilidad.md). Extensión 2.3.5 instalada con respaldo; activación en Chrome sin confirmar por acceso denegado.
-- [ ] **64. Escritorio de trabajo al iniciar Windows — Probado.** Asistente del perfil para otras PCs, páginas y tamaños; JSON de rutas Windows e instalador con vista previa y respaldo. [Evidencia](compatibilidad-instalacion-y-disponibilidad.md). Extensión 2.3.5 instalada con respaldo; activación en Chrome sin confirmar por acceso denegado.
+- [x] **63. Vista original de Propio — Publicado.** Preferencia y componente nativo presente, ausente, cargando o esperando Offline distinguidos en el popup. [Evidencia](compatibilidad-instalacion-y-disponibilidad.md). Extensión 2.3.5 instalada con respaldo y activa confirmada por captura del propietario el 22/10/2026.
+- [x] **64. Escritorio de trabajo al iniciar Windows — Publicado.** Asistente del perfil para otras PCs, páginas y tamaños; JSON de rutas Windows e instalador con vista previa y respaldo. [Evidencia](compatibilidad-instalacion-y-disponibilidad.md). Extensión 2.3.5 instalada con respaldo y activa confirmada por captura del propietario el 22/10/2026.
 - [x] **65. Cuenta y perfil — Publicado.** Google vigente, correo de solo lectura, usuario de perfil editable y separado del saludo. [Evidencia](cuenta-sincronizacion-y-recuperacion.md).
 - [x] **66. Guardado local y sincronización — Publicado.** Detalle local/nube/red/caché y reconexión; comparación por ID y payload completo resuelve el orden de consulta sin ocultar divergencias. [Evidencia](cuenta-sincronizacion-y-recuperacion.md).
 - [x] **67. Respaldo completo JSON — Publicado.** Comparación actual/respaldo, copia privada previa, recuperación explícita y protección de cuenta/revisión/cuota. [Alcance y pruebas](recuperacion-actividades-y-respaldos.md).
@@ -252,7 +252,7 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 - [x] **71. Estado de conexión y actividad de la extensión — Publicado.** Diagnóstico inicial: qué pasa, qué sigue funcionando y qué hacer. [Evidencia](disponibilidad-en-inicio.md).
 - [x] **72. Borrar la cuenta — Publicado.** Exportación JSON antes de borrar, activos/copias/retención claros y revalidación de propietario antes del POST; cancelación sin borrado real. [Evidencia](cuenta-sincronizacion-y-recuperacion.md).
 - [x] **73. Guías y apoyo voluntario — Publicado.** Actualizar guía y README retirando descripciones desactualizadas. [Evidencia](guia-practica-tool-y-extension.md) y [README](../extension/propio-bridge/README.md).
-- [ ] **74. Funcionamiento con otra pestaña al frente — Probado.** Lecturas recientes y permiso exclusivo antes de automatizar; retorno de suspensión exige nueva confirmación y conserva registro. [Evidencia](compatibilidad-instalacion-y-disponibilidad.md). Extensión 2.3.5 instalada con respaldo; activación en Chrome sin confirmar por acceso denegado.
+- [x] **74. Funcionamiento con otra pestaña al frente — Publicado.** Lecturas recientes y permiso exclusivo antes de automatizar; retorno de suspensión exige nueva confirmación y conserva registro. [Evidencia](compatibilidad-instalacion-y-disponibilidad.md). Extensión 2.3.5 instalada con respaldo y activa confirmada por captura del propietario el 22/10/2026.
 - [x] **75. Volumen general y sonidos propios — Publicado.** Explicar volumen cero, avisos escritos y espacio de archivos. [Alcance y validación](avisos-y-cierres-de-llamadas.md).
 - [x] **76. Planificador de Finanzas hacia la meta diaria — Publicado.** Desglosar cálculo y mostrar meta propuesta antes de guardar. [Alcance y validación](finanzas-reservas-y-recepciones.md).
 - [x] **77. Filtros de llamadas y acciones — Publicado.** Búsqueda Customer ID y filtros de procedencia del día activo, sin cambiar totales ni registros. [Alcance](revision-llamadas-e-importaciones.md).
@@ -364,7 +364,7 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
     editables, detalle de confirmación local/nube y conflictos, recuperación PWA,
     borrado de cuenta y ayuda actualizadas. Cubre 65–66, 70, 72–73. Mantener Google
     como entrada pública y configuración de Auth/SMTP vigente.
-12. **Compatibilidad e instalación — probada; activación pendiente.** Estado de vista nativa de Propio,
+12. **Compatibilidad e instalación — publicada.** Estado de vista nativa de Propio,
     configuración guiada de páginas/perfil/notas y tamaños para otras PCs;
     coordinación entre dispositivos antes de permitir iniciadores simultáneos.
     Cubre 63–64 y ampliación de 14/74. No comprar proveedores ni cambiar seguridad

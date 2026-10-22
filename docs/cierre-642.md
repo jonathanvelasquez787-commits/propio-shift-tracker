@@ -2,7 +2,7 @@
 
 Corte: 22 de octubre de 2026, America/Tegucigalpa. Base `718457d`, web 641 y
 extensión 2.3.4 confirmada. Las veinte mejoras restantes están implementadas;
-el plan distingue las publicadas en web de las que requieren activar 2.3.5.
+la captura del propietario del popup 2.3.5 confirma también su activación.
 La publicación se acredita por CI, commit y lectura del dominio, no por este texto.
 
 Publicación comprobada: [PR #105](https://github.com/jonathanvelasquez787-commits/propio-shift-tracker/pull/105),
@@ -11,8 +11,8 @@ Vercel completado y dominio público `/api/health` con ese SHA y `ok: true`.
 Se compararon diez archivos servidos con el build local del mismo commit:
 aplicación, vista, detalles, gate, idiomas, cuatro estilos y service worker.
 Coinciden sus hashes normalizando únicamente finales de línea. CSP, HSTS y
-`no-store` de `/app` comprobados. El plan cierra 16 mejoras web: 75 publicadas,
-cuatro de extensión probadas e instaladas pendientes de activación.
+`no-store` de `/app` comprobados. El plan cierra las 79 mejoras: 16 nuevas publicadas en web y cuatro de extensión
+cuya activación 2.3.5 confirmó el propietario mediante captura del popup.
 
 La revisión posterior de #105 encontró que una ayuda ya descartada seguía
 consumiendo Escape mientras retenía el foco. Se excluye ese estado para que
@@ -93,15 +93,9 @@ Artefactos fuera de Git: `logros-fase9-qa.json`, `phase10-browser-qa.json`,
 
 ## Activación y límites
 
-**Archivos instalados no equivalen a extensión recargada.** El control de
-Windows rechazó Google Chrome con «Computer Use was not approved to use Google
-Chrome». Tras cambiar los permisos del entorno, la herramienta detuvo de nuevo
-el control porque no pudo verificar la URL actual con suficiente confianza para
-aplicar su política. Se suspendieron las acciones de interfaz. No se hizo clic
-en Recargar ni se certificó 2.3.5 activa. 2.3.4 sigue
-siendo la última confirmación humana. Los puntos 14, 63, 64 y 74 permanecen
-probados, con archivos instalados, hasta confirmar la activación; no se anuncian
-79 mejoras plenamente publicadas o todo el entorno listo.
+**Extensión 2.3.5 activa confirmada.** El propietario aportó una captura del popup real con 2.3.5 el 22/10/2026. Esta evidencia cierra la activación de 14, 63, 64 y 74 y completa 79 de 79 mejoras publicadas. La confirmación previa de 2.3.4 sigue siendo histórica. Los intentos automáticos anteriores quedaron bloqueados al identificar la URL o al abrir el administrador de extensiones; la captura humana resuelve esa verificación sin eludir la política.
+
+La captura siguiente descubrió una regresión de ancho: la regla responsive de `popup.css` reemplazaba los 400 px por `width:100%` al arrancar el popup en una ventana estrecha. Se retira únicamente ese reemplazo; se conserva el ancho intrínseco de 400 px y los controles existentes. Se verifica el arranque con viewport pequeño y ambos temas. El worker, la versión 2.3.5 y las preferencias no cambian; la hoja corregida se vuelve a cargar al abrir el popup. Las pruebas anteriores a 320 px trataban el popup como una página responsive y no verificaban este dimensionamiento intrínseco de Chrome. El asistente de configuración conserva sus pruebas responsive.
 
 Las simulaciones no certifican dos PCs físicas, audibilidad, un lector humano,
 otro monitor/reinicio físico, todas las variantes propietarias de Save ni
