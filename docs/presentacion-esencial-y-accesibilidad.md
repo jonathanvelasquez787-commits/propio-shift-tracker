@@ -6,7 +6,7 @@ Alcance: fase 10, puntos 61–62 y 78–79 del plan integral.
 
 - Temas y colores permite activar una vista esencial y elegir si Inicio muestra ganancias/meta, bloques/tabla del día y progreso de Logros. La elección permanece en ajustes sincronizables y respaldables; desactivar restaura los bloques elegidos sin borrar datos ni cambiar las reglas de Logros. Turno, llamadas, navegación, reloj, fecha completa y frase fija permanecen disponibles. No se incorpora otro lenguaje visual: controles y detalles reutilizan los patrones actuales.
 - El guardado fallido de preferencias devuelve los controles y apariencia a su valor anterior. No se confunde un cambio en memoria con uno guardado.
-- Las siete paletas alternativas ajustan texto secundario, acentos y estados frente a página y ambos paneles. Las comprobaciones verifican contraste mínimo de 4.5:1 para texto normal y texto sobre los seis acentos activos. La frase usa el texto de cada paleta. Los colores originales conservan su identidad.
+- Las siete paletas alternativas ajustan texto secundario, acentos y estados frente a página y ambos paneles. Las comprobaciones verifican contraste mínimo de 4.5:1 para texto normal y texto sobre los seis acentos activos. La frase conserva blanco en oscuro y negro en claro también con otras paletas. Los colores originales conservan su identidad.
 - A 480 px y menos, el reloj y la fecha completa pasan a su propia fila del mismo layout. La frase sigue fija y completa; ningún ancho pequeño la sustituye por otro mensaje.
 - Barra y tarjeta de llamadas consultan el mismo descriptor: llamada en curso, llamada terminada pendiente de guardar y pausa. La llamada pendiente conserva la duración cerrada y ofrece Revisar llamada para recuperar el formulario existente. No hace pasar una llamada pendiente por guardada ni modifica contabilidad.
 - El lector recibe cambios de etiqueta de actividad; los cronómetros se marcan como temporizadores sin región viva que anuncie cada segundo. La etiqueta solo se reemplaza cuando cambia.
@@ -20,5 +20,12 @@ Alcance: fase 10, puntos 61–62 y 78–79 del plan integral.
 Comprobados durante implementación: 22 casos de presentación/recuperación, sintaxis e imports/exports y wiring UI. El criterio propio se agregó a la matriz de producción; el inventario conjunto se valida al integrar las demás fases. La compilación y traducciones finales se integran en la entrega general. El compilado intermedio comprobó ocho recorridos de llamadas pendientes (ES/EN, claro/oscuro, 320/1280 px): misma etiqueta, duración cerrada 00:02:03, descarte cancelado protegido, reapertura del formulario y llamadas guardadas intactas, sin errores JS. Se inspeccionaron las capturas móvil claro y escritorio oscuro de este flujo.
 
 ## Límites
+
+La integración final comprobó además 96 combinaciones ES/EN, claro/oscuro,
+ocho paletas y 320/640/1280 px con configuración esencial reversible,
+teclado dentro del selector, fecha/frase completas, ayudas cerradas con Escape
+tras estabilizar su transición y modales por encima del menú. Los ocho
+recorridos de llamada pendiente se conservaron. Evidencia fuera de Git:
+`phase10-browser-qa.json` y `phase10-pending-qa.json`.
 
 Los cálculos de contraste son evidencia sobre tokens y superficies concretas; no certifican cada combinación de transparencia, imagen o estado de todos los componentes. Las pruebas de foco ejecutan las funciones reales con elementos controlados; una simulación no sustituye una sesión humana con lector de pantalla, monitor físico, lupa del sistema o pantalla táctil. Ninguno de estos cambios certifica reglas de pago de Propio, crea llamadas o altera ganancias.

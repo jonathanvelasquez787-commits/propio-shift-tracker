@@ -23,7 +23,6 @@ html.theme-light[data-palette="original"] { --muted-3:var(--muted); --text-muted
 .sched-help-wrap.is-help-open .sched-help-tooltip { opacity:1; transform:none; pointer-events:auto; max-height:50dvh; overflow:auto; }
 .sched-help-wrap.is-help-dismissed .sched-help-tooltip { opacity:0; pointer-events:none; }
 .accordion-card:has(.sched-help-wrap.is-help-open) { overflow:visible; }
-html:root[data-palette]:not([data-palette="original"]) #greetingSubtitle { color:var(--text); }
 html:root[data-palette]:not([data-palette="original"]) :is(.live-activity-bar,.calls-status-card) { background:var(--panel-navy); }
 .appearance-close { min-width:44px; min-height:44px; }
 @media (pointer:coarse) {

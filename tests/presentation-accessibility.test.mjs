@@ -116,7 +116,11 @@ test('touch help toggles and Escape dismisses it while retaining focus and the p
   button.closest=selector=>selector==='.game-help-wrap'?null:wrap;
   wrap.querySelector=()=>button;
   const target={closest:()=>button};
-  h.doc.querySelector=selector=>selector.includes('is-help-open')&&wrap.classList.contains('is-help-open')?wrap:null;
+  h.doc.querySelector=selector=>{
+    if(selector.includes('is-help-open')&&wrap.classList.contains('is-help-open'))return wrap;
+    if(selector.includes(':focus-within')&&(!selector.includes(':not(.is-help-dismissed)')||!wrap.classList.contains('is-help-dismissed')))return wrap;
+    return null;
+  };
   h.listeners.click({target});
   assert.equal(wrap.classList.contains('is-help-open'),true);assert.equal(button.getAttribute('aria-expanded'),'true');
   h.listeners.click({target});
@@ -126,6 +130,9 @@ test('touch help toggles and Escape dismisses it while retaining focus and the p
   h.listeners.keydown({key:'Escape',preventDefault(){prevented=true;},stopPropagation(){stopped=true;}});
   assert.equal(wrap.classList.contains('is-help-open'),false);assert.equal(button.getAttribute('aria-expanded'),'false');
   assert.equal(prevented,true);assert.equal(stopped,true);assert.equal(button.focused,undefined);
+  prevented=false;stopped=false;
+  h.listeners.keydown({key:'Escape',preventDefault(){prevented=true;},stopPropagation(){stopped=true;}});
+  assert.equal(prevented,false);assert.equal(stopped,false,'the next Escape can close the parent modal while focus stays on its help button');
   const detachedWrap=element();
   button.closest=selector=>selector==='.game-help-wrap'?null:detachedWrap;
   h.doc.querySelector=selector=>selector.includes(':focus-within')?detachedWrap:null;

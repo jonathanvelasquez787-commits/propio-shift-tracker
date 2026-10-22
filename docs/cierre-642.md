@@ -5,6 +5,21 @@ extensión 2.3.4 confirmada. Las veinte mejoras restantes están implementadas;
 el plan distingue las publicadas en web de las que requieren activar 2.3.5.
 La publicación se acredita por CI, commit y lectura del dominio, no por este texto.
 
+Publicación comprobada: [PR #105](https://github.com/jonathanvelasquez787-commits/propio-shift-tracker/pull/105),
+main `6266db30531e32422d3438abab2583c561c4f28c`. CI del PR y de main correctos, despliegue
+Vercel completado y dominio público `/api/health` con ese SHA y `ok: true`.
+Se compararon diez archivos servidos con el build local del mismo commit:
+aplicación, vista, detalles, gate, idiomas, cuatro estilos y service worker.
+Coinciden sus hashes normalizando únicamente finales de línea. CSP, HSTS y
+`no-store` de `/app` comprobados. El plan cierra 16 mejoras web: 75 publicadas,
+cuatro de extensión probadas e instaladas pendientes de activación.
+
+La revisión posterior de #105 encontró que una ayuda ya descartada seguía
+consumiendo Escape mientras retenía el foco. Se excluye ese estado para que
+el segundo Escape llegue al modal padre, con regresión y recorrido compilado.
+La frase conserva blanco/negro exactos en todas las paletas, según la decisión
+previa del propietario. El cierre de publicación incorpora estas correcciones.
+
 ## Cambios y conservación
 
 - **53–60, Logros:** activación reversible ante fallo de guardado, introducción
@@ -80,7 +95,10 @@ Artefactos fuera de Git: `logros-fase9-qa.json`, `phase10-browser-qa.json`,
 
 **Archivos instalados no equivalen a extensión recargada.** El control de
 Windows rechazó Google Chrome con «Computer Use was not approved to use Google
-Chrome». No se hizo clic en Recargar ni se certificó 2.3.5 activa. 2.3.4 sigue
+Chrome». Tras cambiar los permisos del entorno, la herramienta detuvo de nuevo
+el control porque no pudo verificar la URL actual con suficiente confianza para
+aplicar su política. Se suspendieron las acciones de interfaz. No se hizo clic
+en Recargar ni se certificó 2.3.5 activa. 2.3.4 sigue
 siendo la última confirmación humana. Los puntos 14, 63, 64 y 74 permanecen
 probados, con archivos instalados, hasta confirmar la activación; no se anuncian
 79 mejoras plenamente publicadas o todo el entorno listo.

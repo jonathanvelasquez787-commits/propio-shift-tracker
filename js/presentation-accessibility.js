@@ -64,7 +64,7 @@ export function wirePresentation({ getSettings, save, apply }, doc = document) {
   }, true);
   doc.addEventListener('keydown', event => {
     if (event.key !== 'Escape') return;
-    const open = doc.querySelector('.sched-help-wrap.is-help-open') || doc.querySelector('.sched-help-wrap:focus-within:not(.game-help-wrap)');
+    const open = doc.querySelector('.sched-help-wrap.is-help-open') || doc.querySelector('.sched-help-wrap:focus-within:not(.game-help-wrap):not(.is-help-dismissed)');
     if (!open?.querySelector('[role="tooltip"]')) return;
     open.classList.remove('is-help-open');
     open.classList.add('is-help-dismissed');
