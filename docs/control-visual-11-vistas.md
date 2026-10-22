@@ -39,11 +39,14 @@ real implementado y comprobado, no a la aprobación.
   Conservar copia previa, cancelación y rechazo de datos inválidos.
 - [x] **Disponibilidad automática — aplicación web.** Próxima acción y espera claras.
   Comprobar conexión pendiente/antigua, pausa manual, horario y descansos.
-- [x] **Ganancias.** Total y componentes distinguibles; conversión debajo.
+- [ ] **Ganancias.** Reabierta el 22/10: el desglose conserva un marco grande
+  con contenido concentrado en una parte. Total y conversión funcionan; falta
+  cumplir la compactación del bloque completo.
   Comprobar moneda intercambiada, cero y estimación de una llamada activa.
 - [x] **Higher Rate.** Bono, ventana y elegibilidad claros. Mantener separadas
   la limpieza que conserva bonos y la corrección con recálculo confirmado.
-- [x] **Proyección.** Proyección y ritmo necesario diferenciados, importes
+- [ ] **Proyección.** Reabierta el 22/10: la tarjeta aún alarga la fila del ciclo
+  y deja un hueco grande. Proyección y ritmo necesario diferenciados, importes
   sin cortes y supuestos consultables; comprobar días sin registros.
 - [x] **Popup — extensión de Chrome.** Vinculación, pausa y cola comprensibles.
   Comprobar eventos pendientes/vencidos, desconexión y opciones desplegadas.
@@ -90,7 +93,8 @@ versiones y responsabilidades separadas.
   breve de Inicio. Las opciones automáticas siguen en el popup de Chrome.
 - Jornada y desgloses del día/ciclo en Reportes, una sola copia de cada bloque.
 - Ayuda de registro en el detalle único de llamada. Ambas fuentes y edición siguen allí.
-- Fechas de pago recupera azul; los controles de recibido siguen funcionando.
+- Fechas de pago recibió un fondo aproximado; no recuperó la fecha azul a la
+  derecha ni la etiqueta del ciclo actual. Corrección reabierta el 22/10.
 - Tarjetas del ciclo, objetivos y Nivel/Racha conservan sus posiciones con altura
   propia. Controles y lectura acotados en Finanzas, Logros, Horario y Calendario;
   la cuadrícula del calendario queda intacta.

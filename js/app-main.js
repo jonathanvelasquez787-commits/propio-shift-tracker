@@ -9,7 +9,7 @@ import { normalizeBattleWeapon } from './game-battle.js';
 import { createPropioReceiver, createStorageRevisionGuard, ignorePropioCall } from './propio-bridge.js';
 import { portalRecordsText } from './propio-history-records.js';
 import { callFeedbackSilenced, withSilentCallFeedback } from './call-feedback.js';
-import { preserveCallRecords, compareCallRecords, acwCallRecord } from './call-records.js';
+import { preserveCallRecords, compareCallRecords, acwCallRecord, latestCompletedCall } from './call-records.js';
 import { settingsWithinBudget, reportLocalPersistenceFailure, readMeta, jsonbBytes, preserveRecoveryCopy, listRecoveryCopies } from './sync.js';
 // Boot importa este módulo solo después de verificar la sesión e hidratar sus datos.
 
@@ -5704,14 +5704,23 @@ function renderHeader() {
     if (acwStart) {
       acwLiveChip.style.display = '';
       acwLiveTimer.textContent = formatDuration(now.getTime() - acwStart.getTime());
-      const record = acwCallRecord(callsForDay(todayCallDateKey()), acwStart.toISOString());
+      const todayCalls = callsForDay(todayCallDateKey());
+      const record = acwCallRecord(todayCalls, acwStart.toISOString());
       const comparison = compareCallRecords(record);
       const source = comparison.propio ? translateText('Según Propio') : comparison.tool ? translateText('Según tu registro') : translateText('Turno / pausa');
       document.getElementById('acwRecordSource').textContent = source;
       const difference = document.getElementById('acwRecordDifference');
       difference.hidden = comparison.differenceMs === null || Math.abs(comparison.differenceMs) < 1000;
       difference.textContent = ui`Diferencia: ${Math.round(Math.abs(comparison.differenceMs || 0) / 1000)} s`;
-      acwLiveChip.title = ui`${source}. ACW desde ${acwStart.toLocaleTimeString(displayLocale())}. Tocá para ver los registros y el cálculo.`;
+      const latestCall = latestCompletedCall(calls, now.getTime());
+      const timing = compareCallRecords(latestCall);
+      const clock = (value, seconds = true) => Number.isFinite(Date.parse(value)) ? new Date(value).toLocaleTimeString(displayLocale(), { hour:'2-digit', minute:'2-digit', ...(seconds ? { second:'2-digit' } : {}) }) : '—';
+      const timingLines = timing.tool
+        ? [ui`Inicio observado: ${clock(timing.tool.startISO)}`, ui`Final observado: ${clock(timing.tool.endISO)}`]
+        : timing.propio
+          ? [translateText('Sin medición observada de esta llamada.'), ui`Inicio informado por Propio: ${clock(timing.propio.startISO, false)}`, ui`Final calculado de Propio: ${clock(timing.propio.endISO)}`, translateText('El historial informa minutos, no los segundos originales.')]
+          : [translateText('Sin medición observada de la última llamada.')];
+      acwLiveChip.title = [...(latestCall ? [ui`Última llamada · ${formatCallDayLabel(latestCall.callDate || callDateKeyFromValue(latestCall.startISO))}`] : []), ...timingLines, ui`${source}. ACW desde ${clock(acwStart.toISOString())}.`, ...(comparison.propio ? [translateText('El final de Propio se calcula con los minutos de su historial.')] : []), translateText('Pulsá para ver el origen del ACW y su cálculo.')].join('\n');
       acwLiveChip.dataset.recordId = record?.id || '';
     } else {
       acwLiveChip.style.display = 'none';

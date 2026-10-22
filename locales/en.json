@@ -2779,5 +2779,17 @@
   "s_ecc4734d": "End the break in Home; availability will then be attempted during your shift.",
   "s_f17ddbcf": "Propio connection status",
   "s_fb810678": "Saved measurement",
-  "s_fbb17ac2": "According to your record"
+  "s_fbb17ac2": "According to your record",
+  "s_06086cf8": "Propio’s end is calculated using the minutes in its history.",
+  "s_0975c28c": "{{v0}}. ACW since {{v1}}.",
+  "s_148d0632": "Observed end: {{v0}}",
+  "s_2d8be4b7": "Start reported by Propio: {{v0}}",
+  "s_390d8eee": "The history reports minutes, not the original seconds.",
+  "s_4d156533": "Observed start: {{v0}}",
+  "s_bf6552e7": "Last observed call",
+  "s_da7c0412": "Press to see the ACW source and its calculation.",
+  "s_e8d77077": "No observed measurement for the last call.",
+  "s_f38e3f19": "Calculated Propio end: {{v0}}",
+  "s_ff6c044a": "No observed measurement for this call.",
+  "s_16580cad": "Last call · {{v0}}"
 }

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { observedCallRecord, reportedCallRecord, preserveCallRecords, compareCallRecords, acwCallRecord, callElapsedMs } from '../js/call-records.js';
+import { observedCallRecord, reportedCallRecord, preserveCallRecords, compareCallRecords, acwCallRecord, latestCompletedCall, callElapsedMs } from '../js/call-records.js';
 import { linkCallRecordReview, openCallRecords } from '../js/call-records-view.js';
 const iso=seconds=>new Date(Date.parse('2026-10-21T08:00:00-06:00')+seconds*1000).toISOString();
 const live=(id='live',start=39,end=500)=>({id,source:'live',startISO:iso(start),endISO:iso(end),durationMin:(end-start)/60,callDate:'10/21/2026',pay:'0.96',customerId:'Propio',propioBridge:{callId:'bridge-call-123456',payEstimated:true,timingEstimated:true}});
@@ -10,6 +10,21 @@ test('a 7:41 observation retains exact milliseconds independently of estimated p
  const call=live(),record=observedCallRecord(call);
  assert.equal(record.durationMs,461000);assert.equal(record.startISO,iso(39));assert.equal(record.endISO,iso(500));
  assert.equal(callElapsedMs(call),461000);assert.equal(record.pay,.96);assert.equal(record.detectedBy,'extension');
+});
+
+test('last completed call follows the preserved observation despite an earlier official final',()=>{
+ const observed=live(),linked=preserveCallRecords(official(),observed,iso(501)),other=live('other',450,490);
+ const calls=[other,linked],before=JSON.stringify(calls);
+ assert.equal(latestCompletedCall(calls,Date.parse(iso(600))),linked);
+ assert.equal(JSON.stringify(calls),before);
+ assert.equal(acwCallRecord(calls,iso(420)),linked);
+});
+
+test('last-call timing ignores future or missing finals and remains separate from a pause anchor',()=>{
+ const earlier=live('earlier',0,50),future=live('future',100,800),missing={id:'unknown',source:'import'};
+ assert.equal(latestCompletedCall([future,missing,earlier],Date.parse(iso(600))),earlier);
+ assert.equal(acwCallRecord([earlier],iso(500)),null);
+ assert.equal(latestCompletedCall([future,missing],Date.parse(iso(600))),null);
 });
 test('official reconciliation and later corrections preserve original times and estimate through JSON reload',()=>{
  const source=live(),snapshot=JSON.stringify(source);

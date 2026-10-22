@@ -15,7 +15,10 @@ Ahí comparás sus fuentes y podés desplegar la edición; el lápiz abre ese mi
 detalle para editar. El contador de ACW también lleva a la llamada responsable. Propio tiene
 prioridad al llegar su historial y la aplicación conserva su inicio, final y duración
 observados como respaldo: una llamada de 7:41 sigue registrada como 7:41 aunque
-su pago se estime con 8 minutos. El origen del ACW y las diferencias quedan
+su pago se estime con 8 minutos. Al dejar el puntero sobre el ACW ves la fecha,
+inicio y final observado de la última llamada, con segundos. Si no hubo una
+observación, lo indica y distingue los tiempos informados/calculados de Propio.
+El origen del ACW y las diferencias quedan
 visibles; el detalle permite comparar ambas versiones sin duplicar ganancias.
 Si falta en Propio, se conserva pendiente de confirmar. Si hay varias posibles
 coincidencias, elegí «Pendientes de vincular» en el filtro del listado. [Alcance y excepciones](registros-propio-y-tool.md).

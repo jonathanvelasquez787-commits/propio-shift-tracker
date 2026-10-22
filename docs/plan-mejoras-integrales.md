@@ -8,12 +8,53 @@ no se considera rota por esa razón.
 
 ## Prioridad visual antes de continuar
 
+### Incumplimientos directos reabiertos el 22/10
+
+Esta lista tiene prioridad sobre Logros y batalla. Las capturas del propietario
+confirman que web 638 ya estaba cargada; no atribuir estos reclamos a caché.
+Los 59 puntos funcionales publicados y los 20 abiertos del inventario se
+mantienen; estos son pedidos directos que no quedaron correctamente cerrados.
+
+- [ ] **Azul original y presentación de Fechas de pago.** Se sustituyó la fecha
+  de próximo pago azul a la derecha y la etiqueta «Actual — día X de 14» por
+  filas nuevas. El fondo aproximado añadido en 638 no recupera el original.
+  Referencia comprobada: renderer de `js/weekly-summary.js` anterior a
+  `37d8ee9`, color `var(--accent-blue-2, var(--cyan))`. Conservar registro de
+  recibido y no volver a inferir un depósito a partir de su fecha pasada.
+- [ ] **Ganancias del ciclo.** Alturas propias retiraron bordes vacíos, pero la
+  proyección sigue alargando la fila y dejando un hueco grande. Compactar el
+  contenido completo del bloque, manteniendo sus tres tarjetas y todos sus datos.
+- [ ] **Desglose de ganancias.** Limitar únicamente las filas a 780 px dejó el
+  marco ancho casi vacío. Ajustar también la composición de día/ciclo dentro
+  de la sección existente. La nueva propuesta no cambia el layout general.
+- [x] **Hover del ACW — entrega 639.** En 638 solo muestra procedencia y ancla. El inicio y
+  final observados con segundos existen en el detalle; faltan en el hover.
+  Corrección de 639: última llamada completada por su observación conservada,
+  distinta del origen del ACW tras una pausa, y finales oficiales identificados
+  como calculados. No inventar segundos ausentes ni cambiar los registros.
+- [ ] **Guía visual actualizada de cada entrega.** La galería externa existente
+  cubre 59 puntos pero quedó en web 635 y popup 2.3.1. Faltan los cambios de
+  637/638 y los siguientes con capturas, ubicación actual y motivo del cambio.
+- [ ] **Lenguaje claro también en la ayuda.** La galería aún usa «TOOL WEB» y el
+  popup conserva «Actualizar tracker y reconectar». La revisión de textos no
+  puede declararse completa por revisar solo el catálogo de la aplicación.
+- [ ] **Cierre visual verificable.** Reabiertas Ganancias y Proyección en el
+  control visual. Para cerrar: comprobar el color contra el código histórico,
+  la altura del bloque completo y la correspondencia entre capturas y versión.
+  Pruebas funcionales correctas no certifican por sí solas estos pedidos visuales.
+
+Propuesta externa para los tres bloques: «propio-tres-correcciones.html», con
+referencia histórica ejecutada desde el renderer anterior, ambos temas y un
+único diseño responsive. No aplicada a producción; requiere aprobar la nueva
+compactación. El hover es una corrección independiente de JS y texto.
+
 ### Presentación nativa aprobada el 21–22/10
 
 Web 638 aplica el mockup que conserva identidad y layout general. Inicio
 retiene sus funciones habituales y ACW; preparación en Ajustes, jornada y
-desgloses en Reportes, ayuda en el detalle único de llamada. Se recupera azul
-en Fechas de pago y se compactan los casos señalados y otros ocho encontrados.
+desgloses en Reportes, ayuda en el detalle único de llamada. El intento de
+recuperar el azul y compactar los bloques anteriores fue insuficiente; esos
+pedidos quedan reabiertos arriba.
 La cuadrícula del calendario no se rediseña. Se revisan los nombres visibles
 y el popup 2.3.3 sin cambiar reglas automáticas ni contables.
 
