@@ -50,10 +50,11 @@ test('worker refresh waits for a new app snapshot and shares it across concurren
   assert.equal(f.announcements,before);assert.equal(f.pending,0);
 });
 
-test('a nonresponding background app returns no plan instead of relabeling an old snapshot as current', () => {
+test('a nonresponding background app returns no plan instead of relabeling an old snapshot as current', async () => {
   const f=fixture();f.ready({startAt:'2026-10-15T12:00:00Z',endAt:'2026-10-15T20:00:00Z'});
-  const replies=[];f.refresh(x=>replies.push(x));f.timeout();assert.deepEqual(replies,[null]);
+  const replies=[];f.refresh(x=>replies.push(x));await new Promise(resolve=>setImmediate(resolve));f.timeout();assert.deepEqual(replies,[null]);
   const before=f.messages;for(const name of ['pageshow','visibilitychange','resume'])f.lifecycle(name);
+  await new Promise(resolve=>setImmediate(resolve));
   assert.equal(f.messages,before+3);
 });
 test('reloading the extension handles synchronous context invalidation without leaving a hello loop', async () => {

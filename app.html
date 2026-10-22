@@ -24,14 +24,16 @@
 <link rel="stylesheet" href="/css/game.css"/>
 <link rel="stylesheet" href="/css/game-battle.css"/>
 <link rel="stylesheet" href="/css/appearance.css"/>
+<link rel="stylesheet" href="/css/accessibility.css"/>
 </head>
 <body>
-<div aria-live="polite" class="live-activity-bar" id="liveActivityBar" role="status">
+<a class="skip-link" href="#pageHome">Saltar al contenido</a>
+<div class="live-activity-bar" id="liveActivityBar" role="region" aria-label="Actividad en vivo">
   <div class="live-bar-left">
     <span class="live-bar-icon-wrap" aria-hidden="true"><span class="live-bar-dot"></span></span>
     <div class="live-bar-text">
-      <span class="live-bar-label" id="liveBarLabel">—</span>
-      <span class="live-bar-timer" id="liveBarTimer">00:00:00</span>
+      <span class="live-bar-label" id="liveBarLabel" role="status" aria-live="polite" aria-atomic="true">—</span>
+      <span class="live-bar-timer" id="liveBarTimer" role="timer" aria-live="off">00:00:00</span>
     </div>
   </div>
   <div class="live-bar-actions">
@@ -161,7 +163,7 @@
 </div>
 </section>
 
-<div class="app-page" data-page="home" id="pageHome">
+<div class="app-page" data-page="home" id="pageHome" role="main" tabindex="-1">
 <section class="card span-12" id="callsSection">
 <div class="section-title">
 <div>
@@ -175,7 +177,7 @@
 <span class="calls-status-icon" id="callsStatusIcon" aria-hidden="true"></span>
 <div class="calls-status-text"><span class="calls-status-text-title" id="callsStatusTextTitle">Comienza una nueva llamada</span></div>
 <div class="calls-status-mid" id="callsStatusMid" style="display:none;">
-<span class="calls-status-timer" id="callsStatusTimer">00:00:00</span>
+<span class="calls-status-timer" id="callsStatusTimer" role="timer" aria-live="off">00:00:00</span>
 <div class="calls-status-waveform" id="callsStatusWaveform"><span></span><span></span><span></span><span></span></div>
 </div>
 <div class="calls-status-actions" id="callsStatusActions" style="display:none;">
@@ -389,7 +391,7 @@
 
 </div><!-- /pageHome -->
 
-<div class="app-page" data-page="schedule" hidden id="pageSchedule">
+<div class="app-page" data-page="schedule" hidden id="pageSchedule" role="main" tabindex="-1">
 <details class="accordion-card sched-v271" id="scheduleConfigAccordion" open>
 <summary>
   <div class="accordion-head">
@@ -541,7 +543,7 @@
 
 
 
-<div class="app-page" data-page="reports" hidden id="pageReports">
+<div class="app-page" data-page="reports" hidden id="pageReports" role="main" tabindex="-1">
 <div class="rpt-topbar">
 <div style="display:flex; align-items:center; gap:14px;">
 <div class="rpt-header-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><line x1="4" y1="20" x2="4" y2="10"/><line x1="10" y1="20" x2="10" y2="4"/><line x1="16" y1="20" x2="16" y2="14"/><line x1="21" y1="20" x2="3" y2="20"/></svg></div>
@@ -689,7 +691,7 @@
 
 </div><!-- /pageReports -->
 
-<div class="app-page" data-page="paydates" hidden id="pagePayDates">
+<div class="app-page" data-page="paydates" hidden id="pagePayDates" role="main" tabindex="-1">
 <details class="accordion-card" id="payDatesAccordion" open>
 <summary>
   <div class="accordion-head">
@@ -703,7 +705,7 @@
 </details>
 </div><!-- /pagePayDates -->
 
-<div class="app-page" data-page="calendar" hidden id="pageCalendar">
+<div class="app-page" data-page="calendar" hidden id="pageCalendar" role="main" tabindex="-1">
 <details class="accordion-card" id="calendarAccordion" open>
 <summary>
   <div class="accordion-head">
@@ -778,7 +780,7 @@
 </details>
 </div><!-- /pageCalendar -->
 
-<div class="app-page" data-page="finance" hidden id="pageFinance">
+<div class="app-page" data-page="finance" hidden id="pageFinance" role="main" tabindex="-1">
 <section class="card" id="financeSection">
   <div class="fin-header">
     <div class="fin-header-left">
@@ -865,7 +867,7 @@
 </section>
 </div><!-- /pageFinance -->
 
-<div class="app-page game-achievements-page" data-page="achievements" hidden id="pageAchievements">
+<div class="app-page game-achievements-page" data-page="achievements" hidden id="pageAchievements" role="main" tabindex="-1">
 <details class="game-achievements-hero polished-setting">
 <summary><span>Preferencias de Logros<small>Activación, temporada y configuración</small></span></summary>
   <div class="game-page-kicker"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="5"/><path d="m8.5 12.5-2 8 5.5-3 5.5 3-2-8"/><path d="m10.2 8 1.8-2 1.8 2-1.8 1.4Z"/></svg> El Monstruo</div>
@@ -877,6 +879,8 @@
     <div class="game-achievements-season" data-game-role="season-status"><span>Temporada</span><strong data-game-role="season-label">Ciclo actual</strong></div>
   </div>
   <div class="game-achievements-toolbar"><label class="game-settings-toggle" for="gameEnabledInput"><span><strong>Activar Logros</strong><small>Racha, XP, misiones y colección sin cambiar tus ganancias.</small></span><input id="gameEnabledInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label></div>
+  <p class="note">Logros convierte tu actividad en progreso de juego. Refuerzo positivo y premios personales se configuran por separado; ninguno cambia tu pago.</p>
+  <p class="note">Al desactivar Logros se conserva el progreso guardado. Podés activarlo de nuevo sin reiniciarlo.</p>
 </details>
   <section class="game-settings-disclosures" aria-label="Preferencias de Logros">
 <details class="game-panel game-settings-accordion" id="gameSettingsAccordion">
@@ -885,6 +889,7 @@
       <span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
     </summary>
     <div class="game-settings-accordion-body">
+      <details class="review-details"><summary>Armas, práctica y duelo</summary><div class="review-detail-body"><p class="note">Las armas cambian la animación y la práctica. Disparar o jugar el duelo no registra llamadas, dinero ni XP laboral. El duelo se ofrece en Break/Lunch o fuera del turno; al volver al trabajo se pausa y podés retomarlo después.</p><p class="note">En Inicio, abrí Logros debajo de la batalla para elegir el arma y Duelo · 60 s. Automático permite salir; al regresar, elegí Duelo y Continuar duelo. En móvil usá los controles debajo de la escena.</p></div></details>
       <div class="game-settings-section">
         <div class="game-monster-name-setting">
           <label for="monsterNameInput">Nombre del monstruo del día</label>
@@ -1031,7 +1036,7 @@
 
 </div><!-- /pageAchievements -->
 
-<div class="app-page" data-page="help" hidden id="pageHelp">
+<div class="app-page" data-page="help" hidden id="pageHelp" role="main" tabindex="-1">
 <div class="help-head">
 <h1>Ayuda</h1>
 <p>Qué hace cada parte de la app y cómo configurarla — sección por sección.</p>
@@ -1626,19 +1631,29 @@
 <div class="note" style="margin:0;">El emoji aparece junto a tu nombre en el saludo de arriba (ej. "Buenas tardes, [tu nombre] 🙂"). Toca uno de la lista o escribe cualquier otro en el cuadro de texto. Déjalo vacío para no mostrar ninguno.</div>
 </div>
 <div class="divider"></div>
-<div class="goals-section-title"><svg class="goals-section-icon ic-svg blue" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="m4 6 8 6 8-6"/></svg>Datos de acceso</div>
+<div class="goals-section-title"><svg class="goals-section-icon ic-svg blue" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="m4 6 8 6 8-6"/></svg>Cuenta y acceso con Google</div>
 <div class="goals-field-row">
 <div class="goals-field">
-<label for="accountUsernameInput">Nombre de usuario</label>
-<input id="accountUsernameInput" maxlength="24" autocomplete="username" placeholder="usuario" type="text"/>
+<label for="accountUsernameInput">Usuario del perfil</label>
+<input id="accountUsernameInput" maxlength="24" autocomplete="username" placeholder="usuario" type="text" aria-describedby="accountProfileHelp"/>
 </div>
 <div class="goals-field">
-<label for="accountEmailInput">Correo electrónico</label>
-<input id="accountEmailInput" autocomplete="email" placeholder="tu@correo.com" type="email"/>
+<label for="accountEmailInput">Correo de Google (solo lectura)</label>
+<input id="accountEmailInput" autocomplete="email" placeholder="tu@correo.com" type="email" readonly aria-describedby="accountProfileHelp"/>
 </div>
 </div>
-<div class="note" id="accountProfileStatus" aria-live="polite" style="margin:0;">El usuario sirve para entrar sin escribir tu correo. Si cambias el correo, tendrás que confirmarlo desde el mensaje que envíe Supabase.</div>
-<button class="mc-btn-primary cyan" id="saveAccountProfileBtn" type="button" style="width:100%; margin-top:10px;">Guardar datos de acceso</button>
+<div class="note" id="accountProfileHelp" style="margin:0;">El usuario identifica tu perfil. Para entrar, usa Google. Cambiarlo no cambia tu cuenta de Google ni el nombre del saludo.</div>
+<div class="note" id="accountProfileStatus" aria-live="polite" style="margin:0;"></div>
+<button class="mc-btn-primary cyan" id="saveAccountProfileBtn" type="button" style="width:100%; margin-top:10px;">Guardar usuario del perfil</button>
+<details class="polished-disclosure" id="accountSyncDetails"><summary>Guardado y recuperación de esta app</summary><div class="polished-detail">
+<p><strong>En este navegador:</strong> <span id="syncLocalDetail"></span></p>
+<p><strong>En tu cuenta:</strong> <span id="syncCloudDetail"></span></p>
+<p><strong>Conexión:</strong> <span id="syncConnectionDetail"></span></p>
+<p><strong>App y modo sin conexión:</strong> <span id="syncAppDetail"></span></p>
+<p class="note">Instalar la app no crea otro respaldo. Para abrir sin red necesitas haberla abierto antes, conservar los datos del navegador y tener una copia de tu cuenta en este dispositivo. Google y la sincronización necesitan conexión; una sesión vencida puede pedirte entrar de nuevo.</p>
+<p class="note">La app instalada no mantiene la PC despierta ni garantiza llamadas o avisos con el equipo suspendido. Borrar datos del navegador también borra las copias locales; exporta tu JSON para conservar una copia independiente.</p>
+<button class="mc-btn-primary cyan" id="accountSyncRetryBtn" type="button">Reconectar y sincronizar</button>
+</div></details>
 </div>
 
 <div class="divider"></div>
@@ -2544,7 +2559,7 @@ $0.72"></textarea>
     <span class="boot-text" id="bootGateText">Abriendo tu cuenta…</span>
   </div>
 </div>
-<dialog class="appearance-dialog" id="appearanceDialog" aria-labelledby="appearanceTitle"><div class="appearance-dialog-head"><div><h2 id="appearanceTitle">Elegí cómo se ve la aplicación</h2><p>El mismo contenido, con los colores que prefieras.</p></div><button class="appearance-close" type="button" data-close-appearance aria-label="Cerrar selector de temas">×</button></div><div class="appearance-dialog-content"><div class="appearance-mode-row"><span>Modo de apariencia</span><div class="appearance-modes" role="group" aria-label="Modo de apariencia"><button type="button" data-preview-theme="light" aria-pressed="false">Claro original</button><button type="button" data-preview-theme="dark" aria-pressed="false">Oscuro original</button></div></div><div class="appearance-section-label"><h3>Paleta de colores</h3><span>Original + 7 paletas</span></div><div class="appearance-palette-grid" role="radiogroup" aria-label="Paletas de colores"><button type="button" class="appearance-palette" data-palette-choice="original" role="radio" aria-checked="true" tabindex="0" aria-label="Original: los colores actuales de la aplicación"><span class="appearance-palette-colors" aria-hidden="true"><i style="background:#0D1230" title="#0D1230"></i><i style="background:#2FD5FF" title="#2FD5FF"></i><i style="background:#FFFFFF" title="#FFFFFF"></i><i style="background:#6366F1" title="#6366F1"></i></span><span class="appearance-palette-check" aria-hidden="true">✓</span><span class="appearance-palette-text"><strong>Original</strong><small>Los colores actuales de la aplicación</small></span></button><button type="button" class="appearance-palette" data-palette-choice="neon" role="radio" aria-checked="false" tabindex="-1" aria-label="Morado Neón: Violeta, fucsia, coral y amarillo"><span class="appearance-palette-colors" aria-hidden="true"><i style="background:#5003C0" title="#5003C0"></i><i style="background:#AB03A9" title="#AB03A9"></i><i style="background:#FF467A" title="#FF467A"></i><i style="background:#FFD51E" title="#FFD51E"></i></span><span class="appearance-palette-check" aria-hidden="true">✓</span><span class="appearance-palette-text"><strong>Morado Neón</strong><small>Violeta, fucsia, coral y amarillo</small></span></button><button type="button" class="appearance-palette" data-palette-choice="lavender" role="radio" aria-checked="false" tabindex="-1" aria-label="Lavanda Pastel: Lavanda, celeste y menta"><span class="appearance-palette-colors" aria-hidden="true"><i style="background:#9FA1FF" title="#9FA1FF"></i><i style="background:#B5BAFF" title="#B5BAFF"></i><i style="background:#AEE2FF" title="#AEE2FF"></i><i style="background:#D9F9DF" title="#D9F9DF"></i></span><span class="appearance-palette-check" aria-hidden="true">✓</span><span class="appearance-palette-text"><strong>Lavanda Pastel</strong><small>Lavanda, celeste y menta</small></span></button><button type="button" class="appearance-palette" data-palette-choice="magenta" role="radio" aria-checked="false" tabindex="-1" aria-label="Rosa Magenta: Morado profundo y tonos rosados"><span class="appearance-palette-colors" aria-hidden="true"><i style="background:#462C7D" title="#462C7D"></i><i style="background:#831C91" title="#831C91"></i><i style="background:#D552A3" title="#D552A3"></i><i style="background:#FF70BF" title="#FF70BF"></i></span><span class="appearance-palette-check" aria-hidden="true">✓</span><span class="appearance-palette-text"><strong>Rosa Magenta</strong><small>Morado profundo y tonos rosados</small></span></button><button type="button" class="appearance-palette" data-palette-choice="sand" role="radio" aria-checked="false" tabindex="-1" aria-label="Azul Arena: Azul suave, crema y arena"><span class="appearance-palette-colors" aria-hidden="true"><i style="background:#81A6C6" title="#81A6C6"></i><i style="background:#AACDDC" title="#AACDDC"></i><i style="background:#F3E3D0" title="#F3E3D0"></i><i style="background:#D2C4B4" title="#D2C4B4"></i></span><span class="appearance-palette-check" aria-hidden="true">✓</span><span class="appearance-palette-text"><strong>Azul Arena</strong><small>Azul suave, crema y arena</small></span></button><button type="button" class="appearance-palette" data-palette-choice="royal" role="radio" aria-checked="false" tabindex="-1" aria-label="Azul Real: Azul noche, intenso y celeste"><span class="appearance-palette-colors" aria-hidden="true"><i style="background:#091540" title="#091540"></i><i style="background:#1B2CC1" title="#1B2CC1"></i><i style="background:#7692FF" title="#7692FF"></i><i style="background:#ABD2FA" title="#ABD2FA"></i></span><span class="appearance-palette-check" aria-hidden="true">✓</span><span class="appearance-palette-text"><strong>Azul Real</strong><small>Azul noche, intenso y celeste</small></span></button><button type="button" class="appearance-palette" data-palette-choice="ocean" role="radio" aria-checked="false" tabindex="-1" aria-label="Turquesa Profundo: Turquesa, azul y violeta"><span class="appearance-palette-colors" aria-hidden="true"><i style="background:#78B9B5" title="#78B9B5"></i><i style="background:#0F828C" title="#0F828C"></i><i style="background:#065084" title="#065084"></i><i style="background:#320A6B" title="#320A6B"></i></span><span class="appearance-palette-check" aria-hidden="true">✓</span><span class="appearance-palette-text"><strong>Turquesa Profundo</strong><small>Turquesa, azul y violeta</small></span></button><button type="button" class="appearance-palette" data-palette-choice="sage" role="radio" aria-checked="false" tabindex="-1" aria-label="Verde Salvia: Verde salvia, menta y crema"><span class="appearance-palette-colors" aria-hidden="true"><i style="background:#659287" title="#659287"></i><i style="background:#88BDA4" title="#88BDA4"></i><i style="background:#B1D3B9" title="#B1D3B9"></i><i style="background:#E6F2DD" title="#E6F2DD"></i></span><span class="appearance-palette-check" aria-hidden="true">✓</span><span class="appearance-palette-text"><strong>Verde Salvia</strong><small>Verde salvia, menta y crema</small></span></button></div><p class="appearance-help">Original conserva los modos claro y oscuro actuales. Las otras paletas se adaptan al modo elegido.</p></div><div class="appearance-dialog-foot"><div class="appearance-current"><span class="appearance-current-swatches" data-current-swatches aria-hidden="true"></span><span data-appearance-label>Claro original</span></div><div class="appearance-footer-actions"><a id="appearanceSource" target="_blank" rel="noopener noreferrer" hidden>Ver en Color Hunt</a><button class="appearance-done" data-close-appearance type="button">Abrir aplicación</button></div></div></dialog>
+<dialog class="appearance-dialog" id="appearanceDialog" aria-labelledby="appearanceTitle"><div class="appearance-dialog-head"><div><h2 id="appearanceTitle">Elegí cómo se ve la aplicación</h2><p>El mismo contenido, con los colores que prefieras.</p></div><button class="appearance-close" type="button" data-close-appearance aria-label="Cerrar selector de temas">×</button></div><div class="appearance-dialog-content"><div class="appearance-mode-row"><span>Modo de apariencia</span><div class="appearance-modes" role="group" aria-label="Modo de apariencia"><button type="button" data-preview-theme="light" aria-pressed="false">Claro original</button><button type="button" data-preview-theme="dark" aria-pressed="false">Oscuro original</button></div></div><div class="appearance-section-label"><h3>Paleta de colores</h3><span>Original + 7 paletas</span></div><div class="appearance-palette-grid" role="radiogroup" aria-label="Paletas de colores"><button type="button" class="appearance-palette" data-palette-choice="original" role="radio" aria-checked="true" tabindex="0" aria-label="Original: los colores actuales de la aplicación"><span class="appearance-palette-colors" aria-hidden="true"><i style="background:#0D1230" title="#0D1230"></i><i style="background:#2FD5FF" title="#2FD5FF"></i><i style="background:#FFFFFF" title="#FFFFFF"></i><i style="background:#6366F1" title="#6366F1"></i></span><span class="appearance-palette-check" aria-hidden="true">✓</span><span class="appearance-palette-text"><strong>Original</strong><small>Los colores actuales de la aplicación</small></span></button><button type="button" class="appearance-palette" data-palette-choice="neon" role="radio" aria-checked="false" tabindex="-1" aria-label="Morado Neón: Violeta, fucsia, coral y amarillo"><span class="appearance-palette-colors" aria-hidden="true"><i style="background:#5003C0" title="#5003C0"></i><i style="background:#AB03A9" title="#AB03A9"></i><i style="background:#FF467A" title="#FF467A"></i><i style="background:#FFD51E" title="#FFD51E"></i></span><span class="appearance-palette-check" aria-hidden="true">✓</span><span class="appearance-palette-text"><strong>Morado Neón</strong><small>Violeta, fucsia, coral y amarillo</small></span></button><button type="button" class="appearance-palette" data-palette-choice="lavender" role="radio" aria-checked="false" tabindex="-1" aria-label="Lavanda Pastel: Lavanda, celeste y menta"><span class="appearance-palette-colors" aria-hidden="true"><i style="background:#9FA1FF" title="#9FA1FF"></i><i style="background:#B5BAFF" title="#B5BAFF"></i><i style="background:#AEE2FF" title="#AEE2FF"></i><i style="background:#D9F9DF" title="#D9F9DF"></i></span><span class="appearance-palette-check" aria-hidden="true">✓</span><span class="appearance-palette-text"><strong>Lavanda Pastel</strong><small>Lavanda, celeste y menta</small></span></button><button type="button" class="appearance-palette" data-palette-choice="magenta" role="radio" aria-checked="false" tabindex="-1" aria-label="Rosa Magenta: Morado profundo y tonos rosados"><span class="appearance-palette-colors" aria-hidden="true"><i style="background:#462C7D" title="#462C7D"></i><i style="background:#831C91" title="#831C91"></i><i style="background:#D552A3" title="#D552A3"></i><i style="background:#FF70BF" title="#FF70BF"></i></span><span class="appearance-palette-check" aria-hidden="true">✓</span><span class="appearance-palette-text"><strong>Rosa Magenta</strong><small>Morado profundo y tonos rosados</small></span></button><button type="button" class="appearance-palette" data-palette-choice="sand" role="radio" aria-checked="false" tabindex="-1" aria-label="Azul Arena: Azul suave, crema y arena"><span class="appearance-palette-colors" aria-hidden="true"><i style="background:#81A6C6" title="#81A6C6"></i><i style="background:#AACDDC" title="#AACDDC"></i><i style="background:#F3E3D0" title="#F3E3D0"></i><i style="background:#D2C4B4" title="#D2C4B4"></i></span><span class="appearance-palette-check" aria-hidden="true">✓</span><span class="appearance-palette-text"><strong>Azul Arena</strong><small>Azul suave, crema y arena</small></span></button><button type="button" class="appearance-palette" data-palette-choice="royal" role="radio" aria-checked="false" tabindex="-1" aria-label="Azul Real: Azul noche, intenso y celeste"><span class="appearance-palette-colors" aria-hidden="true"><i style="background:#091540" title="#091540"></i><i style="background:#1B2CC1" title="#1B2CC1"></i><i style="background:#7692FF" title="#7692FF"></i><i style="background:#ABD2FA" title="#ABD2FA"></i></span><span class="appearance-palette-check" aria-hidden="true">✓</span><span class="appearance-palette-text"><strong>Azul Real</strong><small>Azul noche, intenso y celeste</small></span></button><button type="button" class="appearance-palette" data-palette-choice="ocean" role="radio" aria-checked="false" tabindex="-1" aria-label="Turquesa Profundo: Turquesa, azul y violeta"><span class="appearance-palette-colors" aria-hidden="true"><i style="background:#78B9B5" title="#78B9B5"></i><i style="background:#0F828C" title="#0F828C"></i><i style="background:#065084" title="#065084"></i><i style="background:#320A6B" title="#320A6B"></i></span><span class="appearance-palette-check" aria-hidden="true">✓</span><span class="appearance-palette-text"><strong>Turquesa Profundo</strong><small>Turquesa, azul y violeta</small></span></button><button type="button" class="appearance-palette" data-palette-choice="sage" role="radio" aria-checked="false" tabindex="-1" aria-label="Verde Salvia: Verde salvia, menta y crema"><span class="appearance-palette-colors" aria-hidden="true"><i style="background:#659287" title="#659287"></i><i style="background:#88BDA4" title="#88BDA4"></i><i style="background:#B1D3B9" title="#B1D3B9"></i><i style="background:#E6F2DD" title="#E6F2DD"></i></span><span class="appearance-palette-check" aria-hidden="true">✓</span><span class="appearance-palette-text"><strong>Verde Salvia</strong><small>Verde salvia, menta y crema</small></span></button></div><details class="polished-setting" id="essentialViewSettings"><summary><span>Vista esencial<small>Elegí los bloques prioritarios de Inicio.</small></span></summary><div class="polished-setting-body"><p class="note" id="essentialViewHelp">El turno, las llamadas, la fecha y la frase permanecen visibles. Los bloques ocultos siguen disponibles al desactivar esta vista; tus registros y Logros se conservan.</p><label class="sched-checkbox-row"><input type="checkbox" data-essential-option="enabled" aria-describedby="essentialViewHelp"/> Activar vista esencial</label><fieldset><legend>Mostrar en Inicio</legend><label class="sched-checkbox-row"><input type="checkbox" data-essential-option="earnings"/> Ganancias y meta</label><label class="sched-checkbox-row"><input type="checkbox" data-essential-option="schedule"/> Bloques y llamadas del día</label><label class="sched-checkbox-row"><input type="checkbox" data-essential-option="game"/> Progreso de Logros</label></fieldset></div></details><p class="appearance-help">Original conserva los modos claro y oscuro actuales. Las otras paletas se adaptan al modo elegido.</p></div><div class="appearance-dialog-foot"><div class="appearance-current"><span class="appearance-current-swatches" data-current-swatches aria-hidden="true"></span><span data-appearance-label>Claro original</span></div><div class="appearance-footer-actions"><a id="appearanceSource" target="_blank" rel="noopener noreferrer" hidden>Ver en Color Hunt</a><button class="appearance-done" data-close-appearance type="button">Abrir aplicación</button></div></div></dialog>
 <script type="module" src="/js/boot.js"></script>
 </body>
 </html>

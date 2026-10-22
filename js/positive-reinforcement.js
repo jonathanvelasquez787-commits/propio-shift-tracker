@@ -608,7 +608,7 @@ function renderSettingsRewards() {
       const matches=item=>(item.sourceRewardId||item.rewardId)===reward.id;
       const pending=state.game.reinforcement.pendingRewards.filter(matches).length;
       const completed=state.game.reinforcement.claims.filter(matches).length;
-      const status=pending?ui`${pending} por realizar`:completed?ui`${completed} realizados`:translateText('En progreso');
+      const status=[pending?ui`${pending} por realizar`:'',completed?ui`${completed} realizados`:''].filter(Boolean).join(' · ')||translateText('En progreso');
       return ui`<button type="button" class="physical-reward-selected" data-positive-action="edit-reward" data-reward-id="${escapeHtml(reward.id)}"><span>${escapeHtml(reward.icon)}</span><strong>${escapeHtml(reward.name)}</strong><small>${escapeHtml(WINDOW_LABELS[reward.window])} · ${reward.enabled===false?translateText('Pausado')+' · ':''}${escapeHtml(status)}${reward.accumulationTarget > 1 ? ui` · ${Math.min(state.game.reinforcement.progress[reward.id] || 0, reward.accumulationTarget)}/${reward.accumulationTarget} hitos` : ''}</small></button>`;
     }).join('')
     : translateMarkup('<p class="game-collection-empty">Aún no elegiste premios. Agrega uno del catálogo o crea el tuyo.</p>');

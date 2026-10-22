@@ -955,9 +955,7 @@ function renderCycleBosses() {
     const goal = role('cycle-goal');
     if (title) title.textContent = boss.defeated ? translateText('JEFE DERROTADO') : translateText('El Guardián de la Quincena');
     if (status) status.textContent = boss.defeated ? translateText('DERROTADO') : boss.hp <= 25 ? translateText('CASI CAE') : translateText('EN MARCHA');
-    if (subtitle) subtitle.textContent = boss.defeated
-      ? translateText('Meta del ciclo cumplida. El botín real sigue siendo tu pago.')
-      : ui`Progreso del ciclo: ${Math.round(boss.pct)}%.`;
+    if (subtitle) subtitle.textContent = ui`Ciclo ${startLabel} — ${endLabel} · ${Math.round(boss.pct)}% de la meta.`;
     if (progress) {
       progress.style.width = `${boss.pct}%`;
       progress.parentElement?.setAttribute('aria-valuenow', String(Math.round(boss.pct)));
@@ -971,9 +969,11 @@ function renderCycleBosses() {
       root.appendChild(choice);
     }
     const pending = state.game.cycleReward?.pending && state.game.cycleReward.options?.length;
+    const claimed = Object.values(state.game.ledger).filter(item => item?.type === 'cycle-reward' && item.cycleKey)
+      .sort((a, b) => (callDateToDate(b.cycleKey)?.getTime() || 0) - (callDateToDate(a.cycleKey)?.getTime() || 0))[0];
     choice.className = 'game-cycle-choice';
-    choice.hidden = !pending;
-    choice.innerHTML = pending ? ui`<strong>Elige tu recompensa del ciclo</strong><small>Premio del ciclo con cierre ${escapeHtml(formatCallDayLabel(state.game.cycleReward.cycleKey))}. Cumpliste su meta; este premio de juego no confirma un pago recibido.</small><div>${state.game.cycleReward.options.map((option) => ui`<button type="button" data-game-action="choose-cycle-reward" data-cycle-reward="${escapeHtml(option.id)}">${escapeHtml(translateStoredText(option.label))}</button>`).join('')}</div>` : '';
+    choice.hidden = !pending && !claimed;
+    choice.innerHTML = pending ? ui`<strong>Elige tu recompensa del ciclo</strong><small>Premio del ciclo con cierre ${escapeHtml(formatCallDayLabel(state.game.cycleReward.cycleKey))}. Cumpliste su meta; este premio de juego no confirma un pago recibido.</small><div>${state.game.cycleReward.options.map((option) => ui`<button type="button" data-game-action="choose-cycle-reward" data-cycle-reward="${escapeHtml(option.id)}">${escapeHtml(translateStoredText(option.label))}</button>`).join('')}</div>` : claimed ? ui`<strong>Recompensa del ciclo guardada</strong><small>Ciclo con cierre ${escapeHtml(formatCallDayLabel(claimed.cycleKey))} · ${escapeHtml(claimed.accessory ? translateText(claimed.accessory) : ui`${Number(claimed.gross) || 0} XP`)}. Ya fue reclamada; no se vuelve a entregar al abrir esta sección.</small>` : '';
   });
 }
 function syncCycleBossAchievement() {
@@ -1070,6 +1070,11 @@ function renderGameProgressRoadmap() {
   const equipmentRoot = equipmentPanel?.querySelector('[data-game-role="equipment-list"]');
   if (equipmentPanel && equipmentRoot) {
     const equipped = equipmentForState();
+    const previews = new Set([...equipmentRoot.querySelectorAll('details[open]')].map(node => node.dataset.equipmentPreview));
+    const day = computeGameDay(currentGameDayKey());
+    const renderKey = JSON.stringify([equipped, state.game.accessories, level.level, day.species.id, displayLocale()]);
+    if (equipmentRoot.dataset.renderKey === renderKey) return;
+    equipmentRoot.dataset.renderKey = renderKey;
     const ownedCount = ACCESSORY_CATALOG.filter((item) => state.game.accessories.includes(item.label)).length;
     const count = equipmentPanel.querySelector('[data-game-role="equipment-count"]');
     const empty = equipmentPanel.querySelector('[data-game-role="equipment-empty"]');
@@ -1085,7 +1090,8 @@ function renderGameProgressRoadmap() {
       const control = available
         ? ui`<button type="button" class="game-text-button game-equipment-state" data-game-action="equip-accessory" data-accessory="${escapeHtml(item.id)}" aria-pressed="${active}">${active ? translateText('Quitar') : translateText('Equipar')}</button>`
         : ui`<span class="game-equipment-state">${escapeHtml(lockedLabel)}</span>`;
-      return ui`<article class="game-equipment-item ${active ? 'is-equipped' : available ? 'is-owned' : 'is-locked'}" data-equipment-state="${stateName}" role="listitem"><span class="game-equipment-icon" aria-hidden="true">${gamePixelIcon(item.slot === 'body' ? 'shield' : item.slot === 'head' ? 'crown' : 'gem')}</span><span class="game-equipment-copy"><strong>${escapeHtml(translateText(item.label))}</strong><small>Ranura ${escapeHtml(slotLabel(item.slot))} · nivel ${item.unlockLevel}</small></span>${control}</article>`;
+      const preview = monsterSvg({ species: day.species.id, state: 'awake', variant: 'normal', hpPct: 100, sizeClass: 'sm', equipment: { ...equipped, [item.slot]: item.label } });
+      return ui`<article class="game-equipment-item ${active ? 'is-equipped' : available ? 'is-owned' : 'is-locked'}" data-equipment-state="${stateName}" role="listitem"><span class="game-equipment-icon" aria-hidden="true">${gamePixelIcon(item.slot === 'body' ? 'shield' : item.slot === 'head' ? 'crown' : 'gem')}</span><span class="game-equipment-copy"><strong>${escapeHtml(translateText(item.label))}</strong><small>Ranura ${escapeHtml(slotLabel(item.slot))} · nivel ${item.unlockLevel}</small><details class="review-details" data-equipment-preview="${item.id}" ${previews.has(item.id) ? 'open' : ''}><summary>Vista previa</summary><div class="review-detail-body">${preview}<small>Vista previa sin equipar ni guardar cambios.</small></div></details></span>${control}</article>`;
     }).join('');
   }
 }
@@ -2800,6 +2806,17 @@ function saveMonsterName() {
 
 let gameInitialized = false;
 
+export function setGameEnabled(enabled) {
+  ensureGameSettings();
+  const previous = settings.game.enabled;
+  settings.game.enabled = enabled === true;
+  const saved = saveSettingsOnly() !== false;
+  if (!saved) settings.game.enabled = previous;
+  renderGame();
+  renderHeader?.();
+  return saved;
+}
+
 export function initGame() {
   if (gameInitialized) return;
   gameInitialized = true;
@@ -2831,10 +2848,7 @@ export function initGame() {
   });
   for (const id of ['gameEnabledInput', 'sidebarAchievementsInput']) {
     document.getElementById(id)?.addEventListener('change', (event) => {
-      settings.game.enabled = !!event.target.checked;
-      saveSettingsOnly();
-      renderGame();
-      renderHeader?.();
+      setGameEnabled(!!event.target.checked);
     });
   }
   document.getElementById('sidebarGameSoundInput')?.addEventListener('change', (event) => {

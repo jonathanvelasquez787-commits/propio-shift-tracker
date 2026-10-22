@@ -287,7 +287,7 @@ function bootHarness(cloud) {
   const noop = () => {};
   Object.assign(h.context, { isConfigured: () => true, setBootMessage: noop, fail: message => { throw Error(message); },
     askConflict: async () => 'local', setLanguage: () => false, mountApp: async () => { actions.push('mount'); return true; },
-    crypto: webcrypto, TextEncoder, installPropioBridge: () => { actions.push('bridge'); return noop; },
+    crypto: webcrypto, TextEncoder, createAutomationLease: () => ({stop(){}}), installPropioBridge: () => { actions.push('bridge'); return noop; },
     normalizeAppAddress: noop, setAppEntryHint: noop, wireSyncStatus: noop, setSyncStatus: noop, getProfile: async () => ({}),
     injectAccountPanel: () => actions.push('panel'), injectDeleteAccount: noop, injectCycleProjection: noop,
     injectRecoveryCopies: noop, readOfflineOwner: () => null, watchProductionHealth: noop,

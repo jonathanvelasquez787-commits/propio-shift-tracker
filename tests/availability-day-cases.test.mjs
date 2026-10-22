@@ -6,7 +6,8 @@ import { PORTAL_ORIGIN, TRACKER_ORIGIN } from '../js/propio-bridge-rules.js';
 const start = Date.parse('2026-10-15T14:00:00Z'), scope = 'a'.repeat(64);
 function fixture(offset = 600000) {
   let clock = start + offset, serial = 0, targets = [scope], plan = {}, result = { status: 'ok' };
-  const storage = {}, events = [];
+  const coordinationOwner = '11111111-1111-4111-8111-111111111111';
+  const storage = { 'bridge-v1': { schema: 1, coordinationOwner } }, events = [];
   const iso = value => new Date(value).toISOString();
   const api = { runtime: { id: 'day-fixture', getURL: path => 'chrome-extension://day-fixture/' + path },
     storage: { local: { get: async key => ({ [key]: structuredClone(storage[key]) }), set: async value => Object.assign(storage, structuredClone(value)) } },
@@ -14,7 +15,8 @@ function fixture(offset = 600000) {
       sendMessage: async (id, packet) => {
         if (packet.kind === 'identify-tracker') return { accountScope: targets[id - 10], plan: {
           startAt: iso(start), endAt: iso(start + 8 * 3600000), scheduledPauses: [], hasCall: true,
-          lastCallEndedAt: iso(start), acw: { startedAt: iso(start), observedAt: iso(clock) }, ...plan } };
+          lastCallEndedAt: iso(start), acw: { startedAt: iso(start), observedAt: iso(clock) },
+          automationLease: { version: 1, owner: coordinationOwner, grantedAt: iso(clock), expiresAt: iso(clock + 25000) }, ...plan } };
         events.push(packet); return result;
       } } };
   const create = () => createBridgeWorker(api, { now: () => clock, randomId: () => 'day-case-event-' + String(++serial).padStart(12, '0') });
@@ -24,7 +26,7 @@ function fixture(offset = 600000) {
   const documentId = 'day-case-document-1234';
   const send = packet => worker.message(packet, popup);
   const observe = (extra = {}, sender = portal) => worker.message({ kind: 'portal-observation', session: 'authenticated', call: 'idle',
-    offline: true, documentId, ...extra }, sender);
+    offline: true, documentId, observedAt: iso(clock), ...extra }, sender);
   return { storage, events, iso, send, observe, portal, documentId, now: () => clock,
     plan: update => { plan = update; }, advance: amount => { clock += amount; }, targets: values => { targets = values; },
     ack: value => { result = value; }, restart: () => { worker = create(); },
@@ -101,6 +103,8 @@ test('explicit popup pause preserves all preferences and blocks timed pause comp
   await f.observe(); assert.equal(f.events.some(packet => packet.event.type === 'pause-end'), false);
   f.restart(); assert.equal(f.storage['bridge-v1'].preparation.spacing.minutes, 3);
   await f.send({ kind: 'pause-availability', paused: false }); await f.observe();
+  assert.equal(f.events.filter(packet => packet.event.type === 'pause-end').length, 0, 'a restarted worker confirms its lease before closing a pause');
+  await f.observe();
   assert.equal(f.events.filter(packet => packet.event.type === 'pause-end').length, 1);
 });
 

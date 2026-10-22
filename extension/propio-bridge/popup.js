@@ -1,4 +1,6 @@
+import { automationStatusView } from '../../js/automation-status.js';
 document.getElementById('extensionVersion').textContent = chrome.runtime.getManifest().version;
+let nativeLayout = null, layoutChoice = null;
 
 const reasons = {
   'portal-closed': 'La pestaña de Propio se cerró durante una llamada. Revisá su final en Propio Shift Tracker.',
@@ -34,6 +36,10 @@ const availabilityReasons = {
   off: 'No hay un iniciador pendiente.', available: 'Ya estás disponible en Propio.',
   'offline-control': 'Esperando Offline o Not Available con Start Calls disponible.',
   retry: 'Esperando un momento antes de reintentar Start Calls.', starting: 'Pulsando Start Calls para ponerte disponible.',
+  stale: 'Lectura atrasada. Esperando confirmar Propio de nuevo; no se pulsa Start Calls ni Stop Calls.',
+  'recording-off': 'El registro automático está apagado.',
+  'device-passive': 'Solo registro en esta PC. No pulsa Start Calls ni Stop Calls ni termina pausas automáticamente.',
+  coordination: 'Esperando permiso de la nube para esta PC. Otra PC puede estar usando los iniciadores. El registro continúa; pausá la PC anterior y esperá hasta 30 segundos.',
 };
 let busy = false, feedback = '';
 async function refresh() {
@@ -64,9 +70,14 @@ async function refresh() {
   document.getElementById('portalStatus').textContent = !state.paired ? 'Esperando tu sesión en Propio Shift Tracker para vincularla automáticamente. La vista original funciona por separado.' : state.portal === 'authenticated' ? `Sesión reconocida. ${callStatus}` : state.portal === 'logged-out' ? 'Cierre de sesión confirmado en Propio.' : 'Abrí Propio para reconocer tu sesión.';
   toggle.checked = state.mode === 'auto'; toggle.disabled = busy || !state.paired;
   const prep = state.preparation, prepToggle = document.getElementById('prepareFirst');
+  document.getElementById('devicePassive').checked = prep?.devicePassive === true;
+  document.getElementById('devicePassive').disabled = busy;
   document.getElementById('availabilityPaused').checked = prep?.availabilityPaused === true;
   document.getElementById('availabilityPaused').disabled = busy || !state.paired;
-  document.getElementById('availabilityStatus').textContent = availabilityReasons[prep?.waitReason] || 'Comprobando cuándo ponerte disponible.';
+  const availability = automationStatusView(state.automationStatus);
+  document.getElementById('availabilityStatus').textContent = availabilityReasons[availability.key] || availabilityReasons[prep?.waitReason] || 'Comprobando cuándo ponerte disponible.';
+  nativeLayout = state.layout;
+  if (layoutChoice) renderLayout(layoutChoice);
   const spacing = prep?.spacing || { enabled: false, minutes: 2 };
   document.getElementById('spacingEnabled').checked = spacing.enabled === true;
   document.getElementById('spacingEnabled').disabled = busy || !state.paired;
@@ -140,6 +151,7 @@ document.getElementById('pair').addEventListener('click', () => act({ kind: 'pai
 document.getElementById('automatic').addEventListener('change', event => act({ kind: 'mode', mode: event.target.checked ? 'auto' : 'observe' }));
 document.getElementById('prepareFirst').addEventListener('change', event => act({ kind: 'prepare-first', enabled: event.target.checked }));
 document.getElementById('availabilityPaused').addEventListener('change', event => act({ kind: 'pause-availability', paused: event.target.checked }));
+document.getElementById('devicePassive').addEventListener('change', event => act({ kind: 'device-passive', enabled: event.target.checked }));
 document.getElementById('refreshTracker').addEventListener('click', () => act({ kind: 'refresh-tracker' }));
 const saveSpacing = () => act({ kind: 'spacing', enabled: document.getElementById('spacingEnabled').checked, minutes: Number(document.getElementById('spacingMinutes').value) });
 document.getElementById('spacingEnabled').addEventListener('change', saveSpacing);
@@ -155,12 +167,16 @@ setInterval(() => { if (!busy) refresh().catch(() => {}); }, 2000);
 const layoutKey = 'propio-original-layout-v1';
 let layoutBusy = false, layoutRevision = 0;
 function renderLayout(value) {
+  layoutChoice = value || { enabled: false };
   const toggle = document.getElementById('originalLayout');
   toggle.checked = value?.enabled === true;
   toggle.disabled = layoutBusy;
-  document.getElementById('originalLayoutStatus').textContent = toggle.checked
-    ? 'Activada. Se recuerda en este perfil.'
-    : 'Desactivada. Se recuerda en este perfil.';
+  const states = { 'native-present': 'Componente original detectado en Propio.', loading: 'Esperando que Propio termine de cargar.',
+    'waiting-offline': 'Esperando Offline para aplicar la vista sin interrumpir llamadas.',
+    'native-missing': 'No se detecta el componente original. Depende de que Propio lo siga incluyendo; la extensión no reemplaza sus totales.' };
+  document.getElementById('originalLayoutStatus').textContent = !toggle.checked ? 'Desactivada. Se recuerda en este perfil.'
+    : nativeLayout?.revision === value?.revision ? states[nativeLayout.state] || 'Esperando confirmar la vista de Propio.'
+    : 'Preferencia activada; falta confirmar el componente en Propio. Abrí una sola pestaña del portal.';
 }
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area !== 'local' || !changes[layoutKey]) return;

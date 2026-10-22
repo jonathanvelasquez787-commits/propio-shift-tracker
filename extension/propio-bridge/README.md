@@ -1,4 +1,4 @@
-# Propio · Tracker y vista original · 2.3.4
+# Propio · Tracker y vista original · 2.3.5
 
 La extensión conecta Propio Shift Tracker con la sesión y el historial de Propio. Su
 registro de llamadas funciona independientemente de la apariencia del portal.
@@ -91,8 +91,15 @@ el registro continúa. Para reanudar, usá Start Calls manualmente o apagá
 «Pausar disponibilidad automática» en el popup. Esta elección se conserva al
 reiniciar. El interruptor pausa clics; no modifica la disponibilidad actual.
 Un Propio Shift Tracker cerrado, antiguo o de otra cuenta no autoriza nuevos inicios.
-No hay coordinación global entre dos PCs: activá los iniciadores solo en una.
-Las decisiones de los 54 escenarios constan en docs/disponibilidad-casos-cotidianos.md.
+La versión 2.3.5 exige un permiso exclusivo por cuenta, con vencimiento de
+30 segundos en la nube. «Solo registro en esta PC» conserva las llamadas y
+deja los clics para otra PC. Para transferirlos, pausá la PC anterior y activá
+la nueva; una extensión antigua sin coordinación también debe actualizarse.
+Los controles manuales del portal siguen disponibles. Una lectura atrasada,
+permiso vencido o pérdida de conexión bloquea los clics, sin detener el registro.
+Las decisiones de los escenarios constan en docs/disponibilidad-casos-cotidianos.md;
+la coordinación y el asistente de otras PCs se explican en
+[compatibilidad e instalación](../../docs/compatibilidad-instalacion-y-disponibilidad.md).
 
 ## Recuperación del historial
 

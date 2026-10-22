@@ -40,7 +40,7 @@ function harness({ divergent = false, empty = false, absent = false, choice = 'l
     DATA_SCHEMA_VERSION: 2, SUPABASE_URL: 'https://audit.invalid', SUPABASE_ANON_KEY: 'audit',
     window: { localStorage: storage, sessionStorage: storage, location: { replace: url => { context.redirected = url; }, reload: noop } },
     setTimeout: () => 1, clearTimeout: noop, getSupabase: () => backend,
-    crypto: webcrypto, TextEncoder, isConfigured: () => true, setBootMessage: noop, fail: message => { throw new Error(message); },
+    crypto: webcrypto, TextEncoder, createAutomationLease: () => ({stop(){}}), isConfigured: () => true, setBootMessage: noop, fail: message => { throw new Error(message); },
     askConflict: async () => choice, setLanguage: () => false,
     mountApp: async () => { if (race) cloud = { state: { newer: true }, settings: {}, calls: [{ id: 'newer' }], updated_at: laterBase }; return true; },
     installPropioBridge: () => noop, normalizeAppAddress: noop, wireSyncStatus: noop, setSyncStatus: noop,

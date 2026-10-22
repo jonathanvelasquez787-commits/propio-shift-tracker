@@ -49,7 +49,7 @@ test('external styles preserve cascade order, markup attributes and literal doll
 
 test('new shell assets are available in the offline cache and unsupported source layouts fail the build', () => {
   const worker = fs.readFileSync(new URL('../js/service-worker.js', import.meta.url), 'utf8');
-  for (const name of ['app-core', 'app-shell', 'game', 'game-battle', 'appearance']) {
+  for (const name of ['app-core', 'app-shell', 'game', 'game-battle', 'appearance', 'accessibility']) {
     assert.ok(worker.includes(`/css/${name}.css?v=\${BUILD_VERSION}`), `${name} must share the release cache key`);
   }
   assert.ok(worker.includes('/assets/app-view.js?v=${BUILD_VERSION}'));
@@ -60,7 +60,7 @@ test('every app stylesheet belongs to the HTML release while retaining cascade o
   const input = source.replace('href="/css/app-shell.css"', 'href="/css/app-shell.css" media="screen" data-purpose="layout"');
   const result = createAppShell(input, 'release-next', '.core{}');
   const links = collect(parse(result.html), node => node.tagName === 'link' && attr(node, 'rel') === 'stylesheet');
-  assert.deepEqual(links.map(node => attr(node, 'href')), ['app-core', 'app-shell', 'game', 'game-battle', 'appearance'].map(name => `/css/${name}.css?v=release-next`));
+  assert.deepEqual(links.map(node => attr(node, 'href')), ['app-core', 'app-shell', 'game', 'game-battle', 'appearance', 'accessibility'].map(name => `/css/${name}.css?v=release-next`));
   const shell = links.find(node => attr(node, 'href').includes('app-shell'));
   assert.equal(attr(shell, 'media'), 'screen');
   assert.equal(attr(shell, 'data-purpose'), 'layout');

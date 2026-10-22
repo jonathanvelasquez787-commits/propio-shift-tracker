@@ -2,6 +2,7 @@ import { PALETTES } from './theme-palettes.js';
 import { applySavedColors } from './appearance-colors.js';
 import { setLanguage, translateText } from './i18n.js';
 import { saveLanguagePreference } from './language-preference.js';
+import { applyPresentation, wirePresentation } from './presentation-accessibility.js';
 
 export function applyAppearance(settings) {
   const root = document.documentElement;
@@ -12,6 +13,7 @@ export function applyAppearance(settings) {
   applySavedColors({ ...settings, theme: mode }, root);
   setLanguage(settings.language);
   saveLanguagePreference(settings.language);
+  applyPresentation(settings);
   document.querySelectorAll('[data-palette-choice]').forEach(button => {
     const active = button.dataset.paletteChoice === palette.id;
     button.setAttribute('aria-checked', String(active));
@@ -48,10 +50,17 @@ export function wireAppearance({ getSettings, save, applyTheme }) {
   if (!dialog || dialog.dataset.wired) return;
   dialog.dataset.wired = 'true';
   const change = patch => {
-    Object.assign(getSettings(), patch);
-    save();
+    const owner = getSettings(), previous = { ...owner };
+    Object.assign(owner, patch);
+    if (save() === false && getSettings() === owner) {
+      for (const key of Object.keys(patch)) {
+        if (Object.hasOwn(previous, key)) owner[key] = previous[key];
+        else delete owner[key];
+      }
+    }
     applyTheme();
   };
+  wirePresentation({ getSettings, save, apply: applyTheme });
   document.querySelectorAll('[data-palette-choice]').forEach((button, index) => {
     button.addEventListener('click', () => change({ palette: button.dataset.paletteChoice }));
     button.addEventListener('keydown', event => {
@@ -73,6 +82,17 @@ export function wireAppearance({ getSettings, save, applyTheme }) {
     if (event.target !== dialog) return;
     const bounds = dialog.getBoundingClientRect();
     if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) dialog.close();
+  });
+  dialog.addEventListener('keydown', event => {
+    if (event.key === 'Escape') { event.stopPropagation(); return; }
+    if (event.key !== 'Tab') return;
+    event.stopPropagation();
+    const controls = [...dialog.querySelectorAll('button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),summary,[tabindex]')]
+      .filter(element => element.tabIndex >= 0 && element.getClientRects().length);
+    if (!controls.length) { event.preventDefault(); return; }
+    const first = controls[0], last = controls.at(-1), current = document.activeElement;
+    if (event.shiftKey && (current === first || !dialog.contains(current))) { event.preventDefault(); last.focus(); }
+    else if (!event.shiftKey && (current === last || !dialog.contains(current))) { event.preventDefault(); first.focus(); }
   });
   window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => {
     if (getSettings().theme === 'auto') applyTheme();

@@ -40,15 +40,27 @@ test('rejected daily goal removal restores the override and its historical snaps
 
 function profileHarness(){
  const elements=Object.fromEntries(['accountUsernameInput','accountEmailInput','accountProfileStatus','saveAccountProfileBtn'].map(id=>[id,{value:id.includes('Username')?'new_name':'a@example.test',textContent:'',disabled:false}]));
- const queued=[];const updates=[];
+ const queued=[];const updates=[],emailUpdates=[];
  const h=vm.createContext({ui,translateText:x=>x,settings:{owner:'A'},EMAIL_AUTH_READY:false,
   document:{activeElement:null,getElementById:id=>elements[id]},getSession:async()=>({user:{id:'A'}}),
   getProfile:()=>new Promise(resolve=>queued.push(resolve)),getUser:async()=>({id:'A',email:'a@example.test'}),
-  updateUsername:async value=>updates.push(value),updateEmail:async()=>{},authErrorMessage:()=> 'error',toast:()=>{},
+  updateUsername:async value=>updates.push(value),updateEmail:async value=>emailUpdates.push(value),authErrorMessage:()=> 'error',toast:()=>{},
  });
  vm.runInContext('let profileRequestVersion = 0;\n'+declarations('js/settings.js',['syncAccountProfileFields','saveAccountProfile']),h);
- return {h,elements,queued,updates};
+ return {h,elements,queued,updates,emailUpdates};
 }
+
+test('Google account profile keeps email read-only and never submits a manipulated email field',async()=>{
+ const x=profileHarness();const load=x.h.syncAccountProfileFields();
+ await new Promise(resolve=>setImmediate(resolve));
+ x.queued.shift()({username:'current_name',user_id:'A'});await load;
+ assert.equal(x.elements.accountEmailInput.readOnly,true);
+ x.elements.accountUsernameInput.value='edited_name';
+ x.elements.accountEmailInput.value='other@example.invalid';
+ const save=x.h.saveAccountProfile();await new Promise(resolve=>setImmediate(resolve));
+ x.queued.shift()({username:'current_name',user_id:'A'});await save;
+ assert.deepEqual(x.updates,['edited_name']);assert.deepEqual(x.emailUpdates,[]);
+});
 
 test('profile save never applies the old form after the active account changes while reading',async()=>{
  const x=profileHarness();const pending=x.h.saveAccountProfile();

@@ -9,6 +9,7 @@ function momentLabel(value, now) {
 }
 
 function pauseDescription(snapshot, now) {
+  if (snapshot.devicePassive || snapshot.coordinationConfirmed === false) return translateText('Esta PC registra llamadas y conserva tus opciones, pero no pulsa Start Calls ni Stop Calls ni termina pausas automáticamente.');
   const type = snapshot.pauseType === 'break' ? 'Break' : snapshot.pauseType === 'lunch' ? 'Lunch' : null;
   const mode = snapshot.options.timed
     ? translateText('Cierre automático solo para pausas con regreso activado y duración configurada.')
@@ -33,6 +34,8 @@ function statusMessages(key, snapshot) {
     stale: [translateText('Esperando una lectura reciente'), translateText('La extensión debe confirmar el estado de Propio antes de mostrar la próxima acción.')],
     'recording-off': [translateText('Registro automático apagado'), translateText('Activá Registrar mi actividad en la extensión de Chrome para usar las opciones automáticas.')],
     'manual-paused': [translateText('Pausada por vos'), translateText('El registro de llamadas continúa. Reanudá la disponibilidad desde la extensión o con Start Calls en Propio.')],
+    'device-passive': [translateText('Solo registro en esta PC'), translateText('Esta PC registra llamadas y conserva tus opciones, pero no pulsa Start Calls ni Stop Calls ni termina pausas automáticamente.')],
+    coordination: [translateText('Esperando permiso para esta PC'), translateText('Otra PC puede estar usando la disponibilidad automática, o falta conexión con la nube. El registro continúa. Pausá los iniciadores de la PC anterior; el permiso vence en hasta 30 segundos.')],
     review: [translateText('La conexión necesita revisión'), translateText('Abrí el estado de conexión de la extensión para ver qué necesita atención. El inicio automático espera.')],
     connection: [translateText('Esperando tu sesión de Propio'), translateText('Abrí Propio con tu sesión para que la extensión pueda confirmar la disponibilidad.')],
     schedule: [translateText('Esperando confirmar tu horario'), translateText('La extensión necesita el horario y los descansos actuales antes de actuar.')],

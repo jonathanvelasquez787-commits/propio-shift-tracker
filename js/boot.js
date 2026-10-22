@@ -10,6 +10,7 @@ import { ui, translateText, translateMarkup, displayLocale, setLanguage, transla
 import { getSupabase, isConfigured } from './supabase-client.js';
 import { getProfile, signOut, setAppEntryHint } from './auth.js';
 import { installPropioBridge } from './propio-bridge.js';
+import { createAutomationLease } from './automation-lease.js';
 import { installAutomationStatusUi } from './automation-ui.js';
 import { SUPABASE_URL } from './config.js';
 import {
@@ -219,6 +220,20 @@ function injectAccountPanel(profile, email) {
     <button class="sidebar-logout-btn" id="sidebarLogoutBtn" type="button">Cerrar sesión</button>`;
   footer.appendChild(wrap);
 
+  const retry = document.getElementById('accountSyncRetryBtn');
+  retry?.addEventListener('click', async () => {
+    if (window.flushLocalChanges && !window.flushLocalChanges()) return;
+    if (navigator.onLine === false) {
+      setSyncStatus('error', translateText('Sin conexión — se guardó local'));
+      return;
+    }
+    if (!readMeta().dirty) { window.location.reload(); return; }
+    const result = await pushSnapshot();
+    if (result.skipped) window.location.reload();
+  });
+  setSyncStatus(readMeta().dirty ? 'saving' : 'ok',
+    readMeta().dirty ? translateText('Cambios sin subir…') : translateText('Sincronizado'));
+
   document.getElementById('sidebarLogoutBtn').addEventListener('click', async () => {
     if (window.flushLocalChanges && !window.flushLocalChanges()) return;
     const meta = readMeta();
@@ -350,7 +365,7 @@ function injectDeleteAccount(userId, getCurrentUserId = () => readMeta().userId)
       <div class="polished-delete-counts"><div><strong data-delete-count="calls">—</strong><span>Llamadas</span></div><div><strong data-delete-count="pauses">—</strong><span>Pausas</span></div><div><strong data-delete-count="events">—</strong><span>Acciones</span></div></div>
       <p class="danger-card-desc">Se eliminan tu cuenta y sus datos activos de Propio Shift Tracker.</p>
       <button class="polished-export-first" id="deleteAccountExportBtn" type="button"><span><strong>Guardar mi respaldo</strong><small>Exportar JSON antes de continuar</small></span><span aria-hidden="true">↗</span></button>
-      <details class="polished-disclosure"><summary>Qué se borra y qué se conserva</summary><div class="polished-detail"><div class="review-line"><span>Cuenta y datos de Propio Shift Tracker</span><strong>Se eliminan</strong></div><div class="review-line"><span>Cuenta e historial oficial de Propio</span><strong>Se conservan</strong></div><p class="note">Incluye llamadas, turnos, pausas, horario, metas, Finanzas y Logros.</p></div></details>
+      <details class="polished-disclosure"><summary>Qué se borra y qué se conserva</summary><div class="polished-detail"><div class="review-line"><span>Cuenta y datos de Propio Shift Tracker</span><strong>Se eliminan</strong></div><div class="review-line"><span>Cuenta e historial oficial de Propio</span><strong>Se conservan</strong></div><p class="note">Incluye llamadas, turnos, pausas, horario, metas, Finanzas y Logros.</p><p class="note">También se retiran los datos y copias recuperables de esta cuenta en este navegador. Tu cuenta de Google, los JSON que descargaste y las copias locales de otros navegadores o dispositivos no se borran desde aquí.</p></div></details>
       <p class="polished-retention">Las copias históricas cifradas se retiran por rotación, con una retención prevista de 31 días.</p>
       <button class="mc-btn-solid-full bad" id="deleteAccountBtn" type="button">Borrar cuenta y datos</button>
     </div>`;
@@ -387,7 +402,7 @@ function injectDeleteAccount(userId, getCurrentUserId = () => readMeta().userId)
           return;
         }
         const token = session?.access_token;
-        if (!token || session.user.id !== userId) {
+        if (!token || session.user.id !== userId || getCurrentUserId() !== userId || readMeta().userId !== userId) {
           window.location.replace('/');
           return;
         }
@@ -566,10 +581,36 @@ function injectCycleProjection() {
   }, 5000);
 }
 
+function renderSyncDetails(kind, text) {
+  if (!document.getElementById('accountSyncDetails')) return;
+  const meta = readMeta();
+  const dateLabel = value => {
+    const date = new Date(value || 0);
+    return Number.isFinite(date.getTime()) && date.getTime() > 0 ? date.toLocaleString(displayLocale()).replace(/\.$/, '') : '';
+  };
+  const saved = dateLabel(meta.lastLocalSaveAt);
+  const confirmed = dateLabel(meta.lastSyncedUpdatedAt);
+  const local = document.getElementById('syncLocalDetail');
+  const cloud = document.getElementById('syncCloudDetail');
+  const connection = document.getElementById('syncConnectionDetail');
+  const app = document.getElementById('syncAppDetail');
+  if (local) local.textContent = getLocalPersistenceFailure()
+    ? translateText('El último cambio no se pudo guardar. Conserva esta pestaña y revisa el aviso de guardado.')
+    : saved ? ui`Copia local guardada. Último cambio: ${saved}.` : translateText('Copia local disponible en este navegador.');
+  if (cloud) cloud.textContent = `${text} · ${confirmed ? ui`Última revisión confirmada: ${confirmed}.` : translateText('Todavía no hay una revisión de nube confirmada en este navegador.')}`;
+  if (connection) connection.textContent = navigator.onLine === false
+    ? translateText('Sin red. Los cambios locales quedan pendientes; al reconectar se comprueba la cuenta y la revisión antes de subir.')
+    : translateText('Hay conexión de red. Solo una confirmación del servidor acredita el guardado en la nube.');
+  if (app) app.textContent = navigator.serviceWorker?.controller
+    ? translateText('La caché de la app está activa. El respaldo de tus datos se gestiona por separado.')
+    : translateText('Todavía no se confirmó la caché de la app. Mantén conexión para abrirla de nuevo.');
+  const details = document.getElementById('accountSyncDetails');
+  details.dataset.state = kind;
+}
+
 function setSyncStatus(kind, text) {
   const dot = document.getElementById('sidebarSyncDot');
   const label = document.getElementById('sidebarSyncText');
-  if (!dot || !label) return;
   const failure = getLocalPersistenceFailure();
   if (failure) {
     kind = 'error';
@@ -577,22 +618,27 @@ function setSyncStatus(kind, text) {
       : failure === 'budget' ? translateText('No se pudo guardar — reduce el tamaño de tus ajustes')
       : translateText('No se pudo guardar — almacenamiento lleno');
   }
+  renderSyncDetails(kind, text);
+  if (!dot || !label) return;
   dot.dataset.state = kind;
   label.textContent = text;
 }
 
 function wireSyncStatus() {
-  let lastPush = null;
+  let lastPush = null, cloudConflict = false;
   onSync((type) => {
-    if (type === 'local-persistence') setSyncStatus('saving', translateText('Cambios sin subir…'));
-    if (type === 'dirty') setSyncStatus('saving', translateText('Cambios sin subir…'));
+    if (type === 'local-persistence' || type === 'dirty') setSyncStatus(cloudConflict ? 'error' : 'saving',
+      cloudConflict ? translateText('Otro dispositivo guardó después') : translateText('Cambios sin subir…'));
     if (type === 'pushed') {
+      cloudConflict = false;
       lastPush = new Date();
       setSyncStatus(readMeta().dirty ? 'saving' : 'ok',
         readMeta().dirty ? translateText('Cambios sin subir…') : translateText('Guardado en la nube'));
     }
-    if (type === 'error') setSyncStatus('error', translateText('Sin conexión — se guardó local'));
+    if (type === 'error') setSyncStatus('error', navigator.onLine === false
+      ? translateText('Sin conexión — se guardó local') : translateText('La nube no confirmó el guardado'));
     if (type === 'conflict') {
+      cloudConflict = true;
       setSyncStatus('error', translateText('Otro dispositivo guardó después'));
       showCloudConflictBanner();
     }
@@ -607,8 +653,12 @@ function wireSyncStatus() {
   }, 60000);
 
   window.addEventListener('offline', () => setSyncStatus('error', translateText('Sin conexión')));
-  window.addEventListener('online', () => setSyncStatus('saving', 'Reconectando…'));
-  window.addEventListener('propio-local-persistence', () => setSyncStatus('saving', translateText('Cambios sin subir…')));
+  window.addEventListener('online', () => setSyncStatus(cloudConflict ? 'error' : readMeta().dirty ? 'saving' : 'ok',
+    cloudConflict ? translateText('Otro dispositivo guardó después') : readMeta().dirty ? translateText('Reconectando…') : translateText('Sincronizado')));
+  window.addEventListener('propio-local-persistence', () => setSyncStatus(cloudConflict ? 'error' : 'saving',
+    cloudConflict ? translateText('Otro dispositivo guardó después') : translateText('Cambios sin subir…')));
+  navigator.serviceWorker?.addEventListener('controllerchange', () => renderSyncDetails(
+    document.getElementById('sidebarSyncDot')?.dataset.state || 'saving', document.getElementById('sidebarSyncText')?.textContent || ''));
 }
 
 // La app ya trae este banner para el conflicto entre pestañas; el conflicto
@@ -619,7 +669,7 @@ function showCloudConflictBanner() {
   const text = banner.querySelector('.storage-conflict-banner-text');
   if (text) {
     text.textContent =
-      translateText('Otro dispositivo guardó cambios más recientes en tu cuenta. Si sigues aquí, tu próximo cambio podría sobrescribirlos.');
+      translateText('Otro dispositivo guardó cambios más recientes. Tus cambios siguen en este navegador y no reemplazan esa revisión. Recarga para comparar y elegir; la versión reemplazada queda en copias recuperables.');
   }
   banner.classList.add('show');
 }
@@ -767,7 +817,8 @@ async function boot() {
   const accountScope = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('');
   const { applyPropioBridgeEvent, getPropioBridgePlan } = await import('./app-main.js');
   if (bridgeUserId !== userId) return;
-  const stopBridge = installPropioBridge({ accountScope, receive: applyPropioBridgeEvent, getPlan: getPropioBridgePlan,
+  const automationLease = createAutomationLease(getSupabase(), { isCurrent: () => bridgeUserId === userId && readMeta().userId === userId });
+  const stopBridge = installPropioBridge({ accountScope, receive: applyPropioBridgeEvent, getPlan: getPropioBridgePlan, automationLease,
     onStatus: status => { if (bridgeUserId === userId && readMeta().userId === userId) automationUi?.update(status); } });
   stopPropioBridge = () => { stopBridge(); automationUi?.stop(); automationUi = null; };
 

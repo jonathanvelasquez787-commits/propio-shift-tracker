@@ -12,6 +12,29 @@
   <main>
     <div class="brand"><img src="icons/icon-48.png" width="42" height="42" alt=""><div><h1>Tu espacio de trabajo</h1><p>Propio y UseInterpreter a la izquierda; Propio Shift Tracker y Linguee a la derecha.</p></div></div>
     <section class="card"><p id="workspace-status" role="status">Preparando tus ventanas…</p><p class="muted">Propio y UseInterpreter a la izquierda, Propio Shift Tracker y Linguee a la derecha. Se prepara al abrir tu perfil, a cualquier hora.</p><div class="actions"><button id="workspace-retry" hidden>Reintentar</button><a href="https://propio-shift-tracker.vercel.app/">Abrir Propio Shift Tracker</a></div></section>
+    <form id="workspace-setup" class="card" hidden>
+      <h2>Preparar esta PC</h2><p class="muted">1. Usá el perfil de Chrome con tu cuenta. Estas opciones se guardan solo acá; no cambian las otras PCs.</p>
+      <label class="field">Propio<input name="portal" type="url" required></label>
+      <label class="field">UseInterpreter<input name="interpreter" type="url" required></label>
+      <label class="field">Propio Shift Tracker<input name="tracker" type="url" required></label>
+      <label class="field">Linguee<input name="dictionary" type="url" required></label>
+      <p class="helper">Se admiten las páginas reconocidas y sus rutas, sin contraseñas ni parámetros privados.</p>
+      <label class="field">Ancho de la columna derecha (%)<input name="width" type="number" min="25" max="50" step=".01" required></label>
+      <label class="field">Alto de la ventana derecha (%)<input name="height" type="number" min="40" max="100" step=".1" required></label>
+      <label class="field"><span><input name="startup" type="checkbox"> Organizar al abrir este perfil</span></label>
+      <label class="field"><span><input name="passive" type="checkbox"> Solo registro en esta PC</span></label>
+      <p class="helper">2. Si otra PC usa la disponibilidad automática, dejá «Solo registro» activo acá. Para transferirla, pausá los iniciadores en la anterior y apagá esta opción en la nueva. La nube permite una PC por cuenta; el permiso anterior vence en hasta 30 segundos. El registro continúa.</p>
+      <button id="setup-save" type="submit" disabled>Guardar configuración de este perfil</button>
+      <p id="setup-status" class="helper" role="status">Leyendo configuración…</p>
+      <details class="disclosure"><summary>3. Notas y acceso al iniciar Windows</summary>
+        <p class="helper">La extensión organiza Chrome. El iniciador de Windows abre tu archivo de notas existente y conserva los argumentos y el perfil del acceso elegido. El instalador valida y respalda antes de cambiarlo; esta preparación no instala nada.</p>
+        <label class="field">Ruta del acceso de Chrome de esta PC<input name="shortcut" type="text" placeholder="C:\Users\TuUsuario\Desktop\Trabajo.lnk"></label>
+        <label class="field">Ruta del archivo de notas de esta PC<input name="notes" type="text" placeholder="C:\Users\TuUsuario\Documents\Notas.txt"></label>
+        <p class="helper">Reservá espacio para las notas con un alto de 40% a 85%. No se lee ni copia su contenido. En la otra PC, elegí sus propias rutas y perfil.</p>
+        <button id="setup-export" type="button">Preparar configuración para Windows</button>
+      </details>
+      <p class="helper">Chrome requiere vista dividida para organizar las ventanas. El equipo suspendido no ejecuta automatismos; al volver se comprueban de nuevo el portal y el permiso.</p>
+    </form>
   </main>
   <script type="module" src="workspace-page.js"></script>
 </body>

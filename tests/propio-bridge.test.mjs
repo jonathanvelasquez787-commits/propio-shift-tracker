@@ -184,7 +184,7 @@ test('portal cooldown stops only a unique Available Stop Calls control and prese
   f.document.controls = [stop]; f.document.statuses = [f.element('Available')];
   assert.equal(availableStopButton(f.document), stop);
   let clock = 10000;
-  const observer = createPortalObserver({ document: f.document, documentId: 'spacing-document-1234', now: () => clock, send: async () => ({ ok: true, stopCalls: true }) });
+  const observer = createPortalObserver({ document: f.document, documentId: 'spacing-document-1234', now: () => clock, send: async () => ({ ok: true, stopCalls: true, commandId: 'confirmed-command-123', authorizationUntil: new Date(clock + 3000).toISOString() }) });
   await observer.sample(); clock += 1000; await observer.sample(); assert.equal(stops, 1);
   f.document.controls = [f.element('Accept'), f.element('Reject'), stop]; assert.equal(availableStopButton(f.document), null);
   await observer.sample(); clock += 1000; await observer.sample(); assert.equal(stops, 1);
@@ -348,7 +348,7 @@ test('portal preparation clicks only an explicit Offline Start Calls button and 
   const button=f.element('Start Calls');let starts=0, accepts=0;button.click=()=>starts++;
   f.document.controls=[button];f.document.statuses=[f.element('Offline')];
   assert.equal(offlineStartButton(f.document),button);
-  let clock=10000;const observer=createPortalObserver({document:f.document,documentId:'prepare-document-1234',now:()=>clock,send:async()=>({ok:true,prepare:true})});
+  let clock=10000;const observer=createPortalObserver({document:f.document,documentId:'prepare-document-1234',now:()=>clock,send:async()=>({ok:true,prepare:true,commandId:'confirmed-command-123',authorizationUntil:new Date(clock+3000).toISOString()})});
   await observer.sample();clock+=1000;await observer.sample();assert.equal(starts,1);
   const accept=f.element('Accept');accept.click=()=>accepts++;
   f.document.controls=[accept,f.element('Reject')];assert.equal(offlineStartButton(f.document),null);
@@ -494,7 +494,8 @@ function receiverFixture(clock = now) {
   return { state, calls, operations, receive, setSaved: value => { saved = value; } };
 }
 function workerFixture() {
-  const data = {}, delivered = [], reloads = [];
+  const coordinationOwner = '11111111-1111-4111-8111-111111111111';
+  const data = { 'bridge-v1': { schema: 1, coordinationOwner } }, delivered = [], reloads = [];
   let targets = [], portalTargets = [1], plan = null, ack = { status: 'ok' }, clock = Date.parse(at), n = 0;
   const api = { runtime: { id: 'extension-id', getURL: name => `chrome-extension://extension-id/${name}` },
     storage: { local: { async get(key) { return { [key]: structuredClone(data[key]) }; }, async set(update) { Object.assign(data, structuredClone(update)); } } },
@@ -503,7 +504,8 @@ function workerFixture() {
         const bridge = data['bridge-v1'], latest = bridge?.preparation?.spacing?.lastEndedAt || plan?.lastCallEndedAt || plan?.startAt;
         const acw = plan?.pause || Object.values(bridge?.tabs || {}).some(tab => tab.active) ? null
           : { startedAt: plan?.lastPause?.endedAt || latest, observedAt: new Date(clock).toISOString() };
-        return { accountScope: targets[id - 10], plan: plan && !Object.hasOwn(plan, 'acw') ? { ...plan, acw } : plan };
+        const automationLease = { version: 1, owner: coordinationOwner, grantedAt: new Date(clock).toISOString(), expiresAt: new Date(clock + 25000).toISOString() };
+        return { accountScope: targets[id - 10], plan: plan && { ...plan, ...(!Object.hasOwn(plan, 'acw') ? { acw } : {}), automationLease: Object.hasOwn(plan, 'automationLease') ? plan.automationLease : automationLease } };
       }
       delivered.push(message); return ack;
     }, async create() {}, async reload(id) { reloads.push(id); } } };
@@ -514,7 +516,7 @@ function workerFixture() {
       requestBody: { raw: [{ bytes: new TextEncoder().encode(JSON.stringify({ name, username: 'never-retained', token: 'never-retained' })).buffer }] }, ...options });
     await worker.completed({ requestId, statusCode: options.statusCode || 200 });
   }
-  return { data, delivered, reloads, signal, get worker() { return worker; }, targets: value => { targets = value; }, portals: value => { portalTargets = value; },
+  return { data, delivered, reloads, signal, get worker() { return { ...worker, message: (packet, source) => worker.message(packet?.kind === 'portal-observation' && !Object.hasOwn(packet, 'observedAt') ? { ...packet, observedAt: new Date(clock).toISOString() } : packet, source) }; }, targets: value => { targets = value; }, portals: value => { portalTargets = value; },
     ack: value => { ack = value; }, plan: value => { plan = value ? {scheduledPauses:[],...value} : null; }, advance: milliseconds => { clock += milliseconds; }, now: () => clock,
     restart() { worker = createBridgeWorker(api, { now: () => clock, randomId: () => `generated-id-${String(++n).padStart(12,'0')}` }); } };
 }
@@ -938,4 +940,80 @@ test('original narrow header authenticates only its matching visible name and ke
   assert.equal(offlineStartButton(f.document), f.document.controls[0]);
   name.textContent = 'Different User (12345)'; assert.equal(readPortalObservation(f.document).session, 'unknown');
   name.textContent = 'Synthetic User (12345)'; name.hidden = true; assert.equal(readPortalObservation(f.document).session, 'unknown');
+});
+
+test('a missing, expired or foreign device lease blocks initiators while call recording still delivers', async () => {
+  for (const lease of [null, { version: 1, owner: '22222222-2222-4222-8222-222222222222', grantedAt: at, expiresAt: new Date(Date.parse(at) + 25000).toISOString() },
+    { version: 1, owner: '11111111-1111-4111-8111-111111111111', grantedAt: new Date(Date.parse(at) - 30000).toISOString(), expiresAt: at }]) {
+    const f = workerFixture(); f.plan({ startAt: at, endAt: '2026-10-04T22:00:00Z', automationLease: lease });
+    await enablePortal(f); await f.worker.message({ kind: 'prepare-first', enabled: true }, sender);
+    const answer = await f.worker.message(portalPacket('authenticated', { call: 'idle', offline: true }), portalSender);
+    assert.equal(answer.prepare, false); assert.equal(answer.stopCalls, false);
+    assert.equal(f.data['bridge-v1'].preparation.waitReason, 'coordination');
+    await f.worker.message(portalPacket('authenticated', { call: 'connected', signal: 'accepted' }), portalSender);
+    f.advance(60000); await f.worker.message(portalPacket('authenticated', { call: 'idle', signal: 'disconnected' }), portalSender);
+    assert.equal(f.delivered.filter(item => item.event.type === 'call-end').length, 1);
+  }
+});
+
+test('a passive PC keeps recording, spacing and return preferences and cannot end a timed break', async () => {
+  const f = workerFixture(); await enablePortal(f);
+  await f.worker.message({ kind: 'prepare-first', enabled: true }, sender);
+  await f.worker.message({ kind: 'spacing', enabled: true, minutes: 2 }, sender);
+  await f.worker.message({ kind: 'resume-options', break: true, lunch: true, mode: 'timed' }, sender);
+  await f.worker.message({ kind: 'device-passive', enabled: true }, sender);
+  f.advance(600000);
+  f.plan({ startAt: at, endAt: '2026-10-04T22:00:00Z', hasCall: true,
+    pause: { type: 'break', startedAt: new Date(f.now() - 120000).toISOString(), endsAt: new Date(f.now() - 1000).toISOString() } });
+  await f.worker.flush();
+  const answer = await f.worker.message(portalPacket('authenticated', { call: 'idle', offline: true, available: true }), portalSender);
+  assert.equal(answer.prepare, false); assert.equal(answer.stopCalls, false);
+  assert.equal(f.delivered.some(item => item.event.type === 'pause-end'), false);
+  const status = await f.worker.message({ kind: 'status' }, sender);
+  assert.equal(status.mode, 'auto'); assert.equal(status.preparation.enabled, true);
+  assert.deepEqual(status.preparation.resume, { break: true, lunch: true, mode: 'timed' });
+  assert.equal(status.preparation.spacing.enabled, true);
+  const coordination = await f.worker.message({ kind: 'tracker-coordination', accountScope: scope }, { id: sender.id, url: TRACKER_ORIGIN + '/', frameId: 0, tab: { id: 10 } });
+  assert.equal(coordination.enabled, false);
+});
+
+test('automation commands are one-use and reject paused, expired, replaced-document and changed-plan confirmations', async () => {
+  for (const mode of ['valid','paused','passive','late','document','plan']) {
+    const f = workerFixture(); f.plan({ startAt: at, endAt: '2026-10-04T22:00:00Z' }); await enablePortal(f);
+    await f.worker.message({ kind: 'prepare-first', enabled: true }, sender);
+    const answer = await f.worker.message(portalPacket('authenticated', { call: 'idle', offline: true }), portalSender);
+    assert.equal(answer.prepare, true);
+    if (mode === 'paused') await f.worker.message({ kind: 'pause-availability', paused: true }, sender);
+    if (mode === 'passive') await f.worker.message({ kind: 'device-passive', enabled: true }, sender);
+    if (mode === 'late') f.advance(3001);
+    if (mode === 'plan') { f.plan({ startAt: at, endAt: '2026-10-04T22:00:00Z', ended: true }); await f.worker.flush(); }
+    const confirmation = { kind: 'confirm-automation-action', commandId: answer.commandId, documentId: mode === 'document' ? 'other-document-12345' : 'portal-document-12345' };
+    assert.equal((await f.worker.message(confirmation, portalSender)).ok, mode === 'valid', mode);
+    if (mode === 'valid') assert.equal((await f.worker.message(confirmation, portalSender)).ok, false);
+  }
+});
+
+test('a delayed portal reply and a revoked confirmation never click native controls', async () => {
+  for (const revoke of [false, true]) {
+    const f = portalDocument(); f.document.welcome = f.element('Welcome, Synthetic User (12345)');
+    const button = f.element('Start Calls'); let clicks = 0, clock = 10000;
+    button.click = () => clicks++; f.document.controls = [button]; f.document.statuses = [f.element('Offline')];
+    const observer = createPortalObserver({ document: f.document, documentId: 'delayed-document-12345', now: () => clock,
+      send: async packet => {
+        if (packet.kind === 'confirm-automation-action') return { ok: false };
+        if (!revoke) clock += 3001;
+        return { ok: true, prepare: true, commandId: 'delayed-command-12345', authorizationUntil: new Date(clock + 10000).toISOString() };
+      } });
+    await observer.sample(); clock += 1000; await observer.sample(); assert.equal(clicks, 0); observer.stop();
+  }
+});
+
+test('a delayed portal observation cannot authorize a start and recovers only after a new sample', async () => {
+  const f = workerFixture(); f.plan({ startAt: at, endAt: '2026-10-04T22:00:00Z' }); await enablePortal(f);
+  await f.worker.message({ kind: 'prepare-first', enabled: true }, sender);
+  const stale = await f.worker.message(portalPacket('authenticated', { call: 'idle', offline: true, observedAt: new Date(f.now() - 4000).toISOString() }), portalSender);
+  assert.equal(stale.prepare, false); assert.equal(stale.stopCalls, false);
+  assert.equal((await f.worker.message({ kind: 'status' }, sender)).automationStatus.observedAt, null);
+  const recent = await f.worker.message(portalPacket('authenticated', { call: 'idle', offline: true }), portalSender);
+  assert.equal(recent.prepare, true);
 });

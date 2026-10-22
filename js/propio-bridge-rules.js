@@ -1,4 +1,5 @@
 import { validatePortalRecord } from './propio-history-records.js';
+import { validateAutomationLease } from './automation-lease.js';
 export const BRIDGE_PROTOCOL = 'pst-propio-bridge/v1';
 export const TRACKER_ORIGIN = 'https://propio-shift-tracker.vercel.app';
 export const PORTAL_ORIGIN = 'https://interpreters.propio-ls.com';
@@ -34,7 +35,8 @@ export function validateBridgePlan(value, now = Date.now()) {
     acw, acwVerified: value.acwVerified !== false && (value.acw === null || !!acw),
     lastCallEndedAt: typeof value.lastCallEndedAt === 'string' && Date.parse(value.lastCallEndedAt) >= start && Date.parse(value.lastCallEndedAt) <= Math.min(now, end) ? new Date(value.lastCallEndedAt).toISOString() : null,
     scheduledPauses, scheduleVerified: Array.isArray(value.scheduledPauses) && value.scheduleVerified !== false,
-    pause: pause(value.pause, false), lastPause: pause(value.lastPause, true) };
+    pause: pause(value.pause, false), lastPause: pause(value.lastPause, true),
+    automationLease: validateAutomationLease(value.automationLease, now) };
 }
 export function validateBridgeEvent(value, now = Date.now()) {
   if (!value || typeof value !== 'object' || Array.isArray(value) || value.version !== 1 || !bridgeId(value.id)) return null;

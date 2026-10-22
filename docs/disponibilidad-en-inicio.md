@@ -77,7 +77,9 @@ controles y sigue siendo quien permite elegir las opciones.
 
 Los artefactos de navegador quedan fuera de Git. CI y despliegue del commit se
 enlazan en el PR. Esto no certifica todas las variantes nativas de Save ni dos
-PCs simultáneos. La coordinación global sigue pendiente en el plan.
+PCs físicas simultáneas. La coordinación pendiente de esta entrega histórica se
+implementa en web 642 / extensión 2.3.5 con permiso exclusivo y vencimiento en
+servidor; [arquitectura y evidencia](compatibilidad-instalacion-y-disponibilidad.md).
 
 ## Actualización local
 

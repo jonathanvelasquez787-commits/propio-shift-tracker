@@ -374,49 +374,49 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 ### 53. Activar Logros y la batalla
 
 - **Qué hace:** representa el avance real hacia tu meta mediante el héroe y el monstruo, y guarda progreso de juego.
-- **Qué configurás:** Activar Logros, nombre del monstruo, intensidad y sonidos. Está desactivado por defecto para cuentas nuevas.
+- **Qué configurás:** Preferencias de Logros → Activar Logros; Gamificación → nombre del monstruo y sonidos. Está desactivado por defecto para cuentas nuevas. Desactivarlo conserva el progreso y no pausa el refuerzo positivo, que tiene su propio control.
 - **Ejemplo:** al guardar una llamada válida se representa un ataque; el avance contable sigue siendo el de tus llamadas reales.
 
 ### 54. Armas y práctica
 
 - **Qué hace:** permite elegir armas visuales y probar ataques con los controles de la batalla o el teclado cuando el foco corresponde.
-- **Qué configurás:** el arma y los ajustes de efectos/sonido.
+- **Qué configurás:** Inicio → Logros debajo de la batalla → arma y Duelo · 60 s; efectos/sonido en Gamificación. La ayuda plegable explica teclado y controles móviles.
 - **Ejemplo:** probás el lanzacohetes por diversión. Disparar de práctica no inventa llamadas, dinero ni XP de productividad.
 
 ### 55. XP, niveles, misiones, rachas y récords
 
 - **Qué hace:** reconoce hitos de constancia y progreso con registros de juego; permite revisar logros y récords personales.
-- **Qué configurás:** Logros y sus preferencias disponibles; algunas reglas, como considerar días libres en rachas, tienen su ajuste.
+- **Qué configurás:** Logros y sus preferencias; Nivel → Cómo sumás XP y misiones muestra elegibilidad, componentes y tope diario de 150 XP. Las correcciones pueden ajustar el progreso; importar llamadas históricas no genera XP retroactivo. Considerar días libres en la racha conserva su propio ajuste.
 - **Ejemplo:** completás actividad válida durante varios días y revisás la racha y los hitos. Repegar duplicados no debe servir para cobrar otra vez el mismo premio.
 
 ### 56. Cofre de la meta diaria
 
 - **Qué hace:** al cumplir la meta del día actual permite obtener su premio, con un registro que evita reclamarlo varias veces por recargar.
-- **Qué configurás:** la meta diaria y Logros; abrís el cofre cuando corresponda.
+- **Qué configurás:** la meta diaria y Logros; Nivel → Cofre de la meta diaria indica pendiente, disponible, abierto o ajustado por corrección. Lo abrís desde Inicio cuando esté disponible y no estés en una llamada.
 - **Ejemplo:** llegás a tu meta y abrís el cofre. Recargar la aplicación no genera un segundo cofre del mismo día. Si una corrección deja la meta sin cumplir, el progreso y premio se reconcilian.
 
 ### 57. Equipo, trofeos y bestiario
 
 - **Qué hace:** conserva accesorios desbloqueados, distinciones y criaturas derrotadas; permite equipar elementos disponibles.
-- **Qué configurás:** elegís el equipo que querés usar dentro de lo desbloqueado.
+- **Qué configurás:** Equipo → Mostrar equipo filtra obtenido, equipado, disponible o bloqueado. Vista previa muestra la pieza sin guardar; Equipar/Quitar usa el mismo control de siempre y exige haberla obtenido y alcanzar su nivel.
 - **Ejemplo:** obtenés un accesorio y lo equipás al héroe. Cambia su presentación, no tu tasa de pago.
 
 ### 58. Premios personales
 
 - **Qué hace:** permite crear premios y ofrecerlos en momentos seguros de la jornada, acumular hitos y registrar si los realizaste o guardaste para después.
-- **Qué configurás:** premio, condición para ganarlo, frecuencia, acumulación, máximo diario y si ofrecerlo en Break, Lunch o fin de turno; duración/costo opcionales.
+- **Qué configurás:** Mis premios → Crear mi premio: nombre, condición y momento. Opciones del premio conserva límites, acumulación, costo y pausa; la lista distingue los que faltan por realizar de los realizados, incluso si el premio está pausado.
 - **Ejemplo:** cada cinco llamadas ganás un té para el próximo Break. La aplicación lo recuerda; no compra el té ni verifica que lo hayas tomado. El costo es informativo.
 
 ### 59. Duelo durante una pausa o fuera del turno
 
 - **Qué hace:** ofrece una partida arcade opcional con ataques y controles propios, separada de los registros laborales. Solo permite jugar en pausa o fuera de turno.
-- **Qué configurás:** entrás al duelo desde los controles de la batalla cuando esté disponible y usás sus controles de juego.
+- **Qué configurás:** Inicio → Logros debajo de la batalla → Duelo · 60 s → Jugar. Automático permite salir. Tras volver al trabajo, entrás de nuevo durante una pausa y elegís Continuar duelo. En móvil aparecen botones táctiles. Recargar puede reiniciar la ronda, sin modificar tu trabajo guardado.
 - **Ejemplo:** durante tu Break jugás una partida. Sus puntos y vidas no se convierten en ingresos, llamadas ni productividad; al volver al trabajo se aplica la protección de su estado.
 
 ### 60. Premio del ciclo completado
 
 - **Qué hace:** al cerrar un ciclo cuya meta se cumplió, puede ofrecer una elección de premio de juego y registra lo reclamado para evitar repetirlo.
-- **Qué configurás:** meta del ciclo y Logros; elegís entre las opciones disponibles cuando aparece el premio.
+- **Qué configurás:** meta del ciclo y Logros; el jefe muestra el intervalo actual y cada premio indica su cierre. Elegís entre las opciones disponibles; después aparece la constancia de lo reclamado y no se entrega otra vez al abrir la sección.
 - **Ejemplo:** cumpliste la meta del ciclo anterior y elegís XP o un accesorio disponible. Ese premio no es dinero adicional pagado por Propio.
 
 ## 11. Apariencia y comodidad
@@ -424,7 +424,7 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 ### 61. Temas, paletas e idioma
 
 - **Qué hace:** conserva claro/oscuro, Original y siete paletas, además de Español o English.
-- **Qué configurás:** Temas y colores en el menú; idioma en el selector o en Tu perfil.
+- **Qué configurás:** Temas y colores en el menú; Vista esencial permite elegir ganancias/meta, bloques/llamadas y Logros en Inicio. Desactivarla restaura los bloques sin borrar datos. Idioma en el selector o en Tu perfil. Las siete paletas ajustan contraste de texto y estados sobre sus paneles.
 - **Ejemplo:** pasás de oscuro en la mañana a claro en el teléfono. Tus llamadas, notas y ganancias siguen siendo las mismas.
 
 ### 62. Reloj, fecha, saludo y vista angosta
@@ -436,13 +436,13 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 ### 63. Vista original de Propio
 
 - **Qué hace:** permite recuperar opcionalmente la barra nativa de Propio que sigue incluida en su página. La barra oscura añadida por la extensión se retiró del puente unificado.
-- **Qué configurás:** «Usar la vista original de Propio». Se aplica con un solo portal y cuando esté Offline, sin una llamada activa.
+- **Qué configurás:** «Usar la vista original de Propio». Se aplica con un solo portal y cuando esté Offline, sin una llamada activa. El popup distingue componente detectado, carga pendiente, espera de Offline o componente ausente; guardar la preferencia no significa que Propio ya la haya mostrado.
 - **Ejemplo:** activás la opción y volvés a ver la barra original con Calls, Minutes, Pay e iconos. Desactivarla permite volver a la presentación habitual de Propio.
 
 ### 64. Escritorio de trabajo al iniciar Windows
 
 - **Qué hace:** en tu PC configurada, abre Chrome con el perfil Jonathan y organiza las páginas de trabajo; abre también el archivo de notas que elegiste.
-- **Qué configurás:** es la preparación local que dejamos instalada: Propio y app.useinterpreter.com a la izquierda; Propio Shift Tracker y Linguee en la ventana derecha, con notas debajo.
+- **Qué configurás:** Configurar esta PC → Preparar esta PC en el popup permite elegir páginas, apertura del perfil y tamaños. En otra PC propone Solo registro; el apartado Windows prepara las rutas de su propio acceso y notas para el instalador. Abrir o guardar el asistente no mueve ventanas ni lee las notas. Tu preparación local confirmada se conserva.
 - **Ejemplo:** iniciás Windows y aparece tu espacio de trabajo. También podés abrir «Jonathan - Chrome» del escritorio para abrir Chrome y ese mismo archivo de notas, acomodado debajo de Propio Shift Tracker incluso si ya estaba abierto. Abrir las páginas no concede disponibilidad antes de tu horario. Ya confirmaste que el arranque funcionó después de reiniciar; esta preparación no se instala sola al entrar desde otra PC.
 
 ## 12. Cuenta, guardado y respaldo
@@ -450,13 +450,13 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 ### 65. Cuenta y perfil
 
 - **Qué hace:** permite entrar con Google y personalizar los datos de perfil disponibles. El acceso público por correo o usuario y contraseña está deshabilitado actualmente.
-- **Qué configurás:** cuenta, nombre, emoji y usuario en sus formularios.
+- **Qué configurás:** nombre y emoji en Tu perfil; Cuenta y acceso con Google permite guardar el usuario del perfil. El correo de Google es de solo lectura; cambiar el usuario no cambia el acceso ni el saludo.
 - **Ejemplo:** entrás desde otro navegador con la misma cuenta para recuperar tus registros guardados en la nube.
 
 ### 66. Guardado local y sincronización
 
 - **Qué hace:** conserva datos en el dispositivo y sincroniza la cuenta cuando hay conexión. Muestra problemas de guardado y pide decidir ante una divergencia real entre versiones.
-- **Qué configurás:** tu sesión y conexión; ante un conflicto elegís la versión que querés conservar.
+- **Qué configurás:** Ajustes → Guardado y recuperación de esta app muestra copia local, última revisión confirmada en nube, red y caché; Reconectar comprueba pendientes antes de subir. Ante una divergencia real elegís la versión, conservando una copia recuperable de la reemplazada. Las mismas llamadas en otro orden ya no provocan conflicto.
 - **Ejemplo:** hiciste cambios distintos en dos dispositivos. La aplicación puede pedirte cuál conservar, en vez de inventar una mezcla. El modo sin conexión tiene límites y no garantiza que la extensión pueda automatizar disponibilidad.
 
 ### 67. Respaldo completo JSON
@@ -480,7 +480,7 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 ### 70. App instalable y recuperación
 
 - **Qué hace:** la PWA permite abrir la aplicación como aplicación y conserva el shell necesario para su carga. El sistema de guardado incluye mecanismos de recuperación frente a fallos.
-- **Qué configurás:** instalación desde el navegador y las opciones de recuperación cuando la aplicación las ofrece.
+- **Qué configurás:** instalación desde el navegador; Ajustes → Guardado y recuperación explica caché, sesión y respaldo. Para abrir sin red debe existir la caché y una copia propia en este navegador. Instalar no crea otro respaldo ni mantiene despierta la PC. Google y sincronización requieren red.
 - **Ejemplo:** abrís la aplicación desde su icono. Para sincronizar y para coordinar disponibilidad con Propio seguís necesitando las condiciones de conexión y sesión correspondientes.
 
 ### 71. Estado de conexión y actividad de la extensión
@@ -492,7 +492,7 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 ### 72. Borrar la cuenta
 
 - **Qué hace:** elimina la cuenta y sus datos activos del servicio. Es una acción distinta de cerrar sesión, terminar turno o limpiar una vista local.
-- **Qué configurás:** la acción Borrar cuenta y datos en Ajustes exige confirmar; exportá antes tu JSON si querés conservar una copia.
+- **Qué configurás:** Ajustes → Borrar cuenta y datos ofrece Guardar mi respaldo antes de confirmar. Explica activos, copias locales propias y retención prevista de 31 días de copias históricas; conserva Google, Propio, JSON descargados y copias locales de otros dispositivos.
 - **Ejemplo:** decidís dejar de usar el servicio y eliminar tu cuenta. También se eliminan sus llamadas, turnos y finanzas activos; las copias históricas cifradas se retiran por su rotación, con retención prevista de 31 días.
 
 ## 13. Ayuda y apoyo al proyecto
@@ -508,7 +508,7 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 ### 74. Seguir trabajando al cambiar de pestaña
 
 - **Qué hace:** la extensión protege las páginas de trabajo contra el descarte por memoria y solicita lecturas actuales del ACW. Mantiene las prioridades de horario, pausas y Stop Calls manual.
-- **Qué configurás:** mantener abiertas Propio y Propio Shift Tracker, con la extensión activa. No necesitás otro contador.
+- **Qué configurás:** mantener abiertas Propio y Propio Shift Tracker con extensión 2.3.5 activa. Para transferir iniciadores a otra PC, pausás la anterior o activás Solo registro allí y habilitás la nueva. La nube concede un permiso por cuenta, que vence en hasta 30 segundos; sin lectura y permiso recientes no ejecuta clics. El registro continúa.
 - **Ejemplo:** dejás el ACW en 00:50 y consultás Linguee. El límite sigue siendo 03:00. Chrome puede demorar una comprobación; una PC suspendida o una lectura antigua no permiten prometer el inicio al segundo exacto.
 
 ### 75. Volumen general y sonidos propios
@@ -537,8 +537,8 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 
 ### 79. Uso con teclado y ayudas de accesibilidad
 
-- **Qué hace:** los controles habituales usan botones, campos y etiquetas que permiten navegación con teclado. La revisión completa de accesibilidad sigue pendiente en el plan; no se presenta como certificada.
-- **Qué configurás:** zoom del navegador y preferencias de accesibilidad del sistema, según lo que necesités.
+- **Qué hace:** navegación por teclado, salto al contenido, foco visible y restaurado, ayudas táctiles cerrables con Escape y objetivos táctiles ampliados. Barra y tarjeta anuncian el mismo estado, incluida una llamada pendiente de guardar, sin leer el reloj cada segundo. Se comprobaron reflow y paletas; no equivale a certificación humana con todo lector de pantalla.
+- **Qué configurás:** zoom del navegador, movimiento reducido del sistema y Vista esencial en Temas y colores.
 - **Ejemplo:** usás Tab para llegar a un botón y Enter para activarlo. Si un control no se alcanza o se recorta con zoom, es un caso para corregir, no una limitación que debás aceptar sin revisión.
 
 ## Una mañana completa con estas funciones
@@ -557,7 +557,7 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 
 - No acepta, rechaza ni cuelga llamadas por vos.
 - No confirma las reglas de Propio para redondear segundos ni garantiza su pago.
-- No coordina los iniciadores globalmente entre dos PCs ni dispone de un reloj servidor independiente para validar cambios arbitrarios de hora.
+- La coordinación de iniciadores exige web 642 y extensión 2.3.5 en ambas PCs. No impide clics manuales ni los de versiones antiguas. El permiso vence por hora servidor, pero los horarios y ACW no tienen certificación frente a cambios arbitrarios de reloj del sistema.
 - No obtiene promociones de Higher Rate de tu correo automáticamente.
 - No compra premios, paga gastos ni comprueba depósitos bancarios.
 - Abrir Chrome y acomodar ventanas es una configuración local de tu PC; el encendido automático de la PC lo configurás vos.

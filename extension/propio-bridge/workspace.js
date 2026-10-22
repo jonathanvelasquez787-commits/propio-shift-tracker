@@ -1,19 +1,15 @@
-const pages = {
-  portal: 'https://interpreters.propio-ls.com/portal',
-  interpreter: 'https://app.useinterpreter.com/',
-  tracker: 'https://propio-shift-tracker.vercel.app/',
-  dictionary: 'https://www.linguee.es/'
-};
+import { workspacePages, validateWorkspaceSettings } from './workspace-settings.js';
 const lockKey = 'workday-workspace-lock';
 
-export function workspaceBounds(screen, frameInset = 8, rightPaneHeightRatio = 1) {
+export function workspaceBounds(screen, frameInset = 8, rightPaneHeightRatio = 1, rightPaneWidthRatio = 5 / 16) {
   const width = Math.round(screen.availWidth), height = Math.round(screen.availHeight);
   if (!Number.isFinite(width) || !Number.isFinite(height) || width < 900 || height < 500) {
     throw new Error('Necesitás una pantalla de al menos 900 × 500 para esta distribución.');
   }
   const left = Math.round(screen.availLeft || 0), top = Math.round(screen.availTop || 0);
   const inset = Number.isFinite(frameInset) ? Math.max(0, Math.min(16, frameInset)) : 8;
-  const rightContentWidth = Math.max(320, Math.round(width * 5 / 16));
+  const widthRatio = Number.isFinite(rightPaneWidthRatio) && rightPaneWidthRatio >= .25 && rightPaneWidthRatio <= .5 ? rightPaneWidthRatio : 5 / 16;
+  const rightContentWidth = Math.max(320, Math.round(width * widthRatio));
   const rightWidth = rightContentWidth + 2 * inset;
   const ratio = typeof rightPaneHeightRatio === 'number' && Number.isFinite(rightPaneHeightRatio) && rightPaneHeightRatio >= .4 && rightPaneHeightRatio <= 1 ? rightPaneHeightRatio : 1;
   // Overlap invisible side borders and extend the bottom border past the work area.
@@ -23,11 +19,12 @@ export function workspaceBounds(screen, frameInset = 8, rightPaneHeightRatio = 1
   };
 }
 
-export async function arrangeWorkspace(api, screen, { at = Date.now(), frameInset = 8, rightPaneHeightRatio = 1, wait = ms => new Promise(resolve => setTimeout(resolve, ms)) } = {}) {
+export async function arrangeWorkspace(api, screen, { at = Date.now(), frameInset = 8, rightPaneHeightRatio = 1, rightPaneWidthRatio = 5 / 16, configuration = null, wait = ms => new Promise(resolve => setTimeout(resolve, ms)) } = {}) {
+  const pages = configuration ? validateWorkspaceSettings(configuration).pages : workspacePages;
   if (typeof api.tabs.createSplit !== 'function' || typeof api.tabs.unsplit !== 'function') {
     throw new Error('Chrome necesita tener disponible la vista dividida para extensiones (versión 155 o posterior).');
   }
-  const bounds = workspaceBounds(screen, frameInset, rightPaneHeightRatio);
+  const bounds = workspaceBounds(screen, frameInset, rightPaneHeightRatio, rightPaneWidthRatio);
   const launcher = await api.tabs.getCurrent();
   if (!launcher || launcher.incognito) throw new Error('Abrí el espacio de trabajo en tu perfil habitual de Chrome.');
   const owner = `${launcher.id}:${at}`;

@@ -32,9 +32,13 @@ function harness({ cloud = null, callRows = null, callsError = null, callsPageEr
       rpc: (name, payload) => new Promise((resolve) => requests.push({ name, payload, resolve })),
       from: (table) => ({ select: () => ({ eq: () => {
         if (table !== 'calls') return { maybeSingle: async () => ({ data: cloudReads++ ? cloudAfter : cloud, error: null }) };
-        const rows = callRows ?? cloud?.calls?.map((payload) => ({ payload })) ?? [];
+        let rows = callRows ?? cloud?.calls?.map((payload) => ({ call_id: String(payload.id), payload })) ?? [];
         const query = {
-          order: () => query,
+          order: (column) => {
+            assert.equal(column, 'call_id');
+            rows = [...rows].sort((a, b) => String(a.call_id ?? a.payload?.id).localeCompare(String(b.call_id ?? b.payload?.id)));
+            return query;
+          },
           range: async (from, to) => ({ data: rows.slice(from, Math.min(to + 1, from + maxRows)), count: includeCount ? rows.length : null, error: from ? callsPageError : callsError }),
           then: (resolve, reject) => Promise.resolve({ data: rows.slice(0, 1000), error: callsError }).then(resolve, reject),
         };
@@ -46,6 +50,51 @@ function harness({ cloud = null, callRows = null, callsError = null, callsPageEr
   vm.runInContext("onSync((type) => auditEvents.push(type));", Object.assign(context, { auditEvents: events }));
   return { values, sessionValues, requests, timers, events, run: (code) => vm.runInContext(code, context) };
 }
+
+test('reopening acknowledges an exit upload with an older local revision and calls returned in call_id order', async () => {
+  const snapshot = { state: { events: [{ id: 'event-2' }, { id: 'event-1' }] },
+    calls: [{ id: 'z-new', pay: '0.24', detail: { source: 'manual' } }, { id: 'a-old', pay: '0.12' }], settings: { goal: 45 } };
+  const cloud = { ...snapshot, updated_at: '2026-10-22T10:02:00Z' };
+  const h = harness({ cloud });
+  h.run(`adoptCloud(${JSON.stringify({ ...snapshot, updated_at: '2026-10-22T10:01:00Z' })}, 'audit'); markDirty();`);
+  const before = new Map(h.values);
+  const result = await h.run("resolveBoot('audit')");
+  assert.deepEqual(Array.from(result.cloud.calls, call => call.id), ['a-old', 'z-new']);
+  assert.equal(result.action, 'use-cloud');
+  assert.deepEqual(h.values, before);
+  assert.equal(h.requests.length, 0);
+  h.run(`adoptCloud(${JSON.stringify(result.cloud)}, 'audit')`);
+  assert.equal(h.run('readMeta().dirty'), false);
+  assert.equal(h.run('readMeta().lastSyncedUpdatedAt'), cloud.updated_at);
+  assert.equal(h.run("listRecoveryCopies('audit').length"), 0);
+});
+
+test('equivalent call order never hides changed payloads, identities, duplicate IDs or ordered state arrays', async () => {
+  const original = { state: { events: ['first', 'second'] }, calls: [{ id: 'z', pay: '0.24' }, { id: 'a', pay: '0.12' }], settings: { priorities: ['a', 'b'] } };
+  for (const change of [
+    value => { value.calls[0].pay = '0.25'; },
+    value => { value.calls[0].id = 'different'; },
+    value => { value.state.events.reverse(); },
+    value => { value.settings.priorities.reverse(); },
+    value => { value.calls.push({ id: 'z', pay: '0.24' }); },
+    value => { value.calls[0].id = 7; },
+  ]) {
+    const changed = structuredClone(original); change(changed);
+    const h = harness({ cloud: { ...changed, updated_at: 'new-base' } });
+    h.run(`adoptCloud(${JSON.stringify({ ...original, updated_at: 'old-base' })}, 'audit'); markDirty();`);
+    const before = new Map(h.values);
+    const result = await h.run("resolveBoot('audit')");
+    assert.equal(result.action, 'conflict');
+    assert.deepEqual(h.values, before);
+    assert.equal(h.requests.length, 0);
+  }
+  const h = harness();
+  assert.equal(h.run("sameSnapshot({calls:[{id:'same',pay:1},{id:'same',pay:2}]},{calls:[{id:'same',pay:2},{id:'same',pay:1}]})"), false);
+  assert.equal(h.run("sameSnapshot({calls:[{pay:1},{pay:2}]},{calls:[{pay:2},{pay:1}]})"), false);
+  assert.equal(h.run("sameSnapshot({calls:[{id:7,pay:1}]},{calls:[{id:'7',pay:1}]})"), false);
+  assert.equal(h.run("sameSnapshot({calls:[{id:'é',pay:1},{id:'é',pay:2}]},{calls:[{id:'é',pay:2},{id:'é',pay:1}]})"), true);
+  assert.equal(h.run(`sameSnapshot(JSON.parse('{"calls":[{"id":"a","__proto__":{"kept":1}}]}'), JSON.parse('{"calls":[{"id":"a","__proto__":{"kept":2}}]}'))`), false);
+});
 
 test('un fallo de lectura de llamadas no descarga el snapshot antiguo ni altera datos locales', async () => {
   const cloud = { state: { cloud: true }, calls: [], settings: {}, updated_at: 'cloud-base' };
@@ -108,7 +157,7 @@ test('sin conteo la descarga sigue hasta una página vacía aunque la API limite
   const h = harness({ cloud: { state: {}, calls: [], settings: {}, updated_at: 'cloud-base' }, callRows, maxRows: 200, includeCount: false });
   const result = await h.run("fetchCloud('audit')");
   assert.equal(result.calls.length, 505);
-  assert.equal(result.calls.at(-1).id, 'call-504');
+  assert.deepEqual(Array.from(result.calls, call => call.id), callRows.map(row => row.payload.id).sort((a, b) => a.localeCompare(b)));
 });
 
 test('un error de la RPC vigente no utiliza la escritura antigua ni confirma los cambios', async () => {
