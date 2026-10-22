@@ -1,8 +1,8 @@
 # Propio y el respaldo observado
 
 El diseño y la separación de registros se aprobaron el 21/10/2026. La web
-conserva dos fuentes vinculadas a una sola llamada; la extensión ya transmite los instantes observados. La extensión 2.3.2 solo
-compacta su ayuda; estos cambios de registro se implementan en la web.
+conserva dos fuentes vinculadas a una sola llamada; la extensión ya transmite los instantes observados. La extensión 2.3.3 aclara
+los nombres del popup; los cambios de presentación y registros están en la web.
 
 ## Datos y prioridades
 
@@ -32,7 +32,10 @@ detalle. El lápiz abre ese mismo detalle con la edición desplegada. El ACW
 lleva a la llamada que explica su cálculo, sin otra pantalla. No hay una
 segunda tarjeta de historial. El detalle distingue Propio, respaldo,
 diferencia de cierre y pago, y muestra el historial y milisegundos plegados.
-No se muestran controles de simulación de la maqueta en la app real.
+La ayuda «Cómo se registra una llamada en vivo» se consulta en ese mismo
+detalle. «Propio» identifica el historial oficial y «Medición guardada», el
+respaldo original. El redondeo solo estima el pago y conserva los segundos
+exactos. No se muestran controles de simulación de la maqueta en la app real.
 
 ## Ausencias y discrepancias
 

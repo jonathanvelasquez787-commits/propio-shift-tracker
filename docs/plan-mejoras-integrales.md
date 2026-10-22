@@ -8,6 +8,20 @@ no se considera rota por esa razón.
 
 ## Prioridad visual antes de continuar
 
+### Presentación nativa aprobada el 21–22/10
+
+Web 638 aplica el mockup que conserva identidad y layout general. Inicio
+retiene sus funciones habituales y ACW; preparación en Ajustes, jornada y
+desgloses en Reportes, ayuda en el detalle único de llamada. Se recupera azul
+en Fechas de pago y se compactan los casos señalados y otros ocho encontrados.
+La cuadrícula del calendario no se rediseña. Se revisan los nombres visibles
+y el popup 2.3.3 sin cambiar reglas automáticas ni contables.
+
+Ver [control visual](control-visual-11-vistas.md) y la guía de funciones para
+ubicaciones y evidencia. Esta entrega no cambia los 59 puntos funcionales
+publicados ni los 20 abiertos del plan original.
+
+
 ### Integración solicitada el 21/10
 
 El propietario pidió revisar exhaustivamente la repetición de información y
@@ -28,7 +42,7 @@ Instalación con respaldo y recarga confirmada por el propietario.
 - [x] Un solo editor para la meta del ciclo, con accesos contextuales.
 - [x] Un editor de promoción con alcance explícito de conservación o recálculo.
 - [x] Historial de Higher Rate por día con sus ventanas y llamadas, sin dos recorridos.
-- [x] Detalle de jornada integrado con Bloques y acciones, conservando los motivos.
+- [x] Detalle único de jornada con acceso desde Inicio; reubicado en Reportes en 638, conservando motivos y acciones.
 - [x] Configuración del apoyo sin llamadas en Avisos; reflexión en su llamada.
 - [x] Copias recuperables junto a importación/exportación de respaldo.
 - [x] Último reparto plegado junto al control automático de Finanzas.

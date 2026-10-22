@@ -3,7 +3,9 @@
 Aprobación del propietario, 20/10/2026: «Aprobadas». Referencia: el archivo
 externo `outputs/mockup-completo.html`, con once vistas y sus detalles.
 
-**11 de 11 vistas implementadas y comprobadas con datos ficticios.** La maqueta aprobada se
+Las once vistas tuvieron una entrega previa comprobada con datos ficticios. El
+propietario señaló después problemas de tamaño, texto y distribución; esa
+comprobación anterior no equivale a aceptación del resultado actual. La maqueta aprobada se
 comprobó en 66 combinaciones de tema/ancho; ese resultado pertenece a la
 maqueta y no certifica la implementación. Ninguna casilla se cierra por un
 build, una captura de la maqueta o la ausencia de desbordamiento solamente.
@@ -35,7 +37,7 @@ real implementado y comprobado, no a la aprobación.
   Comprobar silencio, aviso desactivado y archivos de audio personalizados.
 - [x] **Restaurar respaldo.** Comparación antes/después y alcance visible.
   Conservar copia previa, cancelación y rechazo de datos inválidos.
-- [x] **Disponibilidad automática — tool web.** Próxima acción y espera claras.
+- [x] **Disponibilidad automática — aplicación web.** Próxima acción y espera claras.
   Comprobar conexión pendiente/antigua, pausa manual, horario y descansos.
 - [x] **Ganancias.** Total y componentes distinguibles; conversión debajo.
   Comprobar moneda intercambiada, cero y estimación de una llamada activa.
@@ -75,3 +77,29 @@ aplicación compilada con cuenta ficticia; `integracion-qa.json` registra doce
 recorridos ES/EN, temas y anchos. `integracion-popup-qa.json` registra el popup
 real con API de Chrome simulada. La revisión no convierte la maqueta en prueba.
 La extensión 2.3.2 cambia su ayuda; el propietario confirmó su recarga.
+
+## Ajuste nativo aprobado el 21–22/10
+
+La referencia vigente es el mockup externo «propio-misma-interfaz.html». El
+propietario aprobó conservar el estilo y layout general; se descarta el mockup
+que cambiaba la composición global. Web 638 y extensión 2.3.3 mantienen sus
+versiones y responsabilidades separadas.
+
+- Inicio conserva llamadas, resumen de ganancias, ACW, Bloques/Llamadas y Logros.
+- Preparación y diagnóstico de disponibilidad en Ajustes, abiertos desde el estado
+  breve de Inicio. Las opciones automáticas siguen en el popup de Chrome.
+- Jornada y desgloses del día/ciclo en Reportes, una sola copia de cada bloque.
+- Ayuda de registro en el detalle único de llamada. Ambas fuentes y edición siguen allí.
+- Fechas de pago recupera azul; los controles de recibido siguen funcionando.
+- Tarjetas del ciclo, objetivos y Nivel/Racha conservan sus posiciones con altura
+  propia. Controles y lectura acotados en Finanzas, Logros, Horario y Calendario;
+  la cuadrícula del calendario queda intacta.
+
+Evidencia fuera de Git: «aprobado-qa.json» registra dieciséis recorridos
+ES/EN, claro/oscuro y 320/390/1200/1800 px. «final-scan-<tema>-<ancho>.json»
+registra trece secciones en ambos temas y 320/1800 px, con detalles abiertos,
+pago que conserva la reserva y ACW histórico sin contador en vivo. Capturas
+«final-*» y «aplicado-*» pertenecen a la aplicación compilada con datos
+ficticios; «aprobado-popup-qa.json» al popup real con API de Chrome simulada.
+967 pruebas y build correctos. La instalación, recarga y publicación se
+registran por separado, sin inferirlas de estas comprobaciones locales.

@@ -324,23 +324,20 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
-- **Prioridad visual del 20/10:** el propietario rechazó el resumen de Logros
-  en preparación y señaló pantallas anteriores con texto largo y plano.
-  No publicar la fase 9 con esa presentación. Hay una nueva propuesta de
-  11 pantallas fuera de Git, incluidos Logros, Avisos, respaldos, disponibilidad,
-  ganancias, Higher Rate, proyección, popup, horario, Finanzas y borrado de cuenta.
-  Mockup completo comprobado en ambos temas y 320/390/1200 px (66 vistas y
-  22 accesos de detalle). Las once vistas fueron aprobadas explícitamente el
-  20/10 con «Aprobadas»; aplicadas y publicadas en web 635 y popup 2.3.1.
-  Registrar implementación y capturas reales en
-  [control visual](docs/control-visual-11-vistas.md), sin dar por comprobada la
-  app a partir de la maqueta. No deshacer el trabajo ni los resguardos preparados.
+- **Presentación aprobada el 21–22/10:** se aplica la referencia que conserva
+  la identidad y distribución general, después del reclamo sobre texto y espacios
+  grandes. El diseño anterior que cambiaba la composición global queda descartado.
+  Disponibilidad detallada en Ajustes; jornada y desgloses en Reportes; ayuda de
+  registro dentro del detalle único de llamada. Inicio conserva sus controles,
+  ACW, resumen, Bloques/Llamadas y Logros. Las filas de pago recuperan el azul.
+  Ver [control visual](docs/control-visual-11-vistas.md). La aprobación de una
+  maqueta no certifica el resultado; conservar capturas de la aplicación real.
 
 - **Mejoras integrales aprobadas el 18/10:** ejecutar las recomendaciones de la
   evaluación de 79 funciones por fases; alcance y estado completo en
   [plan de mejoras](docs/plan-mejoras-integrales.md). 59 mejoras publicadas:
   fases 1–8 verificadas, incluido Finanzas, el diseño aprobado y Reportes,
-  Calendario y exportaciones. Web 635 publicada con las once vistas aprobadas y archivos públicos comprobados;
+  Calendario y exportaciones. Las entregas visuales posteriores no cierran tareas funcionales;
   siguen las mejoras funcionales de Logros, accesibilidad,
   cuenta e instalación.
   No perder las fases posteriores al
@@ -463,19 +460,21 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
-- App 637: integración aprobada de catorce puntos en los destinos existentes.
-  Una sola vista de llamada reúne comparación y edición; los pendientes viven
-  en el listado. Logros, metas, Higher Rate, jornada, apoyo, respaldos y reparto
-  reutilizan sus funciones, sin los resúmenes y formularios paralelos retirados.
-  Entrega en PR #99; comprobación de publicación y archivos del commit al desplegar.
-  Archivos de extensión 2.3.2 instalados con respaldo y configuración
-  personal conservada. El propietario confirmó la recarga y el popup 2.3.2.
-  Diseño compacto aprobado: resumen cerrado y preparación al pulsarlo.
-  El panel de disponibilidad está en la tool;
-  el popup de Chrome configura la extensión y esta transmite el estado a la web.
-  Resumen independiente retirado, sin build
-  mantenido. El historial oficial compartido y las funciones del tracker siguen
-  activos. Guía de 73 funciones en docs/guia-practica-tool-y-extension.md.
+- App 638: presentación aprobada con los mismos colores, navegación y layout
+  general. Ajustes contiene la preparación de disponibilidad; Inicio muestra solo
+  su estado breve y conserva ACW. Reportes reúne jornada y desgloses; el detalle
+  de llamada conserva ambas fuentes y su ayuda, en una sola ventana.
+  Compactación localizada de filas, controles y ayudas de Reportes, Finanzas,
+  Horario y Logros; alturas independientes para tarjetas. Calendario conserva
+  su cuadrícula. Fechas de pago recupera fondos, bordes e iconos azules.
+  Los textos distinguen Propio, Medición guardada y la extensión de Chrome;
+  se retira «tool» de los textos visibles. Sin cambio de datos ni esquema alojado.
+  Web y extensión tienen versiones propias: web 638.0.0 y popup 2.3.3.
+  Archivos 2.3.3 instalados con respaldo completo y ajustes personales conservados.
+  La última recarga confirmada por el propietario es 2.3.2; no dar por recargada
+  2.3.3 por instalar sus archivos. Guía de 73 funciones en
+  docs/guia-practica-tool-y-extension.md. Las veinte tareas funcionales siguen
+  abiertas en su plan.
 - Google es la entrada pública. Formularios deshabilitados de login/registro y
   solicitud de contraseña retirados; se conserva recuperación de enlaces emitidos,
   perfil, cierre de sesión y el endpoint heredado protegido con sus regresiones.
@@ -499,6 +498,22 @@ futura opera bajo esto, sin excepción:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v638 — Presentación nativa aprobada y ubicaciones claras.**
+
+- Inicio conserva ACW y sus funciones habituales; los detalles añadidos usan
+  Ajustes, Reportes y la ventana existente de llamada, sin copias paralelas.
+- Filas de pago azules, tarjetas con altura propia, etiquetas y valores cercanos,
+  controles proporcionados y ayudas secundarias plegadas. Mismos tokens y layout
+  general. La cuadrícula de Calendario conserva su tamaño y distribución.
+- 967 pruebas correctas; build, idiomas, módulos y wiring verificados. Dieciséis
+  recorridos compilados ES/EN, temas y 320/390/1200/1800 px; otras 52 capturas
+  de trece secciones en ambos temas y 320/1800 px. Pago conserva reserva y el
+  día histórico no muestra el ACW en vivo. Popup 2.3.3 comprobado con API de
+  Chrome simulada en ambos temas. Evidencia externa a Git; no son llamadas reales.
+- Extensión 2.3.3 cambia textos del popup; no modifica la detección de llamadas,
+  los tiempos ni la disponibilidad. Instalación y publicación se comprueban
+  por separado; una copia de archivos no confirma la recarga en Chrome.
 
 **v637 — Respaldo observado e integración en funciones existentes.**
 
@@ -532,16 +547,3 @@ futura opera bajo esto, sin excepción:
 - 951 pruebas y doce recorridos compilados ES/EN, temas y 320/390/1200 px.
   PR #98 publicado, CI de PR/main y traducciones correctos; producción READY
   y archivos del mismo SHA verificados. Ver docs/redondeo-de-estimaciones.md.
-
-**v635 — Presentación aprobada de once vistas publicada.**
-
-- Diseño aprobado aplicado a la web y al popup. Disponibilidad con contador y
-  texto en una fila compacta, según el ajuste posterior del propietario.
-- 947 pruebas correctas y doce recorridos ES/EN, claro/oscuro y 320/390/1200 px.
-  Popup comprobado en ambos temas con API de Chrome simulada. Revisión visual
-  detectó y corrigió posiciones de grid, ancho de Logros y contraste de acciones.
-- Web 635.0.0 publicada: PR #97, CI de PR/main y traducciones correctos,
-  producción READY y ocho archivos públicos del mismo SHA comprobados. Extensión
-  2.3.1 instalada con respaldo; el propietario confirmó la recarga y su versión.
-  Las veinte mejoras funcionales abiertas siguen en su plan.
-  Ver docs/presentacion-aprobada.md y docs/control-visual-11-vistas.md.

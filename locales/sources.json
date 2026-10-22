@@ -51,6 +51,12 @@
       "app.html"
     ]
   },
+  "s_012fad36": {
+    "source": "Idioma",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_013781d1": {
     "source": "Registro automático apagado",
     "files": [
@@ -71,6 +77,12 @@
   },
   "s_0163610f": {
     "source": "Pendiente de pagar del presupuesto",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
+  "s_01652e8c": {
+    "source": "Qué cambia al registrar o reservar",
     "files": [
       "js/finance-planning.js"
     ]
@@ -145,6 +157,12 @@
     "source": "Intentar acceder a datos de otras cuentas, o sondear la seguridad del servicio sin autorización escrita.",
     "files": [
       "terminos.html"
+    ]
+  },
+  "s_030f01aa": {
+    "source": "Planificá Trabajo, Break y Lunch. En Trabajo podés fijar una meta de minutos en llamada.",
+    "files": [
+      "app.html"
     ]
   },
   "s_032f5cdf": {
@@ -455,12 +473,6 @@
       "js/accounting-export.js"
     ]
   },
-  "s_07934c06": {
-    "source": "{{v0}} programado hasta {{v1}}. No hay una pausa activa registrada en la tool; se respeta el horario.",
-    "files": [
-      "js/automation-ui.js"
-    ]
-  },
   "s_07aef84d": {
     "source": "{{v0}} llamadas completadas · buen golpe.",
     "files": [
@@ -524,12 +536,6 @@
   },
   "s_08814f8e": {
     "source": "Productividad semanal",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_0891d230": {
-    "source": "Ver tool",
     "files": [
       "app.html"
     ]
@@ -653,12 +659,6 @@
     "source": "Se sumó a tu perfil.",
     "files": [
       "js/game.js"
-    ]
-  },
-  "s_09df9e7b": {
-    "source": "🗓️ Configura Inicio/Fin del turno y agrega bloques de Trabajo/Break/Lunch con su hora — el resto del turno sin bloque queda sin plan. \"Bloques del día\" compara esto contra lo que hiciste de verdad.",
-    "files": [
-      "app.html"
     ]
   },
   "s_09fa5f7d": {
@@ -866,11 +866,10 @@
       "js/app-main.js"
     ]
   },
-  "s_0c6b6d58": {
-    "source": "Los colores actuales de la tool",
+  "s_0c6b6eed": {
+    "source": "De 0 a 39 segundos se conservan los minutos completos; desde 40 segundos se suma un minuto. Ejemplo: 7:39 → 7 min y 7:40 → 8 min. La duración exacta se conserva.",
     "files": [
-      "app.html",
-      "js/theme-palettes.js"
+      "app.html"
     ]
   },
   "s_0c874c8e": {
@@ -943,12 +942,6 @@
       "js/game.js"
     ]
   },
-  "s_0d3c1462": {
-    "source": "Los componentes se muestran antes de límites y sellos. El total del día respeta el tope de {{v0}} XP y el cierre guardado. Corregir o borrar llamadas puede ajustar el progreso; no vuelve a cobrar una recompensa ya reclamada.",
-    "files": [
-      "js/game-review.js"
-    ]
-  },
   "s_0d4512ac": {
     "source": "Gastos",
     "files": [
@@ -1019,6 +1012,12 @@
     "source": "Sin Break planeado hoy",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_0e4a1686": {
+    "source": "Los componentes se muestran antes de límites y sellos. Se respeta el cierre guardado. Corregir o borrar llamadas puede ajustar el progreso; una recompensa reclamada no se cobra otra vez.",
+    "files": [
+      "js/game-review.js"
     ]
   },
   "s_0e4fcc67": {
@@ -1282,6 +1281,12 @@
       "app.html"
     ]
   },
+  "s_123e4440": {
+    "source": "El pago se registra por fecha y no libera la reserva.",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
   "s_128fc70c": {
     "source": "Retomaste después de una llamada difícil · ese paso cuenta",
     "files": [
@@ -1477,13 +1482,6 @@
       "terminos.html"
     ]
   },
-  "s_15efa16e": {
-    "source": "Conectá la extensión para ver su próxima acción. Los controles manuales siguen disponibles.",
-    "files": [
-      "app.html",
-      "js/automation-ui.js"
-    ]
-  },
   "s_160f1d9d": {
     "source": "Llamada guardada ({{v0}}) — edítala en Tabla de llamadas si hace falta",
     "files": [
@@ -1555,18 +1553,6 @@
     "files": [
       "js/app-main.js",
       "js/higher-rate-review.js"
-    ]
-  },
-  "s_1742b002": {
-    "source": "Próximo intento de disponibilidad",
-    "files": [
-      "js/automation-ui.js"
-    ]
-  },
-  "s_17482183": {
-    "source": "Reinicia los datos de TODOS los días y los ajustes de la tool. El cambio se sincroniza con tu cuenta; la cuenta y las opciones de la extensión se conservan.",
-    "files": [
-      "app.html"
     ]
   },
   "s_174c8eb2": {
@@ -2506,12 +2492,6 @@
       "js/automation-ui.js"
     ]
   },
-  "s_24d37ec6": {
-    "source": "Extensión de Chrome · estado en tu tool",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_25055385": {
     "source": "{{v13}}/{{v14}}",
     "files": [
@@ -2576,13 +2556,6 @@
     "source": "{{v4}}{{v5}}%",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_2679a0fc": {
-    "source": "Esperando información de la extensión",
-    "files": [
-      "app.html",
-      "js/automation-ui.js"
     ]
   },
   "s_26813a20": {
@@ -2650,12 +2623,6 @@
     "source": "Sin comparación disponible con ayer",
     "files": [
       "js/reports.js"
-    ]
-  },
-  "s_27788c82": {
-    "source": "Incluye llamadas, turnos, pausas, horario, metas, Finanzas y progreso de juego de la tool.",
-    "files": [
-      "js/boot.js"
     ]
   },
   "s_278307a9": {
@@ -3002,6 +2969,18 @@
       "js/call-review-view.js"
     ]
   },
+  "s_2cbb0df7": {
+    "source": "Plantilla: tu horario semanal. Semana específica: una excepción guardada aparte.",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_2cc50cea": {
+    "source": "El respaldo excede el tamaño permitido. Elegí un respaldo JSON de Propio Shift Tracker.",
+    "files": [
+      "js/backup-recovery.js"
+    ]
+  },
   "s_2ce32aec": {
     "source": "de esa semana",
     "files": [
@@ -3191,12 +3170,6 @@
     "source": "Sonidos arcade",
     "files": [
       "app.html"
-    ]
-  },
-  "s_2f9b3105": {
-    "source": "Final de tu tool",
-    "files": [
-      "js/call-records-view.js"
     ]
   },
   "s_2fa0ade4": {
@@ -3439,6 +3412,12 @@
       "js/game-battle.js"
     ]
   },
+  "s_330370b0": {
+    "source": "Omitir reserva automática excluye este gasto del reparto; no registra un pago.",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
   "s_3324811e": {
     "source": "Cómo querés volver",
     "files": [
@@ -3575,12 +3554,6 @@
       "js/pay-receipts.js"
     ]
   },
-  "s_34f7bda2": {
-    "source": "Idioma de la tool",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_35249ea0": {
     "source": "6. Tus derechos",
     "files": [
@@ -3671,6 +3644,12 @@
       "js/positive-reinforcement.js"
     ]
   },
+  "s_36b651f0": {
+    "source": "Próximo intento",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_36c195a4": {
     "source": "Hitos",
     "files": [
@@ -3719,16 +3698,16 @@
       "js/pay-receipts.js"
     ]
   },
+  "s_3741f807": {
+    "source": "Pagos agrupados por fecha, sin saldo mensual calculado.",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
   "s_374d8cb3": {
     "source": "Moneda:",
     "files": [
       "app.html"
-    ]
-  },
-  "s_3758b709": {
-    "source": "Se reinician todos los días, llamadas, turnos, pausas, Logros, Finanzas, horario, metas y perfil de la tool.",
-    "files": [
-      "js/backup-recovery.js"
     ]
   },
   "s_3770dabd": {
@@ -3808,12 +3787,6 @@
     "source": "Pago estimado",
     "files": [
       "js/call-records-view.js"
-    ]
-  },
-  "s_38e6f698": {
-    "source": "Suena al terminar y guardar desde la tool. La sincronización de la extensión es silenciosa.",
-    "files": [
-      "app.html"
     ]
   },
   "s_39096e35": {
@@ -4139,12 +4112,6 @@
       "js/call-table-view.js"
     ]
   },
-  "s_3e3c5557": {
-    "source": "La duración prevista de {{v0}} ya se cumplió. Esperando confirmar su cierre en el tracker.",
-    "files": [
-      "js/automation-ui.js"
-    ]
-  },
   "s_3e7a0773": {
     "source": "Bonos de juego",
     "files": [
@@ -4229,12 +4196,6 @@
       "js/shift-work-review.js"
     ]
   },
-  "s_3fde747f": {
-    "source": "Al alcanzar {{v0}} minutos de ACW, esta extensión intentará pulsar Start Calls.",
-    "files": [
-      "js/automation-ui.js"
-    ]
-  },
   "s_3ff91443": {
     "source": "Importe del pago",
     "files": [
@@ -4271,12 +4232,6 @@
       "js/game.js"
     ]
   },
-  "s_40f9c3e3": {
-    "source": "Se eliminan tu cuenta y sus datos activos de la tool.",
-    "files": [
-      "js/boot.js"
-    ]
-  },
   "s_411234a6": {
     "source": "Importación",
     "files": [
@@ -4287,6 +4242,12 @@
     "source": "Impulso estable · tu caja de 5 llamadas se conserva",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_411a658a": {
+    "source": "en",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_412deadf": {
@@ -4484,12 +4445,6 @@
       "js/game.js"
     ]
   },
-  "s_443dab3f": {
-    "source": "Mueve TODOS los bloques de hoy (más Inicio/Fin del turno) la misma cantidad de tiempo, sin perder el orden ni la duración de cada uno.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_44760121": {
     "source": "Cuenta",
     "files": [
@@ -4600,6 +4555,12 @@
       "js/app-main.js"
     ]
   },
+  "s_45ebadcb": {
+    "source": "Medición exacta · pago estimado",
+    "files": [
+      "js/call-table-view.js"
+    ]
+  },
   "s_45f33874": {
     "source": "La extensión deja un intervalo entre intentos de disponibilidad.",
     "files": [
@@ -4655,14 +4616,14 @@
       "js/positive-reinforcement.js"
     ]
   },
-  "s_46c0ec8d": {
-    "source": "Terminá la pausa en la tool y pulsá Start Calls en Propio cuando quieras volver.",
-    "files": [
-      "js/automation-ui.js"
-    ]
-  },
   "s_46d21443": {
     "source": "Trofeos",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_46fdfa44": {
+    "source": "compara minutos y meta de esa fecha.",
     "files": [
       "app.html"
     ]
@@ -4972,6 +4933,12 @@
     "source": "Corregida por vos",
     "files": [
       "js/call-table-view.js"
+    ]
+  },
+  "s_4b2e2528": {
+    "source": "Elegí cómo se ve la aplicación",
+    "files": [
+      "app.html"
     ]
   },
   "s_4b3c5b1d": {
@@ -5390,6 +5357,12 @@
       "js/settings.js"
     ]
   },
+  "s_51aa4a34": {
+    "source": "Incluye llamadas, turnos, pausas, horario, metas, Finanzas y Logros.",
+    "files": [
+      "js/boot.js"
+    ]
+  },
   "s_51b83c0b": {
     "source": "Recompensa guardada",
     "files": [
@@ -5790,16 +5763,16 @@
       "js/game.js"
     ]
   },
-  "s_572fe925": {
-    "source": "Clasificación",
+  "s_571a7b4a": {
+    "source": "Pago estimado.",
     "files": [
       "app.html"
     ]
   },
-  "s_574313b3": {
-    "source": "Recargá el tracker cuando estés libre para compartir su ACW actual con la extensión.",
+  "s_572fe925": {
+    "source": "Clasificación",
     "files": [
-      "js/automation-ui.js"
+      "app.html"
     ]
   },
   "s_57494302": {
@@ -5831,12 +5804,6 @@
     "source": "Vaciado del día",
     "files": [
       "js/call-recovery.js"
-    ]
-  },
-  "s_58485f56": {
-    "source": "Si esta tool te ayuda, puedes apoyar su desarrollo.",
-    "files": [
-      "app.html"
     ]
   },
   "s_584dcf45": {
@@ -5985,6 +5952,12 @@
       "js/game-battle.js"
     ]
   },
+  "s_59c040e8": {
+    "source": "Historial de Propio.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_59cbdf10": {
     "source": "Cuernos dorados",
     "files": [
@@ -6009,8 +5982,8 @@
       "js/calls.js"
     ]
   },
-  "s_5a6c802a": {
-    "source": "Meta diaria de la tool",
+  "s_5a827d1b": {
+    "source": "según tu horario o tu elección.",
     "files": [
       "app.html"
     ]
@@ -6131,16 +6104,16 @@
       "js/higher-rate-review.js"
     ]
   },
+  "s_5da9c766": {
+    "source": "Recargá Propio Shift Tracker cuando estés libre para compartir su ACW actual con la extensión de Chrome.",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_5deee299": {
     "source": "Un día libre/sin turno no corta la racha (se salta)",
     "files": [
       "js/reports.js"
-    ]
-  },
-  "s_5dfb58cd": {
-    "source": "Elige cómo se ve tu tool",
-    "files": [
-      "app.html"
     ]
   },
   "s_5e247b63": {
@@ -6357,6 +6330,12 @@
     "source": "Esperando tu sesión de Propio",
     "files": [
       "js/automation-ui.js"
+    ]
+  },
+  "s_61743d69": {
+    "source": "Ganancias del día",
+    "files": [
+      "app.html"
     ]
   },
   "s_618438af": {
@@ -6663,6 +6642,12 @@
     "source": "Rango personalizado",
     "files": [
       "app.html"
+    ]
+  },
+  "s_6641a7b3": {
+    "source": "Tope diario: {{v0}} XP.",
+    "files": [
+      "js/game-review.js"
     ]
   },
   "s_66460e29": {
@@ -7115,6 +7100,12 @@
       "js/game.js"
     ]
   },
+  "s_6e7b53fb": {
+    "source": "Terminá la pausa en Inicio y pulsá Start Calls en Propio cuando quieras volver.",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_6e806508": {
     "source": "Tu horario planeado. Si llegas tarde o te pasas de un break, aquí se ve la diferencia contra el plan.",
     "files": [
@@ -7257,6 +7248,12 @@
       "js/game.js"
     ]
   },
+  "s_706f667a": {
+    "source": "Reinicia todos los días y los ajustes de Propio Shift Tracker. Se sincroniza con tu cuenta; conserva la cuenta y las opciones de la extensión de Chrome.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_7084d3b4": {
     "source": "No quedan días laborales en el ciclo.",
     "files": [
@@ -7267,12 +7264,6 @@
     "source": "ACW",
     "files": [
       "app.html"
-    ]
-  },
-  "s_709a05d1": {
-    "source": "Sin llamadas elegibles, el XP del día es cero. Importar llamadas históricas no concede XP retroactivo.",
-    "files": [
-      "js/game-review.js"
     ]
   },
   "s_70a7a727": {
@@ -7303,6 +7294,12 @@
     "source": "Racha de los últimos siete días",
     "files": [
       "app.html"
+    ]
+  },
+  "s_71310300": {
+    "source": "Al alcanzar {{v0}} minutos de ACW, la extensión de Chrome intentará pulsar Start Calls.",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_7166a73f": {
@@ -7702,6 +7699,12 @@
       "app.html"
     ]
   },
+  "s_7709b5f5": {
+    "source": "Se eliminan tu cuenta y sus datos activos de Propio Shift Tracker.",
+    "files": [
+      "js/boot.js"
+    ]
+  },
   "s_77134979": {
     "source": "Los porcentajes deben sumar 100% y estar entre 0 y 100.",
     "files": [
@@ -7852,12 +7855,6 @@
       "js/finance.js"
     ]
   },
-  "s_79952c7c": {
-    "source": "Ver jornada: ACW, pausas y adherencia",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_799ffcda": {
     "source": "Inicio",
     "files": [
@@ -7914,6 +7911,12 @@
     "source": "Manuales",
     "files": [
       "app.html"
+    ]
+  },
+  "s_7a7a27d9": {
+    "source": "Activá Registrar mi actividad en la extensión de Chrome para usar las opciones automáticas.",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_7a80cfd2": {
@@ -8010,6 +8013,12 @@
     "source": "El ajuste no puede pasar de +12h de una sola vez.",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_7bc511f5": {
+    "source": "Libre:",
+    "files": [
+      "app.html"
     ]
   },
   "s_7bcfb42f": {
@@ -8319,12 +8328,6 @@
     "source": "Continuar conserva el inicio anterior y marca el hueco como interrupción accidental.",
     "files": [
       "js/shift-work-review.js"
-    ]
-  },
-  "s_80399c91": {
-    "source": "Según tu tool",
-    "files": [
-      "js/app-main.js"
     ]
   },
   "s_8043d60f": {
@@ -8676,6 +8679,12 @@
       "js/schedule.js"
     ]
   },
+  "s_85313e20": {
+    "source": "Se reinician llamadas, turnos, pausas, Logros, Finanzas, horario, metas y perfil de todos los días.",
+    "files": [
+      "js/backup-recovery.js"
+    ]
+  },
   "s_85326291": {
     "source": "Revisar vínculo",
     "files": [
@@ -8889,12 +8898,6 @@
       "js/call-review-view.js"
     ]
   },
-  "s_8844b8db": {
-    "source": "Pago estimado: de 0 a 39 segundos se conservan los minutos completos; desde 40 segundos se suma un minuto. La duración observada no se redondea.",
-    "files": [
-      "js/call-records-view.js"
-    ]
-  },
   "s_885e114b": {
     "source": "11:40 – 12:00 · tomado a tiempo",
     "files": [
@@ -8929,6 +8932,12 @@
     "source": "Vidas del héroe",
     "files": [
       "js/game-battle.js"
+    ]
+  },
+  "s_88ca6f96": {
+    "source": "Las pausas terminan cuando pulsás Terminar Break o Terminar Lunch en Inicio.",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_88d5b902": {
@@ -8981,6 +8990,12 @@
   },
   "s_897c8e66": {
     "source": "Ajustes generales",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_89a7a83f": {
+    "source": "Desplaza inicio, final y bloques por igual, conservando orden y duración.",
     "files": [
       "app.html"
     ]
@@ -9046,6 +9061,12 @@
       "js/call-review-view.js"
     ]
   },
+  "s_8abfee19": {
+    "source": "La duración prevista de {{v0}} ya se cumplió. Esperando confirmar su cierre en Inicio.",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_8acbc5e6": {
     "source": "Sigue así, ya vas a la mitad.",
     "files": [
@@ -9086,6 +9107,13 @@
     "source": "Confirmando la próxima acción",
     "files": [
       "js/automation-ui.js"
+    ]
+  },
+  "s_8b49bfc5": {
+    "source": "Los colores actuales de la aplicación",
+    "files": [
+      "app.html",
+      "js/theme-palettes.js"
     ]
   },
   "s_8b946df1": {
@@ -9160,6 +9188,13 @@
     "source": "Cuadro de texto limpiado",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_8c626ae6": {
+    "source": "Sin confirmar",
+    "files": [
+      "app.html",
+      "js/automation-ui.js"
     ]
   },
   "s_8c7521a8": {
@@ -9260,12 +9295,6 @@
   },
   "s_8d8726c3": {
     "source": "Quitar nota",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_8db17a27": {
-    "source": "Sin datos: no hay turno ni llamadas registrados. No equivale a una meta incumplida. Libre: así figura en tu horario o en el estado elegido por vos. Con actividad: el color compara los minutos con la meta guardada para esa fecha.",
     "files": [
       "app.html"
     ]
@@ -9460,12 +9489,6 @@
       "app.html"
     ]
   },
-  "s_90685751": {
-    "source": "Este control excluye el gasto del reparto automático. No registra un pago.",
-    "files": [
-      "js/finance-planning.js"
-    ]
-  },
   "s_90899808": {
     "source": "−{{v0}} {{v1}}",
     "files": [
@@ -9486,6 +9509,12 @@
   },
   "s_909f57a6": {
     "source": "Trabajo:",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_90a590c0": {
+    "source": "Si esta aplicación te ayuda, podés apoyar su desarrollo.",
     "files": [
       "app.html"
     ]
@@ -9865,12 +9894,6 @@
       "js/call-review-view.js"
     ]
   },
-  "s_96158d1c": {
-    "source": "Tu tool conserva la llamada",
-    "files": [
-      "js/call-records-view.js"
-    ]
-  },
   "s_962ed7ff": {
     "source": "Entra o crea tu cuenta con Google. No necesitas una contraseña de esta app.",
     "files": [
@@ -9888,12 +9911,6 @@
     "source": "Abriendo tu turno…",
     "files": [
       "js/boot.js"
-    ]
-  },
-  "s_9665bdd8": {
-    "source": "El tracker necesita actualizarse",
-    "files": [
-      "js/automation-ui.js"
     ]
   },
   "s_9668738b": {
@@ -10550,6 +10567,12 @@
       "app.html"
     ]
   },
+  "s_a0e258d4": {
+    "source": "Sin datos:",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_a0f62742": {
     "source": "Ajustes",
     "files": [
@@ -10648,6 +10671,12 @@
       "terminos.html"
     ]
   },
+  "s_a1e41c29": {
+    "source": "La medición original sigue guardada",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_a1f32861": {
     "source": "Regreso puntual de {pause} · listo para continuar{xp}",
     "files": [
@@ -10687,6 +10716,12 @@
   },
   "s_a2b4318d": {
     "source": "Paletas de colores",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_a2b49e3a": {
+    "source": "Con actividad:",
     "files": [
       "app.html"
     ]
@@ -10801,12 +10836,6 @@
       "app.html"
     ]
   },
-  "s_a465d7e5": {
-    "source": "Higher Rate añade minutos equivalentes al evaluar el color. Los minutos de llamadas y el bono se muestran por separado. La leyenda numérica del mes usa tu meta general actual; una fecha puede conservar otra meta.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_a47304c2": {
     "source": "TE LO GANASTE",
     "files": [
@@ -10842,6 +10871,18 @@
     "files": [
       "app.html",
       "js/notification-review.js"
+    ]
+  },
+  "s_a4ec2905": {
+    "source": "La aplicación necesita actualizarse",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
+  "s_a4f7815d": {
+    "source": "Esperado según tus registros",
+    "files": [
+      "js/pay-receipts.js"
     ]
   },
   "s_a51c9500": {
@@ -11115,6 +11156,13 @@
       "js/backup-recovery.js"
     ]
   },
+  "s_a96f7c8e": {
+    "source": "Sin conexión confirmada",
+    "files": [
+      "app.html",
+      "js/automation-ui.js"
+    ]
+  },
   "s_a99b925e": {
     "source": "No se pudieron preparar tus datos.",
     "files": [
@@ -11125,6 +11173,13 @@
     "source": "Lanzacohetes",
     "files": [
       "js/game-battle.js"
+    ]
+  },
+  "s_a9fbaa32": {
+    "source": "Abrí Propio y comprobá que la extensión de Chrome esté activada. Los controles manuales siguen disponibles.",
+    "files": [
+      "app.html",
+      "js/automation-ui.js"
     ]
   },
   "s_a9ff8c6c": {
@@ -11264,12 +11319,6 @@
       "terminos.html"
     ]
   },
-  "s_abd98790": {
-    "source": "Tu tool",
-    "files": [
-      "js/call-records-view.js"
-    ]
-  },
   "s_abf5c610": {
     "source": "Borra nivel, XP, racha, trofeos, accesorios y monstruos derrotados. Tus llamadas, turnos, metas y finanzas no se tocan.",
     "files": [
@@ -11359,6 +11408,7 @@
   "s_ad75d38b": {
     "source": "Ganancias del ciclo",
     "files": [
+      "app.html",
       "js/app-main.js"
     ]
   },
@@ -11404,10 +11454,10 @@
       "js/call-records-view.js"
     ]
   },
-  "s_aec4921e": {
-    "source": "La tool conserva el inicio, el final y la duración observados con milisegundos. El redondeo desde 40 segundos se usa para estimar el pago. Al llegar el historial, Propio tiene prioridad y la observación original queda como respaldo.",
+  "s_ae910331": {
+    "source": "Cuenta y datos de Propio Shift Tracker",
     "files": [
-      "app.html"
+      "js/boot.js"
     ]
   },
   "s_aeca0c44": {
@@ -11456,6 +11506,12 @@
     "source": "El acceso no está disponible temporalmente. Espera un minuto y vuelve a intentar.",
     "files": [
       "js/auth.js"
+    ]
+  },
+  "s_af8b1b79": {
+    "source": "Ver jornada →",
+    "files": [
+      "app.html"
     ]
   },
   "s_afa97f45": {
@@ -11891,12 +11947,6 @@
       "js/app-main.js"
     ]
   },
-  "s_b56ab8eb": {
-    "source": "Cada franja de tu turno es un bloque. Agrega uno por cada Trabajo, Break o Lunch que planees, con su hora de inicio y de fin — el resto del turno que no cubras con ningún bloque simplemente queda sin plan, sin afectar tu Adherencia. Un bloque de Trabajo puede llevar además una \"meta productiva\": cuántos minutos en llamada esperas lograr en ese bloque.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_b58db35e": {
     "source": "Califican o conservan un bono de esta ventana ({{v8}})",
     "files": [
@@ -11968,6 +12018,12 @@
     "source": "{{v0}}/{{v1}} min",
     "files": [
       "js/reports.js"
+    ]
+  },
+  "s_b6becd9b": {
+    "source": "Sus datos tienen prioridad. La medición original queda guardada como respaldo.",
+    "files": [
+      "app.html"
     ]
   },
   "s_b6c21d45": {
@@ -12130,12 +12186,6 @@
       "js/finance.js"
     ]
   },
-  "s_b9d0fe4e": {
-    "source": "Activá Registrar en mi tracker en la extensión para usar sus automatismos.",
-    "files": [
-      "js/automation-ui.js"
-    ]
-  },
   "s_b9fe5bbf": {
     "source": "Herramientas avanzadas",
     "files": [
@@ -12189,6 +12239,12 @@
     "source": "Ahorro (%)",
     "files": [
       "app.html"
+    ]
+  },
+  "s_bb2b86de": {
+    "source": "{{v0}} programado hasta {{v1}}. No hay una pausa activa registrada; se respeta el horario.",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_bb340588": {
@@ -12705,12 +12761,6 @@
       "js/positive-reinforcement.js"
     ]
   },
-  "s_c346278a": {
-    "source": "\"Plantilla\" es tu horario de siempre — se repite igual cada semana. Usa \"Semana específica\" solo cuando UNA semana en particular va a ser distinta de tu plantilla (ej. cambiaste de turno por una semana nada más) — se guarda aparte, sin tocar tu plantilla de siempre.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_c37a0766": {
     "source": "Meta $0.00",
     "files": [
@@ -12830,12 +12880,6 @@
       "js/backup-recovery.js"
     ]
   },
-  "s_c5772eb6": {
-    "source": "Tracker y cuenta reconocidos",
-    "files": [
-      "js/automation-ui.js"
-    ]
-  },
   "s_c58a10f3": {
     "source": "Ej. L, HNL, MXN...",
     "files": [
@@ -12847,12 +12891,6 @@
     "files": [
       "js/game.js",
       "js/shift-work-review.js"
-    ]
-  },
-  "s_c59bfba5": {
-    "source": "Terminá la pausa en la tool; después la extensión intentará ponerte disponible dentro del turno.",
-    "files": [
-      "js/automation-ui.js"
     ]
   },
   "s_c5a7a1c5": {
@@ -13116,12 +13154,6 @@
       "app.html"
     ]
   },
-  "s_c9143998": {
-    "source": "Esperado según la tool",
-    "files": [
-      "js/pay-receipts.js"
-    ]
-  },
   "s_c9263b18": {
     "source": "PREMIO FÍSICO",
     "files": [
@@ -13270,12 +13302,6 @@
       "js/reinforcement-feedback.js"
     ]
   },
-  "s_cbc8793b": {
-    "source": "Original: Los colores actuales de la tool",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_cc4a5d5d": {
     "source": "#2FD5FF",
     "files": [
@@ -13373,6 +13399,12 @@
       "js/game.js"
     ]
   },
+  "s_cdde3e56": {
+    "source": "Abrir aplicación",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_cde3f117": {
     "source": "Suena después de guardar una llamada nueva. Editar una llamada existente no reproduce este aviso.",
     "files": [
@@ -13385,6 +13417,12 @@
       "js/call-recovery.js"
     ]
   },
+  "s_cdf4c2a8": {
+    "source": "Plantilla se repite cada semana. Semana específica guarda una excepción sin cambiar la plantilla. Configurá inicio y final; agregá bloques de Trabajo, Break o Lunch con su hora y duración. El tiempo sin bloques queda sin plan y no afecta la adherencia. Trabajo puede tener una meta de minutos en llamada.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_cdf62580": {
     "source": "Bufanda de racha",
     "files": [
@@ -13395,12 +13433,6 @@
     "source": "Cosméticos de ciclo",
     "files": [
       "js/game.js"
-    ]
-  },
-  "s_cdfc3ae0": {
-    "source": "Medido · tool; pago estimado",
-    "files": [
-      "js/call-table-view.js"
     ]
   },
   "s_ce065b21": {
@@ -13453,6 +13485,12 @@
   },
   "s_ce3ed148": {
     "source": "#320A6B",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_ce44b83e": {
+    "source": "Base registrada, estimaciones y Higher Rate.",
     "files": [
       "app.html"
     ]
@@ -13645,6 +13683,12 @@
       "js/app-main.js"
     ]
   },
+  "s_d0fe9e63": {
+    "source": "Cómo se comparan los importes",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_d0fead6d": {
     "source": "{{v0}} histórica(s)",
     "files": [
@@ -13704,6 +13748,12 @@
     "source": "No se aplicó la moneda porque no se pudo guardar.",
     "files": [
       "js/settings.js"
+    ]
+  },
+  "s_d24a0f62": {
+    "source": "Límites y correcciones",
+    "files": [
+      "js/game-review.js"
     ]
   },
   "s_d24a6da6": {
@@ -13941,6 +13991,12 @@
       "index.html"
     ]
   },
+  "s_d55c0716": {
+    "source": "Original: los colores actuales de la aplicación",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_d5674789": {
     "source": "propio-shift-tracker.app",
     "files": [
@@ -14153,6 +14209,12 @@
     "source": "Impulso mejorado · caja de rareza elevada",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_d9b0c540": {
+    "source": "Ajustes → Tu perfil → Idioma",
+    "files": [
+      "app.html"
     ]
   },
   "s_d9d35cf9": {
@@ -14443,12 +14505,6 @@
       "js/finance.js"
     ]
   },
-  "s_dceb8b40": {
-    "source": "Ajustes → Tu perfil → Idioma de la tool",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_dcf1c3f4": {
     "source": "Editar meta anual",
     "files": [
@@ -14546,6 +14602,12 @@
       "js/game-review.js"
     ]
   },
+  "s_dd990a16": {
+    "source": "Cómo se estima el aporte",
+    "files": [
+      "js/finance-planning.js"
+    ]
+  },
   "s_ddaf48c4": {
     "source": "Acumulado del día: {{v1}}",
     "files": [
@@ -14600,6 +14662,12 @@
     "source": "Acerca de Escudos",
     "files": [
       "app.html"
+    ]
+  },
+  "s_de745f04": {
+    "source": "Sin llamadas elegibles, hoy sumás 0 XP. Las importaciones históricas no suman XP.",
+    "files": [
+      "js/game-review.js"
     ]
   },
   "s_de8f094e": {
@@ -14700,6 +14768,12 @@
       "app.html"
     ]
   },
+  "s_dfc93589": {
+    "source": "Medición exacta.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_dfc99456": {
     "source": "Debes registrar un correo real: es el único medio para recuperar el acceso si olvidas la contraseña.",
     "files": [
@@ -14723,12 +14797,6 @@
     "source": "Sin registros: meta sin evaluar",
     "files": [
       "js/reports.js"
-    ]
-  },
-  "s_e098a646": {
-    "source": "El respaldo excede el tamaño permitido. Elegí un JSON exportado por la tool.",
-    "files": [
-      "js/backup-recovery.js"
     ]
   },
   "s_e09ab272": {
@@ -14865,12 +14933,6 @@
       "js/higher-rate-review.js"
     ]
   },
-  "s_e2726367": {
-    "source": "Cuenta y datos de la tool",
-    "files": [
-      "js/boot.js"
-    ]
-  },
   "s_e2ac5636": {
     "source": "📊 Detalle de llamadas de hoy",
     "files": [
@@ -14979,6 +15041,12 @@
       "privacidad.html"
     ]
   },
+  "s_e429934f": {
+    "source": "Higher Rate añade minutos equivalentes al color. Los minutos reales y el bono se muestran separados. La leyenda usa tu meta general; una fecha puede conservar otra.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_e439b9be": {
     "source": "0 días",
     "files": [
@@ -15001,6 +15069,12 @@
     "source": "Ver y editar promoción",
     "files": [
       "js/higher-rate.js"
+    ]
+  },
+  "s_e493f5ca": {
+    "source": "Guardamos inicio, final y duración con milisegundos.",
+    "files": [
+      "app.html"
     ]
   },
   "s_e49d517c": {
@@ -15027,10 +15101,10 @@
       "js/reports.js"
     ]
   },
-  "s_e509da38": {
-    "source": "Las pausas terminan cuando vos pulsás Terminar Break o Terminar Lunch en la tool.",
+  "s_e537a6f0": {
+    "source": "Suena al terminar y guardar aquí. Las llamadas sincronizadas desde Propio no producen este sonido.",
     "files": [
-      "js/automation-ui.js"
+      "app.html"
     ]
   },
   "s_e5501c0b": {
@@ -15139,6 +15213,12 @@
     "source": "Celebrar llamadas completadas",
     "files": [
       "app.html"
+    ]
+  },
+  "s_e6c4ffb3": {
+    "source": "Aplicación y cuenta reconocidas",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_e6e4b705": {
@@ -15523,10 +15603,22 @@
       "js/call-recovery.js"
     ]
   },
+  "s_ec891ff1": {
+    "source": "sin turno ni llamadas; no implica incumplimiento.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_ecc1c141": {
     "source": "Mi premio",
     "files": [
       "app.html"
+    ]
+  },
+  "s_ecc4734d": {
+    "source": "Terminá la pausa en Inicio; después se intentará ponerte disponible dentro del turno.",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_ecc7e225": {
@@ -15857,6 +15949,12 @@
     "source": "Omitida",
     "files": [
       "js/call-review-view.js"
+    ]
+  },
+  "s_f17ddbcf": {
+    "source": "Estado de la conexión con Propio",
+    "files": [
+      "app.html"
     ]
   },
   "s_f1912a3c": {
@@ -16573,6 +16671,12 @@
       "app.html"
     ]
   },
+  "s_fb810678": {
+    "source": "Medición guardada",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_fb8fa428": {
     "source": "Descanso por productividad: cada {{v0}} min productivos = {{v1}} min de descanso",
     "files": [
@@ -16589,6 +16693,12 @@
     "source": "Esperando el inicio de tu turno",
     "files": [
       "js/automation-ui.js"
+    ]
+  },
+  "s_fbb17ac2": {
+    "source": "Según tu registro",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_fbe687f6": {

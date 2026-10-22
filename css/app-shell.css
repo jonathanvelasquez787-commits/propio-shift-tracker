@@ -800,3 +800,61 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 .record-difference-line,.record-review-note>strong{color:var(--text)}
 
 #callEditModal .mc-modal-head>div{min-width:0}#callEditModal .record-history code{overflow-wrap:anywhere}#rptTriGrid{grid-template-columns:repeat(2,minmax(0,1fr))}@media(max-width:760px){#rptTriGrid{grid-template-columns:1fr}}
+
+.automation-brief{display:inline-flex;align-items:baseline;flex-wrap:wrap;gap:6px;width:auto;max-width:100%;margin-top:12px;text-align:left;font-size:11px;padding:7px 10px}
+.automation-brief[hidden],.automation-brief [hidden]{display:none}
+.automation-brief>span:first-child{font-weight:650}.automation-brief #automationCompactTitle{color:var(--muted)}.automation-brief strong{color:var(--cyan);font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}
+#goalsModal #automationPanel{margin-top:20px;border-top:1px solid var(--line);padding-top:10px}
+#goalsModal #automationPanel[open] .automation-title{white-space:normal;min-width:0}
+#goalsModal #automationPanel[open] .automation-checks ul{gap:0}
+#automationPanel .automation-checks li:empty,#automationPanel .polished-days>span:empty{display:none}
+#workDayReviewBtn{width:auto;max-width:100%;justify-self:start;padding-inline:12px}
+#earningsDetailsSection{margin-bottom:14px}
+#earningsDetailsSection .earnings-breakdown{margin-top:12px}
+#earningsDetailsSection [data-earnings-breakdown]{max-width:780px}
+#earningsDetailsSection .polished-breakdown-row{padding:12px 0;gap:12px}
+#earningsDetailsSection .polished-breakdown-row>div:first-of-type{flex:0 1 280px}
+#earningsDetailsSection .polished-breakdown-row>div:last-child{margin-left:auto}
+#earningsDetailsSection .polished-foot{text-align:left;margin-top:10px}
+#workDayReviewDetails .polished-detail{max-width:900px}
+#workDayReviewDetails .review-scope{margin-bottom:12px}
+#workDayReviewDetails .review-overview{gap:24px;padding-bottom:14px}
+#workDayReviewDetails .review-line{justify-content:flex-start;gap:20px;padding:8px 0}
+#workDayReviewDetails .review-line>span{flex:0 1 300px}
+#workDayReviewDetails .review-line>strong{text-align:left}
+#workDayReviewDetails .review-heading{justify-content:flex-start;gap:20px;margin-top:16px}
+#workDayReviewDetails .review-pause{max-width:620px;padding:9px 0}
+#workDayReviewDetails .review-details>summary{padding:10px 0}
+#workDayReviewDetails .review-detail-body .note{max-width:64ch}
+#rptCycleGrid,#rptGoalsGrid{align-items:start}
+#rptCycleGrid .polished-hero{padding:16px;margin-top:12px}
+#rptCycleGrid .polished-pace{padding:14px;margin:12px 0}
+#rptCycleGrid .polished-forecast .polished-amount{font-size:30px}
+#rptCycleGrid .polished-detail .review-line{padding:9px 0}
+#rptCycleGrid .polished-detail .note{max-width:62ch}
+#statsAccordion .rd-list{max-width:720px}
+#statsAccordion .rd-row{gap:22px;justify-content:flex-start}
+#statsAccordion .rd-label{flex:0 1 280px}
+#payDatesBody .wk-row{border-radius:14px;margin:8px 0;padding:14px;background:rgba(var(--cyan-rgb),.07);border:1px solid rgba(var(--cyan-rgb),.20)}
+#payDatesBody .wk-row.is-today{background:rgba(var(--cyan-rgb),.12);border-color:rgba(var(--cyan-rgb),.32)}
+#payDatesBody .wk-row .wk-row-icon{background:rgba(var(--cyan-rgb),.16);color:var(--cyan)}
+#payDatesBody .pay-receipt-details{max-width:620px}
+#pageFinance .fin-row{padding-top:14px;padding-bottom:14px}
+#pageFinance .fin-plan-row>summary{min-height:40px}
+#pageFinance .fin-plan-row-body{padding-top:6px;padding-bottom:8px}
+#pageFinance .fin-plan-row-body>.note,#pageFinance .fin-plan-help p{max-width:64ch;margin:6px 0}
+#pageFinance .fin-row-actions{gap:8px}
+#pageFinance .fin-plan-metrics{gap:16px}
+#pageFinance .fin-plan-field{min-width:0}
+#pageFinance .fin-plan .fin-plan-inputs,#pageFinance .fin-plan-distribution{max-width:900px}
+#pageFinance .fin-plan-help{margin-top:8px;font-size:12px;color:var(--muted)}
+#pageFinance .fin-plan-help>summary{padding:7px 0;cursor:pointer}
+#pageFinance .fin-month-history .fin-plan-metrics{margin-top:12px;gap:24px}
+#pageFinance .fin-month-history .fin-payment-history{margin-top:12px}
+#pageSchedule .sched-hint{max-width:70ch}
+#pageSchedule .sched-time-row{max-width:800px}
+#pageSchedule .sched-offset-row{max-width:620px}
+#pageCalendar .cal-status-help .note{max-width:70ch}
+.record-help-steps{padding-left:20px;margin:12px 0;color:var(--muted);font-size:12px;line-height:1.6}
+.record-help-steps li{margin:8px 0}.record-help-steps strong{color:var(--text)}
+@media(max-width:600px){#workDayReviewDetails .review-line>span{flex-basis:55%}#earningsDetailsSection .polished-breakdown-row>div:first-of-type{flex:1}#rptCycleGrid .polished-forecast .polished-amount{font-size:26px}#statsAccordion .rd-label{flex-basis:60%}}

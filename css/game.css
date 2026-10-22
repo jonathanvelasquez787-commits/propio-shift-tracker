@@ -1450,7 +1450,13 @@ html.theme-light {
 }
 
 .game-achievements-page .game-settings-disclosures { grid-template-columns: minmax(0, 1fr); }
-.game-achievements-page .game-achievements-grid-top { align-items: stretch; }
+.game-achievements-page .game-achievements-grid-top { align-items: start; }
+.game-achievements-page #gameSettingsProfile { align-items: start; }
+.game-achievements-page #gameStreakPanel { align-self: start; }
+.game-achievements-page .game-monster-name-setting,
+.game-achievements-page .physical-reward-catalog { max-width: 720px; }
+.game-achievements-page .game-settings-accordion-body > .note,
+.game-achievements-page .game-monster-name-setting > small { max-width: 64ch; }
 .game-achievements-grid-bottom, .game-achievements-grid-collection { align-items: stretch; }
 .game-achievements-page .game-panel { min-width: 0; }
 .game-achievements-page .game-panel-head > div:has(h2) { display: grid; grid-template-columns: minmax(0, max-content) auto; justify-content: start; align-items: center; gap: 4px 0; }

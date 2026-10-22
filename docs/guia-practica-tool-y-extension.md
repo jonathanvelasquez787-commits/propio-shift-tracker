@@ -1,32 +1,38 @@
-# Guía práctica de la tool y su extensión
+# Guía práctica de Propio Shift Tracker y su extensión
 
-Revisión: 18 de octubre de 2026. Esta guía explica las funciones que existen en el proyecto y cómo se usan juntas. La publicación de las correcciones de la auditoría se documenta por separado.
+Revisión de ubicaciones y nombres: 22 de octubre de 2026. Esta guía explica las funciones que existen en el proyecto y cómo se usan juntas. La publicación de las correcciones de la auditoría se documenta por separado.
 
-La **tool** lleva tus registros, cálculos y ajustes. La **extensión** conecta esos registros con Propio y puede pulsar Start Calls o Stop Calls según tus preferencias. La aceptación de una llamada sigue siendo tuya.
+**Propio Shift Tracker** lleva tus registros, cálculos y ajustes. La **extensión** conecta esos registros con Propio y puede pulsar Start Calls o Stop Calls según tus preferencias. La aceptación de una llamada sigue siendo tuya.
 
-- **En la tool:** Inicio → «Disponibilidad automática» muestra el estado y su cuenta regresiva. Pulsá ese resumen para ver la preparación. La etiqueta «Extensión de Chrome · estado en tu tool» identifica de dónde vienen esos datos.
+- **En la aplicación:** Inicio conserva un estado breve y su espera. Pulsalo para abrir Ajustes → «Disponibilidad automática», donde están la preparación y el diagnóstico. El ACW sigue visible junto al turno.
 - **En la extensión:** el popup de su icono en Chrome permite configurar los iniciadores, la espera, los regresos de pausas y la vista original de Propio.
 - **Versiones:** el número del popup corresponde a la extensión instalada y coincide con Administrar extensiones. La app web tiene su propia versión; actualizar una parte no implica rediseñar la otra.
 
-### Comparar Propio con lo que observó la tool
+### Comparar Propio con lo que observó la aplicación
 
 En Inicio → Bloques del día → Llamadas, pulsá una llamada para ver su detalle.
 Ahí comparás sus fuentes y podés desplegar la edición; el lápiz abre ese mismo
 detalle para editar. El contador de ACW también lleva a la llamada responsable. Propio tiene
-prioridad al llegar su historial y la tool conserva su inicio, final y duración
+prioridad al llegar su historial y la aplicación conserva su inicio, final y duración
 observados como respaldo: una llamada de 7:41 sigue registrada como 7:41 aunque
 su pago se estime con 8 minutos. El origen del ACW y las diferencias quedan
 visibles; el detalle permite comparar ambas versiones sin duplicar ganancias.
 Si falta en Propio, se conserva pendiente de confirmar. Si hay varias posibles
 coincidencias, elegí «Pendientes de vincular» en el filtro del listado. [Alcance y excepciones](registros-propio-y-tool.md).
 
+### Detalles y resúmenes
+
+- **Reportes → Jornada:** revisión de ACW, pausas, plan, metas y adherencia. «Ver jornada →» en Inicio abre ese mismo detalle.
+- **Reportes → Desglose de ganancias:** componentes del día y del ciclo. El resumen de ganancias permanece en Inicio.
+- **Detalle de llamada → Cómo se registra una llamada en vivo:** medición exacta, redondeo de pago y prioridad del historial oficial. «Propio» y «Medición guardada» identifican las fuentes.
+
 ## 1. Empezar y terminar tu jornada
 
 ### 1. Registro automático de la conexión a Propio
 
-- **Qué hace:** detecta tu sesión de Propio y comunica el inicio o cierre confirmado a la tool. No confunde simplemente tener Chrome abierto con estar autenticado en Propio.
-- **Qué configurás:** «Registrar en mi tracker» en la extensión. La tool debe estar abierta con tu cuenta.
-- **Ejemplo:** abrís Propio a las 7:42 y la tool registra esa conexión sin que tengás que pulsar Iniciar shift.
+- **Qué hace:** detecta tu sesión de Propio y comunica el inicio o cierre confirmado a la aplicación. No confunde simplemente tener Chrome abierto con estar autenticado en Propio.
+- **Qué configurás:** «Registrar mi actividad» en la extensión. La aplicación debe estar abierta con tu cuenta.
+- **Ejemplo:** abrís Propio a las 7:42 y la aplicación registra esa conexión sin que tengás que pulsar Iniciar shift.
 
 ### 2. Diferencia entre estar conectado y empezar a trabajar
 
@@ -58,25 +64,25 @@ Estas opciones están en el popup de la extensión. **Registrar llamadas y poner
 
 ### 6. Vinculación con tu cuenta
 
-- **Qué hace:** la extensión reconoce la tool abierta y se vincula con su cuenta. Si necesita intervención, ofrece Vincular cuenta y muestra su estado.
-- **Qué configurás:** abrís Propio y la tool con tu sesión. Conviene mantener una sola pestaña escribible de cada una para evitar ambigüedad.
-- **Ejemplo:** se abre tu escritorio de trabajo y la extensión reconoce la cuenta del tracker sin pedirte vincular cada mañana.
+- **Qué hace:** la extensión reconoce la aplicación abierta y se vincula con su cuenta. Si necesita intervención, ofrece Vincular cuenta y muestra su estado.
+- **Qué configurás:** abrís Propio y la aplicación con tu sesión. Conviene mantener una sola pestaña escribible de cada una para evitar ambigüedad.
+- **Ejemplo:** se abre tu escritorio de trabajo y la extensión reconoce la cuenta de Propio Shift Tracker sin pedirte vincular cada mañana.
 
 ### 7. Ponerte disponible al comenzar el turno
 
 - **Qué hace:** pulsa Start Calls desde la hora de entrada, dentro del horario y hasta que conectás tu primera llamada. No añade la espera entre llamadas antes de esa primera llamada.
-- **Qué configurás:** «Al comenzar mi turno» y tu horario en la tool.
+- **Qué configurás:** «Al comenzar mi turno» y tu horario en la aplicación.
 - **Ejemplo:** encendés a las 6:00, tu turno empieza a las 6:30 y la espera es de tres minutos: manda el inicio de las 6:30. No empieza a las 6:03 ni espera hasta las 6:33.
 
-### 8. Esperar entre llamadas usando el ACW de la tool
+### 8. Esperar entre llamadas usando el ACW de la aplicación
 
-- **Qué hace:** después de una llamada, pulsa Stop Calls cuando reconoce el control disponible. Espera a que el ACW que publica la tool alcance o supere el límite y después pulsa Start Calls.
+- **Qué hace:** después de una llamada, pulsa Stop Calls cuando reconoce el control disponible. Espera a que el ACW que publica la aplicación alcance o supere el límite y después pulsa Start Calls.
 - **Qué configurás:** «Esperar entre llamadas» y de 1 a 60 minutos de ACW.
 - **Ejemplo:** elegís tres minutos y el ACW ya muestra 00:50 cuando la extensión lo recibe. Faltan 02:10. No necesita haber visto 00:00. Si cambiás el límite a cinco minutos, usa el mismo tramo de ACW, sin reiniciarlo.
 
-Inicio muestra también la próxima acción confirmada por la extensión: espera,
-pausa manual, horario, llamada o revisión. Si la lectura queda atrasada retira
-la cuenta regresiva hasta confirmarla. «Ver preparación del turno» muestra la
+Inicio muestra un estado breve y la espera confirmada. Pulsarlo abre Ajustes →
+«Disponibilidad automática». Si la lectura queda atrasada, se retira la cuenta
+regresiva hasta confirmarla. «Preparación del turno» muestra la
 conexión detectada y el comienzo laboral por separado, además del final previsto
 y la modalidad de cierre de Break/Lunch. Entrar antes del horario no agrega
 trabajo ni ACW; una llamada real anterior sí acredita trabajo. También reúne cuenta,
@@ -97,7 +103,7 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 ### 11. Elegir cómo terminan las pausas
 
 - **Qué hace:** permite esperar a que vos pulses Terminar Break/Lunch o solicitar que la pausa termine al cumplir su duración conocida.
-- **Qué configurás:** el selector «¿Cómo querés terminar esas pausas?» y la duración de tus pausas en Horario. El tracker debe seguir abierto para guardar el cierre automático.
+- **Qué configurás:** el selector «¿Cómo querés terminar esas pausas?» y la duración de tus pausas en Horario. Propio Shift Tracker debe seguir abierto para guardar el cierre automático.
 - **Ejemplo:** elegís cierre por duración y empezás un Break de quince minutos a las 10:00. Al cumplirlo, la extensión puede pedir su cierre y volver a disponibilidad. Si elegís cierre manual, llegar a las 10:15 no sustituye tu clic.
 
 ### 12. Pausar todos los automatismos de disponibilidad
@@ -122,23 +128,23 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 
 ### 15. Llamadas detectadas en vivo por la extensión
 
-- **Qué hace:** comunica la conexión y desconexión confirmadas para registrar la llamada en la tool. Save de Propio sigue cumpliendo su función propia dentro de Propio.
-- **Qué configurás:** «Registrar en mi tracker» activado y cuenta vinculada.
-- **Ejemplo:** conectás a las 9:00 y colgás a las 9:05. El tracker recibe esos movimientos sin que pulsés también sus botones de llamada.
+- **Qué hace:** comunica la conexión y desconexión confirmadas para registrar la llamada en la aplicación. Save de Propio sigue cumpliendo su función propia dentro de Propio.
+- **Qué configurás:** «Registrar mi actividad» activado y cuenta vinculada.
+- **Ejemplo:** conectás a las 9:00 y colgás a las 9:05. Propio Shift Tracker recibe esos movimientos sin que pulsés también sus botones de llamada.
 
 ### 16. Recuperación desde el historial oficial de Propio
 
 - **Qué hace:** usa las filas que Propio carga para completar o corregir tus llamadas. Reconcilia una llamada en vivo con su fila oficial y conserva filas de cero minutos como cero.
 - **Qué configurás:** registro automático; abrís el historial y sus páginas para que Propio cargue las filas que querés recuperar.
-- **Ejemplo:** la tool guardó una llamada en vivo y luego aparece su registro oficial. Actualiza el registro correspondiente en vez de sumar otra llamada. La sincronización de fondo carga los datos sin el sonido ni los avisos de una importación manual.
+- **Ejemplo:** la aplicación guardó una llamada en vivo y luego aparece su registro oficial. Actualiza el registro correspondiente en vez de sumar otra llamada. La sincronización de fondo carga los datos sin el sonido ni los avisos de una importación manual.
 
-### 17. Registros pendientes cuando el tracker no está abierto
+### 17. Registros pendientes cuando Propio Shift Tracker no está abierto
 
 - **Qué hace:** la extensión guarda eventos pendientes y trata de entregarlos a la cuenta vinculada al volver. La cola tiene límites y no sustituye un respaldo permanente.
 - **Qué configurás:** mantenés la vinculación; el popup muestra eventos por sincronizar. Los eventos tienen una ventana de hasta 24 horas para su entrega.
-- **Ejemplo:** cerraste la tool un momento y terminaste una llamada. Al abrir la misma cuenta puede recibirla. Si se requiere revisar el estado, el popup lo informa.
+- **Ejemplo:** cerraste la aplicación un momento y terminaste una llamada. Al abrir la misma cuenta puede recibirla. Si se requiere revisar el estado, el popup lo informa.
 
-### 18. Llamada en vivo con los botones de la tool
+### 18. Llamada en vivo con los botones de la aplicación
 
 - **Qué hace:** Iniciar llamada corre el tiempo y terminarla la guarda automáticamente. Si falla el guardado normal, conserva un respaldo pendiente para recuperarlo.
 - **Qué configurás:** tu tasa y, si corresponde, las ventanas de Higher Rate. Podés usarlo sin la extensión.
@@ -182,7 +188,7 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 - **Qué configurás:** el máximo de minutos en su ajuste de ACW.
 - **Ejemplo:** elegís un máximo diario para revisar tu uso del tiempo. Ese objetivo no sustituye los tres minutos entre llamadas: la espera automática se configura por separado en la extensión.
 
-### 25. Break y Lunch de la tool
+### 25. Break y Lunch de la aplicación
 
 - **Qué hace:** registra inicio y final de cada pausa y muestra su duración. Una llamada real puede cerrar la pausa para registrar la actividad que empieza.
 - **Qué configurás:** sus bloques y duraciones en Horario; sus botones en Inicio registran cuándo los tomás realmente.
@@ -192,7 +198,7 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 
 - **Qué hace:** reabrir el mismo Break/Lunch dentro de cinco minutos continúa desde su inicio original. Si descartás esa continuación, devuelve el tramo que ya estaba cerrado. Una pausa nueva descartada no se registra.
 - **Qué configurás:** usás los controles de la actividad en vivo y sus confirmaciones.
-- **Ejemplo:** cerraste Break sin querer y lo reanudás enseguida. La tool puede conservar la continuación y señalar la interrupción, en vez de tratarla como dos descansos independientes.
+- **Ejemplo:** cerraste Break sin querer y lo reanudás enseguida. La aplicación puede conservar la continuación y señalar la interrupción, en vez de tratarla como dos descansos independientes.
 
 ### 27. Editar huecos entre llamadas
 
@@ -212,7 +218,7 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 
 - **Qué hace:** define la jornada habitual de cada día, incluidos días libres y bloques de trabajo, Break y Lunch.
 - **Qué configurás:** entradas, salidas, comienzos y duraciones; cada bloque de trabajo puede tener su meta productiva.
-- **Ejemplo:** de lunes a viernes trabajás de 8:00 a 16:00 y el domingo es libre. La tool usa esa plantilla sin que la repitás cada semana. Un horario 22:00–06:00 termina a las 6:00 del día siguiente.
+- **Ejemplo:** de lunes a viernes trabajás de 8:00 a 16:00 y el domingo es libre. La aplicación usa esa plantilla sin que la repitás cada semana. Un horario 22:00–06:00 termina a las 6:00 del día siguiente.
 
 ### 30. Semana específica y copia de horarios
 
@@ -254,7 +260,7 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 
 ### 36. Ventanas de Higher Rate
 
-- **Qué hace:** agrega el bono del nivel a llamadas que califican por su hora de inicio, con la gracia inicial prevista en la tool. No lee tu correo para crear ventanas por sí sola.
+- **Qué hace:** agrega el bono del nivel a llamadas que califican por su hora de inicio, con la gracia inicial prevista en la aplicación. No lee tu correo para crear ventanas por sí sola.
 - **Qué configurás:** fecha, inicio, fin y nivel de la promoción en Higher Rate. «Revisar llamadas» explica cuáles califican, la gracia y los bonos conservados.
 - **Ejemplo:** cargás una ventana Gold que anunció Propio y revisás por qué una llamada califica o queda fuera. Las elegibles reciben el bono calculado además de su pago base.
 
@@ -314,7 +320,7 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 
 - **Qué hace:** organiza ciclos de catorce días y muestra cuándo les corresponde el pago según el desfase configurado.
 - **Qué configurás:** fecha ancla del ciclo y cuántos días después se paga.
-- **Ejemplo:** el ciclo termina un domingo y tu desfase es de varios días. La tool calcula la fecha esperada; no comprueba que Propio haya depositado.
+- **Ejemplo:** el ciclo termina un domingo y tu desfase es de varios días. La aplicación calcula la fecha esperada; no comprueba que Propio haya depositado.
 
 ### 46. Calendario de productividad
 
@@ -384,7 +390,7 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 
 - **Qué hace:** al cumplir la meta del día actual permite obtener su premio, con un registro que evita reclamarlo varias veces por recargar.
 - **Qué configurás:** la meta diaria y Logros; abrís el cofre cuando corresponda.
-- **Ejemplo:** llegás a tu meta y abrís el cofre. Recargar la tool no genera un segundo cofre del mismo día. Si una corrección deja la meta sin cumplir, el progreso y premio se reconcilian.
+- **Ejemplo:** llegás a tu meta y abrís el cofre. Recargar la aplicación no genera un segundo cofre del mismo día. Si una corrección deja la meta sin cumplir, el progreso y premio se reconcilian.
 
 ### 57. Equipo, trofeos y bestiario
 
@@ -396,7 +402,7 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 
 - **Qué hace:** permite crear premios y ofrecerlos en momentos seguros de la jornada, acumular hitos y registrar si los realizaste o guardaste para después.
 - **Qué configurás:** premio, condición para ganarlo, frecuencia, acumulación, máximo diario y si ofrecerlo en Break, Lunch o fin de turno; duración/costo opcionales.
-- **Ejemplo:** cada cinco llamadas ganás un té para el próximo Break. La tool lo recuerda; no compra el té ni verifica que lo hayas tomado. El costo es informativo.
+- **Ejemplo:** cada cinco llamadas ganás un té para el próximo Break. La aplicación lo recuerda; no compra el té ni verifica que lo hayas tomado. El costo es informativo.
 
 ### 59. Duelo durante una pausa o fuera del turno
 
@@ -422,7 +428,7 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 
 - **Qué hace:** muestra hora y fecha junto al saludo, adapta el espacio disponible y conserva los controles del día en una presentación compacta. La frase del saludo es fija y se conserva al recargar.
 - **Qué configurás:** nombre y emoji del perfil, apariencia y tamaño de la ventana. El reloj también permite alternar su visibilidad con su control.
-- **Ejemplo:** dejás el tracker en una ventana angosta a la derecha y seguís viendo la hora y el día activo sin dedicarle toda la pantalla.
+- **Ejemplo:** dejás Propio Shift Tracker en una ventana angosta a la derecha y seguís viendo la hora y el día activo sin dedicarle toda la pantalla.
 
 ### 63. Vista original de Propio
 
@@ -433,8 +439,8 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 ### 64. Escritorio de trabajo al iniciar Windows
 
 - **Qué hace:** en tu PC configurada, abre Chrome con el perfil Jonathan y organiza las páginas de trabajo; abre también el archivo de notas que elegiste.
-- **Qué configurás:** es la preparación local que dejamos instalada: Propio y app.useinterpreter.com a la izquierda; tracker y Linguee en la ventana derecha, con notas debajo.
-- **Ejemplo:** iniciás Windows y aparece tu espacio de trabajo. También podés abrir «Jonathan - Chrome» del escritorio para abrir Chrome y ese mismo archivo de notas, acomodado debajo del tracker incluso si ya estaba abierto. Abrir las páginas no concede disponibilidad antes de tu horario. Ya confirmaste que el arranque funcionó después de reiniciar; esta preparación no se instala sola al entrar desde otra PC.
+- **Qué configurás:** es la preparación local que dejamos instalada: Propio y app.useinterpreter.com a la izquierda; Propio Shift Tracker y Linguee en la ventana derecha, con notas debajo.
+- **Ejemplo:** iniciás Windows y aparece tu espacio de trabajo. También podés abrir «Jonathan - Chrome» del escritorio para abrir Chrome y ese mismo archivo de notas, acomodado debajo de Propio Shift Tracker incluso si ya estaba abierto. Abrir las páginas no concede disponibilidad antes de tu horario. Ya confirmaste que el arranque funcionó después de reiniciar; esta preparación no se instala sola al entrar desde otra PC.
 
 ## 12. Cuenta, guardado y respaldo
 
@@ -448,31 +454,31 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 
 - **Qué hace:** conserva datos en el dispositivo y sincroniza la cuenta cuando hay conexión. Muestra problemas de guardado y pide decidir ante una divergencia real entre versiones.
 - **Qué configurás:** tu sesión y conexión; ante un conflicto elegís la versión que querés conservar.
-- **Ejemplo:** hiciste cambios distintos en dos dispositivos. La tool puede pedirte cuál conservar, en vez de inventar una mezcla. El modo sin conexión tiene límites y no garantiza que la extensión pueda automatizar disponibilidad.
+- **Ejemplo:** hiciste cambios distintos en dos dispositivos. La aplicación puede pedirte cuál conservar, en vez de inventar una mezcla. El modo sin conexión tiene límites y no garantiza que la extensión pueda automatizar disponibilidad.
 
 ### 67. Respaldo completo JSON
 
-- **Qué hace:** exporta e importa un respaldo de los datos de la tool. Antes de reemplazarlos compara llamadas, acciones y pausas, explica los ajustes que cambiarán y guarda una copia privada de lo anterior en este navegador.
+- **Qué hace:** exporta e importa un respaldo de los datos de la aplicación. Antes de reemplazarlos compara llamadas, acciones y pausas, explica los ajustes que cambiarán y guarda una copia privada de lo anterior en este navegador.
 - **Qué configurás:** Exportar o Importar JSON en Ajustes; revisás las confirmaciones antes de reemplazar datos.
 - **Ejemplo:** guardás un respaldo antes de una limpieza grande y lo conservás como una copia adicional. Un CSV contable no reemplaza ese respaldo.
 
 ### 68. Reportes CSV y PDF
 
-- **Qué hace:** exporta información contable del período elegido para consultar o compartir fuera de la tool.
+- **Qué hace:** exporta información contable del período elegido para consultar o compartir fuera de la aplicación.
 - **Qué configurás:** período o fechas Desde/Hasta y formato.
 - **Ejemplo:** exportás las llamadas y totales de un ciclo para comparar con tu pago. Es un reporte en dólares; no es un archivo para restaurar toda tu cuenta.
 
 ### 69. Reinicios y borrados
 
-- **Qué hace:** permite reiniciar un día o toda la tool con alcance explícito y copia previa. Se sincroniza con tu cuenta; no borra tu cuenta ni el historial original de Propio. Una actividad pendiente impide reemplazar datos.
+- **Qué hace:** permite reiniciar un día o toda la aplicación con alcance explícito y copia previa. Se sincroniza con tu cuenta; no borra tu cuenta ni el historial original de Propio. Una actividad pendiente impide reemplazar datos.
 - **Qué configurás:** elegís la acción y revisás su alcance. Reiniciar → Copias recuperables permite comparar y recuperar el conjunto completo anterior. Las copias solo están en este navegador; guardá también tu JSON.
 - **Ejemplo:** borrar un día no es lo mismo que cerrar el turno. Si solo querés terminar de trabajar, usás Finalizar shift para conservar los registros.
 
 ### 70. App instalable y recuperación
 
-- **Qué hace:** la PWA permite abrir la tool como aplicación y conserva el shell necesario para su carga. El sistema de guardado incluye mecanismos de recuperación frente a fallos.
-- **Qué configurás:** instalación desde el navegador y las opciones de recuperación cuando la tool las ofrece.
-- **Ejemplo:** abrís la tool desde su icono. Para sincronizar y para coordinar disponibilidad con Propio seguís necesitando las condiciones de conexión y sesión correspondientes.
+- **Qué hace:** la PWA permite abrir la aplicación como aplicación y conserva el shell necesario para su carga. El sistema de guardado incluye mecanismos de recuperación frente a fallos.
+- **Qué configurás:** instalación desde el navegador y las opciones de recuperación cuando la aplicación las ofrece.
+- **Ejemplo:** abrís la aplicación desde su icono. Para sincronizar y para coordinar disponibilidad con Propio seguís necesitando las condiciones de conexión y sesión correspondientes.
 
 ### 71. Estado de conexión y actividad de la extensión
 
@@ -492,18 +498,18 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 
 - **Qué hace:** ofrece explicaciones de uso y enlaces de ayuda; el pie incluye Invítame un café como apoyo voluntario al desarrollo.
 - **Qué configurás:** elegís el contenido que querés consultar o abrís el enlace externo de apoyo.
-- **Ejemplo:** revisás cómo importar llamadas antes de hacerlo. Si decidís apoyar por Ko-fi, ese pago se realiza fuera de la tool y no se registra como gasto ni desbloquea funciones por sí solo.
+- **Ejemplo:** revisás cómo importar llamadas antes de hacerlo. Si decidís apoyar por Ko-fi, ese pago se realiza fuera de la aplicación y no se registra como gasto ni desbloquea funciones por sí solo.
 
 ## Una mañana completa con estas funciones
 
 1. Encendés la PC a las 6:00. Se abren tu escritorio de Chrome y tus notas.
 2. Propio ya está autenticado: queda registrada la conexión. Tu horario empieza a las 6:30 y todavía no hay trabajo anticipado acreditado por una llamada.
 3. A las 6:30, con «Al comenzar mi turno» activo y sin bloqueos, la extensión pulsa Start Calls. Vos aceptás la llamada que elijás.
-4. La llamada termina. Con espera de tres minutos, la extensión puede pulsar Stop Calls y usa el ACW de la tool para decidir cuándo volver a pulsar Start Calls.
+4. La llamada termina. Con espera de tres minutos, la extensión puede pulsar Stop Calls y usa el ACW de la aplicación para decidir cuándo volver a pulsar Start Calls.
 5. Si cuando recibe el ACW ya va por 00:50, espera los 02:10 restantes. No vuelve a cero por su cuenta.
 6. Empezás Break: no se inicia disponibilidad durante esa pausa. Al terminarlo, tu opción de regreso determina si vuelve automáticamente.
 7. Pulsás Stop Calls manualmente porque querés detener los automatismos. Se recuerda la pausa, pero el registro de llamadas continúa.
-8. Al cargar Propio el historial oficial, la tool completa o corrige sus llamadas en silencio. Después revisás ganancias, metas y Finanzas con esos registros.
+8. Al cargar Propio el historial oficial, la aplicación completa o corrige sus llamadas en silencio. Después revisás ganancias, metas y Finanzas con esos registros.
 9. Finalizás el turno. El cierre bloquea nuevos inicios automáticos de ese turno y conservás la jornada para Reportes y Calendario.
 
 ## Cosas que todavía no hace
@@ -517,8 +523,8 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 
 ## Usar otras pestañas durante el turno
 
-Podés dejar el tracker abierto y consultar Linguee u otra pestaña. La extensión
-protege el tracker, Propio y UseInterpreter contra el descarte automático por
+Podés dejar Propio Shift Tracker abierto y consultar Linguee u otra pestaña. La extensión
+protege Propio Shift Tracker, Propio y UseInterpreter contra el descarte automático por
 memoria y añade una revisión de respaldo cada 30 segundos. Primero solicita el
 ACW actual; mantiene las prioridades de horario, Break/Lunch y Stop manual.
 
