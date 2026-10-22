@@ -31,16 +31,18 @@ mantienen; estos son pedidos directos que no quedaron correctamente cerrados.
   Corrección de 639: última llamada completada por su observación conservada,
   distinta del origen del ACW tras una pausa, y finales oficiales identificados
   como calculados. No inventar segundos ausentes ni cambiar los registros.
-- [ ] **Guía visual actualizada de cada entrega.** La galería externa existente
-  cubre 59 puntos pero quedó en web 635 y popup 2.3.1. Faltan los cambios de
-  637/638 y los siguientes con capturas, ubicación actual y motivo del cambio.
-- [ ] **Lenguaje claro también en la ayuda.** La galería aún usa «TOOL WEB» y el
-  popup conserva «Actualizar tracker y reconectar». La revisión de textos no
-  puede declararse completa por revisar solo el catálogo de la aplicación.
-- [ ] **Cierre visual verificable.** Reabiertas Ganancias y Proyección en el
-  control visual. Para cerrar: comprobar el color contra el código histórico,
-  la altura del bloque completo y la correspondencia entre capturas y versión.
-  Pruebas funcionales correctas no certifican por sí solas estos pedidos visuales.
+- [x] **Guía visual actualizada — entrega 641.** Galería externa renovada:
+  25 secciones y las 59 mejoras publicadas, con ubicación, motivo, configuración
+  y ejemplo. Capturas compiladas de web 641 en ambos temas y cuatro anchos;
+  popup 2.3.4 identificado como extensión con API de Chrome simulada.
+- [x] **Lenguaje claro también en la ayuda — entrega 641.** Galería, guías,
+  popup y organizador distinguen Propio Shift Tracker, el portal de Propio y
+  la extensión de Chrome. «Actualizar y reconectar» conserva su acción.
+  Corregidas rutas desactualizadas y la explicación de segundos/redondeo.
+- [x] **Cierre visual verificable — entrega 641.** Capturas actuales de las once
+  vistas, inspección del resultado real y recorridos de sus controles. Azul
+  contrastado con el token histórico en 640; ciclo y desglose integrados en el
+  hueco solicitado. Criterios y evidencia en control-visual-11-vistas.md.
 - [x] **Guía práctica de todas las funciones — entrega 639.** La lista seguía en
   73 apartados y no explicaba por separado el planificador y filtros nuevos;
   el apoyo sin llamadas todavía apuntaba a Logros. Añadidos 74–79 con qué hace,
@@ -54,8 +56,8 @@ la evidencia de publicación se verifica aparte. No aplicar la propuesta previa.
 
 Propuesta externa anterior para los tres bloques: «propio-tres-correcciones.html», con
 referencia histórica ejecutada desde el renderer anterior, ambos temas y un
-único diseño responsive. No aplicada a producción; requiere aprobar la nueva
-compactación. El hover es una corrección independiente de JS y texto.
+único diseño responsive. Archivada y no aplicada: fue sustituida por las reubicaciones expresamente
+solicitadas y publicadas en 640. No requiere otra aprobación para este cierre.
 
 ### Presentación nativa aprobada el 21–22/10
 
@@ -63,7 +65,7 @@ Web 638 aplica el mockup que conserva identidad y layout general. Inicio
 retiene sus funciones habituales y ACW; preparación en Ajustes, jornada y
 desgloses en Reportes, ayuda en el detalle único de llamada. El intento de
 recuperar el azul y compactar los bloques anteriores fue insuficiente; esos
-pedidos quedan reabiertos arriba.
+pedidos se corrigieron en 640 y su evidencia actual se renovó en 641.
 La cuadrícula del calendario no se rediseña. Se revisan los nombres visibles
 y el popup 2.3.3 sin cambiar reglas automáticas ni contables.
 
@@ -181,7 +183,7 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 - [x] **9. Regreso automático de Break — Publicado.** Indica si terminar Break intentará volver a disponibilidad o si hace falta Start Calls manual. [Evidencia](disponibilidad-en-inicio.md).
 - [x] **10. Regreso automático de Lunch — Publicado.** Mostrar por separado la preferencia de regreso de Lunch. [Evidencia](disponibilidad-en-inicio.md).
 - [x] **11. Elegir cómo terminan las pausas — Publicado.** Modalidad y final previsto visibles para pausas activas; distingue horarios programados, duración ausente y cierre por confirmar. [Evidencia](disponibilidad-en-inicio.md).
-- [x] **12. Pausar todos los automatismos de disponibilidad — Publicado.** Estado de pausa manual y forma de reanudar visibles en la tool. [Evidencia](disponibilidad-en-inicio.md).
+- [x] **12. Pausar todos los automatismos de disponibilidad — Publicado.** Estado de pausa manual y forma de reanudar visibles en la aplicación. [Evidencia](disponibilidad-en-inicio.md).
 - [x] **13. Reintento cuando no tomás una oferta — Publicado.** Explicar reintento y condición que lo detiene sin interruptores adicionales. [Evidencia](disponibilidad-en-inicio.md).
 - [ ] **14. Prioridades que frenan los clics automáticos — En curso.** Motivo dominante del bloqueo y coordinación antes de uso simultáneo en PCs.
 - [x] **15. Llamadas detectadas en vivo por la extensión — Publicado.** Procedencia estimada visible y conservada hasta la reconciliación oficial. [Alcance](revision-llamadas-e-importaciones.md).

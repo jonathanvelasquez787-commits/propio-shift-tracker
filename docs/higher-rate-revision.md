@@ -1,7 +1,7 @@
 # Revisar y corregir Higher Rate
 
 App 627 completa los puntos 36 y 37, después del desglose de ganancias de
-33–35. La extensión continúa en 2.2.10: estos controles pertenecen a la tool.
+33–35. La extensión continúa en 2.2.10: estos controles pertenecen a la aplicación.
 
 ## Revisar una promoción
 
@@ -11,7 +11,7 @@ con ese último grupo plegado. Cada registro explica si entra por horario,
 gracia inicial, una ventana superpuesta con mayor bono o un bono conservado.
 La revisión no modifica datos; «Volver a revisar» toma los registros actuales.
 
-Son las reglas configuradas de la tool: cinco minutos de gracia antes del
+Son las reglas configuradas de la aplicación: cinco minutos de gracia antes del
 inicio, fin exclusivo, duración completa y mayor bono en superposiciones.
 Se conserva el comportamiento de ventanas que cruzan medianoche. Esto no
 certifica cómo Propio liquida los segundos o los bonos oficialmente.
@@ -65,7 +65,7 @@ JavaScript inicial ni el catálogo inicial. La descarga fallida permite reintent
 
 La revisión opera sobre ventanas que siguen en la lista. Limpiar no permite
 reconstruir ventanas retiradas ni calcular automáticamente bonos de llamadas
-que aún no habían llegado al tracker; esa recuperación tardía pertenece a la
+que aún no habían llegado al Propio Shift Tracker; esa recuperación tardía pertenece a la
 fase de llamadas/importación. No se elimina ningún bono histórico por limpiar.
 
 Sigue la fase 3 del plan: recuperación y trazabilidad. No se considera

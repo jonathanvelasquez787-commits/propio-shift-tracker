@@ -1,119 +1,60 @@
 # Control visual de las once vistas aprobadas
 
-Aprobación del propietario, 20/10/2026: «Aprobadas». Referencia: el archivo
-externo `outputs/mockup-completo.html`, con once vistas y sus detalles.
+Aprobación original: «Aprobadas», 20/10/2026. Referencia vigente posterior:
+«propio-misma-interfaz.html», aprobada para conservar identidad y distribución.
+Los reclamos posteriores de tamaño y azul se corrigieron en 640. Una aprobación
+de maqueta no certifica la implementación ni sustituye esta comprobación.
 
-Las once vistas tuvieron una entrega previa comprobada con datos ficticios. El
-propietario señaló después problemas de tamaño, texto y distribución; esa
-comprobación anterior no equivale a aceptación del resultado actual. La maqueta aprobada se
-comprobó en 66 combinaciones de tema/ancho; ese resultado pertenece a la
-maqueta y no certifica la implementación. Ninguna casilla se cierra por un
-build, una captura de la maqueta o la ausencia de desbordamiento solamente.
+## Resultado actual: web 641 y popup 2.3.4
 
-## Evidencia necesaria para cerrar cada vista
+Inspección de capturas de la aplicación compilada en claro y oscuro, a 320,
+390, 1200 y 1800 px. El popup usa su HTML/CSS/JS reales a 400 px, con API de
+Chrome simulada. Los datos son ficticios: no se modificaron llamadas reales.
+Galería externa: guia-visual-cambios.html, 25 secciones y 59 mejoras.
 
-- Misma jerarquía que la referencia aprobada: dato principal, acción clara y
-  explicación contextual. Sin volver a apilar párrafos largos en el resumen.
-- Capturas de la aplicación compilada en claro y oscuro, a 320, 390 y 1200 px;
-  el popup se comprueba en su ancho real de 400 px con API de Chrome simulada. Registrar los archivos de evidencia
-  fuera de Git y enlazarlos desde la guía visual de la entrega.
-- Inspección visual de esas capturas comparadas con la referencia: cifras y
-  conversiones legibles, espaciado, saltos de línea, contraste y foco visibles.
-  La ausencia de desbordamiento es una comprobación adicional.
-- Abrir los detalles y ejecutar las acciones relevantes con una cuenta aislada.
-  Conservar controles, estados de error, cálculos y resguardos de la función.
-  Mostrar siempre las consecuencias necesarias antes de confirmar algo sensible.
-- Revisar el conjunto después de cambiar estilos compartidos. Una modificación
-  posterior que afecte una vista invalida su comprobación anterior hasta revisarla.
+- [x] **Logros.** Nivel, XP y avance dentro de su panel existente;
+  captura achievements. Las reglas de juego no se cambiaron en esta entrega.
+- [x] **Avisos.** Próximo aviso, volumen y opciones agrupadas; g21.
+  Carga de audio ficticio y revisión del archivo guardado: g22.
+- [x] **Restaurar respaldo.** Comparación y alcance antes de confirmar; g18.
+  Se abrió la vista previa y se canceló sin sustituir datos.
+- [x] **Disponibilidad automática.** Inicio conserva estado breve; preparación
+  completa en Ajustes, con intento 2:10 en una línea y horarios consultables; g0.
+- [x] **Ganancias.** Desglose día/ciclo dentro del hueco bajo Racha/meta,
+  junto a Proyección; g10. Filas compactas, USD y conversión secundaria visibles.
+- [x] **Higher Rate.** Bono y elegibilidad en la revisión existente; g11.
+  Corrección con vista previa y cancelación: g12. Limpiar conserva bonos.
+- [x] **Proyección.** Mantiene su tarjeta; g16. Promedio y ritmo necesario
+  diferenciados, supuestos plegados e importes con conversión secundaria.
+- [x] **Popup de Chrome.** Conexión, cola y pausa separados; popup-dark/light.
+  Opciones desplegadas, cola vencida y botón de reconexión comprobados.
+- [x] **Horario.** Vista previa de alcance antes de aplicar; g9.
+  Se recorrieron los controles y se canceló la confirmación.
+- [x] **Meta desde Finanzas.** Meta actual/propuesta e impacto consultable;
+  g15. Se canceló antes de modificar la meta; no se confunde con una reserva.
+- [x] **Borrar cuenta.** Alcance, respaldo y advertencia irreversible visibles;
+  account. No se ejecutó la eliminación de una cuenta.
 
-## Estado por vista
+La fecha azul de pago aparece a la derecha, con el distintivo del ciclo actual:
+pay-dates. El token coincide con weekly-summary.js anterior a 37d8ee9:
+var(--accent-blue-2, var(--cyan)). No se usó un azul aproximado de fondo.
+Jornada se revisa dentro de Adherencia; Inicio abre el mismo nodo, no una copia.
 
-Todas tienen diseño aprobado. Las casillas siguientes se refieren al resultado
-real implementado y comprobado, no a la aprobación.
+## Evidencia fuera de Git
 
-- [x] **Logros.** XP y nivel protagonistas, estado del cofre y accesos breves.
-  Comprobar también cero XP, juego desactivado y recompensa ajustada/reclamada.
-- [x] **Avisos.** Progreso y volumen claros, configuraciones por grupos.
-  Comprobar silencio, aviso desactivado y archivos de audio personalizados.
-- [x] **Restaurar respaldo.** Comparación antes/después y alcance visible.
-  Conservar copia previa, cancelación y rechazo de datos inválidos.
-- [x] **Disponibilidad automática — aplicación web.** Próxima acción y espera claras.
-  Comprobar conexión pendiente/antigua, pausa manual, horario y descansos.
-- [x] **Ganancias.** Reabierta el 22/10 y corregida en 640: desglose día/ciclo
-  compacto en el hueco señalado, sin el marco ancho casi vacío. Total y
-  conversión conservados; evidencia compilada al final del documento.
-  Comprobar moneda intercambiada, cero y estimación de una llamada activa.
-- [x] **Higher Rate.** Bono, ventana y elegibilidad claros. Mantener separadas
-  la limpieza que conserva bonos y la corrección con recálculo confirmado.
-- [x] **Proyección.** Reabierta el 22/10 y corregido el hueco en 640: el desglose
-  ocupa el espacio junto a ella. Proyección y ritmo necesario diferenciados, importes
-  sin cortes y supuestos consultables; comprobar días sin registros.
-- [x] **Popup — extensión de Chrome.** Vinculación, pausa y cola comprensibles.
-  Comprobar eventos pendientes/vencidos, desconexión y opciones desplegadas.
-- [x] **Confirmación de horario.** Antes/después, días y alcance claros.
-  Conservar registros reales y las reglas del desplazamiento del turno.
-- [x] **Meta desde Finanzas.** Meta actual/propuesta y cálculo consultable.
-  Conservar la distinción entre cambiar una meta y reservar dinero.
-- [x] **Borrar cuenta.** Alcance, respaldo y carácter irreversible visibles.
-  Conservar confirmación final y la información de retención necesaria.
+Todos los nombres siguientes están dentro de outputs/ del espacio de trabajo:
 
-## Cierre de la entrega
+- cierre-641-capturas.json: ocho contextos, 248 capturas y errores vacíos.
+- cierre-641-<vista>-<tema>-<ancho>.png: capturas nativas, no maquetas.
+- cierre-641-inspeccion-<tema>-<ancho>.png: hojas de inspección de las once vistas.
+- cierre-641-popup-qa.json: interacción del popup y API simulada en ambos temas.
+- guia-visual-qa.json: 25 secciones, 59 puntos, imágenes y búsqueda verificadas.
+- integrado-640-qa.json: integración de jornada, disposición y azul histórico.
+- cierre-641-production.json: commit público y comparación de ocho archivos
+  servidos con el build del mismo commit; se genera al verificar la publicación.
+- cierre-641-extension-install.json: instalación, respaldo, preferencias y
+  worker conservados. No confirma por sí sola una recarga en Chrome.
 
-Además de las once comprobaciones visuales, registrar las pruebas funcionales
-pertinentes, versiones de web y extensión por separado y evidencia de la
-publicación. Las capturas deben identificar si son maqueta, aplicación real
-o popup con API de Chrome simulada. El listado de 79 mejoras permanece en
-`plan-mejoras-integrales.md`; aprobar estas once vistas no cierra sus pendientes.
-
-Evidencia de la entrega preparada: `aprobadas-aplicadas-qa.json` (12 recorridos),
-`aprobadas-popup-qa.json` (ambos temas) y `approved-visual-tests.log`
-(947 pruebas correctas), fuera de Git. Capturas `aplicado-*` fuera de Git.
-La disponibilidad compacta es el ajuste posterior pedido por el propietario.
-Publicación verificada en PR #97 y producción del mismo commit. El propietario
-confirmó la recarga y el popup 2.3.1.
-
-## Integración posterior aprobada el 21/10
-
-Web 637 reúne catorce ajustes de distribución en funciones existentes. Las
-capturas `integrado-*` y `registro-*`, fuera de Git, corresponden a la
-aplicación compilada con cuenta ficticia; `integracion-qa.json` registra doce
-recorridos ES/EN, temas y anchos. `integracion-popup-qa.json` registra el popup
-real con API de Chrome simulada. La revisión no convierte la maqueta en prueba.
-La extensión 2.3.2 cambia su ayuda; el propietario confirmó su recarga.
-
-## Ajuste nativo aprobado el 21–22/10
-
-La referencia vigente es el mockup externo «propio-misma-interfaz.html». El
-propietario aprobó conservar el estilo y layout general; se descarta el mockup
-que cambiaba la composición global. Web 638 y extensión 2.3.3 mantienen sus
-versiones y responsabilidades separadas.
-
-- Inicio conserva llamadas, resumen de ganancias, ACW, Bloques/Llamadas y Logros.
-- Preparación y diagnóstico de disponibilidad en Ajustes, abiertos desde el estado
-  breve de Inicio. Las opciones automáticas siguen en el popup de Chrome.
-- Jornada y desgloses del día/ciclo en Reportes, una sola copia de cada bloque.
-- Ayuda de registro en el detalle único de llamada. Ambas fuentes y edición siguen allí.
-- Fechas de pago recibió un fondo aproximado; no recuperó la fecha azul a la
-  derecha ni la etiqueta del ciclo actual. Corrección reabierta el 22/10.
-- Tarjetas del ciclo, objetivos y Nivel/Racha conservan sus posiciones con altura
-  propia. Controles y lectura acotados en Finanzas, Logros, Horario y Calendario;
-  la cuadrícula del calendario queda intacta.
-
-Evidencia fuera de Git: «aprobado-qa.json» registra dieciséis recorridos
-ES/EN, claro/oscuro y 320/390/1200/1800 px. «final-scan-<tema>-<ancho>.json»
-registra trece secciones en ambos temas y 320/1800 px, con detalles abiertos,
-pago que conserva la reserva y ACW histórico sin contador en vivo. Capturas
-«final-*» y «aplicado-*» pertenecen a la aplicación compilada con datos
-ficticios; «aprobado-popup-qa.json» al popup real con API de Chrome simulada.
-967 pruebas y build correctos. La instalación, recarga y publicación se
-registran por separado, sin inferirlas de estas comprobaciones locales.
-
-## Integración y restauración solicitadas el 22/10
-
-Entrega 640: el mismo desglose se integra en el hueco bajo Racha/meta, junto a
-Proyección; Jornada en Adherencia, plegada y conservada al actualizar Reportes;
-fecha azul a la derecha y distintivo del ciclo restaurados desde el token
-histórico. Doce recorridos compilados ES/EN, claro/oscuro y 320/390/1024/1800 px,
-con aperturas, actualización, enlace desde Inicio y comparación/registro recibido.
-Evidencia fuera de Git: integrado-640-qa.json y capturas integrado-640-*.
-Los resultados no cierran las veinte mejoras funcionales abiertas.
+Las 969 pruebas funcionales pasan. El control visual incluye inspección de las
+capturas y recorridos; no se cierra solo por build o ausencia de desbordamiento.
+Las veinte mejoras funcionales abiertas siguen en plan-mejoras-integrales.md.

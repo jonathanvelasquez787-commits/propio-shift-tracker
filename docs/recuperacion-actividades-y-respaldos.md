@@ -1,7 +1,7 @@
 # Actividades accidentales y respaldos
 
 Entrega web 629: puntos 22, 26, 27, 47, 67 y 69 del plan aprobado. La extensión
-conserva su versión y comportamiento; estas funciones se usan en la tool.
+conserva su versión y comportamiento; estas funciones se usan en la aplicación.
 
 ## Descartar y continuar
 
@@ -46,7 +46,7 @@ copia del estado que reemplaza.
 
 - Reiniciar día conserva otros días, horario y metas. La copia previa es
   completa para poder recuperar también los datos relacionados.
-- Reiniciar todo devuelve datos y ajustes de la tool a sus valores iniciales;
+- Reiniciar todo devuelve datos y ajustes de la aplicación a sus valores iniciales;
   conserva la cuenta y las preferencias propias de la extensión.
 - Estos cambios se sincronizan con la cuenta. No borran el historial oficial
   de Propio, que una importación posterior puede volver a incorporar.

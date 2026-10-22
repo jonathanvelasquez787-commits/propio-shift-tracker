@@ -1,6 +1,6 @@
 # Avisos y cierres de llamadas
 
-Entrega web 634: puntos 48–52 y 75. Son funciones de la tool; no requiere
+Entrega web 634: puntos 48–52 y 75. Son funciones de la aplicación; no requiere
 otra versión ni recarga de la extensión.
 
 ## Dónde encontrarlos
@@ -17,7 +17,7 @@ no haya turno activo o durante una pausa se muestra en espera. Completar un
 tramo no demuestra que sonó: al recargar no se repiten avisos anteriores.
 No inicia una pausa ni altera la disponibilidad de Propio.
 
-Los sonidos de llamada distinguen terminar desde la tool, importar un lote
+Los sonidos de llamada distinguen terminar desde la aplicación, importar un lote
 y guardar manualmente. La sincronización de la extensión continúa silenciosa.
 Duplicados y fallos de guardado no se presentan como importaciones exitosas.
 El selector de sonido no borra un archivo guardado: Quitar archivo libera
@@ -26,8 +26,8 @@ no se presenta su tamaño como una medición de la cuota restante del navegador.
 
 ## Apoyo y reflexión
 
-Desde Avisos, Configurar apoyo sin llamadas abre Refuerzo positivo en Logros:
-allí se conservan los minutos, repetición y mensaje existentes. No se crean
+En Avisos → Apoyo y cierre de llamadas se configuran los minutos de espera,
+la repetición y el mensaje. No se crean
 ajustes duplicados. Ver cierres guardados abre Mi historial positivo, donde se
 consultan las reflexiones, sus notas y los otros acontecimientos personales.
 

@@ -2,7 +2,7 @@
 
 El propietario eligió el 21/10/2026 redondear al minuto siguiente desde los
 40 segundos, incluidos: 7:39 → 7 minutos, 7:40 → 8 y 8:00 → 8. Es un criterio
-personal para la tool, no una regla de facturación confirmada por Propio.
+personal para la aplicación, no una regla de facturación confirmada por Propio.
 
 ## Alcance
 

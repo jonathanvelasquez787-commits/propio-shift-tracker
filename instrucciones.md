@@ -324,27 +324,15 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
-- **Corrección solicitada expresamente el 22/10, entrega 640:** el desglose
-  existente se coloca en el hueco bajo Racha/meta, junto a Proyección, en la
-  misma sección de Reportes. Jornada se integra como «Ver jornada» en
-  Adherencia, conservando el mismo nodo, sus listeners y el acceso desde Inicio.
-  Fechas de pago restaura la fecha azul a la derecha y el distintivo actual
-  usando el token histórico de 37d8ee9^:js/weekly-summary.js; se conserva el
-  registro manual de recibido. Son reubicaciones/restauración pedidas por el
-  propietario y publicables por su instrucción «publica»; no aplicar la maqueta
-  anterior ni cambiar el layout general. Publicación y capturas se registran
-  por separado. Siguen abiertas la galería visual, lenguaje de ayuda y veinte
-  mejoras funcionales del plan original.
-
-- **Presentación aprobada el 21–22/10:** se aplica la referencia que conserva
-  la identidad y distribución general, después del reclamo sobre texto y espacios
-  grandes. El diseño anterior que cambiaba la composición global queda descartado.
-  Disponibilidad detallada en Ajustes; jornada y desgloses en Reportes; ayuda de
-  registro dentro del detalle único de llamada. Inicio conserva sus controles,
-  ACW, resumen, Bloques/Llamadas y Logros. La recuperación del azul quedó
-  incompleta y la compactación de ciclo/desglose fue rechazada el 22/10.
-  Ver [control visual](docs/control-visual-11-vistas.md). La aprobación de una
-  maqueta no certifica el resultado; conservar capturas de la aplicación real.
+- **Activación local del popup 2.3.4:** archivos instalados con respaldo y
+  preferencias conservadas; Chrome no está conectado a este chat. Requiere
+  recarga del propietario cuando esté fuera de una llamada. No confundir
+  instalación con activación ni repetir recargas de entregas anteriores.
+- **Ocho pedidos directos del 22/10:** implementación y evidencia reunidas en
+  docs/cierre-ocho-pedidos.md. Web 639 aporta el hover con segundos; 640 integra
+  Reportes y restaura la fecha azul; 641 cierra galería, lenguaje y control
+  visual. Confirmar el commit público con cierre-641-production.json fuera de
+  Git. Este cierre no completa las veinte mejoras funcionales del plan.
 
 - **Mejoras integrales aprobadas el 18/10:** ejecutar las recomendaciones de la
   evaluación de 79 funciones por fases; alcance y estado completo en
@@ -473,26 +461,19 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
-- App 639 añade inicio/final observado con segundos al hover del ACW, sin
-  modificar su cálculo ni los registros. Después de una pausa conserva la
-  última llamada en el resumen y distingue el ancla actual. Importaciones sin
-  observación no inventan segundos. Extensión sigue en 2.3.3, sin archivos nuevos.
-- App 638: presentación aprobada con los mismos colores, navegación y layout
-  general. Ajustes contiene la preparación de disponibilidad; Inicio muestra solo
-  su estado breve y conserva ACW. Reportes reúne jornada y desgloses; el detalle
-  de llamada conserva ambas fuentes y su ayuda, en una sola ventana.
-  Compactación localizada de filas, controles y ayudas de Reportes, Finanzas,
-  Horario y Logros; alturas independientes para tarjetas. Calendario conserva
-  su cuadrícula. Fechas de pago recibió un fondo aproximado; la fecha azul
-  original a la derecha y la etiqueta del ciclo siguen pendientes de restaurar.
-  Los textos distinguen Propio, Medición guardada y la extensión de Chrome;
-  se retira «tool» de los textos visibles. Sin cambio de datos ni esquema alojado.
-  Web y extensión tienen versiones propias: web 638.0.0 y popup 2.3.3.
-  Archivos 2.3.3 instalados con respaldo completo y ajustes personales conservados.
-  La última recarga confirmada por el propietario es 2.3.2; no dar por recargada
-  2.3.3 por instalar sus archivos. Guía de 79 funciones en
-  docs/guia-practica-tool-y-extension.md. Las veinte tareas funcionales siguen
-  abiertas en su plan.
+- App 641: guías y galería actuales, lenguaje claro en popup/organizador y
+  corrección del espacio de flechas plegables en móvil. 969 pruebas correctas;
+  ocho recorridos compilados ES, ambos temas y 320/390/1200/1800 px, con 248
+  capturas y datos ficticios. Popup 2.3.4 probado con API de Chrome simulada.
+  Worker sin cambios; respaldo completo y preferencias locales conservadas.
+- App 640 integra el desglose día/ciclo bajo Racha/meta junto a Proyección y
+  «Ver jornada» dentro de Adherencia. Fecha azul a la derecha y distintivo del
+  ciclo restaurados desde el token histórico. App 639 muestra inicio/final
+  observado con segundos al pasar por el ACW, separado de su ancla actual.
+- Inicio conserva sus funciones y ACW. Preparación de disponibilidad en Ajustes,
+  jornada y desgloses en Reportes, comparación y edición en el detalle único de
+  llamada. Sin copias paralelas ni cambio del layout general. La guía práctica
+  explica las 79 funciones; el plan conserva veinte mejoras funcionales abiertas.
 - Google es la entrada pública. Formularios deshabilitados de login/registro y
   solicitud de contraseña retirados; se conserva recuperación de enlaces emitidos,
   perfil, cierre de sesión y el endpoint heredado protegido con sus regresiones.
@@ -516,6 +497,16 @@ futura opera bajo esto, sin excepción:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v641 — Ayuda clara, galería actual y comprobación visual completa.**
+
+- Galería externa: 25 secciones, las 59 mejoras publicadas, rutas actuales,
+  motivo, configuración y ejemplo; guía práctica de 79 funciones completa.
+- Popup/organizador 2.3.4 con nombres claros; mismas acciones y worker. Guías
+  corregidas para reflejar las ubicaciones y conservar la duración observada.
+- Flechas plegables con caja cuadrada y margen de pintura: sin desborde móvil.
+  969 pruebas, ocho recorridos y capturas nativas, ambos temas, galería sin
+  enlaces de imagen rotos. Instalación y recarga de Chrome se registran aparte.
 
 **v640 — Integración solicitada en Reportes y restauración de Fechas de pago.**
 
@@ -541,19 +532,3 @@ futura opera bajo esto, sin excepción:
   cerrar estos reclamos solo por un build o por ausencia de desbordamiento.
 - Propuesta de tres bloques fuera de Git; sin nuevos cambios visuales publicados
   por esta entrega. Extensión permanece 2.3.3; no se pide otra recarga por 639.
-
-**v638 — Presentación nativa aprobada y ubicaciones claras.**
-
-- Inicio conserva ACW y sus funciones habituales; los detalles añadidos usan
-  Ajustes, Reportes y la ventana existente de llamada, sin copias paralelas.
-- Intento insuficiente de color en Fechas de pago y de compactación del ciclo
-  y desglose: reclamos reabiertos el 22/10. Se conservan las reubicaciones,
-  controles y ayudas plegadas; Calendario mantiene su cuadrícula.
-- 967 pruebas correctas; build, idiomas, módulos y wiring verificados. Dieciséis
-  recorridos compilados ES/EN, temas y 320/390/1200/1800 px; otras 52 capturas
-  de trece secciones en ambos temas y 320/1800 px. Pago conserva reserva y el
-  día histórico no muestra el ACW en vivo. Popup 2.3.3 comprobado con API de
-  Chrome simulada en ambos temas. Evidencia externa a Git; no son llamadas reales.
-- Extensión 2.3.3 cambia textos del popup; no modifica la detección de llamadas,
-  los tiempos ni la disponibilidad. Instalación y publicación se comprueban
-  por separado; una copia de archivos no confirma la recarga en Chrome.

@@ -115,7 +115,7 @@ async function refresh() {
   const diagnostic = state.diagnostic || { requests: 0, recognized: 0, last: [] };
   document.getElementById('connectionHealth').textContent = reasons[state.attention] || (!state.paired ? 'Esperando tu sesión de Propio Shift Tracker para conectar.'
     : state.portal === 'authenticated' ? `Propio está abierto y tu sesión fue reconocida. ${callStatus}`
-    : state.portal === 'logged-out' ? 'Saliste de Propio. Esperando que vuelvas a entrar.' : 'Tu tracker está vinculado. Esperando que Propio confirme tu sesión.');
+    : state.portal === 'logged-out' ? 'Saliste de Propio. Esperando que vuelvas a entrar.' : 'Tu cuenta está vinculada. Esperando que Propio confirme tu sesión.');
   document.getElementById('detectorStatus').textContent = diagnostic.requests
     ? `${diagnostic.requests} solicitud(es) observada(s) · ${diagnostic.recognized} señal(es) reconocida(s)`
     : 'Todavía no se observaron solicitudes del portal.';

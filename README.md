@@ -5,13 +5,14 @@ Incluye adherencia, Higher Rate, finanzas, calendario, reportes y gamificación
 opcional. La entrada pública usa **Google**; correo/contraseña y usuario/contraseña
 no están habilitados como métodos públicos de acceso.
 
-La extensión unificada conecta el portal de Propio con el tracker, sincroniza
+La extensión unificada conecta el portal de Propio con Propio Shift Tracker, sincroniza
 llamadas e historial oficial y permite configurar disponibilidad automática,
 vista original del portal y distribución de ventanas. La disponibilidad pulsa
 Start Calls o Stop Calls bajo sus condiciones; no acepta ni rechaza llamadas.
 
 ## Documentación
 
+- [Cierre de los ocho pedidos del 22/10](docs/cierre-ocho-pedidos.md): cambios, evidencia y límites.
 - [Lista de mejoras aprobadas](docs/plan-mejoras-integrales.md): estado individual y evidencia de cada entrega.
 - [Guía práctica de funciones](docs/guia-practica-tool-y-extension.md): qué hace
   cada función, qué se configura y un ejemplo real.
