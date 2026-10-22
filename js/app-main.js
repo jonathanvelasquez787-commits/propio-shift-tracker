@@ -2883,7 +2883,7 @@ function pauseForSlot(slot, dayKey = getActiveDayKey()) {
   return assignment[slotIndex] || null;
 }
 
-function slotStats(slot, dayCalls = calls, dayPauses = dayPauseIntervals(getActiveDayKey()), shiftStart = null, shiftEnd = null, dayKey = getActiveDayKey(), extendStart = null, extendEnd = null) {
+function slotStats(slot, dayCalls = calls, dayPauses = dayPauseIntervals(getActiveDayKey()), shiftStart = null, shiftEnd = null, dayKey = getActiveDayKey(), extendStart = null, extendEnd = null, classifiedGaps = null) {
   const base = callDateToDate(dayKey) || new Date();
   const slotStart = dateAtTime(base, slot.start);
   const slotEnd = dateAtTime(base, slot.end);
@@ -2948,7 +2948,24 @@ function slotStats(slot, dayCalls = calls, dayPauses = dayPauseIntervals(getActi
     if (p.type === slotTypeLower) pauseMinSameType += netOverlap;
   }
 
-  const workUsed = Math.max(0, Math.min(durationMin, callMin + acwMin - pauseMin));
+  let workPauseMin = 0;
+  if (slot.type === 'Work' && sortedCalls.length && dayPauses.length) {
+    const firstStart = new Date(sortedCalls[0].startISO);
+    const accountedStart = shiftStart && shiftStart < firstStart ? shiftStart : firstStart;
+    const accountedEnd = new Date(Math.max(...sortedCalls.map(call => Date.parse(call.endISO))));
+    // Las pausas fuera del tramo contabilizado no pueden reducir trabajo ya realizado.
+    for (const pause of mergeIntervals(dayPauses)) {
+      const from = new Date(Math.max(callWindowStart.getTime(), accountedStart.getTime(), pause.start.getTime()));
+      const to = new Date(Math.min(callWindowEnd.getTime(), accountedEnd.getTime(), pause.end.getTime()));
+      if (to <= from) continue;
+      workPauseMin += Math.max(0, (to - from) / 60000 - overlapMinutesWithIntervals(from, to, callIntervalsForNetting));
+    }
+  }
+  if (slot.type === 'Work' && Array.isArray(classifiedGaps)) {
+    acwMin = acwMinutesForBlock(classifiedGaps, callWindowStart, callWindowEnd, mergeIntervals(dayPauses), overlapMinutesWithIntervals);
+    workPauseMin = 0;
+  }
+  const workUsed = Math.max(0, Math.min(durationMin, callMin + acwMin - workPauseMin));
   const pauseUsed = Math.max(0, Math.min(durationMin, pauseMinSameType));
   const filledMin = slot.type === 'Work' ? workUsed : pauseUsed;
   const pct = durationMin > 0 ? Math.min(100, (filledMin / durationMin) * 100) : 0;
@@ -3014,7 +3031,7 @@ function slotStats(slot, dayCalls = calls, dayPauses = dayPauseIntervals(getActi
   let status = translateText('Pendiente');
   let statusTone = 'muted';
   let detail = slot.type === 'Work'
-    ? ui`Usado ${formatDuration(workUsed * 60000)} · ${formatDuration(callMin * 60000)} llamadas · ${formatDuration(acwMin * 60000)} ACW${pauseMin ? ui` · ${formatDuration(pauseMin * 60000)} pausa` : ''}`
+    ? ui`Usado ${formatDuration(workUsed * 60000)} · ${formatDuration(callMin * 60000)} llamadas · ${formatDuration(acwMin * 60000)} ACW${workPauseMin ? ui` · ${formatDuration(workPauseMin * 60000)} pausa` : ''}`
     : ui`Usado ${formatDuration(pauseUsed * 60000)} de ${formatDuration(durationMin * 60000)}`;
 
   if (slot.type === 'Work') {
@@ -6293,15 +6310,14 @@ function renderSchedule() {
       const lunchBlockTimes = [];
 
       const blockGaps = dayGapRows(dayKey, dayCalls);
-      const blockPauseIntervals = mergeIntervals(dayPauses);
       const slotRows = plannedSlots.map((slot, slotIdx) => {
         const extendStart = slotIdx === firstWorkIndex ? shiftStart : null;
         const extendEnd = slotIdx === lastWorkIndex ? shiftEnd : null;
-        const stats = slotStats(slot, dayCalls, dayPauses, shiftStart, shiftEnd, dayKey, extendStart, extendEnd);
+        const stats = slotStats(slot, dayCalls, dayPauses, shiftStart, shiftEnd, dayKey, extendStart, extendEnd, blockGaps);
         const active = now >= stats.slotStart && now < stats.slotEnd;
         const done = live ? now >= stats.slotEnd : !!(shiftEnd && shiftEnd >= stats.slotEnd);
         const blockAcwMin = slot.type === 'Work'
-          ? acwMinutesForBlock(blockGaps, stats.callWindowStart, stats.callWindowEnd, blockPauseIntervals, overlapMinutesWithIntervals)
+          ? stats.acwMin
           : 0;
         if (slot.type === 'Break') {
           breakPlannedMin += stats.durationMin;
