@@ -27,8 +27,9 @@ externa cierre-641-production.json identifica el commit público y verifica
 ocho archivos servidos. PR anteriores: #101 (639) y #102 (640).
 
 Extensión 2.3.4: archivos instalados con respaldo completo; preferencias y
-worker conservados. La activación requiere recargarla en Chrome y confirmar
-su versión. La copia de archivos no se presenta como recarga confirmada.
+worker conservados. El 22/10/2026 el propietario confirmó «Sí, muestra 2.3.4»
+después de recargarla en Chrome. Activación confirmada por el propietario;
+se distingue de la instalación y de la prueba con API simulada.
 
 ## Evidencia y pendientes
 

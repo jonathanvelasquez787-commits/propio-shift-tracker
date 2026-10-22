@@ -324,10 +324,6 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
-- **Activación local del popup 2.3.4:** archivos instalados con respaldo y
-  preferencias conservadas; Chrome no está conectado a este chat. Requiere
-  recarga del propietario cuando esté fuera de una llamada. No confundir
-  instalación con activación ni repetir recargas de entregas anteriores.
 - **Ocho pedidos directos del 22/10:** implementación y evidencia reunidas en
   docs/cierre-ocho-pedidos.md. Web 639 aporta el hover con segundos; 640 integra
   Reportes y restaura la fecha azul; 641 cierra galería, lenguaje y control
@@ -362,6 +358,10 @@ futura opera bajo esto, sin excepción:
   ver [idiomas y temas](docs/idiomas-y-temas.md).
 
 **CONFIRMACIONES Y CONFIGURACIÓN LOCAL VIGENTES**
+
+- El 22/10/2026 el propietario confirmó «Sí, muestra 2.3.4» después de recargar
+  la extensión. Popup 2.3.4 activo; no volver a pedir esta recarga ni presentarla
+  como pendiente. Archivos instalados con respaldo y preferencias conservadas.
 
 - El usuario confirmó inicio automático de llamadas, regreso tras Break y arranque
   correcto después de reiniciar. La recarga de Propio/tracker está confirmada;
