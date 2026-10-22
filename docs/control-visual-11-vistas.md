@@ -66,3 +66,12 @@ Evidencia de la entrega preparada: `aprobadas-aplicadas-qa.json` (12 recorridos)
 La disponibilidad compacta es el ajuste posterior pedido por el propietario.
 Publicación verificada en PR #97 y producción del mismo commit. El propietario
 confirmó la recarga y el popup 2.3.1.
+
+## Integración posterior aprobada el 21/10
+
+Web 637 reúne catorce ajustes de distribución en funciones existentes. Las
+capturas `integrado-*` y `registro-*`, fuera de Git, corresponden a la
+aplicación compilada con cuenta ficticia; `integracion-qa.json` registra doce
+recorridos ES/EN, temas y anchos. `integracion-popup-qa.json` registra el popup
+real con API de Chrome simulada. La revisión no convierte la maqueta en prueba.
+La extensión 2.3.2 cambia su ayuda; el propietario confirmó su recarga.

@@ -3,7 +3,7 @@ import { callElapsedMs, compareCallRecords } from './call-records.js';
 
 export function renderCallTable(context) {
   const { ui, translateText, translateMarkup, getActiveDayKey, formatCallDayLabel, callsForDay, dayActionRows, tableFilterMode,
-    higherRateBonusForCall, higherRateTierBadgeHtml, iconHtml, escapeHtml, parseMoney, money, financeConvertedNote,
+    state, higherRateBonusForCall, higherRateTierBadgeHtml, iconHtml, escapeHtml, parseMoney, money, financeConvertedNote,
     timeLabelFromDate, formatMinutes } = context;
       const wrap = document.getElementById('callTableWrap');
       const dayKey = getActiveDayKey();
@@ -15,6 +15,12 @@ export function renderCallTable(context) {
       const source = document.getElementById('callSourceFilter')?.value || 'all';
       const count = document.getElementById('callReviewCounts');
       if (count) count.textContent = ui`Día activo: ${sortedCalls.length} llamada(s) · Coinciden con tu búsqueda: ${sortedCalls.filter(call => matchesCallReview(call, search, source)).length}`;
+      const reviews = (state.callRecordReviews || []).filter(review => (review.call.callDate === dayKey || sortedCalls.some(call => review.candidateIds.includes(call.id))) && (!search || String(review.call.customerId).toLowerCase().includes(search.toLowerCase())));
+      if (count && reviews.length) count.textContent += ui` · ${reviews.length} pendiente(s) de vincular`;
+      if (source === 'pending') {
+        if (count) count.textContent = `${translateText('Pendientes de vincular')}: ${reviews.length}`;
+        wrap.innerHTML = reviews.map(review => `<div class="tbl-row"><div class="tbl-row-main"><button class="record-link" type="button" data-record-review="${escapeHtml(review.id)}">#${escapeHtml(review.call.customerId)} · ${escapeHtml(translateText('Revisar vínculo'))}</button><div class="tbl-row-sub">${escapeHtml(review.call.callStart)} · ${escapeHtml(ui`${review.call.durationMin} min`)}</div></div><div class="tbl-row-right">${money(parseMoney(review.call.pay))}${financeConvertedNote(parseMoney(review.call.pay))}</div></div>`).join('') || `<p class="note">${escapeHtml(translateText('No hay vínculos pendientes para este día.'))}</p>`; return;
+      }
       const actionRows = dayActionRows(dayKey);
 
       // Entradas combinadas — cada una con un `ts` común para poder ordenar todo junto
@@ -73,9 +79,9 @@ export function renderCallTable(context) {
             <div class="tbl-row">
               <span class="tbl-row-icon type-call">${iconHtml('phone')}</span>
               <div class="tbl-row-main">
-                <div class="tbl-row-title">#${escapeHtml(c.customerId)} <span class="tbl-type-badge type-call">Llamada</span></div>
+                <div class="tbl-row-title"><button class="record-link" type="button" data-call-records="${escapeHtml(c.id || '')}">#${escapeHtml(c.customerId)}</button> <span class="tbl-type-badge type-call">Llamada</span></div>
                 <div class="tbl-row-sub">${escapeHtml(billableText)} · ${escapeHtml(droppedText)} · ${escapeHtml(sourceLabel)}</div>
-                <button class="record-link" type="button" data-call-records="${escapeHtml(c.id || '')}">${comparison.propio ? comparison.tool ? translateText('Propio y respaldo') : translateText('Registro de Propio') : comparison.tool ? translateText('Respaldo · pendiente de Propio') : translateText('Ver registros')}${Math.abs(comparison.differenceMs || 0) >= 1000 ? ui` · Diferencia: ${Math.round(Math.abs(comparison.differenceMs) / 1000)} s` : ''}</button>
+                <span class="tbl-row-sub">${comparison.propio ? comparison.tool ? translateText('Propio y respaldo') : translateText('Registro de Propio') : comparison.tool ? translateText('Respaldo · pendiente de Propio') : translateText('Ver registros')}${Math.abs(comparison.differenceMs || 0) >= 1000 ? ui` · Diferencia: ${Math.round(Math.abs(comparison.differenceMs) / 1000)} s` : ''}</span>
               </div>
               <div class="tbl-row-right">
                 <div class="tbl-row-amount">${money(parseMoney(c.pay))}</div>

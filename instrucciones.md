@@ -463,8 +463,13 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
-- App 637; archivos de extensión 2.3.1 instalados con respaldo y configuración
-  personal conservada. El propietario confirmó la recarga y el popup 2.3.1.
+- App 637: integración aprobada de catorce puntos en los destinos existentes.
+  Una sola vista de llamada reúne comparación y edición; los pendientes viven
+  en el listado. Logros, metas, Higher Rate, jornada, apoyo, respaldos y reparto
+  reutilizan sus funciones, sin los resúmenes y formularios paralelos retirados.
+  Entrega en PR #99; comprobación de publicación y archivos del commit al desplegar.
+  Archivos de extensión 2.3.2 instalados con respaldo y configuración
+  personal conservada. El propietario confirmó la recarga y el popup 2.3.2.
   Diseño compacto aprobado: resumen cerrado y preparación al pulsarlo.
   El panel de disponibilidad está en la tool;
   el popup de Chrome configura la extensión y esta transmite el estado a la web.
@@ -495,19 +500,26 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
-**v637 — Propio y respaldo observado separados.**
+**v637 — Respaldo observado e integración en funciones existentes.**
 
-- Diseño aprobado aplicado al ACW, última llamada y comparación. Duración
+- Detalle único de llamada desde el listado o ACW; edición plegada y pendientes
+  en su filtro. Retirada la tarjeta adicional de última llamada. Duración
   observada de 7:41 conserva 461000 ms; el pago puede estimarse con ocho minutos.
   La importación conserva el respaldo original y usa Propio como principal.
 - Diferencias de cierre/pago visibles, historial plegado y cero distinguido de
   ausencia. Vínculos dudosos persistidos para selección explícita, con protección
   ante cuenta/datos cambiados, otras llamadas y fallo de guardado.
-- Sin cambios de extensión, esquema alojado ni compras. Ver
+- Catorce integraciones aprobadas aplicadas; meta del ciclo y promoción con
+  un solo editor. La edición de promoción distingue conservar y recalcular.
+  Los vínculos resueltos en otra importación se retiran de su cola.
+- La extensión 2.3.2 solo compacta la ayuda del popup; instalada con respaldo
+  y recarga confirmada. Sin cambios de esquema alojado ni compras. Ver
   docs/registros-propio-y-tool.md. Las veinte mejoras del plan siguen abiertas.
-- 962 pruebas correctas, build, i18n, módulos y wiring verificados. Recorridos
+- 966 pruebas correctas, build, i18n, módulos y wiring verificados. Recorridos
   compilados aislados ES/EN, claro/oscuro y 320/390/1200 px para precisión,
   importación, corrección a cero, recarga y selección explícita de respaldo.
+  Doce recorridos de integración y ambos temas del popup, con API de Chrome
+  simulada y datos ficticios; alcance distinto de las pruebas físicas pendientes.
 
 **v636 — Estimaciones desde cuarenta segundos y disponibilidad compacta.**
 

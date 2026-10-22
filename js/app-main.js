@@ -3719,13 +3719,6 @@ function useAutoCycleGoal() {
   toast(translateText('Meta del ciclo vuelve a calcularse automáticamente'));
 }
 
-function updateCycleGoalFromAjustes() {
-  const input = document.getElementById('cycleGoalInput');
-  const amount = Number(input?.value);
-  if (setCycleGoalOverride(0, Number.isFinite(amount) && amount > 0 ? amount : null) === false) return false;
-  render();
-}
-
 // Mejor/peor día de los últimos 7 días CON adherencia calculable — score = Adherencia del día
 // (mismo criterio "más alto es mejor" que ya usa el resto de la app). "vs promedio" compara contra
 // el promedio de esa misma serie de 7 días.
@@ -4559,7 +4552,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       if (owner !== settings || sequence !== importOutcomeSequence) return;
       const retry = document.getElementById('importResultRetryBtn');
       if (retry) retry.hidden = !!view;
-      if (view) view.renderImportOutcome({ ui, translateText, escapeHtml }, ...args);
+      if (view) view.renderImportOutcome({ ui, translateText, escapeHtml, reviews: state.callRecordReviews || [] }, ...args);
       else toast(translateText('El registro ya terminó, pero no se pudo cargar su detalle. Podés reintentarlo.'));
     }
 
@@ -4732,8 +4725,10 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       }
 
       if (background && (overlapSkipped > recordReviews.length || futureRows.length)) return false;
-      if (recordReviews.length) {
-        const previous = state.callRecordReviews || [];
+      const resolvedReviewIds = new Set([...accepted.map(item => `${item.call.customerId}|${item.call.startISO}`), ...skippedDuplicates.map(call => `${call.customerId}|${call.startISO}`)]);
+      const reviewsRemoved = (state.callRecordReviews || []).some(review => resolvedReviewIds.has(review.id));
+      if (recordReviews.length || reviewsRemoved) {
+        const previous = (state.callRecordReviews || []).filter(review => !resolvedReviewIds.has(review.id));
         const incomingIds = new Set(recordReviews.map(review => review.id));
         const next = [...previous.filter(review => !incomingIds.has(review.id)), ...recordReviews];
         if (next.length > 100) return false;
@@ -4809,7 +4804,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       const replacedNote = replacedLive.length ? ui` · ${replacedLive.length} live actualizada(s)` : '';
       const correctedNote = correctedOfficial.length ? ui` · ${correctedOfficial.length} oficial(es) corregida(s)` : '';
 
-      const importChangedData = unique.length || replacedLive.length || correctedOfficial.length || recordReviews.length;
+      const importChangedData = unique.length || replacedLive.length || correctedOfficial.length || recordReviews.length || reviewsRemoved;
       if (importChangedData) {
         setEvent('import', translateText('Llamadas importadas'), ui`${unique.length} fila(s) · ${importNote}${overlapNote}${duplicateNote}${futureNote}${replacedNote}${correctedNote}`, 'Propio');
         financeRunAutoFillCascade();
@@ -5190,6 +5185,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
         return;
       }
       if(owner!==settings||document.getElementById('pageAchievements').hidden)return;
+      if (!view) { document.getElementById('gameReviewSummary').textContent=translateText('No se pudo cargar el resumen. Volvé a abrir esta sección.'); return; }
       view.renderGameReview({ui,translateText,escapeHtml,model:gameReviewSnapshot(),valid:()=>owner===settings});
     }
 
@@ -5197,8 +5193,9 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       document.getElementById('notificationReview').replaceChildren();
       const owner=settings,view=await loadDetailViews({retry:true});
       if(owner!==settings||!document.getElementById('notificationsModal').classList.contains('open'))return;
+      if (!view) return;
       view.renderNotificationReview({ui,translateText,escapeHtml,settings,productive:minutesSinceLastProductiveBreakAnchor,soundConfigs:Object.values(ALARM_SOUND_CONFIGS),valid:()=>owner===settings,navigate:kind=>{
-        closeModal('notificationsModal');navigateToPage('achievements');
+        if(kind==='history'){ closeModal('notificationsModal');navigateToPage('achievements'); }
         const target=document.getElementById(kind==='support'?'positiveSettingsAccordion':'positiveHistoryPanel');
         if(kind==='support')target.open=true;
         target.scrollIntoView({block:'start'});target.setAttribute('tabindex','-1');target.focus({preventScroll:true});
@@ -5720,26 +5717,6 @@ function renderHeader() {
       acwLiveChip.style.display = 'none';
     }
   }
-  const recordButton = document.getElementById('latestCallRecordsBtn');
-  const recordReviewButton = document.getElementById('pendingCallRecordsBtn');
-  if (recordButton) {
-    const latest = [...callsForDay(getActiveDayKey())].sort((a,b) => Date.parse(b.endISO) - Date.parse(a.endISO))[0];
-    document.getElementById('latestCallRecordRow').hidden = !latest;
-    recordButton.hidden = !latest;
-    if (latest) {
-      recordButton.dataset.callRecords = latest.id;
-      const comparison = compareCallRecords(latest);
-      document.getElementById('latestCallRecordLabel').textContent = `#${latest.customerId} · ${formatDuration(latest.source === 'live' ? Date.parse(latest.endISO) - Date.parse(latest.startISO) : latest.durationMin * 60000)}`;
-      document.getElementById('latestCallRecordStatus').textContent = comparison.propio ? comparison.tool ? translateText('Propio · respaldo guardado') : translateText('Registro de Propio') : comparison.tool ? translateText('Tool · pendiente de confirmar en Propio') : translateText('Registro manual');
-      document.getElementById('latestCallRecordPay').textContent = money(parseMoney(latest.pay));
-      document.getElementById('latestCallRecordConverted').textContent = convertedAmountText(parseMoney(latest.pay));
-    }
-  }
-  if (recordReviewButton) {
-    recordReviewButton.hidden = !(state.callRecordReviews || []).length;
-    recordReviewButton.textContent = ui`Revisar vínculos pendientes: ${(state.callRecordReviews || []).length}`;
-  }
-
   const greetingTitleEl = document.getElementById('greetingTitle');
   if (greetingTitleEl) greetingTitleEl.textContent = greetingText(now);
   const greetingSubtitleText = translateText('Jamás negocio con mis excusas: no hacer nada también es una. Doy el primer paso y avanzo hasta lograr lo que me propongo.');
@@ -6887,8 +6864,15 @@ export function render() {
       const start = computeCurrentAcwStart();
       openCallRecords(document.getElementById('acwLiveChip').dataset.recordId || null, start?.toISOString());
     });
-    document.getElementById('pendingCallRecordsBtn').addEventListener('click', () => openCallRecords(null));
     document.addEventListener('click', event => {
+      if (event.target.closest?.('[data-open-call-pending]')) {
+        closeModal('callsModal'); navigateToPage('home');
+        setBlocksViewMode('calls'); document.getElementById('blocksCallsView').closest('details.accordion-card').open = true;
+        document.getElementById('callSourceFilter').value='pending'; renderTable();
+        const target=document.getElementById('callSourceFilter');target.scrollIntoView({block:'center'});target.focus();return;
+      }
+      const review = event.target instanceof Element ? event.target.closest('[data-record-review]') : null;
+      if (review) { openCallRecords(null, null, review.dataset.recordReview); return; }
       const target = event.target instanceof Element ? event.target.closest('[data-call-records]') : null;
       if (target) {
         const start = computeCurrentAcwStart(), owner = start && acwCallRecord(calls, start.toISOString());
@@ -7118,7 +7102,13 @@ export function render() {
       }
     });
     document.getElementById('copyDayToAllBtn').addEventListener('click', copyDayToAll);
-    document.getElementById('workDayReviewBtn').addEventListener('click', openWorkDayReview);
+    document.getElementById('workDayReviewBtn').addEventListener('click', () => {
+      const target = document.getElementById('workDayReviewDetails');
+      target.closest('details.accordion-card').open = true;
+      setBlocksViewMode('blocks');
+      target.open = true; openWorkDayReview(); target.scrollIntoView({block:'start'}); target.querySelector('summary').focus();
+    });
+    document.getElementById('workDayReviewDetails').addEventListener('toggle', () => { if(document.getElementById('workDayReviewDetails').open) openWorkDayReview(); });
     document.getElementById('payDatesRetryBtn').addEventListener('click', () => usePayReceipts('retry'));
     document.getElementById('payDatesBody').addEventListener('click', event => {
       const button = event.target instanceof Element ? event.target.closest('[data-pay-receipt]') : null;
@@ -7396,43 +7386,11 @@ export function render() {
     document.getElementById('higherRateModal').addEventListener('click', (e) => {
       const review = e.target instanceof Element ? e.target.closest('[data-review-hr-window]') : null;
       if (review) { openHigherRateReview(review.closest('.hr-window-card').getAttribute('data-hr-window-id')); return; }
-      // El pill de nivel escribe en el <select class="hr-window-tier-input"> oculto de siempre.
-      const tierBtn = e.target instanceof Element ? e.target.closest('[data-hr-tier-btn]') : null;
-      if (tierBtn) {
-        const card = tierBtn.closest('.hr-window-card');
-        const select = card ? card.querySelector('.hr-window-tier-input') : null;
-        const tier = tierBtn.getAttribute('data-tier');
-        if (select) select.value = tier;
-        if (card) {
-          card.setAttribute('data-tier', tier);
-          card.querySelectorAll('.hr-window-tier-btn').forEach(b => {
-            const t = b.getAttribute('data-tier');
-            const active = t === tier;
-            b.setAttribute('aria-pressed', active ? 'true' : 'false');
-            b.textContent = hrTierButtonLabel(t, active);
-          });
-        }
-        saveHigherRateWindowsFromEditor();
-        return;
-      }
       const btn = e.target instanceof Element ? e.target.closest('[data-remove-hr-window]') : null;
       if (!btn) return;
       const row = btn.closest('.hr-window-card');
       const id = row ? row.getAttribute('data-hr-window-id') : null;
       if (id) removeHigherRateWindowRowAt(id);
-    });
-    document.getElementById('higherRateModal').addEventListener('change', (e) => {
-      if (!(e.target instanceof Element)) return;
-      const card = e.target.closest('.hr-window-card');
-      if (!card) return;
-      // La fecha sigue siendo un <input type="date"> real (editable), solo restylada para verse
-      // como texto.
-      if (e.target.classList.contains('hr-window-date-input')) {
-        const dayKey = dayKeyFromIsoDate(e.target.value) || todayCallDateKey();
-        const nameEl = card.querySelector('.hr-window-day-name');
-        if (nameEl) nameEl.textContent = hrWindowWeekdayLabel(dayKey);
-      }
-      saveHigherRateWindowsFromEditor();
     });
     document.getElementById('daySelector').addEventListener('change', (e) => {
       const key = dayKeyFromIsoDate(e.target.value);
@@ -7636,7 +7594,7 @@ export function render() {
         saveCycleGoalEditor();
       }
     });
-    document.getElementById('cycleGoalInput').addEventListener('change', updateCycleGoalFromAjustes);
+    document.getElementById('cycleGoalSettingsBtn').addEventListener('click', () => { closeModal('goalsModal'); openCycleGoalEditor(); });
     document.getElementById('saveCalYearGoalBtn').addEventListener('click', saveCalYearGoalModal);
     document.getElementById('useAutoCalYearGoalBtn').addEventListener('click', useAutoCalYearGoalModal);
     document.getElementById('calYearGoalModal').addEventListener('keydown', (e) => {

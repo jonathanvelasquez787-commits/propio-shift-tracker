@@ -125,6 +125,26 @@ test('correction transactions roll back rejected finance and bonus changes, then
   assert.equal(higherRateBonusForCall(calls[0]), null); assert.equal(higherRateBonusForCall(calls[1]).amount, .77);
 });
 
+test('the unified promotion editor previews and preserves earned bonuses before moving its window', async t => {
+  const h = transactionFixture(t), draft = { ...window, start: '10:00', end: '11:00' };
+  const before = higherRateBonusForCall(calls[0]).amount;
+  const model = fixture([window]);
+  const plan = higherRateCorrectionPlan(calls, [window], 'hr', draft, {...model.context, preserve:true});
+  assert.equal(plan.beforeTotal, plan.afterTotal);
+  // Restore the transaction owner replaced by the pure-model fixture.
+  const tx = transactionFixture(t);
+  tx.accepted = false;
+  const prior = JSON.stringify({settings,calls});
+  assert.equal(await applyHigherRateCorrection('hr', draft, tx.stamp(), 'preserve'), false);
+  assert.equal(JSON.stringify({settings,calls}), prior);
+  tx.accepted = true;
+  assert.equal(await applyHigherRateCorrection('hr', draft, tx.stamp(), 'preserve'), true);
+  assert.equal(higherRateBonusForCall(calls[0]).amount, before);
+  assert.equal(calls[0].frozenHigherRateBonus.windowId, 'hr');
+  const reloaded = JSON.parse(tx.saved);
+  assert.equal(reloaded.calls[0].frozenHigherRateBonus.amount, before);
+});
+
 for (const change of ['account', 'calls', 'revision', 'currency']) test(`correction refuses to apply after ${change} changes during review`, async t => {
   const h = transactionFixture(t), stamp = h.stamp();
   if (change === 'account') setAppSettings(structuredClone(settings));

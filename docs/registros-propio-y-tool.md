@@ -1,8 +1,8 @@
 # Propio y el respaldo observado
 
 El diseño y la separación de registros se aprobaron el 21/10/2026. La web
-conserva dos fuentes vinculadas a una sola llamada; la extensión 2.3.1 ya
-transmite los instantes observados y no necesita cambiar para esta entrega.
+conserva dos fuentes vinculadas a una sola llamada; la extensión ya transmite los instantes observados. La extensión 2.3.2 solo
+compacta su ayuda; estos cambios de registro se implementan en la web.
 
 ## Datos y prioridades
 
@@ -27,8 +27,10 @@ transmite los instantes observados y no necesita cambiar para esta entrega.
 
 ## Dónde verlo
 
-En Inicio, pulsar el ACW o «Ver registros» de la última llamada. En la tabla,
-cada llamada tiene acceso a su registro. El detalle distingue Propio, respaldo,
+En Inicio → Bloques del día → Llamadas, pulsar la llamada para abrir su único
+detalle. El lápiz abre ese mismo detalle con la edición desplegada. El ACW
+lleva a la llamada que explica su cálculo, sin otra pantalla. No hay una
+segunda tarjeta de historial. El detalle distingue Propio, respaldo,
 diferencia de cierre y pago, y muestra el historial y milisegundos plegados.
 No se muestran controles de simulación de la maqueta en la app real.
 
@@ -39,8 +41,9 @@ llamada local queda pendiente de confirmar. Un cero informado sí es un dato:
 Propio pasa a ser principal, conservando duración y estimación originales.
 
 Si varias llamadas live pueden coincidir, `state.callRecordReviews` conserva
-la fila recibida y los candidatos sin reemplazarlos. «Revisar vínculos pendientes»
-permite seleccionar uno. Cuenta, fila recibida y candidatos deben seguir
+la fila recibida y los candidatos sin reemplazarlos. El filtro «Pendientes de
+vincular» del listado abre cada caso en el mismo detalle y permite seleccionar
+uno. Una importación que lo resuelva retira su revisión en la misma transacción. Cuenta, fila recibida y candidatos deben seguir
 iguales al confirmar. Otra llamada real que cruce el intervalo bloquea la
 vinculación, sin borrar ni excluir datos del total. No se adivina cómo dividir
 una fila oficial entre varias llamadas reales. La cola admite 100 revisiones;

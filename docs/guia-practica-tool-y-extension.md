@@ -10,14 +10,15 @@ La **tool** lleva tus registros, cálculos y ajustes. La **extensión** conecta 
 
 ### Comparar Propio con lo que observó la tool
 
-En Inicio, pulsá el contador de ACW o «Ver registros» de la última llamada.
-También podés abrir el registro desde cada fila de la tabla. Propio tiene
+En Inicio → Bloques del día → Llamadas, pulsá una llamada para ver su detalle.
+Ahí comparás sus fuentes y podés desplegar la edición; el lápiz abre ese mismo
+detalle para editar. El contador de ACW también lleva a la llamada responsable. Propio tiene
 prioridad al llegar su historial y la tool conserva su inicio, final y duración
 observados como respaldo: una llamada de 7:41 sigue registrada como 7:41 aunque
 su pago se estime con 8 minutos. El origen del ACW y las diferencias quedan
 visibles; el detalle permite comparar ambas versiones sin duplicar ganancias.
 Si falta en Propio, se conserva pendiente de confirmar. Si hay varias posibles
-coincidencias, usá «Revisar vínculos pendientes». [Alcance y excepciones](registros-propio-y-tool.md).
+coincidencias, elegí «Pendientes de vincular» en el filtro del listado. [Alcance y excepciones](registros-propio-y-tool.md).
 
 ## 1. Empezar y terminar tu jornada
 

@@ -38,7 +38,7 @@ export function linkCallRecordReview(context, reviewId, callId, opened) {
   return true;
 }
 
-export function openCallRecords(context, callId, acwStart = null) {
+export function openCallRecords(context, callId, acwStart = null, reviewId = null) {
   const { calls, state, settings } = context.data(), owner = settings;
   const { ui, translateText, escapeHtml: esc, money, financeConvertedInline, formatDuration } = context;
   const root = document.getElementById('callRecordsContent');
@@ -53,13 +53,15 @@ export function openCallRecords(context, callId, acwStart = null) {
   const elapsed = acwStart ? Math.max(0, Date.now() - Date.parse(start)) : null;
   const title = propio ? tool && acwStart ? translateText('El ACW sigue el final de Propio') : translateText('Registro informado por Propio')
     : tool ? translateText('Tu tool conserva la llamada') : acwStart ? translateText('ACW desde el turno o una pausa') : translateText('Vínculos pendientes de revisión');
-  document.getElementById('callRecordsSubtitle').textContent = call ? `#${call.customerId} · ${call.callDate}` : translateText('Tus observaciones se conservan');
+  document.getElementById('callRecordsSubtitle').textContent = call ? call.callDate : translateText('Tus observaciones se conservan');
   let html = `<div class="record-explain"><strong>${esc(title)}</strong><p>${esc(propio && tool ? translateText('Propio tiene prioridad. La observación original sigue guardada como respaldo.') : tool ? translateText('La llamada aún no está confirmada en el historial de Propio. No se borra por ausencia.') : translateText('Consultá el origen de los tiempos y los registros disponibles.'))}</p></div>`;
   if (Number.isFinite(elapsed)) html += `<div class="record-equation"><div><small>${esc(translateText('Ahora'))}</small><strong>${esc(equationClock(new Date().toISOString()))}</strong></div><span>−</span><div><small>${esc(propio ? translateText('Final de Propio*') : tool ? translateText('Final de tu tool') : translateText('Inicio del ACW'))}</small><strong>${esc(equationClock(start))}</strong></div><span>=</span><div><small>ACW</small><strong class="record-acw-value">${esc(compactDuration(elapsed))}</strong></div></div>`;
   if (comparison.differenceMs !== null && (Math.abs(comparison.differenceMs) >= 1000 || comparison.payDifference)) {
     html += `<div class="record-difference-line">${esc(ui`Diferencia de cierre: ${formatDuration(Math.abs(comparison.differenceMs))}`)}${comparison.payDifference ? ` · ${esc(translateText('Diferencia de pago'))}: ${amount(Math.abs(comparison.payDifference))}` : ''}</div>`;
   }
   if (call) {
+    if (call.manualCorrectionAt || !propio && !tool) html += `<div class="review-overview"><div class="review-metric"><span>${esc(translateText('Duración registrada'))}</span><strong>${esc(formatDuration(Number(call.durationMin) * 60000))}</strong></div><div class="review-metric"><span>${esc(translateText('Pago registrado'))}</span><strong>${amount(Number(String(call.pay).replace(/[$,\s]/g,'')))}</strong></div></div>`;
+    if (propio || tool) {
     html += `<div class="record-sources"><article class="record-source is-propio"><header><strong>Propio</strong><span>${esc(propio ? translateText('PRIORIDAD') : translateText('PENDIENTE'))}</span></header>`;
     html += propio ? `<dl>${row(translateText('Inicio informado'),esc(clock(propio.startISO)))}${row(translateText('Final calculado*'),esc(clock(propio.endISO)))}${row(translateText('Duración informada'),esc(ui`${propio.durationMin} min`))}${row(translateText('Pago informado'),amount(propio.pay))}</dl><p class="record-source-note">${esc(translateText('*Inicio + duración del historial. Propio no expone aquí los segundos originales.'))}</p>`
       : `<div class="record-await"><strong>${esc(translateText('Aún no aparece'))}</strong><p>${esc(translateText('Tu respaldo se conserva mientras esperamos el historial.'))}</p></div>`;
@@ -69,6 +71,9 @@ export function openCallRecords(context, callId, acwStart = null) {
     html += '</article></div>';
     if (propio && tool && (!propio.durationMin || !propio.pay)) html += `<div class="record-review-note"><strong>${esc(translateText('Propio informa cero'))}</strong><p>${esc(translateText('El total usa el registro de Propio. Tu observación y su estimación siguen disponibles.'))}</p></div>`;
     html += `<p class="record-foot">${esc(translateText('Dos fuentes de la misma llamada; no se suman dos veces.'))}</p>`;
+    }
+    const reflection = state.game?.reinforcement?.reflections?.[call.id];
+    if (reflection) html += `<details class="record-history"><summary>${esc(translateText('Cierre personal de esta llamada'))}</summary><p>${esc(({good:translateText('Cerró bien'),difficult:translateText('Fue difícil'),learning:translateText('Me dejó un aprendizaje')})[reflection.outcome] || reflection.outcome)}</p>${reflection.note ? `<p>${esc(reflection.note)}</p>` : ''}</details>`;
     const events = [];
     if (tool) {
       events.push([tool.startISO,translateText('Inicio observado')],[tool.endISO,translateText('Cierre observado · respaldo guardado')]);
@@ -77,7 +82,7 @@ export function openCallRecords(context, callId, acwStart = null) {
     for (const previous of call.records?.changes || []) if(previous.receivedAt) events.push([previous.receivedAt,translateText('Versión anterior de Propio conservada')]);
     html += `<details class="record-history"><summary>${esc(translateText('Ver cómo se actualizó esta llamada'))}</summary><ol>${events.sort((a,b)=>Date.parse(a[0])-Date.parse(b[0])).map(([at,label])=>`<li><time>${esc(clock(at))}</time><span>${esc(label)}</span></li>`).join('')}</ol>${tool ? `<div class="record-precision"><strong>${esc(translateText('Marcas observadas con milisegundos'))}</strong><code>${esc(tool.startISO)}</code><code>${esc(tool.endISO)}</code><p>${esc(ui`Duración guardada: ${tool.durationMs} ms`)}</p></div>` : ''}<p class="record-source-note">${esc(translateText('Pago estimado: de 0 a 39 segundos se conservan los minutos completos; desde 40 segundos se suma un minuto. La duración observada no se redondea.'))}</p></details>`;
   }
-  const reviews = (state.callRecordReviews || []).filter(review => !call || review.candidateIds.includes(call.id));
+  const reviews = (state.callRecordReviews || []).filter(review => reviewId ? review.id === reviewId : call && review.candidateIds.includes(call.id));
   for (const review of reviews) {
     const candidates = calls.filter(item => review.candidateIds.includes(item.id));
     html += `<section class="record-review-note"><strong>${esc(translateText('Revisá antes de vincular'))} · #${esc(review.call.customerId)}</strong><p>${esc(ui`Propio: ${clock(review.call.startISO)} · ${review.call.durationMin} min`)} · ${amount(Number(String(review.call.pay).replace(/[$,\s]/g,'')))}</p><div class="record-candidates">${candidates.map((item,index)=>`<label><input type="radio" name="record-${esc(review.id)}" value="${esc(item.id)}" ${index?'':'checked'}/><span>${esc(clock(item.startISO))} → ${esc(clock(item.endISO))}<small>${esc(formatDuration(Date.parse(item.endISO)-Date.parse(item.startISO)))}</small></span></label>`).join('')}</div><button class="mc-btn-primary cyan" type="button" data-record-link="${esc(review.id)}">${esc(translateText('Vincular respaldo seleccionado'))}</button><p class="record-source-note">${esc(translateText('Los demás registros se conservan. Si hay un cruce con otra llamada, la vinculación se detiene para revisión.'))}</p></section>`;
@@ -88,8 +93,8 @@ export function openCallRecords(context, callId, acwStart = null) {
     const opened = { owner, review: JSON.stringify(review), candidates: JSON.stringify(calls.filter(item => review.candidateIds.includes(item.id))) };
     button.addEventListener('click', () => {
       const input = [...root.querySelectorAll('input[type="radio"]')].find(item => item.name === `record-${review.id}` && item.checked);
-      if (input && linkCallRecordReview(context, review.id, input.value, opened)) openCallRecords(context,input.value);
+      if (input && linkCallRecordReview(context, review.id, input.value, opened)) context.closeModal('callEditModal');
     });
   }
-  context.openModal('callRecordsModal');
+  context.openModal('callEditModal');
 }

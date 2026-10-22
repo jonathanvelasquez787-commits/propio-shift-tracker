@@ -29,12 +29,16 @@ export function configureCallsContext(context) {
     toDateFromInputs, toast, todayCallDateKey, playCallSavedSound } = context);
 }
 
-let editingCallId = null, editingCallContext = null;
+let editingCallId = null, editingCallContext = null, callDetailSequence = 0;
 
 async function useCallRecovery(action, ...args) {
   const owner = settings;
+  const detail = action === 'openCallRecords', sequence = detail ? ++callDetailSequence : callDetailSequence;
+  const record = detail && args[0] ? JSON.stringify(calls.find(call => call.id === args[0])) : null;
   const module = await loadDetailViews({ retry: true });
   if (settings !== owner) return false;
+  if (detail && !document.getElementById('callEditModal').classList.contains('open')) return false;
+  if (detail && (sequence !== callDetailSequence || record && record !== JSON.stringify(calls.find(call => call.id === args[0])))) return false;
   if (!module) { toast(translateText('No se pudo cargar el detalle. Cerrá y abrí esta sección para reintentar.')); return false; }
   return module[action]({ ...callContext, ui, translateText, displayLocale,
     data: () => ({ calls, state, settings }), setCalls, setState: setAppState, reconcileLastCallEndedAt,
@@ -43,7 +47,15 @@ async function useCallRecovery(action, ...args) {
 }
 
 export function openCallRecovery() { return useCallRecovery('openCallRecovery'); }
-export function openCallRecords(callId, acwStart = null) { return useCallRecovery('openCallRecords', callId, acwStart); }
+export function openCallRecords(callId, acwStart = null, reviewId = null) {
+  if (callId) return openCallEditor(callId, { edit: false, acwStart });
+  document.getElementById('callEditFields').hidden = true;
+  document.getElementById('callEditModalTitle').textContent = translateText('Detalle del registro');
+  document.getElementById('callRecordsContent').innerHTML = '';
+  editingCallId = null; editingCallContext = null;
+  openModal('callEditModal');
+  return useCallRecovery('openCallRecords', null, acwStart, reviewId);
+}
 
 // Filtro Todo/Llamadas/Acciones sobre la tabla fusionada "Tabla de llamadas y acciones de hoy" (ver
 // #tableFilterRow en el HTML y dayActionRows/renderTable más abajo). Vive en memoria, no en
@@ -84,7 +96,7 @@ function reconcileLastCallEndedAt(dayKey) {
 }
 
 // Editor de una llamada ya importada: corrige duración, pago, billable y dropped.
-export function openCallEditor(callId) {
+export function openCallEditor(callId, options = {}) {
   const call = calls.find(c => c.id === callId);
   if (!call) {
     toast(translateText('No pude encontrar esa llamada'));
@@ -99,7 +111,9 @@ export function openCallEditor(callId) {
   const billableInput = document.getElementById('callEditBillableInput');
   const droppedInput = document.getElementById('callEditDroppedInput');
 
-  if (title) title.textContent = ui`Editar llamada · #${call.customerId}`;
+  if (title) title.textContent = ui`Detalle de llamada · #${call.customerId}`;
+  const fields = document.getElementById('callEditFields'); fields.hidden = false; fields.open = options.edit !== false;
+  document.getElementById('callRecordsContent').innerHTML = '';
   if (preview) preview.textContent = ui`${call.callDate} · ${call.callStart} — los datos de fecha/hora no se pueden editar aquí, solo duración, pago, billable y dropped.`;
   if (durationInput) durationInput.value = call.durationMin;
   if (payInput) payInput.value = parseMoney(call.pay).toFixed(2);
@@ -130,6 +144,7 @@ export function openCallEditor(callId) {
   }
 
   openModal('callEditModal');
+  return useCallRecovery('openCallRecords', callId, options.acwStart || null);
 }
 
 function readNumericCallPay(value, fallback = 0) {
@@ -653,7 +668,7 @@ export async function renderTable(options = {}) {
   const status = document.getElementById('callTableLoadStatus'), retry = document.getElementById('callTableRetryBtn');
   if (status) status.hidden = !!view;
   if (retry) retry.hidden = !!view;
-  if (view) view.renderCallTable({ ...callContext, ui, translateText, translateMarkup, dayActionRows, tableFilterMode });
+  if (view) view.renderCallTable({ ...callContext, state, ui, translateText, translateMarkup, dayActionRows, tableFilterMode });
 }
 
 // (Fase 4): "Resumen del día" + "Estadísticas" — 2 tarjetas nuevas de escritorio (ocultas en mobile

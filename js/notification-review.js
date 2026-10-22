@@ -33,7 +33,7 @@ export function renderNotificationReview(context) {
   const fileHtml=`<details class="polished-setting"><summary><span>${escapeHtml(translateText('Archivos de sonido guardados'))}<small>${escapeHtml(ui`${files.length} archivos propios`)}</small></span></summary><div class="polished-setting-body">`
     +(files.length?files.map(item=>row(item.name,`${(item.size.bytes/1024).toFixed(1)} KiB`)).join(''):ui`<p class="note">No hay archivos propios guardados.</p>`)
     +ui`<p class="note">Máximo 300 KiB por archivo. Se guarda como texto dentro de tus ajustes y ocupa más que el audio original. Elegir otro sonido no borra el archivo; usá Quitar archivo para liberarlo.</p></div></details>`
-    +`<div class="polished-shortcuts">${button('support',translateText('Configurar apoyo sin llamadas'))}${button('history',translateText('Ver cierres guardados'))}</div>`;
+    +`<div class="polished-shortcuts">${button('history',translateText('Ver cierres guardados'))}</div>`;
   if(fileRoot&&fileRoot.dataset.content!==fileHtml){const opened=fileRoot.querySelector('details')?.open;fileRoot.innerHTML=fileHtml;fileRoot.dataset.content=fileHtml;if(opened)fileRoot.querySelector('details').open=true;}
   if(!bound){bound=true;
     document.addEventListener('input',event=>{if(event.target.closest?.('#notificationsModal'))queueMicrotask(()=>activeContext&&renderNotificationReview(activeContext));});

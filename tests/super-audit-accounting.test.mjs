@@ -82,6 +82,18 @@ test('observed 7:41 survives official reconciliation, correction and reload with
   const before=JSON.stringify(calls);assert.equal(x.h.importCalls(''),false);assert.equal(JSON.stringify(calls),before);
 });
 
+test('a later official reconciliation removes its previous ambiguous review and preserves the observed backup',async t=>{
+  const x=harness(t),start=at(1,'08:00').getTime(),iso=seconds=>new Date(start+seconds*1000).toISOString();
+  autoSaveLiveCall(iso(5),iso(20)); autoSaveLiveCall(iso(30),iso(50));
+  const row=[['official','09/01/2025','08:00 AM','0','Yes','No','$0.00']];
+  x.import(row); assert.equal(state.callRecordReviews.length,1);
+  await deleteCallRecord(calls[1].id);
+  x.import(row);
+  assert.equal(state.callRecordReviews.length,0); assert.equal(calls.length,1);
+  assert.equal(calls[0].records.tool.durationMs,15000);
+  x.reload(); assert.equal(state.callRecordReviews.length,0);
+});
+
 test('ambiguous zero-minute official matches persist for explicit review without deleting either live call',t=>{
   const x=harness(t),start=at(1,'08:00').getTime(),iso=seconds=>new Date(start+seconds*1000).toISOString();
   autoSaveLiveCall(iso(5),iso(20));autoSaveLiveCall(iso(30),iso(50));const before=JSON.stringify(calls);
