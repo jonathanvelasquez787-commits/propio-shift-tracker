@@ -67,15 +67,15 @@ test('boot recognizes ownership changed by another tab while downloading and pre
 
 function deletionHarness({ owner = 'account-a', sessionOwner = owner, sessionError = null, responseOk = true,
   failRecoveryCleanup = false, failSnapshotCleanup = false, changeOwnerDuringDelete = false, rejectSession = false } = {}) {
-  const actions = [], requests = [];
+  const actions = [], requests = [], elements = {};
   let localOwner = owner, currentUserId = owner;
-  let click, confirmation;
-  const button = { addEventListener: (_event, handler) => { click = handler; } };
+  let confirmation, markup = '', message = '';
   const card = { querySelector: () => ({}), insertBefore() {}, appendChild() {} };
-  const context = vm.createContext({ ui, translateText, translateMarkup, displayLocale,
+  const context = vm.createContext({ ui: (parts,...values)=>parts.reduce((out,part,index)=>out+part+(values[index]??''),''), translateText: value=>value, translateMarkup, displayLocale,
     MutationObserver: class { observe() {} disconnect() {} },
-    document: { querySelector: () => card, createElement: () => ({}), getElementById: () => button },
-    window: { addEventListener() {}, appConfirm: (_message, handler) => { confirmation = handler; }, location: { replace: url => actions.push(`redirect:${url}`) }, toast: text => actions.push(`toast:${text}`) },
+    document: { querySelector: () => card, createElement: () => ({set innerHTML(value){markup=value;}}),
+      getElementById: id => elements[id] ||= { addEventListener: (_event, handler) => { elements[id].handler = handler; }, click: () => actions.push(`click:${id}`) } },
+    window: { addEventListener() {}, appConfirm: (_message, handler) => { message = _message; confirmation = handler; }, location: { replace: url => actions.push(`redirect:${url}`) }, toast: text => actions.push(`toast:${text}`) },
     getSupabase: () => ({ auth: { getSession: async () => {
       if (rejectSession) throw Error('Failed to fetch');
       return { data: { session: { user: { id: sessionOwner }, access_token: `token-${sessionOwner}` } }, error: sessionError };
@@ -92,8 +92,24 @@ function deletionHarness({ owner = 'account-a', sessionOwner = owner, sessionErr
   });
   vm.runInContext(deletionSource, context);
   vm.runInContext(`injectDeleteAccount(${JSON.stringify(owner)}, getCurrentUserId)`, context);
-  return { actions, requests, async confirm() { click(); await confirmation(); } };
+  return { actions, requests, elements, markup:()=>markup,message:()=>message,
+    changeOwner:value=>{currentUserId=value;localOwner=value;},
+    async confirm() { elements.deleteAccountBtn.handler(); await confirmation(); } };
 }
+
+test('account deletion offers the existing JSON export and describes retained Google, Propio, downloads and other devices',async()=>{
+  const h=deletionHarness();
+  h.elements.deleteAccountExportBtn.handler();
+  assert.deepEqual(h.actions,['click:exportBtn']);
+  assert.match(h.markup(),/cuenta de Google/);assert.match(h.markup(),/historial oficial de Propio/);
+  assert.match(h.markup(),/JSON que descargaste/);assert.match(h.markup(),/otros navegadores o dispositivos/);
+  await h.confirm();assert.match(h.message(),/31 días/);assert.match(h.message(),/No se puede deshacer/);
+});
+
+test('account deletion refuses a stale local owner even if the SDK still returns the original session',async()=>{
+  const h=deletionHarness();h.changeOwner('account-b');await h.confirm();
+  assert.equal(h.requests.length,0);assert.deepEqual(h.actions,['redirect:/']);
+});
 
 test('successful account deletion clears the correct local recovery owner and finishes logout and redirect', async () => {
   const h = deletionHarness();

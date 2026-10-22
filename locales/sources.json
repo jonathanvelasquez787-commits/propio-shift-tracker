@@ -472,6 +472,12 @@
       "js/game.js"
     ]
   },
+  "s_0785c811": {
+    "source": "Ciclo con cierre {{v0}} · {{v1}}. Ya fue reclamada; no se vuelve a entregar al abrir esta sección.",
+    "files": [
+      "js/game.js"
+    ]
+  },
   "s_078ba895": {
     "source": "Duración (min)",
     "files": [
@@ -916,12 +922,6 @@
       "js/shift-work-review.js"
     ]
   },
-  "s_0cd1c6a8": {
-    "source": "Correo electrónico",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_0cd39ef0": {
     "source": "Reclamar:",
     "files": [
@@ -1293,12 +1293,6 @@
       "js/finance.js"
     ]
   },
-  "s_121a0df3": {
-    "source": "Datos de acceso",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_123e4440": {
     "source": "El pago se registra por fecha y no libera la reserva.",
     "files": [
@@ -1512,6 +1506,12 @@
       "js/calls.js"
     ]
   },
+  "s_1613bb90": {
+    "source": "Armas, práctica y duelo",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_16150449": {
     "source": "Cargando los datos de la cuenta…",
     "files": [
@@ -1552,12 +1552,6 @@
     "source": "{{v0}} → {{v1}} · {{v2}} min útiles",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_16b894e9": {
-    "source": "Guardar datos de acceso",
-    "files": [
-      "app.html"
     ]
   },
   "s_16c391b6": {
@@ -1695,6 +1689,12 @@
   },
   "s_18560d0c": {
     "source": "Esta semana ya pasó — queda protegida, solo lectura.",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_186799ad": {
+    "source": "Elegí los bloques prioritarios de Inicio.",
     "files": [
       "app.html"
     ]
@@ -2184,6 +2184,12 @@
       "app.html"
     ]
   },
+  "s_1f87f105": {
+    "source": "Vista previa",
+    "files": [
+      "js/game.js"
+    ]
+  },
   "s_1fa218ff": {
     "source": "XP ganado",
     "files": [
@@ -2546,6 +2552,12 @@
       "js/finance.js"
     ]
   },
+  "s_25a79d01": {
+    "source": "Cofre de la meta diaria",
+    "files": [
+      "js/game-review.js"
+    ]
+  },
   "s_25cc1c29": {
     "source": "ES",
     "files": [
@@ -2598,6 +2610,12 @@
     "source": "#AEE2FF",
     "files": [
       "app.html"
+    ]
+  },
+  "s_26a2d48d": {
+    "source": "Ciclo {{v0}} — {{v1}} · {{v2}}% de la meta.",
+    "files": [
+      "js/game.js"
     ]
   },
   "s_26b62d39": {
@@ -2691,6 +2709,12 @@
       "app.html"
     ]
   },
+  "s_27cee92b": {
+    "source": "Vista previa sin equipar ni guardar cambios.",
+    "files": [
+      "js/game.js"
+    ]
+  },
   "s_27e45f35": {
     "source": "Resumen completo de tu rendimiento",
     "files": [
@@ -2754,7 +2778,8 @@
   "s_291705dd": {
     "source": "Guardar",
     "files": [
-      "app.html"
+      "app.html",
+      "js/app-main.js"
     ]
   },
   "s_291c0e5e": {
@@ -3015,6 +3040,12 @@
     "source": "No se quitó el sonido porque no se pudo guardar.",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_2d746531": {
+    "source": "Mostrar en Inicio",
+    "files": [
+      "app.html"
     ]
   },
   "s_2d8be4b7": {
@@ -3351,6 +3382,12 @@
       "app.html"
     ]
   },
+  "s_31cd450a": {
+    "source": "Ganancias y meta",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_3208ffe2": {
     "source": "Ponle un nombre a la categoría",
     "files": [
@@ -3458,6 +3495,12 @@
     "source": "Monstruo derrotado",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_33489347": {
+    "source": "Copia local guardada. Último cambio: {{v0}}.",
+    "files": [
+      "js/boot.js"
     ]
   },
   "s_335e4905": {
@@ -4027,6 +4070,12 @@
       "js/reports.js"
     ]
   },
+  "s_3b975090": {
+    "source": "Reconectando…",
+    "files": [
+      "js/boot.js"
+    ]
+  },
   "s_3baa0e06": {
     "source": "apoyo desde el aire",
     "files": [
@@ -4220,6 +4269,12 @@
       "js/monsters.js"
     ]
   },
+  "s_3f668a24": {
+    "source": "Copia local disponible en este navegador.",
+    "files": [
+      "js/boot.js"
+    ]
+  },
   "s_3f6e2bce": {
     "source": "#B5BAFF",
     "files": [
@@ -4266,6 +4321,12 @@
     "source": "Récord diario previo",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_40c99346": {
+    "source": "Solo registro en esta PC",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_411234a6": {
@@ -4561,6 +4622,12 @@
       "js/shift-work-review.js"
     ]
   },
+  "s_44f111ee": {
+    "source": "Una corrección dejó la meta por debajo de lo necesario y se ajustó la recompensa asociada. No se borraron tus llamadas. Podés volver a alcanzar la meta.",
+    "files": [
+      "js/game-review.js"
+    ]
+  },
   "s_452eba29": {
     "source": "{{v0}} Productividad — últimos 14 días",
     "files": [
@@ -4632,12 +4699,6 @@
     "source": "Cómo configurarlo",
     "files": [
       "app.html"
-    ]
-  },
-  "s_4684c74e": {
-    "source": "Meta del ciclo cumplida. El botín real sigue siendo tu pago.",
-    "files": [
-      "js/game.js"
     ]
   },
   "s_4694d1b8": {
@@ -4741,6 +4802,12 @@
   },
   "s_47e74654": {
     "source": "Recargar",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_47ecd9aa": {
+    "source": "Logros convierte tu actividad en progreso de juego. Refuerzo positivo y premios personales se configuran por separado; ninguno cambia tu pago.",
     "files": [
       "app.html"
     ]
@@ -4921,6 +4988,12 @@
     "source": "La extensión no inicia disponibilidad después de finalizar el turno o su horario.",
     "files": [
       "js/automation-ui.js"
+    ]
+  },
+  "s_4a98e0bc": {
+    "source": "El usuario identifica tu perfil. Para entrar, usa Google. Cambiarlo no cambia tu cuenta de Google ni el nombre del saludo.",
+    "files": [
+      "app.html"
     ]
   },
   "s_4aa12764": {
@@ -5174,6 +5247,12 @@
       "js/finance-planning.js"
     ]
   },
+  "s_4e90944c": {
+    "source": "Vista esencial",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_4e99072c": {
     "source": "Ver copias recuperables",
     "files": [
@@ -5221,6 +5300,12 @@
     "source": "Armadura cian",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_4f9bef4b": {
+    "source": "Bloques y llamadas del día",
+    "files": [
+      "app.html"
     ]
   },
   "s_4f9fbc6e": {
@@ -5365,6 +5450,12 @@
     "source": "Adherencia minuto a minuto, con el motivo de cada desvío",
     "files": [
       "index.html"
+    ]
+  },
+  "s_5167cdb2": {
+    "source": "El cofre se habilita al alcanzar la meta diaria de ganancias. Una corrección puede cambiar ese estado.",
+    "files": [
+      "js/game-review.js"
     ]
   },
   "s_516dc71b": {
@@ -5530,6 +5621,12 @@
     "source": "🎁 Cofre sorpresa · +{{v0}} XP",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_5360502e": {
+    "source": "El turno, las llamadas, la fecha y la frase permanecen visibles. Los bloques ocultos siguen disponibles al desactivar esta vista; tus registros y Logros se conservan.",
+    "files": [
+      "app.html"
     ]
   },
   "s_53aab57b": {
@@ -5969,6 +6066,12 @@
       "app.html"
     ]
   },
+  "s_595e8905": {
+    "source": "Esperando permiso para esta PC",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_5977b0b2": {
     "source": "Comienza una nueva llamada",
     "files": [
@@ -6004,6 +6107,12 @@
     "source": "Tus ciclos de 14 días — a qué altura vas y cuándo cae el próximo pago.",
     "files": [
       "app.html"
+    ]
+  },
+  "s_59dc7587": {
+    "source": "Todavía no hay una revisión de nube confirmada en este navegador.",
+    "files": [
+      "js/boot.js"
     ]
   },
   "s_59ee576d": {
@@ -6152,6 +6261,12 @@
       "js/automation-ui.js"
     ]
   },
+  "s_5dadeae9": {
+    "source": "La app instalada no mantiene la PC despierta ni garantiza llamadas o avisos con el equipo suspendido. Borrar datos del navegador también borra las copias locales; exporta tu JSON para conservar una copia independiente.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_5deee299": {
     "source": "Un día libre/sin turno no corta la racha (se salta)",
     "files": [
@@ -6162,6 +6277,12 @@
     "source": "Disponible desde {{v0}}",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_5e3feadb": {
+    "source": "Al desactivar Logros se conserva el progreso guardado. Podés activarlo de nuevo sin reiniciarlo.",
+    "files": [
+      "app.html"
     ]
   },
   "s_5e4a8a58": {
@@ -6348,12 +6469,6 @@
     "source": "Mis premios",
     "files": [
       "app.html"
-    ]
-  },
-  "s_610ee1ec": {
-    "source": "Progreso del ciclo: {{v0}}%.",
-    "files": [
-      "js/game.js"
     ]
   },
   "s_613bcbbd": {
@@ -6563,6 +6678,12 @@
     "source": "Ver detalle",
     "files": [
       "app.html"
+    ]
+  },
+  "s_64a96ac0": {
+    "source": "El último cambio no se pudo guardar. Conserva esta pestaña y revisa el aviso de guardado.",
+    "files": [
+      "js/boot.js"
     ]
   },
   "s_64ae7500": {
@@ -7136,6 +7257,12 @@
       "js/game.js"
     ]
   },
+  "s_6e748bd7": {
+    "source": "En tu cuenta:",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_6e7b53fb": {
     "source": "Terminá la pausa en Inicio y pulsá Start Calls en Propio cuando quieras volver.",
     "files": [
@@ -7527,6 +7654,12 @@
       "index.html"
     ]
   },
+  "s_743e467a": {
+    "source": "Todavía no se confirmó la caché de la app. Mantén conexión para abrirla de nuevo.",
+    "files": [
+      "js/boot.js"
+    ]
+  },
   "s_745071d5": {
     "source": "Pendientes de vincular",
     "files": [
@@ -7786,6 +7919,7 @@
   "s_7829299e": {
     "source": "Reconectar y sincronizar",
     "files": [
+      "app.html",
       "js/boot.js"
     ]
   },
@@ -8282,6 +8416,12 @@
       "app.html"
     ]
   },
+  "s_7e64a952": {
+    "source": "Conexión:",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_7e6e482d": {
     "source": "Se sube y reemplaza la de la nube",
     "files": [
@@ -8328,6 +8468,12 @@
     "source": "Categoría",
     "files": [
       "app.html"
+    ]
+  },
+  "s_7f3a2403": {
+    "source": "La caché de la app está activa. El respaldo de tus datos se gestiona por separado.",
+    "files": [
+      "js/boot.js"
     ]
   },
   "s_7f4cc8be": {
@@ -8721,6 +8867,12 @@
       "js/schedule.js"
     ]
   },
+  "s_85243453": {
+    "source": "Otra PC puede estar usando la disponibilidad automática, o falta conexión con la nube. El registro continúa. Pausá los iniciadores de la PC anterior; el permiso vence en hasta 30 segundos.",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_85313e20": {
     "source": "Se reinician llamadas, turnos, pausas, Logros, Finanzas, horario, metas y perfil de todos los días.",
     "files": [
@@ -8731,6 +8883,12 @@
     "source": "Revisar vínculo",
     "files": [
       "js/call-table-view.js"
+    ]
+  },
+  "s_8541527a": {
+    "source": "Guardado y recuperación de esta app",
+    "files": [
+      "app.html"
     ]
   },
   "s_85457cfb": {
@@ -8938,6 +9096,12 @@
     "source": "Termina en el futuro; revisá fecha, hora y duración.",
     "files": [
       "js/call-review-view.js"
+    ]
+  },
+  "s_8841c8bb": {
+    "source": "App y modo sin conexión:",
+    "files": [
+      "app.html"
     ]
   },
   "s_885e114b": {
@@ -9263,6 +9427,12 @@
       "js/reports.js"
     ]
   },
+  "s_8cc1b8f0": {
+    "source": "La nube no confirmó el guardado",
+    "files": [
+      "js/boot.js"
+    ]
+  },
   "s_8cc466fa": {
     "source": "Cambios sin subir…",
     "files": [
@@ -9408,6 +9578,12 @@
     "source": "No hay premios para esta pausa; los demás siguen guardados.",
     "files": [
       "js/positive-reinforcement.js"
+    ]
+  },
+  "s_8eddcd4f": {
+    "source": "Correo de Google (solo lectura)",
+    "files": [
+      "app.html"
     ]
   },
   "s_8edfa6b7": {
@@ -10126,6 +10302,12 @@
       "js/game.js"
     ]
   },
+  "s_996fb29b": {
+    "source": "Sin red. Los cambios locales quedan pendientes; al reconectar se comprueba la cuenta y la revisión antes de subir.",
+    "files": [
+      "js/boot.js"
+    ]
+  },
   "s_999075ee": {
     "source": "Inicio del ACW",
     "files": [
@@ -10339,6 +10521,12 @@
       "js/app-main.js"
     ]
   },
+  "s_9ce699b5": {
+    "source": "{{v0}} XP",
+    "files": [
+      "js/game.js"
+    ]
+  },
   "s_9d00356c": {
     "source": "Temporada actual",
     "files": [
@@ -10385,6 +10573,12 @@
     "source": "Pendiente de reservar",
     "files": [
       "js/finance.js"
+    ]
+  },
+  "s_9d84e12f": {
+    "source": "Hay conexión de red. Solo una confirmación del servidor acredita el guardado en la nube.",
+    "files": [
+      "js/boot.js"
     ]
   },
   "s_9d889b79": {
@@ -10481,6 +10675,12 @@
     "source": "{{v5}}\n      {{v6}}",
     "files": [
       "js/reports.js"
+    ]
+  },
+  "s_9ed8166b": {
+    "source": "Revisar llamada",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_9f04d29e": {
@@ -10699,12 +10899,6 @@
     "source": "Lo que aprendiste hoy puede ayudarte en la siguiente llamada",
     "files": [
       "js/reinforcement-feedback.js"
-    ]
-  },
-  "s_a1c7521d": {
-    "source": "Otro dispositivo guardó cambios más recientes en tu cuenta. Si sigues aquí, tu próximo cambio podría sobrescribirlos.",
-    "files": [
-      "js/boot.js"
     ]
   },
   "s_a1cb48b3": {
@@ -11108,6 +11302,12 @@
       "index.html"
     ]
   },
+  "s_a7c9b6a4": {
+    "source": "Usuario del perfil",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_a7ea305e": {
     "source": "Ninguna fila nueva — {{v0}} omitida(s). Revisa el detalle debajo del cuadro de texto.",
     "files": [
@@ -11217,6 +11417,12 @@
       "js/game-battle.js"
     ]
   },
+  "s_a9b7cfb3": {
+    "source": "Cuenta y acceso con Google",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_a9fbaa32": {
     "source": "Abrí Propio y comprobá que la extensión de Chrome esté activada. Los controles manuales siguen disponibles.",
     "files": [
@@ -11273,6 +11479,12 @@
       "app.html"
     ]
   },
+  "s_aa87bace": {
+    "source": "En este navegador:",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_aaa0f5ae": {
     "source": "{{v4}}{{v5}}",
     "files": [
@@ -11304,6 +11516,12 @@
     "source": "Fin del turno",
     "files": [
       "app.html"
+    ]
+  },
+  "s_ab17ae62": {
+    "source": "Llamada pendiente de guardar",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_ab24dd7f": {
@@ -12128,6 +12346,12 @@
     "source": "Pagado en el mes elegido",
     "files": [
       "js/finance.js"
+    ]
+  },
+  "s_b77f6f66": {
+    "source": "Disponible para abrir",
+    "files": [
+      "js/game-review.js"
     ]
   },
   "s_b7baa774": {
@@ -13604,6 +13828,12 @@
       "js/game.js"
     ]
   },
+  "s_cf675910": {
+    "source": "Ajustado por corrección",
+    "files": [
+      "js/game-review.js"
+    ]
+  },
   "s_cf9c492e": {
     "source": "Los datos cambiaron. Cerrá y abrí este registro antes de guardar.",
     "files": [
@@ -13703,6 +13933,12 @@
   },
   "s_d0e54d0b": {
     "source": "Más larga",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_d0ea7421": {
+    "source": "Las armas cambian la animación y la práctica. Disparar o jugar el duelo no registra llamadas, dinero ni XP laboral. El duelo se ofrece en Break/Lunch o fuera del turno; al volver al trabajo se pausa y podés retomarlo después.",
     "files": [
       "app.html"
     ]
@@ -13949,6 +14185,12 @@
       "app.html"
     ]
   },
+  "s_d458f078": {
+    "source": "Saltar al contenido",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_d4765580": {
     "source": "Ranura facial",
     "files": [
@@ -13989,6 +14231,12 @@
     "source": "El historial oficial de Propio no se borra; una sincronización posterior puede volver a incorporarlo.",
     "files": [
       "js/backup-recovery.js"
+    ]
+  },
+  "s_d4c3e9e3": {
+    "source": "Cumpliste la meta. Abrí el cofre desde Inicio cuando estés fuera de una llamada.",
+    "files": [
+      "js/game-review.js"
     ]
   },
   "s_d4c84061": {
@@ -14179,6 +14427,12 @@
     "source": "{{v0}} Solo {{v1}}",
     "files": [
       "js/settings.js"
+    ]
+  },
+  "s_d85a79e3": {
+    "source": "Actividad en vivo",
+    "files": [
+      "app.html"
     ]
   },
   "s_d899c380": {
@@ -14682,14 +14936,20 @@
       "js/positive-reinforcement.js"
     ]
   },
-  "s_de0bbed3": {
-    "source": "El usuario sirve para entrar sin escribir tu correo. Si cambias el correo, tendrás que confirmarlo desde el mensaje que envíe Supabase.",
+  "s_ddf1ccd3": {
+    "source": "Esta PC registra llamadas y conserva tus opciones, pero no pulsa Start Calls ni Stop Calls ni termina pausas automáticamente.",
     "files": [
-      "app.html"
+      "js/automation-ui.js"
     ]
   },
   "s_de2015a8": {
     "source": "JEFE DEL CICLO",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_de457463": {
+    "source": "En Inicio, abrí Logros debajo de la batalla para elegir el arma y Duelo · 60 s. Automático permite salir; al regresar, elegí Duelo y Continuar duelo. En móvil usá los controles debajo de la escena.",
     "files": [
       "app.html"
     ]
@@ -14708,6 +14968,12 @@
   },
   "s_de605ad3": {
     "source": "Acerca de Escudos",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_de6c1e12": {
+    "source": "Guardar usuario del perfil",
     "files": [
       "app.html"
     ]
@@ -14845,6 +15111,12 @@
     "source": "Sin registros: meta sin evaluar",
     "files": [
       "js/reports.js"
+    ]
+  },
+  "s_e082c01d": {
+    "source": "Última revisión confirmada: {{v0}}.",
+    "files": [
+      "js/boot.js"
     ]
   },
   "s_e09ab272": {
@@ -15039,6 +15311,12 @@
     "source": "Acerca de STAGE CLEAR",
     "files": [
       "app.html"
+    ]
+  },
+  "s_e390029c": {
+    "source": "Meta pendiente",
+    "files": [
+      "js/game-review.js"
     ]
   },
   "s_e393413e": {
@@ -15245,6 +15523,12 @@
       "js/call-recovery.js"
     ]
   },
+  "s_e68be059": {
+    "source": "La recompensa ya está guardada en tu perfil. Abrir el panel otra vez no la duplica.",
+    "files": [
+      "js/game-review.js"
+    ]
+  },
   "s_e68e1c6e": {
     "source": "¡Bienvenido!",
     "files": [
@@ -15326,6 +15610,12 @@
       "js/game.js",
       "js/pay-receipts.js",
       "js/reports.js"
+    ]
+  },
+  "s_e7d3c8f8": {
+    "source": "Productividad aporta hasta 50 XP, llamadas hasta 30, adherencia hasta 30, puntualidad 20 y misiones hasta 20; el total respeta el tope diario. El nivel depende del XP acumulado. La racha usa productividad y adherencia; los récords se recalculan con las llamadas guardadas.",
+    "files": [
+      "js/game-review.js"
     ]
   },
   "s_e7eb9d67": {
@@ -15448,6 +15738,12 @@
     "source": "¿Seguro?",
     "files": [
       "app.html"
+    ]
+  },
+  "s_e9d043d2": {
+    "source": "Otro dispositivo guardó cambios más recientes. Tus cambios siguen en este navegador y no reemplazan esa revisión. Recarga para comparar y elegir; la versión reemplazada queda en copias recuperables.",
+    "files": [
+      "js/boot.js"
     ]
   },
   "s_e9d9fe9d": {
@@ -16342,6 +16638,12 @@
       "js/game.js"
     ]
   },
+  "s_f5ccca22": {
+    "source": "También se retiran los datos y copias recuperables de esta cuenta en este navegador. Tu cuenta de Google, los JSON que descargaste y las copias locales de otros navegadores o dispositivos no se borran desde aquí.",
+    "files": [
+      "js/boot.js"
+    ]
+  },
   "s_f5ce710b": {
     "source": "Resumen por día",
     "files": [
@@ -16421,8 +16723,20 @@
       "js/finance.js"
     ]
   },
+  "s_f66c7b00": {
+    "source": "Activar vista esencial",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_f66f6a18": {
     "source": "Qué incluye el archivo",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_f672bc8e": {
+    "source": "Instalar la app no crea otro respaldo. Para abrir sin red necesitas haberla abierto antes, conservar los datos del navegador y tener una copia de tu cuenta en este dispositivo. Google y la sincronización necesitan conexión; una sesión vencida puede pedirte entrar de nuevo.",
     "files": [
       "app.html"
     ]
@@ -16466,6 +16780,7 @@
   "s_f731a8bb": {
     "source": "Cofre abierto · recompensa guardada",
     "files": [
+      "js/game-review.js",
       "js/game.js"
     ]
   },
@@ -16479,6 +16794,12 @@
     "source": "(min de descanso ganados). Déjalos vacíos y guarda para volver a los mensajes de siempre.",
     "files": [
       "app.html"
+    ]
+  },
+  "s_f75f2950": {
+    "source": "Recompensa del ciclo guardada",
+    "files": [
+      "js/game.js"
     ]
   },
   "s_f7821d8b": {
@@ -16548,6 +16869,12 @@
     "source": "Vincular respaldo seleccionado",
     "files": [
       "js/call-records-view.js"
+    ]
+  },
+  "s_f8a938e5": {
+    "source": "Progreso de Logros",
+    "files": [
+      "app.html"
     ]
   },
   "s_f8b58bd9": {
@@ -16987,7 +17314,6 @@
   "s_ff69f07b": {
     "source": "Nombre de usuario",
     "files": [
-      "app.html",
       "privacidad.html"
     ]
   },

@@ -9,7 +9,7 @@ los nombres del popup; los cambios de presentación y registros están en la web
 - Una llamada live conserva inicio y fin ISO con milisegundos, `durationMs`
   entero y duración en minutos sin redondeo decimal. Una observación de
   7:41 conserva 461000 ms; puede estimar el pago con 8 minutos.
-- `records.aplicación` guarda la observación original, el pago estimado y si la
+- `records.tool` guarda la observación original, el pago estimado y si la
   detectó la extensión o la aplicación. La importación y las correcciones posteriores
   no sustituyen esa observación.
 - `records.propio` conserva el inicio, duración y pago informados, el final

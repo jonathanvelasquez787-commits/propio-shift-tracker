@@ -330,15 +330,8 @@ futura opera bajo esto, sin excepción:
   visual. Confirmar el commit público con cierre-641-production.json fuera de
   Git. Este cierre no completa las veinte mejoras funcionales del plan.
 
-- **Mejoras integrales aprobadas el 18/10:** ejecutar las recomendaciones de la
-  evaluación de 79 funciones por fases; alcance y estado completo en
-  [plan de mejoras](docs/plan-mejoras-integrales.md). 59 mejoras publicadas:
-  fases 1–8 verificadas, incluido Finanzas, el diseño aprobado y Reportes,
-  Calendario y exportaciones. Las entregas visuales posteriores no cierran tareas funcionales;
-  siguen las mejoras funcionales de Logros, accesibilidad,
-  cuenta e instalación.
-  No perder las fases posteriores al
-  entregar una parte ni considerar pendiente la instalación ya confirmada.
+- **Mejoras integrales aprobadas el 18/10:** las veinte restantes están implementadas y probadas en web 642 / extensión 2.3.5. La publicación de esta entrega todavía debe verificarse. Mantener el inventario y la evidencia en [plan](docs/plan-mejoras-integrales.md) y [cierre 642](docs/cierre-642.md). No convertir implementación o archivos instalados en recarga confirmada.
+- **Activación 2.3.5:** archivos instalados con respaldo y preferencias conservadas. Computer Use rechazó Google Chrome; no se ejecutó recarga ni se confirmó la nueva versión activa. 2.3.4 fue la última confirmación humana y sigue siendo un hecho histórico válido. No pedir otra recarga por cambios solo de web.
 - **Segundos oficiales de Propio:** confirmar con evidencia si el último minuto
   incompleto se incluye en duración y pago. El formato de hora visible no lo demuestra.
   No cambiar ACW ni alargar llamadas por esa suposición.
@@ -461,7 +454,7 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
-- App 641: guías y galería actuales, lenguaje claro en popup/organizador y
+- Base histórica App 641: guías y galería de esa entrega, lenguaje claro en popup/organizador y
   corrección del espacio de flechas plegables en móvil. 969 pruebas correctas;
   ocho recorridos compilados ES, ambos temas y 320/390/1200/1800 px, con 248
   capturas y datos ficticios. Popup 2.3.4 probado con API de Chrome simulada.
@@ -473,7 +466,8 @@ futura opera bajo esto, sin excepción:
 - Inicio conserva sus funciones y ACW. Preparación de disponibilidad en Ajustes,
   jornada y desgloses en Reportes, comparación y edición en el detalle único de
   llamada. Sin copias paralelas ni cambio del layout general. La guía práctica
-  explica las 79 funciones; el plan conserva veinte mejoras funcionales abiertas.
+  explica las 79 funciones; la entrega 642 registra las veinte mejoras finales
+  sin confundir implementación, publicación y activación de la extensión.
 - Google es la entrada pública. Formularios deshabilitados de login/registro y
   solicitud de contraseña retirados; se conserva recuperación de enlaces emitidos,
   perfil, cierre de sesión y el endpoint heredado protegido con sus regresiones.
@@ -519,16 +513,3 @@ futura opera bajo esto, sin excepción:
   recibido permanece disponible. Ajuste de flecha plegable en móvil.
 - Capturas y comprobaciones fuera de Git; extensión sin cambios. Los veinte
   puntos funcionales abiertos no se cierran por esta corrección visual.
-
-**v639 — Hover de ACW con los instantes observados y reclamos reabiertos.**
-
-- El hover muestra inicio/final observado con segundos de la última llamada
-  terminada. El ancla del ACW sigue aparte y conserva prioridad oficial;
-  después de una pausa no confunde ese nuevo ancla con el final de la llamada.
-- Una importación sin respaldo observado identifica la falta de medición y
-  conserva la precisión en minutos del inicio oficial. No inventa segundos.
-- Reabiertos color/presentación originales de Fechas de pago, compactación del
-  ciclo y desglose, guía visual y lenguaje de ayuda. El control visual no puede
-  cerrar estos reclamos solo por un build o por ausencia de desbordamiento.
-- Propuesta de tres bloques fuera de Git; sin nuevos cambios visuales publicados
-  por esta entrega. Extensión permanece 2.3.3; no se pide otra recarga por 639.

@@ -6,7 +6,14 @@ export function installOriginalPortal(api, { window, document, reloadAllowed = (
   if (window.top !== window || window.location.origin !== 'https://interpreters.propio-ls.com' || !/^\/portal(?:\/|$)/.test(window.location.pathname)) return;
   let current = null, loadedRevision = null, attemptedRevision = null, revision = 0, applying = false, stopped = false;
   const normalize = value => value && typeof value.enabled === 'boolean' && /^[\w-]{12,100}$/.test(value.revision || '') ? { enabled: value.enabled, revision: value.revision } : null;
-  const announce = () => window.postMessage({ protocol, enabled: current?.enabled === true }, window.location.origin);
+  const announce = () => {
+    window.postMessage({ protocol, enabled: current?.enabled === true }, window.location.origin);
+    if (!current || stopped) return;
+    const header = document.querySelector('app-header'), native = document.querySelector('app-daily-rollup');
+    const state = !current.enabled ? 'disabled' : native ? 'native-present' : !header ? 'loading' : !reloadAllowed() ? 'waiting-offline' : 'native-missing';
+    try { Promise.resolve(api.runtime.sendMessage({ kind: 'portal-layout-observation', revision: current.revision, state })).catch(() => {}); }
+    catch (error) { if (/extension context invalidated/i.test(String(error?.message))) stop(); }
+  };
   async function apply() {
     if (stopped || applying || !current || current.revision === attemptedRevision || !document.querySelector('app-header') || !reloadAllowed()) return;
     const legacyMissing = current.enabled && !document.querySelector('app-daily-rollup');

@@ -1,4 +1,5 @@
 import { arrangeWorkspace } from './workspace.js';
+import { readWorkspaceSettings } from './workspace-settings.js';
 const status = document.getElementById('workspace-status');
 const retry = document.getElementById('workspace-retry');
 let running = false;
@@ -22,7 +23,8 @@ async function prepare() {
         if (loaded && typeof loaded === 'object') preferences = loaded;
       }
     } catch {}
-    const result = await arrangeWorkspace(chrome, window.screen, { frameInset, rightPaneHeightRatio: preferences.rightPaneHeightRatio });
+    const settings = await readWorkspaceSettings(chrome, preferences);
+    const result = await arrangeWorkspace(chrome, window.screen, { frameInset, configuration: settings, rightPaneHeightRatio: settings.rightPaneHeightRatio, rightPaneWidthRatio: settings.rightPaneWidthRatio });
     if (result.status === 'already-running') status.textContent = 'Otra pestaña ya está preparando tus ventanas.';
     else {
       await chrome.storage.session.set({ 'workspace-profile-session': { prepared: true, phase: 'ready' } });
@@ -41,4 +43,8 @@ async function prepare() {
   } finally { running = false; }
 }
 retry.addEventListener('click', prepare);
-prepare();
+if (location.hash === '#setup') {
+  document.getElementById('workspace-setup').hidden = false;
+  status.textContent = 'Configurá este perfil sin cambiar tu instalación actual.';
+  void import('./workspace-setup.js');
+} else prepare();

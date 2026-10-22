@@ -126,12 +126,20 @@ export function createPortalObserver({ document, send, documentId, now = () => D
       const offline = Boolean(offlineStartButton(document));
       const available = Boolean(availableStopButton(document));
       const revision = availabilityRevision;
-      const result = await send({ kind: 'portal-observation', documentId, ...observation, offline, available, ...(pendingSignal ? { signal: pendingSignal } : {}) });
+      const requestedAt = now();
+      const result = await send({ kind: 'portal-observation', documentId, observedAt: new Date(requestedAt).toISOString(), ...observation, offline, available, ...(pendingSignal ? { signal: pendingSignal } : {}) });
       if (result?.ok) pendingSignal = null;
       if (pendingAvailability) { await sendManualAvailability(); return result; }
       if (revision !== availabilityRevision) return result;
-      if (result?.prepare === true && offline) offlineStartButton(document)?.click();
-      else if (result?.stopCalls === true && available) availableStopButton(document)?.click();
+      const action = result?.prepare === true && offline ? 'start' : result?.stopCalls === true && available ? 'stop' : null;
+      if (action && result.commandId && now() >= requestedAt && now() - requestedAt <= 3000 && Date.parse(result.authorizationUntil) > now()) {
+        const confirmed = await send({ kind: 'confirm-automation-action', documentId, commandId: result.commandId });
+        const current = readPortalObservation(document);
+        if (!stopped && revision === availabilityRevision && !pendingAvailability && confirmed?.ok && now() - requestedAt <= 3000 &&
+            now() >= requestedAt && Date.parse(confirmed.authorizationUntil) > now() && current.session === 'authenticated' && current.call === 'idle') {
+          (action === 'start' ? offlineStartButton(document) : availableStopButton(document))?.click();
+        }
+      }
       return result;
     } catch (error) {
       if (/extension context invalidated/i.test(String(error?.message))) stop();

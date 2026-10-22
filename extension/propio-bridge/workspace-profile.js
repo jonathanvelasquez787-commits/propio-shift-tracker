@@ -16,6 +16,11 @@ export function installProfileWorkspace(api, { readDefault = async () => {
     const defaults = await readDefault();
     const value = defaults === true || defaults?.openOnProfileStart === true;
     const revision = typeof defaults?.profileSetupRevision === 'string' ? defaults.profileSetupRevision.slice(0, 64) : '';
+    const configured = (await api.storage.local.get('workspace-configuration-v1'))['workspace-configuration-v1'];
+    if (configured?.version === 1 && typeof configured.openOnProfileStart === 'boolean') {
+      const chosen = (await api.storage.local.get(preferenceKey))[preferenceKey];
+      return typeof chosen === 'boolean' ? chosen : configured.openOnProfileStart;
+    }
     if (revision && (await api.storage.local.get(revisionKey))[revisionKey] !== revision) {
       // Una configuración personal nueva se aplica una vez; luego manda la elección guardada.
       await api.storage.local.set({ [preferenceKey]: value, [revisionKey]: revision });

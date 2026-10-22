@@ -88,15 +88,19 @@ export function createPropioReceiver({ getState, getCalls, start, end, catchUp, 
   };
 }
 
-export function installPropioBridge({ host = globalThis.window, accountScope, receive, getPlan = () => null, onStatus = () => {} }) {
+export function installPropioBridge({ host = globalThis.window, accountScope, receive, getPlan = () => null, onStatus = () => {}, automationLease = null }) {
   if (!host || !accountScopeValid(accountScope)) return () => {};
   const nonce = host.crypto.randomUUID();
   let queue = Promise.resolve(), closed = false;
   const post = value => host.postMessage({ protocol: BRIDGE_PROTOCOL, direction: 'app', nonce, accountScope, ...value }, host.location.origin);
+  const plan = () => { const value = getPlan(); return value ? { ...value, automationLease: automationLease?.current() || null } : null; };
   const listener = message => {
     if (message.source !== host || message.origin !== host.location.origin || message.data?.protocol !== BRIDGE_PROTOCOL || message.data.direction !== 'extension') return;
     const packet = message.data;
-    if (packet.kind === 'hello') { post({ kind: 'ready', plan: getPlan() }); return; }
+    if (packet.kind === 'hello') {
+      automationLease?.request({ owner: packet.automationOwner, enabled: packet.automationEnabled === true });
+      post({ kind: 'ready', plan: plan() }); return;
+    }
     if (packet.kind === 'automation-status') {
       if (!closed && packet.nonce === nonce && packet.accountScope === accountScope) onStatus(packet.status);
       return;
@@ -106,13 +110,14 @@ export function installPropioBridge({ host = globalThis.window, accountScope, re
       if (closed) return;
       let result;
       try {
-        const apply = () => receive(packet.event);
+        const apply = () => packet.event?.type === 'pause-end' && !automationLease?.current()
+          ? { status: 'blocked', reason: 'coordination' } : receive(packet.event);
         result = host.navigator?.locks ? await host.navigator.locks.request('pst-propio-bridge', apply) : await apply();
       } catch { result = { status: 'blocked', reason: 'app-error' }; }
       post({ kind: 'ack', requestId: packet.requestId, result });
     });
   };
   host.addEventListener('message', listener);
-  post({ kind: 'ready', plan: getPlan() });
-  return () => { closed = true; host.removeEventListener('message', listener); };
+  post({ kind: 'ready', plan: plan() });
+  return () => { closed = true; automationLease?.stop(); host.removeEventListener('message', listener); };
 }

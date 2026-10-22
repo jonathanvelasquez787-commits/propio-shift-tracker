@@ -112,6 +112,7 @@ function emptyMeta() {
     dirty: false,
     deviceId: null,
     lastPushAt: null,
+    lastLocalSaveAt: null,
   };
 }
 
@@ -276,7 +277,7 @@ function sortKeys(value) {
       .reduce((acc, key) => {
         acc[key] = sortKeys(value[key]);
         return acc;
-      }, {});
+      }, Object.create(null));
   }
   return value;
 }
@@ -285,12 +286,23 @@ export function sameSnapshot(a, b) {
   try {
     return (
       stableJson((a && a.state) ?? {}) === stableJson((b && b.state) ?? {}) &&
-      stableJson((a && a.calls) ?? []) === stableJson((b && b.calls) ?? []) &&
+      stableJson(canonicalCalls((a && a.calls) ?? [])) === stableJson(canonicalCalls((b && b.calls) ?? [])) &&
       stableJson((a && a.settings) ?? {}) === stableJson((b && b.settings) ?? {})
     );
   } catch {
     return false;
   }
+}
+
+function canonicalCalls(calls) {
+  if (!Array.isArray(calls)) return calls;
+  const ids = new Set();
+  for (const call of calls) {
+    if (!call || call.id === undefined || call.id === null || ids.has(String(call.id))) return calls;
+    ids.add(String(call.id));
+  }
+  // Normalized cloud rows arrive by call_id; only this record collection is unordered.
+  return [...calls].sort((a, b) => String(a.id) < String(b.id) ? -1 : String(a.id) > String(b.id) ? 1 : 0);
 }
 
 // Escribe sin marcar "sucio": lo usa la hidratación desde la nube, que por
@@ -664,7 +676,7 @@ function patchLocalStorage() {
 }
 
 function markDirty() {
-  writeMeta({ dirty: true });
+  writeMeta({ dirty: true, lastLocalSaveAt: new Date().toISOString() });
   emit('dirty', {});
   if (pushTimer) clearTimeout(pushTimer);
   pushTimer = setTimeout(() => {

@@ -13,9 +13,10 @@ const hex = channels => '#'+channels.map(value=>Math.round(value).toString(16).p
 export const mix = (color,base,weight) => hex(rgb(color).map((value,index)=>value*weight+rgb(base)[index]*(1-weight)));
 const luminance = color => rgb(color).map(value=>{const v=value/255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4;}).reduce((total,value,index)=>total+value*[.2126,.7152,.0722][index],0);
 export const contrast = (a,b) => (Math.max(luminance(a),luminance(b))+.05)/(Math.min(luminance(a),luminance(b))+.05);
-const readable = (color,background) => {
-  const destination = luminance(background)>.4?'#10121d':'#ffffff';
-  for(let weight=1;weight>=0;weight-=.025) { const result=mix(color,destination,weight);if(contrast(result,background)>=4.7)return result; }
+const readable = (color,backgrounds) => {
+  const surfaces = Array.isArray(backgrounds) ? backgrounds : [backgrounds];
+  const destination = luminance(surfaces[0])>.4?'#10121d':'#ffffff';
+  for(let weight=1;weight>=0;weight-=.025) { const result=mix(color,destination,weight);if(surfaces.every(background=>contrast(result,background)>=4.7))return result; }
   return destination;
 };
 export function paletteTokens(palette,mode) {
@@ -27,10 +28,11 @@ export function paletteTokens(palette,mode) {
   const panel=light?mix(colors[palette.lightBackground],'#ffffff',.09):mix(deep,'#10131c',darkWeight);
   const panel2=light?mix(colors[palette.lightBackground],'#ffffff',.22):mix(deep,'#202431',darkWeight);
   const raw=colors[light?palette.lightAccent:palette.darkAccent];
-  const accent=readable(raw,panel),secondary=readable(colors[palette.secondary],panel);
+  const surfaces=[panel,panel2,background];
+  const accent=readable(raw,surfaces),secondary=readable(colors[palette.secondary],surfaces);
   const text=light?mix(deep,'#11131b',.35):mix(colors[3],'#ffffff',.12);
-  const muted=readable(mix(text,panel,.65),panel),line=mix(text,panel,light?.16:.22);
-  const good=light?'#14794d':'#83e6ad',warn=light?'#a25c08':'#ffd17b',bad=light?'#b63149':'#ff96ad';
+  const muted=readable(mix(text,panel,.65),surfaces),line=mix(text,panel,light?.16:.22);
+  const good=readable(light?'#14794d':'#83e6ad',surfaces),warn=readable(light?'#a25c08':'#ffd17b',surfaces),bad=readable(light?'#b63149':'#ff96ad',surfaces);
   const onRaw=contrast(raw,'#10121d')>=contrast(raw,'#ffffff')?'#10121d':'#ffffff';
   const tokens={
     '--bg':background,'--bg-2':background,'--bg-page':background,'--bg-card':panel,

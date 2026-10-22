@@ -12,6 +12,7 @@ Start Calls o Stop Calls bajo sus condiciones; no acepta ni rechaza llamadas.
 
 ## Documentación
 
+- [Entrega 642: fases finales](docs/cierre-642.md): Logros, vista esencial, cuenta y coordinación entre PCs; publicación y activación se registran por separado.
 - [Cierre de los ocho pedidos del 22/10](docs/cierre-ocho-pedidos.md): cambios, evidencia y límites.
 - [Lista de mejoras aprobadas](docs/plan-mejoras-integrales.md): estado individual y evidencia de cada entrega.
 - [Guía práctica de funciones](docs/guia-practica-tool-y-extension.md): qué hace

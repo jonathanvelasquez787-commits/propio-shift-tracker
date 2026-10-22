@@ -3,6 +3,47 @@
   "scope": "Google; Email/SMTP deshabilitados; sin compras ni funciones nuevas",
   "criteria": [
     {
+      "id": "portable-workspace-configuration",
+      "area": "Configuración del escritorio en otras PCs",
+      "acceptance": "Asistente con páginas y tamaños validados, persistencia reversible y vista previa del instalador sin tocar accesos ni notas.",
+      "sources": [],
+      "tests": [
+        {
+          "file": "tests/workspace-settings.test.mjs",
+          "namedCases": [
+            "opening the assistant previews safe defaults without changing existing installation or saved preferences",
+            "saving updates only workspace preferences atomically and reopening preserves all pages and sizes",
+            "invalid URLs, private parameters, credentials and sizes are rejected before preference writes",
+            "a failed save preserves the prior preferences and does not silently replace malformed persisted configuration",
+            "column and notes reservation sizes share the same ratio and respect negative monitor origins"
+          ]
+        },
+        {
+          "file": "tests/desktop-installer.test.mjs",
+          "namedCases": ["Windows installer previews a new PC with its own profile and notes, rejects invalid sizes without mutations"]
+        }
+      ]
+    },
+    {
+      "id": "exclusive-automation-lease",
+      "area": "Disponibilidad entre dispositivos",
+      "acceptance": "Permiso exclusivo por cuenta con hora de servidor, vencimiento conservador, rechazo de respuestas viejas y cierre seguro sin permiso; el registro de llamadas es independiente.",
+      "sources": [
+        "js/automation-lease.js"
+      ],
+      "tests": [
+        {
+          "file": "tests/automation-lease.test.mjs",
+          "namedCases": [
+            "availability lease starts only on extension demand, expires conservatively and never mutates call settings",
+            "denial, network errors, old accounts, disabled PCs and resumed pages cannot reuse permission",
+            "late renewal responses cannot authorize an expired request, replaced owner or stopped account",
+            "SQL lease is exclusive per account, cannot be stolen or read directly, and expires by server time"
+          ]
+        }
+      ]
+    },
+    {
       "id": "shift-and-schedule-review",
       "area": "Turno, pausas y horario",
       "acceptance": "Cierre con alcance explícito y rechazo recuperable, continuidad elegida, métricas del día diferenciadas y copias de horario con vista previa limitada a sus destinos.",
@@ -1717,6 +1758,29 @@
           "file": "tests/higher-rate-review.test.mjs",
           "namedCases": [
             "the unified promotion editor previews and preserves earned bonuses before moving its window"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "essential-presentation-accessibility",
+      "area": "Presentación esencial y accesibilidad",
+      "acceptance": "Preferencias reversibles y guardado rechazado conservan la vista previa; paletas legibles en tres superficies; llamada pendiente comparte duración y recuperación; foco vuelve al disparador sin robarlo de otro modal.",
+      "sources": [
+        "js/presentation-accessibility.js"
+      ],
+      "tests": [
+        {
+          "file": "tests/presentation-accessibility.test.mjs",
+          "namedCases": [
+            "essential view restores configured blocks without altering data or achievement settings",
+            "a failed essential preference save rolls back controls and leaves the previous preference intact",
+            "palette text and semantic states keep normal-text contrast on page and both panel surfaces",
+            "pending calls show the same frozen duration and recovery action in activity bar and call card",
+            "activity priority follows live call then pending call then pause and clears obsolete controls",
+            "closing a modal returns focus and a delayed opening cannot steal focus from a newer dialog",
+            "touch help toggles and Escape dismisses it while retaining focus and the parent dialog",
+            "appearance dialog keeps Tab inside visible controls and leaves Escape to the native dialog"
           ]
         }
       ]

@@ -17,9 +17,13 @@
     document.removeEventListener('resume', hello);
     try { chrome.runtime.onMessage.removeListener(onExtensionMessage); } catch { /* Chrome may already have invalidated this content script. */ }
   }
-  const hello = () => {
+  const hello = async () => {
     if (!alive()) { stop(); return; }
-    window.postMessage({ protocol, direction: 'extension', kind: 'hello' }, origin);
+    const owner = ready && { accountScope: ready.accountScope, nonce: ready.nonce };
+    let coordination = null;
+    try { if (owner) coordination = await chrome.runtime.sendMessage({ kind: 'tracker-coordination', accountScope: owner.accountScope }); } catch {}
+    if (!alive() || (owner && (owner.accountScope !== ready?.accountScope || owner.nonce !== ready?.nonce))) return;
+    window.postMessage({ protocol, direction: 'extension', kind: 'hello', automationOwner: coordination?.owner, automationEnabled: coordination?.enabled === true }, origin);
   };
   async function announce(packet) {
     if (announcing) return;
@@ -51,6 +55,8 @@
         ? packet.plan.scheduledPauses.map(slot => ({ type: slot?.type, startedAt: slot?.startedAt, endedAt: slot?.endedAt })) : [];
       if (plan) plan.scheduleVerified = Array.isArray(packet.plan.scheduledPauses) && packet.plan.scheduledPauses.length <= 100;
       if (plan) plan.lastCallEndedAt = typeof packet.plan.lastCallEndedAt === 'string' ? packet.plan.lastCallEndedAt : null;
+      if (plan) plan.automationLease = packet.plan.automationLease && typeof packet.plan.automationLease === 'object'
+        ? { version: packet.plan.automationLease.version, owner: packet.plan.automationLease.owner, grantedAt: packet.plan.automationLease.grantedAt, expiresAt: packet.plan.automationLease.expiresAt } : null;
       if (plan && Object.prototype.hasOwnProperty.call(packet.plan, 'acw')) plan.acw = packet.plan.acw === null ? null
         : { startedAt: packet.plan.acw?.startedAt, observedAt: packet.plan.acw?.observedAt };
       if (plan) for (const key of ['pause','lastPause']) {

@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { runInNewContext } from 'node:vm';
 import { installProfileWorkspace } from '../extension/propio-bridge/workspace-profile.js';
+import { readWorkspaceSettings } from '../extension/propio-bridge/workspace-settings.js';
 
 function fixture({ normal = [{ id: 1, type: 'normal' }], preference, readDefault = async () => true, launchers = [] } = {}) {
   const local = preference === undefined ? {} : { 'workspace-profile-enabled': preference };
@@ -135,10 +136,10 @@ async function workspacePage(result, preferences = {}) {
     } },
     tabs: { getCurrent: async () => ({ id: 7 }), remove: async id => changes.push(['remove', id]), update: async (id, values) => changes.push(['update', id, values]) }
   };
-  const source = readFileSync(new URL('../extension/propio-bridge/workspace-page.js', import.meta.url), 'utf8').replace("import { arrangeWorkspace } from './workspace.js';", '');
+  const source = readFileSync(new URL('../extension/propio-bridge/workspace-page.js', import.meta.url), 'utf8').replace(/^import .*;$/gm, '');
   await runInNewContext(source, {
     document: { getElementById: id => id === 'workspace-status' ? status : retry },
-    chrome, window: { screen: {}, outerWidth: 800, innerWidth: 800 }, navigator: { platform: 'Win32' }, location: { hash: '#profile' },
+    chrome, readWorkspaceSettings, window: { screen: {}, outerWidth: 800, innerWidth: 800 }, navigator: { platform: 'Win32' }, location: { hash: '#profile' },
     fetch: async url => { assert.match(url, /workspace-preferences.json$/); if (preferences instanceof Error) throw preferences; return { ok: true, json: async () => preferences }; },
     arrangeWorkspace: async (api, screen, values) => { options.push(values); if (result instanceof Error) throw result; return result; }
   });
@@ -165,10 +166,10 @@ test('workspace launcher uses the personal top-pane height and falls back when p
   assert.equal(personal.options[0].rightPaneHeightRatio, .61);
   assert.equal(personal.options[0].frameInset, 8, 'maximized Windows still needs border compensation after restoring');
   const unavailable = await workspacePage({ status: 'ready' }, new Error('Unavailable preferences'));
-  assert.equal(unavailable.options[0].rightPaneHeightRatio, undefined);
+  assert.equal(unavailable.options[0].rightPaneHeightRatio, 1);
   assert.equal(unavailable.session['workspace-profile-session'].phase, 'ready');
   const invalid = await workspacePage({ status: 'ready' }, null);
-  assert.equal(invalid.options[0].rightPaneHeightRatio, undefined);
+  assert.equal(invalid.options[0].rightPaneHeightRatio, 1);
   assert.equal(invalid.session['workspace-profile-session'].phase, 'ready');
 });
 

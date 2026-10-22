@@ -5,7 +5,7 @@ import { setAppCalls, setAppSettings, setAppState } from '../js/app-context.js';
 import { ACCESSORY_CATALOG, configureGameContext, createDefaultGameState, normalizeGameState, computeGameDay,
   onGameCallSaved, onGameCallsChanged, onGameShiftEnded, onGameShiftStarted, onGameBackupExported,
   onGameDayMetadataChanged, openDailyGoalChest, claimPendingChest, equipAccessory, onGameDayReset,
-  onGamePauseEnded, onGamePauseStarted, onGameDayRollover, chooseCycleReward, renderGame } from '../js/game.js';
+  onGamePauseEnded, onGamePauseStarted, onGameDayRollover, chooseCycleReward, renderGame, setGameEnabled } from '../js/game.js';
 import { configurePositiveReinforcementContext } from '../js/positive-reinforcement.js';
 import { withSilentCallFeedback } from '../js/call-feedback.js';
 
@@ -35,6 +35,7 @@ function fixture({ owned = false, goal = 10000, shields = 0, status = 'compliant
   const keyFor = (date = new Date()) => `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}/${date.getFullYear()}`;
   const key = keyFor();
   const rows = [];
+  let settingsSaveResult;
   const current = { game: createDefaultGameState(), gapAnnotations: {}, pauseHistory: [] };
   current.game.shields = shields;
   if (owned) current.game.accessories = ACCESSORY_CATALOG.map(item => item.label);
@@ -56,10 +57,11 @@ function fixture({ owned = false, goal = 10000, shields = 0, status = 'compliant
       start: new Date(Date.now() + offset * 86400000), end: new Date(Date.now() + offset * 86400000) }),
     effectiveCycleGoal: () => cycleGoal,
     convertedAmountText: () => '', escapeHtml: String, money: String, formatCallDayLabel: String, formatMinutes: String,
-    parseMoney: Number, openModal() {}, closeModal() {}, saveSettingsOnly() {}, saveStateOnly() {}, toast() {},
+    parseMoney: Number, openModal() {}, closeModal() {}, saveSettingsOnly() { return settingsSaveResult; }, saveStateOnly() {}, toast() {},
   };
   configureGameContext(common); configurePositiveReinforcementContext(common);
   return { key, rows, current, config,
+    setSettingsSaveResult(value) { settingsSaveResult = value; },
     add(count = 1, pay = 0, random = () => .99) { for (let i = 0; i < count; i++) {
       const now = Date.now() - 600000 + rows.length * 1000;
       const call = { id: `audit-${rows.length}`, callDate: key, shiftDayKey: key, billable: 'Yes', dropped: 'No',
@@ -73,6 +75,30 @@ function fixture({ owned = false, goal = 10000, shields = 0, status = 'compliant
       for (const name of ['document', 'window']) { if (previous[name] === undefined) delete globalThis[name]; else globalThis[name] = previous[name]; } },
   };
 }
+
+test('achievement activation rolls back a rejected preference and preserves earned progress when disabled', () => {
+  const f = fixture();
+  try {
+    f.current.game.totalXp = 300;
+    f.current.game.level = 3;
+    f.current.game.accessories = ['Visor violeta'];
+    f.current.game.ledger['chest:10/09/2026'] = { type: 'chest', sealedOn: '10/09/2026', gross: 25, applied: 25 };
+    renderGame();
+    const before = structuredClone(f.current.game);
+    f.setSettingsSaveResult(false);
+    assert.equal(setGameEnabled(false), false);
+    assert.equal(f.config.game.enabled, true);
+    assert.deepEqual(f.current.game, before);
+    f.setSettingsSaveResult(undefined);
+    assert.equal(setGameEnabled(false), true);
+    assert.equal(f.config.game.enabled, false);
+    assert.deepEqual(f.current.game, before);
+    assert.equal(setGameEnabled(true), true);
+    assert.equal(f.config.game.enabled, true);
+    assert.deepEqual(f.current.game, before);
+    assert.deepEqual(f.rows, []);
+  } finally { f.dispose(); }
+});
 
 test('resetting one day removes its reinforcement receipts and rewards while preserving other days and preferences', () => {
   const f = fixture();

@@ -151,7 +151,9 @@ de publicar. Conservar datos y funciones; seguir después el orden de fases.
 
 ## Lista de control completa
 
-**59 de 79 mejoras publicadas.** 2 en curso y 18 pendientes. La preparación del
+**59 de 79 mejoras publicadas; veinte probadas en preparación de la entrega 642.** Publicación pendiente hasta comprobar CI y el dominio. Extensión 2.3.5 instalada con respaldo, sin activación confirmada. [Cierre 642](cierre-642.md).
+
+**Historial hasta 641 (evidencia fechada):** La preparación del
 turno usa app 624 y extensión 2.2.10, con publicación comprobada y recarga de la
 extensión, Propio y tracker confirmada por el propietario. App 625 refuerza la
 limpieza de Higher Rate; app 626 incorpora, en orden, el desglose de ganancias,
@@ -160,8 +162,13 @@ por ventana y corrección con vista previa, conservando bonos al editar o limpia
 App 628 completa el punto 21 con historial antes/después y recuperación de
 ediciones, eliminaciones y vaciados de llamadas. App 629 publica 22, 26–27, 47, 67 y 69 y cierra la fase 3, con CI y producción comprobados. App 630 publica 15–20 y 77, con código de extensión 2.3.0 instalado y recarga aún sin confirmar. App 631 publica los once puntos de la fase 5, con CI y producción comprobados. App 632 publica Finanzas y pagos recibidos con el diseño aprobado de Jornada, Reservas y Pago recibido. App 633 publica los cuatro puntos de Reportes, Calendario y exportaciones con CI y producción comprobados. App 634 publica Avisos y reflexión con CI y producción comprobados. Sigue fase 9: Logros y batalla.
 
+Estado vigente de la extensión: **2.3.4 activa**, con recarga confirmada por el
+propietario el 22/10/2026. Las menciones de recargas sin confirmar en el relato
+de versiones y en las entregas verificadas describen el estado de aquella fecha;
+no son una acción pendiente actual. La web sigue su numeración independiente.
+
 Estas 79 mejoras corresponden al sistema completo. El panel de disponibilidad
-y preparación se ve en la **tool web**; el popup de la **extensión de Chrome**
+y preparación se ve en **Propio Shift Tracker**; el popup de la **extensión de Chrome**
 conserva sus controles y transmite los datos a ese panel. La corrección 2.2.10
 sincroniza el rótulo de versión del popup con Chrome; el propietario confirmó que
 ambos muestran 2.2.10. App 624 compacta ese resumen con detalles plegados y etiqueta
@@ -179,24 +186,24 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 - [x] **5. Día activo e historial de acciones — Publicado.** Hoy/Historial visibles, consulta del día y protección de controles. [Alcance](jornada-pausas-y-horarios.md).
 - [x] **6. Vinculación con tu cuenta — Publicado.** Resumen de preparación: cuenta, tracker, Propio y automatismos. [Evidencia](disponibilidad-en-inicio.md).
 - [x] **7. Ponerte disponible al comenzar el turno — Publicado.** Mostrar en Inicio la espera hasta el horario de entrada. [Evidencia](disponibilidad-en-inicio.md).
-- [x] **8. Esperar entre llamadas usando el ACW de la tool — Publicado.** Cuenta regresiva del ACW confirmada por la extensión en Inicio. [Evidencia](disponibilidad-en-inicio.md).
+- [x] **8. Esperar entre llamadas usando el ACW de la aplicación — Publicado.** Cuenta regresiva del ACW confirmada por la extensión en Inicio. [Evidencia](disponibilidad-en-inicio.md).
 - [x] **9. Regreso automático de Break — Publicado.** Indica si terminar Break intentará volver a disponibilidad o si hace falta Start Calls manual. [Evidencia](disponibilidad-en-inicio.md).
 - [x] **10. Regreso automático de Lunch — Publicado.** Mostrar por separado la preferencia de regreso de Lunch. [Evidencia](disponibilidad-en-inicio.md).
 - [x] **11. Elegir cómo terminan las pausas — Publicado.** Modalidad y final previsto visibles para pausas activas; distingue horarios programados, duración ausente y cierre por confirmar. [Evidencia](disponibilidad-en-inicio.md).
 - [x] **12. Pausar todos los automatismos de disponibilidad — Publicado.** Estado de pausa manual y forma de reanudar visibles en la aplicación. [Evidencia](disponibilidad-en-inicio.md).
 - [x] **13. Reintento cuando no tomás una oferta — Publicado.** Explicar reintento y condición que lo detiene sin interruptores adicionales. [Evidencia](disponibilidad-en-inicio.md).
-- [ ] **14. Prioridades que frenan los clics automáticos — En curso.** Motivo dominante del bloqueo y coordinación antes de uso simultáneo en PCs.
+- [ ] **14. Prioridades que frenan los clics automáticos — Probado.** Motivo dominante, PC de solo registro y permiso exclusivo por cuenta con vencimiento servidor; rechaza órdenes y lecturas atrasadas. [Evidencia](compatibilidad-instalacion-y-disponibilidad.md). Extensión 2.3.5 instalada con respaldo; activación en Chrome sin confirmar por acceso denegado.
 - [x] **15. Llamadas detectadas en vivo por la extensión — Publicado.** Procedencia estimada visible y conservada hasta la reconciliación oficial. [Alcance](revision-llamadas-e-importaciones.md).
 - [x] **16. Recuperación desde el historial oficial de Propio — Publicado.** Consulta concentrada de estimadas, oficiales y correcciones con procedencia explícita. [Alcance](revision-llamadas-e-importaciones.md).
 - [x] **17. Registros pendientes cuando el tracker no está abierto — Publicado.** Popup con vencimiento de eventos, revisión sin borrado automático y apertura de pestaña existente. [Alcance](revision-llamadas-e-importaciones.md).
-- [x] **18. Llamada en vivo con los botones de la tool — Publicado.** Medición precisa, redondeo e importe estimado explicados; cierre con respaldo previo y rechazo recuperable. [Alcance](revision-llamadas-e-importaciones.md).
+- [x] **18. Llamada en vivo con los botones de la aplicación — Publicado.** Medición precisa, redondeo e importe estimado explicados; cierre con respaldo previo y rechazo recuperable. [Alcance](revision-llamadas-e-importaciones.md).
 - [x] **19. Agregar una llamada manual — Publicado.** Vista previa de fecha, inicio/final, duración y pago; rechazo conserva formulario y evita recompensa. [Alcance](revision-llamadas-e-importaciones.md).
 - [x] **20. Pegar llamadas de Propio — Publicado.** Resultado por fila, incluidas repeticiones y errores, con motivo plegado y reintento de detalle. [Alcance](revision-llamadas-e-importaciones.md).
 - [x] **21. Editar y borrar llamadas — Publicado.** Historial antes/después, deshacer edición y recuperar borrados individuales/lotes, con vista previa y protección frente a versiones posteriores y fallo al guardar. [Evidencia y límites](recuperacion-llamadas.md).
 - [x] **22. Descartar una llamada accidental — Publicado.** Confirmación específica del turno/pausa que se restaura y guardado con reversión ante fallo. [Alcance y pruebas](recuperacion-actividades-y-respaldos.md).
 - [x] **23. ACW en vivo y ACW acumulado — Publicado.** Espera actual y acumulado del día diferenciados en jornada. [Alcance](jornada-pausas-y-horarios.md).
 - [x] **24. Meta máxima de ACW — Publicado.** Máximo diario distinguido de la espera automática de la extensión. [Alcance](jornada-pausas-y-horarios.md).
-- [x] **25. Break y Lunch de la tool — Publicado.** Consulta de pausas planeadas/registradas/en curso con tiempos reales. [Alcance](jornada-pausas-y-horarios.md).
+- [x] **25. Break y Lunch de la aplicación — Publicado.** Consulta de pausas planeadas/registradas/en curso con tiempos reales. [Alcance](jornada-pausas-y-horarios.md).
 - [x] **26. Continuar o descartar una pausa accidental — Publicado.** Continuación identificada; descartarla devuelve el tramo cerrado previo, con protección de guardado. [Alcance y pruebas](recuperacion-actividades-y-respaldos.md).
 - [x] **27. Editar huecos entre llamadas — Publicado.** Clasificación manual visible en tabla/editor; revisión vigente y reversión ante rechazo. [Alcance y pruebas](recuperacion-actividades-y-respaldos.md).
 - [x] **28. Adherencia al horario — Publicado.** Minutos evaluados, adherentes y excepciones con causas plegadas. [Alcance](jornada-pausas-y-horarios.md).
@@ -224,33 +231,33 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 - [x] **50. Aviso de descanso por minutos productivos — Publicado.** Progreso hacia el aviso sin iniciar pausas automáticamente. [Alcance y validación](avisos-y-cierres-de-llamadas.md).
 - [x] **51. Mensaje de apoyo cuando llevás tiempo sin llamadas — Publicado.** Acceso comprensible al apoyo configurable desde Avisos. [Alcance y validación](avisos-y-cierres-de-llamadas.md).
 - [x] **52. Cierre breve y recuperación de una llamada difícil — Publicado.** Respuesta/cierre ágil y consulta de reflexiones guardadas. [Alcance y validación](avisos-y-cierres-de-llamadas.md).
-- [ ] **53. Activar Logros y la batalla — Pendiente.** Introducción que explique batalla y opciones.
-- [ ] **54. Armas y práctica — Pendiente.** Conservar alcance de armas/práctica y verificar separación contable.
-- [ ] **55. XP, niveles, misiones, rachas y récords — Pendiente.** Explicar reglas de XP/hitos y ajustes por correcciones.
-- [ ] **56. Cofre de la meta diaria — Pendiente.** Estados de cofre disponible, reclamado y reconciliado.
-- [ ] **57. Equipo, trofeos y bestiario — Pendiente.** Organización y vista previa de equipo disponible/equipado.
-- [ ] **58. Premios personales — Pendiente.** Simplificar creación y distinguir estados de premios personales.
-- [ ] **59. Duelo durante una pausa o fuera del turno — Pendiente.** Entrada/salida móvil y continuidad del duelo al volver al trabajo.
-- [ ] **60. Premio del ciclo completado — Pendiente.** Identificar ciclo y condición de cada premio.
-- [ ] **61. Temas, paletas e idioma — Pendiente.** Paletas legibles, revisión de contraste y vista esencial configurable.
-- [ ] **62. Reloj, fecha, saludo y vista angosta — Pendiente.** Mantener frase fija/fecha completa y revisar espacio en anchos pequeños.
-- [ ] **63. Vista original de Propio — Pendiente.** Explicar estado y dependencia del componente nativo de Propio.
-- [ ] **64. Escritorio de trabajo al iniciar Windows — Pendiente.** Configuración guiada para otras PCs de páginas/perfil/notas/tamaños.
-- [ ] **65. Cuenta y perfil — Pendiente.** Rótulos acordes con campos editables y acceso Google vigente.
-- [ ] **66. Guardado local y sincronización — Pendiente.** Detalle visible de guardado local/nube y conflictos. Revisar el reconocimiento tras una subida al salir: QA detectó un conflicto conservador con contenido de llamadas equivalente en distinto orden y revisión local anterior; se conservaron ambas versiones. Reproducir con el orden real de la consulta antes de cambiar la comparación.
+- [ ] **53. Activar Logros y la batalla — Probado.** Introducción dentro de Preferencias; desactivar conserva progreso y rechazar guardado revierte el interruptor. [Evidencia](logros-reglas-y-premios.md).
+- [ ] **54. Armas y práctica — Probado.** Ayuda de armas, práctica y controles móviles; jugar conserva llamadas, ganancias y XP laboral. [Evidencia](logros-reglas-y-premios.md).
+- [ ] **55. XP, niveles, misiones, rachas y récords — Probado.** XP del día, elegibilidad, componentes, tope, niveles, racha y correcciones en el detalle de Nivel. [Evidencia](logros-reglas-y-premios.md).
+- [ ] **56. Cofre de la meta diaria — Probado.** Meta pendiente, cofre disponible, reclamado y ajustado por corrección; acción e idempotencia canónicas conservadas. [Evidencia](logros-reglas-y-premios.md).
+- [ ] **57. Equipo, trofeos y bestiario — Probado.** Filtro de equipo y vista previa sin equipar ni guardar; apertura y foco conservados al actualizar. [Evidencia](logros-reglas-y-premios.md).
+- [ ] **58. Premios personales — Probado.** Editor simple y opciones avanzadas existentes; pendientes y realizados visibles juntos, pausa sin retirar lo ganado. [Evidencia](logros-reglas-y-premios.md).
+- [ ] **59. Duelo durante una pausa o fuera del turno — Probado.** Entrada y salida táctiles, pausa al volver al trabajo y reanudación explícita de la ronda sin registros laborales. [Evidencia](logros-reglas-y-premios.md).
+- [ ] **60. Premio del ciclo completado — Probado.** Intervalo del ciclo, cierre propio del premio pendiente y constancia del último reclamado; sin duplicados ni depósitos inferidos. [Evidencia](logros-reglas-y-premios.md).
+- [ ] **61. Temas, paletas e idioma — Probado.** Vista esencial reversible con bloques elegibles y contraste de las siete paletas en ambos modos. [Evidencia](presentacion-esencial-y-accesibilidad.md).
+- [ ] **62. Reloj, fecha, saludo y vista angosta — Probado.** Fecha completa, frase fija y reloj adaptados al mismo layout angosto. [Evidencia](presentacion-esencial-y-accesibilidad.md).
+- [ ] **63. Vista original de Propio — Probado.** Preferencia y componente nativo presente, ausente, cargando o esperando Offline distinguidos en el popup. [Evidencia](compatibilidad-instalacion-y-disponibilidad.md). Extensión 2.3.5 instalada con respaldo; activación en Chrome sin confirmar por acceso denegado.
+- [ ] **64. Escritorio de trabajo al iniciar Windows — Probado.** Asistente del perfil para otras PCs, páginas y tamaños; JSON de rutas Windows e instalador con vista previa y respaldo. [Evidencia](compatibilidad-instalacion-y-disponibilidad.md). Extensión 2.3.5 instalada con respaldo; activación en Chrome sin confirmar por acceso denegado.
+- [ ] **65. Cuenta y perfil — Probado.** Google vigente, correo de solo lectura, usuario de perfil editable y separado del saludo. [Evidencia](cuenta-sincronizacion-y-recuperacion.md).
+- [ ] **66. Guardado local y sincronización — Probado.** Detalle local/nube/red/caché y reconexión; comparación por ID y payload completo resuelve el orden de consulta sin ocultar divergencias. [Evidencia](cuenta-sincronizacion-y-recuperacion.md).
 - [x] **67. Respaldo completo JSON — Publicado.** Comparación actual/respaldo, copia privada previa, recuperación explícita y protección de cuenta/revisión/cuota. [Alcance y pruebas](recuperacion-actividades-y-respaldos.md).
 - [x] **68. Reportes CSV y PDF — Publicado.** Explicar período/datos incluidos y diferencia con respaldo. [Alcance y límites](reportes-calendario-y-exportaciones.md).
 - [x] **69. Reinicios y borrados — Publicado.** Alcance específico del día/total, copia previa y recuperación consultable; rechazo conserva los datos. [Alcance y pruebas](recuperacion-actividades-y-respaldos.md).
-- [ ] **70. App instalable y recuperación — Pendiente.** Explicar estado local, reconexión y límites de PWA.
+- [ ] **70. App instalable y recuperación — Probado.** Estado de caché, copia propia, sesión y límites; reapertura offline y posterior sincronización comprobadas con worker real aislado. [Evidencia](cuenta-sincronizacion-y-recuperacion.md).
 - [x] **71. Estado de conexión y actividad de la extensión — Publicado.** Diagnóstico inicial: qué pasa, qué sigue funcionando y qué hacer. [Evidencia](disponibilidad-en-inicio.md).
-- [ ] **72. Borrar la cuenta — Pendiente.** Alcance y retención claros, ofreciendo exportar antes.
+- [ ] **72. Borrar la cuenta — Probado.** Exportación JSON antes de borrar, activos/copias/retención claros y revalidación de propietario antes del POST; cancelación sin borrado real. [Evidencia](cuenta-sincronizacion-y-recuperacion.md).
 - [x] **73. Guías y apoyo voluntario — Publicado.** Actualizar guía y README retirando descripciones desactualizadas. [Evidencia](guia-practica-tool-y-extension.md) y [README](../extension/propio-bridge/README.md).
-- [ ] **74. Funcionamiento con otra pestaña al frente — En curso.** Lectura atrasada/reconexión visibles y coordinación futura multi-PC.
+- [ ] **74. Funcionamiento con otra pestaña al frente — Probado.** Lecturas recientes y permiso exclusivo antes de automatizar; retorno de suspensión exige nueva confirmación y conserva registro. [Evidencia](compatibilidad-instalacion-y-disponibilidad.md). Extensión 2.3.5 instalada con respaldo; activación en Chrome sin confirmar por acceso denegado.
 - [x] **75. Volumen general y sonidos propios — Publicado.** Explicar volumen cero, avisos escritos y espacio de archivos. [Alcance y validación](avisos-y-cierres-de-llamadas.md).
 - [x] **76. Planificador de Finanzas hacia la meta diaria — Publicado.** Desglosar cálculo y mostrar meta propuesta antes de guardar. [Alcance y validación](finanzas-reservas-y-recepciones.md).
 - [x] **77. Filtros de llamadas y acciones — Publicado.** Búsqueda Customer ID y filtros de procedencia del día activo, sin cambiar totales ni registros. [Alcance](revision-llamadas-e-importaciones.md).
-- [ ] **78. Barra de actividad en vivo — Pendiente.** Consistencia entre barra y tarjetas incluidas llamadas pendientes.
-- [ ] **79. Accesibilidad — Pendiente.** Revisión de teclado, zoom, lector, ayudas táctiles y objetivos de controles.
+- [ ] **78. Barra de actividad en vivo — Probado.** Barra y tarjeta comparten estado y duración congelada de la llamada pendiente; mismo editor, sin duplicación. [Evidencia](presentacion-esencial-y-accesibilidad.md).
+- [ ] **79. Accesibilidad — Probado.** Teclado, foco/restauración, salto al contenido, ayudas táctiles/Escape, reflow y movimiento reducido comprobados; límites de lector humano explícitos. [Evidencia](presentacion-esencial-y-accesibilidad.md).
 
 ## Entregas verificadas
 
@@ -345,19 +352,19 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 8. **Avisos y acompañamiento — publicada (web 634, PR #96).** Resumen de alarmas, sonido/volumen y
    archivos, progreso hacia descanso, acceso a apoyo, reflexión fácil y consulta.
    Cubre 48–52 y 75. Mantener elecciones y carácter voluntario.
-9. **Logros — pendiente.** Introducción, reglas y estados de premios/cofres,
+9. **Logros — probada (web 642).** Introducción, reglas y estados de premios/cofres,
    organización de equipo, creación de premios y entrada/salida del duelo.
    Cubre 53–60. Armas/práctica mantienen alcance; no crear productividad ficticia.
-10. **Presentación esencial y accesibilidad — pendiente.** Bloques prioritarios
+10. **Presentación esencial y accesibilidad — probada (web 642).** Bloques prioritarios
     configurables; paletas, zoom, foco, teclado, ayudas táctiles, lector y
     movimiento reducido; reloj/frase, consistencia de actividad viva. Cubre
     61–62, 78–79. Rediseños puramente visuales requieren su mockup aprobado según
     instrucciones.md; funcionalidades ya aprobadas conservan sus excepciones.
-11. **Cuenta, sincronización y documentación — pendiente.** Textos de campos
+11. **Cuenta, sincronización y documentación — probada (web 642).** Textos de campos
     editables, detalle de confirmación local/nube y conflictos, recuperación PWA,
     borrado de cuenta y ayuda actualizadas. Cubre 65–66, 70, 72–73. Mantener Google
     como entrada pública y configuración de Auth/SMTP vigente.
-12. **Compatibilidad e instalación — pendiente.** Estado de vista nativa de Propio,
+12. **Compatibilidad e instalación — probada; activación pendiente.** Estado de vista nativa de Propio,
     configuración guiada de páginas/perfil/notas y tamaños para otras PCs;
     coordinación entre dispositivos antes de permitir iniciadores simultáneos.
     Cubre 63–64 y ampliación de 14/74. No comprar proveedores ni cambiar seguridad
@@ -376,7 +383,7 @@ pruebas del proyecto.
 ### Asuntos adicionales fuera de ese conteo
 
 - **Segundos oficiales de Propio:** obtener evidencia sobre duración y pago del
-  último minuto incompleto. La precisión del contador de la tool no demuestra
+  último minuto incompleto. La precisión del contador de la aplicación no demuestra
   la regla de facturación de Propio.
   Por decisión del propietario se publicó el umbral personal inclusivo de 40 s
   para estimaciones nuevas (web 636); no cierra la investigación oficial. La

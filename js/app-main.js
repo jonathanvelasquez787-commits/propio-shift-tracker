@@ -4314,9 +4314,19 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
           label: translateText('En llamada'),
           startedAt: state.activeCall.startedAt,
           colorVar: '--cyan',
-          rgb: '47, 213, 255',
+          rgb: 'var(--cyan-rgb)',
           onSave: endCall,
           onDiscard: discardActiveCall,
+        };
+      }
+      if (state.pendingLiveCallBackup) {
+        return {
+          type: 'pending', label: translateText('Llamada pendiente de guardar'),
+          startedAt: state.pendingLiveCallBackup.startedAtISO,
+          endedAt: state.pendingLiveCallBackup.endedAtISO,
+          colorVar: '--warn', rgb: 'var(--warn-rgb)',
+          onSave: restorePendingLiveCallBackup,
+          onDiscard: null,
         };
       }
       if (state.activePause) {
@@ -4326,7 +4336,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
           label: isLunch ? translateText('Lunch') : translateText('Break'),
           startedAt: state.activePause.startedAt,
           colorVar: isLunch ? '--blue' : '--warn',
-          rgb: isLunch ? '124, 140, 255' : '255, 209, 92',
+          rgb: isLunch ? 'var(--blue-rgb)' : 'var(--warn-rgb)',
           onSave: () => endPause(),
           onDiscard: discardActivePause,
         };
@@ -4353,9 +4363,13 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       bar.style.setProperty('--live-bar-color', `var(${info.colorVar})`);
       bar.style.setProperty('--live-bar-rgb', info.rgb);
       const labelEl = document.getElementById('liveBarLabel');
-      if (labelEl) labelEl.textContent = info.label;
+      if (labelEl && labelEl.textContent !== info.label) labelEl.textContent = info.label;
       const timerEl = document.getElementById('liveBarTimer');
-      if (timerEl) timerEl.textContent = formatDuration(Date.now() - new Date(info.startedAt).getTime());
+      if (timerEl) timerEl.textContent = formatDuration((info.endedAt ? Date.parse(info.endedAt) : Date.now()) - new Date(info.startedAt).getTime());
+      const saveLabel = bar.querySelector('.live-bar-save-label');
+      if (saveLabel) saveLabel.textContent = info.type === 'pending' ? translateText('Revisar llamada') : translateText('Guardar');
+      const discard = document.getElementById('liveBarDiscardBtn');
+      if (discard) discard.hidden = !info.onDiscard;
     }
 
     // Tarjeta de estado dentro de "Llamadas". La fila entera se tiñe vía `.live` en el contenedor
@@ -4373,14 +4387,23 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       const controlsGrid = document.getElementById('callsControlsGrid');
       if (!card || !icon || !textTitle) return;
 
-      const isLive = !!state.activeCall;
+      const info = liveActivityInfo();
+      const isLive = info?.type === 'call';
+      const isPending = info?.type === 'pending';
+      const hasCall = isLive || isPending;
       icon.innerHTML = iconHtml('phone');
       card.classList.toggle('live', isLive);
-      textTitle.textContent = isLive ? translateText('En llamada') : translateText('Comienza una nueva llamada');
-      if (mid) mid.style.display = isLive ? '' : 'none';
-      if (timerEl && isLive) timerEl.textContent = formatDuration(Date.now() - new Date(state.activeCall.startedAt).getTime());
-      if (actions) actions.style.display = isLive ? '' : 'none';
-      if (controlsGrid) controlsGrid.style.display = isLive ? 'none' : '';
+      card.classList.toggle('pending', isPending);
+      const title = hasCall ? info.label : translateText('Comienza una nueva llamada');
+      if (textTitle.textContent !== title) textTitle.textContent = title;
+      if (mid) mid.style.display = hasCall ? '' : 'none';
+      if (timerEl && hasCall) timerEl.textContent = formatDuration((info.endedAt ? Date.parse(info.endedAt) : Date.now()) - Date.parse(info.startedAt));
+      if (actions) actions.style.display = hasCall ? '' : 'none';
+      if (controlsGrid) controlsGrid.style.display = hasCall ? 'none' : '';
+      const save = document.getElementById('callsStatusSaveBtn');
+      if (save) save.textContent = isPending ? translateText('Revisar llamada') : translateText('Guardar');
+      const discard = document.getElementById('callsStatusEndBtn');
+      if (discard) discard.hidden = isPending;
     }
 
     // Reset all three keys through the guarded snapshot writer, without a delete/write gap.
@@ -6561,6 +6584,7 @@ export function render() {
 
     // Trampa de foco: sin esto el teclado podía escaparse de un modal abierto.
     let openModalStack = [];
+    const modalReturnFocus = new Map();
 
     // Elementos que pueden recibir foco por teclado dentro de un modal — mismo criterio estándar
     // (enlaces con href, controles no deshabilitados, cualquier cosa con tabindex explícito)
@@ -6573,6 +6597,7 @@ export function render() {
       const modal = document.getElementById(id);
       if (!modal) return;
       if(id==='goalsModal')renderAccountingExportScope();
+      if (!modal.classList.contains('open')) modalReturnFocus.set(id, document.activeElement);
       modal.classList.add('open');
       modal.setAttribute('aria-hidden', 'false');
       if (!openModalStack.includes(id)) openModalStack.push(id);
@@ -6582,7 +6607,7 @@ export function render() {
       const preferredTarget = focusables.find(el => ['INPUT', 'SELECT', 'TEXTAREA'].includes(el.tagName));
       const focusTarget = preferredTarget || focusables[0];
       if (focusTarget) {
-        setTimeout(() => focusTarget.focus(), 0);
+        setTimeout(() => { if (modal.classList.contains('open') && openModalStack.at(-1) === id) focusTarget.focus(); }, 0);
       }
     }
 
@@ -6593,13 +6618,18 @@ export function render() {
       const modal = document.getElementById(id);
       if (!modal) return;
       const wasOpen = modal.classList.contains('open');
+      const ownedFocus = modal.contains(document.activeElement);
       modal.classList.remove('open');
       modal.setAttribute('aria-hidden', 'true');
       openModalStack = openModalStack.filter(m => m !== id);
+      const previousFocus = modalReturnFocus.get(id);
+      modalReturnFocus.delete(id);
+      if (wasOpen && ownedFocus && previousFocus?.isConnected && !previousFocus.closest('[aria-hidden="true"], [hidden]')) previousFocus.focus({ preventScroll: true });
       if (wasOpen) document.dispatchEvent(new CustomEvent('app:modal-closed', { detail: { id } }));
     }
 
     function closeAllModals() {
+      [...openModalStack].reverse().forEach(closeModal);
       closeModal('goalsModal');
       closeModal('callsModal');
       closeModal('resetModal');
@@ -7160,11 +7190,14 @@ export function render() {
       if (currentLiveActivity) currentLiveActivity.onSave();
     });
     document.getElementById('liveBarDiscardBtn').addEventListener('click', () => {
-      if (currentLiveActivity) currentLiveActivity.onDiscard();
+      currentLiveActivity?.onDiscard?.();
     });
     // Botones "Guardar"/"Terminar" de la nueva tarjeta de estado dentro de "Llamadas" (ver `.calls-
     // status-card`) — mismas 2 funciones que ya usa la barra fija para una llamada activa.
-    document.getElementById('callsStatusSaveBtn').addEventListener('click', endCall);
+    document.getElementById('callsStatusSaveBtn').addEventListener('click', () => {
+      if (state.pendingLiveCallBackup && !state.activeCall) restorePendingLiveCallBackup();
+      else endCall();
+    });
     document.getElementById('callsStatusEndBtn').addEventListener('click', discardActiveCall);
     document.getElementById('resetHeaderBtn').addEventListener('click', () => {
       const label = document.getElementById('resetDayLabel');

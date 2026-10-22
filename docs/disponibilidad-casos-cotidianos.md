@@ -84,7 +84,7 @@ observador de `tests/propio-bridge.test.mjs`.
 50. Desplazar horario al llegar tarde: utiliza el inicio, fin y pausas efectivos que publica la aplicación, sin sumar un desplazamiento propio.
 51. Medianoche: mantiene el inicio/fin del turno activo en timestamps completos; no reinicia por el cambio de fecha.
 52. Cambio de reloj/zona: el horario y ACW se recalculan con la PC. Rechaza snapshots de ACW futuros; no existe un reloj servidor independiente que certifique cambios arbitrarios del reloj del sistema.
-53. Otra PC: no hay exclusión global entre dispositivos. La protección local no la garantiza; dejar los iniciadores activos en una sola PC sigue siendo necesario.
+53. Otra PC: desde web 642 / extensión 2.3.5 se exige un permiso exclusivo por cuenta, con vencimiento de 30 segundos en servidor. Para transferirlo, pausar los iniciadores en la PC anterior y habilitarlos en la nueva; «Solo registro» conserva las llamadas. Ambas extensiones deben estar actualizadas. No se certificaron dos PCs físicas: ver [coordinación y límites](compatibilidad-instalacion-y-disponibilidad.md).
 54. Alejarse de la PC: aceptación siempre manual. El interruptor de pausa detiene automatismos y conserva registro y preferencias.
 
 ## Límites de la comprobación
