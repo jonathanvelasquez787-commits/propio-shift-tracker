@@ -456,6 +456,8 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
+- Web 643 corrige dos inconsistencias del tiempo Usado de los bloques halladas en un recorrido de uso normal: no resta pausas posteriores a la actividad contabilizada ni suma huecos sin conexión. Comparte ACW clasificado con su resumen. 1.002 pruebas y recorrido con cuenta ficticia; ver docs/prueba-usuario-2026-10-22.md. La extensión 2.3.5 activa confirmada y el cierre 79/79 se conservan. No requiere recarga de extensión.
+
 - Base histórica App 641: guías y galería de esa entrega, lenguaje claro en popup/organizador y
   corrección del espacio de flechas plegables en móvil. 969 pruebas correctas;
   ocho recorridos compilados ES, ambos temas y 320/390/1200/1800 px, con 248
@@ -493,6 +495,11 @@ futura opera bajo esto, sin excepción:
 ---
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**v643 — Trabajo usado coherente al tomar pausas e importar llamadas.**
+
+- Las pausas fuera del tramo de actividad no borran trabajo ya contado; las pausas superpuestas se descuentan una sola vez y conservan las llamadas. Usado comparte el ACW clasificado y conectado del bloque.
+- Recorrido real de interfaz con cuenta ficticia: llamada/recarga, Break interrumpido y restaurado, Lunch, manual inválida/válida, conciliación sin duplicados, Reportes, Finanzas, exportaciones, idioma/tema y cierre persistente. 1.002 pruebas correctas; evidencia y límites en docs/prueba-usuario-2026-10-22.md.
 
 **v641 — Ayuda clara, galería actual y comprobación visual completa.**
 

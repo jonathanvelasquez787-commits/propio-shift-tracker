@@ -5,6 +5,7 @@ import vm from 'node:vm';
 import { parse } from 'acorn';
 import { ui, translateText, translateMarkup, setLanguage } from '../js/i18n.js';
 import { parse as parseHtml } from 'parse5';
+import { acwMinutesForBlock } from '../js/block-acw.js';
 
 function declarations(file, names) {
   const source = fs.readFileSync(new URL(file, import.meta.url), 'utf8');
@@ -81,6 +82,48 @@ test('night work blocks preserve chronological order, duration and next-day call
   assert.equal(stats.durationMin,180);assert.equal(stats.callMin,10);
   const pause=h.slotStats(slots[1],[],[],null,null,key(at(12,0)));
   assert.equal(pause.slotStart.getTime(),at(13,1).getTime());assert.equal(pause.durationMin,15);
+});
+
+test('work already counted never shrinks for a later pause, while pauses inside counted gaps are deducted once', () => {
+  const h=vm.createContext({Date,ui,translateText,translateMarkup,state:{shiftEndedAt:null},calls:[],
+    pauseForSlot:()=>null,callDateToDate:()=>at(22,0),todayCallDateKey:()=>key(at(22,0)),
+    formatDuration:String,formatMinutes:String,formatDeltaMinutes:String});
+  vm.runInContext(declarations('../js/app-main.js',['toMinutes','dateAtTime','overlapMinutes',
+    'mergeIntervals','overlapMinutesWithIntervals','slotStats']),h);
+  const slot={type:'Work',start:'08:00',end:'18:00',goalMin:240};
+  const call=(start,end)=>({startISO:start.toISOString(),endISO:end.toISOString()});
+  const pause=(start,end,type='break')=>({start,end,type});
+  const first=call(at(22,9,1),at(22,9,10));
+  const stats=pauses=>h.slotStats(slot,[first],pauses,at(22,9),null,key(at(22,0)));
+  assert.equal(stats([]).filledMin,10);
+  for(const end of [at(22,9,20),at(22,10),at(22,12)]) {
+    assert.equal(stats([pause(at(22,9,15),end)]).filledMin,10,'growing pause after the last call cannot erase prior work');
+  }
+  assert.equal(stats([pause(at(22,8),at(22,8,30))]).filledMin,10,'pause before counted activity is excluded');
+  assert.equal(stats([pause(at(22,9,8),at(22,9,20))]).filledMin,10,'call time inside a pause remains work');
+  assert.equal(stats([pause(at(22,9),at(22,9,1))]).filledMin,9,'leading ACW pause is still deducted');
+  const second=call(at(22,9,30),at(22,9,40));
+  const middle=[pause(at(22,9,15),at(22,9,25)),pause(at(22,9,20),at(22,9,25),'lunch')];
+  assert.equal(h.slotStats(slot,[first,second],middle,at(22,9),null,key(at(22,0))).filledMin,30,'overlapping pause sources deduct their union once');
+  const breakStats=h.slotStats({type:'Break',start:'09:00',end:'09:15'},[],[pause(at(22,9),at(22,9,10))],null,null,key(at(22,0)));
+  assert.equal(breakStats.filledMin,10,'planned pause progress remains unchanged');
+});
+
+test('work progress uses classified connected ACW and never fills an offline gap or deducts a pause twice', () => {
+  const h=vm.createContext({Date,ui,translateText,translateMarkup,acwMinutesForBlock,state:{shiftEndedAt:null},calls:[],
+    pauseForSlot:()=>null,callDateToDate:()=>at(22,0),todayCallDateKey:()=>key(at(22,0)),
+    formatDuration:String,formatMinutes:String,formatDeltaMinutes:String});
+  vm.runInContext(declarations('../js/app-main.js',['toMinutes','dateAtTime','overlapMinutes',
+    'mergeIntervals','overlapMinutesWithIntervals','slotStats']),h);
+  const slot={type:'Work',start:'08:00',end:'18:00',goalMin:240};
+  const first={startISO:at(22,9).toISOString(),endISO:at(22,9,10).toISOString()};
+  const second={startISO:at(22,10).toISOString(),endISO:at(22,10,10).toISOString()};
+  const gap={label:'acw',prev:first,cur:second,connectedIntervals:[{start:at(22,9,50),end:at(22,10)}]};
+  const pauses=[{type:'break',start:at(22,9,52),end:at(22,9,55)}];
+  const stats=h.slotStats(slot,[first,second],pauses,at(22,9),null,key(at(22,0)),null,null,[gap]);
+  assert.equal(stats.callMin,20);assert.equal(stats.acwMin,7);assert.equal(stats.filledMin,27);
+  assert.equal(h.slotStats(slot,[first,second],pauses,at(22,9),null,key(at(22,0)),null,null,[{...gap,label:'other'}]).filledMin,20);
+  assert.equal(h.slotStats(slot,[first,second],pauses,at(22,9),null,key(at(22,0)),null,null,[]).filledMin,20);
 });
 
 test('night adherence counts full dated minutes and next-day pauses instead of a zero-length clock range', () => {
