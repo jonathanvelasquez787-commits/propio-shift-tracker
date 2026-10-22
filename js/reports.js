@@ -476,6 +476,7 @@ export function renderReportsDashboard() {
     const goalMin = dayGoalForReports.min;
     const goalUsd = dayGoalForReports.usd;
     const goalAdherence = Number(settings.adherenceGoalPct || 95);
+    const adherenceHistory = reportsAdherenceStats();
     const productivePct = goalMin > 0 ? Math.min(100, (kpi.productiveMin / goalMin) * 100) : 0;
     const earningsPct = goalUsd > 0 ? Math.min(100, (kpi.earnings / goalUsd) * 100) : 0;
     const adherencePct = kpi.adherencePct === null ? 0 : Math.min(100, (kpi.adherencePct / goalAdherence) * 100);
@@ -498,6 +499,7 @@ export function renderReportsDashboard() {
         <div class="rpt-goal-bar good"><div style="width:${adherencePct}%;"></div></div>
         <div class="gh-goal-foot">${notEvaluated||(kpi.adherencePct===null?translateText('Sin adherencia calculable para esta fecha'):kpi.adherencePct >= goalAdherence ? translateText('¡Meta alcanzada!') : ui`Faltan ${Math.max(0, goalAdherence - kpi.adherencePct)}%`)}</div>
         ${deltaLine(kpi.adherenceDeltaPts, '%')}
+        <details class="polished-disclosure"><summary>Comparación de los últimos 7 días</summary><div class="polished-detail"><p class="note">Mejor: ${adherenceHistory.bestPct === null ? '—' : adherenceHistory.bestPct + '%'} · Peor: ${adherenceHistory.worstPct === null ? '—' : adherenceHistory.worstPct + '%'} · Promedio: ${adherenceHistory.avgPct === null ? '—' : adherenceHistory.avgPct + '%'}</p></div></details>
       </div>
       <div class="rpt-goal-card gh-goal-card" style="margin-top:0;">
         <div class="gh-goal-top"><span>Ganancias</span><b>${money(kpi.earnings)}/${money(goalUsd)}</b></div>
@@ -559,11 +561,6 @@ export function renderReportsDashboard() {
     const callLen = (q.callPct / 100) * CIRC;
     const acwLen = (q.acwPct / 100) * CIRC;
     const otherLen = (q.otherPct / 100) * CIRC;
-    const adh = reportsAdherenceStats();
-    const arcTotal = 171; // Longitud del path del arco en el SVG del mock (M10,80 A60,60 0 0 1 130,80)
-    const arcPct = adh.todayPct === null ? 0 : adh.todayPct;
-    const arcOffset = arcTotal - (arcPct / 100) * arcTotal;
-    const arcLabel = arcPct >= 95 ? translateText('Excelente') : arcPct >= 85 ? translateText('Muy buena') : arcPct >= 70 ? translateText('Aceptable') : arcPct > 0 ? translateText('Baja') : translateText('Sin datos');
     triGrid.innerHTML = ui`
       <div class="rpt-mini-card">
         <div class="rpt-mini-title">ACTIVIDAD DE HOY</div>
@@ -588,21 +585,6 @@ export function renderReportsDashboard() {
             <span><i style="background:var(--rpt-blue);"></i> Llamadas ${Math.round(q.callPct)}%</span>
             <span><i style="background:var(--rpt-purple);"></i> ACW ${Math.round(q.acwPct)}%</span>
             <span><i style="background:var(--pink);"></i> Improductivo ${Math.round(q.otherPct)}%</span>
-          </div>
-        </div>
-      </div>
-      <div class="rpt-mini-card">
-        <div class="rpt-mini-title">ADHERENCIA</div>
-        <div class="rpt-arc-wrap">
-          <svg width="140" height="90" viewBox="0 0 140 90">
-            <path d="M10,80 A60,60 0 0 1 130,80" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="12"/>
-            <path d="M10,80 A60,60 0 0 1 130,80" fill="none" stroke="var(--good)" stroke-width="12" stroke-dasharray="${arcTotal}" stroke-dashoffset="${arcOffset}"/>
-          </svg>
-          <div class="rpt-arc-val">${adh.todayPct === null ? '—' : adh.todayPct + '%'}</div>
-          <div class="rpt-arc-label">${escapeHtml(arcLabel)}</div>
-          <div class="rpt-arc-stats">
-            <span>Mejor: ${adh.bestPct === null ? '—' : adh.bestPct + '%'} · Peor: ${adh.worstPct === null ? '—' : adh.worstPct + '%'}</span>
-            <span>Promedio 7d: ${adh.avgPct === null ? '—' : adh.avgPct + '%'}</span>
           </div>
         </div>
       </div>
@@ -650,14 +632,7 @@ export function renderReportsDashboard() {
             <div class="gh-ring-label" style="text-align:left; white-space:normal;">de tu meta ${money(c.goal)}${financeConvertedInline(c.goal)}${c.isCustomGoal ? '' : ' (auto)'}</div>
           </div>
         </div>
-        <div class="gh-goal-card" style="margin-top:0;">
-          <div class="gh-goal-top"><span>Progreso del ciclo</span><b>${Math.round(c.pctOfGoal)}%</b></div>
-          <div class="progress"><div style="width:${c.pctOfGoal}%; background: linear-gradient(90deg, var(--teal), var(--blue));"></div></div>
-          <div class="gh-goal-foot">
-            <span>${c.isCustomGoal ? translateText('Meta personalizada') : translateText('Sugerida automáticamente')}</span>
-            <button class="tbl-icon-btn" type="button" data-edit-card="cycle-goal" aria-label="Editar meta del ciclo" title="Editar meta del ciclo">${iconHtml('edit')}</button>
-          </div>
-        </div>
+        <div class="gh-goal-foot"><span>${c.isCustomGoal ? translateText('Meta personalizada') : translateText('Sugerida automáticamente')}</span><button class="tbl-icon-btn" type="button" data-edit-card="cycle-goal" aria-label="Editar meta del ciclo">${iconHtml('edit')}</button></div>
         <div class="rpt-mini-stats" style="margin-top:10px;">
           <div>Trabajo<b>${money(c.trabajo)}</b>${financeConvertedNote(c.trabajo)}</div>
           <div>Higher Rate<b>${money(c.higherRate)}</b>${financeConvertedNote(c.higherRate)}</div>
@@ -667,7 +642,7 @@ export function renderReportsDashboard() {
         <div class="rpt-mini-title">${iconHtml('chart')} PROYECCIÓN DEL CICLO</div>
         <div class="polished-hero"><span class="polished-eyebrow">Con el promedio del ciclo</span><strong class="polished-amount">${money(proj.projected)}${financeConvertedInline(proj.projected)}</strong><div class="polished-days"><span>${proj.daysElapsed}/${CYCLE_LENGTH_DAYS} días transcurridos</span><span>${proj.daysRemaining} días restantes</span></div></div>
         <div class="polished-pace"><span class="polished-eyebrow">Para llegar a tu meta</span><strong>${escapeHtml(paceText)}</strong>${!pace.met&&pace.workDaysLeft>0?ui`<span class="polished-amount">${money(pace.perDayUsd)}${financeConvertedInline(pace.perDayUsd)}</span><p>por día laboral · ${pace.workDaysLeft} restantes</p>`:pace.met?ui`<p>Todo lo que ganes de aquí en adelante es extra</p>`:ui`<p>No quedan días laborales en el ciclo.</p>`}</div>
-        <div class="polished-bento polished-pair"><div><span>Meta del ciclo</span><strong>${money(c.goal)}${financeConvertedInline(c.goal)}</strong></div><div><span>Falta para la meta</span><strong>${money(pace.remainingUsd)}${financeConvertedInline(pace.remainingUsd)}</strong></div></div>
+        <div class="polished-pace"><span>Falta para la meta del ciclo</span><strong>${money(pace.remainingUsd)}${financeConvertedInline(pace.remainingUsd)}</strong></div>
         <details class="polished-disclosure"><summary>Cómo se calcula la proyección</summary><div class="polished-detail"><div class="review-line"><span>Ganado en el ciclo</span><strong>${money(c.amount)}${financeConvertedInline(c.amount)}</strong></div><div class="review-line"><span>Promedio por día natural</span><strong>${money(proj.dailyAvg)}${financeConvertedInline(proj.dailyAvg)}</strong></div><div class="review-line"><span>vs tu meta del ciclo</span><strong style="color:var(--${projTone});">${projDelta >= 0 ? '+' : ''}${money(projDelta)}${financeConvertedInline(projDelta)}</strong></div><p class="note">Divide las ganancias registradas del ciclo, incluido Higher Rate, entre los días naturales transcurridos y extiende ese promedio al ciclo completo. Cuenta días libres y hoy, aunque todavía esté incompleto. No predice nuevas promociones ni garantiza ese ingreso.</p><p class="note">El ritmo para llegar a la meta usa los días laborales restantes; es un cálculo distinto.</p></div></details>
       </div>
     `;

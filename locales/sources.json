@@ -14,6 +14,7 @@
   "s_00433042": {
     "source": "Pago registrado",
     "files": [
+      "js/call-records-view.js",
       "js/finance-planning.js"
     ]
   },
@@ -62,6 +63,12 @@
       "js/app-main.js"
     ]
   },
+  "s_0149ddfe": {
+    "source": "{{v33}}{{v34}}{{v35}}",
+    "files": [
+      "js/reports.js"
+    ]
+  },
   "s_0163610f": {
     "source": "Pendiente de pagar del presupuesto",
     "files": [
@@ -71,8 +78,7 @@
   "s_019c53d5": {
     "source": "Meta del ciclo",
     "files": [
-      "app.html",
-      "js/reports.js"
+      "app.html"
     ]
   },
   "s_01bd29f9": {
@@ -85,6 +91,12 @@
     "source": "Pausar animación",
     "files": [
       "js/game-battle.js"
+    ]
+  },
+  "s_01e1d1cd": {
+    "source": "Pago informado",
+    "files": [
+      "js/call-records-view.js"
     ]
   },
   "s_01e4ceff": {
@@ -154,10 +166,10 @@
       "app.html"
     ]
   },
-  "s_038073a0": {
-    "source": "{{v25}} días restantes",
+  "s_035732f7": {
+    "source": "{{v3}} · {{v4}} · {{v5}}",
     "files": [
-      "js/reports.js"
+      "js/call-table-view.js"
     ]
   },
   "s_0381729f": {
@@ -202,6 +214,12 @@
       "js/app-main.js"
     ]
   },
+  "s_0411f839": {
+    "source": "Revisar cambios",
+    "files": [
+      "js/higher-rate-review.js"
+    ]
+  },
   "s_041d6801": {
     "source": "Ganado hoy",
     "files": [
@@ -218,6 +236,12 @@
     "source": "Asignación por prioridad",
     "files": [
       "app.html"
+    ]
+  },
+  "s_043ef205": {
+    "source": "Final calculado*",
+    "files": [
+      "js/call-records-view.js"
     ]
   },
   "s_044dda93": {
@@ -337,7 +361,6 @@
   "s_06000b96": {
     "source": "{{v0}} por realizar",
     "files": [
-      "js/game-review.js",
       "js/positive-reinforcement.js"
     ]
   },
@@ -566,6 +589,12 @@
       "js/game.js"
     ]
   },
+  "s_092c7b6d": {
+    "source": "Sin observación disponible",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_0934e2f2": {
     "source": "Tope diario {{v5}}",
     "files": [
@@ -594,6 +623,12 @@
     "source": "Ranura de espalda",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_09ca7a2c": {
+    "source": "Los demás registros se conservan. Si hay un cruce con otra llamada, la vinculación se detiene para revisión.",
+    "files": [
+      "js/call-records-view.js"
     ]
   },
   "s_09d22d83": {
@@ -759,6 +794,12 @@
       "js/detail-views.js"
     ]
   },
+  "s_0be62a37": {
+    "source": "Versión anterior de Propio conservada",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_0be9309b": {
     "source": "Se comparan los presupuestos actuales con los pagos del mes elegido. Los importes de distintos períodos se suman sin convertirlos a un presupuesto mensual.",
     "files": [
@@ -805,6 +846,18 @@
     "source": "Enfoque y productividad",
     "files": [
       "js/schedule.js"
+    ]
+  },
+  "s_0c4256d2": {
+    "source": "Consultá el origen de los tiempos y los registros disponibles.",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
+  "s_0c5038dc": {
+    "source": "Tiempos detectados; se conservan aunque el historial cambie.",
+    "files": [
+      "js/call-records-view.js"
     ]
   },
   "s_0c5ba5b3": {
@@ -864,6 +917,12 @@
       "privacidad.html"
     ]
   },
+  "s_0cea0ece": {
+    "source": "{{v23}} días restantes",
+    "files": [
+      "js/reports.js"
+    ]
+  },
   "s_0d0de6fb": {
     "source": "Vos atendé. Él te acompaña.",
     "files": [
@@ -908,6 +967,12 @@
       "app.html"
     ]
   },
+  "s_0d7fe4f9": {
+    "source": "{{v19}}{{v20}}",
+    "files": [
+      "js/reports.js"
+    ]
+  },
   "s_0db995c6": {
     "source": "{{v0}} Llamadas por hora del día",
     "files": [
@@ -924,12 +989,6 @@
     "source": "Reconocimientos permanentes por completar metas y otros objetivos. Se guardan en tu perfil; no se gastan ni afectan tus ganancias.",
     "files": [
       "app.html"
-    ]
-  },
-  "s_0dfd11da": {
-    "source": "{{v37}}{{v38}}{{v39}}",
-    "files": [
-      "js/reports.js"
     ]
   },
   "s_0e0cba13": {
@@ -992,6 +1051,12 @@
       "app.html"
     ]
   },
+  "s_0e985f87": {
+    "source": "No reconstruimos segundos que no se registraron.",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_0e9fcf0b": {
     "source": "Cambiar a modo claro",
     "files": [
@@ -1014,6 +1079,12 @@
     "source": "Esa duración traslapa con la llamada #{{v0}} ({{v1}}). Ajusta la duración.",
     "files": [
       "js/call-recovery.js"
+    ]
+  },
+  "s_0f1e649e": {
+    "source": "Final observado",
+    "files": [
+      "js/call-records-view.js"
     ]
   },
   "s_0f362289": {
@@ -1168,12 +1239,6 @@
       "js/calls.js"
     ]
   },
-  "s_1127078e": {
-    "source": "Silver (+$0.02)",
-    "files": [
-      "js/higher-rate.js"
-    ]
-  },
   "s_114452d9": {
     "source": "Iniciar Break",
     "files": [
@@ -1190,12 +1255,6 @@
     "source": "x0",
     "files": [
       "app.html"
-    ]
-  },
-  "s_116c23f3": {
-    "source": "Esta promoción fue un error: quitarla y recalcular.",
-    "files": [
-      "js/higher-rate-review.js"
     ]
   },
   "s_11c27b19": {
@@ -1431,12 +1490,6 @@
       "js/calls.js"
     ]
   },
-  "s_1613bb90": {
-    "source": "Armas, práctica y duelo",
-    "files": [
-      "js/game-review.js"
-    ]
-  },
   "s_16150449": {
     "source": "Cargando los datos de la cuenta…",
     "files": [
@@ -1471,12 +1524,6 @@
     "source": "{{v0}} → {{v1}} · {{v2}} min útiles",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_16ad5b91": {
-    "source": "Se calcula sola (tu meta diaria × días laborales del ciclo) salvo que la edites aquí o con el ✎ en Reportes. Déjala vacía o en 0 para volver al cálculo automático.",
-    "files": [
-      "app.html"
     ]
   },
   "s_16b894e9": {
@@ -1550,6 +1597,12 @@
     "source": "Sin actividad registrada para este día. No se considera una meta incumplida.",
     "files": [
       "js/reports.js"
+    ]
+  },
+  "s_17897a17": {
+    "source": "Historial de Propio recibido",
+    "files": [
+      "js/call-records-view.js"
     ]
   },
   "s_178f3bcc": {
@@ -1636,6 +1689,12 @@
       "app.html"
     ]
   },
+  "s_188739f0": {
+    "source": "Ver registros",
+    "files": [
+      "js/call-table-view.js"
+    ]
+  },
   "s_188da0a2": {
     "source": "La actividad cambió. Revisá de nuevo antes de descartarla.",
     "files": [
@@ -1676,12 +1735,6 @@
     "source": "Ahorro",
     "files": [
       "js/finance-review.js"
-    ]
-  },
-  "s_18ecec6e": {
-    "source": "{{v0}} {{v1}} en llamada · +{{v2}}{{v3}}",
-    "files": [
-      "js/detail-views.js"
     ]
   },
   "s_190b1c67": {
@@ -1886,6 +1939,12 @@
       "js/accounting-export.js"
     ]
   },
+  "s_1b4230f9": {
+    "source": "Marcas observadas con milisegundos",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_1b690e90": {
     "source": "Fases, equipo y mejoras disponibles en cada nivel.",
     "files": [
@@ -1944,12 +2003,6 @@
     "source": "Meta de Adherencia: {{v0}}%",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_1c9a112d": {
-    "source": "Ver reparto automático",
-    "files": [
-      "app.html"
     ]
   },
   "s_1cbb44a6": {
@@ -2177,6 +2230,12 @@
       "app.html"
     ]
   },
+  "s_2041bb03": {
+    "source": "{{v3}} – {{v4}}",
+    "files": [
+      "js/higher-rate.js"
+    ]
+  },
   "s_206992ec": {
     "source": "¿Continuar el turno anterior o iniciar otra sesión?",
     "files": [
@@ -2205,12 +2264,6 @@
     "source": "Cumplir la meta diaria",
     "files": [
       "app.html"
-    ]
-  },
-  "s_217fdf57": {
-    "source": "{{v7}} · {{v8}} min",
-    "files": [
-      "js/call-table-view.js"
     ]
   },
   "s_21830f6d": {
@@ -2263,12 +2316,6 @@
       "js/finance.js"
     ]
   },
-  "s_2223bbb3": {
-    "source": "Fuera del turno",
-    "files": [
-      "js/game-review.js"
-    ]
-  },
   "s_22380468": {
     "source": "Confirmar",
     "files": [
@@ -2306,6 +2353,12 @@
       "js/settings.js"
     ]
   },
+  "s_229fb219": {
+    "source": "Efecto del cambio",
+    "files": [
+      "js/higher-rate-review.js"
+    ]
+  },
   "s_2308e9af": {
     "source": "Tiempo de ACW/AfterCallWork acumulado hoy (huecos entre llamadas sin clasificar como Break/Lunch/Otro)",
     "files": [
@@ -2335,6 +2388,12 @@
     "source": "Sin emoji",
     "files": [
       "js/settings.js"
+    ]
+  },
+  "s_235ee2ed": {
+    "source": "Vínculos pendientes de revisión",
+    "files": [
+      "js/call-records-view.js"
     ]
   },
   "s_236c978a": {
@@ -2453,6 +2512,12 @@
       "app.html"
     ]
   },
+  "s_25055385": {
+    "source": "{{v13}}/{{v14}}",
+    "files": [
+      "js/reports.js"
+    ]
+  },
   "s_254330de": {
     "source": "Sin ventanas pasadas todavía.",
     "files": [
@@ -2477,12 +2542,6 @@
       "js/finance.js"
     ]
   },
-  "s_25a79d01": {
-    "source": "Cofre de la meta diaria",
-    "files": [
-      "js/game-review.js"
-    ]
-  },
   "s_25cc1c29": {
     "source": "ES",
     "files": [
@@ -2499,12 +2558,6 @@
     "source": "{{v1}} min",
     "files": [
       "js/game.js"
-    ]
-  },
-  "s_262ac7c8": {
-    "source": "Revisar llamadas",
-    "files": [
-      "js/higher-rate.js"
     ]
   },
   "s_262d2a5d": {
@@ -2719,12 +2772,6 @@
       "js/automation-ui.js"
     ]
   },
-  "s_292f69bb": {
-    "source": "Fecha de la ventana",
-    "files": [
-      "js/higher-rate.js"
-    ]
-  },
   "s_293d11ee": {
     "source": "Sin actividad",
     "files": [
@@ -2815,6 +2862,12 @@
       "js/call-table-view.js"
     ]
   },
+  "s_2a5ef6b7": {
+    "source": "Tu respaldo se conserva mientras esperamos el historial.",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_2a734315": {
     "source": "Beep clásico",
     "files": [
@@ -2864,6 +2917,12 @@
       "js/landing.js"
     ]
   },
+  "s_2b35a1e9": {
+    "source": "La llamada aún no está confirmada en el historial de Propio. No se borra por ausencia.",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_2b4744f9": {
     "source": "el plan se queda igual — el tiempo perdido se ve como un hueco al inicio, y tu turno sigue terminando a la hora de siempre.",
     "files": [
@@ -2911,6 +2970,12 @@
     "source": "Tu recompensa espera al próximo inicio de turno.",
     "files": [
       "app.html"
+    ]
+  },
+  "s_2c1a9129": {
+    "source": "Revisá antes de vincular",
+    "files": [
+      "js/call-records-view.js"
     ]
   },
   "s_2c6cce18": {
@@ -2983,6 +3048,8 @@
     "source": "{{v0}} min",
     "files": [
       "js/app-main.js",
+      "js/call-records-view.js",
+      "js/call-table-view.js",
       "js/finance-planning.js"
     ]
   },
@@ -3020,12 +3087,6 @@
     "source": "Vacío = se guarda como Manual",
     "files": [
       "app.html"
-    ]
-  },
-  "s_2ea6dc3b": {
-    "source": "ADHERENCIA",
-    "files": [
-      "js/reports.js"
     ]
   },
   "s_2ebc52f2": {
@@ -3126,16 +3187,16 @@
       "js/game.js"
     ]
   },
-  "s_2f8a4314": {
-    "source": "Sin llamadas en Higher Rate",
-    "files": [
-      "js/detail-views.js"
-    ]
-  },
   "s_2f9a4ba8": {
     "source": "Sonidos arcade",
     "files": [
       "app.html"
+    ]
+  },
+  "s_2f9b3105": {
+    "source": "Final de tu tool",
+    "files": [
+      "js/call-records-view.js"
     ]
   },
   "s_2fa0ade4": {
@@ -3168,12 +3229,6 @@
     "source": "Toca su estado (Libre o Trabajado) para cambiarlo, o el lápiz para agregar una categoría o nota.",
     "files": [
       "app.html"
-    ]
-  },
-  "s_302c28c7": {
-    "source": "Falta para la meta",
-    "files": [
-      "js/reports.js"
     ]
   },
   "s_303fe282": {
@@ -3360,6 +3415,12 @@
       "app.html"
     ]
   },
+  "s_328ac186": {
+    "source": "Revisá las posibles coincidencias en el listado de llamadas.",
+    "files": [
+      "js/call-review-view.js"
+    ]
+  },
   "s_3295b604": {
     "source": "Lo que hace",
     "files": [
@@ -3412,7 +3473,6 @@
   "s_337ded88": {
     "source": "Editar llamada",
     "files": [
-      "app.html",
       "js/call-table-view.js"
     ]
   },
@@ -3477,6 +3537,12 @@
       "app.html"
     ]
   },
+  "s_347cd186": {
+    "source": "{{v0}} · +{{v1}}{{v2}}",
+    "files": [
+      "js/higher-rate.js"
+    ]
+  },
   "s_347fc296": {
     "source": "{{v0}} días",
     "files": [
@@ -3487,6 +3553,7 @@
     "source": "Cerró bien",
     "files": [
       "app.html",
+      "js/call-records-view.js",
       "js/positive-reinforcement.js"
     ]
   },
@@ -3494,6 +3561,12 @@
     "source": "Historial de ventanas limpio. Tus llamadas y bonos se conservaron.",
     "files": [
       "js/higher-rate.js"
+    ]
+  },
+  "s_34d6c930": {
+    "source": "Cierre observado · respaldo guardado",
+    "files": [
+      "js/call-records-view.js"
     ]
   },
   "s_34e932ca": {
@@ -3506,12 +3579,6 @@
     "source": "Idioma de la tool",
     "files": [
       "app.html"
-    ]
-  },
-  "s_35212722": {
-    "source": "Corregir promoción",
-    "files": [
-      "js/higher-rate-review.js"
     ]
   },
   "s_35249ea0": {
@@ -3604,12 +3671,6 @@
       "js/positive-reinforcement.js"
     ]
   },
-  "s_36a691c3": {
-    "source": "#{{v1}}",
-    "files": [
-      "js/call-table-view.js"
-    ]
-  },
   "s_36c195a4": {
     "source": "Hitos",
     "files": [
@@ -3694,10 +3755,10 @@
       "js/notification-review.js"
     ]
   },
-  "s_37cf147e": {
-    "source": "Meta del ciclo actual ($)",
+  "s_37b29ef5": {
+    "source": "Duración informada",
     "files": [
-      "app.html"
+      "js/call-records-view.js"
     ]
   },
   "s_37f1d1c9": {
@@ -3743,6 +3804,12 @@
       "js/app-main.js"
     ]
   },
+  "s_38e04de0": {
+    "source": "Pago estimado",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_38e6f698": {
     "source": "Suena al terminar y guardar desde la tool. La sincronización de la extensión es silenciosa.",
     "files": [
@@ -3783,12 +3850,6 @@
     "source": "Editar",
     "files": [
       "js/weekly-summary.js"
-    ]
-  },
-  "s_397db7aa": {
-    "source": "Confirmar recálculo",
-    "files": [
-      "js/higher-rate-review.js"
     ]
   },
   "s_398e440e": {
@@ -3843,8 +3904,7 @@
   "s_39f30811": {
     "source": "Hora de fin",
     "files": [
-      "js/higher-rate-review.js",
-      "js/higher-rate.js"
+      "js/higher-rate-review.js"
     ]
   },
   "s_39ffff4b": {
@@ -3865,6 +3925,12 @@
     "source": "{{v0}}:00 – {{v1}} llamada(s) en 14 días",
     "files": [
       "js/reports.js"
+    ]
+  },
+  "s_3a61da0a": {
+    "source": "Los registros cambiaron. Cerrá y abrí la comparación antes de vincular.",
+    "files": [
+      "js/call-records-view.js"
     ]
   },
   "s_3a779a98": {
@@ -3908,12 +3974,6 @@
     "source": "Llamada iniciada",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_3afd5b4e": {
-    "source": "En turno",
-    "files": [
-      "js/game-review.js"
     ]
   },
   "s_3aff7202": {
@@ -3968,6 +4028,12 @@
     "source": "Sincronizado",
     "files": [
       "js/boot.js"
+    ]
+  },
+  "s_3bb3bf43": {
+    "source": "Duración guardada: {{v0}} ms",
+    "files": [
+      "js/call-records-view.js"
     ]
   },
   "s_3bbd21ac": {
@@ -4067,6 +4133,12 @@
       "js/app-main.js"
     ]
   },
+  "s_3e384632": {
+    "source": "Respaldo · pendiente de Propio",
+    "files": [
+      "js/call-table-view.js"
+    ]
+  },
   "s_3e3c5557": {
     "source": "La duración prevista de {{v0}} ya se cumplió. Esperando confirmar su cierre en el tracker.",
     "files": [
@@ -4133,6 +4205,12 @@
       "js/sync.js"
     ]
   },
+  "s_3f53be63": {
+    "source": "Inicio informado",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_3f563c9d": {
     "source": "derrotado",
     "files": [
@@ -4193,12 +4271,6 @@
       "js/game.js"
     ]
   },
-  "s_40b9d4e7": {
-    "source": "{{v1}} Días pasados ({{v2}})",
-    "files": [
-      "js/detail-views.js"
-    ]
-  },
   "s_40f9c3e3": {
     "source": "Se eliminan tu cuenta y sus datos activos de la tool.",
     "files": [
@@ -4215,6 +4287,12 @@
     "source": "Impulso estable · tu caja de 5 llamadas se conserva",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_412deadf": {
+    "source": "Quitar esta ventana",
+    "files": [
+      "js/higher-rate-review.js"
     ]
   },
   "s_4130f4f8": {
@@ -4358,6 +4436,12 @@
       "app.html"
     ]
   },
+  "s_436e54e3": {
+    "source": "Según Propio",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_43b540ae": {
     "source": "Diagnósticos técnicos mínimos.",
     "files": [
@@ -4484,12 +4568,6 @@
     "source": "Revisar horario",
     "files": [
       "js/shift-work-review.js"
-    ]
-  },
-  "s_44f111ee": {
-    "source": "Una corrección dejó la meta por debajo de lo necesario y se ajustó la recompensa asociada. No se borraron tus llamadas. Podés volver a alcanzar la meta.",
-    "files": [
-      "js/game-review.js"
     ]
   },
   "s_452eba29": {
@@ -4718,6 +4796,12 @@
       "app.html"
     ]
   },
+  "s_48cb167e": {
+    "source": "{{v26}}{{v27}}",
+    "files": [
+      "js/reports.js"
+    ]
+  },
   "s_48d567d8": {
     "source": "Sonido \"{{v0}}\" guardado",
     "files": [
@@ -4896,12 +4980,6 @@
       "app.html"
     ]
   },
-  "s_4b4b3c25": {
-    "source": "Datos del día seleccionado, sin cambiar tus registros.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_4b786cc9": {
     "source": "Continuar con Google",
     "files": [
@@ -4938,6 +5016,12 @@
       "js/calls.js"
     ]
   },
+  "s_4bfa7f3f": {
+    "source": "Final de Propio*",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_4c0197d9": {
     "source": "Revisar cada fila y su motivo",
     "files": [
@@ -4955,6 +5039,12 @@
     "source": "Aplicar a todos",
     "files": [
       "app.html"
+    ]
+  },
+  "s_4c64637e": {
+    "source": "Detalle del registro",
+    "files": [
+      "js/calls.js"
     ]
   },
   "s_4c721b6d": {
@@ -5057,12 +5147,6 @@
       "js/game.js"
     ]
   },
-  "s_4e66f48e": {
-    "source": "Nivel de la ventana",
-    "files": [
-      "js/higher-rate.js"
-    ]
-  },
   "s_4e6d1d40": {
     "source": "A D",
     "files": [
@@ -5120,12 +5204,6 @@
   },
   "s_4f1f3c20": {
     "source": "+ Agregar meta",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_4f6ea0b2": {
-    "source": "Reparto automático de reservas",
     "files": [
       "app.html"
     ]
@@ -5286,12 +5364,6 @@
       "index.html"
     ]
   },
-  "s_5167cdb2": {
-    "source": "El cofre se habilita al alcanzar la meta diaria de ganancias. Una corrección puede cambiar ese estado.",
-    "files": [
-      "js/game-review.js"
-    ]
-  },
   "s_516dc71b": {
     "source": "Dom",
     "files": [
@@ -5321,7 +5393,6 @@
   "s_51b83c0b": {
     "source": "Recompensa guardada",
     "files": [
-      "js/game-review.js",
       "js/game.js"
     ]
   },
@@ -5683,12 +5754,6 @@
       "app.html"
     ]
   },
-  "s_56a14a14": {
-    "source": "{{v32}}{{v33}}",
-    "files": [
-      "js/reports.js"
-    ]
-  },
   "s_56adae1f": {
     "source": "La tomé y seguí adelante.",
     "files": [
@@ -6005,12 +6070,6 @@
       "app.html"
     ]
   },
-  "s_5c25abae": {
-    "source": "Ventana {{v0}}",
-    "files": [
-      "js/detail-views.js"
-    ]
-  },
   "s_5c27ba57": {
     "source": "35 XP de temporada",
     "files": [
@@ -6279,8 +6338,7 @@
   "s_60ba73f9": {
     "source": "Mis premios",
     "files": [
-      "app.html",
-      "js/game-review.js"
+      "app.html"
     ]
   },
   "s_610ee1ec": {
@@ -6380,6 +6438,18 @@
     "files": [
       "app.html",
       "js/reports.js"
+    ]
+  },
+  "s_6300df73": {
+    "source": "Ver cómo se actualizó esta llamada",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
+  "s_6329a166": {
+    "source": "Diferencia: {{v0}} s",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_63369025": {
@@ -6595,6 +6665,12 @@
       "app.html"
     ]
   },
+  "s_66460e29": {
+    "source": "Tus observaciones se conservan",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_66551ff1": {
     "source": "Usado {{v0}} · {{v1}} llamadas · {{v2}} ACW{{v3}}",
     "files": [
@@ -6734,22 +6810,10 @@
       "privacidad.html"
     ]
   },
-  "s_6933cf0c": {
-    "source": "Ver estado del cofre",
-    "files": [
-      "js/game-review.js"
-    ]
-  },
   "s_6938be5d": {
     "source": "Tasa y moneda",
     "files": [
       "app.html"
-    ]
-  },
-  "s_6943c861": {
-    "source": "Faltan {{v0}} XP para el siguiente nivel",
-    "files": [
-      "js/game-review.js"
     ]
   },
   "s_696939a3": {
@@ -7063,12 +7127,6 @@
       "js/app-main.js"
     ]
   },
-  "s_6e8bb7e0": {
-    "source": "Promedio 7d: {{v23}}",
-    "files": [
-      "js/reports.js"
-    ]
-  },
   "s_6e9d9aee": {
     "source": "{{v5}} {{v6}}: +{{v7}}{{v8}}",
     "files": [
@@ -7199,12 +7257,6 @@
       "js/game.js"
     ]
   },
-  "s_707fa47e": {
-    "source": "Logros de hoy",
-    "files": [
-      "js/game-review.js"
-    ]
-  },
   "s_7084d3b4": {
     "source": "No quedan días laborales en el ciclo.",
     "files": [
@@ -7332,6 +7384,12 @@
       "js/app-main.js"
     ]
   },
+  "s_7274c782": {
+    "source": "Aún no aparece",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_72853c78": {
     "source": "— es la base contra la que se mide tu adherencia.",
     "files": [
@@ -7354,12 +7412,6 @@
     "source": "Objetivo",
     "files": [
       "js/finance.js"
-    ]
-  },
-  "s_72c937ff": {
-    "source": "{{v10}}/{{v11}}",
-    "files": [
-      "js/reports.js"
     ]
   },
   "s_72e07553": {
@@ -7424,10 +7476,23 @@
       "js/call-table-view.js"
     ]
   },
+  "s_74226abe": {
+    "source": "Falta para la meta del ciclo",
+    "files": [
+      "js/reports.js"
+    ]
+  },
   "s_742929fc": {
     "source": "Qué puedes registrar y cómo usar los números de tu jornada.",
     "files": [
       "index.html"
+    ]
+  },
+  "s_745071d5": {
+    "source": "Pendientes de vincular",
+    "files": [
+      "app.html",
+      "js/call-table-view.js"
     ]
   },
   "s_7463cd99": {
@@ -7460,12 +7525,6 @@
       "js/automation-ui.js"
     ]
   },
-  "s_74ca6265": {
-    "source": "{{v0}} de ventana",
-    "files": [
-      "js/detail-views.js"
-    ]
-  },
   "s_74d092b6": {
     "source": "Cada cuántas llamadas",
     "files": [
@@ -7492,8 +7551,7 @@
   "s_74e64e64": {
     "source": "En pausa",
     "files": [
-      "js/game-battle.js",
-      "js/game-review.js"
+      "js/game-battle.js"
     ]
   },
   "s_75098ce7": {
@@ -7882,12 +7940,6 @@
       "js/reports.js"
     ]
   },
-  "s_7ae4593f": {
-    "source": "Revisar recálculo",
-    "files": [
-      "js/higher-rate-review.js"
-    ]
-  },
   "s_7b026cab": {
     "source": "{{v0}} Ganancias del ciclo",
     "files": [
@@ -7904,6 +7956,12 @@
     "source": "Resumen por día y detalle de llamadas del rango, en USD. El detalle separa pago base, Higher Rate y total. Incluye días sin llamadas; no predice ganancias futuras.",
     "files": [
       "app.html"
+    ]
+  },
+  "s_7b6e5c4b": {
+    "source": "Inicio observado",
+    "files": [
+      "js/call-records-view.js"
     ]
   },
   "s_7b792083": {
@@ -7984,6 +8042,12 @@
       "app.html"
     ]
   },
+  "s_7c1553b3": {
+    "source": "Último reparto automático",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_7c77d239": {
     "source": "Usa un plazo entre 1 y 120 meses.",
     "files": [
@@ -8038,6 +8102,12 @@
       "app.html"
     ]
   },
+  "s_7cdc986d": {
+    "source": "Cierre personal de esta llamada",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_7d2466a9": {
     "source": "Cada cuenta ve solo lo suyo",
     "files": [
@@ -8054,6 +8124,12 @@
     "source": "La app nunca compra nada ni interrumpe una llamada. Tú decides cuándo realizar, guardar o cambiar cada premio.",
     "files": [
       "app.html"
+    ]
+  },
+  "s_7d5f8aad": {
+    "source": "Fue difícil",
+    "files": [
+      "js/call-records-view.js"
     ]
   },
   "s_7d6eab8b": {
@@ -8243,6 +8319,12 @@
     "source": "Continuar conserva el inicio anterior y marca el hueco como interrupción accidental.",
     "files": [
       "js/shift-work-review.js"
+    ]
+  },
+  "s_80399c91": {
+    "source": "Según tu tool",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_8043d60f": {
@@ -8533,6 +8615,12 @@
       "js/calendar.js"
     ]
   },
+  "s_843dc624": {
+    "source": "Registro de Propio",
+    "files": [
+      "js/call-table-view.js"
+    ]
+  },
   "s_845bab6d": {
     "source": "Tu héroe",
     "files": [
@@ -8558,17 +8646,16 @@
       "js/boot.js"
     ]
   },
-  "s_84c01e1e": {
-    "source": "Las opciones se configuran en el popup de la extensión.",
+  "s_84b0ffe4": {
+    "source": "Otra llamada cruza este registro. Revisá los tiempos antes de vincular; no se eliminó ningún respaldo.",
     "files": [
-      "app.html"
+      "js/call-records-view.js"
     ]
   },
   "s_84d4c8cc": {
     "source": "En llamada",
     "files": [
-      "js/app-main.js",
-      "js/game-review.js"
+      "js/app-main.js"
     ]
   },
   "s_84ead977": {
@@ -8587,6 +8674,12 @@
     "source": "{{v0}}: la meta productiva ({{v1}} min) no puede ser mayor que la duración del bloque ({{v2}} min).",
     "files": [
       "js/schedule.js"
+    ]
+  },
+  "s_85326291": {
+    "source": "Revisar vínculo",
+    "files": [
+      "js/call-table-view.js"
     ]
   },
   "s_85457cfb": {
@@ -8629,6 +8722,12 @@
     "source": "Todo se guarda también en tu dispositivo y se sincroniza al volver la señal.",
     "files": [
       "index.html"
+    ]
+  },
+  "s_85cb5c18": {
+    "source": "Turno / pausa",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_85cb77f8": {
@@ -8790,6 +8889,12 @@
       "js/call-review-view.js"
     ]
   },
+  "s_8844b8db": {
+    "source": "Pago estimado: de 0 a 39 segundos se conservan los minutos completos; desde 40 segundos se suma un minuto. La duración observada no se redondea.",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_885e114b": {
     "source": "11:40 – 12:00 · tomado a tiempo",
     "files": [
@@ -8899,10 +9004,22 @@
       "index.html"
     ]
   },
+  "s_8a29c051": {
+    "source": "Editar datos de esta llamada",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_8a37b37f": {
     "source": "Eliminar registro",
     "files": [
       "app.html"
+    ]
+  },
+  "s_8a65d63d": {
+    "source": "Duración observada",
+    "files": [
+      "js/call-records-view.js"
     ]
   },
   "s_8a78b923": {
@@ -9135,6 +9252,12 @@
       "js/game-battle.js"
     ]
   },
+  "s_8d78feda": {
+    "source": "Plan, registro y motivos de la jornada",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_8d8726c3": {
     "source": "Quitar nota",
     "files": [
@@ -9147,12 +9270,17 @@
       "app.html"
     ]
   },
+  "s_8dc2b464": {
+    "source": "Editar meta del ciclo actual",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_8dd41866": {
     "source": "Sin datos",
     "files": [
       "app.html",
       "js/game.js",
-      "js/reports.js",
       "js/weekly-summary.js"
     ]
   },
@@ -9196,8 +9324,7 @@
     "source": "Hora de inicio",
     "files": [
       "app.html",
-      "js/higher-rate-review.js",
-      "js/higher-rate.js"
+      "js/higher-rate-review.js"
     ]
   },
   "s_8e4897ca": {
@@ -9210,12 +9337,6 @@
     "source": "Entre llamadas",
     "files": [
       "js/calls.js"
-    ]
-  },
-  "s_8eba2cd8": {
-    "source": "Modo de trabajo",
-    "files": [
-      "js/game-review.js"
     ]
   },
   "s_8ec34fee": {
@@ -9313,12 +9434,6 @@
     "source": "Marca si cerró bien, si cumpliste aunque fue difícil o si te dejó un aprendizaje.",
     "files": [
       "app.html"
-    ]
-  },
-  "s_90024964": {
-    "source": "{{v0}} llamadas elegibles",
-    "files": [
-      "js/game-review.js"
     ]
   },
   "s_900a7777": {
@@ -9477,6 +9592,12 @@
       "js/shift-work-review.js"
     ]
   },
+  "s_91bf759c": {
+    "source": "*Inicio + duración del historial. Propio no expone aquí los segundos originales.",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_91c20a20": {
     "source": "{{v0}}m · Cumplida",
     "files": [
@@ -9529,12 +9650,6 @@
     "source": "25 monedas de XP",
     "files": [
       "js/game.js"
-    ]
-  },
-  "s_92c174c3": {
-    "source": "La tool mide el tiempo entre iniciar y terminar. Guarda minutos con dos decimales; una llamada muy breve puede quedar en 0 min. El pago es estimado con tu tarifa. Las llamadas detectadas por la extensión también son provisionales hasta recibir el historial de Propio.",
-    "files": [
-      "app.html"
     ]
   },
   "s_92fd1f27": {
@@ -9744,6 +9859,18 @@
       "app.html"
     ]
   },
+  "s_9603aea6": {
+    "source": "Pendiente de vincular",
+    "files": [
+      "js/call-review-view.js"
+    ]
+  },
+  "s_96158d1c": {
+    "source": "Tu tool conserva la llamada",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_962ed7ff": {
     "source": "Entra o crea tu cuenta con Google. No necesitas una contraseña de esta app.",
     "files": [
@@ -9944,6 +10071,12 @@
     "source": "Cuida la calidad de cada llamada",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_999075ee": {
+    "source": "Inicio del ACW",
+    "files": [
+      "js/call-records-view.js"
     ]
   },
   "s_99a6b149": {
@@ -10387,12 +10520,6 @@
       "app.html"
     ]
   },
-  "s_a058440b": {
-    "source": "Total de la tool",
-    "files": [
-      "js/detail-views.js"
-    ]
-  },
   "s_a0761ad9": {
     "source": "Reporte de ganancias — {{v1}}",
     "files": [
@@ -10421,12 +10548,6 @@
     "source": "Activar o silenciar los efectos de Logros; los avisos de turno y pausas se controlan aparte.",
     "files": [
       "app.html"
-    ]
-  },
-  "s_a0c27aec": {
-    "source": "Aceptable",
-    "files": [
-      "js/reports.js"
     ]
   },
   "s_a0f62742": {
@@ -10644,12 +10765,6 @@
       "js/finance.js"
     ]
   },
-  "s_a3806022": {
-    "source": "Al colgar, el ACW cuenta cuánto esperás la siguiente llamada. Para estimar tu pago, miramos los segundos que sobran después de los minutos completos: de 0 a 39 segundos, conservamos esos minutos; de 40 a 59 segundos, sumamos un minuto. Por ejemplo: 7 minutos y 39 segundos → 7 minutos de pago estimado. Desde 7 minutos y 40 segundos → 8 minutos de pago estimado.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_a3bb57ea": {
     "source": "Día siguiente",
     "files": [
@@ -10790,6 +10905,12 @@
       "js/weekly-summary.js"
     ]
   },
+  "s_a62d210b": {
+    "source": "PENDIENTE",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_a62ebd34": {
     "source": "No hay horario configurado para este día. Edítalo en “Horario”.",
     "files": [
@@ -10896,12 +11017,6 @@
     "source": "El registro de llamadas continúa. Reanudá la disponibilidad desde la extensión o con Start Calls en Propio.",
     "files": [
       "js/automation-ui.js"
-    ]
-  },
-  "s_a7c10551": {
-    "source": "Corrige duración, pago, billable o dropped de una llamada ya importada. El nivel de Higher Rate no se edita aquí: sale de tus ventanas configuradas.",
-    "files": [
-      "app.html"
     ]
   },
   "s_a7c2d521": {
@@ -11112,6 +11227,12 @@
       "app.html"
     ]
   },
+  "s_ab75a67c": {
+    "source": "Confirmar cambios",
+    "files": [
+      "js/higher-rate-review.js"
+    ]
+  },
   "s_ab842473": {
     "source": "{{v0}} guardada(s) · {{v1}} sin importar o sin cambios",
     "files": [
@@ -11121,8 +11242,7 @@
   "s_ab8c9ed4": {
     "source": "Equipo",
     "files": [
-      "app.html",
-      "js/game-review.js"
+      "app.html"
     ]
   },
   "s_ab90cc7e": {
@@ -11144,16 +11264,16 @@
       "terminos.html"
     ]
   },
+  "s_abd98790": {
+    "source": "Tu tool",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_abf5c610": {
     "source": "Borra nivel, XP, racha, trofeos, accesorios y monstruos derrotados. Tus llamadas, turnos, metas y finanzas no se tocan.",
     "files": [
       "app.html"
-    ]
-  },
-  "s_ac07583a": {
-    "source": "Editar llamada · #{{v0}}",
-    "files": [
-      "js/calls.js"
     ]
   },
   "s_ac1b452c": {
@@ -11203,6 +11323,12 @@
     "source": "Despensa",
     "files": [
       "js/finance.js"
+    ]
+  },
+  "s_ace5a3bd": {
+    "source": "Registro informado por Propio",
+    "files": [
+      "js/call-records-view.js"
     ]
   },
   "s_ad066d9d": {
@@ -11272,8 +11398,14 @@
       "js/finance-planning.js"
     ]
   },
-  "s_ae98bba2": {
-    "source": "Refuerzo positivo",
+  "s_ae79e9de": {
+    "source": "Duración registrada",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
+  "s_aec4921e": {
+    "source": "La tool conserva el inicio, el final y la duración observados con milisegundos. El redondeo desde 40 segundos se usa para estimar el pago. Al llegar el historial, Propio tiene prioridad y la observación original queda como respaldo.",
     "files": [
       "app.html"
     ]
@@ -11306,6 +11438,12 @@
     "source": "Misiones automáticas",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_af659f6b": {
+    "source": "Detalle de llamada · #{{v0}}",
+    "files": [
+      "js/calls.js"
     ]
   },
   "s_af737e44": {
@@ -11437,10 +11575,10 @@
       "js/backup-recovery.js"
     ]
   },
-  "s_b153d3d6": {
-    "source": "Configurar apoyo sin llamadas",
+  "s_b10ba308": {
+    "source": "Ver origen del ACW",
     "files": [
-      "js/notification-review.js"
+      "app.html"
     ]
   },
   "s_b166ed55": {
@@ -11564,12 +11702,6 @@
       "js/detail-views.js"
     ]
   },
-  "s_b3072e30": {
-    "source": "Mejor: {{v21}} · Peor: {{v22}}",
-    "files": [
-      "js/reports.js"
-    ]
-  },
   "s_b3087cca": {
     "source": "La extensión necesita el horario y los descansos actuales antes de actuar.",
     "files": [
@@ -11690,12 +11822,6 @@
     "source": "Estado",
     "files": [
       "app.html"
-    ]
-  },
-  "s_b47ddc69": {
-    "source": "Baja",
-    "files": [
-      "js/reports.js"
     ]
   },
   "s_b481c851": {
@@ -11906,12 +12032,6 @@
       "js/finance.js"
     ]
   },
-  "s_b77f6f66": {
-    "source": "Disponible para abrir",
-    "files": [
-      "js/game-review.js"
-    ]
-  },
   "s_b7baa774": {
     "source": "Privacidad",
     "files": [
@@ -11974,6 +12094,12 @@
       "app.html"
     ]
   },
+  "s_b944d700": {
+    "source": "Usá los datos del aviso de Propio. Abrí una promoción para revisar sus llamadas y elegir el efecto de una edición.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_b962bc93": {
     "source": "Gastos y metas de ahorro que se llenan solas con lo que vas ganando, en el orden de prioridad que tú decidas.",
     "files": [
@@ -12008,12 +12134,6 @@
     "source": "Activá Registrar en mi tracker en la extensión para usar sus automatismos.",
     "files": [
       "js/automation-ui.js"
-    ]
-  },
-  "s_b9dce0f5": {
-    "source": "Sin ventanas configuradas",
-    "files": [
-      "js/detail-views.js"
     ]
   },
   "s_b9fe5bbf": {
@@ -12114,6 +12234,12 @@
       "app.html"
     ]
   },
+  "s_bb62e055": {
+    "source": "{{v21}}/{{v22}} días transcurridos",
+    "files": [
+      "js/reports.js"
+    ]
+  },
   "s_bb66f6a9": {
     "source": "{{v0}} RACHA DE CUMPLIMIENTO",
     "files": [
@@ -12187,12 +12313,6 @@
       "terminos.html"
     ]
   },
-  "s_bcfdacd3": {
-    "source": "{{v20}} PROYECCIÓN DEL CICLO",
-    "files": [
-      "js/reports.js"
-    ]
-  },
   "s_bcffa388": {
     "source": "Meta histórica conservada",
     "files": [
@@ -12203,6 +12323,12 @@
     "source": "Copiar este horario a Lunes-Viernes",
     "files": [
       "app.html"
+    ]
+  },
+  "s_bd329cb5": {
+    "source": "· Diferencia: {{v0}} s",
+    "files": [
+      "js/call-table-view.js"
     ]
   },
   "s_bd66f4ea": {
@@ -12629,12 +12755,6 @@
       "app.html"
     ]
   },
-  "s_c40165ee": {
-    "source": "Gold (+$0.03)",
-    "files": [
-      "js/higher-rate.js"
-    ]
-  },
   "s_c4032edd": {
     "source": "Sí",
     "files": [
@@ -12917,6 +13037,12 @@
       "js/app-main.js"
     ]
   },
+  "s_c7ca9533": {
+    "source": "Propio y respaldo",
+    "files": [
+      "js/call-table-view.js"
+    ]
+  },
   "s_c7cfe25c": {
     "source": "Marcaste este día como Libre a mano (Resumen semanal → Editar día) — no se exige Adherencia, aunque tenías turno planeado.",
     "files": [
@@ -13002,6 +13128,12 @@
       "app.html"
     ]
   },
+  "s_c937292d": {
+    "source": "El total usa el registro de Propio. Tu observación y su estimación siguen disponibles.",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_c93a51ea": {
     "source": "Configura tu moneda secundaria en Metas para intercambiarla",
     "files": [
@@ -13057,10 +13189,10 @@
       "js/higher-rate-review.js"
     ]
   },
-  "s_ca54f61d": {
-    "source": "El recálculo actualiza ganancias, Finanzas y Logros. Conserva el pago base y los bonos conservados de otras promociones.",
+  "s_ca4c8652": {
+    "source": "{{v18}} PROYECCIÓN DEL CICLO",
     "files": [
-      "js/higher-rate-review.js"
+      "js/reports.js"
     ]
   },
   "s_ca83bbc4": {
@@ -13122,6 +13254,7 @@
     "source": "Ahora",
     "files": [
       "js/backup-recovery.js",
+      "js/call-records-view.js",
       "js/call-recovery.js"
     ]
   },
@@ -13324,6 +13457,12 @@
       "app.html"
     ]
   },
+  "s_ce84dca5": {
+    "source": "· {{v0}} pendiente(s) de vincular",
+    "files": [
+      "js/call-table-view.js"
+    ]
+  },
   "s_ce8a1664": {
     "source": "PERSONALIZACIÓN",
     "files": [
@@ -13383,18 +13522,6 @@
     "files": [
       "js/app-main.js",
       "js/game.js"
-    ]
-  },
-  "s_cf675910": {
-    "source": "Ajustado por corrección",
-    "files": [
-      "js/game-review.js"
-    ]
-  },
-  "s_cf7f407d": {
-    "source": "Usá la fecha, horas y nivel del aviso de Propio. Editar estas tarjetas conserva los bonos registrados; para corregir un error, abrí «Revisar llamadas».",
-    "files": [
-      "app.html"
     ]
   },
   "s_cf9c492e": {
@@ -13476,12 +13603,6 @@
       "js/shift-work-review.js"
     ]
   },
-  "s_d0bb3c36": {
-    "source": "Abrir cofre",
-    "files": [
-      "js/game-review.js"
-    ]
-  },
   "s_d0bcff73": {
     "source": "Los archivos de la app y copias de seguridad privadas y cifradas. La clave para descifrarlas se conserva fuera de Vercel.",
     "files": [
@@ -13504,12 +13625,6 @@
     "source": "Más larga",
     "files": [
       "app.html"
-    ]
-  },
-  "s_d0ea7421": {
-    "source": "Las armas cambian la animación y la práctica. Disparar o jugar el duelo no registra llamadas, dinero ni XP laboral. El duelo se ofrece en Break/Lunch o fuera del turno; al volver al trabajo se pausa y podés retomarlo después.",
-    "files": [
-      "js/game-review.js"
     ]
   },
   "s_d0f4673e": {
@@ -13564,7 +13679,6 @@
     "source": "Nivel",
     "files": [
       "app.html",
-      "js/game-review.js",
       "js/higher-rate-review.js"
     ]
   },
@@ -13694,6 +13808,12 @@
       "app.html"
     ]
   },
+  "s_d388f37b": {
+    "source": "RESPALDO",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_d38fee45": {
     "source": "Elige una fecha válida",
     "files": [
@@ -13767,16 +13887,16 @@
       "js/calls.js"
     ]
   },
+  "s_d4b1ad02": {
+    "source": "Propio tiene prioridad. La observación original sigue guardada como respaldo.",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_d4b231fe": {
     "source": "El historial oficial de Propio no se borra; una sincronización posterior puede volver a incorporarlo.",
     "files": [
       "js/backup-recovery.js"
-    ]
-  },
-  "s_d4c3e9e3": {
-    "source": "Cumpliste la meta. Abrí el cofre desde Inicio cuando estés fuera de una llamada.",
-    "files": [
-      "js/game-review.js"
     ]
   },
   "s_d4c84061": {
@@ -13839,6 +13959,12 @@
     "source": "Tenés una llamada entrante",
     "files": [
       "js/automation-ui.js"
+    ]
+  },
+  "s_d5a75a77": {
+    "source": "El ACW sigue el final de Propio",
+    "files": [
+      "js/call-records-view.js"
     ]
   },
   "s_d5e075c4": {
@@ -13963,6 +14089,12 @@
       "js/game.js"
     ]
   },
+  "s_d8a6e317": {
+    "source": "Propio informa cero",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_d8cd1aeb": {
     "source": "Pon tu horario",
     "files": [
@@ -13997,12 +14129,6 @@
     "source": "Gasto agregado",
     "files": [
       "js/finance.js"
-    ]
-  },
-  "s_d9589ae8": {
-    "source": "{{v2}} · {{v3}} · {{v4}}",
-    "files": [
-      "js/call-table-view.js"
     ]
   },
   "s_d95edd6e": {
@@ -14143,6 +14269,12 @@
       "js/settings.js"
     ]
   },
+  "s_db4a4f23": {
+    "source": "ACW desde el turno o una pausa",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_db5a5bf0": {
     "source": "No hay cambios recuperables en esta vista.",
     "files": [
@@ -14215,6 +14347,12 @@
       "app.html"
     ]
   },
+  "s_dc2b73db": {
+    "source": "Diferencia de pago",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_dc36d04d": {
     "source": "Reservado{{v10}}",
     "files": [
@@ -14261,12 +14399,6 @@
     "source": "El navegador bloqueó la ventana nueva — habilita ventanas emergentes para exportar a PDF.",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_dcb9768b": {
-    "source": "Tu jornada",
-    "files": [
-      "app.html"
     ]
   },
   "s_dcc378be": {
@@ -14436,6 +14568,7 @@
     "source": "Me dejó un aprendizaje",
     "files": [
       "app.html",
+      "js/call-records-view.js",
       "js/positive-reinforcement.js"
     ]
   },
@@ -14678,12 +14811,6 @@
       "js/calls.js"
     ]
   },
-  "s_e1b00897": {
-    "source": "El estado se actualiza desde la extensión. Si la lectura deja de ser reciente, se muestra la espera de confirmación.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_e1c47e30": {
     "source": "Nota opcional",
     "files": [
@@ -14804,12 +14931,6 @@
       "app.html"
     ]
   },
-  "s_e390029c": {
-    "source": "Meta pendiente",
-    "files": [
-      "js/game-review.js"
-    ]
-  },
   "s_e393413e": {
     "source": "Pago parcial",
     "files": [
@@ -14820,12 +14941,6 @@
     "source": "Orden (informativo)",
     "files": [
       "js/schedule.js"
-    ]
-  },
-  "s_e3b09ecd": {
-    "source": "Destinos y ajustes, separados de los pagos.",
-    "files": [
-      "app.html"
     ]
   },
   "s_e3b7fffc": {
@@ -14882,10 +14997,22 @@
       "js/finance.js"
     ]
   },
+  "s_e4625882": {
+    "source": "Ver y editar promoción",
+    "files": [
+      "js/higher-rate.js"
+    ]
+  },
   "s_e49d517c": {
     "source": "Bono ganado hoy{{v7}}",
     "files": [
       "js/detail-views.js"
+    ]
+  },
+  "s_e4a7955d": {
+    "source": "No hay vínculos pendientes para este día.",
+    "files": [
+      "js/call-table-view.js"
     ]
   },
   "s_e4baf720": {
@@ -14996,12 +15123,6 @@
       "js/call-recovery.js"
     ]
   },
-  "s_e68be059": {
-    "source": "La recompensa ya está guardada en tu perfil. Abrir el panel otra vez no la duplica.",
-    "files": [
-      "js/game-review.js"
-    ]
-  },
   "s_e68e1c6e": {
     "source": "¡Bienvenido!",
     "files": [
@@ -15103,12 +15224,6 @@
       "js/app-main.js"
     ]
   },
-  "s_e83216c9": {
-    "source": "{{v12}}%",
-    "files": [
-      "js/reports.js"
-    ]
-  },
   "s_e8438e2a": {
     "source": "Cerrar",
     "files": [
@@ -15153,6 +15268,12 @@
       "js/automation-ui.js"
     ]
   },
+  "s_e8f1d885": {
+    "source": "Detalle de llamada",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_e925b413": {
     "source": "{icon} Premio disponible para tu {window}: {name}{extra}",
     "files": [
@@ -15165,16 +15286,16 @@
       "js/automation-ui.js"
     ]
   },
+  "s_e92cc4fb": {
+    "source": "Revisar vínculos pendientes",
+    "files": [
+      "js/call-review-view.js"
+    ]
+  },
   "s_e9330778": {
     "source": "Neutral",
     "files": [
       "js/game.js"
-    ]
-  },
-  "s_e96031b3": {
-    "source": "Progreso del ciclo",
-    "files": [
-      "js/reports.js"
     ]
   },
   "s_e990b548": {
@@ -15274,6 +15395,12 @@
       "js/game.js"
     ]
   },
+  "s_eb0e4471": {
+    "source": "{{v0}}. ACW desde {{v1}}. Tocá para ver los registros y el cálculo.",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_eb225500": {
     "source": "Plantilla",
     "files": [
@@ -15290,6 +15417,12 @@
     "source": "Tiempo de Lunch tomado hoy",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_eb3aa340": {
+    "source": "Diferencia de cierre: {{v0}}",
+    "files": [
+      "js/call-records-view.js"
     ]
   },
   "s_eb8b17fb": {
@@ -15320,12 +15453,6 @@
     "source": "Ganancias del {{v0}}",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_ebc185b4": {
-    "source": "Elegí cómo acompañar tu jornada",
-    "files": [
-      "js/game-review.js"
     ]
   },
   "s_ebc193ad": {
@@ -15390,22 +15517,10 @@
       "js/app-main.js"
     ]
   },
-  "s_ec60a9c7": {
-    "source": "{{v1}} – {{v2}}",
-    "files": [
-      "js/detail-views.js"
-    ]
-  },
   "s_ec6271ba": {
     "source": "Llamada actualizada",
     "files": [
       "js/call-recovery.js"
-    ]
-  },
-  "s_ec8ab79f": {
-    "source": "Muy buena",
-    "files": [
-      "js/reports.js"
     ]
   },
   "s_ecc1c141": {
@@ -15418,6 +15533,12 @@
     "source": "Elegir este color",
     "files": [
       "js/finance.js"
+    ]
+  },
+  "s_eccde8c9": {
+    "source": "Mejor: {{v10}} · Peor: {{v11}} · Promedio: {{v12}}",
+    "files": [
+      "js/reports.js"
     ]
   },
   "s_ece2ef1d": {
@@ -15499,6 +15620,12 @@
       "js/app-main.js"
     ]
   },
+  "s_ee04f7c9": {
+    "source": "{{v10}} · {{v11}}",
+    "files": [
+      "js/call-table-view.js"
+    ]
+  },
   "s_ee1bc225": {
     "source": "Historial desde: —",
     "files": [
@@ -15518,10 +15645,10 @@
       "js/shift-work-review.js"
     ]
   },
-  "s_ee372ae2": {
-    "source": "{{v21}}{{v22}}",
+  "s_ee2cb28e": {
+    "source": "Apoyo y cierre de llamadas",
     "files": [
-      "js/reports.js"
+      "app.html"
     ]
   },
   "s_ee39700e": {
@@ -15561,6 +15688,12 @@
       "js/reports.js"
     ]
   },
+  "s_ef06ae98": {
+    "source": "Conservar bonos ya ganados",
+    "files": [
+      "js/higher-rate-review.js"
+    ]
+  },
   "s_ef0b027e": {
     "source": "Hoy sí me doy cuenta de todo",
     "files": [
@@ -15595,6 +15728,12 @@
     "source": "Fin al día siguiente",
     "files": [
       "js/schedule.js"
+    ]
+  },
+  "s_efa1d9df": {
+    "source": "PRIORIDAD",
+    "files": [
+      "js/call-records-view.js"
     ]
   },
   "s_efc3ceb5": {
@@ -15634,10 +15773,10 @@
       "js/app-main.js"
     ]
   },
-  "s_f0b8f25a": {
-    "source": "El progreso de juego no cambia tu pago.",
+  "s_f0b1c4ee": {
+    "source": "Propio: {{v0}} · {{v1}} min",
     "files": [
-      "js/game-review.js"
+      "js/call-records-view.js"
     ]
   },
   "s_f0c3d6cd": {
@@ -15794,6 +15933,12 @@
       "app.html"
     ]
   },
+  "s_f293712e": {
+    "source": "#{{v2}}",
+    "files": [
+      "js/call-table-view.js"
+    ]
+  },
   "s_f29de2ce": {
     "source": "Ej. Casa, Internet, Fondo de emergencia...",
     "files": [
@@ -15810,6 +15955,12 @@
     "source": "Cuerpo",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_f2f5ebc0": {
+    "source": "Corregir y recalcular bonos afectados",
+    "files": [
+      "js/higher-rate-review.js"
     ]
   },
   "s_f3054b61": {
@@ -16027,12 +16178,6 @@
       "terminos.html"
     ]
   },
-  "s_f5bb668d": {
-    "source": "{{v23}}/{{v24}} días transcurridos",
-    "files": [
-      "js/reports.js"
-    ]
-  },
   "s_f5c0d963": {
     "source": "Rosa Magenta: Morado profundo y tonos rosados",
     "files": [
@@ -16082,6 +16227,12 @@
       "app.html"
     ]
   },
+  "s_f5f78000": {
+    "source": "Respaldo vinculado. Las dos versiones se conservaron.",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_f60069a5": {
     "source": "Duración inválida o fuera del límite.",
     "files": [
@@ -16104,6 +16255,12 @@
     "source": "Racha semanal",
     "files": [
       "app.html"
+    ]
+  },
+  "s_f6344908": {
+    "source": "Dos fuentes de la misma llamada; no se suman dos veces.",
+    "files": [
+      "js/call-records-view.js"
     ]
   },
   "s_f660b997": {
@@ -16172,12 +16329,6 @@
       "app.html"
     ]
   },
-  "s_f75b75c4": {
-    "source": "{{v34}}{{v35}}",
-    "files": [
-      "js/reports.js"
-    ]
-  },
   "s_f7821d8b": {
     "source": "Solo cambia el borrador. Después usá Guardar día.",
     "files": [
@@ -16241,10 +16392,10 @@
       "js/reinforcement-feedback.js"
     ]
   },
-  "s_f8adb800": {
-    "source": "Excelente",
+  "s_f88c94e6": {
+    "source": "Vincular respaldo seleccionado",
     "files": [
-      "js/reports.js"
+      "js/call-records-view.js"
     ]
   },
   "s_f8b58bd9": {
@@ -16318,6 +16469,12 @@
     "files": [
       "js/app-main.js",
       "js/calls.js"
+    ]
+  },
+  "s_f9c07aa4": {
+    "source": "Editar promoción",
+    "files": [
+      "js/higher-rate-review.js"
     ]
   },
   "s_f9d1bc59": {
@@ -16482,6 +16639,12 @@
       "app.html"
     ]
   },
+  "s_fca9eaec": {
+    "source": "Comparación de los últimos 7 días",
+    "files": [
+      "js/reports.js"
+    ]
+  },
   "s_fce63fff": {
     "source": "Lavanda, celeste y menta",
     "files": [
@@ -16613,12 +16776,6 @@
     "source": "No se guardó el plan. Tus metas anteriores se conservaron.",
     "files": [
       "js/finance-planning.js"
-    ]
-  },
-  "s_fee72da9": {
-    "source": "Bronce (+$0.01)",
-    "files": [
-      "js/higher-rate.js"
     ]
   },
   "s_fef0ec5d": {

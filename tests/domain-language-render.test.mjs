@@ -186,6 +186,7 @@ test('Higher Rate history singular and plural render in English with unchanged w
     higherRateWindowIsPast: window => window.past,
     renderHigherRateWindowRow: window => `<div data-window-id="${window.id}"></div>`,
     iconHtml: () => '', renderHigherRateDayStats() {}, renderHigherRateLiveCard() {},
+    higherRateStatsForDay: () => ({totalBonus:0}), money: () => '$0.00', financeConvertedInline: () => '', escapeHtml: String, formatCallDayLabel: x=>x,
   });
   vm.runInContext('let higherRateLastPastCount = null;\n' + declarations('../js/higher-rate.js', ['renderHigherRateWindowsEditor']), h);
   for (const count of [1, 2]) {

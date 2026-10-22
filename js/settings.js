@@ -379,10 +379,6 @@ let syncingGoals = false;
       const cyclePayOffsetInput = document.getElementById('cyclePayOffsetInput');
       if (cycleAnchorInput && document.activeElement !== cycleAnchorInput) cycleAnchorInput.value = settings.cycleAnchorDate;
       if (cyclePayOffsetInput && document.activeElement !== cyclePayOffsetInput) cyclePayOffsetInput.value = settings.cyclePayOffsetDays;
-      // v328 — Meta del ciclo actual, editable también desde aquí (ver
-      // comentario junto a cycleGoalOverrides en defaultSettings()).
-      const cycleGoalInput = document.getElementById('cycleGoalInput');
-      if (cycleGoalInput && document.activeElement !== cycleGoalInput) cycleGoalInput.value = effectiveCycleGoal(0).toFixed(2);
     }
 
 let profileRequestVersion = 0;

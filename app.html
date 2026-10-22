@@ -123,7 +123,7 @@
 <div class="chips">
 <div class="chip"><span class="dot-state" id="stateDot"></span><strong id="stateText">No iniciado</strong></div>
 <div class="acw-day-pair">
-<div class="chip" id="acwLiveChip" style="display:none;" title="Al colgar, el ACW cuenta cuánto esperás la siguiente llamada. Para estimar tu pago, miramos los segundos que sobran después de los minutos completos: de 0 a 39 segundos, conservamos esos minutos; de 40 a 59 segundos, sumamos un minuto. Por ejemplo: 7 minutos y 39 segundos → 7 minutos de pago estimado. Desde 7 minutos y 40 segundos → 8 minutos de pago estimado."><span aria-hidden="true">⏱️</span><span class="acw-label-full">ACW/AfterCallWork</span><span class="acw-label-short">ACW</span> <strong id="acwLiveTimer">00:00:00</strong></div>
+<button class="chip" id="acwLiveChip" style="display:none;" type="button" aria-label="Ver origen del ACW" aria-controls="callEditModal"><span aria-hidden="true">⏱️</span><span class="acw-label-full">ACW/AfterCallWork</span><span class="acw-label-short">ACW</span> <strong id="acwLiveTimer">00:00:00</strong><span id="acwRecordSource"></span></button><span id="acwRecordDifference" class="record-difference" hidden></span>
 <div class="summary-pill">
   <button class="day-active-label-btn" id="dayActiveLabelBtn" type="button" title="Ir a Hoy">Día activo</button>
   <button class="day-nav-btn" id="dayPrevBtn" type="button" aria-label="Día anterior" title="Día anterior">‹</button>
@@ -168,9 +168,9 @@
 <div class="automation-acw-progress" id="automationAcwProgress" hidden><progress max="100" value="0" id="automationAcwProgressBar" aria-label="Progreso de la espera entre llamadas"></progress><span id="automationAcwProgressLabel"></span></div>
 <details class="polished-disclosure"><summary>Preparación del turno</summary><div class="polished-detail automation-checks"><p class="automation-detail" id="automationDetail">Conectá la extensión para ver su próxima acción. Los controles manuales siguen disponibles.</p><ul><li id="automationTrackerCheck">Esperando confirmar la conexión de la extensión</li><li id="automationPortalCheck">Sesión de Propio pendiente de confirmar</li><li id="automationConnectionCheck"></li><li id="automationWorkCheck"></li><li id="automationScheduleCheck">Horario y descansos pendientes de confirmar</li><li id="automationFirstCheck"></li><li id="automationReturnsCheck"></li><li id="automationPauseCheck"></li></ul>
 <div class="polished-days"><span id="automationOptionsCheck">Esperando tus opciones actuales</span><span id="automationHoursCheck"></span></div>
-<p class="automation-hint">Las opciones se configuran en el popup de la extensión.</p>
+
 </div></details>
-<details class="automation-help"><summary>Sobre estos horarios</summary><p>La conexión indica cuándo la extensión reconoció tu sesión de Propio. El inicio laboral respeta tu horario o una llamada real anterior; si lo iniciás manualmente, usa esa hora.</p><p>El estado se actualiza desde la extensión. Si la lectura deja de ser reciente, se muestra la espera de confirmación.</p></details>
+<details class="automation-help"><summary>Sobre estos horarios</summary><p>La conexión indica cuándo la extensión reconoció tu sesión de Propio. El inicio laboral respeta tu horario o una llamada real anterior; si lo iniciás manualmente, usa esa hora.</p></details>
 </div>
 </details>
 </div>
@@ -208,7 +208,7 @@
 <button class="action-btn" id="pasteCallsBtn" type="button" data-accent="cyan"><span class="action-ripple"></span><span class="action-icon-wrap"><span class="action-ring"></span><span class="action-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-3"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></svg></span></span><span class="action-label">Pegar Llamadas</span><span class="action-sub">Importar data</span></button>
 <button class="action-btn" id="addCallManualBtn" type="button" data-accent="good"><span class="action-ripple"></span><span class="action-icon-wrap"><span class="action-ring"></span><span class="action-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></span><span class="action-label">Agregar llamada</span><span class="action-sub">Manual</span></button>
 </div>
-<details class="fin-preview" style="margin-top:12px;"><summary>Cómo se registra una llamada en vivo</summary><p class="alert-hint">La tool mide el tiempo entre iniciar y terminar. Guarda minutos con dos decimales; una llamada muy breve puede quedar en 0 min. El pago es estimado con tu tarifa. Las llamadas detectadas por la extensión también son provisionales hasta recibir el historial de Propio.</p></details>
+<details class="fin-preview" style="margin-top:12px;"><summary>Cómo se registra una llamada en vivo</summary><p class="alert-hint">La tool conserva el inicio, el final y la duración observados con milisegundos. El redondeo desde 40 segundos se usa para estimar el pago. Al llegar el historial, Propio tiene prioridad y la observación original queda como respaldo.</p></details>
 </section>
 
 <details class="accordion-card" id="earningsAccordion" open>
@@ -373,6 +373,7 @@
 </summary>
 <div class="accordion-body">
 <div id="blocksView">
+<details class="polished-disclosure" id="workDayReviewDetails"><summary>Plan, registro y motivos de la jornada</summary><div class="polished-detail" id="workDayReviewContent"></div></details>
   <div class="blocks-top-grid" id="blockSummaryStrip"></div>
   <div class="day-metrics-row sched-blocks-summary-row" id="dayMetricsRow">
     <span class="slot-status bad live-exception" id="adherenceLiveBadge" style="display:none;"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12" y2="17.01"/></svg> Fuera de adherencia ahora</span>
@@ -397,7 +398,7 @@
     <button class="table-filter-btn" data-table-filter="calls" type="button">Llamadas</button>
     <button class="table-filter-btn" data-table-filter="actions" type="button">Acciones</button>
   </div>
-  <div class="call-review-controls"><div class="goals-field"><label for="callSearchInput">Buscar Customer ID</label><input id="callSearchInput" type="search" placeholder="Customer ID del día activo" autocomplete="off"/></div><div class="goals-field"><label for="callSourceFilter">Estado del registro</label><select id="callSourceFilter"><option value="all">Todos</option><option value="estimated">Estimadas en vivo</option><option value="official">Oficiales importadas</option><option value="corrected">Corregidas</option><option value="manual">Manuales</option><option value="unknown">Origen sin confirmar</option></select></div></div>
+  <div class="call-review-controls"><div class="goals-field"><label for="callSearchInput">Buscar Customer ID</label><input id="callSearchInput" type="search" placeholder="Customer ID del día activo" autocomplete="off"/></div><div class="goals-field"><label for="callSourceFilter">Estado del registro</label><select id="callSourceFilter"><option value="all">Todos</option><option value="pending">Pendientes de vincular</option><option value="estimated">Estimadas en vivo</option><option value="official">Oficiales importadas</option><option value="corrected">Corregidas</option><option value="manual">Manuales</option><option value="unknown">Origen sin confirmar</option></select></div></div>
   <p class="note" id="callReviewCounts" aria-live="polite"></p>
   <p class="note" id="callTableLoadStatus" role="status" hidden>No se pudo cargar la tabla. Tus registros siguen guardados; podés reintentar.</p><button class="mc-btn-secondary" id="callTableRetryBtn" type="button" hidden>Reintentar tabla</button>
   <div class="table-wrap" id="callTableWrap"></div>
@@ -814,7 +815,7 @@
   </label>
   <p class="sched-hint" style="margin:0 0 16px;">Reserva el disponible en orden de prioridad: Gastos primero, luego Metas. Puedes ajustar cada reserva con Sumar o Restar.</p>
 
-  <button class="fin-ghost-btn" id="financeDistributionReviewBtn" type="button">Ver reparto automático</button>
+  <details class="polished-disclosure" id="financeDistributionDetails"><summary id="financeDistributionReviewBtn">Último reparto automático</summary><div class="polished-detail" id="financeDistributionContent"></div></details>
   <details class="fin-plan" id="financePlanDetails">
     <summary><strong>Planificar presupuesto</strong><span id="financePlanSummary"></span><span aria-hidden="true">⌄</span></summary>
     <div class="fin-plan-body">
@@ -871,7 +872,6 @@
 </div><!-- /pageFinance -->
 
 <div class="app-page game-achievements-page" data-page="achievements" hidden id="pageAchievements">
-<div id="gameReviewSummary"></div>
 <details class="game-achievements-hero polished-setting">
 <summary><span>Preferencias de Logros<small>Activación, temporada y configuración</small></span></summary>
   <div class="game-page-kicker"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="5"/><path d="m8.5 12.5-2 8 5.5-3 5.5 3-2-8"/><path d="m10.2 8 1.8-2 1.8 2-1.8 1.4Z"/></svg> El Monstruo</div>
@@ -907,24 +907,6 @@
       </div>
     </div>
   </details>
-<details class="game-panel game-settings-accordion" id="positiveSettingsAccordion">
-    <summary class="game-settings-accordion-summary">
-      <span class="game-settings-accordion-copy"><span class="game-panel-eyebrow">CUIDADO PERSONAL</span><strong>Refuerzo positivo</strong><small>Reconoce llamadas, recuperación, metas y premios elegidos por ti.</small></span>
-      <span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
-    </summary>
-    <div class="game-settings-accordion-body">
-      <div class="positive-settings-section game-settings-section">
-        <label class="game-settings-toggle" for="positiveReinforcementEnabledInput"><span><strong>Celebrar llamadas completadas</strong><small>Convierte constancia, recuperación y metas en evidencia positiva y premios seguros.</small></span><input id="positiveReinforcementEnabledInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label>
-        <label class="game-settings-toggle" for="positiveAskAfterCallInput"><span><strong>Cierre breve después de cada llamada</strong><small>Marca si cerró bien, si cumpliste aunque fue difícil o si te dejó un aprendizaje.</small></span><input id="positiveAskAfterCallInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label>
-        <div class="game-monster-name-setting">
-          <label for="positiveInactivityMinutesInput">Avisar tras estos minutos de trabajo sin llamadas</label>
-          <div class="game-monster-name-controls"><input id="positiveInactivityMinutesInput" type="number" min="1" max="240" step="1" inputmode="numeric" aria-describedby="positiveInactivityMessageHelp positiveInactivityMessageStatus"/></div>
-          <label class="game-settings-toggle" for="positiveInactivityRepeatInput"><span><strong>Repetir mientras siga sin llamadas</strong><small>Vuelve a avisar cada vez que transcurran esos minutos de trabajo. Apagado: una sola vez hasta la siguiente llamada.</small></span><input id="positiveInactivityRepeatInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label>
-          <label for="positiveInactivityMessageInput">Mensaje de apoyo sin llamadas</label>
-          <div class="game-monster-name-controls"><input id="positiveInactivityMessageInput" type="text" maxlength="240" autocomplete="off" aria-describedby="positiveInactivityMessageHelp positiveInactivityMessageStatus"/><button class="mc-btn-primary cyan" id="positiveInactivityMessageSaveBtn" type="button">Guardar aviso</button></div>
-          <small id="positiveInactivityMessageHelp">No cuenta Break/Lunch. Déjalo vacío y guarda para volver al mensaje original.</small>
-          <span class="game-monster-name-status" id="positiveInactivityMessageStatus" role="status" aria-live="polite"></span>
-        </div>
         <details class="game-settings-accordion game-reward-settings" id="positiveRewardsAccordion">
           <summary class="game-settings-accordion-summary"><span class="game-settings-accordion-copy"><strong>Mis premios</strong><small>Premios físicos y catálogo sugerido.</small></span><span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></summary>
           <div class="game-settings-accordion-body positive-rewards-body">
@@ -938,9 +920,6 @@
         </div>
         <p class="note" style="margin:0;">La app nunca compra nada ni interrumpe una llamada. Tú decides cuándo realizar, guardar o cambiar cada premio.</p></div>
         </details>
-      </div>
-    </div>
-  </details>
 </section>
 
 <section class="game-advanced-settings" aria-label="Herramientas avanzadas">
@@ -961,6 +940,7 @@
     <div class="game-panel-head"><div><span class="game-panel-eyebrow">Progreso</span><h2>Nivel <strong data-game-role="level" data-game-stat="level">1</strong></h2><span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Nivel y XP" aria-describedby="levelInfo">i</button><span class="sched-help-tooltip" id="levelInfo" role="tooltip">XP son puntos de experiencia. Los obtienes al completar llamadas, misiones y objetivos; suben tu nivel y desbloquean equipo. No son dinero ni cambian tu pago.</span></span></div><span class="game-level-emblem" data-game-role="level-emblem">1</span></div>
     <div class="game-level-track" role="progressbar" aria-label="Progreso hacia el siguiente nivel" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span data-game-role="level-progress" style="width:0%;"></span></div>
     <div class="game-level-foot"><span data-game-role="level-xp" data-game-stat="xp">0 XP</span><span data-game-role="next-level">Siguiente: 100 XP</span></div>
+    <div id="gameReviewSummary"></div>
     <div class="game-level-ladder" data-game-role="level-ladder"><span class="is-current">1</span><i></i><span>2</span><i></i><span>3</span><i></i><span>4</span></div>
     <details class="game-settings-accordion game-unlock-details">
       <summary class="game-settings-accordion-summary"><span class="game-settings-accordion-copy"><strong>Desbloqueos por nivel</strong><small>Fases, equipo y mejoras disponibles en cada nivel.</small></span><span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></summary>
@@ -1593,6 +1573,25 @@
 <p class="alert-hint" id="productiveBreakSoundFileStatus" style="margin-top:4px;">Ningún archivo propio guardado — usando el beep clásico mientras tanto.</p>
 </div>
 </div></div></details>
+<details class="polished-setting" id="positiveSettingsAccordion">
+    <summary class="game-settings-accordion-summary">
+      <span class="game-settings-accordion-copy"><span class="game-panel-eyebrow">CUIDADO PERSONAL</span><strong>Apoyo y cierre de llamadas</strong><small>Reconoce llamadas, recuperación, metas y premios elegidos por ti.</small></span>
+      <span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+    </summary>
+    <div class="game-settings-accordion-body">
+      <div class="positive-settings-section game-settings-section">
+        <label class="game-settings-toggle" for="positiveReinforcementEnabledInput"><span><strong>Celebrar llamadas completadas</strong><small>Convierte constancia, recuperación y metas en evidencia positiva y premios seguros.</small></span><input id="positiveReinforcementEnabledInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label>
+        <label class="game-settings-toggle" for="positiveAskAfterCallInput"><span><strong>Cierre breve después de cada llamada</strong><small>Marca si cerró bien, si cumpliste aunque fue difícil o si te dejó un aprendizaje.</small></span><input id="positiveAskAfterCallInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label>
+        <div class="game-monster-name-setting">
+          <label for="positiveInactivityMinutesInput">Avisar tras estos minutos de trabajo sin llamadas</label>
+          <div class="game-monster-name-controls"><input id="positiveInactivityMinutesInput" type="number" min="1" max="240" step="1" inputmode="numeric" aria-describedby="positiveInactivityMessageHelp positiveInactivityMessageStatus"/></div>
+          <label class="game-settings-toggle" for="positiveInactivityRepeatInput"><span><strong>Repetir mientras siga sin llamadas</strong><small>Vuelve a avisar cada vez que transcurran esos minutos de trabajo. Apagado: una sola vez hasta la siguiente llamada.</small></span><input id="positiveInactivityRepeatInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label>
+          <label for="positiveInactivityMessageInput">Mensaje de apoyo sin llamadas</label>
+          <div class="game-monster-name-controls"><input id="positiveInactivityMessageInput" type="text" maxlength="240" autocomplete="off" aria-describedby="positiveInactivityMessageHelp positiveInactivityMessageStatus"/><button class="mc-btn-primary cyan" id="positiveInactivityMessageSaveBtn" type="button">Guardar aviso</button></div>
+          <small id="positiveInactivityMessageHelp">No cuenta Break/Lunch. Déjalo vacío y guarda para volver al mensaje original.</small>
+          <span class="game-monster-name-status" id="positiveInactivityMessageStatus" role="status" aria-live="polite"></span>
+        </div>
+</div></div></details>
 <div id="notificationFilesReview"></div>
 <div class="modal-actions mc-action-row">
 <button class="mc-btn-primary cyan" data-close-modal="notificationsModal" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polyline points="5 12 10 17 19 6"/></svg> Listo</button>
@@ -1713,11 +1712,7 @@
 </span>
 </div>
 <div class="note" style="margin:0;">El ciclo siempre dura 14 días desde la fecha que pongas arriba. Se guarda solo. Ajusta esto si tus ciclos reales no coinciden con "Ganancias del ciclo".</div>
-<div class="goals-field" style="margin-top:10px; max-width:220px;">
-<label for="cycleGoalInput">Meta del ciclo actual ($)</label>
-<input id="cycleGoalInput" inputmode="decimal" min="0" step="0.01" type="number"/>
-</div>
-<div class="note" style="margin:6px 0 0;">Se calcula sola (tu meta diaria × días laborales del ciclo) salvo que la edites aquí o con el ✎ en Reportes. Déjala vacía o en 0 para volver al cálculo automático.</div>
+<button class="gap-edit-btn" id="cycleGoalSettingsBtn" type="button">Editar meta del ciclo actual</button>
 </div>
 
 <div class="divider"></div>
@@ -1728,7 +1723,7 @@
 <button id="exportBtn" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"/><polyline points="7 10 12 15 17 10"/><path d="M4 19h16"/></svg> Exportar JSON</button>
 <button id="importJsonBtn" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3"/><polyline points="7 8 12 3 17 8"/><path d="M4 19h16"/></svg> Importar JSON</button>
 <input accept="application/json,.json" id="importJsonFile" style="display:none;" type="file"/>
-</div>
+</div><div class="danger-card" style="margin-top:12px;"><div class="danger-card-head"><span class="danger-card-title">Copias recuperables</span></div><p class="danger-card-desc">Consultá la copia anterior a una restauración o reinicio. Se conserva solo en este navegador y para tu cuenta.</p><button class="mc-btn-secondary" id="snapshotRecoveryBtn" type="button">Ver copias recuperables</button></div>
 <div class="note" style="margin:0;">"Exportar JSON" descarga un respaldo completo: llamadas, turnos, pausas, horario, metas, Finanzas, Higher Rate, gamificación y ajustes. "Importar JSON" restaura todo eso. Los backups antiguos sin configuración siguen siendo compatibles.</div>
 </div>
 
@@ -1868,7 +1863,7 @@
 <span class="danger-card-badge">Con copia previa local</span>
 <button class="mc-btn-solid-full bad" id="eraseAllDataBtn" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><path d="M6 7V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v3"/><path d="M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg> Borrar todos los datos</button>
 </div>
-<div class="danger-card" style="margin-top:12px;"><div class="danger-card-head"><span class="danger-card-title">Copias recuperables</span></div><p class="danger-card-desc">Consultá la copia anterior a una restauración o reinicio. Se conserva solo en este navegador y para tu cuenta.</p><button class="mc-btn-secondary" id="snapshotRecoveryBtn" type="button">Ver copias recuperables</button></div>
+
 </div>
 </div>
 <div aria-hidden="true" class="modal-overlay" id="higherRateModal">
@@ -1877,7 +1872,7 @@
 <div class="mc-header-icon hr-gradient" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c2 3-1 4-1 7a3 3 0 1 0 6 0c0-1-.5-2-.5-2 2 1 3 3.5 3 6a7 7 0 1 1-14 0c0-4 2-6 3.5-8 .5 2 1 2.5 3-3Z"/></svg></div>
 <div>
 <h3 id="higherRateModalTitle">Higher Rate</h3>
-<p>Usá la fecha, horas y nivel del aviso de Propio. Editar estas tarjetas conserva los bonos registrados; para corregir un error, abrí «Revisar llamadas».</p>
+<p>Usá los datos del aviso de Propio. Abrí una promoción para revisar sus llamadas y elegir el efecto de una edición.</p>
 </div>
 <button aria-label="Cerrar" class="modal-close" data-close-modal="higherRateModal" type="button">×</button>
 </div>
@@ -1976,7 +1971,6 @@ $0.72"></textarea>
 
 </div>
 </div>
-<div aria-hidden="true" class="modal-overlay" id="workDayReviewModal"><div aria-labelledby="workDayReviewTitle" aria-modal="true" class="modal-card" role="dialog"><div class="modal-head mc-modal-head"><div class="mc-header-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/></svg></div><div><h3 id="workDayReviewTitle">Tu jornada</h3><p>Datos del día seleccionado, sin cambiar tus registros.</p></div><button aria-label="Cerrar" class="modal-close" data-close-modal="workDayReviewModal" type="button">×</button></div><div id="workDayReviewContent"></div><div class="review-close-row"><button type="button" class="mc-btn-warn-pill" data-close-modal="workDayReviewModal">Cerrar</button></div></div></div>
 <div aria-hidden="true" class="modal-overlay" id="acwGoalModal">
 <div aria-labelledby="acwGoalModalTitle" aria-modal="true" class="modal-card" role="dialog">
 <div class="modal-head mc-modal-head">
@@ -2002,7 +1996,6 @@ $0.72"></textarea>
 </div>
 </div>
 </div>
-<div aria-hidden="true" class="modal-overlay" id="financeDistributionModal"><div aria-labelledby="financeDistributionTitle" aria-modal="true" class="modal-card" role="dialog"><div class="modal-head mc-modal-head"><div><h3 id="financeDistributionTitle">Reparto automático de reservas</h3><p>Destinos y ajustes, separados de los pagos.</p></div><button class="modal-close" aria-label="Cerrar" data-close-modal="financeDistributionModal" type="button">×</button></div><div id="financeDistributionContent"></div></div></div>
 <div aria-hidden="true" class="modal-overlay" id="payReceiptModal"><div aria-labelledby="payReceiptTitle" aria-modal="true" class="modal-card" role="dialog"><div class="modal-head mc-modal-head"><div class="mc-header-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="15" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></div><div><h3 id="payReceiptTitle">Pago recibido</h3><p id="payReceiptScope"></p></div><button class="modal-close" aria-label="Cerrar" data-close-modal="payReceiptModal" type="button">×</button></div><div class="review-receipt-hero" id="payReceiptExpected"></div><div class="receipt-fields"><div class="goals-field"><label for="payReceiptAmount">Total recibido en dólares</label><input id="payReceiptAmount" type="number" min="0" max="1000000000" step="0.01" inputmode="decimal"/></div><div class="goals-field"><label for="payReceiptDate">Fecha de la última recepción</label><input id="payReceiptDate" type="date"/></div></div><div id="payReceiptPreview"></div><details class="review-details"><summary>Si recibiste varios abonos o cambia una llamada</summary><p class="note">Si recibiste varios abonos, ingresá su total acumulado y la fecha del último. Este registro no añade ganancias ni mueve reservas; sirve para comparar lo recibido con las llamadas del ciclo.</p></details><p id="payReceiptStatus" class="note" role="status" aria-live="polite"></p><div class="modal-actions mc-action-row"><button class="mc-btn-primary cyan" id="payReceiptSaveBtn" type="button">Guardar recibido</button><button class="mc-btn-warn-pill" id="payReceiptDeleteBtn" type="button" hidden>Eliminar registro</button><button class="mc-btn-warn-pill" data-close-modal="payReceiptModal" type="button">Cancelar</button></div></div></div>
 <div aria-hidden="true" class="modal-overlay" id="financeRowModal">
 <div aria-labelledby="financeRowModalTitle" aria-modal="true" class="modal-card" role="dialog">
@@ -2289,22 +2282,24 @@ $0.72"></textarea>
 </div>
 </div>
 <div aria-hidden="true" class="modal-overlay" id="callEditModal">
-<div aria-labelledby="callEditModalTitle" aria-modal="true" class="modal-card" role="dialog">
+<div aria-labelledby="callEditModalTitle" aria-modal="true" class="modal-card record-modal" role="dialog">
 <div class="modal-head mc-modal-head">
 <div class="mc-header-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
 <div>
-<h3 id="callEditModalTitle">Editar llamada</h3>
-<p id="callEditModalSubtitle">Corrige duración, pago, billable o dropped de una llamada ya importada. El nivel de Higher Rate no se edita aquí: sale de tus ventanas configuradas.</p>
+<h3 id="callEditModalTitle">Detalle de llamada</h3>
+<p id="callRecordsSubtitle"></p>
 </div>
 <button aria-label="Cerrar" class="modal-close" data-close-modal="callEditModal" type="button">×</button>
 </div>
 
+<div id="callRecordsContent"></div>
+<details class="polished-disclosure" id="callEditFields"><summary>Editar datos de esta llamada</summary><div class="polished-detail">
 <div class="goals-section">
 <div class="goals-section-title"><svg class="goals-section-icon ic-svg good" viewBox="0 0 24 24" aria-hidden="true"><line x1="10" y1="2" x2="14" y2="2"/><line x1="12" y1="6" x2="12" y2="2.5"/><circle cx="12" cy="13" r="8"/><polyline points="12 9 12 13 15 15"/></svg>Duración y pago</div>
 <div class="goals-field-row">
 <div class="goals-field">
 <label for="callEditDurationInput">Duración (min)</label>
-<input id="callEditDurationInput" inputmode="numeric" min="0" max="1440" step="1" type="number"/>
+<input id="callEditDurationInput" inputmode="numeric" min="0" max="1440" step="any" type="number"/>
 </div>
 <div class="goals-field">
 <label for="callEditPayInput">Pago ($)</label>
@@ -2362,6 +2357,7 @@ $0.72"></textarea>
 <button class="mc-btn-primary cyan" id="saveCallEditBtn" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polyline points="5 12 10 17 19 6"/></svg> Guardar</button>
 <button class="mc-btn-warn-pill" data-close-modal="callEditModal" type="button">Cancelar</button>
 </div>
+</div></details>
 </div>
 </div>
 <div aria-hidden="true" class="modal-overlay" id="manualCallModal">

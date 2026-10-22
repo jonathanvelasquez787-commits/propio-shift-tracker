@@ -9,6 +9,7 @@ import { normalizeBattleWeapon } from './game-battle.js';
 import { createPropioReceiver, createStorageRevisionGuard, ignorePropioCall } from './propio-bridge.js';
 import { portalRecordsText } from './propio-history-records.js';
 import { callFeedbackSilenced, withSilentCallFeedback } from './call-feedback.js';
+import { preserveCallRecords, compareCallRecords, acwCallRecord } from './call-records.js';
 import { settingsWithinBudget, reportLocalPersistenceFailure, readMeta, jsonbBytes, preserveRecoveryCopy, listRecoveryCopies } from './sync.js';
 // Boot importa este módulo solo después de verificar la sesión e hidratar sus datos.
 
@@ -55,6 +56,7 @@ import {
   markManualCallPayDirty,
   openCallEditor,
   openCallRecovery,
+  openCallRecords,
   openManualCallModal,
   renderDayStatsCards,
   renderTable,
@@ -1371,7 +1373,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
     export function pad(n) { return String(n).padStart(2, '0'); }
 
     export function formatDuration(ms) {
-      const s = Math.max(0, Math.floor(ms / 1000));
+      const s = Math.max(0, Math.floor(Math.round(ms) / 1000));
       const h = Math.floor(s / 3600);
       const m = Math.floor((s % 3600) / 60);
       const sec = s % 60;
@@ -1489,11 +1491,14 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
 
       const now = new Date();
       const candidates = [bounds.start.getTime()];
-      callsForDay(dayKey).forEach(c => candidates.push(new Date(c.endISO).getTime()));
+      callsForDay(dayKey).forEach(c => candidates.push(new Date(c.records?.propio?.endISO || c.endISO).getTime()));
       dayPauseIntervals(dayKey).forEach(p => candidates.push(p.end.getTime()));
       // Sin este candidato, colgar una llamada no se reflejaba aquí hasta confirmarla en el modal
       // de guardado.
-      if (state.lastCallEndedAt) candidates.push(new Date(state.lastCallEndedAt).getTime());
+      if (state.lastCallEndedAt) {
+        const record = calls.find(call => call.endISO === state.lastCallEndedAt || call.records?.tool?.endISO === state.lastCallEndedAt);
+        candidates.push(new Date(record?.records?.propio?.endISO || state.lastCallEndedAt).getTime());
+      }
       const valid = candidates.filter(t => Number.isFinite(t) && t <= now.getTime());
       if (!valid.length) return null;
       return new Date(Math.max(...valid));
@@ -3714,13 +3719,6 @@ function useAutoCycleGoal() {
   toast(translateText('Meta del ciclo vuelve a calcularse automáticamente'));
 }
 
-function updateCycleGoalFromAjustes() {
-  const input = document.getElementById('cycleGoalInput');
-  const amount = Number(input?.value);
-  if (setCycleGoalOverride(0, Number.isFinite(amount) && amount > 0 ? amount : null) === false) return false;
-  render();
-}
-
 // Mejor/peor día de los últimos 7 días CON adherencia calculable — score = Adherencia del día
 // (mismo criterio "más alto es mejor" que ya usa el resto de la app). "vs promedio" compara contra
 // el promedio de esa misma serie de 7 días.
@@ -4554,7 +4552,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       if (owner !== settings || sequence !== importOutcomeSequence) return;
       const retry = document.getElementById('importResultRetryBtn');
       if (retry) retry.hidden = !!view;
-      if (view) view.renderImportOutcome({ ui, translateText, escapeHtml }, ...args);
+      if (view) view.renderImportOutcome({ ui, translateText, escapeHtml, reviews: state.callRecordReviews || [] }, ...args);
       else toast(translateText('El registro ya terminó, pero no se pudo cargar su detalle. Podés reintentarlo.'));
     }
 
@@ -4632,6 +4630,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       const correctedOfficial = [];
       const replacedIds = new Set();
       const skippedOverlaps = [];
+      const recordReviews = [];
       let overlapSkipped = 0;
       const correctedDuplicateDays = new Set();
 
@@ -4694,6 +4693,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
           continue;
         }
         if (zeroLiveMatches.length > 1) {
+          recordReviews.push({ id: `${c.customerId}|${c.startISO}`, call: { ...c, source: 'import' }, candidateIds: zeroLiveMatches.map(call => call.id), receivedAt: importTs });
           overlapSkipped++;
           skippedOverlaps.push({ ...c, withCustomerId: zeroLiveMatches[0].customerId, withCallStart: zeroLiveMatches[0].callStart });
           continue;
@@ -4717,18 +4717,30 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
         }
 
         const overlapsWith = overlaps[0];
+        if (overlaps.length > 1 && overlaps.every(isReplaceableLiveCall)) {
+          recordReviews.push({ id: `${c.customerId}|${c.startISO}`, call: { ...c, source: 'import' }, candidateIds: overlaps.map(call => call.id), receivedAt: importTs });
+        }
         overlapSkipped++;
         skippedOverlaps.push({ ...c, withCustomerId: overlapsWith.customerId, withCallStart: overlapsWith.callStart });
       }
 
-      if (background && (overlapSkipped || futureRows.length)) return false;
+      if (background && (overlapSkipped > recordReviews.length || futureRows.length)) return false;
+      const resolvedReviewIds = new Set([...accepted.map(item => `${item.call.customerId}|${item.call.startISO}`), ...skippedDuplicates.map(call => `${call.customerId}|${call.startISO}`)]);
+      const reviewsRemoved = (state.callRecordReviews || []).some(review => resolvedReviewIds.has(review.id));
+      if (recordReviews.length || reviewsRemoved) {
+        const previous = (state.callRecordReviews || []).filter(review => !resolvedReviewIds.has(review.id));
+        const incomingIds = new Set(recordReviews.map(review => review.id));
+        const next = [...previous.filter(review => !incomingIds.has(review.id)), ...recordReviews];
+        if (next.length > 100) return false;
+        state.callRecordReviews = next;
+      }
       if (replacedIds.size) setAppCalls(calls.filter(c => !replacedIds.has(c.id)));
 
       const importedRows = accepted.map(item => {
         const preserveOfficialIdentity = item.replacementKind === 'import' && item.replaces;
         const replacingLive = item.replacementKind === 'live' && item.replaces;
         const replacingExisting = (preserveOfficialIdentity || replacingLive) ? item.replaces : null;
-        const call = {
+        const call = preserveCallRecords({
           ...item.call,
           id: preserveOfficialIdentity ? item.replaces.id : item.call.id,
           // Una corrección oficial conserva el día CONTABLE original igual que el reemplazo de una
@@ -4750,7 +4762,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
           importedAt: preserveOfficialIdentity ? (item.replaces.importedAt || importTs) : importTs,
           source: 'import',
           ...(replacingExisting ? { officialCorrection: { kind: preserveOfficialIdentity ? 'corrected' : 'reconciled', at: importTs } } : {}),
-        };
+        }, replacingExisting, importTs);
         return { ...item, call };
       });
 
@@ -4764,7 +4776,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
         const dayKey = callDateKeyFromValue(item.call.callDate);
         if (dayKey) importedDates.add(dayKey);
 
-        if (item.replacementKind === 'live' && state.lastCallEndedAt && item.replaces?.endISO) {
+        if (item.replaces && state.lastCallEndedAt && item.replaces?.endISO) {
           const tracked = new Date(state.lastCallEndedAt).getTime();
           const provisionalEnd = new Date(item.replaces.endISO).getTime();
           if (Number.isFinite(tracked) && Number.isFinite(provisionalEnd) && Math.abs(tracked - provisionalEnd) <= 1000) {
@@ -4792,7 +4804,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       const replacedNote = replacedLive.length ? ui` · ${replacedLive.length} live actualizada(s)` : '';
       const correctedNote = correctedOfficial.length ? ui` · ${correctedOfficial.length} oficial(es) corregida(s)` : '';
 
-      const importChangedData = unique.length || replacedLive.length || correctedOfficial.length;
+      const importChangedData = unique.length || replacedLive.length || correctedOfficial.length || recordReviews.length || reviewsRemoved;
       if (importChangedData) {
         setEvent('import', translateText('Llamadas importadas'), ui`${unique.length} fila(s) · ${importNote}${overlapNote}${duplicateNote}${futureNote}${replacedNote}${correctedNote}`, 'Propio');
         financeRunAutoFillCascade();
@@ -4805,7 +4817,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
         importedDates.forEach(dayKey => onGameCallsChanged(dayKey));
         if (!background) playCallSavedSound('callPasted');
       }
-      if (background) return !overlapSkipped && !futureRows.length;
+      if (background) return overlapSkipped === recordReviews.length && !futureRows.length;
       ta.value = '';
       renderImportSkippedSummary(skippedDuplicates, skippedOverlaps, futureRows, replacedLive, correctedOfficial, importedRows.filter(item => !item.replacementKind).map(item => item.call), parseDiagnostics);
 
@@ -5173,6 +5185,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
         return;
       }
       if(owner!==settings||document.getElementById('pageAchievements').hidden)return;
+      if (!view) { document.getElementById('gameReviewSummary').textContent=translateText('No se pudo cargar el resumen. Volvé a abrir esta sección.'); return; }
       view.renderGameReview({ui,translateText,escapeHtml,model:gameReviewSnapshot(),valid:()=>owner===settings});
     }
 
@@ -5180,8 +5193,9 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       document.getElementById('notificationReview').replaceChildren();
       const owner=settings,view=await loadDetailViews({retry:true});
       if(owner!==settings||!document.getElementById('notificationsModal').classList.contains('open'))return;
+      if (!view) return;
       view.renderNotificationReview({ui,translateText,escapeHtml,settings,productive:minutesSinceLastProductiveBreakAnchor,soundConfigs:Object.values(ALARM_SOUND_CONFIGS),valid:()=>owner===settings,navigate:kind=>{
-        closeModal('notificationsModal');navigateToPage('achievements');
+        if(kind==='history'){ closeModal('notificationsModal');navigateToPage('achievements'); }
         const target=document.getElementById(kind==='support'?'positiveSettingsAccordion':'positiveHistoryPanel');
         if(kind==='support')target.open=true;
         target.scrollIntoView({block:'start'});target.setAttribute('tabindex','-1');target.focus({preventScroll:true});
@@ -5690,11 +5704,19 @@ function renderHeader() {
     if (acwStart) {
       acwLiveChip.style.display = '';
       acwLiveTimer.textContent = formatDuration(now.getTime() - acwStart.getTime());
+      const record = acwCallRecord(callsForDay(todayCallDateKey()), acwStart.toISOString());
+      const comparison = compareCallRecords(record);
+      const source = comparison.propio ? translateText('Según Propio') : comparison.tool ? translateText('Según tu tool') : translateText('Turno / pausa');
+      document.getElementById('acwRecordSource').textContent = source;
+      const difference = document.getElementById('acwRecordDifference');
+      difference.hidden = comparison.differenceMs === null || Math.abs(comparison.differenceMs) < 1000;
+      difference.textContent = ui`Diferencia: ${Math.round(Math.abs(comparison.differenceMs || 0) / 1000)} s`;
+      acwLiveChip.title = ui`${source}. ACW desde ${acwStart.toLocaleTimeString(displayLocale())}. Tocá para ver los registros y el cálculo.`;
+      acwLiveChip.dataset.recordId = record?.id || '';
     } else {
       acwLiveChip.style.display = 'none';
     }
   }
-
   const greetingTitleEl = document.getElementById('greetingTitle');
   if (greetingTitleEl) greetingTitleEl.textContent = greetingText(now);
   const greetingSubtitleText = translateText('Jamás negocio con mis excusas: no hacer nada también es una. Doy el primer paso y avanzo hasta lograr lo que me propongo.');
@@ -6838,6 +6860,25 @@ export function render() {
       openGapEditor(dayKey, gapKey);
     });
 
+    document.getElementById('acwLiveChip').addEventListener('click', () => {
+      const start = computeCurrentAcwStart();
+      openCallRecords(document.getElementById('acwLiveChip').dataset.recordId || null, start?.toISOString());
+    });
+    document.addEventListener('click', event => {
+      if (event.target.closest?.('[data-open-call-pending]')) {
+        closeModal('callsModal'); navigateToPage('home');
+        setBlocksViewMode('calls'); document.getElementById('blocksCallsView').closest('details.accordion-card').open = true;
+        document.getElementById('callSourceFilter').value='pending'; renderTable();
+        const target=document.getElementById('callSourceFilter');target.scrollIntoView({block:'center'});target.focus();return;
+      }
+      const review = event.target instanceof Element ? event.target.closest('[data-record-review]') : null;
+      if (review) { openCallRecords(null, null, review.dataset.recordReview); return; }
+      const target = event.target instanceof Element ? event.target.closest('[data-call-records]') : null;
+      if (target) {
+        const start = computeCurrentAcwStart(), owner = start && acwCallRecord(calls, start.toISOString());
+        openCallRecords(target.dataset.callRecords, owner?.id === target.dataset.callRecords ? start.toISOString() : null);
+      }
+    });
     document.addEventListener('click', (e) => {
       const target = e.target instanceof Element ? e.target.closest('[data-call-edit]') : null;
       if (!target) return;
@@ -7061,7 +7102,13 @@ export function render() {
       }
     });
     document.getElementById('copyDayToAllBtn').addEventListener('click', copyDayToAll);
-    document.getElementById('workDayReviewBtn').addEventListener('click', openWorkDayReview);
+    document.getElementById('workDayReviewBtn').addEventListener('click', () => {
+      const target = document.getElementById('workDayReviewDetails');
+      target.closest('details.accordion-card').open = true;
+      setBlocksViewMode('blocks');
+      target.open = true; openWorkDayReview(); target.scrollIntoView({block:'start'}); target.querySelector('summary').focus();
+    });
+    document.getElementById('workDayReviewDetails').addEventListener('toggle', () => { if(document.getElementById('workDayReviewDetails').open) openWorkDayReview(); });
     document.getElementById('payDatesRetryBtn').addEventListener('click', () => usePayReceipts('retry'));
     document.getElementById('payDatesBody').addEventListener('click', event => {
       const button = event.target instanceof Element ? event.target.closest('[data-pay-receipt]') : null;
@@ -7339,43 +7386,11 @@ export function render() {
     document.getElementById('higherRateModal').addEventListener('click', (e) => {
       const review = e.target instanceof Element ? e.target.closest('[data-review-hr-window]') : null;
       if (review) { openHigherRateReview(review.closest('.hr-window-card').getAttribute('data-hr-window-id')); return; }
-      // El pill de nivel escribe en el <select class="hr-window-tier-input"> oculto de siempre.
-      const tierBtn = e.target instanceof Element ? e.target.closest('[data-hr-tier-btn]') : null;
-      if (tierBtn) {
-        const card = tierBtn.closest('.hr-window-card');
-        const select = card ? card.querySelector('.hr-window-tier-input') : null;
-        const tier = tierBtn.getAttribute('data-tier');
-        if (select) select.value = tier;
-        if (card) {
-          card.setAttribute('data-tier', tier);
-          card.querySelectorAll('.hr-window-tier-btn').forEach(b => {
-            const t = b.getAttribute('data-tier');
-            const active = t === tier;
-            b.setAttribute('aria-pressed', active ? 'true' : 'false');
-            b.textContent = hrTierButtonLabel(t, active);
-          });
-        }
-        saveHigherRateWindowsFromEditor();
-        return;
-      }
       const btn = e.target instanceof Element ? e.target.closest('[data-remove-hr-window]') : null;
       if (!btn) return;
       const row = btn.closest('.hr-window-card');
       const id = row ? row.getAttribute('data-hr-window-id') : null;
       if (id) removeHigherRateWindowRowAt(id);
-    });
-    document.getElementById('higherRateModal').addEventListener('change', (e) => {
-      if (!(e.target instanceof Element)) return;
-      const card = e.target.closest('.hr-window-card');
-      if (!card) return;
-      // La fecha sigue siendo un <input type="date"> real (editable), solo restylada para verse
-      // como texto.
-      if (e.target.classList.contains('hr-window-date-input')) {
-        const dayKey = dayKeyFromIsoDate(e.target.value) || todayCallDateKey();
-        const nameEl = card.querySelector('.hr-window-day-name');
-        if (nameEl) nameEl.textContent = hrWindowWeekdayLabel(dayKey);
-      }
-      saveHigherRateWindowsFromEditor();
     });
     document.getElementById('daySelector').addEventListener('change', (e) => {
       const key = dayKeyFromIsoDate(e.target.value);
@@ -7579,7 +7594,7 @@ export function render() {
         saveCycleGoalEditor();
       }
     });
-    document.getElementById('cycleGoalInput').addEventListener('change', updateCycleGoalFromAjustes);
+    document.getElementById('cycleGoalSettingsBtn').addEventListener('click', () => { closeModal('goalsModal'); openCycleGoalEditor(); });
     document.getElementById('saveCalYearGoalBtn').addEventListener('click', saveCalYearGoalModal);
     document.getElementById('useAutoCalYearGoalBtn').addEventListener('click', useAutoCalYearGoalModal);
     document.getElementById('calYearGoalModal').addEventListener('keydown', (e) => {
@@ -7801,7 +7816,7 @@ export function getPropioBridgePlan() {
   return { startAt: start.toISOString(), endAt: end.toISOString(),
     scheduledPauses,
     acw: acwStart ? { startedAt: acwStart.toISOString(), observedAt: day.toISOString() } : null,
-    lastCallEndedAt: [state.lastCallEndedAt, ...calls.map(call => call.endISO)]
+    lastCallEndedAt: [state.lastCallEndedAt, ...calls.map(call => call.records?.propio?.endISO || call.endISO)]
       .filter(value => Date.parse(value) >= since && Date.parse(value) <= Math.min(day.getTime(), end.getTime()))
       .sort((a, b) => Date.parse(b) - Date.parse(a))[0] || null,
     hasCall: Boolean(state.activeCall) || calls.some(call => Date.parse(call.startISO) >= since && Date.parse(call.startISO) < end.getTime()),

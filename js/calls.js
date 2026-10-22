@@ -5,6 +5,7 @@ import { calls, settings, state, setAppCalls as setCalls, setAppState, setAppSet
 import { ignorePropioCall } from './propio-bridge.js';
 import { callFeedbackSilenced, withSilentCallFeedback } from './call-feedback.js';
 import { PAY_ESTIMATE_RULE, roundedPayMinutes, callPayMinutes } from './pay-estimate.js';
+import { observedCallRecord } from './call-records.js';
 
 let HIGHER_RATE_TIERS, MAX_CALL_DURATION_MIN, appConfirm, autoStartShiftFromCalls, callDateKeyFromValue, callDedupeKey;
 let callsForDay, callsOverlap, closeModal, connectedMinutesForDay, convertedAmountText, dayAdherence;
@@ -28,12 +29,16 @@ export function configureCallsContext(context) {
     toDateFromInputs, toast, todayCallDateKey, playCallSavedSound } = context);
 }
 
-let editingCallId = null, editingCallContext = null;
+let editingCallId = null, editingCallContext = null, callDetailSequence = 0;
 
 async function useCallRecovery(action, ...args) {
   const owner = settings;
+  const detail = action === 'openCallRecords', sequence = detail ? ++callDetailSequence : callDetailSequence;
+  const record = detail && args[0] ? JSON.stringify(calls.find(call => call.id === args[0])) : null;
   const module = await loadDetailViews({ retry: true });
   if (settings !== owner) return false;
+  if (detail && !document.getElementById('callEditModal').classList.contains('open')) return false;
+  if (detail && (sequence !== callDetailSequence || record && record !== JSON.stringify(calls.find(call => call.id === args[0])))) return false;
   if (!module) { toast(translateText('No se pudo cargar el detalle. Cerrá y abrí esta sección para reintentar.')); return false; }
   return module[action]({ ...callContext, ui, translateText, displayLocale,
     data: () => ({ calls, state, settings }), setCalls, setState: setAppState, reconcileLastCallEndedAt,
@@ -42,6 +47,15 @@ async function useCallRecovery(action, ...args) {
 }
 
 export function openCallRecovery() { return useCallRecovery('openCallRecovery'); }
+export function openCallRecords(callId, acwStart = null, reviewId = null) {
+  if (callId) return openCallEditor(callId, { edit: false, acwStart });
+  document.getElementById('callEditFields').hidden = true;
+  document.getElementById('callEditModalTitle').textContent = translateText('Detalle del registro');
+  document.getElementById('callRecordsContent').innerHTML = '';
+  editingCallId = null; editingCallContext = null;
+  openModal('callEditModal');
+  return useCallRecovery('openCallRecords', null, acwStart, reviewId);
+}
 
 // Filtro Todo/Llamadas/Acciones sobre la tabla fusionada "Tabla de llamadas y acciones de hoy" (ver
 // #tableFilterRow en el HTML y dayActionRows/renderTable más abajo). Vive en memoria, no en
@@ -74,15 +88,15 @@ function reconcileLastCallEndedAt(dayKey) {
   const now = Date.now();
   const latest = callsForDay(normalized)
     .filter(call => {
-      const end = new Date(call.endISO).getTime();
+      const end = new Date(call.records?.propio?.endISO || call.endISO).getTime();
       return Number.isFinite(end) && end <= now;
     })
-    .sort((a, b) => new Date(b.endISO) - new Date(a.endISO))[0];
-  state.lastCallEndedAt = latest ? latest.endISO : null;
+    .sort((a, b) => new Date(b.records?.propio?.endISO || b.endISO) - new Date(a.records?.propio?.endISO || a.endISO))[0];
+  state.lastCallEndedAt = latest ? latest.records?.propio?.endISO || latest.endISO : null;
 }
 
 // Editor de una llamada ya importada: corrige duración, pago, billable y dropped.
-export function openCallEditor(callId) {
+export function openCallEditor(callId, options = {}) {
   const call = calls.find(c => c.id === callId);
   if (!call) {
     toast(translateText('No pude encontrar esa llamada'));
@@ -97,7 +111,9 @@ export function openCallEditor(callId) {
   const billableInput = document.getElementById('callEditBillableInput');
   const droppedInput = document.getElementById('callEditDroppedInput');
 
-  if (title) title.textContent = ui`Editar llamada · #${call.customerId}`;
+  if (title) title.textContent = ui`Detalle de llamada · #${call.customerId}`;
+  const fields = document.getElementById('callEditFields'); fields.hidden = false; fields.open = options.edit !== false;
+  document.getElementById('callRecordsContent').innerHTML = '';
   if (preview) preview.textContent = ui`${call.callDate} · ${call.callStart} — los datos de fecha/hora no se pueden editar aquí, solo duración, pago, billable y dropped.`;
   if (durationInput) durationInput.value = call.durationMin;
   if (payInput) payInput.value = parseMoney(call.pay).toFixed(2);
@@ -128,6 +144,7 @@ export function openCallEditor(callId) {
   }
 
   openModal('callEditModal');
+  return useCallRecovery('openCallRecords', callId, options.acwStart || null);
 }
 
 function readNumericCallPay(value, fallback = 0) {
@@ -322,6 +339,8 @@ function restoreLiveBackupTiming(candidate, original, callDate, callStart) {
         : new Date(start.getTime() + candidate.durationMin * 60000).toISOString(),
     });
   }
+  if (original.records) result.records = JSON.parse(JSON.stringify(original.records));
+  result.durationMs = Math.max(0, Date.parse(result.endISO) - Date.parse(result.startISO));
   return result;
 }
 
@@ -389,8 +408,8 @@ function buildLiveCallCandidate({ customerId, startedAtISO, endedAtISO, billable
   const rawEnd = new Date(endedAtISO);
   if (Number.isNaN(start.getTime()) || Number.isNaN(rawEnd.getTime())) return null;
   const elapsedMs = Math.max(0, rawEnd.getTime() - start.getTime());
-  const durationMin = Math.round((elapsedMs / 60000) * 100) / 100;
-  // Si el fin no quedó después del inicio, se reconstruye con la duración redondeada.
+  const durationMin = elapsedMs / 60000;
+  // La duración observada conserva todos los segundos; el pago se calcula aparte.
   const end = rawEnd.getTime() > start.getTime() ? rawEnd : new Date(start.getTime() + durationMin * 60000);
   const accounting = callAccountingFields(start, todayCallDateKey(start));
   return {
@@ -401,6 +420,7 @@ function buildLiveCallCandidate({ customerId, startedAtISO, endedAtISO, billable
     // (hora/minuto), pero NO se usa para calcular startISO/endISO (ver arriba)
     callStart: callStartLabelFromHHMM(`${pad(start.getHours())}:${pad(start.getMinutes())}`),
     durationMin,
+    durationMs: elapsedMs,
     billable,
     dropped,
     pay,
@@ -520,7 +540,7 @@ export function saveManualCall() {
 export function autoSaveLiveCall(startedAtISO, endedAtISO, liveContext = null) {
   if (liveContext?.propioBridge && !callFeedbackSilenced()) return withSilentCallFeedback(() => autoSaveLiveCall(startedAtISO, endedAtISO, liveContext));
   const elapsedMs = Math.max(0, new Date(endedAtISO).getTime() - new Date(startedAtISO).getTime());
-  const durationMin = Math.round((elapsedMs / 60000) * 100) / 100;
+  const durationMin = elapsedMs / 60000;
   const pay = (roundedPayMinutes(elapsedMs / 60000) * rateTilePerMin('normal')).toFixed(2);
 
   const candidate = buildLiveCallCandidate({
@@ -536,6 +556,7 @@ export function autoSaveLiveCall(startedAtISO, endedAtISO, liveContext = null) {
     candidate.customerId = 'Propio';
     candidate.propioBridge = { ...liveContext.propioBridge };
   }
+  if (candidate) candidate.records = { tool: observedCallRecord(candidate) };
   const previous = { calls, state: JSON.parse(JSON.stringify(state)), settings: JSON.parse(JSON.stringify(settings)) };
   const result = trySaveCallCandidate(candidate);
 
@@ -647,7 +668,7 @@ export async function renderTable(options = {}) {
   const status = document.getElementById('callTableLoadStatus'), retry = document.getElementById('callTableRetryBtn');
   if (status) status.hidden = !!view;
   if (retry) retry.hidden = !!view;
-  if (view) view.renderCallTable({ ...callContext, ui, translateText, translateMarkup, dayActionRows, tableFilterMode });
+  if (view) view.renderCallTable({ ...callContext, state, ui, translateText, translateMarkup, dayActionRows, tableFilterMode });
 }
 
 // (Fase 4): "Resumen del día" + "Estadísticas" — 2 tarjetas nuevas de escritorio (ocultas en mobile

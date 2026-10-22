@@ -8,6 +8,51 @@ no se considera rota por esa razón.
 
 ## Prioridad visual antes de continuar
 
+### Integración solicitada el 21/10
+
+El propietario pidió revisar exhaustivamente la repetición de información y
+la incorporación de mejoras en funciones existentes. Revisión de código,
+navegación e inventario completo de 79 funciones realizada; no es una nueva
+certificación mensual ni cierra las veinte mejoras funcionales abiertas.
+Integración aprobada y aplicada en web 637 / PR #99. La publicación se comprueba
+con el commit servido; no se considera completada por estas pruebas locales.
+
+**14 de 14 integraciones aprobadas implementadas.** Verificación: 966 pruebas,
+doce recorridos ES/EN, temas y 320/390/1200 px; popup 2.3.2 en ambos temas.
+Instalación con respaldo y recarga confirmada por el propietario.
+
+- [x] Comparación y edición de una llamada en un mismo detalle.
+- [x] Listado de llamadas existente como acceso principal, sin otra tarjeta de historial.
+- [x] Vínculos pendientes dentro de la revisión/listado de llamadas e importaciones.
+- [x] XP, nivel, cofre y colección integrados en los paneles existentes de Logros.
+- [x] Un solo editor para la meta del ciclo, con accesos contextuales.
+- [x] Un editor de promoción con alcance explícito de conservación o recálculo.
+- [x] Historial de Higher Rate por día con sus ventanas y llamadas, sin dos recorridos.
+- [x] Detalle de jornada integrado con Bloques y acciones, conservando los motivos.
+- [x] Configuración del apoyo sin llamadas en Avisos; reflexión en su llamada.
+- [x] Copias recuperables junto a importación/exportación de respaldo.
+- [x] Último reparto plegado junto al control automático de Finanzas.
+- [x] Indicadores actuales, metas y comparación histórica sin repetición en Reportes.
+- [x] Un total principal en Ganancias y componentes dentro del desglose.
+- [x] Estado breve y ayuda contextual de automatización, con explicación completa en la guía.
+
+No todos son duplicados exactos: hay formularios paralelos, opciones mal
+ubicadas y detalles que no necesitan otra ventana. Conservar las diferencias
+entre ACW actual/acumulado, plan/actividad, XP diario/acumulado, reservas/pagos/
+ingresos, meta diaria/bloque/ciclo y datos oficiales/respaldo observado.
+`relocateCallsSection` mueve el mismo elemento; no duplica un historial.
+El popup configura la extensión y la web muestra su estado: conservar esas
+responsabilidades. La barra de actividad comparte handlers con la tarjeta;
+revisar su visibilidad simultánea en vez de crear otra actividad.
+
+Orden: integrar primero la entrega 637; luego Logros; después editores y
+ubicación de opciones; finalmente compactar indicadores y ayudas. La revisión
+del PR detectó además una cola que conservaba un vínculo ya resuelto por otra
+importación: corregida con regresión de importación, borrado y recarga. El plan
+funcional original conserva 59 puntos publicados y 20 abiertos.
+
+### Aprobaciones visuales conservadas
+
 La comprobación adicional del 20/10 confirmó que el problema no se limita a
 las tres pantallas de la maqueta: detalles de Disponibilidad, desglose de
 Ganancias, revisión/corrección de Higher Rate, supuestos de proyección,
@@ -267,8 +312,10 @@ pruebas del proyecto.
 - **Segundos oficiales de Propio:** obtener evidencia sobre duración y pago del
   último minuto incompleto. La precisión del contador de la tool no demuestra
   la regla de facturación de Propio.
-  Por decisión del propietario se prepara el umbral personal inclusivo de 40 s
-  para estimaciones nuevas; no cierra la investigación oficial. Ver
+  Por decisión del propietario se publicó el umbral personal inclusivo de 40 s
+  para estimaciones nuevas (web 636); no cierra la investigación oficial. La
+  entrega 637 conserva observación y Propio por separado; ver
+  [registros y excepciones](registros-propio-y-tool.md). Ver también
   [alcance del redondeo](redondeo-de-estimaciones.md).
 - **Visibilidad por nombre en Google:** seguimiento externo documentado en
   [SEO](seo.md). La última comprobación documentada no es una consulta actual.

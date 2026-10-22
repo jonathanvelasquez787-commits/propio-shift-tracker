@@ -50,7 +50,7 @@ export function renderWorkReview(context) {
   html+=`<h4 class="review-heading">${escapeHtml(translateText('Pausas: plan y registro'))}</h4>`
     +(context.pauseRows.map(pause=>`<div class="review-pause"><strong>${escapeHtml(pause.label)}</strong><span>${escapeHtml(pause.time||pause.value)}</span>${pause.duration?`<small>${escapeHtml(pause.duration)}</small>`:''}</div>`).join('')||ui`<p class="note">No hay pausas planeadas ni registradas para esta fecha.</p>`);
   document.getElementById('workDayReviewContent').innerHTML = html;
-  context.openModal('workDayReviewModal');
+
 }
 
 export function schedulePreviewRows(config) {

@@ -46,7 +46,8 @@ export function higherRateCorrectionPlan(sourceCalls, windows, windowId, draft, 
   for (const call of sourceCalls) {
     const before = context.higherRateBonusForCall(call, windows);
     const releasing = call.frozenHigherRateBonus?.windowId === windowId;
-    const after = context.higherRateBonusForCall(releasing ? { ...call, frozenHigherRateBonus: undefined } : call, next);
+    const preserved = context.preserve && before?.windowId === windowId;
+    const after = preserved ? before : context.higherRateBonusForCall(releasing && !context.preserve ? { ...call, frozenHigherRateBonus: undefined } : call, next);
     const beforeAmount = Number(before?.amount) || 0, afterAmount = Number(after?.amount) || 0;
     if (![beforeAmount, afterAmount].every(n => Number.isFinite(n) && n >= 0)) return null;
     beforeTotal += beforeAmount; afterTotal += afterAmount;
@@ -82,20 +83,20 @@ export function openHigherRateReview(context, windowId) {
       <details class="polished-disclosure"><summary>Cómo califica una llamada</summary><div class="polished-detail"><div class="review-line"><span>Gracia antes del inicio</span><strong>${context.HIGHER_RATE_EARLY_GRACE_MIN} min</strong></div><div class="review-line"><span>Desde</span><strong>${escapeHtml(dateTime(result.grace))}</strong></div><p class="note">El fin no se incluye. Cuenta la duración completa; en ventanas superpuestas gana el mayor bono.</p></div></details>
       <details class="polished-disclosure"><summary>Califican o conservan un bono de esta ventana (${result.rows.length})</summary><div class="polished-detail">${result.rows.map(row).join('') || ui`<p class="note">Todavía no hay llamadas registradas que califiquen.</p>`}</div></details>
       <details class="polished-disclosure"><summary>Fuera de esta ventana (${result.excluded.length})</summary><div class="polished-detail">${result.excluded.map(row).join('')}</div></details>
-      <div class="modal-actions mc-action-row"><button type="button" class="gap-edit-btn" data-hr-refresh>Volver a revisar</button><button type="button" class="gap-edit-btn" data-hr-correct>Corregir promoción</button></div>
+      <div class="modal-actions mc-action-row"><button type="button" class="gap-edit-btn" data-hr-refresh>Volver a revisar</button><button type="button" class="gap-edit-btn" data-hr-correct>Editar promoción</button></div>
       <div data-hr-editor hidden>
-        <p class="note">El recálculo actualiza ganancias, Finanzas y Logros. Conserva el pago base y los bonos conservados de otras promociones.</p>
+        <label class="goals-field">Efecto del cambio<select data-hr-mode><option value="preserve">Conservar bonos ya ganados</option><option value="recalculate">Corregir y recalcular bonos afectados</option></select></label>
         <div class="goals-field-row">
           <label class="goals-field">Fecha<input data-hr-field="date" type="date" min="1970-01-01" max="2099-12-31" value="${escapeHtml(context.isoDateFromDayKey(window.date))}"></label>
           <label class="goals-field">Nivel<select class="alert-select" data-hr-field="tier">${Object.entries(context.HIGHER_RATE_TIERS).map(([key, meta]) => `<option value="${escapeHtml(key)}" ${key === window.tier ? 'selected' : ''}>${escapeHtml(translateText(meta.label || key))}</option>`).join('')}</select></label>
           <label class="goals-field">Hora de inicio<input data-hr-field="start" type="time" value="${escapeHtml(window.start)}"></label>
           <label class="goals-field">Hora de fin<input data-hr-field="end" type="time" value="${escapeHtml(window.end)}"></label>
         </div>
-        <label class="note"><input type="checkbox" data-hr-remove> Esta promoción fue un error: quitarla y recalcular.</label>
-        <button type="button" class="gap-edit-btn" data-hr-preview>Revisar recálculo</button>
+        <label class="note"><input type="checkbox" data-hr-remove> Quitar esta ventana</label>
+        <button type="button" class="gap-edit-btn" data-hr-preview>Revisar cambios</button>
         <div data-hr-impact aria-live="polite"></div>
         <p class="alert-hint" data-hr-error role="status"></p>
-        <button type="button" class="mc-btn-primary warn" data-hr-apply hidden>Confirmar recálculo</button>
+        <button type="button" class="mc-btn-primary warn" data-hr-apply hidden>Confirmar cambios</button>
       </div>`;
     body.querySelector('[data-hr-refresh]').onclick = draw;
     const editor = body.querySelector('[data-hr-editor]'), apply = body.querySelector('[data-hr-apply]');
@@ -114,10 +115,11 @@ export function openHigherRateReview(context, windowId) {
     body.querySelector('[data-hr-preview]').onclick = () => {
       invalidate();
       const data = context.data(), value = draft();
-      const plan = data.owner === owner && higherRateCorrectionPlan(data.calls, data.windows, windowId, value, context);
+      const mode = editor.querySelector('[data-hr-mode]').value;
+      const plan = data.owner === owner && higherRateCorrectionPlan(data.calls, data.windows, windowId, value, {...context,preserve:mode === 'preserve'});
       if (!plan) { error.textContent = translateText('Revisá la fecha, las horas, el nivel y que la ventana siga disponible.'); return; }
       if (!plan.hasChanges) { error.textContent = translateText('No hay cambios que aplicar.'); return; }
-      prepared = { value, signature: JSON.stringify(value), stamp: context.stamp() };
+      prepared = { value, mode, signature: JSON.stringify(value), stamp: context.stamp() };
       impact.innerHTML = ui`<p class="review-scope">Llamadas afectadas: ${plan.rows.length}</p><div class="polished-comparison"><div><span>Antes</span><strong class="polished-amount">${amount(plan.beforeAffected)}</strong></div><span aria-hidden="true">→</span><div><span>Después</span><strong class="polished-amount">${amount(plan.afterAffected)}</strong></div></div>`
         + plan.rows.map(item => ui`<div class="fin-preview-row"><div class="fin-preview-main"><strong>#${escapeHtml(item.call.customerId || item.call.id)}</strong><div class="fin-preview-sub">${escapeHtml(dateTime(item.call.startISO))}</div></div><div class="fin-preview-right"><div>Antes: ${amount(item.before)}</div><div>Después: ${amount(item.after)}</div></div></div>`).join('');
       apply.hidden = false;
@@ -127,7 +129,7 @@ export function openHigherRateReview(context, windowId) {
       if (prepared.signature !== JSON.stringify(draft())) { invalidate(); return; }
       apply.disabled = true;
       const current = prepared;
-      const success = await context.apply(windowId, current.value, current.stamp);
+      const success = await context.apply(windowId, current.value, current.stamp, current.mode);
       apply.disabled = false;
       if (success) context.closeModal('higherRateReviewModal');
       else { invalidate(); error.textContent = translateText('No se aplicó. Revisá el guardado y volvé a calcular; los datos pudieron cambiar.'); }

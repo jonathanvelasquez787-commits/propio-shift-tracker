@@ -55,8 +55,8 @@ test('earnings rows translate both languages, escape their scope and show second
       parseMoney, higherRateBonusForCall: bonusForCall, scopeLabel: '<today>', exchangeRate: 27, currencyLabel: 'L' });
     assert.ok(!wrap.innerHTML.includes('<today>'));
     assert.match(wrap.innerHTML, language === 'es' ? /Base registrada/ : /Recorded base/);
-    assert.equal((wrap.innerHTML.match(/≈ L/g) || []).length, 4);
-    assert.match(wrap.innerHTML, /\$1\.50/);
+    assert.equal((wrap.innerHTML.match(/≈ L/g) || []).length, 3);
+    assert.doesNotMatch(wrap.innerHTML, /\$1\.50/, 'the total remains in its existing heading, outside the breakdown');
     assert.match(wrap.innerHTML, /\$1 = L 27/);
   }
   setLanguage('es');

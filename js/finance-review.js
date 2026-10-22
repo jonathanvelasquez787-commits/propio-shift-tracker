@@ -43,5 +43,5 @@ export function openFinanceDistribution(context,model) {
   document.getElementById('financeDistributionContent').innerHTML=`<h4 class="review-heading">${escapeHtml(translateText('Último ajuste automático de reservas'))}</h4>`
     +(items.length?`<p class="review-scope">${escapeHtml(at)}</p>${items.map(item=>`<div class="review-line"><span>${escapeHtml(item.name)}</span><strong>${amount(item.amount)}</strong></div>`).join('')}`:ui`<p class="note">Todavía no hay un ajuste automático registrado en esta versión.</p>`)
     +ui`<details class="review-details"><summary>Cómo se reparte</summary><div class="review-detail-body"><p class="note">El disponible se reserva primero para Gastos y luego para Metas, siguiendo las prioridades de cada lista. Los pagos registrados se llevan por separado.</p><p class="note">Los importes negativos liberan reservas tras corregir las ganancias. Es el último ajuste automático, no un historial de pagos ni el saldo actual de cada fila.</p></div></details>`;
-  context.openModal('financeDistributionModal');
+
 }

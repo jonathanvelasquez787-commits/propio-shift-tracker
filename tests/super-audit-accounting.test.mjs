@@ -14,6 +14,7 @@ import { configureGameContext, createDefaultGameState, computeGameDay, onGameCal
 import { configurePositiveReinforcementContext } from '../js/positive-reinforcement.js';
 import { withSilentCallFeedback, callFeedbackSilenced } from '../js/call-feedback.js';
 import { PAY_ESTIMATE_RULE, roundedPayMinutes, callPayMinutes } from '../js/pay-estimate.js';
+import { preserveCallRecords } from '../js/call-records.js';
 
 const source = fs.readFileSync(new URL('../js/app-main.js', import.meta.url), 'utf8');
 const declarations = new Map(parse(source, { ecmaVersion: 'latest', sourceType: 'module' }).body.map(node => node.declaration || node).filter(node => node.type === 'FunctionDeclaration').map(node => [node.id.name, source.slice(node.start, node.end)]));
@@ -40,7 +41,7 @@ test('new live pay and Higher Rate use the same forty-second threshold through r
   const iso=s=>new Date(start+s*1000).toISOString();
   assert.equal(autoSaveLiveCall(iso(0),iso(459.999)),true);
   assert.equal(calls[0].pay,'0.84');assert.equal(higherRateBonusForCall(calls[0]).amount,.14);
-  assert.equal(calls[0].endISO,iso(459.999));assert.equal(calls[0].durationMin,7.67);
+  assert.equal(calls[0].endISO,iso(459.999));assert.equal(calls[0].durationMin,459999/60000);
   assert.equal(autoSaveLiveCall(iso(600),iso(1060)),true);
   assert.equal(calls[1].pay,'0.96');assert.equal(higherRateBonusForCall(calls[1]).amount,.16);
   x.reload();assert.equal(callPayMinutes(calls[0]),7);assert.equal(callPayMinutes(calls[1]),8);
@@ -63,6 +64,42 @@ test('live backup preview and save retain exact seconds below the rounding thres
   assert.equal(calls[0].endISO, end);
   assert.equal(calls[0].pay, '0.84');
   assert.equal(callPayMinutes(calls[0]), 7);
+});
+
+test('observed 7:41 survives official reconciliation, correction and reload without double counting', t => {
+  const x=harness(t),start=at(1,'08:00').getTime();
+  const iso=seconds=>new Date(start+seconds*1000).toISOString();
+  autoSaveLiveCall(iso(39),iso(500));
+  assert.equal(calls[0].durationMs,461000);assert.equal(calls[0].durationMin,461000/60000);
+  assert.equal(calls[0].pay,'0.96');const observation=JSON.stringify(calls[0].records.tool);
+  x.import([['official','09/01/2025','08:00 AM','7','Yes','No','$0.84']]);
+  assert.equal(calls.length,1);assert.equal(calls[0].durationMin,7);assert.equal(x.h.parseMoney(calls[0].pay),.84);
+  assert.equal(JSON.stringify(calls[0].records.tool),observation);
+  x.reload();assert.equal(calls[0].records.tool.durationMs,461000);
+  x.import([['official','09/01/2025','08:00 AM','8','Yes','No','$0.96']]);
+  assert.equal(calls.length,1);assert.equal(JSON.stringify(calls[0].records.tool),observation);
+  assert.equal(calls[0].records.propio.durationMin,8);
+  const before=JSON.stringify(calls);assert.equal(x.h.importCalls(''),false);assert.equal(JSON.stringify(calls),before);
+});
+
+test('a later official reconciliation removes its previous ambiguous review and preserves the observed backup',async t=>{
+  const x=harness(t),start=at(1,'08:00').getTime(),iso=seconds=>new Date(start+seconds*1000).toISOString();
+  autoSaveLiveCall(iso(5),iso(20)); autoSaveLiveCall(iso(30),iso(50));
+  const row=[['official','09/01/2025','08:00 AM','0','Yes','No','$0.00']];
+  x.import(row); assert.equal(state.callRecordReviews.length,1);
+  await deleteCallRecord(calls[1].id);
+  x.import(row);
+  assert.equal(state.callRecordReviews.length,0); assert.equal(calls.length,1);
+  assert.equal(calls[0].records.tool.durationMs,15000);
+  x.reload(); assert.equal(state.callRecordReviews.length,0);
+});
+
+test('ambiguous zero-minute official matches persist for explicit review without deleting either live call',t=>{
+  const x=harness(t),start=at(1,'08:00').getTime(),iso=seconds=>new Date(start+seconds*1000).toISOString();
+  autoSaveLiveCall(iso(5),iso(20));autoSaveLiveCall(iso(30),iso(50));const before=JSON.stringify(calls);
+  assert.equal(x.h.importCalls('official\t09/01/2025\t08:00 AM\t0\tYes\tNo\t$0.00'),true);
+  assert.equal(JSON.stringify(calls),before);assert.equal(state.callRecordReviews.length,1);
+  x.reload();assert.equal(state.callRecordReviews[0].candidateIds.length,2);assert.equal(calls.length,2);
 });
 
 test('manual payment estimates use forty seconds while explicit user payments are preserved', t => {
@@ -165,7 +202,7 @@ function harness(t) {
   const messages=[];
   const save = () => { if(rejectSave)return false; persisted = JSON.stringify({ calls, settings, state }); saves++; return true; };
   const h = { Date: ClockDate, ui, translateText, document, escapeHtml: String, MAX_CALL_DURATION_MIN: 1440, CONNECTED_LIVE_GRACE_MIN: 90,
-    makeLocalId: () => `id-${++sequence}`, setAppCalls, setAppState, setAppSettings, render() {}, higherRateBonusForCall, higherRateBonusForCalls, higherRateBonusBreakdownForCalls,
+    makeLocalId: () => `id-${++sequence}`, setAppCalls, setAppState, setAppSettings, render() {}, higherRateBonusForCall, higherRateBonusForCalls, higherRateBonusBreakdownForCalls, preserveCallRecords,
     callsForDay: key => calls.filter(c => c.callDate === key),
     getActiveDayKey: () => state.activeDayKey, defaultActiveDayKey: () => h.todayCallDateKey(),
     toast:message=>messages.push(message), saveAll: save, financeRunAutoFillCascade, autoStartShiftFromCalls() {}, playCallSavedSound:kind=>soundEvents.push(kind),

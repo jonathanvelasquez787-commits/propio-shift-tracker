@@ -8,6 +8,18 @@ La **tool** lleva tus registros, cálculos y ajustes. La **extensión** conecta 
 - **En la extensión:** el popup de su icono en Chrome permite configurar los iniciadores, la espera, los regresos de pausas y la vista original de Propio.
 - **Versiones:** el número del popup corresponde a la extensión instalada y coincide con Administrar extensiones. La app web tiene su propia versión; actualizar una parte no implica rediseñar la otra.
 
+### Comparar Propio con lo que observó la tool
+
+En Inicio → Bloques del día → Llamadas, pulsá una llamada para ver su detalle.
+Ahí comparás sus fuentes y podés desplegar la edición; el lápiz abre ese mismo
+detalle para editar. El contador de ACW también lleva a la llamada responsable. Propio tiene
+prioridad al llegar su historial y la tool conserva su inicio, final y duración
+observados como respaldo: una llamada de 7:41 sigue registrada como 7:41 aunque
+su pago se estime con 8 minutos. El origen del ACW y las diferencias quedan
+visibles; el detalle permite comparar ambas versiones sin duplicar ganancias.
+Si falta en Propio, se conserva pendiente de confirmar. Si hay varias posibles
+coincidencias, elegí «Pendientes de vincular» en el filtro del listado. [Alcance y excepciones](registros-propio-y-tool.md).
+
 ## 1. Empezar y terminar tu jornada
 
 ### 1. Registro automático de la conexión a Propio

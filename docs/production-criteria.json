@@ -292,14 +292,18 @@
       "id": "notification-review",
       "area": "Resumen de avisos",
       "acceptance": "Distingue sonido manual y sincronización silenciosa, volumen cero, audio codificado y progreso sin afirmar que disparó una alarma.",
-      "sources": ["js/notification-review.js"],
-      "tests": [{
-        "file": "tests/notification-review.test.mjs",
-        "namedCases": [
-          "custom audio size accounts for base64 padding and keeps encoded cost distinct",
-          "productive progress uses complete intervals without claiming that past notices fired"
-        ]
-      }]
+      "sources": [
+        "js/notification-review.js"
+      ],
+      "tests": [
+        {
+          "file": "tests/notification-review.test.mjs",
+          "namedCases": [
+            "custom audio size accounts for base64 padding and keeps encoded cost distinct",
+            "productive progress uses complete intervals without claiming that past notices fired"
+          ]
+        }
+      ]
     },
     {
       "id": "calls",
@@ -756,7 +760,7 @@
             "cuarta simulación mensual: llamadas antes o después del checkpoint cuentan como presencia sin mover Entrada/Salida",
             "cuarta simulación mensual: descartar live también revierte efectos de gamificación del auto-turno",
             "cuarta simulación mensual: gamificación nocturna no se parte a medianoche",
-            "quinta simulación mensual: editar fecha y nivel de Higher Rate sí llega al guardado",
+            "promotion list opens its single editor and the editor previews the selected effect before saving",
             "quinta simulación mensual: descartar live iniciada durante Break Lunch restaura la pausa",
             "quinta simulación mensual: respaldo live sobrevive refresh y descartar revierte turno ACW",
             "quinta simulación mensual: respaldo live conserva duración decimal y día contable nocturno",
@@ -1669,6 +1673,50 @@
             "failed lazy export or changed accounts close the placeholder without exporting another account",
             "export snapshots call amounts and bonuses before the optional document module loads",
             "PDF displays the selected scope, totals and safe call text without inline event handlers"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "call-source-records",
+      "area": "ACW y respaldo observado",
+      "acceptance": "Duración observada con milisegundos, prioridad del historial sin perder el respaldo y vínculos explícitos protegidos contra cambios y fallos de guardado.",
+      "sources": [
+        "js/call-records.js",
+        "js/call-records-view.js"
+      ],
+      "tests": [
+        {
+          "file": "tests/interface-integration.test.mjs",
+          "namedCases": [
+            "call comparison and correction share the existing detail and pending cases use the call filter",
+            "workday, allocation, recovery and support reside in their existing functional destinations"
+          ]
+        },
+        {
+          "file": "tests/call-records.test.mjs",
+          "namedCases": [
+            "a 7:41 observation retains exact milliseconds independently of estimated paid minutes",
+            "official reconciliation and later corrections preserve original times and estimate through JSON reload",
+            "zero is an official record while absent history leaves the observation available",
+            "legacy official rows do not fabricate unavailable observed seconds",
+            "explicit linking preserves the selected backup and every other call without duplicating the official row",
+            "linking rejects stale account or candidates and preserves the pending record",
+            "failed persistence restores both calls and the pending link",
+            "linking refuses to overwrite another real overlapping call",
+            "comparison renders observed seconds and official zero without combining their payments"
+          ]
+        },
+        {
+          "file": "tests/super-audit-accounting.test.mjs",
+          "namedCases": [
+            "a later official reconciliation removes its previous ambiguous review and preserves the observed backup"
+          ]
+        },
+        {
+          "file": "tests/higher-rate-review.test.mjs",
+          "namedCases": [
+            "the unified promotion editor previews and preserves earned bonuses before moving its window"
           ]
         }
       ]

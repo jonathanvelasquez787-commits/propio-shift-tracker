@@ -24,14 +24,13 @@ export function renderEarningsBreakdown(wrap, sourceCalls, context) {
     [translateText('En vivo'), amounts.liveBase, translateText('Estimación provisional'), 'is-live'],
     [translateText('Higher Rate'), amounts.bonus, translateText('Bono calculado'), 'is-bonus'],
   ];
-  const html = `<p class="review-scope">${escapeHtml(scopeLabel)}</p><div class="polished-hero"><span class="polished-eyebrow">${escapeHtml(translateText('Total de la tool'))}</span><strong class="polished-amount">${money(amounts.total)}${financeConvertedInline(amounts.total)}</strong></div>`
+  const html = `<p class="review-scope">${escapeHtml(scopeLabel)}</p>`
     + rows.map(([label, amount, hint, tone]) => `<div class="polished-breakdown-row"><span class="polished-dot ${tone}"></span><div><strong>${escapeHtml(label)}</strong><small>${escapeHtml(hint)}</small></div><div><strong class="polished-amount">${money(amount)}</strong><span class="polished-converted">${financeConvertedInline(amount)}</span></div></div>`).join('')
     + ui`<details class="polished-disclosure"><summary>Cómo se forma el total</summary><div class="polished-detail"><div class="review-line"><span>Registros</span><strong>${amounts.count}</strong></div><div class="review-line"><span>Estimados en vivo</span><strong>${amounts.liveCount}</strong></div><p class="note">La base registrada incluye importaciones y montos manuales. Los estimados en vivo se actualizan con el historial de Propio. Higher Rate se calcula con tus ventanas; el total no confirma un pago recibido.</p></div></details>`
     + `<p class="polished-foot">${conversion}</p>`;
   if (wrap.innerHTML !== html) wrap.innerHTML = html;
 }
 
-let higherRateHistoryOpen = false;
 export function renderHigherRateDayStats(context) {
   const { ui, translateText, translateMarkup, displayLocale, settings, HIGHER_RATE_TIERS,
     callDateKeyFromValue, callDateToDate, escapeHtml, financeConvertedInline,
@@ -52,20 +51,6 @@ function draw() {
       if (!wrap) return;
       const todayKey = todayCallDateKey();
       const today = todayRange();
-      const dates = new Set();
-      (settings.higherRateWindows || []).forEach(w => {
-        const key = callDateKeyFromValue(w.date);
-        if (key && key !== todayKey) dates.add(key);
-      });
-
-      const past = [];
-      dates.forEach(key => {
-        const d = callDateToDate(key);
-        if (d && d < today) past.push(key);
-      });
-      past.sort((a, b) => callDateToDate(b) - callDateToDate(a));
-
-      // Tarjeta hero de Hoy.
       const todayStats = higherRateStatsForDay(todayKey);
       const todayWindowsMin = higherRateWindowsTodayTotalMin(todayKey);
       const liveStatus = higherRateLiveStatus();
@@ -105,75 +90,7 @@ function draw() {
         </div>
       `;
 
-      // Timeline de Días pasados.
-      const tlItemHtml = (key) => {
-        const stats = higherRateStatsForDay(key);
-        const windowsForDay = (settings.higherRateWindows || [])
-          .filter(w => callDateKeyFromValue(w.date) === key)
-          .sort((a, b) => toMinutes(formatHHMM(a.start)) - toMinutes(formatHHMM(b.start)));
-        const dateObj = callDateToDate(key);
-        const dayNameRaw = new Intl.DateTimeFormat(displayLocale(), { weekday: 'long' }).format(dateObj);
-        const dayName = dayNameRaw.charAt(0).toUpperCase() + dayNameRaw.slice(1);
-        const dayNum = new Intl.DateTimeFormat(displayLocale(), { day: 'numeric', month: 'short' }).format(dateObj);
-
-        let mainHtml, accentRgb;
-        if (windowsForDay.length) {
-          // Acento del día = el nivel de mayor bono entre TODAS sus ventanas (mismo criterio que
-          // dominantHigherRateTier), para un solo color de tarjeta aunque el día tenga niveles
-          // distintos.
-          const dominantWindow = windowsForDay.reduce((a, b) =>
-            (HIGHER_RATE_TIERS[b.tier]?.bonusPerMin || 0) > (HIGHER_RATE_TIERS[a.tier]?.bonusPerMin || 0) ? b : a
-          );
-          accentRgb = HIGHER_RATE_TIERS[dominantWindow.tier]?.colorRgb || '125,140,255';
-          mainHtml = windowsForDay.map(w => {
-            const meta = HIGHER_RATE_TIERS[w.tier];
-            return ui`<div class="hr-tl-window-row"><span class="hr-tl-name">Ventana ${escapeHtml(meta?.label || w.tier)}</span><span class="hr-tl-sub">${escapeHtml(timeLabel(w.start))} – ${escapeHtml(timeLabel(w.end))}</span></div>`;
-          }).join('');
-        } else {
-          mainHtml = ui`<div class="hr-tl-name">Sin ventanas configuradas</div>`;
-          accentRgb = '144,160,190';
-        }
-
-        const windowsMinForDay = higherRateWindowsTodayTotalMin(key);
-        const pillsHtml = [
-          stats.totalMin > 0
-            ? ui`<span class="hr-count-pill tone-live">${iconHtml('flame')} ${escapeHtml(formatBlockDurationLabel(stats.totalMin))} en llamada · +${money(stats.totalBonus)}${financeConvertedInline(stats.totalBonus)}</span>`
-            : ui`<span class="hr-count-pill tone-muted">Sin llamadas en Higher Rate</span>`,
-          windowsMinForDay > 0 ? ui`<span class="hr-count-pill tone-window">${escapeHtml(formatBlockDurationLabel(windowsMinForDay))} de ventana</span>` : '',
-        ].filter(Boolean).join('');
-
-        return ui`
-          <div class="hr-tl-item ${windowsForDay.length ? '' : 'is-empty'}" style="--dot-rgb:${accentRgb};">
-            <div class="hr-tl-date">${escapeHtml(dayName)}<b>${escapeHtml(dayNum)}</b></div>
-            <div class="hr-tl-rail" aria-hidden="true"><span class="hr-tl-dot"></span></div>
-            <div class="hr-tl-card" style="--accent-rgb:${accentRgb};">
-              <span class="hr-tl-icon">${iconHtml(windowsForDay.length ? 'medal' : 'calendar')}</span>
-              <div class="hr-tl-main">${mainHtml}</div>
-              <div class="hr-tl-pills">${pillsHtml}</div>
-            </div>
-          </div>
-        `;
-      };
-
-      const pastHtml = past.length
-        ? ui`
-          <button type="button" class="hr-past-toggle" id="higherRatePastToggleBtn" data-open="${higherRateHistoryOpen ? 'true' : 'false'}">
-            <span class="hr-past-toggle-left">${iconHtml('history')} Días pasados (${past.length})</span>
-            ${iconHtml('chevronDown', 'chev')}
-          </button>
-          <div class="hr-tl" id="higherRatePastList" style="margin-top:14px;${higherRateHistoryOpen ? '' : ' display:none;'}">${past.map(k => tlItemHtml(k)).join('')}</div>
-        `
-        : '';
-
-      wrap.innerHTML = heroHtml + pastHtml;
-
-      const pastToggleBtn = document.getElementById('higherRatePastToggleBtn');
-      if (pastToggleBtn) {
-        pastToggleBtn.addEventListener('click', () => {
-          higherRateHistoryOpen = !higherRateHistoryOpen;
-          context.refresh();
-        });
-      }
+      wrap.innerHTML = heroHtml;
     }
   draw();
 }
@@ -183,6 +100,7 @@ export { confirmActivityChange } from './work-actions.js';
 export { confirmReplacement, importBackupFile, openSnapshotRecovery } from './backup-recovery.js';
 export { renderImportOutcome } from './call-review-view.js';
 export { renderCallTable } from './call-table-view.js';
+export { openCallRecords } from './call-records-view.js';
 export { confirmShiftTransition, openWorkDayReview, confirmSchedulePlan } from './shift-work-review.js';
 export { payReceiptAction } from './pay-receipts.js';
 export { confirmFinanceAction, openFinanceDistribution } from './finance-review.js';

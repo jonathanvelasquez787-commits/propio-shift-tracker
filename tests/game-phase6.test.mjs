@@ -81,7 +81,7 @@ test('HTML integra la ruta de Logros, el arena, las misiones, ajustes y modales 
 test('Logros simplifica ajustes, comparte activación lateral y admite nombre personalizado seguro', () => {
   const html = read('app.html');
   const achievements = between(html, '<div class="app-page game-achievements-page"', '</div><!-- /pageAchievements -->');
-  const gameEditor = between(achievements, '<details class="game-panel game-settings-accordion" id="gameSettingsAccordion">', '<details class="game-panel game-settings-accordion" id="positiveSettingsAccordion">');
+  const gameEditor = between(achievements, '<details class="game-panel game-settings-accordion" id="gameSettingsAccordion">', '<details class="game-settings-accordion game-reward-settings" id="positiveRewardsAccordion">');
   const settingsModal = between(html, '<div aria-hidden="true" class="modal-overlay" id="goalsModal">', '<div aria-hidden="true" class="modal-overlay game-modal-overlay" id="stageClearModal">');
   const allIds = [...html.matchAll(/\bid="([^"]+)"/g)].map((match) => match[1]);
   assert.deepEqual(allIds.filter((id, index) => allIds.indexOf(id) !== index), []);
@@ -890,19 +890,19 @@ test('cuarta simulación mensual: gamificación nocturna no se parte a medianoch
 });
 
 
-test('quinta simulación mensual: editar fecha y nivel de Higher Rate sí llega al guardado', () => {
+test('promotion list opens its single editor and the editor previews the selected effect before saving', () => {
   const appMain = read('js/app-main.js');
   const higherRate = read('js/higher-rate.js');
   assert.match(higherRate, /export function hrWindowWeekdayLabel\(/);
   assert.match(higherRate, /export function hrTierButtonLabel\(/);
   assert.match(appMain, /hrTierButtonLabel,/);
   assert.match(appMain, /hrWindowWeekdayLabel,/);
-  const clickHandler = appMain.slice(appMain.indexOf("document.getElementById('higherRateModal').addEventListener('click'"), appMain.indexOf("document.getElementById('higherRateModal').addEventListener('change'"));
-  assert.match(clickHandler, /hrTierButtonLabel\(t, active\)/);
-  assert.match(clickHandler, /saveHigherRateWindowsFromEditor\(\)/);
-  const changeHandler = appMain.slice(appMain.indexOf("document.getElementById('higherRateModal').addEventListener('change'"), appMain.indexOf("document.getElementById('daySelector').addEventListener('change'"));
-  assert.match(changeHandler, /hrWindowWeekdayLabel\(dayKey\)/);
-  assert.match(changeHandler, /saveHigherRateWindowsFromEditor\(\)/);
+  const clickHandler = appMain.slice(appMain.indexOf("document.getElementById('higherRateModal').addEventListener('click'"), appMain.indexOf("document.getElementById('daySelector').addEventListener('change'"));
+  assert.match(clickHandler, /openHigherRateReview\(/);
+  assert.doesNotMatch(clickHandler, /saveHigherRateWindowsFromEditor\(\)/);
+  const editor=read('js/higher-rate-review.js');
+  assert.match(editor,/data-hr-field="date"/); assert.match(editor,/data-hr-field="tier"/);
+  assert.match(editor,/data-hr-mode/); assert.match(editor,/context\.apply\(windowId, current.value, current.stamp, current.mode\)/);
 });
 
 test('quinta simulación mensual: descartar live iniciada durante Break Lunch restaura la pausa', () => {

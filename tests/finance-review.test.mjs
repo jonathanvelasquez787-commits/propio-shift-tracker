@@ -44,7 +44,7 @@ test('finance plan preview keeps projections and their assumptions folded and co
 
 test('latest distribution distinguishes released amounts from payments and escapes destination labels',t=>{
  const h=harness(t);openFinanceDistribution(h.context,{report:{at:'2026-10-19T18:00:00Z',items:[{name:'<script>',amount:-20},{name:'Savings',amount:10},{name:'Invalid',amount:Infinity}]}});
- const html=h.elements.get('financeDistributionContent').innerHTML;assert.match(html,/\$-20.00/);assert.match(html,/\+\$10.00/);assert.match(html,/&lt;script>/);assert.doesNotMatch(html,/Infinity/);assert.match(html,/no un historial de pagos/);assert.deepEqual(h.opened,['financeDistributionModal']);
+ const html=h.elements.get('financeDistributionContent').innerHTML;assert.match(html,/\$-20.00/);assert.match(html,/\+\$10.00/);assert.match(html,/&lt;script>/);assert.doesNotMatch(html,/Infinity/);assert.match(html,/no un historial de pagos/);assert.deepEqual(h.opened,[], 'the existing Finance disclosure must not open a second modal');
 });
 
 test('finance settings reject malformed received-payment backups instead of silently discarding them',()=>{
