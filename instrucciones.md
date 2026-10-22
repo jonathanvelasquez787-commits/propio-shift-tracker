@@ -324,15 +324,17 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
-- **Reclamos del 22/10 con prioridad:** el propietario mostró que 638 seguía
-  teniendo proyección y desgloses grandes y que no se había recuperado el azul
-  original. No atribuirlo a caché. El azul histórico era la fecha de pago a la
-  derecha, no un nuevo fondo: referencia `37d8ee9^:js/weekly-summary.js`.
-  Hover de ACW incompleto en 638, corregido en la entrega independiente 639; galería visual
-  desactualizada y textos de ayuda aún técnicos. Registro de los ocho pedidos
-  directos reabiertos en [plan](docs/plan-mejoras-integrales.md). Las veinte
-  mejoras funcionales anteriores siguen abiertas. Propuesta de tres bloques
-  externa a Git preparada; no aplicar su nueva compactación sin aprobación.
+- **Corrección solicitada expresamente el 22/10, entrega 640:** el desglose
+  existente se coloca en el hueco bajo Racha/meta, junto a Proyección, en la
+  misma sección de Reportes. Jornada se integra como «Ver jornada» en
+  Adherencia, conservando el mismo nodo, sus listeners y el acceso desde Inicio.
+  Fechas de pago restaura la fecha azul a la derecha y el distintivo actual
+  usando el token histórico de 37d8ee9^:js/weekly-summary.js; se conserva el
+  registro manual de recibido. Son reubicaciones/restauración pedidas por el
+  propietario y publicables por su instrucción «publica»; no aplicar la maqueta
+  anterior ni cambiar el layout general. Publicación y capturas se registran
+  por separado. Siguen abiertas la galería visual, lenguaje de ayuda y veinte
+  mejoras funcionales del plan original.
 
 - **Presentación aprobada el 21–22/10:** se aplica la referencia que conserva
   la identidad y distribución general, después del reclamo sobre texto y espacios
@@ -515,6 +517,18 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v640 — Integración solicitada en Reportes y restauración de Fechas de pago.**
+
+- Desglose día/ciclo compacto en el espacio bajo las dos tarjetas izquierdas,
+  junto a Proyección. Mismos datos, importes y conversiones; se apila en móvil.
+- «Ver jornada» dentro de Adherencia conserva el nodo al actualizar Reportes,
+  su apertura y listeners. Se retira el marco independiente de ancho completo.
+- Fecha de pago a la derecha con el token azul histórico y etiqueta del ciclo
+  actual. No se deduce una recepción por el paso de la fecha; comparar/registrar
+  recibido permanece disponible. Ajuste de flecha plegable en móvil.
+- Capturas y comprobaciones fuera de Git; extensión sin cambios. Los veinte
+  puntos funcionales abiertos no se cierran por esta corrección visual.
+
 **v639 — Hover de ACW con los instantes observados y reclamos reabiertos.**
 
 - El hover muestra inicio/final observado con segundos de la última llamada
@@ -543,24 +557,3 @@ futura opera bajo esto, sin excepción:
 - Extensión 2.3.3 cambia textos del popup; no modifica la detección de llamadas,
   los tiempos ni la disponibilidad. Instalación y publicación se comprueban
   por separado; una copia de archivos no confirma la recarga en Chrome.
-
-**v637 — Respaldo observado e integración en funciones existentes.**
-
-- Detalle único de llamada desde el listado o ACW; edición plegada y pendientes
-  en su filtro. Retirada la tarjeta adicional de última llamada. Duración
-  observada de 7:41 conserva 461000 ms; el pago puede estimarse con ocho minutos.
-  La importación conserva el respaldo original y usa Propio como principal.
-- Diferencias de cierre/pago visibles, historial plegado y cero distinguido de
-  ausencia. Vínculos dudosos persistidos para selección explícita, con protección
-  ante cuenta/datos cambiados, otras llamadas y fallo de guardado.
-- Catorce integraciones aprobadas aplicadas; meta del ciclo y promoción con
-  un solo editor. La edición de promoción distingue conservar y recalcular.
-  Los vínculos resueltos en otra importación se retiran de su cola.
-- La extensión 2.3.2 solo compacta la ayuda del popup; instalada con respaldo
-  y recarga confirmada. Sin cambios de esquema alojado ni compras. Ver
-  docs/registros-propio-y-tool.md. Las veinte mejoras del plan siguen abiertas.
-- 966 pruebas correctas, build, i18n, módulos y wiring verificados. Recorridos
-  compilados aislados ES/EN, claro/oscuro y 320/390/1200 px para precisión,
-  importación, corrección a cero, recarga y selección explícita de respaldo.
-  Doce recorridos de integración y ambos temas del popup, con API de Chrome
-  simulada y datos ficticios; alcance distinto de las pruebas físicas pendientes.

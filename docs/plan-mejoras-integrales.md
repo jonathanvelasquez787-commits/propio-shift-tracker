@@ -15,18 +15,17 @@ confirman que web 638 ya estaba cargada; no atribuir estos reclamos a caché.
 Los 59 puntos funcionales publicados y los 20 abiertos del inventario se
 mantienen; estos son pedidos directos que no quedaron correctamente cerrados.
 
-- [ ] **Azul original y presentación de Fechas de pago.** Se sustituyó la fecha
-  de próximo pago azul a la derecha y la etiqueta «Actual — día X de 14» por
-  filas nuevas. El fondo aproximado añadido en 638 no recupera el original.
-  Referencia comprobada: renderer de `js/weekly-summary.js` anterior a
-  `37d8ee9`, color `var(--accent-blue-2, var(--cyan))`. Conservar registro de
-  recibido y no volver a inferir un depósito a partir de su fecha pasada.
-- [ ] **Ganancias del ciclo.** Alturas propias retiraron bordes vacíos, pero la
-  proyección sigue alargando la fila y dejando un hueco grande. Compactar el
-  contenido completo del bloque, manteniendo sus tres tarjetas y todos sus datos.
-- [ ] **Desglose de ganancias.** Limitar únicamente las filas a 780 px dejó el
-  marco ancho casi vacío. Ajustar también la composición de día/ciclo dentro
-  de la sección existente. La nueva propuesta no cambia el layout general.
+- [x] **Azul original y presentación de Fechas de pago — entrega 640.** Restauradas
+  la fecha azul a la derecha y la etiqueta «Actual — día X de 14». Referencia:
+  renderer de `js/weekly-summary.js` anterior a `37d8ee9`, usando el mismo token
+  `var(--accent-blue-2, var(--cyan))`. Comparar y registrar recibido se conservan;
+  una fecha pasada no confirma ningún depósito.
+- [x] **Ganancias del ciclo — entrega 640.** Se aprovecha el hueco bajo Racha/meta
+  para el desglose existente, junto a Proyección, tal como señaló el propietario.
+  Las tres tarjetas, sus posiciones y los datos de proyección se conservan.
+- [x] **Desglose de ganancias — entrega 640.** Día y ciclo juntos dentro de la
+  misma sección, con filas compactas que usan su ancho completo. Se retira la
+  limitación interior de 780 px que dejaba el marco casi vacío; en móvil se apilan.
 - [x] **Hover del ACW — entrega 639.** En 638 solo muestra procedencia y ancla. El inicio y
   final observados con segundos existen en el detalle; faltan en el hover.
   Corrección de 639: última llamada completada por su observación conservada,
@@ -48,7 +47,12 @@ mantienen; estos son pedidos directos que no quedaron correctamente cerrados.
   qué configurar y ejemplo, y corregida la ubicación a Avisos. Las funciones
   existentes y las mejoras todavía pendientes no se confunden.
 
-Propuesta externa para los tres bloques: «propio-tres-correcciones.html», con
+La solicitud posterior del 22/10 ordena publicar las reubicaciones concretas:
+Desglose bajo Racha/meta junto a Proyección, Jornada dentro de Adherencia y
+restauración de fecha/etiqueta azul. Entrega 640 conserva los nodos y funciones;
+la evidencia de publicación se verifica aparte. No aplicar la propuesta previa.
+
+Propuesta externa anterior para los tres bloques: «propio-tres-correcciones.html», con
 referencia histórica ejecutada desde el renderer anterior, ambos temas y un
 único diseño responsive. No aplicada a producción; requiere aprobar la nueva
 compactación. El hover es una corrección independiente de JS y texto.

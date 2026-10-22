@@ -25,8 +25,8 @@ coincidencias, elegí «Pendientes de vincular» en el filtro del listado. [Alca
 
 ### Detalles y resúmenes
 
-- **Reportes → Jornada:** revisión de ACW, pausas, plan, metas y adherencia. «Ver jornada →» en Inicio abre ese mismo detalle.
-- **Reportes → Desglose de ganancias:** componentes del día y del ciclo. El resumen de ganancias permanece en Inicio.
+- **Reportes → Adherencia → Ver jornada:** revisión de ACW, pausas, plan, metas y adherencia. «Ver jornada →» en Inicio abre ese mismo detalle.
+- **Reportes → Ganancias del ciclo → Desglose de ganancias:** componentes del día y del ciclo, debajo de Racha y la meta del ciclo, junto a Proyección. El resumen de ganancias permanece en Inicio.
 - **Detalle de llamada → Cómo se registra una llamada en vivo:** medición exacta, redondeo de pago y prioridad del historial oficial. «Propio» y «Medición guardada» identifican las fuentes.
 
 ## 1. Empezar y terminar tu jornada

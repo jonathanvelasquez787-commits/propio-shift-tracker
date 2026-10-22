@@ -565,7 +565,8 @@
 <div class="rpt-section-title" id="rptSecCycle"></div>
 <div class="rpt-sel-pill">Ciclo actual</div>
 </div>
-<div class="rpt-cycle-grid" id="rptCycleGrid" style="margin-bottom:14px;"></div>
+<div class="rpt-cycle-layout">
+<div class="rpt-cycle-grid" id="rptCycleGrid"></div>
 
 <section class="card span-12" id="earningsDetailsSection"><div class="section-title"><div><h2>Desglose de ganancias</h2><p>Base registrada, estimaciones y Higher Rate.</p></div></div>
 <details class="fin-preview earnings-breakdown" id="earningsDayBreakdown">
@@ -577,6 +578,7 @@
 <div data-earnings-breakdown aria-live="polite"></div>
 </details>
 </section>
+</div>
 <details class="accordion-card" id="weekSummaryAccordion" open>
 <summary>
   <div class="accordion-head">
@@ -647,9 +649,9 @@
 <div class="rpt-trend-row" id="rptTrendRow"></div>
 </div>
 
-<section class="card span-12" id="workDayReviewSection">
-<details class="polished-disclosure" id="workDayReviewDetails"><summary>Plan, registro y motivos de la jornada</summary><div class="polished-detail" id="workDayReviewContent"></div></details>
-</section>
+<div id="workDayReviewSection">
+<details class="polished-disclosure" id="workDayReviewDetails"><summary>Ver jornada</summary><div class="polished-detail" id="workDayReviewContent"></div></details>
+</div>
 <div class="day-stats-grid" id="dayStatsGrid">
 <details class="accordion-card" id="statsAccordion" open>
 <summary>
