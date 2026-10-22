@@ -388,6 +388,12 @@
       "js/finance.js"
     ]
   },
+  "s_06086cf8": {
+    "source": "El final de Propio se calcula con los minutos de su historial.",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_062e5a32": {
     "source": "). Tu horario, metas y el resto de tus días no se tocan.",
     "files": [
@@ -611,6 +617,12 @@
     "source": "No cumplido",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_0975c28c": {
+    "source": "{{v0}}. ACW desde {{v1}}.",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_0981dba9": {
@@ -1410,6 +1422,12 @@
       "js/game-battle.js"
     ]
   },
+  "s_148d0632": {
+    "source": "Final observado: {{v0}}",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_14b38bc7": {
     "source": "Importe fijo",
     "files": [
@@ -1510,6 +1528,12 @@
     "source": "Nivel {{v1}}",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_16580cad": {
+    "source": "Última llamada · {{v0}}",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_1670988e": {
@@ -2993,6 +3017,12 @@
       "js/app-main.js"
     ]
   },
+  "s_2d8be4b7": {
+    "source": "Inicio informado por Propio: {{v0}}",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_2d8dc169": {
     "source": "Esta semana",
     "files": [
@@ -3793,6 +3823,12 @@
     "source": "Progreso contra el jefe del ciclo",
     "files": [
       "app.html"
+    ]
+  },
+  "s_390d8eee": {
+    "source": "El historial informa minutos, no los segundos originales.",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_3918a758": {
@@ -5049,6 +5085,12 @@
     "files": [
       "privacidad.html",
       "terminos.html"
+    ]
+  },
+  "s_4d156533": {
+    "source": "Inicio observado: {{v0}}",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_4d321623": {
@@ -14253,6 +14295,12 @@
       "js/reports.js"
     ]
   },
+  "s_da7c0412": {
+    "source": "Pulsá para ver el origen del ACW y su cálculo.",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_da7c94c6": {
     "source": "Too Much",
     "files": [
@@ -15335,6 +15383,12 @@
       "js/call-recovery.js"
     ]
   },
+  "s_e8d77077": {
+    "source": "Sin medición observada de la última llamada.",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_e8dde678": {
     "source": "Meta",
     "files": [
@@ -15473,12 +15527,6 @@
     "source": "LLAMADA REGISTRADA · {{v0}} · sin XP por esta llamada",
     "files": [
       "js/game.js"
-    ]
-  },
-  "s_eb0e4471": {
-    "source": "{{v0}}. ACW desde {{v1}}. Tocá para ver los registros y el cálculo.",
-    "files": [
-      "js/app-main.js"
     ]
   },
   "s_eb225500": {
@@ -16097,6 +16145,12 @@
     "source": "Turno en vivo",
     "files": [
       "index.html"
+    ]
+  },
+  "s_f38e3f19": {
+    "source": "Final calculado de Propio: {{v0}}",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_f3901ba5": {
@@ -16935,6 +16989,12 @@
     "files": [
       "app.html",
       "privacidad.html"
+    ]
+  },
+  "s_ff6c044a": {
+    "source": "Sin medición observada de esta llamada.",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_ffa0ac26": {

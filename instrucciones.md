@@ -324,12 +324,23 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
+- **Reclamos del 22/10 con prioridad:** el propietario mostró que 638 seguía
+  teniendo proyección y desgloses grandes y que no se había recuperado el azul
+  original. No atribuirlo a caché. El azul histórico era la fecha de pago a la
+  derecha, no un nuevo fondo: referencia `37d8ee9^:js/weekly-summary.js`.
+  Hover de ACW incompleto en 638, corregido en la entrega independiente 639; galería visual
+  desactualizada y textos de ayuda aún técnicos. Registro de los ocho pedidos
+  directos reabiertos en [plan](docs/plan-mejoras-integrales.md). Las veinte
+  mejoras funcionales anteriores siguen abiertas. Propuesta de tres bloques
+  externa a Git preparada; no aplicar su nueva compactación sin aprobación.
+
 - **Presentación aprobada el 21–22/10:** se aplica la referencia que conserva
   la identidad y distribución general, después del reclamo sobre texto y espacios
   grandes. El diseño anterior que cambiaba la composición global queda descartado.
   Disponibilidad detallada en Ajustes; jornada y desgloses en Reportes; ayuda de
   registro dentro del detalle único de llamada. Inicio conserva sus controles,
-  ACW, resumen, Bloques/Llamadas y Logros. Las filas de pago recuperan el azul.
+  ACW, resumen, Bloques/Llamadas y Logros. La recuperación del azul quedó
+  incompleta y la compactación de ciclo/desglose fue rechazada el 22/10.
   Ver [control visual](docs/control-visual-11-vistas.md). La aprobación de una
   maqueta no certifica el resultado; conservar capturas de la aplicación real.
 
@@ -460,19 +471,24 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
+- App 639 añade inicio/final observado con segundos al hover del ACW, sin
+  modificar su cálculo ni los registros. Después de una pausa conserva la
+  última llamada en el resumen y distingue el ancla actual. Importaciones sin
+  observación no inventan segundos. Extensión sigue en 2.3.3, sin archivos nuevos.
 - App 638: presentación aprobada con los mismos colores, navegación y layout
   general. Ajustes contiene la preparación de disponibilidad; Inicio muestra solo
   su estado breve y conserva ACW. Reportes reúne jornada y desgloses; el detalle
   de llamada conserva ambas fuentes y su ayuda, en una sola ventana.
   Compactación localizada de filas, controles y ayudas de Reportes, Finanzas,
   Horario y Logros; alturas independientes para tarjetas. Calendario conserva
-  su cuadrícula. Fechas de pago recupera fondos, bordes e iconos azules.
+  su cuadrícula. Fechas de pago recibió un fondo aproximado; la fecha azul
+  original a la derecha y la etiqueta del ciclo siguen pendientes de restaurar.
   Los textos distinguen Propio, Medición guardada y la extensión de Chrome;
   se retira «tool» de los textos visibles. Sin cambio de datos ni esquema alojado.
   Web y extensión tienen versiones propias: web 638.0.0 y popup 2.3.3.
   Archivos 2.3.3 instalados con respaldo completo y ajustes personales conservados.
   La última recarga confirmada por el propietario es 2.3.2; no dar por recargada
-  2.3.3 por instalar sus archivos. Guía de 73 funciones en
+  2.3.3 por instalar sus archivos. Guía de 79 funciones en
   docs/guia-practica-tool-y-extension.md. Las veinte tareas funcionales siguen
   abiertas en su plan.
 - Google es la entrada pública. Formularios deshabilitados de login/registro y
@@ -499,13 +515,26 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v639 — Hover de ACW con los instantes observados y reclamos reabiertos.**
+
+- El hover muestra inicio/final observado con segundos de la última llamada
+  terminada. El ancla del ACW sigue aparte y conserva prioridad oficial;
+  después de una pausa no confunde ese nuevo ancla con el final de la llamada.
+- Una importación sin respaldo observado identifica la falta de medición y
+  conserva la precisión en minutos del inicio oficial. No inventa segundos.
+- Reabiertos color/presentación originales de Fechas de pago, compactación del
+  ciclo y desglose, guía visual y lenguaje de ayuda. El control visual no puede
+  cerrar estos reclamos solo por un build o por ausencia de desbordamiento.
+- Propuesta de tres bloques fuera de Git; sin nuevos cambios visuales publicados
+  por esta entrega. Extensión permanece 2.3.3; no se pide otra recarga por 639.
+
 **v638 — Presentación nativa aprobada y ubicaciones claras.**
 
 - Inicio conserva ACW y sus funciones habituales; los detalles añadidos usan
   Ajustes, Reportes y la ventana existente de llamada, sin copias paralelas.
-- Filas de pago azules, tarjetas con altura propia, etiquetas y valores cercanos,
-  controles proporcionados y ayudas secundarias plegadas. Mismos tokens y layout
-  general. La cuadrícula de Calendario conserva su tamaño y distribución.
+- Intento insuficiente de color en Fechas de pago y de compactación del ciclo
+  y desglose: reclamos reabiertos el 22/10. Se conservan las reubicaciones,
+  controles y ayudas plegadas; Calendario mantiene su cuadrícula.
 - 967 pruebas correctas; build, idiomas, módulos y wiring verificados. Dieciséis
   recorridos compilados ES/EN, temas y 320/390/1200/1800 px; otras 52 capturas
   de trece secciones en ambos temas y 320/1800 px. Pago conserva reserva y el
@@ -535,15 +564,3 @@ futura opera bajo esto, sin excepción:
   importación, corrección a cero, recarga y selección explícita de respaldo.
   Doce recorridos de integración y ambos temas del popup, con API de Chrome
   simulada y datos ficticios; alcance distinto de las pruebas físicas pendientes.
-
-**v636 — Estimaciones desde cuarenta segundos y disponibilidad compacta.**
-
-- Umbral personal inclusivo: 7:39 → 7 minutos y 7:40 → 8. Nuevas estimaciones
-  y Higher Rate coherentes, sin recalcular registros anteriores. Importaciones
-  oficiales y pagos manuales explícitos conservan prioridad. Duración real y
-  ACW sin modificar; recuperación conserva segundos exactos en preview y guardado.
-- Tooltip del ACW con explicación y ejemplos aprobados. Disponibilidad compacta
-  también sin conexión; explicación y preparación plegadas. Extensión sin cambios, 2.3.1.
-- 951 pruebas y doce recorridos compilados ES/EN, temas y 320/390/1200 px.
-  PR #98 publicado, CI de PR/main y traducciones correctos; producción READY
-  y archivos del mismo SHA verificados. Ver docs/redondeo-de-estimaciones.md.

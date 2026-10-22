@@ -42,6 +42,15 @@ export function acwCallRecord(calls, startedAt) {
   return calls.find(call => Date.parse(call.records?.propio?.endISO || call.endISO) === time) || null;
 }
 
+export function latestCompletedCall(calls, nowMs = Date.now()) {
+  let latest = null, latestEnd = -Infinity;
+  for (const call of calls) {
+    const end = Date.parse(call.records?.tool?.endISO || call.endISO);
+    if (Number.isFinite(end) && end <= nowMs && end > latestEnd) { latest = call; latestEnd = end; }
+  }
+  return latest;
+}
+
 export function callElapsedMs(call) {
   return call?.source === 'live' && Number.isFinite(Date.parse(call.startISO)) && Number.isFinite(Date.parse(call.endISO))
     ? Math.max(0, Date.parse(call.endISO) - Date.parse(call.startISO)) : Math.max(0, Number(call?.durationMin) || 0) * 60000;

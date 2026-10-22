@@ -15,7 +15,10 @@ Ahí comparás sus fuentes y podés desplegar la edición; el lápiz abre ese mi
 detalle para editar. El contador de ACW también lleva a la llamada responsable. Propio tiene
 prioridad al llegar su historial y la aplicación conserva su inicio, final y duración
 observados como respaldo: una llamada de 7:41 sigue registrada como 7:41 aunque
-su pago se estime con 8 minutos. El origen del ACW y las diferencias quedan
+su pago se estime con 8 minutos. Al dejar el puntero sobre el ACW ves la fecha,
+inicio y final observado de la última llamada, con segundos. Si no hubo una
+observación, lo indica y distingue los tiempos informados/calculados de Propio.
+El origen del ACW y las diferencias quedan
 visibles; el detalle permite comparar ambas versiones sin duplicar ganancias.
 Si falta en Propio, se conserva pendiente de confirmar. Si hay varias posibles
 coincidencias, elegí «Pendientes de vincular» en el filtro del listado. [Alcance y excepciones](registros-propio-y-tool.md).
@@ -357,7 +360,7 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 ### 51. Mensaje de apoyo cuando llevás tiempo sin llamadas
 
 - **Qué hace:** muestra un mensaje después de los minutos de trabajo sin llamadas elegidos. Puede funcionar con Logros apagado.
-- **Qué configurás:** activar refuerzo, texto, minutos de espera y si se repite mientras seguís sin llamadas, en sus ajustes de Logros.
+- **Qué configurás:** en Avisos → Apoyo y cierre de llamadas, activar refuerzo, texto, minutos de espera y si se repite mientras seguís sin llamadas.
 - **Ejemplo:** elegís veinte minutos y una sola vez: muestra el apoyo al cumplirlos y no insiste en ese mismo tramo. Con repetición, puede volver a avisar por cada nuevo intervalo de veinte minutos aplicable.
 
 ### 52. Cierre breve y recuperación de una llamada difícil
@@ -500,6 +503,44 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 - **Qué configurás:** elegís el contenido que querés consultar o abrís el enlace externo de apoyo.
 - **Ejemplo:** revisás cómo importar llamadas antes de hacerlo. Si decidís apoyar por Ko-fi, ese pago se realiza fuera de la aplicación y no se registra como gasto ni desbloquea funciones por sí solo.
 
+## 14. Controles adicionales y uso del navegador
+
+### 74. Seguir trabajando al cambiar de pestaña
+
+- **Qué hace:** la extensión protege las páginas de trabajo contra el descarte por memoria y solicita lecturas actuales del ACW. Mantiene las prioridades de horario, pausas y Stop Calls manual.
+- **Qué configurás:** mantener abiertas Propio y Propio Shift Tracker, con la extensión activa. No necesitás otro contador.
+- **Ejemplo:** dejás el ACW en 00:50 y consultás Linguee. El límite sigue siendo 03:00. Chrome puede demorar una comprobación; una PC suspendida o una lectura antigua no permiten prometer el inicio al segundo exacto.
+
+### 75. Volumen general y sonidos propios
+
+- **Qué hace:** un volumen general controla los sonidos de la aplicación, incluidos archivos personalizados. En cero se conservan los avisos escritos.
+- **Qué configurás:** Avisos → volumen general; en cada aviso podés elegir, probar o subir el sonido, respetando el límite de archivo mostrado.
+- **Ejemplo:** bajás el volumen general a cero para trabajar en silencio. Los mensajes siguen apareciendo y podés volver a activar el audio con ese mismo control.
+
+### 76. Planificar un presupuesto y proponer una meta diaria
+
+- **Qué hace:** estima ingresos a partir de horas productivas, días y tarifa; permite repartir esa proyección entre gastos fijos, variables y ahorro. Proyectar ingresos no reserva dinero ni registra pagos.
+- **Qué configurás:** Finanzas → Planificar presupuesto, con horas productivas por día, días por semana y porcentajes del reparto. Guardar meta diaria muestra su alcance antes de confirmar.
+- **Ejemplo:** comparás trabajar cuatro o cinco días por semana para decidir tu meta. Revisás la propuesta y solo la guardás cuando querés cambiar la meta general.
+
+### 77. Buscar y filtrar llamadas
+
+- **Qué hace:** limita las filas visibles del día activo por Customer ID y estado del registro. Los filtros no borran llamadas ni cambian los totales.
+- **Qué configurás:** Inicio → Bloques del día → Llamadas: Buscar Customer ID y Estado del registro. Incluye pendientes de vincular, estimadas, oficiales, corregidas, manuales y origen sin confirmar.
+- **Ejemplo:** elegís Pendientes de vincular para resolver una coincidencia dudosa y después volvés a Todos. El resto de las llamadas sigue guardado.
+
+### 78. Barra de actividad en vivo
+
+- **Qué hace:** conserva a mano el estado y tiempo de una llamada o pausa activa, con las acciones disponibles para esa actividad. Usa los mismos registros que sus controles principales.
+- **Qué configurás:** no necesita un registro adicional. Sus acciones cambian según la actividad y mantienen las confirmaciones correspondientes.
+- **Ejemplo:** estás consultando otra sección durante una llamada y usás la barra para guardarla. Se guarda esa misma llamada, sin crear una segunda entrada.
+
+### 79. Uso con teclado y ayudas de accesibilidad
+
+- **Qué hace:** los controles habituales usan botones, campos y etiquetas que permiten navegación con teclado. La revisión completa de accesibilidad sigue pendiente en el plan; no se presenta como certificada.
+- **Qué configurás:** zoom del navegador y preferencias de accesibilidad del sistema, según lo que necesités.
+- **Ejemplo:** usás Tab para llegar a un botón y Enter para activarlo. Si un control no se alcanza o se recorta con zoom, es un caso para corregir, no una limitación que debás aceptar sin revisión.
+
 ## Una mañana completa con estas funciones
 
 1. Encendés la PC a las 6:00. Se abren tu escritorio de Chrome y tus notas.
@@ -521,15 +562,3 @@ portal, horario y opciones sin cambiar esas opciones ni aceptar llamadas.
 - No compra premios, paga gastos ni comprueba depósitos bancarios.
 - Abrir Chrome y acomodar ventanas es una configuración local de tu PC; el encendido automático de la PC lo configurás vos.
 
-## Usar otras pestañas durante el turno
-
-Podés dejar Propio Shift Tracker abierto y consultar Linguee u otra pestaña. La extensión
-protege Propio Shift Tracker, Propio y UseInterpreter contra el descarte automático por
-memoria y añade una revisión de respaldo cada 30 segundos. Primero solicita el
-ACW actual; mantiene las prioridades de horario, Break/Lunch y Stop manual.
-
-No tenés que configurar un contador nuevo. Por ejemplo, si dejaste ACW en 00:50,
-el umbral sigue siendo 03:00 aunque estés mirando Linguee. Una comprobación puede
-llegar después del umbral: no se garantiza exactitud al segundo en segundo plano.
-Si Chrome congela la página o la PC entra en suspensión, la extensión no inventa
-un ACW actualizado ni pulsa Start Calls con una lectura antigua.
