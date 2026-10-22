@@ -984,6 +984,12 @@
       "js/reports.js"
     ]
   },
+  "s_0dcd5bb1": {
+    "source": "Actual — día {{v0}} de 14",
+    "files": [
+      "js/pay-receipts.js"
+    ]
+  },
   "s_0df3e259": {
     "source": "Falta confirmar tu correo. Revisa la bandeja de entrada.",
     "files": [
@@ -2262,12 +2268,6 @@
     "source": "Por encontrar",
     "files": [
       "js/game.js"
-    ]
-  },
-  "s_20d66fbf": {
-    "source": "Meta del ciclo y cálculo del ACW",
-    "files": [
-      "js/shift-work-review.js"
     ]
   },
   "s_20dd05b7": {
@@ -4567,12 +4567,6 @@
       "js/reports.js"
     ]
   },
-  "s_4533b073": {
-    "source": "{{v4}} · {{v5}}",
-    "files": [
-      "js/pay-receipts.js"
-    ]
-  },
   "s_455c3a0c": {
     "source": "Avisos",
     "files": [
@@ -6042,6 +6036,12 @@
       "js/game-battle.js"
     ]
   },
+  "s_5b6d7204": {
+    "source": "Ciclo: {{v3}}{{v4}}",
+    "files": [
+      "js/pay-receipts.js"
+    ]
+  },
   "s_5b80a29c": {
     "source": "Inicio del turno ya utilizado",
     "files": [
@@ -6252,12 +6252,6 @@
     "source": "de tu meta",
     "files": [
       "app.html"
-    ]
-  },
-  "s_5fc81666": {
-    "source": "Ciclo: {{v3}}",
-    "files": [
-      "js/pay-receipts.js"
     ]
   },
   "s_5fca3183": {
@@ -7176,6 +7170,12 @@
     "source": "Funciona sin internet",
     "files": [
       "index.html"
+    ]
+  },
+  "s_6ed6dfab": {
+    "source": "Ver jornada",
+    "files": [
+      "app.html"
     ]
   },
   "s_6ede6844": {
@@ -9329,12 +9329,6 @@
       "js/game-battle.js"
     ]
   },
-  "s_8d78feda": {
-    "source": "Plan, registro y motivos de la jornada",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_8d8726c3": {
     "source": "Quitar nota",
     "files": [
@@ -10269,6 +10263,12 @@
     "source": "{{v0}} → {{v1}}",
     "files": [
       "js/pay-receipts.js"
+    ]
+  },
+  "s_9bc564bb": {
+    "source": "Metas y cálculo del ACW",
+    "files": [
+      "js/shift-work-review.js"
     ]
   },
   "s_9bf60754": {

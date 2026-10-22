@@ -487,6 +487,7 @@ export function renderReportsDashboard() {
       const text = unit === '$' ? `${money(Math.abs(val))}${financeConvertedInline(Math.abs(val))}` : `${Math.abs(val)}${unit}`;
       return ui`<div class="rpt-goal-delta ${up ? 'up' : 'down'}">${up ? '↑' : '↓'} ${text} vs ayer</div>`;
     };
+    const workDayReview = document.getElementById('workDayReviewSection');
     goalsGrid.innerHTML = ui`
       <div class="rpt-goal-card gh-goal-card" style="margin-top:0;">
         <div class="gh-goal-top"><span>Productividad</span><b>${formatMinutes(kpi.productiveMin)}/${formatMinutes(goalMin)} min</b></div>
@@ -509,6 +510,7 @@ export function renderReportsDashboard() {
         ${deltaLine(kpi.earningsDelta, '$')}
       </div>
     `;
+    if (workDayReview) goalsGrid.children[1].append(workDayReview);
   }
 
   // Gráfica de 14 días (productivo real vs meta diaria constante)

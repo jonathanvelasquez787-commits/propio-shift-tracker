@@ -2791,5 +2791,9 @@
   "s_e8d77077": "No observed measurement for the last call.",
   "s_f38e3f19": "Calculated Propio end: {{v0}}",
   "s_ff6c044a": "No observed measurement for this call.",
-  "s_16580cad": "Last call · {{v0}}"
+  "s_16580cad": "Last call · {{v0}}",
+  "s_0dcd5bb1": "Current — day {{v0}} of 14",
+  "s_5b6d7204": "Cycle: {{v3}}{{v4}}",
+  "s_6ed6dfab": "Review workday",
+  "s_9bc564bb": "Goals and ACW calculation"
 }

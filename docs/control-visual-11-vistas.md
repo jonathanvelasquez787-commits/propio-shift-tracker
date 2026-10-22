@@ -39,14 +39,14 @@ real implementado y comprobado, no a la aprobación.
   Conservar copia previa, cancelación y rechazo de datos inválidos.
 - [x] **Disponibilidad automática — aplicación web.** Próxima acción y espera claras.
   Comprobar conexión pendiente/antigua, pausa manual, horario y descansos.
-- [ ] **Ganancias.** Reabierta el 22/10: el desglose conserva un marco grande
-  con contenido concentrado en una parte. Total y conversión funcionan; falta
-  cumplir la compactación del bloque completo.
+- [x] **Ganancias.** Reabierta el 22/10 y corregida en 640: desglose día/ciclo
+  compacto en el hueco señalado, sin el marco ancho casi vacío. Total y
+  conversión conservados; evidencia compilada al final del documento.
   Comprobar moneda intercambiada, cero y estimación de una llamada activa.
 - [x] **Higher Rate.** Bono, ventana y elegibilidad claros. Mantener separadas
   la limpieza que conserva bonos y la corrección con recálculo confirmado.
-- [ ] **Proyección.** Reabierta el 22/10: la tarjeta aún alarga la fila del ciclo
-  y deja un hueco grande. Proyección y ritmo necesario diferenciados, importes
+- [x] **Proyección.** Reabierta el 22/10 y corregido el hueco en 640: el desglose
+  ocupa el espacio junto a ella. Proyección y ritmo necesario diferenciados, importes
   sin cortes y supuestos consultables; comprobar días sin registros.
 - [x] **Popup — extensión de Chrome.** Vinculación, pausa y cola comprensibles.
   Comprobar eventos pendientes/vencidos, desconexión y opciones desplegadas.
@@ -107,3 +107,13 @@ pago que conserva la reserva y ACW histórico sin contador en vivo. Capturas
 ficticios; «aprobado-popup-qa.json» al popup real con API de Chrome simulada.
 967 pruebas y build correctos. La instalación, recarga y publicación se
 registran por separado, sin inferirlas de estas comprobaciones locales.
+
+## Integración y restauración solicitadas el 22/10
+
+Entrega 640: el mismo desglose se integra en el hueco bajo Racha/meta, junto a
+Proyección; Jornada en Adherencia, plegada y conservada al actualizar Reportes;
+fecha azul a la derecha y distintivo del ciclo restaurados desde el token
+histórico. Doce recorridos compilados ES/EN, claro/oscuro y 320/390/1024/1800 px,
+con aperturas, actualización, enlace desde Inicio y comparación/registro recibido.
+Evidencia fuera de Git: integrado-640-qa.json y capturas integrado-640-*.
+Los resultados no cierran las veinte mejoras funcionales abiertas.
