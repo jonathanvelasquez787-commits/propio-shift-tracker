@@ -330,9 +330,9 @@ futura opera bajo esto, sin excepción:
   visual. Confirmar el commit público con cierre-641-production.json fuera de
   Git. Este cierre no completa las veinte mejoras funcionales del plan.
 
-- **Mejoras integrales aprobadas el 18/10:** las veinte restantes están implementadas y probadas en web 642 / extensión 2.3.5. La publicación de esta entrega todavía debe verificarse. Mantener el inventario y la evidencia en [plan](docs/plan-mejoras-integrales.md) y [cierre 642](docs/cierre-642.md). No convertir implementación o archivos instalados en recarga confirmada.
-- **Activación 2.3.5:** archivos instalados con respaldo y preferencias conservadas. Computer Use rechazó Google Chrome; no se ejecutó recarga ni se confirmó la nueva versión activa. 2.3.4 fue la última confirmación humana y sigue siendo un hecho histórico válido. No pedir otra recarga por cambios solo de web.
-- **Segundos oficiales de Propio:** confirmar con evidencia si el último minuto
+- **Mejoras integrales aprobadas el 18/10:** las veinte restantes están implementadas y probadas en web 642 / extensión 2.3.5. 75 de 79 publicadas; cuatro de extensión probadas e instaladas, pendientes de activación de Chrome. Mantener el inventario y la evidencia en [plan](docs/plan-mejoras-integrales.md) y [cierre 642](docs/cierre-642.md). No convertir implementación o archivos instalados en recarga confirmada.
+- **Activación 2.3.5:** archivos instalados con respaldo y preferencias conservadas. Computer Use rechazó Google Chrome y, tras el cambio de permisos, detuvo el control al no poder verificar su URL; no se ejecutó recarga ni se confirmó la nueva versión activa. 2.3.4 fue la última confirmación humana y sigue siendo un hecho histórico válido. No pedir otra recarga por cambios solo de web.
+- - **Segundos oficiales de Propio:** confirmar con evidencia si el último minuto
   incompleto se incluye en duración y pago. El formato de hora visible no lo demuestra.
   No cambiar ACW ni alargar llamadas por esa suposición.
   El 21/10 el propietario eligió para las nuevas estimaciones personales el umbral

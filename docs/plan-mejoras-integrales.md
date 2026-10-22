@@ -151,7 +151,7 @@ de publicar. Conservar datos y funciones; seguir después el orden de fases.
 
 ## Lista de control completa
 
-**59 de 79 mejoras publicadas; veinte probadas en preparación de la entrega 642.** Publicación pendiente hasta comprobar CI y el dominio. Extensión 2.3.5 instalada con respaldo, sin activación confirmada. [Cierre 642](cierre-642.md).
+**75 de 79 mejoras publicadas; cuatro probadas e instaladas pendientes de activación de Chrome.** Las veinte mejoras restantes están implementadas y comprobadas en la entrega 642. [Cierre 642](cierre-642.md).
 
 **Historial hasta 641 (evidencia fechada):** La preparación del
 turno usa app 624 y extensión 2.2.10, con publicación comprobada y recarga de la
@@ -231,33 +231,33 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 - [x] **50. Aviso de descanso por minutos productivos — Publicado.** Progreso hacia el aviso sin iniciar pausas automáticamente. [Alcance y validación](avisos-y-cierres-de-llamadas.md).
 - [x] **51. Mensaje de apoyo cuando llevás tiempo sin llamadas — Publicado.** Acceso comprensible al apoyo configurable desde Avisos. [Alcance y validación](avisos-y-cierres-de-llamadas.md).
 - [x] **52. Cierre breve y recuperación de una llamada difícil — Publicado.** Respuesta/cierre ágil y consulta de reflexiones guardadas. [Alcance y validación](avisos-y-cierres-de-llamadas.md).
-- [ ] **53. Activar Logros y la batalla — Probado.** Introducción dentro de Preferencias; desactivar conserva progreso y rechazar guardado revierte el interruptor. [Evidencia](logros-reglas-y-premios.md).
-- [ ] **54. Armas y práctica — Probado.** Ayuda de armas, práctica y controles móviles; jugar conserva llamadas, ganancias y XP laboral. [Evidencia](logros-reglas-y-premios.md).
-- [ ] **55. XP, niveles, misiones, rachas y récords — Probado.** XP del día, elegibilidad, componentes, tope, niveles, racha y correcciones en el detalle de Nivel. [Evidencia](logros-reglas-y-premios.md).
-- [ ] **56. Cofre de la meta diaria — Probado.** Meta pendiente, cofre disponible, reclamado y ajustado por corrección; acción e idempotencia canónicas conservadas. [Evidencia](logros-reglas-y-premios.md).
-- [ ] **57. Equipo, trofeos y bestiario — Probado.** Filtro de equipo y vista previa sin equipar ni guardar; apertura y foco conservados al actualizar. [Evidencia](logros-reglas-y-premios.md).
-- [ ] **58. Premios personales — Probado.** Editor simple y opciones avanzadas existentes; pendientes y realizados visibles juntos, pausa sin retirar lo ganado. [Evidencia](logros-reglas-y-premios.md).
-- [ ] **59. Duelo durante una pausa o fuera del turno — Probado.** Entrada y salida táctiles, pausa al volver al trabajo y reanudación explícita de la ronda sin registros laborales. [Evidencia](logros-reglas-y-premios.md).
-- [ ] **60. Premio del ciclo completado — Probado.** Intervalo del ciclo, cierre propio del premio pendiente y constancia del último reclamado; sin duplicados ni depósitos inferidos. [Evidencia](logros-reglas-y-premios.md).
-- [ ] **61. Temas, paletas e idioma — Probado.** Vista esencial reversible con bloques elegibles y contraste de las siete paletas en ambos modos. [Evidencia](presentacion-esencial-y-accesibilidad.md).
-- [ ] **62. Reloj, fecha, saludo y vista angosta — Probado.** Fecha completa, frase fija y reloj adaptados al mismo layout angosto. [Evidencia](presentacion-esencial-y-accesibilidad.md).
+- [x] **53. Activar Logros y la batalla — Publicado.** Introducción dentro de Preferencias; desactivar conserva progreso y rechazar guardado revierte el interruptor. [Evidencia](logros-reglas-y-premios.md).
+- [x] **54. Armas y práctica — Publicado.** Ayuda de armas, práctica y controles móviles; jugar conserva llamadas, ganancias y XP laboral. [Evidencia](logros-reglas-y-premios.md).
+- [x] **55. XP, niveles, misiones, rachas y récords — Publicado.** XP del día, elegibilidad, componentes, tope, niveles, racha y correcciones en el detalle de Nivel. [Evidencia](logros-reglas-y-premios.md).
+- [x] **56. Cofre de la meta diaria — Publicado.** Meta pendiente, cofre disponible, reclamado y ajustado por corrección; acción e idempotencia canónicas conservadas. [Evidencia](logros-reglas-y-premios.md).
+- [x] **57. Equipo, trofeos y bestiario — Publicado.** Filtro de equipo y vista previa sin equipar ni guardar; apertura y foco conservados al actualizar. [Evidencia](logros-reglas-y-premios.md).
+- [x] **58. Premios personales — Publicado.** Editor simple y opciones avanzadas existentes; pendientes y realizados visibles juntos, pausa sin retirar lo ganado. [Evidencia](logros-reglas-y-premios.md).
+- [x] **59. Duelo durante una pausa o fuera del turno — Publicado.** Entrada y salida táctiles, pausa al volver al trabajo y reanudación explícita de la ronda sin registros laborales. [Evidencia](logros-reglas-y-premios.md).
+- [x] **60. Premio del ciclo completado — Publicado.** Intervalo del ciclo, cierre propio del premio pendiente y constancia del último reclamado; sin duplicados ni depósitos inferidos. [Evidencia](logros-reglas-y-premios.md).
+- [x] **61. Temas, paletas e idioma — Publicado.** Vista esencial reversible con bloques elegibles y contraste de las siete paletas en ambos modos. [Evidencia](presentacion-esencial-y-accesibilidad.md).
+- [x] **62. Reloj, fecha, saludo y vista angosta — Publicado.** Fecha completa, frase fija y reloj adaptados al mismo layout angosto. [Evidencia](presentacion-esencial-y-accesibilidad.md).
 - [ ] **63. Vista original de Propio — Probado.** Preferencia y componente nativo presente, ausente, cargando o esperando Offline distinguidos en el popup. [Evidencia](compatibilidad-instalacion-y-disponibilidad.md). Extensión 2.3.5 instalada con respaldo; activación en Chrome sin confirmar por acceso denegado.
 - [ ] **64. Escritorio de trabajo al iniciar Windows — Probado.** Asistente del perfil para otras PCs, páginas y tamaños; JSON de rutas Windows e instalador con vista previa y respaldo. [Evidencia](compatibilidad-instalacion-y-disponibilidad.md). Extensión 2.3.5 instalada con respaldo; activación en Chrome sin confirmar por acceso denegado.
-- [ ] **65. Cuenta y perfil — Probado.** Google vigente, correo de solo lectura, usuario de perfil editable y separado del saludo. [Evidencia](cuenta-sincronizacion-y-recuperacion.md).
-- [ ] **66. Guardado local y sincronización — Probado.** Detalle local/nube/red/caché y reconexión; comparación por ID y payload completo resuelve el orden de consulta sin ocultar divergencias. [Evidencia](cuenta-sincronizacion-y-recuperacion.md).
+- [x] **65. Cuenta y perfil — Publicado.** Google vigente, correo de solo lectura, usuario de perfil editable y separado del saludo. [Evidencia](cuenta-sincronizacion-y-recuperacion.md).
+- [x] **66. Guardado local y sincronización — Publicado.** Detalle local/nube/red/caché y reconexión; comparación por ID y payload completo resuelve el orden de consulta sin ocultar divergencias. [Evidencia](cuenta-sincronizacion-y-recuperacion.md).
 - [x] **67. Respaldo completo JSON — Publicado.** Comparación actual/respaldo, copia privada previa, recuperación explícita y protección de cuenta/revisión/cuota. [Alcance y pruebas](recuperacion-actividades-y-respaldos.md).
 - [x] **68. Reportes CSV y PDF — Publicado.** Explicar período/datos incluidos y diferencia con respaldo. [Alcance y límites](reportes-calendario-y-exportaciones.md).
 - [x] **69. Reinicios y borrados — Publicado.** Alcance específico del día/total, copia previa y recuperación consultable; rechazo conserva los datos. [Alcance y pruebas](recuperacion-actividades-y-respaldos.md).
-- [ ] **70. App instalable y recuperación — Probado.** Estado de caché, copia propia, sesión y límites; reapertura offline y posterior sincronización comprobadas con worker real aislado. [Evidencia](cuenta-sincronizacion-y-recuperacion.md).
+- [x] **70. App instalable y recuperación — Publicado.** Estado de caché, copia propia, sesión y límites; reapertura offline y posterior sincronización comprobadas con worker real aislado. [Evidencia](cuenta-sincronizacion-y-recuperacion.md).
 - [x] **71. Estado de conexión y actividad de la extensión — Publicado.** Diagnóstico inicial: qué pasa, qué sigue funcionando y qué hacer. [Evidencia](disponibilidad-en-inicio.md).
-- [ ] **72. Borrar la cuenta — Probado.** Exportación JSON antes de borrar, activos/copias/retención claros y revalidación de propietario antes del POST; cancelación sin borrado real. [Evidencia](cuenta-sincronizacion-y-recuperacion.md).
+- [x] **72. Borrar la cuenta — Publicado.** Exportación JSON antes de borrar, activos/copias/retención claros y revalidación de propietario antes del POST; cancelación sin borrado real. [Evidencia](cuenta-sincronizacion-y-recuperacion.md).
 - [x] **73. Guías y apoyo voluntario — Publicado.** Actualizar guía y README retirando descripciones desactualizadas. [Evidencia](guia-practica-tool-y-extension.md) y [README](../extension/propio-bridge/README.md).
 - [ ] **74. Funcionamiento con otra pestaña al frente — Probado.** Lecturas recientes y permiso exclusivo antes de automatizar; retorno de suspensión exige nueva confirmación y conserva registro. [Evidencia](compatibilidad-instalacion-y-disponibilidad.md). Extensión 2.3.5 instalada con respaldo; activación en Chrome sin confirmar por acceso denegado.
 - [x] **75. Volumen general y sonidos propios — Publicado.** Explicar volumen cero, avisos escritos y espacio de archivos. [Alcance y validación](avisos-y-cierres-de-llamadas.md).
 - [x] **76. Planificador de Finanzas hacia la meta diaria — Publicado.** Desglosar cálculo y mostrar meta propuesta antes de guardar. [Alcance y validación](finanzas-reservas-y-recepciones.md).
 - [x] **77. Filtros de llamadas y acciones — Publicado.** Búsqueda Customer ID y filtros de procedencia del día activo, sin cambiar totales ni registros. [Alcance](revision-llamadas-e-importaciones.md).
-- [ ] **78. Barra de actividad en vivo — Probado.** Barra y tarjeta comparten estado y duración congelada de la llamada pendiente; mismo editor, sin duplicación. [Evidencia](presentacion-esencial-y-accesibilidad.md).
-- [ ] **79. Accesibilidad — Probado.** Teclado, foco/restauración, salto al contenido, ayudas táctiles/Escape, reflow y movimiento reducido comprobados; límites de lector humano explícitos. [Evidencia](presentacion-esencial-y-accesibilidad.md).
+- [x] **78. Barra de actividad en vivo — Publicado.** Barra y tarjeta comparten estado y duración congelada de la llamada pendiente; mismo editor, sin duplicación. [Evidencia](presentacion-esencial-y-accesibilidad.md).
+- [x] **79. Accesibilidad — Publicado.** Teclado, foco/restauración, salto al contenido, ayudas táctiles/Escape, reflow y movimiento reducido comprobados; límites de lector humano explícitos. [Evidencia](presentacion-esencial-y-accesibilidad.md).
 
 ## Entregas verificadas
 
@@ -352,15 +352,15 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 8. **Avisos y acompañamiento — publicada (web 634, PR #96).** Resumen de alarmas, sonido/volumen y
    archivos, progreso hacia descanso, acceso a apoyo, reflexión fácil y consulta.
    Cubre 48–52 y 75. Mantener elecciones y carácter voluntario.
-9. **Logros — probada (web 642).** Introducción, reglas y estados de premios/cofres,
+9. **Logros — publicada (web 642).** Introducción, reglas y estados de premios/cofres,
    organización de equipo, creación de premios y entrada/salida del duelo.
    Cubre 53–60. Armas/práctica mantienen alcance; no crear productividad ficticia.
-10. **Presentación esencial y accesibilidad — probada (web 642).** Bloques prioritarios
+10. **Presentación esencial y accesibilidad — publicada (web 642).** Bloques prioritarios
     configurables; paletas, zoom, foco, teclado, ayudas táctiles, lector y
     movimiento reducido; reloj/frase, consistencia de actividad viva. Cubre
     61–62, 78–79. Rediseños puramente visuales requieren su mockup aprobado según
     instrucciones.md; funcionalidades ya aprobadas conservan sus excepciones.
-11. **Cuenta, sincronización y documentación — probada (web 642).** Textos de campos
+11. **Cuenta, sincronización y documentación — publicada (web 642).** Textos de campos
     editables, detalle de confirmación local/nube y conflictos, recuperación PWA,
     borrado de cuenta y ayuda actualizadas. Cubre 65–66, 70, 72–73. Mantener Google
     como entrada pública y configuración de Auth/SMTP vigente.

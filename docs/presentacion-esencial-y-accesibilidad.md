@@ -21,4 +21,11 @@ Comprobados durante implementación: 22 casos de presentación/recuperación, si
 
 ## Límites
 
+La integración final comprobó además 96 combinaciones ES/EN, claro/oscuro,
+ocho paletas y 320/640/1280 px con configuración esencial reversible,
+teclado dentro del selector, fecha/frase completas, ayudas cerradas con Escape
+tras estabilizar su transición y modales por encima del menú. Los ocho
+recorridos de llamada pendiente se conservaron. Evidencia fuera de Git:
+`phase10-browser-qa.json` y `phase10-pending-qa.json`.
+
 Los cálculos de contraste son evidencia sobre tokens y superficies concretas; no certifican cada combinación de transparencia, imagen o estado de todos los componentes. Las pruebas de foco ejecutan las funciones reales con elementos controlados; una simulación no sustituye una sesión humana con lector de pantalla, monitor físico, lupa del sistema o pantalla táctil. Ninguno de estos cambios certifica reglas de pago de Propio, crea llamadas o altera ganancias.
