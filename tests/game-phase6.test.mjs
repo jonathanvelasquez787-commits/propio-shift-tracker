@@ -102,7 +102,6 @@ test('Logros simplifica ajustes, comparte activación lateral y admite nombre pe
   assert.equal(sanitize({ name: 'no' }), '');
   assert.doesNotMatch(game, /intensity === 'off'\) settings\.game\.enabled = false/);
   assert.match(game, /config\.monsterName = name/);
-  assert.match(game, /saveSettingsOnly\(\);[\s\S]*renderGame\(\);/);
   assert.match(game, /monsterNameInput'\)\?\.addEventListener\('input'/);
   assert.match(game, /lastSettingsMonsterName !== savedMonsterName/);
   assert.match(game, /monsterName && !monsterNameDraftDirty && document\.activeElement !== monsterName/);
@@ -873,7 +872,7 @@ test('cuarta simulación mensual: llamadas antes o después del checkpoint cuent
 
 test('cuarta simulación mensual: descartar live también revierte efectos de gamificación del auto-turno', () => {
   const appMain = read('js/app-main.js');
-  assert.match(appMain, /const gameBeforeAutoShift = needsAutoShift[\s\S]*gameBeforeAutoShift,[\s\S]*if \(needsAutoShift\) onGameShiftStarted\(\{ continued: false \}\)/);
+  assert.match(appMain, /const gameBeforeAutoShift = needsAutoShift[\s\S]*gameBeforeAutoShift,[\s\S]*if \(needsAutoShift\) onGameShiftStarted\(\{ continued: false, captureState:/);
   assert.match(appMain, /discarded\.gameBeforeAutoShift/);
 });
 

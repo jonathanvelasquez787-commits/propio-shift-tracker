@@ -39,7 +39,7 @@ export function compareCallRecords(call) {
 
 export function acwCallRecord(calls, startedAt) {
   const time = Date.parse(startedAt);
-  return calls.find(call => Date.parse(call.records?.propio?.endISO || call.endISO) === time) || null;
+  return calls.find(call => Date.parse(call.endISO || call.records?.propio?.endISO) === time) || null;
 }
 
 export function latestCompletedCall(calls, nowMs = Date.now()) {

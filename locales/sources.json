@@ -1714,6 +1714,7 @@
   "s_188da0a2": {
     "source": "La actividad cambió. Revisá de nuevo antes de descartarla.",
     "files": [
+      "js/calls.js",
       "js/work-actions.js"
     ]
   },
@@ -2767,6 +2768,13 @@
     "source": "Siguiente",
     "files": [
       "app.html"
+    ]
+  },
+  "s_28c5f735": {
+    "source": "No se puede guardar: coincide con la llamada en curso.",
+    "files": [
+      "js/call-recovery.js",
+      "js/calls.js"
     ]
   },
   "s_28f6abb1": {
@@ -4032,6 +4040,12 @@
     "source": "en llamada dentro de ventana",
     "files": [
       "js/detail-views.js"
+    ]
+  },
+  "s_3b391913": {
+    "source": "Final corregido",
+    "files": [
+      "js/call-records-view.js"
     ]
   },
   "s_3b3bc4d2": {
@@ -6046,6 +6060,12 @@
     "source": "(Break o Lunch),",
     "files": [
       "app.html"
+    ]
+  },
+  "s_591b802c": {
+    "source": "Tu corrección guardada se usa en el registro. Las fuentes originales se conservan como respaldo.",
+    "files": [
+      "js/call-records-view.js"
     ]
   },
   "s_59415956": {
@@ -10824,6 +10844,7 @@
   "s_a113743d": {
     "source": "Los datos cambiaron. Abrí de nuevo esta acción antes de confirmar.",
     "files": [
+      "js/app-main.js",
       "js/backup-recovery.js"
     ]
   },
@@ -10881,6 +10902,12 @@
     "source": "en curso",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_a169ba28": {
+    "source": "Futuro",
+    "files": [
+      "js/weekly-summary.js"
     ]
   },
   "s_a16d97a9": {
@@ -14862,6 +14889,12 @@
       "privacidad.html"
     ]
   },
+  "s_dd3da577": {
+    "source": "El ACW sigue tu corrección guardada",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_dd5b2b85": {
     "source": "Descartar Break",
     "files": [
@@ -16489,6 +16522,7 @@
   "s_f3e66bd1": {
     "source": "No se guardó el descarte. Tu actividad anterior se conservó.",
     "files": [
+      "js/calls.js",
       "js/work-actions.js"
     ]
   },

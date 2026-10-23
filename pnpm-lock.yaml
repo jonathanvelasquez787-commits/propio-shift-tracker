@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  '@vercel/cli-config>zod': 4.6.6
+
 importers:
 
   .:
@@ -649,8 +652,8 @@ packages:
     engines: {node: '>= 14.6'}
     hasBin: true
 
-  zod@4.1.11:
-    resolution: {integrity: sha512-WPsqwxITS2tzx1bzhIKsEs19ABD5vmCVa4xBo2tq/SrV4RNZtfws1EnCWQXM6yh8bD08a1idvkB5MZSBiZsjwg==}
+  zod@4.6.6:
+    resolution: {integrity: sha512-4UmzQUF5fxvfcYHlbjBmejU+w+hbDnWFx4aS8kBx7nPBHcO2SqPbpAG8snbdg+Xse4pRefR98hgjFgIMCI/UhA==}
 
 snapshots:
 
@@ -758,7 +761,7 @@ snapshots:
   '@vercel/cli-config@0.3.1':
     dependencies:
       xdg-app-paths: 5.5.1
-      zod: 4.1.11
+      zod: 4.6.6
 
   '@vercel/cli-exec@1.0.1':
     dependencies:
@@ -1231,4 +1234,4 @@ snapshots:
 
   yaml@2.9.0: {}
 
-  zod@4.1.11: {}
+  zod@4.6.6: {}

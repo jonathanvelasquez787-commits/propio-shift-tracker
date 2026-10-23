@@ -8,6 +8,7 @@ import { ACCESSORY_CATALOG, configureGameContext, createDefaultGameState, normal
   onGamePauseEnded, onGamePauseStarted, onGameDayRollover, chooseCycleReward, renderGame, setGameEnabled } from '../js/game.js';
 import { configurePositiveReinforcementContext } from '../js/positive-reinforcement.js';
 import { withSilentCallFeedback } from '../js/call-feedback.js';
+import { restoreAutomaticGameChanges } from '../js/work-actions.js';
 
 test('discreet automatic feedback preserves identical XP, milestone and surprise reward receipts', () => {
   const snapshots = [];
@@ -98,6 +99,26 @@ test('achievement activation rolls back a rejected preference and preserves earn
     assert.deepEqual(f.current.game, before);
     assert.deepEqual(f.rows, []);
   } finally { f.dispose(); }
+});
+
+test('automatic-start capture restores the closed day without erasing a later import of an earlier call', () => {
+  const f=fixture();
+  try {
+    f.add(1,1);onGameShiftEnded(f.key);
+    const before=structuredClone(f.current.game);let started;
+    onGameShiftStarted({captureState:value=>{started=value;}});
+    assert.equal(started.days[f.key].finalized,undefined);
+    const historical={id:'later-historical',shiftDayKey:f.key,callDate:f.key,startISO:new Date(Date.now()-20*60000).toISOString(),
+      endISO:new Date(Date.now()-15*60000).toISOString(),importedAt:new Date().toISOString(),durationMin:5,pay:2,billable:'Yes',dropped:'No',countsAsProductive:true};
+    f.rows.push(historical);onGameCallSaved(historical,'import');onGameCallsChanged(historical.callDate);
+    const laterLedger=Object.fromEntries(Object.entries(f.current.game.ledger).filter(([key])=>!Object.hasOwn(started.ledger,key)));
+    assert.ok(Object.keys(laterLedger).length>0);
+    f.current.game=restoreAutomaticGameChanges(f.current.game,before,started);
+    onGameCallsChanged(f.key);onGameDayMetadataChanged(f.key);
+    assert.equal(f.current.game.days[f.key].finalized,true);
+    assert.equal(f.current.game.days[f.key].earnings,3);assert.equal(f.current.game.days[f.key].callCount,2);
+    for(const [key,value]of Object.entries(laterLedger))assert.deepEqual(f.current.game.ledger[key],value);
+  } finally {f.dispose();}
 });
 
 test('resetting one day removes its reinforcement receipts and rewards while preserving other days and preferences', () => {

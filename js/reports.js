@@ -420,8 +420,15 @@ export function reportDayAssessment({isOff,hasShift,callCount,productiveMin,goal
 }
 
 function updateStreakSkipOffSetting(checked) {
+  const owner = settings, previous = settings.streakSkipOffDays, hadPrevious = Object.hasOwn(settings, 'streakSkipOffDays');
   settings.streakSkipOffDays = !!checked;
-  saveSettingsOnly();
+  if (saveSettingsOnly() === false) {
+    if (settings === owner) {
+      if (hadPrevious) owner.streakSkipOffDays = previous;
+      else delete owner.streakSkipOffDays;
+    }
+    render(); return false;
+  }
   onGameDayMetadataChanged(todayCallDateKey());
   render();
 }
@@ -659,8 +666,8 @@ export function renderReportsDashboard() {
     const t = reportsTrends();
     const bd = reportsWeekBillableDropped(0);
     trendRow.innerHTML = [
-      trendChipHtml('Productividad', t.productivePct),
-      trendChipHtml('Adherencia', t.adherencePct),
+      trendChipHtml(translateText('Productividad'), t.productivePct),
+      trendChipHtml(translateText('Adherencia'), t.adherencePct),
       trendChipHtml(translateText('Ganancias'), t.earningsPct),
       trendChipHtml(translateText('Llamadas'), t.callsPct),
       trendChipHtml('ACW', t.acwPct, { invertGood: true }),

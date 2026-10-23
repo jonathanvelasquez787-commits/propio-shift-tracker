@@ -66,6 +66,19 @@ test('live backup preview and save retain exact seconds below the rounding thres
   assert.equal(callPayMinutes(calls[0]), 7);
 });
 
+test('a refresh before the live candidate is built preserves exact observation and bridge identity on recovery', t => {
+  const x = harness(t), base = at(1, '08:00').getTime();
+  const startedAtISO = new Date(base + 39123).toISOString(), endedAtISO = new Date(base + 500357).toISOString();
+  state.pendingLiveCallBackup = { startedAtISO, endedAtISO, candidate: null,
+    liveContext: { propioBridge: { callId: 'interrupted-before-candidate-123', payEstimated: true, timingEstimated: true } } };
+  assert.equal(restorePendingLiveCallBackup(), true); saveManualCall();
+  assert.equal(calls.length, 1); assert.equal(calls[0].startISO, startedAtISO); assert.equal(calls[0].endISO, endedAtISO);
+  assert.equal(calls[0].durationMin, 461234 / 60000); assert.equal(calls[0].source, 'live');
+  assert.equal(calls[0].id, 'propio_interrupted-before-candidate-123');
+  assert.equal(calls[0].records.tool.durationMs, 461234); assert.equal(calls[0].records.tool.callId, 'interrupted-before-candidate-123');
+  x.reload(); assert.equal(calls[0].endISO, endedAtISO); assert.equal(calls[0].records.tool.durationMs, 461234);
+});
+
 test('observed 7:41 survives official reconciliation, correction and reload without double counting', t => {
   const x=harness(t),start=at(1,'08:00').getTime();
   const iso=seconds=>new Date(start+seconds*1000).toISOString();
@@ -230,6 +243,23 @@ function harness(t) {
     },
   };
 }
+
+for (const activity of ['active', 'pending']) test(`imports preserve ${activity} call time and admit an adjacent earlier call`, t => {
+  const x = harness(t); x.advance(at(1, '10:00'));
+  const start = at(1, '09:00').toISOString();
+  if (activity === 'active') state.activeCall = { startedAt: start };
+  else state.pendingLiveCallBackup = { startedAtISO: start, endedAtISO: at(1, '09:10').toISOString(), candidate: null };
+  const before = JSON.stringify(state), raw = 'overlap\t09/01/2025\t08:55 AM\t10\tYes\tNo\t$1.20';
+  assert.equal(x.h.importCalls(raw), false);
+  assert.equal(JSON.stringify(state), before); assert.equal(calls.length, 0); assert.equal(x.saves(), 0);
+  x.import([['adjacent', '09/01/2025', '08:50 AM', '10', 'Yes', 'No', '$1.20'],
+    ['overlap', '09/01/2025', '08:55 AM', '10', 'Yes', 'No', '$1.20']]);
+  assert.equal(calls.length, 1); assert.equal(calls[0].customerId, 'adjacent');
+  assert.equal(calls[0].endISO, start);
+  assert.equal(activity === 'active' ? state.activeCall.startedAt : state.pendingLiveCallBackup.startedAtISO, start);
+  x.reload(); assert.equal(calls.length, 1);
+  assert.equal(activity === 'active' ? state.activeCall.startedAt : state.pendingLiveCallBackup.startedAtISO, start);
+});
 
 test('a rejected manual call save does not announce success or award its reward', async t => {
   const x=harness(t);x.advance(at(2,'19:00'));x.rejectSave();

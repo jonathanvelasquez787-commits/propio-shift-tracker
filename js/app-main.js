@@ -10,6 +10,7 @@ import { createPropioReceiver, createStorageRevisionGuard, ignorePropioCall } fr
 import { portalRecordsText } from './propio-history-records.js';
 import { callFeedbackSilenced, withSilentCallFeedback } from './call-feedback.js';
 import { preserveCallRecords, compareCallRecords, acwCallRecord, latestCompletedCall } from './call-records.js';
+import { restoreAutomaticGameChanges } from './work-actions.js';
 import { settingsWithinBudget, reportLocalPersistenceFailure, readMeta, jsonbBytes, preserveRecoveryCopy, listRecoveryCopies } from './sync.js';
 // Boot importa este módulo solo después de verificar la sesión e hidratar sus datos.
 
@@ -1491,13 +1492,13 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
 
       const now = new Date();
       const candidates = [bounds.start.getTime()];
-      callsForDay(dayKey).forEach(c => candidates.push(new Date(c.records?.propio?.endISO || c.endISO).getTime()));
+      callsForDay(dayKey).forEach(c => candidates.push(new Date(c.endISO || c.records?.propio?.endISO).getTime()));
       dayPauseIntervals(dayKey).forEach(p => candidates.push(p.end.getTime()));
       // Sin este candidato, colgar una llamada no se reflejaba aquí hasta confirmarla en el modal
       // de guardado.
       if (state.lastCallEndedAt) {
-        const record = calls.find(call => call.endISO === state.lastCallEndedAt || call.records?.tool?.endISO === state.lastCallEndedAt);
-        candidates.push(new Date(record?.records?.propio?.endISO || state.lastCallEndedAt).getTime());
+        const record = calls.find(call => call.endISO === state.lastCallEndedAt || call.records?.tool?.endISO === state.lastCallEndedAt || call.records?.propio?.endISO === state.lastCallEndedAt);
+        candidates.push(new Date(record?.endISO || state.lastCallEndedAt).getTime());
       }
       const valid = candidates.filter(t => Number.isFinite(t) && t <= now.getTime());
       if (!valid.length) return null;
@@ -4222,15 +4223,13 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
         previousShiftStartedAt,
         previousShiftEndedAt,
         interruptedPauseRollback,
-        // onGameShiftStarted puede reabrir STAGE CLEAR, abrir un cofre o tocar ledger/XP.
-        // Si esta llamada resulta accidental y se descarta, se restaura exactamente el estado de
-        // juego anterior junto con el turno automático.
+        // Las dos capturas permiten revertir solo los efectos del inicio automático.
         gameBeforeAutoShift,
         ...(options.propioBridge ? { propioBridge: { ...options.propioBridge } } : {}),
       };
       if (saveAll() === false) { setAppState(before); render(); return false; }
       interruptedPauseRollback?.finish?.();
-      if (needsAutoShift) onGameShiftStarted({ continued: false });
+      if (needsAutoShift) onGameShiftStarted({ continued: false, captureState: game => { state.activeCall.gameAfterAutoShift = game; } });
       toast(needsAutoShift ? translateText('Llamada iniciada · turno abierto automáticamente') : translateText('Llamada iniciada'));
       return true;
     }
@@ -4288,10 +4287,15 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
           }
           state.shiftStartedAt = discarded.previousShiftStartedAt || null;
           state.shiftEndedAt = discarded.previousShiftEndedAt || null;
-          if (discarded.gameBeforeAutoShift) state.game = discarded.gameBeforeAutoShift;
+          if (discarded.gameBeforeAutoShift) state.game = restoreAutomaticGameChanges(state.game, discarded.gameBeforeAutoShift, discarded.gameAfterAutoShift);
         }
 
       }, discarded => {
+        if (discarded?.autoStartedShift) {
+          const day = todayCallDateKey(new Date(discarded.startedAt));
+          onGameCallsChanged(day);
+          onGameDayMetadataChanged(day);
+        }
         toast(discarded?.autoStartedShift ? translateText('Llamada descartada · turno automático revertido') : translateText('Llamada descartada'));
       });
     }
@@ -4693,6 +4697,15 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       };
 
       for (const c of deduped) {
+        const pending = state.pendingLiveCallBackup;
+        const ongoing = state.activeCall ? { startISO: state.activeCall.startedAt, endISO: importTs }
+          : pending ? { startISO: pending.startedAtISO, endISO: pending.endedAtISO } : null;
+        if (ongoing && callsOverlap(ongoing, c)) {
+          overlapSkipped++;
+          skippedOverlaps.push({ ...c, withCustomerId: pending?.candidate?.customerId || translateText('En llamada'),
+            withCallStart: timeLabelFromDate(new Date(ongoing.startISO)) });
+          continue;
+        }
         const overlaps = overlapCheckSet.filter(existingCall => callsOverlap(existingCall, c));
         const exactOfficialCalls = exactOfficialCallsFor(overlapCheckSet, c);
         const unrelatedOverlap = exactOfficialCalls.length && overlaps.find(call => !exactOfficialCalls.includes(call));
@@ -5148,7 +5161,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       formatMinutes, gapLabelText, getActiveDayKey, higherRateBonusForCall, higherRateTierBadgeHtml,
       iconHtml, importedCallStats, isoDateFromDayKey, makeLocalId, money, onGameCallSaved, onGameCallsChanged, openModal,
       pad, parseMoney, rateTilePerMin, renderRateTiles, sameCallDay, saveAll, timeLabelFromDate,
-      toDateFromInputs, toast, todayCallDateKey, playCallSavedSound, canPersistLocalChanges, render,
+      toDateFromInputs, toast, todayCallDateKey, playCallSavedSound, canPersistLocalChanges, render, onGameDayMetadataChanged,
       stateWithinBudget: value => jsonbBytes(value) <= 2097152,
     });
     configureHigherRateContext({
@@ -5747,7 +5760,7 @@ function renderHeader() {
       const todayCalls = callsForDay(todayCallDateKey());
       const record = acwCallRecord(todayCalls, acwStart.toISOString());
       const comparison = compareCallRecords(record);
-      const source = comparison.propio ? translateText('Según Propio') : comparison.tool ? translateText('Según tu registro') : translateText('Turno / pausa');
+      const source = record?.manualCorrectionAt ? translateText('Según tu registro') : comparison.propio ? translateText('Según Propio') : comparison.tool ? translateText('Según tu registro') : translateText('Turno / pausa');
       document.getElementById('acwRecordSource').textContent = source;
       const difference = document.getElementById('acwRecordDifference');
       difference.hidden = comparison.differenceMs === null || Math.abs(comparison.differenceMs) < 1000;
@@ -7151,18 +7164,36 @@ export function render() {
     document.getElementById('scheduleWeekTodayBtn').addEventListener('click', () => navigateScheduleWeek(0));
     document.getElementById('scheduleWeekCustomInput').addEventListener('change', (e) => {
       if (scheduleWeekIsPast(scheduleWeekOffset)) { e.target.checked = scheduleWeekHasCustom(scheduleWeekOffset); return; }
+      const ownerSettings = settings, ownerState = state, offset = scheduleWeekOffset, mode = scheduleViewMode;
+      const signature = () => JSON.stringify([settings.weeklySchedule, settings.scheduleOverridesByWeek]);
+      const expected = signature();
+      const apply = enabled => {
+        if (settings !== ownerSettings || state !== ownerState || scheduleWeekOffset !== offset || scheduleViewMode !== mode
+          || signature() !== expected || scheduleWeekIsPast(offset) || !canPersistLocalChanges()) {
+          toast(translateText('Los datos cambiaron. Abrí de nuevo esta acción antes de confirmar.'));
+          syncShiftModalFields(); return false;
+        }
+        const previousSettings = JSON.parse(JSON.stringify(settings)), previousState = JSON.parse(JSON.stringify(state));
+        if (enabled) ensureScheduleWeekOverride(offset); else removeScheduleWeekOverride(offset);
+        if (saveAll({render:false}) === false) {
+          for (const [current, owner, previous] of [[settings, ownerSettings, previousSettings], [state, ownerState, previousState]]) {
+            if (current !== owner) continue;
+            Object.keys(owner).forEach(key => delete owner[key]);
+            Object.assign(owner, previous);
+          }
+          render(); syncShiftModalFields(); return false;
+        }
+        onGameDayMetadataChanged(todayCallDateKey());
+        render(); syncShiftModalFields();
+        return true;
+      };
       if (e.target.checked) {
-        ensureScheduleWeekOverride(scheduleWeekOffset);
-        if (saveSettingsOnly() === false) return false;
+        if (!apply(true)) return false;
         toast(translateText('Semana personalizada — arrancó como copia de tu plantilla, ajústala y guarda cada día que cambie.'));
-        syncShiftModalFields();
       } else {
         e.target.checked = true;
         appConfirm(translateText('¿Quitar la personalización de esta semana y volver a usar la plantilla? El horario propio de esta semana se borra — no afecta la plantilla ni otras semanas.'), () => {
-          removeScheduleWeekOverride(scheduleWeekOffset);
-          onGameDayMetadataChanged(todayCallDateKey());
-          if (saveAll() === false) return false;
-          syncShiftModalFields();
+          return apply(false);
         });
       }
     });
@@ -7893,7 +7924,7 @@ export function getPropioBridgePlan() {
   return { startAt: start.toISOString(), endAt: end.toISOString(),
     scheduledPauses,
     acw: acwStart ? { startedAt: acwStart.toISOString(), observedAt: day.toISOString() } : null,
-    lastCallEndedAt: [state.lastCallEndedAt, ...calls.map(call => call.records?.propio?.endISO || call.endISO)]
+    lastCallEndedAt: [state.lastCallEndedAt, ...calls.map(call => call.endISO || call.records?.propio?.endISO)]
       .filter(value => Date.parse(value) >= since && Date.parse(value) <= Math.min(day.getTime(), end.getTime()))
       .sort((a, b) => Date.parse(b) - Date.parse(a))[0] || null,
     hasCall: Boolean(state.activeCall) || calls.some(call => Date.parse(call.startISO) >= since && Date.parse(call.startISO) < end.getTime()),

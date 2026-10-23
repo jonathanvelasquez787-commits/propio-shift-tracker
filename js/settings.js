@@ -314,10 +314,19 @@ let syncingGoals = false;
     export function finishOnboarding() {
       const nameInput = document.getElementById('onboardingNameInput');
       const emojiInput = document.getElementById('onboardingEmojiInput');
+      const owner = settings, previous = { ...settings };
       settings.userName = String(nameInput?.value || '').trim().slice(0, 40);
       settings.userEmoji = String(emojiInput?.value || '').trim().slice(0, 8);
       settings.onboarded = true;
-      if (saveSettingsOnly() === false) return false;
+      if (saveSettingsOnly() === false) {
+        if (settings === owner) {
+          for (const key of ['userName', 'userEmoji', 'onboarded']) {
+            if (Object.hasOwn(previous, key)) owner[key] = previous[key];
+            else delete owner[key];
+          }
+        }
+        return false;
+      }
       closeModal('onboardingModal');
       render();
     }

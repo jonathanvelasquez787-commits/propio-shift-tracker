@@ -456,6 +456,8 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
+- Web 644 cierra la auditoría profunda explícita del 23/10: diez grupos funcionales reparados y Zod indirecto actualizado a 4.6.6. Rechazos de guardado, semanas personalizadas, llamadas activas/pendientes, precisión recuperada, ACW corregido, premios intercalados e idioma. Mes interactivo ficticio de 32 días: 84 llamadas, 476 minutos, $57.12 y 56 pausas; escenarios reparados repetidos sobre 644. Informe y límites en docs/auditoria-profunda-2026-10-23.md. Extensión 2.3.5 activa confirmada, sin cambios de instalación.
+
 - Web 643 corrige dos inconsistencias del tiempo Usado de los bloques halladas en un recorrido de uso normal: no resta pausas posteriores a la actividad contabilizada ni suma huecos sin conexión. Comparte ACW clasificado con su resumen. 1.002 pruebas y recorrido con cuenta ficticia; ver docs/prueba-usuario-2026-10-22.md. La extensión 2.3.5 activa confirmada y el cierre 79/79 se conservan. No requiere recarga de extensión.
 
 - Base histórica App 641: guías y galería de esa entrega, lenguaje claro en popup/organizador y
@@ -496,6 +498,12 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v644 — Auditoría profunda: integridad de guardado, llamadas y estado combinado.**
+
+- Guardados rechazados revierten bienvenida, racha, preferencias de Logros y semanas personalizadas; las confirmaciones obsoletas no se aplican.
+- Respaldo pendiente conserva milisegundos e identidad tras recarga; descartar revierte de forma segura y conserva premios posteriores. Manuales/ediciones/imports protegen llamadas en curso. ACW y duración vigente siguen la corrección sin borrar evidencia original.
+- Estado futuro y tendencias traducidos; Zod indirecto 4.6.6 elimina una alerta alta. Mes ficticio y regresiones, CI/publicación y límites documentados en docs/auditoria-profunda-2026-10-23.md.
+
 **v643 — Trabajo usado coherente al tomar pausas e importar llamadas.**
 
 - Las pausas fuera del tramo de actividad no borran trabajo ya contado; las pausas superpuestas se descuentan una sola vez y conservan las llamadas. Usado comparte el ACW clasificado y conectado del bloque.
@@ -510,15 +518,3 @@ futura opera bajo esto, sin excepción:
 - Flechas plegables con caja cuadrada y margen de pintura: sin desborde móvil.
   969 pruebas, ocho recorridos y capturas nativas, ambos temas, galería sin
   enlaces de imagen rotos. Instalación y recarga de Chrome se registran aparte.
-
-**v640 — Integración solicitada en Reportes y restauración de Fechas de pago.**
-
-- Desglose día/ciclo compacto en el espacio bajo las dos tarjetas izquierdas,
-  junto a Proyección. Mismos datos, importes y conversiones; se apila en móvil.
-- «Ver jornada» dentro de Adherencia conserva el nodo al actualizar Reportes,
-  su apertura y listeners. Se retira el marco independiente de ancho completo.
-- Fecha de pago a la derecha con el token azul histórico y etiqueta del ciclo
-  actual. No se deduce una recepción por el paso de la fecha; comparar/registrar
-  recibido permanece disponible. Ajuste de flecha plegable en móvil.
-- Capturas y comprobaciones fuera de Git; extensión sin cambios. Los veinte
-  puntos funcionales abiertos no se cierran por esta corrección visual.

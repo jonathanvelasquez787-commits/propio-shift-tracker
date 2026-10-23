@@ -32,7 +32,7 @@ export function renderWeekSummary({ settings, weekViewOffset, weekSummaryForOffs
     if (r.isOff) {
       badgeText = translateText('Libre'); badgeTone = 'neutral'; iconName = 'calendar'; iconTone = 'neutral';
     } else if (r.isFuture) {
-      badgeText = 'Futuro'; badgeTone = 'neutral'; iconName = 'calendar'; iconTone = 'neutral';
+      badgeText = translateText('Futuro'); badgeTone = 'neutral'; iconName = 'calendar'; iconTone = 'neutral';
     } else if (!r.hasShift && !r.calls) {
       badgeText = translateText('Sin datos'); badgeTone = 'bad'; iconName = 'alertTriangle'; iconTone = 'bad';
     } else {

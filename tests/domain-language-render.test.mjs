@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import { parse } from 'acorn';
-import { ui, translateText, translateMarkup, setLanguage } from '../js/i18n.js';
+import { ui, translateText, translateMarkup, setLanguage, displayLocale } from '../js/i18n.js';
 import { parse as parseHtml } from 'parse5';
 import { acwMinutesForBlock } from '../js/block-acw.js';
 
@@ -261,4 +261,49 @@ test('paste-call placeholder localizes help while preserving original Propio sam
   assert.match(input.placeholder, /^Paste your Propio data here\.\.\.\n\nExample:\n/);
   assert.equal(input.placeholder.split('Example:\n')[1], original.split('Ejemplo:\n')[1]);
   assert.equal(input.value, before);
+});
+
+test('weekly future badges render in the current language without changing notes or future amounts', t => {
+  t.after(() => setLanguage('es'));
+  const elements = Object.fromEntries(['weekSummaryWrap', 'weekSummarySubtitle', 'weekSummaryTip'].map(id => [id, { innerHTML: '', textContent: '' }]));
+  const summary = { weekStart: 0, weekEnd: 7, days: [{ dayKey: 'future', isFuture: true, calls: 0, hasShift: false,
+    earnings: 999, productive: 0, adherencePct: null, note: { category: 'personal', comment: 'Mi nota personal' } }],
+    totals: { calls: 0, earnings: 0, productive: 0, avgAdherence: null } };
+  const before = JSON.stringify(summary);
+  const h = vm.createContext({ ui, translateText, displayLocale, document: { getElementById: id => elements[id] || null } });
+  vm.runInContext(declarations('../js/weekly-summary.js', ['renderWeekSummary']), h);
+  const context = { settings: {}, weekViewOffset: 1, weekSummaryForOffset: () => summary,
+    formatWeekRangeLabel: () => '0–7', cycleWeekNumberForWeekStart: () => 1, callDateToDate: () => at(29, 0),
+    weekdayKeyForDayKey: () => 'mon', WEEKDAY_LABELS: { mon: 'Monday' }, dayNoteCategoryMeta: () => ({ label: 'Personal', tagClass: 'neutral' }),
+    escapeHtml: String, money: value => `$${value}`, financeConvertedNote: () => '', formatDuration: String, iconHtml: () => '', convertedAmountText: () => '' };
+  for (const language of ['es', 'en']) {
+    setLanguage(language); h.renderWeekSummary(context);
+    const html = elements.weekSummaryWrap.innerHTML;
+    assert.ok(html.includes(`>${language === 'en' ? 'Future' : 'Futuro'}</button>`), `future status must use the ${language} catalog`);
+    assert.ok(html.includes('Mi nota personal')); assert.ok(!html.includes('$999'));
+    if (language === 'en') assert.ok(!html.includes('Futuro'));
+    assert.equal(JSON.stringify(summary), before);
+  }
+});
+
+test('report trend rendering translates metric labels and preserves signed percentages in both languages', t => {
+  t.after(() => setLanguage('es'));
+  const elements = Object.fromEntries(['rptDashboard', 'rptTrendRow'].map(id => [id, { innerHTML: '' }]));
+  let trend = { productivePct: -92, adherencePct: 780, earningsPct: -10, callsPct: 0, acwPct: null };
+  const h = vm.createContext({ ui, translateText, escapeHtml: String, iconHtml: () => '',
+    document: { getElementById: id => elements[id] || null },
+    getActiveDayKey: () => 'today', todayCallDateKey: () => 'today', reportsKpiData: () => ({ callCount: 1, productiveMin: 1 }),
+    dayIsEffectivelyOff: () => false, dayShiftBounds: () => ({ start: at(23, 8) }), effectiveDailyGoal: () => ({ min: 1 }),
+    renderReportsMonthlyChart() {}, reportsTrends: () => trend, reportsWeekBillableDropped: () => ({ billablePct: 100, droppedPct: 0 }) });
+  vm.runInContext(declarations('../js/reports.js', ['reportDayAssessment', 'trendChipHtml', 'statChipHtml', 'renderReportsDashboard']), h);
+  for (const language of ['es', 'en']) {
+    setLanguage(language); h.renderReportsDashboard();
+    const html = elements.rptTrendRow.innerHTML;
+    assert.ok(html.includes(`${language === 'en' ? 'Productivity' : 'Productividad'} -92%`));
+    assert.ok(html.includes(`${language === 'en' ? 'Adherence' : 'Adherencia'} +780%`));
+    if (language === 'en') assert.doesNotMatch(html, /Productividad|Adherencia/);
+  }
+  setLanguage('en'); trend = { ...trend, productivePct: 0, adherencePct: null }; h.renderReportsDashboard();
+  assert.match(elements.rptTrendRow.innerHTML, /Productivity/); assert.match(elements.rptTrendRow.innerHTML, /Adherence/);
+  assert.doesNotMatch(elements.rptTrendRow.innerHTML, /Productividad|Adherencia/);
 });

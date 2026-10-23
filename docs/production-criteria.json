@@ -20,7 +20,9 @@
         },
         {
           "file": "tests/desktop-installer.test.mjs",
-          "namedCases": ["Windows installer previews a new PC with its own profile and notes, rejects invalid sizes without mutations"]
+          "namedCases": [
+            "Windows installer previews a new PC with its own profile and notes, rejects invalid sizes without mutations"
+          ]
         }
       ]
     },
@@ -1781,6 +1783,41 @@
             "closing a modal returns focus and a delayed opening cannot steal focus from a newer dialog",
             "touch help toggles and Escape dismisses it while retaining focus and the parent dialog",
             "appearance dialog keeps Tab inside visible controls and leaves Escape to the native dialog"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "deep-audit-2026-10-23",
+      "area": "Recuperación e integridad de acciones combinadas",
+      "acceptance": "Guardados rechazados conservan preferencias y actividad; cierre recuperado conserva milisegundos; manuales e imports protegen llamadas activas; ACW sigue correcciones sin borrar evidencia; descartar auto inicio conserva premios posteriores.",
+      "sources": [
+        "js/calls.js",
+        "js/call-recovery.js",
+        "js/call-records.js",
+        "js/app-main.js",
+        "js/work-actions.js",
+        "js/game.js",
+        "js/settings.js",
+        "js/reports.js"
+      ],
+      "tests": [
+        {
+          "file": "tests/deep-audit-call-integrity.test.mjs",
+          "namedCases": [
+            "editing a completed call cannot extend into an active live call",
+            "a manual form opened before a live call starts cannot save overlapping time",
+            "discarding a draft interrupted before its candidate was built ignores its bridge replay",
+            "ACW follows manual duration corrections while preserving the original official evidence",
+            "reversing an automatic shift keeps later historical rewards and personal choices",
+            "discarding a pending automatic call preserves rewards that arrived while it was under review"
+          ]
+        },
+        {
+          "file": "tests/structural-controls.test.mjs",
+          "namedCases": [
+            "onboarding rollback never overwrites a replacement settings owner",
+            "streak rollback never restores the previous account over a replacement owner"
           ]
         }
       ]
