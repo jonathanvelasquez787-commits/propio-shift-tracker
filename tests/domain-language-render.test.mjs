@@ -307,3 +307,21 @@ test('report trend rendering translates metric labels and preserves signed perce
   assert.match(elements.rptTrendRow.innerHTML, /Productivity/); assert.match(elements.rptTrendRow.innerHTML, /Adherence/);
   assert.doesNotMatch(elements.rptTrendRow.innerHTML, /Productividad|Adherencia/);
 });
+
+test('saved action titles follow the display language without rewriting history or personal text', t => {
+  t.after(() => setLanguage('es'));
+  const events = [{type:'shift',title:'Shift iniciado',ts:'2026-10-03T14:30:00Z'},
+    {type:'shift',title:'Shift terminado',ts:'2026-10-04T06:03:00Z'},
+    {type:'import',title:'Mi texto personal',ts:'2026-10-03T15:00:00Z'}];
+  const before = JSON.stringify(events);
+  const h=vm.createContext({translateText,state:{pauseHistory:[]},callDateKeyFromValue:x=>x,
+    dayEvents:()=>events,dayGapRows:()=>[],dayWorkSessions:()=>[]});
+  vm.runInContext(declarations('../js/calls.js',['dayActionRows']),h);
+  for(const language of ['es','en']){
+    setLanguage(language);const rows=h.dayActionRows('10/03/2026');
+    assert.equal(rows[0].detail,translateText('Shift iniciado'));
+    assert.equal(rows[1].detail,translateText('Shift terminado'));
+    if(language==='en')assert.doesNotMatch(rows[0].detail+rows[1].detail,/iniciado|terminado/);
+    assert.equal(rows[2].detail,'Mi texto personal');assert.equal(JSON.stringify(events),before);
+  }
+});

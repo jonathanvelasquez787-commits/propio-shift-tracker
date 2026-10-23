@@ -660,7 +660,7 @@ function dayActionRows(dayKey) {
       ts: e.ts,
       badgeLabel: connection ? translateText('Conexión') : e.type === 'shift' ? translateText('Shift') : e.type === 'break' ? translateText('Break') : e.type === 'lunch' ? translateText('Lunch') : translateText('Importación'),
       badgeClass: `type-${e.type}`,
-      detail: connection ? (/iniciado/i.test(e.title) ? translateText('Conexión a Propio detectada') : translateText('Conexión a Propio finalizada')) : e.title,
+      detail: connection ? (/iniciado/i.test(e.title) ? translateText('Conexión a Propio detectada') : translateText('Conexión a Propio finalizada')) : translateText(e.title),
       note: '',
       durationMin,
       editable: false,
