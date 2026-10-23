@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import { parse } from 'acorn';
-import { activityEffects, confirmActivityChange } from '../js/work-actions.js';
+import { activityEffects, confirmActivityChange, restoreAutomaticGameChanges } from '../js/work-actions.js';
 import { confirmReplacement, replacementSignature, snapshotCounts } from '../js/backup-recovery.js';
 
 const source = fs.readFileSync(new URL('../js/app-main.js', import.meta.url), 'utf8');
@@ -19,7 +19,8 @@ function activityHarness(active={startedAt:'2026-10-19T14:00:00Z'}) {
     settings:{}, ui,translateText:value=>value,escapeHtml:String, document:documentStub,
     saveStateOnly:()=>!h.reject,saveAll:()=>!h.reject,canPersistLocalChanges:()=>!h.stale,
     setAppState:value=>{h.state=value;},render:()=>{},toast:message=>h.messages.push(message),
-    ignorePropioCall:(state,id)=>{state.ignored=id;},callDateKeyFromValue:value=>value,
+    ignorePropioCall:(state,id)=>{state.ignored=id;},callDateKeyFromValue:value=>value, restoreAutomaticGameChanges,
+    todayCallDateKey:()=> '10/19/2026',onGameCallsChanged(){},onGameDayMetadataChanged(){},
     currentShiftAccountingDayKey:()=> '10/19/2026',stopBreakStartAlarm:()=>h.alarms++,stopBreakEndAlarm:()=>h.alarms++,
     appConfirm:(_message,callback)=>{h.confirm=callback;},
   });
@@ -54,6 +55,18 @@ test('discarding a continued pause restores its previously closed interval',()=>
   assert.equal(h.state.activePause,null);assert.deepEqual(clone(h.state.pauseHistory),[closed]);
   assert.deepEqual(clone(h.state.events),[{id:'original'}]);assert.deepEqual(clone(h.state.dayInterruptions['10/19/2026']),[{id:'other'}]);
   assert.equal(h.alarms,2);
+});
+
+test('discarding an automatic live call keeps historical rewards earned after its start',()=>{
+  const before={totalXp:300,ledger:{original:true},days:{today:{finalized:true,xp:200}}};
+  const started={totalXp:100,ledger:{original:true,reflex:true},days:{today:{reopened:true}}};
+  const h=activityHarness({startedAt:'2026-10-19T14:00:00Z',autoStartedShift:true,gameBeforeAutoShift:before,
+    gameAfterAutoShift:started,previousShiftStartedAt:'old',previousShiftEndedAt:'closed'});
+  h.state.game={...clone(started),totalXp:150,ledger:{...started.ledger,historical:{applied:50}},days:{...started.days,history:{earnings:4}}};
+  h.discardActiveCall();assert.equal(h.confirm(),true);
+  assert.equal(h.state.game.totalXp,350);assert.equal(h.state.game.ledger.historical.applied,50);
+  assert.equal(h.state.game.ledger.reflex,undefined);assert.equal(h.state.game.days.today.finalized,true);
+  assert.equal(h.state.game.days.history.earnings,4);assert.equal(h.state.shiftEndedAt,'closed');
 });
 
 test('discarding a fresh pause removes only its own start event',()=>{

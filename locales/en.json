@@ -2856,5 +2856,10 @@
   "s_40c99346": "Recording only on this PC",
   "s_595e8905": "Waiting for permission for this PC",
   "s_85243453": "Another PC may be using automatic availability, or the cloud connection is unavailable. Recording continues. Pause the initiators on the previous PC; permission expires within 30 seconds.",
-  "s_ddf1ccd3": "This PC records calls and keeps your choices, but does not press Start Calls or Stop Calls or end breaks automatically."
+  "s_ddf1ccd3": "This PC records calls and keeps your choices, but does not press Start Calls or Stop Calls or end breaks automatically.",
+  "s_28c5f735": "Cannot save: it overlaps the ongoing call.",
+  "s_3b391913": "Corrected end",
+  "s_591b802c": "Your saved correction is used in the record. The original sources are kept as backup.",
+  "s_dd3da577": "ACW follows your saved correction",
+  "s_a169ba28": "Future"
 }

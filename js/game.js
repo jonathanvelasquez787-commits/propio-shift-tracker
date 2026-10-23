@@ -346,6 +346,14 @@ function ensureGameSettings() {
   return settings.game;
 }
 
+function saveGamePreference(key, value) {
+  const owner = settings, game = ensureGameSettings(), previous = game[key];
+  game[key] = value;
+  if (saveSettingsOnly() !== false) return true;
+  if (settings === owner && settings.game === game) game[key] = previous;
+  return false;
+}
+
 function currentGameDayKey() {
   const startedAt = state.shiftStartedAt ? new Date(state.shiftStartedAt) : null;
   if (startedAt && !Number.isNaN(startedAt.getTime()) && !state.shiftEndedAt) {
@@ -782,8 +790,8 @@ function renderArena() {
   if (victory.innerHTML !== victoryMarkup) victory.innerHTML = victoryMarkup;
   victory.dataset.rewardOpened = String(!!receipt);
   syncBattle(root, { dayKey, currentDay: dayKey === currentGameDayKey(), workMode, enabled: active, weapon: settings.game.weapon, callSignatures, goalUsd: day.goal.usd, monsterMarkup: sprite, monsterLabel: translateText('Tu meta de hoy'), monsterDescription: monsterImageLabel, monsterName: displayName, heroLabel: translateText('Tu héroe'), heroEquipment: equipmentForState(), soundEnabled: settings.game.soundEnabled, goalStatus: status, collectionMarkup: compactCollectionMarkup(dayKey), defeated: day.defeated, hpPct: day.hpPct }, {
-    onWeaponChange: weapon => { settings.game.weapon = normalizeBattleWeapon(weapon); saveSettingsOnly(); },
-    onToggleSound: () => { settings.game.soundEnabled = !settings.game.soundEnabled; syncGameAudio(); saveSettingsOnly(); lastArenaRenderKey = ''; renderGame(); },
+    onWeaponChange: weapon => { if (!saveGamePreference('weapon', normalizeBattleWeapon(weapon))) { lastArenaRenderKey = ''; renderArena(); } },
+    onToggleSound: () => { saveGamePreference('soundEnabled', !settings.game.soundEnabled); syncGameAudio(); lastArenaRenderKey = ''; renderGame(); },
     onSound: kind => {
       if (kind === 'practice-hit') return;
       playGameSound(kind, { allowed: () => {
@@ -2340,11 +2348,15 @@ function revokeStageClear(dayKey, { silent = false } = {}) {
   }
 }
 
-export function onGameShiftStarted({ continued = false } = {}) {
+export function onGameShiftStarted({ continued = false, captureState = null } = {}) {
   const dayKey = currentGameDayKey();
   ensureGameState(dayKey);
   const enabled = gameEnabled();
   const hadFinalizedDay = !!state.game.days[dayKey]?.finalized;
+  const persist = () => {
+    captureState?.(JSON.parse(JSON.stringify(state.game)));
+    saveStateOnly();
+  };
 
   // La consistencia del día no depende de que la capa visual de gamificación esté encendida.
   // Si se reabre un turno con STAGE CLEAR previo, hay que revocarlo siempre; de lo contrario,
@@ -2356,12 +2368,12 @@ export function onGameShiftStarted({ continued = false } = {}) {
   }
 
   if (continued) {
-    saveStateOnly();
+    persist();
     if (enabled) renderGame();
     return;
   }
   if (!enabled) {
-    if (hadFinalizedDay) saveStateOnly();
+    if (hadFinalizedDay || captureState) persist();
     return;
   }
 
@@ -2375,7 +2387,7 @@ export function onGameShiftStarted({ continued = false } = {}) {
       queueGameToast('+20 XP · Reflejos perfectos', 'record');
     }
   }
-  saveStateOnly();
+  persist();
   renderGame();
 }
 
@@ -2852,16 +2864,14 @@ export function initGame() {
     });
   }
   document.getElementById('sidebarGameSoundInput')?.addEventListener('change', (event) => {
-    settings.game.soundEnabled = !!event.target.checked;
+    saveGamePreference('soundEnabled', !!event.target.checked);
     syncGameAudio();
-    saveSettingsOnly();
     renderSettingsProfile();
     renderArena();
   });
   document.getElementById('gameSoundVolumeInput')?.addEventListener('input', (event) => {
-    settings.game.soundVolume = Math.max(0, Math.min(100, Number(event.target.value) || 0));
+    if (!saveGamePreference('soundVolume', Math.max(0, Math.min(100, Number(event.target.value) || 0)))) event.target.value = settings.game.soundVolume;
     syncGameAudio();
-    saveSettingsOnly();
     renderSettingsProfile();
   });
   document.getElementById('gameSoundPreviewBtn')?.addEventListener('click', (event) => {

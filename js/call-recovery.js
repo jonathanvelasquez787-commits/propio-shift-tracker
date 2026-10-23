@@ -88,7 +88,7 @@ function transact(context, kind, changes, restoredId = null) {
 }
 
 export function saveEditedCall(context, callId, opened) {
-  const { calls, settings } = context.data(), original = calls.find(call => call.id === callId);
+  const { calls, settings, state } = context.data(), original = calls.find(call => call.id === callId);
   const { ui, translateText, toast } = context;
   if (!original || !opened || opened.owner !== settings || opened.call !== canonical(original)) {
     toast(translateText('La llamada cambió mientras la editabas. Cerrá y abrí el editor para revisar la versión actual.')); return false;
@@ -107,6 +107,10 @@ export function saveEditedCall(context, callId, opened) {
   const billable = input('callEditBillableInput')?.value === 'Yes' ? 'Yes' : 'No';
   const dropped = input('callEditDroppedInput')?.value === 'Yes' ? 'Yes' : 'No';
   const next = { ...original, durationMin: duration, pay: Math.max(0, amount).toFixed(2), billable, dropped, endISO: end.toISOString(), countsAsProductive: billable === 'Yes' && dropped === 'No' };
+  if (Object.hasOwn(original, 'durationMs')) next.durationMs = end.getTime() - start.getTime();
+  if (state.activeCall && context.callsOverlap(next, { startISO: state.activeCall.startedAt, endISO: new Date().toISOString() })) {
+    toast(translateText('No se puede guardar: coincide con la llamada en curso.')); return false;
+  }
   const overlap = calls.find(call => call.id !== callId && context.callsOverlap(call, next));
   if (overlap) { toast(ui`Esa duración traslapa con la llamada #${overlap.customerId} (${overlap.callStart}). Ajusta la duración.`); return false; }
   if (!equal(original, next)) {

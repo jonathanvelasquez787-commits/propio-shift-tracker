@@ -166,3 +166,24 @@ test('a newer deleted-call version or a future edited end cannot create a recove
   assert.equal(saveEditedCall(h.context, original.id, { owner: h.data().settings, call: canonical(h.data().calls[0]) }), false);
   assert.equal(h.snapshot(), before); assert.equal(h.writes, 0); assert.equal(h.closed, 0);
 });
+
+for (const hasDurationMs of [true, false]) test(`editing duration reconciles existing milliseconds (${hasDurationMs}) and preserves observed evidence`, t => {
+  const h = fixture(t), startISO = ago(100), endISO = new Date(Date.parse(startISO) + 300000).toISOString();
+  const tool = { id: 'a', startISO, endISO, durationMs: 300000, pay: .60, detectedBy: 'tool' };
+  Object.assign(h.data().calls[0], { source: 'live', startISO, endISO, durationMin: 5, pay: '.60', records: { tool },
+    ...(hasDurationMs ? { durationMs: 300000 } : {}) });
+  const original = structuredClone(h.data().calls[0]);
+  const canonical = value => JSON.stringify(value, (_key, item) => item && typeof item === 'object' && !Array.isArray(item) ? Object.fromEntries(Object.keys(item).sort().map(key => [key, item[key]])) : item);
+  const previous = globalThis.document;
+  const inputs = { callEditDurationInput: { value: '3' }, callEditPayInput: { value: '.36' }, callEditBillableInput: { value: 'Yes' }, callEditDroppedInput: { value: 'No' } };
+  globalThis.document = { getElementById: key => inputs[key] };
+  t.after(() => { if (previous === undefined) delete globalThis.document; else globalThis.document = previous; });
+  assert.equal(saveEditedCall(h.context, 'a', { owner: h.data().settings, call: canonical(original) }), true);
+  h.reload();
+  const saved = h.data().calls.find(call => call.id === 'a');
+  assert.equal(saved.durationMin, 3); assert.equal(Date.parse(saved.endISO) - Date.parse(saved.startISO), 180000);
+  assert.equal(saved.durationMs, hasDurationMs ? 180000 : undefined);
+  assert.deepEqual(saved.records.tool, tool);
+  assert.equal(restoreCallChange(h.context, 'change-1', callRecoveryStamp(h.data())), true);
+  h.reload(); assert.deepEqual(h.data().calls.find(call => call.id === 'a'), original);
+});

@@ -96,3 +96,17 @@ test('comparison renders observed seconds and official zero without combining th
   assert.ok(!content.innerHTML.includes('class="record-equation"'), 'historical review must not invent a current ACW');
  }finally{globalThis.document=original;}
 });
+
+test('a manually corrected ACW explains its current final and retains both original sources',()=>{
+ const original=globalThis.document,content={innerHTML:'',querySelectorAll:()=>[]},subtitle={textContent:''};
+ globalThis.document={getElementById:id=>id==='callRecordsContent'?content:subtitle};
+ try{
+  const raw=preserveCallRecords(official(0,'$0.00'),live(),iso(501));
+  const call={...raw,manualCorrectionAt:iso(600),endISO:iso(480),durationMin:8,pay:'1.10'};
+  openCallRecords({data:()=>({calls:[call],state:{},settings:{}}),ui:(strings,...values)=>strings.reduce((s,part,i)=>s+part+(values[i]??''),''),translateText:x=>x,
+   escapeHtml:String,money:x=>'$'+x.toFixed(2),financeConvertedInline:()=>'',displayLocale:()=> 'en-US',formatDuration:ms=>String(ms),openModal(){}},call.id,call.endISO);
+  assert.match(content.innerHTML,/El ACW sigue tu corrección guardada/);assert.match(content.innerHTML,/Final corregido/);
+  assert.match(content.innerHTML,/\$1\.10/);assert.match(content.innerHTML,/\$0\.00/);assert.match(content.innerHTML,/\$0\.96/);
+  assert.doesNotMatch(content.innerHTML,/El total usa el registro de Propio/);assert.doesNotMatch(content.innerHTML,/>PRIORIDAD</);
+ }finally{globalThis.document=original;}
+});

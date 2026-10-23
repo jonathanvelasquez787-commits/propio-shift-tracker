@@ -6,6 +6,7 @@ import { ignorePropioCall } from './propio-bridge.js';
 import { callFeedbackSilenced, withSilentCallFeedback } from './call-feedback.js';
 import { PAY_ESTIMATE_RULE, roundedPayMinutes, callPayMinutes } from './pay-estimate.js';
 import { observedCallRecord } from './call-records.js';
+import { restoreAutomaticGameChanges } from './work-actions.js';
 
 let HIGHER_RATE_TIERS, MAX_CALL_DURATION_MIN, appConfirm, autoStartShiftFromCalls, callDateKeyFromValue, callDedupeKey;
 let callsForDay, callsOverlap, closeModal, connectedMinutesForDay, convertedAmountText, dayAdherence;
@@ -88,11 +89,11 @@ function reconcileLastCallEndedAt(dayKey) {
   const now = Date.now();
   const latest = callsForDay(normalized)
     .filter(call => {
-      const end = new Date(call.records?.propio?.endISO || call.endISO).getTime();
+      const end = new Date(call.endISO || call.records?.propio?.endISO).getTime();
       return Number.isFinite(end) && end <= now;
     })
-    .sort((a, b) => new Date(b.records?.propio?.endISO || b.endISO) - new Date(a.records?.propio?.endISO || a.endISO))[0];
-  state.lastCallEndedAt = latest ? latest.records?.propio?.endISO || latest.endISO : null;
+    .sort((a, b) => new Date(b.endISO || b.records?.propio?.endISO) - new Date(a.endISO || a.records?.propio?.endISO))[0];
+  state.lastCallEndedAt = latest ? latest.endISO || latest.records?.propio?.endISO : null;
 }
 
 // Editor de una llamada ya importada: corrige duración, pago, billable y dropped.
@@ -270,7 +271,7 @@ function openManualCallModalFromLiveCall(startedAtISO, endedAtISO, originalCandi
 function rollbackPendingLiveBackup() {
   const pending = state.pendingLiveCallBackup;
   const context = pending?.liveContext;
-  ignorePropioCall(state, pending?.candidate?.propioBridge?.callId);
+  ignorePropioCall(state, pending?.candidate?.propioBridge?.callId || context?.propioBridge?.callId);
 
   if (context?.interruptedPauseRollback) {
     const rollback = context.interruptedPauseRollback;
@@ -283,7 +284,7 @@ function rollbackPendingLiveBackup() {
     if (context.autoShiftEventId) state.events = state.events.filter(event => event?.id !== context.autoShiftEventId);
     state.shiftStartedAt = context.previousShiftStartedAt || null;
     state.shiftEndedAt = context.previousShiftEndedAt || null;
-    if (context.gameBeforeAutoShift) state.game = context.gameBeforeAutoShift;
+    if (context.gameBeforeAutoShift) state.game = restoreAutomaticGameChanges(state.game, context.gameBeforeAutoShift, context.gameAfterAutoShift);
   }
 
   const affectedDayKey = callDateKeyFromValue(pending?.candidate?.callDate)
@@ -296,8 +297,12 @@ function rollbackPendingLiveBackup() {
 export function restorePendingLiveCallBackup() {
   const pending = state.pendingLiveCallBackup;
   if (!pending?.startedAtISO || !pending?.endedAtISO) return false;
+  if (!pending.candidate) {
+    pending.candidate = observedLiveCallCandidate(pending.startedAtISO, pending.endedAtISO, pending.liveContext);
+    if (!pending.candidate) return false;
+  }
   manualCallLiveBackupPending = true;
-  openManualCallModalFromLiveCall(pending.startedAtISO, pending.endedAtISO, pending.candidate || null);
+  openManualCallModalFromLiveCall(pending.startedAtISO, pending.endedAtISO, pending.candidate);
   return true;
 }
 
@@ -308,10 +313,36 @@ export function requestCloseManualCallModal() {
     closeModal('manualCallModal');
     return;
   }
+  const owner = state, preferences = settings, pending = state.pendingLiveCallBackup;
+  const signature = () => JSON.stringify([state.pendingLiveCallBackup, state.activeCall, state.activePause,
+    state.shiftStartedAt, state.shiftEndedAt, state.pauseHistory, state.game]);
+  const expected = signature();
+  let settled = false;
   appConfirm(translateText('¿Descartar esta llamada sin guardarla? La llamada que acabas de colgar se perderá por completo — no quedará ningún registro de ese tiempo trabajado.'), () => {
-    rollbackPendingLiveBackup();
-    if (saveAll() === false) return false;
+    if (settled) return false;
+    settled = true;
+    if (state !== owner || settings !== preferences || signature() !== expected || !callContext.canPersistLocalChanges()) {
+      toast(translateText('La actividad cambió. Revisá de nuevo antes de descartarla.'));
+      return false;
+    }
+    const before = JSON.parse(JSON.stringify(state));
+    try {
+      rollbackPendingLiveBackup();
+      if (saveAll() === false) throw Error('SAVE_REJECTED');
+    } catch {
+      setAppState(before);
+      manualCallLiveBackupPending = true;
+      callContext.render?.();
+      toast(translateText('No se guardó el descarte. Tu actividad anterior se conservó.'));
+      return false;
+    }
     closeModal('manualCallModal');
+    if (pending?.liveContext?.autoStartedShift) {
+      const day = callDateKeyFromValue(pending.candidate?.callDate) || todayCallDateKey(new Date(pending.startedAtISO));
+      onGameCallsChanged(day);
+      callContext.onGameDayMetadataChanged?.(day);
+    }
+    return true;
   });
 }
 
@@ -438,6 +469,9 @@ function buildLiveCallCandidate({ customerId, startedAtISO, endedAtISO, billable
 // el día activo. NO llama a saveAll/toast.
 function trySaveCallCandidate(candidate) {
   if (!candidate) return { ok: false, reason: translateText('Fecha u hora inválida') };
+  if (state.activeCall && callsOverlap(candidate, { startISO: state.activeCall.startedAt, endISO: new Date().toISOString() })) {
+    return { ok: false, reason: translateText('No se puede guardar: coincide con la llamada en curso.') };
+  }
   const overlapsWith = calls.find(c => callsOverlap(c, candidate));
   if (overlapsWith) {
     return { ok: false, reason: ui`Esa hora se traslapa con la llamada #${overlapsWith.customerId} (${overlapsWith.callStart}). Ajusta la hora o la duración.` };
@@ -514,7 +548,7 @@ export function saveManualCall() {
   const result = trySaveCallCandidate(candidate);
   if (!result.ok) {
     toast(result.reason);
-    return;
+    return false;
   }
   // Guardado exitoso (sea "Agregar llamada manual" normal o el respaldo de una llamada en vivo): ya
   // no hay nada que perder al cerrar, se apaga la bandera antes de cerrar sin preguntar.
@@ -537,12 +571,9 @@ export function saveManualCall() {
 // Terminar una llamada y querer empezar otra de inmediato (mismo minuto o cualquier otro) "no
 // dejaba" — el modal de "Guardar llamada" cubre toda la pantalla y bloquea el click a "Iniciar
 // llamada" hasta resolverlo.
-export function autoSaveLiveCall(startedAtISO, endedAtISO, liveContext = null) {
-  if (liveContext?.propioBridge && !callFeedbackSilenced()) return withSilentCallFeedback(() => autoSaveLiveCall(startedAtISO, endedAtISO, liveContext));
+function observedLiveCallCandidate(startedAtISO, endedAtISO, liveContext) {
   const elapsedMs = Math.max(0, new Date(endedAtISO).getTime() - new Date(startedAtISO).getTime());
-  const durationMin = elapsedMs / 60000;
   const pay = (roundedPayMinutes(elapsedMs / 60000) * rateTilePerMin('normal')).toFixed(2);
-
   const candidate = buildLiveCallCandidate({
     customerId: '',
     startedAtISO,
@@ -557,6 +588,14 @@ export function autoSaveLiveCall(startedAtISO, endedAtISO, liveContext = null) {
     candidate.propioBridge = { ...liveContext.propioBridge };
   }
   if (candidate) candidate.records = { tool: observedCallRecord(candidate) };
+  return candidate;
+}
+
+export function autoSaveLiveCall(startedAtISO, endedAtISO, liveContext = null) {
+  if (liveContext?.propioBridge && !callFeedbackSilenced()) return withSilentCallFeedback(() => autoSaveLiveCall(startedAtISO, endedAtISO, liveContext));
+  const elapsedMs = Math.max(0, new Date(endedAtISO).getTime() - new Date(startedAtISO).getTime());
+  const durationMin = elapsedMs / 60000;
+  const candidate = observedLiveCallCandidate(startedAtISO, endedAtISO, liveContext);
   const previous = { calls, state: JSON.parse(JSON.stringify(state)), settings: JSON.parse(JSON.stringify(settings)) };
   const result = trySaveCallCandidate(candidate);
 
@@ -621,7 +660,7 @@ function dayActionRows(dayKey) {
       ts: e.ts,
       badgeLabel: connection ? translateText('Conexión') : e.type === 'shift' ? translateText('Shift') : e.type === 'break' ? translateText('Break') : e.type === 'lunch' ? translateText('Lunch') : translateText('Importación'),
       badgeClass: `type-${e.type}`,
-      detail: connection ? (/iniciado/i.test(e.title) ? translateText('Conexión a Propio detectada') : translateText('Conexión a Propio finalizada')) : e.title,
+      detail: connection ? (/iniciado/i.test(e.title) ? translateText('Conexión a Propio detectada') : translateText('Conexión a Propio finalizada')) : translateText(e.title),
       note: '',
       durationMin,
       editable: false,
