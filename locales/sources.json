@@ -208,6 +208,12 @@
       "app.html"
     ]
   },
+  "s_03a84ccf": {
+    "source": "Unidades por USD",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_03b552da": {
     "source": "Tu historial de cambios",
     "files": [
@@ -1367,6 +1373,12 @@
       "js/reports.js"
     ]
   },
+  "s_13d91da6": {
+    "source": "Tu meta, tarifa y preferencias.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_13fe0c9d": {
     "source": "Dentro del plan o de la gracia",
     "files": [
@@ -1707,12 +1719,6 @@
   },
   "s_190b1c67": {
     "source": "Gamificación",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_192d1e6c": {
-    "source": "Tasa por minuto ($)",
     "files": [
       "app.html"
     ]
@@ -3495,6 +3501,12 @@
       "js/finance.js"
     ]
   },
+  "s_33e0b59a": {
+    "source": "Dólares · USD",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_33ee4150": {
     "source": "3. Dónde se guardan",
     "files": [
@@ -3682,6 +3694,12 @@
     "source": "Meta máxima de ACW: {{v0}} min",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_36e70e18": {
+    "source": "Minutos",
+    "files": [
+      "app.html"
     ]
   },
   "s_36eddae1": {
@@ -5245,12 +5263,6 @@
       "js/app-main.js"
     ]
   },
-  "s_4fd399d4": {
-    "source": "Meta en minutos",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_4fe6a999": {
     "source": "Tiempo y bono por día",
     "files": [
@@ -5339,18 +5351,6 @@
     "source": "{{v10}}\n          {{v11}}",
     "files": [
       "js/detail-views.js"
-    ]
-  },
-  "s_5111640d": {
-    "source": "Backup de datos",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_5115705d": {
-    "source": "Tasa de cambio (moneda por $1)",
-    "files": [
-      "app.html"
     ]
   },
   "s_51260306": {
@@ -6937,12 +6937,6 @@
       "js/game.js"
     ]
   },
-  "s_6ab3bb7b": {
-    "source": "Meta en dólares",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_6ab9d54c": {
     "source": "Productivo",
     "files": [
@@ -7369,6 +7363,12 @@
     "source": "Al alcanzar {{v0}} minutos de ACW, la extensión de Chrome intentará pulsar Start Calls.",
     "files": [
       "js/automation-ui.js"
+    ]
+  },
+  "s_713b6e1f": {
+    "source": "Cómo se aplican tarifa y moneda",
+    "files": [
+      "app.html"
     ]
   },
   "s_7166a73f": {
@@ -9179,6 +9179,12 @@
       "js/monsters.js"
     ]
   },
+  "s_8af6089f": {
+    "source": "Copias y exportación",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_8b1d8111": {
     "source": "El respaldo contiene un historial de actividad inválido. Tus datos actuales no se cambiaron.",
     "files": [
@@ -9745,6 +9751,12 @@
       "js/backup-recovery.js"
     ]
   },
+  "s_924ecd4a": {
+    "source": "Eliminación irreversible de la cuenta y sus datos",
+    "files": [
+      "js/boot.js"
+    ]
+  },
   "s_9279758f": {
     "source": "{{v0}} min · meta diaria",
     "files": [
@@ -9755,12 +9767,6 @@
     "source": "Estimación provisional",
     "files": [
       "js/detail-views.js"
-    ]
-  },
-  "s_928a27e2": {
-    "source": "Se sincronizan solas con tu tasa por minuto de abajo. Al guardar, eliges si el cambio vale solo para el día que estás viendo o para siempre.",
-    "files": [
-      "app.html"
     ]
   },
   "s_92a0ed7e": {
@@ -11006,6 +11012,12 @@
       "js/auth.js"
     ]
   },
+  "s_a5859fd8": {
+    "source": "Perfil y cuenta",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_a58c4288": {
     "source": "Varita mágica",
     "files": [
@@ -11701,6 +11713,12 @@
       "privacidad.html"
     ]
   },
+  "s_b0973bcd": {
+    "source": "Respaldo completo, recuperación y contabilidad",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_b0bac425": {
     "source": "Parcial",
     "files": [
@@ -11907,6 +11925,12 @@
     "files": [
       "app.html",
       "js/app-main.js"
+    ]
+  },
+  "s_b401ff28": {
+    "source": "El cambio es manual. Tus importes guardados en dólares se conservan.",
+    "files": [
+      "app.html"
     ]
   },
   "s_b4022ab0": {
@@ -12887,6 +12911,12 @@
       "app.html"
     ]
   },
+  "s_c4055115": {
+    "source": "Se sincronizan con tu tarifa. Al cambiar la meta, elegís si aplica al día o a tu meta general.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_c42659fe": {
     "source": "form-msg show {{v0}}",
     "files": [
@@ -12924,6 +12954,12 @@
     "source": "Meta de hoy",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_c4e63dd4": {
+    "source": "Nombre, emoji y acceso con Google",
+    "files": [
+      "app.html"
     ]
   },
   "s_c4ef62f0": {
@@ -13764,12 +13800,6 @@
     "source": "Esperando confirmar tu ACW",
     "files": [
       "js/automation-ui.js"
-    ]
-  },
-  "s_d17d4f4d": {
-    "source": "Perfil, idioma, meta, tasa y ciclo de pago.",
-    "files": [
-      "app.html"
     ]
   },
   "s_d1a06e73": {
@@ -14957,6 +14987,12 @@
       "js/reinforcement-feedback.js"
     ]
   },
+  "s_e182e49e": {
+    "source": "Fecha de referencia y días hasta el pago",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_e189063d": {
     "source": "estela de estrellas",
     "files": [
@@ -15587,6 +15623,12 @@
     "source": "Diferencia de cierre: {{v0}}",
     "files": [
       "js/call-records-view.js"
+    ]
+  },
+  "s_eb5d09c8": {
+    "source": "USD por minuto",
+    "files": [
+      "app.html"
     ]
   },
   "s_eb8b17fb": {

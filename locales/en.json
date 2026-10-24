@@ -2871,5 +2871,19 @@
   "s_0b62af98": "Remaining: {{v13}}{{v14}}",
   "s_259f071b": "· Automatic reservation skipped",
   "s_27d8bbfe": "Reserve your earnings for expenses and goals.",
-  "s_629fff94": "This adjustment moves money between Available and Reserved."
+  "s_629fff94": "This adjustment moves money between Available and Reserved.",
+  "s_13d91da6": "Your goal, rate and preferences.",
+  "s_8af6089f": "Backups and exports",
+  "s_924ecd4a": "Permanently delete the account and its data",
+  "s_a5859fd8": "Profile and account",
+  "s_b0973bcd": "Full backup, recovery and accounting",
+  "s_c4e63dd4": "Name, emoji and Google sign-in",
+  "s_e182e49e": "Reference date and days until payday",
+  "s_03a84ccf": "Units per USD",
+  "s_33e0b59a": "Dollars · USD",
+  "s_36e70e18": "Minutes",
+  "s_713b6e1f": "How rate and currency apply",
+  "s_b401ff28": "The exchange rate is manual. Your saved dollar amounts are preserved.",
+  "s_c4055115": "These stay in sync with your rate. When changing the goal, choose whether it applies to the day or your general goal.",
+  "s_eb5d09c8": "USD per minute"
 }

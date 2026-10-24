@@ -458,6 +458,8 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
+- Web 648 aplica el mock aprobado de Ajustes: idioma, meta, tarifa y moneda visibles; Perfil y cuenta, Ciclo de pago, Copias y exportación y Disponibilidad plegables. Borrar cuenta queda al final en un grupo separado, conservando confirmación y validación de propietario. Los 65 ids anteriores de Ajustes y todos sus handlers se conservan. Las copias inyectadas se ubican en su grupo. No cambia el modelo de datos ni la extensión.
+
 - Web 647 aplica el mock aprobado de Finanzas simplificada: Disponible, Gastos, Metas, prioridades y reservas. Se retiran de la interfaz planificador/50-30-20, registro e historial mensual de pagos y estimaciones de aportes por meses. Los datos anteriores se conservan en ajustes y respaldos; categorías, edición, reparto, exclusiones y liberación permanecen. La próxima prioridad incluye Metas cuando termina Gastos. Extensión sin cambios.
 
 - Web 646 recupera Fechas de pago según la referencia 631 elegida y aprobada por el propietario: tarjeta y fecha azul, leyenda, filas compactas y fecha a la derecha; sin controles de registrar/comparar recibido. Los registros anteriores siguen en respaldos y no se infiere un depósito por pasar la fecha. La simplificación posterior de Finanzas está documentada en web 647. Extensión sin cambios.
@@ -506,6 +508,11 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v648 — Ajustes agrupados según mock aprobado.**
+
+- Un mismo diseño adaptable en claro/oscuro; ajustes diarios a mano y detalles plegados. Respaldos y contabilidad agrupados, cuenta separada al final.
+- Se conservan ids, campos, listeners y confirmaciones; la inserción de copias cambia solo de ubicación. Validación de wiring, traducciones, build y recorridos con datos ficticios.
+
 **v647 — Finanzas simplificada según mock aprobado.**
 
 - Filas con Reservado y Objetivo, progreso y ajustes plegados; controles de prioridad y moneda conservados. Sin planificador, pagos mensuales ni estimador de meses en la interfaz. Datos heredados preservados.
@@ -515,9 +522,3 @@ futura opera bajo esto, sin excepción:
 
 - Recuperada la lista compacta, azul histórico y etiqueta de ciclo; retirados de esa vista los controles de recepción y comparación. Datos anteriores conservados y fechas pasadas diferenciadas de recepciones reales.
 - Reintentar pagos respeta su estado oculto cuando la carga ya terminó. Diseño único probado en móvil y escritorio, claro/oscuro y ES/EN. Finanzas y extensión no cambian.
-
-**v645 — Segunda auditoría: concurrencia, recuperación y formularios obsoletos.**
-
-- Recuperar respeta llamadas pendientes y bonos ganados; rechazos restauran reservas e informe juntos y no pisan cuentas reemplazadas.
-- Confirmaciones y formularios de Finanzas/Logros respetan propietario y cambios posteriores; premio cosmético duplicado no consume la elección. Feedback sigue el idioma actual.
-- Usuario tardío, cierre de sesión, permisos colgados y ACK del puente protegidos. Undici indirecto actualizado a 6.29.1. Evidencia y límites en docs/auditoria-profunda-2026-10-24.md; instalación y activación de extensión se distinguen.

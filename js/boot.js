@@ -274,7 +274,9 @@ function injectRecoveryCopies(userId) {
     <p>Se conservan antes de reemplazar datos o cambiar de cuenta. Restaurar también guarda la copia que estás usando ahora.</p>
     <select id="recoveryCopySelect" aria-label="Copia a recuperar"></select>
     <button class="mc-btn-primary cyan" id="restoreRecoveryCopyBtn" type="button">Restaurar copia</button>`;
-  card.insertBefore(section, card.querySelector('.modal-actions'));
+  const recoveryGroup = document.getElementById('settingsRecoveryCopies');
+  if (recoveryGroup) recoveryGroup.appendChild(section);
+  else card.insertBefore(section, card.querySelector('.modal-actions'));
   const select = document.getElementById('recoveryCopySelect');
   copies.toReversed().forEach(copy => {
     const option = document.createElement('option');
@@ -348,9 +350,7 @@ function watchProductionHealth() {
   void check(); window.setInterval(check, 5 * 60 * 1000);
 }
 
-// La política de privacidad promete que la cuenta se puede borrar; esto lo
-// hace cierto. Se inyecta dentro de Ajustes, al lado de "Backup de datos",
-// reutilizando las clases de tarjeta de peligro que ya existen.
+// La cuenta conserva su confirmación y validación de propietario dentro del grupo separado.
 function injectDeleteAccount(userId, getCurrentUserId = () => readMeta().userId) {
   const card = document.querySelector('#goalsModal .modal-card');
   if (!card) return;
@@ -358,14 +358,10 @@ function injectDeleteAccount(userId, getCurrentUserId = () => readMeta().userId)
 
   const block = document.createElement('div');
   block.innerHTML = ui`
-    <div class="divider"></div>
+    <details class="settings-group settings-delete-group">
+    <summary><span class="settings-group-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><path d="m12 3 10 18H2L12 3Z"/><path d="M12 9v4m0 3h.01"/></svg></span><span><strong>Borrar mi cuenta</strong><small>Eliminación irreversible de la cuenta y sus datos</small></span><span class="settings-chevron" aria-hidden="true">⌄</span></summary>
+    <div class="settings-group-body">
     <div class="danger-card tone-bad polished-delete">
-      <div class="danger-card-head">
-        <span class="danger-card-icon" aria-hidden="true">
-          <svg class="ic-svg" viewBox="0 0 24 24"><line x1="4" y1="7" x2="20" y2="7"/><path d="M6 7V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v3"/><path d="M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg>
-        </span>
-        <span class="danger-card-title">Borrar mi cuenta</span>
-      </div>
       <span class="danger-card-badge">Irreversible</span>
       <div class="polished-delete-counts"><div><strong data-delete-count="calls">—</strong><span>Llamadas</span></div><div><strong data-delete-count="pauses">—</strong><span>Pausas</span></div><div><strong data-delete-count="events">—</strong><span>Acciones</span></div></div>
       <p class="danger-card-desc">Se eliminan tu cuenta y sus datos activos de Propio Shift Tracker.</p>
@@ -373,7 +369,7 @@ function injectDeleteAccount(userId, getCurrentUserId = () => readMeta().userId)
       <details class="polished-disclosure"><summary>Qué se borra y qué se conserva</summary><div class="polished-detail"><div class="review-line"><span>Cuenta y datos de Propio Shift Tracker</span><strong>Se eliminan</strong></div><div class="review-line"><span>Cuenta e historial oficial de Propio</span><strong>Se conservan</strong></div><p class="note">Incluye llamadas, turnos, pausas, horario, metas, Finanzas y Logros.</p><p class="note">También se retiran los datos y copias recuperables de esta cuenta en este navegador. Tu cuenta de Google, los JSON que descargaste y las copias locales de otros navegadores o dispositivos no se borran desde aquí.</p></div></details>
       <p class="polished-retention">Las copias históricas cifradas se retiran por rotación, con una retención prevista de 31 días.</p>
       <button class="mc-btn-solid-full bad" id="deleteAccountBtn" type="button">Borrar cuenta y datos</button>
-    </div>`;
+    </div></div></details>`;
 
   if (actions) card.insertBefore(block, actions);
   else card.appendChild(block);
