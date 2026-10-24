@@ -2867,5 +2867,9 @@
   "s_7673f16e": "Past date",
   "s_8c3a9094": "Next payday",
   "s_9770e175": "Today, {{v0}}",
-  "s_bdc99ddc": "Received"
+  "s_bdc99ddc": "Received",
+  "s_0b62af98": "Remaining: {{v13}}{{v14}}",
+  "s_259f071b": "· Automatic reservation skipped",
+  "s_27d8bbfe": "Reserve your earnings for expenses and goals.",
+  "s_629fff94": "This adjustment moves money between Available and Reserved."
 }

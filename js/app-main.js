@@ -7633,7 +7633,6 @@ export function render() {
       financeToggleManualPaid(checkbox.getAttribute('data-fin-cat'), checkbox.getAttribute('data-fin-mark-paid'), checkbox.checked);
     });
     document.getElementById('financeAutoFillInput').addEventListener('change', e => { const checked=e.target.checked;e.target.checked=!!settings.financeAutoFill;reviewFinanceAction('auto',null,null,checked); });
-    document.getElementById('financeDistributionReviewBtn').addEventListener('click',()=>reviewFinanceAction('inspect'));
     wireFinancePlanning();
     document.getElementById('saveDayNoteBtn').addEventListener('click', saveDayNoteFromModal);
     document.getElementById('clearDayNoteBtn').addEventListener('click', clearDayNoteFromModal);

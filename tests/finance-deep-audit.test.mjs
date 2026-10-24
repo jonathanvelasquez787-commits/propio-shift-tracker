@@ -326,13 +326,27 @@ test('rendering a supported finance history validates dates once per frame inste
   assert.equal((h.field('financeGastosList').innerHTML.match(/data-fin-row=/g)||[]).length,40);
 });
 
-test('monthly render data refreshes after in-place payment correction and budget-period changes',t=>{
+test('simplified finance renders only reservations and objectives while retaining legacy payments and periods',t=>{
   const h=harness(t),now=new Date(),month=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
   addFinancePayment('otro','food','10','',`${month}-01`);renderFinanceSection();
   settings.financePayments[0].usd=90;h.expense.budgetPeriod='fortnightly';renderFinanceSection();
   const html=h.field('financeGastosList').innerHTML;
-  assert.match(html,/Pagado en el mes elegido[\s\S]*?\$90\.00/);assert.ok(!html.includes('Presupuesto excedido'));
-  settings.financePayments[0].usd=0;renderFinanceSection();assert.match(h.field('financeGastosList').innerHTML,/Pagado en el mes elegido[\s\S]*?\$0\.00/);
+  assert.doesNotMatch(html,/Pagado en el mes elegido|Presupuesto excedido|data-fin-payment|data-fin-savings/);
+  assert.match(html,/Reservado[\s\S]*?\$30\.00/);assert.match(html,/Objetivo[\s\S]*?\$80\.00/);
+  assert.equal(settings.financePayments[0].usd,90);assert.equal(h.expense.budgetPeriod,'fortnightly');
+  const before=JSON.stringify(settings);renderFinanceSection();assert.equal(JSON.stringify(settings),before);
+});
+
+test('automatic-allocation exclusions remain editable after removing the payment ledger',t=>{
+  const h=harness(t);h.expense.manualPaid=true;renderFinanceSection();
+  assert.match(h.field('financeGastosList').innerHTML,/data-fin-mark-paid="food"[^>]*checked/);
+  financeToggleManualPaid('otro','food',false);financeRunAutoFillCascade();
+  assert.equal(h.expense.manualPaid,false);h.reload();assert.equal(settings.financeCategories.otro.rows[0].manualPaid,false);
+});
+
+test('next allocation priority reaches goals after all expenses are reserved',t=>{
+  const h=harness(t);h.expense.assignedAmount=h.expense.targetAmount;h.second.assignedAmount=h.second.targetAmount;
+  renderFinanceSection();assert.equal(h.field('financeNextPriorityVal').textContent,'Meta');
 });
 
 test('currency input formatting preserves dollar cents for tiny rates and expands exponent notation',t=>{

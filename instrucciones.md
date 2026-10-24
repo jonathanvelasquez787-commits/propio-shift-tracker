@@ -458,7 +458,9 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
-- Web 646 recupera Fechas de pago según la referencia 631 elegida y aprobada por el propietario: tarjeta y fecha azul, leyenda, filas compactas y fecha a la derecha; sin controles de registrar/comparar recibido. Los registros anteriores siguen en respaldos y no se infiere un depósito por pasar la fecha. Finanzas no se simplificó todavía; se revisaron sus extras para informar al propietario. Extensión sin cambios.
+- Web 647 aplica el mock aprobado de Finanzas simplificada: Disponible, Gastos, Metas, prioridades y reservas. Se retiran de la interfaz planificador/50-30-20, registro e historial mensual de pagos y estimaciones de aportes por meses. Los datos anteriores se conservan en ajustes y respaldos; categorías, edición, reparto, exclusiones y liberación permanecen. La próxima prioridad incluye Metas cuando termina Gastos. Extensión sin cambios.
+
+- Web 646 recupera Fechas de pago según la referencia 631 elegida y aprobada por el propietario: tarjeta y fecha azul, leyenda, filas compactas y fecha a la derecha; sin controles de registrar/comparar recibido. Los registros anteriores siguen en respaldos y no se infiere un depósito por pasar la fecha. La simplificación posterior de Finanzas está documentada en web 647. Extensión sin cambios.
 
 - Web 645 amplía la auditoría profunda del 24/10: propietarios y respuestas tardías, recuperación de pendientes y bonos, Finanzas y premios intercalados. 75 regresiones nuevas; 1.125 pruebas correctas y mes ficticio de 35 días. Informe y límites en docs/auditoria-profunda-2026-10-24.md. Extensión 2.3.6 instalada como archivos con respaldo y preferencias conservadas; activación runtime no certificada (última confirmada: 2.3.5).
 
@@ -504,6 +506,11 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v647 — Finanzas simplificada según mock aprobado.**
+
+- Filas con Reservado y Objetivo, progreso y ajustes plegados; controles de prioridad y moneda conservados. Sin planificador, pagos mensuales ni estimador de meses en la interfaz. Datos heredados preservados.
+- Exclusión automática accesible dentro de cada reserva; próxima prioridad continúa con Metas. Comprobaciones de reservas, persistencia, traducciones, wiring y compilación. Detalle en docs/finanzas-reservas-y-recepciones.md.
+
 **v646 — Fechas de pago con presentación 631 aprobada.**
 
 - Recuperada la lista compacta, azul histórico y etiqueta de ciclo; retirados de esa vista los controles de recepción y comparación. Datos anteriores conservados y fechas pasadas diferenciadas de recepciones reales.
@@ -514,9 +521,3 @@ futura opera bajo esto, sin excepción:
 - Recuperar respeta llamadas pendientes y bonos ganados; rechazos restauran reservas e informe juntos y no pisan cuentas reemplazadas.
 - Confirmaciones y formularios de Finanzas/Logros respetan propietario y cambios posteriores; premio cosmético duplicado no consume la elección. Feedback sigue el idioma actual.
 - Usuario tardío, cierre de sesión, permisos colgados y ACK del puente protegidos. Undici indirecto actualizado a 6.29.1. Evidencia y límites en docs/auditoria-profunda-2026-10-24.md; instalación y activación de extensión se distinguen.
-
-**v644 — Auditoría profunda: integridad de guardado, llamadas y estado combinado.**
-
-- Guardados rechazados revierten bienvenida, racha, preferencias de Logros y semanas personalizadas; las confirmaciones obsoletas no se aplican.
-- Respaldo pendiente conserva milisegundos e identidad tras recarga; descartar revierte de forma segura y conserva premios posteriores. Manuales/ediciones/imports protegen llamadas en curso. ACW y duración vigente siguen la corrección sin borrar evidencia original.
-- Estado futuro y tendencias traducidos; Zod indirecto 4.6.6 elimina una alerta alta. Mes ficticio y regresiones, CI/publicación y límites documentados en docs/auditoria-profunda-2026-10-23.md.

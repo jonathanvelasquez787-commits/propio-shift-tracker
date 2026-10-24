@@ -1,8 +1,8 @@
 import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 // app-main.js inyecta los helpers; app-context.js mantiene el estado compartido.
 import { settings, calls } from './app-context.js';
-import { configureFinancePlanning, captureFinanceDetails, financePlanningRowHtml, renderFinancePlanning, financeAmountInputHtml, clearFinanceAmountDraft, financeReservationHtml, prepareFinanceMonthRender, financeCurrentExpenseStatus, financeReservationSign, financeInputUsd, financeInputValue } from './finance-planning.js';
-import { financeBudgetPeriod, financeCanCompareMonthlyBudget, financeReservationPlan } from './finance-plan-model.js';
+import { configureFinancePlanning, captureFinanceDetails, financeAmountInputHtml, clearFinanceAmountDraft, financeReservationHtml, financeReservationSign, financeInputUsd, financeInputValue } from './finance-planning.js';
+import { financeBudgetPeriod, financeReservationPlan } from './finance-plan-model.js';
 import { loadDetailViews } from './detail-views-loader.js';
 
 let money, convertedAmountText, iconHtml, escapeHtml, toast, appConfirm, openModal, closeModal, render;
@@ -324,40 +324,31 @@ function financeRowHtml(row, opts) {
       <span class="fin-priority-num" title="${priorityTitle}">${opts.index + 1}</span>
       <button class="fin-priority-btn" type="button" data-fin-priority-down="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" ${downDisabled} aria-label="Bajar prioridad" title="${priorityTitle}">${iconHtml('chevronDown')}</button>
     </div>
-    <span class="fin-cat-icon">${financeCategoryIconHtml(cat)}</span>
   `;
 
   const isMeta = opts.isMeta;
   const remaining = Math.max(0, target - assigned);
   const barPct = target > 0 ? Math.min(100, assigned / target * 100) : 0;
-  const reserveLabel = assigned <= 0 ? translateText('Sin reserva') : remaining > 0.004 ? translateText('Reserva parcial') : translateText('Reserva completa');
-  const reserveTone = assigned <= 0 ? 'neutral' : remaining > 0.004 ? 'warn' : 'good';
-  const status = isMeta ? null : financeCurrentExpenseStatus(row);
-  const monthlyBudget = financeCanCompareMonthlyBudget(row);
-  const paymentLabel = !status || status.paymentStatus === 'none' ? translateText('Sin pagos') : status.paymentStatus === 'partial' ? translateText('Pago parcial') : translateText('Pagado');
-  const paymentBadge = status ? ui`<span class="fin-badge tone-${!monthlyBudget ? 'neutral' : status.excess > 0 ? 'warn' : status.paymentStatus === 'paid' ? 'good' : 'neutral'}">${!monthlyBudget && status.paid > 0 ? translateText('Pagos registrados') : monthlyBudget && status.excess > 0 ? translateText('Presupuesto excedido') : monthlyBudget ? paymentLabel : translateText('Sin pagos')}</span>` : '';
-  const metrics = financeRowMetric(isMeta ? translateText('Objetivo') : translateText('Presupuesto'), target)
-    + financeRowMetric(translateText('Reservado'), assigned, ui`<span class="fin-badge tone-${reserveTone}">${reserveLabel}</span>${!isMeta && row.manualPaid ? ui`<span class="fin-row-sub">Reserva automática omitida</span>` : ''}`)
-    + financeRowMetric(isMeta ? translateText('Pendiente de reservar') : translateText('Pagado en el mes elegido'), isMeta ? remaining : status.paid, paymentBadge)
-    + (!isMeta ? financeRowMetric(translateText('Pendiente de reservar'),remaining) : '')
-    + (!isMeta && monthlyBudget ? financeRowMetric(status.excess>0?translateText('Exceso pagado en el mes'):translateText('Pendiente de pagar del mes'),status.excess||status.remaining) : '');
+  const metrics = financeRowMetric(translateText('Reservado'), assigned)
+    + financeRowMetric(translateText('Objetivo'), target);
   return ui`
     <div class="fin-row" data-fin-row="${escapeHtml(row.id)}" style="--cat-rgb:${cat.rgb};">
-      ${priorityHtml}
+      <div class="fin-row-heading">
       <div class="fin-row-main">
         <div class="fin-row-title">${escapeHtml(row.name)}</div>
-          <div class="fin-row-sub">${escapeHtml(cat.label)}${isMeta ? '' : ui` · ${financePeriodLabel(row)} · ${row.recurring ? translateText('Recurrente') : translateText('Puntual')} · ${row.expenseType === 'variable' ? translateText('Importe variable') : translateText('Importe fijo')}`}</div>
-        <div class="fin-progress-track" role="progressbar" aria-label="Progreso de la reserva" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(barPct)}"><div style="width:${barPct}%; background:${isMeta ? 'var(--purple)' : 'var(--cyan)'};"></div></div>
+        <div class="fin-row-sub">${escapeHtml(cat.label)}${!isMeta && row.manualPaid ? ui` · Reserva automática omitida` : ''}</div>
+      </div>
+      ${priorityHtml}
       </div>
       <div class="fin-row-metrics">${metrics}</div>
+      <div class="fin-progress-track" role="progressbar" aria-label="Progreso de la reserva" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(barPct)}"><div style="width:${barPct}%; background:var(--cyan);"></div></div>
       ${financeReservationHtml(row, ui`<div class="fin-row-actions">
         ${financeAmountInputHtml(row, 'reservation')}${signPillHtml}
         <button class="fin-mini-btn-primary ${sign === 'minus' ? 'mode-minus' : ''}" type="button" data-fin-apply="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" data-fin-help="${escapeHtml(translateText('Confirma el monto y la opción Sumar o Restar. Sumar usa solo dinero disponible; en gastos no supera el presupuesto. Restar devuelve como máximo lo reservado.'))}">Aplicar ajuste</button>
         ${!isMeta && assigned > 0 ? ui`<button class="fin-ghost-btn" type="button" data-fin-reset="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" data-fin-help="${escapeHtml(translateText('Devuelve toda la reserva de este gasto al Disponible. Conserva el presupuesto, los pagos registrados y la exclusión del reparto automático.'))}">Liberar reserva</button>` : ''}
         <button class="fin-ghost-btn fin-ghost-btn-icon" type="button" data-fin-edit="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" aria-label="Editar fila" title="Editar fila">${iconHtml('edit')}</button>
         <button class="hr-window-remove-btn" type="button" data-fin-delete="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" aria-label="Eliminar fila" title="Eliminar fila">${iconHtml('trash')}</button>
-      </div>`)}
-      ${financePlanningRowHtml(row, isMeta)}
+      </div><div class="fin-reservation-pending">Faltan ${money(remaining)}${financeConvertedInline(remaining)}</div>${!isMeta ? ui`<label class="fin-checkbox-label"><input type="checkbox" data-fin-mark-paid="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" ${row.manualPaid ? 'checked' : ''}/> Omitir reserva automática</label>` : ''}`)}
     </div>
   `;
 }
@@ -393,8 +384,8 @@ export function renderFinanceSection() {
   if (autoFillInput) autoFillInput.checked = !!settings.financeAutoFill;
 
   const gastoRows = financeGastoRowsSorted();
-  prepareFinanceMonthRender(gastoRows);
-  const nextPending = gastoRows.find(r => Number(r.targetAmount) > 0 && !financeIsRowPagado(r));
+  const nextPending = gastoRows.find(r => Number(r.targetAmount) > 0 && !financeIsRowPagado(r))
+    || financeMetaRowsSorted().find(r => (Number(r.assignedAmount) || 0) < (Number(r.targetAmount) || 0) - 0.004);
   const nextPriorityEl = document.getElementById('financeNextPriorityVal');
   if (nextPriorityEl) nextPriorityEl.textContent = nextPending ? nextPending.name : '—';
 
@@ -430,7 +421,6 @@ export function renderFinanceSection() {
   }
 
   renderFinancePreview();
-  renderFinancePlanning({prepared:true});
   updateFinanceTotalsScrollHint();
 }
 
@@ -720,14 +710,6 @@ export function openFinanceRowModal(kind, existingRow = null) {
   // La categoría ya no se esconde en Metas: "Meta de ahorro" es una categoría más entre las que se
   // puede elegir, no un caso aparte forzado a 'ahorro'.
   if (typeField) typeField.style.display = isMeta ? 'none' : '';
-  const expenseTypeField = document.getElementById('financeRowExpenseTypeField');
-  const expenseTypeInput = document.getElementById('financeRowExpenseTypeInput');
-  if (expenseTypeField) expenseTypeField.style.display = isMeta ? 'none' : '';
-  if (expenseTypeInput) expenseTypeInput.value = existingRow?.expenseType === 'variable' ? 'variable' : 'fixed';
-  const periodField = document.getElementById('financeRowBudgetPeriodField');
-  const periodInput = document.getElementById('financeRowBudgetPeriodInput');
-  if (periodField) periodField.style.display = isMeta ? 'none' : '';
-  if (periodInput) periodInput.value = financeBudgetPeriod(existingRow || {});
   openModal('financeRowModal');
 }
 
@@ -969,8 +951,6 @@ export function saveFinanceRowModal() {
     foundRow.kind = isMeta ? 'meta' : 'gasto';
     if (!isMeta) {
       foundRow.recurring = (typeInput?.value || 'recurring') === 'recurring';
-      foundRow.expenseType = document.getElementById('financeRowExpenseTypeInput')?.value === 'variable' ? 'variable' : 'fixed';
-      foundRow.budgetPeriod = financeBudgetPeriod({budgetPeriod:document.getElementById('financeRowBudgetPeriodInput')?.value});
     }
     if (catId !== foundCatId) {
       settings.financeCategories[foundCatId].rows = settings.financeCategories[foundCatId].rows.filter(r => r.id !== foundRow.id);
@@ -1004,8 +984,6 @@ export function saveFinanceRowModal() {
   };
   if (!isMeta) {
     row.recurring = (typeInput?.value || 'recurring') === 'recurring';
-    row.expenseType = document.getElementById('financeRowExpenseTypeInput')?.value === 'variable' ? 'variable' : 'fixed';
-    row.budgetPeriod = financeBudgetPeriod({budgetPeriod:document.getElementById('financeRowBudgetPeriodInput')?.value});
     row.manualPaid = false;
   }
   cat.rows.push(row);

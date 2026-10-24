@@ -787,10 +787,9 @@
       <div class="fin-header-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12V8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h13a1 1 0 0 0 1-1v-4"/><path d="M20 12a2 2 0 0 1 0 4h-3a2 2 0 0 1 0-4Z"/></svg></div>
       <div>
         <div class="fin-title">Finanzas</div>
-        <div class="fin-sub">Reserva tus ganancias para gastos y metas; registra tus pagos por separado.</div>
+        <div class="fin-sub">Reserva tus ganancias para gastos y metas.</div>
       </div>
     </div>
-    <div class="fin-date-pill">Asignación por prioridad</div>
   </div>
 
   <div class="fin-available-card">
@@ -798,7 +797,6 @@
       <div class="fin-available-label">Disponible para asignar</div>
       <div class="fin-available-amt" id="financeAvailableAmt">$0.00</div>
       <div class="fin-available-converted" id="financeAvailableConverted"></div>
-      <div class="fin-available-note">Ganancias de llamadas aún sin reservar. El orden ↑/↓ decide la prioridad.</div>
     </div>
     <div class="fin-available-stat">
       <div class="fin-available-stat-label">Siguiente prioridad</div>
@@ -811,56 +809,17 @@
   </label>
   <p class="sched-hint" style="margin:0 0 16px;">Reserva el disponible en orden de prioridad: Gastos primero, luego Metas. Puedes ajustar cada reserva con Sumar o Restar.</p>
 
-  <details class="polished-disclosure" id="financeDistributionDetails"><summary id="financeDistributionReviewBtn">Último reparto automático</summary><div class="polished-detail" id="financeDistributionContent"></div></details>
-  <details class="fin-plan" id="financePlanDetails">
-    <summary><strong>Planificar presupuesto</strong><span id="financePlanSummary"></span><span aria-hidden="true">⌄</span></summary>
-    <div class="fin-plan-body">
-      <div class="fin-plan-inputs">
-        <label class="fin-plan-field" for="financePlanHoursInput">Horas productivas por día<input id="financePlanHoursInput" data-fin-plan-input type="number" min="0" max="24" step="any"/></label>
-        <label class="fin-plan-field" for="financePlanDaysInput">Días por semana (proyección)<input id="financePlanDaysInput" data-fin-plan-input type="number" min="1" max="7" step="1"/></label>
-        <div class="fin-plan-settings"><span>Tarifa y moneda de Ajustes</span><strong id="financePlanRate"></strong><small>Las conversiones usan tu moneda y tipo de cambio configurados.</small></div>
-      </div>
-      <div class="fin-plan-projection" aria-live="polite">
-        <div><span>Meta diaria</span><strong id="financePlanDailyValue"></strong></div>
-        <div><span>Ingreso proyectado · 4 semanas</span><strong id="financePlanProjectedValue"></strong></div>
-        <button class="fin-mini-btn-primary" id="saveFinancePlanBtn" type="button">Guardar meta diaria</button>
-      </div>
-      <p class="sched-hint">Al guardar se actualizan tu meta general y la de hoy. Tus llamadas, ganancias anteriores y bloques de horario se conservan.</p>
-      <div class="fin-plan-split-heading"><strong>Distribución del ingreso</strong><span class="sched-help-wrap"><button class="sched-compact-info-btn" id="financeSplitHelpBtn" type="button" aria-label="Qué es el método 50-30-20" aria-describedby="financeSplitTooltip">i</button><span class="sched-help-tooltip fin-split-tooltip" id="financeSplitTooltip" role="tooltip">El método 50-30-20 propone destinar 50% a necesidades, 30% a gustos y 20% al ahorro. Es una referencia: puedes elegir otros porcentajes que sumen 100%. No cambia tus prioridades de asignación.</span></span></div>
-      <div class="fin-plan-distribution">
-        <div><label class="fin-plan-field" for="financePlanFixedInput">Gastos fijos (%)<input id="financePlanFixedInput" data-fin-plan-input type="number" min="0" max="100" step="any"/></label><strong id="financePlanFixedValue"></strong></div>
-        <div><label class="fin-plan-field" for="financePlanVariableInput">Gastos variables (%)<input id="financePlanVariableInput" data-fin-plan-input type="number" min="0" max="100" step="any"/></label><strong id="financePlanVariableValue"></strong></div>
-        <div><label class="fin-plan-field" for="financePlanSavingsInput">Ahorro (%)<input id="financePlanSavingsInput" data-fin-plan-input type="number" min="0" max="100" step="any"/></label><strong id="financePlanSavingsValue"></strong></div>
-      </div>
-      <p class="sched-hint" id="financePlanSplitTotal" aria-live="polite"></p>
-      <p class="fin-plan-error" id="financePlanError" role="alert" hidden></p>
-      <p class="fin-plan-status" id="financePlanSaveStatus" role="status" aria-live="polite"></p>
-    </div>
-  </details>
-
   <div class="fin-tab-toggle" id="financeTabToggle" role="group" aria-label="Ver Gastos o Metas">
     <button class="fin-tab-btn active" data-fin-tab="gastos" type="button">Gastos</button>
     <button class="fin-tab-btn" data-fin-tab="metas" type="button">Metas</button>
   </div>
 
   <div id="financeGastosView">
-    <div class="fin-info-box fin-info-box-compact">
-      <svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-      <span>Presupuesto = importe previsto. Reservado = ganancias apartadas. Pagado = pagos registrados con fecha.</span>
-    </div>
-    <div class="fin-plan-month-head fin-expense-month"><strong>Pagos del mes elegido</strong><label class="fin-plan-field" for="financeMonthInput">Mes de los pagos<input id="financeMonthInput" type="month"/></label></div>
-    <details class="fin-payment-history-all fin-month-history"><summary>Resumen de pagos e historial general</summary><div class="fin-plan-metrics" id="financeMonthTotals" aria-live="polite"></div><details class="fin-plan-help"><summary>Cómo se comparan los importes</summary><p class="sched-hint">Se comparan los presupuestos actuales con los pagos del mes elegido. Los importes de distintos períodos se suman sin convertirlos a un presupuesto mensual.</p></details><div id="financePaymentHistory"></div></details>
-    <div id="financeGastosTotalRow"></div>
     <div class="fin-list" id="financeGastosList"></div>
     <button class="sched-add-block-btn" id="addFinanceGastoBtn" type="button">+ Agregar gasto</button>
   </div>
 
   <div id="financeMetasView" style="display:none;">
-    <div class="fin-info-box">
-      <svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-      <span>Reservado para la meta = ganancias apartadas dentro de la app. Se acumula entre meses; no confirma depósitos en una cuenta de ahorro.</span>
-    </div>
-    <div id="financeMetasTotalRow"></div>
     <div class="fin-list" id="financeMetasList"></div>
     <button class="sched-add-block-btn" id="addFinanceMetaBtn" type="button">+ Agregar meta</button>
   </div>
@@ -2073,15 +2032,6 @@ $0.72"></textarea>
 <option value="onetime">Puntual</option>
 </select>
 <p class="sched-hint">Recurrente permite volver a reservar este gasto. Las reservas se liberan manualmente; no se reinician con el calendario.</p>
-</div>
-<div class="goals-field" id="financeRowBudgetPeriodField">
-<label for="financeRowBudgetPeriodInput">Período del presupuesto</label>
-<select id="financeRowBudgetPeriodInput"><option value="unspecified">Sin definir</option><option value="weekly">Por semana</option><option value="fortnightly">Por 2 semanas</option><option value="monthly">Por mes</option><option value="onetime">Una sola vez</option></select>
-<p class="sched-hint">Indica a qué período corresponde el importe. No multiplica el presupuesto ni programa reservas automáticas.</p>
-</div>
-<div class="goals-field" id="financeRowExpenseTypeField">
-<label for="financeRowExpenseTypeInput">Comportamiento del importe</label>
-<select id="financeRowExpenseTypeInput"><option value="fixed">Fijo: importe estable</option><option value="variable">Variable: importe cambiante</option></select>
 </div>
 <div class="goals-field">
 <label for="financeRowTargetInput">Monto objetivo ($)</label>
