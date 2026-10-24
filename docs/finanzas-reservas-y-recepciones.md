@@ -35,7 +35,18 @@ la reserva automática. Un rechazo de almacenamiento conserva el estado anterior
 El resumen de Inicio identifica los pendientes como acumulados de Finanzas,
 independientes del día activo.
 
-## Registrar lo recibido
+## Fechas de pago y recepciones anteriores
+
+Desde web 646, el propietario pidió recuperar la presentación compacta de la
+631. Fechas de pago vuelve a mostrar la próxima fecha, el ciclo actual y la
+lista con fechas a la derecha. Se retiraron de esa vista los botones de
+registrar/editar recibido y la comparación de importes. No se borran datos de
+recepción anteriores: siguen incluidos en el respaldo JSON y su validación.
+Una fecha pasada no se marca recibida automáticamente; el indicador recibido
+solo se usa si ya existía un registro válido.
+
+El siguiente bloque describe el funcionamiento anterior, conservado para
+interpretar esos respaldos; ya no es una instrucción de la interfaz actual.
 
 En Fechas de pago, una fecha pasada no se considera pagada por sí sola.
 «Registrar recibido» solicita total en USD y fecha real. Si hubo varios abonos,

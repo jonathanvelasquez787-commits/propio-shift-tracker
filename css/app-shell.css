@@ -855,10 +855,6 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 #statsAccordion .rd-list{max-width:720px}
 #statsAccordion .rd-row{gap:22px;justify-content:flex-start}
 #statsAccordion .rd-label{flex:0 1 280px}
-#payDatesBody .wk-row{border-radius:0;margin:0;padding:11px 4px;background:transparent;border:0;border-bottom:1px solid var(--line)}
-#payDatesBody .wk-row.is-today{background:rgba(var(--cyan-rgb),.06);border-radius:10px}
-#payDatesBody .wk-row .wk-row-icon{background:rgba(var(--cyan-rgb),.16);color:var(--cyan)}
-#payDatesBody .pay-receipt-details{max-width:620px}
 #pageFinance .fin-row{padding-top:14px;padding-bottom:14px}
 #pageFinance .fin-plan-row>summary{min-height:40px}
 #pageFinance .fin-plan-row-body{padding-top:6px;padding-bottom:8px}
@@ -879,5 +875,6 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 .record-help-steps li{margin:8px 0}.record-help-steps strong{color:var(--text)}
 @media(max-width:600px){#workDayReviewDetails .review-line>span{flex-basis:55%}#earningsDetailsSection .polished-breakdown-row>div:first-of-type{flex:1}#rptCycleGrid .polished-forecast .polished-amount{font-size:26px}#statsAccordion .rd-label{flex-basis:60%}}
 
-#payDatesBody .wk-row-right{flex:0 1 220px;min-width:100px;max-width:35%}#payDatesBody .wk-row-amount{white-space:normal}#payDatesBody .wk-row-main>.fin-ghost-btn{margin-top:6px}#payDatesBody .pay-receipt-details>summary{padding:6px 0}
-@media(max-width:480px){#payDatesBody .wk-row{flex-wrap:wrap}#payDatesBody .wk-row-main{flex-basis:calc(100% - 50px)}#payDatesBody .wk-row-right{flex-basis:100%;margin-left:44px;max-width:100%;text-align:left}#payDatesBody .wk-row-title{display:block}#payDatesBody .wk-row-badge{display:table;margin-top:4px}}
+#payDatesBody .wk-row-right{max-width:38%;min-width:0}
+#payDatesBody .wk-row-title .wk-row-badge{white-space:normal}
+#payDatesRetryBtn[hidden]{display:none}
