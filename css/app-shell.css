@@ -941,10 +941,10 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 #goalsModal #settingsRecoveryCopies:empty{display:none}
 #goalsModal #settingsRecoveryCopies select{width:100%;min-width:0}
 #goalsModal #automationPanel{margin:0;padding:0;border-top:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent}
-#goalsModal #automationPanel .automation-heading{padding:15px 0;gap:12px;flex-wrap:wrap}
+#goalsModal #automationPanel .automation-heading{display:flex;padding:15px 0;gap:12px;flex-wrap:wrap}
 #goalsModal #automationPanel .automation-icon{width:31px;min-width:31px;background:transparent;border:0;color:var(--cyan)}
 #goalsModal #automationPanel .automation-identity{flex:1;min-width:0}
-#goalsModal #automationPanel .automation-state{margin-left:43px;text-align:left;flex-basis:100%;order:4}
+#goalsModal #automationPanel .automation-state{margin-left:43px;text-align:left;flex-basis:calc(100% - 43px);justify-content:flex-start;flex-wrap:wrap;order:4}
 #goalsModal #automationPanel .automation-body{padding:0 0 18px 43px}
 #goalsModal .settings-delete-group{margin-top:25px;border-top:1px solid var(--line);border-bottom:0;background:rgba(var(--bad-rgb),.05);padding:0 12px;border-radius:0 0 12px 12px}
 #goalsModal .settings-delete-group>summary strong,#goalsModal .settings-delete-group .settings-group-icon{color:var(--bad)}
