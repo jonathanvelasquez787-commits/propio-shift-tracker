@@ -147,7 +147,7 @@ export function captureFinanceDetails() {
 }
 
 export function financeReservationHtml(row, controls) {
-  return ui`<details class="fin-plan-row fin-reservation-controls" data-fin-reservation-row="${ctx.escapeHtml(row.id)}" ${expandedReservations.has(row.id) ? 'open' : ''}><summary>Apartar o devolver dinero<span aria-hidden="true">⌄</span></summary><div class="fin-plan-row-body"><p class="sched-hint">Este ajuste mueve dinero entre Disponible y Reservado. No registra un pago.</p>${controls}</div></details>`;
+  return ui`<details class="fin-plan-row fin-reservation-controls" data-fin-reservation-row="${ctx.escapeHtml(row.id)}" ${expandedReservations.has(row.id) ? 'open' : ''}><summary>Apartar o devolver dinero<span aria-hidden="true">⌄</span></summary><div class="fin-plan-row-body"><p class="sched-hint">Este ajuste mueve dinero entre Disponible y Reservado.</p>${controls}</div></details>`;
 }
 
 function paymentHistoryHtml(records) {
@@ -328,27 +328,16 @@ export function wireFinancePlanning() {
   const section = el('financeSection');
   if (!section || section.dataset.planningWired) return;
   section.dataset.planningWired = 'true';
-  wireFinanceSplitHelp();
   wireFinanceFieldHelp(section);
   section.addEventListener('input', event => {
     const target = event.target;
-    if (target.matches('[data-fin-plan-input]')) { planDraft = true; el('financePlanSaveStatus').textContent = ''; updateFinancePlanPreview(); }
-    const body = target.closest('.fin-plan-row-body');
     const entry = target.closest('[data-fin-amount-scope]');
     if (entry && target.tagName === 'INPUT') rememberAmount(entry);
-    if (body && target.matches('[data-fin-payment-date], [data-fin-savings-months]')) {
-      const rowId = body.closest('[data-fin-plan-row]').getAttribute('data-fin-plan-row');
-      if (target.matches('[data-fin-savings-months]')) savingsDrafts.set(rowId, {months:target.value});
-      else rowDrafts.set(`${rowId}:${selected()}`, {date:target.value});
-    }
+
   });
   section.addEventListener('change', event => {
     if (event.target.matches('[data-fin-amount-unit]')) { rememberAmount(event.target.closest('[data-fin-amount-scope]'), true); return; }
-    if (event.target.id !== 'financeMonthInput') return;
-    const month = event.target.value;
-    if (!validFinanceDate(month + '-01')) { event.target.value = selected(); return; }
-    selectedMonth = month;
-    ctx.renderFinanceSection();
+
   });
   section.addEventListener('click', event => {
     const button = event.target.closest('button');
@@ -358,19 +347,7 @@ export function wireFinancePlanning() {
       amountDrafts.set(key, {...amountDrafts.get(key), sign:button.getAttribute('data-sign')});
       return;
     }
-    if (button.id === 'saveFinancePlanBtn') { reviewFinancePlan(); return; }
-    if (button.hasAttribute('data-fin-payment-delete')) { deleteFinancePayment(button.getAttribute('data-fin-payment-delete')); return; }
-    if (button.hasAttribute('data-fin-payment-save')) {
-      const body = button.closest('.fin-plan-row-body');
-      const entry = body.querySelector('[data-fin-amount-scope]');
-      const raw = entry.querySelector('input').value;
-      const local = entry.querySelector('select').value === 'local';
-      addFinancePayment(button.getAttribute('data-fin-cat'), button.getAttribute('data-fin-payment-save'), local ? '' : raw,
-        local ? raw : '', body.querySelector('[data-fin-payment-date]').value);
-    }
-    if (button.hasAttribute('data-fin-savings-save')) {
-      saveFinanceSavingsMonths(button.getAttribute('data-fin-cat'), button.getAttribute('data-fin-savings-save'), button.closest('.fin-plan-row-body').querySelector('[data-fin-savings-months]').value);
-    }
+
   });
 }
 

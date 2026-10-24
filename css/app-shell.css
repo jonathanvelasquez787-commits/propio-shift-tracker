@@ -878,3 +878,26 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 #payDatesBody .wk-row-right{max-width:38%;min-width:0}
 #payDatesBody .wk-row-title .wk-row-badge{white-space:normal}
 #payDatesRetryBtn[hidden]{display:none}
+
+#pageFinance .fin-header{margin-bottom:20px}
+#pageFinance .fin-available-amt{display:block}
+#pageFinance .fin-available-converted{display:block;margin-left:0}
+#pageFinance .fin-available-stat{text-align:left}
+#pageFinance .fin-list{gap:0}
+#pageFinance .fin-row{display:block;padding:18px 0;border:0;border-top:1px solid var(--line);border-radius:0;background:transparent;min-width:0}
+#pageFinance .fin-row-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;min-width:0}
+#pageFinance .fin-row-main{flex:1;min-width:0}
+#pageFinance .fin-row-title{font-size:15px}
+#pageFinance .fin-priority{flex-direction:row;gap:6px}
+#pageFinance .fin-priority-btn{width:32px;height:36px}
+#pageFinance .fin-priority-num{background:transparent;width:auto;min-width:14px}
+#pageFinance .fin-row-metrics{grid-template-columns:repeat(2,minmax(0,1fr));margin:14px 0 10px;gap:16px}
+#pageFinance .fin-row-metrics .fin-plan-metric:last-child{text-align:right}
+#pageFinance .fin-row-metrics .fin-plan-metric{font-size:12px;gap:2px}
+#pageFinance .fin-progress-track{height:6px;margin:0;border:0}
+#pageFinance .fin-plan-row{margin-top:10px;border:0}
+#pageFinance .fin-plan-row>summary{color:var(--cyan);justify-content:flex-start;gap:8px}
+#pageFinance .fin-reservation-pending{font-size:12px;color:var(--muted);margin-top:10px;overflow-wrap:anywhere}
+#pageFinance .sched-add-block-btn{margin-top:14px}
+@media(max-width:640px){#pageFinance .fin-available-card{padding:14px}#pageFinance .fin-header-icon{width:42px;height:42px}#pageFinance .fin-row-actions>.fin-amount-entry{flex-basis:100%}}
+@media(pointer:coarse){#pageFinance .fin-priority-btn{width:38px;min-height:44px}}
