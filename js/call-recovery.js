@@ -1,3 +1,5 @@
+import { unfinishedCallIntervals } from './call-records.js';
+
 const KEEP_MS = 30 * 86400000, MAX_ENTRIES = 50, MAX_BYTES = 384 * 1024;
 const clone = value => JSON.parse(JSON.stringify(value));
 const canonical = value => JSON.stringify(value, function (_key, item) {
@@ -6,6 +8,44 @@ const canonical = value => JSON.stringify(value, function (_key, item) {
 });
 const equal = (a, b) => canonical(a) === canonical(b);
 const bytes = value => new TextEncoder().encode(JSON.stringify(value)).length;
+
+function higherRateReceipt(call, settings, bonusForCall) {
+  const bonus = call && bonusForCall(call);
+  const valid = bonus && typeof bonus.tier === 'string' && typeof bonus.windowId === 'string'
+    && Number.isFinite(bonus.amount) && bonus.amount >= 0;
+  return { bonus: valid ? clone(bonus) : null,
+    window: valid ? clone((settings.higherRateWindows || []).find(window => window.id === bonus.windowId) || null) : null };
+}
+
+export function correctRecoveryHigherRateReceipts(history, windowId, windows, bonusForCall) {
+  return (Array.isArray(history) ? history : []).map(entry => !entry || !Array.isArray(entry.changes) ? entry : ({ ...entry, changes: entry.changes.map(change => {
+    if (!change || typeof change !== 'object') return change;
+    const next = { ...change };
+    for (const side of ['before', 'after']) {
+      const call = change[side];
+      if (!call || typeof call !== 'object' || change[`${side}HigherRateBonus`]?.windowId !== windowId) continue;
+      const corrected = { ...call };
+      if (corrected.frozenHigherRateBonus?.windowId === windowId) delete corrected.frozenHigherRateBonus;
+      const receipt = higherRateReceipt(corrected, { higherRateWindows: windows }, candidate => bonusForCall(candidate, windows));
+      next[`${side}HigherRateBonus`] = receipt.bonus;
+      next[`${side}HigherRateWindow`] = receipt.window;
+      next[`${side}HigherRateRecalculatedWindowId`] = windowId;
+    }
+    return next;
+  }) }));
+}
+
+function callBeforeRecovery(change, context) {
+  const call = clone(change.before), receipt = change.beforeHigherRateBonus;
+  if (call.frozenHigherRateBonus?.windowId === change.beforeHigherRateRecalculatedWindowId) delete call.frozenHigherRateBonus;
+  if (!call.frozenHigherRateBonus && receipt && typeof receipt.tier === 'string' && typeof receipt.windowId === 'string'
+    && Number.isFinite(receipt.amount) && receipt.amount >= 0) {
+    const windows = context.data?.().settings?.higherRateWindows || [];
+    const current = windows.find(window => window.id === receipt.windowId);
+    if (!change.beforeHigherRateWindow || !equal(current || null, change.beforeHigherRateWindow)) call.frozenHigherRateBonus = clone(receipt);
+  }
+  return call;
+}
 
 export function recoveryEntries(value, now = Date.now()) {
   return (Array.isArray(value) ? value : []).filter(entry => entry && typeof entry.id === 'string'
@@ -35,28 +75,33 @@ export function callRecoveryPlan(sourceCalls, entry, context) {
     const start = Date.parse(before.startISO), end = Date.parse(before.endISO), duration = Number(before.durationMin);
     if (!Number.isFinite(start) || !Number.isFinite(end) || end < start || end > Date.now()
       || !Number.isFinite(duration) || duration < 0 || duration > context.MAX_CALL_DURATION_MIN) return { reason: 'invalid' };
-    replacements.push(clone(before));
+    replacements.push(callBeforeRecovery(change, context));
   }
   const remaining = sourceCalls.filter(call => !ids.has(call.id));
   const occupied = [...remaining];
-  if (context.activeCall?.startedAt) occupied.push({ startISO: context.activeCall.startedAt, endISO: new Date(Date.now()).toISOString() });
+  occupied.push(...unfinishedCallIntervals(context));
   for (const call of replacements) {
     if (occupied.some(other => context.callsOverlap(other, call)
       || (other.customerId === call.customerId && Date.parse(other.startISO) === Date.parse(call.startISO))
       || context.callDedupeKey(other) === context.callDedupeKey(call))) return { reason: 'overlap' };
     occupied.push(call);
   }
-  return { calls: [...remaining, ...replacements], changes: entry.changes.map(change => ({ id: change.id, before: change.after, after: change.before })) };
+  return { calls: [...remaining, ...replacements], changes: entry.changes.map(change => ({ id: change.id, before: change.after,
+    after: replacements.find(call => call.id === change.id) || null })) };
 }
 
 function transact(context, kind, changes, restoredId = null) {
   const { translateText } = context;
   const { state, settings, calls } = context.data();
   if (!context.canPersistLocalChanges()) return false;
-  const record = { id: context.makeLocalId(), at: new Date(Date.now()).toISOString(), kind, changes: changes.map(change => ({ ...clone(change),
-    beforeBonus: change.before ? context.higherRateBonusForCall(change.before)?.amount || 0 : 0,
-    afterBonus: change.after ? context.higherRateBonusForCall(change.after)?.amount || 0 : 0,
-  })) };
+  const record = { id: context.makeLocalId(), at: new Date(Date.now()).toISOString(), kind, changes: changes.map(change => {
+    const before = higherRateReceipt(change.before, settings, context.higherRateBonusForCall);
+    const after = higherRateReceipt(change.after, settings, context.higherRateBonusForCall);
+    return { ...clone(change), beforeHigherRateBonus: before.bonus, beforeHigherRateWindow: before.window,
+      afterHigherRateBonus: after.bonus, afterHigherRateWindow: after.window,
+      beforeBonus: change.before ? context.higherRateBonusForCall(change.before)?.amount || 0 : 0,
+      afterBonus: change.after ? context.higherRateBonusForCall(change.after)?.amount || 0 : 0 };
+  }) };
   const history = appendRecoveryEntry(state.callRecovery, record);
   if (!history) { context.toast(translateText('Este cambio supera el espacio del historial. Las llamadas se conservaron.')); return false; }
   if (restoredId) {
@@ -64,9 +109,11 @@ function transact(context, kind, changes, restoredId = null) {
     if (original) original.restoredAt = record.at;
   }
   const previousState = clone(state), previousCategories = settings.financeCategories === undefined ? undefined : clone(settings.financeCategories);
+  const previousDistribution = settings.financeLastDistribution === undefined ? undefined : clone(settings.financeLastDistribution);
   const ids = new Set(changes.map(change => change.id));
   state.callRecovery = history;
-  context.setCalls([...calls.filter(call => !ids.has(call.id)), ...changes.flatMap(change => change.after ? [clone(change.after)] : [])]);
+  const stagedCalls = [...calls.filter(call => !ids.has(call.id)), ...changes.flatMap(change => change.after ? [clone(change.after)] : [])];
+  context.setCalls(stagedCalls);
   const days = new Set(changes.flatMap(change => [change.before?.callDate, change.after?.callDate]).map(context.callDateKeyFromValue).filter(Boolean));
   let accepted = false;
   try {
@@ -75,9 +122,13 @@ function transact(context, kind, changes, restoredId = null) {
     if (context.stateWithinBudget(state)) accepted = context.saveAll({ render: false }) !== false;
   } catch { /* Un guardado interrumpido no debe dejar una eliminación aplicada solo en memoria. */ }
   if (!accepted) {
-    context.setCalls(calls);
-    context.setState(previousState);
-    if (previousCategories === undefined) delete settings.financeCategories; else settings.financeCategories = previousCategories;
+    const current = context.data();
+    if (current.state === state && current.settings === settings && current.calls === stagedCalls) {
+      context.setCalls(calls);
+      context.setState(previousState);
+      if (previousCategories === undefined) delete settings.financeCategories; else settings.financeCategories = previousCategories;
+      if (previousDistribution === undefined) delete settings.financeLastDistribution; else settings.financeLastDistribution = previousDistribution;
+    }
     context.render();
     context.toast(translateText('No se guardó el cambio. Tus llamadas y el historial anterior se conservaron.'));
     return false;
@@ -108,8 +159,8 @@ export function saveEditedCall(context, callId, opened) {
   const dropped = input('callEditDroppedInput')?.value === 'Yes' ? 'Yes' : 'No';
   const next = { ...original, durationMin: duration, pay: Math.max(0, amount).toFixed(2), billable, dropped, endISO: end.toISOString(), countsAsProductive: billable === 'Yes' && dropped === 'No' };
   if (Object.hasOwn(original, 'durationMs')) next.durationMs = end.getTime() - start.getTime();
-  if (state.activeCall && context.callsOverlap(next, { startISO: state.activeCall.startedAt, endISO: new Date().toISOString() })) {
-    toast(translateText('No se puede guardar: coincide con la llamada en curso.')); return false;
+  if (unfinishedCallIntervals(state).some(interval => context.callsOverlap(next, interval))) {
+    toast(translateText('Coincide con otra llamada')); return false;
   }
   const overlap = calls.find(call => call.id !== callId && context.callsOverlap(call, next));
   if (overlap) { toast(ui`Esa duración traslapa con la llamada #${overlap.customerId} (${overlap.callStart}). Ajusta la duración.`); return false; }
@@ -155,7 +206,7 @@ export function restoreCallChange(context, entryId, stamp) {
   if (!stamp || stamp.used || current.state !== stamp.state || current.settings !== stamp.settings
     || canonical([current.calls, current.state.callRecovery, current.settings]) !== stamp.revision) return false;
   const entry = recoveryEntries(current.state.callRecovery).find(item => item.id === entryId);
-  const plan = callRecoveryPlan(current.calls, entry, { ...context, activeCall: current.state.activeCall });
+  const plan = callRecoveryPlan(current.calls, entry, { ...context, activeCall: current.state.activeCall, pendingLiveCallBackup: current.state.pendingLiveCallBackup });
   if (plan.reason) return false;
   stamp.used = true;
   return transact(context, 'restore', plan.changes, entryId);
@@ -184,7 +235,7 @@ export function openCallRecovery(context) {
     const data = context.data();
     if (data.settings !== owner) { body.textContent = translateText('La cuenta cambió. Cerrá esta ventana.'); return; }
     const entries = recoveryEntries(data.state.callRecovery).slice().reverse().map(entry => ({ entry,
-      plan: callRecoveryPlan(data.calls, entry, { ...context, activeCall: data.state.activeCall }) }));
+      plan: callRecoveryPlan(data.calls, entry, { ...context, activeCall: data.state.activeCall, pendingLiveCallBackup: data.state.pendingLiveCallBackup }) }));
     const ready = entries.filter(item => !item.plan.reason).length;
     body.innerHTML = ui`<div class="recovery-overview"><span class="recovery-symbol" aria-hidden="true">↶</span><div><strong>Tu historial de cambios</strong><p>Revisá y recuperá llamadas sin sobrescribir cambios posteriores.</p></div><span class="recovery-count">${ready}</span></div>
       <div class="recovery-toolbar"><div class="table-filter-row"><button type="button" class="table-filter-btn ${mode === 'ready' ? 'active' : ''}" data-recovery-filter="ready">Recuperables</button><button type="button" class="table-filter-btn ${mode === 'all' ? 'active' : ''}" data-recovery-filter="all">Todos</button></div><button type="button" class="gap-edit-btn" data-recovery-refresh>Actualizar</button></div>
@@ -199,7 +250,7 @@ export function openCallRecovery(context) {
     body.querySelector('[data-recovery-refresh]').onclick = draw;
     body.querySelectorAll('[data-recovery-review]').forEach(button => { button.onclick = () => {
       const data = context.data(), entry = recoveryEntries(data.state.callRecovery).find(item => item.id === button.dataset.recoveryReview);
-      const plan = data.settings === owner && callRecoveryPlan(data.calls, entry, { ...context, activeCall: data.state.activeCall });
+      const plan = data.settings === owner && callRecoveryPlan(data.calls, entry, { ...context, activeCall: data.state.activeCall, pendingLiveCallBackup: data.state.pendingLiveCallBackup });
       if (!plan || plan.reason) { draw(); return; }
       prepared = callRecoveryStamp(data);
       const before = plan.changes.reduce((n, change) => n + total(change.before), 0), after = plan.changes.reduce((n, change) => n + total(change.after), 0);

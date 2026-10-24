@@ -2773,7 +2773,6 @@
   "s_28c5f735": {
     "source": "No se puede guardar: coincide con la llamada en curso.",
     "files": [
-      "js/call-recovery.js",
       "js/calls.js"
     ]
   },
@@ -12593,6 +12592,12 @@
     "source": "{{v0}} RACHA DE CUMPLIMIENTO",
     "files": [
       "js/reports.js"
+    ]
+  },
+  "s_bbf9bad7": {
+    "source": "Los datos cambiaron. Vuelve a abrir el formulario o la confirmación.",
+    "files": [
+      "js/finance.js"
     ]
   },
   "s_bc297ede": {

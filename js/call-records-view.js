@@ -1,4 +1,4 @@
-import { compareCallRecords, preserveCallRecords } from './call-records.js';
+import { compareCallRecords, preserveCallRecords, unfinishedCallIntervals } from './call-records.js';
 
 export function linkCallRecordReview(context, reviewId, callId, opened) {
   const { translateText } = context;
@@ -11,17 +11,20 @@ export function linkCallRecordReview(context, reviewId, callId, opened) {
     context.toast(translateText('Los registros cambiaron. Cerrá y abrí la comparación antes de vincular.')); return false;
   }
   const incoming = review.call;
-  if (state.activeCall || calls.some(call => call.id !== callId && context.callsOverlap(call, incoming))) {
+  if (state.activeCall || unfinishedCallIntervals(state).some(interval => context.callsOverlap(interval, incoming))
+    || calls.some(call => call.id !== callId && context.callsOverlap(call, incoming))) {
     context.toast(translateText('Otra llamada cruza este registro. Revisá los tiempos antes de vincular; no se eliminó ningún respaldo.')); return false;
   }
   const previousState = structuredClone(state), categories = structuredClone(settings.financeCategories);
+  const distribution = structuredClone(settings.financeLastDistribution);
   const call = preserveCallRecords({ ...incoming, id: candidate.id, callDate: candidate.callDate,
     calendarCallDate: candidate.calendarCallDate || incoming.calendarCallDate || incoming.callDate, shiftDayKey: candidate.shiftDayKey,
     ...(candidate.frozenHigherRateBonus ? { frozenHigherRateBonus: { ...candidate.frozenHigherRateBonus } } : {}),
     ...(candidate.propioBridge ? { propioBridge: { ...candidate.propioBridge, timingEstimated: false, payEstimated: false } } : {}),
     source: 'import', importedAt: review.receivedAt, officialCorrection: { kind: 'reconciled', at: new Date().toISOString() },
   }, candidate, review.receivedAt);
-  context.setCalls(calls.map(item => item.id === callId ? call : item));
+  const stagedCalls = calls.map(item => item.id === callId ? call : item);
+  context.setCalls(stagedCalls);
   state.callRecordReviews = state.callRecordReviews.filter(item => item.id !== reviewId);
   let saved = false;
   try {
@@ -30,7 +33,11 @@ export function linkCallRecordReview(context, reviewId, callId, opened) {
     saved = context.saveAll() !== false;
   } catch { /* El respaldo permanece si falla el guardado. */ }
   if (!saved) {
-    context.setCalls(calls); context.setState(previousState); settings.financeCategories = categories;
+    const current = context.data();
+    if (current.state === state && current.settings === settings && current.calls === stagedCalls) {
+      context.setCalls(calls); context.setState(previousState); settings.financeCategories = categories;
+      if (distribution === undefined) delete settings.financeLastDistribution; else settings.financeLastDistribution = distribution;
+    }
     context.render(); return false;
   }
   context.onGameCallsChanged(call.callDate); context.render();

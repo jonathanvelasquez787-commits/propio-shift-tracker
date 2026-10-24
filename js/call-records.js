@@ -3,6 +3,15 @@ function numericPay(value) {
   return Number.isFinite(n) ? n : 0;
 }
 
+export function unfinishedCallIntervals({ activeCall, pendingLiveCallBackup } = {}, now = Date.now()) {
+  const intervals = [];
+  if (activeCall?.startedAt) intervals.push({ startISO: activeCall.startedAt, endISO: new Date(now).toISOString() });
+  if (pendingLiveCallBackup) intervals.push({ startISO: pendingLiveCallBackup.startedAtISO || pendingLiveCallBackup.candidate?.startISO,
+    endISO: pendingLiveCallBackup.endedAtISO || pendingLiveCallBackup.candidate?.endISO });
+  return intervals.filter(interval => Number.isFinite(Date.parse(interval.startISO)) && Number.isFinite(Date.parse(interval.endISO))
+    && Date.parse(interval.endISO) >= Date.parse(interval.startISO));
+}
+
 export function observedCallRecord(call) {
   if (call?.records?.tool) return { ...call.records.tool };
   if (call?.source !== 'live') return null;

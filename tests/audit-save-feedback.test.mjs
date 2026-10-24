@@ -131,7 +131,7 @@ test('monster name retains its draft and original setting when saving rejects, t
 test('game reset preserves progress and omits success after rejected persistence',()=>{
   const original={totalXp:100,reinforcement:{pendingRewards:[{id:'p'}]}},messages=[];
   let rendered=0;
-  const h=vm.createContext({translateText:x=>x,state:{game:original},appConfirm:(_,accept)=>accept(),
+  const h=vm.createContext({translateText:x=>x,state:{game:original},settings:{game:{enabled:true}},appConfirm:(_,accept)=>accept(),
     normalizeReinforcementState:x=>x,createDefaultGameState:()=>({totalXp:0}),ensureGameState(){},
     saveStateOnly:()=>false,renderGame:()=>{rendered++;},toast:x=>messages.push(x)});
   vm.runInContext(declaration('../js/game.js','resetGameProgress'),h);h.resetGameProgress();

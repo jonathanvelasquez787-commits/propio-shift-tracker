@@ -21,7 +21,7 @@ function financeMutationSnapshot() {
 }
 
 function saveFinanceMutation(snapshot) {
-  if (saveSettingsOnly() !== false) return true;
+  try { if (saveSettingsOnly() !== false) return true; } catch { /* Restaura también un guardado interrumpido. */ }
   // No restaures un snapshot en una cuenta que el escritor haya reemplazado.
   if (settings !== snapshot.root) return false;
   for (const {ref, value} of snapshot.records) {
@@ -46,6 +46,8 @@ function saveFinanceMutation(snapshot) {
 
 export function configureFinanceContext(context) {
   financeContext=context;
+  financeRowEditor = null;
+  financeCategoryEditor = null;
   ({ money, convertedAmountText, iconHtml, escapeHtml, toast, appConfirm, openModal, closeModal,
     saveSettingsOnly, makeLocalId, parseMoney, usdCeilFromCurrencyAmount, higherRateBonusForCalls,
     renderEmojiPicker, render } = context);
@@ -221,6 +223,16 @@ let financeRowModalKind = 'gasto';
 let financeEditingRowId = null;
 // Categoría propia que se está editando en el panel "+ Nueva categoría" (null = modo alta).
 let financeEditingCatId = null;
+let financeRowEditor = null;
+let financeCategoryEditor = null;
+function financeGuard(target) {
+  return {owner:settings, signature:JSON.stringify(target), consumed:false};
+}
+function financeGuardValid(guard, target) {
+  if (!guard || (!guard.consumed && settings === guard.owner && JSON.stringify(target) === guard.signature)) return true;
+  toast(translateText('Los datos cambiaron. Vuelve a abrir el formulario o la confirmación.'));
+  return false;
+}
 let financeRowTargetSyncing = false;
 
 // Sincroniza Monto objetivo ($) ↔ Monto objetivo en tu moneda, en cualquier dirección — mismo
@@ -631,8 +643,11 @@ export function financeToggleManualPaid(catId, rowId, checked) {
 export function financeDeleteRow(catId, rowId) {
   const row = financeFindRow(catId, rowId);
   if (!row) return;
+  const guard = financeGuard({id:row.id, name:row.name});
   appConfirm(ui`¿Eliminar "${row.name}"? Esta acción no se puede deshacer.`, () => {
     const current = financeAllCategoryIds().map(id => financeFindRow(id, rowId)).find(Boolean);
+    if (!financeGuardValid(guard, current && {id:current.id, name:current.name})) return false;
+    guard.consumed = true;
     if (!current) return;
     const previous = financeMutationSnapshot();
     const cat = settings.financeCategories[current.categoryId];
@@ -660,6 +675,7 @@ function financeApplyNameSuggestion(categoryId) {
 }
 
 export function openFinanceRowModal(kind, existingRow = null) {
+  financeRowEditor = financeGuard(existingRow);
   financeRowModalKind = kind === 'meta' ? 'meta' : 'gasto';
   financeEditingRowId = existingRow ? existingRow.id : null;
   const title = document.getElementById('financeRowModalTitle');
@@ -769,6 +785,7 @@ export function openFinanceNewCatPanel(catId = null) {
     ? (Array.isArray(settings.customFinanceCategories) ? settings.customFinanceCategories : []).find(c => c.id === catId)
     : null;
   financeEditingCatId = existing ? existing.id : null;
+  financeCategoryEditor = financeGuard(existing || null);
   if (title) title.textContent = existing ? translateText('Editar categoría') : translateText('Nueva categoría');
   if (btnLabel) btnLabel.textContent = existing ? translateText('Guardar cambios') : translateText('Crear categoría');
   if (nameInput) nameInput.value = existing ? existing.label : '';
@@ -801,6 +818,8 @@ function renderFinanceColorSwatches(selected) {
 // Edición: actualiza label/emoji/rgb en el mismo objeto — no toca settings.financeCategories[id]
 // (las filas ya guardadas en esa categoría siguen ahí, solo cambia cómo se ve la categoría).
 export function createFinanceCategory() {
+  const current = financeEditingCatId ? settings.customFinanceCategories?.find(c => c.id === financeEditingCatId) : null;
+  if (!financeGuardValid(financeCategoryEditor, current)) return false;
   const nameInput = document.getElementById('financeNewCatNameInput');
   const emojiInput = document.getElementById('financeNewCatEmojiInput');
   const colorInput = document.getElementById('financeNewCatColorInput');
@@ -822,6 +841,7 @@ export function createFinanceCategory() {
     existing.rgb = rgb;
     const editedId = existing.id;
     if (!saveFinanceMutation(previous)) return false;
+    if (financeCategoryEditor) financeCategoryEditor.consumed = true;
     closeFinanceNewCatPanel();
     renderFinanceCategoryChips(editedId);
     selectFinanceCategoryChip(editedId);
@@ -834,6 +854,7 @@ export function createFinanceCategory() {
   settings.customFinanceCategories.push({ id, label, emoji, rgb });
   settings.financeCategories[id] = { rows: [] };
   if (!saveFinanceMutation(previous)) return false;
+  if (financeCategoryEditor) financeCategoryEditor.consumed = true;
   closeFinanceNewCatPanel();
   renderFinanceCategoryChips(id);
   selectFinanceCategoryChip(id);
@@ -848,11 +869,14 @@ export function financeDeleteCategory(catId) {
   if (!cat) return;
   const catRows = settings.financeCategories[catId] ? settings.financeCategories[catId].rows : [];
   const rowCount = catRows.length;
+  const guard = financeGuard(cat);
   const warning = rowCount > 0
     ? ui` Sus ${rowCount} fila(s) no se borran: pasan a la categoría "Otro".`
     : '';
   appConfirm(ui`¿Borrar la categoría "${cat.label}"?${warning} Esta acción no se puede deshacer.`, () => {
     const currentCategory = settings.customFinanceCategories.find(category => category.id === catId);
+    if (!financeGuardValid(guard, currentCategory)) return false;
+    guard.consumed = true;
     if (!currentCategory) return;
     const currentRows = settings.financeCategories[catId]?.rows || [];
     const previous = financeMutationSnapshot();
@@ -876,6 +900,8 @@ export function financeDeleteCategory(catId) {
 }
 
 export function saveFinanceRowModal() {
+  const current = financeEditingRowId ? Object.values(settings.financeCategories).flatMap(category => category.rows).find(row => row.id === financeEditingRowId) : null;
+  if (!financeGuardValid(financeRowEditor, current)) return false;
   const nameInput = document.getElementById('financeRowNameInput');
   const categoryInput = document.getElementById('financeRowCategoryInput');
   const typeInput = document.getElementById('financeRowTypeInput');
@@ -953,6 +979,7 @@ export function saveFinanceRowModal() {
     }
     financeRunAutoFillCascade();
     if (!saveFinanceMutation(previous)) return false;
+    if (financeRowEditor) financeRowEditor.consumed = true;
     closeModal('financeRowModal');
     render();
     toast(isMeta ? translateText('Meta actualizada') : translateText('Gasto actualizado'));
@@ -986,6 +1013,7 @@ export function saveFinanceRowModal() {
   // asignar de antes, solo le toca lo que sobre después de las filas con más prioridad.
   financeRunAutoFillCascade();
   if (!saveFinanceMutation(previous)) return false;
+  if (financeRowEditor) financeRowEditor.consumed = true;
   closeModal('financeRowModal');
   render();
   toast(isMeta ? translateText('Meta agregada') : translateText('Gasto agregado'));

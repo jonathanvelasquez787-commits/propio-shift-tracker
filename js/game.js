@@ -909,6 +909,7 @@ export function equipmentForState(equipment = state.game?.equipment) {
 export function chooseCycleReward(choiceId) {
   if (!gameEnabled()) return false;
   ensureGameState();
+  const owner = state, game = state.game;
   const pending = state.game.cycleReward;
   if (!pending?.pending || !pending.cycleKey) return false;
   const key = `cycle-reward:${pending.cycleKey}`;
@@ -918,6 +919,7 @@ export function chooseCycleReward(choiceId) {
   }
   const option = (pending.options || []).find((item) => item.id === String(choiceId));
   if (!option) return false;
+  if (option.type === 'accessory' && state.game.accessories.includes(option.accessory)) return false;
   const previous = { totalXp: state.game.totalXp, level: state.game.level, accessories: [...state.game.accessories], cycleReward: pending };
   const oldLevel = state.game.level;
   let applied = 0;
@@ -932,8 +934,10 @@ export function chooseCycleReward(choiceId) {
   state.game.ledger[key] = { type: 'cycle-reward', cycleKey: pending.cycleKey, choiceId: option.id, gross: Number(option.amount) || 0, applied, accessory: option.accessory || null };
   state.game.cycleReward = { pending: false, cycleKey: null, options: [] };
   if (saveStateOnly() === false) {
-    Object.assign(state.game, previous);
-    delete state.game.ledger[key];
+    if (state === owner && state.game === game) {
+      Object.assign(game, previous);
+      delete game.ledger[key];
+    }
     return false;
   }
   queueGameToast(ui`🏆 Recompensa del ciclo · ${option.label}`, 'loot');
@@ -981,7 +985,7 @@ function renderCycleBosses() {
       .sort((a, b) => (callDateToDate(b.cycleKey)?.getTime() || 0) - (callDateToDate(a.cycleKey)?.getTime() || 0))[0];
     choice.className = 'game-cycle-choice';
     choice.hidden = !pending && !claimed;
-    choice.innerHTML = pending ? ui`<strong>Elige tu recompensa del ciclo</strong><small>Premio del ciclo con cierre ${escapeHtml(formatCallDayLabel(state.game.cycleReward.cycleKey))}. Cumpliste su meta; este premio de juego no confirma un pago recibido.</small><div>${state.game.cycleReward.options.map((option) => ui`<button type="button" data-game-action="choose-cycle-reward" data-cycle-reward="${escapeHtml(option.id)}">${escapeHtml(translateStoredText(option.label))}</button>`).join('')}</div>` : claimed ? ui`<strong>Recompensa del ciclo guardada</strong><small>Ciclo con cierre ${escapeHtml(formatCallDayLabel(claimed.cycleKey))} · ${escapeHtml(claimed.accessory ? translateText(claimed.accessory) : ui`${Number(claimed.gross) || 0} XP`)}. Ya fue reclamada; no se vuelve a entregar al abrir esta sección.</small>` : '';
+    choice.innerHTML = pending ? ui`<strong>Elige tu recompensa del ciclo</strong><small>Premio del ciclo con cierre ${escapeHtml(formatCallDayLabel(state.game.cycleReward.cycleKey))}. Cumpliste su meta; este premio de juego no confirma un pago recibido.</small><div>${state.game.cycleReward.options.filter((option) => option.type !== 'accessory' || !state.game.accessories.includes(option.accessory)).map((option) => ui`<button type="button" data-game-action="choose-cycle-reward" data-cycle-reward="${escapeHtml(option.id)}">${escapeHtml(translateStoredText(option.label))}</button>`).join('')}</div>` : claimed ? ui`<strong>Recompensa del ciclo guardada</strong><small>Ciclo con cierre ${escapeHtml(formatCallDayLabel(claimed.cycleKey))} · ${escapeHtml(claimed.accessory ? translateText(claimed.accessory) : ui`${Number(claimed.gross) || 0} XP`)}. Ya fue reclamada; no se vuelve a entregar al abrir esta sección.</small>` : '';
   });
 }
 function syncCycleBossAchievement() {
@@ -2612,6 +2616,7 @@ function chestReward(sealedOn, { goalReward = false } = {}) {
 }
 
 function grantChestReward(sealedOn, { goalReward = false, showModal = true } = {}) {
+  const owner = state, game = state.game;
   const key = `chest:${sealedOn}`;
   const existing = state.game.ledger[key];
   if (existing) return false;
@@ -2629,8 +2634,10 @@ function grantChestReward(sealedOn, { goalReward = false, showModal = true } = {
   }
   if (state.game.chest.sealedOn === sealedOn) state.game.chest = { pending: false, sealedOn: null };
   if (saveStateOnly() === false) {
-    Object.assign(state.game, previous);
-    delete state.game.ledger[key];
+    if (state === owner && state.game === game) {
+      Object.assign(game, previous);
+      delete game.ledger[key];
+    }
     return false;
   }
 
@@ -2653,9 +2660,13 @@ function openPendingChest(todayKey, { allowSameDay = false } = {}) {
   if (!state.game.chest.pending || !state.game.chest.sealedOn || (!allowSameDay && state.game.chest.sealedOn === todayKey)) return false;
   const sealedOn = state.game.chest.sealedOn;
   if (state.game.ledger[`chest:${sealedOn}`]) {
+    const owner = state, game = state.game;
     const previous = state.game.chest;
     state.game.chest = { pending: false, sealedOn: null };
-    if (saveStateOnly() === false) { state.game.chest = previous; return false; }
+    if (saveStateOnly() === false) {
+      if (state === owner && state.game === game) game.chest = previous;
+      return false;
+    }
     return true;
   }
   return grantChestReward(sealedOn);
@@ -2716,14 +2727,17 @@ export function onGamePauseStarted(type) {
 export function equipAccessory(accessoryLabel) {
   if (!gameEnabled()) return false;
   ensureGameState();
+  const owner = state, game = state.game;
   const value = String(accessoryLabel ?? '');
   const item = ACCESSORY_BY_LABEL[value] || ACCESSORY_BY_ID[value];
   if (!item || !state.game.accessories.includes(item.label) || item.unlockLevel > state.game.level) return false;
   const currently = state.game.equipment[item.slot];
   state.game.equipment[item.slot] = currently === item.label ? null : item.label;
   if (saveStateOnly() === false) {
-    if (currently === undefined) delete state.game.equipment[item.slot];
-    else state.game.equipment[item.slot] = currently;
+    if (state === owner && state.game === game) {
+      if (currently === undefined) delete game.equipment[item.slot];
+      else game.equipment[item.slot] = currently;
+    }
     return false;
   }
   renderGame();
@@ -2786,14 +2800,23 @@ export function onGameBackupExported() {
 }
 
 function resetGameProgress() {
+  const owner = state, settingsOwner = settings, signature = JSON.stringify(state?.game);
+  let consumed = false;
   appConfirm(translateText('¿Reiniciar todo el progreso de gamificación? Se borran XP, niveles, rachas, escudos, cofres, accesorios, trofeos y bestiario. Tus llamadas, turnos y finanzas no se tocan.'), () => {
+    if (consumed || state !== owner || settings !== settingsOwner || JSON.stringify(state?.game) !== signature) return false;
+    consumed = true;
     const previous = state.game;
     const reinforcement = normalizeReinforcementState(state.game?.reinforcement);
     state.game = { ...createDefaultGameState(), reinforcement };
     ensureGameState();
-    if (saveStateOnly() === false) { state.game = previous; return false; }
+    const game = state.game;
+    if (saveStateOnly() === false) {
+      if (state === owner && state.game === game) state.game = previous;
+      return false;
+    }
     renderGame();
     toast(translateText('Progreso de gamificación reiniciado'));
+    return true;
   });
 }
 
@@ -2819,11 +2842,7 @@ function saveMonsterName() {
 let gameInitialized = false;
 
 export function setGameEnabled(enabled) {
-  ensureGameSettings();
-  const previous = settings.game.enabled;
-  settings.game.enabled = enabled === true;
-  const saved = saveSettingsOnly() !== false;
-  if (!saved) settings.game.enabled = previous;
+  const saved = saveGamePreference('enabled', enabled === true);
   renderGame();
   renderHeader?.();
   return saved;

@@ -1,4 +1,4 @@
-# Propio · Tracker y vista original · 2.3.5
+# Propio · Tracker y vista original · 2.3.6
 
 La extensión conecta Propio Shift Tracker con la sesión y el historial de Propio. Su
 registro de llamadas funciona independientemente de la apariencia del portal.
@@ -91,7 +91,7 @@ el registro continúa. Para reanudar, usá Start Calls manualmente o apagá
 «Pausar disponibilidad automática» en el popup. Esta elección se conserva al
 reiniciar. El interruptor pausa clics; no modifica la disponibilidad actual.
 Un Propio Shift Tracker cerrado, antiguo o de otra cuenta no autoriza nuevos inicios.
-La versión 2.3.5 exige un permiso exclusivo por cuenta, con vencimiento de
+Desde 2.3.5 se exige un permiso exclusivo por cuenta, con vencimiento de
 30 segundos en la nube. «Solo registro en esta PC» conserva las llamadas y
 deja los clics para otra PC. Para transferirlos, pausá la PC anterior y activá
 la nueva; una extensión antigua sin coordinación también debe actualizarse.
@@ -114,6 +114,12 @@ El popup tiene ancho propio de 400 px, temas claro/oscuro y el icono de la aplic
 No recoge usuario/contraseña, nombres, ID del intérprete, notas, audio, URLs, headers, tokens o cuerpos para diagnóstico. El registro automático lee únicamente las siete columnas del historial: Customer ID numérico, fecha, inicio, duración, Billable, Dropped y Pay. Esas filas se conservan en la cola local y se entregan a tu cuenta de Propio Shift Tracker; sus comprobantes evitan repetirlas. La vista original usa el componente nativo de totales de Propio; la extensión no los calcula. La cuenta de Propio Shift Tracker se vincula por hash.
 
 La cola y sesión sobreviven al reinicio del worker. Entrega a una sola pestaña de la cuenta conectada, conserva hasta 200 eventos y reintenta cuando vuelve Propio Shift Tracker. Eventos de más de 24 horas requieren revisión. Una llamada manual, un respaldo pendiente, traslapes, varias pestañas o errores de almacenamiento bloquean la entrega. Cambiar de cuenta con pendientes exige resolverlos primero. Pausar durante una llamada requiere esperar o descartar expresamente las señales revisadas. Si cerrás Propio durante una llamada, revisá su final en Propio Shift Tracker.
+
+Si Propio Shift Tracker queda congelado o no responde, la entrega libera su
+espera sin borrar la señal pendiente. Al recuperarse, vuelve a intentarla y los
+comprobantes conservan una sola aplicación del evento. La disponibilidad exige
+un permiso reciente; una solicitud de permiso sin respuesta no se reutiliza al
+reanudar ni impide solicitar uno nuevo después de vencer.
 
 ## Actualizar la extensión existente
 

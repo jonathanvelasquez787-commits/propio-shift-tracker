@@ -350,6 +350,8 @@ futura opera bajo esto, sin excepción:
   el propietario decide activarlo. ES/EN funcionan localmente sin ese servicio;
   ver [idiomas y temas](docs/idiomas-y-temas.md).
 
+- **Extensión 2.3.6 de web 645:** archivos instalados con respaldo, 21 hashes comprobados y preferencias intactas. Su activación runtime no está certificada; la última activa confirmada sigue siendo 2.3.5. Esta actualización del worker no reabre los cuatro puntos históricos del plan.
+
 **CONFIRMACIONES Y CONFIGURACIÓN LOCAL VIGENTES**
 
 - El 22/10/2026 el propietario mostró el popup real con **2.3.5**. Esta es la confirmación vigente de extensión activa y cierra la activación pendiente. Las confirmaciones anteriores permanecen como hechos históricos; no pedir otra recarga para cambios solo de web o reapertura de estilos del popup.
@@ -456,6 +458,8 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
+- Web 645 amplía la auditoría profunda del 24/10: propietarios y respuestas tardías, recuperación de pendientes y bonos, Finanzas y premios intercalados. 75 regresiones nuevas; 1.125 pruebas correctas y mes ficticio de 35 días. Informe y límites en docs/auditoria-profunda-2026-10-24.md. Extensión 2.3.6 instalada como archivos con respaldo y preferencias conservadas; activación runtime no certificada (última confirmada: 2.3.5).
+
 - Web 644 cierra la auditoría profunda explícita del 23/10: diez grupos funcionales reparados y Zod indirecto actualizado a 4.6.6. Rechazos de guardado, semanas personalizadas, llamadas activas/pendientes, precisión recuperada, ACW corregido, premios intercalados e idioma. Mes interactivo ficticio de 32 días: 84 llamadas, 476 minutos, $57.12 y 56 pausas; escenarios reparados repetidos sobre 644. Informe y límites en docs/auditoria-profunda-2026-10-23.md. Extensión 2.3.5 activa confirmada, sin cambios de instalación.
 
 - Web 643 corrige dos inconsistencias del tiempo Usado de los bloques halladas en un recorrido de uso normal: no resta pausas posteriores a la actividad contabilizada ni suma huecos sin conexión. Comparte ACW clasificado con su resumen. 1.002 pruebas y recorrido con cuenta ficticia; ver docs/prueba-usuario-2026-10-22.md. La extensión 2.3.5 activa confirmada y el cierre 79/79 se conservan. No requiere recarga de extensión.
@@ -498,6 +502,12 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v645 — Segunda auditoría: concurrencia, recuperación y formularios obsoletos.**
+
+- Recuperar respeta llamadas pendientes y bonos ganados; rechazos restauran reservas e informe juntos y no pisan cuentas reemplazadas.
+- Confirmaciones y formularios de Finanzas/Logros respetan propietario y cambios posteriores; premio cosmético duplicado no consume la elección. Feedback sigue el idioma actual.
+- Usuario tardío, cierre de sesión, permisos colgados y ACK del puente protegidos. Undici indirecto actualizado a 6.29.1. Evidencia y límites en docs/auditoria-profunda-2026-10-24.md; instalación y activación de extensión se distinguen.
+
 **v644 — Auditoría profunda: integridad de guardado, llamadas y estado combinado.**
 
 - Guardados rechazados revierten bienvenida, racha, preferencias de Logros y semanas personalizadas; las confirmaciones obsoletas no se aplican.
@@ -508,13 +518,3 @@ futura opera bajo esto, sin excepción:
 
 - Las pausas fuera del tramo de actividad no borran trabajo ya contado; las pausas superpuestas se descuentan una sola vez y conservan las llamadas. Usado comparte el ACW clasificado y conectado del bloque.
 - Recorrido real de interfaz con cuenta ficticia: llamada/recarga, Break interrumpido y restaurado, Lunch, manual inválida/válida, conciliación sin duplicados, Reportes, Finanzas, exportaciones, idioma/tema y cierre persistente. 1.002 pruebas correctas; evidencia y límites en docs/prueba-usuario-2026-10-22.md.
-
-**v641 — Ayuda clara, galería actual y comprobación visual completa.**
-
-- Galería externa: 25 secciones, las 59 mejoras publicadas, rutas actuales,
-  motivo, configuración y ejemplo; guía práctica de 79 funciones completa.
-- Popup/organizador 2.3.4 con nombres claros; mismas acciones y worker. Guías
-  corregidas para reflejar las ubicaciones y conservar la duración observada.
-- Flechas plegables con caja cuadrada y margen de pintura: sin desborde móvil.
-  969 pruebas, ocho recorridos y capturas nativas, ambos temas, galería sin
-  enlaces de imagen rotos. Instalación y recarga de Chrome se registran aparte.

@@ -1,6 +1,6 @@
 {
   "name": "propio-shift-tracker",
-  "version": "644.0.0",
+  "version": "645.0.0",
   "private": true,
   "description": "Registro personal de turnos, llamadas y ganancias — con cuentas y respaldo en la nube.",
   "type": "module",
@@ -35,7 +35,8 @@
   },
   "pnpm": {
     "overrides": {
-      "@vercel/cli-config>zod": "4.6.6"
+      "@vercel/cli-config>zod": "4.6.6",
+      "@vercel/blob>undici": "6.29.1"
     }
   }
 }
