@@ -2862,5 +2862,10 @@
   "s_591b802c": "Your saved correction is used in the record. The original sources are kept as backup.",
   "s_dd3da577": "ACW follows your saved correction",
   "s_a169ba28": "Future",
-  "s_bbf9bad7": "The data changed. Reopen the form or confirmation."
+  "s_bbf9bad7": "The data changed. Reopen the form or confirmation.",
+  "s_2202e087": "In {{v0}} days",
+  "s_7673f16e": "Past date",
+  "s_8c3a9094": "Next payday",
+  "s_9770e175": "Today, {{v0}}",
+  "s_bdc99ddc": "Received"
 }

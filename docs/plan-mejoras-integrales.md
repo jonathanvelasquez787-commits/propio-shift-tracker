@@ -8,6 +8,13 @@ no se considera rota por esa razón.
 
 ## Prioridad visual antes de continuar
 
+Actualización del 24/10: el propietario identificó «Antes del cambio · 631»
+en la comparación histórica y pidió recuperarlo. Web 646 aplica esa referencia
+en Fechas de pago: lista compacta con azul y fecha a la derecha, sin los
+controles añadidos de registrar/comparar recibido. Los datos anteriores se
+conservan; una fecha pasada no se toma como evidencia de pago. Esta decisión
+posterior sustituye la presentación parcial de 640 para esta sección.
+
 ### Incumplimientos directos reabiertos el 22/10
 
 Esta lista tiene prioridad sobre Logros y batalla. Las capturas del propietario
@@ -223,7 +230,7 @@ no ampliar alcance. Un cambio parcial no cierra la función completa.
 - [x] **42. Resumen de Finanzas en Inicio — Publicado.** Identificar pendientes de Finanzas como acumulados. [Alcance y validación](finanzas-reservas-y-recepciones.md).
 - [x] **43. Reportes de rendimiento — Publicado.** Conclusiones principales antes del detalle de métricas. [Alcance y límites](reportes-calendario-y-exportaciones.md).
 - [x] **44. Proyección del ciclo — Publicado.** Supuestos de proyección y efecto de días/ritmo visibles. [Alcance y límites](reportes-calendario-y-exportaciones.md).
-- [x] **45. Fechas de pago — Publicado.** Registrar pago recibido manual y diferencia con lo esperado. [Alcance y validación](finanzas-reservas-y-recepciones.md).
+- [x] **45. Fechas de pago — Simplificado por pedido del propietario en 646.** Presentación compacta aprobada de la 631; controles de recepción/comparación retirados de la vista, con datos anteriores preservados en respaldos. [Alcance](finanzas-reservas-y-recepciones.md).
 - [x] **46. Calendario de productividad — Publicado.** Leyenda que distinga sin datos, libre y meta no cumplida. [Alcance y límites](reportes-calendario-y-exportaciones.md).
 - [x] **47. Marcar días y agregar contexto — Publicado.** Estado manual visible en semana/calendario y efecto histórico explicado; edición protegida. [Alcance y pruebas](recuperacion-actividades-y-respaldos.md).
 - [x] **48. Alarmas de turno y descansos — Publicado.** Resumen de alarmas activas. [Alcance y validación](avisos-y-cierres-de-llamadas.md).

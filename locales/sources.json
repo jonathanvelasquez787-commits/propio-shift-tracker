@@ -1786,12 +1786,6 @@
       "js/boot.js"
     ]
   },
-  "s_19b444f9": {
-    "source": "Registrar recibido",
-    "files": [
-      "js/pay-receipts.js"
-    ]
-  },
   "s_19ccdc29": {
     "source": "Términos de uso — Propio Shift Tracker",
     "files": [
@@ -2331,6 +2325,12 @@
     "source": "Presupuesto excedido",
     "files": [
       "js/finance.js"
+    ]
+  },
+  "s_2202e087": {
+    "source": "En {{v0}} días",
+    "files": [
+      "js/pay-receipts.js"
     ]
   },
   "s_22380468": {
@@ -4969,12 +4969,6 @@
       "js/auth.js"
     ]
   },
-  "s_4a3c9aaf": {
-    "source": "{{v2}} · {{v3}}",
-    "files": [
-      "js/pay-receipts.js"
-    ]
-  },
   "s_4a6fc298": {
     "source": "Higher Rate",
     "files": [
@@ -5602,12 +5596,6 @@
   },
   "s_52ef7275": {
     "source": "días restantes",
-    "files": [
-      "js/pay-receipts.js"
-    ]
-  },
-  "s_52f4f9f2": {
-    "source": "Recepción registrada por vos",
     "files": [
       "js/pay-receipts.js"
     ]
@@ -6784,12 +6772,6 @@
       "js/app-main.js"
     ]
   },
-  "s_6585df2f": {
-    "source": "Comparar esperado y recibido",
-    "files": [
-      "js/pay-receipts.js"
-    ]
-  },
   "s_659521b0": {
     "source": "a tiempo",
     "files": [
@@ -7863,6 +7845,12 @@
       "index.html"
     ]
   },
+  "s_7673f16e": {
+    "source": "Fecha pasada",
+    "files": [
+      "js/pay-receipts.js"
+    ]
+  },
   "s_76889f4f": {
     "source": "Buscando tus datos…",
     "files": [
@@ -8370,12 +8358,6 @@
     "source": "Turno continuado — interrupción de {{v0}} min registrada",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_7de24f9c": {
-    "source": "Próxima fecha de pago",
-    "files": [
-      "js/pay-receipts.js"
     ]
   },
   "s_7df9c415": {
@@ -9180,7 +9162,8 @@
   "s_88f9fc5b": {
     "source": "Próximo",
     "files": [
-      "js/app-main.js"
+      "js/app-main.js",
+      "js/pay-receipts.js"
     ]
   },
   "s_88fb12d2": {
@@ -9413,6 +9396,12 @@
     "source": "Cuadro de texto limpiado",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_8c3a9094": {
+    "source": "Próximo pago",
+    "files": [
+      "js/pay-receipts.js"
     ]
   },
   "s_8c626ae6": {
@@ -9948,12 +9937,6 @@
       "privacidad.html"
     ]
   },
-  "s_9376d0d6": {
-    "source": "Fecha programada",
-    "files": [
-      "js/pay-receipts.js"
-    ]
-  },
   "s_9382621b": {
     "source": "Cómo ganarlo",
     "files": [
@@ -10203,6 +10186,12 @@
     "source": "0 XP",
     "files": [
       "app.html"
+    ]
+  },
+  "s_9770e175": {
+    "source": "Hoy, {{v0}}",
+    "files": [
+      "js/pay-receipts.js"
     ]
   },
   "s_97720557": {
@@ -10460,12 +10449,6 @@
       "js/weekly-summary.js"
     ]
   },
-  "s_9bb42a36": {
-    "source": "{{v0}} → {{v1}}",
-    "files": [
-      "js/pay-receipts.js"
-    ]
-  },
   "s_9bc564bb": {
     "source": "Metas y cálculo del ACW",
     "files": [
@@ -10555,7 +10538,8 @@
   "s_9d239fd3": {
     "source": "Ciclo actual",
     "files": [
-      "app.html"
+      "app.html",
+      "js/pay-receipts.js"
     ]
   },
   "s_9d30513d": {
@@ -11141,12 +11125,6 @@
       "js/automation-ui.js"
     ]
   },
-  "s_a4f7815d": {
-    "source": "Esperado según tus registros",
-    "files": [
-      "js/pay-receipts.js"
-    ]
-  },
   "s_a51c9500": {
     "source": "Luz",
     "files": [
@@ -11194,12 +11172,6 @@
     "source": "{{v0}} archivos propios",
     "files": [
       "js/notification-review.js"
-    ]
-  },
-  "s_a5df5ae0": {
-    "source": "El esperado sigue los registros del ciclo; el recibido no se recalcula al corregir llamadas.",
-    "files": [
-      "js/pay-receipts.js"
     ]
   },
   "s_a627704f": {
@@ -12716,6 +12688,12 @@
       "js/app-main.js"
     ]
   },
+  "s_bdc99ddc": {
+    "source": "Recibido",
+    "files": [
+      "js/pay-receipts.js"
+    ]
+  },
   "s_bdd858a5": {
     "source": "Quitar",
     "files": [
@@ -13215,12 +13193,6 @@
       "js/game.js"
     ]
   },
-  "s_c61d6ed3": {
-    "source": "Diferencia",
-    "files": [
-      "js/pay-receipts.js"
-    ]
-  },
   "s_c6309426": {
     "source": "Reserva completa",
     "files": [
@@ -13440,12 +13412,6 @@
       "app.html"
     ]
   },
-  "s_c8f63058": {
-    "source": "Fecha pasada · recepción sin confirmar",
-    "files": [
-      "js/pay-receipts.js"
-    ]
-  },
   "s_c90bfeab": {
     "source": "L",
     "files": [
@@ -13634,12 +13600,6 @@
     "source": "Gracia antes del inicio",
     "files": [
       "js/higher-rate-review.js"
-    ]
-  },
-  "s_ccdd95a7": {
-    "source": "Editar recibido",
-    "files": [
-      "js/pay-receipts.js"
     ]
   },
   "s_ccec9183": {
@@ -14182,12 +14142,6 @@
   },
   "s_d3ad88b9": {
     "source": "Revisá el monto y la fecha: la recepción no puede estar en el futuro.",
-    "files": [
-      "js/pay-receipts.js"
-    ]
-  },
-  "s_d3d39d07": {
-    "source": "Recepciones de otros ciclos ({{v0}})",
     "files": [
       "js/pay-receipts.js"
     ]
@@ -15081,7 +15035,8 @@
   "s_df4aef17": {
     "source": "14 días",
     "files": [
-      "app.html"
+      "app.html",
+      "js/pay-receipts.js"
     ]
   },
   "s_df54f508": {
@@ -15325,12 +15280,6 @@
     "source": "¿Vaciar {{v0}} llamadas de {{v1}}? Se conservarán en el historial recuperable hasta 30 días. Turno, pausas y horario permanecen.",
     "files": [
       "js/call-recovery.js"
-    ]
-  },
-  "s_e35bc1a4": {
-    "source": "Todavía no registraste una recepción para este ciclo.",
-    "files": [
-      "js/pay-receipts.js"
     ]
   },
   "s_e37b6f56": {
@@ -15613,12 +15562,6 @@
     "source": "Toca un día para verlo. Toca su estado para cambiarlo, o usa Editar para agregar una categoría o una nota.",
     "files": [
       "app.html"
-    ]
-  },
-  "s_e721de21": {
-    "source": "Recibido al {{v0}}",
-    "files": [
-      "js/pay-receipts.js"
     ]
   },
   "s_e7413268": {
@@ -17186,12 +17129,6 @@
     "source": "Te faltan {{v0}}{{v1}}",
     "files": [
       "js/game.js"
-    ]
-  },
-  "s_fd4e052f": {
-    "source": "Las fechas son programadas. Un pago se marca recibido solo cuando vos lo registrás.",
-    "files": [
-      "js/pay-receipts.js"
     ]
   },
   "s_fd50c919": {

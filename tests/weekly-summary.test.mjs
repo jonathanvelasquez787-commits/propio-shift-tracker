@@ -53,11 +53,27 @@ test('pay-date renderer uses the supplied cycle dates and current locale on each
     isoDateFromDayKey:value=>value,escapeHtml,iconHtml:()=>'',data:()=>({settings:{payReceipts:[]},calls:[]}),money,financeConvertedInline:()=>'',parseMoney:Number,higherRateBonusForCall:()=>({amount:0}),
   };
   setLanguage('es');payReceiptAction(context,'render');
-  assert.match(elements.payDatesBody.innerHTML,/Próxima fecha de pago/);
-  assert.match(elements.payDatesBody.innerHTML,/recepción sin confirmar/);
+  assert.match(elements.payDatesBody.innerHTML,/Próximo pago/);
+  assert.match(elements.payDatesBody.innerHTML,/Fecha pasada/);
   assert.doesNotMatch(elements.payDatesBody.innerHTML,/Ya pagado|>Pagado</);
   assert.match(elements.payDatesBody.innerHTML,/noviembre/);
   setLanguage('en');payReceiptAction(context,'render');
-  assert.match(elements.payDatesBody.innerHTML,/Next scheduled payday/);
+  assert.match(elements.payDatesBody.innerHTML,/Next payday/);
   assert.match(elements.payDatesBody.innerHTML,/November/);
+});
+
+test('restored pay dates leave stored receipts intact without the manual receipt editor in the list', t => {
+  const elements=documentFixture(t);setLanguage('es');
+  const data={settings:{payReceipts:[{id:'old',cycleStart:'2026-09-19',cycleEnd:'2026-10-02',scheduledDate:'2026-10-07',date:'2026-10-07',usd:100,expectedAtSave:98}]},calls:[{pay:98}]};
+  const before=JSON.stringify(data);
+  const context={ui,translateText,displayLocale,data:()=>data,
+    todayRange:(date=new Date(2026,9,24))=>new Date(date.getFullYear(),date.getMonth(),date.getDate()),
+    cycleBoundsForOffset:offset=>({start:new Date(2026,9,17+offset*14),end:new Date(2026,9,30+offset*14),payDate:new Date(2026,10,4+offset*14)}),
+    formatCallDayLabel:key=>key,todayCallDateKey:date=>`${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`,
+    isoDateFromDayKey:value=>value,escapeHtml,iconHtml:()=>''};
+  payReceiptAction(context,'render');
+  assert.equal(JSON.stringify(data),before);
+  assert.doesNotMatch(elements.payDatesBody.innerHTML,/data-pay-receipt|Comparar esperado y recibido|Registrar recibido/);
+  assert.match(elements.payDatesBody.innerHTML,/tone-good/);
+  assert.match(elements.payDatesBody.innerHTML,/Fecha pasada/);
 });

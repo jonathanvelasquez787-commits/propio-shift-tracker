@@ -458,6 +458,8 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
+- Web 646 recupera Fechas de pago según la referencia 631 elegida y aprobada por el propietario: tarjeta y fecha azul, leyenda, filas compactas y fecha a la derecha; sin controles de registrar/comparar recibido. Los registros anteriores siguen en respaldos y no se infiere un depósito por pasar la fecha. Finanzas no se simplificó todavía; se revisaron sus extras para informar al propietario. Extensión sin cambios.
+
 - Web 645 amplía la auditoría profunda del 24/10: propietarios y respuestas tardías, recuperación de pendientes y bonos, Finanzas y premios intercalados. 75 regresiones nuevas; 1.125 pruebas correctas y mes ficticio de 35 días. Informe y límites en docs/auditoria-profunda-2026-10-24.md. Extensión 2.3.6 instalada como archivos con respaldo y preferencias conservadas; activación runtime no certificada (última confirmada: 2.3.5).
 
 - Web 644 cierra la auditoría profunda explícita del 23/10: diez grupos funcionales reparados y Zod indirecto actualizado a 4.6.6. Rechazos de guardado, semanas personalizadas, llamadas activas/pendientes, precisión recuperada, ACW corregido, premios intercalados e idioma. Mes interactivo ficticio de 32 días: 84 llamadas, 476 minutos, $57.12 y 56 pausas; escenarios reparados repetidos sobre 644. Informe y límites en docs/auditoria-profunda-2026-10-23.md. Extensión 2.3.5 activa confirmada, sin cambios de instalación.
@@ -502,6 +504,11 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v646 — Fechas de pago con presentación 631 aprobada.**
+
+- Recuperada la lista compacta, azul histórico y etiqueta de ciclo; retirados de esa vista los controles de recepción y comparación. Datos anteriores conservados y fechas pasadas diferenciadas de recepciones reales.
+- Reintentar pagos respeta su estado oculto cuando la carga ya terminó. Diseño único probado en móvil y escritorio, claro/oscuro y ES/EN. Finanzas y extensión no cambian.
+
 **v645 — Segunda auditoría: concurrencia, recuperación y formularios obsoletos.**
 
 - Recuperar respeta llamadas pendientes y bonos ganados; rechazos restauran reservas e informe juntos y no pisan cuentas reemplazadas.
@@ -513,8 +520,3 @@ futura opera bajo esto, sin excepción:
 - Guardados rechazados revierten bienvenida, racha, preferencias de Logros y semanas personalizadas; las confirmaciones obsoletas no se aplican.
 - Respaldo pendiente conserva milisegundos e identidad tras recarga; descartar revierte de forma segura y conserva premios posteriores. Manuales/ediciones/imports protegen llamadas en curso. ACW y duración vigente siguen la corrección sin borrar evidencia original.
 - Estado futuro y tendencias traducidos; Zod indirecto 4.6.6 elimina una alerta alta. Mes ficticio y regresiones, CI/publicación y límites documentados en docs/auditoria-profunda-2026-10-23.md.
-
-**v643 — Trabajo usado coherente al tomar pausas e importar llamadas.**
-
-- Las pausas fuera del tramo de actividad no borran trabajo ya contado; las pausas superpuestas se descuentan una sola vez y conservan las llamadas. Usado comparte el ACW clasificado y conectado del bloque.
-- Recorrido real de interfaz con cuenta ficticia: llamada/recarga, Break interrumpido y restaurado, Lunch, manual inválida/válida, conciliación sin duplicados, Reportes, Finanzas, exportaciones, idioma/tema y cierre persistente. 1.002 pruebas correctas; evidencia y límites en docs/prueba-usuario-2026-10-22.md.
