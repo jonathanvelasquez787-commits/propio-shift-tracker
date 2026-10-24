@@ -269,7 +269,7 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     });
     if (!queued) return false;
     let ack;
-    try { ack = await api.tabs.sendMessage(queued.tabId, { kind: 'deliver-event', accountScope: queued.item.accountScope, event: queued.item.event }, { frameId: 0 }); }
+    try { ack = await sendToTab(queued.tabId, { kind: 'deliver-event', accountScope: queued.item.accountScope, event: queued.item.event }); }
     catch { ack = { status: 'blocked', reason: 'tracker-closed' }; }
     return transact(state => {
       if (state.queue[0]?.event.id !== queued.item.event.id || state.accountScope !== queued.item.accountScope) return false;

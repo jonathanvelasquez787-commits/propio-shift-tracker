@@ -358,3 +358,49 @@ test('new budgets use cents and reject subcent targets while unchanged legacy pr
   openFinanceRowModal('gasto');h.field('financeRowNameInput').value='Subcentavo';h.field('financeRowTargetInput').value='.003';h.field('financeRowTargetCurrencyInput').value='';saveFinanceRowModal();assert.equal(settings.financeCategories.casa.rows.length,1);
   h.expense.targetAmount=.003;h.expense.assignedAmount=.003;openFinanceRowModal('gasto',h.expense);h.field('financeRowNameInput').value='Nombre editado';saveFinanceRowModal();assert.equal(h.expense.targetAmount,.003);
 });
+
+for (const action of ['delete-row','delete-category','edit-row','new-row','edit-category','new-category']) {
+  test(`audit2 finance ${action} cannot cross a replaced settings owner`, t=>{
+    const h=harness(t);let confirm;
+    settings.customFinanceCategories=[{id:'custom_x',label:'Casa propia',emoji:'x',rgb:'102,226,165'}];
+    settings.financeCategories.custom_x={rows:[]};
+    configureFinanceContext({...h.context,appConfirm:(_message,run)=>{confirm=run;}});
+    if(action==='delete-row')financeDeleteRow('otro','food');
+    if(action==='delete-category')financeDeleteCategory('custom_x');
+    if(action==='edit-row'||action==='new-row'){
+      openFinanceRowModal('gasto',action==='edit-row'?h.expense:null);
+      h.field('financeRowNameInput').value='Borrador anterior';h.field('financeRowTargetInput').value='12';h.field('financeRowTargetCurrencyInput').value='';
+    }
+    if(action==='edit-category'||action==='new-category'){
+      openFinanceNewCatPanel(action==='edit-category'?'custom_x':null);h.field('financeNewCatNameInput').value='Borrador anterior';
+    }
+    setAppSettings(JSON.parse(JSON.stringify(settings)));const before=JSON.stringify(settings);
+    if(confirm)confirm();else if(action.endsWith('row'))saveFinanceRowModal();else createFinanceCategory();
+    assert.equal(JSON.stringify(settings),before);
+  });
+}
+
+for(const action of ['delete-row','delete-category','edit-row','edit-category'])test(`audit2 finance ${action} refuses a changed target`,t=>{
+  const h=harness(t);let confirm;
+  settings.customFinanceCategories=[{id:'custom_x',label:'Casa propia',emoji:'x',rgb:'102,226,165'}];settings.financeCategories.custom_x={rows:[]};
+  configureFinanceContext({...h.context,appConfirm:(_message,run)=>{confirm=run;}});
+  if(action==='delete-row')financeDeleteRow('otro','food');
+  if(action==='delete-category')financeDeleteCategory('custom_x');
+  if(action==='edit-row'){openFinanceRowModal('gasto',h.expense);h.field('financeRowNameInput').value='Borrador';h.field('financeRowTargetCurrencyInput').value='';}
+  if(action==='edit-category'){openFinanceNewCatPanel('custom_x');h.field('financeNewCatNameInput').value='Borrador';}
+  if(action.endsWith('row'))h.expense.name='Cambio sincronizado';else settings.customFinanceCategories[0].label='Cambio sincronizado';
+  const before=JSON.stringify(settings);
+  if(confirm)confirm();else if(action==='edit-row')saveFinanceRowModal();else createFinanceCategory();
+  assert.equal(JSON.stringify(settings),before);
+});
+
+test('audit2 finance successful new-row modal cannot replay a second insert',t=>{
+ const h=harness(t);openFinanceRowModal('gasto');h.field('financeRowNameInput').value='Solo una';h.field('financeRowTargetInput').value='12';h.field('financeRowTargetCurrencyInput').value='';
+ saveFinanceRowModal();const before=JSON.stringify(settings);saveFinanceRowModal();assert.equal(JSON.stringify(settings),before);
+});
+
+test('audit2 finance thrown writer restores the adjustment and permits a clean retry',t=>{
+ const h=harness(t),before=JSON.stringify(settings);configureFinanceContext({...h.context,saveSettingsOnly:()=>{throw Error('disk interrupted');}});
+ assert.equal(financeApplySignedAmount('otro','food','5','plus'),false);assert.equal(JSON.stringify(settings),before);
+ configureFinanceContext(h.context);h.save();h.reload();assert.equal(JSON.stringify(settings),before);
+});

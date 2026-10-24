@@ -1821,6 +1821,44 @@
           ]
         }
       ]
+    },
+    {
+      "id": "second-deep-audit-integrity",
+      "acceptance": "Los formularios, recuperación, premios y respuestas asíncronas respetan al dueño y no sobrescriben datos posteriores; los intervalos pendientes y bonos ganados sobreviven fallos y correcciones explícitas.",
+      "sources": [
+        "js/finance.js",
+        "js/call-recovery.js",
+        "js/call-records-view.js",
+        "js/higher-rate.js",
+        "js/game.js",
+        "js/auth.js",
+        "js/automation-lease.js",
+        "js/boot.js",
+        "extension/propio-bridge/bridge-worker.js"
+      ],
+      "tests": [
+        {
+          "file": "tests/audit2-call-integrity.test.mjs",
+          "namedCases": [
+            "editing duration protects a pending call while allowing an exact adjacent endpoint",
+            "explicit official linking cannot expand a saved observation into a pending interval"
+          ]
+        },
+        {
+          "file": "tests/audit2-game-integrity.test.mjs",
+          "namedCases": [
+            "reset rejection restores progress; a fresh confirmation succeeds once and preserves personal rewards",
+            "a cycle cosmetic acquired from another reward cannot consume the pending cycle choice"
+          ]
+        },
+        {
+          "file": "tests/deep-audit-concurrency.test.mjs",
+          "namedCases": [
+            "delayed authenticated user reads reject an account that changed while the response was in flight",
+            "an unanswered lease request expires locally so renewals resume without a reload"
+          ]
+        }
+      ]
     }
   ],
   "limits": [

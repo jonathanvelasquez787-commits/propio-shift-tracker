@@ -235,11 +235,15 @@ function injectAccountPanel(profile, email) {
     readMeta().dirty ? translateText('Cambios sin subir…') : translateText('Sincronizado'));
 
   document.getElementById('sidebarLogoutBtn').addEventListener('click', async () => {
+    const ownerId = window[Symbol.for('propio.expectedAppOwner')] ?? readMeta().userId;
+    const current = () => ownerId && readMeta().userId === ownerId;
+    if (!current()) { window.location.replace('/'); return; }
     if (window.flushLocalChanges && !window.flushLocalChanges()) return;
     const meta = readMeta();
     if (meta.dirty) {
       setSyncStatus('saving', translateText('Guardando antes de salir…'));
       const result = await pushSnapshot();
+      if (!current()) { window.location.replace('/'); return; }
       if (!result.ok || result.pending || readMeta().dirty) {
         try { preserveRecoveryCopy(meta.userId, readLocalSnapshot(), 'account-switch'); }
         catch (error) {
@@ -249,8 +253,9 @@ function injectAccountPanel(profile, email) {
         }
       }
     }
+    if (!current()) { window.location.replace('/'); return; }
     try {
-      await signOut();
+      await signOut(ownerId);
     } catch {
       /* si falla el signOut igual sacamos al usuario */
     }

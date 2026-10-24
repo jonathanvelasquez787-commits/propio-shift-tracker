@@ -81,19 +81,21 @@ for (const action of ['saveHigherRateWindowsFromEditor', 'removeHigherRateWindow
     test(`${action} restores frozen bonus and finance allocation after rejection (${hasFrozenBonus ? 'existing' : 'new'} frozen bonus)`, () => {
       const originalWindow = { id: 'hr', date: '2026-10-12', start: '08:00', end: '09:00', tier: 'bronze' };
       const settings = { higherRateWindows: [originalWindow], financeCategories: { otro: { rows: [{ id: 'row', assignedAmount: .1 }] } } };
+      if (hasFrozenBonus) settings.financeLastDistribution = { at: 'prior', items: [{ id: 'row', amount: .1 }] };
       const call = { id: 'call', callDate: '10/12/2026', startISO: new Date('2026-10-12T08:15:00').toISOString(), durationMin: 10 };
       if (hasFrozenBonus) call.frozenHigherRateBonus = { tier: 'bronze', amount: .1, windowId: 'hr' };
       const before = JSON.stringify({ settings, call });
       const draft = [{ ...originalWindow, start: '08:10', tier: 'gold' }], effects = [];
-      let accepted = false;
+      let accepted = false, persisted;
       const h = vm.createContext({ Date, callPayMinutes, settings, calls: [call],
         HIGHER_RATE_EARLY_GRACE_MIN: 5, HIGHER_RATE_TIERS: { bronze: { bonusPerMin: .01 }, gold: { bonusPerMin: .03 } },
         timeLabel: value => value, formatHHMM: value => value,
         toMinutes: value => Number(value.slice(0, 2)) * 60 + Number(value.slice(3)),
         toDateFromInputs: (date, time) => new Date(`${date}T${time}:00`), callDateKeyFromValue: value => value,
         readHigherRateWindowsFromEditor: () => draft,
-        financeRunAutoFillCascade: () => { settings.financeCategories.otro.rows[0].assignedAmount += .2; },
-        saveAll: () => accepted, render() {}, renderHigherRateLiveCard() {}, renderHigherRateDayStats() {}, renderHigherRateWindowsEditor() {},
+        financeRunAutoFillCascade: () => { settings.financeCategories.otro.rows[0].assignedAmount += .2;
+          settings.financeLastDistribution = { at: 'rejected', items: [{ id: 'row', amount: .2 }] }; },
+        saveAll: () => { if (accepted) persisted = JSON.stringify({ settings, call }); return accepted; }, render() {}, renderHigherRateLiveCard() {}, renderHigherRateDayStats() {}, renderHigherRateWindowsEditor() {},
         notifyHigherRateRetroactiveMatches: () => effects.push('success'), notifyHigherRateMidnightCrossingWindows() {},
         onGameCallsChanged: () => effects.push('game'),
       });
@@ -106,6 +108,7 @@ for (const action of ['saveHigherRateWindowsFromEditor', 'removeHigherRateWindow
       assert.deepEqual(effects, []);
       assert.equal(draft[0].tier, 'gold');
       accepted = true;
+      h.saveAll(); assert.equal(persisted, before, 'an unrelated later save must not persist the rejected distribution report');
       assert.equal(h[action]('hr'), true);
       assert.ok(Math.abs(settings.financeCategories.otro.rows[0].assignedAmount - .3) < 1e-12);
       assert.equal(call.frozenHigherRateBonus.tier, 'bronze');

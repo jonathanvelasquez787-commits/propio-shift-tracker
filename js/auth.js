@@ -27,7 +27,10 @@ function assertAccount(session, expectedUserId) {
 export async function getUser(expectedUserId) {
   const { data, error } = await getSupabase().auth.getUser();
   if (error) throw error;
-  if (data.user) assertAccount({user:data.user}, expectedUserId);
+  if (data.user) {
+    const userId = assertAccount({user:data.user}, expectedUserId);
+    assertAccount(await getSession(), userId);
+  }
   return data.user || null;
 }
 
@@ -104,7 +107,8 @@ export async function updateUsername(username, expectedUserId) {
   return true;
 }
 
-export async function signOut() {
+export async function signOut(expectedUserId) {
+  if (expectedUserId) assertAccount(await getSession(), expectedUserId);
   try {
     await getSupabase().auth.signOut();
   } finally {

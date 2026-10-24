@@ -18,7 +18,12 @@ export function createAutomationLease(client, { host = window, now = () => Date.
     return checked;
   }
   async function renew() {
-    if (!enabled || stopped || !owner || !isCurrent() || pending || monotonic() - lastRequest < 8000) return;
+    if (!enabled || stopped || !owner || !isCurrent()) return;
+    if (pending) {
+      if (monotonic() - lastRequest < MAX_LEASE_MS) return;
+      generation++; pending = null; invalidate(); lastRequest = -Infinity;
+    }
+    if (monotonic() - lastRequest < 8000) return;
     const revision = generation, requestedOwner = owner, started = now(), startedMono = monotonic();
     lastRequest = startedMono;
     const request = (async () => {
@@ -38,12 +43,12 @@ export function createAutomationLease(client, { host = window, now = () => Date.
   }
   function request({ owner: nextOwner, enabled: requested } = {}) {
     const next = requested === true && uuid(nextOwner) && isCurrent();
-    if (owner !== nextOwner || enabled !== next) { generation++; invalidate(); lastRequest = -Infinity; }
+    if (owner !== nextOwner || enabled !== next) { generation++; pending = null; invalidate(); lastRequest = -Infinity; }
     owner = uuid(nextOwner) ? nextOwner : null; enabled = next;
     if (enabled) void renew();
     return current();
   }
-  const suspend = () => { generation++; invalidate(); lastRequest = -Infinity; };
+  const suspend = () => { generation++; pending = null; invalidate(); lastRequest = -Infinity; };
   const resume = () => { suspend(); if (enabled) void renew(); };
   const timer = host.setInterval(() => { current(); void renew(); }, 4000);
   host.addEventListener('offline', suspend);

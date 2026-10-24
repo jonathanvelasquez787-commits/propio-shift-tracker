@@ -1,4 +1,4 @@
-import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
+import { ui, translateText, translateStoredText, translateMarkup, displayLocale } from './i18n.js';
 import { settings } from './app-context.js';
 import { callFeedbackSilenced } from './call-feedback.js';
 
@@ -101,7 +101,8 @@ export function reinforcementText(kind, vars = {}, variantSeed = 0) {
   }
   const variants = REINFORCEMENT_TEXTS[kind];
   if (!variants?.length) return '';
-  return variants[variantIndex(variantSeed, variants.length)].replace(/\{([a-zA-Z]+)\}/g, (_, key) => String(vars[key] ?? ''));
+  return translateStoredText(variants[variantIndex(variantSeed, variants.length)])
+    .replace(/\{([a-zA-Z]+)\}/g, (_, key) => String(vars[key] ?? ''));
 }
 
 export function normalizeInactivityMessage(value) {

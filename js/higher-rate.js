@@ -1,7 +1,7 @@
 import { loadDetailViews } from './detail-views-loader.js';
 import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 // app-main.js injects Higher Rate helpers; app-context.js owns shared app state.
-import { calls, settings } from './app-context.js';
+import { calls, settings, state } from './app-context.js';
 import { callPayMinutes } from './pay-estimate.js';
 
 let HIGHER_RATE_EARLY_GRACE_MIN, HIGHER_RATE_TIERS, appConfirm, callDateKeyFromValue, callDateToDate;
@@ -41,12 +41,16 @@ export async function applyHigherRateCorrection(windowId, draft, stamp, mode = '
   if (!plan || !plan.hasChanges) return false;
   stamp.used = true;
   const previous = higherRateMutationSnapshot(), gameBefore = higherRateGameBonusSnapshot();
+  const ownerState = state, recoveryBefore = state?.callRecovery;
   if (mode === 'preserve') freezeHigherRateBonusesForWindowIds([windowId]);
   settings.higherRateWindows = plan.windows;
   if (mode !== 'preserve') for (const call of calls) if (call.frozenHigherRateBonus?.windowId === windowId) delete call.frozenHigherRateBonus;
   let saved = false;
-  try { financeRunAutoFillCascade(); saved = saveAll({ render: false }) !== false; } catch { /* La revisión conserva el estado anterior ante un guardado interrumpido. */ }
-  if (!saved) { restoreHigherRateMutation(previous); render(); return false; }
+  try {
+    if (mode !== 'preserve' && Array.isArray(recoveryBefore)) state.callRecovery = view.correctRecoveryHigherRateReceipts(recoveryBefore, windowId, plan.windows, higherRateBonusForCall);
+    financeRunAutoFillCascade(); saved = saveAll({ render: false }) !== false;
+  } catch { /* La revisión conserva el estado anterior ante un guardado interrumpido. */ }
+  if (!saved) { restoreHigherRateMutation(previous); if (state === ownerState && recoveryBefore !== undefined) state.callRecovery = recoveryBefore; render(); return false; }
   reconcileHigherRateGameChanges(gameBefore);
   render(); renderHigherRateWindowsEditor(settings.higherRateWindows || []);
   return true;
@@ -423,17 +427,22 @@ export async function applyHigherRateCorrection(windowId, draft, stamp, mode = '
 
     function higherRateMutationSnapshot() {
       return {
+        ownerSettings: settings, ownerCalls: calls,
         windows: settings.higherRateWindows,
         categories: settings.financeCategories === undefined ? undefined : JSON.parse(JSON.stringify(settings.financeCategories)),
+        distribution: settings.financeLastDistribution === undefined ? undefined : JSON.parse(JSON.stringify(settings.financeLastDistribution)),
         bonuses: calls.map(call => [call, call.frozenHigherRateBonus]),
       };
     }
 
     function restoreHigherRateMutation(snapshot) {
+      if (settings !== snapshot.ownerSettings || calls !== snapshot.ownerCalls) return false;
       if (snapshot.windows === undefined) delete settings.higherRateWindows;
       else settings.higherRateWindows = snapshot.windows;
       if (snapshot.categories === undefined) delete settings.financeCategories;
       else settings.financeCategories = snapshot.categories;
+      if (snapshot.distribution === undefined) delete settings.financeLastDistribution;
+      else settings.financeLastDistribution = snapshot.distribution;
       snapshot.bonuses.forEach(([call, bonus]) => {
         if (bonus === undefined) delete call.frozenHigherRateBonus;
         else call.frozenHigherRateBonus = bonus;
