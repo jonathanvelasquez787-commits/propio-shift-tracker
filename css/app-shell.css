@@ -902,63 +902,13 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 @media(max-width:640px){#pageFinance .fin-available-card{padding:14px}#pageFinance .fin-header-icon{width:42px;height:42px}#pageFinance .fin-row-actions>.fin-amount-entry{flex-basis:100%}}
 @media(pointer:coarse){#pageFinance .fin-priority-btn{width:38px;min-height:44px}}
 
-#goalsModal .modal-card{width:min(640px,100%);padding:24px;border-radius:20px}
-#goalsModal .goals-modal-head{align-items:center;margin-bottom:20px;gap:12px}
-#goalsModal .goals-modal-head>div:nth-child(2){flex:1;min-width:0}
-#goalsModal .goals-modal-head h3{font-size:21px;letter-spacing:-.02em}
-#goalsModal .goals-modal-head p{font-size:12px;margin:3px 0 0;color:var(--muted)}
-#goalsModal .settings-language{max-width:210px;margin-bottom:20px}
-#goalsModal .settings-daily{border:1px solid var(--line);background:rgba(var(--cyan-rgb),.06);border-radius:15px;padding:17px;margin-bottom:18px}
-#goalsModal .settings-daily>.goals-section+.goals-section{border-top:1px solid var(--line);padding-top:17px;margin-top:20px}
-#goalsModal .goals-section{gap:12px;min-width:0}
-#goalsModal .goals-field label{font-size:11px;text-transform:none;letter-spacing:0;line-height:1.5}
-#goalsModal .goals-field{gap:6px}
-#goalsModal .goals-field input,#goalsModal .goals-field select{border:1px solid var(--line);border-radius:10px;background:var(--panel-navy);padding:10px 11px;min-height:42px;font-size:15px;font-weight:600;min-width:0;box-sizing:border-box}
-#goalsModal .goals-field input:focus-visible,#goalsModal .goals-field select:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
-#goalsModal .goals-field-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-#goalsModal #goalsGoalFieldsRow,#goalsModal .settings-rate-fields{grid-template-columns:repeat(3,minmax(0,1fr))}
-#goalsModal .note{font-size:12px;line-height:1.5;overflow-wrap:anywhere}
-#goalsModal .settings-groups{border-top:1px solid var(--line)}
-#goalsModal .settings-group{border-bottom:1px solid var(--line);min-width:0}
-#goalsModal .settings-group>summary{display:flex;align-items:center;gap:12px;padding:15px 0;list-style:none;cursor:pointer}
-#goalsModal .settings-group>summary::-webkit-details-marker{display:none}
-#goalsModal .settings-group>summary>span:nth-child(2){flex:1;min-width:0}
-#goalsModal .settings-group>summary strong{display:block;font-size:13px;font-weight:800}
-#goalsModal .settings-group>summary small{display:block;font-size:11px;color:var(--muted);line-height:1.5;margin-top:3px}
-#goalsModal .settings-group-icon{width:31px;min-height:34px;display:grid;place-items:center;flex-shrink:0;color:var(--cyan)}
-#goalsModal .settings-group-icon .ic-svg{width:19px;height:19px;color:inherit;stroke:currentColor}
-#goalsModal .settings-chevron{font-size:15px;color:var(--muted);flex-shrink:0}
-#goalsModal .settings-group[open]>summary .settings-chevron{transform:rotate(180deg)}
-#goalsModal .settings-group-body{padding:0 0 18px 43px;min-width:0}
-#goalsModal .settings-group-body>.goals-section{min-width:0}
-#goalsModal .settings-accounting{margin-top:16px}
-#goalsModal .settings-accounting>summary{color:var(--cyan);font-size:12px;font-weight:700;padding:7px 0;cursor:pointer}
-#goalsModal .settings-accounting-body{padding-top:12px}
-#goalsModal .settings-inline-help>summary{font-size:11px;font-weight:700;color:var(--cyan);padding:3px 0;cursor:pointer}
-#goalsModal .settings-recovery-card{margin-top:12px;padding:12px 0}
-#goalsModal .settings-recovery-card .danger-card-head{margin-bottom:6px}
-#goalsModal .settings-recovery-card .danger-card-title{font-size:13px}
 #goalsModal #settingsRecoveryCopies:empty{display:none}
 #goalsModal #settingsRecoveryCopies select{width:100%;min-width:0}
-#goalsModal #automationPanel{margin:0;padding:0;border-top:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent}
-#goalsModal #automationPanel .automation-heading{display:flex;padding:15px 0;gap:12px;flex-wrap:wrap}
-#goalsModal #automationPanel .automation-icon{width:31px;min-width:31px;background:transparent;border:0;color:var(--cyan)}
-#goalsModal #automationPanel .automation-identity{flex:1;min-width:0}
-#goalsModal #automationPanel .automation-state{margin-left:43px;text-align:left;flex-basis:calc(100% - 43px);justify-content:flex-start;flex-wrap:wrap;order:4}
-#goalsModal #automationPanel .automation-body{padding:0 0 18px 43px}
 #goalsModal .settings-delete-group{margin-top:25px;border-top:1px solid var(--line);border-bottom:0;background:rgba(var(--bad-rgb),.05);padding:0 12px;border-radius:0 0 12px 12px}
 #goalsModal .settings-delete-group>summary strong,#goalsModal .settings-delete-group .settings-group-icon{color:var(--bad)}
 #goalsModal .settings-delete-group .polished-delete{padding:0;border:0;background:transparent}
 #goalsModal .polished-delete-counts{padding:12px;gap:8px}
 #goalsModal .polished-delete-counts strong{font-size:20px}
-#goalsModal .goals-profile-row{flex-wrap:wrap;gap:10px}
-#goalsModal .goals-emoji-circle{width:40px;height:42px;border-radius:12px;font-size:23px}
-#goalsModal .goals-emoji-toggle-btn{min-height:38px}
-#goalsModal .goals-profile-name-field{min-width:120px}
-#goalsModal .goals-pill-row{gap:12px}
-#goalsModal .goals-pill-field{min-width:0;max-width:100%;flex-wrap:wrap}
-#goalsModal .modal-actions{justify-content:flex-end;margin-top:20px}
-#goalsModal .modal-actions>.mc-btn-primary{flex:0 0 auto;min-width:90px}
 
 #pageReports .rpt-day-conclusion[hidden]{display:none}
 #pageReports .rpt-day-conclusion{padding:10px 12px;border:0;border-radius:10px;margin-bottom:16px;background:rgba(var(--cyan-rgb),.05)}
@@ -1040,4 +990,22 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 #workDayReviewContent>.review-details>summary{font-size:11px;font-weight:700;line-height:1.5}
 #workDayReviewContent .review-detail-body{overflow-wrap:anywhere}
 @media(max-width:540px){#rptGoalsGrid{grid-template-columns:1fr;gap:9px}#rptGoalsGrid .rpt-goal-card{padding:12px 14px}#rptGoalsGrid .gh-goal-top{flex-direction:row;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:10px}#rptGoalsGrid .gh-goal-top>b{font-size:22px;text-align:right}#workDayReviewContent{grid-template-columns:1fr}#workDayReviewContent>.review-overview{padding:12px}.rpt-history-stats{gap:8px 16px}}
-@media(max-width:480px){#goalsModal{padding:12px}#goalsModal .modal-card{padding:16px}#goalsModal .settings-daily{padding:13px}#goalsModal .settings-language{max-width:none}#goalsModal #goalsGoalFieldsRow,#goalsModal .settings-rate-fields{grid-template-columns:repeat(2,minmax(0,1fr))}#goalsModal .settings-group-body,#goalsModal #automationPanel .automation-body{padding-left:0}#goalsModal .goals-field input,#goalsModal .goals-field select{font-size:16px}#goalsModal .settings-delete-group{padding:0 9px}}
+
+#goalsModal .goals-profile-row{flex-wrap:wrap}
+#goalsModal .goals-field input:focus-visible,#goalsModal .goals-field select:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+#goalsModal .settings-delete-group>summary{display:flex;gap:12px;align-items:center;padding:14px 0;cursor:pointer}
+#goalsModal .settings-delete-group small{display:block;color:var(--muted);font-size:11px}
+#goalsModal .settings-delete-group .settings-group-body{padding-bottom:14px}
+
+.hr-window-tier-label{display:block;text-align:center;font-weight:900;border-radius:8px;padding:6px 12px}
+.hr-window-card[data-tier="bronze"] .hr-window-tier-label{background:var(--tier-bronze);color:#3a2308}
+.hr-window-card[data-tier="silver"] .hr-window-tier-label{background:var(--tier-silver);color:#2a2f36}
+.hr-window-card[data-tier="gold"] .hr-window-tier-label{background:var(--tier-gold);color:#413006}
+
+#higherRateModal .hero-today-top,#higherRateModal .hero-today-foot{flex-wrap:wrap}
+#higherRateModal .hero-today-top>div{min-width:0}
+#higherRateModal .hero-today-tier{max-width:100%;white-space:normal;box-sizing:border-box}
+#higherRateModal .hero-fig{min-width:0}
+
+#goalsModal .goals-pill-field{min-width:0;max-width:100%;flex-wrap:wrap;box-sizing:border-box}
+#goalsModal .goals-pill-field input{min-width:0;max-width:100%;box-sizing:border-box}

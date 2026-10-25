@@ -228,7 +228,13 @@ export async function applyHigherRateCorrection(windowId, draft, stamp, mode = '
     // BUG-016 (QA ) — Pedido del usuario: el `.hr-window-date-input` que arma esta función llevaba min/max agregados (ver el atributo en el template de abajo) para no aceptar años absurdos (0999/9999) sin ninguna validación
     function renderHigherRateWindowRow(w) {
       const tier = HIGHER_RATE_TIERS[w.tier] ? w.tier : 'bronze';
-      return ui`<div class="hr-window-card" data-hr-window-id="${escapeHtml(w.id || '')}" data-tier="${tier}"><div class="hr-window-top"><strong>${escapeHtml(formatCallDayLabel(w.date))}</strong><button type="button" class="hr-window-remove-btn" data-remove-hr-window aria-label="Eliminar ventana">×</button></div><div class="hr-window-time">${escapeHtml(timeLabel(w.start))} – ${escapeHtml(timeLabel(w.end))}</div><span class="hr-count-pill">${escapeHtml(HIGHER_RATE_TIERS[tier].label)}</span><button type="button" class="gap-edit-btn" data-review-hr-window>Ver y editar promoción</button></div>`;
+      return ui`<div class="hr-window-card" data-hr-window-id="${escapeHtml(w.id || '')}" data-tier="${tier}">
+        <div class="hr-window-top"><div class="hr-window-day"><span class="hr-window-day-icon" aria-hidden="true">${iconHtml('calendar')}</span><div class="hr-window-day-text"><div class="hr-window-day-name">${escapeHtml(hrWindowWeekdayLabel(w.date))}</div><strong>${escapeHtml(formatCallDayLabel(w.date))}</strong></div></div><button type="button" class="hr-window-remove-btn" data-remove-hr-window aria-label="Eliminar ventana">×</button></div>
+        <div class="hr-window-time"><span class="hr-window-time-icon" aria-hidden="true">${iconHtml('clock')}</span><strong>${escapeHtml(timeLabel(w.start))}</strong><span class="hr-time-sep" aria-hidden="true">–</span><strong>${escapeHtml(timeLabel(w.end))}</strong></div>
+        <div class="hr-window-tier-row"><span class="hr-window-tier-label">${escapeHtml(HIGHER_RATE_TIERS[tier].label)}</span></div>
+        <button type="button" class="gap-edit-btn" data-review-hr-window>Ver y editar promoción</button>
+      </div>`;
+
     }
     let renderedHigherRateWindows = [];
 

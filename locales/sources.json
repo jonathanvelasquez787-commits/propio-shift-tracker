@@ -2203,12 +2203,6 @@
       "app.html"
     ]
   },
-  "s_2041bb03": {
-    "source": "{{v3}} – {{v4}}",
-    "files": [
-      "js/higher-rate.js"
-    ]
-  },
   "s_206992ec": {
     "source": "¿Continuar el turno anterior o iniciar otra sesión?",
     "files": [
@@ -5348,6 +5342,12 @@
     "source": "{{v10}}\n          {{v11}}",
     "files": [
       "js/detail-views.js"
+    ]
+  },
+  "s_5111640d": {
+    "source": "Backup de datos",
+    "files": [
+      "app.html"
     ]
   },
   "s_51260306": {
@@ -9194,12 +9194,6 @@
       "js/monsters.js"
     ]
   },
-  "s_8af6089f": {
-    "source": "Copias y exportación",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_8b1d8111": {
     "source": "El respaldo contiene un historial de actividad inválido. Tus datos actuales no se cambiaron.",
     "files": [
@@ -11027,12 +11021,6 @@
       "js/auth.js"
     ]
   },
-  "s_a5859fd8": {
-    "source": "Perfil y cuenta",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_a58c4288": {
     "source": "Varita mágica",
     "files": [
@@ -11738,12 +11726,6 @@
     "source": "todo es editable desde la propia app.",
     "files": [
       "privacidad.html"
-    ]
-  },
-  "s_b0973bcd": {
-    "source": "Respaldo completo, recuperación y contabilidad",
-    "files": [
-      "app.html"
     ]
   },
   "s_b0bac425": {
@@ -12964,12 +12946,6 @@
     "source": "Meta de hoy",
     "files": [
       "js/game.js"
-    ]
-  },
-  "s_c4e63dd4": {
-    "source": "Nombre, emoji y acceso con Google",
-    "files": [
-      "app.html"
     ]
   },
   "s_c4ef62f0": {
@@ -15001,12 +14977,6 @@
     "source": "Encontraste un aprendizaje en esta llamada",
     "files": [
       "js/reinforcement-feedback.js"
-    ]
-  },
-  "s_e182e49e": {
-    "source": "Fecha de referencia y días hasta el pago",
-    "files": [
-      "app.html"
     ]
   },
   "s_e189063d": {
