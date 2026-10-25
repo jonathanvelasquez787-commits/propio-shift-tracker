@@ -74,7 +74,6 @@ import {
 
 import {
   addHigherRateWindowRow,
-  openHigherRateReview,
   saveHigherRateWindowDraft,
   higherRateBonusBreakdownForCalls,
   higherRateBonusChipsHtml,
@@ -7519,8 +7518,7 @@ export function render() {
     // y #higherRateHistoryList).
     document.getElementById('higherRateModal').addEventListener('change', (e) => {
       const row = e.target instanceof Element ? e.target.closest('.hr-window-card') : null;
-      const save = row?.querySelector('[data-save-hr-window]');
-      if (save) save.disabled = false;
+      if (row) void saveHigherRateWindowDraft(row);
     });
     document.getElementById('higherRateModal').addEventListener('click', (e) => {
       const tierButton = e.target instanceof Element ? e.target.closest('[data-hr-tier-btn]') : null;
@@ -7531,18 +7529,9 @@ export function render() {
           button.setAttribute('aria-pressed', String(button === tierButton));
           button.textContent = hrTierButtonLabel(button.getAttribute('data-tier'), button === tierButton);
         });
-        row.querySelector('[data-save-hr-window]').disabled = false;
+        void saveHigherRateWindowDraft(row);
         return;
       }
-      const save = e.target instanceof Element ? e.target.closest('[data-save-hr-window]') : null;
-      if (save && !save.disabled) {
-        save.disabled = true;
-        saveHigherRateWindowDraft(save.closest('.hr-window-card')).finally(() => { if (save.isConnected) save.disabled = false; });
-        return;
-      }
-
-      const review = e.target instanceof Element ? e.target.closest('[data-review-hr-window]') : null;
-      if (review) { openHigherRateReview(review.closest('.hr-window-card').getAttribute('data-hr-window-id')); return; }
       const btn = e.target instanceof Element ? e.target.closest('[data-remove-hr-window]') : null;
       if (!btn) return;
       const row = btn.closest('.hr-window-card');

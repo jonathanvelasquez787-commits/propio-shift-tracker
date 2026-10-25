@@ -2520,12 +2520,6 @@
       "js/game.js"
     ]
   },
-  "s_262ac7c8": {
-    "source": "Revisar llamadas",
-    "files": [
-      "js/higher-rate.js"
-    ]
-  },
   "s_262d2a5d": {
     "source": "Gracia (min)",
     "files": [
@@ -8849,6 +8843,12 @@
       "js/shift-work-review.js"
     ]
   },
+  "s_85a04400": {
+    "source": "Usá la fecha, horas y nivel del aviso de Propio. Los cambios se guardan automáticamente y conservan los bonos registrados.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_85b22c65": {
     "source": "Meta del ciclo vuelve a calcularse automáticamente",
     "files": [
@@ -9928,12 +9928,6 @@
   },
   "s_94462133": {
     "source": "#0F828C",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_945d4109": {
-    "source": "Usá la fecha, horas y nivel del aviso de Propio. Guardar cambios conserva los bonos registrados; para corregirlos, abrí «Revisar llamadas».",
     "files": [
       "app.html"
     ]
@@ -14861,8 +14855,7 @@
   "s_deca50a1": {
     "source": "Guardar cambios",
     "files": [
-      "js/finance.js",
-      "js/higher-rate.js"
+      "js/finance.js"
     ]
   },
   "s_deed570c": {

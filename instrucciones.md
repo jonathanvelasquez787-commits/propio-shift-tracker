@@ -514,6 +514,12 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v654 — Higher Rate automático y ventanas futuras.**
+
+- Retira Guardar cambios y Revisar llamadas de las tarjetas por pedido del propietario. Fecha, horas y nivel se guardan automáticamente con conservación de bonos; los cambios rápidos se procesan en orden sin reemplazar otros borradores ni mezclar propietarios.
+- Corrige la revisión obsoleta después de agregar una ventana, que rechazaba el primer cambio de fecha. Actualiza el día de la semana y conserva las ventanas existentes. Tres regresiones nuevas; 1.137 pruebas correctas y dos ventanas del 26/10 comprobadas tras recarga con datos ficticios.
+
+
 **v653 — Finanzas 601 y editor de Higher Rate completos.**
 
 - Finanzas recupera las tarjetas por categoría, barras, totales y Sumar/Restar/Aplicar visibles de la referencia 601 aprobada. Conserva las reglas contables actuales, la conversión precisa, exclusiones y liberación de reservas; no recupera el registro de pagos ni borra datos históricos.
@@ -524,9 +530,3 @@ futura opera bajo esto, sin excepción:
 
 - Ajustes vuelve al formulario seguido, secciones y campos subrayados de 631. Conserva idioma, perfil Google, metas actuales, exportaciones, recuperación, disponibilidad y eliminación protegida.
 - Higher Rate recupera la presentación con iconos de fecha y hora y nivel destacado; conserva la revisión segura antes de editar, el cálculo y la persistencia actuales. Reportes mantiene las optimizaciones de 651. Pruebas, compilación y revisión responsive claro/oscuro.
-
-
-**v651 — Apertura de Reportes sin cálculos ocultos innecesarios.**
-
-- Los análisis plegados mensual y de calidad se calculan al abrirlos. Productividad deja de calcular pausas/estadísticas/adherencia que no dibuja y la comparación semanal calcula solo adherencia.
-- Tres regresiones para carga plegada, totales y bonos, precisión productiva e índice temporal sin datos obsoletos. 1.131 pruebas correctas; con 2.160 llamadas ficticias, apertura normal de 57,8 s a 1,1 s. Un análisis mensual ya abierto todavía requiere más cálculo. No se cambian reglas contables ni datos guardados.

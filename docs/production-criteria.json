@@ -429,7 +429,9 @@
         {
           "file": "tests/higher-rate-persistence-order.test.mjs",
           "namedCases": [
-            "a rejected retroactive Higher Rate window cannot persist game receipts before its settings snapshot; retry reconciles once"
+            "a rejected retroactive Higher Rate window cannot persist game receipts before its settings snapshot; retry reconciles once",
+            "adding a promotion refreshes its edit stamp only after accepted persistence: true",
+            "adding a promotion refreshes its edit stamp only after accepted persistence: false"
           ]
         },
         {
@@ -509,7 +511,8 @@
             "interrupted correction storage restores promotion, finance and preserved bonuses before retry",
             "restored inline promotion editor preserves earned bonuses through the guarded transaction",
             "restored inline promotion editor rejects stale drafts and invalid times without writes",
-            "restored inline promotion editor rolls back rejected saves without losing recorded money"
+            "restored inline promotion editor rolls back rejected saves without losing recorded money",
+            "automatic promotion edits serialize rapid date and tier changes without losing tomorrow or earned bonuses"
           ]
         },
         {
@@ -1773,7 +1776,8 @@
             "the unified promotion editor previews and preserves earned bonuses before moving its window",
             "restored inline promotion editor preserves earned bonuses through the guarded transaction",
             "restored inline promotion editor rejects stale drafts and invalid times without writes",
-            "restored inline promotion editor rolls back rejected saves without losing recorded money"
+            "restored inline promotion editor rolls back rejected saves without losing recorded money",
+            "automatic promotion edits serialize rapid date and tier changes without losing tomorrow or earned bonuses"
           ]
         }
       ]

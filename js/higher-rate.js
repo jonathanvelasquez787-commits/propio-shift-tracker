@@ -32,19 +32,40 @@ export async function openHigherRateReview(windowId) {
 }
 
 
-export async function saveHigherRateWindowDraft(row) {
+export function saveHigherRateWindowDraft(row) {
   const id = row.getAttribute('data-hr-window-id');
   const draft = { date: dayKeyFromIsoDate(row.querySelector('.hr-window-date-input').value),
     start: row.querySelector('.hr-window-start-input').value,
     end: row.querySelector('.hr-window-end-input').value,
     tier: row.querySelector('.hr-window-tier-input').value };
-  const stamp = renderedHigherRateEditStamp && { ...renderedHigherRateEditStamp, used: false };
-  const saved = await applyHigherRateCorrection(id, draft, stamp, 'preserve');
-  if (!saved) toast(translateText('No se aplicó. Revisá el guardado y volvé a calcular; los datos pudieron cambiar.'));
-  return saved;
+  const entry = { stamp: renderedHigherRateEditStamp && { ...renderedHigherRateEditStamp, used: false } };
+  pendingHigherRateDrafts.push(entry);
+  const commit = async () => {
+    try {
+      const original = settings.higherRateWindows?.find(window => window.id === id);
+      const current = entry.stamp?.owner === settings && entry.stamp.callsOwner === calls && entry.stamp.revision === JSON.stringify([settings, calls]);
+      const unchanged = current && original && ['date', 'start', 'end', 'tier'].every(key => original[key] === draft[key]);
+      const saved = unchanged || await applyHigherRateCorrection(id, draft, entry.stamp, 'preserve', false);
+      if (!saved) { toast(translateText('No se aplicó. Revisá el guardado y volvé a calcular; los datos pudieron cambiar.')); return false; }
+      const stamp = { owner: settings, callsOwner: calls, revision: JSON.stringify([settings, calls]), used: false };
+      const previousStamp = entry.stamp;
+      for (const pending of pendingHigherRateDrafts) {
+        if (pending.stamp?.owner === previousStamp?.owner && pending.stamp?.callsOwner === previousStamp?.callsOwner && pending.stamp?.revision === previousStamp?.revision) pending.stamp = { ...stamp };
+      }
+      renderedHigherRateEditStamp = stamp;
+      renderedHigherRateWindows = (settings.higherRateWindows || []).map(window => ({ ...window }));
+      const day = row.querySelector('.hr-window-day-name');
+      if (day) day.textContent = hrWindowWeekdayLabel(dayKeyFromIsoDate(row.querySelector('.hr-window-date-input').value));
+      renderHigherRateDayStats(); renderHigherRateLiveCard();
+      return true;
+    } finally { pendingHigherRateDrafts.splice(pendingHigherRateDrafts.indexOf(entry), 1); }
+  };
+  const operation = higherRateDraftQueue.then(commit, commit);
+  higherRateDraftQueue = operation.then(() => {}, () => {});
+  return operation;
 }
 
-export async function applyHigherRateCorrection(windowId, draft, stamp, mode = 'recalculate') {
+export async function applyHigherRateCorrection(windowId, draft, stamp, mode = 'recalculate', refreshEditor = true) {
   const view = await loadDetailViews();
   if (!view || !stamp || stamp.used || !canPersistLocalChanges() || stamp.owner !== settings
     || stamp.callsOwner !== calls || stamp.revision !== JSON.stringify([settings, calls])) return false;
@@ -65,7 +86,7 @@ export async function applyHigherRateCorrection(windowId, draft, stamp, mode = '
   } catch { /* La revisión conserva el estado anterior ante un guardado interrumpido. */ }
   if (!saved) { restoreHigherRateMutation(previous); if (state === ownerState && recoveryBefore !== undefined) state.callRecovery = recoveryBefore; render(); return false; }
   reconcileHigherRateGameChanges(gameBefore);
-  render(); renderHigherRateWindowsEditor(settings.higherRateWindows || []);
+  render(); if (refreshEditor) renderHigherRateWindowsEditor(settings.higherRateWindows || []);
   return true;
 }
 
@@ -269,12 +290,12 @@ export async function applyHigherRateCorrection(windowId, draft, stamp, mode = '
             <option value="gold" ${tier === 'gold' ? 'selected' : ''}>Gold (+$0.03)</option>
           </select>
           <div class="hr-window-tier-row" role="group" aria-label="Nivel de la ventana">${tierButtonsHtml}</div>
-          <button type="button" class="gap-edit-btn" data-save-hr-window disabled>Guardar cambios</button>
-          <button type="button" class="gap-edit-btn" data-review-hr-window>Revisar llamadas</button>
         </div>
       `;
     }
     let renderedHigherRateWindows = [];
+    let higherRateDraftQueue = Promise.resolve();
+    const pendingHigherRateDrafts = [];
     let renderedHigherRateEditStamp;
 
     // Total de minutos/horas del día que ya calificaron para un bono de Higher Rate, dentro del
@@ -566,8 +587,11 @@ export async function applyHigherRateCorrection(windowId, draft, stamp, mode = '
     }
 
     // "agrego una ventana y luego no la encuentro".
-    export function addHigherRateWindowRow() {
-      const current = readHigherRateWindowsFromEditor();
+    export async function addHigherRateWindowRow() {
+      const owner = settings, callsOwner = calls;
+      await higherRateDraftQueue;
+      if (settings !== owner || calls !== callsOwner || !canPersistLocalChanges()) return false;
+      const current = (settings.higherRateWindows || []).map(window => ({ ...window }));
       const todayKey = todayCallDateKey();
       const now = new Date();
       const startMin = now.getHours() * 60 + now.getMinutes();
@@ -577,7 +601,8 @@ export async function applyHigherRateCorrection(windowId, draft, stamp, mode = '
       const newWindow = { id: makeLocalId(), date: todayKey, start: minutesToHHMM(startMin), end: minutesToHHMM(endMin), tier: 'bronze' };
       current.push(newWindow);
       renderHigherRateWindowsEditor(current);
-      saveHigherRateWindowsFromEditor();
+      if (!saveHigherRateWindowsFromEditor()) { renderHigherRateWindowsEditor(settings.higherRateWindows || []); return false; }
+      renderedHigherRateEditStamp = { owner: settings, callsOwner: calls, revision: JSON.stringify([settings, calls]), used: false };
       const newCard = document.querySelector(`.hr-window-card[data-hr-window-id="${newWindow.id}"]`);
       if (newCard && newCard.scrollIntoView) newCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       newCard?.querySelector('.hr-window-date-input')?.focus();
