@@ -1,4 +1,10 @@
 {
+  "s_000b5c2b": {
+    "source": "/ {{v1}} min",
+    "files": [
+      "js/reports.js"
+    ]
+  },
   "s_000c6bd9": {
     "source": "Fijar menú abierto",
     "files": [
@@ -1262,6 +1268,12 @@
       "app.html"
     ]
   },
+  "s_11eedeae": {
+    "source": "Mejor",
+    "files": [
+      "js/reports.js"
+    ]
+  },
   "s_12046777": {
     "source": "Categoría \"{{v0}}\" borrada",
     "files": [
@@ -2087,6 +2099,12 @@
       "js/app-main.js"
     ]
   },
+  "s_1edca183": {
+    "source": "Peor",
+    "files": [
+      "js/reports.js"
+    ]
+  },
   "s_1eea3f8b": {
     "source": "#B1D3B9",
     "files": [
@@ -2471,12 +2489,6 @@
       "js/automation-ui.js"
     ]
   },
-  "s_25055385": {
-    "source": "{{v13}}/{{v14}}",
-    "files": [
-      "js/reports.js"
-    ]
-  },
   "s_254330de": {
     "source": "Sin ventanas pasadas todavía.",
     "files": [
@@ -2626,12 +2638,6 @@
     "source": "Falta el campo \"state\" (o no es válido) en el archivo.",
     "files": [
       "js/backup-recovery.js"
-    ]
-  },
-  "s_2789f8fc": {
-    "source": "{{v5}}/{{v6}}%",
-    "files": [
-      "js/reports.js"
     ]
   },
   "s_27987d02": {
@@ -3723,7 +3729,8 @@
   "s_371bc6be": {
     "source": "Promedio",
     "files": [
-      "app.html"
+      "app.html",
+      "js/reports.js"
     ]
   },
   "s_371f45fa": {
@@ -6838,6 +6845,12 @@
     "source": "Ocho cosas que antes vivían en tu cabeza, en un cuaderno o en una hoja aparte.",
     "files": [
       "index.html"
+    ]
+  },
+  "s_68d15065": {
+    "source": "/ {{v6}}%",
+    "files": [
+      "js/reports.js"
     ]
   },
   "s_68dfe19e": {
@@ -12133,12 +12146,6 @@
       "js/higher-rate.js"
     ]
   },
-  "s_b6b72169": {
-    "source": "{{v0}}/{{v1}} min",
-    "files": [
-      "js/reports.js"
-    ]
-  },
   "s_b6becd9b": {
     "source": "Sus datos tienen prioridad. La medición original queda guardada como respaldo.",
     "files": [
@@ -14691,6 +14698,12 @@
       "js/app-main.js"
     ]
   },
+  "s_dd813f5e": {
+    "source": "/ {{v11}}",
+    "files": [
+      "js/reports.js"
+    ]
+  },
   "s_dd88d5e0": {
     "source": "Dentro del horario",
     "files": [
@@ -15751,12 +15764,6 @@
     "source": "Elegir este color",
     "files": [
       "js/finance.js"
-    ]
-  },
-  "s_eccde8c9": {
-    "source": "Mejor: {{v10}} · Peor: {{v11}} · Promedio: {{v12}}",
-    "files": [
-      "js/reports.js"
     ]
   },
   "s_ece2ef1d": {
@@ -16898,7 +16905,7 @@
   "s_fca9eaec": {
     "source": "Comparación de los últimos 7 días",
     "files": [
-      "js/reports.js"
+      "app.html"
     ]
   },
   "s_fce63fff": {

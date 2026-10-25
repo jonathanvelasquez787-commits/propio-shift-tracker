@@ -37,12 +37,13 @@ test('calendar status keeps no-data days distinct from recorded zero-minute work
 });
 
 test('report cards do not turn missing activity or a day off into missing minutes and money',t=>{
- setLanguage('es');const previous=globalThis.document,elements=new Map(['rptDashboard','rptDayConclusion','rptGoalsGrid','rptSecGoals'].map(id=>[id,{innerHTML:''}]));
+ setLanguage('es');const previous=globalThis.document,elements=new Map(['rptDashboard','rptDayConclusion','rptGoalsGrid','rptSecGoals','rptGoalsStatus','rptGoalsComparison','rptAdherenceHistoryContent'].map(id=>[id,{innerHTML:''}]));
  globalThis.document={getElementById:id=>elements.get(id)||null};t.after(()=>{if(previous===undefined)delete globalThis.document;else globalThis.document=previous;});
  let off=false;
  configureReportsContext({todayRange:()=>new Date(2026,9,19),dayConfigFor:()=>({}),getActiveDayKey:()=> '10/19/2026',todayCallDateKey:()=> '10/19/2026',callDateToDate:()=>new Date(2026,9,19),previousCalendarDay:date=>new Date(date.getTime()-86400000),callsForDay:()=>[],importedCallStats:()=>({earnings:0}),productiveMinutesForDay:()=>0,dayAdherence:()=>null,dayShiftBounds:()=>({start:null}),dayIsEffectivelyOff:()=>off,effectiveDailyGoal:()=>({min:360,usd:43.2}),escapeHtml:String,iconHtml:()=>'',formatMinutes:String,money:value=>'$'+value,financeConvertedInline:()=>'',convertedAmountText:()=>''});
  renderReportsDashboard();assert.match(elements.get('rptDayConclusion').innerHTML,/Sin actividad registrada/);assert.doesNotMatch(elements.get('rptGoalsGrid').innerHTML,/Faltan|Meta alcanzada/);
- off=true;renderReportsDashboard();assert.match(elements.get('rptGoalsGrid').innerHTML,/Día libre: meta sin evaluar/);assert.doesNotMatch(elements.get('rptGoalsGrid').innerHTML,/Faltan/);
+ off=true;renderReportsDashboard();assert.match(elements.get('rptGoalsStatus').textContent,/Día libre: meta sin evaluar/);assert.doesNotMatch(elements.get('rptGoalsGrid').innerHTML,/Faltan/);
+ assert.equal(elements.get('rptGoalsComparison').hidden,false);assert.doesNotMatch(elements.get('rptGoalsGrid').innerHTML,/Sin comparación disponible|<details/);
 });
 
 function context(){

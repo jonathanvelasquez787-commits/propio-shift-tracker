@@ -959,4 +959,34 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 #goalsModal .goals-pill-field{min-width:0;max-width:100%;flex-wrap:wrap}
 #goalsModal .modal-actions{justify-content:flex-end;margin-top:20px}
 #goalsModal .modal-actions>.mc-btn-primary{flex:0 0 auto;min-width:90px}
+
+#rptGoalsStatus{font-size:12px;color:var(--muted);background:rgba(var(--cyan-rgb),.05);border-radius:10px;padding:10px 12px;margin:0 0 14px}
+#rptGoalsStatus[hidden],#rptGoalsComparison[hidden]{display:none}
+#rptGoalsGrid{grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch;gap:12px}
+#rptGoalsGrid .rpt-goal-card{display:flex;flex-direction:column;min-width:0;padding:16px;border-radius:15px}
+#rptGoalsGrid .gh-goal-top{display:flex;flex-direction:column;align-items:flex-start;gap:9px;margin-bottom:13px}
+#rptGoalsGrid .gh-goal-top>span{font-size:12px;color:var(--muted);font-weight:800}
+#rptGoalsGrid .gh-goal-top>b{font-size:24px;line-height:1.3;letter-spacing:-.02em;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+#rptGoalsGrid .gh-goal-top>b>span{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:0;white-space:nowrap}
+#rptGoalsGrid .rpt-goal-bar{height:6px;flex-shrink:0;margin-bottom:0;background:var(--line)}
+#rptGoalsGrid .rpt-goal-bar>div{background:var(--cyan)}
+#rptGoalsGrid .fin-row-converted{font-size:11px;margin-top:8px;overflow-wrap:anywhere}
+#rptGoalsGrid .gh-goal-foot{font-size:11px;line-height:1.5;margin-top:8px}
+#rptGoalsGrid .gh-goal-foot:empty{display:none}
+#rptGoalsGrid .rpt-goal-delta{margin-top:auto;padding-top:10px;border-top:0;font-size:11px;overflow-wrap:anywhere}
+#rptGoalsComparison{font-size:11px;color:var(--muted);margin-top:10px}
+#rptGoalsDetails{margin:18px 0;min-width:0}
+#rptGoalsDetails>.polished-disclosure,#rptGoalsDetails #workDayReviewDetails{border-top:1px solid var(--line)}
+#rptAdherenceHistoryContent{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;border-top:0;padding:0 0 18px;font-size:12px}
+.rpt-history-label,.rpt-history-stats>span{color:var(--muted)}
+.rpt-history-stats{display:flex;gap:20px;flex-wrap:wrap}
+.rpt-history-stats strong{font-weight:800;color:var(--text);margin-left:5px;font-variant-numeric:tabular-nums}
+#workDayReviewContent{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 16px;border-top:0;padding-top:0}
+#workDayReviewContent>.review-scope,#workDayReviewContent>.review-overview{grid-column:1/-1}
+#workDayReviewContent>.review-scope{margin:0 0 10px}
+#workDayReviewContent>.review-overview{background:rgba(var(--cyan-rgb),.06);padding:14px 16px;border:0;border-radius:12px}
+#workDayReviewContent>.review-details{min-width:0;align-self:start}
+#workDayReviewContent>.review-details>summary{font-size:11px;font-weight:700;line-height:1.5}
+#workDayReviewContent .review-detail-body{overflow-wrap:anywhere}
+@media(max-width:540px){#rptGoalsGrid{grid-template-columns:1fr;gap:9px}#rptGoalsGrid .rpt-goal-card{padding:12px 14px}#rptGoalsGrid .gh-goal-top{flex-direction:row;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:10px}#rptGoalsGrid .gh-goal-top>b{font-size:22px;text-align:right}#workDayReviewContent{grid-template-columns:1fr}#workDayReviewContent>.review-overview{padding:12px}.rpt-history-stats{gap:8px 16px}}
 @media(max-width:480px){#goalsModal{padding:12px}#goalsModal .modal-card{padding:16px}#goalsModal .settings-daily{padding:13px}#goalsModal .settings-language{max-width:none}#goalsModal #goalsGoalFieldsRow,#goalsModal .settings-rate-fields{grid-template-columns:repeat(2,minmax(0,1fr))}#goalsModal .settings-group-body,#goalsModal #automationPanel .automation-body{padding-left:0}#goalsModal .goals-field input,#goalsModal .goals-field select{font-size:16px}#goalsModal .settings-delete-group{padding:0 9px}}
