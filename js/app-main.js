@@ -5764,7 +5764,7 @@ function renderHeader() {
   const hasShift = !!shiftBounds.start;
 
   document.getElementById('clockNow').textContent = clockTimeVisible ? fmtTime(now) : '--:--:--';
-  document.getElementById('clockDate').textContent = fmtDate(now);
+  document.getElementById('clockDate').textContent = fmtDate(callDateToDate(dayKey) || now);
   document.getElementById('stateText').textContent = translateText(currentStateLabel());
   const continuationHint = document.getElementById('pauseContinuationHint');
   if (continuationHint) continuationHint.hidden = !state.activePause?.continuationClosedPause;
@@ -7522,6 +7522,9 @@ export function render() {
       const row = btn.closest('.hr-window-card');
       const id = row ? row.getAttribute('data-hr-window-id') : null;
       if (id) removeHigherRateWindowRowAt(id);
+    });
+    document.getElementById('daySelector').addEventListener('click', (e) => {
+      try { e.currentTarget.showPicker?.(); } catch {}
     });
     document.getElementById('daySelector').addEventListener('change', (e) => {
       const key = dayKeyFromIsoDate(e.target.value);

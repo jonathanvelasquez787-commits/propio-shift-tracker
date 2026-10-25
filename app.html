@@ -119,19 +119,19 @@
 </div>
 <div class="clockbox">
 <div class="clock" id="clockNow">--:--:--</div>
-<div class="date" id="clockDate">---</div>
+<div class="clock-date-controls">
+  <button class="day-active-label-btn" id="dayActiveLabelBtn" type="button" title="Ir a Hoy" aria-label="Ir a Hoy">Día activo</button>
+  <button class="day-nav-btn" id="dayPrevBtn" type="button" aria-label="Día anterior" title="Día anterior">‹</button>
+  <label class="clock-date-picker"><span class="date" id="clockDate">---</span><input id="daySelector" aria-label="Día activo" type="date" min="1970-01-01" max="2099-12-31"/></label>
+  <button class="day-nav-btn" id="dayNextBtn" type="button" aria-label="Día siguiente" title="Día siguiente">›</button>
+</div>
 </div>
 </div>
 <div class="chips">
 <div class="day-status-controls">
 <div class="chip"><span class="dot-state" id="stateDot"></span><strong id="stateText">No iniciado</strong></div>
 <div class="acw-day-pair">
-<div class="summary-pill">
-  <button class="day-active-label-btn" id="dayActiveLabelBtn" type="button" title="Ir a Hoy" aria-label="Ir a Hoy">Día activo</button>
-  <button class="day-nav-btn" id="dayPrevBtn" type="button" aria-label="Día anterior" title="Día anterior">‹</button>
-  <input id="daySelector" aria-label="Día activo" type="date" min="1970-01-01" max="2099-12-31"/>
-  <button class="day-nav-btn" id="dayNextBtn" type="button" aria-label="Día siguiente" title="Día siguiente">›</button>
-</div>
+
 <button class="chip" id="acwLiveChip" type="button" aria-label="Ver origen del ACW" aria-controls="callEditModal"><span aria-hidden="true">⏱️</span><span class="acw-label-full">ACW</span><span class="acw-label-short">ACW</span> <strong id="acwLiveTimer">00:00:00</strong><span id="acwRecordSource" hidden></span></button>
 </div>
 </div>
@@ -253,14 +253,6 @@
 <div id="financePreviewRows"></div>
 <p class="note">Acumulados de Finanzas, independientemente del día activo.</p>
 </div>
-<div class="hr-live-card" id="earningsHigherRateLiveCard" style="display:none; margin-top:10px;">
-<span class="hr-live-icon" id="earningsHigherRateLiveIcon" aria-hidden="true"></span>
-<div class="hr-live-text">
-<div class="hr-live-title" id="earningsHigherRateLiveTitle">—</div>
-<div class="hr-live-sub" id="earningsHigherRateLiveSub"></div>
-</div>
-
-</div>
 
 </div>
 </div>
@@ -332,7 +324,6 @@
 </div>
 </div>
 </section>
-<div class="positive-evidence-card" hidden id="positiveEvidenceCard" aria-live="polite"></div>
 <div class="game-loot-box" hidden id="gameLootBox" aria-live="polite"></div>
 <div class="game-record-banner" hidden id="gameRecordBanner" role="status"></div>
 <div class="game-call-fx" id="gameCallFx" aria-hidden="true"></div>
@@ -998,6 +989,7 @@
   </article>
 </section>
 
+<div class="positive-evidence-card" hidden id="positiveEvidenceCard" aria-live="polite"></div>
 <section class="positive-history-section">
   <article class="game-panel" id="positiveHistoryPanel">
     <div class="game-panel-head"><div><span class="game-panel-eyebrow">Evidencia acumulada</span><h2>Mi historial positivo</h2><span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Historial positivo" aria-describedby="positiveHistoryInfo">i</button><span class="sched-help-tooltip" id="positiveHistoryInfo" role="tooltip">Guarda los cierres de llamadas, recuperaciones y premios realizados. Sirve para reconocer tu constancia; tus comentarios personales se muestran tal como los escribiste.</span></span></div><span class="game-panel-badge" id="positiveHistoryCount">0</span></div>

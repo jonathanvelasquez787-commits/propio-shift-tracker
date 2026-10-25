@@ -381,7 +381,7 @@ export async function applyHigherRateCorrection(windowId, draft, stamp, mode = '
       card.classList.toggle('tone-active', status.active);
       // Ver.tone-tier en el CSS: tiñe ícono/fecha/borde con el color del nivel.
       card.classList.toggle('tone-tier', !status.active);
-      const compactUpcoming = ids.card === 'earningsHigherRateLiveCard' && !status.active;
+      const compactUpcoming = ids.card === 'higherRateLiveCard' && !status.active;
       card.classList.toggle('hr-live-compact', compactUpcoming);
       icon.hidden = compactUpcoming;
       sub.hidden = compactUpcoming;
@@ -425,8 +425,7 @@ export async function applyHigherRateCorrection(windowId, draft, stamp, mode = '
     }
 
     export function renderHigherRateLiveCard() {
-      renderHigherRateLiveCardInto({ card: 'higherRateLiveCard', icon: 'higherRateLiveIcon', title: 'higherRateLiveTitle', sub: 'higherRateLiveSub' }, { hideWhenUpcoming: true });
-      renderHigherRateLiveCardInto({ card: 'earningsHigherRateLiveCard', icon: 'earningsHigherRateLiveIcon', title: 'earningsHigherRateLiveTitle', sub: 'earningsHigherRateLiveSub' });
+      renderHigherRateLiveCardInto({ card: 'higherRateLiveCard', icon: 'higherRateLiveIcon', title: 'higherRateLiveTitle', sub: 'higherRateLiveSub' });
     }
 
     async function renderHigherRateDayStats(retry = false) {
