@@ -1018,6 +1018,14 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 @media(max-width:480px){.day-status-controls{gap:3px}.day-status-controls>.chip{font-size:10px;padding:4px 4px;gap:3px;min-height:26px}.day-status-controls>.chip .dot-state{width:6px;height:6px}.day-status-controls .summary-pill{padding:3px 3px;gap:2px;font-size:10px;min-height:26px}.day-status-controls #daySelector{width:72px;max-width:72px;font-size:9.5px}.day-status-controls .day-nav-btn{width:12px;height:18px;font-size:10px}.day-status-controls #dayActiveLabelBtn{font-size:0;width:14px;padding:0}.day-status-controls #dayActiveLabelBtn::before{content:'↶';font-size:12px}.day-status-controls #acwLiveChip{font-size:10px;padding:4px 4px;gap:3px;min-height:26px}.day-status-controls #acwLiveChip>span[aria-hidden]{display:none}}
 @media(max-width:360px){.day-status-controls{margin-inline:-14px;width:calc(100% + 28px);max-width:none;gap:2px}}
 #callsStatusCard[hidden]{display:none}
+#earningsHigherRateLiveCard.hr-live-compact{padding:7px 8px;min-height:30px;border-radius:10px;gap:0}
+#earningsHigherRateLiveCard.hr-live-compact .hr-live-icon,#earningsHigherRateLiveCard.hr-live-compact .hr-live-sub{display:none}
+#earningsHigherRateLiveCard.hr-live-compact .hr-live-text{width:100%;min-width:0}
+#earningsHigherRateLiveCard.hr-live-compact .hr-live-title{display:flex;align-items:center;gap:5px;white-space:nowrap;font-size:10.5px;font-weight:600;line-height:1.4;letter-spacing:-.01em}
+#earningsHigherRateLiveCard.hr-live-compact .hr-compact-label{color:var(--muted);font-weight:500}
+#earningsHigherRateLiveCard.hr-live-compact .hr-compact-tier{color:var(--live-color,var(--text))}
+#earningsHigherRateLiveCard.hr-live-compact .hr-compact-date::before,#earningsHigherRateLiveCard.hr-live-compact .hr-compact-hours::before,#earningsHigherRateLiveCard.hr-live-compact .hr-compact-tier::before{content:'·';color:var(--muted);margin-right:5px}
+@media(max-width:480px){#earningsHigherRateLiveCard.hr-live-compact{padding:6px}#earningsHigherRateLiveCard.hr-live-compact .hr-live-title{font-size:10px;gap:3px}#earningsHigherRateLiveCard.hr-live-compact .hr-compact-date::before,#earningsHigherRateLiveCard.hr-live-compact .hr-compact-hours::before,#earningsHigherRateLiveCard.hr-live-compact .hr-compact-tier::before{margin-right:3px}}
 
 #higherRateModal .hero-today{padding:12px 14px;margin-bottom:12px;border-radius:14px}
 #higherRateModal .hero-today-top{gap:8px}

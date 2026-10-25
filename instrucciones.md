@@ -458,7 +458,7 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
-- Web 657 y extensión 2.3.7: ACW compacto corregido, diagnóstico de disponibilidad trasladado al popup, acceso a cierres retirado de Avisos y modo oscuro opcional del portal. La recarga de la extensión existente no pudo certificarse porque la política del navegador bloquea su página de administración.
+- Web 658 y extensión 2.3.7: ACW compacto corregido, diagnóstico de disponibilidad trasladado al popup, acceso a cierres retirado de Avisos y modo oscuro opcional del portal. La recarga de la extensión existente no pudo certificarse porque la política del navegador bloquea su página de administración.
 
 - Web 651 evita calcular los análisis mensual y de calidad mientras están plegados. El gráfico productivo calcula solo productividad y la comparación semanal solo adherencia. Índice de llamadas limitado a una lectura síncrona, descartado al terminar; controles y valores conservados. Referencias reales de Finanzas, Higher Rate y Ajustes de 631 (c178210) recuperadas fuera de Git para revisar su restauración visual.
 
@@ -516,6 +516,12 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v658 — Próxima ventana en una línea compacta.**
+
+- El aviso de Higher Rate dentro de Ganancias reúne etiqueta, fecha abreviada, rango horario completo en formato 24 h y nivel en una sola línea. Reduce padding, tipografía y decoración sin ocultar la hora final. Conserva el estado activo y sus minutos restantes.
+- Regresión bilingüe verifica fecha, inicio/fin, nivel y regreso al detalle activo. Comprobación visual de ancho/alto y una sola línea en móvil y escritorio. Conserva íntegra la fila única de estado/fecha/ACW de 657.
+
+
 **v657 — Estado, fecha y ACW en una sola fila, también en móvil.**
 
 - Corrige la interpretación visual de 656: elimina la composición de dos filas. Mantiene las tres píldoras alineadas, sin salto, con fecha completa, segundos y estado legibles. En móvil compacto, el acceso a Hoy usa un icono con etiqueta accesible y el reloj decorativo se omite; se conservan todos los controles.
@@ -528,10 +534,3 @@ futura opera bajo esto, sin excepción:
 - Retira Disponibilidad automática de Ajustes y traslada su diagnóstico al popup de 400 px, plegado en Preparación del turno. Conserva los controles y la comunicación de horario, pausas y ACW. Los metadatos del inicio laboral se validan y transfieren sin alterar decisiones de disponibilidad.
 - Extensión 2.3.7 agrega Modo oscuro en Propio, apagado por defecto, reversible y guardado por perfil. Solo modifica apariencia en el portal superior de Propio; no recarga, pulsa controles ni filtra imágenes/video. 1.141 pruebas correctas; cambios intercalados, persistencia fallida, alcance y desactivación. No se certificó visualmente en una sesión real de Propio.
 - Retira de Avisos el acceso Ver cierres guardados; el historial y sus datos siguen en Logros. La administración chrome://extensions fue bloqueada por la política del navegador: no intentar eludirla ni afirmar que la nueva versión está activa sin evidencia.
-
-
-**v655 — Inicio compacto y resumen de Higher Rate reducido.**
-
-- El resumen diario de Higher Rate conserva sus tres métricas con menos padding, cifras más pequeñas y distribución adaptable.
-- El contador ACW queda a la derecha del selector de fecha y junto al estado, con segundos y origen conservados. Muestra cero cuando no hay tramo activo y evita abrir un origen inexistente. Retira el resumen de disponibilidad de Inicio; su detalle permanece en Ajustes.
-- Retira la ayuda introductoria de Llamadas y el acceso Ver jornada de Inicio; la tarjeta de llamada solo aparece durante una llamada real o pendiente, conservando sus acciones. Jornada sigue en Reportes. Validados estados activo/pendiente/inactivo, traducciones, wiring, pruebas y compilación.
