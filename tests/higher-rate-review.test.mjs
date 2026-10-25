@@ -172,7 +172,7 @@ test('interrupted correction storage restores promotion, finance and preserved b
 function inlineEditor(h) {
   const source = fs.readFileSync(new URL('../js/higher-rate.js', import.meta.url), 'utf8');
   const node = parse(source, { ecmaVersion: 'latest', sourceType: 'module' }).body.find(n => n.declaration?.id?.name === 'saveHigherRateWindowDraft').declaration;
-  const context = vm.createContext({ applyHigherRateCorrection, renderedHigherRateEditStamp: h.stamp(), dayKeyFromIsoDate: x => x, translateText: x => x, toast() {} });
+  const context = vm.createContext({ applyHigherRateCorrection, settings, calls, renderedHigherRateWindows: [], higherRateDraftQueue: Promise.resolve(), pendingHigherRateDrafts: [], hrWindowWeekdayLabel: x => x, renderHigherRateDayStats() {}, renderHigherRateLiveCard() {}, renderedHigherRateEditStamp: h.stamp(), dayKeyFromIsoDate: x => x, translateText: x => x, toast() {} });
   vm.runInContext(source.slice(node.start, node.end), context);
   const values = { '.hr-window-date-input': window.date, '.hr-window-start-input': '10:00', '.hr-window-end-input': '11:00', '.hr-window-tier-input': 'gold' };
   return { save: () => context.saveHigherRateWindowDraft({ getAttribute: () => 'hr', querySelector: selector => ({ value: values[selector] }) }), values };
@@ -208,4 +208,19 @@ test('restored inline promotion editor rolls back rejected saves without losing 
   assert.equal(await editor.save(), false);
   assert.equal(JSON.stringify({ settings, calls }), before);
   assert.equal(h.effects, 0);
+});
+
+test('automatic promotion edits serialize rapid date and tier changes without losing tomorrow or earned bonuses', async t => {
+  const h = transactionFixture(t);
+  delete calls[0].frozenHigherRateBonus;
+  const editor = inlineEditor(h);
+  const first = editor.save();
+  editor.values['.hr-window-date-input'] = '2026-10-13';
+  editor.values['.hr-window-tier-input'] = 'bronze';
+  const second = editor.save();
+  assert.deepEqual(await Promise.all([first, second]), [true, true]);
+  assert.equal(settings.higherRateWindows[0].date, '2026-10-13');
+  assert.equal(settings.higherRateWindows[0].tier, 'bronze');
+  assert.equal(higherRateBonusForCall(calls[0]).amount, .2);
+  assert.equal(h.writes, 2);
 });

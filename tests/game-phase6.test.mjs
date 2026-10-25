@@ -803,7 +803,7 @@ test('runtime smoke: helpers de renderGame existen para Logros y Higher Rate', (
   const appMain = read('js/app-main.js');
   const higherRate = read('js/higher-rate.js');
   assert.match(appMain, /if \(page === 'achievements'\) renderGame\(\)/);
-  assert.match(higherRate, /export function addHigherRateWindowRow\(\)/);
+  assert.match(higherRate, /export async function addHigherRateWindowRow\(\)/);
   assert.match(higherRate, /saveHigherRateWindowsFromEditor\(\)/);
 });
 
@@ -897,7 +897,8 @@ test('promotion list opens its single editor and the editor previews the selecte
   assert.match(appMain, /hrTierButtonLabel,/);
   assert.match(appMain, /hrWindowWeekdayLabel,/);
   const clickHandler = appMain.slice(appMain.indexOf("document.getElementById('higherRateModal').addEventListener('click'"), appMain.indexOf("document.getElementById('daySelector').addEventListener('change'"));
-  assert.match(clickHandler, /openHigherRateReview\(/);
+  assert.match(clickHandler, /saveHigherRateWindowDraft\(/);
+  assert.doesNotMatch(higherRate, /data-save-hr-window|data-review-hr-window/);
   assert.doesNotMatch(clickHandler, /saveHigherRateWindowsFromEditor\(\)/);
   const editor=read('js/higher-rate-review.js');
   assert.match(editor,/data-hr-field="date"/); assert.match(editor,/data-hr-field="tier"/);

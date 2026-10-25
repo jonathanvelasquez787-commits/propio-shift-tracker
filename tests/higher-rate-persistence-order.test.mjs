@@ -116,3 +116,26 @@ for (const action of ['saveHigherRateWindowsFromEditor', 'removeHigherRateWindow
     });
   }
 }
+
+async function checkAddedPromotionStamp(accepted) {
+  const settings = { higherRateWindows: [{ id: 'existing', date: '10/25/2026', start: '08:00', end: '09:00', tier: 'bronze' }] }, calls = [];
+  const original = JSON.stringify(settings), rows = new Map();
+  const h = vm.createContext({ settings, calls, higherRateDraftQueue: Promise.resolve(), renderedHigherRateEditStamp: null,
+    canPersistLocalChanges: () => true, todayCallDateKey: () => '10/25/2026', makeLocalId: () => 'new',
+    minutesToHHMM: minute => String(Math.floor(minute / 60)).padStart(2, '0') + ':' + String(minute % 60).padStart(2, '0'),
+    renderHigherRateWindowsEditor(windows) { h.draft = windows; h.renderedHigherRateEditStamp = { owner: settings, callsOwner: calls, revision: JSON.stringify([settings, calls]), used: false }; rows.clear(); windows.forEach(window => rows.set(window.id, window)); },
+    saveHigherRateWindowsFromEditor() { if (!accepted) return false; settings.higherRateWindows = h.draft; return true; },
+    document: { querySelector() { return { scrollIntoView() {}, querySelector: () => ({ focus() {} }) }; } }, Date,
+  });
+  vm.runInContext(functions('../js/higher-rate.js', ['addHigherRateWindowRow']), h);
+  const result = await h.addHigherRateWindowRow();
+  assert.equal(settings.higherRateWindows.some(window => window.id === 'new'), accepted);
+  if (accepted) {
+    assert.equal(h.renderedHigherRateEditStamp.revision, JSON.stringify([settings, calls]), 'the newly added row can immediately save tomorrow instead of using its pre-add stamp');
+    assert.ok(rows.has('new'));
+    assert.equal(settings.higherRateWindows[0].id, 'existing');
+  } else { assert.equal(result, false); assert.equal(JSON.stringify(settings), original); assert.ok(!rows.has('new')); }
+}
+
+test('adding a promotion refreshes its edit stamp only after accepted persistence: true', () => checkAddedPromotionStamp(true));
+test('adding a promotion refreshes its edit stamp only after accepted persistence: false', () => checkAddedPromotionStamp(false));

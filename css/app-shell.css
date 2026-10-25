@@ -1003,7 +1003,6 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 #pageFinance .fin-item-tools{display:inline-flex;align-items:center;gap:6px}
 @media(max-width:480px){#pageFinance .wk-total-metrics{flex-basis:100%;gap:8px}#pageFinance .wk-total-metric{flex:1 1 70px}}
 
-#higherRateModal [data-save-hr-window]:disabled{opacity:.45;cursor:default}
 
 #pageFinance .fin-row-amt-line{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
 #pageFinance .fin-row-restante-inline{display:inline}
