@@ -531,4 +531,3 @@ futura opera bajo esto, sin excepción:
 
 - Ganancias y meta del ciclo a la izquierda, proyección a la derecha, racha debajo; el mismo diseño se apila en móvil. Desglose, resumen semanal y análisis secundarios plegados.
 - Información y controles existentes conservados; aviso de día libre consolidado. Validación visual, pruebas, wiring, traducciones y compilación.
-
