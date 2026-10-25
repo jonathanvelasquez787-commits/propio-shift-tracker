@@ -4440,7 +4440,8 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       icon.innerHTML = iconHtml('phone');
       card.classList.toggle('live', isLive);
       card.classList.toggle('pending', isPending);
-      const title = hasCall ? info.label : translateText('Comienza una nueva llamada');
+      card.hidden = !hasCall;
+      const title = hasCall ? info.label : '';
       if (textTitle.textContent !== title) textTitle.textContent = title;
       if (mid) mid.style.display = hasCall ? '' : 'none';
       if (timerEl && hasCall) timerEl.textContent = formatDuration((info.endedAt ? Date.parse(info.endedAt) : Date.now()) - Date.parse(info.startedAt));
@@ -5773,14 +5774,14 @@ function renderHeader() {
   const continuationHint = document.getElementById('pauseContinuationHint');
   if (continuationHint) continuationHint.hidden = !state.activePause?.continuationClosedPause;
 
-  // Chip de ACW/AfterCallWork en vivo — visible solo mientras aplica (computeCurrentAcwStart ya filtra
-  // turno no iniciado/terminado y llamada/pausa activa).
+  // El contador queda a cero fuera de un tramo activo; el origen solo se abre mientras aplica.
   const acwLiveChip = document.getElementById('acwLiveChip');
   const acwLiveTimer = document.getElementById('acwLiveTimer');
   if (acwLiveChip && acwLiveTimer) {
     const acwStart = computeCurrentAcwStart();
     if (acwStart) {
       acwLiveChip.style.display = '';
+      acwLiveChip.disabled = false;
       acwLiveTimer.textContent = formatDuration(now.getTime() - acwStart.getTime());
       const todayCalls = callsForDay(todayCallDateKey());
       const record = acwCallRecord(todayCalls, acwStart.toISOString());
@@ -5801,12 +5802,16 @@ function renderHeader() {
       acwLiveChip.title = [...(latestCall ? [ui`Última llamada · ${formatCallDayLabel(latestCall.callDate || callDateKeyFromValue(latestCall.startISO))}`] : []), ...timingLines, ui`${source}. ACW desde ${clock(acwStart.toISOString())}.`, ...(comparison.propio ? [translateText('El final de Propio se calcula con los minutos de su historial.')] : []), translateText('Pulsá para ver el origen del ACW y su cálculo.')].join('\n');
       acwLiveChip.dataset.recordId = record?.id || '';
     } else {
-      acwLiveChip.style.display = 'none';
+      acwLiveChip.style.display = '';
+      acwLiveChip.disabled = true;
+      acwLiveTimer.textContent = '00:00:00';
+      acwLiveChip.title = translateText('Sin ACW activo');
+      document.getElementById('acwRecordDifference').hidden = true;
     }
   }
   const reviewAcw = document.getElementById('workDayCurrentAcw');
   if (reviewAcw && document.getElementById('workDayReviewDetails').open) {
-    reviewAcw.textContent = isViewingToday() && acwLiveChip?.style.display !== 'none' && acwLiveTimer ? acwLiveTimer.textContent : '—';
+    reviewAcw.textContent = isViewingToday() && acwLiveChip && !acwLiveChip.disabled && acwLiveTimer ? acwLiveTimer.textContent : '—';
   }
   const greetingTitleEl = document.getElementById('greetingTitle');
   if (greetingTitleEl) greetingTitleEl.textContent = greetingText(now);
@@ -7223,21 +7228,6 @@ export function render() {
       }
     });
     document.getElementById('copyDayToAllBtn').addEventListener('click', copyDayToAll);
-    document.getElementById('workDayReviewBtn').addEventListener('click', () => {
-      const target = document.getElementById('workDayReviewDetails');
-      navigateToPage('reports');
-      target.open = true; openWorkDayReview(); target.scrollIntoView({block:'start'}); target.querySelector('summary').focus();
-    });
-    document.getElementById('automationStatusBtn').addEventListener('click', () => {
-      const target = document.getElementById('automationPanel');
-      target.open = true;
-      openSettingsModal();
-      requestAnimationFrame(() => {
-        if (!document.getElementById('goalsModal').classList.contains('open')) return;
-        target.scrollIntoView({ block: 'nearest' });
-        target.querySelector('summary').focus();
-      });
-    });
     document.getElementById('workDayReviewDetails').addEventListener('toggle', () => { if(document.getElementById('workDayReviewDetails').open) openWorkDayReview(); });
     document.getElementById('payDatesRetryBtn').addEventListener('click', () => usePayReceipts('retry'));
     document.getElementById('payDatesBody').addEventListener('click', event => {

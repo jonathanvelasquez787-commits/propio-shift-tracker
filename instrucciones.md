@@ -440,7 +440,7 @@ futura opera bajo esto, sin excepción:
   cambiar su deduplicación. Las entradas manuales de asignación de Finanzas
   usan otro parser estricto: `"12,50"` corresponde a 12.50, también en moneda local.
 - Higher Rate: la edición normal conserva el bono ya registrado, también al
-  cambiar nivel. Una corrección de fecha/horas/nivel requiere «Revisar llamadas»
+  cambiar nivel. El recálculo de bonos históricos se realiza desde la revisión de llamadas
   → «Corregir promoción», vista previa y confirmación del recálculo. Limpiar
   conserva bonos y no reconstruye ventanas retiradas para llamadas aún ausentes.
 - Una llamada en vivo conserva inicio/fin y duración observados con milisegundos.
@@ -514,6 +514,13 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v655 — Inicio compacto y resumen de Higher Rate reducido.**
+
+- El resumen diario de Higher Rate conserva sus tres métricas con menos padding, cifras más pequeñas y distribución adaptable.
+- El contador ACW queda a la derecha del selector de fecha y junto al estado, con segundos y origen conservados. Muestra cero cuando no hay tramo activo y evita abrir un origen inexistente. Retira el resumen de disponibilidad de Inicio; su detalle permanece en Ajustes.
+- Retira la ayuda introductoria de Llamadas y el acceso Ver jornada de Inicio; la tarjeta de llamada solo aparece durante una llamada real o pendiente, conservando sus acciones. Jornada sigue en Reportes. Validados estados activo/pendiente/inactivo, traducciones, wiring, pruebas y compilación.
+
+
 **v654 — Higher Rate automático y ventanas futuras.**
 
 - Retira Guardar cambios y Revisar llamadas de las tarjetas por pedido del propietario. Fecha, horas y nivel se guardan automáticamente con conservación de bonos; los cambios rápidos se procesan en orden sin reemplazar otros borradores ni mezclar propietarios.
@@ -524,9 +531,3 @@ futura opera bajo esto, sin excepción:
 
 - Finanzas recupera las tarjetas por categoría, barras, totales y Sumar/Restar/Aplicar visibles de la referencia 601 aprobada. Conserva las reglas contables actuales, la conversión precisa, exclusiones y liberación de reservas; no recupera el registro de pagos ni borra datos históricos.
 - Completa la restauración parcial de Higher Rate 652: fecha, horas y los tres niveles editables en cada tarjeta. Guardar cambios usa la transacción actual con conservación de bonos; Revisar llamadas mantiene la corrección con impacto previo. Tres regresiones nuevas verifican bonos, borradores obsoletos, horas inválidas y rechazo de guardado. 1.134 pruebas correctas; validación visual en ambos temas y 320/620/1365 px con datos ficticios.
-
-
-**v652 — Ajustes y Higher Rate con aspecto histórico aprobado.**
-
-- Ajustes vuelve al formulario seguido, secciones y campos subrayados de 631. Conserva idioma, perfil Google, metas actuales, exportaciones, recuperación, disponibilidad y eliminación protegida.
-- Higher Rate recupera la presentación con iconos de fecha y hora y nivel destacado; conserva la revisión segura antes de editar, el cálculo y la persistencia actuales. Reportes mantiene las optimizaciones de 651. Pruebas, compilación y revisión responsive claro/oscuro.

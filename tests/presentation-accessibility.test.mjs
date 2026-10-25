@@ -82,6 +82,7 @@ test('pending calls show the same frozen duration and recovery action in activit
   assert.equal(e.liveBarTimer.textContent,'123000');assert.equal(e.callsStatusTimer.textContent,'123000');
   assert.equal(saveLabel.textContent,'Revisar llamada');assert.equal(e.callsStatusSaveBtn.textContent,'Revisar llamada');
   assert.equal(e.liveBarDiscardBtn.hidden,true);assert.equal(e.callsStatusEndBtn.hidden,true);
+  assert.equal(e.callsStatusCard.hidden,false);
   h.liveActivityInfo().onSave();assert.equal(h.opened,true);assert.equal(JSON.stringify(h.state),before);
 });
 
@@ -91,10 +92,12 @@ test('activity priority follows live call then pending call then pause and clear
   h.state.pendingLiveCallBackup={startedAtISO:'2026-10-22T14:00:00Z',endedAtISO:'2026-10-22T14:02:00Z'};
   h.state.activePause={type:'lunch',startedAt:new Date().toISOString()};
   assert.equal(h.liveActivityInfo().type,'call');
+  h.updateCallsStatusCard();assert.equal(e.callsStatusCard.hidden,false);
   h.state.activeCall=null;assert.equal(h.liveActivityInfo().type,'pending');
   h.state.pendingLiveCallBackup=null;assert.equal(h.liveActivityInfo().type,'lunch');
   h.updateLiveActivityBar();h.updateCallsStatusCard();assert.equal(e.liveBarDiscardBtn.hidden,false);
   assert.equal(e.callsStatusActions.style.display,'none');
+  assert.equal(e.callsStatusCard.hidden,true);assert.equal(e.callsControlsGrid.style.display,'');
   h.state.activePause=null;h.updateLiveActivityBar();assert.equal(e.liveActivityBar.classList.contains('show'),false);
 });
 
