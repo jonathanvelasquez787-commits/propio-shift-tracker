@@ -325,3 +325,16 @@ test('saved action titles follow the display language without rewriting history 
     assert.equal(rows[2].detail,'Mi texto personal');assert.equal(JSON.stringify(events),before);
   }
 });
+
+
+test('upcoming Higher Rate summary retains date, both hours and tier on one line and restores active detail',t=>{
+ const classes=new Set(),card={style:{setProperty(){},removeProperty(){}},classList:{toggle:(name,on)=>on?classes.add(name):classes.delete(name)}},icon={},title={},sub={};
+ const nodes={earningsHigherRateLiveCard:card,earningsHigherRateLiveIcon:icon,earningsHigherRateLiveTitle:title,earningsHigherRateLiveSub:sub};
+ const h=vm.createContext({ui,translateText,displayLocale,document:{getElementById:id=>nodes[id]},higherRateLiveStatus:()=>h.status,HIGHER_RATE_TIERS:{silver:{label:'Silver',colorRgb:'1,2,3',colorVar:'--silver'}},iconHtml:()=>'',escapeHtml:String,todayCallDateKey:()=> '10/25/2026',formatCallDayLabel:()=> 'Lun 26 de oct',timeLabel:x=>x,formatHHMM:x=>x,formatMinutes:String,callDateToDate:()=>new Date(2026,9,26)});
+ vm.runInContext(declarations('../js/higher-rate.js',['renderHigherRateLiveCardInto']),h);
+ const ids={card:'earningsHigherRateLiveCard',icon:'earningsHigherRateLiveIcon',title:'earningsHigherRateLiveTitle',sub:'earningsHigherRateLiveSub'};
+ h.status={active:false,window:{date:'10/26/2026',start:'07:15',end:'09:45',tier:'silver'}};
+ for(const language of ['es','en']){setLanguage(language);h.renderHigherRateLiveCardInto(ids);assert.match(title.innerHTML,/07:15–09:45/);assert.match(title.innerHTML,/Silver/);assert.match(title.innerHTML,/26/);assert.equal(classes.has('hr-live-compact'),true);assert.equal(sub.hidden,true);assert.equal(icon.hidden,true);}
+ h.status={...h.status,active:true,minutesLeft:12};h.renderHigherRateLiveCardInto(ids);assert.equal(classes.has('hr-live-compact'),false);assert.equal(sub.hidden,false);assert.equal(icon.hidden,false);assert.match(sub.textContent,/12/);assert.match(sub.textContent,/09:45/);
+ t.after(()=>setLanguage('es'));
+});

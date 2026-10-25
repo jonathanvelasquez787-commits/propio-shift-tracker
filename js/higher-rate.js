@@ -381,6 +381,11 @@ export async function applyHigherRateCorrection(windowId, draft, stamp, mode = '
       card.classList.toggle('tone-active', status.active);
       // Ver.tone-tier en el CSS: tiñe ícono/fecha/borde con el color del nivel.
       card.classList.toggle('tone-tier', !status.active);
+      const compactUpcoming = ids.card === 'earningsHigherRateLiveCard' && !status.active;
+      card.classList.toggle('hr-live-compact', compactUpcoming);
+      icon.hidden = compactUpcoming;
+      sub.hidden = compactUpcoming;
+      card.title = '';
       icon.innerHTML = iconHtml('flame');
       const tierMeta = HIGHER_RATE_TIERS[status.window.tier];
       const tierLabel = tierMeta?.label || status.window.tier;
@@ -401,6 +406,17 @@ export async function applyHigherRateCorrection(windowId, draft, stamp, mode = '
         const dayLabelRaw = isToday ? translateText('Hoy') : formatCallDayLabel(status.window.date);
         const dayLabel = dayLabelRaw.charAt(0).toUpperCase() + dayLabelRaw.slice(1);
         const datetimeText = `${dayLabel} · ${timeLabel(status.window.start)}`;
+        if (compactUpcoming) {
+          const date = callDateToDate(status.window.date);
+          const compactDay = isToday ? translateText('Hoy') : date
+            ? date.toLocaleDateString(displayLocale(), { weekday: 'short', day: 'numeric', month: 'short' }).replaceAll(',', '')
+            : dayLabel;
+          const range = `${formatHHMM(status.window.start)}–${formatHHMM(status.window.end)}`;
+          title.innerHTML = ui`<span class="hr-compact-label">Próxima ventana</span><span class="hr-compact-date">${escapeHtml(compactDay)}</span><span class="hr-compact-hours">${escapeHtml(range)}</span><span class="hr-compact-tier">${escapeHtml(tierLabel)}</span>`;
+          sub.textContent = '';
+          card.title = `${translateText('Próxima ventana')} · ${datetimeText} – ${timeLabel(status.window.end)} · ${tierLabel}`;
+          return;
+        }
         const chipRgb = tierMeta?.colorRgb || '255,209,92';
         const chipColorVar = tierMeta?.colorVar || '--warn';
         title.innerHTML = ui`<div class="hr-live-eyebrow">Próxima ventana</div><div class="hr-live-main-row"><span class="hr-live-datetime">${escapeHtml(datetimeText)}</span><span class="hr-live-tier-chip" style="background: rgba(${chipRgb}, .16); border: 1px solid rgba(${chipRgb}, .4); color: var(${chipColorVar});">${escapeHtml(tierLabel)}</span></div>`;
