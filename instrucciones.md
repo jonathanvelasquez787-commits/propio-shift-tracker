@@ -324,6 +324,8 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
+- Finanzas: el propietario aprobó Higher Rate y Ajustes 631, pero pidió una referencia de Finanzas anterior a los controles de reservas y registro de pagos. Recuperada web 601 (f77db5a), previa a pagos mensuales. Su aspecto queda como referencia pendiente de elección; no se modifica Finanzas publicada.
+
 - **Ocho pedidos directos del 22/10:** implementación y evidencia reunidas en
   docs/cierre-ocho-pedidos.md. Web 639 aporta el hover con segundos; 640 integra
   Reportes y restaura la fecha azul; 641 cierra galería, lenguaje y control
@@ -514,6 +516,12 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v652 — Ajustes y Higher Rate con aspecto histórico aprobado.**
+
+- Ajustes vuelve al formulario seguido, secciones y campos subrayados de 631. Conserva idioma, perfil Google, metas actuales, exportaciones, recuperación, disponibilidad y eliminación protegida.
+- Higher Rate recupera la presentación con iconos de fecha y hora y nivel destacado; conserva la revisión segura antes de editar, el cálculo y la persistencia actuales. Reportes mantiene las optimizaciones de 651. Pruebas, compilación y revisión responsive claro/oscuro.
+
+
 **v651 — Apertura de Reportes sin cálculos ocultos innecesarios.**
 
 - Los análisis plegados mensual y de calidad se calculan al abrirlos. Productividad deja de calcular pausas/estadísticas/adherencia que no dibuja y la comparación semanal calcula solo adherencia.
@@ -524,7 +532,3 @@ futura opera bajo esto, sin excepción:
 - Ganancias y meta del ciclo a la izquierda, proyección a la derecha, racha debajo; el mismo diseño se apila en móvil. Desglose, resumen semanal y análisis secundarios plegados.
 - Información y controles existentes conservados; aviso de día libre consolidado. Validación visual, pruebas, wiring, traducciones y compilación.
 
-**v649 — Objetivos alineados y jornada fuera de la columna de Adherencia.**
-
-- Detalles semanales y jornada debajo de las tres métricas, con estado plegable estable al actualizar datos. Mismo diseño adaptable en claro/oscuro.
-- Conservados cálculos, registro y controles; información común de día sin evaluar consolidada sin perder comparaciones diferentes. Verificación de tests, wiring, traducciones, build y uso con datos ficticios.
