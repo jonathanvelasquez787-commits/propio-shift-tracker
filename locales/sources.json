@@ -11,6 +11,12 @@
       "app.html"
     ]
   },
+  "s_0019dd10": {
+    "source": "{{v18}} días restantes",
+    "files": [
+      "js/reports.js"
+    ]
+  },
   "s_001ac9f3": {
     "source": "Meta anual",
     "files": [
@@ -75,12 +81,6 @@
       "js/app-main.js"
     ]
   },
-  "s_0149ddfe": {
-    "source": "{{v33}}{{v34}}{{v35}}",
-    "files": [
-      "js/reports.js"
-    ]
-  },
   "s_0163610f": {
     "source": "Pendiente de pagar del presupuesto",
     "files": [
@@ -96,7 +96,8 @@
   "s_019c53d5": {
     "source": "Meta del ciclo",
     "files": [
-      "app.html"
+      "app.html",
+      "js/reports.js"
     ]
   },
   "s_01bd29f9": {
@@ -910,12 +911,6 @@
       "privacidad.html"
     ]
   },
-  "s_0cea0ece": {
-    "source": "{{v23}} días restantes",
-    "files": [
-      "js/reports.js"
-    ]
-  },
   "s_0d0de6fb": {
     "source": "Vos atendé. Él te acompaña.",
     "files": [
@@ -952,12 +947,6 @@
     "source": "Se corre todo el turno:",
     "files": [
       "app.html"
-    ]
-  },
-  "s_0d7fe4f9": {
-    "source": "{{v19}}{{v20}}",
-    "files": [
-      "js/reports.js"
     ]
   },
   "s_0db995c6": {
@@ -1379,12 +1368,6 @@
       "js/calls.js"
     ]
   },
-  "s_13c32d60": {
-    "source": "{{v2}} {{v3}}",
-    "files": [
-      "js/reports.js"
-    ]
-  },
   "s_13d91da6": {
     "source": "Tu meta, tarifa y preferencias.",
     "files": [
@@ -1664,6 +1647,12 @@
   },
   "s_18560d0c": {
     "source": "Esta semana ya pasó — queda protegida, solo lectura.",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_18664d26": {
+    "source": "Llamadas por hora del día",
     "files": [
       "app.html"
     ]
@@ -1970,12 +1959,6 @@
     "source": "Acerca de Racha semanal",
     "files": [
       "app.html"
-    ]
-  },
-  "s_1c71f032": {
-    "source": "Con el promedio del ciclo",
-    "files": [
-      "js/reports.js"
     ]
   },
   "s_1c8e0c8e": {
@@ -3262,6 +3245,12 @@
       "js/call-review-view.js"
     ]
   },
+  "s_30e84a4f": {
+    "source": "{{v31}} RACHA DE CUMPLIMIENTO",
+    "files": [
+      "js/reports.js"
+    ]
+  },
   "s_310608c4": {
     "source": "5. Propiedad del software",
     "files": [
@@ -3323,6 +3312,12 @@
     "source": "Sábado",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_31aea8b2": {
+    "source": "{{v25}}{{v26}}",
+    "files": [
+      "js/reports.js"
     ]
   },
   "s_31b3c8a2": {
@@ -4648,7 +4643,8 @@
     "source": "Editar meta",
     "files": [
       "js/app-main.js",
-      "js/finance.js"
+      "js/finance.js",
+      "js/reports.js"
     ]
   },
   "s_465b78d5": {
@@ -4814,12 +4810,6 @@
     "source": "Un solo control para TODOS los sonidos: Logros, llamadas guardadas, turno/Break/Lunch y descanso por productividad, incluidos tus archivos personalizados. 0% = silencioso; los avisos escritos siguen apareciendo.",
     "files": [
       "app.html"
-    ]
-  },
-  "s_48cb167e": {
-    "source": "{{v26}}{{v27}}",
-    "files": [
-      "js/reports.js"
     ]
   },
   "s_48d567d8": {
@@ -5555,8 +5545,8 @@
       "app.html"
     ]
   },
-  "s_53b452d6": {
-    "source": "de tu meta {{v9}}{{v10}}{{v11}}",
+  "s_53b40b09": {
+    "source": "Meta {{v5}}{{v6}}",
     "files": [
       "js/reports.js"
     ]
@@ -5589,6 +5579,12 @@
     "source": "Editar categoría",
     "files": [
       "js/finance.js"
+    ]
+  },
+  "s_540c11ff": {
+    "source": "Ganancias y adherencia por mes",
+    "files": [
+      "app.html"
     ]
   },
   "s_54454368": {
@@ -5843,6 +5839,12 @@
   },
   "s_574ff83e": {
     "source": "Oficiales importadas",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_57c3bdae": {
+    "source": "Calidad y adherencia",
     "files": [
       "app.html"
     ]
@@ -6628,6 +6630,12 @@
     "source": "{{v0}} · {{v1}}",
     "files": [
       "js/shift-work-review.js"
+    ]
+  },
+  "s_64ec9762": {
+    "source": "Día y ciclo",
+    "files": [
+      "app.html"
     ]
   },
   "s_64f14582": {
@@ -8034,12 +8042,6 @@
   },
   "s_7b026cab": {
     "source": "{{v0}} Ganancias del ciclo",
-    "files": [
-      "js/reports.js"
-    ]
-  },
-  "s_7b12ef4e": {
-    "source": "{{v28}}{{v29}}",
     "files": [
       "js/reports.js"
     ]
@@ -10372,6 +10374,12 @@
       "js/positive-reinforcement.js"
     ]
   },
+  "s_9c39d9cf": {
+    "source": "{{v28}}{{v29}}{{v30}}",
+    "files": [
+      "js/reports.js"
+    ]
+  },
   "s_9c5c2b3a": {
     "source": "0 próximas",
     "files": [
@@ -10673,12 +10681,6 @@
     "source": "Otro dispositivo guardó después",
     "files": [
       "js/boot.js"
-    ]
-  },
-  "s_a08f8098": {
-    "source": "{{v6}}%",
-    "files": [
-      "js/reports.js"
     ]
   },
   "s_a098978e": {
@@ -11055,6 +11057,12 @@
       "js/notification-review.js"
     ]
   },
+  "s_a615f230": {
+    "source": "Día libre: metas sin evaluar. Tu actividad registrada se conserva.",
+    "files": [
+      "js/reports.js"
+    ]
+  },
   "s_a627704f": {
     "source": "Cambiar estado del día",
     "files": [
@@ -11113,6 +11121,12 @@
     "source": "Eliminar llamada",
     "files": [
       "js/call-table-view.js"
+    ]
+  },
+  "s_a6c5442b": {
+    "source": "{{v16}}/{{v17}} días transcurridos",
+    "files": [
+      "js/reports.js"
     ]
   },
   "s_a6c71991": {
@@ -12403,18 +12417,6 @@
       "app.html"
     ]
   },
-  "s_bb62e055": {
-    "source": "{{v21}}/{{v22}} días transcurridos",
-    "files": [
-      "js/reports.js"
-    ]
-  },
-  "s_bb66f6a9": {
-    "source": "{{v0}} RACHA DE CUMPLIMIENTO",
-    "files": [
-      "js/reports.js"
-    ]
-  },
   "s_bbf9bad7": {
     "source": "Los datos cambiaron. Vuelve a abrir el formulario o la confirmación.",
     "files": [
@@ -12799,7 +12801,8 @@
   "s_c1c41846": {
     "source": "{{v0}}%",
     "files": [
-      "js/app-main.js"
+      "js/app-main.js",
+      "js/reports.js"
     ]
   },
   "s_c1cc1f9b": {
@@ -13316,12 +13319,6 @@
       "js/higher-rate-review.js"
     ]
   },
-  "s_ca4c8652": {
-    "source": "{{v18}} PROYECCIÓN DEL CICLO",
-    "files": [
-      "js/reports.js"
-    ]
-  },
   "s_ca83bbc4": {
     "source": "({{v0}})",
     "files": [
@@ -13407,6 +13404,12 @@
     "source": "#E6F2DD",
     "files": [
       "app.html"
+    ]
+  },
+  "s_cc73ddb0": {
+    "source": "{{v14}}{{v15}}",
+    "files": [
+      "js/reports.js"
     ]
   },
   "s_cc9d8fbf": {
@@ -13575,12 +13578,6 @@
   },
   "s_ce3ed148": {
     "source": "#320A6B",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_ce44b83e": {
-    "source": "Base registrada, estimaciones y Higher Rate.",
     "files": [
       "app.html"
     ]
@@ -14299,6 +14296,12 @@
     "source": "Tu ciclo de pago, resumido y proyectado",
     "files": [
       "app.html"
+    ]
+  },
+  "s_d9877c58": {
+    "source": "Estimación con el promedio del ciclo",
+    "files": [
+      "js/reports.js"
     ]
   },
   "s_d99569dd": {
@@ -15481,6 +15484,12 @@
       "js/automation-ui.js"
     ]
   },
+  "s_e8ec8ea9": {
+    "source": "{{v13}} PROYECCIÓN DEL CICLO",
+    "files": [
+      "js/reports.js"
+    ]
+  },
   "s_e8f1d885": {
     "source": "Detalle de llamada",
     "files": [
@@ -15876,6 +15885,12 @@
       "app.html"
     ]
   },
+  "s_ee372ae2": {
+    "source": "{{v21}}{{v22}}",
+    "files": [
+      "js/reports.js"
+    ]
+  },
   "s_ee39700e": {
     "source": "Enfermedad",
     "files": [
@@ -15905,12 +15920,6 @@
     "source": "Elige cuánto ajustar el turno antes de aplicar.",
     "files": [
       "js/schedule.js"
-    ]
-  },
-  "s_ee78939c": {
-    "source": "{{v30}}{{v31}}",
-    "files": [
-      "js/reports.js"
     ]
   },
   "s_ef06ae98": {
@@ -15983,6 +15992,12 @@
     "source": "Este presupuesto no es mensual o conserva fracciones de centavo. Los pagos se agrupan por su fecha; no se calcula un saldo mensual pendiente ni un exceso.",
     "files": [
       "js/finance-planning.js"
+    ]
+  },
+  "s_f07686e2": {
+    "source": "{{v23}}{{v24}}",
+    "files": [
+      "js/reports.js"
     ]
   },
   "s_f090197f": {
@@ -16150,6 +16165,12 @@
     "files": [
       "privacidad.html",
       "terminos.html"
+    ]
+  },
+  "s_f29079d6": {
+    "source": "{{v33}} {{v34}}",
+    "files": [
+      "js/reports.js"
     ]
   },
   "s_f290b8b1": {
@@ -17033,6 +17054,12 @@
     "source": "Modo de juego",
     "files": [
       "js/game-battle.js"
+    ]
+  },
+  "s_fefad2c5": {
+    "source": "Ganado hasta ahora",
+    "files": [
+      "js/reports.js"
     ]
   },
   "s_ff194c81": {

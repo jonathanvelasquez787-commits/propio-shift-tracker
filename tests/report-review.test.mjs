@@ -42,7 +42,7 @@ test('report cards do not turn missing activity or a day off into missing minute
  let off=false;
  configureReportsContext({todayRange:()=>new Date(2026,9,19),dayConfigFor:()=>({}),getActiveDayKey:()=> '10/19/2026',todayCallDateKey:()=> '10/19/2026',callDateToDate:()=>new Date(2026,9,19),previousCalendarDay:date=>new Date(date.getTime()-86400000),callsForDay:()=>[],importedCallStats:()=>({earnings:0}),productiveMinutesForDay:()=>0,dayAdherence:()=>null,dayShiftBounds:()=>({start:null}),dayIsEffectivelyOff:()=>off,effectiveDailyGoal:()=>({min:360,usd:43.2}),escapeHtml:String,iconHtml:()=>'',formatMinutes:String,money:value=>'$'+value,financeConvertedInline:()=>'',convertedAmountText:()=>''});
  renderReportsDashboard();assert.match(elements.get('rptDayConclusion').innerHTML,/Sin actividad registrada/);assert.doesNotMatch(elements.get('rptGoalsGrid').innerHTML,/Faltan|Meta alcanzada/);
- off=true;renderReportsDashboard();assert.match(elements.get('rptGoalsStatus').textContent,/Día libre: meta sin evaluar/);assert.doesNotMatch(elements.get('rptGoalsGrid').innerHTML,/Faltan/);
+ off=true;renderReportsDashboard();assert.match(elements.get('rptGoalsStatus').textContent,/Día libre: metas sin evaluar/);assert.equal(elements.get('rptDayConclusion').hidden,true);assert.doesNotMatch(elements.get('rptGoalsGrid').innerHTML,/Faltan/);
  assert.equal(elements.get('rptGoalsComparison').hidden,false);assert.doesNotMatch(elements.get('rptGoalsGrid').innerHTML,/Sin comparación disponible|<details/);
 });
 

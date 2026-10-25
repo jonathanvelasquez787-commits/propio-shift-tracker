@@ -960,6 +960,57 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 #goalsModal .modal-actions{justify-content:flex-end;margin-top:20px}
 #goalsModal .modal-actions>.mc-btn-primary{flex:0 0 auto;min-width:90px}
 
+#pageReports .rpt-day-conclusion[hidden]{display:none}
+#pageReports .rpt-day-conclusion{padding:10px 12px;border:0;border-radius:10px;margin-bottom:16px;background:rgba(var(--cyan-rgb),.05)}
+#pageReports .rpt-day-conclusion strong{display:none}
+#pageReports .rpt-day-conclusion p{margin:0;font-size:12px}
+#pageReports .rpt-cycle-layout{display:block;margin-bottom:20px}
+#pageReports .rpt-cycle-layout>#rptCycleGrid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:0;align-items:stretch;border:1px solid var(--line);border-radius:17px;overflow:hidden;margin-bottom:0}
+#rptCycleGrid>.rpt-cycle-card{order:1;grid-column:1;grid-row:1;border:0;border-radius:0;padding:22px;background:var(--panel-navy);min-width:0}
+#pageReports #rptCycleGrid>.polished-forecast{order:2;grid-column:2;grid-row:1;border:0;border-left:1px solid var(--line);border-radius:0;padding:22px;background:rgba(var(--cyan-rgb),.035);min-width:0}
+#rptCycleGrid .rpt-cycle-top{margin-bottom:14px;gap:10px}
+#rptCycleGrid .rpt-cycle-top .rpt-mini-title{margin:0;font-size:11px;letter-spacing:.07em;text-transform:uppercase}
+#rptCycleGrid .rpt-cycle-percent{color:var(--cyan);font-size:15px}
+#rptCycleGrid .rpt-cycle-amt{font-size:36px;line-height:1.2;letter-spacing:-.035em;overflow-wrap:anywhere}
+#rptCycleGrid .rpt-cycle-card>.fin-row-converted{font-size:12px;margin-top:5px}
+#rptCycleGrid .rpt-cycle-progress{height:8px;border-radius:99px;background:var(--line);margin:18px 0 14px;overflow:hidden}
+#rptCycleGrid .rpt-cycle-progress>div{height:100%;border-radius:inherit;background:var(--cyan)}
+#rptCycleGrid .rpt-cycle-goal{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font-size:12px}
+#rptCycleGrid .rpt-cycle-goal>span{min-width:0;overflow-wrap:anywhere}
+#rptCycleGrid .rpt-cycle-goal .tbl-icon-btn{display:inline-flex;align-items:center;gap:5px;width:auto;padding:5px 9px;font-size:11px;color:var(--cyan)}
+#rptCycleGrid .rpt-cycle-card>.gh-goal-foot{font-size:11px;margin-top:6px;color:var(--muted)}
+#rptCycleGrid .rpt-mini-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin-top:22px!important;padding-top:16px;border-top:1px solid var(--line)}
+#rptCycleGrid .rpt-mini-stats>div{min-width:0}
+#rptCycleGrid .polished-hero{padding:0;margin-top:10px;border:0;background:none;display:flex;flex-direction:column}
+#rptCycleGrid .polished-hero>.polished-eyebrow{order:2;margin-top:5px;text-transform:none;letter-spacing:0}
+#rptCycleGrid .polished-hero>.polished-amount{order:1}
+#rptCycleGrid .polished-hero>.polished-days{order:3;margin:8px 0 0}
+#rptCycleGrid .polished-days>span{padding:0;background:none;border-radius:0}
+#rptCycleGrid .polished-forecast .polished-amount{font-size:24px;color:var(--text)}
+#rptCycleGrid .polished-forecast .polished-amount>.fin-row-converted-inline{display:block;font-size:11px;font-weight:400;margin:3px 0 0}
+#rptCycleGrid .polished-pace{padding:10px 0 0;margin:10px 0;border:0;border-top:1px solid var(--line);border-radius:0;background:none}
+#rptCycleGrid .polished-pace>strong{font-size:19px}
+#rptCycleGrid .polished-pace .polished-amount{font-size:13px}
+#rptCycleGrid>.rpt-streak-card{order:3;grid-column:1/-1;grid-row:2;display:flex;flex-direction:row;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;border:0;border-top:1px solid var(--line);border-radius:0;padding:16px 22px;background:var(--panel-navy);min-width:0}
+#rptCycleGrid .rpt-streak-card>.rpt-mini-title{display:none}
+#rptCycleGrid .rpt-streak-icon{width:20px;height:24px;background:none;color:var(--cyan)}
+#rptCycleGrid .rpt-streak-num{font-size:16px}
+#rptCycleGrid .rpt-streak-sub,#rptCycleGrid .rpt-streak-toggle{font-size:11px}
+#pageReports .rpt-cycle-layout>#earningsDetailsSection{display:block;grid-column:auto;grid-row:auto;padding:0;margin:16px 0 0;border:0;border-top:1px solid var(--line);border-radius:0;background:none}
+#earningsDetailsSection>.rpt-earnings-details-body{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding-bottom:14px}
+#pageReports .rpt-detail-label{font-size:11px;font-weight:400;color:var(--muted);margin-left:auto}
+#pageReports .rpt-analysis-detail{border-top:1px solid var(--line);margin:0}
+#pageReports .rpt-analysis-detail>summary,#pageReports #earningsDetailsSection>summary{display:flex;align-items:center;gap:10px;min-height:48px;font-size:12px;font-weight:750}
+#pageReports .rpt-analysis-body{padding-bottom:16px;min-width:0}
+#pageReports #rptMonthlyDetails .rpt-section-title,#pageReports #rptHoursDetails .rpt-section-head,#pageReports #rptQualityDetails .rpt-section-head:first-child{display:none}
+#pageReports #rptMonthlyDetails .rpt-section-head{justify-content:flex-start;margin:0 0 12px}
+#pageReports .rpt-chart-card{border:0;background:none;padding:6px 0 14px;border-radius:0}
+#pageReports #weekSummaryAccordion{margin:20px 0 26px}
+#pageReports #statsAccordion{border:0;border-top:1px solid var(--line);border-radius:0;background:none}
+#pageReports #statsAccordion>summary{padding:12px 0}
+#pageReports #statsAccordion h2{font-size:12px}
+@media(max-width:600px){#pageReports .rpt-cycle-layout>#rptCycleGrid{grid-template-columns:1fr}#rptCycleGrid>.rpt-cycle-card{grid-column:1;grid-row:1;padding:17px}#pageReports #rptCycleGrid>.polished-forecast{grid-column:1;grid-row:2;border-left:0;border-top:1px solid var(--line);padding:17px}#rptCycleGrid>.rpt-streak-card{grid-row:3;padding:16px 17px}#earningsDetailsSection>.rpt-earnings-details-body{grid-template-columns:1fr}#rptCycleGrid .rpt-cycle-amt{font-size:32px}}
+
 #rptGoalsStatus{font-size:12px;color:var(--muted);background:rgba(var(--cyan-rgb),.05);border-radius:10px;padding:10px 12px;margin:0 0 14px}
 #rptGoalsStatus[hidden],#rptGoalsComparison[hidden]{display:none}
 #rptGoalsGrid{grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch;gap:12px}
