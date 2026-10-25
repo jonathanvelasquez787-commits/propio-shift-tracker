@@ -484,40 +484,44 @@ export function renderReportsDashboard() {
     const goalUsd = dayGoalForReports.usd;
     const goalAdherence = Number(settings.adherenceGoalPct || 95);
     const adherenceHistory = reportsAdherenceStats();
+    const commonComparison = [kpi.productiveDeltaMin, kpi.adherenceDeltaPts, kpi.earningsDelta].every(value => value === null || !Number.isFinite(value));
+    const status = document.getElementById('rptGoalsStatus');
+    if (status) { status.textContent = notEvaluated || ''; status.hidden = !notEvaluated; }
+    const comparison = document.getElementById('rptGoalsComparison');
+    if (comparison) { comparison.textContent = commonComparison ? translateText('Sin comparación disponible con ayer') : ''; comparison.hidden = !commonComparison; }
+    const history = document.getElementById('rptAdherenceHistoryContent');
+    if (history) history.innerHTML = ui`<span class="rpt-history-label">Adherencia</span><div class="rpt-history-stats"><span>Mejor <strong>${adherenceHistory.bestPct === null ? '—' : adherenceHistory.bestPct + '%'}</strong></span><span>Peor <strong>${adherenceHistory.worstPct === null ? '—' : adherenceHistory.worstPct + '%'}</strong></span><span>Promedio <strong>${adherenceHistory.avgPct === null ? '—' : adherenceHistory.avgPct + '%'}</strong></span></div>`;
     const productivePct = goalMin > 0 ? Math.min(100, (kpi.productiveMin / goalMin) * 100) : 0;
     const earningsPct = goalUsd > 0 ? Math.min(100, (kpi.earnings / goalUsd) * 100) : 0;
     const adherencePct = kpi.adherencePct === null ? 0 : Math.min(100, (kpi.adherencePct / goalAdherence) * 100);
     const deltaLine = (val, unit) => {
-      if (val === null || !Number.isFinite(val)) return ui`<div class="rpt-goal-delta flat">Sin comparación disponible con ayer</div>`;
+      if (val === null || !Number.isFinite(val)) return commonComparison ? '' : ui`<div class="rpt-goal-delta flat">Sin comparación disponible con ayer</div>`;
       if (val === 0) return ui`<div class="rpt-goal-delta flat">Sin cambio vs ayer</div>`;
       const up = val > 0;
       const text = unit === '$' ? `${money(Math.abs(val))}${financeConvertedInline(Math.abs(val))}` : `${Math.abs(val)}${unit}`;
       return ui`<div class="rpt-goal-delta ${up ? 'up' : 'down'}">${up ? '↑' : '↓'} ${text} vs ayer</div>`;
     };
-    const workDayReview = document.getElementById('workDayReviewSection');
     goalsGrid.innerHTML = ui`
       <div class="rpt-goal-card gh-goal-card" style="margin-top:0;">
-        <div class="gh-goal-top"><span>Productividad</span><b>${formatMinutes(kpi.productiveMin)}/${formatMinutes(goalMin)} min</b></div>
+        <div class="gh-goal-top"><span>Productividad</span><b>${formatMinutes(kpi.productiveMin)} <span>/ ${formatMinutes(goalMin)} min</span></b></div>
         <div class="rpt-goal-bar blue"><div style="width:${productivePct}%;"></div></div>
-        <div class="gh-goal-foot">${notEvaluated||(kpi.productiveMin >= goalMin ? translateText('¡Meta alcanzada!') : ui`Faltan ${formatMinutes(Math.max(0, goalMin - kpi.productiveMin))} min`)}</div>
+        <div class="gh-goal-foot">${notEvaluated ? '' : (kpi.productiveMin >= goalMin ? translateText('¡Meta alcanzada!') : ui`Faltan ${formatMinutes(Math.max(0, goalMin - kpi.productiveMin))} min`)}</div>
         ${deltaLine(kpi.productiveDeltaMin, ' min')}
       </div>
       <div class="rpt-goal-card gh-goal-card" style="margin-top:0;">
-        <div class="gh-goal-top"><span>Adherencia</span><b>${kpi.adherencePct === null ? '—' : kpi.adherencePct}/${goalAdherence}%</b></div>
+        <div class="gh-goal-top"><span>Adherencia</span><b>${kpi.adherencePct === null ? '—' : kpi.adherencePct} <span>/ ${goalAdherence}%</span></b></div>
         <div class="rpt-goal-bar good"><div style="width:${adherencePct}%;"></div></div>
-        <div class="gh-goal-foot">${notEvaluated||(kpi.adherencePct===null?translateText('Sin adherencia calculable para esta fecha'):kpi.adherencePct >= goalAdherence ? translateText('¡Meta alcanzada!') : ui`Faltan ${Math.max(0, goalAdherence - kpi.adherencePct)}%`)}</div>
+        <div class="gh-goal-foot">${notEvaluated ? '' : (kpi.adherencePct===null?translateText('Sin adherencia calculable para esta fecha'):kpi.adherencePct >= goalAdherence ? translateText('¡Meta alcanzada!') : ui`Faltan ${Math.max(0, goalAdherence - kpi.adherencePct)}%`)}</div>
         ${deltaLine(kpi.adherenceDeltaPts, '%')}
-        <details class="polished-disclosure"><summary>Comparación de los últimos 7 días</summary><div class="polished-detail"><p class="note">Mejor: ${adherenceHistory.bestPct === null ? '—' : adherenceHistory.bestPct + '%'} · Peor: ${adherenceHistory.worstPct === null ? '—' : adherenceHistory.worstPct + '%'} · Promedio: ${adherenceHistory.avgPct === null ? '—' : adherenceHistory.avgPct + '%'}</p></div></details>
       </div>
       <div class="rpt-goal-card gh-goal-card" style="margin-top:0;">
-        <div class="gh-goal-top"><span>Ganancias</span><b>${money(kpi.earnings)}/${money(goalUsd)}</b></div>
-        ${convertedAmountText(goalUsd) ? ui`<div class="fin-row-converted">${escapeHtml(convertedAmountText(kpi.earnings))} / ${escapeHtml(convertedAmountText(goalUsd))}</div>` : ''}
+        <div class="gh-goal-top"><span>Ganancias</span><b>${money(kpi.earnings)} <span>/ ${money(goalUsd)}</span></b></div>
         <div class="rpt-goal-bar purple"><div style="width:${earningsPct}%;"></div></div>
-        <div class="gh-goal-foot">${notEvaluated||(kpi.earnings >= goalUsd ? translateText('¡Meta alcanzada!') : ui`Faltan ${money(Math.max(0, goalUsd - kpi.earnings))}${financeConvertedInline(Math.max(0, goalUsd - kpi.earnings))}`)}</div>
+        ${convertedAmountText(goalUsd) ? ui`<div class="fin-row-converted">${escapeHtml(convertedAmountText(kpi.earnings))} / ${escapeHtml(convertedAmountText(goalUsd))}</div>` : ''}
+        <div class="gh-goal-foot">${notEvaluated ? '' : (kpi.earnings >= goalUsd ? translateText('¡Meta alcanzada!') : ui`Faltan ${money(Math.max(0, goalUsd - kpi.earnings))}${financeConvertedInline(Math.max(0, goalUsd - kpi.earnings))}`)}</div>
         ${deltaLine(kpi.earningsDelta, '$')}
       </div>
     `;
-    if (workDayReview) goalsGrid.children[1].append(workDayReview);
   }
 
   // Gráfica de 14 días (productivo real vs meta diaria constante)

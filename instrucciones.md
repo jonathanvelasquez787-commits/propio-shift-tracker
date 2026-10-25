@@ -458,6 +458,8 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
+- Web 649 aplica el mock aprobado de objetivos y jornada: tres métricas alineadas; comparación semanal y jornada a todo el ancho debajo. Un único aviso de día sin evaluar y comparación sin ayer cuando aplica a las tres; comparaciones individuales conservadas cuando difieren. Cálculos, controles, moneda y datos se conservan.
+
 - Web 648 aplica el mock aprobado de Ajustes: idioma, meta, tarifa y moneda visibles; Perfil y cuenta, Ciclo de pago, Copias y exportación y Disponibilidad plegables. Borrar cuenta queda al final en un grupo separado, conservando confirmación y validación de propietario. Los 65 ids anteriores de Ajustes y todos sus handlers se conservan. Las copias inyectadas se ubican en su grupo. No cambia el modelo de datos ni la extensión.
 
 - Web 647 aplica el mock aprobado de Finanzas simplificada: Disponible, Gastos, Metas, prioridades y reservas. Se retiran de la interfaz planificador/50-30-20, registro e historial mensual de pagos y estimaciones de aportes por meses. Los datos anteriores se conservan en ajustes y respaldos; categorías, edición, reparto, exclusiones y liberación permanecen. La próxima prioridad incluye Metas cuando termina Gastos. Extensión sin cambios.
@@ -508,6 +510,11 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v649 — Objetivos alineados y jornada fuera de la columna de Adherencia.**
+
+- Detalles semanales y jornada debajo de las tres métricas, con estado plegable estable al actualizar datos. Mismo diseño adaptable en claro/oscuro.
+- Conservados cálculos, registro y controles; información común de día sin evaluar consolidada sin perder comparaciones diferentes. Verificación de tests, wiring, traducciones, build y uso con datos ficticios.
+
 **v648 — Ajustes agrupados según mock aprobado.**
 
 - Un mismo diseño adaptable en claro/oscuro; ajustes diarios a mano y detalles plegados. Respaldos y contabilidad agrupados, cuenta separada al final.
@@ -517,8 +524,3 @@ futura opera bajo esto, sin excepción:
 
 - Filas con Reservado y Objetivo, progreso y ajustes plegados; controles de prioridad y moneda conservados. Sin planificador, pagos mensuales ni estimador de meses en la interfaz. Datos heredados preservados.
 - Exclusión automática accesible dentro de cada reserva; próxima prioridad continúa con Metas. Comprobaciones de reservas, persistencia, traducciones, wiring y compilación. Detalle en docs/finanzas-reservas-y-recepciones.md.
-
-**v646 — Fechas de pago con presentación 631 aprobada.**
-
-- Recuperada la lista compacta, azul histórico y etiqueta de ciclo; retirados de esa vista los controles de recepción y comparación. Datos anteriores conservados y fechas pasadas diferenciadas de recepciones reales.
-- Reintentar pagos respeta su estado oculto cuando la carga ya terminó. Diseño único probado en móvil y escritorio, claro/oscuro y ES/EN. Finanzas y extensión no cambian.
