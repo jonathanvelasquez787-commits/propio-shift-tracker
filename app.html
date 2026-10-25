@@ -127,14 +127,15 @@
 <div class="chip"><span class="dot-state" id="stateDot"></span><strong id="stateText">No iniciado</strong></div>
 <div class="acw-day-pair">
 <div class="summary-pill">
-  <button class="day-active-label-btn" id="dayActiveLabelBtn" type="button" title="Ir a Hoy">Día activo</button>
+  <button class="day-active-label-btn" id="dayActiveLabelBtn" type="button" title="Ir a Hoy" aria-label="Ir a Hoy">Día activo</button>
   <button class="day-nav-btn" id="dayPrevBtn" type="button" aria-label="Día anterior" title="Día anterior">‹</button>
   <input id="daySelector" aria-label="Día activo" type="date" min="1970-01-01" max="2099-12-31"/>
   <button class="day-nav-btn" id="dayNextBtn" type="button" aria-label="Día siguiente" title="Día siguiente">›</button>
 </div>
-<button class="chip" id="acwLiveChip" type="button" aria-label="Ver origen del ACW" aria-controls="callEditModal"><span aria-hidden="true">⏱️</span><span class="acw-label-full">ACW</span><span class="acw-label-short">ACW</span> <strong id="acwLiveTimer">00:00:00</strong><span id="acwRecordSource" hidden></span></button><span id="acwRecordDifference" class="record-difference" hidden></span>
+<button class="chip" id="acwLiveChip" type="button" aria-label="Ver origen del ACW" aria-controls="callEditModal"><span aria-hidden="true">⏱️</span><span class="acw-label-full">ACW</span><span class="acw-label-short">ACW</span> <strong id="acwLiveTimer">00:00:00</strong><span id="acwRecordSource" hidden></span></button>
 </div>
 </div>
+<span id="acwRecordDifference" class="record-difference" hidden></span>
 <button class="chip game-chip game-chip-streak" data-game-nav id="gameStreakChip" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c2.8 3.5 5.5 5.8 5.5 10.3A5.5 5.5 0 1 1 6.5 13c0-2.6 1.3-4.8 3.2-6.6-.1 1.8.5 3 1.5 3.8C12.7 8.5 13 5.8 12 3Z"/></svg><span>Racha</span><strong id="gameStreakValue">0</strong></button>
 <button class="chip game-chip game-chip-combo" data-game-nav hidden id="gameComboChip" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="m13 2-9 12h7l-1 8 9-12h-7l1-8Z"/></svg><span>Combo</span><strong id="gameComboValue">x0</strong></button>
 <button class="chip game-chip game-chip-level" data-game-nav id="gameLevelChip" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="5"/><path d="m8.5 12.5-2 8 5.5-3 5.5 3-2-8"/><path d="m10.2 8 1.8-2 1.8 2-1.8 1.4Z"/></svg><span>Nivel</span><strong id="gameLevelValue">1</strong></button>

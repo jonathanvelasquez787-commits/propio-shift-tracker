@@ -1007,14 +1007,16 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 #pageFinance .fin-row-amt-line{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
 #pageFinance .fin-row-restante-inline{display:inline}
 
-.day-status-controls{display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0;max-width:100%}
+.day-status-controls{display:flex;align-items:center;gap:6px;flex-wrap:nowrap;min-width:0;max-width:100%}
 .acw-day-pair{display:contents}
 .acw-day-pair>.summary-pill{order:0}
 .acw-day-pair>#acwLiveChip{order:1;white-space:nowrap}
 .acw-day-pair>.record-difference{order:2}
 #acwLiveChip{font-family:inherit;font-size:11px;line-height:1.2;min-height:28px;padding:5px 8px;gap:5px;font-variant-numeric:tabular-nums}
 #acwLiveChip:disabled{opacity:.75;cursor:default}
-@media(max-width:760px){.day-status-controls{display:grid;grid-template-columns:minmax(0,1fr) auto;width:100%;gap:6px}.day-status-controls>.chip{grid-row:2;grid-column:1;justify-self:start;font-size:11px;min-height:28px;padding:5px 8px;line-height:1.2}.day-status-controls .summary-pill{grid-row:1;grid-column:1/-1;justify-self:stretch;justify-content:center;min-height:30px;padding:5px 8px;gap:6px;font-size:11px}.day-status-controls #daySelector{width:90px;max-width:90px;font-size:11px}.day-status-controls .day-nav-btn{width:20px;height:20px}.day-status-controls #acwLiveChip{grid-row:2;grid-column:2;justify-self:end;gap:4px}.acw-day-pair .record-difference{grid-row:3;grid-column:1/-1;max-width:100%;white-space:normal}}
+@media(max-width:760px){.day-status-controls{flex-wrap:nowrap;width:100%;gap:5px}.day-status-controls>.chip{font-size:11px;min-height:28px;padding:5px 7px;gap:4px;line-height:1.2}.day-status-controls .summary-pill{flex:0 0 auto;min-height:28px;padding:4px 5px;gap:3px;font-size:11px}.day-status-controls #acwLiveChip{gap:3px;min-height:28px}.day-status-controls #daySelector{width:80px;max-width:80px}.day-status-controls .day-nav-btn{width:16px;height:18px}.chips>.record-difference{max-width:100%;white-space:normal}}
+@media(max-width:480px){.day-status-controls{gap:3px}.day-status-controls>.chip{font-size:10px;padding:4px 4px;gap:3px;min-height:26px}.day-status-controls>.chip .dot-state{width:6px;height:6px}.day-status-controls .summary-pill{padding:3px 3px;gap:2px;font-size:10px;min-height:26px}.day-status-controls #daySelector{width:72px;max-width:72px;font-size:9.5px}.day-status-controls .day-nav-btn{width:12px;height:18px;font-size:10px}.day-status-controls #dayActiveLabelBtn{font-size:0;width:14px;padding:0}.day-status-controls #dayActiveLabelBtn::before{content:'↶';font-size:12px}.day-status-controls #acwLiveChip{font-size:10px;padding:4px 4px;gap:3px;min-height:26px}.day-status-controls #acwLiveChip>span[aria-hidden]{display:none}}
+@media(max-width:360px){.day-status-controls{margin-inline:-14px;width:calc(100% + 28px);max-width:none;gap:2px}}
 #callsStatusCard[hidden]{display:none}
 
 #higherRateModal .hero-today{padding:12px 14px;margin-bottom:12px;border-radius:14px}
