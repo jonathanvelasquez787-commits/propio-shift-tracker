@@ -29,9 +29,16 @@ test('approved placements keep the existing Home controls and one copy of each d
  assert.equal(ids.has('automationStatusBtn'),false);
  assert.equal(ids.has('workDayReviewBtn'),false);
  assert.equal(within('acwLiveChip','heroSection'),true);
- const pair=ids.get('acwLiveChip').parentNode;
  assert.equal(within('daySelector','heroSection'),true);
- assert.equal(pair.childNodes.filter(n=>n.tagName)[0].attrs.some(a=>a.name==='class'&&a.value==='summary-pill'),true);
+ assert.equal(within('daySelector','clockDate'),false);
+ assert.equal(ids.get('daySelector').parentNode,ids.get('clockDate').parentNode);
+ assert.equal(within('daySelector','acwLiveChip'),false);
+ assert.equal(within('daySelector','stateText'),false);
+ assert.equal(ids.get('daySelector').parentNode.parentNode.parentNode.attrs.some(a=>a.name==='class'&&a.value==='clockbox'),true);
+ assert.equal(ids.has('earningsHigherRateLiveCard'),false);
+ assert.equal(within('higherRateLiveCard','higherRateModal'),true);
+ assert.equal(within('positiveEvidenceCard','pageAchievements'),true);
+ assert.equal(within('positiveEvidenceCard','pageHome'),false);
  assert.equal(within('callRecordingHelp','callEditModal'),true);
  for(const id of ['workDayReviewDetails','automationPanel','callRecordingHelp'])assert.equal(within(id,'pageHome'),false,id);
  for(const id of ['workDayReviewDetails','earningsDayBreakdown','earningsCycleBreakdown'])assert.equal((html.match(new RegExp('id="'+id+'"','g'))||[]).length,1,id);

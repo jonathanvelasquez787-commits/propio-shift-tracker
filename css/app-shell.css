@@ -1018,14 +1018,14 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 @media(max-width:480px){.day-status-controls{gap:3px}.day-status-controls>.chip{font-size:10px;padding:4px 4px;gap:3px;min-height:26px}.day-status-controls>.chip .dot-state{width:6px;height:6px}.day-status-controls .summary-pill{padding:3px 3px;gap:2px;font-size:10px;min-height:26px}.day-status-controls #daySelector{width:72px;max-width:72px;font-size:9.5px}.day-status-controls .day-nav-btn{width:12px;height:18px;font-size:10px}.day-status-controls #dayActiveLabelBtn{font-size:0;width:14px;padding:0}.day-status-controls #dayActiveLabelBtn::before{content:'↶';font-size:12px}.day-status-controls #acwLiveChip{font-size:10px;padding:4px 4px;gap:3px;min-height:26px}.day-status-controls #acwLiveChip>span[aria-hidden]{display:none}}
 @media(max-width:360px){.day-status-controls{margin-inline:-14px;width:calc(100% + 28px);max-width:none;gap:2px}}
 #callsStatusCard[hidden]{display:none}
-#earningsHigherRateLiveCard.hr-live-compact{padding:7px 8px;min-height:30px;border-radius:10px;gap:0}
-#earningsHigherRateLiveCard.hr-live-compact .hr-live-icon,#earningsHigherRateLiveCard.hr-live-compact .hr-live-sub{display:none}
-#earningsHigherRateLiveCard.hr-live-compact .hr-live-text{width:100%;min-width:0}
-#earningsHigherRateLiveCard.hr-live-compact .hr-live-title{display:flex;align-items:center;gap:5px;white-space:nowrap;font-size:10.5px;font-weight:600;line-height:1.4;letter-spacing:-.01em}
-#earningsHigherRateLiveCard.hr-live-compact .hr-compact-label{color:var(--muted);font-weight:500}
-#earningsHigherRateLiveCard.hr-live-compact .hr-compact-tier{color:var(--live-color,var(--text))}
-#earningsHigherRateLiveCard.hr-live-compact .hr-compact-date::before,#earningsHigherRateLiveCard.hr-live-compact .hr-compact-hours::before,#earningsHigherRateLiveCard.hr-live-compact .hr-compact-tier::before{content:'·';color:var(--muted);margin-right:5px}
-@media(max-width:480px){#earningsHigherRateLiveCard.hr-live-compact{padding:6px}#earningsHigherRateLiveCard.hr-live-compact .hr-live-title{font-size:10px;gap:3px}#earningsHigherRateLiveCard.hr-live-compact .hr-compact-date::before,#earningsHigherRateLiveCard.hr-live-compact .hr-compact-hours::before,#earningsHigherRateLiveCard.hr-live-compact .hr-compact-tier::before{margin-right:3px}}
+#higherRateLiveCard.hr-live-compact{padding:7px 8px;min-height:30px;border-radius:10px;gap:0}
+#higherRateLiveCard.hr-live-compact .hr-live-icon,#higherRateLiveCard.hr-live-compact .hr-live-sub{display:none}
+#higherRateLiveCard.hr-live-compact .hr-live-text{width:100%;min-width:0}
+#higherRateLiveCard.hr-live-compact .hr-live-title{display:flex;align-items:center;gap:5px;white-space:nowrap;font-size:10.5px;font-weight:600;line-height:1.4;letter-spacing:-.01em}
+#higherRateLiveCard.hr-live-compact .hr-compact-label{color:var(--muted);font-weight:500}
+#higherRateLiveCard.hr-live-compact .hr-compact-tier{color:var(--live-color,var(--text))}
+#higherRateLiveCard.hr-live-compact .hr-compact-date::before,#higherRateLiveCard.hr-live-compact .hr-compact-hours::before,#higherRateLiveCard.hr-live-compact .hr-compact-tier::before{content:'·';color:var(--muted);margin-right:5px}
+@media(max-width:480px){#higherRateLiveCard.hr-live-compact{padding:6px}#higherRateLiveCard.hr-live-compact .hr-live-title{font-size:10px;gap:3px}#higherRateLiveCard.hr-live-compact .hr-compact-date::before,#higherRateLiveCard.hr-live-compact .hr-compact-hours::before,#higherRateLiveCard.hr-live-compact .hr-compact-tier::before{margin-right:3px}}
 
 #higherRateModal .hero-today{padding:12px 14px;margin-bottom:12px;border-radius:14px}
 #higherRateModal .hero-today-top{gap:8px}
@@ -1038,3 +1038,12 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 #higherRateModal .hero-today-track{margin-top:10px;height:5px}
 #higherRateModal .hero-today-foot{font-size:9px;margin-top:5px;gap:5px}
 @media(max-width:480px){#higherRateModal .hero-today-figures{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}#higherRateModal .hero-today-figures>div:first-child{grid-column:1/-1;display:flex;gap:9px;align-items:center}#higherRateModal .hero-today-figures>div:first-child .hero-fig-label{margin-top:0}}
+
+.clock-date-controls{display:flex;align-items:center;justify-content:flex-end;gap:5px;max-width:100%;color:var(--muted)}
+.clock-date-picker{position:relative;display:inline-flex;align-items:center;min-width:0;cursor:pointer;border-radius:5px}
+.clock-date-picker #clockDate{margin:0;white-space:nowrap;font-size:11px;line-height:1.5}
+.clock-date-picker #daySelector{position:absolute;inset:0;opacity:0;width:100%;max-width:none;height:100%;cursor:pointer;margin:0;padding:0}
+.clock-date-picker:focus-within{outline:2px solid var(--cyan);outline-offset:3px}
+.clock-date-controls .day-nav-btn{flex-shrink:0;width:20px;height:23px;color:inherit}
+.clock-date-controls #dayActiveLabelBtn{font-size:10px;padding:2px 3px;color:inherit}
+@media(max-width:760px){.title-row{grid-template-columns:minmax(0,1fr)}.title-row .clockbox{grid-column:1;grid-row:2;justify-self:end;max-width:100%}.clock-date-controls{gap:3px}:root.theme-light .title-row .clock-date-controls{color:rgba(255,255,255,.85)}.clock-date-picker #clockDate{font-size:10px}.clock-date-controls .day-nav-btn{width:18px;height:23px}.clock-date-controls #dayActiveLabelBtn{font-size:10px}}
