@@ -21,8 +21,8 @@ import {
   computeComplianceStreak,
   cycleGoalPace,
   dayComplianceStatus,
-  renderReportsDashboard,
-  renderReportsMonthlyChart,
+  renderReportsDashboard as renderReportsDashboardView,
+  renderReportsMonthlyChart as renderReportsMonthlyChartView,
   reportsCycleProjection,
   configureReportsContext,
 } from './reports.js';
@@ -2389,8 +2389,30 @@ function isViewingToday() {
   return getActiveDayKey() === todayCallDateKey();
 }
 
+function withReportCallReadIndex(work) {
+  // Sólo vive durante esta lectura síncrona; cada consulta devuelve su propio arreglo.
+  if (callsForDay.reportReadIndex?.source === calls) return work();
+  const previous = callsForDay.reportReadIndex, source = calls, days = new Map();
+  for (const call of source) {
+    const key = callDateKeyFromValue(call.callDate);
+    if (!days.has(key)) days.set(key, []);
+    days.get(key).push(call);
+  }
+  callsForDay.reportReadIndex = {source, days};
+  try { return work(); } finally { callsForDay.reportReadIndex = previous; }
+}
+
+function renderReportsDashboard() {
+  return withReportCallReadIndex(renderReportsDashboardView);
+}
+
+function renderReportsMonthlyChart() {
+  return withReportCallReadIndex(renderReportsMonthlyChartView);
+}
+
 export function callsForDay(dayKey = getActiveDayKey(), sourceCalls = calls) {
   const normalized = callDateKeyFromValue(dayKey);
+  if (callsForDay.reportReadIndex?.source === sourceCalls) return [...(callsForDay.reportReadIndex.days.get(normalized) || [])];
   return sourceCalls.filter(c => callDateKeyFromValue(c.callDate) === normalized);
 }
 
@@ -2725,7 +2747,10 @@ export function connectedMinutesForDay(dayKey = getActiveDayKey()) {
 }
 
 export function productiveMinutesForDay(dayKey = getActiveDayKey()) {
-  return importedCallStats(callsForDay(dayKey), dayKey).productive;
+  return [...callsForDay(dayKey)]
+    .sort((a, b) => new Date(a.startISO) - new Date(b.startISO))
+    .filter(call => call.countsAsProductive !== false)
+    .reduce((total, call) => total + (call.durationMin || 0), 0);
 }
 
 function manualGapPauseIntervals(dayKey, type) {
@@ -5139,7 +5164,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       financeConvertedInline, financeConvertedNote, formatCallDayLabel, formatDuration, formatMinutes,
       getActiveDayKey, getCycleGoalOverride, iconHtml, importedCallStats, money, pad, previousCalendarDay,
       onGameDayMetadataChanged, productiveMinutesForDay, saveSettingsOnly, todayCallDateKey, todayRange,
-      weekDaysForOffset, weekSummaryForOffset, render,
+      weekDaysForOffset, weekSummaryForOffset, render, parseMoney, higherRateBonusForCalls,
     });
     configureCalendarContext({
       RATE, callsForDay, closeModal, convertedAmountText, dayIsEffectivelyOff, dayNoteCategoryMeta,
@@ -7515,6 +7540,12 @@ export function render() {
     document.getElementById('cycleCurrentBtn').addEventListener('click', () => { cycleViewOffset = 0; renderHeader(); });
     // Ganancias/Adherencia por mes (Reportes) — mismo patrón que weekPrevBtn/cyclePrevBtn de
     // arriba.
+    document.getElementById('rptMonthlyDetails').addEventListener('toggle', event => {
+      if (event.target.open && currentPage === 'reports') renderReportsMonthlyChart();
+    });
+    document.getElementById('rptQualityDetails').addEventListener('toggle', event => {
+      if (event.target.open && currentPage === 'reports') renderReportsDashboard();
+    });
     document.getElementById('rptMonthlyPrevBtn').addEventListener('click', () => {
       const historyStart = effectiveHistoryStartDate();
       if (historyStart) {

@@ -458,6 +458,8 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
+- Web 651 evita calcular los análisis mensual y de calidad mientras están plegados. El gráfico productivo calcula solo productividad y la comparación semanal solo adherencia. Índice de llamadas limitado a una lectura síncrona, descartado al terminar; controles y valores conservados. Referencias reales de Finanzas, Higher Rate y Ajustes de 631 (c178210) recuperadas fuera de Git para revisar su restauración visual.
+
 - Web 650 aplica el mock aprobado del resto de Reportes: ganado y meta del ciclo destacados, proyección identificada como estimación, racha compacta y análisis secundarios plegables. Aviso de día libre sin duplicar; controles, cálculos y datos conservados.
 
 - Web 649 aplica el mock aprobado de objetivos y jornada: tres métricas alineadas; comparación semanal y jornada a todo el ancho debajo. Un único aviso de día sin evaluar y comparación sin ayer cuando aplica a las tres; comparaciones individuales conservadas cuando difieren. Cálculos, controles, moneda y datos se conservan.
@@ -512,6 +514,11 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v651 — Apertura de Reportes sin cálculos ocultos innecesarios.**
+
+- Los análisis plegados mensual y de calidad se calculan al abrirlos. Productividad deja de calcular pausas/estadísticas/adherencia que no dibuja y la comparación semanal calcula solo adherencia.
+- Tres regresiones para carga plegada, totales y bonos, precisión productiva e índice temporal sin datos obsoletos. 1.131 pruebas correctas; con 2.160 llamadas ficticias, apertura normal de 57,8 s a 1,1 s. Un análisis mensual ya abierto todavía requiere más cálculo. No se cambian reglas contables ni datos guardados.
+
 **v650 — Reportes jerarquizados según mock aprobado.**
 
 - Ganancias y meta del ciclo a la izquierda, proyección a la derecha, racha debajo; el mismo diseño se apila en móvil. Desglose, resumen semanal y análisis secundarios plegados.
@@ -521,8 +528,3 @@ futura opera bajo esto, sin excepción:
 
 - Detalles semanales y jornada debajo de las tres métricas, con estado plegable estable al actualizar datos. Mismo diseño adaptable en claro/oscuro.
 - Conservados cálculos, registro y controles; información común de día sin evaluar consolidada sin perder comparaciones diferentes. Verificación de tests, wiring, traducciones, build y uso con datos ficticios.
-
-**v648 — Ajustes agrupados según mock aprobado.**
-
-- Un mismo diseño adaptable en claro/oscuro; ajustes diarios a mano y detalles plegados. Respaldos y contabilidad agrupados, cuenta separada al final.
-- Se conservan ids, campos, listeners y confirmaciones; la inserción de copias cambia solo de ubicación. Validación de wiring, traducciones, build y recorridos con datos ficticios.

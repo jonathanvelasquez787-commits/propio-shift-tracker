@@ -37,7 +37,8 @@ test('calendar status keeps no-data days distinct from recorded zero-minute work
 });
 
 test('report cards do not turn missing activity or a day off into missing minutes and money',t=>{
- setLanguage('es');const previous=globalThis.document,elements=new Map(['rptDashboard','rptDayConclusion','rptGoalsGrid','rptSecGoals','rptGoalsStatus','rptGoalsComparison','rptAdherenceHistoryContent'].map(id=>[id,{innerHTML:''}]));
+ setLanguage('es');const previous=globalThis.document,elements=new Map(['rptDashboard','rptDayConclusion','rptGoalsGrid','rptSecGoals','rptGoalsStatus','rptGoalsComparison','rptAdherenceHistoryContent','rptChartSvg','rptQualityDetails','rptTriGrid','rptTrendRow'].map(id=>[id,{innerHTML:''}]));
+ elements.get('rptQualityDetails').open=false;
  globalThis.document={getElementById:id=>elements.get(id)||null};t.after(()=>{if(previous===undefined)delete globalThis.document;else globalThis.document=previous;});
  let off=false;
  configureReportsContext({todayRange:()=>new Date(2026,9,19),dayConfigFor:()=>({}),getActiveDayKey:()=> '10/19/2026',todayCallDateKey:()=> '10/19/2026',callDateToDate:()=>new Date(2026,9,19),previousCalendarDay:date=>new Date(date.getTime()-86400000),callsForDay:()=>[],importedCallStats:()=>({earnings:0}),productiveMinutesForDay:()=>0,dayAdherence:()=>null,dayShiftBounds:()=>({start:null}),dayIsEffectivelyOff:()=>off,effectiveDailyGoal:()=>({min:360,usd:43.2}),escapeHtml:String,iconHtml:()=>'',formatMinutes:String,money:value=>'$'+value,financeConvertedInline:()=>'',convertedAmountText:()=>''});
