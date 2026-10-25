@@ -324,8 +324,6 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
-- Finanzas: el propietario aprobó Higher Rate y Ajustes 631, pero pidió una referencia de Finanzas anterior a los controles de reservas y registro de pagos. Recuperada web 601 (f77db5a), previa a pagos mensuales. Su aspecto queda como referencia pendiente de elección; no se modifica Finanzas publicada.
-
 - **Ocho pedidos directos del 22/10:** implementación y evidencia reunidas en
   docs/cierre-ocho-pedidos.md. Web 639 aporta el hover con segundos; 640 integra
   Reportes y restaura la fecha azul; 641 cierra galería, lenguaje y control
@@ -516,6 +514,12 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v653 — Finanzas 601 y editor de Higher Rate completos.**
+
+- Finanzas recupera las tarjetas por categoría, barras, totales y Sumar/Restar/Aplicar visibles de la referencia 601 aprobada. Conserva las reglas contables actuales, la conversión precisa, exclusiones y liberación de reservas; no recupera el registro de pagos ni borra datos históricos.
+- Completa la restauración parcial de Higher Rate 652: fecha, horas y los tres niveles editables en cada tarjeta. Guardar cambios usa la transacción actual con conservación de bonos; Revisar llamadas mantiene la corrección con impacto previo. Tres regresiones nuevas verifican bonos, borradores obsoletos, horas inválidas y rechazo de guardado. 1.134 pruebas correctas; validación visual en ambos temas y 320/620/1365 px con datos ficticios.
+
+
 **v652 — Ajustes y Higher Rate con aspecto histórico aprobado.**
 
 - Ajustes vuelve al formulario seguido, secciones y campos subrayados de 631. Conserva idioma, perfil Google, metas actuales, exportaciones, recuperación, disponibilidad y eliminación protegida.
@@ -526,8 +530,3 @@ futura opera bajo esto, sin excepción:
 
 - Los análisis plegados mensual y de calidad se calculan al abrirlos. Productividad deja de calcular pausas/estadísticas/adherencia que no dibuja y la comparación semanal calcula solo adherencia.
 - Tres regresiones para carga plegada, totales y bonos, precisión productiva e índice temporal sin datos obsoletos. 1.131 pruebas correctas; con 2.160 llamadas ficticias, apertura normal de 57,8 s a 1,1 s. Un análisis mensual ya abierto todavía requiere más cálculo. No se cambian reglas contables ni datos guardados.
-
-**v650 — Reportes jerarquizados según mock aprobado.**
-
-- Ganancias y meta del ciclo a la izquierda, proyección a la derecha, racha debajo; el mismo diseño se apila en móvil. Desglose, resumen semanal y análisis secundarios plegados.
-- Información y controles existentes conservados; aviso de día libre consolidado. Validación visual, pruebas, wiring, traducciones y compilación.

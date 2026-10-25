@@ -69,18 +69,6 @@
 @media(max-width:640px){.fin-plan-inputs{grid-template-columns:1fr 1fr}.fin-plan-settings{grid-column:1/-1}.fin-plan>summary{flex-wrap:wrap}.fin-plan>summary>span:first-of-type{order:3;width:100%}.fin-plan-projection>div{flex-basis:100%}.fin-plan-distribution{grid-template-columns:1fr}.fin-plan-distribution>div{grid-template-columns:1fr 1fr;align-items:end}.fin-plan-distribution strong{padding-bottom:10px}.fin-plan-month-head{flex-wrap:wrap}.fin-plan-metrics{gap:16px}.fin-payment-controls label{flex-basis:100%}}
 @media(pointer:coarse){.fin-plan-field input{font-size:16px}.fin-plan button,.fin-plan-row button,.fin-plan summary,.fin-plan-row summary{min-height:44px}}
 
-/* Reservas y pagos comparten un layout y controles de moneda. */
-#pageFinance .fin-row{display:grid;grid-template-columns:24px 38px minmax(160px,1fr) minmax(320px,1.3fr);align-items:center;gap:12px 14px}
-#pageFinance .fin-row-main{order:initial;min-width:0;overflow-wrap:anywhere}
-#pageFinance .fin-row-sub{line-height:1.5}
-#pageFinance .fin-row-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;min-width:0}
-#pageFinance .fin-row-metrics .fin-plan-metric{font-size:11px;overflow-wrap:anywhere}
-#pageFinance .fin-row-metrics .fin-badge{justify-self:start;margin:0;order:initial;white-space:normal}
-#pageFinance .fin-row-metrics .fin-row-converted{margin:0;font-size:11px}
-#pageFinance .fin-row-actions{grid-column:3/-1;display:flex;flex-wrap:wrap;align-items:center;gap:10px;min-width:0;order:initial;margin:0}
-#pageFinance .fin-reservation-controls .fin-row-actions{grid-column:auto}
-#pageFinance .fin-plan-row{grid-column:3/-1;order:initial;margin:0;padding-top:0;width:auto}
-#pageFinance .fin-plan-row-body{max-width:760px;padding:12px 0 4px}
 .fin-amount-entry{display:grid;grid-template-columns:minmax(0,150px) minmax(0,84px);gap:6px 8px;min-width:0;max-width:100%}
 .fin-plan-field select{width:100%;min-width:0;box-sizing:border-box;border:1px solid var(--line);border-radius:11px;padding:10px 8px;background:var(--panel-navy);color:var(--text);font:inherit;font-size:14px}
 .fin-plan-field select option{background:var(--panel-navy);color:var(--text)}
@@ -879,28 +867,6 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 #payDatesBody .wk-row-title .wk-row-badge{white-space:normal}
 #payDatesRetryBtn[hidden]{display:none}
 
-#pageFinance .fin-header{margin-bottom:20px}
-#pageFinance .fin-available-amt{display:block}
-#pageFinance .fin-available-converted{display:block;margin-left:0}
-#pageFinance .fin-available-stat{text-align:left}
-#pageFinance .fin-list{gap:0}
-#pageFinance .fin-row{display:block;padding:18px 0;border:0;border-top:1px solid var(--line);border-radius:0;background:transparent;min-width:0}
-#pageFinance .fin-row-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;min-width:0}
-#pageFinance .fin-row-main{flex:1;min-width:0}
-#pageFinance .fin-row-title{font-size:15px}
-#pageFinance .fin-priority{flex-direction:row;gap:6px}
-#pageFinance .fin-priority-btn{width:32px;height:36px}
-#pageFinance .fin-priority-num{background:transparent;width:auto;min-width:14px}
-#pageFinance .fin-row-metrics{grid-template-columns:repeat(2,minmax(0,1fr));margin:14px 0 10px;gap:16px}
-#pageFinance .fin-row-metrics .fin-plan-metric:last-child{text-align:right}
-#pageFinance .fin-row-metrics .fin-plan-metric{font-size:12px;gap:2px}
-#pageFinance .fin-progress-track{height:6px;margin:0;border:0}
-#pageFinance .fin-plan-row{margin-top:10px;border:0}
-#pageFinance .fin-plan-row>summary{color:var(--cyan);justify-content:flex-start;gap:8px}
-#pageFinance .fin-reservation-pending{font-size:12px;color:var(--muted);margin-top:10px;overflow-wrap:anywhere}
-#pageFinance .sched-add-block-btn{margin-top:14px}
-@media(max-width:640px){#pageFinance .fin-available-card{padding:14px}#pageFinance .fin-header-icon{width:42px;height:42px}#pageFinance .fin-row-actions>.fin-amount-entry{flex-basis:100%}}
-@media(pointer:coarse){#pageFinance .fin-priority-btn{width:38px;min-height:44px}}
 
 #goalsModal #settingsRecoveryCopies:empty{display:none}
 #goalsModal #settingsRecoveryCopies select{width:100%;min-width:0}
@@ -1009,3 +975,35 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 
 #goalsModal .goals-pill-field{min-width:0;max-width:100%;flex-wrap:wrap;box-sizing:border-box}
 #goalsModal .goals-pill-field input{min-width:0;max-width:100%;box-sizing:border-box}
+
+/* Tarjetas de Finanzas: controles visibles en la misma fila. */
+#pageFinance .fin-row{min-width:0}
+#pageFinance .fin-row-actions{min-width:0;flex-wrap:wrap;flex-basis:100%;order:5;margin-top:8px;gap:8px}
+#pageFinance .fin-checkbox-label{order:6;flex-basis:100%;margin-top:0}
+#pageFinance .fin-amount-entry{grid-template-columns:minmax(0,120px) minmax(0,74px);gap:4px 8px}
+#pageFinance .fin-amount-entry input,#pageFinance .fin-amount-entry select{padding:6px 8px;min-height:34px;font-size:12px}
+#pageFinance .fin-row-amt-line{overflow-wrap:anywhere}
+#pageFinance .fin-row-restante-inline{white-space:normal}
+@media(max-width:760px){#pageFinance .fin-row-main{order:4}#pageFinance .fin-row-actions{order:5}#pageFinance .fin-row-actions>.fin-amount-entry{flex:0 1 220px;grid-template-columns:minmax(0,1fr) 74px}#pageFinance .fin-row-actions>.fin-ghost-btn-icon{width:auto;padding:7px 9px}}
+
+#pageFinance .fin-amount-entry .fin-plan-field{font-size:0;gap:0}
+#pageFinance .fin-amount-entry{grid-template-columns:minmax(0,95px) minmax(0,62px)}
+#pageFinance .fin-amount-equivalent:empty{display:none}
+#pageFinance .wk-total-row{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px}
+#pageFinance .wk-total-label{font-size:11px}
+#pageFinance .wk-total-metrics{display:flex;flex:1;flex-wrap:wrap;gap:10px}
+#pageFinance .wk-total-metric{display:inline-flex;align-items:baseline;gap:4px;flex-wrap:wrap;font-size:10px}
+#pageFinance .wk-total-metric-label{display:inline;font-size:9px}
+#pageFinance .wk-total-metric strong{display:inline;font-size:11px;margin:0}
+#pageFinance .wk-total-row .fin-row-converted-inline{display:inline;font-size:8px}
+@media(max-width:760px){#pageFinance .fin-row-actions>.fin-amount-entry{flex:0 1 160px;grid-template-columns:minmax(0,1fr) 62px}#pageFinance .fin-row-actions>.fin-ghost-btn:not(.fin-ghost-btn-icon){width:auto;padding:7px 10px}#pageFinance .fin-row-actions .mc-pill-btn{padding:7px 9px;font-size:11px}#pageFinance .fin-checkbox-label{font-size:10px}}
+
+#pageFinance .wk-total-metrics,#pageFinance .wk-total-metric{min-width:0;max-width:100%;white-space:normal}
+#pageFinance .wk-total-metric-label{white-space:normal}
+#pageFinance .fin-item-tools{display:inline-flex;align-items:center;gap:6px}
+@media(max-width:480px){#pageFinance .wk-total-metrics{flex-basis:100%;gap:8px}#pageFinance .wk-total-metric{flex:1 1 70px}}
+
+#higherRateModal [data-save-hr-window]:disabled{opacity:.45;cursor:default}
+
+#pageFinance .fin-row-amt-line{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+#pageFinance .fin-row-restante-inline{display:inline}
