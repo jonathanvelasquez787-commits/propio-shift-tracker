@@ -6031,13 +6031,6 @@
       "js/automation-ui.js"
     ]
   },
-  "s_5977b0b2": {
-    "source": "Comienza una nueva llamada",
-    "files": [
-      "app.html",
-      "js/app-main.js"
-    ]
-  },
   "s_598ad9c9": {
     "source": "Enfrentaste una llamada difícil · tu esfuerzo cuenta",
     "files": [
@@ -9339,7 +9332,6 @@
   "s_8c626ae6": {
     "source": "Sin confirmar",
     "files": [
-      "app.html",
       "js/automation-ui.js"
     ]
   },
@@ -11699,12 +11691,6 @@
       "js/auth.js"
     ]
   },
-  "s_af8b1b79": {
-    "source": "Ver jornada →",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_afa97f45": {
     "source": "sin configurar",
     "files": [
@@ -12364,12 +12350,6 @@
     "source": "Recompensa individual · {{v0}} XP",
     "files": [
       "js/game.js"
-    ]
-  },
-  "s_baa7ff16": {
-    "source": "ACW/AfterCallWork",
-    "files": [
-      "app.html"
     ]
   },
   "s_baae7e2a": {
@@ -13315,12 +13295,6 @@
     "source": "No se pudo guardar el perfil. Vuelve a intentar.",
     "files": [
       "js/auth.js"
-    ]
-  },
-  "s_c974220a": {
-    "source": "Inicia una llamada, pega tu exportación de Propio o agrega una manual.",
-    "files": [
-      "app.html"
     ]
   },
   "s_c98471bb": {
@@ -16132,6 +16106,12 @@
     "source": "Omitida",
     "files": [
       "js/call-review-view.js"
+    ]
+  },
+  "s_f1710b98": {
+    "source": "Sin ACW activo",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_f17ddbcf": {

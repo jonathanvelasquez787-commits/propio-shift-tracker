@@ -25,7 +25,12 @@ test('approved placements keep the existing Home controls and one copy of each d
  for(const id of ['callsSection','earningsAccordion','scheduleAccordion','blocksView','blocksCallsView'])assert.equal(within(id,'pageHome'),true,id);
  for(const id of ['earningsDayBreakdown','earningsCycleBreakdown','workDayReviewDetails'])assert.equal(within(id,'pageReports'),true,id);
  assert.equal(within('automationPanel','goalsModal'),true);
- assert.equal(within('automationStatusBtn','heroSection'),true);
+ assert.equal(ids.has('automationStatusBtn'),false);
+ assert.equal(ids.has('workDayReviewBtn'),false);
+ assert.equal(within('acwLiveChip','heroSection'),true);
+ const pair=ids.get('acwLiveChip').parentNode;
+ assert.equal(within('daySelector','heroSection'),true);
+ assert.equal(pair.childNodes.filter(n=>n.tagName)[0].attrs.some(a=>a.name==='class'&&a.value==='summary-pill'),true);
  assert.equal(within('callRecordingHelp','callEditModal'),true);
  for(const id of ['workDayReviewDetails','automationPanel','callRecordingHelp'])assert.equal(within(id,'pageHome'),false,id);
  for(const id of ['automationPanel','workDayReviewDetails','earningsDayBreakdown','earningsCycleBreakdown'])assert.equal((html.match(new RegExp('id="'+id+'"','g'))||[]).length,1,id);
