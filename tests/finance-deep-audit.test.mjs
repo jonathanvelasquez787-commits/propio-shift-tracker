@@ -332,7 +332,8 @@ test('simplified finance renders only reservations and objectives while retainin
   settings.financePayments[0].usd=90;h.expense.budgetPeriod='fortnightly';renderFinanceSection();
   const html=h.field('financeGastosList').innerHTML;
   assert.doesNotMatch(html,/Pagado en el mes elegido|Presupuesto excedido|data-fin-payment|data-fin-savings/);
-  assert.match(html,/Reservado[\s\S]*?\$30\.00/);assert.match(html,/Objetivo[\s\S]*?\$80\.00/);
+  assert.match(html,/\$30\.00[\s\S]*?de \$80\.00/);assert.match(html,/Faltan[\s\S]*?\$50\.00/);
+  assert.doesNotMatch(html,/data-fin-reservation-row/);assert.match(html,/data-fin-apply="food"/);
   assert.equal(settings.financePayments[0].usd,90);assert.equal(h.expense.budgetPeriod,'fortnightly');
   const before=JSON.stringify(settings);renderFinanceSection();assert.equal(JSON.stringify(settings),before);
 });

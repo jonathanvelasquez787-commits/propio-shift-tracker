@@ -267,7 +267,6 @@
     "source": "{{v0}}{{v1}}",
     "files": [
       "js/calendar.js",
-      "js/finance.js",
       "js/reports.js",
       "js/shift-work-review.js"
     ]
@@ -747,12 +746,6 @@
       "js/positive-reinforcement.js"
     ]
   },
-  "s_0b62af98": {
-    "source": "Faltan {{v13}}{{v14}}",
-    "files": [
-      "js/finance.js"
-    ]
-  },
   "s_0b633af6": {
     "source": "El código, el diseño, los textos y la marca de Propio Shift Tracker pertenecen\n    a su titular y están protegidos por derechos de autor. Tener una cuenta te da\n    derecho a",
     "files": [
@@ -947,6 +940,12 @@
     "source": "Se corre todo el turno:",
     "files": [
       "app.html"
+    ]
+  },
+  "s_0d7fe4f9": {
+    "source": "{{v19}}{{v20}}",
+    "files": [
+      "js/finance.js"
     ]
   },
   "s_0db995c6": {
@@ -1224,6 +1223,12 @@
     "source": "Llamada terminada: {{v0}} – {{v1}} ({{v2}}). Ajusta lo que haga falta antes de guardarla.",
     "files": [
       "js/calls.js"
+    ]
+  },
+  "s_1127078e": {
+    "source": "Silver (+$0.02)",
+    "files": [
+      "js/higher-rate.js"
     ]
   },
   "s_114452d9": {
@@ -1734,7 +1739,8 @@
     "source": "Recurrente",
     "files": [
       "app.html",
-      "js/finance-review.js"
+      "js/finance-review.js",
+      "js/finance.js"
     ]
   },
   "s_199e7ad5": {
@@ -2484,12 +2490,6 @@
       "app.html"
     ]
   },
-  "s_259f071b": {
-    "source": "· Reserva automática omitida",
-    "files": [
-      "js/finance.js"
-    ]
-  },
   "s_25a3433a": {
     "source": "Asignación automática activada — se repartirá con tu próxima llamada guardada",
     "files": [
@@ -2518,6 +2518,12 @@
     "source": "{{v1}} min",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_262ac7c8": {
+    "source": "Revisar llamadas",
+    "files": [
+      "js/higher-rate.js"
     ]
   },
   "s_262d2a5d": {
@@ -2732,6 +2738,12 @@
       "js/automation-ui.js"
     ]
   },
+  "s_292f69bb": {
+    "source": "Fecha de la ventana",
+    "files": [
+      "js/higher-rate.js"
+    ]
+  },
   "s_293d11ee": {
     "source": "Sin actividad",
     "files": [
@@ -2857,6 +2869,12 @@
     "files": [
       "app.html",
       "js/game.js"
+    ]
+  },
+  "s_2af2e5a4": {
+    "source": "· {{v0}}",
+    "files": [
+      "js/finance.js"
     ]
   },
   "s_2b0ccc28": {
@@ -3907,7 +3925,8 @@
   "s_39f30811": {
     "source": "Hora de fin",
     "files": [
-      "js/higher-rate-review.js"
+      "js/higher-rate-review.js",
+      "js/higher-rate.js"
     ]
   },
   "s_39ffff4b": {
@@ -4597,6 +4616,12 @@
       "js/game-battle.js"
     ]
   },
+  "s_458b225e": {
+    "source": "Cubierto",
+    "files": [
+      "js/finance.js"
+    ]
+  },
   "s_45e3f698": {
     "source": "Tema: {{v0}}",
     "files": [
@@ -4954,6 +4979,12 @@
       "js/game.js"
     ]
   },
+  "s_4b0193f4": {
+    "source": "{{v5}}{{v6}}",
+    "files": [
+      "js/finance.js"
+    ]
+  },
   "s_4b174433": {
     "source": "{{v0}} · {{v1}} — los datos de fecha/hora no se pueden editar aquí, solo duración, pago, billable y dropped.",
     "files": [
@@ -5149,6 +5180,12 @@
     "source": "Espalda",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_4e66f48e": {
+    "source": "Nivel de la ventana",
+    "files": [
+      "js/higher-rate.js"
     ]
   },
   "s_4e6d1d40": {
@@ -6916,6 +6953,12 @@
       "js/auth.js"
     ]
   },
+  "s_69f37c88": {
+    "source": "Sin asignar",
+    "files": [
+      "js/finance.js"
+    ]
+  },
   "s_6a038413": {
     "source": "Llegada tarde",
     "files": [
@@ -7944,12 +7987,6 @@
     "source": "{{v0}} ({{v1}}–{{v2}}) queda fuera del turno ({{v3}}–{{v4}}).",
     "files": [
       "js/schedule.js"
-    ]
-  },
-  "s_7994eef1": {
-    "source": "Aplicar ajuste",
-    "files": [
-      "js/finance.js"
     ]
   },
   "s_799ffcda": {
@@ -9462,7 +9499,8 @@
     "source": "Hora de inicio",
     "files": [
       "app.html",
-      "js/higher-rate-review.js"
+      "js/higher-rate-review.js",
+      "js/higher-rate.js"
     ]
   },
   "s_8e4897ca": {
@@ -9890,6 +9928,12 @@
   },
   "s_94462133": {
     "source": "#0F828C",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_945d4109": {
+    "source": "Usá la fecha, horas y nivel del aviso de Propio. Guardar cambios conserva los bonos registrados; para corregirlos, abrí «Revisar llamadas».",
     "files": [
       "app.html"
     ]
@@ -10455,6 +10499,12 @@
       "js/app-main.js"
     ]
   },
+  "s_9d5e19e3": {
+    "source": "Aplicar",
+    "files": [
+      "js/finance.js"
+    ]
+  },
   "s_9d773438": {
     "source": "Qué tan apegado estuviste hoy a tu horario planeado",
     "files": [
@@ -10818,6 +10868,12 @@
       "js/app-main.js"
     ]
   },
+  "s_a2a5c676": {
+    "source": "{{v8}} de {{v9}}{{v10}} {{v11}}",
+    "files": [
+      "js/finance.js"
+    ]
+  },
   "s_a2b14871": {
     "source": "Suena mientras la pestaña esté abierta, si aún no le diste a \"Iniciar shift\". 0 min = desactivado. Variable disponible en el mensaje:",
     "files": [
@@ -10902,7 +10958,8 @@
   "s_a36f3aa0": {
     "source": "No se aplicó. Revisá el guardado y volvé a calcular; los datos pudieron cambiar.",
     "files": [
-      "js/higher-rate-review.js"
+      "js/higher-rate-review.js",
+      "js/higher-rate.js"
     ]
   },
   "s_a37a9164": {
@@ -11731,7 +11788,8 @@
   "s_b0bac425": {
     "source": "Parcial",
     "files": [
-      "js/app-main.js"
+      "js/app-main.js",
+      "js/finance.js"
     ]
   },
   "s_b0beee40": {
@@ -12194,7 +12252,8 @@
     "source": "Puntual",
     "files": [
       "app.html",
-      "js/finance-review.js"
+      "js/finance-review.js",
+      "js/finance.js"
     ]
   },
   "s_b77f6f66": {
@@ -12261,12 +12320,6 @@
   },
   "s_b93f1f71": {
     "source": "Original conserva los modos claro y oscuro actuales. Las otras paletas se adaptan al modo elegido.",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_b944d700": {
-    "source": "Usá los datos del aviso de Propio. Abrí una promoción para revisar sus llamadas y elegir el efecto de una edición.",
     "files": [
       "app.html"
     ]
@@ -12768,6 +12821,12 @@
       "app.html"
     ]
   },
+  "s_c1a3facb": {
+    "source": "Sin empezar",
+    "files": [
+      "js/finance.js"
+    ]
+  },
   "s_c1b0330d": {
     "source": "\"Bloques del día\" compara, minuto a minuto, lo que hiciste de verdad contra lo planeado. \"Gracia\" perdona desvíos chicos alrededor de cada cambio de bloque (0 = cualquier desvío cuenta de inmediato). \"Meta\" es tu propio objetivo de % para comparar contra tu Adherencia real de cada día.",
     "files": [
@@ -12895,6 +12954,12 @@
     "source": "Navegación",
     "files": [
       "app.html"
+    ]
+  },
+  "s_c40165ee": {
+    "source": "Gold (+$0.03)",
+    "files": [
+      "js/higher-rate.js"
     ]
   },
   "s_c4032edd": {
@@ -14796,7 +14861,8 @@
   "s_deca50a1": {
     "source": "Guardar cambios",
     "files": [
-      "js/finance.js"
+      "js/finance.js",
+      "js/higher-rate.js"
     ]
   },
   "s_deed570c": {
@@ -15163,12 +15229,6 @@
     "source": "Gasolina",
     "files": [
       "js/finance.js"
-    ]
-  },
-  "s_e4625882": {
-    "source": "Ver y editar promoción",
-    "files": [
-      "js/higher-rate.js"
     ]
   },
   "s_e493f5ca": {
@@ -15623,6 +15683,12 @@
       "app.html"
     ]
   },
+  "s_eb76da7f": {
+    "source": "Faltan",
+    "files": [
+      "js/finance.js"
+    ]
+  },
   "s_eb8b17fb": {
     "source": "El respaldo contiene llamadas inválidas. Tus datos actuales no se cambiaron.",
     "files": [
@@ -15633,6 +15699,12 @@
     "source": "Caminar a la derecha",
     "files": [
       "js/game-battle.js"
+    ]
+  },
+  "s_eb9a5910": {
+    "source": "Cumplida",
+    "files": [
+      "js/finance.js"
     ]
   },
   "s_ebad7b06": {
@@ -16975,6 +17047,7 @@
   "s_fdf3e8d5": {
     "source": "En progreso",
     "files": [
+      "js/finance.js",
       "js/positive-reinforcement.js"
     ]
   },
@@ -17018,6 +17091,12 @@
     "source": "No se guardó el plan. Tus metas anteriores se conservaron.",
     "files": [
       "js/finance-planning.js"
+    ]
+  },
+  "s_fee72da9": {
+    "source": "Bronce (+$0.01)",
+    "files": [
+      "js/higher-rate.js"
     ]
   },
   "s_fef0ec5d": {

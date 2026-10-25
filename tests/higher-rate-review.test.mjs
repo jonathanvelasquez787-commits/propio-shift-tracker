@@ -1,3 +1,6 @@
+import fs from 'node:fs';
+import vm from 'node:vm';
+import { parse } from 'acorn';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { higherRateWindowReview, higherRateCorrectionPlan } from '../js/higher-rate-review.js';
@@ -164,4 +167,45 @@ test('interrupted correction storage restores promotion, finance and preserved b
   h.accepted = true;
   assert.equal(await applyHigherRateCorrection('hr', null, h.stamp()), true);
   assert.equal(h.writes, 2); assert.equal(h.effects, 1);
+});
+
+function inlineEditor(h) {
+  const source = fs.readFileSync(new URL('../js/higher-rate.js', import.meta.url), 'utf8');
+  const node = parse(source, { ecmaVersion: 'latest', sourceType: 'module' }).body.find(n => n.declaration?.id?.name === 'saveHigherRateWindowDraft').declaration;
+  const context = vm.createContext({ applyHigherRateCorrection, renderedHigherRateEditStamp: h.stamp(), dayKeyFromIsoDate: x => x, translateText: x => x, toast() {} });
+  vm.runInContext(source.slice(node.start, node.end), context);
+  const values = { '.hr-window-date-input': window.date, '.hr-window-start-input': '10:00', '.hr-window-end-input': '11:00', '.hr-window-tier-input': 'gold' };
+  return { save: () => context.saveHigherRateWindowDraft({ getAttribute: () => 'hr', querySelector: selector => ({ value: values[selector] }) }), values };
+}
+
+test('restored inline promotion editor preserves earned bonuses through the guarded transaction', async t => {
+  const h = transactionFixture(t);
+  delete calls[0].frozenHigherRateBonus;
+  const editor = inlineEditor(h);
+  assert.equal(await editor.save(), true);
+  assert.equal(settings.higherRateWindows[0].start, '10:00');
+  assert.equal(settings.higherRateWindows[0].tier, 'gold');
+  assert.equal(higherRateBonusForCall(calls[0]).amount, .2);
+  assert.equal(calls[0].frozenHigherRateBonus.windowId, 'hr');
+  assert.equal(h.writes, 1);
+});
+
+test('restored inline promotion editor rejects stale drafts and invalid times without writes', async t => {
+  const h = transactionFixture(t), editor = inlineEditor(h);
+  settings.exchangeRate = 30;
+  const changed = JSON.stringify({ settings, calls });
+  assert.equal(await editor.save(), false);
+  assert.equal(JSON.stringify({ settings, calls }), changed);
+  const fresh = inlineEditor(h);
+  fresh.values['.hr-window-end-input'] = '10:00';
+  assert.equal(await fresh.save(), false);
+  assert.equal(h.writes, 0);
+});
+
+test('restored inline promotion editor rolls back rejected saves without losing recorded money', async t => {
+  const h = transactionFixture(t), editor = inlineEditor(h), before = JSON.stringify({ settings, calls });
+  h.accepted = false;
+  assert.equal(await editor.save(), false);
+  assert.equal(JSON.stringify({ settings, calls }), before);
+  assert.equal(h.effects, 0);
 });

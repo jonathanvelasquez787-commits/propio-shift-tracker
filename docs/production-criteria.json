@@ -506,7 +506,10 @@
             "Higher Rate review handles overnight calls and zero-duration records without manufacturing a 24-hour window",
             "correction previews release only the selected promotion and recompute the highest remaining bonus without mutating calls",
             "correction transactions roll back rejected finance and bonus changes, then persist exactly once and survive reload",
-            "interrupted correction storage restores promotion, finance and preserved bonuses before retry"
+            "interrupted correction storage restores promotion, finance and preserved bonuses before retry",
+            "restored inline promotion editor preserves earned bonuses through the guarded transaction",
+            "restored inline promotion editor rejects stale drafts and invalid times without writes",
+            "restored inline promotion editor rolls back rejected saves without losing recorded money"
           ]
         },
         {
@@ -1767,7 +1770,10 @@
         {
           "file": "tests/higher-rate-review.test.mjs",
           "namedCases": [
-            "the unified promotion editor previews and preserves earned bonuses before moving its window"
+            "the unified promotion editor previews and preserves earned bonuses before moving its window",
+            "restored inline promotion editor preserves earned bonuses through the guarded transaction",
+            "restored inline promotion editor rejects stale drafts and invalid times without writes",
+            "restored inline promotion editor rolls back rejected saves without losing recorded money"
           ]
         }
       ]

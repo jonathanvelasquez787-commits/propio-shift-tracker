@@ -224,7 +224,7 @@ test('finance preview localizes allocated and saved labels without translating p
 test('Higher Rate history singular and plural render in English with unchanged window identities', t => {
   setLanguage('en'); t.after(() => setLanguage('es'));
   const elements = new Map(['higherRateWindowsList', 'higherRateHistoryList', 'higherRateHistoryTitle', 'higherRateActiveCountPill'].map(id => [id, { innerHTML: '' }]));
-  const h = vm.createContext({ ui, translateText, translateMarkup,
+  const h = vm.createContext({ ui, translateText, translateMarkup, settings: {}, calls: [],
     document: { getElementById: id => elements.get(id) || null },
     higherRateWindowIsPast: window => window.past,
     renderHigherRateWindowRow: window => `<div data-window-id="${window.id}"></div>`,

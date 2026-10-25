@@ -31,6 +31,19 @@ export async function openHigherRateReview(windowId) {
     data: () => ({ owner: settings, windows: settings.higherRateWindows || [], calls }), openModal, closeModal }, windowId);
 }
 
+
+export async function saveHigherRateWindowDraft(row) {
+  const id = row.getAttribute('data-hr-window-id');
+  const draft = { date: dayKeyFromIsoDate(row.querySelector('.hr-window-date-input').value),
+    start: row.querySelector('.hr-window-start-input').value,
+    end: row.querySelector('.hr-window-end-input').value,
+    tier: row.querySelector('.hr-window-tier-input').value };
+  const stamp = renderedHigherRateEditStamp && { ...renderedHigherRateEditStamp, used: false };
+  const saved = await applyHigherRateCorrection(id, draft, stamp, 'preserve');
+  if (!saved) toast(translateText('No se aplicó. Revisá el guardado y volvé a calcular; los datos pudieron cambiar.'));
+  return saved;
+}
+
 export async function applyHigherRateCorrection(windowId, draft, stamp, mode = 'recalculate') {
   const view = await loadDetailViews();
   if (!view || !stamp || stamp.used || !canPersistLocalChanges() || stamp.owner !== settings
@@ -225,18 +238,44 @@ export async function applyHigherRateCorrection(windowId, draft, stamp, mode = '
       return active ? `${meta.label} +${money(meta.bonusPerMin)}` : meta.label;
     }
 
-    // BUG-016 (QA ) — Pedido del usuario: el `.hr-window-date-input` que arma esta función llevaba min/max agregados (ver el atributo en el template de abajo) para no aceptar años absurdos (0999/9999) sin ninguna validación
+    // Los límites de fecha del editor coinciden con la validación de la transacción.
     function renderHigherRateWindowRow(w) {
       const tier = HIGHER_RATE_TIERS[w.tier] ? w.tier : 'bronze';
-      return ui`<div class="hr-window-card" data-hr-window-id="${escapeHtml(w.id || '')}" data-tier="${tier}">
-        <div class="hr-window-top"><div class="hr-window-day"><span class="hr-window-day-icon" aria-hidden="true">${iconHtml('calendar')}</span><div class="hr-window-day-text"><div class="hr-window-day-name">${escapeHtml(hrWindowWeekdayLabel(w.date))}</div><strong>${escapeHtml(formatCallDayLabel(w.date))}</strong></div></div><button type="button" class="hr-window-remove-btn" data-remove-hr-window aria-label="Eliminar ventana">×</button></div>
-        <div class="hr-window-time"><span class="hr-window-time-icon" aria-hidden="true">${iconHtml('clock')}</span><strong>${escapeHtml(timeLabel(w.start))}</strong><span class="hr-time-sep" aria-hidden="true">–</span><strong>${escapeHtml(timeLabel(w.end))}</strong></div>
-        <div class="hr-window-tier-row"><span class="hr-window-tier-label">${escapeHtml(HIGHER_RATE_TIERS[tier].label)}</span></div>
-        <button type="button" class="gap-edit-btn" data-review-hr-window>Ver y editar promoción</button>
-      </div>`;
-
+      const tierButtonsHtml = ['bronze', 'silver', 'gold'].map(t => {
+        const active = t === tier;
+        return ui`<button type="button" class="hr-window-tier-btn" data-hr-tier-btn data-tier="${t}" aria-pressed="${active ? 'true' : 'false'}">${escapeHtml(hrTierButtonLabel(t, active))}</button>`;
+      }).join('');
+      return ui`
+        <div class="hr-window-card" data-hr-window-id="${escapeHtml(w.id || '')}" data-tier="${tier}">
+          <div class="hr-window-top">
+            <div class="hr-window-day">
+              <span class="hr-window-day-icon" aria-hidden="true">${iconHtml('calendar')}</span>
+              <div class="hr-window-day-text">
+                <div class="hr-window-day-name">${escapeHtml(hrWindowWeekdayLabel(w.date))}</div>
+                <input type="date" class="hr-window-date-input hr-window-date-visible" value="${escapeHtml(isoDateFromDayKey(w.date))}" title="Fecha de la ventana" min="1970-01-01" max="2099-12-31"/>
+              </div>
+            </div>
+            <button type="button" class="hr-window-remove-btn" data-remove-hr-window aria-label="Eliminar ventana"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          </div>
+          <div class="hr-window-time">
+            <span class="hr-window-time-icon" aria-hidden="true">${iconHtml('clock')}</span>
+            <input type="time" class="hr-window-start-input hr-window-time-input" value="${formatHHMM(w.start)}" title="Hora de inicio"/>
+            <span class="hr-time-sep" aria-hidden="true">–</span>
+            <input type="time" class="hr-window-end-input hr-window-time-input" value="${formatHHMM(w.end)}" title="Hora de fin"/>
+          </div>
+          <select class="alert-select hr-window-tier-input" style="display:none;">
+            <option value="bronze" ${tier === 'bronze' ? 'selected' : ''}>Bronce (+$0.01)</option>
+            <option value="silver" ${tier === 'silver' ? 'selected' : ''}>Silver (+$0.02)</option>
+            <option value="gold" ${tier === 'gold' ? 'selected' : ''}>Gold (+$0.03)</option>
+          </select>
+          <div class="hr-window-tier-row" role="group" aria-label="Nivel de la ventana">${tierButtonsHtml}</div>
+          <button type="button" class="gap-edit-btn" data-save-hr-window disabled>Guardar cambios</button>
+          <button type="button" class="gap-edit-btn" data-review-hr-window>Revisar llamadas</button>
+        </div>
+      `;
     }
     let renderedHigherRateWindows = [];
+    let renderedHigherRateEditStamp;
 
     // Total de minutos/horas del día que ya calificaron para un bono de Higher Rate, dentro del
     // propio modal — reutiliza higherRateBonusForCall (misma regla de elegibilidad de siempre, sin
@@ -404,6 +443,7 @@ export async function applyHigherRateCorrection(windowId, draft, stamp, mode = '
       if (!list || !historyList) return;
       const arr = Array.isArray(windows) ? windows : [];
       renderedHigherRateWindows = arr.map(window => ({...window}));
+      renderedHigherRateEditStamp = { owner: settings, callsOwner: calls, revision: JSON.stringify([settings, calls]), used: false };
       const isPastWindow = (w) => higherRateWindowIsPast(w);
       const active = arr.filter(w => !isPastWindow(w));
       const past = arr.filter(isPastWindow);
@@ -540,7 +580,7 @@ export async function applyHigherRateCorrection(windowId, draft, stamp, mode = '
       saveHigherRateWindowsFromEditor();
       const newCard = document.querySelector(`.hr-window-card[data-hr-window-id="${newWindow.id}"]`);
       if (newCard && newCard.scrollIntoView) newCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      openHigherRateReview(newWindow.id);
+      newCard?.querySelector('.hr-window-date-input')?.focus();
     }
 
     export function removeHigherRateWindowRowAt(id) {

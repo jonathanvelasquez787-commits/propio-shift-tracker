@@ -1,7 +1,7 @@
 import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 // app-main.js inyecta los helpers; app-context.js mantiene el estado compartido.
 import { settings, calls } from './app-context.js';
-import { configureFinancePlanning, captureFinanceDetails, financeAmountInputHtml, clearFinanceAmountDraft, financeReservationHtml, financeReservationSign, financeInputUsd, financeInputValue } from './finance-planning.js';
+import { configureFinancePlanning, captureFinanceDetails, financeAmountInputHtml, clearFinanceAmountDraft, financeReservationSign, financeInputUsd, financeInputValue } from './finance-planning.js';
 import { financeBudgetPeriod, financeReservationPlan } from './finance-plan-model.js';
 import { loadDetailViews } from './detail-views-loader.js';
 
@@ -329,26 +329,28 @@ function financeRowHtml(row, opts) {
   const isMeta = opts.isMeta;
   const remaining = Math.max(0, target - assigned);
   const barPct = target > 0 ? Math.min(100, assigned / target * 100) : 0;
-  const metrics = financeRowMetric(translateText('Reservado'), assigned)
-    + financeRowMetric(translateText('Objetivo'), target);
+  const complete = target > 0 && remaining < 0.005;
+  const badge = isMeta ? (complete ? translateText('Cumplida') : assigned > 0 ? translateText('En progreso') : translateText('Sin empezar')) : (complete ? translateText('Cubierto') : assigned > 0 ? translateText('Parcial') : translateText('Sin asignar'));
+  const tone = complete ? 'good' : assigned > 0 ? 'warn' : 'bad';
   return ui`
     <div class="fin-row" data-fin-row="${escapeHtml(row.id)}" style="--cat-rgb:${cat.rgb};">
-      <div class="fin-row-heading">
+      ${priorityHtml}
+      <span class="fin-cat-icon" aria-hidden="true">${financeCategoryIconHtml(cat)}</span>
       <div class="fin-row-main">
         <div class="fin-row-title">${escapeHtml(row.name)}</div>
-        <div class="fin-row-sub">${escapeHtml(cat.label)}${!isMeta && row.manualPaid ? ui` · Reserva automática omitida` : ''}</div>
+        <div class="fin-row-sub">${escapeHtml(cat.label)}${!isMeta ? ui` · ${row.recurring ? translateText('Recurrente') : translateText('Puntual')}` : ''}</div>
+        <div class="fin-row-amt-line"><span><b>${money(assigned)}</b>${financeConvertedInline(assigned)} de ${money(target)}${financeConvertedInline(target)} ${translateText('Reservado')}</span><span class="fin-row-restante-inline">Faltan <b>${money(remaining)}</b>${financeConvertedInline(remaining)}</span></div>
+        <div class="fin-progress-track" role="progressbar" aria-label="Progreso de la reserva" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(barPct)}"><div style="width:${barPct}%;background:var(--${complete ? 'good' : 'warn'});"></div></div>
       </div>
-      ${priorityHtml}
-      </div>
-      <div class="fin-row-metrics">${metrics}</div>
-      <div class="fin-progress-track" role="progressbar" aria-label="Progreso de la reserva" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(barPct)}"><div style="width:${barPct}%; background:var(--cyan);"></div></div>
-      ${financeReservationHtml(row, ui`<div class="fin-row-actions">
+      <span class="fin-badge tone-${tone}">${badge}</span>
+      <div class="fin-row-actions">
         ${financeAmountInputHtml(row, 'reservation')}${signPillHtml}
-        <button class="fin-mini-btn-primary ${sign === 'minus' ? 'mode-minus' : ''}" type="button" data-fin-apply="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" data-fin-help="${escapeHtml(translateText('Confirma el monto y la opción Sumar o Restar. Sumar usa solo dinero disponible; en gastos no supera el presupuesto. Restar devuelve como máximo lo reservado.'))}">Aplicar ajuste</button>
+        <button class="fin-mini-btn-primary ${sign === 'minus' ? 'mode-minus' : ''}" type="button" data-fin-apply="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" data-fin-help="${escapeHtml(translateText('Confirma el monto y la opción Sumar o Restar. Sumar usa solo dinero disponible; en gastos no supera el presupuesto. Restar devuelve como máximo lo reservado.'))}">Aplicar</button>
         ${!isMeta && assigned > 0 ? ui`<button class="fin-ghost-btn" type="button" data-fin-reset="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" data-fin-help="${escapeHtml(translateText('Devuelve toda la reserva de este gasto al Disponible. Conserva el presupuesto, los pagos registrados y la exclusión del reparto automático.'))}">Liberar reserva</button>` : ''}
-        <button class="fin-ghost-btn fin-ghost-btn-icon" type="button" data-fin-edit="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" aria-label="Editar fila" title="Editar fila">${iconHtml('edit')}</button>
-        <button class="hr-window-remove-btn" type="button" data-fin-delete="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" aria-label="Eliminar fila" title="Eliminar fila">${iconHtml('trash')}</button>
-      </div><div class="fin-reservation-pending">Faltan ${money(remaining)}${financeConvertedInline(remaining)}</div>${!isMeta ? ui`<label class="fin-checkbox-label"><input type="checkbox" data-fin-mark-paid="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" ${row.manualPaid ? 'checked' : ''}/> Omitir reserva automática</label>` : ''}`)}
+        <span class="fin-item-tools"><button class="fin-ghost-btn fin-ghost-btn-icon" type="button" data-fin-edit="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" aria-label="Editar fila" title="Editar fila">${iconHtml('edit')}</button>
+        <button class="hr-window-remove-btn" type="button" data-fin-delete="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" aria-label="Eliminar fila" title="Eliminar fila">${iconHtml('trash')}</button></span>
+      </div>
+      ${!isMeta ? ui`<label class="fin-checkbox-label"><input type="checkbox" data-fin-mark-paid="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" ${row.manualPaid ? 'checked' : ''}/> Omitir reserva automática</label>` : ''}
     </div>
   `;
 }
