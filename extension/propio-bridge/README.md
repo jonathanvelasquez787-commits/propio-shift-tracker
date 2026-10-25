@@ -220,3 +220,9 @@ confirmación: no afirma disponibilidad antes de observarla en Propio.
 Actualizar requiere recargar la extensión y las páginas cuando no haya llamada
 pendiente. Una versión anterior conserva el registro y sus automatismos, pero
 la nueva sección no recibe ese estado hasta actualizar el contenido.
+
+## Apariencia y diagnóstico
+
+La opción «Modo oscuro en Propio» se guarda en `propio-dark-mode-v1`, desactivada por defecto. El content script del portal solo alterna `data-pst-dark` en el documento superior de `interpreters.propio-ls.com/portal`. El CSS está limitado a ese atributo; no invierte imágenes/video ni recarga o pulsa controles. Desactivarlo restaura los estilos originales.
+
+«Preparación del turno» reúne el diagnóstico de conexión, horario, inicio laboral, pausas y espera antes mostrado en Ajustes de la web. El horario y el ACW se siguen calculando en el tracker; el popup no inventa un contador alternativo.

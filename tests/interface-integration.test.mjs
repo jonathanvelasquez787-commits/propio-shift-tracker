@@ -24,7 +24,8 @@ test('workday, allocation, recovery and support reside in their existing functio
 test('approved placements keep the existing Home controls and one copy of each detail',()=>{
  for(const id of ['callsSection','earningsAccordion','scheduleAccordion','blocksView','blocksCallsView'])assert.equal(within(id,'pageHome'),true,id);
  for(const id of ['earningsDayBreakdown','earningsCycleBreakdown','workDayReviewDetails'])assert.equal(within(id,'pageReports'),true,id);
- assert.equal(within('automationPanel','goalsModal'),true);
+ assert.equal(ids.has('automationPanel'),false);
+ assert.match(fs.readFileSync(new URL('../extension/propio-bridge/popup.html',import.meta.url),'utf8'),/id="automationPanel"/);
  assert.equal(ids.has('automationStatusBtn'),false);
  assert.equal(ids.has('workDayReviewBtn'),false);
  assert.equal(within('acwLiveChip','heroSection'),true);
@@ -33,5 +34,5 @@ test('approved placements keep the existing Home controls and one copy of each d
  assert.equal(pair.childNodes.filter(n=>n.tagName)[0].attrs.some(a=>a.name==='class'&&a.value==='summary-pill'),true);
  assert.equal(within('callRecordingHelp','callEditModal'),true);
  for(const id of ['workDayReviewDetails','automationPanel','callRecordingHelp'])assert.equal(within(id,'pageHome'),false,id);
- for(const id of ['automationPanel','workDayReviewDetails','earningsDayBreakdown','earningsCycleBreakdown'])assert.equal((html.match(new RegExp('id="'+id+'"','g'))||[]).length,1,id);
+ for(const id of ['workDayReviewDetails','earningsDayBreakdown','earningsCycleBreakdown'])assert.equal((html.match(new RegExp('id="'+id+'"','g'))||[]).length,1,id);
 });

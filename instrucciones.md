@@ -350,7 +350,7 @@ futura opera bajo esto, sin excepción:
   el propietario decide activarlo. ES/EN funcionan localmente sin ese servicio;
   ver [idiomas y temas](docs/idiomas-y-temas.md).
 
-- **Extensión 2.3.6 de web 645:** archivos instalados con respaldo, 21 hashes comprobados y preferencias intactas. Su activación runtime no está certificada; la última activa confirmada sigue siendo 2.3.5. Esta actualización del worker no reabre los cuatro puntos históricos del plan.
+- **Extensión 2.3.7 de web 656:** paquete preparado e instalación en la ruta existente con respaldo y preferencias conservadas. La política del navegador bloquea chrome://extensions; su recarga y activación runtime no están certificadas. La última activa confirmada sigue siendo 2.3.5. No afirmar que copiar archivos prueba su activación ni reabrir los cuatro puntos históricos del plan.
 
 **CONFIRMACIONES Y CONFIGURACIÓN LOCAL VIGENTES**
 
@@ -458,6 +458,8 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
+- Web 656 y extensión 2.3.7: ACW compacto corregido, diagnóstico de disponibilidad trasladado al popup, acceso a cierres retirado de Avisos y modo oscuro opcional del portal. La recarga de la extensión existente no pudo certificarse porque la política del navegador bloquea su página de administración.
+
 - Web 651 evita calcular los análisis mensual y de calidad mientras están plegados. El gráfico productivo calcula solo productividad y la comparación semanal solo adherencia. Índice de llamadas limitado a una lectura síncrona, descartado al terminar; controles y valores conservados. Referencias reales de Finanzas, Higher Rate y Ajustes de 631 (c178210) recuperadas fuera de Git para revisar su restauración visual.
 
 - Web 650 aplica el mock aprobado del resto de Reportes: ganado y meta del ciclo destacados, proyección identificada como estimación, racha compacta y análisis secundarios plegables. Aviso de día libre sin duplicar; controles, cálculos y datos conservados.
@@ -514,6 +516,14 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v656 — ACW proporcionado, diagnóstico en la extensión y modo oscuro de Propio.**
+
+- Corrige la herencia de fuente del chip ACW. Conserva los segundos, el origen y el cero durante llamadas/pausas; en móvil la fecha ocupa la primera fila y estado/ACW se alinean a los lados en la segunda; escritorio conserva una sola fila. Recorrido con turno, llamada, guardado y detalle de origen en cuenta ficticia a 320/375 px; claro/oscuro.
+- Retira Disponibilidad automática de Ajustes y traslada su diagnóstico al popup de 400 px, plegado en Preparación del turno. Conserva los controles y la comunicación de horario, pausas y ACW. Los metadatos del inicio laboral se validan y transfieren sin alterar decisiones de disponibilidad.
+- Extensión 2.3.7 agrega Modo oscuro en Propio, apagado por defecto, reversible y guardado por perfil. Solo modifica apariencia en el portal superior de Propio; no recarga, pulsa controles ni filtra imágenes/video. 1.141 pruebas correctas; cambios intercalados, persistencia fallida, alcance y desactivación. No se certificó visualmente en una sesión real de Propio.
+- Retira de Avisos el acceso Ver cierres guardados; el historial y sus datos siguen en Logros. La administración chrome://extensions fue bloqueada por la política del navegador: no intentar eludirla ni afirmar que la nueva versión está activa sin evidencia.
+
+
 **v655 — Inicio compacto y resumen de Higher Rate reducido.**
 
 - El resumen diario de Higher Rate conserva sus tres métricas con menos padding, cifras más pequeñas y distribución adaptable.
@@ -525,9 +535,3 @@ futura opera bajo esto, sin excepción:
 
 - Retira Guardar cambios y Revisar llamadas de las tarjetas por pedido del propietario. Fecha, horas y nivel se guardan automáticamente con conservación de bonos; los cambios rápidos se procesan en orden sin reemplazar otros borradores ni mezclar propietarios.
 - Corrige la revisión obsoleta después de agregar una ventana, que rechazaba el primer cambio de fecha. Actualiza el día de la semana y conserva las ventanas existentes. Tres regresiones nuevas; 1.137 pruebas correctas y dos ventanas del 26/10 comprobadas tras recarga con datos ficticios.
-
-
-**v653 — Finanzas 601 y editor de Higher Rate completos.**
-
-- Finanzas recupera las tarjetas por categoría, barras, totales y Sumar/Restar/Aplicar visibles de la referencia 601 aprobada. Conserva las reglas contables actuales, la conversión precisa, exclusiones y liberación de reservas; no recupera el registro de pagos ni borra datos históricos.
-- Completa la restauración parcial de Higher Rate 652: fecha, horas y los tres niveles editables en cada tarjeta. Guardar cambios usa la transacción actual con conservación de bonos; Revisar llamadas mantiene la corrección con impacto previo. Tres regresiones nuevas verifican bonos, borradores obsoletos, horas inválidas y rechazo de guardado. 1.134 pruebas correctas; validación visual en ambos temas y 320/620/1365 px con datos ficticios.

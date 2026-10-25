@@ -15,6 +15,7 @@ function fixture() {
     state: { shiftStartedAt: iso('18:00:00'), shiftEndedAt: null, activeCall: null, activePause: null, pauseHistory: [], lastCallEndedAt: iso('18:10:00') },
     calls: [{ startISO: iso('18:01:00'), endISO: iso('18:10:00') }], settings: { lateArrivalMode: 'anchor' },
     localStorageRevision: { isCurrent: () => true }, todayCallDateKey: () => '10/15/2026',
+    getWorkSessionStatus: () => ({ startedAt: iso('18:00:00'), endedAt: null, manual: true, callAtStart: false }),
     getShiftWindow: () => ({ start: '18:00', end: '22:00' }), getDayNote: () => null,
     callDateToDate: () => new Date(iso('00:00:00')), dateAtTime: (date, time) => new Date(iso(time + ':00')),
     referenceDurationMinForActivePause: () => 10, currentShiftAccountingDayKey: () => '10/15/2026',
@@ -35,6 +36,8 @@ test('bridge plan shares the visible ACW anchor with elapsed seconds and reconci
     assert.equal(validated.acw.startedAt, iso(endedAt));
     assert.equal(validated.acw.observedAt, new Date(f.now()).toISOString());
     assert.equal(validated.acwVerified, true);
+    assert.equal(validated.workSession.startedAt, iso('18:00:00'));
+    assert.equal(validated.workSession.manual, true);
   }
 });
 

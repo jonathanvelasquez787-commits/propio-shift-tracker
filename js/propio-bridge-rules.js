@@ -31,7 +31,14 @@ export function validateBridgePlan(value, now = Date.now()) {
     Number.isFinite(acwStart) && Number.isFinite(acwObserved) && acwStart >= start - BRIDGE_MAX_AGE && acwStart <= acwObserved &&
     acwStart < end && acwObserved <= now + 1000 && now - acwObserved <= BRIDGE_MAX_AGE
       ? { startedAt: new Date(acwStart).toISOString(), observedAt: new Date(acwObserved).toISOString() } : null;
+  const work = value.workSession, workStart = typeof work?.startedAt === 'string' ? Date.parse(work.startedAt) : NaN;
+  const workEnd = typeof work?.endedAt === 'string' ? Date.parse(work.endedAt) : NaN;
+  const workSession = Number.isFinite(workStart) && Math.abs(workStart - now) <= BRIDGE_MAX_AGE
+    ? { startedAt: new Date(workStart).toISOString(),
+      endedAt: Number.isFinite(workEnd) && Math.abs(workEnd - now) <= BRIDGE_MAX_AGE && workEnd <= now ? new Date(workEnd).toISOString() : null,
+      manual: work.manual === true, callAtStart: work.callAtStart === true } : null;
   return { startAt: new Date(start).toISOString(), endAt: new Date(end).toISOString(), hasCall: value.hasCall === true, ended: value.ended === true,
+    workSession,
     acw, acwVerified: value.acwVerified !== false && (value.acw === null || !!acw),
     lastCallEndedAt: typeof value.lastCallEndedAt === 'string' && Date.parse(value.lastCallEndedAt) >= start && Date.parse(value.lastCallEndedAt) <= Math.min(now, end) ? new Date(value.lastCallEndedAt).toISOString() : null,
     scheduledPauses, scheduleVerified: Array.isArray(value.scheduledPauses) && value.scheduleVerified !== false,
