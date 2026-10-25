@@ -1717,6 +1717,14 @@
             "export snapshots call amounts and bonuses before the optional document module loads",
             "PDF displays the selected scope, totals and safe call text without inline event handlers"
           ]
+        },
+        {
+          "file": "tests/reports-lazy-render.test.mjs",
+          "namedCases": [
+            "productive minutes retain ordering, fractions and exclusions without computing gaps or bonuses",
+            "closed monthly analysis skips history work; reopening uses current data and current width",
+            "report call index is scoped to one read, preserves alternate sources and resets after errors"
+          ]
         }
       ]
     },

@@ -8,7 +8,7 @@ let dayShiftBounds, effectiveCycleGoal, effectiveDailyGoal, effectiveHistoryStar
 let financeConvertedInline, financeConvertedNote, formatCallDayLabel, formatDuration, formatMinutes;
 let getActiveDayKey, getCycleGoalOverride, iconHtml, importedCallStats, money, onGameDayMetadataChanged, pad, previousCalendarDay;
 let productiveMinutesForDay, saveSettingsOnly, todayCallDateKey, todayRange, weekDaysForOffset, weekSummaryForOffset;
-let render;
+let render, parseMoney, higherRateBonusForCalls;
 
 export function configureReportsContext(context) {
   ({ CYCLE_LENGTH_DAYS, RATE, callDateToDate, callsForDay, connectedMinutesForDay, convertedAmountText,
@@ -17,7 +17,7 @@ export function configureReportsContext(context) {
     financeConvertedNote, formatCallDayLabel, formatDuration, formatMinutes, getActiveDayKey,
     getCycleGoalOverride, iconHtml, importedCallStats, money, onGameDayMetadataChanged, pad, previousCalendarDay,
     productiveMinutesForDay, saveSettingsOnly, todayCallDateKey, todayRange, weekDaysForOffset,
-    weekSummaryForOffset, render } = context);
+    weekSummaryForOffset, render, parseMoney, higherRateBonusForCalls } = context);
 }
 
 function reportsDailySeries(days = 14) {
@@ -98,7 +98,8 @@ function reportsMonthlySeries(offset = 0, monthsCount = REPORTS_MONTHLY_PAGE_SIZ
         if (historyStartRange && d < historyStartRange) continue;
         const dayKey = todayCallDateKey(d);
         const dayCalls = callsForDay(dayKey);
-        earnings += importedCallStats(dayCalls, dayKey).earnings;
+        const sorted = [...dayCalls].sort((a, b) => new Date(a.startISO) - new Date(b.startISO));
+        earnings += sorted.reduce((sum, call) => sum + parseMoney(call.pay), 0) + higherRateBonusForCalls(sorted);
         const isOff = dayIsEffectivelyOff(dayKey);
         if (!isOff) {
           workedDays++;
@@ -122,6 +123,8 @@ function reportsMonthlySeries(offset = 0, monthsCount = REPORTS_MONTHLY_PAGE_SIZ
 }
 
 export function renderReportsMonthlyChart() {
+  const disclosure = document.getElementById('rptMonthlyDetails');
+  if (disclosure && !disclosure.open) return;
   const svg = document.getElementById('rptMonthlyChartSvg');
   const rangeLabel = document.getElementById('rptMonthlyRangeLabel');
   const nextBtn = document.getElementById('rptMonthlyNextBtn');
@@ -255,7 +258,14 @@ function reportsQualityOfTime(dayKey = getActiveDayKey()) {
 }
 
 function reportsAdherenceStats() {
-  const series = reportsDailySeries(7).filter(r => r.adherencePct !== null);
+  const end = todayRange();
+  const series = [];
+  for (let offset = 6; offset >= 0; offset--) {
+    const dayKey = todayCallDateKey(new Date(end.getFullYear(), end.getMonth(), end.getDate() - offset));
+    if (dayIsEffectivelyOff(dayKey)) continue;
+    const adherence = dayAdherence(dayKey);
+    if (adherence) series.push({adherencePct: adherence.scorePct});
+  }
   const today = dayAdherence(getActiveDayKey());
   if (!series.length) return { todayPct: today ? today.scorePct : null, bestPct: null, worstPct: null, avgPct: null };
   const pcts = series.map(r => r.adherencePct);
@@ -528,7 +538,11 @@ export function renderReportsDashboard() {
   // Gráfica de 14 días (productivo real vs meta diaria constante)
   const chartSvg = document.getElementById('rptChartSvg');
   if (chartSvg) {
-    const series = reportsDailySeries(14);
+    const end = todayRange();
+    const series = Array.from({length:14}, (_, index) => {
+      const date = new Date(end.getFullYear(), end.getMonth(), end.getDate() - 13 + index);
+      return {productive:productiveMinutesForDay(todayCallDateKey(date))};
+    });
     const goalMin = Number(settings.productiveGoalMin || 0);
     const maxVal = Math.max(goalMin, ...series.map(r => r.productive), 1);
     const w = 600, h = 140, pad = 6;
@@ -558,7 +572,9 @@ export function renderReportsDashboard() {
 
   // Tri-grid: Actividad de hoy / Calidad del tiempo (dona) / Adherencia (arco)
   const triGrid = document.getElementById('rptTriGrid');
-  if (triGrid) {
+  const qualityDetails = document.getElementById('rptQualityDetails');
+  const qualityVisible = !qualityDetails || qualityDetails.open;
+  if (triGrid && qualityVisible) {
     const stats = importedCallStats(callsForDay(dayKey), dayKey);
     const prevKey = todayCallDateKey(previousCalendarDay(callDateToDate(dayKey) || new Date()));
     const prevStats = importedCallStats(callsForDay(prevKey), prevKey);
@@ -661,7 +677,7 @@ export function renderReportsDashboard() {
 
   // Tendencias vs 7 días anteriores + % Billable/Dropped semanal (nuevo)
   const trendRow = document.getElementById('rptTrendRow');
-  if (trendRow) {
+  if (trendRow && qualityVisible) {
     const t = reportsTrends();
     const bd = reportsWeekBillableDropped(0);
     trendRow.innerHTML = [
