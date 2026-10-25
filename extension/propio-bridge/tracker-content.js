@@ -55,6 +55,11 @@
         ? packet.plan.scheduledPauses.map(slot => ({ type: slot?.type, startedAt: slot?.startedAt, endedAt: slot?.endedAt })) : [];
       if (plan) plan.scheduleVerified = Array.isArray(packet.plan.scheduledPauses) && packet.plan.scheduledPauses.length <= 100;
       if (plan) plan.lastCallEndedAt = typeof packet.plan.lastCallEndedAt === 'string' ? packet.plan.lastCallEndedAt : null;
+      if (plan) {
+        const work = packet.plan.workSession;
+        plan.workSession = work && typeof work.startedAt === 'string'
+          ? { startedAt: work.startedAt, endedAt: work.endedAt, manual: work.manual === true, callAtStart: work.callAtStart === true } : null;
+      }
       if (plan) plan.automationLease = packet.plan.automationLease && typeof packet.plan.automationLease === 'object'
         ? { version: packet.plan.automationLease.version, owner: packet.plan.automationLease.owner, grantedAt: packet.plan.automationLease.grantedAt, expiresAt: packet.plan.automationLease.expiresAt } : null;
       if (plan && Object.prototype.hasOwnProperty.call(packet.plan, 'acw')) plan.acw = packet.plan.acw === null ? null

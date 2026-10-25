@@ -1,0 +1,14 @@
+html[data-pst-dark]{color-scheme:dark;background:#0b1220!important;color:#e7edf6!important}
+html[data-pst-dark] :is(body,app-root,main,app-header,app-interpreter-portal,.main-content,.content-wrapper,.mat-drawer-container,.mat-drawer-content,.mat-sidenav-container){background-color:#0b1220!important;color:#e7edf6!important}
+html[data-pst-dark] :is(.card,.panel,.well,.mat-card,.mat-mdc-card,.mat-toolbar,.mat-table,.mat-mdc-table,table,.mat-menu-panel,.mat-mdc-menu-panel,.dropdown-menu,.modal-content,.mat-dialog-container,.mat-mdc-dialog-surface,.mat-select-panel,.mat-mdc-select-panel,.mat-expansion-panel,.bg-white,.bg-light){background-color:#142136!important;color:#e7edf6!important;border-color:#34445b!important}
+html[data-pst-dark] :is(.card-header,.card-footer,.panel-heading,.panel-footer,thead,th,.mat-header-cell,.mat-mdc-header-cell){background-color:#1d2d44!important;color:#f1f5fb!important;border-color:#34445b!important}
+html[data-pst-dark] :is(td,.mat-cell,.mat-mdc-cell,.mat-expansion-panel-header,.mat-menu-item,.mat-mdc-menu-item,.dropdown-item,.list-group-item){color:#e7edf6!important;border-color:#34445b!important}
+html[data-pst-dark] :is(.list-group-item,.table-striped>tbody>tr:nth-of-type(odd),.table-hover>tbody>tr:hover,.dropdown-item:hover,.mat-menu-item:hover,.mat-mdc-menu-item:hover){background-color:#1b2c44!important}
+html[data-pst-dark] :is(input,textarea,select,.form-control,.mat-form-field-flex,.mat-mdc-text-field-wrapper){background-color:#101c2f!important;color:#e7edf6!important;border-color:#50627b!important;caret-color:#e7edf6}
+html[data-pst-dark] :is(input,textarea)::placeholder{color:#a8b8ce!important;opacity:1}
+html[data-pst-dark] :is(.text-dark,.text-body,.mat-form-field-label,.mat-mdc-floating-label,.mat-select-value,.mat-mdc-select-value,.mat-expansion-panel-header-title,.mat-tab-label,.mat-mdc-tab,.mat-mdc-dialog-title){color:#e7edf6!important}
+html[data-pst-dark] :is(.text-muted,.mat-hint,.mat-mdc-form-field-hint,.mat-expansion-panel-header-description){color:#adbed4!important}
+html[data-pst-dark] :is(.btn-default,.btn-light,.btn-outline-secondary,.mat-button,.mat-mdc-button){background-color:#22344d!important;color:#e7edf6!important;border-color:#50627b!important}
+html[data-pst-dark] a:not(.btn){color:#80d5ff!important}
+html[data-pst-dark] :is(hr,.divider,.mat-divider){border-color:#34445b!important}
+html[data-pst-dark] :is(.mat-icon,.mat-mdc-icon-button){color:inherit}

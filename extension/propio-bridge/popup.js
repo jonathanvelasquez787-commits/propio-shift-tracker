@@ -1,4 +1,6 @@
 import { automationStatusView } from '../../js/automation-status.js';
+import { installAutomationStatusUi } from '../../js/automation-ui.js';
+import { portalDarkKey } from './portal-dark-mode.js';
 document.getElementById('extensionVersion').textContent = chrome.runtime.getManifest().version;
 let nativeLayout = null, layoutChoice = null;
 
@@ -41,10 +43,13 @@ const availabilityReasons = {
   'device-passive': 'Solo registro en esta PC. No pulsa Start Calls ni Stop Calls ni termina pausas automáticamente.',
   coordination: 'Esperando permiso de la nube para esta PC. Otra PC puede estar usando los iniciadores. El registro continúa; pausá la PC anterior y esperá hasta 30 segundos.',
 };
-let busy = false, feedback = '';
+let busy = false, feedback = '', automationUi = null, workSession = null;
 async function refresh() {
   const state = await send({ kind: 'status' });
   if (!state || state.ok === false) throw new Error('status');
+  workSession = state.preparation?.plan?.workSession || null;
+  automationUi ||= installAutomationStatusUi({ getWorkSession: () => workSession });
+  automationUi.update(state.automationStatus || null);
   document.getElementById('status').textContent = state.mode === 'auto' ? 'Registro automático activo' : state.paired ? 'Listo para registrar' : 'Buscando Propio Shift Tracker';
   document.getElementById('detail').textContent = feedback || reasons[state.attention] || (state.paired ? state.mode === 'auto' ? 'El registro automático está activo.' : 'Activá el registro cuando quieras comenzar.' : 'Se vincula automáticamente al reconocer tu sesión en Propio Shift Tracker.');
   document.getElementById('detail').classList.toggle('error', Boolean(feedback || state.attention));
@@ -197,4 +202,34 @@ document.getElementById('originalLayout').addEventListener('change', async event
     try { const values = await chrome.storage.local.get(layoutKey); renderLayout(values[layoutKey]); } catch {}
     document.getElementById('originalLayoutStatus').textContent = 'No se pudo guardar. Se conserva la elección anterior; reintentá.';
   } finally { layoutBusy = false; event.target.disabled = false; }
+});
+
+let darkBusy = false, darkRevision = 0, darkChoice = false;
+function renderPortalDark(value) {
+  darkChoice = value?.enabled === true;
+  document.getElementById('portalDark').checked = darkChoice;
+  document.getElementById('portalDarkStatus').textContent = darkChoice
+    ? 'Activado. Tu elección se recuerda en este navegador.'
+    : 'Desactivado. Propio conserva sus colores originales.';
+}
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area !== 'local' || !changes[portalDarkKey]) return;
+  darkRevision++;
+  renderPortalDark(changes[portalDarkKey].newValue);
+});
+const initialDarkRevision = darkRevision;
+chrome.storage.local.get(portalDarkKey).then(values => {
+  if (darkRevision === initialDarkRevision) renderPortalDark(values[portalDarkKey]);
+}).catch(() => { document.getElementById('portalDarkStatus').textContent = 'No se pudo leer la preferencia. Reintentá al abrir la extensión.'; });
+document.getElementById('portalDark').addEventListener('change', async event => {
+  if (darkBusy) return;
+  const enabled = event.target.checked;
+  darkBusy = true; event.target.disabled = true;
+  try {
+    await chrome.storage.local.set({ [portalDarkKey]: { enabled } });
+    renderPortalDark({ enabled });
+  } catch {
+    renderPortalDark({ enabled: darkChoice });
+    document.getElementById('portalDarkStatus').textContent = 'No se pudo guardar. Se conserva la elección anterior; reintentá.';
+  } finally { darkBusy = false; event.target.disabled = false; }
 });

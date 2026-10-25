@@ -1,5 +1,9 @@
-import { ui, translateText, displayLocale } from './i18n.js';
 import { AUTOMATION_STATUS_MAX_AGE, validateAutomationStatus, automationStatusView } from './automation-status.js';
+
+// The extension popup uses Spanish independently of the tracker's language.
+const translateText = text => text;
+const displayLocale = () => 'es-MX';
+const ui = (parts, ...values) => parts.map((part, index) => part + (values[index] ?? '')).join('');
 
 function momentLabel(value, now) {
   if (typeof value !== 'string' || !Number.isFinite(Date.parse(value))) return '';

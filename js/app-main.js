@@ -5273,12 +5273,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       const owner=settings,view=await loadDetailViews({retry:true});
       if(owner!==settings||!document.getElementById('notificationsModal').classList.contains('open'))return;
       if (!view) return;
-      view.renderNotificationReview({ui,translateText,escapeHtml,settings,productive:minutesSinceLastProductiveBreakAnchor,soundConfigs:Object.values(ALARM_SOUND_CONFIGS),valid:()=>owner===settings,navigate:kind=>{
-        if(kind==='history'){ closeModal('notificationsModal');navigateToPage('achievements'); }
-        const target=document.getElementById(kind==='support'?'positiveSettingsAccordion':'positiveHistoryPanel');
-        if(kind==='support')target.open=true;
-        target.scrollIntoView({block:'start'});target.setAttribute('tabindex','-1');target.focus({preventScroll:true});
-      }});
+      view.renderNotificationReview({ui,translateText,escapeHtml,settings,productive:minutesSinceLastProductiveBreakAnchor,soundConfigs:Object.values(ALARM_SOUND_CONFIGS),valid:()=>owner===settings});
     }
 
 
@@ -7955,6 +7950,7 @@ export function getPropioBridgePlan() {
     .map(slot => ({ type: slot.type, startedAt: new Date(slot.startedAt).toISOString(), endedAt: new Date(slot.endedAt).toISOString() }));
   const acwStart = computeCurrentAcwStart();
   return { startAt: start.toISOString(), endAt: end.toISOString(),
+    workSession: getWorkSessionStatus(),
     scheduledPauses,
     acw: acwStart ? { startedAt: acwStart.toISOString(), observedAt: day.toISOString() } : null,
     lastCallEndedAt: [state.lastCallEndedAt, ...calls.map(call => call.endISO || call.records?.propio?.endISO)]
