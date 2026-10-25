@@ -471,6 +471,7 @@ export function renderReportsDashboard() {
   const notEvaluated=day.kind==='nodata'?translateText('Sin registros: meta sin evaluar'):day.kind==='off'?translateText('Día libre: meta sin evaluar'):null;
   const conclusion=document.getElementById('rptDayConclusion');
   if(conclusion){
+    conclusion.hidden = !!notEvaluated;
     const text=day.kind==='nodata'?translateText('Sin actividad registrada para este día. No se considera una meta incumplida.')
       :day.kind==='off'?translateText('Día libre. La actividad registrada se conserva sin juzgar la meta del día.')
       :day.kind==='met'?translateText('Tu meta de productividad está alcanzada.')
@@ -486,7 +487,7 @@ export function renderReportsDashboard() {
     const adherenceHistory = reportsAdherenceStats();
     const commonComparison = [kpi.productiveDeltaMin, kpi.adherenceDeltaPts, kpi.earningsDelta].every(value => value === null || !Number.isFinite(value));
     const status = document.getElementById('rptGoalsStatus');
-    if (status) { status.textContent = notEvaluated || ''; status.hidden = !notEvaluated; }
+    if (status) { status.textContent = day.kind === 'off' ? translateText('Día libre: metas sin evaluar. Tu actividad registrada se conserva.') : notEvaluated || ''; status.hidden = !notEvaluated; }
     const comparison = document.getElementById('rptGoalsComparison');
     if (comparison) { comparison.textContent = commonComparison ? translateText('Sin comparación disponible con ayer') : ''; comparison.hidden = !commonComparison; }
     const history = document.getElementById('rptAdherenceHistoryContent');
@@ -604,9 +605,6 @@ export function renderReportsDashboard() {
     `;
   }
 
-  // "Ganancias del ciclo" se simplifica (mejor/ peor día se quita de aquí — se queda solo en la
-  // tarjeta de Adherencia de arriba, era el mismo dato repetido dos veces) y gana una tarjeta de
-  // Proyección.
   const cycleGrid = document.getElementById('rptCycleGrid');
   if (cycleGrid) {
     const c = reportsCycleBreakdown();
@@ -622,6 +620,25 @@ export function renderReportsDashboard() {
         ? translateText('Sin días laborales')
         : ui`~${pace.perDayHours.toFixed(1)} h/día`;
     cycleGrid.innerHTML = ui`
+      <div class="rpt-mini-card rpt-cycle-card">
+        <div class="rpt-cycle-top"><span class="rpt-mini-title">Ganado hasta ahora</span><strong class="rpt-cycle-percent">${Math.round(c.pctOfGoal)}%</strong></div>
+        <div class="rpt-cycle-amt">${money(c.amount)}</div>
+        ${financeConvertedNote(c.amount)}
+        <div class="rpt-cycle-progress" role="progressbar" aria-label="Meta del ciclo" aria-valuenow="${Math.round(c.pctOfGoal)}" aria-valuemin="0" aria-valuemax="100"><div style="width:${Math.min(100, Math.max(0,c.pctOfGoal))}%;"></div></div>
+        <div class="rpt-cycle-goal"><span>Meta ${money(c.goal)}${financeConvertedInline(c.goal)}</span><button class="tbl-icon-btn" type="button" data-edit-card="cycle-goal" aria-label="Editar meta del ciclo">${iconHtml('edit')} <span>Editar meta</span></button></div>
+        <div class="gh-goal-foot">${c.isCustomGoal ? translateText('Meta personalizada') : translateText('Sugerida automáticamente')}</div>
+        <div class="rpt-mini-stats" style="margin-top:10px;">
+          <div>Trabajo<b>${money(c.trabajo)}</b>${financeConvertedNote(c.trabajo)}</div>
+          <div>Higher Rate<b>${money(c.higherRate)}</b>${financeConvertedNote(c.higherRate)}</div>
+        </div>
+      </div>
+      <div class="rpt-mini-card polished-forecast">
+        <div class="rpt-mini-title">${iconHtml('chart')} PROYECCIÓN DEL CICLO</div>
+        <div class="polished-hero"><span class="polished-eyebrow">Estimación con el promedio del ciclo</span><strong class="polished-amount">${money(proj.projected)}${financeConvertedInline(proj.projected)}</strong><div class="polished-days"><span>${proj.daysElapsed}/${CYCLE_LENGTH_DAYS} días transcurridos</span><span>${proj.daysRemaining} días restantes</span></div></div>
+        <div class="polished-pace"><span class="polished-eyebrow">Para llegar a tu meta</span><strong>${escapeHtml(paceText)}</strong>${!pace.met&&pace.workDaysLeft>0?ui`<span class="polished-amount">${money(pace.perDayUsd)}${financeConvertedInline(pace.perDayUsd)}</span><p>por día laboral · ${pace.workDaysLeft} restantes</p>`:pace.met?ui`<p>Todo lo que ganes de aquí en adelante es extra</p>`:ui`<p>No quedan días laborales en el ciclo.</p>`}</div>
+        <div class="polished-pace"><span>Falta para la meta del ciclo</span><strong>${money(pace.remainingUsd)}${financeConvertedInline(pace.remainingUsd)}</strong></div>
+        <details class="polished-disclosure"><summary>Cómo se calcula la proyección</summary><div class="polished-detail"><div class="review-line"><span>Ganado en el ciclo</span><strong>${money(c.amount)}${financeConvertedInline(c.amount)}</strong></div><div class="review-line"><span>Promedio por día natural</span><strong>${money(proj.dailyAvg)}${financeConvertedInline(proj.dailyAvg)}</strong></div><div class="review-line"><span>vs tu meta del ciclo</span><strong style="color:var(--${projTone});">${projDelta >= 0 ? '+' : ''}${money(projDelta)}${financeConvertedInline(projDelta)}</strong></div><p class="note">Divide las ganancias registradas del ciclo, incluido Higher Rate, entre los días naturales transcurridos y extiende ese promedio al ciclo completo. Cuenta días libres y hoy, aunque todavía esté incompleto. No predice nuevas promociones ni garantiza ese ingreso.</p><p class="note">El ritmo para llegar a la meta usa los días laborales restantes; es un cálculo distinto.</p></div></details>
+      </div>
       <div class="rpt-mini-card rpt-streak-card">
         <div class="rpt-mini-title">${iconHtml('flame')} RACHA DE CUMPLIMIENTO</div>
         <div class="rpt-streak-main">
@@ -635,28 +652,6 @@ export function renderReportsDashboard() {
           <input type="checkbox" id="streakSkipOffToggle" ${skipOff ? 'checked' : ''}/>
           Un día libre/sin turno no corta la racha (se salta)
         </label>
-      </div>
-      <div class="rpt-mini-card rpt-cycle-card">
-        <div class="gh-ring-wrap" style="flex-direction:row; justify-content:flex-start; gap:12px; margin-bottom:12px;">
-          <div class="gh-ring" style="--ring-pct:${c.pctOfGoal};"><span class="gh-ring-value">${Math.round(c.pctOfGoal)}%</span></div>
-          <div style="min-width:0;">
-            <div class="rpt-cycle-amt">${money(c.amount)}</div>
-            ${financeConvertedNote(c.amount)}
-            <div class="gh-ring-label" style="text-align:left; white-space:normal;">de tu meta ${money(c.goal)}${financeConvertedInline(c.goal)}${c.isCustomGoal ? '' : ' (auto)'}</div>
-          </div>
-        </div>
-        <div class="gh-goal-foot"><span>${c.isCustomGoal ? translateText('Meta personalizada') : translateText('Sugerida automáticamente')}</span><button class="tbl-icon-btn" type="button" data-edit-card="cycle-goal" aria-label="Editar meta del ciclo">${iconHtml('edit')}</button></div>
-        <div class="rpt-mini-stats" style="margin-top:10px;">
-          <div>Trabajo<b>${money(c.trabajo)}</b>${financeConvertedNote(c.trabajo)}</div>
-          <div>Higher Rate<b>${money(c.higherRate)}</b>${financeConvertedNote(c.higherRate)}</div>
-        </div>
-      </div>
-      <div class="rpt-mini-card polished-forecast">
-        <div class="rpt-mini-title">${iconHtml('chart')} PROYECCIÓN DEL CICLO</div>
-        <div class="polished-hero"><span class="polished-eyebrow">Con el promedio del ciclo</span><strong class="polished-amount">${money(proj.projected)}${financeConvertedInline(proj.projected)}</strong><div class="polished-days"><span>${proj.daysElapsed}/${CYCLE_LENGTH_DAYS} días transcurridos</span><span>${proj.daysRemaining} días restantes</span></div></div>
-        <div class="polished-pace"><span class="polished-eyebrow">Para llegar a tu meta</span><strong>${escapeHtml(paceText)}</strong>${!pace.met&&pace.workDaysLeft>0?ui`<span class="polished-amount">${money(pace.perDayUsd)}${financeConvertedInline(pace.perDayUsd)}</span><p>por día laboral · ${pace.workDaysLeft} restantes</p>`:pace.met?ui`<p>Todo lo que ganes de aquí en adelante es extra</p>`:ui`<p>No quedan días laborales en el ciclo.</p>`}</div>
-        <div class="polished-pace"><span>Falta para la meta del ciclo</span><strong>${money(pace.remainingUsd)}${financeConvertedInline(pace.remainingUsd)}</strong></div>
-        <details class="polished-disclosure"><summary>Cómo se calcula la proyección</summary><div class="polished-detail"><div class="review-line"><span>Ganado en el ciclo</span><strong>${money(c.amount)}${financeConvertedInline(c.amount)}</strong></div><div class="review-line"><span>Promedio por día natural</span><strong>${money(proj.dailyAvg)}${financeConvertedInline(proj.dailyAvg)}</strong></div><div class="review-line"><span>vs tu meta del ciclo</span><strong style="color:var(--${projTone});">${projDelta >= 0 ? '+' : ''}${money(projDelta)}${financeConvertedInline(projDelta)}</strong></div><p class="note">Divide las ganancias registradas del ciclo, incluido Higher Rate, entre los días naturales transcurridos y extiende ese promedio al ciclo completo. Cuenta días libres y hoy, aunque todavía esté incompleto. No predice nuevas promociones ni garantiza ese ingreso.</p><p class="note">El ritmo para llegar a la meta usa los días laborales restantes; es un cálculo distinto.</p></div></details>
       </div>
     `;
     const streakToggle = document.getElementById('streakSkipOffToggle');

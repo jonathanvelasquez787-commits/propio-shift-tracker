@@ -576,7 +576,7 @@
 <div class="rpt-cycle-layout">
 <div class="rpt-cycle-grid" id="rptCycleGrid"></div>
 
-<section class="card span-12" id="earningsDetailsSection"><div class="section-title"><div><h2>Desglose de ganancias</h2><p>Base registrada, estimaciones y Higher Rate.</p></div></div>
+<details class="polished-disclosure" id="earningsDetailsSection"><summary>Desglose de ganancias <span class="rpt-detail-label">Día y ciclo</span></summary><div class="rpt-earnings-details-body">
 <details class="fin-preview earnings-breakdown" id="earningsDayBreakdown">
 <summary class="fin-preview-head"><span class="fin-preview-title">Ganancias del día</span><span aria-hidden="true">⌄</span></summary>
 <div data-earnings-breakdown aria-live="polite"></div>
@@ -585,9 +585,9 @@
 <summary class="fin-preview-head"><span class="fin-preview-title">Ganancias del ciclo</span><span aria-hidden="true">⌄</span></summary>
 <div data-earnings-breakdown aria-live="polite"></div>
 </details>
-</section>
+</div></details>
 </div>
-<details class="accordion-card" id="weekSummaryAccordion" open>
+<details class="accordion-card" id="weekSummaryAccordion">
 <summary>
   <div class="accordion-head">
     <h2>Resumen semanal</h2>
@@ -624,6 +624,7 @@
 <svg id="rptChartSvg" viewBox="0 0 600 140" width="100%" height="140" preserveAspectRatio="none"></svg>
 </div>
 
+<details class="polished-disclosure rpt-analysis-detail" id="rptMonthlyDetails"><summary>Ganancias y adherencia por mes</summary><div class="rpt-analysis-body">
 <div class="rpt-section-head">
 <div class="rpt-section-title" id="rptSecMonthly"></div>
 <div class="week-nav" style="margin:0;">
@@ -638,6 +639,9 @@
 <svg id="rptMonthlyChartSvg" viewBox="0 0 600 170" width="100%" height="170"></svg>
 </div>
 
+</div></details>
+
+<details class="polished-disclosure rpt-analysis-detail" id="rptHoursDetails"><summary>Llamadas por hora del día <span class="rpt-detail-label">14 días</span></summary><div class="rpt-analysis-body">
 <div class="rpt-section-head">
 <div class="rpt-section-title" id="rptSecHours"></div>
 <div class="rpt-sel-pill">14 días</div>
@@ -646,7 +650,9 @@
 <div class="rpt-hour-bars" id="rptHourBars"></div>
 </div>
 
-<div class="rpt-section-head">
+</div></details>
+
+<details class="polished-disclosure rpt-analysis-detail" id="rptQualityDetails"><summary>Calidad y adherencia</summary><div class="rpt-analysis-body"><div class="rpt-section-head">
 <div class="rpt-section-title" id="rptSecQuality"></div>
 </div>
 <div class="rpt-tri-grid" id="rptTriGrid"></div>
@@ -654,12 +660,12 @@
 <div class="rpt-section-head" style="margin-bottom:8px;">
 <div class="rpt-section-title" style="text-transform:uppercase;">Tendencias (vs 7 días anteriores)</div>
 </div>
-<div class="rpt-trend-row" id="rptTrendRow"></div>
+<div class="rpt-trend-row" id="rptTrendRow"></div></div></details>
 </div>
 
 
 <div class="day-stats-grid" id="dayStatsGrid">
-<details class="accordion-card" id="statsAccordion" open>
+<details class="accordion-card" id="statsAccordion">
 <summary>
 <div class="accordion-head">
 <h2>📊 Detalle de llamadas de hoy</h2>

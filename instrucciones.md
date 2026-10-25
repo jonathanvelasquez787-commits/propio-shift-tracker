@@ -458,6 +458,8 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
+- Web 650 aplica el mock aprobado del resto de Reportes: ganado y meta del ciclo destacados, proyección identificada como estimación, racha compacta y análisis secundarios plegables. Aviso de día libre sin duplicar; controles, cálculos y datos conservados.
+
 - Web 649 aplica el mock aprobado de objetivos y jornada: tres métricas alineadas; comparación semanal y jornada a todo el ancho debajo. Un único aviso de día sin evaluar y comparación sin ayer cuando aplica a las tres; comparaciones individuales conservadas cuando difieren. Cálculos, controles, moneda y datos se conservan.
 
 - Web 648 aplica el mock aprobado de Ajustes: idioma, meta, tarifa y moneda visibles; Perfil y cuenta, Ciclo de pago, Copias y exportación y Disponibilidad plegables. Borrar cuenta queda al final en un grupo separado, conservando confirmación y validación de propietario. Los 65 ids anteriores de Ajustes y todos sus handlers se conservan. Las copias inyectadas se ubican en su grupo. No cambia el modelo de datos ni la extensión.
@@ -510,6 +512,11 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v650 — Reportes jerarquizados según mock aprobado.**
+
+- Ganancias y meta del ciclo a la izquierda, proyección a la derecha, racha debajo; el mismo diseño se apila en móvil. Desglose, resumen semanal y análisis secundarios plegados.
+- Información y controles existentes conservados; aviso de día libre consolidado. Validación visual, pruebas, wiring, traducciones y compilación.
+
 **v649 — Objetivos alineados y jornada fuera de la columna de Adherencia.**
 
 - Detalles semanales y jornada debajo de las tres métricas, con estado plegable estable al actualizar datos. Mismo diseño adaptable en claro/oscuro.
@@ -519,8 +526,3 @@ futura opera bajo esto, sin excepción:
 
 - Un mismo diseño adaptable en claro/oscuro; ajustes diarios a mano y detalles plegados. Respaldos y contabilidad agrupados, cuenta separada al final.
 - Se conservan ids, campos, listeners y confirmaciones; la inserción de copias cambia solo de ubicación. Validación de wiring, traducciones, build y recorridos con datos ficticios.
-
-**v647 — Finanzas simplificada según mock aprobado.**
-
-- Filas con Reservado y Objetivo, progreso y ajustes plegados; controles de prioridad y moneda conservados. Sin planificador, pagos mensuales ni estimador de meses en la interfaz. Datos heredados preservados.
-- Exclusión automática accesible dentro de cada reserva; próxima prioridad continúa con Metas. Comprobaciones de reservas, persistencia, traducciones, wiring y compilación. Detalle en docs/finanzas-reservas-y-recepciones.md.
