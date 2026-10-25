@@ -458,7 +458,7 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
-- Web 656 y extensión 2.3.7: ACW compacto corregido, diagnóstico de disponibilidad trasladado al popup, acceso a cierres retirado de Avisos y modo oscuro opcional del portal. La recarga de la extensión existente no pudo certificarse porque la política del navegador bloquea su página de administración.
+- Web 657 y extensión 2.3.7: ACW compacto corregido, diagnóstico de disponibilidad trasladado al popup, acceso a cierres retirado de Avisos y modo oscuro opcional del portal. La recarga de la extensión existente no pudo certificarse porque la política del navegador bloquea su página de administración.
 
 - Web 651 evita calcular los análisis mensual y de calidad mientras están plegados. El gráfico productivo calcula solo productividad y la comparación semanal solo adherencia. Índice de llamadas limitado a una lectura síncrona, descartado al terminar; controles y valores conservados. Referencias reales de Finanzas, Higher Rate y Ajustes de 631 (c178210) recuperadas fuera de Git para revisar su restauración visual.
 
@@ -516,6 +516,12 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v657 — Estado, fecha y ACW en una sola fila, también en móvil.**
+
+- Corrige la interpretación visual de 656: elimina la composición de dos filas. Mantiene las tres píldoras alineadas, sin salto, con fecha completa, segundos y estado legibles. En móvil compacto, el acceso a Hoy usa un icono con etiqueta accesible y el reloj decorativo se omite; se conservan todos los controles.
+- La comparación de fuentes queda fuera del grupo de tres píldoras para que no lo desplace. Verificación real de geometría y captura a 320/375 px, estados en inglés/español, llamada activa y ACW posterior. No modifica duración, pago ni datos de llamadas.
+
+
 **v656 — ACW proporcionado, diagnóstico en la extensión y modo oscuro de Propio.**
 
 - Corrige la herencia de fuente del chip ACW. Conserva los segundos, el origen y el cero durante llamadas/pausas; en móvil la fecha ocupa la primera fila y estado/ACW se alinean a los lados en la segunda; escritorio conserva una sola fila. Recorrido con turno, llamada, guardado y detalle de origen en cuenta ficticia a 320/375 px; claro/oscuro.
@@ -529,9 +535,3 @@ futura opera bajo esto, sin excepción:
 - El resumen diario de Higher Rate conserva sus tres métricas con menos padding, cifras más pequeñas y distribución adaptable.
 - El contador ACW queda a la derecha del selector de fecha y junto al estado, con segundos y origen conservados. Muestra cero cuando no hay tramo activo y evita abrir un origen inexistente. Retira el resumen de disponibilidad de Inicio; su detalle permanece en Ajustes.
 - Retira la ayuda introductoria de Llamadas y el acceso Ver jornada de Inicio; la tarjeta de llamada solo aparece durante una llamada real o pendiente, conservando sus acciones. Jornada sigue en Reportes. Validados estados activo/pendiente/inactivo, traducciones, wiring, pruebas y compilación.
-
-
-**v654 — Higher Rate automático y ventanas futuras.**
-
-- Retira Guardar cambios y Revisar llamadas de las tarjetas por pedido del propietario. Fecha, horas y nivel se guardan automáticamente con conservación de bonos; los cambios rápidos se procesan en orden sin reemplazar otros borradores ni mezclar propietarios.
-- Corrige la revisión obsoleta después de agregar una ventana, que rechazaba el primer cambio de fecha. Actualiza el día de la semana y conserva las ventanas existentes. Tres regresiones nuevas; 1.137 pruebas correctas y dos ventanas del 26/10 comprobadas tras recarga con datos ficticios.
