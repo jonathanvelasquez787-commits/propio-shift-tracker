@@ -1,11 +1,11 @@
-# Propio · Tracker y vista original · 2.3.10
+# Propio · Tracker y vista original · 2.3.11
 
 La extensión conecta Propio Shift Tracker con la sesión y el historial de Propio. Su
 registro de llamadas funciona independientemente de la apariencia del portal.
 
 El popup de Chrome contiene las opciones de la extensión; su versión se lee
 del manifest instalado, igual que en Administrar extensiones. El diagnóstico de disponibilidad, conexión y preparación del turno está en
-«Preparación del turno», dentro del popup. La app web y la extensión tienen versiones separadas.
+«Qué hará la extensión ahora», dentro de «Actividad y ayuda» en el popup. La app web y la extensión tienen versiones separadas.
 
 La cola informa cuántos eventos faltan y cuándo vence el más antiguo (24 horas).
 Son señales de llamada, sesión o historial, no llamadas adicionales. Los vencidos
@@ -14,7 +14,7 @@ pestaña cuando ya existe. [Uso y límites](../../docs/revision-llamadas-e-impor
 
 ## Vista original de Propio
 
-«Usar la vista original de Propio» recupera la vista nativa que todavía incluye
+«Vista original» recupera la vista nativa que todavía incluye
 el portal: barra turquesa, Calls, Minutes, Pay e iconos. Apagado por defecto,
 guarda la elección en el perfil de Chrome. Al apagarlo vuelve a la selección
 normal de Propio. No crea una barra alternativa ni calcula totales propios.
@@ -48,7 +48,7 @@ el diagnóstico técnico dentro de Detalles para soporte, cerrado por defecto.
 
 ## Sesión y Shift
 
-«Al comenzar mi turno» es una opción separada; el primer vínculo automático la prepara y después conserva tu elección. Lee el horario actual de la cuenta vinculada mientras hay una sola pestaña lista de Propio Shift Tracker; descarta el plan cuando Propio Shift Tracker deja de estar disponible. Con registro activo, sesión reconocida y un solo portal, a partir de la hora de inicio pulsa únicamente Start Calls si el botón habilitado y el estado Offline están confirmados. Sirve también al entrar tarde, mientras el turno no haya terminado. Respeta los Break/Lunch programados aunque no hayas iniciado una pausa en la aplicación; al terminar el intervalo puede comenzar la preparación pendiente. Exige que Propio Shift Tracker transmita el horario completo de pausas; con una versión anterior abierta espera a que se recargue. Si dejás pasar una llamada y volvés a Offline, reintenta con un intervalo mínimo de 15 segundos. Al conectar la primera llamada, registra la finalización de esta preparación y no la reactiva al recargar ni al apagar/encender la opción durante el mismo turno. Nunca pulsa Accept, Reject ni controles de video/terceros; vos elegís qué tomar. Stop Calls se usa únicamente al esperar entre llamadas. Un Stop manual pausa los automatismos. No actúa con estado ambiguo, llamada activa, horarios faltantes o finalizados, día libre ni varias pestañas del portal.
+«Estar disponible al iniciar el turno» es una opción separada; el primer vínculo automático la prepara y después conserva tu elección. Lee el horario actual de la cuenta vinculada mientras hay una sola pestaña lista de Propio Shift Tracker; descarta el plan cuando Propio Shift Tracker deja de estar disponible. Con registro activo, sesión reconocida y un solo portal, a partir de la hora de inicio pulsa únicamente Start Calls si el botón habilitado y el estado Offline están confirmados. Sirve también al entrar tarde, mientras el turno no haya terminado. Respeta los Break/Lunch programados aunque no hayas iniciado una pausa en la aplicación; al terminar el intervalo puede comenzar la preparación pendiente. Exige que Propio Shift Tracker transmita el horario completo de pausas; con una versión anterior abierta espera a que se recargue. Si dejás pasar una llamada y volvés a Offline, reintenta con un intervalo mínimo de 15 segundos. Al conectar la primera llamada, registra la finalización de esta preparación y no la reactiva al recargar ni al apagar/encender la opción durante el mismo turno. Nunca pulsa Accept, Reject ni controles de video/terceros; vos elegís qué tomar. Stop Calls se usa únicamente al esperar entre llamadas. Un Stop manual pausa los automatismos. No actúa con estado ambiguo, llamada activa, horarios faltantes o finalizados, día libre ni varias pestañas del portal.
 
 Reconoce localmente el encabezado visible «Welcome, … (ID)» del portal. Con automático activado, la primera detección inicia el Shift; si ya estaba abierto, conserva su hora. Desde 1.5.1, pulsar Sign out y completar la redirección de esa pestaña a propio.com o www.propio.com termina el Shift vinculado, sin tener que abrir Login otra vez. El clic se comunica antes de abandonar el portal; el worker confirma la navegación aun cuando desaparece el script de la página. Usa webNavigation con filtros para esos dos hosts y no persiste direcciones. Un clic sin redirección, una visita desde la barra de direcciones, Back, recargar u otra pestaña no termina el turno. Volver al formulario visible `#loginform` sigue confirmando el cierre si la sesión expiró. Una llamada automática pendiente se cierra antes del turno con tiempo estimado hasta esa detección. No cierra llamadas manuales sin revisión.
 
