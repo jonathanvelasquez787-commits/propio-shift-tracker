@@ -47,7 +47,7 @@ html:root[data-palette]:not([data-palette="original"]) .hero { background:linear
 html:root[data-palette]:not([data-palette="original"]) .brand { color:var(--pale-cyan); background:rgba(var(--palette-primary-rgb),.08); border-color:rgba(var(--palette-primary-rgb),.24); }
 html:root[data-palette]:not([data-palette="original"]) :is(.chip,.summary-pill,.hero-action-btn):not(.danger) { background:var(--panel-2); border-color:var(--line); color:var(--text); }
 html:root[data-palette]:not([data-palette="original"]) .hero-action-btn.danger { background:rgba(var(--bad-rgb),.06); color:var(--bad); border-color:rgba(var(--bad-rgb),.25); }
-html:root[data-palette]:not([data-palette="original"]) .clockbox { background:var(--panel-2); color:var(--text); border:1px solid var(--line); }
+html:root[data-palette]:not([data-palette="original"]) .clockbox { background:transparent; color:var(--text); border:0; padding:0; box-shadow:none; }
 html:root[data-palette]:not([data-palette="original"]) .clockbox .clock { color:var(--text) !important; }
 html:root[data-palette]:not([data-palette="original"]) .clockbox .date { color:var(--muted) !important; }
 html:root[data-palette]:not([data-palette="original"]) .action-btn[data-accent="cyan"] { --palette-active-ink:var(--palette-on-cyan); }

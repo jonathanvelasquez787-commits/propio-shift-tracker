@@ -458,6 +458,8 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
+- Web 663: alinea estado, ACW, reloj y fecha en Inicio; elimina el fondo del reloj, baja solo 8 px la hora en móvil y abrevia la frase a «Jamás negocio con mis excusas». Compacta acciones de turno y llamadas, limita la barra de llamada al ancho del layout, acorta la animación de pulsación y diferencia fondos/tarjetas en las siete paletas claras y oscuras. Los cuatro iconos superiores del menú móvil quedan tal como estaban en 662. «Vista esencial» sigue disponible. Extensión 2.3.10 sin cambios; su activación runtime sigue sin certificarse.
+
 - Web 662: la barra superior de llamada adopta el diseño de la ficha anterior, oculta la ficha duplicada durante llamada activa y conserva recuperación de pendientes. Botones de turno y llamadas compactados. Extensión 2.3.10 sin cambios; su activación runtime sigue sin certificarse.
 
 - Web 651 evita calcular los análisis mensual y de calidad mientras están plegados. El gráfico productivo calcula solo productividad y la comparación semanal solo adherencia. Índice de llamadas limitado a una lectura síncrona, descartado al terminar; controles y valores conservados. Referencias reales de Finanzas, Higher Rate y Ajustes de 631 (c178210) recuperadas fuera de Git para revisar su restauración visual.
@@ -521,12 +523,12 @@ futura opera bajo esto, sin excepción:
 - En el portal original, los contadores nativos de llamadas, minutos y pago usan chips de Material con texto e iconos oscuros; el indicador de conexión usa colores de estado propios. El tema oscuro ahora da contraste a los chips, nombre e iconos, y conserva colores distintos para conectado, desconectado, ocupado, error y advertencia.
 - La corrección se limita a apariencia con el tema activo; sin tocar estados, registro, permisos ni datos. Validar los estados con una página local basada en las clases observadas y comprobar reversión a claro. No afirmar activación runtime sin evidencia.
 
-**v661 — Acciones de turno y llamadas.**
-
-- Turno a la izquierda en escritorio, con iconos circulares; en móvil, «Tu turno» reúne los tres botones y Llamadas usa una acción a todo el ancho con dos debajo. IDs, estados, temporizadores, colores y animaciones conservados.
-- Comprobación con cuenta ficticia, temas claro y oscuro, escritorio y 320/390 px; turno, pausa, llamada, historial y acceso a importar. Compilación y 1.142 pruebas correctas. La extensión no cambia.
-
 **v662 — Llamada unificada y acciones compactas.**
 
 - La barra fija durante la llamada usa el diseño de la ficha anterior con contador, Guardar y Descartar; la ficha duplicada se oculta solo para la llamada activa y la recuperación pendiente se conserva. Los botones de turno y llamadas se compactan.
 - Verificado con cuenta ficticia en móvil y escritorio, temas claro y oscuro, guardado, descarte y pausa; se conservan temporizadores y animaciones. La extensión no cambia.
+
+**v663 — Ajustes aprobados de Inicio y paletas.**
+
+- Estado, ACW y fecha comparten una fila; reloj sin fondo y a la derecha del saludo, con ajuste vertical solo en móvil. Frase abreviada, botones compactos, barra de llamada dentro del layout y respuesta visual de pulsación más rápida. No se reordena el menú móvil superior ni se retira «Vista esencial».
+- Siete paletas con fondos y tarjetas distinguibles en claro y oscuro; contraste de texto y separación de superficies comprobados automáticamente. Extensión sin cambios.

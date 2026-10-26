@@ -31,6 +31,7 @@ test('all custom palettes have readable normal text and restore original without
   for (const mode of ['light', 'dark']) for (const palette of PALETTES.slice(1)) {
     const tokens = paletteTokens(palette, mode);
     for (const color of ['--text', '--muted', '--primary']) assert.ok(contrast(tokens[color], tokens['--panel']) >= 4.5, `${palette.id}/${mode}/${color}`);
+    assert.ok(contrast(tokens['--bg'], tokens['--panel']) >= (mode === 'light' ? 1.18 : 1.25), `${palette.id}/${mode}: page and cards must remain distinct`);
     applySavedColors({ palette: palette.id, theme: mode, language: 'en' }, root);
     assert.equal(root.lang, 'en');
     assert.equal(properties.get('--bg'), tokens['--bg']);

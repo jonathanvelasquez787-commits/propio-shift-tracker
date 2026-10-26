@@ -5765,7 +5765,10 @@ function renderHeader() {
   const hasShift = !!shiftBounds.start;
 
   document.getElementById('clockNow').textContent = clockTimeVisible ? fmtTime(now) : '--:--:--';
-  document.getElementById('clockDate').textContent = fmtDate(callDateToDate(dayKey) || now);
+  const selectedDay = callDateToDate(dayKey) || now;
+  document.getElementById('clockDate').textContent = window.innerWidth <= 760
+    ? new Intl.DateTimeFormat(displayLocale(), { day: '2-digit', month: '2-digit', year: 'numeric' }).format(selectedDay)
+    : fmtDate(selectedDay);
   document.getElementById('stateText').textContent = translateText(currentStateLabel());
   const continuationHint = document.getElementById('pauseContinuationHint');
   if (continuationHint) continuationHint.hidden = !state.activePause?.continuationClosedPause;
@@ -5811,7 +5814,7 @@ function renderHeader() {
   }
   const greetingTitleEl = document.getElementById('greetingTitle');
   if (greetingTitleEl) greetingTitleEl.textContent = greetingText(now);
-  const greetingSubtitleText = translateText('Jamás negocio con mis excusas: no hacer nada también es una. Doy el primer paso y avanzo hasta lograr lo que me propongo.');
+  const greetingSubtitleText = translateText('Jamás negocio con mis excusas');
   const greetingSubtitleEl = document.getElementById('greetingSubtitle');
   if (greetingSubtitleEl && greetingSubtitleEl.textContent !== greetingSubtitleText) {
     greetingSubtitleEl.textContent = greetingSubtitleText;
@@ -7784,7 +7787,7 @@ export function render() {
         btn.classList.remove('is-pressed');
         void btn.offsetWidth;
         btn.classList.add('is-pressed');
-        setTimeout(() => btn.classList.remove('is-pressed'), 550);
+        setTimeout(() => btn.classList.remove('is-pressed'), 260);
         return;
       }
 
@@ -7796,7 +7799,7 @@ export function render() {
       });
 
       const accentRgb = getComputedStyle(btn).getPropertyValue('--accent-rgb').trim() || '47, 213, 255';
-      const DURATION = 620;
+      const DURATION = 260;
 
       // El relleno tipo onda: crece, se sostiene un instante, se retrae.
       ripple.animate([
