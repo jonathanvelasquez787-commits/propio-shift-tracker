@@ -350,7 +350,7 @@ futura opera bajo esto, sin excepción:
   el propietario decide activarlo. ES/EN funcionan localmente sin ese servicio;
   ver [idiomas y temas](docs/idiomas-y-temas.md).
 
-- **Extensión 2.3.7 de web 656:** paquete preparado e instalación en la ruta existente con respaldo y preferencias conservadas. La política del navegador bloquea chrome://extensions; su recarga y activación runtime no están certificadas. La última activa confirmada sigue siendo 2.3.5. No afirmar que copiar archivos prueba su activación ni reabrir los cuatro puntos históricos del plan.
+- **Extensión 2.3.8 de web 660:** actualización de contraste preparada para la ruta existente, con respaldo y preferencias conservadas. La política del navegador bloquea chrome://extensions; su recarga y activación runtime no están certificadas para 2.3.8. El DOM real del 26/10 confirmó el atributo del tema oscuro de la entrega anterior, pero no identifica por sí solo la versión del manifest. No afirmar que copiar archivos prueba su activación ni reabrir los cuatro puntos históricos del plan.
 
 **CONFIRMACIONES Y CONFIGURACIÓN LOCAL VIGENTES**
 
@@ -458,7 +458,7 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
-- Web 659 y extensión 2.3.7: ACW compacto corregido, diagnóstico de disponibilidad trasladado al popup, acceso a cierres retirado de Avisos y modo oscuro opcional del portal. La recarga de la extensión existente no pudo certificarse porque la política del navegador bloquea su página de administración.
+- Web 660 y extensión 2.3.8: ACW compacto corregido, diagnóstico de disponibilidad trasladado al popup, acceso a cierres retirado de Avisos y modo oscuro opcional del portal. La recarga de la extensión existente no pudo certificarse porque la política del navegador bloquea su página de administración.
 
 - Web 651 evita calcular los análisis mensual y de calidad mientras están plegados. El gráfico productivo calcula solo productividad y la comparación semanal solo adherencia. Índice de llamadas limitado a una lectura síncrona, descartado al terminar; controles y valores conservados. Referencias reales de Finanzas, Higher Rate y Ajustes de 631 (c178210) recuperadas fuera de Git para revisar su restauración visual.
 
@@ -516,6 +516,12 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**v660 — Contraste real de Propio y cabecera compacta.**
+
+- Inspección del DOM real de Propio identificó fondos claros en app-background, app-component-background y mat-mdc-paginator, además de títulos y mat-label negros. Extensión 2.3.8 cubre esos selectores y estados inhabilitados sin cambiar controles habilitados ni automatismos. Revisión de CSS con las clases reales y apagado reversible; no confundir el escenario local con activación de 2.3.8 en Chrome.
+- Estado y ACW se agrupan con reloj/fecha, alineados a su base cuando caben. A 320 px el bloque se compacta sin la separación excesiva, estado/ACW siguen juntos. Recorrido con llamada real de prueba local, guardado, segundos de ACW, fecha larga, Hoy y ambos temas.
+- Web 659 ya estaba fusionada/publicada al retomar el 26/10. Se conservan sus traslados de Inicio y fecha única. 2.3.8 requiere verificar activación; la página de administración sigue bajo el bloqueo documentado, no eludirlo.
+
 **v659 — Fecha única bajo el reloj y detalles en su sección.**
 
 - El selector con calendario, anterior/siguiente y regreso a Hoy vive debajo del reloj. La fecha larga muestra el día consultado y conserva los mismos ids/listeners; se elimina la fecha duplicada de la fila de estado/ACW.
@@ -526,9 +532,3 @@ futura opera bajo esto, sin excepción:
 
 - El aviso de Higher Rate dentro de Ganancias reúne etiqueta, fecha abreviada, rango horario completo en formato 24 h y nivel en una sola línea. Reduce padding, tipografía y decoración sin ocultar la hora final. Conserva el estado activo y sus minutos restantes.
 - Regresión bilingüe verifica fecha, inicio/fin, nivel y regreso al detalle activo. Comprobación visual de ancho/alto y una sola línea en móvil y escritorio. Conserva íntegra la fila única de estado/fecha/ACW de 657.
-
-
-**v657 — Estado, fecha y ACW en una sola fila, también en móvil.**
-
-- Corrige la interpretación visual de 656: elimina la composición de dos filas. Mantiene las tres píldoras alineadas, sin salto, con fecha completa, segundos y estado legibles. En móvil compacto, el acceso a Hoy usa un icono con etiqueta accesible y el reloj decorativo se omite; se conservan todos los controles.
-- La comparación de fuentes queda fuera del grupo de tres píldoras para que no lo desplace. Verificación real de geometría y captura a 320/375 px, estados en inglés/español, llamada activa y ACW posterior. No modifica duración, pago ni datos de llamadas.

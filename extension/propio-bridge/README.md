@@ -1,12 +1,11 @@
-# Propio · Tracker y vista original · 2.3.6
+# Propio · Tracker y vista original · 2.3.8
 
 La extensión conecta Propio Shift Tracker con la sesión y el historial de Propio. Su
 registro de llamadas funciona independientemente de la apariencia del portal.
 
 El popup de Chrome contiene las opciones de la extensión; su versión se lee
-del manifest instalado, igual que en Administrar extensiones. La sección
-«Disponibilidad automática» está en Ajustes de la aplicación y presenta los datos
-que comunica la extensión. La app web y la extensión tienen versiones separadas.
+del manifest instalado, igual que en Administrar extensiones. El diagnóstico de disponibilidad, conexión y preparación del turno está en
+«Preparación del turno», dentro del popup. La app web y la extensión tienen versiones separadas.
 
 La cola informa cuántos eventos faltan y cuándo vence el más antiguo (24 horas).
 Son señales de llamada, sesión o historial, no llamadas adicionales. Los vencidos
@@ -226,3 +225,12 @@ la nueva sección no recibe ese estado hasta actualizar el contenido.
 La opción «Modo oscuro en Propio» se guarda en `propio-dark-mode-v1`, desactivada por defecto. El content script del portal solo alterna `data-pst-dark` en el documento superior de `interpreters.propio-ls.com/portal`. El CSS está limitado a ese atributo; no invierte imágenes/video ni recarga o pulsa controles. Desactivarlo restaura los estilos originales.
 
 «Preparación del turno» reúne el diagnóstico de conexión, horario, inicio laboral, pausas y espera antes mostrado en Ajustes de la web. El horario y el ACW se siguen calculando en el tracker; el popup no inventa un contador alternativo.
+
+## Modo oscuro de Propio
+
+La opción del popup es reversible, se guarda por perfil y está apagada por defecto.
+Cubre el fondo de Propio, historial, estado de llamada, campos, calendario y
+paginación. Conserva los colores de las acciones habilitadas; los botones
+inhabilitados mantienen un contraste reducido. No filtra imágenes ni video,
+no recarga el portal y no pulsa controles de llamadas al cambiar el tema.
+Solo se aplica en el portal superior de interpreters.propio-ls.com.

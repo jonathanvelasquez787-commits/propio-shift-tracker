@@ -12,3 +12,13 @@ html[data-pst-dark] :is(.btn-default,.btn-light,.btn-outline-secondary,.mat-butt
 html[data-pst-dark] a:not(.btn){color:#80d5ff!important}
 html[data-pst-dark] :is(hr,.divider,.mat-divider){border-color:#34445b!important}
 html[data-pst-dark] :is(.mat-icon,.mat-mdc-icon-button){color:inherit}
+
+html[data-pst-dark] :is(.mat-app-background,.app-background,.basic-container-body){background-color:#0b1220!important;color:#e7edf6!important}
+html[data-pst-dark] :is(.app-component-background,.mat-mdc-paginator,.mat-calendar,.mat-datepicker-content,.mat-mdc-select-panel){background-color:#142136!important;color:#e7edf6!important;border-color:#34445b!important}
+html[data-pst-dark] :is(.header-welcome-message-font,.app-headline,.app-head-line,.call-history-container,.app-call-control-container,.mat-mdc-paginator-container,.mat-mdc-paginator-page-size-label,.mat-mdc-paginator-range-label,mat-label,.mat-datepicker-toggle,.mat-calendar-body-cell-content,.mat-calendar-period-button,.mat-calendar-arrow,.mat-calendar-previous-button,.mat-calendar-next-button){color:#e7edf6!important}
+html[data-pst-dark] .call-status-text.offline{color:#adbed4!important}
+html[data-pst-dark] :is(.mat-mdc-form-field, .mat-mdc-paginator){--mat-form-field-enabled-select-arrow-color:#adbed4;--mat-form-field-enabled-trailing-icon-color:#adbed4;--mat-form-field-enabled-leading-icon-color:#adbed4;--mdc-filled-text-field-label-text-color:#adbed4;--mdc-filled-text-field-hover-label-text-color:#e7edf6;--mdc-filled-text-field-input-text-color:#e7edf6;--mdc-outlined-text-field-outline-color:#50627b;--mat-paginator-container-text-color:#adbed4;--mat-paginator-enabled-icon-color:#e7edf6;--mat-paginator-disabled-icon-color:#62728a}
+html[data-pst-dark] :is(.mat-datepicker-toggle,.call-history-title) .mat-mdc-icon-button{color:#adbed4!important}
+html[data-pst-dark] :is(button:disabled,button.mat-mdc-button-disabled){color:#8391a6!important;background-color:#263348!important}
+html[data-pst-dark] .mat-calendar-body-cell:not(.mat-calendar-body-disabled):hover>.mat-calendar-body-cell-content{background-color:#263d5d!important}
+html[data-pst-dark] .mat-calendar-body-selected{background-color:#275b91!important;color:#fff!important}
