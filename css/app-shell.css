@@ -1133,3 +1133,65 @@ body:has(.live-activity-bar.call-active) .app { padding-top:calc(74px + env(safe
   .live-activity-bar.call-active .live-bar-save-label { position:static; width:auto; height:auto; margin:0; overflow:visible; clip:auto; }
 }
 @media (max-width:360px) { .live-activity-bar.call-active .live-bar-wave { display:none; } .live-activity-bar.call-active .live-bar-dot { width:6px; height:6px; } }
+
+/* Keep the greeting, live status and date on a compact shared grid. */
+.title-row { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:4px 14px; align-items:end; }
+.title-row > div:first-child { grid-column:1; grid-row:1; align-self:end; }
+.title-row .hero-meta-row,
+.title-row .hero-meta-row .clockbox { display:contents; }
+.title-row .hero-meta-row #clockNow { grid-column:2; grid-row:1; justify-self:end; align-self:end; font-size:clamp(24px,3vw,38px); text-align:right; }
+.title-row .hero-meta-row .day-status-controls { grid-column:1; grid-row:2; align-self:center; width:auto; margin:0; }
+.title-row .hero-meta-row .clock-date-controls { grid-column:2; grid-row:2; align-self:center; justify-content:flex-end; }
+.title-row .subtle { margin-top:5px; }
+.title-row .clockbox { background:transparent; padding:0; border-radius:0; box-shadow:none; }
+.title-row #clockNow,
+.title-row #clockDate { color:var(--text); opacity:1; }
+.title-row .clock-date-controls { color:var(--muted); }
+:root.theme-light .title-row #clockNow { color:var(--text); }
+:root.theme-light .title-row #clockDate { color:var(--muted); }
+:root.theme-light .title-row .clock-date-controls { color:var(--muted); }
+
+.chips { margin-top:8px; }
+.hero-shift-actions .action-btn { min-width:94px; min-height:53px; padding:5px 8px; gap:1px; }
+.hero-shift-actions .action-btn .action-icon-wrap { width:23px; height:23px; }
+.hero-shift-actions .action-btn .action-icon { font-size:12px; }
+.hero-shift-actions .action-btn .action-label { font-size:10px; }
+.hero-shift-actions .action-btn .action-sub { font-size:8px; }
+#callsControlsGrid .action-btn { min-height:52px; padding:7px 10px; gap:8px; }
+#callsControlsGrid .action-icon-wrap { width:30px; height:30px; }
+#callsControlsGrid .action-label { font-size:12px; }
+#callsControlsGrid .action-sub { font-size:10px; }
+
+.live-activity-bar.call-active { left:16px; right:16px; max-width:1468px; margin-inline:auto; }
+@media (min-width:901px) {
+  body.sidebar-pinned .live-activity-bar.call-active {
+    left:16px; right:auto; width:calc(100% - 312px); max-width:1468px;
+    margin-left:280px; margin-right:auto;
+  }
+}
+@media (max-width:760px) {
+  .title-row { grid-template-columns:minmax(0,1fr) auto; gap:4px 8px; }
+  .title-row > div:first-child { grid-column:1; grid-row:1; }
+  .title-row .hero-meta-row .day-status-controls { grid-column:1; grid-row:2; }
+  .title-row .hero-meta-row #clockNow { grid-column:2; grid-row:1; align-self:center; font-size:clamp(19px,5vw,25px); transform:translateY(8px); }
+  .title-row .hero-meta-row .clock-date-controls { grid-column:2; grid-row:2; }
+  .title-row .clockbox { background:transparent; padding:0; }
+  .chips > .hero-shift-actions { padding:7px; gap:5px; border-radius:14px; }
+  .hero-shift-title { font-size:13px; margin-bottom:1px; }
+  .hero-shift-actions .action-btn { min-height:54px; min-width:0; padding:5px 3px; }
+  #callsControlsGrid .action-btn { min-height:48px; padding:5px 7px; gap:5px; }
+  #callsControlsGrid .action-icon-wrap { width:27px; height:27px; }
+  #callsControlsGrid .action-label { font-size:10.5px; }
+  #callsControlsGrid .action-sub { font-size:8.5px; }
+  .live-activity-bar.call-active { left:12px; right:12px; max-width:none; }
+}
+@media (max-width:360px) {
+  .title-row .hero-meta-row #clockNow { font-size:17px; }
+  .title-row .hero-meta-row .day-status-controls { gap:3px; }
+  .title-row .hero-meta-row .day-status-controls>.chip,
+  .title-row .hero-meta-row #acwLiveChip { font-size:9px; padding:3px; }
+  .live-activity-bar.call-active .live-bar-icon-wrap { display:none; }
+  .live-activity-bar.call-active .live-bar-save,
+  .live-activity-bar.call-active .live-bar-discard { font-size:9px; padding:5px; }
+  #callsControlsGrid .action-label { font-size:9.5px; }
+}

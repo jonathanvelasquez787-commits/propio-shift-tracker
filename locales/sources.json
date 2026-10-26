@@ -1493,12 +1493,6 @@
       "app.html"
     ]
   },
-  "s_163832bc": {
-    "source": "Disponibilidad automática",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_164452f4": {
     "source": "Nivel {{v1}}",
     "files": [
@@ -3474,7 +3468,6 @@
   "s_336f3a12": {
     "source": "Esperando confirmar la conexión de la extensión",
     "files": [
-      "app.html",
       "js/automation-ui.js"
     ]
   },
@@ -3882,8 +3875,7 @@
   "s_39cef31f": {
     "source": "Ver cierres guardados",
     "files": [
-      "app.html",
-      "js/notification-review.js"
+      "app.html"
     ]
   },
   "s_39d7100c": {
@@ -4207,12 +4199,6 @@
     "source": "Estimar aporte mensual",
     "files": [
       "js/finance-planning.js"
-    ]
-  },
-  "s_3ef813be": {
-    "source": "La conexión indica cuándo la extensión reconoció tu sesión de Propio. El inicio laboral respeta tu horario o una llamada real anterior; si lo iniciás manualmente, usa esa hora.",
-    "files": [
-      "app.html"
     ]
   },
   "s_3efdd8c6": {
@@ -5119,6 +5105,13 @@
       "js/app-main.js"
     ]
   },
+  "s_4d648806": {
+    "source": "Jamás negocio con mis excusas",
+    "files": [
+      "app.html",
+      "js/app-main.js"
+    ]
+  },
   "s_4dbb712f": {
     "source": "+ Agregar",
     "files": [
@@ -5162,12 +5155,6 @@
     "source": "Usado",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_4e0e0f60": {
-    "source": "Preparación del turno",
-    "files": [
-      "app.html"
     ]
   },
   "s_4e237b85": {
@@ -5967,7 +5954,6 @@
   "s_58d22760": {
     "source": "Horario y descansos pendientes de confirmar",
     "files": [
-      "app.html",
       "js/automation-ui.js"
     ]
   },
@@ -11054,7 +11040,6 @@
   "s_a565e966": {
     "source": "Esperando tus opciones actuales",
     "files": [
-      "app.html",
       "js/automation-ui.js"
     ]
   },
@@ -11331,7 +11316,6 @@
   "s_a96f7c8e": {
     "source": "Sin conexión confirmada",
     "files": [
-      "app.html",
       "js/automation-ui.js"
     ]
   },
@@ -11356,7 +11340,6 @@
   "s_a9fbaa32": {
     "source": "Abrí Propio y comprobá que la extensión de Chrome esté activada. Los controles manuales siguen disponibles.",
     "files": [
-      "app.html",
       "js/automation-ui.js"
     ]
   },
@@ -12316,12 +12299,6 @@
       "index.html"
     ]
   },
-  "s_b9729d87": {
-    "source": "Sobre estos horarios",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_b9b75854": {
     "source": "Llamadas del día enviadas al historial recuperable",
     "files": [
@@ -12769,12 +12746,6 @@
       "js/reports.js"
     ]
   },
-  "s_c0c471a5": {
-    "source": "Tiempo para el próximo intento",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_c0c482c3": {
     "source": "MONSTRUO DEL DÍA",
     "files": [
@@ -13099,12 +13070,6 @@
   },
   "s_c683e5a6": {
     "source": "Agrega un gasto o una meta desde",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_c6863ccd": {
-    "source": "Progreso de la espera entre llamadas",
     "files": [
       "app.html"
     ]
@@ -13466,7 +13431,6 @@
   "s_cd0c0ff0": {
     "source": "Sesión de Propio pendiente de confirmar",
     "files": [
-      "app.html",
       "js/automation-ui.js"
     ]
   },
@@ -15753,13 +15717,6 @@
       "privacidad.html"
     ]
   },
-  "s_ec2ef78d": {
-    "source": "Jamás negocio con mis excusas: no hacer nada también es una. Doy el primer paso y avanzo hasta lograr lo que me propongo.",
-    "files": [
-      "app.html",
-      "js/app-main.js"
-    ]
-  },
   "s_ec6271ba": {
     "source": "Llamada actualizada",
     "files": [
@@ -16118,12 +16075,6 @@
     "source": "Sin ACW activo",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_f17ddbcf": {
-    "source": "Estado de la conexión con Propio",
-    "files": [
-      "app.html"
     ]
   },
   "s_f1912a3c": {
