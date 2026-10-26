@@ -22,3 +22,13 @@ html[data-pst-dark] :is(.mat-datepicker-toggle,.call-history-title) .mat-mdc-ico
 html[data-pst-dark] :is(button:disabled,button.mat-mdc-button-disabled){color:#959ba5!important;background-color:#2c2f35!important}
 html[data-pst-dark] .mat-calendar-body-cell:not(.mat-calendar-body-disabled):hover>.mat-calendar-body-cell-content{background-color:#34383f!important}
 html[data-pst-dark] .mat-calendar-body-selected{background-color:#386f91!important;color:#fff!important}
+
+html[data-pst-dark] .app-interpreter-name{color:#e8eaed!important}
+html[data-pst-dark] app-daily-rollup .mat-mdc-chip{background-color:#34383f!important;--mdc-chip-label-text-color:#e8eaed;--mdc-chip-with-icon-icon-color:#e8eaed;--mdc-chip-selected-label-text-color:#e8eaed}
+html[data-pst-dark] app-daily-rollup :is(.mat-mdc-chip-action,.mat-mdc-chip-action-label,.app-chip-icon){color:#e8eaed!important}
+html[data-pst-dark] .app-connection-icon{background-color:#34383f!important}
+html[data-pst-dark] .app-connection-icon .app-device-online{color:#5fdc85!important}
+html[data-pst-dark] .app-connection-icon .app-device-offline{color:#b0b5bd!important}
+html[data-pst-dark] .app-connection-icon .app-device-busy{color:#ff7278!important}
+html[data-pst-dark] .app-connection-icon .app-device-error{color:#ff7278!important}
+html[data-pst-dark] .app-connection-icon .app-device-warning{color:#ffad63!important}
