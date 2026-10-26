@@ -458,7 +458,7 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
-- Web 660 y extensión 2.3.10: ACW compacto corregido, diagnóstico de disponibilidad trasladado al popup, acceso a cierres retirado de Avisos y modo oscuro opcional del portal. La recarga de la extensión existente no pudo certificarse porque la política del navegador bloquea su página de administración.
+- Web 661: acciones de turno alineadas a la izquierda en escritorio con iconos circulares; en móvil se agrupan en «Tu turno» y las acciones de llamadas pasan a una fila principal y dos inferiores. Se conservan controles, colores, animaciones y comportamiento. Extensión 2.3.10 sin cambios; su activación runtime sigue sin certificarse.
 
 - Web 651 evita calcular los análisis mensual y de calidad mientras están plegados. El gráfico productivo calcula solo productividad y la comparación semanal solo adherencia. Índice de llamadas limitado a una lectura síncrona, descartado al terminar; controles y valores conservados. Referencias reales de Finanzas, Higher Rate y Ajustes de 631 (c178210) recuperadas fuera de Git para revisar su restauración visual.
 
@@ -526,8 +526,7 @@ futura opera bajo esto, sin excepción:
 - Sustituye los fondos negro/azul por grises carbón cercanos, con bordes y texto secundarios neutros. Mantiene los acentos de las acciones nativas, dimensiones, controles y funcionamiento de encendido/apagado.
 - Cambio solo de tokens de color; sin cambios funcionales, de permisos ni de layout. Se comprueba contraste y reversión en la página de prueba con clases observadas en el portal real. No afirmar activación de la extensión sin evidencia del navegador.
 
-**v660 — Contraste real de Propio y cabecera compacta.**
+**v661 — Acciones de turno y llamadas.**
 
-- Inspección del DOM real de Propio identificó fondos claros en app-background, app-component-background y mat-mdc-paginator, además de títulos y mat-label negros. Extensión 2.3.8 cubre esos selectores y estados inhabilitados sin cambiar controles habilitados ni automatismos. Revisión de CSS con las clases reales y apagado reversible; no confundir el escenario local con activación de 2.3.8 en Chrome.
-- Estado y ACW se agrupan con reloj/fecha, alineados a su base cuando caben. A 320 px el bloque se compacta sin la separación excesiva, estado/ACW siguen juntos. Recorrido con llamada real de prueba local, guardado, segundos de ACW, fecha larga, Hoy y ambos temas.
-- Web 659 ya estaba fusionada/publicada al retomar el 26/10. Se conservan sus traslados de Inicio y fecha única. 2.3.8 requiere verificar activación; la página de administración sigue bajo el bloqueo documentado, no eludirlo.
+- Turno a la izquierda en escritorio, con iconos circulares; en móvil, «Tu turno» reúne los tres botones y Llamadas usa una acción a todo el ancho con dos debajo. IDs, estados, temporizadores, colores y animaciones conservados.
+- Comprobación con cuenta ficticia, temas claro y oscuro, escritorio y 320/390 px; turno, pausa, llamada, historial y acceso a importar. Compilación y 1.142 pruebas correctas. La extensión no cambia.
