@@ -4406,6 +4406,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       }
       document.body.classList.add('has-live-bar');
       bar.classList.add('show');
+      bar.classList.toggle('call-active', info.type === 'call');
       bar.style.setProperty('--live-bar-color', `var(${info.colorVar})`);
       bar.style.setProperty('--live-bar-rgb', info.rgb);
       const labelEl = document.getElementById('liveBarLabel');
