@@ -1,24 +1,24 @@
-html[data-pst-dark]{color-scheme:dark;background:#0b1220!important;color:#e7edf6!important}
-html[data-pst-dark] :is(body,app-root,main,app-header,app-interpreter-portal,.main-content,.content-wrapper,.mat-drawer-container,.mat-drawer-content,.mat-sidenav-container){background-color:#0b1220!important;color:#e7edf6!important}
-html[data-pst-dark] :is(.card,.panel,.well,.mat-card,.mat-mdc-card,.mat-toolbar,.mat-table,.mat-mdc-table,table,.mat-menu-panel,.mat-mdc-menu-panel,.dropdown-menu,.modal-content,.mat-dialog-container,.mat-mdc-dialog-surface,.mat-select-panel,.mat-mdc-select-panel,.mat-expansion-panel,.bg-white,.bg-light){background-color:#142136!important;color:#e7edf6!important;border-color:#34445b!important}
-html[data-pst-dark] :is(.card-header,.card-footer,.panel-heading,.panel-footer,thead,th,.mat-header-cell,.mat-mdc-header-cell){background-color:#1d2d44!important;color:#f1f5fb!important;border-color:#34445b!important}
-html[data-pst-dark] :is(td,.mat-cell,.mat-mdc-cell,.mat-expansion-panel-header,.mat-menu-item,.mat-mdc-menu-item,.dropdown-item,.list-group-item){color:#e7edf6!important;border-color:#34445b!important}
-html[data-pst-dark] :is(.list-group-item,.table-striped>tbody>tr:nth-of-type(odd),.table-hover>tbody>tr:hover,.dropdown-item:hover,.mat-menu-item:hover,.mat-mdc-menu-item:hover){background-color:#1b2c44!important}
-html[data-pst-dark] :is(input,textarea,select,.form-control,.mat-form-field-flex,.mat-mdc-text-field-wrapper){background-color:#101c2f!important;color:#e7edf6!important;border-color:#50627b!important;caret-color:#e7edf6}
-html[data-pst-dark] :is(input,textarea)::placeholder{color:#a8b8ce!important;opacity:1}
-html[data-pst-dark] :is(.text-dark,.text-body,.mat-form-field-label,.mat-mdc-floating-label,.mat-select-value,.mat-mdc-select-value,.mat-expansion-panel-header-title,.mat-tab-label,.mat-mdc-tab,.mat-mdc-dialog-title){color:#e7edf6!important}
-html[data-pst-dark] :is(.text-muted,.mat-hint,.mat-mdc-form-field-hint,.mat-expansion-panel-header-description){color:#adbed4!important}
-html[data-pst-dark] :is(.btn-default,.btn-light,.btn-outline-secondary,.mat-button,.mat-mdc-button){background-color:#22344d!important;color:#e7edf6!important;border-color:#50627b!important}
+html[data-pst-dark]{color-scheme:dark;background:#191b1f!important;color:#e8eaed!important}
+html[data-pst-dark] :is(body,app-root,main,app-header,app-interpreter-portal,.main-content,.content-wrapper,.mat-drawer-container,.mat-drawer-content,.mat-sidenav-container){background-color:#191b1f!important;color:#e8eaed!important}
+html[data-pst-dark] :is(.card,.panel,.well,.mat-card,.mat-mdc-card,.mat-toolbar,.mat-table,.mat-mdc-table,table,.mat-menu-panel,.mat-mdc-menu-panel,.dropdown-menu,.modal-content,.mat-dialog-container,.mat-mdc-dialog-surface,.mat-select-panel,.mat-mdc-select-panel,.mat-expansion-panel,.bg-white,.bg-light){background-color:#202226!important;color:#e8eaed!important;border-color:#3b3f46!important}
+html[data-pst-dark] :is(.card-header,.card-footer,.panel-heading,.panel-footer,thead,th,.mat-header-cell,.mat-mdc-header-cell){background-color:#282b30!important;color:#f4f5f6!important;border-color:#3b3f46!important}
+html[data-pst-dark] :is(td,.mat-cell,.mat-mdc-cell,.mat-expansion-panel-header,.mat-menu-item,.mat-mdc-menu-item,.dropdown-item,.list-group-item){color:#e8eaed!important;border-color:#3b3f46!important}
+html[data-pst-dark] :is(.list-group-item,.table-striped>tbody>tr:nth-of-type(odd),.table-hover>tbody>tr:hover,.dropdown-item:hover,.mat-menu-item:hover,.mat-mdc-menu-item:hover){background-color:#292c31!important}
+html[data-pst-dark] :is(input,textarea,select,.form-control,.mat-form-field-flex,.mat-mdc-text-field-wrapper){background-color:#1c1e22!important;color:#e8eaed!important;border-color:#626974!important;caret-color:#e8eaed}
+html[data-pst-dark] :is(input,textarea)::placeholder{color:#b0b5bd!important;opacity:1}
+html[data-pst-dark] :is(.text-dark,.text-body,.mat-form-field-label,.mat-mdc-floating-label,.mat-select-value,.mat-mdc-select-value,.mat-expansion-panel-header-title,.mat-tab-label,.mat-mdc-tab,.mat-mdc-dialog-title){color:#e8eaed!important}
+html[data-pst-dark] :is(.text-muted,.mat-hint,.mat-mdc-form-field-hint,.mat-expansion-panel-header-description){color:#b0b5bd!important}
+html[data-pst-dark] :is(.btn-default,.btn-light,.btn-outline-secondary,.mat-button,.mat-mdc-button){background-color:#303339!important;color:#e8eaed!important;border-color:#626974!important}
 html[data-pst-dark] a:not(.btn){color:#80d5ff!important}
-html[data-pst-dark] :is(hr,.divider,.mat-divider){border-color:#34445b!important}
+html[data-pst-dark] :is(hr,.divider,.mat-divider){border-color:#3b3f46!important}
 html[data-pst-dark] :is(.mat-icon,.mat-mdc-icon-button){color:inherit}
 
-html[data-pst-dark] :is(.mat-app-background,.app-background,.basic-container-body){background-color:#0b1220!important;color:#e7edf6!important}
-html[data-pst-dark] :is(.app-component-background,.mat-mdc-paginator,.mat-calendar,.mat-datepicker-content,.mat-mdc-select-panel){background-color:#142136!important;color:#e7edf6!important;border-color:#34445b!important}
-html[data-pst-dark] :is(.header-welcome-message-font,.app-headline,.app-head-line,.call-history-container,.app-call-control-container,.mat-mdc-paginator-container,.mat-mdc-paginator-page-size-label,.mat-mdc-paginator-range-label,mat-label,.mat-datepicker-toggle,.mat-calendar-body-cell-content,.mat-calendar-period-button,.mat-calendar-arrow,.mat-calendar-previous-button,.mat-calendar-next-button){color:#e7edf6!important}
-html[data-pst-dark] .call-status-text.offline{color:#adbed4!important}
-html[data-pst-dark] :is(.mat-mdc-form-field, .mat-mdc-paginator){--mat-form-field-enabled-select-arrow-color:#adbed4;--mat-form-field-enabled-trailing-icon-color:#adbed4;--mat-form-field-enabled-leading-icon-color:#adbed4;--mdc-filled-text-field-label-text-color:#adbed4;--mdc-filled-text-field-hover-label-text-color:#e7edf6;--mdc-filled-text-field-input-text-color:#e7edf6;--mdc-outlined-text-field-outline-color:#50627b;--mat-paginator-container-text-color:#adbed4;--mat-paginator-enabled-icon-color:#e7edf6;--mat-paginator-disabled-icon-color:#62728a}
-html[data-pst-dark] :is(.mat-datepicker-toggle,.call-history-title) .mat-mdc-icon-button{color:#adbed4!important}
-html[data-pst-dark] :is(button:disabled,button.mat-mdc-button-disabled){color:#8391a6!important;background-color:#263348!important}
-html[data-pst-dark] .mat-calendar-body-cell:not(.mat-calendar-body-disabled):hover>.mat-calendar-body-cell-content{background-color:#263d5d!important}
-html[data-pst-dark] .mat-calendar-body-selected{background-color:#275b91!important;color:#fff!important}
+html[data-pst-dark] :is(.mat-app-background,.app-background,.basic-container-body){background-color:#191b1f!important;color:#e8eaed!important}
+html[data-pst-dark] :is(.app-component-background,.mat-mdc-paginator,.mat-calendar,.mat-datepicker-content,.mat-mdc-select-panel){background-color:#202226!important;color:#e8eaed!important;border-color:#3b3f46!important}
+html[data-pst-dark] :is(.header-welcome-message-font,.app-headline,.app-head-line,.call-history-container,.app-call-control-container,.mat-mdc-paginator-container,.mat-mdc-paginator-page-size-label,.mat-mdc-paginator-range-label,mat-label,.mat-datepicker-toggle,.mat-calendar-body-cell-content,.mat-calendar-period-button,.mat-calendar-arrow,.mat-calendar-previous-button,.mat-calendar-next-button){color:#e8eaed!important}
+html[data-pst-dark] .call-status-text.offline{color:#b0b5bd!important}
+html[data-pst-dark] :is(.mat-mdc-form-field, .mat-mdc-paginator){--mat-form-field-enabled-select-arrow-color:#b0b5bd;--mat-form-field-enabled-trailing-icon-color:#b0b5bd;--mat-form-field-enabled-leading-icon-color:#b0b5bd;--mdc-filled-text-field-label-text-color:#b0b5bd;--mdc-filled-text-field-hover-label-text-color:#e8eaed;--mdc-filled-text-field-input-text-color:#e8eaed;--mdc-outlined-text-field-outline-color:#626974;--mat-paginator-container-text-color:#b0b5bd;--mat-paginator-enabled-icon-color:#e8eaed;--mat-paginator-disabled-icon-color:#717781}
+html[data-pst-dark] :is(.mat-datepicker-toggle,.call-history-title) .mat-mdc-icon-button{color:#b0b5bd!important}
+html[data-pst-dark] :is(button:disabled,button.mat-mdc-button-disabled){color:#959ba5!important;background-color:#2c2f35!important}
+html[data-pst-dark] .mat-calendar-body-cell:not(.mat-calendar-body-disabled):hover>.mat-calendar-body-cell-content{background-color:#34383f!important}
+html[data-pst-dark] .mat-calendar-body-selected{background-color:#386f91!important;color:#fff!important}

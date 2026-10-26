@@ -350,7 +350,7 @@ futura opera bajo esto, sin excepción:
   el propietario decide activarlo. ES/EN funcionan localmente sin ese servicio;
   ver [idiomas y temas](docs/idiomas-y-temas.md).
 
-- **Extensión 2.3.8 de web 660:** actualización de contraste preparada para la ruta existente, con respaldo y preferencias conservadas. La política del navegador bloquea chrome://extensions; su recarga y activación runtime no están certificadas para 2.3.8. El DOM real del 26/10 confirmó el atributo del tema oscuro de la entrega anterior, pero no identifica por sí solo la versión del manifest. No afirmar que copiar archivos prueba su activación ni reabrir los cuatro puntos históricos del plan.
+- **Extensión 2.3.9 de web 660:** actualización de contraste preparada para la ruta existente, con respaldo y preferencias conservadas. La política del navegador bloquea chrome://extensions; su recarga y activación runtime no están certificadas para 2.3.9. El DOM real del 26/10 confirmó el atributo del tema oscuro de la entrega anterior, pero no identifica por sí solo la versión del manifest. No afirmar que copiar archivos prueba su activación ni reabrir los cuatro puntos históricos del plan.
 
 **CONFIRMACIONES Y CONFIGURACIÓN LOCAL VIGENTES**
 
@@ -458,7 +458,7 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
-- Web 660 y extensión 2.3.8: ACW compacto corregido, diagnóstico de disponibilidad trasladado al popup, acceso a cierres retirado de Avisos y modo oscuro opcional del portal. La recarga de la extensión existente no pudo certificarse porque la política del navegador bloquea su página de administración.
+- Web 660 y extensión 2.3.9: ACW compacto corregido, diagnóstico de disponibilidad trasladado al popup, acceso a cierres retirado de Avisos y modo oscuro opcional del portal. La recarga de la extensión existente no pudo certificarse porque la política del navegador bloquea su página de administración.
 
 - Web 651 evita calcular los análisis mensual y de calidad mientras están plegados. El gráfico productivo calcula solo productividad y la comparación semanal solo adherencia. Índice de llamadas limitado a una lectura síncrona, descartado al terminar; controles y valores conservados. Referencias reales de Finanzas, Higher Rate y Ajustes de 631 (c178210) recuperadas fuera de Git para revisar su restauración visual.
 
@@ -516,6 +516,11 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
+**Extensión 2.3.9 — Oscuro neutro en Propio.**
+
+- Sustituye los fondos negro/azul por grises carbón cercanos, con bordes y texto secundarios neutros. Mantiene los acentos de las acciones nativas, dimensiones, controles y funcionamiento de encendido/apagado.
+- Cambio solo de tokens de color; sin cambios funcionales, de permisos ni de layout. Se comprueba contraste y reversión en la página de prueba con clases observadas en el portal real. No afirmar activación de la extensión sin evidencia del navegador.
+
 **v660 — Contraste real de Propio y cabecera compacta.**
 
 - Inspección del DOM real de Propio identificó fondos claros en app-background, app-component-background y mat-mdc-paginator, además de títulos y mat-label negros. Extensión 2.3.8 cubre esos selectores y estados inhabilitados sin cambiar controles habilitados ni automatismos. Revisión de CSS con las clases reales y apagado reversible; no confundir el escenario local con activación de 2.3.8 en Chrome.
@@ -527,8 +532,3 @@ futura opera bajo esto, sin excepción:
 - El selector con calendario, anterior/siguiente y regreso a Hoy vive debajo del reloj. La fecha larga muestra el día consultado y conserva los mismos ids/listeners; se elimina la fecha duplicada de la fila de estado/ACW.
 - Próxima ventana queda en Higher Rate, compacta; Prueba positiva de hoy y sus premios quedan en Logros, junto al historial positivo. Se conservan datos y funciones.
 - Comprobaciones de ubicación, render bilingüe, navegación de fecha y revisión visual responsive. Extensión sin cambios; su activación 2.3.7 sigue sin certificar por el bloqueo documentado.
-
-**v658 — Próxima ventana en una línea compacta.**
-
-- El aviso de Higher Rate dentro de Ganancias reúne etiqueta, fecha abreviada, rango horario completo en formato 24 h y nivel en una sola línea. Reduce padding, tipografía y decoración sin ocultar la hora final. Conserva el estado activo y sus minutos restantes.
-- Regresión bilingüe verifica fecha, inicio/fin, nivel y regreso al detalle activo. Comprobación visual de ancho/alto y una sola línea en móvil y escritorio. Conserva íntegra la fila única de estado/fecha/ACW de 657.

@@ -1,4 +1,4 @@
-# Propio · Tracker y vista original · 2.3.8
+# Propio · Tracker y vista original · 2.3.9
 
 La extensión conecta Propio Shift Tracker con la sesión y el historial de Propio. Su
 registro de llamadas funciona independientemente de la apariencia del portal.
@@ -229,7 +229,8 @@ La opción «Modo oscuro en Propio» se guarda en `propio-dark-mode-v1`, desacti
 ## Modo oscuro de Propio
 
 La opción del popup es reversible, se guarda por perfil y está apagada por defecto.
-Cubre el fondo de Propio, historial, estado de llamada, campos, calendario y
+Usa grises carbón neutros para fondo, paneles, campos y tabla, con diferencias
+suaves entre superficies. Cubre historial, estado de llamada, calendario y
 paginación. Conserva los colores de las acciones habilitadas; los botones
 inhabilitados mantienen un contraste reducido. No filtra imágenes ni video,
 no recarga el portal y no pulsa controles de llamadas al cambiar el tema.
