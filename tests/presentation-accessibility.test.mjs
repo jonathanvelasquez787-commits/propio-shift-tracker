@@ -92,10 +92,12 @@ test('activity priority follows live call then pending call then pause and clear
   h.state.pendingLiveCallBackup={startedAtISO:'2026-10-22T14:00:00Z',endedAtISO:'2026-10-22T14:02:00Z'};
   h.state.activePause={type:'lunch',startedAt:new Date().toISOString()};
   assert.equal(h.liveActivityInfo().type,'call');
-  h.updateCallsStatusCard();assert.equal(e.callsStatusCard.hidden,false);
+  h.updateLiveActivityBar(); h.updateCallsStatusCard();assert.equal(e.callsStatusCard.hidden,false);
+  assert.equal(e.liveActivityBar.classList.contains('call-active'),true);
   h.state.activeCall=null;assert.equal(h.liveActivityInfo().type,'pending');
   h.state.pendingLiveCallBackup=null;assert.equal(h.liveActivityInfo().type,'lunch');
   h.updateLiveActivityBar();h.updateCallsStatusCard();assert.equal(e.liveBarDiscardBtn.hidden,false);
+  assert.equal(e.liveActivityBar.classList.contains('call-active'),false);
   assert.equal(e.callsStatusActions.style.display,'none');
   assert.equal(e.callsStatusCard.hidden,true);assert.equal(e.callsControlsGrid.style.display,'');
   h.state.activePause=null;h.updateLiveActivityBar();assert.equal(e.liveActivityBar.classList.contains('show'),false);
