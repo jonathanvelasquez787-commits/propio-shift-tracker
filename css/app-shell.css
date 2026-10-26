@@ -1186,10 +1186,14 @@ body:has(.live-activity-bar.call-active) .app { padding-top:calc(74px + env(safe
   .live-activity-bar.call-active { left:12px; right:12px; max-width:none; }
 }
 @media (max-width:360px) {
+  .title-row { column-gap:2px; }
   .title-row .hero-meta-row #clockNow { font-size:17px; }
-  .title-row .hero-meta-row .day-status-controls { gap:3px; }
+  .title-row .hero-meta-row .day-status-controls { gap:2px; width:auto; margin:0; }
   .title-row .hero-meta-row .day-status-controls>.chip,
-  .title-row .hero-meta-row #acwLiveChip { font-size:9px; padding:3px; }
+  .title-row .hero-meta-row #acwLiveChip { font-size:8.5px; padding:3px 2px; gap:2px; letter-spacing:-.02em; }
+  .title-row .clock-date-controls { gap:1px; }
+  .title-row .clock-date-controls .day-nav-btn { width:14px; }
+  .title-row .clock-date-picker #clockDate { font-size:9px; letter-spacing:-.025em; }
   .live-activity-bar.call-active .live-bar-icon-wrap { display:none; }
   .live-activity-bar.call-active .live-bar-save,
   .live-activity-bar.call-active .live-bar-discard { font-size:9px; padding:5px; }
