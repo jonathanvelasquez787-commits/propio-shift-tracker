@@ -1047,3 +1047,12 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 .clock-date-controls .day-nav-btn{flex-shrink:0;width:20px;height:23px;color:inherit}
 .clock-date-controls #dayActiveLabelBtn{font-size:10px;padding:2px 3px;color:inherit}
 @media(max-width:760px){.title-row{grid-template-columns:minmax(0,1fr)}.title-row .clockbox{grid-column:1;grid-row:2;justify-self:end;max-width:100%}.clock-date-controls{gap:3px}:root.theme-light .title-row .clock-date-controls{color:rgba(255,255,255,.85)}.clock-date-picker #clockDate{font-size:10px}.clock-date-controls .day-nav-btn{width:18px;height:23px}.clock-date-controls #dayActiveLabelBtn{font-size:10px}}
+
+.title-row{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+.title-row>div:first-child{flex:1 1 280px;min-width:0}
+.title-row .hero-meta-row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex:1 1 430px;min-width:0}
+.hero-meta-row .day-status-controls{flex:0 0 auto;width:auto;margin:0;max-width:100%;gap:6px}
+.hero-meta-row .clockbox{flex:0 1 auto;min-width:0;max-width:100%}
+.hero-meta-row #clockNow{font-size:clamp(24px,3vw,38px)}
+@media(max-width:760px){.title-row{flex-direction:column;align-items:stretch;gap:8px}.title-row>div:first-child,.title-row .hero-meta-row{flex-basis:auto}.title-row .hero-meta-row{gap:8px}.hero-meta-row .clockbox{width:auto;gap:4px}.hero-meta-row .day-status-controls{gap:5px}.hero-meta-row .day-status-controls>.chip{min-height:28px;font-size:11px}.hero-meta-row #acwLiveChip{font-size:11px}.hero-meta-row .clock-date-controls{gap:3px}}
+@media(max-width:500px){.title-row .hero-meta-row{flex-direction:column;align-items:flex-start;gap:7px}.hero-meta-row .clockbox{order:0;align-items:flex-start;text-align:left}.hero-meta-row .clock-date-controls{justify-content:flex-start}.hero-meta-row .clock-date-picker #clockDate{text-align:left}.hero-meta-row .day-status-controls{order:1}.hero-meta-row #clockNow{align-self:flex-start}}

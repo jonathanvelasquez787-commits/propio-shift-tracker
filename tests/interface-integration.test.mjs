@@ -32,6 +32,7 @@ test('approved placements keep the existing Home controls and one copy of each d
  assert.equal(within('daySelector','heroSection'),true);
  assert.equal(within('daySelector','clockDate'),false);
  assert.equal(ids.get('daySelector').parentNode,ids.get('clockDate').parentNode);
+ assert.equal(ids.get('acwLiveChip').parentNode.parentNode.parentNode,ids.get('clockDate').parentNode.parentNode.parentNode.parentNode);
  assert.equal(within('daySelector','acwLiveChip'),false);
  assert.equal(within('daySelector','stateText'),false);
  assert.equal(ids.get('daySelector').parentNode.parentNode.parentNode.attrs.some(a=>a.name==='class'&&a.value==='clockbox'),true);
