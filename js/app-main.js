@@ -6721,6 +6721,7 @@ export function render() {
       if (!callsSection) return;
       // Ayuda es contenido de referencia, no de trabajo: Llamadas no tiene lugar ahí.
       callsSection.hidden = page === 'help';
+      syncCallControlsPlacement(page);
       if (page === 'help') return;
       if (page === 'home') {
         const pageHome = document.getElementById('pageHome');
@@ -6736,6 +6737,47 @@ export function render() {
         if (heroSection) heroSection.insertAdjacentElement('afterend', callsSection);
       }
     }
+
+    // En mobile (<= 760px) los 3 botones de llamadas (#callsControlsGrid) viven dentro de la tarjeta
+    // "Tu turno" (.hero-shift-actions) para formar una sola fila de 6; en escritorio vuelven a
+    // #callsSection. Aquí también se crea, una sola vez, el separador y el botón circular que
+    // colapsa/expande la fila (solo se ven en mobile, ver app-shell.css).
+    const callControlsMobileQuery = window.matchMedia('(max-width: 760px)');
+    function syncCallControlsPlacement(page = currentPage) {
+      const hero = document.querySelector('.hero-shift-actions');
+      const grid = document.getElementById('callsControlsGrid');
+      const callsSection = document.getElementById('callsSection');
+      if (!hero || !grid || !callsSection) return;
+      if (!hero.querySelector('.hero-shift-sep')) {
+        const sep = document.createElement('span');
+        sep.className = 'hero-shift-sep';
+        sep.setAttribute('aria-hidden', 'true');
+        hero.appendChild(sep);
+      }
+      const title = hero.querySelector('.hero-shift-title');
+      if (title && !hero.querySelector('.hero-shift-toggle')) {
+        if (!title.id) title.id = 'heroShiftTitle';
+        const toggle = document.createElement('button');
+        toggle.type = 'button';
+        toggle.className = 'accordion-chevron hero-shift-toggle';
+        toggle.setAttribute('aria-expanded', 'true');
+        toggle.setAttribute('aria-labelledby', title.id);
+        toggle.innerHTML = iconHtml('chevronDown');
+        toggle.addEventListener('click', () => {
+          const collapsed = hero.classList.toggle('is-collapsed');
+          toggle.setAttribute('aria-expanded', String(!collapsed));
+        });
+        title.after(toggle);
+      }
+      if (callControlsMobileQuery.matches) {
+        if (grid.parentElement !== hero) hero.appendChild(grid);
+      } else if (grid.parentElement !== callsSection) {
+        callsSection.appendChild(grid);
+      }
+      hero.classList.toggle('calls-off', page === 'help');
+    }
+    if (callControlsMobileQuery.addEventListener) callControlsMobileQuery.addEventListener('change', () => syncCallControlsPlacement());
+    else if (callControlsMobileQuery.addListener) callControlsMobileQuery.addListener(() => syncCallControlsPlacement());
 
     function navigateToPage(page) {
       // Páginas válidas del menú lateral.
