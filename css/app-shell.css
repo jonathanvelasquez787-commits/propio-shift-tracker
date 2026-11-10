@@ -1225,6 +1225,7 @@ body:has(.live-activity-bar.call-active) .app { padding-top:calc(74px + env(safe
   .hero-shift-actions #callsControlsGrid,
   .hero-shift-actions #callsControlsGrid:has(#callControlBtn.is-active) { display: contents !important; }
 
+  .hero-shift-actions #callsControlsGrid #callControlBtn { grid-column: auto; }
   .hero-shift-actions .action-btn,
   .hero-shift-actions #callsControlsGrid .action-btn {
     display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
