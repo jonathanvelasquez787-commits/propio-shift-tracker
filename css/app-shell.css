@@ -1199,3 +1199,67 @@ body:has(.live-activity-bar.call-active) .app { padding-top:calc(74px + env(safe
   .live-activity-bar.call-active .live-bar-discard { font-size:9px; padding:5px; }
   #callsControlsGrid .action-label { font-size:9.5px; }
 }
+
+/* ---- Móvil: 6 botones de turno y llamadas en una sola fila, con colapsar ---- */
+.hero-shift-sep, .hero-shift-toggle { display: none; }
+@media (max-width: 760px) {
+  .chips > .hero-shift-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) 1px repeat(3, minmax(0, 1fr));
+    gap: 4px;
+    padding: 8px 7px;
+    align-items: stretch;
+  }
+  .chips > .hero-shift-actions > .hero-shift-title { grid-column: 1 / 5; grid-row: 1; align-self: center; margin: 0; }
+  .chips > .hero-shift-actions > .hero-shift-toggle {
+    display: grid; position: relative; grid-column: 5 / -1; grid-row: 1; justify-self: end; align-self: center;
+    margin: 0; padding: 0; font: inherit; cursor: pointer; appearance: none; -webkit-appearance: none;
+    transform: rotate(180deg);
+  }
+  .hero-shift-toggle::before { content: ""; position: absolute; inset: -8px; }
+  .hero-shift-toggle:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+  .hero-shift-actions:not(.is-collapsed) .hero-shift-toggle { color: var(--text); background: rgba(var(--cyan-rgb), .10); }
+  html.theme-light .hero-shift-actions:not(.is-collapsed) .hero-shift-toggle { background: rgba(var(--accent-decorative-rgb), .10); }
+  .hero-shift-actions.is-collapsed .hero-shift-toggle { transform: none; }
+  .hero-shift-actions > .hero-shift-sep { display: block; grid-column: 4; grid-row: 2; width: 1px; background: var(--line); }
+
+  .hero-shift-actions #callsControlsGrid,
+  .hero-shift-actions #callsControlsGrid:has(#callControlBtn.is-active) { display: contents !important; }
+
+  .hero-shift-actions .action-btn,
+  .hero-shift-actions #callsControlsGrid .action-btn {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+    min-width: 0; min-height: 68px; padding: 6px 2px; gap: 3px;
+  }
+  .hero-shift-actions .action-btn .action-icon-wrap,
+  .hero-shift-actions #callsControlsGrid .action-icon-wrap { grid-column: auto; grid-row: auto; width: 28px; height: 28px; }
+  .hero-shift-actions .action-btn .action-label,
+  .hero-shift-actions #callsControlsGrid .action-label { grid-column: auto; font-size: 10px; line-height: 1.15; min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+  .hero-shift-actions .action-btn .action-sub,
+  .hero-shift-actions #callsControlsGrid .action-sub { grid-column: auto; margin: 0; font-size: 8.5px; line-height: 1.2; min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+
+  /* Colapsado: solo queda "Tu turno" + el círculo. */
+  .chips > .hero-shift-actions.is-collapsed > .action-btn,
+  .chips > .hero-shift-actions.is-collapsed > .hero-shift-sep,
+  .hero-shift-actions.is-collapsed #callsControlsGrid,
+  .hero-shift-actions.is-collapsed #callsControlsGrid:has(#callControlBtn.is-active) { display: none !important; }
+
+  /* Página Ayuda: sin llamadas, la fila queda con los 3 botones de turno. */
+  .chips > .hero-shift-actions.calls-off { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .chips > .hero-shift-actions.calls-off > .hero-shift-title { grid-column: 1 / 3; }
+  .chips > .hero-shift-actions.calls-off > .hero-shift-toggle { grid-column: 3; }
+  .hero-shift-actions.calls-off > .hero-shift-sep,
+  .hero-shift-actions.calls-off #callsControlsGrid,
+  .hero-shift-actions.calls-off #callsControlsGrid:has(#callControlBtn.is-active) { display: none !important; }
+
+  /* #callsSection solo conserva título + tarjeta de estado: sin tarjeta visible, desaparece. */
+  #callsSection > .section-title { display: none; }
+  #callsSection:has(> #callsStatusCard[hidden]),
+  #callsSection:has(> #callsStatusCard.live) { display: none !important; }
+}
+@media (max-width: 360px) {
+  .chips > .hero-shift-actions { padding: 7px 5px; gap: 3px; }
+  .hero-shift-actions .action-btn .action-label,
+  .hero-shift-actions #callsControlsGrid .action-label { font-size: 9px; }
+  .hero-shift-actions .action-btn .action-sub,
+  .hero-shift-actions #callsControlsGrid .action-sub { font-size: 8px; }
+}
