@@ -1,5 +1,4 @@
 {
-  "s_a77de2a6": "Your shift",
   "s_0163610f": "Unpaid budget amount",
   "s_03b8a461": "Variable amount",
   "s_04ace283": "Amount over budget",
@@ -2929,5 +2928,6 @@
   "s_fee72da9": "Bronze (+$0.01)",
   "s_a2a5c676": "{{v8}} of {{v9}}{{v10}} {{v11}}",
   "s_85a04400": "Use the date, times and tier from the Propio notice. Changes save automatically and preserve recorded bonuses.",
-  "s_f1710b98": "No active ACW"
+  "s_f1710b98": "No active ACW",
+  "s_48b164cf": "Today's actions"
 }

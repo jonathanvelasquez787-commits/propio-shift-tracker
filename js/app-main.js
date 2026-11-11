@@ -6738,16 +6738,13 @@ export function render() {
       }
     }
 
-    // En mobile (<= 760px) los 3 botones de llamadas (#callsControlsGrid) viven dentro de la tarjeta
-    // "Tu turno" (.hero-shift-actions) para formar una sola fila de 6; en escritorio vuelven a
-    // #callsSection. Aquí también se crea, una sola vez, el separador y el botón circular que
-    // colapsa/expande la fila (solo se ven en mobile, ver app-shell.css).
-    const callControlsMobileQuery = window.matchMedia('(max-width: 760px)');
+    // Los 3 botones de llamadas (#callsControlsGrid) viven dentro de la tarjeta "Acciones de Hoy"
+    // (.hero-shift-actions) para formar una sola fila de 6. Aquí también se crea, una sola vez, el
+    // separador y el botón circular que colapsa/expande la fila (ver app-shell.css).
     function syncCallControlsPlacement(page = currentPage) {
       const hero = document.querySelector('.hero-shift-actions');
       const grid = document.getElementById('callsControlsGrid');
-      const callsSection = document.getElementById('callsSection');
-      if (!hero || !grid || !callsSection) return;
+      if (!hero || !grid) return;
       if (!hero.querySelector('.hero-shift-sep')) {
         const sep = document.createElement('span');
         sep.className = 'hero-shift-sep';
@@ -6769,15 +6766,9 @@ export function render() {
         });
         title.after(toggle);
       }
-      if (callControlsMobileQuery.matches) {
-        if (grid.parentElement !== hero) hero.appendChild(grid);
-      } else if (grid.parentElement !== callsSection) {
-        callsSection.appendChild(grid);
-      }
+      if (grid.parentElement !== hero) hero.appendChild(grid);
       hero.classList.toggle('calls-off', page === 'help');
     }
-    if (callControlsMobileQuery.addEventListener) callControlsMobileQuery.addEventListener('change', () => syncCallControlsPlacement());
-    else if (callControlsMobileQuery.addListener) callControlsMobileQuery.addListener(() => syncCallControlsPlacement());
 
     function navigateToPage(page) {
       // Páginas válidas del menú lateral.

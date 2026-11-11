@@ -4811,6 +4811,12 @@
       "app.html"
     ]
   },
+  "s_48b164cf": {
+    "source": "Acciones de Hoy",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_48d567d8": {
     "source": "Sonido \"{{v0}}\" guardado",
     "files": [
@@ -11203,12 +11209,6 @@
     "source": "El registro de llamadas continúa. Reanudá la disponibilidad desde la extensión o con Start Calls en Propio.",
     "files": [
       "js/automation-ui.js"
-    ]
-  },
-  "s_a77de2a6": {
-    "source": "Tu turno",
-    "files": [
-      "app.html"
     ]
   },
   "s_a7c2d521": {
