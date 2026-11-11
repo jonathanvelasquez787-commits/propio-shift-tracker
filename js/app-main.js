@@ -746,7 +746,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
         productiveBreakAwardMin: 5,
         // Modo freelancer: sin horario fijo, el aviso de descanso sale por regla (minutos productivos o
         // tiempo conectado desde la última pausa, gana el que llegue primero).
-        freelancer: { enabled: false, since: '', breakMin: 10, lunchMin: 30, connectedEveryMin: 90, snoozeMin: 5 },
+        freelancer: { enabled: false, since: '', breakMin: 10, lunchMin: 30, connectedEveryMin: 90, snoozeMin: 5, sessionGoalMin: 0, lunchEveryMin: 0 },
         // Mensaje editable también para este aviso — dos plantillas independientes (primera vez del
         // turno / repeticiones siguientes, ver checkProductiveBreakEarnedAlarm) con variables
         // `{productivo}`/`{descanso}`.
@@ -1017,6 +1017,8 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
           lunchMin: whole(fl.lunchMin, 1, 240, 30),
           connectedEveryMin: whole(fl.connectedEveryMin, 0, 720, 90),
           snoozeMin: whole(fl.snoozeMin, 1, 60, 5),
+          sessionGoalMin: whole(fl.sessionGoalMin, 0, 1440, 0),
+          lunchEveryMin: whole(fl.lunchEveryMin, 0, 720, 0),
         };
       }
       if (typeof settings.financeAutoFill !== 'boolean') settings.financeAutoFill = false;
@@ -5267,9 +5269,12 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       const result = minutesSinceLastProductiveBreakAnchor();
       if (!result) return null;
       const connectedMin = (Date.now() - result.anchor.getTime()) / 60000;
-      const earnMin = Number(settings.productiveBreakEarnMin), every = settings.freelancer.connectedEveryMin;
-      if (!((earnMin > 0 && result.productiveMin >= earnMin) || (every > 0 && connectedMin >= every))) return null;
-      return { anchorKey: result.anchor.toISOString(), productiveMin: result.productiveMin, connectedMin };
+      const earnMin = Number(settings.productiveBreakEarnMin), every = settings.freelancer.connectedEveryMin, lunchEvery = settings.freelancer.lunchEveryMin;
+      let lunchAnchor = Date.parse(state.shiftStartedAt);
+      state.pauseHistory.filter(p => p.type === 'lunch' && Date.parse(p.endedAt) >= lunchAnchor).forEach(p => { lunchAnchor = Math.max(lunchAnchor, Date.parse(p.endedAt)); });
+      const lunchDue = lunchEvery > 0 && (Date.now() - lunchAnchor) / 60000 >= lunchEvery;
+      if (!lunchDue && !((earnMin > 0 && result.productiveMin >= earnMin) || (every > 0 && connectedMin >= every))) return null;
+      return { anchorKey: `${result.anchor.toISOString()}|${lunchDue ? 'lunch' : 'break'}`, suggestedType: lunchDue ? 'lunch' : 'break', productiveMin: result.productiveMin, connectedMin };
     }
 
     function syncFreelancerPromptType(type) {
@@ -5294,7 +5299,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       freelancerPrompt.anchorKey = due.anchorKey;
       freelancerPrompt.handled = false;
       document.getElementById('breakPromptText').textContent = ui`Llevas ${formatMinutes(due.productiveMin)} min productivos y ${formatMinutes(due.connectedMin)} min conectado desde tu última pausa.`;
-      syncFreelancerPromptType('break');
+      syncFreelancerPromptType(due.suggestedType);
       playProductiveBreakSound();
       openModal('breakPromptModal');
     }
@@ -5332,10 +5337,125 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       playProductiveBreakSound();
     }
 
+    // ---- Modo freelancer: meta de sesión (tiempo conectado desde "Iniciar shift") ----
+    let freelancerGoalModalHandled = false;
+    const freelancerHm = (min) => { const m = Math.max(0, Math.round(min)); return `${Math.floor(m / 60)}h ${pad(m % 60)}m`; };
+
+    function freelancerSessionInfo() {
+      if (!freelancerActive() || !state.shiftStartedAt || state.shiftEndedAt) return null;
+      const stored = state.freelancerSession && state.freelancerSession.startedAt === state.shiftStartedAt ? state.freelancerSession : null;
+      return {
+        session: stored,
+        elapsedMin: (Date.now() - Date.parse(state.shiftStartedAt)) / 60000,
+        goalMin: stored ? Number(stored.goalMin) || 0 : settings.freelancer.sessionGoalMin,
+      };
+    }
+
+    function ensureFreelancerSession() {
+      if (!state.freelancerSession || state.freelancerSession.startedAt !== state.shiftStartedAt) {
+        state.freelancerSession = { startedAt: state.shiftStartedAt, goalMin: settings.freelancer.sessionGoalMin };
+      }
+      return state.freelancerSession;
+    }
+
+    function renderFreelancerSession() {
+      const title = document.querySelector('.hero-shift-title');
+      if (!title) return;
+      const info = freelancerSessionInfo();
+      let btn = title.querySelector('.hero-shift-session');
+      if (!btn) {
+        if (!info) return;
+        btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'hero-shift-session';
+        btn.addEventListener('click', () => openFreelancerSessionModal());
+        title.appendChild(btn);
+      }
+      btn.hidden = !info;
+      if (!info) return;
+      const text = info.goalMin > 0 ? `${freelancerHm(info.elapsedMin)} / ${freelancerHm(info.goalMin)}` : translateText('Fijar meta');
+      if (btn.textContent !== text) btn.textContent = text;
+      btn.classList.toggle('is-reached', info.goalMin > 0 && info.elapsedMin >= info.goalMin);
+    }
+
+    function openFreelancerSessionModal() {
+      const info = freelancerSessionInfo();
+      if (!info) return;
+      const reached = info.goalMin > 0 && info.elapsedMin >= info.goalMin;
+      document.getElementById('sessionGoalText').textContent = info.goalMin <= 0
+        ? translateText('Todavía no tienes meta para esta sesión.')
+        : reached ? ui`Llegaste a tu meta de ${freelancerHm(info.goalMin)} conectado. ¿Quieres seguir?` : ui`Llevas ${freelancerHm(info.elapsedMin)} de ${freelancerHm(info.goalMin)} conectado.`;
+      document.getElementById('sessionGoalMinInput').value = info.goalMin > 0 ? info.goalMin : '';
+      freelancerGoalModalHandled = false;
+      openModal('sessionGoalModal');
+    }
+
+    function acknowledgeFreelancerGoal() {
+      const info = freelancerSessionInfo();
+      if (!info || !(info.goalMin > 0) || info.elapsedMin < info.goalMin) return;
+      ensureFreelancerSession().ackGoalMin = info.goalMin;
+      saveStateOnly();
+    }
+
+    function setFreelancerGoal(minutes) {
+      if (!freelancerSessionInfo()) return;
+      const session = ensureFreelancerSession();
+      const previous = { goalMin: session.goalMin, ackGoalMin: session.ackGoalMin };
+      session.goalMin = minutes; delete session.ackGoalMin;
+      if (saveStateOnly() === false) { session.goalMin = previous.goalMin; if (previous.ackGoalMin !== undefined) session.ackGoalMin = previous.ackGoalMin; return; }
+      freelancerGoalModalHandled = true;
+      closeModal('sessionGoalModal');
+      render();
+      toast(ui`Meta de la sesión: ${freelancerHm(minutes)}`);
+    }
+
+    function saveFreelancerGoalFromInput() {
+      const minutes = Number(document.getElementById('sessionGoalMinInput').value);
+      if (!Number.isInteger(minutes) || minutes < 10 || minutes > 1440) { toast(translateText('Elige una meta entre 10 y 1440 minutos.')); return; }
+      setFreelancerGoal(minutes);
+    }
+
+    function extendFreelancerGoal(addMin) {
+      const info = freelancerSessionInfo();
+      if (info) setFreelancerGoal(Math.ceil(Math.max(info.goalMin, info.elapsedMin)) + addMin);
+    }
+
+    function checkFreelancerGoalPrompt() {
+      const modal = document.getElementById('sessionGoalModal');
+      const info = freelancerSessionInfo();
+      if (!modal || !info || !(info.goalMin > 0) || info.elapsedMin < info.goalMin) return;
+      if (info.session && info.session.ackGoalMin === info.goalMin) return;
+      if (modal.classList.contains('open') || state.activeCall || state.activePause || openModalStack.length) return;
+      playProductiveBreakSound();
+      openFreelancerSessionModal();
+    }
+
+    document.addEventListener('app:modal-closed', (event) => {
+      if (event.detail?.id !== 'sessionGoalModal' || freelancerGoalModalHandled) return;
+      acknowledgeFreelancerGoal();
+    });
+
+    const FREELANCER_TEMPLATES = {
+      short: { name: () => translateText('Sesión corta'), sessionGoalMin: 120, breakMin: 5, connectedEveryMin: 50, lunchEveryMin: 0, lunchMin: 30, earn: 40 },
+      medium: { name: () => translateText('Turno medio'), sessionGoalMin: 240, breakMin: 10, connectedEveryMin: 90, lunchEveryMin: 0, lunchMin: 30, earn: 60 },
+      long: { name: () => translateText('Turno largo'), sessionGoalMin: 480, breakMin: 15, connectedEveryMin: 90, lunchEveryMin: 240, lunchMin: 30, earn: 75 },
+    };
+
+    function applyFreelancerTemplate(key) {
+      const template = FREELANCER_TEMPLATES[key];
+      if (!template) return;
+      const previousFreelancer = settings.freelancer, previousEarn = settings.productiveBreakEarnMin;
+      settings.freelancer = { ...settings.freelancer, sessionGoalMin: template.sessionGoalMin, breakMin: template.breakMin, connectedEveryMin: template.connectedEveryMin, lunchEveryMin: template.lunchEveryMin, lunchMin: template.lunchMin };
+      settings.productiveBreakEarnMin = template.earn;
+      if (saveSettingsOnly() === false) { settings.freelancer = previousFreelancer; settings.productiveBreakEarnMin = previousEarn; return false; }
+      syncNotificationsModalFields();
+      toast(ui`Plantilla aplicada: ${template.name()}`);
+    }
+
     function updateFreelancerSettings() {
       const read = (id) => Number(document.getElementById(id)?.value);
       const next = { ...settings.freelancer, enabled: document.getElementById('freelancerEnabledInput').checked };
-      const pairs = [['breakMin', 'freelancerBreakMinInput', 1, 240], ['lunchMin', 'freelancerLunchMinInput', 1, 240], ['connectedEveryMin', 'freelancerConnectedMinInput', 0, 720], ['snoozeMin', 'freelancerSnoozeMinInput', 1, 60]];
+      const pairs = [['breakMin', 'freelancerBreakMinInput', 1, 240], ['lunchMin', 'freelancerLunchMinInput', 1, 240], ['connectedEveryMin', 'freelancerConnectedMinInput', 0, 720], ['snoozeMin', 'freelancerSnoozeMinInput', 1, 60], ['sessionGoalMin', 'freelancerSessionGoalInput', 0, 1440], ['lunchEveryMin', 'freelancerLunchEveryInput', 0, 720]];
       for (const [key, id, min, max] of pairs) { const n = read(id); if (Number.isInteger(n) && n >= min && n <= max) next[key] = n; }
       next.since = next.enabled ? (settings.freelancer.enabled && settings.freelancer.since ? settings.freelancer.since : todayCallDateKey()) : '';
       const previous = settings.freelancer;
@@ -5353,6 +5473,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       if (enabled) enabled.checked = fl.enabled;
       set('freelancerBreakMinInput', fl.breakMin); set('freelancerLunchMinInput', fl.lunchMin);
       set('freelancerConnectedMinInput', fl.connectedEveryMin); set('freelancerSnoozeMinInput', fl.snoozeMin);
+      set('freelancerSessionGoalInput', fl.sessionGoalMin); set('freelancerLunchEveryInput', fl.lunchEveryMin);
     }
 
     function syncNotificationsModalFields() {
@@ -6461,6 +6582,17 @@ function renderSchedule() {
         }
       }
 
+      if (settings.freelancer?.enabled === true && !(settings.freelancer.since && callDateToDate(settings.freelancer.since) > callDateToDate(dayKey))) {
+        if (subtitle) subtitle.textContent = translateText('Modo freelancer: aquí ves los descansos que has tomado.');
+        const offNote = document.getElementById('scheduleOffWorkedNote');
+        if (offNote) offNote.style.display = 'none';
+        const taken = dayPauseIntervals(dayKey).sort((a, b) => a.start - b.start);
+        wrap.innerHTML = taken.length
+          ? taken.map(p => ui`<div class="note">${escapeHtml(p.type === 'lunch' ? translateText('Lunch') : translateText('Break'))} · ${timeLabelFromDate(p.start)} – ${timeLabelFromDate(p.end)} · ${formatMinutes((p.end - p.start) / 60000)} min</div>`).join('')
+          : ui`<div class="note">${escapeHtml(translateText('Todavía no has tomado descansos.'))}</div>`;
+        renderBlockSummaryStrip([]);
+        return;
+      }
       if (!plannedSlots.length) {
         wrap.innerHTML = translateMarkup('<div class="note">No hay horario configurado para este día. Edítalo en “Horario”.</div>');
         renderBlockSummaryStrip([]);
@@ -6730,6 +6862,7 @@ ${example}`;
 
 export function render() {
       renderHeader();
+      renderFreelancerSession();
       renderSchedule();
       renderWeekSummary();
       // Solo se recalcula con la página de Reportes visible: recorre meses de historial día por
@@ -7647,7 +7780,18 @@ export function render() {
     document.getElementById('productiveBreakEarnMinInput').addEventListener('change', updateProductiveBreakSettings);
     document.getElementById('productiveBreakAwardMinInput').addEventListener('change', updateProductiveBreakSettings);
     document.getElementById('productiveBreakSoundInput').addEventListener('change', updateProductiveBreakSound);
-    for (const id of ['freelancerEnabledInput', 'freelancerBreakMinInput', 'freelancerLunchMinInput', 'freelancerConnectedMinInput', 'freelancerSnoozeMinInput']) document.getElementById(id).addEventListener('change', updateFreelancerSettings);
+    for (const id of ['freelancerEnabledInput', 'freelancerBreakMinInput', 'freelancerLunchMinInput', 'freelancerConnectedMinInput', 'freelancerSnoozeMinInput', 'freelancerSessionGoalInput', 'freelancerLunchEveryInput']) document.getElementById(id).addEventListener('change', updateFreelancerSettings);
+    document.getElementById('freelancerTemplateRow').addEventListener('click', (e) => {
+      const btn = e.target instanceof Element ? e.target.closest('[data-fl-template]') : null;
+      if (btn) applyFreelancerTemplate(btn.getAttribute('data-fl-template'));
+    });
+    document.getElementById('sessionGoalSaveBtn').addEventListener('click', saveFreelancerGoalFromInput);
+    document.getElementById('sessionGoalDismissBtn').addEventListener('click', () => { acknowledgeFreelancerGoal(); freelancerGoalModalHandled = true; closeModal('sessionGoalModal'); });
+    document.getElementById('sessionGoalEndBtn').addEventListener('click', () => { freelancerGoalModalHandled = true; closeModal('sessionGoalModal'); toggleShift(); });
+    document.getElementById('sessionGoalQuickRow').addEventListener('click', (e) => {
+      const btn = e.target instanceof Element ? e.target.closest('[data-sg-add]') : null;
+      if (btn) extendFreelancerGoal(Number(btn.getAttribute('data-sg-add')));
+    });
     document.getElementById('breakPromptAcceptBtn').addEventListener('click', acceptFreelancerBreak);
     document.getElementById('breakPromptSnoozeBtn').addEventListener('click', snoozeFreelancerBreak);
     document.getElementById('breakPromptDismissBtn').addEventListener('click', () => closeFreelancerPrompt(false));
@@ -8049,6 +8193,8 @@ export function render() {
       checkProductiveBreakEarnedAlarm();
       checkFreelancerBreakPrompt();
       checkFreelancerBreakOver();
+      checkFreelancerGoalPrompt();
+      renderFreelancerSession();
       // Cuenta regresiva en vivo de "Estás en una ventana ahora" — se repinta cada segundo, ya que
       // ahora vive tanto en el modal como en "Ganancias de hoy" (siempre visible en Inicio).
       renderHigherRateLiveCard();

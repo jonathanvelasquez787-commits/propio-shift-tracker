@@ -1284,3 +1284,8 @@ html.theme-light .hero-shift-actions:not(.is-collapsed) .hero-shift-toggle { bac
   .hero-shift-actions .action-btn .action-sub,
   .hero-shift-actions #callsControlsGrid .action-sub { font-size: 8px; }
 }
+
+.hero-shift-session { margin-left: 8px; padding: 2px 9px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--muted); font: inherit; font-size: 11px; font-weight: 600; line-height: 1.5; cursor: pointer; font-variant-numeric: tabular-nums; vertical-align: middle; }
+.hero-shift-session[hidden] { display: none; }
+.hero-shift-session.is-reached { color: var(--warn); border-color: var(--warn); }
+.hero-shift-session:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }

@@ -2239,11 +2239,23 @@
       "app.html"
     ]
   },
+  "s_20ff6b57": {
+    "source": "Terminar turno",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_21830f6d": {
     "source": "Azul suave, crema y arena",
     "files": [
       "app.html",
       "js/theme-palettes.js"
+    ]
+  },
+  "s_218a616a": {
+    "source": "Guardar meta",
+    "files": [
+      "app.html"
     ]
   },
   "s_219a0026": {
@@ -3769,6 +3781,12 @@
       "js/boot.js"
     ]
   },
+  "s_37825345": {
+    "source": "Plantilla aplicada: {{v0}}",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_3786aa68": {
     "source": "se calcula solo a partir de tus ganancias reales, sin que tengas que anotarlo tú.",
     "files": [
@@ -4476,6 +4494,12 @@
   },
   "s_436e54e3": {
     "source": "Según Propio",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
+  "s_437ce4c7": {
+    "source": "Todavía no has tomado descansos.",
     "files": [
       "js/app-main.js"
     ]
@@ -6336,6 +6360,13 @@
       "js/detail-views.js"
     ]
   },
+  "s_5f772ac5": {
+    "source": "Turno medio",
+    "files": [
+      "app.html",
+      "js/app-main.js"
+    ]
+  },
   "s_5f895d21": {
     "source": "Historial desde",
     "files": [
@@ -6388,6 +6419,12 @@
     "source": "el JSON exportado es tu copia completa, en un formato abierto.",
     "files": [
       "privacidad.html"
+    ]
+  },
+  "s_601b2130": {
+    "source": "Elige una meta entre 10 y 1440 minutos.",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_602a2d48": {
@@ -7059,6 +7096,12 @@
       "js/backup-recovery.js"
     ]
   },
+  "s_6b1ce89a": {
+    "source": "{{v0}} · {{v1}} – {{v2}} · {{v3}} min",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_6b1e4ed4": {
     "source": "Bronce",
     "files": [
@@ -7460,6 +7503,12 @@
     "source": "Cómo se aplican tarifa y moneda",
     "files": [
       "app.html"
+    ]
+  },
+  "s_714f85e9": {
+    "source": "Todavía no tienes meta para esta sesión.",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_7166a73f": {
@@ -8110,10 +8159,22 @@
       "js/reports.js"
     ]
   },
+  "s_7ab7b9a7": {
+    "source": "Meta de la sesión: {{v0}}",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_7b026cab": {
     "source": "{{v0}} Ganancias del ciclo",
     "files": [
       "js/reports.js"
+    ]
+  },
+  "s_7b444316": {
+    "source": "Lunch tras (min conectado, 0 = apagado)",
+    "files": [
+      "app.html"
     ]
   },
   "s_7b4ae944": {
@@ -9553,6 +9614,12 @@
       "js/calls.js"
     ]
   },
+  "s_8ec2e670": {
+    "source": "+2 h",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_8ec34fee": {
     "source": "No hay premios para esta pausa; los demás siguen guardados.",
     "files": [
@@ -9838,6 +9905,12 @@
   },
   "s_91cf25d9": {
     "source": "{{v0}} continuado — interrupción de {{v1}} min registrada",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
+  "s_91df71a4": {
+    "source": "Llevas {{v0}} de {{v1}} conectado.",
     "files": [
       "js/app-main.js"
     ]
@@ -10327,6 +10400,18 @@
     "source": "Caminata breve",
     "files": [
       "js/positive-reinforcement.js"
+    ]
+  },
+  "s_9a07cbca": {
+    "source": "Fijar meta",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
+  "s_9a0c8409": {
+    "source": "Plantillas",
+    "files": [
+      "app.html"
     ]
   },
   "s_9a1c3fb2": {
@@ -11575,6 +11660,12 @@
       "js/automation-ui.js"
     ]
   },
+  "s_ac358a06": {
+    "source": "Meta de la sesión (min conectado)",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_ac52bfaf": {
     "source": "Faltan {{v0}} min",
     "files": [
@@ -11700,6 +11791,12 @@
   },
   "s_aeca0c44": {
     "source": "Borra llamadas, pausas, huecos, la nota, el log y la gamificación SOLO del día activo (",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_aeebacac": {
+    "source": "Meta de sesión",
     "files": [
       "app.html"
     ]
@@ -12310,6 +12407,13 @@
       "app.html"
     ]
   },
+  "s_b821ecea": {
+    "source": "Turno largo",
+    "files": [
+      "app.html",
+      "js/app-main.js"
+    ]
+  },
   "s_b8511696": {
     "source": "\"Exportar JSON\" descarga un respaldo completo: llamadas, turnos, pausas, horario, metas, Finanzas, Higher Rate, gamificación y ajustes. \"Importar JSON\" restaura todo eso. Los backups antiguos sin configuración siguen siendo compatibles.",
     "files": [
@@ -12796,6 +12900,12 @@
     "source": "12:04 · 14 min · Billable",
     "files": [
       "index.html"
+    ]
+  },
+  "s_c088c97f": {
+    "source": "Modo freelancer: aquí ves los descansos que has tomado.",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_c08ef1c6": {
@@ -13712,6 +13822,13 @@
       "js/game-review.js"
     ]
   },
+  "s_cf85de9f": {
+    "source": "Sesión corta",
+    "files": [
+      "app.html",
+      "js/app-main.js"
+    ]
+  },
   "s_cf9c492e": {
     "source": "Los datos cambiaron. Cerrá y abrí este registro antes de guardar.",
     "files": [
@@ -13968,6 +14085,12 @@
   },
   "s_d30c0e69": {
     "source": "V",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_d31d1bdd": {
+    "source": "Meta de sesión (min, 0 = sin meta)",
     "files": [
       "app.html"
     ]
@@ -14397,6 +14520,12 @@
       "js/game-battle.js"
     ]
   },
+  "s_d9ed9557": {
+    "source": "Llegaste a tu meta de {{v0}} conectado. ¿Quieres seguir?",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_da016c4f": {
     "source": "Subir contenido ilegal o que infrinja derechos de terceros.",
     "files": [
@@ -14515,6 +14644,12 @@
     "source": "No hay cambios recuperables en esta vista.",
     "files": [
       "js/call-recovery.js"
+    ]
+  },
+  "s_db765001": {
+    "source": "+1 h",
+    "files": [
+      "app.html"
     ]
   },
   "s_db783f8e": {
@@ -15579,6 +15714,12 @@
   },
   "s_e990b548": {
     "source": "100% de vida",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_e9b7cd35": {
+    "source": "+30 min",
     "files": [
       "app.html"
     ]
