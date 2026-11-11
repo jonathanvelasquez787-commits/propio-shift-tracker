@@ -2929,5 +2929,20 @@
   "s_a2a5c676": "{{v8}} of {{v9}}{{v10}} {{v11}}",
   "s_85a04400": "Use the date, times and tier from the Propio notice. Changes save automatically and preserve recorded bonuses.",
   "s_f1710b98": "No active ACW",
-  "s_48b164cf": "Today's actions"
+  "s_48b164cf": "Today's actions",
+  "s_17c4ca94": "Freelancer mode enabled",
+  "s_1b47ea56": "No fixed schedule: rule-based breaks",
+  "s_2d0c3881": "Snooze",
+  "s_3f883b70": "Lunch (min)",
+  "s_45799d19": "Enable freelancer mode",
+  "s_4ea99fbe": "Freelancer mode disabled",
+  "s_6a9af4c8": "Alert after (connected min, 0 = off)",
+  "s_6da6d056": "Snooze (min)",
+  "s_738ac4bd": "Freelancer mode",
+  "s_90687a5b": "You've logged {{v0}} productive min and {{v1}} min connected since your last pause.",
+  "s_909c062f": "Break (min)",
+  "s_bb6c15cb": "Your {{v0}} of {{v1}} min is over. End it when you are back.",
+  "s_bbf96cf7": "Start break",
+  "s_d413e786": "With no planned schedule, the break alert appears when you reach the productive minutes set in “Productivity rest” or the connected minutes here, whichever comes first. From the alert you choose Break or Lunch and its length.",
+  "s_e0d192c3": "Time for a break"
 }

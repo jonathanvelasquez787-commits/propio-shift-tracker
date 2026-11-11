@@ -1482,6 +1482,18 @@
 <button class="mc-btn-warn-pill" id="clearCallManualSoundBtn" type="button" title="Quitar sonido personalizado" disabled>Quitar archivo</button>
 </div>
 </div></div></details>
+<details class="polished-setting" id="notificationFreelancerGroup"><summary><span>Modo freelancer<small>Sin horario fijo: descansos por regla</small></span></summary><div class="polished-setting-body"><div class="sched-compact-card">
+<label class="sched-checkbox-row"><input id="freelancerEnabledInput" type="checkbox"/> Activar modo freelancer</label>
+<p class="alert-hint">Sin horario planeado: el aviso de descanso sale cuando acumulas los minutos productivos de «Descanso por productividad» o los minutos conectado de aquí, lo que llegue primero. Desde el aviso eliges Break o Lunch y su duración.</p>
+<div class="sched-compact-row">
+<div class="sched-compact-field"><label for="freelancerBreakMinInput">Break (min)</label><input id="freelancerBreakMinInput" inputmode="numeric" min="1" max="240" step="1" type="number"/></div>
+<div class="sched-compact-field"><label for="freelancerLunchMinInput">Lunch (min)</label><input id="freelancerLunchMinInput" inputmode="numeric" min="1" max="240" step="1" type="number"/></div>
+</div>
+<div class="sched-compact-row">
+<div class="sched-compact-field"><label for="freelancerConnectedMinInput">Avisar tras (min conectado, 0 = apagado)</label><input id="freelancerConnectedMinInput" inputmode="numeric" min="0" max="720" step="1" type="number"/></div>
+<div class="sched-compact-field"><label for="freelancerSnoozeMinInput">Posponer (min)</label><input id="freelancerSnoozeMinInput" inputmode="numeric" min="1" max="60" step="1" type="number"/></div>
+</div>
+</div></div></details>
 <details class="polished-setting" id="notificationProductivityGroup"><summary><span>Descanso por productividad<small>Minutos, mensajes y sonido</small></span></summary><div class="polished-setting-body"><div class="sched-compact-card">
 <div class="sched-compact-head">
 <div class="sched-compact-title"><span class="sched-compact-title-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></span>Descanso por productividad</div>
@@ -1936,6 +1948,33 @@ $0.72"></textarea>
 <div class="note" id="importSkippedSummary" style="display:none;"></div>
 <button class="mc-btn-secondary" id="importResultRetryBtn" type="button" hidden>Reintentar detalle de importación</button>
 
+</div>
+</div>
+<div aria-hidden="true" class="modal-overlay" id="breakPromptModal">
+<div aria-labelledby="breakPromptTitle" aria-modal="true" class="modal-card" role="dialog">
+<div class="modal-head mc-modal-head">
+<div class="mc-header-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg></div>
+<div>
+<h3 id="breakPromptTitle">Es hora de un descanso</h3>
+<p id="breakPromptText"></p>
+</div>
+<button aria-label="Cerrar" class="modal-close" data-close-modal="breakPromptModal" type="button">×</button>
+</div>
+<div class="goals-section">
+<div class="mc-pill-row" id="breakPromptTypeRow" role="group" aria-label="Descanso">
+<button aria-pressed="true" class="mc-pill-btn" data-bp-type="break" type="button">Break</button>
+<button aria-pressed="false" class="mc-pill-btn" data-bp-type="lunch" type="button">Lunch</button>
+</div>
+<div class="goals-field">
+<label for="breakPromptMinInput">Duración (min)</label>
+<input id="breakPromptMinInput" inputmode="numeric" min="1" max="240" step="1" type="number"/>
+</div>
+</div>
+<div class="modal-actions mc-action-row">
+<button class="mc-btn-primary cyan" id="breakPromptAcceptBtn" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polyline points="5 12 10 17 19 6"/></svg> Empezar descanso</button>
+<button class="mc-btn-warn-pill" id="breakPromptSnoozeBtn" type="button">Posponer</button>
+<button class="mc-btn-warn-pill" id="breakPromptDismissBtn" type="button">Ahora no</button>
+</div>
 </div>
 </div>
 <div aria-hidden="true" class="modal-overlay" id="acwGoalModal">

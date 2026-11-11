@@ -1608,6 +1608,12 @@
       "js/game.js"
     ]
   },
+  "s_17c4ca94": {
+    "source": "Modo freelancer activado",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_17e6ee00": {
     "source": "La fuente oficial de tu pago es siempre la de tu empleador o\n    plataforma",
     "files": [
@@ -1911,6 +1917,12 @@
     "source": "Marcas observadas con milisegundos",
     "files": [
       "js/call-records-view.js"
+    ]
+  },
+  "s_1b47ea56": {
+    "source": "Sin horario fijo: descansos por regla",
+    "files": [
+      "app.html"
     ]
   },
   "s_1b690e90": {
@@ -2984,6 +2996,12 @@
     "source": "de esa semana",
     "files": [
       "js/schedule.js"
+    ]
+  },
+  "s_2d0c3881": {
+    "source": "Posponer",
+    "files": [
+      "app.html"
     ]
   },
   "s_2d6bba04": {
@@ -4237,6 +4255,12 @@
       "app.html"
     ]
   },
+  "s_3f883b70": {
+    "source": "Lunch (min)",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_3fb79ea5": {
     "source": "Aplicar horario",
     "files": [
@@ -4594,6 +4618,12 @@
     "source": "PSR B0531+21",
     "files": [
       "js/game-battle.js"
+    ]
+  },
+  "s_45799d19": {
+    "source": "Activar modo freelancer",
+    "files": [
+      "app.html"
     ]
   },
   "s_458b225e": {
@@ -5209,6 +5239,12 @@
     "source": "Ver copias recuperables",
     "files": [
       "app.html"
+    ]
+  },
+  "s_4ea99fbe": {
+    "source": "Modo freelancer desactivado",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_4eb1ea50": {
@@ -6974,6 +7010,12 @@
       "js/reports.js"
     ]
   },
+  "s_6a9af4c8": {
+    "source": "Avisar tras (min conectado, 0 = apagado)",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_6aaf475d": {
     "source": "Hoy no hubo llamadas completadas. Puedes descansar y retomar mañana a tu ritmo.",
     "files": [
@@ -7179,6 +7221,12 @@
     "files": [
       "js/finance.js",
       "js/shift-work-review.js"
+    ]
+  },
+  "s_6da6d056": {
+    "source": "Posponer (min)",
+    "files": [
+      "app.html"
     ]
   },
   "s_6dc20677": {
@@ -7559,6 +7607,12 @@
     "files": [
       "app.html",
       "js/theme-palettes.js"
+    ]
+  },
+  "s_738ac4bd": {
+    "source": "Modo freelancer",
+    "files": [
+      "app.html"
     ]
   },
   "s_73c20441": {
@@ -9626,6 +9680,12 @@
       "app.html"
     ]
   },
+  "s_90687a5b": {
+    "source": "Llevas {{v0}} min productivos y {{v1}} min conectado desde tu última pausa.",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_90899808": {
     "source": "−{{v0}} {{v1}}",
     "files": [
@@ -9636,6 +9696,12 @@
     "source": "Railgun",
     "files": [
       "js/game-battle.js"
+    ]
+  },
+  "s_909c062f": {
+    "source": "Break (min)",
+    "files": [
+      "app.html"
     ]
   },
   "s_909e1722": {
@@ -12409,6 +12475,18 @@
       "app.html"
     ]
   },
+  "s_bb6c15cb": {
+    "source": "Tu {{v0}} de {{v1}} min terminó. Termínalo cuando regreses.",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
+  "s_bbf96cf7": {
+    "source": "Empezar descanso",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_bbf9bad7": {
     "source": "Los datos cambiaron. Vuelve a abrir el formulario o la confirmación.",
     "files": [
@@ -13955,6 +14033,12 @@
       "js/accounting-export.js"
     ]
   },
+  "s_d413e786": {
+    "source": "Sin horario planeado: el aviso de descanso sale cuando acumulas los minutos productivos de «Descanso por productividad» o los minutos conectado de aquí, lo que llegue primero. Desde el aviso eliges Break o Lunch y su duración.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_d446035e": {
     "source": "Hecho",
     "files": [
@@ -14926,6 +15010,12 @@
       "app.html"
     ]
   },
+  "s_e0d192c3": {
+    "source": "Es hora de un descanso",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_e100623d": {
     "source": "Limpiar",
     "files": [
@@ -15873,6 +15963,7 @@
   "s_ee55e877": {
     "source": "Elige un número entero entre 1 y 240 minutos.",
     "files": [
+      "js/app-main.js",
       "js/positive-reinforcement.js"
     ]
   },

@@ -744,6 +744,9 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
         // derecho a M minutos de descanso.
         productiveBreakEarnMin: 30,
         productiveBreakAwardMin: 5,
+        // Modo freelancer: sin horario fijo, el aviso de descanso sale por regla (minutos productivos o
+        // tiempo conectado desde la última pausa, gana el que llegue primero).
+        freelancer: { enabled: false, since: '', breakMin: 10, lunchMin: 30, connectedEveryMin: 90, snoozeMin: 5 },
         // Mensaje editable también para este aviso — dos plantillas independientes (primera vez del
         // turno / repeticiones siguientes, ver checkProductiveBreakEarnedAlarm) con variables
         // `{productivo}`/`{descanso}`.
@@ -1004,6 +1007,18 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
           row.assignedAmount = Number.isFinite(assigned) && assigned >= 0 ? assigned : 0;
         });
       });
+      {
+        const fl = settings.freelancer && typeof settings.freelancer === 'object' && !Array.isArray(settings.freelancer) ? settings.freelancer : {};
+        const whole = (value, min, max, fallbackValue) => { const n = Number(value); return Number.isFinite(n) && n >= min && n <= max ? Math.round(n) : fallbackValue; };
+        settings.freelancer = {
+          enabled: fl.enabled === true,
+          since: /^\d{2}\/\d{2}\/\d{4}$/.test(String(fl.since || '')) ? String(fl.since) : '',
+          breakMin: whole(fl.breakMin, 1, 240, 10),
+          lunchMin: whole(fl.lunchMin, 1, 240, 30),
+          connectedEveryMin: whole(fl.connectedEveryMin, 0, 720, 90),
+          snoozeMin: whole(fl.snoozeMin, 1, 60, 5),
+        };
+      }
       if (typeof settings.financeAutoFill !== 'boolean') settings.financeAutoFill = false;
       if (!settings.game || typeof settings.game !== 'object' || Array.isArray(settings.game)) settings.game = { ...fallback.game };
       if (typeof settings.game.enabled !== 'boolean') settings.game.enabled = fallback.game.enabled;
@@ -1782,7 +1797,17 @@ function playCallSavedSound(kind) {
 
 // Revisa cada segundo si entramos a la ventana [hora planeada − alertBeforeShiftMin, hora
 // planeada).
+// Modo freelancer: sin horario planeado. Los avisos de turno/Break por hora y la Adherencia contra el
+// plan no aplican; en su lugar sale el aviso de descanso por regla (ver checkFreelancerBreakPrompt).
+function freelancerActive() { return settings.freelancer?.enabled === true; }
+function freelancerSkipsDay(dayKey) {
+  if (!freelancerActive()) return false;
+  const since = callDateToDate(settings.freelancer.since), day = callDateToDate(dayKey);
+  return !since || (!!day && day >= since);
+}
+
 function checkShiftAlarm() {
+  if (settings.freelancer?.enabled === true) { stopShiftAlarm(); return; }
   const cfg = dayConfigFor(todayCallDateKey());
   const alertMin = Number(settings.alertBeforeShiftMin);
   // Se usa dayShiftBounds().live y no state.shiftStartedAt: ese solo se llena con el click real de
@@ -1844,6 +1869,7 @@ function stopBreakStartAlarm() {
 // en orden cronológico y dispara el aviso para el primero que aún no se haya tomado y cuya hora
 // caiga.
 function checkBreakStartAlarm() {
+  if (settings.freelancer?.enabled === true) { stopBreakStartAlarm(); return; }
   const alertMin = Number(settings.alertBeforeBreakMin);
   // Mismo problema que checkShiftAlarm.
   const shiftIsLive = dayShiftBounds(todayCallDateKey()).live;
@@ -1924,6 +1950,7 @@ function findPlannedSlotForActivePause(dayKey) {
 // duración del primer slot de ese tipo.
 function referenceDurationMinForActivePause(dayKey) {
   if (!state.activePause) return null;
+  if (Number(state.activePause.plannedMin) > 0) return Number(state.activePause.plannedMin);
   const matchedSlot = findPlannedSlotForActivePause(dayKey);
   if (matchedSlot) return toMinutes(matchedSlot.end) - toMinutes(matchedSlot.start);
 
@@ -2086,6 +2113,7 @@ function minutesSinceLastProductiveBreakAnchor() {
 const productiveBreakEarnedFiredTramoByAnchor = new Map();
 
 function checkProductiveBreakEarnedAlarm() {
+  if (settings.freelancer?.enabled === true) return;
   const earnMin = Number(settings.productiveBreakEarnMin);
   const awardMin = Number(settings.productiveBreakAwardMin);
   if (!Number.isFinite(earnMin) || earnMin <= 0) return;
@@ -3222,6 +3250,7 @@ function plannedMinuteSlots(slots) {
 // checkpoints.
 function minuteAdherenceForDay(dayKey, sessions) {
   const normalized = callDateKeyFromValue(dayKey);
+  if (settings.freelancer?.enabled === true && !(settings.freelancer.since && callDateToDate(settings.freelancer.since) > callDateToDate(normalized))) return null;
   const isToday = normalized === todayCallDateKey();
   // Recibe todas las sesiones del día: con 2+ sesiones el hueco entre ellas debe contar como
   // ausencia, no como trabajo.
@@ -3247,7 +3276,7 @@ function minuteAdherenceForDay(dayKey, sessions) {
 // Saber si AHORA MISMO (este minuto) estás fuera de adherencia — para un indicador en vivo, no solo
 // el % acumulado del día.
 function isRightNowOutOfAdherence() {
-  if (!state.shiftStartedAt || state.shiftEndedAt) return false;
+  if (!state.shiftStartedAt || state.shiftEndedAt || settings.freelancer?.enabled === true) return false;
   const dayKey = currentShiftAccountingDayKey();
   // Un día forzado a Libre desde "Editar día" (Resumen semanal) ya no exige Adherencia.
   if (dayIsEffectivelyOff(dayKey)) return false;
@@ -3272,6 +3301,7 @@ function isRightNowOutOfAdherence() {
 // (aparte) del % global de arriba (que sigue viniendo de minuteAdherenceForDay, sin cambios).
 function slotMinuteAdherence(dayKey, originalSlot, sessions) {
   const normalized = callDateKeyFromValue(dayKey);
+  if (settings.freelancer?.enabled === true && !(settings.freelancer.since && callDateToDate(settings.freelancer.since) > callDateToDate(normalized))) return null;
   const isToday = normalized === todayCallDateKey();
   // Un día forzado a Libre desde "Editar día" (Resumen semanal) ya no exige Adherencia.
   if (dayIsEffectivelyOff(normalized)) return null;
@@ -3304,6 +3334,7 @@ function slotMinuteAdherence(dayKey, originalSlot, sessions) {
 
 export function dayAdherence(dayKey) {
   const normalized = callDateKeyFromValue(dayKey);
+  if (settings.freelancer?.enabled === true && !(settings.freelancer.since && callDateToDate(settings.freelancer.since) > callDateToDate(normalized))) return null;
   const cfg = dayConfigFor(normalized);
   // Un día "libre" con actividad real (llamadas o turno) sí se evalúa, no se salta.
   if (!cfg || dayIsEffectivelyOff(normalized)) return null;
@@ -3825,6 +3856,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
     const SHIFT_START_EARLY_GRACE_MIN = 10;
 
     function shiftStartTooEarly() {
+      if (settings.freelancer?.enabled === true) return false;
       // Solo aplica cuando se está por INICIAR un turno nuevo — si ya está activo (el botón es
       // "Finalizar shift"), nunca debe bloquearse.
       if (state.shiftStartedAt && !state.shiftEndedAt) return false;
@@ -3901,6 +3933,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
     }
 
     function liveCallDayIsOff() {
+      if (typeof settings !== 'undefined' && settings.freelancer?.enabled === true) return false;
       const day = todayCallDateKey();
       const forced = getDayNote(day)?.forcedStatus;
       return forced === 'off' || (forced !== 'work' && !!dayConfigFor(day)?.off);
@@ -5226,7 +5259,104 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
     });
 
     // Pedido del usuario : Volumen/Avisos con sonido/Adherencia/ Descanso por productividad salieron de Horario — no son horario, son cómo y cuándo te avisa la app.
+    // ---- Modo freelancer: aviso de descanso por regla ----
+    const freelancerPrompt = { dismissedAnchor: null, snoozeUntil: 0, type: 'break', anchorKey: null, handled: false, overdueKey: null };
+
+    function freelancerBreakDue() {
+      if (!freelancerActive() || state.activeCall || state.activePause || state.shiftEndedAt || !state.shiftStartedAt) return null;
+      const result = minutesSinceLastProductiveBreakAnchor();
+      if (!result) return null;
+      const connectedMin = (Date.now() - result.anchor.getTime()) / 60000;
+      const earnMin = Number(settings.productiveBreakEarnMin), every = settings.freelancer.connectedEveryMin;
+      if (!((earnMin > 0 && result.productiveMin >= earnMin) || (every > 0 && connectedMin >= every))) return null;
+      return { anchorKey: result.anchor.toISOString(), productiveMin: result.productiveMin, connectedMin };
+    }
+
+    function syncFreelancerPromptType(type) {
+      freelancerPrompt.type = type === 'lunch' ? 'lunch' : 'break';
+      document.querySelectorAll('#breakPromptTypeRow [data-bp-type]').forEach(btn => btn.setAttribute('aria-pressed', String(btn.getAttribute('data-bp-type') === freelancerPrompt.type)));
+      const minutes = freelancerPrompt.type === 'lunch' ? settings.freelancer.lunchMin : settings.freelancer.breakMin;
+      document.getElementById('breakPromptMinInput').value = minutes;
+    }
+
+    function closeFreelancerPrompt(handled) {
+      freelancerPrompt.handled = handled;
+      closeModal('breakPromptModal');
+    }
+
+    function checkFreelancerBreakPrompt() {
+      const modal = document.getElementById('breakPromptModal');
+      if (!modal) return;
+      const due = freelancerBreakDue();
+      const isOpen = modal.classList.contains('open');
+      if (!due) { if (isOpen) closeFreelancerPrompt(true); return; }
+      if (isOpen || freelancerPrompt.dismissedAnchor === due.anchorKey || Date.now() < freelancerPrompt.snoozeUntil || openModalStack.length) return;
+      freelancerPrompt.anchorKey = due.anchorKey;
+      freelancerPrompt.handled = false;
+      document.getElementById('breakPromptText').textContent = ui`Llevas ${formatMinutes(due.productiveMin)} min productivos y ${formatMinutes(due.connectedMin)} min conectado desde tu última pausa.`;
+      syncFreelancerPromptType('break');
+      playProductiveBreakSound();
+      openModal('breakPromptModal');
+    }
+
+    function acceptFreelancerBreak() {
+      const minutes = Number(document.getElementById('breakPromptMinInput').value);
+      if (!Number.isInteger(minutes) || minutes < 1 || minutes > 240) { toast(translateText('Elige un número entero entre 1 y 240 minutos.')); return; }
+      closeFreelancerPrompt(true);
+      if (state.activeCall || state.activePause || !state.shiftStartedAt || state.shiftEndedAt) return;
+      startPause(freelancerPrompt.type);
+      if (state.activePause && state.activePause.type === freelancerPrompt.type) {
+        state.activePause.plannedMin = minutes;
+        saveStateOnly();
+        render();
+      }
+    }
+
+    function snoozeFreelancerBreak() {
+      freelancerPrompt.snoozeUntil = Date.now() + settings.freelancer.snoozeMin * 60000;
+      closeFreelancerPrompt(true);
+    }
+
+    // Cerrar con ×, clic afuera o Escape cuenta como "Ahora no": no vuelve a salir hasta la próxima pausa.
+    document.addEventListener('app:modal-closed', (event) => {
+      if (event.detail?.id !== 'breakPromptModal' || freelancerPrompt.handled) return;
+      freelancerPrompt.dismissedAnchor = freelancerPrompt.anchorKey;
+    });
+
+    function checkFreelancerBreakOver() {
+      if (!freelancerActive() || !state.activePause || !(Number(state.activePause.plannedMin) > 0)) return;
+      const endsAt = Date.parse(state.activePause.startedAt) + Number(state.activePause.plannedMin) * 60000;
+      if (Date.now() < endsAt || freelancerPrompt.overdueKey === state.activePause.startedAt) return;
+      freelancerPrompt.overdueKey = state.activePause.startedAt;
+      toast(ui`Tu ${state.activePause.type === 'lunch' ? translateText('Lunch') : translateText('Break')} de ${state.activePause.plannedMin} min terminó. Termínalo cuando regreses.`);
+      playProductiveBreakSound();
+    }
+
+    function updateFreelancerSettings() {
+      const read = (id) => Number(document.getElementById(id)?.value);
+      const next = { ...settings.freelancer, enabled: document.getElementById('freelancerEnabledInput').checked };
+      const pairs = [['breakMin', 'freelancerBreakMinInput', 1, 240], ['lunchMin', 'freelancerLunchMinInput', 1, 240], ['connectedEveryMin', 'freelancerConnectedMinInput', 0, 720], ['snoozeMin', 'freelancerSnoozeMinInput', 1, 60]];
+      for (const [key, id, min, max] of pairs) { const n = read(id); if (Number.isInteger(n) && n >= min && n <= max) next[key] = n; }
+      next.since = next.enabled ? (settings.freelancer.enabled && settings.freelancer.since ? settings.freelancer.since : todayCallDateKey()) : '';
+      const previous = settings.freelancer;
+      settings.freelancer = next;
+      if (saveSettingsOnly() === false) { settings.freelancer = previous; syncNotificationsModalFields(); return false; }
+      freelancerPrompt.dismissedAnchor = null; freelancerPrompt.snoozeUntil = 0;
+      render();
+      toast(next.enabled ? translateText('Modo freelancer activado') : translateText('Modo freelancer desactivado'));
+    }
+
+    function syncFreelancerFields() {
+      const fl = settings.freelancer;
+      const set = (id, value) => { const el = document.getElementById(id); if (el && document.activeElement !== el) el.value = value; };
+      const enabled = document.getElementById('freelancerEnabledInput');
+      if (enabled) enabled.checked = fl.enabled;
+      set('freelancerBreakMinInput', fl.breakMin); set('freelancerLunchMinInput', fl.lunchMin);
+      set('freelancerConnectedMinInput', fl.connectedEveryMin); set('freelancerSnoozeMinInput', fl.snoozeMin);
+    }
+
     function syncNotificationsModalFields() {
+      syncFreelancerFields();
       const shiftAlertMinInput = document.getElementById('shiftAlertMinInput');
       if (shiftAlertMinInput && document.activeElement !== shiftAlertMinInput) shiftAlertMinInput.value = settings.alertBeforeShiftMin;
       const masterVolumeInput = document.getElementById('masterVolumeInput');
@@ -7517,6 +7647,14 @@ export function render() {
     document.getElementById('productiveBreakEarnMinInput').addEventListener('change', updateProductiveBreakSettings);
     document.getElementById('productiveBreakAwardMinInput').addEventListener('change', updateProductiveBreakSettings);
     document.getElementById('productiveBreakSoundInput').addEventListener('change', updateProductiveBreakSound);
+    for (const id of ['freelancerEnabledInput', 'freelancerBreakMinInput', 'freelancerLunchMinInput', 'freelancerConnectedMinInput', 'freelancerSnoozeMinInput']) document.getElementById(id).addEventListener('change', updateFreelancerSettings);
+    document.getElementById('breakPromptAcceptBtn').addEventListener('click', acceptFreelancerBreak);
+    document.getElementById('breakPromptSnoozeBtn').addEventListener('click', snoozeFreelancerBreak);
+    document.getElementById('breakPromptDismissBtn').addEventListener('click', () => closeFreelancerPrompt(false));
+    document.getElementById('breakPromptTypeRow').addEventListener('click', (e) => {
+      const btn = e.target instanceof Element ? e.target.closest('[data-bp-type]') : null;
+      if (btn) syncFreelancerPromptType(btn.getAttribute('data-bp-type'));
+    });
     document.getElementById('productiveBreakSoundFile').addEventListener('change', handleProductiveBreakSoundFile);
     document.getElementById('testProductiveBreakSoundBtn').addEventListener('click', testProductiveBreakSound);
     // Mismo wiring que arriba, generalizado por `kind` (ver ALARM_SOUND_CONFIGS).
@@ -7909,6 +8047,8 @@ export function render() {
       checkBreakStartAlarm();
       checkBreakEndAlarm();
       checkProductiveBreakEarnedAlarm();
+      checkFreelancerBreakPrompt();
+      checkFreelancerBreakOver();
       // Cuenta regresiva en vivo de "Estás en una ventana ahora" — se repinta cada segundo, ya que
       // ahora vive tanto en el modal como en "Ganancias de hoy" (siempre visible en Inicio).
       renderHigherRateLiveCard();
