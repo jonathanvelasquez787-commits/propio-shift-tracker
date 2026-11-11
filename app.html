@@ -1493,6 +1493,16 @@
 <div class="sched-compact-field"><label for="freelancerConnectedMinInput">Avisar tras (min conectado, 0 = apagado)</label><input id="freelancerConnectedMinInput" inputmode="numeric" min="0" max="720" step="1" type="number"/></div>
 <div class="sched-compact-field"><label for="freelancerSnoozeMinInput">Posponer (min)</label><input id="freelancerSnoozeMinInput" inputmode="numeric" min="1" max="60" step="1" type="number"/></div>
 </div>
+<div class="sched-compact-row">
+<div class="sched-compact-field"><label for="freelancerSessionGoalInput">Meta de sesión (min, 0 = sin meta)</label><input id="freelancerSessionGoalInput" inputmode="numeric" min="0" max="1440" step="1" type="number"/></div>
+<div class="sched-compact-field"><label for="freelancerLunchEveryInput">Lunch tras (min conectado, 0 = apagado)</label><input id="freelancerLunchEveryInput" inputmode="numeric" min="0" max="720" step="1" type="number"/></div>
+</div>
+<p class="alert-hint">Plantillas</p>
+<div class="mc-pill-row" id="freelancerTemplateRow" role="group" aria-label="Plantillas">
+<button class="mc-pill-btn" data-fl-template="short" type="button">Sesión corta</button>
+<button class="mc-pill-btn" data-fl-template="medium" type="button">Turno medio</button>
+<button class="mc-pill-btn" data-fl-template="long" type="button">Turno largo</button>
+</div>
 </div></div></details>
 <details class="polished-setting" id="notificationProductivityGroup"><summary><span>Descanso por productividad<small>Minutos, mensajes y sonido</small></span></summary><div class="polished-setting-body"><div class="sched-compact-card">
 <div class="sched-compact-head">
@@ -1974,6 +1984,33 @@ $0.72"></textarea>
 <button class="mc-btn-primary cyan" id="breakPromptAcceptBtn" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polyline points="5 12 10 17 19 6"/></svg> Empezar descanso</button>
 <button class="mc-btn-warn-pill" id="breakPromptSnoozeBtn" type="button">Posponer</button>
 <button class="mc-btn-warn-pill" id="breakPromptDismissBtn" type="button">Ahora no</button>
+</div>
+</div>
+</div>
+<div aria-hidden="true" class="modal-overlay" id="sessionGoalModal">
+<div aria-labelledby="sessionGoalTitle" aria-modal="true" class="modal-card" role="dialog">
+<div class="modal-head mc-modal-head">
+<div>
+<h3 id="sessionGoalTitle">Meta de sesión</h3>
+<p id="sessionGoalText"></p>
+</div>
+<button aria-label="Cerrar" class="modal-close" data-close-modal="sessionGoalModal" type="button">×</button>
+</div>
+<div class="goals-section">
+<div class="mc-pill-row" id="sessionGoalQuickRow" role="group" aria-label="Meta de sesión">
+<button class="mc-pill-btn" data-sg-add="30" type="button">+30 min</button>
+<button class="mc-pill-btn" data-sg-add="60" type="button">+1 h</button>
+<button class="mc-pill-btn" data-sg-add="120" type="button">+2 h</button>
+</div>
+<div class="goals-field">
+<label for="sessionGoalMinInput">Meta de la sesión (min conectado)</label>
+<input id="sessionGoalMinInput" inputmode="numeric" min="10" max="1440" step="1" type="number"/>
+</div>
+</div>
+<div class="modal-actions mc-action-row">
+<button class="mc-btn-primary cyan" id="sessionGoalSaveBtn" type="button">Guardar meta</button>
+<button class="mc-btn-warn-pill" id="sessionGoalEndBtn" type="button">Terminar turno</button>
+<button class="mc-btn-warn-pill" id="sessionGoalDismissBtn" type="button">Ahora no</button>
 </div>
 </div>
 </div>
