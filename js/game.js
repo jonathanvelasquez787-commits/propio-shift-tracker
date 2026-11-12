@@ -12,7 +12,7 @@ let cycleBoundsForOffset, cycleEarningsForOffset, dayAdherence, dayComplianceSta
 let dayIsEffectivelyOff, effectiveCycleGoal, effectiveDailyGoal, escapeHtml, financeConvertedInline;
 let financeRowIsMeta, formatCallDayLabel, formatMinutes, higherRateBonusForCall, higherRateLiveStatus;
 let importedCallStats, money, openModal, parseMoney, productiveMinutesForDay, saveSettingsOnly;
-let saveStateOnly, todayCallDateKey, toast, weekdayKeyForDayKey, getReinforcementWorkIntervals, renderHeader;
+let saveStateOnly, todayCallDateKey, toast, weekdayKeyForDayKey, getReinforcementWorkIntervals, renderHeader, freelancerDiscipline;
 
 export function configureGameContext(context) {
   reviewGame=context.reviewGame;
@@ -21,7 +21,7 @@ export function configureGameContext(context) {
     dayIsEffectivelyOff, effectiveCycleGoal, effectiveDailyGoal, escapeHtml, financeConvertedInline,
     financeRowIsMeta, formatCallDayLabel, formatMinutes, higherRateBonusForCall, higherRateLiveStatus,
     importedCallStats, money, openModal, parseMoney, productiveMinutesForDay, saveSettingsOnly,
-    saveStateOnly, todayCallDateKey, toast, weekdayKeyForDayKey, getReinforcementWorkIntervals, renderHeader } = context);
+    saveStateOnly, todayCallDateKey, toast, weekdayKeyForDayKey, getReinforcementWorkIntervals, renderHeader, freelancerDiscipline } = context);
   configureReinforcementFeedback({ queueToast: queueGameToast, triggerEffect: () => triggerGameEvent('gameArena', 'clear', 900), playSound: playGameTone });
 }
 import { MONSTER_CATALOG, monsterForWeekday, monsterSvg, gamePixelIcon, gamePixelChest } from './monsters.js';
@@ -463,13 +463,15 @@ function missionSnapshot(dayKey, stats, goal, adherence, dayState = null) {
   const productiveOk = productiveApplies && stats.productive >= goal.min - 0.5;
   const remainingProductive = Math.max(0, goal.min - stats.productive);
   const pauseCheckpoints = (adherence?.checkpoints || []).filter((item) => !['Entrada', 'Salida', 'Turno'].includes(item.label));
-  const expectedPauses = plannedPauseCount(dayKey);
+  // Modo freelancer: sin horario, las pausas esperadas salen de la regla de descanso y se comparan con las tomadas.
+  const discipline = freelancerDiscipline?.(dayKey) || null;
+  const expectedPauses = discipline ? discipline.expected : plannedPauseCount(dayKey);
   const breaksApplies = expectedPauses > 0;
-  const breaksOk = breaksApplies && pauseCheckpoints.length >= expectedPauses && pauseCheckpoints.every((item) => item.ok);
-  const missingBreaks = Math.max(0, expectedPauses - pauseCheckpoints.filter((item) => item.ok).length);
+  const breaksOk = discipline ? breaksApplies && discipline.taken >= expectedPauses : breaksApplies && pauseCheckpoints.length >= expectedPauses && pauseCheckpoints.every((item) => item.ok);
+  const missingBreaks = discipline ? Math.max(0, expectedPauses - discipline.taken) : Math.max(0, expectedPauses - pauseCheckpoints.filter((item) => item.ok).length);
   const adherenceGoal = Number(settings.adherenceGoalPct) || 95;
-  const adherencePct = Number(adherence?.scorePct);
-  const adherenceApplies = Number.isFinite(adherencePct);
+  const adherencePct = discipline ? discipline.pct : Number(adherence?.scorePct);
+  const adherenceApplies = discipline ? discipline.expected > 0 : Number.isFinite(adherencePct);
   const adherenceOk = adherenceApplies && adherencePct >= adherenceGoal;
   const qualityApplies = stats.total > 0;
   const qualityOk = qualityApplies && stats.zeroCount === 0 && stats.dropped === 0;
@@ -545,7 +547,8 @@ export function computeGameDay(dayKey = todayCallDateKey(), { ignoreLock = false
   const missions = missionSnapshot(dayKey, xpStats, goal, adherence, savedEntry);
   const productivityXp = goal.min > 0 ? Math.round(Math.min(1, xpStats.productive / goal.min) * 50) : 50;
   const callsXp = Math.min(30, eligibleCalls.reduce((sum, call) => sum + callXp(call), 0));
-  const adherencePct = Math.max(0, Number(adherence?.scorePct) || 0);
+  const discipline = freelancerDiscipline?.(dayKey) || null;
+  const adherencePct = discipline ? discipline.pct : Math.max(0, Number(adherence?.scorePct) || 0);
   const adherenceGoal = Number(settings.adherenceGoalPct) || 95;
   const adherenceXp = Math.round(Math.min(1, adherencePct / adherenceGoal) * 30);
   const punctualityXp = state.game.ledger[`reflex:${dayKey}`] ? 20 : 0;
@@ -1959,7 +1962,8 @@ export function checkReinforcementInactivity(now = Date.now()) {
   ensureGameState();
   const interruptions = Object.values(state.dayInterruptions || {}).flatMap((items) => Array.isArray(items) ? items : [])
     .map((item) => ({ startedAt: item.gapStart, endedAt: item.gapEnd }));
-  const workIntervals = getReinforcementWorkIntervals?.(currentGameDayKey());
+  // Modo freelancer: sin horario planeado, cualquier momento con el turno abierto cuenta como trabajo.
+  const workIntervals = typeof freelancerDiscipline === 'function' && freelancerDiscipline(currentGameDayKey()) ? undefined : getReinforcementWorkIntervals?.(currentGameDayKey());
   if (Array.isArray(workIntervals) && !workIntervals.some((interval) => new Date(interval.startedAt).getTime() <= Number(now) && new Date(interval.endedAt).getTime() > Number(now))) return false;
   const elapsed = activeWorkSinceLastCall({ ...state, calls, now, workIntervals, pauseHistory: [...(state.pauseHistory || []), ...interruptions] });
   const interval = normalizeInactivityMinutes(settings.reinforcement?.inactivityMinutes) * 60000;

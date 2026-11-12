@@ -328,6 +328,14 @@ function reportsTrends() {
 export function dayComplianceStatus(dayKey) {
   if (dayIsEffectivelyOff(dayKey)) return 'off';
   const isToday = dayKey === todayCallDateKey();
+  // Modo freelancer: sin horario no hay Adherencia; el día cumple si alcanzas la meta productiva.
+  const freelancer = settings.freelancer;
+  if (freelancer?.enabled === true && !(freelancer.since && callDateToDate(freelancer.since) > callDateToDate(dayKey))) {
+    const productive = productiveMinutesForDay(dayKey), dailyGoalMin = effectiveDailyGoal(dayKey).min;
+    if (!productive && !dayShiftBounds(dayKey).start) return isToday ? 'pending' : 'off';
+    if (dailyGoalMin <= 0 || productive >= dailyGoalMin - 0.5) return 'compliant';
+    return isToday ? 'pending' : 'failed';
+  }
   const adherence = dayAdherence(dayKey);
   if (!adherence) return isToday ? 'pending' : 'off';
   const goalPct = Number(settings.adherenceGoalPct) || 95;
