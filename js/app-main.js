@@ -1808,6 +1808,15 @@ function freelancerSkipsDay(dayKey) {
   return !since || (!!day && day >= since);
 }
 
+// Modo freelancer: pausas esperadas según la regla de descanso (tiempo conectado / cada N min) vs tomadas.
+function freelancerDiscipline(dayKey) {
+  const fl = settings.freelancer;
+  if (!(fl?.enabled === true && !(fl.since && callDateToDate(fl.since) > callDateToDate(dayKey)))) return null;
+  const expected = fl.connectedEveryMin > 0 ? Math.floor(connectedMinutesForDay(dayKey) / fl.connectedEveryMin) : 0;
+  const taken = dayPauseIntervals(dayKey).length;
+  return { expected, taken, pct: expected > 0 ? Math.min(100, Math.round((taken / expected) * 100)) : 100 };
+}
+
 function checkShiftAlarm() {
   if (settings.freelancer?.enabled === true) { stopShiftAlarm(); return; }
   const cfg = dayConfigFor(todayCallDateKey());
@@ -5250,6 +5259,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       financeRowIsMeta, formatCallDayLabel, formatMinutes, higherRateBonusForCall, higherRateLiveStatus,
       importedCallStats, money, openModal, parseMoney, productiveMinutesForDay, saveSettingsOnly,
       saveStateOnly, todayCallDateKey, toast, weekdayKeyForDayKey, renderHeader,
+      freelancerDiscipline,
       getReinforcementWorkIntervals: (dayKey) => {
         return reinforcementScheduleIntervals(dayKey).filter((slot) => String(slot.type).toLowerCase() === 'work');
       },
