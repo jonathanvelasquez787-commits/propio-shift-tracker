@@ -1289,3 +1289,4 @@ html.theme-light .hero-shift-actions:not(.is-collapsed) .hero-shift-toggle { bac
 .hero-shift-session[hidden] { display: none; }
 .hero-shift-session.is-reached { color: var(--warn); border-color: var(--warn); }
 .hero-shift-session:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+.hero-shift-session { white-space: nowrap; }

@@ -1877,6 +1877,28 @@
           ]
         }
       ]
+    },
+    {
+      "id": "freelancer-mode",
+      "area": "tracker",
+      "acceptance": "Sin horario fijo, el aviso de descanso sale por regla (minutos productivos o conectado), con duración elegible, posponer y meta de sesión extensible; la racha cuenta el día por la meta productiva y no por Adherencia; los días anteriores a activarlo conservan su lógica.",
+      "sources": [
+        "js/app-main.js",
+        "js/game.js",
+        "js/reports.js"
+      ],
+      "tests": [
+        {
+          "file": "tests/freelancer-mode.test.mjs",
+          "namedCases": [
+            "modo freelancer: el día cumple al alcanzar la meta productiva, sin Adherencia",
+            "modo freelancer: un día pasado por debajo de la meta falla y uno sin actividad se salta",
+            "modo freelancer: hoy por debajo de la meta queda pendiente, no fallido",
+            "modo freelancer: los días anteriores a la fecha de activación siguen con la lógica de Adherencia",
+            "sin modo freelancer no cambia el comportamiento previo"
+          ]
+        }
+      ]
     }
   ],
   "limits": [
