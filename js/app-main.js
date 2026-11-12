@@ -1802,11 +1802,6 @@ function playCallSavedSound(kind) {
 // Modo freelancer: sin horario planeado. Los avisos de turno/Break por hora y la Adherencia contra el
 // plan no aplican; en su lugar sale el aviso de descanso por regla (ver checkFreelancerBreakPrompt).
 function freelancerActive() { return settings.freelancer?.enabled === true; }
-function freelancerSkipsDay(dayKey) {
-  if (!freelancerActive()) return false;
-  const since = callDateToDate(settings.freelancer.since), day = callDateToDate(dayKey);
-  return !since || (!!day && day >= since);
-}
 
 // Modo freelancer: pausas esperadas según la regla de descanso (tiempo conectado / cada N min) vs tomadas.
 function freelancerDiscipline(dayKey) {
@@ -5284,7 +5279,9 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       state.pauseHistory.filter(p => p.type === 'lunch' && Date.parse(p.endedAt) >= lunchAnchor).forEach(p => { lunchAnchor = Math.max(lunchAnchor, Date.parse(p.endedAt)); });
       const lunchDue = lunchEvery > 0 && (Date.now() - lunchAnchor) / 60000 >= lunchEvery;
       if (!lunchDue && !((earnMin > 0 && result.productiveMin >= earnMin) || (every > 0 && connectedMin >= every))) return null;
-      return { anchorKey: `${result.anchor.toISOString()}|${lunchDue ? 'lunch' : 'break'}`, suggestedType: lunchDue ? 'lunch' : 'break', productiveMin: result.productiveMin, connectedMin };
+      // "Ahora no" calla este tramo; si sigues sin descansar, vuelve a avisar al cumplirse el siguiente.
+      const tramo = Math.max(earnMin > 0 ? Math.floor(result.productiveMin / earnMin) : 0, every > 0 ? Math.floor(connectedMin / every) : 0);
+      return { anchorKey: `${result.anchor.toISOString()}|${lunchDue ? 'lunch' : 'break'}|${tramo}`, suggestedType: lunchDue ? 'lunch' : 'break', productiveMin: result.productiveMin, connectedMin };
     }
 
     function syncFreelancerPromptType(type) {
@@ -5470,15 +5467,16 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       next.since = next.enabled ? (settings.freelancer.enabled && settings.freelancer.since ? settings.freelancer.since : todayCallDateKey()) : '';
       const previous = settings.freelancer;
       settings.freelancer = next;
-      if (saveSettingsOnly() === false) { settings.freelancer = previous; syncNotificationsModalFields(); return false; }
+      if (saveSettingsOnly() === false) { settings.freelancer = previous; syncFreelancerFields(true); return false; }
       freelancerPrompt.dismissedAnchor = null; freelancerPrompt.snoozeUntil = 0;
+      syncFreelancerFields(true);
       render();
       toast(next.enabled ? translateText('Modo freelancer activado') : translateText('Modo freelancer desactivado'));
     }
 
-    function syncFreelancerFields() {
+    function syncFreelancerFields(force = false) {
       const fl = settings.freelancer;
-      const set = (id, value) => { const el = document.getElementById(id); if (el && document.activeElement !== el) el.value = value; };
+      const set = (id, value) => { const el = document.getElementById(id); if (el && (force || document.activeElement !== el)) el.value = value; };
       const enabled = document.getElementById('freelancerEnabledInput');
       if (enabled) enabled.checked = fl.enabled;
       set('freelancerBreakMinInput', fl.breakMin); set('freelancerLunchMinInput', fl.lunchMin);
@@ -6601,6 +6599,8 @@ function renderSchedule() {
           ? taken.map(p => ui`<div class="note">${escapeHtml(p.type === 'lunch' ? translateText('Lunch') : translateText('Break'))} · ${timeLabelFromDate(p.start)} – ${timeLabelFromDate(p.end)} · ${formatMinutes((p.end - p.start) / 60000)} min</div>`).join('')
           : ui`<div class="note">${escapeHtml(translateText('Todavía no has tomado descansos.'))}</div>`;
         renderBlockSummaryStrip([]);
+        const liveBadge = document.getElementById('adherenceLiveBadge');
+        if (liveBadge) liveBadge.style.display = 'none';
         return;
       }
       if (!plannedSlots.length) {
@@ -8267,7 +8267,11 @@ export function getPropioBridgePlan() {
   if (!localStorageRevision.isCurrent()) return null;
   const day = new Date(), accountingDay = state.shiftStartedAt && !state.shiftEndedAt ? todayCallDateKey(new Date(state.shiftStartedAt)) : todayCallDateKey(day);
   const planned = getShiftWindow(accountingDay), forced = getDayNote(accountingDay)?.forcedStatus;
-  if (forced === 'off' || (planned.off && forced !== 'work')) return null;
+  // Modo freelancer: sin horario planeado, la ventana es el turno real abierto (la automatización del puente
+  // no debe esperar ni cortar según un horario que el usuario ya no usa).
+  const freelance = settings.freelancer?.enabled === true && !(settings.freelancer.since && callDateToDate(settings.freelancer.since) > callDateToDate(accountingDay));
+  if (freelance && !state.shiftStartedAt) return null;
+  if (!freelance && (forced === 'off' || (planned.off && forced !== 'work'))) return null;
   const base = callDateToDate(accountingDay) || day, start = dateAtTime(base, planned.start), end = dateAtTime(base, planned.end);
   if (end <= start) end.setDate(end.getDate() + 1);
   const activeStart = state.shiftStartedAt && !state.shiftEndedAt ? Date.parse(state.shiftStartedAt) : NaN;
@@ -8276,11 +8280,15 @@ export function getPropioBridgePlan() {
     const delay = Math.floor((effectiveStart - start.getTime()) / 60000) * 60000;
     start.setTime(start.getTime() + delay); end.setTime(end.getTime() + delay);
   }
+  if (freelance) {
+    start.setTime(Date.parse(state.shiftStartedAt));
+    end.setTime(start.getTime() + 86400000);
+  }
   const since = Number.isFinite(activeStart) && activeStart < end.getTime() ? Math.min(activeStart, start.getTime()) : start.getTime();
   const pauseDuration = state.activePause ? referenceDurationMinForActivePause(currentShiftAccountingDayKey(day)) : null;
   const lastPause = state.pauseHistory.filter(pause => Date.parse(pause.endedAt) >= since && Date.parse(pause.endedAt) <= day.getTime())
     .sort((a, b) => Date.parse(b.endedAt) - Date.parse(a.endedAt))[0];
-  const scheduledPauses = reinforcementScheduleIntervals(accountingDay).filter(slot => ['break','lunch'].includes(String(slot.type).toLowerCase()))
+  const scheduledPauses = freelance ? [] : reinforcementScheduleIntervals(accountingDay).filter(slot => ['break','lunch'].includes(String(slot.type).toLowerCase()))
     .map(slot => ({ type: String(slot.type).toLowerCase(), startedAt: Math.max(start.getTime(), Date.parse(slot.startedAt)), endedAt: Math.min(end.getTime(), Date.parse(slot.endedAt)) }))
     .filter(slot => slot.startedAt < slot.endedAt)
     .map(slot => ({ type: slot.type, startedAt: new Date(slot.startedAt).toISOString(), endedAt: new Date(slot.endedAt).toISOString() }));
