@@ -458,6 +458,8 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
+- Web 664: «Acciones de Hoy» colapsada pasa de tarjeta alta a una franja de ~46 px con título, botón de turno y círculo de expandir. Solo CSS; los otros cinco botones siguen ocultos al colapsar y la barra de llamada no cambia. Extensión 2.3.11 sin cambios.
+
 - Web 663: alinea estado, ACW, reloj y fecha en Inicio; elimina el fondo del reloj, baja solo 8 px la hora en móvil y abrevia la frase a «Jamás negocio con mis excusas». Compacta acciones de turno y llamadas, limita la barra de llamada al ancho del layout, acorta la animación de pulsación y diferencia fondos/tarjetas en las siete paletas claras y oscuras. Los cuatro iconos superiores del menú móvil quedan tal como estaban en 662. «Vista esencial» sigue disponible. El popup de la extensión avanza por separado a 2.3.11; su activación runtime sigue sin certificarse.
 
 - Web 662: la barra superior de llamada adopta el diseño de la ficha anterior, oculta la ficha duplicada durante llamada activa y conserva recuperación de pendientes. Botones de turno y llamadas compactados. Extensión 2.3.10 sin cambios; su activación runtime sigue sin certificarse.
@@ -518,11 +520,6 @@ futura opera bajo esto, sin excepción:
 
 **ÚLTIMOS FIXES (máx. 3, los más recientes)**
 
-**v662 — Llamada unificada y acciones compactas.**
-
-- La barra fija durante la llamada usa el diseño de la ficha anterior con contador, Guardar y Descartar; la ficha duplicada se oculta solo para la llamada activa y la recuperación pendiente se conserva. Los botones de turno y llamadas se compactan.
-- Verificado con cuenta ficticia en móvil y escritorio, temas claro y oscuro, guardado, descarte y pausa; se conservan temporizadores y animaciones. La extensión no cambia.
-
 **v663 — Ajustes aprobados de Inicio y paletas.**
 
 - Estado, ACW y fecha comparten una fila; reloj sin fondo y a la derecha del saludo, con ajuste vertical solo en móvil. Frase abreviada, botones compactos, barra de llamada dentro del layout y respuesta visual de pulsación más rápida. No se reordena el menú móvil superior ni se retira «Vista esencial».
@@ -532,3 +529,8 @@ futura opera bajo esto, sin excepción:
 
 - El popup presenta primero el estado y las acciones, después actividad, automatización por horario, apariencia de Propio y ayuda. El historial pasa a la sección de ayuda; los eventos pendientes siguen visibles cuando existen. Se acortan rótulos y explicaciones repetidas.
 - Conserva los mismos controles, ids, handlers, almacenamiento y permisos. La activación runtime de esta versión requiere evidencia independiente de la copia de archivos.
+
+**v664 — Acciones de Hoy colapsadas, más compactas.**
+
+- Colapsada, la tarjeta queda en una sola franja con el título, el botón Iniciar/Finalizar shift y el círculo de expandir, en lugar de una tarjeta alta con solo título y círculo. Mockup claro/oscuro aprobado; mismo layout en escritorio y móvil.
+- Solo CSS (`css/app-shell.css`): mismos ids, listeners y JS; expandida no cambia. Verificado con check-ui-wiring, check-i18n y check-production-criteria.
