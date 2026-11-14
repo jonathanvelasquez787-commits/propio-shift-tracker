@@ -501,6 +501,16 @@
       ],
       "tests": [
         {
+          "file": "tests/higher-rate-popup-layout.test.mjs",
+          "namedCases": [
+            "popup Higher Rate: los textos largos viven en un panel plegado detrás del botón \"i\"",
+            "popup Higher Rate: estado de la ventana y números de hoy van en una sola tarjeta",
+            "popup Higher Rate: \"Ventanas\" y \"+ Agregar\" comparten fila",
+            "popup Higher Rate: cada ventana ocupa dos líneas y sigue siendo editable",
+            "popup Higher Rate: el historial sigue plegado y conserva \"Limpiar historial\""
+          ]
+        },
+        {
           "file": "tests/higher-rate-review.test.mjs",
           "namedCases": [
             "Higher Rate review explains exact grace and exclusive-end boundaries using the real bonus calculation",

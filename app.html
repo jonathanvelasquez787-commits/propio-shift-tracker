@@ -1904,16 +1904,17 @@
 <div class="mc-header-icon hr-gradient" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c2 3-1 4-1 7a3 3 0 1 0 6 0c0-1-.5-2-.5-2 2 1 3 3.5 3 6a7 7 0 1 1-14 0c0-4 2-6 3.5-8 .5 2 1 2.5 3-3Z"/></svg></div>
 <div>
 <h3 id="higherRateModalTitle">Higher Rate</h3>
-<p>Usá la fecha, horas y nivel del aviso de Propio. Los cambios se guardan automáticamente y conservan los bonos registrados.</p>
 </div>
+<button aria-controls="higherRateInfoPanel" aria-expanded="false" aria-label="Cómo funciona" class="hr-info-btn" id="higherRateInfoBtn" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16.5"/><line x1="12" y1="7.5" x2="12" y2="7.51"/></svg></button>
 <button aria-label="Cerrar" class="modal-close" data-close-modal="higherRateModal" type="button">×</button>
 </div>
 
-<div class="mc-info-box">
-<svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.8.4-1.5 1-1.5 2.2"/><line x1="12" y1="17" x2="12" y2="17.01"/></svg>
-<span>Una llamada cuenta <strong>completa</strong> si empieza hasta 5 min antes de que la ventana comience, o en cualquier momento antes de que termine, aunque se extienda después.</span>
+<div class="hr-info-panel" id="higherRateInfoPanel" hidden>
+<p>Usá la fecha, horas y nivel del aviso de Propio. Los cambios se guardan automáticamente y conservan los bonos registrados.</p>
+<p>Una llamada cuenta <strong>completa</strong> si empieza hasta 5 min antes de que la ventana comience, o en cualquier momento antes de que termine, aunque se extienda después.</p>
 </div>
 
+<div class="hr-summary">
 <div class="hr-live-card" id="higherRateLiveCard" style="display:none;">
 <span class="hr-live-icon" id="higherRateLiveIcon" aria-hidden="true"></span>
 <div class="hr-live-text">
@@ -1921,25 +1922,15 @@
 <div class="hr-live-sub" id="higherRateLiveSub"></div>
 </div>
 </div>
-
-<div class="hr-daystats-head">
-<div class="hr-daystats-head-left">
-<span class="hr-daystats-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c2 3-1 4-1 7a3 3 0 1 0 6 0c0-1-.5-2-.5-2 2 1 3 3.5 3 6a7 7 0 1 1-14 0c0-4 2-6 3.5-8 .5 2 1 2.5 3-3Z"/></svg></span>
-<div>
-<div class="hr-daystats-title">Tiempo y bono por día</div>
-<div class="hr-daystats-sub">Cuánto ganaste en cada ventana, día por día</div>
-</div>
-</div>
-</div>
 <div id="higherRateDayStats"></div>
+</div>
 
 <div class="hr-section-head">
-<div class="hr-section-title">Ventanas activas</div>
+<div class="hr-section-title">Ventanas</div>
 <div class="hr-count-pill" id="higherRateActiveCountPill">0 próximas</div>
+<button aria-label="Agregar ventana" class="hr-add-btn" id="addHigherRateWindowBtn" type="button"><span class="hr-add-plus" aria-hidden="true">+</span> Agregar</button>
 </div>
 <div class="hr-window-grid" id="higherRateWindowsList"></div>
-
-<button class="hr-add-window-btn" id="addHigherRateWindowBtn" type="button"><span class="hr-add-window-plus" aria-hidden="true">+</span> Agregar ventana</button>
 
 <details id="higherRateHistoryAccordion">
 <summary>

@@ -7865,6 +7865,12 @@ export function render() {
     document.getElementById('testBreakStartAlarmSoundBtn').addEventListener('click', () => testAlarmSound('breakStart'));
     document.getElementById('testBreakEndAlarmSoundBtn').addEventListener('click', () => testAlarmSound('breakEnd'));
     document.getElementById('addHigherRateWindowBtn').addEventListener('click', addHigherRateWindowRow);
+    document.getElementById('higherRateInfoBtn').addEventListener('click', (e) => {
+      const panel = document.getElementById('higherRateInfoPanel');
+      const open = panel.hidden;
+      panel.hidden = !open;
+      e.currentTarget.setAttribute('aria-expanded', String(open));
+    });
     for (const id of ['earningsDayBreakdown', 'earningsCycleBreakdown']) {
       document.getElementById(id).addEventListener('toggle', event => { if (event.target.open) renderEarningsDetails(true); });
     }
