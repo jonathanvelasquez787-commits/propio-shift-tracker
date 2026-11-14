@@ -458,7 +458,7 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
-- Web 664: «Acciones de Hoy» colapsada pasa de tarjeta alta a una franja de ~46 px con título, botón de turno y círculo de expandir; desde 1400 px de ancho muestra los seis botones compactos en esa misma franja. Solo CSS; en pantallas angostas los otros cinco botones siguen ocultos al colapsar y la barra de llamada no cambia. Extensión 2.3.11 sin cambios.
+- Web 664: «Acciones de Hoy» colapsada pasa de tarjeta alta a una franja de ~46 px con título, botón de turno y círculo de expandir; muestra los seis botones en esa misma franja: solo iconos en pantallas angostas (con «Hoy» como título corto) y con etiqueta desde 1400 px. Solo CSS más un `<span>` de título corto en app.html y la barra de llamada no cambia. Extensión 2.3.11 sin cambios.
 
 - Web 663: alinea estado, ACW, reloj y fecha en Inicio; elimina el fondo del reloj, baja solo 8 px la hora en móvil y abrevia la frase a «Jamás negocio con mis excusas». Compacta acciones de turno y llamadas, limita la barra de llamada al ancho del layout, acorta la animación de pulsación y diferencia fondos/tarjetas en las siete paletas claras y oscuras. Los cuatro iconos superiores del menú móvil quedan tal como estaban en 662. «Vista esencial» sigue disponible. El popup de la extensión avanza por separado a 2.3.11; su activación runtime sigue sin certificarse.
 
@@ -532,5 +532,5 @@ futura opera bajo esto, sin excepción:
 
 **v664 — Acciones de Hoy colapsadas, más compactas.**
 
-- Colapsada, la tarjeta queda en una sola franja con el título, el botón Iniciar/Finalizar shift y el círculo de expandir, en lugar de una tarjeta alta con solo título y círculo. Desde 1400 px de ancho caben y se muestran también Break, Lunch y los tres botones de llamadas, compactos. Mockup claro/oscuro aprobado para la franja; la extensión a seis botones se pidió viendo el resultado en escritorio.
-- Solo CSS (`css/app-shell.css`): mismos ids, listeners y JS; expandida no cambia. Verificado con check-ui-wiring, check-i18n y check-production-criteria.
+- Colapsada, la tarjeta queda en una sola franja con el título, el botón Iniciar/Finalizar shift y el círculo de expandir, en lugar de una tarjeta alta con solo título y círculo. Muestra también Break, Lunch y los tres botones de llamadas: solo iconos en pantallas angostas (opción B del mockup claro/oscuro aprobado, con «Hoy» como título corto y las etiquetas visibles solo para lectores de pantalla) y con etiqueta desde 1400 px.
+- CSS (`css/app-shell.css`) y un `<span class="hero-shift-short">` en app.html: mismos ids, listeners y JS; expandida no cambia. Verificado con check-ui-wiring, check-i18n, check-production-criteria y la suite de tests.
