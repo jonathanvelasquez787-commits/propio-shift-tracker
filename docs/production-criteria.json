@@ -1114,6 +1114,12 @@
           ]
         },
         {
+          "file": "tests/game-battle-compact.test.mjs",
+          "namedCases": [
+            "Reto de hoy compacto: nivel en el encabezado y sin bloques repetidos"
+          ]
+        },
+        {
           "file": "tests/achievements-settings-rows.test.mjs",
           "namedCases": [
             "Ajustes de Logros: cuatro filas cortas y \"Mis premios\" en Colección"

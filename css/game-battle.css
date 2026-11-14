@@ -28,7 +28,8 @@
 #gameArena.game-arena--battle { display: block; padding: 0; border: 0; border-radius: 0; background: var(--panel-navy); }
 #gameArena.game-arena--battle > .game-battle { margin: 0; border: 0; }
 .game-battle-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 15px 18px 10px; }
-.game-battle-heading { flex: 1; }
+.game-battle-heading { flex: 1; min-width: 0; }
+.game-level-chip { display: inline-block; margin-top: 7px; padding: 3px 8px; border-radius: 5px; background: var(--cyan); color: var(--bg, #fff); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 11px; font-weight: 700; letter-spacing: .08em; line-height: 1.3; }
 .game-battle-heading > .game-kicker { display: block; margin-bottom: 5px; color: var(--muted); font-family: inherit; font-size: 11px; font-weight: 600; letter-spacing: .09em; line-height: 1.35; overflow-wrap: anywhere; }
 .game-battle-heading h3 { margin: 0; font-size: 18px; line-height: 1.2; font-weight: 700; letter-spacing: -.35px; overflow-wrap: anywhere; }
 .game-battle-head-tools { display: flex; flex-shrink: 0; gap: 4px; }
@@ -75,15 +76,18 @@
 .game-battle-health:empty { display: none; }
 .game-compact-goal-line { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 5px 12px; margin-bottom: 10px; font-size: 12px; }
 .game-compact-goal-line > span { color: var(--muted); }
-.game-compact-goal-line strong { font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.game-compact-goal-line strong { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .game-compact-goal-line strong :is(span, small) { color: var(--muted); font-size: 12px; font-weight: 400; }
-.game-compact-goal-track { position: relative; height: 7px; margin-right: 23px; border-radius: 5px; background: var(--line); }
+.game-compact-goal-track { position: relative; height: 10px; margin-right: 23px; border-radius: 5px; background: var(--line); }
 .game-compact-goal-fill { display: block; height: 100%; border-radius: inherit; background: var(--cyan); transition: width .45s ease; }
-.game-compact-goal-chest { position: absolute; right: -23px; top: -6px; width: 19px; height: 19px; color: var(--muted); }
+.game-compact-goal-chest { position: absolute; right: -23px; top: -5px; width: 19px; height: 19px; color: var(--muted); }
 .game-compact-goal-chest svg { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
 .game-compact-goal-track[aria-valuenow="100"] .game-compact-goal-chest { color: var(--tier-gold); }
 .game-compact-goal-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 5px 10px; margin-top: 9px; color: var(--muted); font-size: 11px; line-height: 1.4; overflow-wrap: anywhere; }
 .game-battle-footer { display: flex; align-items: center; gap: 10px; min-height: 43px; padding: 8px 18px 10px; border-top: 1px solid var(--line); background: var(--accordion-bg); }
+.game-battle-feed:empty { display: none; }
+.game-battle-footer:has(.game-battle-feed:empty) { justify-content: flex-end; }
+.game-battle-loadout small { display: none; }
 .game-battle-feed { flex: 1; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.4; overflow-wrap: anywhere; }
 .game-battle-footer > button { display: flex; align-items: center; gap: 3px; flex-shrink: 0; min-height: 32px; padding: 5px 0 5px 8px; border: 0; background: transparent; color: var(--cyan); font-size: 12px; font-weight: 600; }
 .game-battle-footer > button svg { width: 13px; height: 13px; }
@@ -96,7 +100,6 @@
 .game-battle-loadout label { font-size: 12px; font-weight: 400; color: var(--text); overflow-wrap: anywhere; }
 .game-battle-loadout select { max-width: 100%; }
 .game-battle-loadout small { grid-column: 1 / -1; color: var(--muted); font-size: 11px; line-height: 1.4; overflow-wrap: anywhere; }
-.game-battle-loadout small:empty { display: none; }
 .game-compact-collection-icon { display: grid; place-items: center; width: 31px; height: 31px; flex: 0 0 31px; border-radius: 6px; background: var(--accordion-bg); color: var(--cyan); }
 .game-compact-collection-icon svg { width: 17px; height: 17px; }
 .game-compact-collection-item > :is(label, div), .game-battle-loadout > label { flex: 1; }
