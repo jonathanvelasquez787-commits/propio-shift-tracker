@@ -1,4 +1,10 @@
 {
+  "s_00069319": {
+    "source": "Negro Grafito: Negros neutros y acento índigo",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_000b5c2b": {
     "source": "/ {{v1}} min",
     "files": [
@@ -2834,6 +2840,13 @@
       "app.html"
     ]
   },
+  "s_2a1f41a6": {
+    "source": "Negro Grafito",
+    "files": [
+      "app.html",
+      "js/theme-palettes.js"
+    ]
+  },
   "s_2a3037c0": {
     "source": "{{v0}} acción registrada",
     "files": [
@@ -4632,6 +4645,12 @@
       "js/game-review.js"
     ]
   },
+  "s_451db15f": {
+    "source": "Original + 8 paletas",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_452eba29": {
     "source": "{{v0}} Productividad — últimos 14 días",
     "files": [
@@ -4929,6 +4948,12 @@
     "source": "Borrar cuenta y datos",
     "files": [
       "js/boot.js"
+    ]
+  },
+  "s_49dc4b72": {
+    "source": "#1E1E22",
+    "files": [
+      "app.html"
     ]
   },
   "s_49e53544": {
@@ -7045,6 +7070,12 @@
     "source": "El archivo no contiene un objeto JSON válido.",
     "files": [
       "js/backup-recovery.js"
+    ]
+  },
+  "s_6a7321b4": {
+    "source": "#09090B",
+    "files": [
+      "app.html"
     ]
   },
   "s_6a8349a3": {
@@ -12591,6 +12622,13 @@
       "js/app-main.js"
     ]
   },
+  "s_bb6c8a20": {
+    "source": "Negros neutros y acento índigo",
+    "files": [
+      "app.html",
+      "js/theme-palettes.js"
+    ]
+  },
   "s_bbf96cf7": {
     "source": "Empezar descanso",
     "files": [
@@ -14023,12 +14061,6 @@
       "js/game-review.js"
     ]
   },
-  "s_d24a6da6": {
-    "source": "Original + 7 paletas",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_d259eba8": {
     "source": "Disponible en descanso o fuera del turno",
     "files": [
@@ -15253,6 +15285,12 @@
   },
   "s_e20ba9f1": {
     "source": "Hueco más largo",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_e211b774": {
+    "source": "#A1A1AA",
     "files": [
       "app.html"
     ]
