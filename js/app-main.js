@@ -5331,14 +5331,18 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
     }
 
     function snoozeFreelancerBreak() {
-      freelancerPrompt.snoozeUntil = Date.now() + settings.freelancer.snoozeMin * 60000;
+      const snoozeMin = Number(settings.freelancer.snoozeMin);
+      freelancerPrompt.snoozeUntil = Date.now() + (Number.isFinite(snoozeMin) && snoozeMin >= 1 ? snoozeMin : 5) * 60000;
       closeFreelancerPrompt(true);
     }
 
     // Cerrar con ×, clic afuera o Escape cuenta como "Ahora no": no vuelve a salir hasta la próxima pausa.
     document.addEventListener('app:modal-closed', (event) => {
       if (event.detail?.id !== 'breakPromptModal' || freelancerPrompt.handled) return;
-      freelancerPrompt.dismissedAnchor = freelancerPrompt.anchorKey;
+      // Se calla el tramo que está vigente AHORA (no solo el de cuando se abrió): si el tramo cambió
+      // con el popup abierto, la clave vieja ya no coincidía y el mismo aviso volvía a salir.
+      const dueNow = freelancerBreakDue();
+      freelancerPrompt.dismissedAnchor = dueNow ? dueNow.anchorKey : freelancerPrompt.anchorKey;
     });
 
     function checkFreelancerBreakOver() {
