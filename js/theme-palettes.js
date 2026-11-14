@@ -20,16 +20,16 @@ const readable = (color,backgrounds) => {
   for(let weight=1;weight>=0;weight-=.025) { const result=mix(color,destination,weight);if(surfaces.every(background=>contrast(result,background)>=4.7))return result; }
   return destination;
 };
-// Orden de los tres fondos en cada modo: [afuera/página = el más claro, tarjeta principal = el más intenso, interior/secundario = intermedio].
+// Orden de los tres fondos en cada modo: [afuera/página = a medio camino entre el más claro y el intermedio (así no queda lavado), tarjeta principal = el más intenso, interior/secundario = intermedio].
 const PALETTE_SURFACES = {
-  neon: { light:['#FFF2CD','#FFD873','#FFE7AD'], dark:['#452566','#140329','#351653'] },
-  lavender: { light:['#F1F2FF','#DBDEFA','#E3E5FA'], dark:['#4A4D71','#242541','#3A3D61'] },
-  magenta: { light:['#FBE7F2','#F6C9DF','#F7D4E7'], dark:['#4B2854','#190D20','#3A1D44'] },
-  sand: { light:['#F7EDE1','#E8D8C8','#EFE0D0'], dark:['#4C5E6A','#253542','#3B4D5B'] },
-  royal: { light:['#ECF3FF','#CEDDF7','#DDE8FB'], dark:['#273760','#060B1E','#19264A'] },
-  ocean: { light:['#EAF5F3','#C5E1DF','#D8ECE9'], dark:['#1B4B57','#071E2B','#12394A'] },
-  sage: { light:['#EAF4E8','#CDE3D3','#DCECDF'], dark:['#36534A','#162A28','#29423D'] },
-  graphite: { light:['#FFFFFF','#EBEBEE','#F4F4F5'], dark:['#1E1E22','#09090B','#131315'] },
+  neon: { light:['#FFECBD','#FFD873','#FFE7AD'], dark:['#3D1E5C','#140329','#351653'] },
+  lavender: { light:['#EAECFC','#DBDEFA','#E3E5FA'], dark:['#424569','#242541','#3A3D61'] },
+  magenta: { light:['#F9DEEC','#F6C9DF','#F7D4E7'], dark:['#42224C','#190D20','#3A1D44'] },
+  sand: { light:['#F3E6D8','#E8D8C8','#EFE0D0'], dark:['#445662','#253542','#3B4D5B'] },
+  royal: { light:['#E4EEFD','#CEDDF7','#DDE8FB'], dark:['#202E55','#060B1E','#19264A'] },
+  ocean: { light:['#E1F0EE','#C5E1DF','#D8ECE9'], dark:['#164250','#071E2B','#12394A'] },
+  sage: { light:['#E3F0E4','#CDE3D3','#DCECDF'], dark:['#304A44','#162A28','#29423D'] },
+  graphite: { light:['#FAFAFA','#EBEBEE','#F4F4F5'], dark:['#18181C','#09090B','#131315'] },
 };
 // Todas las paletas solo cambian los fondos: el resto de colores (texto, bordes, botones,
 // acentos) se queda con los de Original. Estos valores solo alimentan los tokens --palette-*.
