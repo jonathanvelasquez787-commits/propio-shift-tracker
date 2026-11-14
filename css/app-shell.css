@@ -1249,35 +1249,53 @@ html.theme-light .hero-shift-actions:not(.is-collapsed) .hero-shift-toggle { bac
 .hero-shift-actions.is-collapsed #callsControlsGrid,
 .hero-shift-actions.is-collapsed #callsControlsGrid:has(#callControlBtn.is-active) { display: none !important; }
 
-/* Colapsado: una franja con título, botón de shift y círculo; en pantallas anchas, los seis botones compactos. */
-.chips > .hero-shift-actions.is-collapsed { display: flex; align-items: center; gap: 8px; padding: 6px 8px 6px 14px; border-radius: 14px; }
-.chips > .hero-shift-actions.is-collapsed > .hero-shift-title { flex: 1; min-width: 0; font-size: 13px; }
-.chips > .hero-shift-actions.is-collapsed > .hero-shift-toggle { order: 9; flex: 0 0 auto; }
+/* Colapsado: una franja con los seis botones, solo iconos en pantallas angostas y con etiqueta desde 1400 px. */
+.chips > .hero-shift-actions.is-collapsed { display: flex; align-items: center; gap: 4px; padding: 6px 8px 6px 12px; border-radius: 14px; }
+.chips > .hero-shift-actions.is-collapsed > .hero-shift-toggle { order: 9; flex: 0 0 auto; margin-left: 4px; }
+.hero-shift-short { display: none; }
+.chips > .hero-shift-actions.is-collapsed > #shiftControlBtn,
+.chips > .hero-shift-actions.is-collapsed > #breakControlBtn,
+.chips > .hero-shift-actions.is-collapsed > #lunchControlBtn { display: flex !important; }
+.chips > .hero-shift-actions.is-collapsed:not(.calls-off) #callsControlsGrid,
+.chips > .hero-shift-actions.is-collapsed:not(.calls-off) #callsControlsGrid:has(#callControlBtn.is-active) { display: contents !important; }
 .chips > .hero-shift-actions.is-collapsed > #shiftControlBtn,
 .chips > .hero-shift-actions.is-collapsed > #breakControlBtn,
 .chips > .hero-shift-actions.is-collapsed > #lunchControlBtn,
 .chips > .hero-shift-actions.is-collapsed:not(.calls-off) #callsControlsGrid .action-btn {
-  flex: 0 0 auto; flex-direction: row; gap: 6px; min-width: 0; min-height: 34px; padding: 4px 10px 4px 5px;
+  display: flex; flex: 1 1 40px; flex-direction: row; align-items: center; justify-content: center; gap: 0;
+  min-width: 30px; max-width: 40px; min-height: 34px; padding: 0;
 }
-.chips > .hero-shift-actions.is-collapsed > #shiftControlBtn { display: flex !important; }
 .chips > .hero-shift-actions.is-collapsed > #shiftControlBtn .action-icon-wrap,
 .chips > .hero-shift-actions.is-collapsed > #breakControlBtn .action-icon-wrap,
 .chips > .hero-shift-actions.is-collapsed > #lunchControlBtn .action-icon-wrap,
-.chips > .hero-shift-actions.is-collapsed:not(.calls-off) #callsControlsGrid .action-icon-wrap { width: 22px; height: 22px; }
+.chips > .hero-shift-actions.is-collapsed:not(.calls-off) #callsControlsGrid .action-btn .action-icon-wrap { width: 22px; height: 22px; background: transparent; border-color: transparent; }
 .chips > .hero-shift-actions.is-collapsed > #shiftControlBtn .action-sub,
 .chips > .hero-shift-actions.is-collapsed > #breakControlBtn .action-sub,
 .chips > .hero-shift-actions.is-collapsed > #lunchControlBtn .action-sub,
-.chips > .hero-shift-actions.is-collapsed:not(.calls-off) #callsControlsGrid .action-sub { display: none; }
+.chips > .hero-shift-actions.is-collapsed:not(.calls-off) #callsControlsGrid .action-btn .action-sub { display: none; }
 .chips > .hero-shift-actions.is-collapsed > #shiftControlBtn .action-label,
 .chips > .hero-shift-actions.is-collapsed > #breakControlBtn .action-label,
 .chips > .hero-shift-actions.is-collapsed > #lunchControlBtn .action-label,
-.chips > .hero-shift-actions.is-collapsed:not(.calls-off) #callsControlsGrid .action-label { font-size: 11px; white-space: nowrap; }
+.chips > .hero-shift-actions.is-collapsed:not(.calls-off) #callsControlsGrid .action-btn .action-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (max-width: 1399px) {
+  .chips > .hero-shift-actions.is-collapsed > .hero-shift-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .chips > .hero-shift-actions.is-collapsed > .hero-shift-short { display: block; flex: 1 1 auto; min-width: 0; margin-right: auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); font-size: 13px; font-weight: 800; }
+}
 @media (min-width: 1400px) {
   .chips > .hero-shift-actions.is-collapsed { gap: 6px; }
+  .chips > .hero-shift-actions.is-collapsed > .hero-shift-title { flex: 1; min-width: 0; font-size: 13px; }
+  .chips > .hero-shift-actions.is-collapsed > #shiftControlBtn,
   .chips > .hero-shift-actions.is-collapsed > #breakControlBtn,
-  .chips > .hero-shift-actions.is-collapsed > #lunchControlBtn { display: flex !important; }
-  .chips > .hero-shift-actions.is-collapsed:not(.calls-off) #callsControlsGrid,
-  .chips > .hero-shift-actions.is-collapsed:not(.calls-off) #callsControlsGrid:has(#callControlBtn.is-active) { display: contents !important; }
+  .chips > .hero-shift-actions.is-collapsed > #lunchControlBtn,
+  .chips > .hero-shift-actions.is-collapsed:not(.calls-off) #callsControlsGrid .action-btn { flex: 0 0 auto; max-width: none; gap: 6px; padding: 4px 10px 4px 5px; }
+  .chips > .hero-shift-actions.is-collapsed > #shiftControlBtn .action-icon-wrap,
+  .chips > .hero-shift-actions.is-collapsed > #breakControlBtn .action-icon-wrap,
+  .chips > .hero-shift-actions.is-collapsed > #lunchControlBtn .action-icon-wrap,
+  .chips > .hero-shift-actions.is-collapsed:not(.calls-off) #callsControlsGrid .action-btn .action-icon-wrap { background: rgba(var(--accent-rgb), .14); border-color: rgba(var(--accent-rgb), .3); }
+  .chips > .hero-shift-actions.is-collapsed > #shiftControlBtn .action-label,
+  .chips > .hero-shift-actions.is-collapsed > #breakControlBtn .action-label,
+  .chips > .hero-shift-actions.is-collapsed > #lunchControlBtn .action-label,
+  .chips > .hero-shift-actions.is-collapsed:not(.calls-off) #callsControlsGrid .action-btn .action-label { position: static; width: auto; height: auto; overflow: visible; clip: auto; font-size: 11px; }
 }
 
 /* Página Ayuda: sin llamadas, la fila queda con los 3 botones de turno. */
