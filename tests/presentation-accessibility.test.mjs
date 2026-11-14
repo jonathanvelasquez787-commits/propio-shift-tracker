@@ -209,10 +209,12 @@ test('there is a single actions bar: no top live bar, no expanded view, names un
   const main = fs.readFileSync('js/app-main.js', 'utf8');
   assert.ok(!/live-activity-bar|liveActivityBar|liveBarSaveBtn/.test(html + main), 'the top live bar is gone');
   assert.ok(!/hero-shift-toggle/.test(main), 'no expand/collapse arrow');
-  const names = { shiftControlBtn: 'Turno', breakControlBtn: 'Break', lunchControlBtn: 'Lunch', callControlBtn: 'Llamada', pasteCallsBtn: 'Pegar', addCallManualBtn: 'Agregar' };
+  const names = { shiftControlBtn: 'Turno', breakControlBtn: 'Break', lunchControlBtn: 'Lunch', callControlBtn: 'Llamada', pasteCallsBtn: 'Pegar', addCallManualBtn: 'Agregar', liveDiscardBtn: 'Descartar' };
   for (const [id, name] of Object.entries(names)) {
     const start = html.indexOf(`id="${id}"`), end = html.indexOf('</button>', start);
-    assert.ok(html.slice(start, end).includes(`<span class="action-short" aria-hidden="true">${name}</span>`), `${id} shows "${name}" under its icon`);
+    assert.ok(!html.slice(start, end).includes('action-short'), `${id}: the name is outside the button box`);
+    assert.ok(html.slice(end + 9).startsWith(`<span class="action-short" aria-hidden="true">${name}</span></div>`), `${id} shows "${name}" below its box`);
+    assert.ok(html.lastIndexOf('<div class="action-slot"', start) > html.lastIndexOf('</div>', start), `${id} lives inside its own slot`);
   }
   assert.ok(/id="liveDiscardBtn"[^>]*hidden/.test(html), 'discard button starts hidden');
   const shell = fs.readFileSync('css/app-shell.css', 'utf8');
@@ -223,13 +225,15 @@ test('there is a single actions bar: no top live bar, no expanded view, names un
 test('the actions bar keeps its layout: six buttons share the width and the empty Llamadas card stays hidden', () => {
   const css = fs.readFileSync('css/app-shell.css', 'utf8');
   assert.ok(/#callsSection:has\(> #callsStatusCard\[hidden\]\)[^{]*\{[^}]*display:\s*none/.test(css), 'an empty Llamadas card disappears');
-  assert.ok(/\.hero-shift-actions :is\(#shiftControlBtn[^)]*\)\s*\{[^}]*flex:\s*1 1 0[^}]*min-width:\s*0/.test(css), 'buttons share the bar width instead of using a fixed width');
-  assert.ok(/#liveDiscardBtn \.action-short \{ display: none; \}/.test(css), 'narrow screens show the discard X without text so everything fits');
+  assert.ok(/\.action-slot \{[^}]*flex:\s*1 1 0[^}]*min-width:\s*0/.test(css), 'buttons share the bar width instead of using a fixed width');
+  assert.ok(/\[data-slot="discard"\] > \.action-short \{ display: none; \}/.test(css), 'narrow screens show the discard X without text so everything fits');
+  assert.ok(!/#callsControlsGrid:has\(#callControlBtn\.is-active\)\s*\{[^}]*display:\s*grid/.test(css), 'an active call must not turn the call group into a box (it scrambled the button order)');
+  for (const slot of ['shift', 'break', 'lunch', 'call', 'paste', 'add']) assert.ok(new RegExp(`\\[data-slot="${slot}"\\] \\{ order: \\d+`).test(css), `${slot} has an explicit order`);
+  assert.ok(/data-live-type="call"\] \.action-slot\[data-slot="discard"\] \{ order: 55/.test(css), 'discard sits right after the active call');
 });
 
-test('the short action names keep the same hover color as the labels', () => {
-  const core = fs.readFileSync('css/app-core.css', 'utf8');
+test('the short action names turn to the text color on hover and when active', () => {
   const shell = fs.readFileSync('css/app-shell.css', 'utf8');
-  assert.ok(/\.action-btn:hover \.action-short/.test(core), 'hover color override covers the short name');
-  assert.ok(/:not\(:hover\) \.action-short \{ color: var\(--muted\)/.test(shell), 'the muted name color does not win over the hover color');
+  assert.ok(/\.action-slot:has\(> \.action-btn:hover:not\(:disabled\)\) > \.action-short/.test(shell), 'hover changes the name color');
+  assert.ok(/\.action-slot:has\(> \.action-btn\.is-active\) > \.action-short/.test(shell), 'active changes the name color');
 });
