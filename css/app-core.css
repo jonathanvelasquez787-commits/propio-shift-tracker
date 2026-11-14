@@ -478,7 +478,8 @@
       :root:not(.theme-dark) .action-btn.is-pressed .action-label,
       :root:not(.theme-dark) .action-btn.is-pressed .action-sub,
       :root:not(.theme-dark) .action-btn.is-active .action-label,
-      :root:not(.theme-dark) .action-btn.is-active .action-sub {
+      :root:not(.theme-dark) .action-btn.is-active .action-sub ,:root:not(.theme-dark) .action-btn.is-pressed .action-short,
+      :root:not(.theme-dark) .action-btn.is-active .action-short {
         color: #fff;
       }
       /* Contraparte solo para punteros reales: en touch nunca aplica, así que nunca se queda
@@ -930,7 +931,8 @@
     html.theme-light .action-btn.is-pressed .action-label,
     html.theme-light .action-btn.is-pressed .action-sub,
     html.theme-light .action-btn.is-active .action-label,
-    html.theme-light .action-btn.is-active .action-sub {
+    html.theme-light .action-btn.is-active .action-sub ,html.theme-light .action-btn.is-pressed .action-short,
+    html.theme-light .action-btn.is-active .action-short {
       color: #fff;
     }
     @media (hover: hover) and (pointer: fine) {
@@ -3139,7 +3141,7 @@
     .action-btn.is-pressed .action-ripple { transform: scale(1); opacity: 1; }
     .action-btn.is-pressed .action-icon { transform: scale(1.12) translateY(-1px); }
     .action-btn.is-pressed .action-label,
-    .action-btn.is-pressed .action-sub {
+    .action-btn.is-pressed .action-sub ,.action-btn.is-pressed .action-short {
       color: var(--text);
     }
     /* El anillo pulsante corre al mismo tiempo que el relleno, no antes ni después. */
@@ -3180,7 +3182,7 @@
       opacity: 1;
     }
     .action-btn.is-active .action-label,
-    .action-btn.is-active .action-sub {
+    .action-btn.is-active .action-sub ,.action-btn.is-active .action-short {
       color: var(--text);
     }
     .action-btn.is-active .action-ring {
