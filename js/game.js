@@ -2880,12 +2880,6 @@ export function initGame() {
       setGameEnabled(!!event.target.checked);
     });
   }
-  document.getElementById('gameSettingsGearBtn')?.addEventListener('click', () => {
-    const fold = document.getElementById('gameSettingsFold');
-    if (!fold) return;
-    fold.open = true;
-    fold.scrollIntoView({ block: 'start' });
-  });
   document.getElementById('sidebarGameSoundInput')?.addEventListener('change', (event) => {
     saveGamePreference('soundEnabled', !!event.target.checked);
     syncGameAudio();

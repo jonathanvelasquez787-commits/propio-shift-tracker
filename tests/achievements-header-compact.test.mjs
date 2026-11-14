@@ -10,8 +10,9 @@ const header = html.slice(start, end);
 test('encabezado de Logros compacto: sin kicker, sin frase y con notas dentro del botón i', () => {
   assert.doesNotMatch(header, /game-page-kicker/);
   assert.doesNotMatch(header, /Tu racha, tu nivel y cada criatura/);
-  assert.doesNotMatch(header, /<details/);
-  assert.doesNotMatch(header, /<p class="note">/);
+  const headerSinAjustes = header.slice(0, header.lastIndexOf('<details', header.indexOf('id="gameSettingsFold"')));
+  assert.doesNotMatch(headerSinAjustes, /<details/);
+  assert.doesNotMatch(headerSinAjustes, /<p class="note">/);
   assert.match(header, /<h1>Logros<\/h1>/);
   assert.match(header, /data-game-role="season-label"/);
   assert.match(header, /id="gameEnabledInput"/);

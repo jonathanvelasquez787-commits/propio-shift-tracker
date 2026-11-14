@@ -1571,5 +1571,4 @@ html.theme-light {
 .game-achievements-page .game-fold-body .game-panel { padding: 0; }
 .positive-history-section { margin-top: 8px; }
 .game-settings-fold { margin-top: 8px; }
-.game-achievements-toolbar .game-settings-gear { flex: 0 0 auto; }
-.game-achievements-toolbar .game-settings-gear .ic-svg { width: 16px; height: 16px; }
+.game-achievements-hero .game-settings-fold { margin-top: 8px; padding: 8px 0 0; border: 0; border-top: 1px solid var(--line); border-radius: 0; background: transparent; box-shadow: none; }

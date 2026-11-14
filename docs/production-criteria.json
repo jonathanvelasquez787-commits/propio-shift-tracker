@@ -84,7 +84,7 @@
           "file": "tests/achievements-folds-settings.test.mjs",
           "namedCases": [
             "Logros: Equipo, Bestiario, Trofeos e Historial son filas plegadas con conteo y sin tarjetas vacías",
-            "Logros: los ajustes van plegados al final y el engranaje del encabezado los abre"
+            "Logros: los ajustes van plegados justo debajo de Activar Logros"
           ]
         },
         {
