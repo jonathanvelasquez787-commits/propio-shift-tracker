@@ -61,9 +61,9 @@ const ORIGINAL_COLORS = {
   dark: { '--text':'#edf4ff','--muted':'#97a6c4','--primary':'#2fd5ff','--bad':'#ff6b72' },
 };
 // Pares que hoy quedan por debajo de 3:1 por el diseño "solo fondos". Seguimiento: ajustar esos fondos.
-const KNOWN_LOW_CONTRAST = new Set(['sand/dark/--muted','sand/dark/--bad','lavender/dark/--bad']);
+const KNOWN_LOW_CONTRAST = new Set(['lavender/dark/--bad']);
 test('palette text and semantic states keep normal-text contrast on page and both panel surfaces', () => {
-  for (const palette of PALETTES.slice(1)) for (const mode of ['light','dark']) {
+  for (const palette of PALETTES.slice(1)) for (const mode of Object.keys(palette.modes)) {
     const tokens=paletteTokens(palette,mode);
     for (const key of ['--text','--muted','--primary','--bad','--good','--warn','--teal']) assert.equal(tokens[key],undefined,`${palette.id}/${mode}/${key} must come from Original`);
     const surfaces=['--bg','--panel','--panel-2'].map(key=>tokens[key]);

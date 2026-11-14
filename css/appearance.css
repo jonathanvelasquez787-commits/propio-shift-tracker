@@ -103,3 +103,4 @@ html:root[data-palette]:not([data-palette="original"]) :is(.game-panel,.game-mis
 .appearance-current-swatches { flex-shrink: 0; }
 .appearance-current [data-appearance-label] { overflow-wrap: anywhere; }
 .appearance-footer-actions { flex-wrap: wrap; }
+.appearance-palette-mode { font-style:normal; font-size:10px; font-weight:750; color:var(--cyan); }

@@ -5,7 +5,7 @@ import vm from 'node:vm';
 import { minify } from 'terser';
 import { resources } from '../js/locales.generated.js';
 import { localeResourceScript, partitionLocaleResources } from '../scripts/locale-bundle.mjs';
-import { PALETTES, paletteTokens, contrast } from '../js/theme-palettes.js';
+import { PALETTES, PALETTE_CHOICES, paletteTokens, contrast } from '../js/theme-palettes.js';
 import { applySavedColors } from '../js/appearance-colors.js';
 import { currentLanguage, setLanguage, translateDocument, translateText, translateStoredText, translateMarkup, ui } from '../js/i18n.js';
 import { collectCatalog, markupMessages } from '../scripts/i18n-catalog.mjs';
@@ -29,7 +29,7 @@ test('all custom palettes have readable normal text and restore original without
   const properties = new Map([['--user-test', 'keep']]);
   const root = { dataset: {}, style: { setProperty: (key, value) => properties.set(key, value), removeProperty: key => properties.delete(key) } };
   // Las paletas solo cambian los fondos; texto, bordes y acentos vienen de Original.
-  for (const mode of ['light', 'dark']) for (const palette of PALETTES.slice(1)) {
+  for (const palette of PALETTES.slice(1)) for (const mode of Object.keys(palette.modes)) {
     const tokens = paletteTokens(palette, mode);
     for (const key of ['--text', '--muted', '--line', '--card-line', '--cyan', '--primary', '--good', '--bad']) assert.equal(tokens[key], undefined, `${palette.id}/${mode}/${key} must come from Original`);
     // Con el fondo de afuera suavizado hacia el intermedio, en claro la separación página/tarjeta baja a 1.13–1.18.
@@ -51,22 +51,25 @@ test('all custom palettes have readable normal text and restore original without
 test('graphite palette only changes the three background blacks and keeps Original colors', () => {
   const graphite = PALETTES.find(item => item.id === 'graphite');
   assert.ok(graphite && graphite.name === 'Negro Grafito' && !graphite.code);
-  const dark = paletteTokens(graphite, 'dark'), light = paletteTokens(graphite, 'light');
+  assert.deepEqual(Object.keys(graphite.modes), ['dark'], 'Negro Grafito solo existe en oscuro');
+  const dark = paletteTokens(graphite, 'dark');
   assert.deepEqual([dark['--bg'], dark['--panel'], dark['--panel-2']], ['#18181C', '#09090B', '#131315']);
-  assert.deepEqual([light['--bg'], light['--panel'], light['--panel-2']], ['#FAFAFA', '#EBEBEE', '#F4F4F5']);
-  for (const tokens of [dark, light]) for (const key of ['--text', '--muted', '--line', '--card-line', '--cyan', '--teal', '--purple', '--good', '--warn', '--bad', '--primary'])
+  for (const tokens of [dark]) for (const key of ['--text', '--muted', '--line', '--card-line', '--cyan', '--teal', '--purple', '--good', '--warn', '--bad', '--primary'])
     assert.equal(tokens[key], undefined, `${key} must come from Original`);
   assert.equal(dark['--palette-primary'], '#2FD5FF');
-  assert.equal(light['--palette-primary'], '#6366F1');
   // Sin degradado: en Grafito la tarjeta principal y las demás comparten un solo color.
-  for (const tokens of [dark, light]) assert.equal(tokens['--palette-hero-tint'], tokens['--panel']);
+  for (const tokens of [dark]) assert.equal(tokens['--palette-hero-tint'], tokens['--panel']);
 });
 
 test('graphite palette is offered in the appearance dialog and the palette count matches', () => {
   const html = fs.readFileSync(new URL('../app.html', import.meta.url), 'utf8');
-  const ids = [...html.matchAll(/data-palette-choice="([^"]+)"/g)].map(match => match[1]);
-  assert.deepEqual(ids, PALETTES.map(item => item.id));
-  assert.ok(html.includes(`Original + ${PALETTES.length - 1} paletas`));
+  const keys = [...html.matchAll(/data-palette-choice="([^"]+)" data-mode-choice="([^"]+)"/g)].map(match => `${match[1]}:${match[2]}`);
+  assert.deepEqual(keys, PALETTE_CHOICES.map(item => item.key));
+  assert.ok(html.includes(`${PALETTE_CHOICES.length} temas`));
+  // Una sola lista de temas: sin selector aparte de claro/oscuro, y Negro Grafito justo después de Original.
+  assert.ok(!html.includes('data-preview-theme'));
+  assert.deepEqual(PALETTE_CHOICES.slice(0, 3).map(item => item.name), ['Original Claro', 'Original Oscuro', 'Negro Grafito']);
+  for (const removed of ['Morado Neón', 'Azul Arena', 'Rosa Magenta']) assert.ok(!PALETTE_CHOICES.some(item => item.name === removed));
 });
 
 test('offline English translates authored text while retaining personal names and nested safe markup', () => {

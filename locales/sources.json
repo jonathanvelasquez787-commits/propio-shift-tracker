@@ -251,6 +251,12 @@
       "app.html"
     ]
   },
+  "s_043073f1": {
+    "source": "#CEDDF7",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_043ef205": {
     "source": "Final calculado*",
     "files": [
@@ -293,6 +299,12 @@
     "source": "Metas, tasa por minuto, moneda secundaria y ciclo de pago.",
     "files": [
       "privacidad.html"
+    ]
+  },
+  "s_0525b4a9": {
+    "source": "#E3E5FA",
+    "files": [
+      "app.html"
     ]
   },
   "s_053043f7": {
@@ -509,6 +521,12 @@
       "js/finance.js"
     ]
   },
+  "s_07e0e133": {
+    "source": "#DDE8FB",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_07eb37e7": {
     "source": "Hay varias pestañas de Propio",
     "files": [
@@ -524,7 +542,6 @@
   "s_082c97f7": {
     "source": "Morado Neón",
     "files": [
-      "app.html",
       "js/theme-palettes.js"
     ]
   },
@@ -798,6 +815,12 @@
     "source": "Cambio manual: $1 = {{v0}} {{v1}}.",
     "files": [
       "js/detail-views.js"
+    ]
+  },
+  "s_0be4e40d": {
+    "source": "Original Oscuro: Los colores actuales de la aplicación",
+    "files": [
+      "app.html"
     ]
   },
   "s_0be62a37": {
@@ -1457,12 +1480,6 @@
       "js/positive-reinforcement.js"
     ]
   },
-  "s_15bd91bc": {
-    "source": "Modo de apariencia",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_15db7cff": {
     "source": "fin del turno",
     "files": [
@@ -1804,12 +1821,6 @@
       "js/notification-review.js"
     ]
   },
-  "s_1a320660": {
-    "source": "#462C7D",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_1a37b0aa": {
     "source": "Monstruos vencidos",
     "files": [
@@ -2106,12 +2117,6 @@
       "js/reports.js"
     ]
   },
-  "s_1eea3f8b": {
-    "source": "#B1D3B9",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_1eec43c9": {
     "source": "para nombre y emoji.",
     "files": [
@@ -2251,13 +2256,6 @@
       "app.html"
     ]
   },
-  "s_21830f6d": {
-    "source": "Azul suave, crema y arena",
-    "files": [
-      "app.html",
-      "js/theme-palettes.js"
-    ]
-  },
   "s_218a616a": {
     "source": "Guardar meta",
     "files": [
@@ -2286,6 +2284,12 @@
     "source": "{{v4}}. {{v5}}",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_21c1e2d9": {
+    "source": "Bosque de Salvia: Verde salvia, menta y crema",
+    "files": [
+      "app.html"
     ]
   },
   "s_21d1bdeb": {
@@ -2460,6 +2464,12 @@
       "js/backup-recovery.js"
     ]
   },
+  "s_247db171": {
+    "source": "Bosque de Salvia",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_2486313b": {
     "source": "Inicio de turno → primera llamada",
     "files": [
@@ -2580,12 +2590,6 @@
       "js/game-battle.js"
     ]
   },
-  "s_2693f64b": {
-    "source": "#AEE2FF",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_26a2d48d": {
     "source": "Ciclo {{v0}} — {{v1}} · {{v2}}% de la meta.",
     "files": [
@@ -2645,12 +2649,6 @@
     "source": "Falta el campo \"state\" (o no es válido) en el archivo.",
     "files": [
       "js/backup-recovery.js"
-    ]
-  },
-  "s_27987d02": {
-    "source": "#1B2CC1",
-    "files": [
-      "app.html"
     ]
   },
   "s_27a78440": {
@@ -3023,6 +3021,12 @@
       "js/backup-recovery.js"
     ]
   },
+  "s_2ccac76e": {
+    "source": "Lavanda Nocturna",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_2ce32aec": {
     "source": "de esa semana",
     "files": [
@@ -3092,6 +3096,12 @@
       "js/schedule.js"
     ]
   },
+  "s_2e840342": {
+    "source": "#304A44",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_2e9445f7": {
     "source": "Min",
     "files": [
@@ -3118,6 +3128,12 @@
   },
   "s_2ea6aa6a": {
     "source": "Vacío = se guarda como Manual",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_2ebabc0a": {
+    "source": "Lavanda Suave",
     "files": [
       "app.html"
     ]
@@ -3234,12 +3250,6 @@
       "js/reports.js"
     ]
   },
-  "s_2fbd56d3": {
-    "source": "Oscuro original",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_2fca941c": {
     "source": "Guardar y empezar",
     "files": [
@@ -3286,6 +3296,12 @@
     "source": "Volviste a tomar una llamada después de {{v0}}.",
     "files": [
       "js/reinforcement-rules.js"
+    ]
+  },
+  "s_30d97ebf": {
+    "source": "Original Oscuro",
+    "files": [
+      "app.html"
     ]
   },
   "s_30da288d": {
@@ -3429,12 +3445,6 @@
       "app.html"
     ]
   },
-  "s_32371ea4": {
-    "source": "#FF467A",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_32498034": {
     "source": "Eliminar bloque {{v13}}",
     "files": [
@@ -3542,6 +3552,12 @@
     "source": "Resultado de la última importación",
     "files": [
       "js/call-review-view.js"
+    ]
+  },
+  "s_33cc7252": {
+    "source": "Lavanda Nocturna: Lavanda, celeste y menta",
+    "files": [
+      "app.html"
     ]
   },
   "s_33d4dce2": {
@@ -4166,6 +4182,12 @@
       "js/game-battle.js"
     ]
   },
+  "s_3ce700de": {
+    "source": "#162A28",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_3d4ca758": {
     "source": "Estado del día",
     "files": [
@@ -4262,10 +4284,22 @@
       "js/calendar.js"
     ]
   },
+  "s_3f00a024": {
+    "source": "12 temas",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_3f16d319": {
     "source": "{{v0}} acciones registradas",
     "files": [
       "js/sync.js"
+    ]
+  },
+  "s_3f33df73": {
+    "source": "Original Claro",
+    "files": [
+      "app.html"
     ]
   },
   "s_3f53be63": {
@@ -4284,12 +4318,6 @@
     "source": "Copia local disponible en este navegador.",
     "files": [
       "js/boot.js"
-    ]
-  },
-  "s_3f6e2bce": {
-    "source": "#B5BAFF",
-    "files": [
-      "app.html"
     ]
   },
   "s_3f883b70": {
@@ -4328,6 +4356,12 @@
       "app.html"
     ]
   },
+  "s_400e95db": {
+    "source": "#3D1E5C",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_402319c6": {
     "source": "Automático (según tu horario)",
     "files": [
@@ -4344,6 +4378,12 @@
     "source": "Solo registro en esta PC",
     "files": [
       "js/automation-ui.js"
+    ]
+  },
+  "s_40ee1dc7": {
+    "source": "#19264A",
+    "files": [
+      "app.html"
     ]
   },
   "s_411234a6": {
@@ -4391,7 +4431,6 @@
   "s_41c5948a": {
     "source": "Turquesa Profundo",
     "files": [
-      "app.html",
       "js/theme-palettes.js"
     ]
   },
@@ -4645,8 +4684,8 @@
       "js/game-review.js"
     ]
   },
-  "s_451db15f": {
-    "source": "Original + 8 paletas",
+  "s_44fba952": {
+    "source": "Claro",
     "files": [
       "app.html"
     ]
@@ -4860,6 +4899,12 @@
       "js/app-main.js"
     ]
   },
+  "s_48594f6b": {
+    "source": "#EAECFC",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_486ef5ab": {
     "source": "Cuándo",
     "files": [
@@ -4948,12 +4993,6 @@
     "source": "Borrar cuenta y datos",
     "files": [
       "js/boot.js"
-    ]
-  },
-  "s_49dc4b72": {
-    "source": "#1E1E22",
-    "files": [
-      "app.html"
     ]
   },
   "s_49e53544": {
@@ -5219,7 +5258,6 @@
   "s_4dcac109": {
     "source": "Azul Real",
     "files": [
-      "app.html",
       "js/theme-palettes.js"
     ]
   },
@@ -5252,6 +5290,12 @@
     "source": "Espalda",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_4e42073d": {
+    "source": "Brisa Turquesa: Turquesa, azul y violeta",
+    "files": [
+      "app.html"
     ]
   },
   "s_4e66f48e": {
@@ -6150,12 +6194,6 @@
       "js/boot.js"
     ]
   },
-  "s_59ee576d": {
-    "source": "#831C91",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_5a3eb15d": {
     "source": "Llamada agregada",
     "files": [
@@ -6512,6 +6550,12 @@
       "app.html"
     ]
   },
+  "s_6122ffc6": {
+    "source": "Azul Medianoche",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_613bcbbd": {
     "source": "Reintentar tabla",
     "files": [
@@ -6621,6 +6665,12 @@
     "source": "Ver cómo se actualizó esta llamada",
     "files": [
       "js/call-records-view.js"
+    ]
+  },
+  "s_63236fb9": {
+    "source": "#8B7BFF",
+    "files": [
+      "app.html"
     ]
   },
   "s_6329a166": {
@@ -6951,12 +7001,6 @@
       "js/app-main.js"
     ]
   },
-  "s_68958345": {
-    "source": "Lavanda Pastel: Lavanda, celeste y menta",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_68a2e7c7": {
     "source": "Video o parte de un episodio",
     "files": [
@@ -6985,12 +7029,6 @@
     "source": "Tiempo productivo",
     "files": [
       "js/shift-work-review.js"
-    ]
-  },
-  "s_691b3252": {
-    "source": "#D552A3",
-    "files": [
-      "app.html"
     ]
   },
   "s_69232c9b": {
@@ -7188,12 +7226,6 @@
       "js/game.js"
     ]
   },
-  "s_6bd0d713": {
-    "source": "Verde Salvia: Verde salvia, menta y crema",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_6be44c9c": {
     "source": "Conexión",
     "files": [
@@ -7266,16 +7298,16 @@
       "js/schedule.js"
     ]
   },
+  "s_6d4315b9": {
+    "source": "Mar Profundo: Turquesa, azul y violeta",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_6d53c082": {
     "source": "Mira los números",
     "files": [
       "index.html"
-    ]
-  },
-  "s_6d6bc0fd": {
-    "source": "#FF70BF",
-    "files": [
-      "app.html"
     ]
   },
   "s_6d6ee436": {
@@ -7320,6 +7352,12 @@
     "source": "Ranura {{v4}} · nivel {{v5}}",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_6e63625c": {
+    "source": "Oscuro",
+    "files": [
+      "app.html"
     ]
   },
   "s_6e748bd7": {
@@ -7417,7 +7455,6 @@
   "s_6fd58fc7": {
     "source": "Verde Salvia",
     "files": [
-      "app.html",
       "js/theme-palettes.js"
     ]
   },
@@ -7555,12 +7592,6 @@
       "js/app-main.js"
     ]
   },
-  "s_7166a73f": {
-    "source": "#FFD51E",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_71841671": {
     "source": "Si la app falla, se registra el tipo de error, un mensaje depurado, la ruta y la versión de la app. El correo se oculta y la dirección de red se transforma en un identificador no reversible antes de guardarse.",
     "files": [
@@ -7597,12 +7628,6 @@
       "js/finance-review.js"
     ]
   },
-  "s_71daacb6": {
-    "source": "#ABD2FA",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_71f189f6": {
     "source": "Editar hueco",
     "files": [
@@ -7620,12 +7645,6 @@
     "source": "Lanzallamas",
     "files": [
       "js/game-battle.js"
-    ]
-  },
-  "s_7246bb3f": {
-    "source": "#9FA1FF",
-    "files": [
-      "app.html"
     ]
   },
   "s_725a7d53": {
@@ -7982,6 +8001,12 @@
       "js/weekly-summary.js"
     ]
   },
+  "s_776cb9e0": {
+    "source": "Noche Violeta: Violeta, fucsia, coral y amarillo",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_77789679": {
     "source": "{{v0}}% de {{v1}}%",
     "files": [
@@ -8089,12 +8114,6 @@
     "source": "Faltan {{v0}}{{v1}}",
     "files": [
       "js/reports.js"
-    ]
-  },
-  "s_79559d96": {
-    "source": "Paleta de colores",
-    "files": [
-      "app.html"
     ]
   },
   "s_795f0e3b": {
@@ -8257,12 +8276,6 @@
       "app.html"
     ]
   },
-  "s_7b91d755": {
-    "source": "#78B9B5",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_7b9215bf": {
     "source": "Inicio del turno",
     "files": [
@@ -8375,6 +8388,12 @@
     "source": "Cierre personal de esta llamada",
     "files": [
       "js/call-records-view.js"
+    ]
+  },
+  "s_7cebcf3c": {
+    "source": "Elegí el tema que más te guste: cada uno ya es claro u oscuro.",
+    "files": [
+      "app.html"
     ]
   },
   "s_7d2466a9": {
@@ -8518,12 +8537,6 @@
       "js/accounting-export.js"
     ]
   },
-  "s_7ef548a9": {
-    "source": "#88BDA4",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_7ef923a5": {
     "source": "Bajar prioridad",
     "files": [
@@ -8608,6 +8621,12 @@
       "js/automation-ui.js"
     ]
   },
+  "s_80994e27": {
+    "source": "#E4EEFD",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_80fe07c8": {
     "source": "Turno ajustado {{v0}} — recuerda \"Guardar día\" para confirmar",
     "files": [
@@ -8624,6 +8643,12 @@
     "source": "Llamada",
     "files": [
       "js/call-table-view.js"
+    ]
+  },
+  "s_8135ef32": {
+    "source": "Noche Violeta",
+    "files": [
+      "app.html"
     ]
   },
   "s_81496bac": {
@@ -8648,12 +8673,6 @@
     "source": "{{v0}} Historial ({{v1}} {{v2}})",
     "files": [
       "js/higher-rate.js"
-    ]
-  },
-  "s_81957547": {
-    "source": "Morado Neón: Violeta, fucsia, coral y amarillo",
-    "files": [
-      "app.html"
     ]
   },
   "s_81980738": {
@@ -8822,6 +8841,12 @@
     "source": "Meta nueva: {{v0}} min · {{v1}}{{v2}}",
     "files": [
       "js/settings.js"
+    ]
+  },
+  "s_83535adf": {
+    "source": "Azul Medianoche: Azul noche, intenso y celeste",
+    "files": [
+      "app.html"
     ]
   },
   "s_836ea7f7": {
@@ -9182,6 +9207,12 @@
       "app.html"
     ]
   },
+  "s_8845a6e3": {
+    "source": "#202E55",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_885e114b": {
     "source": "11:40 – 12:00 · tomado a tiempo",
     "files": [
@@ -9204,6 +9235,12 @@
     "source": "Sugerido: {{v0}} · {{v1}} {{v2}} min",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_8883d3ca": {
+    "source": "#C5E1DF",
+    "files": [
+      "app.html"
     ]
   },
   "s_8886da7a": {
@@ -9247,6 +9284,12 @@
     "source": "{{v0}} de 3 estrellas",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_890ab8f2": {
+    "source": "Cielo Azul: Azul noche, intenso y celeste",
+    "files": [
+      "app.html"
     ]
   },
   "s_8917b012": {
@@ -9554,6 +9597,12 @@
   },
   "s_8d273a38": {
     "source": "Siguiente prioridad",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_8d2fd5b9": {
+    "source": "#071E2B",
     "files": [
       "app.html"
     ]
@@ -9899,12 +9948,6 @@
       "app.html"
     ]
   },
-  "s_91810e1d": {
-    "source": "#F3E3D0",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_9191de26": {
     "source": "Dejá una sola pestaña del portal para evitar actuar sobre la sesión equivocada.",
     "files": [
@@ -9957,6 +10000,12 @@
     "source": "Llevas {{v0}} de {{v1}} conectado.",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_91e0bb82": {
+    "source": "#DBDEFA",
+    "files": [
+      "app.html"
     ]
   },
   "s_920ddf2c": {
@@ -10093,12 +10142,6 @@
       "js/app-main.js"
     ]
   },
-  "s_94462133": {
-    "source": "#0F828C",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_9468c6eb": {
     "source": "Horario de {{v0}} guardado",
     "files": [
@@ -10160,6 +10203,12 @@
       "privacidad.html"
     ]
   },
+  "s_95a2244e": {
+    "source": "#12394A",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_95b9cf35": {
     "source": "Minutos productivos por día",
     "files": [
@@ -10180,6 +10229,12 @@
   },
   "s_95f46905": {
     "source": "Resume ganancias, adherencia y minutos productivos por ciclo de pago, con una proyección de a dónde vas a llegar si sigues al ritmo actual.",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_95f8d5c1": {
+    "source": "Original Claro: Los colores actuales de la aplicación",
     "files": [
       "app.html"
     ]
@@ -10354,13 +10409,6 @@
       "js/automation-ui.js"
     ]
   },
-  "s_9898c6a1": {
-    "source": "Rosa Magenta",
-    "files": [
-      "app.html",
-      "js/theme-palettes.js"
-    ]
-  },
   "s_98b206bd": {
     "source": "{{v9}} → {{v10}}",
     "files": [
@@ -10472,6 +10520,12 @@
   },
   "s_9a2c69a8": {
     "source": "Golpes, armaduras, combos, premios y victorias con efectos breves. Se combinan con el volumen general de Ajustes → Alarmas. Puedes silenciarlos en el menú lateral.",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_9a366108": {
+    "source": "#E1F0EE",
     "files": [
       "app.html"
     ]
@@ -10709,12 +10763,6 @@
       "js/call-recovery.js"
     ]
   },
-  "s_9d942cda": {
-    "source": "Azul Real: Azul noche, intenso y celeste",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_9d9e0b4f": {
     "source": "¿Para cuándo es esta meta?",
     "files": [
@@ -10760,6 +10808,12 @@
     "source": "La extensión debe confirmar el estado de Propio antes de mostrar la próxima acción.",
     "files": [
       "js/automation-ui.js"
+    ]
+  },
+  "s_9e40c2fa": {
+    "source": "#A855F7",
+    "files": [
+      "app.html"
     ]
   },
   "s_9e65b22e": {
@@ -11053,19 +11107,6 @@
       "app.html"
     ]
   },
-  "s_a2b286ed": {
-    "source": "Morado profundo y tonos rosados",
-    "files": [
-      "app.html",
-      "js/theme-palettes.js"
-    ]
-  },
-  "s_a2b4318d": {
-    "source": "Paletas de colores",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_a2b49e3a": {
     "source": "Con actividad:",
     "files": [
@@ -11082,7 +11123,6 @@
   "s_a2fe7692": {
     "source": "Original",
     "files": [
-      "app.html",
       "js/theme-palettes.js"
     ]
   },
@@ -11135,6 +11175,12 @@
       "js/higher-rate.js"
     ]
   },
+  "s_a37753aa": {
+    "source": "#29423D",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_a37a9164": {
     "source": "Buenos días",
     "files": [
@@ -11173,12 +11219,6 @@
   },
   "s_a415fbad": {
     "source": "Historial de cambios",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_a45085e2": {
-    "source": "#D9F9DF",
     "files": [
       "app.html"
     ]
@@ -11304,12 +11344,6 @@
       "js/game.js"
     ]
   },
-  "s_a673358d": {
-    "source": "Claro original",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_a68af785": {
     "source": "Sumar o restar de la reserva",
     "files": [
@@ -11404,6 +11438,12 @@
     "source": "El registro de llamadas continúa. Reanudá la disponibilidad desde la extensión o con Start Calls en Propio.",
     "files": [
       "js/automation-ui.js"
+    ]
+  },
+  "s_a79ca484": {
+    "source": "Mar Profundo",
+    "files": [
+      "app.html"
     ]
   },
   "s_a7c2d521": {
@@ -11562,6 +11602,12 @@
       "app.html"
     ]
   },
+  "s_aa5b0df0": {
+    "source": "#060B1E",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_aa64f0fa": {
     "source": "Visor bloqueado",
     "files": [
@@ -11643,6 +11689,12 @@
       "js/app-main.js"
     ]
   },
+  "s_ab4be598": {
+    "source": "Brisa Turquesa",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_ab634077": {
     "source": "Período a exportar",
     "files": [
@@ -11702,6 +11754,12 @@
     "source": "Intentando ponerte disponible",
     "files": [
       "js/automation-ui.js"
+    ]
+  },
+  "s_ac236890": {
+    "source": "#D8ECE9",
+    "files": [
+      "app.html"
     ]
   },
   "s_ac358a06": {
@@ -12132,6 +12190,12 @@
       "app.html"
     ]
   },
+  "s_b336460c": {
+    "source": "#CDE3D3",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_b341d057": {
     "source": "Acerca de Bestiario",
     "files": [
@@ -12394,12 +12458,6 @@
       "app.html"
     ]
   },
-  "s_b6ee0687": {
-    "source": "Turquesa Profundo: Turquesa, azul y violeta",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_b7079385": {
     "source": "{{v0}} momentos difíciles",
     "files": [
@@ -12499,12 +12557,6 @@
     "source": "Lunch: {{v0}}",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_b93f1f71": {
-    "source": "Original conserva los modos claro y oscuro actuales. Las otras paletas se adaptan al modo elegido.",
-    "files": [
-      "app.html"
     ]
   },
   "s_b962bc93": {
@@ -12663,6 +12715,12 @@
     "source": "Llamadas marcadas como Billable hoy",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_bc5d567b": {
+    "source": "Salvia Fresca",
+    "files": [
+      "app.html"
     ]
   },
   "s_bc902c0e": {
@@ -12850,7 +12908,6 @@
   "s_bee7b995": {
     "source": "Lavanda Pastel",
     "files": [
-      "app.html",
       "js/theme-palettes.js"
     ]
   },
@@ -13208,6 +13265,12 @@
       "js/backup-recovery.js"
     ]
   },
+  "s_c540ebf5": {
+    "source": "Temas",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_c552cfee": {
     "source": "Tres estrellas",
     "files": [
@@ -13358,13 +13421,6 @@
     "source": "10. Ley aplicable",
     "files": [
       "terminos.html"
-    ]
-  },
-  "s_c72aa82c": {
-    "source": "Azul Arena",
-    "files": [
-      "app.html",
-      "js/theme-palettes.js"
     ]
   },
   "s_c73bb4cf": {
@@ -13544,6 +13600,12 @@
       "js/game.js"
     ]
   },
+  "s_caceaee5": {
+    "source": "#E3F0E4",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_cad11401": {
     "source": "Bloques de enfoque productivo",
     "files": [
@@ -13560,6 +13622,12 @@
     "source": "{{v4}} {{v5}}{{v6}}{{v7}}",
     "files": [
       "js/weekly-summary.js"
+    ]
+  },
+  "s_cafecf7d": {
+    "source": "#7C3AED",
+    "files": [
+      "app.html"
     ]
   },
   "s_cb0d16c8": {
@@ -13608,12 +13676,6 @@
   },
   "s_cc4a5d5d": {
     "source": "#2FD5FF",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_cc5f19bd": {
-    "source": "#E6F2DD",
     "files": [
       "app.html"
     ]
@@ -13787,12 +13849,6 @@
       "js/positive-reinforcement.js"
     ]
   },
-  "s_ce3ed148": {
-    "source": "#320A6B",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_ce84dca5": {
     "source": "· {{v0}} pendiente(s) de vincular",
     "files": [
@@ -13898,12 +13954,6 @@
       "js/reinforcement-feedback.js"
     ]
   },
-  "s_cfea4551": {
-    "source": "#5003C0",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_d02d99f6": {
     "source": "#0D1230",
     "files": [
@@ -14004,6 +14054,12 @@
     "source": "{{v0}} histórica(s)",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_d12ee789": {
+    "source": "#DCECDF",
+    "files": [
+      "app.html"
     ]
   },
   "s_d13bc89d": {
@@ -14137,12 +14193,6 @@
     "source": "META CUMPLIDA",
     "files": [
       "js/game.js"
-    ]
-  },
-  "s_d35d5206": {
-    "source": "#AACDDC",
-    "files": [
-      "app.html"
     ]
   },
   "s_d379a183": {
@@ -14306,12 +14356,6 @@
     "source": "No hay que instalar nada ni configurar medio día antes de que sirva.",
     "files": [
       "index.html"
-    ]
-  },
-  "s_d55c0716": {
-    "source": "Original: los colores actuales de la aplicación",
-    "files": [
-      "app.html"
     ]
   },
   "s_d5674789": {
@@ -14925,12 +14969,6 @@
       "js/app-main.js"
     ]
   },
-  "s_dd6a0a2b": {
-    "source": "#81A6C6",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_dd7e8436": {
     "source": "⚠️ {{v0}} semana(s) personalizada(s) de Horario con datos inválidos se descartaron al cargar.",
     "files": [
@@ -15277,20 +15315,8 @@
       "js/boot.js"
     ]
   },
-  "s_e1ec2e88": {
-    "source": "#7692FF",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_e20ba9f1": {
     "source": "Hueco más largo",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_e211b774": {
-    "source": "#A1A1AA",
     "files": [
       "app.html"
     ]
@@ -15331,6 +15357,12 @@
       "js/finance.js"
     ]
   },
+  "s_e2c44e41": {
+    "source": "Cielo Azul",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_e2cab854": {
     "source": "No se pudo guardar — almacenamiento lleno",
     "files": [
@@ -15365,6 +15397,12 @@
     "source": "Escribe tu contraseña nueva para terminar.",
     "files": [
       "js/landing.js"
+    ]
+  },
+  "s_e381ff2c": {
+    "source": "#3A3D61",
+    "files": [
+      "app.html"
     ]
   },
   "s_e3863232": {
@@ -15963,6 +16001,12 @@
       "js/app-main.js"
     ]
   },
+  "s_ebd3981e": {
+    "source": "Lavanda Suave: Lavanda, celeste y menta",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_ebf9d9fe": {
     "source": "Guardar recibido",
     "files": [
@@ -16281,12 +16325,6 @@
       "js/game.js"
     ]
   },
-  "s_f0cea180": {
-    "source": "Azul Arena: Azul suave, crema y arena",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_f0f200b2": {
     "source": "Subir sonido (MP3/WAV/OGG, máx. 300KB)",
     "files": [
@@ -16459,6 +16497,12 @@
       "js/higher-rate-review.js"
     ]
   },
+  "s_f2f96e96": {
+    "source": "#18181C",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_f3054b61": {
     "source": "Reservar aparta dinero en tu plan. No registra un pago ni cambia tus ganancias.",
     "files": [
@@ -16627,12 +16671,6 @@
       "js/auth.js"
     ]
   },
-  "s_f52c0abe": {
-    "source": "#AB03A9",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_f56ab548": {
     "source": "{{v0}} Hoy: objetivos y progreso",
     "files": [
@@ -16679,12 +16717,6 @@
     "source": "19 de septiembre de 2026",
     "files": [
       "terminos.html"
-    ]
-  },
-  "s_f5c0d963": {
-    "source": "Rosa Magenta: Morado profundo y tonos rosados",
-    "files": [
-      "app.html"
     ]
   },
   "s_f5c7742f": {
@@ -16938,6 +16970,12 @@
       "js/app-main.js"
     ]
   },
+  "s_f8c85277": {
+    "source": "Salvia Fresca: Verde salvia, menta y crema",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_f9215e3b": {
     "source": "Horario de {{v0}} guardado para esa semana",
     "files": [
@@ -17159,6 +17197,12 @@
     "source": "Elige Restar para devolver el monto escrito: baja el Reservado y sube el Disponible. Después pulsa Aplicar ajuste. No elimina pagos ni reduce tus ganancias.",
     "files": [
       "js/finance.js"
+    ]
+  },
+  "s_fc6f78a4": {
+    "source": "#7D8CFF",
+    "files": [
+      "app.html"
     ]
   },
   "s_fc8e1c9d": {
@@ -17387,12 +17431,6 @@
   },
   "s_ffe786bf": {
     "source": "Meta ($)",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_ffec32f1": {
-    "source": "#D2C4B4",
     "files": [
       "app.html"
     ]

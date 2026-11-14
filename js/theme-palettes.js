@@ -1,13 +1,11 @@
 export const PALETTES = [
-  { id:'original',name:'Original',description:'Los colores actuales de la aplicación',colors:['#0D1230','#2FD5FF','#FFFFFF','#6366F1'] },
-  { id:'neon',name:'Morado Neón',description:'Violeta, fucsia, coral y amarillo',colors:['#5003C0','#AB03A9','#FF467A','#FFD51E'],code:'5003c0ab03a9ff467affd51e',lightAccent:0,darkAccent:3,secondary:1,lightBackground:3 },
-  { id:'lavender',name:'Lavanda Pastel',description:'Lavanda, celeste y menta',colors:['#9FA1FF','#B5BAFF','#AEE2FF','#D9F9DF'],code:'9fa1ffb5baffaee2ffd9f9df',lightAccent:0,darkAccent:2,secondary:1,lightBackground:3 },
-  { id:'magenta',name:'Rosa Magenta',description:'Morado profundo y tonos rosados',colors:['#462C7D','#831C91','#D552A3','#FF70BF'],code:'462c7d831c91d552a3ff70bf',lightAccent:1,darkAccent:3,secondary:2,lightBackground:3 },
-  { id:'sand',name:'Azul Arena',description:'Azul suave, crema y arena',colors:['#81A6C6','#AACDDC','#F3E3D0','#D2C4B4'],code:'81a6c6aacddcf3e3d0d2c4b4',lightAccent:0,darkAccent:1,secondary:3,lightBackground:2 },
-  { id:'royal',name:'Azul Real',description:'Azul noche, intenso y celeste',colors:['#091540','#1B2CC1','#7692FF','#ABD2FA'],code:'0915401b2cc17692ffabd2fa',lightAccent:1,darkAccent:2,secondary:2,lightBackground:3 },
-  { id:'ocean',name:'Turquesa Profundo',description:'Turquesa, azul y violeta',colors:['#78B9B5','#0F828C','#065084','#320A6B'],code:'78b9b50f828c065084320a6b',lightAccent:1,darkAccent:0,secondary:3,lightBackground:0 },
-  { id:'sage',name:'Verde Salvia',description:'Verde salvia, menta y crema',colors:['#659287','#88BDA4','#B1D3B9','#E6F2DD'],code:'65928788bda4b1d3b9e6f2dd',lightAccent:0,darkAccent:1,secondary:2,lightBackground:3 },
-  { id:'graphite',name:'Negro Grafito',description:'Cambia solo los tres negros de fondo',colors:['#09090B','#131315','#1E1E22','#A1A1AA'],lightAccent:3,darkAccent:3,secondary:3,gameBody:'#6366F1' }
+  { id:'original',name:'Original',description:'Los colores actuales de la aplicación',colors:['#0D1230','#2FD5FF','#FFFFFF','#6366F1'],modes:{ light:'Original Claro',dark:'Original Oscuro' } },
+  { id:'graphite',name:'Negro Grafito',description:'Cambia solo los tres negros de fondo',colors:['#09090B','#131315','#1E1E22','#A1A1AA'],lightAccent:3,darkAccent:3,secondary:3,gameBody:'#6366F1',modes:{ dark:'Negro Grafito' } },
+  { id:'lavender',name:'Lavanda Pastel',description:'Lavanda, celeste y menta',colors:['#9FA1FF','#B5BAFF','#AEE2FF','#D9F9DF'],code:'9fa1ffb5baffaee2ffd9f9df',lightAccent:0,darkAccent:2,secondary:1,lightBackground:3,modes:{ light:'Lavanda Suave',dark:'Lavanda Nocturna' } },
+  { id:'royal',name:'Azul Real',description:'Azul noche, intenso y celeste',colors:['#091540','#1B2CC1','#7692FF','#ABD2FA'],code:'0915401b2cc17692ffabd2fa',lightAccent:1,darkAccent:2,secondary:2,lightBackground:3,modes:{ light:'Cielo Azul',dark:'Azul Medianoche' } },
+  { id:'ocean',name:'Turquesa Profundo',description:'Turquesa, azul y violeta',colors:['#78B9B5','#0F828C','#065084','#320A6B'],code:'78b9b50f828c065084320a6b',lightAccent:1,darkAccent:0,secondary:3,lightBackground:0,modes:{ light:'Brisa Turquesa',dark:'Mar Profundo' } },
+  { id:'sage',name:'Verde Salvia',description:'Verde salvia, menta y crema',colors:['#659287','#88BDA4','#B1D3B9','#E6F2DD'],code:'65928788bda4b1d3b9e6f2dd',lightAccent:0,darkAccent:1,secondary:2,lightBackground:3,modes:{ light:'Salvia Fresca',dark:'Bosque de Salvia' } },
+  { id:'neon',name:'Morado Neón',description:'Violeta, fucsia, coral y amarillo',colors:['#5003C0','#AB03A9','#FF467A','#FFD51E'],code:'5003c0ab03a9ff467affd51e',lightAccent:0,darkAccent:3,secondary:1,lightBackground:3,modes:{ dark:'Noche Violeta' } }
 ];
 const rgb = hex => hex.match(/[a-f\d]{2}/gi).map(value=>parseInt(value,16));
 const hex = channels => '#'+channels.map(value=>Math.round(value).toString(16).padStart(2,'0')).join('');
@@ -22,14 +20,12 @@ const readable = (color,backgrounds) => {
 };
 // Orden de los tres fondos en cada modo: [afuera/página = a medio camino entre el más claro y el intermedio (así no queda lavado), tarjeta principal = el más intenso, interior/secundario = intermedio].
 const PALETTE_SURFACES = {
-  neon: { light:['#FFECBD','#FFD873','#FFE7AD'], dark:['#3D1E5C','#140329','#351653'] },
+  neon: { dark:['#3D1E5C','#140329','#351653'] },
   lavender: { light:['#EAECFC','#DBDEFA','#E3E5FA'], dark:['#424569','#242541','#3A3D61'] },
-  magenta: { light:['#F9DEEC','#F6C9DF','#F7D4E7'], dark:['#42224C','#190D20','#3A1D44'] },
-  sand: { light:['#F3E6D8','#E8D8C8','#EFE0D0'], dark:['#445662','#253542','#3B4D5B'] },
   royal: { light:['#E4EEFD','#CEDDF7','#DDE8FB'], dark:['#202E55','#060B1E','#19264A'] },
   ocean: { light:['#E1F0EE','#C5E1DF','#D8ECE9'], dark:['#164250','#071E2B','#12394A'] },
   sage: { light:['#E3F0E4','#CDE3D3','#DCECDF'], dark:['#304A44','#162A28','#29423D'] },
-  graphite: { light:['#FAFAFA','#EBEBEE','#F4F4F5'], dark:['#18181C','#09090B','#131315'] },
+  graphite: { dark:['#18181C','#09090B','#131315'] },
 };
 // Todas las paletas solo cambian los fondos: el resto de colores (texto, bordes, botones,
 // acentos) se queda con los de Original. Estos valores solo alimentan los tokens --palette-*.
@@ -85,3 +81,17 @@ export function paletteTokens(palette,mode) {
   if(fixed)for(const name of Object.keys(tokens))if(!SURFACE_ONLY_KEEP.test(name))delete tokens[name];
   return tokens;
 }
+
+// Un solo tema = una paleta con su modo (claro u oscuro). Estas son las tarjetas del selector.
+export const PALETTE_CHOICES = PALETTES.flatMap(palette => Object.entries(palette.modes).map(([mode,name]) => ({
+  key:`${palette.id}:${mode}`, paletteId:palette.id, mode, name, description:palette.description,
+  colors: palette.id==='original'
+    ? (mode==='light' ? ['#FFFFFF','#6366F1','#7C3AED','#A855F7'] : ['#0D1230','#2FD5FF','#8B7BFF','#7D8CFF'])
+    : [...PALETTE_SURFACES[palette.id][mode],ORIGINAL_ACCENTS[mode].accent],
+})));
+// Si el tema guardado ya no existe (paleta quitada o modo que esa paleta no tiene), se usa Original.
+export function resolvePalette(id,mode) {
+  const palette = PALETTES.find(item => item.id === id);
+  return palette && Object.hasOwn(palette.modes,mode) ? palette : PALETTES[0];
+}
+export const choiceName = (palette,mode) => palette.modes[mode];
