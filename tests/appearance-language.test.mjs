@@ -54,6 +54,8 @@ test('graphite palette keeps three neutral blacks, grey text and borders, and an
     const [r, g, b] = channels(tokens[key]);
     assert.ok(Math.max(r, g, b) - Math.min(r, g, b) <= 8, `${key} must stay neutral grey: ${tokens[key]}`);
   }
+  // Sin degradado: la tarjeta principal y las demás comparten un solo color.
+  for (const tokens of [dark, light]) assert.equal(tokens['--palette-hero-tint'], tokens['--panel']);
   for (const tokens of [dark, light]) {
     const [r, g, b] = channels(tokens['--palette-primary']);
     assert.ok(b > r && b > g, 'indigo accent');
