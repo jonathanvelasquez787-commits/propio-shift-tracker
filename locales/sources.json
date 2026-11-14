@@ -9062,6 +9062,12 @@
       "js/calls.js"
     ]
   },
+  "s_88940a5f": {
+    "source": "Presupuestado",
+    "files": [
+      "js/finance.js"
+    ]
+  },
   "s_889f2c2a": {
     "source": "Vidas del héroe",
     "files": [
@@ -9310,12 +9316,6 @@
     "files": [
       "app.html",
       "js/app-main.js"
-    ]
-  },
-  "s_8beef0c0": {
-    "source": "Presupuesto",
-    "files": [
-      "js/finance.js"
     ]
   },
   "s_8bef1651": {
