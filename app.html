@@ -64,6 +64,7 @@
 </div>
 </button>
 <div class="sidebar-footer">
+<div class="sidebar-section-label">Gamificación</div>
 <div class="sidebar-darkmode-row">
 <span class="sidebar-darkmode-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8v5a4 4 0 0 1-8 0V3Z"/><path d="M8 5H4v2a4 4 0 0 0 4 4M16 5h4v2a4 4 0 0 1-4 4M12 12v6M8 21h8M9 18h6"/></svg></span>
 <span>Activar Logros</span>
@@ -77,6 +78,22 @@
 <span>Sonidos arcade</span>
 <label class="sidebar-switch" title="Activar o silenciar los efectos de Logros; los avisos de turno y pausas se controlan aparte.">
 <input aria-label="Sonidos arcade" id="sidebarGameSoundInput" type="checkbox"/>
+<span class="sidebar-switch-track"><span class="sidebar-switch-thumb"></span></span>
+</label>
+</div>
+<div class="sidebar-darkmode-row">
+<span class="sidebar-darkmode-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21 9 9l6 6-10 6Z"/><path d="M14 4v2M19 9h-2M18 5l-1.5 1.5"/></svg></span>
+<span>Celebrar llamadas</span>
+<label class="sidebar-switch" title="Convierte constancia, recuperación y metas en evidencia positiva y premios seguros.">
+<input aria-label="Celebrar llamadas" id="positiveReinforcementEnabledInput" type="checkbox"/>
+<span class="sidebar-switch-track"><span class="sidebar-switch-thumb"></span></span>
+</label>
+</div>
+<div class="sidebar-darkmode-row">
+<span class="sidebar-darkmode-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="m8.5 12.5 2.5 2.5 4.5-5"/></svg></span>
+<span>Cierre breve</span>
+<label class="sidebar-switch" title="Después de cada llamada, marca si cerró bien, si cumpliste aunque fue difícil o si te dejó un aprendizaje.">
+<input aria-label="Cierre breve" id="positiveAskAfterCallInput" type="checkbox"/>
 <span class="sidebar-switch-track"><span class="sidebar-switch-thumb"></span></span>
 </label>
 </div>
@@ -1590,13 +1607,11 @@
 </div></div></details>
 <details class="polished-setting" id="positiveSettingsAccordion">
     <summary class="game-settings-accordion-summary">
-      <span class="game-settings-accordion-copy"><span class="game-panel-eyebrow">CUIDADO PERSONAL</span><strong>Apoyo y cierre de llamadas</strong><small>Reconoce llamadas, recuperación, metas y premios elegidos por ti.</small></span>
+      <span class="game-settings-accordion-copy"><span class="game-panel-eyebrow">CUIDADO PERSONAL</span><strong>Aviso sin llamadas</strong><small>Un mensaje de apoyo cuando pasa mucho tiempo sin llamadas.</small></span>
       <span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
     </summary>
     <div class="game-settings-accordion-body">
       <div class="positive-settings-section game-settings-section">
-        <label class="game-settings-toggle" for="positiveReinforcementEnabledInput"><span><strong>Celebrar llamadas completadas</strong><small>Convierte constancia, recuperación y metas en evidencia positiva y premios seguros.</small></span><input id="positiveReinforcementEnabledInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label>
-        <label class="game-settings-toggle" for="positiveAskAfterCallInput"><span><strong>Cierre breve después de cada llamada</strong><small>Marca si cerró bien, si cumpliste aunque fue difícil o si te dejó un aprendizaje.</small></span><input id="positiveAskAfterCallInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label>
         <div class="game-monster-name-setting">
           <label for="positiveInactivityMinutesInput">Avisar tras estos minutos de trabajo sin llamadas</label>
           <div class="game-monster-name-controls"><input id="positiveInactivityMinutesInput" type="number" min="1" max="240" step="1" inputmode="numeric" aria-describedby="positiveInactivityMessageHelp positiveInactivityMessageStatus"/></div>
