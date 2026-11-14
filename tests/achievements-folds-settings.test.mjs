@@ -26,14 +26,13 @@ test('Logros: Equipo, Bestiario, Trofeos e Historial son filas plegadas con cont
   assert.match(page, /id="positiveHistoryToggle"/);
 });
 
-test('Logros: los ajustes van plegados al final y el engranaje del encabezado los abre', () => {
+test('Logros: los ajustes van plegados justo debajo de Activar Logros', () => {
   const settings = page.slice(page.lastIndexOf('<details', page.indexOf('id="gameSettingsFold"')));
   for (const id of ['gameSettingsAccordion', 'positiveRewardsAccordion', 'gameResetAccordion', 'monsterNameInput', 'gameSoundVolumeInput', 'resetGameProgressBtn']) {
     assert.ok(settings.includes(`id="${id}"`), `#${id} dentro de Ajustes`);
   }
-  assert.ok(page.indexOf('id="gameSettingsFold"') > page.indexOf('id="positiveHistoryPanel"'));
-  assert.ok(page.indexOf('id="gameSettingsGearBtn"') < page.indexOf('id="gameLevelPanel"'));
-  const game = readFileSync(new URL('../js/game.js', import.meta.url), 'utf8');
-  assert.match(game, /getElementById\('gameSettingsGearBtn'\)\?\.addEventListener\('click'/);
-  assert.match(game, /fold\.open = true/);
+  assert.ok(page.indexOf('id="gameSettingsFold"') > page.indexOf('id="gameEnabledInput"'));
+  assert.ok(page.indexOf('id="gameSettingsFold"') < page.indexOf('id="gameLevelPanel"'));
+  assert.doesNotMatch(page, /gameSettingsGearBtn/);
+  assert.doesNotMatch(readFileSync(new URL('../js/game.js', import.meta.url), 'utf8'), /gameSettingsGearBtn/);
 });
