@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 
 const html = readFileSync(new URL('../app.html', import.meta.url), 'utf8');
 const start = html.indexOf('<div class="app-page game-achievements-page"');
-const end = html.indexOf('<section class="game-settings-disclosures"', start);
+const end = html.indexOf('id="gameAchievementsSummary"', start);
 const header = html.slice(start, end);
 
 test('encabezado de Logros compacto: sin kicker, sin frase y con notas dentro del botón i', () => {

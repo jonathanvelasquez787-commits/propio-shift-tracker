@@ -905,58 +905,9 @@
     <h1>Logros</h1>
     <div class="game-achievements-season" data-game-role="season-status"><span>Temporada</span><strong data-game-role="season-label">Ciclo actual</strong></div>
   </div>
-  <div class="game-achievements-toolbar"><label class="game-settings-toggle" for="gameEnabledInput"><span><strong>Activar Logros</strong></span><input id="gameEnabledInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label><span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Logros" aria-describedby="gameHeaderInfo">i</button><span class="sched-help-tooltip" id="gameHeaderInfo" role="tooltip">Logros convierte tu actividad en progreso de juego: racha, XP, misiones y colección, sin cambiar tus ganancias. Refuerzo positivo y premios personales se configuran por separado; ninguno cambia tu pago. Al desactivar Logros se conserva el progreso guardado. Podés activarlo de nuevo sin reiniciarlo.</span></span></div>
+  <div class="game-achievements-toolbar"><label class="game-settings-toggle" for="gameEnabledInput"><span><strong>Activar Logros</strong></span><input id="gameEnabledInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label><span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Logros" aria-describedby="gameHeaderInfo">i</button><span class="sched-help-tooltip" id="gameHeaderInfo" role="tooltip">Logros convierte tu actividad en progreso de juego: racha, XP, misiones y colección, sin cambiar tus ganancias. Refuerzo positivo y premios personales se configuran por separado; ninguno cambia tu pago. Al desactivar Logros se conserva el progreso guardado. Podés activarlo de nuevo sin reiniciarlo.</span></span><button class="sched-compact-info-btn game-settings-gear" id="gameSettingsGearBtn" type="button" aria-label="Abrir ajustes de Logros" aria-controls="gameSettingsFold"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg></button></div>
 </div>
-  <section class="game-settings-disclosures" aria-label="Preferencias de Logros">
-<details class="game-panel game-settings-accordion" id="gameSettingsAccordion">
-    <summary class="game-settings-accordion-summary">
-      <span class="game-settings-accordion-copy"><span class="game-panel-eyebrow">PERSONALIZACIÓN</span><strong>Gamificación</strong><small>Nombre del monstruo y sonidos arcade. Las misiones se calculan automáticamente.</small></span>
-      <span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
-    </summary>
-    <div class="game-settings-accordion-body">
-      <details class="review-details"><summary>Armas, práctica y duelo</summary><div class="review-detail-body"><p class="note">Las armas cambian la animación y la práctica. Disparar o jugar el duelo no registra llamadas, dinero ni XP laboral. El duelo se ofrece en Break/Lunch o fuera del turno; al volver al trabajo se pausa y podés retomarlo después.</p><p class="note">En Inicio, abrí Logros debajo de la batalla para elegir el arma y Duelo · 60 s. Automático permite salir; al regresar, elegí Duelo y Continuar duelo. En móvil usá los controles debajo de la escena.</p></div></details>
-      <div class="game-settings-section">
-        <div class="game-monster-name-setting">
-          <label for="monsterNameInput">Nombre del monstruo del día</label>
-          <div class="game-monster-name-controls"><input id="monsterNameInput" type="text" maxlength="60" autocomplete="off" aria-describedby="monsterNameHelp monsterNameSaveStatus" placeholder="Usar nombre del catálogo"/><button class="mc-btn-primary cyan" id="monsterNameSaveBtn" type="button">Guardar nombre</button></div>
-          <small id="monsterNameHelp">Un solo nombre para el monstruo diario. Déjalo vacío para usar los nombres del catálogo.</small>
-          <span class="game-monster-name-status" id="monsterNameSaveStatus" role="status" aria-live="polite"></span>
-        </div>
-        <div class="game-monster-name-setting">
-          <label for="gameSoundVolumeInput">Volumen de Logros</label>
-          <div class="volume-row"><input id="gameSoundVolumeInput" type="range" min="0" max="100" step="1" value="40" aria-describedby="gameSoundHelp"/><span class="volume-value" id="gameSoundVolumeValue">40%</span><button class="sched-compact-test-btn" id="gameSoundPreviewBtn" type="button" aria-label="Probar sonidos arcade"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polygon points="4 9 8 9 12 5 12 19 8 15 4 15"/><path d="M17 8a5 5 0 0 1 0 8"/></svg></button></div>
-          <small id="gameSoundHelp">Golpes, armaduras, combos, premios y victorias con efectos breves. Se combinan con el volumen general de Ajustes → Alarmas. Puedes silenciarlos en el menú lateral.</small>
-          <span class="game-monster-name-status" id="gameSoundStatus" role="status" aria-live="polite"></span>
-        </div>
-      </div>
-    </div>
-  </details>
-        <details class="game-settings-accordion game-reward-settings" id="positiveRewardsAccordion">
-          <summary class="game-settings-accordion-summary"><span class="game-settings-accordion-copy"><strong>Mis premios</strong><small>Premios físicos y catálogo sugerido.</small></span><span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></summary>
-          <div class="game-settings-accordion-body positive-rewards-body">
-        <div class="positive-settings-block">
-          <div class="positive-settings-heading"><span><strong>Mis premios físicos</strong><small>Se guardan hasta tu próximo Break, Lunch o fin del turno.</small></span><button type="button" data-positive-action="new-reward">Crear mi premio</button></div>
-          <div class="physical-reward-selected-list" id="physicalRewardSelected"></div>
-        </div>
-        <div class="positive-settings-block">
-          <div class="positive-settings-heading"><span><strong>Catálogo sugerido</strong><small>Agrega una idea y personalízala a tu gusto.</small></span></div>
-          <div class="physical-reward-catalog" id="physicalRewardCatalog"><label for="physicalRewardPresetSelect">Elegir un premio sugerido</label><div class="game-monster-name-controls"><select id="physicalRewardPresetSelect"></select><button type="button" id="physicalRewardPresetAdd" data-positive-action="add-preset">Agregar premio</button></div><small id="physicalRewardPresetDescription"></small></div>
-        </div>
-        <p class="note" style="margin:0;">La app nunca compra nada ni interrumpe una llamada. Tú decides cuándo realizar, guardar o cambiar cada premio.</p></div>
-        </details>
-</section>
 
-<section class="game-advanced-settings" aria-label="Herramientas avanzadas">
-
-  <details class="game-panel game-settings-accordion" id="gameResetAccordion">
-    <summary class="game-settings-accordion-summary"><span class="game-settings-accordion-copy"><span class="game-panel-eyebrow">PROGRESO DE JUEGO</span><strong>Reiniciar progreso</strong><small>Revisa qué se borra antes de confirmar.</small></span><span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></summary>
-    <div class="game-settings-accordion-body"><div class="danger-card tone-bad game-settings-danger">
-          <div class="danger-card-head"><span class="danger-card-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 15 9 15 3"/></svg></span><span class="danger-card-title">Reiniciar progreso</span></div>
-          <p class="danger-card-desc">Borra nivel, XP, racha, trofeos, accesorios y monstruos derrotados. Tus llamadas, turnos, metas y finanzas no se tocan.</p>
-          <button class="mc-btn-solid-full bad" id="resetGameProgressBtn" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 15 9 15 3"/></svg> Reiniciar progreso</button>
-        </div></div>
-  </details>
-</section>
 
 <section class="game-achievements-grid game-achievements-grid-top" id="gameAchievementsSummary" aria-label="Tu progreso">
 <div class="game-progress-profile" id="gameSettingsProfile" aria-live="polite">
@@ -1026,39 +977,98 @@
   </article>
 </section>
 
-<section aria-labelledby="gameEquipmentTitle" class="game-panel game-equipment-panel" data-game-root="equipment-panel" id="gameEquipmentPanel">
-  <div class="game-panel-head"><div><span class="game-panel-eyebrow">Personalización</span><h2 id="gameEquipmentTitle">Equipo</h2><span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Equipo" aria-describedby="equipmentInfo">i</button><span class="sched-help-tooltip" id="equipmentInfo" role="tooltip">Accesorios que desbloqueas con niveles, misiones y objetivos. Selecciona uno disponible para equiparlo o retirarlo; un accesorio bloqueado indica qué falta.</span></span></div><span class="game-panel-badge" data-game-role="equipment-count">0 / 6</span></div>
-  <p class="game-panel-intro">Accesorios y mejoras que se activan al completar tus objetivos.</p>
-  <div class="goals-field"><label for="gameEquipmentFilter">Mostrar equipo</label><select id="gameEquipmentFilter"><option value="all">Todo el equipo</option><option value="owned">Obtenido</option><option value="equipped">Equipado</option><option value="available">Disponible para equipar</option><option value="locked">Por desbloquear</option></select><small id="gameEquipmentFilterStatus" role="status"></small></div>
-  <div aria-label="Equipo desbloqueable" class="game-equipment-grid" data-game-role="equipment-list" data-game-root="equipment-grid" role="list">
-    <article aria-label="Visor bloqueado" class="game-equipment-item is-locked" data-equipment-state="locked" data-game-role="equipment-item" role="listitem">
-      <span aria-hidden="true" class="game-equipment-icon">?</span>
-      <span class="game-equipment-copy"><strong>Próximo accesorio</strong><small data-game-role="equipment-status">Completa una misión para desbloquearlo</small></span>
-      <span aria-hidden="true" class="game-equipment-state">Bloqueado</span>
-    </article>
+<details class="game-panel game-equipment-panel game-fold game-equipment-fold" data-game-root="equipment-panel" id="gameEquipmentPanel">
+  <summary class="game-fold-summary"><h2 id="gameEquipmentTitle">Equipo</h2><span class="game-panel-badge" data-game-role="equipment-count">0 / 6</span></summary>
+  <div class="game-fold-body">
+  <span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Equipo" aria-describedby="equipmentInfo">i</button><span class="sched-help-tooltip" id="equipmentInfo" role="tooltip">Accesorios que desbloqueas con niveles, misiones y objetivos. Selecciona uno disponible para equiparlo o retirarlo; un accesorio bloqueado indica qué falta.</span></span>
+  <div aria-label="Equipo desbloqueable" class="game-equipment-grid" data-game-role="equipment-list" data-game-root="equipment-grid" role="list"></div>
   </div>
-  <p class="game-collection-empty" data-game-role="equipment-empty">Tus accesorios aparecerán aquí al conseguirlos.</p>
-</section>
+</details>
 
 <section class="game-achievements-grid game-achievements-grid-collection" aria-label="Colecciones">
-<article class="game-panel game-bestiary-panel" id="gameBestiary">
-    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Colección</span><h2>Bestiario</h2><span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Bestiario" aria-describedby="bestiaryInfo">i</button><span class="sched-help-tooltip" id="bestiaryInfo" role="tooltip">Colección de monstruos que ya derrotaste al completar la meta diaria. Muestra tu historial de victorias y las criaturas que faltan.</span></span></div><span class="game-panel-badge" data-game-role="bestiary-count">0 / 7</span></div>
-    <div class="game-collection-grid" data-game-role="bestiary-list"><div class="game-collection-empty">Derrota tu primer monstruo para llenar esta colección.</div></div>
-  </article>
-<article class="game-panel game-trophies-panel" id="gameTrophies">
-    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Distinciones</span><h2>Trofeos</h2><span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Trofeos" aria-describedby="trophiesInfo">i</button><span class="sched-help-tooltip" id="trophiesInfo" role="tooltip">Reconocimientos permanentes por completar metas y otros objetivos. Se guardan en tu perfil; no se gastan ni afectan tus ganancias.</span></span></div><span class="game-panel-badge" data-game-role="trophy-count">0</span></div>
+<details class="game-panel game-bestiary-panel game-fold game-bestiary-fold" id="gameBestiary">
+  <summary class="game-fold-summary"><h2>Bestiario</h2><span class="game-panel-badge" data-game-role="bestiary-count">0 / 7</span></summary>
+  <div class="game-fold-body">
+  <span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Bestiario" aria-describedby="bestiaryInfo">i</button><span class="sched-help-tooltip" id="bestiaryInfo" role="tooltip">Colección de monstruos que ya derrotaste al completar la meta diaria. Muestra tu historial de victorias y las criaturas que faltan.</span></span>
+    <div class="game-collection-grid" data-game-role="bestiary-list"></div>
+  </div>
+</details>
+<details class="game-panel game-trophies-panel game-fold game-trophies-fold" id="gameTrophies">
+  <summary class="game-fold-summary"><h2>Trofeos</h2><span class="game-panel-badge" data-game-role="trophy-count">0</span></summary>
+  <div class="game-fold-body">
+  <span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Trofeos" aria-describedby="trophiesInfo">i</button><span class="sched-help-tooltip" id="trophiesInfo" role="tooltip">Reconocimientos permanentes por completar metas y otros objetivos. Se guardan en tu perfil; no se gastan ni afectan tus ganancias.</span></span>
     <div class="game-trophy-list" data-game-role="trophy-list"><div class="game-collection-empty">Tus próximos trofeos aparecerán aquí.</div></div>
-  </article>
+  </div>
+</details>
 </section>
 
 <div class="positive-evidence-card" hidden id="positiveEvidenceCard" aria-live="polite"></div>
 <section class="positive-history-section">
-  <article class="game-panel" id="positiveHistoryPanel">
-    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Evidencia acumulada</span><h2>Mi historial positivo</h2><span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Historial positivo" aria-describedby="positiveHistoryInfo">i</button><span class="sched-help-tooltip" id="positiveHistoryInfo" role="tooltip">Guarda los cierres de llamadas, recuperaciones y premios realizados. Sirve para reconocer tu constancia; tus comentarios personales se muestran tal como los escribiste.</span></span></div><span class="game-panel-badge" id="positiveHistoryCount">0</span></div>
+  <details class="game-panel game-fold game-history-fold" id="positiveHistoryPanel">
+  <summary class="game-fold-summary"><h2>Mi historial positivo</h2><span class="game-panel-badge" id="positiveHistoryCount">0</span></summary>
+  <div class="game-fold-body">
+  <span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Historial positivo" aria-describedby="positiveHistoryInfo">i</button><span class="sched-help-tooltip" id="positiveHistoryInfo" role="tooltip">Guarda los cierres de llamadas, recuperaciones y premios realizados. Sirve para reconocer tu constancia; tus comentarios personales se muestran tal como los escribiste.</span></span>
     <div class="positive-history-list" id="positiveHistoryList"><div class="game-collection-empty">Tus llamadas y premios realizados aparecerán aquí.</div></div>
     <button class="game-text-button" id="positiveHistoryToggle" data-positive-action="toggle-history" type="button" hidden>Ver todo</button>
-  </article>
+  </div>
+</details>
 </section>
+
+<details class="game-panel game-fold game-settings-fold" id="gameSettingsFold">
+  <summary class="game-fold-summary"><h2>Ajustes</h2></summary>
+  <div class="game-fold-body">
+  <section class="game-settings-disclosures" aria-label="Preferencias de Logros">
+<details class="game-panel game-settings-accordion" id="gameSettingsAccordion">
+    <summary class="game-settings-accordion-summary">
+      <span class="game-settings-accordion-copy"><span class="game-panel-eyebrow">PERSONALIZACIÓN</span><strong>Gamificación</strong><small>Nombre del monstruo y sonidos arcade. Las misiones se calculan automáticamente.</small></span>
+      <span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+    </summary>
+    <div class="game-settings-accordion-body">
+      <details class="review-details"><summary>Armas, práctica y duelo</summary><div class="review-detail-body"><p class="note">Las armas cambian la animación y la práctica. Disparar o jugar el duelo no registra llamadas, dinero ni XP laboral. El duelo se ofrece en Break/Lunch o fuera del turno; al volver al trabajo se pausa y podés retomarlo después.</p><p class="note">En Inicio, abrí Logros debajo de la batalla para elegir el arma y Duelo · 60 s. Automático permite salir; al regresar, elegí Duelo y Continuar duelo. En móvil usá los controles debajo de la escena.</p></div></details>
+      <div class="game-settings-section">
+        <div class="game-monster-name-setting">
+          <label for="monsterNameInput">Nombre del monstruo del día</label>
+          <div class="game-monster-name-controls"><input id="monsterNameInput" type="text" maxlength="60" autocomplete="off" aria-describedby="monsterNameHelp monsterNameSaveStatus" placeholder="Usar nombre del catálogo"/><button class="mc-btn-primary cyan" id="monsterNameSaveBtn" type="button">Guardar nombre</button></div>
+          <small id="monsterNameHelp">Un solo nombre para el monstruo diario. Déjalo vacío para usar los nombres del catálogo.</small>
+          <span class="game-monster-name-status" id="monsterNameSaveStatus" role="status" aria-live="polite"></span>
+        </div>
+        <div class="game-monster-name-setting">
+          <label for="gameSoundVolumeInput">Volumen de Logros</label>
+          <div class="volume-row"><input id="gameSoundVolumeInput" type="range" min="0" max="100" step="1" value="40" aria-describedby="gameSoundHelp"/><span class="volume-value" id="gameSoundVolumeValue">40%</span><button class="sched-compact-test-btn" id="gameSoundPreviewBtn" type="button" aria-label="Probar sonidos arcade"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polygon points="4 9 8 9 12 5 12 19 8 15 4 15"/><path d="M17 8a5 5 0 0 1 0 8"/></svg></button></div>
+          <small id="gameSoundHelp">Golpes, armaduras, combos, premios y victorias con efectos breves. Se combinan con el volumen general de Ajustes → Alarmas. Puedes silenciarlos en el menú lateral.</small>
+          <span class="game-monster-name-status" id="gameSoundStatus" role="status" aria-live="polite"></span>
+        </div>
+      </div>
+    </div>
+  </details>
+        <details class="game-settings-accordion game-reward-settings" id="positiveRewardsAccordion">
+          <summary class="game-settings-accordion-summary"><span class="game-settings-accordion-copy"><strong>Mis premios</strong><small>Premios físicos y catálogo sugerido.</small></span><span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></summary>
+          <div class="game-settings-accordion-body positive-rewards-body">
+        <div class="positive-settings-block">
+          <div class="positive-settings-heading"><span><strong>Mis premios físicos</strong><small>Se guardan hasta tu próximo Break, Lunch o fin del turno.</small></span><button type="button" data-positive-action="new-reward">Crear mi premio</button></div>
+          <div class="physical-reward-selected-list" id="physicalRewardSelected"></div>
+        </div>
+        <div class="positive-settings-block">
+          <div class="positive-settings-heading"><span><strong>Catálogo sugerido</strong><small>Agrega una idea y personalízala a tu gusto.</small></span></div>
+          <div class="physical-reward-catalog" id="physicalRewardCatalog"><label for="physicalRewardPresetSelect">Elegir un premio sugerido</label><div class="game-monster-name-controls"><select id="physicalRewardPresetSelect"></select><button type="button" id="physicalRewardPresetAdd" data-positive-action="add-preset">Agregar premio</button></div><small id="physicalRewardPresetDescription"></small></div>
+        </div>
+        <p class="note" style="margin:0;">La app nunca compra nada ni interrumpe una llamada. Tú decides cuándo realizar, guardar o cambiar cada premio.</p></div>
+        </details>
+</section>
+
+<section class="game-advanced-settings" aria-label="Herramientas avanzadas">
+
+  <details class="game-panel game-settings-accordion" id="gameResetAccordion">
+    <summary class="game-settings-accordion-summary"><span class="game-settings-accordion-copy"><span class="game-panel-eyebrow">PROGRESO DE JUEGO</span><strong>Reiniciar progreso</strong><small>Revisa qué se borra antes de confirmar.</small></span><span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></summary>
+    <div class="game-settings-accordion-body"><div class="danger-card tone-bad game-settings-danger">
+          <div class="danger-card-head"><span class="danger-card-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 15 9 15 3"/></svg></span><span class="danger-card-title">Reiniciar progreso</span></div>
+          <p class="danger-card-desc">Borra nivel, XP, racha, trofeos, accesorios y monstruos derrotados. Tus llamadas, turnos, metas y finanzas no se tocan.</p>
+          <button class="mc-btn-solid-full bad" id="resetGameProgressBtn" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 15 9 15 3"/></svg> Reiniciar progreso</button>
+        </div></div>
+  </details>
+</section>
+  </div>
+</details>
 
 </div><!-- /pageAchievements -->
 

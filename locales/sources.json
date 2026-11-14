@@ -118,12 +118,6 @@
       "js/finance-planning.js"
     ]
   },
-  "s_01ed35ea": {
-    "source": "Evidencia acumulada",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_025a86cd": {
     "source": "Reiniciar",
     "files": [
@@ -577,12 +571,6 @@
   },
   "s_089f7bfe": {
     "source": "El ciclo siempre dura 14 días desde la fecha que pongas arriba. Se guarda solo. Ajusta esto si tus ciclos reales no coinciden con \"Ganancias del ciclo\".",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_08ac79c1": {
-    "source": "Disponible para equipar",
     "files": [
       "app.html"
     ]
@@ -1412,12 +1400,6 @@
     "source": "Dentro del plan o de la gracia",
     "files": [
       "js/shift-work-review.js"
-    ]
-  },
-  "s_14457e71": {
-    "source": "Completa una misión para desbloquearlo",
-    "files": [
-      "app.html"
     ]
   },
   "s_14457ff6": {
@@ -5279,12 +5261,6 @@
       "js/app-main.js"
     ]
   },
-  "s_4eb1ea50": {
-    "source": "Colección",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_4ec40af3": {
     "source": "Shift iniciado — ya tenías llamadas desde las {{v0}} ({{v1}} min antes). \"Conectado\" cuenta desde ahora, no desde esa llamada.",
     "files": [
@@ -6873,12 +6849,6 @@
       "js/positive-reinforcement.js"
     ]
   },
-  "s_67f4a20f": {
-    "source": "Todo el equipo",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_6800221e": {
     "source": "Prom./día trabajado",
     "files": [
@@ -6901,12 +6871,6 @@
     "source": "usar",
     "files": [
       "terminos.html"
-    ]
-  },
-  "s_6877c664": {
-    "source": "Personalización",
-    "files": [
-      "app.html"
     ]
   },
   "s_688eab14": {
@@ -7523,12 +7487,6 @@
     "source": "{{v0}} · +{{v1}} más",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_719cff1b": {
-    "source": "Próximo accesorio",
-    "files": [
-      "app.html"
     ]
   },
   "s_719f0e97": {
@@ -8263,12 +8221,6 @@
       "js/game.js"
     ]
   },
-  "s_7c8c4e8b": {
-    "source": "Derrota tu primer monstruo para llenar esta colección.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_7caa1d33": {
     "source": "🎁 Cofre sorpresa · XP diario sellado",
     "files": [
@@ -8456,12 +8408,6 @@
     "source": "Bajar prioridad",
     "files": [
       "js/finance.js"
-    ]
-  },
-  "s_7f21c982": {
-    "source": "Accesorios y mejoras que se activan al completar tus objetivos.",
-    "files": [
-      "app.html"
     ]
   },
   "s_7f22a829": {
@@ -10210,6 +10156,12 @@
       "app.html"
     ]
   },
+  "s_971a6d61": {
+    "source": "Abrir ajustes de Logros",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_9755ec80": {
     "source": "La conexión necesita revisión",
     "files": [
@@ -11499,12 +11451,6 @@
       "app.html"
     ]
   },
-  "s_aa64f0fa": {
-    "source": "Visor bloqueado",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_aa6588a4": {
     "source": "Tus próximos trofeos aparecerán aquí.",
     "files": [
@@ -12055,12 +12001,6 @@
     "source": "{{v1}}{{v2}}{{v3}}",
     "files": [
       "js/reports.js"
-    ]
-  },
-  "s_b2fb2be0": {
-    "source": "Mostrar equipo",
-    "files": [
-      "app.html"
     ]
   },
   "s_b2ff322f": {
@@ -12694,12 +12634,6 @@
       "js/landing.js"
     ]
   },
-  "s_bd8b5121": {
-    "source": "Bloqueado",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_bd976710": {
     "source": "Automático: se decide según tu horario semanal. Si hay llamadas o turno en un día libre, cuenta como trabajado.",
     "files": [
@@ -12918,12 +12852,6 @@
       "app.html"
     ]
   },
-  "s_c0be0813": {
-    "source": "Obtenido",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_c0c0088a": {
     "source": "Sugerida automáticamente",
     "files": [
@@ -13017,12 +12945,6 @@
     "source": "Qué guarda",
     "files": [
       "privacidad.html"
-    ]
-  },
-  "s_c299d7e7": {
-    "source": "Distinciones",
-    "files": [
-      "app.html"
     ]
   },
   "s_c29d557f": {
@@ -14386,12 +14308,6 @@
       "js/monsters.js"
     ]
   },
-  "s_d816bebd": {
-    "source": "Por desbloquear",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_d817466c": {
     "source": "Copia completa actual",
     "files": [
@@ -14694,12 +14610,6 @@
   },
   "s_dc074137": {
     "source": "Hitos de la meta diaria",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_dc28c284": {
-    "source": "Tus accesorios aparecerán aquí al conseguirlos.",
     "files": [
       "app.html"
     ]
@@ -15969,7 +15879,6 @@
   "s_ece6975b": {
     "source": "Equipado",
     "files": [
-      "app.html",
       "js/game.js"
     ]
   },

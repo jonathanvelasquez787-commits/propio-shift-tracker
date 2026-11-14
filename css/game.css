@@ -1556,3 +1556,20 @@ html.theme-light {
 .game-missions-column .game-milestones-summary { flex-wrap: wrap; }
 .game-achievements-page .game-achievements-grid-bottom { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .game-achievements-grid-bottom > .game-panel { padding: 10px; min-width: 0; }
+
+/* Filas plegadas con conteo (Equipo, Bestiario, Trofeos, Historial, Ajustes) */
+.game-fold { padding: 0; min-width: 0; }
+.game-fold > .game-fold-summary { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 8px 12px; list-style: none; cursor: pointer; }
+.game-fold > .game-fold-summary::-webkit-details-marker { display: none; }
+.game-fold > .game-fold-summary h2 { margin: 0; flex: 1 1 auto; font-size: 13px; }
+.game-fold > .game-fold-summary::after { content: "⌄"; color: var(--muted); }
+.game-fold[open] > .game-fold-summary::after { transform: rotate(180deg); }
+.game-fold > .game-fold-summary:focus-visible { outline: 2px solid var(--cyan); outline-offset: -2px; border-radius: 8px; }
+.game-fold > .game-fold-body { padding: 8px 12px 12px; border-top: 1px solid var(--line); }
+.game-fold-body > .game-help-wrap { display: inline-block; margin-bottom: 8px; }
+.game-achievements-page .game-achievements-grid-collection { gap: 8px; }
+.game-achievements-page .game-fold-body .game-panel { padding: 0; }
+.positive-history-section { margin-top: 8px; }
+.game-settings-fold { margin-top: 8px; }
+.game-achievements-toolbar .game-settings-gear { flex: 0 0 auto; }
+.game-achievements-toolbar .game-settings-gear .ic-svg { width: 16px; height: 16px; }
