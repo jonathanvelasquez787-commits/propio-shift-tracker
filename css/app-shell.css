@@ -1238,3 +1238,18 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 .alert-customize[open]>summary:after{transform:rotate(90deg)}
 .alert-customize>summary:focus-visible{outline:2px solid var(--cyan);outline-offset:2px;border-radius:8px}
 .alert-customize-body{display:flex;flex-direction:column;gap:10px;padding:4px 0 2px}
+/* Avisos: una sola lista unida, filas con línea fina (sin cajas dentro de cajas) */
+.notif-group{margin:0;padding:0;border-bottom:1px solid var(--line)}
+.notif-group-title{margin:0;padding:16px 0 4px;font-size:12px;font-weight:700;color:var(--muted)}
+.notif-group-body{padding:0 0 8px}
+#notificationsModal .notif-group .sched-compact-card{background:transparent;border:0;border-radius:0;box-shadow:none;padding:10px 0;margin:0;border-bottom:1px solid var(--line)}
+#notificationsModal .notif-group .sched-compact-card:last-child{border-bottom:0}
+#notificationsModal .notif-group .sched-compact-title-icon{display:none}
+#notificationsModal .notif-group .sched-compact-title{font-size:13px;font-weight:600}
+#notificationsModal .notif-group .notif-row{grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:12px;row-gap:0}
+#notificationsModal .notif-group .notif-row>.alert-customize{grid-column:1/-1;margin-top:4px;border-top:0}
+#notificationsModal .notif-group .notif-row>.sched-compact-row{margin:0}
+#notificationsModal .notif-group .notif-row .sched-compact-field{display:flex;flex-direction:row;align-items:center;gap:8px}
+#notificationsModal .notif-group .notif-row .sched-compact-field input[type=number]{width:64px}
+#notificationsModal .notif-group .notif-row .sched-checkbox-row{margin:0;white-space:nowrap}
+#notificationsModal .notif-group .alert-customize>summary{min-height:32px}
