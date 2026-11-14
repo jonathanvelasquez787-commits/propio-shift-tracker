@@ -1260,6 +1260,12 @@
       "app.html"
     ]
   },
+  "s_1171bdcd": {
+    "source": "Mensaje y sonido",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_11c27b19": {
     "source": "Modo oscuro",
     "files": [
@@ -13900,6 +13906,12 @@
     "source": "Esperando confirmar tu ACW",
     "files": [
       "js/automation-ui.js"
+    ]
+  },
+  "s_d1918071": {
+    "source": "Personalizar",
+    "files": [
+      "app.html"
     ]
   },
   "s_d1a06e73": {
