@@ -1108,6 +1108,14 @@
           ]
         },
         {
+          "file": "tests/notifications-list.test.mjs",
+          "namedCases": [
+            "Avisos: una sola lista unida, sin plegables ni tarjetas anidadas por grupo",
+            "Avisos: la lista unida no deja fondo ni borde propio en cada aviso",
+            "Avisos: se conservan los campos de cada aviso"
+          ]
+        },
+        {
           "file": "tests/extension-popup-simple.test.mjs",
           "namedCases": [
             "popup de la extensión: estado, registro y disponibilidad a la vista; el resto en \"Más opciones\""

@@ -2154,12 +2154,6 @@
       "js/game-battle.js"
     ]
   },
-  "s_1faa0225": {
-    "source": "Minutos, mensajes y sonido",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_1fb9396d": {
     "source": "Por semana",
     "files": [
@@ -3247,12 +3241,6 @@
     "source": "Se descarta esta continuación y vuelve el tramo de pausa que ya estaba terminado.",
     "files": [
       "js/work-actions.js"
-    ]
-  },
-  "s_309e061f": {
-    "source": "Anticipación y sonidos",
-    "files": [
-      "app.html"
     ]
   },
   "s_30a42ee4": {
@@ -14087,12 +14075,6 @@
     "source": "Restaurar copia",
     "files": [
       "js/boot.js"
-    ]
-  },
-  "s_d482c364": {
-    "source": "Finalizadas, importadas y manuales",
-    "files": [
-      "app.html"
     ]
   },
   "s_d48cea8e": {
