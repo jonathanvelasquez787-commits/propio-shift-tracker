@@ -4448,7 +4448,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       const info = liveActivityInfo();
       currentLiveActivity = info;
       if (!info) {
-        bar.classList.remove('show');
+        bar.classList.remove('show', 'call-active');
         document.body.classList.remove('has-live-bar');
         return;
       }

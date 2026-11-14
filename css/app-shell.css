@@ -1121,7 +1121,7 @@ html.theme-light .live-activity-bar.call-active { --call-color:var(--accent-blue
 .live-activity-bar.call-active .live-bar-discard { background:rgba(var(--bad-rgb),.1); border-color:rgba(var(--bad-rgb),.28); color:var(--bad); }
 .live-activity-bar.call-active .live-bar-btn svg { display:none; }
 .live-activity-bar.call-active .live-bar-discard-label { display:inline; }
-body:has(.live-activity-bar.call-active) .app { padding-top:calc(74px + env(safe-area-inset-top, 0px)); }
+body:has(.live-activity-bar.show.call-active) .app { padding-top:calc(74px + env(safe-area-inset-top, 0px)); }
 @media (max-width:760px) {
   .live-activity-bar.call-active { gap:6px; padding:8px; }
   .live-activity-bar.call-active .live-bar-left { gap:6px; }
