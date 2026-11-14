@@ -5488,6 +5488,8 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       const set = (id, value) => { const el = document.getElementById(id); if (el && (force || document.activeElement !== el)) el.value = value; };
       const enabled = document.getElementById('freelancerEnabledInput');
       if (enabled) enabled.checked = fl.enabled;
+      const statusTag = document.getElementById('freelancerStatusTag');
+      if (statusTag) { statusTag.textContent = fl.enabled ? translateText('Activado') : translateText('Desactivado'); statusTag.classList.toggle('good', fl.enabled === true); }
       set('freelancerBreakMinInput', fl.breakMin); set('freelancerLunchMinInput', fl.lunchMin);
       set('freelancerConnectedMinInput', fl.connectedEveryMin); set('freelancerSnoozeMinInput', fl.snoozeMin);
       set('freelancerSessionGoalInput', fl.sessionGoalMin); set('freelancerLunchEveryInput', fl.lunchEveryMin);
