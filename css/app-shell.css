@@ -1172,7 +1172,9 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 /* La X de Descartar solo aparece mientras hay algo en curso, junto a esa acción. */
 .chips > .hero-shift-actions .action-slot[data-slot="discard"]:has(> #liveDiscardBtn[hidden]) { display: none; }
 .chips > .hero-shift-actions .action-slot[data-slot="discard"] { flex: 0 0 auto; max-width: none; }
-.chips > .hero-shift-actions .action-slot > #liveDiscardBtn { min-width: 44px; border-color: rgba(var(--bad-rgb), .35); background: rgba(var(--bad-rgb), .1); color: var(--bad); }
+.chips > .hero-shift-actions .action-slot > #liveDiscardBtn { min-width: 52px; border: 1.5px solid var(--bad); background: rgba(var(--bad-rgb), .12); color: var(--bad); }
+.chips > .hero-shift-actions .action-slot > #liveDiscardBtn .ic-svg { width: 18px; height: 18px; }
+.chips > .hero-shift-actions .action-slot > #liveDiscardBtn:hover:not(:disabled) { background: rgba(var(--bad-rgb), .22); }
 .chips > .hero-shift-actions .action-slot[data-slot="discard"] > .action-short { color: var(--bad); }
 /* Orden de la fila: la X queda justo después de la acción que está en curso. */
 .chips > .hero-shift-actions .action-slot[data-slot="shift"] { order: 10; }

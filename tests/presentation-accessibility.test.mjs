@@ -237,3 +237,12 @@ test('the short action names turn to the text color on hover and when active', (
   assert.ok(/\.action-slot:has\(> \.action-btn:hover:not\(:disabled\)\) > \.action-short/.test(shell), 'hover changes the name color');
   assert.ok(/\.action-slot:has\(> \.action-btn\.is-active\) > \.action-short/.test(shell), 'active changes the name color');
 });
+
+test('the discard button is a red-outlined box with a trash can', () => {
+  const html = fs.readFileSync('app.html', 'utf8');
+  const css = fs.readFileSync('css/app-shell.css', 'utf8');
+  const start = html.indexOf('id="liveDiscardBtn"'), end = html.indexOf('</button>', start);
+  assert.ok(html.slice(start, end).includes('<path d="M8 6V4h8v2"/>'), 'trash can icon');
+  assert.ok(!html.slice(start, end).includes('<line'), 'no plain X anymore');
+  assert.ok(/#liveDiscardBtn \{[^}]*border:\s*1\.5px solid var\(--bad\)/.test(css), 'red outline');
+});
