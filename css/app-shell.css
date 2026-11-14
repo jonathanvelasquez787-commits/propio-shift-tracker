@@ -1331,3 +1331,12 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 #scheduleAccordion.sched-freelancer-list .fl-break-chip.is-lunch{background:rgba(240,180,60,.2)}
 #scheduleAccordion.sched-freelancer-list .fl-break-time{flex:1 1 auto;min-width:0;color:var(--muted)}
 #scheduleAccordion.sched-freelancer-list .fl-break-min{flex:0 0 auto;white-space:nowrap}
+
+/* finanzas-encabezado-celular */
+@media (max-width:640px){
+  #financeSection .fin-top .fin-header-left{flex:0 0 auto}
+  #financeSection .fin-top .fin-available-stat{flex:1 1 0;min-width:0;flex-direction:column;align-items:flex-end;gap:2px;flex-wrap:nowrap}
+  #financeSection .fin-top .fin-available-stat-label{font-size:10px;line-height:1.2}
+  #financeSection .fin-top .fin-available-stat-val{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+}
+/* fin finanzas-encabezado-celular */
