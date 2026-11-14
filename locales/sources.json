@@ -2863,13 +2863,6 @@
       "js/game.js"
     ]
   },
-  "s_2aef566d": {
-    "source": "Llamada más larga",
-    "files": [
-      "app.html",
-      "js/game.js"
-    ]
-  },
   "s_2af2e5a4": {
     "source": "· {{v0}}",
     "files": [
@@ -10434,6 +10427,13 @@
       "js/weekly-summary.js"
     ]
   },
+  "s_9bb1e329": {
+    "source": "Sin STAGE CLEAR aún.",
+    "files": [
+      "app.html",
+      "js/game.js"
+    ]
+  },
   "s_9bc564bb": {
     "source": "Metas y cálculo del ACW",
     "files": [
@@ -13831,7 +13831,8 @@
   "s_d0e54d0b": {
     "source": "Más larga",
     "files": [
-      "app.html"
+      "app.html",
+      "js/game.js"
     ]
   },
   "s_d0ea7421": {
@@ -15952,13 +15953,6 @@
     "source": "Historial desde: —",
     "files": [
       "app.html"
-    ]
-  },
-  "s_ee1c38a2": {
-    "source": "Aún no hay un STAGE CLEAR guardado.",
-    "files": [
-      "app.html",
-      "js/game.js"
     ]
   },
   "s_ee1cc2b0": {
