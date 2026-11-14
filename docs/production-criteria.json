@@ -1048,7 +1048,7 @@
           "file": "tests/appearance-language.test.mjs",
           "namedCases": [
             "all custom palettes have readable normal text and restore original without removing unrelated variables",
-            "graphite palette keeps three neutral blacks, grey text and borders, and an indigo accent in both modes",
+            "graphite palette only changes the three background blacks and keeps Original colors",
             "graphite palette is offered in the appearance dialog and the palette count matches",
             "offline English translates authored text while retaining personal names and nested safe markup",
             "catalog includes current HTML and authored JS without style or script source",
