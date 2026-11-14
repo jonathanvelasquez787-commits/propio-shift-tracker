@@ -17,4 +17,6 @@ test('Logros: Misiones e Hitos comparten fila y Última victoria con Récords va
   assert.ok(block.indexOf('id="gameLastStageClear"') < block.indexOf('id="gameRecords"'));
   assert.doesNotMatch(block, /game-panel-eyebrow/);
   assert.doesNotMatch(block, /ARMADURA/);
+  assert.match(block, /Sin STAGE CLEAR aún\./);
+  assert.doesNotMatch(block, /Aún no hay un STAGE CLEAR guardado|Llamada más larga/);
 });

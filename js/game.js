@@ -1213,7 +1213,7 @@ function renderAchievements() {
     const biggest = calls.reduce((best, call) => Math.max(best, parseMoney(call.pay)), 0);
     if (list) list.innerHTML = ui`
       <div class="game-record-row"><span>Mayor pago</span><strong>${withConversion(biggest)}</strong></div>
-      <div class="game-record-row"><span>Llamada más larga</span><strong>${formatMinutes(longest)} min</strong></div>
+      <div class="game-record-row"><span>Más larga</span><strong>${formatMinutes(longest)} min</strong></div>
       <div class="game-record-row"><span>Mejor racha semanal</span><strong>${state.game.bestStreak} días</strong></div>`;
   }
 
@@ -1235,7 +1235,7 @@ function renderAchievements() {
       }
     } else {
       if (date) date.textContent = '—';
-      if (content) content.innerHTML = ui`${pixelStars(0)}<p>Aún no hay un STAGE CLEAR guardado.</p>`;
+      if (content) content.innerHTML = ui`${pixelStars(0)}<p>Sin STAGE CLEAR aún.</p>`;
       if (button) {
         button.hidden = true;
         delete button.dataset.dayKey;
