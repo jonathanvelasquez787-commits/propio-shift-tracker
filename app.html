@@ -994,6 +994,12 @@
   </div>
 </section>
 
+<div class="game-logros-tabs" role="tablist" aria-label="Secciones de Logros">
+<button type="button" role="tab" id="gameLogrosTabHoy" data-logros-tab="hoy" aria-selected="true" aria-controls="gameLogrosPaneHoy">Hoy</button>
+<button type="button" role="tab" id="gameLogrosTabColeccion" data-logros-tab="coleccion" aria-selected="false" aria-controls="gameLogrosPaneColeccion" tabindex="-1">Colección</button>
+<button type="button" role="tab" id="gameLogrosTabHistorial" data-logros-tab="historial" aria-selected="false" aria-controls="gameLogrosPaneHistorial" tabindex="-1">Historial</button>
+</div>
+<div class="game-logros-pane" role="tabpanel" id="gameLogrosPaneHoy" data-logros-pane="hoy" aria-labelledby="gameLogrosTabHoy">
 <div class="game-missions-column">
 <details class="game-missions" hidden id="gameMissions">
   <summary class="game-missions-summary"><span>Misiones del día</span><strong data-game-role="missions-score">0 / 3</strong></summary>
@@ -1016,22 +1022,8 @@
   <div class="game-cycle-boss-layout"><div class="game-boss-copy"><strong data-game-role="cycle-title">El jefe observa tu progreso.</strong><p data-game-role="cycle-subtitle">La barra refleja lo que llevas acumulado en el ciclo de pago actual.</p><div class="game-boss-progress" role="progressbar" aria-label="Progreso contra el jefe del ciclo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span data-game-role="cycle-progress" style="width:0%;"></span></div><div class="game-boss-progress-foot"><span data-game-role="cycle-earned">$0.00</span><span data-game-role="cycle-goal">Meta $0.00</span></div></div><div class="game-boss-sprite" data-game-role="cycle-sprite" aria-hidden="true"><span class="game-pixel-crown"></span><span class="game-pixel-eye left"></span><span class="game-pixel-eye right"></span><span class="game-pixel-mouth"></span></div></div>
 </section>
 
-<section class="game-achievements-grid game-achievements-grid-bottom" aria-label="Victorias y récords">
-<article class="game-panel game-last-clear-panel" id="gameLastStageClear">
-    <div class="game-panel-head"><div><h2>STAGE CLEAR</h2><span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de STAGE CLEAR" aria-describedby="stageClearInfo">i</button><span class="sched-help-tooltip" id="stageClearInfo" role="tooltip">Es el resumen de un turno terminado: muestra misiones, XP y récords. Puedes abrir el último cierre para revisar lo que conseguiste.</span></span></div><span class="game-panel-badge" data-game-role="last-clear-date">—</span></div>
-    <div class="game-last-clear-content" data-game-role="last-clear-content"><div class="game-clear-stars" aria-hidden="true"><span>★</span><span>★</span><span>★</span></div><p>Sin STAGE CLEAR aún.</p></div>
-    <button class="game-text-button" data-game-action="open-last-clear" type="button">Ver detalle</button>
-    <div aria-label="Cofre reclamable" class="game-chest-claim" data-game-role="chest-claim" hidden id="gameChestClaim" role="region">
-      <span aria-hidden="true" class="game-chest-claim-icon">🎁</span>
-      <span class="game-chest-claim-copy"><strong data-game-role="chest-claim-title">Cofre listo</strong><small data-game-role="chest-claim-subtitle">Abre tu próxima sesión para reclamarlo.</small></span>
-    </div>
-  </article>
-<article class="game-panel" id="gameRecords">
-    <div class="game-panel-head"><div><h2>Récords</h2></div><svg class="ic-svg game-panel-head-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9Z"/></svg></div>
-    <div class="game-record-list" data-game-role="records-list"><div class="game-record-row"><span>Mayor pago</span><strong>—</strong></div><div class="game-record-row"><span>Más larga</span><strong>—</strong></div><div class="game-record-row"><span>Mejor racha semanal</span><strong>—</strong></div></div>
-  </article>
-</section>
-
+</div>
+<div class="game-logros-pane" role="tabpanel" id="gameLogrosPaneColeccion" data-logros-pane="coleccion" aria-labelledby="gameLogrosTabColeccion" hidden>
 <details class="game-panel game-equipment-panel game-fold game-equipment-fold" data-game-root="equipment-panel" id="gameEquipmentPanel">
   <summary class="game-fold-summary"><h2 id="gameEquipmentTitle">Equipo</h2><span class="game-panel-badge" data-game-role="equipment-count">0 / 6</span></summary>
   <div class="game-fold-body">
@@ -1058,6 +1050,24 @@
 </section>
 
 <div class="positive-evidence-card" hidden id="positiveEvidenceCard" aria-live="polite"></div>
+</div>
+<div class="game-logros-pane" role="tabpanel" id="gameLogrosPaneHistorial" data-logros-pane="historial" aria-labelledby="gameLogrosTabHistorial" hidden>
+<section class="game-achievements-grid game-achievements-grid-bottom" aria-label="Victorias y récords">
+<article class="game-panel game-last-clear-panel" id="gameLastStageClear">
+    <div class="game-panel-head"><div><h2>STAGE CLEAR</h2><span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de STAGE CLEAR" aria-describedby="stageClearInfo">i</button><span class="sched-help-tooltip" id="stageClearInfo" role="tooltip">Es el resumen de un turno terminado: muestra misiones, XP y récords. Puedes abrir el último cierre para revisar lo que conseguiste.</span></span></div><span class="game-panel-badge" data-game-role="last-clear-date">—</span></div>
+    <div class="game-last-clear-content" data-game-role="last-clear-content"><div class="game-clear-stars" aria-hidden="true"><span>★</span><span>★</span><span>★</span></div><p>Sin STAGE CLEAR aún.</p></div>
+    <button class="game-text-button" data-game-action="open-last-clear" type="button">Ver detalle</button>
+    <div aria-label="Cofre reclamable" class="game-chest-claim" data-game-role="chest-claim" hidden id="gameChestClaim" role="region">
+      <span aria-hidden="true" class="game-chest-claim-icon">🎁</span>
+      <span class="game-chest-claim-copy"><strong data-game-role="chest-claim-title">Cofre listo</strong><small data-game-role="chest-claim-subtitle">Abre tu próxima sesión para reclamarlo.</small></span>
+    </div>
+  </article>
+<article class="game-panel" id="gameRecords">
+    <div class="game-panel-head"><div><h2>Récords</h2></div><svg class="ic-svg game-panel-head-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9Z"/></svg></div>
+    <div class="game-record-list" data-game-role="records-list"><div class="game-record-row"><span>Mayor pago</span><strong>—</strong></div><div class="game-record-row"><span>Más larga</span><strong>—</strong></div><div class="game-record-row"><span>Mejor racha semanal</span><strong>—</strong></div></div>
+  </article>
+</section>
+
 <section class="positive-history-section">
   <details class="game-panel game-fold game-history-fold" id="positiveHistoryPanel">
   <summary class="game-fold-summary"><h2>Mi historial positivo</h2><span class="game-panel-badge" id="positiveHistoryCount">0</span></summary>
@@ -1071,6 +1081,7 @@
 
 
 
+</div>
 </div><!-- /pageAchievements -->
 
 <div class="app-page" data-page="help" hidden id="pageHelp" role="main" tabindex="-1">

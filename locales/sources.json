@@ -1891,6 +1891,7 @@
   "s_1b0709d2": {
     "source": "Historial",
     "files": [
+      "app.html",
       "js/app-main.js"
     ]
   },
@@ -5252,6 +5253,12 @@
     "source": "Modo freelancer desactivado",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_4eb1ea50": {
+    "source": "Colección",
+    "files": [
+      "app.html"
     ]
   },
   "s_4ec40af3": {
@@ -12013,6 +12020,12 @@
     "source": "Hito del {percent}% alcanzado · sumaste {amount} hoy",
     "files": [
       "js/reinforcement-feedback.js"
+    ]
+  },
+  "s_b3335e5c": {
+    "source": "Secciones de Logros",
+    "files": [
+      "app.html"
     ]
   },
   "s_b3338f85": {
