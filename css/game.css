@@ -1549,3 +1549,10 @@ html.theme-light {
 #gameAchievementsSummary { grid-template-columns: minmax(0, 1fr); }
 .game-progress-card { padding: 12px; }
 .game-progress-card > .game-streak-panel { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+
+/* Misiones e Hitos en una fila; Última victoria y Récords como tira de dos */
+.game-missions-column { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 8px; }
+.game-missions-column > details[open] { grid-column: 1 / -1; }
+.game-missions-column .game-milestones-summary { flex-wrap: wrap; }
+.game-achievements-page .game-achievements-grid-bottom { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.game-achievements-grid-bottom > .game-panel { padding: 10px; min-width: 0; }

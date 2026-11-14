@@ -1661,12 +1661,6 @@
       "js/boot.js"
     ]
   },
-  "s_1831b4ca": {
-    "source": "ARMADURA",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_1836b308": {
     "source": "Período sin definir",
     "files": [
@@ -7543,12 +7537,6 @@
       "js/app-main.js"
     ]
   },
-  "s_71c0d6ab": {
-    "source": "Récords personales",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_71d1b7dd": {
     "source": "Gastos variables",
     "files": [
@@ -11580,12 +11568,6 @@
       "js/app-main.js"
     ]
   },
-  "s_ab24dd7f": {
-    "source": "Última victoria",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_ab37691f": {
     "source": "Tiempo clasificado como Otro (huecos largos sin Break/Lunch real)",
     "files": [
@@ -13434,12 +13416,6 @@
     "source": "Aunque Propio ya esté abierto, la disponibilidad espera tu horario.",
     "files": [
       "js/automation-ui.js"
-    ]
-  },
-  "s_c89c5e49": {
-    "source": "Temporada de 14 días",
-    "files": [
-      "app.html"
     ]
   },
   "s_c90bfeab": {
