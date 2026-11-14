@@ -1589,3 +1589,10 @@ html.theme-light {
 .game-settings-row[open] > summary::after { transform: rotate(90deg); }
 .game-settings-row > summary:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; border-radius: 10px; }
 .game-settings-row-body { padding: 2px 14px 14px; }
+
+/* logros-misiones-fila */
+.game-missions-summary { flex-wrap: wrap; row-gap: 2px; }
+.game-missions-summary > strong { margin-left: 0; }
+.game-missions-summary::after { margin-left: auto; order: 2; }
+.game-missions-summary > small { order: 3; flex: 0 0 100%; color: var(--muted); font-size: 11px; font-weight: 600; line-height: 1.2; }
+/* fin logros-misiones-fila */

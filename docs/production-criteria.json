@@ -1114,6 +1114,13 @@
           ]
         },
         {
+          "file": "tests/game-missions-row.test.mjs",
+          "namedCases": [
+            "Logros: la fila Misiones pone título y número arriba y el aviso de armaduras debajo, sin encimarse",
+            "Logros: la fila Misiones conserva su contenido (título, conteo y armaduras pendientes)"
+          ]
+        },
+        {
           "file": "tests/freelancer-blocks-list.test.mjs",
           "namedCases": [
             "Bloques del día en freelancer: cada descanso es una fila con etiqueta, horas y minutos",
