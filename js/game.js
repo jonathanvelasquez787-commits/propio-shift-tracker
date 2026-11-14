@@ -694,8 +694,7 @@ function compactCollectionMarkup(dayKey) {
   const owned = state.game.accessories.includes(latest.label);
   const available = owned && latest.unlockLevel <= level.level;
   const equipped = state.game.equipment[latest.slot] === latest.label;
-  return ui`<div class="game-compact-collection-item"><span class="game-compact-collection-icon" aria-hidden="true">${gamePixelIcon('gem')}</span><div class="game-compact-collection-copy"><strong>${escapeHtml(translateText(latest.label))}</strong><small>${equipped ? translateText('Equipado') : available ? translateText('Desbloqueado') : owned ? ui`Disponible en nivel ${latest.unlockLevel}` : translateText('En el próximo cofre')}</small></div><button type="button" data-game-action="equip-accessory" data-accessory="${latest.id}" aria-pressed="${equipped}" ${available ? '' : 'disabled'}>${equipped ? translateText('Quitar') : translateText('Equipar')}</button></div>
-    <button type="button" class="game-compact-view-all" data-game-nav>Ver mis Logros →</button>`;
+  return ui`<div class="game-slot-kicker">Visor</div><strong>${escapeHtml(translateText(latest.label))}</strong><small>${equipped ? translateText('Equipado') : available ? translateText('Desbloqueado') : owned ? ui`Disponible en nivel ${latest.unlockLevel}` : translateText('En el próximo cofre')}</small>${available ? ui`<button type="button" data-game-action="equip-accessory" data-accessory="${latest.id}" aria-pressed="${equipped}">${equipped ? translateText('Quitar') : translateText('Equipar')}</button>` : ''}`;
 }
 
 function compactVictoryMarkup(day) {

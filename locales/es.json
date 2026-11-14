@@ -2110,6 +2110,7 @@
   "s_c1b0330d": "\"Bloques del día\" compara, minuto a minuto, lo que hiciste de verdad contra lo planeado. \"Gracia\" perdona desvíos chicos alrededor de cada cambio de bloque (0 = cualquier desvío cuenta de inmediato). \"Meta\" es tu propio objetivo de % para comparar contra tu Adherencia real de cada día.",
   "s_c1bb98c1": "Ajustes → Moneda secundaria",
   "s_c1c41846": "{{v0}}%",
+  "s_c1c86ba0": "Visor",
   "s_c1cc1f9b": "¿Borrar tu cuenta para siempre? Se eliminan la cuenta y sus datos activos. Las copias históricas cifradas se retiran por rotación, con una retención prevista de 31 días. No se puede deshacer.",
   "s_c1e967e9": "En turno: {{v1}}",
   "s_c1f3e040": "(min productivos acumulados),",

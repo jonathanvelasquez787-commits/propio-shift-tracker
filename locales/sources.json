@@ -1276,7 +1276,7 @@
   "s_11cafaf7": {
     "source": "Ver mis Logros →",
     "files": [
-      "js/game.js"
+      "js/game-battle.js"
     ]
   },
   "s_11ea6853": {
@@ -12885,6 +12885,12 @@
     "files": [
       "js/app-main.js",
       "js/reports.js"
+    ]
+  },
+  "s_c1c86ba0": {
+    "source": "Visor",
+    "files": [
+      "js/game.js"
     ]
   },
   "s_c1cc1f9b": {

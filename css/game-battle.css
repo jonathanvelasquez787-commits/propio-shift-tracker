@@ -211,3 +211,22 @@
 #gameHomeGroup > .game-call-fx:empty { display: none; }
 #gameHomeDay:has(> .game-arena[hidden]),
 #gameHomeGroup:not(:has(#gameArena:not([hidden]), #positiveEvidenceCard:not([hidden]), #gameLootBox:not([hidden]), #gameRecordBanner:not([hidden]), #gameCallFx:not(:empty))) { display: none; }
+
+/* Panel Logros desplegado: un solo bloque, sin rayas */
+.game-battle-slots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.game-battle-slot, .game-battle-collection .game-battle-loadout { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; padding: 10px; border: 0; border-radius: 10px; background: var(--accordion-bg); }
+.game-slot-kicker, .game-battle-collection .game-battle-loadout label { color: var(--muted); font-size: 11px; }
+.game-battle-slot strong { font-size: 13px; font-weight: 600; overflow-wrap: anywhere; }
+.game-battle-slot small { color: var(--muted); font-size: 11px; line-height: 1.4; }
+.game-battle-slot button { margin-top: 6px; }
+.game-battle-collection .game-battle-loadout > div { display: block; width: 100%; }
+.game-battle-collection .game-battle-loadout select { width: 100%; max-width: 100%; min-height: 0; padding: 0; border: 0; background: transparent; font-weight: 600; }
+.game-battle-collection .game-battle-loadout small { display: none; }
+.game-battle-collection .game-battle-mode-row { padding: 8px 0 0; border-top: 0; }
+.game-battle-collection .game-battle-modes { display: flex; flex-wrap: nowrap; width: 100%; gap: 0; padding: 3px; border-radius: 10px; background: var(--accordion-bg); }
+.game-battle-collection .game-battle-modes button { flex: 1; min-height: 34px; border: 0; border-radius: 8px; background: transparent; font-size: 12px; }
+.game-battle-collection .game-battle-modes [aria-pressed="true"] { background: var(--cyan); color: var(--bg, #0b0b10); }
+.game-battle-collection-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding-top: 10px; }
+.game-battle-collection-foot small { color: var(--muted); font-size: 11px; line-height: 1.4; }
+.game-battle-collection-foot small:empty { display: none; }
+.game-battle-collection .game-battle-collection-foot button { min-height: 0; margin-left: auto; padding: 4px 0; border: 0; background: transparent; color: var(--cyan); font-size: 12px; }
