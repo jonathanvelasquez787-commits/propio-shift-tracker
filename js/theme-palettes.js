@@ -1,5 +1,5 @@
 export const PALETTES = [
-  { id:'original',name:'Original',description:'Los colores actuales de la aplicación',colors:['#0D1230','#2FD5FF','#FFFFFF','#6366F1'],modes:{ light:'Original Claro',dark:'Original Oscuro' } },
+  { id:'original',name:'Original',description:'Los colores actuales de la aplicación',colors:['#0D1230','#2FD5FF','#FFFFFF','#6366F1'],modes:{ light:'Original Claro',dark:'Azul Oscuro' } },
   { id:'graphite',name:'Negro Grafito',description:'Cambia solo los tres negros de fondo',colors:['#09090B','#131315','#1E1E22','#A1A1AA'],lightAccent:3,darkAccent:3,secondary:3,gameBody:'#6366F1',modes:{ dark:'Negro Grafito' } },
   { id:'lavender',name:'Lavanda Pastel',description:'Lavanda, celeste y menta',colors:['#9FA1FF','#B5BAFF','#AEE2FF','#D9F9DF'],code:'9fa1ffb5baffaee2ffd9f9df',lightAccent:0,darkAccent:2,secondary:1,lightBackground:3,muted:{ light:'#576479',dark:'#9DABC8' },modes:{ light:'Lavanda Suave',dark:'Lavanda Nocturna' } },
   { id:'royal',name:'Azul Real',description:'Azul noche, intenso y celeste',colors:['#091540','#1B2CC1','#7692FF','#ABD2FA'],code:'0915401b2cc17692ffabd2fa',lightAccent:1,darkAccent:2,secondary:2,lightBackground:3,muted:{ light:'#556277' },modes:{ light:'Cielo Azul',dark:'Azul Medianoche' } },

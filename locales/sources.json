@@ -823,12 +823,6 @@
       "js/detail-views.js"
     ]
   },
-  "s_0be4e40d": {
-    "source": "Original Oscuro: Los colores actuales de la aplicación",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_0be62a37": {
     "source": "Versión anterior de Propio conservada",
     "files": [
@@ -3296,12 +3290,6 @@
     "source": "Volviste a tomar una llamada después de {{v0}}.",
     "files": [
       "js/reinforcement-rules.js"
-    ]
-  },
-  "s_30d97ebf": {
-    "source": "Original Oscuro",
-    "files": [
-      "app.html"
     ]
   },
   "s_30da288d": {
@@ -11471,6 +11459,12 @@
       "app.html"
     ]
   },
+  "s_a8f3c698": {
+    "source": "Azul Oscuro: Los colores actuales de la aplicación",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_a9027727": {
     "source": "Se descarta la pausa activa completa; no se suma a tu historial ni a Adherencia.",
     "files": [
@@ -14476,6 +14470,12 @@
     "source": "{{v0}} Solo {{v1}}",
     "files": [
       "js/settings.js"
+    ]
+  },
+  "s_d86fe180": {
+    "source": "Azul Oscuro",
+    "files": [
+      "app.html"
     ]
   },
   "s_d899c380": {
