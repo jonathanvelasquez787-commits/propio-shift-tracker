@@ -1901,6 +1901,12 @@
       "js/app-main.js"
     ]
   },
+  "s_1b0edc21": {
+    "source": "Más información",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_1b38c059": {
     "source": "Adherencia (%)",
     "files": [
@@ -2644,12 +2650,6 @@
     "source": "Vista previa sin equipar ni guardar cambios.",
     "files": [
       "js/game.js"
-    ]
-  },
-  "s_27d8bbfe": {
-    "source": "Reserva tus ganancias para gastos y metas.",
-    "files": [
-      "app.html"
     ]
   },
   "s_27e45f35": {

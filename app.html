@@ -853,13 +853,17 @@
 
 <div class="app-page" data-page="finance" hidden id="pageFinance" role="main" tabindex="-1">
 <section class="card" id="financeSection">
+  <div class="fin-top">
   <div class="fin-header">
     <div class="fin-header-left">
       <div class="fin-header-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12V8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h13a1 1 0 0 0 1-1v-4"/><path d="M20 12a2 2 0 0 1 0 4h-3a2 2 0 0 1 0-4Z"/></svg></div>
       <div>
         <div class="fin-title">Finanzas</div>
-        <div class="fin-sub">Reserva tus ganancias para gastos y metas.</div>
       </div>
+    </div>
+    <div class="fin-available-stat">
+      <div class="fin-available-stat-label">Siguiente prioridad</div>
+      <div class="fin-available-stat-val" id="financeNextPriorityVal">—</div>
     </div>
   </div>
 
@@ -869,16 +873,18 @@
       <div class="fin-available-amt" id="financeAvailableAmt">$0.00</div>
       <div class="fin-available-converted" id="financeAvailableConverted"></div>
     </div>
-    <div class="fin-available-stat">
-      <div class="fin-available-stat-label">Siguiente prioridad</div>
-      <div class="fin-available-stat-val" id="financeNextPriorityVal">—</div>
-    </div>
   </div>
 
-  <label class="sched-checkbox-row" style="margin-bottom:4px;">
-    <input id="financeAutoFillInput" type="checkbox"/> Asignar disponible automáticamente
-  </label>
-  <p class="sched-hint" style="margin:0 0 16px;">Reserva el disponible en orden de prioridad: Gastos primero, luego Metas. Puedes ajustar cada reserva con Sumar o Restar.</p>
+  <div class="fin-auto-row">
+    <label class="sched-checkbox-row">
+      <input id="financeAutoFillInput" type="checkbox"/> Asignar disponible automáticamente
+    </label>
+    <div class="sched-help-wrap">
+      <button class="sched-compact-info-btn" type="button" aria-describedby="financeAutoFillInfoTooltip" aria-label="Más información">i</button>
+      <div class="sched-help-tooltip" id="financeAutoFillInfoTooltip" role="tooltip">Reserva el disponible en orden de prioridad: Gastos primero, luego Metas. Puedes ajustar cada reserva con Sumar o Restar.</div>
+    </div>
+  </div>
+  </div>
 
   <div class="fin-tab-toggle" id="financeTabToggle" role="group" aria-label="Ver Gastos o Metas">
     <button class="fin-tab-btn active" data-fin-tab="gastos" type="button">Gastos</button>
