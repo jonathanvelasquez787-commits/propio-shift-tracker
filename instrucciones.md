@@ -458,6 +458,180 @@ futura opera bajo esto, sin excepción:
 
 **ESTADO ACTUAL**
 
+- Web 665: «Acciones de Hoy» recuerda si quedó colapsada o expandida y la pastilla Hoy/Ciclo de Ganancias recuerda su vista; ambos estados se guardan en los ajustes y se aplican al abrir la app en otra pestaña. Extensión 2.3.11 sin cambios.
+
+- Web 664: «Acciones de Hoy» colapsada pasa de tarjeta alta a una franja de ~46 px con título, botón de turno y círculo de expandir; muestra los seis botones en esa misma franja: solo iconos en pantallas angostas (con «Hoy» como título corto) y con etiqueta desde 1400 px. Solo CSS más un `<span>` de título corto en app.html y la barra de llamada no cambia. Extensión 2.3.11 sin cambios.
+
+- Web 663: alinea estado, ACW, reloj y fecha en Inicio; elimina el fondo del reloj, baja solo 8 px la hora en móvil y abrevia la frase a «Jamás negocio con mis excusas». Compacta acciones de turno y llamadas, limita la barra de llamada al ancho del layout, acorta la animación de pulsación y diferencia fondos/tarjetas en las siete paletas claras y oscuras. Los cuatro iconos superiores del menú móvil quedan tal como estaban en 662. «Vista esencial» sigue disponible. El popup de la extensión avanza por separado a 2.3.11; su activación runtime sigue sin certificarse.
+
+- Web 662: la barra superior de llamada adopta el diseño de la ficha anterior, oculta la ficha duplicada durante llamada activa y conserva recuperación de pendientes. Botones de turno y llamadas compactados. Extensión 2.3.10 sin cambios; su activación runtime sigue sin certificarse.
+
+- Web 651 evita calcular los análisis mensual y de calidad mientras están plegados. El gráfico productivo calcula solo productividad y la comparación semanal solo adherencia. Índice de llamadas limitado a una lectura síncrona, descartado al terminar; controles y valores conservados. Referencias reales de Finanzas, Higher Rate y Ajustes de 631 (c178210) recuperadas fuera de Git para revisar su restauración visual.
+
+- Web 650 aplica el mock aprobado del resto de Reportes: ganado y meta del ciclo destacados, proyección identificada como estimación, racha compacta y análisis secundarios plegables. Aviso de día libre sin duplicar; controles, cálculos y datos conservados.
+
+- Web 649 aplica el mock aprobado de objetivos y jornada: tres métricas alineadas; comparación semanal y jornada a todo el ancho debajo. Un único aviso de día sin evaluar y comparación sin ayer cuando aplica a las tres; comparaciones individuales conservadas cuando difieren. Cálculos, controles, moneda y datos se conservan.
+
+- Web 648 aplica el mock aprobado de Ajustes: idioma, meta, tarifa y moneda visibles; Perfil y cuenta, Ciclo de pago, Copias y exportación y Disponibilidad plegables. Borrar cuenta queda al final en un grupo separado, conservando confirmación y validación de propietario. Los 65 ids anteriores de Ajustes y todos sus handlers se conservan. Las copias inyectadas se ubican en su grupo. No cambia el modelo de datos ni la extensión.
+
+- Web 647 aplica el mock aprobado de Finanzas simplificada: Disponible, Gastos, Metas, prioridades y reservas. Se retiran de la interfaz planificador/50-30-20, registro e historial mensual de pagos y estimaciones de aportes por meses. Los datos anteriores se conservan en ajustes y respaldos; categorías, edición, reparto, exclusiones y liberación permanecen. La próxima prioridad incluye Metas cuando termina Gastos. Extensión sin cambios.
+
+- Web 646 recupera Fechas de pago según la referencia 631 elegida y aprobada por el propietario: tarjeta y fecha azul, leyenda, filas compactas y fecha a la derecha; sin controles de registrar/comparar recibido. Los registros anteriores siguen en respaldos y no se infiere un depósito por pasar la fecha. La simplificación posterior de Finanzas está documentada en web 647. Extensión sin cambios.
+
+- Web 645 amplía la auditoría profunda del 24/10: propietarios y respuestas tardías, recuperación de pendientes y bonos, Finanzas y premios intercalados. 75 regresiones nuevas; 1.125 pruebas correctas y mes ficticio de 35 días. Informe y límites en docs/auditoria-profunda-2026-10-24.md. Extensión 2.3.6 instalada como archivos con respaldo y preferencias conservadas; activación runtime no certificada (última confirmada: 2.3.5).
+
+- Web 644 cierra la auditoría profunda explícita del 23/10: diez grupos funcionales reparados y Zod indirecto actualizado a 4.6.6. Rechazos de guardado, semanas personalizadas, llamadas activas/pendientes, precisión recuperada, ACW corregido, premios intercalados e idioma. Mes interactivo ficticio de 32 días: 84 llamadas, 476 minutos, $57.12 y 56 pausas; escenarios reparados repetidos sobre 644. Informe y límites en docs/auditoria-profunda-2026-10-23.md. Extensión 2.3.5 activa confirmada, sin cambios de instalación.
+
+- Web 643 corrige dos inconsistencias del tiempo Usado de los bloques halladas en un recorrido de uso normal: no resta pausas posteriores a la actividad contabilizada ni suma huecos sin conexión. Comparte ACW clasificado con su resumen. 1.002 pruebas y recorrido con cuenta ficticia; ver docs/prueba-usuario-2026-10-22.md. La extensión 2.3.5 activa confirmada y el cierre 79/79 se conservan. No requiere recarga de extensión.
+
+- Base histórica App 641: guías y galería de esa entrega, lenguaje claro en popup/organizador y
+  corrección del espacio de flechas plegables en móvil. 969 pruebas correctas;
+  ocho recorridos compilados ES, ambos temas y 320/390/1200/1800 px, con 248
+  capturas y datos ficticios. Popup 2.3.4 probado con API de Chrome simulada.
+  Worker sin cambios; respaldo completo y preferencias locales conservadas.
+- App 640 integra el desglose día/ciclo bajo Racha/meta junto a Proyección y
+  «Ver jornada» dentro de Adherencia. Fecha azul a la derecha y distintivo del
+  ciclo restaurados desde el token histórico. App 639 muestra inicio/final
+  observado con segundos al pasar por el ACW, separado de su ancla actual.
+- Inicio conserva sus funciones y ACW. Preparación de disponibilidad en Ajustes,
+  jornada y desgloses en Reportes, comparación y edición en el detalle único de
+  llamada. Sin copias paralelas ni cambio del layout general. La guía práctica
+  explica las 79 funciones; la entrega 642 registra las veinte mejoras finales
+  sin confundir implementación, publicación y activación de la extensión.
+- Google es la entrada pública. Formularios deshabilitados de login/registro y
+  solicitud de contraseña retirados; se conserva recuperación de enlaces emitidos,
+  perfil, cierre de sesión y el endpoint heredado protegido con sus regresiones.
+  No se cambió configuración de Auth ni esquema alojado. Email/SMTP siguen apagados.
+- app.html mantiene el marcado; css/app-core.css contiene sus estilos, en el
+  mismo lugar de la cascada. js/app-main.js coordina módulos; weekly-summary.js
+  recibe entradas actuales sin poseer estado. Boot verifica cuenta antes de montar.
+- Traducciones fuente en locales/; js/locales.generated.js se genera antes de
+  pruebas/build y no se versiona. No se suben salidas de work/, outputs/, artifacts/
+  ni instaladores generados. README concentra la documentación de entrada.
+- Cuenta y llamadas sincronizadas bajo RLS, revisiones y propietario local. No
+  mezclar automáticamente conflictos ni anunciar éxito tras rechazar guardado.
+  Migraciones, lockfile, pruebas, presupuestos y protecciones se conservan.
+- Funciones y reglas de Finanzas, premios, Higher Rate, fechas contables, idiomas,
+  sonidos y organización se documentan en sus guías actuales; los informes y Git
+  preservan la evidencia histórica. No recrear un diario de versiones aquí.
+- Frase fija del saludo blanca en oscuro y negra en claro. Menú mantiene Horario
+  después de Finanzas; botón de moneda recuerda la preferencia y equivalencia
+  debajo. El cambio interno no rediseña la interfaz.
+
+---
+
+**ÚLTIMOS FIXES (máx. 3, los más recientes)**
+
+**Extensión 2.3.11:** el popup agrupa conexión, actividad, automatización, apariencia y ayuda, con textos más breves. Conserva ids, listeners y comportamiento de 2.3.10. La política del navegador bloquea chrome://extensions; una copia local no certifica la activación runtime. El DOM real del 26/10 confirmó el atributo del tema oscuro de una entrega anterior, pero no identifica por sí solo la versión del manifest. No reabrir los cuatro puntos históricos del plan.
+
+**CONFIRMACIONES Y CONFIGURACIÓN LOCAL VIGENTES**
+
+- El 22/10/2026 el propietario mostró el popup real con **2.3.5**. Esta es la confirmación vigente de extensión activa y cierra la activación pendiente. Las confirmaciones anteriores permanecen como hechos históricos; no pedir otra recarga para cambios solo de web o reapertura de estilos del popup.
+
+- El 22/10/2026 el propietario confirmó «Sí, muestra 2.3.4» después de recargar
+  la extensión. Popup 2.3.4 activo; no volver a pedir esta recarga ni presentarla
+  como pendiente. Archivos instalados con respaldo y preferencias conservadas.
+
+- El usuario confirmó inicio automático de llamadas, regreso tras Break y arranque
+  correcto después de reiniciar. La recarga de Propio/tracker está confirmada;
+  después confirmó 2.2.10 tanto en Chrome como en el popup. No volver a presentar
+  esa instalación como pendiente.
+- Chrome Jonathan se abre al iniciar Windows y se organiza también al abrirlo
+  manualmente, a cualquier hora. Propio y https://app.useinterpreter.com/ quedan
+  a la izquierda; tracker y Linguee arriba a la derecha; Notas debajo, ancho 5/16
+  y proporción de altura .612. No hay franjas horarias para ese organizador.
+- El inicio de Chrome sigue apuntando a chrome.exe con Default, restore-last-session
+  y el organizador. Escritorio usa Open-Chrome-And-Notes.exe; inicio de Notas usa
+  el mismo iniciador con --notes-only. Código en windows/ e instalador en scripts/.
+  Binario/configuración personal: Documents/Propio Workspace, fuera del repositorio,
+  evitando redirección MSIX de LocalAppData. Reutiliza la ventana de notas y no
+  modifica su texto. Accesos originales respaldados.
+- El usuario confirmó resueltos el puente y entregas anteriores; no inferir desde
+  eso una versión instalada nueva ni una ficha pública de Chrome Web Store.
+  La extensión actual se distribuye desde archivo según el propietario.
+- La automatización de reintentar indexación quedó PAUSED. No reactivarla ni
+  publicar mensajes en comunidades sin autorización.
+
+**ALCANCE DE VALIDACIÓN**
+
+- La auditoría solicitada del 15–17/10 está cerrada: siete grupos corregidos,
+  798 pruebas en su cierre y 32 días con cuenta ficticia. CI y publicación en
+  PR #73; confirmación de recarga conservada. Los diez informes anteriores están
+  [consolidados con originales inmutables](docs/auditoria-profunda-2026-10-17.md).
+- App y extensión conservan pruebas de persistencia, aislamiento, contabilidad,
+  regresiones y SQL local. No confundir fixtures con dos PCs Google humanos,
+  OAuth humano nuevo, cron alojado, dispositivos físicos o audibilidad real.
+- Las capturas de todas las variantes nativas de llamada/Save siguen sin
+  certificación completa; el funcionamiento confirmado por el usuario no prueba
+  cada variante. No provocar llamadas para comprobarlo.
+- No hay exclusión global entre PCs ni reloj servidor independiente para cambios
+  arbitrarios de hora/zona. Usar iniciadores en una PC. Chrome puede demorar
+  alarmas, congelar páginas y no ejecuta automatismos con la PC suspendida.
+- El iniciador pasó --verify, 32 geometrías, 38 pruebas de workspace y posición
+  real de Notas; no se certificó otro monitor físico ni un nuevo reinicio físico.
+- PostgreSQL alojado se actualizó el 12/10 a 17.11.0.003 con nueve migraciones y
+  tablas RLS. Perfil/ajustes/estado se compararon con copia fresca; cero llamadas
+  en nube era intencional según el usuario. No restaurar datos antiguos encima
+  de actividad nueva. Controles, recuperación y fechas en docs/production-*.md.
+
+**LIMITACIONES CONOCIDAS** (alcance reducido a propósito, no son bugs)
+
+- Los premios físicos son compromisos personales: la app registra que el
+  usuario marcó uno como realizado, pero no comprueba la actividad ni hace
+  compras o pagos automáticos.
+- Se pueden configurar hasta 60 premios y mantener 100 pendientes. Al llenar
+  la cola no se descartan premios: los nuevos hitos conservan su progreso y
+  pueden generar un premio en un evento posterior cuando haya espacio.
+- La Proyección del ciclo de Inicio muestra siempre el ciclo ACTUAL
+  (`reportsCycleProjection()`/`cycleGoalPace()` fijadas al offset 0); se
+  esconde sola al navegar a otro ciclo.
+- El tema elegido en la landing se guarda en la misma clave que usa la app,
+  así que la app abre con él — salvo que la nube traiga otro `theme`
+  guardado, en cuyo caso gana la nube (correcto: es la fuente de verdad de
+  los ajustes) y solo puede notarse la primera vez que se entra desde un
+  navegador nuevo.
+- El aviso "Dos versiones distintas de tus datos" solo sale ante una
+  divergencia REAL entre dos dispositivos (nunca se mezcla sola porque
+  inventaría un día de trabajo que no existió) — todo lo demás se resuelve
+  sin preguntar.
+- El preview de "Próximos pendientes" en Ganancias de hoy muestra el balance
+  GLOBAL acumulado de Finanzas, no algo que nazca/se resetee por día — es
+  consciente, pese a la inconsistencia visual de mostrarlo en una vista
+  rotulada "de hoy".
+- Turno sin cerrar antes de medianoche: `dayShiftSessions` solo empareja
+  eventos del día consultado y del ANTERIOR, nunca del siguiente. Se dejó así
+  a propósito para no romper el caso mucho más común de "olvidé cerrar ayer y
+  hoy arranqué un turno nuevo".
+- `possiblePauseTotal` continúa en los resultados contables por compatibilidad
+  con sus consumidores y regresiones; no se elimina un contrato por carecer de render.
+- Importación: `parseCalls` guarda `pay` tal como viene en el texto pegado,
+  sin clampear negativos (a diferencia del editor/modal manual, que sí lo
+  hacen) — no se tocó a propósito porque cambiaría `callDedupeKey` y con eso
+  la detección de duplicados de llamadas ya guardadas.
+- `parseMoney` conserva la semántica de los pagos antiguos importados para no
+  cambiar su deduplicación. Las entradas manuales de asignación de Finanzas
+  usan otro parser estricto: `"12,50"` corresponde a 12.50, también en moneda local.
+- Higher Rate: la edición normal conserva el bono ya registrado, también al
+  cambiar nivel. El recálculo de bonos históricos se realiza desde la revisión de llamadas
+  → «Corregir promoción», vista previa y confirmación del recálculo. Limpiar
+  conserva bonos y no reconstruye ventanas retiradas para llamadas aún ausentes.
+- Una llamada en vivo conserva inicio/fin y duración observados con milisegundos.
+  La duración en minutos no se redondea a dos decimales; el umbral de 40 segundos
+  solo calcula el pago estimado. Propio pasa a ser principal al importar, con el
+  respaldo original separado. El historial puede informar 0 min; no deducir de
+  eso las reglas de facturación de Propio. Detalle en docs/registros-propio-y-tool.md.
+- Cambiar el ancla del ciclo de pago mueve el inicio de TODAS las semanas
+  (`startOfCycleWeek`), incluidas las claves de "Semana específica" — se
+  re-anclan solas por el centro de la semana vieja, pero un movimiento grande
+  del ancla puede dejar una semana personalizada cubriendo un día distinto en
+  los extremos.
+
+---
+
+**ESTADO ACTUAL**
+
+- Web 665: «Acciones de Hoy» recuerda si quedó colapsada o expandida y la pastilla Hoy/Ciclo de Ganancias recuerda su vista; ambos estados se guardan en los ajustes y se aplican al abrir la app en otra pestaña. Extensión 2.3.11 sin cambios.
+
 - Web 664: «Acciones de Hoy» colapsada pasa de tarjeta alta a una franja de ~46 px con título, botón de turno y círculo de expandir; muestra los seis botones en esa misma franja: solo iconos en pantallas angostas (con «Hoy» como título corto) y con etiqueta desde 1400 px. Solo CSS más un `<span>` de título corto en app.html y la barra de llamada no cambia. Extensión 2.3.11 sin cambios.
 
 - Web 663: alinea estado, ACW, reloj y fecha en Inicio; elimina el fondo del reloj, baja solo 8 px la hora en móvil y abrevia la frase a «Jamás negocio con mis excusas». Compacta acciones de turno y llamadas, limita la barra de llamada al ancho del layout, acorta la animación de pulsación y diferencia fondos/tarjetas en las siete paletas claras y oscuras. Los cuatro iconos superiores del menú móvil quedan tal como estaban en 662. «Vista esencial» sigue disponible. El popup de la extensión avanza por separado a 2.3.11; su activación runtime sigue sin certificarse.
@@ -534,3 +708,8 @@ futura opera bajo esto, sin excepción:
 
 - Colapsada, la tarjeta queda en una sola franja con el título, el botón Iniciar/Finalizar shift y el círculo de expandir, en lugar de una tarjeta alta con solo título y círculo. Muestra también Break, Lunch y los tres botones de llamadas: solo iconos en pantallas angostas (opción B del mockup claro/oscuro aprobado, con «Hoy» como título corto y las etiquetas visibles solo para lectores de pantalla) y con etiqueta desde 1400 px.
 - CSS (`css/app-shell.css`) y un `<span class="hero-shift-short">` en app.html: mismos ids, listeners y JS; expandida no cambia. Verificado con check-ui-wiring, check-i18n, check-production-criteria y la suite de tests.
+
+**v665 — Inicio recuerda sus vistas.**
+
+- La fila «Acciones de Hoy» (colapsada o expandida) y la pastilla Hoy/Ciclo de «Ganancias» guardan su estado en los ajustes (`heroActionsCollapsed`, `earningsViewMode`) y lo restauran al abrir la app, también en otra pestaña. Valores por defecto: expandida y vista Hoy; valores inválidos se corrigen al cargar.
+- Sin cambios de diseño, ids ni textos. Verificado con check-ui-wiring, check-i18n, check-production-criteria, la suite de tests y la compilación (presupuestos OK).

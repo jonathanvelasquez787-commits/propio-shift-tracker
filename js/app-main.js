@@ -775,6 +775,9 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
         // Toggle "Contraer bloques al terminar" dentro de "Bloques del día" (ver
         // #collapseCompletedBlocksBtn)
         collapseCompletedBlocks: false,
+        // Estado recordado de la fila "Acciones de Hoy" (colapsada o no) y de la pastilla Hoy/Ciclo de Ganancias.
+        heroActionsCollapsed: false,
+        earningsViewMode: 'day',
         weekSummaryTipDismissed: false,
         // Un día libre/sin turno puede cortar la racha o simplemente saltarse, a elección del
         // usuario.
@@ -845,6 +848,8 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
       if (!settings.accordionState || typeof settings.accordionState !== 'object' || Array.isArray(settings.accordionState)) settings.accordionState = {};
       if (typeof settings.sidebarPinned !== 'boolean') settings.sidebarPinned = true;
       if (typeof settings.collapseCompletedBlocks !== 'boolean') settings.collapseCompletedBlocks = false;
+      if (typeof settings.heroActionsCollapsed !== 'boolean') settings.heroActionsCollapsed = false;
+      if (!['day', 'cycle'].includes(settings.earningsViewMode)) settings.earningsViewMode = 'day';
       if (typeof settings.weekSummaryTipDismissed !== 'boolean') settings.weekSummaryTipDismissed = false;
       if (typeof settings.streakSkipOffDays !== 'boolean') settings.streakSkipOffDays = true;
       if (!Number.isFinite(Number(settings.productiveBreakEarnMin)) || Number(settings.productiveBreakEarnMin) <= 0) settings.productiveBreakEarnMin = fallback.productiveBreakEarnMin;
@@ -3480,10 +3485,14 @@ export function setCalViewMode(value) { setContextCalViewMode(value); }
 
 // Pastilla "Hoy / Ciclo" dentro de "Ganancias de hoy" — alterna entre
 // #earningsDayView/#earningsCycleView sin animación. Vive en memoria (no en localStorage)
-let earningsViewMode = 'day';
+let earningsViewMode = settings.earningsViewMode === 'cycle' ? 'cycle' : 'day';
 
-function setEarningsViewMode(mode) {
+function setEarningsViewMode(mode, { persist = false } = {}) {
   earningsViewMode = mode === 'cycle' ? 'cycle' : 'day';
+  if (persist && settings.earningsViewMode !== earningsViewMode) {
+    settings.earningsViewMode = earningsViewMode;
+    saveSettingsOnly();
+  }
   const dayView = document.getElementById('earningsDayView');
   const cycleView = document.getElementById('earningsCycleView');
   const goalBadge = document.getElementById('goalPctBadge');
@@ -7030,12 +7039,18 @@ export function render() {
         const toggle = document.createElement('button');
         toggle.type = 'button';
         toggle.className = 'accordion-chevron hero-shift-toggle';
-        toggle.setAttribute('aria-expanded', 'true');
+        const startCollapsed = settings.heroActionsCollapsed === true;
+        hero.classList.toggle('is-collapsed', startCollapsed);
+        toggle.setAttribute('aria-expanded', String(!startCollapsed));
         toggle.setAttribute('aria-labelledby', title.id);
         toggle.innerHTML = iconHtml('chevronDown');
         toggle.addEventListener('click', () => {
           const collapsed = hero.classList.toggle('is-collapsed');
           toggle.setAttribute('aria-expanded', String(!collapsed));
+          if (settings.heroActionsCollapsed !== collapsed) {
+            settings.heroActionsCollapsed = collapsed;
+            saveSettingsOnly();
+          }
         });
         title.after(toggle);
       }
@@ -7732,7 +7747,7 @@ export function render() {
       e.stopPropagation();
       const btn = e.target instanceof Element ? e.target.closest('[data-earnings-mode]') : null;
       if (!btn) return;
-      setEarningsViewMode(btn.getAttribute('data-earnings-mode'));
+      setEarningsViewMode(btn.getAttribute('data-earnings-mode'), { persist: true });
     });
     // Pastilla "Bloques / Llamadas" dentro del <summary> de "Bloques del día" — mismo criterio que
     // earningsModeToggle arriba.
@@ -8089,6 +8104,7 @@ export function render() {
     // "Avisos" pasó de popup a sección siempre presente en su propia página del sidebar.
     syncNotificationsModalFields();
     applyAccordionState();
+    setEarningsViewMode(earningsViewMode);
     wireAccordionPersistence();
     wireActionButtonPress();
     initSidebarNav();
