@@ -1102,6 +1102,12 @@
           ]
         },
         {
+          "file": "tests/notifications-customize.test.mjs",
+          "namedCases": [
+            "Avisos: mensaje y sonido de cada aviso van dentro de \"Personalizar\" plegado"
+          ]
+        },
+        {
           "file": "tests/achievements-tabs.test.mjs",
           "namedCases": [
             "Logros en tres secciones: Hoy, Colección e Historial con botones y solo una visible"

@@ -1228,3 +1228,13 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 .hero-shift-session.is-reached { color: var(--warn); border-color: var(--warn); }
 .hero-shift-session:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
 .hero-shift-session { white-space: nowrap; }
+
+/* Avisos: mensaje y sonido van dentro de "Personalizar" (plegado) */
+.alert-customize{border-top:1px solid var(--line);margin-top:10px;padding-top:2px}
+.alert-customize>summary{display:flex;align-items:center;gap:8px;list-style:none;cursor:pointer;min-height:40px;font-size:12px;font-weight:700;color:var(--text)}
+.alert-customize>summary::-webkit-details-marker{display:none}
+.alert-customize>summary small{font-size:11px;font-weight:400;color:var(--muted);flex:1;min-width:0}
+.alert-customize>summary:after{content:'›';font-size:20px;color:var(--muted);font-weight:400;margin-left:auto}
+.alert-customize[open]>summary:after{transform:rotate(90deg)}
+.alert-customize>summary:focus-visible{outline:2px solid var(--cyan);outline-offset:2px;border-radius:8px}
+.alert-customize-body{display:flex;flex-direction:column;gap:10px;padding:4px 0 2px}
