@@ -1102,6 +1102,12 @@
           ]
         },
         {
+          "file": "tests/appearance-cards-compact.test.mjs",
+          "namedCases": [
+            "selector de temas: tarjetas compactas, modo en la línea del nombre y descripción solo para lectores de pantalla"
+          ]
+        },
+        {
           "file": "tests/language-preference.test.mjs",
           "namedCases": [
             "English is the default while an explicit Spanish preference remains Spanish",
