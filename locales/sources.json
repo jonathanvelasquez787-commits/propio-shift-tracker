@@ -1273,6 +1273,12 @@
       "js/theme-toggle.js"
     ]
   },
+  "s_11cafaf7": {
+    "source": "Ver mis Logros →",
+    "files": [
+      "js/game.js"
+    ]
+  },
   "s_11ea6853": {
     "source": "Duración sugerida (min)",
     "files": [
@@ -1795,12 +1801,6 @@
     "source": "Máximo 300 KiB por archivo. Se guarda como texto dentro de tus ajustes y ocupa más que el audio original. Elegir otro sonido no borra el archivo; usá Quitar archivo para liberarlo.",
     "files": [
       "js/notification-review.js"
-    ]
-  },
-  "s_1a37b0aa": {
-    "source": "Monstruos vencidos",
-    "files": [
-      "js/game.js"
     ]
   },
   "s_1a569dfb": {
@@ -3045,6 +3045,12 @@
       "js/app-main.js"
     ]
   },
+  "s_2da267dc": {
+    "source": "Arma",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_2db4c4cc": {
     "source": "Mantén un ritmo sostenible",
     "files": [
@@ -4024,6 +4030,12 @@
       "js/call-table-view.js"
     ]
   },
+  "s_3b60479b": {
+    "source": "NV {{v2}}",
+    "files": [
+      "js/game.js"
+    ]
+  },
   "s_3b6e30dc": {
     "source": "Actualizada",
     "files": [
@@ -4371,12 +4383,6 @@
     "source": "Presupuesto actual",
     "files": [
       "js/finance-planning.js"
-    ]
-  },
-  "s_420587d6": {
-    "source": "/ {{v2}}",
-    "files": [
-      "js/game.js"
     ]
   },
   "s_420ea8e5": {
@@ -5856,12 +5862,6 @@
       "app.html"
     ]
   },
-  "s_5712a5ac": {
-    "source": "Ver todos mis Logros →",
-    "files": [
-      "js/game.js"
-    ]
-  },
   "s_571a7b4a": {
     "source": "Pago estimado.",
     "files": [
@@ -6025,12 +6025,6 @@
       "js/call-records-view.js"
     ]
   },
-  "s_59415956": {
-    "source": "Tu colección de victorias",
-    "files": [
-      "js/game.js"
-    ]
-  },
   "s_5947e149": {
     "source": "No hay pixeles de terceros ni perfiles de comportamiento.",
     "files": [
@@ -6053,12 +6047,6 @@
     "source": "Enfrentaste una llamada difícil · tu esfuerzo cuenta",
     "files": [
       "js/reinforcement-feedback.js"
-    ]
-  },
-  "s_599b419c": {
-    "source": "ARMA EQUIPADA",
-    "files": [
-      "js/game-battle.js"
     ]
   },
   "s_59c040e8": {
@@ -7305,13 +7293,6 @@
       "js/app-main.js"
     ]
   },
-  "s_6effe0f0": {
-    "source": "Cada llamada te acerca al cofre.",
-    "files": [
-      "js/game-battle.js",
-      "js/game.js"
-    ]
-  },
   "s_6f2d3b08": {
     "source": "Jefe del ciclo",
     "files": [
@@ -7986,6 +7967,7 @@
   "s_795011d6": {
     "source": "Faltan {{v0}}{{v1}}",
     "files": [
+      "js/game.js",
       "js/reports.js"
     ]
   },
@@ -8854,12 +8836,6 @@
     "source": "El navegador bloqueó el sonido de los avisos — toca \"Activar sonido\" para permitirlo mientras esta pestaña siga abierta.",
     "files": [
       "app.html"
-    ]
-  },
-  "s_8584b0f5": {
-    "source": "Duelo disponible durante el descanso",
-    "files": [
-      "js/game-battle.js"
     ]
   },
   "s_85899ade": {
@@ -10255,7 +10231,6 @@
   "s_98b6adcb": {
     "source": "{{v0}} / {{v1}}",
     "files": [
-      "js/game.js",
       "js/reports.js"
     ]
   },
@@ -10507,12 +10482,6 @@
     "source": "Volviste a tiempo de {pause} · cuidaste tu descanso y tu ritmo{xp}",
     "files": [
       "js/reinforcement-feedback.js"
-    ]
-  },
-  "s_9c88c1d5": {
-    "source": "Tu colección",
-    "files": [
-      "js/game.js"
     ]
   },
   "s_9c90f5e4": {
@@ -11715,6 +11684,12 @@
     "source": "Cuenta y datos de Propio Shift Tracker",
     "files": [
       "js/boot.js"
+    ]
+  },
+  "s_ae98547d": {
+    "source": "/ {{v3}}",
+    "files": [
+      "js/game.js"
     ]
   },
   "s_aeca0c44": {
@@ -17012,12 +16987,6 @@
     "files": [
       "app.html",
       "js/theme-palettes.js"
-    ]
-  },
-  "s_fce6dd5f": {
-    "source": "Te faltan {{v0}}{{v1}}",
-    "files": [
-      "js/game.js"
     ]
   },
   "s_fd50c919": {

@@ -777,10 +777,11 @@ function renderArena() {
   }
   const heading = root.querySelector('[data-battle-heading]');
   heading.innerHTML = ui`<span class="game-kicker">${dayKey === currentGameDayKey() ? translateText('TU RETO DE HOY') : formatCallDayLabel(dayKey)}</span><h3>${escapeHtml(displayName)}</h3><span class="game-level-chip">NV ${gameLevelProgress().level}</span>`;
+  const converted = convertedAmountText(day.stats.earnings);
   const convertedRemaining = convertedAmountText(remaining);
   const status = day.defeated ? receipt ? translateText('Cofre abierto. ¡Seguí sumando!') : translateText('Meta alcanzada. Este cofre es tuyo.') : '';
   root.querySelector('[data-battle-health-slot]').innerHTML = ui`
-    <div class="game-compact-goal-line"><span>${dayKey === currentGameDayKey() ? translateText('Meta de hoy') : translateText('Meta de este día')}</span><strong>${money(day.stats.earnings)} <small>/ ${money(day.goal.usd)}</small></strong></div>
+    <div class="game-compact-goal-line"><span>${dayKey === currentGameDayKey() ? translateText('Meta de hoy') : translateText('Meta de este día')}</span><strong${converted ? ` title="${escapeHtml(converted)}"` : ''}>${money(day.stats.earnings)} <small>/ ${money(day.goal.usd)}</small></strong></div>
     <div class="game-compact-goal-track" role="progressbar" aria-label="Avance hacia la meta y el cofre" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(100 - day.hpPct)}"><i class="game-compact-goal-fill" style="width:${100 - day.hpPct}%"></i><span class="game-compact-goal-chest" aria-hidden="true">${gamePixelChest(!!receipt)}</span></div>
     <div class="game-compact-goal-foot"><span>${day.defeated ? receipt ? translateText('Recompensa guardada') : translateText('Cofre conseguido') : ui`Faltan ${money(remaining)}${convertedRemaining ? ` · ${escapeHtml(convertedRemaining)}` : ''}`}</span></div>`;
   const victory = root.querySelector('[data-battle-victory]');
