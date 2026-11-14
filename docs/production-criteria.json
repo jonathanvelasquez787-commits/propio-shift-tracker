@@ -75,6 +75,12 @@
           ]
         },
         {
+          "file": "tests/achievements-rows-compact.test.mjs",
+          "namedCases": [
+            "Logros: Misiones e Hitos comparten fila y Última victoria con Récords van como tira, sin etiquetas pequeñas"
+          ]
+        },
+        {
           "file": "tests/shift-work-review.test.mjs",
           "namedCases": [
             "shift confirmation explains active work and changes nothing before acceptance",
