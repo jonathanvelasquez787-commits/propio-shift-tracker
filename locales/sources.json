@@ -1691,12 +1691,6 @@
       "app.html"
     ]
   },
-  "s_186799ad": {
-    "source": "Elegí los bloques prioritarios de Inicio.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_188379e2": {
     "source": "Mes actual",
     "files": [
@@ -5316,12 +5310,6 @@
       "js/finance-planning.js"
     ]
   },
-  "s_4e90944c": {
-    "source": "Vista esencial",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_4e99072c": {
     "source": "Ver copias recuperables",
     "files": [
@@ -5375,12 +5363,6 @@
     "source": "Armadura cian",
     "files": [
       "js/game.js"
-    ]
-  },
-  "s_4f9bef4b": {
-    "source": "Bloques y llamadas del día",
-    "files": [
-      "app.html"
     ]
   },
   "s_4f9fbc6e": {
@@ -5678,12 +5660,6 @@
     "source": "🎁 Cofre sorpresa · +{{v0}} XP",
     "files": [
       "js/game.js"
-    ]
-  },
-  "s_5360502e": {
-    "source": "El turno, las llamadas, la fecha y la frase permanecen visibles. Los bloques ocultos siguen disponibles al desactivar esta vista; tus registros y Logros se conservan.",
-    "files": [
-      "app.html"
     ]
   },
   "s_53aab57b": {
@@ -6757,6 +6733,12 @@
     "source": "Sesión de videojuego",
     "files": [
       "js/positive-reinforcement.js"
+    ]
+  },
+  "s_646dbd54": {
+    "source": "Bloques y llamadas",
+    "files": [
+      "app.html"
     ]
   },
   "s_64940ad5": {
@@ -7991,6 +7973,12 @@
   },
   "s_776cb9e0": {
     "source": "Noche Violeta: Violeta, fucsia, coral y amarillo",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_77746c25": {
+    "source": "Mostrar u ocultar la tarjeta de Logros y los chips Racha y Nivel en Inicio",
     "files": [
       "app.html"
     ]
@@ -10614,6 +10602,12 @@
     "source": "{{v28}}{{v29}}{{v30}}",
     "files": [
       "js/reports.js"
+    ]
+  },
+  "s_9c3cd1cc": {
+    "source": "Mostrar u ocultar el horario y las llamadas del día en Inicio",
+    "files": [
+      "app.html"
     ]
   },
   "s_9c5c2b3a": {
@@ -14317,6 +14311,12 @@
       "js/positive-reinforcement.js"
     ]
   },
+  "s_d527f76e": {
+    "source": "Mostrar u ocultar la tarjeta Ganancias de hoy en Inicio",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_d54b8e2d": {
     "source": "Al agregar una llamada manual",
     "files": [
@@ -16767,12 +16767,6 @@
     "source": "Monto objetivo en {{v0}}",
     "files": [
       "js/finance.js"
-    ]
-  },
-  "s_f66c7b00": {
-    "source": "Activar vista esencial",
-    "files": [
-      "app.html"
     ]
   },
   "s_f66f6a18": {

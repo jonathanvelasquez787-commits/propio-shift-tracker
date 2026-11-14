@@ -1,17 +1,20 @@
 export function presentationPreferences(value) {
   const source = value && typeof value === 'object' && !Array.isArray(value) ? value : {};
-  return { enabled: source.enabled === true, earnings: source.earnings !== false,
-    schedule: source.schedule !== false, game: source.game === true };
+  // Formato anterior (con interruptor principal): si estaba apagado se veía todo.
+  if ('enabled' in source) {
+    if (source.enabled !== true) return { earnings:true, schedule:true, game:true };
+    return { earnings: source.earnings !== false, schedule: source.schedule !== false, game: source.game === true };
+  }
+  return { earnings: source.earnings !== false, schedule: source.schedule !== false, game: source.game !== false };
 }
 
 export function applyPresentation(settings, doc = document) {
   const preferences = presentationPreferences(settings.essentialView);
   for (const key of ['earnings', 'schedule', 'game']) {
-    doc.documentElement.classList.toggle(`essential-hide-${key}`, preferences.enabled && !preferences[key]);
+    doc.documentElement.classList.toggle(`essential-hide-${key}`, !preferences[key]);
   }
   for (const input of doc.querySelectorAll('[data-essential-option]')) {
     input.checked = preferences[input.dataset.essentialOption];
-    input.disabled = input.dataset.essentialOption !== 'enabled' && !preferences.enabled;
   }
 }
 
