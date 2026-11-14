@@ -1253,3 +1253,23 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 #notificationsModal .notif-group .notif-row .sched-compact-field input[type=number]{width:64px}
 #notificationsModal .notif-group .notif-row .sched-checkbox-row{margin:0;white-space:nowrap}
 #notificationsModal .notif-group .alert-customize>summary{min-height:32px}
+/* Finanzas (celular): tarjeta de gasto compacta en 3 filas — nombre y estado arriba, reservado y barra, y una sola barra unida de monto */
+@media(max-width:760px){
+#pageFinance .fin-row{align-items:center;column-gap:8px;row-gap:8px;padding:12px}
+#pageFinance .fin-row-main,#pageFinance .fin-row-actions{display:contents}
+#pageFinance .fin-row-title{order:1;flex:0 1 auto;min-width:0}
+#pageFinance .fin-row-sub{order:2;flex:1 1 0;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#pageFinance .fin-badge{order:3;margin-left:auto}
+#pageFinance .fin-row-amt-line{order:4;flex:0 0 100%;margin-top:2px}
+#pageFinance .fin-progress-track{order:4;flex:0 0 100%;margin-top:-2px}
+#pageFinance .fin-row-bar{order:5;flex:0 0 100%;display:flex;align-items:stretch;min-width:0;border:1px solid var(--line-2);border-radius:10px;overflow:hidden}
+#pageFinance .fin-row-bar>.fin-amount-entry{flex:1 1 auto;min-width:0;grid-template-columns:minmax(0,1fr) 64px;gap:0}
+#pageFinance .fin-row-bar .fin-amount-entry input,#pageFinance .fin-row-bar .fin-amount-entry select{border:0;border-radius:0;background:transparent;min-height:40px}
+#pageFinance .fin-row-bar .fin-amount-entry select{border-left:1px solid var(--line)}
+#pageFinance .fin-row-bar .mc-pill-row{display:flex;gap:0;padding:0;border:0;border-left:1px solid var(--line);border-radius:0;background:transparent}
+#pageFinance .fin-row-bar .mc-pill-btn{border-radius:0;padding:0 8px;min-height:40px;font-size:11px}
+#pageFinance .fin-row-bar .fin-mini-btn-primary{border-radius:0;height:auto;min-height:40px;padding:0 14px}
+#pageFinance .fin-row-actions>.fin-ghost-btn:not(.fin-ghost-btn-icon){order:6;width:auto;height:auto;min-height:36px;padding:0 4px;border:0;background:transparent}
+#pageFinance .fin-item-tools{order:6}
+#pageFinance .fin-checkbox-label{order:6;flex:0 1 auto;margin:0 0 0 auto;white-space:normal;text-align:right}
+}

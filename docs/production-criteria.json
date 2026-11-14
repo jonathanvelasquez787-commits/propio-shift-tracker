@@ -1108,6 +1108,13 @@
           ]
         },
         {
+          "file": "tests/finance-row-compact.test.mjs",
+          "namedCases": [
+            "Finanzas: tarjeta de gasto compacta con una sola barra de monto",
+            "Finanzas: en celular la tarjeta de gasto reordena sin cambiar sus botones"
+          ]
+        },
+        {
           "file": "tests/notifications-list.test.mjs",
           "namedCases": [
             "Avisos: una sola lista unida, sin plegables ni tarjetas anidadas por grupo",

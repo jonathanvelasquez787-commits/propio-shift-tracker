@@ -344,8 +344,10 @@ function financeRowHtml(row, opts) {
       </div>
       <span class="fin-badge tone-${tone}">${badge}</span>
       <div class="fin-row-actions">
+        <div class="fin-row-bar">
         ${financeAmountInputHtml(row, 'reservation')}${signPillHtml}
         <button class="fin-mini-btn-primary ${sign === 'minus' ? 'mode-minus' : ''}" type="button" data-fin-apply="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" data-fin-help="${escapeHtml(translateText('Confirma el monto y la opción Sumar o Restar. Sumar usa solo dinero disponible; en gastos no supera el presupuesto. Restar devuelve como máximo lo reservado.'))}">Aplicar</button>
+        </div>
         ${!isMeta && assigned > 0 ? ui`<button class="fin-ghost-btn" type="button" data-fin-reset="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" data-fin-help="${escapeHtml(translateText('Devuelve toda la reserva de este gasto al Disponible. Conserva el presupuesto, los pagos registrados y la exclusión del reparto automático.'))}">Liberar reserva</button>` : ''}
         <span class="fin-item-tools"><button class="fin-ghost-btn fin-ghost-btn-icon" type="button" data-fin-edit="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" aria-label="Editar fila" title="Editar fila">${iconHtml('edit')}</button>
         <button class="hr-window-remove-btn" type="button" data-fin-delete="${escapeHtml(row.id)}" data-fin-cat="${escapeHtml(row.categoryId)}" aria-label="Eliminar fila" title="Eliminar fila">${iconHtml('trash')}</button></span>
