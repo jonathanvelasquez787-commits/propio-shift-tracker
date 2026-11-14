@@ -69,6 +69,12 @@
           ]
         },
         {
+          "file": "tests/achievements-progress-card.test.mjs",
+          "namedCases": [
+            "progreso de Logros: Nivel, XP, racha y escudos viven en una sola tarjeta sin escalera ni etiquetas"
+          ]
+        },
+        {
           "file": "tests/shift-work-review.test.mjs",
           "namedCases": [
             "shift confirmation explains active work and changes nothing before acceptance",
