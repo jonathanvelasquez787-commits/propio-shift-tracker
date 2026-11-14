@@ -32,8 +32,9 @@ test('all custom palettes have readable normal text and restore original without
   for (const mode of ['light', 'dark']) for (const palette of PALETTES.slice(1)) {
     const tokens = paletteTokens(palette, mode);
     for (const key of ['--text', '--muted', '--line', '--card-line', '--cyan', '--primary', '--good', '--bad']) assert.equal(tokens[key], undefined, `${palette.id}/${mode}/${key} must come from Original`);
+    // Con el fondo de afuera suavizado hacia el intermedio, en claro la separación página/tarjeta baja a 1.13–1.18.
     // Grafito usa negros muy cercanos a propósito (1.07 entre página y tarjeta), así que no se le pide separación.
-    if (palette.id !== 'graphite') assert.ok(contrast(tokens['--bg'], tokens['--panel']) >= (mode === 'light' ? 1.18 : 1.25) || contrast(tokens['--bg'], tokens['--panel-2']) >= 1.25, `${palette.id}/${mode}: page and cards must remain distinct`);
+    if (palette.id !== 'graphite') assert.ok(contrast(tokens['--bg'], tokens['--panel']) >= (mode === 'light' ? 1.12 : 1.25) || contrast(tokens['--bg'], tokens['--panel-2']) >= 1.25, `${palette.id}/${mode}: page and cards must remain distinct`);
     // Orden de los fondos: afuera el más claro, tarjeta principal el más intenso e interior intermedio.
     const against = key => contrast(tokens[key], '#FFFFFF');
     assert.ok(against('--bg') < against('--panel-2') && against('--panel-2') < against('--panel'), `${palette.id}/${mode}: page lightest, card strongest, inner in between`);
@@ -51,8 +52,8 @@ test('graphite palette only changes the three background blacks and keeps Origin
   const graphite = PALETTES.find(item => item.id === 'graphite');
   assert.ok(graphite && graphite.name === 'Negro Grafito' && !graphite.code);
   const dark = paletteTokens(graphite, 'dark'), light = paletteTokens(graphite, 'light');
-  assert.deepEqual([dark['--bg'], dark['--panel'], dark['--panel-2']], ['#1E1E22', '#09090B', '#131315']);
-  assert.deepEqual([light['--bg'], light['--panel'], light['--panel-2']], ['#FFFFFF', '#EBEBEE', '#F4F4F5']);
+  assert.deepEqual([dark['--bg'], dark['--panel'], dark['--panel-2']], ['#18181C', '#09090B', '#131315']);
+  assert.deepEqual([light['--bg'], light['--panel'], light['--panel-2']], ['#FAFAFA', '#EBEBEE', '#F4F4F5']);
   for (const tokens of [dark, light]) for (const key of ['--text', '--muted', '--line', '--card-line', '--cyan', '--teal', '--purple', '--good', '--warn', '--bad', '--primary'])
     assert.equal(tokens[key], undefined, `${key} must come from Original`);
   assert.equal(dark['--palette-primary'], '#2FD5FF');
