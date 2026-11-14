@@ -1108,6 +1108,12 @@
           ]
         },
         {
+          "file": "tests/finance-header-mobile.test.mjs",
+          "namedCases": [
+            "Finanzas en celular: \"Siguiente prioridad\" va en dos líneas y no se encima con el título"
+          ]
+        },
+        {
           "file": "tests/freelancer-blocks-list.test.mjs",
           "namedCases": [
             "Bloques del día en freelancer: cada descanso es una fila con etiqueta, horas y minutos",
