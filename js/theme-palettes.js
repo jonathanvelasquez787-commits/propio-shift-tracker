@@ -1,10 +1,10 @@
 export const PALETTES = [
   { id:'original',name:'Original',description:'Los colores actuales de la aplicación',colors:['#0D1230','#2FD5FF','#FFFFFF','#6366F1'],modes:{ light:'Original Claro',dark:'Original Oscuro' } },
   { id:'graphite',name:'Negro Grafito',description:'Cambia solo los tres negros de fondo',colors:['#09090B','#131315','#1E1E22','#A1A1AA'],lightAccent:3,darkAccent:3,secondary:3,gameBody:'#6366F1',modes:{ dark:'Negro Grafito' } },
-  { id:'lavender',name:'Lavanda Pastel',description:'Lavanda, celeste y menta',colors:['#9FA1FF','#B5BAFF','#AEE2FF','#D9F9DF'],code:'9fa1ffb5baffaee2ffd9f9df',lightAccent:0,darkAccent:2,secondary:1,lightBackground:3,modes:{ light:'Lavanda Suave',dark:'Lavanda Nocturna' } },
-  { id:'royal',name:'Azul Real',description:'Azul noche, intenso y celeste',colors:['#091540','#1B2CC1','#7692FF','#ABD2FA'],code:'0915401b2cc17692ffabd2fa',lightAccent:1,darkAccent:2,secondary:2,lightBackground:3,modes:{ light:'Cielo Azul',dark:'Azul Medianoche' } },
-  { id:'ocean',name:'Turquesa Profundo',description:'Turquesa, azul y violeta',colors:['#78B9B5','#0F828C','#065084','#320A6B'],code:'78b9b50f828c065084320a6b',lightAccent:1,darkAccent:0,secondary:3,lightBackground:0,modes:{ light:'Brisa Turquesa',dark:'Mar Profundo' } },
-  { id:'sage',name:'Verde Salvia',description:'Verde salvia, menta y crema',colors:['#659287','#88BDA4','#B1D3B9','#E6F2DD'],code:'65928788bda4b1d3b9e6f2dd',lightAccent:0,darkAccent:1,secondary:2,lightBackground:3,modes:{ light:'Salvia Fresca',dark:'Bosque de Salvia' } },
+  { id:'lavender',name:'Lavanda Pastel',description:'Lavanda, celeste y menta',colors:['#9FA1FF','#B5BAFF','#AEE2FF','#D9F9DF'],code:'9fa1ffb5baffaee2ffd9f9df',lightAccent:0,darkAccent:2,secondary:1,lightBackground:3,muted:{ light:'#576479',dark:'#9DABC8' },modes:{ light:'Lavanda Suave',dark:'Lavanda Nocturna' } },
+  { id:'royal',name:'Azul Real',description:'Azul noche, intenso y celeste',colors:['#091540','#1B2CC1','#7692FF','#ABD2FA'],code:'0915401b2cc17692ffabd2fa',lightAccent:1,darkAccent:2,secondary:2,lightBackground:3,muted:{ light:'#556277' },modes:{ light:'Cielo Azul',dark:'Azul Medianoche' } },
+  { id:'ocean',name:'Turquesa Profundo',description:'Turquesa, azul y violeta',colors:['#78B9B5','#0F828C','#065084','#320A6B'],code:'78b9b50f828c065084320a6b',lightAccent:1,darkAccent:0,secondary:3,lightBackground:0,muted:{ light:'#546176' },modes:{ light:'Brisa Turquesa',dark:'Mar Profundo' } },
+  { id:'sage',name:'Verde Salvia',description:'Verde salvia, menta y crema',colors:['#659287','#88BDA4','#B1D3B9','#E6F2DD'],code:'65928788bda4b1d3b9e6f2dd',lightAccent:0,darkAccent:1,secondary:2,lightBackground:3,muted:{ light:'#556277',dark:'#99A8C5' },modes:{ light:'Salvia Fresca',dark:'Bosque de Salvia' } },
   { id:'neon',name:'Morado Neón',description:'Violeta, fucsia, coral y amarillo',colors:['#5003C0','#AB03A9','#FF467A','#FFD51E'],code:'5003c0ab03a9ff467affd51e',lightAccent:0,darkAccent:3,secondary:1,lightBackground:3,modes:{ dark:'Noche Violeta' } }
 ];
 const rgb = hex => hex.match(/[a-f\d]{2}/gi).map(value=>parseInt(value,16));
@@ -18,7 +18,8 @@ const readable = (color,backgrounds) => {
   for(let weight=1;weight>=0;weight-=.025) { const result=mix(color,destination,weight);if(surfaces.every(background=>contrast(result,background)>=4.7))return result; }
   return destination;
 };
-// Orden de los tres fondos en cada modo: [afuera/página = a medio camino entre el más claro y el intermedio (así no queda lavado), tarjeta principal = el más intenso, interior/secundario = intermedio].
+// Fondos de cada modo: [(ya no se usa, queda por orden), tarjeta principal, interior/secundario].
+// El fondo de afuera es el mismo color que la tarjeta principal; la tarjeta se distingue por su borde y sombra.
 const PALETTE_SURFACES = {
   neon: { dark:['#3D1E5C','#140329','#351653'] },
   lavender: { light:['#EAECFC','#DBDEFA','#E3E5FA'], dark:['#424569','#242541','#3A3D61'] },
@@ -38,7 +39,7 @@ export function paletteTokens(palette,mode) {
   if(palette.id==='original')return {};
   const light=mode==='light',colors=palette.colors;
   const deep=palette.id==='ocean'?colors[3]:colors[0];
-  const [background,panel,panel2]=PALETTE_SURFACES[palette.id][mode];
+  const [,panel,panel2]=PALETTE_SURFACES[palette.id][mode],background=panel;
   const fixed=ORIGINAL_ACCENTS[mode];
   const raw=fixed?fixed.accent:colors[light?palette.lightAccent:palette.darkAccent];
   const surfaces=[panel,panel2,background];
@@ -79,6 +80,9 @@ export function paletteTokens(palette,mode) {
     tokens[`--liquid-${name}-rgb`]=rgb(value).join(',');tokens[`--rail-${name}-rgb`]=rgb(value).join(',');
   }
   if(fixed)for(const name of Object.keys(tokens))if(!SURFACE_ONLY_KEEP.test(name))delete tokens[name];
+  // Retoque mínimo del gris secundario, solo en los temas que lo definen (para llegar a contraste 4.5).
+  const softGray=palette.muted&&palette.muted[mode];
+  if(softGray)for(const name of ['--muted','--text-gray','--muted-3','--text-muted-3','--tier-silver'])tokens[name]=softGray;
   return tokens;
 }
 
@@ -87,7 +91,7 @@ export const PALETTE_CHOICES = PALETTES.flatMap(palette => Object.entries(palett
   key:`${palette.id}:${mode}`, paletteId:palette.id, mode, name, description:palette.description,
   colors: palette.id==='original'
     ? (mode==='light' ? ['#FFFFFF','#6366F1','#7C3AED','#A855F7'] : ['#0D1230','#2FD5FF','#8B7BFF','#7D8CFF'])
-    : [...PALETTE_SURFACES[palette.id][mode],ORIGINAL_ACCENTS[mode].accent],
+    : [PALETTE_SURFACES[palette.id][mode][1],PALETTE_SURFACES[palette.id][mode][1],PALETTE_SURFACES[palette.id][mode][2],ORIGINAL_ACCENTS[mode].accent],
 })));
 // Si el tema guardado ya no existe (paleta quitada o modo que esa paleta no tiene), se usa Original.
 export function resolvePalette(id,mode) {

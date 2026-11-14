@@ -3096,12 +3096,6 @@
       "js/schedule.js"
     ]
   },
-  "s_2e840342": {
-    "source": "#304A44",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_2e9445f7": {
     "source": "Min",
     "files": [
@@ -4356,12 +4350,6 @@
       "app.html"
     ]
   },
-  "s_400e95db": {
-    "source": "#3D1E5C",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_402319c6": {
     "source": "Automático (según tu horario)",
     "files": [
@@ -4897,12 +4885,6 @@
     "source": "Solo disponible viendo 'Hoy'",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_48594f6b": {
-    "source": "#EAECFC",
-    "files": [
-      "app.html"
     ]
   },
   "s_486ef5ab": {
@@ -8621,12 +8603,6 @@
       "js/automation-ui.js"
     ]
   },
-  "s_80994e27": {
-    "source": "#E4EEFD",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_80fe07c8": {
     "source": "Turno ajustado {{v0}} — recuerda \"Guardar día\" para confirmar",
     "files": [
@@ -9203,12 +9179,6 @@
   },
   "s_8841c8bb": {
     "source": "App y modo sin conexión:",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_8845a6e3": {
-    "source": "#202E55",
     "files": [
       "app.html"
     ]
@@ -10520,12 +10490,6 @@
   },
   "s_9a2c69a8": {
     "source": "Golpes, armaduras, combos, premios y victorias con efectos breves. Se combinan con el volumen general de Ajustes → Alarmas. Puedes silenciarlos en el menú lateral.",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_9a366108": {
-    "source": "#E1F0EE",
     "files": [
       "app.html"
     ]
@@ -13600,12 +13564,6 @@
       "js/game.js"
     ]
   },
-  "s_caceaee5": {
-    "source": "#E3F0E4",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_cad11401": {
     "source": "Bloques de enfoque productivo",
     "files": [
@@ -16495,12 +16453,6 @@
     "source": "Corregir y recalcular bonos afectados",
     "files": [
       "js/higher-rate-review.js"
-    ]
-  },
-  "s_f2f96e96": {
-    "source": "#18181C",
-    "files": [
-      "app.html"
     ]
   },
   "s_f3054b61": {

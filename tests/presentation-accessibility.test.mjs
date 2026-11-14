@@ -60,17 +60,19 @@ const ORIGINAL_COLORS = {
   light: { '--text':'#0f172a','--muted':'#64748b','--primary':'#6366f1','--bad':'#dc2626' },
   dark: { '--text':'#edf4ff','--muted':'#97a6c4','--primary':'#2fd5ff','--bad':'#ff6b72' },
 };
-// Pares que hoy quedan por debajo de 3:1 por el diseño "solo fondos". Seguimiento: ajustar esos fondos.
-const KNOWN_LOW_CONTRAST = new Set(['lavender/dark/--bad']);
 test('palette text and semantic states keep normal-text contrast on page and both panel surfaces', () => {
   for (const palette of PALETTES.slice(1)) for (const mode of Object.keys(palette.modes)) {
     const tokens=paletteTokens(palette,mode);
-    for (const key of ['--text','--muted','--primary','--bad','--good','--warn','--teal']) assert.equal(tokens[key],undefined,`${palette.id}/${mode}/${key} must come from Original`);
+    for (const key of ['--text','--primary','--bad','--good','--warn','--teal']) assert.equal(tokens[key],undefined,`${palette.id}/${mode}/${key} must come from Original`);
+    // bg == panel; --muted solo cambia en los temas con retoque de gris.
     const surfaces=['--bg','--panel','--panel-2'].map(key=>tokens[key]);
-    for (const [key,color] of Object.entries(ORIGINAL_COLORS[mode])) {
+    const softGray=palette.muted&&palette.muted[mode];
+    assert.equal(tokens['--muted'],softGray||undefined,`${palette.id}/${mode}: --muted only where retouched`);
+    for (const [key,original] of Object.entries(ORIGINAL_COLORS[mode])) {
+      const color=key==='--muted'&&softGray?softGray:original;
+      if (key==='--muted'&&softGray) { const w=Math.min(...surfaces.map(surface=>contrast(color,surface))); assert.ok(w>=4.5,`${palette.id}/${mode}: soft gray ${w.toFixed(2)}`); continue; }
       const worst=Math.min(...surfaces.map(surface=>contrast(color,surface)));
       if (key==='--text') assert.ok(worst>=4.5,`${palette.id}/${mode}: ${key} ${worst.toFixed(2)}`);
-      else if (KNOWN_LOW_CONTRAST.has(`${palette.id}/${mode}/${key}`)) assert.ok(worst>=2.4,`${palette.id}/${mode}: ${key} ${worst.toFixed(2)} got worse`);
       else assert.ok(worst>=3,`${palette.id}/${mode}: ${key} ${worst.toFixed(2)}`);
     }
     for (const color of ['cyan','blue','pink','good','warn','bad']) assert.ok(tokens[`--palette-on-${color}`],`${palette.id}/${mode}: missing --palette-on-${color}`);
@@ -174,4 +176,18 @@ test('appearance dialog keeps Tab inside visible controls and leaves Escape to t
     globalThis.document.activeElement=first;event.shiftKey=true;dialog.keydown(event);assert.equal(last.focused,true);
     prevented=false;event.key='Escape';dialog.keydown(event);assert.equal(stopped,true);assert.equal(prevented,false);
   } finally { if(beforeDocument===undefined)delete globalThis.document;else globalThis.document=beforeDocument;if(beforeWindow===undefined)delete globalThis.window;else globalThis.window=beforeWindow; }
+});
+
+test('every theme uses one color for page and card, and the softened grays reach 4.5 contrast', () => {
+  const retouched = [];
+  for (const palette of PALETTES.slice(1)) for (const mode of Object.keys(palette.modes)) {
+    const tokens=paletteTokens(palette,mode);
+    assert.equal(tokens['--bg'],tokens['--panel'],`${palette.id}/${mode}: --bg must equal --panel`);
+    if (palette.muted&&palette.muted[mode]) {
+      retouched.push(`${palette.id}/${mode}`);
+      for (const key of ['--muted','--text-gray','--muted-3','--text-muted-3','--tier-silver']) assert.equal(tokens[key],palette.muted[mode],`${palette.id}/${mode}/${key}`);
+      for (const surface of ['--bg','--panel','--panel-2']) assert.ok(contrast(tokens['--muted'],tokens[surface])>=4.5,`${palette.id}/${mode}: gray on ${surface}`);
+    }
+  }
+  assert.equal(retouched.length,6,'six themes get the softened gray: '+retouched.join(', '));
 });
