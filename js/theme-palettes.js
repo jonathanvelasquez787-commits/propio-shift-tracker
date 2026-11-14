@@ -33,8 +33,8 @@ const PALETTE_SURFACES = {
 // Todas las paletas solo cambian los fondos: el resto de colores (texto, bordes, botones,
 // acentos) se queda con los de Original. Estos valores solo alimentan los tokens --palette-*.
 const ORIGINAL_ACCENTS = {
-  dark: { accent:'#2FD5FF', secondary:'#8B7BFF', good:'#66E2A5', warn:'#FFD15C', bad:'#FF6B72' },
-  light: { accent:'#6366F1', secondary:'#7C3AED', good:'#22C55E', warn:'#F97316', bad:'#DC2626' },
+  dark: { accent:'#2FD5FF', secondary:'#8B7BFF', blue:'#7D8CFF', good:'#66E2A5', warn:'#FFD15C', bad:'#FF6B72' },
+  light: { accent:'#6366F1', secondary:'#7C3AED', blue:'#A855F7', good:'#22C55E', warn:'#F97316', bad:'#DC2626' },
 };
 const SURFACE_ONLY_KEEP = /^--(bg|bg-2|bg-page|bg-card|panel|panel-navy|panel-2|accordion-bg|primary-light|btn-secondary-bg|surface-control|surface-sunken|palette-.+|game-pixel-.+|liquid-.+|rail-.+)$/;
 export function paletteTokens(palette,mode) {
@@ -77,7 +77,7 @@ export function paletteTokens(palette,mode) {
   };
   const mappings={cyan:accent,teal:secondary,blue:secondary,purple:secondary,pink:accent,good,warn,bad,'danger-red':bad,'rpt-blue':accent,'rpt-purple':secondary,'accent-decorative':accent,'accent-blue-2':accent,'hover-flip':accent,'tier-gold':warn,'palette-primary':raw,'palette-secondary':colors[palette.secondary]};
   for(const [name,value] of Object.entries(mappings))tokens[`--${name}-rgb`]=rgb(value).join(',');
-  for(const [name,value] of Object.entries({cyan:accent,blue:secondary,pink:accent,good,warn,bad}))tokens[`--palette-on-${name}`]=contrast(value,'#10121d')>=contrast(value,'#ffffff')?'#10121d':'#ffffff';
+  for(const [name,value] of Object.entries({cyan:accent,blue:fixed?fixed.blue:secondary,pink:accent,good,warn,bad}))tokens[`--palette-on-${name}`]=contrast(value,'#10121d')>=contrast(value,'#ffffff')?'#10121d':'#ffffff';
   for(const [name,value] of Object.entries({work:raw,break:warn,lunch:colors[palette.secondary]})) {
     tokens[`--liquid-${name}-rgb`]=rgb(value).join(',');tokens[`--rail-${name}-rgb`]=rgb(value).join(',');
   }
