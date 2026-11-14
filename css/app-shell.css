@@ -1245,14 +1245,14 @@ html.theme-light .hero-shift-actions:not(.is-collapsed) .hero-shift-toggle { bac
 
 /* Colapsado: solo queda el título + el círculo. */
 .chips > .hero-shift-actions.is-collapsed > .action-btn,
-.chips > .hero-shift-actions.is-collapsed > .hero-shift-sep,
 .hero-shift-actions.is-collapsed #callsControlsGrid,
 .hero-shift-actions.is-collapsed #callsControlsGrid:has(#callControlBtn.is-active) { display: none !important; }
 
 /* Colapsado: una franja con los seis botones, solo iconos en pantallas angostas y con etiqueta desde 1400 px. */
-.chips > .hero-shift-actions.is-collapsed { display: flex; align-items: center; gap: 4px; padding: 6px 8px 6px 12px; border-radius: 14px; }
-.chips > .hero-shift-actions.is-collapsed > .hero-shift-toggle { order: 9; flex: 0 0 auto; margin-left: 4px; }
-.hero-shift-short { display: none; }
+.chips > .hero-shift-actions.is-collapsed { position: relative; display: flex; align-items: center; justify-content: center; gap: 4px; padding: 6px 46px; border-radius: 14px; }
+.chips > .hero-shift-actions.is-collapsed > .hero-shift-toggle { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); margin: 0; }
+/* Separador entre los 3 botones de turno y los 3 de llamadas. */
+.chips > .hero-shift-actions.is-collapsed:not(.calls-off) > .hero-shift-sep { display: block !important; flex: 0 0 2px; width: 2px; height: 24px; align-self: center; margin: 0 6px; border-radius: 2px; background: var(--line-2, var(--line)); }
 .chips > .hero-shift-actions.is-collapsed > #shiftControlBtn,
 .chips > .hero-shift-actions.is-collapsed > #breakControlBtn,
 .chips > .hero-shift-actions.is-collapsed > #lunchControlBtn { display: flex !important; }
@@ -1277,13 +1277,10 @@ html.theme-light .hero-shift-actions:not(.is-collapsed) .hero-shift-toggle { bac
 .chips > .hero-shift-actions.is-collapsed > #breakControlBtn .action-label,
 .chips > .hero-shift-actions.is-collapsed > #lunchControlBtn .action-label,
 .chips > .hero-shift-actions.is-collapsed:not(.calls-off) #callsControlsGrid .action-btn .action-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-@media (max-width: 1399px) {
-  .chips > .hero-shift-actions.is-collapsed > .hero-shift-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-  .chips > .hero-shift-actions.is-collapsed > .hero-shift-short { display: block; flex: 1 1 auto; min-width: 0; margin-right: auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); font-size: 13px; font-weight: 800; }
-}
+/* Plegada no muestra texto (decía "Hoy" aunque se cambiara de día): el título queda solo para lectores de pantalla. */
+.chips > .hero-shift-actions.is-collapsed > .hero-shift-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 @media (min-width: 1400px) {
   .chips > .hero-shift-actions.is-collapsed { gap: 6px; }
-  .chips > .hero-shift-actions.is-collapsed > .hero-shift-title { flex: 1; min-width: 0; font-size: 13px; }
   .chips > .hero-shift-actions.is-collapsed > #shiftControlBtn,
   .chips > .hero-shift-actions.is-collapsed > #breakControlBtn,
   .chips > .hero-shift-actions.is-collapsed > #lunchControlBtn,
