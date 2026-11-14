@@ -36,12 +36,6 @@
       "terminos.html"
     ]
   },
-  "s_008c41c1": {
-    "source": "No cuenta Break/Lunch. Déjalo vacío y guarda para volver al mensaje original.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_00965780": {
     "source": "Preferencias de la interfaz: tema, avisos, sonidos.",
     "files": [
@@ -470,6 +464,12 @@
     "source": "pausas",
     "files": [
       "js/reinforcement-rules.js"
+    ]
+  },
+  "s_0737280d": {
+    "source": "Avisar tras",
+    "files": [
+      "app.html"
     ]
   },
   "s_0749314b": {
@@ -2954,6 +2954,12 @@
       "js/game.js"
     ]
   },
+  "s_2b918bfc": {
+    "source": "Apagado: una sola vez.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_2b93cc13": {
     "source": "Contraer bloques al terminar",
     "files": [
@@ -3959,12 +3965,6 @@
     "source": "Destino del dinero",
     "files": [
       "js/finance-review.js"
-    ]
-  },
-  "s_39e82d05": {
-    "source": "Avisar tras estos minutos de trabajo sin llamadas",
-    "files": [
-      "app.html"
     ]
   },
   "s_39edda14": {
@@ -7233,6 +7233,12 @@
       "js/game.js"
     ]
   },
+  "s_6cd2f1d3": {
+    "source": "Repetir el aviso",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_6ce6e40d": {
     "source": "Higher Rate · ¡golpe crítico!",
     "files": [
@@ -10393,12 +10399,6 @@
       "js/reports.js"
     ]
   },
-  "s_98ca10b0": {
-    "source": "Repetir mientras siga sin llamadas",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_98ce6844": {
     "source": "Tres cosas que hiciste bien hoy",
     "files": [
@@ -11838,12 +11838,6 @@
       "js/app-main.js"
     ]
   },
-  "s_adf04ef1": {
-    "source": "Guardar aviso",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_ae2da05c": {
     "source": "Un pago actualiza el historial del mes de su fecha. La reserva se conserva hasta que la liberes; tus llamadas y ganancias no cambian.",
     "files": [
@@ -12109,6 +12103,12 @@
   },
   "s_b285539d": {
     "source": "Todo",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_b2a11573": {
+    "source": "No cuenta Break ni Lunch. Vacío y guardar vuelve al mensaje original.",
     "files": [
       "app.html"
     ]
@@ -13295,6 +13295,12 @@
     "source": "Premios para cerrar tu turno",
     "files": [
       "js/positive-reinforcement.js"
+    ]
+  },
+  "s_c5f7fbe1": {
+    "source": "minutos de trabajo sin llamadas",
+    "files": [
+      "app.html"
     ]
   },
   "s_c60abeb8": {
