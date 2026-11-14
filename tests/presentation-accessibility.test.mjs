@@ -191,3 +191,16 @@ test('every theme uses one color for page and card, and the softened grays reach
   }
   assert.equal(retouched.length,6,'six themes get the softened gray: '+retouched.join(', '));
 });
+
+test('collapsed actions bar opens only the active break, lunch or call button and shows its timer', () => {
+  const css = fs.readFileSync('css/app-shell.css', 'utf8');
+  const html = fs.readFileSync('app.html', 'utf8');
+  const hidden = /\.is-collapsed[^{]*\.action-sub[^{]*\{[^}]*display:\s*none/;
+  assert.ok(hidden.test(css), 'inactive collapsed buttons still hide their timer');
+  for (const id of ['breakControlBtn', 'lunchControlBtn', 'callControlBtn']) {
+    assert.ok(html.includes(`id="${id}"`), `${id} exists`);
+    const shows = new RegExp(`#${id}\\.is-active \\.action-sub[^{]*\\{[^}]*display:\\s*block`);
+    assert.ok(shows.test(css), `${id}: active button shows its timer when the bar is collapsed`);
+  }
+  assert.ok(!/#shiftControlBtn\.is-active \.action-sub[^{]*\{[^}]*display:\s*block/.test(css), 'the shift button keeps its icon-only look');
+});
