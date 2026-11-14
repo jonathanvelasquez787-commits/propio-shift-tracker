@@ -7052,7 +7052,7 @@
     .earnings-breakdown .fin-row-converted-inline { display: block; white-space: normal; }
 #higherRateReviewModal [hidden] { display: none !important; }
 .recovery-modal { width: min(680px, 94vw); min-width: 0; }
-.recovery-overview { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 16px; border: 1px solid rgba(var(--cyan-rgb), .24); border-radius: var(--radius-sm, 16px); background: linear-gradient(125deg, rgba(var(--cyan-rgb), .12), rgba(var(--blue-rgb), .05)); }
+.recovery-overview { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 16px; border: 1px solid rgba(var(--cyan-rgb), .24); border-radius: var(--radius-sm, 16px); background: var(--panel-navy); }
 .recovery-overview p { margin: 5px 0 0; font-size: 12px; line-height: 1.5; color: var(--muted); }
 .recovery-symbol, .recovery-empty > span { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 13px; color: var(--cyan); background: rgba(var(--cyan-rgb), .12); font-size: 27px; font-weight: 800; }
 .recovery-count { font-size: 24px; font-weight: 900; color: var(--cyan); }
@@ -7555,7 +7555,7 @@
        renderHigherRateDayStats. */
     .hero-today.is-live {
       border-color: rgba(var(--live-rgb, var(--good-rgb)), .4);
-      background: radial-gradient(circle 200px at 100% 0%, rgba(var(--live-rgb, var(--good-rgb)), .14), transparent), rgba(var(--live-rgb, var(--good-rgb)), .05);
+      background: rgba(var(--live-rgb, var(--good-rgb)), .08);
     }
     .hero-today-top {
       display: flex;
