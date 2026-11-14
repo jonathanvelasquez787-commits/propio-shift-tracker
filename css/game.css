@@ -138,7 +138,7 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
   border: 1px solid rgba(var(--tier-gold-rgb, 255, 215, 110), .48);
   border-radius: 14px;
   padding: 10px 12px;
-  background: linear-gradient(135deg, rgba(var(--tier-gold-rgb, 255, 215, 110), .12), rgba(var(--rpt-purple-rgb), .08));
+  background: rgba(var(--tier-gold-rgb, 255, 215, 110), .1);
   color: var(--text);
   overflow-wrap: anywhere;
 }
@@ -156,9 +156,7 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
   overflow: hidden;
   border: 1px solid rgba(var(--rpt-purple-rgb), .42);
   border-radius: 19px;
-  background:
-    radial-gradient(circle at 86% 24%, rgba(var(--rpt-purple-rgb), .18), transparent 36%),
-    linear-gradient(135deg, rgba(var(--rpt-purple-rgb), .11), rgba(var(--cyan-rgb), .06));
+  background: var(--panel-navy);
   box-shadow: var(--shadow);
 }
 
@@ -425,7 +423,7 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
   padding: 14px;
   border: 1px solid rgba(var(--tier-gold-rgb, 255, 215, 110), .35);
   border-radius: 16px;
-  background: linear-gradient(135deg, rgba(var(--tier-gold-rgb, 255, 215, 110), .08), rgba(var(--rpt-purple-rgb), .07));
+  background: var(--panel-navy);
 }
 .game-cycle-boss-head h3 { color: var(--text); }
 .game-cycle-boss-body { display: grid; grid-template-columns: minmax(0, 1fr) 100px; align-items: center; gap: 16px; margin-top: 10px; }
@@ -465,7 +463,7 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 .game-day-panels .game-monster-stage { align-self: center; }
 .game-achievements-hero,
 .game-panel { border: 1px solid var(--card-line); border-radius: var(--radius); background: var(--panel-navy); box-shadow: var(--shadow); }
-.game-achievements-hero { padding: 14px; background: radial-gradient(circle at 88% 10%, rgba(var(--rpt-purple-rgb), .16), transparent 35%), var(--panel-navy); }
+.game-achievements-hero { padding: 14px; background: var(--panel-navy); }
 .game-page-kicker { display: flex; align-items: center; gap: 7px; }
 .game-page-kicker .ic-svg { width: 15px; height: 15px; color: var(--tier-gold); }
 .game-achievements-hero-row { align-items: end; margin-top: 8px; }
@@ -864,15 +862,15 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 .game-toast { max-width: 100%; overflow: hidden; contain: layout paint; opacity: 0; transform: translateX(10px); transition: opacity .2s var(--ease-out), transform .2s var(--ease-out); will-change: opacity, transform; }
 .game-toast.show { opacity: 1; transform: translateX(0); }
 .game-toast--loot,
-.game-toast[data-tone="loot"] { border-color: rgba(var(--tier-gold-rgb, 255, 215, 110), .58); background: linear-gradient(135deg, rgba(var(--tier-gold-rgb, 255, 215, 110), .14), var(--panel-navy)); }
+.game-toast[data-tone="loot"] { border-color: rgba(var(--tier-gold-rgb, 255, 215, 110), .58); background: var(--panel-navy); }
 .game-toast--loot .ic-svg,
 .game-toast[data-tone="loot"] .ic-svg { color: var(--tier-gold); }
 .game-toast--record,
-.game-toast[data-tone="record"] { border-color: rgba(var(--good-rgb), .58); background: linear-gradient(135deg, rgba(var(--good-rgb), .12), var(--panel-navy)); }
+.game-toast[data-tone="record"] { border-color: rgba(var(--good-rgb), .58); background: var(--panel-navy); }
 .game-toast--record .ic-svg,
 .game-toast[data-tone="record"] .ic-svg { color: var(--good); }
 .game-toast--rare,
-.game-toast[data-tone="rare"] { border-color: rgba(var(--pink-rgb), .58); background: linear-gradient(135deg, rgba(var(--pink-rgb), .12), var(--panel-navy)); }
+.game-toast[data-tone="rare"] { border-color: rgba(var(--pink-rgb), .58); background: var(--panel-navy); }
 .game-toast--rare .ic-svg,
 .game-toast[data-tone="rare"] .ic-svg { color: var(--pink); }
 
@@ -1041,7 +1039,7 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 
 .game-arena[data-game-phase="guarded"] { border-color: rgba(var(--tier-gold-rgb, 255, 215, 110), .64); }
 .game-arena[data-game-phase="guarded"] .game-monster-armor { opacity: 1; border-color: var(--tier-gold); }
-.game-arena[data-game-phase="fury"] { border-color: rgba(var(--bad-rgb), .6); background: linear-gradient(135deg, rgba(var(--bad-rgb), .09), rgba(var(--tier-gold-rgb, 255, 215, 110), .08)); }
+.game-arena[data-game-phase="fury"] { border-color: rgba(var(--bad-rgb), .6); background: var(--panel-navy); }
 .game-arena[data-game-phase="vulnerable"] { border-color: rgba(var(--good-rgb), .62); }
 .game-arena[data-game-phase="vulnerable"] .game-monster-sprite { color: var(--good); }
 .game-arena[data-game-phase="defeated"],
@@ -1129,7 +1127,7 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
   padding: 12px 14px;
   border: 1px solid rgba(var(--good-rgb), .38);
   border-radius: 14px;
-  background: linear-gradient(120deg, rgba(var(--good-rgb), .09), rgba(var(--cyan-rgb), .045)), var(--panel-navy);
+  background: var(--panel-navy);
 }
 .positive-evidence-card > div:first-child { display: grid; gap: 4px; min-width: 0; }
 .positive-evidence-card > div:first-child > span { color: var(--good); font-family: var(--font-mono); font-size: 9px; font-weight: 950; letter-spacing: .1em; }

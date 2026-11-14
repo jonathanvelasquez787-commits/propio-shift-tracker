@@ -43,7 +43,6 @@
 .sidebar-appearance-btn:focus-visible { outline:2px solid var(--cyan); outline-offset:3px; }
 html:root[data-palette]:not([data-palette="original"]) body { background:var(--bg); }
 html:root[data-palette]:not([data-palette="original"]) :is(.hero,.card,.mini,.table-card,.list-card,.accordion-card,.sidebar-nav,.modal-card) { background:var(--panel-navy); border-color:var(--card-line); box-shadow:var(--shadow); }
-html:root[data-palette]:not([data-palette="original"]) .hero { background:linear-gradient(110deg,var(--palette-hero-tint),var(--panel-navy) 65%); }
 html:root[data-palette]:not([data-palette="original"]) .brand { color:var(--pale-cyan); background:rgba(var(--palette-primary-rgb),.08); border-color:rgba(var(--palette-primary-rgb),.24); }
 html:root[data-palette]:not([data-palette="original"]) :is(.chip,.summary-pill,.hero-action-btn):not(.danger) { background:var(--panel-2); border-color:var(--line); color:var(--text); }
 html:root[data-palette]:not([data-palette="original"]) .hero-action-btn.danger { background:rgba(var(--bad-rgb),.06); color:var(--bad); border-color:rgba(var(--bad-rgb),.25); }
@@ -70,7 +69,7 @@ html:root[data-palette]:not([data-palette="original"]) :is(.fin-header-icon,.mc-
 html:root[data-palette]:not([data-palette="original"]) :is(.fin-available-card,.mc-info-box,.gh-goal-card) { background:var(--palette-card-tint); border-color:rgba(var(--palette-primary-rgb),.25); }
 html:root[data-palette]:not([data-palette="original"]) .fin-available-label { color:var(--cyan); }
 html:root[data-palette]:not([data-palette="original"]) .sidebar-link.active { background:var(--palette-card-tint); color:var(--cyan); }
-html:root[data-palette]:not([data-palette="original"]) :is(.game-arena,.game-achievements-hero,.game-cycle-boss) { background:linear-gradient(125deg,var(--palette-hero-tint),var(--panel-navy)); }
+html:root[data-palette]:not([data-palette="original"]) :is(.game-arena,.game-achievements-hero,.game-cycle-boss) { background:var(--panel-navy); }
 html:root[data-palette]:not([data-palette="original"]) :is(.game-panel,.game-missions) { background:var(--panel-navy); }
 @media(max-width:800px) { .appearance-palette-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media(max-width:650px) {
