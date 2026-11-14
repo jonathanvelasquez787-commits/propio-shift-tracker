@@ -1277,6 +1277,17 @@ html.theme-light .hero-shift-actions:not(.is-collapsed) .hero-shift-toggle { bac
 .chips > .hero-shift-actions.is-collapsed > #breakControlBtn .action-label,
 .chips > .hero-shift-actions.is-collapsed > #lunchControlBtn .action-label,
 .chips > .hero-shift-actions.is-collapsed:not(.calls-off) #callsControlsGrid .action-btn .action-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+/* Plegada inteligente: el botón de Break, Lunch o llamada que está en curso se abre y muestra su tiempo (ej. 00:12:30). Los demás siguen siendo solo un icono. */
+.chips > .hero-shift-actions.is-collapsed > #breakControlBtn.is-active,
+.chips > .hero-shift-actions.is-collapsed > #lunchControlBtn.is-active,
+.chips > .hero-shift-actions.is-collapsed:not(.calls-off) #callsControlsGrid #callControlBtn.is-active {
+  flex: 0 0 auto; max-width: none; gap: 6px; padding: 0 10px 0 6px;
+}
+.chips > .hero-shift-actions.is-collapsed > #breakControlBtn.is-active .action-sub,
+.chips > .hero-shift-actions.is-collapsed > #lunchControlBtn.is-active .action-sub,
+.chips > .hero-shift-actions.is-collapsed:not(.calls-off) #callsControlsGrid #callControlBtn.is-active .action-sub {
+  display: block; font-size: 11px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; overflow-wrap: normal;
+}
 /* Plegada no muestra texto (decía "Hoy" aunque se cambiara de día): el título queda solo para lectores de pantalla. */
 .chips > .hero-shift-actions.is-collapsed > .hero-shift-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 @media (min-width: 1400px) {
