@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
+const financeJs = readFileSync(new URL('../js/finance.js', import.meta.url), 'utf8');
+
 const html = readFileSync(new URL('../app.html', import.meta.url), 'utf8');
 const css = readFileSync(new URL('../css/app-shell.css', import.meta.url), 'utf8');
 const sectionStart = html.indexOf('id="financeSection"');
@@ -29,4 +31,10 @@ test('Finanzas: en celular el resumen Total va en filas con el monto a la derech
   assert.match(css, /#pageFinance \.wk-total-metrics\{flex-direction:column/);
   assert.match(css, /#pageFinance \.wk-total-metric\{display:flex;justify-content:space-between/);
   assert.match(css, /#financeSection \.fin-top\{border:1px solid var\(--line\)/);
+});
+
+test('Finanzas: el resumen de Total gastos dice "Presupuestado" junto a Reservado y Pendiente', () => {
+  const row = financeJs.slice(financeJs.indexOf('function financeTotalsRowHtml'), financeJs.indexOf('export function renderFinanceSection'));
+  assert.match(row, /translateText\('Presupuestado'\)/);
+  assert.doesNotMatch(row, /translateText\('Presupuesto'\)/);
 });

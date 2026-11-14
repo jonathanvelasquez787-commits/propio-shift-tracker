@@ -369,7 +369,7 @@ function financeTotalsRowHtml(label, targetTotal, assignedTotal, assignedLabel, 
     <div class="wk-total-row" style="margin-bottom: 4px;">
       <div class="wk-total-label">${escapeHtml(label)}</div>
       <div class="wk-total-metrics">
-        <div class="wk-total-metric"><span class="wk-total-metric-label">${label === translateText('Total metas') ? translateText('Objetivo') : translateText('Presupuesto')}</span><strong>${money(targetTotal)}</strong>${financeConvertedInline(targetTotal)}</div>
+        <div class="wk-total-metric"><span class="wk-total-metric-label">${label === translateText('Total metas') ? translateText('Objetivo') : translateText('Presupuestado')}</span><strong>${money(targetTotal)}</strong>${financeConvertedInline(targetTotal)}</div>
         <div class="wk-total-metric"><span class="wk-total-metric-label">${escapeHtml(assignedLabel)}</span><strong>${money(assignedTotal)}</strong>${financeConvertedInline(assignedTotal)}</div>
         <div class="wk-total-metric"><span class="wk-total-metric-label">Pendiente de reservar</span><strong>${money(remaining)}</strong>${financeConvertedInline(remaining)}</div>
       </div>

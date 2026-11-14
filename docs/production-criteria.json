@@ -1119,7 +1119,8 @@
           "namedCases": [
             "Finanzas: la parte de arriba es un solo bloque con título, siguiente prioridad, disponible y casilla",
             "Finanzas: el texto largo de la casilla automática va detrás de una \"i\"",
-            "Finanzas: en celular el resumen Total va en filas con el monto a la derecha"
+            "Finanzas: en celular el resumen Total va en filas con el monto a la derecha",
+            "Finanzas: el resumen de Total gastos dice \"Presupuestado\" junto a Reservado y Pendiente"
           ]
         },
         {
