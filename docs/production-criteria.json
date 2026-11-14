@@ -1940,7 +1940,8 @@
             "modo freelancer: un día pasado por debajo de la meta falla y uno sin actividad se salta",
             "modo freelancer: hoy por debajo de la meta queda pendiente, no fallido",
             "modo freelancer: los días anteriores a la fecha de activación siguen con la lógica de Adherencia",
-            "sin modo freelancer no cambia el comportamiento previo"
+            "sin modo freelancer no cambia el comportamiento previo",
+            "aviso de descanso: \"Ahora no\" calla el tramo vigente y \"Posponer\" nunca queda sin tiempo"
           ]
         }
       ]
