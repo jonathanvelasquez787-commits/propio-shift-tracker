@@ -55,6 +55,14 @@
       ],
       "tests": [
         {
+          "file": "tests/schedule-block-card-layout.test.mjs",
+          "namedCases": [
+            "tarjeta de bloque del día: dos líneas, con tipo, horas y × arriba",
+            "tarjeta de bloque del día: duración y meta productiva comparten la línea de abajo",
+            "tarjeta de bloque del día: ya no muestra el subtítulo fijo ni el símbolo de orden"
+          ]
+        },
+        {
           "file": "tests/shift-work-review.test.mjs",
           "namedCases": [
             "shift confirmation explains active work and changes nothing before acceptance",

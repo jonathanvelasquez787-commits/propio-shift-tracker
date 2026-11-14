@@ -4527,7 +4527,7 @@
       grid-template-columns: 44px 22px 1fr;
       gap: 10px;
       align-items: stretch;
-      padding: 0 0 18px;
+      padding: 0 0 10px;
     }
     .sched-tl-item:last-child { padding-bottom: 0; }
     .sched-tl-hour {
@@ -4573,9 +4573,9 @@
 
     .sched-tl-card {
       display: grid;
-      gap: 10px;
-      padding: 13px 14px;
-      border-radius: 16px;
+      gap: 7px;
+      padding: 8px 10px;
+      border-radius: 12px;
       border: 1px solid var(--line);
       background: rgba(var(--blue-rgb), .10);
       border-left: 3px solid rgba(var(--blue-rgb), .55);
@@ -4595,7 +4595,14 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 10px;
+      gap: 6px 8px;
+    }
+    .sched-tl-card-bottom {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px 8px;
     }
     .sched-tl-icon {
       flex: 0 0 auto;
@@ -4619,7 +4626,7 @@
     }
 
     .sched-tl-titles {
-      flex: 1 1 160px;
+      flex: 1 1 60px;
       min-width: 0;
     }
     /* El <select> de Tipo se pinta como texto, sin apariencia nativa. */
@@ -4644,6 +4651,7 @@
       color: var(--blue);
       outline: none;
     }
+    .sched-tl-subtitle:empty { display: none; }
     .sched-tl-subtitle {
       margin-top: 1px;
       color: var(--muted);
@@ -4670,15 +4678,6 @@
       color: var(--good);
       background: rgba(var(--good-rgb), .13);
       border-color: rgba(var(--good-rgb), .3);
-    }
-    .sched-tl-handle {
-      flex: 0 0 auto;
-      color: var(--muted);
-      font-size: 13px;
-      letter-spacing: -2px;
-      cursor: grab;
-      opacity: .45;
-      user-select: none;
     }
     /* Selector reforzado (3 clases) para ganarle a `.block-row .block-remove-btn`. */
     .sched-tl-item .block-remove-btn.sched-tl-remove {
@@ -4741,10 +4740,14 @@
     .sched-tl-time-input::-webkit-calendar-picker-indicator {
       display: none;
     }
-    .sched-tl-goal {
-      padding: 8px 10px;
+    .block-row .sched-tl-goal {
+      flex: 0 1 auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 2px 8px;
       margin: 0;
-      border-radius: 10px;
+      border-radius: 8px;
       background: rgba(var(--blue-rgb), .06);
       border: 1px solid rgba(var(--blue-rgb), .16);
     }
@@ -4754,6 +4757,8 @@
     }
     .sched-tl-goal input {
       font-size: 13px;
+      width: 52px;
+      text-align: right;
     }
 
     @media (max-width: 760px) {
@@ -4766,29 +4771,9 @@
       .sched-tl-rail::before { width: 1.5px; }
       .sched-tl-dot { width: 9px; height: 9px; margin-top: 5px; border-width: 1.5px; }
       .sched-tl-icon { width: 28px; height: 28px; font-size: 13px; }
-      .sched-tl-handle { display: none; }
-      .sched-tl-time-input { font-size: 13.5px; max-width: 72px; }
+      .sched-tl-time-input { font-size: 13.5px; max-width: 62px; }
 
-      .sched-tl-card-top {
-        display: grid;
-        grid-template-columns: auto 1fr auto;
-        grid-template-areas:
-          "icon title title"
-          "time time time"
-          "dur  dur  remove";
-        row-gap: 6px;
-        column-gap: 8px;
-      }
-      .sched-tl-icon { grid-area: icon; }
-      .sched-tl-titles { grid-area: title; flex: unset; }
-      .sched-tl-time-inline { grid-area: time; flex: unset; }
-      .sched-tl-duration { grid-area: dur; justify-self: start; }
-      .sched-tl-item .block-remove-btn.sched-tl-remove {
-        grid-area: remove;
-        justify-self: end;
-        align-self: center;
-        opacity: 1;
-      }
+      .sched-tl-item .block-remove-btn.sched-tl-remove { opacity: 1; }
     }
 
     .sched-timeline-add-row {

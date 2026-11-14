@@ -865,12 +865,6 @@
       "app.html"
     ]
   },
-  "s_0c3d1da5": {
-    "source": "Enfoque y productividad",
-    "files": [
-      "js/schedule.js"
-    ]
-  },
   "s_0c4256d2": {
     "source": "Consultá el origen de los tiempos y los registros disponibles.",
     "files": [
@@ -3141,8 +3135,7 @@
   "s_2ebf6c74": {
     "source": "Almuerzo / Descanso largo",
     "files": [
-      "app.html",
-      "js/schedule.js"
+      "app.html"
     ]
   },
   "s_2eca4db5": {
@@ -3431,12 +3424,6 @@
     "source": "Detalles",
     "files": [
       "app.html"
-    ]
-  },
-  "s_32498034": {
-    "source": "Eliminar bloque {{v13}}",
-    "files": [
-      "js/schedule.js"
     ]
   },
   "s_324b106f": {
@@ -6253,6 +6240,12 @@
     "source": "Por mes",
     "files": [
       "js/finance.js"
+    ]
+  },
+  "s_5d2e7a8e": {
+    "source": "Eliminar bloque {{v11}}",
+    "files": [
+      "js/schedule.js"
     ]
   },
   "s_5d341394": {
@@ -9072,8 +9065,7 @@
   "s_877a44a8": {
     "source": "{{v7}}{{v8}}",
     "files": [
-      "js/reports.js",
-      "js/schedule.js"
+      "js/reports.js"
     ]
   },
   "s_878ecf76": {
@@ -9140,12 +9132,6 @@
     "source": "Renta",
     "files": [
       "js/finance.js"
-    ]
-  },
-  "s_87ffbe84": {
-    "source": "Descanso corto",
-    "files": [
-      "js/schedule.js"
     ]
   },
   "s_881adcbf": {
@@ -15387,12 +15373,6 @@
     "source": "Meta pendiente",
     "files": [
       "js/game-review.js"
-    ]
-  },
-  "s_e3999b44": {
-    "source": "Orden (informativo)",
-    "files": [
-      "js/schedule.js"
     ]
   },
   "s_e3b7fffc": {
