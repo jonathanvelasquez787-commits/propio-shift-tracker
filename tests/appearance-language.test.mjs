@@ -28,14 +28,12 @@ test('production locale deduplication reconstructs every translation and placeho
 test('all custom palettes have readable normal text and restore original without removing unrelated variables', () => {
   const properties = new Map([['--user-test', 'keep']]);
   const root = { dataset: {}, style: { setProperty: (key, value) => properties.set(key, value), removeProperty: key => properties.delete(key) } };
-  // Grafito solo pone fondos y deja texto y acentos a los de Original, así que no define estos tokens.
-  for (const mode of ['light', 'dark']) for (const palette of PALETTES.slice(1).filter(item => item.id !== 'graphite')) {
+  // Las paletas solo cambian los fondos; texto, bordes y acentos vienen de Original.
+  for (const mode of ['light', 'dark']) for (const palette of PALETTES.slice(1)) {
     const tokens = paletteTokens(palette, mode);
-    for (const color of ['--text', '--muted', '--primary']) assert.ok(contrast(tokens[color], tokens['--panel']) >= 4.5, `${palette.id}/${mode}/${color}`);
-    // Las tarjetas se dibujan con borde (--card-line): la separación puede venir de las superficies
-    // o, en paletas de negros muy cercanos, del borde contra la página o la tarjeta.
-    const separation = Math.max(contrast(tokens['--bg'], tokens['--panel']), contrast(tokens['--card-line'], tokens['--bg']), contrast(tokens['--card-line'], tokens['--panel']));
-    assert.ok(separation >= (mode === 'light' ? 1.18 : 1.25), `${palette.id}/${mode}: page and cards must remain distinct`);
+    for (const key of ['--text', '--muted', '--line', '--card-line', '--cyan', '--primary', '--good', '--bad']) assert.equal(tokens[key], undefined, `${palette.id}/${mode}/${key} must come from Original`);
+    // Grafito usa negros muy cercanos a propósito (1.07 entre página y tarjeta), así que no se le pide separación.
+    if (palette.id !== 'graphite') assert.ok(contrast(tokens['--bg'], tokens['--panel']) >= (mode === 'light' ? 1.18 : 1.25) || contrast(tokens['--bg'], tokens['--panel-2']) >= 1.25, `${palette.id}/${mode}: page and cards must remain distinct`);
     applySavedColors({ palette: palette.id, theme: mode, language: 'en' }, root);
     assert.equal(root.lang, 'en');
     assert.equal(properties.get('--bg'), tokens['--bg']);

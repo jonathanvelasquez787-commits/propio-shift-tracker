@@ -30,19 +30,19 @@ const PALETTE_SURFACES = {
   sage: { light:['#CDE3D3','#EAF4E8','#DCECDF'], dark:['#162A28','#29423D','#36534A'] },
   graphite: { light:['#F4F4F5','#FFFFFF','#EBEBEE'], dark:['#09090B','#131315','#1E1E22'] },
 };
-// Grafito solo cambia los tres negros de fondo: el resto de colores (texto, bordes, botones,
+// Todas las paletas solo cambian los fondos: el resto de colores (texto, bordes, botones,
 // acentos) se queda con los de Original. Estos valores solo alimentan los tokens --palette-*.
-const GRAPHITE_ORIGINAL = {
+const ORIGINAL_ACCENTS = {
   dark: { accent:'#2FD5FF', secondary:'#8B7BFF', good:'#66E2A5', warn:'#FFD15C', bad:'#FF6B72' },
   light: { accent:'#6366F1', secondary:'#7C3AED', good:'#22C55E', warn:'#F97316', bad:'#DC2626' },
 };
-const GRAPHITE_KEEP = /^--(bg|bg-2|bg-page|bg-card|panel|panel-navy|panel-2|accordion-bg|primary-light|btn-secondary-bg|surface-control|surface-sunken|palette-.+|game-pixel-.+|liquid-.+|rail-.+)$/;
+const SURFACE_ONLY_KEEP = /^--(bg|bg-2|bg-page|bg-card|panel|panel-navy|panel-2|accordion-bg|primary-light|btn-secondary-bg|surface-control|surface-sunken|palette-.+|game-pixel-.+|liquid-.+|rail-.+)$/;
 export function paletteTokens(palette,mode) {
   if(palette.id==='original')return {};
   const light=mode==='light',colors=palette.colors;
   const deep=palette.id==='ocean'?colors[3]:colors[0];
   const [background,panel,panel2]=PALETTE_SURFACES[palette.id][mode];
-  const fixed=palette.id==='graphite'?GRAPHITE_ORIGINAL[mode]:null;
+  const fixed=ORIGINAL_ACCENTS[mode];
   const raw=fixed?fixed.accent:colors[light?palette.lightAccent:palette.darkAccent];
   const surfaces=[panel,panel2,background];
   const accent=fixed?fixed.accent:readable(raw,surfaces),secondary=fixed?fixed.secondary:readable(colors[palette.secondary],surfaces);
@@ -81,6 +81,6 @@ export function paletteTokens(palette,mode) {
   for(const [name,value] of Object.entries({work:raw,break:warn,lunch:colors[palette.secondary]})) {
     tokens[`--liquid-${name}-rgb`]=rgb(value).join(',');tokens[`--rail-${name}-rgb`]=rgb(value).join(',');
   }
-  if(fixed)for(const name of Object.keys(tokens))if(!GRAPHITE_KEEP.test(name))delete tokens[name];
+  if(fixed)for(const name of Object.keys(tokens))if(!SURFACE_ONLY_KEEP.test(name))delete tokens[name];
   return tokens;
 }
