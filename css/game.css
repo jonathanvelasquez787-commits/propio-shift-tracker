@@ -1578,3 +1578,14 @@ html.theme-light {
 .game-logros-tabs button[aria-selected="true"] { background:rgba(var(--cyan-rgb),.14); color:var(--pale-cyan); box-shadow:inset 0 0 0 1px rgba(var(--cyan-rgb),.28); }
 .game-logros-pane { display:grid; gap:14px; min-width:0; }
 .game-logros-pane[hidden] { display:none; }
+
+/* Ajustes de Logros: filas cortas plegadas */
+.game-settings-row { border: 1px solid var(--line); border-radius: 12px; background: var(--bg-2); min-width: 0; }
+.game-settings-row > summary { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 14px; list-style: none; cursor: pointer; font-size: 14px; font-weight: 700; color: var(--text); }
+.game-settings-row > summary::-webkit-details-marker { display: none; }
+.game-settings-row > summary > span { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 8px; }
+.game-settings-row > summary small { font-size: 12px; font-weight: 400; color: var(--muted); }
+.game-settings-row > summary::after { content: '›'; font-size: 22px; color: var(--muted); font-weight: 400; }
+.game-settings-row[open] > summary::after { transform: rotate(90deg); }
+.game-settings-row > summary:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; border-radius: 10px; }
+.game-settings-row-body { padding: 2px 14px 14px; }
