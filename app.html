@@ -388,6 +388,42 @@
 </div><!-- /pageHome -->
 
 <div class="app-page" data-page="schedule" hidden id="pageSchedule" role="main" tabindex="-1">
+<details class="accordion-card sched-v271" id="freelancerAccordion">
+<summary>
+  <div class="accordion-head">
+    <h2><span class="sched-header-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>Modo freelancer</h2>
+    <p>Sin horario fijo: descansos por regla</p>
+  </div>
+  <div class="sched-header-actions">
+    <span class="tag" id="freelancerStatusTag">Desactivado</span>
+    <div class="accordion-chevron"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></div>
+  </div>
+</summary>
+<div class="accordion-body">
+<div class="sched-compact-card">
+<label class="sched-checkbox-row"><input id="freelancerEnabledInput" type="checkbox"/> Activar modo freelancer</label>
+<p class="alert-hint">Sin horario planeado: el aviso de descanso sale cuando acumulas los minutos productivos de «Descanso por productividad» o los minutos conectado de aquí, lo que llegue primero. Desde el aviso eliges Break o Lunch y su duración.</p>
+<div class="sched-compact-row">
+<div class="sched-compact-field"><label for="freelancerBreakMinInput">Break (min)</label><input id="freelancerBreakMinInput" inputmode="numeric" min="1" max="240" step="1" type="number"/></div>
+<div class="sched-compact-field"><label for="freelancerLunchMinInput">Lunch (min)</label><input id="freelancerLunchMinInput" inputmode="numeric" min="1" max="240" step="1" type="number"/></div>
+</div>
+<div class="sched-compact-row">
+<div class="sched-compact-field"><label for="freelancerConnectedMinInput">Avisar tras (min conectado, 0 = apagado)</label><input id="freelancerConnectedMinInput" inputmode="numeric" min="0" max="720" step="1" type="number"/></div>
+<div class="sched-compact-field"><label for="freelancerSnoozeMinInput">Posponer (min)</label><input id="freelancerSnoozeMinInput" inputmode="numeric" min="1" max="60" step="1" type="number"/></div>
+</div>
+<div class="sched-compact-row">
+<div class="sched-compact-field"><label for="freelancerSessionGoalInput">Meta de sesión (min, 0 = sin meta)</label><input id="freelancerSessionGoalInput" inputmode="numeric" min="0" max="1440" step="1" type="number"/></div>
+<div class="sched-compact-field"><label for="freelancerLunchEveryInput">Lunch tras (min conectado, 0 = apagado)</label><input id="freelancerLunchEveryInput" inputmode="numeric" min="0" max="720" step="1" type="number"/></div>
+</div>
+<p class="alert-hint">Plantillas</p>
+<div class="mc-pill-row" id="freelancerTemplateRow" role="group" aria-label="Plantillas">
+<button class="mc-pill-btn" data-fl-template="short" type="button">Sesión corta</button>
+<button class="mc-pill-btn" data-fl-template="medium" type="button">Turno medio</button>
+<button class="mc-pill-btn" data-fl-template="long" type="button">Turno largo</button>
+</div>
+</div>
+</div>
+</details>
 <details class="accordion-card sched-v271" id="scheduleConfigAccordion" open>
 <summary>
   <div class="accordion-head">
@@ -1481,28 +1517,6 @@
 </div>
 <p class="alert-hint" id="callManualAlarmSoundFileStatus" role="status" aria-live="polite">Ningún archivo propio guardado — usando el beep clásico mientras tanto.</p>
 <button class="mc-btn-warn-pill" id="clearCallManualSoundBtn" type="button" title="Quitar sonido personalizado" disabled>Quitar archivo</button>
-</div>
-</div></div></details>
-<details class="polished-setting" id="notificationFreelancerGroup"><summary><span>Modo freelancer<small>Sin horario fijo: descansos por regla</small></span></summary><div class="polished-setting-body"><div class="sched-compact-card">
-<label class="sched-checkbox-row"><input id="freelancerEnabledInput" type="checkbox"/> Activar modo freelancer</label>
-<p class="alert-hint">Sin horario planeado: el aviso de descanso sale cuando acumulas los minutos productivos de «Descanso por productividad» o los minutos conectado de aquí, lo que llegue primero. Desde el aviso eliges Break o Lunch y su duración.</p>
-<div class="sched-compact-row">
-<div class="sched-compact-field"><label for="freelancerBreakMinInput">Break (min)</label><input id="freelancerBreakMinInput" inputmode="numeric" min="1" max="240" step="1" type="number"/></div>
-<div class="sched-compact-field"><label for="freelancerLunchMinInput">Lunch (min)</label><input id="freelancerLunchMinInput" inputmode="numeric" min="1" max="240" step="1" type="number"/></div>
-</div>
-<div class="sched-compact-row">
-<div class="sched-compact-field"><label for="freelancerConnectedMinInput">Avisar tras (min conectado, 0 = apagado)</label><input id="freelancerConnectedMinInput" inputmode="numeric" min="0" max="720" step="1" type="number"/></div>
-<div class="sched-compact-field"><label for="freelancerSnoozeMinInput">Posponer (min)</label><input id="freelancerSnoozeMinInput" inputmode="numeric" min="1" max="60" step="1" type="number"/></div>
-</div>
-<div class="sched-compact-row">
-<div class="sched-compact-field"><label for="freelancerSessionGoalInput">Meta de sesión (min, 0 = sin meta)</label><input id="freelancerSessionGoalInput" inputmode="numeric" min="0" max="1440" step="1" type="number"/></div>
-<div class="sched-compact-field"><label for="freelancerLunchEveryInput">Lunch tras (min conectado, 0 = apagado)</label><input id="freelancerLunchEveryInput" inputmode="numeric" min="0" max="720" step="1" type="number"/></div>
-</div>
-<p class="alert-hint">Plantillas</p>
-<div class="mc-pill-row" id="freelancerTemplateRow" role="group" aria-label="Plantillas">
-<button class="mc-pill-btn" data-fl-template="short" type="button">Sesión corta</button>
-<button class="mc-pill-btn" data-fl-template="medium" type="button">Turno medio</button>
-<button class="mc-pill-btn" data-fl-template="long" type="button">Turno largo</button>
 </div>
 </div></div></details>
 <details class="polished-setting" id="notificationProductivityGroup"><summary><span>Descanso por productividad<small>Minutos, mensajes y sonido</small></span></summary><div class="polished-setting-body"><div class="sched-compact-card">

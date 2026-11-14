@@ -2496,6 +2496,12 @@
       "js/higher-rate.js"
     ]
   },
+  "s_2567cf7e": {
+    "source": "Activado",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_2580a2b2": {
     "source": "Reservado",
     "files": [
@@ -15012,6 +15018,8 @@
   "s_dec67310": {
     "source": "Desactivado",
     "files": [
+      "app.html",
+      "js/app-main.js",
       "js/notification-review.js"
     ]
   },
