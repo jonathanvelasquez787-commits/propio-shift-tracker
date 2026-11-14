@@ -265,3 +265,15 @@ test('sidebar groups Gamificación with Logros, sounds, celebrate calls and brie
   assert.equal(html.split('id="positiveReinforcementEnabledInput"').length, 2);
   assert.equal(html.split('id="positiveAskAfterCallInput"').length, 2);
 });
+
+test('no-calls reminder keeps its controls in compact rows with minutes, repeat and message plus save together', () => {
+  const html = fs.readFileSync('app.html', 'utf8');
+  const start = html.indexOf('id="positiveSettingsAccordion"');
+  const block = html.slice(start, html.indexOf('</details>', start));
+  for (const id of ['positiveInactivityMinutesInput', 'positiveInactivityRepeatInput', 'positiveInactivityMessageInput', 'positiveInactivityMessageSaveBtn', 'positiveInactivityMessageHelp', 'positiveInactivityMessageStatus']) {
+    assert.equal(block.split(`id="${id}"`).length, 2, id);
+  }
+  const controls = block.slice(block.indexOf('class="game-monster-name-controls"'), block.indexOf('id="positiveInactivityMessageHelp"'));
+  assert.ok(controls.includes('positiveInactivityMessageInput') && controls.includes('positiveInactivityMessageSaveBtn'));
+  assert.ok(block.includes('aria-label="Mensaje de apoyo sin llamadas"'));
+});

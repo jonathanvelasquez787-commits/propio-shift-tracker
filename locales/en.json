@@ -3040,5 +3040,10 @@
   "s_87b5c82e": "After each call, mark whether it went well, whether you got through it even though it was hard, or whether it left you with a lesson.",
   "s_af8a3bbc": "A supportive message when a long time passes without calls.",
   "s_c4890840": "No-calls reminder",
-  "s_e5b5a040": "Celebrate calls"
+  "s_e5b5a040": "Celebrate calls",
+  "s_0737280d": "Alert after",
+  "s_2b918bfc": "Off: just once.",
+  "s_6cd2f1d3": "Repeat the alert",
+  "s_b2a11573": "Doesn't count Break or Lunch. Leave empty and save to restore the original message.",
+  "s_c5f7fbe1": "minutes of work without calls"
 }
