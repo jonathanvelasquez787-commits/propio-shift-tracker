@@ -7632,6 +7632,7 @@ export function render() {
       if(!event.target.closest?.('[data-reflection-history]'))return;
       closeModal('positiveReflectionModal');navigateToPage('achievements');
       const target=document.getElementById('positiveHistoryPanel');
+      if(target.tagName==='DETAILS')target.open=true;
       target.scrollIntoView({block:'start'});target.setAttribute('tabindex','-1');target.focus({preventScroll:true});
     });
     document.getElementById('pasteCallsBtn').addEventListener('click', () => {

@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs';
 const html = readFileSync(new URL('../app.html', import.meta.url), 'utf8');
 const css = readFileSync(new URL('../css/game.css', import.meta.url), 'utf8');
 const start = html.indexOf('<div class="game-missions-column">');
-const end = html.indexOf('<section aria-labelledby="gameEquipmentTitle"', start);
+const end = html.indexOf('game-equipment-fold', start);
 const block = html.slice(start, end);
 
 test('Logros: Misiones e Hitos comparten fila y Última victoria con Récords van como tira, sin etiquetas pequeñas', () => {
