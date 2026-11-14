@@ -3518,12 +3518,6 @@
       "index.html"
     ]
   },
-  "s_33610728": {
-    "source": "Cuánto ganaste en cada ventana, día por día",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_336f3a12": {
     "source": "Esperando confirmar la conexión de la extensión",
     "files": [
@@ -5381,12 +5375,6 @@
     "source": "Salida temprana -{{v0}}m",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_4fe6a999": {
-    "source": "Tiempo y bono por día",
-    "files": [
-      "app.html"
     ]
   },
   "s_500bb902": {
@@ -7750,12 +7738,6 @@
     "source": "Llamada iniciada · turno abierto automáticamente",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_74646ce6": {
-    "source": "Ventanas activas",
-    "files": [
-      "app.html"
     ]
   },
   "s_746ca045": {
@@ -12034,6 +12016,12 @@
       "app.html"
     ]
   },
+  "s_b11e6781": {
+    "source": "Ventanas",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_b166ed55": {
     "source": "Se termina la pausa activa y se conserva en el historial.",
     "files": [
@@ -13397,6 +13385,7 @@
   "s_c6d52fbe": {
     "source": "Cómo funciona",
     "files": [
+      "app.html",
       "index.html"
     ]
   },

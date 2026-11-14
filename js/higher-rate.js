@@ -268,28 +268,26 @@ export async function applyHigherRateCorrection(windowId, draft, stamp, mode = '
       }).join('');
       return ui`
         <div class="hr-window-card" data-hr-window-id="${escapeHtml(w.id || '')}" data-tier="${tier}">
-          <div class="hr-window-top">
+          <div class="hr-window-line">
             <div class="hr-window-day">
-              <span class="hr-window-day-icon" aria-hidden="true">${iconHtml('calendar')}</span>
-              <div class="hr-window-day-text">
-                <div class="hr-window-day-name">${escapeHtml(hrWindowWeekdayLabel(w.date))}</div>
-                <input type="date" class="hr-window-date-input hr-window-date-visible" value="${escapeHtml(isoDateFromDayKey(w.date))}" title="Fecha de la ventana" min="1970-01-01" max="2099-12-31"/>
-              </div>
+              <span class="hr-window-day-name">${escapeHtml(hrWindowWeekdayLabel(w.date))}</span>
+              <input type="date" class="hr-window-date-input hr-window-date-visible" value="${escapeHtml(isoDateFromDayKey(w.date))}" title="Fecha de la ventana" min="1970-01-01" max="2099-12-31"/>
             </div>
-            <button type="button" class="hr-window-remove-btn" data-remove-hr-window aria-label="Eliminar ventana"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-          </div>
-          <div class="hr-window-time">
-            <span class="hr-window-time-icon" aria-hidden="true">${iconHtml('clock')}</span>
-            <input type="time" class="hr-window-start-input hr-window-time-input" value="${formatHHMM(w.start)}" title="Hora de inicio"/>
-            <span class="hr-time-sep" aria-hidden="true">–</span>
-            <input type="time" class="hr-window-end-input hr-window-time-input" value="${formatHHMM(w.end)}" title="Hora de fin"/>
+            <div class="hr-window-time">
+              <input type="time" class="hr-window-start-input hr-window-time-input" value="${formatHHMM(w.start)}" title="Hora de inicio"/>
+              <span class="hr-time-sep" aria-hidden="true">–</span>
+              <input type="time" class="hr-window-end-input hr-window-time-input" value="${formatHHMM(w.end)}" title="Hora de fin"/>
+            </div>
           </div>
           <select class="alert-select hr-window-tier-input" style="display:none;">
             <option value="bronze" ${tier === 'bronze' ? 'selected' : ''}>Bronce (+$0.01)</option>
             <option value="silver" ${tier === 'silver' ? 'selected' : ''}>Silver (+$0.02)</option>
             <option value="gold" ${tier === 'gold' ? 'selected' : ''}>Gold (+$0.03)</option>
           </select>
-          <div class="hr-window-tier-row" role="group" aria-label="Nivel de la ventana">${tierButtonsHtml}</div>
+          <div class="hr-window-line hr-window-line-tier">
+            <div class="hr-window-tier-row" role="group" aria-label="Nivel de la ventana">${tierButtonsHtml}</div>
+            <button type="button" class="hr-window-remove-btn" data-remove-hr-window aria-label="Eliminar ventana"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          </div>
         </div>
       `;
     }

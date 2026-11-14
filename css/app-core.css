@@ -7267,9 +7267,8 @@
     .hr-section-head {
       display: flex;
       align-items: center;
-      justify-content: space-between;
       gap: 8px;
-      margin: 18px 0 10px;
+      margin: 14px 0 8px;
     }
     .hr-section-title {
       font-size: 13px;
@@ -7302,40 +7301,6 @@
       border-color: var(--line);
     }
     .hr-count-pill .ic-svg { width: 10px; height: 10px; }
-    .hr-daystats-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin: 18px 0 10px;
-    }
-    .hr-daystats-head-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .hr-daystats-icon {
-      width: 34px;
-      height: 34px;
-      border-radius: 11px;
-      flex: 0 0 auto;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, var(--cyan), var(--blue));
-      color: #07101f;
-    }
-    .hr-daystats-icon .ic-svg { width: 16px; height: 16px; }
-    .hr-daystats-title {
-      font-size: 14.5px;
-      font-weight: 900;
-      letter-spacing: -.01em;
-    }
-    .hr-daystats-sub {
-      font-size: 11.5px;
-      color: var(--muted-3);
-      margin-top: 1px;
-    }
     .hero-today {
       position: relative;
       overflow: hidden;
@@ -7576,43 +7541,35 @@
       .hr-window-grid { grid-template-columns: 1fr; }
     }
     .hr-window-card {
-      border-radius: 16px;
+      border-radius: 12px;
       border: 1px solid var(--line);
       background: rgba(255,255,255,.03);
-      padding: 13px 14px;
+      padding: 8px 10px;
+      display: grid;
+      gap: 7px;
       position: relative;
       transition: border-color .14s ease, background .14s ease;
     }
     .hr-window-card[data-tier="bronze"] { border-color: rgba(224,160,107,.32); background: rgba(224,160,107,.05); }
     .hr-window-card[data-tier="silver"] { border-color: rgba(215,222,230,.28); background: rgba(215,222,230,.04); }
     .hr-window-card[data-tier="gold"] { border-color: rgba(255,215,110,.32); background: rgba(255,215,110,.05); }
-    .hr-window-top {
+    .hr-window-line {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: space-between;
       gap: 8px;
+      flex-wrap: wrap;
+      min-width: 0;
     }
     .hr-window-day {
       display: flex;
-      align-items: center;
-      gap: 9px;
+      align-items: baseline;
+      gap: 7px;
       min-width: 0;
     }
-    .hr-window-day-icon {
-      width: 30px;
-      height: 30px;
-      border-radius: 9px;
-      background: rgba(255,255,255,.05);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex: 0 0 auto;
-      color: var(--text);
-    }
-    .hr-window-day-text { min-width: 0; }
     .hr-window-day-name {
       font-weight: 900;
-      font-size: 13.5px;
+      font-size: 13px;
       letter-spacing: -.01em;
     }
     .hr-window-date-visible {
@@ -7620,9 +7577,8 @@
       border: 0;
       background: transparent;
       padding: 0;
-      margin-top: 1px;
       color: var(--muted);
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 600;
       font-family: inherit;
       outline: none;
@@ -7653,13 +7609,11 @@
     .hr-window-time {
       display: flex;
       align-items: center;
-      gap: 6px;
-      margin-top: 11px;
+      gap: 4px;
       font-size: 12.5px;
       font-weight: 700;
       color: var(--text);
     }
-    .hr-window-time-icon .ic-svg { color: var(--muted); stroke: var(--muted); }
     .hr-window-time-input {
       border: 0;
       background: transparent;
@@ -7678,11 +7632,12 @@
       color: var(--muted);
       font-weight: 400;
     }
+    .hr-window-line-tier { flex-wrap: nowrap; }
     .hr-window-tier-row {
+      flex: 1 1 auto;
       display: flex;
       gap: 2px;
       padding: 3px;
-      margin-top: 12px;
       border-radius: 12px;
       background: rgba(255,255,255,.04);
       border: 1px solid var(--line);
@@ -7690,7 +7645,7 @@
     .hr-window-tier-btn {
       flex: 1;
       text-align: center;
-      padding: 6px 4px;
+      padding: 5px 4px;
       border-radius: 9px;
       font-size: 10.5px;
       font-weight: 800;
@@ -7705,43 +7660,76 @@
     .hr-window-tier-btn[aria-pressed="true"][data-tier="bronze"] { background: var(--tier-bronze); color: #3a2308; }
     .hr-window-tier-btn[aria-pressed="true"][data-tier="silver"] { background: var(--tier-silver); color: #2a2f36; }
     .hr-window-tier-btn[aria-pressed="true"][data-tier="gold"] { background: var(--tier-gold); color: #413006; }
-    .hr-add-window-btn {
-      width: 100%;
-      margin-top: 12px;
-      display: flex;
+    .hr-add-btn {
+      margin-left: auto;
+      display: inline-flex;
       align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 13px;
-      border-radius: 16px;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 999px;
       border: 1.5px dashed rgba(var(--blue-rgb), .5);
       color: var(--blue);
       background: transparent;
       font-weight: 800;
-      font-size: 13.5px;
+      font-size: 12.5px;
+      font-family: inherit;
       cursor: pointer;
+      white-space: nowrap;
       transition: border-color .14s ease, background .14s ease;
     }
-    .hr-add-window-btn:hover,
-    .hr-add-window-btn:focus-visible {
+    .hr-add-btn:hover,
+    .hr-add-btn:focus-visible {
       border-color: rgba(var(--blue-rgb), .8);
       background: rgba(var(--blue-rgb), .06);
       outline: none;
     }
-    .hr-add-window-plus {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      border: 1.5px dashed rgba(var(--blue-rgb), .6);
+    .hr-add-plus { font-size: 15px; line-height: 1; font-weight: 900; }
+    /* Botón "i" del encabezado y panel con los textos largos. */
+    #higherRateModal .mc-modal-head { align-items: center; justify-content: flex-start; }
+    #higherRateModal .mc-modal-head > div:not(.mc-header-icon) { flex: 1 1 auto; min-width: 0; }
+    .hr-info-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      color: var(--muted);
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 12px;
       flex: 0 0 auto;
+      cursor: pointer;
+      padding: 0;
+    }
+    .hr-info-btn .ic-svg { width: 18px; height: 18px; }
+    .hr-info-btn[aria-expanded="true"] {
+      color: var(--cyan);
+      border-color: rgba(var(--cyan-rgb), .4);
+      background: rgba(var(--cyan-rgb), .08);
+    }
+    .hr-info-panel {
+      display: grid;
+      gap: 6px;
+      border: 1px solid rgba(var(--cyan-rgb), .18);
+      background: rgba(var(--cyan-rgb), .07);
+      border-radius: 12px;
+      padding: 10px 13px;
+      margin-bottom: 4px;
+    }
+    .hr-info-panel[hidden] { display: none; }
+    .hr-info-panel p { margin: 0; font-size: 11.5px; line-height: 1.5; color: var(--muted); }
+    .hr-info-panel strong { color: var(--text); font-weight: 800; }
+    /* Estado de la ventana + números de hoy en una sola tarjeta. */
+    .hr-summary {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255,255,255,.03);
+      overflow: hidden;
+      margin-top: 4px;
     }
     /* <details> sin .accordion-card: vive dentro de un modal que ya trae fondo y padding. */
     #higherRateHistoryAccordion {
-      margin-top: 18px;
+      margin-top: 12px;
     }
     #higherRateHistoryAccordion > summary {
       list-style: none;
@@ -7750,7 +7738,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      padding: 14px 0 0;
+      padding: 10px 0 0;
       border-top: 1px solid var(--line);
     }
     #higherRateHistoryAccordion > summary::-webkit-details-marker { display: none; }
@@ -7774,11 +7762,9 @@
       gap: 10px;
     }
     @media (max-width: 620px) {
-      .hr-window-card { padding: 11px 12px; border-radius: 14px; }
-      .hr-window-day-icon { width: 26px; height: 26px; }
       .hr-window-day-name { font-size: 12.5px; }
       .hr-window-time { font-size: 11.5px; }
-      .hr-window-tier-btn { font-size: 9.5px; padding: 5px 3px; }
+      .hr-window-tier-btn { font-size: 9.5px; padding: 4px 3px; }
     }
 
     @media (max-width: 760px) {
