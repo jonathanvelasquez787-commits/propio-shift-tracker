@@ -20,15 +20,16 @@ const readable = (color,backgrounds) => {
   for(let weight=1;weight>=0;weight-=.025) { const result=mix(color,destination,weight);if(surfaces.every(background=>contrast(result,background)>=4.7))return result; }
   return destination;
 };
+// Orden de los tres fondos en cada modo: [afuera/página = el más claro, tarjeta principal = el más intenso, interior/secundario = intermedio].
 const PALETTE_SURFACES = {
-  neon: { light:['#FFD873','#FFF2CD','#FFE7AD'], dark:['#140329','#351653','#452566'] },
-  lavender: { light:['#DBDEFA','#F1F2FF','#E3E5FA'], dark:['#242541','#3A3D61','#4A4D71'] },
-  magenta: { light:['#F6C9DF','#FBE7F2','#F7D4E7'], dark:['#190D20','#3A1D44','#4B2854'] },
-  sand: { light:['#E8D8C8','#F7EDE1','#EFE0D0'], dark:['#253542','#3B4D5B','#4C5E6A'] },
-  royal: { light:['#CEDDF7','#ECF3FF','#DDE8FB'], dark:['#060B1E','#19264A','#273760'] },
-  ocean: { light:['#C5E1DF','#EAF5F3','#D8ECE9'], dark:['#071E2B','#12394A','#1B4B57'] },
-  sage: { light:['#CDE3D3','#EAF4E8','#DCECDF'], dark:['#162A28','#29423D','#36534A'] },
-  graphite: { light:['#F4F4F5','#FFFFFF','#EBEBEE'], dark:['#09090B','#131315','#1E1E22'] },
+  neon: { light:['#FFF2CD','#FFD873','#FFE7AD'], dark:['#452566','#140329','#351653'] },
+  lavender: { light:['#F1F2FF','#DBDEFA','#E3E5FA'], dark:['#4A4D71','#242541','#3A3D61'] },
+  magenta: { light:['#FBE7F2','#F6C9DF','#F7D4E7'], dark:['#4B2854','#190D20','#3A1D44'] },
+  sand: { light:['#F7EDE1','#E8D8C8','#EFE0D0'], dark:['#4C5E6A','#253542','#3B4D5B'] },
+  royal: { light:['#ECF3FF','#CEDDF7','#DDE8FB'], dark:['#273760','#060B1E','#19264A'] },
+  ocean: { light:['#EAF5F3','#C5E1DF','#D8ECE9'], dark:['#1B4B57','#071E2B','#12394A'] },
+  sage: { light:['#EAF4E8','#CDE3D3','#DCECDF'], dark:['#36534A','#162A28','#29423D'] },
+  graphite: { light:['#FFFFFF','#EBEBEE','#F4F4F5'], dark:['#1E1E22','#09090B','#131315'] },
 };
 // Todas las paletas solo cambian los fondos: el resto de colores (texto, bordes, botones,
 // acentos) se queda con los de Original. Estos valores solo alimentan los tokens --palette-*.
