@@ -38,3 +38,11 @@ main{padding:14px}.brand{margin:2px 0 14px}.brand p{font-size:11px}.card{padding
 .more-options>summary::after{content:'›';font-size:20px;font-weight:400}
 .more-options[open]>summary::after{transform:rotate(90deg)}
 .more-options[open]>summary{margin-bottom:8px}
+
+/* Opciones de uso diario a la vista, junto a su interruptor */
+.quick-card .select-field,.quick-card .inline-field{margin:0;padding:10px 0;border-top:1px solid var(--line);font-size:13px;color:var(--text)}
+.quick-card .inline-field{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.quick-card .inline-field input{width:84px;min-height:35px;text-align:center}
+.quick-card .select-field{gap:7px}
+.quick-card .select-field+.helper,.quick-card .inline-field+.helper{margin:0 0 6px;font-size:11px}
+.appearance-card h2{font-size:13px;margin:0 0 4px}

@@ -10,13 +10,14 @@ const more = html.slice(html.indexOf('id="moreOptions"'), html.indexOf('<script 
 
 test('popup de la extensión: estado, registro y disponibilidad a la vista; el resto en "Más opciones"', () => {
   for (const id of ['status', 'connectionBadge', 'resumeAvailability', 'automatic', 'availabilityPaused', 'prepareFirst',
-    'resumeBreak', 'resumeLunch', 'spacingEnabled', 'spacingSummary', 'availabilityStatus', 'open']) {
+    'resumeBreak', 'resumeLunch', 'resumeMode', 'spacingEnabled', 'spacingSummary', 'spacingMinutes', 'availabilityStatus', 'originalLayout', 'portalDark', 'open']) {
     assert.ok(visible.includes(`id="${id}"`), `#${id} está a la vista`);
   }
-  for (const id of ['devicePassive', 'resumeMode', 'spacingMinutes', 'originalLayout', 'portalDark', 'automationPanel', 'signals', 'technicalDetails', 'reviewed']) {
+  for (const id of ['devicePassive', 'automationPanel', 'signals', 'technicalDetails', 'reviewed']) {
     assert.ok(more.includes(`id="${id}"`), `#${id} queda dentro de "Más opciones"`);
     assert.ok(!visible.includes(`id="${id}"`), `#${id} ya no está a la vista`);
   }
+  assert.ok(visible.indexOf('id="resumeMode"') > visible.indexOf('id="resumeLunch"') && visible.indexOf('id="spacingMinutes"') > visible.indexOf('id="spacingEnabled"'), 'cada opción va junto a su interruptor');
   assert.doesNotMatch(html, /<details class="more-options" id="moreOptions" open/);
   const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map((m) => m[1]);
   assert.deepEqual(ids.filter((id, i) => ids.indexOf(id) !== i), [], 'sin ids repetidos');

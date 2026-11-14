@@ -1,11 +1,11 @@
-# Propio · Tracker y vista original · 2.3.12
+# Propio · Tracker y vista original · 2.3.13
 
 La extensión conecta Propio Shift Tracker con la sesión y el historial de Propio. Su
 registro de llamadas funciona independientemente de la apariencia del portal.
 
 El popup de Chrome contiene las opciones de la extensión; su versión se lee
-del manifest instalado, igual que en Administrar extensiones. El popup muestra lo esencial: estado, «Registrar mi actividad» y las opciones de disponibilidad
-que más se usan. Lo demás está en «Más opciones». El diagnóstico de disponibilidad, conexión y preparación del turno está en
+del manifest instalado, igual que en Administrar extensiones. El popup muestra lo que se usa a diario: estado, «Registrar mi actividad», las opciones de disponibilidad
+(con quién termina Break/Lunch y los minutos de ACW junto a su interruptor) y «Apariencia de Propio». Lo demás está en «Más opciones». El diagnóstico de disponibilidad, conexión y preparación del turno está en
 «Qué hará la extensión ahora», dentro de «Actividad y ayuda» en «Más opciones». La app web y la extensión tienen versiones separadas.
 
 La cola informa cuántos eventos faltan y cuándo vence el más antiguo (24 horas).
