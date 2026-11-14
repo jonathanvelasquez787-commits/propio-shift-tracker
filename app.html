@@ -960,19 +960,19 @@
 
 <section class="game-achievements-grid game-achievements-grid-top" id="gameAchievementsSummary" aria-label="Tu progreso">
 <div class="game-progress-profile" id="gameSettingsProfile" aria-live="polite">
-<article class="game-panel game-level-panel" id="gameLevelPanel">
-    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Progreso</span><h2>Nivel <strong data-game-role="level" data-game-stat="level">1</strong></h2><span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Nivel y XP" aria-describedby="levelInfo">i</button><span class="sched-help-tooltip" id="levelInfo" role="tooltip">XP son puntos de experiencia. Los obtienes al completar llamadas, misiones y objetivos; suben tu nivel y desbloquean equipo. No son dinero ni cambian tu pago.</span></span></div><span class="game-level-emblem" data-game-role="level-emblem">1</span></div>
+<article class="game-panel game-progress-card">
+<div class="game-level-panel" id="gameLevelPanel">
+    <div class="game-panel-head"><div><h2>Nivel <strong data-game-role="level" data-game-stat="level">1</strong></h2><span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Nivel y XP" aria-describedby="levelInfo">i</button><span class="sched-help-tooltip" id="levelInfo" role="tooltip">XP son puntos de experiencia. Los obtienes al completar llamadas, misiones y objetivos; suben tu nivel y desbloquean equipo. No son dinero ni cambian tu pago.</span></span></div><span class="game-level-emblem" data-game-role="level-emblem">1</span></div>
     <div class="game-level-track" role="progressbar" aria-label="Progreso hacia el siguiente nivel" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span data-game-role="level-progress" style="width:0%;"></span></div>
     <div class="game-level-foot"><span data-game-role="level-xp" data-game-stat="xp">0 XP</span><span data-game-role="next-level">Siguiente: 100 XP</span></div>
     <div id="gameReviewSummary"></div>
-    <div class="game-level-ladder" data-game-role="level-ladder"><span class="is-current">1</span><i></i><span>2</span><i></i><span>3</span><i></i><span>4</span></div>
     <details class="game-settings-accordion game-unlock-details">
       <summary class="game-settings-accordion-summary"><span class="game-settings-accordion-copy"><strong>Desbloqueos por nivel</strong><small>Fases, equipo y mejoras disponibles en cada nivel.</small></span><span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></summary>
       <div class="game-settings-accordion-body"><div class="game-unlock-roadmap" data-game-dynamic="unlock-roadmap"></div></div>
     </details>
-  </article>
-<article class="game-panel game-streak-panel" id="gameStreakPanel">
-    <div class="game-panel-head"><div><span class="game-panel-eyebrow">Constancia</span><h2>Racha semanal <span class="game-streak-current" data-game-stat="streak">0 días</span></h2><span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Racha semanal" aria-describedby="streakInfo">i</button><span class="sched-help-tooltip" id="streakInfo" role="tooltip">Cuenta los días consecutivos que cumples las reglas de productividad y adherencia. Los días libres se tratan según tu configuración. Los símbolos muestran el resultado de cada día.</span></span></div><span class="game-panel-badge" data-game-role="streak-best">Mejor: 0</span></div>
+  </div>
+<div class="game-streak-panel" id="gameStreakPanel">
+    <div class="game-panel-head"><div><h2>Racha semanal <span class="game-streak-current" data-game-stat="streak">0 días</span></h2><span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Racha semanal" aria-describedby="streakInfo">i</button><span class="sched-help-tooltip" id="streakInfo" role="tooltip">Cuenta los días consecutivos que cumples las reglas de productividad y adherencia. Los días libres se tratan según tu configuración. Los símbolos muestran el resultado de cada día.</span></span></div><span class="game-panel-badge" data-game-role="streak-best">Mejor: 0</span></div>
     <div class="game-streak-week" data-game-role="streak-week" role="list" aria-label="Racha de los últimos siete días">
       <span class="game-streak-day" data-day-state="empty" role="listitem"><b>L</b><em>—</em></span>
       <span class="game-streak-day" data-day-state="empty" role="listitem"><b>M</b><em>—</em></span>
@@ -983,7 +983,8 @@
       <span class="game-streak-day" data-day-state="empty" role="listitem"><b>D</b><em>—</em></span>
     </div>
     <div class="game-panel-foot"><span>Escudos disponibles</span><span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Escudos" aria-describedby="shieldsInfo">i</button><span class="sched-help-tooltip" id="shieldsInfo" role="tooltip">Protegen tu racha si un día no cumple los requisitos. Puedes guardar hasta tres; se ganan por constancia y respaldo semanal y se usan automáticamente cuando corresponda.</span></span><strong data-game-role="shields" data-game-stat="shields">0</strong></div>
-  </article>
+  </div>
+</article>
   </div>
 </section>
 

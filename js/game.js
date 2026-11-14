@@ -1192,14 +1192,6 @@ function renderAchievements() {
       progress.style.width = `${level.pct}%`;
       progress.parentElement?.setAttribute('aria-valuenow', String(Math.round(level.pct)));
     }
-    const ladder = levelRoot.querySelector('[data-game-role="level-ladder"]');
-    if (ladder) {
-      const steps = ladder.querySelectorAll('span');
-      steps.forEach((step, index) => {
-        step.textContent = String(level.level + index);
-        step.classList.toggle('is-current', index === 0);
-      });
-    }
   }
   renderBestiary();
   renderGameProgressRoadmap();

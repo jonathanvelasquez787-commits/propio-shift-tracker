@@ -511,10 +511,6 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 .game-level-track { height: 12px; margin-top: 18px; overflow: hidden; border: 1px solid var(--line-2); border-radius: 5px; background: var(--line); }
 .game-level-track span { display: block; height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--rpt-purple), var(--cyan)); }
 .game-level-foot { align-items: center; margin-top: 7px; color: var(--muted); font-size: 10px; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
-.game-level-ladder { display: flex; align-items: center; margin-top: 18px; color: var(--muted-3); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 10px; font-weight: 950; }
-.game-level-ladder span { display: grid; place-items: center; width: 21px; height: 21px; border: 1px solid var(--line-2); border-radius: 50%; }
-.game-level-ladder span.is-current { border-color: var(--tier-gold); color: var(--tier-gold); }
-.game-level-ladder i { flex: 1 1 auto; height: 1px; margin: 0 5px; background: var(--line-2); }
 .game-cycle-panel { padding-bottom: 16px; }
 .game-cycle-boss-layout { display: grid; grid-template-columns: minmax(0, 1fr) 118px; align-items: center; gap: 18px; margin-top: 12px; }
 .game-boss-copy { min-width: 0; }
@@ -1548,3 +1544,8 @@ html.theme-light {
 .game-achievements-hero-compact .game-achievements-hero-row { margin-top: 0; align-items: center; gap: 8px 12px; }
 .game-achievements-hero-compact .game-achievements-toolbar { margin-top: 8px; padding-top: 8px; flex-wrap: nowrap; gap: 8px; }
 .game-achievements-hero-compact .game-achievements-toolbar .game-settings-toggle { flex: 1 1 auto; max-width: none; }
+
+/* Progreso unificado: Nivel, XP, racha y escudos en una sola tarjeta */
+#gameAchievementsSummary { grid-template-columns: minmax(0, 1fr); }
+.game-progress-card { padding: 12px; }
+.game-progress-card > .game-streak-panel { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
