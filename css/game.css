@@ -1589,3 +1589,28 @@ html.theme-light {
 .game-settings-row[open] > summary::after { transform: rotate(90deg); }
 .game-settings-row > summary:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; border-radius: 10px; }
 .game-settings-row-body { padding: 2px 14px 14px; }
+
+/* logros-tarjeta-nivel-compacta */
+@media (max-width: 640px) {
+  .game-progress-card { padding: 10px 12px; }
+  .game-progress-card .game-panel h2, .game-progress-card h2 { margin: 0; font-size: 14px; }
+  .game-progress-card .game-level-emblem { display: none; }
+  .game-level-panel { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 8px; }
+  .game-level-panel > .game-panel-head { grid-column: 1; grid-row: 1; }
+  .game-level-panel > .game-level-foot { grid-column: 2; grid-row: 1; margin: 0; gap: 8px; }
+  .game-level-panel > .game-level-track { grid-column: 1 / -1; grid-row: 2; height: 8px; margin-top: 6px; }
+  .game-level-panel > #gameReviewSummary, .game-level-panel > .game-unlock-details { grid-column: 1 / -1; }
+  .game-unlock-details { margin-top: 8px; }
+  .game-level-panel .game-unlock-details > summary { padding: 6px 0 0; }
+  .game-unlock-details .game-settings-accordion-copy > small { display: none; }
+  .game-progress-card > .game-streak-panel { display: flex; flex-wrap: wrap; align-items: center; column-gap: 8px; row-gap: 8px; margin-top: 10px; padding-top: 10px; }
+  .game-streak-panel > .game-panel-head { flex: 1 1 auto; order: 1; gap: 6px; align-items: center; min-width: 0; }
+  .game-streak-panel > .game-panel-foot { flex: 0 0 auto; order: 2; margin: 0; gap: 4px; font-size: 10px; }
+  .game-streak-panel > .game-streak-week { flex: 0 0 100%; order: 3; gap: 4px; }
+  .game-streak-panel .game-streak-current { margin-left: 4px; font-size: 11px; }
+  .game-streak-panel .game-panel-badge { padding: 2px 6px; font-size: 10px; }
+  .game-streak-day { padding: 2px 0; gap: 2px; border: 0; background: transparent; }
+  .game-streak-day em { order: 1; width: 18px; height: 18px; font-size: 10px; }
+  .game-streak-day b { order: 2; font-size: 10px; }
+}
+/* fin logros-tarjeta-nivel-compacta */

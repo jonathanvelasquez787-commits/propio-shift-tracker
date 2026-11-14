@@ -4157,12 +4157,6 @@
       "app.html"
     ]
   },
-  "s_3db42957": {
-    "source": "Escudos disponibles",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_3df1ce32": {
     "source": "Oficial · importado",
     "files": [
@@ -15176,6 +15170,12 @@
     "source": "¿Vaciar {{v0}} llamadas de {{v1}}? Se conservarán en el historial recuperable hasta 30 días. Turno, pausas y horario permanecen.",
     "files": [
       "js/call-recovery.js"
+    ]
+  },
+  "s_e354b5e9": {
+    "source": "Escudos",
+    "files": [
+      "app.html"
     ]
   },
   "s_e37b6f56": {
