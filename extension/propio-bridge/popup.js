@@ -79,6 +79,12 @@ async function refresh() {
   document.getElementById('devicePassive').disabled = busy;
   document.getElementById('availabilityPaused').checked = prep?.availabilityPaused === true;
   document.getElementById('availabilityPaused').disabled = busy || !state.paired;
+  const resumeBtn = document.getElementById('resumeAvailability');
+  resumeBtn.hidden = !(state.paired && prep?.availabilityPaused === true); resumeBtn.disabled = busy;
+  if (state.paired && prep?.availabilityPaused === true) {
+    document.getElementById('status').textContent = 'Disponibilidad en pausa';
+    if (!feedback && !state.attention) document.getElementById('detail').textContent = 'Sigue registrando. Reanuda desde aquí o con Start Calls en Propio.';
+  }
   const availability = automationStatusView(state.automationStatus);
   document.getElementById('availabilityStatus').textContent = availabilityReasons[availability.key] || availabilityReasons[prep?.waitReason] || 'Comprobando cuándo ponerte disponible.';
   nativeLayout = state.layout;
@@ -88,6 +94,7 @@ async function refresh() {
   document.getElementById('spacingEnabled').disabled = busy || !state.paired;
   const minutesInput = document.getElementById('spacingMinutes');
   if (document.activeElement !== minutesInput) minutesInput.value = spacing.minutes;
+  document.getElementById('spacingSummary').textContent = `ACW ${spacing.minutes} min`;
   minutesInput.disabled = busy || !state.paired;
   const remaining = Math.max(0, Math.ceil((Date.parse(spacing.waitUntil) - Date.now()) / 1000));
   document.getElementById('spacingStatus').textContent = !spacing.enabled ? 'Apagado. No agrega esperas entre llamadas.'
@@ -153,6 +160,7 @@ async function act(packet) {
 }
 document.getElementById('open').addEventListener('click', () => act({ kind: 'open-tracker' }));
 document.getElementById('pair').addEventListener('click', () => act({ kind: 'pair' }));
+document.getElementById('resumeAvailability').addEventListener('click', () => act({ kind: 'pause-availability', paused: false }));
 document.getElementById('automatic').addEventListener('change', event => act({ kind: 'mode', mode: event.target.checked ? 'auto' : 'observe' }));
 document.getElementById('prepareFirst').addEventListener('change', event => act({ kind: 'prepare-first', enabled: event.target.checked }));
 document.getElementById('availabilityPaused').addEventListener('change', event => act({ kind: 'pause-availability', paused: event.target.checked }));
