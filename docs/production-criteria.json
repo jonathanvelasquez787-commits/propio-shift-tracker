@@ -1108,6 +1108,13 @@
           ]
         },
         {
+          "file": "tests/finance-row-desktop.test.mjs",
+          "namedCases": [
+            "Finanzas escritorio: la tarjeta de gasto agrupa nombre y medidor para ir en una sola fila",
+            "Finanzas escritorio: controles abajo en una fila con la barra unida y la casilla a la derecha"
+          ]
+        },
+        {
           "file": "tests/finance-top-compact.test.mjs",
           "namedCases": [
             "Finanzas: la parte de arriba es un solo bloque con título, siguiente prioridad, disponible y casilla",

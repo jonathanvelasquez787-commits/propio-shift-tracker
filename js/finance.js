@@ -337,10 +337,14 @@ function financeRowHtml(row, opts) {
       ${priorityHtml}
       <span class="fin-cat-icon" aria-hidden="true">${financeCategoryIconHtml(cat)}</span>
       <div class="fin-row-main">
+        <div class="fin-row-id">
         <div class="fin-row-title">${escapeHtml(row.name)}</div>
         <div class="fin-row-sub">${escapeHtml(cat.label)}${!isMeta ? ui` · ${row.recurring ? translateText('Recurrente') : translateText('Puntual')}` : ''}</div>
+        </div>
+        <div class="fin-row-meter">
         <div class="fin-row-amt-line"><span><b>${money(assigned)}</b>${financeConvertedInline(assigned)} de ${money(target)}${financeConvertedInline(target)} ${translateText('Reservado')}</span><span class="fin-row-restante-inline">Faltan <b>${money(remaining)}</b>${financeConvertedInline(remaining)}</span></div>
         <div class="fin-progress-track" role="progressbar" aria-label="Progreso de la reserva" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(barPct)}"><div style="width:${barPct}%;background:var(--${complete ? 'good' : 'warn'});"></div></div>
+        </div>
       </div>
       <span class="fin-badge tone-${tone}">${badge}</span>
       <div class="fin-row-actions">
