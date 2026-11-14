@@ -2955,6 +2955,12 @@
       "js/call-records-view.js"
     ]
   },
+  "s_2c652d5b": {
+    "source": "{{v4}} min",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_2c6cce18": {
     "source": "4. Tus datos son tuyos",
     "files": [
@@ -3874,6 +3880,12 @@
     "source": "Cambiar",
     "files": [
       "js/positive-reinforcement.js"
+    ]
+  },
+  "s_39970333": {
+    "source": "{{v2}} – {{v3}}",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_39a76cd5": {
@@ -7024,12 +7036,6 @@
     "source": "No se pudo leer el archivo.",
     "files": [
       "js/backup-recovery.js"
-    ]
-  },
-  "s_6b1ce89a": {
-    "source": "{{v0}} · {{v1}} – {{v2}} · {{v3}} min",
-    "files": [
-      "js/app-main.js"
     ]
   },
   "s_6b1e4ed4": {
@@ -11225,6 +11231,12 @@
   },
   "s_a724fd64": {
     "source": "Restan",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
+  "s_a72cdd8d": {
+    "source": "Descansos de hoy · {{v0}} · {{v1}} min en total",
     "files": [
       "js/app-main.js"
     ]

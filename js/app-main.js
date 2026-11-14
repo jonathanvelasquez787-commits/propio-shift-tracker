@@ -6602,13 +6602,21 @@ function renderSchedule() {
         }
       }
 
-      if (settings.freelancer?.enabled === true && !(settings.freelancer.since && callDateToDate(settings.freelancer.since) > callDateToDate(dayKey))) {
-        if (subtitle) subtitle.textContent = translateText('Modo freelancer: aquí ves los descansos que has tomado.');
+      const scheduleAccordionEl = document.getElementById('scheduleAccordion');
+      const freelancerBlocksOn = settings.freelancer?.enabled === true && !(settings.freelancer.since && callDateToDate(settings.freelancer.since) > callDateToDate(dayKey));
+      if (scheduleAccordionEl) scheduleAccordionEl.classList.toggle('sched-freelancer-list', freelancerBlocksOn);
+      if (freelancerBlocksOn) {
         const offNote = document.getElementById('scheduleOffWorkedNote');
         if (offNote) offNote.style.display = 'none';
         const taken = dayPauseIntervals(dayKey).sort((a, b) => a.start - b.start);
+        const totalTakenMin = taken.reduce((sum, p) => sum + (p.end - p.start) / 60000, 0);
+        if (subtitle) {
+          subtitle.textContent = taken.length
+            ? ui`Descansos de hoy · ${taken.length} · ${formatMinutes(totalTakenMin)} min en total`
+            : translateText('Modo freelancer: aquí ves los descansos que has tomado.');
+        }
         wrap.innerHTML = taken.length
-          ? taken.map(p => ui`<div class="note">${escapeHtml(p.type === 'lunch' ? translateText('Lunch') : translateText('Break'))} · ${timeLabelFromDate(p.start)} – ${timeLabelFromDate(p.end)} · ${formatMinutes((p.end - p.start) / 60000)} min</div>`).join('')
+          ? taken.map(p => ui`<div class="fl-break-row"><span class="fl-break-chip ${p.type === 'lunch' ? 'is-lunch' : 'is-break'}">${escapeHtml(p.type === 'lunch' ? translateText('Lunch') : translateText('Break'))}</span><span class="fl-break-time">${timeLabelFromDate(p.start)} – ${timeLabelFromDate(p.end)}</span><span class="fl-break-min">${formatMinutes((p.end - p.start) / 60000)} min</span></div>`).join('')
           : ui`<div class="note">${escapeHtml(translateText('Todavía no has tomado descansos.'))}</div>`;
         renderBlockSummaryStrip([]);
         const liveBadge = document.getElementById('adherenceLiveBadge');
