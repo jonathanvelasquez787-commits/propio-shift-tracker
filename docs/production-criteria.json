@@ -63,6 +63,12 @@
           ]
         },
         {
+          "file": "tests/achievements-header-compact.test.mjs",
+          "namedCases": [
+            "encabezado de Logros compacto: sin kicker, sin frase y con notas dentro del botón i"
+          ]
+        },
+        {
           "file": "tests/shift-work-review.test.mjs",
           "namedCases": [
             "shift confirmation explains active work and changes nothing before acceptance",

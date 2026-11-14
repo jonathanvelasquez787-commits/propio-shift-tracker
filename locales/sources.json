@@ -1396,6 +1396,12 @@
       "js/calls.js"
     ]
   },
+  "s_13ad46be": {
+    "source": "Logros convierte tu actividad en progreso de juego: racha, XP, misiones y colección, sin cambiar tus ganancias. Refuerzo positivo y premios personales se configuran por separado; ninguno cambia tu pago. Al desactivar Logros se conserva el progreso guardado. Podés activarlo de nuevo sin reiniciarlo.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_13d91da6": {
     "source": "Tu meta, tarifa y preferencias.",
     "files": [
@@ -4838,12 +4844,6 @@
       "app.html"
     ]
   },
-  "s_47ecd9aa": {
-    "source": "Logros convierte tu actividad en progreso de juego. Refuerzo positivo y premios personales se configuran por separado; ninguno cambia tu pago.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_47f388e8": {
     "source": "Vuelve a Disponible",
     "files": [
@@ -6206,12 +6206,6 @@
       "app.html"
     ]
   },
-  "s_5c53a38f": {
-    "source": "Racha, XP, misiones y colección sin cambiar tus ganancias.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_5c925686": {
     "source": "Usa un monto objetivo de al menos un centavo y de hasta mil millones de dólares.",
     "files": [
@@ -6282,12 +6276,6 @@
     "source": "Disponible desde {{v0}}",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_5e3feadb": {
-    "source": "Al desactivar Logros se conserva el progreso guardado. Podés activarlo de nuevo sin reiniciarlo.",
-    "files": [
-      "app.html"
     ]
   },
   "s_5e4a8a58": {
@@ -8383,12 +8371,6 @@
       "js/higher-rate-review.js"
     ]
   },
-  "s_7d81145d": {
-    "source": "Tu racha, tu nivel y cada criatura que ya venciste.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_7da7c1f8": {
     "source": "Lunch no tomado",
     "files": [
@@ -10475,6 +10457,12 @@
       "app.html"
     ]
   },
+  "s_9a883e1d": {
+    "source": "Acerca de Logros",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_9ab85688": {
     "source": "Productividad +{{v8}}",
     "files": [
@@ -11407,12 +11395,6 @@
     "source": "Pausado",
     "files": [
       "js/positive-reinforcement.js"
-    ]
-  },
-  "s_a86789a1": {
-    "source": "Activación, temporada y configuración",
-    "files": [
-      "app.html"
     ]
   },
   "s_a87219bc": {
@@ -14792,12 +14774,6 @@
     "source": "Épico",
     "files": [
       "js/game.js"
-    ]
-  },
-  "s_dca1d129": {
-    "source": "El Monstruo",
-    "files": [
-      "app.html"
     ]
   },
   "s_dcaa2d72": {
