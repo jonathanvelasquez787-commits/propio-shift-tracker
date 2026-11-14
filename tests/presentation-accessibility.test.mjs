@@ -248,3 +248,10 @@ test('the discard button is a red-outlined box with a trash can', () => {
   assert.ok(!html.slice(start, end).includes('<line'), 'no plain X anymore');
   assert.ok(/#liveDiscardBtn \{[^}]*border:\s*1\.5px solid var\(--bad\)/.test(css), 'red outline');
 });
+
+test('sidebar sound row is a sub-row of Achievements and hides when Achievements is off', () => {
+  const html = fs.readFileSync('app.html', 'utf8'), game = fs.readFileSync('js/game.js', 'utf8');
+  assert.match(html, /id="sidebarGameSoundRow"/);
+  assert.match(html, /sidebar-subrow/);
+  assert.match(game, /soundRow\.hidden = !gameEnabled\(\)/);
+});
