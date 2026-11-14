@@ -694,11 +694,8 @@ function compactCollectionMarkup(dayKey) {
   const owned = state.game.accessories.includes(latest.label);
   const available = owned && latest.unlockLevel <= level.level;
   const equipped = state.game.equipment[latest.slot] === latest.label;
-  const victories = Object.keys(state.game.ledger).filter(key => key.startsWith('monster-defeat:')).length;
-  return ui`<div class="game-compact-collection-head"><h4>Tu colección</h4><span>Nivel ${level.level} · ${state.game.totalXp} XP</span></div>
-    <div class="game-compact-collection-item"><span class="game-compact-collection-icon" aria-hidden="true">${gamePixelIcon('gem')}</span><div class="game-compact-collection-copy"><strong>${escapeHtml(translateText(latest.label))}</strong><small>${equipped ? translateText('Equipado') : available ? translateText('Desbloqueado') : owned ? ui`Disponible en nivel ${latest.unlockLevel}` : translateText('En el próximo cofre')}</small></div><button type="button" data-game-action="equip-accessory" data-accessory="${latest.id}" aria-pressed="${equipped}" ${available ? '' : 'disabled'}>${equipped ? translateText('Quitar') : translateText('Equipar')}</button></div>
-    <div class="game-compact-collection-item"><span class="game-compact-collection-icon" aria-hidden="true">${gamePixelIcon('sword')}</span><div class="game-compact-collection-copy"><strong>Monstruos vencidos</strong><small>Tu colección de victorias</small></div><b>${victories}</b></div>
-    <button type="button" class="game-compact-view-all" data-game-nav>Ver todos mis Logros →</button>`;
+  return ui`<div class="game-compact-collection-item"><span class="game-compact-collection-icon" aria-hidden="true">${gamePixelIcon('gem')}</span><div class="game-compact-collection-copy"><strong>${escapeHtml(translateText(latest.label))}</strong><small>${equipped ? translateText('Equipado') : available ? translateText('Desbloqueado') : owned ? ui`Disponible en nivel ${latest.unlockLevel}` : translateText('En el próximo cofre')}</small></div><button type="button" data-game-action="equip-accessory" data-accessory="${latest.id}" aria-pressed="${equipped}" ${available ? '' : 'disabled'}>${equipped ? translateText('Quitar') : translateText('Equipar')}</button></div>
+    <button type="button" class="game-compact-view-all" data-game-nav>Ver mis Logros →</button>`;
 }
 
 function compactVictoryMarkup(day) {
@@ -779,15 +776,14 @@ function renderArena() {
     root.innerHTML = battleMarkup();
   }
   const heading = root.querySelector('[data-battle-heading]');
-  heading.innerHTML = ui`<span class="game-kicker">${dayKey === currentGameDayKey() ? translateText('TU RETO DE HOY') : formatCallDayLabel(dayKey)}</span><h3>${escapeHtml(displayName)}</h3>`;
+  heading.innerHTML = ui`<span class="game-kicker">${dayKey === currentGameDayKey() ? translateText('TU RETO DE HOY') : formatCallDayLabel(dayKey)}</span><h3>${escapeHtml(displayName)}</h3><span class="game-level-chip">NV ${gameLevelProgress().level}</span>`;
   const converted = convertedAmountText(day.stats.earnings);
-  const convertedGoal = convertedAmountText(day.goal.usd);
   const convertedRemaining = convertedAmountText(remaining);
-  const status = day.defeated ? receipt ? translateText('Cofre abierto. ¡Seguí sumando!') : translateText('Meta alcanzada. Este cofre es tuyo.') : translateText('Cada llamada te acerca al cofre.');
+  const status = day.defeated ? receipt ? translateText('Cofre abierto. ¡Seguí sumando!') : translateText('Meta alcanzada. Este cofre es tuyo.') : '';
   root.querySelector('[data-battle-health-slot]').innerHTML = ui`
-    <div class="game-compact-goal-line"><span>${dayKey === currentGameDayKey() ? translateText('Meta de hoy') : translateText('Meta de este día')}</span><strong>${money(day.stats.earnings)} <small>/ ${money(day.goal.usd)}</small></strong></div>
+    <div class="game-compact-goal-line"><span>${dayKey === currentGameDayKey() ? translateText('Meta de hoy') : translateText('Meta de este día')}</span><strong${converted ? ` title="${escapeHtml(converted)}"` : ''}>${money(day.stats.earnings)} <small>/ ${money(day.goal.usd)}</small></strong></div>
     <div class="game-compact-goal-track" role="progressbar" aria-label="Avance hacia la meta y el cofre" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(100 - day.hpPct)}"><i class="game-compact-goal-fill" style="width:${100 - day.hpPct}%"></i><span class="game-compact-goal-chest" aria-hidden="true">${gamePixelChest(!!receipt)}</span></div>
-    <div class="game-compact-goal-foot"><span>${converted ? ui`${escapeHtml(converted)} / ${escapeHtml(convertedGoal)}` : ''}</span><span>${day.defeated ? receipt ? translateText('Recompensa guardada') : translateText('Cofre conseguido') : ui`Te faltan ${money(remaining)}${convertedRemaining ? ` (${escapeHtml(convertedRemaining)})` : ''}`}</span></div>`;
+    <div class="game-compact-goal-foot"><span>${day.defeated ? receipt ? translateText('Recompensa guardada') : translateText('Cofre conseguido') : ui`Faltan ${money(remaining)}${convertedRemaining ? ` · ${escapeHtml(convertedRemaining)}` : ''}`}</span></div>`;
   const victory = root.querySelector('[data-battle-victory]');
   const victoryMarkup = compactVictoryMarkup(day);
   if (victory.innerHTML !== victoryMarkup) victory.innerHTML = victoryMarkup;

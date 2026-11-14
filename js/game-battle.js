@@ -109,10 +109,10 @@ export function battleMarkup() {
       <div class="game-battle-victory" data-battle-victory hidden></div>
     </div>
     <div class="game-battle-health" data-battle-health-slot></div>
-    <div class="game-battle-footer"><p class="game-battle-feed" data-battle-feed>Cada llamada te acerca al cofre.</p><button type="button" data-battle-action="collection" data-battle-collection-toggle aria-expanded="false" aria-controls="gameBattleCollection">Logros <span aria-hidden="true">⌄</span></button></div>
+    <div class="game-battle-footer"><p class="game-battle-feed" data-battle-feed></p><button type="button" data-battle-action="collection" data-battle-collection-toggle aria-expanded="false" aria-controls="gameBattleCollection">Logros <span aria-hidden="true">⌄</span></button></div>
     <section id="gameBattleCollection" class="game-battle-collection" data-battle-collection hidden aria-label="Logros">
       <div data-battle-collection-summary></div>
-      <div class="game-battle-loadout"><div><label for="gameBattleWeapon">ARMA EQUIPADA</label><select id="gameBattleWeapon" data-battle-weapon-select>${BATTLE_WEAPONS.map(w => `<option value="${w.id}">${escape(weaponName(w.id))}</option>`).join('')}</select><small data-battle-selected></small></div></div>
+      <div class="game-battle-loadout"><div><label for="gameBattleWeapon">Arma</label><select id="gameBattleWeapon" data-battle-weapon-select>${BATTLE_WEAPONS.map(w => `<option value="${w.id}">${escape(weaponName(w.id))}</option>`).join('')}</select><small data-battle-selected></small></div></div>
       <div class="game-battle-mode-row"><div class="game-battle-modes" role="group" aria-label="Modo de juego"><button type="button" data-battle-action="auto" aria-pressed="true">Automático</button><button type="button" data-battle-action="duel" aria-pressed="false" data-battle-duel-button>Duelo · 60 s</button></div><small data-battle-work-note></small></div>
       <div class="game-battle-duel-hud" data-battle-duel-hud hidden>
         <strong data-battle-hearts aria-label="Vidas del héroe"></strong><span data-battle-time></span><span data-battle-points></span><span data-battle-best></span>
@@ -293,7 +293,7 @@ function createBattle(element) {
     $('duel-button').disabled = !canPlayDuel(work) || !ctx;
     $('duel-button').title = translateText('Disponible en descanso o fuera del turno');
     element.querySelectorAll('[data-battle-action="auto"], [data-battle-action="duel"]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.battleAction === mode)));
-    $('work-note').textContent = work === 'call' ? translateText('En llamada · modo tranquilo') : work === 'ready' ? translateText('Duelo disponible durante el descanso') : translateText('Jugá solo si tenés tiempo libre');
+    $('work-note').textContent = work === 'call' ? translateText('En llamada · modo tranquilo') : work === 'ready' ? '' : translateText('Jugá solo si tenés tiempo libre');
     $('hearts').textContent = '♥'.repeat(d.lives) + '♡'.repeat(3-d.lives);
     $('hearts').setAttribute('aria-label', ui`${d.lives} vidas del héroe`);
     $('time').textContent = `${Math.ceil(d.time)} s`;
@@ -312,7 +312,7 @@ function createBattle(element) {
     const attack = d.attacks.find(item => item.age <= item.warning);
     const message = d.status === 'won' ? translateText('¡Duelo ganado!') : d.status === 'lost' ? translateText('Ronda terminada · probá otra vez') : d.status === 'paused' ? translateText('Duelo pausado · continuá cuando estés libre') : d.status === 'ready' ? translateText('60 segundos · 3 vidas · esquivá y dispará') : attack?.kind === 'wave' ? translateText('Onda baja · saltá') : attack?.kind === 'projectile' ? translateText('Disparo dirigido · movete') : attack?.kind === 'charge' ? translateText('Embestida · esquivá o saltá') : translateText('Dispará al monstruo');
     if (message !== lastDuelAnnouncement) { $('duel-message').textContent = message; lastDuelAnnouncement = message; }
-    if (!manual && !bannerUntil) $('feed').textContent = work === 'call' ? translateText('En llamada · todo tranquilo.') : autoPaused ? translateText('En pausa') : view.goalStatus || translateText('Cada llamada te acerca al cofre.');
+    if (!manual && !bannerUntil) $('feed').textContent = work === 'call' ? translateText('En llamada · todo tranquilo.') : autoPaused ? translateText('En pausa') : view.goalStatus || '';
     updateAuto();
   }
   function changeMode(next) {
