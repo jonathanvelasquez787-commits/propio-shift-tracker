@@ -586,7 +586,7 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
   opacity: 1;
 }
 :is(body:has(#callsModal.open) #pasteCallsBtn:not(:disabled),
-    body:has(#manualCallModal.open) #addCallManualBtn:not(:disabled)) :is(.action-label, .action-sub) {
+    body:has(#manualCallModal.open) #addCallManualBtn:not(:disabled)) :is(.action-label,.action-sub,.action-short) {
   color: var(--palette-active-ink, var(--text));
 }
 #breakControlBtn.is-active:not(:disabled) .action-icon svg > line {
@@ -1147,26 +1147,26 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 /* Separador doble (||) entre los botones de turno y los de llamadas. */
 .chips > .hero-shift-actions > .hero-shift-sep { display: block; order: 40; flex: 0 0 2px; width: 2px; height: 36px; margin: 2px 8px 0 4px; border-radius: 2px; background: var(--line-2, var(--line)); box-shadow: 4px 0 0 var(--line-2, var(--line)); }
 .chips > .hero-shift-actions :is(#shiftControlBtn,#breakControlBtn,#lunchControlBtn,#liveDiscardBtn,#callControlBtn,#pasteCallsBtn,#addCallManualBtn) {
-  display: flex; flex: 0 0 auto; flex-flow: row wrap; align-items: center; justify-content: center; align-content: center; gap: 2px 5px;
-  width: auto; min-width: 48px; max-width: none; min-height: 52px; padding: 5px 6px; box-sizing: border-box; text-align: center;
+  display: grid; flex: 1 1 0; grid-template-columns: auto; align-items: center; justify-items: center; justify-content: center; align-content: center; gap: 2px 5px;
+  width: auto; min-width: 0; max-width: 72px; min-height: 52px; padding: 5px 2px; box-sizing: border-box; text-align: center;
 }
 .chips > .hero-shift-actions :is(#shiftControlBtn,#breakControlBtn,#lunchControlBtn,#liveDiscardBtn,#callControlBtn,#pasteCallsBtn,#addCallManualBtn) .action-icon-wrap { grid-column: auto; grid-row: auto; flex: 0 0 auto; width: 24px; height: 24px; background: transparent; border-color: transparent; }
 .chips > .hero-shift-actions :is(#shiftControlBtn,#breakControlBtn,#lunchControlBtn,#liveDiscardBtn,#callControlBtn,#pasteCallsBtn,#addCallManualBtn) .action-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .chips > .hero-shift-actions :is(#shiftControlBtn,#breakControlBtn,#lunchControlBtn,#liveDiscardBtn,#callControlBtn,#pasteCallsBtn,#addCallManualBtn) .action-sub { display: none; }
 /* Nombre corto debajo del icono. */
-.chips > .hero-shift-actions .action-short { display: block; flex: 0 0 100%; font-size: 10px; font-weight: 700; line-height: 1.1; color: var(--muted); text-align: center; white-space: nowrap; }
-.chips > .hero-shift-actions .action-btn.is-active .action-short,
+.chips > .hero-shift-actions .action-short { position: relative; z-index: 1; display: block; grid-column: 1 / -1; width: 100%; font-size: 10px; font-weight: 700; line-height: 1.1; text-align: center; white-space: nowrap; }
+.chips > .hero-shift-actions .action-btn:not(.is-active):not(.is-pressed):not(.is-pending):not(:hover) .action-short { color: var(--muted); }
 .chips > .hero-shift-actions .action-btn.is-pending .action-short { color: inherit; }
 /* El botón de Break, Lunch o llamada que está en curso (o pendiente) se abre y muestra su tiempo; el nombre sigue debajo. */
 .chips > .hero-shift-actions :is(#breakControlBtn,#lunchControlBtn,#callControlBtn).is-active,
-.chips > .hero-shift-actions #callControlBtn.is-pending { padding: 5px 10px 5px 6px; }
+.chips > .hero-shift-actions #callControlBtn.is-pending { flex: 0 0 auto; max-width: none; grid-template-columns: auto auto; padding: 5px 10px 5px 6px; }
 .chips > .hero-shift-actions :is(#breakControlBtn,#lunchControlBtn,#callControlBtn).is-active .action-sub,
 .chips > .hero-shift-actions #callControlBtn.is-pending .action-sub { display: block; font-size: 11px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; overflow-wrap: normal; }
 /* Llamada que se cortó sin guardarse: amarillo, con su duración. */
 .chips > .hero-shift-actions #callControlBtn.is-pending { border-color: var(--warn); background: rgba(var(--warn-rgb), .14); color: var(--warn); }
 /* La X de Descartar solo aparece mientras hay algo en curso, junto a ese botón. */
 .chips > .hero-shift-actions #liveDiscardBtn[hidden] { display: none !important; }
-.chips > .hero-shift-actions #liveDiscardBtn { min-width: 44px; border-color: rgba(var(--bad-rgb), .35); background: rgba(var(--bad-rgb), .1); color: var(--bad); }
+.chips > .hero-shift-actions #liveDiscardBtn { flex: 0 0 auto; min-width: 44px; border-color: rgba(var(--bad-rgb), .35); background: rgba(var(--bad-rgb), .1); color: var(--bad); }
 .chips > .hero-shift-actions #liveDiscardBtn .action-short { color: inherit; }
 /* Orden de la fila: la X queda justo después del botón que está en curso. */
 .chips > .hero-shift-actions #shiftControlBtn { order: 10; }
@@ -1185,18 +1185,28 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 .chips > .hero-shift-actions.is-stuck { position: fixed; top: calc(8px + env(safe-area-inset-top, 0px)); z-index: 70; margin: 0; flex: none; background: var(--panel); border-color: var(--card-line, var(--line)); box-shadow: var(--shadow); }
 @media (min-width: 761px) { .chips > .hero-shift-actions { gap: 8px; padding: 10px 16px; } }
 @media (max-width: 420px) {
-  .chips > .hero-shift-actions { gap: 4px; padding: 7px 6px; }
-  .chips > .hero-shift-actions :is(#shiftControlBtn,#breakControlBtn,#lunchControlBtn,#liveDiscardBtn,#callControlBtn,#pasteCallsBtn,#addCallManualBtn) { min-width: 40px; padding: 4px 3px; }
+  .chips > .hero-shift-actions { gap: 3px; padding: 7px 5px; }
+  .chips > .hero-shift-actions :is(#shiftControlBtn,#breakControlBtn,#lunchControlBtn,#liveDiscardBtn,#callControlBtn,#pasteCallsBtn,#addCallManualBtn) { padding: 4px 1px; }
+  /* En pantallas angostas la X de descartar va sin texto (queda su nombre para lectores de pantalla) para que todo quepa. */
+  .chips > .hero-shift-actions #liveDiscardBtn { min-width: 30px; padding: 4px 2px; }
+  .chips > .hero-shift-actions #liveDiscardBtn .action-short { display: none; }
   .chips > .hero-shift-actions :is(#shiftControlBtn,#breakControlBtn,#lunchControlBtn,#liveDiscardBtn,#callControlBtn,#pasteCallsBtn,#addCallManualBtn) .action-icon-wrap { width: 20px; height: 20px; }
   .chips > .hero-shift-actions .action-short { font-size: 9px; }
   .chips > .hero-shift-actions > .hero-shift-sep { margin: 2px 5px 0 2px; }
   .chips > .hero-shift-actions :is(#breakControlBtn,#lunchControlBtn,#callControlBtn).is-active,
-  .chips > .hero-shift-actions #callControlBtn.is-pending { padding: 4px 6px; }
+  .chips > .hero-shift-actions #callControlBtn.is-pending { flex: 0 0 auto; grid-template-columns: auto; padding: 4px 6px; }
   .chips > .hero-shift-actions :is(#breakControlBtn,#lunchControlBtn,#callControlBtn).is-active .action-icon-wrap,
   .chips > .hero-shift-actions #callControlBtn.is-pending .action-icon-wrap { display: none; }
   .chips > .hero-shift-actions :is(#breakControlBtn,#lunchControlBtn,#callControlBtn).is-active .action-sub,
   .chips > .hero-shift-actions #callControlBtn.is-pending .action-sub { font-size: 10px; }
 }
+
+/* #callsSection solo conserva título + tarjeta de estado: sin tarjeta visible, desaparece. */
+#callsSection > .section-title { display: none; }
+#callsSection:has(> #callsStatusCard[hidden]),
+#callsSection:has(> #callsStatusCard.live) { display: none !important; }
+
+@media (max-width: 380px) { .chips > .hero-shift-actions .action-short { font-size: 8.5px; letter-spacing: -.2px; } }
 
 /* Página Ayuda: sin llamadas, la fila queda con los 3 botones de turno. */
 .hero-shift-actions.calls-off > .hero-shift-sep,

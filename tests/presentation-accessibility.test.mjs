@@ -219,3 +219,17 @@ test('there is a single actions bar: no top live bar, no expanded view, names un
   assert.ok(/is-stuck/.test(shell) && /wireStickyActionsBar/.test(main), 'the bar sticks to the top while scrolling');
   assert.ok(/#heroSection\s*\{[^}]*backdrop-filter:\s*none/.test(shell), 'the hero card has no backdrop-filter, otherwise position:fixed would not follow the screen');
 });
+
+test('the actions bar keeps its layout: six buttons share the width and the empty Llamadas card stays hidden', () => {
+  const css = fs.readFileSync('css/app-shell.css', 'utf8');
+  assert.ok(/#callsSection:has\(> #callsStatusCard\[hidden\]\)[^{]*\{[^}]*display:\s*none/.test(css), 'an empty Llamadas card disappears');
+  assert.ok(/\.hero-shift-actions :is\(#shiftControlBtn[^)]*\)\s*\{[^}]*flex:\s*1 1 0[^}]*min-width:\s*0/.test(css), 'buttons share the bar width instead of using a fixed width');
+  assert.ok(/#liveDiscardBtn \.action-short \{ display: none; \}/.test(css), 'narrow screens show the discard X without text so everything fits');
+});
+
+test('the short action names keep the same hover color as the labels', () => {
+  const core = fs.readFileSync('css/app-core.css', 'utf8');
+  const shell = fs.readFileSync('css/app-shell.css', 'utf8');
+  assert.ok(/\.action-btn:hover \.action-short/.test(core), 'hover color override covers the short name');
+  assert.ok(/:not\(:hover\) \.action-short \{ color: var\(--muted\)/.test(shell), 'the muted name color does not win over the hover color');
+});
