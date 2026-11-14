@@ -185,9 +185,9 @@ export function configureScheduleContext(context) {
     // initialization". Se llama a iconHtml(meta.iconName) recién donde se usa, en tiempo de
     // ejecución (ver renderBlocksEditor más abajo).
     export const BLOCK_TIMELINE_META = {
-      work: { iconName: 'briefcase', subtitle: translateText('Enfoque y productividad') },
-      break: { iconName: 'coffee', subtitle: translateText('Descanso corto') },
-      lunch: { iconName: 'utensils', subtitle: translateText('Almuerzo / Descanso largo') },
+      work: { iconName: 'briefcase' },
+      break: { iconName: 'coffee' },
+      lunch: { iconName: 'utensils' },
     };
 
     // Duración legible ("2h 10m" / "45 min" / "1h") para la píldora de la tarjeta
@@ -234,20 +234,21 @@ export function configureScheduleContext(context) {
                   <option value="break" ${type === 'break' ? 'selected' : ''}>Break</option>
                   <option value="lunch" ${type === 'lunch' ? 'selected' : ''}>Lunch</option>
                 </select>
-                <div class="sched-tl-subtitle">${meta.subtitle}${nextDayLabel ? ` · ${nextDayLabel}` : ''}</div>
+                <div class="sched-tl-subtitle">${nextDayLabel}</div>
               </div>
               <div class="sched-tl-time-inline">
                 <input type="time" class="block-start-input sched-tl-time-input" inputmode="numeric" value="${startVal}"/>
                 <span class="sched-tl-time-sep" aria-hidden="true">—</span>
                 <input type="time" class="block-end-input sched-tl-time-input" inputmode="numeric" value="${endVal}"/>
               </div>
-              <span class="sched-tl-duration">${durationLabel}</span>
-              <span class="sched-tl-handle" aria-hidden="true" title="Orden (informativo)">⋮⋮</span>
               <button type="button" class="gap-edit-btn block-remove-btn sched-tl-remove" data-remove-block="${i}" aria-label="Eliminar bloque ${i + 1}"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
             </div>
-            <div class="field block-goal-field sched-tl-goal" style="${type === 'work' ? '' : 'display:none;'}">
-              <label>Meta productiva (min)</label>
-              <input type="number" class="block-goal-input" inputmode="numeric" min="0" step="1" value="${goalVal}"/>
+            <div class="sched-tl-card-bottom">
+              <span class="sched-tl-duration">${durationLabel}</span>
+              <div class="field block-goal-field sched-tl-goal" style="${type === 'work' ? '' : 'display:none;'}">
+                <label>Meta productiva (min)</label>
+                <input type="number" class="block-goal-input" inputmode="numeric" min="0" step="1" value="${goalVal}"/>
+              </div>
             </div>
           </div>
         </div>
@@ -262,7 +263,7 @@ export function configureScheduleContext(context) {
       const type = row.querySelector('.block-type-input')?.value || 'work', meta = BLOCK_TIMELINE_META[type] || BLOCK_TIMELINE_META.work;
       const anchor = toMinutes(document.getElementById('dayStartInput')?.value || '00:00');
       const note = toMinutes(start) < anchor ? translateText('Inicio al día siguiente') : toMinutes(end) < toMinutes(start) ? translateText('Fin al día siguiente') : '';
-      for (const [selector,value] of [['.sched-tl-hour',start],['.sched-tl-duration',formatBlockDurationLabel(duration)],['.sched-tl-subtitle',meta.subtitle+(note ? ` · ${note}` : '')]]) {
+      for (const [selector,value] of [['.sched-tl-hour',start],['.sched-tl-duration',formatBlockDurationLabel(duration)],['.sched-tl-subtitle',note]]) {
         const element=row.querySelector(selector);if(element)element.textContent=value;
       }
       const icon=row.querySelector('.sched-tl-icon');if(icon)icon.innerHTML=iconHtml(meta.iconName);
