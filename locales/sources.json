@@ -1,10 +1,4 @@
 {
-  "s_00069319": {
-    "source": "Negro Grafito: Negros neutros y acento índigo",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_000b5c2b": {
     "source": "/ {{v1}} min",
     "files": [
@@ -756,6 +750,12 @@
     "source": "El código, el diseño, los textos y la marca de Propio Shift Tracker pertenecen\n    a su titular y están protegidos por derechos de autor. Tener una cuenta te da\n    derecho a",
     "files": [
       "terminos.html"
+    ]
+  },
+  "s_0b6be82f": {
+    "source": "Negro Grafito: Cambia solo los tres negros de fondo",
+    "files": [
+      "app.html"
     ]
   },
   "s_0b703510": {
@@ -7536,6 +7536,13 @@
       "js/automation-ui.js"
     ]
   },
+  "s_71356a2e": {
+    "source": "Cambia solo los tres negros de fondo",
+    "files": [
+      "app.html",
+      "js/theme-palettes.js"
+    ]
+  },
   "s_713b6e1f": {
     "source": "Cómo se aplican tarifa y moneda",
     "files": [
@@ -12620,13 +12627,6 @@
     "source": "Tu {{v0}} de {{v1}} min terminó. Termínalo cuando regreses.",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_bb6c8a20": {
-    "source": "Negros neutros y acento índigo",
-    "files": [
-      "app.html",
-      "js/theme-palettes.js"
     ]
   },
   "s_bbf96cf7": {

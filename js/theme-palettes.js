@@ -7,7 +7,7 @@ export const PALETTES = [
   { id:'royal',name:'Azul Real',description:'Azul noche, intenso y celeste',colors:['#091540','#1B2CC1','#7692FF','#ABD2FA'],code:'0915401b2cc17692ffabd2fa',lightAccent:1,darkAccent:2,secondary:2,lightBackground:3 },
   { id:'ocean',name:'Turquesa Profundo',description:'Turquesa, azul y violeta',colors:['#78B9B5','#0F828C','#065084','#320A6B'],code:'78b9b50f828c065084320a6b',lightAccent:1,darkAccent:0,secondary:3,lightBackground:0 },
   { id:'sage',name:'Verde Salvia',description:'Verde salvia, menta y crema',colors:['#659287','#88BDA4','#B1D3B9','#E6F2DD'],code:'65928788bda4b1d3b9e6f2dd',lightAccent:0,darkAccent:1,secondary:2,lightBackground:3 },
-  { id:'graphite',name:'Negro Grafito',description:'Negros neutros y acento índigo',colors:['#09090B','#1E1E22','#A1A1AA','#6366F1'],lightAccent:3,darkAccent:3,secondary:2 }
+  { id:'graphite',name:'Negro Grafito',description:'Cambia solo los tres negros de fondo',colors:['#09090B','#131315','#1E1E22','#A1A1AA'],lightAccent:3,darkAccent:3,secondary:3,gameBody:'#6366F1' }
 ];
 const rgb = hex => hex.match(/[a-f\d]{2}/gi).map(value=>parseInt(value,16));
 const hex = channels => '#'+channels.map(value=>Math.round(value).toString(16).padStart(2,'0')).join('');
@@ -69,7 +69,7 @@ export function paletteTokens(palette,mode) {
     '--shadow-soft':light?'0 2px 8px rgba(20,25,45,.04)':'0 3px 10px rgba(0,0,0,.1)',
     '--shadow-active':'0 0 0 2px '+mix(raw,panel,.25),
     '--game-pixel-ink':light?mix(deep,'#11131b',.55):background,
-    '--game-pixel-body':colors[light?palette.lightAccent:palette.darkAccent],
+    '--game-pixel-body':palette.gameBody||colors[light?palette.lightAccent:palette.darkAccent],
     '--game-pixel-highlight':mix(raw,'#ffffff',.55),'--game-pixel-shade':mix(raw,deep,.4),
     '--game-pixel-floor':mix(raw,panel,.14),'--game-pixel-good':good,'--game-pixel-good-text':good,
     '--tier-gold':warn,'--tier-bronze':light?'#a45e24':'#ffc397','--tier-silver':muted,
