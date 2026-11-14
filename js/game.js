@@ -2880,6 +2880,25 @@ export function initGame() {
       setGameEnabled(!!event.target.checked);
     });
   }
+  const logrosTabs = [...document.querySelectorAll('[data-logros-tab]')];
+  const selectLogrosTab = (name, focus) => {
+    logrosTabs.forEach((tab) => {
+      const on = tab.dataset.logrosTab === name;
+      tab.setAttribute('aria-selected', String(on));
+      tab.tabIndex = on ? 0 : -1;
+      if (on && focus) tab.focus();
+    });
+    document.querySelectorAll('[data-logros-pane]').forEach((pane) => { pane.hidden = pane.dataset.logrosPane !== name; });
+  };
+  logrosTabs.forEach((tab, index) => {
+    tab.addEventListener('click', () => selectLogrosTab(tab.dataset.logrosTab, false));
+    tab.addEventListener('keydown', (event) => {
+      const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
+      if (!step) return;
+      event.preventDefault();
+      selectLogrosTab(logrosTabs[(index + step + logrosTabs.length) % logrosTabs.length].dataset.logrosTab, true);
+    });
+  });
   document.getElementById('sidebarGameSoundInput')?.addEventListener('change', (event) => {
     saveGamePreference('soundEnabled', !!event.target.checked);
     syncGameAudio();

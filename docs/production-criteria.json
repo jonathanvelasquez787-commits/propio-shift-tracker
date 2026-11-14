@@ -1102,6 +1102,12 @@
           ]
         },
         {
+          "file": "tests/achievements-tabs.test.mjs",
+          "namedCases": [
+            "Logros en tres secciones: Hoy, Colección e Historial con botones y solo una visible"
+          ]
+        },
+        {
           "file": "tests/appearance-cards-compact.test.mjs",
           "namedCases": [
             "selector de temas: tarjetas compactas, modo en la línea del nombre y descripción solo para lectores de pantalla"
