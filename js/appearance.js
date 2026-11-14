@@ -1,4 +1,4 @@
-import { PALETTES } from './theme-palettes.js';
+import { PALETTE_CHOICES, resolvePalette } from './theme-palettes.js';
 import { applySavedColors } from './appearance-colors.js';
 import { setLanguage, translateText } from './i18n.js';
 import { saveLanguagePreference } from './language-preference.js';
@@ -6,31 +6,23 @@ import { applyPresentation, wirePresentation } from './presentation-accessibilit
 
 export function applyAppearance(settings) {
   const root = document.documentElement;
-  const palette = PALETTES.find(item => item.id === settings.palette) || PALETTES[0];
   const mode = settings.theme === 'auto'
     ? (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
     : settings.theme === 'dark' ? 'dark' : 'light';
+  const palette = resolvePalette(settings.palette, mode);
+  const choice = PALETTE_CHOICES.find(item => item.paletteId === palette.id && item.mode === mode);
   applySavedColors({ ...settings, theme: mode }, root);
   setLanguage(settings.language);
   saveLanguagePreference(settings.language);
   applyPresentation(settings);
   document.querySelectorAll('[data-palette-choice]').forEach(button => {
-    const active = button.dataset.paletteChoice === palette.id;
+    const active = button.dataset.paletteChoice === choice.paletteId && button.dataset.modeChoice === choice.mode;
     button.setAttribute('aria-checked', String(active));
     button.tabIndex = active ? 0 : -1;
   });
-  document.querySelectorAll('[data-preview-theme]').forEach(button => {
-    button.textContent = palette.id === 'original'
-      ? translateText(button.dataset.previewTheme === 'light' ? 'Claro original' : 'Oscuro original')
-      : translateText(button.dataset.previewTheme === 'light' ? 'Claro' : 'Oscuro');
-    button.setAttribute('aria-pressed', String(button.dataset.previewTheme === mode));
-  });
-  const label = palette.id === 'original'
-    ? translateText(mode === 'light' ? 'Claro original' : 'Oscuro original')
-    : `${translateText(palette.name)} · ${translateText(mode === 'light' ? 'Claro' : 'Oscuro')}`;
-  document.querySelectorAll('[data-appearance-label]').forEach(element => element.textContent = label);
+  document.querySelectorAll('[data-appearance-label]').forEach(element => element.textContent = translateText(choice.name));
   document.querySelectorAll('[data-current-swatches]').forEach(element => {
-    element.replaceChildren(...palette.colors.map(color => {
+    element.replaceChildren(...choice.colors.map(color => {
       const swatch = document.createElement('i');
       swatch.style.background = color;
       swatch.title = color;
@@ -61,19 +53,18 @@ export function wireAppearance({ getSettings, save, applyTheme }) {
     applyTheme();
   };
   wirePresentation({ getSettings, save, apply: applyTheme });
+  const choose = item => change({ palette: item.paletteId, theme: item.mode });
   document.querySelectorAll('[data-palette-choice]').forEach((button, index) => {
-    button.addEventListener('click', () => change({ palette: button.dataset.paletteChoice }));
+    button.addEventListener('click', () => choose(PALETTE_CHOICES[index]));
     button.addEventListener('keydown', event => {
       if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key)) return;
       event.preventDefault();
-      const next = event.key === 'Home' ? 0 : event.key === 'End' ? PALETTES.length - 1
-        : (index + (['ArrowLeft', 'ArrowUp'].includes(event.key) ? -1 : 1) + PALETTES.length) % PALETTES.length;
-      change({ palette: PALETTES[next].id });
-      document.querySelector(`[data-palette-choice="${PALETTES[next].id}"]`).focus();
+      const next = event.key === 'Home' ? 0 : event.key === 'End' ? PALETTE_CHOICES.length - 1
+        : (index + (['ArrowLeft', 'ArrowUp'].includes(event.key) ? -1 : 1) + PALETTE_CHOICES.length) % PALETTE_CHOICES.length;
+      choose(PALETTE_CHOICES[next]);
+      document.querySelectorAll('[data-palette-choice]')[next].focus();
     });
   });
-  document.querySelectorAll('[data-preview-theme]').forEach(button =>
-    button.addEventListener('click', () => change({ theme: button.dataset.previewTheme })));
   document.querySelectorAll('[data-open-appearance]').forEach(button =>
     button.addEventListener('click', () => { if (!dialog.open) dialog.showModal(); }));
   document.querySelectorAll('[data-close-appearance]').forEach(button =>

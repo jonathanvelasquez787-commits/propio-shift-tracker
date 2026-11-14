@@ -1,9 +1,9 @@
-import { PALETTES, paletteTokens } from './theme-palettes.js';
+import { PALETTES, paletteTokens, resolvePalette } from './theme-palettes.js';
 import { normalizeLanguage } from './language-preference.js';
 
 export function applySavedColors(settings, root = document.documentElement) {
-  const palette = PALETTES.find(item => item.id === settings.palette) || PALETTES[0];
   const mode = settings.theme === 'dark' ? 'dark' : 'light';
+  const palette = resolvePalette(settings.palette, mode);
   const previous = root.dataset.palette;
   if (previous && previous !== 'original') {
     const oldPalette = PALETTES.find(item => item.id === previous);
