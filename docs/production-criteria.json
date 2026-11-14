@@ -1108,6 +1108,12 @@
           ]
         },
         {
+          "file": "tests/extension-popup-simple.test.mjs",
+          "namedCases": [
+            "popup de la extensión: estado, registro y disponibilidad a la vista; el resto en \"Más opciones\""
+          ]
+        },
+        {
           "file": "tests/achievements-settings-rows.test.mjs",
           "namedCases": [
             "Ajustes de Logros: cuatro filas cortas y \"Mis premios\" en Colección"
