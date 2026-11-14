@@ -8198,6 +8198,12 @@
       "js/reports.js"
     ]
   },
+  "s_7ab57f55": {
+    "source": "Cierre breve",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_7ab7b9a7": {
     "source": "Meta de la sesión: {{v0}}",
     "files": [
@@ -9106,6 +9112,12 @@
       "js/finance-planning.js"
     ]
   },
+  "s_87b5c82e": {
+    "source": "Después de cada llamada, marca si cerró bien, si cumpliste aunque fue difícil o si te dejó un aprendizaje.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_87b66d7f": {
     "source": "Disponible en nivel {{v0}}",
     "files": [
@@ -9773,12 +9785,6 @@
     "source": "Únicamente para que la app funcione: mostrarte tus propios datos, calcular tu\n    adherencia, tus minutos productivos y tus ganancias, sincronizar todo entre\n    tus dispositivos y detectar fallos técnicos para corregirlos. No se usan para\n    ningún otro fin.",
     "files": [
       "privacidad.html"
-    ]
-  },
-  "s_8fcf2cb5": {
-    "source": "Marca si cerró bien, si cumpliste aunque fue difícil o si te dejó un aprendizaje.",
-    "files": [
-      "app.html"
     ]
   },
   "s_900a7777": {
@@ -11910,6 +11916,12 @@
       "js/auth.js"
     ]
   },
+  "s_af8a3bbc": {
+    "source": "Un mensaje de apoyo cuando pasa mucho tiempo sin llamadas.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_afa97f45": {
     "source": "sin configurar",
     "files": [
@@ -13206,6 +13218,12 @@
       "js/weekly-summary.js"
     ]
   },
+  "s_c4890840": {
+    "source": "Aviso sin llamadas",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_c4939e30": {
     "source": "Cofre sellado desde {{v1}}",
     "files": [
@@ -13475,12 +13493,6 @@
   },
   "s_c89c5e49": {
     "source": "Temporada de 14 días",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_c8f1044e": {
-    "source": "Cierre breve después de cada llamada",
     "files": [
       "app.html"
     ]
@@ -15526,6 +15538,12 @@
       "app.html"
     ]
   },
+  "s_e5b5a040": {
+    "source": "Celebrar llamadas",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_e5bbea33": {
     "source": "Funciones",
     "files": [
@@ -15578,12 +15596,6 @@
     "source": "Mediodía Mordedor",
     "files": [
       "js/monsters.js"
-    ]
-  },
-  "s_e6bc8345": {
-    "source": "Celebrar llamadas completadas",
-    "files": [
-      "app.html"
     ]
   },
   "s_e6c4ffb3": {
@@ -16135,12 +16147,6 @@
     "source": "Se guarda la llamada en curso hasta este momento. Si falla, el turno sigue abierto.",
     "files": [
       "js/shift-work-review.js"
-    ]
-  },
-  "s_ee2cb28e": {
-    "source": "Apoyo y cierre de llamadas",
-    "files": [
-      "app.html"
     ]
   },
   "s_ee372ae2": {
@@ -17120,12 +17126,6 @@
     "source": "{{v2}}, aparte del pago base. Para corregirlo, abrí Higher Rate → Revisar llamadas → Corregir promoción.",
     "files": [
       "js/calls.js"
-    ]
-  },
-  "s_fbf212b6": {
-    "source": "Reconoce llamadas, recuperación, metas y premios elegidos por ti.",
-    "files": [
-      "app.html"
     ]
   },
   "s_fc107c60": {
