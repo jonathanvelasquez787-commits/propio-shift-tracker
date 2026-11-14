@@ -63,7 +63,7 @@ export function paletteTokens(palette,mode) {
     '--rpt-blue':accent,'--rpt-purple':secondary,'--accent-decorative':accent,'--pale-decorative':accent,'--accent-blue-2':accent,'--hover-flip':accent,
     '--icon-mono':text,'--btn-secondary-bg':panel2,'--surface-control':panel2,'--surface-sunken':background,'--black-badge':light?text:background,
     '--palette-primary':raw,'--palette-secondary':colors[palette.secondary],'--palette-on-primary':onRaw,
-    '--palette-card-tint':mix(raw,panel,light?.14:.12),'--palette-hero-tint':mix(fixed?fixed.secondary:colors[palette.secondary],panel,.15),
+    '--palette-card-tint':mix(raw,panel,light?.14:.12),'--palette-hero-tint':palette.id==='graphite'?panel:mix(fixed?fixed.secondary:colors[palette.secondary],panel,.15),
     '--earnings-value-color':accent,'--glow-1':'transparent','--glow-2':'transparent',
     '--shadow':light?'0 4px 18px rgba(20,25,45,.09)':'0 6px 22px rgba(0,0,0,.18)',
     '--shadow-soft':light?'0 2px 8px rgba(20,25,45,.04)':'0 3px 10px rgba(0,0,0,.1)',

@@ -54,6 +54,8 @@ test('graphite palette only changes the three background blacks and keeps Origin
     assert.equal(tokens[key], undefined, `${key} must come from Original`);
   assert.equal(dark['--palette-primary'], '#2FD5FF');
   assert.equal(light['--palette-primary'], '#6366F1');
+  // Sin degradado: en Grafito la tarjeta principal y las demás comparten un solo color.
+  for (const tokens of [dark, light]) assert.equal(tokens['--palette-hero-tint'], tokens['--panel']);
 });
 
 test('graphite palette is offered in the appearance dialog and the palette count matches', () => {
