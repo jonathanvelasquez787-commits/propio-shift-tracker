@@ -19,10 +19,10 @@ function element() {
     focus(){ this.focused = true; }, contains:()=>false };
 }
 function presentationHarness() {
-  const inputs = ['enabled','earnings','schedule','game'].map(key => Object.assign(element(), { dataset:{ essentialOption:key } }));
+  const inputs = ['earnings','schedule','game'].map(key => Object.assign(element(), { dataset:{ essentialOption:key } }));
   const root = element(), listeners = {};
   const doc = { documentElement:root, querySelectorAll:()=>inputs, querySelector:()=>null, addEventListener:(type,action)=>listeners[type]=action };
-  let settings = { essentialView:{ enabled:true, earnings:false, schedule:true, game:false }, marker:'keep' };
+  let settings = { essentialView:{ earnings:false, schedule:true, game:false }, marker:'keep' };
   const h = { inputs, root, doc, listeners, reject:false, get settings(){ return settings; }, replace(value){settings=value;} };
   wirePresentation({ getSettings:()=>settings, save:()=>!h.reject, apply:()=>applyPresentation(settings,doc) },doc);
   applyPresentation(settings,doc);
@@ -30,27 +30,29 @@ function presentationHarness() {
 }
 
 test('essential view restores configured blocks without altering data or achievement settings', () => {
-  assert.deepEqual(presentationPreferences(null), { enabled:false, earnings:true, schedule:true, game:false });
-  assert.equal(presentationPreferences({enabled:'true', game:'true'}).enabled,false);
+  assert.deepEqual(presentationPreferences(null), { earnings:true, schedule:true, game:true });
+  // Formato anterior: con el interruptor principal apagado se veía todo; encendido respeta lo elegido.
+  assert.deepEqual(presentationPreferences({enabled:false, earnings:false, game:false}), { earnings:true, schedule:true, game:true });
+  assert.deepEqual(presentationPreferences({enabled:true, earnings:false}), { earnings:false, schedule:true, game:false });
   const h = presentationHarness(), before = JSON.stringify(h.settings);
   assert.ok(h.root.classList.contains('essential-hide-earnings'));
   assert.ok(h.root.classList.contains('essential-hide-game'));
   assert.equal(h.root.classList.contains('essential-hide-schedule'),false);
   assert.equal(JSON.stringify(h.settings),before);
-  h.inputs[0].checked=false; h.inputs[0].change();
-  assert.equal(h.root.classList.contains('essential-hide-earnings'),false);
-  assert.equal(h.inputs[1].disabled,true);
-  assert.equal(h.settings.essentialView.earnings,false);
   h.inputs[0].checked=true; h.inputs[0].change();
+  assert.equal(h.root.classList.contains('essential-hide-earnings'),false);
+  assert.equal(h.settings.essentialView.earnings,true);
+  assert.equal('enabled' in h.settings.essentialView,false);
+  h.inputs[0].checked=false; h.inputs[0].change();
   assert.ok(h.root.classList.contains('essential-hide-earnings'));
   assert.equal(h.settings.marker,'keep');
 });
 
 test('a failed essential preference save rolls back controls and leaves the previous preference intact', () => {
   const h = presentationHarness(), previous = h.settings.essentialView;
-  h.reject=true; h.inputs[1].checked=true; h.inputs[1].change();
+  h.reject=true; h.inputs[0].checked=true; h.inputs[0].change();
   assert.equal(h.settings.essentialView,previous);
-  assert.equal(h.inputs[1].checked,false);
+  assert.equal(h.inputs[0].checked,false);
   assert.ok(h.root.classList.contains('essential-hide-earnings'));
 });
 

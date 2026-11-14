@@ -7,12 +7,6 @@ body :is(button,a,input,select,textarea,summary,[tabindex]) { scroll-margin-bloc
 .essential-hide-schedule #pageHome #scheduleAccordion,
 .essential-hide-game #gameHomeGroup,
 .essential-hide-game .hero .game-chip { display:none !important; }
-#essentialViewSettings { margin-top:20px; }
-#essentialViewSettings fieldset { border:1px solid var(--line); border-radius:12px; padding:10px 14px; margin-top:10px; min-width:0; }
-#essentialViewSettings legend { color:var(--text); font-size:12px; padding:0 5px; }
-#essentialViewSettings label { min-height:44px; }
-#essentialViewSettings input { flex-shrink:0; width:20px; height:20px; accent-color:var(--cyan); }
-#essentialViewSettings .note { line-height:1.6; color:var(--muted); font-size:12px; }
 .calls-status-actions button[hidden] { display:none !important; }
 
 html.theme-light[data-palette="original"] { --muted-3:var(--muted); --text-muted-3:var(--muted); }
