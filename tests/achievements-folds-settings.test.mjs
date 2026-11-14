@@ -28,7 +28,7 @@ test('Logros: Equipo, Bestiario, Trofeos e Historial son filas plegadas con cont
 
 test('Logros: los ajustes van plegados justo debajo de Activar Logros', () => {
   const settings = page.slice(page.lastIndexOf('<details', page.indexOf('id="gameSettingsFold"')));
-  for (const id of ['gameSettingsAccordion', 'positiveRewardsAccordion', 'gameResetAccordion', 'monsterNameInput', 'gameSoundVolumeInput', 'resetGameProgressBtn']) {
+  for (const id of ['gameSettingsAccordion', 'gameSoundSettingRow', 'gameWeaponsSettingRow', 'gameResetAccordion', 'monsterNameInput', 'gameSoundVolumeInput', 'resetGameProgressBtn']) {
     assert.ok(settings.includes(`id="${id}"`), `#${id} dentro de Ajustes`);
   }
   assert.ok(page.indexOf('id="gameSettingsFold"') > page.indexOf('id="gameEnabledInput"'));

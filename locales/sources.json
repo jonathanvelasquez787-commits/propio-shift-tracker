@@ -1474,6 +1474,12 @@
       "js/positive-reinforcement.js"
     ]
   },
+  "s_15dc0678": {
+    "source": "Acerca del volumen de Logros",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_15e99343": {
     "source": ", que forma parte de estos términos.",
     "files": [
@@ -1484,12 +1490,6 @@
     "source": "Llamada guardada ({{v0}}) — edítala en Tabla de llamadas si hace falta",
     "files": [
       "js/calls.js"
-    ]
-  },
-  "s_1613bb90": {
-    "source": "Armas, práctica y duelo",
-    "files": [
-      "app.html"
     ]
   },
   "s_16150449": {
@@ -5533,12 +5533,6 @@
     "source": "La app todavía no está conectada a su base de datos. Si eres quien la administra: edita js/config.js con la URL y la anon key de Supabase.",
     "files": [
       "js/landing.js"
-    ]
-  },
-  "s_52783691": {
-    "source": "Nombre del monstruo y sonidos arcade. Las misiones se calculan automáticamente.",
-    "files": [
-      "app.html"
     ]
   },
   "s_527cc8d3": {
@@ -12247,12 +12241,6 @@
       "app.html"
     ]
   },
-  "s_b5d8fc73": {
-    "source": "PROGRESO DE JUEGO",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_b6083e12": {
     "source": "Acerca de Próximas recompensas",
     "files": [
@@ -13682,12 +13670,6 @@
       "js/call-table-view.js"
     ]
   },
-  "s_ce8a1664": {
-    "source": "PERSONALIZACIÓN",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_ce959d4e": {
     "source": "Ganando bono ahora",
     "files": [
@@ -13910,6 +13892,12 @@
   },
   "s_d1918071": {
     "source": "Personalizar",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_d19a4470": {
+    "source": "Cómo funcionan",
     "files": [
       "app.html"
     ]
@@ -15500,6 +15488,12 @@
       "js/game.js",
       "js/pay-receipts.js",
       "js/reports.js"
+    ]
+  },
+  "s_e7cfd5ad": {
+    "source": "Armas y duelo",
+    "files": [
+      "app.html"
     ]
   },
   "s_e7d3c8f8": {

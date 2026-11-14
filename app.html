@@ -910,48 +910,37 @@
   <summary class="game-fold-summary"><h2>Ajustes</h2></summary>
   <div class="game-fold-body">
   <section class="game-settings-disclosures" aria-label="Preferencias de Logros">
-<details class="game-panel game-settings-accordion" id="gameSettingsAccordion">
-    <summary class="game-settings-accordion-summary">
-      <span class="game-settings-accordion-copy"><span class="game-panel-eyebrow">PERSONALIZACIÓN</span><strong>Gamificación</strong><small>Nombre del monstruo y sonidos arcade. Las misiones se calculan automáticamente.</small></span>
-      <span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
-    </summary>
-    <div class="game-settings-accordion-body">
-      <details class="review-details"><summary>Armas, práctica y duelo</summary><div class="review-detail-body"><p class="note">Las armas cambian la animación y la práctica. Disparar o jugar el duelo no registra llamadas, dinero ni XP laboral. El duelo se ofrece en Break/Lunch o fuera del turno; al volver al trabajo se pausa y podés retomarlo después.</p><p class="note">En Inicio, abrí Logros debajo de la batalla para elegir el arma y Duelo · 60 s. Automático permite salir; al regresar, elegí Duelo y Continuar duelo. En móvil usá los controles debajo de la escena.</p></div></details>
-      <div class="game-settings-section">
-        <div class="game-monster-name-setting">
-          <label for="monsterNameInput">Nombre del monstruo del día</label>
-          <div class="game-monster-name-controls"><input id="monsterNameInput" type="text" maxlength="60" autocomplete="off" aria-describedby="monsterNameHelp monsterNameSaveStatus" placeholder="Usar nombre del catálogo"/><button class="mc-btn-primary cyan" id="monsterNameSaveBtn" type="button">Guardar nombre</button></div>
-          <small id="monsterNameHelp">Un solo nombre para el monstruo diario. Déjalo vacío para usar los nombres del catálogo.</small>
-          <span class="game-monster-name-status" id="monsterNameSaveStatus" role="status" aria-live="polite"></span>
-        </div>
-        <div class="game-monster-name-setting">
-          <label for="gameSoundVolumeInput">Volumen de Logros</label>
-          <div class="volume-row"><input id="gameSoundVolumeInput" type="range" min="0" max="100" step="1" value="40" aria-describedby="gameSoundHelp"/><span class="volume-value" id="gameSoundVolumeValue">40%</span><button class="sched-compact-test-btn" id="gameSoundPreviewBtn" type="button" aria-label="Probar sonidos arcade"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polygon points="4 9 8 9 12 5 12 19 8 15 4 15"/><path d="M17 8a5 5 0 0 1 0 8"/></svg></button></div>
-          <small id="gameSoundHelp">Golpes, armaduras, combos, premios y victorias con efectos breves. Se combinan con el volumen general de Ajustes → Alarmas. Puedes silenciarlos en el menú lateral.</small>
-          <span class="game-monster-name-status" id="gameSoundStatus" role="status" aria-live="polite"></span>
-        </div>
-      </div>
+<details class="game-settings-row" id="gameSettingsAccordion">
+  <summary><span>Monstruo del día<small>Nombre</small></span></summary>
+  <div class="game-settings-row-body">
+    <div class="game-monster-name-setting">
+      <label for="monsterNameInput">Nombre del monstruo del día</label>
+      <div class="game-monster-name-controls"><input id="monsterNameInput" type="text" maxlength="60" autocomplete="off" aria-describedby="monsterNameHelp monsterNameSaveStatus" placeholder="Usar nombre del catálogo"/><button class="mc-btn-primary cyan" id="monsterNameSaveBtn" type="button">Guardar nombre</button></div>
+      <small id="monsterNameHelp">Un solo nombre para el monstruo diario. Déjalo vacío para usar los nombres del catálogo.</small>
+      <span class="game-monster-name-status" id="monsterNameSaveStatus" role="status" aria-live="polite"></span>
     </div>
-  </details>
-        <details class="game-settings-accordion game-reward-settings" id="positiveRewardsAccordion">
-          <summary class="game-settings-accordion-summary"><span class="game-settings-accordion-copy"><strong>Mis premios</strong><small>Premios físicos y catálogo sugerido.</small></span><span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></summary>
-          <div class="game-settings-accordion-body positive-rewards-body">
-        <div class="positive-settings-block">
-          <div class="positive-settings-heading"><span><strong>Mis premios físicos</strong><small>Se guardan hasta tu próximo Break, Lunch o fin del turno.</small></span><button type="button" data-positive-action="new-reward">Crear mi premio</button></div>
-          <div class="physical-reward-selected-list" id="physicalRewardSelected"></div>
-        </div>
-        <div class="positive-settings-block">
-          <div class="positive-settings-heading"><span><strong>Catálogo sugerido</strong><small>Agrega una idea y personalízala a tu gusto.</small></span></div>
-          <div class="physical-reward-catalog" id="physicalRewardCatalog"><label for="physicalRewardPresetSelect">Elegir un premio sugerido</label><div class="game-monster-name-controls"><select id="physicalRewardPresetSelect"></select><button type="button" id="physicalRewardPresetAdd" data-positive-action="add-preset">Agregar premio</button></div><small id="physicalRewardPresetDescription"></small></div>
-        </div>
-        <p class="note" style="margin:0;">La app nunca compra nada ni interrumpe una llamada. Tú decides cuándo realizar, guardar o cambiar cada premio.</p></div>
-        </details>
+  </div>
+</details>
+<details class="game-settings-row" id="gameSoundSettingRow">
+  <summary><span>Volumen de Logros<small>Sonidos arcade</small></span></summary>
+  <div class="game-settings-row-body">
+    <div class="game-monster-name-setting">
+      <div class="msg-preview-row"><label for="gameSoundVolumeInput">Volumen de Logros</label><span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca del volumen de Logros" aria-describedby="gameSoundHelp">i</button><span class="sched-help-tooltip" id="gameSoundHelp" role="tooltip">Golpes, armaduras, combos, premios y victorias con efectos breves. Se combinan con el volumen general de Ajustes → Alarmas. Puedes silenciarlos en el menú lateral.</span></span></div>
+      <div class="volume-row"><input id="gameSoundVolumeInput" type="range" min="0" max="100" step="1" value="40" aria-describedby="gameSoundHelp"/><span class="volume-value" id="gameSoundVolumeValue">40%</span><button class="sched-compact-test-btn" id="gameSoundPreviewBtn" type="button" aria-label="Probar sonidos arcade"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polygon points="4 9 8 9 12 5 12 19 8 15 4 15"/><path d="M17 8a5 5 0 0 1 0 8"/></svg></button></div>
+      <span class="game-monster-name-status" id="gameSoundStatus" role="status" aria-live="polite"></span>
+    </div>
+  </div>
+</details>
+<details class="game-settings-row" id="gameWeaponsSettingRow">
+  <summary><span>Armas y duelo<small>Cómo funcionan</small></span></summary>
+  <div class="game-settings-row-body"><p class="note">Las armas cambian la animación y la práctica. Disparar o jugar el duelo no registra llamadas, dinero ni XP laboral. El duelo se ofrece en Break/Lunch o fuera del turno; al volver al trabajo se pausa y podés retomarlo después.</p><p class="note">En Inicio, abrí Logros debajo de la batalla para elegir el arma y Duelo · 60 s. Automático permite salir; al regresar, elegí Duelo y Continuar duelo. En móvil usá los controles debajo de la escena.</p></div>
+</details>
 </section>
 
 <section class="game-advanced-settings" aria-label="Herramientas avanzadas">
 
   <details class="game-panel game-settings-accordion" id="gameResetAccordion">
-    <summary class="game-settings-accordion-summary"><span class="game-settings-accordion-copy"><span class="game-panel-eyebrow">PROGRESO DE JUEGO</span><strong>Reiniciar progreso</strong><small>Revisa qué se borra antes de confirmar.</small></span><span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></summary>
+    <summary class="game-settings-accordion-summary"><span class="game-settings-accordion-copy"><strong>Reiniciar progreso</strong><small>Revisa qué se borra antes de confirmar.</small></span><span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></summary>
     <div class="game-settings-accordion-body"><div class="danger-card tone-bad game-settings-danger">
           <div class="danger-card-head"><span class="danger-card-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 15 9 15 3"/></svg></span><span class="danger-card-title">Reiniciar progreso</span></div>
           <p class="danger-card-desc">Borra nivel, XP, racha, trofeos, accesorios y monstruos derrotados. Tus llamadas, turnos, metas y finanzas no se tocan.</p>
@@ -1048,6 +1037,20 @@
   </div>
 </details>
 </section>
+
+<details class="game-settings-accordion game-reward-settings" id="positiveRewardsAccordion">
+  <summary class="game-settings-accordion-summary"><span class="game-settings-accordion-copy"><strong>Mis premios</strong><small>Premios físicos y catálogo sugerido.</small></span><span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></summary>
+  <div class="game-settings-accordion-body positive-rewards-body">
+<div class="positive-settings-block">
+  <div class="positive-settings-heading"><span><strong>Mis premios físicos</strong><small>Se guardan hasta tu próximo Break, Lunch o fin del turno.</small></span><button type="button" data-positive-action="new-reward">Crear mi premio</button></div>
+  <div class="physical-reward-selected-list" id="physicalRewardSelected"></div>
+</div>
+<div class="positive-settings-block">
+  <div class="positive-settings-heading"><span><strong>Catálogo sugerido</strong><small>Agrega una idea y personalízala a tu gusto.</small></span></div>
+  <div class="physical-reward-catalog" id="physicalRewardCatalog"><label for="physicalRewardPresetSelect">Elegir un premio sugerido</label><div class="game-monster-name-controls"><select id="physicalRewardPresetSelect"></select><button type="button" id="physicalRewardPresetAdd" data-positive-action="add-preset">Agregar premio</button></div><small id="physicalRewardPresetDescription"></small></div>
+</div>
+<p class="note" style="margin:0;">La app nunca compra nada ni interrumpe una llamada. Tú decides cuándo realizar, guardar o cambiar cada premio.</p></div>
+</details>
 
 <div class="positive-evidence-card" hidden id="positiveEvidenceCard" aria-live="polite"></div>
 </div>

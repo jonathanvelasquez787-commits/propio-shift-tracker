@@ -81,7 +81,7 @@ test('HTML integra la ruta de Logros, el arena, las misiones, ajustes y modales 
 test('Logros simplifica ajustes, comparte activación lateral y admite nombre personalizado seguro', () => {
   const html = read('app.html');
   const achievements = between(html, '<div class="app-page game-achievements-page"', '</div><!-- /pageAchievements -->');
-  const gameEditor = between(achievements, '<details class="game-panel game-settings-accordion" id="gameSettingsAccordion">', '<details class="game-settings-accordion game-reward-settings" id="positiveRewardsAccordion">');
+  const gameEditor = between(achievements, '<details class="game-settings-row" id="gameSettingsAccordion">', '<section class="game-advanced-settings"');
   const settingsModal = between(html, '<div aria-hidden="true" class="modal-overlay" id="goalsModal">', '<div aria-hidden="true" class="modal-overlay game-modal-overlay" id="stageClearModal">');
   const allIds = [...html.matchAll(/\bid="([^"]+)"/g)].map((match) => match[1]);
   assert.deepEqual(allIds.filter((id, index) => allIds.indexOf(id) !== index), []);
