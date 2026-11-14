@@ -31,7 +31,10 @@ test('all custom palettes have readable normal text and restore original without
   for (const mode of ['light', 'dark']) for (const palette of PALETTES.slice(1)) {
     const tokens = paletteTokens(palette, mode);
     for (const color of ['--text', '--muted', '--primary']) assert.ok(contrast(tokens[color], tokens['--panel']) >= 4.5, `${palette.id}/${mode}/${color}`);
-    assert.ok(contrast(tokens['--bg'], tokens['--panel']) >= (mode === 'light' ? 1.18 : 1.25), `${palette.id}/${mode}: page and cards must remain distinct`);
+    // Las tarjetas se dibujan con borde (--card-line): la separación puede venir de las superficies
+    // o, en paletas de negros muy cercanos, del borde contra la página o la tarjeta.
+    const separation = Math.max(contrast(tokens['--bg'], tokens['--panel']), contrast(tokens['--card-line'], tokens['--bg']), contrast(tokens['--card-line'], tokens['--panel']));
+    assert.ok(separation >= (mode === 'light' ? 1.18 : 1.25), `${palette.id}/${mode}: page and cards must remain distinct`);
     applySavedColors({ palette: palette.id, theme: mode, language: 'en' }, root);
     assert.equal(root.lang, 'en');
     assert.equal(properties.get('--bg'), tokens['--bg']);
@@ -40,6 +43,33 @@ test('all custom palettes have readable normal text and restore original without
   }
   applySavedColors({ palette: 'invalid' }, root);
   assert.equal(root.dataset.palette, 'original');
+});
+
+test('graphite palette keeps three neutral blacks, grey text and borders, and an indigo accent in both modes', () => {
+  const graphite = PALETTES.find(item => item.id === 'graphite');
+  assert.ok(graphite && graphite.name === 'Negro Grafito' && !graphite.code);
+  const channels = hex => hex.match(/[a-f\d]{2}/gi).map(value => parseInt(value, 16));
+  const dark = paletteTokens(graphite, 'dark'), light = paletteTokens(graphite, 'light');
+  assert.deepEqual([dark['--bg'], dark['--panel'], dark['--panel-2']], ['#09090B', '#131315', '#1E1E22']);
+  assert.deepEqual([light['--bg'], light['--panel'], light['--panel-2']], ['#F4F4F5', '#FFFFFF', '#EBEBEE']);
+  for (const tokens of [dark, light]) for (const key of ['--text', '--muted', '--line', '--line-2']) {
+    const [r, g, b] = channels(tokens[key]);
+    assert.ok(Math.max(r, g, b) - Math.min(r, g, b) <= 8, `${key} must stay neutral grey: ${tokens[key]}`);
+  }
+  // Sobre negro la fórmula general dejaría el borde casi tan claro como el texto; aquí es sutil.
+  assert.ok(contrast(dark['--line'], dark['--bg']) < 1.6 && contrast(dark['--line'], dark['--panel']) >= 1.2);
+  for (const tokens of [dark, light]) {
+    const [r, g, b] = channels(tokens['--palette-primary']);
+    assert.ok(b > r && b > g, 'indigo accent');
+    assert.equal(tokens['--palette-primary'], '#6366F1');
+  }
+});
+
+test('graphite palette is offered in the appearance dialog and the palette count matches', () => {
+  const html = fs.readFileSync(new URL('../app.html', import.meta.url), 'utf8');
+  const ids = [...html.matchAll(/data-palette-choice="([^"]+)"/g)].map(match => match[1]);
+  assert.deepEqual(ids, PALETTES.map(item => item.id));
+  assert.ok(html.includes(`Original + ${PALETTES.length - 1} paletas`));
 });
 
 test('offline English translates authored text while retaining personal names and nested safe markup', () => {

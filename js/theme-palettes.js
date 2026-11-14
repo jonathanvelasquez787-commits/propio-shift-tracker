@@ -6,7 +6,8 @@ export const PALETTES = [
   { id:'sand',name:'Azul Arena',description:'Azul suave, crema y arena',colors:['#81A6C6','#AACDDC','#F3E3D0','#D2C4B4'],code:'81a6c6aacddcf3e3d0d2c4b4',lightAccent:0,darkAccent:1,secondary:3,lightBackground:2 },
   { id:'royal',name:'Azul Real',description:'Azul noche, intenso y celeste',colors:['#091540','#1B2CC1','#7692FF','#ABD2FA'],code:'0915401b2cc17692ffabd2fa',lightAccent:1,darkAccent:2,secondary:2,lightBackground:3 },
   { id:'ocean',name:'Turquesa Profundo',description:'Turquesa, azul y violeta',colors:['#78B9B5','#0F828C','#065084','#320A6B'],code:'78b9b50f828c065084320a6b',lightAccent:1,darkAccent:0,secondary:3,lightBackground:0 },
-  { id:'sage',name:'Verde Salvia',description:'Verde salvia, menta y crema',colors:['#659287','#88BDA4','#B1D3B9','#E6F2DD'],code:'65928788bda4b1d3b9e6f2dd',lightAccent:0,darkAccent:1,secondary:2,lightBackground:3 }
+  { id:'sage',name:'Verde Salvia',description:'Verde salvia, menta y crema',colors:['#659287','#88BDA4','#B1D3B9','#E6F2DD'],code:'65928788bda4b1d3b9e6f2dd',lightAccent:0,darkAccent:1,secondary:2,lightBackground:3 },
+  { id:'graphite',name:'Negro Grafito',description:'Negros neutros y acento índigo',colors:['#09090B','#1E1E22','#A1A1AA','#6366F1'],lightAccent:3,darkAccent:3,secondary:2 }
 ];
 const rgb = hex => hex.match(/[a-f\d]{2}/gi).map(value=>parseInt(value,16));
 const hex = channels => '#'+channels.map(value=>Math.round(value).toString(16).padStart(2,'0')).join('');
@@ -27,6 +28,15 @@ const PALETTE_SURFACES = {
   royal: { light:['#CEDDF7','#ECF3FF','#DDE8FB'], dark:['#060B1E','#19264A','#273760'] },
   ocean: { light:['#C5E1DF','#EAF5F3','#D8ECE9'], dark:['#071E2B','#12394A','#1B4B57'] },
   sage: { light:['#CDE3D3','#EAF4E8','#DCECDF'], dark:['#162A28','#29423D','#36534A'] },
+  graphite: { light:['#F4F4F5','#FFFFFF','#EBEBEE'], dark:['#09090B','#131315','#1E1E22'] },
+};
+// Paletas neutras: texto y bordes grises fijos. La fórmula general mezcla el texto con la
+// superficie y, sobre negro, deja bordes demasiado brillantes.
+const PALETTE_NEUTRALS = {
+  graphite: {
+    light: { text:'#0E1015', line:'#E1E1E4', line2:'#C9C9CC' },
+    dark: { text:'#FEFEFE', line:'#27272A', line2:'#3A3A3D' },
+  },
 };
 export function paletteTokens(palette,mode) {
   if(palette.id==='original')return {};
@@ -36,15 +46,17 @@ export function paletteTokens(palette,mode) {
   const raw=colors[light?palette.lightAccent:palette.darkAccent];
   const surfaces=[panel,panel2,background];
   const accent=readable(raw,surfaces),secondary=readable(colors[palette.secondary],surfaces);
-  const text=light?mix(deep,'#11131b',.35):mix(colors[3],'#ffffff',.12);
-  const muted=readable(mix(text,panel,.65),surfaces),line=mix(text,panel,light?.16:.22);
+  const neutral=PALETTE_NEUTRALS[palette.id]?.[mode];
+  const text=neutral?neutral.text:light?mix(deep,'#11131b',.35):mix(colors[3],'#ffffff',.12);
+  const muted=readable(mix(text,panel,.65),surfaces),line=neutral?neutral.line:mix(text,panel,light?.16:.22);
+  const line2=neutral?neutral.line2:mix(text,panel,.28);
   const good=readable(light?'#14794d':'#83e6ad',surfaces),warn=readable(light?'#a25c08':'#ffd17b',surfaces),bad=readable(light?'#b63149':'#ff96ad',surfaces);
   const onRaw=contrast(raw,'#10121d')>=contrast(raw,'#ffffff')?'#10121d':'#ffffff';
   const tokens={
     '--bg':background,'--bg-2':background,'--bg-page':background,'--bg-card':panel,
     '--panel':panel,'--panel-navy':panel,'--panel-2':panel2,'--accordion-bg':panel,
     '--text':text,'--text-dark':text,'--muted':muted,'--text-gray':muted,'--muted-3':muted,'--text-muted-3':muted,
-    '--line':line,'--line-2':mix(text,panel,.28),'--card-line':line,'--border-light':line,
+    '--line':line,'--line-2':line2,'--card-line':line,'--border-light':line,
     '--cyan':accent,'--primary':accent,'--primary-light':panel2,'--teal':secondary,'--blue':secondary,'--purple':secondary,'--pink':accent,
     '--good':good,'--success-green':good,'--warn':warn,'--break-orange':warn,'--bad':bad,'--danger-red':bad,'--lunch-purple':secondary,
     '--pale-cyan':accent,'--pale-teal':secondary,'--pale-indigo':secondary,'--pale-good':good,'--pale-warn':warn,'--pale-bad':bad,
