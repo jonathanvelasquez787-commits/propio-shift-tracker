@@ -111,9 +111,10 @@ export function battleMarkup() {
     <div class="game-battle-health" data-battle-health-slot></div>
     <div class="game-battle-footer"><p class="game-battle-feed" data-battle-feed></p><button type="button" data-battle-action="collection" data-battle-collection-toggle aria-expanded="false" aria-controls="gameBattleCollection">Logros <span aria-hidden="true">⌄</span></button></div>
     <section id="gameBattleCollection" class="game-battle-collection" data-battle-collection hidden aria-label="Logros">
-      <div data-battle-collection-summary></div>
-      <div class="game-battle-loadout"><div><label for="gameBattleWeapon">Arma</label><select id="gameBattleWeapon" data-battle-weapon-select>${BATTLE_WEAPONS.map(w => `<option value="${w.id}">${escape(weaponName(w.id))}</option>`).join('')}</select><small data-battle-selected></small></div></div>
-      <div class="game-battle-mode-row"><div class="game-battle-modes" role="group" aria-label="Modo de juego"><button type="button" data-battle-action="auto" aria-pressed="true">Automático</button><button type="button" data-battle-action="duel" aria-pressed="false" data-battle-duel-button>Duelo · 60 s</button></div><small data-battle-work-note></small></div>
+      <div class="game-battle-slots"><div class="game-battle-slot" data-battle-collection-summary></div>
+        <div class="game-battle-loadout"><div><label for="gameBattleWeapon">Arma</label><select id="gameBattleWeapon" data-battle-weapon-select>${BATTLE_WEAPONS.map(w => `<option value="${w.id}">${escape(weaponName(w.id))}</option>`).join('')}</select><small data-battle-selected></small></div></div></div>
+      <div class="game-battle-mode-row"><div class="game-battle-modes" role="group" aria-label="Modo de juego"><button type="button" data-battle-action="auto" aria-pressed="true">Automático</button><button type="button" data-battle-action="duel" aria-pressed="false" data-battle-duel-button>Duelo · 60 s</button></div></div>
+      <div class="game-battle-collection-foot"><small data-battle-work-note></small><button type="button" data-game-nav>Ver mis Logros →</button></div>
       <div class="game-battle-duel-hud" data-battle-duel-hud hidden>
         <strong data-battle-hearts aria-label="Vidas del héroe"></strong><span data-battle-time></span><span data-battle-points></span><span data-battle-best></span>
         <button type="button" data-battle-action="start" data-battle-start>Jugar</button>

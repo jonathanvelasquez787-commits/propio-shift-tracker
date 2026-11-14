@@ -1116,7 +1116,8 @@
         {
           "file": "tests/game-battle-compact.test.mjs",
           "namedCases": [
-            "Reto de hoy compacto: nivel en el encabezado y sin bloques repetidos"
+            "Reto de hoy compacto: nivel en el encabezado y sin bloques repetidos",
+            "Logros desplegado: visor y arma lado a lado, modos unidos y un solo pie"
           ]
         },
         {
