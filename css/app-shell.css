@@ -1155,7 +1155,7 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 .chips > .hero-shift-actions :is(#shiftControlBtn,#breakControlBtn,#lunchControlBtn,#liveDiscardBtn,#callControlBtn,#pasteCallsBtn,#addCallManualBtn) .action-sub { display: none; }
 /* Nombre corto debajo del icono. */
 .chips > .hero-shift-actions .action-short { position: relative; z-index: 1; display: block; grid-column: 1 / -1; width: 100%; font-size: 10px; font-weight: 700; line-height: 1.1; text-align: center; white-space: nowrap; }
-.chips > .hero-shift-actions .action-btn:not(.is-active):not(.is-pressed):not(.is-pending) .action-short { color: var(--muted); }
+.chips > .hero-shift-actions .action-btn:not(.is-active):not(.is-pressed):not(.is-pending):not(:hover) .action-short { color: var(--muted); }
 .chips > .hero-shift-actions .action-btn.is-pending .action-short { color: inherit; }
 /* El botón de Break, Lunch o llamada que está en curso (o pendiente) se abre y muestra su tiempo; el nombre sigue debajo. */
 .chips > .hero-shift-actions :is(#breakControlBtn,#lunchControlBtn,#callControlBtn).is-active,
