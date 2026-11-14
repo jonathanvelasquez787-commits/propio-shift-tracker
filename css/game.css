@@ -1542,3 +1542,9 @@ html.theme-light {
 .inactivity-compact .inactivity-row small { color:var(--muted); font-size:11px; line-height:1.35; }
 .inactivity-compact .inactivity-row input { flex:0 0 auto; width:64px; min-height:38px; padding:8px 6px; text-align:center; border:1px solid var(--line); border-radius:10px; background:var(--panel-navy); color:var(--text); }
 .inactivity-compact .game-monster-name-controls { grid-template-columns:minmax(0,1fr) auto; }
+
+/* Encabezado compacto de Logros: título, temporada e interruptor en pocas líneas */
+.game-achievements-hero-compact { padding: 10px 12px; }
+.game-achievements-hero-compact .game-achievements-hero-row { margin-top: 0; align-items: center; gap: 8px 12px; }
+.game-achievements-hero-compact .game-achievements-toolbar { margin-top: 8px; padding-top: 8px; flex-wrap: nowrap; gap: 8px; }
+.game-achievements-hero-compact .game-achievements-toolbar .game-settings-toggle { flex: 1 1 auto; max-width: none; }
