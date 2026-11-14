@@ -30,27 +30,27 @@ const PALETTE_SURFACES = {
   sage: { light:['#CDE3D3','#EAF4E8','#DCECDF'], dark:['#162A28','#29423D','#36534A'] },
   graphite: { light:['#F4F4F5','#FFFFFF','#EBEBEE'], dark:['#09090B','#131315','#1E1E22'] },
 };
-// Paletas neutras: texto y bordes grises fijos. La fórmula general mezcla el texto con la
-// superficie y, sobre negro, deja bordes demasiado brillantes.
-const PALETTE_NEUTRALS = {
-  graphite: {
-    light: { text:'#0E1015', line:'#E1E1E4', line2:'#C9C9CC' },
-    dark: { text:'#FEFEFE', line:'#27272A', line2:'#3A3A3D' },
-  },
+// Grafito solo cambia los tres negros de fondo: el resto de colores (texto, bordes, botones,
+// acentos) se queda con los de Original. Estos valores solo alimentan los tokens --palette-*.
+const GRAPHITE_ORIGINAL = {
+  dark: { accent:'#2FD5FF', secondary:'#8B7BFF', good:'#66E2A5', warn:'#FFD15C', bad:'#FF6B72' },
+  light: { accent:'#6366F1', secondary:'#7C3AED', good:'#22C55E', warn:'#F97316', bad:'#DC2626' },
 };
+const GRAPHITE_KEEP = /^--(bg|bg-2|bg-page|bg-card|panel|panel-navy|panel-2|accordion-bg|primary-light|btn-secondary-bg|surface-control|surface-sunken|palette-.+|game-pixel-.+|liquid-.+|rail-.+)$/;
 export function paletteTokens(palette,mode) {
   if(palette.id==='original')return {};
   const light=mode==='light',colors=palette.colors;
   const deep=palette.id==='ocean'?colors[3]:colors[0];
   const [background,panel,panel2]=PALETTE_SURFACES[palette.id][mode];
-  const raw=colors[light?palette.lightAccent:palette.darkAccent];
+  const fixed=palette.id==='graphite'?GRAPHITE_ORIGINAL[mode]:null;
+  const raw=fixed?fixed.accent:colors[light?palette.lightAccent:palette.darkAccent];
   const surfaces=[panel,panel2,background];
-  const accent=readable(raw,surfaces),secondary=readable(colors[palette.secondary],surfaces);
-  const neutral=PALETTE_NEUTRALS[palette.id]?.[mode];
+  const accent=fixed?fixed.accent:readable(raw,surfaces),secondary=fixed?fixed.secondary:readable(colors[palette.secondary],surfaces);
+  const neutral=null;
   const text=neutral?neutral.text:light?mix(deep,'#11131b',.35):mix(colors[3],'#ffffff',.12);
   const muted=readable(mix(text,panel,.65),surfaces),line=neutral?neutral.line:mix(text,panel,light?.16:.22);
   const line2=neutral?neutral.line2:mix(text,panel,.28);
-  const good=readable(light?'#14794d':'#83e6ad',surfaces),warn=readable(light?'#a25c08':'#ffd17b',surfaces),bad=readable(light?'#b63149':'#ff96ad',surfaces);
+  const good=fixed?fixed.good:readable(light?'#14794d':'#83e6ad',surfaces),warn=fixed?fixed.warn:readable(light?'#a25c08':'#ffd17b',surfaces),bad=fixed?fixed.bad:readable(light?'#b63149':'#ff96ad',surfaces);
   const onRaw=contrast(raw,'#10121d')>=contrast(raw,'#ffffff')?'#10121d':'#ffffff';
   const tokens={
     '--bg':background,'--bg-2':background,'--bg-page':background,'--bg-card':panel,
@@ -63,7 +63,7 @@ export function paletteTokens(palette,mode) {
     '--rpt-blue':accent,'--rpt-purple':secondary,'--accent-decorative':accent,'--pale-decorative':accent,'--accent-blue-2':accent,'--hover-flip':accent,
     '--icon-mono':text,'--btn-secondary-bg':panel2,'--surface-control':panel2,'--surface-sunken':background,'--black-badge':light?text:background,
     '--palette-primary':raw,'--palette-secondary':colors[palette.secondary],'--palette-on-primary':onRaw,
-    '--palette-card-tint':mix(raw,panel,light?.14:.12),'--palette-hero-tint':mix(colors[palette.secondary],panel,.15),
+    '--palette-card-tint':mix(raw,panel,light?.14:.12),'--palette-hero-tint':mix(fixed?fixed.secondary:colors[palette.secondary],panel,.15),
     '--earnings-value-color':accent,'--glow-1':'transparent','--glow-2':'transparent',
     '--shadow':light?'0 4px 18px rgba(20,25,45,.09)':'0 6px 22px rgba(0,0,0,.18)',
     '--shadow-soft':light?'0 2px 8px rgba(20,25,45,.04)':'0 3px 10px rgba(0,0,0,.1)',
@@ -81,5 +81,6 @@ export function paletteTokens(palette,mode) {
   for(const [name,value] of Object.entries({work:raw,break:warn,lunch:colors[palette.secondary]})) {
     tokens[`--liquid-${name}-rgb`]=rgb(value).join(',');tokens[`--rail-${name}-rgb`]=rgb(value).join(',');
   }
+  if(fixed)for(const name of Object.keys(tokens))if(!GRAPHITE_KEEP.test(name))delete tokens[name];
   return tokens;
 }
