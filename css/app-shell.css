@@ -1325,3 +1325,9 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 #pageFinance .wk-total-row{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:12px 4px 10px}
 #pageFinance .wk-total-metrics{display:flex;flex:0 1 auto;justify-content:flex-end;gap:20px;margin-left:auto}
 }
+#scheduleAccordion.sched-freelancer-list .blocks-top-grid,#scheduleAccordion.sched-freelancer-list .day-metrics-row,#scheduleAccordion.sched-freelancer-list .blocks-footer-row{display:none}
+#scheduleAccordion.sched-freelancer-list .fl-break-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:13px}
+#scheduleAccordion.sched-freelancer-list .fl-break-chip{flex:0 0 auto;min-width:48px;text-align:center;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;color:var(--text);background:rgba(120,140,200,.18)}
+#scheduleAccordion.sched-freelancer-list .fl-break-chip.is-lunch{background:rgba(240,180,60,.2)}
+#scheduleAccordion.sched-freelancer-list .fl-break-time{flex:1 1 auto;min-width:0;color:var(--muted)}
+#scheduleAccordion.sched-freelancer-list .fl-break-min{flex:0 0 auto;white-space:nowrap}

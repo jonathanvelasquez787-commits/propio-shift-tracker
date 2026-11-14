@@ -1108,6 +1108,13 @@
           ]
         },
         {
+          "file": "tests/freelancer-blocks-list.test.mjs",
+          "namedCases": [
+            "Bloques del día en freelancer: cada descanso es una fila con etiqueta, horas y minutos",
+            "Bloques del día en freelancer: se esconden el botón de contraer y los huecos vacíos"
+          ]
+        },
+        {
           "file": "tests/finance-row-desktop.test.mjs",
           "namedCases": [
             "Finanzas escritorio: la tarjeta de gasto agrupa nombre y medidor para ir en una sola fila",
