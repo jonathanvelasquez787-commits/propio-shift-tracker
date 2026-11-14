@@ -80,7 +80,7 @@ test('graphite palette is offered in the appearance dialog and the palette count
   assert.ok(html.includes(`${PALETTE_CHOICES.length} temas`));
   // Una sola lista de temas: sin selector aparte de claro/oscuro, y Negro Grafito justo después de Original.
   assert.ok(!html.includes('data-preview-theme'));
-  assert.deepEqual(PALETTE_CHOICES.slice(0, 3).map(item => item.name), ['Original Claro', 'Original Oscuro', 'Negro Grafito']);
+  assert.deepEqual(PALETTE_CHOICES.slice(0, 3).map(item => item.name), ['Original Claro', 'Azul Oscuro', 'Negro Grafito']);
   for (const removed of ['Morado Neón', 'Azul Arena', 'Rosa Magenta']) assert.ok(!PALETTE_CHOICES.some(item => item.name === removed));
 });
 
