@@ -48,6 +48,18 @@ test('all custom palettes have readable normal text and restore original without
   assert.equal(root.dataset.palette, 'original');
 });
 
+test('switching between any two themes applies the new one and leaves nothing of the old one', () => {
+  const makeRoot = () => { const properties = new Map([['--user-test', 'keep']]); return { properties, dataset: {}, style: { setProperty: (key, value) => properties.set(key, value), removeProperty: key => properties.delete(key) } }; };
+  for (const from of PALETTE_CHOICES) for (const to of PALETTE_CHOICES) {
+    const root = makeRoot();
+    applySavedColors({ palette: from.paletteId, theme: from.mode, language: 'es' }, root);
+    applySavedColors({ palette: to.paletteId, theme: to.mode, language: 'es' }, root);
+    const fresh = makeRoot();
+    applySavedColors({ palette: to.paletteId, theme: to.mode, language: 'es' }, fresh);
+    assert.deepEqual([...root.properties].sort(), [...fresh.properties].sort(), `${from.key} -> ${to.key}`);
+  }
+});
+
 test('graphite palette only changes the three background blacks and keeps Original colors', () => {
   const graphite = PALETTES.find(item => item.id === 'graphite');
   assert.ok(graphite && graphite.name === 'Negro Grafito' && !graphite.code);
