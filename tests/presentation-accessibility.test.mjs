@@ -80,42 +80,44 @@ test('palette text and semantic states keep normal-text contrast on page and bot
 });
 
 function liveHarness() {
-  const elements=Object.fromEntries(['liveActivityBar','liveBarLabel','liveBarTimer','liveBarDiscardBtn','callsStatusCard','callsStatusIcon','callsStatusTextTitle','callsStatusTimer','callsStatusMid','callsStatusActions','callsControlsGrid','callsStatusSaveBtn','callsStatusEndBtn'].map(id=>[id,element()]));
-  const saveLabel=element();elements.liveActivityBar.querySelector=()=>saveLabel;
-  const context=vm.createContext({ state:{ activeCall:null,activePause:null,pendingLiveCallBackup:null }, document:{getElementById:id=>elements[id],body:element()},
-    translateText:value=>value, formatDuration:value=>String(value), iconHtml:()=>'', endCall(){},discardActiveCall(){},endPause(){},discardActivePause(){},restorePendingLiveCallBackup(){context.opened=true;},Date });
-  vm.runInContext('let currentLiveActivity = null;\n'+['liveActivityInfo','updateLiveActivityBar','updateCallsStatusCard'].map(fn).join('\n'),context);
-  return { context, elements, saveLabel };
+  const elements=Object.fromEntries(['liveDiscardBtn','callControlBtn','callsStatusCard','callsStatusIcon','callsStatusTextTitle','callsStatusTimer','callsStatusMid','callsStatusActions','callsControlsGrid','callsStatusSaveBtn','callsStatusEndBtn'].map(id=>[id,element()]));
+  const hero=element();
+  const context=vm.createContext({ state:{ activeCall:null,activePause:null,pendingLiveCallBackup:null }, document:{getElementById:id=>elements[id],querySelector:selector=>selector==='.hero-shift-actions'?hero:null,body:element()},
+    translateText:value=>value, formatDuration:value=>String(value), iconHtml:()=>'', isViewingToday:()=>true, endCall(){},discardActiveCall(){},endPause(){},discardActivePause(){},restorePendingLiveCallBackup(){context.opened=true;},Date });
+  vm.runInContext('let currentLiveActivity = null;\n'+['liveActivityInfo','updateLiveActivityBar','updateCallsStatusCard','callActionLabel','callActionTimer'].map(fn).join('\n'),context);
+  return { context, elements, hero };
 }
 test('pending calls show the same frozen duration and recovery action in activity bar and call card', () => {
-  const {context:h,elements:e,saveLabel}=liveHarness();
+  const {context:h,elements:e,hero}=liveHarness();
   h.state.pendingLiveCallBackup={startedAtISO:'2026-10-22T14:00:00Z',endedAtISO:'2026-10-22T14:02:03Z'};
   h.state.activePause={type:'break',startedAt:'2026-10-22T14:03:00Z'};
   const before=JSON.stringify(h.state);
   h.updateLiveActivityBar();h.updateCallsStatusCard();
-  assert.equal(e.liveBarLabel.textContent,e.callsStatusTextTitle.textContent);
-  assert.equal(e.liveBarTimer.textContent,'123000');assert.equal(e.callsStatusTimer.textContent,'123000');
-  assert.equal(saveLabel.textContent,'Revisar llamada');assert.equal(e.callsStatusSaveBtn.textContent,'Revisar llamada');
-  assert.equal(e.liveBarDiscardBtn.hidden,true);assert.equal(e.callsStatusEndBtn.hidden,true);
+  // La barra de acciones (única) y la tarjeta de llamadas muestran la misma duración congelada y la misma acción.
+  assert.equal(h.callActionTimer(),'123000');assert.equal(e.callsStatusTimer.textContent,'123000');
+  assert.equal(h.callActionLabel(),'Revisar llamada');assert.equal(e.callsStatusSaveBtn.textContent,'Revisar llamada');
+  assert.equal(hero.dataset.liveType,'pending');assert.equal(e.callControlBtn.classList.contains('is-pending'),true);
+  assert.equal(e.liveDiscardBtn.hidden,true);assert.equal(e.callsStatusEndBtn.hidden,true);
   assert.equal(e.callsStatusCard.hidden,false);
   h.liveActivityInfo().onSave();assert.equal(h.opened,true);assert.equal(JSON.stringify(h.state),before);
 });
 
 test('activity priority follows live call then pending call then pause and clears obsolete controls', () => {
-  const {context:h,elements:e}=liveHarness();
+  const {context:h,elements:e,hero}=liveHarness();
   h.state.activeCall={startedAt:new Date().toISOString()};
   h.state.pendingLiveCallBackup={startedAtISO:'2026-10-22T14:00:00Z',endedAtISO:'2026-10-22T14:02:00Z'};
   h.state.activePause={type:'lunch',startedAt:new Date().toISOString()};
   assert.equal(h.liveActivityInfo().type,'call');
   h.updateLiveActivityBar(); h.updateCallsStatusCard();assert.equal(e.callsStatusCard.hidden,false);
-  assert.equal(e.liveActivityBar.classList.contains('call-active'),true);
+  assert.equal(hero.dataset.liveType,'call');assert.equal(e.liveDiscardBtn.hidden,false);
+  assert.equal(e.callControlBtn.classList.contains('is-pending'),false);
   h.state.activeCall=null;assert.equal(h.liveActivityInfo().type,'pending');
   h.state.pendingLiveCallBackup=null;assert.equal(h.liveActivityInfo().type,'lunch');
-  h.updateLiveActivityBar();h.updateCallsStatusCard();assert.equal(e.liveBarDiscardBtn.hidden,false);
-  assert.equal(e.liveActivityBar.classList.contains('call-active'),false);
+  h.updateLiveActivityBar();h.updateCallsStatusCard();assert.equal(e.liveDiscardBtn.hidden,false);
+  assert.equal(hero.dataset.liveType,'lunch');
   assert.equal(e.callsStatusActions.style.display,'none');
   assert.equal(e.callsStatusCard.hidden,true);assert.equal(e.callsControlsGrid.style.display,'');
-  h.state.activePause=null;h.updateLiveActivityBar();assert.equal(e.liveActivityBar.classList.contains('show'),false);
+  h.state.activePause=null;h.updateLiveActivityBar();assert.equal(hero.dataset.liveType,undefined);assert.equal(e.liveDiscardBtn.hidden,true);
 });
 
 test('closing a modal returns focus and a delayed opening cannot steal focus from a newer dialog', () => {
@@ -195,12 +197,25 @@ test('every theme uses one color for page and card, and the softened grays reach
 test('collapsed actions bar opens only the active break, lunch or call button and shows its timer', () => {
   const css = fs.readFileSync('css/app-shell.css', 'utf8');
   const html = fs.readFileSync('app.html', 'utf8');
-  const hidden = /\.is-collapsed[^{]*\.action-sub[^{]*\{[^}]*display:\s*none/;
-  assert.ok(hidden.test(css), 'inactive collapsed buttons still hide their timer');
-  for (const id of ['breakControlBtn', 'lunchControlBtn', 'callControlBtn']) {
-    assert.ok(html.includes(`id="${id}"`), `${id} exists`);
-    const shows = new RegExp(`#${id}\\.is-active \\.action-sub[^{]*\\{[^}]*display:\\s*block`);
-    assert.ok(shows.test(css), `${id}: active button shows its timer when the bar is collapsed`);
-  }
+  assert.ok(/\.action-sub\s*\{\s*display:\s*none/.test(css), 'inactive buttons hide their timer');
+  assert.ok(/\.is-active \.action-sub[^{]*\{[^}]*display:\s*block/.test(css), 'the active break, lunch or call button shows its timer');
+  assert.ok(/#callControlBtn\.is-pending \.action-sub[^{]*\{[^}]*display:\s*block/.test(css), 'a pending call shows its duration');
+  for (const id of ['breakControlBtn', 'lunchControlBtn', 'callControlBtn']) assert.ok(html.includes(`id="${id}"`) && css.includes(`#${id}`), `${id} is styled`);
   assert.ok(!/#shiftControlBtn\.is-active \.action-sub[^{]*\{[^}]*display:\s*block/.test(css), 'the shift button keeps its icon-only look');
+});
+
+test('there is a single actions bar: no top live bar, no expanded view, names under each icon and a discard button', () => {
+  const html = fs.readFileSync('app.html', 'utf8');
+  const main = fs.readFileSync('js/app-main.js', 'utf8');
+  assert.ok(!/live-activity-bar|liveActivityBar|liveBarSaveBtn/.test(html + main), 'the top live bar is gone');
+  assert.ok(!/hero-shift-toggle/.test(main), 'no expand/collapse arrow');
+  const names = { shiftControlBtn: 'Turno', breakControlBtn: 'Break', lunchControlBtn: 'Lunch', callControlBtn: 'Llamada', pasteCallsBtn: 'Pegar', addCallManualBtn: 'Agregar' };
+  for (const [id, name] of Object.entries(names)) {
+    const start = html.indexOf(`id="${id}"`), end = html.indexOf('</button>', start);
+    assert.ok(html.slice(start, end).includes(`<span class="action-short" aria-hidden="true">${name}</span>`), `${id} shows "${name}" under its icon`);
+  }
+  assert.ok(/id="liveDiscardBtn"[^>]*hidden/.test(html), 'discard button starts hidden');
+  const shell = fs.readFileSync('css/app-shell.css', 'utf8');
+  assert.ok(/is-stuck/.test(shell) && /wireStickyActionsBar/.test(main), 'the bar sticks to the top while scrolling');
+  assert.ok(/#heroSection\s*\{[^}]*backdrop-filter:\s*none/.test(shell), 'the hero card has no backdrop-filter, otherwise position:fixed would not follow the screen');
 });

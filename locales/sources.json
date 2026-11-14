@@ -191,6 +191,12 @@
       "js/call-table-view.js"
     ]
   },
+  "s_0362f7d4": {
+    "source": "Pegar",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_0381729f": {
     "source": "Elige la moneda del importe. La equivalencia usa el tipo de cambio de Ajustes. Cambiar de moneda conserva el mismo valor en dólares.",
     "files": [
@@ -8618,6 +8624,7 @@
   "s_81299c55": {
     "source": "Llamada",
     "files": [
+      "app.html",
       "js/call-table-view.js"
     ]
   },
@@ -14045,6 +14052,12 @@
       "js/higher-rate-review.js"
     ]
   },
+  "s_d1a11dfe": {
+    "source": "Agregar",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_d1f02f1c": {
     "source": "{{v3}} adherencia",
     "files": [
@@ -14456,12 +14469,6 @@
     "source": "{{v0}} Solo {{v1}}",
     "files": [
       "js/settings.js"
-    ]
-  },
-  "s_d85a79e3": {
-    "source": "Actividad en vivo",
-    "files": [
-      "app.html"
     ]
   },
   "s_d899c380": {

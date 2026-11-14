@@ -13,8 +13,8 @@ body :is(button,a,input,select,textarea,summary,[tabindex]) { scroll-margin-bloc
 #essentialViewSettings label { min-height:44px; }
 #essentialViewSettings input { flex-shrink:0; width:20px; height:20px; accent-color:var(--cyan); }
 #essentialViewSettings .note { line-height:1.6; color:var(--muted); font-size:12px; }
-.live-bar-btn[hidden],.calls-status-actions button[hidden] { display:none !important; }
-.live-bar-label,.live-bar-timer { color:var(--text); }
+.calls-status-actions button[hidden] { display:none !important; }
+
 html.theme-light[data-palette="original"] { --muted-3:var(--muted); --text-muted-3:var(--muted); }
 .calls-status-card.pending { border-color:var(--warn); }
 .calls-status-card.pending .calls-status-text-title { color:var(--text); }
@@ -23,11 +23,9 @@ html.theme-light[data-palette="original"] { --muted-3:var(--muted); --text-muted
 .sched-help-wrap.is-help-open .sched-help-tooltip { opacity:1; transform:none; pointer-events:auto; max-height:50dvh; overflow:auto; }
 .sched-help-wrap.is-help-dismissed .sched-help-tooltip { opacity:0; pointer-events:none; }
 .accordion-card:has(.sched-help-wrap.is-help-open) { overflow:visible; }
-html:root[data-palette]:not([data-palette="original"]) :is(.live-activity-bar,.calls-status-card) { background:var(--panel-navy); }
+
 .appearance-close { min-width:44px; min-height:44px; }
-@media (pointer:coarse) {
-  :is(.tbl-icon-btn,.gap-edit-btn,.sched-compact-info-btn,.day-nav-btn,.modal-close,.live-bar-btn,.calls-status-actions button,.sched-header-help-btn) { min-width:44px; min-height:44px; }
-}
+
 @media (max-width:480px) {
   #scheduleAccordion>summary { flex-wrap:wrap; }
   #scheduleAccordion>summary>.accordion-head { flex:1 1 100%; }
@@ -37,10 +35,7 @@ html:root[data-palette]:not([data-palette="original"]) :is(.live-activity-bar,.c
   .title-row #clockDate { width:auto; max-width:100%; white-space:normal; overflow-wrap:anywhere; font-size:11px; text-align:left; }
   .title-row #clockNow { align-self:auto; font-size:24px; }
   #greetingSubtitle { overflow-wrap:anywhere; }
-  .live-activity-bar { flex-wrap:wrap; }
-  .live-bar-left,.live-bar-text { min-width:0; }
-  .live-bar-label { white-space:normal; }
-  .live-bar-actions { margin-left:auto; }
+
   .calls-status-card { flex-wrap:wrap; }
   .calls-status-text { min-width:0; overflow-wrap:anywhere; }
 }

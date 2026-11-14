@@ -3938,6 +3938,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       // El emoji 📞 ya no va aquí — vive en el ícono estático del botón (.action-icon en el HTML,
       // envuelto en el anillo pulsante) desde el rediseño de Controles.
       if (!isViewingToday()) return translateText('Iniciar llamada');
+      if (state.pendingLiveCallBackup && !state.activeCall) return translateText('Revisar llamada');
       return state.activeCall ? translateText('Terminar llamada') : translateText('Iniciar llamada');
     }
 
@@ -3957,6 +3958,9 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
     function callActionTimer() {
       if (state.activeCall) {
         return formatDuration(Date.now() - new Date(state.activeCall.startedAt).getTime());
+      }
+      if (state.pendingLiveCallBackup) {
+        return formatDuration(Date.parse(state.pendingLiveCallBackup.endedAtISO) - Date.parse(state.pendingLiveCallBackup.startedAtISO));
       }
       return '00:00:00';
     }
@@ -4255,6 +4259,8 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
         return;
       }
       if (state.activeCall) return endCall();
+      // Una llamada que se cortó sin guardarse: el botón amarillo "Revisar" abre su recuperación.
+      if (state.pendingLiveCallBackup) return restorePendingLiveCallBackup();
       return startCall();
     }
 
@@ -4443,28 +4449,19 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
     let currentLiveActivity = null;
 
     function updateLiveActivityBar() {
-      const bar = document.getElementById('liveActivityBar');
-      if (!bar) return;
+      // La barra fija de arriba se quitó: la barra de acciones (la de los botones) muestra lo mismo.
+      // Aquí solo se marca qué está en curso y se muestra la X de "Descartar" junto a ese botón.
       const info = liveActivityInfo();
       currentLiveActivity = info;
-      if (!info) {
-        bar.classList.remove('show', 'call-active');
-        document.body.classList.remove('has-live-bar');
-        return;
+      const hero = document.querySelector('.hero-shift-actions');
+      if (hero) {
+        if (info) hero.dataset.liveType = info.type;
+        else delete hero.dataset.liveType;
       }
-      document.body.classList.add('has-live-bar');
-      bar.classList.add('show');
-      bar.classList.toggle('call-active', info.type === 'call');
-      bar.style.setProperty('--live-bar-color', `var(${info.colorVar})`);
-      bar.style.setProperty('--live-bar-rgb', info.rgb);
-      const labelEl = document.getElementById('liveBarLabel');
-      if (labelEl && labelEl.textContent !== info.label) labelEl.textContent = info.label;
-      const timerEl = document.getElementById('liveBarTimer');
-      if (timerEl) timerEl.textContent = formatDuration((info.endedAt ? Date.parse(info.endedAt) : Date.now()) - new Date(info.startedAt).getTime());
-      const saveLabel = bar.querySelector('.live-bar-save-label');
-      if (saveLabel) saveLabel.textContent = info.type === 'pending' ? translateText('Revisar llamada') : translateText('Guardar');
-      const discard = document.getElementById('liveBarDiscardBtn');
-      if (discard) discard.hidden = !info.onDiscard;
+      const discard = document.getElementById('liveDiscardBtn');
+      if (discard) discard.hidden = !(info && info.onDiscard);
+      const callBtn = document.getElementById('callControlBtn');
+      if (callBtn) callBtn.classList.toggle('is-pending', !!(info && info.type === 'pending'));
     }
 
     // Tarjeta de estado dentro de "Llamadas". La fila entera se tiñe vía `.live` en el contenedor
@@ -7022,6 +7019,52 @@ export function render() {
       }
     }
 
+    // Barra de acciones pegada arriba al bajar la página. Se usa posición fija (y un hueco del mismo
+    // alto en su lugar) porque la barra vive al final de la tarjeta de arriba y "sticky" no la dejaría
+    // acompañar el resto de la página.
+    function wireStickyActionsBar(hero) {
+      if (hero.dataset.stickyWired) return;
+      hero.dataset.stickyWired = '1';
+      let placeholder = null, frame = 0;
+      const gap = 8;
+      const safeTop = () => {
+        const probe = document.createElement('div');
+        probe.style.cssText = 'position:absolute;visibility:hidden;padding-top:env(safe-area-inset-top, 0px)';
+        document.body.appendChild(probe);
+        const value = parseFloat(getComputedStyle(probe).paddingTop) || 0;
+        probe.remove();
+        return value;
+      };
+      const update = () => {
+        frame = 0;
+        const line = gap + safeTop();
+        const box = (placeholder || hero).getBoundingClientRect();
+        if (box.top < line && box.width > 0) {
+          if (!placeholder) {
+            placeholder = document.createElement('div');
+            placeholder.className = 'hero-shift-anchor';
+            placeholder.setAttribute('aria-hidden', 'true');
+            placeholder.style.height = hero.offsetHeight + 'px';
+            hero.before(placeholder);
+            hero.classList.add('is-stuck');
+          }
+          const anchorBox = placeholder.getBoundingClientRect();
+          hero.style.left = anchorBox.left + 'px';
+          hero.style.width = anchorBox.width + 'px';
+        } else if (placeholder) {
+          placeholder.remove();
+          placeholder = null;
+          hero.classList.remove('is-stuck');
+          hero.style.left = '';
+          hero.style.width = '';
+        }
+      };
+      const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
+      window.addEventListener('scroll', schedule, { passive: true });
+      window.addEventListener('resize', schedule);
+      schedule();
+    }
+
     // Los 3 botones de llamadas (#callsControlsGrid) viven dentro de la tarjeta "Acciones de Hoy"
     // (.hero-shift-actions) para formar una sola fila de 6. Aquí también se crea, una sola vez, el
     // separador y el botón circular que colapsa/expande la fila (ver app-shell.css).
@@ -7036,26 +7079,10 @@ export function render() {
         hero.appendChild(sep);
       }
       const title = hero.querySelector('.hero-shift-title');
-      if (title && !hero.querySelector('.hero-shift-toggle')) {
-        if (!title.id) title.id = 'heroShiftTitle';
-        const toggle = document.createElement('button');
-        toggle.type = 'button';
-        toggle.className = 'accordion-chevron hero-shift-toggle';
-        const startCollapsed = settings.heroActionsCollapsed === true;
-        hero.classList.toggle('is-collapsed', startCollapsed);
-        toggle.setAttribute('aria-expanded', String(!startCollapsed));
-        toggle.setAttribute('aria-labelledby', title.id);
-        toggle.innerHTML = iconHtml('chevronDown');
-        toggle.addEventListener('click', () => {
-          const collapsed = hero.classList.toggle('is-collapsed');
-          toggle.setAttribute('aria-expanded', String(!collapsed));
-          if (settings.heroActionsCollapsed !== collapsed) {
-            settings.heroActionsCollapsed = collapsed;
-            saveSettingsOnly();
-          }
-        });
-        title.after(toggle);
-      }
+      if (title && !title.id) title.id = 'heroShiftTitle';
+      // Ya no hay versión expandida: la barra siempre va plegada, con el nombre bajo cada icono.
+      hero.classList.add('is-collapsed');
+      wireStickyActionsBar(hero);
       if (grid.parentElement !== hero) hero.appendChild(grid);
       hero.classList.toggle('calls-off', page === 'help');
     }
@@ -7569,11 +7596,8 @@ export function render() {
     document.getElementById('breakControlBtn').addEventListener('click', () => togglePause('break'));
     document.getElementById('lunchControlBtn').addEventListener('click', () => togglePause('lunch'));
     document.getElementById('callControlBtn').addEventListener('click', toggleCall);
-    // Barra fija de actividad en vivo: un solo listener por botón (no se reasignan en cada tick)
-    document.getElementById('liveBarSaveBtn').addEventListener('click', () => {
-      if (currentLiveActivity) currentLiveActivity.onSave();
-    });
-    document.getElementById('liveBarDiscardBtn').addEventListener('click', () => {
+    // Botón "Descartar" (la X de la barra de acciones): un solo listener, lee la acción vigente en cada clic.
+    document.getElementById('liveDiscardBtn').addEventListener('click', () => {
       currentLiveActivity?.onDiscard?.();
     });
     // Botones "Guardar"/"Terminar" de la nueva tarjeta de estado dentro de "Llamadas" (ver `.calls-

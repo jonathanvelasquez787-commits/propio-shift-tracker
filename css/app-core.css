@@ -245,31 +245,10 @@
       :root:not(.theme-dark) .hero-top-row { border-bottom-color: var(--line); }
       :root:not(.theme-dark) .divider { background: var(--line); }
       /* Las reglas base pintan var(--panel-navy) sin condición; aquí se revierte. */
-      :root:not(.theme-dark) .hero,
-      :root:not(.theme-dark) .card,
-      :root:not(.theme-dark) .mini,
-      :root:not(.theme-dark) .table-card,
-      :root:not(.theme-dark) .list-card,
-      :root:not(.theme-dark) .calls-status-card,
-      :root:not(.theme-dark) .rpt-date-pill,
-      :root:not(.theme-dark) .rpt-sel-pill,
-      :root:not(.theme-dark) .rpt-goal-card,
-      :root:not(.theme-dark) .rpt-chart-card,
-      :root:not(.theme-dark) .rpt-mini-card,
-      :root:not(.theme-dark) .rpt-trend-chip,
-      :root:not(.theme-dark) .rpt-streak-card,
-      :root:not(.theme-dark) .metric-card,
-      :root:not(.theme-dark) .month-card,
-      :root:not(.theme-dark) .live-activity-bar {
+      :root:not(.theme-dark) .hero,:root:not(.theme-dark) .card,:root:not(.theme-dark) .mini,:root:not(.theme-dark) .table-card,:root:not(.theme-dark) .list-card,:root:not(.theme-dark) .calls-status-card,:root:not(.theme-dark) .rpt-date-pill,:root:not(.theme-dark) .rpt-sel-pill,:root:not(.theme-dark) .rpt-goal-card,:root:not(.theme-dark) .rpt-chart-card,:root:not(.theme-dark) .rpt-mini-card,:root:not(.theme-dark) .rpt-trend-chip,:root:not(.theme-dark) .rpt-streak-card,:root:not(.theme-dark) .metric-card,:root:not(.theme-dark) .month-card {
         background: var(--panel);
       }
-      :root:not(.theme-dark) .live-activity-bar {
-        box-shadow: var(--shadow-raised);
-      }
-      :root:not(.theme-dark) .live-bar-label {
-        color: var(--text);
-        color: color-mix(in srgb, rgb(var(--live-bar-rgb, var(--cyan-rgb))) 50%, var(--text));
-      }
+
       :root:not(.theme-dark) .goal-bar,
       :root:not(.theme-dark) .mini-cell.cal-tier-nodata {
         background: var(--line);
@@ -719,31 +698,10 @@
     html.theme-light .sidebar-footer { border-top-color: var(--line); }
     html.theme-light .hero-top-row { border-bottom-color: var(--line); }
     html.theme-light .divider { background: var(--line); }
-    html.theme-light .hero,
-    html.theme-light .card,
-    html.theme-light .mini,
-    html.theme-light .table-card,
-    html.theme-light .list-card,
-    html.theme-light .calls-status-card,
-    html.theme-light .rpt-date-pill,
-    html.theme-light .rpt-sel-pill,
-    html.theme-light .rpt-goal-card,
-    html.theme-light .rpt-chart-card,
-    html.theme-light .rpt-mini-card,
-    html.theme-light .rpt-trend-chip,
-    html.theme-light .rpt-streak-card,
-    html.theme-light .metric-card,
-    html.theme-light .month-card,
-    html.theme-light .live-activity-bar {
+    html.theme-light .hero,html.theme-light .card,html.theme-light .mini,html.theme-light .table-card,html.theme-light .list-card,html.theme-light .calls-status-card,html.theme-light .rpt-date-pill,html.theme-light .rpt-sel-pill,html.theme-light .rpt-goal-card,html.theme-light .rpt-chart-card,html.theme-light .rpt-mini-card,html.theme-light .rpt-trend-chip,html.theme-light .rpt-streak-card,html.theme-light .metric-card,html.theme-light .month-card {
       background: var(--panel);
     }
-    html.theme-light .live-activity-bar {
-      box-shadow: var(--shadow-raised);
-    }
-    html.theme-light .live-bar-label {
-      color: var(--text);
-      color: color-mix(in srgb, rgb(var(--live-bar-rgb, var(--cyan-rgb))) 50%, var(--text));
-    }
+
     html.theme-light .goal-bar,
     html.theme-light .mini-cell.cal-tier-nodata {
       background: var(--line);
@@ -1498,8 +1456,7 @@
       body.sidebar-pinned .sidebar-nav {
         transform: translateX(0);
       }
-      body.sidebar-pinned .app,
-      body.sidebar-pinned .live-activity-bar {
+      body.sidebar-pinned .app {
         margin-left: min(280px, 84vw);
       }
     }
@@ -1657,7 +1614,6 @@
       flex-shrink: 0;
       position: relative;
     }
-
 
     .hero-actions {
       display: flex;
@@ -2592,7 +2548,6 @@
       font-size: 9px;
     }
 
-
     #daySelector {
       border: 0;
       outline: none;
@@ -2628,8 +2583,6 @@
       color: var(--hover-flip);
       outline: none;
     }
-
-
 
     .controls-grid {
       display: grid;
@@ -2816,7 +2769,6 @@
       .calls-status-btn-end { padding: 6px 9px; font-size: 10.5px; }
     }
 
-
     #earningsSectionTitle {
       scroll-margin-top: 90px;
     }
@@ -2856,7 +2808,6 @@
       }
     }
 
-
     @media (min-width: 1201px) {
       .clockbox {
         background: var(--black-badge);
@@ -2889,7 +2840,6 @@
         opacity: .68;
       }
     }
-
 
     @media (min-width: 1201px) {
       .schedule {
@@ -3057,7 +3007,6 @@
 .slot-progress.productivity > div {
   background: linear-gradient(90deg, var(--good), var(--teal));
 }
-
 
 /* Meta de Productividad: degradado teal→azul mientras avanza, verde sólido al alcanzarse. */
 .slot-progress.goal > div {
@@ -4079,7 +4028,6 @@
       .tbl-icon-btn .ic-svg { width: 12px; height: 12px; }
     }
 
-
     .divider {
       height: 1px;
       background: transparent;
@@ -4342,159 +4290,9 @@
       }
     }
 
-    @keyframes live-bar-icon-pulse {
-      0%, 100% { box-shadow: 0 0 0 4px rgba(var(--live-bar-rgb, var(--cyan-rgb)), .18); }
-      50% { box-shadow: 0 0 0 7px rgba(var(--live-bar-rgb, var(--cyan-rgb)), .06); }
-    }
-    @keyframes live-bar-dot-pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: .4; }
-    }
-    .live-activity-bar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 70;
-      display: none;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 10px 16px;
-      padding-top: calc(10px + env(safe-area-inset-top, 0px));
-      background: var(--panel-navy);
-      border-bottom: 1px solid rgba(var(--live-bar-rgb, var(--cyan-rgb)), .32);
-      backdrop-filter: blur(12px);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, .28);
-    }
-
-    .live-activity-bar.show { display: flex; }
-
-    .live-bar-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-width: 0;
-    }
-
-    .live-bar-icon-wrap {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      flex: 0 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(var(--live-bar-rgb, var(--cyan-rgb)), .16);
-      border: 1px solid rgba(var(--live-bar-rgb, var(--cyan-rgb)), .4);
-      animation: live-bar-icon-pulse 1.8s infinite;
-    }
-
-    .live-bar-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      flex: 0 0 auto;
-      background: rgb(var(--live-bar-rgb, var(--cyan-rgb)));
-      animation: live-bar-dot-pulse 1.6s infinite;
-    }
-
-    .live-bar-text {
-      display: grid;
-      gap: 1px;
-      min-width: 0;
-    }
-
-    .live-bar-label {
-      font-weight: 900;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      color: rgb(var(--live-bar-rgb, var(--cyan-rgb)));
-      white-space: nowrap;
-    }
-
-    .live-bar-timer {
-      font-weight: 900;
-      font-variant-numeric: tabular-nums;
-      font-size: 16px;
-      letter-spacing: -.02em;
-      color: var(--text);
-      white-space: nowrap;
-    }
-
-    .live-bar-actions {
-      display: flex;
-      gap: 8px;
-      flex: 0 0 auto;
-    }
-
-    .live-bar-btn {
-      border-radius: 10px;
-      font-weight: 800;
-      cursor: pointer;
-      border: 1px solid transparent;
-      transition: transform .14s ease, filter .14s ease;
-    }
-
-    .live-bar-btn:hover,
-    .live-bar-btn:focus-visible {
-      transform: translateY(-1px);
-      outline: none;
-    }
-
-    .live-bar-save {
-      background: rgba(var(--good-rgb), .16);
-      border-color: rgba(var(--good-rgb), .4);
-      color: var(--pale-good);
-      padding: 9px 16px;
-      font-size: 12.5px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      white-space: nowrap;
-    }
-
-    .live-bar-discard {
-      background: rgba(var(--pink-rgb), .10);
-      border-color: rgba(var(--pink-rgb), .32);
-      color: var(--pale-bad);
-      width: 34px;
-      height: 34px;
-      padding: 0;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      line-height: 1;
-    }
 
     /* El padding-top va en .app y no en body para que el fondo decorativo siga arrancando en la
        esquina de la pantalla. */
-    body.has-live-bar .app { padding-top: 62px; }
-
-    @media (max-width: 760px) {
-      .live-activity-bar { padding: 8px 12px; padding-top: calc(8px + env(safe-area-inset-top, 0px)); gap: 8px; }
-      .live-bar-icon-wrap { width: 32px; height: 32px; }
-      .live-bar-left { gap: 9px; }
-      .live-bar-label { font-size: 9.5px; }
-      .live-bar-timer { font-size: 14px; }
-      .live-bar-save { position: relative; width: 32px; height: 32px; padding: 0; gap: 0; justify-content: center; }
-      .live-bar-save-label {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        padding: 0;
-        margin: -1px;
-        overflow: hidden;
-        clip: rect(0, 0, 0, 0);
-        white-space: nowrap;
-        border: 0;
-      }
-      .live-bar-discard { width: 32px; height: 32px; font-size: 13px; }
-      body.has-live-bar .app { padding-top: 54px; }
-    }
-
 
     .sched-header-icon {
       display: inline-flex;
@@ -5283,7 +5081,6 @@
       .sched-compact-grid-2 { grid-template-columns: 1fr; }
     }
 
-
     .sched-blocks-summary-row {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -5796,7 +5593,6 @@
       white-space: nowrap;
     }
 
-
     .rpt-chart-card {
       background: var(--panel-navy);
       border: 1px solid var(--card-line);
@@ -5880,7 +5676,6 @@
       .cal-day-amt-alt { font-size: 13px; }
       .cal-day-bonus { font-size: 12px; padding: 2px 7px; }
     }
-
 
     .cal-year-metrics {
       display: grid;
