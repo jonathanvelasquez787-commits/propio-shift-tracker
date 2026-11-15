@@ -109,7 +109,7 @@ export function battleMarkup() {
       <div class="game-battle-victory" data-battle-victory hidden></div>
     </div>
     <div class="game-battle-health" data-battle-health-slot></div>
-    <div class="game-battle-footer"><p class="game-battle-feed" data-battle-feed></p><button type="button" data-battle-action="collection" data-battle-collection-toggle aria-expanded="false" aria-controls="gameBattleCollection">Logros <span aria-hidden="true">⌄</span></button></div>
+    <div class="game-battle-footer"><p class="game-battle-feed" data-battle-feed></p><span class="game-battle-stun" data-battle-stun hidden><i data-battle-stun-fill></i></span><button type="button" class="game-battle-free-shot" data-battle-action="free-shot" data-battle-free-shot title="Práctica: no cuenta para ganancias, XP ni récords">Disparar</button><button type="button" data-battle-action="collection" data-battle-collection-toggle aria-expanded="false" aria-controls="gameBattleCollection">Logros <span aria-hidden="true">⌄</span></button></div>
     <section id="gameBattleCollection" class="game-battle-collection" data-battle-collection hidden aria-label="Logros">
       <div class="game-battle-slots"><div class="game-battle-slot" data-battle-collection-summary></div>
         <div class="game-battle-loadout"><div><label for="gameBattleWeapon">Arma</label><select id="gameBattleWeapon" data-battle-weapon-select>${BATTLE_WEAPONS.map(w => `<option value="${w.id}">${escape(weaponName(w.id))}</option>`).join('')}</select><small data-battle-selected></small></div></div></div>
@@ -157,6 +157,7 @@ function createBattle(element) {
   let reduced = !!motion?.matches, view = {}, callbacks = {}, colors = {}, world = { w: 600, h: 154, floor: 128 }, stageScale = 1;
   let hero = { x: 96, jump: 0, vy: 0, walk: 0, recoil: 0, face: 1 };
   let bullets = [], particles = [], active = null, weapon = 'pistol', raf = 0, lastTime = 0, clock = 0, destroyed = false, intersecting = true, running = false, lastMonsterMarkup, hasSynced = false;
+  let freeShotAt = 0, stun = 0, dizzyTimer = 0, stunTimer = 0;
   let bannerUntil = 0, noticeUntil = 0, hitUntil = 0, droneUntil = 0, flash = 0, staticTimer = 0, soundPending = false;
   const listen = (node, type, handler, options) => { node?.addEventListener?.(type, handler, options); cleanup.push(() => node?.removeEventListener?.(type, handler, options)); };
   const boss = () => ({ x: world.w < 500 ? world.w * .93 - 47 : world.w * .89 - 55, y: world.floor - (world.w < 500 ? 37 : 43) });
@@ -232,6 +233,8 @@ function createBattle(element) {
     $('sound').setAttribute('aria-label', view.soundEnabled === true ? translateText('Silenciar sonidos') : translateText('Activar sonidos'));
     $('sound-icon').setAttribute('d', view.soundEnabled === true ? 'M15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14' : 'm16 9 5 6m0-6-5 6');
     $('weapon-select').disabled = work === 'call';
+    const freeShotButton = $('free-shot');
+    if (freeShotButton) freeShotButton.disabled = mode === 'duel' || work === 'call' || reduced || !ctx || view.currentDay === false || !!view.defeated || autoPaused;
     element.dataset.battleSpecials = String(Math.floor(auto.snapshot().calls / 3));
     element.dataset.autoState = work === 'call' ? 'call' : autoPaused ? 'paused' : 'idle';
   }
@@ -335,6 +338,27 @@ function createBattle(element) {
     const cooldown = ['rocket','too-much'].includes(id) ? .7 : ['railgun','shotgun','psr'].includes(id) ? .5 : ['smg','flame'].includes(id) ? .25 : .38;
     if (!duel.shoot(work, { grenade: id === 'grenade', damage, cooldown })) return;
     emit({ practice: true }, w.id); updateDuel(); reconcile();
+  }
+  // Disparo libre: solo efectos visuales y un medidor temporal; no llama a callbacks de ganancias, XP ni récords.
+  function freeShot() {
+    const now = Date.now();
+    if (!visible() || !ctx || mode !== 'auto' || work === 'call' || view.defeated || autoPaused || stun >= 100 || now - freeShotAt < 380) return;
+    freeShotAt = now;
+    emit({ practice: true }, weapon);
+    setStun(stun + 12);
+    if (stun >= 100) {
+      element.dataset.battleDizzy = 'true';
+      host.clearTimeout?.(dizzyTimer);
+      dizzyTimer = host.setTimeout?.(() => { element.removeAttribute('data-battle-dizzy'); setStun(0); }, 1700) || 0;
+    }
+    reconcile();
+  }
+  function setStun(value) {
+    stun = Math.max(0, Math.min(100, value));
+    const bar = $('stun');
+    if (bar) { bar.hidden = stun === 0; $('stun-fill').style.width = `${stun}%`; }
+    host.clearInterval?.(stunTimer); stunTimer = 0;
+    if (stun > 0 && stun < 100) stunTimer = host.setInterval?.(() => { if (Date.now() - freeShotAt > 700) setStun(stun - 4); }, 400) || 0;
   }
   function jump() { if (mode === 'duel' && duel.snapshot().status === 'running' && canPlayDuel(work) && visible() && hero.jump === 0) { hero.vy = 340; reconcile(); } }
   function play(event) {
@@ -495,7 +519,7 @@ function createBattle(element) {
   }
   function destroy() {
     if (destroyed) return;
-    pause(); destroyed=true; callbacks={}; cleanup.forEach(remove=>remove()); observers.forEach(observer=>observer.disconnect());
+    pause(); host.clearTimeout?.(dizzyTimer); host.clearInterval?.(stunTimer); destroyed=true; callbacks={}; cleanup.forEach(remove=>remove()); observers.forEach(observer=>observer.disconnect());
   }
   listen(element,'click',event=>{
     const button=event.target.closest?.('button'); if (!button||!element.contains(button)) return;
@@ -517,6 +541,7 @@ function createBattle(element) {
       $('collection-toggle').setAttribute('aria-expanded', String(collectionOpen));
     }
     else if (action === 'start') beginDuel();
+    else if (action === 'free-shot') freeShot();
     else if (action==='attack'||action==='hero'||action==='grenade') { practice(action==='grenade'?'grenade':weapon); if (action==='hero') stage.focus({ preventScroll:true }); }
     else if (action==='jump') jump();
   });

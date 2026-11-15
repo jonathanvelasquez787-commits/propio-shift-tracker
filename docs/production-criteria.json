@@ -1181,6 +1181,14 @@
           ]
         },
         {
+          "file": "tests/battle-free-shot.test.mjs",
+          "namedCases": [
+            "Disparo de práctica: el botón existe en el pie de la batalla y se desactiva en llamada, duelo y jefe derrotado",
+            "Disparo de práctica: solo muestra efectos y no toca ganancias, XP ni récords",
+            "Disparo de práctica: el medidor de aturdimiento y su animación respetan movimiento reducido"
+          ]
+        },
+        {
           "file": "tests/freelancer-blocks-list.test.mjs",
           "namedCases": [
             "Bloques del día en freelancer: cada descanso es una fila con etiqueta, horas y minutos",

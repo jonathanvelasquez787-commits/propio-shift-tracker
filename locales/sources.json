@@ -3647,6 +3647,12 @@
       "index.html"
     ]
   },
+  "s_356b50a1": {
+    "source": "Práctica: no cuenta para ganancias, XP ni récords",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_35a267fa": {
     "source": "Stage guardado",
     "files": [
