@@ -1029,7 +1029,7 @@
         {
           "file": "tests/action-bar-desktop-size.test.mjs",
           "namedCases": [
-            "Barra de acciones: solo en escritorio los botones vuelven a 72 de ancho por 46 de alto",
+            "Barra de acciones: solo en escritorio los botones miden 108 de ancho por 46 de alto",
             "Barra de acciones: en celular los botones chicos de 40 por 34 no se tocan"
           ]
         },
@@ -1131,7 +1131,8 @@
           "file": "tests/action-bar-spacing.test.mjs",
           "namedCases": [
             "barra de acciones: en escritorio hay más espacio entre botones, con tope",
-            "barra de acciones: el celular conserva su separación y los botones no cambian de tamaño"
+            "barra de acciones: el celular conserva su separación",
+            "barra de acciones: en escritorio los botones son más anchos (108 px) y la altura no cambia"
           ]
         }
       ]

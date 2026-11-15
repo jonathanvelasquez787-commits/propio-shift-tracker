@@ -7,10 +7,10 @@ const start = css.indexOf('/* botones barra escritorio */');
 const end = css.indexOf('/* fin botones barra escritorio */');
 const block = css.slice(start, end);
 
-test('Barra de acciones: solo en escritorio los botones vuelven a 72 de ancho por 46 de alto', () => {
+test('Barra de acciones: solo en escritorio los botones miden 108 de ancho por 46 de alto', () => {
   assert.ok(start > 0 && end > start, 'el bloque CSS está marcado');
   assert.match(block, /@media \(min-width: 761px\)/);
-  assert.match(block, /\.action-slot \{ flex: 0 0 auto; width: 72px; \}/);
+  assert.match(block, /\.action-slot \{ flex: 0 0 auto; width: 108px; \}/);
   assert.match(block, /min-height: 46px;/);
   assert.doesNotMatch(block, /max-width/);
 });
