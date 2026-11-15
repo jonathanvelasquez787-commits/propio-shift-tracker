@@ -11,3 +11,11 @@ test('popup: "Pausar disponibilidad automática" se explica sin jerga', () => {
   assert.ok(row.includes('Si la encendés, pausa el ponerte disponible. No pausa el guardado de llamadas.'));
   assert.ok(!row.includes('Start Calls'), 'el texto de ayuda ya no menciona Start Calls');
 });
+
+test('popup: las opciones de volver a estar disponible dicen "Estar disponible"', () => {
+  const rowOf = (id) => { const i = html.indexOf(`for="${id}"`); return html.slice(i, html.indexOf('</label>', i)); };
+  assert.ok(rowOf('prepareFirst').includes('Estar disponible al iniciar el turno'));
+  assert.ok(rowOf('resumeBreak').includes('Estar disponible después del Break'));
+  assert.ok(rowOf('resumeLunch').includes('Estar disponible después del Lunch'));
+  assert.ok(!html.includes('Volver después de'));
+});
