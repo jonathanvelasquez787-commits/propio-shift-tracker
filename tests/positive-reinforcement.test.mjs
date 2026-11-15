@@ -406,6 +406,4 @@ test('Logros elimina plan, intensidad y presupuesto sin dejar controles ni liste
   assert.match(positive, /reinforcement\.pendingRewards\.length >= 100/);
   assert.match(positive, /settings\.reinforcement\.rewards\.length >= 60[\s\S]*toast\(translateText\('Ya tienes el máximo de 60 premios\.'\)\)/);
   assert.doesNotMatch(html + game + positive, /gameDailyFocus|gameIntensityInput|positiveWeeklyBudgetInput|choose-mission/);
-  assert.match(html, /id="sidebarAchievementsInput"/);
-  assert.match(html, /Activar Logros/);
 });

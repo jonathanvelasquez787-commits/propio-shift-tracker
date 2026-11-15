@@ -295,19 +295,6 @@ test('la normalización profunda contiene xp, estrellas, misiones y monstruo cor
   assert.doesNotMatch(JSON.stringify(normalized), /<script|onerror=|onload=/i);
 });
 
-test('barras, misiones y racha exponen estado accesible', () => {
-  const game = read('js/game.js');
-  const html = read('app.html');
-  assert.match(html, /aria-label="Progreso contra el jefe del ciclo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"/);
-  assert.match(html, /aria-label="Progreso hacia el siguiente nivel" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"/);
-  assert.match(game, /parentElement\?\.setAttribute\('aria-valuenow', String\(Math\.round\(boss\.pct\)\)\)/);
-  assert.match(game, /parentElement\?\.setAttribute\('aria-valuenow', String\(Math\.round\(level\.pct\)\)\)/);
-  assert.match(game, /game-mission-grid" role="list" aria-label="Misiones del día"/);
-  assert.match(game, /role="listitem" aria-label="\$\{escapeHtml\(ui`Misión/);
-  assert.match(html, /game-streak-week" data-game-role="streak-week" role="list"/);
-  assert.match(game, /cell\.setAttribute\('aria-label', label\)/);
-});
-
 test('CSS de juego cubre motion reducido, layout estrecho y responsive', () => {
   const css = read('css/game.css');
   assert.match(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);

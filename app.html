@@ -52,7 +52,7 @@
 <button class="sidebar-link" data-page="calendar" type="button"><span class="sidebar-link-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg></span><span class="sidebar-link-label">Calendario</span></button>
 <button class="sidebar-link" data-page="finance" type="button"><span class="sidebar-link-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12V8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h13a1 1 0 0 0 1-1v-4"/><path d="M20 12a2 2 0 0 1 0 4h-3a2 2 0 0 1 0-4Z"/></svg></span><span class="sidebar-link-label">Finanzas</span></button>
 <button class="sidebar-link" data-page="schedule" type="button"><span class="sidebar-link-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span class="sidebar-link-label">Horario</span></button>
-<button class="sidebar-link" data-page="achievements" type="button"><span class="sidebar-link-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="5"/><path d="m8.5 12.5-2 8 5.5-3 5.5 3-2-8"/><path d="m10.2 8 1.8-2 1.8 2-1.8 1.4Z"/></svg></span><span class="sidebar-link-label">Logros</span></button>
+<button class="sidebar-link" data-page="achievements" type="button"><span class="sidebar-link-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.4-9.3-9A5.3 5.3 0 0 1 12 6.6 5.3 5.3 0 0 1 21.3 12C19 16.6 12 21 12 21Z"/></svg></span><span class="sidebar-link-label">Historial positivo</span></button>
 </div>
 <div class="sidebar-section-label">Mi progreso</div>
 <button class="sidebar-progress-card" id="sidebarProgressCard" type="button" title="Ver Reportes">
@@ -63,20 +63,12 @@
 </div>
 </button>
 <div class="sidebar-footer">
-<div class="sidebar-section-label">Gamificación</div>
-<div class="sidebar-darkmode-row">
-<span class="sidebar-darkmode-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8v5a4 4 0 0 1-8 0V3Z"/><path d="M8 5H4v2a4 4 0 0 0 4 4M16 5h4v2a4 4 0 0 1-4 4M12 12v6M8 21h8M9 18h6"/></svg></span>
-<span>Activar Logros</span>
-<label class="sidebar-switch" title="Activar o desactivar Logros">
-<input aria-label="Activar Logros" id="sidebarAchievementsInput" type="checkbox"/>
-<span class="sidebar-switch-track"><span class="sidebar-switch-thumb"></span></span>
-</label>
-</div>
+<div class="sidebar-section-label">Refuerzo positivo</div>
 <div class="sidebar-darkmode-row sidebar-subrow" id="sidebarGameSoundRow">
 <span class="sidebar-darkmode-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polygon points="4 9 8 9 12 5 12 19 8 15 4 15"/><path d="M17 8a5 5 0 0 1 0 8"/></svg></span>
-<span>Sonidos arcade</span>
-<label class="sidebar-switch" title="Activar o silenciar los efectos de Logros; los avisos de turno y pausas se controlan aparte.">
-<input aria-label="Sonidos arcade" id="sidebarGameSoundInput" type="checkbox"/>
+<span>Sonidos</span>
+<label class="sidebar-switch" title="Activar o silenciar los sonidos de Celebrar llamadas; los avisos de turno y pausas se controlan aparte.">
+<input aria-label="Sonidos" id="sidebarGameSoundInput" type="checkbox"/>
 <span class="sidebar-switch-track"><span class="sidebar-switch-thumb"></span></span>
 </label>
 </div>
@@ -110,14 +102,6 @@
 <span>Bloques y llamadas</span>
 <label class="sidebar-switch" title="Mostrar u ocultar el horario y las llamadas del día en Inicio">
 <input aria-label="Bloques y llamadas" data-essential-option="schedule" type="checkbox"/>
-<span class="sidebar-switch-track"><span class="sidebar-switch-thumb"></span></span>
-</label>
-</div>
-<div class="sidebar-darkmode-row">
-<span class="sidebar-darkmode-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="5"/><path d="m8.5 12.5-2 8 5.5-3 5.5 3-2-8"/></svg></span>
-<span>Progreso de Logros</span>
-<label class="sidebar-switch" title="Mostrar u ocultar la tarjeta de Logros y los chips Racha y Nivel en Inicio">
-<input aria-label="Progreso de Logros" data-essential-option="game" type="checkbox"/>
 <span class="sidebar-switch-track"><span class="sidebar-switch-thumb"></span></span>
 </label>
 </div>
@@ -166,9 +150,6 @@
 </div>
 <div class="chips">
 <span id="acwRecordDifference" class="record-difference" hidden></span>
-<button class="chip game-chip game-chip-streak" data-game-nav id="gameStreakChip" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c2.8 3.5 5.5 5.8 5.5 10.3A5.5 5.5 0 1 1 6.5 13c0-2.6 1.3-4.8 3.2-6.6-.1 1.8.5 3 1.5 3.8C12.7 8.5 13 5.8 12 3Z"/></svg><span>Racha</span><strong id="gameStreakValue">0</strong></button>
-<button class="chip game-chip game-chip-combo" data-game-nav hidden id="gameComboChip" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="m13 2-9 12h7l-1 8 9-12h-7l1-8Z"/></svg><span>Combo</span><strong id="gameComboValue">x0</strong></button>
-<button class="chip game-chip game-chip-level" data-game-nav id="gameLevelChip" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="5"/><path d="m8.5 12.5-2 8 5.5-3 5.5 3-2-8"/><path d="m10.2 8 1.8-2 1.8 2-1.8 1.4Z"/></svg><span>Nivel</span><strong id="gameLevelValue">1</strong></button>
 
 <div class="hero-shift-actions">
 <span class="hero-shift-title">Acciones de Hoy</span>
@@ -879,178 +860,11 @@
 
 <div class="app-page game-achievements-page" data-page="achievements" hidden id="pageAchievements" role="main" tabindex="-1">
 <div class="game-achievements-hero game-achievements-hero-compact">
-  <div class="game-achievements-hero-row">
-    <h1>Logros</h1>
-    <div class="game-achievements-season" data-game-role="season-status"><span>Temporada</span><strong data-game-role="season-label">Ciclo actual</strong></div>
-  </div>
-  <div class="game-achievements-toolbar"><label class="game-settings-toggle" for="gameEnabledInput"><span><strong>Activar Logros</strong></span><input id="gameEnabledInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label><span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Logros" aria-describedby="gameHeaderInfo">i</button><span class="sched-help-tooltip" id="gameHeaderInfo" role="tooltip">Logros convierte tu actividad en progreso de juego: racha, XP, misiones y colección, sin cambiar tus ganancias. Refuerzo positivo y premios personales se configuran por separado; ninguno cambia tu pago. Al desactivar Logros se conserva el progreso guardado. Podés activarlo de nuevo sin reiniciarlo.</span></span></div>
-<details class="game-panel game-fold game-settings-fold" id="gameSettingsFold">
-  <summary class="game-fold-summary"><h2>Ajustes</h2></summary>
-  <div class="game-fold-body">
-  <section class="game-settings-disclosures" aria-label="Preferencias de Logros">
-<details class="game-settings-row" id="gameSettingsAccordion">
-  <summary><span>Monstruo del día<small>Nombre</small></span></summary>
-  <div class="game-settings-row-body">
-    <div class="game-monster-name-setting">
-      <label for="monsterNameInput">Nombre del monstruo del día</label>
-      <div class="game-monster-name-controls"><input id="monsterNameInput" type="text" maxlength="60" autocomplete="off" aria-describedby="monsterNameHelp monsterNameSaveStatus" placeholder="Usar nombre del catálogo"/><button class="mc-btn-primary cyan" id="monsterNameSaveBtn" type="button">Guardar nombre</button></div>
-      <small id="monsterNameHelp">Un solo nombre para el monstruo diario. Déjalo vacío para usar los nombres del catálogo.</small>
-      <span class="game-monster-name-status" id="monsterNameSaveStatus" role="status" aria-live="polite"></span>
-    </div>
-  </div>
-</details>
-<details class="game-settings-row" id="gameSoundSettingRow">
-  <summary><span>Volumen de Logros<small>Sonidos arcade</small></span></summary>
-  <div class="game-settings-row-body">
-    <div class="game-monster-name-setting">
-      <div class="msg-preview-row"><label for="gameSoundVolumeInput">Volumen de Logros</label><span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca del volumen de Logros" aria-describedby="gameSoundHelp">i</button><span class="sched-help-tooltip" id="gameSoundHelp" role="tooltip">Golpes, armaduras, combos, premios y victorias con efectos breves. Se combinan con el volumen general de Ajustes → Alarmas. Puedes silenciarlos en el menú lateral.</span></span></div>
-      <div class="volume-row"><input id="gameSoundVolumeInput" type="range" min="0" max="100" step="1" value="40" aria-describedby="gameSoundHelp"/><span class="volume-value" id="gameSoundVolumeValue">40%</span><button class="sched-compact-test-btn" id="gameSoundPreviewBtn" type="button" aria-label="Probar sonidos arcade"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polygon points="4 9 8 9 12 5 12 19 8 15 4 15"/><path d="M17 8a5 5 0 0 1 0 8"/></svg></button></div>
-      <span class="game-monster-name-status" id="gameSoundStatus" role="status" aria-live="polite"></span>
-    </div>
-  </div>
-</details>
-<details class="game-settings-row" id="gameWeaponsSettingRow">
-  <summary><span>Armas y duelo<small>Cómo funcionan</small></span></summary>
-  <div class="game-settings-row-body"><p class="note">Las armas cambian la animación y la práctica. Disparar o jugar el duelo no registra llamadas, dinero ni XP laboral. El duelo se ofrece en Break/Lunch o fuera del turno; al volver al trabajo se pausa y podés retomarlo después.</p><p class="note">En Inicio, abrí Logros debajo de la batalla para elegir el arma y Duelo · 60 s. Automático permite salir; al regresar, elegí Duelo y Continuar duelo. En móvil usá los controles debajo de la escena.</p></div>
-</details>
-</section>
-
-<section class="game-advanced-settings" aria-label="Herramientas avanzadas">
-
-  <details class="game-panel game-settings-accordion" id="gameResetAccordion">
-    <summary class="game-settings-accordion-summary"><span class="game-settings-accordion-copy"><strong>Reiniciar progreso</strong><small>Revisa qué se borra antes de confirmar.</small></span><span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></summary>
-    <div class="game-settings-accordion-body"><div class="danger-card tone-bad game-settings-danger">
-          <div class="danger-card-head"><span class="danger-card-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 15 9 15 3"/></svg></span><span class="danger-card-title">Reiniciar progreso</span></div>
-          <p class="danger-card-desc">Borra nivel, XP, racha, trofeos, accesorios y monstruos derrotados. Tus llamadas, turnos, metas y finanzas no se tocan.</p>
-          <button class="mc-btn-solid-full bad" id="resetGameProgressBtn" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 15 9 15 3"/></svg> Reiniciar progreso</button>
-        </div></div>
-  </details>
-</section>
-  </div>
-</details>
+  <div class="game-achievements-hero-row"><h1>Historial positivo</h1></div>
 </div>
-
-
-<section class="game-achievements-grid game-achievements-grid-top" id="gameAchievementsSummary" aria-label="Tu progreso">
-<div class="game-progress-profile" id="gameSettingsProfile" aria-live="polite">
-<article class="game-panel game-progress-card">
-<div class="game-level-panel" id="gameLevelPanel">
-    <div class="game-panel-head"><div><h2>Nivel <strong data-game-role="level" data-game-stat="level">1</strong></h2><span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Nivel y XP" aria-describedby="levelInfo">i</button><span class="sched-help-tooltip" id="levelInfo" role="tooltip">XP son puntos de experiencia. Los obtienes al completar llamadas, misiones y objetivos; suben tu nivel y desbloquean equipo. No son dinero ni cambian tu pago.</span></span></div><span class="game-level-emblem" data-game-role="level-emblem">1</span></div>
-    <div class="game-level-track" role="progressbar" aria-label="Progreso hacia el siguiente nivel" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span data-game-role="level-progress" style="width:0%;"></span></div>
-    <div class="game-level-foot"><span data-game-role="level-xp" data-game-stat="xp">0 XP</span><span data-game-role="next-level">Siguiente: 100 XP</span></div>
-    <div id="gameReviewSummary"></div>
-    <details class="game-settings-accordion game-unlock-details">
-      <summary class="game-settings-accordion-summary"><span class="game-settings-accordion-copy"><strong>Desbloqueos por nivel</strong><small>Fases, equipo y mejoras disponibles en cada nivel.</small></span><span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></summary>
-      <div class="game-settings-accordion-body"><div class="game-unlock-roadmap" data-game-dynamic="unlock-roadmap"></div></div>
-    </details>
-  </div>
-<div class="game-streak-panel" id="gameStreakPanel">
-    <div class="game-panel-head"><div><h2>Racha semanal <span class="game-streak-current" data-game-stat="streak">0 días</span></h2><span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Racha semanal" aria-describedby="streakInfo">i</button><span class="sched-help-tooltip" id="streakInfo" role="tooltip">Cuenta los días consecutivos que cumples las reglas de productividad y adherencia. Los días libres se tratan según tu configuración. Los símbolos muestran el resultado de cada día.</span></span></div><span class="game-panel-badge" data-game-role="streak-best">Mejor: 0</span></div>
-    <div class="game-streak-week" data-game-role="streak-week" role="list" aria-label="Racha de los últimos siete días">
-      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>L</b><em>—</em></span>
-      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>M</b><em>—</em></span>
-      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>X</b><em>—</em></span>
-      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>J</b><em>—</em></span>
-      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>V</b><em>—</em></span>
-      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>S</b><em>—</em></span>
-      <span class="game-streak-day" data-day-state="empty" role="listitem"><b>D</b><em>—</em></span>
-    </div>
-    <div class="game-panel-foot"><span>Escudos</span><span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Escudos" aria-describedby="shieldsInfo">i</button><span class="sched-help-tooltip" id="shieldsInfo" role="tooltip">Protegen tu racha si un día no cumple los requisitos. Puedes guardar hasta tres; se ganan por constancia y respaldo semanal y se usan automáticamente cuando corresponda.</span></span><strong data-game-role="shields" data-game-stat="shields">0</strong></div>
-  </div>
-</article>
-  </div>
-</section>
-
-<div class="game-logros-tabs" role="tablist" aria-label="Secciones de Logros">
-<button type="button" role="tab" id="gameLogrosTabHoy" data-logros-tab="hoy" aria-selected="true" aria-controls="gameLogrosPaneHoy">Hoy</button>
-<button type="button" role="tab" id="gameLogrosTabColeccion" data-logros-tab="coleccion" aria-selected="false" aria-controls="gameLogrosPaneColeccion" tabindex="-1">Colección</button>
-<button type="button" role="tab" id="gameLogrosTabHistorial" data-logros-tab="historial" aria-selected="false" aria-controls="gameLogrosPaneHistorial" tabindex="-1">Historial</button>
-</div>
-<div class="game-logros-pane" role="tabpanel" id="gameLogrosPaneHoy" data-logros-pane="hoy" aria-labelledby="gameLogrosTabHoy">
-<div class="game-missions-column">
-<details class="game-missions" hidden id="gameMissions">
-  <summary class="game-missions-summary"><span>Misiones del día</span><strong data-game-role="missions-score">0 / 3</strong></summary>
-  <div class="game-missions-body">
-  <div class="game-mission-list" data-game-role="mission-list">
-    <div class="game-mission" data-mission-key="productive"><span class="game-mission-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M3 12h18"/></svg></span><div><strong>Minutos productivos</strong><small data-game-role="mission-progress">0 / meta</small></div><span class="game-mission-check" aria-hidden="true">✓</span></div>
-    <div class="game-mission" data-mission-key="break"><span class="game-mission-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/></svg></span><div><strong>Break/Lunch a tiempo</strong><small data-game-role="mission-progress">Pendiente</small></div><span class="game-mission-check" aria-hidden="true">✓</span></div>
-    <div class="game-mission" data-mission-key="adherence"><span class="game-mission-icon"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg></span><div><strong>Adherencia del día</strong><small data-game-role="mission-progress">0% / meta</small></div><span class="game-mission-check" aria-hidden="true">✓</span></div>
-  </div>
-</div>
-</details>
-<details class="game-milestones" hidden id="gameMilestones">
-  <summary class="game-milestones-summary"><span>Hitos</span><strong id="gameMilestonesScore">0/4</strong><div data-game-milestone-next></div></summary>
-  <div class="game-milestones-body" data-game-milestone-progress></div>
-</details>
-</div>
-
-<section class="game-panel game-cycle-panel" id="gameCycleBossAchievements">
-  <div class="game-panel-head"><div><h2>Jefe del ciclo</h2><span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Jefe del ciclo" aria-describedby="cycleBossInfo">i</button><span class="sched-help-tooltip" id="cycleBossInfo" role="tooltip">Representa la meta de ganancias de tu ciclo de pago de 14 días. Cada dólar ganado reduce su vida. Completar la meta desbloquea una recompensa de juego.</span></span></div><span class="game-cycle-label" data-game-role="cycle-status">En marcha</span></div>
-  <div class="game-cycle-boss-layout"><div class="game-boss-copy"><strong data-game-role="cycle-title">El jefe observa tu progreso.</strong><p data-game-role="cycle-subtitle">La barra refleja lo que llevas acumulado en el ciclo de pago actual.</p><div class="game-boss-progress" role="progressbar" aria-label="Progreso contra el jefe del ciclo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span data-game-role="cycle-progress" style="width:0%;"></span></div><div class="game-boss-progress-foot"><span data-game-role="cycle-earned">$0.00</span><span data-game-role="cycle-goal">Meta $0.00</span></div></div><div class="game-boss-sprite" data-game-role="cycle-sprite" aria-hidden="true"><span class="game-pixel-crown"></span><span class="game-pixel-eye left"></span><span class="game-pixel-eye right"></span><span class="game-pixel-mouth"></span></div></div>
-</section>
-
-</div>
-<div class="game-logros-pane" role="tabpanel" id="gameLogrosPaneColeccion" data-logros-pane="coleccion" aria-labelledby="gameLogrosTabColeccion" hidden>
-<details class="game-panel game-equipment-panel game-fold game-equipment-fold" data-game-root="equipment-panel" id="gameEquipmentPanel">
-  <summary class="game-fold-summary"><h2 id="gameEquipmentTitle">Equipo</h2><span class="game-panel-badge" data-game-role="equipment-count">0 / 6</span></summary>
-  <div class="game-fold-body">
-  <span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Equipo" aria-describedby="equipmentInfo">i</button><span class="sched-help-tooltip" id="equipmentInfo" role="tooltip">Accesorios que desbloqueas con niveles, misiones y objetivos. Selecciona uno disponible para equiparlo o retirarlo; un accesorio bloqueado indica qué falta.</span></span>
-  <div aria-label="Equipo desbloqueable" class="game-equipment-grid" data-game-role="equipment-list" data-game-root="equipment-grid" role="list"></div>
-  </div>
-</details>
-
-<section class="game-achievements-grid game-achievements-grid-collection" aria-label="Colecciones">
-<details class="game-panel game-bestiary-panel game-fold game-bestiary-fold" id="gameBestiary">
-  <summary class="game-fold-summary"><h2>Bestiario</h2><span class="game-panel-badge" data-game-role="bestiary-count">0 / 7</span></summary>
-  <div class="game-fold-body">
-  <span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Bestiario" aria-describedby="bestiaryInfo">i</button><span class="sched-help-tooltip" id="bestiaryInfo" role="tooltip">Colección de monstruos que ya derrotaste al completar la meta diaria. Muestra tu historial de victorias y las criaturas que faltan.</span></span>
-    <div class="game-collection-grid" data-game-role="bestiary-list"></div>
-  </div>
-</details>
-<details class="game-panel game-trophies-panel game-fold game-trophies-fold" id="gameTrophies">
-  <summary class="game-fold-summary"><h2>Trofeos</h2><span class="game-panel-badge" data-game-role="trophy-count">0</span></summary>
-  <div class="game-fold-body">
-  <span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Trofeos" aria-describedby="trophiesInfo">i</button><span class="sched-help-tooltip" id="trophiesInfo" role="tooltip">Reconocimientos permanentes por completar metas y otros objetivos. Se guardan en tu perfil; no se gastan ni afectan tus ganancias.</span></span>
-    <div class="game-trophy-list" data-game-role="trophy-list"><div class="game-collection-empty">Tus próximos trofeos aparecerán aquí.</div></div>
-  </div>
-</details>
-</section>
-
-<details class="game-settings-accordion game-reward-settings" id="positiveRewardsAccordion">
-  <summary class="game-settings-accordion-summary"><span class="game-settings-accordion-copy"><strong>Mis premios</strong><small>Premios físicos y catálogo sugerido.</small></span><span class="game-settings-accordion-chevron" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></summary>
-  <div class="game-settings-accordion-body positive-rewards-body">
-<div class="positive-settings-block">
-  <div class="positive-settings-heading"><span><strong>Mis premios físicos</strong><small>Se guardan hasta tu próximo Break, Lunch o fin del turno.</small></span><button type="button" data-positive-action="new-reward">Crear mi premio</button></div>
-  <div class="physical-reward-selected-list" id="physicalRewardSelected"></div>
-</div>
-<div class="positive-settings-block">
-  <div class="positive-settings-heading"><span><strong>Catálogo sugerido</strong><small>Agrega una idea y personalízala a tu gusto.</small></span></div>
-  <div class="physical-reward-catalog" id="physicalRewardCatalog"><label for="physicalRewardPresetSelect">Elegir un premio sugerido</label><div class="game-monster-name-controls"><select id="physicalRewardPresetSelect"></select><button type="button" id="physicalRewardPresetAdd" data-positive-action="add-preset">Agregar premio</button></div><small id="physicalRewardPresetDescription"></small></div>
-</div>
-<p class="note" style="margin:0;">La app nunca compra nada ni interrumpe una llamada. Tú decides cuándo realizar, guardar o cambiar cada premio.</p></div>
-</details>
-
 <div class="positive-evidence-card" hidden id="positiveEvidenceCard" aria-live="polite"></div>
-</div>
-<div class="game-logros-pane" role="tabpanel" id="gameLogrosPaneHistorial" data-logros-pane="historial" aria-labelledby="gameLogrosTabHistorial" hidden>
-<section class="game-achievements-grid game-achievements-grid-bottom" aria-label="Victorias y récords">
-<article class="game-panel game-last-clear-panel" id="gameLastStageClear">
-    <div class="game-panel-head"><div><h2>STAGE CLEAR</h2><span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de STAGE CLEAR" aria-describedby="stageClearInfo">i</button><span class="sched-help-tooltip" id="stageClearInfo" role="tooltip">Es el resumen de un turno terminado: muestra misiones, XP y récords. Puedes abrir el último cierre para revisar lo que conseguiste.</span></span></div><span class="game-panel-badge" data-game-role="last-clear-date">—</span></div>
-    <div class="game-last-clear-content" data-game-role="last-clear-content"><div class="game-clear-stars" aria-hidden="true"><span>★</span><span>★</span><span>★</span></div><p>Sin STAGE CLEAR aún.</p></div>
-    <button class="game-text-button" data-game-action="open-last-clear" type="button">Ver detalle</button>
-    <div aria-label="Cofre reclamable" class="game-chest-claim" data-game-role="chest-claim" hidden id="gameChestClaim" role="region">
-      <span aria-hidden="true" class="game-chest-claim-icon">🎁</span>
-      <span class="game-chest-claim-copy"><strong data-game-role="chest-claim-title">Cofre listo</strong><small data-game-role="chest-claim-subtitle">Abre tu próxima sesión para reclamarlo.</small></span>
-    </div>
-  </article>
-<article class="game-panel" id="gameRecords">
-    <div class="game-panel-head"><div><h2>Récords</h2></div><svg class="ic-svg game-panel-head-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9Z"/></svg></div>
-    <div class="game-record-list" data-game-role="records-list"><div class="game-record-row"><span>Mayor pago</span><strong>—</strong></div><div class="game-record-row"><span>Más larga</span><strong>—</strong></div><div class="game-record-row"><span>Mejor racha semanal</span><strong>—</strong></div></div>
-  </article>
-</section>
-
 <section class="positive-history-section">
-  <details class="game-panel game-fold game-history-fold" id="positiveHistoryPanel">
+  <details class="game-panel game-fold game-history-fold" id="positiveHistoryPanel" open>
   <summary class="game-fold-summary"><h2>Mi historial positivo</h2><span class="game-panel-badge" id="positiveHistoryCount">0</span></summary>
   <div class="game-fold-body">
   <span class="sched-help-wrap game-help-wrap"><button class="sched-compact-info-btn" type="button" aria-label="Acerca de Historial positivo" aria-describedby="positiveHistoryInfo">i</button><span class="sched-help-tooltip" id="positiveHistoryInfo" role="tooltip">Guarda los cierres de llamadas, recuperaciones y premios realizados. Sirve para reconocer tu constancia; tus comentarios personales se muestran tal como los escribiste.</span></span>
@@ -1059,10 +873,6 @@
   </div>
 </details>
 </section>
-
-
-
-</div>
 </div><!-- /pageAchievements -->
 
 <div class="app-page" data-page="help" hidden id="pageHelp" role="main" tabindex="-1">

@@ -249,21 +249,22 @@ test('the discard button is a red-outlined box with a trash can', () => {
   assert.ok(/#liveDiscardBtn \{[^}]*border:\s*1\.5px solid var\(--bad\)/.test(css), 'red outline');
 });
 
-test('sidebar sound row is a sub-row of Achievements and hides when Achievements is off', () => {
-  const html = fs.readFileSync('app.html', 'utf8'), game = fs.readFileSync('js/game.js', 'utf8');
-  assert.match(html, /id="sidebarGameSoundRow"/);
+test('sidebar sound row is a sub-row of Celebrar llamadas and hides when no reinforcement is on', () => {
+  const html = fs.readFileSync('app.html', 'utf8'), positive = fs.readFileSync('js/positive-reinforcement.js', 'utf8');
+  assert.match(html, /id=\"sidebarGameSoundRow\"/);
   assert.match(html, /sidebar-subrow/);
-  assert.match(game, /soundRow\.hidden = !gameEnabled\(\)/);
+  assert.match(positive, /soundRow\.hidden = !settings\.reinforcement\.enabled/);
 });
 
-test('sidebar groups Gamificación with Logros, sounds, celebrate calls and brief wrap-up', () => {
+test('sidebar groups Refuerzo positivo with sounds, celebrate calls and brief wrap-up, without Logros switches', () => {
   const html = fs.readFileSync('app.html', 'utf8');
-  const sidebar = html.slice(html.indexOf('<div class="sidebar-footer">'), html.indexOf('</nav>'));
-  const order = ['>Gamificación<', 'sidebarAchievementsInput', 'sidebarGameSoundInput', 'positiveReinforcementEnabledInput', 'positiveAskAfterCallInput', '>Mostrar en Inicio<'].map(key => sidebar.indexOf(key));
+  const sidebar = html.slice(html.indexOf('<div class=\"sidebar-footer\">'), html.indexOf('</nav>'));
+  const order = ['>Refuerzo positivo<', 'sidebarGameSoundInput', 'positiveReinforcementEnabledInput', 'positiveAskAfterCallInput', '>Mostrar en Inicio<'].map(key => sidebar.indexOf(key));
   assert.ok(order.every(index => index >= 0), 'faltan filas en el menú');
   assert.deepEqual([...order].sort((a, b) => a - b), order);
-  assert.equal(html.split('id="positiveReinforcementEnabledInput"').length, 2);
-  assert.equal(html.split('id="positiveAskAfterCallInput"').length, 2);
+  assert.equal(html.split('id=\"positiveReinforcementEnabledInput\"').length, 2);
+  assert.equal(html.split('id=\"positiveAskAfterCallInput\"').length, 2);
+  assert.ok(!html.includes('sidebarAchievementsInput') && !html.includes('Progreso de Logros') && !html.includes('>Gamificación<'));
 });
 
 test('no-calls reminder keeps its controls in compact rows with minutes, repeat and message plus save together', () => {
