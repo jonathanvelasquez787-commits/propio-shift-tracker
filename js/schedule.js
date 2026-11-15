@@ -138,6 +138,36 @@ export function configureScheduleContext(context) {
       return settings.weeklySchedule;
     }
 
+    // Horas cortas para la tira de la semana: "6–2" (sin minutos si son :00, sin AM/PM); con minutos "6:30–2:30".
+    function shortShiftHour(hhmm) {
+      const m = /^(\d{1,2}):(\d{2})/.exec(String(hhmm || ''));
+      if (!m) return '';
+      const h24 = Number(m[1]) % 24;
+      const h12 = h24 % 12 === 0 ? 12 : h24 % 12;
+      return m[2] === '00' ? String(h12) : h12 + ':' + m[2];
+    }
+    function shortShiftRange(start, end) {
+      const a = shortShiftHour(start);
+      const b = shortShiftHour(end);
+      return a && b ? a + '–' + b : '';
+    }
+
+    // Chip "8 h de turno": calculado con los campos Inicio y Fin (si el fin es menor, el turno cruza la medianoche).
+    export function updateShiftLenChip() {
+      const chip = document.getElementById('schedShiftLenChip');
+      if (!chip) return;
+      const off = document.getElementById('dayOffInput');
+      const a = /^(\d{1,2}):(\d{2})/.exec((document.getElementById('dayStartInput') || {}).value || '');
+      const b = /^(\d{1,2}):(\d{2})/.exec((document.getElementById('dayEndInput') || {}).value || '');
+      if ((off && off.checked) || !a || !b) { chip.textContent = ''; chip.hidden = true; return; }
+      let mins = (Number(b[1]) * 60 + Number(b[2])) - (Number(a[1]) * 60 + Number(a[2]));
+      if (mins <= 0) mins += 24 * 60;
+      const h = Math.floor(mins / 60);
+      const m = mins % 60;
+      chip.textContent = m ? ui`${h} h ${m} min de turno` : ui`${h} h de turno`;
+      chip.hidden = false;
+    }
+
     export function renderDayTabs() {
       const wrap = document.getElementById('scheduleDayTabs');
       if (!wrap) return;
@@ -145,7 +175,8 @@ export function configureScheduleContext(context) {
       wrap.innerHTML = WEEKDAYS.map(k => {
         const active = k === scheduleEditDay;
         const off = !target[k] || target[k].off;
-        return ui`<button class="day-tab ${active ? 'active' : ''} ${off ? 'off' : ''}" data-day="${k}" type="button">${WEEKDAY_LABELS_SHORT[k]}</button>`;
+        const hours = off ? translateText('Libre') : shortShiftRange(target[k].start, target[k].end);
+        return ui`<button class="day-tab ${active ? 'active' : ''} ${off ? 'off' : ''}" data-day="${k}" type="button"><span class="day-tab-name">${WEEKDAY_LABELS_SHORT[k]}</span><span class="day-tab-hours">${hours}</span></button>`;
       }).join('');
       wrap.querySelectorAll('.day-tab').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -407,7 +438,7 @@ export function configureScheduleContext(context) {
       if (!isWeekMode) {
         banner.className = 'sched-mode-banner tone-template';
         bannerIcon.innerHTML = iconHtml('repeat');
-        bannerText.textContent = translateText('Editando tu horario de siempre — se repite cada semana.');
+        bannerText.textContent = translateText('Tu horario de siempre · se repite cada semana');
       } else if (!hasCustom) {
         banner.className = 'sched-mode-banner tone-template';
         bannerIcon.innerHTML = iconHtml('eye');
@@ -476,6 +507,7 @@ export function configureScheduleContext(context) {
       // Pedido del usuario: título de la tarjeta de cabecera del día muestra el NOMBRE COMPLETO del día activo (ver `.sched-day-card- title` en el CSS/HTML)
       const schedDayCardTitle = document.getElementById('schedDayCardTitle');
       if (schedDayCardTitle) schedDayCardTitle.textContent = WEEKDAY_LABELS[scheduleEditDay] || translateText('Lunes');
+      updateShiftLenChip();
       renderBlocksEditor(blocks);
       if (lateSelect) lateSelect.value = settings.lateArrivalMode || 'anchor';
       // Pedido del usuario (v147): Adherencia vuelve a Horario (pasó por

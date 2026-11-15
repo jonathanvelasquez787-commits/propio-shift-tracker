@@ -2289,5 +2289,9 @@
   "s_cbcf74da": "Brief wrap-up for extension calls",
   "s_f792549d": "Also asks how it went for calls the extension records on its own. Off: they are saved quietly.",
   "s_6e88192f": "Switch sides of the buttons",
-  "s_bae812cd": "Snooze {{v0}} min"
+  "s_bae812cd": "Snooze {{v0}} min",
+  "s_2b6f3cba": "End",
+  "s_91d4e65f": "{{v0}} h {{v1}} min shift",
+  "s_c85ca8d2": "Your usual schedule · repeats every week",
+  "s_d61eb096": "{{v0}} h shift"
 }
