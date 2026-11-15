@@ -1217,6 +1217,15 @@
           ]
         },
         {
+          "file": "tests/game-height-matches-buttons.test.mjs",
+          "namedCases": [
+            "en la barra la escena del juego mide 88 px y todo va dentro de ella en una sola celda",
+            "arriba van el reto y la meta en una franja y abajo los botones, sin tocar el tamaño de los botones de acción",
+            "el selector de Arma sube a la franja de abajo en la barra y vuelve a Logros fuera de ella",
+            "el piso del juego sube sobre la franja de abajo con --battle-floor-lift y el monstruo queda parado sobre él"
+          ]
+        },
+        {
           "file": "tests/freelancer-blocks-list.test.mjs",
           "namedCases": [
             "Bloques del día en freelancer: cada descanso es una fila con etiqueta, horas y minutos",

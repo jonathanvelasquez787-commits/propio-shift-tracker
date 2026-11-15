@@ -206,7 +206,9 @@ function createBattle(element) {
     const ratio = Math.min(host.devicePixelRatio || 1, 2);
     const height = rect.height || 154;
     stageScale = mode === 'auto' ? Math.min(1, height / 154) : 1;
-    world = { w: rect.width / stageScale, h: height / stageScale, floor: height / stageScale - 26 };
+    // En la barra de acciones la franja de botones tapa el piso: el CSS sube el piso con --battle-floor-lift (en px de pantalla).
+    const lift = Math.max(0, parseFloat(host.getComputedStyle?.(stage)?.getPropertyValue('--battle-floor-lift')) || 0);
+    world = { w: rect.width / stageScale, h: height / stageScale, floor: (height - lift) / stageScale - 26 };
     canvas.width = Math.round(rect.width * ratio); canvas.height = Math.round(height * ratio);
     ctx?.setTransform(ratio * stageScale, 0, 0, ratio * stageScale, 0, 0);
     if (ctx) ctx.imageSmoothingEnabled = false;
