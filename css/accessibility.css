@@ -6,6 +6,7 @@ body :is(button,a,input,select,textarea,summary,[tabindex]) { scroll-margin-bloc
 .essential-hide-earnings #pageHome #earningsAccordion,
 .essential-hide-schedule #pageHome #scheduleAccordion,
 .essential-hide-game #gameHomeGroup,
+.essential-hide-game #gameHomeDay,
 .essential-hide-game .hero .game-chip { display:none !important; }
 .calls-status-actions button[hidden] { display:none !important; }
 

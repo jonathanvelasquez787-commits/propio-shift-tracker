@@ -1517,3 +1517,36 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 }
 /* fin linea y reto estrecho */
 
+
+/* reto en ganancias celular */
+/* Celular: el reto de hoy va dentro de la fila de Ganancias de hoy, entre el monto y el anillo de la meta, a la derecha. Mide lo mismo de alto que la fila (71 px) y solo deja nivel, dinero, sonido, escena, Disparar y Arma. */
+@media (max-width: 760px) {
+  .earn-row:has(> #gameHomeDay) { flex-wrap: nowrap; align-items: center; gap: 8px; }
+  .earn-row > #gameHomeDay { flex: 1 1 0; min-width: 96px; height: 71px; margin: 0; }
+  .earn-row > #gameHomeDay .game-battle { grid-template-rows: 71px; height: 71px; }
+  .earn-row > #gameHomeDay .game-battle .game-battle-stage { height: 71px; --battle-floor-lift: 10px; }
+  .earn-row > #gameHomeDay .game-battle .game-battle-head { height: 17px; padding: 1px 4px 0; gap: 2px; }
+  .earn-row > #gameHomeDay .game-battle .game-battle-heading > h3,
+  .earn-row > #gameHomeDay .game-battle .game-battle-head-tools button[data-battle-auto-pause],
+  .earn-row > #gameHomeDay .game-battle .game-battle-footer > [data-game-nav] { display: none; }
+  .earn-row > #gameHomeDay .game-battle .game-level-chip { padding: 0 4px; font-size: 8px; line-height: 12px; }
+  .earn-row > #gameHomeDay .game-battle .game-battle-head-tools button { width: 14px; height: 14px; }
+  .earn-row > #gameHomeDay .game-battle .game-battle-head-tools svg { width: 10px; height: 10px; }
+  .earn-row > #gameHomeDay .game-battle .game-compact-goal-line { top: 2px; right: 22px; font-size: 10px; line-height: 14px; }
+  .earn-row > #gameHomeDay .game-battle .game-compact-goal-track { top: 15px; }
+  .earn-row > #gameHomeDay .game-battle .game-compact-goal-line strong { font-size: 11px; font-weight: 800; }
+  .earn-row > #gameHomeDay .game-battle .game-compact-goal-line strong small,
+  .earn-row > #gameHomeDay .game-battle .game-battle-stun { display: none; }
+  .earn-row > #gameHomeDay .game-battle .game-battle-monster { bottom: 16px; width: 34px; height: 27px; }
+  .earn-row > #gameHomeDay .game-battle .game-battle-footer { height: 18px; min-height: 18px; padding: 0 3px; gap: 3px; }
+  .earn-row > #gameHomeDay .game-battle .game-battle-footer > button { min-height: 14px; padding: 0 5px; font-size: 9px; }
+  .earn-row > #gameHomeDay .game-battle .game-battle-footer .game-battle-loadout select { max-width: 64px; min-height: 14px; font-size: 9px; padding: 0 2px; }
+}
+/* Pantalla táctil: Disparar y Arma miden al menos 24 px de alto (mínimo de WCAG 2.2) y el reto no cambia de alto. */
+@media (max-width: 760px) and (pointer: coarse) {
+  .earn-row > #gameHomeDay .game-battle .game-battle-footer { height: 26px; min-height: 26px; }
+  .earn-row > #gameHomeDay .game-battle .game-battle-footer > button { min-height: 24px; }
+  .earn-row > #gameHomeDay .game-battle .game-battle-footer .game-battle-loadout select { min-height: 24px; }
+  .earn-row > #gameHomeDay .game-battle .game-battle-monster { bottom: 24px; }
+}
+/* fin reto en ganancias celular */
