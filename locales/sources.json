@@ -369,12 +369,6 @@
       "js/finance-planning.js"
     ]
   },
-  "s_06b44bc2": {
-    "source": "CLEAR",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_0737280d": {
     "source": "Avisar tras",
     "files": [
@@ -706,12 +700,6 @@
     "source": "Duración prevista de {{v0}}: hasta {{v1}}.",
     "files": [
       "js/automation-ui.js"
-    ]
-  },
-  "s_0d32876e": {
-    "source": "Misiones",
-    "files": [
-      "app.html"
     ]
   },
   "s_0d4512ac": {
@@ -1656,12 +1644,6 @@
       "app.html"
     ]
   },
-  "s_1fa218ff": {
-    "source": "XP ganado",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_1fb9396d": {
     "source": "Por semana",
     "files": [
@@ -1997,12 +1979,6 @@
       "app.html"
     ]
   },
-  "s_266289d1": {
-    "source": "{{v4}}{{v5}}%",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
   "s_26813a20": {
     "source": "No se pudo conservar la copia anterior. No se cambiaron tus datos.",
     "files": [
@@ -2307,12 +2283,6 @@
       "js/calls.js"
     ]
   },
-  "s_2bf91ad8": {
-    "source": "Tu recompensa espera al próximo inicio de turno.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_2c1a9129": {
     "source": "Revisá antes de vincular",
     "files": [
@@ -2514,12 +2484,6 @@
     "source": "Ciclo de pago actualizado",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_2f580f27": {
-    "source": "Cerrar cofre",
-    "files": [
-      "app.html"
     ]
   },
   "s_2f721278": {
@@ -3787,12 +3751,6 @@
     "source": "Meta en {{v0}}",
     "files": [
       "js/settings.js"
-    ]
-  },
-  "s_47807110": {
-    "source": "Recompensa",
-    "files": [
-      "app.html"
     ]
   },
   "s_47a4101e": {
@@ -5961,12 +5919,6 @@
       "js/app-main.js"
     ]
   },
-  "s_719f0e97": {
-    "source": "{{v2}}%{{v3}}",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
   "s_71d1b7dd": {
     "source": "Gastos variables",
     "files": [
@@ -6797,12 +6749,6 @@
   },
   "s_8135ef32": {
     "source": "Noche Violeta",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_81496bac": {
-    "source": "Victoria",
     "files": [
       "app.html"
     ]
@@ -7952,12 +7898,6 @@
       "js/calendar.js"
     ]
   },
-  "s_9325967f": {
-    "source": "El escenario de hoy quedó despejado.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_932b0549": {
     "source": "Adherencia real",
     "files": [
@@ -8181,12 +8121,6 @@
     "source": "La conexión necesita revisión",
     "files": [
       "js/automation-ui.js"
-    ]
-  },
-  "s_976ecadd": {
-    "source": "0 XP",
-    "files": [
-      "app.html"
     ]
   },
   "s_9770e175": {
@@ -10058,12 +9992,6 @@
       "js/call-recovery.js"
     ]
   },
-  "s_b9c116de": {
-    "source": "Continuar",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_b9c16341": {
     "source": "Valor interno: {{v0}} USD{{v1}}. La pantalla redondea a centavos.",
     "files": [
@@ -10369,12 +10297,6 @@
       "js/app-main.js"
     ]
   },
-  "s_bff43bf5": {
-    "source": "Próximo hito: {{v0}}% · te faltan {{v1}}{{v2}}",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
   "s_c008672a": {
     "source": "Repetida dentro del texto pegado; se leyó una sola vez.",
     "files": [
@@ -10625,12 +10547,6 @@
       "app.html"
     ]
   },
-  "s_c4ef62f0": {
-    "source": "Récord",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_c51ade12": {
     "source": "Estas copias son locales, privadas de tu cuenta y no sustituyen un respaldo JSON descargado. Borrar los datos del navegador también las elimina.",
     "files": [
@@ -10639,12 +10555,6 @@
   },
   "s_c540ebf5": {
     "source": "Temas",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_c552cfee": {
-    "source": "Tres estrellas",
     "files": [
       "app.html"
     ]
@@ -10673,22 +10583,10 @@
       "js/shift-work-review.js"
     ]
   },
-  "s_c5a7a1c5": {
-    "source": "Cerrar STAGE CLEAR",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_c5f7fbe1": {
     "source": "minutos de trabajo sin llamadas",
     "files": [
       "app.html"
-    ]
-  },
-  "s_c630f9fd": {
-    "source": "100% de tu meta diaria alcanzado",
-    "files": [
-      "js/app-main.js"
     ]
   },
   "s_c6322a4c": {
@@ -11736,12 +11634,6 @@
       "js/reports.js"
     ]
   },
-  "s_dab9befc": {
-    "source": "Cofre sellado",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_daca34d8": {
     "source": "Sonidos",
     "files": [
@@ -11830,12 +11722,6 @@
     "source": "{{v7}} → {{v8}}",
     "files": [
       "js/call-recovery.js"
-    ]
-  },
-  "s_dc074137": {
-    "source": "Hitos de la meta diaria",
-    "files": [
-      "app.html"
     ]
   },
   "s_dc2b73db": {
@@ -13074,12 +12960,6 @@
     "source": "Propio: {{v0}} · {{v1}} min",
     "files": [
       "js/call-records-view.js"
-    ]
-  },
-  "s_f0c3d6cd": {
-    "source": "STAGE",
-    "files": [
-      "app.html"
     ]
   },
   "s_f0f200b2": {

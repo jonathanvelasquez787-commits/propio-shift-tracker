@@ -112,8 +112,8 @@ test('avisos y modales de juego se recuperan al cerrar', () => {
   const appMain = read('js/app-main.js');
   assert.match(game, /app:modal-closed/);
   assert.match(appMain, /new CustomEvent\('app:modal-closed'/);
-  assert.match(appMain, /closeModal\('stageClearModal'\)/);
-  assert.match(appMain, /closeModal\('chestModal'\)/);
+  assert.doesNotMatch(appMain, /stageClearModal|chestModal/);
+  assert.doesNotMatch(read('app.html'), /stageClearModal|chestModal/);
 });
 
 test('el sonido del refuerzo solo depende de Celebrar llamadas y del día actual', () => {
