@@ -1206,7 +1206,7 @@
           "file": "tests/game-in-actions-bar.test.mjs",
           "namedCases": [
             "en escritorio el juego del día se mueve dentro de la barra de acciones y vuelve en celular",
-            "la barra con juego deja los botones a la izquierda y el juego a la derecha, solo en escritorio"
+            "la barra con juego deja los botones y el juego juntos a la izquierda y todo se queda pegado al bajar, solo en escritorio"
           ]
         },
         {
@@ -1257,7 +1257,8 @@
           "namedCases": [
             "en escritorio hay una línea doble entre los botones y el reto de hoy, y el reto no pasa de 520 px",
             "en celular el reto mide lo mismo de ancho que la barra de botones, sin línea y sin pegarse arriba",
-            "la línea se mide contra un botón y se vuelve a medir cuando cambia el tamaño de la barra"
+            "la línea se mide contra un botón y se vuelve a medir cuando cambia el tamaño de la barra",
+            "las líneas quedan a la izquierda junto al reto, no se ocultan al pegarse arriba y en celular el reto deja espacio abajo"
           ]
         },
         {
