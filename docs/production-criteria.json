@@ -1121,6 +1121,13 @@
           ]
         },
         {
+          "file": "tests/notifications-min-unit.test.mjs",
+          "namedCases": [
+            "Avisos: los minutos de \"antes\" muestran \"min\" a la derecha y la etiqueta queda solo para lectores de pantalla",
+            "Avisos: el campo de minutos se ajusta a su contenido para que \"min\" no se salga de la ventana"
+          ]
+        },
+        {
           "file": "tests/freelancer-blocks-list.test.mjs",
           "namedCases": [
             "Bloques del día en freelancer: cada descanso es una fila con etiqueta, horas y minutos",
