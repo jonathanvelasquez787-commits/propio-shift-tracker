@@ -1121,6 +1121,15 @@
           ]
         },
         {
+          "file": "tests/game-progress-card-compact.test.mjs",
+          "namedCases": [
+            "Logros en celular: Nivel y XP van en una línea, sin el círculo con el número",
+            "Logros en celular: Desbloqueos por nivel queda en una sola línea sin subtítulo",
+            "Logros en celular: Racha, Mejor y Escudos van en una línea y los días son puntos con la letra debajo",
+            "Logros: la tarjeta conserva los elementos que usa game.js"
+          ]
+        },
+        {
           "file": "tests/notifications-min-unit.test.mjs",
           "namedCases": [
             "Avisos: los minutos de \"antes\" muestran \"min\" a la derecha y la etiqueta queda solo para lectores de pantalla",
