@@ -923,7 +923,8 @@
         {
           "file": "tests/popup-pause-text.test.mjs",
           "namedCases": [
-            "popup: \"Pausar disponibilidad automática\" se explica sin jerga"
+            "popup: \"Pausar disponibilidad automática\" se explica sin jerga",
+            "popup: las opciones de volver a estar disponible dicen \"Estar disponible\""
           ]
         }
       ]
