@@ -65,8 +65,8 @@ export function normalizeGameState(raw) {
 
 function ensureGameSettings() {
   if (!settings.game || typeof settings.game !== 'object' || Array.isArray(settings.game)) settings.game = {};
-  if (typeof settings.game.enabled !== 'boolean') settings.game.enabled = false;
-  settings.game.intensity = 'arcade';
+  delete settings.game.enabled;
+  delete settings.game.intensity;
   if (typeof settings.game.soundEnabled !== 'boolean') settings.game.soundEnabled = true;
   const soundVolume = Number(settings.game.soundVolume);
   settings.game.soundVolume = Number.isFinite(soundVolume) ? Math.max(0, Math.min(100, soundVolume)) : 40;
@@ -88,10 +88,6 @@ function currentGameDayKey() {
     return todayCallDateKey(startedAt);
   }
   return todayCallDateKey();
-}
-
-function displayedGameDayKey() {
-  return callDateKeyFromValue(state.activeDayKey) || currentGameDayKey();
 }
 
 export function ensureGameState() {
@@ -148,7 +144,7 @@ function renderSoundSettings() {
 
 function clearTransientGameUi() {
   const live = document.getElementById('gameStatusLive');
-  if (live && !reinforcementFeedbackEnabled('either')) live.textContent = '';
+  if (live && !reinforcementFeedbackEnabled()) live.textContent = '';
 }
 
 export function renderGame() {
@@ -171,9 +167,9 @@ let lastGameToastText = '';
 let lastDisplayedToastText = '';
 const TOAST_PRIORITIES = Object.freeze({ record: 4, loot: 3, impulse: 2, critical: 2, '': 1 });
 
-export function announceGameStatus(message, { channel = 'game' } = {}) {
+export function announceGameStatus(message) {
   if (callFeedbackSilenced()) return;
-  if (!reinforcementFeedbackEnabled(channel) || state.activeCall) return;
+  if (!reinforcementFeedbackEnabled() || state.activeCall) return;
   const live = document.getElementById('gameStatusLive');
   if (!live || !message) return;
   live.textContent = '';
@@ -183,26 +179,25 @@ export function announceGameStatus(message, { channel = 'game' } = {}) {
 export function queueGameToast(message, tone = '', options = {}) {
   if (callFeedbackSilenced()) return;
   const text = String(message ?? '').trim();
-  const channel = options.channel || 'game';
-  const allowed = reinforcementFeedbackEnabled(channel);
+  const allowed = reinforcementFeedbackEnabled();
   if (!text || !allowed || (options.repeat !== true && text === lastGameToastText)) return;
   const key = `${tone}:${text}`;
   if (gameToastQueue.some((item) => item.key === key) || Array.from(document.querySelectorAll('#gameToastStack [data-game-toast-key]')).some((node) => node.dataset.gameToastKey === key)) return;
   const priority = Number.isFinite(Number(options.priority)) ? Number(options.priority) : (TOAST_PRIORITIES[tone] || 1);
   lastGameToastText = text;
-  gameToastQueue.push({ key, message: text, tone, priority, channel, repeat: options.repeat === true });
+  gameToastQueue.push({ key, message: text, tone, priority, repeat: options.repeat === true });
   gameToastQueue.sort((a, b) => b.priority - a.priority);
-  if (options.announce !== false) announceGameStatus(text, { channel });
+  if (options.announce !== false) announceGameStatus(text);
   drainGameToasts();
 }
 
 function pruneDisabledGameToasts() {
   const stack = document.getElementById('gameToastStack');
   for (const node of Array.from(stack?.children || [])) {
-    if (!reinforcementFeedbackEnabled(node.dataset.gameToastChannel || 'game')) node.remove();
+    if (!reinforcementFeedbackEnabled()) node.remove();
   }
   for (let index = gameToastQueue.length - 1; index >= 0; index--) {
-    if (!reinforcementFeedbackEnabled(gameToastQueue[index].channel)) gameToastQueue.splice(index, 1);
+    if (!reinforcementFeedbackEnabled()) gameToastQueue.splice(index, 1);
   }
 }
 
@@ -212,14 +207,13 @@ function drainGameToasts() {
   if (!stack || state.activeCall || document.querySelector('.modal-overlay.open')) return;
   while (gameToastQueue.length && stack.children.length < 3) {
     const item = gameToastQueue.shift();
-    const allowed = reinforcementFeedbackEnabled(item.channel);
+    const allowed = reinforcementFeedbackEnabled();
     if (!allowed) continue;
     if (!item.repeat && item.message === lastDisplayedToastText) continue;
     lastDisplayedToastText = item.message;
     const toastElement = document.createElement('div');
     toastElement.className = `game-toast ${item.tone ? `game-toast--${item.tone}` : ''}`;
     toastElement.dataset.gameToastKey = item.key;
-    toastElement.dataset.gameToastChannel = item.channel;
     toastElement.textContent = item.message;
     stack.appendChild(toastElement);
     requestAnimationFrame(() => toastElement.classList.add('show'));
@@ -233,11 +227,10 @@ function drainGameToasts() {
   }
 }
 
-function playGameTone(kind = 'hit', dayKey = currentGameDayKey(), channel = 'game') {
-  const allowed = () => !state.activeCall && reinforcementFeedbackEnabled(channel) && dayKey === currentGameDayKey()
-    && (channel === 'personal' || dayKey === displayedGameDayKey());
+function playGameTone(kind = 'pause', dayKey = currentGameDayKey()) {
+  const allowed = () => !state.activeCall && reinforcementFeedbackEnabled() && dayKey === currentGameDayKey();
   if (!allowed()) return false;
-  return playGameSound(kind, { allowed, channel });
+  return playGameSound(kind, { allowed });
 }
 
 function reinforcementCallKey(call, dayKey) {
@@ -263,7 +256,7 @@ export function onGameMonetaryProgress(dayKey, earnings, goal, { silent = false,
   progress.crossed.forEach((pct) => { state.game.ledger[`money-hit:${dayKey}:${pct}`] = true; });
   if (progress.crossed.length) {
     saveStateOnly();
-    if (!silent) notifyReinforcement(reinforcementText('milestone', { percent: progress.crossed.join('%, '), amount: `${money?.(earnings) || `$${Number(earnings).toFixed(2)}`} ${convertedAmountText?.(earnings) || ''}`.trim() }), { channel: 'either', effect: true, sound: 'impulse', dayKey });
+    if (!silent) notifyReinforcement(reinforcementText('milestone', { percent: progress.crossed.join('%, '), amount: `${money?.(earnings) || `$${Number(earnings).toFixed(2)}`} ${convertedAmountText?.(earnings) || ''}`.trim() }), { effect: true, sound: 'impulse', dayKey });
   }
   return progress;
 }
@@ -297,7 +290,7 @@ export function checkReinforcementInactivity(now = Date.now()) {
   }
   state.game.ledger[key] = { elapsedMs: elapsed };
   saveStateOnly();
-  notifyReinforcement(reinforcementText('idle'), { channel: 'either', repeat: settings.reinforcement?.inactivityRepeat === true });
+  notifyReinforcement(reinforcementText('idle'), { repeat: settings.reinforcement?.inactivityRepeat === true });
   return true;
 }
 
@@ -316,7 +309,7 @@ function processCallReinforcement(call, source, dayKey) {
     state.game.reinforcement.recoveryPending = { callId: String(call.id), dayKey, endISO: call.endISO };
     if (!state.game.ledger[droppedKey]) {
       state.game.ledger[droppedKey] = true;
-      notifyReinforcement(reinforcementText('dropped'), { channel: 'either' });
+      notifyReinforcement(reinforcementText('dropped'));
     }
     saveStateOnly();
     return false;
@@ -324,7 +317,7 @@ function processCallReinforcement(call, source, dayKey) {
   if (!callIsRecentlyProductive(call, dayKey)) return false;
   state.game.ledger[key] = { ...(existing || {}), dayKey, feedback: true };
   const previousCalls = callsForDay(dayKey).filter((item) => item.id !== call.id);
-  notifyReinforcement(chooseCallFeedback(call, { previousCalls, bonus: higherRateBonusAmount, money, convertedAmountText }), { channel: 'either' });
+  notifyReinforcement(chooseCallFeedback(call, { previousCalls, bonus: higherRateBonusAmount, money, convertedAmountText }));
   const stats = importedCallStats(callsForDay(dayKey), dayKey);
   onGameMonetaryProgress(dayKey, stats.earnings, effectiveDailyGoal(dayKey).usd);
   saveStateOnly();
@@ -393,7 +386,7 @@ export function onGamePauseEnded(pauseRecord, { onTime = false } = {}) {
     if (!previous || previous.endedAt !== pauseRecord.endedAt) {
       state.game.ledger[key] = { type: 'pause', dayKey, onTime, endedAt: pauseRecord.endedAt };
       saveStateOnly();
-      if (onTime) notifyReinforcement(reinforcementText('pause', { pause: pauseRecord.type === 'lunch' ? translateText('Lunch') : translateText('Break') }, pauseRecord.startedAt), { channel: 'either', sound: 'pause', dayKey });
+      if (onTime) notifyReinforcement(reinforcementText('pause', { pause: pauseRecord.type === 'lunch' ? translateText('Lunch') : translateText('Break') }, pauseRecord.startedAt), { sound: 'pause', dayKey });
     }
   }
 }

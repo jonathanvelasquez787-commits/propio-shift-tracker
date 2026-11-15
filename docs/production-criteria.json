@@ -743,7 +743,7 @@
             "CSS de juego cubre motion reducido, layout estrecho y responsive",
             "build mantiene módulos fuente fuera de public y el worker precarga el CSS de juego",
             "avisos y modales de juego se recuperan al cerrar",
-            "Arcade fijo y reduced-motion solo elimina movimiento",
+            "el sonido del refuerzo solo depende de Celebrar llamadas y del día actual",
             "simulación mensual: pegar llamadas usa hooks de juego y reemplaza live provisional",
             "simulación mensual: llamadas y Break Lunch no pueden ocupar los mismos minutos",
             "simulación mensual: llamada no salta ventana temprana ni reescribe entrada salida manual",
@@ -799,8 +799,8 @@
             "volumen maestro, volumen arcade y sus interruptores impiden desbloquear audio",
             "un lote de impacto, misión y derrota reproduce una sola fanfarria",
             "silenciar antes de reproducir cancela el lote incluso si después se restaura el volumen",
-            "apagar Logros cancela sonidos personales y pruebas pendientes sin reproducirlos al reactivar",
-            "apagar Logros durante resume cancela audio aunque refuerzo personal permanezca activado",
+            "apagar Celebrar llamadas cancela sonidos y pruebas pendientes sin reproducirlos al reactivar",
+            "apagar Celebrar llamadas durante resume cancela audio",
             "silenciar durante una fanfarria detiene y desconecta todas las voces",
             "ocultar página cancela lotes y voces y volver no reproduce sonidos pendientes",
             "cancelar mientras resume espera impide que una promesa tardía reproduzca audio",
@@ -866,7 +866,7 @@
           "file": "tests/reinforcement-feedback.test.mjs",
           "namedCases": [
             "automatic call feedback suppresses both notification channels without disabling preferences",
-            "Logros y refuerzo positivo controlan sus propios canales incluso con intensidad antigua",
+            "solo Celebrar llamadas controla los avisos y los ajustes viejos del juego no cuentan",
             "los hitos se anuncian como avisos y no usan partículas",
             "textos centrales tienen variantes estables y no dejan variables sin reemplazar",
             "feedback reconoce llamada normal, umbral largo, bono y mejor pago con moneda secundaria",
@@ -879,6 +879,14 @@
           "namedCases": [
             "normalizar el estado al arrancar no requiere el contexto de fechas y borra lo guardado del juego",
             "un estado vacío o dañado vuelve al estado por defecto del refuerzo"
+          ]
+        },
+        {
+          "file": "tests/game-settings-cleanup.test.mjs",
+          "namedCases": [
+            "los ajustes viejos del juego (enabled e intensity) se borran al cargar y ya no se crean",
+            "sin Celebrar llamadas todo queda mudo aunque el ajuste viejo diga enabled",
+            "el audio y los avisos ya no tienen canal \"game\""
           ]
         }
       ]

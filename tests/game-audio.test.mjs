@@ -42,8 +42,8 @@ test('silent history scope restores audio after nested updates and failures', ()
   assert.equal(gameSoundsSilenced(), false);
 });
 
-function harness({ resumeMode = 'running', available = true, delayedEnded = false, preview = false, channel = 'game' } = {}) {
-  const config = { masterVolume: 100, game: { enabled: true, soundEnabled: true, soundVolume: 40 }, reinforcement: { enabled: true } };
+function harness({ resumeMode = 'running', available = true, delayedEnded = false, preview = false } = {}) {
+  const config = { masterVolume: 100, game: { soundEnabled: true, soundVolume: 40 }, reinforcement: { enabled: true } };
   const timers = new Map(), documentListeners = new Map(), hostListeners = new Map(), contexts = [];
   let timerId = 0;
   const addListener = (map, name, callback) => map.set(name, [...(map.get(name) || []), callback]);
@@ -109,7 +109,7 @@ function harness({ resumeMode = 'running', available = true, delayedEnded = fals
     setTimeout(callback, delay) { const id = ++timerId; timers.set(id, { callback, delay }); return id; },
     clearTimeout(id) { timers.delete(id); },
   };
-  const audio = (preview ? createGameAudioPreview : createGameAudio)({ readSettings: () => config, host, doc, channel });
+  const audio = (preview ? createGameAudioPreview : createGameAudio)({ readSettings: () => config, host, doc });
   const dispatch = (name, props = {}) => {
     for (const callback of documentListeners.get(name) || []) callback({ type: name, isTrusted: true, ...props });
   };
@@ -145,9 +145,8 @@ test('inicializar o recargar no crea contexto ni reproduce eventos anteriores', 
 
 const WEAPON_CUES = ['shoot-pistol', 'shoot-smg', 'shoot-shotgun', 'shoot-rocket', 'shoot-railgun', 'shoot-flame', 'shoot-too-much', 'shoot-drone', 'shoot-psr', 'shoot-wand', 'shoot-grenade'];
 
-test('el audio personal funciona con Logros apagado y respeta su interruptor y volúmenes', async () => {
-  const h = harness({ channel: 'personal', delayedEnded: true });
-  h.config.game.enabled = false;
+test('el audio del refuerzo respeta su interruptor y volúmenes', async () => {
+  const h = harness({ delayedEnded: true });
   h.config.masterVolume = 50;
   h.config.game.soundVolume = 20;
   h.unlock();
@@ -155,9 +154,6 @@ test('el audio personal funciona con Logros apagado y respeta su interruptor y v
   await h.flush();
   assert.ok(h.sources.length > 0);
   assert.equal(h.contexts[0].nodes[0].gain.events.at(-1).value, .1);
-  h.config.game.enabled = true;
-  h.audio.sync();
-  h.config.game.enabled = false;
   h.audio.sync();
   assert.equal(h.sources.some(source => source.stops.includes(undefined)), false);
   h.config.reinforcement.enabled = false;
@@ -166,8 +162,8 @@ test('el audio personal funciona con Logros apagado y respeta su interruptor y v
   assert.equal(h.audio.play('reward'), false);
 });
 
-test('Logros encendido no activa audio personal cuando el refuerzo está apagado', async () => {
-  const h = harness({ channel: 'personal' });
+test('con Celebrar llamadas apagado no suena el audio aunque existan ajustes viejos del juego', async () => {
+  const h = harness();
   h.config.reinforcement.enabled = false;
   h.unlock();
   assert.equal(h.contexts.length, 0);
@@ -176,9 +172,9 @@ test('Logros encendido no activa audio personal cuando el refuerzo está apagado
   assert.equal(h.sources.length, 0);
 });
 
-test('la prueba explícita suena con Logros apagado sin activar ni cambiar preferencias', async () => {
+test('la prueba explícita suena con Celebrar llamadas apagado sin activar ni cambiar preferencias', async () => {
   const h = harness({ preview: true });
-  Object.assign(h.config.game, { enabled: false, soundEnabled: false, soundVolume: 20 });
+  Object.assign(h.config.game, { soundEnabled: false, soundVolume: 20 }); h.config.reinforcement.enabled = false;
   h.config.masterVolume = 50;
   const before = structuredClone(h.config);
   assert.equal(h.audio.play('loot'), false);
@@ -200,7 +196,7 @@ test('la prueba explícita suena con Logros apagado sin activar ni cambiar prefe
 test('la prueba de sonido respeta volumen cero y cancela voces al ocultar la pestaña', async () => {
   for (const mute of [h => { h.config.masterVolume = 0; }, h => { h.config.game.soundVolume = 0; }]) {
     const h = harness({ preview: true });
-    h.config.game.enabled = false;
+    h.config.reinforcement.enabled = false;
     mute(h);
     assert.equal(h.audio.play('loot', { type: 'click', isTrusted: true }), false);
     await h.flush();
@@ -208,7 +204,7 @@ test('la prueba de sonido respeta volumen cero y cancela voces al ocultar la pes
     assert.equal(h.sources.length, 0);
   }
   const h = harness({ preview: true, delayedEnded: true });
-  h.config.game.enabled = false;
+  h.config.reinforcement.enabled = false;
   h.audio.play('loot', { type: 'click', isTrusted: true });
   await h.flush();
   h.doc.hidden = true;
@@ -320,7 +316,7 @@ test('silenciar o apagar gamificación cancela ráfagas futuras y práctica pend
     h => { h.config.masterVolume = 0; },
     h => { h.config.game.soundVolume = 0; },
     h => { h.config.game.soundEnabled = false; },
-    h => { h.config.game.enabled = false; },
+    h => { h.config.reinforcement.enabled = false; },
   ]) {
     const h = harness({ delayedEnded: true });
     h.unlock();
@@ -334,7 +330,7 @@ test('silenciar o apagar gamificación cancela ráfagas futuras y práctica pend
     assert.ok(shots.every(source => source.stops.includes(undefined) && source.disconnects === 1 && source.connections[0].disconnects === 1));
     for (const kind of WEAPON_CUES) assert.equal(h.audio.play(kind), false);
     h.config.masterVolume = 100;
-    Object.assign(h.config.game, { enabled: true, soundEnabled: true, soundVolume: 40 });
+    Object.assign(h.config.game, { soundEnabled: true, soundVolume: 40 }); h.config.reinforcement.enabled = true;
     h.audio.sync();
     await h.flush();
     assert.equal(h.sources.length, shots.length);
@@ -352,7 +348,7 @@ test('los disparos respetan gesto real, gamificación apagada y volúmenes', asy
     h => { h.config.masterVolume = 0; },
     h => { h.config.game.soundVolume = 0; },
     h => { h.config.game.soundEnabled = false; },
-    h => { h.config.game.enabled = false; },
+    h => { h.config.reinforcement.enabled = false; },
   ]) {
     const h = harness();
     disable(h);
@@ -449,7 +445,7 @@ test('volumen maestro, volumen arcade y sus interruptores impiden desbloquear au
     h => { h.config.masterVolume = 0; },
     h => { h.config.game.soundVolume = 0; },
     h => { h.config.game.soundEnabled = false; },
-    h => { h.config.game.enabled = false; },
+    h => { h.config.reinforcement.enabled = false; },
   ]) {
     const h = harness();
     disable(h);
@@ -486,32 +482,32 @@ test('silenciar antes de reproducir cancela el lote incluso si después se resta
   assert.equal(h.sources.length, 0);
 });
 
-test('apagar Logros cancela sonidos personales y pruebas pendientes sin reproducirlos al reactivar', async () => {
+test('apagar Celebrar llamadas cancela sonidos y pruebas pendientes sin reproducirlos al reactivar', async () => {
   const h = harness();
   h.config.reinforcement = { enabled: true };
   h.unlock();
   assert.equal(h.audio.play('reward'), true);
   assert.equal(h.audio.play('loot'), true, 'la prueba de arcade entra en el mismo lote');
-  h.config.game.enabled = false;
+  h.config.reinforcement.enabled = false;
   h.audio.sync();
   assert.equal(h.timers.size, 0);
   assert.equal(h.audio.play('pause'), false);
   assert.equal(h.audio.play('loot'), false);
-  h.config.game.enabled = true;
+  h.config.reinforcement.enabled = true;
   h.audio.sync();
   await h.flush();
   assert.equal(h.sources.length, 0);
 });
 
-test('apagar Logros durante resume cancela audio aunque refuerzo personal permanezca activado', async () => {
+test('apagar Celebrar llamadas durante resume cancela audio', async () => {
   const h = harness({ resumeMode: 'defer' });
   h.config.reinforcement = { enabled: true };
   h.unlock();
   h.audio.play('reward');
   const flushed = h.beginFlush();
-  h.config.game.enabled = false;
+  h.config.reinforcement.enabled = false;
   h.audio.sync();
-  h.config.game.enabled = true;
+  h.config.reinforcement.enabled = true;
   h.contexts[0].resolvers.forEach(resolve => resolve());
   await flushed;
   assert.equal(h.sources.length, 0);
@@ -522,7 +518,7 @@ test('silenciar durante una fanfarria detiene y desconecta todas las voces', asy
     h => { h.config.masterVolume = 0; },
     h => { h.config.game.soundVolume = 0; },
     h => { h.config.game.soundEnabled = false; },
-    h => { h.config.game.enabled = false; },
+    h => { h.config.reinforcement.enabled = false; },
   ]) {
     const h = harness();
     h.unlock();

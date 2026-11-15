@@ -91,7 +91,7 @@ function evaluateCallRecovery(call, dayKey) {
 }
 
 function announceCallRecovery(call, dayKey, { recovered }) {
-  if (recovered) notifyReinforcement(reinforcementText('recovery', {}, call.id), { channel: 'personal', sound: 'pause', dayKey });
+  if (recovered) notifyReinforcement(reinforcementText('recovery', {}, call.id), { sound: 'pause', dayKey });
 }
 
 let reflectionCall = null;
@@ -180,7 +180,7 @@ function saveReflection(outcome) {
   reflectionCall = null;
   closeModal('positiveReflectionModal');
   renderPositiveReinforcement();
-  notifyReinforcement(message, { channel: 'personal' });
+  notifyReinforcement(message);
 }
 
 let inactivityMessageDraftOwner = null;
