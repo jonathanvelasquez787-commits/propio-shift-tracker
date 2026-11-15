@@ -3504,6 +3504,7 @@ function setEarningsViewMode(mode, { persist = false } = {}) {
   if (dayView) dayView.style.display = earningsViewMode === 'day' ? '' : 'none';
   if (cycleView) cycleView.style.display = earningsViewMode === 'cycle' ? '' : 'none';
   if (goalBadge) goalBadge.style.display = earningsViewMode === 'day' ? '' : 'none';
+  document.dispatchEvent(new CustomEvent('earningsviewchange', { detail: { mode: earningsViewMode } }));
   if (earningsViewMode === 'cycle') {
     if (title) title.textContent = translateText('Ganancias del ciclo');
     if (subtitle) subtitle.textContent = translateText('Total del ciclo de pago actual (14 días) y la próxima fecha de pago.');
@@ -7088,7 +7089,9 @@ export function render() {
       const inBar = !!desktopGameQuery?.matches && page === 'home';
       // Celular: el reto va dentro de la fila de Ganancias de hoy, entre el monto y el anillo "de tu meta".
       const earnRow = document.querySelector('#earningsDayView .earn-row');
-      const inEarn = !desktopGameQuery?.matches && page === 'home' && !!earnRow;
+      // Solo mientras la vista "Hoy" de Ganancias se ve: en "Ciclo" esa vista se esconde y el reto vuelve a su lugar de siempre.
+      const earnDayShown = document.getElementById('earningsDayView')?.style.display !== 'none';
+      const inEarn = !desktopGameQuery?.matches && page === 'home' && !!earnRow && earnDayShown;
       if (inBar && day.parentElement !== hero) { day.classList.add('hero-shift-game'); hero.appendChild(day); }
       else if (inEarn) {
         day.classList.remove('hero-shift-game');
@@ -7099,6 +7102,8 @@ export function render() {
       placeBattleLoadout();
       placeGameSeparator();
     }
+    // Al cambiar Ganancias entre Hoy y Ciclo, el reto se acomoda otra vez (en celular vive dentro de la vista Hoy).
+    document.addEventListener('earningsviewchange', () => syncGameInActionsBar());
     // Línea doble (igual a la de entre los botones) entre los botones y el reto de hoy. Solo aparece cuando el
     // juego está al lado de los botones: si baja a su propia fila (ventana angosta) o está en celular, se oculta.
     function placeGameSeparator() {

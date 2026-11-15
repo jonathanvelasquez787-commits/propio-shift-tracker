@@ -1542,4 +1542,11 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
   .earn-row > #gameHomeDay .game-battle .game-battle-footer > button { min-height: 14px; padding: 0 5px; font-size: 9px; }
   .earn-row > #gameHomeDay .game-battle .game-battle-footer .game-battle-loadout select { max-width: 64px; min-height: 14px; font-size: 9px; padding: 0 2px; }
 }
+/* Pantalla táctil: Disparar y Arma miden al menos 24 px de alto (mínimo de WCAG 2.2) y el reto no cambia de alto. */
+@media (max-width: 760px) and (pointer: coarse) {
+  .earn-row > #gameHomeDay .game-battle .game-battle-footer { height: 26px; min-height: 26px; }
+  .earn-row > #gameHomeDay .game-battle .game-battle-footer > button { min-height: 24px; }
+  .earn-row > #gameHomeDay .game-battle .game-battle-footer .game-battle-loadout select { min-height: 24px; }
+  .earn-row > #gameHomeDay .game-battle .game-battle-monster { bottom: 24px; }
+}
 /* fin reto en ganancias celular */
