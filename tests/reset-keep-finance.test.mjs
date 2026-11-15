@@ -51,7 +51,7 @@ test('borrar todos los datos también borra las Finanzas cuando la casilla está
   assert.equal(Object.hasOwn(context.settings, 'payReceipts'), false);
 });
 
-test('el aviso de borrar todo trae la casilla "También borrar Finanzas" sin marcar', () => {
+test('el aviso de borrar todo trae la casilla de Finanzas sin marcar', () => {
   const details = { innerHTML: '', className: '' };
   const prior = globalThis.document;
   globalThis.document = { getElementById: id => (id === 'confirmModalDetails' ? details : null) };
@@ -61,5 +61,5 @@ test('el aviso de borrar todo trae la casilla "También borrar Finanzas" sin mar
   } finally { if (prior === undefined) delete globalThis.document; else globalThis.document = prior; }
   assert.match(details.innerHTML, /id="resetEraseFinanceInput" type="checkbox"\/>/);
   assert.doesNotMatch(details.innerHTML, /resetEraseFinanceInput[^>]*checked/);
-  assert.match(details.innerHTML, /Finance is kept|Las Finanzas se conservan/);
+  assert.match(details.innerHTML, /Only what you leave checked|Se borra solo lo que dejes marcado/);
 });

@@ -55,6 +55,36 @@ function comparisonHtml(context, incoming) {
   return `<div class="recovery-card snapshot-comparison"><strong class="note">${escapeHtml(caption)}</strong>${labels.map((label, i) => ui`<div class="fin-preview-row"><span>${escapeHtml(label)}</span><strong>${current[i]}${next ? ` → ${next[i]}` : ''}</strong></div>`).join('')}</div>`;
 }
 
+// Pantalla "Reiniciar todos los datos": casillas para elegir qué se borra (misma lógica que eraseAllData en app-main.js).
+const RESET_PICK_IDS = ['resetEraseCallsInput', 'resetEraseScheduleInput', 'resetEraseProfileInput', 'resetEraseFinanceInput'];
+function resetPickerHtml(context, effects) {
+  const { translateText, escapeHtml } = context;
+  const t = text => escapeHtml(text);
+  const counts = snapshotCounts(context.data());
+  const chips = [[counts[0], counts[0] === 1 ? translateText('llamada') : translateText('llamadas')], [counts[1], counts[1] === 1 ? translateText('acción') : translateText('acciones')], [counts[2], counts[2] === 1 ? translateText('pausa') : translateText('pausas')]]
+    .map(([n, label]) => `<span class="reset-chip">${n} ${t(label)}</span>`).join('');
+  const check = '<svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polyline points="5 12 10 17 19 6"/></svg>';
+  const picks = [
+    [RESET_PICK_IDS[0], translateText('Llamadas y turnos'), translateText('Llamadas, turnos y pausas de todos los días'), true],
+    [RESET_PICK_IDS[1], translateText('Horario y metas'), translateText('Tu horario de siempre y tus metas'), true],
+    [RESET_PICK_IDS[2], translateText('Perfil y ajustes'), translateText('Nombre, apariencia y avisos'), true],
+    [RESET_PICK_IDS[3], translateText('Finanzas'), translateText('Categorías, pagos, plan y recibos'), false],
+  ];
+  const del = t(translateText('Se borra')), keep = t(translateText('Se conserva'));
+  const rows = picks.map(([id, title, sub, on]) => `<label class="reset-pick" for="${id}"><input id="${id}" type="checkbox"${on ? ' checked' : ''}/><span class="reset-pick-box">${check}</span><span class="reset-pick-text"><strong>${t(title)}</strong><small>${t(sub)}</small></span><span class="reset-pick-tag reset-pick-del">${del}</span><span class="reset-pick-tag reset-pick-keep">${keep}</span></label>`).join('');
+  const how = effects.filter(Boolean).map(line => `<li>${escapeHtml(line)}</li>`).join('');
+  return `<div class="reset-picker"><div class="reset-top"><span class="reset-have">${t(translateText('Hoy tenés:'))}</span>${chips}<button type="button" class="reset-how-btn" id="resetHowBtn" aria-expanded="false" aria-controls="resetHowPanel">${t(translateText('¿Cómo funciona?'))}</button></div><div class="recovery-card reset-how-panel" id="resetHowPanel" hidden><ul class="confirmation-effects">${how}</ul></div><div class="reset-label">${t(translateText('Qué querés borrar'))}</div>${rows}</div>`;
+}
+function wireResetPicker() {
+  const ids = RESET_PICK_IDS;
+  const ok = document.getElementById('confirmModalOkBtn');
+  const sync = () => { if (ok) ok.disabled = !ids.some(id => document.getElementById(id)?.checked); };
+  ids.forEach(id => document.getElementById(id)?.addEventListener('change', sync));
+  const how = document.getElementById('resetHowBtn'), panel = document.getElementById('resetHowPanel');
+  how?.addEventListener('click', () => { const open = panel.hidden; panel.hidden = !open; how.setAttribute('aria-expanded', open ? 'true' : 'false'); });
+  sync();
+}
+
 export function confirmReplacement(context, kind, change, options = {}) {
   const { ui, translateText, escapeHtml } = context;
   const owner = context.data(), account = context.account(), expected = replacementSignature(owner);
@@ -63,7 +93,7 @@ export function confirmReplacement(context, kind, change, options = {}) {
     ui`Día que se reinicia: ${options.dayLabel}.`,
     translateText('Se eliminan sus llamadas, pausas, huecos, nota, acciones y progreso diario. Otros días, horario y metas se conservan.'),
   ] : kind === 'reset' ? [
-    translateText('Se reinician llamadas, turnos, pausas, horario, metas y perfil de todos los días. Las Finanzas se conservan, salvo que marques la casilla.'),
+    translateText('Se borra solo lo que dejes marcado. Lo que no marques se conserva.'),
     translateText('Tu cuenta y los ajustes propios de la extensión se conservan.'),
   ] : [
     translateText('Las llamadas, turnos, pausas y notas actuales se reemplazan por los del respaldo.'),
@@ -101,12 +131,12 @@ export function confirmReplacement(context, kind, change, options = {}) {
   const details = document.getElementById('confirmModalDetails');
   if (details) {
     details.className=kind==='import'?'review-confirm polished-restore':'';
-    details.innerHTML = comparisonHtml(context, incoming)
+    details.innerHTML = kind==='reset' ? resetPickerHtml(context, effects) : comparisonHtml(context, incoming)
       +(kind==='import'?ui`<div class="polished-impact"><strong>Datos del respaldo</strong><span>Reemplazan llamadas, turnos, pausas y notas.</span></div>`+`<div class="polished-impact"><strong>${escapeHtml(translateText('Tus ajustes'))}</strong><span>${escapeHtml(effects[1])}</span></div>`
         +(effects[2]?`<div class="review-callout">${escapeHtml(effects[2])}</div>`:'')
         +ui`<div class="polished-impact"><strong>Copia previa protegida</strong><span>Se guarda en este navegador antes de restaurar.</span></div><details class="polished-disclosure"><summary>Sincronización y recuperación</summary><div class="polished-detail"><p class="note">${escapeHtml(effects.at(-1))}</p></div></details>`
-        :ui`<ul class="confirmation-effects">${effects.filter(Boolean).map(line => `<li>${escapeHtml(line)}</li>`).join('')}</ul>`)
-      +(kind==='reset'?`<label class="sched-checkbox-row" for="resetEraseFinanceInput"><input id="resetEraseFinanceInput" type="checkbox"/><span>${escapeHtml(translateText('También borrar Finanzas'))}</span></label><p class="note">${escapeHtml(translateText('Sin marcar, tus categorías, pagos, plan y recibos de Finanzas se conservan.'))}</p>`:'');
+        :ui`<ul class="confirmation-effects">${effects.filter(Boolean).map(line => `<li>${escapeHtml(line)}</li>`).join('')}</ul>`);
+    if (kind === 'reset') wireResetPicker();
     if(kind==='import'){const button=document.getElementById('confirmModalOkBtn');if(button)button.textContent=translateText('Restaurar datos');}
   }
 }

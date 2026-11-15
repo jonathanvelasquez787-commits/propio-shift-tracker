@@ -130,6 +130,12 @@
       "privacidad.html"
     ]
   },
+  "s_02c190ee": {
+    "source": "Hoy tenés:",
+    "files": [
+      "js/backup-recovery.js"
+    ]
+  },
   "s_02c73e3a": {
     "source": "Esperado según tus llamadas",
     "files": [
@@ -367,6 +373,12 @@
     "source": "No se registró el pago porque no se pudo guardar.",
     "files": [
       "js/finance-planning.js"
+    ]
+  },
+  "s_070f05b6": {
+    "source": "pausas",
+    "files": [
+      "js/backup-recovery.js"
     ]
   },
   "s_0737280d": {
@@ -780,6 +792,12 @@
       "js/app-main.js"
     ]
   },
+  "s_0e527d40": {
+    "source": "Llamadas, turnos y pausas de todos los días",
+    "files": [
+      "js/backup-recovery.js"
+    ]
+  },
   "s_0e668107": {
     "source": "[TU PAÍS]",
     "files": [
@@ -1083,6 +1101,12 @@
       "index.html",
       "privacidad.html",
       "terminos.html"
+    ]
+  },
+  "s_138c73d4": {
+    "source": "Horario y metas",
+    "files": [
+      "js/backup-recovery.js"
     ]
   },
   "s_13ac8f93": {
@@ -1691,6 +1715,12 @@
     "source": "Mes anterior",
     "files": [
       "app.html"
+    ]
+  },
+  "s_205c4867": {
+    "source": "Nombre, apariencia y avisos",
+    "files": [
+      "js/backup-recovery.js"
     ]
   },
   "s_206992ec": {
@@ -3326,6 +3356,12 @@
       "app.html"
     ]
   },
+  "s_3db5de2d": {
+    "source": "Tu horario de siempre y tus metas",
+    "files": [
+      "js/backup-recovery.js"
+    ]
+  },
   "s_3df1ce32": {
     "source": "Oficial · importado",
     "files": [
@@ -3638,12 +3674,6 @@
     "source": "Cuenta",
     "files": [
       "app.html"
-    ]
-  },
-  "s_4478497d": {
-    "source": "Se reinician llamadas, turnos, pausas, horario, metas y perfil de todos los días. Las Finanzas se conservan, salvo que marques la casilla.",
-    "files": [
-      "js/backup-recovery.js"
     ]
   },
   "s_4487f87e": {
@@ -4320,6 +4350,12 @@
     "source": "Higher Rate hoy",
     "files": [
       "js/detail-views.js"
+    ]
+  },
+  "s_507f2db5": {
+    "source": "llamada",
+    "files": [
+      "js/backup-recovery.js"
     ]
   },
   "s_50b8c494": {
@@ -5671,6 +5707,12 @@
       "app.html"
     ]
   },
+  "s_6c84cd41": {
+    "source": "pausa",
+    "files": [
+      "js/backup-recovery.js"
+    ]
+  },
   "s_6c94b6b3": {
     "source": "Gold",
     "files": [
@@ -7019,6 +7061,12 @@
       "app.html"
     ]
   },
+  "s_840ebf7f": {
+    "source": "Se borra",
+    "files": [
+      "js/backup-recovery.js"
+    ]
+  },
   "s_84258390": {
     "source": "Estás en llamada",
     "files": [
@@ -8234,7 +8282,8 @@
   "s_98264b50": {
     "source": "¿Cómo funciona?",
     "files": [
-      "app.html"
+      "app.html",
+      "js/backup-recovery.js"
     ]
   },
   "s_9836d81d": {
@@ -8653,6 +8702,12 @@
       "app.html"
     ]
   },
+  "s_a04bbf46": {
+    "source": "Se borra solo lo que dejes marcado. Lo que no marques se conserva.",
+    "files": [
+      "js/backup-recovery.js"
+    ]
+  },
   "s_a0512351": {
     "source": "Metas",
     "files": [
@@ -8792,6 +8847,12 @@
     "source": "Viernes",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_a2a07fd0": {
+    "source": "acciones",
+    "files": [
+      "js/backup-recovery.js"
     ]
   },
   "s_a2a2fa03": {
@@ -9127,6 +9188,12 @@
       "js/app-main.js"
     ]
   },
+  "s_a8096cd0": {
+    "source": "Se conserva",
+    "files": [
+      "js/backup-recovery.js"
+    ]
+  },
   "s_a84134d8": {
     "source": "Shift iniciado automáticamente",
     "files": [
@@ -9344,6 +9411,12 @@
     "source": "1. Qué es este servicio",
     "files": [
       "terminos.html"
+    ]
+  },
+  "s_abea7e56": {
+    "source": "Llamadas y turnos",
+    "files": [
+      "js/backup-recovery.js"
     ]
   },
   "s_ac1e51f5": {
@@ -9595,7 +9668,8 @@
     "source": "Finanzas",
     "files": [
       "app.html",
-      "index.html"
+      "index.html",
+      "js/backup-recovery.js"
     ]
   },
   "s_b0fda0e8": {
@@ -9963,6 +10037,12 @@
       "app.html",
       "js/finance-review.js",
       "js/finance.js"
+    ]
+  },
+  "s_b7a9f3a1": {
+    "source": "Perfil y ajustes",
+    "files": [
+      "js/backup-recovery.js"
     ]
   },
   "s_b7baa774": {
@@ -10581,12 +10661,6 @@
       "js/accounting-export.js",
       "js/reports.js",
       "js/weekly-summary.js"
-    ]
-  },
-  "s_c472b69c": {
-    "source": "Sin marcar, tus categorías, pagos, plan y recibos de Finanzas se conservan.",
-    "files": [
-      "js/backup-recovery.js"
     ]
   },
   "s_c4890840": {
@@ -11588,6 +11662,12 @@
       "index.html"
     ]
   },
+  "s_d7f9a111": {
+    "source": "Qué querés borrar",
+    "files": [
+      "js/backup-recovery.js"
+    ]
+  },
   "s_d817466c": {
     "source": "Copia completa actual",
     "files": [
@@ -12241,6 +12321,12 @@
       "js/boot.js"
     ]
   },
+  "s_e1f56720": {
+    "source": "acción",
+    "files": [
+      "js/backup-recovery.js"
+    ]
+  },
   "s_e20ba9f1": {
     "source": "Hueco más largo",
     "files": [
@@ -12461,12 +12547,6 @@
     "source": "Funciones",
     "files": [
       "index.html"
-    ]
-  },
-  "s_e5caa1b6": {
-    "source": "Todos los datos fueron borrados",
-    "files": [
-      "js/app-main.js"
     ]
   },
   "s_e623d221": {
@@ -12906,6 +12986,12 @@
     "source": "Esperando para reintentar",
     "files": [
       "js/automation-ui.js"
+    ]
+  },
+  "s_ed1d395e": {
+    "source": "Categorías, pagos, plan y recibos",
+    "files": [
+      "js/backup-recovery.js"
     ]
   },
   "s_ed45e497": {
@@ -13793,12 +13879,6 @@
     "source": "Desglose de ganancias",
     "files": [
       "app.html"
-    ]
-  },
-  "s_fc4d592f": {
-    "source": "También borrar Finanzas",
-    "files": [
-      "js/backup-recovery.js"
     ]
   },
   "s_fc67bb73": {

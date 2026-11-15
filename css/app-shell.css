@@ -1598,3 +1598,30 @@ html[data-palette]:not([data-palette="original"]) .boot-choice { border-color: v
   #schedMoreCard .sched-more-val { max-width: 52%; }
 }
 /* fin horario rediseño D */
+
+/* reiniciar datos casillas */
+#confirmModalDetails .reset-picker { display: flex; flex-direction: column; gap: 10px; padding: 2px 0 4px; }
+#confirmModalDetails .reset-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+#confirmModalDetails .reset-have { font-size: 12px; color: var(--muted); font-weight: 700; }
+#confirmModalDetails .reset-chip { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: color-mix(in srgb, var(--cyan) 16%, transparent); color: var(--cyan); }
+#confirmModalDetails .reset-how-btn { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 12px; font-weight: 700; color: var(--muted); padding: 6px 11px; border: 1px solid var(--line); border-radius: 999px; background: transparent; cursor: pointer; }
+#confirmModalDetails .reset-how-panel[hidden] { display: none; }
+#confirmModalDetails .reset-how-panel { margin: 0; }
+#confirmModalDetails .reset-label { margin-top: 4px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 800; }
+#confirmModalDetails .reset-pick { position: relative; display: flex; align-items: center; gap: 12px; padding: 11px 12px; border: 1px solid var(--line); border-left: 4px solid var(--cyan); border-radius: 14px; background: color-mix(in srgb, var(--text) 4%, transparent); cursor: pointer; }
+#confirmModalDetails .reset-pick:last-of-type { border-left-color: var(--good); }
+#confirmModalDetails .reset-pick input { position: absolute; opacity: 0; pointer-events: none; }
+#confirmModalDetails .reset-pick-box { flex: none; width: 22px; height: 22px; border-radius: 7px; border: 2px solid var(--line-2); display: grid; place-items: center; color: transparent; }
+#confirmModalDetails .reset-pick-box .ic-svg { width: 14px; height: 14px; }
+#confirmModalDetails .reset-pick input:not(:checked) ~ .reset-pick-box .ic-svg { display: none; }
+#confirmModalDetails .reset-pick input:checked ~ .reset-pick-box { background: var(--cyan); border-color: var(--cyan); color: var(--bg); }
+#confirmModalDetails .reset-pick input:focus-visible ~ .reset-pick-box { outline: 2px solid var(--cyan); outline-offset: 2px; }
+#confirmModalDetails .reset-pick-text { flex: 1; min-width: 0; display: grid; gap: 2px; }
+#confirmModalDetails .reset-pick-text strong { font-size: 14px; font-weight: 800; }
+#confirmModalDetails .reset-pick-text small { font-size: 12px; color: var(--muted); }
+#confirmModalDetails .reset-pick-tag { font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
+#confirmModalDetails .reset-pick-del { background: color-mix(in srgb, var(--bad) 16%, transparent); color: var(--bad); }
+#confirmModalDetails .reset-pick-keep { background: color-mix(in srgb, var(--good) 15%, transparent); color: var(--good); }
+#confirmModalDetails .reset-pick input:checked ~ .reset-pick-keep, #confirmModalDetails .reset-pick input:not(:checked) ~ .reset-pick-del { display: none; }
+#confirmModalOkBtn:disabled { opacity: .45; cursor: not-allowed; }
+/* fin reiniciar datos casillas */

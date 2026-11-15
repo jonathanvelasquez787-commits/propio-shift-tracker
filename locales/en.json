@@ -2290,5 +2290,22 @@
   "s_6673e5b4": "+0:00 h",
   "s_8e6e3b2c": "Grace {{v0}} min · Goal {{v1}} %",
   "s_a2a2fa03": "Move the whole shift",
-  "s_d5c4dfb6": "Move shift · If you're late · Adherence · Freelancer"
+  "s_d5c4dfb6": "Move shift · If you're late · Adherence · Freelancer",
+  "s_a04bbf46": "Only what you leave checked is deleted. Anything you do not check is kept.",
+  "s_02c190ee": "Today you have:",
+  "s_070f05b6": "breaks",
+  "s_0e527d40": "Calls, shifts and breaks from every day",
+  "s_138c73d4": "Schedule and goals",
+  "s_205c4867": "Name, appearance and alerts",
+  "s_3db5de2d": "Your usual schedule and your goals",
+  "s_840ebf7f": "Deleted",
+  "s_a2a07fd0": "actions",
+  "s_a8096cd0": "Kept",
+  "s_abea7e56": "Calls and shifts",
+  "s_b7a9f3a1": "Profile and settings",
+  "s_d7f9a111": "What to delete",
+  "s_ed1d395e": "Categories, payments, plan and receipts",
+  "s_507f2db5": "call",
+  "s_6c84cd41": "break",
+  "s_e1f56720": "action"
 }
