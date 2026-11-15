@@ -430,8 +430,13 @@
 </summary>
 <div class="accordion-body">
 <div class="sched-compact-card">
+<div class="sched-freelancer-head">
 <label class="sched-checkbox-row"><input id="freelancerEnabledInput" type="checkbox"/> Activar modo freelancer</label>
-<p class="alert-hint">Sin horario planeado: el aviso de descanso sale cuando acumulas los minutos productivos de «Descanso por productividad» o los minutos conectado de aquí, lo que llegue primero. Desde el aviso eliges Break o Lunch y su duración.</p>
+<div class="sched-help-wrap">
+<button class="sched-compact-info-btn" type="button" aria-describedby="freelancerInfoTooltip">i</button>
+<div class="sched-help-tooltip" id="freelancerInfoTooltip" role="tooltip">Sin horario planeado: el aviso de descanso sale cuando acumulas los minutos productivos de «Descanso por productividad» o los minutos conectado de aquí, lo que llegue primero. Desde el aviso eliges Break o Lunch y su duración.</div>
+</div>
+</div>
 <div class="sched-compact-row">
 <div class="sched-compact-field"><label for="freelancerBreakMinInput">Break (min)</label><input id="freelancerBreakMinInput" inputmode="numeric" min="1" max="240" step="1" type="number"/></div>
 <div class="sched-compact-field"><label for="freelancerLunchMinInput">Lunch (min)</label><input id="freelancerLunchMinInput" inputmode="numeric" min="1" max="240" step="1" type="number"/></div>
@@ -444,11 +449,13 @@
 <div class="sched-compact-field"><label for="freelancerSessionGoalInput">Meta de sesión (min, 0 = sin meta)</label><input id="freelancerSessionGoalInput" inputmode="numeric" min="0" max="1440" step="1" type="number"/></div>
 <div class="sched-compact-field"><label for="freelancerLunchEveryInput">Lunch tras (min conectado, 0 = apagado)</label><input id="freelancerLunchEveryInput" inputmode="numeric" min="0" max="720" step="1" type="number"/></div>
 </div>
+<div class="sched-templates-line">
 <p class="alert-hint">Plantillas</p>
 <div class="mc-pill-row" id="freelancerTemplateRow" role="group" aria-label="Plantillas">
 <button class="mc-pill-btn" data-fl-template="short" type="button">Sesión corta</button>
 <button class="mc-pill-btn" data-fl-template="medium" type="button">Turno medio</button>
 <button class="mc-pill-btn" data-fl-template="long" type="button">Turno largo</button>
+</div>
 </div>
 </div>
 </div>
