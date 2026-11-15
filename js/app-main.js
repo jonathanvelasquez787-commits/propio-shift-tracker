@@ -4488,19 +4488,32 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
     function eraseAllData() {
       return useSnapshotTools('confirmReplacement', 'reset', () => {
         if (!canPersistLocalChanges()) return false;
-        // Claves de Finanzas que se conservan salvo que se marque la casilla.
+        // Pantalla "Reiniciar todos los datos": 4 casillas. Lo que no se marca se conserva.
         const FINANCE_SETTING_KEYS = ['financeCategories', 'financeAutoFill', 'financeLastDistribution', 'financePayments', 'financePlanning', 'customFinanceCategories', 'payReceipts'];
+        // Claves de Horario y metas; todo lo demás de los ajustes es "Perfil y ajustes".
+        const SCHEDULE_SETTING_KEYS = ['productiveGoalMin', 'earningsGoal', 'shiftStart', 'shiftEnd', 'lateArrivalMode', 'weeklySchedule', 'scheduleOverridesByWeek', 'adherenceGraceMin', 'adherenceGoalPct', 'acwMaxGoalMin', 'cycleGoalOverrides', 'yearGoalOverrides', 'dailyGoalOverrides', 'historyStartDateOverride', 'freelancer', 'higherRateWindows'];
+        const erases = id => { const box = document.getElementById(id); return box ? !!box.checked : true; };
+        const eraseCalls = erases('resetEraseCallsInput'), eraseSchedule = erases('resetEraseScheduleInput'), eraseProfile = erases('resetEraseProfileInput');
         const eraseFinance = !!document.getElementById('resetEraseFinanceInput')?.checked;
+        if (!eraseCalls && !eraseSchedule && !eraseProfile && !eraseFinance) return false;
         const previous = { state, calls, settings };
+        const freshState = defaultState();
 
-        setAppState(defaultState());
-        setAppCalls([]);
-        setAppSettings(defaultSettings());
-        if (!eraseFinance) {
-          FINANCE_SETTING_KEYS.forEach(key => {
-            if (Object.hasOwn(previous.settings, key)) settings[key] = JSON.parse(JSON.stringify(previous.settings[key]));
-          });
+        if (eraseCalls) {
+          // Las metas del día viven también en el estado: siguen a la casilla de Horario y metas.
+          if (!eraseSchedule) { freshState.productiveGoalMin = previous.state.productiveGoalMin; freshState.earningsGoal = previous.state.earningsGoal; }
+          setAppState(freshState);
+          setAppCalls([]);
+        } else if (eraseSchedule) {
+          setAppState({ ...previous.state, productiveGoalMin: freshState.productiveGoalMin, earningsGoal: freshState.earningsGoal });
         }
+        const nextSettings = defaultSettings();
+        setAppSettings(nextSettings);
+        Object.keys(previous.settings).forEach(key => {
+          const group = FINANCE_SETTING_KEYS.includes(key) ? 'finance' : SCHEDULE_SETTING_KEYS.includes(key) ? 'schedule' : 'profile';
+          const erase = group === 'finance' ? eraseFinance : group === 'schedule' ? eraseSchedule : eraseProfile;
+          if (!erase) nextSettings[key] = JSON.parse(JSON.stringify(previous.settings[key]));
+        });
         ensureCurrencySettings();
         if (persistFullSnapshot() === false) {
           setAppState(previous.state);
@@ -4519,8 +4532,10 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
         resetCallEditorState();
 
         render();
-        toast(translateText('Todos los datos fueron borrados'));
+        toast(translateText(eraseCalls && eraseSchedule && eraseProfile ? 'Todos los datos fueron borrados' : 'Los datos elegidos fueron borrados'));
         closeModal('resetModal');
+        // El popup de bienvenida solo vuelve si se borró el perfil.
+        if (!eraseProfile) return true;
 
         // Vuelve a mostrar el popup de bienvenida, igual que la primera vez que se abre la app.
         const onboardingNameInput = document.getElementById('onboardingNameInput');
@@ -7288,7 +7303,9 @@ export function render() {
       if (heading) heading.textContent = translateText('Confirmar');
       const details = document.getElementById('confirmModalDetails');
       if (details) { details.replaceChildren(); details.className = ''; }
-      document.getElementById('confirmModalOkBtn').textContent = translateText('Sí, continuar');
+      const confirmOkBtn = document.getElementById('confirmModalOkBtn');
+      confirmOkBtn.disabled = false;
+      confirmOkBtn.textContent = translateText('Sí, continuar');
       const msgEl = document.getElementById('confirmModalMessage');
       if (msgEl) msgEl.textContent = message;
       openModal('confirmModal');

@@ -319,7 +319,19 @@
           "namedCases": [
             "borrar todos los datos conserva las Finanzas cuando la casilla no está marcada",
             "borrar todos los datos también borra las Finanzas cuando la casilla está marcada",
-            "el aviso de borrar todo trae la casilla \"También borrar Finanzas\" sin marcar"
+            "el aviso de borrar todo trae la casilla de Finanzas sin marcar"
+          ]
+        },
+        {
+          "file": "tests/reset-picker.test.mjs",
+          "namedCases": [
+            "reiniciar con solo \"Llamadas y turnos\" marcada deja horario, perfil y Finanzas",
+            "reiniciar con solo \"Horario y metas\" marcada conserva llamadas y perfil",
+            "reiniciar con solo \"Perfil y ajustes\" marcada borra el perfil y vuelve la bienvenida",
+            "reiniciar sin tocar el perfil no vuelve a pedir el nombre",
+            "reiniciar con las 4 casillas marcadas borra todo, Finanzas incluida",
+            "reiniciar sin ninguna casilla marcada no cambia nada",
+            "el aviso de reiniciar trae 4 casillas: tres marcadas y Finanzas sin marcar"
           ]
         },
         {
