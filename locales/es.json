@@ -2188,6 +2188,7 @@
   "s_c954f86e": "No se pudo guardar el perfil. Vuelve a intentar.",
   "s_c98471bb": "Marca",
   "s_c98b872a": "Exportar PDF",
+  "s_c98f4557": "min",
   "s_c9cf97c2": "Jugar",
   "s_ca0bcc33": "Suena mientras la pestaña esté abierta, si aún no le diste al botón de Break/Lunch. 0 min = desactivado. Variables disponibles en el mensaje:",
   "s_ca28dfd4": "#{{v0}}",
