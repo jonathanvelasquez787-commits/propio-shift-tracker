@@ -1149,7 +1149,8 @@
           "file": "tests/freelancer-break-prompt-buttons.test.mjs",
           "namedCases": [
             "aviso de descanso: Posponer dice cuántos minutos pospone",
-            "aviso de descanso: ya no hay botón \"Ahora no\" (queda la X)"
+            "aviso de descanso: ya no hay botón \"Ahora no\" (queda la X)",
+            "aviso de descanso: lo pospuesto sobrevive a recargar la página"
           ]
         }
       ]

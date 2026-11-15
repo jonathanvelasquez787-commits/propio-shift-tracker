@@ -5251,6 +5251,24 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
     // Pedido del usuario : Volumen/Avisos con sonido/Adherencia/ Descanso por productividad salieron de Horario — no son horario, son cómo y cuándo te avisa la app.
     // ---- Modo freelancer: aviso de descanso por regla ----
     const freelancerPrompt = { dismissedAnchor: null, snoozeUntil: 0, type: 'break', anchorKey: null, handled: false, overdueKey: null };
+    // Lo pospuesto o callado se guarda en el navegador: si recargas la página, el aviso no vuelve de golpe.
+    const FREELANCER_PROMPT_MEMORY_KEY = 'propio_shift_tracker_break_prompt_v1';
+    let freelancerPromptMemoryLoaded = false;
+    function loadFreelancerPromptMemory() {
+      if (freelancerPromptMemoryLoaded || !state.shiftStartedAt) return;
+      freelancerPromptMemoryLoaded = true;
+      try {
+        const saved = JSON.parse(localStorage.getItem(FREELANCER_PROMPT_MEMORY_KEY) || 'null');
+        if (!saved || saved.shift !== state.shiftStartedAt) return;
+        if (Number.isFinite(saved.snoozeUntil)) freelancerPrompt.snoozeUntil = Math.max(freelancerPrompt.snoozeUntil, saved.snoozeUntil);
+        if (typeof saved.dismissedAnchor === 'string' && !freelancerPrompt.dismissedAnchor) freelancerPrompt.dismissedAnchor = saved.dismissedAnchor;
+      } catch (_) { /* sin memoria: se comporta como antes */ }
+    }
+    function saveFreelancerPromptMemory() {
+      try {
+        localStorage.setItem(FREELANCER_PROMPT_MEMORY_KEY, JSON.stringify({ shift: state.shiftStartedAt || null, snoozeUntil: freelancerPrompt.snoozeUntil, dismissedAnchor: freelancerPrompt.dismissedAnchor }));
+      } catch (_) { /* si no se puede guardar, sigue en memoria */ }
+    }
 
     function freelancerBreakDue() {
       if (!freelancerActive() || state.activeCall || state.activePause || state.shiftEndedAt || !state.shiftStartedAt) return null;
@@ -5282,6 +5300,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
     function checkFreelancerBreakPrompt() {
       const modal = document.getElementById('breakPromptModal');
       if (!modal) return;
+      loadFreelancerPromptMemory();
       const due = freelancerBreakDue();
       const isOpen = modal.classList.contains('open');
       if (!due) { if (isOpen) closeFreelancerPrompt(true); return; }
@@ -5316,6 +5335,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
 
     function snoozeFreelancerBreak() {
       freelancerPrompt.snoozeUntil = Date.now() + freelancerSnoozeMinutes() * 60000;
+      saveFreelancerPromptMemory();
       closeFreelancerPrompt(true);
     }
 
@@ -5326,6 +5346,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       // con el popup abierto, la clave vieja ya no coincidía y el mismo aviso volvía a salir.
       const dueNow = freelancerBreakDue();
       freelancerPrompt.dismissedAnchor = dueNow ? dueNow.anchorKey : freelancerPrompt.anchorKey;
+      saveFreelancerPromptMemory();
     });
 
     function checkFreelancerBreakOver() {
@@ -5462,6 +5483,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       settings.freelancer = next;
       if (saveSettingsOnly() === false) { settings.freelancer = previous; syncFreelancerFields(true); return false; }
       freelancerPrompt.dismissedAnchor = null; freelancerPrompt.snoozeUntil = 0;
+      saveFreelancerPromptMemory();
       syncFreelancerFields(true);
       render();
       toast(next.enabled ? translateText('Modo freelancer activado') : translateText('Modo freelancer desactivado'));

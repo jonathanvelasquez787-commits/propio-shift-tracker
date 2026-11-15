@@ -20,3 +20,10 @@ test('aviso de descanso: ya no hay botón "Ahora no" (queda la X)', () => {
   assert.doesNotMatch(main, /breakPromptDismissBtn/, 'tampoco queda su código');
   assert.match(main, /event\.detail\?\.id !== 'breakPromptModal' \|\| freelancerPrompt\.handled/, 'cerrar con la X sigue callando este tramo');
 });
+
+test('aviso de descanso: lo pospuesto sobrevive a recargar la página', () => {
+  assert.match(main, /function saveFreelancerPromptMemory\(\) \{[\s\S]*?localStorage\.setItem\(FREELANCER_PROMPT_MEMORY_KEY/, 'guarda en el navegador');
+  assert.match(main, /function snoozeFreelancerBreak\(\) \{[\s\S]*?saveFreelancerPromptMemory\(\);/, 'al posponer se guarda');
+  assert.match(main, /function checkFreelancerBreakPrompt\(\) \{[\s\S]*?loadFreelancerPromptMemory\(\);/, 'al revisar, primero lee lo guardado');
+  assert.match(main, /saved\.shift !== state\.shiftStartedAt/, 'solo vale para el turno en que se pospuso');
+});
