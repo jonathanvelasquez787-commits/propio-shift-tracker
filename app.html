@@ -375,49 +375,6 @@
 </div><!-- /pageHome -->
 
 <div class="app-page" data-page="schedule" hidden id="pageSchedule" role="main" tabindex="-1">
-<details class="accordion-card sched-v271" id="freelancerAccordion">
-<summary>
-  <div class="accordion-head">
-    <h2><span class="sched-header-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>Modo freelancer</h2>
-    <p>Sin horario fijo: descansos por regla</p>
-  </div>
-  <div class="sched-header-actions">
-    <span class="tag" id="freelancerStatusTag">Desactivado</span>
-    <div class="accordion-chevron"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></div>
-  </div>
-</summary>
-<div class="accordion-body">
-<div class="sched-compact-card">
-<div class="sched-freelancer-head">
-<label class="sched-checkbox-row"><input id="freelancerEnabledInput" type="checkbox"/> Activar modo freelancer</label>
-<div class="sched-help-wrap">
-<button class="sched-compact-info-btn" type="button" aria-describedby="freelancerInfoTooltip">i</button>
-<div class="sched-help-tooltip" id="freelancerInfoTooltip" role="tooltip">Sin horario planeado: el aviso de descanso sale cuando acumulas los minutos productivos de «Descanso por productividad» o los minutos conectado de aquí, lo que llegue primero. Desde el aviso eliges Break o Lunch y su duración.</div>
-</div>
-</div>
-<div class="sched-compact-row">
-<div class="sched-compact-field"><label for="freelancerBreakMinInput">Break (min)</label><input id="freelancerBreakMinInput" inputmode="numeric" min="1" max="240" step="1" type="number"/></div>
-<div class="sched-compact-field"><label for="freelancerLunchMinInput">Lunch (min)</label><input id="freelancerLunchMinInput" inputmode="numeric" min="1" max="240" step="1" type="number"/></div>
-</div>
-<div class="sched-compact-row">
-<div class="sched-compact-field"><label for="freelancerConnectedMinInput">Avisar tras (min conectado, 0 = apagado)</label><input id="freelancerConnectedMinInput" inputmode="numeric" min="0" max="720" step="1" type="number"/></div>
-<div class="sched-compact-field"><label for="freelancerSnoozeMinInput">Posponer (min)</label><input id="freelancerSnoozeMinInput" inputmode="numeric" min="1" max="60" step="1" type="number"/></div>
-</div>
-<div class="sched-compact-row">
-<div class="sched-compact-field"><label for="freelancerSessionGoalInput">Meta de sesión (min, 0 = sin meta)</label><input id="freelancerSessionGoalInput" inputmode="numeric" min="0" max="1440" step="1" type="number"/></div>
-<div class="sched-compact-field"><label for="freelancerLunchEveryInput">Lunch tras (min conectado, 0 = apagado)</label><input id="freelancerLunchEveryInput" inputmode="numeric" min="0" max="720" step="1" type="number"/></div>
-</div>
-<div class="sched-templates-line">
-<p class="alert-hint">Plantillas</p>
-<div class="mc-pill-row" id="freelancerTemplateRow" role="group" aria-label="Plantillas">
-<button class="mc-pill-btn" data-fl-template="short" type="button">Sesión corta</button>
-<button class="mc-pill-btn" data-fl-template="medium" type="button">Turno medio</button>
-<button class="mc-pill-btn" data-fl-template="long" type="button">Turno largo</button>
-</div>
-</div>
-</div>
-</div>
-</details>
 <div class="accordion-card sched-v271 sched-redesign" id="scheduleConfigAccordion">
 <div class="sched-rd-head">
   <span class="sched-header-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
@@ -467,6 +424,45 @@
   </div>
 
   <div class="sched-block">
+    <div class="sched-daybar" id="schedDayBar" role="img" aria-label="Resumen del día"></div>
+    <div class="sched-daybar-ticks" id="schedDayBarTicks" aria-hidden="true"></div>
+    <div class="gap-editor-list sched-bk-list" id="blocksEditorList"></div>
+    <div class="sched-add-row">
+      <span class="sched-add-label">Agregar:</span>
+      <button class="sched-add-pill" data-add="work" id="addWorkBlockBtn" type="button">+ Trabajo</button>
+      <button class="sched-add-pill" data-add="break" id="addBreakBlockBtn" type="button">+ Break</button>
+      <button class="sched-add-pill" data-add="lunch" id="addLunchBlockBtn" type="button">+ Lunch</button>
+    </div>
+  </div>
+
+  <div class="modal-actions mc-action-row sched-footer">
+    <button class="mc-btn-primary blue" id="saveShiftWindowBtn" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></svg> Guardar día</button>
+    <div class="sched-copy" id="schedCopyWrap">
+      <button class="mc-btn-secondary" id="schedCopyMenuBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="schedCopyMenu" title="Copiar a otros días"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="sched-copy-label">Copiar a otros días</span><svg class="ic-svg sched-copy-chevron" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
+      <div class="sched-copy-menu" id="schedCopyMenu" role="menu" hidden>
+        <button class="sched-copy-item" id="copyDayToAllBtn" type="button" role="menuitem" title="Copiar este horario a Lunes a Viernes">Lunes a Viernes</button>
+        <button class="sched-copy-item" id="copyWeekendBtn" type="button" role="menuitem" title="Copiar este horario a Sábado y Domingo">Sábado y Domingo</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div><!-- /scheduleConfigAccordion -->
+<div class="accordion-card sched-v271 sched-more" id="schedMoreCard">
+  <button class="sched-more-toggle" id="schedMoreToggle" type="button" aria-expanded="false" aria-controls="schedMoreBody">
+    <span class="sched-more-ico" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 2 21 6 17 10"/><path d="M3 12v-2a4 4 0 0 1 4-4h14"/><path d="M7 22 3 18 7 14"/><path d="M21 12v2a4 4 0 0 1-4 4H3"/></svg></span>
+    <span class="sched-more-title">Más opciones</span>
+    <span class="sched-more-sum">Mover turno · Si llegas tarde · Adherencia · Freelancer</span>
+    <span class="sched-more-arrow" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg></span>
+  </button>
+  <div class="sched-more-body" id="schedMoreBody" hidden>
+    <section class="sched-more-row" data-more="offset">
+      <button class="sched-more-rowbtn" type="button" aria-expanded="false" aria-controls="schedMorePanel-offset" data-more-toggle="offset">
+        <span class="sched-more-ico" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 2 21 6 17 10"/><path d="M3 12v-2a4 4 0 0 1 4-4h14"/><path d="M7 22 3 18 7 14"/><path d="M21 12v2a4 4 0 0 1-4 4H3"/></svg></span>
+        <span class="sched-more-name">Mover todo el turno</span>
+        <span class="sched-more-val"><span id="schedMoreValOffset">+0:00 h</span></span>
+        <span class="sched-more-arrow" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg></span>
+      </button>
+      <div class="sched-more-panel" id="schedMorePanel-offset" hidden>
     <div class="sched-offset-block">
       <div class="sched-compact-title" style="font-size:12.5px;"><span class="sched-compact-title-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg></span>Ajustar turno completo</div>
       <p class="sched-hint" style="margin-top:4px;">Desplaza inicio, final y bloques por igual, conservando orden y duración.</p>
@@ -482,20 +478,17 @@
         <button type="button" id="scheduleOffsetApplyBtn" class="sched-offset-apply-btn">Aplicar a todos</button>
       </div>
     </div>
-
-    <div class="sched-daybar" id="schedDayBar" role="img" aria-label="Resumen del día"></div>
-    <div class="sched-daybar-ticks" id="schedDayBarTicks" aria-hidden="true"></div>
-    <div class="gap-editor-list sched-bk-list" id="blocksEditorList"></div>
-    <div class="sched-add-row">
-      <span class="sched-add-label">Agregar:</span>
-      <button class="sched-add-pill" data-add="work" id="addWorkBlockBtn" type="button">+ Trabajo</button>
-      <button class="sched-add-pill" data-add="break" id="addBreakBlockBtn" type="button">+ Break</button>
-      <button class="sched-add-pill" data-add="lunch" id="addLunchBlockBtn" type="button">+ Lunch</button>
-    </div>
-  </div>
-
-  <div class="sched-compact-grid-2">
-    <div class="sched-compact-card">
+      </div>
+    </section>
+    <section class="sched-more-row" data-more="late">
+      <button class="sched-more-rowbtn" type="button" aria-expanded="false" aria-controls="schedMorePanel-late" data-more-toggle="late">
+        <span class="sched-more-ico" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></span>
+        <span class="sched-more-name">Si llegas tarde</span>
+        <span class="sched-more-val"><span id="schedMoreValLate"></span></span>
+        <span class="sched-more-arrow" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg></span>
+      </button>
+      <div class="sched-more-panel" id="schedMorePanel-late" hidden>
+<div class="sched-compact-card">
       <div class="sched-compact-head">
         <div class="sched-compact-title"><span class="sched-compact-title-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><polyline points="12 9 12 13 14.5 14.5"/><path d="M5 3 2 6"/><path d="M22 6 19 3"/></svg></span>Si llegas tarde</div>
         <div class="sched-help-wrap">
@@ -510,8 +503,17 @@
         </select>
       </div>
     </div>
-
-    <div class="sched-compact-card">
+      </div>
+    </section>
+    <section class="sched-more-row" data-more="adherence">
+      <button class="sched-more-rowbtn" type="button" aria-expanded="false" aria-controls="schedMorePanel-adherence" data-more-toggle="adherence">
+        <span class="sched-more-ico" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></span>
+        <span class="sched-more-name">Adherencia</span>
+        <span class="sched-more-val"><span id="schedMoreValAdherence"></span></span>
+        <span class="sched-more-arrow" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg></span>
+      </button>
+      <div class="sched-more-panel" id="schedMorePanel-adherence" hidden>
+<div class="sched-compact-card">
       <div class="sched-compact-head">
         <div class="sched-compact-title"><span class="sched-compact-title-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></span>Adherencia</div>
         <div class="sched-help-wrap">
@@ -530,20 +532,49 @@
         </div>
       </div>
     </div>
-  </div>
-
-  <div class="modal-actions mc-action-row sched-footer">
-    <button class="mc-btn-primary blue" id="saveShiftWindowBtn" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></svg> Guardar día</button>
-    <div class="sched-copy" id="schedCopyWrap">
-      <button class="mc-btn-secondary" id="schedCopyMenuBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="schedCopyMenu" title="Copiar a otros días"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="sched-copy-label">Copiar a otros días</span><svg class="ic-svg sched-copy-chevron" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
-      <div class="sched-copy-menu" id="schedCopyMenu" role="menu" hidden>
-        <button class="sched-copy-item" id="copyDayToAllBtn" type="button" role="menuitem" title="Copiar este horario a Lunes a Viernes">Lunes a Viernes</button>
-        <button class="sched-copy-item" id="copyWeekendBtn" type="button" role="menuitem" title="Copiar este horario a Sábado y Domingo">Sábado y Domingo</button>
       </div>
-    </div>
-  </div>
+    </section>
+    <section class="sched-more-row" data-more="freelancer">
+      <button class="sched-more-rowbtn" type="button" aria-expanded="false" aria-controls="schedMorePanel-freelancer" data-more-toggle="freelancer">
+        <span class="sched-more-ico" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
+        <span class="sched-more-name">Modo freelancer</span>
+        <span class="sched-more-val"><span class="tag" id="freelancerStatusTag">Desactivado</span></span>
+        <span class="sched-more-arrow" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg></span>
+      </button>
+      <div class="sched-more-panel" id="schedMorePanel-freelancer" hidden>
+<div class="sched-compact-card">
+<div class="sched-freelancer-head">
+<label class="sched-checkbox-row"><input id="freelancerEnabledInput" type="checkbox"/> Activar modo freelancer</label>
+<div class="sched-help-wrap">
+<button class="sched-compact-info-btn" type="button" aria-describedby="freelancerInfoTooltip">i</button>
+<div class="sched-help-tooltip" id="freelancerInfoTooltip" role="tooltip">Sin horario planeado: el aviso de descanso sale cuando acumulas los minutos productivos de «Descanso por productividad» o los minutos conectado de aquí, lo que llegue primero. Desde el aviso eliges Break o Lunch y su duración.</div>
 </div>
-</div><!-- /scheduleConfigAccordion -->
+</div>
+<div class="sched-compact-row">
+<div class="sched-compact-field"><label for="freelancerBreakMinInput">Break (min)</label><input id="freelancerBreakMinInput" inputmode="numeric" min="1" max="240" step="1" type="number"/></div>
+<div class="sched-compact-field"><label for="freelancerLunchMinInput">Lunch (min)</label><input id="freelancerLunchMinInput" inputmode="numeric" min="1" max="240" step="1" type="number"/></div>
+</div>
+<div class="sched-compact-row">
+<div class="sched-compact-field"><label for="freelancerConnectedMinInput">Avisar tras (min conectado, 0 = apagado)</label><input id="freelancerConnectedMinInput" inputmode="numeric" min="0" max="720" step="1" type="number"/></div>
+<div class="sched-compact-field"><label for="freelancerSnoozeMinInput">Posponer (min)</label><input id="freelancerSnoozeMinInput" inputmode="numeric" min="1" max="60" step="1" type="number"/></div>
+</div>
+<div class="sched-compact-row">
+<div class="sched-compact-field"><label for="freelancerSessionGoalInput">Meta de sesión (min, 0 = sin meta)</label><input id="freelancerSessionGoalInput" inputmode="numeric" min="0" max="1440" step="1" type="number"/></div>
+<div class="sched-compact-field"><label for="freelancerLunchEveryInput">Lunch tras (min conectado, 0 = apagado)</label><input id="freelancerLunchEveryInput" inputmode="numeric" min="0" max="720" step="1" type="number"/></div>
+</div>
+<div class="sched-templates-line">
+<p class="alert-hint">Plantillas</p>
+<div class="mc-pill-row" id="freelancerTemplateRow" role="group" aria-label="Plantillas">
+<button class="mc-pill-btn" data-fl-template="short" type="button">Sesión corta</button>
+<button class="mc-pill-btn" data-fl-template="medium" type="button">Turno medio</button>
+<button class="mc-pill-btn" data-fl-template="long" type="button">Turno largo</button>
+</div>
+</div>
+</div>
+      </div>
+    </section>
+  </div>
+</div><!-- /schedMoreCard -->
 
 
 </div><!-- /pageSchedule -->

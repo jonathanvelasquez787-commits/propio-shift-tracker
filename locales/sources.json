@@ -1493,12 +1493,6 @@
       "js/call-records-view.js"
     ]
   },
-  "s_1b47ea56": {
-    "source": "Sin horario fijo: descansos por regla",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_1b9ae0bb": {
     "source": "English",
     "files": [
@@ -3634,6 +3628,12 @@
       "index.html"
     ]
   },
+  "s_44726112": {
+    "source": "Más opciones",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_44760121": {
     "source": "Cuenta",
     "files": [
@@ -5420,6 +5420,12 @@
     "source": "Usado {{v0}} · {{v1}} llamadas · {{v2}} ACW{{v3}}",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_6673e5b4": {
+    "source": "+0:00 h",
+    "files": [
+      "app.html"
     ]
   },
   "s_66bec934": {
@@ -7688,6 +7694,12 @@
       "js/call-recovery.js"
     ]
   },
+  "s_8e6e3b2c": {
+    "source": "Gracia {{v0}} min · Meta {{v1}} %",
+    "files": [
+      "js/schedule.js"
+    ]
+  },
   "s_8eb37d12": {
     "source": "Entre llamadas",
     "files": [
@@ -8780,6 +8792,12 @@
     "source": "Viernes",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_a2a2fa03": {
+    "source": "Mover todo el turno",
+    "files": [
+      "app.html"
     ]
   },
   "s_a2a5c676": {
@@ -11483,6 +11501,12 @@
     "source": "El ACW sigue el final de Propio",
     "files": [
       "js/call-records-view.js"
+    ]
+  },
+  "s_d5c4dfb6": {
+    "source": "Mover turno · Si llegas tarde · Adherencia · Freelancer",
+    "files": [
+      "app.html"
     ]
   },
   "s_d5e075c4": {
