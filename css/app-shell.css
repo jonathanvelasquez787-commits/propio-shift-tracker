@@ -1504,3 +1504,18 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 #gameHomeDay { border-radius: 12px; overflow: hidden; }
 #gameHomeDay .game-battle { border-radius: 12px; overflow: hidden; }
 /* fin reto de hoy redondeado */
+
+/* linea y reto estrecho */
+/* Escritorio: una línea doble igual a la de entre los botones separa los botones del reto de hoy y el reto no pasa de 520 px de ancho. Celular: el reto es tan estrecho como la barra de botones (no cambia de lugar). */
+@media (min-width: 761px) {
+  .chips > .hero-shift-actions.has-game > .hero-shift-game-sep { display: block; order: 99; flex: 0 0 2px; width: 2px; height: 46px; margin: 0 8px 0 auto; border-radius: 2px; background: var(--line-2, var(--line)); box-shadow: 4px 0 0 var(--line-2, var(--line)); }
+  .chips > .hero-shift-actions.has-game > .hero-shift-game-sep + .hero-shift-game { margin-left: 0; }
+  .chips > .hero-shift-actions.has-game > .hero-shift-game { max-width: 520px; }
+  .chips > .hero-shift-actions.has-game.is-stuck > .hero-shift-game-sep { display: none; }
+}
+@media (max-width: 760px) {
+  .hero-shift-game-sep { display: none; }
+  #gameHomeDay { margin-left: 15px; margin-right: 15px; }
+}
+/* fin linea y reto estrecho */
+
