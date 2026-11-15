@@ -1460,20 +1460,6 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 }
 /* fin juego baja en ventana angosta */
 
-/* logros flotante en la barra */
-/* Con el juego dentro de la barra, lo que se abre con Logros sale como un panel flotante debajo del juego: no agranda la barra ni mueve los botones. */
-@media (min-width: 761px) {
-  .chips > .hero-shift-actions.has-game > #gameHomeDay.hero-shift-game,
-  .chips > .hero-shift-actions.has-game > .hero-shift-game .game-arena { overflow: visible; }
-  .chips > .hero-shift-actions.has-game > .hero-shift-game .game-battle-stage { border-radius: 11px; }
-  .chips > .hero-shift-actions.has-game > .hero-shift-game .game-battle .game-battle-head { border-radius: 11px 11px 0 0; }
-  .chips > .hero-shift-actions.has-game > .hero-shift-game .game-battle .game-battle-footer { border-radius: 0 0 11px 11px; }
-  .chips > .hero-shift-actions.has-game > .hero-shift-game .game-battle .game-battle-collection { position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 30; max-height: min(60vh, 420px); overflow: auto; border: 1px solid rgba(var(--rpt-purple-rgb), .42); border-radius: 14px; background: var(--panel-navy); box-shadow: var(--shadow); }
-  /* Mientras Logros está abierto, la barra y su contenedor dejan de recortar y pasan por encima de las tarjetas de abajo. */
-  .chips:has(> .hero-shift-actions.has-game .game-battle-collection:not([hidden])),
-  .chips > .hero-shift-actions.has-game:has(.game-battle-collection:not([hidden])) { position: relative; z-index: 40; overflow: visible; }
-}
-/* fin logros flotante en la barra */
 
 /* juego en celular igual que escritorio */
 /* Celular: el reto de hoy se ve igual que en escritorio (escena de 88 px con todo dentro). No cambia de lugar: sigue debajo de Ganancias. */
@@ -1512,3 +1498,9 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
   #gameHomeDay .game-battle .game-battle-heading > .game-kicker { display: none; }
 }
 /* fin juego en celular igual que escritorio */
+
+/* reto de hoy redondeado */
+/* Todo el reto de hoy tiene las esquinas redondeadas como los botones: lo de adentro (franjas de arriba y abajo) se recorta con el borde. */
+#gameHomeDay { border-radius: 12px; overflow: hidden; }
+#gameHomeDay .game-battle { border-radius: 12px; overflow: hidden; }
+/* fin reto de hoy redondeado */
