@@ -7,7 +7,7 @@ import { wireFinancePlanning, financeInputUsd } from './finance-planning.js';
 import { validFinanceSettings } from './finance-plan-model.js';
 import { createPropioReceiver, createStorageRevisionGuard, ignorePropioCall } from './propio-bridge.js';
 import { portalRecordsText } from './propio-history-records.js';
-import { callFeedbackSilenced, withSilentCallFeedback } from './call-feedback.js';
+import { callFeedbackSilenced, withBridgeCallFeedback, withSilentCallFeedback } from './call-feedback.js';
 import { preserveCallRecords, compareCallRecords, acwCallRecord, latestCompletedCall } from './call-records.js';
 import { settingsWithinBudget, reportLocalPersistenceFailure, readMeta, jsonbBytes, preserveRecoveryCopy, listRecoveryCopies } from './sync.js';
 // Boot importa este módulo solo después de verificar la sesión e hidratar sus datos.
@@ -8232,8 +8232,8 @@ export const applyPropioBridgeEvent = createPropioReceiver({
   startSession: event => startShift({ at: event.at, propio: true }),
   endSession: event => endShift({ at: event.at, propio: true }),
   start: event => startCall({ startedAt: event.at, propioBridge: { callId: event.callId, payEstimated: true, timingEstimated: true } }),
-  end: event => withSilentCallFeedback(() => endCall({ endedAt: event.at })),
-  catchUp: event => withSilentCallFeedback(() => {
+  end: event => withBridgeCallFeedback(() => endCall({ endedAt: event.at })),
+  catchUp: event => withBridgeCallFeedback(() => {
     const context = { propioBridge: { callId: event.callId, payEstimated: true, timingEstimated: true } };
     const result = autoSaveLiveCall(event.startedAt, event.at, context);
     if (result && (!state.lastCallEndedAt || Date.parse(state.lastCallEndedAt) < Date.parse(event.at))) state.lastCallEndedAt = event.at;

@@ -1,5 +1,5 @@
 import { translateText } from './i18n.js';
-import { callFeedbackSilenced } from './call-feedback.js';
+import { reinforcementFeedbackSilenced } from './call-feedback.js';
 import { calls, settings, state } from './app-context.js';
 import { initGameAudio, playGameSound, syncGameAudio } from './reinforcement-audio.js';
 import { activeWorkSinceLastCall, monetaryMilestones } from './reinforcement-rules.js';
@@ -168,7 +168,7 @@ let lastDisplayedToastText = '';
 const TOAST_PRIORITIES = Object.freeze({ record: 4, loot: 3, impulse: 2, critical: 2, '': 1 });
 
 export function announceGameStatus(message) {
-  if (callFeedbackSilenced()) return;
+  if (reinforcementFeedbackSilenced()) return;
   if (!reinforcementFeedbackEnabled() || state.activeCall) return;
   const live = document.getElementById('gameStatusLive');
   if (!live || !message) return;
@@ -177,7 +177,7 @@ export function announceGameStatus(message) {
 }
 
 export function queueGameToast(message, tone = '', options = {}) {
-  if (callFeedbackSilenced()) return;
+  if (reinforcementFeedbackSilenced()) return;
   const text = String(message ?? '').trim();
   const allowed = reinforcementFeedbackEnabled();
   if (!text || !allowed || (options.repeat !== true && text === lastGameToastText)) return;

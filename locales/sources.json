@@ -2564,6 +2564,12 @@
       "js/call-review-view.js"
     ]
   },
+  "s_30e67ac1": {
+    "source": "Cierre breve con la extensión",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_30e84a4f": {
     "source": "{{v31}} RACHA DE CUMPLIMIENTO",
     "files": [
@@ -2905,6 +2911,12 @@
     "source": "·\n      Responsable del tratamiento:",
     "files": [
       "privacidad.html"
+    ]
+  },
+  "s_365ab1a9": {
+    "source": "Celebrar con la extensión",
+    "files": [
+      "app.html"
     ]
   },
   "s_36624ec3": {
@@ -3342,6 +3354,12 @@
     "source": "Pago inválido o fuera del límite.",
     "files": [
       "js/call-review-view.js"
+    ]
+  },
+  "s_3eb38533": {
+    "source": "Celebrar llamadas de la extensión",
+    "files": [
+      "app.html"
     ]
   },
   "s_3ecc4384": {
@@ -4024,6 +4042,12 @@
   },
   "s_4b3c5b1d": {
     "source": "Probar sonido",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_4b663a8d": {
+    "source": "Celebra también las llamadas que la extensión registra sola. Apagado: se guardan en silencio.",
     "files": [
       "app.html"
     ]
@@ -10903,6 +10927,12 @@
       "js/call-recovery.js"
     ]
   },
+  "s_cbcf74da": {
+    "source": "Cierre breve de la extensión",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_cbf3808a": {
     "source": "Volviste a tiempo de {pause} · cuidaste tu descanso y tu ritmo",
     "files": [
@@ -13506,6 +13536,12 @@
     "source": "Solo cambia el borrador. Después usá Guardar día.",
     "files": [
       "js/shift-work-review.js"
+    ]
+  },
+  "s_f792549d": {
+    "source": "También pregunta cómo te fue en las llamadas que la extensión registra sola. Apagado: se guardan en silencio.",
+    "files": [
+      "app.html"
     ]
   },
   "s_f7934017": {
