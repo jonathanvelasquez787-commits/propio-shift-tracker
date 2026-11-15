@@ -6579,7 +6579,7 @@ function renderSchedule() {
           ? translateText('Día libre según tu horario semanal.')
           : (settings.lateArrivalMode === 'shift'
               ? translateText('Tu horario planeado, corrido si llegaste tarde (ver "Si llegas tarde a tu turno" en Horario).')
-              : translateText('Tu horario planeado. Si llegas tarde o te pasas de un break, aquí se ve la diferencia contra el plan.'));
+              : translateText('Tu plan vs. lo que hiciste.'));
       }
 
       // Un día marcado off:true en el horario semanal pero con actividad real (dayCfg.off true Y
@@ -6592,7 +6592,7 @@ function renderSchedule() {
         if (cfgIsOff && !isOff) {
           offWorkedNote.textContent = forced === 'work'
             ? translateText('Marcaste este día como Trabajado a mano (Resumen semanal → Editar día) — no aparece libre, aunque tu horario diga que sí lo es.')
-            : translateText('Trabajaste en tu día libre — no aparece marcado como libre, se ve igual que un día laboral normal.');
+            : translateText('Trabajaste en tu día libre');
           offWorkedNote.style.display = 'block';
         } else if (!cfgIsOff && isOff) {
           offWorkedNote.textContent = translateText('Marcaste este día como Libre a mano (Resumen semanal → Editar día) — no se exige Adherencia, aunque tenías turno planeado.');

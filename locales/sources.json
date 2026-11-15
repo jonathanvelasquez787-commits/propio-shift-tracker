@@ -3075,6 +3075,13 @@
       "js/game.js"
     ]
   },
+  "s_2dbf25aa": {
+    "source": "Trabajaste en tu día libre",
+    "files": [
+      "app.html",
+      "js/app-main.js"
+    ]
+  },
   "s_2e4a471e": {
     "source": "acw",
     "files": [
@@ -4113,6 +4120,12 @@
     "files": [
       "js/finance-review.js",
       "js/finance.js"
+    ]
+  },
+  "s_3c221bc3": {
+    "source": "Acerca de Bloques del día",
+    "files": [
+      "app.html"
     ]
   },
   "s_3c48f996": {
@@ -7254,7 +7267,7 @@
   "s_6e806508": {
     "source": "Tu horario planeado. Si llegas tarde o te pasas de un break, aquí se ve la diferencia contra el plan.",
     "files": [
-      "js/app-main.js"
+      "app.html"
     ]
   },
   "s_6e8711b7": {
@@ -12064,13 +12077,6 @@
       "js/app-main.js"
     ]
   },
-  "s_b3fd358c": {
-    "source": "Trabajaste en tu día libre — no aparece marcado como libre, se ve igual que un día laboral normal.",
-    "files": [
-      "app.html",
-      "js/app-main.js"
-    ]
-  },
   "s_b401ff28": {
     "source": "El cambio es manual. Tus importes guardados en dólares se conservan.",
     "files": [
@@ -12081,6 +12087,12 @@
     "source": "Accesorio {{v0}}: {{v1}}",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_b405074d": {
+    "source": "Tu plan vs. lo que hiciste.",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_b413f622": {

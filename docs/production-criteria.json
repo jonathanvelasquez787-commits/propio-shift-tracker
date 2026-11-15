@@ -1174,6 +1174,13 @@
           ]
         },
         {
+          "file": "tests/blocks-text-short.test.mjs",
+          "namedCases": [
+            "Bloques del día: el texto largo vive en el icono i y el subtítulo es corto",
+            "Bloques del día: el aviso de día libre trabajado queda corto y el icono i no abre ni cierra el acordeón"
+          ]
+        },
+        {
           "file": "tests/freelancer-blocks-list.test.mjs",
           "namedCases": [
             "Bloques del día en freelancer: cada descanso es una fila con etiqueta, horas y minutos",
