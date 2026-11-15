@@ -1145,6 +1145,13 @@
           ]
         },
         {
+          "file": "tests/action-bar-small.test.mjs",
+          "namedCases": [
+            "Barra de acciones: los botones miden 40 de ancho por 34 de alto",
+            "Barra de acciones: los botones quedan centrados y el que está en curso puede crecer para mostrar su tiempo"
+          ]
+        },
+        {
           "file": "tests/freelancer-blocks-list.test.mjs",
           "namedCases": [
             "Bloques del día en freelancer: cada descanso es una fila con etiqueta, horas y minutos",
