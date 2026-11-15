@@ -251,10 +251,25 @@ function renderSettingsReinforcement() {
   }
 }
 
+const positiveSvg = (path) => `<svg class="positive-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${path}"></path></svg>`;
+const POSITIVE_ICON_PATHS = {
+  good: 'M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z',
+  difficult: 'M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z',
+  learning: 'M9 18h6M10 21h4M12 3a6 6 0 00-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0012 3z',
+  recovery: 'M4 17l6-6 4 4 6-7M15 8h5v5',
+};
+
+function greetingTitle(name, completed) {
+  if (completed > 0) return name ? ui`Hoy diste todo, ${escapeHtml(name)}.` : translateText('Hoy diste todo.');
+  return name ? ui`Hola, ${escapeHtml(name)}.` : translateText('Hola.');
+}
+
 function renderEvidence() {
   const root = document.getElementById('positiveEvidenceCard');
+  const hero = document.getElementById('positiveHero');
   if (!root) return;
   root.hidden = !reinforcementEnabled();
+  if (hero) hero.hidden = !root.hidden;
   if (root.hidden) return;
   const dayKey = currentPositiveDayKey();
   const dayReflections = Object.values(state.game.reinforcement.reflections).filter((item) => item.dayKey === dayKey);
@@ -263,7 +278,19 @@ function renderEvidence() {
   const learning = dayReflections.filter((item) => item.outcome === 'learning').length;
   const recoveries = state.game.reinforcement.recoveries.filter((item) => item.dayKey === dayKey).length;
   const completed = callsForDay(dayKey).length;
-  root.innerHTML = ui`<div><span>PRUEBA POSITIVA DE HOY</span><strong>${completed === 1 ? ui`${completed} llamada completada` : ui`${completed} llamadas completadas`}</strong><small>${good} cerraron bien · ${resilient} difíciles que enfrentaste · ${learning} aprendizajes · ${recoveries} recuperaciones</small></div>`;
+  const name = String(settings.userName || '').trim();
+  const summary = completed === 0
+    ? translateText('Tus llamadas completadas aparecerán aquí.')
+    : completed === 1
+      ? translateText('1 llamada completada. Cada una cuenta, también las difíciles.')
+      : ui`${completed} llamadas completadas. Cada una cuenta, también las difíciles.`;
+  const tile = (kind, count, label) => `<div class="positive-tile positive-tile-${kind}">${positiveSvg(POSITIVE_ICON_PATHS[kind === 'hard' ? 'difficult' : kind])}<strong>${count}</strong><span>${label}</span></div>`;
+  const strip = recoveries === 0 ? ''
+    : `<div class="positive-strip">${positiveSvg(POSITIVE_ICON_PATHS.recovery)}<span>${recoveries === 1
+      ? translateText('Hoy volviste a tomar otra llamada 1 vez después de una difícil.')
+      : ui`Hoy volviste a tomar otra llamada ${recoveries} veces después de una difícil.`}</span></div>`;
+  root.innerHTML = `<div class="positive-greeting-head"><span class="positive-greeting-kicker">${translateText('Historial positivo')}</span><h1 class="positive-greeting-title">${greetingTitle(name, completed)}</h1><p class="positive-greeting-sub">${summary}</p></div>`
+    + (completed === 0 ? '' : `<div class="positive-tiles">${tile('good', good, translateText('Cerraron bien'))}${tile('hard', resilient, translateText('Cumplí aunque fue difícil'))}${tile('learning', learning, translateText('Me dejaron un aprendizaje'))}</div>${strip}`);
 }
 
 let historyExpanded = false;

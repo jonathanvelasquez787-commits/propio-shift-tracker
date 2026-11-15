@@ -878,6 +878,15 @@
           "namedCases": [
             "no visible text mentions the removed game (logros, gamificación, monstruos, premios)"
           ]
+        },
+        {
+          "file": "tests/positive-greeting.test.mjs",
+          "namedCases": [
+            "positive page greeting card lives inside the page and has its own class",
+            "positive greeting shows the name, three counters and the recovery strip",
+            "positive greeting uses SVG icons instead of emoji and the old card text is gone",
+            "positive greeting styles use theme variables and are fenced in their own block"
+          ]
         }
       ]
     },
