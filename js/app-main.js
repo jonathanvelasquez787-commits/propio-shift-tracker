@@ -7106,10 +7106,17 @@ export function render() {
         sep.setAttribute('aria-hidden', 'true');
         hero.insertBefore(sep, day);
       }
-      sep.style.display = '';
-      if (day.getBoundingClientRect().top > sep.getBoundingClientRect().bottom - 1) sep.style.display = 'none';
+      // Se mide contra un botón (siempre visible) y no contra la línea: al pegarse arriba la línea se oculta por CSS y
+      // su medida sería 0, lo que la dejaba escondida para siempre al maximizar la ventana.
+      const firstButton = hero.querySelector('button');
+      const wrapped = !!firstButton && day.getBoundingClientRect().top >= firstButton.getBoundingClientRect().bottom - 1;
+      sep.style.display = wrapped ? 'none' : '';
     }
     window.addEventListener('resize', () => placeGameSeparator());
+    if (typeof ResizeObserver === 'function') {
+      const heroForSep = document.querySelector('.hero-shift-actions');
+      if (heroForSep) new ResizeObserver(() => placeGameSeparator()).observe(heroForSep);
+    }
     // Con el juego dentro de la barra, el selector de Arma sube a la franja de abajo de la escena (siempre visible).
     // En celular el juego se ve igual, así que el selector también va abajo. Solo en escritorio fuera de Inicio vuelve al desplegable de Logros.
     function placeBattleLoadout() {

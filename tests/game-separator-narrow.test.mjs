@@ -22,3 +22,9 @@ test('en celular el reto mide lo mismo de ancho que la barra de botones, sin lí
   assert.ok(!block.includes('position: sticky'));
   assert.ok(!block.includes('position: fixed'));
 });
+
+test('la línea se mide contra un botón y se vuelve a medir cuando cambia el tamaño de la barra', () => {
+  assert.ok(js.includes("hero.querySelector('button')"));
+  assert.ok(!js.includes('sep.getBoundingClientRect().bottom'));
+  assert.ok(js.includes('new ResizeObserver(() => placeGameSeparator())'));
+});

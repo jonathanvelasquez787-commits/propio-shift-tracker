@@ -1256,7 +1256,8 @@
           "file": "tests/game-separator-narrow.test.mjs",
           "namedCases": [
             "en escritorio hay una línea doble entre los botones y el reto de hoy, y el reto no pasa de 520 px",
-            "en celular el reto mide lo mismo de ancho que la barra de botones, sin línea y sin pegarse arriba"
+            "en celular el reto mide lo mismo de ancho que la barra de botones, sin línea y sin pegarse arriba",
+            "la línea se mide contra un botón y se vuelve a medir cuando cambia el tamaño de la barra"
           ]
         },
         {
