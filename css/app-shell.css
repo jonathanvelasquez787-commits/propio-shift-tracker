@@ -1364,3 +1364,21 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
   .chips > .hero-shift-actions { gap: 4px; padding: 6px 6px; }
 }
 /* fin botones barra chicos */
+/* horario compacto */
+/* Modo freelancer: el texto largo pasa al icono i y las plantillas van en una fila. */
+.sched-freelancer-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.sched-freelancer-head > .sched-checkbox-row { margin: 0; }
+.sched-templates-line { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-top: 4px; }
+.sched-templates-line > .alert-hint { margin: 0; }
+.sched-templates-line > .mc-pill-row { flex: 1 1 100%; }
+.sched-templates-line .mc-pill-btn { white-space: nowrap; font-size: 12px; padding-inline: 6px; }
+@media (max-width: 760px) {
+  /* Día: Inicio y Fin del turno lado a lado. */
+  #pageSchedule .sched-time-row { grid-template-columns: 1fr 1fr; gap: 10px; }
+  #pageSchedule .sched-time-field input[type="time"] { font-size: 16px; padding: 8px 28px 8px 8px; }
+  #pageSchedule .sched-time-field-clock { right: 8px; }
+  /* Botones de abajo: Guardar día arriba a todo el ancho y los dos de copiar parejos. */
+  #saveShiftWindowBtn { flex: 0 0 100%; }
+  #copyDayToAllBtn, #copyWeekendBtn { flex: 1 1 0; min-width: 0; justify-content: center; white-space: nowrap; font-size: 13px; padding-inline: 8px; }
+}
+/* fin horario compacto */

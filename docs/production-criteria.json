@@ -1152,6 +1152,15 @@
           ]
         },
         {
+          "file": "tests/schedule-compact.test.mjs",
+          "namedCases": [
+            "Horario: en celular Inicio y Fin del turno van lado a lado",
+            "Horario: el texto largo del modo freelancer vive en el icono i y no pierde su contenido",
+            "Horario: las plantillas del modo freelancer conservan sus tres botones en una fila",
+            "Horario: en celular Guardar día ocupa todo el ancho y los dos botones de copiar quedan parejos"
+          ]
+        },
+        {
           "file": "tests/freelancer-blocks-list.test.mjs",
           "namedCases": [
             "Bloques del día en freelancer: cada descanso es una fila con etiqueta, horas y minutos",
