@@ -924,7 +924,10 @@
           "file": "tests/popup-pause-text.test.mjs",
           "namedCases": [
             "popup: \"Pausar disponibilidad automática\" se explica sin jerga",
-            "popup: las opciones de volver a estar disponible dicen \"Estar disponible\""
+            "popup: las opciones de volver a estar disponible dicen \"Estar disponible\"",
+            "popup: \"Abrir Shift Tracker\" queda a la derecha de \"Revisar conexión\"",
+            "popup: \"Revisar conexión\" muestra un aviso cuando termina bien",
+            "popup: los textos de Más opciones son cortos"
           ]
         }
       ]
