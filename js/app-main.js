@@ -7077,6 +7077,21 @@ export function render() {
       schedule();
     }
 
+    // Escritorio: el juego del día (#gameHomeDay) vive dentro de la barra de acciones, a la derecha de los
+    // botones. En celular, y fuera de Inicio, vuelve a su lugar de siempre (#gameHomeGroup).
+    const desktopGameQuery = typeof window.matchMedia === 'function' ? window.matchMedia('(min-width: 761px)') : null;
+    function syncGameInActionsBar(page = currentPage) {
+      const hero = document.querySelector('.hero-shift-actions');
+      const day = document.getElementById('gameHomeDay');
+      const group = document.getElementById('gameHomeGroup');
+      if (!hero || !day || !group) return;
+      const inBar = !!desktopGameQuery?.matches && page === 'home';
+      if (inBar && day.parentElement !== hero) { day.classList.add('hero-shift-game'); hero.appendChild(day); }
+      else if (!inBar && day.parentElement !== group) { day.classList.remove('hero-shift-game'); group.prepend(day); }
+      hero.classList.toggle('has-game', inBar);
+    }
+    desktopGameQuery?.addEventListener?.('change', () => syncGameInActionsBar());
+
     // Los 3 botones de llamadas (#callsControlsGrid) viven dentro de la tarjeta "Acciones de Hoy"
     // (.hero-shift-actions) para formar una sola fila de 6. Aquí también se crea, una sola vez, el
     // separador y el botón circular que colapsa/expande la fila (ver app-shell.css).
@@ -7097,6 +7112,7 @@ export function render() {
       wireStickyActionsBar(hero);
       if (grid.parentElement !== hero) hero.appendChild(grid);
       hero.classList.toggle('calls-off', page === 'help');
+      syncGameInActionsBar(page);
     }
 
     function navigateToPage(page) {
