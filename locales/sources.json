@@ -3622,6 +3622,12 @@
       "app.html"
     ]
   },
+  "s_4478497d": {
+    "source": "Se reinician llamadas, turnos, pausas, horario, metas y perfil de todos los días. Las Finanzas se conservan, salvo que marques la casilla.",
+    "files": [
+      "js/backup-recovery.js"
+    ]
+  },
   "s_4487f87e": {
     "source": "{{v2}}{{v3}}",
     "files": [
@@ -4890,12 +4896,6 @@
     "source": "Inicio del turno ya utilizado",
     "files": [
       "js/automation-ui.js"
-    ]
-  },
-  "s_5b9c71de": {
-    "source": "Se reinician llamadas, turnos, pausas, Finanzas, horario, metas y perfil de todos los días.",
-    "files": [
-      "js/backup-recovery.js"
     ]
   },
   "s_5ba07c42": {
@@ -10565,6 +10565,12 @@
       "js/weekly-summary.js"
     ]
   },
+  "s_c472b69c": {
+    "source": "Sin marcar, tus categorías, pagos, plan y recibos de Finanzas se conservan.",
+    "files": [
+      "js/backup-recovery.js"
+    ]
+  },
   "s_c4890840": {
     "source": "Aviso sin llamadas",
     "files": [
@@ -13757,6 +13763,12 @@
     "source": "Desglose de ganancias",
     "files": [
       "app.html"
+    ]
+  },
+  "s_fc4d592f": {
+    "source": "También borrar Finanzas",
+    "files": [
+      "js/backup-recovery.js"
     ]
   },
   "s_fc67bb73": {

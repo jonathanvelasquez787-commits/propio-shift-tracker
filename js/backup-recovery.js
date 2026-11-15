@@ -63,7 +63,7 @@ export function confirmReplacement(context, kind, change, options = {}) {
     ui`Día que se reinicia: ${options.dayLabel}.`,
     translateText('Se eliminan sus llamadas, pausas, huecos, nota, acciones y progreso diario. Otros días, horario y metas se conservan.'),
   ] : kind === 'reset' ? [
-    translateText('Se reinician llamadas, turnos, pausas, Finanzas, horario, metas y perfil de todos los días.'),
+    translateText('Se reinician llamadas, turnos, pausas, horario, metas y perfil de todos los días. Las Finanzas se conservan, salvo que marques la casilla.'),
     translateText('Tu cuenta y los ajustes propios de la extensión se conservan.'),
   ] : [
     translateText('Las llamadas, turnos, pausas y notas actuales se reemplazan por los del respaldo.'),
@@ -105,7 +105,8 @@ export function confirmReplacement(context, kind, change, options = {}) {
       +(kind==='import'?ui`<div class="polished-impact"><strong>Datos del respaldo</strong><span>Reemplazan llamadas, turnos, pausas y notas.</span></div>`+`<div class="polished-impact"><strong>${escapeHtml(translateText('Tus ajustes'))}</strong><span>${escapeHtml(effects[1])}</span></div>`
         +(effects[2]?`<div class="review-callout">${escapeHtml(effects[2])}</div>`:'')
         +ui`<div class="polished-impact"><strong>Copia previa protegida</strong><span>Se guarda en este navegador antes de restaurar.</span></div><details class="polished-disclosure"><summary>Sincronización y recuperación</summary><div class="polished-detail"><p class="note">${escapeHtml(effects.at(-1))}</p></div></details>`
-        :ui`<ul class="confirmation-effects">${effects.filter(Boolean).map(line => `<li>${escapeHtml(line)}</li>`).join('')}</ul>`);
+        :ui`<ul class="confirmation-effects">${effects.filter(Boolean).map(line => `<li>${escapeHtml(line)}</li>`).join('')}</ul>`)
+      +(kind==='reset'?`<label class="sched-checkbox-row" for="resetEraseFinanceInput"><input id="resetEraseFinanceInput" type="checkbox"/><span>${escapeHtml(translateText('También borrar Finanzas'))}</span></label><p class="note">${escapeHtml(translateText('Sin marcar, tus categorías, pagos, plan y recibos de Finanzas se conservan.'))}</p>`:'');
     if(kind==='import'){const button=document.getElementById('confirmModalOkBtn');if(button)button.textContent=translateText('Restaurar datos');}
   }
 }
