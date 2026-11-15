@@ -4569,7 +4569,8 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
         toast(translateText('Guarda o descarta la llamada pendiente antes de reiniciar este día.'));
         return;
       }
-      return useSnapshotTools('confirmReplacement', 'day', () => {
+      // Qué pertenece a este día (se usa para contar y para borrar).
+      const dayScope = () => {
         const trackedShiftStart = state.shiftStartedAt ? new Date(state.shiftStartedAt) : null;
         const trackedShiftEnd = state.shiftEndedAt ? new Date(state.shiftEndedAt) : new Date();
         const trackedShiftDayKey = trackedShiftStart && Number.isFinite(trackedShiftStart.getTime())
@@ -4582,40 +4583,59 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
           const endMs = trackedShiftEnd && Number.isFinite(trackedShiftEnd.getTime()) ? trackedShiftEnd.getTime() : Date.now();
           return Number.isFinite(t) && t >= trackedShiftStart.getTime() && t <= endMs;
         };
-
-        setAppCalls(calls.filter(c => callDateKeyFromValue(c.callDate) !== normalizedDayKey));
-        state.events = state.events.filter(e => {
+        const eventOutsideDay = e => {
           const accountingDay = callDateKeyFromValue(e?.shiftDayKey);
           if (accountingDay) return accountingDay !== normalizedDayKey;
           return !sameCallDay(e.ts, normalizedDayKey) && !belongsToTrackedShift(e.ts);
-        });
-        state.pauseHistory = state.pauseHistory.filter(p => {
+        };
+        const pauseOutsideDay = p => {
           const accountingDay = callDateKeyFromValue(p?.shiftDayKey);
           if (accountingDay) return accountingDay !== normalizedDayKey;
           const touchesCalendarDay = sameCallDay(p.startedAt, normalizedDayKey);
           const touchesTrackedShift = belongsToTrackedShift(p.startedAt) || belongsToTrackedShift(p.endedAt);
           return !touchesCalendarDay && !touchesTrackedShift;
-        });
-        if (state.gapAnnotations && state.gapAnnotations[normalizedDayKey]) delete state.gapAnnotations[normalizedDayKey];
-        if (state.dayNotes && state.dayNotes[normalizedDayKey]) delete state.dayNotes[normalizedDayKey];
-        if (state.dayInterruptions && state.dayInterruptions[normalizedDayKey]) delete state.dayInterruptions[normalizedDayKey];
+        };
+        return { trackedShiftDayKey, resetsTrackedShift, eventOutsideDay, pauseOutsideDay };
+      };
+      const dayNow = dayScope();
+      const dayCounts = {
+        calls: calls.filter(c => callDateKeyFromValue(c.callDate) === normalizedDayKey).length,
+        actions: state.events.filter(e => !dayNow.eventOutsideDay(e)).length,
+        pauses: state.pauseHistory.filter(p => !dayNow.pauseOutsideDay(p)).length,
+      };
+      return useSnapshotTools('confirmReplacement', 'day', () => {
+        // Pantalla "Reiniciar día": 3 casillas. Lo que no se marca se conserva.
+        const erases = id => { const box = document.getElementById(id); return box ? !!box.checked : true; };
+        const eraseCalls = erases('resetDayCallsInput'), eraseBreaks = erases('resetDayBreaksInput'), eraseNotes = erases('resetDayNotesInput');
+        if (!eraseCalls && !eraseBreaks && !eraseNotes) return false;
+        const { trackedShiftDayKey, resetsTrackedShift, eventOutsideDay, pauseOutsideDay } = dayScope();
 
-        if (resetsTrackedShift || (!trackedShiftDayKey && normalizedDayKey === todayCallDateKey())) {
-          state.shiftStartedAt = null;
-          state.shiftEndedAt = null;
-          state.activePause = null;
-          state.activeCall = null;
-          state.pendingLiveCallBackup = null;
-          state.lastCallEndedAt = null;
+        if (eraseCalls) setAppCalls(calls.filter(c => callDateKeyFromValue(c.callDate) !== normalizedDayKey));
+        if (eraseNotes) state.events = state.events.filter(eventOutsideDay);
+        if (eraseBreaks) {
+          state.pauseHistory = state.pauseHistory.filter(pauseOutsideDay);
+          if (state.gapAnnotations && state.gapAnnotations[normalizedDayKey]) delete state.gapAnnotations[normalizedDayKey];
+        }
+        if (eraseNotes) {
+          if (state.dayNotes && state.dayNotes[normalizedDayKey]) delete state.dayNotes[normalizedDayKey];
+          if (state.dayInterruptions && state.dayInterruptions[normalizedDayKey]) delete state.dayInterruptions[normalizedDayKey];
+          if (resetsTrackedShift || (!trackedShiftDayKey && normalizedDayKey === todayCallDateKey())) {
+            state.shiftStartedAt = null;
+            state.shiftEndedAt = null;
+            state.activePause = null;
+            state.activeCall = null;
+            state.pendingLiveCallBackup = null;
+            state.lastCallEndedAt = null;
+          }
         }
 
         state.activeDayKey = normalizedDayKey || dayKey;
-        onReinforcementDayReset(normalizedDayKey || dayKey);
+        if (eraseNotes) onReinforcementDayReset(normalizedDayKey || dayKey);
         financeRunAutoFillCascade();
         if (saveAll() === false) return false;
         toast(translateText('Día reiniciado'));
         return true;
-      }, { dayLabel: formatCallDayLabel(dayKey) });
+      }, { dayLabel: formatCallDayLabel(dayKey), dayCounts });
     }
 
     // Clave para detectar llamadas duplicadas. Usa el valor NUMÉRICO de pay (via parseMoney), no el

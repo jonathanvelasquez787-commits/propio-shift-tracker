@@ -1610,6 +1610,7 @@ html[data-palette]:not([data-palette="original"]) .boot-choice { border-color: v
 #confirmModalDetails .reset-label { margin-top: 4px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 800; }
 #confirmModalDetails .reset-pick { position: relative; display: flex; align-items: center; gap: 12px; padding: 11px 12px; border: 1px solid var(--line); border-left: 4px solid var(--cyan); border-radius: 14px; background: color-mix(in srgb, var(--text) 4%, transparent); cursor: pointer; }
 #confirmModalDetails .reset-pick:last-of-type { border-left-color: var(--good); }
+#confirmModalDetails .reset-picker-day .reset-pick:last-of-type { border-left-color: var(--cyan); }
 #confirmModalDetails .reset-pick input { position: absolute; opacity: 0; pointer-events: none; }
 #confirmModalDetails .reset-pick-box { flex: none; width: 22px; height: 22px; border-radius: 7px; border: 2px solid var(--line-2); display: grid; place-items: center; color: transparent; }
 #confirmModalDetails .reset-pick-box .ic-svg { width: 14px; height: 14px; }

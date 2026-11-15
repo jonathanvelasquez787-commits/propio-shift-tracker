@@ -265,6 +265,12 @@
       "js/finance-planning.js"
     ]
   },
+  "s_04d2f0ea": {
+    "source": "Se borra solo lo que dejes marcado de este día. Otros días, horario y metas se conservan.",
+    "files": [
+      "js/backup-recovery.js"
+    ]
+  },
   "s_04e821c3": {
     "source": "Metas, tasa por minuto, moneda secundaria y ciclo de pago.",
     "files": [
@@ -979,12 +985,6 @@
       "js/higher-rate-review.js"
     ]
   },
-  "s_10e0d712": {
-    "source": "Día que se reinicia: {{v0}}.",
-    "files": [
-      "js/backup-recovery.js"
-    ]
-  },
   "s_11002277": {
     "source": "Llamada terminada: {{v0}} – {{v1}} ({{v2}}). Ajusta lo que haga falta antes de guardarla.",
     "files": [
@@ -1583,6 +1583,12 @@
       "js/app-main.js"
     ]
   },
+  "s_1d4eee41": {
+    "source": "Día:",
+    "files": [
+      "js/backup-recovery.js"
+    ]
+  },
   "s_1dc9b4f2": {
     "source": "Sin categoría",
     "files": [
@@ -1599,6 +1605,12 @@
     "source": "Toca un día para verlo. Toca Libre o Trabajado para cambiarlo. El lápiz agrega categoría o nota.",
     "files": [
       "app.html"
+    ]
+  },
+  "s_1e12ca2c": {
+    "source": "Breaks, lunch y huecos anotados",
+    "files": [
+      "js/backup-recovery.js"
     ]
   },
   "s_1e34f604": {
@@ -2556,6 +2568,12 @@
     "source": "Guardar y empezar",
     "files": [
       "app.html"
+    ]
+  },
+  "s_2fcb35fb": {
+    "source": "Nota y acciones",
+    "files": [
+      "js/backup-recovery.js"
     ]
   },
   "s_2ff6d2e3": {
@@ -10132,6 +10150,12 @@
       "js/app-main.js"
     ]
   },
+  "s_baa70682": {
+    "source": "Pausas y huecos",
+    "files": [
+      "js/backup-recovery.js"
+    ]
+  },
   "s_baae7e2a": {
     "source": "Sin conexión",
     "files": [
@@ -10693,12 +10717,6 @@
       "js/app-main.js"
     ]
   },
-  "s_c5767979": {
-    "source": "Se eliminan sus llamadas, pausas, huecos, nota, acciones y progreso diario. Otros días, horario y metas se conservan.",
-    "files": [
-      "js/backup-recovery.js"
-    ]
-  },
   "s_c58a10f3": {
     "source": "Ej. L, HNL, MXN...",
     "files": [
@@ -11174,6 +11192,12 @@
     "source": "Revisá la fecha, las horas, el nivel y que la ventana siga disponible.",
     "files": [
       "js/higher-rate-review.js"
+    ]
+  },
+  "s_cef3f78f": {
+    "source": "Tu nota, el registro y el avance del día",
+    "files": [
+      "js/backup-recovery.js"
     ]
   },
   "s_cef69891": {
@@ -13867,6 +13891,12 @@
     "source": "{{v2}}, aparte del pago base. Para corregirlo, abrí Higher Rate → Revisar llamadas → Corregir promoción.",
     "files": [
       "js/calls.js"
+    ]
+  },
+  "s_fbff991e": {
+    "source": "Las llamadas de este día",
+    "files": [
+      "js/backup-recovery.js"
     ]
   },
   "s_fc107c60": {
