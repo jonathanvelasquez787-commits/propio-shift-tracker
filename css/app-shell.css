@@ -1350,3 +1350,17 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
   .chips > .hero-shift-actions .action-slot > .action-short { display: none; }
 }
 /* fin acciones sin nombre en celular */
+/* botones barra chicos */
+/* Los botones de la barra de acciones vuelven a ser chicos (40 x 34), centrados en la barra, en celular y en compu. */
+.chips > .hero-shift-actions { justify-content: center; align-items: center; gap: 6px; padding: 7px 10px; }
+.chips > .hero-shift-actions .action-slot { flex: 0 0 auto; width: 40px; max-width: none; }
+.chips > .hero-shift-actions .action-slot > :is(#shiftControlBtn,#breakControlBtn,#lunchControlBtn,#liveDiscardBtn,#callControlBtn,#pasteCallsBtn,#addCallManualBtn) { min-height: 34px; padding: 2px; }
+.chips > .hero-shift-actions .action-slot > :is(#shiftControlBtn,#breakControlBtn,#lunchControlBtn,#liveDiscardBtn,#callControlBtn,#pasteCallsBtn,#addCallManualBtn) .action-icon-wrap { width: 20px; height: 20px; }
+.chips > .hero-shift-actions .action-slot:has(> :is(#breakControlBtn,#lunchControlBtn,#callControlBtn).is-active),
+.chips > .hero-shift-actions .action-slot:has(> #callControlBtn.is-pending),
+.chips > .hero-shift-actions .action-slot[data-slot="discard"] { width: auto; }
+.chips > .hero-shift-actions .action-slot > #liveDiscardBtn { min-width: 40px; }
+@media (max-width: 420px) {
+  .chips > .hero-shift-actions { gap: 4px; padding: 6px 6px; }
+}
+/* fin botones barra chicos */
