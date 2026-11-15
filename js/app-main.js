@@ -118,7 +118,6 @@ import {
   createDefaultGameState,
   initGame,
   normalizeGameState,
-  onGameBackupExported,
   onGameCallSaved,
   onGameMonetaryProgress,
   migrateGameCallReferences,
@@ -127,14 +126,10 @@ import {
   onGameDayRollover,
   onGameDayReset,
   onGameDayMetadataChanged,
-  onGameGapSaved,
   onGamePauseEnded,
   onGamePauseStarted,
-  onGameShiftAlarmFired,
-  onGameShiftEnded,
   onGameShiftStarted,
   renderGame,
-  gameReviewSnapshot,
   renderGameLive,
   configureGameContext,
 } from './game.js';
@@ -454,7 +449,6 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
         const d = new Date(p?.startedAt || 0);
         if (Number.isFinite(d.getTime())) candidates.push(todayRange(d));
       });
-      Object.keys(state.game?.days || {}).forEach(addDayKey);
       Object.keys(state.dayNotes || {}).forEach(addDayKey);
       Object.keys(settings.dailyGoalOverrides || {}).forEach(addDayKey);
       if (!candidates.length) return null;
@@ -1843,7 +1837,6 @@ function checkShiftAlarm() {
   if (now >= alertTime) {
     if (shiftAlarmFiredForDate !== todayKey) {
       shiftAlarmFiredForDate = todayKey;
-      onGameShiftAlarmFired(todayKey, now.toISOString());
       toast(renderAlertTemplate(settings.shiftAlarmMessage, { hora: timeLabel(formatHHMM(cfg.start)) }));
     }
     startShiftAlarm();
@@ -4149,7 +4142,6 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       if (state.pendingLiveCallBackup) { toast(translateText('Resuelve la llamada pendiente antes de finalizar el turno')); return false; }
       const before = JSON.parse(JSON.stringify(state));
       if (!options.propio) state.propioBridgeSession = null;
-      const shiftDayKey = todayCallDateKey(new Date(state.shiftStartedAt));
       const now = options.at || new Date().toISOString();
       const closedPause = state.activePause ? endPause({ silent: true, deferSave: true, forShiftEnd: true, endedAt: now }) : null;
       if (closedPause === false) return false;
@@ -4158,7 +4150,6 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       if (saveAll() === false) { setAppState(before); render(); return false; }
       closedPause?.finish?.();
       toast(translateText('Shift terminado'));
-      onGameShiftEnded(shiftDayKey);
     }
 
     function startPause(type) {
@@ -4965,7 +4956,6 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
     }
 
     function exportJSON() {
-      onGameBackupExported();
       const payload = { schemaVersion: 2, state, calls, settings, exportedAt: new Date().toISOString() };
       const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
@@ -5254,7 +5244,6 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       usdCeilFromCurrencyAmount,
     });
     configureGameContext({
-      reviewGame:refreshGameReview,
       appConfirm, callDateKeyFromValue, callDateToDate, callsForDay, closeModal, computeComplianceStreak, convertedAmountText,
       cycleBoundsForOffset, cycleEarningsForOffset, dayAdherence, dayComplianceStatus, dayConfigFor,
       dayIsEffectivelyOff, effectiveCycleGoal, effectiveDailyGoal, escapeHtml, financeConvertedInline,
@@ -5526,19 +5515,6 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       });
       // Los 5 campos "Mensaje" dejaron de ser editables (ver MESSAGE_PREVIEW_CONFIGS/syncMessagePreview más abajo)
       Object.keys(MESSAGE_PREVIEW_CONFIGS).forEach((kind) => syncMessagePreview(kind));
-    }
-
-    async function refreshGameReview(retry=false) {
-      if(document.getElementById('pageAchievements').hidden)return;
-      const owner=settings;
-      let view;
-      try{view=await loadDetailViews({retry});}catch{
-        if(owner===settings)document.getElementById('gameReviewSummary').textContent=translateText('No se pudo cargar el resumen. Volvé a abrir esta sección.');
-        return;
-      }
-      if(owner!==settings||document.getElementById('pageAchievements').hidden)return;
-      if (!view) { document.getElementById('gameReviewSummary').textContent=translateText('No se pudo cargar el resumen. Volvé a abrir esta sección.'); return; }
-      view.renderGameReview({ui,translateText,escapeHtml,model:gameReviewSnapshot(),valid:()=>owner===settings});
     }
 
     async function openNotificationReview() {
@@ -6433,7 +6409,6 @@ function saveGapEditor() {
   editingGapContext = null;
   closeModal('gapModal');
   toast('Hueco guardado');
-  onGameGapSaved(savedContext.dayKey, savedContext.gapKey, label);
 }
 
 // Editar día (Resumen semanal)
@@ -7118,7 +7093,6 @@ export function render() {
       document.querySelectorAll('.app-page').forEach(el => {
         el.hidden = el.getAttribute('data-page') !== page;
       });
-      if(page==='achievements')refreshGameReview(true);
       document.querySelectorAll('.sidebar-link').forEach(btn => {
         btn.classList.toggle('active', btn.getAttribute('data-page') === page);
       });

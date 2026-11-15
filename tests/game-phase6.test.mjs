@@ -10,7 +10,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { setAppCalls, setAppSettings, setAppState } from '../js/app-context.js';
-import { ACCESSORY_CATALOG, computeGameDay, configureGameContext, createDefaultGameState, normalizeGameState, onGameCallSaved, onGameCallsChanged } from '../js/game.js';
+import { configureGameContext, createDefaultGameState, normalizeGameState, onGameCallSaved, onGameCallsChanged } from '../js/game.js';
 import { configurePositiveReinforcementContext, createDefaultReinforcementState, normalizeReinforcementState } from '../js/positive-reinforcement.js';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -23,204 +23,6 @@ function validCallDate(key) {
   const date = new Date(Number(match[3]), Number(match[1]) - 1, Number(match[2]));
   return date.getFullYear() === Number(match[3]) && date.getMonth() === Number(match[1]) - 1 && date.getDate() === Number(match[2]) ? date : null;
 }
-
-test('Fase 6 expone el catálogo semanal y renderiza SVG seguro para todos los estados', async () => {
-  const monstersSource = read('js/monsters.js');
-  assert.match(monstersSource, /from '\.\/i18n\.js'/);
-  assert.match(monstersSource, /export const MONSTER_CATALOG/);
-  assert.match(monstersSource, /export function monsterSvg/);
-  assert.match(monstersSource, /currentColor/);
-  assert.match(monstersSource, /role="img"/);
-  assert.match(monstersSource, /aria-label=/);
-  assert.match(monstersSource, /replaceAll\('&', '&amp;'/);
-
-  const monsters = await import(new URL('../js/monsters.js?phase6-test', import.meta.url));
-  assert.deepEqual(Object.keys(monsters.MONSTER_CATALOG), ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
-  assert.equal(monsters.MONSTER_CATALOG.sat.id, monsters.MONSTER_CATALOG.sun.id);
-
-  for (const weekdayKey of Object.keys(monsters.MONSTER_CATALOG)) {
-    assert.equal(monsters.monsterForWeekday(weekdayKey).weekdayKey, weekdayKey);
-  }
-  for (const state of ['sleeping', 'awake', 'angry', 'wounded', 'fury', 'defeated']) {
-    for (const variant of ['normal', 'gold', 'streak']) {
-      const svg = monsters.monsterSvg({ species: 'mon', state, variant, hpPct: 42, sizeClass: 'sm' });
-      assert.match(svg, new RegExp(`monster-svg--${state}`));
-      assert.match(svg, new RegExp(`monster-svg--${variant}`));
-      assert.match(svg, /role="img"/);
-      assert.match(svg, /currentColor/);
-    }
-  }
-  const safe = monsters.monsterSvg({ species: 'mon', state: '<script>', sizeClass: 'x" onload="alert(1)' });
-  assert.doesNotMatch(safe, /<script|onload=/i);
-});
-
-test('state y settings conservan defaults y normalización de Fase 6', () => {
-  const game = read('js/game.js');
-  const appMain = read('js/app-main.js');
-  assert.match(game, /export function createDefaultGameState\(\)/);
-  assert.match(game, /chest: \{ pending: false, sealedOn: null \}/);
-  assert.match(game, /live: \{ dayKey: null, combo: 0, shiftAlarmAt: null \}/);
-  assert.match(game, /export function normalizeGameState\(raw\)/);
-  assert.match(game, /shields: boundedGameNumber\(source\.shields, GAME_SHIELD_CAP, true\)/);
-  assert.doesNotMatch(game, /intensity === 'off'\) settings\.game\.enabled = false/);
-  assert.match(appMain, /game: createDefaultGameState\(\)/);
-  assert.match(appMain, /game: normalizeGameState\(src\.game\)/);
-  assert.match(appMain, /game: \{ enabled: false, intensity: 'arcade', soundEnabled: true, soundVolume: 40 \}/);
-  assert.match(game, /if \(typeof settings\.game\.enabled !== 'boolean'\) settings\.game\.enabled = false/);
-});
-
-test('XP solo entra por llamadas actuales y oportunas, con tope diario y lock de snapshot', () => {
-  const game = read('js/game.js');
-  const calls = read('js/calls.js');
-  assert.match(game, /export const GAME_DAILY_XP_CAP = 150/);
-  assert.match(game, /Math\.min\(GAME_DAILY_XP_CAP/);
-  assert.match(game, /eligibleCalls\.length\s*\? Math\.min\(GAME_DAILY_XP_CAP/);
-  assert.match(game, /const importedDay = todayCallDateKey\(new Date\(imported\)\)/);
-  assert.match(game, /if \(importedDay === dayKey\) return true/);
-  assert.match(game, /return callDateKeyFromValue\(call\.shiftDayKey\) === dayKey/);
-  assert.match(game, /if \(lag < 0 \|\| lag > 30 \* 60000\) return false/);
-  assert.match(game, /Number\.isFinite\(lockedXp\) \? Math\.min\(rawXp, lockedXp\) : rawXp/);
-  assert.match(game, /!\['manual', 'live', 'import'\]\.includes\(source\)/);
-  assert.match(calls, /onGameCallSaved\(candidate, pendingBackup \? 'live' : 'manual'\)/);
-  assert.match(calls, /onGameCallSaved\(candidate, 'live'\)/);
-  assert.doesNotMatch(calls, /onGameCallSaved\([^\n]*import/i);
-});
-
-test('el hook real conserva el botín XP de la quinta llamada al reconciliar y recargar', () => {
-  const keyFor = (date = new Date()) => `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}/${date.getFullYear()}`;
-  const parseDayKey = (value) => {
-    const match = String(value ?? '').match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-    if (!match) return null;
-    const date = new Date(Number(match[3]), Number(match[1]) - 1, Number(match[2]));
-    return date.getFullYear() === Number(match[3]) && date.getMonth() === Number(match[1]) - 1 && date.getDate() === Number(match[2]) ? date : null;
-  };
-  const dayKeyFromValue = (value) => {
-    const raw = String(value ?? '').trim();
-    if (parseDayKey(raw)) return raw;
-    const date = new Date(value);
-    return Number.isFinite(date.getTime()) ? keyFor(date) : null;
-  };
-  let currentState;
-  let callRows = [];
-  const currentSettings = {
-    game: { enabled: true, intensity: 'subtle' },
-    reinforcement: { enabled: false, askAfterCall: false, rewards: [] },
-    adherenceGoalPct: 95,
-  };
-  const callsForDay = (dayKey) => callRows.filter((call) => dayKeyFromValue(call.shiftDayKey || call.callDate) === dayKey);
-  const importedCallStats = (calls = []) => ({
-    productive: calls.reduce((total, call) => total + (Number(call.durationMin) || 0), 0),
-    total: calls.length, zeroCount: 0, dropped: 0, gapTotal: 0,
-    earnings: calls.reduce((total, call) => total + (Number(call.pay) || 0), 0),
-  });
-  const effectiveDailyGoal = () => ({ min: 1000, usd: 10000 });
-  const convertedAmountText = () => '';
-  const escapeHtml = (value) => String(value);
-  const saveStateOnly = () => {};
-  const saveSettingsOnly = () => {};
-  const toast = () => {};
-  const previousDocument = globalThis.document;
-  const previousWindow = globalThis.window;
-  globalThis.window = { matchMedia: () => ({ matches: true }) };
-  globalThis.document = {
-    activeElement: null,
-    documentElement: { classList: { toggle() {} } },
-    getElementById: () => null,
-    querySelector: () => null,
-    querySelectorAll: () => [],
-  };
-  setAppSettings(currentSettings);
-  configureGameContext({
-    callDateKeyFromValue: dayKeyFromValue,
-    callsForDay,
-    cycleEarningsForOffset: () => ({ earnings: 0, start: new Date(), end: new Date() }),
-    effectiveCycleGoal: () => 1000,
-    dayAdherence: () => ({ scorePct: 0, checkpoints: [] }),
-    dayConfigFor: () => ({ blocks: [] }),
-    effectiveDailyGoal,
-    formatCallDayLabel: (value) => String(value),
-    formatMinutes: (value) => String(value),
-    computeComplianceStreak: () => ({ days: 0 }),
-    higherRateBonusForCall: () => null,
-    higherRateLiveStatus: () => ({ active: false }),
-    importedCallStats,
-    parseMoney: (value) => Number(value) || 0,
-    saveStateOnly,
-    todayCallDateKey: keyFor,
-    weekdayKeyForDayKey: () => 'mon',
-  });
-  configurePositiveReinforcementContext({
-    callDateKeyFromValue: dayKeyFromValue, callsForDay, closeModal: () => {}, convertedAmountText,
-    effectiveDailyGoal, escapeHtml, importedCallStats, openModal: () => {}, saveSettingsOnly,
-    saveStateOnly, toast, todayCallDateKey: keyFor,
-  });
-
-  const resetScenario = ({ bonusXp = 0, xpLocked } = {}) => {
-    const game = createDefaultGameState();
-    // Owning the entire catalog guarantees XP even on dates whose loot is cosmetic.
-    game.accessories = ACCESSORY_CATALOG.map(item => item.label);
-    game.days[keyFor()] = { bonusXp, ...(xpLocked === undefined ? {} : { xpLocked }) };
-    currentState = { game, gapAnnotations: {} };
-    callRows = [];
-    setAppState(currentState);
-    setAppCalls(callRows);
-    const baseNow = Date.now() - 240000;
-    for (let index = 0; index < 5; index++) {
-      const start = baseNow + index * 20000;
-      const end = start + 10000;
-      const call = {
-        id: `loot-call-${index + 1}`,
-        callDate: keyFor(),
-        shiftDayKey: keyFor(),
-        billable: 'Yes',
-        dropped: 'No',
-        countsAsProductive: true,
-        durationMin: 1,
-        pay: 0,
-        startISO: new Date(start).toISOString(),
-        endISO: new Date(end).toISOString(),
-        importedAt: new Date(end + 1000).toISOString(),
-      };
-      callRows.push(call);
-      setAppCalls(callRows);
-      onGameCallSaved(call, 'manual', { random: () => 0.99 });
-    }
-    return keyFor();
-  };
-
-  try {
-    const dayKey = resetScenario();
-    const lootKey = `loot:${dayKey}:5`;
-    const receipt = currentState.game.ledger[lootKey];
-    assert.equal(receipt.type, 'bonusXp');
-    assert.ok(receipt.applied > 0, 'la quinta llamada debe aplicar XP por debajo del tope diario');
-    assert.equal(currentState.game.days[dayKey].bonusXp, receipt.applied);
-    assert.ok(computeGameDay(dayKey).xp < 150);
-
-    currentState = { ...currentState, game: normalizeGameState(JSON.parse(JSON.stringify(currentState.game))) };
-    setAppState(currentState);
-    onGameCallsChanged(dayKey);
-    assert.equal(currentState.game.ledger[lootKey].applied, receipt.applied);
-    assert.equal(currentState.game.days[dayKey].bonusXp, receipt.applied);
-    assert.equal(Object.keys(currentState.game.ledger).filter((key) => key.startsWith(`loot:${dayKey}:`)).length, 1);
-
-    const lockedDay = resetScenario({ xpLocked: 80 });
-    assert.equal(currentState.game.ledger[`loot:${lockedDay}:5`].applied, 0);
-    assert.equal(currentState.game.days[lockedDay].bonusXp, 0);
-
-    const cappedDay = resetScenario({ bonusXp: 150 });
-    assert.equal(currentState.game.ledger[`loot:${cappedDay}:5`].applied, 0);
-    assert.equal(currentState.game.days[cappedDay].bonusXp, 150);
-  } finally {
-    setAppState(null);
-    setAppCalls([]);
-    setAppSettings({});
-    if (previousDocument === undefined) delete globalThis.document;
-    else globalThis.document = previousDocument;
-    if (previousWindow === undefined) delete globalThis.window;
-    else globalThis.window = previousWindow;
-  }
-});
 
 test('el bono manual de Higher Rate no se suma dos veces y los tiles conservan su efecto fuera de ventana', () => {
   const calls = read('js/calls.js');
@@ -238,7 +40,7 @@ test('el bono manual de Higher Rate no se suma dos veces y los tiles conservan s
   assert.match(calls, /if \(!callStart\)\s*\{\s*toast\(translateText\('Elige una hora válida'\)\)/);
 });
 
-test('la hora manual vacía no se convierte en 07:00 y las horas futuras no se guardan ni reciben XP', () => {
+test('la hora manual vacía no se convierte en 07:00 y las horas futuras no se guardan ni reciben aviso', () => {
   const calls = read('js/calls.js');
   const timeHelper = between(calls, 'function callStartLabelFromHHMM', '// El pago estimado');
   const formatHHMM = (value) => {
@@ -253,7 +55,7 @@ test('la hora manual vacía no se convierte en 07:00 y las horas futuras no se g
   assert.match(calls, /La llamada no puede terminar en el futuro/);
 
   const game = read('js/game.js');
-  const eligibilitySource = between(game, 'function callIsXpEligible', 'function plannedPauseCount');
+  const eligibilitySource = between(game, 'function callIsRecentlyProductive', 'function higherRateBonusAmount');
   const now = new Date(2026, 8, 28, 12, 0, 0).getTime();
   class FixedDate extends Date {
     constructor(...args) { super(...(args.length ? args : [now])); }
@@ -264,35 +66,6 @@ test('la hora manual vacía no se convierte en 07:00 y las horas futuras no se g
   const baseCall = { billable: 'Yes', dropped: 'No', durationMin: 1, importedAt: new FixedDate(now).toISOString(), startISO: new FixedDate(now - 120000).toISOString(), endISO: new FixedDate(now - 60000).toISOString() };
   assert.equal(eligible(baseCall, dayKeyFor()), true);
   assert.equal(eligible({ ...baseCall, startISO: new FixedDate(now + 60000).toISOString(), endISO: new FixedDate(now + 120000).toISOString() }, dayKeyFor()), false);
-});
-
-test('la normalización profunda contiene xp, estrellas, misiones y monstruo corruptos importados', () => {
-  const game = read('js/game.js');
-  const normalizerSource = between(game, 'export function createDefaultGameState()', '\n\nexport function xpThresholdForLevel').replace(/^export /gm, '');
-  const catalog = { mon: { id: 'mon' }, tue: { id: 'tue' } };
-  const normalize = new Function('GAME_DAILY_XP_CAP', 'GAME_SHIELD_CAP', 'GAME_DAY_LIMIT', 'callDateToDate', 'MONSTER_CATALOG', 'createDefaultReinforcementState', 'normalizeReinforcementState', `${normalizerSource}; return normalizeGameState;`)(150, 3, 400, validCallDate, catalog, createDefaultReinforcementState, normalizeReinforcementState);
-  const payload = {
-    totalXp: '<svg onload=alert(1)>',
-    days: {
-      '09/28/2026': {
-        finalized: true,
-        xp: '<img src=x onerror=alert(1)>',
-        stars: -1,
-        missions: '<script>alert(1)</script>',
-        monster: { species: '<svg onload=alert(1)>', variant: '<script>', defeated: 'true', hpPct: 'NaN' },
-      },
-      '99/99/2026': { finalized: true, xp: 50, stars: 2 },
-    },
-  };
-  const normalized = normalize(payload);
-  const day = normalized.days['09/28/2026'];
-  assert.equal(normalized.totalXp, 0);
-  assert.deepEqual(Object.keys(normalized.days), ['09/28/2026']);
-  assert.equal(day.xp, 0);
-  assert.equal(day.stars, 0);
-  assert.deepEqual(day.missions, []);
-  assert.deepEqual(day.monster, { species: 'mon', variant: 'normal', defeated: false, hpPct: 0 });
-  assert.doesNotMatch(JSON.stringify(normalized), /<script|onerror=|onload=/i);
 });
 
 test('CSS de juego cubre motion reducido, layout estrecho y responsive', () => {
@@ -334,45 +107,6 @@ test('build mantiene módulos fuente fuera de public y el worker precarga el CSS
   }
 });
 
-test('Logros conserva las tarjetas de app.html y solo actualiza sus nodos internos', () => {
-  const game = read('js/game.js');
-  assert.doesNotMatch(game, /summary\.innerHTML\s*=/);
-  assert.doesNotMatch(game, /streakRoot\.innerHTML\s*=/);
-  assert.doesNotMatch(game, /levelRoot\.innerHTML\s*=/);
-  assert.doesNotMatch(game, /trophies\.innerHTML\s*=/);
-  assert.doesNotMatch(game, /records\.innerHTML\s*=/);
-  assert.doesNotMatch(game, /last\.innerHTML\s*=/);
-  assert.match(game, /data-game-role=["\']bestiary-list/);
-  assert.match(game, /data-game-role=["\']trophy-list/);
-  assert.match(game, /data-game-role=["\']records-list/);
-  assert.match(game, /data-game-stat=["\']\$\{key\}/);
-  assert.match(game, /collection:\s*String\(seen\.size\)/);
-  assert.match(game, /data-game-action=["\']open-last-clear/);
-});
-
-
-test('edición y borrado corrigen datos sin reescribir XP ya congelado por STAGE CLEAR', () => {
-  const game = read('js/game.js');
-  const calls = read('js/calls.js');
-  assert.match(game, /STAGE CLEAR congela XP/);
-  const changed = game.slice(game.indexOf('export function onGameCallsChanged'), game.indexOf('export function onGameDayReset'));
-  assert.doesNotMatch(changed, /state\.game\.totalXp\s*=/);
-  assert.doesNotMatch(changed, /entry\.xp\s*=/);
-  assert.match(changed, /entry\.earnings\s*=/);
-  assert.match(changed, /entry\.monster\s*=/);
-  assert.match(calls, /onGameCallsChanged\(affectedDayKey\)/);
-});
-
-test('STAGE CLEAR reversible restaura escudos y racha, y conserva snapshot consistente', () => {
-  const game = read('js/game.js');
-  assert.match(game, /shieldsBefore/);
-  assert.match(game, /bestStreakBefore/);
-  assert.match(game, /streakShieldAwardedKey/);
-  assert.match(game, /entry\.xpBreakdown \|\| fallback\.xpBreakdown/);
-  assert.match(game, /entry\.earnings/);
-  assert.match(game, /recomputeBestStreak\(\)/);
-});
-
 test('avisos y modales de juego se recuperan al cerrar', () => {
   const game = read('js/game.js');
   const appMain = read('js/app-main.js');
@@ -380,54 +114,6 @@ test('avisos y modales de juego se recuperan al cerrar', () => {
   assert.match(appMain, /new CustomEvent\('app:modal-closed'/);
   assert.match(appMain, /closeModal\('stageClearModal'\)/);
   assert.match(appMain, /closeModal\('chestModal'\)/);
-});
-
-test('Logros muestra accesorios y cofre pendiente, y racha de Reportes respeta escudos', () => {
-  const game = read('js/game.js');
-  const reports = read('js/reports.js');
-  assert.match(game, /game-accessory-card/);
-  assert.match(game, /data-game-role="chest-claim"/);
-  assert.match(game, /nextUnownedAccessory/);
-  assert.match(reports, /state\.game\?\.days\?\.\[dayKey\]\?\.shieldUsed/);
-});
-
-test('XP flotante representa concesión real y distingue XP sellado', () => {
-  const game = read('js/game.js');
-  assert.match(game, /const grantedXp = Math\.max\(0, currentDay\.xp - beforeCallXp\)/);
-  assert.match(game, /XP DIARIO SELLADO/);
-  assert.match(game, /BOTÍN EXTRA/);
-});
-
-
-test('pendientes finales de Phase 6 quedan conectados a comportamiento real', () => {
-  const game = read('js/game.js');
-  const css = read('css/game.css');
-
-  assert.match(game, /if \(!arcadeEnabled\(\) \|\| window\.matchMedia[\s\S]*game-live-xp-float/);
-  assert.match(game, /triggerGameEvent\('gameArena', 'clear'/);
-  assert.match(game, /classList\.toggle\('is-revealing', arcadeEnabled\(\)\)/);
-  assert.match(css, /game-arena--arcade\[data-game-event="clear"\]/);
-  assert.match(css, /@keyframes game-pixel-burst/);
-
-  assert.match(game, /game-stage-comparisons/);
-  assert.match(game, /Récord diario previo/);
-  assert.match(game, /XP para nivel/);
-  assert.match(game, /stageComparisonSnapshot/);
-
-  assert.match(game, /NUEVO RÉCORD · Racha/);
-  assert.match(game, /Cofre abierto ·/);
-  assert.match(game, /syncCycleBossAchievement/);
-  assert.match(game, /cycle-defeat:\$\{endKey\}/);
-});
-
-test('consistencia de gamificación se mantiene aunque esté apagada', () => {
-  const game = read('js/game.js');
-  const changed = game.slice(game.indexOf('export function onGameCallsChanged'), game.indexOf('export function onGameShiftAlarmFired'));
-  const started = game.slice(game.indexOf('export function onGameShiftStarted'), game.indexOf('function stageComparisonSnapshot'));
-  assert.doesNotMatch(changed, /if \(!gameEnabled\(\)\) return false/);
-  assert.match(changed, /const enabled = gameEnabled\(\)/);
-  assert.match(started, /if \(hadFinalizedDay\)/);
-  assert.match(started, /revokeStageClear\(dayKey, \{ silent: !enabled \}\)/);
 });
 
 test('Arcade fijo y reduced-motion solo elimina movimiento', () => {
@@ -472,15 +158,6 @@ test('simulación mensual: llamada no salta ventana temprana ni reescribe entrad
   assert.match(appMain, /endIsAutomatic/);
 });
 
-test('simulación mensual: XP solo para llamadas productivas ya terminadas', () => {
-  const game = read('js/game.js');
-  const eligibility = game.slice(game.indexOf('function callIsXpEligible'), game.indexOf('function plannedPauseCount'));
-  assert.match(eligibility, /countsAsProductive/);
-  assert.match(eligibility, /billable/);
-  assert.match(eligibility, /dropped/);
-  assert.match(eligibility, /if \(lag < 0 \|\| lag > 30 \* 60000\) return false/);
-});
-
 test('simulación mensual: llamada manual futura se rechaza y live conserva segundos', () => {
   const calls = read('js/calls.js');
   assert.match(calls, /La llamada no puede terminar en el futuro/);
@@ -488,32 +165,6 @@ test('simulación mensual: llamada manual futura se rechaza y live conserva segu
   assert.doesNotMatch(calls, /Math\.max\(1, Math\.round\(\(new Date\(endedAtISO\)/);
 });
 
-
-test('segunda simulación mensual: importaciones tardías no dan XP indirecto', () => {
-  const game = read('js/game.js');
-  const compute = game.slice(game.indexOf('export function computeGameDay'), game.indexOf('function yesterdayShadowPct'));
-  assert.match(compute, /const xpStats = importedCallStats\(eligibleCalls, dayKey\)/);
-  assert.match(compute, /missionSnapshot\(dayKey, xpStats/);
-  assert.match(compute, /xpStats\.productive/);
-  assert.match(compute, /const rawXp = eligibleCalls\.length/);
-});
-
-test('segunda simulación mensual: segunda sesión reabre el cierre antes de volver a congelar', () => {
-  const game = read('js/game.js');
-  const started = game.slice(game.indexOf('export function onGameShiftStarted'), game.indexOf('function stageComparisonSnapshot'));
-  assert.match(started, /hadFinalizedDay/);
-  assert.match(started, /revokeStageClear\(dayKey, \{ silent: !enabled \}\)/);
-  assert.match(started, /STAGE CLEAR reabierto/);
-});
-
-test('segunda simulación mensual: caja y combo se reconcilian al corregir una live', () => {
-  const game = read('js/game.js');
-  assert.match(game, /function reconcileLiveComboAndLoot/);
-  assert.match(game, /rollbackLootReceipt/);
-  assert.match(game, /latestOtherGapResetTime/);
-  assert.match(game, /state\.game\.live\.combo = eligible/);
-  assert.match(game, /receipt = \{ type: 'accessory'/);
-});
 
 test('segunda simulación mensual: Propio puede corregir una llamada ya importada', () => {
   const appMain = read('js/app-main.js');
@@ -547,15 +198,6 @@ test('segunda simulación mensual: descartar no reinicia ACW y reemplazar live c
   assert.match(appMain, /state\.lastCallEndedAt = item\.call\.endISO/);
 });
 
-test('segunda simulación mensual: STAGE CLEAR usa el día del inicio del turno al cruzar medianoche', () => {
-  const appMain = read('js/app-main.js');
-  const game = read('js/game.js');
-  assert.match(appMain, /const shiftDayKey = todayCallDateKey\(new Date\(state\.shiftStartedAt\)\)/);
-  assert.match(appMain, /onGameShiftEnded\(shiftDayKey\)/);
-  assert.match(game, /export function onGameShiftEnded\(dayKey = currentGameDayKey\(\)\)/);
-});
-
-
 test('tercera simulación mensual: Finanzas nunca queda sobreasignada al bajar ganancias', () => {
   const finance = read('js/finance.js');
   const calls = read('js/calls.js');
@@ -566,28 +208,6 @@ test('tercera simulación mensual: Finanzas nunca queda sobreasignada al bajar g
   assert.match(finance, /const trimmed = financeTrimAssignmentsToEarnings\(\)/);
   assert.match(calls, /financeRunAutoFillCascade\(\);[\s\S]*if \(saveAll\(\) === false\) \{[\s\S]*setAppState\(previous.state\)[\s\S]*return false;[\s\S]*onGameCallsChanged/);
   assert.match(appMain, /function applyImportedPayload[\s\S]*financeRunAutoFillCascade\(\)/);
-});
-
-test('tercera simulación mensual: reset y vaciado limpian estados derivados sin romper XP congelado', () => {
-  const game = read('js/game.js');
-  const appMain = read('js/app-main.js');
-  assert.match(game, /export function onGameDayReset/);
-  assert.match(game, /delete state\.game\.days\[normalized\]/);
-  assert.match(game, /entry\.callCount === 0 && state\.game\.chest\.pending/);
-  assert.match(game, /if \(entry\.finalized \|\| Number\.isFinite/);
-  assert.match(appMain, /onGameDayReset\(normalizedDayKey \|\| dayKey\)/);
-  assert.match(appMain, /delete state\.dayInterruptions\[normalizedDayKey\]/);
-  assert.match(appMain, /state\.lastCallEndedAt = null/);
-});
-
-test('tercera simulación mensual: gamificación apagada mantiene consistencia y filas de cero minutos no dan XP', () => {
-  const game = read('js/game.js');
-  const eligibility = game.slice(game.indexOf('function callIsXpEligible'), game.indexOf('function plannedPauseCount'));
-  const started = game.slice(game.indexOf('export function onGameShiftStarted'), game.indexOf('function stageComparisonSnapshot'));
-  assert.match(eligibility, /Number\(call\.durationMin\) > 0/);
-  assert.match(eligibility, /call\.shiftDayKey/);
-  assert.match(started, /if \(hadFinalizedDay\)/);
-  assert.match(started, /revokeStageClear\(dayKey, \{ silent: !enabled \}\)/);
 });
 
 test('tercera simulación mensual: turno nocturno conserva día contable y correcciones oficiales', () => {
@@ -615,15 +235,6 @@ test('tercera simulación mensual: horario y meta históricos quedan congelados 
   assert.match(settings, /snapshotHistoricalPlanning\(\);[\s\S]*settings\.productiveGoalMin/);
 });
 
-test('tercera simulación mensual: recompensas financieras son reversibles', () => {
-  const game = read('js/game.js');
-  assert.match(game, /function rollbackFinanceReward/);
-  assert.match(game, /state\.game\.trophies = state\.game\.trophies\.filter/);
-  assert.match(game, /accessory: accessory \|\| null/);
-  assert.match(game, /!validMetaKeys\.has\(key\)/);
-  assert.match(game, /!validPaidKeys\.has\(key\)/);
-});
-
 test('tercera simulación mensual: ACW se recalcula al editar borrar o vaciar llamadas', () => {
   const calls = read('js/calls.js');
   assert.match(calls, /function reconcileLastCallEndedAt/);
@@ -638,20 +249,7 @@ test('tercera simulación mensual: pegar llamadas de hoy vuelve a auto iniciar e
   assert.match(importing, /!state\.shiftStartedAt && !state\.shiftEndedAt/);
 });
 
-test('tercera simulación mensual: editar estado manual del día reconcilia gamificación', () => {
-  const appMain = read('js/app-main.js');
-  const game = read('js/game.js');
-  assert.match(appMain, /onGameDayMetadataChanged\(normalized\)/);
-  assert.match(game, /export function onGameDayMetadataChanged/);
-  assert.match(game, /state\.game\.bestStreak = recomputeBestStreak\(\)/);
-});
-
-
-test('runtime smoke: helpers de renderGame existen para Logros y Higher Rate', () => {
-  const game = read('js/game.js');
-  for (const name of ['gameStreak', 'recomputeBestStreak', 'gameLevelProgress', 'withConversion', 'monsterStateFor', 'monsterVariantFor']) {
-    assert.match(game, new RegExp('function\\s+' + name + '\\s*\\('), name + ' debe existir');
-  }
+test('runtime smoke: la página de historial positivo y Higher Rate siguen conectados', () => {
   const appMain = read('js/app-main.js');
   const higherRate = read('js/higher-rate.js');
   assert.match(appMain, /if \(page === 'achievements'\) renderGame\(\)/);
@@ -726,18 +324,6 @@ test('cuarta simulación mensual: descartar live también revierte efectos de ga
   const appMain = read('js/app-main.js');
   assert.match(appMain, /const gameBeforeAutoShift = needsAutoShift[\s\S]*gameBeforeAutoShift,[\s\S]*if \(needsAutoShift\) onGameShiftStarted\(\{ continued: false, captureState:/);
   assert.match(appMain, /discarded\.gameBeforeAutoShift/);
-});
-
-
-test('cuarta simulación mensual: gamificación nocturna no se parte a medianoche', () => {
-  const game = read('js/game.js');
-  assert.match(game, /function currentGameDayKey\(\)/);
-  assert.match(game, /return todayCallDateKey\(startedAt\)/);
-  assert.match(game, /ensureGameState\(preferredDayKey = null\)/);
-  assert.match(game, /const dayKey = callDateKeyFromValue\(call\.shiftDayKey\)/);
-  assert.match(game, /ensureGameState\(dayKey\)/);
-  assert.match(game, /const dayKey = currentGameDayKey\(\);[\s\S]*computeGameDay\(dayKey\)/);
-  assert.doesNotMatch(game, /onGameDayRollover\(\)[\s\S]{0,180}state\.game\.live = \{ dayKey: todayCallDateKey\(\)/);
 });
 
 

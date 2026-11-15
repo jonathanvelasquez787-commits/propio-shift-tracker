@@ -1,4 +1,3 @@
-import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 const MONETARY_STEPS = [25, 50, 75, 100];
 
 function finiteNumber(value, fallback = 0) {
@@ -69,45 +68,4 @@ export function activeWorkSinceLastCall({
     }
   }
   return Math.max(0, total);
-}
-
-export function supportiveDayEvidence({
-  callCount = 0, earnings = 0, bestCallAmount = 0, yesterdayEarnings = 0,
-  yesterdayHasData = false, onTimePauses = 0, recoveries = 0, streak = 0,
-  compliant = false, formatAmount,
-} = {}) {
-  const count = Math.max(0, Math.floor(finiteNumber(callCount)));
-  const earned = Math.max(0, finiteNumber(earnings));
-  const recovered = Math.max(0, Math.floor(finiteNumber(recoveries)));
-  const punctual = Math.max(0, Math.floor(finiteNumber(onTimePauses)));
-  const things = [];
-  const amount = typeof formatAmount === 'function' ? formatAmount : null;
-  if (count > 0) {
-    const gain = earned > 0 && amount ? ui` y sumaste ${amount(earned)}` : '';
-    things.push(ui`Completaste ${count} ${count === 1 ? translateText('llamada') : translateText('llamadas')}${gain}.`);
-  }
-  if (recovered > 0 && count > 0) {
-    things.push(ui`Volviste a tomar una llamada después de ${recovered === 1 ? translateText('un momento difícil') : ui`${recovered} momentos difíciles`}.`);
-  }
-  if (punctual > 0) {
-    things.push(ui`Volviste a tiempo de ${punctual} ${punctual === 1 ? translateText('pausa') : translateText('pausas')}.`);
-  }
-  if (count > 0 && yesterdayHasData && earned > Math.max(0, finiteNumber(yesterdayEarnings))) {
-    things.push(translateText('Hoy tus ganancias superaron las de ayer: un avance respecto a tu propio día.'));
-  }
-  const best = Math.max(0, finiteNumber(bestCallAmount));
-  if (count > 0 && best > 0 && amount) {
-    things.push(ui`Tu mejor llamada del día aportó ${amount(best)}.`);
-  }
-  const closingStreak = Math.max(0, Math.floor(finiteNumber(streak)));
-  const projection = compliant && count > 0 && closingStreak > 0
-    ? ui`Si mañana completas otro día que cumpla tu plan, tu racha llegará a ${closingStreak + 1} días.`
-    : null;
-  return { things: things.slice(0, 3), projection };
-}
-
-export function surpriseDecision(random = Math.random) {
-  if (typeof random !== 'function') return false;
-  const draw = random();
-  return typeof draw === 'number' && Number.isFinite(draw) && draw >= 0 && draw < 0.15;
 }

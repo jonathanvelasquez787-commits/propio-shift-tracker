@@ -31,9 +31,9 @@ export const REINFORCEMENT_TEXTS = Object.freeze({
     translateText('Hito del {percent}% alcanzado · sumaste {amount} hoy'),
   ]),
   pause: Object.freeze([
-    translateText('Volviste a tiempo de {pause} · cuidaste tu descanso y tu ritmo{xp}'),
-    translateText('{pause} terminado a tiempo · tu pausa también cuenta{xp}'),
-    translateText('Regreso puntual de {pause} · listo para continuar{xp}'),
+    translateText('Volviste a tiempo de {pause} · cuidaste tu descanso y tu ritmo'),
+    translateText('{pause} terminado a tiempo · tu pausa también cuenta'),
+    translateText('Regreso puntual de {pause} · listo para continuar'),
   ]),
   dropped: Object.freeze([
     translateText('La llamada se cortó · una llamada no define tu día'),
@@ -68,12 +68,10 @@ export const REINFORCEMENT_TEXTS = Object.freeze({
 });
 
 let queueToast = null;
-let triggerEffect = null;
 let playSound = null;
 
 export function configureReinforcementFeedback(context = {}) {
   queueToast = typeof context.queueToast === 'function' ? context.queueToast : null;
-  triggerEffect = typeof context.triggerEffect === 'function' ? context.triggerEffect : null;
   playSound = typeof context.playSound === 'function' ? context.playSound : null;
 }
 
@@ -119,8 +117,6 @@ export function notifyReinforcement(message, { channel = 'game', effect = false,
   if (!text || !reinforcementFeedbackEnabled(channel) || !queueToast) return false;
   queueToast(text, effect ? 'record' : '', { channel, ...(repeat ? { repeat: true } : {}) });
   if (sound && playSound) playSound(sound, dayKey, channel === 'personal' || (channel === 'either' && settings.game?.enabled !== true) ? 'personal' : 'game');
-  if (effect && settings.game?.enabled === true && triggerEffect
-      && !globalThis.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches) triggerEffect(text);
   return true;
 }
 
@@ -153,6 +149,5 @@ export function chooseCallFeedback(call, { previousCalls = [], bonus = 0, money,
 
 export function resetFeedbackForTests() {
   queueToast = null;
-  triggerEffect = null;
   playSound = null;
 }
