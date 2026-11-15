@@ -7037,7 +7037,7 @@ export function render() {
 
     function navigateToPage(page) {
       // Páginas válidas del menú lateral.
-      const pages = ['home', 'schedule', 'reports', 'paydates', 'calendar', 'finance', 'achievements', 'help'];
+      const pages = ['home', 'schedule', 'reports', 'paydates', 'calendar', 'finance', 'positive', 'help'];
       if (!pages.includes(page)) page = 'home';
       currentPage = page;
       // Render ya no recalcula renderReportsDashboard salvo que currentPage === 'reports' (ver esa
@@ -7048,7 +7048,7 @@ export function render() {
       }
       if (page === 'paydates') renderPayDatesSection();
       if (page === 'finance') renderFinanceSection();
-      if (page === 'achievements') renderGame();
+      if (page === 'positive') renderGame();
       // Vista anual por default.
       if (page === 'calendar') { syncCalViewVisibility(); if (calViewMode === 'year') renderCalYear(); else renderCalendarMonth(); }
       relocateCallsSection(page);
@@ -7577,7 +7577,7 @@ export function render() {
     });
     document.addEventListener('click',event=>{
       if(!event.target.closest?.('[data-reflection-history]'))return;
-      closeModal('positiveReflectionModal');navigateToPage('achievements');
+      closeModal('positiveReflectionModal');navigateToPage('positive');
       const target=document.getElementById('positiveHistoryPanel');
       if(target.tagName==='DETAILS')target.open=true;
       target.scrollIntoView({block:'start'});target.setAttribute('tabindex','-1');target.focus({preventScroll:true});

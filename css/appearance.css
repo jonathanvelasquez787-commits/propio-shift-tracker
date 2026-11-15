@@ -69,7 +69,7 @@ html:root[data-palette]:not([data-palette="original"]) :is(.fin-header-icon,.mc-
 html:root[data-palette]:not([data-palette="original"]) :is(.fin-available-card,.mc-info-box,.gh-goal-card) { background:var(--palette-card-tint); border-color:rgba(var(--palette-primary-rgb),.25); }
 html:root[data-palette]:not([data-palette="original"]) .fin-available-label { color:var(--cyan); }
 html:root[data-palette]:not([data-palette="original"]) .sidebar-link.active { background:var(--palette-card-tint); color:var(--cyan); }
-html:root[data-palette]:not([data-palette="original"]) :is(.game-arena,.game-achievements-hero,.game-cycle-boss) { background:var(--panel-navy); }
+html:root[data-palette]:not([data-palette="original"]) .positive-hero { background:var(--panel-navy); }
 html:root[data-palette]:not([data-palette="original"]) :is(.game-panel,.game-missions) { background:var(--panel-navy); }
 @media(max-width:800px) { .appearance-palette-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media(max-width:650px) {

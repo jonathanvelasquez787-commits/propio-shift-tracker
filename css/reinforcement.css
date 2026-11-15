@@ -16,14 +16,14 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
   border: 0;
 }
 /* El atributo hidden debe ganar sobre los display:flex/grid de la capa de juego. */
-.game-achievements-page[hidden],
+.positive-page[hidden],
 .game-toast-stack[hidden],
 .positive-evidence-card[hidden] {
   display: none !important;
 }
 .game-toast-stack,
-.game-achievements-page,
-.game-achievements-page *,
+.positive-page,
+.positive-page *,
 .game-settings-section {
   min-width: 0;
 }
@@ -73,17 +73,17 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 
 .game-kicker { color: var(--rpt-purple); font-size: 10px; font-weight: 950; letter-spacing: .14em; line-height: 1.2; text-transform: uppercase; }
 
-.game-achievements-hero-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.positive-hero-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
 .game-panel h2 { min-width: 0; margin: 4px 0 0; color: var(--text); font-size: 16px; letter-spacing: -.035em; overflow-wrap: anywhere; }
 
 /* Página Logros. */
-.game-achievements-page { display: grid; gap: 10px; padding-bottom: 18px; }
-.game-achievements-hero,
+.positive-page { display: grid; gap: 10px; padding-bottom: 18px; }
+.positive-hero,
 .game-panel { border: 1px solid var(--card-line); border-radius: var(--radius); background: var(--panel-navy); box-shadow: var(--shadow); }
-.game-achievements-hero { padding: 14px; background: var(--panel-navy); }
-.game-achievements-hero-row { align-items: end; margin-top: 8px; }
-.game-achievements-hero h1 { margin: 0; font-size: clamp(23px, 3vw, 28px); letter-spacing: -.055em; }
-.game-achievements-hero p { margin: 6px 0 0; color: var(--muted); font-size: 13px; line-height: 1.45; }
+.positive-hero { padding: 14px; background: var(--panel-navy); }
+.positive-hero-row { align-items: end; margin-top: 8px; }
+.positive-hero h1 { margin: 0; font-size: clamp(23px, 3vw, 28px); letter-spacing: -.055em; }
+.positive-hero p { margin: 6px 0 0; color: var(--muted); font-size: 13px; line-height: 1.45; }
 .game-panel { padding: 11px; overflow: hidden; }
 .game-panel-badge { flex: 0 0 auto; padding: 5px 8px; border: 1px solid var(--line); border-radius: 8px; color: var(--muted); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 10px; font-weight: 900; }
 .game-collection-empty { grid-column: 1 / -1; padding: 16px 10px; color: var(--muted); font-size: 11.5px; line-height: 1.45; text-align: center; }
@@ -136,7 +136,7 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 
 @media (prefers-reduced-motion: reduce) {
 .game-toast-stack *,
-.game-achievements-page *,
+.positive-page *,
 .game-settings-section * {
     animation: none !important;
     transition: none !important;
@@ -267,48 +267,48 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 }
 
 .game-panel,
-.game-achievements-hero,
+.positive-hero,
 .game-toast {
   position: relative; border-width: 2px; border-radius: 0;
   background: var(--panel-navy); box-shadow: 4px 4px 0 var(--line);
 }
 .game-panel,
-.game-achievements-hero { padding: 13px; }
+.positive-hero { padding: 13px; }
 .game-settings-accordion { padding: 0; }
 .game-panel,
-.game-achievements-hero {
+.positive-hero {
   clip-path: polygon(6px 0, calc(100% - 6px) 0, calc(100% - 6px) 4px, 100% 4px, 100% calc(100% - 6px), calc(100% - 4px) calc(100% - 6px), calc(100% - 4px) 100%, 6px 100%, 6px calc(100% - 4px), 0 calc(100% - 4px), 0 6px, 6px 6px);
 }
 .game-kicker,
 .game-panel-eyebrow { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
 .game-panel-badge { border-radius: 0; }
-.game-achievements-page { gap: 14px; }
+.positive-page { gap: 14px; }
 .game-settings-toggle:has(input:checked) .game-settings-switch { background: var(--cyan); }
-.game-achievements-page :is(button, select, input[type="text"]) { border-radius: 2px; }
+.positive-page :is(button, select, input[type="text"]) { border-radius: 2px; }
 @media (prefers-reduced-motion: reduce) {
-.game-achievements-page * { animation: none !important; transition: none !important; }
+.positive-page * { animation: none !important; transition: none !important; }
 }
-.game-achievements-page .inactivity-message-setting{ max-width: 720px; }
-.game-achievements-page .game-settings-accordion-body > .note,
-.game-achievements-page .inactivity-message-setting > small { max-width: 64ch; }
-.game-achievements-page .game-panel { min-width: 0; }
+.positive-page .inactivity-message-setting{ max-width: 720px; }
+.positive-page .game-settings-accordion-body > .note,
+.positive-page .inactivity-message-setting > small { max-width: 64ch; }
+.positive-page .game-panel { min-width: 0; }
 .game-help-wrap { display: inline-flex; margin-left: 7px; vertical-align: middle; }
 .game-help-wrap .sched-help-tooltip { position: fixed; width: min(290px, calc(100vw - 52px)); left: 8px; right: auto; transform: none; z-index: 1000; }
 
-.game-achievements-page .game-collection-empty { padding: 10px 0; }
+.positive-page .game-collection-empty { padding: 10px 0; }
 /* Compact surfaces keep the pixel artwork while giving the data more space. */
-.game-achievements-page .game-panel,
-.game-achievements-hero {
+.positive-page .game-panel,
+.positive-hero {
   border-width: 1px;
   border-color: var(--line-2);
   border-radius: 8px;
   clip-path: none;
   box-shadow: none;
 }
-.game-achievements-page { gap: 8px; }
-.game-achievements-page .game-panel,
-.game-achievements-hero { padding: 10px 12px; }
-.game-achievements-page .game-settings-accordion { padding: 0; }
+.positive-page { gap: 8px; }
+.positive-page .game-panel,
+.positive-hero { padding: 10px 12px; }
+.positive-page .game-settings-accordion { padding: 0; }
 .positive-evidence-card { margin: 8px 0; padding: 9px 12px; gap: 8px 12px; border-color: var(--line-2); border-radius: 8px; background: var(--panel-navy); }
 .positive-evidence-card > div:first-child { gap: 3px; }
 .positive-evidence-card > div:first-child > strong { font-size: 13px; }
@@ -328,8 +328,8 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 .inactivity-compact .inactivity-message-controls { grid-template-columns:minmax(0,1fr) auto; }
 
 /* Encabezado compacto de Logros: título, temporada e interruptor en pocas líneas */
-.game-achievements-hero-compact { padding: 10px 12px; }
-.game-achievements-hero-compact .game-achievements-hero-row { margin-top: 0; align-items: center; gap: 8px 12px; }
+.positive-hero-compact { padding: 10px 12px; }
+.positive-hero-compact .positive-hero-row { margin-top: 0; align-items: center; gap: 8px 12px; }
 
 /* Filas plegadas con conteo (Equipo, Bestiario, Trofeos, Historial, Ajustes) */
 .game-fold { padding: 0; min-width: 0; }
@@ -341,6 +341,6 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 .game-fold > .game-fold-summary:focus-visible { outline: 2px solid var(--cyan); outline-offset: -2px; border-radius: 8px; }
 .game-fold > .game-fold-body { padding: 8px 12px 12px; border-top: 1px solid var(--line); }
 .game-fold-body > .game-help-wrap { display: inline-block; margin-bottom: 8px; }
-.game-achievements-page .game-fold-body .game-panel { padding: 0; }
+.positive-page .game-fold-body .game-panel { padding: 0; }
 .positive-history-section { margin-top: 8px; }
 /* fin logros-misiones-fila */

@@ -38,7 +38,7 @@ test('approved placements keep the existing Home controls and one copy of each d
  assert.equal(ids.get('daySelector').parentNode.parentNode.parentNode.attrs.some(a=>a.name==='class'&&a.value==='clockbox'),true);
  assert.equal(ids.has('earningsHigherRateLiveCard'),false);
  assert.equal(within('higherRateLiveCard','higherRateModal'),true);
- assert.equal(within('positiveEvidenceCard','pageAchievements'),true);
+ assert.equal(within('positiveEvidenceCard','pagePositive'),true);
  assert.equal(within('positiveEvidenceCard','pageHome'),false);
  assert.equal(within('callRecordingHelp','callEditModal'),true);
  for(const id of ['workDayReviewDetails','automationPanel','callRecordingHelp'])assert.equal(within(id,'pageHome'),false,id);
