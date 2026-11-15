@@ -1400,6 +1400,13 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
   .chips > .hero-shift-actions .action-slot > #liveDiscardBtn { min-width: 52px; }
 }
 /* fin botones barra escritorio */
+/* barra delgada celular */
+/* En celular la barra de acciones es mas delgada: 2 px de espacio arriba y abajo (de 60 a 40 px de alto). Los botones no cambian; la raya del medio baja a 34 px, el mismo alto que los botones. */
+@media (max-width: 760px) {
+  .chips > .hero-shift-actions { padding-block: 2px; }
+  .chips > .hero-shift-actions > .hero-shift-sep { height: 34px; }
+}
+/* fin barra delgada celular */
 
 /* boot-gate-tema */
 /* La pantalla de carga usa los colores del tema elegido (theme-init.js los pone en <html> antes de pintar).
