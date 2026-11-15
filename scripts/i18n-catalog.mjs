@@ -54,11 +54,9 @@ export function collectCatalog(root = process.cwd()) {
     walk(parseJavaScript(source, { ecmaVersion: 'latest', sourceType: 'module' }));
   }
   // Catalog names remain Spanish identities in saved records; only their display is localized.
-  for (const file of ['monsters.js', 'game.js', 'theme-palettes.js', 'positive-reinforcement.js', 'app-main.js']) {
+  for (const file of ['game.js', 'theme-palettes.js', 'positive-reinforcement.js', 'app-main.js']) {
     const source = fs.readFileSync(path.join(root, 'js', file), 'utf8');
-    const limit = file === 'monsters.js' ? source.indexOf('function equipmentEntries')
-      : file === 'game.js' ? source.indexOf('const ACCESSORY_BY_LABEL')
-      : file === 'positive-reinforcement.js' ? source.indexOf('const WINDOW_LABELS') : source.length;
+    const limit = source.length;
     const snippet = source.slice(0, limit);
     for (const match of snippet.matchAll(/\b(?:name|phrase|label|description):\s*'([^']+)'/g)) add(match[1], `js/${file}`);
     if (file === 'app-main.js') for (const match of source.matchAll(/(?:shiftAlarmMessage|breakStartAlarmMessage|breakEndAlarmMessage|productiveBreakMessageFirst|productiveBreakMessageRepeat):\s*'([^']+)'/g)) add(match[1], `js/${file}`);

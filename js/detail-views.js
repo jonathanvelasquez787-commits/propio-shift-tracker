@@ -106,5 +106,4 @@ export { payReceiptAction } from './pay-receipts.js';
 export { confirmFinanceAction, openFinanceDistribution } from './finance-review.js';
 export { exportAccountingDocument } from './accounting-export.js';
 export { renderNotificationReview } from './notification-review.js';
-export { renderGameReview } from './game-review.js';
 export const detailTranslations = null;

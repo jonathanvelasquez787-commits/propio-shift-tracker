@@ -97,7 +97,7 @@ function gameHandler(name) {
   return gameText.slice(callback.start, callback.end);
 }
 
-for (const [name, key, value] of [['sidebarGameSoundInput', 'soundEnabled', false], ['gameSoundVolumeInput', 'soundVolume', 90]]) {
+for (const [name, key, value] of [['sidebarGameSoundInput', 'soundEnabled', false]]) {
   test(`${name} restores rejected preferences, visible controls and audio before unrelated saves, and permits retry`, () => {
     let accepted = false, disk;
     const initial = { game: { weapon: 'pistol', soundEnabled: true, soundVolume: 40 } };
@@ -106,6 +106,7 @@ for (const [name, key, value] of [['sidebarGameSoundInput', 'soundEnabled', fals
       ensureGameSettings: () => h.settings.game, normalizeBattleWeapon: value => value,
       saveSettingsOnly: () => { if (accepted) disk = copy(h.settings); return accepted; },
       syncGameAudio: () => heard.push(copy(h.settings.game)),
+      renderSoundSettings: () => { input.checked = h.settings.game.soundEnabled; },
       renderSettingsProfile: () => { input.checked = h.settings.game.soundEnabled; visible.volume = h.settings.game.soundVolume; },
       renderArena: () => { visible.weapon = h.settings.game.weapon; visible.sound = h.settings.game.soundEnabled; },
       renderGame: () => { h.renderSettingsProfile(); h.renderArena(); } });

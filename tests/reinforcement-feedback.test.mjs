@@ -76,29 +76,14 @@ test('Logros y refuerzo positivo controlan sus propios canales incluso con inten
   assert.equal(notifyReinforcement('   ', { channel: 'either' }), false);
 });
 
-test('Arcade celebra hitos y movimiento reducido conserva anuncios sin partículas', () => {
-  const config = { game: { enabled: true, intensity: 'arcade' }, reinforcement: { enabled: false } };
-  setAppSettings(config);
+test('los hitos se anuncian como avisos y no usan partículas', () => {
+  setAppSettings({ reinforcement: { enabled: true } });
   const queued = [];
-  const effects = [];
-  configureReinforcementFeedback({ queueToast: (...args) => queued.push(args), triggerEffect: (text) => effects.push(text) });
-  notifyReinforcement('Hito', { effect: true });
-  assert.deepEqual(queued[0], ['Hito', 'record', { channel: 'game' }]);
-  assert.deepEqual(effects, ['Hito']);
-  notifyReinforcement('Llamada normal');
-  assert.deepEqual(effects, ['Hito'], 'las llamadas normales no disparan partículas');
-  notifyReinforcement('Récord', { effect: true });
-  assert.deepEqual(effects, ['Hito', 'Récord']);
-  const previousMatchMedia = globalThis.matchMedia;
-  try {
-    globalThis.matchMedia = () => ({ matches: true });
-    notifyReinforcement('Otro hito', { effect: true });
-    assert.deepEqual(effects, ['Hito', 'Récord']);
-    assert.equal(queued.at(-1)[0], 'Otro hito');
-  } finally {
-    if (previousMatchMedia === undefined) delete globalThis.matchMedia;
-    else globalThis.matchMedia = previousMatchMedia;
-  }
+  configureReinforcementFeedback({ queueToast: (...args) => queued.push(args) });
+  notifyReinforcement('Hito', { channel: 'personal', effect: true });
+  assert.equal(queued[0][0], 'Hito');
+  notifyReinforcement('Llamada normal', { channel: 'personal' });
+  assert.equal(queued.at(-1)[0], 'Llamada normal');
   resetFeedbackForTests();
   assert.equal(notifyReinforcement('Sin cola configurada'), false);
 });

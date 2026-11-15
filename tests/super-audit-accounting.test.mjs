@@ -10,7 +10,7 @@ import { configureFinanceContext, financeRunAutoFillCascade, financeApplySignedA
 import { addFinancePayment, deleteFinancePayment, saveFinanceSavingsMonths } from '../js/finance-planning.js';
 import { financeMonthTotals } from '../js/finance-plan-model.js';
 import { configureHigherRateContext, higherRateBonusForCall, higherRateBonusForCalls, higherRateBonusBreakdownForCalls } from '../js/higher-rate.js';
-import { configureGameContext, createDefaultGameState, computeGameDay, onGameCallsChanged } from '../js/game.js';
+import { configureGameContext, createDefaultGameState, onGameCallsChanged } from '../js/game.js';
 import { configurePositiveReinforcementContext } from '../js/positive-reinforcement.js';
 import { withSilentCallFeedback, callFeedbackSilenced } from '../js/call-feedback.js';
 import { PAY_ESTIMATE_RULE, roundedPayMinutes, callPayMinutes } from '../js/pay-estimate.js';
@@ -352,12 +352,12 @@ test('closing a shift during a pause saves both changes together and preserves t
   const x=harness(t);x.advance(at(1,'12:10'));
   let alarms=0,rewards=0;
   Object.assign(x.h,{fmtTime:String,findPlannedSlotForActivePause:()=>null,currentShiftAccountingDayKey:()=> '09/01/2025',
-    saveStateOnly:()=>assert.fail('No intermediate pause save'),stopBreakEndAlarm:()=>alarms++,onGamePauseEnded:()=>rewards++,onGameShiftEnded:()=>rewards++,ADHERENCE_TOLERANCE_MIN:3});
+    saveStateOnly:()=>assert.fail('No intermediate pause save'),stopBreakEndAlarm:()=>alarms++,onGamePauseEnded:()=>rewards++,ADHERENCE_TOLERANCE_MIN:3});
   vm.runInContext(['endPause','endShift'].map(name=>declarations.get(name)).join('\n'),x.h);
   state.shiftStartedAt=at(1,'08:00').toISOString();state.activePause={type:'lunch',startedAt:at(1,'12:00').toISOString()};
   const before=JSON.stringify(state);x.rejectSave();
   assert.equal(x.h.endShift(),false);assert.equal(JSON.stringify(state),before);assert.equal(alarms,0);assert.equal(rewards,0);
-  x.rejectSave(false);x.h.endShift();assert.equal(state.activePause,null);assert.equal(state.pauseHistory.length,1);assert.equal(alarms,1);assert.equal(rewards,2);
+  x.rejectSave(false);x.h.endShift();assert.equal(state.activePause,null);assert.equal(state.pauseHistory.length,1);assert.equal(alarms,1);assert.equal(rewards,1);
   x.reload();assert.equal(state.pauseHistory.length,1);assert.ok(state.shiftEndedAt);
 });
 
@@ -622,7 +622,7 @@ test('a correction collapses only legacy zero-minute duplicates of its exact off
   assert.equal(calls.length, 3, 'an unrelated overlapping call prevents the correction and its deduplication');
 });
 
-test('reimporting the existing official zero row heals legacy duplicates and rolls back current XP exactly once', async t => {
+test('reimporting the existing official zero row heals legacy duplicates exactly once', async t => {
   const x = harness(t); x.advance(at(1, '08:05'));
   x.import([['42', '09/01/2025', '8:00 AM', 3, 'Yes', 'No', '.36']]);
   const original = { ...calls[0], frozenHigherRateBonus: { tier: 'gold', windowId: 'removed', amount: .09 } };
@@ -633,24 +633,18 @@ test('reimporting the existing official zero row heals legacy duplicates and rol
   settings.financeCategories.otro.rows.push(row);
   settings.game = { enabled: false, soundEnabled: false };
   state.game = createDefaultGameState();
-  const day = '09/01/2025', receiptKey = `reinforce-call:${day}:${original.id}`;
-  state.game.days[day] = { bonusXp: 10 };
-  state.game.ledger[receiptKey] = { dayKey: day, gross: 10, applied: 10, amount: 10 };
+  const day = '09/01/2025';
   const common = { ...x.h, dayConfigFor: () => ({ blocks: [] }), weekdayKeyForDayKey: () => 'mon',
     saveStateOnly() {}, saveSettingsOnly() {}, closeModal() {}, openModal() {}, escapeHtml: String, formatMinutes: String,
     convertedAmountText: () => '', getReinforcementWorkIntervals: () => [] };
   configureGameContext(common); configurePositiveReinforcementContext(common);
   x.h.onGameCallsChanged = onGameCallsChanged;
-  assert.ok(computeGameDay(day).xp > 0);
-  const rewarded = x.gameSaved.length;
   const officialZero = [['42', day, '8:00 AM', 0, 'No', 'Yes', '0.00']];
   x.import(officialZero);
   assert.equal(calls.length, 1); assert.equal(calls[0].id, original.id);
   assert.equal(calls[0].durationMin, 0); assert.equal(x.h.importedCallStats(calls, day).earnings, 0);
   assert.equal(higherRateBonusForCall(calls[0]).amount, 0);
   assert.equal(row.assignedAmount, 0);
-  assert.equal(state.game.days[day].bonusXp, 0); assert.equal(state.game.ledger[receiptKey].applied, 0);
-  assert.equal(computeGameDay(day).xp, 0); assert.equal(x.gameSaved.length, rewarded);
   x.reload();
   const snapshot = JSON.stringify({ calls, state, settings }), saves = x.saves();
   x.import(officialZero);

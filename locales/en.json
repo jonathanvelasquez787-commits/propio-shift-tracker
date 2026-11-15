@@ -1204,7 +1204,6 @@
   "s_9c2a4246": "Reward completed: {{v0}}",
   "s_9c5c2b3a": "0 upcoming",
   "s_9c71d7f0": "Actions",
-  "s_9c85933a": "You returned on time from {pause} · protected your rest and pace{xp}",
   "s_9c90f5e4": "{{v1}} {{v2}} vs yesterday",
   "s_9cd40013": "You can take it whenever you want",
   "s_9d00356c": "Current season",
@@ -1250,7 +1249,6 @@
   "s_a1ade7b9": "What you learned today can help with your next call",
   "s_a1c7521d": "Another device saved newer changes to your account. Your next change here could overwrite them.",
   "s_a1cb48b3": "Your records belong to you. Download everything anytime from\n    Settings → \"Export JSON\", or delete it with\n    your account. Data processing is described in the",
-  "s_a1f32861": "On-time return from {pause} · ready to continue{xp}",
   "s_a1f64b83": "Adherence: {{v1}}%",
   "s_a289a14b": "Friday",
   "s_a2b14871": "Sounds while the tab is open if you haven't pressed \"Start shift\". 0 min = disabled. Available message variable:",
@@ -1617,7 +1615,6 @@
   "s_d978a575": "Your pay cycle, summarized and projected",
   "s_d99569dd": "No shift",
   "s_d9975ce1": "Boost improved · higher-rarity box",
-  "s_d9d35cf9": "{pause} ended on time · your break counts too{xp}",
   "s_d9e6ccb6": "rapid burst",
   "s_da016c4f": "Upload illegal content or content that infringes others' rights.",
   "s_da15522a": "Vercel",
@@ -3090,5 +3087,8 @@
   "s_daca34d8": "Sounds",
   "s_8385a949": "Your completed calls will appear here.",
   "s_f1284dd0": "Saves your call wrap-ups and recoveries. It helps you recognize your consistency; your personal comments are shown exactly as you wrote them.",
-  "s_f18ca172": "Turns consistency, recovery and goals into positive evidence."
+  "s_f18ca172": "Turns consistency, recovery and goals into positive evidence.",
+  "s_cbf3808a": "You returned on time from {pause} · protected your rest and pace",
+  "s_409b0351": "On-time return from {pause} · ready to continue",
+  "s_0ce764f9": "{pause} ended on time · your break counts too"
 }

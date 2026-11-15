@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { setLanguage } from '../js/i18n.js';
-import { monetaryMilestones, activeWorkSinceLastCall, supportiveDayEvidence, surpriseDecision } from '../js/reinforcement-rules.js';
+import { monetaryMilestones, activeWorkSinceLastCall } from '../js/reinforcement-rules.js';
 
 const MINUTE = 60000;
 const time = (clock) => `2026-09-29T${clock}:00-06:00`;
@@ -109,46 +109,3 @@ test('scheduled work intersects the real overnight shift rather than calendar da
   }), 90 * MINUTE);
 });
 
-test('supportive closure uses up to three factual positives and conditional tomorrow projection', () => {
-  setLanguage('es');
-  const result = supportiveDayEvidence({
-    callCount: 5, earnings: 10, bestCallAmount: 4, yesterdayEarnings: 8, yesterdayHasData: true,
-    onTimePauses: 1, recoveries: 1, streak: 3, compliant: true,
-    formatAmount: (value) => `$${value.toFixed(2)} (≈ L ${(value * 25).toFixed(2)})`,
-  });
-  assert.equal(result.things.length, 3);
-  assert.match(result.things[0], /5 llamadas.*\$10\.00.*L 250\.00/);
-  assert.match(result.things[1], /momento difícil/);
-  assert.match(result.things[2], /tiempo de 1 pausa/);
-  assert.match(result.projection, /^Si mañana.*4 días/);
-});
-
-test('sparse and difficult days never manufacture achievements or money without currency formatting', () => {
-  setLanguage('es');
-  assert.deepEqual(supportiveDayEvidence(), { things: [], projection: null });
-  const empty = supportiveDayEvidence({ callCount: 0, earnings: 50, bestCallAmount: 12, recoveries: 2, streak: 5, compliant: true });
-  assert.deepEqual(empty, { things: [], projection: null });
-  const sparse = supportiveDayEvidence({ callCount: 1, earnings: 1, yesterdayEarnings: 50, yesterdayHasData: true, streak: 5 });
-  assert.deepEqual(sparse, { things: ['Completaste 1 llamada.'], projection: null });
-  assert.deepEqual(supportiveDayEvidence({ callCount: 0, onTimePauses: 1 }).things, ['Volviste a tiempo de 1 pausa.']);
-});
-
-test('closure comparisons stay personal and best call uses the provided money formatter', () => {
-  setLanguage('es');
-  const result = supportiveDayEvidence({ callCount: 2, earnings: 20, yesterdayEarnings: 10, yesterdayHasData: true, bestCallAmount: 12, formatAmount: (n) => `${n} USD · ${n * 25} HNL` });
-  assert.match(result.things[1], /respecto a tu propio día/);
-  assert.match(result.things[2], /12 USD · 300 HNL/);
-  assert.equal(supportiveDayEvidence({ callCount: 2, earnings: 20, yesterdayEarnings: 10 }).things.length, 1);
-  assert.equal(supportiveDayEvidence({ callCount: 1, streak: 0, compliant: true }).projection, null);
-});
-
-test('surprise decisions use a single validated controlled draw with a fifteen percent boundary', () => {
-  let draws = 0;
-  assert.equal(surpriseDecision(() => { draws++; return 0.149999; }), true);
-  assert.equal(draws, 1);
-  assert.equal(surpriseDecision(() => 0), true);
-  assert.equal(surpriseDecision(() => 0.15), false);
-  assert.equal(surpriseDecision(() => 0.99999), false);
-  for (const value of [-1, 1, Infinity, NaN, '0.1', null]) assert.equal(surpriseDecision(() => value), false);
-  assert.equal(surpriseDecision(null), false);
-});
