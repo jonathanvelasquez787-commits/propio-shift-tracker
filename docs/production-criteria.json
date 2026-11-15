@@ -1226,6 +1226,12 @@
           ]
         },
         {
+          "file": "tests/game-wraps-narrow-window.test.mjs",
+          "namedCases": [
+            "en ventana angosta de escritorio el juego baja a su propia fila en vez de salirse de la barra"
+          ]
+        },
+        {
           "file": "tests/freelancer-blocks-list.test.mjs",
           "namedCases": [
             "Bloques del día en freelancer: cada descanso es una fila con etiqueta, horas y minutos",

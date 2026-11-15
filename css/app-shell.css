@@ -1451,3 +1451,11 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
   .chips > .hero-shift-actions.has-game > .hero-shift-game .game-battle .game-battle-heading > .game-kicker { display: none; }
 }
 /* fin juego a la altura de los botones */
+
+/* juego baja en ventana angosta */
+/* Si el juego no cabe al lado de los botones (ventana angosta de escritorio), baja a una fila propia de todo el ancho en vez de salirse de la barra. */
+@media (min-width: 761px) {
+  .chips > .hero-shift-actions.has-game { flex-wrap: wrap; }
+  .chips > .hero-shift-actions.has-game > .hero-shift-game { flex: 1 1 400px; min-width: 320px; }
+}
+/* fin juego baja en ventana angosta */
