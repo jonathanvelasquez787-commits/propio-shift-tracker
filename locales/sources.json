@@ -328,7 +328,6 @@
   "s_0568a84d": {
     "source": "Misiones del día",
     "files": [
-      "app.html",
       "js/game.js"
     ]
   },
@@ -430,12 +429,6 @@
       "js/finance-planning.js"
     ]
   },
-  "s_06a81af4": {
-    "source": "Desbloqueos por nivel",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_06b44bc2": {
     "source": "CLEAR",
     "files": [
@@ -501,6 +494,12 @@
     "source": "◆ Escudo ganado por racha semanal",
     "files": [
       "js/game.js"
+    ]
+  },
+  "s_07d4771d": {
+    "source": "Activar o silenciar los sonidos de Celebrar llamadas; los avisos de turno y pausas se controlan aparte.",
+    "files": [
+      "app.html"
     ]
   },
   "s_07dc2780": {
@@ -751,12 +750,6 @@
       "js/calendar.js"
     ]
   },
-  "s_0b8bdfef": {
-    "source": "0 / meta",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_0b8ff1b4": {
     "source": "La ventana terminó; el premio sigue guardado para después.",
     "files": [
@@ -801,12 +794,6 @@
   },
   "s_0c1e63b6": {
     "source": "Acumulados de Finanzas, independientemente del día activo.",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_0c31b2d5": {
-    "source": "Se guardan hasta tu próximo Break, Lunch o fin del turno.",
     "files": [
       "app.html"
     ]
@@ -922,12 +909,6 @@
       "js/auth.js"
     ]
   },
-  "s_0df41071": {
-    "source": "Reconocimientos permanentes por completar metas y otros objetivos. Se guardan en tu perfil; no se gastan ni afectan tus ganancias.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_0e0cba13": {
     "source": "Nuevo mejor pago por llamada de hoy · {amount}",
     "files": [
@@ -964,12 +945,6 @@
       "js/game-review.js"
     ]
   },
-  "s_0e4fcc67": {
-    "source": "Cofre listo",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_0e668107": {
     "source": "[TU PAÍS]",
     "files": [
@@ -984,12 +959,6 @@
   },
   "s_0e74c33c": {
     "source": "Detecta filas en columnas o una por bloque, sin importar el formato.",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_0e7dcc6b": {
-    "source": "Catálogo sugerido",
     "files": [
       "app.html"
     ]
@@ -1050,12 +1019,6 @@
   },
   "s_0f8c084b": {
     "source": "si empieza hasta 5 min antes de que la ventana comience, o en cualquier momento antes de que termine, aunque se extienda después.",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_0f8f307b": {
-    "source": "Un solo nombre para el monstruo diario. Déjalo vacío para usar los nombres del catálogo.",
     "files": [
       "app.html"
     ]
@@ -1133,12 +1096,6 @@
       "js/schedule.js"
     ]
   },
-  "s_10697127": {
-    "source": "Activar Logros",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_106da2b3": {
     "source": "¿Restaurar esta copia? Los datos actuales también quedarán conservados en este navegador.",
     "files": [
@@ -1205,12 +1162,6 @@
       "js/finance-planning.js"
     ]
   },
-  "s_11631015": {
-    "source": "x0",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_1171bdcd": {
     "source": "Mensaje y sonido",
     "files": [
@@ -1252,12 +1203,6 @@
     "source": "Retomaste después de una llamada difícil · ese paso cuenta",
     "files": [
       "js/reinforcement-feedback.js"
-    ]
-  },
-  "s_1292d62f": {
-    "source": "Protegen tu racha si un día no cumple los requisitos. Puedes guardar hasta tres; se ganan por constancia y respaldo semanal y se usan automáticamente cuando corresponda.",
-    "files": [
-      "app.html"
     ]
   },
   "s_129d036e": {
@@ -1335,12 +1280,6 @@
       "js/calls.js"
     ]
   },
-  "s_13ad46be": {
-    "source": "Logros convierte tu actividad en progreso de juego: racha, XP, misiones y colección, sin cambiar tus ganancias. Refuerzo positivo y premios personales se configuran por separado; ninguno cambia tu pago. Al desactivar Logros se conserva el progreso guardado. Podés activarlo de nuevo sin reiniciarlo.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_13d91da6": {
     "source": "Tu meta, tarifa y preferencias.",
     "files": [
@@ -1411,12 +1350,6 @@
     "source": "fin del turno",
     "files": [
       "js/positive-reinforcement.js"
-    ]
-  },
-  "s_15dc0678": {
-    "source": "Acerca del volumen de Logros",
-    "files": [
-      "app.html"
     ]
   },
   "s_15e99343": {
@@ -1655,12 +1588,6 @@
       "js/finance-review.js"
     ]
   },
-  "s_190b1c67": {
-    "source": "Gamificación",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_19709586": {
     "source": "Llamadas +{{v9}}",
     "files": [
@@ -1824,7 +1751,6 @@
   "s_1b0709d2": {
     "source": "Historial",
     "files": [
-      "app.html",
       "js/app-main.js"
     ]
   },
@@ -1848,12 +1774,6 @@
   },
   "s_1b47ea56": {
     "source": "Sin horario fijo: descansos por regla",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_1b690e90": {
-    "source": "Fases, equipo y mejoras disponibles en cada nivel.",
     "files": [
       "app.html"
     ]
@@ -1892,12 +1812,6 @@
     "source": "Propio Shift Tracker | Turnos y ganancias de intérpretes",
     "files": [
       "index.html"
-    ]
-  },
-  "s_1c5be691": {
-    "source": "Acerca de Racha semanal",
-    "files": [
-      "app.html"
     ]
   },
   "s_1c8e0c8e": {
@@ -2537,12 +2451,6 @@
       "js/positive-reinforcement.js"
     ]
   },
-  "s_27c2dfee": {
-    "source": "Usar nombre del catálogo",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_27cee92b": {
     "source": "Vista previa sin equipar ni guardar cambios.",
     "files": [
@@ -2652,12 +2560,6 @@
       "js/reports.js"
     ]
   },
-  "s_29b3d78a": {
-    "source": "Progreso hacia el siguiente nivel",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_29c081de": {
     "source": "Asignación automática activada — tu Disponible ya se repartió en orden de prioridad",
     "files": [
@@ -2686,12 +2588,6 @@
     "source": "Premios para tu {{v0}}",
     "files": [
       "js/positive-reinforcement.js"
-    ]
-  },
-  "s_2a14edbd": {
-    "source": "Accesorios que desbloqueas con niveles, misiones y objetivos. Selecciona uno disponible para equiparlo o retirarlo; un accesorio bloqueado indica qué falta.",
-    "files": [
-      "app.html"
     ]
   },
   "s_2a1f41a6": {
@@ -3091,12 +2987,6 @@
       "js/game.js"
     ]
   },
-  "s_2f9a4ba8": {
-    "source": "Sonidos arcade",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_2fa0ade4": {
     "source": "{{v1}} {{v2}}",
     "files": [
@@ -3127,12 +3017,6 @@
     "source": "Se descarta esta continuación y vuelve el tramo de pausa que ya estaba terminado.",
     "files": [
       "js/work-actions.js"
-    ]
-  },
-  "s_30a42ee4": {
-    "source": "Victorias y récords",
-    "files": [
-      "app.html"
     ]
   },
   "s_30b2afdd": {
@@ -3556,12 +3440,6 @@
       "js/automation-ui.js"
     ]
   },
-  "s_36c195a4": {
-    "source": "Hitos",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_36c6e861": {
     "source": "llamadas ya tomadas califican",
     "files": [
@@ -3702,12 +3580,6 @@
       "js/call-records-view.js"
     ]
   },
-  "s_39096e35": {
-    "source": "Progreso contra el jefe del ciclo",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_390d8eee": {
     "source": "El historial informa minutos, no los segundos originales.",
     "files": [
@@ -3768,12 +3640,6 @@
       "js/shift-work-review.js"
     ]
   },
-  "s_39e165d9": {
-    "source": "XP son puntos de experiencia. Los obtienes al completar llamadas, misiones y objetivos; suben tu nivel y desbloquean equipo. No son dinero ni cambian tu pago.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_39e3298b": {
     "source": "Destino del dinero",
     "files": [
@@ -3796,7 +3662,6 @@
   "s_39ffff4b": {
     "source": "Pendiente",
     "files": [
-      "app.html",
       "js/app-main.js",
       "js/game.js"
     ]
@@ -3872,12 +3737,6 @@
     "source": "Final corregido",
     "files": [
       "js/call-records-view.js"
-    ]
-  },
-  "s_3b3bc4d2": {
-    "source": "Guardar nombre",
-    "files": [
-      "app.html"
     ]
   },
   "s_3b3e3b2f": {
@@ -4223,12 +4082,6 @@
       "js/game.js"
     ]
   },
-  "s_42104459": {
-    "source": "Premios físicos y catálogo sugerido.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_424b6a68": {
     "source": "(hora de inicio de tu turno). Déjalo vacío y guarda para volver al mensaje de siempre.",
     "files": [
@@ -4284,12 +4137,6 @@
       "app.html"
     ]
   },
-  "s_430509ec": {
-    "source": "Reiniciar progreso",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_432dd927": {
     "source": "Cambiar a modo oscuro",
     "files": [
@@ -4333,12 +4180,6 @@
       "privacidad.html"
     ]
   },
-  "s_43c0cf3e": {
-    "source": "Representa la meta de ganancias de tu ciclo de pago de 14 días. Cada dólar ganado reduce su vida. Completar la meta desbloquea una recompensa de juego.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_43c7eef1": {
     "source": "Una llamada cuenta",
     "files": [
@@ -4375,12 +4216,6 @@
     "source": "Supabase Inc. — proveedor de base de datos y autenticación",
     "files": [
       "privacidad.html"
-    ]
-  },
-  "s_448bacd4": {
-    "source": "Adherencia del día",
-    "files": [
-      "app.html"
     ]
   },
   "s_4495bfef": {
@@ -4527,12 +4362,6 @@
     "source": "premios disponibles",
     "files": [
       "js/positive-reinforcement.js"
-    ]
-  },
-  "s_46d21443": {
-    "source": "Trofeos",
-    "files": [
-      "app.html"
     ]
   },
   "s_46fdfa44": {
@@ -4872,12 +4701,6 @@
       "index.html"
     ]
   },
-  "s_4ba8a1e5": {
-    "source": "Abre tu próxima sesión para reclamarlo.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_4bbc583d": {
     "source": "Revisa tu conexión.",
     "files": [
@@ -4990,12 +4813,6 @@
       "js/theme-palettes.js"
     ]
   },
-  "s_4dd221d8": {
-    "source": "Break/Lunch a tiempo",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_4de6ef7d": {
     "source": "Buscar en la ayuda",
     "files": [
@@ -5063,12 +4880,6 @@
       "js/app-main.js"
     ]
   },
-  "s_4eb1ea50": {
-    "source": "Colección",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_4ec40af3": {
     "source": "Shift iniciado — ya tenías llamadas desde las {{v0}} ({{v1}} min antes). \"Conectado\" cuenta desde ahora, no desde esa llamada.",
     "files": [
@@ -5112,12 +4923,6 @@
       "js/reinforcement-feedback.js"
     ]
   },
-  "s_4fc93013": {
-    "source": "Cuenta los días consecutivos que cumples las reglas de productividad y adherencia. Los días libres se tratan según tu configuración. Los símbolos muestran el resultado de cada día.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_4fcc99bf": {
     "source": "Salida temprana -{{v0}}m",
     "files": [
@@ -5158,12 +4963,6 @@
     "source": "llamada",
     "files": [
       "js/reinforcement-rules.js"
-    ]
-  },
-  "s_50aea7dd": {
-    "source": "La barra refleja lo que llevas acumulado en el ciclo de pago actual.",
-    "files": [
-      "app.html"
     ]
   },
   "s_50b8c494": {
@@ -5446,12 +5245,6 @@
       "js/reinforcement-feedback.js"
     ]
   },
-  "s_5493eb9d": {
-    "source": "Tu progreso",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_54c53860": {
     "source": "Desde",
     "files": [
@@ -5486,7 +5279,6 @@
   "s_5515c614": {
     "source": "Mayor pago",
     "files": [
-      "app.html",
       "js/game.js"
     ]
   },
@@ -6001,22 +5793,10 @@
       "privacidad.html"
     ]
   },
-  "s_5ec18cba": {
-    "source": "Racha",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_5ec4aed2": {
     "source": "Las próximas ediciones y eliminaciones aparecerán aquí.",
     "files": [
       "js/call-recovery.js"
-    ]
-  },
-  "s_5efd13c0": {
-    "source": "Colecciones",
-    "files": [
-      "app.html"
     ]
   },
   "s_5f033f08": {
@@ -6064,12 +5844,6 @@
   },
   "s_5fbd0ee6": {
     "source": "de tu meta",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_5fd7a78d": {
-    "source": "Revisa qué se borra antes de confirmar.",
     "files": [
       "app.html"
     ]
@@ -6156,12 +5930,6 @@
     "source": "{{v0}} tarde(s)",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_60ba73f9": {
-    "source": "Mis premios",
-    "files": [
-      "app.html"
     ]
   },
   "s_6122ffc6": {
@@ -6337,12 +6105,6 @@
       "index.html"
     ]
   },
-  "s_63cc98fc": {
-    "source": "Es el resumen de un turno terminado: muestra misiones, XP y récords. Puedes abrir el último cierre para revisar lo que conseguiste.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_63ce5606": {
     "source": "Común",
     "files": [
@@ -6381,12 +6143,6 @@
   },
   "s_646dbd54": {
     "source": "Bloques y llamadas",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_64940ad5": {
-    "source": "Ver detalle",
     "files": [
       "app.html"
     ]
@@ -6546,12 +6302,6 @@
     "source": "Impulso x{{v0}} · {{v1}} llamada(s)",
     "files": [
       "js/game.js"
-    ]
-  },
-  "s_67457d6c": {
-    "source": "Mejor: 0",
-    "files": [
-      "app.html"
     ]
   },
   "s_6764a0b5": {
@@ -6741,12 +6491,6 @@
     "files": [
       "index.html",
       "js/weekly-summary.js"
-    ]
-  },
-  "s_6abfa5bd": {
-    "source": "Colección de monstruos que ya derrotaste al completar la meta diaria. Muestra tu historial de victorias y las criaturas que faltan.",
-    "files": [
-      "app.html"
     ]
   },
   "s_6acb924a": {
@@ -7009,12 +6753,6 @@
       "js/app-main.js"
     ]
   },
-  "s_6f2d3b08": {
-    "source": "Jefe del ciclo",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_6f5ece4f": {
     "source": "Volumen 0%: no suena ningún aviso. Los mensajes escritos siguen activos.",
     "files": [
@@ -7141,12 +6879,6 @@
     "source": "{{v0}} estable",
     "files": [
       "js/reports.js"
-    ]
-  },
-  "s_7119e320": {
-    "source": "Racha de los últimos siete días",
-    "files": [
-      "app.html"
     ]
   },
   "s_71310300": {
@@ -7423,7 +7155,6 @@
   "s_7597b21e": {
     "source": "Mejor racha semanal",
     "files": [
-      "app.html",
       "js/game.js"
     ]
   },
@@ -7561,12 +7292,6 @@
   },
   "s_776cb9e0": {
     "source": "Noche Violeta: Violeta, fucsia, coral y amarillo",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_77746c25": {
-    "source": "Mostrar u ocultar la tarjeta de Logros y los chips Racha y Nivel en Inicio",
     "files": [
       "app.html"
     ]
@@ -7888,12 +7613,6 @@
       "js/shift-work-review.js"
     ]
   },
-  "s_7c0ee4cd": {
-    "source": "Bestiario",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_7c77d239": {
     "source": "Usa un plazo entre 1 y 120 meses.",
     "files": [
@@ -7958,12 +7677,6 @@
     "source": "Reemplazó el registro estimado por los datos del historial de Propio.",
     "files": [
       "js/call-review-view.js"
-    ]
-  },
-  "s_7d55762e": {
-    "source": "La app nunca compra nada ni interrumpe una llamada. Tú decides cuándo realizar, guardar o cambiar cada premio.",
-    "files": [
-      "app.html"
     ]
   },
   "s_7d5f8aad": {
@@ -8089,12 +7802,6 @@
       "js/finance.js"
     ]
   },
-  "s_7f22a829": {
-    "source": "Acerca de Trofeos",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_7f275484": {
     "source": "Categoría",
     "files": [
@@ -8105,12 +7812,6 @@
     "source": "La caché de la app está activa. El respaldo de tus datos se gestiona por separado.",
     "files": [
       "js/boot.js"
-    ]
-  },
-  "s_7f4cc8be": {
-    "source": "Temporada",
-    "files": [
-      "app.html"
     ]
   },
   "s_7f5df705": {
@@ -8294,12 +7995,6 @@
       "js/app-main.js"
     ]
   },
-  "s_82c12a9a": {
-    "source": "Acerca de Jefe del ciclo",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_82c397e3": {
     "source": "Nivel {{v0}}",
     "files": [
@@ -8310,12 +8005,6 @@
     "source": "si estás en la Unión Europea, puedes presentar una reclamación ante tu autoridad de protección de datos.",
     "files": [
       "privacidad.html"
-    ]
-  },
-  "s_830aae23": {
-    "source": "Monstruo del día",
-    "files": [
-      "app.html"
     ]
   },
   "s_831365be": {
@@ -8392,12 +8081,6 @@
   },
   "s_83b6b1b5": {
     "source": "(también visible en Inicio) siempre muestra el ciclo actual.",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_83cd7fa1": {
-    "source": "Combo",
     "files": [
       "app.html"
     ]
@@ -8670,18 +8353,6 @@
   },
   "s_87cc347d": {
     "source": "Navega entre ciclos con las flechas dentro de Reportes.",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_87d0e560": {
-    "source": "Volumen de Logros",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_87d81439": {
-    "source": "Récords",
     "files": [
       "app.html"
     ]
@@ -9397,12 +9068,6 @@
       "js/schedule.js"
     ]
   },
-  "s_917be80a": {
-    "source": "Elegir un premio sugerido",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_9191de26": {
     "source": "Dejá una sola pestaña del portal para evitar actuar sobre la sesión equivocada.",
     "files": [
@@ -9550,7 +9215,6 @@
   "s_93d51f48": {
     "source": "STAGE CLEAR",
     "files": [
-      "app.html",
       "js/game.js"
     ]
   },
@@ -9601,12 +9265,6 @@
     "source": "1. Qué datos se recogen",
     "files": [
       "privacidad.html"
-    ]
-  },
-  "s_947efcf4": {
-    "source": "Activar o desactivar Logros",
-    "files": [
-      "app.html"
     ]
   },
   "s_947ff0d7": {
@@ -9960,12 +9618,6 @@
       "js/finance.js"
     ]
   },
-  "s_9a2c69a8": {
-    "source": "Golpes, armaduras, combos, premios y victorias con efectos breves. Se combinan con el volumen general de Ajustes → Alarmas. Puedes silenciarlos en el menú lateral.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_9a37c906": {
     "source": "Revisá cómo se cerrará tu turno.",
     "files": [
@@ -9986,12 +9638,6 @@
   },
   "s_9a61340a": {
     "source": "El emoji aparece junto a tu nombre en el saludo de arriba (ej. \"Buenas tardes, [tu nombre] 🙂\"). Toca uno de la lista o escribe cualquier otro en el cuadro de texto. Déjalo vacío para no mostrar ninguno.",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_9a883e1d": {
-    "source": "Acerca de Logros",
     "files": [
       "app.html"
     ]
@@ -10048,7 +9694,6 @@
   "s_9bb1e329": {
     "source": "Sin STAGE CLEAR aún.",
     "files": [
-      "app.html",
       "js/game.js"
     ]
   },
@@ -10391,12 +10036,6 @@
       "js/boot.js"
     ]
   },
-  "s_a098978e": {
-    "source": "Activar o silenciar los efectos de Logros; los avisos de turno y pausas se controlan aparte.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_a0e258d4": {
     "source": "Sin datos:",
     "files": [
@@ -10654,12 +10293,6 @@
       "app.html"
     ]
   },
-  "s_a484ba34": {
-    "source": "El jefe observa tu progreso.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_a49ca9de": {
     "source": "Se reserva ahora",
     "files": [
@@ -10695,12 +10328,6 @@
     "source": "Luz",
     "files": [
       "js/finance.js"
-    ]
-  },
-  "s_a530ea94": {
-    "source": "En marcha",
-    "files": [
-      "app.html"
     ]
   },
   "s_a565e966": {
@@ -10955,12 +10582,6 @@
       "js/detail-views.js"
     ]
   },
-  "s_a94e3df8": {
-    "source": "Equipo desbloqueable",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_a96e09f5": {
     "source": "Copia guardada en este navegador",
     "files": [
@@ -11024,7 +10645,6 @@
   "s_aa6588a4": {
     "source": "Tus próximos trofeos aparecerán aquí.",
     "files": [
-      "app.html",
       "js/game.js"
     ]
   },
@@ -11114,12 +10734,6 @@
       "js/call-review-view.js"
     ]
   },
-  "s_ab8c9ed4": {
-    "source": "Equipo",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_ab90cc7e": {
     "source": "CASI CAE",
     "files": [
@@ -11137,12 +10751,6 @@
     "source": "1. Qué es este servicio",
     "files": [
       "terminos.html"
-    ]
-  },
-  "s_abf5c610": {
-    "source": "Borra nivel, XP, racha, trofeos, accesorios y monstruos derrotados. Tus llamadas, turnos, metas y finanzas no se tocan.",
-    "files": [
-      "app.html"
     ]
   },
   "s_ac1b452c": {
@@ -11278,6 +10886,12 @@
     "source": "Cuenta y datos de Propio Shift Tracker",
     "files": [
       "js/boot.js"
+    ]
+  },
+  "s_ae98bba2": {
+    "source": "Refuerzo positivo",
+    "files": [
+      "app.html"
     ]
   },
   "s_aeca0c44": {
@@ -11483,6 +11097,12 @@
       "app.html"
     ]
   },
+  "s_b1e1131f": {
+    "source": "Historial positivo",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_b1e8237e": {
     "source": "Crear mi cuenta",
     "files": [
@@ -11573,12 +11193,6 @@
       "js/reinforcement-feedback.js"
     ]
   },
-  "s_b3335e5c": {
-    "source": "Secciones de Logros",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_b3338f85": {
     "source": "Restar 15 minutos",
     "files": [
@@ -11587,12 +11201,6 @@
   },
   "s_b336460c": {
     "source": "#CDE3D3",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_b341d057": {
-    "source": "Acerca de Bestiario",
     "files": [
       "app.html"
     ]
@@ -11638,12 +11246,6 @@
     "source": "Tu plan vs. lo que hiciste.",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_b413f622": {
-    "source": "Cofre reclamable",
-    "files": [
-      "app.html"
     ]
   },
   "s_b419ec4b": {
@@ -11971,12 +11573,6 @@
       "js/finance.js"
     ]
   },
-  "s_b9fe5bbf": {
-    "source": "Herramientas avanzadas",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_ba091659": {
     "source": "No se pudo cargar el resumen. Cerrá Avisos y volvé a abrirlo.",
     "files": [
@@ -12085,12 +11681,6 @@
     "source": "Una nueva llamada completada · seguiste adelante",
     "files": [
       "js/reinforcement-feedback.js"
-    ]
-  },
-  "s_bc29c879": {
-    "source": "Nombre del monstruo del día",
-    "files": [
-      "app.html"
     ]
   },
   "s_bc2e4f16": {
@@ -12223,12 +11813,6 @@
   },
   "s_bdf1ee3d": {
     "source": "Ventanas horarias con bono extra por minuto (Bronce, Silver o Gold), avisadas por Propio por correo — el bono se suma solo a cada llamada que califique por horario.",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_be196ddd": {
-    "source": "Mis premios físicos",
     "files": [
       "app.html"
     ]
@@ -12399,12 +11983,6 @@
       "js/app-main.js",
       "js/game-review.js",
       "js/reports.js"
-    ]
-  },
-  "s_c10bf213": {
-    "source": "D",
-    "files": [
-      "app.html"
     ]
   },
   "s_c122ac2a": {
@@ -12839,7 +12417,6 @@
   "s_c80bfd18": {
     "source": "M",
     "files": [
-      "app.html",
       "js/calendar.js"
     ]
   },
@@ -12861,22 +12438,10 @@
       "js/backup-recovery.js"
     ]
   },
-  "s_c87c64f6": {
-    "source": "Acerca de Equipo",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_c885bc89": {
     "source": "Aunque Propio ya esté abierto, la disponibilidad espera tu horario.",
     "files": [
       "js/automation-ui.js"
-    ]
-  },
-  "s_c90bfeab": {
-    "source": "L",
-    "files": [
-      "app.html"
     ]
   },
   "s_c9263b18": {
@@ -13238,12 +12803,6 @@
       "js/schedule.js"
     ]
   },
-  "s_cf0c081d": {
-    "source": "J",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_cf65724e": {
     "source": "Día guardado",
     "files": [
@@ -13362,12 +12921,6 @@
       "js/game.js"
     ]
   },
-  "s_d0ea7421": {
-    "source": "Las armas cambian la animación y la práctica. Disparar o jugar el duelo no registra llamadas, dinero ni XP laboral. El duelo se ofrece en Break/Lunch o fuera del turno; al volver al trabajo se pausa y podés retomarlo después.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_d0f4673e": {
     "source": "min fuera del plan",
     "files": [
@@ -13418,12 +12971,6 @@
   },
   "s_d1918071": {
     "source": "Personalizar",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_d19a4470": {
-    "source": "Cómo funcionan",
     "files": [
       "app.html"
     ]
@@ -13519,12 +13066,6 @@
       "js/app-main.js"
     ]
   },
-  "s_d30c0e69": {
-    "source": "V",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_d31d1bdd": {
     "source": "Meta de sesión (min, 0 = sin meta)",
     "files": [
@@ -13582,7 +13123,6 @@
   "s_d4073926": {
     "source": "Minutos productivos",
     "files": [
-      "app.html",
       "js/accounting-export.js"
     ]
   },
@@ -13730,12 +13270,6 @@
     "source": "⚠️ {{v0}} ventana(s) de Higher Rate con datos inválidos se descartaron al cargar.",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_d60c1322": {
-    "source": "S",
-    "files": [
-      "app.html"
     ]
   },
   "s_d65c2a56": {
@@ -14004,6 +13538,12 @@
       "app.html"
     ]
   },
+  "s_daca34d8": {
+    "source": "Sonidos",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_dafa42e9": {
     "source": "Ver tus datos:",
     "files": [
@@ -14220,12 +13760,6 @@
       "js/higher-rate-review.js"
     ]
   },
-  "s_dd0c1e27": {
-    "source": "X",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_dd141193": {
     "source": "¡Vas por buen camino!",
     "files": [
@@ -14331,28 +13865,10 @@
       "js/automation-ui.js"
     ]
   },
-  "s_de457463": {
-    "source": "En Inicio, abrí Logros debajo de la batalla para elegir el arma y Duelo · 60 s. Automático permite salir; al regresar, elegí Duelo y Continuar duelo. En móvil usá los controles debajo de la escena.",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_de55886f": {
-    "source": "Siguiente: 100 XP",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_de59a815": {
     "source": "No se pudo leer la data",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_de605ad3": {
-    "source": "Acerca de Escudos",
-    "files": [
-      "app.html"
     ]
   },
   "s_de6c1e12": {
@@ -14657,12 +14173,6 @@
       "js/call-recovery.js"
     ]
   },
-  "s_e354b5e9": {
-    "source": "Escudos",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_e37b6f56": {
     "source": "Customer ID",
     "files": [
@@ -14677,12 +14187,6 @@
   },
   "s_e381ff2c": {
     "source": "#3A3D61",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_e3863232": {
-    "source": "Acerca de STAGE CLEAR",
     "files": [
       "app.html"
     ]
@@ -14725,12 +14229,6 @@
   },
   "s_e429934f": {
     "source": "Higher Rate añade minutos equivalentes al color. Los minutos reales y el bono se muestran separados. La leyenda usa tu meta general; una fecha puede conservar otra.",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_e439b9be": {
-    "source": "0 días",
     "files": [
       "app.html"
     ]
@@ -14948,12 +14446,6 @@
       "js/game.js",
       "js/pay-receipts.js",
       "js/reports.js"
-    ]
-  },
-  "s_e7cfd5ad": {
-    "source": "Armas y duelo",
-    "files": [
-      "app.html"
     ]
   },
   "s_e7d3c8f8": {
@@ -15374,12 +14866,6 @@
       "js/finance-planning.js"
     ]
   },
-  "s_ed66015e": {
-    "source": "Probar sonidos arcade",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_eda38b05": {
     "source": "Horario copiado a Lunes-Viernes {{v0}}",
     "files": [
@@ -15440,12 +14926,6 @@
     "files": [
       "js/app-main.js",
       "js/positive-reinforcement.js"
-    ]
-  },
-  "s_ee6034f6": {
-    "source": "Crear mi premio",
-    "files": [
-      "app.html"
     ]
   },
   "s_ee6fdae5": {
@@ -15589,12 +15069,6 @@
   },
   "s_f12b6205": {
     "source": "Importar data",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_f12f608e": {
-    "source": "Acerca de Nivel y XP",
     "files": [
       "app.html"
     ]
@@ -15854,12 +15328,6 @@
       "js/boot.js"
     ]
   },
-  "s_f4965880": {
-    "source": "0% / meta",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_f4d17130": {
     "source": "¿Descartar esta llamada sin guardarla? La llamada que acabas de colgar se perderá por completo — no quedará ningún registro de ese tiempo trabajado.",
     "files": [
@@ -16011,12 +15479,6 @@
       "js/app-main.js"
     ]
   },
-  "s_f6321177": {
-    "source": "Racha semanal",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_f6344908": {
     "source": "Dos fuentes de la misma llamada; no se suman dos veces.",
     "files": [
@@ -16134,12 +15596,6 @@
       "js/weekly-summary.js"
     ]
   },
-  "s_f83926c3": {
-    "source": "Logros",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_f84b63ef": {
     "source": "¿Eliminar esta recepción manual? Las llamadas, ganancias y reservas no cambian.",
     "files": [
@@ -16168,12 +15624,6 @@
     "source": "Vincular respaldo seleccionado",
     "files": [
       "js/call-records-view.js"
-    ]
-  },
-  "s_f8a938e5": {
-    "source": "Progreso de Logros",
-    "files": [
-      "app.html"
     ]
   },
   "s_f8b58bd9": {
@@ -16430,12 +15880,6 @@
       "js/backup-recovery.js"
     ]
   },
-  "s_fd56bd87": {
-    "source": "Preferencias de Logros",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_fd7dd237": {
     "source": "Ver Hoy o Ciclo",
     "files": [
@@ -16501,12 +15945,6 @@
     "source": "Guardar y entrar",
     "files": [
       "index.html"
-    ]
-  },
-  "s_fe5c2a67": {
-    "source": "Agrega una idea y personalízala a tu gusto.",
-    "files": [
-      "app.html"
     ]
   },
   "s_fe643c25": {

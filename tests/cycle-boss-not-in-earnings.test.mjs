@@ -10,7 +10,3 @@ test('la tarjeta Ganancias del ciclo ya no muestra al jefe del ciclo (Guardián 
   assert.ok(inicio > 0);
   assert.ok(!html.slice(inicio - 1500, inicio).includes('game-cycle-boss-head'));
 });
-
-test('el jefe del ciclo sigue en la página de Logros', () => {
-  assert.ok(html.includes('id="gameCycleBossAchievements"'));
-});

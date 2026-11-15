@@ -1155,8 +1155,6 @@ function renderSettingsProfile() {
   if (enabled) enabled.checked = gameEnabled();
   const sidebarEnabled = document.getElementById('sidebarAchievementsInput');
   if (sidebarEnabled) sidebarEnabled.checked = gameEnabled();
-  const soundRow = document.getElementById('sidebarGameSoundRow');
-  if (soundRow) soundRow.hidden = !gameEnabled();
   const soundEnabled = document.getElementById('sidebarGameSoundInput');
   if (soundEnabled) {
     soundEnabled.checked = settings.game.soundEnabled;

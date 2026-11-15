@@ -1028,6 +1028,8 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
       if (typeof settings.financeAutoFill !== 'boolean') settings.financeAutoFill = false;
       if (!settings.game || typeof settings.game !== 'object' || Array.isArray(settings.game)) settings.game = { ...fallback.game };
       if (typeof settings.game.enabled !== 'boolean') settings.game.enabled = fallback.game.enabled;
+      // Logros ya no tiene pantalla ni interruptor: se deja apagado para que no salgan avisos sin forma de quitarlos.
+      settings.game.enabled = false;
       settings.game.intensity = 'arcade';
       if (typeof settings.game.soundEnabled !== 'boolean') settings.game.soundEnabled = true;
       const gameSoundVolume = Number(settings.game.soundVolume);

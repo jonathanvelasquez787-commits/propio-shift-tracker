@@ -87,16 +87,16 @@ test('graphite palette is offered in the appearance dialog and the palette count
 test('offline English translates authored text while retaining personal names and nested safe markup', () => {
   setLanguage('en');
   try {
-    assert.equal(translateText('  Activar Logros  '), '  Enable Achievements  ');
+    assert.equal(translateText('  Cierre breve  '), '  Brief wrap-up  ');
     const personal = 'Rompe la armadura de productividad <img data-personal="true">';
     const result = ui`<p>Sonido "${personal}" guardado</p>`;
     assert.equal(result, `<p>Sound "${personal}" saved</p>`);
-    const opaque = '<style>.hola { color: red; }</style><script>"Activar Logros"</script>';
+    const opaque = '<style>.hola { color: red; }</style><script>"Cierre breve"</script>';
     assert.equal(translateMarkup(opaque), opaque);
-    assert.ok(translateMarkup('<button title="Activar Logros">Activar Logros</button>').includes('title="Enable Achievements"'));
+    assert.ok(translateMarkup('<button title="Cierre breve">Cierre breve</button>').includes('title="Brief wrap-up"'));
     assert.equal(translateText('Nota personal fuera del catálogo'), 'Nota personal fuera del catálogo');
   } finally { setLanguage('es'); }
-  assert.equal(translateText('Activar Logros'), 'Activar Logros');
+  assert.equal(translateText('Cierre breve'), 'Cierre breve');
 });
 
 test('catalog includes current HTML and authored JS without style or script source', () => {
@@ -140,8 +140,8 @@ test('dynamic document messages and attributes retain personal values across lan
   const spanish = '  Categoría "Mi meta española" borrada\n';
   const english = '  Category "Mi meta española" deleted\n';
   const text = { nodeValue: spanish, parentElement: { closest: () => null } };
-  const personal = { nodeValue: 'Activar Logros', parentElement: { closest: () => ({}) } };
-  const attributes = new Map([['title', spanish], ['aria-label', '  Activar Logros  ']]);
+  const personal = { nodeValue: 'Cierre breve', parentElement: { closest: () => ({}) } };
+  const attributes = new Map([['title', spanish], ['aria-label', '  Cierre breve  ']]);
   const element = {
     closest: () => null, hasAttribute: name => attributes.has(name),
     getAttribute: name => attributes.get(name), setAttribute: (name, value) => attributes.set(name, value),
@@ -163,8 +163,8 @@ test('dynamic document messages and attributes retain personal values across lan
   otherBundle.translateDocument(root);
   assert.equal(text.nodeValue, english);
   assert.equal(attributes.get('title'), english);
-  assert.equal(attributes.get('aria-label'), '  Enable Achievements  ');
-  assert.equal(personal.nodeValue, 'Activar Logros');
+  assert.equal(attributes.get('aria-label'), '  Brief wrap-up  ');
+  assert.equal(personal.nodeValue, 'Cierre breve');
   setLanguage('en');
   translateDocument(root);
   assert.equal(text.nodeValue, english);

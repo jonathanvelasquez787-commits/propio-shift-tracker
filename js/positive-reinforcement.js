@@ -577,6 +577,8 @@ function renderSettingsRewards() {
   const ask = document.getElementById('positiveAskAfterCallInput');
   if (enabled) enabled.checked = settings.reinforcement.enabled;
   if (ask) ask.checked = settings.reinforcement.askAfterCall;
+  const soundRow = document.getElementById('sidebarGameSoundRow');
+  if (soundRow) soundRow.hidden = !settings.reinforcement.enabled;
   const inactivityInput = document.getElementById('positiveInactivityMessageInput');
   if (inactivityInput) {
     const changedOwner = inactivityMessageDraftOwner !== settings;
