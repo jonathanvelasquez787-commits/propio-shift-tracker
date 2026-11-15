@@ -225,7 +225,7 @@ export function saveInactivityMessage() {
   return true;
 }
 
-function renderSettingsReinforcement() {
+export function renderSettingsReinforcement() {
   const enabled = document.getElementById('positiveReinforcementEnabledInput');
   const ask = document.getElementById('positiveAskAfterCallInput');
   if (enabled) enabled.checked = settings.reinforcement.enabled;

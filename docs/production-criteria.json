@@ -907,6 +907,18 @@
             "el menú lateral tiene un interruptor de la extensión para cada cosa",
             "la extensión usa los interruptores y el historial importado sigue silencioso"
           ]
+        },
+        {
+          "file": "tests/bridge-popup-reinforcement.test.mjs",
+          "namedCases": [
+            "las reglas del puente solo aceptan dos booleanos exactos para el refuerzo",
+            "la app avisa sus dos interruptores en cada paquete ready y valida los cambios que llegan de la extensión",
+            "una app vieja sin soporte responde update-tracker y no manda ajustes inventados",
+            "el worker guarda el estado que avisa la app y el popup lo manda a la pestaña vinculada",
+            "el worker rechaza valores raros, cuentas sin vincular, remitentes ajenos y respuestas fallidas",
+            "el popup tiene su tarjeta entre ACW y Apariencia, apagada y deshabilitada sin vínculo",
+            "el script de contenido de la extensión reenvía los ajustes solo a la pestaña vinculada"
+          ]
         }
       ]
     },

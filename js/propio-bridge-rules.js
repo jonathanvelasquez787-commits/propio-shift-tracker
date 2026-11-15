@@ -45,6 +45,12 @@ export function validateBridgePlan(value, now = Date.now()) {
     pause: pause(value.pause, false), lastPause: pause(value.lastPause, true),
     automationLease: validateAutomationLease(value.automationLease, now) };
 }
+// Ajustes de refuerzo que viajan entre el popup de la extensión y la app: solo dos booleanos exactos.
+export function validateBridgeReinforcement(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  if (typeof value.celebrate !== 'boolean' || typeof value.ask !== 'boolean') return null;
+  return { celebrate: value.celebrate, ask: value.ask };
+}
 export function validateBridgeEvent(value, now = Date.now()) {
   if (!value || typeof value !== 'object' || Array.isArray(value) || value.version !== 1 || !bridgeId(value.id)) return null;
   if (!['call-start','call-end','session-start','session-end','available','unavailable','history-records','pause-end'].includes(value.type)) return null;

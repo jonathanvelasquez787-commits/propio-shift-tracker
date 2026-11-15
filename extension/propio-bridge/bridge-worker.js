@@ -1,4 +1,4 @@
-import { PORTAL_ORIGIN, TRACKER_ORIGIN, TWILIO_EVENT_ORIGINS, BRIDGE_MAX_AGE, accountScopeValid, readPropioSignal, readPropioRequestBody, propioRequestKind, validateBridgeEvent, validateBridgePlan, createPropioReducer } from '../../js/propio-bridge-rules.js';
+import { PORTAL_ORIGIN, TRACKER_ORIGIN, TWILIO_EVENT_ORIGINS, BRIDGE_MAX_AGE, accountScopeValid, readPropioSignal, readPropioRequestBody, propioRequestKind, validateBridgeEvent, validateBridgePlan, validateBridgeReinforcement, createPropioReducer } from '../../js/propio-bridge-rules.js';
 import { validatePortalRecord, portalRecordKey } from '../../js/propio-history-records.js';
 import { createAutomationStatus } from '../../js/automation-status.js';
 import { validateAutomationLease } from '../../js/automation-lease.js';
@@ -9,7 +9,7 @@ const SIGN_OUT_DESTINATIONS = new Set(['https://propio.com', 'https://www.propio
 const fresh = () => ({ mode: 'observe', accountScope: null, tabs: {}, session: null, queue: [], completed: 0, last: [], attention: null,
   preparation: { enabled: false, availabilityPaused: false, plan: null, doneFor: null, lastAttemptAt: 0,
     spacing: { enabled: false, minutes: 2, lastEndedAt: null }, waitReason: null,
-    resume: { break: false, lunch: false, mode: 'manual' }, pendingPause: null, resumedPauses: [] } });
+    resume: { break: false, lunch: false, mode: 'manual' }, pendingPause: null, resumedPauses: [], reinforcement: null } });
 export function pendingQueueSummary(queue, now = Date.now()) {
   const times = queue.map(item => Date.parse(item?.event?.at)).filter(time => Number.isFinite(time) && time >= 0 && time <= now + 10000);
   if (!times.length) return null;
@@ -47,7 +47,7 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     const results = await Promise.all(tabs.map(async tab => {
       try {
         const ready = await sendToTab(tab.id, { kind: 'identify-tracker', refresh: true });
-        return accountScopeValid(ready?.accountScope) ? { tabId: tab.id, accountScope: ready.accountScope, plan: validateBridgePlan(ready.plan, now()) } : null;
+        return accountScopeValid(ready?.accountScope) ? { tabId: tab.id, accountScope: ready.accountScope, plan: validateBridgePlan(ready.plan, now()), reinforcement: validateBridgeReinforcement(ready.reinforcement) } : null;
       } catch { return null; }
     }));
     return results.filter(Boolean);
@@ -453,8 +453,8 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
           state.tabs = {}; state.session = null; state.attention = null; state.history = null; state.historySeen = [];
         }
         const matched = targets.filter(target => target.accountScope === state.accountScope);
-        if (matched.length === 1 && packet.accountScope === state.accountScope) updatePlan(state, matched[0].plan);
-        else if (matched.length > 1) { updatePlan(state, null); state.attention = 'multiple-trackers'; }
+        if (matched.length === 1 && packet.accountScope === state.accountScope) { updatePlan(state, matched[0].plan); state.preparation.reinforcement = matched[0].reinforcement; }
+        else if (matched.length > 1) { updatePlan(state, null); state.preparation.reinforcement = null; state.attention = 'multiple-trackers'; }
       });
       await flush(); return { ok: true };
     }
@@ -490,11 +490,11 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
       const targets = await trackers();
       if (targets.length !== 1) return { ok: false, reason: targets.length ? 'multiple-trackers' : 'tracker-closed' };
       return transact(state => {
-        if (state.accountScope === targets[0].accountScope) { updatePlan(state, targets[0].plan); return { ok: true }; }
+        if (state.accountScope === targets[0].accountScope) { updatePlan(state, targets[0].plan); state.preparation.reinforcement = targets[0].reinforcement; return { ok: true }; }
         if (state.queue.length && state.accountScope !== targets[0].accountScope) return { ok: false, reason: 'pending-account' };
         if (state.mode === 'auto' && Object.values(state.tabs).some(tab => tab.active)) return { ok: false, reason: 'active-portal-call' };
         state.accountScope = targets[0].accountScope; state.mode = 'observe'; state.tabs = {}; state.session = null; state.attention = null; state.history = null; state.historySeen = [];
-        state.preparation = { ...fresh().preparation, plan: targets[0].plan };
+        state.preparation = { ...fresh().preparation, plan: targets[0].plan, reinforcement: targets[0].reinforcement };
         return { ok: true };
       });
     }
@@ -514,6 +514,23 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
       return transact(state => {
         if (!state.accountScope) return { ok: false, reason: 'account-needed' };
         state.preparation.spacing.enabled = packet.enabled; state.preparation.spacing.minutes = packet.minutes;
+        return { ok: true };
+      });
+    }
+    if (packet?.kind === 'reinforcement') {
+      const value = validateBridgeReinforcement(packet);
+      if (!value) return { ok: false, reason: 'invalid-reinforcement' };
+      const scope = await transact(state => state.accountScope);
+      if (!scope) return { ok: false, reason: 'account-needed' };
+      const matched = (await trackers()).filter(target => target.accountScope === scope);
+      if (matched.length !== 1) return { ok: false, reason: matched.length > 1 ? 'multiple-trackers' : 'tracker-closed' };
+      let ack;
+      try { ack = await sendToTab(matched[0].tabId, { kind: 'deliver-settings', accountScope: scope, reinforcement: value }); }
+      catch { ack = { status: 'blocked', reason: 'tracker-closed' }; }
+      if (ack?.status !== 'ok') return { ok: false, reason: ack?.reason || 'tracker-closed' };
+      return transact(state => {
+        if (state.accountScope !== scope) return { ok: false, reason: 'account-needed' };
+        state.preparation.reinforcement = value;
         return { ok: true };
       });
     }

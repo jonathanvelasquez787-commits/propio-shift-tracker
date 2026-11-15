@@ -133,6 +133,7 @@ import {
 import {
   configurePositiveReinforcementContext,
   migratePositiveCallIdReferences,
+  renderSettingsReinforcement,
 } from './positive-reinforcement.js';
 import { acwMinutesForBlock } from './block-acw.js';
 
@@ -8257,6 +8258,26 @@ export function getWorkSessionStatus() {
       (to > from || call === state.activeCall) && Math.max(connection.getTime(), from) === start.getTime();
   });
   return { startedAt: start.toISOString(), endedAt: state.shiftEndedAt || null, manual, callAtStart };
+}
+
+// Ajustes que la extensión muestra en su popup: los mismos dos interruptores del menú lateral.
+export function getPropioBridgeReinforcement() {
+  if (!localStorageRevision.isCurrent()) return null;
+  return { celebrate: settings.reinforcement?.celebrateBridgeCalls === true, ask: settings.reinforcement?.askAfterBridgeCall === true };
+}
+
+export function applyPropioBridgeReinforcement(value) {
+  if (!localStorageRevision.isCurrent()) return { status: 'blocked', reason: 'stale-tab' };
+  const previous = { celebrateBridgeCalls: settings.reinforcement.celebrateBridgeCalls, askAfterBridgeCall: settings.reinforcement.askAfterBridgeCall };
+  settings.reinforcement.celebrateBridgeCalls = value.celebrate === true;
+  settings.reinforcement.askAfterBridgeCall = value.ask === true;
+  if (saveSettingsOnly() === false) {
+    Object.assign(settings.reinforcement, previous);
+    renderSettingsReinforcement();
+    return { status: 'blocked', reason: 'storage' };
+  }
+  renderSettingsReinforcement();
+  return { status: 'ok' };
 }
 
 export function getPropioBridgePlan() {
