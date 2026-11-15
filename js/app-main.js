@@ -7601,6 +7601,15 @@ export function render() {
     document.getElementById('payReceiptDeleteBtn').addEventListener('click', () => usePayReceipts('delete'));
     document.getElementById('payReceiptAmount').addEventListener('input', () => usePayReceipts('preview'));
     document.getElementById('copyWeekendBtn').addEventListener('click', copyDayToWeekend);
+    {
+      // Menú "Copiar a otros días": se abre con el botón, se cierra al elegir, al tocar afuera o con Escape.
+      const copyBtn = document.getElementById('schedCopyMenuBtn'), copyMenu = document.getElementById('schedCopyMenu');
+      const setCopyMenu = open => { copyMenu.hidden = !open; copyBtn.setAttribute('aria-expanded', open ? 'true' : 'false'); };
+      copyBtn.addEventListener('click', () => setCopyMenu(copyMenu.hidden));
+      copyMenu.addEventListener('click', () => setCopyMenu(false));
+      document.addEventListener('click', event => { if (!copyMenu.hidden && !event.target.closest('#schedCopyWrap')) setCopyMenu(false); });
+      document.addEventListener('keydown', event => { if (event.key === 'Escape' && !copyMenu.hidden) { setCopyMenu(false); copyBtn.focus(); } });
+    }
     document.getElementById('confirmModalOkBtn').addEventListener('click', () => {
       const action = pendingConfirmAction;
       pendingConfirmAction = null;

@@ -371,7 +371,6 @@
   "s_461b6b92": "Week 2: 00:00:00",
   "s_461c545f": "Edit goal",
   "s_467d0cba": "How to set it up",
-  "s_4705a0e1": "Monday–Friday",
   "s_470e7fe8": "An identical call is already saved (same customer, date, time, duration, payment, billable and dropped).",
   "s_47191cc5": "Dropped",
   "s_472c9354": "Details",
@@ -901,7 +900,6 @@
   "s_b08d5afb": "adherence",
   "s_b0951083": "everything is editable from the app itself.",
   "s_b0bac425": "Partial",
-  "s_b0cffd29": "Copy this schedule to Saturday–Sunday",
   "s_b0f0f7cd": "Finances",
   "s_b0fda0e8": "Current week",
   "s_b1a104cd": "·\n      Contact:",
@@ -936,7 +934,6 @@
   "s_b6a86d2e": "History is already empty — no Higher Rate windows have ended yet.",
   "s_b6c21d45": "The \"calls\" field is missing or not a list in the file.",
   "s_b6d7e507": "Settings → Schedule/Goals",
-  "s_b75010cd": "Saturday–Sunday",
   "s_b7705696": "On time",
   "s_b7baa774": "Privacy",
   "s_b7d16139": "Today's preview",
@@ -962,7 +959,6 @@
   "s_bcb17372": "Sounds while this tab is open and an ACTUAL break is running. 0 min = disabled. Available message variables:",
   "s_bceb827c": "Loan",
   "s_bcfd8af7": ". Any\n    dispute is submitted to competent courts in that jurisdiction, without\n    prejudice to your consumer rights in your country of\n    residence.",
-  "s_bd0a92f5": "Copy this schedule to Monday–Friday",
   "s_bd66f4ea": "hours",
   "s_bd764dfa": "Show password",
   "s_bd791753": "One moment…",
@@ -2285,5 +2281,10 @@
   "s_e6a0b7e3": "Day summary",
   "s_4478497d": "Calls, shifts, breaks, schedule, goals and profile for all days are reset. Finance is kept unless you check the box.",
   "s_c472b69c": "If left unchecked, your Finance categories, payments, plan and receipts are kept.",
-  "s_fc4d592f": "Also erase Finance"
+  "s_fc4d592f": "Also erase Finance",
+  "s_1a943c4f": "Monday to Friday",
+  "s_313add57": "Saturday and Sunday",
+  "s_32e4c148": "Copy to other days",
+  "s_6d7a241b": "Copy this schedule to Monday to Friday",
+  "s_d698174b": "Copy this schedule to Saturday and Sunday"
 }

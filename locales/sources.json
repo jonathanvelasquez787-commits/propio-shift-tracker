@@ -1421,6 +1421,12 @@
       "js/backup-recovery.js"
     ]
   },
+  "s_1a943c4f": {
+    "source": "Lunes a Viernes",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_1a9f7f1c": {
     "source": "Tu cuenta y los ajustes propios de la extensión se conservan.",
     "files": [
@@ -2594,6 +2600,12 @@
       "js/call-table-view.js"
     ]
   },
+  "s_313add57": {
+    "source": "Sábado y Domingo",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_3140df12": {
     "source": "El cambio se sincroniza con tu cuenta al reconectar. Antes se guarda una copia privada en este navegador, accesible desde Reiniciar → Copias recuperables.",
     "files": [
@@ -2698,6 +2710,12 @@
     "source": "Lo que hace",
     "files": [
       "index.html"
+    ]
+  },
+  "s_32e4c148": {
+    "source": "Copiar a otros días",
+    "files": [
+      "app.html"
     ]
   },
   "s_330370b0": {
@@ -3765,12 +3783,6 @@
   },
   "s_46fdfa44": {
     "source": "compara minutos y meta de esa fecha.",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_4705a0e1": {
-    "source": "Lunes-Viernes",
     "files": [
       "app.html"
     ]
@@ -5710,6 +5722,12 @@
     "source": "días",
     "files": [
       "js/reports.js"
+    ]
+  },
+  "s_6d7a241b": {
+    "source": "Copiar este horario a Lunes a Viernes",
+    "files": [
+      "app.html"
     ]
   },
   "s_6d987bb5": {
@@ -9555,12 +9573,6 @@
       "js/automation-ui.js"
     ]
   },
-  "s_b0cffd29": {
-    "source": "Copiar este horario a Sábado-Domingo",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_b0f0f7cd": {
     "source": "Finanzas",
     "files": [
@@ -9921,12 +9933,6 @@
       "js/call-recovery.js"
     ]
   },
-  "s_b75010cd": {
-    "source": "Sábado-Domingo",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_b751b797": {
     "source": "No se pudo preparar la recuperación. Volvé a intentarlo.",
     "files": [
@@ -10185,12 +10191,6 @@
     "source": "Meta histórica conservada",
     "files": [
       "js/shift-work-review.js"
-    ]
-  },
-  "s_bd0a92f5": {
-    "source": "Copiar este horario a Lunes-Viernes",
-    "files": [
-      "app.html"
     ]
   },
   "s_bd329cb5": {
@@ -11499,6 +11499,12 @@
   },
   "s_d67b433d": {
     "source": "Si recibiste varios abonos o cambia una llamada",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_d698174b": {
+    "source": "Copiar este horario a Sábado y Domingo",
     "files": [
       "app.html"
     ]

@@ -532,10 +532,15 @@
     </div>
   </div>
 
-  <div class="modal-actions mc-action-row">
+  <div class="modal-actions mc-action-row sched-footer">
     <button class="mc-btn-primary blue" id="saveShiftWindowBtn" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></svg> Guardar día</button>
-    <button class="mc-btn-warn-pill" id="copyDayToAllBtn" type="button" title="Copiar este horario a Lunes-Viernes"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Lunes-Viernes</button>
-    <button class="mc-btn-warn-pill" id="copyWeekendBtn" type="button" title="Copiar este horario a Sábado-Domingo"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Sábado-Domingo</button>
+    <div class="sched-copy" id="schedCopyWrap">
+      <button class="mc-btn-secondary" id="schedCopyMenuBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="schedCopyMenu" title="Copiar a otros días"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="sched-copy-label">Copiar a otros días</span><svg class="ic-svg sched-copy-chevron" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
+      <div class="sched-copy-menu" id="schedCopyMenu" role="menu" hidden>
+        <button class="sched-copy-item" id="copyDayToAllBtn" type="button" role="menuitem" title="Copiar este horario a Lunes a Viernes">Lunes a Viernes</button>
+        <button class="sched-copy-item" id="copyWeekendBtn" type="button" role="menuitem" title="Copiar este horario a Sábado y Domingo">Sábado y Domingo</button>
+      </div>
+    </div>
   </div>
 </div>
 </div><!-- /scheduleConfigAccordion -->

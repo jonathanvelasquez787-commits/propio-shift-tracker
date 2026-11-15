@@ -1376,9 +1376,6 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
   #pageSchedule .sched-time-row { grid-template-columns: 1fr 1fr; gap: 10px; }
   #pageSchedule .sched-time-field input[type="time"] { font-size: 16px; padding: 8px 28px 8px 8px; }
   #pageSchedule .sched-time-field-clock { right: 8px; }
-  /* Botones de abajo: Guardar día arriba a todo el ancho y los dos de copiar parejos. */
-  #saveShiftWindowBtn { flex: 0 0 100%; }
-  #copyDayToAllBtn, #copyWeekendBtn { flex: 1 1 0; min-width: 0; justify-content: center; white-space: nowrap; font-size: 13px; padding-inline: 8px; }
 }
 /* fin horario compacto */
 /* barra en dos mitades */
@@ -1552,3 +1549,21 @@ html[data-palette]:not([data-palette="original"]) .boot-choice { border-color: v
   #scheduleConfigAccordion #blocksEditorList.sched-bk-list { grid-template-columns: minmax(0, 1fr); gap: 10px; }
 }
 /* fin horario rediseño B */
+/* horario rediseño C */
+#scheduleConfigAccordion .sched-footer { display: flex; align-items: stretch; flex-wrap: nowrap; gap: 10px; margin: 0; }
+#scheduleConfigAccordion .sched-footer #saveShiftWindowBtn { flex: 1 1 0; min-width: 0; justify-content: center; border-radius: 16px; padding: 13px 16px; font-size: 15px; font-weight: 800; }
+#scheduleConfigAccordion .sched-copy { position: relative; flex: 0 0 auto; display: flex; }
+#scheduleConfigAccordion #schedCopyMenuBtn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 16px; padding: 13px 16px; font-size: 14px; font-weight: 800; white-space: nowrap; }
+#scheduleConfigAccordion #schedCopyMenuBtn .ic-svg { width: 16px; height: 16px; flex: 0 0 16px; }
+#scheduleConfigAccordion #schedCopyMenuBtn[aria-expanded="true"] .sched-copy-chevron { transform: rotate(180deg); }
+#scheduleConfigAccordion .sched-copy-menu { position: absolute; right: 0; bottom: calc(100% + 8px); z-index: 30; min-width: 220px; display: grid; gap: 2px; padding: 6px; border: 1px solid var(--line); border-radius: 14px; background: var(--bg); box-shadow: 0 12px 32px rgba(0, 0, 0, .35); }
+#scheduleConfigAccordion .sched-copy-menu[hidden] { display: none; }
+#scheduleConfigAccordion .sched-copy-item { display: block; width: 100%; text-align: left; border: 0; background: transparent; color: var(--text); border-radius: 10px; padding: 11px 12px; font-size: 14px; font-weight: 700; cursor: pointer; }
+#scheduleConfigAccordion .sched-copy-item:hover, #scheduleConfigAccordion .sched-copy-item:focus-visible { background: color-mix(in srgb, var(--blue) 14%, transparent); }
+#scheduleConfigAccordion .sched-copy-item:disabled { opacity: .5; cursor: not-allowed; }
+@media (max-width: 760px) {
+  #scheduleConfigAccordion .sched-footer { gap: 8px; }
+  #scheduleConfigAccordion .sched-copy-label { display: none; }
+  #scheduleConfigAccordion #schedCopyMenuBtn { padding: 13px 14px; }
+}
+/* fin horario rediseño C */
