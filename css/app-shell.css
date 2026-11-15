@@ -1502,3 +1502,53 @@ html[data-palette]:not([data-palette="original"]) .boot-choice { border-color: v
   #scheduleConfigAccordion .sched-switch-row { flex: 1 1 100%; margin: 0; }
 }
 /* fin horario rediseño */
+
+/* horario rediseño B */
+#scheduleConfigAccordion .sched-daybar { display: flex; gap: 3px; height: 38px; margin-top: 4px; }
+#scheduleConfigAccordion .sched-bar-seg { display: flex; align-items: center; justify-content: center; min-width: 0; border-radius: 9px; background: var(--blue); color: #07101f; }
+#scheduleConfigAccordion .sched-bar-seg[data-bar-type="break"] { background: #5b6482; color: #e6e9f5; }
+#scheduleConfigAccordion .sched-bar-seg[data-bar-type="lunch"] { background: rgb(var(--good-rgb)); color: #06241a; }
+#scheduleConfigAccordion .sched-bar-seg .ic-svg { width: 15px; height: 15px; }
+#scheduleConfigAccordion .sched-bar-gap { background: transparent; }
+#scheduleConfigAccordion .sched-daybar-ticks { position: relative; height: 16px; margin-top: -6px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 11px; color: var(--muted); }
+#scheduleConfigAccordion .sched-bar-tick { position: absolute; top: 0; white-space: nowrap; }
+
+#scheduleConfigAccordion #blocksEditorList.sched-bk-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 0; margin: 0; border: 0; background: none; }
+#scheduleConfigAccordion #blocksEditorList .sched-bk { display: block; padding: 0; margin: 0; border: 0; background: none; min-width: 0; }
+#scheduleConfigAccordion #blocksEditorList .sched-bk .sched-tl-card { position: relative; display: grid; gap: 12px; padding: 14px 14px 14px 18px; border-radius: 16px; border: 1px solid var(--line); background: rgba(255,255,255,.03); overflow: hidden; }
+#scheduleConfigAccordion #blocksEditorList .sched-bk .sched-tl-card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--blue); }
+#scheduleConfigAccordion #blocksEditorList .sched-bk[data-block-type="break"] .sched-tl-card::before { background: #7b84a8; }
+#scheduleConfigAccordion #blocksEditorList .sched-bk[data-block-type="lunch"] .sched-tl-card::before { background: rgb(var(--good-rgb)); }
+#scheduleConfigAccordion .sched-bk-top { display: flex; align-items: center; gap: 10px; }
+#scheduleConfigAccordion .sched-bk .sched-tl-icon { flex: 0 0 30px; width: 30px; height: 30px; border-radius: 10px; display: grid; place-items: center; background: rgba(var(--blue-rgb), .16); color: var(--blue); }
+#scheduleConfigAccordion .sched-bk[data-block-type="break"] .sched-tl-icon { background: rgba(123,132,168,.2); color: #7b84a8; }
+#scheduleConfigAccordion .sched-bk[data-block-type="lunch"] .sched-tl-icon { background: rgba(var(--good-rgb), .16); color: rgb(var(--good-rgb)); }
+#scheduleConfigAccordion .sched-bk .sched-tl-titles { flex: 1 1 auto; min-width: 0; display: grid; }
+#scheduleConfigAccordion .sched-bk-name { font-size: 15px; font-weight: 800; }
+#scheduleConfigAccordion .sched-bk .sched-tl-subtitle { font-size: 11px; color: var(--muted); }
+#scheduleConfigAccordion .sched-bk .sched-tl-subtitle:empty { display: none; }
+#scheduleConfigAccordion .sched-bk .sched-tl-duration { flex: 0 0 auto; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: rgba(var(--blue-rgb), .16); color: var(--blue); }
+#scheduleConfigAccordion .sched-bk[data-block-type="break"] .sched-tl-duration { background: rgba(123,132,168,.2); color: var(--muted); }
+#scheduleConfigAccordion .sched-bk[data-block-type="lunch"] .sched-tl-duration { background: rgba(var(--good-rgb), .16); color: rgb(var(--good-rgb)); }
+#scheduleConfigAccordion .sched-bk .sched-tl-remove { flex: 0 0 34px; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; }
+#scheduleConfigAccordion .sched-bk-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+#scheduleConfigAccordion .sched-bk-field { display: grid; gap: 5px; margin: 0; min-width: 0; }
+#scheduleConfigAccordion .sched-bk-field > span { font-size: 10.5px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+#scheduleConfigAccordion .sched-bk-field input { width: 100%; box-sizing: border-box; text-align: center; border-radius: 11px; padding: 9px 6px; font-size: 13.5px; font-weight: 700; border: 1px solid var(--line); background: var(--panel-2); color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+#scheduleConfigAccordion .sched-bk-field input::-webkit-calendar-picker-indicator { display: none; }
+#scheduleConfigAccordion .sched-bk-field.block-goal-field, #scheduleConfigAccordion .sched-bk-field.sched-tl-goal { border: 0; background: none; padding: 0; box-shadow: none; border-radius: 0; }
+#scheduleConfigAccordion .sched-bk-field input { padding: 9px 2px; font-size: 12.5px; letter-spacing: -.03em; }
+#scheduleConfigAccordion label.sched-bk-field > input { display: block; width: 100%; min-width: 0; max-width: none; }
+#scheduleConfigAccordion .sched-bk-field input[type="time"] { -webkit-appearance: none; appearance: none; }
+#scheduleConfigAccordion .sched-bk-field input[type="time"]::-webkit-datetime-edit { padding: 0; }
+#scheduleConfigAccordion .sched-bk-field input[type="time"]::-webkit-datetime-edit-fields-wrapper { padding: 0; }
+#scheduleConfigAccordion .sched-add-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+#scheduleConfigAccordion .sched-add-label { font-size: 12.5px; font-weight: 700; color: var(--muted); }
+#scheduleConfigAccordion .sched-add-pill { border: 1.5px dashed currentColor; background: transparent; border-radius: 999px; padding: 7px 14px; font-size: 13px; font-weight: 800; color: var(--blue); cursor: pointer; }
+#scheduleConfigAccordion .sched-add-pill[data-add="break"] { color: var(--muted); }
+#scheduleConfigAccordion .sched-add-pill[data-add="lunch"] { color: rgb(var(--good-rgb)); }
+#scheduleConfigAccordion .sched-add-pill:disabled { opacity: .5; cursor: not-allowed; }
+@media (max-width: 760px) {
+  #scheduleConfigAccordion #blocksEditorList.sched-bk-list { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+}
+/* fin horario rediseño B */

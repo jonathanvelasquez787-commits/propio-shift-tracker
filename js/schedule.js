@@ -252,39 +252,80 @@ export function configureScheduleContext(context) {
         const nextDayLabel = toMinutes(startVal) < anchor ? translateText('Inicio al día siguiente')
           : toMinutes(startVal) + durVal >= 1440 ? translateText('Fin al día siguiente') : '';
         // Ver comentario junto a `.sched-tl-hour` en el CSS: la hora de inicio se repite aquí como texto suelto a la izquierda de la línea/punto conector
+        const typeName = type === 'work' ? translateText('Trabajo') : type === 'break' ? 'Break' : 'Lunch';
         return ui`
-        <div class="block-row sched-tl-item" data-block-row="${i}" data-block-type="${type}">
-          <div class="sched-tl-hour" aria-hidden="true">${startVal}</div>
-          <div class="sched-tl-rail" aria-hidden="true"><span class="sched-tl-dot"></span></div>
+        <div class="block-row sched-tl-item sched-bk" data-block-row="${i}" data-block-type="${type}">
+          <div class="sched-tl-hour" hidden aria-hidden="true">${startVal}</div>
           <div class="sched-tl-card">
-            <div class="sched-tl-card-top">
+            <div class="sched-bk-top">
               <span class="sched-tl-icon">${iconHtml(meta.iconName)}</span>
               <div class="sched-tl-titles">
-                <select class="alert-select block-type-input sched-tl-type-select">
-                  <option value="work" ${type === 'work' ? 'selected' : ''}>Trabajo</option>
-                  <option value="break" ${type === 'break' ? 'selected' : ''}>Break</option>
-                  <option value="lunch" ${type === 'lunch' ? 'selected' : ''}>Lunch</option>
-                </select>
+                <span class="sched-bk-name">${typeName}</span>
+                <input type="hidden" class="block-type-input" value="${type}"/>
                 <div class="sched-tl-subtitle">${nextDayLabel}</div>
               </div>
-              <div class="sched-tl-time-inline">
-                <input type="time" class="block-start-input sched-tl-time-input" inputmode="numeric" value="${startVal}"/>
-                <span class="sched-tl-time-sep" aria-hidden="true">—</span>
-                <input type="time" class="block-end-input sched-tl-time-input" inputmode="numeric" value="${endVal}"/>
-              </div>
+              <span class="sched-tl-duration">${durationLabel}</span>
               <button type="button" class="gap-edit-btn block-remove-btn sched-tl-remove" data-remove-block="${i}" aria-label="Eliminar bloque ${i + 1}"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
             </div>
-            <div class="sched-tl-card-bottom">
-              <span class="sched-tl-duration">${durationLabel}</span>
-              <div class="field block-goal-field sched-tl-goal" style="${type === 'work' ? '' : 'display:none;'}">
-                <label>Meta productiva (min)</label>
-                <input type="number" class="block-goal-input" inputmode="numeric" min="0" step="1" value="${goalVal}"/>
-              </div>
+            <div class="sched-bk-fields">
+              <label class="sched-bk-field"><span>Desde</span><input type="time" class="block-start-input sched-tl-time-input" inputmode="numeric" value="${startVal}"/></label>
+              <label class="sched-bk-field"><span>Hasta</span><input type="time" class="block-end-input sched-tl-time-input" inputmode="numeric" value="${endVal}"/></label>
+              <label class="sched-bk-field block-goal-field sched-tl-goal" style="${type === 'work' ? '' : 'display:none;'}"><span>Meta (min)</span><input type="number" class="block-goal-input" inputmode="numeric" min="0" step="1" value="${goalVal}"/></label>
             </div>
           </div>
         </div>
       `;
-      }).join('') || translateMarkup('<div class="note" style="margin:0;">Sin bloques configurados. Usa "+ Agregar bloque" para empezar (Trabajo también es un bloque explícito ahora).</div>');
+      }).join('') || translateMarkup('<div class="note" style="margin:0;">Sin bloques configurados. Usa "+ Trabajo", "+ Break" o "+ Lunch" para empezar.</div>');
+      renderDayBar();
+    }
+
+
+    // Barra del día (solo lectura): un segmento por bloque, ancho = minutos; marcas de hora cada 2 h.
+    function barHourLabel(min, withSuffix) {
+      const h24 = Math.floor((((min % 1440) + 1440) % 1440) / 60);
+      const h12 = h24 % 12 === 0 ? 12 : h24 % 12;
+      return withSuffix ? h12 + ' ' + (h24 < 12 ? 'AM' : 'PM') : String(h12);
+    }
+    export function renderDayBar() {
+      const bar = document.getElementById('schedDayBar');
+      const ticks = document.getElementById('schedDayBarTicks');
+      if (!bar || !ticks) return;
+      const startRaw = document.getElementById('dayStartInput')?.value || '';
+      const endRaw = document.getElementById('dayEndInput')?.value || '';
+      if (!startRaw || !endRaw) { bar.innerHTML = ''; ticks.innerHTML = ''; return; }
+      const shiftStart = toMinutes(formatHHMM(startRaw));
+      let total = toMinutes(formatHHMM(endRaw)) - shiftStart;
+      if (total <= 0) total += 1440;
+      const rows = Array.from(document.querySelectorAll('#blocksEditorList .block-row')).map(row => {
+        const st = toMinutes(formatHHMM(row.querySelector('.block-start-input')?.value || '00:00'));
+        const en = toMinutes(formatHHMM(row.querySelector('.block-end-input')?.value || '00:00'));
+        return { type: row.querySelector('.block-type-input')?.value || 'work', from: ((st - shiftStart) % 1440 + 1440) % 1440, dur: ((en - st) % 1440 + 1440) % 1440 };
+      }).filter(r => r.dur > 0 && r.from < total).sort((x, y) => x.from - y.from);
+      let cursor = 0;
+      let html = '';
+      for (const r of rows) {
+        const from = Math.max(r.from, cursor);
+        const dur = Math.min(r.dur - (from - r.from), total - from);
+        if (dur <= 0) continue;
+        if (from > cursor) html += `<span class="sched-bar-gap" style="flex:${from - cursor}"></span>`;
+        const t = BLOCK_TYPE_LABELS[r.type] ? r.type : 'work';
+        const icon = dur >= 50 ? iconHtml((BLOCK_TIMELINE_META[t] || BLOCK_TIMELINE_META.work).iconName) : '';
+        html += `<span class="sched-bar-seg" data-bar-type="${t}" style="flex:${dur}">${icon}</span>`;
+        cursor = from + dur;
+      }
+      if (cursor < total) html += `<span class="sched-bar-gap" style="flex:${total - cursor}"></span>`;
+      bar.innerHTML = html;
+      let tickHtml = '';
+      let prevPm = null;
+      for (let m = 0; m <= total; m += 120) {
+        const abs = shiftStart + m;
+        const pm = Math.floor((((abs % 1440) + 1440) % 1440) / 60) >= 12;
+        const label = barHourLabel(abs, prevPm === null || pm !== prevPm);
+        prevPm = pm;
+        const pos = m === 0 ? 'left:0' : m === total ? 'right:0' : `left:${(m / total) * 100}%;transform:translateX(-50%)`;
+        tickHtml += `<span class="sched-bar-tick" style="${pos}">${label}</span>`;
+      }
+      ticks.innerHTML = tickHtml;
     }
 
     export function updateScheduleRowSummary(row) {
@@ -384,7 +425,7 @@ export function configureScheduleContext(context) {
       return dur;
     }
 
-    export function addBlockRow() {
+    export function addBlockRow(forcedType) {
       const current = readBlocksFromEditor();
       let newStart = '09:00';
       let lastEndingBlock = null;
@@ -398,7 +439,7 @@ export function configureScheduleContext(context) {
         });
         newStart = minutesToHHMM(maxEnd);
       }
-      const type = suggestNextBlockType(current, lastEndingBlock, newStart);
+      const type = (typeof forcedType === 'string' && BLOCK_TYPE_LABELS[forcedType]) ? forcedType : suggestNextBlockType(current, lastEndingBlock, newStart);
       const dur = suggestNextBlockDuration(type, newStart);
       current.push({ type, start: newStart, dur });
       renderBlocksEditor(current);
@@ -419,7 +460,7 @@ export function configureScheduleContext(context) {
 
     // Habilita/deshabilita los campos del día (Día libre, Inicio, Fin, bloques + "+ Agregar bloque") y los botones de copiar/guardar
     function setScheduleFormDisabled(disabled) {
-      ['dayOffInput', 'dayStartInput', 'dayEndInput', 'addBlockBtn', 'copyDayToAllBtn', 'copyWeekendBtn', 'saveShiftWindowBtn', 'scheduleOffsetMinusBtn', 'scheduleOffsetPlusBtn', 'scheduleOffsetApplyBtn'].forEach(id => {
+      ['dayOffInput', 'dayStartInput', 'dayEndInput', 'addWorkBlockBtn', 'addBreakBlockBtn', 'addLunchBlockBtn', 'copyDayToAllBtn', 'copyWeekendBtn', 'saveShiftWindowBtn', 'scheduleOffsetMinusBtn', 'scheduleOffsetPlusBtn', 'scheduleOffsetApplyBtn'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.disabled = disabled;
       });

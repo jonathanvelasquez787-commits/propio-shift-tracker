@@ -41,7 +41,7 @@ import {
   configureCalendarContext,
 } from './calendar.js';
 
-import { updateScheduleRowSummary, addBlockRow, applyScheduleOffset, copyDayToAll, copyDayToWeekend, ensureScheduleWeekOverride, formatBlockDurationLabel, removeBlockRowAt, removeScheduleWeekOverride, saveShiftWindow, scheduleFormIsDirty, scheduleWeekHasCustom, scheduleWeekIsPast, syncShiftModalFields, syncScheduleOffsetUI, configureScheduleContext, updateShiftLenChip } from './schedule.js';
+import { updateScheduleRowSummary, addBlockRow, applyScheduleOffset, copyDayToAll, copyDayToWeekend, ensureScheduleWeekOverride, formatBlockDurationLabel, removeBlockRowAt, removeScheduleWeekOverride, saveShiftWindow, scheduleFormIsDirty, scheduleWeekHasCustom, scheduleWeekIsPast, syncShiftModalFields, syncScheduleOffsetUI, configureScheduleContext, updateShiftLenChip, renderDayBar } from './schedule.js';
 
 
 import {
@@ -7749,7 +7749,9 @@ export function render() {
     document.getElementById('exchangeRateInput').addEventListener('change', updateCurrencySettings);
     document.getElementById('currencyLabelInput').addEventListener('change', updateCurrencySettings);
     document.getElementById('saveShiftWindowBtn').addEventListener('click', saveShiftWindow);
-    document.getElementById('addBlockBtn').addEventListener('click', addBlockRow);
+    [['addWorkBlockBtn', 'work'], ['addBreakBlockBtn', 'break'], ['addLunchBlockBtn', 'lunch']].forEach(([id, type]) => {
+      document.getElementById(id).addEventListener('click', () => addBlockRow(type));
+    });
     document.getElementById('scheduleOffsetMinusBtn').addEventListener('click', () => {
       if (scheduleOffsetMin - 15 < -SCHEDULE_OFFSET_LIMIT_MIN) {
         toast(ui`El ajuste no puede pasar de -12h de una sola vez.`);
@@ -7823,12 +7825,13 @@ export function render() {
       if (!timeInput) return;
       const row = timeInput.closest('.block-row');
       if (row) updateScheduleRowSummary(row);
+      renderDayBar();
     });
     // Cambiar Día libre presenta la revisión de alcance antes de guardar.
     document.getElementById('dayOffInput').addEventListener('change', saveShiftWindow);
     ['dayStartInput', 'dayEndInput', 'dayOffInput'].forEach(id => {
       const el = document.getElementById(id);
-      if (el) { el.addEventListener('input', updateShiftLenChip); el.addEventListener('change', updateShiftLenChip); }
+      if (el) { el.addEventListener('input', () => { updateShiftLenChip(); renderDayBar(); }); el.addEventListener('change', () => { updateShiftLenChip(); renderDayBar(); }); }
     });
     document.getElementById('cycleAnchorInput').addEventListener('change', updateCycleSettings);
     document.getElementById('cyclePayOffsetInput').addEventListener('change', updateCycleSettings);
