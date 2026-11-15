@@ -4606,12 +4606,6 @@
       "js/game.js"
     ]
   },
-  "s_44a0cab3": {
-    "source": "No hay cookies de publicidad, píxeles de seguimiento ni analítica de terceros. Los diagnósticos técnicos se guardan en la infraestructura privada de la app.",
-    "files": [
-      "privacidad.html"
-    ]
-  },
   "s_44cced1b": {
     "source": "Adherencia",
     "files": [
@@ -7481,6 +7475,12 @@
     "source": "Todavía no tienes meta para esta sesión.",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_7153b062": {
+    "source": "No hay cookies de publicidad ni píxeles de seguimiento. Contamos visitas con Vercel Analytics, sin cookies y sin datos personales. Los diagnósticos técnicos se guardan en la infraestructura privada de la app.",
+    "files": [
+      "privacidad.html"
     ]
   },
   "s_71841671": {

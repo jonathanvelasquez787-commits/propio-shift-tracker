@@ -1189,6 +1189,13 @@
           ]
         },
         {
+          "file": "tests/vercel-analytics.test.mjs",
+          "namedCases": [
+            "Vercel Analytics: el build agrega el script solo a la landing y a la app, sin tocar el HTML fuente",
+            "Vercel Analytics: la política de seguridad lo permite desde el mismo origen y la privacidad lo declara"
+          ]
+        },
+        {
           "file": "tests/freelancer-blocks-list.test.mjs",
           "namedCases": [
             "Bloques del día en freelancer: cada descanso es una fila con etiqueta, horas y minutos",

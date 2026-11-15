@@ -118,6 +118,8 @@ for (const name of ['index.html', 'app.html', 'privacidad.html', 'terminos.html'
     .replace(/^<link rel="modulepreload" href="\/js\/.*?"\/>\r?\n/gm, '');
   if (name === 'app.html') html = html.replace('</head>', `<link rel="modulepreload" href="/assets/app-main.js?v=${release}">\n</head>`);
   html = html.replace('</head>', `<script src="/assets/monitoring.js?v=${release}"></script>\n</head>`);
+  // Vercel Analytics: cuenta visitas y páginas vistas sin cookies. Solo en la landing y la app; el archivo lo sirve Vercel.
+  if (name === 'index.html' || name === 'app.html') html = html.replace('</head>', '<script defer src="/_vercel/insights/script.js"></script>\n</head>');
   html = html.replace('</head>', '<link rel="manifest" href="/manifest.webmanifest">\n<meta name="theme-color" content="#07111f">\n</head>');
   html = html.replace('</body>', `<script src="/assets/register-sw.js?v=${release}" defer></script>\n</body>`);
   if (name === 'app.html') {
