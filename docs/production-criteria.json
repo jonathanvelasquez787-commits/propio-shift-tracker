@@ -1246,6 +1246,13 @@
           ]
         },
         {
+          "file": "tests/cycle-boss-not-in-earnings.test.mjs",
+          "namedCases": [
+            "la tarjeta Ganancias del ciclo ya no muestra al jefe del ciclo (Guardián de la Quincena)",
+            "el jefe del ciclo sigue en la página de Logros"
+          ]
+        },
+        {
           "file": "tests/freelancer-blocks-list.test.mjs",
           "namedCases": [
             "Bloques del día en freelancer: cada descanso es una fila con etiqueta, horas y minutos",

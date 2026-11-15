@@ -60,7 +60,7 @@ test('HTML integra la ruta de Logros, el arena, las misiones, ajustes y modales 
   const duplicates = ids.filter((id, index) => ids.indexOf(id) !== index);
   assert.deepEqual(duplicates, []);
   for (const id of [
-    'gameArena', 'gameMissions', 'gameCycleBoss', 'gameCycleBossAchievements',
+    'gameArena', 'gameMissions', 'gameCycleBossAchievements',
     'gameAchievementsSummary', 'gameStreakPanel', 'gameLevelPanel', 'gameBestiary',
     'gameTrophies', 'gameRecords', 'gameLastStageClear', 'gameToastStack',
     'gameEnabledInput', 'sidebarAchievementsInput', 'gameSettingsProfile',
