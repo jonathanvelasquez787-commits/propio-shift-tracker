@@ -1474,3 +1474,41 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
   .chips > .hero-shift-actions.has-game:has(.game-battle-collection:not([hidden])) { position: relative; z-index: 40; overflow: visible; }
 }
 /* fin logros flotante en la barra */
+
+/* juego en celular igual que escritorio */
+/* Celular: el reto de hoy se ve igual que en escritorio (escena de 88 px con todo dentro). No cambia de lugar: sigue debajo de Ganancias. */
+@media (max-width: 760px) {
+  #gameHomeDay .game-battle { position: relative; grid-template-columns: minmax(0, 1fr); grid-template-rows: 88px auto; }
+  #gameHomeDay .game-battle .game-battle-head,
+  #gameHomeDay .game-battle .game-battle-stage,
+  #gameHomeDay .game-battle .game-battle-health,
+  #gameHomeDay .game-battle .game-battle-footer { grid-column: 1; grid-row: 1; }
+  #gameHomeDay .game-battle .game-battle-stage { height: 88px; align-self: start; --battle-floor-lift: 15px; }
+  #gameHomeDay .game-battle .game-battle-collection { grid-row: 2; }
+  #gameHomeDay .game-battle .game-battle-head { align-self: start; z-index: 3; height: 24px; padding: 2px 6px 0 10px; gap: 4px; background: color-mix(in srgb, var(--battle-sky) 78%, transparent); }
+  #gameHomeDay .game-battle .game-battle-heading { display: flex; flex-wrap: nowrap; align-items: center; gap: 6px; min-width: 0; overflow: hidden; white-space: nowrap; }
+  #gameHomeDay .game-battle .game-battle-heading > .game-kicker { margin: 0; font-size: 9px; }
+  #gameHomeDay .game-battle .game-battle-heading h3 { font-size: 12px; overflow: hidden; text-overflow: ellipsis; }
+  #gameHomeDay .game-battle .game-level-chip { align-self: center; margin: 0; padding: 0 5px; font-size: 9px; line-height: 14px; transform: none; }
+  #gameHomeDay .game-battle .game-battle-head-tools button { width: 20px; height: 20px; min-width: 0; }
+  #gameHomeDay .game-battle .game-battle-head-tools svg { width: 12px; height: 12px; }
+  #gameHomeDay .game-battle .game-battle-health { align-self: start; z-index: 4; padding: 0; background: none; pointer-events: none; }
+  #gameHomeDay .game-battle .game-compact-goal-line { position: absolute; top: 4px; right: 54px; margin: 0; font-size: 11px; line-height: 16px; }
+  #gameHomeDay .game-battle .game-compact-goal-line > span { display: none; }
+  #gameHomeDay .game-battle .game-compact-goal-track { position: absolute; left: 0; right: 0; top: 21px; height: 3px; margin: 0; }
+  #gameHomeDay .game-battle .game-compact-goal-chest,
+  #gameHomeDay .game-battle .game-compact-goal-foot { display: none; }
+  #gameHomeDay .game-battle .game-battle-footer { align-self: end; z-index: 3; height: 26px; min-height: 26px; padding: 0 10px; gap: 8px; justify-content: center; border-top: 0; background: color-mix(in srgb, var(--battle-sky) 82%, transparent); }
+  #gameHomeDay .game-battle .game-battle-footer > button { min-height: 20px; padding: 0 6px; font-size: 12px; }
+  #gameHomeDay .game-battle .game-battle-footer .game-battle-loadout { display: flex; align-items: center; padding: 0; background: none; }
+  #gameHomeDay .game-battle .game-battle-footer .game-battle-loadout > div { display: flex; align-items: center; width: auto; }
+  #gameHomeDay .game-battle .game-battle-footer .game-battle-loadout label,
+  #gameHomeDay .game-battle .game-battle-footer .game-battle-loadout small { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  #gameHomeDay .game-battle .game-battle-footer .game-battle-loadout select { width: auto; max-width: 118px; min-height: 20px; padding: 0 4px; border: 1px solid var(--line); border-radius: 6px; background: var(--accordion-bg); font-size: 11px; }
+  #gameHomeDay .game-battle .game-battle-monster { bottom: 24px; width: 52px; height: 41px; }
+  #gameHomeDay .game-battle .game-battle-label { display: none; }
+}
+@media (max-width: 760px) {
+  #gameHomeDay .game-battle .game-battle-heading > .game-kicker { display: none; }
+}
+/* fin juego en celular igual que escritorio */

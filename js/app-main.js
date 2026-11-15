@@ -7092,7 +7092,7 @@ export function render() {
       placeBattleLoadout();
     }
     // Con el juego dentro de la barra, el selector de Arma sube a la franja de abajo de la escena (siempre visible).
-    // Fuera de la barra vuelve a su lugar, dentro del desplegable de Logros.
+    // En celular el juego se ve igual, así que el selector también va abajo. Solo en escritorio fuera de Inicio vuelve al desplegable de Logros.
     function placeBattleLoadout() {
       const day = document.getElementById('gameHomeDay');
       const battle = day?.querySelector('.game-battle');
@@ -7100,7 +7100,7 @@ export function render() {
       const footer = battle?.querySelector('.game-battle-footer');
       const slots = battle?.querySelector('.game-battle-slots');
       if (!loadout || !footer || !slots) return;
-      const inBar = day.classList.contains('hero-shift-game');
+      const inBar = day.classList.contains('hero-shift-game') || !desktopGameQuery?.matches;
       if (inBar && loadout.parentElement !== footer) footer.insertBefore(loadout, footer.querySelector('[data-battle-collection-toggle]'));
       else if (!inBar && loadout.parentElement !== slots) slots.appendChild(loadout);
     }
