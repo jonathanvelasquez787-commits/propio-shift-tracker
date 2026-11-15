@@ -2,15 +2,15 @@ export function presentationPreferences(value) {
   const source = value && typeof value === 'object' && !Array.isArray(value) ? value : {};
   // Formato anterior (con interruptor principal): si estaba apagado se veía todo.
   if ('enabled' in source) {
-    if (source.enabled !== true) return { earnings:true, schedule:true, game:true };
-    return { earnings: source.earnings !== false, schedule: source.schedule !== false, game: source.game === true };
+    if (source.enabled !== true) return { earnings:true, schedule:true };
+    return { earnings: source.earnings !== false, schedule: source.schedule !== false };
   }
-  return { earnings: source.earnings !== false, schedule: source.schedule !== false, game: source.game !== false };
+  return { earnings: source.earnings !== false, schedule: source.schedule !== false };
 }
 
 export function applyPresentation(settings, doc = document) {
   const preferences = presentationPreferences(settings.essentialView);
-  for (const key of ['earnings', 'schedule', 'game']) {
+  for (const key of ['earnings', 'schedule']) {
     doc.documentElement.classList.toggle(`essential-hide-${key}`, !preferences[key]);
   }
   for (const input of doc.querySelectorAll('[data-essential-option]')) {
