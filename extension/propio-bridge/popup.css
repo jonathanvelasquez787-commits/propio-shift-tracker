@@ -21,7 +21,6 @@ main{padding:14px}.brand{margin:2px 0 14px}.brand p{font-size:11px}.card{padding
 .connection .status{font-size:19px;margin:12px 0 4px}
 .connection .actions{margin-top:14px}
 .connection .actions button.primary{flex:1;min-height:42px;font-size:13px}
-.connection #pair:not(.primary){flex:none;min-height:0;padding:0;border:0;background:none;color:var(--muted);font-weight:500;text-decoration:underline}
 .connection #pair:not(.primary):hover{color:var(--text)}
 .quick-card h2{font-size:13px;margin:0 0 4px}
 .quick-card .toggle-row{min-height:48px;margin:0;padding:10px 0;border-top:1px solid var(--line)}
@@ -29,9 +28,6 @@ main{padding:14px}.brand{margin:2px 0 14px}.brand p{font-size:11px}.card{padding
 .quick-card h2+.toggle-row{border-top:0}
 .quick-card .helper{margin-top:4px}
 .quick-card>button#refreshTracker{margin-top:8px}
-.quick-links{display:flex;justify-content:flex-start;padding:0 2px 6px}
-.quick-links button,.quick-links button.primary{border:0;background:none;color:var(--muted);padding:6px 0;min-height:0;font-size:12px;font-weight:500}
-.quick-links button:hover{color:var(--text)}
 .more-options{margin:0 0 4px}
 .more-options>summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;min-height:44px;padding:0 4px;font-size:13px;font-weight:600;color:var(--muted)}
 .more-options>summary::-webkit-details-marker{display:none}
@@ -46,3 +42,6 @@ main{padding:14px}.brand{margin:2px 0 14px}.brand p{font-size:11px}.card{padding
 .quick-card .select-field{gap:7px}
 .quick-card .select-field+.helper,.quick-card .inline-field+.helper{margin:0 0 6px;font-size:11px}
 .appearance-card h2{font-size:13px;margin:0 0 4px}
+/* botones conexion */
+.connection .actions button,.connection .actions button.primary{flex:1 1 120px;min-width:0}
+/* fin botones conexion */

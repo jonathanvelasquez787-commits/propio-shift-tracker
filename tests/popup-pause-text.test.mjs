@@ -19,3 +19,26 @@ test('popup: las opciones de volver a estar disponible dicen "Estar disponible"'
   assert.ok(rowOf('resumeLunch').includes('Estar disponible después del Lunch'));
   assert.ok(!html.includes('Volver después de'));
 });
+
+const popupJs = readFileSync(new URL('../extension/propio-bridge/popup.js', import.meta.url), 'utf8');
+
+test('popup: "Abrir Shift Tracker" queda a la derecha de "Revisar conexión"', () => {
+  const start = html.indexOf('<div class="actions">');
+  const actions = html.slice(start, html.indexOf('</div>', start));
+  assert.ok(actions.indexOf('id="pair"') > -1 && actions.indexOf('id="open"') > actions.indexOf('id="pair"'));
+  assert.ok(!html.includes('quick-links'));
+});
+
+test('popup: "Revisar conexión" muestra un aviso cuando termina bien', () => {
+  assert.ok(popupJs.includes("act({ kind: 'pair' }, 'Conexión revisada"));
+  assert.ok(popupJs.includes('async function act(packet, okMessage)'));
+});
+
+test('popup: los textos de Más opciones son cortos', () => {
+  assert.ok(!html.includes('Se detienen los iniciadores'));
+  assert.ok(!html.includes('El permiso de la nube vence'));
+  assert.ok(!html.includes('Estos números cuentan'));
+  assert.ok(html.includes('Se detiene el ponerte disponible. Para volver, apagá la pausa.'));
+  assert.ok(html.includes('Guarda llamadas, pero no te pone disponible.'));
+  assert.ok(html.includes('Elegí páginas, perfil y tamaños.'));
+});

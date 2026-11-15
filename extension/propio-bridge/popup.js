@@ -47,7 +47,7 @@ const availabilityReasons = {
   'device-passive': 'Solo registro en esta PC. No pulsa Start Calls ni Stop Calls ni termina pausas automáticamente.',
   coordination: 'Esperando permiso de la nube para esta PC. Otra PC puede estar usando los iniciadores. El registro continúa; pausá la PC anterior y esperá hasta 30 segundos.',
 };
-let busy = false, feedback = '', automationUi = null, workSession = null;
+let busy = false, feedback = '', feedbackIsOk = false, automationUi = null, workSession = null;
 async function refresh() {
   const state = await send({ kind: 'status' });
   if (!state || state.ok === false) throw new Error('status');
@@ -56,7 +56,7 @@ async function refresh() {
   automationUi.update(state.automationStatus || null);
   document.getElementById('status').textContent = state.mode === 'auto' ? 'Registro automático activo' : state.paired ? 'Listo para registrar' : 'Buscando Propio Shift Tracker';
   document.getElementById('detail').textContent = feedback || reasons[state.attention] || (state.paired ? state.mode === 'auto' ? 'El registro automático está activo.' : 'Activá el registro cuando quieras comenzar.' : 'Se vincula automáticamente al reconocer tu sesión en Propio Shift Tracker.');
-  document.getElementById('detail').classList.toggle('error', Boolean(feedback || state.attention));
+  document.getElementById('detail').classList.toggle('error', Boolean((feedback && !feedbackIsOk) || state.attention));
   const badge = document.getElementById('connectionBadge'); badge.textContent = state.paired ? 'Conectada' : 'Esperando'; badge.classList.toggle('connected', state.paired);
   document.getElementById('observedCount').textContent = String(state.completed);
   document.getElementById('historyCount').textContent = state.history ? String(state.history.count) : '—';
@@ -114,7 +114,7 @@ async function refresh() {
   refreshTracker.disabled = busy || state.active || state.call === 'connected' || state.call === 'incoming';
   const plannedPause = plan?.scheduledPauses?.filter(slot => Date.now() >= Date.parse(slot.startedAt) && Date.now() < Date.parse(slot.endedAt))
     .sort((a, b) => Date.parse(b.endedAt) - Date.parse(a.endedAt))[0];
-  document.getElementById('prepareStatus').textContent = !prep?.enabled ? 'Apagado. Vos pulsás «Start Calls» para comenzar.'
+  document.getElementById('prepareStatus').textContent = !prep?.enabled ? 'Apagado. Para empezar, pulsá Start Calls en Propio.'
     : state.mode !== 'auto' ? 'Activá «Registrar mi actividad» para usar esta opción.'
     : !plan ? 'Esperando un horario de trabajo de Propio Shift Tracker. En día libre no se activa.'
     : !plan.scheduleVerified ? 'La conexión de esta pestaña todavía no confirma tus descansos. Actualizá Propio Shift Tracker para reconectarlo.'
@@ -162,15 +162,15 @@ async function refresh() {
     requests.append(li);
   }
 }
-async function act(packet) {
+async function act(packet, okMessage) {
   if (busy) return;
-  busy = true; feedback = '';
-  try { const result = await send(packet); if (!result?.ok) feedback = reasons[result?.reason] || 'No se pudo completar la acción.'; }
+  busy = true; feedback = ''; feedbackIsOk = false;
+  try { const result = await send(packet); if (!result?.ok) feedback = reasons[result?.reason] || 'No se pudo completar la acción.'; else if (okMessage) { feedback = okMessage; feedbackIsOk = true; const shown = okMessage; setTimeout(() => { if (feedback === shown) { feedback = ''; feedbackIsOk = false; refresh().catch(() => {}); } }, 6000); } }
   catch { feedback = reasons.storage; }
   finally { busy = false; await refresh().catch(() => {}); }
 }
 document.getElementById('open').addEventListener('click', () => act({ kind: 'open-tracker' }));
-document.getElementById('pair').addEventListener('click', () => act({ kind: 'pair' }));
+document.getElementById('pair').addEventListener('click', () => act({ kind: 'pair' }, 'Conexión revisada: Propio Shift Tracker está conectado.'));
 document.getElementById('resumeAvailability').addEventListener('click', () => act({ kind: 'pause-availability', paused: false }));
 document.getElementById('automatic').addEventListener('change', event => act({ kind: 'mode', mode: event.target.checked ? 'auto' : 'observe' }));
 document.getElementById('prepareFirst').addEventListener('change', event => act({ kind: 'prepare-first', enabled: event.target.checked }));
