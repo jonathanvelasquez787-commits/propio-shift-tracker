@@ -928,7 +928,8 @@
             "popup: \"Abrir Shift Tracker\" queda a la derecha de \"Revisar conexión\"",
             "popup: \"Revisar conexión\" muestra un aviso cuando termina bien",
             "popup: los textos de Más opciones son cortos",
-            "popup: ya no tiene \"Solo registrar en esta PC\" ni \"Cómo funciona la espera\""
+            "popup: ya no tiene \"Solo registrar en esta PC\" ni \"Cómo funciona la espera\"",
+            "popup: ya no tiene la tarjeta \"Más sobre la disponibilidad\""
           ]
         }
       ]
