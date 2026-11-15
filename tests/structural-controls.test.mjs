@@ -56,7 +56,7 @@ for (const previous of [undefined, true]) {
     let accepted = false, rewards = 0, disk;
     const initial = previous === undefined ? {} : { streakSkipOffDays: previous };
     const h = vm.createContext({ settings: copy(initial), saveSettingsOnly: () => { if (accepted) disk = copy(h.settings); return accepted; },
-      render() {}, onGameDayMetadataChanged: () => { rewards++; }, todayCallDateKey: () => 'today' });
+      render() {}, onReinforcementDayMetadataChanged: () => { rewards++; }, todayCallDateKey: () => 'today' });
     vm.runInContext(declaration('reports', 'updateStreakSkipOffSetting'), h);
     assert.equal(h.updateStreakSkipOffSetting(false), false);
     assert.deepEqual(copy(h.settings), initial); assert.equal(rewards, 0);
@@ -70,13 +70,13 @@ test('streak rollback never restores the previous account over a replacement own
   const replacement = { streakSkipOffDays: false };
   const h = vm.createContext({ settings: { streakSkipOffDays: true },
     saveSettingsOnly: () => { h.settings = replacement; return false; }, render() {},
-    onGameDayMetadataChanged: () => assert.fail('Rejected setting must not change rewards') });
+    onReinforcementDayMetadataChanged: () => assert.fail('Rejected setting must not change rewards') });
   vm.runInContext(declaration('reports', 'updateStreakSkipOffSetting'), h);
   assert.equal(h.updateStreakSkipOffSetting(false), false);
   assert.equal(h.settings, replacement); assert.equal(replacement.streakSkipOffDays, false);
 });
 
-const gameText = fs.readFileSync(new URL('../js/game.js', import.meta.url), 'utf8');
+const gameText = fs.readFileSync(new URL('../js/reinforcement.js', import.meta.url), 'utf8');
 const gameAst = parse(gameText, { ecmaVersion: 'latest', sourceType: 'module' });
 function findNode(node, predicate) {
   if (!node || typeof node !== 'object') return null;
@@ -110,7 +110,7 @@ for (const [name, key, value] of [['sidebarGameSoundInput', 'soundEnabled', fals
       renderSettingsProfile: () => { input.checked = h.settings.game.soundEnabled; visible.volume = h.settings.game.soundVolume; },
       renderArena: () => { visible.weapon = h.settings.game.weapon; visible.sound = h.settings.game.soundEnabled; },
       renderGame: () => { h.renderSettingsProfile(); h.renderArena(); } });
-    vm.runInContext(`${declaration('game', 'saveGamePreference')}\nconst handler = ${gameHandler(name)};`, h);
+    vm.runInContext(`${declaration('reinforcement', 'saveGamePreference')}\nconst handler = ${gameHandler(name)};`, h);
     const invoke = () => vm.runInContext(name === 'onWeaponChange' ? `handler('${value}')` : 'handler({target:input})', Object.assign(h, { input }));
     invoke();
     assert.deepEqual(copy(h.settings), initial);
@@ -132,7 +132,7 @@ for (const key of ['weapon', 'soundEnabled', 'soundVolume']) test(`game ${key} r
         if (replaceSettings) h.settings = { game: replacement }; else h.settings.game = replacement;
         return false;
       } });
-    vm.runInContext(declaration('game', 'saveGamePreference'), h);
+    vm.runInContext(declaration('reinforcement', 'saveGamePreference'), h);
     assert.equal(h.saveGamePreference(key, 'draft'), false);
     assert.equal(h.settings.game, replacement);
     assert.deepEqual(replacement, { weapon: 'other', soundEnabled: false, soundVolume: 5 });
@@ -162,7 +162,7 @@ function scheduleWeekHarness({ enabled = true, overrides, beforeWrite = () => {}
     scheduleWeekKeyForOffset: offset => `week-${offset}`, cloneWeeklyScheduleForOverride: () => copy(h.settings.weeklySchedule),
     snapshotHistoricalPlanning: () => { mutations++; h.settings.historicalPlanning.changed = 'settings'; h.state.historicalPlanning.changed = 'state'; },
     saveAll: persist, saveSettingsOnly: persist, canPersistLocalChanges: () => true,
-    onGameDayMetadataChanged: () => { rewards++; }, todayCallDateKey: () => 'today', toast() {}, translateText: text => text, render() {},
+    onReinforcementDayMetadataChanged: () => { rewards++; }, todayCallDateKey: () => 'today', toast() {}, translateText: text => text, render() {},
     appConfirm: (_message, callback) => { confirmation = callback; },
     syncShiftModalFields: () => { input.checked = !!h.settings.scheduleOverridesByWeek?.[`week-${h.scheduleWeekOffset}`]; } });
   vm.runInContext(`${declaration('schedule', 'ensureScheduleWeekOverride')}\n${declaration('schedule', 'removeScheduleWeekOverride')}\nconst handler = ${weekHandler};`, h);

@@ -36,7 +36,7 @@ function fixture(t) {
     reconcileLastCallEndedAt: () => { state.lastCallEndedAt = calls.at(-1)?.endISO || null; },
     saveAll() { h.writes++; if (h.onSave) return h.onSave(); if (h.accepted === 'throw') throw Error('interrupted'); if (!h.accepted) return false;
       h.saved = JSON.stringify({ calls, state, settings }); return true; },
-    onGameCallsChanged() { h.gameCalls++; }, finishEdit() {}, closeModal() {},
+    onReinforcementCallsChanged() { h.gameCalls++; }, finishEdit() {}, closeModal() {},
   };
   h.context = context; h.snapshot = () => JSON.stringify({ calls, state, settings });
   h.reload = () => { const data = JSON.parse(h.saved); setAppCalls(data.calls); setAppState(data.state); setAppSettings(data.settings); };

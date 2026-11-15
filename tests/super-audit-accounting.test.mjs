@@ -10,7 +10,7 @@ import { configureFinanceContext, financeRunAutoFillCascade, financeApplySignedA
 import { addFinancePayment, deleteFinancePayment, saveFinanceSavingsMonths } from '../js/finance-planning.js';
 import { financeMonthTotals } from '../js/finance-plan-model.js';
 import { configureHigherRateContext, higherRateBonusForCall, higherRateBonusForCalls, higherRateBonusBreakdownForCalls } from '../js/higher-rate.js';
-import { configureGameContext, createDefaultGameState, onGameCallsChanged } from '../js/game.js';
+import { configureGameContext, createDefaultGameState, onReinforcementCallsChanged } from '../js/reinforcement.js';
 import { configurePositiveReinforcementContext } from '../js/positive-reinforcement.js';
 import { withSilentCallFeedback, callFeedbackSilenced } from '../js/call-feedback.js';
 import { PAY_ESTIMATE_RULE, roundedPayMinutes, callPayMinutes } from '../js/pay-estimate.js';
@@ -132,7 +132,7 @@ test('official bridge synchronization is silent while the live finish and manual
   const callback = receiver.declaration.declarations[0].init.arguments[0].properties.find(node => node.key.name === 'importHistory').value;
   const muted = [];
   x.h.withSilentCallFeedback = withSilentCallFeedback; x.h.portalRecordsText = value => value;
-  x.h.onGameCallsChanged = () => muted.push(callFeedbackSilenced());
+  x.h.onReinforcementCallsChanged = () => muted.push(callFeedbackSilenced());
   const importHistory = vm.runInContext(`(${source.slice(callback.start, callback.end)})`, x.h);
   const row = '91434\t09/01/2025\t09:00 AM\t10\tYes\tNo\t$1.20';
   assert.equal(importHistory(row), true); assert.equal(calls.length, 1);
@@ -220,7 +220,7 @@ function harness(t) {
     callsForDay: key => calls.filter(c => c.callDate === key),
     getActiveDayKey: () => state.activeDayKey, defaultActiveDayKey: () => h.todayCallDateKey(),
     toast:message=>messages.push(message), saveAll: save, financeRunAutoFillCascade, autoStartShiftFromCalls() {}, playCallSavedSound:kind=>soundEvents.push(kind),
-    migratePositiveCallIdReferences() {}, migrateGameCallReferences() {}, onGameCallSaved: call => gameSaved.push(call.id), onGameCallsChanged() {},
+    migratePositiveCallIdReferences() {}, migrateGameCallReferences() {}, onReinforcementCallSaved: call => gameSaved.push(call.id), onReinforcementCallsChanged() {},
     setEvent: (...args) => state.events.push(args), renderImportSkippedSummary() {}, callImportFlag: () => null,
     canPersistLocalChanges: () => true,
     dayIsEffectivelyOff: key => new Date(h.callDateToDate(key)).getDay() === 0, dayAdherence: () => null,
@@ -352,7 +352,7 @@ test('closing a shift during a pause saves both changes together and preserves t
   const x=harness(t);x.advance(at(1,'12:10'));
   let alarms=0,rewards=0;
   Object.assign(x.h,{fmtTime:String,findPlannedSlotForActivePause:()=>null,currentShiftAccountingDayKey:()=> '09/01/2025',
-    saveStateOnly:()=>assert.fail('No intermediate pause save'),stopBreakEndAlarm:()=>alarms++,onGamePauseEnded:()=>rewards++,ADHERENCE_TOLERANCE_MIN:3});
+    saveStateOnly:()=>assert.fail('No intermediate pause save'),stopBreakEndAlarm:()=>alarms++,onReinforcementPauseEnded:()=>rewards++,ADHERENCE_TOLERANCE_MIN:3});
   vm.runInContext(['endPause','endShift'].map(name=>declarations.get(name)).join('\n'),x.h);
   state.shiftStartedAt=at(1,'08:00').toISOString();state.activePause={type:'lunch',startedAt:at(1,'12:00').toISOString()};
   const before=JSON.stringify(state);x.rejectSave();
@@ -364,7 +364,7 @@ test('closing a shift during a pause saves both changes together and preserves t
 test('starting a call during a pause rolls back rejected activity without stopping its alarm or granting rewards',t=>{
   const x=harness(t);x.advance(at(1,'12:10'));let rewards=0,alarms=0;
   Object.assign(x.h,{fmtTime:String,liveCallDayIsOff:()=>false,findPlannedSlotForActivePause:()=>null,currentShiftAccountingDayKey:()=> '09/01/2025',
-    saveStateOnly:()=>assert.fail('No intermediate pause save'),stopBreakEndAlarm:()=>alarms++,onGamePauseEnded:()=>rewards++,onGameShiftStarted:()=>rewards++,ADHERENCE_TOLERANCE_MIN:3});
+    saveStateOnly:()=>assert.fail('No intermediate pause save'),stopBreakEndAlarm:()=>alarms++,onReinforcementPauseEnded:()=>rewards++,onReinforcementShiftStarted:()=>rewards++,ADHERENCE_TOLERANCE_MIN:3});
   vm.runInContext(['endPause','startCall'].map(name=>declarations.get(name)).join('\n'),x.h);
   state.shiftStartedAt=at(1,'08:00').toISOString();state.activePause={type:'break',startedAt:at(1,'12:00').toISOString()};
   const before=JSON.stringify(state);x.rejectSave();assert.equal(x.h.startCall(),false);
@@ -375,7 +375,7 @@ test('starting a call during a pause rolls back rejected activity without stoppi
 
 test('manual shift reopening does not change its closed session until a continuation choice is accepted',t=>{
   const x=harness(t);x.advance(at(1,'09:02'));let resume;
-  Object.assign(x.h,{fmtTime:String,ACCIDENTAL_TOGGLE_GRACE_MIN:5,stopShiftAlarm(){},onGameShiftStarted(){},
+  Object.assign(x.h,{fmtTime:String,ACCIDENTAL_TOGGLE_GRACE_MIN:5,stopShiftAlarm(){},onReinforcementShiftStarted(){},
     reviewShiftTransition:(_kind,continued,fresh)=>{resume={continued,fresh};}});
   vm.runInContext(declarations.get('startShift'),x.h);
   state.shiftStartedAt=at(1,'08:00').toISOString();state.shiftEndedAt=at(1,'09:00').toISOString();state.propioBridgeSession={sessionId:'keep'};
@@ -638,7 +638,7 @@ test('reimporting the existing official zero row heals legacy duplicates exactly
     saveStateOnly() {}, saveSettingsOnly() {}, closeModal() {}, openModal() {}, escapeHtml: String, formatMinutes: String,
     convertedAmountText: () => '', getReinforcementWorkIntervals: () => [] };
   configureGameContext(common); configurePositiveReinforcementContext(common);
-  x.h.onGameCallsChanged = onGameCallsChanged;
+  x.h.onReinforcementCallsChanged = onReinforcementCallsChanged;
   const officialZero = [['42', day, '8:00 AM', 0, 'No', 'Yes', '0.00']];
   x.import(officialZero);
   assert.equal(calls.length, 1); assert.equal(calls[0].id, original.id);

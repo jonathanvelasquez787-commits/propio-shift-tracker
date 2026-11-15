@@ -133,7 +133,7 @@ function transact(context, kind, changes, restoredId = null) {
     context.toast(translateText('No se guardó el cambio. Tus llamadas y el historial anterior se conservaron.'));
     return false;
   }
-  days.forEach(context.onGameCallsChanged);
+  days.forEach(context.onReinforcementCallsChanged);
   context.render();
   return true;
 }

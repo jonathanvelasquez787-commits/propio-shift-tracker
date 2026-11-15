@@ -9,7 +9,7 @@ const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 
 test('auditoría profunda: editar Higher Rate reconcilia días de gamificación cuyo bono cambió', () => {
   const hr = read('js/higher-rate.js');
-  assert.match(hr, /onGameCallsChanged,/);
+  assert.match(hr, /onReinforcementCallsChanged,/);
   assert.match(hr, /function higherRateGameBonusSnapshot\(\)/);
   assert.match(hr, /function reconcileHigherRateGameChanges\(beforeSnapshot\)/);
   const save = hr.slice(hr.indexOf('export function saveHigherRateWindowsFromEditor'), hr.indexOf('export function removeHigherRateWindowRowAt'));
@@ -55,11 +55,11 @@ test('auditoría profunda: cambios de horario y metas reconcilian metadata del j
   const schedule = read('js/schedule.js');
   const settings = read('js/settings.js');
   const app = read('js/app-main.js');
-  assert.match(app, /export \{ onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged \}/);
-  assert.match(schedule, /onGameDayMetadataChanged,/);
-  assert.match(schedule, /onGameDayMetadataChanged\(todayCallDateKey\(\)\)/);
-  assert.match(settings, /onGameDayMetadataChanged,/);
-  assert.match(settings, /onGameDayMetadataChanged\(dayKey\)/);
+  assert.match(app, /export \{ onReinforcementCallSaved, onReinforcementCallsChanged, onReinforcementDayMetadataChanged \}/);
+  assert.match(schedule, /onReinforcementDayMetadataChanged,/);
+  assert.match(schedule, /onReinforcementDayMetadataChanged\(todayCallDateKey\(\)\)/);
+  assert.match(settings, /onReinforcementDayMetadataChanged,/);
+  assert.match(settings, /onReinforcementDayMetadataChanged\(dayKey\)/);
 });
 
 test('auditoría profunda: cambiar reglas de racha refresca juego además del reporte', () => {
@@ -67,7 +67,7 @@ test('auditoría profunda: cambiar reglas de racha refresca juego además del re
   const start = reports.indexOf('function updateStreakSkipOffSetting');
   const end = reports.indexOf('function trendChipHtml', start);
   const body = reports.slice(start, end);
-  assert.match(body, /onGameDayMetadataChanged\(todayCallDateKey\(\)\)/);
+  assert.match(body, /onReinforcementDayMetadataChanged\(todayCallDateKey\(\)\)/);
   assert.match(body, /render\(\)/);
   assert.doesNotMatch(body, /renderReportsDashboard\(\)/);
 });

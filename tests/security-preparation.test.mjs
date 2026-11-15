@@ -163,7 +163,7 @@ test('PWA shell includes a manifest and service worker with API exclusions', () 
   assert.match(worker, /cache\.match\(request\)/);
   assert.doesNotMatch(worker, /caches\.match\(request\)/);
   for (const asset of [
-    '/css/tokens.css', '/css/landing.css', '/css/legal.css', '/css/app-shell.css', '/css/game.css',
+    '/css/tokens.css', '/css/landing.css', '/css/legal.css', '/css/app-shell.css', '/css/reinforcement.css',
     '/assets/theme-init.js', '/assets/theme-toggle.js', '/assets/footer-year.js', '/assets/landing-ui.js',
     '/assets/landing.js', '/assets/boot.js', '/assets/monitoring.js', '/assets/register-sw.js',
   ]) assert.ok(worker.includes(asset), `missing precache asset ${asset}`);

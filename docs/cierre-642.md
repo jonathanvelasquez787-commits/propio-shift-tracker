@@ -26,7 +26,7 @@ previa del propietario. El cierre de publicación incorpora estas correcciones.
   plegada, reglas de XP/racha/misiones, cuatro estados del cofre, vista previa
   del equipo sin guardado y con foco estable, pendientes y premios realizados
   juntos, duelo con pausa/reanudación explícita y ciclo identificado en premio
-  pendiente o reclamado. [Reglas y evidencia](logros-reglas-y-premios.md).
+  pendiente o reclamado..
 - **61–62 y 78–79, presentación:** vista esencial configurable y reversible,
   contraste de paletas, fecha/frase en anchos pequeños, mismo estado de llamada
   pendiente en barra y tarjeta, teclado/foco, ayudas táctiles/Escape, reflow y

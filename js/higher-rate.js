@@ -7,14 +7,14 @@ import { callPayMinutes } from './pay-estimate.js';
 let HIGHER_RATE_EARLY_GRACE_MIN, HIGHER_RATE_TIERS, appConfirm, callDateKeyFromValue, callDateToDate;
 let callsForDay, dayKeyFromIsoDate, escapeHtml, financeConvertedInline, financeRunAutoFillCascade, formatBlockDurationLabel;
 let formatCallDayLabel, formatHHMM, formatMinutes, iconHtml, isoDateFromDayKey, makeLocalId;
-let mergeIntervals, minutesToHHMM, money, onGameCallsChanged, render, saveAll, timeLabel, toDateFromInputs, toMinutes;
+let mergeIntervals, minutesToHHMM, money, onReinforcementCallsChanged, render, saveAll, timeLabel, toDateFromInputs, toMinutes;
 let toast, todayCallDateKey, todayRange, canPersistLocalChanges, convertedAmountText, openModal, closeModal;
 
 export function configureHigherRateContext(context) {
   ({ HIGHER_RATE_EARLY_GRACE_MIN, HIGHER_RATE_TIERS, appConfirm, callDateKeyFromValue, callDateToDate,
     callsForDay, dayKeyFromIsoDate, escapeHtml, financeConvertedInline, financeRunAutoFillCascade, formatBlockDurationLabel,
     formatCallDayLabel, formatHHMM, formatMinutes, iconHtml, isoDateFromDayKey, makeLocalId,
-    mergeIntervals, minutesToHHMM, money, onGameCallsChanged, render, saveAll, timeLabel, toDateFromInputs, toMinutes, toast,
+    mergeIntervals, minutesToHHMM, money, onReinforcementCallsChanged, render, saveAll, timeLabel, toDateFromInputs, toMinutes, toast,
     todayCallDateKey, todayRange, canPersistLocalChanges, convertedAmountText, openModal, closeModal } = context);
 }
 
@@ -181,7 +181,7 @@ export async function applyHigherRateCorrection(windowId, draft, stamp, mode = '
         const currentDayKey = callDateKeyFromValue(call.callDate);
         if (currentDayKey) affectedDays.add(currentDayKey);
       });
-      affectedDays.forEach(dayKey => onGameCallsChanged(dayKey));
+      affectedDays.forEach(dayKey => onReinforcementCallsChanged(dayKey));
       return affectedDays;
     }
 

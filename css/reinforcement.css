@@ -578,15 +578,15 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 .game-settings-accordion-body { min-width: 0; padding: 10px 11px; }
 .game-settings-accordion-body > .game-settings-section,
 .game-settings-accordion-body > .positive-settings-section { min-width: 0; }
-.game-monster-name-setting { display: grid; gap: 6px; min-width: 0; }
-.game-monster-name-setting > label { color: var(--text); font-size: 12px; font-weight: 850; }
-.game-monster-name-controls { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; min-width: 0; }
-.game-monster-name-controls > input { width: 100%; min-width: 0; min-height: 38px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel-navy); color: var(--text); font: inherit; font-size: 12px; }
-.game-monster-name-controls > input:focus-visible { border-color: var(--cyan); outline: 2px solid rgba(var(--cyan-rgb), .38); outline-offset: 1px; }
-.game-monster-name-controls > button { min-height: 38px; padding: 8px 12px; white-space: nowrap; }
-.game-monster-name-setting > small { color: var(--muted); font-size: 10px; line-height: 1.4; }
-.game-monster-name-status { min-height: 0; color: var(--good); font-size: 10px; line-height: 1.4; overflow-wrap: anywhere; }
-.game-monster-name-status:empty { display: none; }
+.inactivity-message-setting { display: grid; gap: 6px; min-width: 0; }
+.inactivity-message-setting > label { color: var(--text); font-size: 12px; font-weight: 850; }
+.inactivity-message-controls { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; min-width: 0; }
+.inactivity-message-controls > input { width: 100%; min-width: 0; min-height: 38px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel-navy); color: var(--text); font: inherit; font-size: 12px; }
+.inactivity-message-controls > input:focus-visible { border-color: var(--cyan); outline: 2px solid rgba(var(--cyan-rgb), .38); outline-offset: 1px; }
+.inactivity-message-controls > button { min-height: 38px; padding: 8px 12px; white-space: nowrap; }
+.inactivity-message-setting > small { color: var(--muted); font-size: 10px; line-height: 1.4; }
+.inactivity-message-status { min-height: 0; color: var(--good); font-size: 10px; line-height: 1.4; overflow-wrap: anywhere; }
+.inactivity-message-status:empty { display: none; }
 .game-sealed-chest { width: 100%; padding: 10px; border: 1px solid rgba(var(--tier-gold-rgb, 255, 215, 110), .38); border-radius: 10px; color: var(--tier-gold); font-size: 11px; }
 
 @media (max-width: 1000px) {
@@ -860,8 +860,8 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 @media (max-width: 520px) {
   .game-settings-disclosures { gap: 8px; }
   .game-settings-accordion > summary { gap: 8px; padding: 12px; }
-  .game-monster-name-controls { grid-template-columns: minmax(0, 1fr); }
-  .game-monster-name-controls > button { justify-self: start; }
+  .inactivity-message-controls { grid-template-columns: minmax(0, 1fr); }
+  .inactivity-message-controls > button { justify-self: start; }
   .game-toast-stack { max-height: calc(100dvh - 86px); overflow: hidden; }
   .game-toast { grid-template-columns: auto minmax(0, 1fr); padding: 10px 11px; }
   .game-xp-float,
@@ -1102,9 +1102,9 @@ html.theme-light {
 .game-achievements-page .game-achievements-grid-top { align-items: start; }
 .game-achievements-page #gameSettingsProfile { align-items: start; }
 .game-achievements-page #gameStreakPanel { align-self: start; }
-.game-achievements-page .game-monster-name-setting{ max-width: 720px; }
+.game-achievements-page .inactivity-message-setting{ max-width: 720px; }
 .game-achievements-page .game-settings-accordion-body > .note,
-.game-achievements-page .game-monster-name-setting > small { max-width: 64ch; }
+.game-achievements-page .inactivity-message-setting > small { max-width: 64ch; }
 .game-achievements-grid-bottom, .game-achievements-grid-collection { align-items: stretch; }
 .game-achievements-page .game-panel { min-width: 0; }
 .game-achievements-page .game-panel-head > div:has(h2) { display: grid; grid-template-columns: minmax(0, max-content) auto; justify-content: start; align-items: center; gap: 4px 0; }
@@ -1170,7 +1170,7 @@ html.theme-light {
 .inactivity-compact .inactivity-row strong { color:var(--text); font-size:13px; }
 .inactivity-compact .inactivity-row small { color:var(--muted); font-size:11px; line-height:1.35; }
 .inactivity-compact .inactivity-row input { flex:0 0 auto; width:64px; min-height:38px; padding:8px 6px; text-align:center; border:1px solid var(--line); border-radius:10px; background:var(--panel-navy); color:var(--text); }
-.inactivity-compact .game-monster-name-controls { grid-template-columns:minmax(0,1fr) auto; }
+.inactivity-compact .inactivity-message-controls { grid-template-columns:minmax(0,1fr) auto; }
 
 /* Encabezado compacto de Logros: título, temporada e interruptor en pocas líneas */
 .game-achievements-hero-compact { padding: 10px 12px; }

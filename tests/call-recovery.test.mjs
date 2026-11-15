@@ -24,7 +24,7 @@ function fixture(t) {
     higherRateBonusForCall: c => c.frozenHigherRateBonus ? { amount: .03 * Number(c.durationMin) } : null,
     parseMoney: value => Number(value), callDateKeyFromValue: value => value, getActiveDayKey: () => '10/19/2026', formatCallDayLabel: value => value,
     saveAll() { h.writes++; if (h.accepted === 'throw') throw Error('storage'); if (!h.accepted) return false; h.saved = JSON.stringify({ state, settings, calls }); return true; },
-    onGameCallsChanged(day) { assert.ok(h.saved); h.games.push(day); }, render() {}, toast: message => h.messages.push(message),
+    onReinforcementCallsChanged(day) { assert.ok(h.saved); h.games.push(day); }, render() {}, toast: message => h.messages.push(message),
     appConfirm: (message, run) => { h.confirm = { message, run }; }, closeModal: () => h.closed++, finishEdit: () => h.endedEdit++,
   };
   h.context = context; h.data = context.data; h.snapshot = () => JSON.stringify(context.data());

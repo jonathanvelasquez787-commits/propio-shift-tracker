@@ -6091,7 +6091,7 @@
       "app.html",
       "js/app-main.js",
       "js/calls.js",
-      "js/game.js",
+      "js/reinforcement.js",
       "js/schedule.js"
     ]
   },
@@ -8482,7 +8482,7 @@
       "app.html",
       "js/app-main.js",
       "js/calls.js",
-      "js/game.js",
+      "js/reinforcement.js",
       "js/schedule.js"
     ]
   },

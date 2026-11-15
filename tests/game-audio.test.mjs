@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createGameAudio, withGameSoundsSilenced, gameSoundsSilenced } from '../js/game-audio.js';
+import { createGameAudio, withGameSoundsSilenced, gameSoundsSilenced } from '../js/reinforcement-audio.js';
 import { withSilentCallFeedback, callFeedbackSilenced } from '../js/call-feedback.js';
 
 test('discreet call feedback restores after nested failures and does not replay suppressed audio', async () => {

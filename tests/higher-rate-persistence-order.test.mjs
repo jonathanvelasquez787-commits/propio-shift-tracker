@@ -44,7 +44,7 @@ test('a rejected retroactive Higher Rate window cannot persist game receipts bef
       }
     }, renderHigherRateLiveCard() {}, renderHigherRateDayStats() {},
     notifyHigherRateRetroactiveMatches: () => effects.push('retroactive success'), notifyHigherRateMidnightCrossingWindows() {},
-    onGameCallsChanged(dayKey) {
+    onReinforcementCallsChanged(dayKey) {
       reconciliations++;
       state.game.ledger[dayKey] = h.higherRateBonusForCall(calls[0]).amount;
       h.saveStateOnly();
@@ -97,7 +97,7 @@ for (const action of ['saveHigherRateWindowsFromEditor', 'removeHigherRateWindow
           settings.financeLastDistribution = { at: 'rejected', items: [{ id: 'row', amount: .2 }] }; },
         saveAll: () => { if (accepted) persisted = JSON.stringify({ settings, call }); return accepted; }, render() {}, renderHigherRateLiveCard() {}, renderHigherRateDayStats() {}, renderHigherRateWindowsEditor() {},
         notifyHigherRateRetroactiveMatches: () => effects.push('success'), notifyHigherRateMidnightCrossingWindows() {},
-        onGameCallsChanged: () => effects.push('game'),
+        onReinforcementCallsChanged: () => effects.push('game'),
       });
       vm.runInContext(functions('../js/higher-rate.js', ['higherRateWindowBounds', 'callQualifiesForHigherRateWindow',
         'higherRateBonusForCall', 'higherRateGameBonusSnapshot', 'reconcileHigherRateGameChanges',

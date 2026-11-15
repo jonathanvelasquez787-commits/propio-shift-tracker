@@ -223,8 +223,8 @@ test('reemplazar una llamada live migra las referencias antes de reconciliar inc
   assert.equal(currentState.game.reinforcement.reflections.officialId.callId, 'officialId');
   const appMain = fs.readFileSync(path.join(root, 'js/app-main.js'), 'utf8');
   const importBody = appMain.slice(appMain.indexOf('function importCalls('), appMain.indexOf('function clearCallInputBox'));
-  assert.ok(importBody.indexOf('migratePositiveCallIdReferences') < importBody.indexOf('onGameCallsChanged'));
-  assert.ok(importBody.indexOf('migrateGameCallReferences') < importBody.indexOf('onGameCallsChanged'));
+  assert.ok(importBody.indexOf('migratePositiveCallIdReferences') < importBody.indexOf('onReinforcementCallsChanged'));
+  assert.ok(importBody.indexOf('migrateGameCallReferences') < importBody.indexOf('onReinforcementCallsChanged'));
   assert.match(importBody, /item\.replacementKind === 'live'\)\s*\{?\s*migratePositiveCallIdReferences\(item\.replaces\?\.id, item\.call\.id, item\.call\.endISO\)/);
   assert.match(importBody, /migrateGameCallReferences\(item\.replaces\?\.id, item\.call\.id\)/);
 });
@@ -306,9 +306,9 @@ test('dropped repetidas no abren reflexión y una recuperación requiere llamada
 
 test('Logros elimina plan, intensidad y presupuesto sin dejar controles ni listeners', () => {
   const html = fs.readFileSync(path.join(root, 'app.html'), 'utf8');
-  const game = fs.readFileSync(path.join(root, 'js/game.js'), 'utf8');
+  const game = fs.readFileSync(path.join(root, 'js/reinforcement.js'), 'utf8');
   const positive = fs.readFileSync(path.join(root, 'js/positive-reinforcement.js'), 'utf8');
-  const css = fs.readFileSync(path.join(root, 'css/game.css'), 'utf8');
+  const css = fs.readFileSync(path.join(root, 'css/reinforcement.css'), 'utf8');
   assert.doesNotMatch(html + positive, /physicalReward|pendingRewards|PHYSICAL_REWARD|onPositiveRewardWindow/);
   assert.doesNotMatch(css, /positive-reward-editor-grid|physical-reward/);
   assert.doesNotMatch(html + game + positive, /gameDailyFocus|gameIntensityInput|positiveWeeklyBudgetInput|choose-mission/);

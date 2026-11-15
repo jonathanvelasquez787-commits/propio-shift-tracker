@@ -37,7 +37,7 @@ function fixture(t) {
     saveAll: () => { h.writes++; if (!h.accepted) return false; h.saved = JSON.stringify({ settings, calls }); return true; },
     render() {}, toast: x => h.messages.push(x),
     financeRunAutoFillCascade: () => assert.fail('Archiving must not change financial assignments'),
-    onGameCallsChanged: () => assert.fail('Archiving must not award or revoke game progress'),
+    onReinforcementCallsChanged: () => assert.fail('Archiving must not award or revoke game progress'),
   });
   return h;
 }

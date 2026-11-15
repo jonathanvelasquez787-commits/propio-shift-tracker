@@ -1,7 +1,7 @@
 import { translateText } from './i18n.js';
 import { callFeedbackSilenced } from './call-feedback.js';
 import { calls, settings, state } from './app-context.js';
-import { initGameAudio, playGameSound, syncGameAudio } from './game-audio.js';
+import { initGameAudio, playGameSound, syncGameAudio } from './reinforcement-audio.js';
 import { activeWorkSinceLastCall, monetaryMilestones } from './reinforcement-rules.js';
 import { chooseCallFeedback, configureReinforcementFeedback, normalizeInactivityMinutes, notifyReinforcement, reinforcementFeedbackEnabled, reinforcementText } from './reinforcement-feedback.js';
 import {
@@ -248,7 +248,7 @@ export function migrateGameCallReferences(oldId, newId) {
   });
 }
 
-export function onGameMonetaryProgress(dayKey, earnings, goal, { silent = false, record = true } = {}) {
+export function onReinforcementMonetaryProgress(dayKey, earnings, goal, { silent = false, record = true } = {}) {
   ensureGameState();
   const claimed = [25, 50, 75, 100].filter((pct) => state.game.ledger[`money-hit:${dayKey}:${pct}`]);
   const progress = monetaryMilestones(earnings, goal, claimed);
@@ -319,12 +319,12 @@ function processCallReinforcement(call, source, dayKey) {
   const previousCalls = callsForDay(dayKey).filter((item) => item.id !== call.id);
   notifyReinforcement(chooseCallFeedback(call, { previousCalls, bonus: higherRateBonusAmount, money, convertedAmountText }));
   const stats = importedCallStats(callsForDay(dayKey), dayKey);
-  onGameMonetaryProgress(dayKey, stats.earnings, effectiveDailyGoal(dayKey).usd);
+  onReinforcementMonetaryProgress(dayKey, stats.earnings, effectiveDailyGoal(dayKey).usd);
   saveStateOnly();
   return true;
 }
 
-export function onGameCallSaved(call, source = 'manual') {
+export function onReinforcementCallSaved(call, source = 'manual') {
   if (!call || !['manual', 'live', 'import'].includes(source)) return;
   const dayKey = callDateKeyFromValue(call.shiftDayKey)
     || callDateKeyFromValue(call.callDate)
@@ -336,10 +336,10 @@ export function onGameCallSaved(call, source = 'manual') {
 
 function syncMoneyProgress(dayKey) {
   const stats = importedCallStats(callsForDay(dayKey), dayKey);
-  onGameMonetaryProgress(dayKey, stats.earnings, effectiveDailyGoal(dayKey).usd, { silent: dayKey !== currentGameDayKey() });
+  onReinforcementMonetaryProgress(dayKey, stats.earnings, effectiveDailyGoal(dayKey).usd, { silent: dayKey !== currentGameDayKey() });
 }
 
-export function onGameCallsChanged(dayKey) {
+export function onReinforcementCallsChanged(dayKey) {
   ensureGameState();
   const normalizedDayKey = String(dayKey || '');
   reconcilePositiveCalls(normalizedDayKey);
@@ -347,7 +347,7 @@ export function onGameCallsChanged(dayKey) {
   return true;
 }
 
-export function onGameDayReset(dayKey) {
+export function onReinforcementDayReset(dayKey) {
   ensureGameState();
   const normalized = String(dayKey || '');
   resetPositiveDay(normalized);
@@ -364,20 +364,20 @@ export function onGameDayReset(dayKey) {
   saveStateOnly();
 }
 
-export function onGameDayMetadataChanged(dayKey) {
+export function onReinforcementDayMetadataChanged(dayKey) {
   ensureGameState();
   syncMoneyProgress(String(dayKey || ''));
   saveStateOnly();
 }
 
 // Al iniciar un turno solo se guarda una copia del estado: si la llamada que abrió el turno se descarta, se puede volver atrás.
-export function onGameShiftStarted({ captureState = null } = {}) {
+export function onReinforcementShiftStarted({ captureState = null } = {}) {
   ensureGameState();
   captureState?.(JSON.parse(JSON.stringify(state.game)));
   saveStateOnly();
 }
 
-export function onGamePauseEnded(pauseRecord, { onTime = false } = {}) {
+export function onReinforcementPauseEnded(pauseRecord, { onTime = false } = {}) {
   ensureGameState();
   if (pauseRecord && ['break', 'lunch'].includes(pauseRecord.type)) {
     const dayKey = callDateKeyFromValue(pauseRecord.shiftDayKey) || currentGameDayKey();
@@ -391,7 +391,7 @@ export function onGamePauseEnded(pauseRecord, { onTime = false } = {}) {
   }
 }
 
-export function onGamePauseStarted(type) {
+export function onReinforcementPauseStarted(type) {
   ensureGameState();
   const pause = state.activePause;
   if (pause) {
@@ -403,7 +403,7 @@ export function onGamePauseStarted(type) {
   saveStateOnly();
 }
 
-export function onGameDayRollover() {
+export function onReinforcementDayRollover() {
   // ensureGameState conserva el día en que arrancó un turno nocturno todavía activo.
   ensureGameState();
   saveStateOnly();

@@ -40,7 +40,7 @@ export function linkCallRecordReview(context, reviewId, callId, opened) {
     }
     context.render(); return false;
   }
-  context.onGameCallsChanged(call.callDate); context.render();
+  context.onReinforcementCallsChanged(call.callDate); context.render();
   context.toast(translateText('Respaldo vinculado. Las dos versiones se conservaron.'));
   return true;
 }

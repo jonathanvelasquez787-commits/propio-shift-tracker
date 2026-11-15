@@ -6,10 +6,10 @@ import { setAppCalls, setAppSettings, setAppState } from '../js/app-context.js';
 setLanguage('es');
 const {
   announceGameStatus, checkReinforcementInactivity, chooseCycleReward, claimPendingChest, computeGameDay, configureGameContext, createDefaultGameState, equipAccessory,
-  migrateGameCallReferences, normalizeGameState, onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged, openDailyGoalChest,
-  onGameMonetaryProgress, onGamePauseEnded, onGamePauseStarted, queueGameToast,
-  renderGame, renderGameLive, rewardSurpriseForCall, onGameShiftEnded, onGameShiftStarted,
-} = await import('../js/game.js');
+  migrateGameCallReferences, normalizeGameState, onReinforcementCallSaved, onReinforcementCallsChanged, onReinforcementDayMetadataChanged, openDailyGoalChest,
+  onReinforcementMonetaryProgress, onReinforcementPauseEnded, onReinforcementPauseStarted, queueGameToast,
+  renderGame, renderGameLive, rewardSurpriseForCall, onReinforcementShiftEnded, onReinforcementShiftStarted,
+} = await import('../js/reinforcement.js');
 const { configurePositiveReinforcementContext } = await import('../js/positive-reinforcement.js');
 import { financeRowIsMeta } from '../js/finance.js';
 
@@ -175,7 +175,7 @@ test('llamadas históricas, futuras y caídas no activan un impacto visual', (t)
   ];
   for (const { id, props } of variants) {
     const call = h.add(id, props);
-    onGameCallSaved(call, 'import');
+    onReinforcementCallSaved(call, 'import');
     assert.equal(h.nodes.get('gameCallFx').innerHTML, '');
     assert.notEqual(h.state.game.ledger[`reinforce-call:${call.shiftDayKey}:${id}`]?.visual, true);
   }
@@ -184,7 +184,7 @@ test('llamadas históricas, futuras y caídas no activan un impacto visual', (t)
 test('hitos monetarios múltiples, cambio de meta, corrección y recarga no repiten celebraciones', (t) => {
   const h = harness(t, { goal: 100 });
   const day = h.keyFor();
-  const progress = onGameMonetaryProgress(day, 80, 100);
+  const progress = onReinforcementMonetaryProgress(day, 80, 100);
   assert.deepEqual(progress.crossed, [25, 50, 75]);
   assert.deepEqual(progress.next, { pct: 100, remaining: 20 });
   assert.equal(h.ledger(`money-hit:${day}:`).length, 3);
@@ -192,15 +192,15 @@ test('hitos monetarios múltiples, cambio de meta, corrección y recarga no repi
   assert.match(h.announcements.at(-1), /\$80\.00 ≈ L 2000\.00/);
   const messages = h.announcements.length;
   h.reload();
-  assert.deepEqual(onGameMonetaryProgress(day, 80, 100).crossed, []);
-  assert.deepEqual(onGameMonetaryProgress(day, 10, 100).crossed, []);
-  assert.deepEqual(onGameMonetaryProgress(day, 80, 200).crossed, []);
-  assert.deepEqual(onGameMonetaryProgress(day, 80, 0).crossed, []);
+  assert.deepEqual(onReinforcementMonetaryProgress(day, 80, 100).crossed, []);
+  assert.deepEqual(onReinforcementMonetaryProgress(day, 10, 100).crossed, []);
+  assert.deepEqual(onReinforcementMonetaryProgress(day, 80, 200).crossed, []);
+  assert.deepEqual(onReinforcementMonetaryProgress(day, 80, 0).crossed, []);
   assert.equal(h.announcements.length, messages);
-  assert.deepEqual(onGameMonetaryProgress(day, 80, 80).crossed, [100]);
+  assert.deepEqual(onReinforcementMonetaryProgress(day, 80, 80).crossed, [100]);
   assert.equal(h.ledger(`money-hit:${day}:`).length, 4);
   const nextDay = '09/30/2026';
-  assert.deepEqual(onGameMonetaryProgress(nextDay, 30, 100).crossed, [25]);
+  assert.deepEqual(onReinforcementMonetaryProgress(nextDay, 30, 100).crossed, [25]);
   assert.equal(h.ledger(`money-hit:${nextDay}:`).length, 1);
 });
 
@@ -210,18 +210,18 @@ test('hooks llamadas y correcciones mantienen hitos en el día contable nocturno
   h.state.shiftStartedAt = h.iso(at - 2 * 3600000);
   const call = h.add('night-call', { pay: 55 });
   assert.equal(call.shiftDayKey, '09/29/2026');
-  onGameCallSaved(call, 'live', { random: () => 0.99 });
+  onReinforcementCallSaved(call, 'live', { random: () => 0.99 });
   assert.equal(h.ledger('money-hit:09/29/2026:').length, 2);
   assert.equal(h.ledger('money-hit:09/30/2026:').length, 0);
   h.setGoal(50);
-  onGameCallsChanged(call.shiftDayKey);
+  onReinforcementCallsChanged(call.shiftDayKey);
   assert.equal(h.ledger('money-hit:09/29/2026:').length, 4);
   call.pay = 1;
   h.reload();
-  onGameCallsChanged(call.shiftDayKey);
+  onReinforcementCallsChanged(call.shiftDayKey);
   assert.equal(h.ledger('money-hit:09/29/2026:').length, 4);
   h.rows.splice(0, h.rows.length);
-  onGameCallsChanged(call.shiftDayKey);
+  onReinforcementCallsChanged(call.shiftDayKey);
   assert.equal(h.ledger('money-hit:09/29/2026:').length, 4);
 });
 

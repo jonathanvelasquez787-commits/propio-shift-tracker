@@ -20,7 +20,7 @@ function activityHarness(active={startedAt:'2026-10-19T14:00:00Z'}) {
     saveStateOnly:()=>!h.reject,saveAll:()=>!h.reject,canPersistLocalChanges:()=>!h.stale,
     setAppState:value=>{h.state=value;},render:()=>{},toast:message=>h.messages.push(message),
     ignorePropioCall:(state,id)=>{state.ignored=id;},callDateKeyFromValue:value=>value, restoreAutomaticGameChanges,
-    todayCallDateKey:()=> '10/19/2026',onGameCallsChanged(){},onGameDayMetadataChanged(){},
+    todayCallDateKey:()=> '10/19/2026',onReinforcementCallsChanged(){},onReinforcementDayMetadataChanged(){},
     currentShiftAccountingDayKey:()=> '10/19/2026',stopBreakStartAlarm:()=>h.alarms++,stopBreakEndAlarm:()=>h.alarms++,
     appConfirm:(_message,callback)=>{h.confirm=callback;},
   });
@@ -97,7 +97,7 @@ test('a continued pause rejected by storage keeps the previously closed interval
   const h=activityHarness(null),at=Date.parse('2026-10-19T14:10:20Z');
   h.Date=class extends Date {constructor(...args){super(...(args.length?args:[at]));}static now(){return at;}};
   Object.assign(h,{currentShiftAccountingDayKey:()=> '10/19/2026',ACCIDENTAL_TOGGLE_GRACE_MIN:2,formatMinutes:String,fmtTime:String,
-    onGamePauseStarted:()=>{throw Error('Should not award an unsaved pause');},
+    onReinforcementPauseStarted:()=>{throw Error('Should not award an unsaved pause');},
     registerDayInterruption:()=>{h.state.dayInterruptions.test=[{id:'gap'}];return{id:'gap'};},
     setEvent:()=>{h.state.events.push({id:'continued'});return{id:'continued'};}});
   h.state.pauseHistory=[{id:'closed',type:'break',startedAt:'2026-10-19T14:00:00Z',endedAt:'2026-10-19T14:10:00Z',shiftDayKey:'10/19/2026'}];

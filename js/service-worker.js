@@ -14,7 +14,7 @@ const SHELL = [
   '/css/legal.css',
   `/css/app-shell.css?v=${BUILD_VERSION}`,
   `/css/app-core.css?v=${BUILD_VERSION}`,
-  `/css/game.css?v=${BUILD_VERSION}`,
+  `/css/reinforcement.css?v=${BUILD_VERSION}`,
   `/css/appearance.css?v=${BUILD_VERSION}`,
   `/css/accessibility.css?v=${BUILD_VERSION}`,
   `/assets/theme-init.js?v=${BUILD_VERSION}`,
