@@ -1262,6 +1262,20 @@
           ]
         },
         {
+          "file": "tests/game-in-earnings-mobile.test.mjs",
+          "namedCases": [
+            "en celular el reto de hoy se mueve a la fila de Ganancias, entre el monto y el anillo de la meta",
+            "el reto en la fila de Ganancias es compacto: mide 71 px y solo deja nivel, dinero, sonido, escena, Disparar y Arma"
+          ]
+        },
+        {
+          "file": "tests/reto-en-ganancias-celular.test.mjs",
+          "namedCases": [
+            "en celular el reto de hoy se mueve a la fila de Ganancias, antes del anillo de la meta",
+            "en la fila de Ganancias el reto mide 71 px de alto y esconde título, nombre, pausa y Ver mis Logros"
+          ]
+        },
+        {
           "file": "tests/freelancer-blocks-list.test.mjs",
           "namedCases": [
             "Bloques del día en freelancer: cada descanso es una fila con etiqueta, horas y minutos",

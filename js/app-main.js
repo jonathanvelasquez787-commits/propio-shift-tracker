@@ -7086,7 +7086,14 @@ export function render() {
       const group = document.getElementById('gameHomeGroup');
       if (!hero || !day || !group) return;
       const inBar = !!desktopGameQuery?.matches && page === 'home';
+      // Celular: el reto va dentro de la fila de Ganancias de hoy, entre el monto y el anillo "de tu meta".
+      const earnRow = document.querySelector('#earningsDayView .earn-row');
+      const inEarn = !desktopGameQuery?.matches && page === 'home' && !!earnRow;
       if (inBar && day.parentElement !== hero) { day.classList.add('hero-shift-game'); hero.appendChild(day); }
+      else if (inEarn) {
+        day.classList.remove('hero-shift-game');
+        if (day.parentElement !== earnRow) earnRow.insertBefore(day, earnRow.querySelector('.gh-ring-wrap'));
+      }
       else if (!inBar && day.parentElement !== group) { day.classList.remove('hero-shift-game'); group.prepend(day); }
       hero.classList.toggle('has-game', inBar);
       placeBattleLoadout();
