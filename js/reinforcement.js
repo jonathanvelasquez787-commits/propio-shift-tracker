@@ -370,13 +370,6 @@ export function onReinforcementDayMetadataChanged(dayKey) {
   saveStateOnly();
 }
 
-// Al iniciar un turno solo se guarda una copia del estado: si la llamada que abrió el turno se descarta, se puede volver atrás.
-export function onReinforcementShiftStarted({ captureState = null } = {}) {
-  ensureGameState();
-  captureState?.(JSON.parse(JSON.stringify(state.game)));
-  saveStateOnly();
-}
-
 export function onReinforcementPauseEnded(pauseRecord, { onTime = false } = {}) {
   ensureGameState();
   if (pauseRecord && ['break', 'lunch'].includes(pauseRecord.type)) {

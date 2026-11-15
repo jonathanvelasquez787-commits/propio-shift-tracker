@@ -319,13 +319,6 @@ test('cuarta simulación mensual: llamadas antes o después del checkpoint cuent
 });
 
 
-test('cuarta simulación mensual: descartar live también revierte efectos de gamificación del auto-turno', () => {
-  const appMain = read('js/app-main.js');
-  assert.match(appMain, /const gameBeforeAutoShift = needsAutoShift[\s\S]*gameBeforeAutoShift,[\s\S]*if \(needsAutoShift\) onReinforcementShiftStarted\(\{ continued: false, captureState:/);
-  assert.match(appMain, /discarded\.gameBeforeAutoShift/);
-});
-
-
 test('promotion list opens its single editor and the editor previews the selected effect before saving', () => {
   const appMain = read('js/app-main.js');
   const higherRate = read('js/higher-rate.js');

@@ -762,7 +762,6 @@
             "cuarta simulación mensual: backup JSON realmente incluye y restaura settings",
             "cuarta simulación mensual: Higher Rate cruza medianoche sin perder bonos",
             "cuarta simulación mensual: llamadas antes o después del checkpoint cuentan como presencia sin mover Entrada/Salida",
-            "cuarta simulación mensual: descartar live también revierte efectos de gamificación del auto-turno",
             "promotion list opens its single editor and the editor previews the selected effect before saving",
             "quinta simulación mensual: descartar live iniciada durante Break Lunch restaura la pausa",
             "quinta simulación mensual: respaldo live sobrevive refresh y descartar revierte turno ACW",
@@ -1814,9 +1813,7 @@
             "editing a completed call cannot extend into an active live call",
             "a manual form opened before a live call starts cannot save overlapping time",
             "discarding a draft interrupted before its candidate was built ignores its bridge replay",
-            "ACW follows manual duration corrections while preserving the original official evidence",
-            "reversing an automatic shift keeps later historical rewards and personal choices",
-            "discarding a pending automatic call preserves rewards that arrived while it was under review"
+            "ACW follows manual duration corrections while preserving the original official evidence"
           ]
         },
         {

@@ -418,12 +418,6 @@
       "js/automation-ui.js"
     ]
   },
-  "s_08112ed0": {
-    "source": "Se revierte el turno abierto por esta llamada y su progreso automático.",
-    "files": [
-      "js/work-actions.js"
-    ]
-  },
   "s_082c97f7": {
     "source": "Morado Neón",
     "files": [
@@ -2020,6 +2014,12 @@
     "source": "Sin comparación disponible con ayer",
     "files": [
       "js/reports.js"
+    ]
+  },
+  "s_275b62c4": {
+    "source": "Se revierte el turno abierto por esta llamada.",
+    "files": [
+      "js/work-actions.js"
     ]
   },
   "s_2783c7e5": {

@@ -2262,7 +2262,6 @@
   "s_e8c61633": "This change exceeds the history capacity. Your calls were kept.",
   "s_f721b379": "Up to 50 changes · up to 30 days, space permitting. Included in your JSON backup.",
   "s_055d57f7": "Your shift and saved calls are kept.",
-  "s_08112ed0": "The shift opened by this call and its automatic progress are rolled back.",
   "s_10aa082f": "Previous ACW and saved calls are kept.",
   "s_10e0d712": "Day to reset: {{v0}}.",
   "s_188da0a2": "The activity changed. Review it again before discarding.",
@@ -3090,5 +3089,6 @@
   "s_f18ca172": "Turns consistency, recovery and goals into positive evidence.",
   "s_cbf3808a": "You returned on time from {pause} · protected your rest and pace",
   "s_409b0351": "On-time return from {pause} · ready to continue",
-  "s_0ce764f9": "{pause} ended on time · your break counts too"
+  "s_0ce764f9": "{pause} ended on time · your break counts too",
+  "s_275b62c4": "The shift opened by this call is rolled back."
 }
