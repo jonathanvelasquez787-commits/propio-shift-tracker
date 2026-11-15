@@ -2,8 +2,6 @@ import { ui, translateText, translateStoredText, translateMarkup, displayLocale 
 import { callFeedbackSilenced } from './call-feedback.js';
 import { calls, settings, state } from './app-context.js';
 import { initGameAudio, playGameSound, previewGameSound, syncGameAudio, stopGameSounds, gameSoundsSilenced } from './game-audio.js';
-import { battleWorkMode } from './game-duel.js';
-import { battleMarkup, syncBattle, playBattleCall, stopBattle, normalizeBattleWeapon } from './game-battle.js';
 import { financeReservationComplete } from './finance.js';
 import { activeWorkSinceLastCall, monetaryMilestones, supportiveDayEvidence, surpriseDecision } from './reinforcement-rules.js';
 import { chooseCallFeedback, configureReinforcementFeedback, normalizeInactivityMinutes, notifyReinforcement, reinforcementFeedbackEnabled, reinforcementText } from './reinforcement-feedback.js';
@@ -336,7 +334,6 @@ function ensureGameSettings() {
   if (!settings.game || typeof settings.game !== 'object' || Array.isArray(settings.game)) settings.game = {};
   if (typeof settings.game.enabled !== 'boolean') settings.game.enabled = false;
   settings.game.intensity = 'arcade';
-  settings.game.weapon = normalizeBattleWeapon(settings.game.weapon);
   if (typeof settings.game.soundEnabled !== 'boolean') settings.game.soundEnabled = true;
   const soundVolume = Number(settings.game.soundVolume);
   settings.game.soundVolume = Number.isFinite(soundVolume) ? Math.max(0, Math.min(100, soundVolume)) : 40;
@@ -589,7 +586,7 @@ export function computeGameDay(dayKey = todayCallDateKey(), { ignoreLock = false
 
 export function gameReviewSnapshot() {
   const day=computeGameDay(currentGameDayKey());
-  return {enabled:gameEnabled(),dayLabel:formatCallDayLabel(day.dayKey),level:gameLevelProgress(),collection:{owned:ACCESSORY_CATALOG.filter(item=>state.game.accessories.includes(item.label)).length,total:ACCESSORY_CATALOG.length},pendingRewards:state.game.reinforcement?.pendingRewards?.length||0,xp:day.xp,eligibleCalls:day.eligibleCalls.length,callCount:callsForDay(day.dayKey).length,breakdown:day.xpBreakdown,cap:GAME_DAILY_XP_CAP,workMode:battleWorkMode(state),chest:{defeated:day.defeated,claimed:!!state.game.ledger[`chest:${day.dayKey}`],adjustedAt:state.game.days[day.dayKey]?.goalChestAdjustedAt||null}};
+  return {enabled:gameEnabled(),dayLabel:formatCallDayLabel(day.dayKey),level:gameLevelProgress(),collection:{owned:ACCESSORY_CATALOG.filter(item=>state.game.accessories.includes(item.label)).length,total:ACCESSORY_CATALOG.length},pendingRewards:state.game.reinforcement?.pendingRewards?.length||0,xp:day.xp,eligibleCalls:day.eligibleCalls.length,callCount:callsForDay(day.dayKey).length,breakdown:day.xpBreakdown,cap:GAME_DAILY_XP_CAP,chest:{defeated:day.defeated,claimed:!!state.game.ledger[`chest:${day.dayKey}`],adjustedAt:state.game.days[day.dayKey]?.goalChestAdjustedAt||null}};
 }
 
 function gameStreak() {
@@ -683,7 +680,6 @@ function yesterdayShadowPct(dayKey = currentGameDayKey()) {
   return Math.max(0, Math.min(100, (importedCallStats(partial, key).earnings / goal) * 100));
 }
 
-let lastArenaRenderKey = '';
 let monsterNameDraftDirty = false;
 let lastSettingsMonsterName = null;
 
@@ -706,101 +702,6 @@ function compactVictoryMarkup(day) {
   }
   return ui`<span class="game-compact-win-label">META CUMPLIDA</span><strong>¡Cofre ganado!</strong>${day.dayKey === currentGameDayKey() ? ui`<button type="button" data-game-action="open-daily-chest" data-game-day="${day.dayKey}" ${state.activeCall ? 'disabled' : ''}>${gamePixelChest()} Abrir cofre</button>` : ui`<button type="button" data-game-nav>Ver mis Logros</button>`}`;
 }
-
-function renderArena() {
-  const root = document.getElementById('gameArena');
-  const classic = document.getElementById('classicDailyGoalCard');
-  if (!root || !classic) return;
-  const dayKey = displayedGameDayKey();
-  const day = computeGameDay(dayKey);
-  const active = gameEnabled() && day.goal.usd > 0;
-  root.hidden = !active;
-  classic.style.display = active ? 'none' : '';
-  const progressHome = classic.querySelector('[data-game-progress-home]');
-  const milestoneDetails = document.getElementById('gameMilestones');
-  const progress = document.getElementById('earningsBar')?.closest('.earnings-goal-progress');
-  const nextMilestone = document.getElementById('earningsNextMilestone');
-  if (progressHome && milestoneDetails && progress && nextMilestone) {
-    const progressTarget = active ? milestoneDetails.querySelector('[data-game-milestone-progress]') : progressHome;
-    const nextTarget = active ? milestoneDetails.querySelector('[data-game-milestone-next]') : progressHome;
-    if (progress.parentElement !== progressTarget) progressTarget.append(progress);
-    if (nextMilestone.parentElement !== nextTarget) nextTarget.append(nextMilestone);
-  }
-  if (!active) {
-    stopBattle();
-    lastArenaRenderKey = '';
-    root.className = 'game-arena';
-    root.removeAttribute('data-game-state');
-    root.removeAttribute('data-game-phase');
-    root.removeAttribute('data-game-intensity');
-    return;
-  }
-
-  const monsterState = monsterStateFor(day);
-  const monsterPhase = day.phase || monsterPhaseFor(day);
-  const variant = monsterVariantFor(day);
-  const customName = sanitizeMonsterName(settings.game.monsterName);
-  const displayName = customName || translateText(day.species.name);
-  const remaining = Math.max(0, day.goal.usd - day.stats.earnings);
-  const dayCalls = callsForDay(dayKey);
-  const callSignatures = Object.fromEntries(dayCalls.map(call => [String(call.id), JSON.stringify([call.pay, higherRateBonusAmount(call), call.durationMin, call.startISO, call.endISO, call.billable, call.dropped])]));
-  const workMode = battleWorkMode(state);
-  const receipt = state.game.ledger[`chest:${dayKey}`];
-  const toastStack = document.getElementById('gameToastStack');
-  if (toastStack) toastStack.hidden = workMode === 'call';
-  if (workMode === 'call') {
-    stopGameSounds();
-    root.classList.remove('is-hit', 'is-critical-hit');
-    root.removeAttribute('data-game-event');
-    document.getElementById('gameCallFx')?.replaceChildren();
-    document.querySelectorAll('.game-pixel-fx-layer, .game-live-xp-float').forEach(node => node.remove());
-  }
-  const victories = Object.keys(state.game.ledger).filter(key => key.startsWith('monster-defeat:')).length;
-  const renderKey = [workMode, dayKey, monsterState, monsterPhase, variant, displayName, day.combo, day.stats.earnings.toFixed(2), Math.round(day.hpPct * 10), Object.values(state.game.equipment || {}).join('|'), day.xp, state.game.totalXp, victories, state.game.accessories.join('|'), JSON.stringify(receipt), settings.game.weapon, settings.game.soundEnabled, settings.currencyLabel, settings.exchangeRate, displayLocale(), day.goal.usd, JSON.stringify(callSignatures)].join(':');
-  if (renderKey === lastArenaRenderKey) return;
-  lastArenaRenderKey = renderKey;
-  if (root.dataset.gameDayKey && root.dataset.gameDayKey !== dayKey) delete root.dataset.gameEvent;
-  root.className = `game-arena game-arena--arcade game-arena--battle game-${escapeHtml(monsterState)}`;
-  root.dataset.gameState = monsterState;
-  root.dataset.gameDayKey = dayKey;
-  root.dataset.gameHp = String(day.hpPct);
-  root.dataset.gamePhase = monsterPhase;
-  root.dataset.gameIntensity = 'arcade';
-  const monsterImageLabel = ui`${displayName}, ${Math.round(100 - day.hpPct)}% de la meta completada`;
-  const battleMonsterState = monsterState === 'sleeping' && dayKey === currentGameDayKey() && workMode !== 'call' ? 'angry' : monsterState;
-  const sprite = monsterSvg({ species: day.species.id, state: battleMonsterState, variant, hpPct: day.hpPct, sizeClass: 'lg', equipment: state.game.equipment })
-    .replace(/ role="img" aria-label="[^"]*"/, ' aria-hidden="true"');
-  if (!root.querySelector('.game-battle')) {
-    stopBattle();
-    root.innerHTML = battleMarkup();
-  }
-  const heading = root.querySelector('[data-battle-heading]');
-  heading.innerHTML = ui`<span class="game-kicker">${dayKey === currentGameDayKey() ? translateText('TU RETO DE HOY') : formatCallDayLabel(dayKey)}</span><h3>${escapeHtml(displayName)}</h3><span class="game-level-chip">NV ${gameLevelProgress().level}</span>`;
-  const converted = convertedAmountText(day.stats.earnings);
-  const convertedRemaining = convertedAmountText(remaining);
-  const status = day.defeated ? receipt ? translateText('Cofre abierto. ¡Seguí sumando!') : translateText('Meta alcanzada. Este cofre es tuyo.') : '';
-  root.querySelector('[data-battle-health-slot]').innerHTML = ui`
-    <div class="game-compact-goal-line"><span>${dayKey === currentGameDayKey() ? translateText('Meta de hoy') : translateText('Meta de este día')}</span><strong${converted ? ` title="${escapeHtml(converted)}"` : ''}>${money(day.stats.earnings)} <small>/ ${money(day.goal.usd)}</small></strong></div>
-    <div class="game-compact-goal-track" role="progressbar" aria-label="Avance hacia la meta y el cofre" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(100 - day.hpPct)}"><i class="game-compact-goal-fill" style="width:${100 - day.hpPct}%"></i><span class="game-compact-goal-chest" aria-hidden="true">${gamePixelChest(!!receipt)}</span></div>
-    <div class="game-compact-goal-foot"><span>${day.defeated ? receipt ? translateText('Recompensa guardada') : translateText('Cofre conseguido') : ui`Faltan ${money(remaining)}${convertedRemaining ? ` · ${escapeHtml(convertedRemaining)}` : ''}`}</span></div>`;
-  const victory = root.querySelector('[data-battle-victory]');
-  const victoryMarkup = compactVictoryMarkup(day);
-  if (victory.innerHTML !== victoryMarkup) victory.innerHTML = victoryMarkup;
-  victory.dataset.rewardOpened = String(!!receipt);
-  syncBattle(root, { dayKey, currentDay: dayKey === currentGameDayKey(), workMode, enabled: active, weapon: settings.game.weapon, callSignatures, goalUsd: day.goal.usd, monsterMarkup: sprite, monsterLabel: translateText('Tu meta de hoy'), monsterDescription: monsterImageLabel, monsterName: displayName, heroLabel: translateText('Tu héroe'), heroEquipment: equipmentForState(), soundEnabled: settings.game.soundEnabled, goalStatus: status, collectionMarkup: compactCollectionMarkup(dayKey), defeated: day.defeated, hpPct: day.hpPct }, {
-    onWeaponChange: weapon => { if (!saveGamePreference('weapon', normalizeBattleWeapon(weapon))) { lastArenaRenderKey = ''; renderArena(); } },
-    onToggleSound: () => { saveGamePreference('soundEnabled', !settings.game.soundEnabled); syncGameAudio(); lastArenaRenderKey = ''; renderGame(); },
-    onSound: kind => {
-      if (kind === 'practice-hit') return;
-      playGameSound(kind, { allowed: () => {
-        const bounds = root.querySelector('.game-battle')?.getBoundingClientRect();
-        return !state.activeCall && gameEnabled() && dayKey === displayedGameDayKey() && !root.hidden && !!root.getClientRects().length && !!bounds && bounds.bottom > 0 && bounds.top < window.innerHeight;
-      } });
-    },
-    onPause: stopGameSounds,
-  });
-}
-
 
 function renderMissions() {
   const root = document.getElementById('gameMissions');
@@ -1397,7 +1298,6 @@ function syncFinanceRewards() {
 }
 
 function clearTransientGameUi() {
-  stopBattle();
   callFxVersion += 1;
   const arena = document.getElementById('gameArena');
   arena?.classList.remove('is-hit', 'is-critical-hit');
@@ -1437,7 +1337,6 @@ export function renderGame() {
   if (financeChanged || bossDefeatedNow) saveStateOnly();
 
   renderHeroChips();
-  renderArena();
   renderMissions();
   renderCycleBosses();
   renderAchievements();
@@ -1455,7 +1354,6 @@ export function renderGame() {
 
 export function renderGameLive() {
   if (!gameEnabled()) return drainGameToasts();
-  renderArena();
   drainGameToasts();
 }
 
@@ -1612,7 +1510,7 @@ function showCallFx(call, xp, critical, mode = 'xp') {
   if (state.activeCall) return true;
   const amount = parseMoney(call.pay) + higherRateBonusAmount(call);
   const dayKey = callDateKeyFromValue(call.shiftDayKey) || callDateKeyFromValue(call.callDate) || currentGameDayKey();
-  const battlePlayed = dayKey === currentGameDayKey() && dayKey === displayedGameDayKey() && playBattleCall({ dayKey, amountText: ui`−${money(amount)} ${convertedAmountText(amount)}`.trim(), xp, critical, silentSound: gameSoundsSilenced() });
+  const battlePlayed = false;
   if (battlePlayed) {
     root.innerHTML = '';
     document.querySelectorAll('.game-live-xp-float').forEach(node => node.remove());
@@ -2042,7 +1940,7 @@ export function onGameCallSaved(call, source = 'manual', options = {}) {
     if (firstVisualEvent) {
       saveStateOnly();
       renderGame();
-      const battlePlayed = showCallFx(call, 0, higherRateBonusAmount(call) > 0, 'recorded');
+  const battlePlayed = false;
       if (!battlePlayed) playGameTone('hit', dayKey);
     }
     return;
@@ -2062,7 +1960,7 @@ export function onGameCallSaved(call, source = 'manual', options = {}) {
   if (currentDay.defeated && xpLocked) {
     saveStateOnly();
     renderGame();
-    const battlePlayed = firstVisualEvent && showCallFx(call, 0, critical, 'extra');
+  const battlePlayed = false;
     maybeShowRecord(call);
     if (!battlePlayed) playGameTone(critical ? 'critical' : 'hit', dayKey);
     return;
@@ -2102,7 +2000,7 @@ export function onGameCallSaved(call, source = 'manual', options = {}) {
   saveStateOnly();
   renderGame();
 
-  const battlePlayed = firstVisualEvent && showCallFx(call, grantedXp, critical);
+  const battlePlayed = false;
   maybeShowRecord(call);
   if (defeatedNow) {
     triggerGameEvent('gameArena', 'clear', 1000);
@@ -2898,8 +2796,7 @@ export function initGame() {
     saveGamePreference('soundEnabled', !!event.target.checked);
     syncGameAudio();
     renderSettingsProfile();
-    renderArena();
-  });
+    });
   document.getElementById('gameSoundVolumeInput')?.addEventListener('input', (event) => {
     if (!saveGamePreference('soundVolume', Math.max(0, Math.min(100, Number(event.target.value) || 0)))) event.target.value = settings.game.soundVolume;
     syncGameAudio();

@@ -5,7 +5,6 @@ import { loadDetailViews } from './detail-views-loader.js';
 import { wireAchievementHelp } from './help-tooltips.js';
 import { wireFinancePlanning, financeInputUsd } from './finance-planning.js';
 import { validFinanceSettings } from './finance-plan-model.js';
-import { normalizeBattleWeapon } from './game-battle.js';
 import { createPropioReceiver, createStorageRevisionGuard, ignorePropioCall } from './propio-bridge.js';
 import { portalRecordsText } from './propio-history-records.js';
 import { callFeedbackSilenced, withSilentCallFeedback } from './call-feedback.js';
@@ -1030,7 +1029,6 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
       if (!settings.game || typeof settings.game !== 'object' || Array.isArray(settings.game)) settings.game = { ...fallback.game };
       if (typeof settings.game.enabled !== 'boolean') settings.game.enabled = fallback.game.enabled;
       settings.game.intensity = 'arcade';
-      settings.game.weapon = normalizeBattleWeapon(settings.game.weapon);
       if (typeof settings.game.soundEnabled !== 'boolean') settings.game.soundEnabled = true;
       const gameSoundVolume = Number(settings.game.soundVolume);
       settings.game.soundVolume = Number.isFinite(gameSoundVolume) ? Math.max(0, Math.min(100, gameSoundVolume)) : 40;
@@ -7078,74 +7076,6 @@ export function render() {
       schedule();
     }
 
-    // Escritorio: el juego del día (#gameHomeDay) vive dentro de la barra de acciones, a la derecha de los
-    // botones. En celular, y fuera de Inicio, vuelve a su lugar de siempre (#gameHomeGroup).
-    const desktopGameQuery = typeof window.matchMedia === 'function' ? window.matchMedia('(min-width: 761px)') : null;
-    function syncGameInActionsBar(page = currentPage) {
-      const hero = document.querySelector('.hero-shift-actions');
-      const day = document.getElementById('gameHomeDay');
-      const group = document.getElementById('gameHomeGroup');
-      if (!hero || !day || !group) return;
-      const inBar = !!desktopGameQuery?.matches && page === 'home';
-      // Celular: el reto va dentro de la fila de Ganancias de hoy, entre el monto y el anillo "de tu meta".
-      const earnRow = document.querySelector('#earningsDayView .earn-row');
-      // Solo mientras la vista "Hoy" de Ganancias se ve: en "Ciclo" esa vista se esconde y el reto vuelve a su lugar de siempre.
-      const earnDayShown = document.getElementById('earningsDayView')?.style.display !== 'none';
-      const inEarn = !desktopGameQuery?.matches && page === 'home' && !!earnRow && earnDayShown;
-      if (inBar && day.parentElement !== hero) { day.classList.add('hero-shift-game'); hero.appendChild(day); }
-      else if (inEarn) {
-        day.classList.remove('hero-shift-game');
-        if (day.parentElement !== earnRow) earnRow.insertBefore(day, earnRow.querySelector('.gh-ring-wrap'));
-      }
-      else if (!inBar && day.parentElement !== group) { day.classList.remove('hero-shift-game'); group.prepend(day); }
-      hero.classList.toggle('has-game', inBar);
-      placeBattleLoadout();
-      placeGameSeparator();
-    }
-    // Al cambiar Ganancias entre Hoy y Ciclo, el reto se acomoda otra vez (en celular vive dentro de la vista Hoy).
-    document.addEventListener('earningsviewchange', () => syncGameInActionsBar());
-    // Línea doble (igual a la de entre los botones) entre los botones y el reto de hoy. Solo aparece cuando el
-    // juego está al lado de los botones: si baja a su propia fila (ventana angosta) o está en celular, se oculta.
-    function placeGameSeparator() {
-      const hero = document.querySelector('.hero-shift-actions');
-      const day = document.getElementById('gameHomeDay');
-      if (!hero || !day) return;
-      let sep = hero.querySelector('.hero-shift-game-sep');
-      if (!hero.classList.contains('has-game')) { sep?.remove(); return; }
-      if (!sep) {
-        sep = document.createElement('span');
-        sep.className = 'hero-shift-game-sep';
-        sep.setAttribute('aria-hidden', 'true');
-        hero.insertBefore(sep, day);
-      }
-      // Se mide contra un botón (siempre visible) y no contra la línea: al pegarse arriba la línea se oculta por CSS y
-      // su medida sería 0, lo que la dejaba escondida para siempre al maximizar la ventana.
-      const firstButton = hero.querySelector('button');
-      const wrapped = !!firstButton && day.getBoundingClientRect().top >= firstButton.getBoundingClientRect().bottom - 1;
-      sep.style.display = wrapped ? 'none' : '';
-    }
-    window.addEventListener('resize', () => placeGameSeparator());
-    if (typeof ResizeObserver === 'function') {
-      const heroForSep = document.querySelector('.hero-shift-actions');
-      if (heroForSep) new ResizeObserver(() => placeGameSeparator()).observe(heroForSep);
-    }
-    // Con el juego dentro de la barra, el selector de Arma sube a la franja de abajo de la escena (siempre visible).
-    // En celular el juego se ve igual, así que el selector también va abajo. Solo en escritorio fuera de Inicio vuelve al desplegable de Logros.
-    function placeBattleLoadout() {
-      const day = document.getElementById('gameHomeDay');
-      const battle = day?.querySelector('.game-battle');
-      const loadout = battle?.querySelector('.game-battle-loadout');
-      const footer = battle?.querySelector('.game-battle-footer');
-      const slots = battle?.querySelector('.game-battle-slots');
-      if (!loadout || !footer || !slots) return;
-      const inBar = day.classList.contains('hero-shift-game') || !desktopGameQuery?.matches;
-      if (inBar && loadout.parentElement !== footer) footer.insertBefore(loadout, footer.querySelector('[data-battle-collection-toggle]'));
-      else if (!inBar && loadout.parentElement !== slots) slots.appendChild(loadout);
-    }
-    const gameDayForLoadout = document.getElementById('gameHomeDay');
-    if (gameDayForLoadout && typeof MutationObserver === 'function') new MutationObserver(() => placeBattleLoadout()).observe(gameDayForLoadout, { childList: true, subtree: true });
-    desktopGameQuery?.addEventListener?.('change', () => syncGameInActionsBar());
-
     // Los 3 botones de llamadas (#callsControlsGrid) viven dentro de la tarjeta "Acciones de Hoy"
     // (.hero-shift-actions) para formar una sola fila de 6. Aquí también se crea, una sola vez, el
     // separador y el botón circular que colapsa/expande la fila (ver app-shell.css).
@@ -7166,7 +7096,6 @@ export function render() {
       wireStickyActionsBar(hero);
       if (grid.parentElement !== hero) hero.appendChild(grid);
       hero.classList.toggle('calls-off', page === 'help');
-      syncGameInActionsBar(page);
     }
 
     function navigateToPage(page) {

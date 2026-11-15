@@ -764,8 +764,6 @@
         "js/game-review.js",
         "js/game-auto.js",
         "js/game-audio.js",
-        "js/game-battle.js",
-        "js/game-duel.js",
         "js/monsters.js",
         "js/positive-reinforcement.js",
         "js/reinforcement-feedback.js",
@@ -796,22 +794,15 @@
           "file": "tests/game-phase6.test.mjs",
           "namedCases": [
             "Fase 6 expone el catálogo semanal y renderiza SVG seguro para todos los estados",
-            "HTML integra la ruta de Logros, el arena, las misiones, ajustes y modales sin IDs duplicados",
-            "Logros simplifica ajustes, comparte activación lateral y admite nombre personalizado seguro",
             "state y settings conservan defaults y normalización de Fase 6",
             "XP solo entra por llamadas actuales y oportunas, con tope diario y lock de snapshot",
-            "después de derrotar no entra XP nuevo pero sí se muestra botín extra",
             "el hook real conserva el botín XP de la quinta llamada al reconciliar y recargar",
             "el bono manual de Higher Rate no se suma dos veces y los tiles conservan su efecto fuera de ventana",
             "la hora manual vacía no se convierte en 07:00 y las horas futuras no se guardan ni reciben XP",
             "la normalización profunda contiene xp, estrellas, misiones y monstruo corruptos importados",
-            "derrota no debe seguir produciendo golpes/recompensas posteriores",
-            "STAGE CLEAR bloquea recompensas posteriores y solo vuelve a habilitarse al revocar",
             "barras, misiones y racha exponen estado accesible",
-            "cierre y cofre son idempotentes, y el dinero secundario aparece en la experiencia",
             "CSS de juego cubre motion reducido, layout estrecho y responsive",
             "build mantiene módulos fuente fuera de public y el worker precarga el CSS de juego",
-            "gamificación apagada respeta hidden y el render conserva la estructura visual",
             "Logros conserva las tarjetas de app.html y solo actualiza sus nodos internos",
             "edición y borrado corrigen datos sin reescribir XP ya congelado por STAGE CLEAR",
             "STAGE CLEAR reversible restaura escudos y racha, y conserva snapshot consistente",
@@ -860,43 +851,11 @@
           ]
         },
         {
-          "file": "tests/game-duel.test.mjs",
-          "namedCases": [
-            "call state always takes precedence over pause, ended shift and off shift",
-            "work interruptions preserve duel time, points and health and never resume automatically",
-            "all three attacks are telegraphed and jumping or moving avoids their collision",
-            "enemy damage can end a round, while safe play still expires at sixty seconds",
-            "weapons, grenade cooldown, score and best round remain isolated in the arcade model"
-          ]
-        },
-        {
           "file": "tests/game-depth.test.mjs",
           "namedCases": [
             "las fases y placas son deterministas y no mezclan HP financiero",
             "Higher Rate vivo solo activa furia en el día actual",
-            "loot transparente y equipamiento SVG son deterministas y accesibles",
-            "la superficie dinámica mantiene controles, recibos, accesibilidad y AudioContext único"
-          ]
-        },
-        {
-          "file": "tests/game-battle.test.mjs",
-          "namedCases": [
-            "weapon selection normalizes only cosmetic catalog ids; imports work without DOM",
-            "history battle animations stay silent after enqueue and later live calls still sound",
-            "coalesced history animations preserve totals and sound only when a live event is included",
-            "large imports remain one representation and excess events coalesce at six rows",
-            "the automatic shot runs briefly and releases its animation loop after impact",
-            "automatic default stays still and manual inputs never alter real HP or call data",
-            "canvas fallback presents automatic results and disables the optional duel",
-            "work calls interrupt the duel immediately and returning to break requires explicit resume",
-            "visibility/date changes cancel pending visual calls and unmount releases animation observers",
-            "switching reduced motion or disabling an active scene cancels every pending effect",
-            "same-day edits, deletions and goal changes cancel pending hits while additions preserve the batch",
-            "idle breathing never attacks and pauses for live calls, hidden scenes and victories",
-            "every third eligible represented call triggers one automatic special including batched counts",
-            "compact collection stays collapsed across sync until toggled, with real root-owned slots",
-            "winning shot precedes cofre and changed dates never reveal a stale cofre",
-            "paused call feedback stays static across sync and reduced feedback returns to real goal status"
+            "loot transparente y equipamiento SVG son deterministas y accesibles"
           ]
         },
         {
@@ -986,14 +945,10 @@
           "file": "tests/reinforcement-integration.test.mjs",
           "namedCases": [
             "Arcade sustituye intensidades antiguas sin activar Logros ni modificar XP guardado",
-            "el modo tranquilo sigue las llamadas en vivo y difiere feedback sin perder recompensas",
             "misiones abiertas son automáticas y los enfoques de resultados sellados se conservan",
             "Finanzas concede y revoca el premio en el mes local aunque UTC ya esté en el siguiente",
             "completar el monto de un gasto recurrente concede su recibo mensual y reiniciarlo lo revoca",
-            "pegar ayer derrota su monstruo y cambiar el día no daña al monstruo actual ni concede XP histórico",
             "corregir un día cerrado derrota su monstruo sin reabrir XP y retirar dinero revoca esa derrota",
-            "el combo reacciona a una llamada sin pago sin duplicar el feedback compacto",
-            "guardar con arena visible, ausente o Logros apagado conserva dinero y HP sin duplicar recibos",
             "timers de llamadas sucesivas no duplican feedback ni alteran sus recibos en la batalla compacta",
             "llamadas históricas, futuras y caídas no activan un impacto visual",
             "hooks manual/live/import guardan una decisión por llamada y migran la oficial sin reintentar azar",
@@ -1012,7 +967,6 @@
             "repeating inactivity actually redisplays identical messages after expiry without weakening ordinary toast dedupe",
             "inactividad nocturna deduplica a ambos lados de medianoche del mismo turno",
             "cola real limita a tres toasts y no repite el último texto después de expirar",
-            "apagar Logros limpia refuerzo visible y conserva preferencias de sonido, premios e historial guardados",
             "cierre de racha semanal conserva rollback y comparaciones al recargar y revoca el escudo al reabrir",
             "metadatos de cierre importados validan dinero, fechas y rollback antes de restaurar premios",
             "cierre nocturno cumplido proyecta la racha del día contable y las correcciones históricas no la proyectan de nuevo",
@@ -1181,14 +1135,6 @@
           ]
         },
         {
-          "file": "tests/battle-free-shot.test.mjs",
-          "namedCases": [
-            "Disparo de práctica: el botón existe en el pie de la batalla y se desactiva en llamada, duelo y jefe derrotado",
-            "Disparo de práctica: solo muestra efectos y no toca ganancias, XP ni récords",
-            "Disparo de práctica: el medidor de aturdimiento y su animación respetan movimiento reducido"
-          ]
-        },
-        {
           "file": "tests/vercel-analytics.test.mjs",
           "namedCases": [
             "Vercel Analytics: el build agrega el script solo a la landing y a la app, sin tocar el HTML fuente",
@@ -1196,91 +1142,10 @@
           ]
         },
         {
-          "file": "tests/battle-sin-duelo.test.mjs",
-          "namedCases": [
-            "la batalla ya no muestra los botones Automático y Duelo",
-            "Disparar es un botón con borde y la barra de aturdimiento siempre se ve"
-          ]
-        },
-        {
-          "file": "tests/game-in-actions-bar.test.mjs",
-          "namedCases": [
-            "en escritorio el juego del día se mueve dentro de la barra de acciones y vuelve en celular",
-            "la barra con juego deja los botones y el juego juntos a la izquierda y todo se queda pegado al bajar, solo en escritorio"
-          ]
-        },
-        {
-          "file": "tests/battle-meta-in-scene.test.mjs",
-          "namedCases": [
-            "la meta y la barra van encima de la escena, en la misma celda de la grilla",
-            "Disparar y Logros van abajo de la escena, centrados y sin la linea divisoria"
-          ]
-        },
-        {
-          "file": "tests/game-height-matches-buttons.test.mjs",
-          "namedCases": [
-            "en la barra la escena del juego mide 88 px y todo va dentro de ella en una sola celda",
-            "arriba van el reto y la meta en una franja y abajo los botones, sin tocar el tamaño de los botones de acción",
-            "el selector de Arma sube a la franja de abajo en la barra y vuelve a Logros fuera de ella",
-            "el piso del juego sube sobre la franja de abajo con --battle-floor-lift y el monstruo queda parado sobre él"
-          ]
-        },
-        {
-          "file": "tests/game-wraps-narrow-window.test.mjs",
-          "namedCases": [
-            "en ventana angosta de escritorio el juego baja a su propia fila en vez de salirse de la barra"
-          ]
-        },
-        {
-          "file": "tests/game-mobile-same-as-desktop.test.mjs",
-          "namedCases": [
-            "en celular el reto de hoy se ve igual que en escritorio (escena de 88 px) sin cambiar de lugar",
-            "en celular el selector de Arma queda en la franja de abajo, siempre visible"
-          ]
-        },
-        {
-          "file": "tests/game-view-logros-button.test.mjs",
-          "namedCases": [
-            "el botón de Logros del reto de hoy se llama Ver mis Logros y abre la página de Logros sin desplegable",
-            "todo el reto de hoy tiene las esquinas redondeadas y recorta lo de adentro"
-          ]
-        },
-        {
           "file": "tests/cycle-boss-not-in-earnings.test.mjs",
           "namedCases": [
             "la tarjeta Ganancias del ciclo ya no muestra al jefe del ciclo (Guardián de la Quincena)",
             "el jefe del ciclo sigue en la página de Logros"
-          ]
-        },
-        {
-          "file": "tests/game-separator-narrow.test.mjs",
-          "namedCases": [
-            "en escritorio hay una línea doble entre los botones y el reto de hoy, y el reto no pasa de 520 px",
-            "en celular el reto mide lo mismo de ancho que la barra de botones, sin línea y sin pegarse arriba",
-            "la línea se mide contra un botón y se vuelve a medir cuando cambia el tamaño de la barra",
-            "las líneas quedan a la izquierda junto al reto, no se ocultan al pegarse arriba y en celular el reto deja espacio abajo"
-          ]
-        },
-        {
-          "file": "tests/game-in-earnings-mobile.test.mjs",
-          "namedCases": [
-            "en celular el reto de hoy se mueve a la fila de Ganancias, entre el monto y el anillo de la meta",
-            "el reto en la fila de Ganancias es compacto: mide 71 px y solo deja nivel, dinero, sonido, escena, Disparar y Arma"
-          ]
-        },
-        {
-          "file": "tests/reto-en-ganancias-celular.test.mjs",
-          "namedCases": [
-            "en celular el reto de hoy se mueve a la fila de Ganancias, antes del anillo de la meta",
-            "en la fila de Ganancias el reto mide 71 px de alto y esconde título, nombre, pausa y Ver mis Logros"
-          ]
-        },
-        {
-          "file": "tests/reto-en-ganancias-celular-revision.test.mjs",
-          "namedCases": [
-            "en celular el reto solo entra a Ganancias mientras la vista Hoy se ve y se reacomoda al cambiar a Ciclo",
-            "la vista esencial que apaga el progreso de Logros tambien esconde el reto dentro de Ganancias",
-            "en pantalla tactil Disparar y Arma miden al menos 24 px de alto"
           ]
         },
         {
@@ -1325,13 +1190,6 @@
           "file": "tests/extension-popup-simple.test.mjs",
           "namedCases": [
             "popup de la extensión: estado, registro y disponibilidad a la vista; el resto en \"Más opciones\""
-          ]
-        },
-        {
-          "file": "tests/game-battle-compact.test.mjs",
-          "namedCases": [
-            "Reto de hoy compacto: nivel en el encabezado y sin bloques repetidos",
-            "Logros desplegado: visor y arma lado a lado, modos unidos y un solo pie"
           ]
         },
         {
