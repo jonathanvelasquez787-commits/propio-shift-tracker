@@ -887,6 +887,15 @@
             "positive greeting uses SVG icons instead of emoji and the old card text is gone",
             "positive greeting styles use theme variables and are fenced in their own block"
           ]
+        },
+        {
+          "file": "tests/positive-journey.test.mjs",
+          "namedCases": [
+            "positive page has the remembered-note card and the journey panel keeps its controls",
+            "remembered note comes only from earlier days and stays the same during a day",
+            "journey groups by day with Hoy and Ayer headings and uses SVG dots",
+            "journey styles are fenced, use theme variables and the old row styles are gone"
+          ]
         }
       ]
     },

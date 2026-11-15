@@ -293,6 +293,54 @@ function renderEvidence() {
     + (completed === 0 ? '' : `<div class="positive-tiles">${tile('good', good, translateText('Cerraron bien'))}${tile('hard', resilient, translateText('Cumplí aunque fue difícil'))}${tile('learning', learning, translateText('Me dejaron un aprendizaje'))}</div>${strip}`);
 }
 
+function dayKeyToDate(dayKey) {
+  const text = String(dayKey || '');
+  const iso = text.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  const us = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  const [year, month, day] = iso ? [iso[1], iso[2], iso[3]].map(Number) : us ? [us[3], us[1], us[2]].map(Number) : [0, 0, 0];
+  return year && month && day ? new Date(year, month - 1, day) : null;
+}
+
+function daysBetween(earlierKey, laterKey) {
+  const earlier = dayKeyToDate(earlierKey), later = dayKeyToDate(laterKey);
+  return earlier && later ? Math.round((later - earlier) / 86400000) : NaN;
+}
+
+function pickRememberedNote(dayKey) {
+  const notes = Object.values(state.game.reinforcement.reflections)
+    .filter((item) => item.note && item.dayKey && daysBetween(item.dayKey, dayKey) > 0)
+    .sort((a, b) => String(a.callId).localeCompare(String(b.callId)));
+  if (!notes.length) return null;
+  let seed = 0;
+  for (const char of dayKey) seed = (seed * 31 + char.charCodeAt(0)) % 100003;
+  return notes[seed % notes.length];
+}
+
+function renderRemembered() {
+  const root = document.getElementById('positiveRememberCard');
+  if (!root) return;
+  const dayKey = currentPositiveDayKey();
+  const note = reinforcementEnabled() ? pickRememberedNote(dayKey) : null;
+  root.hidden = !note;
+  if (!note) return;
+  const days = daysBetween(note.dayKey, dayKey);
+  const ago = days <= 1 ? translateText('Tú, ayer') : ui`Tú, hace ${days} días`;
+  root.innerHTML = `<span class="positive-remember-kicker">${translateText('Algo que escribiste')}</span><p class="positive-remember-note">«${escapeHtml(note.note)}»</p><span class="positive-remember-ago">${ago}</span>`;
+}
+
+function dayHeading(dayKey, todayKey) {
+  const diff = daysBetween(dayKey, todayKey);
+  if (diff === 0) return translateText('Hoy');
+  if (diff === 1) return translateText('Ayer');
+  const date = dayKeyToDate(dayKey);
+  return date ? date.toLocaleDateString(displayLocale(), { day: 'numeric', month: 'long', year: date.getFullYear() === new Date().getFullYear() ? undefined : 'numeric' }) : dayKey;
+}
+
+function timeLabel(iso) {
+  const date = new Date(iso);
+  return Number.isFinite(date.getTime()) ? date.toLocaleTimeString(displayLocale(), { hour: 'numeric', minute: '2-digit' }) : '';
+}
+
 let historyExpanded = false;
 function renderHistory() {
   const root = document.getElementById('positiveHistoryList');
@@ -301,15 +349,26 @@ function renderHistory() {
   const outcomes = { good: translateText('Cerró bien'), difficult: translateText('Cumplí aunque fue difícil'), learning: translateText('Me dejó un aprendizaje') };
   const records = [
     ...Object.values(reinforcement.reflections).map((item) => ({
-      at: item.savedAt, dayKey: item.dayKey, icon: item.outcome === 'good' ? '✨' : item.outcome === 'difficult' ? '🛡️' : '💡',
+      at: item.savedAt, dayKey: item.dayKey, kind: item.outcome === 'good' ? 'good' : item.outcome === 'difficult' ? 'hard' : 'learning',
       title: outcomes[item.outcome], note: item.note,
     })),
-    ...reinforcement.recoveries.map((item) => ({ at: item.at, dayKey: item.dayKey, icon: '🛡️', title: translateText('Volví a tomar otra llamada'), note: '' })),
+    ...reinforcement.recoveries.map((item) => ({ at: item.at, dayKey: item.dayKey, kind: 'hard', icon: 'recovery', title: translateText('Volví a tomar otra llamada'), note: '' })),
   ].sort((a, b) => String(b.at).localeCompare(String(a.at)));
   const count = document.getElementById('positiveHistoryCount');
   if (count) count.textContent = String(records.length);
-  root.innerHTML = records.length
-    ? (historyExpanded ? records : records.slice(0, 8)).map((item) => ui`<div class="positive-history-row"><span aria-hidden="true">${escapeHtml(item.icon)}</span><div><strong>${escapeHtml(item.title)}</strong>${item.note ? ui`<small>${escapeHtml(item.note)}</small>` : ''}</div><time>${escapeHtml(item.dayKey)}</time></div>`).join('')
+  const shown = historyExpanded ? records : records.slice(0, 8);
+  const todayKey = currentPositiveDayKey();
+  let html = '';
+  let lastDay = null;
+  for (const item of shown) {
+    if (item.dayKey !== lastDay) {
+      html += `<span class="positive-day-heading">${escapeHtml(dayHeading(item.dayKey, todayKey))}</span>`;
+      lastDay = item.dayKey;
+    }
+    const iconPath = POSITIVE_ICON_PATHS[item.icon || (item.kind === 'hard' ? 'difficult' : item.kind)];
+    html += `<div class="positive-step"><div class="positive-step-rail"><span class="positive-step-dot positive-tile-${item.kind}">${positiveSvg(iconPath)}</span><span class="positive-step-line"></span></div><div class="positive-step-body"><div class="positive-step-top"><strong>${escapeHtml(item.title)}</strong><time>${escapeHtml(timeLabel(item.at))}</time></div>${item.note ? `<p>«${escapeHtml(item.note)}»</p>` : ''}</div></div>`;
+  }
+  root.innerHTML = records.length ? html
     : translateMarkup('<div class="game-collection-empty">Tus llamadas completadas aparecerán aquí.</div>');
   const toggle = document.getElementById('positiveHistoryToggle');
   if (toggle) {
@@ -326,6 +385,7 @@ export function renderPositiveReinforcement() {
   }
   renderSettingsReinforcement();
   renderEvidence();
+  renderRemembered();
   renderHistory();
 }
 

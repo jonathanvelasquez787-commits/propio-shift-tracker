@@ -19,6 +19,7 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 .positive-page[hidden],
 .game-toast-stack[hidden],
 .positive-greeting[hidden],
+.positive-remember[hidden],
 .positive-page .positive-hero[hidden] {
   display: none !important;
 }
@@ -233,12 +234,6 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 .positive-history-section { min-width: 0; margin-top: 12px; }
 .positive-history-section [hidden] { display: none !important; }
 .positive-history-list { display: grid; gap: 7px; min-width: 0; margin-top: 10px; }
-.positive-history-row { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; align-items: start; gap: 8px; min-width: 0; padding: 8px 0; border-top: 1px solid var(--line); }
-.positive-history-row > span { font-size: 17px; }
-.positive-history-row > div { display: grid; gap: 3px; min-width: 0; }
-.positive-history-row strong { color: var(--text); font-size: 11px; overflow-wrap: anywhere; }
-.positive-history-row small { color: var(--muted); font-size: 10px; line-height: 1.35; overflow-wrap: anywhere; }
-.positive-history-row time { color: var(--muted); font-size: 9px; white-space: nowrap; }
 
 @media (max-width: 520px) {
   .positive-settings-heading { align-items: flex-start; }
@@ -323,7 +318,7 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
 /* fin logros-misiones-fila */
 
 /* historial-positivo-saludo */
-.positive-greeting { --pos-accent: var(--cyan); --pos-accent-2: var(--purple); }
+.positive-page { --pos-accent: var(--cyan); --pos-accent-2: var(--purple); }
 .positive-page .positive-greeting { display: grid; gap: 16px; min-width: 0; padding: 22px 20px; border: 0; border-radius: 22px;
   background: linear-gradient(135deg, color-mix(in srgb, var(--pos-accent) 14%, var(--panel-navy)) 0%, color-mix(in srgb, var(--pos-accent-2) 14%, var(--panel-navy)) 100%); }
 .positive-greeting-head { display: grid; gap: 8px; min-width: 0; }
@@ -349,3 +344,34 @@ html.theme-light { --tier-gold-rgb: 202, 138, 4; }
   .positive-strip { font-size: 14px; }
 }
 /* fin historial-positivo-saludo */
+
+/* historial-positivo-recorrido */
+.positive-page .positive-remember { display: grid; gap: 10px; min-width: 0; padding: 20px 22px; border: 1px solid var(--line); border-radius: 22px; background: var(--panel); }
+.positive-remember-kicker { color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.positive-remember-note { margin: 0; color: var(--text); font-size: clamp(17px, 2.6vw, 20px); line-height: 1.45; letter-spacing: -.01em; overflow-wrap: anywhere; }
+.positive-remember-ago { color: var(--muted); font-size: 13px; }
+.positive-page .positive-journey { border: 1px solid var(--line); border-radius: 22px; background: var(--panel); }
+.positive-journey > .game-fold-summary { padding: 18px 22px 10px; }
+.positive-journey > .game-fold-summary h2 { font-size: 20px; letter-spacing: -.02em; }
+.positive-journey > .game-fold-body { padding: 4px 22px 14px; border-top: 0; }
+.positive-journey .positive-history-list { display: block; margin-top: 8px; }
+.positive-day-heading { display: block; margin: 8px 0 12px; color: color-mix(in srgb, var(--cyan) 75%, var(--text)); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.positive-step { display: flex; gap: 14px; min-width: 0; }
+.positive-step-rail { display: flex; flex-direction: column; align-items: center; }
+.positive-step-dot { display: flex; align-items: center; justify-content: center; flex: none; width: 38px; height: 38px; border-radius: 50%;
+  background: color-mix(in srgb, var(--tile) 16%, var(--panel)); color: color-mix(in srgb, var(--tile) 70%, var(--text)); }
+.positive-step-dot .positive-icon { width: 18px; height: 18px; }
+.positive-step-line { flex: 1; width: 2px; margin-top: 4px; background: var(--line); }
+.positive-step:last-child .positive-step-line { display: none; }
+.positive-step-body { flex: 1; min-width: 0; padding: 8px 0 20px; }
+.positive-step:last-child .positive-step-body { padding-bottom: 6px; }
+.positive-step-top { display: flex; justify-content: space-between; gap: 12px; }
+.positive-step-top strong { color: var(--text); font-size: 15px; overflow-wrap: anywhere; }
+.positive-step-top time { color: var(--muted); font-size: 12px; white-space: nowrap; }
+.positive-step-body p { margin: 6px 0 0; color: color-mix(in srgb, var(--text) 78%, var(--panel)); font-size: 14px; font-style: italic; line-height: 1.5; overflow-wrap: anywhere; }
+@media (max-width: 520px) {
+  .positive-page .positive-remember { padding: 16px 14px; border-radius: 18px; }
+  .positive-journey > .game-fold-summary { padding: 14px 14px 8px; }
+  .positive-journey > .game-fold-body { padding: 4px 14px 12px; }
+}
+/* fin historial-positivo-recorrido */
