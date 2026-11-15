@@ -7089,7 +7089,23 @@ export function render() {
       if (inBar && day.parentElement !== hero) { day.classList.add('hero-shift-game'); hero.appendChild(day); }
       else if (!inBar && day.parentElement !== group) { day.classList.remove('hero-shift-game'); group.prepend(day); }
       hero.classList.toggle('has-game', inBar);
+      placeBattleLoadout();
     }
+    // Con el juego dentro de la barra, el selector de Arma sube a la franja de abajo de la escena (siempre visible).
+    // Fuera de la barra vuelve a su lugar, dentro del desplegable de Logros.
+    function placeBattleLoadout() {
+      const day = document.getElementById('gameHomeDay');
+      const battle = day?.querySelector('.game-battle');
+      const loadout = battle?.querySelector('.game-battle-loadout');
+      const footer = battle?.querySelector('.game-battle-footer');
+      const slots = battle?.querySelector('.game-battle-slots');
+      if (!loadout || !footer || !slots) return;
+      const inBar = day.classList.contains('hero-shift-game');
+      if (inBar && loadout.parentElement !== footer) footer.insertBefore(loadout, footer.querySelector('[data-battle-collection-toggle]'));
+      else if (!inBar && loadout.parentElement !== slots) slots.appendChild(loadout);
+    }
+    const gameDayForLoadout = document.getElementById('gameHomeDay');
+    if (gameDayForLoadout && typeof MutationObserver === 'function') new MutationObserver(() => placeBattleLoadout()).observe(gameDayForLoadout, { childList: true, subtree: true });
     desktopGameQuery?.addEventListener?.('change', () => syncGameInActionsBar());
 
     // Los 3 botones de llamadas (#callsControlsGrid) viven dentro de la tarjeta "Acciones de Hoy"

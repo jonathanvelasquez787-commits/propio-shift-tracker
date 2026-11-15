@@ -1412,3 +1412,42 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
   .chips > .hero-shift-actions.has-game.is-stuck > .hero-shift-game { display: none; }
 }
 /* fin juego en la barra */
+
+/* juego a la altura de los botones */
+/* Escritorio, juego dentro de la barra: la escena mide 88 px (como la fila de botones) y TODO va dentro de ella: arriba el reto y la meta, abajo los botones. Lo que se abre con Logros baja debajo. */
+@media (min-width: 761px) {
+  .chips > .hero-shift-actions.has-game > .hero-shift-game { align-self: center; }
+  .chips > .hero-shift-actions.has-game > .hero-shift-game .game-battle { position: relative; grid-template-columns: minmax(0, 1fr); grid-template-rows: 88px auto; }
+  .chips > .hero-shift-actions.has-game > .hero-shift-game .game-battle .game-battle-head,
+  .chips > .hero-shift-actions.has-game > .hero-shift-game .game-battle .game-battle-stage,
+  .chips > .hero-shift-actions.has-game > .hero-shift-game .game-battle .game-battle-health,
+  .chips > .hero-shift-actions.has-game > .hero-shift-game .game-battle .game-battle-footer { grid-column: 1; grid-row: 1; }
+  .chips > .hero-shift-actions.has-game > .hero-shift-game .game-battle .game-battle-stage { height: 88px; align-self: start; --battle-floor-lift: 15px; }
+  .chips > .hero-shift-actions.has-game > .hero-shift-game .game-battle .game-battle-collection { grid-row: 2; }
+  .chips > .hero-shift-actions.has-game > .hero-shift-game .game-battle .game-battle-head { align-self: start; z-index: 3; height: 24px; padding: 2px 6px 0 10px; gap: 4px; background: color-mix(in srgb, var(--battle-sky) 78%, transparent); }
+  .chips > .hero-shift-actions.has-game > .hero-shift-game .game-battle .game-battle-heading { display: flex; flex-wrap: nowrap; align-items: center; gap: 6px; min-width: 0; overflow: hidden; white-space: nowrap; }
+  .chips > .hero-shift-actions.has-game > .hero-shift-game .game-battle .game-battle-heading > .game-kicker { margin: 0; font-size: 9px; }
+  .chips > .hero-shift-actions.has-game > .hero-shift-game .game-battle .game-battle-heading h3 { font-size: 12px; overflow: hidden; text-overflow: ellipsis; }
+  .chips > .hero-shift-actions.has-game > .hero-shift-game .game-battle .game-level-chip { align-self: center; margin: 0; padding: 0 5px; font-size: 9px; line-height: 14px; transform: none; }
+  .chips > .hero-shift-actions.has-game > .hero-shift-game .game-battle .game-battle-head-tools button { width: 20px; height: 20px; min-width: 0; }
+  .chips > .hero-shift-actions.has-game > .hero-shift-game .game-battle .game-battle-head-tools svg { width: 12px; height: 12px; }
+  .chips > .hero-shift-actions.has-game > .hero-shift-game .game-battle .game-battle-health { align-self: start; z-index: 4; padding: 0; background: none; pointer-events: none; }
+  .chips > .hero-shift-actions.has-game > .hero-shift-game .game-battle .game-compact-goal-line { position: absolute; top: 4px; right: 54px; margin: 0; font-size: 11px; line-height: 16px; }
+  .chips > .hero-shift-actions.has-game > .hero-shift-game .game-battle .game-compact-goal-line > span { display: none; }
+  .chips > .hero-shift-actions.has-game > .hero-shift-game .game-battle .game-compact-goal-track { position: absolute; left: 0; right: 0; top: 21px; height: 3px; margin: 0; }
+  .chips > .hero-shift-actions.has-game > .hero-shift-game .game-battle .game-compact-goal-chest,
+  .chips > .hero-shift-actions.has-game > .hero-shift-game .game-battle .game-compact-goal-foot { display: none; }
+  .chips > .hero-shift-actions.has-game > .hero-shift-game .game-battle .game-battle-footer { align-self: end; z-index: 3; height: 26px; min-height: 26px; padding: 0 10px; gap: 8px; justify-content: center; border-top: 0; background: color-mix(in srgb, var(--battle-sky) 82%, transparent); }
+  .chips > .hero-shift-actions.has-game > .hero-shift-game .game-battle .game-battle-footer > button { min-height: 20px; padding: 0 6px; font-size: 12px; }
+  .chips > .hero-shift-actions.has-game > .hero-shift-game .game-battle .game-battle-footer .game-battle-loadout { display: flex; align-items: center; padding: 0; background: none; }
+  .chips > .hero-shift-actions.has-game > .hero-shift-game .game-battle .game-battle-footer .game-battle-loadout > div { display: flex; align-items: center; width: auto; }
+  .chips > .hero-shift-actions.has-game > .hero-shift-game .game-battle .game-battle-footer .game-battle-loadout label,
+  .chips > .hero-shift-actions.has-game > .hero-shift-game .game-battle .game-battle-footer .game-battle-loadout small { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .chips > .hero-shift-actions.has-game > .hero-shift-game .game-battle .game-battle-footer .game-battle-loadout select { width: auto; max-width: 118px; min-height: 20px; padding: 0 4px; border: 1px solid var(--line); border-radius: 6px; background: var(--accordion-bg); font-size: 11px; }
+  .chips > .hero-shift-actions.has-game > .hero-shift-game .game-battle .game-battle-monster { bottom: 24px; width: 52px; height: 41px; }
+  .chips > .hero-shift-actions.has-game > .hero-shift-game .game-battle .game-battle-label { display: none; }
+}
+@media (min-width: 761px) and (max-width: 1279px) {
+  .chips > .hero-shift-actions.has-game > .hero-shift-game .game-battle .game-battle-heading > .game-kicker { display: none; }
+}
+/* fin juego a la altura de los botones */
