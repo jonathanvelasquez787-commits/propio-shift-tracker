@@ -311,7 +311,6 @@
             "oversized settings keep all pending changes and their failure until a complete retry succeeds",
             "un almacenamiento que rechaza escrituras conserva las claves previas sin borrarlas",
             "un fallo al guardar solo estado obliga a guardar el siguiente snapshot completo",
-            "el JSON descargado incluye el recibo y escudo del mismo respaldo",
             "una exportación de dos años conserva los días y las llamadas después del día 400"
           ]
         },
@@ -323,10 +322,6 @@
             "cycle goal editors keep their dialog and omit success when persistence rejects",
             "day note editors keep their dialog and omit success and rewards when persistence rejects",
             "annual calendar goal can be retried after persistence recovers",
-            "monster name retains its draft and original setting when saving rejects, then permits retry",
-            "game reset preserves progress and omits success after rejected persistence",
-            "equipment is rolled back and can be retried without a false success",
-            "a previously awarded pending chest is preserved if clearing its stale pending flag cannot persist",
             "Higher Rate purge restores windows, frozen bonuses and finance assignments when persistence rejects"
           ]
         },
@@ -384,7 +379,7 @@
             "multiple explicit sessions plus calls outside them count each real connected minute once",
             "a corrected zero-minute official call cannot expand across a different customer call",
             "a correction collapses only legacy zero-minute duplicates of its exact official identity",
-            "reimporting the existing official zero row heals legacy duplicates and rolls back current XP exactly once",
+            "reimporting the existing official zero row heals legacy duplicates exactly once",
             "an exact zero-minute official correction cannot replace an unrelated overlapping live call",
             "31 chronological days preserve an independent ledger through imports, manual/live calls, corrections, deletion, goals, and reloads",
             "31 daily call saves, currency changes, allocation resets and payment corrections preserve an independent monthly payment ledger"
@@ -464,7 +459,6 @@
         {
           "file": "tests/deep-audit.test.mjs",
           "namedCases": [
-            "auditoría profunda: Higher Rate usa bonus.amount para crítico, XP y FX monetario",
             "auditoría profunda: editar Higher Rate reconcilia días de gamificación cuyo bono cambió",
             "auditoría profunda: ajustar turno completo no deja Inicio Fin mutados si no hay bloques",
             "auditoría profunda: reiniciar día protege llamada activa o respaldo live pendiente",
@@ -599,7 +593,7 @@
             "multiple explicit sessions plus calls outside them count each real connected minute once",
             "a corrected zero-minute official call cannot expand across a different customer call",
             "a correction collapses only legacy zero-minute duplicates of its exact official identity",
-            "reimporting the existing official zero row heals legacy duplicates and rolls back current XP exactly once",
+            "reimporting the existing official zero row heals legacy duplicates exactly once",
             "an exact zero-minute official correction cannot replace an unrelated overlapping live call",
             "31 chronological days preserve an independent ledger through imports, manual/live calls, corrections, deletion, goals, and reloads",
             "31 daily call saves, currency changes, allocation resets and payment corrections preserve an independent monthly payment ledger"
@@ -656,7 +650,7 @@
             "multiple explicit sessions plus calls outside them count each real connected minute once",
             "a corrected zero-minute official call cannot expand across a different customer call",
             "a correction collapses only legacy zero-minute duplicates of its exact official identity",
-            "reimporting the existing official zero row heals legacy duplicates and rolls back current XP exactly once",
+            "reimporting the existing official zero row heals legacy duplicates exactly once",
             "an exact zero-minute official correction cannot replace an unrelated overlapping live call",
             "31 chronological days preserve an independent ledger through imports, manual/live calls, corrections, deletion, goals, and reloads",
             "31 daily call saves, currency changes, allocation resets and payment corrections preserve an independent monthly payment ledger"
@@ -675,7 +669,6 @@
             "oversized settings keep all pending changes and their failure until a complete retry succeeds",
             "un almacenamiento que rechaza escrituras conserva las claves previas sin borrarlas",
             "un fallo al guardar solo estado obliga a guardar el siguiente snapshot completo",
-            "el JSON descargado incluye el recibo y escudo del mismo respaldo",
             "una exportación de dos años conserva los días y las llamadas después del día 400"
           ]
         },
@@ -736,73 +729,34 @@
       "acceptance": "Recibos idempotentes, correcciones y recargas; apagar Logros conserva dinero/historia; sin recompensas al fallar guardar.",
       "sources": [
         "js/game.js",
-        "js/game-review.js",
         "js/game-auto.js",
         "js/game-audio.js",
-        "js/monsters.js",
         "js/positive-reinforcement.js",
         "js/reinforcement-feedback.js",
         "js/reinforcement-rules.js"
       ],
       "tests": [
         {
-          "file": "tests/game-state-bootstrap.test.mjs",
-          "namedCases": [
-            "normalizar gamificación durante el arranque no requiere el contexto de fechas y conserva el historial persistido"
-          ]
-        },
-        {
-          "file": "tests/game-review.test.mjs",
-          "namedCases": [
-            "chest review distinguishes earned, claimed and corrected rewards without granting anything",
-            "chest correction context survives live and finalized state normalization",
-            "equipment filters keep equipped pieces owned while separating available and locked items"
-          ]
-        },
-        {
           "file": "tests/game-phase6.test.mjs",
           "namedCases": [
-            "Fase 6 expone el catálogo semanal y renderiza SVG seguro para todos los estados",
-            "state y settings conservan defaults y normalización de Fase 6",
-            "XP solo entra por llamadas actuales y oportunas, con tope diario y lock de snapshot",
-            "el hook real conserva el botín XP de la quinta llamada al reconciliar y recargar",
             "el bono manual de Higher Rate no se suma dos veces y los tiles conservan su efecto fuera de ventana",
-            "la hora manual vacía no se convierte en 07:00 y las horas futuras no se guardan ni reciben XP",
-            "la normalización profunda contiene xp, estrellas, misiones y monstruo corruptos importados",
             "CSS de juego cubre motion reducido, layout estrecho y responsive",
             "build mantiene módulos fuente fuera de public y el worker precarga el CSS de juego",
-            "Logros conserva las tarjetas de app.html y solo actualiza sus nodos internos",
-            "edición y borrado corrigen datos sin reescribir XP ya congelado por STAGE CLEAR",
-            "STAGE CLEAR reversible restaura escudos y racha, y conserva snapshot consistente",
             "avisos y modales de juego se recuperan al cerrar",
-            "Logros muestra accesorios y cofre pendiente, y racha de Reportes respeta escudos",
-            "XP flotante representa concesión real y distingue XP sellado",
-            "pendientes finales de Phase 6 quedan conectados a comportamiento real",
-            "consistencia de gamificación se mantiene aunque esté apagada",
             "Arcade fijo y reduced-motion solo elimina movimiento",
             "simulación mensual: pegar llamadas usa hooks de juego y reemplaza live provisional",
             "simulación mensual: llamadas y Break Lunch no pueden ocupar los mismos minutos",
             "simulación mensual: llamada no salta ventana temprana ni reescribe entrada salida manual",
-            "simulación mensual: XP solo para llamadas productivas ya terminadas",
             "simulación mensual: llamada manual futura se rechaza y live conserva segundos",
-            "segunda simulación mensual: importaciones tardías no dan XP indirecto",
-            "segunda simulación mensual: segunda sesión reabre el cierre antes de volver a congelar",
-            "segunda simulación mensual: caja y combo se reconcilian al corregir una live",
             "segunda simulación mensual: Propio puede corregir una llamada ya importada",
             "segunda simulación mensual: finalizar turno no cierra si falla el guardado de la llamada",
             "segunda simulación mensual: ninguna llamada manual editada o pegada puede terminar en el futuro",
             "segunda simulación mensual: descartar no reinicia ACW y reemplazar live corrige su fin",
-            "segunda simulación mensual: STAGE CLEAR usa el día del inicio del turno al cruzar medianoche",
             "tercera simulación mensual: Finanzas nunca queda sobreasignada al bajar ganancias",
-            "tercera simulación mensual: reset y vaciado limpian estados derivados sin romper XP congelado",
-            "tercera simulación mensual: gamificación apagada mantiene consistencia y filas de cero minutos no dan XP",
             "tercera simulación mensual: turno nocturno conserva día contable y correcciones oficiales",
             "tercera simulación mensual: horario y meta históricos quedan congelados antes de cambios globales",
-            "tercera simulación mensual: recompensas financieras son reversibles",
             "tercera simulación mensual: ACW se recalcula al editar borrar o vaciar llamadas",
             "tercera simulación mensual: pegar llamadas de hoy vuelve a auto iniciar el turno",
-            "tercera simulación mensual: editar estado manual del día reconcilia gamificación",
-            "runtime smoke: helpers de renderGame existen para Logros y Higher Rate",
             "cuarta simulación mensual: llamadas live antes y después del turno permiten días laborales y bloquean nuevos inicios en días libres",
             "cuarta simulación mensual: descartar la primera live revierte el turno que esa llamada abrió",
             "cuarta simulación mensual: llamada manual de hoy auto inicia turno igual que pegar llamadas",
@@ -810,20 +764,11 @@
             "cuarta simulación mensual: Higher Rate cruza medianoche sin perder bonos",
             "cuarta simulación mensual: llamadas antes o después del checkpoint cuentan como presencia sin mover Entrada/Salida",
             "cuarta simulación mensual: descartar live también revierte efectos de gamificación del auto-turno",
-            "cuarta simulación mensual: gamificación nocturna no se parte a medianoche",
             "promotion list opens its single editor and the editor previews the selected effect before saving",
             "quinta simulación mensual: descartar live iniciada durante Break Lunch restaura la pausa",
             "quinta simulación mensual: respaldo live sobrevive refresh y descartar revierte turno ACW",
             "quinta simulación mensual: respaldo live conserva duración decimal y día contable nocturno",
             "quinta simulación mensual: Break Lunch y reset respetan día contable de turno nocturno"
-          ]
-        },
-        {
-          "file": "tests/game-depth.test.mjs",
-          "namedCases": [
-            "las fases y placas son deterministas y no mezclan HP financiero",
-            "Higher Rate vivo solo activa furia en el día actual",
-            "loot transparente y equipamiento SVG son deterministas y accesibles"
           ]
         },
         {
@@ -871,25 +816,6 @@
         {
           "file": "tests/super-audit-game.test.mjs",
           "namedCases": [
-            "discreet automatic feedback preserves identical XP, milestone and surprise reward receipts",
-            "correction below eight calls revokes improved loot and requalifying grants it exactly once",
-            "correction removes improved cosmetic and equipment before requalifying",
-            "continue preserves a backup shield earned after closing the shift",
-            "continue reverses only stage shield consumption, preserving later backup award",
-            "continue does not remove a shield already restored by correcting adherence",
-            "goal chest XP remains idempotent across close, continue, correction, requalification and reset",
-            "exact decimal financial goal unlocks chest, while a real shortfall cannot",
-            "continue undoes weekly streak shield without consuming later backup shield",
-            "legacy same-day chest receipts prevent duplicate rewards across reopen and changed goal",
-            "invalid pending chest day is discarded by persisted normalization",
-            "large capped reward ledger reconciles every threshold without removing unrelated bonus",
-            "duplicate saved callbacks cannot repeat surprise, loot, chest or frozen stage XP",
-            "continuing a pause revokes its return bonus once and a late return cannot restore it",
-            "reopening a corrected frozen day reconciles invalid loot before earning new XP",
-            "reopening with Logros disabled also removes loot invalidated while frozen",
-            "day reset reverses stage consumption and award in the right order at the shield cap",
-            "decimal cycle goal grants exactly one rollover reward while a real cent shortfall grants none",
-            "current cycle uses the same decimal attainment as rollover",
             "resetting one day removes its reinforcement receipts while preserving other days and preferences"
           ]
         },
@@ -910,39 +836,15 @@
         {
           "file": "tests/reinforcement-integration.test.mjs",
           "namedCases": [
-            "Arcade sustituye intensidades antiguas sin activar Logros ni modificar XP guardado",
-            "misiones abiertas son automáticas y los enfoques de resultados sellados se conservan",
-            "Finanzas concede y revoca el premio en el mes local aunque UTC ya esté en el siguiente",
-            "completar el monto de un gasto recurrente concede su recibo mensual y reiniciarlo lo revoca",
-            "corregir un día cerrado derrota su monstruo sin reabrir XP y retirar dinero revoca esa derrota",
-            "timers de llamadas sucesivas no duplican feedback ni alteran sus recibos en la batalla compacta",
             "llamadas históricas, futuras y caídas no activan un impacto visual",
-            "hooks manual/live/import guardan una decisión por llamada y migran la oficial sin reintentar azar",
-            "cofre sorpresa real respeta bloqueo y tope sin perder su decisión persistida",
             "hitos monetarios múltiples, cambio de meta, corrección y recarga no repiten celebraciones",
-            "corregir o borrar la llamada revierte XP sorpresa y conserva la decisión sin nuevos sorteos",
             "hooks llamadas y correcciones mantienen hitos en el día contable nocturno",
-            "Break reinicia combo y reconciliación lo conserva; retorno puntual concede una sola vez",
-            "pausa tardía y retorno con XP bloqueado no conceden bonus; dropped conserva combo sin premiar errores",
-            "reanudar una pausa ya premiada y terminar tarde corrige la puntualidad sin duplicar XP",
-            "inactividad excluye pausas, turno cerrado y llamada activa; persiste dedupe y se rearma tras otra llamada",
             "custom inactivity notification uses saved text with achievements off and preserves threshold and dedupe",
-            "configurable inactivity repeats use work time, survive reload and reset after a call without catch-up bursts",
             "inactivity once-only and changed intervals preserve the last delivery instead of replaying a notice",
             "legacy inactivity receipts establish a repeat baseline and corrected pauses cannot replay delivery",
             "repeating inactivity actually redisplays identical messages after expiry without weakening ordinary toast dedupe",
             "inactividad nocturna deduplica a ambos lados de medianoche del mismo turno",
-            "cola real limita a tres toasts y no repite el último texto después de expirar",
-            "cierre de racha semanal conserva rollback y comparaciones al recargar y revoca el escudo al reabrir",
-            "metadatos de cierre importados validan dinero, fechas y rollback antes de restaurar premios",
-            "cierre nocturno cumplido proyecta la racha del día contable y las correcciones históricas no la proyectan de nuevo",
-            "cofre de meta exige dinero suficiente, meta positiva, día actual, Logros y ninguna llamada activa",
-            "cofre de meta exacta guarda el primer visor inmediatamente y repetir o recargar conserva un solo premio",
-            "cerrar y continuar el turno conserva el cofre de meta sin sellar ni conceder un segundo premio",
-            "corregir y borrar llamadas revoca el visor y su equipo; alcanzar la meta otra vez lo recupera sin sumar XP",
-            "premio de 25 XP se reembolsa por corrección y meta nueva sin permitir cultivar XP al repetir",
-            "cofres heredados conservan su recibo al corregir dinero o meta y bloquean un premio diario duplicado",
-            "visor desbloqueado en nivel uno conserva equipo facial y snapshot cerrado al normalizar y recargar"
+            "cola real limita a tres toasts y no repite el último texto después de expirar"
           ]
         },
         {
@@ -957,11 +859,7 @@
             "active work subtracts a clipped union of pauses and interruptions rather than double counting",
             "active work follows the real shift across midnight without resetting inactivity",
             "scheduled working intervals exclude off-duty time and union overlaps before subtracting pauses",
-            "scheduled work intersects the real overnight shift rather than calendar dates",
-            "supportive closure uses up to three factual positives and conditional tomorrow projection",
-            "sparse and difficult days never manufacture achievements or money without currency formatting",
-            "closure comparisons stay personal and best call uses the provided money formatter",
-            "surprise decisions use a single validated controlled draw with a fifteen percent boundary"
+            "scheduled work intersects the real overnight shift rather than calendar dates"
           ]
         },
         {
@@ -969,11 +867,18 @@
           "namedCases": [
             "automatic call feedback suppresses both notification channels without disabling preferences",
             "Logros y refuerzo positivo controlan sus propios canales incluso con intensidad antigua",
-            "Arcade celebra hitos y movimiento reducido conserva anuncios sin partículas",
+            "los hitos se anuncian como avisos y no usan partículas",
             "textos centrales tienen variantes estables y no dejan variables sin reemplazar",
             "feedback reconoce llamada normal, umbral largo, bono y mejor pago con moneda secundaria",
             "mejor llamada compara el bono real de las anteriores y excluye el mismo evento",
             "Refuerzo positivo funciona con Logros apagado y espera el cierre del diálogo de importación"
+          ]
+        },
+        {
+          "file": "tests/game-state-bootstrap.test.mjs",
+          "namedCases": [
+            "normalizar el estado al arrancar no requiere el contexto de fechas y borra lo guardado del juego",
+            "un estado vacío o dañado vuelve al estado por defecto del refuerzo"
           ]
         }
       ]
@@ -1016,9 +921,8 @@
             "offline English translates authored text while retaining personal names and nested safe markup",
             "catalog includes current HTML and authored JS without style or script source",
             "new and changed strings, missing parameters and injected HTML cannot publish as valid English",
-            "saved mission messages change language without editing numbers or personal values",
             "dynamic document messages and attributes retain personal values across language changes and independent bundles",
-            "English UI keeps saved equipment identifiers and adherence checkpoint identities"
+            "English UI keeps adherence checkpoint identities"
           ]
         },
         {
@@ -1031,13 +935,6 @@
           "file": "tests/finance-header-mobile.test.mjs",
           "namedCases": [
             "Finanzas en celular: \"Siguiente prioridad\" va en dos líneas y no se encima con el título"
-          ]
-        },
-        {
-          "file": "tests/game-missions-row.test.mjs",
-          "namedCases": [
-            "Logros: la fila Misiones pone título y número arriba y el aviso de armaduras debajo, sin encimarse",
-            "Logros: la fila Misiones conserva su contenido (título, conteo y armaduras pendientes)"
           ]
         },
         {
@@ -1961,17 +1858,16 @@
           ]
         },
         {
-          "file": "tests/audit2-game-integrity.test.mjs",
-          "namedCases": [
-            "reset rejection restores progress; a fresh confirmation succeeds once and preserves personal rewards",
-            "a cycle cosmetic acquired from another reward cannot consume the pending cycle choice"
-          ]
-        },
-        {
           "file": "tests/deep-audit-concurrency.test.mjs",
           "namedCases": [
             "delayed authenticated user reads reject an account that changed while the response was in flight",
             "an unanswered lease request expires locally so renewals resume without a reload"
+          ]
+        },
+        {
+          "file": "tests/audit2-game-integrity.test.mjs",
+          "namedCases": [
+            "reinforcement templates follow runtime language changes"
           ]
         }
       ]

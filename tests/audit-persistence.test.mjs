@@ -202,25 +202,6 @@ test('un fallo al guardar solo estado obliga a guardar el siguiente snapshot com
   assert.deepEqual(JSON.parse(h.values.get('state')), h.state);
 });
 
-test('el JSON descargado incluye el recibo y escudo del mismo respaldo', () => {
-  let downloaded;
-  const state = { game: { shields: 0, ledger: {} } };
-  const context = vm.createContext({ ui, translateText, translateMarkup, displayLocale, applySavedColors, state, calls: [], settings: {}, Date,
-    onGameBackupExported() {
-      if (!state.game.ledger['backup-shield:week']) { state.game.shields++; state.game.ledger['backup-shield:week'] = true; }
-    },
-    Blob: class { constructor(parts) { downloaded = JSON.parse(parts[0]); } },
-    URL: { createObjectURL: () => 'blob:backup', revokeObjectURL() {} },
-    document: { createElement: () => ({ click() {} }) },
-  });
-  const body = source.slice(source.indexOf('    function exportJSON()'), source.indexOf('    // Exportación para contabilidad/impuestos'));
-  vm.runInContext(body + '\nexportJSON();', context);
-  assert.deepEqual(downloaded.state, state);
-  assert.equal(downloaded.state.game.shields, 1);
-  vm.runInContext('exportJSON();', context);
-  assert.equal(downloaded.state.game.shields, 1);
-});
-
 test('una exportación de dos años conserva los días y las llamadas después del día 400', () => {
   const lastCall = { id: 'last-day', startISO: '2026-12-31T12:00:00Z', pay: 15 };
   const context = vm.createContext({ ui, translateText, translateMarkup, displayLocale, applySavedColors, Date,

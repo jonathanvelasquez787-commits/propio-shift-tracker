@@ -115,18 +115,6 @@ test('new and changed strings, missing parameters and injected HTML cannot publi
   assert.deepEqual(validateTranslations({ label: 'Hola {{v0}} · {{v1}}' }, { label: '{{v1}} · Hello {{v0}}' }), []);
 });
 
-test('saved mission messages change language without editing numbers or personal values', () => {
-  const original = 'Faltan 136.7 min';
-  setLanguage('en');
-  const english = translateStoredText(original);
-  assert.equal(english, '136.7 min remaining');
-  const title = 'Meta cumplida: Mi meta española';
-  assert.equal(translateStoredText(title), 'Goal completed: Mi meta española');
-  setLanguage('es');
-  assert.equal(translateStoredText(english), original);
-  assert.equal(translateStoredText('Goal completed: Mi meta española'), title);
-});
-
 test('dynamic document messages and attributes retain personal values across language changes and independent bundles', async (t) => {
   const previousLanguage = currentLanguage();
   const original = Object.fromEntries(['document', 'NodeFilter'].map(key => [key, globalThis[key]]));
@@ -181,10 +169,8 @@ test('dynamic document messages and attributes retain personal values across lan
   assert.equal(attributes.get('aria-label'), '  Contraseña nueva  ');
 });
 
-test('English UI keeps saved equipment identifiers and adherence checkpoint identities', () => {
-  const game = fs.readFileSync('js/game.js', 'utf8');
+test('English UI keeps adherence checkpoint identities', () => {
   const app = fs.readFileSync('js/app-main.js', 'utf8');
-  assert.match(game, /data-accessory="\$\{escapeHtml\(item\.id\)\}"/);
   assert.match(app, /label: 'Entrada'/);
   assert.match(app, /label: 'Salida'/);
   assert.match(app, /textContent = translateText\(currentStateLabel\(\)\)/);

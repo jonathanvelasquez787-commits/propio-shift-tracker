@@ -7,16 +7,6 @@ import { fileURLToPath } from 'node:url';
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 
-test('auditoría profunda: Higher Rate usa bonus.amount para crítico, XP y FX monetario', () => {
-  const game = read('js/game.js');
-  assert.match(game, /function higherRateBonusAmount\(call\)/);
-  assert.match(game, /Number\(higherRateBonusForCall\(call\)\?\.amount\) \|\| 0/);
-  assert.match(game, /const critical = higherRateBonusAmount\(call\) > 0/);
-  assert.match(game, /const amount = parseMoney\(call\.pay\) \+ higherRateBonusAmount\(call\)/);
-  assert.doesNotMatch(game, /higherRateBonusForCall\(call\) > 0/);
-  assert.doesNotMatch(game, /parseMoney\(call\.pay\) \+ higherRateBonusForCall\(call\)/);
-});
-
 test('auditoría profunda: editar Higher Rate reconcilia días de gamificación cuyo bono cambió', () => {
   const hr = read('js/higher-rate.js');
   assert.match(hr, /onGameCallsChanged,/);
@@ -95,7 +85,6 @@ test('auditoría profunda: sonidos personalizados detectan fallo real de persist
   assert.match(alarm, /settings\[cfg\.urlKey\] = previous\.dataUrl/);
 });
 
-
 test('auditoría profunda: corrección oficial preserva día contable y bono Higher Rate congelado', () => {
   const app = read('js/app-main.js');
   const start = app.indexOf('const importedRows = accepted.map');
@@ -121,7 +110,6 @@ test('auditoría profunda: hidratar desde nube restaura snapshot anterior si loc
   assert.match(body, /throw error/);
 });
 
-
 test('auditoría profunda: descartar una pausa continuada elimina sus artefactos de interrupción', () => {
   const app = read('js/app-main.js');
   const start = app.indexOf('function startPause(type)');
@@ -133,7 +121,6 @@ test('auditoría profunda: descartar una pausa continuada elimina sus artefactos
   assert.match(body, /state\.dayInterruptions\[accountingDay\] = state\.dayInterruptions\[accountingDay\][\s\S]*continuationInterruptionId/);
   assert.match(body, /state\.events = state\.events\.filter\(event => event\?\.id !== discarded\.continuationEventId\)/);
 });
-
 
 test('auditoría profunda: saveAll es atómico entre state calls y settings', () => {
   const app = read('js/app-main.js');
