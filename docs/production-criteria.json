@@ -919,6 +919,12 @@
             "el popup tiene su tarjeta entre ACW y Apariencia, apagada y deshabilitada sin vínculo",
             "el script de contenido de la extensión reenvía los ajustes solo a la pestaña vinculada"
           ]
+        },
+        {
+          "file": "tests/popup-pause-text.test.mjs",
+          "namedCases": [
+            "popup: \"Pausar disponibilidad automática\" se explica sin jerga"
+          ]
         }
       ]
     },
