@@ -291,7 +291,7 @@ test('cuarta simulación mensual: backup JSON realmente incluye y restaura setti
   assert.match(appMain, /schemaVersion: 2, state, calls, settings/);
   assert.match(appMain, /setAppSettings\(restoredSettings\)/);
   assert.match(appMain, /backups viejos \(sin settings\)/i);
-  assert.match(html, /respaldo completo: llamadas, turnos, pausas, horario, metas, Finanzas, Higher Rate, gamificación y ajustes/);
+  assert.match(html, /respaldo completo: llamadas, turnos, pausas, horario, metas, Finanzas, Higher Rate y ajustes/);
 });
 
 

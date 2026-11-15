@@ -872,6 +872,12 @@
             "sin Celebrar llamadas todo queda mudo aunque el ajuste viejo diga enabled",
             "el audio y los avisos ya no tienen canal \"game\""
           ]
+        },
+        {
+          "file": "tests/no-game-wording.test.mjs",
+          "namedCases": [
+            "no visible text mentions the removed game (logros, gamificación, monstruos, premios)"
+          ]
         }
       ]
     },

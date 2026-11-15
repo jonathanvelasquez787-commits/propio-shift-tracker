@@ -804,6 +804,12 @@
       "js/reinforcement-feedback.js"
     ]
   },
+  "s_0eee0e3b": {
+    "source": "Borra llamadas, pausas, huecos, la nota y el log SOLO del día activo (",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_0f078100": {
     "source": "Llamadas {{v14}}%",
     "files": [
@@ -2386,6 +2392,12 @@
       "js/app-main.js"
     ]
   },
+  "s_2e2526dd": {
+    "source": "Reemplazan llamadas, turnos, pausas y notas.",
+    "files": [
+      "js/backup-recovery.js"
+    ]
+  },
   "s_2e4a471e": {
     "source": "acw",
     "files": [
@@ -3814,12 +3826,6 @@
       "terminos.html"
     ]
   },
-  "s_48a7bff7": {
-    "source": "Un solo control para TODOS los sonidos: Logros, llamadas guardadas, turno/Break/Lunch y descanso por productividad, incluidos tus archivos personalizados. 0% = silencioso; los avisos escritos siguen apareciendo.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_48b164cf": {
     "source": "Acciones de Hoy",
     "files": [
@@ -4318,12 +4324,6 @@
       "js/settings.js"
     ]
   },
-  "s_51aa4a34": {
-    "source": "Incluye llamadas, turnos, pausas, horario, metas, Finanzas y Logros.",
-    "files": [
-      "js/boot.js"
-    ]
-  },
   "s_51cae736": {
     "source": "completa",
     "files": [
@@ -4716,6 +4716,12 @@
       "js/higher-rate-review.js"
     ]
   },
+  "s_58c19ed6": {
+    "source": "Se actualizarán ganancias y Finanzas.",
+    "files": [
+      "js/call-recovery.js"
+    ]
+  },
   "s_58d22760": {
     "source": "Horario y descansos pendientes de confirmar",
     "files": [
@@ -4812,6 +4818,12 @@
       "js/calendar.js"
     ]
   },
+  "s_5b3107c5": {
+    "source": "Las llamadas, turnos, pausas y notas actuales se reemplazan por los del respaldo.",
+    "files": [
+      "js/backup-recovery.js"
+    ]
+  },
   "s_5b6d7204": {
     "source": "Ciclo: {{v3}}{{v4}}",
     "files": [
@@ -4822,6 +4834,12 @@
     "source": "Inicio del turno ya utilizado",
     "files": [
       "js/automation-ui.js"
+    ]
+  },
+  "s_5b9c71de": {
+    "source": "Se reinician llamadas, turnos, pausas, Finanzas, horario, metas y perfil de todos los días.",
+    "files": [
+      "js/backup-recovery.js"
     ]
   },
   "s_5ba07c42": {
@@ -4883,6 +4901,12 @@
     "source": "ventana total de hoy",
     "files": [
       "js/detail-views.js"
+    ]
+  },
+  "s_5d01e0be": {
+    "source": "Incluye llamadas, turnos, pausas, horario, metas y Finanzas.",
+    "files": [
+      "js/boot.js"
     ]
   },
   "s_5d021bcb": {
@@ -4996,6 +5020,12 @@
   },
   "s_5f895d21": {
     "source": "Historial desde",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_5f96e611": {
+    "source": "Un solo control para TODOS los sonidos: llamadas guardadas, turno/Break/Lunch y descanso por productividad, incluidos tus archivos personalizados. 0% = silencioso; los avisos escritos siguen apareciendo.",
     "files": [
       "app.html"
     ]
@@ -7012,12 +7042,6 @@
       "js/automation-ui.js"
     ]
   },
-  "s_85313e20": {
-    "source": "Se reinician llamadas, turnos, pausas, Logros, Finanzas, horario, metas y perfil de todos los días.",
-    "files": [
-      "js/backup-recovery.js"
-    ]
-  },
   "s_85326291": {
     "source": "Revisar vínculo",
     "files": [
@@ -7987,12 +8011,6 @@
     "source": "Meta 7 h",
     "files": [
       "index.html"
-    ]
-  },
-  "s_94cd4fc3": {
-    "source": "Reemplazan llamadas, turnos, pausas, notas y Logros.",
-    "files": [
-      "js/backup-recovery.js"
     ]
   },
   "s_950854fb": {
@@ -9397,12 +9415,6 @@
       "app.html"
     ]
   },
-  "s_aeca0c44": {
-    "source": "Borra llamadas, pausas, huecos, la nota, el log y la gamificación SOLO del día activo (",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_aeebacac": {
     "source": "Meta de sesión",
     "files": [
@@ -9935,12 +9947,6 @@
     "files": [
       "app.html",
       "js/app-main.js"
-    ]
-  },
-  "s_b8511696": {
-    "source": "\"Exportar JSON\" descarga un respaldo completo: llamadas, turnos, pausas, horario, metas, Finanzas, Higher Rate, gamificación y ajustes. \"Importar JSON\" restaura todo eso. Los backups antiguos sin configuración siguen siendo compatibles.",
-    "files": [
-      "app.html"
     ]
   },
   "s_b8773d4d": {
@@ -11259,6 +11265,12 @@
       "js/finance-planning.js"
     ]
   },
+  "s_d2dcddd4": {
+    "source": "\"Exportar JSON\" descarga un respaldo completo: llamadas, turnos, pausas, horario, metas, Finanzas, Higher Rate y ajustes. \"Importar JSON\" restaura todo eso. Los backups antiguos sin configuración siguen siendo compatibles.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_d2fa7170": {
     "source": "Inicia el shift para comenzar",
     "files": [
@@ -12376,12 +12388,6 @@
       "app.html"
     ]
   },
-  "s_e664b2cc": {
-    "source": "Se actualizarán ganancias, Finanzas y Logros.",
-    "files": [
-      "js/call-recovery.js"
-    ]
-  },
   "s_e68e1c6e": {
     "source": "¡Bienvenido!",
     "files": [
@@ -12548,12 +12554,6 @@
     "source": "+30 min",
     "files": [
       "app.html"
-    ]
-  },
-  "s_e9b98273": {
-    "source": "Las llamadas, turnos, pausas, notas y Logros actuales se reemplazan por los del respaldo.",
-    "files": [
-      "js/backup-recovery.js"
     ]
   },
   "s_e9cd3286": {

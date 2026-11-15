@@ -63,10 +63,10 @@ export function confirmReplacement(context, kind, change, options = {}) {
     ui`Día que se reinicia: ${options.dayLabel}.`,
     translateText('Se eliminan sus llamadas, pausas, huecos, nota, acciones y progreso diario. Otros días, horario y metas se conservan.'),
   ] : kind === 'reset' ? [
-    translateText('Se reinician llamadas, turnos, pausas, Logros, Finanzas, horario, metas y perfil de todos los días.'),
+    translateText('Se reinician llamadas, turnos, pausas, Finanzas, horario, metas y perfil de todos los días.'),
     translateText('Tu cuenta y los ajustes propios de la extensión se conservan.'),
   ] : [
-    translateText('Las llamadas, turnos, pausas, notas y Logros actuales se reemplazan por los del respaldo.'),
+    translateText('Las llamadas, turnos, pausas y notas actuales se reemplazan por los del respaldo.'),
     incoming?.settings ? translateText('Se reemplazan también horario, metas, Finanzas, Higher Rate y perfil con los ajustes del respaldo.')
       : translateText('El respaldo no incluye ajustes: tu configuración actual se conserva.'),
     incoming?.state?.activeCall || incoming?.state?.activePause ? translateText('El respaldo contiene una actividad abierta; se restaurará con su hora de inicio original.') : '',
@@ -102,7 +102,7 @@ export function confirmReplacement(context, kind, change, options = {}) {
   if (details) {
     details.className=kind==='import'?'review-confirm polished-restore':'';
     details.innerHTML = comparisonHtml(context, incoming)
-      +(kind==='import'?ui`<div class="polished-impact"><strong>Datos del respaldo</strong><span>Reemplazan llamadas, turnos, pausas, notas y Logros.</span></div>`+`<div class="polished-impact"><strong>${escapeHtml(translateText('Tus ajustes'))}</strong><span>${escapeHtml(effects[1])}</span></div>`
+      +(kind==='import'?ui`<div class="polished-impact"><strong>Datos del respaldo</strong><span>Reemplazan llamadas, turnos, pausas y notas.</span></div>`+`<div class="polished-impact"><strong>${escapeHtml(translateText('Tus ajustes'))}</strong><span>${escapeHtml(effects[1])}</span></div>`
         +(effects[2]?`<div class="review-callout">${escapeHtml(effects[2])}</div>`:'')
         +ui`<div class="polished-impact"><strong>Copia previa protegida</strong><span>Se guarda en este navegador antes de restaurar.</span></div><details class="polished-disclosure"><summary>Sincronización y recuperación</summary><div class="polished-detail"><p class="note">${escapeHtml(effects.at(-1))}</p></div></details>`
         :ui`<ul class="confirmation-effects">${effects.filter(Boolean).map(line => `<li>${escapeHtml(line)}</li>`).join('')}</ul>`);
