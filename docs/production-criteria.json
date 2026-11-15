@@ -1203,6 +1203,13 @@
           ]
         },
         {
+          "file": "tests/game-in-actions-bar.test.mjs",
+          "namedCases": [
+            "en escritorio el juego del día se mueve dentro de la barra de acciones y vuelve en celular",
+            "la barra con juego deja los botones a la izquierda y el juego a la derecha, solo en escritorio"
+          ]
+        },
+        {
           "file": "tests/freelancer-blocks-list.test.mjs",
           "namedCases": [
             "Bloques del día en freelancer: cada descanso es una fila con etiqueta, horas y minutos",

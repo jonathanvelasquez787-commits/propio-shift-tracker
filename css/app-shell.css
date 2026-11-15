@@ -1401,3 +1401,14 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
   .chips > .hero-shift-actions .action-slot > #liveDiscardBtn { min-width: 52px; }
 }
 /* fin botones barra escritorio */
+/* juego en la barra */
+/* Escritorio: los 6 botones quedan en una fila a la izquierda y el juego del dia a la derecha, dentro de la misma barra. Al pegarse arriba al bajar, la barra vuelve a mostrar solo los botones. */
+@media (min-width: 761px) {
+  .chips > .hero-shift-actions.has-game { justify-content: flex-start; align-items: center; }
+  .chips > .hero-shift-actions.has-game .action-slot[data-slot="shift"] { margin-left: 0; }
+  .chips > .hero-shift-actions.has-game .action-slot[data-slot="add"] { margin-right: 0; }
+  .chips > .hero-shift-actions.has-game > .hero-shift-sep { margin: 0 4px; }
+  .chips > .hero-shift-actions.has-game > .hero-shift-game { order: 100; flex: 1 1 0; min-width: 320px; margin: 0 0 0 auto; align-self: stretch; }
+  .chips > .hero-shift-actions.has-game.is-stuck > .hero-shift-game { display: none; }
+}
+/* fin juego en la barra */
