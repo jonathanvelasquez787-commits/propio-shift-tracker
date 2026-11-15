@@ -1144,6 +1144,13 @@
             "barra de acciones: el lado elegido se guarda en los ajustes",
             "barra de acciones: cambiada, las llamadas van a la izquierda y el turno a la derecha"
           ]
+        },
+        {
+          "file": "tests/freelancer-break-prompt-buttons.test.mjs",
+          "namedCases": [
+            "aviso de descanso: Posponer dice cuántos minutos pospone",
+            "aviso de descanso: ya no hay botón \"Ahora no\" (queda la X)"
+          ]
         }
       ]
     },
