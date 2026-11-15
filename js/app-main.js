@@ -4488,11 +4488,19 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
     function eraseAllData() {
       return useSnapshotTools('confirmReplacement', 'reset', () => {
         if (!canPersistLocalChanges()) return false;
+        // Claves de Finanzas que se conservan salvo que se marque la casilla.
+        const FINANCE_SETTING_KEYS = ['financeCategories', 'financeAutoFill', 'financeLastDistribution', 'financePayments', 'financePlanning', 'customFinanceCategories', 'payReceipts'];
+        const eraseFinance = !!document.getElementById('resetEraseFinanceInput')?.checked;
         const previous = { state, calls, settings };
 
         setAppState(defaultState());
         setAppCalls([]);
         setAppSettings(defaultSettings());
+        if (!eraseFinance) {
+          FINANCE_SETTING_KEYS.forEach(key => {
+            if (Object.hasOwn(previous.settings, key)) settings[key] = JSON.parse(JSON.stringify(previous.settings[key]));
+          });
+        }
         ensureCurrencySettings();
         if (persistFullSnapshot() === false) {
           setAppState(previous.state);

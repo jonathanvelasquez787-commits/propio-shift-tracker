@@ -315,6 +315,14 @@
           ]
         },
         {
+          "file": "tests/reset-keep-finance.test.mjs",
+          "namedCases": [
+            "borrar todos los datos conserva las Finanzas cuando la casilla no está marcada",
+            "borrar todos los datos también borra las Finanzas cuando la casilla está marcada",
+            "el aviso de borrar todo trae la casilla \"También borrar Finanzas\" sin marcar"
+          ]
+        },
+        {
           "file": "tests/audit-save-feedback.test.mjs",
           "namedCases": [
             "starting a live call does not announce success after its snapshot is rejected",
