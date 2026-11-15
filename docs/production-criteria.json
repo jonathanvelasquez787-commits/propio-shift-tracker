@@ -1232,17 +1232,17 @@
           ]
         },
         {
-          "file": "tests/game-collection-floats-in-bar.test.mjs",
-          "namedCases": [
-            "con el juego en la barra, lo que abre Logros sale como panel flotante y no agranda la barra",
-            "el panel flotante no queda recortado ni tapado por las tarjetas de abajo"
-          ]
-        },
-        {
           "file": "tests/game-mobile-same-as-desktop.test.mjs",
           "namedCases": [
             "en celular el reto de hoy se ve igual que en escritorio (escena de 88 px) sin cambiar de lugar",
             "en celular el selector de Arma queda en la franja de abajo, siempre visible"
+          ]
+        },
+        {
+          "file": "tests/game-view-logros-button.test.mjs",
+          "namedCases": [
+            "el botón de Logros del reto de hoy se llama Ver mis Logros y abre la página de Logros sin desplegable",
+            "todo el reto de hoy tiene las esquinas redondeadas y recorta lo de adentro"
           ]
         },
         {

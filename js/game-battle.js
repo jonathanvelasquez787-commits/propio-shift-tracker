@@ -109,7 +109,7 @@ export function battleMarkup() {
       <div class="game-battle-victory" data-battle-victory hidden></div>
     </div>
     <div class="game-battle-health" data-battle-health-slot></div>
-    <div class="game-battle-footer"><p class="game-battle-feed" data-battle-feed></p><span class="game-battle-stun" data-battle-stun title="Aturdimiento: solo diversión"><i data-battle-stun-fill></i></span><button type="button" class="game-battle-free-shot" data-battle-action="free-shot" data-battle-free-shot title="Práctica: no cuenta para ganancias, XP ni récords">Disparar</button><button type="button" data-battle-action="collection" data-battle-collection-toggle aria-expanded="false" aria-controls="gameBattleCollection">Logros <span aria-hidden="true">⌄</span></button></div>
+    <div class="game-battle-footer"><p class="game-battle-feed" data-battle-feed></p><span class="game-battle-stun" data-battle-stun title="Aturdimiento: solo diversión"><i data-battle-stun-fill></i></span><button type="button" class="game-battle-free-shot" data-battle-action="free-shot" data-battle-free-shot title="Práctica: no cuenta para ganancias, XP ni récords">Disparar</button><button type="button" data-game-nav data-battle-collection-toggle>Ver mis Logros</button></div>
     <section id="gameBattleCollection" class="game-battle-collection" data-battle-collection hidden aria-label="Logros">
       <div class="game-battle-slots"><div class="game-battle-slot" data-battle-collection-summary></div>
         <div class="game-battle-loadout"><div><label for="gameBattleWeapon">Arma</label><select id="gameBattleWeapon" data-battle-weapon-select>${BATTLE_WEAPONS.map(w => `<option value="${w.id}">${escape(weaponName(w.id))}</option>`).join('')}</select><small data-battle-selected></small></div></div></div>
@@ -513,7 +513,6 @@ function createBattle(element) {
     if (typeof next.collectionMarkup === 'string' && $('collection-summary').innerHTML !== next.collectionMarkup) $('collection-summary').innerHTML = next.collectionMarkup;
     $('collection').hidden = !collectionOpen;
     element.dataset.battleCollectionOpen = String(collectionOpen);
-    $('collection-toggle').setAttribute('aria-expanded', String(collectionOpen));
     updateDuel(); resize(); refresh();
   }
   function destroy() {

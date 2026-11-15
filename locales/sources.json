@@ -4407,6 +4407,7 @@
   "s_420ea8e5": {
     "source": "Ver mis Logros",
     "files": [
+      "js/game-battle.js",
       "js/game.js"
     ]
   },

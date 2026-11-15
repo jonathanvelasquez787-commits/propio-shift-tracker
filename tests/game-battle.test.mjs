@@ -324,7 +324,6 @@ test('compact collection stays collapsed across sync until toggled, with real ro
     h.view.collectionMarkup = '<strong>Level 3 · real collection</strong>';
     h.nodes.victory.innerHTML = '<button data-game-action="open-daily-chest">Open</button>';
     h.mount(); assert.equal(h.nodes.collection.hidden, true);
-    assert.equal(h.nodes['collection-toggle'].attributes['aria-expanded'], 'false');
     h.click('collection-toggle'); h.mount();
     assert.equal(h.nodes.collection.hidden, false); assert.equal(h.element.dataset.battleCollectionOpen, 'true');
     assert.equal(h.nodes['collection-summary'].innerHTML, h.view.collectionMarkup);
