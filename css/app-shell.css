@@ -1382,3 +1382,9 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
   #copyDayToAllBtn, #copyWeekendBtn { flex: 1 1 0; min-width: 0; justify-content: center; white-space: nowrap; font-size: 13px; padding-inline: 8px; }
 }
 /* fin horario compacto */
+/* barra en dos mitades */
+/* Los 3 botones de turno quedan centrados en la mitad izquierda y los 3 de llamadas en la derecha, con el separador en el medio. Los margenes automaticos reparten el espacio libre en partes iguales. */
+.chips > .hero-shift-actions > .hero-shift-sep { margin: 0 auto; }
+.chips > .hero-shift-actions .action-slot[data-slot="shift"] { margin-left: auto; }
+.chips > .hero-shift-actions .action-slot[data-slot="add"] { margin-right: auto; }
+/* fin barra en dos mitades */
