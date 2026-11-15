@@ -130,6 +130,12 @@
       "js/game.js"
     ]
   },
+  "s_029c5a3e": {
+    "source": "Iniciar o terminar tu turno",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_02b014dd": {
     "source": "Si entras con Google:",
     "files": [
@@ -1111,6 +1117,12 @@
   },
   "s_0f8f307b": {
     "source": "Un solo nombre para el monstruo diario. Déjalo vacío para usar los nombres del catálogo.",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_0f93f07d": {
+    "source": "Iniciar o terminar un break",
     "files": [
       "app.html"
     ]
@@ -2329,6 +2341,12 @@
     "source": "Efecto del cambio",
     "files": [
       "js/higher-rate-review.js"
+    ]
+  },
+  "s_22f071d7": {
+    "source": "Pegar llamadas desde otra fuente",
+    "files": [
+      "app.html"
     ]
   },
   "s_2308e9af": {
@@ -11115,6 +11133,12 @@
       "js/notification-review.js"
     ]
   },
+  "s_a5f7c0e2": {
+    "source": "Agregar una llamada a mano",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_a615f230": {
     "source": "Día libre: metas sin evaluar. Tu actividad registrada se conserva.",
     "files": [
@@ -12316,6 +12340,12 @@
       "app.html"
     ]
   },
+  "s_b7d34184": {
+    "source": "Registrar una llamada",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_b821ecea": {
     "source": "Turno largo",
     "files": [
@@ -12860,6 +12890,12 @@
     "source": "Sin empezar",
     "files": [
       "js/finance.js"
+    ]
+  },
+  "s_c1a7bb60": {
+    "source": "Iniciar o terminar el lunch",
+    "files": [
+      "app.html"
     ]
   },
   "s_c1b0330d": {

@@ -1344,3 +1344,9 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
   #financeSection .fin-top .fin-available-stat-val{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 }
 /* fin finanzas-encabezado-celular */
+/* acciones sin nombre en celular */
+/* En celular la barra de acciones muestra solo los iconos; el nombre queda para lectores de pantalla (en la etiqueta oculta de cada boton) y, en compu, como aviso al pasar el mouse (title). */
+@media (max-width: 760px) {
+  .chips > .hero-shift-actions .action-slot > .action-short { display: none; }
+}
+/* fin acciones sin nombre en celular */
