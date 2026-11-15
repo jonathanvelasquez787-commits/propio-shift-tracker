@@ -2281,5 +2281,11 @@
   "s_4bceffa4": "Something you wrote",
   "s_58a5a0a4": "Yesterday",
   "s_aa284c62": "You, yesterday",
-  "s_de73ae2d": "You, {{v0}} days ago"
+  "s_de73ae2d": "You, {{v0}} days ago",
+  "s_30e67ac1": "Brief wrap-up with the extension",
+  "s_365ab1a9": "Celebrate with the extension",
+  "s_3eb38533": "Celebrate extension calls",
+  "s_4b663a8d": "Also celebrates calls the extension records on its own. Off: they are saved quietly.",
+  "s_cbcf74da": "Brief wrap-up for extension calls",
+  "s_f792549d": "Also asks how it went for calls the extension records on its own. Off: they are saved quietly."
 }

@@ -1,7 +1,7 @@
 import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 import { settings, state } from './app-context.js';
 import { normalizeInactivityMessage, normalizeInactivityMinutes, notifyReinforcement, reinforcementFeedbackEnabled, reinforcementText } from './reinforcement-feedback.js';
-import { callFeedbackSilenced } from './call-feedback.js';
+import { reflectionPromptSilenced, reinforcementFeedbackSilenced } from './call-feedback.js';
 
 let callDateKeyFromValue, callsForDay, closeModal;
 let escapeHtml, openModal, saveSettingsOnly, saveStateOnly, todayCallDateKey;
@@ -26,6 +26,8 @@ export function normalizeReinforcementSettings(raw) {
   return {
     enabled: source.enabled === true,
     askAfterCall: source.askAfterCall !== false,
+    celebrateBridgeCalls: source.celebrateBridgeCalls === true,
+    askAfterBridgeCall: source.askAfterBridgeCall === true,
     inactivityMessage: normalizeInactivityMessage(source.inactivityMessage),
     inactivityMinutes: normalizeInactivityMinutes(source.inactivityMinutes),
     inactivityRepeat: source.inactivityRepeat === true,
@@ -137,7 +139,7 @@ export function onPositiveCallSaved(call, source, dayKey) {
   const normalizedDay = callDateKeyFromValue(dayKey) || callDateKeyFromValue(call.callDate) || currentPositiveDayKey();
   const endTime = new Date(call.endISO).getTime();
   if (normalizedDay !== currentPositiveDayKey() || !Number.isFinite(endTime) || endTime > Date.now()) return;
-  const silent = source === 'import' || callFeedbackSilenced();
+  const silent = source === 'import' || reinforcementFeedbackSilenced();
   const previous = structuredClone(state.game.reinforcement);
   const feedback = evaluateCallRecovery(call, normalizedDay);
   if (saveStateOnly() === false) {
@@ -146,7 +148,7 @@ export function onPositiveCallSaved(call, source, dayKey) {
   }
   if (!silent) announceCallRecovery(call, normalizedDay, feedback);
   renderPositiveReinforcement();
-  if (!callFeedbackSilenced() && reinforcementFeedbackEnabled('personal') && settings.reinforcement.askAfterCall && !state.game.reinforcement.reflections[call.id]
+  if (!reflectionPromptSilenced() && reinforcementFeedbackEnabled('personal') && settings.reinforcement.askAfterCall && !state.game.reinforcement.reflections[call.id]
       && reflectionCall?.callId !== String(call.id) && !reflectionQueue.some(item => String(item.call.id) === String(call.id))) {
     reflectionQueue.push({ call, dayKey: normalizedDay });
     drainReflectionQueue();
@@ -228,6 +230,14 @@ function renderSettingsReinforcement() {
   const ask = document.getElementById('positiveAskAfterCallInput');
   if (enabled) enabled.checked = settings.reinforcement.enabled;
   if (ask) ask.checked = settings.reinforcement.askAfterCall;
+  const celebrateBridge = document.getElementById('positiveBridgeCelebrateInput');
+  const askBridge = document.getElementById('positiveBridgeAskInput');
+  if (celebrateBridge) celebrateBridge.checked = settings.reinforcement.celebrateBridgeCalls === true;
+  if (askBridge) askBridge.checked = settings.reinforcement.askAfterBridgeCall === true;
+  const celebrateBridgeRow = document.getElementById('positiveBridgeCelebrateRow');
+  if (celebrateBridgeRow) celebrateBridgeRow.hidden = !settings.reinforcement.enabled;
+  const askBridgeRow = document.getElementById('positiveBridgeAskRow');
+  if (askBridgeRow) askBridgeRow.hidden = !(settings.reinforcement.enabled && settings.reinforcement.askAfterCall);
   const soundRow = document.getElementById('sidebarGameSoundRow');
   if (soundRow) soundRow.hidden = !settings.reinforcement.enabled;
   const inactivityInput = document.getElementById('positiveInactivityMessageInput');
@@ -501,7 +511,18 @@ export function initPositiveReinforcement() {
       settings.reinforcement.askAfterCall = previous;
       event.target.checked = previous;
     }
+    renderSettingsReinforcement();
   });
+  for (const [inputId, key] of [['positiveBridgeCelebrateInput', 'celebrateBridgeCalls'], ['positiveBridgeAskInput', 'askAfterBridgeCall']]) {
+    document.getElementById(inputId)?.addEventListener('change', (event) => {
+      const previous = settings.reinforcement[key] === true;
+      settings.reinforcement[key] = !!event.target.checked;
+      if (saveSettingsOnly() === false) {
+        settings.reinforcement[key] = previous;
+        event.target.checked = previous;
+      }
+    });
+  }
   document.addEventListener('app:modal-closed', (event) => {
     if (event.detail?.id === 'positiveReflectionModal') reflectionCall = null;
     setTimeout(drainReflectionQueue, 0);

@@ -3,7 +3,7 @@ import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 // app-main.js injects call helpers; app-context.js owns shared app state.
 import { calls, settings, state, setAppCalls as setCalls, setAppState, setAppSettings } from './app-context.js';
 import { ignorePropioCall } from './propio-bridge.js';
-import { callFeedbackSilenced, withSilentCallFeedback } from './call-feedback.js';
+import { callFeedbackSilenced, withBridgeCallFeedback } from './call-feedback.js';
 import { PAY_ESTIMATE_RULE, roundedPayMinutes, callPayMinutes } from './pay-estimate.js';
 import { observedCallRecord } from './call-records.js';
 
@@ -590,7 +590,7 @@ function observedLiveCallCandidate(startedAtISO, endedAtISO, liveContext) {
 }
 
 export function autoSaveLiveCall(startedAtISO, endedAtISO, liveContext = null) {
-  if (liveContext?.propioBridge && !callFeedbackSilenced()) return withSilentCallFeedback(() => autoSaveLiveCall(startedAtISO, endedAtISO, liveContext));
+  if (liveContext?.propioBridge && !callFeedbackSilenced()) return withBridgeCallFeedback(() => autoSaveLiveCall(startedAtISO, endedAtISO, liveContext));
   const elapsedMs = Math.max(0, new Date(endedAtISO).getTime() - new Date(startedAtISO).getTime());
   const durationMin = elapsedMs / 60000;
   const candidate = observedLiveCallCandidate(startedAtISO, endedAtISO, liveContext);

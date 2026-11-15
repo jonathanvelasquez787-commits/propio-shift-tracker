@@ -896,6 +896,17 @@
             "journey groups by day with Hoy and Ayer headings and uses SVG dots",
             "journey styles are fenced, use theme variables and the old row styles are gone"
           ]
+        },
+        {
+          "file": "tests/bridge-reinforcement.test.mjs",
+          "namedCases": [
+            "con los interruptores de la extensión apagados todo sigue en silencio",
+            "cada interruptor de la extensión abre solo lo suyo",
+            "importar historial sigue en silencio total aunque los interruptores estén prendidos",
+            "los ajustes nuevos arrancan apagados y solo aceptan true",
+            "el menú lateral tiene un interruptor de la extensión para cada cosa",
+            "la extensión usa los interruptores y el historial importado sigue silencioso"
+          ]
         }
       ]
     },
