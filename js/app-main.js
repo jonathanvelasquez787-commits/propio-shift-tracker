@@ -768,6 +768,9 @@ export { onReinforcementCallSaved, onReinforcementCallsChanged, onReinforcementD
         collapseCompletedBlocks: false,
         // Estado recordado de la fila "Acciones de Hoy" (colapsada o no) y de la pastilla Hoy/Ciclo de Ganancias.
         heroActionsCollapsed: false,
+        // Lado de los botones de la barra de acciones: false = turno a la izquierda y llamadas a la
+        // derecha; true = al reves (se cambia tocando la raya del medio).
+        heroActionsSwapped: false,
         earningsViewMode: 'day',
         weekSummaryTipDismissed: false,
         // Un día libre/sin turno puede cortar la racha o simplemente saltarse, a elección del
@@ -840,6 +843,7 @@ export { onReinforcementCallSaved, onReinforcementCallsChanged, onReinforcementD
       if (typeof settings.sidebarPinned !== 'boolean') settings.sidebarPinned = true;
       if (typeof settings.collapseCompletedBlocks !== 'boolean') settings.collapseCompletedBlocks = false;
       if (typeof settings.heroActionsCollapsed !== 'boolean') settings.heroActionsCollapsed = false;
+      if (typeof settings.heroActionsSwapped !== 'boolean') settings.heroActionsSwapped = false;
       if (!['day', 'cycle'].includes(settings.earningsViewMode)) settings.earningsViewMode = 'day';
       if (typeof settings.weekSummaryTipDismissed !== 'boolean') settings.weekSummaryTipDismissed = false;
       if (typeof settings.streakSkipOffDays !== 'boolean') settings.streakSkipOffDays = true;
@@ -7022,11 +7026,18 @@ export function render() {
       const grid = document.getElementById('callsControlsGrid');
       if (!hero || !grid) return;
       if (!hero.querySelector('.hero-shift-sep')) {
-        const sep = document.createElement('span');
+        // La raya del medio es un boton: al tocarla, los 3 botones de turno y los 3 de llamadas
+        // cambian de lado (ver toggleHeroActionsSide).
+        const sep = document.createElement('button');
+        sep.type = 'button';
         sep.className = 'hero-shift-sep';
-        sep.setAttribute('aria-hidden', 'true');
+        const sepLabel = translateText('Cambiar de lado los botones');
+        sep.setAttribute('aria-label', sepLabel);
+        sep.title = sepLabel;
+        sep.addEventListener('click', toggleHeroActionsSide);
         hero.appendChild(sep);
       }
+      applyHeroActionsSide(hero);
       const title = hero.querySelector('.hero-shift-title');
       if (title && !title.id) title.id = 'heroShiftTitle';
       // Ya no hay versión expandida: la barra siempre va plegada, con el nombre bajo cada icono.
@@ -7034,6 +7045,25 @@ export function render() {
       wireStickyActionsBar(hero);
       if (grid.parentElement !== hero) hero.appendChild(grid);
       hero.classList.toggle('calls-off', page === 'help');
+    }
+
+    // Pone la barra de acciones con el turno a la izquierda (normal) o a la derecha (cambiada).
+    function applyHeroActionsSide(hero) {
+      const swapped = settings.heroActionsSwapped === true;
+      hero.classList.toggle('is-swapped', swapped);
+      const sep = hero.querySelector('.hero-shift-sep');
+      if (sep) sep.setAttribute('aria-pressed', swapped ? 'true' : 'false');
+    }
+
+    function toggleHeroActionsSide() {
+      const previous = settings.heroActionsSwapped === true;
+      settings.heroActionsSwapped = !previous;
+      const hero = document.querySelector('.hero-shift-actions');
+      if (hero) applyHeroActionsSide(hero);
+      if (saveSettingsOnly() === false) {
+        settings.heroActionsSwapped = previous;
+        if (hero) applyHeroActionsSide(hero);
+      }
     }
 
     function navigateToPage(page) {

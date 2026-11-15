@@ -1407,6 +1407,26 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
   .chips > .hero-shift-actions > .hero-shift-sep { height: 34px; }
 }
 /* fin barra delgada celular */
+/* barra cambiar lado */
+/* La raya del medio es un boton de 12 px de ancho que dibuja las dos rayas. Al tocarlo, la barra queda con la clase is-swapped y los botones de llamadas pasan a la izquierda y los de turno a la derecha. */
+.chips > .hero-shift-actions > button.hero-shift-sep { appearance: none; -webkit-appearance: none; position: relative; flex: 0 0 12px; width: 12px; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; cursor: pointer; }
+.chips > .hero-shift-actions > button.hero-shift-sep::before,
+.chips > .hero-shift-actions > button.hero-shift-sep::after { content: ""; position: absolute; top: 0; bottom: 0; width: 2px; border-radius: 2px; background: var(--line-2, var(--line)); }
+.chips > .hero-shift-actions > button.hero-shift-sep::before { left: 3px; }
+.chips > .hero-shift-actions > button.hero-shift-sep::after { left: 7px; }
+.chips > .hero-shift-actions > button.hero-shift-sep:hover::before,
+.chips > .hero-shift-actions > button.hero-shift-sep:hover::after { background: var(--muted); }
+.chips > .hero-shift-actions > button.hero-shift-sep:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: 4px; }
+.chips > .hero-shift-actions.is-swapped .action-slot[data-slot="call"] { order: 10; margin-left: auto; }
+.chips > .hero-shift-actions.is-swapped .action-slot[data-slot="paste"] { order: 20; }
+.chips > .hero-shift-actions.is-swapped .action-slot[data-slot="add"] { order: 30; margin-right: 0; }
+.chips > .hero-shift-actions.is-swapped .action-slot[data-slot="shift"] { order: 50; margin-left: 0; }
+.chips > .hero-shift-actions.is-swapped .action-slot[data-slot="break"] { order: 60; }
+.chips > .hero-shift-actions.is-swapped .action-slot[data-slot="lunch"] { order: 70; margin-right: auto; }
+.chips > .hero-shift-actions.is-swapped[data-live-type="call"] .action-slot[data-slot="discard"] { order: 15; }
+.chips > .hero-shift-actions.is-swapped[data-live-type="break"] .action-slot[data-slot="discard"] { order: 65; }
+.chips > .hero-shift-actions.is-swapped[data-live-type="lunch"] .action-slot[data-slot="discard"] { order: 75; }
+/* fin barra cambiar lado */
 
 /* boot-gate-tema */
 /* La pantalla de carga usa los colores del tema elegido (theme-init.js los pone en <html> antes de pintar).
