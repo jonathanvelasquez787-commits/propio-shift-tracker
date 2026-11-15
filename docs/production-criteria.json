@@ -1114,6 +1114,13 @@
             "boot gate follows the colors of non-original themes",
             "boot gate keeps its own colors for the original theme"
           ]
+        },
+        {
+          "file": "tests/action-bar-spacing.test.mjs",
+          "namedCases": [
+            "barra de acciones: en escritorio hay más espacio entre botones, con tope",
+            "barra de acciones: el celular conserva su separación y los botones no cambian de tamaño"
+          ]
         }
       ]
     },
