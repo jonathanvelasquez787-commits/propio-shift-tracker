@@ -7134,7 +7134,6 @@
   "s_6cb6f874": {
     "source": "EN MARCHA",
     "files": [
-      "app.html",
       "js/game.js"
     ]
   },
@@ -10514,12 +10513,6 @@
     "source": "{{v0}} XP",
     "files": [
       "js/game.js"
-    ]
-  },
-  "s_9d00356c": {
-    "source": "Temporada actual",
-    "files": [
-      "app.html"
     ]
   },
   "s_9d239fd3": {
@@ -14863,12 +14856,6 @@
     "source": "Esta PC registra llamadas y conserva tus opciones, pero no pulsa Start Calls ni Stop Calls ni termina pausas automáticamente.",
     "files": [
       "js/automation-ui.js"
-    ]
-  },
-  "s_de2015a8": {
-    "source": "JEFE DEL CICLO",
-    "files": [
-      "app.html"
     ]
   },
   "s_de457463": {
