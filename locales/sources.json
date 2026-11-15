@@ -51,6 +51,12 @@
       "js/higher-rate-review.js"
     ]
   },
+  "s_00f636b5": {
+    "source": "Hola, {{v0}}.",
+    "files": [
+      "js/positive-reinforcement.js"
+    ]
+  },
   "s_012fad36": {
     "source": "Idioma",
     "files": [
@@ -422,6 +428,12 @@
     "source": "Morado Neón",
     "files": [
       "js/theme-palettes.js"
+    ]
+  },
+  "s_082d8e2c": {
+    "source": "Me dejaron un aprendizaje",
+    "files": [
+      "js/positive-reinforcement.js"
     ]
   },
   "s_08419093": {
@@ -3169,6 +3181,12 @@
       "js/detail-views.js"
     ]
   },
+  "s_3b2f02cb": {
+    "source": "Hoy volviste a tomar otra llamada {{v0}} veces después de una difícil.",
+    "files": [
+      "js/positive-reinforcement.js"
+    ]
+  },
   "s_3b391913": {
     "source": "Final corregido",
     "files": [
@@ -3384,6 +3402,12 @@
     "source": "Aplicar horario",
     "files": [
       "js/shift-work-review.js"
+    ]
+  },
+  "s_3fd4d72b": {
+    "source": "Cerraron bien",
+    "files": [
+      "js/positive-reinforcement.js"
     ]
   },
   "s_3ff91443": {
@@ -4298,6 +4322,12 @@
       "privacidad.html"
     ]
   },
+  "s_5151e1dc": {
+    "source": "Hoy diste todo, {{v0}}.",
+    "files": [
+      "js/positive-reinforcement.js"
+    ]
+  },
   "s_515764df": {
     "source": "Adherencia minuto a minuto, con el motivo de cada desvío",
     "files": [
@@ -4806,6 +4836,12 @@
       "js/calls.js"
     ]
   },
+  "s_5a6de59b": {
+    "source": "1 llamada completada. Cada una cuenta, también las difíciles.",
+    "files": [
+      "js/positive-reinforcement.js"
+    ]
+  },
   "s_5a827d1b": {
     "source": "según tu horario o tu elección.",
     "files": [
@@ -5034,18 +5070,6 @@
     "source": "de tu meta",
     "files": [
       "app.html"
-    ]
-  },
-  "s_5ff81727": {
-    "source": "{{v0}} llamada completada",
-    "files": [
-      "js/positive-reinforcement.js"
-    ]
-  },
-  "s_6002de0c": {
-    "source": "{{v1}} cerraron bien · {{v2}} difíciles que enfrentaste · {{v3}} aprendizajes · {{v4}} recuperaciones",
-    "files": [
-      "js/positive-reinforcement.js"
     ]
   },
   "s_6015b29a": {
@@ -5649,12 +5673,6 @@
     "source": "Cómo califica una llamada",
     "files": [
       "js/higher-rate-review.js"
-    ]
-  },
-  "s_6d3697ab": {
-    "source": "{{v0}} llamadas completadas",
-    "files": [
-      "js/positive-reinforcement.js"
     ]
   },
   "s_6d3d784b": {
@@ -8159,6 +8177,12 @@
       "js/automation-ui.js"
     ]
   },
+  "s_977a87b0": {
+    "source": "{{v0}} llamadas completadas. Cada una cuenta, también las difíciles.",
+    "files": [
+      "js/positive-reinforcement.js"
+    ]
+  },
   "s_97b283ee": {
     "source": "Miércoles",
     "files": [
@@ -9609,7 +9633,8 @@
   "s_b1e1131f": {
     "source": "Historial positivo",
     "files": [
-      "app.html"
+      "app.html",
+      "js/positive-reinforcement.js"
     ]
   },
   "s_b1e8237e": {
@@ -10458,12 +10483,6 @@
       "js/automation-ui.js"
     ]
   },
-  "s_c2eb5dea": {
-    "source": "PRUEBA POSITIVA DE HOY",
-    "files": [
-      "js/positive-reinforcement.js"
-    ]
-  },
   "s_c37a0766": {
     "source": "Meta $0.00",
     "files": [
@@ -10899,6 +10918,12 @@
     "source": "Resultado positivo de la llamada",
     "files": [
       "app.html"
+    ]
+  },
+  "s_ccee17db": {
+    "source": "Hola.",
+    "files": [
+      "js/positive-reinforcement.js"
     ]
   },
   "s_ccf9f22c": {
@@ -11524,6 +11549,12 @@
     "source": "Azul Oscuro",
     "files": [
       "app.html"
+    ]
+  },
+  "s_d8854e4f": {
+    "source": "Hoy volviste a tomar otra llamada 1 vez después de una difícil.",
+    "files": [
+      "js/positive-reinforcement.js"
     ]
   },
   "s_d8a6e317": {
@@ -13022,6 +13053,12 @@
     "source": "Omitida",
     "files": [
       "js/call-review-view.js"
+    ]
+  },
+  "s_f167954a": {
+    "source": "Hoy diste todo.",
+    "files": [
+      "js/positive-reinforcement.js"
     ]
   },
   "s_f1710b98": {
