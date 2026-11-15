@@ -799,7 +799,7 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
         // prioridad) cada vez que se guarda una llamada, en vez de exigir "Aplicar" manual en cada
         // fila.
         financeAutoFill: false,
-        game: { enabled: false, intensity: 'arcade', soundEnabled: true, soundVolume: 40 },
+        game: { soundEnabled: true, soundVolume: 40 },
       };
     }
 
@@ -1021,10 +1021,9 @@ export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
       }
       if (typeof settings.financeAutoFill !== 'boolean') settings.financeAutoFill = false;
       if (!settings.game || typeof settings.game !== 'object' || Array.isArray(settings.game)) settings.game = { ...fallback.game };
-      if (typeof settings.game.enabled !== 'boolean') settings.game.enabled = fallback.game.enabled;
-      // Logros ya no tiene pantalla ni interruptor: se deja apagado para que no salgan avisos sin forma de quitarlos.
-      settings.game.enabled = false;
-      settings.game.intensity = 'arcade';
+      // El juego ya no existe: se borran sus ajustes viejos y solo quedan Sonidos y su volumen.
+      delete settings.game.enabled;
+      delete settings.game.intensity;
       if (typeof settings.game.soundEnabled !== 'boolean') settings.game.soundEnabled = true;
       const gameSoundVolume = Number(settings.game.soundVolume);
       settings.game.soundVolume = Number.isFinite(gameSoundVolume) ? Math.max(0, Math.min(100, gameSoundVolume)) : 40;
@@ -6157,7 +6156,7 @@ function renderHeader() {
   const goalMin = dayGoal.min;
   const goalUsd = dayGoal.usd;
   const goalPct = goalUsd > 0 ? Math.min(100, (stats.earnings / goalUsd) * 100) : 0;
-  const milestonesEnabled = settings.game?.enabled === true && goalUsd > 0;
+  const milestonesEnabled = false; // la barra de hitos sigue oculta; se quita en la Parte 4
   const milestoneProgress = milestonesEnabled ? onGameMonetaryProgress(dayKey, stats.earnings, goalUsd, { silent: true, record: false }) : null;
   const milestoneDetails = document.getElementById('gameMilestones');
   if (milestoneDetails) milestoneDetails.hidden = !milestonesEnabled;

@@ -105,18 +105,16 @@ export function normalizeInactivityMinutes(value) {
   return Number.isFinite(minutes) ? Math.max(1, Math.min(240, Math.trunc(minutes))) : 60;
 }
 
-export function reinforcementFeedbackEnabled(channel = 'game') {
-  const game = settings.game?.enabled === true;
-  const personal = settings.reinforcement?.enabled === true;
-  return channel === 'either' ? game || personal : channel === 'personal' ? personal : channel === 'game' ? game : false;
+export function reinforcementFeedbackEnabled() {
+  return settings.reinforcement?.enabled === true;
 }
 
-export function notifyReinforcement(message, { channel = 'game', effect = false, sound = '', dayKey, repeat = false } = {}) {
+export function notifyReinforcement(message, { effect = false, sound = '', dayKey, repeat = false } = {}) {
   if (callFeedbackSilenced()) return false;
   const text = String(message ?? '').trim();
-  if (!text || !reinforcementFeedbackEnabled(channel) || !queueToast) return false;
-  queueToast(text, effect ? 'record' : '', { channel, ...(repeat ? { repeat: true } : {}) });
-  if (sound && playSound) playSound(sound, dayKey, channel === 'personal' || (channel === 'either' && settings.game?.enabled !== true) ? 'personal' : 'game');
+  if (!text || !reinforcementFeedbackEnabled() || !queueToast) return false;
+  queueToast(text, effect ? 'record' : '', repeat ? { repeat: true } : {});
+  if (sound && playSound) playSound(sound, dayKey);
   return true;
 }
 

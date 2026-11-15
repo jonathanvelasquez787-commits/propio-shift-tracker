@@ -46,43 +46,37 @@ test('automatic call feedback suppresses both notification channels without disa
   const feedback = [];
   configureReinforcementFeedback({ queueToast: (...args) => feedback.push(args), triggerEffect: () => feedback.push('effect'), playSound: () => feedback.push('sound') });
   withSilentCallFeedback(() => {
-    assert.equal(notifyReinforcement('Automatic', { channel: 'game', effect: true, sound: 'hit' }), false);
-    assert.equal(notifyReinforcement('Automatic', { channel: 'personal', sound: 'reward' }), false);
+    assert.equal(notifyReinforcement('Automatic', { effect: true, sound: 'hit' }), false);
+    assert.equal(notifyReinforcement('Automatic', { sound: 'reward' }), false);
   });
   assert.deepEqual(feedback, []);
-  assert.equal(notifyReinforcement('Manual', { channel: 'game' }), true); assert.equal(feedback.length, 1);
+  assert.equal(notifyReinforcement('Manual'), true); assert.equal(feedback.length, 1);
   assert.deepEqual(config, { game: { enabled: true, intensity: 'arcade' }, reinforcement: { enabled: true } });
 });
-test('Logros y refuerzo positivo controlan sus propios canales incluso con intensidad antigua', () => {
-  for (const game of [false, true]) {
-    for (const personal of [false, true]) {
-      for (const intensity of ['off', 'subtle', 'arcade']) {
-        const config = { game: { enabled: game, intensity }, reinforcement: { enabled: personal } };
-        setAppSettings(config);
-        resetFeedbackForTests();
-        const queued = [];
-        configureReinforcementFeedback({ queueToast: (...args) => queued.push(args) });
-        for (const [channel, active] of [['game', game], ['personal', personal], ['either', game || personal]]) {
-          const expected = active;
-          assert.equal(reinforcementFeedbackEnabled(channel), expected);
-          assert.equal(notifyReinforcement(channel, { channel }), expected);
-        }
-        assert.equal(queued.length, Number(game) + Number(personal) + Number(game || personal));
-        assert.deepEqual(config, { game: { enabled: game, intensity }, reinforcement: { enabled: personal } });
-      }
+test('solo Celebrar llamadas controla los avisos y los ajustes viejos del juego no cuentan', () => {
+  for (const personal of [false, true]) {
+    for (const game of [{}, { enabled: true, intensity: 'arcade' }, { soundEnabled: false }]) {
+      const config = { game, reinforcement: { enabled: personal } };
+      setAppSettings(config);
+      resetFeedbackForTests();
+      const queued = [];
+      configureReinforcementFeedback({ queueToast: (...args) => queued.push(args) });
+      assert.equal(reinforcementFeedbackEnabled(), personal);
+      assert.equal(notifyReinforcement('Aviso'), personal);
+      assert.equal(queued.length, Number(personal));
+      assert.deepEqual(config, { game, reinforcement: { enabled: personal } });
     }
   }
-  assert.equal(notifyReinforcement('Canal desconocido', { channel: 'unknown' }), false);
-  assert.equal(notifyReinforcement('   ', { channel: 'either' }), false);
+  assert.equal(notifyReinforcement('   '), false);
 });
 
 test('los hitos se anuncian como avisos y no usan partículas', () => {
   setAppSettings({ reinforcement: { enabled: true } });
   const queued = [];
   configureReinforcementFeedback({ queueToast: (...args) => queued.push(args) });
-  notifyReinforcement('Hito', { channel: 'personal', effect: true });
+  notifyReinforcement('Hito', { effect: true });
   assert.equal(queued[0][0], 'Hito');
-  notifyReinforcement('Llamada normal', { channel: 'personal' });
+  notifyReinforcement('Llamada normal');
   assert.equal(queued.at(-1)[0], 'Llamada normal');
   resetFeedbackForTests();
   assert.equal(notifyReinforcement('Sin cola configurada'), false);
@@ -178,7 +172,6 @@ test('Refuerzo positivo funciona con Logros apagado y espera el cierre del diál
   const button = new Element();
   button.dataset = { positiveOutcome: 'good' };
   listeners.get('click')({ target: button });
-  assert.equal(messages.at(-1)[2].channel, 'personal');
   assert.match(messages.at(-1)[0], /positivo|salió bien|cerró bien/);
   assert.equal(currentState.game.reinforcement.reflections[call.id].outcome, 'good');
   const imported = { ...call, id: 'pasted-1' };

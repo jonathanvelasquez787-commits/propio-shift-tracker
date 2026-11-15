@@ -111,7 +111,7 @@ function harness(t, { at = new Date(2026, 8, 29, 12).getTime(), goal = 10000, st
   globalThis.requestAnimationFrame = (callback) => callback();
   let currentState = { game: createDefaultGameState(), gapAnnotations: {}, pauseHistory: [], dayInterruptions: {}, shiftStartedAt: iso(now - 3 * 3600000), shiftEndedAt: null };
   const rows = [];
-  const config = { game: { enabled: false, intensity: 'subtle' }, reinforcement: { enabled: false, askAfterCall: false }, adherenceGoalPct: 95 };
+  const config = { game: {}, reinforcement: { enabled: false, askAfterCall: false }, adherenceGoalPct: 95 };
   setAppState(currentState);
   setAppCalls(rows);
   setAppSettings(config);
@@ -140,7 +140,7 @@ function harness(t, { at = new Date(2026, 8, 29, 12).getTime(), goal = 10000, st
   });
   configurePositiveReinforcementContext(shared);
   renderGame();
-  config.game.enabled = true;
+  config.reinforcement.enabled = true;
   t.after(() => {
     setAppState(null); setAppCalls([]); setAppSettings({});
     globalThis.Date = NativeDate;
@@ -168,7 +168,6 @@ function harness(t, { at = new Date(2026, 8, 29, 12).getTime(), goal = 10000, st
 
 test('llamadas históricas, futuras y caídas no activan un impacto visual', (t) => {
   const h = harness(t, { surface: true });
-  h.config.game.intensity = 'arcade';
   const variants = [
     { id: 'historic', props: { callDate: '09/28/2026', shiftDayKey: '09/28/2026', startISO: h.iso(h.now - 86400000), endISO: h.iso(h.now - 86340000) } },
     { id: 'future', props: { startISO: h.iso(h.now + 60000), endISO: h.iso(h.now + 120000) } },
@@ -240,7 +239,6 @@ test('inactividad nocturna deduplica a ambos lados de medianoche del mismo turno
 
 test('custom inactivity notification uses saved text with achievements off and preserves threshold and dedupe', (t) => {
   const h = harness(t);
-  h.config.game.enabled = false;
   h.config.reinforcement.enabled = true;
   h.config.reinforcement.inactivityMessage = 'Un paso a la vez <3';
   h.state.shiftStartedAt = h.iso(h.now - 59 * 60000);
@@ -297,7 +295,7 @@ test('repeating inactivity actually redisplays identical messages after expiry w
   assert.equal(checkReinforcementInactivity(h.now), true);
   assert.equal(h.stack.children.at(-1).textContent, 'Apoyo repetido');
   assert.equal(h.announcements.filter(text => text === 'Apoyo repetido').length, 2);
-  queueGameToast('Apoyo repetido', '', { channel: 'either' });
+  queueGameToast('Apoyo repetido', '');
   assert.equal(h.stack.children.length, 1);
 });
 
@@ -314,16 +312,15 @@ test('cola real limita a tres toasts y no repite el último texto después de ex
   queueGameToast('Cola cuatro');
   assert.equal(h.stack.children.length, 0);
   assert.equal(h.announcements.length, 4);
-  h.config.game.enabled = false;
   h.config.reinforcement.enabled = true;
-  queueGameToast('Anuncio personal', '', { channel: 'personal' });
+  queueGameToast('Anuncio personal', '');
   renderGameLive();
   assert.equal(h.stack.children.length, 1);
   renderGame();
   assert.equal(h.stack.children.length, 1);
   h.config.reinforcement.enabled = false;
   renderGame();
-  queueGameToast('Apagado', '', { channel: 'personal' });
+  queueGameToast('Apagado', '');
   assert.equal(h.stack.children.length, 0);
   assert.equal(h.announcements.at(-1), 'Anuncio personal');
 });

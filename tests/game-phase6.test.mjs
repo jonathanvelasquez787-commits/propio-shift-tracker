@@ -116,12 +116,12 @@ test('avisos y modales de juego se recuperan al cerrar', () => {
   assert.match(appMain, /closeModal\('chestModal'\)/);
 });
 
-test('Arcade fijo y reduced-motion solo elimina movimiento', () => {
+test('el sonido del refuerzo solo depende de Celebrar llamadas y del día actual', () => {
   const game = read('js/game.js');
   const tone = between(game, 'function playGameTone', '\nconst gameEventVersions');
-  assert.match(tone, /reinforcementFeedbackEnabled\(channel\)/);
+  assert.match(tone, /reinforcementFeedbackEnabled\(\)/);
   assert.match(tone, /dayKey === currentGameDayKey\(\)/);
-  assert.match(tone, /playGameSound\(kind, \{ allowed, channel \}\)/);
+  assert.match(tone, /playGameSound\(kind, \{ allowed \}\)/);
   assert.doesNotMatch(tone, /prefers-reduced-motion/);
 });
 
