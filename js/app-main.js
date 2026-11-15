@@ -7090,7 +7090,26 @@ export function render() {
       else if (!inBar && day.parentElement !== group) { day.classList.remove('hero-shift-game'); group.prepend(day); }
       hero.classList.toggle('has-game', inBar);
       placeBattleLoadout();
+      placeGameSeparator();
     }
+    // Línea doble (igual a la de entre los botones) entre los botones y el reto de hoy. Solo aparece cuando el
+    // juego está al lado de los botones: si baja a su propia fila (ventana angosta) o está en celular, se oculta.
+    function placeGameSeparator() {
+      const hero = document.querySelector('.hero-shift-actions');
+      const day = document.getElementById('gameHomeDay');
+      if (!hero || !day) return;
+      let sep = hero.querySelector('.hero-shift-game-sep');
+      if (!hero.classList.contains('has-game')) { sep?.remove(); return; }
+      if (!sep) {
+        sep = document.createElement('span');
+        sep.className = 'hero-shift-game-sep';
+        sep.setAttribute('aria-hidden', 'true');
+        hero.insertBefore(sep, day);
+      }
+      sep.style.display = '';
+      if (day.getBoundingClientRect().top > sep.getBoundingClientRect().bottom - 1) sep.style.display = 'none';
+    }
+    window.addEventListener('resize', () => placeGameSeparator());
     // Con el juego dentro de la barra, el selector de Arma sube a la franja de abajo de la escena (siempre visible).
     // En celular el juego se ve igual, así que el selector también va abajo. Solo en escritorio fuera de Inicio vuelve al desplegable de Logros.
     function placeBattleLoadout() {
