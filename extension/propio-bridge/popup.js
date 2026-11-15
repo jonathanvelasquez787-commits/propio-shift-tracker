@@ -17,6 +17,10 @@ const reasons = {
   'tracker-needs-review': 'Propio Shift Tracker requiere revisión: puede haber una llamada manual, un traslape o un problema al guardar.',
   storage: 'No se pudo guardar el estado. Reintentá la conexión.',
   'invalid-spacing': 'Elegí un número entero de 1 a 60 minutos.',
+  'invalid-reinforcement': 'No se pudo cambiar el refuerzo positivo. Reintentá.',
+  'app-timeout': 'Propio Shift Tracker no respondió. Reintentá en unos segundos.',
+  'update-tracker': 'Actualizá Propio Shift Tracker para usar esta opción.',
+  'stale-tab': 'Esa pestaña de Propio Shift Tracker quedó vieja. Recargala e intentá de nuevo.',
 };
 const labels = { history: 'Historial oficial recuperado', 'session-start': 'Sesión iniciada · Shift', 'session-end': 'Sesión cerrada · Shift', incoming: 'Llamada entrante', accepted: 'Llamada aceptada', rejected: 'Llamada rechazada', disconnected: 'Llamada terminada', available: 'Disponible', unavailable: 'Fuera de línea' };
 const send = packet => chrome.runtime.sendMessage(packet);
@@ -119,6 +123,13 @@ async function refresh() {
     : plannedPause ? `Ahora corresponde ${plannedPause.type === 'lunch' ? 'Lunch' : 'Break'}. Esperará hasta ${new Date(plannedPause.endedAt).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })} para empezar.`
     : Date.now() < Date.parse(plan.startAt) ? `Esperará hasta ${new Date(plan.startAt).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })} para ponerte disponible.`
     : 'Tu turno ya empezó. Te pondrá disponible hasta que conectés tu primera llamada.';
+  const reinforcement = prep?.reinforcement || { celebrate: false, ask: false };
+  for (const [id, key] of [['bridgeCelebrate', 'celebrate'], ['bridgeAsk', 'ask']]) {
+    const input = document.getElementById(id); input.checked = reinforcement[key] === true; input.disabled = busy || !state.paired || !prep?.reinforcement;
+  }
+  document.getElementById('reinforcementStatus').textContent = !state.paired ? 'Conectá Propio Shift Tracker para cambiar esto.'
+    : !prep?.reinforcement ? 'Actualizá Propio Shift Tracker para usar esta opción.'
+    : 'Es el mismo ajuste del menú de Propio Shift Tracker.';
   const resume = prep?.resume || { break: false, lunch: false, mode: 'manual' };
   for (const [id, name] of [['resumeBreak','break'],['resumeLunch','lunch']]) {
     const input = document.getElementById(id); input.checked = resume[name]; input.disabled = busy || !state.paired;
@@ -169,6 +180,8 @@ document.getElementById('refreshTracker').addEventListener('click', () => act({ 
 const saveSpacing = () => act({ kind: 'spacing', enabled: document.getElementById('spacingEnabled').checked, minutes: Number(document.getElementById('spacingMinutes').value) });
 document.getElementById('spacingEnabled').addEventListener('change', saveSpacing);
 document.getElementById('spacingMinutes').addEventListener('change', saveSpacing);
+for (const id of ['bridgeCelebrate', 'bridgeAsk']) document.getElementById(id).addEventListener('change', () => act({ kind: 'reinforcement',
+  celebrate: document.getElementById('bridgeCelebrate').checked, ask: document.getElementById('bridgeAsk').checked }));
 for (const id of ['resumeBreak','resumeLunch','resumeMode']) document.getElementById(id).addEventListener('change', () => act({ kind: 'resume-options',
   break: document.getElementById('resumeBreak').checked, lunch: document.getElementById('resumeLunch').checked, mode: document.getElementById('resumeMode').value }));
 document.getElementById('reviewed').addEventListener('click', () => {

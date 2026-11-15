@@ -812,10 +812,10 @@ async function boot() {
 
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('pst-propio-bridge/v1:' + userId));
   const accountScope = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('');
-  const { applyPropioBridgeEvent, getPropioBridgePlan } = await import('./app-main.js');
+  const { applyPropioBridgeEvent, getPropioBridgePlan, getPropioBridgeReinforcement, applyPropioBridgeReinforcement } = await import('./app-main.js');
   if (bridgeUserId !== userId) return;
   const automationLease = createAutomationLease(getSupabase(), { isCurrent: () => bridgeUserId === userId && readMeta().userId === userId });
-  const stopBridge = installPropioBridge({ accountScope, receive: applyPropioBridgeEvent, getPlan: getPropioBridgePlan, automationLease });
+  const stopBridge = installPropioBridge({ accountScope, receive: applyPropioBridgeEvent, getPlan: getPropioBridgePlan, automationLease, getReinforcement: getPropioBridgeReinforcement, applyReinforcement: applyPropioBridgeReinforcement });
   stopPropioBridge = () => { stopBridge(); };
 
   normalizeAppAddress();

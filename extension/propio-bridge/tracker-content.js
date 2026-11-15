@@ -69,8 +69,11 @@
         plan[key] = pause && ['break','lunch'].includes(pause.type) && typeof pause.startedAt === 'string'
           ? { type: pause.type, startedAt: pause.startedAt, [key === 'pause' ? 'endsAt' : 'endedAt']: key === 'pause' ? pause.endsAt : pause.endedAt } : null;
       }
-      const changed = ready?.accountScope !== packet.accountScope || ready?.nonce !== packet.nonce || JSON.stringify(ready?.plan) !== JSON.stringify(plan);
-      ready = { accountScope: packet.accountScope, nonce: packet.nonce, plan };
+      const rein = packet.reinforcement && typeof packet.reinforcement.celebrate === 'boolean' && typeof packet.reinforcement.ask === 'boolean'
+        ? { celebrate: packet.reinforcement.celebrate, ask: packet.reinforcement.ask } : null;
+      const changed = ready?.accountScope !== packet.accountScope || ready?.nonce !== packet.nonce || JSON.stringify(ready?.plan) !== JSON.stringify(plan) ||
+        JSON.stringify(ready?.reinforcement) !== JSON.stringify(rein);
+      ready = { accountScope: packet.accountScope, nonce: packet.nonce, plan, reinforcement: rein };
       void announceStatus();
       if (refreshing) {
         const current = refreshing; refreshing = null; clearTimeout(current.timer); current.responders.forEach(respond => respond(ready));
@@ -92,6 +95,15 @@
       const timer = setTimeout(() => { const current = refreshing; refreshing = null; current?.responders.forEach(reply => reply(null)); }, 2500);
       refreshing = { timer, responders: [value => respondSafely(respond, value)] };
       hello();
+      return true;
+    }
+    if (message?.kind === 'deliver-settings') {
+      if (!ready || message.accountScope !== ready.accountScope) return;
+      const requestId = crypto.randomUUID();
+      const timer = setTimeout(() => { pending.delete(requestId); respondSafely(respond, { status: 'blocked', reason: 'app-timeout' }); }, 8000);
+      pending.set(requestId, { timer, respond });
+      window.postMessage({ protocol, direction: 'extension', kind: 'settings', accountScope: ready.accountScope, nonce: ready.nonce, requestId,
+        reinforcement: { celebrate: message.reinforcement?.celebrate === true, ask: message.reinforcement?.ask === true } }, origin);
       return true;
     }
     if (message?.kind !== 'deliver-event' || !ready || message.accountScope !== ready.accountScope) return;

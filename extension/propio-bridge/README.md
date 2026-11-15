@@ -1,11 +1,11 @@
-# Propio · Tracker y vista original · 2.3.13
+# Propio · Tracker y vista original · 2.3.14
 
 La extensión conecta Propio Shift Tracker con la sesión y el historial de Propio. Su
 registro de llamadas funciona independientemente de la apariencia del portal.
 
 El popup de Chrome contiene las opciones de la extensión; su versión se lee
 del manifest instalado, igual que en Administrar extensiones. El popup muestra lo que se usa a diario: estado, «Registrar mi actividad», las opciones de disponibilidad
-(con quién termina Break/Lunch y los minutos de ACW junto a su interruptor) y «Apariencia de Propio». Lo demás está en «Más opciones». El diagnóstico de disponibilidad, conexión y preparación del turno está en
+(con quién termina Break/Lunch y los minutos de ACW junto a su interruptor) «Refuerzo positivo» y «Apariencia de Propio». Lo demás está en «Más opciones». El diagnóstico de disponibilidad, conexión y preparación del turno está en
 «Qué hará la extensión ahora», dentro de «Actividad y ayuda» en «Más opciones». La app web y la extensión tienen versiones separadas.
 
 La cola informa cuántos eventos faltan y cuándo vence el más antiguo (24 horas).
@@ -237,3 +237,11 @@ paginación. Conserva los colores de las acciones habilitadas; los botones
 inhabilitados mantienen un contraste reducido. No filtra imágenes ni video,
 no recarga el portal y no pulsa controles de llamadas al cambiar el tema.
 Solo se aplica en el portal superior de interpreters.propio-ls.com.
+
+## Refuerzo positivo en el popup (2.3.14)
+
+La tarjeta «Refuerzo positivo» tiene dos interruptores, apagados al inicio: «Celebrar con la extensión» y «Cierre breve con la extensión».
+Son los mismos dos ajustes del menú lateral de Propio Shift Tracker: prender uno en el popup lo prende en la app y al revés (la app avisa su estado
+cada pocos segundos). Al tocar uno, el popup se lo manda a la pestaña vinculada con un paquete `settings` del protocolo `pst-propio-bridge/v1`;
+la app lo valida (solo dos booleanos exactos, mismo origen, cuenta y nonce), lo guarda y confirma. Si la app no confirma, el interruptor no cambia.
+Sin vínculo o con una app vieja, quedan deshabilitados. Las llamadas importadas del historial siguen siempre en silencio.

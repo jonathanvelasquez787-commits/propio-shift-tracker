@@ -1,4 +1,4 @@
-import { BRIDGE_PROTOCOL, validateBridgeEvent, bridgeId, accountScopeValid } from './propio-bridge-rules.js';
+import { BRIDGE_PROTOCOL, validateBridgeEvent, validateBridgeReinforcement, bridgeId, accountScopeValid } from './propio-bridge-rules.js';
 
 export function ignorePropioCall(state, callId, now = Date.now()) {
   if (!bridgeId(callId)) return;
@@ -88,21 +88,41 @@ export function createPropioReceiver({ getState, getCalls, start, end, catchUp, 
   };
 }
 
-export function installPropioBridge({ host = globalThis.window, accountScope, receive, getPlan = () => null, onStatus = () => {}, automationLease = null }) {
+export function installPropioBridge({ host = globalThis.window, accountScope, receive, getPlan = () => null, onStatus = () => {}, automationLease = null, getReinforcement = () => null, applyReinforcement = null }) {
   if (!host || !accountScopeValid(accountScope)) return () => {};
   const nonce = host.crypto.randomUUID();
   let queue = Promise.resolve(), closed = false;
   const post = value => host.postMessage({ protocol: BRIDGE_PROTOCOL, direction: 'app', nonce, accountScope, ...value }, host.location.origin);
+  const reinforcement = () => validateBridgeReinforcement(getReinforcement());
   const plan = () => { const value = getPlan(); return value ? { ...value, automationLease: automationLease?.current() || null } : null; };
   const listener = message => {
     if (message.source !== host || message.origin !== host.location.origin || message.data?.protocol !== BRIDGE_PROTOCOL || message.data.direction !== 'extension') return;
     const packet = message.data;
     if (packet.kind === 'hello') {
       automationLease?.request({ owner: packet.automationOwner, enabled: packet.automationEnabled === true });
-      post({ kind: 'ready', plan: plan() }); return;
+      post({ kind: 'ready', plan: plan(), reinforcement: reinforcement() }); return;
     }
     if (packet.kind === 'automation-status') {
       if (!closed && packet.nonce === nonce && packet.accountScope === accountScope) onStatus(packet.status);
+      return;
+    }
+    if (packet.kind === 'settings') {
+      if (packet.nonce !== nonce || packet.accountScope !== accountScope || !bridgeId(packet.requestId)) return;
+      queue = queue.then(async () => {
+        if (closed) return;
+        let result;
+        const value = validateBridgeReinforcement(packet.reinforcement);
+        if (!value) result = { status: 'rejected', reason: 'invalid-reinforcement' };
+        else if (!applyReinforcement) result = { status: 'blocked', reason: 'update-tracker' };
+        else {
+          try {
+            const apply = () => applyReinforcement(value);
+            result = host.navigator?.locks ? await host.navigator.locks.request('pst-propio-bridge', apply) : await apply();
+          } catch { result = { status: 'blocked', reason: 'app-error' }; }
+        }
+        post({ kind: 'ack', requestId: packet.requestId, result });
+        post({ kind: 'ready', plan: plan(), reinforcement: reinforcement() });
+      });
       return;
     }
     if (packet.kind !== 'event' || packet.nonce !== nonce || packet.accountScope !== accountScope || !bridgeId(packet.requestId)) return;
@@ -118,6 +138,6 @@ export function installPropioBridge({ host = globalThis.window, accountScope, re
     });
   };
   host.addEventListener('message', listener);
-  post({ kind: 'ready', plan: plan() });
+  post({ kind: 'ready', plan: plan(), reinforcement: reinforcement() });
   return () => { closed = true; automationLease?.stop(); host.removeEventListener('message', listener); };
 }
