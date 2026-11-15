@@ -43,14 +43,14 @@ function fraction(value, fallback) {
   return (Number.isFinite(Number(value)) ? Math.max(0, Math.min(100, Number(value))) : fallback) / 100;
 }
 
-export function createGameAudio({ readSettings, host = globalThis, doc = host.document, channel = 'game' } = {}) {
+export function createGameAudio({ readSettings, host = globalThis, doc = host.document } = {}) {
   let context = null, output = null, initialized = false, unlocked = false;
   let pending = null, timer = null, generation = 0, activePriority = 0, activeUntil = 0;
   let activeAllowed = () => true;
   const voices = new Map();
   const volume = () => {
     const config = readSettings?.() || {};
-    const enabled = channel === 'personal' ? config.reinforcement?.enabled === true : config.game?.enabled === true;
+    const enabled = config.reinforcement?.enabled === true;
     return enabled && config.game?.soundEnabled !== false && !doc?.hidden
       ? fraction(config.masterVolume, 100) * fraction(config.game?.soundVolume, 40) : 0;
   };
@@ -176,7 +176,7 @@ export function createGameAudio({ readSettings, host = globalThis, doc = host.do
 export function createGameAudioPreview({ readSettings = () => settings, ...environment } = {}) {
   const audio = createGameAudio({ ...environment, readSettings: () => {
     const config = readSettings() || {};
-    return { ...config, game: { ...config.game, enabled: true, soundEnabled: true } };
+    return { ...config, reinforcement: { ...config.reinforcement, enabled: true }, game: { ...config.game, soundEnabled: true } };
   } });
   return {
     play(kind, event) {
@@ -190,11 +190,10 @@ export function createGameAudioPreview({ readSettings = () => settings, ...envir
   };
 }
 
-const gameAudio = createGameAudio({ readSettings: () => settings });
-const personalAudio = createGameAudio({ readSettings: () => settings, channel: 'personal' });
+const reinforcementAudio = createGameAudio({ readSettings: () => settings });
 const gameAudioPreview = createGameAudioPreview();
-export function initGameAudio() { gameAudio.init(); personalAudio.init(); }
-export function playGameSound(kind, { channel = 'game', ...options } = {}) { return (channel === 'personal' ? personalAudio : gameAudio).play(kind, options); }
+export function initGameAudio() { reinforcementAudio.init(); }
+export function playGameSound(kind, options = {}) { return reinforcementAudio.play(kind, options); }
 export function previewGameSound(kind, event) { return gameAudioPreview.play(kind, event); }
-export function syncGameAudio() { gameAudio.sync(); personalAudio.sync(); gameAudioPreview.sync(); }
-export function stopGameSounds() { gameAudio.stop(); personalAudio.stop(); gameAudioPreview.stop(); }
+export function syncGameAudio() { reinforcementAudio.sync(); gameAudioPreview.sync(); }
+export function stopGameSounds() { reinforcementAudio.stop(); gameAudioPreview.stop(); }
