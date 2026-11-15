@@ -433,6 +433,9 @@
       <button class="sched-add-pill" data-add="break" id="addBreakBlockBtn" type="button">+ Break</button>
       <button class="sched-add-pill" data-add="lunch" id="addLunchBlockBtn" type="button">+ Lunch</button>
     </div>
+    <div class="sched-freelancer-row">
+      <label class="sched-switch-row sched-freelancer-switch"><input id="freelancerEnabledInput" type="checkbox" role="switch"/><span class="sched-switch" aria-hidden="true"></span><span>Modo freelancer</span></label>
+    </div>
   </div>
 
   <div class="modal-actions mc-action-row sched-footer">
@@ -544,7 +547,7 @@
       <div class="sched-more-panel" id="schedMorePanel-freelancer" hidden>
 <div class="sched-compact-card">
 <div class="sched-freelancer-head">
-<label class="sched-checkbox-row"><input id="freelancerEnabledInput" type="checkbox"/> Activar modo freelancer</label>
+<span class="sched-freelancer-note">Se activa debajo de los bloques del día.</span>
 <div class="sched-help-wrap">
 <button class="sched-compact-info-btn" type="button" aria-describedby="freelancerInfoTooltip">i</button>
 <div class="sched-help-tooltip" id="freelancerInfoTooltip" role="tooltip">Sin horario planeado: el aviso de descanso sale cuando acumulas los minutos productivos de «Descanso por productividad» o los minutos conectado de aquí, lo que llegue primero. Desde el aviso eliges Break o Lunch y su duración.</div>

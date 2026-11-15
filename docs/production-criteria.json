@@ -1081,6 +1081,15 @@
           ]
         },
         {
+          "file": "tests/horario-freelancer-bloques.test.mjs",
+          "namedCases": [
+            "el interruptor del modo freelancer está en los bloques del día, debajo de Agregar",
+            "Más opciones ya no repite el interruptor pero conserva los demás campos del modo freelancer",
+            "el interruptor sigue ligado a los ajustes del modo freelancer",
+            "el interruptor tiene su bloque de estilos con variables del tema"
+          ]
+        },
+        {
           "file": "tests/action-bar-halves.test.mjs",
           "namedCases": [
             "Barra de acciones: los botones de turno y los de llamadas se centran cada uno en su mitad"

@@ -3767,12 +3767,6 @@
       "app.html"
     ]
   },
-  "s_45799d19": {
-    "source": "Activar modo freelancer",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_458b225e": {
     "source": "Cubierto",
     "files": [
@@ -5504,6 +5498,12 @@
     "source": "Prom./día trabajado",
     "files": [
       "js/weekly-summary.js"
+    ]
+  },
+  "s_682cce59": {
+    "source": "Se activa debajo de los bloques del día.",
+    "files": [
+      "app.html"
     ]
   },
   "s_68591c47": {

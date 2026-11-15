@@ -23,7 +23,7 @@ test('Horario D: Más opciones tiene 4 filas en orden y cada una guarda sus cont
   for (const id of ['scheduleOffsetMinusBtn', 'scheduleOffsetPlusBtn', 'scheduleOffsetApplyBtn']) assert.ok(panel('offset').includes(`id="${id}"`));
   assert.ok(panel('late').includes('id="lateArrivalModeInput"'));
   for (const id of ['adherenceGraceMinInput', 'adherenceGoalPctInput']) assert.ok(panel('adherence').includes(`id="${id}"`));
-  for (const id of ['freelancerEnabledInput', 'freelancerBreakMinInput', 'freelancerLunchMinInput', 'freelancerConnectedMinInput', 'freelancerSnoozeMinInput', 'freelancerSessionGoalInput', 'freelancerLunchEveryInput']) assert.ok(panel('freelancer').includes(`id="${id}"`));
+  for (const id of ['freelancerBreakMinInput', 'freelancerLunchMinInput', 'freelancerConnectedMinInput', 'freelancerSnoozeMinInput', 'freelancerSessionGoalInput', 'freelancerLunchEveryInput']) assert.ok(panel('freelancer').includes(`id="${id}"`));
   for (const key of ['short', 'medium', 'long']) assert.ok(panel('freelancer').includes(`data-fl-template="${key}"`));
   assert.ok(more.includes('id="freelancerStatusTag"'));
 });
@@ -32,7 +32,7 @@ test('Horario D: ya no queda la tarjeta de Modo freelancer arriba ni los bloques
   assert.ok(!html.includes('id="freelancerAccordion"'));
   assert.ok(!html.includes('sched-compact-grid-2'));
   const card = html.slice(html.indexOf('id="scheduleConfigAccordion"'), html.indexOf('<!-- /scheduleConfigAccordion -->'));
-  for (const id of ['scheduleOffsetApplyBtn', 'lateArrivalModeInput', 'adherenceGraceMinInput', 'freelancerEnabledInput']) assert.ok(!card.includes(`id="${id}"`));
+  for (const id of ['scheduleOffsetApplyBtn', 'lateArrivalModeInput', 'adherenceGraceMinInput']) assert.ok(!card.includes(`id="${id}"`));
 });
 
 test('Horario D: las filas se abren de una en una y los valores grises se actualizan', () => {
