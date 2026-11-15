@@ -119,7 +119,6 @@ import {
   initGame,
   normalizeGameState,
   onGameCallSaved,
-  onGameMonetaryProgress,
   migrateGameCallReferences,
   checkReinforcementInactivity,
   onGameCallsChanged,
@@ -6156,24 +6155,6 @@ function renderHeader() {
   const goalMin = dayGoal.min;
   const goalUsd = dayGoal.usd;
   const goalPct = goalUsd > 0 ? Math.min(100, (stats.earnings / goalUsd) * 100) : 0;
-  const milestonesEnabled = false; // la barra de hitos sigue oculta; se quita en la Parte 4
-  const milestoneProgress = milestonesEnabled ? onGameMonetaryProgress(dayKey, stats.earnings, goalUsd, { silent: true, record: false }) : null;
-  const milestoneDetails = document.getElementById('gameMilestones');
-  if (milestoneDetails) milestoneDetails.hidden = !milestonesEnabled;
-  const milestoneScore = document.getElementById('gameMilestonesScore');
-  if (milestoneScore) milestoneScore.textContent = `${milestoneProgress?.claimed.length || 0}/4`;
-  const milestoneRow = document.getElementById('earningsMilestoneMarkers');
-  if (milestoneRow) {
-    milestoneRow.hidden = !milestonesEnabled;
-    milestoneRow.innerHTML = milestonesEnabled ? [25, 50, 75, 100].map((pct) => ui`<span class="earnings-milestone-mark" data-reached="${milestoneProgress.claimed.includes(pct)}" style="--milestone-position:${pct}%" aria-label="${pct}%${milestoneProgress.claimed.includes(pct) ? ', hito registrado' : ''}"><span aria-hidden="true">${milestoneProgress.claimed.includes(pct) ? '✓ ' : ''}${pct}%</span></span>`).join('') : '';
-  }
-  document.getElementById('remainingText').hidden = milestonesEnabled;
-  const nextMilestone = document.getElementById('earningsNextMilestone');
-  if (nextMilestone) {
-    nextMilestone.hidden = !milestonesEnabled;
-    const next = milestoneProgress?.next;
-    nextMilestone.textContent = !milestonesEnabled ? '' : next ? ui`Próximo hito: ${next.pct}% · te faltan ${money(next.remaining)}${convertedAmountText(next.remaining) ? ` (${convertedAmountText(next.remaining)})` : ''}` : translateText('100% de tu meta diaria alcanzado');
-  }
   // Si aplica un bono de Higher Rate en las llamadas de hoy, lograr la meta debería tomar MENOS
   // minutos.
   const rateForGoal = Number(settings.rate) > 0 ? Number(settings.rate) : RATE;
@@ -6972,8 +6953,6 @@ export function render() {
       closeModal('calYearGoalModal');
       closeModal('calHistoryStartModal');
       closeModal('financeRowModal');
-      closeModal('stageClearModal');
-      closeModal('chestModal');
       closeModal('positiveReflectionModal');
       openModalStack = [];
     }

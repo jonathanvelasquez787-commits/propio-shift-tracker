@@ -12,31 +12,8 @@ export function withGameSoundsSilenced(operation) {
 const note = (frequency, at, duration, gain = .14, wave = 'square', slide = 0) => ({ frequency, at, duration, gain, wave, slide });
 const melody = (frequencies, step = .09, wave = 'square') => frequencies.map((frequency, index) => note(frequency, index * step, step * .85, .12, wave));
 const CUES = Object.freeze({
-  'shoot-pistol': { priority: .5, notes: [note(920, 0, .035, .075, 'square', 190), note(145, .012, .055, .055, 'triangle')], noise: .025 },
-  'shoot-smg': { priority: .5, notes: [0, .035, .07].map(at => note(710, at, .022, .055, 'square', 230)), noise: .018 },
-  'shoot-shotgun': { priority: .5, notes: [note(165, 0, .11, .09, 'sawtooth', 48), note(340, .008, .055, .045, 'square', 90)], noise: .075 },
-  'shoot-rocket': { priority: .5, notes: [note(95, 0, .2, .085, 'sawtooth', 38), note(280, .025, .15, .045, 'triangle', 65)], noise: .12 },
-  'shoot-railgun': { priority: .5, notes: [note(2400, 0, .13, .055, 'sine', 350), note(1200, .015, .11, .04, 'triangle', 175)] },
-  'shoot-flame': { priority: .5, notes: [note(130, 0, .18, .045, 'sawtooth', 240), note(210, .06, .13, .035, 'sawtooth', 100)], noise: .19, noiseGain: .03 },
-  'shoot-too-much': { priority: .5, notes: [480, 240, 720, 120].map((frequency, index) => note(frequency, index * .045, .035, .055, 'square', frequency / 2)), noise: .035 },
-  'shoot-drone': { priority: .5, notes: [note(420, 0, .075, .05, 'sine', 620), note(840, .065, .08, .045, 'sine', 1240)] },
-  'shoot-psr': { priority: .5, notes: [note(1700, 0, .045, .06, 'square', 280), note(260, .02, .12, .06, 'triangle', 65)], noise: .02 },
-  'shoot-wand': { priority: .5, notes: [note(660, 0, .075, .055, 'sine', 1320), note(990, .065, .095, .045, 'triangle', 1980)] },
-  'shoot-grenade': { priority: .5, notes: [note(390, 0, .07, .045, 'triangle', 90), note(85, .07, .11, .085, 'sine', 35)], noise: .065 },
-  hit: { priority: 1, notes: [note(660, 0, .07, .16, 'square', 165), note(220, .02, .09, .13, 'triangle')], noise: .045 },
-  critical: { priority: 3, notes: [note(1047, 0, .12, .13, 'triangle', 523), ...melody([1047, 1319, 1568], .055)], noise: .035 },
-  equip: { priority: 2, notes: melody([392, 784], .065, 'triangle') },
   pause: { priority: 3, notes: melody([523, 659, 784], .08, 'triangle') },
-  vulnerable: { priority: 4, notes: melody([784, 392, 1047], .075), noise: .035 },
-  fury: { priority: 4, notes: melody([175, 196, 233, 349], .07, 'sawtooth') },
   impulse: { priority: 5, notes: melody([523, 784, 880, 1047], .065) },
-  mission: { priority: 6, notes: [note(880, 0, .09, .11, 'square', 220), ...melody([659, 784, 1047], .075).map(n => ({ ...n, at: n.at + .07 }))], noise: .065 },
-  reward: { priority: 7, notes: melody([659, 784, 1047], .1, 'triangle') },
-  loot: { priority: 8, notes: [...melody([784, 1047, 1319], .075, 'triangle'), note(1568, .225, .22, .13, 'square')] },
-  clear: { priority: 9, notes: [...melody([523, 659, 784, 1047], .105), note(784, .42, .29, .09, 'triangle'), note(1047, .42, .32, .13)] },
-  cycle: { priority: 10, notes: [...melody([392, 523, 659, 784, 1047], .105), note(659, .525, .3, .09, 'triangle'), note(1047, .525, .3, .13)] },
-  level: { priority: 11, notes: [...melody([392, 494, 587, 784, 988, 1175], .08), note(1568, .48, .3, .13), note(784, .48, .3, .08, 'triangle')] },
-  stage: { priority: 12, notes: [...melody([523, 784, 1047, 1319, 1175], .12), note(1047, .6, .4, .13), note(659, .6, .4, .08, 'triangle')] },
 });
 
 function fraction(value, fallback) {
@@ -173,27 +150,8 @@ export function createGameAudio({ readSettings, host = globalThis, doc = host.do
   return { init, play, stop, sync, unlock };
 }
 
-export function createGameAudioPreview({ readSettings = () => settings, ...environment } = {}) {
-  const audio = createGameAudio({ ...environment, readSettings: () => {
-    const config = readSettings() || {};
-    return { ...config, reinforcement: { ...config.reinforcement, enabled: true }, game: { ...config.game, soundEnabled: true } };
-  } });
-  return {
-    play(kind, event) {
-      if (event?.isTrusted !== true) return false;
-      audio.init({ unlockOnGesture: false });
-      audio.unlock(event);
-      return audio.play(kind);
-    },
-    stop: audio.stop,
-    sync: audio.sync,
-  };
-}
-
 const reinforcementAudio = createGameAudio({ readSettings: () => settings });
-const gameAudioPreview = createGameAudioPreview();
 export function initGameAudio() { reinforcementAudio.init(); }
 export function playGameSound(kind, options = {}) { return reinforcementAudio.play(kind, options); }
-export function previewGameSound(kind, event) { return gameAudioPreview.play(kind, event); }
-export function syncGameAudio() { reinforcementAudio.sync(); gameAudioPreview.sync(); }
-export function stopGameSounds() { reinforcementAudio.stop(); gameAudioPreview.stop(); }
+export function syncGameAudio() { reinforcementAudio.sync(); }
+export function stopGameSounds() { reinforcementAudio.stop(); }
