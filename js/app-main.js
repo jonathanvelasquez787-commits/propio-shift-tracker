@@ -41,7 +41,7 @@ import {
   configureCalendarContext,
 } from './calendar.js';
 
-import { updateScheduleRowSummary, addBlockRow, applyScheduleOffset, copyDayToAll, copyDayToWeekend, ensureScheduleWeekOverride, formatBlockDurationLabel, removeBlockRowAt, removeScheduleWeekOverride, saveShiftWindow, scheduleFormIsDirty, scheduleWeekHasCustom, scheduleWeekIsPast, syncShiftModalFields, syncScheduleOffsetUI, configureScheduleContext, updateShiftLenChip, renderDayBar } from './schedule.js';
+import { updateScheduleRowSummary, addBlockRow, applyScheduleOffset, copyDayToAll, copyDayToWeekend, ensureScheduleWeekOverride, formatBlockDurationLabel, removeBlockRowAt, removeScheduleWeekOverride, saveShiftWindow, scheduleFormIsDirty, scheduleWeekHasCustom, scheduleWeekIsPast, syncShiftModalFields, syncScheduleOffsetUI, configureScheduleContext, updateShiftLenChip, renderDayBar, updateScheduleMoreSummary } from './schedule.js';
 
 
 import {
@@ -7601,6 +7601,27 @@ export function render() {
     document.getElementById('payReceiptDeleteBtn').addEventListener('click', () => usePayReceipts('delete'));
     document.getElementById('payReceiptAmount').addEventListener('input', () => usePayReceipts('preview'));
     document.getElementById('copyWeekendBtn').addEventListener('click', copyDayToWeekend);
+    {
+      // Tarjeta "Más opciones": se abre/cierra y cada fila muestra solo sus controles (una a la vez).
+      const moreToggle = document.getElementById('schedMoreToggle'), moreBody = document.getElementById('schedMoreBody');
+      moreToggle.addEventListener('click', () => {
+        const open = moreBody.hidden;
+        moreBody.hidden = !open;
+        moreToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        document.getElementById('schedMoreCard').classList.toggle('is-open', open);
+      });
+      moreBody.addEventListener('click', event => {
+        const button = event.target instanceof Element ? event.target.closest('[data-more-toggle]') : null;
+        if (!button) return;
+        const key = button.getAttribute('data-more-toggle'), open = button.getAttribute('aria-expanded') !== 'true';
+        moreBody.querySelectorAll('[data-more-toggle]').forEach(other => {
+          const isThis = other === button, show = isThis && open;
+          other.setAttribute('aria-expanded', show ? 'true' : 'false');
+          document.getElementById('schedMorePanel-' + other.getAttribute('data-more-toggle')).hidden = !show;
+        });
+      });
+      ['input', 'change'].forEach(type => moreBody.addEventListener(type, () => updateScheduleMoreSummary()));
+    }
     {
       // Menú "Copiar a otros días": se abre con el botón, se cierra al elegir, al tocar afuera o con Escape.
       const copyBtn = document.getElementById('schedCopyMenuBtn'), copyMenu = document.getElementById('schedCopyMenu');

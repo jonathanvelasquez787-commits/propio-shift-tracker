@@ -53,6 +53,19 @@ export function configureScheduleContext(context) {
     export function syncScheduleOffsetUI() {
       const valueEl = document.getElementById('scheduleOffsetValue');
       if (valueEl) valueEl.textContent = formatScheduleOffsetLabel(scheduleOffsetMin);
+      const moreValue = document.getElementById('schedMoreValOffset');
+      if (moreValue) moreValue.textContent = `${formatScheduleOffsetLabel(scheduleOffsetMin)} h`;
+    }
+
+    // Valores grises de la tarjeta "Más opciones" (lo que hoy tiene cada opción).
+    export function updateScheduleMoreSummary() {
+      const late = document.getElementById('lateArrivalModeInput');
+      const lateValue = document.getElementById('schedMoreValLate');
+      if (lateValue && late) lateValue.textContent = late.selectedOptions?.[0]?.textContent || '';
+      const grace = document.getElementById('adherenceGraceMinInput');
+      const goal = document.getElementById('adherenceGoalPctInput');
+      const adherenceValue = document.getElementById('schedMoreValAdherence');
+      if (adherenceValue && grace && goal) adherenceValue.textContent = ui`Gracia ${grace.value} min · Meta ${goal.value} %`;
     }
 
     // Mueve Inicio/Fin del turno Y todos los bloques del formulario por `scheduleOffsetMin` minutos — mismo desplazamiento para todo, así que el orden y la duración de cada bloque no cambian, solo su hora.
@@ -558,6 +571,7 @@ export function configureScheduleContext(context) {
       if (adherenceGraceMinInput && document.activeElement !== adherenceGraceMinInput) adherenceGraceMinInput.value = settings.adherenceGraceMin;
       const adherenceGoalPctInput = document.getElementById('adherenceGoalPctInput');
       if (adherenceGoalPctInput && document.activeElement !== adherenceGoalPctInput) adherenceGoalPctInput.value = settings.adherenceGoalPct;
+      updateScheduleMoreSummary();
       renderDayTabs();
       syncScheduleWeekNavUI();
       // El ajuste de turno es por-visita, no por-día: cambiar de día (o de semana) sin haber tocado "Aplicar a todos" debe dejarlo en 0:00 para el día nuevo, no arrastrar el valor del día anterior.

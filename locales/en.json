@@ -2106,7 +2106,6 @@
   "s_f1710b98": "No active ACW",
   "s_48b164cf": "Today's actions",
   "s_17c4ca94": "Freelancer mode enabled",
-  "s_1b47ea56": "No fixed schedule: rule-based breaks",
   "s_2d0c3881": "Snooze",
   "s_3f883b70": "Lunch (min)",
   "s_45799d19": "Enable freelancer mode",
@@ -2286,5 +2285,10 @@
   "s_313add57": "Saturday and Sunday",
   "s_32e4c148": "Copy to other days",
   "s_6d7a241b": "Copy this schedule to Monday to Friday",
-  "s_d698174b": "Copy this schedule to Saturday and Sunday"
+  "s_d698174b": "Copy this schedule to Saturday and Sunday",
+  "s_44726112": "More options",
+  "s_6673e5b4": "+0:00 h",
+  "s_8e6e3b2c": "Grace {{v0}} min · Goal {{v1}} %",
+  "s_a2a2fa03": "Move the whole shift",
+  "s_d5c4dfb6": "Move shift · If you're late · Adherence · Freelancer"
 }
