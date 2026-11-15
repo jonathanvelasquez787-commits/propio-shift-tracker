@@ -1206,7 +1206,6 @@
   "s_ecc7e225": "Choose this color",
   "s_ecec29ea": "Annual goal: {{v0}}{{v1}}",
   "s_ed019f22": "Day reset",
-  "s_ed210b1b": "My positive history",
   "s_eda38b05": "Schedule copied to Monday–Friday {{v0}}",
   "s_edcfda5c": "Your weekly schedule, including exceptions",
   "s_edf3f673": "Thursday",
@@ -2277,5 +2276,10 @@
   "s_d8854e4f": "Today you took another call 1 time after a hard one.",
   "s_f167954a": "You gave it your all today.",
   "s_082d8e2c": "They taught me something",
-  "s_3fd4d72b": "Ended well"
+  "s_3fd4d72b": "Ended well",
+  "s_077f089d": "Your journey",
+  "s_4bceffa4": "Something you wrote",
+  "s_58a5a0a4": "Yesterday",
+  "s_aa284c62": "You, yesterday",
+  "s_de73ae2d": "You, {{v0}} days ago"
 }

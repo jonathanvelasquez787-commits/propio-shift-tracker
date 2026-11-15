@@ -381,6 +381,12 @@
       "app.html"
     ]
   },
+  "s_077f089d": {
+    "source": "Tu recorrido",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_078ba895": {
     "source": "Duración (min)",
     "files": [
@@ -4040,6 +4046,12 @@
       "js/boot.js"
     ]
   },
+  "s_4bceffa4": {
+    "source": "Algo que escribiste",
+    "files": [
+      "js/positive-reinforcement.js"
+    ]
+  },
   "s_4bf8a373": {
     "source": "{{v0}} — sin contar esa(s), la más corta fue {{v1}}",
     "files": [
@@ -4615,6 +4627,7 @@
       "app.html",
       "js/app-main.js",
       "js/higher-rate.js",
+      "js/positive-reinforcement.js",
       "js/shift-work-review.js",
       "js/weekly-summary.js"
     ]
@@ -4744,6 +4757,12 @@
     "source": "Volver a revisar",
     "files": [
       "js/higher-rate-review.js"
+    ]
+  },
+  "s_58a5a0a4": {
+    "source": "Ayer",
+    "files": [
+      "js/positive-reinforcement.js"
     ]
   },
   "s_58c19ed6": {
@@ -9206,6 +9225,12 @@
       "index.html"
     ]
   },
+  "s_aa284c62": {
+    "source": "Tú, ayer",
+    "files": [
+      "js/positive-reinforcement.js"
+    ]
+  },
   "s_aa33e520": {
     "source": "Ahora puedes editar cada día.",
     "files": [
@@ -11968,6 +11993,12 @@
       "app.html"
     ]
   },
+  "s_de73ae2d": {
+    "source": "Tú, hace {{v0}} días",
+    "files": [
+      "js/positive-reinforcement.js"
+    ]
+  },
   "s_dec67310": {
     "source": "Desactivado",
     "files": [
@@ -12832,12 +12863,6 @@
     "source": "Esperando para reintentar",
     "files": [
       "js/automation-ui.js"
-    ]
-  },
-  "s_ed210b1b": {
-    "source": "Mi historial positivo",
-    "files": [
-      "app.html"
     ]
   },
   "s_ed45e497": {
