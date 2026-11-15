@@ -161,15 +161,13 @@ test('a cycle cosmetic acquired from another reward cannot consume the pending c
   assert.equal(writes, 1);
 });
 
-test('reinforcement templates follow runtime language changes without translating user reward names', () => {
+test('reinforcement templates follow runtime language changes', () => {
   setAppSettings({});
   try {
     for (const language of ['es', 'en', 'es']) {
       setLanguage(language);
       assert.equal(reinforcementText('call-normal', { amount: '$1.00' }),
         translateText('Llamada completada · sumaste {amount} a tu día').replace('{amount}', '$1.00'));
-      assert.equal(reinforcementText('reward-claimed', { icon: '☕', name: 'Mi Té' }),
-        translateText('{icon} Premio realizado: {name}').replace('{icon}', '☕').replace('{name}', 'Mi Té'));
     }
   } finally { setLanguage('es'); setAppSettings({}); }
 });

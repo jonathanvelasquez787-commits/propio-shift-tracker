@@ -111,7 +111,7 @@ function harness(t, { at = new Date(2026, 8, 29, 12).getTime(), goal = 10000, st
   globalThis.requestAnimationFrame = (callback) => callback();
   let currentState = { game: createDefaultGameState(), gapAnnotations: {}, pauseHistory: [], dayInterruptions: {}, shiftStartedAt: iso(now - 3 * 3600000), shiftEndedAt: null };
   const rows = [];
-  const config = { game: { enabled: false, intensity: 'subtle' }, reinforcement: { enabled: false, askAfterCall: false, rewards: [] }, adherenceGoalPct: 95 };
+  const config = { game: { enabled: false, intensity: 'subtle' }, reinforcement: { enabled: false, askAfterCall: false }, adherenceGoalPct: 95 };
   setAppState(currentState);
   setAppCalls(rows);
   setAppSettings(config);
@@ -165,20 +165,6 @@ function harness(t, { at = new Date(2026, 8, 29, 12).getTime(), goal = 10000, st
     ledger(prefix) { return Object.entries(currentState.game.ledger).filter(([key]) => key.startsWith(prefix)); },
   };
 }
-
-test('los premios de fin de turno se ofrecen con Logros apagado sin abrir STAGE CLEAR', (t) => {
-  const h = harness(t);
-  h.config.game.enabled = false;
-  h.config.reinforcement.enabled = true;
-  h.state.shiftEndedAt = h.iso(h.now);
-  h.state.game.reinforcement.pendingRewards = [{ id: 'end-tea', rewardId: 'tea', name: 'Té', icon: '☕', window: 'shift-end', dayKey: h.keyFor() }];
-  h.nodes.set('physicalRewardClaimList', { innerHTML: '' });
-  h.nodes.set('physicalRewardClaimTitle', { textContent: '' });
-  const xp = h.state.game.totalXp;
-  assert.equal(onGameShiftEnded(h.keyFor()), true);
-  assert.deepEqual(h.openedModals, ['physicalRewardClaimModal']);
-  assert.equal(h.state.game.totalXp, xp);
-});
 
 test('Arcade sustituye intensidades antiguas sin activar Logros ni modificar XP guardado', (t) => {
   const h = harness(t);

@@ -760,12 +760,6 @@
           ]
         },
         {
-          "file": "tests/reward-editor-owner.test.mjs",
-          "namedCases": [
-            "a personal reward editor cannot save or delete into a replacement owner or a newer reward revision"
-          ]
-        },
-        {
           "file": "tests/game-phase6.test.mjs",
           "namedCases": [
             "Fase 6 expone el catálogo semanal y renderiza SVG seguro para todos los estados",
@@ -878,8 +872,6 @@
           "file": "tests/super-audit-game.test.mjs",
           "namedCases": [
             "discreet automatic feedback preserves identical XP, milestone and surprise reward receipts",
-            "resetting one day removes its reinforcement receipts and rewards while preserving other days and preferences",
-            "resetting an unrelated day preserves accumulated rewards held by the daily limit",
             "correction below eight calls revokes improved loot and requalifying grants it exactly once",
             "correction removes improved cosmetic and equipment before requalifying",
             "continue preserves a backup shield earned after closing the shift",
@@ -897,22 +889,22 @@
             "reopening with Logros disabled also removes loot invalidated while frozen",
             "day reset reverses stage consumption and award in the right order at the shield cap",
             "decimal cycle goal grants exactly one rollover reward while a real cent shortfall grants none",
-            "current cycle uses the same decimal attainment as rollover"
+            "current cycle uses the same decimal attainment as rollover",
+            "resetting one day removes its reinforcement receipts while preserving other days and preferences"
           ]
         },
         {
           "file": "tests/positive-reinforcement.test.mjs",
           "namedCases": [
-            "premios personales y catálogo normalizan límites sin introducir puntos negativos",
             "inactivity editor preserves drafts, rolls back rejected saves and restores defaults with achievements off",
             "inactivity editor cannot copy a previous account message into a new settings owner",
             "inactivity frequency editor saves atomically, validates minutes and preserves or clears account drafts",
-            "premios acumulables conservan ventana e idempotencia sin el presupuesto antiguo",
             "reemplazar una llamada live migra las referencias antes de reconciliar incluso con Logros apagado",
             "una llamada anterior a la difícil no consume la recuperación pendiente",
-            "una cola llena conserva el progreso acumulado sin descartar premios previos",
-            "dropped repetidas no abren reflexión ni ganan premios y una recuperación requiere llamada productiva",
-            "Logros elimina plan, intensidad y presupuesto sin dejar controles ni listeners"
+            "Logros elimina plan, intensidad y presupuesto sin dejar controles ni listeners",
+            "ajustes y estado del refuerzo no guardan premios y borran lo viejo",
+            "la recuperación se registra una sola vez y la reflexión sobrevive al reemplazo de la llamada",
+            "dropped repetidas no abren reflexión y una recuperación requiere llamada productiva"
           ]
         },
         {

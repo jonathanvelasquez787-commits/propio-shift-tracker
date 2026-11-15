@@ -7001,8 +7001,6 @@ export function render() {
       closeModal('stageClearModal');
       closeModal('chestModal');
       closeModal('positiveReflectionModal');
-      closeModal('physicalRewardClaimModal');
-      closeModal('physicalRewardEditorModal');
       openModalStack = [];
     }
 
