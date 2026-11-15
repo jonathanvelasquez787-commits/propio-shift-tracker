@@ -240,3 +240,15 @@
 @keyframes gameBattleDizzy { 0%, 100% { rotate: 0deg; } 25% { rotate: -10deg; } 50% { rotate: 8deg; } 75% { rotate: -5deg; } }
 @media (prefers-reduced-motion: reduce) { .game-battle[data-battle-dizzy="true"] [data-battle-monster] { animation: none; } }
 /* fin disparo de practica */
+
+/* meta dentro de la escena */
+/* La meta, la barra y los botones van DENTRO de la escena del juego: arriba sobre el cielo, abajo sobre el piso. */
+.game-battle[data-battle-mode="auto"] { grid-template-columns: minmax(0, 1fr); }
+.game-battle[data-battle-mode="auto"] .game-battle-stage { grid-column: 1; grid-row: 2; height: 172px; align-self: stretch; }
+.game-battle[data-battle-mode="auto"] .game-battle-monster { bottom: 20px; }
+.game-battle[data-battle-mode="auto"] .game-battle-health { grid-column: 1; grid-row: 2; align-self: start; z-index: 2; padding: 8px 12px 6px; background: color-mix(in srgb, var(--battle-sky) 72%, transparent); pointer-events: none; }
+.game-battle[data-battle-mode="auto"] .game-battle-footer,
+.game-battle[data-battle-mode="auto"] .game-battle-footer:has(.game-battle-feed:empty) { grid-column: 1; grid-row: 2; align-self: end; z-index: 2; justify-content: center; border-top: 0; background: color-mix(in srgb, var(--battle-sky) 72%, transparent); }
+.game-battle[data-battle-mode="auto"] .game-battle-stun { margin-right: 0; }
+.game-battle[data-battle-mode="auto"] .game-battle-collection { grid-row: 3; }
+/* fin meta dentro de la escena */

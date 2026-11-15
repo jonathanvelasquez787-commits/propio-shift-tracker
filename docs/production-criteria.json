@@ -1210,6 +1210,13 @@
           ]
         },
         {
+          "file": "tests/battle-meta-in-scene.test.mjs",
+          "namedCases": [
+            "la meta y la barra van encima de la escena, en la misma celda de la grilla",
+            "Disparar y Logros van abajo de la escena, centrados y sin la linea divisoria"
+          ]
+        },
+        {
           "file": "tests/freelancer-blocks-list.test.mjs",
           "namedCases": [
             "Bloques del día en freelancer: cada descanso es una fila con etiqueta, horas y minutos",
