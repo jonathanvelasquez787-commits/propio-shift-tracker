@@ -8,7 +8,7 @@ import { activeWorkSinceLastCall } from '../js/reinforcement-rules.js';
 import { normalizeInactivityMinutes } from '../js/reinforcement-feedback.js';
 
 const appSource = fs.readFileSync(new URL('../js/app-main.js', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
-const gameSource = fs.readFileSync(new URL('../js/game.js', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
+const gameSource = fs.readFileSync(new URL('../js/reinforcement.js', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
 const scheduleSource = fs.readFileSync(new URL('../js/schedule.js', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
 function sourceFunction(source, name, indentation = '    ') {
   const start = source.indexOf(`function ${name}(`);
@@ -173,7 +173,7 @@ function pauseHarness({ at, startedAt, planned, absoluteSlots, effectiveDuration
     callDateToDate: () => new Date(base), dateAtTime,
     reinforcementScheduleIntervals: () => absoluteSlots || [],
     pauseForSlot: () => effectiveDurationMin == null ? null : { startedAt: state.pauseHistory[0].startedAt, effectiveDurationMin },
-    ADHERENCE_TOLERANCE_MIN: 1, onGamePauseEnded: (record, options) => results.push({ record, options }),
+    ADHERENCE_TOLERANCE_MIN: 1, onReinforcementPauseEnded: (record, options) => results.push({ record, options }),
   });
   const end = vm.runInContext(`(${sourceFunction(appSource, 'endPause')})`, context);
   return { end, results, generalToasts, state };

@@ -52,7 +52,7 @@ function fixture(){
  const messages=[];let accept=true,writes=0;
  const context={data:()=>({calls,state,settings}),canPersistLocalChanges:()=>true,translateText:x=>x,toast:x=>messages.push(x),
   setCalls:value=>{calls=value;},setState:value=>{state=value;},reconcileLastCallEndedAt(){},financeRunAutoFillCascade(){},
-  saveAll(){writes++;return accept;},onGameCallsChanged(){},render(){},
+  saveAll(){writes++;return accept;},onReinforcementCallsChanged(){},render(){},
   callsOverlap:(a,b)=>Date.parse(a.startISO)<Date.parse(b.endISO)&&Date.parse(b.startISO)<Date.parse(a.endISO)};
  const opened=()=>({owner:settings,review:JSON.stringify(state.callRecordReviews[0]),candidates:JSON.stringify(calls)});
  return {context,opened,messages,get calls(){return calls;},get state(){return state;},get settings(){return settings;},reject:()=>{accept=false;},writes:()=>writes};

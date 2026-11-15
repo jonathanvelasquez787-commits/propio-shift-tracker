@@ -26,7 +26,7 @@ function harness(t) {
   configureSettingsContext({...context,RATE:.12,saveStateOnly:save,getActiveDayKey:()=>state.activeDayKey,
     snapshotHistoricalPlanning(){settings.goalHistoryByDay['10/10/2026']={min:settings.productiveGoalMin,usd:settings.earningsGoal};},
     setDailyGoalOverride(day,value){if(value)settings.dailyGoalOverrides[day]=value;else delete settings.dailyGoalOverrides[day];},
-    onGameDayMetadataChanged(){},effectiveDailyGoal:day=>settings.goalHistoryByDay[day]||{min:settings.productiveGoalMin,usd:settings.earningsGoal},formatMinutes:String,currencyCeilFromUsdAmount:(n,fx)=>n*fx});
+    onReinforcementDayMetadataChanged(){},effectiveDailyGoal:day=>settings.goalHistoryByDay[day]||{min:settings.productiveGoalMin,usd:settings.earningsGoal},formatMinutes:String,currencyCeilFromUsdAmount:(n,fx)=>n*fx});
   for(const [id,value] of Object.entries({financePlanHoursInput:'7',financePlanDaysInput:'5',financePlanFixedInput:'60',financePlanVariableInput:'25',financePlanSavingsInput:'15'}))input(id).value=value;
   return {expense,meta,input,reject:()=>{reject=true;},saves:()=>saves,reload(){const snapshot=JSON.parse(persisted);setAppSettings(snapshot.settings);setAppState(snapshot.state);setAppCalls(snapshot.calls);}};
 }

@@ -123,7 +123,7 @@ test('changing the base rate updates future estimates and the general goal while
   const h = vm.createContext({ settings, state: { earningsGoal: 36 }, calls, RATE: .12,
     document: { getElementById: () => ({ value: '.2' }) }, snapshotHistoricalPlanning() {},
     saveAll() { saved = JSON.stringify({ settings, calls }); return true; },
-    onGameDayMetadataChanged() {}, todayCallDateKey: () => '10/19/2026', refreshGoalInputs() {}, render() {}, toast() {} });
+    onReinforcementDayMetadataChanged() {}, todayCallDateKey: () => '10/19/2026', refreshGoalInputs() {}, render() {}, toast() {} });
   vm.runInContext(source.slice(node.start, node.end), h); h.updateRate();
   assert.equal(settings.rate, .2); assert.equal(settings.earningsGoal, 60); assert.equal(h.state.earningsGoal, 60);
   assert.equal(JSON.stringify(calls), originalCalls);

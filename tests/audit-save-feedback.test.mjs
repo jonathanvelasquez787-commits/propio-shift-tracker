@@ -20,7 +20,7 @@ for(const deferSave of [false,true])test(`ending a pause ${deferSave?'stages an 
     setEvent:()=>({id:'event'}),fmtTime:()=> '06:20',stopBreakEndAlarm(){},
     canPersistLocalChanges:()=>true,setAppState:value=>{h.state=value;},render(){},
     saveStateOnly:()=>{writes++;return false;},saveAll:()=>{writes++;return false;},
-    toast:x=>messages.push(x),onGamePauseEnded:()=>{rewards++;}});
+    toast:x=>messages.push(x),onReinforcementPauseEnded:()=>{rewards++;}});
   vm.runInContext(declaration('../js/app-main.js','endPause'),h);
   const result=h.endPause({deferSave,endedAt:'2026-10-11T12:20:00Z'});
   assert.equal(writes,deferSave?0:1);assert.equal(rewards,0);assert.deepEqual(messages,[]);
@@ -43,7 +43,7 @@ test('removing a special daily goal does not announce success or award metadata 
   const h=vm.createContext({getActiveDayKey:()=> '10/11/2026',getDailyGoalOverride:()=>({min:90}),setDailyGoalOverride(){},
     settings:{dailyGoalOverrides:{}},state:{},saveAll:()=>false,
     setAppSettings:value=>{h.settings=value;},setAppState:value=>{h.state=value;},refreshGoalInputs(){},render(){},
-    saveSettingsOnly:()=>false,onGameDayMetadataChanged:()=>{rewards++;},toast:x=>messages.push(x)});
+    saveSettingsOnly:()=>false,onReinforcementDayMetadataChanged:()=>{rewards++;},toast:x=>messages.push(x)});
   vm.runInContext(declaration('../js/settings.js','clearActiveDayGoalOverride'),h);
   assert.equal(h.clearActiveDayGoalOverride(),false);
   assert.equal(rewards,0);assert.deepEqual(messages,[]);
@@ -63,7 +63,7 @@ test('day note editors keep their dialog and omit success and rewards when persi
   let closed=0,rewards=0;const messages=[];
   const h=vm.createContext({editingDayNoteKey:'10/11/2026',dayNoteEditValid:()=>true,state:{dayNotes:{}},callDateKeyFromValue:x=>x,
     document:{getElementById:()=>({value:'work'})},saveStateOnly:()=>false,
-    onGameDayMetadataChanged:()=>{rewards++;},closeModal:()=>{closed++;},toast:x=>messages.push(x)});
+    onReinforcementDayMetadataChanged:()=>{rewards++;},closeModal:()=>{closed++;},toast:x=>messages.push(x)});
   vm.runInContext(['setDayNote','saveDayNoteFromModal','clearDayNoteFromModal'].map(n=>declaration('../js/app-main.js',n)).join('\n'),h);
   assert.equal(h.saveDayNoteFromModal(),false);assert.equal(h.clearDayNoteFromModal(),false);
   assert.equal(h.editingDayNoteKey,'10/11/2026');assert.equal(closed,0);assert.equal(rewards,0);assert.deepEqual(messages,[]);

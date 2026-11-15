@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createDefaultGameState, normalizeGameState } from '../js/game.js';
+import { createDefaultGameState, normalizeGameState } from '../js/reinforcement.js';
 
 test('normalizar el estado al arrancar no requiere el contexto de fechas y borra lo guardado del juego', () => {
   const persistedGame = {

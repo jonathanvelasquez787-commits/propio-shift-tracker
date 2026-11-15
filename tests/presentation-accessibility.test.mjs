@@ -274,7 +274,7 @@ test('no-calls reminder keeps its controls in compact rows with minutes, repeat 
   for (const id of ['positiveInactivityMinutesInput', 'positiveInactivityRepeatInput', 'positiveInactivityMessageInput', 'positiveInactivityMessageSaveBtn', 'positiveInactivityMessageHelp', 'positiveInactivityMessageStatus']) {
     assert.equal(block.split(`id="${id}"`).length, 2, id);
   }
-  const controls = block.slice(block.indexOf('class="game-monster-name-controls"'), block.indexOf('id="positiveInactivityMessageHelp"'));
+  const controls = block.slice(block.indexOf('class="inactivity-message-controls"'), block.indexOf('id="positiveInactivityMessageHelp"'));
   assert.ok(controls.includes('positiveInactivityMessageInput') && controls.includes('positiveInactivityMessageSaveBtn'));
   assert.ok(block.includes('aria-label="Mensaje de apoyo sin llamadas"'));
 });

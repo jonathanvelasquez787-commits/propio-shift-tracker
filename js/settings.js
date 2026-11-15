@@ -7,14 +7,14 @@ import { EMAIL_AUTH_READY } from './config.js';
 let DEFAULT_USER_EMOJI, EMOJI_CHOICES, RATE, closeModal, convertedAmountText;
 let currencyCeilFromUsdAmount, effectiveCycleGoal, effectiveDailyGoal, ensureCurrencySettings, escapeHtml;
 let formatCallDayLabel, formatMinutes, getActiveDayKey, getDailyGoalOverride, iconHtml, money;
-let onGameDayMetadataChanged, openModal, render, saveSettingsOnly, saveAll, snapshotHistoricalPlanning;
+let onReinforcementDayMetadataChanged, openModal, render, saveSettingsOnly, saveAll, snapshotHistoricalPlanning;
 let setDailyGoalOverride, toast;
 let todayCallDateKey, usdCeilFromCurrencyAmount;
 
 export function configureSettingsContext(context) {
   ({ DEFAULT_USER_EMOJI, EMOJI_CHOICES, RATE, closeModal, convertedAmountText, currencyCeilFromUsdAmount,
     effectiveCycleGoal, effectiveDailyGoal, ensureCurrencySettings, escapeHtml, formatCallDayLabel,
-    formatMinutes, getActiveDayKey, getDailyGoalOverride, iconHtml, money, onGameDayMetadataChanged, openModal, render,
+    formatMinutes, getActiveDayKey, getDailyGoalOverride, iconHtml, money, onReinforcementDayMetadataChanged, openModal, render,
     saveSettingsOnly, saveAll, snapshotHistoricalPlanning, setDailyGoalOverride, toast, todayCallDateKey,
     usdCeilFromCurrencyAmount } = context);
 }
@@ -114,7 +114,7 @@ let syncingGoals = false;
         refreshGoalInputs(); render();
         return false;
       }
-      onGameDayMetadataChanged(dayKey);
+      onReinforcementDayMetadataChanged(dayKey);
       refreshGoalInputs();
       render();
       return true;
@@ -193,7 +193,7 @@ let syncingGoals = false;
         refreshGoalInputs(); render();
         return false;
       }
-      onGameDayMetadataChanged(dayKey);
+      onReinforcementDayMetadataChanged(dayKey);
       refreshGoalInputs();
       render();
       toast(translateText('Ese día vuelve a usar tu meta general'));
@@ -222,7 +222,7 @@ let syncingGoals = false;
         if (rateInput) rateInput.value = String(settings.rate);
         render(); toast(translateText('No se aplicó la tarifa porque no se pudo guardar.'), {persistenceFailure:true}); return false;
       }
-      onGameDayMetadataChanged(todayCallDateKey());
+      onReinforcementDayMetadataChanged(todayCallDateKey());
       refreshGoalInputs();
       render();
     }

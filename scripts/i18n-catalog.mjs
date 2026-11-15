@@ -54,7 +54,7 @@ export function collectCatalog(root = process.cwd()) {
     walk(parseJavaScript(source, { ecmaVersion: 'latest', sourceType: 'module' }));
   }
   // Catalog names remain Spanish identities in saved records; only their display is localized.
-  for (const file of ['game.js', 'theme-palettes.js', 'positive-reinforcement.js', 'app-main.js']) {
+  for (const file of ['reinforcement.js', 'theme-palettes.js', 'positive-reinforcement.js', 'app-main.js']) {
     const source = fs.readFileSync(path.join(root, 'js', file), 'utf8');
     const limit = source.length;
     const snippet = source.slice(0, limit);

@@ -37,7 +37,7 @@ function fixture(t) {
     timeLabelFromDate: String, callsForDay: () => calls, toast: text => h.messages.push(text),
     MAX_CALL_DURATION_MIN: 1440, HIGHER_RATE_TIERS: {}, higherRateBonusForCall: () => null, makeLocalId: () => 'manual',
     callDedupeKey: call => call.id, callsOverlap: overlap, financeRunAutoFillCascade() {},
-    getActiveDayKey: () => '10/20/2026', parseMoney: Number, onGameCallSaved() {}, onGameCallsChanged() {},
+    getActiveDayKey: () => '10/20/2026', parseMoney: Number, onReinforcementCallSaved() {}, onReinforcementCallsChanged() {},
     toDateFromInputs: () => new Date(at(8)), autoStartShiftFromCalls() {},
   };
   configureCallsContext(context); restorePendingLiveCallBackup();

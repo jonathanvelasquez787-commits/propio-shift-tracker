@@ -3,8 +3,8 @@ import { beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { setAppCalls, setAppSettings, setAppState } from '../js/app-context.js';
 import { configureGameContext, createDefaultGameState, normalizeGameState,
-  onGameCallSaved, onGameCallsChanged, onGameShiftStarted, onGameDayMetadataChanged, onGameDayReset,
-  onGamePauseEnded, onGamePauseStarted, onGameDayRollover, renderGame } from '../js/game.js';
+  onReinforcementCallSaved, onReinforcementCallsChanged, onReinforcementShiftStarted, onReinforcementDayMetadataChanged, onReinforcementDayReset,
+  onReinforcementPauseEnded, onReinforcementPauseStarted, onReinforcementDayRollover, renderGame } from '../js/reinforcement.js';
 import { configurePositiveReinforcementContext } from '../js/positive-reinforcement.js';
 import { withSilentCallFeedback } from '../js/call-feedback.js';
 import { restoreAutomaticGameChanges } from '../js/work-actions.js';
@@ -14,7 +14,7 @@ test('discreet automatic feedback preserves identical milestone and call receipt
   for (const silent of [false, true]) {
     const f = fixture({ goal: 3 });
     try {
-      const save = () => { f.add(5, 1, () => 0); onGameCallsChanged(f.key); };
+      const save = () => { f.add(5, 1, () => 0); onReinforcementCallsChanged(f.key); };
       if (silent) withSilentCallFeedback(save); else save();
       snapshots.push(structuredClone(f.current.game));
     } finally { f.dispose(); }
@@ -65,7 +65,7 @@ function fixture({ goal = 10000, status = 'compliant', streak = 0,
       const call = { id: `audit-${rows.length}`, callDate: key, shiftDayKey: key, billable: 'Yes', dropped: 'No',
         countsAsProductive: true, durationMin: 1, pay, startISO: new Date(now).toISOString(),
         endISO: new Date(now + 5000).toISOString(), importedAt: new Date(now + 6000).toISOString() };
-      rows.push(call); onGameCallSaved(call, 'manual', { random });
+      rows.push(call); onReinforcementCallSaved(call, 'manual', { random });
     } },
     reload() { current.game = normalizeGameState(JSON.parse(JSON.stringify(current.game))); },
     setStatus(value) { status = value; }, setGoal(value) { goal = value; },
@@ -80,15 +80,15 @@ test('automatic-start capture restores the previous receipts without erasing a l
     f.add(1, 1);
     const before = structuredClone(f.current.game);
     let started;
-    onGameShiftStarted({ captureState: value => { started = value; } });
+    onReinforcementShiftStarted({ captureState: value => { started = value; } });
     assert.deepEqual(started, before);
     const historical = { id: 'later-historical', shiftDayKey: f.key, callDate: f.key, startISO: new Date(Date.now() - 20 * 60000).toISOString(),
       endISO: new Date(Date.now() - 15 * 60000).toISOString(), importedAt: new Date().toISOString(), durationMin: 5, pay: 2, billable: 'Yes', dropped: 'No', countsAsProductive: true };
-    f.rows.push(historical); onGameCallSaved(historical, 'import'); onGameCallsChanged(historical.callDate);
+    f.rows.push(historical); onReinforcementCallSaved(historical, 'import'); onReinforcementCallsChanged(historical.callDate);
     const laterLedger = Object.fromEntries(Object.entries(f.current.game.ledger).filter(([key]) => !Object.hasOwn(started.ledger, key)));
     assert.ok(Object.keys(laterLedger).length > 0);
     f.current.game = restoreAutomaticGameChanges(f.current.game, before, started);
-    onGameCallsChanged(f.key); onGameDayMetadataChanged(f.key);
+    onReinforcementCallsChanged(f.key); onReinforcementDayMetadataChanged(f.key);
     for (const [key, value] of Object.entries(laterLedger)) assert.deepEqual(f.current.game.ledger[key], value);
   } finally { f.dispose(); }
 });
@@ -110,7 +110,7 @@ test('resetting one day removes its reinforcement receipts while preserving othe
     }
     const preferences = structuredClone(f.config.reinforcement);
     f.rows.length = 0;
-    onGameDayReset(f.key);
+    onReinforcementDayReset(f.key);
     const positive = f.current.game.reinforcement;
     assert.deepEqual(Object.keys(positive.reflections), ['yesterday']);
     assert.equal(positive.recoveries.length, 1);
@@ -130,14 +130,14 @@ test('a pause return is recorded once, continuing the pause cancels it and a lat
     f.add(); const pause = { type: 'break', shiftDayKey: f.key,
       startedAt: new Date(Date.now() - 300000).toISOString(), endedAt: new Date(Date.now() - 240000).toISOString() };
     const returns = () => Object.entries(f.current.game.ledger).filter(([key]) => key.startsWith('pause-return:'));
-    onGamePauseEnded(pause, { onTime: true });
+    onReinforcementPauseEnded(pause, { onTime: true });
     assert.equal(returns().length, 1); assert.equal(returns()[0][1].onTime, true);
-    f.reload(); onGamePauseEnded(pause, { onTime: true });
+    f.reload(); onReinforcementPauseEnded(pause, { onTime: true });
     assert.equal(returns().length, 1); assert.equal(returns()[0][1].onTime, true);
-    f.current.activePause = { ...pause, endedAt: null }; onGamePauseStarted('break');
+    f.current.activePause = { ...pause, endedAt: null }; onReinforcementPauseStarted('break');
     assert.equal(returns()[0][1].onTime, false);
-    onGamePauseStarted('break'); assert.equal(returns()[0][1].onTime, false);
-    f.current.activePause = null; onGamePauseEnded({ ...pause, endedAt: new Date().toISOString() }, { onTime: false });
+    onReinforcementPauseStarted('break'); assert.equal(returns()[0][1].onTime, false);
+    f.current.activePause = null; onReinforcementPauseEnded({ ...pause, endedAt: new Date().toISOString() }, { onTime: false });
     assert.equal(returns().length, 1); assert.equal(returns()[0][1].onTime, false);
   } finally { f.dispose(); }
 });
@@ -146,7 +146,7 @@ test('call receipts are stored once and duplicate saved callbacks do not change 
   const f = fixture();
   try {
     f.add(8); f.reload(); const before = JSON.stringify(f.current.game);
-    for (let i = 0; i < 5; i++) for (const call of f.rows) onGameCallSaved(call, 'import');
+    for (let i = 0; i < 5; i++) for (const call of f.rows) onReinforcementCallSaved(call, 'import');
     assert.equal(JSON.stringify(f.current.game), before);
     assert.equal(Object.keys(f.current.game.ledger).filter(key => key.startsWith('reinforce-call:')).length, 8);
     assert.deepEqual(Object.keys(f.current.game).sort(), ['ledger', 'reinforcement', 'version']);

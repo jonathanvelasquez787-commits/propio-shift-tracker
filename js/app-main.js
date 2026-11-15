@@ -118,20 +118,20 @@ import {
   createDefaultGameState,
   initGame,
   normalizeGameState,
-  onGameCallSaved,
+  onReinforcementCallSaved,
   migrateGameCallReferences,
   checkReinforcementInactivity,
-  onGameCallsChanged,
-  onGameDayRollover,
-  onGameDayReset,
-  onGameDayMetadataChanged,
-  onGamePauseEnded,
-  onGamePauseStarted,
-  onGameShiftStarted,
+  onReinforcementCallsChanged,
+  onReinforcementDayRollover,
+  onReinforcementDayReset,
+  onReinforcementDayMetadataChanged,
+  onReinforcementPauseEnded,
+  onReinforcementPauseStarted,
+  onReinforcementShiftStarted,
   renderGame,
   renderGameLive,
   configureGameContext,
-} from './game.js';
+} from './reinforcement.js';
 import {
   configurePositiveReinforcementContext,
   migratePositiveCallIdReferences,
@@ -162,7 +162,7 @@ export { higherRateLiveStatus };
 export { formatBlockDurationLabel };
 export { renderEmojiPicker };
 export { computeComplianceStreak, dayComplianceStatus };
-export { onGameCallSaved, onGameCallsChanged, onGameDayMetadataChanged };
+export { onReinforcementCallSaved, onReinforcementCallsChanged, onReinforcementDayMetadataChanged };
 
     const ACTIVE_APP_KEYS = activeAppKeys();
     const STORAGE_KEY = ACTIVE_APP_KEYS.state;
@@ -1667,7 +1667,7 @@ function checkDayRollover() {
   if (wasFollowingToday) {
     state.activeDayKey = today;
   }
-  onGameDayRollover();
+  onReinforcementDayRollover();
   saveStateOnly();
   render();
   return true;
@@ -3607,7 +3607,7 @@ function setDayNote(dayKey, { category, comment, forcedStatus }) {
     state.dayNotes[normalized] = { category: cat, comment: note, forcedStatus: forced };
   }
   if (saveStateOnly() === false) { state.dayNotes = before; return false; }
-  onGameDayMetadataChanged(normalized);
+  onReinforcementDayMetadataChanged(normalized);
   render();
 }
 
@@ -4003,7 +4003,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       state.shiftEndedAt = null;
       setEvent('shift', translateText('Shift iniciado automáticamente'), fmtTime(firstStart), 'auto');
       if (saveStateOnly() === false) return false;
-      onGameShiftStarted({ continued: false });
+      onReinforcementShiftStarted({ continued: false });
       if (!silent) toast(ui`Shift iniciado automáticamente desde tu primera llamada (${fmtTime(firstStart)})`);
       return true;
     }
@@ -4099,7 +4099,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
           if (!persist()) return false;
           stopShiftAlarm();
           toast(ui`Turno continuado — interrupción de ${formatMinutes(gapMin)} min registrada`);
-          onGameShiftStarted({ continued: true });
+          onReinforcementShiftStarted({ continued: true });
           return;
         }
       }
@@ -4116,7 +4116,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       // apagaría solo en el próximo tick (hasta 1s de retraso), pero apagarlo aquí de inmediato
       // evita ese beep extra.
       stopShiftAlarm();
-      onGameShiftStarted({ continued: false });
+      onReinforcementShiftStarted({ continued: false });
 
       // El estimado desde la primera llamada se reemplaza por la hora del click en cuanto se inicia
       // el turno.
@@ -4183,7 +4183,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
             continuationClosedPause: JSON.parse(JSON.stringify(lastClosed)),
           };
           if (!persistPause()) return false;
-          onGamePauseStarted(type);
+          onReinforcementPauseStarted(type);
           stopBreakStartAlarm();
           toast(ui`${pretty} continuado — interrupción de ${formatMinutes(gapMin)} min registrada`);
           return;
@@ -4195,7 +4195,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       if (!persistPause()) return false;
       stopBreakStartAlarm();
       toast(ui`${pretty} iniciado`);
-      onGamePauseStarted(type);
+      onReinforcementPauseStarted(type);
     }
 
     function endPause(options = {}) {
@@ -4227,7 +4227,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
         const durationDelta = duration - (plannedEnd.getTime() - plannedStart.getTime()) / 60000;
         onTime = Math.abs(startDelta) <= ADHERENCE_TOLERANCE_MIN && Math.abs(durationDelta) <= ADHERENCE_TOLERANCE_MIN;
       }
-      onGamePauseEnded(pauseRecord, { onTime });
+      onReinforcementPauseEnded(pauseRecord, { onTime });
       };
       if (!deferSave) {
         if (saveAll() === false) { setAppState(before); render(); return false; }
@@ -4298,7 +4298,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       };
       if (saveAll() === false) { setAppState(before); render(); return false; }
       interruptedPauseRollback?.finish?.();
-      if (needsAutoShift) onGameShiftStarted({ continued: false, captureState: game => { state.activeCall.gameAfterAutoShift = game; } });
+      if (needsAutoShift) onReinforcementShiftStarted({ continued: false, captureState: game => { state.activeCall.gameAfterAutoShift = game; } });
       toast(needsAutoShift ? translateText('Llamada iniciada · turno abierto automáticamente') : translateText('Llamada iniciada'));
       return true;
     }
@@ -4362,8 +4362,8 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       }, discarded => {
         if (discarded?.autoStartedShift) {
           const day = todayCallDateKey(new Date(discarded.startedAt));
-          onGameCallsChanged(day);
-          onGameDayMetadataChanged(day);
+          onReinforcementCallsChanged(day);
+          onReinforcementDayMetadataChanged(day);
         }
         toast(discarded?.autoStartedShift ? translateText('Llamada descartada · turno automático revertido') : translateText('Llamada descartada'));
       });
@@ -4592,7 +4592,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
         }
 
         state.activeDayKey = normalizedDayKey || dayKey;
-        onGameDayReset(normalizedDayKey || dayKey);
+        onReinforcementDayReset(normalizedDayKey || dayKey);
         financeRunAutoFillCascade();
         if (saveAll() === false) return false;
         toast(translateText('Día reiniciado'));
@@ -4928,8 +4928,8 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
         }
         const todayImportedKey = todayCallDateKey();
         if (importedDates.has(todayImportedKey) && !state.shiftStartedAt && !state.shiftEndedAt && callsForDay(todayImportedKey).length) autoStartShiftFromCalls(true);
-        importedRows.filter(item => !item.replacementKind).forEach(item => onGameCallSaved(item.call, 'import'));
-        importedDates.forEach(dayKey => onGameCallsChanged(dayKey));
+        importedRows.filter(item => !item.replacementKind).forEach(item => onReinforcementCallSaved(item.call, 'import'));
+        importedDates.forEach(dayKey => onReinforcementCallsChanged(dayKey));
         if (!background) playCallSavedSound('callPasted');
       }
       if (background) return overlapSkipped === recordReviews.length && !futureRows.length;
@@ -5199,7 +5199,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       effectiveCycleGoal, effectiveDailyGoal, effectiveHistoryStartDate, escapeHtml,
       financeConvertedInline, financeConvertedNote, formatCallDayLabel, formatDuration, formatMinutes,
       getActiveDayKey, getCycleGoalOverride, iconHtml, importedCallStats, money, pad, previousCalendarDay,
-      onGameDayMetadataChanged, productiveMinutesForDay, saveSettingsOnly, todayCallDateKey, todayRange,
+      onReinforcementDayMetadataChanged, productiveMinutesForDay, saveSettingsOnly, todayCallDateKey, todayRange,
       weekDaysForOffset, weekSummaryForOffset, render, parseMoney, higherRateBonusForCalls,
     });
     configureCalendarContext({
@@ -5211,7 +5211,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
     configureScheduleContext({
       WEEKDAYS, WEEKDAY_LABELS, WEEKDAY_LABELS_SHORT, appConfirm, defaultDaySchedule, ensureWeeklySchedule,
       formatHHMM, formatMinutes, formatWeekRangeLabel, iconHtml, isScheduleWeekPast, minutesToHHMM,
-      onGameDayMetadataChanged, pad, saveAll, snapshotHistoricalPlanning, startOfCycleWeek,
+      onReinforcementDayMetadataChanged, pad, saveAll, snapshotHistoricalPlanning, startOfCycleWeek,
       timeLabel, toMinutes, toast, todayCallDateKey, weekStartKeyFromDate, canPersistLocalChanges, escapeHtml,
     });
     configureCallsContext({
@@ -5220,15 +5220,15 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       dayEvents, dayGapRows, dayKeyFromIsoDate, dayShiftBounds, dayWorkSessions, escapeHtml, financeConvertedInline,
       financeConvertedNote, financeRunAutoFillCascade, formatCallDayLabel, formatDuration, formatHHMM,
       formatMinutes, gapLabelText, getActiveDayKey, higherRateBonusForCall, higherRateTierBadgeHtml,
-      iconHtml, importedCallStats, isoDateFromDayKey, makeLocalId, money, onGameCallSaved, onGameCallsChanged, openModal,
+      iconHtml, importedCallStats, isoDateFromDayKey, makeLocalId, money, onReinforcementCallSaved, onReinforcementCallsChanged, openModal,
       pad, parseMoney, rateTilePerMin, renderRateTiles, sameCallDay, saveAll, timeLabelFromDate,
-      toDateFromInputs, toast, todayCallDateKey, playCallSavedSound, canPersistLocalChanges, render, onGameDayMetadataChanged,
+      toDateFromInputs, toast, todayCallDateKey, playCallSavedSound, canPersistLocalChanges, render, onReinforcementDayMetadataChanged,
       stateWithinBudget: value => jsonbBytes(value) <= 2097152,
     });
     configureHigherRateContext({
       HIGHER_RATE_EARLY_GRACE_MIN, HIGHER_RATE_TIERS, appConfirm, callDateKeyFromValue, callDateToDate,
       callsForDay, dayKeyFromIsoDate, escapeHtml, financeConvertedInline, financeRunAutoFillCascade,
-      onGameCallsChanged, formatBlockDurationLabel,
+      onReinforcementCallsChanged, formatBlockDurationLabel,
       formatCallDayLabel, formatHHMM, formatMinutes, iconHtml, isoDateFromDayKey, makeLocalId,
       mergeIntervals, minutesToHHMM, money, render, saveAll, timeLabel, toDateFromInputs, toMinutes, toast,
       todayCallDateKey, todayRange, canPersistLocalChanges, convertedAmountText, openModal, closeModal,
@@ -5237,7 +5237,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       DEFAULT_USER_EMOJI, EMOJI_CHOICES, RATE, closeModal, convertedAmountText, currencyCeilFromUsdAmount,
       effectiveCycleGoal, effectiveDailyGoal, ensureCurrencySettings, escapeHtml, formatCallDayLabel,
       formatMinutes, getActiveDayKey, getDailyGoalOverride, iconHtml, money, openModal, render,
-      onGameDayMetadataChanged, saveSettingsOnly, saveAll, snapshotHistoricalPlanning,
+      onReinforcementDayMetadataChanged, saveSettingsOnly, saveAll, snapshotHistoricalPlanning,
       setDailyGoalOverride, toast, todayCallDateKey,
       usdCeilFromCurrencyAmount,
     });
@@ -5611,7 +5611,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       const mins = Number(input?.value);
       if (Number.isFinite(mins) && mins >= 0) settings.adherenceGraceMin = mins;
       saveSettingsOnly();
-      onGameDayMetadataChanged(todayCallDateKey());
+      onReinforcementDayMetadataChanged(todayCallDateKey());
       render();
       toast(ui`Ventana de gracia de Adherencia: ${formatMinutes(settings.adherenceGraceMin)} min`);
     }
@@ -5622,7 +5622,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       const pct = Number(input?.value);
       if (Number.isFinite(pct) && pct > 0 && pct <= 100) settings.adherenceGoalPct = pct;
       saveSettingsOnly();
-      onGameDayMetadataChanged(todayCallDateKey());
+      onReinforcementDayMetadataChanged(todayCallDateKey());
       render();
       toast(ui`Meta de Adherencia: ${settings.adherenceGoalPct}%`);
     }
@@ -7525,7 +7525,7 @@ export function render() {
           }
           render(); syncShiftModalFields(); return false;
         }
-        onGameDayMetadataChanged(todayCallDateKey());
+        onReinforcementDayMetadataChanged(todayCallDateKey());
         render(); syncShiftModalFields();
         return true;
       };

@@ -17,11 +17,11 @@
 <link rel="modulepreload" href="/js/calls.js"/>
 <link rel="modulepreload" href="/js/higher-rate.js"/>
 <link rel="modulepreload" href="/js/settings.js"/>
-<link rel="modulepreload" href="/js/game.js"/>
+<link rel="modulepreload" href="/js/reinforcement.js"/>
 <link rel="modulepreload" href="/js/monsters.js"/>
 <link rel="stylesheet" href="/css/app-core.css"/>
 <link rel="stylesheet" href="/css/app-shell.css"/>
-<link rel="stylesheet" href="/css/game.css"/>
+<link rel="stylesheet" href="/css/reinforcement.css"/>
 <link rel="stylesheet" href="/css/appearance.css"/>
 <link rel="stylesheet" href="/css/accessibility.css"/>
 </head>
@@ -1439,15 +1439,15 @@
     </summary>
     <div class="game-settings-accordion-body">
       <div class="positive-settings-section game-settings-section">
-        <div class="game-monster-name-setting inactivity-compact">
+        <div class="inactivity-message-setting inactivity-compact">
           <div class="inactivity-row">
             <label for="positiveInactivityMinutesInput"><strong>Avisar tras</strong><small>minutos de trabajo sin llamadas</small></label>
             <input id="positiveInactivityMinutesInput" type="number" min="1" max="240" step="1" inputmode="numeric" aria-describedby="positiveInactivityMessageHelp positiveInactivityMessageStatus"/>
           </div>
           <label class="game-settings-toggle" for="positiveInactivityRepeatInput" title="Vuelve a avisar cada vez que transcurran esos minutos de trabajo. Apagado: una sola vez hasta la siguiente llamada."><span><strong>Repetir el aviso</strong><small>Apagado: una sola vez.</small></span><input id="positiveInactivityRepeatInput" type="checkbox"/><span class="game-settings-switch" aria-hidden="true"><span></span></span></label>
-          <div class="game-monster-name-controls"><input id="positiveInactivityMessageInput" type="text" maxlength="240" autocomplete="off" aria-label="Mensaje de apoyo sin llamadas" aria-describedby="positiveInactivityMessageHelp positiveInactivityMessageStatus"/><button class="mc-btn-primary cyan" id="positiveInactivityMessageSaveBtn" type="button">Guardar</button></div>
+          <div class="inactivity-message-controls"><input id="positiveInactivityMessageInput" type="text" maxlength="240" autocomplete="off" aria-label="Mensaje de apoyo sin llamadas" aria-describedby="positiveInactivityMessageHelp positiveInactivityMessageStatus"/><button class="mc-btn-primary cyan" id="positiveInactivityMessageSaveBtn" type="button">Guardar</button></div>
           <small id="positiveInactivityMessageHelp">No cuenta Break ni Lunch. Vacío y guardar vuelve al mensaje original.</small>
-          <span class="game-monster-name-status" id="positiveInactivityMessageStatus" role="status" aria-live="polite"></span>
+          <span class="inactivity-message-status" id="positiveInactivityMessageStatus" role="status" aria-live="polite"></span>
         </div>
 </div></div></details>
 <div id="notificationFilesReview"></div>

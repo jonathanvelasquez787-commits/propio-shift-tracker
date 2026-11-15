@@ -728,9 +728,8 @@
       "area": "Logros y refuerzo",
       "acceptance": "Recibos idempotentes, correcciones y recargas; apagar Logros conserva dinero/historia; sin recompensas al fallar guardar.",
       "sources": [
-        "js/game.js",
-        "js/game-auto.js",
-        "js/game-audio.js",
+        "js/reinforcement.js",
+        "js/reinforcement-audio.js",
         "js/positive-reinforcement.js",
         "js/reinforcement-feedback.js",
         "js/reinforcement-rules.js"
@@ -769,14 +768,6 @@
             "quinta simulación mensual: respaldo live sobrevive refresh y descartar revierte turno ACW",
             "quinta simulación mensual: respaldo live conserva duración decimal y día contable nocturno",
             "quinta simulación mensual: Break Lunch y reset respetan día contable de turno nocturno"
-          ]
-        },
-        {
-          "file": "tests/game-auto.test.mjs",
-          "namedCases": [
-            "idle time can only animate a tiny walk, never attack or create temporary HP",
-            "specials count exact third calls across grouped representations",
-            "time jumps and separate scenes cannot alter call cadence"
           ]
         },
         {
@@ -1812,7 +1803,7 @@
         "js/call-records.js",
         "js/app-main.js",
         "js/work-actions.js",
-        "js/game.js",
+        "js/reinforcement.js",
         "js/settings.js",
         "js/reports.js"
       ],
@@ -1845,7 +1836,7 @@
         "js/call-recovery.js",
         "js/call-records-view.js",
         "js/higher-rate.js",
-        "js/game.js",
+        "js/reinforcement.js",
         "js/auth.js",
         "js/automation-lease.js",
         "js/boot.js",
@@ -1880,7 +1871,7 @@
       "acceptance": "Sin horario fijo, el aviso de descanso sale por regla (minutos productivos o conectado), con duración elegible, posponer y meta de sesión extensible; la racha cuenta el día por la meta productiva y no por Adherencia; los días anteriores a activarlo conservan su lógica.",
       "sources": [
         "js/app-main.js",
-        "js/game.js",
+        "js/reinforcement.js",
         "js/reports.js"
       ],
       "tests": [

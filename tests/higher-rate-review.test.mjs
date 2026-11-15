@@ -106,7 +106,7 @@ function transactionFixture(t) {
     canPersistLocalChanges: () => h.allowed,
     financeRunAutoFillCascade: () => { settings.financeCategories.expenses.rows[0].assignedAmount = .5; },
     saveAll() { h.writes++; if (h.accepted === 'throw') throw new Error('storage interrupted'); if (!h.accepted) return false; h.saved = JSON.stringify({ settings, calls }); return true; },
-    onGameCallsChanged() { assert.ok(h.saved, 'reconcile only after the accepted snapshot'); h.effects++; }, render() {},
+    onReinforcementCallsChanged() { assert.ok(h.saved, 'reconcile only after the accepted snapshot'); h.effects++; }, render() {},
   });
   h.stamp = () => ({ owner: settings, callsOwner: calls, revision: JSON.stringify([settings, calls]), used: false });
   return h;

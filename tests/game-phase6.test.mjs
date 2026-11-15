@@ -10,7 +10,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { setAppCalls, setAppSettings, setAppState } from '../js/app-context.js';
-import { configureGameContext, createDefaultGameState, normalizeGameState, onGameCallSaved, onGameCallsChanged } from '../js/game.js';
+import { configureGameContext, createDefaultGameState, normalizeGameState, onReinforcementCallSaved, onReinforcementCallsChanged } from '../js/reinforcement.js';
 import { configurePositiveReinforcementContext, createDefaultReinforcementState, normalizeReinforcementState } from '../js/positive-reinforcement.js';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -54,7 +54,7 @@ test('la hora manual vacía no se convierte en 07:00 y las horas futuras no se g
   assert.match(calls, /new Date\(candidate\.endISO\)\.getTime\(\) > Date\.now\(\)/);
   assert.match(calls, /La llamada no puede terminar en el futuro/);
 
-  const game = read('js/game.js');
+  const game = read('js/reinforcement.js');
   const eligibilitySource = between(game, 'function callIsRecentlyProductive', 'function higherRateBonusAmount');
   const now = new Date(2026, 8, 28, 12, 0, 0).getTime();
   class FixedDate extends Date {
@@ -69,7 +69,7 @@ test('la hora manual vacía no se convierte en 07:00 y las horas futuras no se g
 });
 
 test('CSS de juego cubre motion reducido, layout estrecho y responsive', () => {
-  const css = read('css/game.css');
+  const css = read('css/reinforcement.css');
   assert.match(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);
   assert.match(css, /animation:\s*none\s*!important/);
   assert.match(css, /transition:\s*none\s*!important/);
@@ -88,11 +88,11 @@ test('build mantiene módulos fuente fuera de public y el worker precarga el CSS
   assert.match(build, /Build listo en public\/ sin sourcemaps ni módulos fuente/);
   assert.match(build, /cp\(path\.join\(root, 'css'\), path\.join\(out, 'css'\)/);
   assert.match(worker, /const SHELL = \[/);
-  assert.match(worker, /`\/css\/game\.css\?v=\$\{BUILD_VERSION\}`/);
+  assert.match(worker, /`\/css\/reinforcement\.css\?v=\$\{BUILD_VERSION\}`/);
 
   const publicRoot = path.join(root, 'public');
   if (fs.existsSync(publicRoot)) {
-    assert.equal(fs.existsSync(path.join(publicRoot, 'css', 'game.css')), true);
+    assert.equal(fs.existsSync(path.join(publicRoot, 'css', 'reinforcement.css')), true);
     assert.equal(fs.existsSync(path.join(publicRoot, 'js')), false);
     const files = [];
     const visit = (dir) => {
@@ -108,7 +108,7 @@ test('build mantiene módulos fuente fuera de public y el worker precarga el CSS
 });
 
 test('avisos y modales de juego se recuperan al cerrar', () => {
-  const game = read('js/game.js');
+  const game = read('js/reinforcement.js');
   const appMain = read('js/app-main.js');
   assert.match(game, /app:modal-closed/);
   assert.match(appMain, /new CustomEvent\('app:modal-closed'/);
@@ -117,7 +117,7 @@ test('avisos y modales de juego se recuperan al cerrar', () => {
 });
 
 test('el sonido del refuerzo solo depende de Celebrar llamadas y del día actual', () => {
-  const game = read('js/game.js');
+  const game = read('js/reinforcement.js');
   const tone = between(game, 'function playGameTone', '\nconst gameEventVersions');
   assert.match(tone, /reinforcementFeedbackEnabled\(\)/);
   assert.match(tone, /dayKey === currentGameDayKey\(\)/);
@@ -129,12 +129,12 @@ test('el sonido del refuerzo solo depende de Celebrar llamadas y del día actual
 test('simulación mensual: pegar llamadas usa hooks de juego y reemplaza live provisional', () => {
   const appMain = read('js/app-main.js');
   const calls = read('js/calls.js');
-  const game = read('js/game.js');
+  const game = read('js/reinforcement.js');
 
   assert.match(appMain, /isReplaceableLiveCall/);
   assert.match(appMain, /source:\s*'import'/);
-  assert.match(appMain, /onGameCallSaved\(item\.call, 'import'\)/);
-  assert.match(appMain, /importedDates\.forEach\(dayKey => onGameCallsChanged\(dayKey\)\)/);
+  assert.match(appMain, /onReinforcementCallSaved\(item\.call, 'import'\)/);
+  assert.match(appMain, /importedDates\.forEach\(dayKey => onReinforcementCallsChanged\(dayKey\)\)/);
   assert.match(calls, /source:\s*'live'/);
   assert.match(calls, /source:\s*'manual'/);
   assert.match(game, /\['manual', 'live', 'import'\]/);
@@ -206,7 +206,7 @@ test('tercera simulación mensual: Finanzas nunca queda sobreasignada al bajar g
   assert.match(finance, /reverseAllocationOrder/);
   assert.match(finance, /export function financeReconcileAssignmentsToEarnings/);
   assert.match(finance, /const trimmed = financeTrimAssignmentsToEarnings\(\)/);
-  assert.match(calls, /financeRunAutoFillCascade\(\);[\s\S]*if \(saveAll\(\) === false\) \{[\s\S]*setAppState\(previous.state\)[\s\S]*return false;[\s\S]*onGameCallsChanged/);
+  assert.match(calls, /financeRunAutoFillCascade\(\);[\s\S]*if \(saveAll\(\) === false\) \{[\s\S]*setAppState\(previous.state\)[\s\S]*return false;[\s\S]*onReinforcementCallsChanged/);
   assert.match(appMain, /function applyImportedPayload[\s\S]*financeRunAutoFillCascade\(\)/);
 });
 
@@ -322,7 +322,7 @@ test('cuarta simulación mensual: llamadas antes o después del checkpoint cuent
 
 test('cuarta simulación mensual: descartar live también revierte efectos de gamificación del auto-turno', () => {
   const appMain = read('js/app-main.js');
-  assert.match(appMain, /const gameBeforeAutoShift = needsAutoShift[\s\S]*gameBeforeAutoShift,[\s\S]*if \(needsAutoShift\) onGameShiftStarted\(\{ continued: false, captureState:/);
+  assert.match(appMain, /const gameBeforeAutoShift = needsAutoShift[\s\S]*gameBeforeAutoShift,[\s\S]*if \(needsAutoShift\) onReinforcementShiftStarted\(\{ continued: false, captureState:/);
   assert.match(appMain, /discarded\.gameBeforeAutoShift/);
 });
 

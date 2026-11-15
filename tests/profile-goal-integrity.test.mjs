@@ -18,7 +18,7 @@ test('rejected general goal update preserves settings, state and the complete pe
   snapshotHistoricalPlanning(){h.state.history={day:'old-plan'};},setDailyGoalOverride(){delete h.settings.dailyGoalOverrides.day;},
   setAppSettings:value=>{h.settings=value;},setAppState:value=>{h.state=value;},
   saveStateOnly(){h.disk.state=copy(h.state);return true;},saveSettingsOnly:()=>false,saveAll:()=>false,
-  onGameDayMetadataChanged(){throw Error('Award after failed save');},refreshGoalInputs(){},render(){},toast(){},translateText:x=>x,
+  onReinforcementDayMetadataChanged(){throw Error('Award after failed save');},refreshGoalInputs(){},render(){},toast(){},translateText:x=>x,
  });
  h.disk=copy({state:h.state,settings:h.settings});const before=copy(h.disk);
  vm.runInContext(declarations('js/settings.js',['applyGoalValues']),h);
@@ -31,7 +31,7 @@ test('rejected daily goal removal restores the override and its historical snaps
   getActiveDayKey:()=> 'day',getDailyGoalOverride:()=>({min:120,usd:14.4}),
   setDailyGoalOverride(){delete h.settings.dailyGoalOverrides.day;h.state.planning.day='changed';},saveAll:()=>false,
   setAppSettings:value=>{h.settings=value;},setAppState:value=>{h.state=value;},refreshGoalInputs(){},render(){},
-  onGameDayMetadataChanged(){throw Error('Award after failed save');},
+  onReinforcementDayMetadataChanged(){throw Error('Award after failed save');},
  });
  const before=copy({settings:h.settings,state:h.state});
  vm.runInContext(declarations('js/settings.js',['clearActiveDayGoalOverride']),h);
@@ -110,7 +110,7 @@ for(const name of ['saveShiftWindow','copyDayToAll','copyDayToWeekend'])test(`${
   scheduleViewMode:'template',scheduleWeekOffset:0,scheduleEditDay:'mon',WEEKDAYS:['mon','tue','wed','thu','fri','sat','sun'],WEEKDAY_LABELS:{mon:'Monday'},
   blockRowsWithEqualTimes:()=>[],readScheduleFormAsConfig:()=>({start:'08:00',end:'16:00',blocks:[]}),validateDayConfig:()=>({valid:true}),
   snapshotHistoricalPlanning(){h.state.history='changed';},activeScheduleTarget:()=>h.settings.weeklySchedule,
-  saveSettingsOnly:()=>false,saveAll:()=>false,onGameDayMetadataChanged(){throw Error('Award after failure');},
+  saveSettingsOnly:()=>false,saveAll:()=>false,onReinforcementDayMetadataChanged(){throw Error('Award after failure');},
   appConfirm:(_message,apply)=>apply(),renderDayTabs(){},toast(){},todayCallDateKey:()=> 'today',document:{getElementById:()=>null},
  });
  const before=copy({settings:h.settings,state:h.state});

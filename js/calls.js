@@ -13,7 +13,7 @@ let callsForDay, callsOverlap, closeModal, connectedMinutesForDay, convertedAmou
 let dayEvents, dayGapRows, dayKeyFromIsoDate, dayShiftBounds, dayWorkSessions, escapeHtml, financeConvertedInline;
 let financeConvertedNote, financeRunAutoFillCascade, formatCallDayLabel, formatDuration, formatHHMM;
 let formatMinutes, gapLabelText, getActiveDayKey, higherRateBonusForCall, higherRateTierBadgeHtml;
-let iconHtml, importedCallStats, isoDateFromDayKey, makeLocalId, money, onGameCallSaved, onGameCallsChanged, openModal;
+let iconHtml, importedCallStats, isoDateFromDayKey, makeLocalId, money, onReinforcementCallSaved, onReinforcementCallsChanged, openModal;
 let pad, parseMoney, rateTilePerMin, renderRateTiles, sameCallDay, saveAll, timeLabelFromDate;
 let toDateFromInputs, toast, todayCallDateKey, playCallSavedSound;
 
@@ -25,7 +25,7 @@ export function configureCallsContext(context) {
     dayEvents, dayGapRows, dayKeyFromIsoDate, dayShiftBounds, dayWorkSessions, escapeHtml, financeConvertedInline,
     financeConvertedNote, financeRunAutoFillCascade, formatCallDayLabel, formatDuration, formatHHMM,
     formatMinutes, gapLabelText, getActiveDayKey, higherRateBonusForCall, higherRateTierBadgeHtml,
-    iconHtml, importedCallStats, isoDateFromDayKey, makeLocalId, money, onGameCallSaved, onGameCallsChanged, openModal,
+    iconHtml, importedCallStats, isoDateFromDayKey, makeLocalId, money, onReinforcementCallSaved, onReinforcementCallsChanged, openModal,
     pad, parseMoney, rateTilePerMin, renderRateTiles, sameCallDay, saveAll, timeLabelFromDate,
     toDateFromInputs, toast, todayCallDateKey, playCallSavedSound } = context);
 }
@@ -339,8 +339,8 @@ export function requestCloseManualCallModal() {
     closeModal('manualCallModal');
     if (pending?.liveContext?.autoStartedShift) {
       const day = callDateKeyFromValue(pending.candidate?.callDate) || todayCallDateKey(new Date(pending.startedAtISO));
-      onGameCallsChanged(day);
-      callContext.onGameDayMetadataChanged?.(day);
+      onReinforcementCallsChanged(day);
+      callContext.onReinforcementDayMetadataChanged?.(day);
     }
     return true;
   });
@@ -564,8 +564,8 @@ export function saveManualCall() {
   if (affectedDayKey === todayCallDateKey() && !state.shiftStartedAt && !state.shiftEndedAt) autoStartShiftFromCalls(true);
   toast(translateText('Llamada agregada'));
   playCallSavedSound?.(pendingBackup ? 'callEnded' : 'callManual');
-  onGameCallSaved(candidate, pendingBackup ? 'live' : 'manual');
-  onGameCallsChanged(affectedDayKey);
+  onReinforcementCallSaved(candidate, pendingBackup ? 'live' : 'manual');
+  onReinforcementCallsChanged(affectedDayKey);
 }
 
 // Terminar una llamada y querer empezar otra de inmediato (mismo minuto o cualquier otro) "no
@@ -613,7 +613,7 @@ export function autoSaveLiveCall(startedAtISO, endedAtISO, liveContext = null) {
       toast(ui`Llamada guardada (${formatDuration(durationMin * 60000)}) — edítala en Tabla de llamadas si hace falta`);
       playCallSavedSound?.('callEnded');
     }
-    onGameCallSaved(candidate, 'live');
+    onReinforcementCallSaved(candidate, 'live');
     return true;
   }
 

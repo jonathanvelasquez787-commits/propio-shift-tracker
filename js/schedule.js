@@ -14,7 +14,7 @@ import {
 
 let WEEKDAYS, WEEKDAY_LABELS, WEEKDAY_LABELS_SHORT, appConfirm, defaultDaySchedule;
 let ensureWeeklySchedule, formatHHMM, formatMinutes, formatWeekRangeLabel, iconHtml, isScheduleWeekPast;
-let minutesToHHMM, onGameDayMetadataChanged, pad, saveAll, snapshotHistoricalPlanning;
+let minutesToHHMM, onReinforcementDayMetadataChanged, pad, saveAll, snapshotHistoricalPlanning;
 let startOfCycleWeek, timeLabel, toMinutes, toast, todayCallDateKey, weekStartKeyFromDate;
 let canPersistLocalChanges, escapeHtml;
 
@@ -22,7 +22,7 @@ export function configureScheduleContext(context) {
   ({ canPersistLocalChanges, escapeHtml } = context);
   ({ WEEKDAYS, WEEKDAY_LABELS, WEEKDAY_LABELS_SHORT, appConfirm, defaultDaySchedule, ensureWeeklySchedule,
     formatHHMM, formatMinutes, formatWeekRangeLabel, iconHtml, isScheduleWeekPast, minutesToHHMM,
-    onGameDayMetadataChanged, pad, saveAll, snapshotHistoricalPlanning,
+    onReinforcementDayMetadataChanged, pad, saveAll, snapshotHistoricalPlanning,
     startOfCycleWeek, timeLabel, toMinutes, toast, todayCallDateKey, weekStartKeyFromDate } = context);
 }
 
@@ -590,7 +590,7 @@ export function configureScheduleContext(context) {
         }
         return false;
       }
-      onGameDayMetadataChanged(todayCallDateKey());
+      onReinforcementDayMetadataChanged(todayCallDateKey());
       return true;
     }
 

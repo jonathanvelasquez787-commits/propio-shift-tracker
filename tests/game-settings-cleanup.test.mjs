@@ -8,7 +8,7 @@ const read = (file) => fs.readFileSync(file, 'utf8');
 
 test('los ajustes viejos del juego (enabled e intensity) se borran al cargar y ya no se crean', () => {
   const app = read('js/app-main.js');
-  const game = read('js/game.js');
+  const game = read('js/reinforcement.js');
   assert.match(app, /delete settings\.game\.enabled;/);
   assert.match(app, /delete settings\.game\.intensity;/);
   assert.match(app, /game: \{ soundEnabled: true, soundVolume: 40 \}/);
@@ -31,7 +31,7 @@ test('sin Celebrar llamadas todo queda mudo aunque el ajuste viejo diga enabled'
 });
 
 test('el audio y los avisos ya no tienen canal "game"', () => {
-  for (const file of ['js/game.js', 'js/game-audio.js', 'js/reinforcement-feedback.js', 'js/positive-reinforcement.js']) {
+  for (const file of ['js/reinforcement.js', 'js/reinforcement-audio.js', 'js/reinforcement-feedback.js', 'js/positive-reinforcement.js']) {
     assert.doesNotMatch(read(file), /channel\s*[:=]\s*'(game|personal|either)'|\{ channel[ ,}]|gameToastChannel/, file);
   }
 });

@@ -6,7 +6,7 @@ let CYCLE_LENGTH_DAYS, RATE, callDateToDate, callsForDay, connectedMinutesForDay
 let convertedAmountText, cycleEarningsForOffset, dayAdherence, dayConfigFor, dayIsEffectivelyOff;
 let dayShiftBounds, effectiveCycleGoal, effectiveDailyGoal, effectiveHistoryStartDate, escapeHtml;
 let financeConvertedInline, financeConvertedNote, formatCallDayLabel, formatDuration, formatMinutes;
-let getActiveDayKey, getCycleGoalOverride, iconHtml, importedCallStats, money, onGameDayMetadataChanged, pad, previousCalendarDay;
+let getActiveDayKey, getCycleGoalOverride, iconHtml, importedCallStats, money, onReinforcementDayMetadataChanged, pad, previousCalendarDay;
 let productiveMinutesForDay, saveSettingsOnly, todayCallDateKey, todayRange, weekDaysForOffset, weekSummaryForOffset;
 let render, parseMoney, higherRateBonusForCalls;
 
@@ -15,7 +15,7 @@ export function configureReportsContext(context) {
     cycleEarningsForOffset, dayAdherence, dayConfigFor, dayIsEffectivelyOff, dayShiftBounds,
     effectiveCycleGoal, effectiveDailyGoal, effectiveHistoryStartDate, escapeHtml, financeConvertedInline,
     financeConvertedNote, formatCallDayLabel, formatDuration, formatMinutes, getActiveDayKey,
-    getCycleGoalOverride, iconHtml, importedCallStats, money, onGameDayMetadataChanged, pad, previousCalendarDay,
+    getCycleGoalOverride, iconHtml, importedCallStats, money, onReinforcementDayMetadataChanged, pad, previousCalendarDay,
     productiveMinutesForDay, saveSettingsOnly, todayCallDateKey, todayRange, weekDaysForOffset,
     weekSummaryForOffset, render, parseMoney, higherRateBonusForCalls } = context);
 }
@@ -447,7 +447,7 @@ function updateStreakSkipOffSetting(checked) {
     }
     render(); return false;
   }
-  onGameDayMetadataChanged(todayCallDateKey());
+  onReinforcementDayMetadataChanged(todayCallDateKey());
   render();
 }
 
