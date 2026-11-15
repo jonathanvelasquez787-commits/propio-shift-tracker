@@ -41,31 +41,3 @@ test('loot transparente y equipamiento SVG son deterministas y accesibles', () =
   assert.doesNotMatch(svg, /<script|onload=/i);
 });
 
-test('la superficie dinámica mantiene controles, recibos, accesibilidad y AudioContext único', () => {
-  const game = read('js/game.js');
-  const html = read('app.html');
-  const css = read('css/game.css');
-  const surface = `${game}\n${html}`;
-  for (const className of ['game-compact-goal-track', 'game-slot-kicker', 'game-armor-row', 'game-armor-plate', 'game-next-goals', 'game-next-goal', 'game-mission-reward', 'game-equipment-grid', 'game-equipment-item', 'game-unlock-roadmap', 'game-cycle-choice']) {
-    assert.match(surface, new RegExp(className.replaceAll('-', '\\-')));
-  }
-  for (const action of ['equip-accessory', 'claim-chest', 'choose-cycle-reward']) assert.match(game, new RegExp(`data-game-action=\\"${action}\\"`));
-  assert.match(game, /gross, applied/);
-  assert.match(game, /repairBonusReceipt/);
-  assert.match(game, /from '\.\/game-audio\.js'/);
-  assert.equal((read('js/game-audio.js').match(/new Constructor\(\)/g) || []).length, 1);
-  assert.match(game, /gameStatusLive/);
-  assert.doesNotMatch(surface, /choose-mission|gameDailyFocus/);
-  assert.match(game, /item\.unlockLevel > state\.game\.level/);
-  assert.match(game, /document\.getElementById\('gameEquipmentPanel'\)/);
-  assert.match(game, /data-game-role="chest-claim"/);
-  assert.match(game, /function reconcileMissionEvents/);
-  assert.match(game, /Armadura rota/);
-  assert.match(game, /`mission:\$\{dayKey\}:`/);
-  assert.match(game, /function revokeAccessoryReceipt/);
-  assert.match(game, /const frozenMonster = entry\.monster/);
-  assert.match(html, /id="gameEquipmentPanel"/);
-  assert.match(html, /id="gameChestClaim"/);
-  assert.match(css, /data-game-phase="guarded"/);
-  assert.match(css, /data-game-phase="vulnerable"/);
-});

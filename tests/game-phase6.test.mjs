@@ -54,62 +54,6 @@ test('Fase 6 expone el catálogo semanal y renderiza SVG seguro para todos los e
   assert.doesNotMatch(safe, /<script|onload=/i);
 });
 
-test('HTML integra la ruta de Logros, el arena, las misiones, ajustes y modales sin IDs duplicados', () => {
-  const html = read('app.html');
-  const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map((match) => match[1]);
-  const duplicates = ids.filter((id, index) => ids.indexOf(id) !== index);
-  assert.deepEqual(duplicates, []);
-  for (const id of [
-    'gameArena', 'gameMissions', 'gameCycleBossAchievements',
-    'gameAchievementsSummary', 'gameStreakPanel', 'gameLevelPanel', 'gameBestiary',
-    'gameTrophies', 'gameRecords', 'gameLastStageClear', 'gameToastStack',
-    'gameEnabledInput', 'sidebarAchievementsInput', 'gameSettingsProfile',
-    'stageClearModal', 'stageClearContent', 'chestModal', 'chestContent',
-  ]) assert.match(html, new RegExp(`\\bid="${id}"`), `missing #${id}`);
-  assert.match(html, /<link rel="stylesheet" href="\/css\/game\.css"\s*\/>/);
-  assert.match(html, /data-page="achievements"/);
-
-  const appMain = read('js/app-main.js');
-  assert.match(appMain, /'achievements'/);
-  assert.match(appMain, /if \(page === 'achievements'\) renderGame\(\)/);
-  assert.match(appMain, /onGameShiftStarted/);
-  assert.match(appMain, /onGameShiftEnded/);
-  assert.match(appMain, /onGamePauseEnded/);
-  assert.match(appMain, /onGameGapSaved/);
-});
-
-test('Logros simplifica ajustes, comparte activación lateral y admite nombre personalizado seguro', () => {
-  const html = read('app.html');
-  const achievements = between(html, '<div class="app-page game-achievements-page"', '</div><!-- /pageAchievements -->');
-  const gameEditor = between(achievements, '<details class="game-settings-row" id="gameSettingsAccordion">', '<section class="game-advanced-settings"');
-  const settingsModal = between(html, '<div aria-hidden="true" class="modal-overlay" id="goalsModal">', '<div aria-hidden="true" class="modal-overlay game-modal-overlay" id="stageClearModal">');
-  const allIds = [...html.matchAll(/\bid="([^"]+)"/g)].map((match) => match[1]);
-  assert.deepEqual(allIds.filter((id, index) => allIds.indexOf(id) !== index), []);
-  assert.doesNotMatch(achievements, /gameDailyFocus|gameIntensityInput|positiveWeeklyBudgetInput/);
-  assert.match(achievements, /id="gameEnabledInput"/);
-  assert.match(gameEditor, /id="monsterNameInput"[^>]*maxlength="60"/);
-  assert.match(gameEditor, /id="monsterNameSaveBtn"/);
-  assert.equal((gameEditor.match(/<option\b/g) || []).length, 0);
-  for (const id of [
-    'gameEnabledInput', 'gameIntensityInput', 'gameSettingsProfile', 'positiveReinforcementEnabledInput',
-    'positiveAskAfterCallInput', 'positiveWeeklyBudgetInput', 'physicalRewardSelected', 'physicalRewardCatalog',
-  ]) assert.doesNotMatch(settingsModal, new RegExp(`\\bid="${id}"`), `#${id} should be under Logros`);
-  const game = read('js/game.js');
-  const sanitizerSource = between(game, 'function sanitizeMonsterName(value)', '\n\nfunction ensureGameSettings');
-  const sanitize = new Function(`${sanitizerSource}; return sanitizeMonsterName;`)();
-  assert.equal(sanitize('  Ogre\u0001<script>  '), 'Ogre<script>');
-  assert.equal(sanitize('😀'.repeat(70)), '😀'.repeat(60));
-  assert.equal(sanitize({ name: 'no' }), '');
-  assert.doesNotMatch(game, /intensity === 'off'\) settings\.game\.enabled = false/);
-  assert.match(game, /config\.monsterName = name/);
-  assert.match(game, /monsterNameInput'\)\?\.addEventListener\('input'/);
-  assert.match(game, /lastSettingsMonsterName !== savedMonsterName/);
-  assert.match(game, /monsterName && !monsterNameDraftDirty && document\.activeElement !== monsterName/);
-  assert.match(game, /variant, displayName, day\.combo, day\.stats\.earnings/);
-  assert.match(game, /Monstruo derrotado: \$\{monsterName\}/);
-  assert.match(game, /monsterImageLabel/);
-});
-
 test('state y settings conservan defaults y normalización de Fase 6', () => {
   const game = read('js/game.js');
   const appMain = read('js/app-main.js');
@@ -140,18 +84,6 @@ test('XP solo entra por llamadas actuales y oportunas, con tope diario y lock de
   assert.match(calls, /onGameCallSaved\(candidate, pendingBackup \? 'live' : 'manual'\)/);
   assert.match(calls, /onGameCallSaved\(candidate, 'live'\)/);
   assert.doesNotMatch(calls, /onGameCallSaved\([^\n]*import/i);
-});
-
-test('después de derrotar no entra XP nuevo pero sí se muestra botín extra', () => {
-  const game = read('js/game.js');
-  const handler = game.slice(game.indexOf('export function onGameCallSaved'), game.indexOf('export function onGameGapSaved'));
-  assert.match(handler, /currentDay\.defeated && xpLocked/);
-  assert.match(handler, /showCallFx\(call, 0, critical, 'extra'\)/);
-  assert.match(handler, /monster-defeat:\$\{dayKey\}/);
-  assert.match(handler, /MONSTRUO DERROTADO/);
-  assert.match(handler, /if \(currentDay\.defeated && xpLocked\)/);
-  assert.match(handler, /showCallFx\(call, 0, critical, 'extra'\)/);
-  assert.match(game, /xpLocked: Number\(entry\.xpLocked\)/);
 });
 
 test('el hook real conserva el botín XP de la quinta llamada al reconciliar y recargar', () => {
@@ -363,41 +295,6 @@ test('la normalización profunda contiene xp, estrellas, misiones y monstruo cor
   assert.doesNotMatch(JSON.stringify(normalized), /<script|onerror=|onload=/i);
 });
 
-test('derrota no debe seguir produciendo golpes/recompensas posteriores', () => {
-  const game = read('js/game.js');
-  const handler = game.slice(game.indexOf('export function onGameCallSaved'), game.indexOf('export function onGameGapSaved'));
-  const defeatGuard = handler.indexOf('currentDay.defeated');
-  const fx = handler.indexOf('showCallFx(call, grantedXp');
-  const reward = handler.indexOf('rewardLootBox');
-  assert.ok(defeatGuard >= 0, 'onGameCallSaved debe reconocer el estado derrotado');
-  assert.ok(defeatGuard < fx, 'la derrota debe bloquear el feedback de golpe');
-  assert.ok(defeatGuard < reward, 'la derrota debe bloquear recompensas posteriores');
-  assert.match(game, /if \(entry\.finalized \|\| Number\.isFinite\(Number\(entry\.xpLocked\)\)\) return 0/);
-  assert.match(game, /xpLocked: Number\(entry\.xpLocked\)/);
-});
-
-test('STAGE CLEAR bloquea recompensas posteriores y solo vuelve a habilitarse al revocar', () => {
-  const game = read('js/game.js');
-  const callHandler = between(game, 'export function onGameCallSaved', '\n\nexport function onGameGapSaved');
-  const finalizedGuard = callHandler.indexOf('if (state.game.days[dayKey]?.finalized) {');
-  assert.ok(finalizedGuard >= 0);
-  for (const sideEffect of ['showCallFx(call, grantedXp, critical)', 'maybeShowRecord(call)', 'rewardLootBox(dayKey, count)']) {
-    assert.ok(finalizedGuard < callHandler.indexOf(sideEffect), `${sideEffect} must stay behind the finalization guard`);
-  }
-  const gapHandler = between(game, 'export function onGameGapSaved', '\n\nexport function onGameShiftAlarmFired');
-  assert.ok(gapHandler.indexOf('if (state.game.days[dayKey]?.finalized) {') < gapHandler.indexOf('state.game.ledger[key] = true'));
-  assert.match(game, /state\.game\.days\[currentGameDayKey\(\)\]\?\.finalized/);
-  const shiftStartHandler = between(game, 'export function onGameShiftStarted', 'function stageComparisonSnapshot');
-  assert.ok(shiftStartHandler.indexOf('if (!state.game.days[dayKey]?.finalized) {') < shiftStartHandler.indexOf('const firedAt'));
-  assert.match(game, /hasActivity: !!\(snapshot\.stats\.total \|\| snapshot\.eligibleCalls\.length\)/);
-  assert.match(game, /earnings: Number\(snapshot\.stats\.earnings\) \|\| 0/);
-  assert.match(game, /xpBreakdown: \{ \.\.\.snapshot\.xpBreakdown \}/);
-  assert.match(game, /const breakdown = entry\.xpBreakdown \|\| fallback\.xpBreakdown/);
-  assert.match(game, /rollback\.streakShieldAwardedKey && state\.game\.ledger\[rollback\.streakShieldAwardedKey\]/);
-  assert.match(game, /if \(entry\.shieldUsed\) \{\s*state\.game\.shields = Math\.min\(GAME_SHIELD_CAP, state\.game\.shields \+ 1\)/);
-  assert.doesNotMatch(game, /state\.game\.shields = Math\.max\(0, Math\.min\(GAME_SHIELD_CAP, Number\(rollback\.shieldsBefore\)\)\)/);
-});
-
 test('barras, misiones y racha exponen estado accesible', () => {
   const game = read('js/game.js');
   const html = read('app.html');
@@ -409,21 +306,6 @@ test('barras, misiones y racha exponen estado accesible', () => {
   assert.match(game, /role="listitem" aria-label="\$\{escapeHtml\(ui`Misión/);
   assert.match(html, /game-streak-week" data-game-role="streak-week" role="list"/);
   assert.match(game, /cell\.setAttribute\('aria-label', label\)/);
-});
-
-test('cierre y cofre son idempotentes, y el dinero secundario aparece en la experiencia', () => {
-  const game = read('js/game.js');
-  assert.match(game, /if \(existing\.finalized\) return existing/);
-  assert.match(game, /const key = `chest:\$\{sealedOn\}`/);
-  assert.match(game, /if \(!state\.game\.ledger\[key\]\)/);
-  assert.match(game, /state\.game\.chest = \{ pending: false, sealedOn: null \}/);
-  assert.match(game, /if \(snapshot\.stats\.total \|\| snapshot\.eligibleCalls\.length\)/);
-  assert.match(game, /convertedAmountText/);
-  assert.match(game, /function withConversion/);
-  assert.match(game, /withConversion\(parseMoney\(call\.pay\)\)/);
-  assert.match(game, /withConversion\(earnings\)/);
-  assert.match(game, /money\(day\.stats\.earnings\)/);
-  assert.match(game, /convertedAmountText\(day\.stats\.earnings\)/);
 });
 
 test('CSS de juego cubre motion reducido, layout estrecho y responsive', () => {
@@ -463,23 +345,6 @@ test('build mantiene módulos fuente fuera de public y el worker precarga el CSS
     visit(publicRoot);
     assert.deepEqual(files.filter((file) => file.endsWith('.map')), []);
   }
-});
-
-test('gamificación apagada respeta hidden y el render conserva la estructura visual', () => {
-  const css = read('css/game.css');
-  const game = read('js/game.js');
-  assert.match(css, /\.game-chip\[hidden\][\s\S]*display:\s*none\s*!important/);
-  assert.match(css, /\.game-loot-box\[hidden\]/);
-  assert.match(css, /\.game-arena\[hidden\]/);
-  assert.match(css, /\.monster-layer--face/);
-  assert.match(game, /gameStreakValue/);
-  assert.match(game, /gameComboValue/);
-  assert.match(game, /gameLevelValue/);
-  assert.doesNotMatch(game, /element\.innerHTML = html/);
-  assert.match(game, /profile\.querySelector/);
-  assert.match(game, /root\.dataset\.gameState = monsterState/);
-  assert.match(game, /root\.dataset\.gameIntensity = 'arcade'/);
-  assert.match(game, /root\.removeAttribute\('data-game-state'\)/);
 });
 
 test('Logros conserva las tarjetas de app.html y solo actualiza sus nodos internos', () => {

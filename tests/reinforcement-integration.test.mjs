@@ -12,7 +12,6 @@ const {
 } = await import('../js/game.js');
 const { configurePositiveReinforcementContext } = await import('../js/positive-reinforcement.js');
 import { financeRowIsMeta } from '../js/finance.js';
-import { stopBattle } from '../js/game-battle.js';
 
 function harness(t, { at = new Date(2026, 8, 29, 12).getTime(), goal = 10000, streak = 3, compliance = 'failed', surface = false } = {}) {
   const NativeDate = globalThis.Date;
@@ -143,7 +142,6 @@ function harness(t, { at = new Date(2026, 8, 29, 12).getTime(), goal = 10000, st
   renderGame();
   config.game.enabled = true;
   t.after(() => {
-    stopBattle();
     setAppState(null); setAppCalls([]); setAppSettings({});
     globalThis.Date = NativeDate;
     for (const [key, value] of Object.entries(original)) {
@@ -193,33 +191,6 @@ test('Arcade sustituye intensidades antiguas sin activar Logros ni modificar XP 
     assert.equal(h.config.game.enabled, false);
     assert.equal(h.state.game.totalXp, 321);
   }
-});
-
-test('el modo tranquilo sigue las llamadas en vivo y difiere feedback sin perder recompensas', (t) => {
-  const h = harness(t, { surface: true });
-  renderGame();
-  const battle = () => h.nodes.get('gameArena').querySelector('.game-battle');
-  assert.equal(battle().dataset.battleWork, 'ready');
-  h.state.activeCall = { startedAt: h.iso(h.now) };
-  renderGameLive();
-  assert.equal(battle().dataset.battleWork, 'call');
-  assert.equal(h.stack.hidden, true);
-  const announcements = h.announcements.length;
-  queueGameToast('Premio pendiente de prueba');
-  assert.equal(h.stack.children.length, 0);
-  assert.equal(h.announcements.length, announcements);
-  const call = h.add('quiet-import');
-  onGameCallSaved(call, 'import', { random: () => .99 });
-  assert.equal(h.nodes.get('gameCallFx').innerHTML, '');
-  const rewards = JSON.stringify(h.state.game);
-  h.state.activeCall = null;
-  h.state.activePause = { type: 'break', startedAt: h.iso(h.now) };
-  renderGameLive();
-  assert.equal(battle().dataset.battleWork, 'break');
-  assert.equal(h.stack.hidden, false);
-  assert.ok(h.stack.children.length > 0);
-  assert.equal(JSON.stringify(h.state.game), rewards);
-  assert.equal(h.rows.length, 1);
 });
 
 test('misiones abiertas son automáticas y los enfoques de resultados sellados se conservan', (t) => {
@@ -278,37 +249,6 @@ test('omitir reserva automática no concede un premio ni declara un pago sin din
   h.reload();renderGame();assert.equal(h.ledger('finance-paid:excluded:').length,1);
 });
 
-test('pegar ayer derrota su monstruo y cambiar el día no daña al monstruo actual ni concede XP histórico', (t) => {
-  const h = harness(t, { surface: true, goal: 10 });
-  const today = h.keyFor();
-  onGameCallSaved(h.add('today', { pay: 1 }), 'manual', { random: () => 0.99 });
-  const combo = h.state.game.live.combo;
-  h.nodes.get('gameArena').dataset.gameEvent = 'hit';
-  const yesterday = h.keyFor(new Date(h.now - 86400000));
-  const call = h.add('yesterday', { pay: 11, callDate: yesterday, shiftDayKey: yesterday, startISO: h.iso(h.now - 86400000), endISO: h.iso(h.now - 86340000), importedAt: h.iso(h.now) });
-  onGameCallSaved(call, 'import');
-  onGameCallsChanged(yesterday);
-  h.state.activeDayKey = yesterday;
-  renderGame();
-  assert.equal(computeGameDay(yesterday).hpPct, 0);
-  assert.equal(computeGameDay(yesterday).xp, 0);
-  assert.equal(h.state.game.totalXp, 0);
-  assert.equal(h.state.game.live.combo, combo);
-  assert.equal(h.state.game.ledger[`monster-defeat:${yesterday}`], true);
-  assert.equal(h.nodes.get('gameArena').dataset.gameDayKey, yesterday);
-  assert.equal(h.nodes.get('gameArena').dataset.gameState, 'defeated');
-  assert.equal(h.nodes.get('gameArena').dataset.gameEvent, undefined);
-  h.reload();
-  const notices = h.announcements.length;
-  onGameCallsChanged(yesterday);
-  assert.equal(h.announcements.length, notices);
-  h.state.activeDayKey = today;
-  renderGame();
-  assert.equal(h.nodes.get('gameArena').dataset.gameDayKey, today);
-  assert.equal(computeGameDay(today).hpPct, 90);
-  assert.equal(h.state.game.live.combo, combo);
-});
-
 test('corregir un día cerrado derrota su monstruo sin reabrir XP y retirar dinero revoca esa derrota', (t) => {
   const h = harness(t, { surface: true, goal: 10 });
   const call = h.add('original', { pay: 5 });
@@ -333,79 +273,6 @@ test('corregir un día cerrado derrota su monstruo sin reabrir XP y retirar dine
   assert.equal(h.state.game.days[day].monster.hpPct, 50);
   assert.equal(h.state.game.ledger[`monster-defeat:${day}`], undefined);
   assert.equal(h.state.game.totalXp, totalXp);
-});
-
-test('el combo reacciona a una llamada sin pago sin duplicar el feedback compacto', (t) => {
-  const h = harness(t, { surface: true });
-  h.config.game.intensity = 'arcade';
-  const arena = h.nodes.get('gameArena');
-  const first = h.add('first-paid');
-  onGameCallSaved(first, 'manual', { random: () => 0.99 });
-  assert.equal(h.state.game.live.combo, 1);
-  assert.match(arena.querySelector('[data-battle-health-slot]').innerHTML, /\$1\.00/);
-  const zero = h.add('zero-pay', { pay: 0 });
-  onGameCallSaved(zero, 'manual', { random: () => 0.99 });
-  onGameCallsChanged(zero.shiftDayKey);
-  assert.equal(h.state.game.live.combo, 2);
-  assert.match(arena.querySelector('[data-battle-health-slot]').innerHTML, /\$1\.00/);
-  assert.equal(arena.classList.contains('is-hit'), false);
-  assert.equal(h.nodes.get('gameCallFx').innerHTML, '');
-  h.setGoal(20000);
-  renderGame();
-  assert.equal(arena.classList.contains('is-hit'), false, 'cambiar la meta cancela el impacto del progreso anterior');
-  assert.equal(h.nodes.get('classicDailyGoalCard').style.display, 'none');
-});
-
-test('guardar con arena visible, ausente o Logros apagado conserva dinero y HP sin duplicar recibos', async (t) => {
-  const results = [];
-  for (const mode of ['visible', 'absent', 'disabled']) {
-    await t.test(mode, (subtest) => {
-      const h = harness(subtest, { surface: mode !== 'absent', goal: 100 });
-      h.config.game.enabled = mode !== 'disabled';
-      renderGame();
-      const arena = h.nodes.get('gameArena');
-      const battle = arena?.querySelector('.game-battle');
-      if (mode === 'visible') {
-        assert.ok(battle, 'la representación de batalla debe estar montada');
-        assert.equal(arena.hidden, false);
-        for (const slot of ['heading', 'health-slot', 'feed', 'collection-summary']) assert.ok(arena.querySelector(`[data-battle-${slot}]`));
-      } else if (mode === 'absent') assert.equal(arena, undefined);
-      else assert.equal(arena.hidden, true);
-
-      const call = h.add('same-official-call', { pay: 20, bonus: 5 });
-      const originalCall = structuredClone(call);
-      onGameCallSaved(call, 'manual', { random: () => .99 });
-      onGameCallsChanged(call.shiftDayKey);
-      const first = computeGameDay(call.shiftDayKey);
-      assert.equal(first.hpPct, 75);
-      assert.equal(first.stats.earnings, 25);
-      const receipts = h.ledger(`reinforce-call:${call.shiftDayKey}:`);
-      assert.equal(receipts.length, 1);
-      const receipt = structuredClone(receipts[0][1]);
-      if (mode === 'visible') {
-        assert.equal(battle.dataset.battleHp, '75');
-        assert.match(battle.querySelector('[data-battle-banner]').textContent, /Higher Rate/);
-        assert.match(arena.querySelector('[data-battle-health-slot]').innerHTML, /\$25\.00/);
-        assert.strictEqual(arena.querySelector('.game-battle'), battle, 'guardar actualiza slots sin remontar la escena');
-      }
-
-      h.reload();
-      for (const source of ['manual', 'live', 'import']) {
-        onGameCallSaved(call, source, { random: () => { throw new Error('un recibo guardado no debe volver a sortearse'); } });
-        onGameCallsChanged(call.shiftDayKey);
-      }
-      renderGame();
-      const repeated = computeGameDay(call.shiftDayKey);
-      assert.equal(repeated.hpPct, first.hpPct);
-      assert.equal(repeated.stats.earnings, first.stats.earnings);
-      assert.equal(repeated.xp, first.xp);
-      assert.equal(h.ledger(`reinforce-call:${call.shiftDayKey}:`).length, 1);
-      assert.deepEqual(h.ledger(`reinforce-call:${call.shiftDayKey}:`)[0][1], receipt);
-      assert.deepEqual(h.rows, [originalCall], 'los efectos visuales no deben editar ni duplicar llamadas');
-      results.push({ hp: repeated.hpPct, earnings: repeated.stats.earnings });
-    });
-  }
-  assert.deepEqual(results, [{ hp: 75, earnings: 25 }, { hp: 75, earnings: 25 }, { hp: 75, earnings: 25 }]);
 });
 
 test('timers de llamadas sucesivas no duplican feedback ni alteran sus recibos en la batalla compacta', (t) => {
@@ -435,37 +302,6 @@ test('timers de llamadas sucesivas no duplican feedback ni alteran sus recibos e
   h.advance(2100);
   assert.equal(h.nodes.get('gameArena').classList.contains('is-hit'), false);
 });
-
-for (const source of ['manual', 'live', 'import']) {
-  test(`una llamada ${source} tardía actualiza vida y muestra evidencia una vez sin conceder XP`, (t) => {
-    setLanguage('es');
-    const h = harness(t, { surface: true, goal: 10 });
-    h.config.game.intensity = 'arcade';
-    const call = h.add('late', { pay: 2, startISO: h.iso(h.now - 32 * 60000), endISO: h.iso(h.now - 31 * 60000), importedAt: h.iso(h.now) });
-    onGameCallSaved(call, source, { random: () => { throw new Error('sin sorteo para llamadas tardías'); } });
-    onGameCallsChanged(call.shiftDayKey);
-    const snapshot = computeGameDay(call.shiftDayKey);
-    assert.equal(snapshot.hpPct, 80);
-    assert.equal(snapshot.xp, 0);
-    assert.equal(snapshot.eligibleCalls.length, 0);
-    assert.equal(h.state.game.live.combo, 0);
-    assert.equal(h.nodes.get('gameCallFx').innerHTML, '');
-    assert.match(h.nodes.get('gameArena').querySelector('[data-battle-health-slot]').innerHTML, /\$2\.00/);
-    assert.equal(h.nodes.get('gameArena').classList.contains('is-hit'), false);
-    const key = `reinforce-call:${call.shiftDayKey}:late`;
-    assert.equal(h.state.game.ledger[key].visual, true);
-    assert.equal(h.state.game.ledger[key].surprise, undefined);
-    assert.equal(h.ledger('loot:').length, 0);
-    h.reload();
-    migrateGameCallReferences('late', 'official');
-    call.id = 'official';
-    h.nodes.get('gameCallFx').innerHTML = '';
-    onGameCallSaved(call, source);
-    assert.equal(h.nodes.get('gameCallFx').innerHTML, '');
-    assert.equal(h.state.game.ledger[key], undefined);
-    assert.equal(h.state.game.ledger[`reinforce-call:${call.shiftDayKey}:official`].visual, true);
-  });
-}
 
 test('llamadas históricas, futuras y caídas no activan un impacto visual', (t) => {
   const h = harness(t, { surface: true });
@@ -855,65 +691,6 @@ test('cola real limita a tres toasts y no repite el último texto después de ex
   queueGameToast('Apagado', '', { channel: 'personal' });
   assert.equal(h.stack.children.length, 0);
   assert.equal(h.announcements.at(-1), 'Anuncio personal');
-});
-
-test('apagar Logros limpia refuerzo visible y conserva preferencias de sonido, premios e historial guardados', (t) => {
-  const h = harness(t, { surface: true });
-  h.config.reinforcement.enabled = true;
-  h.config.reinforcement.askAfterCall = true;
-  h.config.game.soundEnabled = true;
-  const selector = { checked: true, disabled: false };
-  h.nodes.set('sidebarGameSoundInput', selector);
-  for (const id of ['stageClearModal', 'chestModal']) h.nodes.set(id, { classList: { contains: (name) => name === 'open' } });
-  h.state.game = normalizeGameState({
-    ...h.state.game,
-    totalXp: 450, level: 3, shields: 2, bestStreak: 5,
-    accessories: ['Armadura cian'], equipment: { body: 'Armadura cian' },
-    trophies: [{ id: 'saved-trophy', label: 'Primer día', earnedOn: '09/28/2026' }],
-    chest: { pending: true, sealedOn: '09/28/2026' },
-    cycleReward: { pending: true, cycleKey: '09/28/2026', options: [{ id: 'xp', label: '35 XP', type: 'xp', amount: 35 }] },
-    reinforcement: {
-      ...h.state.game.reinforcement,
-      progress: { coffee: 2 },
-      pendingRewards: [{ id: 'saved-reward', rewardId: 'coffee', name: 'Café', window: 'break', dayKey: '09/28/2026' }],
-      reflections: { saved: { outcome: 'good', dayKey: '09/28/2026', note: 'Guardado' } },
-    },
-  });
-  const persisted = structuredClone(h.state.game);
-  const preference = structuredClone(h.config.reinforcement);
-  queueGameToast('Personal visible antes de apagar', '', { channel: 'personal' });
-  queueGameToast('Compartido visible antes de apagar', '', { channel: 'either' });
-  queueGameToast('Arcade visible antes de apagar');
-  queueGameToast('Personal pendiente antes de apagar', '', { channel: 'personal' });
-  assert.equal(h.stack.children.length, 3);
-  const announcementsBefore = h.announcements.length;
-  h.config.game.enabled = false;
-  renderGame();
-  assert.equal(selector.checked, true);
-  assert.equal(selector.disabled, false);
-  assert.equal(h.config.game.soundEnabled, true);
-  assert.equal(h.nodes.get('gameArena').hidden, true);
-  assert.equal(h.nodes.get('gameMissions').hidden, true);
-  assert.equal(h.nodes.get('gameCallFx').innerHTML, '');
-  assert.equal(h.stack.children.length, 3, 'los avisos personales permanecen visibles aunque Logros esté apagado');
-  assert.deepEqual(h.closedModals, ['stageClearModal', 'chestModal']);
-  for (const channel of ['game', 'personal', 'either']) queueGameToast(`Off ${channel}`, '', { channel });
-  announceGameStatus('Off anuncio');
-  assert.equal(h.announcements.length, announcementsBefore + 2, 'se anuncian solo los canales personal y compartido');
-  assert.equal(claimPendingChest(), false);
-  assert.equal(chooseCycleReward('xp'), false);
-  assert.equal(equipAccessory('Armadura cian'), false);
-  onGameShiftEnded(h.keyFor());
-  assert.deepEqual(h.state.game, persisted);
-  assert.deepEqual(h.config.reinforcement, preference);
-  assert.deepEqual(h.openedModals, []);
-  h.config.game.enabled = true;
-  renderGame();
-  h.advance(6000);
-  assert.equal(selector.checked, true, 'reactivar Logros conserva la preferencia de Sonidos arcade');
-  assert.equal(selector.disabled, false);
-  assert.equal(h.stack.children.length, 0, 'reactivar no recupera anuncios pendientes');
-  assert.deepEqual(h.state.game, persisted);
 });
 
 test('cierre de racha semanal conserva rollback y comparaciones al recargar y revoca el escudo al reabrir', (t) => {

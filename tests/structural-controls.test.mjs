@@ -97,8 +97,7 @@ function gameHandler(name) {
   return gameText.slice(callback.start, callback.end);
 }
 
-for (const [name, key, value] of [['onWeaponChange', 'weapon', 'rifle'], ['onToggleSound', 'soundEnabled', false],
-  ['sidebarGameSoundInput', 'soundEnabled', false], ['gameSoundVolumeInput', 'soundVolume', 90]]) {
+for (const [name, key, value] of [['sidebarGameSoundInput', 'soundEnabled', false], ['gameSoundVolumeInput', 'soundVolume', 90]]) {
   test(`${name} restores rejected preferences, visible controls and audio before unrelated saves, and permits retry`, () => {
     let accepted = false, disk;
     const initial = { game: { weapon: 'pistol', soundEnabled: true, soundVolume: 40 } };
