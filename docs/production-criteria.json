@@ -1161,6 +1161,12 @@
           ]
         },
         {
+          "file": "tests/action-bar-halves.test.mjs",
+          "namedCases": [
+            "Barra de acciones: los botones de turno y los de llamadas se centran cada uno en su mitad"
+          ]
+        },
+        {
           "file": "tests/freelancer-blocks-list.test.mjs",
           "namedCases": [
             "Bloques del día en freelancer: cada descanso es una fila con etiqueta, horas y minutos",
