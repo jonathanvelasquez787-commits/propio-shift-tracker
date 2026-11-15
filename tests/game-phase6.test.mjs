@@ -251,7 +251,7 @@ test('tercera simulación mensual: pegar llamadas de hoy vuelve a auto iniciar e
 test('runtime smoke: la página de historial positivo y Higher Rate siguen conectados', () => {
   const appMain = read('js/app-main.js');
   const higherRate = read('js/higher-rate.js');
-  assert.match(appMain, /if \(page === 'achievements'\) renderGame\(\)/);
+  assert.match(appMain, /if \(page === 'positive'\) renderGame\(\)/);
   assert.match(higherRate, /export async function addHigherRateWindowRow\(\)/);
   assert.match(higherRate, /saveHigherRateWindowsFromEditor\(\)/);
 });
