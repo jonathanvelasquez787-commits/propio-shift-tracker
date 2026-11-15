@@ -1232,6 +1232,13 @@
           ]
         },
         {
+          "file": "tests/game-collection-floats-in-bar.test.mjs",
+          "namedCases": [
+            "con el juego en la barra, lo que abre Logros sale como panel flotante y no agranda la barra",
+            "el panel flotante no queda recortado ni tapado por las tarjetas de abajo"
+          ]
+        },
+        {
           "file": "tests/freelancer-blocks-list.test.mjs",
           "namedCases": [
             "Bloques del día en freelancer: cada descanso es una fila con etiqueta, horas y minutos",
