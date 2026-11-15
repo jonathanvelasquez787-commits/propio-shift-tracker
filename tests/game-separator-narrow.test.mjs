@@ -18,7 +18,7 @@ test('en escritorio hay una línea doble entre los botones y el reto de hoy, y e
 test('en celular el reto mide lo mismo de ancho que la barra de botones, sin línea y sin pegarse arriba', () => {
   assert.ok(block.includes('@media (max-width: 760px)'));
   assert.ok(block.includes('.hero-shift-game-sep { display: none; }'));
-  assert.ok(block.includes('#gameHomeDay { margin-left: 15px; margin-right: 15px; }'));
+  assert.ok(block.includes('#gameHomeDay { margin-left: 15px; margin-right: 15px; margin-bottom: 12px; }'));
   assert.ok(!block.includes('position: sticky'));
   assert.ok(!block.includes('position: fixed'));
 });
