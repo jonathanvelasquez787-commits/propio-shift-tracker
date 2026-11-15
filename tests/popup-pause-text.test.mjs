@@ -38,7 +38,6 @@ test('popup: los textos de Más opciones son cortos', () => {
   assert.ok(!html.includes('Se detienen los iniciadores'));
   assert.ok(!html.includes('El permiso de la nube vence'));
   assert.ok(!html.includes('Estos números cuentan'));
-  assert.ok(html.includes('Se detiene el ponerte disponible. Para volver, apagá la pausa.'));
   assert.ok(html.includes('Elegí páginas, perfil y tamaños.'));
 });
 
@@ -47,4 +46,11 @@ test('popup: ya no tiene "Solo registrar en esta PC" ni "Cómo funciona la esper
     assert.ok(!html.includes(text), `${text} ya no está en el popup`);
   }
   assert.ok(!popupJs.includes('devicePassive') && !popupJs.includes('prepareStatus'));
+});
+
+test('popup: ya no tiene la tarjeta "Más sobre la disponibilidad"', () => {
+  for (const text of ['Más sobre la disponibilidad', 'Qué se pausa y cómo volver', 'Más opciones de disponibilidad']) {
+    assert.ok(!html.includes(text), `${text} ya no está en el popup`);
+  }
+  assert.ok(html.includes('id="moreOptions"') && html.includes('aria-label="Actividad y ayuda"'));
 });
