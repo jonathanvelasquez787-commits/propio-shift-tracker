@@ -54,6 +54,7 @@ export function wirePresentation({ getSettings, save, apply }, doc = document) {
     const button = event.target.closest?.('.sched-help-wrap button[aria-describedby]');
     if (button?.closest('.game-help-wrap')) return;
     if (button && !button.closest('.sched-help-wrap')?.querySelector('[role="tooltip"]')) return;
+    if (button?.closest('summary')) event.preventDefault?.();
     const open = doc.querySelector('.sched-help-wrap.is-help-open');
     const wrap = button?.closest('.sched-help-wrap');
     if (open && open !== wrap) { open.classList.remove('is-help-open'); open.classList.add('is-help-dismissed'); open.querySelector('button')?.setAttribute('aria-expanded', 'false'); }
