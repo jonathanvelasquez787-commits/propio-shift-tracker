@@ -230,3 +230,13 @@
 .game-battle-collection-foot small { color: var(--muted); font-size: 11px; line-height: 1.4; }
 .game-battle-collection-foot small:empty { display: none; }
 .game-battle-collection .game-battle-collection-foot button { min-height: 0; margin-left: auto; padding: 4px 0; border: 0; background: transparent; color: var(--cyan); font-size: 12px; }
+
+/* disparo de practica */
+.game-battle-free-shot { color: var(--text) !important; font-weight: 600; padding-left: 0 !important; }
+.game-battle-free-shot:disabled { opacity: .45; }
+.game-battle-stun { display: block; flex: 0 1 44px; margin-right: auto; min-width: 24px; height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.game-battle-stun i { display: block; height: 100%; width: 0; background: var(--gold, #ffd84a); transition: width .15s; }
+.game-battle[data-battle-dizzy="true"] [data-battle-monster] { animation: gameBattleDizzy 1.6s ease-in-out; }
+@keyframes gameBattleDizzy { 0%, 100% { rotate: 0deg; } 25% { rotate: -10deg; } 50% { rotate: 8deg; } 75% { rotate: -5deg; } }
+@media (prefers-reduced-motion: reduce) { .game-battle[data-battle-dizzy="true"] [data-battle-monster] { animation: none; } }
+/* fin disparo de practica */
