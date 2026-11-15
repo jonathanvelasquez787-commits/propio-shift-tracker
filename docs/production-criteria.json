@@ -888,7 +888,8 @@
         "js/i18n.js",
         "js/i18n-key.js",
         "js/help-tooltips.js",
-        "js/guide-theme.js"
+        "js/guide-theme.js",
+        "css/app-shell.css"
       ],
       "tests": [
         {
@@ -1058,6 +1059,13 @@
           "file": "tests/finance-category-language.test.mjs",
           "namedCases": [
             "expense and savings category IDs remain valid while the form labels change language"
+          ]
+        },
+        {
+          "file": "tests/boot-gate-theme.test.mjs",
+          "namedCases": [
+            "boot gate follows the colors of non-original themes",
+            "boot gate keeps its own colors for the original theme"
           ]
         }
       ]
