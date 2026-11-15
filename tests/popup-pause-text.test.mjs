@@ -8,6 +8,6 @@ test('popup: "Pausar disponibilidad automática" se explica sin jerga', () => {
   const start = html.indexOf('for="availabilityPaused"');
   const row = html.slice(start, html.indexOf('</label>', start));
   assert.ok(row.includes('Pausar disponibilidad automática'));
-  assert.ok(row.includes('Pausa el ponerte disponible. No pausa el guardado de llamadas.'));
+  assert.ok(row.includes('Si la encendés, pausa el ponerte disponible. No pausa el guardado de llamadas.'));
   assert.ok(!row.includes('Start Calls'), 'el texto de ayuda ya no menciona Start Calls');
 });
