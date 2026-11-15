@@ -1390,7 +1390,7 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 /* botones barra escritorio */
 /* Solo en escritorio los botones de la barra de acciones son mas anchos (108 x 46, antes 72 x 46); la altura no cambia. En celular siguen chicos. */
 @media (min-width: 761px) {
-  .chips > .hero-shift-actions { gap: clamp(8px, 1.5vw, 20px); padding: 10px 16px; } /* barra-acciones-espacio */
+  .chips > .hero-shift-actions { gap: clamp(8px, 1.5vw, 20px); padding: 2px 16px; } /* barra-acciones-espacio */
   .chips > .hero-shift-actions .action-slot { flex: 0 0 auto; width: 108px; }
   .chips > .hero-shift-actions .action-slot > :is(#shiftControlBtn,#breakControlBtn,#lunchControlBtn,#liveDiscardBtn,#callControlBtn,#pasteCallsBtn,#addCallManualBtn) { min-height: 46px; padding: 4px 2px; }
   .chips > .hero-shift-actions .action-slot > :is(#shiftControlBtn,#breakControlBtn,#lunchControlBtn,#liveDiscardBtn,#callControlBtn,#pasteCallsBtn,#addCallManualBtn) .action-icon-wrap { width: 24px; height: 24px; }
