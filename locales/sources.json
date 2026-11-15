@@ -5809,6 +5809,12 @@
       "js/app-main.js"
     ]
   },
+  "s_6e88192f": {
+    "source": "Cambiar de lado los botones",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_6e9d9aee": {
     "source": "{{v5}} {{v6}}: +{{v7}}{{v8}}",
     "files": [

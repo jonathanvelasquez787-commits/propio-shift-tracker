@@ -1136,6 +1136,14 @@
             "barra de acciones: en escritorio la barra es más delgada (2 px arriba y abajo)",
             "barra de acciones: en celular la barra es más delgada (2 px arriba y abajo)"
           ]
+        },
+        {
+          "file": "tests/action-bar-swap.test.mjs",
+          "namedCases": [
+            "barra de acciones: la raya del medio es un botón que cambia los botones de lado",
+            "barra de acciones: el lado elegido se guarda en los ajustes",
+            "barra de acciones: cambiada, las llamadas van a la izquierda y el turno a la derecha"
+          ]
         }
       ]
     },
