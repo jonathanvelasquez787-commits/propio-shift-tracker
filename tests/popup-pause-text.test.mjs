@@ -39,6 +39,12 @@ test('popup: los textos de Más opciones son cortos', () => {
   assert.ok(!html.includes('El permiso de la nube vence'));
   assert.ok(!html.includes('Estos números cuentan'));
   assert.ok(html.includes('Se detiene el ponerte disponible. Para volver, apagá la pausa.'));
-  assert.ok(html.includes('Guarda llamadas, pero no te pone disponible.'));
   assert.ok(html.includes('Elegí páginas, perfil y tamaños.'));
+});
+
+test('popup: ya no tiene "Solo registrar en esta PC" ni "Cómo funciona la espera"', () => {
+  for (const text of ['Solo registrar en esta PC', 'devicePassive', 'Para cambiar de PC', 'prepareStatus', 'Cómo funciona la espera']) {
+    assert.ok(!html.includes(text), `${text} ya no está en el popup`);
+  }
+  assert.ok(!popupJs.includes('devicePassive') && !popupJs.includes('prepareStatus'));
 });
