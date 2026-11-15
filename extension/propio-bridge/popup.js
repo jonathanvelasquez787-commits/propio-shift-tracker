@@ -79,8 +79,6 @@ async function refresh() {
   document.getElementById('portalStatus').textContent = !state.paired ? 'Esperando tu sesión en Propio Shift Tracker para vincularla automáticamente. La vista original funciona por separado.' : state.portal === 'authenticated' ? `Sesión reconocida. ${callStatus}` : state.portal === 'logged-out' ? 'Cierre de sesión confirmado en Propio.' : 'Abrí Propio para reconocer tu sesión.';
   toggle.checked = state.mode === 'auto'; toggle.disabled = busy || !state.paired;
   const prep = state.preparation, prepToggle = document.getElementById('prepareFirst');
-  document.getElementById('devicePassive').checked = prep?.devicePassive === true;
-  document.getElementById('devicePassive').disabled = busy;
   document.getElementById('availabilityPaused').checked = prep?.availabilityPaused === true;
   document.getElementById('availabilityPaused').disabled = busy || !state.paired;
   const resumeBtn = document.getElementById('resumeAvailability');
@@ -112,17 +110,6 @@ async function refresh() {
   const refreshTracker = document.getElementById('refreshTracker');
   refreshTracker.hidden = !state.paired || !plan || (plan.scheduleVerified === true && !(spacing.enabled && plan.acwVerified === false));
   refreshTracker.disabled = busy || state.active || state.call === 'connected' || state.call === 'incoming';
-  const plannedPause = plan?.scheduledPauses?.filter(slot => Date.now() >= Date.parse(slot.startedAt) && Date.now() < Date.parse(slot.endedAt))
-    .sort((a, b) => Date.parse(b.endedAt) - Date.parse(a.endedAt))[0];
-  document.getElementById('prepareStatus').textContent = !prep?.enabled ? 'Apagado. Para empezar, pulsá Start Calls en Propio.'
-    : state.mode !== 'auto' ? 'Activá «Registrar mi actividad» para usar esta opción.'
-    : !plan ? 'Esperando un horario de trabajo de Propio Shift Tracker. En día libre no se activa.'
-    : !plan.scheduleVerified ? 'La conexión de esta pestaña todavía no confirma tus descansos. Actualizá Propio Shift Tracker para reconectarlo.'
-    : plan.ended || Date.now() >= Date.parse(plan.endAt) ? 'Tu turno terminó. Esperará al siguiente.'
-    : prep.doneFor === plan.startAt || plan.hasCall ? 'El arranque de este turno ya terminó. La opción queda encendida para el siguiente turno.'
-    : plannedPause ? `Ahora corresponde ${plannedPause.type === 'lunch' ? 'Lunch' : 'Break'}. Esperará hasta ${new Date(plannedPause.endedAt).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })} para empezar.`
-    : Date.now() < Date.parse(plan.startAt) ? `Esperará hasta ${new Date(plan.startAt).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })} para ponerte disponible.`
-    : 'Tu turno ya empezó. Te pondrá disponible hasta que conectés tu primera llamada.';
   const reinforcement = prep?.reinforcement || { celebrate: false, ask: false };
   for (const [id, key] of [['bridgeCelebrate', 'celebrate'], ['bridgeAsk', 'ask']]) {
     const input = document.getElementById(id); input.checked = reinforcement[key] === true; input.disabled = busy || !state.paired || !prep?.reinforcement;
@@ -175,7 +162,6 @@ document.getElementById('resumeAvailability').addEventListener('click', () => ac
 document.getElementById('automatic').addEventListener('change', event => act({ kind: 'mode', mode: event.target.checked ? 'auto' : 'observe' }));
 document.getElementById('prepareFirst').addEventListener('change', event => act({ kind: 'prepare-first', enabled: event.target.checked }));
 document.getElementById('availabilityPaused').addEventListener('change', event => act({ kind: 'pause-availability', paused: event.target.checked }));
-document.getElementById('devicePassive').addEventListener('change', event => act({ kind: 'device-passive', enabled: event.target.checked }));
 document.getElementById('refreshTracker').addEventListener('click', () => act({ kind: 'refresh-tracker' }));
 const saveSpacing = () => act({ kind: 'spacing', enabled: document.getElementById('spacingEnabled').checked, minutes: Number(document.getElementById('spacingMinutes').value) });
 document.getElementById('spacingEnabled').addEventListener('change', saveSpacing);

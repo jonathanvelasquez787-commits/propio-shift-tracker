@@ -13,7 +13,7 @@ test('popup de la extensión: estado, registro y disponibilidad a la vista; el r
     'resumeBreak', 'resumeLunch', 'resumeMode', 'spacingEnabled', 'spacingSummary', 'spacingMinutes', 'availabilityStatus', 'originalLayout', 'portalDark', 'open']) {
     assert.ok(visible.includes(`id="${id}"`), `#${id} está a la vista`);
   }
-  for (const id of ['devicePassive', 'automationPanel', 'signals', 'technicalDetails', 'reviewed']) {
+  for (const id of ['automationPanel', 'signals', 'technicalDetails', 'reviewed']) {
     assert.ok(more.includes(`id="${id}"`), `#${id} queda dentro de "Más opciones"`);
     assert.ok(!visible.includes(`id="${id}"`), `#${id} ya no está a la vista`);
   }
