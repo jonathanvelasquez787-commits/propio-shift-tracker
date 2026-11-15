@@ -32,3 +32,13 @@ test('barra de acciones: en escritorio la barra es más delgada (2 px arriba y a
   assert.match(block, /\.action-slot \{ flex: 0 0 auto; width: 108px; \}/, 'los botones no cambian de ancho');
   assert.match(block, /min-height: 46px/, 'los botones no cambian de alto');
 });
+
+test('barra de acciones: en celular la barra es más delgada (2 px arriba y abajo)', () => {
+  const i = css.indexOf('/* barra delgada celular */');
+  const cell = css.slice(i, css.indexOf('/* fin barra delgada celular */'));
+  assert.ok(i > 0 && cell.length > 50, 'existe el bloque de celular');
+  assert.match(cell, /@media \(max-width: 760px\)/, 'solo en celular');
+  assert.match(cell, /\.chips > \.hero-shift-actions \{ padding-block: 2px; \}/, 'poco espacio arriba y abajo');
+  assert.match(cell, /\.hero-shift-sep \{ height: 34px; \}/, 'la raya del medio mide lo mismo que los botones');
+  assert.match(css, /min-height: 34px; padding: 2px; \}/, 'los botones de celular no cambian de alto');
+});

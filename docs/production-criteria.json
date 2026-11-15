@@ -1133,7 +1133,8 @@
             "barra de acciones: en escritorio hay más espacio entre botones, con tope",
             "barra de acciones: el celular conserva su separación",
             "barra de acciones: en escritorio los botones son más anchos (108 px) y la altura no cambia",
-            "barra de acciones: en escritorio la barra es más delgada (2 px arriba y abajo)"
+            "barra de acciones: en escritorio la barra es más delgada (2 px arriba y abajo)",
+            "barra de acciones: en celular la barra es más delgada (2 px arriba y abajo)"
           ]
         }
       ]
