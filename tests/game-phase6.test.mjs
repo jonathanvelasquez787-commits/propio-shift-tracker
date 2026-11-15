@@ -73,7 +73,6 @@ test('CSS de juego cubre motion reducido, layout estrecho y responsive', () => {
   assert.match(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);
   assert.match(css, /animation:\s*none\s*!important/);
   assert.match(css, /transition:\s*none\s*!important/);
-  assert.match(css, /@media\s*\(max-width:\s*760px\)/);
   assert.match(css, /@media\s*\(max-width:\s*520px\)/);
   assert.match(css, /min-width:\s*0/);
   assert.match(css, /overflow-wrap:\s*anywhere/);

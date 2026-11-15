@@ -1,6 +1,6 @@
 export const PALETTES = [
   { id:'original',name:'Original',description:'Los colores actuales de la aplicación',colors:['#0D1230','#2FD5FF','#FFFFFF','#6366F1'],modes:{ light:'Original Claro',dark:'Azul Oscuro' } },
-  { id:'graphite',name:'Negro Grafito',description:'Cambia solo los tres negros de fondo',colors:['#09090B','#131315','#1E1E22','#A1A1AA'],lightAccent:3,darkAccent:3,secondary:3,gameBody:'#6366F1',modes:{ dark:'Negro Grafito' } },
+  { id:'graphite',name:'Negro Grafito',description:'Cambia solo los tres negros de fondo',colors:['#09090B','#131315','#1E1E22','#A1A1AA'],lightAccent:3,darkAccent:3,secondary:3,modes:{ dark:'Negro Grafito' } },
   { id:'lavender',name:'Lavanda Pastel',description:'Lavanda, celeste y menta',colors:['#9FA1FF','#B5BAFF','#AEE2FF','#D9F9DF'],code:'9fa1ffb5baffaee2ffd9f9df',lightAccent:0,darkAccent:2,secondary:1,lightBackground:3,muted:{ light:'#576479',dark:'#9DABC8' },modes:{ light:'Lavanda Suave',dark:'Lavanda Nocturna' } },
   { id:'royal',name:'Azul Real',description:'Azul noche, intenso y celeste',colors:['#091540','#1B2CC1','#7692FF','#ABD2FA'],code:'0915401b2cc17692ffabd2fa',lightAccent:1,darkAccent:2,secondary:2,lightBackground:3,muted:{ light:'#556277' },modes:{ light:'Cielo Azul',dark:'Azul Medianoche' } },
   { id:'ocean',name:'Turquesa Profundo',description:'Turquesa, azul y violeta',colors:['#78B9B5','#0F828C','#065084','#320A6B'],code:'78b9b50f828c065084320a6b',lightAccent:1,darkAccent:0,secondary:3,lightBackground:0,muted:{ light:'#546176' },modes:{ light:'Brisa Turquesa',dark:'Mar Profundo' } },
@@ -34,7 +34,7 @@ const ORIGINAL_ACCENTS = {
   dark: { accent:'#2FD5FF', secondary:'#8B7BFF', blue:'#7D8CFF', good:'#66E2A5', warn:'#FFD15C', bad:'#FF6B72' },
   light: { accent:'#6366F1', secondary:'#7C3AED', blue:'#A855F7', good:'#22C55E', warn:'#F97316', bad:'#DC2626' },
 };
-const SURFACE_ONLY_KEEP = /^--(bg|bg-2|bg-page|bg-card|panel|panel-navy|panel-2|accordion-bg|primary-light|btn-secondary-bg|surface-control|surface-sunken|palette-.+|game-pixel-.+|liquid-.+|rail-.+)$/;
+const SURFACE_ONLY_KEEP = /^--(bg|bg-2|bg-page|bg-card|panel|panel-navy|panel-2|accordion-bg|primary-light|btn-secondary-bg|surface-control|surface-sunken|palette-.+|liquid-.+|rail-.+)$/;
 export function paletteTokens(palette,mode) {
   if(palette.id==='original')return {};
   const light=mode==='light',colors=palette.colors;
@@ -66,10 +66,6 @@ export function paletteTokens(palette,mode) {
     '--shadow':light?'0 4px 18px rgba(20,25,45,.09)':'0 6px 22px rgba(0,0,0,.18)',
     '--shadow-soft':light?'0 2px 8px rgba(20,25,45,.04)':'0 3px 10px rgba(0,0,0,.1)',
     '--shadow-active':'0 0 0 2px '+mix(raw,panel,.25),
-    '--game-pixel-ink':light?mix(deep,'#11131b',.55):background,
-    '--game-pixel-body':palette.gameBody||colors[light?palette.lightAccent:palette.darkAccent],
-    '--game-pixel-highlight':mix(raw,'#ffffff',.55),'--game-pixel-shade':mix(raw,deep,.4),
-    '--game-pixel-floor':mix(raw,panel,.14),'--game-pixel-good':good,'--game-pixel-good-text':good,
     '--tier-gold':warn,'--tier-bronze':light?'#a45e24':'#ffc397','--tier-silver':muted,
     '--gradient-logo':`linear-gradient(135deg,${raw},${colors[palette.secondary]})`
   };

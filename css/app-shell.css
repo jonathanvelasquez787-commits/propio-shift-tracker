@@ -694,7 +694,6 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 
 .acw-day-pair { display: contents; }
 .acw-label-short { display: none; }
-.chips .game-chip { order: 1; }
 .chips .summary-pill { order: 2; }
 .chips > .hero-shift-actions { order: 0; margin-left: 0; }
 .hero-shift-title { display: none; }
