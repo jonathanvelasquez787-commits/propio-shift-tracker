@@ -1114,6 +1114,13 @@
           ]
         },
         {
+          "file": "tests/game-missions-row.test.mjs",
+          "namedCases": [
+            "Logros: la fila Misiones pone título y número arriba y el aviso de armaduras debajo, sin encimarse",
+            "Logros: la fila Misiones conserva su contenido (título, conteo y armaduras pendientes)"
+          ]
+        },
+        {
           "file": "tests/game-progress-card-compact.test.mjs",
           "namedCases": [
             "Logros en celular: Nivel y XP van en una línea, sin el círculo con el número",
