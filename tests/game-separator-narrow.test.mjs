@@ -28,3 +28,9 @@ test('la línea se mide contra un botón y se vuelve a medir cuando cambia el ta
   assert.ok(!js.includes('sep.getBoundingClientRect().bottom'));
   assert.ok(js.includes('new ResizeObserver(() => placeGameSeparator())'));
 });
+
+test('las líneas quedan a la izquierda junto al reto, no se ocultan al pegarse arriba y en celular el reto deja espacio abajo', () => {
+  assert.ok(block.includes('height: 46px; margin: 0 8px 0 4px;'));
+  assert.ok(!block.includes('is-stuck'));
+  assert.ok(block.includes('#gameHomeDay { margin-left: 15px; margin-right: 15px; margin-bottom: 12px; }'));
+});

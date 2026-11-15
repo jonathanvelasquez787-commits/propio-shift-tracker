@@ -14,9 +14,9 @@ test('en escritorio el juego del día se mueve dentro de la barra de acciones y 
   assert.ok(js.includes("page === 'home'"));
 });
 
-test('la barra con juego deja los botones a la izquierda y el juego a la derecha, solo en escritorio', () => {
+test('la barra con juego deja los botones y el juego juntos a la izquierda y todo se queda pegado al bajar, solo en escritorio', () => {
   assert.ok(block.includes('@media (min-width: 761px)'));
   assert.ok(block.includes('justify-content: flex-start'));
-  assert.ok(block.includes('margin: 0 0 0 auto'));
-  assert.ok(block.includes('.is-stuck > .hero-shift-game { display: none; }'));
+  assert.ok(!block.includes('margin: 0 0 0 auto'));
+  assert.ok(!block.includes('.is-stuck > .hero-shift-game { display: none; }'));
 });
