@@ -57,9 +57,9 @@
         {
           "file": "tests/schedule-block-card-layout.test.mjs",
           "namedCases": [
-            "tarjeta de bloque del día: dos líneas, con tipo, horas y × arriba",
-            "tarjeta de bloque del día: duración y meta productiva comparten la línea de abajo",
-            "tarjeta de bloque del día: ya no muestra el subtítulo fijo ni el símbolo de orden"
+            "tarjeta de bloque del día: arriba tipo, duración y ×; abajo Desde, Hasta y Meta",
+            "tarjeta de bloque del día: la meta solo se ve en Trabajo y se conserva el subtítulo de día siguiente",
+            "Horario rediseño B: barra del día, agregar por tipo y sin línea de tiempo ni leyenda"
           ]
         },
         {

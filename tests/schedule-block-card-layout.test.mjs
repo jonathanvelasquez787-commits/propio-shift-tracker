@@ -3,26 +3,29 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 const source = fs.readFileSync(new URL('../js/schedule.js', import.meta.url), 'utf8');
+const html = fs.readFileSync(new URL('../app.html', import.meta.url), 'utf8');
 const row = (() => {
-  const start = source.indexOf('<div class="block-row sched-tl-item"');
+  const start = source.indexOf('<div class="block-row sched-tl-item sched-bk"');
   return source.slice(start, source.indexOf('`;', start));
 })();
 
-test('tarjeta de bloque del día: dos líneas, con tipo, horas y × arriba', () => {
-  const [, top, bottom] = row.split(/<div class="sched-tl-card-(?:top|bottom)">/);
-  assert.ok(top && bottom, 'existen la línea de arriba y la de abajo');
-  for (const token of ['sched-tl-icon', 'block-type-input', 'block-start-input', 'block-end-input', 'data-remove-block']) assert.match(top, new RegExp(token));
-  assert.doesNotMatch(top, /sched-tl-duration|block-goal-input/);
+test('tarjeta de bloque del día: arriba tipo, duración y ×; abajo Desde, Hasta y Meta', () => {
+  const [, top, fields] = row.split(/<div class="sched-bk-(?:top|fields)">/);
+  assert.ok(top && fields, 'existen la línea de arriba y la de campos');
+  for (const token of ['sched-tl-icon', 'block-type-input', 'sched-tl-duration', 'data-remove-block']) assert.match(top, new RegExp(token));
+  for (const token of ['block-start-input', 'block-end-input', 'block-goal-input']) assert.match(fields, new RegExp(token));
+  assert.doesNotMatch(top, /block-start-input|block-goal-input/);
 });
 
-test('tarjeta de bloque del día: duración y meta productiva comparten la línea de abajo', () => {
-  const bottom = row.split('<div class="sched-tl-card-bottom">')[1];
-  assert.match(bottom, /sched-tl-duration/);
-  assert.match(bottom, /block-goal-field[\s\S]*block-goal-input/);
-});
-
-test('tarjeta de bloque del día: ya no muestra el subtítulo fijo ni el símbolo de orden', () => {
-  assert.doesNotMatch(row, /meta\.subtitle|sched-tl-handle|⋮⋮/);
+test('tarjeta de bloque del día: la meta solo se ve en Trabajo y se conserva el subtítulo de día siguiente', () => {
+  assert.match(row, /block-goal-field[\s\S]*type === 'work'/);
   assert.match(row, /<div class="sched-tl-subtitle">\$\{nextDayLabel\}<\/div>/);
+  assert.doesNotMatch(row, /sched-tl-handle|⋮⋮/);
   assert.doesNotMatch(source, /Enfoque y productividad|Almuerzo \/ Descanso largo/);
+});
+
+test('Horario rediseño B: barra del día, agregar por tipo y sin línea de tiempo ni leyenda', () => {
+  for (const id of ['schedDayBar', 'schedDayBarTicks', 'addWorkBlockBtn', 'addBreakBlockBtn', 'addLunchBlockBtn']) assert.ok(html.includes(`id="${id}"`), id);
+  assert.ok(!html.includes('id="addBlockBtn"') && !html.includes('sched-legend-chip') && !html.includes('sched-timeline-add-row'));
+  assert.ok(source.includes('export function renderDayBar') && source.includes('export function addBlockRow(forcedType)'));
 });

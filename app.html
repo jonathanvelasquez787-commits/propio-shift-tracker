@@ -483,16 +483,14 @@
       </div>
     </div>
 
-    <div class="gap-editor-list sched-timeline" id="blocksEditorList"></div>
-    <div class="sched-timeline-add-row">
-      <span class="sched-timeline-add-hour" aria-hidden="true"></span>
-      <span class="sched-timeline-add-rail" aria-hidden="true"><span class="sched-add-block-plus" aria-hidden="true">+</span></span>
-      <button class="sched-add-block-btn" id="addBlockBtn" type="button">Agregar bloque</button>
-    </div>
-    <div class="sched-legend-row" aria-hidden="true">
-      <span class="sched-legend-chip" data-legend="work"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="2" y1="12" x2="22" y2="12"/></svg> <strong>Trabajo:</strong>&nbsp;Bloques de enfoque productivo</span>
-      <span class="sched-legend-chip" data-legend="break"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg> <strong>Break:</strong>&nbsp;Descansos cortos</span>
-      <span class="sched-legend-chip" data-legend="lunch"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2v6a2 2 0 0 0 4 0V2"/><path d="M9 8v14"/><path d="M17 2c-1.5 0-3 1.5-3 4s1.5 4 3 5v11"/></svg> <strong>Lunch:</strong>&nbsp;Almuerzo / Descanso largo</span>
+    <div class="sched-daybar" id="schedDayBar" role="img" aria-label="Resumen del día"></div>
+    <div class="sched-daybar-ticks" id="schedDayBarTicks" aria-hidden="true"></div>
+    <div class="gap-editor-list sched-bk-list" id="blocksEditorList"></div>
+    <div class="sched-add-row">
+      <span class="sched-add-label">Agregar:</span>
+      <button class="sched-add-pill" data-add="work" id="addWorkBlockBtn" type="button">+ Trabajo</button>
+      <button class="sched-add-pill" data-add="break" id="addBreakBlockBtn" type="button">+ Break</button>
+      <button class="sched-add-pill" data-add="lunch" id="addLunchBlockBtn" type="button">+ Lunch</button>
     </div>
   </div>
 

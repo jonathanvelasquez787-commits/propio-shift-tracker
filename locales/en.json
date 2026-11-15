@@ -2293,5 +2293,13 @@
   "s_2b6f3cba": "End",
   "s_91d4e65f": "{{v0}} h {{v1}} min shift",
   "s_c85ca8d2": "Your usual schedule · repeats every week",
-  "s_d61eb096": "{{v0}} h shift"
+  "s_d61eb096": "{{v0}} h shift",
+  "s_281e1ab5": "+ Break",
+  "s_2cae178f": "Goal (min)",
+  "s_70faa683": "Remove block {{v9}}",
+  "s_aae69865": "+ Work",
+  "s_c4a1db8c": "Add:",
+  "s_cef69891": "No blocks set. Use \"+ Work\", \"+ Break\" or \"+ Lunch\" to start.",
+  "s_df4f74fe": "+ Lunch",
+  "s_e6a0b7e3": "Day summary"
 }
