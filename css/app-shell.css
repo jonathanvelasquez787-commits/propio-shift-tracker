@@ -1400,3 +1400,15 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
   .chips > .hero-shift-actions .action-slot > #liveDiscardBtn { min-width: 52px; }
 }
 /* fin botones barra escritorio */
+
+/* boot-gate-tema */
+/* La pantalla de carga usa los colores del tema elegido (theme-init.js los pone en <html> antes de pintar).
+   "Original" (claro y azul oscuro) conserva los colores de arriba. */
+html[data-palette]:not([data-palette="original"]) #bootGate { background: var(--bg-page); color: var(--text); }
+html[data-palette]:not([data-palette="original"]) .boot-text { color: var(--muted); }
+html[data-palette]:not([data-palette="original"]) .boot-card { background: var(--panel); border-color: var(--line); box-shadow: var(--shadow); }
+html[data-palette]:not([data-palette="original"]) .boot-card-text { color: var(--muted); }
+html[data-palette]:not([data-palette="original"]) .boot-card-hint,
+html[data-palette]:not([data-palette="original"]) .boot-choice-note { color: var(--muted-3); }
+html[data-palette]:not([data-palette="original"]) .boot-choice { border-color: var(--line-2); }
+/* fin boot-gate-tema */
