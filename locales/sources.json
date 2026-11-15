@@ -148,12 +148,6 @@
       "terminos.html"
     ]
   },
-  "s_030f01aa": {
-    "source": "Planificá Trabajo, Break y Lunch. En Trabajo podés fijar una meta de minutos en llamada.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_032f5cdf": {
     "source": "Cambiar a inglés",
     "files": [
@@ -1815,12 +1809,6 @@
       "js/app-main.js"
     ]
   },
-  "s_230f195c": {
-    "source": "Bloques del día (Trabajo, Break, Lunch)",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_231e5cf8": {
     "source": "Corte de luz",
     "files": [
@@ -2282,6 +2270,12 @@
       "js/notification-review.js"
     ]
   },
+  "s_2b6f3cba": {
+    "source": "Fin",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_2b918bfc": {
     "source": "Apagado: una sola vez.",
     "files": [
@@ -2341,12 +2335,6 @@
     "source": "Nuevo registro importado del historial.",
     "files": [
       "js/call-review-view.js"
-    ]
-  },
-  "s_2cbb0df7": {
-    "source": "Plantilla: tu horario semanal. Semana específica: una excepción guardada aparte.",
-    "files": [
-      "app.html"
     ]
   },
   "s_2cc50cea": {
@@ -4346,12 +4334,6 @@
       "app.html"
     ]
   },
-  "s_51260306": {
-    "source": "Día libre (sin turno)",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_51297936": {
     "source": "Llevártelos:",
     "files": [
@@ -5149,12 +5131,6 @@
     "source": "Lo que ganes de aquí en adelante es extra.",
     "files": [
       "js/boot.js"
-    ]
-  },
-  "s_607b1f5c": {
-    "source": "Cuándo empiezas, cuándo terminas, y tus breaks/lunch de cada día. \"Bloques del día\", en Inicio, se dibuja sobre este plan.",
-    "files": [
-      "app.html"
     ]
   },
   "s_608afca6": {
@@ -6553,12 +6529,6 @@
       "app.html"
     ]
   },
-  "s_7b9215bf": {
-    "source": "Inicio del turno",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_7b9d3fdf": {
     "source": "Al entrar aceptas los",
     "files": [
@@ -7772,13 +7742,6 @@
       "js/finance.js"
     ]
   },
-  "s_8f98d30f": {
-    "source": "Editando tu horario de siempre — se repite cada semana.",
-    "files": [
-      "app.html",
-      "js/schedule.js"
-    ]
-  },
   "s_8f99d72c": {
     "source": "0 min restantes",
     "files": [
@@ -7945,6 +7908,12 @@
     "source": "{{v0}} continuado — interrupción de {{v1}} min registrada",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_91d4e65f": {
+    "source": "{{v0}} h {{v1}} min de turno",
+    "files": [
+      "js/schedule.js"
     ]
   },
   "s_91df71a4": {
@@ -9317,12 +9286,6 @@
       "js/schedule.js"
     ]
   },
-  "s_aaeb5c1f": {
-    "source": "Fin del turno",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_ab17ae62": {
     "source": "Llamada pendiente de guardar",
     "files": [
@@ -10666,6 +10629,7 @@
   "s_c58aa317": {
     "source": "Día libre",
     "files": [
+      "app.html",
       "js/shift-work-review.js"
     ]
   },
@@ -10825,6 +10789,13 @@
     "source": "Tiempo de Break tomado hoy",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_c85ca8d2": {
+    "source": "Tu horario de siempre · se repite cada semana",
+    "files": [
+      "app.html",
+      "js/schedule.js"
     ]
   },
   "s_c87af716": {
@@ -11537,6 +11508,12 @@
     "source": "⚠️ {{v0}} ventana(s) de Higher Rate con datos inválidos se descartaron al cargar.",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_d61eb096": {
+    "source": "{{v0}} h de turno",
+    "files": [
+      "js/schedule.js"
     ]
   },
   "s_d67b433d": {
@@ -13248,6 +13225,7 @@
     "files": [
       "app.html",
       "js/calendar.js",
+      "js/schedule.js",
       "js/weekly-summary.js"
     ]
   },

@@ -41,7 +41,7 @@ import {
   configureCalendarContext,
 } from './calendar.js';
 
-import { updateScheduleRowSummary, addBlockRow, applyScheduleOffset, copyDayToAll, copyDayToWeekend, ensureScheduleWeekOverride, formatBlockDurationLabel, removeBlockRowAt, removeScheduleWeekOverride, saveShiftWindow, scheduleFormIsDirty, scheduleWeekHasCustom, scheduleWeekIsPast, syncShiftModalFields, syncScheduleOffsetUI, configureScheduleContext } from './schedule.js';
+import { updateScheduleRowSummary, addBlockRow, applyScheduleOffset, copyDayToAll, copyDayToWeekend, ensureScheduleWeekOverride, formatBlockDurationLabel, removeBlockRowAt, removeScheduleWeekOverride, saveShiftWindow, scheduleFormIsDirty, scheduleWeekHasCustom, scheduleWeekIsPast, syncShiftModalFields, syncScheduleOffsetUI, configureScheduleContext, updateShiftLenChip } from './schedule.js';
 
 
 import {
@@ -7826,6 +7826,10 @@ export function render() {
     });
     // Cambiar Día libre presenta la revisión de alcance antes de guardar.
     document.getElementById('dayOffInput').addEventListener('change', saveShiftWindow);
+    ['dayStartInput', 'dayEndInput', 'dayOffInput'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.addEventListener('input', updateShiftLenChip); el.addEventListener('change', updateShiftLenChip); }
+    });
     document.getElementById('cycleAnchorInput').addEventListener('change', updateCycleSettings);
     document.getElementById('cyclePayOffsetInput').addEventListener('change', updateCycleSettings);
     document.getElementById('masterVolumeInput').addEventListener('input', updateMasterVolumeSettings);

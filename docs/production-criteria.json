@@ -1021,6 +1021,16 @@
           ]
         },
         {
+          "file": "tests/horario-rediseno-a.test.mjs",
+          "namedCases": [
+            "Horario rediseño A: el encabezado trae título, selector de modo y ayuda en una sola tarjeta",
+            "Horario rediseño A: ya no están los textos explicativos viejos",
+            "Horario rediseño A: la fila del día conserva los ids y suma el chip de duración y el interruptor",
+            "Horario rediseño A: la tira de la semana muestra horas cortas y \"Libre\"",
+            "Horario rediseño A: el CSS nuevo está en su bloque marcado y la tira es una grilla de 7 columnas"
+          ]
+        },
+        {
           "file": "tests/action-bar-halves.test.mjs",
           "namedCases": [
             "Barra de acciones: los botones de turno y los de llamadas se centran cada uno en su mitad"
