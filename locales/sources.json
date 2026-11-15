@@ -10108,6 +10108,12 @@
       "js/accounting-export.js"
     ]
   },
+  "s_bae812cd": {
+    "source": "Posponer {{v0}} min",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_baf6977e": {
     "source": "Tu cuenta",
     "files": [

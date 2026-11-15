@@ -53,6 +53,7 @@ test('aviso de descanso: "Ahora no" calla el tramo vigente y "Posponer" nunca qu
   const src = readFileSync(new URL('../js/app-main.js', import.meta.url), 'utf8');
   const closed = src.slice(src.indexOf("event.detail?.id !== 'breakPromptModal'"));
   assert.match(closed.slice(0, 700), /freelancerBreakDue\(\)/, '"Ahora no" debe silenciar el tramo de ahora, no solo el de cuando se abrió');
-  const snooze = src.slice(src.indexOf('function snoozeFreelancerBreak'), src.indexOf('function snoozeFreelancerBreak') + 500);
+  const snooze = src.slice(src.indexOf('function freelancerSnoozeMinutes'), src.indexOf('function freelancerSnoozeMinutes') + 300);
   assert.match(snooze, /Number\.isFinite\(snoozeMin\)/, 'Posponer debe tener respaldo si la espera no es un número válido');
+  assert.match(src.slice(src.indexOf('function snoozeFreelancerBreak'), src.indexOf('function snoozeFreelancerBreak') + 300), /freelancerSnoozeMinutes\(\)/, 'Posponer usa esos minutos');
 });

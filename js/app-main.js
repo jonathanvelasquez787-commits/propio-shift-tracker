@@ -5290,6 +5290,8 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       freelancerPrompt.handled = false;
       document.getElementById('breakPromptText').textContent = ui`Llevas ${formatMinutes(due.productiveMin)} min productivos y ${formatMinutes(due.connectedMin)} min conectado desde tu última pausa.`;
       syncFreelancerPromptType(due.suggestedType);
+      // El boton dice cuantos minutos se pospone (el numero de Ajustes, "Posponer (min)").
+      document.getElementById('breakPromptSnoozeBtn').textContent = ui`Posponer ${freelancerSnoozeMinutes()} min`;
       playProductiveBreakSound();
       openModal('breakPromptModal');
     }
@@ -5307,13 +5309,17 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       }
     }
 
-    function snoozeFreelancerBreak() {
+    function freelancerSnoozeMinutes() {
       const snoozeMin = Number(settings.freelancer.snoozeMin);
-      freelancerPrompt.snoozeUntil = Date.now() + (Number.isFinite(snoozeMin) && snoozeMin >= 1 ? snoozeMin : 5) * 60000;
+      return Number.isFinite(snoozeMin) && snoozeMin >= 1 ? snoozeMin : 5;
+    }
+
+    function snoozeFreelancerBreak() {
+      freelancerPrompt.snoozeUntil = Date.now() + freelancerSnoozeMinutes() * 60000;
       closeFreelancerPrompt(true);
     }
 
-    // Cerrar con ×, clic afuera o Escape cuenta como "Ahora no": no vuelve a salir hasta la próxima pausa.
+    // Cerrar con ×, clic afuera o Escape es el "Ahora no" (ya no hay boton aparte): no vuelve a salir hasta la próxima pausa.
     document.addEventListener('app:modal-closed', (event) => {
       if (event.detail?.id !== 'breakPromptModal' || freelancerPrompt.handled) return;
       // Se calla el tramo que está vigente AHORA (no solo el de cuando se abrió): si el tramo cambió
@@ -7824,7 +7830,6 @@ export function render() {
     });
     document.getElementById('breakPromptAcceptBtn').addEventListener('click', acceptFreelancerBreak);
     document.getElementById('breakPromptSnoozeBtn').addEventListener('click', snoozeFreelancerBreak);
-    document.getElementById('breakPromptDismissBtn').addEventListener('click', () => closeFreelancerPrompt(false));
     document.getElementById('breakPromptTypeRow').addEventListener('click', (e) => {
       const btn = e.target instanceof Element ? e.target.closest('[data-bp-type]') : null;
       if (btn) syncFreelancerPromptType(btn.getAttribute('data-bp-type'));
