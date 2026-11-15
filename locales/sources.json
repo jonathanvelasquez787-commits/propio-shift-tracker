@@ -51,12 +51,6 @@
       "js/higher-rate-review.js"
     ]
   },
-  "s_00f71fdd": {
-    "source": "Premio activo para nuevos logros",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_012fad36": {
     "source": "Idioma",
     "files": [
@@ -363,18 +357,6 @@
       "js/settings.js"
     ]
   },
-  "s_05f22f9f": {
-    "source": "Cerrar editor",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_06000b96": {
-    "source": "{{v0}} por realizar",
-    "files": [
-      "js/positive-reinforcement.js"
-    ]
-  },
   "s_06010257": {
     "source": "Agregar meta",
     "files": [
@@ -449,12 +431,6 @@
   },
   "s_0737280d": {
     "source": "Avisar tras",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_0749314b": {
-    "source": "Próximo Lunch",
     "files": [
       "app.html"
     ]
@@ -720,12 +696,6 @@
       "js/finance.js"
     ]
   },
-  "s_0b0df769": {
-    "source": "Avanzar un hobby pequeño",
-    "files": [
-      "js/positive-reinforcement.js"
-    ]
-  },
   "s_0b633af6": {
     "source": "El código, el diseño, los textos y la marca de Propio Shift Tracker pertenecen\n    a su titular y están protegidos por derechos de autor. Tener una cuenta te da\n    derecho a",
     "files": [
@@ -750,12 +720,6 @@
       "js/calendar.js"
     ]
   },
-  "s_0b8ff1b4": {
-    "source": "La ventana terminó; el premio sigue guardado para después.",
-    "files": [
-      "js/positive-reinforcement.js"
-    ]
-  },
   "s_0bbf8b09": {
     "source": "Cambio manual: $1 = {{v0}} {{v1}}.",
     "files": [
@@ -772,12 +736,6 @@
     "source": "¿Eliminar este pago del historial? La asignación del gasto se conserva.",
     "files": [
       "js/finance-planning.js"
-    ]
-  },
-  "s_0bf2fc94": {
-    "source": "{{v0}} · {{v1}}{{v2}}{{v3}}",
-    "files": [
-      "js/positive-reinforcement.js"
     ]
   },
   "s_0c14cc7f": {
@@ -1175,12 +1133,6 @@
       "js/theme-toggle.js"
     ]
   },
-  "s_11ea6853": {
-    "source": "Duración sugerida (min)",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_11eedeae": {
     "source": "Mejor",
     "files": [
@@ -1260,12 +1212,6 @@
       "app.html"
     ]
   },
-  "s_1352fe7a": {
-    "source": "Comida favorita",
-    "files": [
-      "js/positive-reinforcement.js"
-    ]
-  },
   "s_135d2dab": {
     "source": "Entrar",
     "files": [
@@ -1338,18 +1284,6 @@
     "source": "Cierre positivo guardado · esta llamada cuenta",
     "files": [
       "js/reinforcement-feedback.js"
-    ]
-  },
-  "s_15b4d584": {
-    "source": "próximo Break",
-    "files": [
-      "js/positive-reinforcement.js"
-    ]
-  },
-  "s_15db7cff": {
-    "source": "fin del turno",
-    "files": [
-      "js/positive-reinforcement.js"
     ]
   },
   "s_15e99343": {
@@ -1694,12 +1628,6 @@
       "js/backup-recovery.js"
     ]
   },
-  "s_1aabde80": {
-    "source": "Estiramiento agradable",
-    "files": [
-      "js/positive-reinforcement.js"
-    ]
-  },
   "s_1ab2692c": {
     "source": "Una llamada cortada no borra el trabajo que ya hiciste",
     "files": [
@@ -1862,12 +1790,6 @@
       "js/app-main.js"
     ]
   },
-  "s_1daf6080": {
-    "source": "· {{v0}} min",
-    "files": [
-      "js/positive-reinforcement.js"
-    ]
-  },
   "s_1dc9b4f2": {
     "source": "Sin categoría",
     "files": [
@@ -1937,12 +1859,6 @@
   },
   "s_1eec43c9": {
     "source": "para nombre y emoji.",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_1f12d092": {
-    "source": "Realízalo ahora, cámbialo o guárdalo para después.",
     "files": [
       "app.html"
     ]
@@ -2042,12 +1958,6 @@
     "source": "Por encontrar",
     "files": [
       "js/game.js"
-    ]
-  },
-  "s_20dd05b7": {
-    "source": "Cumplir la meta diaria",
-    "files": [
-      "app.html"
     ]
   },
   "s_20ff6b57": {
@@ -2276,12 +2186,6 @@
       "js/calls.js"
     ]
   },
-  "s_2493b7b7": {
-    "source": "Usa más de 1 para un premio acumulable.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_24a5cfd9": {
     "source": "Antes de mi turno",
     "files": [
@@ -2322,12 +2226,6 @@
     "source": "Reservado",
     "files": [
       "js/finance.js"
-    ]
-  },
-  "s_259b9958": {
-    "source": "Premios disponibles",
-    "files": [
-      "app.html"
     ]
   },
   "s_25a3433a": {
@@ -2443,12 +2341,6 @@
     "source": "Silver",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_27b618a1": {
-    "source": "Noche sin tareas pendientes",
-    "files": [
-      "js/positive-reinforcement.js"
     ]
   },
   "s_27cee92b": {
@@ -2582,12 +2474,6 @@
     "source": "Terminá o descartá la actividad pendiente antes de reemplazar datos.",
     "files": [
       "js/backup-recovery.js"
-    ]
-  },
-  "s_2a1268fb": {
-    "source": "Premios para tu {{v0}}",
-    "files": [
-      "js/positive-reinforcement.js"
     ]
   },
   "s_2a1f41a6": {
@@ -2878,12 +2764,6 @@
       "index.html"
     ]
   },
-  "s_2e9b819f": {
-    "source": "Opciones del premio: límites, acumulación y costo",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_2ea6aa6a": {
     "source": "Vacío = se guarda como Manual",
     "files": [
@@ -2913,12 +2793,6 @@
     "files": [
       "app.html",
       "index.html"
-    ]
-  },
-  "s_2ee3e77c": {
-    "source": "Cuándo ofrecerlo",
-    "files": [
-      "app.html"
     ]
   },
   "s_2ef9294e": {
@@ -2991,7 +2865,6 @@
     "source": "{{v1}} {{v2}}",
     "files": [
       "js/game.js",
-      "js/positive-reinforcement.js",
       "js/reports.js"
     ]
   },
@@ -3410,12 +3283,6 @@
       "js/finance-planning.js"
     ]
   },
-  "s_36306148": {
-    "source": "Realizado",
-    "files": [
-      "js/positive-reinforcement.js"
-    ]
-  },
   "s_364d8fdb": {
     "source": "·\n      Responsable del tratamiento:",
     "files": [
@@ -3610,12 +3477,6 @@
       "js/weekly-summary.js"
     ]
   },
-  "s_398e440e": {
-    "source": "Cambiar",
-    "files": [
-      "js/positive-reinforcement.js"
-    ]
-  },
   "s_39970333": {
     "source": "{{v2}} – {{v3}}",
     "files": [
@@ -3737,12 +3598,6 @@
     "source": "Final corregido",
     "files": [
       "js/call-records-view.js"
-    ]
-  },
-  "s_3b3e3b2f": {
-    "source": "Guardar premio",
-    "files": [
-      "app.html"
     ]
   },
   "s_3b425a30": {
@@ -4358,12 +4213,6 @@
       "app.html"
     ]
   },
-  "s_4694d1b8": {
-    "source": "premios disponibles",
-    "files": [
-      "js/positive-reinforcement.js"
-    ]
-  },
   "s_46fdfa44": {
     "source": "compara minutos y meta de esa fecha.",
     "files": [
@@ -4623,12 +4472,6 @@
       "app.html"
     ]
   },
-  "s_4aa12764": {
-    "source": "Próximo Break",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_4ab4bebc": {
     "source": "Elegir emoji para el saludo",
     "files": [
@@ -4687,12 +4530,6 @@
     "source": "Continuar con Google",
     "files": [
       "index.html"
-    ]
-  },
-  "s_4b9aab77": {
-    "source": "Completar llamadas",
-    "files": [
-      "app.html"
     ]
   },
   "s_4b9f7879": {
@@ -5106,12 +4943,6 @@
       "js/app-main.js"
     ]
   },
-  "s_52c5bda6": {
-    "source": "· +{{v0}} más",
-    "files": [
-      "js/positive-reinforcement.js"
-    ]
-  },
   "s_52c661cc": {
     "source": "☕ ¡Ganaste un descanso! {productivo} min productivos — tienes derecho a {descanso} min.",
     "files": [
@@ -5182,12 +5013,6 @@
     "source": "Agregar bloque",
     "files": [
       "app.html"
-    ]
-  },
-  "s_53f61fe5": {
-    "source": "Tus premios esperan al próximo Break, Lunch o fin del turno.",
-    "files": [
-      "js/positive-reinforcement.js"
     ]
   },
   "s_540b589d": {
@@ -5304,12 +5129,6 @@
     "source": "El ritmo para llegar a la meta usa los días laborales restantes; es un cálculo distinto.",
     "files": [
       "js/reports.js"
-    ]
-  },
-  "s_5590add2": {
-    "source": "Bebida favorita",
-    "files": [
-      "js/positive-reinforcement.js"
     ]
   },
   "s_55944819": {
@@ -5456,12 +5275,6 @@
       "js/call-recovery.js"
     ]
   },
-  "s_584dcf45": {
-    "source": "Snack favorito",
-    "files": [
-      "js/positive-reinforcement.js"
-    ]
-  },
   "s_58554549": {
     "source": "{{v0}} monedas de XP",
     "files": [
@@ -5514,12 +5327,6 @@
     "source": "Ayer",
     "files": [
       "js/game.js"
-    ]
-  },
-  "s_58a5a9b9": {
-    "source": "5 minutos de contenido favorito",
-    "files": [
-      "js/positive-reinforcement.js"
     ]
   },
   "s_58bf49f3": {
@@ -5769,12 +5576,6 @@
       "js/app-main.js"
     ]
   },
-  "s_5e4a8a58": {
-    "source": "Escuchar una canción favorita",
-    "files": [
-      "js/positive-reinforcement.js"
-    ]
-  },
   "s_5e92f956": {
     "source": "Residual",
     "files": [
@@ -5809,12 +5610,6 @@
     "source": "Meta en tu moneda",
     "files": [
       "app.html"
-    ]
-  },
-  "s_5f269f82": {
-    "source": "Cambiar premio",
-    "files": [
-      "js/positive-reinforcement.js"
     ]
   },
   "s_5f354434": {
@@ -5994,12 +5789,6 @@
       "js/calls.js"
     ]
   },
-  "s_620ca41b": {
-    "source": "Costo opcional ($)",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_621f74e6": {
     "source": "Visor violeta",
     "files": [
@@ -6127,18 +5916,6 @@
     "source": "3 ARMADURAS",
     "files": [
       "js/game.js"
-    ]
-  },
-  "s_644a1a2c": {
-    "source": "Aporte a mi wishlist",
-    "files": [
-      "js/positive-reinforcement.js"
-    ]
-  },
-  "s_6458fc52": {
-    "source": "Sesión de videojuego",
-    "files": [
-      "js/positive-reinforcement.js"
     ]
   },
   "s_646dbd54": {
@@ -6353,12 +6130,6 @@
       "js/app-main.js"
     ]
   },
-  "s_68a2e7c7": {
-    "source": "Video o parte de un episodio",
-    "files": [
-      "js/positive-reinforcement.js"
-    ]
-  },
   "s_68ab6553": {
     "source": "5. Con quién se comparten",
     "files": [
@@ -6405,13 +6176,6 @@
     "source": "Tarifa de Ajustes: {{v0}}/min",
     "files": [
       "js/finance-planning.js"
-    ]
-  },
-  "s_69e71112": {
-    "source": "Agregar premio",
-    "files": [
-      "app.html",
-      "js/positive-reinforcement.js"
     ]
   },
   "s_69e7eb3b": {
@@ -7004,12 +6768,6 @@
       "js/app-main.js"
     ]
   },
-  "s_732da77d": {
-    "source": "Pausarlo frena nuevos premios; los que ya ganaste se conservan. El costo es una referencia personal: no descuenta ganancias, no registra gastos y no compra nada.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_733ceab0": {
     "source": "se pasó {{v0}}",
     "files": [
@@ -7096,12 +6854,6 @@
       "js/automation-ui.js"
     ]
   },
-  "s_74d092b6": {
-    "source": "Cada cuántas llamadas",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_74d0ce3e": {
     "source": "CALIDAD DEL TIEMPO",
     "files": [
@@ -7115,7 +6867,6 @@
       "js/app-main.js",
       "js/calls.js",
       "js/game.js",
-      "js/positive-reinforcement.js",
       "js/schedule.js"
     ]
   },
@@ -7381,18 +7132,6 @@
       "js/app-main.js"
     ]
   },
-  "s_791c7671": {
-    "source": "tu constancia",
-    "files": [
-      "js/positive-reinforcement.js"
-    ]
-  },
-  "s_79252b86": {
-    "source": "Eliminar",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_792ba2a4": {
     "source": "Fuera de esta ventana: {{v5}}",
     "files": [
@@ -7409,12 +7148,6 @@
     "source": "{{v11}} – {{v12}}",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_79662d6b": {
-    "source": "· {{v0}} hitos",
-    "files": [
-      "js/positive-reinforcement.js"
     ]
   },
   "s_798fd9e9": {
@@ -7555,12 +7288,6 @@
   },
   "s_7b82a546": {
     "source": "No hay resultados para tu búsqueda.",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_7b8be62d": {
-    "source": "Guardar premios para después",
     "files": [
       "app.html"
     ]
@@ -7838,12 +7565,6 @@
       "js/calendar.js"
     ]
   },
-  "s_7fc2fb15": {
-    "source": "La cuenta o los premios cambiaron. Cerrá el editor y abrilo de nuevo.",
-    "files": [
-      "js/positive-reinforcement.js"
-    ]
-  },
   "s_80157ce5": {
     "source": "Continuar conserva el inicio anterior y marca el hueco como interrupción accidental.",
     "files": [
@@ -8007,12 +7728,6 @@
       "privacidad.html"
     ]
   },
-  "s_831365be": {
-    "source": "Hitos para ganarlo",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_83252091": {
     "source": "No hay un reparto inmediato; se usará el próximo disponible.",
     "files": [
@@ -8079,6 +7794,13 @@
       "app.html"
     ]
   },
+  "s_8385a949": {
+    "source": "Tus llamadas completadas aparecerán aquí.",
+    "files": [
+      "app.html",
+      "js/positive-reinforcement.js"
+    ]
+  },
   "s_83b6b1b5": {
     "source": "(también visible en Inicio) siempre muestra el ciclo actual.",
     "files": [
@@ -8101,12 +7823,6 @@
     "source": "Ciclo: — – —",
     "files": [
       "app.html"
-    ]
-  },
-  "s_84243dba": {
-    "source": "Aún no elegiste premios. Agrega uno del catálogo o crea el tuyo.",
-    "files": [
-      "js/positive-reinforcement.js"
     ]
   },
   "s_84258390": {
@@ -8869,12 +8585,6 @@
       "app.html"
     ]
   },
-  "s_8ec34fee": {
-    "source": "No hay premios para esta pausa; los demás siguen guardados.",
-    "files": [
-      "js/positive-reinforcement.js"
-    ]
-  },
   "s_8eddcd4f": {
     "source": "Correo de Google (solo lectura)",
     "files": [
@@ -8940,12 +8650,6 @@
     "source": "Bono extra ganado por llamadas dentro de una ventana Higher Rate {{v4}}",
     "files": [
       "js/higher-rate.js"
-    ]
-  },
-  "s_8fa1dad3": {
-    "source": "· {{v0}}/{{v1}} hitos",
-    "files": [
-      "js/positive-reinforcement.js"
     ]
   },
   "s_8fcef020": {
@@ -9152,12 +8856,6 @@
       "js/detail-views.js"
     ]
   },
-  "s_92a0ed7e": {
-    "source": "Guardar para después",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_92acde56": {
     "source": "25 monedas de XP",
     "files": [
@@ -9192,12 +8890,6 @@
     "source": "Gastos y metas de ahorro que registras en la sección de Finanzas.",
     "files": [
       "privacidad.html"
-    ]
-  },
-  "s_9382621b": {
-    "source": "Cómo ganarlo",
-    "files": [
-      "app.html"
     ]
   },
   "s_9392db95": {
@@ -9271,12 +8963,6 @@
     "source": "{{v0}} llamadas duraron 0 min",
     "files": [
       "js/calls.js"
-    ]
-  },
-  "s_94b26e62": {
-    "source": "Opcional",
-    "files": [
-      "app.html"
     ]
   },
   "s_94cca14d": {
@@ -9588,12 +9274,6 @@
       "js/game.js"
     ]
   },
-  "s_99e48417": {
-    "source": "Caminata breve",
-    "files": [
-      "js/positive-reinforcement.js"
-    ]
-  },
   "s_9a07cbca": {
     "source": "Fijar meta",
     "files": [
@@ -9715,22 +9395,10 @@
       "js/boot.js"
     ]
   },
-  "s_9c17728a": {
-    "source": "{{v3}} · {{v4}}{{v5}}{{v6}}",
-    "files": [
-      "js/positive-reinforcement.js"
-    ]
-  },
   "s_9c1e9c4e": {
     "source": "Bloques",
     "files": [
       "app.html"
-    ]
-  },
-  "s_9c2a4246": {
-    "source": "Premio realizado: {{v0}}",
-    "files": [
-      "js/positive-reinforcement.js"
     ]
   },
   "s_9c39d9cf": {
@@ -9876,7 +9544,6 @@
       "js/app-main.js",
       "js/calls.js",
       "js/game.js",
-      "js/positive-reinforcement.js",
       "js/schedule.js"
     ]
   },
@@ -10287,12 +9954,6 @@
       "app.html"
     ]
   },
-  "s_a47304c2": {
-    "source": "TE LO GANASTE",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_a49ca9de": {
     "source": "Se reserva ahora",
     "files": [
@@ -10520,12 +10181,6 @@
     "source": "Shift iniciado automáticamente",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_a865c690": {
-    "source": "Pausado",
-    "files": [
-      "js/positive-reinforcement.js"
     ]
   },
   "s_a87219bc": {
@@ -10837,12 +10492,6 @@
     "source": "Semana 1: 00:00:00",
     "files": [
       "app.html"
-    ]
-  },
-  "s_ad541332": {
-    "source": "Premio guardado",
-    "files": [
-      "js/positive-reinforcement.js"
     ]
   },
   "s_ad75d38b": {
@@ -11248,12 +10897,6 @@
       "js/app-main.js"
     ]
   },
-  "s_b419ec4b": {
-    "source": "llamadas completadas",
-    "files": [
-      "js/positive-reinforcement.js"
-    ]
-  },
   "s_b43a8f17": {
     "source": "ganado este mes",
     "files": [
@@ -11338,12 +10981,6 @@
       "js/boot.js"
     ]
   },
-  "s_b52459fa": {
-    "source": "Editar premio",
-    "files": [
-      "js/positive-reinforcement.js"
-    ]
-  },
   "s_b551df05": {
     "source": "Copias recuperables",
     "files": [
@@ -11379,12 +11016,6 @@
     "source": "y sumaste {{v0}}",
     "files": [
       "js/reinforcement-rules.js"
-    ]
-  },
-  "s_b5d3af8d": {
-    "source": "Guarda los cierres de llamadas, recuperaciones y premios realizados. Sirve para reconocer tu constancia; tus comentarios personales se muestran tal como los escribiste.",
-    "files": [
-      "app.html"
     ]
   },
   "s_b6083e12": {
@@ -12244,20 +11875,8 @@
       "app.html"
     ]
   },
-  "s_c5d7cd2a": {
-    "source": "Premios para cerrar tu turno",
-    "files": [
-      "js/positive-reinforcement.js"
-    ]
-  },
   "s_c5f7fbe1": {
     "source": "minutos de trabajo sin llamadas",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_c60abeb8": {
-    "source": "Convierte constancia, recuperación y metas en evidencia positiva y premios seguros.",
     "files": [
       "app.html"
     ]
@@ -12444,12 +12063,6 @@
       "js/automation-ui.js"
     ]
   },
-  "s_c9263b18": {
-    "source": "PREMIO FÍSICO",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_c937292d": {
     "source": "El total usa el registro de Propio. Tu observación y su estimación siguen disponibles.",
     "files": [
@@ -12524,12 +12137,6 @@
       "app.html"
     ]
   },
-  "s_cad90e4e": {
-    "source": "meta diaria",
-    "files": [
-      "js/positive-reinforcement.js"
-    ]
-  },
   "s_cafaf457": {
     "source": "{{v4}} {{v5}}{{v6}}{{v7}}",
     "files": [
@@ -12542,22 +12149,10 @@
       "app.html"
     ]
   },
-  "s_cb0d16c8": {
-    "source": "Recuperarme después de una difícil",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_cb2b5007": {
     "source": "Quita las ventanas pasadas de esta lista. Conserva las llamadas, sus bonos y las ganancias del día y del ciclo. No recalcula promociones.",
     "files": [
       "app.html"
-    ]
-  },
-  "s_cb3db0cf": {
-    "source": "Lo ganaste con {{v3}}{{v4}}{{v5}}",
-    "files": [
-      "js/positive-reinforcement.js"
     ]
   },
   "s_cb5441e3": {
@@ -12572,12 +12167,6 @@
       "js/backup-recovery.js",
       "js/call-records-view.js",
       "js/call-recovery.js"
-    ]
-  },
-  "s_cb83a982": {
-    "source": "{icon} Disfrutaste tu premio: {name}",
-    "files": [
-      "js/reinforcement-feedback.js"
     ]
   },
   "s_cc4a5d5d": {
@@ -12657,12 +12246,6 @@
     "source": "Martes",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_cd865caf": {
-    "source": "Máximo por día",
-    "files": [
-      "app.html"
     ]
   },
   "s_cdb93949": {
@@ -12836,12 +12419,6 @@
       "js/app-main.js"
     ]
   },
-  "s_cfb95866": {
-    "source": "Aporte a una meta de ahorro",
-    "files": [
-      "js/positive-reinforcement.js"
-    ]
-  },
   "s_cfe33233": {
     "source": "Una llamada más completada · {amount} para tu meta",
     "files": [
@@ -12957,12 +12534,6 @@
       "app.html"
     ]
   },
-  "s_d15dbac1": {
-    "source": "Ver un episodio",
-    "files": [
-      "js/positive-reinforcement.js"
-    ]
-  },
   "s_d16e5c11": {
     "source": "Esperando confirmar tu ACW",
     "files": [
@@ -13076,12 +12647,6 @@
     "source": "META CUMPLIDA",
     "files": [
       "js/game.js"
-    ]
-  },
-  "s_d379a183": {
-    "source": "Escribe un nombre para el premio.",
-    "files": [
-      "js/positive-reinforcement.js"
     ]
   },
   "s_d3818c16": {
@@ -13204,22 +12769,10 @@
       "js/boot.js"
     ]
   },
-  "s_d4d5b56b": {
-    "source": "próximo Lunch",
-    "files": [
-      "js/positive-reinforcement.js"
-    ]
-  },
   "s_d5012e16": {
     "source": "La tarifa calcula nuevas estimaciones y tu meta general. Conserva pagos guardados, bonos y metas especiales.",
     "files": [
       "app.html"
-    ]
-  },
-  "s_d51452df": {
-    "source": "recuperación",
-    "files": [
-      "js/positive-reinforcement.js"
     ]
   },
   "s_d527f76e": {
@@ -13276,12 +12829,6 @@
     "source": "Volviste a tiempo de {{v0}} {{v1}}.",
     "files": [
       "js/reinforcement-rules.js"
-    ]
-  },
-  "s_d66d2721": {
-    "source": "{{v0}} realizados",
-    "files": [
-      "js/positive-reinforcement.js"
     ]
   },
   "s_d67b433d": {
@@ -13496,12 +13043,6 @@
       "js/app-main.js"
     ]
   },
-  "s_da9539a6": {
-    "source": "{icon} Premio realizado: {name}",
-    "files": [
-      "js/reinforcement-feedback.js"
-    ]
-  },
   "s_da97b7cf": {
     "source": "Llamadas recuperadas",
     "files": [
@@ -13626,12 +13167,6 @@
     "source": "Más de {{v0}} min productivos — superaste tu meta",
     "files": [
       "js/calendar.js"
-    ]
-  },
-  "s_dbd1db92": {
-    "source": "Salir un momento al aire",
-    "files": [
-      "js/positive-reinforcement.js"
     ]
   },
   "s_dbeb1d32": {
@@ -13914,13 +13449,6 @@
     "files": [
       "js/positive-reinforcement.js",
       "js/reinforcement-feedback.js"
-    ]
-  },
-  "s_df12a728": {
-    "source": "Tus llamadas y premios realizados aparecerán aquí.",
-    "files": [
-      "app.html",
-      "js/positive-reinforcement.js"
     ]
   },
   "s_df2e3edb": {
@@ -14287,12 +13815,6 @@
       "app.html"
     ]
   },
-  "s_e5605aea": {
-    "source": "premio disponible",
-    "files": [
-      "js/positive-reinforcement.js"
-    ]
-  },
   "s_e569e297": {
     "source": "Aviso de Break/Lunch actualizado",
     "files": [
@@ -14538,12 +14060,6 @@
     "source": "Detalle de llamada",
     "files": [
       "app.html"
-    ]
-  },
-  "s_e925b413": {
-    "source": "{icon} Premio disponible para tu {window}: {name}{extra}",
-    "files": [
-      "js/reinforcement-feedback.js"
     ]
   },
   "s_e929a18c": {
@@ -14806,12 +14322,6 @@
       "app.html"
     ]
   },
-  "s_ecc1c141": {
-    "source": "Mi premio",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_ecc4734d": {
     "source": "Terminá la pausa en Inicio; después se intentará ponerte disponible dentro del turno.",
     "files": [
@@ -15012,12 +14522,6 @@
       "js/reports.js"
     ]
   },
-  "s_f090197f": {
-    "source": "Ver premios",
-    "files": [
-      "js/positive-reinforcement.js"
-    ]
-  },
   "s_f0926646": {
     "source": "En curso",
     "files": [
@@ -15059,6 +14563,12 @@
     "source": "No hay filas para el día activo. La vista se alimenta de las llamadas importadas, tus acciones del turno (Shift/Break/Lunch/ACW) y del día seleccionado.",
     "files": [
       "js/call-table-view.js"
+    ]
+  },
+  "s_f1284dd0": {
+    "source": "Guarda los cierres de llamadas y las recuperaciones. Sirve para reconocer tu constancia; tus comentarios personales se muestran tal como los escribiste.",
+    "files": [
+      "app.html"
     ]
   },
   "s_f1292e13": {
@@ -15105,6 +14615,12 @@
       "js/app-main.js"
     ]
   },
+  "s_f18ca172": {
+    "source": "Convierte constancia, recuperación y metas en evidencia positiva.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_f1912a3c": {
     "source": "Ya estás disponible en Propio",
     "files": [
@@ -15127,12 +14643,6 @@
     "source": "Tu cuenta, tus datos sincronizados, copias diarias y diagnósticos técnicos, protegidos por Row Level Security y tablas privadas",
     "files": [
       "privacidad.html"
-    ]
-  },
-  "s_f1fe56fb": {
-    "source": "Postre con el Lunch",
-    "files": [
-      "js/positive-reinforcement.js"
     ]
   },
   "s_f210e156": {
@@ -15218,12 +14728,6 @@
     "source": "Copia recuperada. También se conservó lo que tenías antes de restaurar.",
     "files": [
       "js/backup-recovery.js"
-    ]
-  },
-  "s_f35a3aed": {
-    "source": "Ya tienes el máximo de 60 premios.",
-    "files": [
-      "js/positive-reinforcement.js"
     ]
   },
   "s_f362f36d": {
@@ -15886,12 +15390,6 @@
       "app.html"
     ]
   },
-  "s_fd8d3583": {
-    "source": "{icon} Tu constancia desbloqueó {name} · {window}{extra}",
-    "files": [
-      "js/reinforcement-feedback.js"
-    ]
-  },
   "s_fda677e1": {
     "source": "La app todavía no está conectada a su base de datos (falta configurar js/config.js).",
     "files": [
@@ -15925,8 +15423,7 @@
   "s_fdf3e8d5": {
     "source": "En progreso",
     "files": [
-      "js/finance.js",
-      "js/positive-reinforcement.js"
+      "js/finance.js"
     ]
   },
   "s_fdfb1cba": {

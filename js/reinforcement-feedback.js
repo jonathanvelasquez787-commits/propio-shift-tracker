@@ -65,14 +65,6 @@ export const REINFORCEMENT_TEXTS = Object.freeze({
     translateText('Encontraste un aprendizaje en esta llamada'),
     translateText('Lo que aprendiste hoy puede ayudarte en la siguiente llamada'),
   ]),
-  'reward-earned': Object.freeze([
-    translateText('{icon} Premio disponible para tu {window}: {name}{extra}'),
-    translateText('{icon} Tu constancia desbloqueó {name} · {window}{extra}'),
-  ]),
-  'reward-claimed': Object.freeze([
-    translateText('{icon} Premio realizado: {name}'),
-    translateText('{icon} Disfrutaste tu premio: {name}'),
-  ]),
 });
 
 let queueToast = null;

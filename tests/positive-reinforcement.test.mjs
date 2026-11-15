@@ -6,9 +6,9 @@ import path from 'node:path';
 import { translateText } from '../js/i18n.js';
 import { setAppCalls, setAppSettings, setAppState } from '../js/app-context.js';
 import {
-  PHYSICAL_REWARD_PRESETS, configurePositiveReinforcementContext, createDefaultReinforcementState,
+  configurePositiveReinforcementContext, createDefaultReinforcementState,
   initPositiveReinforcement, migratePositiveCallIdReferences, normalizeReinforcementSettings,
-  normalizeReinforcementState, onPositiveCallSaved, onPositiveRewardWindow, reconcilePositiveCalls,
+  normalizeReinforcementState, onPositiveCallSaved, reconcilePositiveCalls,
   reopenPositiveReflection, clearPositiveReinforcementTransients,
   renderPositiveReinforcement, saveInactivityMessage,
 } from '../js/positive-reinforcement.js';
@@ -19,18 +19,15 @@ function currentDayKey() {
   return `${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')}/${now.getFullYear()}`;
 }
 
-test('premios personales y catálogo normalizan límites sin introducir puntos negativos', () => {
-  assert.ok(PHYSICAL_REWARD_PRESETS.length >= 15);
-  assert.deepEqual(new Set(PHYSICAL_REWARD_PRESETS.map((item) => item.window)), new Set(['break', 'lunch', 'shift-end']));
-  assert.ok(PHYSICAL_REWARD_PRESETS.some((item) => item.trigger === 'recovery'));
-  assert.ok(PHYSICAL_REWARD_PRESETS.some((item) => item.accumulationTarget > 1));
-  const config = normalizeReinforcementSettings({ weeklyBudgetUsd: -2, rewards: [{ id: 'personal', name: '<Mi premio>', every: 500, maxPerDay: 99, accumulationTarget: 50, durationMin: 300, costUsd: -1 }] });
+test('ajustes y estado del refuerzo no guardan premios y borran lo viejo', () => {
+  const config = normalizeReinforcementSettings({ weeklyBudgetUsd: -2, rewards: [{ id: 'personal', name: 'Mi premio' }] });
   assert.equal(config.enabled, false);
   assert.equal(normalizeReinforcementSettings({ enabled: true }).enabled, true);
   assert.equal(Object.hasOwn(config, 'weeklyBudgetUsd'), false);
-  assert.deepEqual({ every: config.rewards[0].every, maxPerDay: config.rewards[0].maxPerDay, accumulationTarget: config.rewards[0].accumulationTarget, durationMin: config.rewards[0].durationMin, costUsd: config.rewards[0].costUsd }, { every: 100, maxPerDay: 10, accumulationTarget: 30, durationMin: 240, costUsd: 0 });
-  assert.equal(config.rewards[0].name, 'Mi premio');
-  assert.deepEqual(normalizeReinforcementState({ recoveries: [{}], pendingRewards: [{ name: '<bad>', window: 'other' }] }).pendingRewards, []);
+  assert.equal(Object.hasOwn(config, 'rewards'), false);
+  const state = normalizeReinforcementState({ recoveries: [{}], pendingRewards: [{ name: 'x', window: 'break' }], claims: [{}], earnedKeys: { a: true }, progress: { a: 1 } });
+  assert.deepEqual(Object.keys(state).sort(), ['recoveries', 'recoveryPending', 'reflections']);
+  assert.deepEqual(Object.keys(createDefaultReinforcementState()).sort(), ['recoveries', 'recoveryPending', 'reflections']);
 });
 
 test('inactivity editor preserves drafts, rolls back rejected saves and restores defaults with achievements off', (t) => {
@@ -118,25 +115,20 @@ test('inactivity frequency editor saves atomically, validates minutes and preser
   assert.equal(minutes.dataset.dirty, undefined); assert.equal(repeat.dataset.dirty, undefined);
 });
 
-test('premios acumulables conservan ventana e idempotencia sin el presupuesto antiguo', async () => {
+test('la recuperación se registra una sola vez y la reflexión sobrevive al reemplazo de la llamada', async () => {
   const dayKey = currentDayKey();
   const callRows = [];
   const currentState = { game: { reinforcement: createDefaultReinforcementState() } };
-  const currentSettings = { game: { enabled: true }, reinforcement: { enabled: true, askAfterCall: false, weeklyBudgetUsd: 2, rewards: [{ id: 'tea', name: 'Té especial', icon: '☕', window: 'break', trigger: 'calls', every: 2, accumulationTarget: 2, maxPerDay: 1, costUsd: 3 }] } };
+  const currentSettings = { game: { enabled: true }, reinforcement: { enabled: true, askAfterCall: false } };
   setAppState(currentState);
   setAppCalls(callRows);
   setAppSettings(currentSettings);
   const listeners = new Map();
-  const nodes = new Map([
-    ['physicalRewardClaimList', { innerHTML: '' }],
-    ['physicalRewardClaimTitle', { textContent: '' }],
-  ]);
+  const nodes = new Map();
   const opened = [];
-  let swapControl = null;
   globalThis.Element = class { constructor(dataset) { this.dataset = dataset; } closest() { return this; } };
   globalThis.document = {
     getElementById: (id) => nodes.get(id) || null,
-    querySelectorAll: () => swapControl ? [swapControl] : [],
     addEventListener: (type, callback) => listeners.set(type, callback),
   };
   configurePositiveReinforcementContext({
@@ -163,46 +155,13 @@ test('premios acumulables conservan ventana e idempotencia sin el presupuesto an
   };
   addCall('c1');
   addCall('c2');
-  assert.equal(currentState.game.reinforcement.progress.tea, 1);
   currentState.game.reinforcement.recoveryPending = { callId: 'c2', dayKey };
   addCall('c3');
   addCall('c4');
   assert.equal(currentState.game.reinforcement.recoveries.length, 1);
-  assert.equal(currentState.game.reinforcement.pendingRewards.length, 1);
   onPositiveCallSaved(callRows[3], 'import', dayKey);
-  assert.equal(currentState.game.reinforcement.pendingRewards.length, 1);
+  assert.equal(currentState.game.reinforcement.recoveries.length, 1, 'repetir el guardado no duplica la recuperación');
   assert.deepEqual(opened, []);
-
-  const pendingButton = new Element({ positiveAction: 'open-pending' });
-  listeners.get('click')({ target: pendingButton });
-  assert.deepEqual(opened, []);
-  currentState.activePause = { type: 'break' };
-  listeners.get('click')({ target: pendingButton });
-  assert.deepEqual(opened, ['physicalRewardClaimModal']);
-  const earnedId = currentState.game.reinforcement.pendingRewards[0].id;
-  const claimButton = new Element({ positiveAction: 'claim', earnedId });
-  currentSettings.reinforcement.rewards.push({ id: 'alternate', name: 'Otro premio', icon: '🎁', window: 'break', trigger: 'calls', every: 100, accumulationTarget: 30, maxPerDay: 1, costUsd: 3, durationMin: 5, enabled: true });
-  swapControl = { dataset: { rewardSwap: earnedId }, value: 'alternate' };
-  currentState.activePause = null;
-  listeners.get('click')({ target: new Element({ positiveAction: 'swap', earnedId }) });
-  assert.equal(currentState.game.reinforcement.pendingRewards[0].rewardId, 'tea');
-  currentState.activePause = { type: 'break' };
-  listeners.get('click')({ target: new Element({ positiveAction: 'swap', earnedId }) });
-  assert.equal(currentState.game.reinforcement.pendingRewards[0].rewardId, 'alternate');
-  assert.equal(currentState.game.reinforcement.pendingRewards[0].sourceRewardId, 'tea');
-  for (const id of ['c5', 'c6', 'c7', 'c8']) addCall(id);
-  assert.equal(currentState.game.reinforcement.pendingRewards.length, 1, 'cambiar el premio no evade el máximo diario de su origen');
-  currentState.activePause = null;
-  listeners.get('click')({ target: claimButton });
-  assert.equal(currentState.game.reinforcement.pendingRewards.length, 1);
-  assert.equal(currentState.game.reinforcement.claims.length, 0);
-  currentState.activePause = { type: 'break' };
-  listeners.get('click')({ target: claimButton });
-  assert.equal(currentState.game.reinforcement.claims.length, 1, 'un presupuesto antiguo de $2 no bloquea el premio de $3');
-  listeners.get('click')({ target: claimButton });
-  assert.equal(currentState.game.reinforcement.pendingRewards.length, 0);
-  assert.equal(currentState.game.reinforcement.claims.length, 1);
-  assert.match(nodes.get('physicalRewardClaimList').innerHTML, /≈ L 75/);
 
   currentSettings.reinforcement.askAfterCall = true;
   const modalCall = { id: 'modal-live', callDate: dayKey, startISO: new Date(Date.now() - 60000).toISOString(), endISO: new Date(Date.now() - 30000).toISOString() };
@@ -220,28 +179,13 @@ test('premios acumulables conservan ventana e idempotencia sin el presupuesto an
   callRows.push(demoReflectionCall);
   assert.equal(reopenPositiveReflection(demoReflectionCall, dayKey), true);
   assert.equal(opened.at(-1), 'positiveReflectionModal');
-  assert.deepEqual(currentState.game.reinforcement, reinforcementBeforeReopen, 'reabrir reflexión no evalúa premios ni progreso');
+  assert.deepEqual(currentState.game.reinforcement, reinforcementBeforeReopen, 'reabrir reflexión no cambia el estado');
 
   currentSettings.reinforcement.enabled = false;
   assert.equal(reopenPositiveReflection(demoReflectionCall, dayKey), false, 'el refuerzo apagado no reabre la reflexión');
   currentSettings.reinforcement.enabled = true;
   assert.equal(reopenPositiveReflection({ ...demoReflectionCall, endISO: new Date(Date.now() + 60000).toISOString() }, dayKey), false, 'una llamada aún abierta no admite reflexión');
 
-  const stageClearModal = { open: true, classList: { contains: (name) => name === 'open' && stageClearModal.open } };
-  nodes.set('stageClearModal', stageClearModal);
-  currentState.shiftEndedAt = new Date().toISOString();
-  currentState.activePause = null;
-  currentState.game.reinforcement.pendingRewards.push({
-    id: 'qa-shift-reward', rewardId: 'tea', sourceRewardId: 'tea', name: 'Té', icon: '☕', window: 'shift-end',
-    dayKey, triggerKey: `calls:${dayKey}:qa`, earnedAt: new Date().toISOString(), costUsd: 0, durationMin: 0,
-  });
-  assert.equal(onPositiveRewardWindow('shift-end'), true, 'el premio se difiere mientras el modal de cierre está abierto');
-  clearPositiveReinforcementTransients();
-  const openCountBeforeCloseEvent = opened.length;
-  stageClearModal.open = false;
-  listeners.get('app:modal-closed')({ detail: { id: 'stageClearModal' } });
-  await new Promise((resolve) => setTimeout(resolve, 10));
-  assert.equal(opened.length, openCountBeforeCloseEvent, 'limpiar transitorios evita reabrir premios tras cerrar el modal de cierre');
 });
 
 test('reemplazar una llamada live migra las referencias antes de reconciliar incluso con Logros apagado', () => {
@@ -320,38 +264,7 @@ test('una llamada anterior a la difícil no consume la recuperación pendiente',
   assert.deepEqual(currentState.game.reinforcement.recoveries.map(({ callId, fromCallId }) => ({ callId, fromCallId })), [{ callId: 'later', fromCallId: 'difficult' }]);
 });
 
-test('una cola llena conserva el progreso acumulado sin descartar premios previos', () => {
-  const dayKey = currentDayKey();
-  const callRows = [];
-  const fullQueue = Array.from({ length: 100 }, (_, index) => ({ id: `saved-${index}`, rewardId: 'saved', name: 'Guardado', icon: '🎁', window: 'break', dayKey, triggerKey: `saved:${index}`, earnedAt: '', costUsd: 0, durationMin: 0 }));
-  const currentState = { game: { reinforcement: { ...createDefaultReinforcementState(), pendingRewards: fullQueue } } };
-  setAppState(currentState);
-  setAppCalls(callRows);
-  setAppSettings({ game: { enabled: true }, reinforcement: { enabled: true, askAfterCall: false, rewards: [{ id: 'snack', name: 'Snack', window: 'break', trigger: 'calls', every: 1, accumulationTarget: 1, maxPerDay: 10 }] } });
-  configurePositiveReinforcementContext({
-    callDateKeyFromValue: (value) => value === dayKey ? value : '',
-    callsForDay: (value) => value === dayKey ? callRows : [],
-    closeModal: () => {}, convertedAmountText: () => '', effectiveDailyGoal: () => ({ usd: 0 }),
-    escapeHtml: (value) => String(value), importedCallStats: () => ({ earnings: 0 }), openModal: () => {},
-    saveSettingsOnly: () => {}, saveStateOnly: () => {}, toast: () => {}, todayCallDateKey: () => dayKey,
-  });
-  const call = (id, offset) => ({ id, callDate: dayKey, startISO: new Date(Date.now() - 120000 + offset).toISOString(), endISO: new Date(Date.now() - 90000 + offset).toISOString() });
-  const first = call('first', 0);
-  callRows.push(first);
-  onPositiveCallSaved(first, 'import', dayKey);
-  assert.equal(currentState.game.reinforcement.pendingRewards.length, 100);
-  assert.equal(currentState.game.reinforcement.progress.snack, 1);
-
-  currentState.game.reinforcement.pendingRewards.shift();
-  const second = call('second', 30000);
-  callRows.push(second);
-  onPositiveCallSaved(second, 'import', dayKey);
-  assert.equal(currentState.game.reinforcement.pendingRewards.length, 100);
-  assert.ok(currentState.game.reinforcement.pendingRewards.some((item) => item.rewardId === 'snack'));
-  assert.equal(currentState.game.reinforcement.progress.snack, 1);
-});
-
-test('dropped repetidas no abren reflexión ni ganan premios y una recuperación requiere llamada productiva', () => {
+test('dropped repetidas no abren reflexión y una recuperación requiere llamada productiva', () => {
   const dayKey = currentDayKey();
   const now = Date.now();
   const rows = [];
@@ -359,10 +272,7 @@ test('dropped repetidas no abren reflexión ni ganan premios y una recuperación
   const currentState = { game: { reinforcement: { ...createDefaultReinforcementState(), recoveryPending: { callId: origin.id, dayKey, endISO: origin.endISO } } } };
   setAppState(currentState);
   setAppCalls(rows);
-  setAppSettings({ game: { enabled: true, intensity: 'subtle' }, reinforcement: { enabled: true, askAfterCall: true, rewards: [
-    { id: 'calls', name: 'Cada cinco llamadas', window: 'break', trigger: 'calls', every: 5 },
-    { id: 'recovery', name: 'Premio por retomar', window: 'break', trigger: 'recovery' },
-  ] } });
+  setAppSettings({ game: { enabled: true, intensity: 'subtle' }, reinforcement: { enabled: true, askAfterCall: true } });
   const opened = [];
   configurePositiveReinforcementContext({
     callDateKeyFromValue: (value) => value === dayKey ? value : '', callsForDay: () => rows,
@@ -377,7 +287,6 @@ test('dropped repetidas no abren reflexión ni ganan premios y una recuperación
     rows.push(dropped);
     onPositiveCallSaved(dropped, 'live', dayKey);
   }
-  assert.equal(currentState.game.reinforcement.pendingRewards.length, 0);
   assert.equal(currentState.game.reinforcement.recoveries.length, 0);
   assert.deepEqual(opened, []);
   assert.equal(currentState.game.reinforcement.recoveryPending.callId, origin.id);
@@ -391,10 +300,8 @@ test('dropped repetidas no abren reflexión ni ganan premios y una recuperación
   onPositiveCallSaved(productive, 'import', dayKey);
   assert.equal(currentState.game.reinforcement.recoveryPending, null);
   assert.equal(currentState.game.reinforcement.recoveries.length, 1);
-  assert.deepEqual(currentState.game.reinforcement.pendingRewards.map((item) => item.rewardId), ['recovery']);
   onPositiveCallSaved(productive, 'import', dayKey);
   assert.equal(currentState.game.reinforcement.recoveries.length, 1);
-  assert.equal(currentState.game.reinforcement.pendingRewards.length, 1);
 });
 
 test('Logros elimina plan, intensidad y presupuesto sin dejar controles ni listeners', () => {
@@ -402,8 +309,7 @@ test('Logros elimina plan, intensidad y presupuesto sin dejar controles ni liste
   const game = fs.readFileSync(path.join(root, 'js/game.js'), 'utf8');
   const positive = fs.readFileSync(path.join(root, 'js/positive-reinforcement.js'), 'utf8');
   const css = fs.readFileSync(path.join(root, 'css/game.css'), 'utf8');
-  assert.match(css, /\.positive-reward-editor-grid > \.goals-field\[hidden\]\s*\{\s*display:\s*none\s*!important/);
-  assert.match(positive, /reinforcement\.pendingRewards\.length >= 100/);
-  assert.match(positive, /settings\.reinforcement\.rewards\.length >= 60[\s\S]*toast\(translateText\('Ya tienes el máximo de 60 premios\.'\)\)/);
+  assert.doesNotMatch(html + positive, /physicalReward|pendingRewards|PHYSICAL_REWARD|onPositiveRewardWindow/);
+  assert.doesNotMatch(css, /positive-reward-editor-grid|physical-reward/);
   assert.doesNotMatch(html + game + positive, /gameDailyFocus|gameIntensityInput|positiveWeeklyBudgetInput|choose-mission/);
 });

@@ -13,7 +13,7 @@ const {
 } = await import('../js/reinforcement-feedback.js');
 const {
   configurePositiveReinforcementContext, createDefaultReinforcementState,
-  initPositiveReinforcement, onPositiveCallSaved, onPositiveRewardWindow,
+  initPositiveReinforcement, onPositiveCallSaved,
   renderPositiveReinforcement, reopenPositiveReflection,
 } = await import('../js/positive-reinforcement.js');
 
@@ -153,7 +153,7 @@ test('Refuerzo positivo funciona con Logros apagado y espera el cierre del diál
   const call = { id: 'personal-call', callDate: dayKey, startISO: new Date(Date.now() - 120000).toISOString(), endISO: new Date(Date.now() - 60000).toISOString() };
   const rows = [call];
   const currentState = { game: { reinforcement: createDefaultReinforcementState() }, activePause: { type: 'break' } };
-  const config = { game: { enabled: false, intensity: 'off' }, reinforcement: { enabled: false, askAfterCall: true, rewards: [{ id: 'tea', name: 'Té', icon: '☕', window: 'break', trigger: 'calls', every: 1 }] } };
+  const config = { game: { enabled: false, intensity: 'off' }, reinforcement: { enabled: false, askAfterCall: true } };
   setAppState(currentState);
   setAppCalls(rows);
   setAppSettings(config);
@@ -161,8 +161,8 @@ test('Refuerzo positivo funciona con Logros apagado y espera el cierre del diál
   const closed = [];
   const messages = [];
   const listeners = new Map();
-  const nodes = new Map([['physicalRewardClaimList', { innerHTML: '' }], ['physicalRewardClaimTitle', { textContent: '' }]]);
-  for (const id of ['positiveReflectionModal', 'physicalRewardClaimModal', 'physicalRewardEditorModal']) {
+  const nodes = new Map();
+  for (const id of ['positiveReflectionModal']) {
     const modal = { open: false };
     modal.classList = { contains: name => name === 'open' && modal.open };
     nodes.set(id, modal);
@@ -172,27 +172,21 @@ test('Refuerzo positivo funciona con Logros apagado y espera el cierre del diál
   configureReinforcementFeedback({ queueToast: (...args) => messages.push(args) });
   const positiveContext = {
     callDateKeyFromValue: (value) => value === dayKey ? value : '', callsForDay: () => rows,
-    closeModal: (id) => { closed.push(id); nodes.get(id).open = false; }, convertedAmountText: () => '', effectiveDailyGoal: () => ({ usd: 0 }),
-    escapeHtml: String, importedCallStats: () => ({ earnings: 0 }), openModal: (id) => { opened.push(id); nodes.get(id).open = true; },
-    saveSettingsOnly: () => {}, saveStateOnly: () => {}, toast: () => {}, todayCallDateKey: () => dayKey,
+    closeModal: (id) => { closed.push(id); nodes.get(id).open = false; }, 
+    escapeHtml: String, openModal: (id) => { opened.push(id); nodes.get(id).open = true; },
+    saveSettingsOnly: () => {}, saveStateOnly: () => {}, todayCallDateKey: () => dayKey,
   };
   configurePositiveReinforcementContext(positiveContext);
   onPositiveCallSaved(call, 'manual', dayKey);
-  assert.equal(currentState.game.reinforcement.pendingRewards.length, 0);
   assert.deepEqual(currentState.game.reinforcement.reflections, {});
   assert.equal(messages.length, 0);
   assert.deepEqual(opened, []);
   assert.equal(reopenPositiveReflection(call, dayKey), false);
-  assert.equal(onPositiveRewardWindow('break', { manual: true }), false);
 
   config.reinforcement.enabled = true;
   onPositiveCallSaved(call, 'manual', dayKey);
-  assert.equal(currentState.game.reinforcement.pendingRewards.length, 1);
-  assert.ok(messages.length > 0);
+  assert.equal(messages.length, 0, 'sin recuperación pendiente no hay aviso al guardar la llamada');
   assert.deepEqual(opened, ['positiveReflectionModal']);
-  assert.equal(onPositiveRewardWindow('break'), true);
-  assert.equal(onPositiveRewardWindow('break', { manual: true }), true);
-  assert.equal(opened.at(-1), 'physicalRewardClaimModal');
   initPositiveReinforcement();
   assert.equal(opened.filter(id => id === 'positiveReflectionModal').length, 1);
   globalThis.Element = class { closest() { return this; } };
@@ -204,7 +198,7 @@ test('Refuerzo positivo funciona con Logros apagado y espera el cierre del diál
   assert.equal(currentState.game.reinforcement.reflections[call.id].outcome, 'good');
   const imported = { ...call, id: 'pasted-1' };
   const imported2 = { ...call, id: 'pasted-2' };
-  nodes.get('physicalRewardClaimModal').open = false;
+  nodes.get('positiveReflectionModal').open = false;
   rows.push(imported, imported2);
   nodes.set('callsModal', { open: true });
   const beforePaste = opened.length;
@@ -242,26 +236,19 @@ test('Refuerzo positivo funciona con Logros apagado y espera el cierre del diál
   const messagesBeforeFailure = messages.length;
   onPositiveCallSaved(failed, 'manual', dayKey);
   assert.deepEqual(currentState.game.reinforcement, beforeFailure);
-  assert.equal(messages.length, messagesBeforeFailure, 'rejected write cannot announce a reward');
+  assert.equal(messages.length, messagesBeforeFailure, 'rejected write cannot announce feedback');
   assert.equal(opened.length, beforePaste + 2);
   configurePositiveReinforcementContext(positiveContext);
   assert.equal(reopenPositiveReflection(call, dayKey), true);
-  nodes.get('physicalRewardClaimModal').open = true;
-  nodes.get('physicalRewardEditorModal').open = true;
   const saved = structuredClone(currentState.game.reinforcement);
   const messagesBeforeDisable = messages.length;
   closed.length = 0;
   config.reinforcement.enabled = false;
   renderPositiveReinforcement();
-  for (const id of ['positiveReflectionModal', 'physicalRewardClaimModal']) {
-    assert.ok(closed.includes(id), `${id} se cierra al apagar el refuerzo`);
-    assert.equal(nodes.get(id).open, false);
-  }
-  assert.equal(nodes.get('physicalRewardEditorModal').open, true, 'el editor de preferencias sigue disponible con Logros apagado');
-  assert.equal(closed.includes('physicalRewardEditorModal'), false);
+  assert.ok(closed.includes('positiveReflectionModal'), 'positiveReflectionModal se cierra al apagar el refuerzo');
+  assert.equal(nodes.get('positiveReflectionModal').open, false);
   assert.deepEqual(currentState.game.reinforcement, saved);
   assert.equal(reopenPositiveReflection(call, dayKey), false);
-  assert.equal(onPositiveRewardWindow('break', { manual: true }), false);
   listeners.get('click')({ target: button });
   assert.equal(messages.length, messagesBeforeDisable);
   assert.deepEqual(currentState.game.reinforcement, saved);

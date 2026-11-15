@@ -28,7 +28,6 @@ import {
   initPositiveReinforcement,
   normalizeReinforcementState,
   onPositiveCallSaved,
-  onPositiveRewardWindow,
   reconcilePositiveCalls,
   resetPositiveDay,
   renderPositiveReinforcement,
@@ -2469,7 +2468,7 @@ function openStageClear(dayKey, entry, { celebrate = false, leveledUp = false } 
 }
 
 export function onGameShiftEnded(dayKey = currentGameDayKey()) {
-  if (!gameEnabled()) return onPositiveRewardWindow('shift-end');
+  if (!gameEnabled()) return;
   const normalizedDayKey = callDateKeyFromValue(dayKey) || currentGameDayKey();
   ensureGameState(normalizedDayKey);
   const alreadyFinalized = state.game.days[normalizedDayKey]?.finalized;
@@ -2483,7 +2482,6 @@ export function onGameShiftEnded(dayKey = currentGameDayKey()) {
   saveStateOnly();
   renderGame();
   if (!alreadyFinalized && gameEnabled()) openStageClear(normalizedDayKey, entry, { celebrate: true, leveledUp: state.game.level > oldLevel });
-  onPositiveRewardWindow('shift-end');
 }
 
 function chestReward(sealedOn, { goalReward = false } = {}) {
@@ -2610,7 +2608,6 @@ export function onGamePauseStarted(type) {
   state.game.live.combo = 0;
   saveStateOnly();
   if (gameEnabled()) renderGame();
-  return onPositiveRewardWindow(type === 'lunch' ? 'lunch' : 'break');
 }
 
 export function equipAccessory(accessoryLabel) {
