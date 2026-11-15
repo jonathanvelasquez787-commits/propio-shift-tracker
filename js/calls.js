@@ -6,7 +6,6 @@ import { ignorePropioCall } from './propio-bridge.js';
 import { callFeedbackSilenced, withSilentCallFeedback } from './call-feedback.js';
 import { PAY_ESTIMATE_RULE, roundedPayMinutes, callPayMinutes } from './pay-estimate.js';
 import { observedCallRecord } from './call-records.js';
-import { restoreAutomaticGameChanges } from './work-actions.js';
 
 let HIGHER_RATE_TIERS, MAX_CALL_DURATION_MIN, appConfirm, autoStartShiftFromCalls, callDateKeyFromValue, callDedupeKey;
 let callsForDay, callsOverlap, closeModal, connectedMinutesForDay, convertedAmountText, dayAdherence;
@@ -284,7 +283,6 @@ function rollbackPendingLiveBackup() {
     if (context.autoShiftEventId) state.events = state.events.filter(event => event?.id !== context.autoShiftEventId);
     state.shiftStartedAt = context.previousShiftStartedAt || null;
     state.shiftEndedAt = context.previousShiftEndedAt || null;
-    if (context.gameBeforeAutoShift) state.game = restoreAutomaticGameChanges(state.game, context.gameBeforeAutoShift, context.gameAfterAutoShift);
   }
 
   const affectedDayKey = callDateKeyFromValue(pending?.candidate?.callDate)

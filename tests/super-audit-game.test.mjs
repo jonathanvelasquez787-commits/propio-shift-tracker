@@ -3,11 +3,10 @@ import { beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { setAppCalls, setAppSettings, setAppState } from '../js/app-context.js';
 import { configureGameContext, createDefaultGameState, normalizeGameState,
-  onReinforcementCallSaved, onReinforcementCallsChanged, onReinforcementShiftStarted, onReinforcementDayMetadataChanged, onReinforcementDayReset,
+  onReinforcementCallSaved, onReinforcementCallsChanged, onReinforcementDayMetadataChanged, onReinforcementDayReset,
   onReinforcementPauseEnded, onReinforcementPauseStarted, onReinforcementDayRollover, renderGame } from '../js/reinforcement.js';
 import { configurePositiveReinforcementContext } from '../js/positive-reinforcement.js';
 import { withSilentCallFeedback } from '../js/call-feedback.js';
-import { restoreAutomaticGameChanges } from '../js/work-actions.js';
 
 test('discreet automatic feedback preserves identical milestone and call receipts', () => {
   const snapshots = [];
@@ -73,25 +72,6 @@ function fixture({ goal = 10000, status = 'compliant', streak = 0,
       for (const name of ['document', 'window']) { if (previous[name] === undefined) delete globalThis[name]; else globalThis[name] = previous[name]; } },
   };
 }
-
-test('automatic-start capture restores the previous receipts without erasing a later import of an earlier call', () => {
-  const f = fixture();
-  try {
-    f.add(1, 1);
-    const before = structuredClone(f.current.game);
-    let started;
-    onReinforcementShiftStarted({ captureState: value => { started = value; } });
-    assert.deepEqual(started, before);
-    const historical = { id: 'later-historical', shiftDayKey: f.key, callDate: f.key, startISO: new Date(Date.now() - 20 * 60000).toISOString(),
-      endISO: new Date(Date.now() - 15 * 60000).toISOString(), importedAt: new Date().toISOString(), durationMin: 5, pay: 2, billable: 'Yes', dropped: 'No', countsAsProductive: true };
-    f.rows.push(historical); onReinforcementCallSaved(historical, 'import'); onReinforcementCallsChanged(historical.callDate);
-    const laterLedger = Object.fromEntries(Object.entries(f.current.game.ledger).filter(([key]) => !Object.hasOwn(started.ledger, key)));
-    assert.ok(Object.keys(laterLedger).length > 0);
-    f.current.game = restoreAutomaticGameChanges(f.current.game, before, started);
-    onReinforcementCallsChanged(f.key); onReinforcementDayMetadataChanged(f.key);
-    for (const [key, value] of Object.entries(laterLedger)) assert.deepEqual(f.current.game.ledger[key], value);
-  } finally { f.dispose(); }
-});
 
 test('resetting one day removes its reinforcement receipts while preserving other days and preferences', () => {
   const f = fixture();

@@ -9,7 +9,6 @@ import { createPropioReceiver, createStorageRevisionGuard, ignorePropioCall } fr
 import { portalRecordsText } from './propio-history-records.js';
 import { callFeedbackSilenced, withSilentCallFeedback } from './call-feedback.js';
 import { preserveCallRecords, compareCallRecords, acwCallRecord, latestCompletedCall } from './call-records.js';
-import { restoreAutomaticGameChanges } from './work-actions.js';
 import { settingsWithinBudget, reportLocalPersistenceFailure, readMeta, jsonbBytes, preserveRecoveryCopy, listRecoveryCopies } from './sync.js';
 // Boot importa este módulo solo después de verificar la sesión e hidratar sus datos.
 
@@ -127,7 +126,6 @@ import {
   onReinforcementDayMetadataChanged,
   onReinforcementPauseEnded,
   onReinforcementPauseStarted,
-  onReinforcementShiftStarted,
   renderGame,
   renderGameLive,
   configureGameContext,
@@ -4003,7 +4001,6 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       state.shiftEndedAt = null;
       setEvent('shift', translateText('Shift iniciado automáticamente'), fmtTime(firstStart), 'auto');
       if (saveStateOnly() === false) return false;
-      onReinforcementShiftStarted({ continued: false });
       if (!silent) toast(ui`Shift iniciado automáticamente desde tu primera llamada (${fmtTime(firstStart)})`);
       return true;
     }
@@ -4099,7 +4096,6 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
           if (!persist()) return false;
           stopShiftAlarm();
           toast(ui`Turno continuado — interrupción de ${formatMinutes(gapMin)} min registrada`);
-          onReinforcementShiftStarted({ continued: true });
           return;
         }
       }
@@ -4116,7 +4112,6 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       // apagaría solo en el próximo tick (hasta 1s de retraso), pero apagarlo aquí de inmediato
       // evita ese beep extra.
       stopShiftAlarm();
-      onReinforcementShiftStarted({ continued: false });
 
       // El estimado desde la primera llamada se reemplaza por la hora del click en cuanto se inicia
       // el turno.
@@ -4277,7 +4272,6 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       const needsAutoShift = !state.shiftStartedAt || !!state.shiftEndedAt;
       const previousShiftStartedAt = state.shiftStartedAt || null;
       const previousShiftEndedAt = state.shiftEndedAt || null;
-      const gameBeforeAutoShift = needsAutoShift ? JSON.parse(JSON.stringify(state.game || null)) : null;
       let autoShiftEventId = null;
       if (needsAutoShift) {
         state.shiftStartedAt = nowISO;
@@ -4292,13 +4286,10 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
         previousShiftStartedAt,
         previousShiftEndedAt,
         interruptedPauseRollback,
-        // Las dos capturas permiten revertir solo los efectos del inicio automático.
-        gameBeforeAutoShift,
         ...(options.propioBridge ? { propioBridge: { ...options.propioBridge } } : {}),
       };
       if (saveAll() === false) { setAppState(before); render(); return false; }
       interruptedPauseRollback?.finish?.();
-      if (needsAutoShift) onReinforcementShiftStarted({ continued: false, captureState: game => { state.activeCall.gameAfterAutoShift = game; } });
       toast(needsAutoShift ? translateText('Llamada iniciada · turno abierto automáticamente') : translateText('Llamada iniciada'));
       return true;
     }
@@ -4356,7 +4347,6 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
           }
           state.shiftStartedAt = discarded.previousShiftStartedAt || null;
           state.shiftEndedAt = discarded.previousShiftEndedAt || null;
-          if (discarded.gameBeforeAutoShift) state.game = restoreAutomaticGameChanges(state.game, discarded.gameBeforeAutoShift, discarded.gameAfterAutoShift);
         }
 
       }, discarded => {
@@ -5242,21 +5232,15 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       usdCeilFromCurrencyAmount,
     });
     configureGameContext({
-      appConfirm, callDateKeyFromValue, callDateToDate, callsForDay, closeModal, computeComplianceStreak, convertedAmountText,
-      cycleBoundsForOffset, cycleEarningsForOffset, dayAdherence, dayComplianceStatus, dayConfigFor,
-      dayIsEffectivelyOff, effectiveCycleGoal, effectiveDailyGoal, escapeHtml, financeConvertedInline,
-      financeRowIsMeta, formatCallDayLabel, formatMinutes, higherRateBonusForCall, higherRateLiveStatus,
-      importedCallStats, money, openModal, parseMoney, productiveMinutesForDay, saveSettingsOnly,
-      saveStateOnly, todayCallDateKey, toast, weekdayKeyForDayKey, renderHeader,
-      freelancerDiscipline,
+      callDateKeyFromValue, callsForDay, convertedAmountText, effectiveDailyGoal, higherRateBonusForCall,
+      importedCallStats, money, saveSettingsOnly, saveStateOnly, todayCallDateKey, freelancerDiscipline,
       getReinforcementWorkIntervals: (dayKey) => {
         return reinforcementScheduleIntervals(dayKey).filter((slot) => String(slot.type).toLowerCase() === 'work');
       },
     });
     configurePositiveReinforcementContext({
-      callDateKeyFromValue, callsForDay, closeModal, convertedAmountText, effectiveDailyGoal,
-      escapeHtml, importedCallStats, openModal, saveSettingsOnly, saveStateOnly, toast,
-      todayCallDateKey,
+      callDateKeyFromValue, callsForDay, closeModal, escapeHtml, openModal,
+      saveSettingsOnly, saveStateOnly, todayCallDateKey,
     });
 
     // Pedido del usuario : Volumen/Avisos con sonido/Adherencia/ Descanso por productividad salieron de Horario — no son horario, son cómo y cuándo te avisa la app.

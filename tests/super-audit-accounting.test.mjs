@@ -375,7 +375,7 @@ test('starting a call during a pause rolls back rejected activity without stoppi
 
 test('manual shift reopening does not change its closed session until a continuation choice is accepted',t=>{
   const x=harness(t);x.advance(at(1,'09:02'));let resume;
-  Object.assign(x.h,{fmtTime:String,ACCIDENTAL_TOGGLE_GRACE_MIN:5,stopShiftAlarm(){},onReinforcementShiftStarted(){},
+  Object.assign(x.h,{fmtTime:String,ACCIDENTAL_TOGGLE_GRACE_MIN:5,stopShiftAlarm(){},
     reviewShiftTransition:(_kind,continued,fresh)=>{resume={continued,fresh};}});
   vm.runInContext(declarations.get('startShift'),x.h);
   state.shiftStartedAt=at(1,'08:00').toISOString();state.shiftEndedAt=at(1,'09:00').toISOString();state.propioBridgeSession={sessionId:'keep'};

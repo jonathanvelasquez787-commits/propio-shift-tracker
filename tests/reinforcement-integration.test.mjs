@@ -8,7 +8,7 @@ const {
   announceGameStatus, checkReinforcementInactivity, chooseCycleReward, claimPendingChest, computeGameDay, configureGameContext, createDefaultGameState, equipAccessory,
   migrateGameCallReferences, normalizeGameState, onReinforcementCallSaved, onReinforcementCallsChanged, onReinforcementDayMetadataChanged, openDailyGoalChest,
   onReinforcementMonetaryProgress, onReinforcementPauseEnded, onReinforcementPauseStarted, queueGameToast,
-  renderGame, renderGameLive, rewardSurpriseForCall, onReinforcementShiftEnded, onReinforcementShiftStarted,
+  renderGame, renderGameLive, rewardSurpriseForCall, onReinforcementShiftEnded,
 } = await import('../js/reinforcement.js');
 const { configurePositiveReinforcementContext } = await import('../js/positive-reinforcement.js');
 import { financeRowIsMeta } from '../js/finance.js';
