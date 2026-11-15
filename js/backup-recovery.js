@@ -75,8 +75,27 @@ function resetPickerHtml(context, effects) {
   const how = effects.filter(Boolean).map(line => `<li>${escapeHtml(line)}</li>`).join('');
   return `<div class="reset-picker"><div class="reset-top"><span class="reset-have">${t(translateText('Hoy tenés:'))}</span>${chips}<button type="button" class="reset-how-btn" id="resetHowBtn" aria-expanded="false" aria-controls="resetHowPanel">${t(translateText('¿Cómo funciona?'))}</button></div><div class="recovery-card reset-how-panel" id="resetHowPanel" hidden><ul class="confirmation-effects">${how}</ul></div><div class="reset-label">${t(translateText('Qué querés borrar'))}</div>${rows}</div>`;
 }
-function wireResetPicker() {
-  const ids = RESET_PICK_IDS;
+const DAY_PICK_IDS = ['resetDayCallsInput', 'resetDayBreaksInput', 'resetDayNotesInput'];
+// Pantalla "Reiniciar día": mismas casillas que "Reiniciar todos los datos", pero solo del día activo.
+function dayPickerHtml(context, effects, options) {
+  const { translateText, escapeHtml } = context;
+  const t = text => escapeHtml(text);
+  const counts = options.dayCounts || { calls: 0, actions: 0, pauses: 0 };
+  const word = (n, one, many) => translateText(n === 1 ? one : many);
+  const chips = [[counts.calls, word(counts.calls, 'llamada', 'llamadas')], [counts.actions, word(counts.actions, 'acción', 'acciones')], [counts.pauses, word(counts.pauses, 'pausa', 'pausas')]]
+    .map(([n, label]) => `<span class="reset-chip">${n} ${t(label)}</span>`).join('');
+  const check = '<svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polyline points="5 12 10 17 19 6"/></svg>';
+  const picks = [
+    [DAY_PICK_IDS[0], translateText('Llamadas'), translateText('Las llamadas de este día')],
+    [DAY_PICK_IDS[1], translateText('Pausas y huecos'), translateText('Breaks, lunch y huecos anotados')],
+    [DAY_PICK_IDS[2], translateText('Nota y acciones'), translateText('Tu nota, el registro y el avance del día')],
+  ];
+  const del = t(translateText('Se borra')), keep = t(translateText('Se conserva'));
+  const rows = picks.map(([id, title, sub]) => `<label class="reset-pick" for="${id}"><input id="${id}" type="checkbox" checked/><span class="reset-pick-box">${check}</span><span class="reset-pick-text"><strong>${t(title)}</strong><small>${t(sub)}</small></span><span class="reset-pick-tag reset-pick-del">${del}</span><span class="reset-pick-tag reset-pick-keep">${keep}</span></label>`).join('');
+  const how = effects.filter(Boolean).map(line => `<li>${escapeHtml(line)}</li>`).join('');
+  return `<div class="reset-picker reset-picker-day"><div class="reset-top"><span class="reset-have">${t(translateText('Día:'))} ${escapeHtml(String(options.dayLabel || ''))}</span>${chips}<button type="button" class="reset-how-btn" id="resetHowBtn" aria-expanded="false" aria-controls="resetHowPanel">${t(translateText('¿Cómo funciona?'))}</button></div><div class="recovery-card reset-how-panel" id="resetHowPanel" hidden><ul class="confirmation-effects">${how}</ul></div><div class="reset-label">${t(translateText('Qué querés borrar'))}</div>${rows}</div>`;
+}
+function wireResetPicker(ids = RESET_PICK_IDS) {
   const ok = document.getElementById('confirmModalOkBtn');
   const sync = () => { if (ok) ok.disabled = !ids.some(id => document.getElementById(id)?.checked); };
   ids.forEach(id => document.getElementById(id)?.addEventListener('change', sync));
@@ -90,8 +109,7 @@ export function confirmReplacement(context, kind, change, options = {}) {
   const owner = context.data(), account = context.account(), expected = replacementSignature(owner);
   const incoming = options.incoming;
   const effects = kind === 'day' ? [
-    ui`Día que se reinicia: ${options.dayLabel}.`,
-    translateText('Se eliminan sus llamadas, pausas, huecos, nota, acciones y progreso diario. Otros días, horario y metas se conservan.'),
+    translateText('Se borra solo lo que dejes marcado de este día. Otros días, horario y metas se conservan.'),
   ] : kind === 'reset' ? [
     translateText('Se borra solo lo que dejes marcado. Lo que no marques se conserva.'),
     translateText('Tu cuenta y los ajustes propios de la extensión se conservan.'),
@@ -131,12 +149,13 @@ export function confirmReplacement(context, kind, change, options = {}) {
   const details = document.getElementById('confirmModalDetails');
   if (details) {
     details.className=kind==='import'?'review-confirm polished-restore':'';
-    details.innerHTML = kind==='reset' ? resetPickerHtml(context, effects) : comparisonHtml(context, incoming)
+    details.innerHTML = kind==='reset' ? resetPickerHtml(context, effects) : kind==='day' ? dayPickerHtml(context, effects, options) : comparisonHtml(context, incoming)
       +(kind==='import'?ui`<div class="polished-impact"><strong>Datos del respaldo</strong><span>Reemplazan llamadas, turnos, pausas y notas.</span></div>`+`<div class="polished-impact"><strong>${escapeHtml(translateText('Tus ajustes'))}</strong><span>${escapeHtml(effects[1])}</span></div>`
         +(effects[2]?`<div class="review-callout">${escapeHtml(effects[2])}</div>`:'')
         +ui`<div class="polished-impact"><strong>Copia previa protegida</strong><span>Se guarda en este navegador antes de restaurar.</span></div><details class="polished-disclosure"><summary>Sincronización y recuperación</summary><div class="polished-detail"><p class="note">${escapeHtml(effects.at(-1))}</p></div></details>`
         :ui`<ul class="confirmation-effects">${effects.filter(Boolean).map(line => `<li>${escapeHtml(line)}</li>`).join('')}</ul>`);
     if (kind === 'reset') wireResetPicker();
+    if (kind === 'day') wireResetPicker(DAY_PICK_IDS);
     if(kind==='import'){const button=document.getElementById('confirmModalOkBtn');if(button)button.textContent=translateText('Restaurar datos');}
   }
 }

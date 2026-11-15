@@ -335,6 +335,18 @@
           ]
         },
         {
+          "file": "tests/reset-day-picker.test.mjs",
+          "namedCases": [
+            "reiniciar día con solo \"Llamadas\" marcada deja pausas, nota y acciones",
+            "reiniciar día con solo \"Pausas y huecos\" marcada borra pausas y huecos de ese día",
+            "reiniciar día con solo \"Nota y acciones\" marcada borra nota, acciones y turno",
+            "reiniciar día con las 3 casillas borra todo ese día y no toca otros días",
+            "reiniciar día sin ninguna casilla marcada no cambia nada",
+            "reiniciar día le pasa al aviso el nombre del día y los números de ese día",
+            "el aviso de reiniciar día trae 3 casillas marcadas y el botón ¿Cómo funciona?"
+          ]
+        },
+        {
           "file": "tests/audit-save-feedback.test.mjs",
           "namedCases": [
             "starting a live call does not announce success after its snapshot is rejected",
