@@ -1025,7 +1025,7 @@
             "Horario: en celular Inicio y Fin del turno van lado a lado",
             "Horario: el texto largo del modo freelancer vive en el icono i y no pierde su contenido",
             "Horario: las plantillas del modo freelancer conservan sus tres botones en una fila",
-            "Horario: en celular Guardar día ocupa todo el ancho y los dos botones de copiar quedan parejos"
+            "Horario: Guardar día y el menú Copiar a otros días siguen en el pie con sus ids"
           ]
         },
         {
@@ -1036,6 +1036,14 @@
             "Horario rediseño A: la fila del día conserva los ids y suma el chip de duración y el interruptor",
             "Horario rediseño A: la tira de la semana muestra horas cortas y \"Libre\"",
             "Horario rediseño A: el CSS nuevo está en su bloque marcado y la tira es una grilla de 7 columnas"
+          ]
+        },
+        {
+          "file": "tests/horario-rediseno-c.test.mjs",
+          "namedCases": [
+            "Horario C: el pie tiene Guardar día y un menú Copiar a otros días con Lunes a Viernes y Sábado y Domingo",
+            "Horario C: el menú se abre con el botón y se cierra al elegir, al tocar afuera y con Escape",
+            "Horario C: estilos en su bloque, Guardar día ocupa el espacio y en celular el botón de copiar queda solo con íconos"
           ]
         },
         {

@@ -33,8 +33,6 @@ test('Horario: las plantillas del modo freelancer conservan sus tres botones en 
   assert.match(block, /\.sched-templates-line \{ display: flex; flex-wrap: wrap;/);
 });
 
-test('Horario: en celular Guardar día ocupa todo el ancho y los dos botones de copiar quedan parejos', () => {
-  assert.match(block, /#saveShiftWindowBtn \{ flex: 0 0 100%; \}/);
-  assert.match(block, /#copyDayToAllBtn, #copyWeekendBtn \{ flex: 1 1 0;/);
-  for (const id of ['saveShiftWindowBtn', 'copyDayToAllBtn', 'copyWeekendBtn']) assert.ok(html.includes('id="' + id + '"'));
+test('Horario: Guardar día y el menú Copiar a otros días siguen en el pie con sus ids', () => {
+  for (const id of ['saveShiftWindowBtn', 'schedCopyMenuBtn', 'copyDayToAllBtn', 'copyWeekendBtn']) assert.ok(html.includes('id="' + id + '"'));
 });

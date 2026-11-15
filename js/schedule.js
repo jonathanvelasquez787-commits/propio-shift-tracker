@@ -460,7 +460,7 @@ export function configureScheduleContext(context) {
 
     // Habilita/deshabilita los campos del día (Día libre, Inicio, Fin, bloques + "+ Agregar bloque") y los botones de copiar/guardar
     function setScheduleFormDisabled(disabled) {
-      ['dayOffInput', 'dayStartInput', 'dayEndInput', 'addWorkBlockBtn', 'addBreakBlockBtn', 'addLunchBlockBtn', 'copyDayToAllBtn', 'copyWeekendBtn', 'saveShiftWindowBtn', 'scheduleOffsetMinusBtn', 'scheduleOffsetPlusBtn', 'scheduleOffsetApplyBtn'].forEach(id => {
+      ['dayOffInput', 'dayStartInput', 'dayEndInput', 'addWorkBlockBtn', 'addBreakBlockBtn', 'addLunchBlockBtn', 'schedCopyMenuBtn', 'copyDayToAllBtn', 'copyWeekendBtn', 'saveShiftWindowBtn', 'scheduleOffsetMinusBtn', 'scheduleOffsetPlusBtn', 'scheduleOffsetApplyBtn'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.disabled = disabled;
       });
