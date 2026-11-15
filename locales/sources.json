@@ -2628,12 +2628,6 @@
       "js/app-main.js"
     ]
   },
-  "s_2757cfbc": {
-    "source": "Jugá solo si tenés tiempo libre",
-    "files": [
-      "js/game-battle.js"
-    ]
-  },
   "s_275b1f51": {
     "source": "Sin comparación disponible con ayer",
     "files": [
@@ -4162,12 +4156,6 @@
     "source": "\"Solo {{v0}}\" deja tu meta de siempre intacta y aplica esta solo a ese día.",
     "files": [
       "js/settings.js"
-    ]
-  },
-  "s_3cc4cde4": {
-    "source": "Duelo · 60 s",
-    "files": [
-      "js/game-battle.js"
     ]
   },
   "s_3ce700de": {
@@ -13138,6 +13126,12 @@
       "js/app-main.js"
     ]
   },
+  "s_c56a0a58": {
+    "source": "Aturdimiento: solo diversión",
+    "files": [
+      "js/game-battle.js"
+    ]
+  },
   "s_c5767979": {
     "source": "Se eliminan sus llamadas, pausas, huecos, nota, acciones y progreso diario. Otros días, horario y metas se conservan.",
     "files": [
@@ -13978,12 +13972,6 @@
     "source": "Límites y correcciones",
     "files": [
       "js/game-review.js"
-    ]
-  },
-  "s_d259eba8": {
-    "source": "Disponible en descanso o fuera del turno",
-    "files": [
-      "js/game-battle.js"
     ]
   },
   "s_d2631abd": {
@@ -16245,8 +16233,7 @@
   "s_f1ddb571": {
     "source": "Automático",
     "files": [
-      "app.html",
-      "js/game-battle.js"
+      "app.html"
     ]
   },
   "s_f1ed2046": {
@@ -17162,12 +17149,6 @@
     "source": "Bronce (+$0.01)",
     "files": [
       "js/higher-rate.js"
-    ]
-  },
-  "s_fef0ec5d": {
-    "source": "Modo de juego",
-    "files": [
-      "js/game-battle.js"
     ]
   },
   "s_fefad2c5": {

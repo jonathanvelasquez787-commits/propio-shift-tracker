@@ -109,11 +109,10 @@ export function battleMarkup() {
       <div class="game-battle-victory" data-battle-victory hidden></div>
     </div>
     <div class="game-battle-health" data-battle-health-slot></div>
-    <div class="game-battle-footer"><p class="game-battle-feed" data-battle-feed></p><span class="game-battle-stun" data-battle-stun hidden><i data-battle-stun-fill></i></span><button type="button" class="game-battle-free-shot" data-battle-action="free-shot" data-battle-free-shot title="Práctica: no cuenta para ganancias, XP ni récords">Disparar</button><button type="button" data-battle-action="collection" data-battle-collection-toggle aria-expanded="false" aria-controls="gameBattleCollection">Logros <span aria-hidden="true">⌄</span></button></div>
+    <div class="game-battle-footer"><p class="game-battle-feed" data-battle-feed></p><span class="game-battle-stun" data-battle-stun title="Aturdimiento: solo diversión"><i data-battle-stun-fill></i></span><button type="button" class="game-battle-free-shot" data-battle-action="free-shot" data-battle-free-shot title="Práctica: no cuenta para ganancias, XP ni récords">Disparar</button><button type="button" data-battle-action="collection" data-battle-collection-toggle aria-expanded="false" aria-controls="gameBattleCollection">Logros <span aria-hidden="true">⌄</span></button></div>
     <section id="gameBattleCollection" class="game-battle-collection" data-battle-collection hidden aria-label="Logros">
       <div class="game-battle-slots"><div class="game-battle-slot" data-battle-collection-summary></div>
         <div class="game-battle-loadout"><div><label for="gameBattleWeapon">Arma</label><select id="gameBattleWeapon" data-battle-weapon-select>${BATTLE_WEAPONS.map(w => `<option value="${w.id}">${escape(weaponName(w.id))}</option>`).join('')}</select><small data-battle-selected></small></div></div></div>
-      <div class="game-battle-mode-row"><div class="game-battle-modes" role="group" aria-label="Modo de juego"><button type="button" data-battle-action="auto" aria-pressed="true">Automático</button><button type="button" data-battle-action="duel" aria-pressed="false" data-battle-duel-button>Duelo · 60 s</button></div></div>
       <div class="game-battle-collection-foot"><small data-battle-work-note></small><button type="button" data-game-nav>Ver mis Logros →</button></div>
       <div class="game-battle-duel-hud" data-battle-duel-hud hidden>
         <strong data-battle-hearts aria-label="Vidas del héroe"></strong><span data-battle-time></span><span data-battle-points></span><span data-battle-best></span>
@@ -294,10 +293,8 @@ function createBattle(element) {
     $('touch').hidden = !manual;
     $('shortcuts').hidden = !manual;
     target.disabled = !manual || d.status !== 'running';
-    $('duel-button').disabled = !canPlayDuel(work) || !ctx;
-    $('duel-button').title = translateText('Disponible en descanso o fuera del turno');
     element.querySelectorAll('[data-battle-action="auto"], [data-battle-action="duel"]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.battleAction === mode)));
-    $('work-note').textContent = work === 'call' ? translateText('En llamada · modo tranquilo') : work === 'ready' ? '' : translateText('Jugá solo si tenés tiempo libre');
+    $('work-note').textContent = work === 'call' ? translateText('En llamada · modo tranquilo') : '';
     $('hearts').textContent = '♥'.repeat(d.lives) + '♡'.repeat(3-d.lives);
     $('hearts').setAttribute('aria-label', ui`${d.lives} vidas del héroe`);
     $('time').textContent = `${Math.ceil(d.time)} s`;
@@ -356,7 +353,7 @@ function createBattle(element) {
   function setStun(value) {
     stun = Math.max(0, Math.min(100, value));
     const bar = $('stun');
-    if (bar) { bar.hidden = stun === 0; $('stun-fill').style.width = `${stun}%`; }
+    if (bar) $('stun-fill').style.width = `${stun}%`;
     host.clearInterval?.(stunTimer); stunTimer = 0;
     if (stun > 0 && stun < 100) stunTimer = host.setInterval?.(() => { if (Date.now() - freeShotAt > 700) setStun(stun - 4); }, 400) || 0;
   }
