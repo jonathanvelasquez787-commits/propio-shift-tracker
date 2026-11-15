@@ -1196,6 +1196,13 @@
           ]
         },
         {
+          "file": "tests/battle-sin-duelo.test.mjs",
+          "namedCases": [
+            "la batalla ya no muestra los botones Automático y Duelo",
+            "Disparar es un botón con borde y la barra de aturdimiento siempre se ve"
+          ]
+        },
+        {
           "file": "tests/freelancer-blocks-list.test.mjs",
           "namedCases": [
             "Bloques del día en freelancer: cada descanso es una fila con etiqueta, horas y minutos",

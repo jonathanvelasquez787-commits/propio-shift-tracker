@@ -232,7 +232,7 @@
 .game-battle-collection .game-battle-collection-foot button { min-height: 0; margin-left: auto; padding: 4px 0; border: 0; background: transparent; color: var(--cyan); font-size: 12px; }
 
 /* disparo de practica */
-.game-battle-free-shot { color: var(--text) !important; font-weight: 600; padding-left: 0 !important; }
+.game-battle-footer > button.game-battle-free-shot { padding: 6px 16px; border: 1px solid var(--cyan); border-radius: 999px; color: var(--cyan); font-weight: 700; }
 .game-battle-free-shot:disabled { opacity: .45; }
 .game-battle-stun { display: block; flex: 0 1 44px; margin-right: auto; min-width: 24px; height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
 .game-battle-stun i { display: block; height: 100%; width: 0; background: var(--gold, #ffd84a); transition: width .15s; }
