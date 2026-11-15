@@ -1167,6 +1167,13 @@
           ]
         },
         {
+          "file": "tests/action-bar-desktop-size.test.mjs",
+          "namedCases": [
+            "Barra de acciones: solo en escritorio los botones vuelven a 72 de ancho por 46 de alto",
+            "Barra de acciones: en celular los botones chicos de 40 por 34 no se tocan"
+          ]
+        },
+        {
           "file": "tests/freelancer-blocks-list.test.mjs",
           "namedCases": [
             "Bloques del día en freelancer: cada descanso es una fila con etiqueta, horas y minutos",

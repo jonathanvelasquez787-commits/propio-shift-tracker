@@ -1388,3 +1388,16 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 .chips > .hero-shift-actions .action-slot[data-slot="shift"] { margin-left: auto; }
 .chips > .hero-shift-actions .action-slot[data-slot="add"] { margin-right: auto; }
 /* fin barra en dos mitades */
+/* botones barra escritorio */
+/* Solo en escritorio los botones de la barra de acciones vuelven al tamano de antes (72 x 46). En celular siguen chicos. */
+@media (min-width: 761px) {
+  .chips > .hero-shift-actions { gap: 8px; padding: 10px 16px; }
+  .chips > .hero-shift-actions .action-slot { flex: 0 0 auto; width: 72px; }
+  .chips > .hero-shift-actions .action-slot > :is(#shiftControlBtn,#breakControlBtn,#lunchControlBtn,#liveDiscardBtn,#callControlBtn,#pasteCallsBtn,#addCallManualBtn) { min-height: 46px; padding: 4px 2px; }
+  .chips > .hero-shift-actions .action-slot > :is(#shiftControlBtn,#breakControlBtn,#lunchControlBtn,#liveDiscardBtn,#callControlBtn,#pasteCallsBtn,#addCallManualBtn) .action-icon-wrap { width: 24px; height: 24px; }
+  .chips > .hero-shift-actions .action-slot:has(> :is(#breakControlBtn,#lunchControlBtn,#callControlBtn).is-active),
+  .chips > .hero-shift-actions .action-slot:has(> #callControlBtn.is-pending),
+  .chips > .hero-shift-actions .action-slot[data-slot="discard"] { width: auto; }
+  .chips > .hero-shift-actions .action-slot > #liveDiscardBtn { min-width: 52px; }
+}
+/* fin botones barra escritorio */
