@@ -25,3 +25,10 @@ test('barra de acciones: en escritorio los botones son más anchos (108 px) y la
   assert.match(block, /\.action-slot\[data-slot="discard"\] \{ width: auto; \}/, 'el botón de descartar sigue automático');
   assert.match(block, /#callControlBtn\)\.is-active/, 'los botones activos siguen automáticos');
 });
+
+test('barra de acciones: en escritorio la barra es más delgada (2 px arriba y abajo)', () => {
+  assert.match(block, /\.chips > \.hero-shift-actions \{ gap: clamp\(8px, 1\.5vw, 20px\); padding: 2px 16px; \}/, 'poco espacio arriba y abajo');
+  assert.doesNotMatch(block, /padding: 10px 16px/, 'ya no queda el espacio viejo de 10 px');
+  assert.match(block, /\.action-slot \{ flex: 0 0 auto; width: 108px; \}/, 'los botones no cambian de ancho');
+  assert.match(block, /min-height: 46px/, 'los botones no cambian de alto');
+});
