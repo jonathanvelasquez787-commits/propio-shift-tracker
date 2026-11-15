@@ -1239,6 +1239,13 @@
           ]
         },
         {
+          "file": "tests/game-mobile-same-as-desktop.test.mjs",
+          "namedCases": [
+            "en celular el reto de hoy se ve igual que en escritorio (escena de 88 px) sin cambiar de lugar",
+            "en celular el selector de Arma queda en la franja de abajo, siempre visible"
+          ]
+        },
+        {
           "file": "tests/freelancer-blocks-list.test.mjs",
           "namedCases": [
             "Bloques del día en freelancer: cada descanso es una fila con etiqueta, horas y minutos",
