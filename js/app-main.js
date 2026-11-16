@@ -762,7 +762,7 @@ export { onReinforcementCallSaved, onReinforcementCallsChanged, onReinforcementD
         // Estado abierto/cerrado de cada <details> con id propio, para que sobreviva a la recarga.
         accordionState: {},
         // En escritorio el sidebar arranca fijado por defecto.
-        sidebarPinned: true,
+        sidebarPinned: false,
         // Toggle "Contraer bloques al terminar" dentro de "Bloques del día" (ver
         // #collapseCompletedBlocksBtn)
         collapseCompletedBlocks: false,
@@ -840,7 +840,9 @@ export { onReinforcementCallSaved, onReinforcementCallsChanged, onReinforcementD
       if (!['auto', 'light', 'dark'].includes(settings.theme)) settings.theme = fallback.theme;
       if (!Number.isFinite(Number(settings.masterVolume)) || Number(settings.masterVolume) < 0 || Number(settings.masterVolume) > 100) settings.masterVolume = fallback.masterVolume;
       if (!settings.accordionState || typeof settings.accordionState !== 'object' || Array.isArray(settings.accordionState)) settings.accordionState = {};
-      if (typeof settings.sidebarPinned !== 'boolean') settings.sidebarPinned = true;
+      if (typeof settings.sidebarPinned !== 'boolean') settings.sidebarPinned = false;
+      // Una sola vez: el menú ya no sale fijo por defecto (se abre con el botón y se cierra al tocar afuera).
+      if (settings.sidebarPinMigrated !== true) { settings.sidebarPinned = false; settings.sidebarPinMigrated = true; }
       if (typeof settings.collapseCompletedBlocks !== 'boolean') settings.collapseCompletedBlocks = false;
       if (typeof settings.heroActionsCollapsed !== 'boolean') settings.heroActionsCollapsed = false;
       if (typeof settings.heroActionsSwapped !== 'boolean') settings.heroActionsSwapped = false;

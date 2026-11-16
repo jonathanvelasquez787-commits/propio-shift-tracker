@@ -1090,6 +1090,13 @@
           ]
         },
         {
+          "file": "tests/sidebar-not-pinned-default.test.mjs",
+          "namedCases": [
+            "el menú lateral ya no sale fijo por defecto",
+            "quien ya tenía el menú fijo lo pierde una sola vez y después puede volver a fijarlo"
+          ]
+        },
+        {
           "file": "tests/action-bar-halves.test.mjs",
           "namedCases": [
             "Barra de acciones: los botones de turno y los de llamadas se centran cada uno en su mitad"
