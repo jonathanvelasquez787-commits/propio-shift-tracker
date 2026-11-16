@@ -1150,7 +1150,6 @@
   "s_e5823b60": "View Reports",
   "s_e5b43cf8": "Color",
   "s_e5bbea33": "Features",
-  "s_e5caa1b6": "All data was deleted",
   "s_e623d221": "Alert set: {{v0}} min before your shift",
   "s_e6415ef3": "ANNUAL GOAL",
   "s_e68e1c6e": "Welcome!",
@@ -1559,7 +1558,6 @@
   "s_f721b379": "Up to 50 changes · up to 30 days, space permitting. Included in your JSON backup.",
   "s_055d57f7": "Your shift and saved calls are kept.",
   "s_10aa082f": "Previous ACW and saved calls are kept.",
-  "s_10e0d712": "Day to reset: {{v0}}.",
   "s_188da0a2": "The activity changed. Review it again before discarding.",
   "s_1a7d3892": "Review the scope. You can cancel without changing anything.",
   "s_1a9f7f1c": "Your account and the extension settings are kept.",
@@ -1588,7 +1586,6 @@
   "s_b551df05": "Recoverable copies",
   "s_b751b797": "Recovery could not be prepared. Try again.",
   "s_c51ade12": "These copies are local, private to your account and do not replace a downloaded JSON backup. Clearing browser data also removes them.",
-  "s_c5767979": "Its calls, pauses, gaps, note, actions and daily progress are removed. Other days, schedule and goals are kept.",
   "s_c87af716": "Backup restored. The previous copy is still available.",
   "s_ccf9f22c": "The data changed. Close the editor and review it before saving.",
   "s_d2640725": "With a previous local copy",
@@ -2278,9 +2275,6 @@
   "s_cef69891": "No blocks set. Use \"+ Work\", \"+ Break\" or \"+ Lunch\" to start.",
   "s_df4f74fe": "+ Lunch",
   "s_e6a0b7e3": "Day summary",
-  "s_4478497d": "Calls, shifts, breaks, schedule, goals and profile for all days are reset. Finance is kept unless you check the box.",
-  "s_c472b69c": "If left unchecked, your Finance categories, payments, plan and receipts are kept.",
-  "s_fc4d592f": "Also erase Finance",
   "s_1a943c4f": "Monday to Friday",
   "s_313add57": "Saturday and Sunday",
   "s_32e4c148": "Copy to other days",
@@ -2315,5 +2309,6 @@
   "s_baa70682": "Breaks and gaps",
   "s_cef3f78f": "Your note, the log and the day's progress",
   "s_fbff991e": "This day's calls",
-  "s_682cce59": "It is turned on below the day blocks."
+  "s_00f751fa": "With no planned schedule, it tells you when to take a break. Set it up in Schedule, More options.",
+  "s_4f4601b5": "Set up ›"
 }

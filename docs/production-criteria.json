@@ -1081,12 +1081,12 @@
           ]
         },
         {
-          "file": "tests/horario-freelancer-bloques.test.mjs",
+          "file": "tests/menu-freelancer.test.mjs",
           "namedCases": [
-            "el interruptor del modo freelancer está en los bloques del día, debajo de Agregar",
-            "Más opciones ya no repite el interruptor pero conserva los demás campos del modo freelancer",
-            "el interruptor sigue ligado a los ajustes del modo freelancer",
-            "el interruptor tiene su bloque de estilos con variables del tema"
+            "el menú lateral tiene la fila Modo freelancer justo debajo de Bloques y llamadas",
+            "el interruptor ya no está debajo de los bloques del día y vuelve a Más opciones",
+            "el interruptor del menú se sincroniza con los ajustes y Configurar lleva a Más opciones > Modo freelancer",
+            "la fila del menú tiene su bloque de estilos con variables del tema"
           ]
         },
         {

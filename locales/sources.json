@@ -57,6 +57,12 @@
       "js/positive-reinforcement.js"
     ]
   },
+  "s_00f751fa": {
+    "source": "Sin horario planeado: te avisa cuándo descansar. Se configura en Horario, Más opciones.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_012fad36": {
     "source": "Idioma",
     "files": [
@@ -3767,6 +3773,12 @@
       "app.html"
     ]
   },
+  "s_45799d19": {
+    "source": "Activar modo freelancer",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_458b225e": {
     "source": "Cubierto",
     "files": [
@@ -4312,6 +4324,12 @@
   },
   "s_4f1f3c20": {
     "source": "+ Agregar meta",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_4f4601b5": {
+    "source": "Configurar ›",
     "files": [
       "app.html"
     ]
@@ -5498,12 +5516,6 @@
     "source": "Prom./día trabajado",
     "files": [
       "js/weekly-summary.js"
-    ]
-  },
-  "s_682cce59": {
-    "source": "Se activa debajo de los bloques del día.",
-    "files": [
-      "app.html"
     ]
   },
   "s_68591c47": {
