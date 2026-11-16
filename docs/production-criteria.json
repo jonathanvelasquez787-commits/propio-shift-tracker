@@ -1110,6 +1110,13 @@
           ]
         },
         {
+          "file": "tests/tarjetas-plegables-inicio.test.mjs",
+          "namedCases": [
+            "tarjetas plegables: Meta diaria y Pendientes de reservar son details con id y summary",
+            "tarjetas plegables: CSS propio con variables del tema"
+          ]
+        },
+        {
           "file": "tests/block-cards-compact.test.mjs",
           "namedCases": [
             "la tarjeta del bloque junta Productividad, Meta y ACW en una sola fila",
