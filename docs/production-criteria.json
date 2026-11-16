@@ -1117,6 +1117,13 @@
           ]
         },
         {
+          "file": "tests/avisos-compactos.test.mjs",
+          "namedCases": [
+            "avisos compactos: cada aviso queda en una linea con el boton Personalizar al lado",
+            "avisos compactos: usa variables del tema y no colores fijos"
+          ]
+        },
+        {
           "file": "tests/ajustes-pestanas.test.mjs",
           "namedCases": [
             "ajustes pestanas: hay tres pestanas y tres paneles con sus campos",

@@ -1967,3 +1967,17 @@ details.gh-fold > summary:focus-visible { outline: 2px solid var(--cyan); outlin
   #goalsModal #goalsGoalFieldsRow, #goalsModal .settings-rate-fields { grid-template-columns: 1fr 1fr; }
 }
 /* fin ajustes pestanas */
+
+/* avisos compactos */
+#notificationsModal .notif-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0 10px; padding: 8px 0; }
+#notificationsModal .notif-row > .sched-compact-head { flex: 1 1 260px; min-width: 0; margin: 0; }
+#notificationsModal .notif-row .sched-compact-info-btn, #notificationsModal .notif-row .sched-help-wrap { display: none; }
+#notificationsModal .notif-row .alert-customize { flex: 0 0 auto; margin: 0; border: 0; }
+#notificationsModal .notif-row .alert-customize[open] { flex: 1 1 100%; }
+#notificationsModal .notif-row .alert-customize > summary { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 999px; font-size: 12px; font-weight: 700; cursor: pointer; }
+#notificationsModal .notif-row .alert-customize > summary small { display: none; }
+#notificationsModal .notif-row .alert-customize[open] > summary { margin-bottom: 8px; }
+#notificationsModal .polished-productive { padding: 10px 14px; min-height: 0; gap: 14px; }
+#notificationsModal .polished-ring { width: 64px; height: 64px; flex: 0 0 64px; }
+#notificationsModal .polished-ring strong { font-size: 11px; line-height: 1.15; }
+/* fin avisos compactos */
