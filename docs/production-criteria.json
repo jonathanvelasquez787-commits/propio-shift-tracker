@@ -1215,6 +1215,12 @@
           ]
         },
         {
+          "file": "tests/tarjetas-en-llamadas.test.mjs",
+          "namedCases": [
+            "tarjetas en llamadas: Shift, Break y Lunch quedan fuera de la vista Bloques para verse tambien en Llamadas"
+          ]
+        },
+        {
           "file": "tests/horario-mas-chico.test.mjs",
           "namedCases": [
             "Horario se ve mas chico en compu y celular",
