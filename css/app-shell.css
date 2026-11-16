@@ -1900,3 +1900,23 @@ details.gh-fold > summary:focus-visible { outline: 2px solid var(--cyan); outlin
   #confirmModal #confirmModalOkBtn { flex: 0 0 auto; padding: 0 22px; }
 }
 /* fin popups confirmacion */
+
+/* higher rate tarjeta compacta */
+#higherRateModal .hr-summary .hero-today{padding:12px 16px 11px}
+#higherRateModal .hr-summary .hero-today-top{align-items:center;justify-content:space-between;flex-wrap:nowrap}
+#higherRateModal .hr-summary .hero-today-tier{white-space:nowrap;width:auto;flex:0 0 auto;font-size:12px;padding:5px 10px}
+#higherRateModal .hr-summary .hero-today-top>div:first-child{flex:1 1 auto}
+#higherRateModal .hr-summary .hero-today-figures{margin-top:8px;gap:12px}
+#higherRateModal .hr-summary .hero-fig-value{font-size:24px;line-height:1.1}
+#higherRateModal .hr-summary .hero-fig-label{margin-top:3px;text-transform:uppercase;letter-spacing:.05em}
+#higherRateModal .hr-summary .hero-today-track{margin-top:8px}
+#higherRateModal .hr-summary .hero-today-foot{margin-top:5px}
+@media(max-width:480px){
+#higherRateModal .hr-summary .hero-today-label{white-space:nowrap;font-size:8.5px}
+#higherRateModal .hr-summary .hero-today-tier{font-size:10.5px;padding:4px 8px;gap:4px}
+#higherRateModal .hr-summary .hero-today-figures{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 10px;margin-top:6px}
+#higherRateModal .hr-summary .hero-today-figures>div:first-child{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:4px 9px;align-items:baseline}
+#higherRateModal .hr-summary .hero-today-figures>div:first-child .hero-fig-label{margin-top:0}
+}
+#higherRateModal .hr-summary #higherRateLiveCard.tone-active{display:none}
+/* fin higher rate tarjeta compacta */

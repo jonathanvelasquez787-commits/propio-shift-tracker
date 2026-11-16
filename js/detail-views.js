@@ -64,8 +64,6 @@ function draw() {
         ? higherRateHeroTierBadge(liveStatus.window.tier)
         : higherRateHeroTierBadge(dominantHigherRateTier(todayStats.breakdown));
 
-      const todayDateRaw = new Intl.DateTimeFormat(displayLocale(), { weekday: 'long', day: 'numeric', month: 'long' }).format(today);
-      const todayDateLabel = ui`Hoy · ${todayDateRaw.charAt(0).toUpperCase() + todayDateRaw.slice(1)}`;
 
       const footHtml = todayWindowsMin > 0
         ? ui`<div class="hero-today-foot"><span>${Math.round(todayPct)}% de la ventana aprovechada</span><span>${isActiveNow ? ui`Termina a las ${timeLabel(liveStatus.window.end)}` : ''}</span></div>`
@@ -76,14 +74,13 @@ function draw() {
           <div class="hero-today-top">
             <div>
               <span class="hero-today-label ${isActiveNow ? 'tone-active' : ''}">${isActiveNow ? translateMarkup('<span class="pulse-dot" aria-hidden="true"></span>Ganando bono ahora') : translateText('Higher Rate hoy')}</span>
-              <div class="hero-today-date">${escapeHtml(todayDateLabel)}</div>
             </div>
             ${tierBadgeHtml}
           </div>
           <div class="hero-today-figures">
-            <div><div class="hero-fig-value is-bonus">+${money(todayStats.totalBonus)}</div><div class="hero-fig-label">Bono ganado hoy${financeConvertedInline(todayStats.totalBonus)}</div></div>
-            <div><div class="hero-fig-value">${escapeHtml(formatBlockDurationLabel(todayStats.totalMin))}</div><div class="hero-fig-label">en llamada dentro de ventana</div></div>
-            <div><div class="hero-fig-value" style="font-size:20px; color:var(--muted);">${escapeHtml(formatBlockDurationLabel(todayWindowsMin))}</div><div class="hero-fig-label">ventana total de hoy</div></div>
+            <div><div class="hero-fig-value is-bonus">+${money(todayStats.totalBonus)}</div><div class="hero-fig-label">Bono de hoy${financeConvertedInline(todayStats.totalBonus)}</div></div>
+            <div><div class="hero-fig-value">${escapeHtml(formatBlockDurationLabel(todayStats.totalMin))}</div><div class="hero-fig-label">en llamada</div></div>
+            <div><div class="hero-fig-value" style="font-size:20px; color:var(--muted);">${escapeHtml(formatBlockDurationLabel(todayWindowsMin))}</div><div class="hero-fig-label">ventana total</div></div>
           </div>
           ${todayWindowsMin > 0 ? ui`<div class="hero-today-track"><div style="width:${todayPct}%;"></div></div>` : ''}
           ${footHtml}

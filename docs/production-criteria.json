@@ -1117,6 +1117,13 @@
           ]
         },
         {
+          "file": "tests/higher-rate-compacta.test.mjs",
+          "namedCases": [
+            "higher rate compacta: la tarjeta de hoy no repite la fecha y usa textos cortos",
+            "higher rate compacta: la franja de ventana activa se oculta, la insignia queda en la misma fila y sin colores fijos"
+          ]
+        },
+        {
           "file": "tests/reportes-pestanas.test.mjs",
           "namedCases": [
             "reportes pestanas: hay 4 pestañas Hoy, Ciclo, Semana y Detalle con sus paneles",
