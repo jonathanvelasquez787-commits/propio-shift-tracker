@@ -36,3 +36,9 @@ test('editar semana: estilo discreto con variables del tema', () => {
   assert.match(b, /color: var\(--cyan\)/);
   assert.doesNotMatch(b, /#[0-9a-fA-F]{3,8}\b/);
 });
+
+test('editar semana: la fila Corregir días / Cambiar horario / Freelancer no se parte en dos líneas', () => {
+  assert.match(css, /#scheduleAccordion \.sched-quick-row \{ display: flex; flex-wrap: nowrap;/, 'la fila no salta de línea');
+  assert.doesNotMatch(css, /#scheduleAccordion \.sched-quick-row \{[^}]*flex-wrap: wrap/, 'ya no queda flex-wrap: wrap');
+  assert.match(css, /@media \(max-width: 340px\) \{\s*#scheduleAccordion \.sched-quick-row/, 'pantallas muy chicas la compactan');
+});
