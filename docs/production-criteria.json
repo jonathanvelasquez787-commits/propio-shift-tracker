@@ -1097,6 +1097,15 @@
           ]
         },
         {
+          "file": "tests/block-cards-compact.test.mjs",
+          "namedCases": [
+            "la tarjeta del bloque junta Productividad, Meta y ACW en una sola fila",
+            "la barra Usado conserva tiempo, total y porcentaje, sin la línea repetida",
+            "siguen apareciendo Actividad real, Pausa real, el estado y la adherencia del bloque",
+            "los estilos nuevos usan variables del tema, ocultan los textos al contraer y no usan hexadecimales"
+          ]
+        },
+        {
           "file": "tests/action-bar-halves.test.mjs",
           "namedCases": [
             "Barra de acciones: los botones de turno y los de llamadas se centran cada uno en su mitad"

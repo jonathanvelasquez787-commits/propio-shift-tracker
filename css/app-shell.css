@@ -1634,3 +1634,27 @@ html[data-palette]:not([data-palette="original"]) .boot-choice { border-color: v
 .sidebar-fl-config:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; border-radius: 4px; }
 .sidebar-fl-config[hidden] { display: none; }
 /* fin menu lateral modo freelancer */
+
+/* tarjetas de bloques del dia */
+.sblk-card .sblk-head { position: relative; flex-wrap: nowrap; align-items: flex-start; gap: 8px; }
+.sblk-card .sblk-icon { width: 22px; flex: 0 0 22px; display: grid; place-items: center; font-size: 20px; color: var(--muted); }
+.sblk-card .sblk-titles { flex: 1 1 auto; }
+.sblk-card .sblk-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sblk-card .sblk-head .sblk-status { position: absolute; right: 0; top: 16px; font-size: 10.5px; line-height: 13px; padding: 3px 8px; }
+.sblk-card .sblk-subs .sblk-sub-line { margin-top: 1px; font-size: 12px; opacity: .9; }
+.sblk-card.is-collapsed .sblk-subs { display: none; }
+.sblk-card .sblk-extra .sblk-bar-row { margin-top: 10px; }
+.sblk-card .sblk-extra .sblk-bar-label-row { margin-bottom: 5px; }
+.sblk-card .sblk-extra .sblk-bar-label-row strong { font-variant-numeric: tabular-nums; }
+.sblk-card .sblk-extra .sblk-bar-row .sblk-bar-track { height: 8px; }
+.sblk-card .sblk-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 10px; }
+.sblk-card .sblk-tile { min-width: 0; }
+.sblk-card .sblk-tile small { display: block; font-size: 10.5px; color: var(--muted); white-space: nowrap; }
+.sblk-card .sblk-tile strong { display: block; font-size: 13px; font-weight: 800; color: var(--text); margin: 1px 0 5px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sblk-card .sblk-tile .sblk-bar-track { height: 4px; }
+.sblk-card .sblk-tile.is-met strong { color: var(--good); }
+.sblk-card .sblk-tile.is-met .ic-svg { vertical-align: -0.2em; }
+@media (min-width: 901px) {
+  .sblk-card .sblk-head .sblk-status { top: 2px; }
+}
+/* fin tarjetas de bloques del dia */
