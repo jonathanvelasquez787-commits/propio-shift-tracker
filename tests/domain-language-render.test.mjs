@@ -207,7 +207,7 @@ for (const language of ['es', 'en']) {
 
 test('finance preview localizes allocated and saved labels without translating personal names', t => {
   setLanguage('en'); t.after(() => setLanguage('es'));
-  const elements = new Map([['financePreviewBox', { style: {} }], ['financePreviewRows', { innerHTML: '' }]]);
+  const elements = new Map([['financePreviewBox', { style: {} }], ['financePreviewRows', { innerHTML: '' }], ['financePreviewFirst', { innerHTML: '' }]]);
   const personalName = 'Mi nombre personal sin traducir';
   const items = [false, true].map(isMeta => ({ isMeta, row: { categoryId: 'personal', name: personalName, targetAmount: 10, assignedAmount: 2 } }));
   const h = vm.createContext({ ui, translateText, document: { getElementById: id => elements.get(id) },
@@ -215,7 +215,7 @@ test('finance preview localizes allocated and saved labels without translating p
     financeCategoryIconHtml: () => '', escapeHtml: String, money: String, financeConvertedInline: () => '' });
   vm.runInContext(declarations('../js/finance.js', ['renderFinancePreview']), h);
   h.renderFinancePreview();
-  const result = elements.get('financePreviewRows').innerHTML;
+  const result = elements.get('financePreviewFirst').innerHTML + elements.get('financePreviewRows').innerHTML;
   assert.equal(result.split('>Reserved<').length - 1, 2);
   assert.ok(!result.includes('>Reservado<'));
   assert.equal(result.split(personalName).length - 1, 2);
