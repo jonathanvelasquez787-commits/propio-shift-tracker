@@ -7971,13 +7971,16 @@ export function render() {
       sideSwitch.addEventListener('change', () => { document.getElementById('freelancerEnabledInput').checked = sideSwitch.checked; updateFreelancerSettings(); });
       const homeSwitch = document.getElementById('homeFreelancerInput');
       if (homeSwitch) homeSwitch.addEventListener('change', () => { document.getElementById('freelancerEnabledInput').checked = homeSwitch.checked; updateFreelancerSettings(); });
-      sideConfig.addEventListener('click', () => {
+      const openFreelancerConfig = () => {
         navigateToPage('schedule');
         const moreToggle = document.getElementById('schedMoreToggle'), flToggle = document.querySelector('[data-more-toggle="freelancer"]');
         if (moreToggle.getAttribute('aria-expanded') !== 'true') moreToggle.click();
         if (flToggle.getAttribute('aria-expanded') !== 'true') flToggle.click();
         document.getElementById('schedMoreCard').scrollIntoView({ block: 'start' });
-      });
+      };
+      sideConfig.addEventListener('click', openFreelancerConfig);
+      // "Freelancer ›" (Inicio): lleva a donde se configura el modo freelancer
+      document.querySelector('[data-open-freelancer-config]')?.addEventListener('click', (e) => { e.preventDefault(); openFreelancerConfig(); });
     }
     document.getElementById('freelancerTemplateRow').addEventListener('click', (e) => {
       const btn = e.target instanceof Element ? e.target.closest('[data-fl-template]') : null;

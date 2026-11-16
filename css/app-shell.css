@@ -1853,14 +1853,14 @@ details.gh-fold > summary:focus-visible { outline: 2px solid var(--cyan); outlin
 
 /* editar semana acceso */
 #scheduleAccordion .sched-quick-row { display: flex; flex-wrap: wrap; align-items: center; column-gap: 14px; row-gap: 4px; margin-top: 6px; }
-#scheduleAccordion .home-fl-row { display: inline-flex; align-items: center; gap: 8px; margin-left: auto; font-size: 12px; font-weight: 700; color: var(--muted); cursor: pointer; white-space: nowrap; }
+#scheduleAccordion .home-fl-row { display: inline-flex; align-items: center; gap: 8px; margin-left: auto; white-space: nowrap; }
 #scheduleAccordion .home-fl-row .sidebar-switch { zoom: .8; }
 .week-edit-link { background: none; border: 0; padding: 0; font: inherit; font-size: 12px; font-weight: 700; color: var(--cyan); opacity: .85; cursor: pointer; white-space: nowrap; }
 .week-edit-link:hover, .week-edit-link:focus-visible { opacity: 1; text-decoration: underline; }
 .sidebar-week-edit { display: block; align-self: flex-start; text-align: left; margin: 8px 18px 4px; }
 @media (max-width: 760px) {
   #scheduleAccordion .sched-quick-row { column-gap: 10px; }
-  #scheduleAccordion .sched-quick-row .week-edit-link, #scheduleAccordion .home-fl-row { font-size: 11px; }
+  #scheduleAccordion .sched-quick-row .week-edit-link { font-size: 11px; }
   #scheduleAccordion .home-fl-row { gap: 6px; }
   #scheduleAccordion .home-fl-row .sidebar-switch { zoom: .7; }
 }

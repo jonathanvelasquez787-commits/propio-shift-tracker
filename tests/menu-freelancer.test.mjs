@@ -29,7 +29,8 @@ test('el interruptor del menú se sincroniza con los ajustes y Configurar lleva 
   assert.match(main, /const sideEnabled = document\.getElementById\('sidebarFreelancerInput'\);\s+if \(sideEnabled\) sideEnabled\.checked = fl\.enabled === true;/);
   assert.match(main, /sideConfig\.hidden = fl\.enabled !== true/);
   assert.match(main, /freelancerEnabledInput'\)\.checked = sideSwitch\.checked; updateFreelancerSettings\(\);/);
-  const click = main.slice(main.indexOf("sideConfig.addEventListener('click'"), main.indexOf("sideConfig.addEventListener('click'") + 700);
+  assert.match(main, /sideConfig\.addEventListener\('click', openFreelancerConfig\)/);
+  const click = main.slice(main.indexOf('const openFreelancerConfig = () =>'), main.indexOf('const openFreelancerConfig = () =>') + 700);
   assert.match(click, /navigateToPage\('schedule'\)/);
   assert.match(click, /schedMoreToggle/);
   assert.match(click, /data-more-toggle="freelancer"/);
