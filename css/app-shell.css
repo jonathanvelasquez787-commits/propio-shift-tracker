@@ -1658,3 +1658,32 @@ html[data-palette]:not([data-palette="original"]) .boot-choice { border-color: v
   .sblk-card .sblk-head .sblk-status { top: 2px; }
 }
 /* fin tarjetas de bloques del dia */
+/* horario mas chico */
+@media (min-width: 761px) {
+  #pageSchedule { zoom: .85; }
+}
+@media (max-width: 760px) {
+  #pageSchedule { zoom: .87; }
+}
+@media (max-width: 900px) {
+  #scheduleConfigAccordion #blocksEditorList.sched-bk-list { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+}
+@media (min-width: 901px) {
+  #scheduleConfigAccordion #blocksEditorList.sched-bk-list { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  #scheduleConfigAccordion #blocksEditorList .sched-bk .sched-tl-card { grid-template-columns: 30px 110px 74px 170px 170px 170px 1fr 34px; align-items: center; column-gap: 14px; row-gap: 0; padding: 10px 16px 10px 20px; }
+  #scheduleConfigAccordion #blocksEditorList .sched-bk .sched-bk-top,
+  #scheduleConfigAccordion #blocksEditorList .sched-bk .sched-bk-fields { display: contents; }
+  #scheduleConfigAccordion #blocksEditorList .sched-bk .sched-tl-icon,
+  #scheduleConfigAccordion #blocksEditorList .sched-bk .sched-tl-titles,
+  #scheduleConfigAccordion #blocksEditorList .sched-bk .sched-tl-duration,
+  #scheduleConfigAccordion #blocksEditorList .sched-bk .sched-bk-field,
+  #scheduleConfigAccordion #blocksEditorList .sched-bk .sched-tl-remove { grid-row: 1; }
+  #scheduleConfigAccordion #blocksEditorList .sched-bk .sched-tl-icon { grid-column: 1; }
+  #scheduleConfigAccordion #blocksEditorList .sched-bk .sched-tl-titles { grid-column: 2; }
+  #scheduleConfigAccordion #blocksEditorList .sched-bk .sched-tl-duration { grid-column: 3; justify-self: start; }
+  #scheduleConfigAccordion #blocksEditorList .sched-bk .sched-bk-field:nth-child(1) { grid-column: 4; }
+  #scheduleConfigAccordion #blocksEditorList .sched-bk .sched-bk-field:nth-child(2) { grid-column: 5; }
+  #scheduleConfigAccordion #blocksEditorList .sched-bk .sched-bk-field:nth-child(3) { grid-column: 6; }
+  #scheduleConfigAccordion #blocksEditorList .sched-bk .sched-tl-remove { grid-column: 8; }
+}
+/* fin horario mas chico */
