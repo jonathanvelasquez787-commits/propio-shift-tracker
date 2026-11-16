@@ -569,8 +569,8 @@ function injectCycleProjection() {
 
   // data-nav-page ya lo maneja la app con un listener delegado: el botón no
   // necesita wiring propio para llevar a Reportes.
-  const anchor = view.querySelector('.gh-info-row');
-  if (anchor) view.insertBefore(box, anchor);
+  const goalCard = view.querySelector('#cycleGoalCard');
+  if (goalCard) goalCard.after(box);
   else view.appendChild(box);
 
   renderCycleProjection();

@@ -1221,6 +1221,14 @@
           ]
         },
         {
+          "file": "tests/pildoras-ciclo-arriba.test.mjs",
+          "namedCases": [
+            "pildoras ciclo arriba: las pildoras van antes de la tarjeta Meta del ciclo",
+            "pildoras ciclo arriba: la Proyeccion se inserta despues de la tarjeta de meta",
+            "pildoras ciclo arriba: el CSS junta las pildoras en una fila sin colores fijos"
+          ]
+        },
+        {
           "file": "tests/block-cards-compact.test.mjs",
           "namedCases": [
             "la tarjeta del bloque junta Productividad, Meta y ACW en una sola fila",
