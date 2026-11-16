@@ -10332,7 +10332,7 @@
   "s_bb56ed16": {
     "source": "Ver Reportes →",
     "files": [
-      "js/boot.js"
+      "app.html"
     ]
   },
   "s_bb5c39fa": {
@@ -12805,7 +12805,6 @@
     "source": "Proyección del ciclo",
     "files": [
       "app.html",
-      "js/boot.js",
       "js/reports.js"
     ]
   },

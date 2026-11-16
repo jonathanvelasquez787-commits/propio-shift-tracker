@@ -1216,6 +1216,7 @@
           "file": "tests/proyeccion-plegable.test.mjs",
           "namedCases": [
             "proyeccion plegable: la caja es un details con la primera fila en el encabezado",
+            "proyeccion plegable: recuerda abierto o cerrado porque vive en app.html con id",
             "proyeccion plegable: la primera fila va al encabezado y la segunda al cuerpo",
             "proyeccion plegable: el CSS copia la forma de Pendientes y no usa colores fijos"
           ]

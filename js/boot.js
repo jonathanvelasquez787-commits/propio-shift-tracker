@@ -546,33 +546,13 @@ function renderCycleProjection() {
 
 function injectCycleProjection() {
   const view = document.getElementById('earningsCycleView');
-  if (!view || document.getElementById('cycleProjectionBox') || !hasCycleProjectionDeps()) return;
+  const box = document.getElementById('cycleProjectionBox');
+  if (!view || !box || box.dataset.wired === '1' || !hasCycleProjectionDeps()) return;
+  box.dataset.wired = '1';
 
-  // Plegable igual que "Pendientes de reservar": contraída muestra solo la primera fila.
-  const box = document.createElement('details');
-  box.className = 'fin-preview gh-fold';
-  box.id = 'cycleProjectionBox';
-  box.setAttribute('open', '');
-  box.style.marginTop = '12px';
-  box.innerHTML = ui`
-    <summary class="fin-preview-sum">
-      <div class="fin-preview-head">
-        <span class="fin-preview-title">Proyección del ciclo</span>
-        <button class="fin-preview-link" data-nav-page="reports" type="button">Ver Reportes →</button>
-        <span class="gh-fold-chevron" aria-hidden="true"></span>
-      </div>
-      <div id="cycleProjectionFirst"></div>
-    </summary>
-    <div class="gh-fold-body">
-      <div id="cycleProjectionRows"></div>
-    </div>`;
-
-  // data-nav-page ya lo maneja la app con un listener delegado: el botón no
-  // necesita wiring propio para llevar a Reportes.
-  const goalCard = view.querySelector('#cycleGoalCard');
-  if (goalCard) goalCard.after(box);
-  else view.appendChild(box);
-
+  // La caja plegable vive en app.html (así la app recuerda si quedó abierta o
+  // cerrada, igual que "Pendientes de reservar"); aquí solo se llena y se muestra.
+  // data-nav-page ya lo maneja la app con un listener delegado.
   renderCycleProjection();
 
   // Repintar al entrar a la pestaña Ciclo o al cambiar de ciclo, sin esperar
