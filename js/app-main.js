@@ -771,6 +771,8 @@ export { onReinforcementCallSaved, onReinforcementCallsChanged, onReinforcementD
         // Toggle "Contraer bloques al terminar" dentro de "Bloques del día" (ver
         // #collapseCompletedBlocksBtn)
         collapseCompletedBlocks: false,
+        // Pastilla Bloques / Llamadas de "Bloques del día": se recuerda al cerrar la pestaña y en otros navegadores.
+        blocksViewMode: 'blocks',
         // Estado recordado de la fila "Acciones de Hoy" (colapsada o no) y de la pastilla Hoy/Ciclo de Ganancias.
         heroActionsCollapsed: false,
         // Lado de los botones de la barra de acciones: false = turno a la izquierda y llamadas a la
@@ -849,6 +851,7 @@ export { onReinforcementCallSaved, onReinforcementCallsChanged, onReinforcementD
       // Una sola vez: el menú ya no sale fijo por defecto (se abre con el botón y se cierra al tocar afuera).
       if (settings.sidebarPinMigrated !== true) { settings.sidebarPinned = false; settings.sidebarPinMigrated = true; }
       if (typeof settings.collapseCompletedBlocks !== 'boolean') settings.collapseCompletedBlocks = false;
+      if (settings.blocksViewMode !== 'calls') settings.blocksViewMode = 'blocks';
       if (typeof settings.heroActionsCollapsed !== 'boolean') settings.heroActionsCollapsed = false;
       if (typeof settings.heroActionsSwapped !== 'boolean') settings.heroActionsSwapped = false;
       if (!['day', 'cycle'].includes(settings.earningsViewMode)) settings.earningsViewMode = 'day';
@@ -3515,21 +3518,31 @@ function setEarningsViewMode(mode, { persist = false } = {}) {
   }
 }
 
-// Pastilla "Bloques / Llamadas" dentro de "Bloques del día" — alterna entre #blocksView/
-// #blocksCallsView sin animación, mismo mecanismo que earningsViewMode. Vive en memoria (no en
-// localStorage)
-let blocksViewMode = 'blocks';
-
-function setBlocksViewMode(mode) {
-  blocksViewMode = mode === 'calls' ? 'calls' : 'blocks';
+// Pastilla "Bloques / Llamadas" dentro de "Bloques del día": alterna entre #blocksView/#blocksCallsView
+// sin animación, mismo mecanismo que earningsViewMode.
+// La pastilla elegida se guarda en settings.blocksViewMode (igual que reportsTab) para que se recuerde
+// al cerrar la pestaña y en otro navegador con la misma cuenta.
+function applyBlocksViewMode() {
+  const mode = settings.blocksViewMode === 'calls' ? 'calls' : 'blocks';
   const blocksView = document.getElementById('blocksView');
   const callsView = document.getElementById('blocksCallsView');
-  document.querySelectorAll('#blocksViewToggle .blocks-view-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.getAttribute('data-blocks-view') === blocksViewMode);
-  });
-  if (blocksView) blocksView.style.display = blocksViewMode === 'blocks' ? '' : 'none';
-  if (callsView) callsView.style.display = blocksViewMode === 'calls' ? '' : 'none';
-  if (blocksViewMode === 'calls') renderTable();
+  if (typeof document.querySelectorAll === 'function') {
+    document.querySelectorAll('#blocksViewToggle .blocks-view-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-blocks-view') === mode);
+    });
+  }
+  if (blocksView) blocksView.style.display = mode === 'blocks' ? '' : 'none';
+  if (callsView) callsView.style.display = mode === 'calls' ? '' : 'none';
+}
+
+function setBlocksViewMode(mode) {
+  const next = mode === 'calls' ? 'calls' : 'blocks';
+  if (settings.blocksViewMode !== next) {
+    settings.blocksViewMode = next;
+    saveSettingsOnly();
+  }
+  applyBlocksViewMode();
+  if (next === 'calls') renderTable();
 }
 
 // "Resumen semanal" usaba semanas Lunes-Domingo fijas, sin relación con cuándo arranca de verdad el
@@ -6947,6 +6960,7 @@ ${example}`;
 }
 
 export function render() {
+      applyBlocksViewMode();
       renderHeader();
       renderFreelancerSession();
       renderSchedule();
