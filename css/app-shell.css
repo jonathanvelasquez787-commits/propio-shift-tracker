@@ -1752,6 +1752,17 @@ details.gh-fold > summary:focus-visible { outline: 2px solid var(--cyan); outlin
 #classicDailyGoalCard #goalMinBadge { order: 4; }
 #classicDailyGoalCard > .gh-goal-foot { order: 5; margin: 0 0 0 auto; display: flex; align-items: baseline; gap: 4px; }
 #classicDailyGoalCard > .earnings-goal-progress { order: 6; flex: 0 0 100%; margin-top: 2px; }
+@media (max-width: 760px) {
+  #classicDailyGoalCard { gap: 4px 5px; padding: 10px 8px; }
+  #classicDailyGoalCard #goalDailyLabel { font-size: 10px; }
+  #classicDailyGoalCard #goalAmountBadge,
+  #classicDailyGoalCard #goalAmountBadge .gp-value { font-size: 11.5px; }
+  #classicDailyGoalCard #goalAmountConvertedText,
+  #classicDailyGoalCard #goalMinBadge,
+  #classicDailyGoalCard > .gh-goal-foot { font-size: 9.5px; white-space: nowrap; }
+  #classicDailyGoalCard .gp-label { font-size: 8.5px; letter-spacing: 0; }
+  #classicDailyGoalCard .gp-value { margin-left: 2px; }
+}
 /* fin meta diaria una linea */
 
 /* pendientes una linea */
