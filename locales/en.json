@@ -2330,5 +2330,8 @@
   "s_5561fd0b": "General",
   "s_6cda2348": "Data",
   "s_a1358ae8": "Money",
-  "s_cb957c31": "Block {{v0}}"
+  "s_cb957c31": "Block {{v0}}",
+  "s_0cfca7d8": "{{v1}}{{v2}} left of {{v3}}{{v4}}",
+  "s_2751e1f1": "Cycle expenses",
+  "s_9e1e36a1": "Reserved{{v7}}"
 }

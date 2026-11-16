@@ -12,7 +12,7 @@ import { preserveCallRecords, compareCallRecords, acwCallRecord, latestCompleted
 import { settingsWithinBudget, reportLocalPersistenceFailure, readMeta, jsonbBytes, preserveRecoveryCopy, listRecoveryCopies } from './sync.js';
 // Boot importa este módulo solo después de verificar la sesión e hidratar sus datos.
 
-import { FINANCE_CATEGORIES, FINANCE_CUSTOM_CATEGORY_PALETTE, financeRowIsMeta, renderFinanceSection, renderFinancePreview, setFinanceTab, syncFinanceRowTargetFields, financeConvertedInline, financeConvertedNote, financeSwapPriority, financeFindRow, financeApplySignedAmount, reviewFinanceAction, financeToggleManualPaid, financeDeleteRow, openFinanceRowModal, saveFinanceRowModal, selectFinanceCategoryChip, openFinanceNewCatPanel, closeFinanceNewCatPanel, createFinanceCategory, financeDeleteCategory, updateFinanceTotalsScrollHint, financeRunAutoFillCascade, configureFinanceContext } from './finance.js';
+import { FINANCE_CATEGORIES, FINANCE_CUSTOM_CATEGORY_PALETTE, financeRowIsMeta, renderFinanceSection, renderFinancePreview, financeGastosSummary, setFinanceTab, syncFinanceRowTargetFields, financeConvertedInline, financeConvertedNote, financeSwapPriority, financeFindRow, financeApplySignedAmount, reviewFinanceAction, financeToggleManualPaid, financeDeleteRow, openFinanceRowModal, saveFinanceRowModal, selectFinanceCategoryChip, openFinanceNewCatPanel, closeFinanceNewCatPanel, createFinanceCategory, financeDeleteCategory, updateFinanceTotalsScrollHint, financeRunAutoFillCascade, configureFinanceContext } from './finance.js';
 
 import {
   REPORTS_MONTHLY_PAGE_SIZE,
@@ -8459,6 +8459,7 @@ window.financeConvertedInline = financeConvertedInline;
 window.effectiveCycleGoal = effectiveCycleGoal;
 window.cycleGoalPace = cycleGoalPace;
 window.reportsCycleProjection = reportsCycleProjection;
+window.financeGastosSummary = financeGastosSummary;
 
 export const applyPropioBridgeEvent = createPropioReceiver({
   canReceive: () => localStorageRevision.isCurrent(),

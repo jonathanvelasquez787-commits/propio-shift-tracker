@@ -452,8 +452,8 @@ const CYCLE_PROJECTION_DEPS = [
   'effectiveCycleGoal',
   'money',
   'financeConvertedInline',
-  'convertedAmountText',
   'iconHtml',
+  'financeGastosSummary',
 ];
 
 function hasCycleProjectionDeps() {
@@ -475,17 +475,10 @@ function renderCycleProjection() {
 
   const money = window.money;
   const inline = window.financeConvertedInline;
-  const converted = window.convertedAmountText;
   const icon = window.iconHtml;
 
-  const proj = window.reportsCycleProjection();
   const pace = window.cycleGoalPace();
-  const goal = window.effectiveCycleGoal(0);
-
-  const totalDays = proj.daysElapsed + proj.daysRemaining;
-  const delta = proj.projected - goal;
-  const pct = goal > 0 ? Math.max(0, Math.min(100, (proj.projected / goal) * 100)) : 0;
-  const barColor = delta >= 0 ? 'var(--good)' : 'var(--warn)';
+  const gastos = window.financeGastosSummary();
 
   let paceValue;
   let paceColor;
@@ -509,19 +502,6 @@ function renderCycleProjection() {
   }
 
   const firstRowHtml = ui`
-    <div class="fin-preview-row" style="--cat-rgb: var(--blue-rgb);">
-      <span class="fin-preview-icon">${icon('chart')}</span>
-      <div class="fin-preview-main">
-        <div class="fin-preview-name">Al ritmo de hoy</div>
-        <div class="fin-preview-sub">Día ${proj.daysElapsed} de ${totalDays} · ${delta >= 0 ? '+' : ''}${money(delta)}${inline(Math.abs(delta))} vs tu meta</div>
-        <div class="fin-preview-bar"><div style="width:${pct}%; background:${barColor};"></div></div>
-      </div>
-      <div class="fin-preview-right">
-        <div class="fin-preview-amt">${money(proj.projected)}</div>
-        <div class="fin-preview-amt-label">${escapeHtml(converted(proj.projected) || 'proyectado')}</div>
-      </div>
-    </div>`;
-  const secondRowHtml = ui`
     <div class="fin-preview-row" style="--cat-rgb: var(--warn-rgb);">
       <span class="fin-preview-icon">${icon('flag')}</span>
       <div class="fin-preview-main">
@@ -533,6 +513,21 @@ function renderCycleProjection() {
         <div class="fin-preview-amt-label">${escapeHtml(paceLabel)}</div>
       </div>
     </div>`;
+  // Gastos del ciclo: lo reservado de lo que hay que pagar (mismos datos que el total de Gastos en Finanzas).
+  const gastosPct = gastos.target > 0 ? Math.max(0, Math.min(100, (gastos.assigned / gastos.target) * 100)) : 0;
+  const secondRowHtml = gastos.count ? ui`
+    <div class="fin-preview-row" style="--cat-rgb: var(--teal-rgb);">
+      <span class="fin-preview-icon">${icon('wallet')}</span>
+      <div class="fin-preview-main">
+        <div class="fin-preview-name">Gastos del ciclo</div>
+        <div class="fin-preview-sub">Faltan ${money(gastos.pending)}${inline(gastos.pending)} de ${money(gastos.target)}${inline(gastos.target)}</div>
+        <div class="fin-preview-bar"><div style="width:${gastosPct}%; background:var(--warn);"></div></div>
+      </div>
+      <div class="fin-preview-right">
+        <div class="fin-preview-amt">${money(gastos.assigned)}</div>
+        <div class="fin-preview-amt-label">Reservado${inline(gastos.assigned)}</div>
+      </div>
+    </div>` : '';
 
   // La primera fila vive dentro del encabezado (siempre visible); el resto, en el cuerpo plegable.
   const first = document.getElementById('cycleProjectionFirst');

@@ -187,6 +187,15 @@ function financePendingPreviewItems(limit = 3) {
   return pending.slice(0, limit);
 }
 
+// Totales de los gastos (no metas): lo mismo que la fila "Total gastos" de Finanzas.
+export function financeGastosSummary() {
+  const rows = financeGastoRowsSorted();
+  const target = rows.reduce((sum, r) => sum + (Number(r.targetAmount) || 0), 0);
+  const assigned = rows.reduce((sum, r) => sum + (Number(r.assignedAmount) || 0), 0);
+  const pending = rows.reduce((sum, r) => sum + Math.max(0, (Number(r.targetAmount) || 0) - (Number(r.assignedAmount) || 0)), 0);
+  return { count: rows.filter(r => Number(r.targetAmount) > 0).length, target, assigned, pending };
+}
+
 export function renderFinancePreview() {
   const box = document.getElementById('financePreviewBox');
   const rowsEl = document.getElementById('financePreviewRows');
