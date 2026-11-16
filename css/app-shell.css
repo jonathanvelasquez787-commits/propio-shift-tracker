@@ -1878,3 +1878,25 @@ details.gh-fold > summary:focus-visible { outline: 2px solid var(--cyan); outlin
   #scheduleList.sblk-timeline .sblk-hour { display: none; }
 }
 /* fin inicio celular sin columna de horas */
+
+/* popups confirmacion */
+#confirmModal .mc-modal-head { display: flex; align-items: flex-start; gap: 14px; text-align: left; margin-bottom: 14px; }
+#confirmModal .mc-header-icon { width: 40px; height: 40px; flex: 0 0 40px; border-radius: 12px; }
+#confirmModal .mc-modal-head > div:nth-child(2) { flex: 1; min-width: 0; text-align: left; }
+#confirmModal #confirmModalTitle { font-size: 18px; margin: 0 0 2px; text-align: left; }
+#confirmModal #confirmModalMessage { font-size: 13.5px; margin: 0; text-align: left; }
+#confirmModal .modal-close { width: 32px; height: 32px; flex: 0 0 32px; background: transparent; border-color: var(--line); outline: none; box-shadow: none; }
+#confirmModal .modal-close:focus-visible { box-shadow: 0 0 0 2px rgba(var(--blue-rgb), .45); }
+#confirmModal .confirmation-effects { display: block; gap: 0; list-style: none; margin: 0 0 14px; padding: 0; overflow: hidden; border: 1px solid var(--card-line); background: rgba(255,255,255,.03); }
+#confirmModal .confirmation-effects li { display: flex; gap: 10px; align-items: flex-start; margin: 0; padding: 11px 14px; font-size: 14px; line-height: 1.4; }
+#confirmModal .confirmation-effects li + li { border-top: 1px solid var(--line); }
+#confirmModal .confirmation-effects li::before { content: "✓"; flex: 0 0 18px; height: 18px; margin-top: 1px; display: grid; place-items: center; border-radius: 50%; font-size: 11px; font-weight: 700; color: var(--teal); background: rgba(var(--teal-rgb), .18); }
+#confirmModal .mc-action-row { display: flex; flex-direction: row-reverse; justify-content: flex-start; gap: 10px; margin-top: 16px; }
+#confirmModal #confirmModalOkBtn { flex: 1; height: 44px; border-radius: 12px; font-weight: 700; }
+#confirmModal:not(:has(.review-confirm)) #confirmModalOkBtn { background: var(--warn); border-color: var(--warn); color: var(--bg); }
+#confirmModal .mc-btn-warn-pill { height: 44px; border-radius: 12px; padding: 0 18px; }
+@media (min-width: 761px) {
+  #confirmModal .mc-action-row { justify-content: flex-end; }
+  #confirmModal #confirmModalOkBtn { flex: 0 0 auto; padding: 0 22px; }
+}
+/* fin popups confirmacion */
