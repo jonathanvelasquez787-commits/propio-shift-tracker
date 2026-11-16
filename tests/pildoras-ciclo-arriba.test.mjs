@@ -16,10 +16,10 @@ test('pildoras ciclo arriba: las pildoras van antes de la tarjeta Meta del ciclo
 });
 
 test('pildoras ciclo arriba: la Proyeccion se inserta despues de la tarjeta de meta', () => {
-  const at = boot.indexOf('function injectCycleProjection()');
-  const piece = boot.slice(at, at + 2200);
-  assert.match(piece, /#cycleGoalCard/);
-  assert.match(piece, /goalCard\.after\(box\)/);
+  const goal = html.indexOf('id="cycleGoalCard"');
+  const box = html.indexOf('id="cycleProjectionBox"');
+  assert.ok(goal > 0 && box > goal);
+  assert.ok(boot.includes('function injectCycleProjection()'));
 });
 
 test('pildoras ciclo arriba: el CSS junta las pildoras en una fila sin colores fijos', () => {

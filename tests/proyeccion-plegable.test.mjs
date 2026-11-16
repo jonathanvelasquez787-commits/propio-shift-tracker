@@ -2,18 +2,25 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
+const html = readFileSync(new URL('../app.html', import.meta.url), 'utf8');
 const boot = readFileSync(new URL('../js/boot.js', import.meta.url), 'utf8');
 const css = readFileSync(new URL('../css/app-shell.css', import.meta.url), 'utf8');
 
 test('proyeccion plegable: la caja es un details con la primera fila en el encabezado', () => {
-  const at = boot.indexOf('function injectCycleProjection()');
-  const piece = boot.slice(at, at + 1800);
-  assert.match(piece, /createElement\('details'\)/);
-  assert.match(piece, /fin-preview gh-fold/);
+  const at = html.indexOf('<details class="fin-preview gh-fold" id="cycleProjectionBox"');
+  assert.ok(at > 0);
+  const piece = html.slice(at, at + 900);
   assert.match(piece, /<summary class="fin-preview-sum">/);
   assert.match(piece, /gh-fold-chevron/);
   assert.match(piece, /id="cycleProjectionFirst"/);
   assert.match(piece, /class="gh-fold-body"/);
+});
+
+test('proyeccion plegable: recuerda abierto o cerrado porque vive en app.html con id', () => {
+  const at = boot.indexOf('function injectCycleProjection()');
+  const piece = boot.slice(at, at + 900);
+  assert.doesNotMatch(piece, /createElement\('details'\)/);
+  assert.match(piece, /getElementById\('cycleProjectionBox'\)/);
 });
 
 test('proyeccion plegable: la primera fila va al encabezado y la segunda al cuerpo', () => {
