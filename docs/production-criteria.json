@@ -1206,6 +1206,13 @@
           ]
         },
         {
+          "file": "tests/ciclo-meta-una-linea.test.mjs",
+          "namedCases": [
+            "meta ciclo una linea: la tarjeta de Meta del ciclo tiene su id",
+            "meta ciclo una linea: el CSS pone titulo, monto y convertido en una linea sin colores fijos"
+          ]
+        },
+        {
           "file": "tests/block-cards-compact.test.mjs",
           "namedCases": [
             "la tarjeta del bloque junta Productividad, Meta y ACW en una sola fila",
