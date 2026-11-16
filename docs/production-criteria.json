@@ -1127,7 +1127,8 @@
           "namedCases": [
             "editar semana: hay un acceso discreto en Inicio (bajo el subtítulo) y otro en el menú",
             "editar semana: al tocarlo abre Reportes > Semana con el resumen abierto sin cerrar la tarjeta",
-            "editar semana: estilo discreto con variables del tema"
+            "editar semana: estilo discreto con variables del tema",
+            "editar semana: la fila Corregir días / Cambiar horario / Freelancer no se parte en dos líneas"
           ]
         },
         {
