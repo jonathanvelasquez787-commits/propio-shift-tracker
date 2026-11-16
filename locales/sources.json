@@ -2765,6 +2765,12 @@
       "app.html"
     ]
   },
+  "s_32325208": {
+    "source": "Bono de hoy{{v6}}",
+    "files": [
+      "js/detail-views.js"
+    ]
+  },
   "s_324b106f": {
     "source": "← Volver al inicio",
     "files": [
@@ -3269,12 +3275,6 @@
     "source": "Llamada iniciada",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_3aff7202": {
-    "source": "en llamada dentro de ventana",
-    "files": [
-      "js/detail-views.js"
     ]
   },
   "s_3b2f02cb": {
@@ -4424,12 +4424,6 @@
       "js/finance-planning.js"
     ]
   },
-  "s_510db506": {
-    "source": "{{v10}}\n          {{v11}}",
-    "files": [
-      "js/detail-views.js"
-    ]
-  },
   "s_5111640d": {
     "source": "Backup de datos",
     "files": [
@@ -4617,6 +4611,12 @@
     "source": "Gasto fijo",
     "files": [
       "js/finance-planning.js"
+    ]
+  },
+  "s_5456b3ac": {
+    "source": "en llamada",
+    "files": [
+      "js/detail-views.js"
     ]
   },
   "s_54741f50": {
@@ -5055,12 +5055,6 @@
       "js/finance.js"
     ]
   },
-  "s_5cb4b571": {
-    "source": "ventana total de hoy",
-    "files": [
-      "js/detail-views.js"
-    ]
-  },
   "s_5d01e0be": {
     "source": "Incluye llamadas, turnos, pausas, horario, metas y Finanzas.",
     "files": [
@@ -5161,12 +5155,6 @@
     "source": "Ordena tus prioridades con las flechas — lo que esté primero se llena primero con el saldo disponible.",
     "files": [
       "app.html"
-    ]
-  },
-  "s_5f4f9f48": {
-    "source": "Hoy · {{v0}}",
-    "files": [
-      "js/detail-views.js"
     ]
   },
   "s_5f772ac5": {
@@ -7533,6 +7521,12 @@
       "js/app-main.js"
     ]
   },
+  "s_8aa09539": {
+    "source": "{{v9}}\n          {{v10}}",
+    "files": [
+      "js/detail-views.js"
+    ]
+  },
   "s_8ab58258": {
     "source": "Duplicado exacto de una llamada ya guardada.",
     "files": [
@@ -7982,12 +7976,6 @@
     "source": "Enfócate y hazlo contar.",
     "files": [
       "app.html"
-    ]
-  },
-  "s_916a50d2": {
-    "source": "+{{v6}}",
-    "files": [
-      "js/detail-views.js"
     ]
   },
   "s_91742e46": {
@@ -9261,6 +9249,12 @@
     "source": "El registro de llamadas continúa. Reanudá la disponibilidad desde la extensión o con Start Calls en Propio.",
     "files": [
       "js/automation-ui.js"
+    ]
+  },
+  "s_a78f0f62": {
+    "source": "ventana total",
+    "files": [
+      "js/detail-views.js"
     ]
   },
   "s_a79ca484": {
@@ -11676,6 +11670,12 @@
       "js/shift-work-review.js"
     ]
   },
+  "s_d57f0467": {
+    "source": "+{{v5}}",
+    "files": [
+      "js/detail-views.js"
+    ]
+  },
   "s_d59b31d5": {
     "source": "Tenés una llamada entrante",
     "files": [
@@ -12568,12 +12568,6 @@
     "source": "Guardamos inicio, final y duración con milisegundos.",
     "files": [
       "app.html"
-    ]
-  },
-  "s_e49d517c": {
-    "source": "Bono ganado hoy{{v7}}",
-    "files": [
-      "js/detail-views.js"
     ]
   },
   "s_e4a7955d": {
