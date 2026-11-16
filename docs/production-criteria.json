@@ -1124,6 +1124,14 @@
           ]
         },
         {
+          "file": "tests/avisos-parte2.test.mjs",
+          "namedCases": [
+            "avisos parte 2: Aviso sin llamadas queda con una sola flecha y sin etiqueta",
+            "avisos parte 2: Repetir el aviso va sin cuadro y los campos son mas bajos",
+            "avisos parte 2: usa variables del tema y no colores fijos"
+          ]
+        },
+        {
           "file": "tests/ajustes-pestanas.test.mjs",
           "namedCases": [
             "ajustes pestanas: hay tres pestanas y tres paneles con sus campos",
