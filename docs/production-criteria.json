@@ -1222,6 +1222,13 @@
           ]
         },
         {
+          "file": "tests/vaciar-fila-celular.test.mjs",
+          "namedCases": [
+            "vaciar fila celular: Historial de cambios y Vaciar datos del dia comparten una fila",
+            "vaciar fila celular: solo en celular se pone en fila, en compu no cambia nada"
+          ]
+        },
+        {
           "file": "tests/vaciar-datos-del-dia.test.mjs",
           "namedCases": [
             "vaciar datos del dia: el boton cambia de nombre y conserva su estilo",

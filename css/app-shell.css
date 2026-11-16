@@ -2065,3 +2065,20 @@ details.gh-fold > summary:focus-visible { outline: 2px solid var(--cyan); outlin
 #cycleTagsRow > .gh-info-row,
 #cycleTagsRow > .table-tags { display: contents; }
 /* fin pildoras ciclo arriba */
+
+/* vaciar fila celular */
+#callTableAccordion .call-actions-row { display: contents; }
+@media (max-width: 760px) {
+  #callTableAccordion .call-actions-row { display: flex; gap: 8px; margin-bottom: 8px; }
+  #callTableAccordion .call-actions-row .gap-edit-btn {
+    flex: 1 1 0; min-width: 0; margin: 0; padding-left: 6px; padding-right: 6px;
+    justify-content: center; justify-self: stretch; white-space: nowrap; font-size: 12.5px; gap: 5px;
+  }
+  #callTableAccordion .call-actions-row .ic-svg { width: 14px; height: 14px; }
+}
+@media (max-width: 360px) {
+  #callTableAccordion .call-actions-row { gap: 6px; }
+  #callTableAccordion .call-actions-row .gap-edit-btn { font-size: 11px; padding-left: 4px; padding-right: 4px; gap: 3px; }
+  #callTableAccordion .call-actions-row .ic-svg { width: 12px; height: 12px; }
+}
+/* fin vaciar fila celular */
