@@ -100,6 +100,12 @@
       "js/reports.js"
     ]
   },
+  "s_019e5553": {
+    "source": "sin registros",
+    "files": [
+      "js/reports.js"
+    ]
+  },
   "s_01bd29f9": {
     "source": "Resumen semanal",
     "files": [
@@ -116,6 +122,12 @@
     "source": "Usa entre 0 y 24 horas, entre 1 y 7 días y una tarifa válida en Ajustes.",
     "files": [
       "js/finance-planning.js"
+    ]
+  },
+  "s_020db3ec": {
+    "source": "Ganado del ciclo",
+    "files": [
+      "js/reports.js"
     ]
   },
   "s_025a86cd": {
@@ -2648,6 +2660,12 @@
       "js/reinforcement-feedback.js"
     ]
   },
+  "s_311ce35a": {
+    "source": "Minutos de trabajo contra tu meta de {{v0}} min",
+    "files": [
+      "js/reports.js"
+    ]
+  },
   "s_313081ca": {
     "source": "CUIDADO PERSONAL",
     "files": [
@@ -3767,12 +3785,6 @@
       "app.html"
     ]
   },
-  "s_452eba29": {
-    "source": "{{v0}} Productividad — últimos 14 días",
-    "files": [
-      "js/reports.js"
-    ]
-  },
   "s_455c3a0c": {
     "source": "Avisos",
     "files": [
@@ -4334,6 +4346,12 @@
       "app.html"
     ]
   },
+  "s_4f5f86d3": {
+    "source": "min hoy",
+    "files": [
+      "js/reports.js"
+    ]
+  },
   "s_4f8737f0": {
     "source": "y agrega una ventana con fecha, hora de inicio/fin y nivel.",
     "files": [
@@ -4874,6 +4892,12 @@
       "js/boot.js"
     ]
   },
+  "s_58e94e77": {
+    "source": "día libre",
+    "files": [
+      "js/reports.js"
+    ]
+  },
   "s_58f2d1d6": {
     "source": "(Break o Lunch),",
     "files": [
@@ -4962,6 +4986,12 @@
     "source": "Ciclo: {{v3}}{{v4}}",
     "files": [
       "js/pay-receipts.js"
+    ]
+  },
+  "s_5b7f5155": {
+    "source": "{{v2}}/{{v3}} días transcurridos · {{v4}} restantes",
+    "files": [
+      "js/reports.js"
     ]
   },
   "s_5b80a29c": {
@@ -5101,6 +5131,12 @@
     "source": "Borrarlos:",
     "files": [
       "privacidad.html"
+    ]
+  },
+  "s_5ec18cba": {
+    "source": "Racha",
+    "files": [
+      "js/reports.js"
     ]
   },
   "s_5ec4aed2": {
@@ -5792,6 +5828,12 @@
   },
   "s_6d6ee436": {
     "source": "días",
+    "files": [
+      "js/reports.js"
+    ]
+  },
+  "s_6d797bec": {
+    "source": "{{v7}} {{v8}}",
     "files": [
       "js/reports.js"
     ]
@@ -6814,6 +6856,12 @@
       "js/finance.js"
     ]
   },
+  "s_7efa076e": {
+    "source": "{{v0}}{{v1}} por día laboral · {{v2}} restantes",
+    "files": [
+      "js/reports.js"
+    ]
+  },
   "s_7f275484": {
     "source": "Categoría",
     "files": [
@@ -7593,7 +7641,8 @@
     "source": "Ganancias de hoy",
     "files": [
       "app.html",
-      "js/app-main.js"
+      "js/app-main.js",
+      "js/reports.js"
     ]
   },
   "s_8c2547bb": {
@@ -8256,6 +8305,12 @@
       "app.html"
     ]
   },
+  "s_972f6f66": {
+    "source": "Tu ciclo",
+    "files": [
+      "js/reports.js"
+    ]
+  },
   "s_9755ec80": {
     "source": "La conexión necesita revisión",
     "files": [
@@ -8552,7 +8607,8 @@
     "source": "Ciclo actual",
     "files": [
       "app.html",
-      "js/pay-receipts.js"
+      "js/pay-receipts.js",
+      "js/reports.js"
     ]
   },
   "s_9d49011f": {
@@ -9993,6 +10049,12 @@
     "source": "Califican o conservan un bono de esta ventana ({{v8}})",
     "files": [
       "js/higher-rate-review.js"
+    ]
+  },
+  "s_b5b132c9": {
+    "source": "Productividad — últimos 14 días",
+    "files": [
+      "js/reports.js"
     ]
   },
   "s_b620cb7c": {
@@ -12707,7 +12769,8 @@
     "source": "Proyección del ciclo",
     "files": [
       "app.html",
-      "js/boot.js"
+      "js/boot.js",
+      "js/reports.js"
     ]
   },
   "s_e8c61633": {
@@ -13976,6 +14039,12 @@
     "source": "Ver Hoy o Ciclo",
     "files": [
       "app.html"
+    ]
+  },
+  "s_fda31313": {
+    "source": "días transcurridos",
+    "files": [
+      "js/reports.js"
     ]
   },
   "s_fda677e1": {

@@ -1115,7 +1115,10 @@
             "reportes pestanas: hay 4 pestañas Hoy, Ciclo, Semana y Detalle con sus paneles",
             "reportes pestanas: cada sección vive en su panel y no se perdió ningún id",
             "reportes pestanas: solo Hoy se ve al inicio y la pestaña elegida se recuerda",
-            "reportes pestanas: estilo del botón-grupo con variables del tema y celular a todo el ancho"
+            "reportes pestanas: estilo del botón-grupo con variables del tema y celular a todo el ancho",
+            "reportes hoy: la pestaña Hoy tiene 4 tarjetas, gráfica con Tu ciclo y 3 enlaces",
+            "reportes hoy: las tarjetas y Tu ciclo usan los mismos datos que ya calcula la app",
+            "reportes hoy: estilo con variables del tema, 4 columnas en compu y 2x2 en celular"
           ]
         },
         {
