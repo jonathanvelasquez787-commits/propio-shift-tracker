@@ -1222,6 +1222,14 @@
           ]
         },
         {
+          "file": "tests/proyeccion-gastos.test.mjs",
+          "namedCases": [
+            "proyeccion gastos: ya no sale la fila Al ritmo de hoy",
+            "proyeccion gastos: arriba va Para llegar a tu meta y debajo Gastos del ciclo",
+            "proyeccion gastos: los totales salen de las filas de gastos de Finanzas"
+          ]
+        },
+        {
           "file": "tests/pildoras-ciclo-arriba.test.mjs",
           "namedCases": [
             "pildoras ciclo arriba: las pildoras van antes de la tarjeta Meta del ciclo",

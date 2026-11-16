@@ -732,6 +732,12 @@
       "js/reinforcement-feedback.js"
     ]
   },
+  "s_0cfca7d8": {
+    "source": "Faltan {{v1}}{{v2}} de {{v3}}{{v4}}",
+    "files": [
+      "js/boot.js"
+    ]
+  },
   "s_0d21a8f9": {
     "source": "Duración prevista de {{v0}}: hasta {{v1}}.",
     "files": [
@@ -2080,6 +2086,12 @@
     "source": "Terminar llamada",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_2751e1f1": {
+    "source": "Gastos del ciclo",
+    "files": [
+      "js/boot.js"
     ]
   },
   "s_275b1f51": {
@@ -5016,12 +5028,6 @@
     "source": "Inicio del turno ya utilizado",
     "files": [
       "js/automation-ui.js"
-    ]
-  },
-  "s_5ba07c42": {
-    "source": "Al ritmo de hoy",
-    "files": [
-      "js/boot.js"
     ]
   },
   "s_5bb80c8b": {
@@ -8712,6 +8718,12 @@
       "js/automation-ui.js"
     ]
   },
+  "s_9e1e36a1": {
+    "source": "Reservado{{v7}}",
+    "files": [
+      "js/boot.js"
+    ]
+  },
   "s_9e40c2fa": {
     "source": "#A855F7",
     "files": [
@@ -10055,12 +10067,6 @@
     "source": "{{v0}} · {{v1}} llamada(s){{v2}}",
     "files": [
       "js/weekly-summary.js"
-    ]
-  },
-  "s_b50e8da9": {
-    "source": "Día {{v1}} de {{v2}} · {{v3}}{{v4}}{{v5}} vs tu meta",
-    "files": [
-      "js/boot.js"
     ]
   },
   "s_b551df05": {
