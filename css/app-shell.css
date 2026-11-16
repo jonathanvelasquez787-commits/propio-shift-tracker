@@ -2044,3 +2044,18 @@ details.gh-fold > summary:focus-visible { outline: 2px solid var(--cyan); outlin
   #cycleGoalCard .gp-value { margin-left: 2px; }
 }
 /* fin meta ciclo una linea */
+
+/* proyeccion plegable */
+#cycleProjectionBox > .fin-preview-sum { display: block; }
+#cycleProjectionBox .fin-preview-row { padding: 4px 0; }
+#cycleProjectionBox .fin-preview-row:last-child { padding-bottom: 4px; }
+#cycleProjectionBox .fin-preview-main { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 12px; }
+#cycleProjectionBox .fin-preview-sub { margin-top: 0; }
+#cycleProjectionBox .fin-preview-bar { flex: 0 0 100%; margin-top: 3px; }
+#cycleProjectionBox #cycleProjectionFirst .fin-preview-row { border-bottom: 0; }
+#cycleProjectionBox > .gh-fold-body { margin-top: 0; }
+#cycleProjectionBox:not([open]) > .fin-preview-sum .fin-preview-head { margin-bottom: 0; }
+@media (min-width: 761px) {
+  #cycleProjectionBox .fin-preview-right { min-width: 190px; }
+}
+/* fin proyeccion plegable */

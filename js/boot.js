@@ -508,7 +508,7 @@ function renderCycleProjection() {
     paceSub = ui`Faltan ${money(pace.remainingUsd)}${inline(pace.remainingUsd)} · ${money(pace.perDayUsd)}${inline(pace.perDayUsd)} por día laboral`;
   }
 
-  rows.innerHTML = ui`
+  const firstRowHtml = ui`
     <div class="fin-preview-row" style="--cat-rgb: var(--blue-rgb);">
       <span class="fin-preview-icon">${icon('chart')}</span>
       <div class="fin-preview-main">
@@ -520,7 +520,8 @@ function renderCycleProjection() {
         <div class="fin-preview-amt">${money(proj.projected)}</div>
         <div class="fin-preview-amt-label">${escapeHtml(converted(proj.projected) || 'proyectado')}</div>
       </div>
-    </div>
+    </div>`;
+  const secondRowHtml = ui`
     <div class="fin-preview-row" style="--cat-rgb: var(--warn-rgb);">
       <span class="fin-preview-icon">${icon('flag')}</span>
       <div class="fin-preview-main">
@@ -532,22 +533,39 @@ function renderCycleProjection() {
         <div class="fin-preview-amt-label">${escapeHtml(paceLabel)}</div>
       </div>
     </div>`;
+
+  // La primera fila vive dentro del encabezado (siempre visible); el resto, en el cuerpo plegable.
+  const first = document.getElementById('cycleProjectionFirst');
+  if (first) {
+    first.innerHTML = firstRowHtml;
+    rows.innerHTML = secondRowHtml;
+  } else {
+    rows.innerHTML = firstRowHtml + secondRowHtml;
+  }
 }
 
 function injectCycleProjection() {
   const view = document.getElementById('earningsCycleView');
   if (!view || document.getElementById('cycleProjectionBox') || !hasCycleProjectionDeps()) return;
 
-  const box = document.createElement('div');
-  box.className = 'fin-preview';
+  // Plegable igual que "Pendientes de reservar": contraída muestra solo la primera fila.
+  const box = document.createElement('details');
+  box.className = 'fin-preview gh-fold';
   box.id = 'cycleProjectionBox';
+  box.setAttribute('open', '');
   box.style.marginTop = '12px';
   box.innerHTML = ui`
-    <div class="fin-preview-head">
-      <span class="fin-preview-title">Proyección del ciclo</span>
-      <button class="fin-preview-link" data-nav-page="reports" type="button">Ver Reportes →</button>
-    </div>
-    <div id="cycleProjectionRows"></div>`;
+    <summary class="fin-preview-sum">
+      <div class="fin-preview-head">
+        <span class="fin-preview-title">Proyección del ciclo</span>
+        <button class="fin-preview-link" data-nav-page="reports" type="button">Ver Reportes →</button>
+        <span class="gh-fold-chevron" aria-hidden="true"></span>
+      </div>
+      <div id="cycleProjectionFirst"></div>
+    </summary>
+    <div class="gh-fold-body">
+      <div id="cycleProjectionRows"></div>
+    </div>`;
 
   // data-nav-page ya lo maneja la app con un listener delegado: el botón no
   // necesita wiring propio para llevar a Reportes.
