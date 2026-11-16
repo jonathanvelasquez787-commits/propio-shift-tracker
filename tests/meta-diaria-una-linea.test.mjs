@@ -24,3 +24,12 @@ test('meta diaria una linea: CSS en una fila con la barra debajo y sin colores f
   assert.match(bloque, /flex:\s*0 0 100%/);
   assert.doesNotMatch(bloque, /#[0-9a-fA-F]{3,8}\b/);
 });
+
+test('meta diaria una linea: en celular achica el texto para que quepa en una linea', () => {
+  const bloque = css.slice(css.indexOf('/* meta diaria una linea */'), css.indexOf('/* fin meta diaria una linea */'));
+  const m = bloque.match(/@media \(max-width: 760px\) \{([\s\S]*?)\n\}\n/);
+  assert.ok(m, 'falta la regla para celular dentro del bloque');
+  assert.match(m[1], /#classicDailyGoalCard \.gp-label \{ font-size: 8\.5px/);
+  assert.match(m[1], /white-space: nowrap/);
+  assert.doesNotMatch(bloque, /#[0-9a-fA-F]{3,8}\b/);
+});
