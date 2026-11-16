@@ -3885,6 +3885,12 @@
       "js/settings.js"
     ]
   },
+  "s_4762b9ff": {
+    "source": "Secciones de Ajustes",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_47a4101e": {
     "source": "Faltan {{v0}}%",
     "files": [
@@ -4686,6 +4692,12 @@
     "source": "Un botón borra tu cuenta y todos tus datos, aquí y en la nube.",
     "files": [
       "index.html"
+    ]
+  },
+  "s_5561fd0b": {
+    "source": "General",
+    "files": [
+      "app.html"
     ]
   },
   "s_55686835": {
@@ -5781,6 +5793,12 @@
   },
   "s_6cd2f1d3": {
     "source": "Repetir el aviso",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_6cda2348": {
+    "source": "Datos",
     "files": [
       "app.html"
     ]
@@ -8838,6 +8856,12 @@
       "js/finance.js"
     ]
   },
+  "s_a1358ae8": {
+    "source": "Dinero",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_a13f0244": {
     "source": "Cambiar emoji",
     "files": [
@@ -10047,7 +10071,6 @@
   "s_b551df05": {
     "source": "Copias recuperables",
     "files": [
-      "app.html",
       "js/backup-recovery.js"
     ]
   },

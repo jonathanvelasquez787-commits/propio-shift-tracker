@@ -112,6 +112,7 @@ import {
   updateRate,
   wireEmojiPicker,
   wireSettingsLanguage,
+  wireSettingsTabs,
   configureSettingsContext,
 } from './settings.js';
 
@@ -8059,6 +8060,7 @@ export function render() {
     document.getElementById('dayNextBtn').addEventListener('click', () => shiftActiveDayBy(1));
     document.getElementById('dayActiveLabelBtn').addEventListener('click', jumpActiveDayToToday);
     wireReportsTabs();
+    wireSettingsTabs();
     document.getElementById('weekPrevBtn').addEventListener('click', () => { weekViewOffset -= 1; renderWeekSummary(); });
     document.getElementById('weekNextBtn').addEventListener('click', () => { weekViewOffset += 1; renderWeekSummary(); });
     document.getElementById('weekTodayBtn').addEventListener('click', () => { weekViewOffset = 0; renderWeekSummary(); });

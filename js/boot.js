@@ -367,7 +367,9 @@ function injectDeleteAccount(userId, getCurrentUserId = () => readMeta().userId)
       <button class="mc-btn-solid-full bad" id="deleteAccountBtn" type="button">Borrar cuenta y datos</button>
     </div></div></details>`;
 
-  if (actions) card.insertBefore(block, actions);
+  const datosPanel = document.querySelector('#setPanelDatos');
+  if (datosPanel) datosPanel.appendChild(block);
+  else if (actions) card.insertBefore(block, actions);
   else card.appendChild(block);
 
   const refreshCounts=()=>{if(getCurrentUserId()!==userId)return;let data;try{data=readLocalSnapshot();}catch{return;}const counts={calls:data.calls?.length,pauses:data.state?.pauseHistory?.length,events:data.state?.events?.length};for(const [key,value] of Object.entries(counts)){const node=block.querySelector(`[data-delete-count="${key}"]`);if(node)node.textContent=Number.isInteger(value)?String(value):'—';}};

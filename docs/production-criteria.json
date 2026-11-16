@@ -1117,6 +1117,14 @@
           ]
         },
         {
+          "file": "tests/ajustes-pestanas.test.mjs",
+          "namedCases": [
+            "ajustes pestanas: hay tres pestanas y tres paneles con sus campos",
+            "ajustes pestanas: el boton Listo queda fuera de los paneles y los textos largos van en Como funciona",
+            "ajustes pestanas: el CSS usa variables del tema y no colores fijos"
+          ]
+        },
+        {
           "file": "tests/higher-rate-compacta.test.mjs",
           "namedCases": [
             "higher rate compacta: la tarjeta de hoy no repite la fecha y usa textos cortos",
