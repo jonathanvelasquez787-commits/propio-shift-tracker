@@ -1110,6 +1110,15 @@
           ]
         },
         {
+          "file": "tests/reportes-pestanas.test.mjs",
+          "namedCases": [
+            "reportes pestanas: hay 4 pestañas Hoy, Ciclo, Semana y Detalle con sus paneles",
+            "reportes pestanas: cada sección vive en su panel y no se perdió ningún id",
+            "reportes pestanas: solo Hoy se ve al inicio y la pestaña elegida se recuerda",
+            "reportes pestanas: estilo del botón-grupo con variables del tema y celular a todo el ancho"
+          ]
+        },
+        {
           "file": "tests/tarjetas-plegables-inicio.test.mjs",
           "namedCases": [
             "tarjetas plegables: Pendientes de reservar es details con id y summary",

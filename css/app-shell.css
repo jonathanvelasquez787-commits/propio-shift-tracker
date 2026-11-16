@@ -1779,3 +1779,16 @@ details.gh-fold > summary:focus-visible { outline: 2px solid var(--cyan); outlin
   #financePreviewBox .fin-preview-right { min-width: 190px; }
 }
 /* fin pendientes una linea */
+
+/* reportes pestanas */
+#pageReports .rpt-tabs { display: flex; width: fit-content; max-width: 100%; margin: 0 0 14px; border: 1px solid var(--line-2); border-radius: 12px; overflow: hidden; background: rgba(255,255,255,.03); }
+#pageReports .rpt-tab { appearance: none; border: 0; border-left: 1px solid var(--line-2); background: transparent; color: var(--text); font: inherit; font-size: 13px; font-weight: 800; padding: 11px 28px; cursor: pointer; white-space: nowrap; }
+#pageReports .rpt-tab:first-child { border-left: 0; }
+#pageReports .rpt-tab[aria-selected="true"] { background: rgba(var(--blue-rgb), .32); }
+#pageReports .rpt-tab:focus-visible { outline: 2px solid var(--cyan); outline-offset: -2px; }
+#pageReports .rpt-tab-panel[hidden] { display: none; }
+@media (max-width: 760px) {
+  #pageReports .rpt-tabs { width: 100%; }
+  #pageReports .rpt-tab { flex: 1 1 0; padding: 11px 4px; }
+}
+/* fin reportes pestanas */

@@ -465,6 +465,55 @@ function statChipHtml(label, valueText, tone = 'flat') {
   return ui`<div class="rpt-trend-chip"><span class="${tone}">●</span> ${escapeHtml(label)} ${escapeHtml(valueText)}</div>`;
 }
 
+// Pestañas de Reportes: Hoy | Ciclo | Semana | Detalle. Solo muestran u ocultan paneles que ya existen
+// (los ids de adentro no cambian); la pestaña elegida se recuerda en settings.reportsTab.
+export const REPORTS_TABS = ['hoy', 'ciclo', 'semana', 'detalle'];
+
+export function reportsActiveTab() {
+  return REPORTS_TABS.includes(settings.reportsTab) ? settings.reportsTab : 'hoy';
+}
+
+export function applyReportsTab() {
+  if (typeof document.querySelectorAll !== 'function') return;
+  const active = reportsActiveTab();
+  document.querySelectorAll('#pageReports .rpt-tab-panel').forEach(panel => {
+    panel.hidden = panel.getAttribute('data-rpt-tab') !== active;
+  });
+  document.querySelectorAll('#rptTabs [data-rpt-tab-btn]').forEach(btn => {
+    const on = btn.getAttribute('data-rpt-tab-btn') === active;
+    btn.setAttribute('aria-selected', on ? 'true' : 'false');
+    btn.tabIndex = on ? 0 : -1;
+  });
+}
+
+export function setReportsTab(tab, { focus = false } = {}) {
+  if (!REPORTS_TABS.includes(tab)) return;
+  if (settings.reportsTab !== tab) {
+    settings.reportsTab = tab;
+    saveSettingsOnly();
+  }
+  applyReportsTab();
+  if (focus) document.querySelector(`#rptTabs [data-rpt-tab-btn="${tab}"]`)?.focus();
+}
+
+export function wireReportsTabs() {
+  const bar = document.getElementById('rptTabs');
+  if (!bar) return;
+  bar.addEventListener('click', event => {
+    const btn = event.target.closest('[data-rpt-tab-btn]');
+    if (btn) setReportsTab(btn.getAttribute('data-rpt-tab-btn'));
+  });
+  bar.addEventListener('keydown', event => {
+    const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
+    const edge = event.key === 'Home' ? 0 : event.key === 'End' ? REPORTS_TABS.length - 1 : null;
+    if (!step && edge === null) return;
+    event.preventDefault();
+    const next = edge !== null ? edge : (REPORTS_TABS.indexOf(reportsActiveTab()) + step + REPORTS_TABS.length) % REPORTS_TABS.length;
+    setReportsTab(REPORTS_TABS[next], { focus: true });
+  });
+  applyReportsTab();
+}
+
 export function renderReportsDashboard() {
   const dashboard = document.getElementById('rptDashboard');
   if (!dashboard) return;

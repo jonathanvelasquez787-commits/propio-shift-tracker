@@ -12235,6 +12235,12 @@
       "js/app-main.js"
     ]
   },
+  "s_e05cc888": {
+    "source": "Secciones de Reportes",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_e07ff6dc": {
     "source": "Sin registros: meta sin evaluar",
     "files": [
@@ -13124,6 +13130,12 @@
   },
   "s_efc3ceb5": {
     "source": "Ver Bloques o Llamadas",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_efddee0a": {
+    "source": "Semana",
     "files": [
       "app.html"
     ]
