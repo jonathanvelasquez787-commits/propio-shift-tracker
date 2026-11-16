@@ -513,7 +513,7 @@ export { onReinforcementCallSaved, onReinforcementCallsChanged, onReinforcementD
         if (type !== 'break' && type !== 'lunch' && type !== 'work') return;
         points.push({ rawType: type, start: formatHHMM(b.start), dur: Number(b.dur), goalMin: b.goalMin });
       });
-      // El nombre ("Break 1", "Lunch 2", "Bloque de Trabajo 3") se asigna DESPUÉS de ordenar
+      // El nombre ("Break 1", "Lunch 2", "Bloque 3") se asigna DESPUÉS de ordenar
       // cronológicamente, no según el orden del arreglo.
       const anchor = toMinutes(formatHHMM(dayConfig.start));
       const offset = time => (toMinutes(time) - anchor + 1440) % 1440 + anchor;
@@ -527,7 +527,7 @@ export { onReinforcementCallSaved, onReinforcementCallsChanged, onReinforcementD
         let type, name;
         if (p.rawType === 'break') { type = 'Break'; name = `Break ${breakIdx++}`; }
         else if (p.rawType === 'lunch') { type = 'Lunch'; name = `Lunch ${lunchIdx++}`; }
-        else { type = 'Work'; name = ui`Bloque de Trabajo ${workIdx++}`; }
+        else { type = 'Work'; name = ui`Bloque ${workIdx++}`; }
         const slot = { type, name, start: toHHMM(pStart), end: toHHMM(pStart + p.dur), startMin: pStart, endMin: pStart + p.dur };
         // Meta de Productividad configurable POR BLOQUE (minutos productivos que ese bloque de
         // Trabajo debe alcanzar, reemplaza al viejo ratio global de "Margen"). Solo los bloques de
@@ -6644,7 +6644,7 @@ function renderSchedule() {
         if (subtitle) {
           subtitle.textContent = taken.length
             ? ui`Descansos de hoy · ${taken.length} · ${formatMinutes(totalTakenMin)} min en total`
-            : translateText('Modo freelancer: aquí ves los descansos que has tomado.');
+            : translateText('Modo freelancer');
         }
         wrap.innerHTML = taken.length
           ? taken.map(p => ui`<div class="fl-break-row"><span class="fl-break-chip ${p.type === 'lunch' ? 'is-lunch' : 'is-break'}">${escapeHtml(p.type === 'lunch' ? translateText('Lunch') : translateText('Break'))}</span><span class="fl-break-time">${timeLabelFromDate(p.start)} – ${timeLabelFromDate(p.end)}</span><span class="fl-break-min">${formatMinutes((p.end - p.start) / 60000)} min</span></div>`).join('')
@@ -6834,6 +6834,21 @@ function renderSchedule() {
       });
 
       wrap.innerHTML = slotRows.join('');
+      // Tarjetas contraidas: una sola linea con hora, usado y metas (mismos datos de la tarjeta abierta).
+      if (typeof wrap.querySelectorAll === 'function') wrap.querySelectorAll('.sblk-card.is-collapsed').forEach(card => {
+        const titles = card.querySelector('.sblk-titles');
+        if (!titles) return;
+        const parts = [];
+        const range = card.querySelector('.sblk-range');
+        if (range) parts.push(range.textContent.trim());
+        const used = card.querySelector('.sblk-bar-label-row');
+        if (used) parts.push(Array.from(used.children).map(el => el.textContent.replace(/\s+/g, ' ').trim()).join(' '));
+        card.querySelectorAll('.sblk-tile').forEach(tile => parts.push(tile.textContent.replace(/\s+/g, ' ').trim()));
+        const line = document.createElement('div');
+        line.className = 'sblk-collapsed-line';
+        parts.filter(Boolean).forEach(text => { const span = document.createElement('span'); span.textContent = text; line.appendChild(span); });
+        titles.appendChild(line);
+      });
 
       const summaryCards = [];
 

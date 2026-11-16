@@ -6222,7 +6222,8 @@
   "s_738ac4bd": {
     "source": "Modo freelancer",
     "files": [
-      "app.html"
+      "app.html",
+      "js/app-main.js"
     ]
   },
   "s_73c20441": {
@@ -6983,12 +6984,6 @@
       "js/call-recovery.js",
       "js/higher-rate-review.js",
       "js/shift-work-review.js"
-    ]
-  },
-  "s_81c08233": {
-    "source": "Bloque de Trabajo {{v0}}",
-    "files": [
-      "js/app-main.js"
     ]
   },
   "s_81d4ddca": {
@@ -10596,12 +10591,6 @@
       "index.html"
     ]
   },
-  "s_c088c97f": {
-    "source": "Modo freelancer: aquí ves los descansos que has tomado.",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
   "s_c08ef1c6": {
     "source": "Asignar disponible automáticamente",
     "files": [
@@ -11097,6 +11086,12 @@
       "js/backup-recovery.js",
       "js/call-records-view.js",
       "js/call-recovery.js"
+    ]
+  },
+  "s_cb957c31": {
+    "source": "Bloque {{v0}}",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_cbcf74da": {

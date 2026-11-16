@@ -2002,3 +2002,19 @@ details.gh-fold > summary:focus-visible { outline: 2px solid var(--cyan); outlin
 #notificationsModal #notificationFilesReview .polished-setting > summary { min-height: 0; padding: 12px 0; }
 #notificationsModal #notificationFilesReview .polished-setting > summary small { font-size: 11.5px; margin-top: 2px; }
 /* fin avisos parte 2 */
+
+/* bloques contraidos */
+.sblk-card .sblk-collapsed-line { display: none; }
+.sblk-card.is-collapsed .sblk-titles { display: flex; align-items: center; gap: 14px; min-width: 0; flex: 1 1 0; overflow: hidden; }
+.sblk-card.is-collapsed .sblk-head { width: 100%; min-width: 0; box-sizing: border-box; }
+.sblk-card.is-collapsed .sblk-name { flex: 0 0 auto; }
+.sblk-card.is-collapsed .sblk-collapsed-line { display: flex; gap: 12px; min-width: 0; flex: 1 1 auto; overflow: hidden; white-space: nowrap; margin-right: 96px; font-size: 12px; color: var(--muted); }
+.sblk-card.is-collapsed .sblk-collapsed-line span { overflow: hidden; text-overflow: ellipsis; flex: 0 1 auto; }
+.sblk-card.is-collapsed .sblk-collapsed-line span + span::before { content: "· "; opacity: .6; }
+@media (max-width: 700px) {
+  .sblk-card.is-collapsed .sblk-titles { gap: 8px; }
+  .sblk-card.is-collapsed .sblk-collapsed-line { margin-right: 76px; gap: 8px; font-size: 11px; }
+  .sblk-card.is-collapsed .sblk-collapsed-line span:nth-child(n+2) { display: none; }
+  .sblk-card.is-collapsed .sblk-head .sblk-status { top: 50%; transform: translateY(-50%); }
+}
+/* fin bloques contraidos */

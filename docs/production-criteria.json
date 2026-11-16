@@ -1228,6 +1228,15 @@
           ]
         },
         {
+          "file": "tests/bloques-contraidos.test.mjs",
+          "namedCases": [
+            "bloques contraidos: los bloques de trabajo se llaman Bloque N",
+            "bloques contraidos: el subtitulo del modo freelancer sin descansos solo dice Modo freelancer",
+            "bloques contraidos: la tarjeta contraida arma una linea con hora, usado y metas",
+            "bloques contraidos: el CSS muestra la linea solo contraida y sin colores fijos"
+          ]
+        },
+        {
           "file": "tests/horario-mas-chico.test.mjs",
           "namedCases": [
             "Horario se ve mas chico en compu y celular",
