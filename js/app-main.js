@@ -5537,6 +5537,10 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       const set = (id, value) => { const el = document.getElementById(id); if (el && (force || document.activeElement !== el)) el.value = value; };
       const enabled = document.getElementById('freelancerEnabledInput');
       if (enabled) enabled.checked = fl.enabled;
+      const sideEnabled = document.getElementById('sidebarFreelancerInput');
+      if (sideEnabled) sideEnabled.checked = fl.enabled === true;
+      const sideConfig = document.getElementById('sidebarFreelancerConfigBtn');
+      if (sideConfig) sideConfig.hidden = fl.enabled !== true;
       const statusTag = document.getElementById('freelancerStatusTag');
       if (statusTag) { statusTag.textContent = fl.enabled ? translateText('Activado') : translateText('Desactivado'); statusTag.classList.toggle('good', fl.enabled === true); }
       set('freelancerBreakMinInput', fl.breakMin); set('freelancerLunchMinInput', fl.lunchMin);
@@ -7921,6 +7925,18 @@ export function render() {
     document.getElementById('productiveBreakAwardMinInput').addEventListener('change', updateProductiveBreakSettings);
     document.getElementById('productiveBreakSoundInput').addEventListener('change', updateProductiveBreakSound);
     for (const id of ['freelancerEnabledInput', 'freelancerBreakMinInput', 'freelancerLunchMinInput', 'freelancerConnectedMinInput', 'freelancerSnoozeMinInput', 'freelancerSessionGoalInput', 'freelancerLunchEveryInput']) document.getElementById(id).addEventListener('change', updateFreelancerSettings);
+    {
+      // Menú lateral: el mismo interruptor del modo freelancer; "Configurar" lleva a Horario > Más opciones > Modo freelancer.
+      const sideSwitch = document.getElementById('sidebarFreelancerInput'), sideConfig = document.getElementById('sidebarFreelancerConfigBtn');
+      sideSwitch.addEventListener('change', () => { document.getElementById('freelancerEnabledInput').checked = sideSwitch.checked; updateFreelancerSettings(); });
+      sideConfig.addEventListener('click', () => {
+        navigateToPage('schedule');
+        const moreToggle = document.getElementById('schedMoreToggle'), flToggle = document.querySelector('[data-more-toggle="freelancer"]');
+        if (moreToggle.getAttribute('aria-expanded') !== 'true') moreToggle.click();
+        if (flToggle.getAttribute('aria-expanded') !== 'true') flToggle.click();
+        document.getElementById('schedMoreCard').scrollIntoView({ block: 'start' });
+      });
+    }
     document.getElementById('freelancerTemplateRow').addEventListener('click', (e) => {
       const btn = e.target instanceof Element ? e.target.closest('[data-fl-template]') : null;
       if (btn) applyFreelancerTemplate(btn.getAttribute('data-fl-template'));

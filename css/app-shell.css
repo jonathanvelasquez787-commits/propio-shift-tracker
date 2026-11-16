@@ -1627,8 +1627,10 @@ html[data-palette]:not([data-palette="original"]) .boot-choice { border-color: v
 #confirmModalOkBtn:disabled { opacity: .45; cursor: not-allowed; }
 /* fin reiniciar datos casillas */
 
-/* horario freelancer interruptor */
-#scheduleConfigAccordion .sched-freelancer-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
-#scheduleConfigAccordion .sched-freelancer-row .sched-switch-row { margin: 0; flex: 0 1 auto; }
-#schedMoreCard .sched-freelancer-note { font-size: 12.5px; color: var(--muted); }
-/* fin horario freelancer interruptor */
+/* menu lateral modo freelancer */
+.sidebar-fl-label { display: flex; flex-direction: column; gap: 2px; min-width: 0; line-height: 1.15; }
+.sidebar-fl-config { background: none; border: 0; padding: 0; margin: 0; font: inherit; font-size: 12px; font-weight: 600; text-align: left; cursor: pointer; color: color-mix(in srgb, var(--cyan) 70%, var(--text)); }
+.sidebar-fl-config:hover { text-decoration: underline; }
+.sidebar-fl-config:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; border-radius: 4px; }
+.sidebar-fl-config[hidden] { display: none; }
+/* fin menu lateral modo freelancer */

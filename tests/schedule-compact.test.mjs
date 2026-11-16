@@ -19,7 +19,7 @@ test('Horario: el texto largo del modo freelancer vive en el icono i y no pierde
   const at = html.indexOf('class="sched-freelancer-head"');
   assert.ok(at > 0, 'existe la cabecera del modo freelancer');
   const head = html.slice(at, html.indexOf('<div class="sched-compact-row">', at));
-  assert.doesNotMatch(head, /id="freelancerEnabledInput"/);
+  assert.match(head, /id="freelancerEnabledInput"/);
   assert.match(head, /aria-describedby="freelancerInfoTooltip"/);
   assert.match(head, /id="freelancerInfoTooltip" role="tooltip">Sin horario planeado/);
   assert.doesNotMatch(head, /<p class="alert-hint">/);
