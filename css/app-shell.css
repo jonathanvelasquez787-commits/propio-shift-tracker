@@ -1687,3 +1687,14 @@ html[data-palette]:not([data-palette="original"]) .boot-choice { border-color: v
   #scheduleConfigAccordion #blocksEditorList .sched-bk .sched-tl-remove { grid-column: 8; }
 }
 /* fin horario mas chico */
+/* horario barra clara */
+#scheduleConfigAccordion .sched-daybar { height: 46px; }
+#scheduleConfigAccordion .sched-bar-seg { flex-direction: column; gap: 0; line-height: 1.15; overflow: hidden; }
+#scheduleConfigAccordion .sched-bar-name { font-size: 12px; font-weight: 800; white-space: nowrap; }
+#scheduleConfigAccordion .sched-bar-dur { font-size: 12px; font-weight: 500; white-space: nowrap; opacity: .85; }
+#scheduleConfigAccordion .sched-bar-seg:not(:has(.sched-bar-name)) .sched-bar-dur { font-size: 11px; font-weight: 700; opacity: 1; }
+#scheduleConfigAccordion .sched-daybar-ticks { height: 22px; margin-top: 8px; font-size: 12px; }
+@media (max-width: 760px) {
+  #scheduleConfigAccordion .sched-bar-dur { font-size: 11px; font-weight: 700; opacity: 1; }
+}
+/* fin horario barra clara */
