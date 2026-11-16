@@ -1735,3 +1735,21 @@ details.gh-fold > summary.fin-preview-head > .fin-preview-title { margin-right: 
 details.gh-fold:not([open]) .gh-fold-chevron { transform: rotate(-45deg); margin-bottom: 0; }
 details.gh-fold > summary:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; border-radius: 8px; }
 /* fin tarjetas plegables inicio */
+
+/* meta diaria una linea */
+#classicDailyGoalCard {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 16px;
+  padding: 10px 14px;
+}
+#classicDailyGoalCard > .gh-goal-top,
+#classicDailyGoalCard > .gh-goal-sub-row { display: contents; }
+#classicDailyGoalCard #goalDailyLabel { order: 1; }
+#classicDailyGoalCard #goalAmountBadge { order: 2; }
+#classicDailyGoalCard #goalAmountConvertedText { order: 3; }
+#classicDailyGoalCard #goalMinBadge { order: 4; }
+#classicDailyGoalCard > .gh-goal-foot { order: 5; margin: 0 0 0 auto; display: flex; align-items: baseline; gap: 4px; }
+#classicDailyGoalCard > .earnings-goal-progress { order: 6; flex: 0 0 100%; margin-top: 2px; }
+/* fin meta diaria una linea */

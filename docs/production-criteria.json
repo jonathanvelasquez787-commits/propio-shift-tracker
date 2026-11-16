@@ -1112,8 +1112,15 @@
         {
           "file": "tests/tarjetas-plegables-inicio.test.mjs",
           "namedCases": [
-            "tarjetas plegables: Meta diaria y Pendientes de reservar son details con id y summary",
+            "tarjetas plegables: Pendientes de reservar es details con id y summary",
             "tarjetas plegables: CSS propio con variables del tema"
+          ]
+        },
+        {
+          "file": "tests/meta-diaria-una-linea.test.mjs",
+          "namedCases": [
+            "meta diaria una linea: la tarjeta ya no se pliega y conserva todos sus datos",
+            "meta diaria una linea: CSS en una fila con la barra debajo y sin colores fijos"
           ]
         },
         {
