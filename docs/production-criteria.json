@@ -1213,6 +1213,14 @@
           ]
         },
         {
+          "file": "tests/proyeccion-plegable.test.mjs",
+          "namedCases": [
+            "proyeccion plegable: la caja es un details con la primera fila en el encabezado",
+            "proyeccion plegable: la primera fila va al encabezado y la segunda al cuerpo",
+            "proyeccion plegable: el CSS copia la forma de Pendientes y no usa colores fijos"
+          ]
+        },
+        {
           "file": "tests/block-cards-compact.test.mjs",
           "namedCases": [
             "la tarjeta del bloque junta Productividad, Meta y ACW en una sola fila",
