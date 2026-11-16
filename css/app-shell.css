@@ -1920,3 +1920,13 @@ details.gh-fold > summary:focus-visible { outline: 2px solid var(--cyan); outlin
 }
 #higherRateModal .hr-summary #higherRateLiveCard.tone-active{display:none}
 /* fin higher rate tarjeta compacta */
+
+/* higher rate historial */
+#higherRateModal #higherRateWindowsList>.note{font-size:12px;color:var(--muted);margin:0;padding:0 2px}
+#higherRateModal #higherRateHistoryList{margin-top:4px}
+#higherRateModal #higherRateHistoryList details.polished-disclosure{border:1px solid var(--card-line);border-radius:12px;background:rgba(255,255,255,.03);padding:0 12px}
+#higherRateModal #higherRateHistoryList details.polished-disclosure>summary{padding:10px 0}
+#higherRateModal #higherRateHistoryAccordion .mc-action-row{justify-content:flex-end;margin-top:8px}
+#higherRateModal #purgeHigherRateWindowsBtn{font-size:12px;font-weight:700;padding:6px 12px;min-height:0;height:auto;border-radius:99px}
+#higherRateModal #purgeHigherRateWindowsBtn .ic-svg{width:14px;height:14px}
+/* fin higher rate historial */
