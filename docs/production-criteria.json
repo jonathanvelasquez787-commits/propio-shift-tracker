@@ -1230,6 +1230,12 @@
           ]
         },
         {
+          "file": "tests/monto-ciclo-igual.test.mjs",
+          "namedCases": [
+            "monto ciclo igual: el monto del ciclo usa el mismo tamano que el de Hoy"
+          ]
+        },
+        {
           "file": "tests/block-cards-compact.test.mjs",
           "namedCases": [
             "la tarjeta del bloque junta Productividad, Meta y ACW en una sola fila",
