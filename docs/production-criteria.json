@@ -1222,6 +1222,13 @@
           ]
         },
         {
+          "file": "tests/vaciar-datos-del-dia.test.mjs",
+          "namedCases": [
+            "vaciar datos del dia: el boton cambia de nombre y conserva su estilo",
+            "vaciar datos del dia: abre el mismo selector que Reiniciar dia para elegir que borrar"
+          ]
+        },
+        {
           "file": "tests/proyeccion-gastos.test.mjs",
           "namedCases": [
             "proyeccion gastos: ya no sale la fila Al ritmo de hoy",

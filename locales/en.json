@@ -2333,5 +2333,8 @@
   "s_cb957c31": "Block {{v0}}",
   "s_0cfca7d8": "{{v1}}{{v2}} left of {{v3}}{{v4}}",
   "s_2751e1f1": "Cycle expenses",
-  "s_9e1e36a1": "Reserved{{v7}}"
+  "s_9e1e36a1": "Reserved{{v7}}",
+  "s_189f93cb": "Clear day data",
+  "s_963e2338": ": calls, breaks or note. Anything you leave unchecked is kept.",
+  "s_c68e2045": "Choose what to delete from"
 }

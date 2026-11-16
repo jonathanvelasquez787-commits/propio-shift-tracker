@@ -49,7 +49,6 @@ import { updateScheduleRowSummary, addBlockRow, applyScheduleOffset, copyDayToAl
 import {
   applyRateTileToManualCall,
   autoSaveLiveCall,
-  clearActiveDayCalls,
   clearManualCallRateTile,
   deleteCallRecord,
   getManualCallSelectedRateTile,
@@ -7519,7 +7518,7 @@ export function render() {
       }
     });
 
-    document.getElementById('clearDayCallsBtn').addEventListener('click', clearActiveDayCalls);
+    document.getElementById('clearDayCallsBtn').addEventListener('click', resetDay);
     document.getElementById('callRecoveryBtn').addEventListener('click', openCallRecovery);
 
     document.addEventListener('click', (e) => {

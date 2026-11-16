@@ -1345,6 +1345,12 @@
       "js/work-actions.js"
     ]
   },
+  "s_189f93cb": {
+    "source": "Vaciar datos del día",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_18a451bb": {
     "source": "Minutos productivos por día, comparados contra tu meta diaria.",
     "files": [
@@ -8276,6 +8282,12 @@
       "js/call-recovery.js"
     ]
   },
+  "s_963e2338": {
+    "source": ": llamadas, pausas o nota. Lo que no marques se conserva.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_96632326": {
     "source": "Abriendo tu turno…",
     "files": [
@@ -8377,12 +8389,6 @@
     "files": [
       "app.html",
       "js/backup-recovery.js"
-    ]
-  },
-  "s_9836d81d": {
-    "source": "Vaciar llamadas del día",
-    "files": [
-      "app.html"
     ]
   },
   "s_98568a5a": {
@@ -10045,12 +10051,6 @@
       "js/app-main.js"
     ]
   },
-  "s_b499ee09": {
-    "source": ". Conserva las acciones, pausas y el horario. Para borrar también la actividad de ese día, usá Reiniciar día. Podés recuperar las llamadas desde Historial de cambios.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_b4df5bf3": {
     "source": "Completa los campos para agregar la llamada.",
     "files": [
@@ -10481,12 +10481,6 @@
       "terminos.html"
     ]
   },
-  "s_be30ed51": {
-    "source": "Vacía las llamadas de",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_be5b33ad": {
     "source": "Sus {{v0}} fila(s) no se borran: pasan a la categoría \"Otro\".",
     "files": [
@@ -10882,6 +10876,12 @@
     "source": "Elige las fechas Desde y Hasta antes de exportar",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_c68e2045": {
+    "source": "Elegí qué borrar de",
+    "files": [
+      "app.html"
     ]
   },
   "s_c6b0fa79": {
