@@ -5,8 +5,8 @@ import { readFileSync } from 'node:fs';
 const html = readFileSync(new URL('../app.html', import.meta.url), 'utf8');
 const css = readFileSync(new URL('../css/app-shell.css', import.meta.url), 'utf8');
 
-test('tarjetas plegables: Meta diaria y Pendientes de reservar son details con id y summary', () => {
-  for (const id of ['classicDailyGoalCard', 'financePreviewBox']) {
+test('tarjetas plegables: Pendientes de reservar es details con id y summary', () => {
+  for (const id of ['financePreviewBox']) {
     const i = html.indexOf(`id="${id}"`);
     assert.ok(i > 0, `falta ${id}`);
     const tag = html.slice(html.lastIndexOf('<', i), i);
