@@ -2018,3 +2018,29 @@ details.gh-fold > summary:focus-visible { outline: 2px solid var(--cyan); outlin
   .sblk-card.is-collapsed .sblk-head .sblk-status { top: 50%; transform: translateY(-50%); }
 }
 /* fin bloques contraidos */
+
+/* meta ciclo una linea */
+#cycleGoalCard {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 16px;
+  padding: 10px 14px;
+}
+#cycleGoalCard > .gh-goal-top { display: contents; }
+#cycleGoalCard > .gh-goal-top > span { order: 1; }
+#cycleGoalCard #cycleGoalAmountBadge { order: 2; }
+#cycleGoalCard #cycleGoalAmountConvertedText { order: 3; }
+#cycleGoalCard > .gh-goal-foot { order: 5; margin: 0 0 0 auto; display: flex; align-items: center; gap: 6px; }
+#cycleGoalCard > .progress { order: 6; flex: 0 0 100%; margin-top: 2px !important; }
+@media (max-width: 760px) {
+  #cycleGoalCard { gap: 4px 5px; padding: 10px 8px; }
+  #cycleGoalCard > .gh-goal-top > span { font-size: 10px; }
+  #cycleGoalCard #cycleGoalAmountBadge,
+  #cycleGoalCard #cycleGoalAmountBadge .gp-value { font-size: 11.5px; }
+  #cycleGoalCard #cycleGoalAmountConvertedText,
+  #cycleGoalCard > .gh-goal-foot { font-size: 9.5px; white-space: nowrap; }
+  #cycleGoalCard .gp-label { font-size: 8.5px; letter-spacing: 0; }
+  #cycleGoalCard .gp-value { margin-left: 2px; }
+}
+/* fin meta ciclo una linea */
