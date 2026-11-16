@@ -2059,3 +2059,9 @@ details.gh-fold > summary:focus-visible { outline: 2px solid var(--cyan); outlin
   #cycleProjectionBox .fin-preview-right { min-width: 190px; }
 }
 /* fin proyeccion plegable */
+
+/* pildoras ciclo arriba */
+#cycleTagsRow { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 10px; }
+#cycleTagsRow > .gh-info-row,
+#cycleTagsRow > .table-tags { display: contents; }
+/* fin pildoras ciclo arriba */
