@@ -11,3 +11,8 @@ test('al activar el modo freelancer se abre la vista Llamadas', () => {
   assert.match(body, /setBlocksViewMode\('calls'\)/);
   assert.ok(body.indexOf('render();') < body.indexOf("setBlocksViewMode('calls')"));
 });
+
+test('al apagar el modo freelancer se vuelve a la vista Bloques', () => {
+  assert.match(body, /!next\.enabled && previous\.enabled/);
+  assert.match(body, /setBlocksViewMode\('blocks'\)/);
+});

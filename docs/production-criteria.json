@@ -1223,7 +1223,8 @@
         {
           "file": "tests/freelancer-abre-llamadas.test.mjs",
           "namedCases": [
-            "al activar el modo freelancer se abre la vista Llamadas"
+            "al activar el modo freelancer se abre la vista Llamadas",
+            "al apagar el modo freelancer se vuelve a la vista Bloques"
           ]
         },
         {

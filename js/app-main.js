@@ -5537,6 +5537,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       syncFreelancerFields(true);
       render();
       if (next.enabled && !previous.enabled) { setBlocksViewMode('calls'); const callsAcc = document.getElementById('scheduleAccordion'); if (callsAcc) callsAcc.open = true; }
+      else if (!next.enabled && previous.enabled) setBlocksViewMode('blocks');
       toast(next.enabled ? translateText('Modo freelancer activado') : translateText('Modo freelancer desactivado'));
     }
 
