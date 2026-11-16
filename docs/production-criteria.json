@@ -1097,6 +1097,12 @@
           ]
         },
         {
+          "file": "tests/sidebar-scrollbar-hover.test.mjs",
+          "namedCases": [
+            "La barra del menu lateral esta oculta y aparece solo al pasar el mouse"
+          ]
+        },
+        {
           "file": "tests/block-cards-compact.test.mjs",
           "namedCases": [
             "la tarjeta del bloque junta Productividad, Meta y ACW en una sola fila",
