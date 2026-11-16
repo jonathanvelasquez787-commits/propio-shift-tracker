@@ -1704,3 +1704,13 @@ html[data-palette]:not([data-palette="original"]) .boot-choice { border-color: v
   .sidebar-nav:hover { scrollbar-color: color-mix(in srgb, var(--muted) 55%, transparent) transparent; }
 }
 /* fin menu lateral barra al pasar el mouse */
+
+/* espacios laterales */
+@media (min-width: 901px) {
+  body:not(.sidebar-pinned) .app {
+    max-width: 1180px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+/* fin espacios laterales */
