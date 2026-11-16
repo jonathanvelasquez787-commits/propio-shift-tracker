@@ -1221,6 +1221,12 @@
           ]
         },
         {
+          "file": "tests/freelancer-abre-llamadas.test.mjs",
+          "namedCases": [
+            "al activar el modo freelancer se abre la vista Llamadas"
+          ]
+        },
+        {
           "file": "tests/horario-mas-chico.test.mjs",
           "namedCases": [
             "Horario se ve mas chico en compu y celular",
