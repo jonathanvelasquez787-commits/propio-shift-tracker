@@ -1110,6 +1110,13 @@
           ]
         },
         {
+          "file": "tests/popups-confirmacion.test.mjs",
+          "namedCases": [
+            "popups confirmacion: titulo a la izquierda, lista con checks y botones con el principal a la derecha",
+            "popups confirmacion: el boton principal es de color de aviso, sin tocar las revisiones, y sin colores fijos"
+          ]
+        },
+        {
           "file": "tests/reportes-pestanas.test.mjs",
           "namedCases": [
             "reportes pestanas: hay 4 pestañas Hoy, Ciclo, Semana y Detalle con sus paneles",
