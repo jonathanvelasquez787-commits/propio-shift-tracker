@@ -55,3 +55,35 @@ test('reportes pestanas: estilo del botón-grupo con variables del tema y celula
   assert.match(b, /@media \(max-width: 760px\)[\s\S]*flex:\s*1 1 0/);
   assert.doesNotMatch(b, /#[0-9a-fA-F]{3,8}\b/);
 });
+
+test('reportes hoy: la pestaña Hoy tiene 4 tarjetas, gráfica con Tu ciclo y 3 enlaces', () => {
+  const hoy = panel('Hoy');
+  for (const id of ['rptKpis', 'rptDashboard', 'rptChartSvg', 'rptChartDots', 'rptChartXAxis', 'rptChartYAxis', 'rptCycleSide', 'rptMoreLinks']) {
+    assert.ok(hoy.includes(`id="${id}"`), `${id} debe estar en la pestaña Hoy`);
+  }
+  assert.equal((hoy.match(/data-rpt-go="/g) || []).length, 3);
+  assert.match(hoy, /data-rpt-go="semana" data-rpt-open="weekSummaryAccordion"/);
+  assert.match(hoy, /data-rpt-open="rptHoursDetails"/);
+  assert.match(hoy, /data-rpt-open="rptQualityDetails"/);
+  for (const id of ['rptGoalsGrid', 'rptGoalsStatus', 'rptGoalsComparison', 'rptSecGoals']) assert.ok(hoy.includes(`id="${id}"`), `${id} se conserva`);
+  assert.match(hoy, /id="rptGoalsLegacy" hidden/);
+});
+
+test('reportes hoy: las tarjetas y Tu ciclo usan los mismos datos que ya calcula la app', () => {
+  for (const nombre of ['effectiveDailyGoal(dayKey)', 'reportsCycleBreakdown()', 'reportsCycleProjection()', 'cycleGoalPace()', 'computeComplianceStreak()']) {
+    assert.ok(js.includes(nombre), `debe reutilizar ${nombre}`);
+  }
+  for (const texto of ['Ganancias de hoy', 'Ganado del ciclo']) assert.ok(js.includes(`translateText('${texto}')`));
+  assert.match(js, /id="rptProjectionHow"/);
+  assert.match(js, /data-rpt-go="ciclo" data-rpt-open="rptProjectionHow"/);
+});
+
+test('reportes hoy: estilo con variables del tema, 4 columnas en compu y 2x2 en celular', () => {
+  const b = css.slice(css.indexOf('/* reportes hoy */'), css.indexOf('/* fin reportes hoy */'));
+  assert.ok(b.length > 500);
+  assert.match(b, /\.rpt-kpis \{ display: grid; grid-template-columns: repeat\(4, minmax\(0, 1fr\)\)/);
+  assert.match(b, /minmax\(0, 1\.75fr\) minmax\(0, 1fr\)/);
+  assert.match(b, /color-mix\(in srgb, var\(--c\) 16%/);
+  assert.match(b, /@media \(max-width: 760px\)[\s\S]*\.rpt-kpis \{ grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
+  assert.doesNotMatch(b, /#[0-9a-fA-F]{3,8}\b/);
+});

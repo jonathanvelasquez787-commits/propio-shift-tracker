@@ -503,6 +503,14 @@ export function wireReportsTabs() {
     const btn = event.target.closest('[data-rpt-tab-btn]');
     if (btn) setReportsTab(btn.getAttribute('data-rpt-tab-btn'));
   });
+  const page = document.getElementById('pageReports');
+  if (page) page.addEventListener('click', event => {
+    const go = event.target.closest('[data-rpt-go]');
+    if (!go) return;
+    setReportsTab(go.getAttribute('data-rpt-go'));
+    const target = document.getElementById(go.getAttribute('data-rpt-open') || '');
+    if (target) { target.open = true; target.scrollIntoView({ block: 'nearest' }); }
+  });
   bar.addEventListener('keydown', event => {
     const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
     const edge = event.key === 'Home' ? 0 : event.key === 'End' ? REPORTS_TABS.length - 1 : null;
@@ -526,7 +534,7 @@ export function renderReportsDashboard() {
   // `.rpt-section-title` en el DOM) — más robusto ante reordenamientos futuros de esta página.
   const setSecTitle = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
   setSecTitle('rptSecGoals', dayKey===todayCallDateKey()?ui`${iconHtml('target')} Hoy: objetivos y progreso`:ui`${iconHtml('target')} Día seleccionado: objetivos y progreso`);
-  setSecTitle('rptSecChart', ui`${iconHtml('chart')} Productividad — últimos 14 días`);
+  setSecTitle('rptSecChart', ui`Productividad — últimos 14 días`);
   setSecTitle('rptSecHours', ui`${iconHtml('phone')} Llamadas por hora del día`);
   setSecTitle('rptSecQuality', ui`${iconHtml('zap')} Calidad y adherencia`);
   setSecTitle('rptSecCycle', ui`${iconHtml('flag')} Ganancias del ciclo`);
@@ -592,25 +600,43 @@ export function renderReportsDashboard() {
     `;
   }
 
-  // Gráfica de 14 días (productivo real vs meta diaria constante)
+  // Gráfica de 14 días (productivo real vs meta diaria constante). La línea y el área van en el svg;
+  // los puntos y las letras son HTML con porcentajes para que no se deformen al cambiar el ancho.
   const chartSvg = document.getElementById('rptChartSvg');
   if (chartSvg) {
     const end = todayRange();
     const series = Array.from({length:14}, (_, index) => {
       const date = new Date(end.getFullYear(), end.getMonth(), end.getDate() - 13 + index);
-      return {productive:productiveMinutesForDay(todayCallDateKey(date))};
+      return {productive:productiveMinutesForDay(todayCallDateKey(date)), label:String(date.getDate())};
     });
     const goalMin = Number(settings.productiveGoalMin || 0);
-    const maxVal = Math.max(goalMin, ...series.map(r => r.productive), 1);
-    const w = 600, h = 140, pad = 6;
-    const stepX = series.length > 1 ? (w / (series.length - 1)) : w;
-    const yFor = (val) => h - pad - (Math.min(val, maxVal) / maxVal) * (h - pad * 2);
-    const points = series.map((r, i) => `${Math.round(i * stepX)},${Math.round(yFor(r.productive))}`).join(' ');
-    const goalY = Math.round(yFor(goalMin));
+    const peak = Math.max(goalMin, ...series.map(r => r.productive), 1);
+    const step = peak <= 400 ? 100 : peak <= 800 ? 200 : 400;
+    const maxVal = Math.max(step, Math.ceil(peak / step) * step);
+    const w = 600, h = 200;
+    const xPct = i => (series.length > 1 ? (i / (series.length - 1)) * 100 : 50);
+    const yPct = val => 100 - (Math.min(val, maxVal) / maxVal) * 100;
+    const xFor = i => Math.round(xPct(i) * w) / 100;
+    const yFor = val => Math.round(yPct(val) * h) / 100;
+    const points = series.map((r, i) => `${xFor(i)},${yFor(r.productive)}`).join(' ');
+    const area = `0,${h} ${points} ${w},${h}`;
+    const goalY = yFor(goalMin);
+    const ticks = Array.from({length:Math.floor(maxVal / step) + 1}, (_, i) => i * step);
     chartSvg.innerHTML = ui`
-      <polyline points="${points}" fill="none" stroke="var(--rpt-blue)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-      <polyline points="0,${goalY} ${w},${goalY}" fill="none" stroke="var(--rpt-purple)" stroke-width="2" stroke-dasharray="6 5"/>
+      <defs><linearGradient id="rptChartFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--rpt-blue)" stop-opacity=".38"/><stop offset="100%" stop-color="var(--rpt-blue)" stop-opacity="0"/></linearGradient></defs>
+      ${ticks.map(v => `<line x1="0" y1="${yFor(v)}" x2="${w}" y2="${yFor(v)}" stroke="var(--line)" stroke-width="1" vector-effect="non-scaling-stroke"/>`).join('')}
+      <polygon points="${area}" fill="url(#rptChartFill)"/>
+      <polyline points="0,${goalY} ${w},${goalY}" fill="none" stroke="var(--teal)" stroke-width="2" stroke-dasharray="6 5" vector-effect="non-scaling-stroke"/>
+      <polyline points="${points}" fill="none" stroke="var(--rpt-blue)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
     `;
+    const yAxis = document.getElementById('rptChartYAxis');
+    if (yAxis) yAxis.innerHTML = ticks.map(v => `<span style="top:${yPct(v)}%">${v}</span>`).join('');
+    const dots = document.getElementById('rptChartDots');
+    if (dots) dots.innerHTML = series.map((r, i) => `<i style="left:${xPct(i)}%;top:${yPct(r.productive)}%"></i>`).join('');
+    const xAxis = document.getElementById('rptChartXAxis');
+    if (xAxis) xAxis.innerHTML = series.map((r, i) => `<span style="left:${xPct(i)}%">${r.label}</span>`).join('');
+    const chartSub = document.getElementById('rptChartSub');
+    if (chartSub) chartSub.innerHTML = ui`Minutos de trabajo contra tu meta de ${goalMin} min`;
   }
 
   setSecTitle('rptSecMonthly', ui`${iconHtml('chart')} Ganancias y adherencia por mes`);
@@ -710,7 +736,7 @@ export function renderReportsDashboard() {
         <div class="polished-hero"><span class="polished-eyebrow">Estimación con el promedio del ciclo</span><strong class="polished-amount">${money(proj.projected)}${financeConvertedInline(proj.projected)}</strong><div class="polished-days"><span>${proj.daysElapsed}/${CYCLE_LENGTH_DAYS} días transcurridos</span><span>${proj.daysRemaining} días restantes</span></div></div>
         <div class="polished-pace"><span class="polished-eyebrow">Para llegar a tu meta</span><strong>${escapeHtml(paceText)}</strong>${!pace.met&&pace.workDaysLeft>0?ui`<span class="polished-amount">${money(pace.perDayUsd)}${financeConvertedInline(pace.perDayUsd)}</span><p>por día laboral · ${pace.workDaysLeft} restantes</p>`:pace.met?ui`<p>Todo lo que ganes de aquí en adelante es extra</p>`:ui`<p>No quedan días laborales en el ciclo.</p>`}</div>
         <div class="polished-pace"><span>Falta para la meta del ciclo</span><strong>${money(pace.remainingUsd)}${financeConvertedInline(pace.remainingUsd)}</strong></div>
-        <details class="polished-disclosure"><summary>Cómo se calcula la proyección</summary><div class="polished-detail"><div class="review-line"><span>Ganado en el ciclo</span><strong>${money(c.amount)}${financeConvertedInline(c.amount)}</strong></div><div class="review-line"><span>Promedio por día natural</span><strong>${money(proj.dailyAvg)}${financeConvertedInline(proj.dailyAvg)}</strong></div><div class="review-line"><span>vs tu meta del ciclo</span><strong style="color:var(--${projTone});">${projDelta >= 0 ? '+' : ''}${money(projDelta)}${financeConvertedInline(projDelta)}</strong></div><p class="note">Divide las ganancias registradas del ciclo, incluido Higher Rate, entre los días naturales transcurridos y extiende ese promedio al ciclo completo. Cuenta días libres y hoy, aunque todavía esté incompleto. No predice nuevas promociones ni garantiza ese ingreso.</p><p class="note">El ritmo para llegar a la meta usa los días laborales restantes; es un cálculo distinto.</p></div></details>
+        <details class="polished-disclosure" id="rptProjectionHow"><summary>Cómo se calcula la proyección</summary><div class="polished-detail"><div class="review-line"><span>Ganado en el ciclo</span><strong>${money(c.amount)}${financeConvertedInline(c.amount)}</strong></div><div class="review-line"><span>Promedio por día natural</span><strong>${money(proj.dailyAvg)}${financeConvertedInline(proj.dailyAvg)}</strong></div><div class="review-line"><span>vs tu meta del ciclo</span><strong style="color:var(--${projTone});">${projDelta >= 0 ? '+' : ''}${money(projDelta)}${financeConvertedInline(projDelta)}</strong></div><p class="note">Divide las ganancias registradas del ciclo, incluido Higher Rate, entre los días naturales transcurridos y extiende ese promedio al ciclo completo. Cuenta días libres y hoy, aunque todavía esté incompleto. No predice nuevas promociones ni garantiza ese ingreso.</p><p class="note">El ritmo para llegar a la meta usa los días laborales restantes; es un cálculo distinto.</p></div></details>
       </div>
       <div class="rpt-mini-card rpt-streak-card">
         <div class="rpt-mini-title">${iconHtml('flame')} RACHA DE CUMPLIMIENTO</div>
@@ -731,6 +757,62 @@ export function renderReportsDashboard() {
     if (streakToggle) streakToggle.addEventListener('change', (e) => updateStreakSkipOffSetting(e.target.checked));
   }
 
+
+  // Pestaña Hoy: 4 tarjetas y "Tu ciclo". Usan los mismos números que las secciones de arriba y de abajo.
+  const kpisEl = document.getElementById('rptKpis');
+  if (kpisEl) {
+    const dayGoal = effectiveDailyGoal(dayKey);
+    const goalMin = dayGoal.min, goalUsd = dayGoal.usd;
+    const goalAdherence = Number(settings.adherenceGoalPct || 95);
+    const cyc = reportsCycleBreakdown();
+    const proj = reportsCycleProjection();
+    const legacyGrid = document.getElementById('rptGoalsGrid');
+    const legacyCards = legacyGrid && typeof legacyGrid.querySelectorAll === 'function' ? [...legacyGrid.querySelectorAll('.rpt-goal-card')] : [];
+    const legacy = (i, sel) => ((legacyCards[i] && legacyCards[i].querySelector(sel)) || {}).textContent?.trim() || '';
+    const statusEl = document.getElementById('rptGoalsStatus');
+    const statusText = statusEl && !statusEl.hidden ? (statusEl.textContent || '').trim() : '';
+    const withDelta = (parts, i) => parts.concat(legacy(i, '.rpt-goal-delta')).filter(Boolean).join(' · ');
+    const prodState = day.kind === 'nodata' ? translateText('sin registros') : day.kind === 'off' ? translateText('día libre') : legacy(0, '.gh-goal-foot');
+    const prodHelp = withDelta([`${formatMinutes(kpi.productiveMin)} ${translateText('min hoy')}`, prodState], 0);
+    const adhHelp = withDelta([statusText || legacy(1, '.gh-goal-foot')], 1);
+    const earnHelp = withDelta([legacy(2, '.fin-row-converted'), statusText ? '' : legacy(2, '.gh-goal-foot')], 2);
+    const pct = (v, g) => g > 0 ? Math.min(100, Math.max(0, (v / g) * 100)) : 0;
+    const icons = {
+      clock: '<svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>',
+      check: '<svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polyline points="5 12.5 10 17.5 19 7"/></svg>',
+      dollar: '<svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="3" x2="12" y2="21"/><path d="M16.5 7.5C15.7 6.3 14.2 5.5 12 5.5c-2.6 0-4.2 1.2-4.2 3 0 4.3 8.4 2.2 8.4 6.5 0 1.8-1.7 3.5-4.2 3.5-2.2 0-3.9-.9-4.8-2.5"/></svg>',
+      flag: '<svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/></svg>',
+    };
+    const kpiCard = (color, icon, label, value, goal, percent, help) => ui`
+      <div class="rpt-kpi" style="--c:var(--${color});">
+        <span class="rpt-kpi-ico">${icon}</span>
+        <div class="rpt-kpi-body"><div class="rpt-kpi-label">${label}</div><div class="rpt-kpi-val">${value} <span>${goal}</span></div></div>
+        <div class="rpt-kpi-bar"><div style="width:${percent}%;"></div></div>
+        <div class="rpt-kpi-help">${escapeHtml(help)}</div>
+      </div>`;
+    kpisEl.innerHTML = [
+      kpiCard('blue', icons.clock, translateText('Productividad'), formatMinutes(kpi.productiveMin), `/ ${formatMinutes(goalMin)} min`, pct(kpi.productiveMin, goalMin), prodHelp),
+      kpiCard('teal', icons.check, translateText('Adherencia'), kpi.adherencePct === null ? '—' : String(kpi.adherencePct), `/ ${goalAdherence}%`, kpi.adherencePct === null ? 0 : pct(kpi.adherencePct, goalAdherence), adhHelp),
+      kpiCard('good', icons.dollar, translateText('Ganancias de hoy'), money(kpi.earnings), `/ ${money(goalUsd)}`, pct(kpi.earnings, goalUsd), earnHelp),
+      kpiCard('cyan', icons.flag, translateText('Ganado del ciclo'), money(cyc.amount), `/ ${money(cyc.goal)}`, pct(cyc.amount, cyc.goal), `${Math.round(cyc.pctOfGoal)}% · ${proj.daysElapsed}/${CYCLE_LENGTH_DAYS} ${translateText('días transcurridos')}`),
+    ].join('');
+  }
+  const cycleSide = document.getElementById('rptCycleSide');
+  if (cycleSide) {
+    const proj = reportsCycleProjection();
+    const pace = cycleGoalPace();
+    const streak = computeComplianceStreak();
+    const paceText = pace.met ? translateText('Meta alcanzada') : pace.workDaysLeft === 0 ? translateText('Sin días laborales') : ui`~${pace.perDayHours.toFixed(1)} h/día`;
+    const paceSub = !pace.met && pace.workDaysLeft > 0
+      ? ui`${money(pace.perDayUsd)}${financeConvertedInline(pace.perDayUsd)} por día laboral · ${pace.workDaysLeft} restantes`
+      : pace.met ? translateText('Todo lo que ganes de aquí en adelante es extra') : translateText('No quedan días laborales en el ciclo.');
+    cycleSide.innerHTML = ui`
+      <div class="rpt-card-head"><div class="rpt-card-title">Tu ciclo</div><div class="rpt-sel-pill">Ciclo actual</div></div>
+      <div class="rpt-cyc-row"><span class="rpt-cyc-label">Proyección del ciclo</span><strong class="rpt-cyc-val">${money(proj.projected)}${financeConvertedInline(proj.projected)}</strong><span class="rpt-cyc-sub">${proj.daysElapsed}/${CYCLE_LENGTH_DAYS} días transcurridos · ${proj.daysRemaining} restantes</span></div>
+      <div class="rpt-cyc-row"><span class="rpt-cyc-label">Para llegar a tu meta</span><strong class="rpt-cyc-val">${escapeHtml(paceText)}</strong><span class="rpt-cyc-sub">${paceSub}</span></div>
+      <div class="rpt-cyc-row"><span class="rpt-cyc-label">Racha</span><strong class="rpt-cyc-val">${streak.days} ${streak.days === 1 ? translateText('día') : translateText('días')}</strong><span class="rpt-cyc-sub">Cumpliendo tu meta de Adherencia y Productividad, seguidos</span></div>
+      <button type="button" class="rpt-cyc-link" data-rpt-go="ciclo" data-rpt-open="rptProjectionHow">Cómo se calcula la proyección <span aria-hidden="true">›</span></button>`;
+  }
 
   // Tendencias vs 7 días anteriores + % Billable/Dropped semanal (nuevo)
   const trendRow = document.getElementById('rptTrendRow');

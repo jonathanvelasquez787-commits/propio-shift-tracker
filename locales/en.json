@@ -2310,5 +2310,17 @@
   "s_e84c19d0": "{{v13}}{{v14}}",
   "s_fd13bc21": "{{v2}}{{v3}}/{{v4}} min",
   "s_e05cc888": "Report sections",
-  "s_efddee0a": "Week"
+  "s_efddee0a": "Week",
+  "s_019e5553": "no records",
+  "s_020db3ec": "Earned this cycle",
+  "s_311ce35a": "Work minutes against your {{v0}} min goal",
+  "s_4f5f86d3": "min today",
+  "s_58e94e77": "day off",
+  "s_5b7f5155": "{{v2}}/{{v3}} days elapsed · {{v4}} left",
+  "s_5ec18cba": "Streak",
+  "s_6d797bec": "{{v7}} {{v8}}",
+  "s_7efa076e": "{{v0}}{{v1}} per workday · {{v2}} left",
+  "s_972f6f66": "Your cycle",
+  "s_b5b132c9": "Productivity — last 14 days",
+  "s_fda31313": "days elapsed"
 }

@@ -615,21 +615,38 @@
 </div>
 <div class="rpt-tab-panel" id="rptPanelHoy" data-rpt-tab="hoy" role="tabpanel" aria-labelledby="rptTabHoy">
 <div class="rpt-day-conclusion" id="rptDayConclusion"></div>
+<div class="rpt-kpis" id="rptKpis"></div>
+<div class="rpt-main-grid">
+<div class="rpt-dashboard rpt-main-card" id="rptDashboard">
+<div class="rpt-card-head">
+<div>
+<div class="rpt-card-title" id="rptSecChart"></div>
+<p class="rpt-card-sub" id="rptChartSub"></p>
+</div>
+<div class="rpt-sel-pill">14 días</div>
+</div>
+<div class="rpt-legend"><span><i class="solid"></i>Real</span><span><i class="dashed"></i>Meta</span></div>
+<div class="rpt-chart-wrap">
+<div class="rpt-chart-y" id="rptChartYAxis" aria-hidden="true"></div>
+<svg id="rptChartSvg" viewBox="0 0 600 200" width="100%" height="100%" preserveAspectRatio="none"></svg>
+<div class="rpt-chart-dots" id="rptChartDots" aria-hidden="true"></div>
+<div class="rpt-chart-x" id="rptChartXAxis" aria-hidden="true"></div>
+</div>
+</div>
+<div class="rpt-main-card rpt-cycle-side" id="rptCycleSide"></div>
+</div>
+<div class="rpt-more" id="rptMoreLinks">
+<button type="button" class="rpt-more-link" data-rpt-go="semana" data-rpt-open="weekSummaryAccordion">Resumen semanal <span aria-hidden="true">›</span></button>
+<button type="button" class="rpt-more-link" data-rpt-go="detalle" data-rpt-open="rptHoursDetails">Llamadas por hora del día <span aria-hidden="true">›</span></button>
+<button type="button" class="rpt-more-link" data-rpt-go="detalle" data-rpt-open="rptQualityDetails">Calidad y adherencia <span aria-hidden="true">›</span></button>
+</div>
+<div id="rptGoalsLegacy" hidden>
 <div class="rpt-section-head">
 <div class="rpt-section-title" id="rptSecGoals"></div>
 </div>
 <div id="rptGoalsStatus" class="rpt-goals-status" hidden></div>
 <div class="rpt-goals-grid" id="rptGoalsGrid"></div>
 <div id="rptGoalsComparison" class="rpt-goals-comparison" hidden></div>
-<div class="rpt-dashboard" id="rptDashboard">
-<div class="rpt-section-head">
-<div class="rpt-section-title" id="rptSecChart"></div>
-<div class="rpt-sel-pill">14 días</div>
-</div>
-<div class="rpt-chart-card">
-<div class="rpt-legend"><span><i class="solid"></i>Real</span><span><i class="dashed"></i>Meta</span></div>
-<svg id="rptChartSvg" viewBox="0 0 600 140" width="100%" height="140" preserveAspectRatio="none"></svg>
-</div>
 </div>
 </div><!-- /rptPanelHoy -->
 <div class="rpt-tab-panel" id="rptPanelCiclo" data-rpt-tab="ciclo" role="tabpanel" aria-labelledby="rptTabCiclo" hidden>
