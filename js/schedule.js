@@ -295,9 +295,10 @@ export function configureScheduleContext(context) {
 
     // Barra del día (solo lectura): un segmento por bloque, ancho = minutos; marcas de hora cada 2 h.
     function barHourLabel(min, withSuffix) {
-      const h24 = Math.floor((((min % 1440) + 1440) % 1440) / 60);
+      const total = ((min % 1440) + 1440) % 1440;
+      const h24 = Math.floor(total / 60);
       const h12 = h24 % 12 === 0 ? 12 : h24 % 12;
-      return withSuffix ? h12 + ' ' + (h24 < 12 ? 'AM' : 'PM') : String(h12);
+      return h12 + ':' + String(total % 60).padStart(2, '0') + (withSuffix ? ' ' + (h24 < 12 ? 'AM' : 'PM') : '');
     }
     export function renderDayBar() {
       const bar = document.getElementById('schedDayBar');
@@ -314,6 +315,8 @@ export function configureScheduleContext(context) {
         const en = toMinutes(formatHHMM(row.querySelector('.block-end-input')?.value || '00:00'));
         return { type: row.querySelector('.block-type-input')?.value || 'work', from: ((st - shiftStart) % 1440 + 1440) % 1440, dur: ((en - st) % 1440 + 1440) % 1440 };
       }).filter(r => r.dur > 0 && r.from < total).sort((x, y) => x.from - y.from);
+      const compact = typeof window !== 'undefined' && window.innerWidth <= 760;
+      const segments = [];
       let cursor = 0;
       let html = '';
       for (const r of rows) {
@@ -322,22 +325,29 @@ export function configureScheduleContext(context) {
         if (dur <= 0) continue;
         if (from > cursor) html += `<span class="sched-bar-gap" style="flex:${from - cursor}"></span>`;
         const t = BLOCK_TYPE_LABELS[r.type] ? r.type : 'work';
-        const icon = dur >= 50 ? iconHtml((BLOCK_TIMELINE_META[t] || BLOCK_TIMELINE_META.work).iconName) : '';
-        html += `<span class="sched-bar-seg" data-bar-type="${t}" style="flex:${dur}">${icon}</span>`;
+        const durLabel = formatBlockDurationLabel(dur);
+        const label = dur >= 45 ? (compact ? `<span class="sched-bar-dur">${durLabel}</span>` : `<span class="sched-bar-name">${BLOCK_TYPE_LABELS[t]}</span><span class="sched-bar-dur">${durLabel}</span>`) : (compact ? '' : `<span class="sched-bar-dur">${durLabel}</span>`);
+        html += `<span class="sched-bar-seg" data-bar-type="${t}" style="flex:${dur}">${label}</span>`;
+        segments.push({ type: t, from, dur });
         cursor = from + dur;
       }
       if (cursor < total) html += `<span class="sched-bar-gap" style="flex:${total - cursor}"></span>`;
       bar.innerHTML = html;
+      // Marcas: la hora donde empieza cada bloque y la del final (sin encimarse; en celular solo las principales).
+      const barWidth = bar.offsetWidth || (compact ? 330 : 1000);
+      const minGapPx = 34;
       let tickHtml = '';
-      let prevPm = null;
-      for (let m = 0; m <= total; m += 120) {
-        const abs = shiftStart + m;
-        const pm = Math.floor((((abs % 1440) + 1440) % 1440) / 60) >= 12;
-        const label = barHourLabel(abs, prevPm === null || pm !== prevPm);
-        prevPm = pm;
-        const pos = m === 0 ? 'left:0' : m === total ? 'right:0' : `left:${(m / total) * 100}%;transform:translateX(-50%)`;
-        tickHtml += `<span class="sched-bar-tick" style="${pos}">${label}</span>`;
-      }
+      let lastPx = -Infinity;
+      segments.forEach((seg, i) => {
+        if (compact && !(i === 0 || (seg.type === 'work' && i < segments.length - 1))) return;
+        const px = (seg.from / total) * barWidth;
+        if (i > 0 && px - lastPx < minGapPx) return;
+        if (i > 0 && barWidth - px < 56) return;
+        lastPx = px;
+        const pos = seg.from === 0 ? 'left:0' : `left:${(seg.from / total) * 100}%;transform:translateX(-50%)`;
+        tickHtml += `<span class="sched-bar-tick" style="${pos}">${barHourLabel(shiftStart + seg.from, i === 0)}</span>`;
+      });
+      if (segments.length) tickHtml += `<span class="sched-bar-tick" style="right:0">${barHourLabel(shiftStart + total, true)}</span>`;
       ticks.innerHTML = tickHtml;
     }
 

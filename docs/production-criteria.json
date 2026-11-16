@@ -1114,6 +1114,15 @@
           ]
         },
         {
+          "file": "tests/horario-barra-clara.test.mjs",
+          "namedCases": [
+            "La barra del dia muestra nombre y duracion en cada tramo",
+            "La barra del dia pone la hora donde empieza cada bloque y la del final",
+            "En celular la barra muestra solo la duracion y menos horas",
+            "El estilo de la barra clara usa solo variables del tema"
+          ]
+        },
+        {
           "file": "tests/action-bar-halves.test.mjs",
           "namedCases": [
             "Barra de acciones: los botones de turno y los de llamadas se centran cada uno en su mitad"
