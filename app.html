@@ -1530,6 +1530,12 @@
 </div>
 <button aria-label="Cerrar" class="modal-close" data-close-modal="goalsModal" type="button">×</button>
 </div>
+<div class="set-tabs" id="settingsTabs" role="tablist" aria-label="Secciones de Ajustes">
+<button class="set-tab active" id="setTabGeneral" data-set-tab="general" role="tab" aria-selected="true" aria-controls="setPanelGeneral" type="button">General</button>
+<button class="set-tab" id="setTabDinero" data-set-tab="dinero" role="tab" aria-selected="false" aria-controls="setPanelDinero" type="button">Dinero</button>
+<button class="set-tab" id="setTabDatos" data-set-tab="datos" role="tab" aria-selected="false" aria-controls="setPanelDatos" type="button">Datos</button>
+</div>
+<div class="set-panel active" id="setPanelGeneral" data-set-panel="general" role="tabpanel" aria-labelledby="setTabGeneral">
 <div class="goals-section">
 <div class="goals-section-title"><svg class="goals-section-icon ic-svg cyan" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>Tu perfil</div>
 <div class="goals-field">
@@ -1555,7 +1561,7 @@
 <div class="note" style="margin:0;">El emoji aparece junto a tu nombre en el saludo de arriba (ej. "Buenas tardes, [tu nombre] 🙂"). Toca uno de la lista o escribe cualquier otro en el cuadro de texto. Déjalo vacío para no mostrar ninguno.</div>
 </div>
 <div class="divider"></div>
-<div class="goals-section-title"><svg class="goals-section-icon ic-svg blue" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="m4 6 8 6 8-6"/></svg>Cuenta y acceso con Google</div>
+<details class="set-fold" id="settingsAccountFold"><summary>Cuenta y acceso con Google</summary><div class="set-fold-body">
 <div class="goals-field-row">
 <div class="goals-field">
 <label for="accountUsernameInput">Usuario del perfil</label>
@@ -1569,6 +1575,7 @@
 <div class="note" id="accountProfileHelp" style="margin:0;">El usuario identifica tu perfil. Para entrar, usa Google. Cambiarlo no cambia tu cuenta de Google ni el nombre del saludo.</div>
 <div class="note" id="accountProfileStatus" aria-live="polite" style="margin:0;"></div>
 <button class="mc-btn-primary cyan" id="saveAccountProfileBtn" type="button" style="width:100%; margin-top:10px;">Guardar usuario del perfil</button>
+</div></details>
 <details class="polished-disclosure" id="accountSyncDetails"><summary>Guardado y recuperación de esta app</summary><div class="polished-detail">
 <p><strong>En este navegador:</strong> <span id="syncLocalDetail"></span></p>
 <p><strong>En tu cuenta:</strong> <span id="syncCloudDetail"></span></p>
@@ -1579,7 +1586,8 @@
 <button class="mc-btn-primary cyan" id="accountSyncRetryBtn" type="button">Reconectar y sincronizar</button>
 </div></details>
 </div>
-<div class="divider"></div>
+</div><!-- /setPanelGeneral -->
+<div class="set-panel" id="setPanelDinero" data-set-panel="dinero" role="tabpanel" aria-labelledby="setTabDinero" hidden>
 <div class="goals-section">
 <div class="goals-section-title"><svg class="goals-section-icon ic-svg good" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3v18"/><path d="M5 4h9l-1 3 1 3H5"/></svg>Tu meta</div>
 <div class="goals-field-row" id="goalsGoalFieldsRow">
@@ -1596,7 +1604,6 @@
 <input id="goalCurrencyInput" inputmode="decimal" min="0" step="0.01" type="number"/>
 </div>
 </div>
-<div class="note" style="margin:0;">Se sincronizan con tu tarifa. Al cambiar la meta, elegís si aplica al día o a tu meta general.</div>
 <div class="mc-warning-box" id="goalDayOverrideNote" style="display:none;">
 <svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
 <span id="goalDayOverrideNoteText"></span>
@@ -1620,8 +1627,6 @@
 <input id="exchangeRateInput" inputmode="decimal" min="0" step="0.01" type="number"/>
 </div>
 </div>
-<div class="note" style="margin:0;">El cambio es manual. Tus importes guardados en dólares se conservan.</div>
-<details class="settings-inline-help"><summary>Cómo se aplican tarifa y moneda</summary><div class="note">La tarifa calcula nuevas estimaciones y tu meta general. Conserva pagos guardados, bonos y metas especiales.</div><div class="note">El cambio es manual y conserva los importes en dólares. Dejá la tasa en 0 o la moneda vacía para ocultar la conversión.</div></details>
 </div>
 <div class="divider"></div>
 <div class="goals-section">
@@ -1637,10 +1642,16 @@
 <input id="cyclePayOffsetInput" inputmode="numeric" min="0" step="1" type="number"/>
 </span>
 </div>
-<div class="note" style="margin:0;">El ciclo siempre dura 14 días desde la fecha que pongas arriba. Se guarda solo. Ajusta esto si tus ciclos reales no coinciden con "Ganancias del ciclo".</div>
 <button class="gap-edit-btn" id="cycleGoalSettingsBtn" type="button">Editar meta del ciclo actual</button>
 </div>
-<div class="divider"></div>
+<details class="set-fold" id="settingsMoneyHelp"><summary>¿Cómo funciona?</summary><div class="set-fold-body">
+<div class="note" style="margin:0;">Se sincronizan con tu tarifa. Al cambiar la meta, elegís si aplica al día o a tu meta general.</div>
+<div class="note" style="margin:0;">El cambio es manual. Tus importes guardados en dólares se conservan.</div>
+<details class="settings-inline-help"><summary>Cómo se aplican tarifa y moneda</summary><div class="note">La tarifa calcula nuevas estimaciones y tu meta general. Conserva pagos guardados, bonos y metas especiales.</div><div class="note">El cambio es manual y conserva los importes en dólares. Dejá la tasa en 0 o la moneda vacía para ocultar la conversión.</div></details>
+<div class="note" style="margin:0;">El ciclo siempre dura 14 días desde la fecha que pongas arriba. Se guarda solo. Ajusta esto si tus ciclos reales no coinciden con "Ganancias del ciclo".</div>
+</div></details>
+</div><!-- /setPanelDinero -->
+<div class="set-panel" id="setPanelDatos" data-set-panel="datos" role="tabpanel" aria-labelledby="setTabDatos" hidden>
 <div class="goals-section">
 <div class="goals-section-title"><svg class="goals-section-icon ic-svg pink" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3"/></svg>Backup de datos</div>
 
@@ -1648,8 +1659,9 @@
 <button id="exportBtn" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"/><polyline points="7 10 12 15 17 10"/><path d="M4 19h16"/></svg> Exportar JSON</button>
 <button id="importJsonBtn" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3"/><polyline points="7 8 12 3 17 8"/><path d="M4 19h16"/></svg> Importar JSON</button>
 <input accept="application/json,.json" id="importJsonFile" style="display:none;" type="file"/>
-</div><div class="settings-recovery-card" style="margin-top:12px;"><div class="danger-card-head"><span class="danger-card-title">Copias recuperables</span></div><p class="danger-card-desc">Consultá la copia anterior a una restauración o reinicio. Se conserva solo en este navegador y para tu cuenta.</p><button class="mc-btn-secondary" id="snapshotRecoveryBtn" type="button">Ver copias recuperables</button></div>
-<div class="note" style="margin:0;">"Exportar JSON" descarga un respaldo completo: llamadas, turnos, pausas, horario, metas, Finanzas, Higher Rate y ajustes. "Importar JSON" restaura todo eso. Los backups antiguos sin configuración siguen siendo compatibles.</div>
+  <button id="snapshotRecoveryBtn" type="button">Ver copias recuperables</button>
+</div>
+<details class="set-fold" id="settingsBackupHelp"><summary>¿Cómo funciona?</summary><div class="set-fold-body"><div class="note" style="margin:0;">Consultá la copia anterior a una restauración o reinicio. Se conserva solo en este navegador y para tu cuenta.</div><div class="note" style="margin:0;">"Exportar JSON" descarga un respaldo completo: llamadas, turnos, pausas, horario, metas, Finanzas, Higher Rate y ajustes. "Importar JSON" restaura todo eso. Los backups antiguos sin configuración siguen siendo compatibles.</div></div></details>
 </div><div id="settingsRecoveryCopies"></div>
 <div class="divider"></div>
 <div class="goals-section">
@@ -1682,6 +1694,7 @@
 </div>
 <details class="review-details"><summary>Qué incluye el archivo</summary><div class="review-detail-body"><p class="note">Resumen por día y detalle de llamadas del rango, en USD. El detalle separa pago base, Higher Rate y total. Incluye días sin llamadas; no predice ganancias futuras.</p><p class="note">No incluye reservas, pagos de gastos ni dinero recibido. No reemplaza el respaldo JSON. El PDF abre una pestaña lista para Imprimir o Guardar como PDF.</p></div></details>
 </div>
+</div><!-- /setPanelDatos -->
 <div class="divider"></div>
 <div class="modal-actions mc-action-row">
 <button class="mc-btn-primary cyan" data-close-modal="goalsModal" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polyline points="5 12 10 17 19 6"/></svg> Listo</button>

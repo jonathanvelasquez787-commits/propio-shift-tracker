@@ -417,8 +417,31 @@ export async function syncAccountProfileFields() {
   }
 }
 
+const SETTINGS_TABS = ['general', 'dinero', 'datos'];
+
+export function setSettingsTab(tab) {
+  const active = SETTINGS_TABS.includes(tab) ? tab : 'general';
+  document.querySelectorAll('#settingsTabs [data-set-tab]').forEach((btn) => {
+    const on = btn.dataset.setTab === active;
+    btn.classList.toggle('active', on);
+    btn.setAttribute('aria-selected', on ? 'true' : 'false');
+  });
+  document.querySelectorAll('#goalsModal [data-set-panel]').forEach((panel) => {
+    const on = panel.dataset.setPanel === active;
+    panel.classList.toggle('active', on);
+    panel.hidden = !on;
+  });
+}
+
+export function wireSettingsTabs() {
+  document.querySelectorAll('#settingsTabs [data-set-tab]').forEach((btn) => {
+    btn.addEventListener('click', () => setSettingsTab(btn.dataset.setTab));
+  });
+}
+
 export async function openSettingsModal() {
   formatGoalFields();
+  setSettingsTab('general');
   openModal('goalsModal');
   await syncAccountProfileFields();
 }

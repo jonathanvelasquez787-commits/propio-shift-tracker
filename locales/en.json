@@ -2325,5 +2325,9 @@
   "s_d57f0467": "+{{v5}}",
   "s_4ab0608e": "Finished windows move to History. You can clear that list without losing the bonuses already recorded in your calls.",
   "s_4bca78f6": "\"Clear history\" removes past windows from the list. It keeps your calls, their bonuses and the day and cycle earnings. It does not recalculate promotions.",
-  "s_7b3ab040": "No upcoming windows."
+  "s_7b3ab040": "No upcoming windows.",
+  "s_4762b9ff": "Settings sections",
+  "s_5561fd0b": "General",
+  "s_6cda2348": "Data",
+  "s_a1358ae8": "Money"
 }

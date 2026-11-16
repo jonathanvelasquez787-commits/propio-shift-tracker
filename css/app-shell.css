@@ -1930,3 +1930,40 @@ details.gh-fold > summary:focus-visible { outline: 2px solid var(--cyan); outlin
 #higherRateModal #purgeHigherRateWindowsBtn{font-size:12px;font-weight:700;padding:6px 12px;min-height:0;height:auto;border-radius:99px}
 #higherRateModal #purgeHigherRateWindowsBtn .ic-svg{width:14px;height:14px}
 /* fin higher rate historial */
+
+/* ajustes pestanas */
+#goalsModal .set-tabs { display: inline-flex; gap: 4px; padding: 4px; margin: 4px 0 14px; border: 1px solid var(--line); border-radius: 999px; background: rgba(255,255,255,.03); max-width: 100%; }
+#goalsModal .set-tab { height: 36px; padding: 0 20px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font: inherit; font-size: 14px; font-weight: 800; cursor: pointer; }
+#goalsModal .set-tab.active { background: var(--cyan); color: var(--bg); }
+#goalsModal .set-tab:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+#goalsModal .set-panel:not(.active) { display: none; }
+#goalsModal .set-panel > .divider, #goalsModal .set-panel .goals-section > .divider { display: none; }
+#goalsModal .set-fold { border: 0; margin: 0; min-width: 0; }
+#goalsModal .set-fold > summary { list-style: none; cursor: pointer; min-height: 44px; display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: var(--text); }
+#goalsModal .set-fold > summary::-webkit-details-marker { display: none; }
+#goalsModal .set-fold > summary::after { content: "›"; margin-left: auto; font-size: 20px; }
+#goalsModal .set-fold[open] > summary::after { transform: rotate(90deg); }
+#goalsModal .set-fold > summary:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; border-radius: 8px; }
+#goalsModal #settingsAccountFold > summary, #goalsModal #accountSyncDetails > summary { color: var(--cyan); font-size: 14px; font-weight: 700; }
+#goalsModal .set-fold-body { display: grid; gap: 10px; padding: 4px 0 12px; }
+#goalsModal .set-fold-body .note { font-size: 12.5px; line-height: 1.6; color: var(--muted); }
+#goalsModal #setPanelGeneral > .goals-section { grid-template-columns: minmax(200px, 260px) minmax(0, 1fr); align-items: end; gap: 12px 18px; }
+#goalsModal #setPanelGeneral > .goals-section > * { grid-column: 1 / -1; }
+#goalsModal #setPanelGeneral > .goals-section > .goals-field:not(.goals-profile-name-field) { grid-column: 1; }
+#goalsModal #setPanelGeneral > .goals-section > .goals-profile-row { grid-column: 2; }
+#goalsModal #setPanelGeneral > .goals-section > .goals-section-title:first-child { display: none; }
+#goalsModal #setPanelGeneral .goals-profile-row { flex-wrap: nowrap; align-items: center; }
+#goalsModal #setPanelDinero > .goals-section, #goalsModal #setPanelDatos > .goals-section { border: 1px solid var(--card-line); border-radius: 16px; background: rgba(255,255,255,.03); padding: 14px 16px; margin: 0 0 12px; gap: 10px; }
+#goalsModal #setPanelDatos > .goals-section:last-child { margin-bottom: 4px; }
+#goalsModal #goalsGoalFieldsRow, #goalsModal .settings-rate-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px 18px; }
+#goalsModal #setPanelDinero .goals-pill-row { gap: 10px; }
+#goalsModal #setPanelDatos .goals-backup-row { display: flex; flex-wrap: wrap; gap: 10px; }
+#goalsModal #setPanelDatos .goals-backup-row > button { flex: 1 1 150px; }
+@media (max-width: 760px) {
+  #goalsModal .set-tabs { display: flex; }
+  #goalsModal .set-tab { flex: 1; padding: 0 8px; }
+  #goalsModal #setPanelGeneral > .goals-section { grid-template-columns: minmax(0, 1fr); }
+  #goalsModal #setPanelGeneral > .goals-section > .goals-field:not(.goals-profile-name-field), #goalsModal #setPanelGeneral > .goals-section > .goals-profile-row { grid-column: 1; }
+  #goalsModal #goalsGoalFieldsRow, #goalsModal .settings-rate-fields { grid-template-columns: 1fr 1fr; }
+}
+/* fin ajustes pestanas */
