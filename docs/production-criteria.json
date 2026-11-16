@@ -1237,6 +1237,14 @@
           ]
         },
         {
+          "file": "tests/vista-bloques-guardada.test.mjs",
+          "namedCases": [
+            "vista bloques guardada: el ajuste blocksViewMode existe con Bloques por defecto",
+            "vista bloques guardada: elegir Bloques o Llamadas se guarda en los ajustes",
+            "vista bloques guardada: al abrir la app se aplica la vista guardada"
+          ]
+        },
+        {
           "file": "tests/horario-mas-chico.test.mjs",
           "namedCases": [
             "Horario se ve mas chico en compu y celular",
