@@ -1103,6 +1103,13 @@
           ]
         },
         {
+          "file": "tests/espacios-laterales.test.mjs",
+          "namedCases": [
+            "espacios laterales: en escritorio la tarjeta principal mide 1180 px y queda centrada",
+            "espacios laterales: no cambia celular ni tablet y no usa colores fijos"
+          ]
+        },
+        {
           "file": "tests/block-cards-compact.test.mjs",
           "namedCases": [
             "la tarjeta del bloque junta Productividad, Meta y ACW en una sola fila",
