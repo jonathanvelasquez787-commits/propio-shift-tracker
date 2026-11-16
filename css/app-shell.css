@@ -1842,3 +1842,11 @@ details.gh-fold > summary:focus-visible { outline: 2px solid var(--cyan); outlin
   #pageReports .rpt-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 /* fin reportes hoy */
+
+/* reportes pulido */
+#pageReports #rptPanelDetalle #rptGoalsDetails { margin: 0; }
+#pageReports #rptPanelCiclo .polished-pace .polished-amount { display: inline; }
+#pageReports #rptPanelCiclo .polished-pace .polished-amount + p { display: inline; margin: 0 0 0 4px; }
+#pageReports #rptPanelCiclo .polished-pace .polished-amount { letter-spacing: 0; color: var(--text); }
+#pageReports #rptPanelCiclo .polished-pace .polished-amount > .fin-row-converted-inline { display: inline !important; margin: 0 0 0 4px !important; font-size: 11px !important; }
+/* fin reportes pulido */

@@ -1118,7 +1118,8 @@
             "reportes pestanas: estilo del botón-grupo con variables del tema y celular a todo el ancho",
             "reportes hoy: la pestaña Hoy tiene 4 tarjetas, gráfica con Tu ciclo y 3 enlaces",
             "reportes hoy: las tarjetas y Tu ciclo usan los mismos datos que ya calcula la app",
-            "reportes hoy: estilo con variables del tema, 4 columnas en compu y 2x2 en celular"
+            "reportes hoy: estilo con variables del tema, 4 columnas en compu y 2x2 en celular",
+            "reportes pulido: Detalle sin hueco extra y el ritmo por día del Ciclo en una línea"
           ]
         },
         {

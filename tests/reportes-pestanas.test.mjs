@@ -87,3 +87,12 @@ test('reportes hoy: estilo con variables del tema, 4 columnas en compu y 2x2 en 
   assert.match(b, /@media \(max-width: 760px\)[\s\S]*\.rpt-kpis \{ grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
   assert.doesNotMatch(b, /#[0-9a-fA-F]{3,8}\b/);
 });
+
+test('reportes pulido: Detalle sin hueco extra y el ritmo por día del Ciclo en una línea', () => {
+  const b = css.slice(css.indexOf('/* reportes pulido */'), css.indexOf('/* fin reportes pulido */'));
+  assert.ok(b.length > 200);
+  assert.match(b, /#rptPanelDetalle #rptGoalsDetails \{ margin: 0; \}/);
+  assert.match(b, /#rptPanelCiclo \.polished-pace \.polished-amount \{ display: inline; \}/);
+  assert.match(b, /\.fin-row-converted-inline \{ display: inline !important;/);
+  assert.doesNotMatch(b, /#[0-9a-fA-F]{3,8}\b/);
+});
