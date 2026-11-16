@@ -21,6 +21,7 @@ import {
   dayComplianceStatus,
   renderReportsDashboard as renderReportsDashboardView,
   renderReportsMonthlyChart as renderReportsMonthlyChartView,
+  wireReportsTabs,
   reportsCycleProjection,
   configureReportsContext,
 } from './reports.js';
@@ -761,6 +762,8 @@ export { onReinforcementCallSaved, onReinforcementCallsChanged, onReinforcementD
         masterVolume: 100,
         // Estado abierto/cerrado de cada <details> con id propio, para que sobreviva a la recarga.
         accordionState: {},
+        // Pestaña abierta en Reportes: hoy | ciclo | semana | detalle.
+        reportsTab: 'hoy',
         // En escritorio el sidebar arranca fijado por defecto.
         sidebarPinned: false,
         // Toggle "Contraer bloques al terminar" dentro de "Bloques del día" (ver
@@ -8025,6 +8028,7 @@ export function render() {
     document.getElementById('dayPrevBtn').addEventListener('click', () => shiftActiveDayBy(-1));
     document.getElementById('dayNextBtn').addEventListener('click', () => shiftActiveDayBy(1));
     document.getElementById('dayActiveLabelBtn').addEventListener('click', jumpActiveDayToToday);
+    wireReportsTabs();
     document.getElementById('weekPrevBtn').addEventListener('click', () => { weekViewOffset -= 1; renderWeekSummary(); });
     document.getElementById('weekNextBtn').addEventListener('click', () => { weekViewOffset += 1; renderWeekSummary(); });
     document.getElementById('weekTodayBtn').addEventListener('click', () => { weekViewOffset = 0; renderWeekSummary(); });

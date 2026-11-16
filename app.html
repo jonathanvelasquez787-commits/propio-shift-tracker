@@ -607,6 +607,13 @@
 <div class="rpt-date-pill" id="rptDatePill"></div>
 </div>
 
+<div class="rpt-tabs" id="rptTabs" role="tablist" aria-label="Secciones de Reportes">
+<button type="button" class="rpt-tab" id="rptTabHoy" role="tab" data-rpt-tab-btn="hoy" aria-controls="rptPanelHoy" aria-selected="true">Hoy</button>
+<button type="button" class="rpt-tab" id="rptTabCiclo" role="tab" data-rpt-tab-btn="ciclo" aria-controls="rptPanelCiclo" aria-selected="false" tabindex="-1">Ciclo</button>
+<button type="button" class="rpt-tab" id="rptTabSemana" role="tab" data-rpt-tab-btn="semana" aria-controls="rptPanelSemana" aria-selected="false" tabindex="-1">Semana</button>
+<button type="button" class="rpt-tab" id="rptTabDetalle" role="tab" data-rpt-tab-btn="detalle" aria-controls="rptPanelDetalle" aria-selected="false" tabindex="-1">Detalle</button>
+</div>
+<div class="rpt-tab-panel" id="rptPanelHoy" data-rpt-tab="hoy" role="tabpanel" aria-labelledby="rptTabHoy">
 <div class="rpt-day-conclusion" id="rptDayConclusion"></div>
 <div class="rpt-section-head">
 <div class="rpt-section-title" id="rptSecGoals"></div>
@@ -614,13 +621,18 @@
 <div id="rptGoalsStatus" class="rpt-goals-status" hidden></div>
 <div class="rpt-goals-grid" id="rptGoalsGrid"></div>
 <div id="rptGoalsComparison" class="rpt-goals-comparison" hidden></div>
-<div id="rptGoalsDetails"><details class="polished-disclosure" id="rptAdherenceHistory"><summary>Comparación de los últimos 7 días</summary><div class="polished-detail" id="rptAdherenceHistoryContent"></div></details>
-<div id="workDayReviewSection">
-<details class="polished-disclosure" id="workDayReviewDetails"><summary>Ver jornada</summary><div class="polished-detail" id="workDayReviewContent"></div></details>
-</div></div>
-
-
-
+<div class="rpt-dashboard" id="rptDashboard">
+<div class="rpt-section-head">
+<div class="rpt-section-title" id="rptSecChart"></div>
+<div class="rpt-sel-pill">14 días</div>
+</div>
+<div class="rpt-chart-card">
+<div class="rpt-legend"><span><i class="solid"></i>Real</span><span><i class="dashed"></i>Meta</span></div>
+<svg id="rptChartSvg" viewBox="0 0 600 140" width="100%" height="140" preserveAspectRatio="none"></svg>
+</div>
+</div>
+</div><!-- /rptPanelHoy -->
+<div class="rpt-tab-panel" id="rptPanelCiclo" data-rpt-tab="ciclo" role="tabpanel" aria-labelledby="rptTabCiclo" hidden>
 <div class="rpt-section-head" style="margin-top:0;">
 <div class="rpt-section-title" id="rptSecCycle"></div>
 <div class="rpt-sel-pill">Ciclo actual</div>
@@ -639,6 +651,8 @@
 </details>
 </div></details>
 </div>
+</div><!-- /rptPanelCiclo -->
+<div class="rpt-tab-panel" id="rptPanelSemana" data-rpt-tab="semana" role="tabpanel" aria-labelledby="rptTabSemana" hidden>
 <details class="accordion-card" id="weekSummaryAccordion">
 <summary>
   <div class="accordion-head">
@@ -665,17 +679,6 @@
   <div class="table-wrap" id="weekSummaryWrap"></div>
 </div>
 </details>
-
-<div class="rpt-dashboard" id="rptDashboard">
-<div class="rpt-section-head">
-<div class="rpt-section-title" id="rptSecChart"></div>
-<div class="rpt-sel-pill">14 días</div>
-</div>
-<div class="rpt-chart-card">
-<div class="rpt-legend"><span><i class="solid"></i>Real</span><span><i class="dashed"></i>Meta</span></div>
-<svg id="rptChartSvg" viewBox="0 0 600 140" width="100%" height="140" preserveAspectRatio="none"></svg>
-</div>
-
 <details class="polished-disclosure rpt-analysis-detail" id="rptMonthlyDetails"><summary>Ganancias y adherencia por mes</summary><div class="rpt-analysis-body">
 <div class="rpt-section-head">
 <div class="rpt-section-title" id="rptSecMonthly"></div>
@@ -692,7 +695,12 @@
 </div>
 
 </div></details>
-
+</div><!-- /rptPanelSemana -->
+<div class="rpt-tab-panel" id="rptPanelDetalle" data-rpt-tab="detalle" role="tabpanel" aria-labelledby="rptTabDetalle" hidden>
+<div id="rptGoalsDetails"><details class="polished-disclosure" id="rptAdherenceHistory"><summary>Comparación de los últimos 7 días</summary><div class="polished-detail" id="rptAdherenceHistoryContent"></div></details>
+<div id="workDayReviewSection">
+<details class="polished-disclosure" id="workDayReviewDetails"><summary>Ver jornada</summary><div class="polished-detail" id="workDayReviewContent"></div></details>
+</div></div>
 <details class="polished-disclosure rpt-analysis-detail" id="rptHoursDetails"><summary>Llamadas por hora del día <span class="rpt-detail-label">14 días</span></summary><div class="rpt-analysis-body">
 <div class="rpt-section-head">
 <div class="rpt-section-title" id="rptSecHours"></div>
@@ -703,7 +711,6 @@
 </div>
 
 </div></details>
-
 <details class="polished-disclosure rpt-analysis-detail" id="rptQualityDetails"><summary>Calidad y adherencia</summary><div class="rpt-analysis-body"><div class="rpt-section-head">
 <div class="rpt-section-title" id="rptSecQuality"></div>
 </div>
@@ -713,9 +720,6 @@
 <div class="rpt-section-title" style="text-transform:uppercase;">Tendencias (vs 7 días anteriores)</div>
 </div>
 <div class="rpt-trend-row" id="rptTrendRow"></div></div></details>
-</div>
-
-
 <div class="day-stats-grid" id="dayStatsGrid">
 <details class="accordion-card" id="statsAccordion">
 <summary>
@@ -750,7 +754,7 @@
 </div>
 </details>
 </div>
-
+</div><!-- /rptPanelDetalle -->
 </div><!-- /pageReports -->
 
 <div class="app-page" data-page="paydates" hidden id="pagePayDates" role="main" tabindex="-1">
