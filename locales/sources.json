@@ -8894,6 +8894,12 @@
       "js/app-main.js"
     ]
   },
+  "s_a18f3848": {
+    "source": "Corregir días de la semana",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_a1a22567": {
     "source": "Elegir {{v0}}",
     "files": [
@@ -9105,6 +9111,12 @@
     "source": "Luz",
     "files": [
       "js/finance.js"
+    ]
+  },
+  "s_a545c28b": {
+    "source": "Corregir días",
+    "files": [
+      "app.html"
     ]
   },
   "s_a565e966": {
@@ -11424,6 +11436,12 @@
   },
   "s_d1a11dfe": {
     "source": "Agregar",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_d1cbde58": {
+    "source": "Cambiar horario",
     "files": [
       "app.html"
     ]
