@@ -12,6 +12,8 @@ test('editar semana: hay un acceso discreto en Inicio (bajo el subtítulo) y otr
   assert.match(html, /data-open-schedule-edit>Cambiar horario/);
   assert.match(html, /id="homeFreelancerInput" type="checkbox"/);
   assert.match(main, /homeFreelancerInput/);
+  assert.match(html, /<span class="home-fl-row"><button type="button" class="week-edit-link" data-open-freelancer-config>Freelancer /);
+  assert.match(main, /data-open-freelancer-config\]'\)\?\.addEventListener\('click'[^\n]*openFreelancerConfig\(\)/);
   const menu = html.slice(html.indexOf('id="sidebarProgressCard"'), html.indexOf('class="sidebar-footer"'));
   assert.match(menu, /class="week-edit-link sidebar-week-edit" data-open-week-edit/);
 });
