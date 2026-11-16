@@ -1131,6 +1131,13 @@
           ]
         },
         {
+          "file": "tests/inicio-sin-horas-celular.test.mjs",
+          "namedCases": [
+            "inicio celular: se oculta la columna de horas de Bloques del día y se conserva la línea",
+            "inicio celular: la hora sigue visible dentro de cada tarjeta y en compu la columna se queda"
+          ]
+        },
+        {
           "file": "tests/tarjetas-plegables-inicio.test.mjs",
           "namedCases": [
             "tarjetas plegables: Pendientes de reservar es details con id y summary",

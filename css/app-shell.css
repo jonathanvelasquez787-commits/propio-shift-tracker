@@ -1865,3 +1865,10 @@ details.gh-fold > summary:focus-visible { outline: 2px solid var(--cyan); outlin
   #scheduleAccordion .home-fl-row .sidebar-switch { zoom: .7; }
 }
 /* fin editar semana acceso */
+
+/* inicio celular sin columna de horas */
+@media (max-width: 760px) {
+  #scheduleList.sblk-timeline .sblk-item { grid-template-columns: 16px 1fr; }
+  #scheduleList.sblk-timeline .sblk-hour { display: none; }
+}
+/* fin inicio celular sin columna de horas */
