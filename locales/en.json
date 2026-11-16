@@ -600,7 +600,6 @@
   "s_7622c0b8": "Week 2: {{v0}}",
   "s_76498391": "Shift alert disabled",
   "s_76889f4f": "Looking for your data…",
-  "s_76a3b4f0": "No Higher Rate windows for today or later — use \"+ Add window\" when Propio sends an alert.",
   "s_76ac6cdc": "Break taken outside the schedule",
   "s_76afc87b": "Paydays",
   "s_77134f0e": "+ Note",
@@ -1458,10 +1457,8 @@
   "s_a3d4d76d": "Work start: {{v0}}.",
   "s_c2e88076": "Automatic closing only applies to pauses with automatic return enabled and a configured duration.",
   "s_fd50c919": "Manual work start: {{v0}}.",
-  "s_0857f06e": "Completed windows move here. You can clear this list without losing the bonuses already recorded on your calls.",
   "s_34c3a09c": "Window history cleared. Your calls and bonuses were preserved.",
   "s_81980738": "Your data changed. Review the history cleanup again.",
-  "s_cb2b5007": "Removes past windows from this list. Keeps calls, their bonuses, and daily and cycle earnings. Does not recalculate promotions.",
   "s_d6b39e7c": "Clear history",
   "s_0ac26860": "Clear history? Past windows: {{v0}}. Calls with a bonus: {{v1}} ({{v2}} {{v3}}). Your calls and earnings are preserved; only this list is cleared.",
   "s_17360e3f": "{{v0}} – {{v1}}",
@@ -2325,5 +2322,8 @@
   "s_5456b3ac": "on calls",
   "s_a78f0f62": "total window",
   "s_8aa09539": "{{v9}}\n          {{v10}}",
-  "s_d57f0467": "+{{v5}}"
+  "s_d57f0467": "+{{v5}}",
+  "s_4ab0608e": "Finished windows move to History. You can clear that list without losing the bonuses already recorded in your calls.",
+  "s_4bca78f6": "\"Clear history\" removes past windows from the list. It keeps your calls, their bonuses and the day and cycle earnings. It does not recalculate promotions.",
+  "s_7b3ab040": "No upcoming windows."
 }

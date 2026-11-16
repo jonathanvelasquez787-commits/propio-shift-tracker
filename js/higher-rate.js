@@ -488,7 +488,7 @@ export async function applyHigherRateCorrection(windowId, draft, stamp, mode = '
       const sortedPast = [...past].sort(sortByDate);
 
       list.innerHTML = sortedActive.map(renderHigherRateWindowRow).join('')
-        || translateMarkup('<div class="note" style="margin:0;">Sin ventanas de Higher Rate para hoy ni futuras — usa "+ Agregar ventana" cuando te llegue el aviso de Propio.</div>');
+        || translateMarkup('<div class="note" style="margin:0;">Sin ventanas próximas.</div>');
 
       const pastDates = [...new Set(sortedPast.map(window=>window.date))].reverse();
       historyList.innerHTML = pastDates.map(date=>{const stats=higherRateStatsForDay(date);return ui`<details class="polished-disclosure"><summary>${escapeHtml(formatCallDayLabel(date))} · +${money(stats.totalBonus)}${financeConvertedInline(stats.totalBonus)}</summary><div class="polished-detail">${sortedPast.filter(window=>window.date===date).map(renderHigherRateWindowRow).join('')}</div></details>`;}).join('')

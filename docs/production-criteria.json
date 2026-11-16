@@ -1124,6 +1124,13 @@
           ]
         },
         {
+          "file": "tests/higher-rate-historial.test.mjs",
+          "namedCases": [
+            "higher rate historial: textos largos van al panel de informacion y el vacio es corto",
+            "higher rate historial: dias como tarjeta, boton de limpiar chico y sin colores fijos"
+          ]
+        },
+        {
           "file": "tests/reportes-pestanas.test.mjs",
           "namedCases": [
             "reportes pestanas: hay 4 pestañas Hoy, Ciclo, Semana y Detalle con sus paneles",

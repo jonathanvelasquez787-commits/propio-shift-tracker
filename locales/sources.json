@@ -478,12 +478,6 @@
       "js/app-main.js"
     ]
   },
-  "s_0857f06e": {
-    "source": "Las ventanas terminadas se mueven aquí. Podés limpiar esta lista sin perder los bonos ya registrados en tus llamadas.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_08814f8e": {
     "source": "Productividad semanal",
     "files": [
@@ -4076,6 +4070,12 @@
       "app.html"
     ]
   },
+  "s_4ab0608e": {
+    "source": "Las ventanas terminadas se mueven al Historial. Podés limpiar esa lista sin perder los bonos ya registrados en tus llamadas.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_4ab4bebc": {
     "source": "Elegir emoji para el saludo",
     "files": [
@@ -4146,6 +4146,12 @@
     "source": "Revisa tu conexión.",
     "files": [
       "js/boot.js"
+    ]
+  },
+  "s_4bca78f6": {
+    "source": "\"Limpiar historial\" quita las ventanas pasadas de la lista. Conserva las llamadas, sus bonos y las ganancias del día y del ciclo. No recalcula promociones.",
+    "files": [
+      "app.html"
     ]
   },
   "s_4bceffa4": {
@@ -6394,12 +6400,6 @@
       "js/boot.js"
     ]
   },
-  "s_76a3b4f0": {
-    "source": "Sin ventanas de Higher Rate para hoy ni futuras — usa \"+ Agregar ventana\" cuando te llegue el aviso de Propio.",
-    "files": [
-      "js/higher-rate.js"
-    ]
-  },
   "s_76ac6cdc": {
     "source": "Break tomado fuera de horario",
     "files": [
@@ -6600,6 +6600,12 @@
     "source": "{{v0}} Ganancias del ciclo",
     "files": [
       "js/reports.js"
+    ]
+  },
+  "s_7b3ab040": {
+    "source": "Sin ventanas próximas.",
+    "files": [
+      "js/higher-rate.js"
     ]
   },
   "s_7b444316": {
@@ -11052,12 +11058,6 @@
   },
   "s_cafecf7d": {
     "source": "#7C3AED",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_cb2b5007": {
-    "source": "Quita las ventanas pasadas de esta lista. Conserva las llamadas, sus bonos y las ganancias del día y del ciclo. No recalcula promociones.",
     "files": [
       "app.html"
     ]
