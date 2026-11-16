@@ -1714,3 +1714,24 @@ html[data-palette]:not([data-palette="original"]) .boot-choice { border-color: v
   }
 }
 /* fin espacios laterales */
+/* tarjetas plegables inicio */
+details.gh-fold { display: block; }
+details.gh-fold > summary { list-style: none; cursor: pointer; }
+details.gh-fold > summary::-webkit-details-marker { display: none; }
+details.gh-fold > .gh-fold-body { display: grid; gap: 8px; margin-top: 8px; }
+details.gh-fold > summary.gh-goal-top { align-items: center; }
+details.gh-fold > summary.gh-goal-top > span:first-child { margin-right: auto; }
+details.gh-fold > summary.fin-preview-head > .fin-preview-title { margin-right: auto; }
+.gh-fold-chevron {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  margin: 0 4px 3px 2px;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: rotate(45deg);
+  transition: transform .15s ease;
+}
+details.gh-fold:not([open]) .gh-fold-chevron { transform: rotate(-45deg); margin-bottom: 0; }
+details.gh-fold > summary:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; border-radius: 8px; }
+/* fin tarjetas plegables inicio */
