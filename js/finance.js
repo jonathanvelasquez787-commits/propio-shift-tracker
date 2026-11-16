@@ -169,10 +169,10 @@ export function financeReservationComplete(row) {
   return Number.isFinite(target) && target > 0 && Number.isFinite(assigned) && assigned > 0 && assigned >= target - 0.004;
 }
 
-// Próximos 2 gastos/metas pendientes (Gastos primero por prioridad, saltando Pagados; si no
+// Próximos 3 gastos/metas pendientes (Gastos primero por prioridad, saltando Pagados; si no
 // alcanzan el límite, se completa con Metas) — para el preview de "Ganancias de hoy". Sin registro
 // nuevo, reutiliza las mismas colas de Finanzas.
-function financePendingPreviewItems(limit = 2) {
+function financePendingPreviewItems(limit = 3) {
   const pending = [];
   financeGastoRowsSorted().forEach(r => {
     if (Number(r.targetAmount) > 0 && !financeIsRowPagado(r)) pending.push({ row: r, isMeta: false });
@@ -190,11 +190,12 @@ function financePendingPreviewItems(limit = 2) {
 export function renderFinancePreview() {
   const box = document.getElementById('financePreviewBox');
   const rowsEl = document.getElementById('financePreviewRows');
+  const firstEl = document.getElementById('financePreviewFirst');
   if (!box || !rowsEl) return;
-  const items = financePendingPreviewItems(2);
+  const items = financePendingPreviewItems(3);
   if (!items.length) { box.style.display = 'none'; return; }
   box.style.display = '';
-  rowsEl.innerHTML = items.map(({ row, isMeta }) => {
+  const rowHtml = ({ row, isMeta }) => {
     const cat = financeCategoryDef(row.categoryId);
     const target = Number(row.targetAmount) || 0;
     const assigned = Number(row.assignedAmount) || 0;
@@ -215,7 +216,14 @@ export function renderFinancePreview() {
         </div>
       </div>
     `;
-  }).join('');
+  };
+  // La primera fila vive dentro del encabezado (siempre visible); el resto, en el cuerpo plegable.
+  if (firstEl) {
+    firstEl.innerHTML = rowHtml(items[0]);
+    rowsEl.innerHTML = items.slice(1).map(rowHtml).join('');
+  } else {
+    rowsEl.innerHTML = items.map(rowHtml).join('');
+  }
 }
 
 let financeActiveTab = 'gastos';

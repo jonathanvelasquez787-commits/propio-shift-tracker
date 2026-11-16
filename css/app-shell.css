@@ -1721,7 +1721,7 @@ details.gh-fold > summary::-webkit-details-marker { display: none; }
 details.gh-fold > .gh-fold-body { display: grid; gap: 8px; margin-top: 8px; }
 details.gh-fold > summary.gh-goal-top { align-items: center; }
 details.gh-fold > summary.gh-goal-top > span:first-child { margin-right: auto; }
-details.gh-fold > summary.fin-preview-head > .fin-preview-title { margin-right: auto; }
+details.gh-fold > summary.fin-preview-sum > .fin-preview-head > .fin-preview-title { margin-right: auto; }
 .gh-fold-chevron {
   flex: 0 0 auto;
   width: 8px;
@@ -1753,3 +1753,18 @@ details.gh-fold > summary:focus-visible { outline: 2px solid var(--cyan); outlin
 #classicDailyGoalCard > .gh-goal-foot { order: 5; margin: 0 0 0 auto; display: flex; align-items: baseline; gap: 4px; }
 #classicDailyGoalCard > .earnings-goal-progress { order: 6; flex: 0 0 100%; margin-top: 2px; }
 /* fin meta diaria una linea */
+
+/* pendientes una linea */
+#financePreviewBox > .fin-preview-sum { display: block; }
+#financePreviewBox .fin-preview-row { padding: 4px 0; }
+#financePreviewBox .fin-preview-row:last-child { padding-bottom: 4px; }
+#financePreviewBox .fin-preview-main { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 12px; }
+#financePreviewBox .fin-preview-sub { margin-top: 0; }
+#financePreviewBox .fin-preview-bar { flex: 0 0 100%; margin-top: 3px; }
+#financePreviewBox #financePreviewFirst .fin-preview-row { border-bottom: 0; }
+#financePreviewBox > .gh-fold-body { margin-top: 0; }
+#financePreviewBox:not([open]) > .fin-preview-sum .fin-preview-head { margin-bottom: 0; }
+@media (min-width: 761px) {
+  #financePreviewBox .fin-preview-right { min-width: 190px; }
+}
+/* fin pendientes una linea */

@@ -1117,6 +1117,14 @@
           ]
         },
         {
+          "file": "tests/pendientes-una-linea.test.mjs",
+          "namedCases": [
+            "pendientes una linea: la primera fila vive dentro del summary y el resto en el cuerpo",
+            "pendientes una linea: el JS reparte 3 pendientes entre fila 1 y cuerpo",
+            "pendientes una linea: CSS propio con variables del tema"
+          ]
+        },
+        {
           "file": "tests/meta-diaria-una-linea.test.mjs",
           "namedCases": [
             "meta diaria una linea: la tarjeta ya no se pliega y conserva todos sus datos",
