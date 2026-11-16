@@ -33,7 +33,7 @@ test('Bloques del día usa los gaps etiquetados y muestra ACW en las dos variant
   assert.match(app, /acwMinutesForBlock\(classifiedGaps, callWindowStart, callWindowEnd, mergeIntervals\(dayPauses\), overlapMinutesWithIntervals\)/);
   assert.match(app, /slotStats\(slot, dayCalls, dayPauses, shiftStart, shiftEnd, dayKey, extendStart, extendEnd, blockGaps\)/);
   assert.match(app, /const blockAcwMin = slot\.type === 'Work'[\s\S]*?: 0;/);
-  assert.match(app, /stats\.realActivityRange[\s\S]*?\$\{acwProgressLabel\}/);
+  assert.match(app, /<small>ACW<\/small>[\s\S]*?formatDuration\(blockAcwMin \* 60000\)/);
   assert.doesNotMatch(app, /name: 'ACW',[\s\S]*?renderBlockSummaryStrip\(summaryCards\)/);
   assert.match(styles, /grid-template-columns: 1\.6fr 1fr 1fr;/);
   assert.match(styles, /\.block-summary-strip \{ grid-template-columns: repeat\(2, 1fr\);/);

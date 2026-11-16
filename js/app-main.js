@@ -6694,15 +6694,14 @@ function renderSchedule() {
         // "Incompleto".
         const statusText = active ? translateText('Actual') : done ? translateText('Hecho') : ((isPastDay || now >= stats.slotEnd) ? (shiftStart ? translateText('Incompleto') : translateText('Sin actividad')) : translateText('Próximo'));
         const statusClass = stats.statusTone === 'good' ? 'good' : stats.statusTone === 'warn' ? 'warn' : stats.statusTone === 'bad' ? 'bad' : '';
-        const usedProgressLabel = ui`${formatDuration(stats.filledMin * 60000)} usados`;
-        const acwProgressLabel = `ACW ${formatDuration(blockAcwMin * 60000)}`;
+        // Solo lo que NO repite la barra "Usado" ni el dato ACW de abajo.
         const progressLabel = slot.type === 'Work'
           ? (stats.realActivityRange
-              ? ui`Actividad real: ${timeLabelFromDate(stats.realActivityRange.start)} – ${timeLabelFromDate(stats.realActivityRange.end)} · ${stats.realActivityRange.callCount} llamada(s) · ${usedProgressLabel} · ${acwProgressLabel}`
-              : `${usedProgressLabel} · ${acwProgressLabel} · ${Math.round(stats.pct)}%`)
+              ? ui`Actividad real: ${timeLabelFromDate(stats.realActivityRange.start)} – ${timeLabelFromDate(stats.realActivityRange.end)} · ${stats.realActivityRange.callCount} llamada(s)`
+              : '')
           : stats.actualPauseRange
             ? ui`Pausa real: ${formatDuration(stats.actualPauseRange.durationMin * 60000)} (${timeLabelFromDate(stats.actualPauseRange.start)} – ${stats.actualPauseRange.live ? translateText('en curso') : timeLabelFromDate(stats.actualPauseRange.end)})`
-            : ui`${formatDuration(stats.filledMin * 60000)} de ${formatDuration(stats.durationMin * 60000)} · ${Math.round(stats.pct)}%`;
+            : '';
 
         // Reemplaza el desglose de "Margen del día" por cada bloque de Trabajo — ahora es una Meta
         // de Productividad EN MINUTOS, configurable POR BLOQUE (Horario → Bloques → "Meta
@@ -6711,14 +6710,11 @@ function renderSchedule() {
         if (slot.type === 'Work' && stats.productivityGoal) {
           const g = stats.productivityGoal;
           const goalIconHtml = g.met ? `${iconHtml('checkCircle')} ` : '';
-          const goalText = g.met
-            ? ui`Meta productiva alcanzada: ${formatMinutes(g.achievedMin)}/${formatMinutes(g.goalMin)} min`
-            : ui`Meta productiva: ${formatMinutes(g.achievedMin)}/${formatMinutes(g.goalMin)} min`;
-          const goalLabelColor = g.met ? `color: var(--good); font-weight: 800;` : '';
           const goalFill = g.met ? 'linear-gradient(90deg, var(--good), var(--teal))' : 'linear-gradient(90deg, var(--teal), var(--blue))';
           goalBarHtml = ui`
-            <div class="sblk-bar-row tight" title="Minutos productivos meta de este bloque, configurable en Horario → Bloques.">
-              <div class="sblk-bar-label-row" style="${goalLabelColor}"><span>${goalIconHtml}${escapeHtml(goalText)}</span></div>
+            <div class="sblk-tile${g.met ? ' is-met' : ''}" title="Minutos productivos meta de este bloque, configurable en Horario → Bloques.">
+              <small>${escapeHtml(translateText('Meta'))}</small>
+              <strong>${goalIconHtml}${formatMinutes(g.achievedMin)}/${formatMinutes(g.goalMin)} min</strong>
               <div class="sblk-bar-track" aria-label="${escapeHtml(slot.name)} meta productiva"><div style="width:${g.pct}%; background:${goalFill};"></div></div>
             </div>
           `;
@@ -6753,11 +6749,24 @@ function renderSchedule() {
         // criterio que stats.productivityGoal)
         const productivityBarHtml = slot.type === 'Work' && stats.productivityPct !== null && !isFutureDay
           ? ui`
-              <div class="sblk-bar-row tight">
-                <div class="sblk-bar-label-row"><span>Productividad</span><span>${Math.round(stats.productivityPct)}%</span></div>
+              <div class="sblk-tile">
+                <small>Productividad</small>
+                <strong>${Math.round(stats.productivityPct)}%</strong>
                 <div class="sblk-bar-track" aria-label="${escapeHtml(slot.name)} productividad"><div style="width:${stats.productivityPct}%; background: linear-gradient(90deg, var(--good), var(--teal));"></div></div>
               </div>
             `
+          : '';
+        // ACW del bloque (solo Trabajo): antes iba escrito en la línea "usados · ACW · %".
+        const acwTileHtml = slot.type === 'Work'
+          ? ui`
+              <div class="sblk-tile">
+                <small>ACW</small>
+                <strong>${formatDuration(blockAcwMin * 60000)}</strong>
+              </div>
+            `
+          : '';
+        const tilesHtml = (productivityBarHtml || goalBarHtml || acwTileHtml)
+          ? `<div class="sblk-tiles">${productivityBarHtml}${goalBarHtml}${acwTileHtml}</div>`
           : '';
 
         // Mismo relleno "líquido" de las tarjetas de "Turno de Hoy"
@@ -6767,7 +6776,10 @@ function renderSchedule() {
         const badgeToneClass = active ? 'warn' : done ? 'good' : isPastDay && shiftStart ? 'warn' : '';
         const icon = slot.type === 'Work' ? iconHtml('briefcase') : slot.type === 'Break' ? iconHtml('coffee') : iconHtml('utensils');
         const statusDetailLine = stats.status
-          ? ui`<div class="sblk-meta-line" style="${statusClass ? `color: var(--${statusClass}); font-weight: 700;` : ''}">${escapeHtml(stats.status)}</div>`
+          ? ui`<div class="sblk-meta-line sblk-sub-line" style="${statusClass ? `color: var(--${statusClass}); font-weight: 700;` : ''}">${escapeHtml(stats.status)}</div>`
+          : '';
+        const progressLineHtml = progressLabel
+          ? ui`<div class="sblk-meta-line sblk-sub-line">${escapeHtml(progressLabel)}</div>`
           : '';
 
         // Relleno líquido vertical + punto del riel sincronizado + texto legible sobre el líquido.
@@ -6795,18 +6807,16 @@ function renderSchedule() {
                 <div class="sblk-titles">
                   <div class="sblk-name">${escapeHtml(slot.name)}</div>
                   <div class="sblk-range">${slot.start} – ${slot.end}</div>
+                  <div class="sblk-subs">${progressLineHtml}${statusDetailLine}</div>
                 </div>
                 <span class="sblk-status ${badgeToneClass}">${escapeHtml(statusText)}</span>
               </div>
               <div class="sblk-extra">
                 <div class="sblk-bar-row">
-                  <div class="sblk-bar-label-row"><span>Usado</span><span>${formatDuration(stats.filledMin * 60000)} / ${formatDuration(stats.durationMin * 60000)} · ${Math.round(stats.pct)}%</span></div>
+                  <div class="sblk-bar-label-row"><span>Usado</span><span><strong>${formatDuration(stats.filledMin * 60000)} / ${formatDuration(stats.durationMin * 60000)}</strong> · ${Math.round(stats.pct)}%</span></div>
                   <div class="sblk-bar-track" aria-label="${escapeHtml(slot.name)} progreso"><div style="width:${stats.pct}%; background:${usedFillColor};"></div></div>
                 </div>
-                ${productivityBarHtml}
-                ${goalBarHtml}
-                <div class="sblk-meta-line">${escapeHtml(progressLabel)}</div>
-                ${statusDetailLine}
+                ${tilesHtml}
                 ${adherenceBarHtml}
               </div>
             </div>

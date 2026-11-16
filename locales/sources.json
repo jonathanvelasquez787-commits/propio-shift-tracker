@@ -1345,12 +1345,6 @@
       "privacidad.html"
     ]
   },
-  "s_18bf4da6": {
-    "source": "{{v0}} usados",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
   "s_18d44b29": {
     "source": "meta cubierta",
     "files": [
@@ -1753,6 +1747,12 @@
       "js/app-main.js"
     ]
   },
+  "s_20cbef67": {
+    "source": "{{v17}} / {{v18}}",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_20ff6b57": {
     "source": "Terminar turno",
     "files": [
@@ -1961,6 +1961,12 @@
       "app.html"
     ]
   },
+  "s_24817a81": {
+    "source": "· {{v19}}%",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_2486313b": {
     "source": "Inicio de turno → primera llamada",
     "files": [
@@ -2152,6 +2158,12 @@
     "source": "No se puede guardar: coincide con la llamada en curso.",
     "files": [
       "js/calls.js"
+    ]
+  },
+  "s_28da278d": {
+    "source": "Actividad real: {{v0}} – {{v1}} · {{v2}} llamada(s)",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_28f6abb1": {
@@ -2911,12 +2923,6 @@
     "source": "6. Tus derechos",
     "files": [
       "privacidad.html"
-    ]
-  },
-  "s_354a0c8f": {
-    "source": "{{v15}} / {{v16}} · {{v17}}%",
-    "files": [
-      "js/app-main.js"
     ]
   },
   "s_354cb8ba": {
@@ -4273,12 +4279,6 @@
       "js/higher-rate.js"
     ]
   },
-  "s_4e7b5074": {
-    "source": "Actividad real: {{v0}} – {{v1}} · {{v2}} llamada(s) · {{v3}} · {{v4}}",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
   "s_4e7c1010": {
     "source": "Día libre: meta sin evaluar",
     "files": [
@@ -4698,12 +4698,6 @@
     "source": "Revisá lo que cambiará antes de confirmar.",
     "files": [
       "js/work-actions.js"
-    ]
-  },
-  "s_56334813": {
-    "source": "{{v18}} progreso",
-    "files": [
-      "js/app-main.js"
     ]
   },
   "s_564e2e23": {
@@ -6007,7 +6001,8 @@
   "s_70868d7e": {
     "source": "ACW",
     "files": [
-      "app.html"
+      "app.html",
+      "js/app-main.js"
     ]
   },
   "s_70a7a727": {
@@ -6771,12 +6766,6 @@
       "js/finance.js"
     ]
   },
-  "s_7e2119d2": {
-    "source": "{{v3}} meta productiva",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
   "s_7e350eb2": {
     "source": "llamadas",
     "files": [
@@ -7197,6 +7186,12 @@
     "source": "Minutos evaluados",
     "files": [
       "js/shift-work-review.js"
+    ]
+  },
+  "s_8597d4b2": {
+    "source": "{{v20}} progreso",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_85a04400": {
@@ -8491,6 +8486,12 @@
       "js/shift-work-review.js"
     ]
   },
+  "s_9bdbc90c": {
+    "source": "{{v23}}\n                {{v24}}",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_9bf60754": {
     "source": "¿Este día contó como Trabajado o Libre?",
     "files": [
@@ -9226,12 +9227,6 @@
   },
   "s_a84134d8": {
     "source": "Shift iniciado automáticamente",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
-  "s_a87219bc": {
-    "source": "Meta productiva alcanzada: {{v0}}/{{v1}} min",
     "files": [
       "js/app-main.js"
     ]
@@ -10678,12 +10673,6 @@
       "js/landing.js"
     ]
   },
-  "s_c45b7341": {
-    "source": "Meta productiva: {{v0}}/{{v1}} min",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
   "s_c4676a2b": {
     "source": "Billable y Dropped deben decir Yes o No.",
     "files": [
@@ -11752,12 +11741,6 @@
       "js/higher-rate-review.js"
     ]
   },
-  "s_d92b8900": {
-    "source": "{{v21}}\n                {{v22}}",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
   "s_d9372f71": {
     "source": "Gasto agregado",
     "files": [
@@ -11894,6 +11877,12 @@
     "source": "No hay cambios recuperables en esta vista.",
     "files": [
       "js/call-recovery.js"
+    ]
+  },
+  "s_db6bb034": {
+    "source": "{{v5}} meta productiva",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_db765001": {
@@ -12288,12 +12277,6 @@
       "js/reinforcement-feedback.js"
     ]
   },
-  "s_e11ef2f9": {
-    "source": "{{v0}} de {{v1}} · {{v2}}%",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
   "s_e12f665c": {
     "source": "Hasta",
     "files": [
@@ -12451,12 +12434,6 @@
     "source": "Primero Gastos, luego Metas. Reservar no registra pagos ni modifica tus ganancias.",
     "files": [
       "js/finance-review.js"
-    ]
-  },
-  "s_e3db894e": {
-    "source": "{{v24}}\n                {{v25}}",
-    "files": [
-      "js/app-main.js"
     ]
   },
   "s_e3e7c209": {
@@ -12667,7 +12644,6 @@
   "s_e77fb954": {
     "source": "{{v1}}{{v2}}",
     "files": [
-      "js/app-main.js",
       "js/backup-recovery.js",
       "js/pay-receipts.js",
       "js/reports.js"
@@ -12701,6 +12677,12 @@
     "source": "Cerrar",
     "files": [
       "app.html"
+    ]
+  },
+  "s_e84c19d0": {
+    "source": "{{v13}}{{v14}}",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_e857db13": {
@@ -13958,6 +13940,12 @@
     "files": [
       "app.html",
       "js/theme-palettes.js"
+    ]
+  },
+  "s_fd13bc21": {
+    "source": "{{v2}}{{v3}}/{{v4}} min",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_fd50c919": {
