@@ -21,6 +21,7 @@ import {
   dayComplianceStatus,
   renderReportsDashboard as renderReportsDashboardView,
   renderReportsMonthlyChart as renderReportsMonthlyChartView,
+  setReportsTab,
   wireReportsTabs,
   reportsCycleProjection,
   configureReportsContext,
@@ -5542,6 +5543,8 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       const set = (id, value) => { const el = document.getElementById(id); if (el && (force || document.activeElement !== el)) el.value = value; };
       const enabled = document.getElementById('freelancerEnabledInput');
       if (enabled) enabled.checked = fl.enabled;
+      const homeEnabled = document.getElementById('homeFreelancerInput');
+      if (homeEnabled) homeEnabled.checked = fl.enabled === true;
       const sideEnabled = document.getElementById('sidebarFreelancerInput');
       if (sideEnabled) sideEnabled.checked = fl.enabled === true;
       const sideConfig = document.getElementById('sidebarFreelancerConfigBtn');
@@ -7462,6 +7465,28 @@ export function render() {
       navigateToPage(btn.getAttribute('data-nav-page'));
     });
 
+    // "Cambiar horario ›" (Inicio): abre la página Horario
+    document.addEventListener('click', (e) => {
+      const btn = e.target instanceof Element ? e.target.closest('[data-open-schedule-edit]') : null;
+      if (!btn) return;
+      e.preventDefault();
+      navigateToPage('schedule');
+    });
+
+    // "Corregir días ›" (Inicio y menú): abre Reportes > Semana con el resumen abierto
+    document.addEventListener('click', (e) => {
+      const btn = e.target instanceof Element ? e.target.closest('[data-open-week-edit]') : null;
+      if (!btn) return;
+      e.preventDefault();
+      navigateToPage('reports');
+      setReportsTab('semana');
+      const acc = document.getElementById('weekSummaryAccordion');
+      if (acc) {
+        acc.open = true;
+        if (typeof acc.scrollIntoView === 'function') acc.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      }
+    });
+
     document.getElementById('clearDayCallsBtn').addEventListener('click', clearActiveDayCalls);
     document.getElementById('callRecoveryBtn').addEventListener('click', openCallRecovery);
 
@@ -7944,6 +7969,8 @@ export function render() {
       // Menú lateral: el mismo interruptor del modo freelancer; "Configurar" lleva a Horario > Más opciones > Modo freelancer.
       const sideSwitch = document.getElementById('sidebarFreelancerInput'), sideConfig = document.getElementById('sidebarFreelancerConfigBtn');
       sideSwitch.addEventListener('change', () => { document.getElementById('freelancerEnabledInput').checked = sideSwitch.checked; updateFreelancerSettings(); });
+      const homeSwitch = document.getElementById('homeFreelancerInput');
+      if (homeSwitch) homeSwitch.addEventListener('change', () => { document.getElementById('freelancerEnabledInput').checked = homeSwitch.checked; updateFreelancerSettings(); });
       sideConfig.addEventListener('click', () => {
         navigateToPage('schedule');
         const moreToggle = document.getElementById('schedMoreToggle'), flToggle = document.querySelector('[data-more-toggle="freelancer"]');
