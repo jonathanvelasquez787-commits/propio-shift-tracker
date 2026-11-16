@@ -1106,6 +1106,14 @@
           ]
         },
         {
+          "file": "tests/horario-mas-chico.test.mjs",
+          "namedCases": [
+            "Horario se ve mas chico en compu y celular",
+            "Horario muestra los bloques en una sola columna",
+            "En compu cada bloque es una sola linea con columnas fijas"
+          ]
+        },
+        {
           "file": "tests/action-bar-halves.test.mjs",
           "namedCases": [
             "Barra de acciones: los botones de turno y los de llamadas se centran cada uno en su mitad"
