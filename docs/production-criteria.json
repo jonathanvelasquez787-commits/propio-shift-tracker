@@ -1364,7 +1364,8 @@
           "file": "tests/nombres-dentro-botones.test.mjs",
           "namedCases": [
             "el nombre de los botones va dentro del boton solo en escritorio",
-            "con un break o llamada en curso el nombre tambien queda dentro del boton"
+            "con un break o llamada en curso el nombre tambien queda dentro del boton",
+            "el nombre del boton activo va en blanco como el cronometro"
           ]
         },
         {
