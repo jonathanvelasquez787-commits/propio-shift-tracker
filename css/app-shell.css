@@ -2307,3 +2307,9 @@ html:root[data-palette]:not([data-palette="original"]) .hbc-slide[data-accent="c
   :root:not(.theme-light) .chips > .hero-shift-actions .action-slot[data-slot="discard"] > .action-short { color: white; }
 }
 /* fin nombres blancos todos */
+/* botones activos largos */
+@media (min-width: 761px) {
+  .chips > .hero-shift-actions .action-slot:has(> :is(#breakControlBtn,#lunchControlBtn,#callControlBtn).is-active, > #callControlBtn.is-pending) { flex: 0 0 120px; max-width: none; }
+  .chips > .hero-shift-actions .action-slot > :is(#breakControlBtn,#lunchControlBtn,#callControlBtn).is-active, .chips > .hero-shift-actions .action-slot > #callControlBtn.is-pending { width: 100%; }
+}
+/* fin botones activos largos */
