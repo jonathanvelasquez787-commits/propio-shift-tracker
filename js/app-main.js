@@ -5605,7 +5605,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
     async function openNotificationReview() {
       document.getElementById('notificationReview').replaceChildren();
       const owner=settings,view=await loadDetailViews({retry:true});
-      if(owner!==settings||!document.getElementById('notificationsModal').classList.contains('open'))return;
+      if(owner!==settings||!document.getElementById('goalsModal').classList.contains('open')||document.getElementById('setPanelAvisos').hidden)return;
       if (!view) return;
       view.renderNotificationReview({ui,translateText,escapeHtml,settings,productive:minutesSinceLastProductiveBreakAnchor,soundConfigs:Object.values(ALARM_SOUND_CONFIGS),valid:()=>owner===settings});
     }
@@ -7060,7 +7060,6 @@ export function render() {
       closeModal('confirmModal');
       closeModal('acwGoalModal');
       closeModal('higherRateModal');
-      closeModal('notificationsModal');
       closeModal('cycleGoalModal');
       closeModal('goalScopeModal');
       closeModal('calYearGoalModal');
@@ -7777,12 +7776,11 @@ export function render() {
       openModal('higherRateModal');
       syncHigherRateModalFields();
     });
-    // "Avisos" pasa de página del sidebar a ícono del header (a la izquierda de Higher Rate) que
-    // abre su propio popup — mismo patrón que ajustesHeaderBtn/higherRateHeaderBtn de arriba.
-    document.getElementById('avisosHeaderBtn').addEventListener('click', () => {
+    // "Avisos" ahora es una pestaña de Ajustes: al abrirla se cargan los campos y el resumen.
+    document.addEventListener('app:settings-tab', (event) => {
+      if (event.detail?.tab !== 'avisos') return;
       syncNotificationsModalFields();
-      openModal('notificationsModal');
-      openNotificationReview().catch(()=>toast(translateText('No se pudo cargar el resumen. Cerrá Avisos y volvé a abrirlo.')));
+      openNotificationReview().catch(()=>toast(translateText('No se pudo cargar el resumen. Cerrá Ajustes y volvé a abrirlo.')));
     });
     document.addEventListener('click',event=>{
       if(!event.target.closest?.('[data-reflection-history]'))return;

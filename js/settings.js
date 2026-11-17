@@ -417,7 +417,7 @@ export async function syncAccountProfileFields() {
   }
 }
 
-const SETTINGS_TABS = ['general', 'dinero', 'datos'];
+const SETTINGS_TABS = ['general', 'dinero', 'avisos', 'datos'];
 
 export function setSettingsTab(tab) {
   const active = SETTINGS_TABS.includes(tab) ? tab : 'general';
@@ -431,6 +431,7 @@ export function setSettingsTab(tab) {
     panel.classList.toggle('active', on);
     panel.hidden = !on;
   });
+  document.dispatchEvent(new CustomEvent('app:settings-tab', { detail: { tab: active } }));
 }
 
 export function wireSettingsTabs() {

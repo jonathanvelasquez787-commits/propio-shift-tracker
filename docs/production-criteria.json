@@ -1134,7 +1134,7 @@
         {
           "file": "tests/ajustes-pestanas.test.mjs",
           "namedCases": [
-            "ajustes pestanas: hay tres pestanas y tres paneles con sus campos",
+            "ajustes pestanas: hay cuatro pestanas y cuatro paneles con sus campos",
             "ajustes pestanas: el boton Listo queda fuera de los paneles y los textos largos van en Como funciona",
             "ajustes pestanas: el CSS usa variables del tema y no colores fijos"
           ]
@@ -1272,6 +1272,14 @@
           "file": "tests/ciclo-botones-tamano.test.mjs",
           "namedCases": [
             "Ciclo: los botones Anterior, Ciclo actual y Siguiente miden lo mismo que las píldoras"
+          ]
+        },
+        {
+          "file": "tests/avisos-en-ajustes.test.mjs",
+          "namedCases": [
+            "Avisos en Ajustes: es la tercera pestaña, entre Dinero y Datos",
+            "Avisos en Ajustes: el contenido se movió con los mismos ids y ya no existe el pop up ni la campana",
+            "Avisos en Ajustes: al abrir la pestaña se carga el resumen"
           ]
         },
         {

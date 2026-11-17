@@ -7,14 +7,14 @@ const css = readFileSync(new URL('../css/app-shell.css', import.meta.url), 'utf8
 const bloque = css.slice(css.indexOf('/* ajustes pestanas */'), css.indexOf('/* fin ajustes pestanas */'));
 const modal = html.slice(html.indexOf('id="goalsModal"'), html.indexOf('id="positiveReflectionModal"'));
 
-test('ajustes pestanas: hay tres pestanas y tres paneles con sus campos', () => {
-  for (const t of ['general', 'dinero', 'datos']) {
+test('ajustes pestanas: hay cuatro pestanas y cuatro paneles con sus campos', () => {
+  for (const t of ['general', 'dinero', 'avisos', 'datos']) {
     assert.match(modal, new RegExp(`data-set-tab="${t}"`));
     assert.match(modal, new RegExp(`data-set-panel="${t}"`));
   }
   const panel = (name, next) => modal.slice(modal.indexOf(`id="setPanel${name}"`), next ? modal.indexOf(`id="setPanel${next}"`) : modal.indexOf('/setPanelDatos'));
   assert.match(panel('General', 'Dinero'), /id="settingsLanguage"[\s\S]*id="userNameInput"[\s\S]*id="saveAccountProfileBtn"/);
-  assert.match(panel('Dinero', 'Datos'), /id="productiveGoalInput"[\s\S]*id="rateInput"[\s\S]*id="cycleAnchorInput"[\s\S]*id="cycleGoalSettingsBtn"/);
+  assert.match(panel('Dinero', 'Avisos'), /id="productiveGoalInput"[\s\S]*id="rateInput"[\s\S]*id="cycleAnchorInput"[\s\S]*id="cycleGoalSettingsBtn"/);
   assert.match(panel('Datos'), /id="exportBtn"[\s\S]*id="snapshotRecoveryBtn"[\s\S]*id="accountingExportCsvBtn"/);
 });
 

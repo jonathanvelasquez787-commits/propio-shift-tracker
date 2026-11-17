@@ -20,10 +20,10 @@
 #automationPanel[open] .automation-icon{grid-column:1;grid-row:1}#automationPanel[open] .automation-identity{grid-column:2;grid-row:1}#gameReviewSummary .polished-shortcuts>button{border-radius:16px;clip-path:none}#gameReviewSummary .polished-shortcuts small{line-height:1.5}#gameReviewSummary .polished-chest>button{grid-column:1/-1;min-height:44px;border-radius:12px;clip-path:none;font-size:12px}
 #gameReviewSummary{width:100%;max-width:760px;margin-inline:auto}#higherRateReviewModal .gap-edit-btn{background:transparent;color:var(--text);border:1px solid var(--line-2);border-radius:12px;min-height:44px}#higherRateReviewModal .gap-edit-btn:disabled{opacity:.5}
 #automationPanel[open] .automation-state:has(.automation-countdown[data-kind="spacing"]:not([hidden])){flex-direction:row-reverse;justify-content:flex-end;gap:12px;padding:14px 16px;border-radius:16px}#automationPanel[open] .automation-state:has(.automation-countdown[data-kind="spacing"]:not([hidden])) .automation-countdown{font-size:30px;letter-spacing:-1px}#automationPanel[open] .automation-state:has(.automation-countdown[data-kind="spacing"]:not([hidden])) .automation-title{font-size:12px;white-space:nowrap;text-align:left}
-#notificationsModal .modal-card{max-width:760px;padding:26px;border-radius:24px}#notificationsModal>.modal-card>.sched-compact-card{border:0;border-radius:0;box-shadow:none;background:transparent;padding:0 0 20px;margin:0;border-bottom:1px solid var(--line)}#notificationsModal .polished-setting .sched-compact-card{background:var(--bg-2);border:1px solid var(--line);padding:16px}#notificationsModal .polished-setting-body .alert-hint,#notificationFilesReview .note{font-size:12px;line-height:1.6}#notificationFilesReview .polished-shortcuts>button{font-size:12px;line-height:1.4;justify-content:center;text-align:center}#notificationsModal .modal-head{margin-bottom:24px}
+#setPanelAvisos>.sched-compact-card{border:0;border-radius:0;box-shadow:none;background:transparent;padding:0 0 20px;margin:0;border-bottom:1px solid var(--line)}#setPanelAvisos .polished-setting .sched-compact-card{background:var(--bg-2);border:1px solid var(--line);padding:16px}#setPanelAvisos .polished-setting-body .alert-hint,#notificationFilesReview .note{font-size:12px;line-height:1.6}#notificationFilesReview .polished-shortcuts>button{font-size:12px;line-height:1.4;justify-content:center;text-align:center}
 .polished-delete .danger-card-badge{position:static;display:inline-block;margin:6px 0 16px}.polished-delete-counts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;background:rgba(var(--bad-rgb),.04);padding:20px;border-radius:18px;border:1px solid var(--line);margin-bottom:16px}.polished-delete-counts strong{display:block;font-size:27px;line-height:1.2;color:var(--text)}.polished-delete-counts span{display:block;font-size:11px;color:var(--muted);margin-top:5px}.polished-export-first{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--line);border-radius:16px;padding:17px;background:transparent;width:100%;margin:16px 0 0;text-align:left;color:var(--text);cursor:pointer}.polished-export-first strong{display:block;font-size:13px}.polished-export-first small{display:block;font-size:11px;color:var(--muted);margin-top:4px}.polished-retention{font-size:11px;line-height:1.6;color:var(--muted);margin:16px 0}.polished-delete .danger-card-desc{font-size:12px;line-height:1.6}.polished-delete .polished-disclosure>summary{color:var(--text)}
 #automationPanel[open]>.automation-heading{grid-template-columns:46px minmax(0,1fr) 17px;gap:13px;padding:22px 0 0}#automationPanel[open] .automation-icon{width:46px;height:46px;border-radius:15px}#automationPanel[open] .automation-chevron{grid-column:3;grid-row:1}#automationPanel[open] .automation-state{grid-column:1/-1;grid-row:2;display:flex;flex-direction:row-reverse;justify-content:flex-end;align-items:center;padding:12px 14px;border:1px solid rgba(var(--cyan-rgb),.24);background:rgba(var(--cyan-rgb),.045);border-radius:16px;gap:10px;margin-top:8px;text-align:left}#automationPanel[open] .automation-countdown{font-size:30px;line-height:1.1;letter-spacing:-1px}#automationPanel[open] .automation-title{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap}#automationPanel[open]>.automation-body{padding:0}#automationPanel[open] .automation-detail{padding:17px 20px;border-left:3px solid var(--cyan);border-radius:0 14px 14px 0;background:var(--bg-2);font-size:12px;margin:14px 0}#automationPanel[open] .automation-checks ul{grid-template-columns:1fr;gap:0;border:0;padding:0}#automationPanel[open] .automation-checks li{padding:12px 0;border-bottom:1px solid var(--line);font-size:12px}.automation-acw-progress{padding:6px 20px 14px;color:var(--muted);font-size:11px}.automation-acw-progress progress{width:100%;height:5px;accent-color:var(--cyan);display:block;margin-bottom:10px}.automation-acw-progress[hidden]{display:none}
-@media(max-width:600px){#notificationsModal .modal-card{padding:20px 16px}.polished-impact{gap:12px}.polished-impact>span{max-width:60%}.polished-comparison .polished-time{font-size:16px}.polished-pair strong{font-size:17px}.polished-pace{padding:18px 14px}.polished-delete-counts{padding:18px 14px;gap:8px}#automationPanel[open] .automation-countdown{font-size:28px}#automationPanel[open] .automation-title{font-size:clamp(9px,2.75vw,12px)}}
+@media(max-width:600px){.polished-impact{gap:12px}.polished-impact>span{max-width:60%}.polished-comparison .polished-time{font-size:16px}.polished-pair strong{font-size:17px}.polished-pace{padding:18px 14px}.polished-delete-counts{padding:18px 14px;gap:8px}#automationPanel[open] .automation-countdown{font-size:28px}#automationPanel[open] .automation-title{font-size:clamp(9px,2.75vw,12px)}}
 @media(max-width:600px){#automationPanel[open] .automation-state:has(.automation-countdown[data-kind="spacing"]:not([hidden])){gap:10px;padding:13px 12px}#automationPanel[open] .automation-state:has(.automation-countdown[data-kind="spacing"]:not([hidden])) .automation-title{font-size:clamp(9px,2.75vw,12px)}#automationPanel[open] .automation-state:has(.automation-countdown[data-kind="spacing"]:not([hidden])) .automation-countdown{font-size:28px}}
 @media(max-width:600px){.polished-surface{padding:20px 16px;border-radius:22px}.polished-head h2{font-size:22px}.polished-bento{gap:10px}.polished-hero{padding:17px 14px}.polished-number{font-size:46px}.polished-level{padding:14px 10px;gap:9px}.polished-ring{width:82px;height:82px;padding:6px}.polished-ring strong{font-size:25px}.polished-chest{gap:14px;padding:17px 14px}.polished-chest-art{width:55px;height:55px;border-radius:14px}.polished-chest-art svg{width:40px;height:40px}.polished-shortcuts{gap:10px}.polished-shortcuts>button{gap:8px;padding:13px 11px}.polished-shortcuts svg{width:18px;height:18px}.polished-productive{gap:16px;padding:18px 14px}.polished-productive h4{font-size:15px}.polished-productive p{font-size:11px}.polished-comparison{padding:20px 14px;gap:8px}.polished-comparison strong{font-size:27px}.polished-comparison .polished-amount{font-size:23px}}
 @media(max-width:350px){.polished-surface{padding:18px 14px}.polished-head{gap:10px}.polished-head h2{font-size:20px}.polished-icon{width:40px;height:40px;flex-basis:40px}.polished-tag{font-size:10px;padding:5px 8px}.polished-productive{gap:12px}.polished-productive .polished-ring{width:74px;height:74px}.polished-productive .polished-ring strong{font-size:24px}.polished-shortcuts>button{padding:12px 9px}.polished-shortcuts small{font-size:10px}.polished-breakdown-row{gap:9px}.polished-breakdown-row .polished-amount{font-size:18px}.polished-breakdown-row small{font-size:10px}}
@@ -1241,17 +1241,17 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 .notif-group{margin:0;padding:0;border-bottom:1px solid var(--line)}
 .notif-group-title{margin:0;padding:16px 0 4px;font-size:12px;font-weight:700;color:var(--muted)}
 .notif-group-body{padding:0 0 8px}
-#notificationsModal .notif-group .sched-compact-card{background:transparent;border:0;border-radius:0;box-shadow:none;padding:10px 0;margin:0;border-bottom:1px solid var(--line)}
-#notificationsModal .notif-group .sched-compact-card:last-child{border-bottom:0}
-#notificationsModal .notif-group .sched-compact-title-icon{display:none}
-#notificationsModal .notif-group .sched-compact-title{font-size:13px;font-weight:600}
-#notificationsModal .notif-group .notif-row{grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:12px;row-gap:0}
-#notificationsModal .notif-group .notif-row>.alert-customize{grid-column:1/-1;margin-top:4px;border-top:0}
-#notificationsModal .notif-group .notif-row>.sched-compact-row{margin:0}
-#notificationsModal .notif-group .notif-row .sched-compact-field{display:flex;flex-direction:row;align-items:center;gap:8px}
-#notificationsModal .notif-group .notif-row .sched-compact-field input[type=number]{width:64px}
-#notificationsModal .notif-group .notif-row .sched-checkbox-row{margin:0;white-space:nowrap}
-#notificationsModal .notif-group .alert-customize>summary{min-height:32px}
+#setPanelAvisos .notif-group .sched-compact-card{background:transparent;border:0;border-radius:0;box-shadow:none;padding:10px 0;margin:0;border-bottom:1px solid var(--line)}
+#setPanelAvisos .notif-group .sched-compact-card:last-child{border-bottom:0}
+#setPanelAvisos .notif-group .sched-compact-title-icon{display:none}
+#setPanelAvisos .notif-group .sched-compact-title{font-size:13px;font-weight:600}
+#setPanelAvisos .notif-group .notif-row{grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:12px;row-gap:0}
+#setPanelAvisos .notif-group .notif-row>.alert-customize{grid-column:1/-1;margin-top:4px;border-top:0}
+#setPanelAvisos .notif-group .notif-row>.sched-compact-row{margin:0}
+#setPanelAvisos .notif-group .notif-row .sched-compact-field{display:flex;flex-direction:row;align-items:center;gap:8px}
+#setPanelAvisos .notif-group .notif-row .sched-compact-field input[type=number]{width:64px}
+#setPanelAvisos .notif-group .notif-row .sched-checkbox-row{margin:0;white-space:nowrap}
+#setPanelAvisos .notif-group .alert-customize>summary{min-height:32px}
 /* Finanzas (celular): tarjeta de gasto compacta en 3 filas — nombre y estado arriba, reservado y barra, y una sola barra unida de monto */
 @media(max-width:760px){
 #pageFinance .fin-row{align-items:center;column-gap:8px;row-gap:8px;padding:12px}
@@ -1332,8 +1332,8 @@ html.theme-dark .boot-choice-note { color: var(--muted-3, #6f7f9e); }
 #scheduleAccordion.sched-freelancer-list .fl-break-min{flex:0 0 auto;white-space:nowrap}
 
 /* avisos-min-unidad */
-#notificationsModal .notif-group .notif-row .notif-unit{flex:0 0 auto;font-size:12px;color:var(--muted)}
-#notificationsModal .notif-group .notif-row .sched-compact-row .sched-compact-field.narrow{flex:0 0 auto}
+#setPanelAvisos .notif-group .notif-row .notif-unit{flex:0 0 auto;font-size:12px;color:var(--muted)}
+#setPanelAvisos .notif-group .notif-row .sched-compact-row .sched-compact-field.narrow{flex:0 0 auto}
 /* fin avisos-min-unidad */
 /* finanzas-encabezado-celular */
 @media (max-width:640px){
@@ -1969,38 +1969,38 @@ details.gh-fold > summary:focus-visible { outline: 2px solid var(--cyan); outlin
 /* fin ajustes pestanas */
 
 /* avisos compactos */
-#notificationsModal .notif-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0 10px; padding: 8px 0; }
-#notificationsModal .notif-row > .sched-compact-head { flex: 1 1 260px; min-width: 0; margin: 0; }
-#notificationsModal .notif-row .sched-compact-info-btn, #notificationsModal .notif-row .sched-help-wrap { display: none; }
-#notificationsModal .notif-row .alert-customize { flex: 0 0 auto; margin: 0; border: 0; }
-#notificationsModal .notif-row .alert-customize[open] { flex: 1 1 100%; }
-#notificationsModal .notif-row .alert-customize > summary { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 999px; font-size: 12px; font-weight: 700; cursor: pointer; }
-#notificationsModal .notif-row .alert-customize > summary small { display: none; }
-#notificationsModal .notif-row .alert-customize[open] > summary { margin-bottom: 8px; }
-#notificationsModal .polished-productive { padding: 10px 14px; min-height: 0; gap: 14px; }
-#notificationsModal .polished-ring { width: 64px; height: 64px; flex: 0 0 64px; }
-#notificationsModal .polished-ring strong { font-size: 11px; line-height: 1.15; }
+#setPanelAvisos .notif-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0 10px; padding: 8px 0; }
+#setPanelAvisos .notif-row > .sched-compact-head { flex: 1 1 260px; min-width: 0; margin: 0; }
+#setPanelAvisos .notif-row .sched-compact-info-btn, #setPanelAvisos .notif-row .sched-help-wrap { display: none; }
+#setPanelAvisos .notif-row .alert-customize { flex: 0 0 auto; margin: 0; border: 0; }
+#setPanelAvisos .notif-row .alert-customize[open] { flex: 1 1 100%; }
+#setPanelAvisos .notif-row .alert-customize > summary { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 999px; font-size: 12px; font-weight: 700; cursor: pointer; }
+#setPanelAvisos .notif-row .alert-customize > summary small { display: none; }
+#setPanelAvisos .notif-row .alert-customize[open] > summary { margin-bottom: 8px; }
+#setPanelAvisos .polished-productive { padding: 10px 14px; min-height: 0; gap: 14px; }
+#setPanelAvisos .polished-ring { width: 64px; height: 64px; flex: 0 0 64px; }
+#setPanelAvisos .polished-ring strong { font-size: 11px; line-height: 1.15; }
 /* fin avisos compactos */
 /* avisos parte 2 */
-#notificationsModal #positiveSettingsAccordion > summary { min-height: 0; padding: 12px 0; gap: 10px; }
-#notificationsModal #positiveSettingsAccordion > summary::after,
-#notificationsModal #positiveSettingsAccordion > summary::before { display: none !important; content: none !important; }
-#notificationsModal #positiveSettingsAccordion .game-panel-eyebrow { display: none !important; }
-#notificationsModal #positiveSettingsAccordion .game-settings-accordion-copy { gap: 2px; }
-#notificationsModal #positiveSettingsAccordion .game-settings-accordion-copy > small { font-size: 11.5px; margin-top: 0; }
-#notificationsModal #positiveSettingsAccordion > summary > .game-settings-accordion-chevron { flex: 0 0 24px !important; width: 24px; height: 24px; border: 0 !important; background: transparent !important; box-shadow: none !important; }
-#notificationsModal #positiveSettingsAccordion .game-settings-accordion-body { padding: 4px 0 10px; }
-#notificationsModal #positiveSettingsAccordion .inactivity-compact { display: grid; gap: 8px; }
-#notificationsModal #positiveSettingsAccordion .inactivity-row { padding: 0; gap: 10px; }
-#notificationsModal #positiveSettingsAccordion .inactivity-row small { font-size: 11.5px; }
-#notificationsModal #positiveSettingsAccordion .inactivity-row input { width: 76px; min-height: 38px; }
-#notificationsModal #positiveSettingsAccordion .game-settings-toggle { border: 0 !important; background: transparent !important; box-shadow: none !important; padding: 0 !important; }
-#notificationsModal #positiveSettingsAccordion .game-settings-toggle small { font-size: 11.5px; }
-#notificationsModal #positiveSettingsAccordion .inactivity-message-controls > input,
-#notificationsModal #positiveSettingsAccordion .inactivity-message-controls > button { min-height: 40px; height: 40px; }
-#notificationsModal #positiveSettingsAccordion #positiveInactivityMessageHelp { font-size: 11.5px; }
-#notificationsModal #notificationFilesReview .polished-setting > summary { min-height: 0; padding: 12px 0; }
-#notificationsModal #notificationFilesReview .polished-setting > summary small { font-size: 11.5px; margin-top: 2px; }
+#setPanelAvisos #positiveSettingsAccordion > summary { min-height: 0; padding: 12px 0; gap: 10px; }
+#setPanelAvisos #positiveSettingsAccordion > summary::after,
+#setPanelAvisos #positiveSettingsAccordion > summary::before { display: none !important; content: none !important; }
+#setPanelAvisos #positiveSettingsAccordion .game-panel-eyebrow { display: none !important; }
+#setPanelAvisos #positiveSettingsAccordion .game-settings-accordion-copy { gap: 2px; }
+#setPanelAvisos #positiveSettingsAccordion .game-settings-accordion-copy > small { font-size: 11.5px; margin-top: 0; }
+#setPanelAvisos #positiveSettingsAccordion > summary > .game-settings-accordion-chevron { flex: 0 0 24px !important; width: 24px; height: 24px; border: 0 !important; background: transparent !important; box-shadow: none !important; }
+#setPanelAvisos #positiveSettingsAccordion .game-settings-accordion-body { padding: 4px 0 10px; }
+#setPanelAvisos #positiveSettingsAccordion .inactivity-compact { display: grid; gap: 8px; }
+#setPanelAvisos #positiveSettingsAccordion .inactivity-row { padding: 0; gap: 10px; }
+#setPanelAvisos #positiveSettingsAccordion .inactivity-row small { font-size: 11.5px; }
+#setPanelAvisos #positiveSettingsAccordion .inactivity-row input { width: 76px; min-height: 38px; }
+#setPanelAvisos #positiveSettingsAccordion .game-settings-toggle { border: 0 !important; background: transparent !important; box-shadow: none !important; padding: 0 !important; }
+#setPanelAvisos #positiveSettingsAccordion .game-settings-toggle small { font-size: 11.5px; }
+#setPanelAvisos #positiveSettingsAccordion .inactivity-message-controls > input,
+#setPanelAvisos #positiveSettingsAccordion .inactivity-message-controls > button { min-height: 40px; height: 40px; }
+#setPanelAvisos #positiveSettingsAccordion #positiveInactivityMessageHelp { font-size: 11.5px; }
+#setPanelAvisos #notificationFilesReview .polished-setting > summary { min-height: 0; padding: 12px 0; }
+#setPanelAvisos #notificationFilesReview .polished-setting > summary small { font-size: 11.5px; margin-top: 2px; }
 /* fin avisos parte 2 */
 
 /* bloques contraidos */
@@ -2084,13 +2084,13 @@ details.gh-fold > summary:focus-visible { outline: 2px solid var(--cyan); outlin
 /* fin vaciar fila celular */
 
 /* aviso interruptor */
-#notificationsModal #positiveSettingsAccordion > summary > .game-settings-accordion-copy { flex: 1 1 0; min-width: 0; }
-#notificationsModal #positiveSettingsAccordion .inactivity-switch-wrap { flex: 0 0 auto; margin: 0; display: flex; align-items: center; }
-#notificationsModal #positiveSettingsAccordion .inactivity-switch-wrap .game-settings-toggle { position: relative; display: flex; align-items: center; gap: 8px; padding: 0 !important; border: 0 !important; background: transparent !important; }
-#notificationsModal #positiveSettingsAccordion .inactivity-switch-text { font-size: 12px; font-weight: 700; color: var(--muted); white-space: nowrap; }
-#notificationsModal #positiveSettingsAccordion.inactivity-off .game-settings-accordion-body { opacity: .45; pointer-events: none; }
+#setPanelAvisos #positiveSettingsAccordion > summary > .game-settings-accordion-copy { flex: 1 1 0; min-width: 0; }
+#setPanelAvisos #positiveSettingsAccordion .inactivity-switch-wrap { flex: 0 0 auto; margin: 0; display: flex; align-items: center; }
+#setPanelAvisos #positiveSettingsAccordion .inactivity-switch-wrap .game-settings-toggle { position: relative; display: flex; align-items: center; gap: 8px; padding: 0 !important; border: 0 !important; background: transparent !important; }
+#setPanelAvisos #positiveSettingsAccordion .inactivity-switch-text { font-size: 12px; font-weight: 700; color: var(--muted); white-space: nowrap; }
+#setPanelAvisos #positiveSettingsAccordion.inactivity-off .game-settings-accordion-body { opacity: .45; pointer-events: none; }
 @media (max-width: 760px) {
-  #notificationsModal #positiveSettingsAccordion .inactivity-switch-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  #setPanelAvisos #positiveSettingsAccordion .inactivity-switch-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 }
 /* fin aviso interruptor */
 
@@ -2158,3 +2158,13 @@ details.gh-fold > summary:focus-visible { outline: 2px solid var(--cyan); outlin
 /* ciclo botones tamano pildoras */
 #earningsCycleView .week-nav button{padding:5px 10px;font-size:10.5px;min-height:0;line-height:normal}
 /* fin ciclo botones tamano pildoras */
+
+/* ajustes cuatro pestanas */
+@media (max-width: 430px) {
+  #goalsModal .set-tabs { gap: 2px; }
+  #goalsModal .set-tab { padding: 0 clamp(7px, 2.6vw, 12px); font-size: 13px; }
+}
+@media (max-width: 340px) {
+  #goalsModal .set-tab { padding: 0 5px; font-size: 12.5px; }
+}
+/* fin ajustes cuatro pestanas */

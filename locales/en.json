@@ -1786,7 +1786,6 @@
   "s_6f5ece4f": "Volume 0%: all sounds are muted. Written notices remain active.",
   "s_9a502971": "Saved audio files",
   "s_a0789a6e": "Close without saving",
-  "s_ba091659": "The summary could not load. Close Notifications and reopen it.",
   "s_dec67310": "Off",
   "s_f237694f": "Add an optional note before choosing",
   "s_fb707b6c": "Waiting",
@@ -2347,5 +2346,6 @@
   "s_0b4f0b56": "Review and recover calls without overwriting later changes. Up to 50 changes · up to 30 days, depending on space. Included in your JSON backup.",
   "s_513bdb94": "↻ Refresh",
   "s_e32e4c05": "No recoverable changes",
-  "s_b786e768": "Cycle total"
+  "s_b786e768": "Cycle total",
+  "s_db94bc0b": "The summary could not load. Close Settings and reopen it."
 }
