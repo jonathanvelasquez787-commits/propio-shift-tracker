@@ -2119,3 +2119,21 @@ details.gh-fold > summary:focus-visible { outline: 2px solid var(--cyan); outlin
 @media(max-width:600px){#confirmModal .sched-review .rv-same span{font-size:14px}#confirmModal .sched-review .rv-diff b{font-size:13px}}
 @media(max-width:400px){#confirmModal .sched-review .rv-top>span:first-of-type{display:none}#confirmModal .sched-review .rv-diff{grid-template-columns:minmax(0,1fr);gap:6px}#confirmModal .sched-review .rv-diff>span{display:none}}
 /* fin revisar horario */
+
+/* historial compacto */
+#callRecoveryBody .pp-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 8px}
+#callRecoveryBody .pp-bar .table-filter-row{margin:0}
+#callRecoveryBody .pp-bar .gap-edit-btn{min-height:0;padding:7px 12px;font-size:12.5px;white-space:nowrap}
+#callRecoveryBody .pp-bar em{font-style:normal;opacity:.7;margin-left:4px}
+#callRecoveryBody .pp-how{border:1px solid var(--card-line);border-radius:12px;padding:0 12px;margin:0 0 8px;background:rgba(255,255,255,.03)}
+#callRecoveryBody .pp-how summary{padding:8px 0;font-size:12.5px;font-weight:800;color:var(--cyan);cursor:pointer;list-style:none;display:flex;justify-content:space-between}
+#callRecoveryBody .pp-how summary::-webkit-details-marker{display:none}
+#callRecoveryBody .pp-how summary::after{content:'\203A'}
+#callRecoveryBody .pp-how p{margin:0 0 8px;font-size:12.5px;color:var(--muted)}
+#callRecoveryBody .pp-empty{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--card-line);border-radius:14px;background:var(--bg-2)}
+#callRecoveryBody .pp-empty svg{width:20px;height:20px;flex:0 0 20px;fill:none;stroke:var(--good);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+#callRecoveryBody .pp-empty strong{display:block;font-size:13.5px}
+#callRecoveryBody .pp-empty span{display:block;font-size:12px;color:var(--muted)}
+@media(max-width:360px){#callRecoveryBody .pp-bar .table-filter-row{flex-wrap:nowrap}#callRecoveryBody .pp-bar .table-filter-btn{padding:6px 9px;font-size:11.5px;white-space:nowrap}#callRecoveryBody .pp-bar .gap-edit-btn{padding:7px 9px;font-size:11.5px}}
+@media(max-width:340px){#callRecoveryBody .pp-bar{flex-wrap:wrap}}
+/* fin historial compacto */
