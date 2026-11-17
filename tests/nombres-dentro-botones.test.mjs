@@ -19,3 +19,8 @@ test('con un break o llamada en curso el nombre tambien queda dentro del boton',
   assert.match(block, /is-active[^{]*> \.action-short \{ position: absolute/);
   assert.match(block, /is-active[^{]*> \.action-btn \{ height: 56px/);
 });
+
+test('el nombre del boton activo va en blanco como el cronometro', () => {
+  assert.match(block, /is-active[^{]*> \.action-short \{ color: white; \}/);
+  assert.doesNotMatch(block, /color: inherit/);
+});
