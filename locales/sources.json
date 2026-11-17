@@ -4000,6 +4000,12 @@
       "app.html"
     ]
   },
+  "s_4995d6d2": {
+    "source": "Al terminar",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_4998ac7a": {
     "source": "Guardado en la nube",
     "files": [
@@ -7344,6 +7350,12 @@
     "source": "Navega entre ciclos con las flechas dentro de Reportes.",
     "files": [
       "app.html"
+    ]
+  },
+  "s_87e00fdf": {
+    "source": "Expandir bloques",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_87e672c3": {
@@ -13176,6 +13188,13 @@
     "source": "Elige cuánto ajustar el turno antes de aplicar.",
     "files": [
       "js/schedule.js"
+    ]
+  },
+  "s_eee7fe1a": {
+    "source": "Contraer bloques",
+    "files": [
+      "app.html",
+      "js/app-main.js"
     ]
   },
   "s_ef06ae98": {

@@ -2260,3 +2260,30 @@ html:root[data-palette]:not([data-palette="original"]) .hbc-slide[data-accent="c
 }
 @media (min-width: 761px) and (max-width: 959px) { .chips > .hero-shift-actions > .hbc { left: 16px; right: 16px; } }
 /* fin tarjeta de bloques en inicio */
+
+/* contraer capsula */
+/* Cápsula "Contraer bloques | Al terminar": una sola pieza partida en dos mitades. */
+.cb-pill { display: inline-flex; align-items: stretch; flex: none; height: 25px; box-sizing: border-box; overflow: hidden; border: 1px solid var(--line); border-radius: 999px; background: rgba(255, 255, 255, .03); font-size: 10.5px; font-weight: 700; white-space: nowrap; }
+.cb-seg { display: inline-flex; align-items: center; gap: 6px; padding: 0 10px; border: 0; background: transparent; color: var(--muted); font-family: inherit; font-size: inherit; font-weight: inherit; line-height: 1; cursor: pointer; transition: color .14s ease, background .14s ease; }
+.cb-seg + .cb-seg { border-left: 1px solid var(--line); }
+.cb-seg:hover, .cb-seg:focus-visible { color: var(--text); outline: none; }
+.cb-seg:focus-visible { box-shadow: inset 0 0 0 2px var(--cyan); }
+.cb-seg .ic-svg { width: 12px; height: 12px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform .2s ease; }
+.cb-seg-all.is-expand .ic-svg { transform: rotate(180deg); }
+.cb-switch { position: relative; width: 20px; height: 11px; flex: none; border-radius: 999px; background: var(--line-2); transition: background .14s ease; }
+.cb-switch i { position: absolute; top: 1.5px; left: 2px; width: 8px; height: 8px; border-radius: 50%; background: var(--text); transition: transform .14s ease, background .14s ease; }
+.cb-seg-auto[aria-pressed="true"] { color: var(--cyan); background: rgba(var(--cyan-rgb), .1); }
+.cb-seg-auto[aria-pressed="true"] .cb-switch { background: var(--cyan); }
+.cb-seg-auto[aria-pressed="true"] .cb-switch i { background: var(--bg); transform: translateX(8px); }
+:root.theme-light .cb-pill { background: var(--surface-sunken); }
+/* Escritorio: la cápsula va en la línea de Freelancer, a su derecha; la fila de arriba de la lista ya no se usa. */
+#scheduleAccordion .sched-quick-row .cb-pill { margin-left: 14px; }
+#scheduleAccordion.is-calls-view .sched-quick-row .cb-pill { display: none; }
+#scheduleAccordion.sched-freelancer-list .cb-pill { display: none; }
+@media (min-width: 761px) { #scheduleAccordion .blocks-footer-row { display: none; } }
+/* Celular: arriba de la lista, a la derecha. */
+@media (max-width: 760px) {
+  #scheduleAccordion .blocks-footer-row { display: flex; justify-content: flex-end; margin: -2px 0 6px; }
+}
+@media (prefers-reduced-motion: reduce) { .cb-seg .ic-svg, .cb-switch, .cb-switch i { transition: none; } }
+/* fin contraer capsula */
