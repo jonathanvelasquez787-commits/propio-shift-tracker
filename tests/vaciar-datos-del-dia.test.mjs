@@ -16,6 +16,5 @@ test('vaciar datos del dia: el boton cambia de nombre y conserva su estilo', () 
 
 test('vaciar datos del dia: abre el mismo selector que Reiniciar dia para elegir que borrar', () => {
   assert.match(main, /getElementById\('clearDayCallsBtn'\)\.addEventListener\('click', resetDay\)/);
-  assert.match(main, /getElementById\('resetDayBtn'\)\.addEventListener\('click', resetDay\)/);
   assert.doesNotMatch(main, /addEventListener\('click', clearActiveDayCalls\)/);
 });

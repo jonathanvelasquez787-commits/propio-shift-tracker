@@ -1283,6 +1283,13 @@
           ]
         },
         {
+          "file": "tests/reiniciar-en-ajustes.test.mjs",
+          "namedCases": [
+            "Reiniciar en Ajustes: Borrar todos los datos vive al final de la pestaña Datos",
+            "Reiniciar en Ajustes: ya no existen el botón rojo de la barra ni la ventana Reiniciar"
+          ]
+        },
+        {
           "file": "tests/vaciar-datos-del-dia.test.mjs",
           "namedCases": [
             "vaciar datos del dia: el boton cambia de nombre y conserva su estilo",

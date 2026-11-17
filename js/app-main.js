@@ -4552,7 +4552,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
 
         render();
         toast(translateText(eraseCalls && eraseSchedule && eraseProfile ? 'Todos los datos fueron borrados' : 'Los datos elegidos fueron borrados'));
-        closeModal('resetModal');
+        closeModal('goalsModal');
         // El popup de bienvenida solo vuelve si se borró el perfil.
         if (!eraseProfile) return true;
 
@@ -7052,7 +7052,6 @@ export function render() {
       [...openModalStack].reverse().forEach(closeModal);
       closeModal('goalsModal');
       closeModal('callsModal');
-      closeModal('resetModal');
       closeModal('gapModal');
       closeModal('dayNoteModal');
       closeModal('callEditModal');
@@ -7762,12 +7761,6 @@ export function render() {
       else endCall();
     });
     document.getElementById('callsStatusEndBtn').addEventListener('click', discardActiveCall);
-    document.getElementById('resetHeaderBtn').addEventListener('click', () => {
-      const label = document.getElementById('resetDayLabel');
-      if (label) label.textContent = formatCallDayLabel(getActiveDayKey());
-      openModal('resetModal');
-    });
-    document.getElementById('resetDayBtn').addEventListener('click', resetDay);
     document.getElementById('eraseAllDataBtn').addEventListener('click', eraseAllData);
     document.getElementById('snapshotRecoveryBtn').addEventListener('click', () => useSnapshotTools('openSnapshotRecovery'));
     document.getElementById('ajustesHeaderBtn').addEventListener('click', openSettingsModal);

@@ -64,7 +64,7 @@ test('confirmed full reset writes an empty snapshot without mistaking its own ch
   assert.equal(h.run('localStorageRevision.isCurrent()'), true);
   assert.equal(getLocalPersistenceFailure(), null);
   assert.deepEqual(h.opened, ['onboardingModal']);
-  assert.deepEqual(h.closed, ['resetModal']);
+  assert.deepEqual(h.closed, ['goalsModal']);
   assert.ok(h.warnings.includes(translateText('Todos los datos fueron borrados')));
 });
 

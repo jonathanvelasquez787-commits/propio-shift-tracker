@@ -130,12 +130,6 @@
       "js/reports.js"
     ]
   },
-  "s_025a86cd": {
-    "source": "Reiniciar",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_029c5a3e": {
     "source": "Iniciar o terminar tu turno",
     "files": [
@@ -349,12 +343,6 @@
     "source": "El final de Propio se calcula con los minutos de su historial.",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_062e5a32": {
-    "source": "). Tu horario, metas y el resto de tus días no se tocan.",
-    "files": [
-      "app.html"
     ]
   },
   "s_0630d295": {
@@ -856,12 +844,6 @@
     "source": "Aprovechaste Higher Rate · bono de {bonus}",
     "files": [
       "js/reinforcement-feedback.js"
-    ]
-  },
-  "s_0eee0e3b": {
-    "source": "Borra llamadas, pausas, huecos, la nota y el log SOLO del día activo (",
-    "files": [
-      "app.html"
     ]
   },
   "s_0f078100": {
@@ -6001,7 +5983,6 @@
   "s_6ff9d9f7": {
     "source": "Reiniciar día",
     "files": [
-      "app.html",
       "js/backup-recovery.js"
     ]
   },
@@ -6483,12 +6464,6 @@
   },
   "s_78af0ee0": {
     "source": "Guarda la evidencia",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_78af8000": {
-    "source": "Revisá el alcance antes de confirmar. Conservamos una copia previa en este navegador.",
     "files": [
       "app.html"
     ]
@@ -12053,12 +12028,6 @@
   },
   "s_dc3f8cfe": {
     "source": "Reutilización del gasto",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_dc49ad5d": {
-    "source": "Reiniciar día activo",
     "files": [
       "app.html"
     ]
