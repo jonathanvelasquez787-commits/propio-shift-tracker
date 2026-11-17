@@ -2335,3 +2335,9 @@ html:root[data-palette]:not([data-palette="original"]) .hbc-slide[data-accent="c
 :root:not(.theme-light) #breakControlBtn.is-active { --accent: var(--break-active); --accent-rgb: var(--break-active-rgb); }
 :root:not(.theme-light) #lunchControlBtn.is-active { --accent: var(--lunch-active); --accent-rgb: var(--lunch-active-rgb); }
 /* fin break y lunch activos mismos colores en oscuro */
+/* botones misma altura que la pildora */
+@media (min-width: 1180px) {
+  .chips > .hero-shift-actions .action-slot > :is(#shiftControlBtn,#breakControlBtn,#lunchControlBtn,#callControlBtn,#pasteCallsBtn,#addCallManualBtn).action-btn { height: 62px !important; min-height: 62px !important; padding-top: 12px !important; }
+  .chips > .hero-shift-actions .action-slot:not([data-slot="discard"]) > .action-short { bottom: 9px !important; }
+}
+/* fin botones misma altura que la pildora */

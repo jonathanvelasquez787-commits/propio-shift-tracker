@@ -82,3 +82,14 @@ test('break y lunch activos en oscuro usan los mismos colores que en tema claro'
   assert.match(b6, /:root:not\(\.theme-light\) #lunchControlBtn\.is-active \{ --accent: var\(--lunch-active\); --accent-rgb: var\(--lunch-active-rgb\); \}/);
   assert.doesNotMatch(b6, /#[0-9a-fA-F]{3,8}\b/);
 });
+
+test('los botones miden 62 px de alto como la pildora solo desde 1180 px', () => {
+  const s7 = css.indexOf('/* botones misma altura que la pildora */');
+  const e7 = css.indexOf('/* fin botones misma altura que la pildora */');
+  assert.ok(s7 > 0 && e7 > s7);
+  const b7 = css.slice(s7, e7);
+  assert.match(b7, /@media \(min-width: 1180px\)/);
+  assert.match(b7, /height: 62px !important; min-height: 62px !important;/);
+  assert.match(b7, /:not\(\[data-slot="discard"\]\) > \.action-short \{ bottom: 9px !important; \}/);
+  assert.doesNotMatch(b7, /#[0-9a-fA-F]{3,8}\b/);
+});
