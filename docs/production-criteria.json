@@ -1229,6 +1229,16 @@
           ]
         },
         {
+          "file": "tests/aviso-interruptor.test.mjs",
+          "namedCases": [
+            "aviso interruptor: viene encendido por defecto y se puede apagar",
+            "aviso interruptor: apagado no avisa aunque pase el tiempo",
+            "aviso interruptor: vive dentro del summary, antes de la flecha, con nombre accesible",
+            "aviso interruptor: tocarlo no abre ni cierra el acordeon y se guarda al instante",
+            "aviso interruptor: el CSS atenua lo de abajo, oculta la palabra en celular y no usa colores fijos"
+          ]
+        },
+        {
           "file": "tests/vaciar-datos-del-dia.test.mjs",
           "namedCases": [
             "vaciar datos del dia: el boton cambia de nombre y conserva su estilo",
