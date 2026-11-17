@@ -2093,3 +2093,29 @@ details.gh-fold > summary:focus-visible { outline: 2px solid var(--cyan); outlin
   #notificationsModal #positiveSettingsAccordion .inactivity-switch-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 }
 /* fin aviso interruptor */
+
+/* revisar horario */
+#confirmModal .sched-review .rv-top{display:flex!important;flex-wrap:wrap;gap:4px 8px;align-items:center;margin:0 0 10px!important;color:var(--muted);font-size:12.5px}
+#confirmModal .sched-review .rv-top strong{color:var(--text);font-size:13px}
+#confirmModal .sched-review .rv-same{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--card-line);border-radius:14px;background:var(--bg-2);margin:0 0 8px}
+#confirmModal .sched-review .rv-same svg{width:18px;height:18px;flex:0 0 18px;fill:none;stroke:var(--good);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+#confirmModal .sched-review .rv-same span{margin-left:auto;color:var(--text);font-weight:800;font-size:15px;white-space:nowrap}
+#confirmModal .sched-review .rv-same strong{font-size:13px;color:var(--muted);font-weight:700}
+#confirmModal .sched-review .rv-diff{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--card-line);border-radius:14px;background:var(--bg-2);margin:0 0 8px}
+#confirmModal .sched-review .rv-diff small{display:block;color:var(--muted);font-size:11.5px}
+#confirmModal .sched-review .rv-diff b{display:block;font-size:14px;white-space:nowrap}
+#confirmModal .sched-review .rv-links{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 8px}
+#confirmModal .sched-review .rv-links details{border:1px solid var(--card-line);border-radius:12px;padding:0 12px;background:rgba(255,255,255,.03);min-width:0}
+#confirmModal .sched-review .rv-links details[open],#confirmModal .sched-review .rv-links .rv-wide{grid-column:1/-1}
+#confirmModal .sched-review .rv-links summary{padding:9px 0;min-height:0;font-size:12.5px;font-weight:800;color:var(--cyan);cursor:pointer;display:flex;justify-content:space-between;align-items:center;list-style:none}
+#confirmModal .sched-review .rv-links summary::-webkit-details-marker{display:none}
+#confirmModal .sched-review .rv-links summary::after{content:'\203A';font-size:16px;line-height:1;transition:transform .15s}
+#confirmModal .sched-review .rv-links details[open] summary::after{transform:rotate(90deg)}
+#confirmModal .sched-review .rv-links .polished-detail{padding:0 0 10px}
+#confirmModal .sched-review .rv-note{border-left:3px solid var(--cyan);border-radius:12px;background:rgba(var(--cyan-rgb),.08);padding:8px 12px;display:grid;gap:3px;font-size:12.5px;color:var(--muted)}
+#confirmModal .sched-review .rv-note strong{color:var(--text);font-size:12.5px}
+#confirmModal .sched-review .rv-note p{margin:0}
+#confirmModal:has(.sched-review) .modal-actions>*{flex:1 1 0!important;min-width:0;justify-content:center;text-align:center}
+@media(max-width:600px){#confirmModal .sched-review .rv-same span{font-size:14px}#confirmModal .sched-review .rv-diff b{font-size:13px}}
+@media(max-width:400px){#confirmModal .sched-review .rv-top>span:first-of-type{display:none}#confirmModal .sched-review .rv-diff{grid-template-columns:minmax(0,1fr);gap:6px}#confirmModal .sched-review .rv-diff>span{display:none}}
+/* fin revisar horario */

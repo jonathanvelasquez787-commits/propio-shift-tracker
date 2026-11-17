@@ -701,6 +701,12 @@
       "app.html"
     ]
   },
+  "s_0c890c8b": {
+    "source": "Llegada tarde:",
+    "files": [
+      "js/shift-work-review.js"
+    ]
+  },
   "s_0c96b244": {
     "source": "Tu perfil",
     "files": [
@@ -1496,7 +1502,8 @@
   "s_1acd3711": {
     "source": "Sin cambios",
     "files": [
-      "js/call-review-view.js"
+      "js/call-review-view.js",
+      "js/shift-work-review.js"
     ]
   },
   "s_1aeb8665": {
@@ -4227,12 +4234,6 @@
       "js/calls.js"
     ]
   },
-  "s_4c78870e": {
-    "source": "Ver bloques en orden",
-    "files": [
-      "js/shift-work-review.js"
-    ]
-  },
   "s_4cccafad": {
     "source": "Reserva liberada. Los pagos registrados se conservan.",
     "files": [
@@ -5536,6 +5537,12 @@
       "js/app-main.js"
     ]
   },
+  "s_6662662c": {
+    "source": "Se repite cada semana",
+    "files": [
+      "js/shift-work-review.js"
+    ]
+  },
   "s_6673e5b4": {
     "source": "+0:00 h",
     "files": [
@@ -5655,12 +5662,6 @@
     "source": "Sin asignar",
     "files": [
       "js/finance.js"
-    ]
-  },
-  "s_6a038413": {
-    "source": "Llegada tarde",
-    "files": [
-      "js/shift-work-review.js"
     ]
   },
   "s_6a159f82": {
@@ -8697,12 +8698,6 @@
       "js/accounting-export.js"
     ]
   },
-  "s_9dbf74d7": {
-    "source": "El final planeado se conserva.",
-    "files": [
-      "js/shift-work-review.js"
-    ]
-  },
   "s_9dd96d18": {
     "source": "Break",
     "files": [
@@ -10597,6 +10592,12 @@
       "index.html"
     ]
   },
+  "s_c089a153": {
+    "source": "Ver bloques",
+    "files": [
+      "js/shift-work-review.js"
+    ]
+  },
   "s_c08ef1c6": {
     "source": "Asignar disponible automáticamente",
     "files": [
@@ -10796,6 +10797,12 @@
     "source": "Agregar:",
     "files": [
       "app.html"
+    ]
+  },
+  "s_c4c00d29": {
+    "source": "Ver por día",
+    "files": [
+      "js/shift-work-review.js"
     ]
   },
   "s_c51ade12": {
@@ -11666,6 +11673,12 @@
     "source": "La tarifa calcula nuevas estimaciones y tu meta general. Conserva pagos guardados, bonos y metas especiales.",
     "files": [
       "app.html"
+    ]
+  },
+  "s_d5014a37": {
+    "source": "el final planeado se conserva.",
+    "files": [
+      "js/shift-work-review.js"
     ]
   },
   "s_d527f76e": {
@@ -12570,6 +12583,12 @@
       "app.html"
     ]
   },
+  "s_e40c292c": {
+    "source": "a",
+    "files": [
+      "js/shift-work-review.js"
+    ]
+  },
   "s_e412769b": {
     "source": "Quién es",
     "files": [
@@ -12724,12 +12743,6 @@
     "source": "Exportar JSON antes de continuar",
     "files": [
       "js/boot.js"
-    ]
-  },
-  "s_e711cee6": {
-    "source": "Plantilla que se repite cada semana",
-    "files": [
-      "js/shift-work-review.js"
     ]
   },
   "s_e714292a": {
@@ -13953,12 +13966,6 @@
     "source": "Progreso de la reserva",
     "files": [
       "js/finance.js"
-    ]
-  },
-  "s_fb64aaa4": {
-    "source": "Ver antes y después por día",
-    "files": [
-      "js/shift-work-review.js"
     ]
   },
   "s_fb707b6c": {

@@ -77,16 +77,28 @@ export function confirmSchedulePlan(context, plan, change) {
     + (minute>=1440 ? translateText(' (día siguiente)') : '');
   const description = cfg => cfg.off ? translateText('Día libre') : `${time(Number(cfg.start.slice(0,2))*60+Number(cfg.start.slice(3)))} → ${time(Number(cfg.end.slice(0,2))*60+Number(cfg.end.slice(3))+(cfg.end<=cfg.start?1440:0))}`;
   document.getElementById('confirmModalTitle').textContent = translateText('Revisar horario');
-  document.getElementById('confirmModalDetails').className='review-confirm';
+  document.getElementById('confirmModalDetails').className='review-confirm sched-review';
   document.getElementById('confirmModalOkBtn').textContent=plan.draft?translateText('Aplicar al borrador'):translateText('Aplicar horario');
   const sameBefore=days.every(day=>description(day.before)===description(days[0].before));
-  document.getElementById('confirmModalDetails').innerHTML = `<p class="review-scope">${escapeHtml(plan.scope || translateText('Plantilla que se repite cada semana'))}</p>`
-    +`<div class="polished-comparison"><div><span>${escapeHtml(translateText('Antes'))}</span><strong class="polished-time">${escapeHtml(sameBefore&&days.length?description(days[0].before):translateText('Varios horarios'))}</strong></div><span aria-hidden="true">→</span><div><span>${escapeHtml(translateText('Después'))}</span><strong class="polished-time">${escapeHtml(description(plan.config))}</strong></div></div>`
-    +`<div class="polished-days">${days.map(day=>`<span>${escapeHtml(day.label)}</span>`).join('')}</div>`
-    + `<details class="polished-disclosure"><summary>${escapeHtml(translateText('Ver antes y después por día'))}</summary><div class="polished-detail">${days.map(day=>`<div class="review-line"><span>${escapeHtml(day.label)}</span><strong>${escapeHtml(description(day.before))}<br>→ ${escapeHtml(description(plan.config))}</strong></div>`).join('')}</div></details>`
-    + `<details class="polished-disclosure"><summary>${escapeHtml(translateText('Ver bloques en orden'))}</summary><div class="polished-detail">${schedulePreviewRows(plan.config).map(block=>`<div class="review-line"><span>${escapeHtml(context.blockLabel(block.type))}</span><strong>${escapeHtml(time(block.startMin))} → ${escapeHtml(time(block.endMin))}</strong></div>`).join('')}</div></details>`
-    + (plan.shiftLate ? `<details class="polished-disclosure"><summary>${escapeHtml(translateText('Ejemplo: llegada 30 minutos tarde'))}</summary><div class="polished-detail">`+ui`<p class="note">Si llegás 30 minutos tarde, el plan y su final se desplazan 30 minutos.</p>`+schedulePreviewRows(plan.config).map(block=>`<div class="review-line"><span>${escapeHtml(context.blockLabel(block.type))}</span><strong>${escapeHtml(time(block.startMin+30))} → ${escapeHtml(time(block.endMin+30))}</strong></div>`).join('')+'</div></details>' : ui`<div class="polished-impact"><strong>Llegada tarde</strong><span>El final planeado se conserva.</span></div>`)
-    + (plan.draft ? ui`<div class="review-callout">Solo cambia el borrador. Después usá Guardar día.</div>` : ui`<div class="review-callout">Solo cambia el plan; no modifica llamadas ni pausas registradas.</div>`);
+  const afterText=description(plan.config), beforeText=sameBefore&&days.length?description(days[0].before):translateText('Varios horarios');
+  const order=plan.order||[], keys=plan.keys||[], idx=keys.map(key=>order.indexOf(key));
+  const consecutive=days.length>=3&&idx.every((n,i)=>n>=0&&(i===0||n===idx[i-1]+1));
+  const dayNames=consecutive?`${days[0].label} ${translateText('a')} ${days[days.length-1].label}`:days.map(day=>day.label).join(', ');
+  const scope=plan.scope||translateText('Se repite cada semana');
+  const check='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  const compare=sameBefore&&days.length&&beforeText===afterText
+    ? `<div class="rv-same">${check}<strong>${escapeHtml(translateText('Sin cambios'))}</strong><span>${escapeHtml(afterText)}</span></div>`
+    : `<div class="rv-diff"><div><small>${escapeHtml(translateText('Antes'))}</small><b>${escapeHtml(beforeText)}</b></div><span aria-hidden="true">→</span><div><small>${escapeHtml(translateText('Después'))}</small><b>${escapeHtml(afterText)}</b></div></div>`;
+  const dayRows=days.map(day=>`<div class="review-line"><span>${escapeHtml(day.label)}</span><strong>${escapeHtml(description(day.before))}<br>→ ${escapeHtml(afterText)}</strong></div>`).join('');
+  const blockRows=schedulePreviewRows(plan.config).map(block=>`<div class="review-line"><span>${escapeHtml(context.blockLabel(block.type))}</span><strong>${escapeHtml(time(block.startMin))} → ${escapeHtml(time(block.endMin))}</strong></div>`).join('');
+  const lateExample=plan.shiftLate ? `<details class="rv-wide"><summary>${escapeHtml(translateText('Ejemplo: llegada 30 minutos tarde'))}</summary><div class="polished-detail">`+ui`<p class="note">Si llegás 30 minutos tarde, el plan y su final se desplazan 30 minutos.</p>`+schedulePreviewRows(plan.config).map(block=>`<div class="review-line"><span>${escapeHtml(context.blockLabel(block.type))}</span><strong>${escapeHtml(time(block.startMin+30))} → ${escapeHtml(time(block.endMin+30))}</strong></div>`).join('')+'</div></details>' : '';
+  const lateLine=plan.shiftLate ? '' : ui`<div><strong>Llegada tarde:</strong> <span>el final planeado se conserva.</span></div>`;
+  const callout=plan.draft ? ui`<p>Solo cambia el borrador. Después usá Guardar día.</p>` : ui`<p>Solo cambia el plan; no modifica llamadas ni pausas registradas.</p>`;
+  document.getElementById('confirmModalDetails').innerHTML = `<p class="rv-top"><strong>${escapeHtml(dayNames)}</strong><span>·</span><span>${escapeHtml(scope)}</span></p>`
+    + compare
+    + `<div class="rv-links"><details><summary>${escapeHtml(translateText('Ver por día'))}</summary><div class="polished-detail">${dayRows}</div></details>`
+    + `<details><summary>${escapeHtml(translateText('Ver bloques'))}</summary><div class="polished-detail">${blockRows}</div></details>${lateExample}</div>`
+    + `<div class="rv-note">${lateLine}${callout}</div>`;
 }
 
 export function openWorkDayReview(context) {

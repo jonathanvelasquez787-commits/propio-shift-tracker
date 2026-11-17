@@ -37,7 +37,7 @@ export function configureScheduleContext(context) {
         valid: () => settings === owner && (draft || canPersistLocalChanges()) && !(scheduleViewMode === 'week' && scheduleWeekIsPast(scheduleWeekOffset)),
         blockLabel: type => BLOCK_TYPE_LABELS[type] || type },
       { config, scope: scheduleViewMode === 'week' ? document.getElementById('scheduleWeekRangeLabel').textContent : '',
-        keys: dayKeys, labels: WEEKDAY_LABELS, target: activeScheduleTarget(), defaultDay: defaultDaySchedule(true),
+        keys: dayKeys, order: WEEKDAYS, labels: WEEKDAY_LABELS, target: activeScheduleTarget(), defaultDay: defaultDaySchedule(true),
         shiftLate: document.getElementById('lateArrivalModeInput')?.value === 'shift', draft }, change);
     }
 
