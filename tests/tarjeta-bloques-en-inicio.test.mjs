@@ -111,3 +111,19 @@ test('pildora en curso: con un break, lunch o llamada en curso no sale el horari
   assert.match(block, /\.hbc:is\(\.is-peek,:hover\) \.hbc-prog \{ display: flex !important; \}/);
   assert.match(block, /\.hbc-track i \{ background: white !important; \}/);
 });
+
+test('pildora junto al boton: a la par de su boton, con nombre, cronometro, horario y barra, del mismo alto que los botones', () => {
+  const start = css.indexOf('/* pildora junto al boton */');
+  const end = css.indexOf('/* fin pildora junto al boton */');
+  assert.ok(start > 0 && end > start, 'faltan los marcadores del bloque CSS');
+  const block = css.slice(start, end);
+  assert.match(block, /\[data-live-type="break"\] > \.hbc \{ order: 21;/);
+  assert.match(block, /\[data-live-type="lunch"\] > \.hbc \{ order: 31;/);
+  assert.match(block, /\.is-swapped\[data-live-type="break"\] > \.hbc \{ order: 61; \}/);
+  assert.match(block, /\.is-swapped\[data-live-type="lunch"\] > \.hbc \{ order: 71; \}/);
+  assert.match(block, /width: 112px;[^}]*height: 34px;/);
+  assert.doesNotMatch(block, /#[0-9a-fA-F]{3,8}\b/);
+  assert.match(main, /hbc-live-r1/);
+  assert.match(main, /hbc-live-r2/);
+  assert.match(main, /hbc-live-bar/);
+});
