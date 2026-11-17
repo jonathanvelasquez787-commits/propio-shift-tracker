@@ -2180,3 +2180,83 @@ details.gh-fold > summary:focus-visible { outline: 2px solid var(--cyan); outlin
   padding-right: .12em;
 }
 /* fin dinero dorado al llegar a la meta */
+
+/* tarjeta de bloques en inicio */
+/* La tarjeta de Shift / Break / Lunch vive dentro de la barra de acciones, a la derecha. Muestra el bloque en curso; al tocarla sube y entra el siguiente. */
+.chips > .hero-shift-actions > .hbc { order: 99; position: relative; align-self: center; flex: 0 0 300px; width: 300px; height: 62px; margin-left: auto; box-sizing: border-box; border-radius: 14px; overflow: hidden; cursor: pointer; -webkit-tap-highlight-color: transparent; user-select: none; }
+.chips > .hero-shift-actions > .hbc[hidden] { display: none; }
+.hbc:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+.hbc-stack { position: relative; width: 100%; height: 100%; }
+.hbc-slide { --hbc-rgb: var(--cyan-rgb); position: absolute; inset: 0; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; gap: 7px; padding: 9px 12px; border: 1px solid rgb(var(--hbc-rgb)); border-radius: 14px; background: linear-gradient(rgba(var(--hbc-rgb), .09), rgba(var(--hbc-rgb), .09)), var(--bg-2); opacity: 0; transform: translateY(100%); transition: transform .38s cubic-bezier(.22, 1, .36, 1), opacity .38s ease; pointer-events: none; }
+.hbc-slide.is-active { opacity: 1; transform: none; }
+.hbc-slide.is-above { transform: translateY(-100%); }
+.hbc-slide.no-anim { transition: none; }
+.hbc-slide[data-accent="warn"] { --hbc-rgb: var(--warn-rgb); }
+.hbc-slide[data-accent="blue"] { --hbc-rgb: var(--blue-rgb); }
+:root:not(.theme-dark) .hbc-slide[data-accent="cyan"], html.theme-light .hbc-slide[data-accent="cyan"] { --hbc-rgb: var(--accent-blue-2-rgb); }
+html:root[data-palette]:not([data-palette="original"]) .hbc-slide[data-accent="cyan"] { --hbc-rgb: var(--palette-primary-rgb); }
+.hbc-top { display: flex; align-items: center; gap: 7px; min-width: 0; font-size: 13px; color: var(--text); }
+.hbc-ic { display: inline-flex; flex: none; color: rgb(var(--hbc-rgb)); }
+.hbc-ic .ic-svg { width: 14px; height: 14px; color: rgb(var(--hbc-rgb)); stroke: rgb(var(--hbc-rgb)); }
+.hbc-name { font-weight: 800; }
+.hbc-range { min-width: 0; overflow: hidden; color: var(--muted); font-size: 11.5px; text-overflow: ellipsis; white-space: nowrap; }
+.hbc-dots { display: flex; flex: none; gap: 4px; margin-left: auto; }
+.hbc-dots i { width: 6px; height: 6px; border-radius: 999px; background: var(--line-2); }
+.hbc-dots i.on { width: 14px; background: rgb(var(--hbc-rgb)); }
+.hbc-bottom { min-width: 0; }
+.hbc-prog { display: flex; align-items: center; gap: 8px; }
+.hbc-track { flex: 1; height: 6px; overflow: hidden; border-radius: 999px; background: var(--line-2); }
+.hbc-track i { display: block; height: 100%; border-radius: 999px; background: rgb(var(--hbc-rgb)); }
+html:root[data-palette]:not([data-palette="original"]) .hbc-slide[data-accent="cyan"] .hbc-track i { background: var(--palette-primary); }
+.hbc-pct { color: rgb(var(--hbc-rgb)); font-size: 11.5px; font-variant-numeric: tabular-nums; font-weight: 800; }
+.hbc-peek { display: none; }
+.hbc-note { overflow: hidden; color: var(--muted); font-size: 11.5px; text-overflow: ellipsis; white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { .hbc-slide { transition: opacity .15s ease; } }
+/* Cabe en la misma fila: escritorio ancho (tarjeta grande) y de 480 px en adelante (tarjeta chica). */
+@media (min-width: 480px) and (max-width: 760px), (min-width: 960px) {
+  .chips > .hero-shift-actions > .hero-shift-sep { margin: 0 8px 0 4px; }
+  .chips > .hero-shift-actions .action-slot[data-slot="shift"], .chips > .hero-shift-actions.is-swapped .action-slot[data-slot="shift"] { margin-left: 0; }
+  .chips > .hero-shift-actions .action-slot[data-slot="add"], .chips > .hero-shift-actions.is-swapped .action-slot[data-slot="lunch"] { margin-right: 0; }
+  .chips > .hero-shift-actions.is-swapped .action-slot[data-slot="call"] { margin-left: 0; }
+}
+@media (min-width: 480px) and (max-width: 760px) { .chips > .hero-shift-actions > .hero-shift-sep { margin: 0 2px 0 0; } }
+@media (min-width: 761px) { .chips > .hero-shift-actions { gap: 12px; } }
+/* Tarjeta chica: sin horario a la vista; se ve al pasar el mouse o unos segundos despues de tocarla. */
+@media (max-width: 1179px) {
+  .chips > .hero-shift-actions > .hbc { flex: 1 1 104px; min-width: 104px; max-width: 240px; width: auto; height: 34px; }
+  .hbc-slide { gap: 4px; padding: 4px 8px; }
+  .hbc-top { gap: 5px; font-size: 12px; }
+  .hbc-ic .ic-svg { width: 11px; height: 11px; }
+  .hbc-range { display: none; }
+  .hbc-track { height: 5px; }
+  .hbc-pct { font-size: 11px; }
+  .hbc-peek { margin-inline: -3px; overflow: hidden; color: var(--muted); font-size: 9.5px; letter-spacing: -.02em; line-height: 1; text-overflow: ellipsis; white-space: nowrap; }
+  .hbc.is-peek .hbc-prog { display: none; }
+  .hbc.is-peek .hbc-peek { display: block; }
+}
+@media (max-width: 1179px) and (hover: hover) {
+  .hbc:hover .hbc-prog { display: none; }
+  .hbc:hover .hbc-peek { display: block; }
+}
+@media (min-width: 761px) and (max-width: 1179px) {
+  .chips > .hero-shift-actions > .hbc { height: 46px; }
+  .hbc-slide { gap: 6px; padding: 6px 10px; }
+}
+/* Con un Break, Lunch o llamada en curso la barra se llena (aparece el cronometro y la X): en escritorio ancho la tarjeta se achica un poco y en la fila angosta se esconde mientras dura. */
+@media (min-width: 1180px) { .chips > .hero-shift-actions > .hbc { flex: 0 1 300px; min-width: 220px; } }
+@media (min-width: 480px) and (max-width: 760px), (min-width: 960px) and (max-width: 1179px) { .chips > .hero-shift-actions[data-live-type] > .hbc { display: none; } }
+/* No cabe en la fila (celular angosto o ventana de 761 a 959 px): baja a una fila propia con todo a la vista. */
+@media (max-width: 479px), (min-width: 761px) and (max-width: 959px) {
+  .chips > .hero-shift-actions { position: relative; padding-bottom: 64px; }
+  .chips > .hero-shift-actions > .hbc { position: absolute; left: 10px; right: 10px; bottom: 6px; flex: none; width: auto; min-width: 0; max-width: none; height: 54px; margin: 0; }
+  .hbc-slide { gap: 7px; padding: 8px 12px; }
+  .hbc-top { gap: 7px; font-size: 13px; }
+  .hbc-ic .ic-svg { width: 14px; height: 14px; }
+  .hbc-range { display: inline; }
+  .hbc-track { height: 6px; }
+  .hbc-pct { font-size: 11.5px; }
+  .hbc.is-peek .hbc-prog, .hbc:hover .hbc-prog { display: flex; }
+  .hbc.is-peek .hbc-peek, .hbc:hover .hbc-peek { display: none; }
+}
+@media (min-width: 761px) and (max-width: 959px) { .chips > .hero-shift-actions > .hbc { left: 16px; right: 16px; } }
+/* fin tarjeta de bloques en inicio */

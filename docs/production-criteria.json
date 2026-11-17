@@ -1338,7 +1338,16 @@
         {
           "file": "tests/tarjetas-en-llamadas.test.mjs",
           "namedCases": [
-            "tarjetas en llamadas: Shift, Break y Lunch quedan fuera de la vista Bloques para verse tambien en Llamadas"
+            "tarjetas en llamadas: Shift, Break y Lunch viven en la barra de acciones, fuera de Bloques y de Llamadas, y se ven siempre"
+          ]
+        },
+        {
+          "file": "tests/tarjeta-bloques-en-inicio.test.mjs",
+          "namedCases": [
+            "tarjeta de bloques: vive dentro de la barra de acciones y ya no hay tarjetas en Bloques del dia",
+            "tarjeta de bloques: estilos en un bloque propio, sin colores fijos y con los anchos acordados",
+            "tarjeta de bloques: al tocarla pasa a la siguiente, da la vuelta y vuelve a la actual",
+            "tarjeta de bloques: la actual es Shift salvo que haya un Break o Lunch en curso"
           ]
         },
         {
