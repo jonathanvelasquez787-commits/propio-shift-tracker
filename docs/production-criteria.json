@@ -1370,7 +1370,8 @@
             "los botones activos de llamada, break y lunch miden 120 px solo en escritorio",
             "en tema claro los nombres inactivos van en negro y los iconos activos en blanco",
             "en tema oscuro los textos e iconos de los botones activos van en blanco con cualquier paleta",
-            "break y lunch activos en oscuro usan los mismos colores que en tema claro"
+            "break y lunch activos en oscuro usan los mismos colores que en tema claro",
+            "los botones miden 62 px de alto como la pildora solo desde 1180 px"
           ]
         },
         {
