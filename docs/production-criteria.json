@@ -1239,6 +1239,14 @@
           ]
         },
         {
+          "file": "tests/revisar-horario-compacto.test.mjs",
+          "namedCases": [
+            "revisar horario compacto: sin cambios muestra una sola fila rv-same",
+            "revisar horario compacto: si cambia muestra Antes y Después en rv-diff",
+            "revisar horario compacto: el CSS cuida solo este pop up y no usa colores fijos"
+          ]
+        },
+        {
           "file": "tests/vaciar-datos-del-dia.test.mjs",
           "namedCases": [
             "vaciar datos del dia: el boton cambia de nombre y conserva su estilo",
