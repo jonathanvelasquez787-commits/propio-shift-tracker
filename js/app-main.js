@@ -3530,6 +3530,8 @@ function applyBlocksViewMode() {
       btn.classList.toggle('active', btn.getAttribute('data-blocks-view') === mode);
     });
   }
+  const sched = document.getElementById('scheduleAccordion');
+  if (sched && sched.classList && typeof sched.classList.toggle === 'function') sched.classList.toggle('is-calls-view', mode === 'calls');
   if (blocksView) blocksView.style.display = mode === 'blocks' ? '' : 'none';
   if (callsView) callsView.style.display = mode === 'calls' ? '' : 'none';
 }
@@ -6656,6 +6658,35 @@ function renderBlockSummaryStrip(cards) {
   }
 }
 
+// Cápsula "Contraer bloques | Al terminar" (Bloques del día).
+// "Contraer bloques" contrae o expande TODOS los bloques ahora (solo en memoria, no se guarda);
+// "Al terminar" es el ajuste de siempre (settings.collapseCompletedBlocks).
+let blocksManualCollapse = null;
+let blocksAllCollapsed = false;
+const BLOCKS_CAPSULE_WIDE_QUERY = '(min-width: 761px)';
+
+function syncCollapseAllBlocksUI() {
+  const btn = document.getElementById('collapseAllBlocksBtn');
+  if (!btn) return;
+  const label = document.getElementById('collapseAllBlocksLabel');
+  if (label) label.textContent = blocksAllCollapsed ? translateText('Expandir bloques') : translateText('Contraer bloques');
+  if (btn.classList && typeof btn.classList.toggle === 'function') btn.classList.toggle('is-expand', blocksAllCollapsed);
+}
+
+function toggleCollapseAllBlocks() {
+  blocksManualCollapse = blocksAllCollapsed ? 'expanded' : 'collapsed';
+  renderSchedule();
+}
+
+// En escritorio la cápsula va en la línea de Freelancer; en celular, arriba de la lista de bloques.
+function placeBlocksCapsule() {
+  const capsule = document.getElementById('blocksCapsule');
+  if (!capsule || typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
+  const wide = window.matchMedia(BLOCKS_CAPSULE_WIDE_QUERY).matches;
+  const target = wide ? document.querySelector('#scheduleAccordion .sched-quick-row') : document.querySelector('#blocksView .blocks-footer-row');
+  if (target && capsule.parentElement !== target) target.appendChild(capsule);
+}
+
 function renderSchedule() {
       const dayKey = getActiveDayKey();
       const dayCalls = callsForDay(dayKey);
@@ -6747,6 +6778,9 @@ function renderSchedule() {
       const lunchBlockTimes = [];
 
       const blockGaps = dayGapRows(dayKey, dayCalls);
+      let collapsedCardCount = 0;
+      // typeof: las pruebas con documento falso cortan esta funcion sin las variables del modulo.
+      const manualCollapseMode = typeof blocksManualCollapse === 'undefined' ? null : blocksManualCollapse;
       const slotRows = plannedSlots.map((slot, slotIdx) => {
         const extendStart = slotIdx === firstWorkIndex ? shiftStart : null;
         const extendEnd = slotIdx === lastWorkIndex ? shiftEnd : null;
@@ -6875,7 +6909,8 @@ function renderSchedule() {
         } else {
           sblkPct = isFutureDay ? 0 : 100;
         }
-        const isCollapsed = !!settings.collapseCompletedBlocks && done;
+        const isCollapsed = manualCollapseMode === 'collapsed' ? true : manualCollapseMode === 'expanded' ? false : (!!settings.collapseCompletedBlocks && done);
+        if (isCollapsed) collapsedCardCount += 1;
 
         return ui`
           <div class="sblk-item" data-block-type="${slot.type.toLowerCase()}">
@@ -6921,6 +6956,10 @@ function renderSchedule() {
         parts.filter(Boolean).forEach(text => { const span = document.createElement('span'); span.textContent = text; line.appendChild(span); });
         titles.appendChild(line);
       });
+      if (typeof syncCollapseAllBlocksUI === 'function') {
+        blocksAllCollapsed = slotRows.length > 0 && collapsedCardCount === slotRows.length;
+        syncCollapseAllBlocksUI();
+      }
 
       const summaryCards = [];
 
@@ -7335,6 +7374,7 @@ export function render() {
     // Mismo patrón que toggleSidebarPin/applySidebarPinnedState arriba.
     function toggleCollapseCompletedBlocks() {
       settings.collapseCompletedBlocks = !settings.collapseCompletedBlocks;
+      blocksManualCollapse = null;
       saveSettingsOnly();
       syncCollapseCompletedBlocksUI();
       renderSchedule();
@@ -8383,6 +8423,16 @@ export function render() {
     const collapseCompletedBlocksBtn = document.getElementById('collapseCompletedBlocksBtn');
     if (collapseCompletedBlocksBtn) collapseCompletedBlocksBtn.addEventListener('click', toggleCollapseCompletedBlocks);
     syncCollapseCompletedBlocksUI();
+    // Cápsula "Contraer bloques | Al terminar": el clic dentro del summary no debe plegar el acordeón.
+    const collapseAllBlocksBtn = document.getElementById('collapseAllBlocksBtn');
+    if (collapseAllBlocksBtn) collapseAllBlocksBtn.addEventListener('click', toggleCollapseAllBlocks);
+    const blocksCapsule = document.getElementById('blocksCapsule');
+    if (blocksCapsule) blocksCapsule.addEventListener('click', (e) => e.preventDefault());
+    placeBlocksCapsule();
+    if (typeof window.matchMedia === 'function') {
+      const blocksCapsuleMq = window.matchMedia(BLOCKS_CAPSULE_WIDE_QUERY);
+      if (typeof blocksCapsuleMq.addEventListener === 'function') blocksCapsuleMq.addEventListener('change', placeBlocksCapsule);
+    }
 
     // El enfoque anterior (agregar la clase `.is-pressed` y dejar que la transición CSS de siempre
     // la anime) puede chocar con la propia.

@@ -1351,6 +1351,16 @@
           ]
         },
         {
+          "file": "tests/contraer-capsula.test.mjs",
+          "namedCases": [
+            "contraer capsula: una sola capsula con dos mitades y el interruptor de siempre conserva su id",
+            "contraer capsula: estilos propios sin colores fijos, 25 px de alto y lugar en la linea de Freelancer",
+            "contraer capsula: el clic dentro del summary no pliega el acordeon y se coloca segun el ancho",
+            "contraer capsula: el boton contrae todo y, con todo contraido, pasa a Expandir bloques",
+            "contraer capsula: el interruptor Al terminar sigue guardando el ajuste y suelta el modo manual"
+          ]
+        },
+        {
           "file": "tests/freelancer-abre-llamadas.test.mjs",
           "namedCases": [
             "al activar el modo freelancer se abre la vista Llamadas",

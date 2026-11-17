@@ -372,11 +372,9 @@
     <span class="slot-status bad live-exception" id="adherenceLiveBadge" style="display:none;"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12" y2="17.01"/></svg> Fuera de adherencia ahora</span>
   </div>
   <div class="blocks-footer-row">
-  <div class="sblk-collapse-row">
-    <button class="sblk-collapse-toggle" id="collapseCompletedBlocksBtn" type="button" aria-pressed="false">
-      <span class="sblk-collapse-check" aria-hidden="true">✓</span>
-      <span>Contraer bloques al terminar</span>
-    </button>
+  <div class="cb-pill" id="blocksCapsule" role="group" aria-label="Contraer bloques">
+    <button class="cb-seg cb-seg-all" id="collapseAllBlocksBtn" type="button"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 20 5-5 5 5"/><path d="m7 4 5 5 5-5"/></svg><span id="collapseAllBlocksLabel">Contraer bloques</span></button>
+    <button class="cb-seg cb-seg-auto" id="collapseCompletedBlocksBtn" type="button" aria-pressed="false" aria-label="Contraer bloques al terminar"><span class="cb-switch" aria-hidden="true"><i></i></span><span>Al terminar</span></button>
   </div>
   </div>
   <div class="schedule sblk-timeline" id="scheduleList"></div>
