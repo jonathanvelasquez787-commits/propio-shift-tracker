@@ -2294,8 +2294,9 @@ html:root[data-palette]:not([data-palette="original"]) .hbc-slide[data-accent="c
   .chips > .hero-shift-actions .action-slot > :is(#shiftControlBtn,#pasteCallsBtn,#addCallManualBtn,#breakControlBtn:not(.is-active),#lunchControlBtn:not(.is-active),#callControlBtn:not(.is-active):not(.is-pending)) { height: 56px; min-height: 56px; align-content: start; padding: 9px 6px 0; }
   .chips > .hero-shift-actions .action-slot > .action-short { position: absolute; left: 0; right: 0; bottom: 7px; pointer-events: none; font-size: 11px; color: var(--text); }
   .chips > .hero-shift-actions .action-slot:has(> .action-btn:disabled) > .action-short { opacity: .55; }
-  .chips > .hero-shift-actions .action-slot[data-slot="discard"] > .action-short,
-  .chips > .hero-shift-actions .action-slot:has(> :is(#breakControlBtn,#lunchControlBtn,#callControlBtn).is-active, > #callControlBtn.is-pending) > .action-short { position: static; pointer-events: auto; }
+  .chips > .hero-shift-actions .action-slot[data-slot="discard"] > .action-short { position: static; pointer-events: auto; }
   .chips > .hero-shift-actions .action-slot:has(> #shiftControlBtn.is-active) > .action-short { color: white; }
+  .chips > .hero-shift-actions .action-slot:has(> :is(#breakControlBtn,#lunchControlBtn,#callControlBtn).is-active, > #callControlBtn.is-pending) > .action-btn { height: 56px; min-height: 56px; align-content: start; padding: 7px 10px 0 6px; }
+  .chips > .hero-shift-actions .action-slot:has(> :is(#breakControlBtn,#lunchControlBtn,#callControlBtn).is-active, > #callControlBtn.is-pending) > .action-short { position: absolute; color: inherit; }
 }
 /* fin nombres dentro de botones */
