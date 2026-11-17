@@ -7,7 +7,7 @@ const a = css.indexOf('/* capsula sube junta */');
 const b = css.indexOf('/* fin capsula sube junta */');
 const block = css.slice(a, b);
 
-test('capsula sube junta: boton, pildora y Descartar suben 2 px juntos con Break, Lunch y Llamada', () => {
+test('capsula sube junta: boton y pildora suben 2 px juntos con Break, Lunch y Llamada y Descartar se queda quieto', () => {
   assert.ok(a >= 0 && b > a);
   for (const type of ['break', 'lunch', 'call']) {
     const rules = block.split('\n').filter((line) => line.includes(`data-live-type="${type}"`) && line.includes('translateY(-2px)') || (line.includes(`data-live-type="${type}"`) && line.includes('> .hbc') ));
@@ -15,7 +15,7 @@ test('capsula sube junta: boton, pildora y Descartar suben 2 px juntos con Break
   }
   assert.equal((block.match(/translateY\(-2px\) !important/g) || []).length, 3);
   assert.match(block, /> \.hbc:hover/);
-  assert.match(block, /data-slot="discard"\] > \.action-btn:hover/);
+  assert.doesNotMatch(block, /data-slot="discard"/);
   assert.doesNotMatch(block, /#[0-9a-fA-F]{3,8}\b/);
 });
 

@@ -1361,7 +1361,7 @@
         {
           "file": "tests/capsula-sube-junta.test.mjs",
           "namedCases": [
-            "capsula sube junta: boton, pildora y Descartar suben 2 px juntos con Break, Lunch y Llamada",
+            "capsula sube junta: boton y pildora suben 2 px juntos con Break, Lunch y Llamada y Descartar se queda quieto",
             "capsula sube junta: la Llamada vive en otra caja, por eso su regla no usa el hijo directo"
           ]
         },
