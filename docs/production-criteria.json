@@ -1354,7 +1354,8 @@
             "capsula larga: boton en curso, pildora y Descartar van pegados, rellenos de color, y todos los botones muestran borde blanco al pasar el mouse",
             "sin pildora en reposo: sin Break, Lunch ni Llamada en curso la pildora de bloques no se muestra y la barra no deja hueco",
             "capsula sin repetido: en compu el boton en curso muestra solo el icono y tocar la pildora en curso hace lo mismo que tocar su boton",
-            "pildora icono blanco: con un bloque en curso el icono y los puntitos de la pildora van blancos"
+            "pildora icono blanco: con un bloque en curso el icono y los puntitos de la pildora van blancos",
+            "capsula un solo boton: al tocar la pildora en curso se anima su boton igual que al tocar el boton"
           ]
         },
         {
