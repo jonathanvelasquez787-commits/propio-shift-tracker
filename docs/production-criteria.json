@@ -1347,7 +1347,8 @@
             "tarjeta de bloques: vive dentro de la barra de acciones y ya no hay tarjetas en Bloques del dia",
             "tarjeta de bloques: estilos en un bloque propio, sin colores fijos y con los anchos acordados",
             "tarjeta de bloques: al tocarla pasa a la siguiente, da la vuelta y vuelve a la actual",
-            "tarjeta de bloques: la actual es Shift salvo que haya un Break o Lunch en curso"
+            "tarjeta de bloques: la actual es Shift salvo que haya un Break o Lunch en curso",
+            "en celular, con un break, lunch o llamada en curso la pildora toma el color y el cronometro del boton"
           ]
         },
         {
