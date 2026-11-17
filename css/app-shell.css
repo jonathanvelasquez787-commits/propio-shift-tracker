@@ -2496,3 +2496,11 @@ html:root[data-palette]:not([data-palette="original"]) .hbc-slide[data-accent="c
   .chips > .hero-shift-actions:is([data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-live .hbc-live-r1 { display: flex; align-items: baseline; gap: 8px; font-size: 14px; font-weight: 800; }
 }
 /* fin capsula larga */
+
+/* sin pildora en reposo */
+/* Sin Break, Lunch ni Llamada en curso no se ve la pildora de bloques: solo existe unida a su boton. */
+.chips > .hero-shift-actions:not([data-live-type]) > .hbc { display: none !important; }
+@media (max-width: 479px), (min-width: 761px) and (max-width: 959px) {
+  .chips > .hero-shift-actions:not([data-live-type]) { padding-bottom: 0; }
+}
+/* fin sin pildora en reposo */
