@@ -1367,7 +1367,8 @@
             "con un break o llamada en curso el nombre tambien queda dentro del boton",
             "el nombre del boton activo va en blanco como el cronometro",
             "todos los nombres de la barra van en blanco en escritorio",
-            "los botones activos de llamada, break y lunch miden 120 px solo en escritorio"
+            "los botones activos de llamada, break y lunch miden 120 px solo en escritorio",
+            "en tema claro los nombres inactivos van en negro y los iconos activos en blanco"
           ]
         },
         {

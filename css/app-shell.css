@@ -2313,3 +2313,15 @@ html:root[data-palette]:not([data-palette="original"]) .hbc-slide[data-accent="c
   .chips > .hero-shift-actions .action-slot > :is(#breakControlBtn,#lunchControlBtn,#callControlBtn).is-active, .chips > .hero-shift-actions .action-slot > #callControlBtn.is-pending { width: 100%; }
 }
 /* fin botones activos largos */
+/* tema claro nombres negros e iconos blancos */
+@media (min-width: 761px) {
+  :root.theme-light .chips > .hero-shift-actions .action-slot:not([data-slot="discard"]):not(:has(> :is(#shiftControlBtn.is-active,#breakControlBtn.is-active,#lunchControlBtn.is-active,#callControlBtn.is-active,#callControlBtn.is-pending))) > .action-short { color: var(--text); }
+}
+:root.theme-light .chips > .hero-shift-actions .action-slot:has(> :is(#shiftControlBtn.is-active,#breakControlBtn.is-active,#lunchControlBtn.is-active,#callControlBtn.is-active,#callControlBtn.is-pending)) > .action-btn { color: white; }
+:root.theme-light .chips > .hero-shift-actions .action-slot:has(> :is(#shiftControlBtn.is-active,#breakControlBtn.is-active,#lunchControlBtn.is-active,#callControlBtn.is-active,#callControlBtn.is-pending)) > .action-btn svg { color: white; }
+@media (min-width: 761px) {
+  :root.theme-light .chips > .hero-shift-actions .action-slot:not([data-slot="discard"]):has(> .action-btn:disabled) > .action-short { opacity: 1; }
+}
+:root.theme-light .chips > .hero-shift-actions .action-slot:has(> :is(#breakControlBtn.is-active,#lunchControlBtn.is-active,#callControlBtn.is-active,#callControlBtn.is-pending)) > .action-btn svg, :root.theme-light .chips > .hero-shift-actions .action-slot:has(> :is(#breakControlBtn.is-active,#lunchControlBtn.is-active,#callControlBtn.is-active,#callControlBtn.is-pending)) > .action-btn svg * { stroke: white; }
+:root.theme-light .chips > .hero-shift-actions .action-slot:has(> :is(#shiftControlBtn.is-active,#breakControlBtn.is-active,#lunchControlBtn.is-active,#callControlBtn.is-active,#callControlBtn.is-pending)) > .action-btn .action-ring { border-color: white; }
+/* fin tema claro nombres negros e iconos blancos */
