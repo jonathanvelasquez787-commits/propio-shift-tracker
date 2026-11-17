@@ -2146,3 +2146,11 @@ details.gh-fold > summary:focus-visible { outline: 2px solid var(--cyan); outlin
 #earningsCycleView #cycleTagsRow .table-tags{margin-top:8px;gap:8px}
 #earningsCycleView #cycleGoalCard{margin-top:0}
 /* fin ciclo pildoras abajo */
+
+/* ciclo pildoras tamano hoy */
+#earningsCycleView #cycleTagsRow .gh-info-pill,
+#earningsCycleView #cycleTagsRow .tag{padding:5px 8px;font-size:10.5px;min-height:0}
+#earningsCycleView #cycleTagsRow .gh-info-pill svg{width:12px;height:12px}
+#earningsCycleView #cycleTagsRow .gh-info-row,
+#earningsCycleView #cycleTagsRow .table-tags{gap:6px}
+/* fin ciclo pildoras tamano hoy */
