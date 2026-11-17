@@ -171,3 +171,13 @@ test('capsula sin repetido: en compu el boton en curso muestra solo el icono y t
   assert.match(adv, /liveBtn\.click\(\)/);
   assert.match(adv, /else \{\s*heroBlockCardGo/);
 });
+
+test('pildora icono blanco: con un bloque en curso el icono y los puntitos de la pildora van blancos', () => {
+  const start = css.indexOf('/* pildora icono blanco */');
+  const end = css.indexOf('/* fin pildora icono blanco */');
+  assert.ok(start > 0 && end > start, 'faltan los marcadores del bloque CSS');
+  const block = css.slice(start, end);
+  assert.match(block, /\.hbc-ic \.ic-svg \{ color: white !important; stroke: white !important; \}/);
+  assert.match(block, /\.hbc-dots i \{ background: rgba\(255, 255, 255, \.35\) !important; \}/);
+  assert.match(block, /\.hbc-dots i\.on \{ background: white !important; \}/);
+});

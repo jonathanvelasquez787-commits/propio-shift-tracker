@@ -2515,3 +2515,11 @@ html:root[data-palette]:not([data-palette="original"]) .hbc-slide[data-accent="c
   .chips > .hero-shift-actions[data-live-type] .action-slot:not([data-slot="shift"]):not([data-slot="discard"]) > .action-btn:is(.is-active, .is-pending) .action-sub { display: none !important; }
 }
 /* fin capsula sin repetido */
+
+/* pildora icono blanco */
+/* Con un Break, Lunch o Llamada en curso la pildora va rellena del color del boton: su icono y sus puntitos van blancos (no azules ni amarillos). */
+html:root .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-ic,
+html:root .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-ic .ic-svg { color: white !important; stroke: white !important; }
+html:root .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-dots i { background: rgba(255, 255, 255, .35) !important; }
+html:root .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-dots i.on { background: white !important; }
+/* fin pildora icono blanco */
