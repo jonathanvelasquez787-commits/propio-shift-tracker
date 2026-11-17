@@ -1275,10 +1275,11 @@
           ]
         },
         {
-          "file": "tests/ciclo-dinero-dorado.test.mjs",
+          "file": "tests/dinero-dorado-meta.test.mjs",
           "namedCases": [
-            "Ciclo: el dinero del ciclo se pinta con un dorado metálico y no con el verde",
-            "Ciclo: el dorado tiene colores para el tema oscuro y para el claro"
+            "Dinero dorado: solo se pinta dorado con la clase is-goal-met, en Hoy y en Ciclo",
+            "Dinero dorado: la app pone is-goal-met solo al llegar a la meta del día y a la del ciclo",
+            "Dinero dorado: el dorado tiene colores para el tema oscuro y para el claro"
           ]
         },
         {
