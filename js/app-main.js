@@ -3510,7 +3510,7 @@ function setEarningsViewMode(mode, { persist = false } = {}) {
   document.dispatchEvent(new CustomEvent('earningsviewchange', { detail: { mode: earningsViewMode } }));
   if (earningsViewMode === 'cycle') {
     if (title) title.textContent = translateText('Ganancias del ciclo');
-    if (subtitle) subtitle.textContent = translateText('Total del ciclo de pago actual (14 días) y la próxima fecha de pago.');
+    if (subtitle) subtitle.textContent = translateText('Total del ciclo');
   } else {
     if (title) title.textContent = earningsSectionLabel(getActiveDayKey());
     if (subtitle) subtitle.textContent = translateText('Gana, meta y margen del día, de un vistazo.');
