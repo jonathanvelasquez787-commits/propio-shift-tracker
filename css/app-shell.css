@@ -2354,3 +2354,34 @@ html:root[data-palette]:not([data-palette="original"]) .hbc-slide[data-accent="c
   :root.theme-light :is(#breakControlBtn,#lunchControlBtn):hover:not(:disabled) .action-ring { border-color: white; }
 }
 /* fin break y lunch hover mismos colores que activos */
+/* pildora activa celular */
+/* En celular, con un Break, Lunch o llamada en curso: el boton en curso queda chico (solo color e icono) y el cronometro pasa a la pildora, que toma el color del boton. */
+.hbc-live { display: none; }
+@media (max-width: 760px) {
+  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) { --hbc-live-fill: var(--pink); }
+  :root.theme-light .chips > .hero-shift-actions:is([data-live-type="call"],[data-live-type="pending"]) { --hbc-live-fill: var(--danger-red); }
+  .chips > .hero-shift-actions[data-live-type="break"] { --hbc-live-fill: var(--break-active); }
+  .chips > .hero-shift-actions[data-live-type="lunch"] { --hbc-live-fill: var(--lunch-active); }
+  .chips > .hero-shift-actions[data-live-type="break"] .action-slot[data-slot="lunch"]:has(> .action-btn:disabled),
+  .chips > .hero-shift-actions[data-live-type="lunch"] .action-slot[data-slot="break"]:has(> .action-btn:disabled),
+  .chips > .hero-shift-actions:is([data-live-type="call"],[data-live-type="pending"]) .action-slot:is([data-slot="break"],[data-slot="lunch"]):has(> .action-btn:disabled) { display: none !important; }
+  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) .action-slot:not([data-slot="shift"]):has(> .action-btn:is(.is-active,.is-pending)) { flex: 0 0 40px !important; width: 40px !important; min-width: 40px !important; max-width: 40px !important; }
+  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) .action-slot:not([data-slot="shift"]) > .action-btn:is(.is-active,.is-pending) { width: 100% !important; padding: 0 !important; justify-content: center !important; }
+  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) .action-slot:not([data-slot="shift"]) > .action-btn:is(.is-active,.is-pending) :is(.action-label,.action-sub) { position: absolute !important; width: 1px !important; height: 1px !important; overflow: hidden !important; clip: rect(0 0 0 0) !important; white-space: nowrap !important; }
+  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc:not([hidden]) { display: block; }
+  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-slide { border-color: var(--hbc-live-fill) !important; background: var(--hbc-live-fill) !important; }
+  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-top > * { visibility: hidden; }
+  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-live { position: absolute; top: 5px; left: 8px; z-index: 2; display: flex; align-items: center; gap: 5px; color: white; font-size: 13px; font-variant-numeric: tabular-nums; font-weight: 800; line-height: 14px; pointer-events: none; }
+  .hbc-live .hbc-live-ic { display: inline-flex; width: 12px; height: 12px; color: white; }
+  .hbc-live .hbc-live-ic svg { width: 12px; height: 12px; color: white; stroke: white; }
+  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc :is(.hbc-pct,.hbc-peek,.hbc-note) { color: white; }
+  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-track { background: rgba(255, 255, 255, .35); }
+  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-track i { background: white; }
+}
+@media (max-width: 479px) {
+  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-live { top: 9px; left: 12px; font-size: 14px; }
+}
+@media (max-width: 420px) {
+  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) .action-slot > .action-btn:is(.is-active,.is-pending) .action-icon-wrap { display: flex !important; }
+}
+/* fin pildora activa celular */

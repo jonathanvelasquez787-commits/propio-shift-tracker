@@ -4468,6 +4468,20 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       if (discard) discard.hidden = !(info && info.onDiscard);
       const callBtn = document.getElementById('callControlBtn');
       if (callBtn) callBtn.classList.toggle('is-pending', !!(info && info.type === 'pending'));
+      // En celular el cronómetro del botón en curso se ve en la píldora de bloques (ícono + tiempo).
+      const pillLive = document.getElementById('heroBlockCardLive');
+      if (pillLive) {
+        const liveBtnId = info ? (info.type === 'break' ? 'breakControlBtn' : info.type === 'lunch' ? 'lunchControlBtn' : 'callControlBtn') : '';
+        const liveBtn = liveBtnId ? document.getElementById(liveBtnId) : null;
+        const subEl = liveBtn && typeof liveBtn.querySelector === 'function' ? liveBtn.querySelector('.action-sub') : null;
+        const iconEl = liveBtn && typeof liveBtn.querySelector === 'function' ? liveBtn.querySelector('.action-icon') : null;
+        const liveText = subEl ? String(subEl.textContent || '').trim() : '';
+        const liveSig = info ? `${info.type}|${liveText}` : '';
+        if (pillLive.dataset.sig !== liveSig) {
+          pillLive.dataset.sig = liveSig;
+          pillLive.innerHTML = info ? `${iconEl ? `<span class="hbc-live-ic">${iconEl.innerHTML}</span>` : ''}<span class="hbc-live-t">${escapeHtml(liveText)}</span>` : '';
+        }
+      }
     }
 
     // Tarjeta de estado dentro de "Llamadas". La fila entera se tiñe vía `.live` en el contenedor

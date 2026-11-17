@@ -82,3 +82,22 @@ test('tarjeta de bloques: la actual es Shift salvo que haya un Break o Lunch en 
   state.activePause = { type: 'lunch' };
   assert.equal(api.heroBlockCardLiveIndex(cards), 2);
 });
+
+test('en celular, con un break, lunch o llamada en curso la pildora toma el color y el cronometro del boton', () => {
+  assert.match(html, /<div class="hbc" id="heroBlockCard"[^>]*>\s*<div class="hbc-stack"><\/div><span class="hbc-live" id="heroBlockCardLive" aria-hidden="true"><\/span><\/div>/);
+  assert.match(main, /getElementById\('heroBlockCardLive'\)/);
+  assert.match(main, /liveBtnId = info \? \(info\.type === 'break' \? 'breakControlBtn' : info\.type === 'lunch' \? 'lunchControlBtn' : 'callControlBtn'\)/);
+  const s = css.indexOf('/* pildora activa celular */');
+  const e = css.indexOf('/* fin pildora activa celular */');
+  assert.ok(s > 0 && e > s);
+  const b = css.slice(s, e);
+  assert.match(b, /@media \(max-width: 760px\)/);
+  assert.match(b, /\.hbc-live \{ display: none; \}/);
+  assert.match(b, /\[data-live-type="break"\] \{ --hbc-live-fill: var\(--break-active\); \}/);
+  assert.match(b, /\[data-live-type="lunch"\] \{ --hbc-live-fill: var\(--lunch-active\); \}/);
+  assert.match(b, /--hbc-live-fill: var\(--danger-red\)/);
+  assert.match(b, /flex: 0 0 40px !important/);
+  assert.match(b, /\.hbc-slide \{ border-color: var\(--hbc-live-fill\) !important; background: var\(--hbc-live-fill\) !important; \}/);
+  assert.doesNotMatch(b, /\[data-slot="(paste|add)"\]/);
+  assert.doesNotMatch(b, /#[0-9a-fA-F]{3,8}\b/);
+});
