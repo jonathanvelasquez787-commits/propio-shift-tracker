@@ -45,6 +45,10 @@
       --tier-bronze: #e0a06b;
       --tier-silver: #d7dee6;
       --tier-gold: #ffd76e;
+      --break-active: #F97316;
+      --break-active-rgb: 249, 115, 22;
+      --lunch-active: #A855F7;
+      --lunch-active-rgb: 168, 85, 247;
       --earnings-gold-top: #fff0a6;
       --earnings-gold-mid: #f7c948;
       --earnings-gold-low: #c98a14;

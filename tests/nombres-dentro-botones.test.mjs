@@ -69,3 +69,16 @@ test('en tema oscuro los textos e iconos de los botones activos van en blanco co
   assert.match(b5, /svg \* \{ stroke: white; \}/);
   assert.doesNotMatch(b5, /#[0-9a-fA-F]{3,8}\b/);
 });
+
+test('break y lunch activos en oscuro usan los mismos colores que en tema claro', () => {
+  const core = readFileSync(new URL('../css/app-core.css', import.meta.url), 'utf8');
+  assert.match(core, /--break-active: #F97316;/);
+  assert.match(core, /--lunch-active: #A855F7;/);
+  const s6 = css.indexOf('/* break y lunch activos mismos colores en oscuro */');
+  const e6 = css.indexOf('/* fin break y lunch activos mismos colores en oscuro */');
+  assert.ok(s6 > 0 && e6 > s6);
+  const b6 = css.slice(s6, e6);
+  assert.match(b6, /:root:not\(\.theme-light\) #breakControlBtn\.is-active \{ --accent: var\(--break-active\); --accent-rgb: var\(--break-active-rgb\); \}/);
+  assert.match(b6, /:root:not\(\.theme-light\) #lunchControlBtn\.is-active \{ --accent: var\(--lunch-active\); --accent-rgb: var\(--lunch-active-rgb\); \}/);
+  assert.doesNotMatch(b6, /#[0-9a-fA-F]{3,8}\b/);
+});
