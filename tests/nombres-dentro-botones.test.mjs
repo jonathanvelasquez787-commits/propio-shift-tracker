@@ -46,3 +46,14 @@ test('los botones activos de llamada, break y lunch miden 120 px solo en escrito
   assert.match(b3, /width: 100%;/);
   assert.doesNotMatch(b3, /#[0-9a-fA-F]{3,8}\b/);
 });
+
+test('en tema claro los nombres inactivos van en negro y los iconos activos en blanco', () => {
+  const s4 = css.indexOf('/* tema claro nombres negros e iconos blancos */');
+  const e4 = css.indexOf('/* fin tema claro nombres negros e iconos blancos */');
+  assert.ok(s4 > 0 && e4 > s4);
+  const b4 = css.slice(s4, e4);
+  assert.match(b4, /:not\(:has\([^{]*> \.action-short \{ color: var\(--text\); \}/);
+  assert.match(b4, /> \.action-btn svg \{ color: white; \}/);
+  assert.match(b4, /#shiftControlBtn\.is-active/);
+  assert.doesNotMatch(b4, /#[0-9a-fA-F]{3,8}\b/);
+});
