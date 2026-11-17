@@ -34,9 +34,9 @@ export function renderNotificationReview(context) {
     +ui`<p class="note">Máximo 300 KiB por archivo. Se guarda como texto dentro de tus ajustes y ocupa más que el audio original. Elegir otro sonido no borra el archivo; usá Quitar archivo para liberarlo.</p></div></details>`;
   if(fileRoot&&fileRoot.dataset.content!==fileHtml){const opened=fileRoot.querySelector('details')?.open;fileRoot.innerHTML=fileHtml;fileRoot.dataset.content=fileHtml;if(opened)fileRoot.querySelector('details').open=true;}
   if(!bound){bound=true;
-    document.addEventListener('input',event=>{if(event.target.closest?.('#notificationsModal'))queueMicrotask(()=>activeContext&&renderNotificationReview(activeContext));});
-    document.addEventListener('change',event=>{if(event.target.closest?.('#notificationsModal'))queueMicrotask(()=>activeContext&&renderNotificationReview(activeContext));});
-    document.addEventListener('app:modal-closed',event=>{if(event.detail?.id==='notificationsModal'){clearTimeout(timer);timer=null;activeContext=null;}});
+    document.addEventListener('input',event=>{if(event.target.closest?.('#setPanelAvisos'))queueMicrotask(()=>activeContext&&renderNotificationReview(activeContext));});
+    document.addEventListener('change',event=>{if(event.target.closest?.('#setPanelAvisos'))queueMicrotask(()=>activeContext&&renderNotificationReview(activeContext));});
+    document.addEventListener('app:modal-closed',event=>{if(event.detail?.id==='goalsModal'){clearTimeout(timer);timer=null;activeContext=null;}});
   }
-  clearTimeout(timer);timer=setTimeout(()=>{if(activeContext?.valid()&&document.getElementById('notificationsModal')?.classList.contains('open'))renderNotificationReview(activeContext);},1000);
+  clearTimeout(timer);timer=setTimeout(()=>{if(activeContext?.valid()&&document.getElementById('goalsModal')?.classList.contains('open')&&!document.getElementById('setPanelAvisos')?.hidden)renderNotificationReview(activeContext);},1000);
 }

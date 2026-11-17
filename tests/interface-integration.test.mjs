@@ -15,7 +15,7 @@ test('call comparison and correction share the existing detail and pending cases
  assert.equal(ids.has('pendingCallRecordsBtn'),false);
 });
 test('workday, allocation, recovery and support reside in their existing functional destinations',()=>{
- for(const [id,parent] of [['workDayReviewContent','pageReports'],['financeAutoFillInput','financeSection'],['snapshotRecoveryBtn','goalsModal'],['positiveInactivityMinutesInput','notificationsModal']])assert.equal(within(id,parent),true,id);
+ for(const [id,parent] of [['workDayReviewContent','pageReports'],['financeAutoFillInput','financeSection'],['snapshotRecoveryBtn','goalsModal'],['positiveInactivityMinutesInput','setPanelAvisos']])assert.equal(within(id,parent),true,id);
  for(const id of ['workDayReviewModal','financeDistributionModal','cycleGoalInput'])assert.equal(ids.has(id),false,id);
  assert.equal(ids.has('cycleGoalAmountInput'),true);
  for(const id of ['financePlanDetails','financeMonthInput','financePaymentHistory','financeRowBudgetPeriodInput','financeRowExpenseTypeInput'])assert.equal(ids.has(id),false,id);

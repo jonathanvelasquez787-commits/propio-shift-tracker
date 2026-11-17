@@ -265,12 +265,6 @@
       "js/shift-work-review.js"
     ]
   },
-  "s_04519083": {
-    "source": "Sonidos y avisos de tu jornada.",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_04ace283": {
     "source": "Exceso sobre el presupuesto",
     "files": [
@@ -10245,12 +10239,6 @@
       "js/finance.js"
     ]
   },
-  "s_ba091659": {
-    "source": "No se pudo cargar el resumen. Cerrá Avisos y volvé a abrirlo.",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
   "s_baa70682": {
     "source": "Pausas y huecos",
     "files": [
@@ -12019,6 +12007,12 @@
     "source": "Ingresa un pago mayor a cero y una fecha válida.",
     "files": [
       "js/finance-planning.js"
+    ]
+  },
+  "s_db94bc0b": {
+    "source": "No se pudo cargar el resumen. Cerrá Ajustes y volvé a abrirlo.",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_db994404": {

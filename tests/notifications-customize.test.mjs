@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 
 const html = readFileSync(new URL('../app.html', import.meta.url), 'utf8');
 const css = readFileSync(new URL('../css/app-shell.css', import.meta.url), 'utf8');
-const modal = html.slice(html.indexOf('id="notificationsModal"'), html.indexOf('id="goalsModal"'));
+const modal = html.slice(html.indexOf('id="setPanelAvisos"'), html.indexOf('id="setPanelDatos"'));
 const customize = [...modal.matchAll(/<details class="alert-customize">([\s\S]*?)<\/details>/g)].map((m) => m[1]);
 
 test('Avisos: mensaje y sonido de cada aviso van dentro de "Personalizar" plegado', () => {

@@ -18,6 +18,6 @@ test('Avisos: los minutos de "antes" muestran "min" a la derecha y la etiqueta q
 });
 
 test('Avisos: el campo de minutos se ajusta a su contenido para que "min" no se salga de la ventana', () => {
-  assert.match(css, /#notificationsModal \.notif-group \.notif-row \.sched-compact-row \.sched-compact-field\.narrow\{flex:0 0 auto\}/);
-  assert.match(css, /#notificationsModal \.notif-group \.notif-row \.notif-unit\{/);
+  assert.match(css, /#setPanelAvisos \.notif-group \.notif-row \.sched-compact-row \.sched-compact-field\.narrow\{flex:0 0 auto\}/);
+  assert.match(css, /#setPanelAvisos \.notif-group \.notif-row \.notif-unit\{/);
 });

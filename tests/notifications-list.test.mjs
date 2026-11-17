@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 
 const html = readFileSync(new URL('../app.html', import.meta.url), 'utf8');
 const css = readFileSync(new URL('../css/app-shell.css', import.meta.url), 'utf8');
-const modal = html.slice(html.indexOf('id="notificationsModal"'), html.indexOf('id="goalsModal"'));
+const modal = html.slice(html.indexOf('id="setPanelAvisos"'), html.indexOf('id="setPanelDatos"'));
 
 test('Avisos: una sola lista unida, sin plegables ni tarjetas anidadas por grupo', () => {
   for (const id of ['notificationScheduleGroup', 'notificationCallsGroup', 'notificationProductivityGroup']) {
@@ -20,7 +20,7 @@ test('Avisos: una sola lista unida, sin plegables ni tarjetas anidadas por grupo
 });
 
 test('Avisos: la lista unida no deja fondo ni borde propio en cada aviso', () => {
-  assert.match(css, /#notificationsModal \.notif-group \.sched-compact-card\{[^}]*background:transparent[^}]*border:0/);
+  assert.match(css, /#setPanelAvisos \.notif-group \.sched-compact-card\{[^}]*background:transparent[^}]*border:0/);
   assert.match(css, /\.notif-group\{[^}]*border-bottom:1px solid var\(--line\)/);
 });
 
