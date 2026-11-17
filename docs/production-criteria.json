@@ -1371,7 +1371,8 @@
             "en tema claro los nombres inactivos van en negro y los iconos activos en blanco",
             "en tema oscuro los textos e iconos de los botones activos van en blanco con cualquier paleta",
             "break y lunch activos en oscuro usan los mismos colores que en tema claro",
-            "los botones miden 62 px de alto como la pildora solo desde 1180 px"
+            "los botones miden 62 px de alto como la pildora solo desde 1180 px",
+            "al pasar el mouse, break y lunch usan los mismos colores que cuando estan activos"
           ]
         },
         {
