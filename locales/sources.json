@@ -949,6 +949,12 @@
       "js/schedule.js"
     ]
   },
+  "s_106aa3c7": {
+    "source": "{{v1}}%",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_106da2b3": {
     "source": "¿Restaurar esta copia? Los datos actuales también quedarán conservados en este navegador.",
     "files": [
@@ -3831,7 +3837,6 @@
   "s_461c545f": {
     "source": "Editar meta",
     "files": [
-      "js/app-main.js",
       "js/finance.js",
       "js/reports.js"
     ]
@@ -7883,12 +7888,6 @@
       "privacidad.html"
     ]
   },
-  "s_900a7777": {
-    "source": "Editar meta de {{v1}}",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
   "s_90444c5f": {
     "source": "Registros de turnos iniciados y terminados, pausas y llamadas (fecha, hora, duración, si fue facturable, pago).",
     "files": [
@@ -10928,12 +10927,6 @@
       "index.html"
     ]
   },
-  "s_c7bb965b": {
-    "source": "{{v10}}%",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
   "s_c7ca9533": {
     "source": "Propio y respaldo",
     "files": [
@@ -12593,6 +12586,12 @@
     "source": "Cómo se calcula la proyección",
     "files": [
       "js/reports.js"
+    ]
+  },
+  "s_e5117404": {
+    "source": "Ver el siguiente bloque: Shift, Break o Lunch",
+    "files": [
+      "app.html"
     ]
   },
   "s_e537a6f0": {

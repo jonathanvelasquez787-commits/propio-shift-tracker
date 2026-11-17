@@ -6548,58 +6548,112 @@ function clearDayNoteFromModal() {
   toast('Nota eliminada');
 }
 
-// Tarjetas resumen arriba de "Bloques del día"
-function renderBlockSummaryStrip(cards) {
-  const el = document.getElementById('blockSummaryStrip');
-  if (!el) return;
-  if (!Array.isArray(cards) || !cards.length) {
-    el.innerHTML = '';
+// Tarjeta de bloques (Shift / Break / Lunch) dentro de la barra de acciones de Inicio.
+// Muestra la que está en curso; al tocarla sube y entra la siguiente, hasta volver a la actual.
+let heroBlockCardIdx = 0;
+let heroBlockCardLive = null;
+let heroBlockCardPeekTimer = null;
+
+function heroBlockCardLiveIndex(cards) {
+  const type = (typeof state !== 'undefined' && state && state.activePause) ? state.activePause.type : '';
+  const found = cards.findIndex(c => c.kind === type);
+  return found !== -1 ? found : 0;
+}
+
+function heroBlockCardSlideHtml(c, index, total) {
+  const pct = Math.max(0, Math.min(100, Number(c.pct) || 0));
+  const dots = Array.from({ length: total }, (_, i) => `<i${i === index ? ' class="on"' : ''}></i>`).join('');
+  const bottom = c.noPlan
+    ? ui`<div class="hbc-note">${escapeHtml(c.range)}</div>`
+    : ui`<div class="hbc-prog"><div class="hbc-track"><i style="width:${pct}%"></i></div><span class="hbc-pct">${Math.round(pct)}%</span></div><div class="hbc-peek">${escapeHtml(c.range)}</div>`;
+  return ui`<div class="hbc-top"><span class="hbc-ic">${c.icon}</span><b class="hbc-name">${escapeHtml(c.name)}</b>${c.noPlan ? '' : ui`<span class="hbc-range">${escapeHtml(c.range)}</span>`}<span class="hbc-dots" aria-hidden="true">${dots}</span></div><div class="hbc-bottom">${bottom}</div>`;
+}
+
+function heroBlockCardGo(host, next, animate) {
+  const slides = Array.from(host.querySelectorAll('.hbc-slide'));
+  if (!slides.length) return;
+  const cur = Math.min(heroBlockCardIdx, slides.length - 1);
+  next = ((next % slides.length) + slides.length) % slides.length;
+  if (!animate || next === cur) {
+    slides.forEach((el, i) => {
+      el.classList.add('no-anim');
+      el.classList.toggle('is-active', i === next);
+      el.classList.toggle('is-above', i < next);
+    });
+    void host.offsetWidth;
+    slides.forEach(el => el.classList.remove('no-anim'));
+    heroBlockCardIdx = next;
     return;
   }
-  const cardHtml = (c, extraClass = '') => {
-    // Si hoy no hay Break/Lunch planeado, la tarjeta igual se muestra en estado "sin plan".
-    if (c.noPlan) {
-      return ui`
-        <div class="block-summary-card ${extraClass}" data-accent="${escapeHtml(c.accent)}" style="opacity:.82;">
-          <div class="bsc-top">
-            <span class="bsc-icon">${c.icon}</span>
-            <span class="bsc-name">${escapeHtml(c.name)}</span>
-          </div>
-          <div class="bsc-range">${escapeHtml(c.range)}</div>
-          ${c.rangeExtra ? ui`<div class="bsc-range" style="opacity:.7;">${escapeHtml(c.rangeExtra)}</div>` : ''}
-        </div>
-      `;
-    }
-    const pct = Math.max(0, Math.min(100, Number(c.pct) || 0));
-    // La tarjeta de ACW lleva un botón ✎ para editar su propia meta máxima (ver #acwGoalModal,
-    // delegado por `data-edit-card`)
-    const editBtnHtml = c.editable
-      ? ui`<button class="bsc-edit-btn" type="button" data-edit-card="${escapeHtml(c.editable)}" aria-label="Editar meta de ${escapeHtml(c.name)}" title="Editar meta"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>`
-      : '';
-    return ui`
-      <div class="block-summary-card ${extraClass}" data-accent="${escapeHtml(c.accent)}" style="--bsc-pct:${pct}%">
-        <div class="bsc-fill" style="width:${pct}%"></div>
-        <div class="bsc-top">
-          <span class="bsc-icon">${c.icon}</span>
-          <span class="bsc-name">${escapeHtml(c.name)}</span>
-          ${editBtnHtml}
-        </div>
-        <div class="bsc-range">${escapeHtml(c.range)}</div>
-        ${c.rangeExtra ? ui`<div class="bsc-range" style="opacity:.7;">${escapeHtml(c.rangeExtra)}</div>` : ''}
-        <div class="bsc-progress-row">
-          <div class="bsc-progress-track"><div style="width:${pct}%"></div></div>
-          <span class="bsc-pct">${Math.round(pct)}%</span>
-        </div>
-      </div>
-    `;
-  };
-  const shiftIdx = cards.findIndex(c => c.name === 'Shift');
-  const shiftCard = cards[shiftIdx !== -1 ? shiftIdx : 0];
-  const restCards = cards.filter((c, i) => i !== (shiftIdx !== -1 ? shiftIdx : 0));
-  el.innerHTML = ui`
-    <div class="block-summary-shift-row">${cardHtml(shiftCard, 'block-summary-card-shift')}</div>
-    ${restCards.length ? ui`<div class="block-summary-strip">${restCards.map(c => cardHtml(c)).join('')}</div>` : ''}
-  `;
+  const incoming = slides[next];
+  const outgoing = slides[cur];
+  incoming.classList.add('no-anim');
+  incoming.classList.remove('is-active', 'is-above');
+  void incoming.offsetWidth;
+  incoming.classList.remove('no-anim');
+  outgoing.classList.remove('is-active');
+  outgoing.classList.add('is-above');
+  incoming.classList.add('is-active');
+  heroBlockCardIdx = next;
+}
+
+function advanceHeroBlockCard() {
+  const host = document.getElementById('heroBlockCard');
+  if (!host || host.hidden) return;
+  const total = host.querySelectorAll('.hbc-slide').length;
+  if (total < 2) return;
+  heroBlockCardGo(host, heroBlockCardIdx + 1, true);
+  // En celular el horario se ve unos segundos después de tocar.
+  host.classList.add('is-peek');
+  clearTimeout(heroBlockCardPeekTimer);
+  heroBlockCardPeekTimer = setTimeout(() => host.classList.remove('is-peek'), 2600);
+}
+
+function wireHeroBlockCard() {
+  const host = document.getElementById('heroBlockCard');
+  if (!host || host.dataset.wired === '1') return;
+  host.dataset.wired = '1';
+  host.addEventListener('click', advanceHeroBlockCard);
+  host.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    advanceHeroBlockCard();
+  });
+}
+
+function renderBlockSummaryStrip(cards) {
+  const host = document.getElementById('heroBlockCard');
+  if (!host) return;
+  const stack = host.querySelector('.hbc-stack');
+  if (!stack) return;
+  if (!Array.isArray(cards) || !cards.length) {
+    host.hidden = true;
+    stack.innerHTML = '';
+    stack.dataset.sig = '';
+    return;
+  }
+  wireHeroBlockCard();
+  host.hidden = false;
+  const sig = cards.map(c => c.kind || c.name).join('|');
+  const liveIdx = heroBlockCardLiveIndex(cards);
+  const rebuilt = stack.dataset.sig !== sig;
+  if (rebuilt) {
+    stack.innerHTML = cards.map(c => `<div class="hbc-slide" data-accent="${escapeHtml(c.accent)}"></div>`).join('');
+    stack.dataset.sig = sig;
+  }
+  const slides = stack.querySelectorAll('.hbc-slide');
+  cards.forEach((c, i) => {
+    if (slides[i]) slides[i].innerHTML = heroBlockCardSlideHtml(c, i, cards.length);
+  });
+  host.title = cards.map(c => c.rangeExtra ? `${c.name}: ${c.range} · ${c.rangeExtra}` : `${c.name}: ${c.range}`).join('\n');
+  if (rebuilt) {
+    heroBlockCardLive = liveIdx;
+    heroBlockCardGo(host, liveIdx, false);
+  } else if (heroBlockCardLive !== liveIdx) {
+    // Empezó o terminó un descanso: la tarjeta pasa sola a la que está en curso.
+    heroBlockCardLive = liveIdx;
+    heroBlockCardGo(host, liveIdx, true);
+  }
 }
 
 function renderSchedule() {
@@ -6879,6 +6933,7 @@ function renderSchedule() {
       const shiftConnectedMin = shiftStart ? workingMinutesForDay(dayKey) : 0;
       const shiftPct = plannedShiftMin > 0 ? Math.min(100, (shiftConnectedMin / plannedShiftMin) * 100) : 0;
       summaryCards.push({
+        kind: 'shift',
         name: translateText('Shift'),
         icon: iconHtml('play', 'ic-fill'),
         accent: 'cyan',
@@ -6902,6 +6957,7 @@ function renderSchedule() {
       if (breakCount > 0) {
         const { range, rangeExtra } = rangeWithNext(breakBlockTimes);
         summaryCards.push({
+          kind: 'break',
           name: translateText('Break'),
           icon: iconHtml('coffee'),
           accent: 'warn',
@@ -6911,6 +6967,7 @@ function renderSchedule() {
         });
       } else {
         summaryCards.push({
+          kind: 'break',
           name: translateText('Break'),
           icon: iconHtml('coffee'),
           accent: 'warn',
@@ -6923,6 +6980,7 @@ function renderSchedule() {
       if (lunchCount > 0) {
         const { range, rangeExtra } = rangeWithNext(lunchBlockTimes);
         summaryCards.push({
+          kind: 'lunch',
           name: translateText('Lunch'),
           icon: iconHtml('utensils'),
           accent: 'blue',
@@ -6932,6 +6990,7 @@ function renderSchedule() {
         });
       } else {
         summaryCards.push({
+          kind: 'lunch',
           name: translateText('Lunch'),
           icon: iconHtml('utensils'),
           accent: 'blue',
