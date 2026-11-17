@@ -57,3 +57,15 @@ test('en tema claro los nombres inactivos van en negro y los iconos activos en b
   assert.match(b4, /#shiftControlBtn\.is-active/);
   assert.doesNotMatch(b4, /#[0-9a-fA-F]{3,8}\b/);
 });
+
+test('en tema oscuro los textos e iconos de los botones activos van en blanco con cualquier paleta', () => {
+  const s5 = css.indexOf('/* tema oscuro activos blancos */');
+  const e5 = css.indexOf('/* fin tema oscuro activos blancos */');
+  assert.ok(s5 > 0 && e5 > s5);
+  const b5 = css.slice(s5, e5);
+  assert.match(b5, /:root:not\(\.theme-light\)/);
+  assert.match(b5, /\.action-sub[^{]*\{ color: white; \}/);
+  assert.match(b5, /svg \{ fill: white; \}/);
+  assert.match(b5, /svg \* \{ stroke: white; \}/);
+  assert.doesNotMatch(b5, /#[0-9a-fA-F]{3,8}\b/);
+});
