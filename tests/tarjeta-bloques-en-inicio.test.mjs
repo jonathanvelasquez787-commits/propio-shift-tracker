@@ -127,3 +127,23 @@ test('pildora junto al boton: a la par de su boton, con nombre, cronometro, hora
   assert.match(main, /hbc-live-r2/);
   assert.match(main, /hbc-live-bar/);
 });
+
+test('capsula larga: boton en curso, pildora y Descartar van pegados, rellenos de color, y todos los botones muestran borde blanco al pasar el mouse', () => {
+  const start = css.indexOf('/* capsula larga */');
+  const end = css.indexOf('/* fin capsula larga */');
+  assert.ok(start > 0 && end > start, 'faltan los marcadores del bloque CSS');
+  const block = css.slice(start, end);
+  assert.match(block, /\.action-slot\[data-slot="discard"\] \{ order: 22 !important;/);
+  assert.match(block, /\.action-slot\[data-slot="discard"\] \{ order: 32 !important;/);
+  assert.match(block, /\.action-slot\[data-slot="discard"\] \{ order: 52 !important;/);
+  assert.match(block, /\.is-swapped\[data-live-type="break"\] \.action-slot\[data-slot="discard"\] \{ order: 62 !important; \}/);
+  assert.match(block, /\.is-swapped:is\(\[data-live-type="call"\],\[data-live-type="pending"\]\) \.action-slot\[data-slot="discard"\] \{ order: 12 !important; \}/);
+  assert.match(block, /margin-left: calc\(-1 \* var\(--cap-gap\)\) !important/);
+  assert.match(block, /--cap-gap: 6px/);
+  assert.match(block, /--cap-gap: 12px/);
+  assert.match(block, /\.action-btn:hover:not\(:disabled\) \{ box-shadow: 0 0 0 2px var\(--cap-ring\) !important; \}/);
+  assert.match(block, /:has\(> \.action-slot\[data-slot="break"\] > \.action-btn:hover, > \.hbc:hover, > \.action-slot\[data-slot="discard"\] > \.action-btn:hover\)/);
+  assert.match(block, /@media \(min-width: 1180px\) \{[\s\S]*\.hbc-slide \{ border-color: var\(--hbc-live-fill\) !important; background: var\(--hbc-live-fill\) !important; \}/);
+  assert.match(block, /height: 62px/);
+  assert.doesNotMatch(block, /#[0-9a-fA-F]{3,8}\b/);
+});
