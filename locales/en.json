@@ -2343,5 +2343,8 @@
   "s_c089a153": "View blocks",
   "s_c4c00d29": "View by day",
   "s_d5014a37": "the planned end is kept.",
-  "s_e40c292c": "to"
+  "s_e40c292c": "to",
+  "s_0b4f0b56": "Review and recover calls without overwriting later changes. Up to 50 changes · up to 30 days, depending on space. Included in your JSON backup.",
+  "s_513bdb94": "↻ Refresh",
+  "s_e32e4c05": "No recoverable changes"
 }

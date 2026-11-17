@@ -221,12 +221,6 @@
       "app.html"
     ]
   },
-  "s_03b552da": {
-    "source": "Tu historial de cambios",
-    "files": [
-      "js/call-recovery.js"
-    ]
-  },
   "s_03d7eb0b": {
     "source": "📅 Ese día todavía no llega — vas a ver un día futuro sin datos.",
     "files": [
@@ -615,6 +609,12 @@
     "source": "¿Borrar la categoría \"{{v0}}\"?{{v1}} Esta acción no se puede deshacer.",
     "files": [
       "js/finance.js"
+    ]
+  },
+  "s_0b4f0b56": {
+    "source": "Revisá y recuperá llamadas sin sobrescribir cambios posteriores. Hasta 50 cambios · hasta 30 días, según espacio. Incluido en tu respaldo JSON.",
+    "files": [
+      "js/call-recovery.js"
     ]
   },
   "s_0b633af6": {
@@ -4467,6 +4467,12 @@
       "privacidad.html"
     ]
   },
+  "s_513bdb94": {
+    "source": "↻ Actualizar",
+    "files": [
+      "js/call-recovery.js"
+    ]
+  },
   "s_5151e1dc": {
     "source": "Hoy diste todo, {{v0}}.",
     "files": [
@@ -5664,12 +5670,6 @@
       "js/finance.js"
     ]
   },
-  "s_6a159f82": {
-    "source": "Revisá y recuperá llamadas sin sobrescribir cambios posteriores.",
-    "files": [
-      "js/call-recovery.js"
-    ]
-  },
   "s_6a19eada": {
     "source": "cierra tu jornada del día.",
     "files": [
@@ -6728,12 +6728,6 @@
     "source": "Borrar categoría",
     "files": [
       "js/finance.js"
-    ]
-  },
-  "s_7cc1e2b3": {
-    "source": "Actualizar",
-    "files": [
-      "js/call-recovery.js"
     ]
   },
   "s_7cc34461": {
@@ -8389,7 +8383,8 @@
     "source": "¿Cómo funciona?",
     "files": [
       "app.html",
-      "js/backup-recovery.js"
+      "js/backup-recovery.js",
+      "js/call-recovery.js"
     ]
   },
   "s_98568a5a": {
@@ -12002,12 +11997,6 @@
       "js/call-records-view.js"
     ]
   },
-  "s_db5a5bf0": {
-    "source": "No hay cambios recuperables en esta vista.",
-    "files": [
-      "js/call-recovery.js"
-    ]
-  },
   "s_db6bb034": {
     "source": "{{v5}} meta productiva",
     "files": [
@@ -12543,6 +12532,12 @@
   },
   "s_e32278ee": {
     "source": "¿Vaciar {{v0}} llamadas de {{v1}}? Se conservarán en el historial recuperable hasta 30 días. Turno, pausas y horario permanecen.",
+    "files": [
+      "js/call-recovery.js"
+    ]
+  },
+  "s_e32e4c05": {
+    "source": "No hay cambios recuperables",
     "files": [
       "js/call-recovery.js"
     ]
@@ -13759,12 +13754,6 @@
     "source": "Semana personalizada — arrancó como copia de tu plantilla, ajústala y guarda cada día que cambie.",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_f721b379": {
-    "source": "Hasta 50 cambios · hasta 30 días, según espacio. Incluido en tu respaldo JSON.",
-    "files": [
-      "js/call-recovery.js"
     ]
   },
   "s_f730bef3": {

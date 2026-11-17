@@ -1247,6 +1247,14 @@
           ]
         },
         {
+          "file": "tests/historial-compacto.test.mjs",
+          "namedCases": [
+            "historial compacto: sin tarjeta grande, con pastilla con cuenta y Actualizar chico",
+            "historial compacto: textos explicativos en ¿Cómo funciona? y vacío en una fila",
+            "historial compacto: el CSS vive en su bloque y no usa colores fijos"
+          ]
+        },
+        {
           "file": "tests/vaciar-datos-del-dia.test.mjs",
           "namedCases": [
             "vaciar datos del dia: el boton cambia de nombre y conserva su estilo",
