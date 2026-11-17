@@ -1275,6 +1275,13 @@
           ]
         },
         {
+          "file": "tests/ciclo-dinero-dorado.test.mjs",
+          "namedCases": [
+            "Ciclo: el dinero del ciclo se pinta con un dorado metálico y no con el verde",
+            "Ciclo: el dorado tiene colores para el tema oscuro y para el claro"
+          ]
+        },
+        {
           "file": "tests/avisos-en-ajustes.test.mjs",
           "namedCases": [
             "Avisos en Ajustes: es la tercera pestaña, entre Dinero y Datos",

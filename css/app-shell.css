@@ -2168,3 +2168,14 @@ details.gh-fold > summary:focus-visible { outline: 2px solid var(--cyan); outlin
   #goalsModal .set-tab { padding: 0 5px; font-size: 12.5px; }
 }
 /* fin ajustes cuatro pestanas */
+
+/* ciclo dinero dorado */
+#earningsCycleView #cycleEarningsValue {
+  background: linear-gradient(180deg, var(--earnings-cycle-gold-top) 0%, var(--earnings-cycle-gold-mid) 50%, var(--earnings-cycle-gold-low) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  padding-right: .12em;
+}
+/* fin ciclo dinero dorado */
