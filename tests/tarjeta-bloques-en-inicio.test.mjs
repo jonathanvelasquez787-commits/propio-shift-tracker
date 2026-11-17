@@ -143,7 +143,7 @@ test('capsula larga: boton en curso, pildora y Descartar van pegados, rellenos d
   assert.match(block, /--cap-gap: 12px/);
   assert.match(block, /\.action-btn:hover:not\(:disabled\) \{ box-shadow: 0 0 0 2px var\(--cap-ring\) !important; \}/);
   assert.match(block, /:has\(> \.action-slot\[data-slot="break"\] > \.action-btn:hover, > \.hbc:hover, > \.action-slot\[data-slot="discard"\] > \.action-btn:hover\)/);
-  assert.match(block, /@media \(min-width: 1180px\) \{[\s\S]*\.hbc-slide \{ border-color: var\(--hbc-live-fill\) !important; background: var\(--hbc-live-fill\) !important; \}/);
+  assert.match(block, /@media \(min-width: 761px\) \{[\s\S]*\.hbc-slide \{ border-color: var\(--hbc-live-fill\) !important; background: var\(--hbc-live-fill\) !important; \}/);
   assert.match(block, /height: 62px/);
   assert.doesNotMatch(block, /#[0-9a-fA-F]{3,8}\b/);
 });
@@ -162,7 +162,7 @@ test('capsula sin repetido: en compu el boton en curso muestra solo el icono y t
   const end = css.indexOf('/* fin capsula sin repetido */');
   assert.ok(start > 0 && end > start, 'faltan los marcadores del bloque CSS');
   const block = css.slice(start, end);
-  assert.match(block, /min-width: 1180px/);
+  assert.match(block, /min-width: 761px/);
   assert.match(block, /width: 62px !important/);
   assert.match(block, /> \.action-short \{ display: none !important; \}/);
   assert.match(block, /\.action-sub \{ display: none !important; \}/);

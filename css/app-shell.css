@@ -2244,9 +2244,9 @@ html:root[data-palette]:not([data-palette="original"]) .hbc-slide[data-accent="c
 }
 /* Con un Break, Lunch o llamada en curso la barra se llena (aparece el cronometro y la X): en escritorio ancho la tarjeta se achica un poco y en la fila angosta se esconde mientras dura. */
 @media (min-width: 1180px) { .chips > .hero-shift-actions > .hbc { flex: 0 1 300px; min-width: 220px; } }
-@media (min-width: 480px) and (max-width: 760px), (min-width: 960px) and (max-width: 1179px) { .chips > .hero-shift-actions[data-live-type] > .hbc { display: none; } }
+@media (min-width: 480px) and (max-width: 760px) { .chips > .hero-shift-actions[data-live-type] > .hbc { display: none; } }
 /* No cabe en la fila (celular angosto o ventana de 761 a 959 px): baja a una fila propia con todo a la vista. */
-@media (max-width: 479px), (min-width: 761px) and (max-width: 959px) {
+@media (max-width: 479px) {
   .chips > .hero-shift-actions { position: relative; padding-bottom: 64px; }
   .chips > .hero-shift-actions > .hbc { position: absolute; left: 10px; right: 10px; bottom: 6px; flex: none; width: auto; min-width: 0; max-width: none; height: 54px; margin: 0; }
   .hbc-slide { gap: 7px; padding: 8px 12px; }
@@ -2258,7 +2258,6 @@ html:root[data-palette]:not([data-palette="original"]) .hbc-slide[data-accent="c
   .hbc.is-peek .hbc-prog, .hbc:hover .hbc-prog { display: flex; }
   .hbc.is-peek .hbc-peek, .hbc:hover .hbc-peek { display: none; }
 }
-@media (min-width: 761px) and (max-width: 959px) { .chips > .hero-shift-actions > .hbc { left: 16px; right: 16px; } }
 /* fin tarjeta de bloques en inicio */
 
 /* contraer capsula */
@@ -2442,7 +2441,7 @@ html:root[data-palette]:not([data-palette="original"]) .hbc-slide[data-accent="c
 .chips > .hero-shift-actions .action-slot > .action-btn:hover:not(:disabled) { box-shadow: 0 0 0 2px var(--cap-ring) !important; }
 @media (min-width: 480px) and (max-width: 760px) { .chips > .hero-shift-actions { --cap-gap: 6px; } }
 @media (min-width: 1180px) { .chips > .hero-shift-actions { --cap-gap: 12px; } }
-@media (min-width: 480px) and (max-width: 760px), (min-width: 1180px) {
+@media (min-width: 480px) {
   .chips > .hero-shift-actions[data-live-type="break"] > .hbc { order: 21; margin-left: calc(-1 * var(--cap-gap)) !important; }
   .chips > .hero-shift-actions[data-live-type="break"] .action-slot[data-slot="discard"] { order: 22 !important; margin-left: calc(-1 * var(--cap-gap)) !important; }
   .chips > .hero-shift-actions.is-swapped[data-live-type="break"] > .hbc { order: 61; }
@@ -2477,7 +2476,7 @@ html:root[data-palette]:not([data-palette="original"]) .hbc-slide[data-accent="c
   .chips > .hero-shift-actions:is([data-live-type="call"],[data-live-type="pending"]):has(> .action-slot[data-slot="call"] > .action-btn:hover, > .hbc:hover, > .action-slot[data-slot="discard"] > .action-btn:hover) > .hbc { box-shadow: 0 -2px 0 0 var(--cap-ring), 0 2px 0 0 var(--cap-ring) !important; filter: brightness(1.18) saturate(1.1); }
   .chips > .hero-shift-actions:is([data-live-type="call"],[data-live-type="pending"]):has(> .action-slot[data-slot="call"] > .action-btn:hover, > .hbc:hover, > .action-slot[data-slot="discard"] > .action-btn:hover) .action-slot[data-slot="discard"] > .action-btn { box-shadow: 2px 0 0 0 var(--cap-ring), 2px -2px 0 0 var(--cap-ring), 2px 2px 0 0 var(--cap-ring), 0 -2px 0 0 var(--cap-ring), 0 2px 0 0 var(--cap-ring) !important; filter: brightness(1.18) saturate(1.1); }
 }
-@media (min-width: 1180px) {
+@media (min-width: 761px) {
   .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) { --hbc-live-fill: var(--pink); }
   :root.theme-light .chips > .hero-shift-actions:is([data-live-type="call"],[data-live-type="pending"]) { --hbc-live-fill: var(--danger-red); }
   .chips > .hero-shift-actions[data-live-type="break"] { --hbc-live-fill: var(--break-active); }
@@ -2500,14 +2499,14 @@ html:root[data-palette]:not([data-palette="original"]) .hbc-slide[data-accent="c
 /* sin pildora en reposo */
 /* Sin Break, Lunch ni Llamada en curso no se ve la pildora de bloques: solo existe unida a su boton. */
 .chips > .hero-shift-actions:not([data-live-type]) > .hbc { display: none !important; }
-@media (max-width: 479px), (min-width: 761px) and (max-width: 959px) {
+@media (max-width: 479px) {
   .chips > .hero-shift-actions:not([data-live-type]) { padding-bottom: 0; }
 }
 /* fin sin pildora en reposo */
 
 /* capsula sin repetido */
 /* En compu el boton en curso de la capsula muestra solo el icono: el nombre y el cronometro ya salen en la parte larga. */
-@media (min-width: 1180px) {
+@media (min-width: 761px) {
   .chips > .hero-shift-actions[data-live-type] .action-slot:not([data-slot="shift"]):has(> .action-btn.is-active, > .action-btn.is-pending) { width: 62px !important; min-width: 62px !important; flex: 0 0 62px !important; }
   .chips > .hero-shift-actions[data-live-type] .action-slot:not([data-slot="shift"]):not([data-slot="discard"]) > .action-btn:is(.is-active, .is-pending) { width: 62px !important; min-width: 62px !important; display: flex !important; flex-direction: row !important; justify-content: center !important; align-items: center !important; padding: 0 !important; }
   .chips > .hero-shift-actions[data-live-type] .action-slot:not([data-slot="shift"]):not([data-slot="discard"]) > .action-btn:is(.is-active, .is-pending) .action-icon-wrap { position: absolute !important; inset: 0 !important; margin: auto !important; transform: none !important; }
@@ -2526,10 +2525,10 @@ html:root .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-ty
 
 /* capsula sube junta */
 /* Con un Break, Lunch o llamada en curso, el boton y su pildora suben juntos 2 px al pasar el mouse por cualquiera de los dos (igual que sube el boton solo). Descartar NO sube (Jonathan lo pidio asi). */
-@media (min-width: 480px) and (max-width: 760px), (min-width: 1180px) {
+@media (min-width: 480px) {
   .chips > .hero-shift-actions > .hbc { transition: transform .14s ease; }
 }
-@media (hover: hover) and (pointer: fine) and (((min-width: 480px) and (max-width: 760px)) or (min-width: 1180px)) {
+@media (hover: hover) and (pointer: fine) and (min-width: 480px) {
   .chips > .hero-shift-actions[data-live-type="break"]:has(> .action-slot[data-slot="break"] > .action-btn:hover, > .hbc:hover) .action-slot[data-slot="break"] > .action-btn,
   .chips > .hero-shift-actions[data-live-type="break"]:has(> .action-slot[data-slot="break"] > .action-btn:hover, > .hbc:hover) > .hbc { transform: translateY(-2px) !important; }
   .chips > .hero-shift-actions[data-live-type="lunch"]:has(> .action-slot[data-slot="lunch"] > .action-btn:hover, > .hbc:hover) .action-slot[data-slot="lunch"] > .action-btn,
@@ -2538,3 +2537,17 @@ html:root .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-ty
   .chips > .hero-shift-actions:is([data-live-type="call"],[data-live-type="pending"]):has(.action-slot[data-slot="call"] > .action-btn:hover, > .hbc:hover) > .hbc { transform: translateY(-2px) !important; }
 }
 /* fin capsula sube junta */
+
+/* capsula rango medio */
+/* De 761 a 1179 px tambien hay capsula larga. Con una actividad en curso los otros botones se achican a solo icono para que todo quepa en una fila de 62 px. */
+@media (min-width: 761px) and (max-width: 1179px) {
+  .chips > .hero-shift-actions { --cap-gap: 6px; }
+  .chips > .hero-shift-actions[data-live-type] { gap: 6px; padding-left: 12px; padding-right: 12px; }
+  .chips > .hero-shift-actions[data-live-type] .action-slot:not([data-slot="discard"]):not(:has(> .action-btn:is(.is-active, .is-pending))) { width: 56px !important; min-width: 56px !important; flex: 0 0 56px !important; }
+  .chips > .hero-shift-actions[data-live-type] .action-slot:not([data-slot="discard"]):not(:has(> .action-btn:is(.is-active, .is-pending))) > .action-btn { width: 56px !important; min-width: 56px !important; }
+  .chips > .hero-shift-actions[data-live-type] .action-slot:not([data-slot="shift"]):not([data-slot="discard"]):not(:has(> .action-btn:is(.is-active, .is-pending))) :is(.action-short, .action-label, .action-sub) { display: none !important; }
+  .chips > .hero-shift-actions[data-live-type] .action-slot[data-slot="discard"] { width: 56px; min-width: 56px; height: 56px !important; }
+  .chips > .hero-shift-actions[data-live-type] > .hbc { flex: 1 1 0; min-width: 150px; max-width: 260px; height: 56px; }
+  .chips > .hero-shift-actions[data-live-type] .action-slot[data-slot="discard"] > .action-btn { height: 56px !important; min-height: 56px !important; max-height: 56px !important; }
+}
+/* fin capsula rango medio */
