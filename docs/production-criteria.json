@@ -1263,6 +1263,12 @@
           ]
         },
         {
+          "file": "tests/ciclo-pildoras-tamano.test.mjs",
+          "namedCases": [
+            "Ciclo: las píldoras tienen el mismo tamaño que las de Ganancias de hoy"
+          ]
+        },
+        {
           "file": "tests/vaciar-datos-del-dia.test.mjs",
           "namedCases": [
             "vaciar datos del dia: el boton cambia de nombre y conserva su estilo",
