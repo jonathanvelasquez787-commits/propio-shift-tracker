@@ -31,6 +31,7 @@ export function normalizeReinforcementSettings(raw) {
     inactivityMessage: normalizeInactivityMessage(source.inactivityMessage),
     inactivityMinutes: normalizeInactivityMinutes(source.inactivityMinutes),
     inactivityRepeat: source.inactivityRepeat === true,
+    inactivityEnabled: source.inactivityEnabled !== false,
   };
 }
 
@@ -240,6 +241,14 @@ export function renderSettingsReinforcement() {
   if (askBridgeRow) askBridgeRow.hidden = !(settings.reinforcement.enabled && settings.reinforcement.askAfterCall);
   const soundRow = document.getElementById('sidebarGameSoundRow');
   if (soundRow) soundRow.hidden = !settings.reinforcement.enabled;
+  const inactivityOn = settings.reinforcement.inactivityEnabled !== false;
+  const inactivitySwitch = document.getElementById('positiveInactivityEnabledInput');
+  if (inactivitySwitch) inactivitySwitch.checked = inactivityOn;
+  const inactivitySwitchText = document.getElementById('positiveInactivityEnabledText');
+  if (inactivitySwitchText) inactivitySwitchText.textContent = translateText(inactivityOn ? 'Encendido' : 'Apagado');
+  const inactivityBox = document.getElementById('positiveSettingsAccordion');
+  inactivityBox?.classList?.toggle?.('inactivity-off', !inactivityOn);
+  for (const control of [...inactivityEditorControls(), document.getElementById('positiveInactivityMessageSaveBtn')].filter(Boolean)) control.disabled = !inactivityOn;
   const inactivityInput = document.getElementById('positiveInactivityMessageInput');
   if (inactivityInput) {
     const changedOwner = inactivityMessageDraftOwner !== settings;
@@ -494,6 +503,17 @@ export function initPositiveReinforcement() {
     });
   }
   document.getElementById('positiveInactivityMessageSaveBtn')?.addEventListener('click', saveInactivityMessage);
+  const inactivityWrap = document.getElementById('positiveInactivityEnabledWrap');
+  if (typeof inactivityWrap?.addEventListener === 'function') inactivityWrap.addEventListener('click', (event) => event.stopPropagation());
+  document.getElementById('positiveInactivityEnabledInput')?.addEventListener('change', (event) => {
+    const previous = settings.reinforcement.inactivityEnabled !== false;
+    settings.reinforcement.inactivityEnabled = !!event.target.checked;
+    if (saveSettingsOnly() === false) {
+      settings.reinforcement.inactivityEnabled = previous;
+      event.target.checked = previous;
+    }
+    renderSettingsReinforcement();
+  });
   document.getElementById('positiveReinforcementEnabledInput')?.addEventListener('change', (event) => {
     const previous = settings.reinforcement.enabled;
     settings.reinforcement.enabled = !!event.target.checked;

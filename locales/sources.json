@@ -10298,6 +10298,12 @@
       "js/landing.js"
     ]
   },
+  "s_bb131bde": {
+    "source": "Encendido",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_bb2b86de": {
     "source": "{{v0}} programado hasta {{v1}}. No hay una pausa activa registrada; se respeta el horario.",
     "files": [

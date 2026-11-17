@@ -262,6 +262,7 @@ export function onReinforcementMonetaryProgress(dayKey, earnings, goal, { silent
 }
 
 export function checkReinforcementInactivity(now = Date.now()) {
+  if (settings.reinforcement?.inactivityEnabled === false) return false;
   if (!state?.shiftStartedAt || state.shiftEndedAt || state.activePause || state.activeCall) return false;
   ensureGameState();
   const interruptions = Object.values(state.dayInterruptions || {}).flatMap((items) => Array.isArray(items) ? items : [])
