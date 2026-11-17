@@ -15,6 +15,7 @@ test('el nombre de los botones va dentro del boton solo en escritorio', () => {
   assert.doesNotMatch(block, /#[0-9a-fA-F]{3,8}\b/);
 });
 
-test('con un break o llamada en curso el nombre vuelve abajo del boton', () => {
-  assert.match(block, /is-active[^{]*> \.action-short \{ position: static/);
+test('con un break o llamada en curso el nombre tambien queda dentro del boton', () => {
+  assert.match(block, /is-active[^{]*> \.action-short \{ position: absolute/);
+  assert.match(block, /is-active[^{]*> \.action-btn \{ height: 56px/);
 });
