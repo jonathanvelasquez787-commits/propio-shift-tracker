@@ -1,0 +1,20 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+
+const css = readFileSync(new URL('../css/app-shell.css', import.meta.url), 'utf8');
+const start = css.indexOf('/* nombres dentro de botones */');
+const end = css.indexOf('/* fin nombres dentro de botones */');
+const block = css.slice(start, end);
+
+test('el nombre de los botones va dentro del boton solo en escritorio', () => {
+  assert.ok(start > 0 && end > start);
+  assert.match(block, /@media \(min-width: 761px\)/);
+  assert.match(block, /\.action-short \{ position: absolute;/);
+  assert.match(block, /height: 56px/);
+  assert.doesNotMatch(block, /#[0-9a-fA-F]{3,8}\b/);
+});
+
+test('con un break o llamada en curso el nombre vuelve abajo del boton', () => {
+  assert.match(block, /is-active[^{]*> \.action-short \{ position: static/);
+});
