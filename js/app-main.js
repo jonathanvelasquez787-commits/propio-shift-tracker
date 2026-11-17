@@ -4476,10 +4476,21 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
         const subEl = liveBtn && typeof liveBtn.querySelector === 'function' ? liveBtn.querySelector('.action-sub') : null;
         const iconEl = liveBtn && typeof liveBtn.querySelector === 'function' ? liveBtn.querySelector('.action-icon') : null;
         const liveText = subEl ? String(subEl.textContent || '').trim() : '';
-        const liveSig = info ? `${info.type}|${liveText}` : '';
+        // Nombre, horario y avance salen de la tarjeta del mismo bloque (Break = warn, Lunch = blue); la llamada no tiene horario.
+        const liveName = info ? (info.type === 'break' || info.type === 'lunch' ? String(info.label || '') : translateText('Llamada')) : '';
+        const pillCard = document.getElementById('heroBlockCard');
+        const liveAccent = info && info.type === 'break' ? 'warn' : info && info.type === 'lunch' ? 'blue' : '';
+        const liveSlide = liveAccent && pillCard && typeof pillCard.querySelector === 'function' ? pillCard.querySelector(`.hbc-slide[data-accent="${liveAccent}"]`) : null;
+        const rangeEl = liveSlide && typeof liveSlide.querySelector === 'function' ? liveSlide.querySelector('.hbc-range') : null;
+        const fillEl = liveSlide && typeof liveSlide.querySelector === 'function' ? liveSlide.querySelector('.hbc-track i') : null;
+        const liveRange = rangeEl ? String(rangeEl.textContent || '').trim() : '';
+        const livePct = fillEl && fillEl.style ? Math.max(0, Math.min(100, parseFloat(fillEl.style.width) || 0)) : 0;
+        const liveSig = info ? `${info.type}|${liveText}|${liveName}|${liveRange}|${Math.round(livePct)}` : '';
         if (pillLive.dataset.sig !== liveSig) {
           pillLive.dataset.sig = liveSig;
-          pillLive.innerHTML = info ? `${iconEl ? `<span class="hbc-live-ic">${iconEl.innerHTML}</span>` : ''}<span class="hbc-live-t">${escapeHtml(liveText)}</span>` : '';
+          pillLive.innerHTML = info
+            ? `${iconEl ? `<span class="hbc-live-ic">${iconEl.innerHTML}</span>` : ''}<span class="hbc-live-r1"><b class="hbc-live-n">${escapeHtml(liveName)}</b><span class="hbc-live-t">${escapeHtml(liveText)}</span></span>${liveRange ? `<span class="hbc-live-r2">${escapeHtml(liveRange)}</span>` : ''}${liveSlide ? `<span class="hbc-live-bar"><i style="width:${livePct}%"></i></span>` : ''}`
+            : '';
         }
       }
     }

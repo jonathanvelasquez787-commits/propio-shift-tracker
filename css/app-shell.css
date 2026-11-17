@@ -2370,8 +2370,8 @@ html:root[data-palette]:not([data-palette="original"]) .hbc-slide[data-accent="c
   .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) .action-slot:not([data-slot="shift"]) > .action-btn:is(.is-active,.is-pending) :is(.action-label,.action-sub) { position: absolute !important; width: 1px !important; height: 1px !important; overflow: hidden !important; clip: rect(0 0 0 0) !important; white-space: nowrap !important; }
   .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc:not([hidden]) { display: block; }
   .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-slide { border-color: var(--hbc-live-fill) !important; background: var(--hbc-live-fill) !important; }
-  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-top > * { visibility: hidden; }
-  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-live { position: absolute; top: 5px; left: 8px; z-index: 2; display: flex; align-items: center; gap: 5px; color: white; font-size: 13px; font-variant-numeric: tabular-nums; font-weight: 800; line-height: 14px; pointer-events: none; }
+  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-slide > * { visibility: hidden; }
+  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-live { position: absolute; inset: 0; z-index: 2; display: block; padding: 3px 7px 0; color: white; font-variant-numeric: tabular-nums; line-height: 1; pointer-events: none; }
   .hbc-live .hbc-live-ic { display: inline-flex; width: 12px; height: 12px; color: white; }
   .hbc-live .hbc-live-ic svg { width: 12px; height: 12px; color: white; stroke: white; }
   .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc :is(.hbc-pct,.hbc-peek,.hbc-note) { color: white; }
@@ -2379,7 +2379,6 @@ html:root[data-palette]:not([data-palette="original"]) .hbc-slide[data-accent="c
   .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-track i { background: white; }
 }
 @media (max-width: 479px) {
-  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-live { top: 9px; left: 12px; font-size: 14px; }
 }
 @media (max-width: 420px) {
   .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) .action-slot > .action-btn:is(.is-active,.is-pending) .action-icon-wrap { display: flex !important; }
@@ -2397,3 +2396,41 @@ html:root[data-palette]:not([data-palette="original"]) .hbc-slide[data-accent="c
   html:root .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-slide .hbc-pct { color: white !important; }
 }
 /* fin pildora en curso sin horario ajeno */
+
+/* pildora junto al boton */
+/* Con un Break, Lunch o llamada en curso, la pildora se pone a la par de su boton. En celular muestra nombre, cronometro, horario y una barra fina, con el mismo alto que los botones. */
+.hbc-live .hbc-live-r1, .hbc-live .hbc-live-r2, .hbc-live .hbc-live-bar { display: none; }
+@media (min-width: 480px) and (max-width: 760px), (min-width: 1180px) {
+  .chips > .hero-shift-actions[data-live-type="break"] > .hbc { order: 21; margin: 0 0 0 6px; }
+  .chips > .hero-shift-actions[data-live-type="lunch"] > .hbc { order: 31; margin: 0 0 0 6px; }
+  .chips > .hero-shift-actions:is([data-live-type="call"],[data-live-type="pending"]) > .hbc { order: 51; margin: 0 0 0 6px; }
+  .chips > .hero-shift-actions.is-swapped[data-live-type="break"] > .hbc { order: 61; }
+  .chips > .hero-shift-actions.is-swapped[data-live-type="lunch"] > .hbc { order: 71; }
+  .chips > .hero-shift-actions.is-swapped:is([data-live-type="call"],[data-live-type="pending"]) > .hbc { order: 11; }
+}
+@media (min-width: 1180px) {
+  .chips > .hero-shift-actions[data-live-type] > .hbc { flex: 0 1 247px; width: 247px; min-width: 200px; }
+}
+@media (max-width: 760px) {
+  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-live .hbc-live-ic { display: none; }
+  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-live .hbc-live-r1 { display: flex; align-items: baseline; justify-content: space-between; gap: 4px; font-size: 11px; font-weight: 800; }
+  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-live .hbc-live-r2 { display: block; margin-top: 1px; overflow: hidden; font-size: 9px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-live .hbc-live-bar { position: absolute; left: 7px; right: 7px; bottom: 3px; display: block; height: 2px; overflow: hidden; border-radius: 2px; background: rgba(255, 255, 255, .35); }
+  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-live .hbc-live-bar i { display: block; height: 100%; border-radius: 2px; background: white; }
+}
+@media (min-width: 480px) and (max-width: 760px) {
+  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc { margin-left: 3px; flex: 0 0 112px; width: 112px; min-width: 112px; max-width: 112px; height: 34px; }
+}
+@media (max-width: 479px) {
+  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-live { padding: 8px 12px 0; }
+  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-live .hbc-live-r1 { font-size: 15px; }
+  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-live .hbc-live-r2 { margin-top: 3px; font-size: 12px; }
+  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-live .hbc-live-bar { left: 12px; right: 12px; bottom: 9px; height: 5px; }
+}
+@media (max-width: 760px) {
+  .chips > .hero-shift-actions:is([data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-live .hbc-live-r1 { margin-top: 6px; }
+}
+@media (max-width: 479px) {
+  .chips > .hero-shift-actions:is([data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-live .hbc-live-r1 { margin-top: 10px; }
+}
+/* fin pildora junto al boton */

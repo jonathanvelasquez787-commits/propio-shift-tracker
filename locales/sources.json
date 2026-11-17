@@ -6926,6 +6926,7 @@
     "source": "Llamada",
     "files": [
       "app.html",
+      "js/app-main.js",
       "js/call-table-view.js"
     ]
   },
