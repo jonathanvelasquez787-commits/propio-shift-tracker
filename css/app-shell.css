@@ -2504,3 +2504,14 @@ html:root[data-palette]:not([data-palette="original"]) .hbc-slide[data-accent="c
   .chips > .hero-shift-actions:not([data-live-type]) { padding-bottom: 0; }
 }
 /* fin sin pildora en reposo */
+
+/* capsula sin repetido */
+/* En compu el boton en curso de la capsula muestra solo el icono: el nombre y el cronometro ya salen en la parte larga. */
+@media (min-width: 1180px) {
+  .chips > .hero-shift-actions[data-live-type] .action-slot:not([data-slot="shift"]):has(> .action-btn.is-active, > .action-btn.is-pending) { width: 62px !important; min-width: 62px !important; flex: 0 0 62px !important; }
+  .chips > .hero-shift-actions[data-live-type] .action-slot:not([data-slot="shift"]):not([data-slot="discard"]) > .action-btn:is(.is-active, .is-pending) { width: 62px !important; min-width: 62px !important; display: flex !important; flex-direction: row !important; justify-content: center !important; align-items: center !important; padding: 0 !important; }
+  .chips > .hero-shift-actions[data-live-type] .action-slot:not([data-slot="shift"]):not([data-slot="discard"]) > .action-btn:is(.is-active, .is-pending) .action-icon-wrap { position: absolute !important; inset: 0 !important; margin: auto !important; transform: none !important; }
+  .chips > .hero-shift-actions[data-live-type] .action-slot:not([data-slot="shift"]):not([data-slot="discard"]):has(> .action-btn:is(.is-active, .is-pending)) > .action-short { display: none !important; }
+  .chips > .hero-shift-actions[data-live-type] .action-slot:not([data-slot="shift"]):not([data-slot="discard"]) > .action-btn:is(.is-active, .is-pending) .action-sub { display: none !important; }
+}
+/* fin capsula sin repetido */
