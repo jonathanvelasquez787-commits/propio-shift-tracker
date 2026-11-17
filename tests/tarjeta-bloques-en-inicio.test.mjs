@@ -101,3 +101,13 @@ test('en celular, con un break, lunch o llamada en curso la pildora toma el colo
   assert.doesNotMatch(b, /\[data-slot="(paste|add)"\]/);
   assert.doesNotMatch(b, /#[0-9a-fA-F]{3,8}\b/);
 });
+
+test('pildora en curso: con un break, lunch o llamada en curso no sale el horario de otro bloque y la barra va blanca', () => {
+  const start = css.indexOf('/* pildora en curso sin horario ajeno */');
+  const end = css.indexOf('/* fin pildora en curso sin horario ajeno */');
+  assert.ok(start > 0 && end > start, 'faltan los marcadores del bloque CSS');
+  const block = css.slice(start, end);
+  assert.match(block, /\[data-live-type="call"\][^{]*> \.hbc \.hbc-peek \{ display: none !important; \}/);
+  assert.match(block, /\.hbc:is\(\.is-peek,:hover\) \.hbc-prog \{ display: flex !important; \}/);
+  assert.match(block, /\.hbc-track i \{ background: white !important; \}/);
+});

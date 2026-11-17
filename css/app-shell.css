@@ -2385,3 +2385,15 @@ html:root[data-palette]:not([data-palette="original"]) .hbc-slide[data-accent="c
   .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) .action-slot > .action-btn:is(.is-active,.is-pending) .action-icon-wrap { display: flex !important; }
 }
 /* fin pildora activa celular */
+
+/* pildora en curso sin horario ajeno */
+/* Con un Break, Lunch o llamada en curso, al pasar el mouse o tocar la pildora no sale el horario de otro bloque: se queda la barra, y la barra va blanca con cualquier paleta. */
+@media (max-width: 1179px) {
+  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-peek { display: none !important; }
+  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc:is(.is-peek,:hover) .hbc-prog { display: flex !important; }
+}
+@media (max-width: 760px) {
+  html:root .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-slide .hbc-track i { background: white !important; }
+  html:root .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-slide .hbc-pct { color: white !important; }
+}
+/* fin pildora en curso sin horario ajeno */
