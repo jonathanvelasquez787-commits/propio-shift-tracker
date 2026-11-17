@@ -2154,3 +2154,7 @@ details.gh-fold > summary:focus-visible { outline: 2px solid var(--cyan); outlin
 #earningsCycleView #cycleTagsRow .gh-info-row,
 #earningsCycleView #cycleTagsRow .table-tags{gap:6px}
 /* fin ciclo pildoras tamano hoy */
+
+/* ciclo botones tamano pildoras */
+#earningsCycleView .week-nav button{padding:5px 10px;font-size:10.5px;min-height:0;line-height:normal}
+/* fin ciclo botones tamano pildoras */

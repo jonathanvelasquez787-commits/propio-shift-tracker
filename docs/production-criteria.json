@@ -1269,6 +1269,12 @@
           ]
         },
         {
+          "file": "tests/ciclo-botones-tamano.test.mjs",
+          "namedCases": [
+            "Ciclo: los botones Anterior, Ciclo actual y Siguiente miden lo mismo que las píldoras"
+          ]
+        },
+        {
           "file": "tests/vaciar-datos-del-dia.test.mjs",
           "namedCases": [
             "vaciar datos del dia: el boton cambia de nombre y conserva su estilo",
