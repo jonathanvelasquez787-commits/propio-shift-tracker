@@ -2341,3 +2341,16 @@ html:root[data-palette]:not([data-palette="original"]) .hbc-slide[data-accent="c
   .chips > .hero-shift-actions .action-slot:not([data-slot="discard"]) > .action-short { bottom: 9px !important; }
 }
 /* fin botones misma altura que la pildora */
+/* break y lunch hover mismos colores que activos */
+@media (hover: hover) and (pointer: fine) {
+  :root:not(.theme-light) #breakControlBtn:hover:not(:disabled) { --accent: var(--break-active); --accent-rgb: var(--break-active-rgb); }
+  :root:not(.theme-light) #lunchControlBtn:hover:not(:disabled) { --accent: var(--lunch-active); --accent-rgb: var(--lunch-active-rgb); }
+  :root:not(.theme-light) :is(#breakControlBtn,#lunchControlBtn):hover:not(:disabled) :is(.action-label,.action-sub) { color: white; }
+  :root:not(.theme-light) :is(#breakControlBtn,#lunchControlBtn):hover:not(:disabled) svg { color: white; stroke: white; }
+  :root:not(.theme-light) :is(#breakControlBtn,#lunchControlBtn):hover:not(:disabled) .action-ring { border-color: white; }
+  .chips > .hero-shift-actions .action-slot:has(> :is(#breakControlBtn,#lunchControlBtn):hover:not(:disabled)) > .action-short { color: white !important; }
+  :root.theme-light :is(#breakControlBtn,#lunchControlBtn):hover:not(:disabled) :is(.action-label,.action-sub) { color: white; }
+  :root.theme-light :is(#breakControlBtn,#lunchControlBtn):hover:not(:disabled) svg { color: white; stroke: white; }
+  :root.theme-light :is(#breakControlBtn,#lunchControlBtn):hover:not(:disabled) .action-ring { border-color: white; }
+}
+/* fin break y lunch hover mismos colores que activos */

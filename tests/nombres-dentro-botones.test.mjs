@@ -93,3 +93,14 @@ test('los botones miden 62 px de alto como la pildora solo desde 1180 px', () =>
   assert.match(b7, /:not\(\[data-slot="discard"\]\) > \.action-short \{ bottom: 9px !important; \}/);
   assert.doesNotMatch(b7, /#[0-9a-fA-F]{3,8}\b/);
 });
+
+test('al pasar el mouse, break y lunch usan los mismos colores que cuando estan activos', () => {
+  const s8 = css.indexOf('/* break y lunch hover mismos colores que activos */');
+  const e8 = css.indexOf('/* fin break y lunch hover mismos colores que activos */');
+  assert.ok(s8 > 0 && e8 > s8);
+  const b8 = css.slice(s8, e8);
+  assert.match(b8, /@media \(hover: hover\) and \(pointer: fine\)/);
+  assert.match(b8, /#breakControlBtn:hover:not\(:disabled\) \{ --accent: var\(--break-active\); --accent-rgb: var\(--break-active-rgb\); \}/);
+  assert.match(b8, /#lunchControlBtn:hover:not\(:disabled\) \{ --accent: var\(--lunch-active\); --accent-rgb: var\(--lunch-active-rgb\); \}/);
+  assert.doesNotMatch(b8, /#[0-9a-fA-F]{3,8}\b/);
+});
