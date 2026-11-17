@@ -6249,6 +6249,9 @@ function renderHeader() {
   const remainingMin = Math.max(0, goalMin - productive - higherRateBonusMinEquivalent);
 
   renderEarningsCurrency('earningsValue', 'earningsConvertedText', stats.earnings);
+  // Dorado solo al llegar a la meta del día (ver css `dinero dorado al llegar a la meta`).
+  const earningsValueEl = document.getElementById('earningsValue');
+  if (earningsValueEl && earningsValueEl.classList && typeof earningsValueEl.classList.toggle === 'function') earningsValueEl.classList.toggle('is-goal-met', goalUsd > 0 && goalPct >= 100);
   document.getElementById('goalPctBadge').textContent = `${Math.round(goalPct)}%`;
   // Anillo circular de % (reemplaza la vieja escala de puntos 0/25/ 50/75/100%, ver más abajo) —
   // mismo patrón conic-gradient que ya usa `.sidebar-progress-ring`, con su propia variable
@@ -6300,6 +6303,9 @@ function renderHeader() {
   // Comparación contra la Meta del ciclo, también en Inicio.
   const cycleGoalAmount = effectiveCycleGoal(cycleViewOffset);
   const cycleGoalPct = cycleGoalAmount > 0 ? Math.min(100, (cycle.earnings / cycleGoalAmount) * 100) : 0;
+  // Dorado solo al llegar a la meta del ciclo.
+  const cycleEarningsValueEl = document.getElementById('cycleEarningsValue');
+  if (cycleEarningsValueEl && cycleEarningsValueEl.classList && typeof cycleEarningsValueEl.classList.toggle === 'function') cycleEarningsValueEl.classList.toggle('is-goal-met', cycleGoalAmount > 0 && cycleGoalPct >= 100);
   const cycleGoalRingEl = document.getElementById('cycleGoalRing');
   if (cycleGoalRingEl) cycleGoalRingEl.style.setProperty('--ring-pct', String(cycleGoalPct));
   const cycleGoalPctBadgeEl = document.getElementById('cycleGoalPctBadge');

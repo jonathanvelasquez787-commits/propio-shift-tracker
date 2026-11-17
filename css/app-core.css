@@ -45,9 +45,9 @@
       --tier-bronze: #e0a06b;
       --tier-silver: #d7dee6;
       --tier-gold: #ffd76e;
-      --earnings-cycle-gold-top: #fff0a6;
-      --earnings-cycle-gold-mid: #f7c948;
-      --earnings-cycle-gold-low: #c98a14;
+      --earnings-gold-top: #fff0a6;
+      --earnings-gold-mid: #f7c948;
+      --earnings-gold-low: #c98a14;
       --accordion-bg: rgba(255,255,255,.03);
       --earnings-value-color: #00ff7f;
       /* Líquido de "Bloques del día": los 3 tipos en morado, igual en claro y oscuro. */
@@ -130,9 +130,9 @@
         --tier-bronze: #96591F;
         --tier-silver: var(--text-gray);
         --tier-gold: #CA8A04;
-        --earnings-cycle-gold-top: #e9b73a;
-        --earnings-cycle-gold-mid: #c8901a;
-        --earnings-cycle-gold-low: #8f5d08;
+        --earnings-gold-top: #e9b73a;
+        --earnings-gold-mid: #c8901a;
+        --earnings-gold-low: #8f5d08;
         --accordion-bg: var(--panel);
         --accent-decorative: #6366F1;
         --accent-decorative-rgb: 99, 102, 241;
@@ -213,9 +213,9 @@
       --tier-bronze: #96591F;
       --tier-silver: var(--text-gray);
       --tier-gold: #CA8A04;
-      --earnings-cycle-gold-top: #e9b73a;
-      --earnings-cycle-gold-mid: #c8901a;
-      --earnings-cycle-gold-low: #8f5d08;
+      --earnings-gold-top: #e9b73a;
+      --earnings-gold-mid: #c8901a;
+      --earnings-gold-low: #8f5d08;
       --accordion-bg: var(--panel);
       --accent-decorative: #6366F1;
       --accent-decorative-rgb: 99, 102, 241;

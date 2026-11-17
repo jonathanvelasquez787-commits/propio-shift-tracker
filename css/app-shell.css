@@ -2169,13 +2169,14 @@ details.gh-fold > summary:focus-visible { outline: 2px solid var(--cyan); outlin
 }
 /* fin ajustes cuatro pestanas */
 
-/* ciclo dinero dorado */
-#earningsCycleView #cycleEarningsValue {
-  background: linear-gradient(180deg, var(--earnings-cycle-gold-top) 0%, var(--earnings-cycle-gold-mid) 50%, var(--earnings-cycle-gold-low) 100%);
+/* dinero dorado al llegar a la meta */
+#earningsValue.is-goal-met,
+#cycleEarningsValue.is-goal-met {
+  background: linear-gradient(180deg, var(--earnings-gold-top) 0%, var(--earnings-gold-mid) 50%, var(--earnings-gold-low) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
   padding-right: .12em;
 }
-/* fin ciclo dinero dorado */
+/* fin dinero dorado al llegar a la meta */
