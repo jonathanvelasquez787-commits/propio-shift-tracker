@@ -24,3 +24,14 @@ test('el nombre del boton activo va en blanco como el cronometro', () => {
   assert.match(block, /is-active[^{]*> \.action-short \{ color: white; \}/);
   assert.doesNotMatch(block, /color: inherit/);
 });
+
+test('todos los nombres de la barra van en blanco en escritorio', () => {
+  const s2 = css.indexOf('/* nombres blancos todos */');
+  const e2 = css.indexOf('/* fin nombres blancos todos */');
+  assert.ok(s2 > 0 && e2 > s2);
+  const b2 = css.slice(s2, e2);
+  assert.match(b2, /@media \(min-width: 761px\)/);
+  assert.match(b2, /> \.action-short \{ color: white; \}/);
+  assert.match(b2, /not\(\.theme-light\)[^{]*discard[^{]*\{ color: white; \}/);
+  assert.doesNotMatch(b2, /#[0-9a-fA-F]{3,8}\b/);
+});

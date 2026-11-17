@@ -2301,3 +2301,9 @@ html:root[data-palette]:not([data-palette="original"]) .hbc-slide[data-accent="c
   .chips > .hero-shift-actions .action-slot:has(> :is(#breakControlBtn,#lunchControlBtn,#callControlBtn).is-active, > #callControlBtn.is-pending) > .action-short { position: absolute; }
 }
 /* fin nombres dentro de botones */
+/* nombres blancos todos */
+@media (min-width: 761px) {
+  .chips > .hero-shift-actions .action-slot > .action-short { color: white; }
+  :root:not(.theme-light) .chips > .hero-shift-actions .action-slot[data-slot="discard"] > .action-short { color: white; }
+}
+/* fin nombres blancos todos */
