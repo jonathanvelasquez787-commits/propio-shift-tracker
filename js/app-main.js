@@ -8531,9 +8531,19 @@ export function render() {
 
     function wireActionButtonPress() {
       document.addEventListener('pointerdown', (e) => {
-        const btn = e.target instanceof Element ? e.target.closest('.action-btn') : null;
-        if (!btn || btn.disabled) return;
-        playActionPressAnimation(btn);
+        const target = e.target instanceof Element ? e.target : null;
+        const btn = target ? target.closest('.action-btn') : null;
+        if (btn) {
+          if (btn.disabled) return;
+          playActionPressAnimation(btn);
+          return;
+        }
+        // La pildora en curso es parte de su boton (una sola capsula): al tocarla se anima el boton igual que si lo tocaras a el.
+        const pill = target ? target.closest('#heroBlockCard') : null;
+        const bar = pill ? pill.closest('.hero-shift-actions') : null;
+        if (!bar || !bar.dataset || !bar.dataset.liveType) return;
+        const liveBtn = bar.querySelector('#breakControlBtn.is-active, #lunchControlBtn.is-active, #callControlBtn.is-active, #callControlBtn.is-pending');
+        if (liveBtn && !liveBtn.disabled) playActionPressAnimation(liveBtn);
       });
     }
 
