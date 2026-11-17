@@ -5762,12 +5762,6 @@
       "js/reinforcement-feedback.js"
     ]
   },
-  "s_6b88ae44": {
-    "source": "Total del ciclo de pago actual (14 días) y la próxima fecha de pago.",
-    "files": [
-      "js/app-main.js"
-    ]
-  },
   "s_6b8bc0e1": {
     "source": "Muestra qué días cumpliste tu meta, cuáles quedaste cerca, y cuánto ganaste cada mes — incluido el bono de Higher Rate.",
     "files": [
@@ -10156,6 +10150,12 @@
       "app.html",
       "js/finance-review.js",
       "js/finance.js"
+    ]
+  },
+  "s_b786e768": {
+    "source": "Total del ciclo",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_b7a9f3a1": {

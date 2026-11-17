@@ -1255,6 +1255,14 @@
           ]
         },
         {
+          "file": "tests/ciclo-pildoras-abajo.test.mjs",
+          "namedCases": [
+            "Ciclo: los botones Anterior, Ciclo actual y Siguiente van debajo del dinero",
+            "Ciclo: el subtítulo es solo Total del ciclo",
+            "Ciclo: las píldoras tienen más aire que antes"
+          ]
+        },
+        {
           "file": "tests/vaciar-datos-del-dia.test.mjs",
           "namedCases": [
             "vaciar datos del dia: el boton cambia de nombre y conserva su estilo",
