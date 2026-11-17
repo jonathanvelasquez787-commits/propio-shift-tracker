@@ -147,3 +147,12 @@ test('capsula larga: boton en curso, pildora y Descartar van pegados, rellenos d
   assert.match(block, /height: 62px/);
   assert.doesNotMatch(block, /#[0-9a-fA-F]{3,8}\b/);
 });
+
+test('sin pildora en reposo: sin Break, Lunch ni Llamada en curso la pildora de bloques no se muestra y la barra no deja hueco', () => {
+  const start = css.indexOf('/* sin pildora en reposo */');
+  const end = css.indexOf('/* fin sin pildora en reposo */');
+  assert.ok(start > 0 && end > start, 'faltan los marcadores del bloque CSS');
+  const block = css.slice(start, end);
+  assert.match(block, /\.hero-shift-actions:not\(\[data-live-type\]\) > \.hbc \{ display: none !important; \}/);
+  assert.match(block, /:not\(\[data-live-type\]\) \{ padding-bottom: 0; \}/);
+});
