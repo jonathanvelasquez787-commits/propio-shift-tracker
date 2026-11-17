@@ -1352,7 +1352,8 @@
             "pildora en curso: con un break, lunch o llamada en curso no sale el horario de otro bloque y la barra va blanca",
             "pildora junto al boton: a la par de su boton, con nombre, cronometro, horario y barra, del mismo alto que los botones",
             "capsula larga: boton en curso, pildora y Descartar van pegados, rellenos de color, y todos los botones muestran borde blanco al pasar el mouse",
-            "sin pildora en reposo: sin Break, Lunch ni Llamada en curso la pildora de bloques no se muestra y la barra no deja hueco"
+            "sin pildora en reposo: sin Break, Lunch ni Llamada en curso la pildora de bloques no se muestra y la barra no deja hueco",
+            "capsula sin repetido: en compu el boton en curso muestra solo el icono y tocar la pildora en curso hace lo mismo que tocar su boton"
           ]
         },
         {

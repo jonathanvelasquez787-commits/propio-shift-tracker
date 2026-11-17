@@ -156,3 +156,18 @@ test('sin pildora en reposo: sin Break, Lunch ni Llamada en curso la pildora de 
   assert.match(block, /\.hero-shift-actions:not\(\[data-live-type\]\) > \.hbc \{ display: none !important; \}/);
   assert.match(block, /:not\(\[data-live-type\]\) \{ padding-bottom: 0; \}/);
 });
+
+test('capsula sin repetido: en compu el boton en curso muestra solo el icono y tocar la pildora en curso hace lo mismo que tocar su boton', () => {
+  const start = css.indexOf('/* capsula sin repetido */');
+  const end = css.indexOf('/* fin capsula sin repetido */');
+  assert.ok(start > 0 && end > start, 'faltan los marcadores del bloque CSS');
+  const block = css.slice(start, end);
+  assert.match(block, /min-width: 1180px/);
+  assert.match(block, /width: 62px !important/);
+  assert.match(block, /> \.action-short \{ display: none !important; \}/);
+  assert.match(block, /\.action-sub \{ display: none !important; \}/);
+  const adv = main.slice(main.indexOf('function advanceHeroBlockCard'), main.indexOf('function wireHeroBlockCard'));
+  assert.match(adv, /dataset\.liveType/);
+  assert.match(adv, /liveBtn\.click\(\)/);
+  assert.match(adv, /else \{\s*heroBlockCardGo/);
+});

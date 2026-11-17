@@ -6629,7 +6629,15 @@ function advanceHeroBlockCard() {
   if (!host || host.hidden) return;
   const total = host.querySelectorAll('.hbc-slide').length;
   if (total < 2) return;
-  heroBlockCardGo(host, heroBlockCardIdx + 1, true);
+  // Con un Break, Lunch o Llamada en curso la píldora es parte de su botón: tocarla hace lo mismo que tocar el botón (con sus mismos efectos) y no cambia de bloque.
+  const bar = typeof host.closest === 'function' ? host.closest('.hero-shift-actions') : null;
+  const inLive = !!(bar && bar.dataset && bar.dataset.liveType);
+  if (inLive) {
+    const liveBtn = typeof bar.querySelector === 'function' ? bar.querySelector('#breakControlBtn.is-active, #lunchControlBtn.is-active, #callControlBtn.is-active, #callControlBtn.is-pending') : null;
+    if (liveBtn) { liveBtn.click(); return; }
+  } else {
+    heroBlockCardGo(host, heroBlockCardIdx + 1, true);
+  }
   // En celular el horario se ve unos segundos después de tocar.
   host.classList.add('is-peek');
   clearTimeout(heroBlockCardPeekTimer);
