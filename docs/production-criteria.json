@@ -1350,7 +1350,8 @@
             "tarjeta de bloques: la actual es Shift salvo que haya un Break o Lunch en curso",
             "en celular, con un break, lunch o llamada en curso la pildora toma el color y el cronometro del boton",
             "pildora en curso: con un break, lunch o llamada en curso no sale el horario de otro bloque y la barra va blanca",
-            "pildora junto al boton: a la par de su boton, con nombre, cronometro, horario y barra, del mismo alto que los botones"
+            "pildora junto al boton: a la par de su boton, con nombre, cronometro, horario y barra, del mismo alto que los botones",
+            "capsula larga: boton en curso, pildora y Descartar van pegados, rellenos de color, y todos los botones muestran borde blanco al pasar el mouse"
           ]
         },
         {

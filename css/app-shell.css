@@ -2434,3 +2434,65 @@ html:root[data-palette]:not([data-palette="original"]) .hbc-slide[data-accent="c
   .chips > .hero-shift-actions:is([data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-live .hbc-live-r1 { margin-top: 10px; }
 }
 /* fin pildora junto al boton */
+
+/* capsula larga */
+/* Con un Break, Lunch o llamada en curso, el boton en curso, su pildora y Descartar forman una sola capsula larga del color del boton. Al pasar el mouse toda la capsula se ilumina con borde blanco, y los demas botones tambien muestran el borde blanco. */
+.chips > .hero-shift-actions { --cap-ring: rgba(255, 255, 255, .85); }
+:root.theme-light .chips > .hero-shift-actions { --cap-ring: var(--text); }
+.chips > .hero-shift-actions .action-slot > .action-btn:hover:not(:disabled) { box-shadow: 0 0 0 2px var(--cap-ring) !important; }
+@media (min-width: 480px) and (max-width: 760px) { .chips > .hero-shift-actions { --cap-gap: 6px; } }
+@media (min-width: 1180px) { .chips > .hero-shift-actions { --cap-gap: 12px; } }
+@media (min-width: 480px) and (max-width: 760px), (min-width: 1180px) {
+  .chips > .hero-shift-actions[data-live-type="break"] > .hbc { order: 21; margin-left: calc(-1 * var(--cap-gap)) !important; }
+  .chips > .hero-shift-actions[data-live-type="break"] .action-slot[data-slot="discard"] { order: 22 !important; margin-left: calc(-1 * var(--cap-gap)) !important; }
+  .chips > .hero-shift-actions.is-swapped[data-live-type="break"] > .hbc { order: 61; }
+  .chips > .hero-shift-actions.is-swapped[data-live-type="break"] .action-slot[data-slot="discard"] { order: 62 !important; }
+  .chips > .hero-shift-actions[data-live-type="break"] .action-slot[data-slot="break"] > .action-btn { border-top-right-radius: 0 !important; border-bottom-right-radius: 0 !important; }
+  .chips > .hero-shift-actions[data-live-type="break"] > .hbc, .chips > .hero-shift-actions[data-live-type="break"] > .hbc :is(.hbc-stack,.hbc-slide,.hbc-live) { border-top-left-radius: 0 !important; border-bottom-left-radius: 0 !important; }
+  .chips > .hero-shift-actions[data-live-type="break"]:has(> .action-slot[data-slot="discard"] > #liveDiscardBtn:not([hidden])) > .hbc, .chips > .hero-shift-actions[data-live-type="break"]:has(> .action-slot[data-slot="discard"] > #liveDiscardBtn:not([hidden])) > .hbc :is(.hbc-stack,.hbc-slide,.hbc-live) { border-top-right-radius: 0 !important; border-bottom-right-radius: 0 !important; }
+  .chips > .hero-shift-actions[data-live-type="break"] .action-slot[data-slot="discard"] > .action-btn { border-top-left-radius: 0 !important; border-bottom-left-radius: 0 !important; border-left-width: 0 !important; }
+  .chips > .hero-shift-actions[data-live-type="break"]:has(> .action-slot[data-slot="break"] > .action-btn:hover, > .hbc:hover, > .action-slot[data-slot="discard"] > .action-btn:hover) .action-slot[data-slot="break"] > .action-btn { box-shadow: -2px 0 0 0 var(--cap-ring), -2px -2px 0 0 var(--cap-ring), -2px 2px 0 0 var(--cap-ring), 0 -2px 0 0 var(--cap-ring), 0 2px 0 0 var(--cap-ring) !important; filter: brightness(1.18) saturate(1.1); }
+  .chips > .hero-shift-actions[data-live-type="break"]:has(> .action-slot[data-slot="break"] > .action-btn:hover, > .hbc:hover, > .action-slot[data-slot="discard"] > .action-btn:hover) > .hbc { box-shadow: 0 -2px 0 0 var(--cap-ring), 0 2px 0 0 var(--cap-ring) !important; filter: brightness(1.18) saturate(1.1); }
+  .chips > .hero-shift-actions[data-live-type="break"]:has(> .action-slot[data-slot="break"] > .action-btn:hover, > .hbc:hover, > .action-slot[data-slot="discard"] > .action-btn:hover) .action-slot[data-slot="discard"] > .action-btn { box-shadow: 2px 0 0 0 var(--cap-ring), 2px -2px 0 0 var(--cap-ring), 2px 2px 0 0 var(--cap-ring), 0 -2px 0 0 var(--cap-ring), 0 2px 0 0 var(--cap-ring) !important; filter: brightness(1.18) saturate(1.1); }
+  .chips > .hero-shift-actions[data-live-type="lunch"] > .hbc { order: 31; margin-left: calc(-1 * var(--cap-gap)) !important; }
+  .chips > .hero-shift-actions[data-live-type="lunch"] .action-slot[data-slot="discard"] { order: 32 !important; margin-left: calc(-1 * var(--cap-gap)) !important; }
+  .chips > .hero-shift-actions.is-swapped[data-live-type="lunch"] > .hbc { order: 71; }
+  .chips > .hero-shift-actions.is-swapped[data-live-type="lunch"] .action-slot[data-slot="discard"] { order: 72 !important; }
+  .chips > .hero-shift-actions[data-live-type="lunch"] .action-slot[data-slot="lunch"] > .action-btn { border-top-right-radius: 0 !important; border-bottom-right-radius: 0 !important; }
+  .chips > .hero-shift-actions[data-live-type="lunch"] > .hbc, .chips > .hero-shift-actions[data-live-type="lunch"] > .hbc :is(.hbc-stack,.hbc-slide,.hbc-live) { border-top-left-radius: 0 !important; border-bottom-left-radius: 0 !important; }
+  .chips > .hero-shift-actions[data-live-type="lunch"]:has(> .action-slot[data-slot="discard"] > #liveDiscardBtn:not([hidden])) > .hbc, .chips > .hero-shift-actions[data-live-type="lunch"]:has(> .action-slot[data-slot="discard"] > #liveDiscardBtn:not([hidden])) > .hbc :is(.hbc-stack,.hbc-slide,.hbc-live) { border-top-right-radius: 0 !important; border-bottom-right-radius: 0 !important; }
+  .chips > .hero-shift-actions[data-live-type="lunch"] .action-slot[data-slot="discard"] > .action-btn { border-top-left-radius: 0 !important; border-bottom-left-radius: 0 !important; border-left-width: 0 !important; }
+  .chips > .hero-shift-actions[data-live-type="lunch"]:has(> .action-slot[data-slot="lunch"] > .action-btn:hover, > .hbc:hover, > .action-slot[data-slot="discard"] > .action-btn:hover) .action-slot[data-slot="lunch"] > .action-btn { box-shadow: -2px 0 0 0 var(--cap-ring), -2px -2px 0 0 var(--cap-ring), -2px 2px 0 0 var(--cap-ring), 0 -2px 0 0 var(--cap-ring), 0 2px 0 0 var(--cap-ring) !important; filter: brightness(1.18) saturate(1.1); }
+  .chips > .hero-shift-actions[data-live-type="lunch"]:has(> .action-slot[data-slot="lunch"] > .action-btn:hover, > .hbc:hover, > .action-slot[data-slot="discard"] > .action-btn:hover) > .hbc { box-shadow: 0 -2px 0 0 var(--cap-ring), 0 2px 0 0 var(--cap-ring) !important; filter: brightness(1.18) saturate(1.1); }
+  .chips > .hero-shift-actions[data-live-type="lunch"]:has(> .action-slot[data-slot="lunch"] > .action-btn:hover, > .hbc:hover, > .action-slot[data-slot="discard"] > .action-btn:hover) .action-slot[data-slot="discard"] > .action-btn { box-shadow: 2px 0 0 0 var(--cap-ring), 2px -2px 0 0 var(--cap-ring), 2px 2px 0 0 var(--cap-ring), 0 -2px 0 0 var(--cap-ring), 0 2px 0 0 var(--cap-ring) !important; filter: brightness(1.18) saturate(1.1); }
+  .chips > .hero-shift-actions:is([data-live-type="call"],[data-live-type="pending"]) > .hbc { order: 51; margin-left: calc(-1 * var(--cap-gap)) !important; }
+  .chips > .hero-shift-actions:is([data-live-type="call"],[data-live-type="pending"]) .action-slot[data-slot="discard"] { order: 52 !important; margin-left: calc(-1 * var(--cap-gap)) !important; }
+  .chips > .hero-shift-actions.is-swapped:is([data-live-type="call"],[data-live-type="pending"]) > .hbc { order: 11; }
+  .chips > .hero-shift-actions.is-swapped:is([data-live-type="call"],[data-live-type="pending"]) .action-slot[data-slot="discard"] { order: 12 !important; }
+  .chips > .hero-shift-actions:is([data-live-type="call"],[data-live-type="pending"]) .action-slot[data-slot="call"] > .action-btn { border-top-right-radius: 0 !important; border-bottom-right-radius: 0 !important; }
+  .chips > .hero-shift-actions:is([data-live-type="call"],[data-live-type="pending"]) > .hbc, .chips > .hero-shift-actions:is([data-live-type="call"],[data-live-type="pending"]) > .hbc :is(.hbc-stack,.hbc-slide,.hbc-live) { border-top-left-radius: 0 !important; border-bottom-left-radius: 0 !important; }
+  .chips > .hero-shift-actions:is([data-live-type="call"],[data-live-type="pending"]):has(> .action-slot[data-slot="discard"] > #liveDiscardBtn:not([hidden])) > .hbc, .chips > .hero-shift-actions:is([data-live-type="call"],[data-live-type="pending"]):has(> .action-slot[data-slot="discard"] > #liveDiscardBtn:not([hidden])) > .hbc :is(.hbc-stack,.hbc-slide,.hbc-live) { border-top-right-radius: 0 !important; border-bottom-right-radius: 0 !important; }
+  .chips > .hero-shift-actions:is([data-live-type="call"],[data-live-type="pending"]) .action-slot[data-slot="discard"] > .action-btn { border-top-left-radius: 0 !important; border-bottom-left-radius: 0 !important; border-left-width: 0 !important; }
+  .chips > .hero-shift-actions:is([data-live-type="call"],[data-live-type="pending"]):has(> .action-slot[data-slot="call"] > .action-btn:hover, > .hbc:hover, > .action-slot[data-slot="discard"] > .action-btn:hover) .action-slot[data-slot="call"] > .action-btn { box-shadow: -2px 0 0 0 var(--cap-ring), -2px -2px 0 0 var(--cap-ring), -2px 2px 0 0 var(--cap-ring), 0 -2px 0 0 var(--cap-ring), 0 2px 0 0 var(--cap-ring) !important; filter: brightness(1.18) saturate(1.1); }
+  .chips > .hero-shift-actions:is([data-live-type="call"],[data-live-type="pending"]):has(> .action-slot[data-slot="call"] > .action-btn:hover, > .hbc:hover, > .action-slot[data-slot="discard"] > .action-btn:hover) > .hbc { box-shadow: 0 -2px 0 0 var(--cap-ring), 0 2px 0 0 var(--cap-ring) !important; filter: brightness(1.18) saturate(1.1); }
+  .chips > .hero-shift-actions:is([data-live-type="call"],[data-live-type="pending"]):has(> .action-slot[data-slot="call"] > .action-btn:hover, > .hbc:hover, > .action-slot[data-slot="discard"] > .action-btn:hover) .action-slot[data-slot="discard"] > .action-btn { box-shadow: 2px 0 0 0 var(--cap-ring), 2px -2px 0 0 var(--cap-ring), 2px 2px 0 0 var(--cap-ring), 0 -2px 0 0 var(--cap-ring), 0 2px 0 0 var(--cap-ring) !important; filter: brightness(1.18) saturate(1.1); }
+}
+@media (min-width: 1180px) {
+  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) { --hbc-live-fill: var(--pink); }
+  :root.theme-light .chips > .hero-shift-actions:is([data-live-type="call"],[data-live-type="pending"]) { --hbc-live-fill: var(--danger-red); }
+  .chips > .hero-shift-actions[data-live-type="break"] { --hbc-live-fill: var(--break-active); }
+  .chips > .hero-shift-actions[data-live-type="lunch"] { --hbc-live-fill: var(--lunch-active); }
+  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-slide { border-color: var(--hbc-live-fill) !important; background: var(--hbc-live-fill) !important; }
+  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-slide * { color: white !important; }
+  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-track { background: rgba(255, 255, 255, .35); }
+  html:root .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-slide .hbc-track i { background: white !important; }
+  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) .action-slot[data-slot="discard"] { height: 62px; }
+  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) .action-slot[data-slot="discard"] > .action-btn { width: 56px; min-width: 56px; height: 62px; min-height: 62px; max-height: 62px; }
+  .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) .action-slot[data-slot="discard"] > .action-short { display: none !important; }
+  .chips > .hero-shift-actions:is([data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-slide > * { visibility: hidden; }
+  .chips > .hero-shift-actions:is([data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-live { position: absolute; inset: 0; z-index: 2; display: flex; align-items: center; gap: 8px; padding: 0 14px; color: white; font-variant-numeric: tabular-nums; pointer-events: none; }
+  .chips > .hero-shift-actions:is([data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-live .hbc-live-ic { display: inline-flex; width: 18px; height: 18px; color: white; }
+  .chips > .hero-shift-actions:is([data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-live .hbc-live-ic svg { width: 18px; height: 18px; color: white; stroke: white; }
+  .chips > .hero-shift-actions:is([data-live-type="call"],[data-live-type="pending"]) > .hbc .hbc-live .hbc-live-r1 { display: flex; align-items: baseline; gap: 8px; font-size: 14px; font-weight: 800; }
+}
+/* fin capsula larga */
