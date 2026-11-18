@@ -27,6 +27,15 @@ export function wirePresentation({ getSettings, save, apply }, doc = document) {
     const anchor = button.getBoundingClientRect(), bounds = tooltip.getBoundingClientRect();
     tooltip.style.left = `${Math.max(8, Math.min(anchor.left, host.innerWidth - bounds.width - 8))}px`;
     tooltip.style.top = `${anchor.bottom + bounds.height + 12 < host.innerHeight ? anchor.bottom + 8 : Math.max(8, anchor.top - bounds.height - 8)}px`;
+    // Si una tarjeta con desenfoque o transformacion contiene el globo, sus coordenadas dejan de ser las de la pantalla: se corrige por lo que se desvio.
+    const wantLeft = parseFloat(tooltip.style.left), wantTop = parseFloat(tooltip.style.top), placed = tooltip.getBoundingClientRect();
+    if (Number.isFinite(wantLeft) && Number.isFinite(wantTop) && placed && Number.isFinite(placed.left) && Number.isFinite(placed.top)) {
+      const dx = wantLeft - placed.left, dy = wantTop - placed.top;
+      if (Math.abs(dx) > 1 || Math.abs(dy) > 1) {
+        tooltip.style.left = `${wantLeft + dx}px`;
+        tooltip.style.top = `${wantTop + dy}px`;
+      }
+    }
   };
   for (const type of ['focusin', 'pointerover']) doc.addEventListener(type, event => {
     const button = event.target.closest?.('.sched-help-wrap button[aria-describedby]');
