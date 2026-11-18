@@ -2636,3 +2636,11 @@ html:root .sblk-card.is-collapsed .sblk-collapsed-line span:nth-child(n+2) { dis
 /* El globo de ayuda escondido de "Asignar disponible automaticamente" quedaba fuera de la pantalla y ensanchaba toda la pagina de Finanzas. */
 #pageFinance { overflow-x: clip; }
 /* fin finanzas sin desborde */
+
+/* barra en celular angosto */
+/* A 320 px los botones de 40 px no caben (ni en reposo ni con Break/Lunch en curso) y el primero quedaba pegado al borde: de 340 px para abajo se achican poco a poco (hasta 34 px) para que la barra no se salga. */
+@media (max-width: 340px) {
+  .chips > .hero-shift-actions .action-slot { width: auto !important; min-width: 34px !important; flex: 0 1 40px !important; }
+  .chips > .hero-shift-actions .action-slot > .action-btn { width: 100% !important; min-width: 0 !important; }
+}
+/* fin barra en celular angosto */

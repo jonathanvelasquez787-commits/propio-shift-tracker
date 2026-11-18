@@ -1398,6 +1398,14 @@
           ]
         },
         {
+          "file": "tests/barra-celular-angosto.test.mjs",
+          "namedCases": [
+            "la barra de acciones se achica a 320 px para no salirse",
+            "la regla de celular angosto tambien vale con Break, Lunch o Llamada en curso",
+            "el CSS de la barra angosta tiene las llaves balanceadas"
+          ]
+        },
+        {
           "file": "tests/pildora-llamada-horario.test.mjs",
           "namedCases": [
             "pildora de llamada: en compu muestra nombre, cronometro y la hora en que empezo, como Break y Lunch"
