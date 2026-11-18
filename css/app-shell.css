@@ -2631,3 +2631,8 @@ html:root .sblk-card.is-collapsed .sblk-collapsed-line span:nth-child(n+2) { dis
   .chips > .hero-shift-actions:not([data-live-type]) .action-slot:not([data-slot="discard"]) > .action-btn { width: 100% !important; min-width: 0 !important; }
 }
 /* fin barra sin salirse */
+
+/* finanzas sin desborde */
+/* El globo de ayuda escondido de "Asignar disponible automaticamente" quedaba fuera de la pantalla y ensanchaba toda la pagina de Finanzas. */
+#pageFinance { overflow-x: clip; }
+/* fin finanzas sin desborde */
