@@ -7,12 +7,14 @@ const a = css.indexOf('/* capsula rango medio */');
 const b = css.indexOf('/* fin capsula rango medio */');
 const block = css.slice(a, b);
 
-test('capsula rango medio: de 761 a 1179 px los otros botones se achican a solo icono y la barra no crece', () => {
+test('capsula rango medio: de 761 a 1179 px los otros botones conservan su nombre y se achican poco a poco, y la barra no crece', () => {
   assert.ok(a >= 0 && b > a, 'faltan los marcadores del bloque CSS');
   assert.match(block, /@media \(min-width: 761px\) and \(max-width: 1179px\)/);
   assert.match(block, /--cap-gap: 6px/);
-  assert.match(block, /width: 56px !important/);
-  assert.match(block, /:is\(\.action-short, \.action-label, \.action-sub\) \{ display: none !important; \}/);
+  assert.match(block, /flex: 0 1 108px !important/);
+  assert.match(block, /> \.action-short \{ display: block !important; \}/);
+  assert.match(block, /min-width: 215px/);
+  assert.doesNotMatch(block, /display: none !important/);
   assert.match(block, /height: 56px !important/);
   assert.doesNotMatch(block, /#[0-9a-fA-F]{3,8}\b/);
 });
