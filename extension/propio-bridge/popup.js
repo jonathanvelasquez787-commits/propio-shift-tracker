@@ -170,7 +170,7 @@ for (const id of ['bridgeCelebrate', 'bridgeAsk']) document.getElementById(id).a
   celebrate: document.getElementById('bridgeCelebrate').checked, ask: document.getElementById('bridgeAsk').checked }));
 for (const id of ['resumeBreak','resumeLunch','resumeMode']) document.getElementById(id).addEventListener('change', () => act({ kind: 'resume-options',
   break: document.getElementById('resumeBreak').checked, lunch: document.getElementById('resumeLunch').checked, mode: document.getElementById('resumeMode').value }));
-document.getElementById('reviewed').addEventListener('click', () => {
+for (const id of ['reviewed', 'reviewedQueue']) document.getElementById(id).addEventListener('click', () => {
   if (window.confirm('¿Ya revisaste o registraste estas llamadas en Propio Shift Tracker? Se descartarán las señales pendientes y volverá el modo de observación. Una llamada activa en Propio Shift Tracker requiere revisión allí.')) act({ kind: 'clear-reviewed' });
 });
 refresh().catch(() => { document.getElementById('status').textContent = reasons.storage; });
