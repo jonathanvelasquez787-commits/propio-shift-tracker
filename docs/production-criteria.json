@@ -1368,9 +1368,15 @@
         {
           "file": "tests/capsula-rango-medio.test.mjs",
           "namedCases": [
-            "capsula rango medio: de 761 a 1179 px los otros botones se achican a solo icono y la barra no crece",
+            "capsula rango medio: de 761 a 1179 px los otros botones conservan su nombre y se achican poco a poco, y la barra no crece",
             "capsula rango medio: no queda ningun ancho desde 480 px sin capsula ni pildora en fila propia",
             "capsula rango medio: el hover sube junto tambien desde 761 px"
+          ]
+        },
+        {
+          "file": "tests/capsula-rango-medio.test.mjs",
+          "namedCases": [
+            "capsula rango medio: desde 761 px la pildora de Break y Lunch muestra nombre, cronometro, horario y barra como en celular"
           ]
         },
         {
