@@ -31,3 +31,16 @@ test('capsula rango medio: el hover sube junto tambien desde 761 px', () => {
   const h = css.slice(css.indexOf('/* capsula sube junta */'), css.indexOf('/* fin capsula sube junta */'));
   assert.match(h, /\(hover: hover\) and \(pointer: fine\) and \(min-width: 480px\)/);
 });
+
+test('capsula rango medio: desde 761 px la pildora de Break y Lunch muestra nombre, cronometro, horario y barra como en celular', () => {
+  const c = css.indexOf('/* pildora igual en compu */');
+  const d = css.indexOf('/* fin pildora igual en compu */');
+  assert.ok(c >= 0 && d > c, 'faltan los marcadores del bloque CSS');
+  const blk = css.slice(c, d);
+  assert.match(blk, /@media \(min-width: 761px\)/);
+  assert.match(blk, /\.hbc-slide > \* \{ visibility: hidden; \}/);
+  assert.match(blk, /\.hbc-live \.hbc-live-r2 \{ display: block;/);
+  assert.match(blk, /\.hbc-live \.hbc-live-bar \{ position: absolute;/);
+  assert.match(blk, /min-width: 172px/);
+  assert.doesNotMatch(blk, /#[0-9a-fA-F]{3,8}\b/);
+});

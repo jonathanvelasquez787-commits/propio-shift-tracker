@@ -1374,6 +1374,12 @@
           ]
         },
         {
+          "file": "tests/capsula-rango-medio.test.mjs",
+          "namedCases": [
+            "capsula rango medio: desde 761 px la pildora de Break y Lunch muestra nombre, cronometro, horario y barra como en celular"
+          ]
+        },
+        {
           "file": "tests/contraer-capsula.test.mjs",
           "namedCases": [
             "contraer capsula: una sola capsula con dos mitades y el interruptor de siempre conserva su id",
