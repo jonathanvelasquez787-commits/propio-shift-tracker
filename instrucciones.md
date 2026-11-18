@@ -324,6 +324,11 @@ futura opera bajo esto, sin excepción:
 
 **PENDIENTES**
 
+- **Botón «Abrir historial de Propio» en el popup de la extensión (2.3.21):** estaba en el dibujo B que el propietario aprobó el 18/11, pero NO se programó porque la dirección de esa página no existe en ningún archivo de `extension/propio-bridge/` (solo aparece propio.com). Hacerlo solo cuando el propietario pegue la dirección exacta del historial de llamadas de Propio; no inventarla. El resto de la variante B (lista «Ver las N señales», botón «Descartar señales revisadas», aviso al descartar) ya está publicado (PR #334).
+- **Aviso de seguridad de la revisión automática:** `pnpm.auditConfig.ignoreGhsas: ["GHSA-fc5q-39xc-vjpf"]` (picomatch, solo desarrollo) se agregó en package.json con permiso del propietario; quitarlo cuando exista una versión corregida.
+- **Siguiente rediseño a elegir con el propietario:** Finanzas, Fechas de pago, Calendario o Ayuda (el Horario y sus tarjetas ya están rediseñados). Se pregunta con capturas reales antes de programar.
+- **Decidido el 18/11:** la cola de eventos pendientes de la extensión se queda como está (el propietario descartó quitarla y descartó que las señales viejas se borren solas).
+
 - **Ocho pedidos directos del 22/10:** implementación y evidencia reunidas en
   docs/cierre-ocho-pedidos.md. Web 639 aporta el hover con segundos; 640 integra
   Reportes y restaura la fecha azul; 641 cierra galería, lenguaje y control
@@ -350,17 +355,8 @@ futura opera bajo esto, sin excepción:
   el propietario decide activarlo. ES/EN funcionan localmente sin ese servicio;
   ver [idiomas y temas](docs/idiomas-y-temas.md).
 
-- **v664 — Acciones de Hoy colapsadas, más compactas.**
+- **PR #332 — Cápsula de una sola pieza (solo CSS).** Desde 480 px se quita la línea que partía el icono de la píldora en Break, Lunch y Llamada, y el borde blanco al pasar el mouse rodea solo botón + píldora; el basurero conserva su borde. Por dentro siguen siendo dos piezas (`#...ControlBtn` y `#heroBlockCard`); unirlas del todo se evaluó y no se hizo por riesgo. Bloque `/* capsula una pieza */` al final de `css/app-shell.css`; prueba `tests/capsula-una-pieza.test.mjs`.
 
-- Colapsada, la tarjeta queda en una sola franja con el título, el botón Iniciar/Finalizar shift y el círculo de expandir, en lugar de una tarjeta alta con solo título y círculo. Muestra también Break, Lunch y los tres botones de llamadas: solo iconos en pantallas angostas (opción B del mockup claro/oscuro aprobado, con «Hoy» como título corto y las etiquetas visibles solo para lectores de pantalla) y con etiqueta desde 1400 px.
-- CSS (`css/app-shell.css`) y un `<span class="hero-shift-short">` en app.html: mismos ids, listeners y JS; expandida no cambia. Verificado con check-ui-wiring, check-i18n, check-production-criteria y la suite de tests.
+- **PR #333 y #334 — Popup de la extensión (2.3.20 y 2.3.21).** El botón «Descartar señales revisadas» solo estaba dentro de Estado de conexión → Detalles para soporte; ahora vive también al final de «Eventos pendientes». #334 agrega «Ver las N señales» (tipo y hora; el worker manda `queueItems` con solo `type` y `at`, máximo 50), deja «Cómo resolverlos» cerrado y muestra «Señales descartadas. Volvió el modo de observación.» tras descartar. Prueba `tests/senales-pendientes-lista.test.mjs`. Verificado con un popup real y una API Chrome simulada, tema claro y oscuro.
 
-**v665 — Inicio recuerda sus vistas.**
-
-- La fila «Acciones de Hoy» (colapsada o expandida) y la pastilla Hoy/Ciclo de «Ganancias» guardan su estado en los ajustes (`heroActionsCollapsed`, `earningsViewMode`) y lo restauran al abrir la app, también en otra pestaña. Valores por defecto: expandida y vista Hoy; valores inválidos se corrigen al cargar.
-- Sin cambios de diseño, ids ni textos. Verificado con check-ui-wiring, check-i18n, check-production-criteria, la suite de tests y la compilación (presupuestos OK).
-
-**v666 — Modo freelancer dentro de Horario.**
-
-- El grupo «Modo freelancer» deja de vivir en Avisos y pasa a `#freelancerAccordion`, una tarjeta de la página Horario (arriba de la tarjeta Horario), con la etiqueta `#freelancerStatusTag` que refleja si está activado. Mockup claro/oscuro aprobado.
-- Se conservan todos los ids (`freelancerEnabledInput`, campos de minutos, `freelancerTemplateRow`) y sus listeners; el estado abierto/cerrado se guarda con el resto de acordeones. Verificado con check-i18n, check-ui-wiring, check-production-criteria, la suite de tests y la compilación.
+- **PR #330 y #331 — Barra en celular angosto y tema claro.** A 320 px los botones de la barra de acciones se achican de 40 a 36 px y ya no se salen (`/* barra en celular angosto */`). En tema claro el riel del Volumen y el fondo del anillo de % de la meta usan `var(--line-2)` (`/* riel y anillo en tema claro */`). Pruebas `barra-celular-angosto` y `riel-anillo-claro`.
