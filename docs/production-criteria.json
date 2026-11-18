@@ -1406,6 +1406,14 @@
           ]
         },
         {
+          "file": "tests/riel-anillo-claro.test.mjs",
+          "namedCases": [
+            "en tema claro el riel del Volumen usa un gris visible",
+            "en tema claro el fondo del anillo de la meta usa un gris visible",
+            "el CSS del riel y anillo tiene las llaves balanceadas"
+          ]
+        },
+        {
           "file": "tests/pildora-llamada-horario.test.mjs",
           "namedCases": [
             "pildora de llamada: en compu muestra nombre, cronometro y la hora en que empezo, como Break y Lunch"
