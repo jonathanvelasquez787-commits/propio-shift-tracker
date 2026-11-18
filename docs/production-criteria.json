@@ -1386,6 +1386,12 @@
           ]
         },
         {
+          "file": "tests/finanzas-sin-desborde.test.mjs",
+          "namedCases": [
+            "finanzas sin desborde: la pagina de Finanzas recorta lo que se sale por el lado para que no se ensanche"
+          ]
+        },
+        {
           "file": "tests/pildora-llamada-horario.test.mjs",
           "namedCases": [
             "pildora de llamada: en compu muestra nombre, cronometro y la hora en que empezo, como Break y Lunch"
