@@ -1423,6 +1423,14 @@
           ]
         },
         {
+          "file": "tests/senales-pendientes-lista.test.mjs",
+          "namedCases": [
+            "el recuadro de eventos pendientes tiene la lista de senales y el boton de descartar",
+            "el trabajador manda el tipo y la hora de cada senal pendiente, sin mas datos",
+            "descartar desde el recuadro avisa que quedo listo"
+          ]
+        },
+        {
           "file": "tests/pildora-llamada-horario.test.mjs",
           "namedCases": [
             "pildora de llamada: en compu muestra nombre, cronometro y la hora en que empezo, como Break y Lunch"

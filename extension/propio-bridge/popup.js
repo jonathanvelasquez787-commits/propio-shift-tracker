@@ -65,6 +65,16 @@ async function refresh() {
     ? `${state.history.invalid ? `${state.history.invalid} fila(s) pendiente(s) de datos válidos. ` : ''}Última lectura: ${new Date(state.history.at).toLocaleTimeString('es')}.${state.mode !== 'auto' ? ' Activá el registro para sincronizarlas.' : ''}`
     : 'Abrí el historial de Propio para leer y recuperar sus llamadas.';
   document.getElementById('pendingCount').textContent = String(state.queued);
+  const signalNames = { 'history-records': 'Historial de llamadas', 'session-start': 'Inicio de sesión', 'session-end': 'Fin de sesión', 'pause-end': 'Fin de pausa programado' };
+  const signalList = document.getElementById('pendingSignalsList'); signalList.replaceChildren();
+  for (const item of Array.isArray(state.queueItems) ? state.queueItems : []) {
+    const li = document.createElement('li'), when = document.createElement('span'), at = new Date(item.at);
+    li.textContent = signalNames[item.type] || 'Señal';
+    when.textContent = Number.isNaN(at.getTime()) ? '' : at.toLocaleString('es', { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
+    li.append(when); signalList.append(li);
+  }
+  document.getElementById('pendingSignalsTitle').textContent = `Ver las ${state.queued} señales`;
+  document.getElementById('pendingSignalsBox').hidden = !signalList.children.length;
   const queueDetail = document.getElementById('pendingQueueDetail'), queueDeadline = document.getElementById('pendingQueueDeadline');
   queueDetail.hidden = !state.queued;
   const expires = Date.parse(state.queueSummary?.expiresAt), queueRemaining = Math.max(0, Math.ceil((expires - Date.now()) / 60000));
@@ -171,7 +181,7 @@ for (const id of ['bridgeCelebrate', 'bridgeAsk']) document.getElementById(id).a
 for (const id of ['resumeBreak','resumeLunch','resumeMode']) document.getElementById(id).addEventListener('change', () => act({ kind: 'resume-options',
   break: document.getElementById('resumeBreak').checked, lunch: document.getElementById('resumeLunch').checked, mode: document.getElementById('resumeMode').value }));
 for (const id of ['reviewed', 'reviewedQueue']) document.getElementById(id).addEventListener('click', () => {
-  if (window.confirm('¿Ya revisaste o registraste estas llamadas en Propio Shift Tracker? Se descartarán las señales pendientes y volverá el modo de observación. Una llamada activa en Propio Shift Tracker requiere revisión allí.')) act({ kind: 'clear-reviewed' });
+  if (window.confirm('¿Ya revisaste o registraste estas llamadas en Propio Shift Tracker? Se descartarán las señales pendientes y volverá el modo de observación. Una llamada activa en Propio Shift Tracker requiere revisión allí.')) act({ kind: 'clear-reviewed' }, 'Señales descartadas. Volvió el modo de observación.');
 });
 refresh().catch(() => { document.getElementById('status').textContent = reasons.storage; });
 setInterval(() => { if (!busy) refresh().catch(() => {}); }, 2000);
