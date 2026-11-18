@@ -2623,3 +2623,11 @@ html:root .sblk-item:has(> .sblk-card.is-collapsed) .sblk-hour { padding-top: 8p
 html:root .sblk-card.is-collapsed .sblk-collapsed-line span:nth-child(n+2) { display: none !important; }
 }
 /* fin tarjetas contraidas compactas */
+
+/* barra sin salirse */
+/* De 761 a 1179 px, sin actividad en curso, los botones (108 px) se achican poco a poco hasta 50 px si no caben, para que la barra no se salga. Donde ya cabian siguen en 108 px. */
+@media (min-width: 761px) and (max-width: 1179px) {
+  .chips > .hero-shift-actions:not([data-live-type]) .action-slot:not([data-slot="discard"]) { width: auto !important; min-width: 50px !important; flex: 0 1 108px !important; }
+  .chips > .hero-shift-actions:not([data-live-type]) .action-slot:not([data-slot="discard"]) > .action-btn { width: 100% !important; min-width: 0 !important; }
+}
+/* fin barra sin salirse */

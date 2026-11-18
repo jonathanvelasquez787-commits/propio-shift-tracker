@@ -1380,6 +1380,12 @@
           ]
         },
         {
+          "file": "tests/barra-sin-salirse.test.mjs",
+          "namedCases": [
+            "barra sin salirse: de 761 a 1179 px, sin actividad, los botones se achican de 108 a 50 px en vez de salirse de la barra"
+          ]
+        },
+        {
           "file": "tests/tarjetas-compactas.test.mjs",
           "namedCases": [
             "tarjetas compactas: solo tocan tarjetas abiertas y la etiqueta Hecho/Actual queda en la misma linea del titulo",
