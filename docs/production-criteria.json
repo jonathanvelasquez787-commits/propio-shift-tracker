@@ -1388,6 +1388,14 @@
           ]
         },
         {
+          "file": "tests/tarjetas-contraidas-compactas.test.mjs",
+          "namedCases": [
+            "tarjetas contraidas compactas: 36 px de alto, una linea y solo tocan tarjetas contraidas",
+            "tarjetas contraidas compactas: la etiqueta lleva un punto de color y en celular queda solo la hora",
+            "tarjetas contraidas compactas: sin colores fijos y con llaves balanceadas"
+          ]
+        },
+        {
           "file": "tests/contraer-capsula.test.mjs",
           "namedCases": [
             "contraer capsula: una sola capsula con dos mitades y el interruptor de siempre conserva su id",
