@@ -2650,3 +2650,25 @@ html:root .sblk-card.is-collapsed .sblk-collapsed-line span:nth-child(n+2) { dis
 html:root.theme-light .volume-row input[type="range"] { background: var(--line-2) !important; }
 html:root.theme-light .gh-ring { background: conic-gradient(var(--accent-blue-2) calc(var(--ring-pct, 0) * 1%), var(--line-2) 0) !important; }
 /* fin riel y anillo en tema claro */
+
+/* capsula una pieza */
+/* De 480 px para arriba, el boton en curso y su pildora se ven como UNA sola pieza: sin la linea de en medio, y el borde blanco del mouse rodea solo icono + pildora (el basurero conserva su propio borde). */
+@media (min-width: 480px) {
+  html:root .chips > .hero-shift-actions[data-live-type="break"] .action-slot[data-slot="break"] .action-btn { box-shadow: none !important; border-right-width: 0 !important; }
+  html:root .chips > .hero-shift-actions[data-live-type="break"]:has(.action-slot[data-slot="break"] .action-btn:hover, .hbc:hover) .action-slot[data-slot="break"] .action-btn { box-shadow: -2px 0 0 0 var(--cap-ring), 0 -2px 0 0 var(--cap-ring), 0 2px 0 0 var(--cap-ring) !important; }
+  html:root .chips > .hero-shift-actions[data-live-type="break"]:has(.action-slot[data-slot="break"] .action-btn:hover, .hbc:hover) > .hbc { box-shadow: 0 -2px 0 0 var(--cap-ring), 0 2px 0 0 var(--cap-ring), 2px 0 0 0 var(--cap-ring) !important; }
+  html:root .chips > .hero-shift-actions[data-live-type="break"]:has(.action-slot[data-slot="break"] .action-btn:hover, .hbc:hover) .action-slot[data-slot="discard"] .action-btn:not(:hover) { box-shadow: none !important; }
+  html:root .chips > .hero-shift-actions[data-live-type="lunch"] .action-slot[data-slot="lunch"] .action-btn { box-shadow: none !important; border-right-width: 0 !important; }
+  html:root .chips > .hero-shift-actions[data-live-type="lunch"]:has(.action-slot[data-slot="lunch"] .action-btn:hover, .hbc:hover) .action-slot[data-slot="lunch"] .action-btn { box-shadow: -2px 0 0 0 var(--cap-ring), 0 -2px 0 0 var(--cap-ring), 0 2px 0 0 var(--cap-ring) !important; }
+  html:root .chips > .hero-shift-actions[data-live-type="lunch"]:has(.action-slot[data-slot="lunch"] .action-btn:hover, .hbc:hover) > .hbc { box-shadow: 0 -2px 0 0 var(--cap-ring), 0 2px 0 0 var(--cap-ring), 2px 0 0 0 var(--cap-ring) !important; }
+  html:root .chips > .hero-shift-actions[data-live-type="lunch"]:has(.action-slot[data-slot="lunch"] .action-btn:hover, .hbc:hover) .action-slot[data-slot="discard"] .action-btn:not(:hover) { box-shadow: none !important; }
+  html:root .chips > .hero-shift-actions[data-live-type="call"] .action-slot[data-slot="call"] .action-btn { box-shadow: none !important; border-right-width: 0 !important; }
+  html:root .chips > .hero-shift-actions[data-live-type="call"]:has(.action-slot[data-slot="call"] .action-btn:hover, .hbc:hover) .action-slot[data-slot="call"] .action-btn { box-shadow: -2px 0 0 0 var(--cap-ring), 0 -2px 0 0 var(--cap-ring), 0 2px 0 0 var(--cap-ring) !important; }
+  html:root .chips > .hero-shift-actions[data-live-type="call"]:has(.action-slot[data-slot="call"] .action-btn:hover, .hbc:hover) > .hbc { box-shadow: 0 -2px 0 0 var(--cap-ring), 0 2px 0 0 var(--cap-ring), 2px 0 0 0 var(--cap-ring) !important; }
+  html:root .chips > .hero-shift-actions[data-live-type="call"]:has(.action-slot[data-slot="call"] .action-btn:hover, .hbc:hover) .action-slot[data-slot="discard"] .action-btn:not(:hover) { box-shadow: none !important; }
+  html:root .chips > .hero-shift-actions[data-live-type="pending"] .action-slot[data-slot="call"] .action-btn { box-shadow: none !important; border-right-width: 0 !important; }
+  html:root .chips > .hero-shift-actions[data-live-type="pending"]:has(.action-slot[data-slot="call"] .action-btn:hover, .hbc:hover) .action-slot[data-slot="call"] .action-btn { box-shadow: -2px 0 0 0 var(--cap-ring), 0 -2px 0 0 var(--cap-ring), 0 2px 0 0 var(--cap-ring) !important; }
+  html:root .chips > .hero-shift-actions[data-live-type="pending"]:has(.action-slot[data-slot="call"] .action-btn:hover, .hbc:hover) > .hbc { box-shadow: 0 -2px 0 0 var(--cap-ring), 0 2px 0 0 var(--cap-ring), 2px 0 0 0 var(--cap-ring) !important; }
+  html:root .chips > .hero-shift-actions[data-live-type="pending"]:has(.action-slot[data-slot="call"] .action-btn:hover, .hbc:hover) .action-slot[data-slot="discard"] .action-btn:not(:hover) { box-shadow: none !important; }
+}
+/* fin capsula una pieza */
