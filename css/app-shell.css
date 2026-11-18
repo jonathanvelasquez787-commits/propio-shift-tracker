@@ -2607,3 +2607,19 @@ html:root .sblk-card:not(.is-collapsed) .sblk-tile .sblk-bar-track { margin-top:
 html:root .sblk-card:not(.is-collapsed) .sblk-tiles { gap: 8px !important; }
 }
 /* fin tarjetas compactas */
+
+/* tarjetas contraidas compactas */
+html:root .sblk-card.is-collapsed { padding: 0 12px !important; min-height: 0 !important; height: 36px !important; display: flex !important; align-items: center !important; }
+html:root .sblk-card.is-collapsed .sblk-extra { display: none !important; }
+html:root .sblk-card.is-collapsed .sblk-head { flex: 1 1 100% !important; width: 100% !important; padding: 0 !important; margin: 0 !important; align-items: center !important; flex-wrap: nowrap !important; gap: 8px !important; }
+html:root .sblk-card.is-collapsed .sblk-icon { transform: scale(.9); }
+html:root .sblk-card.is-collapsed .sblk-collapsed-line { margin-right: 0 !important; }
+html:root .sblk-card.is-collapsed .sblk-collapsed-line span { display: inline !important; }
+html:root .sblk-card.is-collapsed .sblk-head .sblk-status { position: static !important; transform: none !important; margin-left: auto !important; font-size: 11px !important; padding: 0 !important; background: transparent !important; }
+html:root .sblk-card.is-collapsed .sblk-head .sblk-status::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: currentColor; margin-right: 6px; }
+html:root .sblk-item:has(> .sblk-card.is-collapsed) { padding-bottom: 6px !important; }
+html:root .sblk-item:has(> .sblk-card.is-collapsed) .sblk-hour { padding-top: 8px !important; }
+@media (max-width: 700px) {
+html:root .sblk-card.is-collapsed .sblk-collapsed-line span:nth-child(n+2) { display: none !important; }
+}
+/* fin tarjetas contraidas compactas */
