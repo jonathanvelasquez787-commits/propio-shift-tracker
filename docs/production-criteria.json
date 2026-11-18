@@ -1380,6 +1380,14 @@
           ]
         },
         {
+          "file": "tests/tarjetas-compactas.test.mjs",
+          "namedCases": [
+            "tarjetas compactas: solo tocan tarjetas abiertas y la etiqueta Hecho/Actual queda en la misma linea del titulo",
+            "tarjetas compactas: Usado comparte fila con su barra y en 470 px o menos queda apilado",
+            "tarjetas compactas: sin colores fijos y con llaves balanceadas"
+          ]
+        },
+        {
           "file": "tests/contraer-capsula.test.mjs",
           "namedCases": [
             "contraer capsula: una sola capsula con dos mitades y el interruptor de siempre conserva su id",
