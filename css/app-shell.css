@@ -2644,3 +2644,9 @@ html:root .sblk-card.is-collapsed .sblk-collapsed-line span:nth-child(n+2) { dis
   .chips > .hero-shift-actions .action-slot > .action-btn { width: 100% !important; min-width: 0 !important; }
 }
 /* fin barra en celular angosto */
+
+/* riel y anillo en tema claro */
+/* En tema claro el riel del Volumen y el fondo del anillo de % de la meta eran blancos sobre blanco y no se veian. Ahora usan un gris azulado visible. Tema oscuro sin cambios. */
+html:root.theme-light .volume-row input[type="range"] { background: var(--line-2) !important; }
+html:root.theme-light .gh-ring { background: conic-gradient(var(--accent-blue-2) calc(var(--ring-pct, 0) * 1%), var(--line-2) 0) !important; }
+/* fin riel y anillo en tema claro */
