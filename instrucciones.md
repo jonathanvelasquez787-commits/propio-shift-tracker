@@ -8,7 +8,8 @@ Este archivo tiene dos partes:
    modificar un protocolo.
 2. **ESTADO DEL PROYECTO** (de "PENDIENTES" en adelante). Estado actual,
    pendientes, limitaciones conocidas y el historial de las últimas versiones.
-   Esta parte SÍ se reescribe en cada versión nueva:
+   Esta parte SÍ se reescribe en cada cambio nuevo (desde el PR #283 el número
+   de versión web quedó en 666 y las entradas se identifican por número de PR):
 
 - PENDIENTES: sin límite — se conservan TODOS los bugs/tareas pendientes
   mientras sigan sin resolver, con el detalle que haga falta para
@@ -69,9 +70,10 @@ ese mockup igual debe ser visual y aprobado antes de tocar código):
 
 ---
 
-**PROTOCOLO DE COMENTARIOS EN EL CÓDIGO (leer antes de tocar el .html)**
+**PROTOCOLO DE COMENTARIOS EN EL CÓDIGO (leer antes de tocar app.html, js/ o css/)**
 
-Este proyecto es un solo archivo HTML de miles de líneas. El historial de
+Este proyecto es una app de miles de líneas repartidas en `app.html`, módulos
+ES en `js/` y estilos en `css/`. El historial de
 "por qué se hizo cada cambio" vive en este resumen — el código en sí NO debe
 repetir esa narrativa. Al agregar o editar código:
 
@@ -86,7 +88,7 @@ repetir esa narrativa. Al agregar o editar código:
    solo tienen sentido en el resumen.
 5. Si hace falta explicar el "por qué" de una decisión de más de 2 líneas, se
    escribe en el resumen como parte del registro de esa versión, no como
-   comentario en el archivo HTML.
+   comentario en el código.
 6. Al editar código que ya tiene un comentario largo tipo diario, se
    aprovecha para comprimirlo a 1-2 líneas (o borrarlo si el resumen ya lo
    cubre), sin que haga falta que el usuario lo pida.
@@ -305,8 +307,11 @@ futura opera bajo esto, sin excepción:
 - **Cualquier cambio a `app.html` o a otro archivo lo hace el agente
   directamente en el repositorio**, con herramientas de archivo seguras. El
   usuario nunca recibe pasos para editar código o ejecutar comandos.
-- El agente puede crear commits, hacer push y desplegar a producción cuando
-  sea parte natural de la tarea, sin solicitar aprobación adicional.
+- El agente sube cada cambio a una rama nueva y abre un PR (un PR a la vez);
+  cuando la revisión automática sale verde, el usuario hace solo dos clics en
+  GitHub ("Merge pull request" y "Confirm merge") y el agente confirma por API
+  que quedó mezclado. A veces el usuario mezcla sin avisar: revisar antes de
+  pedirle los clics. El despliegue a producción ocurre al mezclar.
 - El agente principal actúa como orquestador: conserva el contexto global,
   decide arquitectura y alcance, integra resultados y hace la revisión final.
 - El trabajo operativo o repetitivo puede delegarse únicamente a Sol 6.1
@@ -319,6 +324,53 @@ futura opera bajo esto, sin excepción:
   para el usuario.
 - `instrucciones.md` se actualiza directamente junto con el repositorio cuando
   cambia el estado o un protocolo solicitado por el usuario.
+
+---
+
+**REGLAS DE TRABAJO CON EL PROPIETARIO (leer siempre — regla permanente)**
+
+Aprendidas con uso real; el propietario se ha molestado cuando se rompieron.
+
+1. **Idioma y tono:** siempre en español, simple y SIN JERGA (decir "se sale de
+   la barra", no "desborde"; "al pasar el mouse", no "hover"). Mensajes
+   cortos, una cosa por vez. Cuando le toca hacer algo, solo pasos de clics
+   (link directo del PR, "Merge pull request", "Confirm merge"), nunca comandos.
+2. **Hacer exactamente lo pedido, sin ampliar.** Si algo más debería acompañar,
+   preguntar antes. Si en un dibujo se cambia algo que no pidió (colores,
+   tamaños, textos que se quitan o se cierran), avisarlo antes de que pregunte.
+   Si una orden es ambigua ("los textos", "eso", "lo mismo pero al revés"),
+   hacer UNA pregunta mostrando una captura, antes de programar.
+3. **Protocolo visual:** (1) captura real de HOY, (2) dibujo real de la
+   PROPUESTA dentro de la app (HOY | PROPUESTA, con alto y ancho en px),
+   (3) preguntar "¿Lo hago así?" con las imágenes YA mostradas en ese mismo
+   mensaje, (4) programar solo tras su "Dale" o la elección de una variante.
+   Si responde "No me gusta", dibujar 3 variantes reales. Si elige varias
+   opciones a la vez ("1, 2 y 3"), dibujar 3 variantes reales que combinen y
+   que elija una. Los bugs, desbordes y colores invisibles se arreglan directo,
+   con prueba real, mostrando HOY vs PROPUESTA y avisando.
+4. **Si algo del dibujo aprobado NO se va a programar** (porque falta un dato,
+   p. ej. una dirección web que no existe en el código), decirlo en la primera
+   frase del mensaje, o no dibujarlo. Nunca inventar datos para completarlo.
+5. **Auto-revisión antes de mostrar cualquier imagen:** abrir cada PNG y
+   revisarla como si fuera el propietario (textos cortados o encimados, iconos
+   tapados, bordes cortados por el recorte, piezas que cambian de tamaño);
+   comparar HOY vs PROPUESTA con números; probar oscuro Y claro y los anchos que
+   apliquen; rehacer el dibujo si hay errores. Imágenes grandes (1300-1470 px de
+   ancho), una idea por imagen, con nombre nuevo en cada versión. Si el
+   propietario manda la captura de un "error" que no se puede reproducir,
+   decirlo con honestidad y no cambiar nada.
+6. **Verificar antes de afirmar:** con `git grep`/`git log` y capturas reales;
+   nunca decir "ya está hecho" o "no lo pediste" sin mirar.
+7. **Pendientes:** si pregunta qué falta, listar TODO lo pendiente con honestidad
+   (lista corta numerada, sin lo que ya se quitó).
+8. **Extensión:** cada cambio sube la versión (manifest.json, README.md de la
+   extensión y extension-lista/LEEME.txt), reemplaza
+   extension-lista/propio-bridge.zip y se le manda el zip; pasos para él:
+   descomprimir, quitar la anterior en Chrome, "Cargar descomprimida".
+9. **Secretos:** nunca escribir tokens ni contraseñas en el repositorio (este
+   archivo incluido); `scripts/scan-secrets.mjs` lo vigila.
+10. **Gasto de tokens:** trabajar por partes, un PR por parte; si avisa que se
+    acaban, entregar el contexto actualizado y actualizar este archivo.
 
 ---
 
