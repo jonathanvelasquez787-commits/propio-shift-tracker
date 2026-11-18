@@ -4672,6 +4672,7 @@
     "source": "Desde",
     "files": [
       "app.html",
+      "js/app-main.js",
       "js/higher-rate-review.js",
       "js/schedule.js"
     ]

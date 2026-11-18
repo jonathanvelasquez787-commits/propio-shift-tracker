@@ -1386,6 +1386,12 @@
           ]
         },
         {
+          "file": "tests/pildora-llamada-horario.test.mjs",
+          "namedCases": [
+            "pildora de llamada: en compu muestra nombre, cronometro y la hora en que empezo, como Break y Lunch"
+          ]
+        },
+        {
           "file": "tests/tarjetas-compactas.test.mjs",
           "namedCases": [
             "tarjetas compactas: solo tocan tarjetas abiertas y la etiqueta Hecho/Actual queda en la misma linea del titulo",
