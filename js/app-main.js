@@ -4483,7 +4483,13 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
         const liveSlide = liveAccent && pillCard && typeof pillCard.querySelector === 'function' ? pillCard.querySelector(`.hbc-slide[data-accent="${liveAccent}"]`) : null;
         const rangeEl = liveSlide && typeof liveSlide.querySelector === 'function' ? liveSlide.querySelector('.hbc-range') : null;
         const fillEl = liveSlide && typeof liveSlide.querySelector === 'function' ? liveSlide.querySelector('.hbc-track i') : null;
-        const liveRange = rangeEl ? String(rangeEl.textContent || '').trim() : '';
+        let liveRange = rangeEl ? String(rangeEl.textContent || '').trim() : '';
+        if (info && info.type === 'call' && info.startedAt) {
+          const callStart = new Date(info.startedAt);
+          if (!Number.isNaN(callStart.getTime())) {
+            liveRange = `${translateText('Desde')} ${new Intl.DateTimeFormat(displayLocale(), { hour: '2-digit', minute: '2-digit' }).format(callStart)}`;
+          }
+        }
         const livePct = fillEl && fillEl.style ? Math.max(0, Math.min(100, parseFloat(fillEl.style.width) || 0)) : 0;
         const liveSig = info ? `${info.type}|${liveText}|${liveName}|${liveRange}|${Math.round(livePct)}` : '';
         if (pillLive.dataset.sig !== liveSig) {
