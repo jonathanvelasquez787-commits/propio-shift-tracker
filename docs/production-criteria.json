@@ -1466,7 +1466,8 @@
             "cada pagina tiene su boton para pasar de lado y el limite de 2 a la izquierda se explica",
             "cada pagina muestra su direccion y un boton Editar que cambia la misma direccion que se guarda",
             "la pantalla avisa lo que no se ha guardado, deja volver a como estaba y organizar ahora",
-            "en la pantalla de configuracion se esconde la tarjeta Preparando y se explica Solo registro aparte"
+            "en la pantalla de configuracion se esconde la tarjeta Preparando y se explica Solo registro aparte",
+            "los valores por defecto del espacio de trabajo son 33% de ancho y 61.2% de alto"
           ]
         },
         {

@@ -42,11 +42,21 @@ test('cada pagina muestra su direccion y un boton Editar que cambia la misma dir
 test('la pantalla avisa lo que no se ha guardado, deja volver a como estaba y organizar ahora', () => {
   assert.match(page, /id="dirty-note"/); assert.match(page, /Sin guardar/);
   assert.match(page, /id="setup-arrange"[^]*Organizar ahora/); assert.match(page, /id="setup-reset"[^]*Volver a como estaba/);
-  assert.match(script, /markDirty\(false\)/); assert.match(script, /fields\.width\.value = 31\.25; fields\.height\.value = 100/);
+  assert.match(script, /markDirty\(false\)/); assert.match(script, /fields\.width\.value = 33; fields\.height\.value = 61\.2/);
   assert.match(script, /workspace-retry'\)\.click\(\)/);
 });
 
 test('en la pantalla de configuracion se esconde la tarjeta Preparando y se explica Solo registro aparte', () => {
   assert.match(page, /id="workspace-card"/); assert.match(readFileSync('extension/propio-bridge/workspace-page.js', 'utf8'), /workspace-card'\)\.hidden = true/);
   assert.match(page, /<summary>¿Cómo funciona «Solo registro»\?<\/summary>/);
+});
+
+test('los valores por defecto del espacio de trabajo son 33% de ancho y 61.2% de alto', async () => {
+  const { readWorkspaceSettings } = await import('../extension/propio-bridge/workspace-settings.js');
+  const api = { storage: { local: { get: async () => ({}) } } };
+  const prefs = JSON.parse((await import('node:fs')).readFileSync(new URL('../extension/propio-bridge/workspace-preferences.json', import.meta.url), 'utf8'));
+  const settings = await readWorkspaceSettings(api, prefs);
+  assert.equal(settings.rightPaneWidthRatio, .33);
+  assert.equal(settings.rightPaneHeightRatio, .612);
+  assert.equal((await readWorkspaceSettings(api, {})).rightPaneHeightRatio, .612);
 });

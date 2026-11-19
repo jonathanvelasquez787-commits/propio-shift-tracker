@@ -51,7 +51,7 @@ function renderSides() {
   updatePreview();
 }
 function updatePreview() {
-  const width = Math.min(50, Math.max(25, Number(fields.width.value) || 31.25)), height = Math.min(100, Math.max(40, Number(fields.height.value) || 100));
+  const width = Math.min(50, Math.max(25, Number(fields.width.value) || 33)), height = Math.min(100, Math.max(40, Number(fields.height.value) || 61.2));
   const leftBox = document.getElementById('preview-left'), right = document.getElementById('preview-right'), rightKeys = side('right');
   leftBox.style.width = `calc(${100 - width}% - 3px)`; leftBox.textContent = '';
   for (const key of side('left')) { const page = document.createElement('span'); page.textContent = names()[key]; leftBox.append(page); }
@@ -111,7 +111,7 @@ document.getElementById('setup-reset').addEventListener('click', () => {
   if (!loaded) return;
   sides = { ...defaultWorkspaceSides }; extras = [];
   for (const key of workspaceOrder) fields[key].value = workspacePages[key];
-  fields.width.value = 31.25; fields.height.value = 100; widthRange.value = 31.25; heightRange.value = 100;
+  fields.width.value = 33; fields.height.value = 61.2; widthRange.value = 33; heightRange.value = 61.2;
   markDirty(); renderSides();
   message.textContent = 'Volvió la distribución de siempre. Toca Guardar para aplicarla.';
 });

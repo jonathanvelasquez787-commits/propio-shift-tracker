@@ -67,6 +67,6 @@ export async function readWorkspaceSettings(api, defaults = {}) {
   const saved = (await api.storage.local.get(workspaceSettingsKey))[workspaceSettingsKey];
   if (saved !== undefined) return validateWorkspaceSettings(saved);
   return validateWorkspaceSettings({ version: 1, pages: workspacePages, openOnProfileStart: defaults.openOnProfileStart === true,
-    passive: true, rightPaneHeightRatio: typeof defaults.rightPaneHeightRatio === 'number' ? defaults.rightPaneHeightRatio : 1,
-    rightPaneWidthRatio: 5 / 16 });
+    passive: true, rightPaneHeightRatio: typeof defaults.rightPaneHeightRatio === 'number' ? defaults.rightPaneHeightRatio : .612,
+    rightPaneWidthRatio: .33 });
 }

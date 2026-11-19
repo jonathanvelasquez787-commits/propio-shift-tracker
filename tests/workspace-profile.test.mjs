@@ -166,10 +166,10 @@ test('workspace launcher uses the personal top-pane height and falls back when p
   assert.equal(personal.options[0].rightPaneHeightRatio, .61);
   assert.equal(personal.options[0].frameInset, 8, 'maximized Windows still needs border compensation after restoring');
   const unavailable = await workspacePage({ status: 'ready' }, new Error('Unavailable preferences'));
-  assert.equal(unavailable.options[0].rightPaneHeightRatio, 1);
+  assert.equal(unavailable.options[0].rightPaneHeightRatio, .612);
   assert.equal(unavailable.session['workspace-profile-session'].phase, 'ready');
   const invalid = await workspacePage({ status: 'ready' }, null);
-  assert.equal(invalid.options[0].rightPaneHeightRatio, 1);
+  assert.equal(invalid.options[0].rightPaneHeightRatio, .612);
   assert.equal(invalid.session['workspace-profile-session'].phase, 'ready');
 });
 
