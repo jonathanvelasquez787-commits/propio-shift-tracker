@@ -1456,6 +1456,14 @@
           ]
         },
         {
+          "file": "tests/espacio-vivo.test.mjs",
+          "namedCases": [
+            "el espacio de trabajo muestra un dibujo en vivo de la pantalla",
+            "ancho y alto tienen barra y numero con los mismos limites de siempre",
+            "las cuatro direcciones quedan dentro del plegable Direcciones de las páginas"
+          ]
+        },
+        {
           "file": "tests/pildora-llamada-horario.test.mjs",
           "namedCases": [
             "pildora de llamada: en compu muestra nombre, cronometro y la hora en que empezo, como Break y Lunch"

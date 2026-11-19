@@ -7,6 +7,17 @@ const unquote = value => String(value || '').trim().replace(/^["']+|["']+$/g, ''
 async function savePaths() {
   try { await chrome.storage.local.set({ [PATHS_KEY]: { shortcut: unquote(fields.shortcut.value), notes: unquote(fields.notes.value) } }); } catch { /* si no se puede guardar, el cuadro sigue funcionando */ }
 }
+const widthRange = document.getElementById('width-range'), heightRange = document.getElementById('height-range');
+function updatePreview() {
+  const width = Math.min(50, Math.max(25, Number(fields.width.value) || 31.25)), height = Math.min(100, Math.max(40, Number(fields.height.value) || 100));
+  document.getElementById('preview-left').style.width = `calc(${100 - width}% - 3px)`;
+  const right = document.getElementById('preview-right'); right.style.width = `calc(${width}% - 3px)`; right.style.height = `${height}%`;
+  document.getElementById('preview-caption').textContent = `Izquierda: ${Math.round((100 - width) * 100) / 100}% del ancho · Derecha: ${Math.round(width * 100) / 100}% del ancho y ${Math.round(height * 10) / 10}% del alto`;
+}
+for (const [range, number] of [[widthRange, fields.width], [heightRange, fields.height]]) {
+  range.addEventListener('input', () => { number.value = range.value; updatePreview(); });
+  number.addEventListener('input', () => { range.value = number.value; updatePreview(); });
+}
 let loaded = false;
 try {
   const savedPaths = (await chrome.storage.local.get(PATHS_KEY))[PATHS_KEY] || DEFAULT_PATHS;
@@ -28,6 +39,7 @@ try {
   fields.passive.checked = typeof passive === 'boolean' ? passive : value.passive;
   fields.height.value = Math.round(value.rightPaneHeightRatio * 1000) / 10;
   fields.width.value = Math.round(value.rightPaneWidthRatio * 10000) / 100;
+  widthRange.value = fields.width.value; heightRange.value = fields.height.value; updatePreview();
   message.textContent = 'La configuración pertenece solo al perfil de Chrome donde abriste este asistente. Guardar no abre ni mueve ventanas.';
   loaded = true;
 } catch (error) { message.textContent = error.message || 'No se pudo leer la configuración. Reabrí el asistente antes de guardar.'; }
