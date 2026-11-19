@@ -265,7 +265,6 @@ export function configureScheduleContext(context) {
         const nextDayLabel = toMinutes(startVal) < anchor ? translateText('Inicio al día siguiente')
           : toMinutes(startVal) + durVal >= 1440 ? translateText('Fin al día siguiente') : '';
         // Ver comentario junto a `.sched-tl-hour` en el CSS: la hora de inicio se repite aquí como texto suelto a la izquierda de la línea/punto conector
-        const typeName = type === 'work' ? translateText('Trabajo') : type === 'break' ? 'Break' : 'Lunch';
         return ui`
         <div class="block-row sched-tl-item sched-bk" data-block-row="${i}" data-block-type="${type}">
           <div class="sched-tl-hour" hidden aria-hidden="true">${startVal}</div>
@@ -273,8 +272,14 @@ export function configureScheduleContext(context) {
             <div class="sched-bk-top">
               <span class="sched-tl-icon">${iconHtml(meta.iconName)}</span>
               <div class="sched-tl-titles">
-                <span class="sched-bk-name">${typeName}</span>
-                <input type="hidden" class="block-type-input" value="${type}"/>
+                <span class="sched-bk-name sched-bk-name-pick">
+                  <select class="block-type-input sched-bk-name-select" aria-label="Tipo de bloque">
+                    <option value="work"${type === 'work' ? ' selected' : ''}>${BLOCK_TYPE_LABELS.work}</option>
+                    <option value="break"${type === 'break' ? ' selected' : ''}>${BLOCK_TYPE_LABELS.break}</option>
+                    <option value="lunch"${type === 'lunch' ? ' selected' : ''}>${BLOCK_TYPE_LABELS.lunch}</option>
+                  </select>
+                  <svg class="ic-svg sched-bk-name-chev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                </span>
                 <div class="sched-tl-subtitle">${nextDayLabel}</div>
               </div>
               <span class="sched-tl-duration">${durationLabel}</span>
