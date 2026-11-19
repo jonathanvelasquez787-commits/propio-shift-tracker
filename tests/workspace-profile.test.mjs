@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { runInNewContext } from 'node:vm';
 import { installProfileWorkspace } from '../extension/propio-bridge/workspace-profile.js';
-import { readWorkspaceSettings } from '../extension/propio-bridge/workspace-settings.js';
+import { readWorkspaceSettings, describeSides } from '../extension/propio-bridge/workspace-settings.js';
 
 function fixture({ normal = [{ id: 1, type: 'normal' }], preference, readDefault = async () => true, launchers = [] } = {}) {
   const local = preference === undefined ? {} : { 'workspace-profile-enabled': preference };
@@ -138,8 +138,8 @@ async function workspacePage(result, preferences = {}) {
   };
   const source = readFileSync(new URL('../extension/propio-bridge/workspace-page.js', import.meta.url), 'utf8').replace(/^import .*;$/gm, '');
   await runInNewContext(source, {
-    document: { getElementById: id => id === 'workspace-status' ? status : retry },
-    chrome, readWorkspaceSettings, window: { screen: {}, outerWidth: 800, innerWidth: 800 }, navigator: { platform: 'Win32' }, location: { hash: '#profile' },
+    document: { getElementById: id => id === 'workspace-status' ? status : /summary$/.test(id) ? {} : retry },
+    chrome, readWorkspaceSettings, describeSides, window: { screen: {}, outerWidth: 800, innerWidth: 800 }, navigator: { platform: 'Win32' }, location: { hash: '#profile' },
     fetch: async url => { assert.match(url, /workspace-preferences.json$/); if (preferences instanceof Error) throw preferences; return { ok: true, json: async () => preferences }; },
     arrangeWorkspace: async (api, screen, values) => { options.push(values); if (result instanceof Error) throw result; return result; }
   });

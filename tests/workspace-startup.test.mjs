@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { arrangeWorkspace, workspaceBounds } from '../extension/propio-bridge/workspace.js';
+import { workspacePages } from '../extension/propio-bridge/workspace-settings.js';
 
 const screen = { availWidth: 1920, availHeight: 1040, availLeft: 0, availTop: 0 };
 const opts = { at: Date.parse('2026-10-14T12:00:00Z'), wait: async () => {} };
@@ -182,4 +183,28 @@ test('personal top-right pane reserves the lower area for notes without changing
   await arrangeWorkspace(f.api, screen, { ...opts, rightPaneHeightRatio: .61 });
   assert.equal(f.windows.get(2).height, top.right.height);
   assert.equal(f.tabs.get(tracker.id).index, 0); assert.equal(f.tabs.get(dictionary.id).index, 1);
+});
+
+test('con otra distribucion de lados, la izquierda lleva las paginas elegidas en vista dividida y la derecha el resto en pestañas', async () => {
+  const f = fake([portal, interpreter, tracker, dictionary]);
+  const sides = { portal: 'left', interpreter: 'right', tracker: 'right', dictionary: 'left' };
+  const configuration = { version: 1, pages: workspacePages, sides, openOnProfileStart: false, passive: true, rightPaneHeightRatio: 1, rightPaneWidthRatio: 5 / 16 };
+  const result = await arrangeWorkspace(f.api, screen, { ...opts, configuration });
+  assert.equal(result.status, 'ready');
+  assert.deepEqual(f.mutations.filter(m => m[0] === 'split')[0][1], [1, 5]);
+  assert.equal(f.tabs.get(1).windowId, f.tabs.get(5).windowId); assert.equal(f.tabs.get(1).splitViewId, f.tabs.get(5).splitViewId);
+  assert.equal(f.tabs.get(interpreter.id).windowId, f.tabs.get(tracker.id).windowId);
+  assert.notEqual(f.tabs.get(interpreter.id).windowId, f.tabs.get(1).windowId);
+  assert.equal(f.tabs.get(interpreter.id).index, 0); assert.equal(f.tabs.get(tracker.id).index, 1);
+});
+
+test('con una sola pagina a la izquierda no se arma vista dividida', async () => {
+  const f = fake([portal, interpreter, tracker, dictionary]);
+  const sides = { portal: 'left', interpreter: 'right', tracker: 'right', dictionary: 'right' };
+  const configuration = { version: 1, pages: workspacePages, sides, openOnProfileStart: false, passive: true, rightPaneHeightRatio: 1, rightPaneWidthRatio: 5 / 16 };
+  assert.equal((await arrangeWorkspace(f.api, screen, { ...opts, configuration })).status, 'ready');
+  assert.equal(f.mutations.filter(m => m[0] === 'split').length, 0);
+  const rightWindow = f.tabs.get(interpreter.id).windowId;
+  for (const id of [interpreter.id, tracker.id, dictionary.id]) assert.equal(f.tabs.get(id).windowId, rightWindow);
+  assert.notEqual(f.tabs.get(1).windowId, rightWindow);
 });

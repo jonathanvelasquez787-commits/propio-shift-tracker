@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { workspaceSettingsKey, workspacePages, validateWorkspaceSettings, readWorkspaceSettings, saveWorkspaceSettings } from '../extension/propio-bridge/workspace-settings.js';
+import { workspaceSettingsKey, workspacePages, defaultWorkspaceSides, describeSides, validateWorkspaceSettings, readWorkspaceSettings, saveWorkspaceSettings } from '../extension/propio-bridge/workspace-settings.js';
 import { workspaceBounds } from '../extension/propio-bridge/workspace.js';
 
-const settings = () => ({ version: 1, pages: { ...workspacePages }, openOnProfileStart: false, passive: true, rightPaneHeightRatio: .61, rightPaneWidthRatio: .32 });
+const settings = () => ({ version: 1, pages: { ...workspacePages }, sides: { ...defaultWorkspaceSides }, openOnProfileStart: false, passive: true, rightPaneHeightRatio: .61, rightPaneWidthRatio: .32 });
 function fixture({ fail = false } = {}) {
   const store = { 'bridge-v1': { calls: ['preserved'], preparation: { spacing: { enabled: true, minutes: 4 } } }, personal: 'preserved' };
   const api = { storage: { local: { get: async key => ({ [key]: structuredClone(store[key]) }), set: async values => {
@@ -44,4 +44,16 @@ test('column and notes reservation sizes share the same ratio and respect negati
   const bounds = workspaceBounds(area, 8, .612, .4);
   assert.equal(bounds.right.width, 784); assert.equal(bounds.right.left, -784); assert.equal(bounds.right.height, Math.round(1040 * .612) + 8);
   assert.equal(bounds.left.left + bounds.left.width - 8, bounds.right.left + 8);
+});
+test('el lado de cada pagina se guarda, los ajustes viejos sin lados usan los de siempre y los lados invalidos se rechazan', async () => {
+  const old = settings(); delete old.sides;
+  assert.deepEqual(validateWorkspaceSettings(old).sides, { portal: 'left', interpreter: 'left', tracker: 'right', dictionary: 'right' });
+  const swapped = settings(); swapped.sides = { portal: 'left', interpreter: 'right', tracker: 'right', dictionary: 'left' };
+  assert.deepEqual(validateWorkspaceSettings(swapped).sides, swapped.sides);
+  assert.equal(describeSides(swapped.sides), 'Propio y Linguee a la izquierda; UseInterpreter y Propio Shift Tracker a la derecha.');
+  for (const bad of [{ portal: 'right', interpreter: 'right', tracker: 'right', dictionary: 'right' }, { portal: 'left', interpreter: 'left', tracker: 'left', dictionary: 'right' },
+    { portal: 'left', interpreter: 'left', tracker: 'left', dictionary: 'left' }, { portal: 'left', interpreter: 'left', tracker: 'right' }, { portal: 'left', interpreter: 'up', tracker: 'right', dictionary: 'right' }, null]) {
+    const value = settings(); value.sides = bad;
+    assert.throws(() => validateWorkspaceSettings(value));
+  }
 });

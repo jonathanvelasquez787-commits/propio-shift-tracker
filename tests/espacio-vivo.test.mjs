@@ -25,3 +25,10 @@ test('las cuatro direcciones quedan dentro del plegable Direcciones de las pági
   const end = block.indexOf('</details>');
   for (const name of ['portal', 'interpreter', 'tracker', 'dictionary']) assert.ok(block.slice(0, end).includes(`name="${name}"`));
 });
+
+test('cada pagina tiene su boton para pasar de lado y el limite de 2 a la izquierda se explica', () => {
+  assert.match(page, /id="side-left"/); assert.match(page, /id="side-right"/); assert.match(page, /id="sides-note"/);
+  assert.match(script, /Pasar a la derecha/); assert.match(script, /Pasar a la izquierda/);
+  assert.match(script, /left\.length >= 2/); assert.match(script, /caben 2 páginas como mucho/);
+  assert.match(script, /sides: \{ \.\.\.sides \}/);
+});
