@@ -10,6 +10,6 @@ html,body{width:auto;min-width:0;max-height:none}main{max-width:620px;margin:10v
 .sides-box{border:1px solid var(--line);border-radius:14px;padding:12px;margin:0 0 14px}.sides-box h3{font-size:13px;margin:0 0 8px}
 .sides-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:520px){.sides-cols{grid-template-columns:1fr}}
 .side-col{border:1px dashed var(--line);border-radius:10px;padding:8px;min-width:0}.side-col h4{font-size:11px;margin:0 0 6px;text-transform:uppercase;letter-spacing:.04em}
-.side-col ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}.side-col li{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:space-between;border-radius:8px;padding:6px 8px;background:var(--bg);font-size:13px;font-weight:600}
-.side-col li button{font-size:12px;padding:4px 8px;width:auto}.side-col li button:disabled{opacity:.45;cursor:not-allowed}
+.side-col ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}.side-col li{display:flex;flex-direction:column;gap:6px;align-items:stretch;border-radius:8px;padding:6px 8px;background:var(--bg);font-size:13px;font-weight:600}
+.side-col li button{font-size:12px;padding:6px 8px;width:100%;white-space:nowrap}.side-col li button:disabled{opacity:.45;cursor:not-allowed}
 .preview-right{flex-direction:column;gap:2px}.preview-right small{font-size:10px;font-weight:400;text-align:center;padding:0 4px}
