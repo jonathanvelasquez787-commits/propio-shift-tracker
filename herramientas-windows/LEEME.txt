@@ -1,0 +1,8 @@
+Herramientas de Windows de Jonathan (no son parte de la app ni de la extension).
+
+grabadora/               Grabadora de audio (grabadora.pyw). Doble clic en crear_exe.bat para crear Grabadora.exe e instalarla.
+optimizar-interpreter/   optimizar_interpreter.bat: prioridad alta y sin ahorro de energia para Interpreter, y
+                         quita el "Modo de eficiencia" de Chrome (usa optimizar_chrome.ps1, deben estar en la misma carpeta).
+../Reparar-notas.bat     (en la raiz del repo) Repara el acceso de Chrome y las notas. Necesita las carpetas scripts y windows.
+
+Nada de esto lo ejecuta la extension: son archivos para correr con doble clic en Windows.
