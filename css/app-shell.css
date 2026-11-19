@@ -2674,7 +2674,7 @@ html:root.theme-light .gh-ring { background: conic-gradient(var(--accent-blue-2)
 /* fin capsula una pieza */
 
 /* nombre elige tipo */
-#scheduleConfigAccordion .sched-bk-name-pick { position: relative; display: inline-flex; align-items: center; max-width: 100%; }
+#scheduleConfigAccordion .sched-bk-name-pick { justify-self: start; position: relative; display: inline-flex; align-items: center; max-width: 100%; }
 #scheduleConfigAccordion .sched-bk-name-select { appearance: none; -webkit-appearance: none; background: transparent; border: 0; margin: 0; padding: 2px 20px 2px 0; font: inherit; font-size: 15px; font-weight: 800; color: inherit; cursor: pointer; max-width: 100%; field-sizing: content; color-scheme: dark; }
 html.theme-light #scheduleConfigAccordion .sched-bk-name-select { color-scheme: light; }
 #scheduleConfigAccordion .sched-bk-name-select:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; border-radius: 6px; }
