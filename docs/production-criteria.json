@@ -1458,6 +1458,12 @@
           ]
         },
         {
+          "file": "tests/herramientas-windows.test.mjs",
+          "namedCases": [
+            "las herramientas de Windows estan en el repo y Chrome pierde el modo de eficiencia"
+          ]
+        },
+        {
           "file": "tests/espacio-vivo.test.mjs",
           "namedCases": [
             "el espacio de trabajo muestra un dibujo en vivo de la pantalla",
