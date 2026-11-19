@@ -3,20 +3,40 @@ export const workspacePages = Object.freeze({ portal: 'https://interpreters.prop
 export const workspaceOrder = Object.freeze(['portal', 'interpreter', 'tracker', 'dictionary']);
 export const workspaceNames = Object.freeze({ portal: 'Propio', interpreter: 'UseInterpreter', tracker: 'Propio Shift Tracker', dictionary: 'Linguee' });
 export const defaultWorkspaceSides = Object.freeze({ portal: 'left', interpreter: 'left', tracker: 'right', dictionary: 'right' });
-export function validateWorkspaceSides(value) {
-  if (value === undefined) return { ...defaultWorkspaceSides };
+export const maxExtraPages = 4;
+export const workspaceKeys = (extraPages = []) => [...workspaceOrder, ...extraPages.map(page => page.id)];
+export const workspaceNamesFor = (extraPages = []) => ({ ...workspaceNames, ...Object.fromEntries(extraPages.map(page => [page.id, page.name])) });
+export function validateWorkspaceSides(value, keys = workspaceOrder) {
+  if (value === undefined) return Object.fromEntries(keys.map(key => [key, defaultWorkspaceSides[key] || 'right']));
   const sides = {};
-  for (const key of workspaceOrder) {
+  for (const key of keys) {
     if (!value || (value[key] !== 'left' && value[key] !== 'right')) throw Error('Revisá de qué lado va cada página.');
     sides[key] = value[key];
   }
-  const left = workspaceOrder.filter(key => sides[key] === 'left').length;
-  if (left < 1 || left > 2 || left === workspaceOrder.length) throw Error('A la izquierda caben 1 o 2 páginas, y a la derecha tiene que quedar al menos una.');
+  const left = keys.filter(key => sides[key] === 'left').length;
+  if (left < 1 || left > 2 || left === keys.length) throw Error('A la izquierda caben 1 o 2 páginas, y a la derecha tiene que quedar al menos una.');
   return sides;
 }
-export function describeSides(sides) {
-  const names = side => workspaceOrder.filter(key => sides[key] === side).map(key => workspaceNames[key]).reduce((text, name, index, all) => text + (index === 0 ? '' : index === all.length - 1 ? ' y ' : ', ') + name, '');
-  return `${names('left')} a la izquierda; ${names('right')} a la derecha.`;
+export function describeSides(sides, extraPages = []) {
+  const names = workspaceNamesFor(extraPages), keys = workspaceKeys(extraPages);
+  const list = side => keys.filter(key => sides[key] === side).map(key => names[key]).reduce((text, name, index, all) => text + (index === 0 ? '' : index === all.length - 1 ? ' y ' : ', ') + name, '');
+  return `${list('left')} a la izquierda; ${list('right')} a la derecha.`;
+}
+export function validateExtraPages(value) {
+  if (value === undefined) return [];
+  if (!Array.isArray(value) || value.length > maxExtraPages) throw Error(`Podés agregar hasta ${maxExtraPages} páginas.`);
+  const builtIn = new Set([...Object.values(workspacePages).map(raw => new URL(raw).origin), 'https://www.linguee.com']);
+  const ids = new Set(), origins = new Set(), result = [];
+  for (const page of value) {
+    const name = typeof page?.name === 'string' ? page.name.trim() : '';
+    if (!/^extra[1-9]$/.test(page?.id || '') || ids.has(page.id) || !name || name.length > 30) throw Error('Revisá el nombre de la página que agregaste (hasta 30 letras).');
+    let url;
+    try { url = new URL(page.url); } catch { throw Error('Usá direcciones HTTPS completas.'); }
+    if (url.protocol !== 'https:' || url.username || url.password || url.search || url.hash || String(page.url).length > 1000) throw Error('La página nueva debe ser HTTPS, sin contraseña, parámetros ni fragmentos.');
+    if (builtIn.has(url.origin) || origins.has(url.origin)) throw Error('Ese sitio ya está en tu espacio de trabajo.');
+    ids.add(page.id); origins.add(url.origin); result.push({ id: page.id, name, url: url.href });
+  }
+  return result;
 }
 export function validateWorkspaceSettings(value) {
   if (!value || value.version !== 1 || typeof value.openOnProfileStart !== 'boolean' || typeof value.passive !== 'boolean' ||
@@ -33,8 +53,9 @@ export function validateWorkspaceSettings(value) {
         (key === 'portal' && !/^\/portal(?:\/|$)/.test(url.pathname))) throw Error('Usá las páginas de trabajo reconocidas, sin contraseña, parámetros ni fragmentos.');
     pages[key] = url.href;
   }
-  const sides = validateWorkspaceSides(value.sides);
-  return { version: 1, pages, sides, openOnProfileStart: value.openOnProfileStart, passive: value.passive,
+  const extraPages = validateExtraPages(value.extraPages);
+  const sides = validateWorkspaceSides(value.sides, workspaceKeys(extraPages));
+  return { version: 1, pages, sides, ...(extraPages.length ? { extraPages } : {}), openOnProfileStart: value.openOnProfileStart, passive: value.passive,
     rightPaneHeightRatio: value.rightPaneHeightRatio, rightPaneWidthRatio: value.rightPaneWidthRatio };
 }
 export async function saveWorkspaceSettings(api, value) {

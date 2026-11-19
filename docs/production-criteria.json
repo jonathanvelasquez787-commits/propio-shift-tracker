@@ -16,7 +16,8 @@
             "invalid URLs, private parameters, credentials and sizes are rejected before preference writes",
             "a failed save preserves the prior preferences and does not silently replace malformed persisted configuration",
             "column and notes reservation sizes share the same ratio and respect negative monitor origins",
-            "el lado de cada pagina se guarda, los ajustes viejos sin lados usan los de siempre y los lados invalidos se rechazan"
+            "el lado de cada pagina se guarda, los ajustes viejos sin lados usan los de siempre y los lados invalidos se rechazan",
+            "paginas agregadas: se validan solo HTTPS limpio, sin repetir sitios y con lado propio"
           ]
         },
         {
@@ -2146,7 +2147,9 @@
             "incorrect tracker/portal split is separated before moving either window",
             "missing native API fails before changing user tabs",
             "con otra distribucion de lados, la izquierda lleva las paginas elegidas en vista dividida y la derecha el resto en pestañas",
-            "con una sola pagina a la izquierda no se arma vista dividida"
+            "con una sola pagina a la izquierda no se arma vista dividida",
+            "una pagina agregada se abre como pestaña a la derecha cuando Chrome dio el permiso del sitio",
+            "sin permiso del sitio nuevo se frena antes de mover o abrir nada"
           ]
         },
         {

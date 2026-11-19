@@ -15,3 +15,5 @@ html,body{width:auto;min-width:0;max-height:none}main{max-width:620px;margin:24p
 .preview-right{flex-direction:column;gap:2px}.preview-right small{font-size:10px;font-weight:400;text-align:center;padding:0 4px}
 
 .side-address{font-weight:400;opacity:.7;font-size:11px;word-break:break-all}.side-col li input{box-sizing:border-box;width:100%;padding:6px;font-size:12px}
+
+.add-page-form{border:1px dashed var(--line);border-radius:10px;padding:10px;margin-top:10px}#add-page-open{margin-top:10px;width:100%}
