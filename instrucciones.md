@@ -381,31 +381,7 @@ Aprendidas con uso real; el propietario se ha molestado cuando se rompieron.
 - **Siguiente rediseño a elegir con el propietario:** Finanzas, Fechas de pago, Calendario o Ayuda (el Horario y sus tarjetas ya están rediseñados). Se pregunta con capturas reales antes de programar.
 - **Decidido el 18/11:** la cola de eventos pendientes de la extensión se queda como está (el propietario descartó quitarla y descartó que las señales viejas se borren solas).
 
-- **Ocho pedidos directos del 22/10:** implementación y evidencia reunidas en
-  docs/cierre-ocho-pedidos.md. Web 639 aporta el hover con segundos; 640 integra
-  Reportes y restaura la fecha azul; 641 cierra galería, lenguaje y control
-  visual. Confirmar el commit público con cierre-641-production.json fuera de
-  Git. Este cierre no completa las veinte mejoras funcionales del plan.
-
-- **Mejoras integrales aprobadas el 18/10:** 79 de 79 publicadas. Las veinte restantes están implementadas y probadas en web 642 / extensión 2.3.5. El propietario aportó una captura del popup con 2.3.5 el 22/10; confirma su activación y cierra 14, 63, 64 y 74. Inventario y límites en [plan](docs/plan-mejoras-integrales.md) y [cierre 642](docs/cierre-642.md).
-- **Ancho del popup:** corregida la regresión responsive de 2.3.5 que permitía un popup estrecho. Se restaura el ancho intrínseco de 400 px; la versión y el worker no cambian. La corrección de CSS se instala conservando preferencias y se carga al volver a abrir el popup. No reabrir por ello los cuatro puntos ya confirmados.
-- **Segundos oficiales de Propio:** confirmar con evidencia si el último minuto
-  incompleto se incluye en duración y pago. El formato de hora visible no lo demuestra.
-  No cambiar ACW ni alargar llamadas por esa suposición.
-  El 21/10 el propietario eligió para las nuevas estimaciones personales el umbral
-  inclusivo de 40 s: 7:39 → 7 min y 7:40 → 8 min. Implementado en web 636,
-  publicada en PR #98 (main 7cf6016a3512aaf314655e6971fcc2f86c19c1d2); conserva duración real, importes anteriores y prioridad de los
-  datos importados. Ver docs/redondeo-de-estimaciones.md. La regla oficial sigue
-  sin confirmar; no confundir ambos estados.
-- **Visibilidad por nombre en Google:** pendiente de procesamiento externo. La
-  comprobación del 8/10 encontró la raíz indexada con canonical correcto, pero
-  todavía el título anterior y sin posición en primera página por la marca.
-  Hubo rechazo por cuota; no repetir solicitudes ni activar otro reintento sin
-  petición. Conservar verificación y lastmod reales. Detalle en [SEO](docs/seo.md).
-- **Traducción automática opcional:** Locize está preparado, sin cuenta/proveedor
-  activo confirmado. Solo falta contratar/configurar la cuenta y sus secretos si
-  el propietario decide activarlo. ES/EN funcionan localmente sin ese servicio;
-  ver [idiomas y temas](docs/idiomas-y-temas.md).
+- **Pendientes de octubre quitados por el propietario el 18/11 (no volver a agregarlos a esta lista):** ocho pedidos del 22/10, mejoras integrales del 18/10, ancho del popup, segundos oficiales de Propio, visibilidad por nombre en Google y traducción automática Locize. Su detalle sigue en `docs/` (cierre-ocho-pedidos, plan-mejoras-integrales, redondeo-de-estimaciones, seo, idiomas-y-temas); en seo.md queda la advertencia de no repetir solicitudes a Google por cuota.
 
 - **PR #332 — Cápsula de una sola pieza (solo CSS).** Desde 480 px se quita la línea que partía el icono de la píldora en Break, Lunch y Llamada, y el borde blanco al pasar el mouse rodea solo botón + píldora; el basurero conserva su borde. Por dentro siguen siendo dos piezas (`#...ControlBtn` y `#heroBlockCard`); unirlas del todo se evaluó y no se hizo por riesgo. Bloque `/* capsula una pieza */` al final de `css/app-shell.css`; prueba `tests/capsula-una-pieza.test.mjs`.
 
