@@ -15,7 +15,8 @@
             "saving updates only workspace preferences atomically and reopening preserves all pages and sizes",
             "invalid URLs, private parameters, credentials and sizes are rejected before preference writes",
             "a failed save preserves the prior preferences and does not silently replace malformed persisted configuration",
-            "column and notes reservation sizes share the same ratio and respect negative monitor origins"
+            "column and notes reservation sizes share the same ratio and respect negative monitor origins",
+            "el lado de cada pagina se guarda, los ajustes viejos sin lados usan los de siempre y los lados invalidos se rechazan"
           ]
         },
         {
@@ -1460,7 +1461,8 @@
           "namedCases": [
             "el espacio de trabajo muestra un dibujo en vivo de la pantalla",
             "ancho y alto tienen barra y numero con los mismos limites de siempre",
-            "las cuatro direcciones quedan dentro del plegable Direcciones de las páginas"
+            "las cuatro direcciones quedan dentro del plegable Direcciones de las páginas",
+            "cada pagina tiene su boton para pasar de lado y el limite de 2 a la izquierda se explica"
           ]
         },
         {
@@ -2139,7 +2141,9 @@
             "frame compensation meets at visible edges for the requested widths without excess overlap",
             "personal top-right pane reserves the lower area for notes without changing the left split or tab order",
             "incorrect tracker/portal split is separated before moving either window",
-            "missing native API fails before changing user tabs"
+            "missing native API fails before changing user tabs",
+            "con otra distribucion de lados, la izquierda lleva las paginas elegidas en vista dividida y la derecha el resto en pestañas",
+            "con una sola pagina a la izquierda no se arma vista dividida"
           ]
         },
         {

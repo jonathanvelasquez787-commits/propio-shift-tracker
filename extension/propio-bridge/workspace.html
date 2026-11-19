@@ -10,14 +10,18 @@
 </head>
 <body>
   <main>
-    <div class="brand"><img src="icons/icon-48.png" width="42" height="42" alt=""><div><h1>Tu espacio de trabajo</h1><p>Propio y UseInterpreter a la izquierda; Propio Shift Tracker y Linguee a la derecha.</p></div></div>
-    <section class="card"><p id="workspace-status" role="status">Preparando tus ventanas…</p><p class="muted">Propio y UseInterpreter a la izquierda, Propio Shift Tracker y Linguee a la derecha. Se prepara al abrir tu perfil, a cualquier hora.</p><div class="actions"><button id="workspace-retry" hidden>Reintentar</button><a href="https://propio-shift-tracker.vercel.app/">Abrir Propio Shift Tracker</a></div></section>
+    <div class="brand"><img src="icons/icon-48.png" width="42" height="42" alt=""><div><h1>Tu espacio de trabajo</h1><p id="brand-summary">Propio y UseInterpreter a la izquierda; Propio Shift Tracker y Linguee a la derecha.</p></div></div>
+    <section class="card"><p id="workspace-status" role="status">Preparando tus ventanas…</p><p class="muted"><span id="status-summary">Propio y UseInterpreter a la izquierda; Propio Shift Tracker y Linguee a la derecha.</span> Se prepara al abrir tu perfil, a cualquier hora.</p><div class="actions"><button id="workspace-retry" hidden>Reintentar</button><a href="https://propio-shift-tracker.vercel.app/">Abrir Propio Shift Tracker</a></div></section>
     <form id="workspace-setup" class="card" hidden>
       <h2>Preparar esta PC</h2><p class="muted">1. Usá el perfil de Chrome con tu cuenta. Estas opciones se guardan solo acá; no cambian las otras PCs.</p>
       <div class="preview-box" id="workspace-preview" aria-live="polite">
         <h3>Así queda tu pantalla</h3>
-        <div class="preview-screen" id="preview-screen"><div class="preview-left" id="preview-left"><span>Propio</span><span>UseInterpreter</span></div><div class="preview-right" id="preview-right"><span>Propio Shift Tracker</span></div></div>
+        <div class="preview-screen" id="preview-screen"><div class="preview-left" id="preview-left"></div><div class="preview-right" id="preview-right"></div></div>
         <p class="helper" id="preview-caption"></p>
+      </div>
+      <div class="sides-box" id="sides-box"><h3>Qué página va en cada lado</h3>
+        <div class="sides-cols"><div class="side-col"><h4>Izquierda (caben 2)</h4><ul id="side-left"></ul></div><div class="side-col"><h4>Derecha (pestañas)</h4><ul id="side-right"></ul></div></div>
+        <p class="helper" id="sides-note" role="status"></p>
       </div>
       <label class="field slider-field">Ancho de la columna derecha (%)<span class="slider-row"><input id="width-range" type="range" min="25" max="50" step=".25" aria-label="Ancho de la columna derecha"><input name="width" type="number" min="25" max="50" step=".01" required></span></label>
       <label class="field slider-field">Alto de la ventana derecha (%)<span class="slider-row"><input id="height-range" type="range" min="40" max="100" step="1" aria-label="Alto de la ventana derecha"><input name="height" type="number" min="40" max="100" step=".1" required></span></label>

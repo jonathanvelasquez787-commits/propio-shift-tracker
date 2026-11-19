@@ -1,5 +1,5 @@
 import { arrangeWorkspace } from './workspace.js';
-import { readWorkspaceSettings } from './workspace-settings.js';
+import { readWorkspaceSettings, describeSides } from './workspace-settings.js';
 const status = document.getElementById('workspace-status');
 const retry = document.getElementById('workspace-retry');
 let running = false;
@@ -24,6 +24,7 @@ async function prepare() {
       }
     } catch {}
     const settings = await readWorkspaceSettings(chrome, preferences);
+    for (const id of ['brand-summary', 'status-summary']) { const element = document.getElementById(id); if (element) element.textContent = describeSides(settings.sides); }
     const result = await arrangeWorkspace(chrome, window.screen, { frameInset, configuration: settings, rightPaneHeightRatio: settings.rightPaneHeightRatio, rightPaneWidthRatio: settings.rightPaneWidthRatio });
     if (result.status === 'already-running') status.textContent = 'Otra pestaña ya está preparando tus ventanas.';
     else {

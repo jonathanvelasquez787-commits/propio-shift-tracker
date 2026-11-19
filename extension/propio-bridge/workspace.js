@@ -1,4 +1,4 @@
-import { workspacePages, validateWorkspaceSettings } from './workspace-settings.js';
+import { workspacePages, workspaceOrder, defaultWorkspaceSides, validateWorkspaceSettings } from './workspace-settings.js';
 const lockKey = 'workday-workspace-lock';
 
 export function workspaceBounds(screen, frameInset = 8, rightPaneHeightRatio = 1, rightPaneWidthRatio = 5 / 16) {
@@ -20,7 +20,9 @@ export function workspaceBounds(screen, frameInset = 8, rightPaneHeightRatio = 1
 }
 
 export async function arrangeWorkspace(api, screen, { at = Date.now(), frameInset = 8, rightPaneHeightRatio = 1, rightPaneWidthRatio = 5 / 16, configuration = null, wait = ms => new Promise(resolve => setTimeout(resolve, ms)) } = {}) {
-  const pages = configuration ? validateWorkspaceSettings(configuration).pages : workspacePages;
+  const validated = configuration ? validateWorkspaceSettings(configuration) : null;
+  const pages = validated ? validated.pages : workspacePages, sides = validated ? validated.sides : defaultWorkspaceSides;
+  const leftKeys = workspaceOrder.filter(key => sides[key] === 'left'), rightKeys = workspaceOrder.filter(key => sides[key] === 'right');
   if (typeof api.tabs.createSplit !== 'function' || typeof api.tabs.unsplit !== 'function') {
     throw new Error('Chrome necesita tener disponible la vista dividida para extensiones (versión 155 o posterior).');
   }
@@ -36,45 +38,62 @@ export async function arrangeWorkspace(api, screen, { at = Date.now(), frameInse
   try {
     // Dejá terminar la restauración antes de buscar pestañas para no duplicarlas.
     await wait(1200);
-    const results = await Promise.all(Object.entries(pages).map(([key, url]) => api.tabs.query({ url: key === 'dictionary' ? ['https://www.linguee.es/*', 'https://www.linguee.com/*'] : `${new URL(url).origin}/*`, windowType: 'normal' })));
+    const results = await Promise.all(workspaceOrder.map(key => api.tabs.query({ url: key === 'dictionary' ? ['https://www.linguee.es/*', 'https://www.linguee.com/*'] : `${new URL(pages[key]).origin}/*`, windowType: 'normal' })));
     for (let index = 0; index < results.length; index++) {
       results[index] = results[index].filter(tab => !tab.incognito);
-      if (index < 3 && results[index].length > 1) throw new Error('Hay varias pestañas de una página de trabajo. Conservá una de cada una antes de organizar.');
+      if (workspaceOrder[index] !== 'dictionary' && results[index].length > 1) throw new Error('Hay varias pestañas de una página de trabajo. Conservá una de cada una antes de organizar.');
     }
-    let [portal, interpreter, tracker] = results.map(tabs => tabs[0]);
-    if (!portal) portal = await api.tabs.create({ windowId: launcher.windowId, url: pages.portal, active: false });
-    const leftId = portal.windowId;
-    if (Number.isInteger(tracker?.splitViewId) && tracker.splitViewId >= 0) {
-      await api.tabs.unsplit(tracker.splitViewId);
-      portal = await api.tabs.get(portal.id);
+    const found = Object.fromEntries(workspaceOrder.map((key, index) => [key, results[index][0]]));
+    const isSplit = tab => Number.isInteger(tab?.splitViewId) && tab.splitViewId >= 0;
+    // Primera página de la izquierda: ancla de la ventana izquierda.
+    let first = found[leftKeys[0]];
+    if (!first) first = await api.tabs.create({ windowId: launcher.windowId, url: pages[leftKeys[0]], active: false });
+    const leftId = first.windowId;
+    // Primera página de la derecha: ancla de la ventana derecha.
+    let anchor = found[rightKeys[0]];
+    if (isSplit(anchor)) {
+      await api.tabs.unsplit(anchor.splitViewId);
+      first = await api.tabs.get(first.id);
     }
-    if (!tracker || tracker.windowId === leftId) {
-      const right = await api.windows.create(tracker ? { tabId: tracker.id, type: 'normal', focused: false } : { url: pages.tracker, type: 'normal', focused: false });
-      tracker = tracker ? await api.tabs.get(tracker.id) : right.tabs[0];
+    if (!anchor || anchor.windowId === leftId) {
+      const right = await api.windows.create(anchor ? { tabId: anchor.id, type: 'normal', focused: false } : { url: pages[rightKeys[0]], type: 'normal', focused: false });
+      anchor = anchor ? await api.tabs.get(anchor.id) : right.tabs[0];
     }
-    if (!interpreter) interpreter = await api.tabs.create({ windowId: leftId, url: pages.interpreter, active: false });
-    const alreadySplit = portal.windowId === interpreter.windowId && portal.splitViewId >= 0 && portal.splitViewId === interpreter.splitViewId && interpreter.index === portal.index + 1;
-    if (!alreadySplit) {
-      const splits = new Set([portal.splitViewId, interpreter.splitViewId].filter(id => Number.isInteger(id) && id >= 0));
-      for (const split of splits) await api.tabs.unsplit(split);
-      for (const tab of [portal, interpreter]) {
-        if (tab.pinned) await api.tabs.update(tab.id, { pinned: false });
-        if (tab.groupId >= 0) await api.tabs.ungroup(tab.id);
+    const tabs = { [leftKeys[0]]: first, [rightKeys[0]]: anchor };
+    if (leftKeys[1]) {
+      let second = found[leftKeys[1]];
+      if (!second) second = await api.tabs.create({ windowId: leftId, url: pages[leftKeys[1]], active: false });
+      tabs[leftKeys[1]] = second;
+      const alreadySplit = first.windowId === second.windowId && first.splitViewId >= 0 && first.splitViewId === second.splitViewId && second.index === first.index + 1;
+      if (!alreadySplit) {
+        const splits = new Set([first.splitViewId, second.splitViewId].filter(id => Number.isInteger(id) && id >= 0));
+        for (const split of splits) await api.tabs.unsplit(split);
+        for (const tab of [first, second]) {
+          if (tab.pinned) await api.tabs.update(tab.id, { pinned: false });
+          if (tab.groupId >= 0) await api.tabs.ungroup(tab.id);
+        }
+        await api.tabs.move([first.id, second.id], { windowId: leftId, index: 0 });
+        await api.tabs.createSplit([first.id, second.id]);
       }
-      await api.tabs.move([portal.id, interpreter.id], { windowId: leftId, index: 0 });
-      await api.tabs.createSplit([portal.id, interpreter.id]);
+    } else if (first.windowId !== leftId || isSplit(first)) {
+      if (isSplit(first)) await api.tabs.unsplit(first.splitViewId);
+      await api.tabs.move([first.id], { windowId: leftId, index: 0 });
     }
-    let dictionary = results[3].find(tab => tab.windowId === tracker.windowId) || results[3][0];
-    if (!dictionary) dictionary = await api.tabs.create({ windowId: tracker.windowId, url: pages.dictionary, active: false });
-    if (Number.isInteger(dictionary.splitViewId) && dictionary.splitViewId >= 0) await api.tabs.unsplit(dictionary.splitViewId);
-    await api.tabs.move([tracker.id, dictionary.id], { windowId: tracker.windowId, index: 0 });
-    for (const [id, geometry] of [[leftId, bounds.left], [tracker.windowId, bounds.right]]) {
+    for (const key of rightKeys.slice(1)) {
+      let tab = key === 'dictionary' ? (results[workspaceOrder.indexOf(key)].find(item => item.windowId === anchor.windowId) || found[key]) : found[key];
+      if (!tab) tab = await api.tabs.create({ windowId: anchor.windowId, url: pages[key], active: false });
+      if (isSplit(tab)) await api.tabs.unsplit(tab.splitViewId);
+      tabs[key] = tab;
+    }
+    await api.tabs.move(rightKeys.map(key => tabs[key].id), { windowId: anchor.windowId, index: 0 });
+    const portal = tabs.portal, interpreter = tabs.interpreter, tracker = tabs.tracker, dictionary = tabs.dictionary;
+    for (const [id, geometry] of [[leftId, bounds.left], [anchor.windowId, bounds.right]]) {
       await api.windows.update(id, { state: 'normal' });
       await api.windows.update(id, { ...geometry, focused: false });
     }
-    await api.tabs.update(portal.id, { active: true });
-    await api.tabs.update(tracker.id, { active: true });
-    await api.windows.update(tracker.windowId, { focused: true });
+    await api.tabs.update(first.id, { active: true });
+    await api.tabs.update(anchor.id, { active: true });
+    await api.windows.update(anchor.windowId, { focused: true });
     return { status: 'ready', portal: portal.id, interpreter: interpreter.id, tracker: tracker.id, dictionary: dictionary.id };
   } finally {
     if ((await api.storage.session.get(lockKey))[lockKey]?.owner === owner) await api.storage.session.remove(lockKey);
