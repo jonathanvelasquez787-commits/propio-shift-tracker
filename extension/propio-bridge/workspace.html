@@ -22,6 +22,14 @@
       <div class="sides-box" id="sides-box"><h3>Qué página va en cada lado</h3>
         <div class="sides-cols"><div class="side-col"><h4>Izquierda (caben 2)</h4><ul id="side-left"></ul></div><div class="side-col"><h4>Derecha (pestañas)</h4><ul id="side-right"></ul></div></div>
         <p class="helper" id="sides-note" role="status"></p>
+        <button id="add-page-open" type="button">+ Agregar otra página</button>
+        <div id="add-page-form" class="add-page-form" hidden>
+          <label class="field">Nombre<input id="add-name" type="text" maxlength="30" data-no-dirty="1" placeholder="Por ejemplo: Notas"></label>
+          <label class="field">Dirección<input id="add-url" type="url" data-no-dirty="1" placeholder="https://..."></label>
+          <p class="helper">Solo páginas HTTPS, sin contraseñas ni parámetros. Chrome te pide permiso para cada sitio nuevo.</p>
+          <div class="actions"><button id="add-left" type="button">A la izquierda</button><button id="add-right" type="button">A la derecha</button><button id="add-cancel" type="button">Cancelar</button></div>
+          <p id="add-status" class="helper" role="status"></p>
+        </div>
       </div>
       <label class="field slider-field">Ancho de la columna derecha (%)<span class="slider-row"><input id="width-range" type="range" min="25" max="50" step=".25" aria-label="Ancho de la columna derecha"><input name="width" type="number" min="25" max="50" step=".01" required></span></label>
       <label class="field slider-field">Alto de la ventana derecha (%)<span class="slider-row"><input id="height-range" type="range" min="40" max="100" step="1" aria-label="Alto de la ventana derecha"><input name="height" type="number" min="40" max="100" step=".1" required></span></label>

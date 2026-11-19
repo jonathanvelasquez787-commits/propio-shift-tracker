@@ -24,7 +24,7 @@ async function prepare() {
       }
     } catch {}
     const settings = await readWorkspaceSettings(chrome, preferences);
-    for (const id of ['brand-summary', 'status-summary']) { const element = document.getElementById(id); if (element) element.textContent = describeSides(settings.sides); }
+    for (const id of ['brand-summary', 'status-summary']) { const element = document.getElementById(id); if (element) element.textContent = describeSides(settings.sides, settings.extraPages); }
     const result = await arrangeWorkspace(chrome, window.screen, { frameInset, configuration: settings, rightPaneHeightRatio: settings.rightPaneHeightRatio, rightPaneWidthRatio: settings.rightPaneWidthRatio });
     if (result.status === 'already-running') status.textContent = 'Otra pestaña ya está preparando tus ventanas.';
     else {

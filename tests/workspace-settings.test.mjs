@@ -58,3 +58,19 @@ test('el lado de cada pagina se guarda, los ajustes viejos sin lados usan los de
     assert.throws(() => validateWorkspaceSettings(value));
   }
 });
+
+test('paginas agregadas: se validan solo HTTPS limpio, sin repetir sitios y con lado propio', () => {
+  const base = settings();
+  const extra = { id: 'extra1', name: ' Notas ', url: 'https://notas.example.com/app' };
+  const ok = validateWorkspaceSettings({ ...base, extraPages: [extra], sides: { ...base.sides, extra1: 'right' } });
+  assert.deepEqual(ok.extraPages, [{ id: 'extra1', name: 'Notas', url: 'https://notas.example.com/app' }]);
+  assert.equal(ok.sides.extra1, 'right');
+  assert.equal(validateWorkspaceSettings(base).extraPages, undefined);
+  const bad = page => () => validateWorkspaceSettings({ ...base, extraPages: [page], sides: { ...base.sides, extra1: 'right' } });
+  assert.throws(bad({ ...extra, url: 'http://notas.example.com/' }));
+  assert.throws(bad({ ...extra, url: 'https://u:p@notas.example.com/' }));
+  assert.throws(bad({ ...extra, url: 'https://notas.example.com/?a=1' }));
+  assert.throws(bad({ ...extra, url: 'https://www.linguee.es/otra' }), /ya está/);
+  assert.throws(bad({ ...extra, name: '' }));
+  assert.throws(() => validateWorkspaceSettings({ ...base, extraPages: [extra] }), /lado/);
+});

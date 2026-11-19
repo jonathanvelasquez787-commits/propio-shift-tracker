@@ -1,4 +1,4 @@
-import { readWorkspaceSettings, saveWorkspaceSettings, workspacePages, workspaceOrder, workspaceNames, defaultWorkspaceSides, describeSides } from './workspace-settings.js';
+import { readWorkspaceSettings, saveWorkspaceSettings, workspacePages, workspaceOrder, workspaceNames, defaultWorkspaceSides, describeSides, workspaceKeys, workspaceNamesFor, validateExtraPages, maxExtraPages } from './workspace-settings.js';
 const form = document.getElementById('workspace-setup'), message = document.getElementById('setup-status'), save = document.getElementById('setup-save');
 const fields = Object.fromEntries([...form.elements].filter(input => input.name).map(input => [input.name, input]));
 const PATHS_KEY = 'workspace-windows-paths';
@@ -9,22 +9,31 @@ async function savePaths() {
 }
 const widthRange = document.getElementById('width-range'), heightRange = document.getElementById('height-range');
 let sides = { ...defaultWorkspaceSides };
+let extras = [];
+const names = () => workspaceNamesFor(extras);
+const urlOf = key => fields[key] ? fields[key].value : (extras.find(page => page.id === key)?.url || '');
 const dirtyNote = document.getElementById('dirty-note');
 function markDirty(on = true) { if (dirtyNote) dirtyNote.hidden = !on; }
-const side = name => workspaceOrder.filter(key => sides[key] === name);
+const side = name => workspaceKeys(extras).filter(key => sides[key] === name);
 function renderSides() {
   const left = side('left'), right = side('right');
   for (const [name, keys] of [['left', left], ['right', right]]) {
     const list = document.getElementById(`side-${name}`); list.textContent = '';
     for (const key of keys) {
       const item = document.createElement('li'), label = document.createElement('span'), button = document.createElement('button');
-      label.textContent = workspaceNames[key]; button.type = 'button'; button.dataset.side = key;
+      label.textContent = names()[key]; button.type = 'button'; button.dataset.side = key;
       button.textContent = name === 'left' ? 'Pasar a la derecha →' : '← Pasar a la izquierda';
       button.disabled = name === 'left' ? left.length <= 1 : left.length >= 2;
       button.addEventListener('click', () => { sides[key] = name === 'left' ? 'right' : 'left'; markDirty(); renderSides(); });
       const address = document.createElement('small'), edit = document.createElement('button');
-      const show = () => { try { const url = new URL(fields[key].value); address.textContent = url.host + (url.pathname === '/' ? '' : url.pathname); } catch { address.textContent = fields[key].value; } };
+      const show = () => { try { const url = new URL(urlOf(key)); address.textContent = url.host + (url.pathname === '/' ? '' : url.pathname); } catch { address.textContent = urlOf(key); } };
       show(); address.className = 'side-address'; edit.type = 'button'; edit.textContent = 'Editar'; edit.dataset.edit = key;
+      if (!fields[key]) {
+        edit.textContent = 'Quitar'; edit.dataset.remove = key; delete edit.dataset.edit;
+        edit.disabled = name === 'left' && left.length <= 1;
+        edit.addEventListener('click', () => { extras = extras.filter(page => page.id !== key); delete sides[key]; markDirty(); renderSides(); });
+        item.append(label, address, edit, button); list.append(item); continue;
+      }
       edit.addEventListener('click', () => {
         if (item.querySelector('input')) return;
         const input = document.createElement('input'); input.type = 'url'; input.value = fields[key].value; input.setAttribute('aria-label', `Dirección de ${workspaceNames[key]}`);
@@ -36,7 +45,8 @@ function renderSides() {
     }
   }
   document.getElementById('sides-note').textContent = left.length <= 1 ? 'A la izquierda tiene que quedar al menos una página.' : left.length >= 2 ? 'A la izquierda caben 2 páginas como mucho; para pasar otra, primero pasá una a la derecha.' : '';
-  const summary = describeSides(sides);
+  const summary = describeSides(sides, extras);
+  const openAdd = document.getElementById('add-page-open'); if (openAdd) { openAdd.disabled = extras.length >= maxExtraPages; openAdd.textContent = extras.length >= maxExtraPages ? `Ya agregaste ${maxExtraPages} páginas` : '+ Agregar otra página'; }
   for (const id of ['brand-summary', 'status-summary']) { const element = document.getElementById(id); if (element) element.textContent = summary; }
   updatePreview();
 }
@@ -44,10 +54,10 @@ function updatePreview() {
   const width = Math.min(50, Math.max(25, Number(fields.width.value) || 31.25)), height = Math.min(100, Math.max(40, Number(fields.height.value) || 100));
   const leftBox = document.getElementById('preview-left'), right = document.getElementById('preview-right'), rightKeys = side('right');
   leftBox.style.width = `calc(${100 - width}% - 3px)`; leftBox.textContent = '';
-  for (const key of side('left')) { const page = document.createElement('span'); page.textContent = workspaceNames[key]; leftBox.append(page); }
+  for (const key of side('left')) { const page = document.createElement('span'); page.textContent = names()[key]; leftBox.append(page); }
   right.style.width = `calc(${width}% - 3px)`; right.style.height = `${height}%`; right.textContent = '';
-  const main = document.createElement('span'); main.textContent = workspaceNames[rightKeys[0]] || ''; right.append(main);
-  if (rightKeys.length > 1) { const tabs = document.createElement('small'); tabs.textContent = `+ pestañas: ${rightKeys.slice(1).map(key => workspaceNames[key]).join(', ')}`; right.append(tabs); }
+  const main = document.createElement('span'); main.textContent = names()[rightKeys[0]] || ''; right.append(main);
+  if (rightKeys.length > 1) { const tabs = document.createElement('small'); tabs.textContent = `+ pestañas: ${rightKeys.slice(1).map(key => names()[key]).join(', ')}`; right.append(tabs); }
   document.getElementById('preview-caption').textContent = `Izquierda: ${Math.round((100 - width) * 100) / 100}% del ancho · Derecha: ${Math.round(width * 100) / 100}% del ancho y ${Math.round(height * 10) / 10}% del alto`;
 }
 form.addEventListener('input', event => { if (loaded && event.target?.name !== 'shortcut' && event.target?.name !== 'notes' && !event.target?.dataset?.noDirty) markDirty(); });
@@ -76,7 +86,7 @@ try {
   fields.passive.checked = typeof passive === 'boolean' ? passive : value.passive;
   fields.height.value = Math.round(value.rightPaneHeightRatio * 1000) / 10;
   fields.width.value = Math.round(value.rightPaneWidthRatio * 10000) / 100;
-  widthRange.value = fields.width.value; heightRange.value = fields.height.value; sides = { ...value.sides }; renderSides();
+  widthRange.value = fields.width.value; heightRange.value = fields.height.value; sides = { ...value.sides }; extras = (value.extraPages || []).map(page => ({ ...page })); renderSides();
   message.textContent = 'La configuración pertenece solo al perfil de Chrome donde abriste este asistente. Guardar no abre ni mueve ventanas.';
   loaded = true;
 } catch (error) { message.textContent = error.message || 'No se pudo leer la configuración. Reabrí el asistente antes de guardar.'; }
@@ -87,7 +97,7 @@ form.addEventListener('submit', async event => {
   try {
     await saveWorkspaceSettings(chrome, { version: 1, openOnProfileStart: fields.startup.checked, passive: fields.passive.checked,
       rightPaneHeightRatio: Number(fields.height.value) / 100, rightPaneWidthRatio: Number(fields.width.value) / 100,
-      sides: { ...sides }, pages: Object.fromEntries(['portal','interpreter','tracker','dictionary'].map(key => [key, fields[key].value])) });
+      sides: { ...sides }, ...(extras.length ? { extraPages: extras.map(page => ({ ...page })) } : {}), pages: Object.fromEntries(['portal','interpreter','tracker','dictionary'].map(key => [key, fields[key].value])) });
     message.textContent = 'Guardado en este perfil. Tus llamadas, notas y preferencias de otras PCs se conservan. Podés organizar ahora o en la siguiente apertura del perfil.';
     markDirty(false);
   } catch (error) { message.textContent = error.message || 'No se pudo guardar. Se conserva la configuración anterior.'; }
@@ -99,7 +109,7 @@ document.getElementById('setup-arrange').addEventListener('click', () => {
 });
 document.getElementById('setup-reset').addEventListener('click', () => {
   if (!loaded) return;
-  sides = { ...defaultWorkspaceSides };
+  sides = { ...defaultWorkspaceSides }; extras = [];
   for (const key of workspaceOrder) fields[key].value = workspacePages[key];
   fields.width.value = 31.25; fields.height.value = 100; widthRange.value = 31.25; heightRange.value = 100;
   markDirty(); renderSides();
@@ -121,3 +131,29 @@ document.getElementById('setup-export').addEventListener('click', () => {
   exportMessage.textContent = 'Configuración preparada para el instalador de Windows. El archivo contiene rutas, no el contenido de tus notas; todavía no se modificó ningún acceso.' + (!shortcut || !notes ? ' Falta escribir una de las rutas: el instalador de Windows te va a pedir que la escribas.' : '');
 });
 
+
+// + Agregar otra página
+const addForm = document.getElementById('add-page-form'), addStatus = document.getElementById('add-status');
+const addName = document.getElementById('add-name'), addUrl = document.getElementById('add-url');
+function closeAdd() { addForm.hidden = true; addName.value = ''; addUrl.value = ''; addStatus.textContent = ''; }
+document.getElementById('add-page-open').addEventListener('click', () => { addForm.hidden = false; addStatus.textContent = ''; addName.focus(); });
+document.getElementById('add-cancel').addEventListener('click', closeAdd);
+for (const [button, name] of [[document.getElementById('add-left'), 'left'], [document.getElementById('add-right'), 'right']]) {
+  button.addEventListener('click', () => {
+    if (!loaded) return;
+    let page;
+    try {
+      const id = ['extra1', 'extra2', 'extra3', 'extra4'].find(item => !extras.some(entry => entry.id === item));
+      if (!id) throw Error(`Podés agregar hasta ${maxExtraPages} páginas.`);
+      page = validateExtraPages([...extras, { id, name: addName.value, url: addUrl.value.trim() }]).at(-1);
+      if (name === 'left' && side('left').length >= 2) throw Error('A la izquierda caben 2 páginas como mucho. Ponela a la derecha o pasá otra a la derecha primero.');
+    } catch (error) { addStatus.textContent = error.message; return; }
+    addStatus.textContent = 'Chrome te va a preguntar si permitís el sitio. Tocá «Permitir».';
+    // El pedido de permiso tiene que salir directo del clic.
+    chrome.permissions.request({ origins: [`${new URL(page.url).origin}/*`] }).then(granted => {
+      if (!granted) { addStatus.textContent = 'Sin el permiso de Chrome no se puede agregar la página. No se agregó nada.'; return; }
+      extras = [...extras, page]; sides[page.id] = name; markDirty(); renderSides(); closeAdd();
+      document.getElementById('setup-status').textContent = `«${page.name}» agregada. Toca Guardar para aplicarla.`;
+    }).catch(() => { addStatus.textContent = 'No se pudo pedir el permiso. No se agregó nada.'; });
+  });
+}

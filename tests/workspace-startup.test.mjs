@@ -208,3 +208,24 @@ test('con una sola pagina a la izquierda no se arma vista dividida', async () =>
   for (const id of [interpreter.id, tracker.id, dictionary.id]) assert.equal(f.tabs.get(id).windowId, rightWindow);
   assert.notEqual(f.tabs.get(1).windowId, rightWindow);
 });
+
+test('una pagina agregada se abre como pestaña a la derecha cuando Chrome dio el permiso del sitio', async () => {
+  const f = fake([portal, interpreter, tracker, dictionary]);
+  f.api.permissions = { contains: async ({ origins }) => origins[0] === 'https://notas.example.com/*' };
+  const sides = { portal: 'left', interpreter: 'left', tracker: 'right', dictionary: 'right', extra1: 'right' };
+  const configuration = { version: 1, pages: workspacePages, sides, extraPages: [{ id: 'extra1', name: 'Notas', url: 'https://notas.example.com/' }], openOnProfileStart: false, passive: true, rightPaneHeightRatio: 1, rightPaneWidthRatio: 5 / 16 };
+  const result = await arrangeWorkspace(f.api, screen, { ...opts, configuration });
+  assert.equal(result.status, 'ready');
+  assert.ok(result.extra1);
+  assert.equal(f.tabs.get(result.extra1).url, 'https://notas.example.com/');
+  assert.equal(f.tabs.get(result.extra1).windowId, f.tabs.get(tracker.id).windowId);
+});
+
+test('sin permiso del sitio nuevo se frena antes de mover o abrir nada', async () => {
+  const f = fake([portal, interpreter, tracker, dictionary]);
+  f.api.permissions = { contains: async () => false };
+  const sides = { portal: 'left', interpreter: 'left', tracker: 'right', dictionary: 'right', extra1: 'right' };
+  const configuration = { version: 1, pages: workspacePages, sides, extraPages: [{ id: 'extra1', name: 'Notas', url: 'https://notas.example.com/' }], openOnProfileStart: false, passive: true, rightPaneHeightRatio: 1, rightPaneWidthRatio: 5 / 16 };
+  await assert.rejects(arrangeWorkspace(f.api, screen, { ...opts, configuration }), /permiso de Chrome/);
+  assert.equal(f.mutations.length, 0);
+});
