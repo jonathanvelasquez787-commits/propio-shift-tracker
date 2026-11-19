@@ -2,13 +2,14 @@ import { readWorkspaceSettings, saveWorkspaceSettings } from './workspace-settin
 const form = document.getElementById('workspace-setup'), message = document.getElementById('setup-status'), save = document.getElementById('setup-save');
 const fields = Object.fromEntries([...form.elements].filter(input => input.name).map(input => [input.name, input]));
 const PATHS_KEY = 'workspace-windows-paths';
+const DEFAULT_PATHS = { shortcut: 'C:\\Users\\Jonathan\\Desktop\\Jonathan - Chrome.lnk', notes: 'C:\\Users\\Jonathan\\Desktop\\Notas.txt' };
 const unquote = value => String(value || '').trim().replace(/^["']+|["']+$/g, '').trim();
 async function savePaths() {
   try { await chrome.storage.local.set({ [PATHS_KEY]: { shortcut: unquote(fields.shortcut.value), notes: unquote(fields.notes.value) } }); } catch { /* si no se puede guardar, el cuadro sigue funcionando */ }
 }
 let loaded = false;
 try {
-  const savedPaths = (await chrome.storage.local.get(PATHS_KEY))[PATHS_KEY];
+  const savedPaths = (await chrome.storage.local.get(PATHS_KEY))[PATHS_KEY] || DEFAULT_PATHS;
   if (savedPaths && typeof savedPaths === 'object') {
     if (typeof savedPaths.shortcut === 'string') fields.shortcut.value = savedPaths.shortcut;
     if (typeof savedPaths.notes === 'string') fields.notes.value = savedPaths.notes;
