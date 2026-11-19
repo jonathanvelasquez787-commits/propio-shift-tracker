@@ -35,14 +35,14 @@ document.getElementById('setup-export').addEventListener('click', () => {
   const unquote = value => value.trim().replace(/^["']+|["']+$/g, '').trim();
   const exportMessage = document.getElementById('export-status');
   const shortcut = unquote(fields.shortcut.value), notes = unquote(fields.notes.value);
-  if (!/^[a-z]:\\.+\.lnk$/i.test(shortcut) || !/^[a-z]:\\.+/i.test(notes)) {
-    exportMessage.textContent = 'Elegí la ruta completa del acceso de Chrome (.lnk) y del archivo de notas de esta PC.'; return;
+  if ((shortcut && !/^[a-z]:\\.+\.lnk$/i.test(shortcut)) || (notes && !/^[a-z]:\\.+/i.test(notes))) {
+    exportMessage.textContent = 'Escribí la ruta completa (por ejemplo C:\\...\\Trabajo.lnk) o dejá el cuadro vacío para elegirla en Windows.'; return;
   }
   const height = Number(fields.height.value) / 100;
   if (!Number.isFinite(height) || height < .4 || height > .85) { exportMessage.textContent = 'Para reservar espacio a las notas, usá entre 40% y 85% de alto.'; return; }
-  const settings = { version: 1, ShortcutPath: shortcut, NotesFile: notes, RightPaneHeightRatio: height, RightPaneWidthRatio: Number(fields.width.value) / 100 };
+  const settings = { version: 1, ...(shortcut ? { ShortcutPath: shortcut } : {}), ...(notes ? { NotesFile: notes } : {}), RightPaneHeightRatio: height, RightPaneWidthRatio: Number(fields.width.value) / 100 };
   const objectUrl = URL.createObjectURL(new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' }));
   const anchor = document.createElement('a'); anchor.href = objectUrl; anchor.download = 'propio-workspace-configuration.json';
   anchor.click(); setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
-  exportMessage.textContent = 'Configuración preparada para el instalador de Windows. El archivo contiene rutas, no el contenido de tus notas; todavía no se modificó ningún acceso.';
+  exportMessage.textContent = 'Configuración preparada para el instalador de Windows. El archivo contiene rutas, no el contenido de tus notas; todavía no se modificó ningún acceso.' + (!shortcut || !notes ? ' Lo que dejaste vacío se elige en Windows al instalar.' : '');
 });
