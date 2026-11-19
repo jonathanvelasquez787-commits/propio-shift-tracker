@@ -26,13 +26,13 @@ internal static class DesktopWorkspace
 
     internal static Rectangle NotesBounds(Rectangle area, double ratio)
     {
-        return NotesBounds(area, ratio, .3125);
+        return NotesBounds(area, ratio, .33);
     }
 
     internal static Rectangle NotesBounds(Rectangle area, double ratio, double widthRatio)
     {
         if (Double.IsNaN(ratio) || Double.IsInfinity(ratio) || ratio < .4 || ratio > .85) ratio = .612;
-        if (Double.IsNaN(widthRatio) || Double.IsInfinity(widthRatio) || widthRatio < .25 || widthRatio > .5) widthRatio = .3125;
+        if (Double.IsNaN(widthRatio) || Double.IsInfinity(widthRatio) || widthRatio < .25 || widthRatio > .5) widthRatio = .33;
         int width = Math.Max(320, (int)Math.Round(area.Width * widthRatio, MidpointRounding.AwayFromZero)) + 16;
         int top = area.Top + (int)Math.Round(area.Height * ratio, MidpointRounding.AwayFromZero);
         return new Rectangle(area.Right - width, top, width, area.Bottom - top + 8);
@@ -71,7 +71,7 @@ internal static class DesktopWorkspace
         double ratio;
         if (!Double.TryParse(ConfigurationManager.AppSettings["RightPaneHeightRatio"], NumberStyles.Float, CultureInfo.InvariantCulture, out ratio)) ratio = .612;
         double widthRatio;
-        if (!Double.TryParse(ConfigurationManager.AppSettings["RightPaneWidthRatio"], NumberStyles.Float, CultureInfo.InvariantCulture, out widthRatio)) widthRatio = .3125;
+        if (!Double.TryParse(ConfigurationManager.AppSettings["RightPaneWidthRatio"], NumberStyles.Float, CultureInfo.InvariantCulture, out widthRatio)) widthRatio = .33;
         return NotesBounds(WorkspaceScreen(notesWindow).WorkingArea, ratio, widthRatio);
     }
 
