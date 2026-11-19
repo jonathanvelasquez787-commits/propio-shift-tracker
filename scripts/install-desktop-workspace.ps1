@@ -18,16 +18,7 @@ if ($ConfigurationPath) {
     if (!$PSBoundParameters.ContainsKey('RightPaneHeightRatio')) { $RightPaneHeightRatio = [double]$configuration.RightPaneHeightRatio }
     if (!$PSBoundParameters.ContainsKey('RightPaneWidthRatio') -and $null -ne $configuration.RightPaneWidthRatio) { $RightPaneWidthRatio = [double]$configuration.RightPaneWidthRatio }
 }
-function Select-WorkspaceFile([string]$Title, [string]$Filter) {
-    Add-Type -AssemblyName System.Windows.Forms
-    $dialog = New-Object System.Windows.Forms.OpenFileDialog
-    $dialog.Title = $Title; $dialog.Filter = $Filter; $dialog.CheckFileExists = $true; $dialog.Multiselect = $false
-    if ($dialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) { return $dialog.FileName }
-    return $null
-}
-if (!$ShortcutPath) { $ShortcutPath = Select-WorkspaceFile 'Elige el acceso de Chrome (.lnk)' 'Accesos directos (*.lnk)|*.lnk' }
-if (!$NotesFile) { $NotesFile = Select-WorkspaceFile 'Elige el archivo de notas' 'Todos los archivos (*.*)|*.*' }
-if (!$ShortcutPath -or !$NotesFile) { throw 'Seleccioná el acceso de Chrome y el archivo de notas de esta PC.' }
+if (!$ShortcutPath -or !$NotesFile) { throw 'Escribí la ruta del acceso de Chrome y la del archivo de notas de esta PC.' }
 if ([double]::IsNaN($RightPaneHeightRatio) -or [double]::IsInfinity($RightPaneHeightRatio) -or $RightPaneHeightRatio -lt .4 -or $RightPaneHeightRatio -gt .85 -or
     [double]::IsNaN($RightPaneWidthRatio) -or [double]::IsInfinity($RightPaneWidthRatio) -or $RightPaneWidthRatio -lt .25 -or $RightPaneWidthRatio -gt .5) { throw 'Los tamaños de las ventanas no son válidos.' }
 $source = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../windows/Open-Chrome-And-Notes.cs'))
