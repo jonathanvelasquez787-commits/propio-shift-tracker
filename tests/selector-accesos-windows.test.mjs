@@ -36,3 +36,8 @@ test('las rutas de Windows se guardan en este perfil, se vuelven a mostrar y se 
   assert.equal(unquote('"C:\\Users\\Jonathan\\Desktop\\Notas.txt"'), 'C:\\Users\\Jonathan\\Desktop\\Notas.txt');
   assert.equal(unquote('C:\\Users\\Jonathan\\Desktop\\Notas.txt'), 'C:\\Users\\Jonathan\\Desktop\\Notas.txt');
 });
+
+test('las rutas de Jonathan aparecen por defecto y solo se reemplazan si ya hay rutas guardadas', () => {
+  assert.match(script, /const DEFAULT_PATHS = \{ shortcut: 'C:\\\\Users\\\\Jonathan\\\\Desktop\\\\Jonathan - Chrome\.lnk', notes: 'C:\\\\Users\\\\Jonathan\\\\Desktop\\\\Notas\.txt' \}/);
+  assert.match(script, /\[PATHS_KEY\] \|\| DEFAULT_PATHS/);
+});
