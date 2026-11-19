@@ -1442,7 +1442,8 @@
           "namedCases": [
             "los cuadros de ruta de Windows son opcionales y avisan que el explorador se abre al instalar",
             "preparar la configuracion acepta rutas vacias y no las escribe en el archivo",
-            "el instalador abre el explorador de Windows cuando falta una ruta"
+            "el instalador abre el explorador de Windows cuando falta una ruta",
+            "las rutas de Windows se guardan en este perfil, se vuelven a mostrar y se aceptan con o sin comillas"
           ]
         },
         {

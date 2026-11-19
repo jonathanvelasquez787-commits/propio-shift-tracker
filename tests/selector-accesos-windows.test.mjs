@@ -24,3 +24,15 @@ test('el instalador abre el explorador de Windows cuando falta una ruta', () => 
   assert.match(installer, /if \(!\$NotesFile\) \{ \$NotesFile = Select-WorkspaceFile/);
   assert.ok(installer.indexOf('Select-WorkspaceFile') < installer.indexOf("throw 'Seleccioná el acceso de Chrome"));
 });
+
+test('las rutas de Windows se guardan en este perfil, se vuelven a mostrar y se aceptan con o sin comillas', () => {
+  assert.match(script, /workspace-windows-paths/);
+  assert.match(script, /chrome\.storage\.local\.set\(\{ \[PATHS_KEY\]/);
+  assert.match(script, /fields\[key\]\.addEventListener\('change', savePaths\)/);
+  assert.match(script, /fields\.shortcut\.value = savedPaths\.shortcut/);
+  assert.match(script, /fields\.notes\.value = savedPaths\.notes/);
+  assert.match(script, /const unquote = value => String\(value \|\| ''\)\.trim\(\)\.replace\(/);
+  const unquote = value => String(value || '').trim().replace(/^["']+|["']+$/g, '').trim();
+  assert.equal(unquote('"C:\\Users\\Jonathan\\Desktop\\Notas.txt"'), 'C:\\Users\\Jonathan\\Desktop\\Notas.txt');
+  assert.equal(unquote('C:\\Users\\Jonathan\\Desktop\\Notas.txt'), 'C:\\Users\\Jonathan\\Desktop\\Notas.txt');
+});
