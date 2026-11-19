@@ -1462,7 +1462,8 @@
             "el espacio de trabajo muestra un dibujo en vivo de la pantalla",
             "ancho y alto tienen barra y numero con los mismos limites de siempre",
             "las cuatro direcciones quedan dentro del plegable Direcciones de las páginas",
-            "cada pagina tiene su boton para pasar de lado y el limite de 2 a la izquierda se explica"
+            "cada pagina tiene su boton para pasar de lado y el limite de 2 a la izquierda se explica",
+            "cada pagina muestra su direccion y un boton Editar que cambia la misma direccion que se guarda"
           ]
         },
         {

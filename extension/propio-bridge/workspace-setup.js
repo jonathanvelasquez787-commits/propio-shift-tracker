@@ -20,7 +20,17 @@ function renderSides() {
       button.textContent = name === 'left' ? 'Pasar a la derecha →' : '← Pasar a la izquierda';
       button.disabled = name === 'left' ? left.length <= 1 : left.length >= 2;
       button.addEventListener('click', () => { sides[key] = name === 'left' ? 'right' : 'left'; renderSides(); });
-      item.append(label, button); list.append(item);
+      const address = document.createElement('small'), edit = document.createElement('button');
+      const show = () => { try { const url = new URL(fields[key].value); address.textContent = url.host + (url.pathname === '/' ? '' : url.pathname); } catch { address.textContent = fields[key].value; } };
+      show(); address.className = 'side-address'; edit.type = 'button'; edit.textContent = 'Editar'; edit.dataset.edit = key;
+      edit.addEventListener('click', () => {
+        if (item.querySelector('input')) return;
+        const input = document.createElement('input'); input.type = 'url'; input.value = fields[key].value; input.setAttribute('aria-label', `Dirección de ${workspaceNames[key]}`);
+        input.addEventListener('input', () => { fields[key].value = input.value; });
+        input.addEventListener('change', show);
+        address.replaceWith(input); edit.textContent = 'Listo'; edit.addEventListener('click', () => { show(); input.replaceWith(address); edit.textContent = 'Editar'; }, { once: true }); input.focus();
+      });
+      item.append(label, address, edit, button); list.append(item);
     }
   }
   document.getElementById('sides-note').textContent = left.length <= 1 ? 'A la izquierda tiene que quedar al menos una página.' : left.length >= 2 ? 'A la izquierda caben 2 páginas como mucho; para pasar otra, primero pasá una a la derecha.' : '';
