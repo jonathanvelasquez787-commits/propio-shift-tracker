@@ -1461,9 +1461,11 @@
           "namedCases": [
             "el espacio de trabajo muestra un dibujo en vivo de la pantalla",
             "ancho y alto tienen barra y numero con los mismos limites de siempre",
-            "las cuatro direcciones quedan dentro del plegable Direcciones de las páginas",
+            "las cuatro direcciones siguen en el formulario, guardadas fuera de la vista",
             "cada pagina tiene su boton para pasar de lado y el limite de 2 a la izquierda se explica",
-            "cada pagina muestra su direccion y un boton Editar que cambia la misma direccion que se guarda"
+            "cada pagina muestra su direccion y un boton Editar que cambia la misma direccion que se guarda",
+            "la pantalla avisa lo que no se ha guardado, deja volver a como estaba y organizar ahora",
+            "en la pantalla de configuracion se esconde la tarjeta Preparando y se explica Solo registro aparte"
           ]
         },
         {

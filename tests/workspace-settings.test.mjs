@@ -51,6 +51,7 @@ test('el lado de cada pagina se guarda, los ajustes viejos sin lados usan los de
   const swapped = settings(); swapped.sides = { portal: 'left', interpreter: 'right', tracker: 'right', dictionary: 'left' };
   assert.deepEqual(validateWorkspaceSettings(swapped).sides, swapped.sides);
   assert.equal(describeSides(swapped.sides), 'Propio y Linguee a la izquierda; UseInterpreter y Propio Shift Tracker a la derecha.');
+  assert.equal(describeSides({ portal: 'left', interpreter: 'right', tracker: 'right', dictionary: 'right' }), 'Propio a la izquierda; UseInterpreter, Propio Shift Tracker y Linguee a la derecha.');
   for (const bad of [{ portal: 'right', interpreter: 'right', tracker: 'right', dictionary: 'right' }, { portal: 'left', interpreter: 'left', tracker: 'left', dictionary: 'right' },
     { portal: 'left', interpreter: 'left', tracker: 'left', dictionary: 'left' }, { portal: 'left', interpreter: 'left', tracker: 'right' }, { portal: 'left', interpreter: 'up', tracker: 'right', dictionary: 'right' }, null]) {
     const value = settings(); value.sides = bad;

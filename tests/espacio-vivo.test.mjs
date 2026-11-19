@@ -20,10 +20,11 @@ test('ancho y alto tienen barra y numero con los mismos limites de siempre', () 
   assert.match(page, /name="height" type="number" min="40" max="100"/);
 });
 
-test('las cuatro direcciones quedan dentro del plegable Direcciones de las páginas', () => {
-  const block = page.slice(page.indexOf('<summary>Direcciones de las páginas</summary>'));
-  const end = block.indexOf('</details>');
+test('las cuatro direcciones siguen en el formulario, guardadas fuera de la vista', () => {
+  const block = page.slice(page.indexOf('id="address-store"'));
+  const end = block.indexOf('</div>');
   for (const name of ['portal', 'interpreter', 'tracker', 'dictionary']) assert.ok(block.slice(0, end).includes(`name="${name}"`));
+  assert.doesNotMatch(page, /<summary>Direcciones de las páginas<\/summary>/);
 });
 
 test('cada pagina tiene su boton para pasar de lado y el limite de 2 a la izquierda se explica', () => {
@@ -36,4 +37,16 @@ test('cada pagina tiene su boton para pasar de lado y el limite de 2 a la izquie
 test('cada pagina muestra su direccion y un boton Editar que cambia la misma direccion que se guarda', () => {
   assert.match(script, /edit\.textContent = 'Editar'/); assert.match(script, /fields\[key\]\.value = input\.value/);
   assert.match(script, /side-address/); assert.match(script, /Dirección de \$\{workspaceNames\[key\]\}/);
+});
+
+test('la pantalla avisa lo que no se ha guardado, deja volver a como estaba y organizar ahora', () => {
+  assert.match(page, /id="dirty-note"/); assert.match(page, /Sin guardar/);
+  assert.match(page, /id="setup-arrange"[^]*Organizar ahora/); assert.match(page, /id="setup-reset"[^]*Volver a como estaba/);
+  assert.match(script, /markDirty\(false\)/); assert.match(script, /fields\.width\.value = 31\.25; fields\.height\.value = 100/);
+  assert.match(script, /workspace-retry'\)\.click\(\)/);
+});
+
+test('en la pantalla de configuracion se esconde la tarjeta Preparando y se explica Solo registro aparte', () => {
+  assert.match(page, /id="workspace-card"/); assert.match(readFileSync('extension/propio-bridge/workspace-page.js', 'utf8'), /workspace-card'\)\.hidden = true/);
+  assert.match(page, /<summary>¿Cómo funciona «Solo registro»\?<\/summary>/);
 });

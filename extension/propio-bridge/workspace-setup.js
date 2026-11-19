@@ -1,4 +1,4 @@
-import { readWorkspaceSettings, saveWorkspaceSettings, workspaceOrder, workspaceNames, defaultWorkspaceSides, describeSides } from './workspace-settings.js';
+import { readWorkspaceSettings, saveWorkspaceSettings, workspacePages, workspaceOrder, workspaceNames, defaultWorkspaceSides, describeSides } from './workspace-settings.js';
 const form = document.getElementById('workspace-setup'), message = document.getElementById('setup-status'), save = document.getElementById('setup-save');
 const fields = Object.fromEntries([...form.elements].filter(input => input.name).map(input => [input.name, input]));
 const PATHS_KEY = 'workspace-windows-paths';
@@ -9,6 +9,8 @@ async function savePaths() {
 }
 const widthRange = document.getElementById('width-range'), heightRange = document.getElementById('height-range');
 let sides = { ...defaultWorkspaceSides };
+const dirtyNote = document.getElementById('dirty-note');
+function markDirty(on = true) { if (dirtyNote) dirtyNote.hidden = !on; }
 const side = name => workspaceOrder.filter(key => sides[key] === name);
 function renderSides() {
   const left = side('left'), right = side('right');
@@ -19,7 +21,7 @@ function renderSides() {
       label.textContent = workspaceNames[key]; button.type = 'button'; button.dataset.side = key;
       button.textContent = name === 'left' ? 'Pasar a la derecha →' : '← Pasar a la izquierda';
       button.disabled = name === 'left' ? left.length <= 1 : left.length >= 2;
-      button.addEventListener('click', () => { sides[key] = name === 'left' ? 'right' : 'left'; renderSides(); });
+      button.addEventListener('click', () => { sides[key] = name === 'left' ? 'right' : 'left'; markDirty(); renderSides(); });
       const address = document.createElement('small'), edit = document.createElement('button');
       const show = () => { try { const url = new URL(fields[key].value); address.textContent = url.host + (url.pathname === '/' ? '' : url.pathname); } catch { address.textContent = fields[key].value; } };
       show(); address.className = 'side-address'; edit.type = 'button'; edit.textContent = 'Editar'; edit.dataset.edit = key;
@@ -48,6 +50,7 @@ function updatePreview() {
   if (rightKeys.length > 1) { const tabs = document.createElement('small'); tabs.textContent = `+ pestañas: ${rightKeys.slice(1).map(key => workspaceNames[key]).join(', ')}`; right.append(tabs); }
   document.getElementById('preview-caption').textContent = `Izquierda: ${Math.round((100 - width) * 100) / 100}% del ancho · Derecha: ${Math.round(width * 100) / 100}% del ancho y ${Math.round(height * 10) / 10}% del alto`;
 }
+form.addEventListener('input', event => { if (loaded && event.target?.name !== 'shortcut' && event.target?.name !== 'notes' && !event.target?.dataset?.noDirty) markDirty(); });
 for (const [range, number] of [[widthRange, fields.width], [heightRange, fields.height]]) {
   range.addEventListener('input', () => { number.value = range.value; updatePreview(); });
   number.addEventListener('input', () => { range.value = number.value; updatePreview(); });
@@ -86,10 +89,21 @@ form.addEventListener('submit', async event => {
       rightPaneHeightRatio: Number(fields.height.value) / 100, rightPaneWidthRatio: Number(fields.width.value) / 100,
       sides: { ...sides }, pages: Object.fromEntries(['portal','interpreter','tracker','dictionary'].map(key => [key, fields[key].value])) });
     message.textContent = 'Guardado en este perfil. Tus llamadas, notas y preferencias de otras PCs se conservan. Podés organizar ahora o en la siguiente apertura del perfil.';
-    document.getElementById('workspace-retry').hidden = false;
-    document.getElementById('workspace-retry').textContent = 'Organizar ahora';
+    markDirty(false);
   } catch (error) { message.textContent = error.message || 'No se pudo guardar. Se conserva la configuración anterior.'; }
   finally { save.disabled = false; }
+});
+document.getElementById('setup-arrange').addEventListener('click', () => {
+  document.getElementById('workspace-card').hidden = false;
+  document.getElementById('workspace-retry').click();
+});
+document.getElementById('setup-reset').addEventListener('click', () => {
+  if (!loaded) return;
+  sides = { ...defaultWorkspaceSides };
+  for (const key of workspaceOrder) fields[key].value = workspacePages[key];
+  fields.width.value = 31.25; fields.height.value = 100; widthRange.value = 31.25; heightRange.value = 100;
+  markDirty(); renderSides();
+  message.textContent = 'Volvió la distribución de siempre. Toca Guardar para aplicarla.';
 });
 document.getElementById('setup-export').addEventListener('click', () => {
   const exportMessage = document.getElementById('export-status');
@@ -106,3 +120,4 @@ document.getElementById('setup-export').addEventListener('click', () => {
   anchor.click(); setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
   exportMessage.textContent = 'Configuración preparada para el instalador de Windows. El archivo contiene rutas, no el contenido de tus notas; todavía no se modificó ningún acceso.' + (!shortcut || !notes ? ' Falta escribir una de las rutas: el instalador de Windows te va a pedir que la escribas.' : '');
 });
+
