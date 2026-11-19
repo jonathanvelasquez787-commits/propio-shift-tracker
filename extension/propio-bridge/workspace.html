@@ -28,8 +28,9 @@
       <p id="setup-status" class="helper" role="status">Leyendo configuración…</p>
       <details class="disclosure"><summary>3. Notas y acceso al iniciar Windows</summary>
         <p class="helper">La extensión organiza Chrome. El iniciador de Windows abre tu archivo de notas existente y conserva los argumentos y el perfil del acceso elegido. El instalador valida y respalda antes de cambiarlo; esta preparación no instala nada.</p>
-        <label class="field">Ruta del acceso de Chrome de esta PC<input name="shortcut" type="text" placeholder="C:\Users\TuUsuario\Desktop\Trabajo.lnk"></label>
-        <label class="field">Ruta del archivo de notas de esta PC<input name="notes" type="text" placeholder="C:\Users\TuUsuario\Documents\Notas.txt"></label>
+        <label class="field">Ruta del acceso de Chrome de esta PC (opcional)<input name="shortcut" type="text" placeholder="Vacío: Windows abrirá el explorador para elegirlo"></label>
+        <label class="field">Ruta del archivo de notas de esta PC (opcional)<input name="notes" type="text" placeholder="Vacío: Windows abrirá el explorador para elegirlo"></label>
+        <p class="helper">Si dejas una ruta vacía, al instalar en Windows se abre el explorador de archivos para elegirla con clics.</p>
         <p class="helper">Reservá espacio para las notas con un alto de 40% a 85%. No se lee ni copia su contenido. En la otra PC, elegí sus propias rutas y perfil.</p>
         <button id="setup-export" type="button">Preparar configuración para Windows</button>
         <p id="export-status" class="helper" role="status"></p>
