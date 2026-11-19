@@ -3,7 +3,7 @@ param(
     [string]$NotesFile,
     [string]$BackupDirectory,
     [ValidateRange(.4, .85)][double]$RightPaneHeightRatio = .612,
-    [ValidateRange(.25, .5)][double]$RightPaneWidthRatio = .3125,
+    [ValidateRange(.25, .5)][double]$RightPaneWidthRatio = .33,
     [string]$NotesStartupShortcut,
     [string]$ConfigurationPath,
     [string]$InstallDirectory,
