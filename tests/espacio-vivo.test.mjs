@@ -32,3 +32,8 @@ test('cada pagina tiene su boton para pasar de lado y el limite de 2 a la izquie
   assert.match(script, /left\.length >= 2/); assert.match(script, /caben 2 páginas como mucho/);
   assert.match(script, /sides: \{ \.\.\.sides \}/);
 });
+
+test('cada pagina muestra su direccion y un boton Editar que cambia la misma direccion que se guarda', () => {
+  assert.match(script, /edit\.textContent = 'Editar'/); assert.match(script, /fields\[key\]\.value = input\.value/);
+  assert.match(script, /side-address/); assert.match(script, /Dirección de \$\{workspaceNames\[key\]\}/);
+});
