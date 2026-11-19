@@ -1157,6 +1157,12 @@
       "js/app-main.js"
     ]
   },
+  "s_1588ed0a": {
+    "source": "Tipo de bloque",
+    "files": [
+      "js/schedule.js"
+    ]
+  },
   "s_15899ec3": {
     "source": "Cierre positivo guardado · esta llamada cuenta",
     "files": [
@@ -2770,6 +2776,12 @@
     "source": "Bono de hoy{{v6}}",
     "files": [
       "js/detail-views.js"
+    ]
+  },
+  "s_32498034": {
+    "source": "Eliminar bloque {{v13}}",
+    "files": [
+      "js/schedule.js"
     ]
   },
   "s_324b106f": {
@@ -6075,12 +6087,6 @@
     "source": "{{v0}} estable",
     "files": [
       "js/reports.js"
-    ]
-  },
-  "s_70faa683": {
-    "source": "Eliminar bloque {{v9}}",
-    "files": [
-      "js/schedule.js"
     ]
   },
   "s_71310300": {

@@ -1423,6 +1423,14 @@
           ]
         },
         {
+          "file": "tests/nombre-elige-tipo.test.mjs",
+          "namedCases": [
+            "el nombre del bloque es un selector con Trabajo, Break y Lunch",
+            "al cambiar el nombre se cambia el tipo de bloque",
+            "el selector del nombre tiene estilos y llaves balanceadas"
+          ]
+        },
+        {
           "file": "tests/senales-pendientes-lista.test.mjs",
           "namedCases": [
             "el recuadro de eventos pendientes tiene la lista de senales y el boton de descartar",
