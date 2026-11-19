@@ -15,7 +15,7 @@ export function validateWorkspaceSides(value) {
   return sides;
 }
 export function describeSides(sides) {
-  const names = side => workspaceOrder.filter(key => sides[key] === side).map(key => workspaceNames[key]).join(' y ');
+  const names = side => workspaceOrder.filter(key => sides[key] === side).map(key => workspaceNames[key]).reduce((text, name, index, all) => text + (index === 0 ? '' : index === all.length - 1 ? ' y ' : ', ') + name, '');
   return `${names('left')} a la izquierda; ${names('right')} a la derecha.`;
 }
 export function validateWorkspaceSettings(value) {

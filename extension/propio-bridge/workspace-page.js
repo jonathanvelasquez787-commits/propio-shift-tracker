@@ -46,6 +46,7 @@ async function prepare() {
 retry.addEventListener('click', prepare);
 if (location.hash === '#setup') {
   document.getElementById('workspace-setup').hidden = false;
+  document.getElementById('workspace-card').hidden = true;
   status.textContent = 'Configurá este perfil sin cambiar tu instalación actual.';
   void import('./workspace-setup.js');
 } else prepare();
