@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import { parse } from 'acorn';
+import { PALETTES } from '../js/theme-palettes.js';
 
 const source = fs.readFileSync(new URL('../js/settings.js', import.meta.url), 'utf8');
 const node = parse(source, { ecmaVersion: 'latest', sourceType: 'module' }).body
@@ -16,8 +17,8 @@ function onboardingContext(initial, overrides = {}) {
     obSkipOffInput: { checked: true }, obStartInput: { value: '07:00' }, obEndInput: { value: '15:00' }, obGoalInput: { value: '' } };
   const h = vm.createContext({ settings: copy(initial), state: {}, fields, RATE: 0.12,
     document: { getElementById: id => fields[id] || null, querySelectorAll: () => [] },
-    window: { location: { reload() {} } }, normalizeLanguage: value => value === 'en' ? 'en' : 'es',
-    saveLanguagePreference() {}, applyAppearance() {}, translateText: text => text, ui: (parts, ...values) => String.raw({ raw: parts }, ...values),
+    window: { matchMedia: () => ({ matches: false }), location: { reload() {} } }, normalizeLanguage: value => value === 'en' ? 'en' : 'es',
+    saveLanguagePreference() {}, applyAppearance() {}, PALETTES, translateText: text => text, ui: (parts, ...values) => String.raw({ raw: parts }, ...values),
     money: value => String(value), toast() {}, closeModal() {}, render() {}, saveAll: () => true, ...overrides });
   vm.runInContext(onboarding, h);
   return h;

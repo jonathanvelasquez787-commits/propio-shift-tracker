@@ -444,6 +444,7 @@ let syncingGoals = false;
         } else if (target.dataset.obPalette) {
           onboardingChoice.palette = target.dataset.obPalette;
           pressChips('data-ob-palette', onboardingChoice.palette);
+          previewOnboardingPalette();
         }
         onboardingError('');
         refreshOnboardingNotes();
@@ -455,6 +456,34 @@ let syncingGoals = false;
         if (onboardingStep === 2 && !validateOnboardingMoney()) return;
         showOnboardingStep(onboardingStep + 1);
       });
+    }
+
+    // Tema que necesita la paleta elegida: si no existe en el modo actual (Graphite y Neon solo son
+    // oscuras) se pasa a su modo; si existe, no se toca el tema.
+    function onboardingThemeFor(paletteId, theme) {
+      const palette = PALETTES.find(item => item.id === paletteId);
+      if (!palette) return theme;
+      const mode = theme === 'auto'
+        ? (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+        : theme === 'dark' ? 'dark' : 'light';
+      return Object.hasOwn(palette.modes, mode) ? theme : Object.keys(palette.modes)[0];
+    }
+
+    // Igual que applyTheme de la app: primero la clase claro/oscuro de la pagina y luego los colores.
+    function applyOnboardingLook(look) {
+      const root = document.documentElement;
+      if (root && root.classList) {
+        root.classList.remove('theme-light', 'theme-dark');
+        if (look.theme === 'light') root.classList.add('theme-light');
+        else if (look.theme === 'dark') root.classList.add('theme-dark');
+      }
+      applyAppearance(look);
+    }
+
+    // Muestra la paleta elegida sin guardar nada todavia.
+    function previewOnboardingPalette() {
+      const theme = onboardingThemeFor(onboardingChoice.palette, settings.theme);
+      applyOnboardingLook({ ...settings, palette: onboardingChoice.palette, theme });
     }
 
     function validateOnboardingTurn() {
@@ -511,6 +540,7 @@ let syncingGoals = false;
         if (!blocks) continue;
         cfg.start = start; cfg.end = end; cfg.blocks = blocks;
       }
+      settings.theme = onboardingThemeFor(onboardingChoice.palette, settings.theme);
       settings.palette = onboardingChoice.palette;
       settings.language = normalizeLanguage(onboardingChoice.language);
       settings.streakSkipOffDays = !!document.getElementById('obSkipOffInput')?.checked;
@@ -526,7 +556,7 @@ let syncingGoals = false;
         window.location.reload();
         return true;
       }
-      applyAppearance(settings);
+      applyOnboardingLook(settings);
       render();
     }
     export function formatGoalFields() {
