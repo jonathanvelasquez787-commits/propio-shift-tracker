@@ -572,7 +572,7 @@ export function configureScheduleContext(context) {
 
       if (dayOffInput) dayOffInput.checked = !!cfg.off;
       if (startInput) startInput.value = formatHHMM(cfg.start || '07:00');
-      if (endInput) endInput.value = formatHHMM(cfg.end || '16:00');
+      if (endInput) endInput.value = formatHHMM(cfg.end || '15:00');
       // Pedido del usuario: título de la tarjeta de cabecera del día muestra el NOMBRE COMPLETO del día activo (ver `.sched-day-card- title` en el CSS/HTML)
       const schedDayCardTitle = document.getElementById('schedDayCardTitle');
       if (schedDayCardTitle) schedDayCardTitle.textContent = WEEKDAY_LABELS[scheduleEditDay] || translateText('Lunes');
@@ -618,7 +618,7 @@ export function configureScheduleContext(context) {
       const storedNormalized = {
         off: !!(stored && stored.off),
         start: formatHHMM((stored && stored.start) || '07:00'),
-        end: formatHHMM((stored && stored.end) || '16:00'),
+        end: formatHHMM((stored && stored.end) || '15:00'),
         blocks: storedBlocks,
       };
       const lateSelect = document.getElementById('lateArrivalModeInput');

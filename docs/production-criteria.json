@@ -444,7 +444,7 @@
         {
           "file": "tests/goals-and-default-schedule.test.mjs",
           "namedCases": [
-            "new accounts start at 06:00–14:00 with the requested blocks and 360-minute goal",
+            "new accounts start at 07:00–15:00 with the requested blocks and 360-minute goal",
             "loading an existing customized schedule keeps its times, goals and days off",
             "editing the general goal from a historical day changes that day, persists and leaves other history intact",
             "day-only goals leave the general goal intact and using general updates the selected historical day",

@@ -37,11 +37,11 @@ function harness(t) {
   return {h,element,edit,opened:()=>opened,reload(){const data=JSON.parse(persisted);setAppSettings(data.settings);setAppState(data.state);setAppCalls(data.calls);}};
 }
 
-test('new accounts start at 06:00–14:00 with the requested blocks and 360-minute goal',t=>{
+test('new accounts start at 07:00–15:00 with the requested blocks and 360-minute goal',t=>{
   const x=harness(t),fresh=copy(x.h.defaultSettings());
   assert.equal(fresh.productiveGoalMin,360);assert.equal(fresh.earningsGoal,43.2);
-  assert.equal(fresh.shiftStart,'06:00');assert.equal(fresh.shiftEnd,'14:00');
-  const expected=[['work','06:00',130,120],['break','08:10',20],['work','08:30',130,120],['break','10:40',20],['work','11:00',65,60],['lunch','12:05',50],['work','12:55',65,60]];
+  assert.equal(fresh.shiftStart,'07:00');assert.equal(fresh.shiftEnd,'15:00');
+  const expected=[['work','07:00',130,120],['break','09:10',20],['work','09:30',130,120],['break','11:40',20],['work','12:00',65,60],['lunch','13:05',50],['work','13:55',65,60]];
   for(const day of ['mon','tue','wed','thu','fri']){
     assert.equal(fresh.weeklySchedule[day].off,false);
     assert.deepEqual(fresh.weeklySchedule[day].blocks.map(b=>b.type==='work'?[b.type,b.start,b.dur,b.goalMin]:[b.type,b.start,b.dur]),expected);

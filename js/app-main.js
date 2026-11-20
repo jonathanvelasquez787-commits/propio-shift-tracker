@@ -296,16 +296,16 @@ export { onReinforcementCallSaved, onReinforcementCallsChanged, onReinforcementD
     export function defaultDaySchedule(isWorkDay) {
       return {
         off: !isWorkDay,
-        start: '06:00',
-        end: '14:00',
+        start: '07:00',
+        end: '15:00',
         blocks: [
-          { type: 'work', start: '06:00', dur: 130, goalMin: 120 },
-          { type: 'break', start: '08:10', dur: 20 },
-          { type: 'work', start: '08:30', dur: 130, goalMin: 120 },
-          { type: 'break', start: '10:40', dur: 20 },
-          { type: 'work', start: '11:00', dur: 65, goalMin: 60 },
-          { type: 'lunch', start: '12:05', dur: 50 },
-          { type: 'work', start: '12:55', dur: 65, goalMin: 60 },
+          { type: 'work', start: '07:00', dur: 130, goalMin: 120 },
+          { type: 'break', start: '09:10', dur: 20 },
+          { type: 'work', start: '09:30', dur: 130, goalMin: 120 },
+          { type: 'break', start: '11:40', dur: 20 },
+          { type: 'work', start: '12:00', dur: 65, goalMin: 60 },
+          { type: 'lunch', start: '13:05', dur: 50 },
+          { type: 'work', start: '13:55', dur: 65, goalMin: 60 },
         ],
       };
     }
@@ -665,8 +665,8 @@ export { onReinforcementCallSaved, onReinforcementCallsChanged, onReinforcementD
       return {
         productiveGoalMin: DEFAULT_GOAL_MINUTES,
         earningsGoal: DEFAULT_GOAL_DOLLARS,
-        shiftStart: '06:00',
-        shiftEnd: '14:00',
+        shiftStart: '07:00',
+        shiftEnd: '15:00',
         lateArrivalMode: 'anchor', // 'anchor' = la hora de fin no se mueve (pierdes el tiempo) | 'shift' = se corre todo el turno.
         weeklySchedule: defaultWeeklySchedule(),
         // Horario real por SEMANA ESPECÍFICA (con su propia fecha de inicio), aparte de la
@@ -5219,7 +5219,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
     // según cuándo diste click en "Iniciar" — viene del horario semanal configurado.
     function getShiftWindow(dayKey = todayCallDateKey()) {
       const cfg = dayConfigFor(dayKey);
-      if (!cfg) return { start: '07:00', end: '16:00', off: true };
+      if (!cfg) return { start: '07:00', end: '15:00', off: true };
       // Bug reportado por el usuario: al marcar "Día libre (sin turno)" en Horario, el botón "Iniciar shift" (y el chip "Shift: X – Y") cambiaban al fallback fijo 7:00 AM–4:00 PM en vez de mantener el horario real configurado para ese día.
       return { start: formatHHMM(cfg.start), end: formatHHMM(cfg.end), off: !!cfg.off };
     }
