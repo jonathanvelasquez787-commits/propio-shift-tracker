@@ -2379,5 +2379,22 @@
   "s_d1f8ce33": "480 min",
   "s_da898cc2": "300 min",
   "s_dfc060ea": "Back",
-  "s_f81ef41d": "420 min"
+  "s_f81ef41d": "420 min",
+  "s_16057e86": "Join these two calls",
+  "s_22c65791": "{{v0}} call(s) are only in the tool (Propio does not have them)",
+  "s_295a8351": "Join",
+  "s_302fc6ef": "These calls have changed. Close this window and check the table.",
+  "s_56328cea": "The records changed. Close and reopen the comparison before joining.",
+  "s_662d8db5": "The tool measured one call and Propio reported a similar one. If you join them you get a single call with both measurements. If you are not sure, close without joining.",
+  "s_6f667f31": "{{v0}} s apart",
+  "s_74df829c": "{{v0}} min apart",
+  "s_788f5e4f": "Is it the same call?",
+  "s_7f0c2d86": "Another call overlaps this record. Check the times before joining; nothing was deleted.",
+  "s_7fd4dd9c": "Join calls",
+  "s_85e58845": "{{v12}} · {{v13}}",
+  "s_8fac2d02": "Possible repeat of #{{v0}} ({{v1}})",
+  "s_ac3d38cd": "Calls joined. Both measurements were kept.",
+  "s_b88196d6": "Both measurements are kept and the pay is not added twice.",
+  "s_b9d74bc6": "{{v4}} · {{v5}} · {{v6}}",
+  "s_fb7cd82c": "Nothing is joined automatically."
 }

@@ -57,6 +57,7 @@ import {
   openCallEditor,
   openCallRecovery,
   openCallRecords,
+  openCallJoin,
   openManualCallModal,
   renderDayStatsCards,
   renderTable,
@@ -7579,6 +7580,8 @@ export function render() {
       }
       const review = event.target instanceof Element ? event.target.closest('[data-record-review]') : null;
       if (review) { openCallRecords(null, null, review.dataset.recordReview); return; }
+      const join = event.target instanceof Element ? event.target.closest('[data-call-join]') : null;
+      if (join) { const [toolId, propioId] = String(join.dataset.callJoin).split('|'); openCallJoin(toolId, propioId); return; }
       const target = event.target instanceof Element ? event.target.closest('[data-call-records]') : null;
       if (target) {
         const start = computeCurrentAcwStart(), owner = start && acwCallRecord(calls, start.toISOString());

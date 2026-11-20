@@ -57,6 +57,15 @@ export function openCallRecords(callId, acwStart = null, reviewId = null) {
   return useCallRecovery('openCallRecords', null, acwStart, reviewId);
 }
 
+export function openCallJoin(toolId, propioId) {
+  document.getElementById('callEditFields').hidden = true;
+  document.getElementById('callEditModalTitle').textContent = translateText('Juntar llamadas');
+  document.getElementById('callRecordsContent').innerHTML = '';
+  editingCallId = null; editingCallContext = null;
+  openModal('callEditModal');
+  return useCallRecovery('openCallJoin', toolId, propioId);
+}
+
 // Filtro Todo/Llamadas/Acciones sobre la tabla fusionada "Tabla de llamadas y acciones de hoy" (ver
 // #tableFilterRow en el HTML y dayActionRows/renderTable más abajo). Vive en memoria, no en
 // localStorage.

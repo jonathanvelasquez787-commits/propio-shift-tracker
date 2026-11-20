@@ -2411,6 +2411,19 @@
             "restored inline promotion editor rolls back rejected saves without losing recorded money",
             "automatic promotion edits serialize rapid date and tier changes without losing tomorrow or earned bonuses"
           ]
+        },
+        {
+          "file": "tests/llamadas-etiquetas-juntar.test.mjs",
+          "namedCases": [
+            "Cada llamada lleva su etiqueta Propio, Tool o Propio + Tool",
+            "La pista posible repetida sale con inicio a menos de 5 min y duracion a menos de 1 min",
+            "La pista NO sale si la duracion es distinta o el inicio esta lejos",
+            "La pista NO sale si la llamada de Propio ya tiene su propia medicion de la tool",
+            "Cada llamada entra en una sola pista",
+            "Juntar conserva las dos mediciones, quita la fila repetida y no suma el pago dos veces",
+            "Juntar se detiene si las llamadas cambiaron mientras estaba abierta la confirmacion",
+            "La tabla muestra etiquetas, aviso solo-tool y boton Juntar sin colores fijos"
+          ]
         }
       ]
     },

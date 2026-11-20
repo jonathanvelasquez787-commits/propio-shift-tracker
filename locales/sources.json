@@ -179,12 +179,6 @@
       "app.html"
     ]
   },
-  "s_035732f7": {
-    "source": "{{v3}} · {{v4}} · {{v5}}",
-    "files": [
-      "js/call-table-view.js"
-    ]
-  },
   "s_0362f7d4": {
     "source": "Pegar",
     "files": [
@@ -1182,6 +1176,12 @@
       "terminos.html"
     ]
   },
+  "s_16057e86": {
+    "source": "Juntar estas dos llamadas",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_160f1d9d": {
     "source": "Llamada guardada ({{v0}}) — edítala en Tabla de llamadas si hace falta",
     "files": [
@@ -1865,6 +1865,12 @@
       "js/higher-rate-review.js"
     ]
   },
+  "s_22c65791": {
+    "source": "{{v0}} llamada(s) solo están en la tool (Propio no las tiene)",
+    "files": [
+      "js/call-table-view.js"
+    ]
+  },
   "s_22f071d7": {
     "source": "Pegar llamadas desde otra fuente",
     "files": [
@@ -2221,6 +2227,12 @@
     "source": "Sin actividad",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_295a8351": {
+    "source": "Juntar",
+    "files": [
+      "js/call-table-view.js"
     ]
   },
   "s_295d560f": {
@@ -2654,6 +2666,12 @@
     "source": "Toca su estado (Libre o Trabajado) para cambiarlo, o el lápiz para agregar una categoría o nota.",
     "files": [
       "app.html"
+    ]
+  },
+  "s_302fc6ef": {
+    "source": "Estas llamadas ya cambiaron. Cerrá esta ventana y revisá la tabla.",
+    "files": [
+      "js/call-records-view.js"
     ]
   },
   "s_303fe282": {
@@ -4823,6 +4841,12 @@
       "js/work-actions.js"
     ]
   },
+  "s_56328cea": {
+    "source": "Los registros cambiaron. Cerrá y abrí la comparación antes de juntar.",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_564e2e23": {
     "source": "Hoy",
     "files": [
@@ -5599,6 +5623,12 @@
       "app.html"
     ]
   },
+  "s_662d8db5": {
+    "source": "La tool midió una llamada y Propio informó otra parecida. Si las juntas queda una sola llamada con las dos mediciones. Si no estás seguro, cierra sin juntar.",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_66460e29": {
     "source": "Tus observaciones se conservan",
     "files": [
@@ -6041,6 +6071,12 @@
       "js/notification-review.js"
     ]
   },
+  "s_6f667f31": {
+    "source": "{{v0}} s de diferencia",
+    "files": [
+      "js/call-table-view.js"
+    ]
+  },
   "s_6f9cbf3d": {
     "source": "Apartar o devolver dinero",
     "files": [
@@ -6376,6 +6412,12 @@
       "js/reinforcement.js"
     ]
   },
+  "s_74df829c": {
+    "source": "{{v0}} min de diferencia",
+    "files": [
+      "js/call-table-view.js"
+    ]
+  },
   "s_75098ce7": {
     "source": "El pago debe ser un número válido de hasta 1000000000 dólares.",
     "files": [
@@ -6546,6 +6588,12 @@
     "source": "Si olvidas cerrar el turno antes de medianoche, la app lo empareja igual al abrir uno nuevo al día siguiente.",
     "files": [
       "app.html"
+    ]
+  },
+  "s_788f5e4f": {
+    "source": "¿Es la misma llamada?",
+    "files": [
+      "js/call-records-view.js"
     ]
   },
   "s_78aa65ee": {
@@ -6943,6 +6991,12 @@
       "js/reports.js"
     ]
   },
+  "s_7f0c2d86": {
+    "source": "Otra llamada cruza este registro. Revisá los tiempos antes de juntar; no se eliminó nada.",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_7f275484": {
     "source": "Categoría",
     "files": [
@@ -6977,6 +7031,12 @@
     "source": "Estado manual",
     "files": [
       "js/calendar.js"
+    ]
+  },
+  "s_7fd4dd9c": {
+    "source": "Juntar llamadas",
+    "files": [
+      "js/calls.js"
     ]
   },
   "s_80157ce5": {
@@ -7362,6 +7422,12 @@
       "app.html"
     ]
   },
+  "s_85e58845": {
+    "source": "{{v12}} · {{v13}}",
+    "files": [
+      "js/call-table-view.js"
+    ]
+  },
   "s_85e79a40": {
     "source": "Una hora sin llamadas no define tu capacidad · sigue a tu ritmo",
     "files": [
@@ -7407,6 +7473,7 @@
   "s_877a44a8": {
     "source": "{{v7}}{{v8}}",
     "files": [
+      "js/call-table-view.js",
       "js/reports.js"
     ]
   },
@@ -7986,6 +8053,12 @@
     "source": "Bono extra ganado por llamadas dentro de una ventana Higher Rate {{v4}}",
     "files": [
       "js/higher-rate.js"
+    ]
+  },
+  "s_8fac2d02": {
+    "source": "Posible repetida con #{{v0}} ({{v1}})",
+    "files": [
+      "js/call-table-view.js"
     ]
   },
   "s_8fcef020": {
@@ -9643,6 +9716,12 @@
       "app.html"
     ]
   },
+  "s_ac3d38cd": {
+    "source": "Llamadas juntas. Las dos mediciones se conservaron.",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_ac52bfaf": {
     "source": "Faltan {{v0}} min",
     "files": [
@@ -10300,6 +10379,12 @@
       "terminos.html"
     ]
   },
+  "s_b88196d6": {
+    "source": "Las dos mediciones se conservan y el pago no se suma dos veces.",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_b8adf8ad": {
     "source": "Esto no vende publicidad ni comparte datos con nadie. Lo que registras\n          sirve para una sola cosa: que tú lo veas. Y siempre te lo puedes\n          llevar o borrar completo.",
     "files": [
@@ -10347,6 +10432,12 @@
     "source": "Valor interno: {{v0}} USD{{v1}}. La pantalla redondea a centavos.",
     "files": [
       "js/finance.js"
+    ]
+  },
+  "s_b9d74bc6": {
+    "source": "{{v4}} · {{v5}} · {{v6}}",
+    "files": [
+      "js/call-table-view.js"
     ]
   },
   "s_baa70682": {
@@ -13294,12 +13385,6 @@
       "js/app-main.js"
     ]
   },
-  "s_ee04f7c9": {
-    "source": "{{v10}} · {{v11}}",
-    "files": [
-      "js/call-table-view.js"
-    ]
-  },
   "s_ee1bc225": {
     "source": "Historial desde: —",
     "files": [
@@ -14108,6 +14193,12 @@
     "source": "Llamada completada",
     "files": [
       "app.html"
+    ]
+  },
+  "s_fb7cd82c": {
+    "source": "Nada se junta solo.",
+    "files": [
+      "js/call-table-view.js"
     ]
   },
   "s_fb810678": {
