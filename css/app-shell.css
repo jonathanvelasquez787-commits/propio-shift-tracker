@@ -2717,3 +2717,20 @@ html.theme-light #scheduleConfigAccordion .sched-bk-name-select { color-scheme: 
 #onboardingModal .ob-dots i { width: 8px; height: 8px; border-radius: 999px; background: var(--line-2); }
 #onboardingModal .ob-dots i.on { width: 24px; background: var(--cyan); }
 /* fin bienvenida 3 pasos */
+
+/* horario barra alta */
+#scheduleConfigAccordion .sched-daybar { height: 72px; gap: 4px; }
+#scheduleConfigAccordion .sched-daybar-ticks { display: none; }
+#scheduleConfigAccordion .sched-bar-seg { border-radius: 12px; gap: 2px; padding: 4px 6px; box-sizing: border-box; }
+#scheduleConfigAccordion .sched-bar-seg[data-bar-size="short"] { min-width: 34px; flex-grow: 0; }
+#scheduleConfigAccordion .sched-bar-seg[data-bar-size="short"] { flex-basis: auto !important; }
+#scheduleConfigAccordion .sched-bar-seg[data-bar-size="mid"] { min-width: 44px; }
+#scheduleConfigAccordion .sched-bar-ic { display: inline-flex; line-height: 0; }
+#scheduleConfigAccordion .sched-bar-ic .ic-svg { width: 16px; height: 16px; }
+#scheduleConfigAccordion .sched-bar-name { font-size: 14px; font-weight: 800; }
+#scheduleConfigAccordion .sched-bar-range { font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; opacity: .9; }
+#scheduleConfigAccordion .sched-bar-seg[data-bar-size="full"] .sched-bar-dur { font-size: 13px; font-weight: 800; opacity: 1; }
+#scheduleConfigAccordion .sched-bar-head { display: inline-flex; align-items: center; gap: 6px; }
+#scheduleConfigAccordion .sched-bar-seg[data-bar-size="short"] .sched-bar-dur,
+#scheduleConfigAccordion .sched-bar-seg[data-bar-size="mid"] .sched-bar-dur { font-size: 12px; font-weight: 800; opacity: 1; }
+/* fin horario barra alta */
