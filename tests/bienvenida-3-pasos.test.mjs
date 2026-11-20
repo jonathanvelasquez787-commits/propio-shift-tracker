@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import { parse } from 'acorn';
+import { PALETTES } from '../js/theme-palettes.js';
 
 const read = file => fs.readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
 const html = read('app.html');
@@ -28,8 +29,8 @@ function context(settings, values = {}, extra = {}) {
   const log = { reload: 0, closed: 0 };
   const h = vm.createContext({ settings, state: {}, fields, log, RATE: 0.12,
     document: { getElementById: id => fields[id] || null, querySelectorAll: () => [] },
-    window: { location: { reload() { log.reload++; } } }, normalizeLanguage: value => value === 'en' ? 'en' : 'es',
-    saveLanguagePreference() {}, applyAppearance() {}, translateText: text => text, ui: (parts, ...v) => String.raw({ raw: parts }, ...v),
+    window: { matchMedia: () => ({ matches: false }), location: { reload() { log.reload++; } } }, normalizeLanguage: value => value === 'en' ? 'en' : 'es',
+    saveLanguagePreference() {}, applyAppearance() {}, PALETTES, translateText: text => text, ui: (parts, ...v) => String.raw({ raw: parts }, ...v),
     money: value => String(value), toast() {}, closeModal() { log.closed++; }, render() {}, saveAll: () => true, ...extra });
   vm.runInContext(onboarding, h);
   return h;
@@ -129,4 +130,33 @@ test('estilos de la bienvenida: llaves balanceadas y sin colores fijos', () => {
   assert.ok(block.length > 100);
   assert.equal(block.split('{').length, block.split('}').length);
   assert.doesNotMatch(block, /#[0-9a-fA-F]{3,8}\b/);
+});
+
+test('elegir una paleta la muestra al momento y no guarda nada todavia', () => {
+  const settings = { theme: 'auto', language: 'es', palette: 'original' };
+  const seen = [];
+  const h = context(settings, {}, { applyAppearance: value => seen.push({ ...value }) });
+  vm.runInContext("onboardingChoice.palette = 'ocean';", h);
+  h.previewOnboardingPalette();
+  assert.equal(seen.length, 1);
+  assert.equal(seen[0].palette, 'ocean');
+  assert.equal(h.settings.palette, 'original');
+  assert.ok(onboarding.includes('previewOnboardingPalette();'));
+  assert.ok(settingsSource.slice(settingsSource.indexOf('target.dataset.obPalette) {')).slice(0, 400).includes('previewOnboardingPalette()'));
+});
+
+test('una paleta solo oscura con el sistema en claro pasa el tema a oscuro; una que tiene los dos no toca el tema', () => {
+  const light = { matchMedia: () => ({ matches: true }), location: { reload() {} } };
+  for (const [palette, expected] of [['graphite', 'dark'], ['neon', 'dark'], ['ocean', 'auto'], ['original', 'auto']]) {
+    const settings = { theme: 'auto', language: 'es', weeklySchedule: {} };
+    const h = context(settings, {}, { window: light });
+    vm.runInContext(`onboardingChoice.palette = '${palette}';`, h);
+    h.finishOnboarding();
+    assert.equal(h.settings.palette, palette, palette);
+    assert.equal(h.settings.theme, expected, palette);
+  }
+  const dark = context({ theme: 'auto', language: 'es', weeklySchedule: {} });
+  vm.runInContext("onboardingChoice.palette = 'graphite';", dark);
+  dark.finishOnboarding();
+  assert.equal(dark.settings.theme, 'auto');
 });

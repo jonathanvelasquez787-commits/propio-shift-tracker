@@ -2478,7 +2478,9 @@
             "elegir English guarda el idioma y recarga la app",
             "una meta o un horario mal escritos frenan en el paso 1 sin guardar",
             "si solo se borro el perfil, la bienvenida conserva el horario y la meta que ya habia",
-            "estilos de la bienvenida: llaves balanceadas y sin colores fijos"
+            "estilos de la bienvenida: llaves balanceadas y sin colores fijos",
+            "elegir una paleta la muestra al momento y no guarda nada todavia",
+            "una paleta solo oscura con el sistema en claro pasa el tema a oscuro; una que tiene los dos no toca el tema"
           ]
         }
       ]
