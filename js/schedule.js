@@ -320,8 +320,13 @@ export function configureScheduleContext(context) {
         const en = toMinutes(formatHHMM(row.querySelector('.block-end-input')?.value || '00:00'));
         return { type: row.querySelector('.block-type-input')?.value || 'work', from: ((st - shiftStart) % 1440 + 1440) % 1440, dur: ((en - st) % 1440 + 1440) % 1440 };
       }).filter(r => r.dur > 0 && r.from < total).sort((x, y) => x.from - y.from);
-      const compact = typeof window !== 'undefined' && window.innerWidth <= 760;
-      const segments = [];
+      const barWidth = bar.offsetWidth || (typeof window !== 'undefined' ? Math.max(280, Math.min(window.innerWidth - 60, 1000)) : 1000);
+      if (typeof ResizeObserver !== 'undefined' && !bar.dataset.barObserved) {
+        bar.dataset.barObserved = '1';
+        let lastW = bar.offsetWidth;
+        new ResizeObserver(() => { if (bar.offsetWidth && Math.abs(bar.offsetWidth - lastW) > 2) { lastW = bar.offsetWidth; renderDayBar(); } }).observe(bar);
+      }
+      const clock = min => { const t = ((min % 1440) + 1440) % 1440; return String(Math.floor(t / 60)).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0'); };
       let cursor = 0;
       let html = '';
       for (const r of rows) {
@@ -331,29 +336,20 @@ export function configureScheduleContext(context) {
         if (from > cursor) html += `<span class="sched-bar-gap" style="flex:${from - cursor}"></span>`;
         const t = BLOCK_TYPE_LABELS[r.type] ? r.type : 'work';
         const durLabel = formatBlockDurationLabel(dur);
-        const label = dur >= 45 ? (compact ? `<span class="sched-bar-dur">${durLabel}</span>` : `<span class="sched-bar-name">${BLOCK_TYPE_LABELS[t]}</span><span class="sched-bar-dur">${durLabel}</span>`) : (compact ? '' : `<span class="sched-bar-dur">${durLabel}</span>`);
-        html += `<span class="sched-bar-seg" data-bar-type="${t}" style="flex:${dur}">${label}</span>`;
-        segments.push({ type: t, from, dur });
+        const range = clock(shiftStart + from) + ' - ' + clock(shiftStart + from + dur);
+        const px = (dur / total) * barWidth;
+        const icon = typeof iconHtml === 'function' ? `<span class="sched-bar-ic">${iconHtml((BLOCK_TIMELINE_META[t] || BLOCK_TIMELINE_META.work).iconName)}</span>` : '';
+        let label;
+        let size;
+        if (dur < 50) { size = 'short'; label = `${icon}<span class="sched-bar-dur">${dur}</span>`; }
+        else if (px >= 105) { size = 'full'; label = `<span class="sched-bar-head">${icon}<span class="sched-bar-name">${BLOCK_TYPE_LABELS[t]}</span></span><span class="sched-bar-range">${range}</span><span class="sched-bar-dur">${durLabel}</span>`; }
+        else { size = 'mid'; label = `${icon}<span class="sched-bar-dur">${durLabel}</span>`; }
+        html += `<span class="sched-bar-seg" data-bar-type="${t}" data-bar-size="${size}" style="flex:${dur} 1 0" title="${BLOCK_TYPE_LABELS[t]} ${range} (${durLabel})">${label}</span>`;
         cursor = from + dur;
       }
       if (cursor < total) html += `<span class="sched-bar-gap" style="flex:${total - cursor}"></span>`;
       bar.innerHTML = html;
-      // Marcas: la hora donde empieza cada bloque y la del final (sin encimarse; en celular solo las principales).
-      const barWidth = bar.offsetWidth || (compact ? 330 : 1000);
-      const minGapPx = 34;
-      let tickHtml = '';
-      let lastPx = -Infinity;
-      segments.forEach((seg, i) => {
-        if (compact && !(i === 0 || (seg.type === 'work' && i < segments.length - 1))) return;
-        const px = (seg.from / total) * barWidth;
-        if (i > 0 && px - lastPx < minGapPx) return;
-        if (i > 0 && barWidth - px < 56) return;
-        lastPx = px;
-        const pos = seg.from === 0 ? 'left:0' : `left:${(seg.from / total) * 100}%;transform:translateX(-50%)`;
-        tickHtml += `<span class="sched-bar-tick" style="${pos}">${barHourLabel(shiftStart + seg.from, i === 0)}</span>`;
-      });
-      if (segments.length) tickHtml += `<span class="sched-bar-tick" style="right:0">${barHourLabel(shiftStart + total, true)}</span>`;
-      ticks.innerHTML = tickHtml;
+      ticks.innerHTML = '';
     }
 
     export function updateScheduleRowSummary(row) {

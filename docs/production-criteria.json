@@ -1559,8 +1559,8 @@
           "file": "tests/horario-barra-clara.test.mjs",
           "namedCases": [
             "La barra del dia muestra nombre y duracion en cada tramo",
-            "La barra del dia pone la hora donde empieza cada bloque y la del final",
-            "En celular la barra muestra solo la duracion y menos horas",
+            "La barra alta pone icono, nombre, horas y duracion dentro de cada pieza",
+            "En las piezas cortas la barra alta muestra solo icono y minutos",
             "El estilo de la barra clara usa solo variables del tema"
           ]
         },
