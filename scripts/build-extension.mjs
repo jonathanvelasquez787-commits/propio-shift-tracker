@@ -23,6 +23,8 @@ for (const name of ['manifest.json', 'tracker-content.js', 'popup.html', 'popup.
 }
 await mkdir(path.join(out, 'icons'), { recursive: true });
 for (const size of [16, 32, 48, 128]) await copyFile(path.join(root, `extension/propio-bridge/icons/icon-${size}.png`), path.join(out, `icons/icon-${size}.png`));
+await mkdir(path.join(out, 'tools'), { recursive: true });
+for (const file of ['Reparar-notas.bat', 'scripts/install-desktop-workspace.ps1', 'windows/Open-Chrome-And-Notes.cs', 'herramientas-windows/optimizar-interpreter/optimizar_interpreter.bat', 'herramientas-windows/optimizar-interpreter/optimizar_chrome.ps1', 'herramientas-windows/grabadora/grabadora.pyw', 'herramientas-windows/grabadora/crear_exe.bat', 'herramientas-windows/grabadora/grabadora.ico', 'herramientas-windows/grabadora/timbre-propio.wav']) await copyFile(path.join(root, file), path.join(out, 'tools', path.basename(file)));
 const version = JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8')).version;
 const manifest = JSON.parse(await readFile(path.join(out, 'manifest.json'), 'utf8'));
 await writeFile(path.join(out, 'release.json'), JSON.stringify({ appVersion: version, extensionVersion: manifest.version }, null, 2));

@@ -1448,6 +1448,14 @@
           ]
         },
         {
+          "file": "tests/herramientas-descargas.test.mjs",
+          "namedCases": [
+            "La seccion Herramientas de Windows ofrece cada archivo por separado",
+            "El armado de la extension copia a tools/ cada archivo que se ofrece",
+            "Los archivos que se descargan existen en el repo"
+          ]
+        },
+        {
           "file": "tests/selector-accesos-windows.test.mjs",
           "namedCases": [
             "los cuadros de ruta de Windows ya no mencionan el explorador",

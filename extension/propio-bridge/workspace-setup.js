@@ -115,8 +115,8 @@ document.getElementById('setup-reset').addEventListener('click', () => {
   markDirty(); renderSides();
   message.textContent = 'Volvió la distribución de siempre. Toca Guardar para aplicarla.';
 });
-document.getElementById('setup-export').addEventListener('click', () => {
-  const exportMessage = document.getElementById('export-status');
+function exportConfiguration(statusId) {
+  const exportMessage = document.getElementById(statusId);
   const shortcut = unquote(fields.shortcut.value), notes = unquote(fields.notes.value);
   if ((shortcut && !/^[a-z]:\\.+\.lnk$/i.test(shortcut)) || (notes && !/^[a-z]:\\.+/i.test(notes))) {
     exportMessage.textContent = 'Escribí la ruta completa (por ejemplo C:\\...\\Trabajo.lnk).'; return;
@@ -129,7 +129,9 @@ document.getElementById('setup-export').addEventListener('click', () => {
   const anchor = document.createElement('a'); anchor.href = objectUrl; anchor.download = 'propio-workspace-configuration.json';
   anchor.click(); setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
   exportMessage.textContent = 'Configuración preparada para el instalador de Windows. El archivo contiene rutas, no el contenido de tus notas; todavía no se modificó ningún acceso.' + (!shortcut || !notes ? ' Falta escribir una de las rutas: el instalador de Windows te va a pedir que la escribas.' : '');
-});
+}
+document.getElementById('setup-export').addEventListener('click', () => exportConfiguration('export-status'));
+document.getElementById('tools-export').addEventListener('click', () => exportConfiguration('tools-export-status'));
 
 
 // + Agregar otra página
