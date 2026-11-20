@@ -3,6 +3,10 @@ import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { minify } from 'terser';
 import { cp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import os from 'node:os';
+import { execFileSync } from 'node:child_process';
+import { mkdtemp } from 'node:fs/promises';
+import { zipFiles } from './zip-lib.mjs';
 import { createAppShell } from './production-shell.mjs';
 import { createLocalizedLanding } from './landing-pages.mjs';
 import { createInterpreterGuide } from './interpreter-guide.mjs';
@@ -98,6 +102,22 @@ await cp(path.join(root, 'css'), path.join(out, 'css'), { recursive: true });
 await cp(path.join(root, 'manifest.webmanifest'), path.join(out, 'manifest.webmanifest'));
 await cp(path.join(root, 'icons/app-icon.svg'), path.join(out, 'icons/app-icon.svg'));
 await cp(path.join(root, 'icons/social-preview.png'), path.join(out, 'icons/social-preview.png'));
+// La extension de Chrome se arma aqui para que la web siempre ofrezca la version actual.
+const extensionTemp = await mkdtemp(path.join(os.tmpdir(), 'propio-ext-'));
+const extensionDir = path.join(extensionTemp, 'propio-bridge');
+execFileSync(process.execPath, [path.join(root, 'scripts/build-extension.mjs'), extensionDir], { cwd: root, stdio: 'pipe' });
+const extensionEntries = [];
+async function collectExtension(dir) {
+  for (const item of (await readdir(dir, { withFileTypes: true })).sort((x, y) => x.name.localeCompare(y.name))) {
+    const full = path.join(dir, item.name);
+    if (item.isDirectory()) await collectExtension(full);
+    else extensionEntries.push({ name: `propio-bridge/${path.relative(extensionDir, full).split(path.sep).join('/')}`, data: await readFile(full) });
+  }
+}
+await collectExtension(extensionDir);
+await mkdir(path.join(out, 'extension'), { recursive: true });
+await writeFile(path.join(out, 'extension/propio-bridge.zip'), zipFiles(extensionEntries));
+await rm(extensionTemp, { recursive: true, force: true });
 for (const name of ['robots.txt', 'sitemap.xml']) {
   await cp(path.join(root, name), path.join(out, name));
 }
