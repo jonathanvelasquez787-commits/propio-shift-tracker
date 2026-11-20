@@ -1450,9 +1450,9 @@
         {
           "file": "tests/herramientas-descargas.test.mjs",
           "namedCases": [
-            "La seccion Herramientas de Windows ofrece cada archivo por separado",
-            "El armado de la extension copia a tools/ cada archivo que se ofrece",
-            "Los archivos que se descargan existen en el repo"
+            "La seccion Herramientas de Windows ofrece un zip por herramienta",
+            "El armado de la extension crea cada zip con los archivos de la herramienta",
+            "Los archivos que se empaquetan existen en el repo"
           ]
         },
         {
