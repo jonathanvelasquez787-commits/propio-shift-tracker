@@ -49,6 +49,20 @@
         <button id="setup-export" type="button">Preparar configuración para Windows</button>
         <p id="export-status" class="helper" role="status"></p>
       </details>
+      <details class="disclosure" id="windows-tools"><summary>4. Herramientas de Windows</summary>
+        <p class="helper">La extensión solo te entrega los archivos. No ejecuta nada: el último paso (doble clic) lo hacés vos en tu PC. Cada herramienta viene en un .zip: clic derecho, «Extraer todo» y abrí la carpeta.</p>
+        <div class="tool-card"><h3>Reparar notas</h3><p class="helper">Bajá primero el .json con tus rutas y dejalo en Descargas. Después extraé el .zip y hacé doble clic en «Reparar-notas.bat».</p>
+          <button id="tools-export" type="button" class="tool-link">Descargar configuración con tus rutas (.json)</button>
+          <a class="tool-link" href="tools/Reparar-notas.zip" download="Reparar-notas.zip">Descargar Reparar-notas.zip</a>
+          <p id="tools-export-status" class="helper" role="status"></p>
+        </div>
+        <div class="tool-card"><h3>Optimizar Interpreter y Chrome</h3><p class="helper">Extraé el .zip y hacé doble clic en «optimizar_interpreter.bat».</p>
+          <a class="tool-link" href="tools/Optimizar-Interpreter-y-Chrome.zip" download="Optimizar-Interpreter-y-Chrome.zip">Descargar Optimizar-Interpreter-y-Chrome.zip</a>
+        </div>
+        <div class="tool-card"><h3>Grabadora</h3><p class="helper">Necesita Python en tu PC. Extraé el .zip y hacé doble clic en «crear_exe.bat».</p>
+          <a class="tool-link" href="tools/Grabadora.zip" download="Grabadora.zip">Descargar Grabadora.zip</a>
+        </div>
+      </details>
       <p class="helper">Chrome requiere vista dividida para organizar las ventanas. El equipo suspendido no ejecuta automatismos; al volver se comprueban de nuevo el portal y el permiso.</p>
     </form>
   </main>

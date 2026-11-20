@@ -1448,6 +1448,14 @@
           ]
         },
         {
+          "file": "tests/herramientas-descargas.test.mjs",
+          "namedCases": [
+            "La seccion Herramientas de Windows ofrece un zip por herramienta",
+            "El armado de la extension crea cada zip con los archivos de la herramienta",
+            "Los archivos que se empaquetan existen en el repo"
+          ]
+        },
+        {
           "file": "tests/selector-accesos-windows.test.mjs",
           "namedCases": [
             "los cuadros de ruta de Windows ya no mencionan el explorador",
