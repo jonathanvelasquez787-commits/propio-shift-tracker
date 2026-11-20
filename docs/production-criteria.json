@@ -1456,6 +1456,15 @@
           ]
         },
         {
+          "file": "tests/extension-descarga-web.test.mjs",
+          "namedCases": [
+            "Ajustes, pestana Datos, ofrece descargar la extension con los pasos para instalarla",
+            "El armado del sitio publica la extension como zip y el service worker no la intercepta",
+            "El zip propio guarda los archivos con su ruta y es un zip valido",
+            "El estilo de la descarga usa colores del tema y no hexadecimales"
+          ]
+        },
+        {
           "file": "tests/selector-accesos-windows.test.mjs",
           "namedCases": [
             "los cuadros de ruta de Windows ya no mencionan el explorador",

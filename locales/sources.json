@@ -1102,6 +1102,12 @@
       "js/schedule.js"
     ]
   },
+  "s_13490c1f": {
+    "source": "Cómo instalarla en Chrome",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_1352d41e": {
     "source": "Min antes",
     "files": [
@@ -1128,6 +1134,12 @@
       "js/calls.js"
     ]
   },
+  "s_13b6ec29": {
+    "source": "En Chrome escribí",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_13d91da6": {
     "source": "Tu meta, tarifa y preferencias.",
     "files": [
@@ -1150,6 +1162,12 @@
     "source": "Final observado: {{v0}}",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_1498a812": {
+    "source": "propio-bridge",
+    "files": [
+      "app.html"
     ]
   },
   "s_14cdd74b": {
@@ -2831,6 +2849,12 @@
     "source": "Bono de hoy{{v6}}",
     "files": [
       "js/detail-views.js"
+    ]
+  },
+  "s_3235280f": {
+    "source": "chrome://extensions",
+    "files": [
+      "app.html"
     ]
   },
   "s_32498034": {
@@ -5045,6 +5069,12 @@
       "app.html"
     ]
   },
+  "s_59142f6d": {
+    "source": "Activá «Modo de desarrollador» (arriba a la derecha).",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_591b802c": {
     "source": "Tu corrección guardada se usa en el registro. Las fuentes originales se conservan como respaldo.",
     "files": [
@@ -5091,6 +5121,12 @@
     "source": "Todavía no hay una revisión de nube confirmada en este navegador.",
     "files": [
       "js/boot.js"
+    ]
+  },
+  "s_5a16ad58": {
+    "source": "en la barra de direcciones.",
+    "files": [
+      "app.html"
     ]
   },
   "s_5a3eb15d": {
@@ -5468,6 +5504,12 @@
     "source": "Ver cómo se actualizó esta llamada",
     "files": [
       "js/call-records-view.js"
+    ]
+  },
+  "s_63181606": {
+    "source": "Descargar extensión",
+    "files": [
+      "app.html"
     ]
   },
   "s_63236fb9": {
@@ -7253,6 +7295,12 @@
   },
   "s_83535adf": {
     "source": "Azul Medianoche: Azul noche, intenso y celeste",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_8366efd1": {
+    "source": "Tocá «Cargar descomprimida» y elegí la carpeta",
     "files": [
       "app.html"
     ]
@@ -10365,6 +10413,12 @@
       "js/finance.js"
     ]
   },
+  "s_b772aa5f": {
+    "source": "Extraé el archivo que bajaste (clic derecho, «Extraer todo»).",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_b786e768": {
     "source": "Total del ciclo",
     "files": [
@@ -11166,6 +11220,12 @@
       "terminos.html"
     ]
   },
+  "s_c736ff96": {
+    "source": "La extensión registra tus llamadas sola y organiza las páginas de Propio en Chrome. Bajala aquí; siempre es la versión más nueva.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_c73bb4cf": {
     "source": "Guarda tus datos también en la nube, además de en este dispositivo, para que te sigan entre computadora y teléfono.",
     "files": [
@@ -11176,6 +11236,12 @@
     "source": "Higher Rate ($)",
     "files": [
       "js/accounting-export.js"
+    ]
+  },
+  "s_c7598a28": {
+    "source": "Si ya tenés una versión instalada, quitala primero en la misma pantalla y repetí los pasos.",
+    "files": [
+      "app.html"
     ]
   },
   "s_c792eaeb": {
@@ -11821,6 +11887,12 @@
     "source": "Elige una fecha válida",
     "files": [
       "js/calls.js"
+    ]
+  },
+  "s_d39911c9": {
+    "source": "Extensión de Chrome",
+    "files": [
+      "app.html"
     ]
   },
   "s_d3ad88b9": {

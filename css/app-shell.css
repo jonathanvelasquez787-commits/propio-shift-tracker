@@ -2761,3 +2761,9 @@ html.theme-light #scheduleConfigAccordion .sched-bk-name-select { color-scheme: 
 .record-compare-tag[data-kind="rule"] { border-color: var(--cyan); color: var(--cyan); }
 @media (max-width: 620px) { .record-compare-row { grid-template-columns: 38px minmax(40px, 1fr); } .record-compare-label { grid-column: 1 / -1; white-space: normal; } }
 /* fin llamadas comparacion */
+
+/* extension descarga */
+.ext-download-btn { display: inline-flex; align-items: center; gap: 8px; margin: 4px 0 10px; padding: 10px 16px; border-radius: 12px; border: 1px solid var(--cyan); color: var(--cyan); font-weight: 800; text-decoration: none; }
+.ext-download-btn .ic-svg { width: 18px; height: 18px; }
+.ext-steps { margin: 6px 0 10px; padding-left: 20px; line-height: 1.6; font-size: 13px; }
+/* fin extension descarga */

@@ -2403,5 +2403,17 @@
   "s_7d96343f": "Duration: the tool measured {{v0}} less",
   "s_812f79da": "Duration: the tool measured {{v0}} more",
   "s_c927e6e0": "Pay: the tool estimated {{v0}} less",
-  "s_d2c3be88": "Propio counts (it has priority)"
+  "s_d2c3be88": "Propio counts (it has priority)",
+  "s_13490c1f": "How to install it in Chrome",
+  "s_13b6ec29": "In Chrome, type",
+  "s_1498a812": "propio-bridge",
+  "s_3235280f": "chrome://extensions",
+  "s_59142f6d": "Turn on “Developer mode” (top right).",
+  "s_5a16ad58": "in the address bar.",
+  "s_63181606": "Download extension",
+  "s_8366efd1": "Click “Load unpacked” and choose the folder",
+  "s_b772aa5f": "Extract the file you downloaded (right-click, “Extract all”).",
+  "s_c736ff96": "The extension records your calls on its own and arranges the Propio pages in Chrome. Download it here; it is always the newest version.",
+  "s_c7598a28": "If you already have a version installed, remove it first on the same screen and repeat the steps.",
+  "s_d39911c9": "Chrome extension"
 }
