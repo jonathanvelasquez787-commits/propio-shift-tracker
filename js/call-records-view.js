@@ -67,7 +67,24 @@ export function openCallRecords(context, callId, acwStart = null, reviewId = nul
   let html = `<div class="record-explain"><strong>${esc(title)}</strong><p>${esc(corrected ? translateText('Tu corrección guardada se usa en el registro. Las fuentes originales se conservan como respaldo.') : propio && tool ? translateText('Propio tiene prioridad. La observación original sigue guardada como respaldo.') : tool ? translateText('La llamada aún no está confirmada en el historial de Propio. No se borra por ausencia.') : translateText('Consultá el origen de los tiempos y los registros disponibles.'))}</p></div>`;
   if (Number.isFinite(elapsed)) html += `<div class="record-equation"><div><small>${esc(translateText('Ahora'))}</small><strong>${esc(equationClock(new Date().toISOString()))}</strong></div><span>−</span><div><small>${esc(corrected ? translateText('Final corregido') : propio ? translateText('Final de Propio*') : tool ? translateText('Final observado') : translateText('Inicio del ACW'))}</small><strong>${esc(equationClock(start))}</strong></div><span>=</span><div><small>ACW</small><strong class="record-acw-value">${esc(compactDuration(elapsed))}</strong></div></div>`;
   if (comparison.differenceMs !== null && (Math.abs(comparison.differenceMs) >= 1000 || comparison.payDifference)) {
-    html += `<div class="record-difference-line">${esc(ui`Diferencia de cierre: ${formatDuration(Math.abs(comparison.differenceMs))}`)}${comparison.payDifference ? ` · ${esc(translateText('Diferencia de pago'))}: ${amount(Math.abs(comparison.payDifference))}` : ''}</div>`;
+    if (propio && tool) {
+      const clock24 = value => Number.isFinite(Date.parse(value)) ? new Date(value).toLocaleTimeString(context.displayLocale(), { hour:'2-digit', minute:'2-digit', hour12:false }) : '—';
+      const shortDuration = value => compactDuration(value).replace(/^0(?=\d:)/, '');
+      const propioMs = Number(propio.durationMin) * 60000, toolMs = Number(tool.durationMs);
+      const longest = Math.max(propioMs, toolMs, 1);
+      const width = value => `${Math.max(4, Math.round(value / longest * 100))}%`;
+      const durationGap = toolMs - propioMs, payGap = Number(tool.pay) - Number(propio.pay);
+      const tags = [];
+      if (Math.abs(durationGap) >= 1000) tags.push(['diff', durationGap > 0 ? ui`Duración: la tool midió ${shortDuration(durationGap)} más` : ui`Duración: la tool midió ${shortDuration(-durationGap)} menos`]);
+      if (Math.abs(payGap) >= 0.005) tags.push(['diff', payGap > 0 ? ui`Pago: la tool estimó ${money(payGap)} más` : ui`Pago: la tool estimó ${money(-payGap)} menos`]);
+      tags.push(['rule', corrected ? translateText('Cuenta tu corrección guardada') : translateText('Cuenta Propio (tiene prioridad)')]);
+      html += `<section class="record-compare"><h3>${esc(translateText('Comparación'))}</h3>`
+        + `<div class="record-compare-row" data-source="propio"><span class="record-compare-name">Propio</span><span class="record-compare-track"><i style="width:${width(propioMs)}"></i></span><span class="record-compare-label">${esc(ui`${propio.durationMin} min`)} · ${esc(clock24(propio.startISO))} → ${esc(clock24(propio.endISO))}</span></div>`
+        + `<div class="record-compare-row" data-source="tool"><span class="record-compare-name">Tool</span><span class="record-compare-track"><i style="width:${width(toolMs)}"></i></span><span class="record-compare-label">${esc(shortDuration(toolMs))} · ${esc(clock24(tool.startISO))} → ${esc(clock24(tool.endISO))}</span></div>`
+        + `<div class="record-compare-tags">${tags.map(([kind, text]) => `<span class="record-compare-tag" data-kind="${kind}">${esc(text)}</span>`).join('')}</div></section>`;
+    } else {
+      html += `<div class="record-difference-line">${esc(ui`Diferencia de cierre: ${formatDuration(Math.abs(comparison.differenceMs))}`)}${comparison.payDifference ? ` · ${esc(translateText('Diferencia de pago'))}: ${amount(Math.abs(comparison.payDifference))}` : ''}</div>`;
+    }
   }
   if (call) {
     if (call.manualCorrectionAt || !propio && !tool) html += `<div class="review-overview"><div class="review-metric"><span>${esc(translateText('Duración registrada'))}</span><strong>${esc(formatDuration(Number(call.durationMin) * 60000))}</strong></div><div class="review-metric"><span>${esc(translateText('Pago registrado'))}</span><strong>${amount(Number(String(call.pay).replace(/[$,\s]/g,'')))}</strong></div></div>`;

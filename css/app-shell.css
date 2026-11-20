@@ -2746,3 +2746,18 @@ html.theme-light #scheduleConfigAccordion .sched-bk-name-select { color-scheme: 
 .call-join-btn { min-height: 30px; padding: 4px 14px; border-radius: 10px; border: 0; background: var(--cyan); color: var(--bg); font-weight: 800; cursor: pointer; }
 [data-call-join-confirm] { margin-top: 14px; }
 /* fin llamadas etiquetas */
+
+/* llamadas comparacion */
+.record-compare { margin: 14px 0 6px; }
+.record-compare h3 { margin: 0 0 10px; font-size: 14px; color: var(--text); }
+.record-compare-row { display: grid; grid-template-columns: 44px minmax(60px, 1fr) auto; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 12px; }
+.record-compare-name { color: var(--muted); }
+.record-compare-track { display: block; height: 16px; }
+.record-compare-track i { display: block; height: 100%; border-radius: 8px; background: var(--cyan); }
+.record-compare-row[data-source="tool"] .record-compare-track i { background: var(--break-active); }
+.record-compare-label { font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.record-compare-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.record-compare-tag { padding: 4px 10px; border-radius: 10px; border: 1px solid var(--break-active); color: var(--break-active); font-size: 11px; font-weight: 800; }
+.record-compare-tag[data-kind="rule"] { border-color: var(--cyan); color: var(--cyan); }
+@media (max-width: 620px) { .record-compare-row { grid-template-columns: 38px minmax(40px, 1fr); } .record-compare-label { grid-column: 1 / -1; white-space: normal; } }
+/* fin llamadas comparacion */

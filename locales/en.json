@@ -2396,5 +2396,12 @@
   "s_ac3d38cd": "Calls joined. Both measurements were kept.",
   "s_b88196d6": "Both measurements are kept and the pay is not added twice.",
   "s_b9d74bc6": "{{v4}} · {{v5}} · {{v6}}",
-  "s_fb7cd82c": "Nothing is joined automatically."
+  "s_fb7cd82c": "Nothing is joined automatically.",
+  "s_03025e1d": "Comparison",
+  "s_4a9731c6": "Your saved correction counts",
+  "s_7a235481": "Pay: the tool estimated {{v0}} more",
+  "s_7d96343f": "Duration: the tool measured {{v0}} less",
+  "s_812f79da": "Duration: the tool measured {{v0}} more",
+  "s_c927e6e0": "Pay: the tool estimated {{v0}} less",
+  "s_d2c3be88": "Propio counts (it has priority)"
 }

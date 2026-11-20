@@ -2424,6 +2424,14 @@
             "Juntar se detiene si las llamadas cambiaron mientras estaba abierta la confirmacion",
             "La tabla muestra etiquetas, aviso solo-tool y boton Juntar sin colores fijos"
           ]
+        },
+        {
+          "file": "tests/llamadas-comparacion.test.mjs",
+          "namedCases": [
+            "La ventana de detalle muestra la comparacion con dos barras y las etiquetas de diferencia",
+            "Si Propio y la tool miden lo mismo no sale la comparacion",
+            "La comparacion usa colores del tema y no hexadecimales"
+          ]
         }
       ]
     },
