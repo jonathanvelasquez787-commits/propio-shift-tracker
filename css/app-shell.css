@@ -2734,3 +2734,15 @@ html.theme-light #scheduleConfigAccordion .sched-bk-name-select { color-scheme: 
 #scheduleConfigAccordion .sched-bar-seg[data-bar-size="short"] .sched-bar-dur,
 #scheduleConfigAccordion .sched-bar-seg[data-bar-size="mid"] .sched-bar-dur { font-size: 12px; font-weight: 800; opacity: 1; }
 /* fin horario barra alta */
+
+/* llamadas etiquetas */
+.call-origin-tag { display: inline-block; padding: 1px 8px; border-radius: 8px; border: 1px solid currentColor; font-size: 11px; font-weight: 800; line-height: 1.5; vertical-align: middle; }
+.call-origin-tag[data-origin="propio"] { color: rgb(var(--good-rgb)); }
+.call-origin-tag[data-origin="tool"] { color: var(--break-active); }
+.call-origin-tag[data-origin="both"] { color: var(--cyan); }
+.call-tool-only-notice { display: flex; flex-direction: column; gap: 2px; margin: 0 0 10px; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--break-active); color: var(--text); background: rgba(255,255,255,.04); font-size: 13px; }
+.call-tool-only-notice strong { color: var(--break-active); font-size: 15px; }
+.call-repeat-hint { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 8px; padding: 6px 10px; border-radius: 10px; border: 1px solid var(--break-active); font-size: 12px; font-weight: 700; color: var(--break-active); }
+.call-join-btn { min-height: 30px; padding: 4px 14px; border-radius: 10px; border: 0; background: var(--cyan); color: var(--bg); font-weight: 800; cursor: pointer; }
+[data-call-join-confirm] { margin-top: 14px; }
+/* fin llamadas etiquetas */

@@ -1,4 +1,4 @@
-import { callRecordSource, matchesCallReview } from './call-review-model.js';
+import { callRecordSource, matchesCallReview, callRecordTag, isToolOnlyCall, possibleRepeatPairs } from './call-review-model.js';
 import { callElapsedMs, compareCallRecords } from './call-records.js';
 
 export function renderCallTable(context) {
@@ -61,6 +61,9 @@ export function renderCallTable(context) {
         'type-import': 'clipboard',
       };
 
+      const repeatPairs = possibleRepeatPairs(sortedCalls);
+      const toolOnlyCount = sortedCalls.filter(isToolOnlyCall).length;
+      const tagLabel = { both: 'Propio + Tool', propio: 'Propio', tool: 'Tool' };
       const rowsHtml = filtered.map(entry => {
         if (entry.kind === 'call') {
           const c = entry.call;
@@ -71,6 +74,10 @@ export function renderCallTable(context) {
           const droppedText = String(c.dropped).toLowerCase() === 'yes' ? translateText('Dropped') : translateText('No dropped');
           const higherRateBonus = higherRateBonusForCall(c);
           const higherRateBadge = higherRateBonus ? higherRateTierBadgeHtml(higherRateBonus.tier, higherRateBonus.amount) : '';
+          const pair = repeatPairs.get(c.id);
+          const diffMs = pair ? pair.startDiff : 0;
+          const diffText = diffMs < 60000 ? ui`${Math.round(diffMs / 1000)} s de diferencia` : ui`${Math.round(diffMs / 60000)} min de diferencia`;
+          const repeatHtml = pair ? ui`<div class="call-repeat-hint"><span>Posible repetida con #${escapeHtml(pair.propioCall.customerId)} (${diffText})</span><button class="call-join-btn" type="button" data-call-join="${escapeHtml(c.id)}|${escapeHtml(pair.propioCall.id)}">Juntar</button></div>` : '';
           const sourceLabel = { estimated: c.propioBridge ? translateText('Estimado · extensión') : translateText('Medición exacta · pago estimado'),
             official: translateText('Oficial · importado'), 'official-correction': translateText('Oficial corregida'),
             'manual-correction': translateText('Corregida por vos'), manual: translateText('Manual'), unknown: translateText('Origen sin confirmar') }[callRecordSource(c)];
@@ -79,9 +86,10 @@ export function renderCallTable(context) {
             <div class="tbl-row">
               <span class="tbl-row-icon type-call">${iconHtml('phone')}</span>
               <div class="tbl-row-main">
-                <div class="tbl-row-title"><button class="record-link" type="button" data-call-records="${escapeHtml(c.id || '')}">#${escapeHtml(c.customerId)}</button> <span class="tbl-type-badge type-call">Llamada</span></div>
+                <div class="tbl-row-title"><button class="record-link" type="button" data-call-records="${escapeHtml(c.id || '')}">#${escapeHtml(c.customerId)}</button> <span class="tbl-type-badge type-call">Llamada</span>${callRecordTag(c) ? ` <span class="call-origin-tag" data-origin="${callRecordTag(c)}">${tagLabel[callRecordTag(c)]}</span>` : ''}</div>
                 <div class="tbl-row-sub">${escapeHtml(billableText)} · ${escapeHtml(droppedText)} · ${escapeHtml(sourceLabel)}</div>
                 <span class="tbl-row-sub">${comparison.propio ? comparison.tool ? translateText('Propio y respaldo') : translateText('Registro de Propio') : comparison.tool ? translateText('Respaldo · pendiente de Propio') : translateText('Ver registros')}${Math.abs(comparison.differenceMs || 0) >= 1000 ? ui` · Diferencia: ${Math.round(Math.abs(comparison.differenceMs) / 1000)} s` : ''}</span>
+                ${repeatHtml}
               </div>
               <div class="tbl-row-right">
                 <div class="tbl-row-amount">${money(parseMoney(c.pay))}</div>
@@ -124,5 +132,7 @@ export function renderCallTable(context) {
 
       // `#callTableWrap` ya trae su propio borde/fondo redondeado (`.table-wrap`, en el HTML) — las
       // filas se pintan directo ahí dentro, sin envolver en otra tarjeta propia.
-      wrap.innerHTML = rowsHtml.join('');
+      const noticeHtml = toolOnlyCount > 0 && tableFilterMode !== 'actions'
+        ? ui`<div class="call-tool-only-notice" role="status"><strong>${toolOnlyCount} llamada(s) solo están en la tool (Propio no las tiene)</strong><span>Nada se junta solo.</span></div>` : '';
+      wrap.innerHTML = noticeHtml + rowsHtml.join('');
     }

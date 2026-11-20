@@ -108,3 +108,75 @@ export function openCallRecords(context, callId, acwStart = null, reviewId = nul
   }
   context.openModal('callEditModal');
 }
+
+// Juntar a mano una llamada solo-tool con una llamada solo-Propio (la pista "posible repetida").
+// Nunca se llama sola: pide confirmacion mostrando las dos lado a lado.
+function joinableCalls(calls, toolId, propioId) {
+  const toolCall = calls.find(item => item.id === toolId), propioCall = calls.find(item => item.id === propioId);
+  const t = toolCall && compareCallRecords(toolCall), p = propioCall && compareCallRecords(propioCall);
+  return t?.tool && !t.propio && p?.propio && !p.tool ? { toolCall, propioCall, tool: t.tool, propio: p.propio } : null;
+}
+
+export function joinCallRecords(context, toolId, propioId, opened) {
+  const { translateText } = context;
+  const { calls, state, settings } = context.data();
+  const found = joinableCalls(calls, toolId, propioId);
+  if (!context.canPersistLocalChanges() || !found || opened.owner !== settings
+    || opened.tool !== JSON.stringify(found.toolCall) || opened.propio !== JSON.stringify(found.propioCall)) {
+    context.toast(translateText('Los registros cambiaron. Cerrá y abrí la comparación antes de juntar.')); return false;
+  }
+  const { toolCall, propioCall } = found;
+  if (state.activeCall || unfinishedCallIntervals(state).some(interval => context.callsOverlap(interval, propioCall))
+    || calls.some(call => call.id !== toolId && call.id !== propioId && context.callsOverlap(call, propioCall))) {
+    context.toast(translateText('Otra llamada cruza este registro. Revisá los tiempos antes de juntar; no se eliminó nada.')); return false;
+  }
+  const previousState = structuredClone(state), categories = structuredClone(settings.financeCategories);
+  const distribution = structuredClone(settings.financeLastDistribution);
+  const merged = preserveCallRecords({ ...propioCall, id: toolCall.id, callDate: toolCall.callDate,
+    calendarCallDate: toolCall.calendarCallDate || propioCall.calendarCallDate || propioCall.callDate, shiftDayKey: toolCall.shiftDayKey,
+    ...(toolCall.frozenHigherRateBonus ? { frozenHigherRateBonus: { ...toolCall.frozenHigherRateBonus } } : {}),
+    ...(toolCall.propioBridge ? { propioBridge: { ...toolCall.propioBridge, timingEstimated: false, payEstimated: false } } : {}),
+    source: 'import', officialCorrection: { kind: 'reconciled', at: new Date().toISOString() },
+  }, toolCall, propioCall.records?.propio?.receivedAt || propioCall.importedAt);
+  const stagedCalls = calls.filter(item => item.id !== propioId).map(item => item.id === toolId ? merged : item);
+  context.setCalls(stagedCalls);
+  let saved = false;
+  try {
+    context.reconcileLastCallEndedAt(merged.callDate);
+    context.financeRunAutoFillCascade();
+    saved = context.saveAll() !== false;
+  } catch { /* Las dos llamadas permanecen si falla el guardado. */ }
+  if (!saved) {
+    const current = context.data();
+    if (current.state === state && current.settings === settings && current.calls === stagedCalls) {
+      context.setCalls(calls); context.setState(previousState); settings.financeCategories = categories;
+      if (distribution === undefined) delete settings.financeLastDistribution; else settings.financeLastDistribution = distribution;
+    }
+    context.render(); return false;
+  }
+  context.onReinforcementCallsChanged(merged.callDate); context.render();
+  context.toast(translateText('Llamadas juntas. Las dos mediciones se conservaron.'));
+  return true;
+}
+
+export function openCallJoin(context, toolId, propioId) {
+  const { calls, settings } = context.data();
+  const { ui, translateText, escapeHtml: esc, money, financeConvertedInline, formatDuration } = context;
+  const root = document.getElementById('callRecordsContent');
+  const found = joinableCalls(calls, toolId, propioId);
+  if (!root) return false;
+  if (!found) { root.innerHTML = `<p class="note">${esc(translateText('Estas llamadas ya cambiaron. Cerrá esta ventana y revisá la tabla.'))}</p>`; return false; }
+  const { tool, propio, toolCall, propioCall } = found;
+  const clock = value => new Date(value).toLocaleTimeString(context.displayLocale(), { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const amount = value => `${money(value)}${financeConvertedInline(value)}`;
+  const row = (label, value) => `<div><dt>${esc(label)}</dt><dd>${value}</dd></div>`;
+  root.innerHTML = `<div class="record-explain"><strong>${esc(translateText('¿Es la misma llamada?'))}</strong><p>${esc(translateText('La tool midió una llamada y Propio informó otra parecida. Si las juntas queda una sola llamada con las dos mediciones. Si no estás seguro, cierra sin juntar.'))}</p></div>`
+    + `<div class="record-sources"><article class="record-source is-propio"><header><strong>Propio</strong><span>#${esc(propioCall.customerId)}</span></header><dl>${row(translateText('Inicio informado'), esc(clock(propio.startISO)))}${row(translateText('Duración informada'), esc(ui`${propio.durationMin} min`))}${row(translateText('Pago informado'), amount(propio.pay))}</dl></article>`
+    + `<article class="record-source"><header><strong>${esc(translateText('Medición guardada'))}</strong><span>Tool</span></header><dl>${row(translateText('Inicio observado'), esc(clock(tool.startISO)))}${row(translateText('Duración observada'), esc(formatDuration(tool.durationMs)))}${row(translateText('Pago estimado'), amount(tool.pay))}</dl></article></div>`
+    + `<button class="mc-btn-primary cyan" type="button" data-call-join-confirm>${esc(translateText('Juntar estas dos llamadas'))}</button><p class="record-source-note">${esc(translateText('Las dos mediciones se conservan y el pago no se suma dos veces.'))}</p>`;
+  const opened = { owner: settings, tool: JSON.stringify(toolCall), propio: JSON.stringify(propioCall) };
+  root.querySelector('[data-call-join-confirm]').addEventListener('click', () => {
+    if (joinCallRecords(context, toolId, propioId, opened)) context.closeModal('callEditModal');
+  });
+  return true;
+}
