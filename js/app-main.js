@@ -99,6 +99,8 @@ import {
   cancelPendingGoalChange,
   clearActiveDayGoalOverride,
   finishOnboarding,
+  resetOnboardingSteps,
+  wireOnboarding,
   formatGoalFields,
   openSettingsModal,
   renderEmojiPicker,
@@ -4602,6 +4604,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
         const toggleEmojiPickerOnboardingBtnReset = document.getElementById('toggleEmojiPickerOnboardingBtn');
         if (onboardingEmojiPickerWrapReset) onboardingEmojiPickerWrapReset.classList.remove('open');
         if (toggleEmojiPickerOnboardingBtnReset) { toggleEmojiPickerOnboardingBtnReset.setAttribute('aria-expanded', 'false'); toggleEmojiPickerOnboardingBtnReset.textContent = translateText('Cambiar emoji'); }
+        if (typeof resetOnboardingSteps === 'function') resetOnboardingSteps({ keepSchedule: !eraseSchedule });
         openModal('onboardingModal');
         return true;
       });
@@ -8030,6 +8033,7 @@ export function render() {
     });
     renderEmojiPicker('emojiPickerMetas', String(settings.userEmoji || ''));
     document.getElementById('onboardingSaveBtn').addEventListener('click', finishOnboarding);
+    wireOnboarding();
     document.getElementById('rateInput').addEventListener('change', updateRate);
     document.getElementById('exchangeRateInput').addEventListener('change', updateCurrencySettings);
     document.getElementById('currencyLabelInput').addEventListener('change', updateCurrencySettings);
@@ -8565,6 +8569,7 @@ export function render() {
       renderEmojiPicker('emojiPickerOnboarding', initialEmoji);
       const onboardingEmojiPreviewInit = document.getElementById('onboardingEmojiPreview');
       if (onboardingEmojiPreviewInit) onboardingEmojiPreviewInit.textContent = initialEmoji;
+      resetOnboardingSteps();
       openModal('onboardingModal');
     }
 

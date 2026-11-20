@@ -2680,3 +2680,40 @@ html.theme-light #scheduleConfigAccordion .sched-bk-name-select { color-scheme: 
 #scheduleConfigAccordion .sched-bk-name-select:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; border-radius: 6px; }
 #scheduleConfigAccordion .sched-bk-name-chev { position: absolute; right: 0; top: 50%; width: 14px; height: 14px; margin-top: -7px; pointer-events: none; color: var(--muted); }
 /* fin nombre elige tipo */
+
+/* bienvenida 3 pasos */
+#onboardingModal .ob-step[hidden], #onboardingModal .ob-other[hidden], #onboardingModal .ob-error[hidden], #onboardingModal [hidden] { display: none !important; }
+#onboardingModal .ob-label { font-weight: 800; color: var(--text); margin: 14px 0 8px; }
+#onboardingModal .ob-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+#onboardingModal .ob-chip { border: 1px solid var(--line-2); background: var(--panel-2); color: var(--text); border-radius: 999px; padding: 11px 18px; font: inherit; font-weight: 800; cursor: pointer; }
+#onboardingModal .ob-chip[aria-pressed="true"] { background: var(--cyan); border-color: var(--cyan); color: var(--bg); }
+#onboardingModal .ob-chip:focus-visible, #onboardingModal .ob-palette:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+#onboardingModal .ob-note { color: var(--muted); font-size: 13px; margin: 6px 0 0; display: block; }
+#onboardingModal .ob-other { margin-top: 10px; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; }
+#onboardingModal .ob-other .goals-field { flex: 0 1 200px; }
+#onboardingModal #obGoalOther { display: block; max-width: 240px; }
+#onboardingModal .ob-rate-row { display: flex; align-items: center; gap: 8px; max-width: 240px; }
+#onboardingModal .ob-prefix { font-weight: 800; color: var(--text); }
+#onboardingModal .ob-money-row { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; margin-top: 12px; }
+#onboardingModal .ob-money-row .goals-field { flex: 0 1 160px; }
+#onboardingModal .ob-error { color: var(--bad); font-weight: 700; margin: 10px 0 0; }
+#onboardingModal .ob-palettes { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
+@media (max-width: 640px) { #onboardingModal .ob-palettes { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+#onboardingModal #obTurnSection { margin-top: 20px; }
+#onboardingModal .ob-palette { display: flex; flex-direction: column; gap: 6px; align-items: stretch; border: 1px solid var(--line-2); background: var(--panel-2); color: var(--text); border-radius: 14px; padding: 8px; font: inherit; cursor: pointer; }
+#onboardingModal .ob-palette[aria-pressed="true"] { border: 2px solid var(--cyan); padding: 7px; }
+#onboardingModal .ob-swatches { display: flex; gap: 2px; }
+#onboardingModal .ob-swatches i { flex: 1; height: 22px; border-radius: 6px; }
+#onboardingModal .ob-palette-name { font-size: 12px; font-weight: 800; text-align: center; }
+#onboardingModal .ob-switch-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: 16px; cursor: pointer; }
+#onboardingModal .ob-switch-row input { appearance: none; -webkit-appearance: none; position: relative; width: 52px; height: 30px; flex: 0 0 auto; margin: 0; border-radius: 999px; background: var(--line-2); border: 0; cursor: pointer; transition: none; }
+#onboardingModal .ob-switch-row input::after { content: ''; position: absolute; top: 4px; left: 4px; width: 22px; height: 22px; border-radius: 50%; background: var(--bg); }
+#onboardingModal .ob-switch-row input:checked { background: var(--cyan); }
+#onboardingModal .ob-switch-row input:checked::after { left: 26px; }
+#onboardingModal .ob-switch-row input:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+#onboardingModal .ob-actions { align-items: center; justify-content: flex-end; margin-top: 18px; }
+#onboardingModal .ob-actions .mc-btn-primary, #onboardingModal .ob-actions .mc-btn-warn-pill { flex: 0 0 auto; }
+#onboardingModal .ob-dots { display: flex; gap: 8px; margin-right: auto; }
+#onboardingModal .ob-dots i { width: 8px; height: 8px; border-radius: 999px; background: var(--line-2); }
+#onboardingModal .ob-dots i.on { width: 24px; background: var(--cyan); }
+/* fin bienvenida 3 pasos */

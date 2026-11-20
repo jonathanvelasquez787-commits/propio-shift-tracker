@@ -3,6 +3,8 @@ import { AuthError, authErrorMessage, getSession, getProfile, getUser, updateEma
 import { settings, state, setAppSettings, setAppState } from './app-context.js';
 import { normalizeLanguage, saveLanguagePreference } from './language-preference.js';
 import { EMAIL_AUTH_READY } from './config.js';
+import { PALETTES } from './theme-palettes.js';
+import { applyAppearance } from './appearance.js';
 
 let DEFAULT_USER_EMOJI, EMOJI_CHOICES, RATE, closeModal, convertedAmountText;
 let currencyCeilFromUsdAmount, effectiveCycleGoal, effectiveDailyGoal, ensureCurrencySettings, escapeHtml;
@@ -311,23 +313,220 @@ let syncingGoals = false;
       btn.textContent = open ? translateText('Ocultar emoji') : translateText('Cambiar emoji');
     }
 
+    // Bienvenida en 3 pasos (Tu turno / Tu dinero / Tu app). Las elecciones viven en este objeto
+    // hasta "Guardar y empezar"; el tema claro/oscuro NO se elige (queda en 'auto').
+    const ONBOARDING_DEFAULTS = { goal: 360, hours: '07:00-15:00', language: 'es', palette: 'original' };
+    let onboardingStep = 1;
+    let onboardingKeepSchedule = false;
+    const onboardingChoice = { ...ONBOARDING_DEFAULTS };
+    const hhmmToMin = value => { const [h, m] = String(value || '').split(':').map(Number); return h * 60 + m; };
+    const minToHHMM = total => `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
+
+    export function onboardingGoalMinutes() {
+      if (onboardingChoice.goal !== 'other') return Number(onboardingChoice.goal);
+      return Math.round(Number(document.getElementById('obGoalInput')?.value));
+    }
+
+    export function onboardingHours() {
+      if (onboardingChoice.hours !== 'other') {
+        const [start, end] = onboardingChoice.hours.split('-');
+        return { start, end };
+      }
+      return { start: document.getElementById('obStartInput')?.value || '', end: document.getElementById('obEndInput')?.value || '' };
+    }
+
+    // Corre los bloques del horario de siempre a la nueva entrada y estira o acorta el ultimo
+    // bloque para llegar a la salida. Devuelve null si el horario no cabe.
+    export function buildOnboardingBlocks(baseBlocks, start, end, goalMin) {
+      const delta = hhmmToMin(start) - hhmmToMin(baseBlocks[0].start);
+      const blocks = baseBlocks.map(block => ({ ...block, start: minToHHMM(hhmmToMin(block.start) + delta) }));
+      const last = blocks[blocks.length - 1];
+      last.dur = hhmmToMin(end) - hhmmToMin(last.start);
+      if (!(last.dur >= 15)) return null;
+      const work = blocks.filter(block => block.type === 'work');
+      const total = work.reduce((sum, block) => sum + block.dur, 0);
+      let left = goalMin;
+      work.forEach((block, index) => {
+        const part = index === work.length - 1 ? left : Math.min(left, Math.round(goalMin * block.dur / total));
+        block.goalMin = part;
+        left -= part;
+      });
+      return blocks;
+    }
+
+    function onboardingError(text) {
+      const box = document.getElementById('obError');
+      if (!box) return;
+      box.textContent = text ? translateText(text) : '';
+      box.hidden = !text;
+    }
+
+    function pressChips(attr, value) {
+      document.querySelectorAll(`[${attr}]`).forEach(button => button.setAttribute('aria-pressed', String(button.getAttribute(attr) === String(value))));
+    }
+
+    function refreshOnboardingNotes() {
+      const rate = Number(document.getElementById('obRateInput')?.value) || RATE;
+      const goal = onboardingGoalMinutes();
+      const note = document.getElementById('obGoalNote');
+      if (note) note.textContent = Number.isFinite(goal) && goal > 0 ? ui`${goal} min = ${money(goal * rate)} al día con tu pago por minuto` : '';
+      const exchange = Number(document.getElementById('obExchangeInput')?.value);
+      const label = String(document.getElementById('obCurrencyInput')?.value || '').trim();
+      const exchangeNote = document.getElementById('obExchangeNote');
+      if (exchangeNote) exchangeNote.textContent = exchange > 0 ? ui`1 dólar = ${label} ${exchange.toFixed(2)}` : '';
+    }
+
+    export function showOnboardingStep(step) {
+      onboardingStep = Math.min(3, Math.max(1, step));
+      document.querySelectorAll('.ob-step').forEach(panel => { panel.hidden = Number(panel.dataset.obStep) !== onboardingStep; });
+      document.querySelectorAll('.ob-dots i').forEach((dot, index) => dot.classList.toggle('on', index === onboardingStep - 1));
+      const back = document.getElementById('onboardingBackBtn');
+      const next = document.getElementById('onboardingNextBtn');
+      const save = document.getElementById('onboardingSaveBtn');
+      if (back) back.hidden = onboardingStep === 1;
+      if (next) next.hidden = onboardingStep === 3;
+      if (save) save.hidden = onboardingStep !== 3;
+      onboardingError('');
+      refreshOnboardingNotes();
+    }
+
+    // Deja la bienvenida en el paso 1 con los valores de siempre. Se llama al abrirla.
+    export function resetOnboardingSteps({ keepSchedule = false } = {}) {
+      onboardingKeepSchedule = !!keepSchedule;
+      const turn = document.getElementById('obTurnSection');
+      if (turn) turn.hidden = onboardingKeepSchedule;
+      Object.assign(onboardingChoice, ONBOARDING_DEFAULTS, { language: normalizeLanguage(settings.language) });
+      const set = (id, value) => { const el = document.getElementById(id); if (el) el.value = value; };
+      set('obGoalInput', ''); set('obStartInput', '07:00'); set('obEndInput', '15:00');
+      set('obRateInput', String(RATE)); set('obCurrencyInput', 'L'); set('obExchangeInput', '26.80');
+      const skip = document.getElementById('obSkipOffInput');
+      if (skip) skip.checked = true;
+      const goalOther = document.getElementById('obGoalOther');
+      const hoursOther = document.getElementById('obHoursOther');
+      if (goalOther) goalOther.hidden = true;
+      if (hoursOther) hoursOther.hidden = true;
+      pressChips('data-ob-goal', onboardingChoice.goal);
+      pressChips('data-ob-hours', onboardingChoice.hours);
+      pressChips('data-ob-lang', onboardingChoice.language);
+      pressChips('data-ob-palette', onboardingChoice.palette);
+      showOnboardingStep(1);
+    }
+
+    export function wireOnboarding() {
+      const modal = document.getElementById('onboardingModal');
+      if (!modal || modal.dataset.wired) return;
+      modal.dataset.wired = 'true';
+      document.querySelectorAll('.ob-palette').forEach(button => {
+        const palette = PALETTES.find(item => item.id === button.dataset.obPalette);
+        if (!palette) return;
+        button.querySelector('.ob-palette-name').textContent = translateText(palette.name);
+        button.querySelector('.ob-swatches').replaceChildren(...palette.colors.map(color => {
+          const swatch = document.createElement('i');
+          swatch.style.background = color;
+          return swatch;
+        }));
+      });
+      modal.addEventListener('click', event => {
+        const target = event.target.closest('[data-ob-goal],[data-ob-hours],[data-ob-lang],[data-ob-palette]');
+        if (!target) return;
+        if (target.dataset.obGoal) {
+          onboardingChoice.goal = target.dataset.obGoal;
+          pressChips('data-ob-goal', onboardingChoice.goal);
+          document.getElementById('obGoalOther').hidden = onboardingChoice.goal !== 'other';
+          if (onboardingChoice.goal === 'other') document.getElementById('obGoalInput')?.focus();
+        } else if (target.dataset.obHours) {
+          onboardingChoice.hours = target.dataset.obHours;
+          pressChips('data-ob-hours', onboardingChoice.hours);
+          document.getElementById('obHoursOther').hidden = onboardingChoice.hours !== 'other';
+        } else if (target.dataset.obLang) {
+          onboardingChoice.language = target.dataset.obLang;
+          pressChips('data-ob-lang', onboardingChoice.language);
+        } else if (target.dataset.obPalette) {
+          onboardingChoice.palette = target.dataset.obPalette;
+          pressChips('data-ob-palette', onboardingChoice.palette);
+        }
+        onboardingError('');
+        refreshOnboardingNotes();
+      });
+      modal.addEventListener('input', refreshOnboardingNotes);
+      document.getElementById('onboardingBackBtn')?.addEventListener('click', () => showOnboardingStep(onboardingStep - 1));
+      document.getElementById('onboardingNextBtn')?.addEventListener('click', () => {
+        if (onboardingStep === 1 && !validateOnboardingTurn()) return;
+        if (onboardingStep === 2 && !validateOnboardingMoney()) return;
+        showOnboardingStep(onboardingStep + 1);
+      });
+    }
+
+    function validateOnboardingTurn() {
+      if (onboardingKeepSchedule) return true;
+      const goal = onboardingGoalMinutes();
+      if (!Number.isFinite(goal) || goal < 1 || goal > 1440) { onboardingError('Escribe tu meta en minutos, entre 1 y 1440.'); return false; }
+      const { start, end } = onboardingHours();
+      if (!/^\d{2}:\d{2}$/.test(start) || !/^\d{2}:\d{2}$/.test(end) || hhmmToMin(end) <= hhmmToMin(start)) {
+        onboardingError('Escribe una entrada y una salida, y la salida debe ser después de la entrada.'); return false;
+      }
+      const base = (settings.weeklySchedule?.mon?.blocks || []);
+      if (base.length && !buildOnboardingBlocks(base, start, end, goal)) { onboardingError('Ese horario es muy corto para tus bloques. Cambia la entrada o la salida.'); return false; }
+      onboardingError('');
+      return true;
+    }
+
+    function validateOnboardingMoney() {
+      const rate = Number(document.getElementById('obRateInput')?.value);
+      const exchange = Number(document.getElementById('obExchangeInput')?.value);
+      if (!(rate > 0)) { toast(translateText('El pago por minuto debe ser mayor que cero.')); return false; }
+      if (!Number.isFinite(exchange) || exchange < 0) { toast(translateText('Usa un tipo de cambio de cero o mayor que permita convertir tus importes.')); return false; }
+      return true;
+    }
+
     export function finishOnboarding() {
       const nameInput = document.getElementById('onboardingNameInput');
       const emojiInput = document.getElementById('onboardingEmojiInput');
-      const owner = settings, previous = { ...settings };
+      if (!validateOnboardingTurn()) { showOnboardingStep(1); return false; }
+      if (!validateOnboardingMoney()) { showOnboardingStep(2); return false; }
+      const owner = settings, ownerState = state;
+      const previous = JSON.parse(JSON.stringify(settings)), previousState = JSON.parse(JSON.stringify(state));
+      const rate = Number(document.getElementById('obRateInput').value);
+      const goal = onboardingKeepSchedule ? Number(settings.productiveGoalMin) : onboardingGoalMinutes();
+      const { start, end } = onboardingKeepSchedule ? { start: settings.shiftStart, end: settings.shiftEnd } : onboardingHours();
       settings.userName = String(nameInput?.value || '').trim().slice(0, 40);
       settings.userEmoji = String(emojiInput?.value || '').trim().slice(0, 8);
+      settings.rate = rate;
+      if (!onboardingKeepSchedule) {
+        settings.productiveGoalMin = goal;
+        settings.earningsGoal = goal * rate;
+        state.productiveGoalMin = goal;
+        state.earningsGoal = settings.earningsGoal;
+      }
+      settings.exchangeRate = Number(document.getElementById('obExchangeInput').value);
+      settings.currencyLabel = String(document.getElementById('obCurrencyInput')?.value || '').trim().slice(0, 6);
+      if (!onboardingKeepSchedule) {
+        settings.shiftStart = start;
+        settings.shiftEnd = end;
+      }
+      for (const day of onboardingKeepSchedule ? [] : Object.keys(settings.weeklySchedule || {})) {
+        const cfg = settings.weeklySchedule[day];
+        if (!cfg || !Array.isArray(cfg.blocks) || !cfg.blocks.length) continue;
+        const blocks = buildOnboardingBlocks(cfg.blocks, start, end, goal);
+        if (!blocks) continue;
+        cfg.start = start; cfg.end = end; cfg.blocks = blocks;
+      }
+      settings.palette = onboardingChoice.palette;
+      settings.language = normalizeLanguage(onboardingChoice.language);
+      settings.streakSkipOffDays = !!document.getElementById('obSkipOffInput')?.checked;
       settings.onboarded = true;
-      if (saveSettingsOnly() === false) {
-        if (settings === owner) {
-          for (const key of ['userName', 'userEmoji', 'onboarded']) {
-            if (Object.hasOwn(previous, key)) owner[key] = previous[key];
-            else delete owner[key];
-          }
-        }
+      if (saveAll({ render: false }) === false) {
+        if (settings === owner) { Object.keys(owner).forEach(key => delete owner[key]); Object.assign(owner, previous); }
+        if (state === ownerState) { Object.keys(ownerState).forEach(key => delete ownerState[key]); Object.assign(ownerState, previousState); }
         return false;
       }
       closeModal('onboardingModal');
+      if (settings.language !== normalizeLanguage(previous.language)) {
+        saveLanguagePreference(settings.language);
+        window.location.reload();
+        return true;
+      }
+      applyAppearance(settings);
       render();
     }
     export function formatGoalFields() {

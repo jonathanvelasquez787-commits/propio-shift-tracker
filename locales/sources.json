@@ -701,6 +701,12 @@
       "app.html"
     ]
   },
+  "s_0cc4272d": {
+    "source": "Pago por minuto",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_0ccaee25": {
     "source": "Meta del ciclo actual",
     "files": [
@@ -939,6 +945,7 @@
   "s_10552d19": {
     "source": "Salida",
     "files": [
+      "app.html",
       "js/app-main.js"
     ]
   },
@@ -2258,6 +2265,12 @@
       "js/backup-recovery.js"
     ]
   },
+  "s_2a13753f": {
+    "source": "Tu meta en dinero sale de aquí",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_2a1f41a6": {
     "source": "Negro Grafito",
     "files": [
@@ -2305,6 +2318,12 @@
     "source": "pasada",
     "files": [
       "js/higher-rate.js"
+    ]
+  },
+  "s_2a98792b": {
+    "source": "6:00 am – 2:00 pm",
+    "files": [
+      "app.html"
     ]
   },
   "s_2af2e5a4": {
@@ -2384,6 +2403,12 @@
     "files": [
       "js/call-recovery.js",
       "js/calls.js"
+    ]
+  },
+  "s_2bf10ac3": {
+    "source": "Si un día no te toca trabajar, tu racha sigue.",
+    "files": [
+      "app.html"
     ]
   },
   "s_2c1a9129": {
@@ -2587,6 +2612,12 @@
     "source": "Ciclo de pago actualizado",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_2f5f70b0": {
+    "source": "Después puedes ajustar cada día en Horario.",
+    "files": [
+      "app.html"
     ]
   },
   "s_2f721278": {
@@ -3501,6 +3532,12 @@
       "app.html"
     ]
   },
+  "s_3f439eb0": {
+    "source": "1 dólar = {{v0}} {{v1}}",
+    "files": [
+      "js/settings.js"
+    ]
+  },
   "s_3f53be63": {
     "source": "Inicio informado",
     "files": [
@@ -3988,6 +4025,12 @@
       "js/boot.js"
     ]
   },
+  "s_493c95b0": {
+    "source": "Ej. 390",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_495e5d6e": {
     "source": "Si te conectas después de tu hora de inicio, elige qué pasa con el resto del plan en \"Bloques del día\":",
     "files": [
@@ -4033,6 +4076,7 @@
   "s_49e53544": {
     "source": "Entrada",
     "files": [
+      "app.html",
       "js/app-main.js"
     ]
   },
@@ -4315,6 +4359,12 @@
       "app.html"
     ]
   },
+  "s_4e542180": {
+    "source": "Los días libres no cortan mi racha",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_4e66f48e": {
     "source": "Nivel de la ventana",
     "files": [
@@ -4446,6 +4496,12 @@
     "source": "Tus datos te siguen entre la computadora y el teléfono",
     "files": [
       "index.html"
+    ]
+  },
+  "s_50d7dcc9": {
+    "source": "Tipo de cambio",
+    "files": [
+      "app.html"
     ]
   },
   "s_50e108c9": {
@@ -4741,6 +4797,12 @@
     "source": "Este dispositivo tiene cambios sin subir, y en la nube hay una versión\n          guardada{{v0}} el {{v1}}. No se mezclan solas: elige\n          cuál se queda. La versión reemplazada queda en las copias recuperables de Ajustes.",
     "files": [
       "js/boot.js"
+    ]
+  },
+  "s_55dae620": {
+    "source": "360 min",
+    "files": [
+      "app.html"
     ]
   },
   "s_55eee410": {
@@ -5517,6 +5579,12 @@
     "source": "a tiempo",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_65d5b35f": {
+    "source": "Aquí escribes tu meta en minutos",
+    "files": [
+      "app.html"
     ]
   },
   "s_65dd4016": {
@@ -6461,6 +6529,12 @@
       "privacidad.html"
     ]
   },
+  "s_7818bb5f": {
+    "source": "Otra",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_7829299e": {
     "source": "Reconectar y sincronizar",
     "files": [
@@ -6703,6 +6777,12 @@
     "source": "Usa un plazo entre 1 y 120 meses.",
     "files": [
       "js/finance-planning.js"
+    ]
+  },
+  "s_7c7ee19b": {
+    "source": "7:00 am – 3:00 pm",
+    "files": [
+      "app.html"
     ]
   },
   "s_7cb2423e": {
@@ -7665,6 +7745,12 @@
       "js/pay-receipts.js"
     ]
   },
+  "s_8c4e0e3f": {
+    "source": "Minutos al día",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_8c626ae6": {
     "source": "Sin confirmar",
     "files": [
@@ -8080,6 +8166,12 @@
     "source": "Estimación provisional",
     "files": [
       "js/detail-views.js"
+    ]
+  },
+  "s_92eb302d": {
+    "source": "Tu app",
+    "files": [
+      "app.html"
     ]
   },
   "s_92fd1f27": {
@@ -8566,6 +8658,12 @@
     "source": "{{v28}}{{v29}}{{v30}}",
     "files": [
       "js/reports.js"
+    ]
+  },
+  "s_9c3c7f3c": {
+    "source": "El pago por minuto debe ser mayor que cero.",
+    "files": [
+      "js/settings.js"
     ]
   },
   "s_9c3cd1cc": {
@@ -9266,6 +9364,12 @@
       "js/automation-ui.js"
     ]
   },
+  "s_a77de2a6": {
+    "source": "Tu turno",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_a78f0f62": {
     "source": "ventana total",
     "files": [
@@ -9649,6 +9753,12 @@
       "app.html"
     ]
   },
+  "s_aeb97937": {
+    "source": "Meta del día",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_aeebacac": {
     "source": "Meta de sesión",
     "files": [
@@ -9906,6 +10016,12 @@
     "source": "{{v1}}{{v2}}{{v3}}",
     "files": [
       "js/reports.js"
+    ]
+  },
+  "s_b2d37eb7": {
+    "source": "Tu dinero",
+    "files": [
+      "app.html"
     ]
   },
   "s_b2ff322f": {
@@ -10519,6 +10635,12 @@
       "js/call-review-view.js"
     ]
   },
+  "s_bfb8417a": {
+    "source": "Símbolo de tu moneda",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_bfdcdb6f": {
     "source": "Ahora no",
     "files": [
@@ -10561,6 +10683,12 @@
     "files": [
       "js/app-main.js",
       "js/calls.js"
+    ]
+  },
+  "s_c06bc6bd": {
+    "source": "{{v0}} min = {{v1}} al día con tu pago por minuto",
+    "files": [
+      "js/settings.js"
     ]
   },
   "s_c07cf564": {
@@ -11460,6 +11588,12 @@
       "js/app-main.js"
     ]
   },
+  "s_d1f8ce33": {
+    "source": "480 min",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_d21167ab": {
     "source": "Finalizar turno",
     "files": [
@@ -11913,6 +12047,12 @@
       "js/app-main.js"
     ]
   },
+  "s_da898cc2": {
+    "source": "300 min",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_da97b7cf": {
     "source": "Llamadas recuperadas",
     "files": [
@@ -12296,6 +12436,12 @@
     "source": "Tienes cambios sin guardar en esta semana. ¿Descartarlos y cambiar de semana?",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_dfc060ea": {
+    "source": "Atrás",
+    "files": [
+      "app.html"
     ]
   },
   "s_dfc477ea": {
@@ -13793,6 +13939,12 @@
       "app.html",
       "js/call-table-view.js",
       "js/weekly-summary.js"
+    ]
+  },
+  "s_f81ef41d": {
+    "source": "420 min",
+    "files": [
+      "app.html"
     ]
   },
   "s_f84b63ef": {
