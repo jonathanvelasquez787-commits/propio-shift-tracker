@@ -2463,6 +2463,19 @@
             "onboarding rollback never overwrites a replacement settings owner",
             "streak rollback never restores the previous account over a replacement owner"
           ]
+        },
+        {
+          "file": "tests/bienvenida-3-pasos.test.mjs",
+          "namedCases": [
+            "la bienvenida tiene 3 pasos con los controles aprobados y sin elegir tema",
+            "el horario por defecto 7-3 queda igual y 6-2 corre todos los bloques una hora",
+            "\"Otro\": la salida estira el ultimo bloque y la meta se reparte en los bloques de Trabajo",
+            "guardar y empezar escribe cada valor con las claves de siempre y no toca el tema",
+            "elegir English guarda el idioma y recarga la app",
+            "una meta o un horario mal escritos frenan en el paso 1 sin guardar",
+            "si solo se borro el perfil, la bienvenida conserva el horario y la meta que ya habia",
+            "estilos de la bienvenida: llaves balanceadas y sin colores fijos"
+          ]
         }
       ]
     },

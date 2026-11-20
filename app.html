@@ -2354,6 +2354,7 @@ $0.72"></textarea>
 
 <div class="divider"></div>
 
+<div class="ob-step" data-ob-step="1" id="onboardingStep1">
 <div class="goals-section">
 <div class="goals-section-title"><svg class="goals-section-icon ic-svg cyan" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>Tu perfil</div>
 <div class="goals-profile-row">
@@ -2373,8 +2374,68 @@ $0.72"></textarea>
 </div>
 </div>
 
-<div class="modal-actions mc-action-row">
-<button class="mc-btn-primary cyan" id="onboardingSaveBtn" type="button" style="width:100%;"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polyline points="5 12 10 17 19 6"/></svg> Guardar y empezar</button>
+<div class="goals-section" id="obTurnSection">
+<div class="goals-section-title"><svg class="goals-section-icon ic-svg cyan" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/></svg>Tu turno</div>
+<div class="goals-field-label ob-label" id="obGoalLabel">Meta del día</div>
+<div class="ob-chips" role="group" aria-labelledby="obGoalLabel">
+<button class="ob-chip" type="button" data-ob-goal="300" aria-pressed="false">300 min</button>
+<button class="ob-chip" type="button" data-ob-goal="360" aria-pressed="true">360 min</button>
+<button class="ob-chip" type="button" data-ob-goal="420" aria-pressed="false">420 min</button>
+<button class="ob-chip" type="button" data-ob-goal="480" aria-pressed="false">480 min</button>
+<button class="ob-chip" type="button" data-ob-goal="other" aria-pressed="false">Otra</button>
+</div>
+<div class="goals-field ob-other" id="obGoalOther" hidden>
+<label for="obGoalInput">Minutos al día</label>
+<input id="obGoalInput" inputmode="numeric" max="1440" min="1" placeholder="Ej. 390" type="number"/>
+<span class="ob-note">Aquí escribes tu meta en minutos</span>
+</div>
+<p class="ob-note" id="obGoalNote"></p>
+<div class="goals-field-label ob-label" id="obHoursLabel">Horario</div>
+<div class="ob-chips" role="group" aria-labelledby="obHoursLabel">
+<button class="ob-chip" type="button" data-ob-hours="07:00-15:00" aria-pressed="true">7:00 am – 3:00 pm</button>
+<button class="ob-chip" type="button" data-ob-hours="06:00-14:00" aria-pressed="false">6:00 am – 2:00 pm</button>
+<button class="ob-chip" type="button" data-ob-hours="other" aria-pressed="false">Otro</button>
+</div>
+<div class="ob-other ob-hours-other" id="obHoursOther" hidden>
+<div class="goals-field"><label for="obStartInput">Entrada</label><input id="obStartInput" type="time" value="07:00"/></div>
+<div class="goals-field"><label for="obEndInput">Salida</label><input id="obEndInput" type="time" value="15:00"/></div>
+</div>
+<p class="ob-note">Después puedes ajustar cada día en Horario.</p>
+<p class="ob-error" id="obError" role="alert" hidden></p>
+</div>
+</div>
+<div class="ob-step" data-ob-step="2" id="onboardingStep2" hidden>
+<div class="goals-section">
+<div class="goals-section-title"><svg class="goals-section-icon ic-svg cyan" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/></svg>Tu dinero</div>
+<div class="goals-field"><label for="obRateInput">Pago por minuto</label>
+<div class="ob-rate-row"><span class="ob-prefix" aria-hidden="true">$</span><input id="obRateInput" inputmode="decimal" min="0.01" step="0.01" type="number" value="0.12"/></div>
+<span class="ob-note">Tu meta en dinero sale de aquí</span></div>
+<div class="ob-money-row">
+<div class="goals-field"><label for="obCurrencyInput">Símbolo de tu moneda</label><input id="obCurrencyInput" maxlength="6" type="text" value="L"/></div>
+<div class="goals-field"><label for="obExchangeInput">Tipo de cambio</label><input id="obExchangeInput" inputmode="decimal" min="0" step="0.01" type="number" value="26.80"/></div>
+<span class="ob-note" id="obExchangeNote"></span>
+</div>
+</div>
+</div>
+<div class="ob-step" data-ob-step="3" id="onboardingStep3" hidden>
+<div class="goals-section">
+<div class="goals-section-title"><svg class="goals-section-icon ic-svg cyan" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/></svg>Tu app</div>
+<div class="goals-field-label ob-label" id="obColorLabel">Color</div>
+<div class="ob-palettes" role="group" aria-labelledby="obColorLabel"><button class="ob-palette" type="button" data-ob-palette="original" aria-pressed="false"><span class="ob-swatches"></span><span class="ob-palette-name"></span></button><button class="ob-palette" type="button" data-ob-palette="graphite" aria-pressed="false"><span class="ob-swatches"></span><span class="ob-palette-name"></span></button><button class="ob-palette" type="button" data-ob-palette="lavender" aria-pressed="false"><span class="ob-swatches"></span><span class="ob-palette-name"></span></button><button class="ob-palette" type="button" data-ob-palette="royal" aria-pressed="false"><span class="ob-swatches"></span><span class="ob-palette-name"></span></button><button class="ob-palette" type="button" data-ob-palette="ocean" aria-pressed="false"><span class="ob-swatches"></span><span class="ob-palette-name"></span></button><button class="ob-palette" type="button" data-ob-palette="sage" aria-pressed="false"><span class="ob-swatches"></span><span class="ob-palette-name"></span></button><button class="ob-palette" type="button" data-ob-palette="neon" aria-pressed="false"><span class="ob-swatches"></span><span class="ob-palette-name"></span></button></div>
+<div class="goals-field-label ob-label" id="obLangLabel">Idioma</div>
+<div class="ob-chips" role="group" aria-labelledby="obLangLabel">
+<button class="ob-chip" type="button" data-ob-lang="es" aria-pressed="true">Español</button>
+<button class="ob-chip" type="button" data-ob-lang="en" aria-pressed="false">English</button>
+</div>
+<label class="ob-switch-row" for="obSkipOffInput"><span><strong>Los días libres no cortan mi racha</strong><span class="ob-note">Si un día no te toca trabajar, tu racha sigue.</span></span>
+<input id="obSkipOffInput" type="checkbox" role="switch" checked/></label>
+</div>
+</div>
+<div class="modal-actions mc-action-row ob-actions">
+<div class="ob-dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
+<button class="mc-btn-warn-pill" id="onboardingBackBtn" type="button" hidden>Atrás</button>
+<button class="mc-btn-primary cyan" id="onboardingNextBtn" type="button">Siguiente</button>
+<button class="mc-btn-primary cyan" id="onboardingSaveBtn" type="button" hidden><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polyline points="5 12 10 17 19 6"/></svg> Guardar y empezar</button>
 </div>
 </div>
 </div>

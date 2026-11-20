@@ -7,37 +7,48 @@ import { parse } from 'acorn';
 const source = fs.readFileSync(new URL('../js/settings.js', import.meta.url), 'utf8');
 const node = parse(source, { ecmaVersion: 'latest', sourceType: 'module' }).body
   .map(item => item.declaration || item).find(item => item.id?.name === 'finishOnboarding');
-const onboarding = source.slice(node.start, node.end);
+const onboarding = source.slice(source.indexOf('const ONBOARDING_DEFAULTS'), node.end).replace(/export /g, '');
 const copy = value => JSON.parse(JSON.stringify(value));
+
+function onboardingContext(initial, overrides = {}) {
+  const fields = { onboardingNameInput: { value: ' Nuevo ' }, onboardingEmojiInput: { value: ' ⭐ ' },
+    obRateInput: { value: '0.12' }, obExchangeInput: { value: '26.80' }, obCurrencyInput: { value: 'L' },
+    obSkipOffInput: { checked: true }, obStartInput: { value: '07:00' }, obEndInput: { value: '15:00' }, obGoalInput: { value: '' } };
+  const h = vm.createContext({ settings: copy(initial), state: {}, fields, RATE: 0.12,
+    document: { getElementById: id => fields[id] || null, querySelectorAll: () => [] },
+    window: { location: { reload() {} } }, normalizeLanguage: value => value === 'en' ? 'en' : 'es',
+    saveLanguagePreference() {}, applyAppearance() {}, translateText: text => text, ui: (parts, ...values) => String.raw({ raw: parts }, ...values),
+    money: value => String(value), toast() {}, closeModal() {}, render() {}, saveAll: () => true, ...overrides });
+  vm.runInContext(onboarding, h);
+  return h;
+}
 
 for (const initial of [{ theme: 'dark' }, { userName: 'Anterior', userEmoji: '🌱', onboarded: false, theme: 'light' }]) {
   test(`rejected onboarding preserves ${Object.hasOwn(initial, 'userName') ? 'existing' : 'absent'} profile fields through an unrelated save, then permits retry`, () => {
     let accepted = false, disk = copy(initial), closed = 0, rendered = 0;
-    const fields = { onboardingNameInput: { value: ' Nuevo ' }, onboardingEmojiInput: { value: ' ⭐ ' } };
-    const h = vm.createContext({ settings: copy(initial), document: { getElementById: id => fields[id] },
-      saveSettingsOnly: () => { if (accepted) disk = copy(h.settings); return accepted; },
+    const h = onboardingContext(initial, {
+      saveAll: () => { if (accepted) disk = copy(h.settings); return accepted; },
       closeModal: () => { closed++; }, render: () => { rendered++; } });
-    vm.runInContext(onboarding, h);
     assert.equal(h.finishOnboarding(), false);
     assert.deepEqual(copy(h.settings), initial);
     assert.deepEqual(disk, initial);
     assert.equal(closed, 0); assert.equal(rendered, 0);
-    assert.equal(fields.onboardingNameInput.value, ' Nuevo ');
+    assert.equal(h.fields.onboardingNameInput.value, ' Nuevo ');
     accepted = true;
-    h.settings.theme = 'auto'; h.saveSettingsOnly();
+    h.settings.theme = 'auto'; h.saveAll();
     assert.deepEqual(disk, { ...initial, theme: 'auto' });
     h.finishOnboarding();
-    assert.deepEqual(disk, { ...initial, theme: 'auto', userName: 'Nuevo', userEmoji: '⭐', onboarded: true });
+    assert.equal(disk.userName, 'Nuevo'); assert.equal(disk.userEmoji, '⭐'); assert.equal(disk.onboarded, true);
+    assert.equal(disk.theme, 'auto');
     assert.equal(closed, 1); assert.equal(rendered, 1);
   });
 }
 
 test('onboarding rollback never overwrites a replacement settings owner', () => {
   const replacement = { userName: 'Otra cuenta', onboarded: true };
-  const h = vm.createContext({ settings: {}, document: { getElementById: () => ({ value: 'Borrador' }) },
-    saveSettingsOnly: () => { h.settings = replacement; return false; },
+  const h = onboardingContext({}, {
+    saveAll: () => { h.settings = replacement; return false; },
     closeModal: () => assert.fail('Rejected onboarding must stay open'), render: () => assert.fail('Rejected onboarding must keep the draft') });
-  vm.runInContext(onboarding, h);
   assert.equal(h.finishOnboarding(), false);
   assert.equal(h.settings, replacement);
   assert.deepEqual(replacement, { userName: 'Otra cuenta', onboarded: true });
