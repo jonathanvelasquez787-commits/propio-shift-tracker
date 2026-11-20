@@ -160,6 +160,12 @@
       "app.html"
     ]
   },
+  "s_03025e1d": {
+    "source": "Comparación",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_030eed06": {
     "source": "Intentar acceder a datos de otras cuentas, o sondear la seguridad del servicio sin autorización escrita.",
     "files": [
@@ -4156,6 +4162,12 @@
       "js/automation-ui.js"
     ]
   },
+  "s_4a9731c6": {
+    "source": "Cuenta tu corrección guardada",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_4a98e0bc": {
     "source": "El usuario identifica tu perfil. Para entrar, usa Google. Cambiarlo no cambia tu cuenta de Google ni el nombre del saludo.",
     "files": [
@@ -6672,6 +6684,12 @@
       "js/higher-rate-review.js"
     ]
   },
+  "s_7a235481": {
+    "source": "Pago: la tool estimó {{v0}} más",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_7a31b405": {
     "source": "Eliminación",
     "files": [
@@ -6893,6 +6911,12 @@
       "js/higher-rate-review.js"
     ]
   },
+  "s_7d96343f": {
+    "source": "Duración: la tool midió {{v0}} menos",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_7da7c1f8": {
     "source": "Lunch no tomado",
     "files": [
@@ -7075,6 +7099,12 @@
       "app.html",
       "js/app-main.js",
       "js/call-table-view.js"
+    ]
+  },
+  "s_812f79da": {
+    "source": "Duración: la tool midió {{v0}} más",
+    "files": [
+      "js/call-records-view.js"
     ]
   },
   "s_8135ef32": {
@@ -11209,6 +11239,12 @@
       "js/automation-ui.js"
     ]
   },
+  "s_c927e6e0": {
+    "source": "Pago: la tool estimó {{v0}} menos",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_c937292d": {
     "source": "El total usa el registro de Propio. Tu observación y su estimación siguen disponibles.",
     "files": [
@@ -11731,6 +11767,12 @@
     "source": "4. Cuánto tiempo se conservan",
     "files": [
       "privacidad.html"
+    ]
+  },
+  "s_d2c3be88": {
+    "source": "Cuenta Propio (tiene prioridad)",
+    "files": [
+      "js/call-records-view.js"
     ]
   },
   "s_d2ca54cd": {
