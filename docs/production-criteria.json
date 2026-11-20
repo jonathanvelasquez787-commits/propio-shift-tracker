@@ -2395,7 +2395,11 @@
         {
           "file": "tests/super-audit-accounting.test.mjs",
           "namedCases": [
-            "a later official reconciliation removes its previous ambiguous review and preserves the observed backup"
+            "a later official reconciliation removes its previous ambiguous review and preserves the observed backup",
+            "three cases: a call only in the tool stays as backup and is never touched by unrelated official rows",
+            "three cases: a call only in Propio is saved with its own record, is not duplicated and keeps older versions on correction",
+            "three cases: tool and Propio that differ keep both measurements",
+            "three cases: an official row that does not overlap the tool time is kept beside it as a separate call"
           ]
         },
         {

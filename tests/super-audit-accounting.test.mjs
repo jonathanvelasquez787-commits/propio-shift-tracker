@@ -809,3 +809,39 @@ test('42 days across leap February preserve the ledger after incomplete entry, m
   }
   t.diagnostic(`42 persisted daily snapshots, 84 rejected incomplete entries, ${ledger.size} final calls and 42 exported day reconciliations across leap February`);
 });
+
+test('three cases: a call only in the tool stays as backup and is never touched by unrelated official rows', t => {
+  const x=harness(t),start=at(1,'08:00').getTime(),iso=s=>new Date(start+s*1000).toISOString();
+  autoSaveLiveCall(iso(39),iso(500));
+  assert.equal(calls[0].source,'live');assert.equal(calls[0].records.tool.durationMs,461000);assert.equal(calls[0].records.propio,undefined);
+  const snapshot=JSON.stringify(calls[0]);
+  x.import([['other','09/01/2025','09:00 AM','5','Yes','No','$0.60']]);
+  assert.equal(calls.length,2);assert.equal(JSON.stringify(calls.find(c=>c.source==='live')),snapshot);
+  x.reload();assert.equal(JSON.stringify(calls.find(c=>c.source==='live')),snapshot);
+});
+
+test('three cases: a call only in Propio is saved with its own record, is not duplicated and keeps older versions on correction', t => {
+  const x=harness(t);
+  x.import([['official','09/01/2025','08:00 AM','7','Yes','No','$0.84']]);
+  assert.equal(calls.length,1);assert.equal(calls[0].source,'import');assert.equal(calls[0].records.propio.durationMin,7);
+  assert.equal(calls[0].records.tool,undefined);
+  x.import([['official','09/01/2025','08:00 AM','7','Yes','No','$0.84']]);assert.equal(calls.length,1);
+  x.reload();x.import([['official','09/01/2025','08:00 AM','8','Yes','No','$0.96']]);
+  assert.equal(calls.length,1);assert.equal(calls[0].records.propio.durationMin,8);assert.equal(calls[0].records.changes[0].durationMin,7);
+  assert.equal(calls[0].records.tool,undefined);
+});
+
+test('three cases: tool and Propio that differ keep both measurements', t => {
+  const x=harness(t),start=at(1,'08:00').getTime(),iso=s=>new Date(start+s*1000).toISOString();
+  autoSaveLiveCall(iso(39),iso(500));
+  x.import([['official','09/01/2025','08:00 AM','3','Yes','No','$0.36']]);
+  assert.equal(calls.length,1);assert.equal(calls[0].records.tool.durationMs,461000);assert.equal(calls[0].records.propio.durationMin,3);
+  assert.equal(calls[0].records.propio.pay,.36);assert.equal(calls[0].records.tool.pay,.96);
+});
+
+test('three cases: an official row that does not overlap the tool time is kept beside it as a separate call', t => {
+  const x=harness(t),start=at(1,'08:00').getTime(),iso=s=>new Date(start+s*1000).toISOString();
+  autoSaveLiveCall(iso(39),iso(500));
+  x.import([['official','09/01/2025','08:09 AM','5','Yes','No','$0.60']]);
+  assert.equal(calls.length,2);assert.equal(calls.filter(c=>c.source==='live').length,1);assert.equal(calls.filter(c=>c.source==='import').length,1);
+});
