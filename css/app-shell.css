@@ -2767,3 +2767,41 @@ html.theme-light #scheduleConfigAccordion .sched-bk-name-select { color-scheme: 
 .ext-download-btn .ic-svg { width: 18px; height: 18px; }
 .ext-steps { margin: 6px 0 10px; padding-left: 20px; line-height: 1.6; font-size: 13px; }
 /* fin extension descarga */
+
+/* mi orden */
+.mi-orden-card > summary { display: block; }
+.mi-orden-sum { width: 100%; display: grid; gap: 10px; }
+.mi-orden-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.mo-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.mo-chip { display: inline-flex; align-items: center; min-height: 26px; padding: 0 11px; border-radius: 999px; border: 1px solid var(--line-2); font-size: 11px; font-weight: 800; white-space: nowrap; }
+.mo-chip.mo-bad { color: var(--danger-red, var(--bad)); border-color: var(--danger-red, var(--bad)); background: rgba(var(--danger-red-rgb, var(--bad-rgb)), .12); }
+.mo-chip.mo-good { color: var(--good); border-color: var(--good); background: rgba(var(--good-rgb), .12); }
+.mo-chip.mo-muted { color: var(--muted); }
+#miOrdenBody { display: grid; gap: 10px; }
+.mo-tile { border: 1px solid var(--line-2); border-radius: 16px; background: var(--panel-2); padding: 12px 14px; }
+.mo-label { display: block; font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.mo-bad { color: var(--danger-red, var(--bad)); }
+.mo-good { color: var(--good); }
+.mo-muted { color: var(--muted); }
+.mo-sub { font-size: 11px; color: var(--muted); }
+.mo-balance { display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: center; }
+.mo-big { font-size: 34px; font-weight: 900; line-height: 1.05; }
+.mo-big small { font-size: 13px; font-weight: 800; margin-left: 5px; }
+.mo-balance-bar { display: grid; gap: 6px; min-width: 0; }
+.mo-bar-head { font-size: 11px; font-weight: 800; text-align: right; }
+.mo-bar { position: relative; height: 14px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.mo-bar i { position: absolute; top: 0; bottom: 0; right: 50%; border-radius: 999px 0 0 999px; background: linear-gradient(90deg, var(--warn), var(--danger-red, var(--bad))); }
+.mo-bar b { position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; background: var(--text); }
+.mo-bar-labels { display: flex; justify-content: space-between; font-size: 9px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+.mo-money-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.mo-money { border-left: 4px solid var(--line-2); display: grid; gap: 4px; }
+.mo-money-bad { border-left-color: var(--danger-red, var(--bad)); }
+.mo-money-good { border-left-color: var(--good); }
+.mo-money-value { font-size: 22px; font-weight: 900; line-height: 1.1; }
+@media (max-width: 620px) {
+  .mo-balance { grid-template-columns: 1fr; gap: 10px; }
+  .mo-big { font-size: 30px; }
+  .mo-money { padding: 10px 12px; }
+  .mo-money-value { font-size: 19px; }
+}
+/* fin mi orden */

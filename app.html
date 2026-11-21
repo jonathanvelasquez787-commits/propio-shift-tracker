@@ -349,6 +349,23 @@
 </div>
 </div>
 </details>
+<details class="accordion-card mi-orden-card" id="miOrdenAccordion">
+<summary>
+<div class="mi-orden-sum">
+<div class="mi-orden-top">
+<div class="accordion-head">
+<h2>Mi orden</h2>
+<p>Lo que te cuesta el desorden y lo que ganas.</p>
+</div>
+<div class="accordion-chevron"><svg class="ic-svg" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></div>
+</div>
+<div class="mo-chips" id="miOrdenChips"></div>
+</div>
+</summary>
+<div class="accordion-body">
+<div id="miOrdenBody"></div>
+</div>
+</details>
 <details class="accordion-card" id="scheduleAccordion" open>
 <summary>
   <div class="accordion-head">
@@ -1326,6 +1343,16 @@
 <details class="settings-inline-help"><summary>Cómo se aplican tarifa y moneda</summary><div class="note">La tarifa calcula nuevas estimaciones y tu meta general. Conserva pagos guardados, bonos y metas especiales.</div><div class="note">El cambio es manual y conserva los importes en dólares. Dejá la tasa en 0 o la moneda vacía para ocultar la conversión.</div></details>
 <div class="note" style="margin:0;">El ciclo siempre dura 14 días desde la fecha que pongas arriba. Se guarda solo. Ajusta esto si tus ciclos reales no coinciden con "Ganancias del ciclo".</div>
 </div></details>
+<div class="divider"></div>
+<div class="goals-section">
+<div class="goals-section-title"><svg class="goals-section-icon ic-svg warn" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>Mi orden</div>
+<div class="goals-field-row">
+<div class="goals-field">
+<label for="miOrdenTopeInput">Tope de minutos de deuda</label>
+<input id="miOrdenTopeInput" inputmode="numeric" min="1" max="480" step="1" type="number"/>
+</div>
+</div>
+</div>
 </div><!-- /setPanelDinero -->
 <div class="set-panel" id="setPanelAvisos" data-set-panel="avisos" role="tabpanel" aria-labelledby="setTabAvisos" hidden>
 <div id="notificationReview" aria-live="polite"></div>

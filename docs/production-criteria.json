@@ -2453,6 +2453,27 @@
       ]
     },
     {
+      "id": "mi-orden",
+      "area": "Mi orden: desorden del día",
+      "acceptance": "El desorden del día (empezar tarde, cortar antes, pasarse del descanso o lunch) se cuenta sin salir tarde, la deuda respeta el tope del usuario, el dinero perdido no tiene tope y la tarjeta es plegable y recuerda su estado",
+      "sources": [
+        "js/orden-model.js",
+        "js/orden-view.js"
+      ],
+      "tests": [
+        {
+          "file": "tests/mi-orden.test.mjs",
+          "namedCases": [
+            "mi orden cuenta empezar tarde, cortar antes y pasarse del descanso, pero no salir tarde",
+            "mi orden no cuenta nada dentro de la gracia ni sin turno iniciado",
+            "mi orden limita la deuda al tope pero el dinero perdido no tiene tope",
+            "mi orden dibuja chips y tarjetas con desorden y sin turno",
+            "mi orden tiene su tarjeta plegable con id fijo y su ajuste de tope"
+          ]
+        }
+      ]
+    },
+    {
       "id": "essential-presentation-accessibility",
       "area": "Presentación esencial y accesibilidad",
       "acceptance": "Preferencias reversibles y guardado rechazado conservan la vista previa; paletas legibles en tres superficies; llamada pendiente comparte duración y recuperación; foco vuelve al disparador sin robarlo de otro modal.",

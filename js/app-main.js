@@ -143,6 +143,8 @@ import {
 import { acwMinutesForBlock } from './block-acw.js';
 
 import { activeAppKeys } from './sync.js';
+import { disorderBreakdown, orderSummary, sanitizeOrderTope } from './orden-model.js';
+import { renderMiOrden } from './orden-view.js';
 
 import {
   state, calls, settings, reportsMonthlyOffset, calMonthOffset, calViewMode, calYearOffset,
@@ -728,6 +730,7 @@ export { onReinforcementCallSaved, onReinforcementCallsChanged, onReinforcementD
         // gracia configurable alrededor de cada transición planeada (inicio/fin de Trabajo/
         // Break/Lunch).
         adherenceGraceMin: 3,
+        miOrdenTopeMin: 60,
         // Meta de Adherencia en % (como ya existen Meta en minutos/dólares/moneda), editable en
         // Horario junto a la ventana de gracia. Default 95 — umbral típico de un WFM real.
         adherenceGoalPct: 95,
@@ -844,6 +847,7 @@ export { onReinforcementCallSaved, onReinforcementCallsChanged, onReinforcementD
       if (!Number.isFinite(Number(settings.alertBeforeBreakMin)) || Number(settings.alertBeforeBreakMin) < 0) settings.alertBeforeBreakMin = fallback.alertBeforeBreakMin;
       if (!Number.isFinite(Number(settings.alertBeforeBreakEndMin)) || Number(settings.alertBeforeBreakEndMin) < 0) settings.alertBeforeBreakEndMin = fallback.alertBeforeBreakEndMin;
       if (!Number.isFinite(Number(settings.adherenceGraceMin)) || Number(settings.adherenceGraceMin) < 0) settings.adherenceGraceMin = fallback.adherenceGraceMin;
+      settings.miOrdenTopeMin = sanitizeOrderTope(settings.miOrdenTopeMin, fallback.miOrdenTopeMin);
       if (!Number.isFinite(Number(settings.adherenceGoalPct)) || Number(settings.adherenceGoalPct) <= 0 || Number(settings.adherenceGoalPct) > 100) settings.adherenceGoalPct = fallback.adherenceGoalPct;
       if (!Number.isFinite(Number(settings.acwMaxGoalMin)) || Number(settings.acwMaxGoalMin) <= 0) settings.acwMaxGoalMin = fallback.acwMaxGoalMin;
       if (!['auto', 'light', 'dark'].includes(settings.theme)) settings.theme = fallback.theme;
@@ -2952,6 +2956,34 @@ function pauseForSlot(slot, dayKey = getActiveDayKey()) {
   const slotIndex = matchingSlots.findIndex(s => s.start === slot.start && s.end === slot.end);
   if (slotIndex === -1) return null;
   return assignment[slotIndex] || null;
+}
+
+// Mi orden: desorden del dia mostrado (empezar tarde, cortar antes, pasarse del descanso).
+function renderMiOrdenCard({ dayKey, dayCalls, shiftStart, shiftEnd, live, orderStatsRows }) {
+  const works = orderStatsRows.filter(row => row.slot.type === 'Work');
+  const originalWorks = originalPlannedSlotsForDay(dayKey).filter(slot => slot.type === 'Work');
+  const edge = slot => slot ? slotStats(slot, [], [], null, null, dayKey) : null;
+  const firstOriginal = edge(originalWorks[0]);
+  const lastOriginal = edge(originalWorks[originalWorks.length - 1]);
+  const pauses = orderStatsRows
+    .filter(row => row.slot.type !== 'Work' && row.stats.actualPauseRange)
+    .map(row => ({ plannedMin: row.stats.durationMin, actualMin: row.stats.actualPauseRange.durationMin }));
+  const breakdown = disorderBreakdown({
+    plannedStart: firstOriginal ? firstOriginal.slotStart : (works[0]?.stats.slotStart || null),
+    plannedEnd: lastOriginal ? lastOriginal.slotEnd : (works.length ? works[works.length - 1].stats.slotEnd : null),
+    shiftStart,
+    shiftEnd: live ? null : shiftEnd,
+    pauses,
+    graceMin: settings.adherenceGraceMin,
+  });
+  const summary = orderSummary({
+    disorderMin: breakdown.total,
+    topeMin: settings.miOrdenTopeMin,
+    ratePerMin: settings.rate,
+    earned: importedCallStats(dayCalls).earnings,
+    started: !!shiftStart,
+  });
+  renderMiOrden(summary, { translateText, money });
 }
 
 function slotStats(slot, dayCalls = calls, dayPauses = dayPauseIntervals(getActiveDayKey()), shiftStart = null, shiftEnd = null, dayKey = getActiveDayKey(), extendStart = null, extendEnd = null, classifiedGaps = null) {
@@ -6824,10 +6856,12 @@ function renderSchedule() {
       let collapsedCardCount = 0;
       // typeof: las pruebas con documento falso cortan esta funcion sin las variables del modulo.
       const manualCollapseMode = typeof blocksManualCollapse === 'undefined' ? null : blocksManualCollapse;
+      const orderStatsRows = [];
       const slotRows = plannedSlots.map((slot, slotIdx) => {
         const extendStart = slotIdx === firstWorkIndex ? shiftStart : null;
         const extendEnd = slotIdx === lastWorkIndex ? shiftEnd : null;
         const stats = slotStats(slot, dayCalls, dayPauses, shiftStart, shiftEnd, dayKey, extendStart, extendEnd, blockGaps);
+        orderStatsRows.push({ slot, stats });
         const active = now >= stats.slotStart && now < stats.slotEnd;
         const done = live ? now >= stats.slotEnd : !!(shiftEnd && shiftEnd >= stats.slotEnd);
         const blockAcwMin = slot.type === 'Work'
@@ -6983,6 +7017,8 @@ function renderSchedule() {
         `;
       });
 
+      // typeof: las pruebas con documento falso cortan esta funcion sin las variables del modulo.
+      if (typeof renderMiOrdenCard === 'function') renderMiOrdenCard({ dayKey, dayCalls, shiftStart, shiftEnd, live, orderStatsRows });
       wrap.innerHTML = slotRows.join('');
       // Tarjetas contraidas: una sola linea con hora, usado y metas (mismos datos de la tarjeta abierta).
       if (typeof wrap.querySelectorAll === 'function') wrap.querySelectorAll('.sblk-card.is-collapsed').forEach(card => {
@@ -8133,6 +8169,12 @@ export function render() {
     document.getElementById('breakAlertMinInput').addEventListener('change', updateBreakAlertSettings);
     document.getElementById('breakEndAlertMinInput').addEventListener('change', updateBreakAlertSettings);
     document.getElementById('adherenceGraceMinInput').addEventListener('change', updateAdherenceGraceSettings);
+    document.getElementById('miOrdenTopeInput')?.addEventListener('change', event => {
+      settings.miOrdenTopeMin = sanitizeOrderTope(event.target.value, settings.miOrdenTopeMin);
+      event.target.value = String(settings.miOrdenTopeMin);
+      saveSettingsOnly();
+      render();
+    });
     document.getElementById('adherenceGoalPctInput').addEventListener('change', updateAdherenceGoalSettings);
     document.getElementById('productiveBreakEarnMinInput').addEventListener('change', updateProductiveBreakSettings);
     document.getElementById('productiveBreakAwardMinInput').addEventListener('change', updateProductiveBreakSettings);

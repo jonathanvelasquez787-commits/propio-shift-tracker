@@ -864,6 +864,12 @@
       "js/call-recovery.js"
     ]
   },
+  "s_0f1bd047": {
+    "source": "Lo que te cuesta el desorden y lo que ganas.",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_0f1e649e": {
     "source": "Final observado",
     "files": [
@@ -1797,6 +1803,12 @@
       "js/app-main.js"
     ]
   },
+  "s_20df8ec9": {
+    "source": "Balance de minutos",
+    "files": [
+      "js/orden-view.js"
+    ]
+  },
   "s_20ff6b57": {
     "source": "Terminar turno",
     "files": [
@@ -2287,6 +2299,12 @@
     "source": "Al guardar llamadas pegadas",
     "files": [
       "app.html"
+    ]
+  },
+  "s_29f88bca": {
+    "source": "En orden",
+    "files": [
+      "js/orden-view.js"
     ]
   },
   "s_29f9fc78": {
@@ -3520,6 +3538,12 @@
       "js/call-table-view.js"
     ]
   },
+  "s_3e388044": {
+    "source": "Debes",
+    "files": [
+      "js/orden-view.js"
+    ]
+  },
   "s_3e86ce49": {
     "source": "Ingresa un monto mayor a 0",
     "files": [
@@ -4126,6 +4150,12 @@
     "files": [
       "app.html",
       "js/app-main.js"
+    ]
+  },
+  "s_49ef450c": {
+    "source": "Sin deuda",
+    "files": [
+      "js/orden-view.js"
     ]
   },
   "s_4a01f2ff": {
@@ -5956,6 +5986,12 @@
       "app.html"
     ]
   },
+  "s_6cd9801f": {
+    "source": "Sin turno todavía",
+    "files": [
+      "js/orden-view.js"
+    ]
+  },
   "s_6cda2348": {
     "source": "Datos",
     "files": [
@@ -6644,6 +6680,12 @@
       "app.html"
     ]
   },
+  "s_78721e00": {
+    "source": "A favor",
+    "files": [
+      "js/orden-view.js"
+    ]
+  },
   "s_788f5e4f": {
     "source": "¿Es la misma llamada?",
     "files": [
@@ -7121,6 +7163,12 @@
     "source": "Espera entre llamadas: {{v0}}",
     "files": [
       "js/automation-ui.js"
+    ]
+  },
+  "s_80b89841": {
+    "source": "Cuando empieces el turno aquí verás cuánto te cuesta el desorden.",
+    "files": [
+      "js/orden-view.js"
     ]
   },
   "s_80fe07c8": {
@@ -7625,6 +7673,12 @@
     "source": "App y modo sin conexión:",
     "files": [
       "app.html"
+    ]
+  },
+  "s_884e63d7": {
+    "source": "Dinero en orden",
+    "files": [
+      "js/orden-view.js"
     ]
   },
   "s_885e114b": {
@@ -8975,6 +9029,12 @@
       "js/app-main.js"
     ]
   },
+  "s_9f053659": {
+    "source": "Tope de minutos de deuda",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_9f0cd7e9": {
     "source": "{{v0}}% alcanzado · Faltan {{v1}}{{v2}}",
     "files": [
@@ -9320,6 +9380,12 @@
     "source": "Estimación guardada",
     "files": [
       "js/finance-planning.js"
+    ]
+  },
+  "s_a400adef": {
+    "source": "Mi orden",
+    "files": [
+      "app.html"
     ]
   },
   "s_a415fbad": {
@@ -12162,6 +12228,12 @@
       "js/call-records-view.js"
     ]
   },
+  "s_d8b72c3b": {
+    "source": "Tope",
+    "files": [
+      "js/orden-view.js"
+    ]
+  },
   "s_d8cd1aeb": {
     "source": "Pon tu horario",
     "files": [
@@ -12830,7 +12902,8 @@
   "s_e2b7d4a6": {
     "source": "Deuda",
     "files": [
-      "js/finance.js"
+      "js/finance.js",
+      "js/orden-view.js"
     ]
   },
   "s_e2c44e41": {
@@ -14216,6 +14289,12 @@
     "source": "están todos en la app; además puedes descargarlos con \"Exportar JSON\" en Ajustes.",
     "files": [
       "privacidad.html"
+    ]
+  },
+  "s_f9550d9d": {
+    "source": "Perdido por desorden",
+    "files": [
+      "js/orden-view.js"
     ]
   },
   "s_f95feba2": {
