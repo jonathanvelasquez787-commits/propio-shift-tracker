@@ -143,8 +143,8 @@ import {
 import { acwMinutesForBlock } from './block-acw.js';
 
 import { activeAppKeys } from './sync.js';
-import { disorderBreakdown, orderSummary, sanitizeOrderTope } from './orden-model.js';
-import { renderMiOrden } from './orden-view.js';
+import { disorderBreakdown, orderSummary, sanitizeOrderTope, favorMinutes, dayOrderStatus, walkStreak, rewardProgress } from './orden-model.js';
+import { renderMiOrden, setMiOrdenEditing } from './orden-view.js';
 
 import {
   state, calls, settings, reportsMonthlyOffset, calMonthOffset, calViewMode, calYearOffset,
@@ -731,6 +731,7 @@ export { onReinforcementCallSaved, onReinforcementCallsChanged, onReinforcementD
         // Break/Lunch).
         adherenceGraceMin: 3,
         miOrdenTopeMin: 60,
+        miOrdenReward: null,
         // Meta de Adherencia en % (como ya existen Meta en minutos/dólares/moneda), editable en
         // Horario junto a la ventana de gracia. Default 95 — umbral típico de un WFM real.
         adherenceGoalPct: 95,
@@ -848,6 +849,7 @@ export { onReinforcementCallSaved, onReinforcementCallsChanged, onReinforcementD
       if (!Number.isFinite(Number(settings.alertBeforeBreakEndMin)) || Number(settings.alertBeforeBreakEndMin) < 0) settings.alertBeforeBreakEndMin = fallback.alertBeforeBreakEndMin;
       if (!Number.isFinite(Number(settings.adherenceGraceMin)) || Number(settings.adherenceGraceMin) < 0) settings.adherenceGraceMin = fallback.adherenceGraceMin;
       settings.miOrdenTopeMin = sanitizeOrderTope(settings.miOrdenTopeMin, fallback.miOrdenTopeMin);
+      if (settings.miOrdenReward && (typeof settings.miOrdenReward !== 'object' || !String(settings.miOrdenReward.name || '').trim())) settings.miOrdenReward = null;
       if (!Number.isFinite(Number(settings.adherenceGoalPct)) || Number(settings.adherenceGoalPct) <= 0 || Number(settings.adherenceGoalPct) > 100) settings.adherenceGoalPct = fallback.adherenceGoalPct;
       if (!Number.isFinite(Number(settings.acwMaxGoalMin)) || Number(settings.acwMaxGoalMin) <= 0) settings.acwMaxGoalMin = fallback.acwMaxGoalMin;
       if (!['auto', 'light', 'dark'].includes(settings.theme)) settings.theme = fallback.theme;
@@ -2958,32 +2960,131 @@ function pauseForSlot(slot, dayKey = getActiveDayKey()) {
   return assignment[slotIndex] || null;
 }
 
-// Mi orden: desorden del dia mostrado (empezar tarde, cortar antes, pasarse del descanso).
-function renderMiOrdenCard({ dayKey, dayCalls, shiftStart, shiftEnd, live, orderStatsRows }) {
-  const works = orderStatsRows.filter(row => row.slot.type === 'Work');
+// Mi orden: informacion de orden de UN dia (empezar tarde, cortar antes, pasarse del descanso).
+function orderDayInfo(dayKey) {
+  const plannedSlots = getEffectiveScheduleForDay(dayKey);
+  const sessions = dayWorkSessions(dayKey);
+  const shiftStart = sessions[0]?.start || null;
+  const lastSession = sessions[sessions.length - 1] || null;
+  const live = !!(lastSession && lastSession.live);
+  const shiftEnd = lastSession && !lastSession.live ? lastSession.end : null;
+  const dayDate = callDateToDate(dayKey);
+  const todayDate = callDateToDate(todayCallDateKey());
+  const isPast = !!(dayDate && todayDate && dayDate.getTime() < todayDate.getTime());
+  const off = !plannedSlots.length || dayIsEffectivelyOff(dayKey);
+  const dayCalls = callsForDay(dayKey);
+  const dayPauses = dayPausesForSlotStats(dayKey);
   const originalWorks = originalPlannedSlotsForDay(dayKey).filter(slot => slot.type === 'Work');
   const edge = slot => slot ? slotStats(slot, [], [], null, null, dayKey) : null;
   const firstOriginal = edge(originalWorks[0]);
   const lastOriginal = edge(originalWorks[originalWorks.length - 1]);
-  const pauses = orderStatsRows
-    .filter(row => row.slot.type !== 'Work' && row.stats.actualPauseRange)
-    .map(row => ({ plannedMin: row.stats.durationMin, actualMin: row.stats.actualPauseRange.durationMin }));
+  const pauses = [];
+  for (const slot of plannedSlots) {
+    if (slot.type === 'Work') continue;
+    const stats = slotStats(slot, dayCalls, dayPauses, shiftStart, shiftEnd, dayKey);
+    if (stats.actualPauseRange) pauses.push({ plannedMin: stats.durationMin, actualMin: stats.actualPauseRange.durationMin });
+  }
+  const closedEnd = live ? null : shiftEnd;
   const breakdown = disorderBreakdown({
-    plannedStart: firstOriginal ? firstOriginal.slotStart : (works[0]?.stats.slotStart || null),
-    plannedEnd: lastOriginal ? lastOriginal.slotEnd : (works.length ? works[works.length - 1].stats.slotEnd : null),
+    plannedStart: firstOriginal ? firstOriginal.slotStart : null,
+    plannedEnd: lastOriginal ? lastOriginal.slotEnd : null,
     shiftStart,
-    shiftEnd: live ? null : shiftEnd,
+    shiftEnd: closedEnd,
     pauses,
     graceMin: settings.adherenceGraceMin,
   });
-  const summary = orderSummary({
+  const started = !!shiftStart;
+  // Un dia pasado sin turno (libre, vacaciones o sin datos) no cuenta ni a favor ni en contra.
+  const status = dayOrderStatus({ started, ended: !!closedEnd, disorderMin: breakdown.total, off: (off || isPast) && !started });
+  return {
+    key: dayKey,
+    status,
+    started,
     disorderMin: breakdown.total,
+    favorMin: favorMinutes(lastOriginal ? lastOriginal.slotEnd : null, closedEnd),
+    earned: started ? importedCallStats(dayCalls).earnings : 0,
+  };
+}
+
+const MI_ORDEN_HISTORY_DAYS = 90;
+let miOrdenHistoryCache = { signature: '', at: 0, days: [] };
+
+function orderDayKeyOffset(dayKey, offset) {
+  const date = callDateToDate(dayKey);
+  if (!date) return dayKey;
+  date.setDate(date.getDate() + offset);
+  return todayCallDateKey(date);
+}
+
+// Dias anteriores (del mas viejo al mas nuevo). Se guardan unos segundos para no recalcular 90 dias en cada dibujo.
+function orderPastDays(dayKey) {
+  const signature = `${dayKey}|${calls.length}|${settings.adherenceGraceMin}`;
+  const now = Date.now();
+  if (miOrdenHistoryCache.signature === signature && now - miOrdenHistoryCache.at < 30000) return miOrdenHistoryCache.days;
+  const days = [];
+  for (let offset = MI_ORDEN_HISTORY_DAYS; offset >= 1; offset--) days.push(orderDayInfo(orderDayKeyOffset(dayKey, -offset)));
+  miOrdenHistoryCache = { signature, at: now, days };
+  return days;
+}
+
+function renderMiOrdenCard({ dayKey }) {
+  const today = orderDayInfo(dayKey);
+  const history = [...orderPastDays(dayKey), today];
+  const summary = orderSummary({
+    disorderMin: today.disorderMin,
     topeMin: settings.miOrdenTopeMin,
     ratePerMin: settings.rate,
-    earned: importedCallStats(dayCalls).earnings,
-    started: !!shiftStart,
+    earned: today.earned,
+    started: today.started,
+    favorMin: today.favorMin,
   });
-  renderMiOrden(summary, { translateText, money });
+  const streak = walkStreak(history);
+  const baseDate = callDateToDate(dayKey) || new Date();
+  const monday = orderDayKeyOffset(dayKey, -((baseDate.getDay() + 6) % 7));
+  const formatter = new Intl.DateTimeFormat(settings.language === 'en' ? 'en' : 'es', { weekday: 'narrow' });
+  const weekDays = [];
+  for (let i = 0; i < 7; i++) {
+    const key = orderDayKeyOffset(monday, i);
+    const info = key === dayKey ? today : (history.find(day => day.key === key) || orderDayInfo(key));
+    if (info.status === 'off') continue;
+    weekDays.push({ status: info.status, label: formatter.format(callDateToDate(key)), today: key === dayKey });
+  }
+  let reward = null;
+  const saved = settings.miOrdenReward;
+  if (saved && String(saved.name || '').trim()) {
+    const since = callDateToDate(saved.since);
+    const okDays = history.filter(day => day.status === 'ok' && (!since || callDateToDate(day.key) >= since)).length;
+    reward = { name: String(saved.name), ...rewardProgress(okDays, saved.targetDays) };
+  }
+  renderMiOrden({ summary, streak, week: { days: weekDays }, reward }, { translateText, money });
+}
+
+function wireMiOrdenCard() {
+  const body = document.getElementById('miOrdenBody');
+  if (!body) return;
+  body.addEventListener('change', event => {
+    if (event.target?.id !== 'miOrdenTopeInput') return;
+    settings.miOrdenTopeMin = sanitizeOrderTope(event.target.value, settings.miOrdenTopeMin);
+    saveSettingsOnly();
+    miOrdenHistoryCache.signature = '';
+    render();
+  });
+  body.addEventListener('click', event => {
+    const action = event.target?.closest?.('[data-mo-action]')?.dataset?.moAction;
+    if (!action) return;
+    if (action === 'edit-reward') setMiOrdenEditing(true);
+    if (action === 'cancel-reward') setMiOrdenEditing(false);
+    if (action === 'save-reward') {
+      const name = String(document.getElementById('miOrdenRewardName')?.value || '').trim().slice(0, 40);
+      const days = Math.round(Number(document.getElementById('miOrdenRewardDays')?.value));
+      if (!name || !Number.isFinite(days) || days < 1 || days > 365) { toast(translateText('Escribe qué te quieres regalar y cuántos días (de 1 a 365).')); return; }
+      settings.miOrdenReward = { name, targetDays: days, since: todayCallDateKey() };
+      saveSettingsOnly();
+      setMiOrdenEditing(false);
+    }
+    miOrdenHistoryCache.signature = '';
+    render();
+  });
 }
 
 function slotStats(slot, dayCalls = calls, dayPauses = dayPauseIntervals(getActiveDayKey()), shiftStart = null, shiftEnd = null, dayKey = getActiveDayKey(), extendStart = null, extendEnd = null, classifiedGaps = null) {
@@ -6856,12 +6957,10 @@ function renderSchedule() {
       let collapsedCardCount = 0;
       // typeof: las pruebas con documento falso cortan esta funcion sin las variables del modulo.
       const manualCollapseMode = typeof blocksManualCollapse === 'undefined' ? null : blocksManualCollapse;
-      const orderStatsRows = [];
       const slotRows = plannedSlots.map((slot, slotIdx) => {
         const extendStart = slotIdx === firstWorkIndex ? shiftStart : null;
         const extendEnd = slotIdx === lastWorkIndex ? shiftEnd : null;
         const stats = slotStats(slot, dayCalls, dayPauses, shiftStart, shiftEnd, dayKey, extendStart, extendEnd, blockGaps);
-        orderStatsRows.push({ slot, stats });
         const active = now >= stats.slotStart && now < stats.slotEnd;
         const done = live ? now >= stats.slotEnd : !!(shiftEnd && shiftEnd >= stats.slotEnd);
         const blockAcwMin = slot.type === 'Work'
@@ -7018,7 +7117,7 @@ function renderSchedule() {
       });
 
       // typeof: las pruebas con documento falso cortan esta funcion sin las variables del modulo.
-      if (typeof renderMiOrdenCard === 'function') renderMiOrdenCard({ dayKey, dayCalls, shiftStart, shiftEnd, live, orderStatsRows });
+      if (typeof renderMiOrdenCard === 'function') renderMiOrdenCard({ dayKey });
       wrap.innerHTML = slotRows.join('');
       // Tarjetas contraidas: una sola linea con hora, usado y metas (mismos datos de la tarjeta abierta).
       if (typeof wrap.querySelectorAll === 'function') wrap.querySelectorAll('.sblk-card.is-collapsed').forEach(card => {
@@ -8169,12 +8268,7 @@ export function render() {
     document.getElementById('breakAlertMinInput').addEventListener('change', updateBreakAlertSettings);
     document.getElementById('breakEndAlertMinInput').addEventListener('change', updateBreakAlertSettings);
     document.getElementById('adherenceGraceMinInput').addEventListener('change', updateAdherenceGraceSettings);
-    document.getElementById('miOrdenTopeInput')?.addEventListener('change', event => {
-      settings.miOrdenTopeMin = sanitizeOrderTope(event.target.value, settings.miOrdenTopeMin);
-      event.target.value = String(settings.miOrdenTopeMin);
-      saveSettingsOnly();
-      render();
-    });
+    wireMiOrdenCard();
     document.getElementById('adherenceGoalPctInput').addEventListener('change', updateAdherenceGoalSettings);
     document.getElementById('productiveBreakEarnMinInput').addEventListener('change', updateProductiveBreakSettings);
     document.getElementById('productiveBreakAwardMinInput').addEventListener('change', updateProductiveBreakSettings);

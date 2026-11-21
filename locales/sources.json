@@ -375,6 +375,12 @@
       "js/finance-planning.js"
     ]
   },
+  "s_06af7385": {
+    "source": "¿Qué te quieres regalar?",
+    "files": [
+      "js/orden-view.js"
+    ]
+  },
   "s_070f05b6": {
     "source": "pausas",
     "files": [
@@ -591,6 +597,12 @@
     "source": "¿Borrar la categoría \"{{v0}}\"?{{v1}} Esta acción no se puede deshacer.",
     "files": [
       "js/finance.js"
+    ]
+  },
+  "s_0b04a88e": {
+    "source": "Semana limpia",
+    "files": [
+      "js/orden-view.js"
     ]
   },
   "s_0b4f0b56": {
@@ -2244,7 +2256,8 @@
     "source": "Guardar",
     "files": [
       "app.html",
-      "js/app-main.js"
+      "js/app-main.js",
+      "js/orden-view.js"
     ]
   },
   "s_291c0e5e": {
@@ -3125,6 +3138,12 @@
       "js/positive-reinforcement.js"
     ]
   },
+  "s_36a6be5b": {
+    "source": "Escribe qué te quieres regalar y cuántos días (de 1 a 365).",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_36b651f0": {
     "source": "Próximo intento",
     "files": [
@@ -3287,6 +3306,12 @@
     "source": "Editar",
     "files": [
       "js/weekly-summary.js"
+    ]
+  },
+  "s_398e440e": {
+    "source": "Cambiar",
+    "files": [
+      "js/orden-view.js"
     ]
   },
   "s_39970333": {
@@ -3728,6 +3753,12 @@
     "source": "Presupuesto actual",
     "files": [
       "js/finance-planning.js"
+    ]
+  },
+  "s_42166170": {
+    "source": "Perdida hoy",
+    "files": [
+      "js/orden-view.js"
     ]
   },
   "s_424b6a68": {
@@ -4895,6 +4926,12 @@
       "js/finance.js"
     ]
   },
+  "s_55fd8400": {
+    "source": "Todos los días en orden = semana limpia",
+    "files": [
+      "js/orden-view.js"
+    ]
+  },
   "s_55ff5467": {
     "source": "Moneda secundaria desactivada.",
     "files": [
@@ -5232,6 +5269,12 @@
       "js/app-main.js"
     ]
   },
+  "s_5c1ccea2": {
+    "source": "de",
+    "files": [
+      "js/orden-view.js"
+    ]
+  },
   "s_5c2383ec": {
     "source": "Customer ID (opcional)",
     "files": [
@@ -5331,6 +5374,7 @@
   "s_5ec18cba": {
     "source": "Racha",
     "files": [
+      "js/orden-view.js",
       "js/reports.js"
     ]
   },
@@ -5743,6 +5787,12 @@
       "index.html"
     ]
   },
+  "s_66d09661": {
+    "source": "días en orden",
+    "files": [
+      "js/orden-view.js"
+    ]
+  },
   "s_67b16dea": {
     "source": "Meta general, todos los días",
     "files": [
@@ -6036,6 +6086,7 @@
   "s_6d6ee436": {
     "source": "días",
     "files": [
+      "js/orden-view.js",
       "js/reports.js"
     ]
   },
@@ -6541,6 +6592,12 @@
       "js/higher-rate.js"
     ]
   },
+  "s_758582e0": {
+    "source": "a favor",
+    "files": [
+      "js/orden-view.js"
+    ]
+  },
   "s_759fcdd6": {
     "source": "Se aplica el mayor bono de otra ventana",
     "files": [
@@ -6760,6 +6817,12 @@
     "source": "Irreversible",
     "files": [
       "js/boot.js"
+    ]
+  },
+  "s_79d6e6c1": {
+    "source": "Tienes",
+    "files": [
+      "js/orden-view.js"
     ]
   },
   "s_79f3130c": {
@@ -8046,6 +8109,12 @@
       "app.html"
     ]
   },
+  "s_8daa9a21": {
+    "source": "¡Lista para ti!",
+    "files": [
+      "js/orden-view.js"
+    ]
+  },
   "s_8dc2b464": {
     "source": "Editar meta del ciclo actual",
     "files": [
@@ -9032,7 +9101,7 @@
   "s_9f053659": {
     "source": "Tope de minutos de deuda",
     "files": [
-      "app.html"
+      "js/orden-view.js"
     ]
   },
   "s_9f0cd7e9": {
@@ -10066,6 +10135,12 @@
     "source": "No pude encontrar esa llamada",
     "files": [
       "js/calls.js"
+    ]
+  },
+  "s_b0516536": {
+    "source": "Ej. una salida",
+    "files": [
+      "js/orden-view.js"
     ]
   },
   "s_b0593d06": {
@@ -11371,6 +11446,12 @@
       "js/automation-ui.js"
     ]
   },
+  "s_c8998dfc": {
+    "source": "Mi recompensa",
+    "files": [
+      "js/orden-view.js"
+    ]
+  },
   "s_c927e6e0": {
     "source": "Pago: la tool estimó {{v0}} menos",
     "files": [
@@ -11658,6 +11739,12 @@
       "js/higher-rate-review.js"
     ]
   },
+  "s_cec5bb7b": {
+    "source": "Nueva recompensa",
+    "files": [
+      "js/orden-view.js"
+    ]
+  },
   "s_cedb10b4": {
     "source": "Revisá la fecha, las horas, el nivel y que la ventana siga disponible.",
     "files": [
@@ -11674,6 +11761,12 @@
     "source": "Sin bloques configurados. Usa \"+ Trabajo\", \"+ Break\" o \"+ Lunch\" para empezar.",
     "files": [
       "js/schedule.js"
+    ]
+  },
+  "s_cf2ed584": {
+    "source": "¡Semana limpia!",
+    "files": [
+      "js/orden-view.js"
     ]
   },
   "s_cf65724e": {
@@ -12123,6 +12216,12 @@
     "source": "{{v0}} h de turno",
     "files": [
       "js/schedule.js"
+    ]
+  },
+  "s_d67a2695": {
+    "source": "Cada 5 días en orden ganas 1 día de perdón",
+    "files": [
+      "js/orden-view.js"
     ]
   },
   "s_d67b433d": {
@@ -13335,7 +13434,8 @@
     "source": "Cancelar",
     "files": [
       "app.html",
-      "js/call-recovery.js"
+      "js/call-recovery.js",
+      "js/orden-view.js"
     ]
   },
   "s_ea63397b": {
@@ -13542,6 +13642,12 @@
       "js/backup-recovery.js"
     ]
   },
+  "s_ed1f32d9": {
+    "source": "Días en orden para lograrlo",
+    "files": [
+      "js/orden-view.js"
+    ]
+  },
   "s_ed45e497": {
     "source": "Meses usados en la estimación",
     "files": [
@@ -13662,7 +13768,8 @@
   "s_efddee0a": {
     "source": "Semana",
     "files": [
-      "app.html"
+      "app.html",
+      "js/orden-view.js"
     ]
   },
   "s_f004b8ea": {
@@ -14446,6 +14553,12 @@
     "source": "Desglose de ganancias",
     "files": [
       "app.html"
+    ]
+  },
+  "s_fc37cc05": {
+    "source": "Perdón",
+    "files": [
+      "js/orden-view.js"
     ]
   },
   "s_fc67bb73": {

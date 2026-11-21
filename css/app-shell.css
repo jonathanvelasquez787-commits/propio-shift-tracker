@@ -2805,3 +2805,43 @@ html.theme-light #scheduleConfigAccordion .sched-bk-name-select { color-scheme: 
   .mo-money-value { font-size: 19px; }
 }
 /* fin mi orden */
+
+/* mi orden completa */
+.mo-chip.mo-gold { color: var(--warn); border-color: var(--warn); background: rgba(var(--warn-rgb), .12); }
+.mo-chip.mo-cyan { color: var(--cyan); border-color: var(--cyan); background: rgba(var(--cyan-rgb), .12); }
+.mo-bar i.mo-bar-favor { left: 50%; right: auto; border-radius: 0 999px 999px 0; background: linear-gradient(90deg, var(--good), var(--cyan)); }
+.mo-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.mo-streak, .mo-reward, .mo-week { display: grid; gap: 8px; align-content: start; }
+.mo-streak-main { display: flex; align-items: center; gap: 8px; }
+.mo-flame { width: 30px; height: 30px; fill: rgba(var(--warn-rgb), .25); stroke: var(--warn); stroke-width: 1.6; stroke-linejoin: round; }
+.mo-streak.is-lost .mo-flame { stroke: var(--danger-red, var(--bad)); fill: rgba(var(--danger-red-rgb, var(--bad-rgb)), .22); }
+.mo-streak-num { font-size: 32px; font-weight: 900; line-height: 1; color: var(--text); }
+.mo-pills { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.mo-reward-main { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.mo-ring-wrap { position: relative; width: 52px; height: 52px; flex: 0 0 52px; display: grid; place-items: center; }
+.mo-ring { position: absolute; inset: 0; width: 100%; height: 100%; }
+.mo-ring-bg { fill: none; stroke: var(--line); stroke-width: 5; }
+.mo-ring-fg { fill: none; stroke: var(--cyan); stroke-width: 5; stroke-linecap: round; }
+.mo-ring-good .mo-ring-fg { stroke: var(--good); }
+.mo-ring-text { position: relative; font-size: 12px; font-weight: 900; color: var(--text); }
+.mo-reward-text { display: grid; gap: 2px; min-width: 0; }
+.mo-reward-text b { font-size: 14px; color: var(--text); overflow-wrap: anywhere; }
+.mo-reward-done { font-size: 11px; font-weight: 800; }
+.mo-field { display: grid; gap: 4px; font-size: 11px; color: var(--muted); }
+.mo-field input, .mo-tope input { min-height: 34px; border: 1px solid var(--line-2); border-radius: 10px; background: var(--panel); color: var(--text); padding: 0 10px; font: inherit; font-size: 13px; width: 100%; box-sizing: border-box; }
+.mo-btn { min-height: 32px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--cyan); background: rgba(var(--cyan-rgb), .16); color: var(--cyan); font-weight: 800; font-size: 12px; cursor: pointer; }
+.mo-link { background: none; border: 0; padding: 4px 2px; color: var(--cyan); font-weight: 800; font-size: 12px; cursor: pointer; }
+.mo-week-head { display: flex; justify-content: space-between; align-items: center; }
+.mo-days { display: flex; justify-content: space-between; gap: 6px; }
+.mo-day { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; border: 2px solid var(--line-2); color: var(--muted); font-size: 12px; font-weight: 800; }
+.mo-day-ok { border-color: var(--good); color: var(--good); background: rgba(var(--good-rgb), .14); }
+.mo-day-bad { border-color: var(--danger-red, var(--bad)); color: var(--danger-red, var(--bad)); background: rgba(var(--danger-red-rgb, var(--bad-rgb)), .14); }
+.mo-day.is-today { box-shadow: 0 0 0 2px rgba(var(--cyan-rgb), .45); }
+.mo-tope { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 2px 4px; }
+.mo-tope-field { display: flex; align-items: center; gap: 6px; }
+.mo-tope input { width: 76px; }
+@media (max-width: 620px) {
+  .mo-duo { gap: 8px; }
+  .mo-streak-num { font-size: 28px; }
+}
+/* fin mi orden completa */

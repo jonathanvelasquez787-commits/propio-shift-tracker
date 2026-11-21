@@ -21,21 +21,67 @@ export function sanitizeOrderTope(value, fallback = 60) {
   return Number.isFinite(n) && n >= 1 && n <= 480 ? n : fallback;
 }
 
-// debtMin: lo que se debe (tope incluido). lostMoney: dinero que el desorden dejo ir (sin tope).
-// inOrderMoney: lo ganado en un dia sin desorden. Los minutos a favor llegan en la parte 2.
-export function orderSummary({ disorderMin = 0, topeMin = 60, ratePerMin = 0, earned = 0, started = false } = {}) {
+// debtMin: lo que se debe (tope incluido). favorMin: minutos trabajados despues de tu hora de salida.
+// netMin: favor menos deuda. lostMoney: dinero que el desorden dejo ir (sin tope).
+// inOrderMoney: lo ganado en un dia sin desorden.
+export function orderSummary({ disorderMin = 0, topeMin = 60, ratePerMin = 0, earned = 0, started = false, favorMin = 0 } = {}) {
   const total = Math.max(0, Math.round(Number(disorderMin) || 0));
   const tope = sanitizeOrderTope(topeMin);
   const debtMin = Math.min(total, tope);
+  const favor = Math.max(0, Math.round(Number(favorMin) || 0));
   const rate = Math.max(0, Number(ratePerMin) || 0);
   return {
     started: !!started,
     disorderMin: total,
     topeMin: tope,
     debtMin,
-    debtPct: tope > 0 ? debtMin / tope : 0,
-    favorMin: 0,
+    debtPct: debtMin / tope,
+    favorMin: favor,
+    favorPct: Math.min(1, favor / tope),
+    netMin: favor - debtMin,
     lostMoney: total * rate,
     inOrderMoney: started && total === 0 ? Math.max(0, Number(earned) || 0) : 0,
   };
+}
+
+// Minutos que trabajaste despues de tu hora de salida (salir tarde NO es desorden: es a favor).
+export function favorMinutes(plannedEnd, shiftEnd) {
+  if (!plannedEnd || !shiftEnd) return 0;
+  const m = (shiftEnd.getTime() - plannedEnd.getTime()) / MIN;
+  return m >= 1 ? Math.round(m) : 0;
+}
+
+// Estado de un dia: off (libre o sin datos), pending (sin empezar o en curso sin desorden), ok o bad.
+export function dayOrderStatus({ started = false, ended = false, disorderMin = 0, off = false } = {}) {
+  if (off) return 'off';
+  if (!started) return 'pending';
+  if (disorderMin > 0) return 'bad';
+  return ended ? 'ok' : 'pending';
+}
+
+export const ORDER_FORGIVE_EVERY = 5;
+
+// Racha de dias en orden. days va del mas viejo al mas nuevo. Cada 5 dias seguidos se gana 1 dia de
+// perdon (guarda uno solo): el primer dia con desorden lo gasta y la racha sigue. Los dias libres no cuentan.
+export function walkStreak(days = []) {
+  let streak = 0;
+  let perdon = 0;
+  const forgiven = [];
+  for (const day of days) {
+    if (day.status === 'ok') {
+      streak += 1;
+      if (streak % ORDER_FORGIVE_EVERY === 0) perdon = 1;
+    } else if (day.status === 'bad') {
+      if (perdon > 0) { perdon = 0; forgiven.push(day.key); } else streak = 0;
+    }
+  }
+  const last = days[days.length - 1];
+  return { streak, perdon, forgiven, lostToday: !!last && last.status === 'bad' && !forgiven.includes(last.key) };
+}
+
+export function rewardProgress(okDays = 0, targetDays = 0) {
+  const target = Math.max(0, Math.round(Number(targetDays) || 0));
+  const ok = Math.max(0, Math.round(Number(okDays) || 0));
+  const pct = target > 0 ? Math.min(100, Math.round((ok / target) * 100)) : 0;
+  return { okDays: ok, targetDays: target, pct, done: target > 0 && ok >= target };
 }

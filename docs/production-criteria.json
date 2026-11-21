@@ -2455,7 +2455,7 @@
     {
       "id": "mi-orden",
       "area": "Mi orden: desorden del día",
-      "acceptance": "El desorden del día (empezar tarde, cortar antes, pasarse del descanso o lunch) se cuenta sin salir tarde, la deuda respeta el tope del usuario, el dinero perdido no tiene tope y la tarjeta es plegable y recuerda su estado",
+      "acceptance": "El desorden del día (empezar tarde, cortar antes, pasarse del descanso o lunch) se cuenta sin salir tarde, lo trabajado después de la hora de salida es a favor, la deuda respeta el tope del usuario, hay racha con día de perdón, semana limpia y recompensa que escribe el usuario, y la tarjeta es plegable, recuerda su estado y no se redibuja mientras se escribe",
       "sources": [
         "js/orden-model.js",
         "js/orden-view.js"
@@ -2467,8 +2467,14 @@
             "mi orden cuenta empezar tarde, cortar antes y pasarse del descanso, pero no salir tarde",
             "mi orden no cuenta nada dentro de la gracia ni sin turno iniciado",
             "mi orden limita la deuda al tope pero el dinero perdido no tiene tope",
-            "mi orden dibuja chips y tarjetas con desorden y sin turno",
-            "mi orden tiene su tarjeta plegable con id fijo y su ajuste de tope"
+            "mi orden cuenta como a favor lo trabajado despues de la hora de salida",
+            "mi orden da el estado de cada dia y la racha con su dia de perdon",
+            "mi orden calcula el avance de la recompensa que escribe el usuario",
+            "mi orden dibuja balance, racha, semana, tope y el formulario de recompensa",
+            "mi orden muestra la recompensa con su avance y avisa cuando esta lista",
+            "mi orden no redibuja la tarjeta mientras el usuario escribe dentro de ella",
+            "mi orden sin turno muestra el aviso y sin desorden se ve en orden",
+            "mi orden tiene su tarjeta plegable con id fijo y estilos del tema"
           ]
         }
       ]
