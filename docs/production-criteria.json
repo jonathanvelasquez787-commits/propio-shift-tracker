@@ -966,6 +966,13 @@
           ]
         },
         {
+          "file": "tests/extension-cuadro-que-hara.test.mjs",
+          "namedCases": [
+            "cuadro «Qué hará la extensión ahora»: usa el mismo motor y los mismos ids que la ventanita vieja",
+            "cuadro «Qué hará la extensión ahora»: empieza abierta y recuerda si la cierran"
+          ]
+        },
+        {
           "file": "tests/extension-cuadro-senales.test.mjs",
           "namedCases": [
             "cuadro de señales: muestra pendientes, vencimiento y botones como la ventanita vieja",
