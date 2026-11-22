@@ -1,6 +1,6 @@
 import { rollup } from 'rollup';
 import { zipFiles } from './zip-lib.mjs';
-import { mkdir, copyFile, writeFile, readFile, rm } from 'node:fs/promises';
+import { mkdir, copyFile, writeFile, readFile, rm, cp, access } from 'node:fs/promises';
 import path from 'node:path';
 const root = process.cwd();
 const out = path.resolve(process.argv[2] || 'work/propio-bridge');
@@ -19,7 +19,7 @@ await original.close();
 const popup = await rollup({ input: path.join(root, 'extension/propio-bridge/popup.js') });
 await popup.write({ file: path.join(out, 'popup.js'), format: 'iife', inlineDynamicImports: true });
 await popup.close();
-for (const name of ['manifest.json', 'tracker-content.js', 'popup.html', 'popup.css', 'portal-dark.css', 'README.md', 'workspace.html', 'workspace.css', 'workspace.js', 'workspace-page.js', 'workspace-settings.js', 'workspace-setup.js', 'workspace-preferences.json', 'classic-portal.js']) {
+for (const name of ['manifest.json', 'tracker-content.js', 'popup.html', 'panel-guard.js', 'popup.css', 'portal-dark.css', 'README.md', 'workspace.html', 'workspace.css', 'workspace.js', 'workspace-page.js', 'workspace-settings.js', 'workspace-setup.js', 'workspace-preferences.json', 'classic-portal.js']) {
   await copyFile(path.join(root, 'extension/propio-bridge', name), path.join(out, name));
 }
 await mkdir(path.join(out, 'icons'), { recursive: true });
@@ -31,6 +31,23 @@ const toolZips = {
   'Grabadora.zip': ['grabadora.pyw', 'crear_exe.bat', 'grabadora.ico', 'timbre-propio.wav'].map(file => [`herramientas-windows/grabadora/${file}`, file])
 };
 for (const [zipName, files] of Object.entries(toolZips)) await writeFile(path.join(out, 'tools', zipName), zipFiles(await Promise.all(files.map(async ([source, name]) => ({ name, data: await readFile(path.join(root, source)) })))));
+// Copia de la app dentro de la extension (panel lateral). Se toma de la web ya armada (public/).
+// Las rutas /assets/... de la app funcionan igual: en una extension "/" es la raiz de la extension.
+const appDir = path.resolve(process.argv[3] || path.join(root, 'public'));
+const appHtml = await readFile(path.join(appDir, 'app.html'), 'utf8').catch(() => '');
+if (appHtml) {
+  await rm(path.join(out, 'assets'), { recursive: true, force: true });
+  await cp(path.join(appDir, 'assets'), path.join(out, 'assets'), { recursive: true });
+  await cp(path.join(appDir, 'css'), path.join(out, 'css'), { recursive: true });
+  await mkdir(path.join(out, 'icons'), { recursive: true });
+  await copyFile(path.join(appDir, 'icons/app-icon.svg'), path.join(out, 'icons/app-icon.svg'));
+  // Fuera lo que una extension no puede o no debe cargar: analitica remota, monitoreo, service worker.
+  const panel = appHtml
+    .replace(/<script[^>]*(?:_vercel\/insights|monitoring\.js|register-sw\.js)[^>]*><\/script>\s*/g, '')
+    .replace(/<link[^>]*rel="manifest"[^>]*>\s*/g, '')
+    .replace('<head>', '<head>\n<script src="/panel-guard.js"></script>');
+  await writeFile(path.join(out, 'panel.html'), panel);
+}
 const version = JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8')).version;
 const manifest = JSON.parse(await readFile(path.join(out, 'manifest.json'), 'utf8'));
 await writeFile(path.join(out, 'release.json'), JSON.stringify({ appVersion: version, extensionVersion: manifest.version }, null, 2));

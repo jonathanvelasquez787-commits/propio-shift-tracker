@@ -102,7 +102,7 @@ test('original portal build has unchanged permissions, scoped start scripts and 
     assert.equal(personal.content_scripts[0].world, 'MAIN');
     assert.equal(personal.content_scripts[0].run_at, 'document_start');
     assert.deepEqual(personal.content_scripts[0].matches, ['https://interpreters.propio-ls.com/portal*']);
-    assert.deepEqual(personal.permissions, ['storage', 'webRequest', 'alarms', 'webNavigation']);
+    assert.deepEqual(personal.permissions, ['storage', 'webRequest', 'alarms', 'webNavigation', 'sidePanel', 'identity']);
     assert.equal(personal.content_scripts.some(item => item.js.includes('summary-content.js')), false);
     assert.equal(personal.content_scripts[1].run_at, 'document_start');
     assert.deepEqual(personal.content_scripts[1].js, ['original-portal-content.js']);
