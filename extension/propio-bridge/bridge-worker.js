@@ -472,7 +472,9 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
       });
       await flush(); return { ok: true };
     }
-    if (sender.url !== api.runtime.getURL('popup.html')) return null;
+    // Los controles de la extension viven en la ventanita vieja (popup.html) y en la app dentro de la extension (panel.html, ?popup=1 incluido).
+    const controlPage = ['popup.html', 'panel.html'].some(name => { const base = api.runtime.getURL(name), url = String(sender.url || ''); return url === base || url.startsWith(base + '?') || url.startsWith(base + '#'); });
+    if (!controlPage) return null;
     if (packet?.kind === 'device-passive') {
       if (typeof packet.enabled !== 'boolean') return { ok: false, reason: 'invalid-mode' };
       return transact(async state => {

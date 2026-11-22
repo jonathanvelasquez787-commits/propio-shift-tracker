@@ -762,6 +762,7 @@
       "area": "Logros y refuerzo",
       "acceptance": "Recibos idempotentes, correcciones y recargas; apagar Logros conserva dinero/historia; sin recompensas al fallar guardar.",
       "sources": [
+        "js/extension-box.js",
         "js/reinforcement.js",
         "js/reinforcement-audio.js",
         "js/positive-reinforcement.js",
@@ -952,6 +953,16 @@
             "el worker rechaza valores raros, cuentas sin vincular, remitentes ajenos y respuestas fallidas",
             "el popup tiene su tarjeta entre ACW y Apariencia, apagada y deshabilitada sin vínculo",
             "el script de contenido de la extensión reenvía los ajustes solo a la pestaña vinculada"
+          ]
+        },
+        {
+          "file": "tests/extension-cuadro-estado.test.mjs",
+          "namedCases": [
+            "cuadro de la extensión: el punto verde solo sale cuando está vinculada, registrando y sin avisos",
+            "cuadro de la extensión: textos y cola salen igual que en la ventanita vieja",
+            "cuadro de la extensión: en la web normal no se crea nada",
+            "cuadro de la extensión: el worker atiende al panel de la app y sigue rechazando páginas ajenas",
+            "cuadro de la extensión: está conectado a la app y su CSS usa variables del tema"
           ]
         },
         {
