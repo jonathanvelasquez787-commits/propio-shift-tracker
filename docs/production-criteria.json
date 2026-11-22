@@ -2338,6 +2338,12 @@
           ]
         },
         {
+          "file": "tests/capsula-sin-subir.test.mjs",
+          "namedCases": [
+            "al pasar el mouse por la capsula en curso ninguna pieza sube sola"
+          ]
+        },
+        {
           "file": "tests/relleno-en-curso-junto.test.mjs",
           "namedCases": [
             "el boton en curso se llena de color al mismo tiempo que la pildora"
