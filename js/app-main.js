@@ -8604,6 +8604,7 @@ export function render() {
     setEarningsViewMode(earningsViewMode);
     wireAccordionPersistence();
     wireActionButtonPress();
+    wireActionHop();
     wireActiveButtonKeepFilled();
     initSidebarNav();
     initHelpPage();
@@ -8644,7 +8645,7 @@ export function render() {
       // sobre estos mismos elementos para que la nueva arranque limpia, sin pelear con la que quedó
       // a medias.
       [ripple, ring, icon, label, sub].forEach(el => {
-        if (el && el.getAnimations) el.getAnimations().forEach(a => a.cancel());
+        if (el && el.getAnimations) el.getAnimations().forEach(a => { if (a.id !== 'action-hop') a.cancel(); });
       });
 
       const accentRgb = getComputedStyle(btn).getPropertyValue('--accent-rgb').trim() || '47, 213, 255';
@@ -8665,12 +8666,6 @@ export function render() {
         { opacity: 0, transform: 'scale(1.4)', borderColor: `rgba(${accentRgb}, 0)`, offset: 1 },
       ], { duration: DURATION, easing: 'ease-out' });
 
-      icon.animate([
-        { transform: 'scale(1) translateY(0)', offset: 0 },
-        { transform: 'scale(1.12) translateY(-1px)', offset: .45 },
-        { transform: 'scale(1) translateY(0)', offset: 1 },
-      ], { duration: DURATION, easing: 'ease-out' });
-
       // El texto (label + sub) se invierte a oscuro mientras el relleno está encima, y vuelve a su
       // color de acento normal al terminar.
       [label, sub].forEach(el => {
@@ -8689,7 +8684,7 @@ export function render() {
     function keepActiveButtonFilled(btn) {
       if (!btn || !btn.classList || !btn.classList.contains('is-active')) return;
       btn.querySelectorAll('.action-ripple, .action-label, .action-sub').forEach(el => {
-        if (el && el.getAnimations) el.getAnimations().forEach(a => a.cancel());
+        if (el && el.getAnimations) el.getAnimations().forEach(a => { if (a.id !== 'action-hop') a.cancel(); });
       });
     }
 
@@ -8705,6 +8700,46 @@ export function render() {
         if (!btn) return;
         keepActiveButtonFilled(btn);
         setTimeout(() => keepActiveButtonFilled(btn), 0);
+      });
+    }
+
+    // Saltito al tocar: el icono sube 1 px y crece 12 % en 260 ms y vuelve. Antes lo hacia solo el icono;
+    // ahora salta junto con el centro del boton (nombre y detalle, o el rosado de la pildora en curso),
+    // asi todo se mueve como UNA pieza. Funciona con mouse y con dedo, en todos los botones de la barra.
+    function actionHopTargets(target) {
+      const pill = target.closest('#heroBlockCard');
+      const bar = pill ? pill.closest('.hero-shift-actions') : null;
+      if (pill && bar && bar.dataset && bar.dataset.liveType) {
+        const liveBtn = bar.querySelector('#breakControlBtn.is-active, #lunchControlBtn.is-active, #callControlBtn.is-active, #callControlBtn.is-pending');
+        return [liveBtn && liveBtn.querySelector('.action-icon'), pill.querySelector('.hbc-live')];
+      }
+      const btn = target.closest('.action-btn');
+      if (!btn || btn.disabled) return [];
+      const bar2 = btn.closest('.hero-shift-actions');
+      const live = !!(bar2 && bar2.dataset && bar2.dataset.liveType && btn.matches('.is-active, .is-pending') && btn.matches('#breakControlBtn, #lunchControlBtn, #callControlBtn'));
+      const out = [btn.querySelector('.action-icon'), btn.querySelector('.action-label'), btn.querySelector('.action-sub')];
+      if (live && bar2) out.push(bar2.querySelector('#heroBlockCard .hbc-live'));
+      return out;
+    }
+
+    function playActionHop(els) {
+      els.forEach(el => {
+        if (!el || typeof el.animate !== 'function') return;
+        if (el.getAnimations) el.getAnimations().forEach(a => { if (a.id === 'action-hop') a.cancel(); });
+        const a = el.animate([
+          { scale: '1', translate: '0 0', offset: 0 },
+          { scale: '1.12', translate: '0 -1px', offset: .45 },
+          { scale: '1', translate: '0 0', offset: 1 },
+        ], { duration: 260, easing: 'ease-out' });
+        a.id = 'action-hop';
+      });
+    }
+
+    function wireActionHop() {
+      document.addEventListener('pointerdown', (e) => {
+        const target = e.target instanceof Element ? e.target : null;
+        if (!target) return;
+        playActionHop(actionHopTargets(target));
       });
     }
 
