@@ -42,8 +42,17 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
         new Promise(resolve => { timer = setTimeout(() => resolve(null), 4000); })]);
     } finally { clearTimeout(timer); }
   }
+  const ownOrigin = () => { try { return api.runtime?.id ? `chrome-extension://${api.runtime.id}` : null; } catch { return null; } };
+  const trackerSender = url => { try { const origin = new URL(url).origin; return origin === TRACKER_ORIGIN || (ownOrigin() !== null && origin === ownOrigin()); } catch { return false; } };
+  // La ventana propia del tracker (pagina de la extension) manda sobre la web: si esta abierta y se identifica, las llamadas van solo a ella.
   async function trackers() {
-    const tabs = await api.tabs.query({ url: `${TRACKER_ORIGIN}/*` });
+    const own = ownOrigin();
+    const ownTabs = own ? await api.tabs.query({ url: `${own}/panel.html*` }) : [];
+    const ownFound = (await identify(ownTabs));
+    if (ownFound.length) return ownFound;
+    return identify(await api.tabs.query({ url: `${TRACKER_ORIGIN}/*` }));
+  }
+  async function identify(tabs) {
     const results = await Promise.all(tabs.map(async tab => {
       try {
         const ready = await sendToTab(tab.id, { kind: 'identify-tracker', refresh: true });
@@ -428,12 +437,12 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     }
     if (packet?.kind === 'tracker-status') {
       if (sender.frameId !== 0 || !Number.isInteger(sender.tab?.id) || !accountScopeValid(packet.accountScope)) return null;
-      try { if (new URL(sender.url).origin !== TRACKER_ORIGIN) return null; } catch { return null; }
+      if (!trackerSender(sender.url)) return null;
       return transact(state => state.accountScope === packet.accountScope ? automationStatus(state) : null);
     }
     if (packet?.kind === 'tracker-coordination') {
       if (sender.frameId !== 0 || !Number.isInteger(sender.tab?.id) || !accountScopeValid(packet.accountScope)) return null;
-      try { if (new URL(sender.url).origin !== TRACKER_ORIGIN) return null; } catch { return null; }
+      if (!trackerSender(sender.url)) return null;
       return transact(state => {
         if (state.accountScope !== packet.accountScope) return null;
         if (!state.coordinationOwner) state.coordinationOwner = crypto.randomUUID();
@@ -442,7 +451,7 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     }
     if (packet?.kind === 'tracker-ready') {
       if (sender.frameId !== 0 || !sender.tab || !accountScopeValid(packet.accountScope)) return null;
-      try { if (new URL(sender.url).origin !== TRACKER_ORIGIN) return null; } catch { return null; }
+      if (!trackerSender(sender.url)) return null;
       const targets = await trackers();
       await transact(state => {
         if (!state.accountScope && targets.length > 1) state.attention = 'multiple-trackers';

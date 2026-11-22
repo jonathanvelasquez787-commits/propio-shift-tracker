@@ -45,7 +45,7 @@ if (appHtml) {
   const panel = appHtml
     .replace(/<script[^>]*(?:_vercel\/insights|monitoring\.js|register-sw\.js)[^>]*><\/script>\s*/g, '')
     .replace(/<link[^>]*rel="manifest"[^>]*>\s*/g, '')
-    .replace('<head>', '<head>\n<script src="/panel-guard.js"></script>');
+    .replace('<head>', '<head>\n<script src="/panel-guard.js"></script>\n<script src="/tracker-content.js"></script>');
   await writeFile(path.join(out, 'panel.html'), panel);
 }
 const version = JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8')).version;

@@ -2315,6 +2315,14 @@
           ]
         },
         {
+          "file": "tests/extension-ventana-propia.test.mjs",
+          "namedCases": [
+            "extension window tracker takes the calls and the web tab only watches",
+            "web tracker is used when the extension window is not open or does not answer",
+            "extension app page loads the bridge script and the script accepts the extension origin"
+          ]
+        },
+        {
           "file": "tests/propio-extension-reload.test.mjs",
           "namedCases": [
             "worker refresh waits for a new app snapshot and shares it across concurrent requests without reannouncing",

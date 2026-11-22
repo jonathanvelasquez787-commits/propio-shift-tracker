@@ -53,7 +53,7 @@ test('a failed restoration remains owned for retry rather than leaving unrelated
 test('background refresh requests current tracker data and samples hidden portals, skipping discarded/frozen ones', async () => {
   const messages=[],scope='a'.repeat(64),store={};
   const api={runtime:{id:'test'},storage:{local:{get:async k=>({[k]:store[k]}),set:async x=>Object.assign(store,x)}},tabs:{
-    query:async q=>q.url.includes('propio-shift-tracker')?[{id:10}]:[{id:1,active:false},{id:2,discarded:true},{id:3,frozen:true}],
+    query:async q=>String(q.url).startsWith('chrome-extension:')?[]:q.url.includes('propio-shift-tracker')?[{id:10}]:[{id:1,active:false},{id:2,discarded:true},{id:3,frozen:true}],
     sendMessage:async(id,packet)=>{messages.push({id,...packet});return packet.kind==='identify-tracker'?{accountScope:scope}:{};},
   }};
   await createBridgeWorker(api).refreshBackground();

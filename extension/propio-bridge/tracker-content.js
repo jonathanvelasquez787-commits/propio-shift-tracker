@@ -1,5 +1,5 @@
 (() => {
-  const protocol = 'pst-propio-bridge/v1', origin = 'https://propio-shift-tracker.vercel.app';
+  const protocol = 'pst-propio-bridge/v1', origin = location.protocol === 'chrome-extension:' ? location.origin : 'https://propio-shift-tracker.vercel.app';
   if (location.origin !== origin || window.top !== window) return;
   let ready = null, stopped = false, heartbeat, lastAnnounced = 0, announcing = false;
   const pending = new Map();
