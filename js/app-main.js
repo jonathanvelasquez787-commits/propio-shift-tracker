@@ -8712,6 +8712,8 @@ export function render() {
           if (btn.disabled) return;
           // Break, Lunch y Llamada forman una capsula con su pildora: su estado cambia de golpe, sin pulso propio.
           if (btn.matches('#breakControlBtn, #lunchControlBtn, #callControlBtn')) return;
+          // Con mouse el relleno ya sale al pasar el cursor; el pulso lo retraia y lo volvia a llenar (parpadeo). Solo en pantallas tactiles.
+          if (typeof window.matchMedia === 'function' && window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
           playActionPressAnimation(btn);
           return;
         }

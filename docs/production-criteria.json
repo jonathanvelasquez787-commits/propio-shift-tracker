@@ -2344,6 +2344,13 @@
           ]
         },
         {
+          "file": "tests/botones-de-golpe.test.mjs",
+          "namedCases": [
+            "botones de golpe: todos los botones de la barra cambian sin animar borde, relleno, texto ni icono",
+            "botones de golpe: con mouse el pulso al tocar no retrae el relleno que ya dio el hover"
+          ]
+        },
+        {
           "file": "tests/boton-pildora-de-golpe.test.mjs",
           "namedCases": [
             "boton y pildora de golpe: sin transiciones propias en el relleno, el texto ni el borde",

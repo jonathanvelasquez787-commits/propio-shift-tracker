@@ -2874,3 +2874,9 @@ html.theme-light #scheduleConfigAccordion .sched-bk-name-select { color-scheme: 
 .chips > .hero-shift-actions .action-slot > :is(#breakControlBtn,#lunchControlBtn,#callControlBtn) { transition: transform .14s ease, opacity .14s ease; }
 .chips > .hero-shift-actions .action-slot > :is(#breakControlBtn,#lunchControlBtn,#callControlBtn) :is(.action-ripple,.action-label,.action-sub,.action-icon) { transition: none; }
 /* fin boton pildora de golpe */
+
+/* botones de golpe */
+/* Todos los botones de la barra (Turno, Break, Lunch, Llamada, Pegar, Agregar) responden de golpe: sin animar el borde ni el relleno, el texto o el icono por separado. */
+.chips > .hero-shift-actions .action-slot > .action-btn { transition: transform .14s ease, opacity .14s ease; }
+.chips > .hero-shift-actions .action-slot > .action-btn :is(.action-ripple,.action-label,.action-sub,.action-icon) { transition: none; }
+/* fin botones de golpe */
