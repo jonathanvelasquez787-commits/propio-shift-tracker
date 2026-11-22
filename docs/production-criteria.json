@@ -2351,6 +2351,13 @@
           ]
         },
         {
+          "file": "tests/saltito-todo-el-boton.test.mjs",
+          "namedCases": [
+            "saltito: el icono, el nombre y el rosado de la pildora saltan juntos con el mismo movimiento",
+            "saltito: se conecta una sola vez y los pulsos de otras animaciones no lo cancelan"
+          ]
+        },
+        {
           "file": "tests/pildora-termina-llamada.test.mjs",
           "namedCases": [
             "pildora en curso: tocarla responde tambien sin tarjetas (Freelancer o sin horario)",
