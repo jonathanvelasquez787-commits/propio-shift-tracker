@@ -2862,3 +2862,9 @@ html.theme-light #scheduleConfigAccordion .sched-bk-name-select { color-scheme: 
 /* El boton en curso (Break, Lunch, llamada) y su pildora se ven como una sola pieza: mismo color de borde, sin costura. */
 .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"]) .action-slot > :is(#breakControlBtn,#lunchControlBtn,#callControlBtn).is-active { border-color: var(--hbc-live-fill); }
 /* fin union boton pildora */
+
+/* capsula sin subir */
+/* Con algo en curso, el contorno del hover rodea boton + pildora + papelera: ninguna de las tres piezas sube, asi el contorno queda continuo y se ve una sola pieza. */
+.chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) .action-slot:is([data-slot="break"],[data-slot="lunch"],[data-slot="call"],[data-slot="discard"]) > .action-btn:not(#capsulaFija),
+.chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc:not(#capsulaFija) { transform: none !important; }
+/* fin capsula sin subir */
