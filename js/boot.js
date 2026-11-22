@@ -8,7 +8,7 @@ import { ui, translateText, translateMarkup, displayLocale, setLanguage, transla
 // correctos: la app nunca llega a montarse con datos de nadie más ni con datos viejos.
 
 import { getSupabase, isConfigured } from './supabase-client.js';
-import { getProfile, signOut, setAppEntryHint } from './auth.js';
+import { getProfile, signOut, setAppEntryHint, signInWithGoogleInExtension } from './auth.js';
 import { installPropioBridge } from './propio-bridge.js';
 import { createAutomationLease } from './automation-lease.js';
 import { SUPABASE_URL } from './config.js';
@@ -47,6 +47,29 @@ translateDocument();
 const overlay = document.getElementById('bootGate');
 const bootText = document.getElementById('bootGateText');
 const bootBody = document.getElementById('bootGateBody');
+// Dentro de la extension (panel lateral): si no hay sesion se muestra el boton para entrar con Google en vez de irse a la web.
+function showExtensionLogin(problem = '') {
+  if (!bootBody) return;
+  bootBody.innerHTML = ui`
+    <div class="boot-card">
+      <div class="boot-card-title">Entra con tu cuenta</div>
+      <p class="boot-card-text">Usa la misma cuenta de Google que en la web. Tus datos se copian solos entre las dos.</p>
+      ${problem ? ui`<p class="boot-card-text">${escapeHtml(problem)}</p>` : ''}
+      <div class="boot-card-actions">
+        <button class="mc-btn-primary cyan" id="bootExtensionLogin" type="button">Entrar con Google</button>
+      </div>
+    </div>`;
+  const button = document.getElementById('bootExtensionLogin');
+  button.addEventListener('click', async () => {
+    button.disabled = true;
+    try {
+      await signInWithGoogleInExtension();
+      window.location.reload();
+    } catch (error) {
+      showExtensionLogin(translateText('No se pudo entrar. ') + (error && error.message ? error.message : ''));
+    }
+  });
+}
 
 function setBootMessage(text) {
   if (bootText) bootText.textContent = text;
@@ -700,6 +723,7 @@ async function boot() {
   if (!session) {
     if (offlineOwner && navigator.onLine === false) { await mountOfflineApp(offlineOwner); return; }
     setAppEntryHint(false);
+    if (window.location.protocol === 'chrome-extension:') { showExtensionLogin(); return; }
     window.location.replace('/?next=/app');
     return;
   }

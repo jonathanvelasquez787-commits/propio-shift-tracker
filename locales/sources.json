@@ -3533,6 +3533,12 @@
       "app.html"
     ]
   },
+  "s_3da629b5": {
+    "source": "Google no devolvió el permiso.",
+    "files": [
+      "js/auth.js"
+    ]
+  },
   "s_3db0149d": {
     "source": "Estados del calendario",
     "files": [
@@ -3665,6 +3671,12 @@
       "js/positive-reinforcement.js"
     ]
   },
+  "s_3fee08c4": {
+    "source": "No se pudo entrar.",
+    "files": [
+      "js/boot.js"
+    ]
+  },
   "s_3ff91443": {
     "source": "Importe del pago",
     "files": [
@@ -3735,6 +3747,12 @@
     "source": "📅 Volviste a Hoy",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_41939368": {
+    "source": "Usa la misma cuenta de Google que en la web. Tus datos se copian solos entre las dos.",
+    "files": [
+      "js/boot.js"
     ]
   },
   "s_41c09cd5": {
@@ -4472,6 +4490,12 @@
     "source": "Brisa Turquesa: Turquesa, azul y violeta",
     "files": [
       "app.html"
+    ]
+  },
+  "s_4e4a2c4e": {
+    "source": "Entrar con Google",
+    "files": [
+      "js/boot.js"
     ]
   },
   "s_4e542180": {
@@ -10453,6 +10477,12 @@
     "source": "{{v0}} · {{v1}} llamada(s){{v2}}",
     "files": [
       "js/weekly-summary.js"
+    ]
+  },
+  "s_b54e9526": {
+    "source": "Entra con tu cuenta",
+    "files": [
+      "js/boot.js"
     ]
   },
   "s_b551df05": {

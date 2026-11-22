@@ -1465,6 +1465,15 @@
           ]
         },
         {
+          "file": "tests/extension-panel-app.test.mjs",
+          "namedCases": [
+            "la extension declara el panel lateral, el permiso de entrada y un ID fijo",
+            "la extension arma panel.html con la app y sin analitica ni service worker",
+            "dentro de la extension la app muestra el boton de Google en vez de irse a la web",
+            "la ventanita de la extension tiene el boton para abrir el panel lateral"
+          ]
+        },
+        {
           "file": "tests/selector-accesos-windows.test.mjs",
           "namedCases": [
             "los cuadros de ruta de Windows ya no mencionan el explorador",

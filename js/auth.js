@@ -51,6 +51,21 @@ export async function signInWithGoogle(redirectTo) {
   if (error) throw error;
 }
 
+// Dentro de la extension: el login vuelve a https://<id>.chromiumapp.org/ y chrome.identity entrega la direccion.
+export async function signInWithGoogleInExtension() {
+  const redirectTo = chrome.identity.getRedirectURL();
+  const { data, error } = await getSupabase().auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo, skipBrowserRedirect: true, queryParams: { prompt: 'select_account' } },
+  });
+  if (error) throw error;
+  const returned = await chrome.identity.launchWebAuthFlow({ url: data.url, interactive: true });
+  const code = new URL(returned).searchParams.get('code');
+  if (!code) throw new Error(translateText('Google no devolvió el permiso.'));
+  const { error: exchangeError } = await getSupabase().auth.exchangeCodeForSession(code);
+  if (exchangeError) throw exchangeError;
+}
+
 export async function updatePassword(newPassword, expectedUserId) {
   if (String(newPassword || '').length < 8) throw new AuthError('PASSWORD_TOO_SHORT');
   if (!expectedUserId) throw new AuthError('NOT_AUTHENTICATED');

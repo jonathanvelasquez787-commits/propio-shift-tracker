@@ -167,6 +167,15 @@ async function act(packet, okMessage) {
   finally { busy = false; await refresh().catch(() => {}); }
 }
 document.getElementById('open').addEventListener('click', () => act({ kind: 'open-tracker' }));
+document.getElementById('openPanel').addEventListener('click', async () => {
+  try {
+    const current = await chrome.windows.getCurrent();
+    await chrome.sidePanel.open({ windowId: current.id });
+    window.close();
+  } catch {
+    // Chrome sin panel lateral: la ventanita sigue abierta.
+  }
+});
 document.getElementById('pair').addEventListener('click', () => act({ kind: 'pair' }, 'Conexión revisada: Propio Shift Tracker está conectado.'));
 document.getElementById('resumeAvailability').addEventListener('click', () => act({ kind: 'pause-availability', paused: false }));
 document.getElementById('automatic').addEventListener('change', event => act({ kind: 'mode', mode: event.target.checked ? 'auto' : 'observe' }));

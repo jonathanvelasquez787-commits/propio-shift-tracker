@@ -9,7 +9,7 @@ test('unified extension keeps session detection separate from original layout an
  const manifest=JSON.parse(read('extension/propio-bridge/manifest.json'));
  assert.deepEqual(manifest.content_scripts.map(s=>s.matches),[['https://interpreters.propio-ls.com/portal*'],['https://interpreters.propio-ls.com/portal*'],['https://interpreters.propio-ls.com/*'],['https://propio-shift-tracker.vercel.app/*']]);
  assert.deepEqual(manifest.content_scripts[2].js,['portal-content.js']);
- assert.deepEqual(manifest.permissions,['storage','webRequest','alarms','webNavigation']);
+ assert.deepEqual(manifest.permissions,['storage','webRequest','alarms','webNavigation','sidePanel','identity']);
  assert.equal(fs.existsSync(new URL('../extension/propio-bridge/summary-content.js',import.meta.url)),false);
  assert.doesNotMatch(read('extension/propio-bridge/popup.html'),/summaryEnabled|summaryForm|summaryPreferences/);
  assert.match(read('extension/propio-bridge/popup.html'),/originalLayout/);
