@@ -2850,3 +2850,10 @@ html.theme-light #scheduleConfigAccordion .sched-bk-name-select { color-scheme: 
 /* En modo Freelancer o en un dia libre no hay bloques: la pildora en curso se pinta sola con el color de su boton. */
 .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc { background: var(--hbc-live-fill, var(--panel-2)); }
 /* fin pildora sin horario */
+
+/* relleno en curso */
+/* Al iniciar turno, Break, Lunch o llamada, el boton se llena de color al mismo tiempo que la pildora (antes tardaba medio segundo y se veia oscuro). */
+.chips > .hero-shift-actions .action-slot > .action-btn.is-active .action-ripple { transition: none; }
+.chips > .hero-shift-actions .action-slot > .action-btn.is-active .action-label,
+.chips > .hero-shift-actions .action-slot > .action-btn.is-active .action-sub { transition: none; }
+/* fin relleno en curso */
