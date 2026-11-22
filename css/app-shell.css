@@ -2868,3 +2868,9 @@ html.theme-light #scheduleConfigAccordion .sched-bk-name-select { color-scheme: 
 .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) .action-slot:is([data-slot="break"],[data-slot="lunch"],[data-slot="call"],[data-slot="discard"]) > .action-btn:not(#capsulaFija),
 .chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc:not(#capsulaFija) { transform: none !important; }
 /* fin capsula sin subir */
+
+/* boton pildora de golpe */
+/* Break, Lunch y Llamada con su pildora son UNA pieza: el relleno, el texto y el borde del boton cambian de golpe, a la vez que la pildora (sin transiciones propias que dejen una costura). */
+.chips > .hero-shift-actions .action-slot > :is(#breakControlBtn,#lunchControlBtn,#callControlBtn) { transition: transform .14s ease, opacity .14s ease; }
+.chips > .hero-shift-actions .action-slot > :is(#breakControlBtn,#lunchControlBtn,#callControlBtn) :is(.action-ripple,.action-label,.action-sub,.action-icon) { transition: none; }
+/* fin boton pildora de golpe */

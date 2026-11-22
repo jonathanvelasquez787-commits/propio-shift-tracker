@@ -8710,6 +8710,8 @@ export function render() {
         const btn = target ? target.closest('.action-btn') : null;
         if (btn) {
           if (btn.disabled) return;
+          // Break, Lunch y Llamada forman una capsula con su pildora: su estado cambia de golpe, sin pulso propio.
+          if (btn.matches('#breakControlBtn, #lunchControlBtn, #callControlBtn')) return;
           playActionPressAnimation(btn);
           return;
         }
@@ -8717,8 +8719,8 @@ export function render() {
         const pill = target ? target.closest('#heroBlockCard') : null;
         const bar = pill ? pill.closest('.hero-shift-actions') : null;
         if (!bar || !bar.dataset || !bar.dataset.liveType) return;
-        const liveBtn = bar.querySelector('#breakControlBtn.is-active, #lunchControlBtn.is-active, #callControlBtn.is-active, #callControlBtn.is-pending');
-        if (liveBtn && !liveBtn.disabled) playActionPressAnimation(liveBtn);
+        // La pildora y su boton son UNA pieza: tocar la pildora no dispara un pulso aparte en el boton.
+        return;
       });
     }
 
