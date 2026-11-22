@@ -966,6 +966,13 @@
           ]
         },
         {
+          "file": "tests/extension-cuadro-disponibilidad.test.mjs",
+          "namedCases": [
+            "cuadro de disponibilidad: los valores salen igual que en la ventanita vieja",
+            "cuadro de disponibilidad: cada control manda el mismo paquete que la ventanita vieja"
+          ]
+        },
+        {
           "file": "tests/popup-pause-text.test.mjs",
           "namedCases": [
             "popup: \"Pausar disponibilidad automática\" se explica sin jerga",
