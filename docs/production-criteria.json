@@ -966,6 +966,13 @@
           ]
         },
         {
+          "file": "tests/extension-cuadro-senales.test.mjs",
+          "namedCases": [
+            "cuadro de señales: muestra pendientes, vencimiento y botones como la ventanita vieja",
+            "cuadro de señales: cada boton manda el mismo paquete que la ventanita vieja"
+          ]
+        },
+        {
           "file": "tests/extension-cuadro-disponibilidad.test.mjs",
           "namedCases": [
             "cuadro de disponibilidad: los valores salen igual que en la ventanita vieja",

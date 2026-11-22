@@ -74,6 +74,31 @@ export function extensionAvailabilityModel(state, now = Date.now()) {
     spacingOn: spacing.enabled === true, minutes: spacing.minutes, status, resumeNote, spacingNote };
 }
 
+const SIGNAL_NAMES = { 'history-records': 'Historial de llamadas', 'session-start': 'Inicio de sesión', 'session-end': 'Fin de sesión', 'pause-end': 'Fin de pausa programado' };
+
+// Señales pendientes y botones de la Parte 3, a partir de {kind:'status'}. Funcion pura.
+export function extensionQueueModel(state, now = Date.now()) {
+  const ok = state && state.ok !== false;
+  const paired = ok && state.paired === true;
+  const queued = ok ? Math.max(0, Number(state.queued) || 0) : 0;
+  const prep = ok ? state.preparation : null;
+  const plan = prep?.plan, spacing = prep?.spacing || { enabled: false };
+  const expires = Date.parse(state?.queueSummary?.expiresAt);
+  const left = Math.max(0, Math.ceil((expires - now) / 60000));
+  const deadline = !queued ? '' : !Number.isFinite(expires) ? 'Pendientes sin fecha confirmada; requieren revisión.'
+    : state.queueSummary.expired ? 'Hay señales vencidas; el registro necesita revisión.'
+    : `La señal más antigua vence en ${Math.floor(left / 60)} h ${left % 60} min.`;
+  const items = (ok && Array.isArray(state.queueItems) ? state.queueItems : []).map(item => {
+    const at = new Date(item.at);
+    return { name: SIGNAL_NAMES[item.type] || 'Señal', when: Number.isNaN(at.getTime()) ? '' : at.toLocaleString('es', { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }) };
+  });
+  const inCall = ok && (state.active || state.call === 'connected' || state.call === 'incoming');
+  return { queued, deadline, items, showDiscard: Boolean(ok && (queued > 0 || (state.mode === 'auto' && state.active))),
+    showResume: paired && prep?.availabilityPaused === true,
+    showRefresh: paired && Boolean(plan) && !(plan.scheduleVerified === true && !(spacing.enabled && plan.acwVerified === false)),
+    refreshLocked: Boolean(inCall) };
+}
+
 export function initExtensionBox(doc = globalThis.document, chromeApi = globalThis.chrome, loc = globalThis.location) {
   if (!doc || !loc || loc.protocol !== 'chrome-extension:' || !chromeApi?.runtime?.sendMessage) return null;
   const anchor = doc.getElementById('higherRateHeaderBtn');
@@ -101,7 +126,9 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
   const actions = el('div', 'ext-box-actions');
   const pair = btn('Revisar conexión', 'extBoxPair'), open = btn('Abrir Shift Tracker ↗', 'extBoxOpen'), side = btn('Abrir en el panel lateral', 'extBoxSide');
   if (!isPopup) side.hidden = true;
-  actions.append(pair, open, side);
+  const resumeBtn = btn('Reanudar disponibilidad', 'extBoxResumeAvail'), refreshBtn = btn('Actualizar y reconectar', 'extBoxRefresh');
+  resumeBtn.classList.add('is-primary'); resumeBtn.hidden = true; refreshBtn.hidden = true;
+  actions.append(resumeBtn, pair, open, side, refreshBtn);
   conn.append(badge, status, detail, actions);
   const rec = el('label', 'ext-box-row'); rec.setAttribute('for', 'extBoxAuto');
   const recText = el('span'); recText.append(el('b', '', 'Registrar mi actividad'), el('small', '', 'Guarda turnos y llamadas en Shift Tracker.'));
@@ -111,6 +138,16 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
   const pendText = el('span'); const pendNote = el('small', '', 'Nada esperando'); pendNote.id = 'extBoxPendingNote';
   pendText.append(el('b', '', 'Eventos pendientes'), pendNote);
   const pendCount = el('strong', 'ext-box-count', '0'); pendCount.id = 'extBoxPending'; pend.append(pendText, pendCount);
+  const queueBox = el('div', 'ext-box-queue'); queueBox.id = 'extBoxQueue'; queueBox.hidden = true;
+  const deadlineNote = el('p', 'ext-box-note'); deadlineNote.id = 'extBoxQueueDeadline';
+  const fold = (id, label) => { const b = el('button', 'ext-box-row ext-box-fold', ''); b.type = 'button'; b.id = id; b.setAttribute('aria-expanded', 'false'); const t = el('b', '', label), a = el('span', 'ext-box-arrow', '▸'); a.setAttribute('aria-hidden', 'true'); b.append(t, a); return { b, t, a }; };
+  const sigFold = fold('extBoxSignalsBtn', 'Ver las señales'), sigList = el('ul', 'ext-box-signals'); sigList.id = 'extBoxSignals'; sigList.hidden = true;
+  const howFold = fold('extBoxHowBtn', 'Cómo resolverlos'), howBody = el('div', 'ext-box-how'); howBody.id = 'extBoxHow'; howBody.hidden = true;
+  for (const [t, d] of [['Qué son', 'Señales de llamada, sesión o historial; no son llamadas adicionales.'], ['Cómo entregarlos', 'Abrí Propio Shift Tracker con la cuenta vinculada.'], ['Después de 24 horas', 'Se pausa su entrega para revisión. No se borran solas.']]) { const p = el('p'); p.append(el('b', '', t), el('span', '', d)); howBody.append(p); }
+  howBody.append(el('p', 'ext-box-note', 'Revisá el historial de Propio y registrá lo que falte antes de descartar señales.'));
+  const discard = btn('Descartar señales revisadas', 'extBoxDiscard'); discard.classList.add('is-danger'); discard.hidden = true;
+  const discardWrap = el('div', 'ext-box-discard'); discardWrap.append(discard);
+  queueBox.append(deadlineNote, sigFold.b, sigList, howFold.b, howBody);
   const avail = el('div', 'ext-box-avail');
   const availHead = el('button', 'ext-box-row ext-box-fold', ''); availHead.type = 'button'; availHead.id = 'extBoxAvailBtn';
   availHead.setAttribute('aria-expanded', 'true'); availHead.setAttribute('aria-controls', 'extBoxAvailBody');
@@ -141,7 +178,7 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
   const availNote = el('p', 'ext-box-note'); availNote.id = 'extBoxAvailNote'; availNote.setAttribute('role', 'status');
   availBody.append(pausedRow.row, firstRow.row, brkRow.row, lunchRow.row, modeRow, resumeNote, spacingRow.row, minRow, spacingNote, availNote);
   avail.append(availHead, availBody);
-  box.append(head, conn, rec, pend, avail);
+  box.append(head, conn, rec, pend, queueBox, discardWrap, avail);
   doc.body.append(box);
 
   let busy = false, feedback = '', shown = false, timer = null;
@@ -163,6 +200,16 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
     pendCount.textContent = String(m.queued);
     pendNote.textContent = m.queued ? 'Se entregan al abrir Propio Shift Tracker con la cuenta vinculada.' : 'Nada esperando';
     pair.classList.toggle('is-primary', !m.paired); pair.textContent = m.paired ? 'Revisar conexión' : 'Reintentar conexión';
+    const q = extensionQueueModel(state);
+    queueBox.hidden = !q.queued; deadlineNote.textContent = q.deadline;
+    sigList.replaceChildren();
+    for (const it of q.items) { const li = el('li', '', it.name); li.append(el('span', '', it.when)); sigList.append(li); }
+    sigFold.b.hidden = !q.items.length; if (!q.items.length) { sigList.hidden = true; }
+    sigFold.t.textContent = `Ver las ${q.queued} señales`;
+    discard.hidden = !q.showDiscard; discard.disabled = busy;
+    resumeBtn.hidden = !q.showResume; resumeBtn.disabled = busy;
+    refreshBtn.hidden = !q.showRefresh; refreshBtn.disabled = busy || q.refreshLocked;
+    if (q.showResume) { status.textContent = 'Disponibilidad en pausa'; if (!feedback && !m.attention) detail.textContent = 'Sigue registrando. Reanuda desde aquí o con Start Calls en Propio.'; }
     const a = extensionAvailabilityModel(state);
     const lock = busy || !a.paired;
     pausedRow.input.checked = a.paused; firstRow.input.checked = a.first; brkRow.input.checked = a.resumeBreak; lunchRow.input.checked = a.resumeLunch;
@@ -181,6 +228,13 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
   }
   pair.addEventListener('click', () => act({ kind: 'pair' }, 'Conexión revisada: Propio Shift Tracker está conectado.'));
   open.addEventListener('click', () => act({ kind: 'open-tracker' }));
+  resumeBtn.addEventListener('click', () => act({ kind: 'pause-availability', paused: false }));
+  refreshBtn.addEventListener('click', () => act({ kind: 'refresh-tracker' }));
+  discard.addEventListener('click', () => {
+    if (globalThis.confirm('¿Ya revisaste o registraste estas llamadas en Propio Shift Tracker? Se descartarán las señales pendientes y volverá el modo de observación. Una llamada activa en Propio Shift Tracker requiere revisión allí.')) act({ kind: 'clear-reviewed' }, 'Señales descartadas. Volvió el modo de observación.');
+  });
+  const wireFold = (f, body) => f.b.addEventListener('click', () => { const open = body.hidden; body.hidden = !open; f.b.setAttribute('aria-expanded', String(open)); f.a.textContent = open ? '▾' : '▸'; });
+  wireFold(sigFold, sigList); wireFold(howFold, howBody);
   auto.addEventListener('change', () => act({ kind: 'mode', mode: auto.checked ? 'auto' : 'observe' }));
   pausedRow.input.addEventListener('change', () => act({ kind: 'pause-availability', paused: pausedRow.input.checked }));
   firstRow.input.addEventListener('change', () => act({ kind: 'prepare-first', enabled: firstRow.input.checked }));
