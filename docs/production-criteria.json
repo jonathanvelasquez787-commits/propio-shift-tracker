@@ -2301,7 +2301,8 @@
         "extension/propio-bridge/background-tabs.js",
         "extension/propio-bridge/tracker-content.js",
         "extension/propio-bridge/portal-content.js",
-        "extension/propio-bridge/bridge-worker.js"
+        "extension/propio-bridge/bridge-worker.js",
+        "extension/propio-bridge/window-launcher.js"
       ],
       "tests": [
         {
@@ -2320,6 +2321,14 @@
             "extension window tracker takes the calls and the web tab only watches",
             "web tracker is used when the extension window is not open or does not answer",
             "extension app page loads the bridge script and the script accepts the extension origin"
+          ]
+        },
+        {
+          "file": "tests/extension-icono-ventana.test.mjs",
+          "namedCases": [
+            "toolbar icon opens a tall popup-type window of the tracker",
+            "toolbar icon focuses the tracker window that is already open instead of opening another",
+            "manifest has no default popup so the icon click reaches the worker"
           ]
         },
         {
