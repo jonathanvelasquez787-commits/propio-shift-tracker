@@ -148,6 +148,6 @@ for(const scenario of [
     shiftWouldStartNew:()=>!scenario.active,shiftStartTooEarly:()=>false});
   vm.runInContext(['liveCallDayIsOff','callActionDisabled','todayIsOff','shiftActionDisabled'].map(n=>declaration('../js/app-main.js',n)).join('\n'),h);
   assert.equal(h.liveCallDayIsOff(),scenario.forced==='off'||(scenario.forced!=='work'&&scenario.off));
-  assert.equal(h.callActionDisabled(),scenario.disabled);
+  assert.equal(h.callActionDisabled(),!scenario.today);
   assert.equal(h.shiftActionDisabled(),scenario.disabled);
 });

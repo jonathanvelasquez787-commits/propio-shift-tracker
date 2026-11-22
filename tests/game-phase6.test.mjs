@@ -257,15 +257,17 @@ test('runtime smoke: la página de historial positivo y Higher Rate siguen conec
 });
 
 
-test('cuarta simulación mensual: llamadas live antes y después del turno permiten días laborales y bloquean nuevos inicios en días libres', () => {
+test('cuarta simulación mensual: llamadas live antes y después del turno y en días libres se registran siempre', () => {
   const appMain = read('js/app-main.js');
   const startCall = appMain.slice(appMain.indexOf('function startCall('), appMain.indexOf('function endCall(', appMain.indexOf('function startCall(')));
-  const disabled = appMain.slice(appMain.indexOf('function callActionDisabled()'), appMain.indexOf('function callActionTimer()', appMain.indexOf('function callActionDisabled()')));
+  const disabled = appMain.slice(appMain.indexOf('function callActionDisabled()'), appMain.indexOf('function liveCallDayIsOff()', appMain.indexOf('function callActionDisabled()')));
   assert.doesNotMatch(startCall, /shiftStartTooEarly\(\)/);
   assert.match(startCall, /const needsAutoShift = !state\.shiftStartedAt \|\| !!state\.shiftEndedAt/);
   assert.match(startCall, /Shift iniciado automáticamente por llamada/);
   assert.doesNotMatch(disabled, /state\.shiftEndedAt/);
-  assert.match(disabled, /!state\.activeCall && liveCallDayIsOff\(\)/);
+  assert.doesNotMatch(disabled, /liveCallDayIsOff/);
+  assert.doesNotMatch(startCall, /liveCallDayIsOff/);
+  assert.match(disabled, /return !isViewingToday\(\)/);
 });
 
 test('cuarta simulación mensual: descartar la primera live revierte el turno que esa llamada abrió', () => {

@@ -790,7 +790,7 @@
             "tercera simulación mensual: horario y meta históricos quedan congelados antes de cambios globales",
             "tercera simulación mensual: ACW se recalcula al editar borrar o vaciar llamadas",
             "tercera simulación mensual: pegar llamadas de hoy vuelve a auto iniciar el turno",
-            "cuarta simulación mensual: llamadas live antes y después del turno permiten días laborales y bloquean nuevos inicios en días libres",
+            "cuarta simulación mensual: llamadas live antes y después del turno y en días libres se registran siempre",
             "cuarta simulación mensual: descartar la primera live revierte el turno que esa llamada abrió",
             "cuarta simulación mensual: llamada manual de hoy auto inicia turno igual que pegar llamadas",
             "cuarta simulación mensual: backup JSON realmente incluye y restaura settings",
