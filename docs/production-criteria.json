@@ -966,6 +966,13 @@
           ]
         },
         {
+          "file": "tests/extension-cuadro-actividad.test.mjs",
+          "namedCases": [
+            "cuadro de actividad: conexión, historial y señales salen igual que en la ventanita vieja",
+            "cuadro de actividad: tres secciones plegables que empiezan cerradas y recuerdan su estado"
+          ]
+        },
+        {
           "file": "tests/extension-cuadro-que-hara.test.mjs",
           "namedCases": [
             "cuadro «Qué hará la extensión ahora»: usa el mismo motor y los mismos ids que la ventanita vieja",

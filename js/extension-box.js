@@ -100,6 +100,28 @@ export function extensionQueueModel(state, now = Date.now()) {
     refreshLocked: Boolean(inCall) };
 }
 
+const SIGNAL_LABELS = { history: 'Historial oficial recuperado', 'session-start': 'Sesión iniciada · Shift', 'session-end': 'Sesión cerrada · Shift', incoming: 'Llamada entrante', accepted: 'Llamada aceptada', rejected: 'Llamada rechazada', disconnected: 'Llamada terminada', available: 'Disponible', unavailable: 'Fuera de línea' };
+
+// «Estado de conexión», «Historial reconocido» y «Actividad reciente», a partir de {kind:'status'}. Funcion pura.
+export function extensionActivityModel(state) {
+  const ok = Boolean(state) && state.ok !== false;
+  const paired = ok && state.paired === true;
+  const callStatus = !ok ? '' : state.active ? 'Registrando tu llamada actual.' : state.call === 'connected' ? 'Hay una llamada en curso cuyo inicio no se observó; revisala en Propio Shift Tracker.' : state.call === 'incoming' ? 'Tenés una llamada entrante; vos decidís si aceptarla.' : 'Esperando la próxima llamada.';
+  const attention = ok && state.attention ? String(state.attention) : '';
+  const connection = REASONS[attention] || (!paired ? 'Esperando tu sesión de Propio Shift Tracker para conectar.'
+    : state.portal === 'authenticated' ? `Propio está abierto y tu sesión fue reconocida. ${callStatus}`
+    : state.portal === 'logged-out' ? 'Saliste de Propio. Esperando que vuelvas a entrar.' : 'Tu cuenta está vinculada. Esperando que Propio confirme tu sesión.');
+  const h = ok ? state.history : null;
+  const at = h ? new Date(h.at) : null;
+  const historyStatus = h
+    ? `${h.invalid ? `${h.invalid} fila(s) pendiente(s) de datos válidos. ` : ''}Última lectura: ${at && !Number.isNaN(at.getTime()) ? at.toLocaleTimeString('es') : '—'}.${state.mode !== 'auto' ? ' Activá el registro para sincronizarlas.' : ''}`
+    : 'Abrí el historial de Propio para leer y recuperar sus llamadas.';
+  const last = ok && Array.isArray(state.last) ? [...state.last].reverse() : [];
+  const signals = last.length ? last.map(item => `${SIGNAL_LABELS[item.signal] || 'Señal'} · ${new Date(item.at).toLocaleTimeString('es')}`) : ['Todavía no se detectaron señales compatibles.'];
+  return { connection, historyCount: h ? String(h.count) : '—', historyScope: h?.coverage === 'range' ? 'En el historial de hoy' : 'En la página del historial',
+    observed: String(ok ? Number(state.completed) || 0 : 0), historyStatus, signals };
+}
+
 export function initExtensionBox(doc = globalThis.document, chromeApi = globalThis.chrome, loc = globalThis.location) {
   if (!doc || !loc || loc.protocol !== 'chrome-extension:' || !chromeApi?.runtime?.sendMessage) return null;
   const anchor = doc.getElementById('higherRateHeaderBtn');
@@ -199,7 +221,28 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
   const hoursFold = fold('extBoxHoursBtn', 'Sobre estos horarios'), hoursBody = el('p', 'ext-box-note', 'El inicio usa tu horario o tu llamada real. El cálculo está en Reportes, dentro de Jornada.'); hoursBody.id = 'extBoxHours'; hoursBody.hidden = true;
   doingBody.append(doingTitleLine, doingDetail, acw, checks, hoursFold.b, hoursBody);
   doing.append(doingHead, doingBody);
-  box.append(head, conn, rec, pend, queueBox, discardWrap, avail, doing);
+  const section = (id, title, key) => {
+    const wrap = el('div', 'ext-box-avail'), head = el('button', 'ext-box-row ext-box-fold', ''); head.type = 'button'; head.id = id + 'Btn';
+    head.setAttribute('aria-expanded', 'false'); head.setAttribute('aria-controls', id);
+    const arrow = el('span', 'ext-box-arrow', '▸'); arrow.setAttribute('aria-hidden', 'true'); head.append(el('b', '', title), arrow);
+    const body = el('div', 'ext-box-avail-body ext-box-doing'); body.id = id; body.hidden = true; wrap.append(head, body);
+    const setOpen = open => { body.hidden = !open; head.setAttribute('aria-expanded', String(open)); arrow.textContent = open ? '▾' : '▸'; };
+    head.addEventListener('click', () => { const open = body.hidden; setOpen(open); try { chromeApi.storage?.local?.set?.({ [key]: open }); } catch { /* sin guardar */ } });
+    try { Promise.resolve(chromeApi.storage?.local?.get?.(key)).then(saved => { if (saved?.[key] === true) setOpen(true); }).catch(() => {}); } catch { /* sin leer */ }
+    return { wrap, body };
+  };
+  const connSec = section('extBoxConnection', 'Estado de conexión', 'extBoxConnOpen');
+  const connHealth = el('p', 'ext-box-note'); connHealth.id = 'connectionHealth'; connHealth.setAttribute('role', 'status'); connSec.body.append(connHealth);
+  const histSec = section('extBoxHistory', 'Historial reconocido', 'extBoxHistOpen');
+  const stat = (id, note) => { const d = el('div', 'ext-box-stat'); const n = el('strong', '', '—'); n.id = id; const t = el('span', '', note); d.append(n, t); return { d, n, t }; };
+  const histCount = stat('historyCount', 'En historial de Propio'), liveCount = stat('observedCount', 'Terminadas observadas en vivo'); liveCount.n.textContent = '0';
+  histCount.t.id = 'historyScope'; liveCount.t.textContent = 'Terminadas observadas en vivo';
+  const stats = el('div', 'ext-box-stats'); stats.append(histCount.d, liveCount.d);
+  const histStatus = el('p', 'ext-box-note'); histStatus.id = 'historyStatus'; histStatus.setAttribute('role', 'status');
+  histSec.body.append(stats, histStatus);
+  const actSec = section('extBoxActivity', 'Actividad reciente', 'extBoxActOpen');
+  const signalsList = el('ul', 'ext-box-signals'); signalsList.id = 'signals'; actSec.body.append(signalsList);
+  box.append(head, conn, rec, pend, queueBox, discardWrap, avail, doing, connSec.wrap, histSec.wrap, actSec.wrap);
   doc.body.append(box);
 
   let busy = false, feedback = '', shown = false, timer = null, workSession = null;
@@ -224,6 +267,10 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
     pendCount.textContent = String(m.queued);
     pendNote.textContent = m.queued ? 'Se entregan al abrir Propio Shift Tracker con la cuenta vinculada.' : 'Nada esperando';
     pair.classList.toggle('is-primary', !m.paired); pair.textContent = m.paired ? 'Revisar conexión' : 'Reintentar conexión';
+    const act2 = extensionActivityModel(state);
+    connHealth.textContent = act2.connection;
+    histCount.n.textContent = act2.historyCount; histCount.t.textContent = act2.historyScope; liveCount.n.textContent = act2.observed; histStatus.textContent = act2.historyStatus;
+    signalsList.replaceChildren(); for (const t of act2.signals) signalsList.append(el('li', '', t));
     const q = extensionQueueModel(state);
     queueBox.hidden = !q.queued; deadlineNote.textContent = q.deadline;
     sigList.replaceChildren();
