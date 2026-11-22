@@ -2361,6 +2361,7 @@
           "file": "tests/saltito-todo-el-boton.test.mjs",
           "namedCases": [
             "saltito: el icono, el nombre y el rosado de la pildora saltan juntos con el mismo movimiento",
+            "saltito: sale al soltar, despues del cambio de estado, y todo junto en el mismo cuadro",
             "saltito: se conecta una sola vez y los pulsos de otras animaciones no lo cancelan"
           ]
         },

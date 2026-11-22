@@ -8713,19 +8713,23 @@ export function render() {
     // Saltito al tocar: el icono sube 1 px y crece 12 % en 260 ms y vuelve. Antes lo hacia solo el icono;
     // ahora salta junto con el centro del boton (nombre y detalle, o el rosado de la pildora en curso),
     // asi todo se mueve como UNA pieza. Funciona con mouse y con dedo, en todos los botones de la barra.
-    function actionHopTargets(target) {
+    // El boton de la barra que se esta tocando (tambien cuando se toca la pildora rosada de lo que esta en curso).
+    function actionHopButton(target) {
       const pill = target.closest('#heroBlockCard');
       const bar = pill ? pill.closest('.hero-shift-actions') : null;
       if (pill && bar && bar.dataset && bar.dataset.liveType) {
-        const liveBtn = bar.querySelector('#breakControlBtn.is-active, #lunchControlBtn.is-active, #callControlBtn.is-active, #callControlBtn.is-pending');
-        return [liveBtn && liveBtn.querySelector('.action-icon'), pill.querySelector('.hbc-live')];
+        return bar.querySelector('#breakControlBtn.is-active, #lunchControlBtn.is-active, #callControlBtn.is-active, #callControlBtn.is-pending');
       }
       const btn = target.closest('.action-btn');
-      if (!btn || btn.disabled) return [];
-      const bar2 = btn.closest('.hero-shift-actions');
-      const live = !!(bar2 && bar2.dataset && bar2.dataset.liveType && btn.matches('.is-active, .is-pending') && btn.matches('#breakControlBtn, #lunchControlBtn, #callControlBtn'));
+      return btn && !btn.disabled ? btn : null;
+    }
+
+    // Piezas que saltan: las del boton y, si queda algo en curso, el rosado de la pildora. Se calcula DESPUES del cambio de estado.
+    function actionHopTargets(btn) {
       const out = [btn.querySelector('.action-icon'), btn.querySelector('.action-label'), btn.querySelector('.action-sub')];
-      if (live && bar2) out.push(bar2.querySelector('#heroBlockCard .hbc-live'));
+      const bar = btn.closest('.hero-shift-actions');
+      const live = !!(bar && bar.dataset && bar.dataset.liveType && btn.matches('.is-active, .is-pending') && btn.matches('#breakControlBtn, #lunchControlBtn, #callControlBtn'));
+      if (live) out.push(bar.querySelector('#heroBlockCard .hbc-live'));
       return out;
     }
 
@@ -8742,11 +8746,19 @@ export function render() {
       });
     }
 
+    // El salto se hace al SOLTAR (cuando ya cambio el estado), todo junto en el mismo cuadro: boton y pildora.
     function wireActionHop() {
+      let pressed = null;
       document.addEventListener('pointerdown', (e) => {
         const target = e.target instanceof Element ? e.target : null;
-        if (!target) return;
-        playActionHop(actionHopTargets(target));
+        pressed = target ? actionHopButton(target) : null;
+      });
+      document.addEventListener('click', (e) => {
+        const target = e.target instanceof Element ? e.target : null;
+        const btn = pressed && pressed.isConnected ? pressed : (target ? actionHopButton(target) : null);
+        pressed = null;
+        if (!btn) return;
+        requestAnimationFrame(() => playActionHop(actionHopTargets(btn)));
       });
     }
 
