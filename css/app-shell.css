@@ -2845,3 +2845,8 @@ html.theme-light #scheduleConfigAccordion .sched-bk-name-select { color-scheme: 
   .mo-streak-num { font-size: 28px; }
 }
 /* fin mi orden completa */
+
+/* pildora sin horario */
+/* En modo Freelancer o en un dia libre no hay bloques: la pildora en curso se pinta sola con el color de su boton. */
+.chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"],[data-live-type="pending"]) > .hbc { background: var(--hbc-live-fill, var(--panel-2)); }
+/* fin pildora sin horario */

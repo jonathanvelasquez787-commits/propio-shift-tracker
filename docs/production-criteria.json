@@ -2324,6 +2324,14 @@
           ]
         },
         {
+          "file": "tests/boton-en-curso-sin-horario.test.mjs",
+          "namedCases": [
+            "sin horario la pildora en curso se muestra con su nombre y cronometro",
+            "sin horario la pildora en curso se pinta con el color de su boton",
+            "la ventanita del icono se desplaza como ventana para que la barra de acciones quede pegada"
+          ]
+        },
+        {
           "file": "tests/extension-popup-icono.test.mjs",
           "namedCases": [
             "toolbar icon drops the app down as a real extension popup",
