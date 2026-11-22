@@ -4600,6 +4600,9 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       }
       const discard = document.getElementById('liveDiscardBtn');
       if (discard) discard.hidden = !(info && info.onDiscard);
+      // Sin horario (modo Freelancer o dia libre) la pildora no tiene bloques, pero con algo en curso debe verse con su nombre y cronometro.
+      const pillHost = document.getElementById('heroBlockCard');
+      if (pillHost) pillHost.hidden = !info && !pillHost.querySelector('.hbc-stack')?.dataset.sig;
       const callBtn = document.getElementById('callControlBtn');
       if (callBtn) callBtn.classList.toggle('is-pending', !!(info && info.type === 'pending'));
       // En celular el cronómetro del botón en curso se ve en la píldora de bloques (ícono + tiempo).
@@ -6803,7 +6806,7 @@ function renderBlockSummaryStrip(cards) {
   const stack = host.querySelector('.hbc-stack');
   if (!stack) return;
   if (!Array.isArray(cards) || !cards.length) {
-    host.hidden = true;
+    host.hidden = !host.closest?.('.hero-shift-actions')?.dataset.liveType;
     stack.innerHTML = '';
     stack.dataset.sig = '';
     return;

@@ -11,8 +11,9 @@ if (typeof navigation !== 'undefined') {
 }
 
 // Cuando cae del icono de Chrome (panel.html?popup=1) la ventanita mide lo que ella diga, con el maximo que deja Chrome de alto (600).
+// El que se desplaza es la propia ventana (no el body): asi la barra de acciones pegada arriba se entera del scroll.
 if (new URLSearchParams(window.location.search).get('popup') === '1') {
   const style = document.createElement('style');
-  style.textContent = 'html{width:500px;height:600px;overflow:hidden}body{width:500px;height:600px;margin:0;overflow-y:auto}';
+  style.textContent = 'html{width:500px;height:600px;overflow-x:hidden;overflow-y:auto}body{width:500px;margin:0}';
   document.head.appendChild(style);
 }
