@@ -4627,6 +4627,13 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
             liveRange = `${translateText('Desde')} ${new Intl.DateTimeFormat(displayLocale(), { hour: '2-digit', minute: '2-digit' }).format(callStart)}`;
           }
         }
+        // Break y Lunch sin horario (modo Freelancer o dia libre) no tienen rango de tarjeta: muestran "Desde la hora" igual que la llamada.
+        if (info && (info.type === 'break' || info.type === 'lunch') && !liveRange && info.startedAt) {
+          const pauseStart = new Date(info.startedAt);
+          if (!Number.isNaN(pauseStart.getTime())) {
+            liveRange = `${translateText('Desde')} ${new Intl.DateTimeFormat(displayLocale(), { hour: '2-digit', minute: '2-digit' }).format(pauseStart)}`;
+          }
+        }
         const livePct = fillEl && fillEl.style ? Math.max(0, Math.min(100, parseFloat(fillEl.style.width) || 0)) : 0;
         const liveSig = info ? `${info.type}|${liveText}|${liveName}|${liveRange}|${Math.round(livePct)}` : '';
         if (pillLive.dataset.sig !== liveSig) {

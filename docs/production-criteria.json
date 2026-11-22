@@ -2351,6 +2351,13 @@
           ]
         },
         {
+          "file": "tests/pausa-desde-hora.test.mjs",
+          "namedCases": [
+            "Break y Lunch en curso sin horario muestran \"Desde la hora\" como la llamada",
+            "la llamada sigue mostrando su \"Desde la hora\""
+          ]
+        },
+        {
           "file": "tests/saltito-todo-el-boton.test.mjs",
           "namedCases": [
             "saltito: el icono, el nombre y el rosado de la pildora saltan juntos con el mismo movimiento",
