@@ -35,14 +35,17 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     serial = result.catch(() => {});
     return result;
   };
+  // La ventanita que cae del icono (o el panel lateral) es una pagina de la extension, sin pestaña: se le habla con runtime.sendMessage.
+  const EXT_PAGE = 'extension-page';
   async function sendToTab(tabId, packet) {
     let timer;
     try {
-      return await Promise.race([api.tabs.sendMessage(tabId, packet, { frameId: 0 }),
+      return await Promise.race([tabId === EXT_PAGE ? api.runtime.sendMessage(packet) : api.tabs.sendMessage(tabId, packet, { frameId: 0 }),
         new Promise(resolve => { timer = setTimeout(() => resolve(null), 4000); })]);
     } finally { clearTimeout(timer); }
   }
   const ownOrigin = () => { try { return api.runtime?.id ? `chrome-extension://${api.runtime.id}` : null; } catch { return null; } };
+  const viaOwnPage = sender => { try { return !sender.tab && ownOrigin() !== null && new URL(sender.url).origin === ownOrigin(); } catch { return false; } };
   const trackerSender = url => { try { const origin = new URL(url).origin; return origin === TRACKER_ORIGIN || (ownOrigin() !== null && origin === ownOrigin()); } catch { return false; } };
   // La ventana propia del tracker (pagina de la extension) manda sobre la web: si esta abierta y se identifica, las llamadas van solo a ella.
   async function trackers() {
@@ -50,6 +53,8 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     const ownTabs = own ? await api.tabs.query({ url: `${own}/panel.html*` }) : [];
     const ownFound = (await identify(ownTabs));
     if (ownFound.length) return ownFound;
+    const page = own ? await identify([{ id: EXT_PAGE }]) : [];
+    if (page.length) return page;
     return identify(await api.tabs.query({ url: `${TRACKER_ORIGIN}/*` }));
   }
   async function identify(tabs) {
@@ -436,12 +441,12 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
       await flush(); return result;
     }
     if (packet?.kind === 'tracker-status') {
-      if (sender.frameId !== 0 || !Number.isInteger(sender.tab?.id) || !accountScopeValid(packet.accountScope)) return null;
+      if (sender.frameId !== 0 || (!Number.isInteger(sender.tab?.id) && !viaOwnPage(sender)) || !accountScopeValid(packet.accountScope)) return null;
       if (!trackerSender(sender.url)) return null;
       return transact(state => state.accountScope === packet.accountScope ? automationStatus(state) : null);
     }
     if (packet?.kind === 'tracker-coordination') {
-      if (sender.frameId !== 0 || !Number.isInteger(sender.tab?.id) || !accountScopeValid(packet.accountScope)) return null;
+      if (sender.frameId !== 0 || (!Number.isInteger(sender.tab?.id) && !viaOwnPage(sender)) || !accountScopeValid(packet.accountScope)) return null;
       if (!trackerSender(sender.url)) return null;
       return transact(state => {
         if (state.accountScope !== packet.accountScope) return null;
@@ -450,12 +455,12 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
       });
     }
     if (packet?.kind === 'tracker-ready') {
-      if (sender.frameId !== 0 || !sender.tab || !accountScopeValid(packet.accountScope)) return null;
+      if (sender.frameId !== 0 || (!sender.tab && !viaOwnPage(sender)) || !accountScopeValid(packet.accountScope)) return null;
       if (!trackerSender(sender.url)) return null;
       const targets = await trackers();
       await transact(state => {
         if (!state.accountScope && targets.length > 1) state.attention = 'multiple-trackers';
-        if (!state.accountScope && !state.queue.length && targets.length === 1 && targets[0].accountScope === packet.accountScope && targets[0].tabId === sender.tab.id) {
+        if (!state.accountScope && !state.queue.length && targets.length === 1 && targets[0].accountScope === packet.accountScope && targets[0].tabId === (sender.tab ? sender.tab.id : EXT_PAGE)) {
           state.accountScope = targets[0].accountScope;
           state.mode = state.recordingPreference === false ? 'observe' : 'auto';
           state.preparation.enabled = state.firstCallPreference !== false;
