@@ -2351,6 +2351,13 @@
           ]
         },
         {
+          "file": "tests/pildora-termina-llamada.test.mjs",
+          "namedCases": [
+            "pildora en curso: tocarla responde tambien sin tarjetas (Freelancer o sin horario)",
+            "pildora en curso: el toque se conecta antes de salir por \"sin tarjetas\""
+          ]
+        },
+        {
           "file": "tests/boton-pildora-de-golpe.test.mjs",
           "namedCases": [
             "boton y pildora de golpe: sin transiciones propias en el relleno, el texto ni el borde",
