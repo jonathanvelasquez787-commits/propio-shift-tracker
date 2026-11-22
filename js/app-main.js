@@ -8600,6 +8600,7 @@ export function render() {
     setEarningsViewMode(earningsViewMode);
     wireAccordionPersistence();
     wireActionButtonPress();
+    wireActiveButtonKeepFilled();
     initSidebarNav();
     initHelpPage();
     // Toggle "Contraer bloques al terminar".
@@ -8676,6 +8677,30 @@ export function render() {
           { color: '#07101f', offset: .5 },
           { color: baseColor, offset: 1 },
         ], { duration: DURATION, easing: 'ease-out' });
+      });
+    }
+
+    // Si al tocar el boton queda "en curso" (turno, Break, Lunch, llamada), el pulso de relleno ya no
+    // debe retraerse a 0: se cancela el pulso del relleno y del texto y se queda el color fijo del CSS.
+    function keepActiveButtonFilled(btn) {
+      if (!btn || !btn.classList || !btn.classList.contains('is-active')) return;
+      btn.querySelectorAll('.action-ripple, .action-label, .action-sub').forEach(el => {
+        if (el && el.getAnimations) el.getAnimations().forEach(a => a.cancel());
+      });
+    }
+
+    function wireActiveButtonKeepFilled() {
+      document.addEventListener('click', (e) => {
+        const target = e.target instanceof Element ? e.target : null;
+        let btn = target ? target.closest('.action-btn') : null;
+        if (!btn) {
+          const pill = target ? target.closest('#heroBlockCard') : null;
+          const bar = pill ? pill.closest('.hero-shift-actions') : null;
+          if (bar) btn = bar.querySelector('#breakControlBtn.is-active, #lunchControlBtn.is-active, #callControlBtn.is-active');
+        }
+        if (!btn) return;
+        keepActiveButtonFilled(btn);
+        setTimeout(() => keepActiveButtonFilled(btn), 0);
       });
     }
 
