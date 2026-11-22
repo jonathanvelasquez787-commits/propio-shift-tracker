@@ -113,10 +113,10 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
   const pendCount = el('strong', 'ext-box-count', '0'); pendCount.id = 'extBoxPending'; pend.append(pendText, pendCount);
   const avail = el('div', 'ext-box-avail');
   const availHead = el('button', 'ext-box-row ext-box-fold', ''); availHead.type = 'button'; availHead.id = 'extBoxAvailBtn';
-  availHead.setAttribute('aria-expanded', 'false'); availHead.setAttribute('aria-controls', 'extBoxAvailBody');
-  const availArrow = el('span', 'ext-box-arrow', '▸'); availArrow.setAttribute('aria-hidden', 'true');
+  availHead.setAttribute('aria-expanded', 'true'); availHead.setAttribute('aria-controls', 'extBoxAvailBody');
+  const availArrow = el('span', 'ext-box-arrow', '▾'); availArrow.setAttribute('aria-hidden', 'true');
   availHead.append(el('b', '', 'Disponibilidad automática'), availArrow);
-  const availBody = el('div', 'ext-box-avail-body'); availBody.id = 'extBoxAvailBody'; availBody.hidden = true;
+  const availBody = el('div', 'ext-box-avail-body'); availBody.id = 'extBoxAvailBody'; availBody.hidden = false;
   const toggleRow = (id, title, note) => {
     const row = el('label', 'ext-box-row'); row.setAttribute('for', id);
     const text = el('span'); const small = el('small', '', note); text.append(el('b', '', title), small);
@@ -187,9 +187,12 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
   for (const i of [brkRow.input, lunchRow.input, modeSel]) i.addEventListener('change', () => act({ kind: 'resume-options', break: brkRow.input.checked, lunch: lunchRow.input.checked, mode: modeSel.value }));
   const saveSpacing = () => act({ kind: 'spacing', enabled: spacingRow.input.checked, minutes: Number(minInput.value) });
   spacingRow.input.addEventListener('change', saveSpacing); minInput.addEventListener('change', saveSpacing);
+  const setAvailOpen = open => { availBody.hidden = !open; availHead.setAttribute('aria-expanded', String(open)); availArrow.textContent = open ? '▾' : '▸'; };
   availHead.addEventListener('click', () => {
-    const open = availBody.hidden; availBody.hidden = !open; availHead.setAttribute('aria-expanded', String(open)); availArrow.textContent = open ? '▾' : '▸';
+    const open = availBody.hidden; setAvailOpen(open);
+    try { chromeApi.storage?.local?.set?.({ extBoxAvailOpen: open }); } catch { /* sin guardar: no pasa nada */ }
   });
+  try { Promise.resolve(chromeApi.storage?.local?.get?.('extBoxAvailOpen')).then(saved => { if (saved?.extBoxAvailOpen === false) setAvailOpen(false); }).catch(() => {}); } catch { /* sin leer */ }
   side.addEventListener('click', async () => {
     try { const w = await chromeApi.windows.getCurrent(); await chromeApi.sidePanel.open({ windowId: w.id }); globalThis.close?.(); } catch { /* sin panel lateral */ }
   });
