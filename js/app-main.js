@@ -2995,13 +2995,15 @@ function orderDayInfo(dayKey) {
   });
   const started = !!shiftStart;
   // Un dia pasado sin turno (libre, vacaciones o sin datos) no cuenta ni a favor ni en contra.
-  const status = dayOrderStatus({ started, ended: !!closedEnd, disorderMin: breakdown.total, off: (off || isPast) && !started });
+  const favorMin = favorMinutes(lastOriginal ? lastOriginal.slotEnd : null, closedEnd);
+  // Lo trabajado despues de tu hora de salida paga primero el desorden: un dia compensado cuenta en orden.
+  const status = dayOrderStatus({ started, ended: !!closedEnd, disorderMin: Math.max(0, breakdown.total - favorMin), off: (off || isPast) && !started });
   return {
     key: dayKey,
     status,
     started,
     disorderMin: breakdown.total,
-    favorMin: favorMinutes(lastOriginal ? lastOriginal.slotEnd : null, closedEnd),
+    favorMin,
     earned: started ? importedCallStats(dayCalls).earnings : 0,
   };
 }

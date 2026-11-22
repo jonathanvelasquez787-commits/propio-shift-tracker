@@ -21,26 +21,30 @@ export function sanitizeOrderTope(value, fallback = 60) {
   return Number.isFinite(n) && n >= 1 && n <= 480 ? n : fallback;
 }
 
-// debtMin: lo que se debe (tope incluido). favorMin: minutos trabajados despues de tu hora de salida.
-// netMin: favor menos deuda. lostMoney: dinero que el desorden dejo ir (sin tope).
-// inOrderMoney: lo ganado en un dia sin desorden.
+// Los minutos a favor (trabajados despues de tu hora de salida) pagan primero el desorden del dia.
+// remainingMin: desorden que queda sin pagar. debtMin: ese resto con el tope del usuario.
+// favorMin: lo que sobra a favor. netMin: favor menos deuda. lostMoney: dinero del desorden sin pagar (sin tope).
+// inOrderMoney: lo ganado en un dia que termina sin desorden por pagar.
 export function orderSummary({ disorderMin = 0, topeMin = 60, ratePerMin = 0, earned = 0, started = false, favorMin = 0 } = {}) {
   const total = Math.max(0, Math.round(Number(disorderMin) || 0));
   const tope = sanitizeOrderTope(topeMin);
-  const debtMin = Math.min(total, tope);
-  const favor = Math.max(0, Math.round(Number(favorMin) || 0));
+  const favorTotal = Math.max(0, Math.round(Number(favorMin) || 0));
+  const remainingMin = Math.max(0, total - favorTotal);
+  const favor = Math.max(0, favorTotal - total);
+  const debtMin = Math.min(remainingMin, tope);
   const rate = Math.max(0, Number(ratePerMin) || 0);
   return {
     started: !!started,
     disorderMin: total,
+    remainingMin,
     topeMin: tope,
     debtMin,
     debtPct: debtMin / tope,
     favorMin: favor,
     favorPct: Math.min(1, favor / tope),
     netMin: favor - debtMin,
-    lostMoney: total * rate,
-    inOrderMoney: started && total === 0 ? Math.max(0, Number(earned) || 0) : 0,
+    lostMoney: remainingMin * rate,
+    inOrderMoney: started && remainingMin === 0 ? Math.max(0, Number(earned) || 0) : 0,
   };
 }
 

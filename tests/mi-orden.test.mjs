@@ -37,9 +37,24 @@ test('mi orden cuenta como a favor lo trabajado despues de la hora de salida', (
   assert.equal(favorMinutes(at('15:00'), at('15:40')), 40);
   assert.equal(favorMinutes(at('15:00'), at('14:50')), 0);
   assert.equal(favorMinutes(at('15:00'), null), 0);
-  const summary = orderSummary({ disorderMin: 95, topeMin: 60, favorMin: 20, ratePerMin: 0.12, started: true });
-  assert.equal(summary.netMin, -40);
-  assert.equal(summary.favorPct, 20 / 60);
+});
+
+test('mi orden paga el desorden con los minutos a favor y el dinero perdido sigue a la deuda', () => {
+  const parcial = orderSummary({ disorderMin: 95, topeMin: 60, favorMin: 20, ratePerMin: 0.12, started: true });
+  assert.equal(parcial.remainingMin, 75);
+  assert.equal(parcial.debtMin, 60);
+  assert.equal(parcial.favorMin, 0);
+  assert.equal(parcial.netMin, -60);
+  assert.ok(Math.abs(parcial.lostMoney - 9) < 1e-9);
+  const pagado = orderSummary({ disorderMin: 95, topeMin: 60, favorMin: 95, ratePerMin: 0.12, earned: 7, started: true });
+  assert.equal(pagado.debtMin, 0);
+  assert.equal(pagado.netMin, 0);
+  assert.equal(pagado.lostMoney, 0);
+  assert.equal(pagado.inOrderMoney, 7);
+  const sobra = orderSummary({ disorderMin: 30, topeMin: 60, favorMin: 50, started: true });
+  assert.equal(sobra.favorMin, 20);
+  assert.equal(sobra.netMin, 20);
+  assert.equal(sobra.favorPct, 20 / 60);
 });
 
 test('mi orden da el estado de cada dia y la racha con su dia de perdon', () => {
@@ -123,6 +138,7 @@ test('mi orden sin turno muestra el aviso y sin desorden se ve en orden', () => 
   renderMiOrden(emptyData({ summary: orderSummary({ disorderMin: 0, started: true, earned: 5 }) }), tools, doc);
   assert.match(els.miOrdenChips.innerHTML, /En orden/);
   assert.match(els.miOrdenBody.innerHTML, /\+\$5\.00/);
+  assert.ok(!els.miOrdenBody.innerHTML.includes('-$0.00'), 'sin desorden no se muestra -$0.00');
 });
 
 test('mi orden tiene su tarjeta plegable con id fijo y estilos del tema', () => {

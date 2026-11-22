@@ -35,7 +35,7 @@ function balanceTile(summary, translateText) {
   </div>
 </div>
 <div class="mo-money-row">
-  <div class="mo-tile mo-money mo-money-bad"><span class="mo-label">${esc(translateText('Perdido por desorden'))}</span><div class="mo-money-value mo-bad" data-mo-lost>-${esc(summary.lostText)}</div></div>
+  <div class="mo-tile mo-money mo-money-bad"><span class="mo-label">${esc(translateText('Perdido por desorden'))}</span><div class="mo-money-value mo-bad" data-mo-lost>${summary.lostRaw > 0 ? '-' : ''}${esc(summary.lostText)}</div></div>
   <div class="mo-tile mo-money mo-money-good"><span class="mo-label">${esc(translateText('Dinero en orden'))}</span><div class="mo-money-value mo-good">+${esc(summary.inOrderText)}</div></div>
 </div>`;
 }
@@ -96,7 +96,7 @@ export function renderMiOrden(data, tools, doc = document) {
   const translateText = tools.translateText;
   const money = tools.money;
   const { summary, streak, week, reward } = data;
-  const shown = { ...summary, lostText: money(summary.lostMoney), inOrderText: money(summary.inOrderMoney) };
+  const shown = { ...summary, lostRaw: summary.lostMoney, lostText: money(summary.lostMoney), inOrderText: money(summary.inOrderMoney) };
   const list = [];
   if (!summary.started) list.push(chip('muted', translateText('Sin turno todavía')));
   else if (summary.netMin < 0) list.push(chip('bad', `${summary.netMin} min`), chip('bad', `-${money(summary.lostMoney)}`));
