@@ -1,5 +1,5 @@
 // El icono de la extension abre (o enfoca) la ventana propia del tracker, sin pestañas ni barra de direcciones.
-export const WINDOW_SIZE = { width: 640, height: 900 };
+export const WINDOW_SIZE = { width: 490, height: 620 };
 export function installWindowLauncher(api) {
   async function open() {
     const url = api.runtime.getURL('panel.html');
