@@ -145,6 +145,7 @@ import { acwMinutesForBlock } from './block-acw.js';
 import { activeAppKeys } from './sync.js';
 import { disorderBreakdown, orderSummary, sanitizeOrderTope, favorMinutes, dayOrderStatus, walkStreak, rewardProgress } from './orden-model.js';
 import { renderMiOrden, setMiOrdenEditing } from './orden-view.js';
+import { initExtensionBox } from './extension-box.js';
 
 import {
   state, calls, settings, reportsMonthlyOffset, calMonthOffset, calViewMode, calYearOffset,
@@ -8061,6 +8062,7 @@ export function render() {
     document.getElementById('eraseAllDataBtn').addEventListener('click', eraseAllData);
     document.getElementById('snapshotRecoveryBtn').addEventListener('click', () => useSnapshotTools('openSnapshotRecovery'));
     document.getElementById('ajustesHeaderBtn').addEventListener('click', openSettingsModal);
+    initExtensionBox();
     document.getElementById('saveAccountProfileBtn').addEventListener('click', saveAccountProfile);
     document.getElementById('higherRateHeaderBtn').addEventListener('click', () => {
       openModal('higherRateModal');
