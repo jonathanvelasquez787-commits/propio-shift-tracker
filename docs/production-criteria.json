@@ -2468,6 +2468,7 @@
             "mi orden no cuenta nada dentro de la gracia ni sin turno iniciado",
             "mi orden limita la deuda al tope pero el dinero perdido no tiene tope",
             "mi orden cuenta como a favor lo trabajado despues de la hora de salida",
+            "mi orden paga el desorden con los minutos a favor y el dinero perdido sigue a la deuda",
             "mi orden da el estado de cada dia y la racha con su dia de perdon",
             "mi orden calcula el avance de la recompensa que escribe el usuario",
             "mi orden dibuja balance, racha, semana, tope y el formulario de recompensa",
