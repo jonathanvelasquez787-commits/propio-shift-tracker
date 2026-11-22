@@ -182,10 +182,10 @@ test('pildora icono blanco: con un bloque en curso el icono y los puntitos de la
   assert.match(block, /\.hbc-dots i\.on \{ background: white !important; \}/);
 });
 
-test('capsula un solo boton: al tocar la pildora en curso se anima su boton igual que al tocar el boton', () => {
+test('capsula un solo boton: tocar la pildora en curso no dispara un pulso aparte en el boton', () => {
   const start = main.indexOf('function wireActionButtonPress');
   const block = main.slice(start, start + 1500);
   assert.match(block, /closest\('#heroBlockCard'\)/);
   assert.match(block, /dataset\.liveType/);
-  assert.match(block, /playActionPressAnimation\(liveBtn\)/);
+  assert.doesNotMatch(block, /playActionPressAnimation\(liveBtn\)/);
 });

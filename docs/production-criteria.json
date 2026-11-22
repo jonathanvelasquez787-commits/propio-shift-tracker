@@ -1357,7 +1357,7 @@
             "sin pildora en reposo: sin Break, Lunch ni Llamada en curso la pildora de bloques no se muestra y la barra no deja hueco",
             "capsula sin repetido: en compu el boton en curso muestra solo el icono y tocar la pildora en curso hace lo mismo que tocar su boton",
             "pildora icono blanco: con un bloque en curso el icono y los puntitos de la pildora van blancos",
-            "capsula un solo boton: al tocar la pildora en curso se anima su boton igual que al tocar el boton"
+            "capsula un solo boton: tocar la pildora en curso no dispara un pulso aparte en el boton"
           ]
         },
         {
@@ -2341,6 +2341,13 @@
           "file": "tests/capsula-sin-subir.test.mjs",
           "namedCases": [
             "al pasar el mouse por la capsula en curso ninguna pieza sube sola"
+          ]
+        },
+        {
+          "file": "tests/boton-pildora-de-golpe.test.mjs",
+          "namedCases": [
+            "boton y pildora de golpe: sin transiciones propias en el relleno, el texto ni el borde",
+            "boton y pildora de golpe: tocar Break, Lunch o Llamada no corre un pulso solo en el boton"
           ]
         },
         {
