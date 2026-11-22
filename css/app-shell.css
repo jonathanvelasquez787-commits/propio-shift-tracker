@@ -2857,3 +2857,8 @@ html.theme-light #scheduleConfigAccordion .sched-bk-name-select { color-scheme: 
 .chips > .hero-shift-actions .action-slot > .action-btn.is-active .action-label,
 .chips > .hero-shift-actions .action-slot > .action-btn.is-active .action-sub { transition: none; }
 /* fin relleno en curso */
+
+/* union boton pildora */
+/* El boton en curso (Break, Lunch, llamada) y su pildora se ven como una sola pieza: mismo color de borde, sin costura. */
+.chips > .hero-shift-actions:is([data-live-type="break"],[data-live-type="lunch"],[data-live-type="call"]) .action-slot > :is(#breakControlBtn,#lunchControlBtn,#callControlBtn).is-active { border-color: var(--hbc-live-fill); }
+/* fin union boton pildora */
