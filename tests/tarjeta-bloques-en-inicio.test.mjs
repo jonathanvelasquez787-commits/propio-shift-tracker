@@ -169,7 +169,7 @@ test('capsula sin repetido: en compu el boton en curso muestra solo el icono y t
   const adv = main.slice(main.indexOf('function advanceHeroBlockCard'), main.indexOf('function wireHeroBlockCard'));
   assert.match(adv, /dataset\.liveType/);
   assert.match(adv, /liveBtn\.click\(\)/);
-  assert.match(adv, /else \{\s*heroBlockCardGo/);
+  assert.match(adv, /if \(!inLive\) \{\s*heroBlockCardGo/);
 });
 
 test('pildora icono blanco: con un bloque en curso el icono y los puntitos de la pildora van blancos', () => {

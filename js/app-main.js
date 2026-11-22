@@ -6771,15 +6771,17 @@ function heroBlockCardGo(host, next, animate) {
 function advanceHeroBlockCard() {
   const host = document.getElementById('heroBlockCard');
   if (!host || host.hidden) return;
-  const total = host.querySelectorAll('.hbc-slide').length;
-  if (total < 2) return;
   // Con un Break, Lunch o Llamada en curso la píldora es parte de su botón: tocarla hace lo mismo que tocar el botón (con sus mismos efectos) y no cambia de bloque.
+  // Esto va ANTES de contar las tarjetas: en modo Freelancer o sin horario la píldora no tiene tarjetas y aun así debe responder al toque.
   const bar = typeof host.closest === 'function' ? host.closest('.hero-shift-actions') : null;
   const inLive = !!(bar && bar.dataset && bar.dataset.liveType);
   if (inLive) {
     const liveBtn = typeof bar.querySelector === 'function' ? bar.querySelector('#breakControlBtn.is-active, #lunchControlBtn.is-active, #callControlBtn.is-active, #callControlBtn.is-pending') : null;
     if (liveBtn) { liveBtn.click(); return; }
-  } else {
+  }
+  const total = host.querySelectorAll('.hbc-slide').length;
+  if (total < 2) return;
+  if (!inLive) {
     heroBlockCardGo(host, heroBlockCardIdx + 1, true);
   }
   // En celular el horario se ve unos segundos después de tocar.
@@ -6805,6 +6807,8 @@ function renderBlockSummaryStrip(cards) {
   if (!host) return;
   const stack = host.querySelector('.hbc-stack');
   if (!stack) return;
+  // Se conecta el toque ANTES de salir por "sin tarjetas": en Freelancer o sin horario la pildora tambien debe terminar la llamada.
+  wireHeroBlockCard();
   if (!Array.isArray(cards) || !cards.length) {
     host.hidden = !host.closest?.('.hero-shift-actions')?.dataset.liveType;
     stack.innerHTML = '';
