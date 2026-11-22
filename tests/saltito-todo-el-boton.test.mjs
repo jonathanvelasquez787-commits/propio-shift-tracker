@@ -19,6 +19,14 @@ test('saltito: el icono, el nombre y el rosado de la pildora saltan juntos con e
   assert.match(block, /a\.id = 'action-hop'/);
 });
 
+test('saltito: sale al soltar, despues del cambio de estado, y todo junto en el mismo cuadro', () => {
+  const start = js.indexOf('function wireActionHop');
+  const block = js.slice(start, js.indexOf('function wireActionButtonPress'));
+  assert.match(block, /addEventListener\('click'/);
+  assert.doesNotMatch(block, /playActionHop\(actionHopTargets\(target\)\)/);
+  assert.match(block, /requestAnimationFrame\(\(\) => playActionHop\(actionHopTargets\(btn\)\)\)/);
+});
+
 test('saltito: se conecta una sola vez y los pulsos de otras animaciones no lo cancelan', () => {
   assert.equal((js.match(/wireActionHop\(\);/g) || []).length, 1);
   assert.equal((js.match(/a\.id !== 'action-hop'/g) || []).length, 2);
