@@ -27,7 +27,8 @@ test('cuadro de disponibilidad: cada control manda el mismo paquete que la venta
   const src = read('js/extension-box.js');
   for (const piece of ["kind: 'pause-availability', paused:", "kind: 'prepare-first', enabled:", "kind: 'resume-options', break:", "kind: 'spacing', enabled:"]) assert.ok(src.includes(piece), piece);
   for (const id of ['extBoxAvailBtn', 'extBoxAvailBody', 'extBoxPaused', 'extBoxFirst', 'extBoxResumeBreak', 'extBoxResumeLunch', 'extBoxResumeMode', 'extBoxSpacing', 'extBoxMinutes']) assert.ok(src.includes(`'${id}'`), id);
-  assert.ok(src.includes("availBody.hidden = true"), 'empieza plegada');
+  assert.ok(src.includes("availBody.hidden = false"), 'empieza abierta');
+  assert.ok(src.includes('extBoxAvailOpen') && src.includes('storage?.local?.set') && src.includes('storage?.local?.get'), 'recuerda si la dejaste abierta o cerrada');
   assert.ok(!/<details/.test(src), 'sin details');
   const css = read('css/app-shell.css');
   const block = css.slice(css.indexOf('/* cuadro extension */'), css.indexOf('/* fin cuadro extension */'));
