@@ -1,5 +1,6 @@
 // Icono del encabezado + cuadro con el estado de la extension (solo dentro de la extension de Chrome).
 import { automationStatusView } from './automation-status.js';
+import { installAutomationStatusUi } from './automation-ui.js';
 
 const AVAILABILITY_REASONS = {
   connection: 'Esperando la conexión con Propio y Propio Shift Tracker.', schedule: 'La pestaña de Propio Shift Tracker todavía no confirma el horario y los descansos.',
@@ -178,10 +179,31 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
   const availNote = el('p', 'ext-box-note'); availNote.id = 'extBoxAvailNote'; availNote.setAttribute('role', 'status');
   availBody.append(pausedRow.row, firstRow.row, brkRow.row, lunchRow.row, modeRow, resumeNote, spacingRow.row, minRow, spacingNote, availNote);
   avail.append(availHead, availBody);
-  box.append(head, conn, rec, pend, queueBox, discardWrap, avail);
+  const doing = el('div', 'ext-box-avail'); doing.id = 'extBoxDoing';
+  const doingHead = el('button', 'ext-box-row ext-box-fold', ''); doingHead.type = 'button'; doingHead.id = 'extBoxDoingBtn';
+  doingHead.setAttribute('aria-expanded', 'true'); doingHead.setAttribute('aria-controls', 'automationPanel');
+  const doingArrow = el('span', 'ext-box-arrow', '▾'); doingArrow.setAttribute('aria-hidden', 'true');
+  doingHead.append(el('b', '', 'Qué hará la extensión ahora'), doingArrow);
+  const doingBody = el('div', 'ext-box-avail-body ext-box-doing'); doingBody.id = 'automationPanel'; doingBody.hidden = false;
+  const doingTitleLine = el('p', 'ext-box-doing-title');
+  const doingTitle = el('strong', '', 'Sin conexión confirmada'); doingTitle.id = 'automationTitle'; doingTitle.setAttribute('role', 'status'); doingTitle.setAttribute('aria-live', 'polite');
+  const doingClock = el('strong', 'ext-box-clock', ''); doingClock.id = 'automationCountdown'; doingClock.setAttribute('aria-label', 'Tiempo para el próximo intento'); doingClock.hidden = true;
+  doingTitleLine.append(doingTitle, doingClock);
+  const doingP = id => { const p = el('p', 'ext-box-check'); p.id = id; return p; };
+  const doingDetail = doingP('automationDetail'); doingDetail.className = 'ext-box-note';
+  const acw = el('div', 'ext-box-acw'); acw.id = 'automationAcwProgress'; acw.hidden = true;
+  const acwBar = el('progress'); acwBar.id = 'automationAcwProgressBar'; acwBar.max = 100; acwBar.value = 0; acwBar.setAttribute('aria-label', 'Progreso de la espera entre llamadas');
+  const acwLabel = el('p', 'ext-box-note'); acwLabel.id = 'automationAcwProgressLabel'; acw.append(acwBar, acwLabel);
+  const checks = el('div', 'ext-box-checks');
+  for (const id of ['automationTrackerCheck', 'automationPortalCheck', 'automationConnectionCheck', 'automationWorkCheck', 'automationScheduleCheck', 'automationHoursCheck', 'automationFirstCheck', 'automationReturnsCheck', 'automationPauseCheck', 'automationOptionsCheck']) checks.append(doingP(id));
+  const hoursFold = fold('extBoxHoursBtn', 'Sobre estos horarios'), hoursBody = el('p', 'ext-box-note', 'El inicio usa tu horario o tu llamada real. El cálculo está en Reportes, dentro de Jornada.'); hoursBody.id = 'extBoxHours'; hoursBody.hidden = true;
+  doingBody.append(doingTitleLine, doingDetail, acw, checks, hoursFold.b, hoursBody);
+  doing.append(doingHead, doingBody);
+  box.append(head, conn, rec, pend, queueBox, discardWrap, avail, doing);
   doc.body.append(box);
 
-  let busy = false, feedback = '', shown = false, timer = null;
+  let busy = false, feedback = '', shown = false, timer = null, workSession = null;
+  const automationUi = installAutomationStatusUi({ host: globalThis, document: doc, getWorkSession: () => workSession });
   const send = packet => chromeApi.runtime.sendMessage(packet);
   function place() {
     const r = icon.getBoundingClientRect(), y = (globalThis.scrollY || 0);
@@ -191,6 +213,8 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
     let state = null;
     try { state = await send({ kind: 'status' }); } catch { state = null; }
     const m = extensionBoxModel(state);
+    workSession = state?.preparation?.plan?.workSession || null;
+    automationUi.update(state?.ok === false ? null : state?.automationStatus || null);
     icon.dataset.extDot = m.dot;
     icon.title = m.dot === 'on' ? 'Extensión de Chrome: registrando' : 'Extensión de Chrome';
     badge.textContent = m.badge; badge.classList.toggle('is-on', m.paired);
@@ -247,6 +271,13 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
     try { chromeApi.storage?.local?.set?.({ extBoxAvailOpen: open }); } catch { /* sin guardar: no pasa nada */ }
   });
   try { Promise.resolve(chromeApi.storage?.local?.get?.('extBoxAvailOpen')).then(saved => { if (saved?.extBoxAvailOpen === false) setAvailOpen(false); }).catch(() => {}); } catch { /* sin leer */ }
+  const setDoingOpen = open => { doingBody.hidden = !open; doingHead.setAttribute('aria-expanded', String(open)); doingArrow.textContent = open ? '▾' : '▸'; };
+  doingHead.addEventListener('click', () => {
+    const open = doingBody.hidden; setDoingOpen(open);
+    try { chromeApi.storage?.local?.set?.({ extBoxDoingOpen: open }); } catch { /* sin guardar: no pasa nada */ }
+  });
+  try { Promise.resolve(chromeApi.storage?.local?.get?.('extBoxDoingOpen')).then(saved => { if (saved?.extBoxDoingOpen === false) setDoingOpen(false); }).catch(() => {}); } catch { /* sin leer */ }
+  wireFold(hoursFold, hoursBody);
   side.addEventListener('click', async () => {
     try { const w = await chromeApi.windows.getCurrent(); await chromeApi.sidePanel.open({ windowId: w.id }); globalThis.close?.(); } catch { /* sin panel lateral */ }
   });
@@ -257,5 +288,5 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
   globalThis.addEventListener?.('resize', () => { if (shown) place(); });
   refresh().catch(() => {});
   timer = setInterval(() => { if (!doc.hidden) refresh().catch(() => {}); }, 10000);
-  return { icon, box, refresh, stop: () => clearInterval(timer) };
+  return { icon, box, refresh, stop: () => { clearInterval(timer); automationUi.stop(); } };
 }
