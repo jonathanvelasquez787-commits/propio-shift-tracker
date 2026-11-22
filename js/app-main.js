@@ -4099,7 +4099,8 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
     // A diferencia de pauseActionDisabled (Break/Lunch), iniciar una llamada NO exige que ya haya
     // llamadas de ese día para anclar el auto-inicio del turno.
     function callActionDisabled() {
-      return !isViewingToday() || (!state.activeCall && liveCallDayIsOff());
+      // Una llamada real es trabajo aunque el horario marque el dia como libre: el boton nunca se bloquea por eso.
+      return !isViewingToday();
     }
 
     function liveCallDayIsOff() {
@@ -4417,11 +4418,6 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       if (state.activeCall) return;
       if (!canPersistLocalChanges()) return false;
       const before = JSON.parse(JSON.stringify(state));
-      if (liveCallDayIsOff()) {
-        toast(translateText('Hoy es tu día libre'));
-        return false;
-      }
-
       const now = new Date(options.startedAt || Date.now());
       const nowISO = now.toISOString();
       let interruptedPauseRollback = null;
@@ -6401,7 +6397,7 @@ function renderHeader() {
   const callTimer = document.getElementById('callControlTimer');
   callLabel.textContent = callActionLabel();
   callTimer.textContent = viewingToday
-    ? (!state.activeCall && liveCallDayIsOff() ? translateText('Hoy es tu día libre') : callActionTimer())
+    ? callActionTimer()
     : translateText("Solo en 'Hoy'");
   callBtn.disabled = callActionDisabled();
   const callActive = !!state.activeCall;
