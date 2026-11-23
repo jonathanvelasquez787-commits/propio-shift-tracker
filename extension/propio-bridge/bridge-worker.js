@@ -3,6 +3,7 @@ import { validatePortalRecord, portalRecordKey } from '../../js/propio-history-r
 import { createAutomationStatus } from '../../js/automation-status.js';
 import { validateAutomationLease } from '../../js/automation-lease.js';
 import { createWorkerSession } from './worker-session.js';
+import { createWorkerLease } from './worker-lease.js';
 
 const KEY = 'bridge-v1';
 const URLS = [`${PORTAL_ORIGIN}/*`, ...TWILIO_EVENT_ORIGINS.map(origin => `${origin}/v4/EndpointEvents*`)];
@@ -43,6 +44,7 @@ export function pendingQueueSummary(queue, now = Date.now()) {
 }
 export function createBridgeWorker(api, { now = () => Date.now(), randomId = () => crypto.randomUUID(), sessionOptions = {} } = {}) {
   const workerSession = createWorkerSession(api, { now, ...sessionOptions });
+  const workerLease = createWorkerLease(api, workerSession, { now, ...sessionOptions });
   const reduce = createPropioReducer({ randomId }), pending = new Map();
   let serial = Promise.resolve(), flushing = null, acceptedLease = null, leaseDeadline = 0;
   let shownBadge = null;
@@ -171,6 +173,15 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     if (Number.isFinite(seen) && now() - seen >= SILENT_LIMIT_MS) return seen;
     if (Number.isFinite(start) && now() - start >= CALL_MAX_MS) return Math.min(Date.parse(tab.aliveAt) || start, start + CALL_MAX_MS - 10 * 60000);
     return null;
+  }
+  // Parte 2: el worker pide su propio permiso de la nube (90 s) con SU sesion. Solo si hay cuenta, dueño, modo automatico,
+  // esta PC no es "solo registro" y la disponibilidad no esta en pausa. Sin sesion del worker no hace nada y lo deja dicho.
+  async function renewWorkerLease() {
+    const info = await transact(state => ({ scope: state.accountScope, owner: state.coordinationOwner, auto: state.mode === 'auto', passive: state.preparation.devicePassive === true, paused: state.preparation.availabilityPaused === true }));
+    if (!info.scope) return workerLease.skip('no-account');
+    if (!info.auto || info.passive || info.paused) return workerLease.skip('off');
+    if (!info.owner) return workerLease.skip('no-owner');
+    return workerLease.renew({ scope: info.scope, owner: info.owner });
   }
   async function heartbeat() {
     const active = await transact(state => Object.entries(state.tabs).filter(([, tab]) => tab?.active).map(([id]) => id));
@@ -620,7 +631,7 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
       const scope = await transact(state => state.accountScope);
       return workerSession.signIn(scope);
     }
-    if (packet?.kind === 'worker-session-signout') return workerSession.signOut();
+    if (packet?.kind === 'worker-session-signout') { await workerLease.clear(); return workerSession.signOut(); }
     if (packet?.kind === 'device-passive') {
       if (typeof packet.enabled !== 'boolean') return { ok: false, reason: 'invalid-mode' };
       return transact(async state => {
@@ -647,7 +658,7 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
       const call = ['connected', 'incoming', 'idle'].find(kind => authenticated.some(tab => tab.call === kind)) || 'unknown';
       const layout = portals.length === 1 && portals[0].layout && now() >= Date.parse(portals[0].layout.reportedAt) && now() - Date.parse(portals[0].layout.reportedAt) < 15000 ? portals[0].layout : null;
       const workerSessionState = await workerSession.status(state.accountScope);
-      return { workerSession: workerSessionState, mode: state.mode, paired: !!state.accountScope, active: Object.values(state.tabs).some(tab => tab.active), completed: state.completed, history: state.history || null, layout, preparation: state.preparation, automationStatus: automationStatus(state), queued: state.queue.length, queueSummary: pendingQueueSummary(state.queue, now()), queueItems: state.queue.slice(0, 50).map(item => ({ type: item.event.type, at: item.event.at })), last: state.last, attention: state.attention, call, portal: authenticated.length ? 'authenticated' : portals.some(tab => tab.session === 'logged-out') ? 'logged-out' : 'unknown', diagnostic: state.diagnostic || { requests: 0, recognized: 0, last: [] } };
+      return { workerSession: workerSessionState, workerLease: await workerLease.status(), mode: state.mode, paired: !!state.accountScope, active: Object.values(state.tabs).some(tab => tab.active), completed: state.completed, history: state.history || null, layout, preparation: state.preparation, automationStatus: automationStatus(state), queued: state.queue.length, queueSummary: pendingQueueSummary(state.queue, now()), queueItems: state.queue.slice(0, 50).map(item => ({ type: item.event.type, at: item.event.at })), last: state.last, attention: state.attention, call, portal: authenticated.length ? 'authenticated' : portals.some(tab => tab.session === 'logged-out') ? 'logged-out' : 'unknown', diagnostic: state.diagnostic || { requests: 0, recognized: 0, last: [] } };
     }
     if (packet?.kind === 'pair') {
       const targets = await trackers();
@@ -755,10 +766,11 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
       message(packet, sender).then(respond, () => respond({ ok: false, reason: 'storage' })); return true;
     });
     api.alarms.create('retry-bridge', { periodInMinutes: 0.5 });
-    api.alarms.onAlarm.addListener(alarm => { if (alarm.name === 'retry-bridge') heartbeat().then(beat => beat || flush()).catch(() => {}); });
-    api.runtime.onStartup?.addListener(() => { heartbeat().catch(() => {}); });
+    api.alarms.onAlarm.addListener(alarm => { if (alarm.name === 'retry-bridge') { renewWorkerLease().catch(() => {}); heartbeat().then(beat => beat || flush()).catch(() => {}); } });
+    api.runtime.onStartup?.addListener(() => { renewWorkerLease().catch(() => {}); heartbeat().catch(() => {}); });
+    renewWorkerLease().catch(() => {});
     heartbeat().catch(() => {});
     api.tabs.onRemoved.addListener(tabId => { tabRemoved(tabId).catch(() => {}); });
   }
-  return { install, beforeRequest, completed, message, navigationCommitted, flush, refreshBackground, tabRemoved, heartbeat };
+  return { install, beforeRequest, completed, message, navigationCommitted, flush, refreshBackground, tabRemoved, heartbeat, renewWorkerLease };
 }

@@ -173,6 +173,26 @@ export function extensionWorkerSessionModel(state) {
   return { text, canConnect: paired && ws.state !== 'ok' && ws.state !== 'offline', canRemove: ws.state !== 'none' };
 }
 
+// «Permiso del worker» (Parte 2 del permiso con todo cerrado). Funcion pura. Solo informa: el worker aun no pulsa Start Calls solo.
+export function extensionWorkerLeaseModel(state) {
+  const ws = state && state.ok !== false && state.workerSession && typeof state.workerSession === 'object' ? state.workerSession : { state: 'none' };
+  const wl = state && state.ok !== false && state.workerLease && typeof state.workerLease === 'object' ? state.workerLease : { state: 'none' };
+  const asks = Number(wl.asks) || 0, detail = typeof wl.detail === 'string' && wl.detail ? ` (${wl.detail.slice(0, 60)})` : '';
+  if (ws.state === 'none' || ws.state === 'expired' || ws.state === 'wrong-account') return 'Permiso del worker: no se pide hasta que conectes la sesión del worker.';
+  const text = wl.state === 'granted' ? 'concedido'
+    : wl.state === 'lapsed' ? 'se venció y todavía no se renovó'
+    : wl.state === 'denied' ? 'negado (otra instalación tiene el permiso)'
+    : wl.state === 'network' ? 'sin red en el último intento'
+    : wl.state === 'error' ? `la nube respondió con error${detail}`
+    : wl.state === 'bad-answer' ? 'respuesta rara de la nube'
+    : wl.state === 'no-session' ? 'sin sesión válida del worker'
+    : wl.state === 'off' ? 'no se pide ahora (modo automático apagado, esta PC en «solo registro» o en pausa)'
+    : wl.state === 'no-owner' ? 'esperando que la ventanita se abra una vez'
+    : wl.state === 'no-account' ? 'sin cuenta vinculada'
+    : 'todavía sin pedir';
+  return `Permiso del worker: ${text} · pedidos: ${asks}`;
+}
+
 export function initExtensionBox(doc = globalThis.document, chromeApi = globalThis.chrome, loc = globalThis.location, reinforcement = null) {
   if (!doc || !loc || loc.protocol !== 'chrome-extension:' || !chromeApi?.runtime?.sendMessage) return null;
   const anchor = doc.getElementById('higherRateHeaderBtn');
@@ -326,8 +346,9 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
   const leaseNote = el('p', 'ext-box-note'); leaseNote.id = 'extBoxLeaseNote';
   const workerNote = el('p', 'ext-box-note'); workerNote.id = 'extBoxWorkerNote';
   const workerLogin = btn('Conectar sesión del worker', 'extBoxWorkerLogin'), workerLogout = btn('Quitar sesión del worker', 'extBoxWorkerLogout');
+  const workerLeaseNote = el('p', 'ext-box-note'); workerLeaseNote.id = 'extBoxWorkerLeaseNote';
   const workerBtns = el('div', 'ext-box-worker'); workerBtns.append(workerLogin, workerLogout);
-  availBody.append(pausedRow.row, firstRow.row, brkRow.row, lunchRow.row, modeRow, resumeNote, spacingRow.row, minRow, spacingNote, availNote, leaseNote, workerNote, workerBtns);
+  availBody.append(pausedRow.row, firstRow.row, brkRow.row, lunchRow.row, modeRow, resumeNote, spacingRow.row, minRow, spacingNote, availNote, leaseNote, workerNote, workerLeaseNote, workerBtns);
   avail.append(availHead, availBody);
   const doing = el('div', 'ext-box-avail'); doing.id = 'extBoxDoing';
   const doingHead = el('button', 'ext-box-row ext-box-fold', ''); doingHead.type = 'button'; doingHead.id = 'extBoxDoingBtn';
@@ -427,6 +448,7 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
     resumeNote.textContent = a.resumeNote; spacingNote.textContent = a.spacingNote; availNote.textContent = a.status;
     const ws = extensionWorkerSessionModel(state);
     workerNote.textContent = ws.text; workerLogin.hidden = !ws.canConnect; workerLogin.disabled = busy; workerLogout.hidden = !ws.canRemove; workerLogout.disabled = busy; workerBtns.hidden = !ws.canConnect && !ws.canRemove;
+    workerLeaseNote.textContent = extensionWorkerLeaseModel(state);
     leaseNote.textContent = extensionLeaseModel(typeof globalThis.__pstLeaseDiagnostic === 'function' ? globalThis.__pstLeaseDiagnostic() : null);
   }
   async function act(packet, okText) {
