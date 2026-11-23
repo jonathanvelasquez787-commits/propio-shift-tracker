@@ -1,5 +1,11 @@
 import { compareCallRecords, preserveCallRecords, unfinishedCallIntervals } from './call-records.js';
 
+// Nota simple de por que el final de la medicion es aproximado (la extension cerro la llamada sin ver la desconexion).
+function approxEndHtml(tool, translateText, esc) {
+  const text = tool?.endedBy === 'portal-closed' ? translateText('Fin aproximado: se cerró la pestaña de Propio durante la llamada. Se guardó con la hora del cierre.') : '';
+  return text ? `<p class="record-source-note record-approx-end">${esc(text)}</p>` : '';
+}
+
 export function linkCallRecordReview(context, reviewId, callId, opened) {
   const { translateText } = context;
   const { calls, state, settings } = context.data();
@@ -93,7 +99,7 @@ export function openCallRecords(context, callId, acwStart = null, reviewId = nul
     html += propio ? `<dl>${row(translateText('Inicio informado'),esc(clock(propio.startISO)))}${row(translateText('Final calculado*'),esc(clock(propio.endISO)))}${row(translateText('Duración informada'),esc(ui`${propio.durationMin} min`))}${row(translateText('Pago informado'),amount(propio.pay))}</dl><p class="record-source-note">${esc(translateText('*Inicio + duración del historial. Propio no expone aquí los segundos originales.'))}</p>`
       : `<div class="record-await"><strong>${esc(translateText('Aún no aparece'))}</strong><p>${esc(translateText('Tu respaldo se conserva mientras esperamos el historial.'))}</p></div>`;
     html += `</article><article class="record-source"><header><strong>${esc(translateText('Medición guardada'))}</strong><span>${esc(translateText('RESPALDO'))}</span></header>`;
-    html += tool ? `<dl>${row(translateText('Inicio observado'),esc(clock(tool.startISO)))}${row(translateText('Final observado'),esc(clock(tool.endISO)))}${row(translateText('Duración observada'),esc(formatDuration(tool.durationMs)))}${row(translateText('Pago estimado'),amount(tool.pay))}</dl><p class="record-source-note">${esc(translateText('Tiempos detectados; se conservan aunque el historial cambie.'))}</p>`
+    html += tool ? `<dl>${row(translateText('Inicio observado'),esc(clock(tool.startISO)))}${row(translateText('Final observado'),esc(clock(tool.endISO)))}${row(translateText('Duración observada'),esc(formatDuration(tool.durationMs)))}${row(translateText('Pago estimado'),amount(tool.pay))}</dl><p class="record-source-note">${esc(translateText('Tiempos detectados; se conservan aunque el historial cambie.'))}</p>${approxEndHtml(tool, translateText, esc)}`
       : `<div class="record-await"><strong>${esc(translateText('Sin observación disponible'))}</strong><p>${esc(translateText('No reconstruimos segundos que no se registraron.'))}</p></div>`;
     html += '</article></div>';
     if (!corrected && propio && tool && (!propio.durationMin || !propio.pay)) html += `<div class="record-review-note"><strong>${esc(translateText('Propio informa cero'))}</strong><p>${esc(translateText('El total usa el registro de Propio. Tu observación y su estimación siguen disponibles.'))}</p></div>`;
@@ -189,7 +195,7 @@ export function openCallJoin(context, toolId, propioId) {
   const row = (label, value) => `<div><dt>${esc(label)}</dt><dd>${value}</dd></div>`;
   root.innerHTML = `<div class="record-explain"><strong>${esc(translateText('¿Es la misma llamada?'))}</strong><p>${esc(translateText('La tool midió una llamada y Propio informó otra parecida. Si las juntas queda una sola llamada con las dos mediciones. Si no estás seguro, cierra sin juntar.'))}</p></div>`
     + `<div class="record-sources"><article class="record-source is-propio"><header><strong>Propio</strong><span>#${esc(propioCall.customerId)}</span></header><dl>${row(translateText('Inicio informado'), esc(clock(propio.startISO)))}${row(translateText('Duración informada'), esc(ui`${propio.durationMin} min`))}${row(translateText('Pago informado'), amount(propio.pay))}</dl></article>`
-    + `<article class="record-source"><header><strong>${esc(translateText('Medición guardada'))}</strong><span>Tool</span></header><dl>${row(translateText('Inicio observado'), esc(clock(tool.startISO)))}${row(translateText('Duración observada'), esc(formatDuration(tool.durationMs)))}${row(translateText('Pago estimado'), amount(tool.pay))}</dl></article></div>`
+    + `<article class="record-source"><header><strong>${esc(translateText('Medición guardada'))}</strong><span>Tool</span></header><dl>${row(translateText('Inicio observado'), esc(clock(tool.startISO)))}${row(translateText('Duración observada'), esc(formatDuration(tool.durationMs)))}${row(translateText('Pago estimado'), amount(tool.pay))}</dl>${approxEndHtml(tool, translateText, esc)}</article></div>`
     + `<button class="mc-btn-primary cyan" type="button" data-call-join-confirm>${esc(translateText('Juntar estas dos llamadas'))}</button><p class="record-source-note">${esc(translateText('Las dos mediciones se conservan y el pago no se suma dos veces.'))}</p>`;
   const opened = { owner: settings, tool: JSON.stringify(toolCall), propio: JSON.stringify(propioCall) };
   root.querySelector('[data-call-join-confirm]').addEventListener('click', () => {

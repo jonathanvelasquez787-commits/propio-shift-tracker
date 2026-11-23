@@ -19,7 +19,8 @@ export function observedCallRecord(call) {
   if (!Number.isFinite(start) || !Number.isFinite(end) || end < start) return null;
   return { id: call.id, startISO: call.startISO, endISO: call.endISO, durationMs: end - start,
     pay: numericPay(call.pay), detectedBy: call.propioBridge ? 'extension' : 'tool',
-    ...(call.propioBridge?.callId ? { callId: call.propioBridge.callId } : {}) };
+    ...(call.propioBridge?.callId ? { callId: call.propioBridge.callId } : {}),
+    ...(call.propioBridge?.endedBy ? { endedBy: call.propioBridge.endedBy } : {}) };
 }
 
 export function reportedCallRecord(call) {

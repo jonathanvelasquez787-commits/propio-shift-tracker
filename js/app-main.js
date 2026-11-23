@@ -4460,7 +4460,8 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
     // ese modal, así que se quitó esa fricción de raíz.
     function endCall(options = {}) {
       if (!state.activeCall) return;
-      const liveContext = state.activeCall;
+      // Si la extension cerro la llamada por su cuenta (se cerro el portal), el motivo viaja con la llamada.
+      const liveContext = options.endedBy ? { ...state.activeCall, propioBridge: { ...state.activeCall.propioBridge, endedBy: options.endedBy } } : state.activeCall;
       const startedAt = liveContext.startedAt;
       const endedAt = options.endedAt || new Date().toISOString();
       const previousState = JSON.parse(JSON.stringify(state));
@@ -8856,9 +8857,9 @@ export const applyPropioBridgeEvent = createPropioReceiver({
   startSession: event => startShift({ at: event.at, propio: true }),
   endSession: event => endShift({ at: event.at, propio: true }),
   start: event => startCall({ startedAt: event.at, propioBridge: { callId: event.callId, payEstimated: true, timingEstimated: true } }),
-  end: event => withBridgeCallFeedback(() => endCall({ endedAt: event.at })),
+  end: event => withBridgeCallFeedback(() => endCall({ endedAt: event.at, endedBy: event.endedBy })),
   catchUp: event => withBridgeCallFeedback(() => {
-    const context = { propioBridge: { callId: event.callId, payEstimated: true, timingEstimated: true } };
+    const context = { propioBridge: { callId: event.callId, payEstimated: true, timingEstimated: true, ...(event.endedBy ? { endedBy: event.endedBy } : {}) } };
     const result = autoSaveLiveCall(event.startedAt, event.at, context);
     if (result && (!state.lastCallEndedAt || Date.parse(state.lastCallEndedAt) < Date.parse(event.at))) state.lastCallEndedAt = event.at;
     return result;

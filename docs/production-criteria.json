@@ -987,6 +987,19 @@
           ]
         },
         {
+          "file": "tests/extension-llamada-cortada.test.mjs",
+          "namedCases": [
+            "las reglas aceptan el motivo \"portal-closed\" en el final de llamada y descartan cualquier otro",
+            "al cerrarse la pestaña de Propio en plena llamada la extensión genera el final y lo guarda aunque la ventanita esté cerrada",
+            "con la ventanita abierta el final llega a la app con su motivo y la llamada se guarda",
+            "si la ventanita estaba cerrada y el inicio llegó tarde, el final con su motivo guarda la llamada completa",
+            "sin grabación (modo observación) el cierre sigue avisando \"portal-closed\" y no inventa eventos",
+            "cerrar una pestaña sin llamada activa no genera nada",
+            "el listener de pestañas cerradas usa la misma función y la app guarda y muestra el motivo",
+            "la medición guardada conserva el motivo del final aproximado"
+          ]
+        },
+        {
           "file": "tests/extension-carga-rapida.test.mjs",
           "namedCases": ["carga rápida: la ventanita abre con lo local antes de consultar la nube", "carga rápida: con cambios sin subir sigue el arranque normal (primero la nube)", "carga rápida: en la web (no extensión) sigue el arranque normal", "carga rápida: si la nube cambió deja marca y la siguiente apertura usa el arranque normal una vez", "carga rápida: abrir rápido no marca los datos como pendientes de subir", "carga rápida: otra cuenta o sin datos locales no abren rápido"]
         },
