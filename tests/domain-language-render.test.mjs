@@ -6,9 +6,10 @@ import { parse } from 'acorn';
 import { ui, translateText, translateMarkup, setLanguage, displayLocale } from '../js/i18n.js';
 import { parse as parseHtml } from 'parse5';
 import { acwMinutesForBlock } from '../js/block-acw.js';
+import { appMainSource } from './helpers/app-main-source.mjs';
 
 function declarations(file, names) {
-  const source = fs.readFileSync(new URL(file, import.meta.url), 'utf8');
+  const source = file.endsWith('app-main.js') ? appMainSource() : fs.readFileSync(new URL(file, import.meta.url), 'utf8');
   const nodes = parse(source, { ecmaVersion: 'latest', sourceType: 'module' }).body.map(node => node.declaration || node);
   return names.map(name => {
     const node = nodes.find(node => node.type === 'FunctionDeclaration' ? node.id.name === name
@@ -254,7 +255,7 @@ test('paste-call placeholder localizes help while preserving original Propio sam
   const input = { placeholder: original, value: 'Personal customer 9876\n10/12/2026\n8:00 AM\n5\nYes\nNo\n$0.60' };
   const before = input.value;
   const h = vm.createContext({ ui, translateText, document: { getElementById: () => input } });
-  const source = fs.readFileSync(new URL('../js/app-main.js', import.meta.url), 'utf8');
+  const source = appMainSource();
   const node = parse(source, { ecmaVersion: 'latest', sourceType: 'module' }).body.map(node => node.declaration || node)
     .find(node => node.type === 'FunctionDeclaration' && node.id.name === 'syncCallImportPlaceholder');
   if (node) { vm.runInContext(source.slice(node.start, node.end), h); h.syncCallImportPlaceholder(); }

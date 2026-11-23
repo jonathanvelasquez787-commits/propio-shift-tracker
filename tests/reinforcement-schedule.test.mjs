@@ -6,8 +6,9 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import { activeWorkSinceLastCall } from '../js/reinforcement-rules.js';
 import { normalizeInactivityMinutes } from '../js/reinforcement-feedback.js';
+import { appMainSource } from './helpers/app-main-source.mjs';
 
-const appSource = fs.readFileSync(new URL('../js/app-main.js', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
+const appSource = appMainSource().replace(/\r\n/g, '\n');
 const gameSource = fs.readFileSync(new URL('../js/reinforcement.js', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
 const scheduleSource = fs.readFileSync(new URL('../js/schedule.js', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
 function sourceFunction(source, name, indentation = '    ') {

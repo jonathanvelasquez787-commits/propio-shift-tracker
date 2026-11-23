@@ -4,8 +4,9 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import { parse } from 'acorn';
 import { validateBridgePlan } from '../js/propio-bridge-rules.js';
+import { appMainSource } from './helpers/app-main-source.mjs';
 
-const source = fs.readFileSync(new URL('../js/app-main.js', import.meta.url), 'utf8');
+const source = appMainSource();
 const declarations = new Map(parse(source, { ecmaVersion: 'latest', sourceType: 'module' }).body.map(node => node.declaration || node)
   .filter(node => node.type === 'FunctionDeclaration').map(node => [node.id.name, source.slice(node.start, node.end)]));
 const iso = time => `2026-10-15T${time}.000Z`;

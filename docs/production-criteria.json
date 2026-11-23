@@ -1920,7 +1920,8 @@
         "js/propio-history-records.js",
         "extension/propio-bridge/history-observer.js",
         "js/automation-status.js",
-        "js/automation-ui.js"
+        "js/automation-ui.js",
+        "js/bridge-plan.js"
       ],
       "tests": [
         {
@@ -1929,6 +1930,8 @@
             "worker-to-receiver chain retries lost acknowledgments across 500 calls and worker restarts without duplicates"
           ]
         },
+        {
+          "file": "tests/bridge-plan-modulo.test.mjs", "namedCases": ["el modulo del plan se importa y calcula sin pantalla ni sistema de idiomas", "el ACW del plan arranca en el fin de la ultima llamada y se renueva al instante", "dia libre y modo freelancer sin turno no tienen plan; freelancer con turno usa el turno real", "el guardia de pestana al dia y el estado del turno siguen funcionando fuera de la app"]},
         {
           "file": "tests/propio-acw-plan.test.mjs",
           "namedCases": [
