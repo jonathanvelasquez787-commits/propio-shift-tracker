@@ -35,7 +35,7 @@ export function createWorkerData(api, session, { fetchImpl = (...args) => fetch(
 
   async function run({ scope }) {
     const before = (await read()) || {};
-    const base = { ...before, scope, checkedAt: now() };
+    const base = { ...before, scope, checkedAt: now(), lastError: null, lastAttemptAt: null, failDetail: null };
     const token = await session.token(scope);
     if (!token) { await write({ ...base, result: 'no-session' }); return { ok: false, reason: 'no-session' }; }
     const userId = userIdFromToken(token);
@@ -68,7 +68,14 @@ export function createWorkerData(api, session, { fetchImpl = (...args) => fetch(
       return { ok: true, changed: true };
     } catch (err) {
       const reason = err?.http ? 'error' : 'network';
-      await write({ ...base, userId, result: reason, detail: err?.http ? err.message : short(err?.message) });
+      const why = err?.http ? err.message : short(err?.message);
+      // Caida corta: si ya hay una copia buena de ESTA cuenta, se conserva tal cual (result 'ok', con la hora de la ULTIMA revision buena en checkedAt).
+      // El plan del worker deja de usarla solo cuando esa hora pasa de 5 min (DATA_STALE_MS); asi una falla corta de internet no apaga el pulso.
+      if (before.result === 'ok' && before.scope === scope && before.userId === userId && before.state) {
+        await write({ ...before, lastAttemptAt: now(), lastError: reason, failDetail: why });
+        return { ok: false, reason };
+      }
+      await write({ ...base, userId, result: reason, detail: why });
       return { ok: false, reason };
     }
   }
@@ -84,7 +91,7 @@ export function createWorkerData(api, session, { fetchImpl = (...args) => fetch(
   async function status() {
     const saved = await read();
     if (!saved) return { state: 'none' };
-    return { state: saved.result || 'none', updatedAt: saved.updatedAt || null, fetchedAt: saved.fetchedAt || null, checkedAt: saved.checkedAt || null, calls: saved.callsCount ?? null, ...(saved.detail ? { detail: saved.detail } : {}) };
+    return { state: saved.result || 'none', updatedAt: saved.updatedAt || null, fetchedAt: saved.fetchedAt || null, checkedAt: saved.checkedAt || null, calls: saved.callsCount ?? null, ...(saved.detail ? { detail: saved.detail } : {}), ...(saved.result === 'ok' && saved.lastError ? { failing: saved.lastError, failDetail: saved.failDetail || null } : {}) };
   }
   async function clear() { await api.storage.local.remove(DATA_KEY); }
   return { refresh, skip, snapshot, status, clear };

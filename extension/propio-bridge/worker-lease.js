@@ -15,16 +15,19 @@ export function createWorkerLease(api, session, { fetchImpl = (...args) => fetch
 
   async function ask({ scope, owner }) {
     const before = (await read()) || {};
-    const keep = { ...before, scope, owner, asks: (before.asks || 0) + 1, lastAt: now() };
+    const keep = { ...before, scope, owner, asks: (before.asks || 0) + 1, lastAt: now(), failing: null };
+    // Caida corta: si falla la RENOVACION (sin red o error de la nube) y el permiso anterior sigue vigente, se conserva hasta su hora de vencimiento.
+    const stillValid = before.result === 'granted' && before.scope === scope && before.owner === owner && Number.isFinite(before.expiresAt) && before.expiresAt > now();
+    const failed = (reason, detail) => stillValid ? write({ ...keep, result: 'granted', failing: reason, detail: null, failDetail: detail || null }) : write({ ...keep, result: reason, detail });
     const token = await session.token(scope);
     if (!token) { await write({ ...keep, result: 'no-session' }); return { ok: false, reason: 'no-session' }; }
     const started = now();
     let response;
     try { response = await fetchImpl(`${supabaseUrl}/rest/v1/rpc/automation_lease_worker`, { method: 'POST', headers: { apikey: anonKey, Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ p_owner: owner }) }); }
-    catch (err) { await write({ ...keep, result: 'network', detail: short(err?.message) }); return { ok: false, reason: 'network' }; }
+    catch (err) { await failed('network', short(err?.message)); return { ok: false, reason: 'network' }; }
     const body = await response.json().catch(() => null);
     const row = Array.isArray(body) ? body[0] : body;
-    if (!response.ok) { await write({ ...keep, result: 'error', detail: `${response.status} ${short(body?.message || body?.error)}` }); return { ok: false, reason: 'error' }; }
+    if (!response.ok) { await failed('error', `${response.status} ${short(body?.message || body?.error)}`); return { ok: false, reason: 'error' }; }
     const ttl = Date.parse(row?.expires_at) - Date.parse(row?.server_now);
     if (row?.granted !== true) { await write({ ...keep, result: 'denied' }); return { ok: false, reason: 'denied' }; }
     const duration = ttl - MARGIN_MS;
@@ -43,7 +46,7 @@ export function createWorkerLease(api, session, { fetchImpl = (...args) => fetch
     const saved = await read();
     if (!saved) return { state: 'none' };
     const valid = saved.result === 'granted' && Number.isFinite(saved.expiresAt) && saved.expiresAt > now();
-    return { state: valid ? 'granted' : (saved.result === 'granted' ? 'lapsed' : saved.result || 'none'), expiresAt: saved.expiresAt || null, asks: saved.asks || 0, ...(saved.detail ? { detail: saved.detail } : {}) };
+    return { state: valid ? 'granted' : (saved.result === 'granted' ? 'lapsed' : saved.result || 'none'), expiresAt: saved.expiresAt || null, asks: saved.asks || 0, ...(saved.detail ? { detail: saved.detail } : {}), ...(saved.result === 'granted' && saved.failing ? { failing: saved.failing } : {}) };
   }
   async function clear() { await api.storage.local.remove(LEASE_KEY); }
   return { renew, skip, status, clear };

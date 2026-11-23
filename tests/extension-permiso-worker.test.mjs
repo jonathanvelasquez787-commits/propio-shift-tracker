@@ -106,3 +106,44 @@ test('permiso del worker: la migracion deja la funcion de la app intacta y nunca
   assert.doesNotMatch(sql, /create or replace|drop function|create function public\.automation_lease\(/);
   assert.match(sql, /revoke all on function public\.automation_lease_worker\(uuid\) from public, anon/);
 });
+
+// Caida corta (Parte 6): una renovacion fallida NO tira un permiso que todavia esta vigente.
+test('permiso del worker (caida corta): sin red o con error al renovar se conserva el permiso vigente hasta su vencimiento', async () => {
+  const r = rig({ answers: [granted, new Error('sin internet'), { status: 503, json: { message: 'down' } }, new Error('otra vez')] });
+  const l = lease(r);
+  await l.renew({ scope, owner: OWNER });
+  const first = await l.status();
+  assert.equal(first.state, 'granted');
+  r.advance(30000);
+  assert.deepEqual(await l.renew({ scope, owner: OWNER }), { ok: false, reason: 'network' });
+  const s1 = await l.status();
+  assert.deepEqual([s1.state, s1.failing, s1.expiresAt], ['granted', 'network', first.expiresAt]);
+  r.advance(30000);
+  await l.renew({ scope, owner: OWNER });
+  assert.deepEqual([(await l.status()).state, (await l.status()).failing], ['granted', 'error']);
+  r.advance(30000); // ya paso la hora de vencimiento (~80 s): el permiso ya no vale y la falla se anota como siempre
+  await l.renew({ scope, owner: OWNER });
+  const s3 = await l.status();
+  assert.deepEqual([s3.state, s3.failing], ['network', undefined]);
+});
+
+test('permiso del worker (caida corta): al volver la red se renueva y se limpia el aviso; si lo niegan o es otro dueño NO se conserva', async () => {
+  const r = rig({ answers: [granted, new Error('x'), granted] });
+  const l = lease(r);
+  await l.renew({ scope, owner: OWNER }); r.advance(20000); await l.renew({ scope, owner: OWNER });
+  assert.equal((await l.status()).failing, 'network');
+  r.advance(20000); await l.renew({ scope, owner: OWNER });
+  assert.equal((await l.status()).failing, undefined);
+  const d = rig({ answers: [granted, { status: 200, json: [{ granted: false, server_now: iso(T0), expires_at: null }] }] });
+  const ld = lease(d); await ld.renew({ scope, owner: OWNER }); await ld.renew({ scope, owner: OWNER });
+  assert.equal((await ld.status()).state, 'denied');
+  const o = rig({ answers: [granted, new Error('x')] });
+  const lo = lease(o); await lo.renew({ scope, owner: OWNER }); await lo.renew({ scope, owner: 'otro-dueno' });
+  assert.equal((await lo.status()).state, 'network');
+});
+
+test('permiso del worker (caida corta): el cuadro lo explica', () => {
+  const m = wl => extensionWorkerLeaseModel({ workerSession: { state: 'ok' }, workerLease: wl });
+  assert.equal(m({ state: 'granted', failing: 'network' }), 'Permiso del worker: concedido (no hubo red en el último intento; se reintenta solo) · pedidos: 0');
+  assert.match(m({ state: 'lapsed', failing: 'error' }), /se venció \(la nube dio error en el último intento\)/);
+});
