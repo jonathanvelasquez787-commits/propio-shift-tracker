@@ -13029,6 +13029,12 @@
       "js/reinforcement-feedback.js"
     ]
   },
+  "s_e2f0df86": {
+    "source": "Fin aproximado: Propio dejó de mostrar la llamada (se cayó, se congeló o llegó a su límite de tiempo). Se guardó con el último momento en que se vio conectada.",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_e314063d": {
     "source": "Llamada #4821",
     "files": [
