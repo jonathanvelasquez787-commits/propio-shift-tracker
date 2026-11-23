@@ -2447,6 +2447,22 @@ $0.72"></textarea>
 </div>
 </div>
 </div>
+<div aria-hidden="true" class="modal-overlay" id="orderReasonModal">
+<div aria-labelledby="orderReasonTitle" aria-modal="true" class="modal-card" role="dialog">
+<div class="modal-head mc-modal-head">
+<div>
+<h3 id="orderReasonTitle">¿Por qué cambias el horario de hoy?</h3>
+<p>Tu turno ya empezó. Escribe la razón para guardar el cambio (mínimo 5 letras).</p>
+</div>
+<button aria-label="Cerrar" class="modal-close" data-close-modal="orderReasonModal" type="button">×</button>
+</div>
+<textarea id="orderReasonInput" maxlength="200" rows="3" aria-label="Razón del cambio" style="width:100%;"></textarea>
+<div class="modal-actions mc-action-row">
+<button class="mc-btn-primary warn" id="orderReasonOkBtn" type="button" disabled>Guardar cambio</button>
+<button class="mc-btn-warn-pill" data-close-modal="orderReasonModal" type="button" style="background:transparent; border-color:var(--line); color:var(--text);">Cancelar</button>
+</div>
+</div>
+</div>
 <div aria-hidden="true" class="modal-overlay" id="confirmModal">
 <div aria-labelledby="confirmModalTitle" aria-modal="true" class="modal-card" role="dialog">
 <div class="modal-head mc-modal-head">

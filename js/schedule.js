@@ -1,5 +1,6 @@
 import { ui, translateText, translateMarkup, displayLocale } from './i18n.js';
 import { loadDetailViews } from './detail-views-loader.js';
+import { scheduleNeedsReason } from './orden-model.js';
 // app-main.js injects schedule helpers; app-context.js owns shared state and editor offsets.
 import {
   scheduleEditDay,
@@ -16,10 +17,10 @@ let WEEKDAYS, WEEKDAY_LABELS, WEEKDAY_LABELS_SHORT, appConfirm, defaultDaySchedu
 let ensureWeeklySchedule, formatHHMM, formatMinutes, formatWeekRangeLabel, iconHtml, isScheduleWeekPast;
 let minutesToHHMM, onReinforcementDayMetadataChanged, pad, saveAll, snapshotHistoricalPlanning;
 let startOfCycleWeek, timeLabel, toMinutes, toast, todayCallDateKey, weekStartKeyFromDate;
-let canPersistLocalChanges, escapeHtml;
+let canPersistLocalChanges, escapeHtml, askOrderReason, recordScheduleReason;
 
 export function configureScheduleContext(context) {
-  ({ canPersistLocalChanges, escapeHtml } = context);
+  ({ canPersistLocalChanges, escapeHtml, askOrderReason, recordScheduleReason } = context);
   ({ WEEKDAYS, WEEKDAY_LABELS, WEEKDAY_LABELS_SHORT, appConfirm, defaultDaySchedule, ensureWeeklySchedule,
     formatHHMM, formatMinutes, formatWeekRangeLabel, iconHtml, isScheduleWeekPast, minutesToHHMM,
     onReinforcementDayMetadataChanged, pad, saveAll, snapshotHistoricalPlanning,
@@ -693,7 +694,7 @@ export function configureScheduleContext(context) {
     }
 
     // Guardar día modifica únicamente el día seleccionado.
-    export function saveShiftWindow() {
+    export async function saveShiftWindow() {
       if (scheduleViewMode === 'week' && scheduleWeekIsPast(scheduleWeekOffset)) return; // protegido, no debería llegar aquí (botón deshabilitado)
       const midnightOffenders = blockRowsWithEqualTimes();
       if (midnightOffenders.length) {
@@ -706,6 +707,18 @@ export function configureScheduleContext(context) {
       if (!check.valid) {
         toast(check.errors[0]);
         return;
+      }
+      // Mi orden: con el turno en curso, cambiar el horario de HOY pide una razon escrita (antes de la revision).
+      let reason = '';
+      const todayKey = WEEKDAYS[(new Date().getDay() + 6) % 7];
+      const editsToday = scheduleEditDay === todayKey && (scheduleViewMode === 'template' || (scheduleViewMode === 'week' && scheduleWeekOffset === 0));
+      const shiftRunning = !!state.shiftStartedAt && !state.shiftEndedAt;
+      if (editsToday && shiftRunning && askOrderReason) {
+        const stored = activeScheduleTarget() && activeScheduleTarget()[scheduleEditDay] || settings.weeklySchedule?.[scheduleEditDay];
+        if (scheduleNeedsReason(stored, cfg)) {
+          reason = await askOrderReason();
+          if (!reason) return false;
+        }
       }
       return reviewScheduleChange(cfg, [scheduleEditDay], () => {
       if (!persistScheduleMutation(() => {
@@ -720,6 +733,7 @@ export function configureScheduleContext(context) {
           settings.shiftEnd = cfg.end;
         }
       })) return false;
+      if (reason && recordScheduleReason) recordScheduleReason(reason);
       renderDayTabs();
       toast(scheduleViewMode === 'week'
         ? ui`Horario de ${WEEKDAY_LABELS[scheduleEditDay]} guardado para esa semana`

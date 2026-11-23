@@ -145,7 +145,7 @@ import { acwMinutesForBlock } from './block-acw.js';
 import { activeAppKeys } from './sync.js';
 import { CONNECTED_LIVE_GRACE_MIN, GAP_AUTO_OTHER_THRESHOLD_MIN, PAUSE_SLOT_MAX_DISTANCE_MIN, WEEKDAYS, WEEKDAY_JS_INDEX, baseDayConfigFor, buildPlannedSlots, callDateKeyFromValue, callDateToDate, callsForDay, computeCurrentAcwStart, currentShiftAccountingDayKey, cycleAnchorDate, dateAtTime, dateKey, dayConfigFor, dayEvents, dayGapRows, dayIsEffectivelyOff, dayPauseIntervals, dayPausesForSlotStats, dayShiftBounds, dayShiftSessions, dayWorkBounds, dayWorkSessions, defaultActiveDayKey, defaultDaySchedule, defaultWeeklySchedule, ensureBlockProductivityGoals, ensureWeeklySchedule, findPlannedSlotForActivePause, formatHHMM, gapClassification, gapKeyFor, getActiveDayKey, getDayNote, getEffectiveScheduleForDay, getGapAnnotation, getPropioBridgePlan, getShiftWindow, getWorkSessionStatus, manualGapPauseIntervals, mergeIntervals, mergeOverlappingPauseEntries, migrateDayConfigToBlocks, minutesToHHMM, overlapMinutesWithIntervals, pad, pauseAssignmentCache, pauseDurationExcludingCalls, pauseForSlot, previousCalendarDay, referenceDurationMinForActivePause, reinforcementScheduleIntervals, sameCallDay, startOfCycleWeek, subtractCallsFromPauseInterval, suggestGapLabel, toDateFromInputs, toMinutes, todayCallDateKey, weekStartKeyForDayKey, weekStartKeyFromDate, weekdayKeyForDayKey, workStartForConnection, configureBridgePlan } from './bridge-plan.js';
 export { WEEKDAYS, callDateKeyFromValue, callDateToDate, callsForDay, dayConfigFor, dayEvents, dayGapRows, dayIsEffectivelyOff, dayShiftBounds, defaultDaySchedule, ensureWeeklySchedule, formatHHMM, getActiveDayKey, getDayNote, getPropioBridgePlan, getWorkSessionStatus, mergeIntervals, minutesToHHMM, pad, previousCalendarDay, sameCallDay, startOfCycleWeek, toDateFromInputs, toMinutes, todayCallDateKey, weekStartKeyFromDate, weekdayKeyForDayKey } from './bridge-plan.js';
-import { disorderBreakdown, carryDebtMin, orderSummary, sanitizeOrderTope, favorMinutes, dayOrderStatus, walkStreak, rewardProgress } from './orden-model.js';
+import { disorderBreakdown, carryDebtMin, cleanOrderReason, orderSummary, sanitizeOrderTope, favorMinutes, dayOrderStatus, walkStreak, rewardProgress } from './orden-model.js';
 import { renderMiOrden, setMiOrdenEditing } from './orden-view.js';
 import { initExtensionBox } from './extension-box.js';
 
@@ -4574,6 +4574,7 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
       formatHHMM, formatMinutes, formatWeekRangeLabel, iconHtml, isScheduleWeekPast, minutesToHHMM,
       onReinforcementDayMetadataChanged, pad, saveAll, snapshotHistoricalPlanning, startOfCycleWeek,
       timeLabel, toMinutes, toast, todayCallDateKey, weekStartKeyFromDate, canPersistLocalChanges, escapeHtml,
+      askOrderReason, recordScheduleReason,
     });
     configureCallsContext({
       HIGHER_RATE_TIERS, MAX_CALL_DURATION_MIN, appConfirm, autoStartShiftFromCalls, callDateKeyFromValue, callDedupeKey,
@@ -6799,6 +6800,41 @@ export function render() {
       openModal('confirmModal');
     }
 
+    // Mi orden (friccion): pide la razon escrita para cambiar el horario de hoy con el turno en curso.
+    // Devuelve la razon limpia o '' si cancelas.
+    let pendingOrderReason = null;
+    export function askOrderReason() {
+      if (pendingOrderReason) pendingOrderReason('');
+      const input = document.getElementById('orderReasonInput');
+      const ok = document.getElementById('orderReasonOkBtn');
+      if (input) input.value = '';
+      if (ok) ok.disabled = true;
+      return new Promise(resolve => {
+        pendingOrderReason = resolve;
+        openModal('orderReasonModal');
+        input?.focus();
+      });
+    }
+
+    function finishOrderReason(accepted) {
+      const input = document.getElementById('orderReasonInput');
+      const reason = accepted ? cleanOrderReason(input?.value) : '';
+      const resolve = pendingOrderReason;
+      pendingOrderReason = null;
+      if (accepted && !reason) return;
+      closeModal('orderReasonModal');
+      if (resolve) resolve(reason);
+    }
+
+    // La razon queda en la nota del dia (Reporte del dia), junto a lo que ya hubiera escrito.
+    export function recordScheduleReason(reason) {
+      const dayKey = todayCallDateKey();
+      const note = getDayNote(dayKey);
+      const time = new Date().toLocaleTimeString(settings.language === 'en' ? 'en' : 'es', { hour: '2-digit', minute: '2-digit' });
+      const line = `${translateText('Cambio de horario')} ${time}: ${reason}`;
+      setDayNote(dayKey, { category: note?.category || '', comment: note?.comment ? `${note.comment}\n${line}` : line, forcedStatus: note?.forcedStatus || '' });
+    }
+
     document.querySelectorAll('[data-open-modal]').forEach(btn => {
       btn.addEventListener('click', () => openModal(btn.getAttribute('data-open-modal')));
     });
@@ -7314,6 +7350,11 @@ export function render() {
     document.getElementById('exchangeRateInput').addEventListener('change', updateCurrencySettings);
     document.getElementById('currencyLabelInput').addEventListener('change', updateCurrencySettings);
     document.getElementById('saveShiftWindowBtn').addEventListener('click', saveShiftWindow);
+    document.getElementById('orderReasonInput').addEventListener('input', event => {
+      document.getElementById('orderReasonOkBtn').disabled = !cleanOrderReason(event.target.value);
+    });
+    document.getElementById('orderReasonOkBtn').addEventListener('click', () => finishOrderReason(true));
+    document.querySelectorAll('[data-close-modal="orderReasonModal"]').forEach(btn => btn.addEventListener('click', () => finishOrderReason(false)));
     [['addWorkBlockBtn', 'work'], ['addBreakBlockBtn', 'break'], ['addLunchBlockBtn', 'lunch']].forEach(([id, type]) => {
       document.getElementById(id).addEventListener('click', () => addBlockRow(type));
     });
