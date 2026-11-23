@@ -24,6 +24,15 @@
     try {
       if (owner) coordination = await chrome.runtime.sendMessage({ kind: 'tracker-coordination', accountScope: owner.accountScope });
     } catch (error) { why = 'error: ' + String(error?.message || 'sin detalle').slice(0, 30); }
+    // 2.8.41: si el worker contesta vacio, la ventanita lee su codigo directo del almacenamiento (el worker sigue validando el permiso al entregarlo).
+    if (owner && !coordination?.owner && !coordination?.why) {
+      try {
+        const saved = (await chrome.storage.local.get('bridge-v1'))['bridge-v1'];
+        if (saved?.accountScope === owner.accountScope && typeof saved.coordinationOwner === 'string' && saved.coordinationOwner) {
+          coordination = { owner: saved.coordinationOwner, enabled: saved.mode === 'auto' && saved.preparation?.devicePassive !== true && !saved.preparation?.availabilityPaused, direct: true };
+        }
+      } catch { /* sin acceso al almacenamiento: se queda el motivo de abajo */ }
+    }
     if (!alive() || (owner && (owner.accountScope !== ready?.accountScope || owner.nonce !== ready?.nonce))) return;
     if (coordination?.why) why = String(coordination.why).slice(0, 30);
     else if (owner && !coordination?.owner && why === 'no-reply') why = 'respuesta ' + JSON.stringify(coordination ?? null).slice(0, 30);
