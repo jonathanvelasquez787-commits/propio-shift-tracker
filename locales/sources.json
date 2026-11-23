@@ -1406,6 +1406,12 @@
       "js/finance-review.js"
     ]
   },
+  "s_19059508": {
+    "source": "Guardar cambio",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_1996e4f0": {
     "source": "Recurrente",
     "files": [
@@ -2220,6 +2226,12 @@
     "source": "No se puede guardar: coincide con la llamada en curso.",
     "files": [
       "js/calls.js"
+    ]
+  },
+  "s_28c712b6": {
+    "source": "Tu turno ya empezó. Escribe la razón para guardar el cambio (mínimo 5 letras).",
+    "files": [
+      "app.html"
     ]
   },
   "s_28da278d": {
@@ -5614,6 +5626,12 @@
   },
   "s_646dbd54": {
     "source": "Bloques y llamadas",
+    "files": [
+      "app.html"
+    ]
+  },
+  "s_649393b3": {
+    "source": "¿Por qué cambias el horario de hoy?",
     "files": [
       "app.html"
     ]
@@ -14385,6 +14403,12 @@
     "source": "Progreso de la reserva",
     "files": [
       "js/finance.js"
+    ]
+  },
+  "s_fb627113": {
+    "source": "Cambio de horario",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_fb707b6c": {

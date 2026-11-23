@@ -2711,6 +2711,7 @@
         "js/orden-view.js"
       ],
       "tests": [
+        { "file": "tests/mi-orden-castigo-razon.test.mjs", "namedCases": ["castigo razon: mover un bloque o alargar un descanso del dia pide razon", "castigo razon: no la pide si nada se mueve, si solo cambia la meta o si el dia es libre", "castigo razon: la razon necesita al menos 5 letras y se limpia", "castigo razon: guardar el horario de hoy con turno en curso pide la razon y la deja en la nota del dia"] },
         { "file": "tests/mi-orden-castigo-deuda.test.mjs", "namedCases": ["castigo: la deuda del dia anterior se suma a la meta de hoy, con el tope", "castigo: un dia libre no borra la deuda del ultimo dia de trabajo, pero siete dias si", "castigo: el dia perdonado no se cobra y la compensacion a favor paga primero", "castigo: la tarjeta avisa de la deuda de ayer y de la de mañana", "castigo: Ajustes pide la meta sin deuda para no guardarla como meta fija"] },
         {
           "file": "tests/mi-orden.test.mjs",

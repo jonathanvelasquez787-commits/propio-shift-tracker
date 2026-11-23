@@ -102,3 +102,20 @@ export function carryDebtMin(history = [], topeMin = 60) {
   if (walkStreak(history).forgiven.includes(previous.key)) return 0;
   return orderSummary({ disorderMin: previous.disorderMin, topeMin, favorMin: previous.favorMin }).debtMin;
 }
+
+// Castigo, friccion: con el turno en curso, mover un bloque o alargar un descanso del horario de HOY pide una razon escrita.
+export const ORDER_REASON_MIN = 5;
+export function cleanOrderReason(text) {
+  const clean = String(text || '').replace(/\s+/g, ' ').trim().slice(0, 200);
+  return clean.length >= ORDER_REASON_MIN ? clean : '';
+}
+
+// Solo cuenta si el dia sigue siendo de trabajo y cambia el inicio, el final o algun bloque (tipo, hora o duracion).
+// Cambiar solo la meta de un bloque o marcar el dia libre no pide razon.
+export function scheduleNeedsReason(oldCfg, newCfg) {
+  if (!oldCfg || !newCfg || oldCfg.off || newCfg.off) return false;
+  if (!Array.isArray(oldCfg.blocks) || !Array.isArray(newCfg.blocks)) return false;
+  if (oldCfg.start !== newCfg.start || oldCfg.end !== newCfg.end) return true;
+  if (oldCfg.blocks.length !== newCfg.blocks.length) return true;
+  return newCfg.blocks.some((block, i) => block.type !== oldCfg.blocks[i].type || block.start !== oldCfg.blocks[i].start || Number(block.dur) !== Number(oldCfg.blocks[i].dur));
+}
