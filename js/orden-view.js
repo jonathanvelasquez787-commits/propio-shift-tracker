@@ -33,6 +33,8 @@ function balanceTile(summary, translateText) {
     <div class="mo-bar" role="img" aria-label="${esc(head)}"><i class="mo-bar-debt" style="width:${(summary.debtPct * 50).toFixed(1)}%"></i><i class="mo-bar-favor" style="width:${(summary.favorPct * 50).toFixed(1)}%"></i><b></b></div>
     <div class="mo-bar-labels"><span class="mo-bad">${esc(translateText('Deuda'))} ${summary.debtMin}</span><span>0</span><span class="mo-good">${esc(translateText('A favor'))} ${summary.favorMin}</span></div>
   </div>
+  ${summary.carryMin > 0 ? `<span class="mo-sub mo-bad">${esc(translateText('Tu meta de hoy incluye la deuda de ayer'))}: +${summary.carryMin} min</span>` : ''}
+  ${summary.owedMin > 0 ? `<span class="mo-sub mo-bad">${esc(translateText('Si cierras así, mañana tu meta sube'))} ${summary.owedMin} min</span>` : ''}
 </div>
 <div class="mo-money-row">
   <div class="mo-tile mo-money mo-money-bad"><span class="mo-label">${esc(translateText('Perdido por desorden'))}</span><div class="mo-money-value mo-bad" data-mo-lost>${summary.lostRaw > 0 ? '-' : ''}${esc(summary.lostText)}</div></div>

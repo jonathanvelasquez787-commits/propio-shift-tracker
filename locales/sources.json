@@ -5501,6 +5501,12 @@
       "js/calls.js"
     ]
   },
+  "s_6210e16d": {
+    "source": "Si cierras así, mañana tu meta sube",
+    "files": [
+      "js/orden-view.js"
+    ]
+  },
   "s_62208d46": {
     "source": "Historial (0 pasadas)",
     "files": [
@@ -13699,6 +13705,12 @@
     "source": "Propio: {{v0}} · {{v1}} min",
     "files": [
       "js/call-records-view.js"
+    ]
+  },
+  "s_f0ee58ef": {
+    "source": "Tu meta de hoy incluye la deuda de ayer",
+    "files": [
+      "js/orden-view.js"
     ]
   },
   "s_f0f200b2": {
