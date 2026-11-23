@@ -203,7 +203,6 @@
   "s_203d66bc": "Previous month",
   "s_207a770b": "Break overlaps your Lunch",
   "s_219a0026": "Use automatic",
-  "s_21b50060": "Two different versions of your data",
   "s_21db5731": "New category",
   "s_22380468": "Confirm",
   "s_224a7f94": "your email, name and public profile photo are received from Google at sign-in. No access is requested to Gmail, Drive, contacts or other Google services.",
@@ -1290,7 +1289,6 @@
   "s_3827c09d": "There is no space to preserve the previous copy. Export your JSON before replacing data or switching accounts.",
   "s_3bd044df": "The backup or server connection needs attention. Keep your changes in this browser.",
   "s_4295cc6a": "The server could not be verified. Keep your changes in this browser.",
-  "s_55944819": "This device has changes that have not been uploaded, and the cloud has a version saved{{v0}} on {{v1}}. They are not merged automatically: choose which one to keep. The replaced version is kept in recoverable copies in Settings.",
   "s_70db0ee6": "Recoverable copies in this browser",
   "s_7829299e": "Reconnect and sync",
   "s_881adcbf": "Copy to recover",
@@ -2013,7 +2011,6 @@
   "s_d458f078": "Skip to content",
   "s_de6c1e12": "Save profile username",
   "s_e082c01d": "Latest confirmed revision: {{v0}}.",
-  "s_e9d043d2": "Another device saved newer changes. Your changes remain in this browser and do not replace that revision. Reload to compare and choose; the replaced version is kept in recovery copies.",
   "s_f5ccca22": "This account's data and recovery copies in this browser are also removed. Your Google account, downloaded JSON files, and local copies in other browsers or devices are not deleted from here.",
   "s_f672bc8e": "Installing the app does not create another backup. To open it offline, you must have opened it before, kept the browser data, and have a copy of your account on this device. Google and syncing need a connection; an expired session may require you to sign in again.",
   "s_3b975090": "Reconnecting…",
@@ -2451,5 +2448,6 @@
   "s_3fee08c4": "Could not sign in.",
   "s_41939368": "Use the same Google account as on the web. Your data is copied between the two automatically.",
   "s_4e4a2c4e": "Sign in with Google",
-  "s_b54e9526": "Sign in with your account"
+  "s_b54e9526": "Sign in with your account",
+  "s_acde2633": "Another device saved before you. Your changes are still here and were not lost. Tap Reload to choose which version stays; the other one is kept in recoverable copies."
 }

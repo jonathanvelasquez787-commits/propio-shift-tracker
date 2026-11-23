@@ -22,10 +22,10 @@ test('a local rejection remains visible after cloud acknowledgments, timers and 
     ui: (parts, ...values) => parts.reduce((s, p, i) => s + p + (values[i] ?? ''), ''),
     onSync: fn => { handler = fn; }, readMeta: () => ({ dirty: false }),
     setInterval: fn => { timer = fn; }, Date,
-    window: { addEventListener: (name, fn) => { events[name] = fn; } },
+    window: { location: { reload() {} }, addEventListener: (name, fn) => { events[name] = fn; } },
     showCloudConflictBanner() {},
   });
-  vm.runInContext(['renderSyncDetails', 'setSyncStatus', 'wireSyncStatus'].map(n => declaration('../js/boot.js', n)).join('\n') + '\nwireSyncStatus();', context);
+  vm.runInContext(['renderSyncDetails', 'setSyncStatus', 'escribiendoAhora', 'wireSyncStatus'].map(n => declaration('../js/boot.js', n)).join('\n') + '\nwireSyncStatus();', context);
   handler('local-persistence', {});
   assert.equal(dot.dataset.state, 'error');
   const warning = label.textContent;
@@ -52,9 +52,9 @@ test('sync details distinguish pending local data, server confirmation, real fai
     translateText: x => x, displayLocale: () => 'es-HN',
     ui: (parts, ...values) => parts.reduce((s, p, i) => s + p + (values[i] ?? ''), ''),
     readMeta: () => meta, getLocalPersistenceFailure: () => failure,
-    onSync: fn => { handler = fn; }, setInterval() {}, window: { addEventListener: (name, fn) => { events[name] = fn; } }, showCloudConflictBanner() {},
+    onSync: fn => { handler = fn; }, setInterval() {}, window: { location: { reload() {} }, addEventListener: (name, fn) => { events[name] = fn; } }, showCloudConflictBanner() {},
   });
-  vm.runInContext(['renderSyncDetails', 'setSyncStatus', 'wireSyncStatus'].map(n => declaration('../js/boot.js', n)).join('\n') + '\nwireSyncStatus();', context);
+  vm.runInContext(['renderSyncDetails', 'setSyncStatus', 'escribiendoAhora', 'wireSyncStatus'].map(n => declaration('../js/boot.js', n)).join('\n') + '\nwireSyncStatus();', context);
   handler('dirty');
   assert.match(nodes.syncLocalDetail.textContent, /Copia local guardada/);
   assert.match(nodes.syncCloudDetail.textContent, /Cambios sin subir/);

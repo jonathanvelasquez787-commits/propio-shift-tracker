@@ -987,6 +987,10 @@
           ]
         },
         {
+          "file": "tests/sync-volver-a-ver.test.mjs",
+          "namedCases": ["volver a ver: la nube cambió y no hay nada sin subir avisa cloud-changed", "volver a ver: misma revisión en la nube no avisa nada", "volver a ver: con cambios sin subir no consulta ni avisa (lo decide la subida normal)", "volver a ver: un error de la nube o una consulta muy seguida no avisan", "volver a ver: cambios locales mientras se espera a la nube cancelan el aviso", "conflicto de arranque: la decisión trae la hora en que se guardó lo local", "conflicto de arranque: nadie elige, se queda la versión guardada más tarde", "conexión: al volver a ver la página se revisa la nube y solo se recarga sin cambios sin subir ni texto a medias"]
+        },
+        {
           "file": "tests/extension-cuadro-punto-rapido.test.mjs",
           "namedCases": [
             "punto del cuadro: revisa cada segundo al abrir y para al ponerse verde"

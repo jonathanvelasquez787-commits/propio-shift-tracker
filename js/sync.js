@@ -700,6 +700,35 @@ function markDirty() {
   }
 }
 
+// Al volver a ver la pagina: si no hay nada sin subir y la nube tiene una
+// version mas nueva (la guardo otro dispositivo), se avisa para que la app
+// baje esa version. Con cambios sin subir NO se toca nada: de eso se encarga
+// la subida normal (y, si hay conflicto, la pregunta del arranque).
+let lastReturnCheck = 0;
+export async function checkCloudOnReturn({ minGapMs = 5000 } = {}) {
+  const meta = readMeta();
+  if (pushing || meta.dirty || !meta.lastSyncedUpdatedAt || !canSync(meta.userId)) return { skipped: true };
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) return { skipped: true };
+  const nowMs = Date.now();
+  if (nowMs - lastReturnCheck < minGapMs) return { skipped: true };
+  lastReturnCheck = nowMs;
+  const epoch = syncEpoch;
+  try {
+    const { data, error } = await getSupabase()
+      .from('user_data').select('updated_at').eq('user_id', meta.userId).maybeSingle();
+    if (error || !data?.updated_at) return { skipped: true };
+    const now = readMeta();
+    // Si mientras se esperaba la nube hubo cambios locales, cambio la cuenta o
+    // empezo una subida, esta revision ya no vale.
+    if (pushing || syncEpoch !== epoch || now.userId !== meta.userId || now.dirty) return { skipped: true };
+    if (data.updated_at === now.lastSyncedUpdatedAt) return { same: true };
+    emit('cloud-changed', { cloudUpdatedAt: data.updated_at });
+    return { changed: true, updatedAt: data.updated_at };
+  } catch {
+    return { skipped: true };
+  }
+}
+
 export function startAutoSync() {
   patchLocalStorage();
 
@@ -707,7 +736,9 @@ export function startAutoSync() {
     if (document.visibilityState === 'hidden' && readMeta().dirty) {
       pushSnapshot();
     }
+    if (document.visibilityState === 'visible') checkCloudOnReturn();
   });
+  window.addEventListener('focus', () => { checkCloudOnReturn(); });
   window.addEventListener('pagehide', flushOnExit);
 
   // Al volver de estar sin internet, subir lo que haya quedado pendiente.
@@ -807,6 +838,7 @@ export async function resolveBoot(userId) {
     localSnapshot,
     localOwnerId: meta.userId,
     localRevision: meta.lastSyncedUpdatedAt,
+    localSavedAt: meta.lastLocalSaveAt || null,
     localSummary: describeSnapshot(localSnapshot),
     cloudSummary: describeSnapshot(cloud),
   };
