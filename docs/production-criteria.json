@@ -1014,6 +1014,10 @@
           ]
         },
         {
+      "file": "tests/extension-pc-suspendida.test.mjs",
+      "namedCases": ["las reglas aceptan el motivo \"computer-slept\" y siguen descartando otros", "PC suspendida: si la pagina ya dice que no hay llamada, se cierra con el ultimo momento visto", "PC suspendida: si la pagina sigue diciendo \"conectada\", la llamada NO se corta", "PC suspendida: sin respuesta de la pagina espera una vuelta y a la segunda cierra", "latido normal (sin salto grande) con la pagina en reposo NO cierra la llamada", "el detalle de la llamada explica la suspension de la computadora"]
+    },
+    {
       "file": "tests/extension-recarga-llamada.test.mjs",
       "namedCases": ["las reglas aceptan el motivo \"portal-reloaded\" y siguen descartando otros", "F5 a mitad de llamada: la llamada se guarda con la hora de la recarga y fin aproximado", "sin llamada, o con el mismo documento, una observacion NO cierra nada", "la recarga de una pestaña no cierra la llamada de otra pestaña", "la app guarda el motivo en la llamada y el detalle lo explica"]
     },

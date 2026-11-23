@@ -52,7 +52,7 @@ export function validateBridgeReinforcement(value) {
   return { celebrate: value.celebrate, ask: value.ask };
 }
 // Por que la extension tuvo que cerrar una llamada sin ver la desconexion real (el final es aproximado).
-export const BRIDGE_END_REASONS = ['portal-closed', 'chrome-restarted', 'portal-reloaded'];
+export const BRIDGE_END_REASONS = ['portal-closed', 'chrome-restarted', 'portal-reloaded', 'computer-slept'];
 export function validateBridgeEvent(value, now = Date.now()) {
   if (!value || typeof value !== 'object' || Array.isArray(value) || value.version !== 1 || !bridgeId(value.id)) return null;
   if (!['call-start','call-end','session-start','session-end','available','unavailable','history-records','pause-end'].includes(value.type)) return null;

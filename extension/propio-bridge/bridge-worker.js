@@ -14,6 +14,8 @@ const BADGE_PROBLEMS = new Set(['queue-full', 'expired-event', 'event-rejected',
 const BADGE_TITLE = 'Propio · Tracker y vista original';
 // Cuantos eventos de llamadas seguidos (HTTP 2xx) sin un "name" legible hacen pensar que Propio cambio sus señales.
 export const SIGNALS_ODD_LIMIT = 8;
+// Salto entre latidos (normal ~30 s) a partir del cual se sospecha que la PC se suspendio.
+export const SLEEP_GAP_MS = 3 * 60000;
 // Marca "!" en el icono de Chrome cuando la extension esta vinculada y NO esta registrando (o hay llamadas trabadas).
 // "tracker-closed" NO cuenta: con la ventanita cerrada las llamadas esperan en la cola y no se pierden.
 export function badgeFor(state) {
@@ -137,13 +139,13 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     try { const tab = await api.tabs.get(tabId); return typeof tab?.url === 'string' && tab.url.startsWith(`${PORTAL_ORIGIN}/`); }
     catch (error) { return !/No tab with id/i.test(String(error?.message || error)); }
   }
-  function closeOrphan(state, id) {
+  function closeOrphan(state, id, endedBy = 'chrome-restarted') {
     const tab = state.tabs[id], start = Date.parse(tab.active.startedAt), last = Date.parse(tab.aliveAt);
     // Una llamada huerfana de mas de 24 h ya no se puede entregar: se descarta con aviso y NO pausa la grabacion.
     if (now() - start > BRIDGE_MAX_AGE - 60000) state.attention = 'portal-closed';
     else {
       const at = new Date(Math.min(now(), Math.max(Number.isFinite(last) ? last : start, start + 1000))).toISOString();
-      const closed = callSignal(state, id, 'disconnected', at, { endedBy: 'chrome-restarted' });
+      const closed = callSignal(state, id, 'disconnected', at, { endedBy });
       if (!closed?.queued) state.attention = 'portal-closed';
     }
     delete state.tabs[id];
@@ -157,7 +159,17 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
       const at = new Date(now()).toISOString();
       for (const [id, tab] of Object.entries(state.tabs)) {
         if (!tab?.active) continue;
-        if (lost.has(id)) closeOrphan(state, id); else tab.aliveAt = at;
+        if (lost.has(id)) { closeOrphan(state, id); continue; }
+        // PC suspendida: el latido normal llega cada ~30 s. Si pasa un salto grande desde el ultimo "sigue viva", la PC
+        // pudo dormirse y cortar la llamada. NO se cierra a ciegas: si la pagina de Propio (observacion reciente) sigue
+        // diciendo "conectada", la llamada vive; si dice otra cosa, o no responde en 2 vueltas, se cierra con el ultimo
+        // momento en que se vio viva.
+        const gap = now() - Date.parse(tab.aliveAt);
+        if (!Number.isFinite(gap) || gap <= SLEEP_GAP_MS) { tab.aliveAt = at; delete tab.sleepChecks; continue; }
+        const seen = Date.parse(tab.seenAt), fresh = Number.isFinite(seen) && seen <= now() && now() - seen < 15000;
+        if (fresh && tab.call === 'connected') { tab.aliveAt = at; delete tab.sleepChecks; continue; }
+        tab.sleepChecks = (tab.sleepChecks || 0) + 1;
+        if (fresh || tab.sleepChecks >= 2) closeOrphan(state, id, 'computer-slept');
       }
     });
     await flush();

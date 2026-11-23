@@ -4920,6 +4920,12 @@
       "js/app-main.js"
     ]
   },
+  "s_556cb793": {
+    "source": "Fin aproximado: la computadora se suspendió durante la llamada. Se guardó con el último momento en que se vio activa.",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_55899276": {
     "source": "El ritmo para llegar a la meta usa los días laborales restantes; es un cálculo distinto.",
     "files": [
