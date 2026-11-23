@@ -6,11 +6,16 @@ import { getPropioBridgePlan } from '../../js/bridge-plan.js';
 // El permiso que viaja dentro del plan se recorta a 20 s para pasar la comprobacion normal (maximo 25 s).
 export const PLAN_LEASE_MS = 20000;
 export const LEASE_MARGIN_MS = 5000;
+// Parte 4c: si el worker lleva mas de 5 minutos sin poder revisar la nube, no arma plan (no pulsa con datos viejos).
+export const DATA_STALE_MS = 300000;
 
 const iso = ms => new Date(ms).toISOString();
 
 export function buildWorkerPlan({ data, leaseExpiresAt, owner, lastEndedAt, now }) {
   if (!data || data.result !== 'ok' || !data.state || typeof data.state !== 'object') return { plan: null, why: 'no-data' };
+  // checkedAt = ultima vez que la nube contesto bien (aunque nada haya cambiado); sin ese dato no se confia en la copia.
+  const checked = Number(data.checkedAt);
+  if (!Number.isFinite(checked) || now - checked > DATA_STALE_MS) return { plan: null, why: 'stale-data' };
   if (!owner) return { plan: null, why: 'no-owner' };
   if (!Number.isFinite(leaseExpiresAt) || leaseExpiresAt - now <= LEASE_MARGIN_MS) return { plan: null, why: 'no-lease' };
   const cloud = JSON.parse(JSON.stringify(data.state)), cloudSettings = JSON.parse(JSON.stringify(data.settings || {}));

@@ -219,6 +219,7 @@ export function extensionWorkerPlanModel(state) {
   const wp = state && state.ok !== false && state.workerPlan && typeof state.workerPlan === 'object' ? state.workerPlan : { state: 'none' };
   const text = wp.state === 'ok' ? `listo para trabajar con todo cerrado${wp.inferredStart ? ' (turno dado por iniciado a la hora del horario)' : ''}`
     : wp.state === 'no-data' ? 'faltan los datos de la nube del worker'
+    : wp.state === 'stale-data' ? 'datos viejos: hace más de 5 min que no se puede revisar la nube, no se pulsa nada'
     : wp.state === 'no-owner' ? 'esperando que la ventanita se abra una vez'
     : wp.state === 'no-lease' ? 'sin permiso del worker vigente'
     : wp.state === 'no-plan' ? 'hoy no hay turno planeado (día libre o freelancer sin turno)'

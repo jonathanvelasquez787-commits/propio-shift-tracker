@@ -12,7 +12,8 @@ import { extensionWorkerPlanModel } from '../js/extension-box.js';
 // Lunes 16-nov-2026: el horario normal empieza a las 07:00 (hora de la PC de prueba).
 const at = (hh, mm = 0, day = 16) => new Date(2026, 10, day, hh, mm, 0, 0);
 const OWNER = 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee';
-const data = (state = {}, settings = {}, calls = []) => ({ result: 'ok', state, settings, calls });
+// checkedAt = ahora (el reloj de la prueba esta fijado con withClock): la nube se revisó hace un instante.
+const data = (state = {}, settings = {}, calls = []) => ({ result: 'ok', state, settings, calls, checkedAt: Date.now() });
 const build = (now, extra = {}) => buildWorkerPlan({ data: data(), owner: OWNER, leaseExpiresAt: now.getTime() + 80000, lastEndedAt: null, now: now.getTime(), ...extra });
 const withClock = (now, fn) => { test.mock.timers.enable({ apis: ['Date'], now: now.getTime() }); try { return fn(); } finally { test.mock.timers.reset(); } };
 
@@ -105,6 +106,25 @@ test('plan del worker: las llamadas de la nube (forma reducida) cuentan para el 
   });
 });
 
+test('plan del worker (4c): con la nube sin revisar hace mas de 5 min no hay plan; a los 4 min si', () => {
+  const now = at(10);
+  withClock(now, () => {
+    const t = now.getTime();
+    const old = build(now, { data: { ...data(), checkedAt: t - 5 * 60000 - 1000 } });
+    assert.equal(old.plan, null);
+    assert.equal(old.why, 'stale-data');
+    assert.equal(build(now, { data: { ...data(), checkedAt: t - 4 * 60000 } }).why, 'ok');
+    // Sin hora de revision tampoco se confia en la copia.
+    assert.equal(build(now, { data: { ...data(), checkedAt: null } }).why, 'stale-data');
+    // Datos con updatedAt viejo pero revisados hace poco SI valen (la nube esta al dia aunque no hayas guardado).
+    assert.equal(build(now, { data: { ...data(), updatedAt: 'viejo', checkedAt: t - 20000 } }).why, 'ok');
+  });
+});
+
+test('cuadro (4c): la linea del plan explica los datos viejos', () => {
+  assert.match(extensionWorkerPlanModel({ workerPlan: { state: 'stale-data' } }), /datos viejos.*5 min/);
+});
+
 test('cuadro: la linea del plan del worker explica cada estado', () => {
   assert.match(extensionWorkerPlanModel({ workerPlan: { state: 'ok', inferredStart: true } }), /listo para trabajar con todo cerrado.*a la hora del horario/);
   assert.match(extensionWorkerPlanModel({ workerPlan: { state: 'no-lease' } }), /sin permiso del worker/);
@@ -148,5 +168,36 @@ test('worker: con todo cerrado arma el plan solo y prepareFirst lo usa; la venta
     clock += 13000; test.mock.timers.setTime(clock);
     await w.flush();
     assert.equal(store['bridge-v1'].preparation.plan, null);
+  } finally { test.mock.timers.reset(); }
+});
+
+test('worker (4c): con todo cerrado y la nube sin revisar hace mas de 5 min no usa plan y el cuadro dice datos viejos', async () => {
+  const USER = OWNER, scope = await scopeForUser(USER);
+  let clock = at(10, 0).getTime();
+  const store = {
+    [SESSION_KEY]: { accessToken: 'T', refreshToken: 'R', expiresAt: clock + 3600000, scope, email: 'yo@example.com' },
+    [DATA_KEY]: { result: 'ok', scope, userId: USER, updatedAt: 'u', checkedAt: clock - 6 * 60000, state: {}, settings: {}, calls: [] },
+    [LEASE_KEY]: { scope, owner: OWNER, asks: 1, lastAt: clock, result: 'granted', grantedAt: clock, expiresAt: clock + 80000 } };
+  const api = { runtime: { id: 'ext', getURL: n => `chrome-extension://ext/${n}`, onMessage: { addListener() {} } },
+    storage: { local: { get: async key => ({ [key]: structuredClone(store[key]) }), set: async patch => { Object.assign(store, structuredClone(patch)); }, remove: async key => { delete store[key]; } } },
+    alarms: { create() {}, onAlarm: { addListener() {} } }, webNavigation: { onCommitted: { addListener() {} } },
+    webRequest: { onBeforeRequest: { addListener() {} }, onCompleted: { addListener() {} }, onErrorOccurred: { addListener() {} } },
+    tabs: { onRemoved: { addListener() {} }, query: async () => [], sendMessage: async () => null } };
+  test.mock.timers.enable({ apis: ['Date'], now: clock });
+  try {
+    const w = createBridgeWorker(api, { now: () => clock, sessionOptions: { fetchImpl: async () => { throw new Error('sin red'); }, supabaseUrl: 'https://example.supabase.co', anonKey: 'anon' } });
+    const panel = { id: 'ext', url: 'chrome-extension://ext/panel.html?popup=1' };
+    await w.message({ kind: 'status' }, panel);
+    const saved = JSON.parse(JSON.stringify(store['bridge-v1']));
+    saved.mode = 'auto'; saved.accountScope = scope; saved.coordinationOwner = OWNER;
+    store['bridge-v1'] = saved;
+    await w.ensureWorkerPlan(true);
+    assert.equal(w.workerPlanStatus().state, 'stale-data');
+    await w.flush();
+    assert.equal(store['bridge-v1'].preparation.plan, null);
+    // Cuando la nube vuelve a contestar, el plan se arma otra vez.
+    store[DATA_KEY] = { ...store[DATA_KEY], checkedAt: clock - 10000 };
+    await w.ensureWorkerPlan(true);
+    assert.equal(w.workerPlanStatus().state, 'ok');
   } finally { test.mock.timers.reset(); }
 });
