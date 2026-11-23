@@ -12,11 +12,14 @@ const fresh = () => ({ mode: 'observe', accountScope: null, tabs: {}, session: n
     resume: { break: false, lunch: false, mode: 'manual' }, pendingPause: null, resumedPauses: [], reinforcement: null } });
 const BADGE_PROBLEMS = new Set(['queue-full', 'expired-event', 'event-rejected', 'tracker-needs-review']);
 const BADGE_TITLE = 'Propio · Tracker y vista original';
+// Cuantos eventos de llamadas seguidos (HTTP 2xx) sin un "name" legible hacen pensar que Propio cambio sus señales.
+export const SIGNALS_ODD_LIMIT = 8;
 // Marca "!" en el icono de Chrome cuando la extension esta vinculada y NO esta registrando (o hay llamadas trabadas).
 // "tracker-closed" NO cuenta: con la ventanita cerrada las llamadas esperan en la cola y no se pierden.
 export function badgeFor(state) {
   if (!state?.accountScope) return { text: '', title: BADGE_TITLE };
   if (state.mode !== 'auto' || BADGE_PROBLEMS.has(state.attention)) return { text: '!', title: 'Propio: la extensión NO está registrando. Abrí la ventanita para ver por qué.' };
+  if (Number(state.diagnostic?.oddRun) >= SIGNALS_ODD_LIMIT) return { text: '!', title: 'Propio: parece que cambió sus señales de llamadas y la extensión podría no registrarlas. Abrí la ventanita.' };
   return { text: '', title: BADGE_TITLE };
 }
 export function pendingQueueSummary(queue, now = Date.now()) {
@@ -30,7 +33,7 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
   let serial = Promise.resolve(), flushing = null, acceptedLease = null, leaseDeadline = 0;
   let shownBadge = null;
   const showBadge = async state => {
-    const badge = badgeFor(state), key = badge.text;
+    const badge = badgeFor(state), key = `${badge.text}|${badge.title}`;
     if (shownBadge === key) return;
     try {
       await api.action?.setBadgeText?.({ text: badge.text });
@@ -308,13 +311,14 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     if (kind === 'portal-api' && details.method !== 'POST' && !['xmlhttprequest', 'websocket'].includes(details.type)) return;
     try { if (new URL(details.initiator).origin !== PORTAL_ORIGIN) return; } catch { return; }
     // Other portal APIs contribute only a counter; never inspect their bodies.
-    let signal = null, format = 'not-read';
+    let signal = null, format = 'not-read', odd = false;
     try {
       if (kind !== 'portal-api' && details.method === 'POST') {
         const parsed = readPropioRequestBody(details.requestBody);
         format = parsed.format; signal = readPropioSignal(details.url, parsed.body);
+        if (kind === 'twilio') odd = typeof parsed.body?.name !== 'string';
       }
-      pending.set(details.requestId, { signal, kind, format, tabId: details.tabId, at: new Date(details.timeStamp).toISOString() });
+      pending.set(details.requestId, { signal, kind, format, odd, tabId: details.tabId, at: new Date(details.timeStamp).toISOString() });
     } catch { /* Raw bodies, headers and URLs are never retained. */ }
   }
   async function completed(details) {
@@ -325,6 +329,9 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
       const success = details.statusCode >= 200 && details.statusCode < 300;
       state.diagnostic = { requests: Math.min(1000000, diagnostic.requests + 1), recognized: Math.min(1000000, diagnostic.recognized + Number(success && !!item.signal)),
         last: [...diagnostic.last, { kind: item.kind, format: item.format, status: details.statusCode, result: !success ? 'http-error' : item.signal ? 'recognized' : 'unknown', at: item.at }].slice(-20) };
+      // Racha de eventos de llamadas que no se entienden (cambio de formato de Propio); uno legible la reinicia.
+      if (success && item.kind === 'twilio') state.diagnostic.oddRun = item.odd ? Math.min(1000, (Number(diagnostic.oddRun) || 0) + 1) : 0;
+      else state.diagnostic.oddRun = Number(diagnostic.oddRun) || 0;
       if (!success || !item.signal) return;
       callSignal(state, item.tabId, item.signal, item.at);
     });

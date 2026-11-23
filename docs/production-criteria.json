@@ -1014,6 +1014,10 @@
           ]
         },
         {
+      "file": "tests/extension-aviso-senales.test.mjs",
+      "namedCases": ["badgeFor: una racha larga de eventos ilegibles pone \"!\" aunque este registrando", "el worker pone \"!\" tras varios eventos de llamadas sin nombre legible y lo quita con uno legible", "eventos con nombre desconocido o fallos de red NO cuentan como señales cambiadas", "la racha sigue contando aunque lleguen solicitudes que fallan en medio", "las llamadas normales se siguen registrando igual", "el cuadro explica en \"Estado de conexión\" que Propio cambio sus señales"]
+    },
+    {
       "file": "tests/extension-aviso-icono.test.mjs",
       "namedCases": ["badgeFor: sin vincular no hay marca; vinculada y en auto sin problema tampoco", "badgeFor: vinculada y sin registrar, o con llamadas trabadas, muestra \"!\"", "el worker pone la marca en el icono al vincular y la quita al registrar", "si la extension se pausa por un problema, vuelve la marca", "no repite la orden al icono si la marca no cambio", "si el icono falla, el registro sigue funcionando"]
     },
