@@ -41,7 +41,7 @@ try:
         check('con datos de hace 6 min el plan NO se arma', st['workerPlan']['state'] != 'ok', st['workerPlan']['state'])
         r.kick(); time.sleep(5)
         st = r.status(); r.say('tras revisar la nube caida:', brief(st))
-        check('la nube caida queda anotada en datos', st['workerData']['state'] in ('network', 'error'), st['workerData']['state'])
+        check('la nube caida queda anotada en datos (la copia se conserva y dice que el ultimo intento fallo)', st['workerData'].get('failing') in ('network', 'error'), str(st['workerData']))
         check('el plan sigue sin armarse', st['workerPlan']['state'] != 'ok', st['workerPlan']['state'])
         time.sleep(20)
         check('NO se pulso Start Calls sin datos al dia', r.clicks() == 0, f'clicks={r.clicks()}')
