@@ -317,6 +317,10 @@
           ]
         },
         {
+          "file": "tests/quitar-temas.test.mjs",
+          "namedCases": ["quitar temas: Cielo Azul, Lavanda Nocturna, Brisa Turquesa y Salvia Fresca ya no se ofrecen", "quitar temas: quien tenía guardado uno de los temas quitados pasa a Original", "quitar temas: los otros modos de esas paletas se conservan"]
+        },
+    {
           "file": "tests/reiniciar-conserva-tema.test.mjs",
           "namedCases": ["reiniciar todos los datos conserva el tema oscuro que ya tenías", "reiniciar todos los datos conserva el tema claro que ya tenías", "reiniciar sin tema elegido deja el de fábrica"]
         },

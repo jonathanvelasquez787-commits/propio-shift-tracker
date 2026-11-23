@@ -239,12 +239,6 @@
       "app.html"
     ]
   },
-  "s_043073f1": {
-    "source": "#CEDDF7",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_043ef205": {
     "source": "Final calculado*",
     "files": [
@@ -428,12 +422,6 @@
     "source": "Liberaste {{v0}}{{v1}} de {{v2}} a Disponible.",
     "files": [
       "js/finance.js"
-    ]
-  },
-  "s_07e0e133": {
-    "source": "#DDE8FB",
-    "files": [
-      "app.html"
     ]
   },
   "s_07eb37e7": {
@@ -2520,12 +2508,6 @@
       "js/backup-recovery.js"
     ]
   },
-  "s_2ccac76e": {
-    "source": "Lavanda Nocturna",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_2ce32aec": {
     "source": "de esa semana",
     "files": [
@@ -2965,12 +2947,6 @@
     "source": "Resultado de la última importación",
     "files": [
       "js/call-review-view.js"
-    ]
-  },
-  "s_33cc7252": {
-    "source": "Lavanda Nocturna: Lavanda, celeste y menta",
-    "files": [
-      "app.html"
     ]
   },
   "s_33d4dce2": {
@@ -3603,12 +3579,6 @@
     "source": ">{{v0}}m · Superó meta",
     "files": [
       "js/calendar.js"
-    ]
-  },
-  "s_3f00a024": {
-    "source": "12 temas",
-    "files": [
-      "app.html"
     ]
   },
   "s_3f16d319": {
@@ -4478,12 +4448,6 @@
     "source": "Usado",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_4e42073d": {
-    "source": "Brisa Turquesa: Turquesa, azul y violeta",
-    "files": [
-      "app.html"
     ]
   },
   "s_4e4a2c4e": {
@@ -7088,6 +7052,12 @@
       "js/calendar.js"
     ]
   },
+  "s_7dbc0735": {
+    "source": "8 temas",
+    "files": [
+      "app.html"
+    ]
+  },
   "s_7dd34dd8": {
     "source": "Turno continuado — interrupción de {{v0}} min registrada",
     "files": [
@@ -7761,12 +7731,6 @@
       "js/app-main.js"
     ]
   },
-  "s_8883d3ca": {
-    "source": "#C5E1DF",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_8886da7a": {
     "source": "1 llamada duró 0 min",
     "files": [
@@ -7796,12 +7760,6 @@
     "files": [
       "js/app-main.js",
       "js/pay-receipts.js"
-    ]
-  },
-  "s_890ab8f2": {
-    "source": "Cielo Azul: Azul noche, intenso y celeste",
-    "files": [
-      "app.html"
     ]
   },
   "s_8917b012": {
@@ -9868,12 +9826,6 @@
       "js/app-main.js"
     ]
   },
-  "s_ab4be598": {
-    "source": "Brisa Turquesa",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_ab634077": {
     "source": "Período a exportar",
     "files": [
@@ -9915,12 +9867,6 @@
     "source": "Intentando ponerte disponible",
     "files": [
       "js/automation-ui.js"
-    ]
-  },
-  "s_ac236890": {
-    "source": "#D8ECE9",
-    "files": [
-      "app.html"
     ]
   },
   "s_ac358a06": {
@@ -10348,12 +10294,6 @@
   },
   "s_b3338f85": {
     "source": "Restar 15 minutos",
-    "files": [
-      "app.html"
-    ]
-  },
-  "s_b336460c": {
-    "source": "#CDE3D3",
     "files": [
       "app.html"
     ]
@@ -10791,12 +10731,6 @@
     "source": "Llamadas marcadas como Billable hoy",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_bc5d567b": {
-    "source": "Salvia Fresca",
-    "files": [
-      "app.html"
     ]
   },
   "s_bc902c0e": {
@@ -11895,12 +11829,6 @@
     "source": "{{v0}} histórica(s)",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_d12ee789": {
-    "source": "#DCECDF",
-    "files": [
-      "app.html"
     ]
   },
   "s_d13bc89d": {
@@ -13011,12 +12939,6 @@
       "js/orden-view.js"
     ]
   },
-  "s_e2c44e41": {
-    "source": "Cielo Azul",
-    "files": [
-      "app.html"
-    ]
-  },
   "s_e2cab854": {
     "source": "No se pudo guardar — almacenamiento lleno",
     "files": [
@@ -13063,12 +12985,6 @@
     "source": "Escribe tu contraseña nueva para terminar.",
     "files": [
       "js/landing.js"
-    ]
-  },
-  "s_e381ff2c": {
-    "source": "#3A3D61",
-    "files": [
-      "app.html"
     ]
   },
   "s_e3b7fffc": {
@@ -14372,12 +14288,6 @@
     "source": "Llamada descartada",
     "files": [
       "js/app-main.js"
-    ]
-  },
-  "s_f8c85277": {
-    "source": "Salvia Fresca: Verde salvia, menta y crema",
-    "files": [
-      "app.html"
     ]
   },
   "s_f9215e3b": {
