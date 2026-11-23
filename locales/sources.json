@@ -2071,6 +2071,12 @@
       "js/finance.js"
     ]
   },
+  "s_2594e9e0": {
+    "source": "⏰ Tu {tipo} se pasó de lo planeado. Vuelve ya.",
+    "files": [
+      "js/app-main.js"
+    ]
+  },
   "s_25a3433a": {
     "source": "Asignación automática activada — se repartirá con tu próxima llamada guardada",
     "files": [
@@ -10001,6 +10007,12 @@
     "source": "Meta del día",
     "files": [
       "app.html"
+    ]
+  },
+  "s_aee7ae47": {
+    "source": "⏰ Llevas {min} min de más en tu {tipo}. Vuelve ya.",
+    "files": [
+      "js/app-main.js"
     ]
   },
   "s_aeebacac": {
