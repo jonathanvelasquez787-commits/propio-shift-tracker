@@ -947,7 +947,7 @@
             "cada interruptor de la extensión abre solo lo suyo",
             "importar historial sigue en silencio total aunque los interruptores estén prendidos",
             "los ajustes nuevos arrancan apagados y solo aceptan true",
-            "el menú lateral tiene un interruptor de la extensión para cada cosa",
+            "los interruptores «con la extensión» viven en el cuadro de la extensión y no en el menú lateral",
             "la extensión usa los interruptores y el historial importado sigue silencioso"
           ]
         },

@@ -53,7 +53,7 @@ test('cuadro de la extensión: el worker atiende al panel de la app y sigue rech
 test('cuadro de la extensión: está conectado a la app y su CSS usa variables del tema', () => {
   const main = read('js/app-main.js'), css = read('css/app-shell.css');
   assert.match(main, /import \{ initExtensionBox \} from '\.\/extension-box\.js'/);
-  assert.ok(main.indexOf("initExtensionBox();") > main.indexOf("getElementById('ajustesHeaderBtn').addEventListener"));
+  assert.ok(main.indexOf("initExtensionBox(document, globalThis.chrome") > main.indexOf("getElementById('ajustesHeaderBtn').addEventListener"));
   const block = css.slice(css.indexOf('/* cuadro extension */'), css.indexOf('/* fin cuadro extension */'));
   assert.ok(block.length > 500 && !/#[0-9a-fA-F]{3,8}\b/.test(block), 'sin hexadecimales');
   assert.equal((block.match(/\{/g) || []).length, (block.match(/\}/g) || []).length);

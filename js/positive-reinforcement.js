@@ -231,14 +231,6 @@ export function renderSettingsReinforcement() {
   const ask = document.getElementById('positiveAskAfterCallInput');
   if (enabled) enabled.checked = settings.reinforcement.enabled;
   if (ask) ask.checked = settings.reinforcement.askAfterCall;
-  const celebrateBridge = document.getElementById('positiveBridgeCelebrateInput');
-  const askBridge = document.getElementById('positiveBridgeAskInput');
-  if (celebrateBridge) celebrateBridge.checked = settings.reinforcement.celebrateBridgeCalls === true;
-  if (askBridge) askBridge.checked = settings.reinforcement.askAfterBridgeCall === true;
-  const celebrateBridgeRow = document.getElementById('positiveBridgeCelebrateRow');
-  if (celebrateBridgeRow) celebrateBridgeRow.hidden = !settings.reinforcement.enabled;
-  const askBridgeRow = document.getElementById('positiveBridgeAskRow');
-  if (askBridgeRow) askBridgeRow.hidden = !(settings.reinforcement.enabled && settings.reinforcement.askAfterCall);
   const soundRow = document.getElementById('sidebarGameSoundRow');
   if (soundRow) soundRow.hidden = !settings.reinforcement.enabled;
   const inactivityOn = settings.reinforcement.inactivityEnabled !== false;
@@ -533,16 +525,6 @@ export function initPositiveReinforcement() {
     }
     renderSettingsReinforcement();
   });
-  for (const [inputId, key] of [['positiveBridgeCelebrateInput', 'celebrateBridgeCalls'], ['positiveBridgeAskInput', 'askAfterBridgeCall']]) {
-    document.getElementById(inputId)?.addEventListener('change', (event) => {
-      const previous = settings.reinforcement[key] === true;
-      settings.reinforcement[key] = !!event.target.checked;
-      if (saveSettingsOnly() === false) {
-        settings.reinforcement[key] = previous;
-        event.target.checked = previous;
-      }
-    });
-  }
   document.addEventListener('app:modal-closed', (event) => {
     if (event.detail?.id === 'positiveReflectionModal') reflectionCall = null;
     setTimeout(drainReflectionQueue, 0);

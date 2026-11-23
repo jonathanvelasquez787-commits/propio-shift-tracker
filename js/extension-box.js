@@ -143,7 +143,7 @@ export function extensionSupportModel(state) {
     items: last.map(item => `${REQUEST_KINDS[item.kind] || 'Solicitud'} · ${REQUEST_FORMATS[item.format] || 'Sin formato'} · HTTP ${item.status} · ${item.result === 'recognized' ? 'Señal reconocida' : item.result === 'http-error' ? 'Solicitud fallida' : 'Sin señal compatible'}`) };
 }
 
-export function initExtensionBox(doc = globalThis.document, chromeApi = globalThis.chrome, loc = globalThis.location) {
+export function initExtensionBox(doc = globalThis.document, chromeApi = globalThis.chrome, loc = globalThis.location, reinforcement = null) {
   if (!doc || !loc || loc.protocol !== 'chrome-extension:' || !chromeApi?.runtime?.sendMessage) return null;
   const anchor = doc.getElementById('higherRateHeaderBtn');
   if (!anchor || doc.getElementById('extStatusBtn')) return null;
@@ -178,6 +178,29 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
   const recText = el('span'); recText.append(el('b', '', 'Registrar mi actividad'), el('small', '', 'Guarda turnos y llamadas en Shift Tracker.'));
   const sw = el('span', 'ext-box-switch'), auto = el('input'); auto.type = 'checkbox'; auto.id = 'extBoxAuto'; auto.setAttribute('role', 'switch');
   sw.append(auto, el('span', 'ext-box-track')); rec.append(recText, sw);
+  // Interruptores «con la extensión» (antes en el menú lateral). Solo salen si su interruptor padre está encendido.
+  const bridgeRow = (id, title, note) => {
+    const row = el('label', 'ext-box-row'); row.setAttribute('for', id); row.hidden = true;
+    const text = el('span'); text.append(el('b', '', title), el('small', '', note));
+    const sw = el('span', 'ext-box-switch'), input = el('input'); input.type = 'checkbox'; input.id = id; input.setAttribute('role', 'switch');
+    sw.append(input, el('span', 'ext-box-track')); row.append(text, sw);
+    return { row, input };
+  };
+  const celebrateRow = bridgeRow('extBoxCelebrate', 'Celebrar con la extensión', 'Celebra las llamadas que la extensión registra sola.');
+  const askRow = bridgeRow('extBoxAsk', 'Cierre breve con la extensión', 'Pregunta cómo te fue en esas llamadas.');
+  const renderReinforcement = () => {
+    const v = reinforcement?.get?.();
+    celebrateRow.row.hidden = !(v && v.enabled);
+    askRow.row.hidden = !(v && v.enabled && v.askAfterCall);
+    if (v) { celebrateRow.input.checked = v.celebrate === true; askRow.input.checked = v.ask === true; }
+  };
+  const saveReinforcement = () => {
+    const result = reinforcement?.set?.({ celebrate: celebrateRow.input.checked, ask: askRow.input.checked });
+    if (result && result.status !== 'ok') feedback = 'No se pudo guardar este cambio. Intentá de nuevo.';
+    renderReinforcement();
+  };
+  celebrateRow.input.addEventListener('change', saveReinforcement);
+  askRow.input.addEventListener('change', saveReinforcement);
   const pend = el('div', 'ext-box-row');
   const pendText = el('span'); const pendNote = el('small', '', 'Nada esperando'); pendNote.id = 'extBoxPendingNote';
   pendText.append(el('b', '', 'Eventos pendientes'), pendNote);
@@ -269,7 +292,7 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
   const supHelp = el('p', 'ext-box-note', 'Números para revisar la conexión.');
   const supSummary = el('p', 'ext-box-note'); supSummary.id = 'detectorStatus';
   const supList = el('ul', 'ext-box-signals'); supList.id = 'detectorRequests'; supSec.body.append(supHelp, supSummary, supList);
-  box.append(head, conn, rec, pend, queueBox, avail, doing, connSec.wrap, histSec.wrap, actSec.wrap, supSec.wrap);
+  box.append(head, conn, rec, celebrateRow.row, askRow.row, pend, queueBox, avail, doing, connSec.wrap, histSec.wrap, actSec.wrap, supSec.wrap);
   doc.body.append(box);
 
   let busy = false, feedback = '', shown = false, timer = null, workSession = null;
@@ -280,6 +303,7 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
     box.style.top = Math.round(r.bottom + y + 8) + 'px';
   }
   async function refresh() {
+    renderReinforcement();
     let state = null;
     try { state = await send({ kind: 'status' }); } catch { state = null; }
     const m = extensionBoxModel(state);
