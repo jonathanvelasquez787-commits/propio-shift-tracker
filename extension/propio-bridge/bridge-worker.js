@@ -478,7 +478,16 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
       const observed = typeof packet.observedAt === 'string' ? Date.parse(packet.observedAt) : NaN;
       const recentObservation = () => Number.isFinite(observed) && now() >= observed && now() - observed <= 3000;
       await transact(state => {
-        const tabId = sender.tab.id, previous = state.tabs[tabId] || {};
+        const tabId = sender.tab.id;
+        // F5 a mitad de llamada: la pagina nueva trae otro documentId y la llamada de la anterior se corto sin avisar.
+        // No se pierde: se cierra con la hora de la recarga y se marca como final aproximado.
+        const before = state.tabs[tabId];
+        if (before?.active && before.documentId && before.documentId !== packet.documentId) {
+          const closeAt = new Date(Math.max(now(), Date.parse(before.active.startedAt) + 1)).toISOString();
+          const closed = callSignal(state, tabId, 'disconnected', closeAt, { endedBy: 'portal-reloaded' });
+          if (!closed?.queued) state.attention = 'portal-closed';
+        }
+        const previous = state.tabs[tabId] || {};
         const blocked = previous.blockedDocument === packet.documentId;
         state.tabs[tabId] = { ...previous, documentId: packet.documentId, session: packet.session, call: packet.call, offline: packet.offline === true,
           seenAt: Number.isFinite(observed) ? new Date(observed).toISOString() : at, observationFresh: recentObservation() };
