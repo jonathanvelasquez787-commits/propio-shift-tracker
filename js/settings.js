@@ -59,7 +59,7 @@ let syncingGoals = false;
       const minInput = document.getElementById('productiveGoalInput');
       const usdInput = document.getElementById('earningsGoalInput');
       const currencyInput = document.getElementById('goalCurrencyInput');
-      const current = effectiveDailyGoal(getActiveDayKey());
+      const current = effectiveDailyGoal(getActiveDayKey(), { withDebt: false });
       let minutes = Number(minInput.value);
       let dollars = Number(usdInput.value);
       let currencyAmount = Number(currencyInput?.value);
@@ -128,7 +128,7 @@ let syncingGoals = false;
       const usdInput = document.getElementById('earningsGoalInput');
       const currencyInput = document.getElementById('goalCurrencyInput');
       const exchangeRate = Number(settings.exchangeRate) > 0 ? Number(settings.exchangeRate) : 0;
-      const goal = effectiveDailyGoal(getActiveDayKey());
+      const goal = effectiveDailyGoal(getActiveDayKey(), { withDebt: false });
       if (minInput) minInput.value = formatMinutes(goal.min);
       if (usdInput) usdInput.value = goal.usd.toFixed(2);
       if (currencyInput && exchangeRate > 0) currencyInput.value = currencyCeilFromUsdAmount(goal.usd, exchangeRate).toFixed(2);
@@ -147,7 +147,7 @@ let syncingGoals = false;
         return;
       }
       const { minutes, dollars } = computed;
-      const current = effectiveDailyGoal(dayKey);
+      const current = effectiveDailyGoal(dayKey, { withDebt: false });
       if (Math.abs(current.min - minutes) < 0.005 && Math.abs(current.usd - dollars) < 0.005) {
         refreshGoalInputs();
         return;
@@ -571,7 +571,7 @@ let syncingGoals = false;
       const currencyInput = document.getElementById('currencyLabelInput');
       // Los 3 campos de meta muestran la meta EFECTIVA del día activo (puede
       // ser un override de ese día, ver effectiveDailyGoal).
-      const activeDayGoal = effectiveDailyGoal(getActiveDayKey());
+      const activeDayGoal = effectiveDailyGoal(getActiveDayKey(), { withDebt: false });
       if (!pendingGoalChange && document.activeElement !== minInput) minInput.value = formatMinutes(activeDayGoal.min);
       if (!pendingGoalChange && document.activeElement !== usdInput) usdInput.value = activeDayGoal.usd.toFixed(2);
       const goalDayOverrideNote = document.getElementById('goalDayOverrideNote');

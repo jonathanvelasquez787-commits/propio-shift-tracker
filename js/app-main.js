@@ -145,7 +145,7 @@ import { acwMinutesForBlock } from './block-acw.js';
 import { activeAppKeys } from './sync.js';
 import { CONNECTED_LIVE_GRACE_MIN, GAP_AUTO_OTHER_THRESHOLD_MIN, PAUSE_SLOT_MAX_DISTANCE_MIN, WEEKDAYS, WEEKDAY_JS_INDEX, baseDayConfigFor, buildPlannedSlots, callDateKeyFromValue, callDateToDate, callsForDay, computeCurrentAcwStart, currentShiftAccountingDayKey, cycleAnchorDate, dateAtTime, dateKey, dayConfigFor, dayEvents, dayGapRows, dayIsEffectivelyOff, dayPauseIntervals, dayPausesForSlotStats, dayShiftBounds, dayShiftSessions, dayWorkBounds, dayWorkSessions, defaultActiveDayKey, defaultDaySchedule, defaultWeeklySchedule, ensureBlockProductivityGoals, ensureWeeklySchedule, findPlannedSlotForActivePause, formatHHMM, gapClassification, gapKeyFor, getActiveDayKey, getDayNote, getEffectiveScheduleForDay, getGapAnnotation, getPropioBridgePlan, getShiftWindow, getWorkSessionStatus, manualGapPauseIntervals, mergeIntervals, mergeOverlappingPauseEntries, migrateDayConfigToBlocks, minutesToHHMM, overlapMinutesWithIntervals, pad, pauseAssignmentCache, pauseDurationExcludingCalls, pauseForSlot, previousCalendarDay, referenceDurationMinForActivePause, reinforcementScheduleIntervals, sameCallDay, startOfCycleWeek, subtractCallsFromPauseInterval, suggestGapLabel, toDateFromInputs, toMinutes, todayCallDateKey, weekStartKeyForDayKey, weekStartKeyFromDate, weekdayKeyForDayKey, workStartForConnection, configureBridgePlan } from './bridge-plan.js';
 export { WEEKDAYS, callDateKeyFromValue, callDateToDate, callsForDay, dayConfigFor, dayEvents, dayGapRows, dayIsEffectivelyOff, dayShiftBounds, defaultDaySchedule, ensureWeeklySchedule, formatHHMM, getActiveDayKey, getDayNote, getPropioBridgePlan, getWorkSessionStatus, mergeIntervals, minutesToHHMM, pad, previousCalendarDay, sameCallDay, startOfCycleWeek, toDateFromInputs, toMinutes, todayCallDateKey, weekStartKeyFromDate, weekdayKeyForDayKey } from './bridge-plan.js';
-import { disorderBreakdown, orderSummary, sanitizeOrderTope, favorMinutes, dayOrderStatus, walkStreak, rewardProgress } from './orden-model.js';
+import { disorderBreakdown, carryDebtMin, orderSummary, sanitizeOrderTope, favorMinutes, dayOrderStatus, walkStreak, rewardProgress } from './orden-model.js';
 import { renderMiOrden, setMiOrdenEditing } from './orden-view.js';
 import { initExtensionBox } from './extension-box.js';
 
@@ -2232,6 +2232,8 @@ function renderMiOrdenCard({ dayKey }) {
     favorMin: today.favorMin,
   });
   const streak = walkStreak(history);
+  summary.carryMin = orderDebtCarryMin(dayKey);
+  summary.owedMin = streak.lostToday ? summary.debtMin : 0;
   const baseDate = callDateToDate(dayKey) || new Date();
   const monday = orderDayKeyOffset(dayKey, -((baseDate.getDay() + 6) % 7));
   const formatter = new Intl.DateTimeFormat(settings.language === 'en' ? 'en' : 'es', { weekday: 'narrow' });
@@ -3025,19 +3027,40 @@ export function getDailyGoalOverride(dayKey) {
   return { min, usd };
 }
 
-export function effectiveDailyGoal(dayKey = getActiveDayKey()) {
+// Mi orden (castigo): la deuda del ultimo dia de trabajo anterior se suma a la meta de minutos de HOY.
+// Solo hoy (no dias pasados ni futuros), nunca sobre una meta que pusiste a mano para ese dia, y un dia
+// perdonado no se cobra. Devuelve 0 si no hay deuda.
+let orderCarryBusy = false;
+export function orderDebtCarryMin(dayKey) {
+  if (orderCarryBusy) return 0;
+  const normalized = callDateKeyFromValue(dayKey);
+  if (!normalized || normalized !== todayCallDateKey()) return 0;
+  orderCarryBusy = true;
+  try {
+    if (dayIsEffectivelyOff(normalized)) return 0;
+    return carryDebtMin(orderPastDays(normalized), settings.miOrdenTopeMin);
+  } finally {
+    orderCarryBusy = false;
+  }
+}
+
+// { withDebt: false } da la meta SIN la deuda de Mi orden (Ajustes la usa para no guardar la deuda como meta fija).
+export function effectiveDailyGoal(dayKey = getActiveDayKey(), { withDebt = true } = {}) {
   const override = getDailyGoalOverride(dayKey);
   if (override) return { min: override.min, usd: override.usd, isOverride: true };
+  let goal = { min: Number(settings.productiveGoalMin) || 0, usd: Number(settings.earningsGoal) || 0, isOverride: false };
   const normalized = callDateKeyFromValue(dayKey);
   const historical = normalized && settings.goalHistoryByDay && settings.goalHistoryByDay[normalized];
   if (historical && typeof historical === 'object') {
     const min = Number(historical.min);
     const usd = Number(historical.usd);
     if (Number.isFinite(min) && min >= 0 && Number.isFinite(usd) && usd >= 0) {
-      return { min, usd, isOverride: false, isHistorical: true };
+      goal = { min, usd, isOverride: false, isHistorical: true };
     }
   }
-  return { min: Number(settings.productiveGoalMin) || 0, usd: Number(settings.earningsGoal) || 0, isOverride: false };
+  // typeof: otras pruebas copian esta funcion sola, sin la regla de Mi orden.
+  const debtMin = withDebt && typeof orderDebtCarryMin === 'function' ? orderDebtCarryMin(dayKey) : 0;
+  return debtMin > 0 ? { ...goal, min: goal.min + debtMin, debtMin } : goal;
 }
 
 // Value=null borra el override de ese día (vuelve a la meta general).

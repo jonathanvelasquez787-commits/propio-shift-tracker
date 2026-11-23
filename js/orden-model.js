@@ -89,3 +89,16 @@ export function rewardProgress(okDays = 0, targetDays = 0) {
   const pct = target > 0 ? Math.min(100, Math.round((ok / target) * 100)) : 0;
   return { okDays: ok, targetDays: target, pct, done: target > 0 && ok >= target };
 }
+
+// Castigo: deuda (minutos, con tope) del ultimo dia de trabajo de los ultimos 7 que se suma a la meta de hoy.
+// history va del mas viejo al mas nuevo, SIN hoy. Un dia libre no cuenta; un dia perdonado tampoco se cobra.
+export function carryDebtMin(history = [], topeMin = 60) {
+  const recent = history.slice(-7);
+  let previous = null;
+  for (let i = recent.length - 1; i >= 0; i--) {
+    if (recent[i].status !== 'off') { previous = recent[i]; break; }
+  }
+  if (!previous || previous.status !== 'bad') return 0;
+  if (walkStreak(history).forgiven.includes(previous.key)) return 0;
+  return orderSummary({ disorderMin: previous.disorderMin, topeMin, favorMin: previous.favorMin }).debtMin;
+}
