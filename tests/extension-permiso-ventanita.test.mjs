@@ -29,6 +29,14 @@ test('permiso ventanita: la ventanita del icono (sin pestaña y sin frameId) ya 
 
 test('permiso ventanita: un marco hijo de la extension sigue rechazado', () => conOrigenReal(async () => {
   const w = worker();
-  assert.equal((await w.message({ kind: 'tracker-coordination', accountScope: scope }, popup({ frameId: 2 }))).why, 'frame');
-  assert.equal((await w.message({ kind: 'tracker-coordination', accountScope: scope }, { id: 'popup-extension', url: 'https://otro.example/' })).why, 'frame');
+  assert.equal((await w.message({ kind: 'tracker-coordination', accountScope: scope }, popup({ frameId: 2 }))).why, 'frame:2/sin-tab/propia');
+  assert.equal((await w.message({ kind: 'tracker-coordination', accountScope: scope }, { id: 'popup-extension', url: 'https://otro.example/' })).why, 'frame:undefined/sin-tab/ajena');
+}));
+
+test('permiso ventanita: la ventanita propia vale con frameId -1, null o con pestaña', () => conOrigenReal(async () => {
+  const w = worker();
+  for (const extra of [{ frameId: -1 }, { frameId: null }, { frameId: -1, tab: { id: 7 } }, { tab: { id: 7 } }]) {
+    const r = await w.message({ kind: 'tracker-coordination', accountScope: scope }, popup(extra));
+    assert.equal(r.why, 'worker-unpaired', JSON.stringify(extra));
+  }
 }));
