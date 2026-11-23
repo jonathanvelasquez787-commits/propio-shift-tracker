@@ -28,10 +28,12 @@ export const SILENT_LIMIT_MS = 5 * 60000;
 export const CALL_MAX_MS = 250 * 60000;
 // Marca "!" en el icono de Chrome cuando la extension esta vinculada y NO esta registrando (o hay llamadas trabadas).
 // "tracker-closed" NO cuenta: con la ventanita cerrada las llamadas esperan en la cola y no se pierden.
-export function badgeFor(state) {
+export function badgeFor(state, extra = {}) {
   if (!state?.accountScope) return { text: '', title: BADGE_TITLE };
   if (state.mode !== 'auto' || BADGE_PROBLEMS.has(state.attention)) return { text: '!', title: 'Propio: la extensión NO está registrando. Abrí la ventanita para ver por qué.' };
   if (Number(state.diagnostic?.oddRun) >= SIGNALS_ODD_LIMIT) return { text: '!', title: 'Propio: parece que cambió sus señales de llamadas y la extensión podría no registrarlas. Abrí la ventanita.' };
+  // Parte 5: sin sesion propia del worker (falta, vencida o de otra cuenta) NO puede trabajar con todo cerrado; el resto de fallas del modo todo cerrado se ven solo en el cuadro.
+  if (extra.workerSession) return { text: '!', title: 'Propio: la extensión no puede trabajar con todo cerrado porque falta la sesión propia del worker. Abrí la ventanita y tocá «Conectar sesión del worker».' };
   // Sesion de Propio cerrada: hay una pestaña del portal con la sesion cerrada y ninguna con la sesion abierta.
   // Sin pestaña de Propio abierta es normal y NO avisa.
   const portals = Object.values(state.tabs || {});
@@ -50,9 +52,9 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
   const workerData = createWorkerData(api, workerSession, { now, ...sessionOptions });
   const reduce = createPropioReducer({ randomId }), pending = new Map();
   let serial = Promise.resolve(), flushing = null, acceptedLease = null, leaseDeadline = 0;
-  let shownBadge = null;
+  let shownBadge = null, workerSessionProblem = false;
   const showBadge = async state => {
-    const badge = badgeFor(state), key = `${badge.text}|${badge.title}`;
+    const badge = badgeFor(state, { workerSession: workerSessionProblem }), key = `${badge.text}|${badge.title}`;
     if (shownBadge === key) return;
     try {
       await api.action?.setBadgeText?.({ text: badge.text });
@@ -185,6 +187,19 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     if (!info.auto || info.passive || info.paused) return workerLease.skip('off');
     if (!info.owner) return workerLease.skip('no-owner');
     return workerLease.renew({ scope: info.scope, owner: info.owner });
+  }
+  // Parte 5: marca "!" solo si falta la sesion propia del worker (modo auto, esta PC no en "solo registro" y sin ventanita abierta: con ella manda la app).
+  async function checkWorkerSessionBadge() {
+    let problem = false;
+    try {
+      const info = await transact(state => ({ scope: state.accountScope, auto: state.mode === 'auto', passive: state.preparation.devicePassive === true }));
+      if (info.scope && info.auto && !info.passive) {
+        const status = await workerSession.status(info.scope);
+        if (['none', 'expired', 'wrong-account'].includes(status.state)) problem = (await trackers()).length === 0;
+      }
+    } catch { problem = false; }
+    if (problem !== workerSessionProblem) { workerSessionProblem = problem; await transact(() => null); }
+    return problem;
   }
   // Parte 3: el worker lee los datos de la nube con SU sesion (solo lectura; el plan se calcula en la Parte 4).
   // Mismas condiciones que el permiso, salvo la pausa (leer datos no pulsa nada).
@@ -667,9 +682,11 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     if (!controlPage) return null;
     if (packet?.kind === 'worker-session-signin') {
       const scope = await transact(state => state.accountScope);
-      return workerSession.signIn(scope);
+      const signed = await workerSession.signIn(scope);
+      await checkWorkerSessionBadge().catch(() => {});
+      return signed;
     }
-    if (packet?.kind === 'worker-session-signout') { await workerLease.clear(); await workerData.clear(); return workerSession.signOut(); }
+    if (packet?.kind === 'worker-session-signout') { await workerLease.clear(); await workerData.clear(); const out = await workerSession.signOut(); await checkWorkerSessionBadge().catch(() => {}); return out; }
     if (packet?.kind === 'device-passive') {
       if (typeof packet.enabled !== 'boolean') return { ok: false, reason: 'invalid-mode' };
       return transact(async state => {
@@ -804,12 +821,12 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
       message(packet, sender).then(respond, () => respond({ ok: false, reason: 'storage' })); return true;
     });
     api.alarms.create('retry-bridge', { periodInMinutes: 0.5 });
-    api.alarms.onAlarm.addListener(alarm => { if (alarm.name === 'retry-bridge') { renewWorkerLease().catch(() => {}); refreshWorkerData().catch(() => {}); ensureWorkerPlan(true).catch(() => {}); heartbeat().then(beat => beat || flush()).catch(() => {}); } });
-    api.runtime.onStartup?.addListener(() => { renewWorkerLease().catch(() => {}); refreshWorkerData().catch(() => {}); ensureWorkerPlan(true).catch(() => {}); heartbeat().catch(() => {}); });
+    api.alarms.onAlarm.addListener(alarm => { if (alarm.name === 'retry-bridge') { renewWorkerLease().catch(() => {}); refreshWorkerData().catch(() => {}); ensureWorkerPlan(true).catch(() => {}); checkWorkerSessionBadge().catch(() => {}); heartbeat().then(beat => beat || flush()).catch(() => {}); } });
+    api.runtime.onStartup?.addListener(() => { renewWorkerLease().catch(() => {}); refreshWorkerData().catch(() => {}); ensureWorkerPlan(true).catch(() => {}); checkWorkerSessionBadge().catch(() => {}); heartbeat().catch(() => {}); });
     renewWorkerLease().catch(() => {});
     refreshWorkerData().catch(() => {});
     heartbeat().catch(() => {});
     api.tabs.onRemoved.addListener(tabId => { tabRemoved(tabId).catch(() => {}); });
   }
-  return { install, beforeRequest, completed, message, navigationCommitted, flush, refreshBackground, tabRemoved, heartbeat, renewWorkerLease, refreshWorkerData, ensureWorkerPlan, workerPlanStatus, workerDataSnapshot: () => workerData.snapshot() };
+  return { install, beforeRequest, completed, message, navigationCommitted, flush, refreshBackground, tabRemoved, heartbeat, renewWorkerLease, refreshWorkerData, ensureWorkerPlan, checkWorkerSessionBadge, workerPlanStatus, workerDataSnapshot: () => workerData.snapshot() };
 }
