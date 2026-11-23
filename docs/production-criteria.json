@@ -987,6 +987,20 @@
           ]
         },
         {
+          "file": "tests/extension-llamada-latido.test.mjs",
+          "namedCases": [
+            "las reglas aceptan el motivo \"chrome-restarted\" en el final de llamada",
+            "mientras hay una llamada activa la extensión anota el último momento visto, y sin llamada no escribe nada",
+            "Chrome cerrado de golpe: al volver la llamada se guarda con el último latido y el motivo \"chrome-restarted\"",
+            "si el worker se reinicia con Chrome abierto y la pestaña de Propio sigue ahí, la llamada NO se cierra",
+            "si Chrome reutilizó ese número de pestaña para otra página que no es Propio, la llamada huérfana se cierra",
+            "si Chrome murió antes del primer latido la llamada se guarda con 1 segundo, no se pierde",
+            "una llamada huérfana de más de 24 horas no se entrega y NO pausa la grabación",
+            "sin grabación (modo observación) el cierre huérfano solo avisa y no inventa eventos",
+            "la alarma de cada 30 segundos y el arranque de Chrome disparan el latido, y la app muestra la nota nueva"
+          ]
+        },
+        {
           "file": "tests/extension-llamada-cortada.test.mjs",
           "namedCases": [
             "las reglas aceptan el motivo \"portal-closed\" en el final de llamada y descartan cualquier otro",
