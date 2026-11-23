@@ -5,6 +5,7 @@ import { validateAutomationLease } from '../../js/automation-lease.js';
 import { createWorkerSession } from './worker-session.js';
 import { createWorkerLease } from './worker-lease.js';
 import { createWorkerData } from './worker-data.js';
+import { buildWorkerPlan } from './worker-plan.js';
 
 const KEY = 'bridge-v1';
 const URLS = [`${PORTAL_ORIGIN}/*`, ...TWILIO_EVENT_ORIGINS.map(origin => `${origin}/v4/EndpointEvents*`)];
@@ -193,6 +194,31 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     if (!info.auto || info.passive) return workerData.skip('off');
     return workerData.refresh({ scope: info.scope });
   }
+  // Parte 4b: con todo cerrado el worker arma el plan solo (datos de la nube + su permiso + lo que vio en el portal).
+  // Se recalcula cada 5 s como maximo (en cada observacion del portal y en la alarma de 30 s) y vale 12 s.
+  let workerPlanCache = null;
+  const WORKER_PLAN_USE_MS = 12000;
+  async function ensureWorkerPlan(force = false) {
+    if (!force && workerPlanCache && now() - workerPlanCache.at < 5000) return;
+    const at = now();
+    try {
+      const info = await transact(state => ({ auto: state.mode === 'auto', passive: state.preparation.devicePassive === true, owner: state.coordinationOwner, lastEndedAt: state.preparation.spacing.lastEndedAt }));
+      if (!info.auto || info.passive) { workerPlanCache = { at, plan: null, why: 'off' }; return; }
+      const [data, lease] = await Promise.all([workerData.snapshot(), workerLease.status()]);
+      const built = buildWorkerPlan({ data, leaseExpiresAt: lease.state === 'granted' ? lease.expiresAt : null, owner: info.owner, lastEndedAt: info.lastEndedAt, now: at });
+      workerPlanCache = { at, ...built };
+    } catch (err) { workerPlanCache = { at, plan: null, why: 'error' }; }
+  }
+  function workerFallback(state) {
+    const prep = state.preparation, command = prep.command;
+    // Mientras hay una orden de pulsar en marcha el plan no cambia (la confirmacion lo compara tal cual).
+    if (command && now() - command.at < 5000 && prep.plan) return prep.plan;
+    return workerPlanCache?.plan && now() - workerPlanCache.at < WORKER_PLAN_USE_MS ? workerPlanCache.plan : null;
+  }
+  function workerPlanStatus() {
+    const c = workerPlanCache;
+    return c ? { state: c.plan ? 'ok' : c.why, at: c.at, inferredStart: c.inferredStart === true } : { state: 'none' };
+  }
   async function heartbeat() {
     const active = await transact(state => Object.entries(state.tabs).filter(([, tab]) => tab?.active).map(([id]) => id));
     if (!active.length) return false;
@@ -235,8 +261,9 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     state.queue = state.queue.filter(item => item.event.type !== 'pause-end');
     if (state.preparation.pendingPause) state.preparation.pendingPause.requestId = null;
   }
-  function updatePlan(state, plan) {
+  function updatePlan(state, plan, useWorker = false) {
     const prep = state.preparation;
+    if (!plan && useWorker) plan = workerFallback(state);
     const cancelPending = () => {
       const requestId = prep.pendingPause?.requestId;
       if (requestId) state.queue = state.queue.filter(item => item.event.id !== requestId);
@@ -411,7 +438,7 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
       if (matched.length === 1) {
         updatePlan(state, matched[0].plan);
         if (['multiple-trackers', 'tracker-closed'].includes(state.attention)) state.attention = null;
-      } else { updatePlan(state, null); state.attention = matched.length ? 'multiple-trackers' : 'tracker-closed'; }
+      } else { updatePlan(state, null, matched.length === 0); state.attention = matched.length ? 'multiple-trackers' : 'tracker-closed'; }
       if (!state.queue.length) return null;
       if (matched.length !== 1) { state.attention = matched.length ? 'multiple-trackers' : 'tracker-closed'; return null; }
       const item = state.queue[0];
@@ -571,6 +598,7 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
         if (packet.session === 'authenticated' && !blocked && packet.signal) callSignal(state, tabId, packet.signal, at);
         if (!blocked && recentObservation()) schedulePauseEnd(state, packet);
       });
+      await ensureWorkerPlan();
       await flush();
       return transact(state => ({ ok: true, ...(recentObservation() ? prepareFirst(state, sender.tab.id, packet) : { prepare: false, stopCalls: false }), historyEnabled: state.mode === 'auto' && !!state.accountScope && packet.session === 'authenticated' && packet.call !== 'connected' && !Object.values(state.tabs).some(tab => tab.active) }));
     }
@@ -668,7 +696,7 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
       const call = ['connected', 'incoming', 'idle'].find(kind => authenticated.some(tab => tab.call === kind)) || 'unknown';
       const layout = portals.length === 1 && portals[0].layout && now() >= Date.parse(portals[0].layout.reportedAt) && now() - Date.parse(portals[0].layout.reportedAt) < 15000 ? portals[0].layout : null;
       const workerSessionState = await workerSession.status(state.accountScope);
-      return { workerSession: workerSessionState, workerLease: await workerLease.status(), workerData: await workerData.status(), mode: state.mode, paired: !!state.accountScope, active: Object.values(state.tabs).some(tab => tab.active), completed: state.completed, history: state.history || null, layout, preparation: state.preparation, automationStatus: automationStatus(state), queued: state.queue.length, queueSummary: pendingQueueSummary(state.queue, now()), queueItems: state.queue.slice(0, 50).map(item => ({ type: item.event.type, at: item.event.at })), last: state.last, attention: state.attention, call, portal: authenticated.length ? 'authenticated' : portals.some(tab => tab.session === 'logged-out') ? 'logged-out' : 'unknown', diagnostic: state.diagnostic || { requests: 0, recognized: 0, last: [] } };
+      return { workerSession: workerSessionState, workerLease: await workerLease.status(), workerData: await workerData.status(), workerPlan: workerPlanStatus(), mode: state.mode, paired: !!state.accountScope, active: Object.values(state.tabs).some(tab => tab.active), completed: state.completed, history: state.history || null, layout, preparation: state.preparation, automationStatus: automationStatus(state), queued: state.queue.length, queueSummary: pendingQueueSummary(state.queue, now()), queueItems: state.queue.slice(0, 50).map(item => ({ type: item.event.type, at: item.event.at })), last: state.last, attention: state.attention, call, portal: authenticated.length ? 'authenticated' : portals.some(tab => tab.session === 'logged-out') ? 'logged-out' : 'unknown', diagnostic: state.diagnostic || { requests: 0, recognized: 0, last: [] } };
     }
     if (packet?.kind === 'pair') {
       const targets = await trackers();
@@ -739,7 +767,7 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
         state.queue = state.queue.filter(item => item.event.type !== 'pause-end' || (packet.mode === 'timed' && packet[item.event.pauseType]));
         if (state.preparation.pendingPause?.requestId && !state.queue.some(item => item.event.id === state.preparation.pendingPause.requestId)) state.preparation.pendingPause.requestId = null;
         const matched = targets.filter(target => target.accountScope === state.accountScope);
-        updatePlan(state, matched.length === 1 ? matched[0].plan : null);
+        updatePlan(state, matched.length === 1 ? matched[0].plan : null, matched.length === 0);
         return { ok: true };
       });
     }
@@ -776,12 +804,12 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
       message(packet, sender).then(respond, () => respond({ ok: false, reason: 'storage' })); return true;
     });
     api.alarms.create('retry-bridge', { periodInMinutes: 0.5 });
-    api.alarms.onAlarm.addListener(alarm => { if (alarm.name === 'retry-bridge') { renewWorkerLease().catch(() => {}); refreshWorkerData().catch(() => {}); heartbeat().then(beat => beat || flush()).catch(() => {}); } });
-    api.runtime.onStartup?.addListener(() => { renewWorkerLease().catch(() => {}); refreshWorkerData().catch(() => {}); heartbeat().catch(() => {}); });
+    api.alarms.onAlarm.addListener(alarm => { if (alarm.name === 'retry-bridge') { renewWorkerLease().catch(() => {}); refreshWorkerData().catch(() => {}); ensureWorkerPlan(true).catch(() => {}); heartbeat().then(beat => beat || flush()).catch(() => {}); } });
+    api.runtime.onStartup?.addListener(() => { renewWorkerLease().catch(() => {}); refreshWorkerData().catch(() => {}); ensureWorkerPlan(true).catch(() => {}); heartbeat().catch(() => {}); });
     renewWorkerLease().catch(() => {});
     refreshWorkerData().catch(() => {});
     heartbeat().catch(() => {});
     api.tabs.onRemoved.addListener(tabId => { tabRemoved(tabId).catch(() => {}); });
   }
-  return { install, beforeRequest, completed, message, navigationCommitted, flush, refreshBackground, tabRemoved, heartbeat, renewWorkerLease, refreshWorkerData, workerDataSnapshot: () => workerData.snapshot() };
+  return { install, beforeRequest, completed, message, navigationCommitted, flush, refreshBackground, tabRemoved, heartbeat, renewWorkerLease, refreshWorkerData, ensureWorkerPlan, workerPlanStatus, workerDataSnapshot: () => workerData.snapshot() };
 }

@@ -214,6 +214,20 @@ export function extensionWorkerDataModel(state, nowMs = Date.now()) {
   return `Datos del worker: ${text}`;
 }
 
+// «Plan del worker» (Parte 4b del permiso con todo cerrado). Funcion pura. Solo informa.
+export function extensionWorkerPlanModel(state) {
+  const wp = state && state.ok !== false && state.workerPlan && typeof state.workerPlan === 'object' ? state.workerPlan : { state: 'none' };
+  const text = wp.state === 'ok' ? `listo para trabajar con todo cerrado${wp.inferredStart ? ' (turno dado por iniciado a la hora del horario)' : ''}`
+    : wp.state === 'no-data' ? 'faltan los datos de la nube del worker'
+    : wp.state === 'no-owner' ? 'esperando que la ventanita se abra una vez'
+    : wp.state === 'no-lease' ? 'sin permiso del worker vigente'
+    : wp.state === 'no-plan' ? 'hoy no hay turno planeado (día libre o freelancer sin turno)'
+    : wp.state === 'off' ? 'apagado (modo automático apagado o esta PC en «solo registro»)'
+    : wp.state === 'error' ? 'no se pudo calcular'
+    : 'todavía sin calcular';
+  return `Plan del worker: ${text}`;
+}
+
 export function initExtensionBox(doc = globalThis.document, chromeApi = globalThis.chrome, loc = globalThis.location, reinforcement = null) {
   if (!doc || !loc || loc.protocol !== 'chrome-extension:' || !chromeApi?.runtime?.sendMessage) return null;
   const anchor = doc.getElementById('higherRateHeaderBtn');
@@ -369,8 +383,9 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
   const workerLogin = btn('Conectar sesión del worker', 'extBoxWorkerLogin'), workerLogout = btn('Quitar sesión del worker', 'extBoxWorkerLogout');
   const workerLeaseNote = el('p', 'ext-box-note'); workerLeaseNote.id = 'extBoxWorkerLeaseNote';
   const workerDataNote = el('p', 'ext-box-note'); workerDataNote.id = 'extBoxWorkerDataNote';
+  const workerPlanNote = el('p', 'ext-box-note'); workerPlanNote.id = 'extBoxWorkerPlanNote';
   const workerBtns = el('div', 'ext-box-worker'); workerBtns.append(workerLogin, workerLogout);
-  availBody.append(pausedRow.row, firstRow.row, brkRow.row, lunchRow.row, modeRow, resumeNote, spacingRow.row, minRow, spacingNote, availNote, leaseNote, workerNote, workerLeaseNote, workerDataNote, workerBtns);
+  availBody.append(pausedRow.row, firstRow.row, brkRow.row, lunchRow.row, modeRow, resumeNote, spacingRow.row, minRow, spacingNote, availNote, leaseNote, workerNote, workerLeaseNote, workerDataNote, workerPlanNote, workerBtns);
   avail.append(availHead, availBody);
   const doing = el('div', 'ext-box-avail'); doing.id = 'extBoxDoing';
   const doingHead = el('button', 'ext-box-row ext-box-fold', ''); doingHead.type = 'button'; doingHead.id = 'extBoxDoingBtn';
@@ -472,6 +487,7 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
     workerNote.textContent = ws.text; workerLogin.hidden = !ws.canConnect; workerLogin.disabled = busy; workerLogout.hidden = !ws.canRemove; workerLogout.disabled = busy; workerBtns.hidden = !ws.canConnect && !ws.canRemove;
     workerLeaseNote.textContent = extensionWorkerLeaseModel(state);
     workerDataNote.textContent = extensionWorkerDataModel(state);
+    workerPlanNote.textContent = extensionWorkerPlanModel(state);
     leaseNote.textContent = extensionLeaseModel(typeof globalThis.__pstLeaseDiagnostic === 'function' ? globalThis.__pstLeaseDiagnostic() : null);
   }
   async function act(packet, okText) {
