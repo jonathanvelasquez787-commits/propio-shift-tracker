@@ -143,6 +143,16 @@ export function extensionSupportModel(state) {
     items: last.map(item => `${REQUEST_KINDS[item.kind] || 'Solicitud'} · ${REQUEST_FORMATS[item.format] || 'Sin formato'} · HTTP ${item.status} · ${item.result === 'recognized' ? 'Señal reconocida' : item.result === 'http-error' ? 'Solicitud fallida' : 'Sin señal compatible'}`) };
 }
 
+// «Permiso de la nube»: por que la app pide (o no) el permiso de Start Calls. Solo diagnostico. Funcion pura.
+export function extensionLeaseModel(diag) {
+  if (!diag || typeof diag !== 'object') return 'Permiso de la nube: la app todavía no lo informa.';
+  const r = String(diag.reason || '');
+  const why = r === 'granted' ? 'concedido' : r === 'asking' ? 'pidiendo…' : r === 'no-hello' ? 'esperando el primer aviso de la extensión' : r === 'no-owner' ? 'sin dueño (la extensión no mandó su código)'
+    : r === 'off' ? 'apagado (la extensión indicó que no debe pedirlo)' : r === 'wrong-account' ? 'cuenta no coincide (la app no lo pide)' : r === 'denied' ? 'rechazado (lo tiene otra instalación)'
+    : r === 'bad-answer' ? 'respuesta de la nube no válida' : r === 'stopped' ? 'detenido' : r.startsWith('error: ') || r.startsWith('network: ') ? r : 'motivo desconocido';
+  return `Permiso de la nube: ${why} · avisos: ${Number(diag.hellos) || 0} · pedidos: ${Number(diag.rpcs) || 0}`;
+}
+
 export function initExtensionBox(doc = globalThis.document, chromeApi = globalThis.chrome, loc = globalThis.location, reinforcement = null) {
   if (!doc || !loc || loc.protocol !== 'chrome-extension:' || !chromeApi?.runtime?.sendMessage) return null;
   const anchor = doc.getElementById('higherRateHeaderBtn');
@@ -293,7 +303,8 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
   minRow.append(el('span', '', 'Minutos de ACW'), minInput);
   const spacingNote = el('p', 'ext-box-note'); spacingNote.id = 'extBoxSpacingNote';
   const availNote = el('p', 'ext-box-note'); availNote.id = 'extBoxAvailNote'; availNote.setAttribute('role', 'status');
-  availBody.append(pausedRow.row, firstRow.row, brkRow.row, lunchRow.row, modeRow, resumeNote, spacingRow.row, minRow, spacingNote, availNote);
+  const leaseNote = el('p', 'ext-box-note'); leaseNote.id = 'extBoxLeaseNote';
+  availBody.append(pausedRow.row, firstRow.row, brkRow.row, lunchRow.row, modeRow, resumeNote, spacingRow.row, minRow, spacingNote, availNote, leaseNote);
   avail.append(availHead, availBody);
   const doing = el('div', 'ext-box-avail'); doing.id = 'extBoxDoing';
   const doingHead = el('button', 'ext-box-row ext-box-fold', ''); doingHead.type = 'button'; doingHead.id = 'extBoxDoingBtn';
@@ -391,6 +402,7 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
     if (doc.activeElement !== minInput) minInput.value = a.minutes;
     spacingRow.small.textContent = `ACW ${a.minutes} min`;
     resumeNote.textContent = a.resumeNote; spacingNote.textContent = a.spacingNote; availNote.textContent = a.status;
+    leaseNote.textContent = extensionLeaseModel(typeof globalThis.__pstLeaseDiagnostic === 'function' ? globalThis.__pstLeaseDiagnostic() : null);
   }
   async function act(packet, okText) {
     if (busy) return; busy = true; feedback = '';

@@ -10,6 +10,18 @@ export function validateAutomationLease(value, now = Date.now()) {
 
 export function createAutomationLease(client, { host = window, now = () => Date.now(), monotonic = () => host.performance.now(), isCurrent = () => true } = {}) {
   let owner = null, enabled = false, stopped = false, generation = 0, pending = null, snapshot = null, deadline = 0, lastRequest = -Infinity;
+  // Solo para diagnostico: por que se pide (o no) el permiso. No cambia nada del comportamiento.
+  const diag = { hellos: 0, rpcs: 0, asked: null, result: null };
+  const reason = () => {
+    if (stopped) return 'stopped';
+    if (!diag.asked) return 'no-hello';
+    if (!diag.asked.ownerOk) return 'no-owner';
+    if (!diag.asked.requested) return 'off';
+    if (!diag.asked.current) return 'wrong-account';
+    if (snapshot && monotonic() < deadline) return 'granted';
+    return diag.result || 'asking';
+  };
+  const diagnostic = () => ({ reason: reason(), hellos: diag.hellos, rpcs: diag.rpcs });
   const invalidate = () => { snapshot = null; deadline = 0; };
   function current() {
     if (!enabled || stopped || !isCurrent() || monotonic() >= deadline) { invalidate(); return null; }
@@ -25,7 +37,7 @@ export function createAutomationLease(client, { host = window, now = () => Date.
     }
     if (monotonic() - lastRequest < 8000) return;
     const revision = generation, requestedOwner = owner, started = now(), startedMono = monotonic();
-    lastRequest = startedMono;
+    lastRequest = startedMono; diag.rpcs++; diag.result = 'asking';
     const request = (async () => {
       try {
         const { data, error } = await client.rpc('automation_lease', { p_owner: requestedOwner });
@@ -33,16 +45,21 @@ export function createAutomationLease(client, { host = window, now = () => Date.
         const row = Array.isArray(data) ? data[0] : data;
         const ttl = Date.parse(row?.expires_at) - Date.parse(row?.server_now);
         const duration = Math.min(MAX_LEASE_MS, ttl - 5000);
-        if (error || row?.granted !== true || !Number.isFinite(duration) || duration <= 0 || now() < started || now() - started >= duration || monotonic() - startedMono >= duration) { invalidate(); return; }
+        if (error || row?.granted !== true || !Number.isFinite(duration) || duration <= 0 || now() < started || now() - started >= duration || monotonic() - startedMono >= duration) {
+          diag.result = error ? 'error: ' + String(error.message || error.code || 'sin detalle').slice(0, 60) : row?.granted !== true ? 'denied' : 'bad-answer';
+          invalidate(); return;
+        }
+        diag.result = 'granted';
         deadline = startedMono + duration;
         snapshot = { version: 1, owner: requestedOwner, grantedAt: new Date(started).toISOString(), expiresAt: new Date(started + duration).toISOString() };
-      } catch { if (revision === generation) invalidate(); }
+      } catch (err) { if (revision === generation) { diag.result = 'network: ' + String(err?.message || 'sin detalle').slice(0, 60); invalidate(); } }
     })();
     pending = request;
     try { await request; } finally { if (pending === request) pending = null; }
   }
   function request({ owner: nextOwner, enabled: requested } = {}) {
     const next = requested === true && uuid(nextOwner) && isCurrent();
+    diag.hellos++; diag.asked = { ownerOk: uuid(nextOwner), requested: requested === true, current: isCurrent() };
     if (owner !== nextOwner || enabled !== next) { generation++; pending = null; invalidate(); lastRequest = -Infinity; }
     owner = uuid(nextOwner) ? nextOwner : null; enabled = next;
     if (enabled) void renew();
@@ -50,11 +67,12 @@ export function createAutomationLease(client, { host = window, now = () => Date.
   }
   const suspend = () => { generation++; pending = null; invalidate(); lastRequest = -Infinity; };
   const resume = () => { suspend(); if (enabled) void renew(); };
+  try { host.__pstLeaseDiagnostic = diagnostic; } catch { /* solo diagnostico */ }
   const timer = host.setInterval(() => { current(); void renew(); }, 4000);
   host.addEventListener('offline', suspend);
   host.addEventListener('pageshow', resume);
   host.document?.addEventListener('resume', resume);
-  return { request, current, renew, stop() {
+  return { request, current, renew, diagnostic, stop() {
     stopped = true; enabled = false; generation++; invalidate(); host.clearInterval(timer);
     host.removeEventListener('offline', suspend); host.removeEventListener('pageshow', resume); host.document?.removeEventListener('resume', resume);
   } };
