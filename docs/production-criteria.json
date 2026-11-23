@@ -37,6 +37,8 @@
       ],
       "tests": [
         {
+          "file": "tests/extension-permiso-diagnostico.test.mjs", "namedCases": ["permiso diagnostico: dice por que no pide el permiso", "permiso diagnostico: cuenta avisos, pedidos y el resultado", "permiso diagnostico: el cuadro escribe una linea clara"]},
+    {
           "file": "tests/automation-lease.test.mjs",
           "namedCases": [
             "availability lease starts only on extension demand, expires conservatively and never mutates call settings",
