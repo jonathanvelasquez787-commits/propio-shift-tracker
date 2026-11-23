@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { validateAutomationStatus } from '../js/automation-status.js';
-import { acwPillModel, installAcwPill, acwPillKey } from '../extension/propio-bridge/acw-pill.js';
+import { acwPillModel, installAcwPill, acwPillKey, acwPillPosKey, acwPillClamp } from '../extension/propio-bridge/acw-pill.js';
 
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
 const NOW = Date.parse('2026-11-23T15:00:00Z');
@@ -39,7 +39,7 @@ test('pildora de ACW: no se muestra en llamada, con llamada entrante, ya disponi
 
 function fakeDom(darkAttr = false) {
   const made = [];
-  const mk = () => ({ style: {}, textContent: '', attrs: {}, children: [], isConnected: true,
+  const mk = () => ({ style: {}, textContent: '', attrs: {}, children: [], isConnected: true, handlers: {}, addEventListener(k, f) { this.handlers[k] = f; }, setPointerCapture() {},
     setAttribute(k, v) { this.attrs[k] = v; }, append(...c) { this.children.push(...c); }, remove() { this.isConnected = false; },
     attachShadow() { const root = { append: (...c) => { this.shadowKids = c; } }; return root; } });
   const document = { body: { append: (e) => made.push(e) }, documentElement: { hasAttribute: () => darkAttr }, createElement: () => mk() };
@@ -47,8 +47,9 @@ function fakeDom(darkAttr = false) {
 }
 function fakeApi(stored, reply) {
   const listeners = []; const sent = [];
-  return { sent, listeners, runtime: { sendMessage: async (m) => { sent.push(m); return reply(); } },
-    storage: { local: { get: async () => stored }, onChanged: { addListener: (f) => listeners.push(f), removeListener: () => {} } } };
+  const api = { sent, listeners, saved: [], runtime: { sendMessage: async (m) => { sent.push(m); return reply(); } },
+    storage: { local: { get: async () => stored, set: async (v) => { api.saved.push(v); } }, onChanged: { addListener: (f) => listeners.push(f), removeListener: () => {} } } };
+  return api;
 }
 const win = { top: null, location: { origin: 'https://interpreters.propio-ls.com', pathname: '/portal/home' }, addEventListener() {} };
 win.top = win;
@@ -87,4 +88,33 @@ test('pildora de ACW: el worker solo contesta a la pagina de Propio y el cuadro 
   assert.match(box, /'extBoxAcwPill', 'Píldora de ACW en Propio'/);
   assert.ok(box.includes(`ACW_PILL_KEY = '${acwPillKey}'`));
   assert.match(box, /\[ACW_PILL_KEY\]: \{ enabled \}/);
+});
+
+test('pildora de ACW: se arrastra, no se sale de la pantalla y la posicion se guarda', async () => {
+  assert.deepEqual(acwPillClamp({ right: 20, bottom: 20 }, { width: 1000, height: 800 }, { width: 150, height: 40 }), { right: 20, bottom: 20 });
+  assert.deepEqual(acwPillClamp({ right: -50, bottom: 9999 }, { width: 1000, height: 800 }, { width: 150, height: 40 }), { right: 4, bottom: 756 });
+  assert.deepEqual(acwPillClamp(null, { width: 1000, height: 800 }, { width: 150, height: 40 }), { right: 20, bottom: 20 });
+  const { document, made } = fakeDom(); const ticks = [];
+  const api = fakeApi({}, () => ({ ok: true, status: snap() }));
+  const w = Object.assign({}, win, { innerWidth: 1000, innerHeight: 800 }); w.top = w;
+  installAcwPill(api, { window: w, document, setTimer: (f) => { ticks.push(f); return 1; }, clearTimer() {}, now: () => NOW });
+  await new Promise(r => setTimeout(r, 5)); ticks[0](); await new Promise(r => setTimeout(r, 5)); ticks[0]();
+  const pill = made[0].shadowKids[0];
+  pill.handlers.pointerdown({ button: 0, clientX: 900, clientY: 700, pointerId: 1, preventDefault() {} });
+  pill.handlers.pointermove({ clientX: 800, clientY: 600 });
+  assert.equal(pill.style.right, '120px'); assert.equal(pill.style.bottom, '120px');
+  ticks[0]();
+  assert.equal(pill.style.right, '120px');
+  pill.handlers.pointerup({});
+  assert.deepEqual(api.saved, [{ [acwPillPosKey]: { right: 120, bottom: 120 } }]);
+});
+
+test('pildora de ACW: al abrir Propio vuelve a la posicion guardada', async () => {
+  const { document, made } = fakeDom(); const ticks = [];
+  const api = fakeApi({ [acwPillPosKey]: { right: 300, bottom: 150 } }, () => ({ ok: true, status: snap() }));
+  const w = Object.assign({}, win, { innerWidth: 1000, innerHeight: 800 }); w.top = w;
+  installAcwPill(api, { window: w, document, setTimer: (f) => { ticks.push(f); return 1; }, clearTimer() {}, now: () => NOW });
+  await new Promise(r => setTimeout(r, 5)); ticks[0](); await new Promise(r => setTimeout(r, 5)); ticks[0]();
+  const pill = made[0].shadowKids[0];
+  assert.equal(pill.style.right, '300px'); assert.equal(pill.style.bottom, '150px');
 });

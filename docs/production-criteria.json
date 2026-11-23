@@ -1092,7 +1092,7 @@
             "cuadro de señales: Eventos pendientes se oculta en 0 y los tres botones van chicos en una linea"
           ]
         },
-        { "file": "tests/extension-pildora-acw.test.mjs", "namedCases": ["pildora de ACW: la cuenta regresiva dice cuanto falta para ponerte disponible", "pildora de ACW: cada motivo de espera tiene su texto", "pildora de ACW: no se muestra en llamada, con llamada entrante, ya disponible, con registro apagado o con datos viejos", "pildora de ACW: se dibuja con la cuenta regresiva y desaparece al apagar el interruptor", "pildora de ACW: apagada de entrada no pregunta al worker ni se dibuja", "pildora de ACW: el worker solo contesta a la pagina de Propio y el cuadro tiene su interruptor"] },
+        { "file": "tests/extension-pildora-acw.test.mjs", "namedCases": ["pildora de ACW: la cuenta regresiva dice cuanto falta para ponerte disponible", "pildora de ACW: cada motivo de espera tiene su texto", "pildora de ACW: no se muestra en llamada, con llamada entrante, ya disponible, con registro apagado o con datos viejos", "pildora de ACW: se dibuja con la cuenta regresiva y desaparece al apagar el interruptor", "pildora de ACW: apagada de entrada no pregunta al worker ni se dibuja", "pildora de ACW: el worker solo contesta a la pagina de Propio y el cuadro tiene su interruptor", "pildora de ACW: se arrastra, no se sale de la pantalla y la posicion se guarda", "pildora de ACW: al abrir Propio vuelve a la posicion guardada"] },
         {
           "file": "tests/extension-cuadro-apariencia-propio.test.mjs",
           "namedCases": [
