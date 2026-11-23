@@ -20,10 +20,11 @@
   const hello = async () => {
     if (!alive()) { stop(); return; }
     const owner = ready && { accountScope: ready.accountScope, nonce: ready.nonce };
-    let coordination = null;
-    try { if (owner) coordination = await chrome.runtime.sendMessage({ kind: 'tracker-coordination', accountScope: owner.accountScope }); } catch {}
+    let coordination = null, why = owner ? 'no-reply' : 'no-ready';
+    try { if (owner) coordination = await chrome.runtime.sendMessage({ kind: 'tracker-coordination', accountScope: owner.accountScope }); } catch (error) { why = 'error: ' + String(error?.message || 'sin detalle').slice(0, 30); }
     if (!alive() || (owner && (owner.accountScope !== ready?.accountScope || owner.nonce !== ready?.nonce))) return;
-    window.postMessage({ protocol, direction: 'extension', kind: 'hello', automationOwner: coordination?.owner, automationEnabled: coordination?.enabled === true }, origin);
+    if (coordination?.why) why = String(coordination.why).slice(0, 30);
+    window.postMessage({ protocol, direction: 'extension', kind: 'hello', automationOwner: coordination?.owner || undefined, automationEnabled: coordination?.enabled === true, automationWhy: coordination?.owner ? undefined : why }, origin);
   };
   async function announce(packet) {
     if (announcing) return;

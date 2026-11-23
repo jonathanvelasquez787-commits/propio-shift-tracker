@@ -99,7 +99,7 @@ export function installPropioBridge({ host = globalThis.window, accountScope, re
     if (message.source !== host || message.origin !== host.location.origin || message.data?.protocol !== BRIDGE_PROTOCOL || message.data.direction !== 'extension') return;
     const packet = message.data;
     if (packet.kind === 'hello') {
-      automationLease?.request({ owner: packet.automationOwner, enabled: packet.automationEnabled === true });
+      automationLease?.request({ owner: packet.automationOwner, enabled: packet.automationEnabled === true, why: packet.automationWhy });
       post({ kind: 'ready', plan: plan(), reinforcement: reinforcement() }); return;
     }
     if (packet.kind === 'automation-status') {

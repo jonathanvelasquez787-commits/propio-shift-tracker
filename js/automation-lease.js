@@ -11,7 +11,7 @@ export function validateAutomationLease(value, now = Date.now()) {
 export function createAutomationLease(client, { host = window, now = () => Date.now(), monotonic = () => host.performance.now(), isCurrent = () => true } = {}) {
   let owner = null, enabled = false, stopped = false, generation = 0, pending = null, snapshot = null, deadline = 0, lastRequest = -Infinity;
   // Solo para diagnostico: por que se pide (o no) el permiso. No cambia nada del comportamiento.
-  const diag = { hellos: 0, rpcs: 0, asked: null, result: null };
+  const diag = { hellos: 0, rpcs: 0, asked: null, result: null, why: null };
   const reason = () => {
     if (stopped) return 'stopped';
     if (!diag.asked) return 'no-hello';
@@ -21,7 +21,7 @@ export function createAutomationLease(client, { host = window, now = () => Date.
     if (snapshot && monotonic() < deadline) return 'granted';
     return diag.result || 'asking';
   };
-  const diagnostic = () => ({ reason: reason(), hellos: diag.hellos, rpcs: diag.rpcs });
+  const diagnostic = () => ({ reason: reason(), hellos: diag.hellos, rpcs: diag.rpcs, ...(diag.why ? { why: diag.why } : {}) });
   const invalidate = () => { snapshot = null; deadline = 0; };
   function current() {
     if (!enabled || stopped || !isCurrent() || monotonic() >= deadline) { invalidate(); return null; }
@@ -57,9 +57,9 @@ export function createAutomationLease(client, { host = window, now = () => Date.
     pending = request;
     try { await request; } finally { if (pending === request) pending = null; }
   }
-  function request({ owner: nextOwner, enabled: requested } = {}) {
+  function request({ owner: nextOwner, enabled: requested, why } = {}) {
     const next = requested === true && uuid(nextOwner) && isCurrent();
-    diag.hellos++; diag.asked = { ownerOk: uuid(nextOwner), requested: requested === true, current: isCurrent() };
+    diag.hellos++; diag.why = typeof why === 'string' && why ? why.slice(0, 40) : null; diag.asked = { ownerOk: uuid(nextOwner), requested: requested === true, current: isCurrent() };
     if (owner !== nextOwner || enabled !== next) { generation++; pending = null; invalidate(); lastRequest = -Infinity; }
     owner = uuid(nextOwner) ? nextOwner : null; enabled = next;
     if (enabled) void renew();
