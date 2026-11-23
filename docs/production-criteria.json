@@ -1077,6 +1077,13 @@
           ]
         },
         {
+          "file": "tests/extension-cuadro-apariencia-propio.test.mjs",
+          "namedCases": [
+            "apariencia de Propio: el cuadro usa las mismas claves que la ventanita vieja",
+            "apariencia de Propio: los dos interruptores salen justo debajo de Registrar mi actividad"
+          ]
+        },
+        {
           "file": "tests/extension-cuadro-disponibilidad.test.mjs",
           "namedCases": [
             "cuadro de disponibilidad: los valores salen igual que en la ventanita vieja",

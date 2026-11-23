@@ -201,6 +201,54 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
   };
   celebrateRow.input.addEventListener('change', saveReinforcement);
   askRow.input.addEventListener('change', saveReinforcement);
+  // «Apariencia de Propio»: dos interruptores para la pagina del portal (mismas claves que usaba la ventanita vieja).
+  const LAYOUT_KEY = 'propio-original-layout-v1', DARK_KEY = 'propio-dark-mode-v1';
+  const LAYOUT_NOTE = 'Muestra el diseño de siempre cuando Propio lo permite.', DARK_NOTE = 'Cambia los colores del portal de Propio a oscuros.';
+  const LAYOUT_STATES = { 'native-present': 'Componente original detectado en Propio.', loading: 'Esperando que Propio termine de cargar.',
+    'waiting-offline': 'Esperando Offline para aplicar la vista sin interrumpir llamadas.',
+    'native-missing': 'No se detecta el componente original en Propio.' };
+  const appearanceRow = (id, title, note) => {
+    const row = el('label', 'ext-box-row'); row.setAttribute('for', id);
+    const text = el('span'), small = el('small', '', note); text.append(el('b', '', title), small);
+    const sw = el('span', 'ext-box-switch'), input = el('input'); input.type = 'checkbox'; input.id = id; input.setAttribute('role', 'switch');
+    sw.append(input, el('span', 'ext-box-track')); row.append(text, sw);
+    return { row, input, small };
+  };
+  const layoutRow = appearanceRow('extBoxOriginalLayout', 'Vista original de Propio', LAYOUT_NOTE);
+  const darkRow = appearanceRow('extBoxPortalDark', 'Modo oscuro en Propio', DARK_NOTE);
+  let layoutValue = null, layoutBusy = false, darkBusy = false, nativeLayout = null;
+  const renderLayoutRow = () => {
+    layoutRow.input.checked = layoutValue?.enabled === true; layoutRow.input.disabled = layoutBusy;
+    layoutRow.small.textContent = layoutValue?.enabled !== true ? LAYOUT_NOTE
+      : nativeLayout && nativeLayout.revision === layoutValue.revision ? (LAYOUT_STATES[nativeLayout.state] || LAYOUT_NOTE)
+      : 'Activada. Falta confirmar el componente en Propio: abrí una sola pestaña del portal.';
+  };
+  const readAppearance = () => {
+    try {
+      Promise.resolve(chromeApi.storage?.local?.get?.([LAYOUT_KEY, DARK_KEY])).then(v => {
+        if (!layoutBusy) { layoutValue = v?.[LAYOUT_KEY] || null; renderLayoutRow(); }
+        if (!darkBusy) darkRow.input.checked = v?.[DARK_KEY]?.enabled === true;
+      }).catch(() => {});
+    } catch { /* sin leer: los interruptores quedan apagados */ }
+  };
+  layoutRow.input.addEventListener('change', async () => {
+    if (layoutBusy) return;
+    const enabled = layoutRow.input.checked; layoutBusy = true; layoutRow.input.disabled = true;
+    try {
+      const next = { enabled, revision: globalThis.crypto.randomUUID() };
+      await chromeApi.storage.local.set({ [LAYOUT_KEY]: next }); layoutValue = next;
+      layoutRow.small.textContent = 'Guardado. Propio se actualizará cuando esté Offline.';
+    } catch { layoutRow.input.checked = layoutValue?.enabled === true; layoutRow.small.textContent = 'No se pudo guardar. Se conserva la elección anterior; reintentá.'; }
+    finally { layoutBusy = false; layoutRow.input.disabled = false; }
+  });
+  darkRow.input.addEventListener('change', async () => {
+    if (darkBusy) return;
+    const enabled = darkRow.input.checked; darkBusy = true; darkRow.input.disabled = true;
+    try { await chromeApi.storage.local.set({ [DARK_KEY]: { enabled } }); darkRow.small.textContent = DARK_NOTE; }
+    catch { darkRow.input.checked = !enabled; darkRow.small.textContent = 'No se pudo guardar. Se conserva la elección anterior; reintentá.'; }
+    finally { darkBusy = false; darkRow.input.disabled = false; }
+  });
+  try { chromeApi.storage?.onChanged?.addListener?.((changes, area) => { if (area === 'local' && (changes[LAYOUT_KEY] || changes[DARK_KEY])) readAppearance(); }); } catch { /* sin escuchar */ }
   const pend = el('div', 'ext-box-row');
   const pendText = el('span'); const pendNote = el('small', '', 'Nada esperando'); pendNote.id = 'extBoxPendingNote';
   pendText.append(el('b', '', 'Eventos pendientes'), pendNote);
@@ -292,7 +340,7 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
   const supHelp = el('p', 'ext-box-note', 'Números para revisar la conexión.');
   const supSummary = el('p', 'ext-box-note'); supSummary.id = 'detectorStatus';
   const supList = el('ul', 'ext-box-signals'); supList.id = 'detectorRequests'; supSec.body.append(supHelp, supSummary, supList);
-  box.append(head, conn, rec, celebrateRow.row, askRow.row, pend, queueBox, avail, doing, connSec.wrap, histSec.wrap, actSec.wrap, supSec.wrap);
+  box.append(head, conn, rec, celebrateRow.row, askRow.row, layoutRow.row, darkRow.row, pend, queueBox, avail, doing, connSec.wrap, histSec.wrap, actSec.wrap, supSec.wrap);
   doc.body.append(box);
 
   let busy = false, feedback = '', shown = false, timer = null, workSession = null;
@@ -303,10 +351,11 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
     box.style.top = Math.round(r.bottom + y + 8) + 'px';
   }
   async function refresh() {
-    renderReinforcement();
+    renderReinforcement(); readAppearance();
     let state = null;
     try { state = await send({ kind: 'status' }); } catch { state = null; }
     const m = extensionBoxModel(state);
+    nativeLayout = state?.ok === false ? null : state?.layout || null; renderLayoutRow();
     workSession = state?.preparation?.plan?.workSession || null;
     automationUi.update(state?.ok === false ? null : state?.automationStatus || null);
     icon.dataset.extDot = m.dot;
