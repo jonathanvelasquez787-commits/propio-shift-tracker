@@ -75,6 +75,13 @@ export function extensionAvailabilityModel(state, now = Date.now()) {
     spacingOn: spacing.enabled === true, minutes: spacing.minutes, status, resumeNote, spacingNote };
 }
 
+const PROBLEM_TEXT = {
+  'queue-full': 'El registro se pausó porque hay demasiadas llamadas sin revisar.',
+  'expired-event': 'El registro se pausó porque hay una señal de más de 24 horas sin revisar.',
+  'event-rejected': 'El registro se pausó porque una señal no se pudo validar.',
+  'tracker-needs-review': 'Propio Shift Tracker pide revisar unas llamadas antes de seguir.'
+};
+
 const SIGNAL_NAMES = { 'history-records': 'Historial de llamadas', 'session-start': 'Inicio de sesión', 'session-end': 'Fin de sesión', 'pause-end': 'Fin de pausa programado' };
 
 // Señales pendientes y botones de la Parte 3, a partir de {kind:'status'}. Funcion pura.
@@ -94,7 +101,9 @@ export function extensionQueueModel(state, now = Date.now()) {
     return { name: SIGNAL_NAMES[item.type] || 'Señal', when: Number.isNaN(at.getTime()) ? '' : at.toLocaleString('es', { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }) };
   });
   const inCall = ok && (state.active || state.call === 'connected' || state.call === 'incoming');
-  return { queued, deadline, items, showDiscard: Boolean(ok && (queued > 0 || (state.mode === 'auto' && state.active))),
+  const attention = ok && state.attention ? String(state.attention) : '';
+  const problemText = PROBLEM_TEXT[attention] || '';
+  return { queued, deadline, items, problem: Boolean(problemText), problemText, showDiscard: Boolean(problemText),
     showResume: paired && prep?.availabilityPaused === true,
     showRefresh: paired && Boolean(plan) && !(plan.scheduleVerified === true && !(spacing.enabled && plan.acwVerified === false)),
     refreshLocked: Boolean(inCall) };
@@ -173,15 +182,17 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
   pendText.append(el('b', '', 'Eventos pendientes'), pendNote);
   const pendCount = el('strong', 'ext-box-count', '0'); pendCount.id = 'extBoxPending'; pend.append(pendText, pendCount);
   const queueBox = el('div', 'ext-box-queue'); queueBox.id = 'extBoxQueue'; queueBox.hidden = true;
+  const problemTitle = el('b', 'ext-box-problem-title', 'Hay llamadas sin revisar'); const problemNote = el('p', 'ext-box-note'); problemNote.id = 'extBoxProblemText';
   const deadlineNote = el('p', 'ext-box-note'); deadlineNote.id = 'extBoxQueueDeadline';
   const fold = (id, label) => { const b = el('button', 'ext-box-row ext-box-fold', ''); b.type = 'button'; b.id = id; b.setAttribute('aria-expanded', 'false'); const t = el('b', '', label), a = el('span', 'ext-box-arrow', '▸'); a.setAttribute('aria-hidden', 'true'); b.append(t, a); return { b, t, a }; };
-  const sigFold = fold('extBoxSignalsBtn', 'Ver las señales'), sigList = el('ul', 'ext-box-signals'); sigList.id = 'extBoxSignals'; sigList.hidden = true;
-  const howFold = fold('extBoxHowBtn', 'Cómo resolverlos'), howBody = el('div', 'ext-box-how'); howBody.id = 'extBoxHow'; howBody.hidden = true;
+  const moreFold = fold('extBoxMoreBtn', 'Más detalles'), moreBody = el('div', 'ext-box-more'); moreBody.id = 'extBoxMore'; moreBody.hidden = true;
+  const sigList = el('ul', 'ext-box-signals'); sigList.id = 'extBoxSignals'; const howBody = el('div', 'ext-box-how'); howBody.id = 'extBoxHow';
   for (const [t, d] of [['Qué son', 'Señales de llamada, sesión o historial; no son llamadas adicionales.'], ['Cómo entregarlos', 'Abrí Propio Shift Tracker con la cuenta vinculada.'], ['Después de 24 horas', 'Se pausa su entrega para revisión. No se borran solas.']]) { const p = el('p'); p.append(el('b', '', t), el('span', '', d)); howBody.append(p); }
   howBody.append(el('p', 'ext-box-note', 'Revisá el historial de Propio y registrá lo que falte antes de descartar señales.'));
-  const discard = btn('Descartar señales revisadas', 'extBoxDiscard'); discard.classList.add('is-danger'); discard.hidden = true;
+  const discard = btn('Ya las revisé, seguir registrando', 'extBoxDiscard'); discard.classList.add('is-primary');
   const discardWrap = el('div', 'ext-box-discard'); discardWrap.append(discard);
-  queueBox.append(deadlineNote, sigFold.b, sigList, howFold.b, howBody);
+  moreBody.append(deadlineNote, sigList, howBody);
+  queueBox.append(problemTitle, problemNote, discardWrap, moreFold.b, moreBody);
   const avail = el('div', 'ext-box-avail');
   const availHead = el('button', 'ext-box-row ext-box-fold', ''); availHead.type = 'button'; availHead.id = 'extBoxAvailBtn';
   availHead.setAttribute('aria-expanded', 'true'); availHead.setAttribute('aria-controls', 'extBoxAvailBody');
@@ -257,7 +268,7 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
   const supHelp = el('p', 'ext-box-note', 'Números para revisar la conexión.');
   const supSummary = el('p', 'ext-box-note'); supSummary.id = 'detectorStatus';
   const supList = el('ul', 'ext-box-signals'); supList.id = 'detectorRequests'; supSec.body.append(supHelp, supSummary, supList);
-  box.append(head, conn, rec, pend, queueBox, discardWrap, avail, doing, connSec.wrap, histSec.wrap, actSec.wrap, supSec.wrap);
+  box.append(head, conn, rec, pend, queueBox, avail, doing, connSec.wrap, histSec.wrap, actSec.wrap, supSec.wrap);
   doc.body.append(box);
 
   let busy = false, feedback = '', shown = false, timer = null, workSession = null;
@@ -280,6 +291,7 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
     detail.textContent = feedback || m.detail; detail.classList.toggle('is-error', Boolean(m.attention));
     auto.checked = m.auto; auto.disabled = busy || !m.paired;
     pendCount.textContent = String(m.queued);
+    pend.hidden = !m.queued;
     pendNote.textContent = m.queued ? 'Se entregan al abrir Propio Shift Tracker con la cuenta vinculada.' : 'Nada esperando';
     pair.classList.toggle('is-primary', !m.paired); pair.textContent = m.paired ? 'Revisar conexión' : 'Reintentar conexión';
     const act2 = extensionActivityModel(state);
@@ -289,12 +301,11 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
     const sup = extensionSupportModel(state);
     supSummary.textContent = sup.summary; supList.replaceChildren(); for (const t of sup.items) supList.append(el('li', '', t));
     const q = extensionQueueModel(state);
-    queueBox.hidden = !q.queued; deadlineNote.textContent = q.deadline;
+    queueBox.hidden = !q.problem; problemNote.textContent = q.problemText; deadlineNote.textContent = q.deadline;
     sigList.replaceChildren();
     for (const it of q.items) { const li = el('li', '', it.name); li.append(el('span', '', it.when)); sigList.append(li); }
-    sigFold.b.hidden = !q.items.length; if (!q.items.length) { sigList.hidden = true; }
-    sigFold.t.textContent = `Ver las ${q.queued} señales`;
-    discard.hidden = !q.showDiscard; discard.disabled = busy;
+    sigList.hidden = !q.items.length;
+    discard.disabled = busy;
     resumeBtn.hidden = !q.showResume; resumeBtn.disabled = busy;
     refreshBtn.hidden = !q.showRefresh; refreshBtn.disabled = busy || q.refreshLocked;
     if (q.showResume) { status.textContent = 'Disponibilidad en pausa'; if (!feedback && !m.attention) detail.textContent = 'Sigue registrando. Reanuda desde aquí o con Start Calls en Propio.'; }
@@ -314,15 +325,22 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
     finally { busy = false; await refresh().catch(() => {}); }
     if (feedback) setTimeout(() => { feedback = ''; refresh().catch(() => {}); }, 6000);
   }
+  async function actSeq(packets, okText) {
+    if (busy) return; busy = true; feedback = '';
+    try { for (const packet of packets) { const r = await send(packet); if (!r?.ok) { feedback = REASONS[r?.reason] || 'No se pudo completar la acción.'; break; } } if (!feedback) feedback = okText; }
+    catch { feedback = REASONS.storage; }
+    finally { busy = false; await refresh().catch(() => {}); }
+    if (feedback) setTimeout(() => { feedback = ''; refresh().catch(() => {}); }, 6000);
+  }
   pair.addEventListener('click', () => act({ kind: 'pair' }, 'Conexión revisada: Propio Shift Tracker está conectado.'));
   open.addEventListener('click', () => act({ kind: 'open-tracker' }));
   resumeBtn.addEventListener('click', () => act({ kind: 'pause-availability', paused: false }));
   refreshBtn.addEventListener('click', () => act({ kind: 'refresh-tracker' }));
   discard.addEventListener('click', () => {
-    if (globalThis.confirm('¿Ya revisaste o registraste estas llamadas en Propio Shift Tracker? Se descartarán las señales pendientes y volverá el modo de observación. Una llamada activa en Propio Shift Tracker requiere revisión allí.')) act({ kind: 'clear-reviewed' }, 'Señales descartadas. Volvió el modo de observación.');
+    if (globalThis.confirm('¿Ya revisaste o registraste estas llamadas en Propio Shift Tracker? Se descartarán las señales pendientes y el registro seguirá activo. Una llamada activa en Propio Shift Tracker requiere revisión allí.')) actSeq([{ kind: 'clear-reviewed' }, { kind: 'mode', mode: 'auto' }], 'Listo. Señales descartadas y el registro sigue activo.');
   });
   const wireFold = (f, body) => f.b.addEventListener('click', () => { const open = body.hidden; body.hidden = !open; f.b.setAttribute('aria-expanded', String(open)); f.a.textContent = open ? '▾' : '▸'; });
-  wireFold(sigFold, sigList); wireFold(howFold, howBody);
+  wireFold(moreFold, moreBody);
   auto.addEventListener('change', () => act({ kind: 'mode', mode: auto.checked ? 'auto' : 'observe' }));
   pausedRow.input.addEventListener('change', () => act({ kind: 'pause-availability', paused: pausedRow.input.checked }));
   firstRow.input.addEventListener('change', () => act({ kind: 'prepare-first', enabled: firstRow.input.checked }));

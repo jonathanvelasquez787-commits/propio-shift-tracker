@@ -990,7 +990,9 @@
           "file": "tests/extension-cuadro-senales.test.mjs",
           "namedCases": [
             "cuadro de señales: muestra pendientes, vencimiento y botones como la ventanita vieja",
-            "cuadro de señales: cada boton manda el mismo paquete que la ventanita vieja"
+            "cuadro de señales: cada boton manda el mismo paquete que la ventanita vieja",
+            "cuadro de señales: sin problema no sale nada; con problema una tarjeta y un boton que descarta y reactiva",
+            "cuadro de señales: Eventos pendientes se oculta en 0 y los tres botones van chicos en una linea"
           ]
         },
         {
