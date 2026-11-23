@@ -8,6 +8,7 @@ import { configureCallsContext, restorePendingLiveCallBackup, requestCloseManual
 import { saveEditedCall } from '../js/call-recovery.js';
 import { state, calls, settings, setAppState, setAppCalls, setAppSettings } from '../js/app-context.js';
 import { acwCallRecord } from '../js/call-records.js';
+import { appMainSource } from './helpers/app-main-source.mjs';
 
 const at = minutes => new Date(Date.now() - minutes * 60000).toISOString();
 const overlap = (a, b) => Date.parse(a.startISO) < Date.parse(b.endISO) && Date.parse(b.startISO) < Date.parse(a.endISO);
@@ -101,7 +102,7 @@ test('discarding a draft interrupted before its candidate was built ignores its 
 });
 
 test('ACW follows manual duration corrections while preserving the original official evidence', () => {
-  const source = fs.readFileSync(new URL('../js/app-main.js', import.meta.url), 'utf8');
+  const source = appMainSource();
   const node = parse(source, { ecmaVersion: 'latest', sourceType: 'module' }).body.find(node => node.type === 'FunctionDeclaration' && node.id.name === 'computeCurrentAcwStart');
   for (const correctedAgo of [15, 2]) {
     const call = { id: 'corrected', source: 'import', startISO: at(20), endISO: at(correctedAgo), manualCorrectionAt: at(1),

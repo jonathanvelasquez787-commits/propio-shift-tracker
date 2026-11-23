@@ -3,13 +3,15 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import {configureReportsContext,renderReportsMonthlyChart} from '../js/reports.js';
+import { appMainSource } from './helpers/app-main-source.mjs';
 
 test('report call index is scoped to one read, preserves alternate sources and resets after errors',()=>{
- const source=fs.readFileSync(new URL('../js/app-main.js',import.meta.url),'utf8');
- const start=source.indexOf('function withReportCallReadIndex('),end=source.indexOf('\nexport function dayEvents(',start);
+ const source=appMainSource();
+ const start=source.indexOf('function withReportCallReadIndex('),end=source.indexOf('function renderReportsDashboard(',start);
  let normalizations=0;
  const h=vm.createContext({calls:[{id:1,callDate:'a'},{id:2,callDate:'b'},{id:3,callDate:'a'}],callDateKeyFromValue:key=>{normalizations++;return key;},getActiveDayKey:()=> 'a'});
- vm.runInContext(source.slice(start,end).replaceAll('export ',''),h);
+ const callsStart=source.indexOf('function callsForDay(');
+ vm.runInContext((source.slice(start,end)+'\n'+source.slice(callsStart,source.indexOf('export function dayEvents(',callsStart))).replaceAll('export ',''),h);
  h.withReportCallReadIndex(()=>{
    assert.deepEqual(Array.from(h.callsForDay(),c=>c.id),[1,3]);
    h.callsForDay().pop();assert.equal(h.callsForDay().length,2);
@@ -27,8 +29,8 @@ test('report call index is scoped to one read, preserves alternate sources and r
 });
 
 test('productive minutes retain ordering, fractions and exclusions without computing gaps or bonuses',()=>{
- const source=fs.readFileSync(new URL('../js/app-main.js',import.meta.url),'utf8');
- const start=source.indexOf('export function productiveMinutesForDay('),end=source.indexOf('\nfunction manualGapPauseIntervals',start);
+ const source=appMainSource();
+ const start=source.indexOf('export function productiveMinutesForDay('),end=source.indexOf('function actualPauseIntervalsForDay(',start);
  const rows=[{startISO:'2026-10-25T13:00:00Z',durationMin:7.125},{startISO:'2026-10-25T12:00:00Z',durationMin:3.333333333},{startISO:'2026-10-25T14:00:00Z',durationMin:9,countsAsProductive:false},{startISO:'2026-10-25T15:00:00Z',durationMin:0},{startISO:'2026-10-25T16:00:00Z'}];
  const h=vm.createContext({callsForDay:key=>{assert.equal(key,'selected-day');return rows;},getActiveDayKey:()=> 'selected-day',importedCallStats:()=>{throw Error('Unexpected gap or bonus calculation');}});
  vm.runInContext(source.slice(start,end).replace('export ',''),h);

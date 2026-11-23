@@ -12,6 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { setAppCalls, setAppSettings, setAppState } from '../js/app-context.js';
 import { configureGameContext, createDefaultGameState, normalizeGameState, onReinforcementCallSaved, onReinforcementCallsChanged } from '../js/reinforcement.js';
 import { configurePositiveReinforcementContext, createDefaultReinforcementState, normalizeReinforcementState } from '../js/positive-reinforcement.js';
+import { appMainSource } from './helpers/app-main-source.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8').replaceAll('\r\n', '\n');
@@ -108,7 +109,7 @@ test('build mantiene módulos fuente fuera de public y el worker precarga el CSS
 
 test('avisos y modales de juego se recuperan al cerrar', () => {
   const game = read('js/reinforcement.js');
-  const appMain = read('js/app-main.js');
+  const appMain = appMainSource();
   assert.match(game, /app:modal-closed/);
   assert.match(appMain, /new CustomEvent\('app:modal-closed'/);
   assert.doesNotMatch(appMain, /stageClearModal|chestModal/);
@@ -126,7 +127,7 @@ test('el sonido del refuerzo solo depende de Celebrar llamadas y del día actual
 
 
 test('simulación mensual: pegar llamadas usa hooks de juego y reemplaza live provisional', () => {
-  const appMain = read('js/app-main.js');
+  const appMain = appMainSource();
   const calls = read('js/calls.js');
   const game = read('js/reinforcement.js');
 
@@ -140,7 +141,7 @@ test('simulación mensual: pegar llamadas usa hooks de juego y reemplaza live pr
 });
 
 test('simulación mensual: llamadas y Break Lunch no pueden ocupar los mismos minutos', () => {
-  const appMain = read('js/app-main.js');
+  const appMain = appMainSource();
   assert.match(appMain, /subtractCallsFromPauseInterval/);
   assert.match(appMain, /pauseDurationExcludingCalls/);
   assert.match(appMain, /if \(state\.activeCall\) return true/);
@@ -149,7 +150,7 @@ test('simulación mensual: llamadas y Break Lunch no pueden ocupar los mismos mi
 });
 
 test('simulación mensual: llamada no salta ventana temprana ni reescribe entrada salida manual', () => {
-  const appMain = read('js/app-main.js');
+  const appMain = appMainSource();
   const startCall = appMain.slice(appMain.indexOf('function startCall('), appMain.indexOf('function endCall('));
   assert.doesNotMatch(startCall, /shiftStartTooEarly\(\)/);
   assert.match(startCall, /const needsAutoShift = !state\.shiftStartedAt \|\| !!state\.shiftEndedAt/);
@@ -166,7 +167,7 @@ test('simulación mensual: llamada manual futura se rechaza y live conserva segu
 
 
 test('segunda simulación mensual: Propio puede corregir una llamada ya importada', () => {
-  const appMain = read('js/app-main.js');
+  const appMain = appMainSource();
   assert.match(appMain, /sameImportedCallIdentity/);
   assert.match(appMain, /replaceAcceptedCall\(c, previous, 'import'\)/);
   assert.match(appMain, /item\.replaces\.importedAt \|\| importTs/);
@@ -174,7 +175,7 @@ test('segunda simulación mensual: Propio puede corregir una llamada ya importad
 });
 
 test('segunda simulación mensual: finalizar turno no cierra si falla el guardado de la llamada', () => {
-  const appMain = read('js/app-main.js');
+  const appMain = appMainSource();
   const calls = read('js/calls.js');
   assert.match(calls, /return true;[\s\S]*openManualCallModalFromLiveCall[\s\S]*return false;/);
   assert.match(appMain, /if \(state\.activeCall && !endCall\(\)\) \{[^}]*return false; \}/);
@@ -183,7 +184,7 @@ test('segunda simulación mensual: finalizar turno no cierra si falla el guardad
 
 test('segunda simulación mensual: ninguna llamada manual editada o pegada puede terminar en el futuro', () => {
   const calls = read('js/calls.js');
-  const appMain = read('js/app-main.js');
+  const appMain = appMainSource();
   assert.match(calls, /new Date\(candidate\.endISO\)\.getTime\(\) > Date\.now\(\)/);
   assert.match(read('js/call-recovery.js'), /end\.getTime\(\) > Date\.now\(\)/);
   assert.match(appMain, /const endsAt = new Date\(c\.endISO\)\.getTime\(\)/);
@@ -191,7 +192,7 @@ test('segunda simulación mensual: ninguna llamada manual editada o pegada puede
 });
 
 test('segunda simulación mensual: descartar no reinicia ACW y reemplazar live corrige su fin', () => {
-  const appMain = read('js/app-main.js');
+  const appMain = appMainSource();
   const discard = appMain.slice(appMain.indexOf('function discardActiveCall()'), appMain.indexOf('function discardActivePause()'));
   assert.doesNotMatch(discard, /lastCallEndedAt\s*=/);
   assert.match(appMain, /state\.lastCallEndedAt = item\.call\.endISO/);
@@ -200,7 +201,7 @@ test('segunda simulación mensual: descartar no reinicia ACW y reemplazar live c
 test('tercera simulación mensual: Finanzas nunca queda sobreasignada al bajar ganancias', () => {
   const finance = read('js/finance.js');
   const calls = read('js/calls.js');
-  const appMain = read('js/app-main.js');
+  const appMain = appMainSource();
   assert.match(finance, /function financeTrimAssignmentsToEarnings/);
   assert.match(finance, /reverseAllocationOrder/);
   assert.match(finance, /export function financeReconcileAssignmentsToEarnings/);
@@ -211,7 +212,7 @@ test('tercera simulación mensual: Finanzas nunca queda sobreasignada al bajar g
 
 test('tercera simulación mensual: turno nocturno conserva día contable y correcciones oficiales', () => {
   const calls = read('js/calls.js');
-  const appMain = read('js/app-main.js');
+  const appMain = appMainSource();
   assert.match(calls, /const accountingCallDate = belongsToTrackedShift/);
   assert.match(calls, /shiftDayKey: accountingCallDate/);
   assert.match(appMain, /calendarCallDate: call\.callDate, callDate: activeShiftDayKey, shiftDayKey: activeShiftDayKey/);
@@ -222,7 +223,7 @@ test('tercera simulación mensual: turno nocturno conserva día contable y corre
 });
 
 test('tercera simulación mensual: horario y meta históricos quedan congelados antes de cambios globales', () => {
-  const appMain = read('js/app-main.js');
+  const appMain = appMainSource();
   const schedule = read('js/schedule.js');
   const settings = read('js/settings.js');
   assert.match(appMain, /export function snapshotHistoricalPlanning/);
@@ -242,14 +243,14 @@ test('tercera simulación mensual: ACW se recalcula al editar borrar o vaciar ll
 });
 
 test('tercera simulación mensual: pegar llamadas de hoy vuelve a auto iniciar el turno', () => {
-  const appMain = read('js/app-main.js');
+  const appMain = appMainSource();
   const importing = appMain.slice(appMain.indexOf('function importCalls('), appMain.indexOf('function clearCallInputBox'));
   assert.match(importing, /autoStartShiftFromCalls\(true\)/);
   assert.match(importing, /!state\.shiftStartedAt && !state\.shiftEndedAt/);
 });
 
 test('runtime smoke: la página de historial positivo y Higher Rate siguen conectados', () => {
-  const appMain = read('js/app-main.js');
+  const appMain = appMainSource();
   const higherRate = read('js/higher-rate.js');
   assert.match(appMain, /if \(page === 'positive'\) renderGame\(\)/);
   assert.match(higherRate, /export async function addHigherRateWindowRow\(\)/);
@@ -258,7 +259,7 @@ test('runtime smoke: la página de historial positivo y Higher Rate siguen conec
 
 
 test('cuarta simulación mensual: llamadas live antes y después del turno y en días libres se registran siempre', () => {
-  const appMain = read('js/app-main.js');
+  const appMain = appMainSource();
   const startCall = appMain.slice(appMain.indexOf('function startCall('), appMain.indexOf('function endCall(', appMain.indexOf('function startCall(')));
   const disabled = appMain.slice(appMain.indexOf('function callActionDisabled()'), appMain.indexOf('function liveCallDayIsOff()', appMain.indexOf('function callActionDisabled()')));
   assert.doesNotMatch(startCall, /shiftStartTooEarly\(\)/);
@@ -271,7 +272,7 @@ test('cuarta simulación mensual: llamadas live antes y después del turno y en 
 });
 
 test('cuarta simulación mensual: descartar la primera live revierte el turno que esa llamada abrió', () => {
-  const appMain = read('js/app-main.js');
+  const appMain = appMainSource();
   assert.match(appMain, /autoStartedShift: needsAutoShift/);
   assert.match(appMain, /previousShiftStartedAt/);
   assert.match(appMain, /previousShiftEndedAt/);
@@ -288,7 +289,7 @@ test('cuarta simulación mensual: llamada manual de hoy auto inicia turno igual 
 });
 
 test('cuarta simulación mensual: backup JSON realmente incluye y restaura settings', () => {
-  const appMain = read('js/app-main.js');
+  const appMain = appMainSource();
   const html = read('app.html');
   assert.match(appMain, /schemaVersion: 2, state, calls, settings/);
   assert.match(appMain, /setAppSettings\(restoredSettings\)/);
@@ -310,7 +311,7 @@ test('cuarta simulación mensual: Higher Rate cruza medianoche sin perder bonos'
 
 
 test('cuarta simulación mensual: llamadas antes o después del checkpoint cuentan como presencia sin mover Entrada/Salida', () => {
-  const appMain = read('js/app-main.js');
+  const appMain = appMainSource();
   assert.match(appMain, /function callPresenceIntervalsForDay/);
   assert.match(appMain, /function presenceIntervalsForDay/);
   assert.match(appMain, /presenceIntervalsForDay\(normalized, sessions, lastSlotEnd\)/);
@@ -322,7 +323,7 @@ test('cuarta simulación mensual: llamadas antes o después del checkpoint cuent
 
 
 test('promotion list opens its single editor and the editor previews the selected effect before saving', () => {
-  const appMain = read('js/app-main.js');
+  const appMain = appMainSource();
   const higherRate = read('js/higher-rate.js');
   assert.match(higherRate, /export function hrWindowWeekdayLabel\(/);
   assert.match(higherRate, /export function hrTierButtonLabel\(/);
@@ -338,7 +339,7 @@ test('promotion list opens its single editor and the editor previews the selecte
 });
 
 test('quinta simulación mensual: descartar live iniciada durante Break Lunch restaura la pausa', () => {
-  const appMain = read('js/app-main.js');
+  const appMain = appMainSource();
   assert.match(appMain, /let interruptedPauseRollback = null/);
   assert.match(appMain, /interruptedPauseRollback = endPause\(\{ silent: true, deferSave: true, endedAt: nowISO \}\)/);
   assert.match(appMain, /interruptedPauseRollback,/);
@@ -348,7 +349,7 @@ test('quinta simulación mensual: descartar live iniciada durante Break Lunch re
 });
 
 test('quinta simulación mensual: respaldo live sobrevive refresh y descartar revierte turno ACW', () => {
-  const appMain = read('js/app-main.js');
+  const appMain = appMainSource();
   const calls = read('js/calls.js');
   assert.match(appMain, /pendingLiveCallBackup: null/);
   assert.match(appMain, /autoSaveLiveCall\(startedAt, endedAt, liveContext\)/);
@@ -374,7 +375,7 @@ test('quinta simulación mensual: respaldo live conserva duración decimal y dí
 });
 
 test('quinta simulación mensual: Break Lunch y reset respetan día contable de turno nocturno', () => {
-  const appMain = read('js/app-main.js');
+  const appMain = appMainSource();
   assert.match(appMain, /function currentShiftAccountingDayKey\(fallbackDate = new Date\(\)\)/);
   assert.match(appMain, /state\.activePause = \{ type, startedAt: now\.toISOString\(\), shiftDayKey: dayKey \}/);
   assert.match(appMain, /const pauseRecord = \{ id: makeLocalId\(\), type: endedPause\.type, startedAt: endedPause\.startedAt, endedAt: now, shiftDayKey, startEventId:/);

@@ -1,8 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { appMainSource } from './helpers/app-main-source.mjs';
 
-const js = readFileSync(new URL('../js/app-main.js', import.meta.url), 'utf8');
+const js = appMainSource();
 const css = readFileSync(new URL('../css/app-shell.css', import.meta.url), 'utf8');
 
 test('bloques contraidos: los bloques de trabajo se llaman Bloque N', () => {

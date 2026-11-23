@@ -6,8 +6,9 @@ import { parse } from 'acorn';
 import { settings, state, calls, setAppSettings, setAppState, setAppCalls } from '../js/app-context.js';
 import { configureSettingsContext, requestGoalChange, applyPendingGoalChange, clearActiveDayGoalOverride, updateRate } from '../js/settings.js';
 import { ui, translateText, setLanguage } from '../js/i18n.js';
+import { appMainSource } from './helpers/app-main-source.mjs';
 
-const source=fs.readFileSync(new URL('../js/app-main.js',import.meta.url),'utf8');
+const source=appMainSource();
 const nodes=parse(source,{ecmaVersion:'latest',sourceType:'module'}).body.map(n=>n.declaration||n);
 const functions=new Map(nodes.filter(n=>n.type==='FunctionDeclaration').map(n=>[n.id.name,source.slice(n.start,n.end)]));
 const goalConstants=nodes.filter(n=>n.type==='VariableDeclaration' && n.declarations.some(d=>['DEFAULT_GOAL_MINUTES','DEFAULT_GOAL_DOLLARS'].includes(d.id.name))).map(n=>source.slice(n.start,n.end)).join('\n');

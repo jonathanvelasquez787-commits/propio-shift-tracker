@@ -1,3 +1,3 @@
-Extensión Propio ya armada (versión 2.8.44).
+Extensión Propio ya armada (versión 2.8.45).
 Descomprimí propio-bridge.zip y cargá la carpeta propio-bridge en Chrome:
 Administrar extensiones > Cargar descomprimida.

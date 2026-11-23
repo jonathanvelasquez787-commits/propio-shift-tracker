@@ -7,8 +7,9 @@ import vm from 'node:vm';
 import { APP_KEYS, writeLocalSnapshot, settingsWithinBudget, reportLocalPersistenceFailure, getLocalPersistenceFailure } from '../js/sync.js';
 import { createStorageRevisionGuard } from '../js/propio-bridge.js';
 import { confirmReplacement } from '../js/backup-recovery.js';
+import { appMainSource } from './helpers/app-main-source.mjs';
 
-const source = fs.readFileSync(new URL('../js/app-main.js', import.meta.url), 'utf8');
+const source = appMainSource();
 
 function storageHarness() {
   const state = { game: { ledger: {} } }, calls = [], settings = { goal: 10 };
@@ -23,7 +24,7 @@ function storageHarness() {
       removeItem: (key) => values.delete(key),
     }, toast: (message) => warnings.push(message), render: () => {},
   });
-  const body = source.slice(source.indexOf('    function safeLocalStorageSet('), source.indexOf('    export function pad(')).replaceAll('export function ', 'function ');
+  const body = source.slice(source.indexOf('    function safeLocalStorageSet('), source.indexOf('    export function formatDuration(')).replaceAll('export function ', 'function ');
   vm.runInContext("const localStorageRevision = createStorageRevisionGuard(localStorage, [STORAGE_KEY,CALLS_KEY,SETTINGS_KEY]);\n" + body, context);
   return { state, calls, settings, values, warnings, context, reject: (fn) => { reject = fn; }, run: (code) => vm.runInContext(code, context) };
 }

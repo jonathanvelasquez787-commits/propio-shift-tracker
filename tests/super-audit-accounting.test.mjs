@@ -15,8 +15,9 @@ import { configurePositiveReinforcementContext } from '../js/positive-reinforcem
 import { withSilentCallFeedback, callFeedbackSilenced } from '../js/call-feedback.js';
 import { PAY_ESTIMATE_RULE, roundedPayMinutes, callPayMinutes } from '../js/pay-estimate.js';
 import { preserveCallRecords } from '../js/call-records.js';
+import { appMainSource } from './helpers/app-main-source.mjs';
 
-const source = fs.readFileSync(new URL('../js/app-main.js', import.meta.url), 'utf8');
+const source = appMainSource();
 const declarations = new Map(parse(source, { ecmaVersion: 'latest', sourceType: 'module' }).body.map(node => node.declaration || node).filter(node => node.type === 'FunctionDeclaration').map(node => [node.id.name, source.slice(node.start, node.end)]));
 const functions = ['pad', 'dateKey', 'todayRange', 'todayCallDateKey', 'callDateKeyFromValue', 'callDateToDate', 'dayKeyFromIsoDate', 'isoDateFromDayKey', 'sameCallDay', 'toDateFromInputs', 'toMinutes', 'formatHHMM', 'timeLabel', 'timeLabelFromDate', 'parseMoney', 'callsOverlap', 'callDedupeKey', 'parseCalls', 'isReplaceableLiveCall', 'sameImportedCallIdentity', 'importCalls', 'importedCallStats', 'accountingExportDays', 'getDailyGoalOverride', 'effectiveDailyGoal', 'setDailyGoalOverride', 'dayEvents', 'dayShiftBounds', 'dayShiftSessions', 'previousCalendarDay', 'mergeIntervals', 'connectedMinutesForDay'];
 const at = (day, clock = '12:00') => new Date(`2025-09-${String(day).padStart(2, '0')}T${clock}:00`);

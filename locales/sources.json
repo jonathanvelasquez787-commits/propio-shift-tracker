@@ -2566,7 +2566,7 @@
   "s_2e4a471e": {
     "source": "acw",
     "files": [
-      "js/app-main.js"
+      "js/bridge-plan.js"
     ]
   },
   "s_2e576937": {
@@ -11465,7 +11465,7 @@
   "s_cb957c31": {
     "source": "Bloque {{v0}}",
     "files": [
-      "js/app-main.js"
+      "js/bridge-plan.js"
     ]
   },
   "s_cbf3808a": {

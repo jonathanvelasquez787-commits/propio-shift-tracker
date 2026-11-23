@@ -3,9 +3,10 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import { parse } from 'acorn';
+import { appMainSource } from './helpers/app-main-source.mjs';
 
 function declarations(path) {
-  const source = fs.readFileSync(new URL(path, import.meta.url), 'utf8');
+  const source = path.endsWith('app-main.js') ? appMainSource() : fs.readFileSync(new URL(path, import.meta.url), 'utf8');
   return new Map(parse(source, { ecmaVersion: 'latest', sourceType: 'module' }).body.map(node => node.declaration || node)
     .filter(node => node.type === 'FunctionDeclaration').map(node => [node.id.name, source.slice(node.start, node.end)]));
 }

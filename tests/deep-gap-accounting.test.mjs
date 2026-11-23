@@ -4,8 +4,9 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import { parse } from 'acorn';
 import { acwMinutesForBlock } from '../js/block-acw.js';
+import { appMainSource } from './helpers/app-main-source.mjs';
 
-const source = fs.readFileSync(new URL('../js/app-main.js', import.meta.url), 'utf8');
+const source = appMainSource();
 const declarations = new Map(parse(source, { ecmaVersion: 'latest', sourceType: 'module' }).body
   .map(n => n.declaration || n).filter(n => n.type === 'FunctionDeclaration')
   .map(n => [n.id.name, source.slice(n.start, n.end).replace(/^export /, '')]));
