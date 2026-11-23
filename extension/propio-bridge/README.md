@@ -1,4 +1,4 @@
-# Propio · Tracker y vista original · 2.8.25
+# Propio · Tracker y vista original · 2.8.26
 
 La extensión conecta Propio Shift Tracker con la sesión y el historial de Propio. Su
 registro de llamadas funciona independientemente de la apariencia del portal.

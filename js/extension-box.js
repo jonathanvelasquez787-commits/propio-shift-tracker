@@ -120,6 +120,7 @@ export function extensionActivityModel(state) {
   const connection = REASONS[attention] || (!paired ? 'Esperando tu sesión de Propio Shift Tracker para conectar.'
     : state.portal === 'authenticated' ? `Propio está abierto y tu sesión fue reconocida. ${callStatus}`
     : state.portal === 'logged-out' ? 'Saliste de Propio. Esperando que vuelvas a entrar.' : 'Tu cuenta está vinculada. Esperando que Propio confirme tu sesión.');
+  const signalsChanged = ok && paired && Number(state.diagnostic?.oddRun) >= 8; // mismo limite que SIGNALS_ODD_LIMIT del worker
   const h = ok ? state.history : null;
   const at = h ? new Date(h.at) : null;
   const historyStatus = h
@@ -127,7 +128,7 @@ export function extensionActivityModel(state) {
     : 'Abrí el historial de Propio para leer y recuperar sus llamadas.';
   const last = ok && Array.isArray(state.last) ? [...state.last].reverse() : [];
   const signals = last.length ? last.map(item => `${SIGNAL_LABELS[item.signal] || 'Señal'} · ${new Date(item.at).toLocaleTimeString('es')}`) : ['Todavía no se detectaron señales compatibles.'];
-  return { connection, historyCount: h ? String(h.count) : '—', historyScope: h?.coverage === 'range' ? 'En el historial de hoy' : 'En la página del historial',
+  return { connection: signalsChanged ? `${connection} Parece que Propio cambió sus señales de llamadas: la extensión podría no registrarlas. Avisale a quien te ayuda con la extensión.` : connection, historyCount: h ? String(h.count) : '—', historyScope: h?.coverage === 'range' ? 'En el historial de hoy' : 'En la página del historial',
     observed: String(ok ? Number(state.completed) || 0 : 0), historyStatus, signals };
 }
 
