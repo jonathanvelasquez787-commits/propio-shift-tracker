@@ -4712,6 +4712,8 @@ function renderPayDatesSection() { return usePayReceipts('render'); }
           const erase = group === 'finance' ? eraseFinance : group === 'schedule' ? eraseSchedule : eraseProfile;
           if (!erase) nextSettings[key] = JSON.parse(JSON.stringify(previous.settings[key]));
         });
+        // El tema que ya tenías no se borra al reiniciar: si no, volvería a "automático" y la app abriría en claro.
+        if (previous.settings.theme === 'light' || previous.settings.theme === 'dark') nextSettings.theme = previous.settings.theme;
         ensureCurrencySettings();
         if (persistFullSnapshot() === false) {
           setAppState(previous.state);

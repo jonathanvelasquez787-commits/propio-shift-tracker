@@ -52,7 +52,7 @@ test('reiniciar con solo "Horario y metas" marcada conserva llamadas y perfil', 
 test('reiniciar con solo "Perfil y ajustes" marcada borra el perfil y vuelve la bienvenida', () => {
   const { context, opened } = run({ resetEraseProfileInput: true });
   assert.equal(context.settings.userName, '');
-  assert.equal(context.settings.theme, 'auto');
+  assert.equal(context.settings.theme, 'dark'); // el tema elegido se conserva al reiniciar
   assert.equal(context.settings.shiftStart, '07:00');
   assert.equal(context.calls.length, 1);
   assert.deepEqual(opened, ['onboardingModal']);
