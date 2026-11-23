@@ -2163,6 +2163,7 @@
   "s_e2c44e41": "Sky Blue",
   "s_e2cab854": "Could not save — storage is full",
   "s_e2d653d8": "You completed {minutes} min of continuous attention",
+  "s_e2f0df86": "Approximate end: Propio stopped showing the call (it went down, froze or reached its time limit). It was saved with the last moment it was seen connected.",
   "s_e314063d": "Call #4821",
   "s_e32278ee": "Clear {{v0}} calls from {{v1}}? They will stay in recoverable history for up to 30 days. Your shift, breaks and schedule stay unchanged.",
   "s_e32e4c05": "No recoverable changes",

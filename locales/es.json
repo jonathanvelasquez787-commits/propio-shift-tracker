@@ -2131,6 +2131,7 @@
   "s_e2c44e41": "Cielo Azul",
   "s_e2cab854": "No se pudo guardar — almacenamiento lleno",
   "s_e2d653d8": "Completaste {minutes} min de atención continua",
+  "s_e2f0df86": "Fin aproximado: Propio dejó de mostrar la llamada (se cayó, se congeló o llegó a su límite de tiempo). Se guardó con el último momento en que se vio conectada.",
   "s_e314063d": "Llamada #4821",
   "s_e32278ee": "¿Vaciar {{v0}} llamadas de {{v1}}? Se conservarán en el historial recuperable hasta 30 días. Turno, pausas y horario permanecen.",
   "s_e32e4c05": "No hay cambios recuperables",

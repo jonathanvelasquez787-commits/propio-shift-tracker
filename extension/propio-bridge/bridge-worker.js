@@ -16,6 +16,12 @@ const BADGE_TITLE = 'Propio · Tracker y vista original';
 export const SIGNALS_ODD_LIMIT = 8;
 // Salto entre latidos (normal ~30 s) a partir del cual se sospecha que la PC se suspendio.
 export const SLEEP_GAP_MS = 3 * 60000;
+// Propio caido / pagina congelada / limite de duracion (Twilio corta las llamadas a las 4 h por defecto; 10 min de margen).
+// IDLE: la pagina dice "sin llamada" durante tanto tiempo mientras la extension cree que hay una.
+// SILENT: la pestaña no reporta nada durante tanto tiempo (pagina congelada).
+export const IDLE_LIMIT_MS = 2 * 60000;
+export const SILENT_LIMIT_MS = 5 * 60000;
+export const CALL_MAX_MS = 250 * 60000;
 // Marca "!" en el icono de Chrome cuando la extension esta vinculada y NO esta registrando (o hay llamadas trabadas).
 // "tracker-closed" NO cuenta: con la ventanita cerrada las llamadas esperan en la cola y no se pierden.
 export function badgeFor(state) {
@@ -113,7 +119,7 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     if (event?.type === 'call-end' && validateBridgeEvent(event, now())) state.completed++;
     if (event?.type === 'call-end' && validateBridgeEvent(event, now())) state.preparation.spacing.lastEndedAt = event.at;
     // Latido: la hora de inicio cuenta como "ultimo momento visto" de la llamada.
-    if (event?.type === 'call-start') state.tabs[tabId].aliveAt = at;
+    if (event?.type === 'call-start') { state.tabs[tabId].aliveAt = at; delete state.tabs[tabId].idleSince; delete state.tabs[tabId].connectedAt; delete state.tabs[tabId].sleepChecks; }
     const queuedBefore = state.queue.length;
     record(state, signal, at, event);
     return { event, queued: state.queue.length > queuedBefore };
@@ -139,8 +145,8 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     try { const tab = await api.tabs.get(tabId); return typeof tab?.url === 'string' && tab.url.startsWith(`${PORTAL_ORIGIN}/`); }
     catch (error) { return !/No tab with id/i.test(String(error?.message || error)); }
   }
-  function closeOrphan(state, id, endedBy = 'chrome-restarted') {
-    const tab = state.tabs[id], start = Date.parse(tab.active.startedAt), last = Date.parse(tab.aliveAt);
+  function closeOrphan(state, id, endedBy = 'chrome-restarted', lastMs = null) {
+    const tab = state.tabs[id], start = Date.parse(tab.active.startedAt), last = Number.isFinite(lastMs) ? lastMs : Date.parse(tab.aliveAt);
     // Una llamada huerfana de mas de 24 h ya no se puede entregar: se descarta con aviso y NO pausa la grabacion.
     if (now() - start > BRIDGE_MAX_AGE - 60000) state.attention = 'portal-closed';
     else {
@@ -149,6 +155,16 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
       if (!closed?.queued) state.attention = 'portal-closed';
     }
     delete state.tabs[id];
+  }
+  // Propio caido o congelado: la pestaña sigue abierta pero la llamada ya no existe (Propio nunca mando la desconexion).
+  // Devuelve el ultimo momento bueno (ms) si la llamada esta trabada, o null si todo va normal. Una llamada larga de
+  // verdad NO entra aqui: la pagina dice "conectada" todo el tiempo.
+  function stalledAt(tab) {
+    const start = Date.parse(tab.active.startedAt), seen = Date.parse(tab.seenAt), idle = Date.parse(tab.idleSince);
+    if (Number.isFinite(idle) && now() - idle >= IDLE_LIMIT_MS) { const lastOk = Date.parse(tab.connectedAt); return Number.isFinite(lastOk) ? lastOk : start + 1000; }
+    if (Number.isFinite(seen) && now() - seen >= SILENT_LIMIT_MS) return seen;
+    if (Number.isFinite(start) && now() - start >= CALL_MAX_MS) return Math.min(Date.parse(tab.aliveAt) || start, start + CALL_MAX_MS - 10 * 60000);
+    return null;
   }
   async function heartbeat() {
     const active = await transact(state => Object.entries(state.tabs).filter(([, tab]) => tab?.active).map(([id]) => id));
@@ -165,11 +181,17 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
         // diciendo "conectada", la llamada vive; si dice otra cosa, o no responde en 2 vueltas, se cierra con el ultimo
         // momento en que se vio viva.
         const gap = now() - Date.parse(tab.aliveAt);
-        if (!Number.isFinite(gap) || gap <= SLEEP_GAP_MS) { tab.aliveAt = at; delete tab.sleepChecks; continue; }
-        const seen = Date.parse(tab.seenAt), fresh = Number.isFinite(seen) && seen <= now() && now() - seen < 15000;
-        if (fresh && tab.call === 'connected') { tab.aliveAt = at; delete tab.sleepChecks; continue; }
-        tab.sleepChecks = (tab.sleepChecks || 0) + 1;
-        if (fresh || tab.sleepChecks >= 2) closeOrphan(state, id, 'computer-slept');
+        if (Number.isFinite(gap) && gap > SLEEP_GAP_MS) {
+          const seen = Date.parse(tab.seenAt), fresh = Number.isFinite(seen) && seen <= now() && now() - seen < 15000;
+          if (!(fresh && tab.call === 'connected')) {
+            tab.sleepChecks = (tab.sleepChecks || 0) + 1;
+            if (fresh || tab.sleepChecks >= 2) closeOrphan(state, id, 'computer-slept');
+            continue;
+          }
+        }
+        const stalled = stalledAt(tab);
+        if (stalled !== null) { closeOrphan(state, id, 'propio-stopped', stalled); continue; }
+        tab.aliveAt = at; delete tab.sleepChecks;
       }
     });
     await flush();
@@ -512,6 +534,11 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
         } else if (packet.session === 'logged-out' && state.session) {
           // Login remains a fallback when the session expires without a click.
           closeSession(state, at);
+        }
+        // Seguimiento para detectar a Propio caido: ultima vez "conectada" y desde cuando dice "sin llamada".
+        if (state.tabs[tabId].active && packet.session === 'authenticated') {
+          if (packet.call === 'connected') { state.tabs[tabId].connectedAt = at; delete state.tabs[tabId].idleSince; }
+          else if (packet.call === 'idle' && !state.tabs[tabId].idleSince) state.tabs[tabId].idleSince = at;
         }
         if (packet.session === 'logged-out') delete state.tabs[tabId].blockedDocument;
         if (packet.session === 'authenticated' && !blocked && packet.signal) callSignal(state, tabId, packet.signal, at);

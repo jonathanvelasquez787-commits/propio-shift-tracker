@@ -1014,6 +1014,10 @@
           ]
         },
         {
+      "file": "tests/extension-propio-caido.test.mjs",
+      "namedCases": ["las reglas aceptan el motivo \"propio-stopped\" y siguen descartando otros", "Propio caido: si la pagina dice \"sin llamada\" 2 minutos, la llamada se guarda con el ultimo momento conectada", "menos de 2 minutos de \"sin llamada\" NO cierra, y si vuelve a \"conectada\" se olvida", "una llamada larga de 2 horas con la pagina \"conectada\" NO se corta", "pagina congelada: 5 minutos sin reportar nada cierra con la ultima vez que reporto", "limite de duracion: una llamada \"conectada\" que pasa de 4 h 10 min se cierra con fin dudoso de 4 h", "el detalle de la llamada explica que Propio dejo de mostrar la llamada"]
+    },
+    {
       "file": "tests/extension-pc-suspendida.test.mjs",
       "namedCases": ["las reglas aceptan el motivo \"computer-slept\" y siguen descartando otros", "PC suspendida: si la pagina ya dice que no hay llamada, se cierra con el ultimo momento visto", "PC suspendida: si la pagina sigue diciendo \"conectada\", la llamada NO se corta", "PC suspendida: sin respuesta de la pagina espera una vuelta y a la segunda cierra", "latido normal (sin salto grande) con la pagina en reposo NO cierra la llamada", "el detalle de la llamada explica la suspension de la computadora"]
     },

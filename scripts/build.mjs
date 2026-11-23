@@ -162,7 +162,7 @@ await collectExtension(extensionDir);
 await mkdir(path.join(out, 'extension'), { recursive: true });
 await writeFile(path.join(out, 'extension/propio-bridge.zip'), zipFiles(extensionEntries));
 await rm(extensionTemp, { recursive: true, force: true });
-for (const [file, limit] of Object.entries({ 'boot.js':350000, 'app-main.js':835000, 'locales.js':245000, 'detail-views.js':142000 })) {
+for (const [file, limit] of Object.entries({ 'boot.js':350000, 'app-main.js':835000, 'locales.js':245000, 'detail-views.js':143000 })) {
   const size = reviewedBundleSize(await readFile(path.join(assets, file), 'utf8'));
   if (size > limit) throw new Error(`Bundle ${file} exceeds its reviewed byte budget: ${size} > ${limit}`);
 }
