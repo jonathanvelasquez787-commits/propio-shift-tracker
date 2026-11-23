@@ -102,6 +102,15 @@ try:
         check('con el interruptor apagado la pildora desaparece', not has())
         r.ctl.evaluate("chrome.storage.local.set({'propio-acw-pill-v1': {enabled: true}})"); time.sleep(4)
         check('al volver a encenderlo la pildora regresa', has())
+        vp = r.portal.viewport_size; sx, sy = vp['width'] - 100, vp['height'] - 40
+        r.portal.mouse.move(sx, sy); r.portal.mouse.down(); r.portal.mouse.move(sx - 200, sy - 150, steps=8); r.portal.mouse.move(400, 300, steps=8); r.portal.mouse.up(); time.sleep(1)
+        pos = r.ctl.evaluate("chrome.storage.local.get('propio-acw-pill-pos-v1')").get('propio-acw-pill-pos-v1')
+        r.say('posicion guardada:', pos)
+        check('al arrastrar la pildora se guarda su posicion', bool(pos) and pos['right'] > 20 and pos['bottom'] > 20, str(pos))
+        r.portal.screenshot(path=CERT_DIR + '/pill_moved.png')
+        r.portal.reload(); time.sleep(6)
+        r.portal.screenshot(path=CERT_DIR + '/pill_moved_reload.png')
+        check('tras recargar Propio la pildora sigue ahi', has())
 except Exception as e:
     import traceback; traceback.print_exc(); ok = False
 finally:
