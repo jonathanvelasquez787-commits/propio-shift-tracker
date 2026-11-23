@@ -4,6 +4,7 @@ import { compareCallRecords, preserveCallRecords, unfinishedCallIntervals } from
 function approxEndHtml(tool, translateText, esc) {
   const text = tool?.endedBy === 'portal-closed' ? translateText('Fin aproximado: se cerró la pestaña de Propio durante la llamada. Se guardó con la hora del cierre.')
     : tool?.endedBy === 'portal-reloaded' ? translateText('Fin aproximado: se recargó la página de Propio durante la llamada. Se guardó con la hora de la recarga.')
+    : tool?.endedBy === 'computer-slept' ? translateText('Fin aproximado: la computadora se suspendió durante la llamada. Se guardó con el último momento en que se vio activa.')
     : tool?.endedBy === 'chrome-restarted' ? translateText('Fin aproximado: Chrome o la computadora se cerró durante la llamada. Se guardó con el último momento en que se vio activa (puede diferir entre 30 y 60 segundos).') : '';
   return text ? `<p class="record-source-note record-approx-end">${esc(text)}</p>` : '';
 }
