@@ -373,6 +373,15 @@ export function applyLightThemeDefault() {
   syncThemeClass();
 }
 
+// Abrir rápido (ventanita de la extensión): mientras la app se arma guarda su estado sola
+// (normaliza datos). Eso NO son cambios del usuario: si contaran, la ventanita se creería
+// "más nueva" que la nube y sus datos viejos pisarían, por ejemplo, un borrado hecho en la web.
+export async function withoutDirtyMarking(task) {
+  const before = hydrating;
+  hydrating = true;
+  try { return await task(); } finally { hydrating = before; }
+}
+
 // El gate de arranque se dibuja ANTES de que la app corra su applyTheme(), así
 // que sin esto se vería navy por medio segundo y después saltaría a claro. Lee
 // el mismo settings.theme y pone la clase que la app usaría.

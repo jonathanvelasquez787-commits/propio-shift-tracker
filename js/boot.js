@@ -37,6 +37,7 @@ import {
   forgetRecoveryCopies,
   localHasData,
   canOpenFast,
+  withoutDirtyMarking,
   checkCloudOnReturn,
 } from './sync.js';
 
@@ -824,7 +825,9 @@ async function boot() {
   setBootMessage(translateText('Abriendo tu turno…'));
   startAutoSync();
 
-  if (!(await mountApp(userId)) || bridgeUserId !== userId) return;
+  // En apertura rápida lo que la app guarda sola al armarse no cuenta como cambio del usuario.
+  const mounted = fastOpen ? await withoutDirtyMarking(() => mountApp(userId)) : await mountApp(userId);
+  if (!mounted || bridgeUserId !== userId) return;
 
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('pst-propio-bridge/v1:' + userId));
   const accountScope = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('');
