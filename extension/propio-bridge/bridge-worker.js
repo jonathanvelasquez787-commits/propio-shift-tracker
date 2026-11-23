@@ -10,6 +10,15 @@ const fresh = () => ({ mode: 'observe', accountScope: null, tabs: {}, session: n
   preparation: { enabled: false, availabilityPaused: false, plan: null, doneFor: null, lastAttemptAt: 0,
     spacing: { enabled: false, minutes: 2, lastEndedAt: null }, waitReason: null,
     resume: { break: false, lunch: false, mode: 'manual' }, pendingPause: null, resumedPauses: [], reinforcement: null } });
+const BADGE_PROBLEMS = new Set(['queue-full', 'expired-event', 'event-rejected', 'tracker-needs-review']);
+const BADGE_TITLE = 'Propio · Tracker y vista original';
+// Marca "!" en el icono de Chrome cuando la extension esta vinculada y NO esta registrando (o hay llamadas trabadas).
+// "tracker-closed" NO cuenta: con la ventanita cerrada las llamadas esperan en la cola y no se pierden.
+export function badgeFor(state) {
+  if (!state?.accountScope) return { text: '', title: BADGE_TITLE };
+  if (state.mode !== 'auto' || BADGE_PROBLEMS.has(state.attention)) return { text: '!', title: 'Propio: la extensión NO está registrando. Abrí la ventanita para ver por qué.' };
+  return { text: '', title: BADGE_TITLE };
+}
 export function pendingQueueSummary(queue, now = Date.now()) {
   const times = queue.map(item => Date.parse(item?.event?.at)).filter(time => Number.isFinite(time) && time >= 0 && time <= now + 10000);
   if (!times.length) return null;
@@ -19,6 +28,17 @@ export function pendingQueueSummary(queue, now = Date.now()) {
 export function createBridgeWorker(api, { now = () => Date.now(), randomId = () => crypto.randomUUID() } = {}) {
   const reduce = createPropioReducer({ randomId }), pending = new Map();
   let serial = Promise.resolve(), flushing = null, acceptedLease = null, leaseDeadline = 0;
+  let shownBadge = null;
+  const showBadge = async state => {
+    const badge = badgeFor(state), key = badge.text;
+    if (shownBadge === key) return;
+    try {
+      await api.action?.setBadgeText?.({ text: badge.text });
+      if (badge.text) await api.action?.setBadgeBackgroundColor?.({ color: '#f5b301' });
+      await api.action?.setTitle?.({ title: badge.title });
+      shownBadge = key;
+    } catch { /* la marca es solo un aviso: si falla, no se toca el registro */ }
+  };
   const transact = operation => {
     const result = serial.then(async () => {
       const stored = (await api.storage.local.get(KEY))[KEY];
@@ -30,6 +50,7 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
       const before = JSON.stringify(state);
       const output = await operation(state);
       if (stored?.schema !== 1 || before !== JSON.stringify(state)) await api.storage.local.set({ [KEY]: { ...state, schema: 1 } });
+      await showBadge(state);
       return output;
     });
     serial = result.catch(() => {});
