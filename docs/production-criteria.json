@@ -1014,6 +1014,10 @@
           ]
         },
         {
+      "file": "tests/extension-varias-pestanas.test.mjs",
+      "namedCases": ["dos pestañas de Propio: la llamada de una no se mezcla con la otra pestaña", "cerrar la pestaña SIN llamada no corta la llamada de la otra pestaña", "cerrar la pestaña CON llamada guarda esa llamada aunque haya otra pestaña abierta", "cada pestaña lleva su propia llamada: terminar una no cierra la otra"]
+    },
+    {
       "file": "tests/extension-aviso-sesion.test.mjs",
       "namedCases": ["badgeFor: sesion cerrada sin ninguna sesion abierta pone \"!\"; sin pestañas o con una abierta no", "el worker pone \"!\" cuando Propio muestra la sesion cerrada y lo quita al volver a entrar", "con la pestaña de Propio cerrada no hay marca de sesion"]
     },
