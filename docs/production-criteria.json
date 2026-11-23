@@ -1014,6 +1014,10 @@
           ]
         },
         {
+      "file": "tests/extension-aviso-sesion.test.mjs",
+      "namedCases": ["badgeFor: sesion cerrada sin ninguna sesion abierta pone \"!\"; sin pestañas o con una abierta no", "el worker pone \"!\" cuando Propio muestra la sesion cerrada y lo quita al volver a entrar", "con la pestaña de Propio cerrada no hay marca de sesion"]
+    },
+    {
       "file": "tests/extension-aviso-senales.test.mjs",
       "namedCases": ["badgeFor: una racha larga de eventos ilegibles pone \"!\" aunque este registrando", "el worker pone \"!\" tras varios eventos de llamadas sin nombre legible y lo quita con uno legible", "eventos con nombre desconocido o fallos de red NO cuentan como señales cambiadas", "la racha sigue contando aunque lleguen solicitudes que fallan en medio", "las llamadas normales se siguen registrando igual", "el cuadro explica en \"Estado de conexión\" que Propio cambio sus señales"]
     },

@@ -20,6 +20,10 @@ export function badgeFor(state) {
   if (!state?.accountScope) return { text: '', title: BADGE_TITLE };
   if (state.mode !== 'auto' || BADGE_PROBLEMS.has(state.attention)) return { text: '!', title: 'Propio: la extensión NO está registrando. Abrí la ventanita para ver por qué.' };
   if (Number(state.diagnostic?.oddRun) >= SIGNALS_ODD_LIMIT) return { text: '!', title: 'Propio: parece que cambió sus señales de llamadas y la extensión podría no registrarlas. Abrí la ventanita.' };
+  // Sesion de Propio cerrada: hay una pestaña del portal con la sesion cerrada y ninguna con la sesion abierta.
+  // Sin pestaña de Propio abierta es normal y NO avisa.
+  const portals = Object.values(state.tabs || {});
+  if (portals.some(tab => tab.session === 'logged-out') && !portals.some(tab => tab.session === 'authenticated')) return { text: '!', title: 'Propio: saliste de tu sesión y no se registran llamadas hasta que vuelvas a entrar.' };
   return { text: '', title: BADGE_TITLE };
 }
 export function pendingQueueSummary(queue, now = Date.now()) {
