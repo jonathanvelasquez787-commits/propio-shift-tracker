@@ -705,6 +705,23 @@ function markDirty() {
 // baje esa version. Con cambios sin subir NO se toca nada: de eso se encarga
 // la subida normal (y, si hay conflicto, la pregunta del arranque).
 let lastReturnCheck = 0;
+
+// Carga rapida: la ventanita abre con lo guardado en este aparato sin esperar
+// a la nube, solo si es la misma cuenta, hay datos y nada esta sin subir.
+// Si la revision posterior ve que la nube cambio, deja una marca para que la
+// recarga siguiente use el arranque normal (asi no se repite en bucle).
+const SLOW_BOOT_KEY = 'propio_slow_boot_once_v1';
+export function canOpenFast(userId) {
+  try {
+    if (window.sessionStorage.getItem(SLOW_BOOT_KEY)) {
+      window.sessionStorage.removeItem(SLOW_BOOT_KEY);
+      return false;
+    }
+  } catch { /* sin sessionStorage: arranque normal por seguridad */ return false; }
+  const meta = readMeta();
+  return Boolean(userId && meta.userId === userId && !meta.dirty && meta.lastSyncedUpdatedAt && localHasData());
+}
+
 export async function checkCloudOnReturn({ minGapMs = 5000 } = {}) {
   const meta = readMeta();
   if (pushing || meta.dirty || !meta.lastSyncedUpdatedAt || !canSync(meta.userId)) return { skipped: true };
@@ -722,6 +739,7 @@ export async function checkCloudOnReturn({ minGapMs = 5000 } = {}) {
     // empezo una subida, esta revision ya no vale.
     if (pushing || syncEpoch !== epoch || now.userId !== meta.userId || now.dirty) return { skipped: true };
     if (data.updated_at === now.lastSyncedUpdatedAt) return { same: true };
+    try { window.sessionStorage.setItem(SLOW_BOOT_KEY, '1'); } catch { /* ignorar */ }
     emit('cloud-changed', { cloudUpdatedAt: data.updated_at });
     return { changed: true, updatedAt: data.updated_at };
   } catch {
@@ -760,6 +778,7 @@ export const BOOT = {
   USE_CLOUD: 'use-cloud', // solo hay nube, o local está limpio: se baja
   OTHER_ACCOUNT: 'other-account', // el local es de otra cuenta: se descarta sin preguntar
   CONFLICT: 'conflict', // hay dos versiones divergentes: decide el usuario
+  FAST: 'fast', // abrir ya con lo local; la nube se revisa despues
 };
 
 export async function resolveBoot(userId) {
