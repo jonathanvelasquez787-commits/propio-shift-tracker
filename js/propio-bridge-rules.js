@@ -51,6 +51,8 @@ export function validateBridgeReinforcement(value) {
   if (typeof value.celebrate !== 'boolean' || typeof value.ask !== 'boolean') return null;
   return { celebrate: value.celebrate, ask: value.ask };
 }
+// Por que la extension tuvo que cerrar una llamada sin ver la desconexion real (el final es aproximado).
+export const BRIDGE_END_REASONS = ['portal-closed'];
 export function validateBridgeEvent(value, now = Date.now()) {
   if (!value || typeof value !== 'object' || Array.isArray(value) || value.version !== 1 || !bridgeId(value.id)) return null;
   if (!['call-start','call-end','session-start','session-end','available','unavailable','history-records','pause-end'].includes(value.type)) return null;
@@ -83,6 +85,7 @@ export function validateBridgeEvent(value, now = Date.now()) {
       const start = typeof value.startedAt === 'string' ? Date.parse(value.startedAt) : NaN;
       if (!Number.isFinite(start) || start >= time || time-start > BRIDGE_MAX_AGE || now-start > BRIDGE_MAX_AGE) return null;
       event.startedAt = new Date(start).toISOString();
+      if (BRIDGE_END_REASONS.includes(value.endedBy)) event.endedBy = value.endedBy;
     }
   }
   return event;
@@ -137,7 +140,7 @@ export function readPropioRequestBody(requestBody) {
 }
 
 export function createPropioReducer({ randomId = () => crypto.randomUUID() } = {}) {
-  return function reduce(previous, signal, at) {
+  return function reduce(previous, signal, at, options = {}) {
     const state = { active: previous?.active ? { ...previous.active } : null, completed: Number(previous?.completed) || 0,
       ...(previous?.lastEndedAt ? { lastEndedAt: previous.lastEndedAt } : {}) };
     let event = null;
@@ -146,7 +149,8 @@ export function createPropioReducer({ randomId = () => crypto.randomUUID() } = {
       state.active = { callId: randomId(), startedAt: at };
       event = { version: 1, id: randomId(), type: 'call-start', callId: state.active.callId, at };
     } else if (signal === 'disconnected' && state.active && Date.parse(at) > Date.parse(state.active.startedAt)) {
-      event = { version: 1, id: randomId(), type: 'call-end', callId: state.active.callId, startedAt: state.active.startedAt, at };
+      event = { version: 1, id: randomId(), type: 'call-end', callId: state.active.callId, startedAt: state.active.startedAt, at,
+        ...(BRIDGE_END_REASONS.includes(options.endedBy) ? { endedBy: options.endedBy } : {}) };
       state.active = null; state.completed++; state.lastEndedAt = at;
     } else if (signal === 'available' || signal === 'unavailable') {
       event = { version: 1, id: randomId(), type: signal, at };

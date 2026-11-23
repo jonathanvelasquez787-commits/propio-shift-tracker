@@ -87,7 +87,7 @@ export function renderCallTable(context) {
               <span class="tbl-row-icon type-call">${iconHtml('phone')}</span>
               <div class="tbl-row-main">
                 <div class="tbl-row-title"><button class="record-link" type="button" data-call-records="${escapeHtml(c.id || '')}">#${escapeHtml(c.customerId)}</button> <span class="tbl-type-badge type-call">Llamada</span>${callRecordTag(c) ? ` <span class="call-origin-tag" data-origin="${callRecordTag(c)}">${tagLabel[callRecordTag(c)]}</span>` : ''}</div>
-                <div class="tbl-row-sub">${escapeHtml(billableText)} · ${escapeHtml(droppedText)} · ${escapeHtml(sourceLabel)}</div>
+                <div class="tbl-row-sub">${escapeHtml(billableText)} · ${escapeHtml(droppedText)} · ${escapeHtml(sourceLabel)}${c.records?.tool?.endedBy ? ` · ${escapeHtml(translateText('Fin aproximado'))}` : ''}</div>
                 <span class="tbl-row-sub">${comparison.propio ? comparison.tool ? translateText('Propio y respaldo') : translateText('Registro de Propio') : comparison.tool ? translateText('Respaldo · pendiente de Propio') : translateText('Ver registros')}${Math.abs(comparison.differenceMs || 0) >= 1000 ? ui` · Diferencia: ${Math.round(Math.abs(comparison.differenceMs) / 1000)} s` : ''}</span>
                 ${repeatHtml}
               </div>

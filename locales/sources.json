@@ -3767,6 +3767,12 @@
       "app.html"
     ]
   },
+  "s_42600fe5": {
+    "source": "{{v4}} · {{v5}} · {{v6}}{{v7}}",
+    "files": [
+      "js/call-table-view.js"
+    ]
+  },
   "s_4263f6ee": {
     "source": "Mi progreso",
     "files": [
@@ -7338,6 +7344,12 @@
       "privacidad.html"
     ]
   },
+  "s_82e0c2d7": {
+    "source": "{{v13}} · {{v14}}",
+    "files": [
+      "js/call-table-view.js"
+    ]
+  },
   "s_83252091": {
     "source": "No hay un reparto inmediato; se usará el próximo disponible.",
     "files": [
@@ -7599,12 +7611,6 @@
       "app.html"
     ]
   },
-  "s_85e58845": {
-    "source": "{{v12}} · {{v13}}",
-    "files": [
-      "js/call-table-view.js"
-    ]
-  },
   "s_85e79a40": {
     "source": "Una hora sin llamadas no define tu capacidad · sigue a tu ritmo",
     "files": [
@@ -7650,7 +7656,6 @@
   "s_877a44a8": {
     "source": "{{v7}}{{v8}}",
     "files": [
-      "js/call-table-view.js",
       "js/reports.js"
     ]
   },
@@ -8016,6 +8021,7 @@
   "s_8cb6b45e": {
     "source": "{{v8}}{{v9}}",
     "files": [
+      "js/call-table-view.js",
       "js/weekly-summary.js"
     ]
   },
@@ -10645,12 +10651,6 @@
     "source": "Valor interno: {{v0}} USD{{v1}}. La pantalla redondea a centavos.",
     "files": [
       "js/finance.js"
-    ]
-  },
-  "s_b9d74bc6": {
-    "source": "{{v4}} · {{v5}} · {{v6}}",
-    "files": [
-      "js/call-table-view.js"
     ]
   },
   "s_baa70682": {
@@ -14089,6 +14089,12 @@
       "js/finance.js"
     ]
   },
+  "s_f519087b": {
+    "source": "Fin aproximado: se cerró la pestaña de Propio durante la llamada. Se guardó con la hora del cierre.",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_f5196cdd": {
     "source": "No se pudo conectar. Revisa tu internet y vuelve a intentar.",
     "files": [
@@ -14286,6 +14292,12 @@
     "source": "Supabase",
     "files": [
       "privacidad.html"
+    ]
+  },
+  "s_f7a9d660": {
+    "source": "Fin aproximado",
+    "files": [
+      "js/call-table-view.js"
     ]
   },
   "s_f7d54964": {

@@ -73,8 +73,8 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
       else state.queue.push({ accountScope: state.accountScope, event });
     }
   }
-  function callSignal(state, tabId, signal, at) {
-    const { state: reduced, event } = reduce(state.tabs[tabId], signal, at);
+  function callSignal(state, tabId, signal, at, options = {}) {
+    const { state: reduced, event } = reduce(state.tabs[tabId], signal, at, options);
     state.tabs[tabId] = { ...state.tabs[tabId], ...reduced };
     if (event?.type === 'call-start' && state.preparation.plan) {
       state.preparation.doneFor = state.preparation.plan.startAt;
@@ -82,7 +82,23 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     }
     if (event?.type === 'call-end' && validateBridgeEvent(event, now())) state.completed++;
     if (event?.type === 'call-end' && validateBridgeEvent(event, now())) state.preparation.spacing.lastEndedAt = event.at;
+    const queuedBefore = state.queue.length;
     record(state, signal, at, event);
+    return { event, queued: state.queue.length > queuedBefore };
+  }
+  // Se cerro la pestaña de Propio. Si habia una llamada activa NO se pierde: se cierra con la hora del cierre
+  // y se marca como final aproximado, para que la app la guarde y diga que paso.
+  async function tabRemoved(tabId) {
+    await transact(state => {
+      const tab = state.tabs[tabId];
+      if (tab?.active) {
+        const at = new Date(Math.max(now(), Date.parse(tab.active.startedAt) + 1)).toISOString();
+        const closed = callSignal(state, tabId, 'disconnected', at, { endedBy: 'portal-closed' });
+        if (!closed?.queued) state.attention = 'portal-closed';
+      }
+      delete state.tabs[tabId];
+    });
+    await flush();
   }
   function finishResume(state) {
     const prep = state.preparation;
@@ -609,10 +625,7 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     });
     api.alarms.create('retry-bridge', { periodInMinutes: 0.5 });
     api.alarms.onAlarm.addListener(alarm => { if (alarm.name === 'retry-bridge') flush().catch(() => {}); });
-    api.tabs.onRemoved.addListener(tabId => { transact(state => {
-      if (state.tabs[tabId]?.active) state.attention = 'portal-closed';
-      delete state.tabs[tabId];
-    }).catch(() => {}); });
+    api.tabs.onRemoved.addListener(tabId => { tabRemoved(tabId).catch(() => {}); });
   }
-  return { install, beforeRequest, completed, message, navigationCommitted, flush, refreshBackground };
+  return { install, beforeRequest, completed, message, navigationCommitted, flush, refreshBackground, tabRemoved };
 }
