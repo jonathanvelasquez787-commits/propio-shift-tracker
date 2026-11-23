@@ -83,7 +83,9 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
   const ownOrigin = () => { try { return api.runtime?.id ? `chrome-extension://${api.runtime.id}` : null; } catch { return null; } };
   const viaOwnPage = sender => { try { return !sender.tab && ownOrigin() !== null && new URL(sender.url).origin === ownOrigin(); } catch { return false; } };
   // La ventanita del icono es una pagina de la extension sin pestaña: Chrome no le pone frameId (undefined); solo las pestañas lo traen en 0.
-  const topFrame = sender => sender.frameId === 0 || (sender.frameId === undefined && viaOwnPage(sender));
+  // 2.8.40: una pagina propia de la extension vale como marco principal salvo que sea un marco hijo (frameId > 0); acepta undefined, -1 o null, con o sin pestaña.
+  const ownPageUrl = sender => { try { return ownOrigin() !== null && new URL(sender.url).origin === ownOrigin(); } catch { return false; } };
+  const topFrame = sender => sender.frameId === 0 || (ownPageUrl(sender) && !(sender.frameId > 0));
   const trackerSender = url => { try { const origin = new URL(url).origin; return origin === TRACKER_ORIGIN || (ownOrigin() !== null && origin === ownOrigin()); } catch { return false; } };
   // La ventana propia del tracker (pagina de la extension) manda sobre la web: si esta abierta y se identifica, las llamadas van solo a ella.
   async function trackers() {
@@ -581,7 +583,7 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     if (packet?.kind === 'tracker-coordination') {
       // Cuando no hay permiso se responde el motivo (solo para el cuadro de diagnostico).
       const refuse = why => ({ owner: null, enabled: false, why });
-      if (!topFrame(sender)) return refuse('frame');
+      if (!topFrame(sender)) return refuse(`frame:${String(sender.frameId)}/${sender.tab ? 'tab' : 'sin-tab'}/${ownPageUrl(sender) ? 'propia' : 'ajena'}`);
       if (!Number.isInteger(sender.tab?.id) && !viaOwnPage(sender)) return refuse('sender');
       if (!accountScopeValid(packet.accountScope)) return refuse('scope-bad');
       if (!trackerSender(sender.url)) return refuse('origin');

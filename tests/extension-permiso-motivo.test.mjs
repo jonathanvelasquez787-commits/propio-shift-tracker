@@ -22,7 +22,7 @@ const ask = (w, sender = {}, accountScope = scope) => w.message({ kind: 'tracker
 test('permiso motivo: el worker dice por que no entrega el codigo del permiso', async () => {
   const { w } = worker();
   assert.deepEqual(await ask(w), { owner: null, enabled: false, why: 'worker-unpaired' });
-  assert.equal((await ask(w, { frameId: 3 })).why, 'frame');
+  assert.equal((await ask(w, { frameId: 3 })).why, 'frame:3/tab/ajena');
   assert.equal((await ask(w, { tab: undefined })).why, 'sender');
   assert.equal((await ask(w, {}, 'corto')).why, 'scope-bad');
   assert.equal((await ask(w, { url: 'https://otro.example/' })).why, 'origin');
