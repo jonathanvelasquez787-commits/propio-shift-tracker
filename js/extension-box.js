@@ -23,6 +23,12 @@ const AVAILABILITY_REASONS = {
   coordination: 'Esperando permiso de la nube para esta PC. Otra PC puede estar usando los iniciadores. El registro continúa; pausá la PC anterior y esperá hasta 30 segundos.',
 };
 const REASONS = {
+  'login-cancelled': 'Se cerró o canceló la ventana de Google. Probá de nuevo.',
+  'login-no-code': 'Google no devolvió el permiso. Probá de nuevo.',
+  'login-network': 'No hubo red para terminar el inicio de sesión. Probá de nuevo.',
+  'login-failed': 'No se pudo terminar el inicio de sesión del worker. Probá de nuevo.',
+  'wrong-account': 'Elegiste otra cuenta de Google. Usá la misma cuenta de tu Propio Shift Tracker.',
+  'busy': 'Ya hay un inicio de sesión del worker en curso.',
   'portal-closed': 'La pestaña de Propio se cerró durante una llamada. Revisá su final en Propio Shift Tracker.',
   'multiple-trackers': 'Dejá abierta una sola pestaña de Propio Shift Tracker para esta cuenta.',
   'tracker-closed': 'Abrí Propio Shift Tracker e iniciá sesión para conectarlo.',
@@ -152,6 +158,19 @@ export function extensionLeaseModel(diag) {
     : r === 'bad-answer' ? 'respuesta de la nube no válida' : r === 'stopped' ? 'detenido' : r.startsWith('error: ') || r.startsWith('network: ') ? r : 'motivo desconocido';
   const cause = r === 'no-owner' && typeof diag.why === 'string' && diag.why ? ` [motivo: ${diag.why.slice(0, 40)}]` : '';
   return `Permiso de la nube: ${why}${cause} · avisos: ${Number(diag.hellos) || 0} · pedidos: ${Number(diag.rpcs) || 0}`;
+}
+
+// «Sesion propia del worker» (Parte 1 del permiso con todo cerrado). Funcion pura.
+export function extensionWorkerSessionModel(state) {
+  const paired = Boolean(state && state.ok !== false && state.paired);
+  const ws = state && state.ok !== false && state.workerSession && typeof state.workerSession === 'object' ? state.workerSession : { state: 'none' };
+  const who = typeof ws.email === 'string' && ws.email ? ` (${ws.email.slice(0, 60)})` : '';
+  const text = ws.state === 'ok' ? `Sesión propia del worker: conectada${who}.`
+    : ws.state === 'offline' ? `Sesión propia del worker: conectada${who}, pero el último intento no tuvo red.`
+    : ws.state === 'expired' ? 'Sesión propia del worker: se venció. Conectala de nuevo.'
+    : ws.state === 'wrong-account' ? `Sesión propia del worker: es de otra cuenta${who}. Quitala y conectá la correcta.`
+    : paired ? 'Sesión propia del worker: sin conectar. Hará falta para trabajar con todo cerrado (todavía en preparación).' : 'Sesión propia del worker: primero conectá la extensión con tu cuenta.';
+  return { text, canConnect: paired && ws.state !== 'ok' && ws.state !== 'offline', canRemove: ws.state !== 'none' };
 }
 
 export function initExtensionBox(doc = globalThis.document, chromeApi = globalThis.chrome, loc = globalThis.location, reinforcement = null) {
@@ -305,7 +324,10 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
   const spacingNote = el('p', 'ext-box-note'); spacingNote.id = 'extBoxSpacingNote';
   const availNote = el('p', 'ext-box-note'); availNote.id = 'extBoxAvailNote'; availNote.setAttribute('role', 'status');
   const leaseNote = el('p', 'ext-box-note'); leaseNote.id = 'extBoxLeaseNote';
-  availBody.append(pausedRow.row, firstRow.row, brkRow.row, lunchRow.row, modeRow, resumeNote, spacingRow.row, minRow, spacingNote, availNote, leaseNote);
+  const workerNote = el('p', 'ext-box-note'); workerNote.id = 'extBoxWorkerNote';
+  const workerLogin = btn('Conectar sesión del worker', 'extBoxWorkerLogin'), workerLogout = btn('Quitar sesión del worker', 'extBoxWorkerLogout');
+  const workerBtns = el('div', 'ext-box-worker'); workerBtns.append(workerLogin, workerLogout);
+  availBody.append(pausedRow.row, firstRow.row, brkRow.row, lunchRow.row, modeRow, resumeNote, spacingRow.row, minRow, spacingNote, availNote, leaseNote, workerNote, workerBtns);
   avail.append(availHead, availBody);
   const doing = el('div', 'ext-box-avail'); doing.id = 'extBoxDoing';
   const doingHead = el('button', 'ext-box-row ext-box-fold', ''); doingHead.type = 'button'; doingHead.id = 'extBoxDoingBtn';
@@ -403,6 +425,8 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
     if (doc.activeElement !== minInput) minInput.value = a.minutes;
     spacingRow.small.textContent = `ACW ${a.minutes} min`;
     resumeNote.textContent = a.resumeNote; spacingNote.textContent = a.spacingNote; availNote.textContent = a.status;
+    const ws = extensionWorkerSessionModel(state);
+    workerNote.textContent = ws.text; workerLogin.hidden = !ws.canConnect; workerLogin.disabled = busy; workerLogout.hidden = !ws.canRemove; workerLogout.disabled = busy; workerBtns.hidden = !ws.canConnect && !ws.canRemove;
     leaseNote.textContent = extensionLeaseModel(typeof globalThis.__pstLeaseDiagnostic === 'function' ? globalThis.__pstLeaseDiagnostic() : null);
   }
   async function act(packet, okText) {
@@ -419,6 +443,8 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
     finally { busy = false; await refresh().catch(() => {}); }
     if (feedback) setTimeout(() => { feedback = ''; refresh().catch(() => {}); }, 6000);
   }
+  workerLogin.addEventListener('click', () => act({ kind: 'worker-session-signin' }, 'Sesión del worker conectada.'));
+  workerLogout.addEventListener('click', () => act({ kind: 'worker-session-signout' }, 'Sesión del worker quitada.'));
   pair.addEventListener('click', () => act({ kind: 'pair' }, 'Conexión revisada: Propio Shift Tracker está conectado.'));
   open.addEventListener('click', () => act({ kind: 'open-tracker' }));
   resumeBtn.addEventListener('click', () => act({ kind: 'pause-availability', paused: false }));

@@ -2,6 +2,7 @@ import { PORTAL_ORIGIN, TRACKER_ORIGIN, TWILIO_EVENT_ORIGINS, BRIDGE_MAX_AGE, ac
 import { validatePortalRecord, portalRecordKey } from '../../js/propio-history-records.js';
 import { createAutomationStatus } from '../../js/automation-status.js';
 import { validateAutomationLease } from '../../js/automation-lease.js';
+import { createWorkerSession } from './worker-session.js';
 
 const KEY = 'bridge-v1';
 const URLS = [`${PORTAL_ORIGIN}/*`, ...TWILIO_EVENT_ORIGINS.map(origin => `${origin}/v4/EndpointEvents*`)];
@@ -40,7 +41,8 @@ export function pendingQueueSummary(queue, now = Date.now()) {
   const oldest = Math.min(...times), expires = oldest + BRIDGE_MAX_AGE;
   return { oldestAt: new Date(oldest).toISOString(), expiresAt: new Date(expires).toISOString(), expired: now > expires };
 }
-export function createBridgeWorker(api, { now = () => Date.now(), randomId = () => crypto.randomUUID() } = {}) {
+export function createBridgeWorker(api, { now = () => Date.now(), randomId = () => crypto.randomUUID(), sessionOptions = {} } = {}) {
+  const workerSession = createWorkerSession(api, { now, ...sessionOptions });
   const reduce = createPropioReducer({ randomId }), pending = new Map();
   let serial = Promise.resolve(), flushing = null, acceptedLease = null, leaseDeadline = 0;
   let shownBadge = null;
@@ -614,6 +616,11 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     // Los controles de la extension viven en la ventanita vieja (popup.html) y en la app dentro de la extension (panel.html, ?popup=1 incluido).
     const controlPage = ['popup.html', 'panel.html'].some(name => { const base = api.runtime.getURL(name), url = String(sender.url || ''); return url === base || url.startsWith(base + '?') || url.startsWith(base + '#'); });
     if (!controlPage) return null;
+    if (packet?.kind === 'worker-session-signin') {
+      const scope = await transact(state => state.accountScope);
+      return workerSession.signIn(scope);
+    }
+    if (packet?.kind === 'worker-session-signout') return workerSession.signOut();
     if (packet?.kind === 'device-passive') {
       if (typeof packet.enabled !== 'boolean') return { ok: false, reason: 'invalid-mode' };
       return transact(async state => {
@@ -639,7 +646,8 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
       const authenticated = portals.filter(tab => tab.session === 'authenticated' && tab.blockedDocument !== tab.documentId);
       const call = ['connected', 'incoming', 'idle'].find(kind => authenticated.some(tab => tab.call === kind)) || 'unknown';
       const layout = portals.length === 1 && portals[0].layout && now() >= Date.parse(portals[0].layout.reportedAt) && now() - Date.parse(portals[0].layout.reportedAt) < 15000 ? portals[0].layout : null;
-      return { mode: state.mode, paired: !!state.accountScope, active: Object.values(state.tabs).some(tab => tab.active), completed: state.completed, history: state.history || null, layout, preparation: state.preparation, automationStatus: automationStatus(state), queued: state.queue.length, queueSummary: pendingQueueSummary(state.queue, now()), queueItems: state.queue.slice(0, 50).map(item => ({ type: item.event.type, at: item.event.at })), last: state.last, attention: state.attention, call, portal: authenticated.length ? 'authenticated' : portals.some(tab => tab.session === 'logged-out') ? 'logged-out' : 'unknown', diagnostic: state.diagnostic || { requests: 0, recognized: 0, last: [] } };
+      const workerSessionState = await workerSession.status(state.accountScope);
+      return { workerSession: workerSessionState, mode: state.mode, paired: !!state.accountScope, active: Object.values(state.tabs).some(tab => tab.active), completed: state.completed, history: state.history || null, layout, preparation: state.preparation, automationStatus: automationStatus(state), queued: state.queue.length, queueSummary: pendingQueueSummary(state.queue, now()), queueItems: state.queue.slice(0, 50).map(item => ({ type: item.event.type, at: item.event.at })), last: state.last, attention: state.attention, call, portal: authenticated.length ? 'authenticated' : portals.some(tab => tab.session === 'logged-out') ? 'logged-out' : 'unknown', diagnostic: state.diagnostic || { requests: 0, recognized: 0, last: [] } };
     }
     if (packet?.kind === 'pair') {
       const targets = await trackers();
