@@ -194,7 +194,7 @@ test('every theme uses one color for page and card, and the softened grays reach
       for (const surface of ['--bg','--panel','--panel-2']) assert.ok(contrast(tokens['--muted'],tokens[surface])>=4.5,`${palette.id}/${mode}: gray on ${surface}`);
     }
   }
-  assert.equal(retouched.length,6,'six themes get the softened gray: '+retouched.join(', '));
+  assert.equal(retouched.length,2,'two themes get the softened gray: '+retouched.join(', '));
 });
 
 test('collapsed actions bar opens only the active break, lunch or call button and shows its timer', () => {

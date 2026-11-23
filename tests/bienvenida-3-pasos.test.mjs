@@ -147,7 +147,7 @@ test('elegir una paleta la muestra al momento y no guarda nada todavia', () => {
 
 test('una paleta solo oscura con el sistema en claro pasa el tema a oscuro; una que tiene los dos no toca el tema', () => {
   const light = { matchMedia: () => ({ matches: true }), location: { reload() {} } };
-  for (const [palette, expected] of [['graphite', 'dark'], ['neon', 'dark'], ['ocean', 'auto'], ['original', 'auto']]) {
+  for (const [palette, expected] of [['graphite', 'dark'], ['neon', 'dark'], ['ocean', 'dark'], ['lavender', 'auto'], ['original', 'auto']]) {
     const settings = { theme: 'auto', language: 'es', weeklySchedule: {} };
     const h = context(settings, {}, { window: light });
     vm.runInContext(`onboardingChoice.palette = '${palette}';`, h);
