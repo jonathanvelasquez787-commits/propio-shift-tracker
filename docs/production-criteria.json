@@ -1042,6 +1042,10 @@
       "namedCases": ["badgeFor: sin vincular no hay marca; vinculada y en auto sin problema tampoco", "badgeFor: vinculada y sin registrar, o con llamadas trabadas, muestra \"!\"", "el worker pone la marca en el icono al vincular y la quita al registrar", "si la extension se pausa por un problema, vuelve la marca", "no repite la orden al icono si la marca no cambio", "si el icono falla, el registro sigue funcionando"]
     },
     {
+          "file": "tests/extension-arranque-sin-guardar.test.mjs",
+          "namedCases": ["arranque rápido: lo que la app guarda sola al armarse no marca cambios sin subir", "arranque rápido: sigue revisando la nube y, si cambió (ej. borrado en la web), avisa para recargar", "arranque rápido: un cambio del usuario después de abrir SÍ cuenta como pendiente"]
+        },
+    {
           "file": "tests/extension-carga-rapida.test.mjs",
           "namedCases": ["carga rápida: la ventanita abre con lo local antes de consultar la nube", "carga rápida: con cambios sin subir sigue el arranque normal (primero la nube)", "carga rápida: en la web (no extensión) sigue el arranque normal", "carga rápida: si la nube cambió deja marca y la siguiente apertura usa el arranque normal una vez", "carga rápida: abrir rápido no marca los datos como pendientes de subir", "carga rápida: otra cuenta o sin datos locales no abren rápido"]
         },
