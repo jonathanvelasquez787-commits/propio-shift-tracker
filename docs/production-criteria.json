@@ -1014,6 +1014,10 @@
           ]
         },
         {
+      "file": "tests/extension-recarga-llamada.test.mjs",
+      "namedCases": ["las reglas aceptan el motivo \"portal-reloaded\" y siguen descartando otros", "F5 a mitad de llamada: la llamada se guarda con la hora de la recarga y fin aproximado", "sin llamada, o con el mismo documento, una observacion NO cierra nada", "la recarga de una pestaña no cierra la llamada de otra pestaña", "la app guarda el motivo en la llamada y el detalle lo explica"]
+    },
+    {
       "file": "tests/extension-varias-pestanas.test.mjs",
       "namedCases": ["dos pestañas de Propio: la llamada de una no se mezcla con la otra pestaña", "cerrar la pestaña SIN llamada no corta la llamada de la otra pestaña", "cerrar la pestaña CON llamada guarda esa llamada aunque haya otra pestaña abierta", "cada pestaña lleva su propia llamada: terminar una no cierra la otra"]
     },

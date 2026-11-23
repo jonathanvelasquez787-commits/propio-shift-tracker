@@ -11226,6 +11226,12 @@
       "js/backup-recovery.js"
     ]
   },
+  "s_c535c51e": {
+    "source": "Fin aproximado: se recargó la página de Propio durante la llamada. Se guardó con la hora de la recarga.",
+    "files": [
+      "js/call-records-view.js"
+    ]
+  },
   "s_c540ebf5": {
     "source": "Temas",
     "files": [
