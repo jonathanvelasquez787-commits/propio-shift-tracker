@@ -987,6 +987,12 @@
           ]
         },
         {
+          "file": "tests/extension-cuadro-punto-rapido.test.mjs",
+          "namedCases": [
+            "punto del cuadro: revisa cada segundo al abrir y para al ponerse verde"
+          ]
+        },
+        {
           "file": "tests/extension-cuadro-senales.test.mjs",
           "namedCases": [
             "cuadro de señales: muestra pendientes, vencimiento y botones como la ventanita vieja",

@@ -370,5 +370,13 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
   globalThis.addEventListener?.('resize', () => { if (shown) place(); });
   refresh().catch(() => {});
   timer = setInterval(() => { if (!doc.hidden) refresh().catch(() => {}); }, 10000);
-  return { icon, box, refresh, stop: () => { clearInterval(timer); automationUi.stop(); } };
+  // Al abrir la ventanita el punto empieza esperando a que la app se conecte: revisa cada segundo hasta que se ponga verde (o por 30 s) y luego sigue cada 10 s.
+  let quickLeft = 30;
+  const quick = setInterval(() => {
+    if (doc.hidden) return;
+    quickLeft -= 1;
+    refresh().catch(() => {});
+    if (quickLeft <= 0 || icon.dataset.extDot === 'on' || icon.dataset.extDot === 'idle') clearInterval(quick);
+  }, 1000);
+  return { icon, box, refresh, stop: () => { clearInterval(timer); clearInterval(quick); automationUi.stop(); } };
 }
