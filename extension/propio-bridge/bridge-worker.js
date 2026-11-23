@@ -513,6 +513,12 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
         return { ok: true };
       });
     }
+    if (packet?.kind === 'acw-pill') {
+      // Solo lectura para la pildora de ACW que se dibuja en la pagina de Propio.
+      if (sender.frameId !== 0 || !Number.isInteger(sender.tab?.id)) return null;
+      try { if (new URL(sender.url).origin !== PORTAL_ORIGIN) return null; } catch { return null; }
+      return { ok: true, status: await transact(state => automationStatus(state)) };
+    }
     if (packet?.kind === 'confirm-automation-action') {
       if (sender.frameId !== 0 || !Number.isInteger(sender.tab?.id)) return null;
       try { if (new URL(sender.url).origin !== PORTAL_ORIGIN) return null; } catch { return null; }

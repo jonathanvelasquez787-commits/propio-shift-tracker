@@ -9,5 +9,6 @@ La sesion del worker se siembra a mano (el login con Google NO se puede probar a
 - C: marca "!" si falta la sesion del worker; en «solo registro» no avisa.
 - E: 2 min solo con alarmas: el permiso no tiene huecos.
 - F: caida corta de la nube (1 min): datos y plan se conservan (Parte 6).
+- G: la pildora de ACW se dibuja en el portal, se apaga y se enciende con su interruptor (guarda capturas en /tmp/e2e/pill_*.png).
 
 No se ejecutan con `node --test` ni en CI (necesitan Playwright para Python y ~6 min). Correr con `sh scripts/e2e-worker/run.sh`.
