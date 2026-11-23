@@ -82,6 +82,8 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
     }
     if (event?.type === 'call-end' && validateBridgeEvent(event, now())) state.completed++;
     if (event?.type === 'call-end' && validateBridgeEvent(event, now())) state.preparation.spacing.lastEndedAt = event.at;
+    // Latido: la hora de inicio cuenta como "ultimo momento visto" de la llamada.
+    if (event?.type === 'call-start') state.tabs[tabId].aliveAt = at;
     const queuedBefore = state.queue.length;
     record(state, signal, at, event);
     return { event, queued: state.queue.length > queuedBefore };
@@ -99,6 +101,39 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
       delete state.tabs[tabId];
     });
     await flush();
+  }
+  // Latido (cada vuelta de la alarma, ~30 s): mientras hay una llamada activa se anota el ultimo momento en que la pestaña
+  // de Propio se vio viva. Si Chrome se cierra de golpe, se va la luz o se apaga la PC no llega ninguna señal de fin: al
+  // volver (onStartup, o cualquier vuelta de la alarma) la llamada huerfana se cierra con ESE momento, marcada como aproximada.
+  async function tabIsPortal(tabId) {
+    try { const tab = await api.tabs.get(tabId); return typeof tab?.url === 'string' && tab.url.startsWith(`${PORTAL_ORIGIN}/`); }
+    catch (error) { return !/No tab with id/i.test(String(error?.message || error)); }
+  }
+  function closeOrphan(state, id) {
+    const tab = state.tabs[id], start = Date.parse(tab.active.startedAt), last = Date.parse(tab.aliveAt);
+    // Una llamada huerfana de mas de 24 h ya no se puede entregar: se descarta con aviso y NO pausa la grabacion.
+    if (now() - start > BRIDGE_MAX_AGE - 60000) state.attention = 'portal-closed';
+    else {
+      const at = new Date(Math.min(now(), Math.max(Number.isFinite(last) ? last : start, start + 1000))).toISOString();
+      const closed = callSignal(state, id, 'disconnected', at, { endedBy: 'chrome-restarted' });
+      if (!closed?.queued) state.attention = 'portal-closed';
+    }
+    delete state.tabs[id];
+  }
+  async function heartbeat() {
+    const active = await transact(state => Object.entries(state.tabs).filter(([, tab]) => tab?.active).map(([id]) => id));
+    if (!active.length) return false;
+    const lost = new Set();
+    for (const id of active) if (!(await tabIsPortal(Number(id)))) lost.add(id);
+    await transact(state => {
+      const at = new Date(now()).toISOString();
+      for (const [id, tab] of Object.entries(state.tabs)) {
+        if (!tab?.active) continue;
+        if (lost.has(id)) closeOrphan(state, id); else tab.aliveAt = at;
+      }
+    });
+    await flush();
+    return true;
   }
   function finishResume(state) {
     const prep = state.preparation;
@@ -624,8 +659,10 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
       message(packet, sender).then(respond, () => respond({ ok: false, reason: 'storage' })); return true;
     });
     api.alarms.create('retry-bridge', { periodInMinutes: 0.5 });
-    api.alarms.onAlarm.addListener(alarm => { if (alarm.name === 'retry-bridge') flush().catch(() => {}); });
+    api.alarms.onAlarm.addListener(alarm => { if (alarm.name === 'retry-bridge') heartbeat().then(beat => beat || flush()).catch(() => {}); });
+    api.runtime.onStartup?.addListener(() => { heartbeat().catch(() => {}); });
+    heartbeat().catch(() => {});
     api.tabs.onRemoved.addListener(tabId => { tabRemoved(tabId).catch(() => {}); });
   }
-  return { install, beforeRequest, completed, message, navigationCommitted, flush, refreshBackground, tabRemoved };
+  return { install, beforeRequest, completed, message, navigationCommitted, flush, refreshBackground, tabRemoved, heartbeat };
 }

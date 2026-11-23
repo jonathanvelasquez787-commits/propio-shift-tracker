@@ -2,7 +2,8 @@ import { compareCallRecords, preserveCallRecords, unfinishedCallIntervals } from
 
 // Nota simple de por que el final de la medicion es aproximado (la extension cerro la llamada sin ver la desconexion).
 function approxEndHtml(tool, translateText, esc) {
-  const text = tool?.endedBy === 'portal-closed' ? translateText('Fin aproximado: se cerró la pestaña de Propio durante la llamada. Se guardó con la hora del cierre.') : '';
+  const text = tool?.endedBy === 'portal-closed' ? translateText('Fin aproximado: se cerró la pestaña de Propio durante la llamada. Se guardó con la hora del cierre.')
+    : tool?.endedBy === 'chrome-restarted' ? translateText('Fin aproximado: Chrome o la computadora se cerró durante la llamada. Se guardó con el último momento en que se vio activa (puede diferir entre 30 y 60 segundos).') : '';
   return text ? `<p class="record-source-note record-approx-end">${esc(text)}</p>` : '';
 }
 
