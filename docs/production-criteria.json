@@ -317,6 +317,10 @@
           ]
         },
         {
+          "file": "tests/reiniciar-conserva-tema.test.mjs",
+          "namedCases": ["reiniciar todos los datos conserva el tema oscuro que ya tenías", "reiniciar todos los datos conserva el tema claro que ya tenías", "reiniciar sin tema elegido deja el de fábrica"]
+        },
+    {
           "file": "tests/reset-keep-finance.test.mjs",
           "namedCases": [
             "borrar todos los datos conserva las Finanzas cuando la casilla no está marcada",
