@@ -128,43 +128,26 @@ function escapeHtml(str) {
 // Conflicto de versiones: lo decide el usuario, nunca se hace merge automático
 // ---------------------------------------------------------------------------
 
-function askConflict({ localSummary, cloudSummary, cloud }) {
-  return new Promise((resolve) => {
-    const cuando = cloud.updated_at
-      ? new Intl.DateTimeFormat(displayLocale(), {
-          day: 'numeric',
-          month: 'short',
-          hour: '2-digit',
-          minute: '2-digit',
-        }).format(new Date(cloud.updated_at))
-      : translateText('fecha desconocida');
-    const desde = cloud.device_label ? ui` desde ${escapeHtml(cloud.device_label)}` : '';
+// Nadie elige: se queda la versión guardada más tarde (la que tiene lo último
+// que hiciste, venga de la extensión o de la web). La otra no se borra: queda
+// en las copias recuperables de Ajustes. Las llamadas de Propio se pueden
+// volver a traer con su historial; lo que solo vive en esta herramienta es lo
+// que se guardó más tarde.
+function chooseNewerVersion({ cloud, localSavedAt }) {
+  const localMs = Date.parse(localSavedAt || '');
+  const cloudMs = Date.parse(cloud?.updated_at || '');
+  // Sin fecha local no se puede comparar: se protege lo que no se había subido.
+  return Number.isFinite(localMs) && Number.isFinite(cloudMs) && cloudMs > localMs ? 'cloud' : 'local';
+}
 
-    bootBody.innerHTML = ui`
-      <div class="boot-card boot-card-wide">
-        <div class="boot-card-title">Dos versiones distintas de tus datos</div>
-        <p class="boot-card-text">
-          Este dispositivo tiene cambios sin subir, y en la nube hay una versión
-          guardada${desde} el ${escapeHtml(cuando)}. No se mezclan solas: elige
-          cuál se queda. La versión reemplazada queda en las copias recuperables de Ajustes.
-        </p>
-        <div class="boot-choice-grid">
-          <button class="boot-choice" id="bootUseLocal" type="button">
-            <span class="boot-choice-label">Usar la de este dispositivo</span>
-            <span class="boot-choice-sub">${escapeHtml(localSummary)}</span>
-            <span class="boot-choice-note">Se sube y reemplaza la de la nube</span>
-          </button>
-          <button class="boot-choice" id="bootUseCloud" type="button">
-            <span class="boot-choice-label">Usar la de la nube</span>
-            <span class="boot-choice-sub">${escapeHtml(cloudSummary)}</span>
-            <span class="boot-choice-note">Se baja y reemplaza la de este dispositivo</span>
-          </button>
-        </div>
-      </div>`;
+function askConflict({ cloud, localSavedAt }) {
+  // Sin pregunta y sin aviso: se aplica la elección y el arranque sigue.
+  return Promise.resolve(chooseNewerVersion({ cloud, localSavedAt }));
+}
 
-    document.getElementById('bootUseLocal').addEventListener('click', () => resolve('local'));
-    document.getElementById('bootUseCloud').addEventListener('click', () => resolve('cloud'));
-  });
+function escribiendoAhora() {
+  const campo = document.activeElement;
+  return Boolean(campo && /^(INPUT|TEXTAREA)$/.test(campo.tagName) && String(campo.value || '').length > 0);
 }
 
 // ---------------------------------------------------------------------------
@@ -652,10 +635,16 @@ function wireSyncStatus() {
     }
     if (type === 'error') setSyncStatus('error', navigator.onLine === false
       ? translateText('Sin conexión — se guardó local') : translateText('La nube no confirmó el guardado'));
+    if (type === 'cloud-changed' && !readMeta().dirty && !escribiendoAhora()) {
+      // Otro dispositivo guardó y aquí no hay nada sin subir: bajar es seguro.
+      window.location.reload();
+    }
     if (type === 'conflict') {
       cloudConflict = true;
       setSyncStatus('error', translateText('Otro dispositivo guardó después'));
       showCloudConflictBanner();
+      // El arranque elige solo la versión más reciente; si estás escribiendo, espera.
+      if (!escribiendoAhora()) window.location.reload();
     }
   });
 
@@ -684,7 +673,7 @@ function showCloudConflictBanner() {
   const text = banner.querySelector('.storage-conflict-banner-text');
   if (text) {
     text.textContent =
-      translateText('Otro dispositivo guardó cambios más recientes. Tus cambios siguen en este navegador y no reemplazan esa revisión. Recarga para comparar y elegir; la versión reemplazada queda en copias recuperables.');
+      translateText('Otro dispositivo guardó antes que tú. Tus cambios siguen aquí y no se perdieron. Toca Recargar para elegir qué versión se queda; la otra queda en copias recuperables.');
   }
   banner.classList.add('show');
 }

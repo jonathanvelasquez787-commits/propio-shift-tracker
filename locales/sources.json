@@ -1845,12 +1845,6 @@
       "js/app-main.js"
     ]
   },
-  "s_21b50060": {
-    "source": "Dos versiones distintas de tus datos",
-    "files": [
-      "js/boot.js"
-    ]
-  },
   "s_21c1e2d9": {
     "source": "Bosque de Salvia: Verde salvia, menta y crema",
     "files": [
@@ -2801,12 +2795,6 @@
       "js/backup-recovery.js"
     ]
   },
-  "s_3151ba56": {
-    "source": "desde {{v0}}",
-    "files": [
-      "js/boot.js"
-    ]
-  },
   "s_317bdc74": {
     "source": "Propio Shift Tracker",
     "files": [
@@ -3197,12 +3185,6 @@
     "source": "Moneda:",
     "files": [
       "app.html"
-    ]
-  },
-  "s_3770dabd": {
-    "source": "Usar la de la nube",
-    "files": [
-      "js/boot.js"
     ]
   },
   "s_37825345": {
@@ -4932,12 +4914,6 @@
       "js/reports.js"
     ]
   },
-  "s_55944819": {
-    "source": "Este dispositivo tiene cambios sin subir, y en la nube hay una versión\n          guardada{{v0}} el {{v1}}. No se mezclan solas: elige\n          cuál se queda. La versión reemplazada queda en las copias recuperables de Ajustes.",
-    "files": [
-      "js/boot.js"
-    ]
-  },
   "s_55dae620": {
     "source": "360 min",
     "files": [
@@ -6456,12 +6432,6 @@
       "js/boot.js"
     ]
   },
-  "s_72e39b45": {
-    "source": "Se baja y reemplaza la de este dispositivo",
-    "files": [
-      "js/boot.js"
-    ]
-  },
   "s_732b7336": {
     "source": "− Restar",
     "files": [
@@ -7154,12 +7124,6 @@
     "source": "Conexión:",
     "files": [
       "app.html"
-    ]
-  },
-  "s_7e6e482d": {
-    "source": "Se sube y reemplaza la de la nube",
-    "files": [
-      "js/boot.js"
     ]
   },
   "s_7e71593b": {
@@ -7985,12 +7949,6 @@
     "files": [
       "app.html",
       "js/app-main.js"
-    ]
-  },
-  "s_8bce7dc0": {
-    "source": "fecha desconocida",
-    "files": [
-      "js/boot.js"
     ]
   },
   "s_8bcea16f": {
@@ -9989,6 +9947,12 @@
       "js/calendar.js"
     ]
   },
+  "s_acde2633": {
+    "source": "Otro dispositivo guardó antes que tú. Tus cambios siguen aquí y no se perdieron. Toca Recargar para elegir qué versión se queda; la otra queda en copias recuperables.",
+    "files": [
+      "js/boot.js"
+    ]
+  },
   "s_ace1ba22": {
     "source": "Despensa",
     "files": [
@@ -10435,12 +10399,6 @@
     "source": "+{{v0}}",
     "files": [
       "js/calendar.js"
-    ]
-  },
-  "s_b4682766": {
-    "source": "Usar la de este dispositivo",
-    "files": [
-      "js/boot.js"
     ]
   },
   "s_b4708ba5": {
@@ -13422,12 +13380,6 @@
     "source": "¿Seguro?",
     "files": [
       "app.html"
-    ]
-  },
-  "s_e9d043d2": {
-    "source": "Otro dispositivo guardó cambios más recientes. Tus cambios siguen en este navegador y no reemplazan esa revisión. Recarga para comparar y elegir; la versión reemplazada queda en copias recuperables.",
-    "files": [
-      "js/boot.js"
     ]
   },
   "s_e9d9fe9d": {
