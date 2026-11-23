@@ -119,3 +119,16 @@ export function scheduleNeedsReason(oldCfg, newCfg) {
   if (oldCfg.blocks.length !== newCfg.blocks.length) return true;
   return newCfg.blocks.some((block, i) => block.type !== oldCfg.blocks[i].type || block.start !== oldCfg.blocks[i].start || Number(block.dur) !== Number(oldCfg.blocks[i].dur));
 }
+
+// Castigo, parte 3: cuántos minutos completos lleva pasado un descanso de lo planeado.
+// null = todavía no se pasa (o faltan datos). 0 = recién se pasó (primer aviso), 1 = un minuto
+// de más (segundo aviso), etc. Cada cambio de número es un aviso nuevo.
+export function breakOverrunMinute(startedAtMs, plannedMin, nowMs) {
+  const start = Number(startedAtMs);
+  const planned = Number(plannedMin);
+  const now = Number(nowMs);
+  if (!Number.isFinite(start) || !Number.isFinite(now) || !(planned > 0)) return null;
+  const over = now - (start + planned * 60000);
+  if (over < 0) return null;
+  return Math.floor(over / 60000);
+}

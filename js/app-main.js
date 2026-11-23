@@ -145,7 +145,7 @@ import { acwMinutesForBlock } from './block-acw.js';
 import { activeAppKeys } from './sync.js';
 import { CONNECTED_LIVE_GRACE_MIN, GAP_AUTO_OTHER_THRESHOLD_MIN, PAUSE_SLOT_MAX_DISTANCE_MIN, WEEKDAYS, WEEKDAY_JS_INDEX, baseDayConfigFor, buildPlannedSlots, callDateKeyFromValue, callDateToDate, callsForDay, computeCurrentAcwStart, currentShiftAccountingDayKey, cycleAnchorDate, dateAtTime, dateKey, dayConfigFor, dayEvents, dayGapRows, dayIsEffectivelyOff, dayPauseIntervals, dayPausesForSlotStats, dayShiftBounds, dayShiftSessions, dayWorkBounds, dayWorkSessions, defaultActiveDayKey, defaultDaySchedule, defaultWeeklySchedule, ensureBlockProductivityGoals, ensureWeeklySchedule, findPlannedSlotForActivePause, formatHHMM, gapClassification, gapKeyFor, getActiveDayKey, getDayNote, getEffectiveScheduleForDay, getGapAnnotation, getPropioBridgePlan, getShiftWindow, getWorkSessionStatus, manualGapPauseIntervals, mergeIntervals, mergeOverlappingPauseEntries, migrateDayConfigToBlocks, minutesToHHMM, overlapMinutesWithIntervals, pad, pauseAssignmentCache, pauseDurationExcludingCalls, pauseForSlot, previousCalendarDay, referenceDurationMinForActivePause, reinforcementScheduleIntervals, sameCallDay, startOfCycleWeek, subtractCallsFromPauseInterval, suggestGapLabel, toDateFromInputs, toMinutes, todayCallDateKey, weekStartKeyForDayKey, weekStartKeyFromDate, weekdayKeyForDayKey, workStartForConnection, configureBridgePlan } from './bridge-plan.js';
 export { WEEKDAYS, callDateKeyFromValue, callDateToDate, callsForDay, dayConfigFor, dayEvents, dayGapRows, dayIsEffectivelyOff, dayShiftBounds, defaultDaySchedule, ensureWeeklySchedule, formatHHMM, getActiveDayKey, getDayNote, getPropioBridgePlan, getWorkSessionStatus, mergeIntervals, minutesToHHMM, pad, previousCalendarDay, sameCallDay, startOfCycleWeek, toDateFromInputs, toMinutes, todayCallDateKey, weekStartKeyFromDate, weekdayKeyForDayKey } from './bridge-plan.js';
-import { disorderBreakdown, carryDebtMin, cleanOrderReason, orderSummary, sanitizeOrderTope, favorMinutes, dayOrderStatus, walkStreak, rewardProgress } from './orden-model.js';
+import { disorderBreakdown, carryDebtMin, breakOverrunMinute, cleanOrderReason, orderSummary, sanitizeOrderTope, favorMinutes, dayOrderStatus, walkStreak, rewardProgress } from './orden-model.js';
 import { renderMiOrden, setMiOrdenEditing } from './orden-view.js';
 import { initExtensionBox } from './extension-box.js';
 
@@ -1753,6 +1753,26 @@ function checkBreakEndAlarm() {
     }
     startBreakEndAlarm(key);
   }
+}
+
+// Castigo de "Mi orden", parte 3: cuando el Break/Lunch se pasa de lo planeado suena la alarma de
+// fin de descanso y sale un aviso cada minuto, hasta que se termina el descanso. (El modo
+// Freelancer ya tiene su propio aviso de descanso terminado.)
+let breakOverrunLastKey = null;
+function checkBreakOverrunAlarm() {
+  if (!state.activePause || state.shiftEndedAt || freelancerActive()) { breakOverrunLastKey = null; return; }
+  const plannedDurationMin = referenceDurationMinForActivePause(todayCallDateKey());
+  const overMin = breakOverrunMinute(Date.parse(state.activePause.startedAt), plannedDurationMin, Date.now());
+  if (overMin === null) { breakOverrunLastKey = null; return; }
+  const key = `${state.activePause.startedAt}|${overMin}`;
+  if (breakOverrunLastKey === key) return;
+  breakOverrunLastKey = key;
+  stopBreakEndAlarm();
+  const pretty = state.activePause.type === 'lunch' ? translateText('Lunch') : translateText('Break');
+  toast(overMin === 0
+    ? renderAlertTemplate(translateText('⏰ Tu {tipo} se pasó de lo planeado. Vuelve ya.'), { tipo: pretty })
+    : renderAlertTemplate(translateText('⏰ Llevas {min} min de más en tu {tipo}. Vuelve ya.'), { tipo: pretty, min: overMin }));
+  playConfiguredAlarmSound(settings.breakEndAlarmSound, settings.breakEndAlarmCustomSoundDataUrl);
 }
 
 // Descanso ganado por productividad ---- Aviso (toast + sonido) al acumular
@@ -7984,6 +8004,7 @@ export function render() {
       checkShiftAlarm();
       checkBreakStartAlarm();
       checkBreakEndAlarm();
+      checkBreakOverrunAlarm();
       checkProductiveBreakEarnedAlarm();
       checkFreelancerBreakPrompt();
       checkFreelancerBreakOver();
