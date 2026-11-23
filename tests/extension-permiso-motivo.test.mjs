@@ -41,3 +41,8 @@ test('permiso motivo: el hello lleva el motivo desde la extension hasta la app',
   assert.ok(read('extension/propio-bridge/tracker-content.js').includes('automationWhy'));
   assert.ok(read('js/propio-bridge.js').includes('why: packet.automationWhy'));
 });
+
+test('permiso motivo: la ventanita muestra la respuesta cruda si llega vacia', () => {
+  const src = read('extension/propio-bridge/tracker-content.js');
+  assert.ok(src.includes("'respuesta ' + JSON.stringify(coordination ?? null)"));
+});

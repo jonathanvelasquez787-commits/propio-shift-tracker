@@ -21,9 +21,12 @@
     if (!alive()) { stop(); return; }
     const owner = ready && { accountScope: ready.accountScope, nonce: ready.nonce };
     let coordination = null, why = owner ? 'no-reply' : 'no-ready';
-    try { if (owner) coordination = await chrome.runtime.sendMessage({ kind: 'tracker-coordination', accountScope: owner.accountScope }); } catch (error) { why = 'error: ' + String(error?.message || 'sin detalle').slice(0, 30); }
+    try {
+      if (owner) coordination = await chrome.runtime.sendMessage({ kind: 'tracker-coordination', accountScope: owner.accountScope });
+    } catch (error) { why = 'error: ' + String(error?.message || 'sin detalle').slice(0, 30); }
     if (!alive() || (owner && (owner.accountScope !== ready?.accountScope || owner.nonce !== ready?.nonce))) return;
     if (coordination?.why) why = String(coordination.why).slice(0, 30);
+    else if (owner && !coordination?.owner && why === 'no-reply') why = 'respuesta ' + JSON.stringify(coordination ?? null).slice(0, 30);
     window.postMessage({ protocol, direction: 'extension', kind: 'hello', automationOwner: coordination?.owner || undefined, automationEnabled: coordination?.enabled === true, automationWhy: coordination?.owner ? undefined : why }, origin);
   };
   async function announce(packet) {
