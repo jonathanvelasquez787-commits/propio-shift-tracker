@@ -305,7 +305,7 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
   celebrateRow.input.addEventListener('change', saveReinforcement);
   askRow.input.addEventListener('change', saveReinforcement);
   // «Apariencia de Propio»: dos interruptores para la pagina del portal (mismas claves que usaba la ventanita vieja).
-  const LAYOUT_KEY = 'propio-original-layout-v1', DARK_KEY = 'propio-dark-mode-v1';
+  const LAYOUT_KEY = 'propio-original-layout-v1', DARK_KEY = 'propio-dark-mode-v1', ACW_PILL_KEY = 'propio-acw-pill-v1';
   const LAYOUT_NOTE = 'Muestra el diseño de siempre cuando Propio lo permite.', DARK_NOTE = 'Cambia los colores del portal de Propio a oscuros.';
   const LAYOUT_STATES = { 'native-present': 'Componente original detectado en Propio.', loading: 'Esperando que Propio termine de cargar.',
     'waiting-offline': 'Esperando Offline para aplicar la vista sin interrumpir llamadas.',
@@ -319,7 +319,9 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
   };
   const layoutRow = appearanceRow('extBoxOriginalLayout', 'Vista original de Propio', LAYOUT_NOTE);
   const darkRow = appearanceRow('extBoxPortalDark', 'Modo oscuro en Propio', DARK_NOTE);
-  let layoutValue = null, layoutBusy = false, darkBusy = false, nativeLayout = null;
+  const ACW_NOTE = 'Muestra en Propio cuánto falta para que te pongas disponible.';
+  const pillRow = appearanceRow('extBoxAcwPill', 'Píldora de ACW en Propio', ACW_NOTE);
+  let layoutValue = null, layoutBusy = false, darkBusy = false, pillBusy = false, nativeLayout = null;
   const renderLayoutRow = () => {
     layoutRow.input.checked = layoutValue?.enabled === true; layoutRow.input.disabled = layoutBusy;
     layoutRow.small.textContent = layoutValue?.enabled !== true ? LAYOUT_NOTE
@@ -328,9 +330,10 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
   };
   const readAppearance = () => {
     try {
-      Promise.resolve(chromeApi.storage?.local?.get?.([LAYOUT_KEY, DARK_KEY])).then(v => {
+      Promise.resolve(chromeApi.storage?.local?.get?.([LAYOUT_KEY, DARK_KEY, ACW_PILL_KEY])).then(v => {
         if (!layoutBusy) { layoutValue = v?.[LAYOUT_KEY] || null; renderLayoutRow(); }
         if (!darkBusy) darkRow.input.checked = v?.[DARK_KEY]?.enabled === true;
+        if (!pillBusy) pillRow.input.checked = v?.[ACW_PILL_KEY]?.enabled !== false;
       }).catch(() => {});
     } catch { /* sin leer: los interruptores quedan apagados */ }
   };
@@ -351,7 +354,14 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
     catch { darkRow.input.checked = !enabled; darkRow.small.textContent = 'No se pudo guardar. Se conserva la elección anterior; reintentá.'; }
     finally { darkBusy = false; darkRow.input.disabled = false; }
   });
-  try { chromeApi.storage?.onChanged?.addListener?.((changes, area) => { if (area === 'local' && (changes[LAYOUT_KEY] || changes[DARK_KEY])) readAppearance(); }); } catch { /* sin escuchar */ }
+  pillRow.input.addEventListener('change', async () => {
+    if (pillBusy) return;
+    const enabled = pillRow.input.checked; pillBusy = true; pillRow.input.disabled = true;
+    try { await chromeApi.storage.local.set({ [ACW_PILL_KEY]: { enabled } }); pillRow.small.textContent = ACW_NOTE; }
+    catch { pillRow.input.checked = !enabled; pillRow.small.textContent = 'No se pudo guardar. Se conserva la elección anterior; reintentá.'; }
+    finally { pillBusy = false; pillRow.input.disabled = false; }
+  });
+  try { chromeApi.storage?.onChanged?.addListener?.((changes, area) => { if (area === 'local' && (changes[LAYOUT_KEY] || changes[DARK_KEY] || changes[ACW_PILL_KEY])) readAppearance(); }); } catch { /* sin escuchar */ }
   const pend = el('div', 'ext-box-row');
   const pendText = el('span'); const pendNote = el('small', '', 'Nada esperando'); pendNote.id = 'extBoxPendingNote';
   pendText.append(el('b', '', 'Eventos pendientes'), pendNote);
@@ -451,7 +461,7 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
   const supHelp = el('p', 'ext-box-note', 'Números para revisar la conexión.');
   const supSummary = el('p', 'ext-box-note'); supSummary.id = 'detectorStatus';
   const supList = el('ul', 'ext-box-signals'); supList.id = 'detectorRequests'; supSec.body.append(supHelp, supSummary, supList);
-  box.append(head, conn, rec, celebrateRow.row, askRow.row, layoutRow.row, darkRow.row, pend, queueBox, avail, doing, connSec.wrap, histSec.wrap, actSec.wrap, supSec.wrap);
+  box.append(head, conn, rec, celebrateRow.row, askRow.row, layoutRow.row, darkRow.row, pillRow.row, pend, queueBox, avail, doing, connSec.wrap, histSec.wrap, actSec.wrap, supSec.wrap);
   doc.body.append(box);
 
   let busy = false, feedback = '', shown = false, timer = null, workSession = null;

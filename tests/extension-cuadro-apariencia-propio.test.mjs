@@ -18,6 +18,6 @@ test('apariencia de Propio: el cuadro usa las mismas claves que la ventanita vie
 test('apariencia de Propio: los dos interruptores salen justo debajo de Registrar mi actividad', () => {
   assert.match(box, /'extBoxOriginalLayout', 'Vista original de Propio'/);
   assert.match(box, /'extBoxPortalDark', 'Modo oscuro en Propio'/);
-  assert.match(box, /box\.append\(head, conn, rec, celebrateRow\.row, askRow\.row, layoutRow\.row, darkRow\.row, pend,/);
+  assert.match(box, /box\.append\(head, conn, rec, celebrateRow\.row, askRow\.row, layoutRow\.row, darkRow\.row, pillRow\.row, pend,/);
   assert.match(box, /storage\?\.onChanged\?\.addListener/);
 });

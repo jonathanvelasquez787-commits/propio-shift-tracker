@@ -88,6 +88,20 @@ try:
             r.say('permiso: valido=%s pedidos=%s vence en %.0fs' % (valid, lease.get('asks'), (lease.get('expiresAt', 0) - time.time() * 1000) / 1000), '| SW vivos:', len(r.ctx.service_workers))
         check('el permiso nunca se quedo sin vigencia en 2 min', lapses == 0, f'huecos={lapses} de {samples}')
         check('el worker despierto solo (alarmas) y renovo varias veces', asks_changes >= 4, f'cambios de pedidos={asks_changes}')
+    elif name == 'G':  # pildora de ACW dibujada en la pagina de Propio (se ve en la captura; el shadow DOM es cerrado)
+        r.seed(last_ended_min=0.5); r.kick(); r.open_portal()
+        st = wait_for(lambda s: s['workerPlan']['state'] == 'ok', 25); r.say('estado:', brief(st))
+        time.sleep(4)
+        has = lambda: r.portal.evaluate("!!document.getElementById('pst-acw-pill')")
+        check('la pildora aparece en la pagina de Propio durante la espera de ACW', has())
+        r.portal.screenshot(path=CERT_DIR + '/pill_light.png')
+        check('mientras espera NO se pulso Start Calls', r.clicks() == 0, f'clicks={r.clicks()}')
+        r.ctl.evaluate("chrome.storage.local.set({'propio-dark-mode-v1': {enabled: true}})"); time.sleep(3)
+        r.portal.screenshot(path=CERT_DIR + '/pill_dark.png')
+        r.ctl.evaluate("chrome.storage.local.set({'propio-acw-pill-v1': {enabled: false}})"); time.sleep(3)
+        check('con el interruptor apagado la pildora desaparece', not has())
+        r.ctl.evaluate("chrome.storage.local.set({'propio-acw-pill-v1': {enabled: true}})"); time.sleep(4)
+        check('al volver a encenderlo la pildora regresa', has())
 except Exception as e:
     import traceback; traceback.print_exc(); ok = False
 finally:
