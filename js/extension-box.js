@@ -193,6 +193,27 @@ export function extensionWorkerLeaseModel(state) {
   return `Permiso del worker: ${text} · pedidos: ${asks}`;
 }
 
+// «Datos del worker» (Parte 3 del permiso con todo cerrado). Funcion pura. Solo informa.
+export function extensionWorkerDataModel(state, nowMs = Date.now()) {
+  const ws = state && state.ok !== false && state.workerSession && typeof state.workerSession === 'object' ? state.workerSession : { state: 'none' };
+  const wd = state && state.ok !== false && state.workerData && typeof state.workerData === 'object' ? state.workerData : { state: 'none' };
+  if (ws.state === 'none' || ws.state === 'expired' || ws.state === 'wrong-account') return 'Datos del worker: no se leen hasta que conectes la sesión del worker.';
+  const ago = at => { const min = Math.max(0, Math.round((nowMs - Number(at)) / 60000)); return min < 1 ? 'hace menos de 1 min' : min < 60 ? `hace ${min} min` : `hace ${Math.round(min / 60)} h`; };
+  const detail = typeof wd.detail === 'string' && wd.detail ? ` (${wd.detail.slice(0, 60)})` : '';
+  const text = wd.state === 'ok' ? (Number.isFinite(wd.checkedAt) ? `al día, revisados ${ago(wd.checkedAt)}${Number.isFinite(wd.calls) ? ` · llamadas recientes: ${wd.calls}` : ''}${detail}` : 'al día')
+    : wd.state === 'empty' ? 'la nube todavía no tiene datos de esta cuenta'
+    : wd.state === 'changed' ? 'la nube cambió mientras se leía; se reintenta solo'
+    : wd.state === 'network' ? `sin red en el último intento${detail}`
+    : wd.state === 'error' ? `la nube respondió con error${detail}`
+    : wd.state === 'too-big' ? `son demasiado grandes para guardarlos${detail}`
+    : wd.state === 'no-session' ? 'sin sesión válida del worker'
+    : wd.state === 'bad-token' ? 'la sesión del worker no trae tu usuario'
+    : wd.state === 'off' ? 'no se leen ahora (modo automático apagado o esta PC en «solo registro»)'
+    : wd.state === 'no-account' ? 'sin cuenta vinculada'
+    : 'todavía sin leer';
+  return `Datos del worker: ${text}`;
+}
+
 export function initExtensionBox(doc = globalThis.document, chromeApi = globalThis.chrome, loc = globalThis.location, reinforcement = null) {
   if (!doc || !loc || loc.protocol !== 'chrome-extension:' || !chromeApi?.runtime?.sendMessage) return null;
   const anchor = doc.getElementById('higherRateHeaderBtn');
@@ -347,8 +368,9 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
   const workerNote = el('p', 'ext-box-note'); workerNote.id = 'extBoxWorkerNote';
   const workerLogin = btn('Conectar sesión del worker', 'extBoxWorkerLogin'), workerLogout = btn('Quitar sesión del worker', 'extBoxWorkerLogout');
   const workerLeaseNote = el('p', 'ext-box-note'); workerLeaseNote.id = 'extBoxWorkerLeaseNote';
+  const workerDataNote = el('p', 'ext-box-note'); workerDataNote.id = 'extBoxWorkerDataNote';
   const workerBtns = el('div', 'ext-box-worker'); workerBtns.append(workerLogin, workerLogout);
-  availBody.append(pausedRow.row, firstRow.row, brkRow.row, lunchRow.row, modeRow, resumeNote, spacingRow.row, minRow, spacingNote, availNote, leaseNote, workerNote, workerLeaseNote, workerBtns);
+  availBody.append(pausedRow.row, firstRow.row, brkRow.row, lunchRow.row, modeRow, resumeNote, spacingRow.row, minRow, spacingNote, availNote, leaseNote, workerNote, workerLeaseNote, workerDataNote, workerBtns);
   avail.append(availHead, availBody);
   const doing = el('div', 'ext-box-avail'); doing.id = 'extBoxDoing';
   const doingHead = el('button', 'ext-box-row ext-box-fold', ''); doingHead.type = 'button'; doingHead.id = 'extBoxDoingBtn';
@@ -449,6 +471,7 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
     const ws = extensionWorkerSessionModel(state);
     workerNote.textContent = ws.text; workerLogin.hidden = !ws.canConnect; workerLogin.disabled = busy; workerLogout.hidden = !ws.canRemove; workerLogout.disabled = busy; workerBtns.hidden = !ws.canConnect && !ws.canRemove;
     workerLeaseNote.textContent = extensionWorkerLeaseModel(state);
+    workerDataNote.textContent = extensionWorkerDataModel(state);
     leaseNote.textContent = extensionLeaseModel(typeof globalThis.__pstLeaseDiagnostic === 'function' ? globalThis.__pstLeaseDiagnostic() : null);
   }
   async function act(packet, okText) {
