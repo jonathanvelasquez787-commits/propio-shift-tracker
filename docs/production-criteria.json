@@ -987,6 +987,10 @@
           ]
         },
         {
+          "file": "tests/extension-carga-rapida.test.mjs",
+          "namedCases": ["carga rápida: la ventanita abre con lo local antes de consultar la nube", "carga rápida: con cambios sin subir sigue el arranque normal (primero la nube)", "carga rápida: en la web (no extensión) sigue el arranque normal", "carga rápida: si la nube cambió deja marca y la siguiente apertura usa el arranque normal una vez", "carga rápida: abrir rápido no marca los datos como pendientes de subir", "carga rápida: otra cuenta o sin datos locales no abren rápido"]
+        },
+        {
           "file": "tests/sync-volver-a-ver.test.mjs",
           "namedCases": ["volver a ver: la nube cambió y no hay nada sin subir avisa cloud-changed", "volver a ver: misma revisión en la nube no avisa nada", "volver a ver: con cambios sin subir no consulta ni avisa (lo decide la subida normal)", "volver a ver: un error de la nube o una consulta muy seguida no avisan", "volver a ver: cambios locales mientras se espera a la nube cancelan el aviso", "conflicto de arranque: la decisión trae la hora en que se guardó lo local", "conflicto de arranque: nadie elige, se queda la versión guardada más tarde", "conexión: al volver a ver la página se revisa la nube y solo se recarga sin cambios sin subir ni texto a medias"]
         },

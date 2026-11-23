@@ -36,6 +36,8 @@ import {
   restoreRecoveryCopy,
   forgetRecoveryCopies,
   localHasData,
+  canOpenFast,
+  checkCloudOnReturn,
 } from './sync.js';
 
 // Antes que nada: el gate hereda los tokens de la app y por defecto son los
@@ -733,11 +735,14 @@ async function boot() {
   });
 
   const userId = session.user.id;
-  setBootMessage(translateText('Buscando tus datos…'));
+  // Ventanita/panel de la extension: si no hay nada pendiente se abre ya con lo
+  // guardado aqui y la nube se revisa despues, en segundo plano.
+  const fastOpen = window.location.protocol === 'chrome-extension:' && canOpenFast(userId);
+  if (!fastOpen) setBootMessage(translateText('Buscando tus datos…'));
 
   let decision;
   try {
-    decision = await resolveBoot(userId);
+    decision = fastOpen ? { action: BOOT.FAST } : await resolveBoot(userId);
   } catch (err) {
     if (bridgeUserId !== userId) return;
     fail(
@@ -751,6 +756,9 @@ async function boot() {
   let shouldPushLocal = false;
   try {
     switch (decision.action) {
+      case BOOT.FAST:
+        break;
+
       case BOOT.OTHER_ACCOUNT:
         // En este navegador quedaron datos de otra cuenta. Jamás se suben a la
         // cuenta nueva: se descartan y se baja lo que corresponda.
@@ -832,6 +840,7 @@ async function boot() {
     readMeta().dirty ? 'saving' : 'ok',
     readMeta().dirty ? 'Subiendo…' : translateText('Sincronizado')
   );
+  if (fastOpen) checkCloudOnReturn({ minGapMs: 0 });
 
   try {
     const profile = await getProfile();
