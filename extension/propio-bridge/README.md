@@ -1,4 +1,4 @@
-# Propio · Tracker y vista original · 2.8.33
+# Propio · Tracker y vista original · 2.8.34
 
 La extensión conecta Propio Shift Tracker con la sesión y el historial de Propio. Su
 registro de llamadas funciona independientemente de la apariencia del portal.
@@ -239,6 +239,8 @@ no recarga el portal y no pulsa controles de llamadas al cambiar el tema.
 Solo se aplica en el portal superior de interpreters.propio-ls.com.
 
 ## Refuerzo positivo en el popup (2.3.14)
+
+**Desde 2.8.34** esos dos interruptores ya no están en el menú lateral de la app: viven en el cuadro de la extensión (icono del encabezado), debajo de «Registrar mi actividad». Siguen mostrándose solo si «Celebrar llamadas» (y «Cierre breve» para el segundo) están encendidos, y los valores guardados no cambian.
 
 La tarjeta «Refuerzo positivo» tiene dos interruptores, apagados al inicio: «Celebrar con la extensión» y «Cierre breve con la extensión».
 Son los mismos dos ajustes del menú lateral de Propio Shift Tracker: prender uno en el popup lo prende en la app y al revés (la app avisa su estado

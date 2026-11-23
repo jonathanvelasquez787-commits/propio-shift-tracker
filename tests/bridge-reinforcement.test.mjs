@@ -41,10 +41,12 @@ test('los ajustes nuevos arrancan apagados y solo aceptan true', () => {
   assert.equal(normalizeReinforcementSettings({ celebrateBridgeCalls: 'si' }).celebrateBridgeCalls, false);
 });
 
-test('el menú lateral tiene un interruptor de la extensión para cada cosa', () => {
-  for (const id of ['positiveBridgeCelebrateInput', 'positiveBridgeAskInput']) assert.match(html, new RegExp(`id="${id}" type="checkbox"`));
-  assert.match(html, /id="positiveBridgeCelebrateRow"[^>]*hidden/);
-  assert.match(html, /id="positiveBridgeAskRow"[^>]*hidden/);
+test('los interruptores «con la extensión» viven en el cuadro de la extensión y no en el menú lateral', () => {
+  for (const id of ['positiveBridgeCelebrateInput', 'positiveBridgeAskInput', 'positiveBridgeCelebrateRow', 'positiveBridgeAskRow']) assert.equal(html.includes(id), false);
+  const box = readFileSync(new URL('../js/extension-box.js', import.meta.url), 'utf8');
+  for (const id of ['extBoxCelebrate', 'extBoxAsk']) assert.ok(box.includes(`'${id}'`));
+  assert.match(box, /celebrateRow\.row\.hidden = !\(v && v\.enabled\)/);
+  assert.match(box, /askRow\.row\.hidden = !\(v && v\.enabled && v\.askAfterCall\)/);
 });
 
 test('la extensión usa los interruptores y el historial importado sigue silencioso', () => {

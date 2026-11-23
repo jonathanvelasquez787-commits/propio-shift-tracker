@@ -8065,7 +8065,10 @@ export function render() {
     document.getElementById('eraseAllDataBtn').addEventListener('click', eraseAllData);
     document.getElementById('snapshotRecoveryBtn').addEventListener('click', () => useSnapshotTools('openSnapshotRecovery'));
     document.getElementById('ajustesHeaderBtn').addEventListener('click', openSettingsModal);
-    initExtensionBox();
+    initExtensionBox(document, globalThis.chrome, globalThis.location, {
+      get: () => ({ enabled: settings.reinforcement?.enabled === true, askAfterCall: settings.reinforcement?.askAfterCall === true, ...getPropioBridgeReinforcement() }),
+      set: applyPropioBridgeReinforcement,
+    });
     document.getElementById('saveAccountProfileBtn').addEventListener('click', saveAccountProfile);
     document.getElementById('higherRateHeaderBtn').addEventListener('click', () => {
       openModal('higherRateModal');
