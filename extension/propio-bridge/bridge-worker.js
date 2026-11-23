@@ -577,10 +577,14 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
       return transact(state => state.accountScope === packet.accountScope ? automationStatus(state) : null);
     }
     if (packet?.kind === 'tracker-coordination') {
-      if (sender.frameId !== 0 || (!Number.isInteger(sender.tab?.id) && !viaOwnPage(sender)) || !accountScopeValid(packet.accountScope)) return null;
-      if (!trackerSender(sender.url)) return null;
+      // Cuando no hay permiso se responde el motivo (solo para el cuadro de diagnostico).
+      const refuse = why => ({ owner: null, enabled: false, why });
+      if (sender.frameId !== 0) return refuse('frame');
+      if (!Number.isInteger(sender.tab?.id) && !viaOwnPage(sender)) return refuse('sender');
+      if (!accountScopeValid(packet.accountScope)) return refuse('scope-bad');
+      if (!trackerSender(sender.url)) return refuse('origin');
       return transact(state => {
-        if (state.accountScope !== packet.accountScope) return null;
+        if (state.accountScope !== packet.accountScope) return refuse(state.accountScope ? 'scope-mismatch' : 'worker-unpaired');
         if (!state.coordinationOwner) state.coordinationOwner = crypto.randomUUID();
         return { owner: state.coordinationOwner, enabled: state.mode === 'auto' && state.preparation.devicePassive !== true && !state.preparation.availabilityPaused };
       });

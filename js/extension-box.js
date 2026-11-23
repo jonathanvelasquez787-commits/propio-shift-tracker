@@ -150,7 +150,8 @@ export function extensionLeaseModel(diag) {
   const why = r === 'granted' ? 'concedido' : r === 'asking' ? 'pidiendo…' : r === 'no-hello' ? 'esperando el primer aviso de la extensión' : r === 'no-owner' ? 'sin dueño (la extensión no mandó su código)'
     : r === 'off' ? 'apagado (la extensión indicó que no debe pedirlo)' : r === 'wrong-account' ? 'cuenta no coincide (la app no lo pide)' : r === 'denied' ? 'rechazado (lo tiene otra instalación)'
     : r === 'bad-answer' ? 'respuesta de la nube no válida' : r === 'stopped' ? 'detenido' : r.startsWith('error: ') || r.startsWith('network: ') ? r : 'motivo desconocido';
-  return `Permiso de la nube: ${why} · avisos: ${Number(diag.hellos) || 0} · pedidos: ${Number(diag.rpcs) || 0}`;
+  const cause = r === 'no-owner' && typeof diag.why === 'string' && diag.why ? ` [motivo: ${diag.why.slice(0, 40)}]` : '';
+  return `Permiso de la nube: ${why}${cause} · avisos: ${Number(diag.hellos) || 0} · pedidos: ${Number(diag.rpcs) || 0}`;
 }
 
 export function initExtensionBox(doc = globalThis.document, chromeApi = globalThis.chrome, loc = globalThis.location, reinforcement = null) {
