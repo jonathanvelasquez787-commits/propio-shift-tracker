@@ -179,8 +179,9 @@ export function extensionWorkerLeaseModel(state) {
   const wl = state && state.ok !== false && state.workerLease && typeof state.workerLease === 'object' ? state.workerLease : { state: 'none' };
   const asks = Number(wl.asks) || 0, detail = typeof wl.detail === 'string' && wl.detail ? ` (${wl.detail.slice(0, 60)})` : '';
   if (ws.state === 'none' || ws.state === 'expired' || ws.state === 'wrong-account') return 'Permiso del worker: no se pide hasta que conectes la sesión del worker.';
-  const text = wl.state === 'granted' ? 'concedido'
-    : wl.state === 'lapsed' ? 'se venció y todavía no se renovó'
+  const failing = wl.failing === 'network' ? 'no hubo red en el último intento' : wl.failing === 'error' ? 'la nube dio error en el último intento' : '';
+  const text = wl.state === 'granted' ? (failing ? `concedido (${failing}; se reintenta solo)` : 'concedido')
+    : wl.state === 'lapsed' ? (failing ? `se venció (${failing})` : 'se venció y todavía no se renovó')
     : wl.state === 'denied' ? 'negado (otra instalación tiene el permiso)'
     : wl.state === 'network' ? 'sin red en el último intento'
     : wl.state === 'error' ? `la nube respondió con error${detail}`
@@ -200,7 +201,8 @@ export function extensionWorkerDataModel(state, nowMs = Date.now()) {
   if (ws.state === 'none' || ws.state === 'expired' || ws.state === 'wrong-account') return 'Datos del worker: no se leen hasta que conectes la sesión del worker.';
   const ago = at => { const min = Math.max(0, Math.round((nowMs - Number(at)) / 60000)); return min < 1 ? 'hace menos de 1 min' : min < 60 ? `hace ${min} min` : `hace ${Math.round(min / 60)} h`; };
   const detail = typeof wd.detail === 'string' && wd.detail ? ` (${wd.detail.slice(0, 60)})` : '';
-  const text = wd.state === 'ok' ? (Number.isFinite(wd.checkedAt) ? `al día, revisados ${ago(wd.checkedAt)}${Number.isFinite(wd.calls) ? ` · llamadas recientes: ${wd.calls}` : ''}${detail}` : 'al día')
+  const failing = wd.state === 'ok' && wd.failing ? (wd.failing === 'network' ? '; el último intento no tuvo red, se reintenta solo' : '; el último intento recibió error de la nube, se reintenta solo') : '';
+  const text = wd.state === 'ok' ? (Number.isFinite(wd.checkedAt) ? `${failing ? 'última revisión buena' : 'al día, revisados'} ${ago(wd.checkedAt)}${Number.isFinite(wd.calls) ? ` · llamadas recientes: ${wd.calls}` : ''}${detail}${failing}` : 'al día')
     : wd.state === 'empty' ? 'la nube todavía no tiene datos de esta cuenta'
     : wd.state === 'changed' ? 'la nube cambió mientras se leía; se reintenta solo'
     : wd.state === 'network' ? `sin red en el último intento${detail}`

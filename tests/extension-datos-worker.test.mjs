@@ -5,6 +5,7 @@ import { createWorkerSession } from '../extension/propio-bridge/worker-session.j
 import { createWorkerData, userIdFromToken, projectCall, DATA_KEY, CALLS_WINDOW_MS } from '../extension/propio-bridge/worker-data.js';
 import { createBridgeWorker } from '../extension/propio-bridge/bridge-worker.js';
 import { extensionWorkerDataModel } from '../js/extension-box.js';
+import { buildWorkerPlan, DATA_STALE_MS } from '../extension/propio-bridge/worker-plan.js';
 
 const URL0 = 'https://example.supabase.co', USER = 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee';
 const T0 = Date.parse('2026-11-23T15:00:00Z');
@@ -148,4 +149,73 @@ test('datos del worker: el cuadro dice en palabras simples que pasa', () => {
   assert.match(m({ state: 'ok' }, { state: 'off' }), /no se leen ahora/);
   assert.match(m({ state: 'ok' }, { state: 'none' }), /todavía sin leer/);
   assert.match(extensionWorkerDataModel(null), /no se leen hasta/);
+});
+
+// Caida corta de internet (Parte 6): una revision fallida NO tira la copia buena; solo pasados 5 min el plan deja de usarla.
+test('datos del worker (caida corta): si falla una revision y ya habia copia buena, se conserva como ok con la hora de la ultima revision buena', async () => {
+  let down = false;
+  const ok = cloud({ state: {} });
+  const r = rig({ handler: (url, init, n) => down ? new Error('sin internet') : ok(url, init, n) });
+  assert.deepEqual(await r.data.refresh({ scope }), { ok: true, changed: true });
+  const goodAt = r.now();
+  down = true; r.advance(60000);
+  assert.deepEqual(await r.data.refresh({ scope }), { ok: false, reason: 'network' });
+  const st = await r.data.status();
+  assert.equal(st.state, 'ok');
+  assert.equal(st.checkedAt, goodAt, 'checkedAt sigue siendo el de la ultima revision buena');
+  assert.equal(st.failing, 'network');
+  const snap = await r.data.snapshot();
+  assert.equal(snap.result, 'ok');
+  assert.deepEqual(snap.state, {});
+  // un error de la nube (no de red) tambien se conserva, anotando el detalle
+  const bad = rig({ handler: (url, init, n) => down ? { status: 503, json: { message: 'down' } } : ok(url, init, n) });
+  down = false; await bad.data.refresh({ scope }); down = true; bad.advance(1000);
+  await bad.data.refresh({ scope });
+  const st2 = await bad.data.status();
+  assert.deepEqual([st2.state, st2.failing, st2.failDetail], ['ok', 'error', '503 down']);
+});
+
+test('datos del worker (caida corta): al volver la nube se limpia el aviso y se actualiza la hora de revision', async () => {
+  let down = false;
+  const ok = cloud({ state: {} });
+  const r = rig({ handler: (url, init, n) => down ? new Error('x') : ok(url, init, n) });
+  await r.data.refresh({ scope });
+  down = true; r.advance(30000); await r.data.refresh({ scope });
+  assert.equal((await r.data.status()).failing, 'network');
+  down = false; r.advance(30000); await r.data.refresh({ scope });
+  const st = await r.data.status();
+  assert.equal(st.failing, undefined);
+  assert.equal(st.checkedAt, r.now());
+  assert.equal(st.state, 'ok');
+});
+
+test('datos del worker (caida corta): sin copia buena previa (o de otra cuenta) la falla SI se anota como antes', async () => {
+  const r = rig({ handler: () => new Error('x') });
+  await r.data.refresh({ scope });
+  assert.equal((await r.data.status()).state, 'network');
+  // copia buena de OTRA cuenta guardada: no se conserva para esta
+  const other = rig({ handler: () => new Error('x') });
+  other.store[DATA_KEY] = { scope: 'otra-cuenta', userId: 'otro', result: 'ok', updatedAt: UPDATED, checkedAt: T0, state: {}, settings: {}, calls: [] };
+  await other.data.refresh({ scope });
+  assert.equal((await other.data.status()).state, 'network');
+});
+
+test('datos del worker (caida corta): el plan se arma con la copia conservada a los 4 min y deja de armarse pasados 5 min', async () => {
+  let down = false;
+  const ok = cloud({ state: {} });
+  const r = rig({ handler: (url, init, n) => down ? new Error('x') : ok(url, init, n) });
+  await r.data.refresh({ scope });
+  const goodAt = r.now();
+  down = true; r.advance(30000); await r.data.refresh({ scope });
+  const snap = await r.data.snapshot();
+  const build = at => { test.mock.timers.enable({ apis: ['Date'], now: at }); try { return buildWorkerPlan({ data: snap, owner: USER, leaseExpiresAt: at + 80000, lastEndedAt: null, now: at }).why; } finally { test.mock.timers.reset(); } };
+  const early = build(goodAt + 4 * 60000), late = build(goodAt + DATA_STALE_MS + 60000);
+  assert.ok(early !== 'stale-data' && early !== 'no-data', 'a los 4 min con la nube caida el plan sigue disponible: ' + early);
+  assert.equal(late, 'stale-data');
+});
+
+test('datos del worker (caida corta): el cuadro explica que la nube fallo pero la copia sigue valiendo', () => {
+  const m = (workerData) => extensionWorkerDataModel({ workerSession: { state: 'ok' }, workerData }, T0 + 2 * 60000);
+  assert.equal(m({ state: 'ok', checkedAt: T0, calls: 3, failing: 'network' }), 'Datos del worker: última revisión buena hace 2 min · llamadas recientes: 3; el último intento no tuvo red, se reintenta solo');
+  assert.match(m({ state: 'ok', checkedAt: T0, failing: 'error' }), /última revisión buena hace 2 min.*recibió error de la nube/);
 });
