@@ -122,6 +122,17 @@ export function extensionActivityModel(state) {
     observed: String(ok ? Number(state.completed) || 0 : 0), historyStatus, signals };
 }
 
+const REQUEST_KINDS = { status: 'Estado de Propio', twilio: 'Evento de llamadas', 'portal-api': 'Otra solicitud del portal' };
+const REQUEST_FORMATS = { json: 'JSON', form: 'Formulario', missing: 'Cuerpo no disponible', oversized: 'Cuerpo demasiado grande', unreadable: 'Formato no reconocido', 'not-read': 'Cuerpo no leído' };
+
+// «Detalles para soporte»: lo que la extension observo del portal. Funcion pura.
+export function extensionSupportModel(state) {
+  const d = state && state.ok !== false && state.diagnostic ? state.diagnostic : { requests: 0, recognized: 0, last: [] };
+  const last = Array.isArray(d.last) ? [...d.last].reverse() : [];
+  return { summary: d.requests ? `${d.requests} solicitud(es) observada(s) · ${d.recognized} señal(es) reconocida(s)` : 'Todavía no se observaron solicitudes del portal.',
+    items: last.map(item => `${REQUEST_KINDS[item.kind] || 'Solicitud'} · ${REQUEST_FORMATS[item.format] || 'Sin formato'} · HTTP ${item.status} · ${item.result === 'recognized' ? 'Señal reconocida' : item.result === 'http-error' ? 'Solicitud fallida' : 'Sin señal compatible'}`) };
+}
+
 export function initExtensionBox(doc = globalThis.document, chromeApi = globalThis.chrome, loc = globalThis.location) {
   if (!doc || !loc || loc.protocol !== 'chrome-extension:' || !chromeApi?.runtime?.sendMessage) return null;
   const anchor = doc.getElementById('higherRateHeaderBtn');
@@ -242,7 +253,11 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
   histSec.body.append(stats, histStatus);
   const actSec = section('extBoxActivity', 'Actividad reciente', 'extBoxActOpen');
   const signalsList = el('ul', 'ext-box-signals'); signalsList.id = 'signals'; actSec.body.append(signalsList);
-  box.append(head, conn, rec, pend, queueBox, discardWrap, avail, doing, connSec.wrap, histSec.wrap, actSec.wrap);
+  const supSec = section('extBoxSupport', 'Detalles para soporte', 'extBoxSupportOpen');
+  const supHelp = el('p', 'ext-box-note', 'Números para revisar la conexión.');
+  const supSummary = el('p', 'ext-box-note'); supSummary.id = 'detectorStatus';
+  const supList = el('ul', 'ext-box-signals'); supList.id = 'detectorRequests'; supSec.body.append(supHelp, supSummary, supList);
+  box.append(head, conn, rec, pend, queueBox, discardWrap, avail, doing, connSec.wrap, histSec.wrap, actSec.wrap, supSec.wrap);
   doc.body.append(box);
 
   let busy = false, feedback = '', shown = false, timer = null, workSession = null;
@@ -271,6 +286,8 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
     connHealth.textContent = act2.connection;
     histCount.n.textContent = act2.historyCount; histCount.t.textContent = act2.historyScope; liveCount.n.textContent = act2.observed; histStatus.textContent = act2.historyStatus;
     signalsList.replaceChildren(); for (const t of act2.signals) signalsList.append(el('li', '', t));
+    const sup = extensionSupportModel(state);
+    supSummary.textContent = sup.summary; supList.replaceChildren(); for (const t of sup.items) supList.append(el('li', '', t));
     const q = extensionQueueModel(state);
     queueBox.hidden = !q.queued; deadlineNote.textContent = q.deadline;
     sigList.replaceChildren();

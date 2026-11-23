@@ -966,6 +966,13 @@
           ]
         },
         {
+          "file": "tests/extension-cuadro-soporte.test.mjs",
+          "namedCases": [
+            "cuadro de soporte: los números y las solicitudes salen igual que en la ventanita vieja",
+            "cuadro de soporte: sección plegable que empieza cerrada y recuerda su estado"
+          ]
+        },
+        {
           "file": "tests/extension-cuadro-actividad.test.mjs",
           "namedCases": [
             "cuadro de actividad: conexión, historial y señales salen igual que en la ventanita vieja",
