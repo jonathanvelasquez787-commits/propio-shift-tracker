@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Propio · Tracker y vista original",
   "description": "Conecta tu Shift Tracker y permite volver a la vista original de Propio.",
-  "version": "2.8.54",
+  "version": "2.8.55",
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqaSB3smQKaH1QjMC6TEe0Ycvh8Qco8f8MoHTYDLCFqmPeHT4gEX8wFEz1ORTaLo6gOwSovmhbsDnHpwTRHU2jkNAguxa1x4a9z7a9iaMGP4ixwsVgakhGFeO9/bVggik75Fw3FVK8ii7ABpgLl9FE6IjHZxqTkHKZcjsRfcaN5JvAb/RXBJpXc+XsDlOcF2aQdZzFE1Wsdr/C7JFRv+JCCZbIP71SHS4QgJ2sBsbfYcJqDbGS7dnyLhYjR6UjeVO0Tj7fTcGNhvTaZTnsBr81tI9Cym8owdbgCURiqEfy0cwQsGhYiL3ycoqJaHXejqcReFlY4wcwWHKCeOKeHuoyQIDAQAB",
   "minimum_chrome_version": "120",
   "permissions": ["storage", "webRequest", "alarms", "webNavigation", "sidePanel", "identity"],

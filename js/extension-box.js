@@ -76,7 +76,7 @@ export function extensionAvailabilityModel(state, now = Date.now()) {
     : prep?.waitReason === 'pause' ? 'La espera no interrumpe tu Break o Lunch.'
     : prep?.waitReason === 'spacing' && remaining > 0 ? `Faltan ${Math.floor(remaining / 60)}:${String(remaining % 60).padStart(2, '0')} para volver a estar disponible.`
     : `Vuelve a estar disponible cuando el ACW de Propio Shift Tracker llega a ${spacing.minutes} minuto(s).`;
-  return { paired, paused: prep?.availabilityPaused === true, first: prep?.enabled === true,
+  return { paired, paused: prep?.availabilityPaused === true, passive: prep?.devicePassive === true, first: prep?.enabled === true,
     resumeBreak: resume.break === true, resumeLunch: resume.lunch === true, resumeMode: resume.mode === 'timed' ? 'timed' : 'manual',
     spacingOn: spacing.enabled === true, minutes: spacing.minutes, status, resumeNote, spacingNote };
 }
@@ -392,6 +392,7 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
     return { row, input, small };
   };
   const pausedRow = toggleRow('extBoxPaused', 'Pausar disponibilidad automática', 'No pausa el guardado de llamadas.');
+  const passiveRow = toggleRow('extBoxPassive', 'Solo registro en esta PC', 'Guarda tus llamadas, pero esta PC no pulsa Start Calls ni Stop Calls.');
   const firstRow = toggleRow('extBoxFirst', 'Estar disponible al iniciar el turno', 'Desde tu horario hasta la primera llamada.');
   const brkRow = toggleRow('extBoxResumeBreak', 'Estar disponible después del Break', 'Ponerte disponible al terminar el descanso.');
   const lunchRow = toggleRow('extBoxResumeLunch', 'Estar disponible después del Lunch', 'Ponerte disponible al terminar la comida.');
@@ -414,7 +415,7 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
   const workerPlanNote = el('p', 'ext-box-note'); workerPlanNote.id = 'extBoxWorkerPlanNote';
   const closedNote = el('p', 'ext-box-note'); closedNote.id = 'extBoxClosedModeNote';
   const workerBtns = el('div', 'ext-box-worker'); workerBtns.append(workerLogin, workerLogout);
-  availBody.append(pausedRow.row, firstRow.row, brkRow.row, lunchRow.row, modeRow, resumeNote, spacingRow.row, minRow, spacingNote, availNote, leaseNote, closedNote, workerNote, workerLeaseNote, workerDataNote, workerPlanNote, workerBtns);
+  availBody.append(pausedRow.row, passiveRow.row, firstRow.row, brkRow.row, lunchRow.row, modeRow, resumeNote, spacingRow.row, minRow, spacingNote, availNote, leaseNote, closedNote, workerNote, workerLeaseNote, workerDataNote, workerPlanNote, workerBtns);
   avail.append(availHead, availBody);
   const doing = el('div', 'ext-box-avail'); doing.id = 'extBoxDoing';
   const doingHead = el('button', 'ext-box-row ext-box-fold', ''); doingHead.type = 'button'; doingHead.id = 'extBoxDoingBtn';
@@ -507,6 +508,7 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
     const a = extensionAvailabilityModel(state);
     const lock = busy || !a.paired;
     pausedRow.input.checked = a.paused; firstRow.input.checked = a.first; brkRow.input.checked = a.resumeBreak; lunchRow.input.checked = a.resumeLunch;
+    passiveRow.input.checked = a.passive; passiveRow.input.disabled = busy;
     spacingRow.input.checked = a.spacingOn; modeSel.value = a.resumeMode;
     for (const i of [pausedRow.input, firstRow.input, brkRow.input, lunchRow.input, spacingRow.input, modeSel, minInput]) i.disabled = lock;
     if (doc.activeElement !== minInput) minInput.value = a.minutes;
@@ -547,6 +549,7 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
   wireFold(moreFold, moreBody);
   auto.addEventListener('change', () => act({ kind: 'mode', mode: auto.checked ? 'auto' : 'observe' }));
   pausedRow.input.addEventListener('change', () => act({ kind: 'pause-availability', paused: pausedRow.input.checked }));
+  passiveRow.input.addEventListener('change', () => act({ kind: 'device-passive', enabled: passiveRow.input.checked }));
   firstRow.input.addEventListener('change', () => act({ kind: 'prepare-first', enabled: firstRow.input.checked }));
   for (const i of [brkRow.input, lunchRow.input, modeSel]) i.addEventListener('change', () => act({ kind: 'resume-options', break: brkRow.input.checked, lunch: lunchRow.input.checked, mode: modeSel.value }));
   const saveSpacing = () => act({ kind: 'spacing', enabled: spacingRow.input.checked, minutes: Number(minInput.value) });
