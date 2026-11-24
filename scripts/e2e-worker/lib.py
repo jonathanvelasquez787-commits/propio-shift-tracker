@@ -18,6 +18,7 @@ def iso(ms): return time.strftime('%Y-%m-%dT%H:%M:%S', time.gmtime(ms / 1000)) +
 
 PORTAL_HTML = """<!doctype html><html><head><title>portal</title></head><body>
 <h2>Welcome, Test User (1234)</h2><span id=st>Offline</span>
+<div style="background:#00bcd4;padding:8px"><span style="background:rgba(0,0,0,.25);color:#06202a;border-radius:14px;padding:5px 14px;font:500 13px sans-serif;display:inline-block">Calls: 0</span> <span style="background:rgba(0,0,0,.25);color:#06202a;border-radius:14px;padding:5px 14px;font:500 13px sans-serif;display:inline-block">Minutes: 0</span></div>
 <button id=b onclick="window.__clicks=(window.__clicks||0)+1;document.getElementById('st').textContent='Available';this.textContent='Stop Calls'">Start Calls</button>
 </body></html>"""
 

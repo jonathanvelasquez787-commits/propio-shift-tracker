@@ -37,9 +37,51 @@ const COLORS = {
   dark: { go: ['#0e5669', '#dcf8ff', '#2fd5ff'], wait: ['#69460a', '#ffecc8', '#d9a13a'], info: ['#3c4048', '#e8eaed', '#626974'] },
 };
 
+// Copia el aspecto de las pildoras "Calls / Minutes / Pay" de Propio (mismo tamano y color, claro u oscuro).
+const CHIP_TEXT = /^(calls|minutes|pay)\s*:/i;
+const CHIP_TWICE = /(calls|minutes|pay)\s*:[\s\S]*(calls|minutes|pay)\s*:/i;
+const rgba = value => {
+  const m = /^rgba?\(\s*(\d+(?:\.\d+)?)[,\s]+(\d+(?:\.\d+)?)[,\s]+(\d+(?:\.\d+)?)(?:[,\s/]+(\d*\.?\d+%?))?\s*\)$/.exec(String(value || '').trim());
+  if (!m) return null;
+  const a = m[4] === undefined ? 1 : m[4].endsWith('%') ? parseFloat(m[4]) / 100 : parseFloat(m[4]);
+  return { r: +m[1], g: +m[2], b: +m[3], a };
+};
+const blend = (top, under) => `rgb(${[['r'], ['g'], ['b']].map(([k]) => Math.round(top[k] * top.a + under[k] * (1 - top.a))).join(', ')})`;
+export function readChipStyle(window, document) {
+  if (typeof window?.getComputedStyle !== 'function' || typeof document?.querySelectorAll !== 'function') return null;
+  for (const el of document.querySelectorAll('span,div,button,a,li,p')) {
+    if ((el.children?.length || 0) > 4) continue;
+    const text = String(el.textContent || '').trim();
+    if (text.length > 30 || !CHIP_TEXT.test(text) || CHIP_TWICE.test(text)) continue; // un contenedor con varias pildoras no es la pildora
+    for (let node = el, depth = 0; node && node !== document.body && depth < 4; node = node.parentElement, depth++) {
+      const cs = window.getComputedStyle(node), bg = rgba(cs.backgroundColor);
+      if (!bg || bg.a === 0) continue;
+      let under = { r: 255, g: 255, b: 255, a: 1 };
+      for (let up = node.parentElement; up; up = up.parentElement) {
+        const c = rgba(window.getComputedStyle(up).backgroundColor);
+        if (c && c.a > 0) { under = bg.a < 1 && c.a < 1 ? { ...c, a: 1 } : c; if (c.a === 1) break; }
+      }
+      const box = node.getBoundingClientRect?.() || {};
+      const width = parseFloat(cs.borderTopWidth) || 0;
+      return {
+        background: bg.a < 1 ? blend(bg, under) : cs.backgroundColor, color: cs.color, fontFamily: cs.fontFamily, fontSize: cs.fontSize,
+        fontWeight: cs.fontWeight, letterSpacing: cs.letterSpacing, borderRadius: cs.borderTopLeftRadius,
+        border: width > 0 && cs.borderTopStyle !== 'none' ? `${cs.borderTopWidth} solid ${cs.borderTopColor}` : 'none',
+        padding: `${cs.paddingTop} ${cs.paddingRight} ${cs.paddingBottom} ${cs.paddingLeft}`, height: box.height > 0 ? `${box.height}px` : null,
+      };
+    }
+  }
+  return null;
+}
+export function applyChipStyle(pill, chip) {
+  Object.assign(pill.style, { boxSizing: 'border-box', display: 'inline-flex', alignItems: 'center', lineHeight: '1.2', boxShadow: 'none',
+    background: chip.background, color: chip.color, fontFamily: chip.fontFamily, fontSize: chip.fontSize, fontWeight: chip.fontWeight,
+    letterSpacing: chip.letterSpacing, borderRadius: chip.borderRadius, border: chip.border, padding: chip.padding, height: chip.height || 'auto' });
+}
+
 export function installAcwPill(api, { window, document, setTimer = setInterval, clearTimer = clearInterval, now = () => Date.now() } = {}) {
   if (window.top !== window || window.location.origin !== 'https://interpreters.propio-ls.com' || !/^\/portal(?:\/|$)/.test(window.location.pathname)) return;
-  let enabled = true, snapshot = null, polledAt = 0, inFlight = false, stopped = false, host = null, pill = null, revision = 0, pos = null, dragging = false;
+  let enabled = true, snapshot = null, polledAt = 0, inFlight = false, stopped = false, host = null, pill = null, revision = 0, pos = null, dragging = false, chipCache = null, chipAt = 0;
   function place() {
     if (!pill) return;
     const view = { width: window.innerWidth, height: window.innerHeight };
@@ -84,9 +126,14 @@ export function installAcwPill(api, { window, document, setTimer = setInterval, 
       wireDrag(pill);
       root.append(pill); document.body.append(host);
     }
-    const palette = document.documentElement.hasAttribute('data-pst-dark') ? COLORS.dark : COLORS.light;
-    const [bg, fg, edge] = palette[model.tone];
-    pill.style.background = bg; pill.style.color = fg; pill.style.borderColor = edge;
+    if (!chipAt || now() - chipAt >= 3000 || now() < chipAt) { chipCache = readChipStyle(window, document); chipAt = now() || 1; }
+    const chip = chipCache;
+    if (chip) applyChipStyle(pill, chip);
+    else {
+      const palette = document.documentElement.hasAttribute('data-pst-dark') ? COLORS.dark : COLORS.light;
+      const [bg, fg, edge] = palette[model.tone];
+      pill.style.background = bg; pill.style.color = fg; pill.style.borderColor = edge;
+    }
     if (pill.textContent !== model.text) pill.textContent = model.text;
     if (!dragging) place();
   }
