@@ -377,7 +377,7 @@ export function createBridgeWorker(api, { now = () => Date.now(), randomId = () 
       prep.lastStopAttemptAt = now(); record(state, 'spacing-stop', new Date(now()).toISOString(), null);
       return command('stop');
     }
-    if (!firstReady && !resumeReady && !spacingReady) return hold(prep.enabled && (prep.doneFor === plan.startAt || plan.hasCall) ? 'first-done' : 'off');
+    if (!firstReady && !resumeReady && !spacingReady) return hold(prep.enabled && (prep.doneFor === plan.startAt || plan.hasCall) ? 'first-done' : !prep.enabled && spacing.enabled === true && !plan.hasCall ? 'first-call-wait' : 'off');
     if (packet.offline !== true) return hold(packet.available === true ? 'available' : 'offline-control');
     if (now() - prep.lastAttemptAt < 15000) return hold('retry');
     prep.lastAttemptAt = now();

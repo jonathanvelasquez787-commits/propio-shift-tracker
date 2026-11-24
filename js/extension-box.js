@@ -14,6 +14,7 @@ const AVAILABILITY_REASONS = {
   'manual-paused': 'Disponibilidad automática pausada por vos. El registro de llamadas continúa.',
   'pause-return-off': 'El regreso de esta pausa está apagado. Vos pulsás Start Calls para volver.',
   'first-done': 'La primera llamada ya fue tomada. El regreso de Break/Lunch sigue funcionando si está encendido.',
+  'first-call-wait': 'Esperando tu primera llamada del turno. Después de ella, el ACW te pone disponible.',
   off: 'No hay un iniciador pendiente.', available: 'Ya estás disponible en Propio.',
   'offline-control': 'Esperando Offline o Not Available con Start Calls disponible.',
   retry: 'Esperando un momento antes de reintentar Start Calls.', starting: 'Pulsando Start Calls para ponerte disponible.',

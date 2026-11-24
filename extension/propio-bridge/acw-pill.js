@@ -17,6 +17,7 @@ export function acwPillModel(snapshot, now = Date.now()) {
     case 'acw-pending': case 'schedule': return { tone: 'info', text: 'Esperando al Tracker' };
     case 'acw-update': return { tone: 'wait', text: 'Actualiza el Tracker' };
     case 'manual-paused': return { tone: 'info', text: 'Pausada por ti' };
+    case 'first-call-wait': return { tone: 'info', text: 'Esperando tu primera llamada' };
     default: return null;
   }
 }

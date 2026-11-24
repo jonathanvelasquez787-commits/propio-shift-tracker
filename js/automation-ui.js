@@ -57,6 +57,7 @@ function statusMessages(key, snapshot) {
     'acw-pending': [translateText('Esperando confirmar tu ACW'), translateText('La extensión necesita una lectura reciente del contador antes de volver a ponerte disponible.')],
     'pause-return-off': [translateText('Regreso de esta pausa en manual'), translateText('Pulsá Start Calls en Propio cuando quieras volver. La espera entre llamadas no sustituye esta elección.')],
     'first-done': [translateText('Inicio del turno ya utilizado'), translateText('El inicio del turno ya se utilizó. Los regresos de pausas y la espera conservan sus opciones independientes.')],
+    'first-call-wait': [translateText('Esperando tu primera llamada'), translateText('El inicio automático del turno está apagado. Cuando registres tu primera llamada, la espera de ACW te pone disponible.')],
     off: [translateText('Sin inicio automático pendiente'), translateText('Vos pulsás Start Calls cuando quieras estar disponible. Podés revisar tus opciones en la extensión.')],
     available: [translateText('Ya estás disponible en Propio'), translateText('La próxima llamada queda a tu elección. La extensión no acepta llamadas por vos.')],
     'offline-control': [translateText('Esperando el control Start Calls'), translateText('Propio debe confirmar Offline o Not Available y habilitar el botón antes del próximo intento.')],
