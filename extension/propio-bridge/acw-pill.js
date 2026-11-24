@@ -4,9 +4,10 @@ export const acwPillKey = 'propio-acw-pill-v1';
 export const acwPillPosKey = 'propio-acw-pill-pos-v1';
 const EDGE_MIN = 4;
 const POLL_MS = 2000;
+const hhmm = iso => { const d = new Date(iso); return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; };
 const fmt = seconds => `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
 
-// Que dice la pildora segun el estado de la disponibilidad automatica (null = no se muestra).
+// Que dice la pildora segun el estado de la disponibilidad automatica (null solo mientras no ha llegado ningun dato).
 export function acwPillModel(snapshot, now = Date.now()) {
   if (!snapshot) return null;
   const view = automationStatusView(snapshot, now);
@@ -18,7 +19,25 @@ export function acwPillModel(snapshot, now = Date.now()) {
     case 'acw-update': return { tone: 'wait', text: 'Actualiza el Tracker' };
     case 'manual-paused': return { tone: 'info', text: 'Pausada por ti' };
     case 'first-call-wait': return { tone: 'info', text: 'Esperando tu primera llamada' };
-    default: return null;
+    case 'in-call': return { tone: 'go', text: 'En llamada' };
+    case 'incoming': return { tone: 'go', text: 'Llamada entrante' };
+    case 'available': return { tone: 'go', text: 'Disponible' };
+    case 'before-shift': return { tone: 'info', text: snapshot.startAt && Number.isFinite(Date.parse(snapshot.startAt)) ? `Turno empieza ${hhmm(snapshot.startAt)}` : 'Antes de tu turno' };
+    case 'before-shift-manual': return { tone: 'info', text: 'Esperando inicio de turno' };
+    case 'shift-ended': return { tone: 'info', text: 'Fuera de turno' };
+    case 'connection': return { tone: 'wait', text: 'Esperando tu sesión' };
+    case 'offline-control': return { tone: 'wait', text: 'Esperando Start Calls' };
+    case 'retry': return { tone: 'wait', text: 'Reintentando…' };
+    case 'pause-return-off': return { tone: 'info', text: 'Regreso manual' };
+    case 'first-done': return { tone: 'info', text: 'Primera llamada lista' };
+    case 'off': return { tone: 'info', text: 'Disponibilidad apagada' };
+    case 'recording-off': return { tone: 'info', text: 'Registro apagado' };
+    case 'device-passive': return { tone: 'info', text: 'Solo registro en esta PC' };
+    case 'coordination': return { tone: 'wait', text: 'Otra PC activa' };
+    case 'multiple-portals': return { tone: 'wait', text: 'Varias pestañas de Propio' };
+    case 'stale': return { tone: 'wait', text: 'Sin datos recientes' };
+    case 'review': return { tone: 'wait', text: 'Revisa el Tracker' };
+    default: return { tone: 'info', text: 'Revisando Propio' };
   }
 }
 

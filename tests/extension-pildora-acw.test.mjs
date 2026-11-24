@@ -27,14 +27,34 @@ test('pildora de ACW: cada motivo de espera tiene su texto', () => {
   assert.equal(acwPillModel(snap({ reason: 'starting', waitUntil: null }), NOW)?.text, 'Poniéndote disponible…');
 });
 
-test('pildora de ACW: no se muestra en llamada, con llamada entrante, ya disponible, con registro apagado o con datos viejos', () => {
-  assert.equal(acwPillModel(snap({ call: 'connected' }), NOW), null);
-  assert.equal(acwPillModel(snap({ call: 'incoming' }), NOW), null);
-  assert.equal(acwPillModel(snap({ reason: 'available', waitUntil: null }), NOW), null);
-  assert.equal(acwPillModel(snap({ recording: false }), NOW), null);
-  assert.equal(acwPillModel(snap({ devicePassive: true }), NOW), null);
-  assert.equal(acwPillModel(snap(), NOW + 60000), null);
+test('pildora de ACW: nunca se esconde, en cada situacion dice algo corto (solo calla mientras no llega ningun dato)', () => {
+  const text = (over, at = NOW) => acwPillModel(snap(over), at)?.text;
+  assert.equal(text({ call: 'connected' }), 'En llamada');
+  assert.equal(text({ call: 'incoming' }), 'Llamada entrante');
+  assert.equal(text({ reason: 'available', waitUntil: null }), 'Disponible');
+  assert.equal(text({ recording: false }), 'Registro apagado');
+  assert.equal(text({ devicePassive: true }), 'Solo registro en esta PC');
+  assert.equal(text({ coordinationConfirmed: false }), 'Otra PC activa');
+  assert.equal(text({ portal: 'unknown' }), 'Esperando tu sesión');
+  assert.equal(text({ review: true }), 'Revisa el Tracker');
+  assert.equal(text({}, NOW + 60000), 'Sin datos recientes');
+  assert.equal(text({ reason: 'shift-ended', waitUntil: null }), 'Fuera de turno');
+  assert.equal(text({ reason: 'offline-control', waitUntil: null }), 'Esperando Start Calls');
+  assert.equal(text({ reason: 'retry', waitUntil: null }), 'Reintentando…');
+  assert.equal(text({ reason: 'pause-return-off', waitUntil: null }), 'Regreso manual');
+  assert.equal(text({ reason: 'first-done', waitUntil: null }), 'Primera llamada lista');
+  assert.equal(text({ reason: 'multiple-portals', waitUntil: null }), 'Varias pestañas de Propio');
+  assert.equal(text({ reason: 'portal-state', waitUntil: null }), 'Revisando Propio');
+  assert.equal(text({ reason: 'off', waitUntil: null }), 'Disponibilidad apagada');
   assert.equal(acwPillModel(null, NOW), null);
+});
+
+test('pildora de ACW: antes del turno dice a que hora empieza, o el aviso manual si no hay inicio automatico', () => {
+  const start = iso(NOW + 3600000), d = new Date(start);
+  const hhmm = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+  assert.equal(acwPillModel(snap({ reason: 'before-shift', waitUntil: null, startAt: start }), NOW)?.text, `Turno empieza ${hhmm}`);
+  assert.equal(acwPillModel(snap({ reason: 'before-shift', waitUntil: null, startAt: start, options: { first: false, spacing: true, break: false, lunch: false, timed: false, minutes: 3 } }), NOW)?.text, 'Esperando inicio de turno');
+  assert.equal(acwPillModel(snap({ reason: 'before-shift', waitUntil: null, startAt: start, options: { first: false, spacing: false, break: false, lunch: false, timed: false, minutes: 3 } }), NOW)?.text, 'Disponibilidad apagada');
 });
 
 function fakeDom(darkAttr = false) {
