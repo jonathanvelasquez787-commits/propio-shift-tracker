@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { validateAutomationStatus } from '../js/automation-status.js';
-import { acwPillModel, installAcwPill, acwPillKey, acwPillPosKey, acwPillClamp, readChipStyle, applyChipStyle } from '../extension/propio-bridge/acw-pill.js';
+import { acwPillModel, installAcwPill, acwPillKey, acwPillPosKey, acwPillClamp, acwPillDockedPos, readChipStyle, applyChipStyle } from '../extension/propio-bridge/acw-pill.js';
 
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
 const NOW = Date.parse('2026-11-23T15:00:00Z');
@@ -173,4 +173,46 @@ test('pildora de ACW: encuentra el fondo en el ::before, entiende color(srgb) y 
   assert.equal(got.height, '26px');
   const onlyBar = mk('Calls: 0', { backgroundColor: 'rgb(9, 9, 9)' }, body, { height: 60, width: 900 });
   assert.equal(readChipStyle(window, { body, querySelectorAll: () => [onlyBar] }), null, 'una barra grande no cuenta como pildora');
+});
+
+const barChip = () => ({ textContent: 'Calls: 0', children: [], parentElement: null, isConnected: true,
+  getBoundingClientRect: () => ({ left: 200, right: 280, top: 30, bottom: 60, width: 80, height: 30 }),
+  styles: { backgroundColor: 'rgb(0, 150, 170)', color: 'rgb(0, 0, 0)', fontFamily: 'Poppins', fontSize: '14px', fontWeight: '500', letterSpacing: 'normal',
+    borderTopLeftRadius: '15px', borderTopWidth: '0px', borderTopStyle: 'none', paddingTop: '4px', paddingRight: '10px', paddingBottom: '4px', paddingLeft: '10px' } });
+async function dockedPill(stored) {
+  const { document, made } = fakeDom(); const ticks = [], chip = barChip();
+  document.querySelectorAll = () => [chip];
+  const api = fakeApi(stored, () => ({ ok: true, status: snap() }));
+  const w = Object.assign({}, win, { innerWidth: 1000, innerHeight: 800, getComputedStyle: node => node.styles }); w.top = w;
+  installAcwPill(api, { window: w, document, setTimer: (f) => { ticks.push(f); return 1; }, clearTimer() {}, now: () => NOW });
+  await new Promise(r => setTimeout(r, 5)); ticks[0](); await new Promise(r => setTimeout(r, 5)); ticks[0]();
+  return { pill: made[0].shadowKids[0], api, ticks };
+}
+
+test('pildora de ACW: con la vista original su lugar por defecto es a la izquierda de la pildora Calls, a su misma altura', async () => {
+  assert.deepEqual(acwPillDockedPos({ left: 200, bottom: 60, height: 30 }, { width: 1000, height: 800 }, { height: 30 }), { right: 810, bottom: 740 });
+  const { pill } = await dockedPill({ 'propio-original-layout-v1': { enabled: true, revision: 'abcdefghijklmnop' } });
+  assert.equal(pill.style.right, '810px'); assert.equal(pill.style.bottom, '755px'); // la pildora falsa no tiene alto: se centra sobre los 30 px de Calls
+});
+
+test('pildora de ACW: sin vista original se queda en la esquina; si ya la moviste, respeta tu lugar; doble clic la devuelve', async () => {
+  assert.equal((await dockedPill({})).pill.style.right, '20px');
+  const moved = await dockedPill({ 'propio-original-layout-v1': { enabled: true }, [acwPillPosKey]: { right: 300, bottom: 150 } });
+  assert.equal(moved.pill.style.right, '300px'); assert.equal(moved.pill.style.bottom, '150px');
+  let removed = null; moved.api.storage.local.remove = async (k) => { removed = k; };
+  moved.pill.handlers.dblclick();
+  assert.equal(removed, acwPillPosKey);
+  assert.equal(moved.pill.style.right, '810px', 'tras el doble clic vuelve junto a Calls');
+});
+
+test('pildora de ACW: si a la izquierda de Calls no hay espacio, no la tapa y se queda en la esquina', async () => {
+  const { document, made } = fakeDom(); const ticks = [], chip = barChip();
+  chip.getBoundingClientRect = () => ({ left: 8, right: 88, top: 30, bottom: 60, width: 80, height: 30 });
+  document.querySelectorAll = () => [chip];
+  const api = fakeApi({ 'propio-original-layout-v1': { enabled: true } }, () => ({ ok: true, status: snap() }));
+  const w = Object.assign({}, win, { innerWidth: 1000, innerHeight: 800, getComputedStyle: node => node.styles }); w.top = w;
+  installAcwPill(api, { window: w, document, setTimer: (f) => { ticks.push(f); return 1; }, clearTimer() {}, now: () => NOW });
+  await new Promise(r => setTimeout(r, 5)); ticks[0](); await new Promise(r => setTimeout(r, 5)); ticks[0]();
+  const pill = made[0].shadowKids[0];
+  assert.equal(pill.style.right, '20px'); assert.equal(pill.style.bottom, '20px');
 });

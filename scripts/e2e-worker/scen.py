@@ -98,6 +98,12 @@ try:
         check('mientras espera NO se pulso Start Calls', r.clicks() == 0, f'clicks={r.clicks()}')
         r.ctl.evaluate("chrome.storage.local.set({'propio-dark-mode-v1': {enabled: true}})"); time.sleep(3)
         r.portal.screenshot(path=CERT_DIR + '/pill_dark.png')
+        # con la vista original la pildora se acomoda junto a Calls (sin revision valida la vista original no se recarga, solo se prueba el lugar)
+        r.portal.evaluate("document.body.style.paddingLeft = '330px'")  # el portal falso no deja espacio a la izquierda de las chips; se lo damos como en el Propio real
+        r.ctl.evaluate("chrome.storage.local.set({'propio-original-layout-v1': {enabled: true}})"); time.sleep(3)
+        r.portal.screenshot(path=CERT_DIR + '/pill_docked.png')
+        r.portal.evaluate("document.body.style.paddingLeft = ''")
+        r.ctl.evaluate("chrome.storage.local.set({'propio-original-layout-v1': {enabled: false}})"); time.sleep(2)
         r.ctl.evaluate("chrome.storage.local.set({'propio-acw-pill-v1': {enabled: false}})"); time.sleep(3)
         check('con el interruptor apagado la pildora desaparece', not has())
         r.ctl.evaluate("chrome.storage.local.set({'propio-acw-pill-v1': {enabled: true}})"); time.sleep(4)
