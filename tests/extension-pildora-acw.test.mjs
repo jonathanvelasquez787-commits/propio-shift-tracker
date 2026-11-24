@@ -133,8 +133,24 @@ test('pildora de ACW: copia tamano y color de las pildoras Calls / Minutes / Pay
   const window = { getComputedStyle: node => node.styles };
   const got = readChipStyle(window, document);
   assert.equal(got.background, 'rgb(0, 141, 159)', 'mezcla el fondo translucido con el fondo de la barra');
-  assert.equal(got.height, '28px'); assert.equal(got.borderRadius, '14px'); assert.equal(got.border, 'none'); assert.equal(got.padding, '4px 12px 4px 12px');
+  assert.equal(got.height, '28px'); assert.equal(got.borderRadius, '14px'); assert.equal(got.border, 'none'); assert.deepEqual(got.padding, ['4px', '12px', '4px', '12px']);
   const pill = { style: {} }; applyChipStyle(pill, got);
+  assert.equal(pill.style.padding, '4px 22px 4px 22px', 'un poco mas ancha que la pildora de Propio');
   assert.equal(pill.style.height, '28px'); assert.equal(pill.style.color, 'rgb(10, 20, 30)'); assert.equal(pill.style.boxShadow, 'none');
   assert.equal(readChipStyle(window, { body, querySelectorAll: () => [bar] }), null, 'sin pildoras de referencia usa los colores de siempre');
+});
+
+test('pildora de ACW: encuentra el fondo en el ::before, entiende color(srgb) y no toma la barra completa', () => {
+  const mk = (text, styles, parent, box, pseudo) => ({ children: [], textContent: text, parentElement: parent, styles, pseudo, getBoundingClientRect: () => box });
+  const body = mk('', { backgroundColor: 'rgb(255, 255, 255)' }, null, { height: 800, width: 1000 });
+  const bar = mk('', { backgroundColor: 'rgb(0, 188, 212)' }, body, { height: 60, width: 900 });
+  const chip = mk('Pay: $0.00', { backgroundColor: 'rgba(0, 0, 0, 0)', color: 'rgb(1, 2, 3)', fontFamily: 'x', fontSize: '13px', fontWeight: '500', letterSpacing: 'normal',
+    borderTopLeftRadius: '12px', borderTopWidth: '0px', borderTopStyle: 'none', paddingTop: '2px', paddingRight: '8px', paddingBottom: '2px', paddingLeft: '8px' }, bar, { height: 26, width: 90 },
+    { backgroundColor: 'color(srgb 0 0 0 / 0.2)' });
+  const window = { getComputedStyle: (node, pseudo) => (pseudo === '::before' ? node.pseudo || { backgroundColor: 'rgba(0, 0, 0, 0)' } : node.styles) };
+  const got = readChipStyle(window, { body, querySelectorAll: () => [chip] });
+  assert.equal(got.background, 'rgb(0, 150, 170)');
+  assert.equal(got.height, '26px');
+  const onlyBar = mk('Calls: 0', { backgroundColor: 'rgb(9, 9, 9)' }, body, { height: 60, width: 900 });
+  assert.equal(readChipStyle(window, { body, querySelectorAll: () => [onlyBar] }), null, 'una barra grande no cuenta como pildora');
 });
