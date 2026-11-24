@@ -415,7 +415,7 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
   const workerPlanNote = el('p', 'ext-box-note'); workerPlanNote.id = 'extBoxWorkerPlanNote';
   const closedNote = el('p', 'ext-box-note'); closedNote.id = 'extBoxClosedModeNote';
   const workerBtns = el('div', 'ext-box-worker'); workerBtns.append(workerLogin, workerLogout);
-  availBody.append(pausedRow.row, firstRow.row, brkRow.row, lunchRow.row, modeRow, resumeNote, spacingRow.row, minRow, spacingNote, availNote, leaseNote, closedNote, workerNote, workerLeaseNote, workerDataNote, workerPlanNote, workerBtns);
+  availBody.append(pausedRow.row, firstRow.row, brkRow.row, lunchRow.row, modeRow, resumeNote, spacingRow.row, minRow);
   avail.append(availHead, availBody);
   const doing = el('div', 'ext-box-avail'); doing.id = 'extBoxDoing';
   const doingHead = el('button', 'ext-box-row ext-box-fold', ''); doingHead.type = 'button'; doingHead.id = 'extBoxDoingBtn';
@@ -462,7 +462,9 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
   const supHelp = el('p', 'ext-box-note', 'Números para revisar la conexión.');
   const supSummary = el('p', 'ext-box-note'); supSummary.id = 'detectorStatus';
   const supList = el('ul', 'ext-box-signals'); supList.id = 'detectorRequests'; supSec.body.append(supHelp, supSummary, supList);
-  box.append(head, conn, rec, celebrateRow.row, askRow.row, layoutRow.row, darkRow.row, pillRow.row, pend, queueBox, avail, doing, connSec.wrap, histSec.wrap, actSec.wrap, supSec.wrap);
+  const diagSec = section('extBoxDiagnostic', 'Permisos y modo todo cerrado', 'extBoxDiagOpen');
+  diagSec.body.append(spacingNote, availNote, leaseNote, closedNote, workerNote, workerLeaseNote, workerDataNote, workerPlanNote, workerBtns);
+  box.append(head, conn, rec, celebrateRow.row, askRow.row, layoutRow.row, darkRow.row, pillRow.row, pend, queueBox, avail, doing, connSec.wrap, diagSec.wrap, histSec.wrap, actSec.wrap, supSec.wrap);
   doc.body.append(box);
 
   let busy = false, feedback = '', shown = false, timer = null, workSession = null;
