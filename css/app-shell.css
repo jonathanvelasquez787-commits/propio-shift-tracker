@@ -2961,3 +2961,19 @@ html.theme-light #scheduleConfigAccordion .sched-bk-name-select { color-scheme: 
 .ext-box-stat span { font-size: 11px; color: var(--muted); }
 .ext-box-doing .ext-box-signals { padding: 0 0 8px; }
 /* fin cuadro extension */
+
+/* sesion-traspaso */
+.boot-btn-quiet {
+  min-height: 38px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid var(--line, #e2e8f0);
+  background: transparent;
+  color: var(--text, #0f172a);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+.boot-btn-quiet:hover,
+.boot-btn-quiet:focus-visible { background: var(--panel-soft, rgba(148, 163, 184, .16)); outline: none; }
+/* fin sesion-traspaso */

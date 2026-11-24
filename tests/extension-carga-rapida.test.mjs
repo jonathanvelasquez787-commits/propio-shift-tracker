@@ -40,7 +40,7 @@ function harness({ protocol = 'chrome-extension:', dirty = false, cloudAt = base
     getProfile: async () => ({}), injectAccountPanel: noop, injectDeleteAccount: noop, injectCycleProjection: noop,
     injectRecoveryCopies: noop, readOfflineOwner: () => null, watchProductionHealth: noop, mountOfflineApp: async () => {} });
   vm.runInContext(syncSource, context);
-  vm.runInContext('startAutoSync = () => {}; startSessionNote = () => {}; applyLoginLanguagePreference = () => {}; applyLightThemeDefault = () => {}; syncThemeClass = () => {};', context);
+  vm.runInContext('startAutoSync = () => {}; startSessionNote = () => {}; resolveSessionGate = async () => "open"; startSessionPause = () => {}; applyLoginLanguagePreference = () => {}; applyLightThemeDefault = () => {}; syncThemeClass = () => {};', context);
   vm.runInContext(`writeLocalSnapshot({state:{local:true},calls:[{id:'local'}],settings:{}}); writeMeta({userId:'audit', dirty:${dirty}, lastSyncedUpdatedAt:'${base}'});`, context);
   return { order, run: code => vm.runInContext(code, context), boot: () => vm.runInContext(bootBody + '\nboot()', context), flag: () => session.getItem('propio_slow_boot_once_v1') };
 }

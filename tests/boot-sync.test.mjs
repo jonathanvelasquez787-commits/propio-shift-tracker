@@ -50,7 +50,7 @@ function harness({ divergent = false, empty = false, absent = false, choice = 'l
     mountOfflineApp: async user => { context.offlineMounted = user.id; },
   });
   vm.runInContext(syncSource, context);
-  vm.runInContext('startAutoSync = () => {}; startSessionNote = () => {}; applyLoginLanguagePreference = () => {}; applyLightThemeDefault = () => {}; syncThemeClass = () => {};', context);
+  vm.runInContext('startAutoSync = () => {}; startSessionNote = () => {}; resolveSessionGate = async () => "open"; startSessionPause = () => {}; applyLoginLanguagePreference = () => {}; applyLightThemeDefault = () => {}; syncThemeClass = () => {};', context);
   if (!empty && !absent) {
     vm.runInContext(`adoptCloud({state:{initial:true},calls:[{id:'remote'}],settings:{},updated_at:'${oldBase}'},'audit'); writeLocalSnapshot({state:{local:true},calls:[{id:'local'}],settings:{}}); markDirty();`, context);
   }
