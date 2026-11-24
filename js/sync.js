@@ -48,6 +48,7 @@ export function reportLocalPersistenceFailure(reason) {
   }
   emit('local-persistence', { reason });
 }
+let syncPaused = false;
 let cloudCallHashes = new Map();
 let cloudCallOwner = null;
 let cloudCallRevision = null;
@@ -505,7 +506,8 @@ function callDelta(callList) {
   return { current, upserts, deletes };
 }
 
-export async function pushSnapshot({ force = false } = {}) {
+export async function pushSnapshot({ force = false, final = false } = {}) {
+  if (syncPaused && !final) return { skipped: true };
   if (pushing) return { skipped: true };
   const meta = readMeta();
   if (!canSync(meta.userId)) return { skipped: true };
@@ -610,6 +612,7 @@ export async function pushSnapshot({ force = false } = {}) {
 // Ojo: si esta subida llega, la pestaña ya no vive para anotar el updated_at
 // nuevo. Esa desincronización la resuelve resolveBoot(), no acá.
 function flushOnExit() {
+  if (syncPaused) return;
   const meta = readMeta();
   if (!meta.dirty) return;
   if (!canSync(meta.userId) || (meta.lastSyncedUpdatedAt && !hasCallBaseline(meta))) return;
@@ -732,6 +735,7 @@ export function canOpenFast(userId) {
 }
 
 export async function checkCloudOnReturn({ minGapMs = 5000 } = {}) {
+  if (syncPaused) return { skipped: true };
   const meta = readMeta();
   if (pushing || meta.dirty || !meta.lastSyncedUpdatedAt || !canSync(meta.userId)) return { skipped: true };
   if (typeof navigator !== 'undefined' && navigator.onLine === false) return { skipped: true };
@@ -930,6 +934,45 @@ export function resetForUser(userId) {
   writeMeta({ userId, lastSyncedUpdatedAt: null, dirty: false }, { required: true });
 }
 
+// ---------------------------------------------------------------------------
+// Traspaso de sesion (parte 2b): la sesion que ya estaba abierta deja de escribir en la nube.
+// ---------------------------------------------------------------------------
+
+export function isSyncPaused() { return syncPaused; }
+
+// Detiene toda subida y revision de la nube de esta pagina. No cierra la sesion de la cuenta.
+export function pauseSync() {
+  syncPaused = true;
+  for (const timer of [pushTimer, maxWaitTimer, retryTimer]) if (timer) clearTimeout(timer);
+  pushTimer = maxWaitTimer = retryTimer = null;
+}
+
+// Pausa y, si se pide, sube por ultima vez lo que quedaba. `saved` = no se perdio nada:
+// no habia cambios sin subir o la nube confirmo la subida.
+export async function settleForTakeover({ push = true, waitMs = 8000 } = {}) {
+  pauseSync();
+  if (!push) return { saved: !readMeta().dirty };
+  const startedAt = Date.now();
+  while (pushing && Date.now() - startedAt < waitMs) await new Promise(resolve => setTimeout(resolve, 100));
+  if (pushing) return { saved: false };
+  if (!readMeta().dirty) return { saved: true };
+  try {
+    const result = await pushSnapshot({ final: true });
+    return { saved: Boolean(result && result.ok && !result.pending) };
+  } catch { return { saved: false }; }
+}
+
+// Deja lo de este navegador igual a lo de la nube. Si habia cambios sin subir, adoptCloud
+// los guarda antes en copias recuperables. Devuelve false si no se pudo leer la nube.
+export async function yieldToCloud(userId) {
+  if (readMeta().userId !== userId) return true;
+  try {
+    const cloud = await fetchCloud(userId);
+    if (cloud && !isEmptyCloud(cloud)) adoptCloud(cloud, userId);
+    return true;
+  } catch { return false; }
+}
+
 export { DATA_SCHEMA_VERSION };
 
 // ---------------------------------------------------------------------------
@@ -944,6 +987,8 @@ export function onSync(handler) {
 }
 
 function emit(type, payload) {
+  // Una sesion en pausa no se recarga ni abre avisos por lo que pase en la nube.
+  if (syncPaused && (type === 'conflict' || type === 'cloud-changed')) return;
   listeners.forEach((h) => {
     try {
       h(type, payload);

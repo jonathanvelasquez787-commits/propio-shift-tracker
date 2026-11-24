@@ -351,6 +351,12 @@
       "js/shift-work-review.js"
     ]
   },
+  "s_066635b6": {
+    "source": "Abriste Propio en otro lugar",
+    "files": [
+      "js/session-switch.js"
+    ]
+  },
   "s_066ae0eb": {
     "source": "Estado del registro",
     "files": [
@@ -609,6 +615,12 @@
     "source": "Negro Grafito: Cambia solo los tres negros de fondo",
     "files": [
       "app.html"
+    ]
+  },
+  "s_0b7216cf": {
+    "source": "Esta sesión quedó en pausa. Tus datos ya están guardados. Si vuelves aquí, la otra sesión se pausará.",
+    "files": [
+      "js/session-switch.js"
     ]
   },
   "s_0b799e79": {
@@ -1601,6 +1613,12 @@
     "source": "Meta de Adherencia: {{v0}}%",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_1caaf6de": {
+    "source": "Propio no se abrió aquí",
+    "files": [
+      "js/session-switch.js"
     ]
   },
   "s_1cbb44a6": {
@@ -2729,6 +2747,12 @@
       "js/work-actions.js"
     ]
   },
+  "s_306cf6f0": {
+    "source": "Las llamadas esperan en la cola hasta que una sesión las reciba.",
+    "files": [
+      "js/session-switch.js"
+    ]
+  },
   "s_30b2afdd": {
     "source": "Restaurar datos",
     "files": [
@@ -2757,6 +2781,12 @@
     "source": "Llamada completada · sumaste {amount} a tu día",
     "files": [
       "js/reinforcement-feedback.js"
+    ]
+  },
+  "s_3114a9e6": {
+    "source": "Tienes Propio abierto en la herramienta. Si abres aquí, la herramienta subirá su último estado y se pausará. Esperaremos unos segundos a que termine.",
+    "files": [
+      "js/session-switch.js"
     ]
   },
   "s_311ce35a": {
@@ -4914,6 +4944,12 @@
       "js/detail-views.js"
     ]
   },
+  "s_5610223b": {
+    "source": "Propio sigue abierto en la otra sesión. Aquí no se abrirá hasta que toques Abrir aquí.",
+    "files": [
+      "js/session-switch.js"
+    ]
+  },
   "s_561fcc7a": {
     "source": "Revisá lo que cambiará antes de confirmar.",
     "files": [
@@ -5785,6 +5821,12 @@
     "source": "días en orden",
     "files": [
       "js/orden-view.js"
+    ]
+  },
+  "s_6715bf15": {
+    "source": "Volver aquí",
+    "files": [
+      "js/session-switch.js"
     ]
   },
   "s_67b16dea": {
@@ -6725,6 +6767,12 @@
       "app.html"
     ]
   },
+  "s_7859322a": {
+    "source": "Esperando a que la otra sesión guarde…",
+    "files": [
+      "js/session-switch.js"
+    ]
+  },
   "s_78721e00": {
     "source": "A favor",
     "files": [
@@ -7651,6 +7699,12 @@
     "source": "{{v7}}{{v8}}",
     "files": [
       "js/reports.js"
+    ]
+  },
+  "s_877f41b5": {
+    "source": "Abrir aquí",
+    "files": [
+      "js/session-switch.js"
     ]
   },
   "s_878ecf76": {
@@ -9072,6 +9126,12 @@
     "source": "Revisar llamada",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_9ef5ea69": {
+    "source": "Esta sesión quedó en pausa. Lo que no alcanzó a subirse quedó en copias recuperables. Si vuelves aquí, la otra sesión se pausará.",
+    "files": [
+      "js/session-switch.js"
     ]
   },
   "s_9f053659": {
@@ -10847,6 +10907,12 @@
     "source": "·\n      Titular:",
     "files": [
       "terminos.html"
+    ]
+  },
+  "s_be331f82": {
+    "source": "Tienes Propio abierto en la web. Si abres aquí, la web subirá su último estado y se pausará. Esperaremos unos segundos a que termine.",
+    "files": [
+      "js/session-switch.js"
     ]
   },
   "s_be5b33ad": {
@@ -13375,7 +13441,8 @@
     "files": [
       "app.html",
       "js/call-recovery.js",
-      "js/orden-view.js"
+      "js/orden-view.js",
+      "js/session-switch.js"
     ]
   },
   "s_ea63397b": {
@@ -14063,6 +14130,12 @@
     "source": "No se pudo conectar. Revisa tu internet y vuelve a intentar.",
     "files": [
       "js/auth.js"
+    ]
+  },
+  "s_f56aa7ba": {
+    "source": "Ya hay una sesión abierta",
+    "files": [
+      "js/session-switch.js"
     ]
   },
   "s_f56ab548": {
