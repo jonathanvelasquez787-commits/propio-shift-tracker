@@ -415,7 +415,7 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
   const workerPlanNote = el('p', 'ext-box-note'); workerPlanNote.id = 'extBoxWorkerPlanNote';
   const closedNote = el('p', 'ext-box-note'); closedNote.id = 'extBoxClosedModeNote';
   const workerBtns = el('div', 'ext-box-worker'); workerBtns.append(workerLogin, workerLogout);
-  availBody.append(pausedRow.row, passiveRow.row, firstRow.row, brkRow.row, lunchRow.row, modeRow, resumeNote, spacingRow.row, minRow, spacingNote, availNote, leaseNote, closedNote, workerNote, workerLeaseNote, workerDataNote, workerPlanNote, workerBtns);
+  availBody.append(pausedRow.row, firstRow.row, brkRow.row, lunchRow.row, modeRow, resumeNote, spacingRow.row, minRow, spacingNote, availNote, leaseNote, closedNote, workerNote, workerLeaseNote, workerDataNote, workerPlanNote, workerBtns);
   avail.append(availHead, availBody);
   const doing = el('div', 'ext-box-avail'); doing.id = 'extBoxDoing';
   const doingHead = el('button', 'ext-box-row ext-box-fold', ''); doingHead.type = 'button'; doingHead.id = 'extBoxDoingBtn';
@@ -448,7 +448,7 @@ export function initExtensionBox(doc = globalThis.document, chromeApi = globalTh
     return { wrap, body };
   };
   const connSec = section('extBoxConnection', 'Estado de conexión', 'extBoxConnOpen');
-  const connHealth = el('p', 'ext-box-note'); connHealth.id = 'connectionHealth'; connHealth.setAttribute('role', 'status'); connSec.body.append(connHealth);
+  const connHealth = el('p', 'ext-box-note'); connHealth.id = 'connectionHealth'; connHealth.setAttribute('role', 'status'); connSec.body.append(connHealth, passiveRow.row);
   const histSec = section('extBoxHistory', 'Historial reconocido', 'extBoxHistOpen');
   const stat = (id, note) => { const d = el('div', 'ext-box-stat'); const n = el('strong', '', '—'); n.id = id; const t = el('span', '', note); d.append(n, t); return { d, n, t }; };
   const histCount = stat('historyCount', 'En historial de Propio'), liveCount = stat('observedCount', 'Terminadas observadas en vivo'); liveCount.n.textContent = '0';

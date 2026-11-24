@@ -15,5 +15,5 @@ test('cuadro de la extension: el interruptor "Solo registro en esta PC" manda de
   const src = readFileSync(new URL('../js/extension-box.js', import.meta.url), 'utf8');
   assert.match(src, /toggleRow\('extBoxPassive', 'Solo registro en esta PC'/);
   assert.match(src, /passiveRow\.input\.addEventListener\('change', \(\) => act\(\{ kind: 'device-passive', enabled: passiveRow\.input\.checked \}\)\)/);
-  assert.match(src, /availBody\.append\(pausedRow\.row, passiveRow\.row, firstRow\.row,/);
+  assert.match(src, /connSec\.body\.append\(connHealth, passiveRow\.row\)/);
 });
