@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { validateAutomationStatus } from '../js/automation-status.js';
-import { acwPillModel, installAcwPill, acwPillKey, acwPillPosKey, acwPillClamp } from '../extension/propio-bridge/acw-pill.js';
+import { acwPillModel, installAcwPill, acwPillKey, acwPillPosKey, acwPillClamp, readChipStyle, applyChipStyle } from '../extension/propio-bridge/acw-pill.js';
 
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
 const NOW = Date.parse('2026-11-23T15:00:00Z');
@@ -117,4 +117,24 @@ test('pildora de ACW: al abrir Propio vuelve a la posicion guardada', async () =
   await new Promise(r => setTimeout(r, 5)); ticks[0](); await new Promise(r => setTimeout(r, 5)); ticks[0]();
   const pill = made[0].shadowKids[0];
   assert.equal(pill.style.right, '300px'); assert.equal(pill.style.bottom, '150px');
+});
+
+test('pildora de ACW: copia tamano y color de las pildoras Calls / Minutes / Pay de Propio', () => {
+  const page = { background: 'rgb(0, 188, 212)', parent: null };
+  const mk = (text, styles, parent, box) => ({ children: [], textContent: text, parentElement: parent, styles, getBoundingClientRect: () => box || { height: 0 } });
+  const body = mk('', { backgroundColor: 'rgb(0, 188, 212)' }, null);
+  const bar = mk('', { backgroundColor: 'rgb(0, 188, 212)' }, body);
+  const chip = mk('Calls: 0', {
+    backgroundColor: 'rgba(0, 0, 0, 0.25)', color: 'rgb(10, 20, 30)', fontFamily: 'Poppins', fontSize: '13px', fontWeight: '500', letterSpacing: 'normal',
+    borderTopLeftRadius: '14px', borderTopWidth: '0px', borderTopStyle: 'none', borderTopColor: 'rgb(0,0,0)',
+    paddingTop: '4px', paddingRight: '12px', paddingBottom: '4px', paddingLeft: '12px' }, bar, { height: 28 });
+  const wrapper = mk('Calls: 0 Minutes: 0', { backgroundColor: 'rgb(9, 9, 9)' }, body);
+  const document = { body, querySelectorAll: () => [wrapper, bar, chip, mk('Minutes: 0', chip.styles, bar, { height: 28 })] };
+  const window = { getComputedStyle: node => node.styles };
+  const got = readChipStyle(window, document);
+  assert.equal(got.background, 'rgb(0, 141, 159)', 'mezcla el fondo translucido con el fondo de la barra');
+  assert.equal(got.height, '28px'); assert.equal(got.borderRadius, '14px'); assert.equal(got.border, 'none'); assert.equal(got.padding, '4px 12px 4px 12px');
+  const pill = { style: {} }; applyChipStyle(pill, got);
+  assert.equal(pill.style.height, '28px'); assert.equal(pill.style.color, 'rgb(10, 20, 30)'); assert.equal(pill.style.boxShadow, 'none');
+  assert.equal(readChipStyle(window, { body, querySelectorAll: () => [bar] }), null, 'sin pildoras de referencia usa los colores de siempre');
 });
