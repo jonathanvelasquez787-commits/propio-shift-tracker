@@ -243,9 +243,12 @@
       "acceptance": "Revisión esperada, páginas completas, reintentos y acuses tardíos sin borrar cambios de otro dispositivo.",
       "sources": [
         "js/sync.js",
+        "js/session-note.js",
         "js/app-context.js"
       ],
       "tests": [
+        { "file": "tests/sesion-nota-cliente.test.mjs", "namedCases": ["la nota avisa al arrancar y se renueva cada pocos segundos", "guarda las OTRAS sesiones y se deja a si misma fuera", "si la nube falla o la funcion aun no existe, no pasa nada visible y reintenta mas despacio", "al parar borra su nota, no renueva mas y olvida a las otras", "una respuesta que llega despues de parar se ignora", "la nota NUNCA cierra sesion, no escribe en el almacenamiento y el worker no la usa", "boot.js arranca la nota solo despues de montar la app, con el cliente y el id del dispositivo", "la migracion deja la tabla cerrada y las funciones solo para cuentas iniciadas"] },
+        { "file": "tests/sesion-nota-sql.test.mjs", "namedCases": ["la nota de sesion: cada sesion ve a las otras de SU cuenta y a si misma marcada", "otra cuenta no ve ni toca las notas; las tablas y funciones no se abren a anon ni se leen directo", "sin sesion iniciada o con datos invalidos la nota se rechaza", "las notas viejas no cuentan (mas de 2 min) y se borran solas (mas de 10 min); maximo 20 por cuenta", "session_leave borra solo MI nota", "la nota no toca user_data, calls ni el permiso de disponibilidad"] },
         {
           "file": "tests/sync-integration.test.mjs",
           "namedCases": [

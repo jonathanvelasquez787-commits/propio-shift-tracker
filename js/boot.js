@@ -39,7 +39,10 @@ import {
   canOpenFast,
   withoutDirtyMarking,
   checkCloudOnReturn,
+  deviceId,
+  deviceLabel,
 } from './sync.js';
+import { startSessionNote } from './session-note.js';
 
 // Antes que nada: el gate hereda los tokens de la app y por defecto son los
 // del tema oscuro. Pintarlo con el tema correcto de entrada evita el parpadeo.
@@ -828,6 +831,10 @@ async function boot() {
   // En apertura rápida lo que la app guarda sola al armarse no cuenta como cambio del usuario.
   const mounted = fastOpen ? await withoutDirtyMarking(() => mountApp(userId)) : await mountApp(userId);
   if (!mounted || bridgeUserId !== userId) return;
+
+  // Nota de sesion: deja en la nube "hay una sesion abierta aqui" y la renueva. Solo escribe la
+  // nota; no muestra ni cambia nada (parte 1 de "una sola sesion a la vez").
+  startSessionNote({ getClient: getSupabase, getDeviceId: deviceId, getLabel: deviceLabel });
 
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('pst-propio-bridge/v1:' + userId));
   const accountScope = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('');

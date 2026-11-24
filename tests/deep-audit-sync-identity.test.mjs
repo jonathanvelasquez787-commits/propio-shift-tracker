@@ -156,7 +156,7 @@ test('cached offline identity cannot mount data assigned to another account duri
   const actions = [];
   const context = vm.createContext({ ui, translateText, translateMarkup, displayLocale,
     readMeta: () => ({ userId: 'account-b' }), localHasData: () => true,
-    setAccessToken: () => actions.push('token'), applyLoginLanguagePreference: () => actions.push('language'), syncThemeClass() {}, startAutoSync() {},
+    setAccessToken: () => actions.push('token'), applyLoginLanguagePreference: () => actions.push('language'), syncThemeClass() {}, startAutoSync() {}, startSessionNote() {},
     mountApp: async () => { actions.push('mount'); return false; },
     setAppEntryHint: enabled => actions.push(`entry:${enabled}`),
     window: { location: { replace: url => actions.push(`redirect:${url}`) } },
@@ -188,7 +188,7 @@ for (const nextOwner of ['account-a', 'account-b']) {
       }, mountApp: async () => { actions.push('mount'); return false; },
     });
     h.context.window.location = { reload: () => actions.push('reload'), replace: url => actions.push(`redirect:${url}`) };
-    h.run('startAutoSync = () => {}; applyLoginLanguagePreference = () => {}; applyLightThemeDefault = () => {}; syncThemeClass = () => {};');
+    h.run('startAutoSync = () => {}; startSessionNote = () => {}; applyLoginLanguagePreference = () => {}; applyLightThemeDefault = () => {}; syncThemeClass = () => {};');
     await h.run(bootBody + '\nboot()');
     assert.deepEqual(actions, ['reload']);
     assert.equal(h.run('readMeta().userId'), nextOwner);
@@ -205,7 +205,7 @@ for (const choice of ['local', 'cloud']) {
       mountApp: async () => { actions.push('mount'); return false; },
     });
     h.context.window.location = { reload: () => actions.push('reload'), replace: url => actions.push(`redirect:${url}`) };
-    h.run('startAutoSync = () => {}; applyLoginLanguagePreference = () => {}; applyLightThemeDefault = () => {}; syncThemeClass = () => {};');
+    h.run('startAutoSync = () => {}; startSessionNote = () => {}; applyLoginLanguagePreference = () => {}; applyLightThemeDefault = () => {}; syncThemeClass = () => {};');
     await h.run(bootBody + '\nboot()');
     assert.deepEqual(actions, ['mount']);
     assert.equal(h.run('readMeta().userId'), 'account-a');
