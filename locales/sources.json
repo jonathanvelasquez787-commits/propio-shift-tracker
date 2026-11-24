@@ -5360,6 +5360,12 @@
       "js/call-recovery.js"
     ]
   },
+  "s_5ef636cd": {
+    "source": "Esperando tu primera llamada",
+    "files": [
+      "js/automation-ui.js"
+    ]
+  },
   "s_5f033f08": {
     "source": "Ya tienes la sesión abierta — entrando…",
     "files": [
@@ -8483,6 +8489,12 @@
     "source": "· {{v0}} futura(s) omitida(s)",
     "files": [
       "js/app-main.js"
+    ]
+  },
+  "s_945a917a": {
+    "source": "El inicio automático del turno está apagado. Cuando registres tu primera llamada, la espera de ACW te pone disponible.",
+    "files": [
+      "js/automation-ui.js"
     ]
   },
   "s_9468c6eb": {

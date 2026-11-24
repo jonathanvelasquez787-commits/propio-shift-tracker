@@ -1,6 +1,6 @@
 export const AUTOMATION_STATUS_MAX_AGE = 15000;
 const reasons = new Set(['connection','schedule','shift-ended','before-shift','review','in-call','incoming','portal-state',
-  'multiple-portals','pause','spacing','acw-update','acw-pending','manual-paused','pause-return-off','first-done','off',
+  'multiple-portals','pause','spacing','acw-update','acw-pending','manual-paused','pause-return-off','first-done','first-call-wait','off',
   'available','offline-control','retry','starting','device-passive','coordination']);
 const timestamp = value => typeof value === 'string' && value.length <= 32 && Number.isFinite(Date.parse(value)) ? value : null;
 const fresh = (value, now) => value && now >= Date.parse(value) && now - Date.parse(value) <= AUTOMATION_STATUS_MAX_AGE;
