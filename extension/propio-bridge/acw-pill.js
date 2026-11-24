@@ -42,42 +42,59 @@ const COLORS = {
 const CHIP_TEXT = /^(calls|minutes|pay)\s*:/i;
 const CHIP_TWICE = /(calls|minutes|pay)\s*:[\s\S]*(calls|minutes|pay)\s*:/i;
 const rgba = value => {
-  const m = /^rgba?\(\s*(\d+(?:\.\d+)?)[,\s]+(\d+(?:\.\d+)?)[,\s]+(\d+(?:\.\d+)?)(?:[,\s/]+(\d*\.?\d+%?))?\s*\)$/.exec(String(value || '').trim());
-  if (!m) return null;
-  const a = m[4] === undefined ? 1 : m[4].endsWith('%') ? parseFloat(m[4]) / 100 : parseFloat(m[4]);
-  return { r: +m[1], g: +m[2], b: +m[3], a };
+  const text = String(value || '').trim();
+  let m = /^rgba?\(\s*(\d+(?:\.\d+)?)[,\s]+(\d+(?:\.\d+)?)[,\s]+(\d+(?:\.\d+)?)(?:[,\s/]+(\d*\.?\d+%?))?\s*\)$/.exec(text);
+  const alpha = raw => (raw === undefined ? 1 : raw.endsWith('%') ? parseFloat(raw) / 100 : parseFloat(raw));
+  if (m) return { r: +m[1], g: +m[2], b: +m[3], a: alpha(m[4]) };
+  // Chrome devuelve color(srgb ...) cuando el color se mezcla con color-mix().
+  m = /^color\(\s*srgb\s+(\d*\.?\d+)\s+(\d*\.?\d+)\s+(\d*\.?\d+)(?:\s*\/\s*(\d*\.?\d+%?))?\s*\)$/.exec(text);
+  return m ? { r: Math.round(+m[1] * 255), g: Math.round(+m[2] * 255), b: Math.round(+m[3] * 255), a: alpha(m[4]) } : null;
 };
-const blend = (top, under) => `rgb(${[['r'], ['g'], ['b']].map(([k]) => Math.round(top[k] * top.a + under[k] * (1 - top.a))).join(', ')})`;
+const blend = (top, under) => `rgb(${['r', 'g', 'b'].map(k => Math.round(top[k] * top.a + under[k] * (1 - top.a))).join(', ')})`;
+// El fondo puede estar en el propio elemento o en su ::before / ::after (como hacen las chips de Angular Material).
+const paintOf = (window, node) => {
+  for (const pseudo of [undefined, '::before', '::after']) {
+    let cs; try { cs = pseudo ? window.getComputedStyle(node, pseudo) : window.getComputedStyle(node); } catch { cs = null; }
+    const bg = cs && rgba(cs.backgroundColor);
+    if (bg && bg.a > 0) return { cs, bg };
+  }
+  return null;
+};
 export function readChipStyle(window, document) {
   if (typeof window?.getComputedStyle !== 'function' || typeof document?.querySelectorAll !== 'function') return null;
-  for (const el of document.querySelectorAll('span,div,button,a,li,p')) {
+  for (const el of document.querySelectorAll('body *')) {
     if ((el.children?.length || 0) > 4) continue;
     const text = String(el.textContent || '').trim();
     if (text.length > 30 || !CHIP_TEXT.test(text) || CHIP_TWICE.test(text)) continue; // un contenedor con varias pildoras no es la pildora
-    for (let node = el, depth = 0; node && node !== document.body && depth < 4; node = node.parentElement, depth++) {
-      const cs = window.getComputedStyle(node), bg = rgba(cs.backgroundColor);
-      if (!bg || bg.a === 0) continue;
+    for (let node = el, depth = 0; node && node !== document.body && depth < 6; node = node.parentElement, depth++) {
+      const rect = node.getBoundingClientRect?.() || {};
+      if (rect.height > 48 || rect.width > 320) break; // ya es la barra completa, no una pildora
+      const paint = paintOf(window, node);
+      if (!paint) continue;
+      const { cs, bg } = paint;
       let under = { r: 255, g: 255, b: 255, a: 1 };
       for (let up = node.parentElement; up; up = up.parentElement) {
         const c = rgba(window.getComputedStyle(up).backgroundColor);
         if (c && c.a > 0) { under = bg.a < 1 && c.a < 1 ? { ...c, a: 1 } : c; if (c.a === 1) break; }
       }
-      const box = node.getBoundingClientRect?.() || {};
-      const width = parseFloat(cs.borderTopWidth) || 0;
+      const own = window.getComputedStyle(node), width = parseFloat(own.borderTopWidth) || 0;
       return {
-        background: bg.a < 1 ? blend(bg, under) : cs.backgroundColor, color: cs.color, fontFamily: cs.fontFamily, fontSize: cs.fontSize,
-        fontWeight: cs.fontWeight, letterSpacing: cs.letterSpacing, borderRadius: cs.borderTopLeftRadius,
-        border: width > 0 && cs.borderTopStyle !== 'none' ? `${cs.borderTopWidth} solid ${cs.borderTopColor}` : 'none',
-        padding: `${cs.paddingTop} ${cs.paddingRight} ${cs.paddingBottom} ${cs.paddingLeft}`, height: box.height > 0 ? `${box.height}px` : null,
+        background: bg.a < 1 ? blend(bg, under) : `rgb(${bg.r}, ${bg.g}, ${bg.b})`, color: own.color, fontFamily: own.fontFamily, fontSize: own.fontSize,
+        fontWeight: own.fontWeight, letterSpacing: own.letterSpacing, borderRadius: own.borderTopLeftRadius || cs.borderTopLeftRadius,
+        border: width > 0 && own.borderTopStyle !== 'none' ? `${own.borderTopWidth} solid ${own.borderTopColor}` : 'none',
+        padding: [own.paddingTop, own.paddingRight, own.paddingBottom, own.paddingLeft], height: rect.height > 0 ? `${rect.height}px` : null,
       };
     }
   }
   return null;
 }
+// Un poco mas ancha que las pildoras de Propio.
+const EXTRA_SIDE_PX = 10;
+const widen = padding => { const [t, r, b, l] = padding.map(v => parseFloat(v) || 0); return `${t}px ${r + EXTRA_SIDE_PX}px ${b}px ${l + EXTRA_SIDE_PX}px`; };
 export function applyChipStyle(pill, chip) {
   Object.assign(pill.style, { boxSizing: 'border-box', display: 'inline-flex', alignItems: 'center', lineHeight: '1.2', boxShadow: 'none',
     background: chip.background, color: chip.color, fontFamily: chip.fontFamily, fontSize: chip.fontSize, fontWeight: chip.fontWeight,
-    letterSpacing: chip.letterSpacing, borderRadius: chip.borderRadius, border: chip.border, padding: chip.padding, height: chip.height || 'auto' });
+    letterSpacing: chip.letterSpacing, borderRadius: chip.borderRadius, border: chip.border, padding: widen(chip.padding), height: chip.height || 'auto' });
 }
 
 export function installAcwPill(api, { window, document, setTimer = setInterval, clearTimer = clearInterval, now = () => Date.now() } = {}) {
@@ -123,7 +140,7 @@ export function installAcwPill(api, { window, document, setTimer = setInterval, 
       host = document.createElement('div'); host.id = 'pst-acw-pill';
       const root = host.attachShadow({ mode: 'closed' });
       pill = document.createElement('div'); pill.setAttribute('role', 'status');
-      pill.style.cssText = 'position:fixed;right:20px;bottom:20px;z-index:2147483000;padding:9px 18px;border-radius:999px;font:600 14px/1.2 system-ui,sans-serif;border:2px solid;box-shadow:0 2px 8px rgba(0,0,0,.25);cursor:grab;touch-action:none;user-select:none;white-space:nowrap';
+      pill.style.cssText = 'position:fixed;right:20px;bottom:20px;z-index:2147483000;padding:9px 24px;border-radius:999px;font:600 14px/1.2 system-ui,sans-serif;border:2px solid;box-shadow:0 2px 8px rgba(0,0,0,.25);cursor:grab;touch-action:none;user-select:none;white-space:nowrap';
       wireDrag(pill);
       root.append(pill); document.body.append(host);
     }
