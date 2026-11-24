@@ -2,6 +2,7 @@ import { automationStatusView } from '../../js/automation-status.js';
 
 export const acwPillKey = 'propio-acw-pill-v1';
 export const acwPillPosKey = 'propio-acw-pill-pos-v1';
+const originalLayoutKey = 'propio-original-layout-v1';
 const EDGE_MIN = 4;
 const POLL_MS = 2000;
 const hhmm = iso => { const d = new Date(iso); return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; };
@@ -50,6 +51,13 @@ export function acwPillClamp(pos, view, size) {
     right: Math.min(maxRight, Math.max(EDGE_MIN, num(pos?.right, 20))),
     bottom: Math.min(maxBottom, Math.max(EDGE_MIN, num(pos?.bottom, 20))),
   };
+}
+
+// Lugar por defecto con la vista original: pegada a la izquierda de la primera pildora de Propio (Calls), a su misma altura.
+export function acwPillDockedPos(rect, view, size, gap = 10) {
+  const num = (v, d) => (Number.isFinite(v) ? v : d);
+  const centered = (num(rect?.height, 0) - num(size?.height, 0)) / 2;
+  return { right: num(view?.width, 1000) - num(rect?.left, 0) + gap, bottom: num(view?.height, 800) - num(rect?.bottom, 0) + centered };
 }
 
 const COLORS = {
@@ -101,7 +109,7 @@ export function readChipStyle(window, document) {
         background: bg.a < 1 ? blend(bg, under) : `rgb(${bg.r}, ${bg.g}, ${bg.b})`, color: own.color, fontFamily: own.fontFamily, fontSize: own.fontSize,
         fontWeight: own.fontWeight, letterSpacing: own.letterSpacing, borderRadius: own.borderTopLeftRadius || cs.borderTopLeftRadius,
         border: width > 0 && own.borderTopStyle !== 'none' ? `${own.borderTopWidth} solid ${own.borderTopColor}` : 'none',
-        padding: [own.paddingTop, own.paddingRight, own.paddingBottom, own.paddingLeft], height: rect.height > 0 ? `${rect.height}px` : null,
+        padding: [own.paddingTop, own.paddingRight, own.paddingBottom, own.paddingLeft], height: rect.height > 0 ? `${rect.height}px` : null, node,
       };
     }
   }
@@ -118,12 +126,19 @@ export function applyChipStyle(pill, chip) {
 
 export function installAcwPill(api, { window, document, setTimer = setInterval, clearTimer = clearInterval, now = () => Date.now() } = {}) {
   if (window.top !== window || window.location.origin !== 'https://interpreters.propio-ls.com' || !/^\/portal(?:\/|$)/.test(window.location.pathname)) return;
-  let enabled = true, snapshot = null, polledAt = 0, inFlight = false, stopped = false, host = null, pill = null, revision = 0, pos = null, dragging = false, chipCache = null, chipAt = 0;
+  let enabled = true, snapshot = null, polledAt = 0, inFlight = false, stopped = false, host = null, pill = null, revision = 0, pos = null, dragging = false, chipCache = null, chipAt = 0, originalOn = false;
   function place() {
     if (!pill) return;
     const view = { width: window.innerWidth, height: window.innerHeight };
     const size = { width: pill.offsetWidth, height: pill.offsetHeight };
-    const next = acwPillClamp(pos, view, size);
+    const rect = !pos && originalOn && chipCache?.node?.isConnected ? chipCache.node.getBoundingClientRect?.() : null;
+    let target = pos;
+    if (!target && rect && rect.width > 0) {
+      const docked = acwPillDockedPos(rect, view, size);
+      // Si a la izquierda de Calls no cabe, se queda en su esquina para no taparla.
+      if (docked.right <= view.width - (size.width || 0) - EDGE_MIN) target = docked;
+    }
+    const next = acwPillClamp(target, view, size);
     pill.style.right = `${next.right}px`; pill.style.bottom = `${next.bottom}px`;
     return next;
   }
@@ -149,6 +164,11 @@ export function installAcwPill(api, { window, document, setTimer = setInterval, 
     };
     el.addEventListener('pointerup', finish);
     el.addEventListener('pointercancel', finish);
+    // Doble clic: vuelve a su lugar de fabrica (con la vista original, junto a Calls).
+    el.addEventListener('dblclick', () => {
+      pos = null; place();
+      try { Promise.resolve(api.storage.local.remove?.(acwPillPosKey)).catch(() => {}); } catch { /* Sin almacenamiento. */ }
+    });
   }
   function hide() { if (host) { host.remove(); host = null; pill = null; } }
   function render() {
@@ -191,7 +211,9 @@ export function installAcwPill(api, { window, document, setTimer = setInterval, 
     render();
   }
   function changed(changes, area) {
-    if (stopped || area !== 'local' || !changes[acwPillKey]) return;
+    if (stopped || area !== 'local') return;
+    if (changes[originalLayoutKey]) { originalOn = changes[originalLayoutKey].newValue?.enabled === true; if (!dragging) place(); }
+    if (!changes[acwPillKey]) return;
     revision++; enabled = changes[acwPillKey].newValue?.enabled !== false;
     if (enabled) polledAt = 0; tick();
   }
@@ -202,8 +224,9 @@ export function installAcwPill(api, { window, document, setTimer = setInterval, 
   }
   api.storage.onChanged.addListener(changed);
   const initialRevision = revision;
-  api.storage.local.get([acwPillKey, acwPillPosKey]).then(values => {
+  api.storage.local.get([acwPillKey, acwPillPosKey, originalLayoutKey]).then(values => {
     if (stopped) return;
+    originalOn = values[originalLayoutKey]?.enabled === true;
     const saved = values[acwPillPosKey];
     if (saved && Number.isFinite(saved.right) && Number.isFinite(saved.bottom)) pos = { right: saved.right, bottom: saved.bottom };
     if (initialRevision !== revision) return;
@@ -211,5 +234,8 @@ export function installAcwPill(api, { window, document, setTimer = setInterval, 
   }).catch(() => {});
   const timer = setTimer(tick, 1000);
   window.addEventListener('pagehide', event => { if (!event.persisted) stop(); });
+  const follow = () => { if (!stopped && !dragging) place(); };
+  window.addEventListener('resize', follow);
+  window.addEventListener('scroll', follow, true);
   return { stop };
 }
