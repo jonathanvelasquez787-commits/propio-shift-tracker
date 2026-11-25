@@ -100,6 +100,41 @@ export function createTakeoverWatcher({ getClient, deviceId, kind, startedAt, on
   return {
     start() { if (running) return; running = true; schedule(); },
     stop() { running = false; if (timer) clearTimer(timer); timer = null; },
+    // "Mira ya": adelanta la proxima revision (por ejemplo cuando llega el aviso de Realtime).
+    // Sigue leyendo el pedido real en la nube y aplicando las mismas reglas; no es una orden.
+    poke() { if (!running || busy) return; if (timer) clearTimer(timer); timer = null; poll(); },
     isRunning: () => running,
+  };
+}
+
+// Aviso por la red (Realtime de Supabase): la nube manda un mensaje privado a esta cuenta cuando
+// alguien pide el traspaso. El mensaje no trae datos y no se obedece: solo hace llamar a `onNudge`
+// (que debe mirar el pedido real). Si Realtime falla o no esta, no pasa nada: la revision cada 5 s
+// sigue sola. Nunca lanza error ni muestra nada.
+export const NUDGE_TOPIC_PREFIX = 'session-handoff:';
+export const NUDGE_EVENT = 'takeover';
+export function createTakeoverNudge({ getClient, userId, onNudge }) {
+  let client = null, channel = null, active = false;
+  async function open() {
+    try {
+      client = getClient();
+      await client.realtime.setAuth();
+      if (!active) return;
+      channel = client.channel(`${NUDGE_TOPIC_PREFIX}${userId}`, { config: { private: true } })
+        .on('broadcast', { event: NUDGE_EVENT }, () => {
+          try { onNudge(); } catch { /* el aviso nunca debe romper la app */ }
+        });
+      channel.subscribe(() => { /* si se cae, el cliente reintenta solo; el sondeo cubre mientras tanto */ });
+    } catch { /* sin Realtime: solo la revision normal */ }
+  }
+  function close() {
+    const ch = channel; channel = null;
+    if (!ch) return;
+    try { Promise.resolve(client.removeChannel(ch)).catch(() => {}); } catch { /* nada */ }
+  }
+  return {
+    start() { if (active || !userId) return; active = true; open(); },
+    stop() { active = false; close(); },
+    isRunning: () => active,
   };
 }
