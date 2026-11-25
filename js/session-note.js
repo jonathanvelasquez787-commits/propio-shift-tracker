@@ -62,15 +62,16 @@ export function createSessionNote({ getClient, kind, getDeviceId, getLabel, rand
 
   // Al cerrar: borra MI nota (mejor esfuerzo). Si no llega, la nota vence sola.
   function stop() {
-    if (!running) return;
+    if (!running) return Promise.resolve();
     running = false;
     if (timer) clearTimer(timer);
     timer = null;
     const leaving = instance;
     others = [];
+    // Devuelve la promesa para que quien se va a pausar pueda esperar a que la nota se borre.
     try {
-      Promise.resolve(getClient().rpc('session_leave', { p_instance: leaving })).catch(() => {});
-    } catch { /* nada */ }
+      return Promise.resolve(getClient().rpc('session_leave', { p_instance: leaving })).then(() => {}, () => {});
+    } catch { return Promise.resolve(); }
   }
 
   return {

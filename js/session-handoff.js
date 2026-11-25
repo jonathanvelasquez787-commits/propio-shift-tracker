@@ -46,6 +46,20 @@ export async function announcePresence({ getClient, deviceId, label, kind, rando
   } catch { return false; }
 }
 
+// Borra notas de sesiones que ya no contestan (mejor esfuerzo, nunca lanza error). Solo se usa cuando
+// nadie confirmo el traspaso: esas notas eran de paginas que ya no estan. Si una de verdad seguia
+// viva, vuelve a dejar su nota en su siguiente latido.
+export async function dropNotes({ getClient, instances, timeoutMs = PEEK_TIMEOUT_MS, setTimer = setTimeout, clearTimer = clearTimeout }) {
+  let dropped = 0;
+  for (const instance of instances) {
+    try {
+      const { error } = await limited(getClient().rpc('session_leave', { p_instance: instance }), timeoutMs, setTimer, clearTimer);
+      if (!error) dropped += 1;
+    } catch { /* mejor esfuerzo */ }
+  }
+  return dropped;
+}
+
 export async function requestTakeover({ getClient, deviceId, label, kind }) {
   try {
     const { error } = await getClient().rpc('session_takeover_request', { p_device_id: deviceId, p_label: label, p_kind: kind });
