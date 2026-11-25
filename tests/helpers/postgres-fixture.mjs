@@ -9,6 +9,14 @@ export async function applicationDatabase({ transformMigration = sql => sql } = 
     create role anon; create role authenticated; create role service_role bypassrls;
     create schema auth; create schema extensions; create schema cron;
     create schema net; create schema vault;
+    create schema realtime;
+    create table realtime.messages(id bigint generated always as identity primary key, topic text, extension text default 'broadcast', event text, payload jsonb, private boolean);
+    alter table realtime.messages enable row level security;
+    grant usage on schema realtime to authenticated;
+    grant select on realtime.messages to authenticated;
+    create function realtime.send(payload jsonb, event text, topic text, private boolean default true) returns void language sql as $$
+      insert into realtime.messages(topic, event, payload, private) values(topic, event, payload, private) $$;
+    create function realtime.topic() returns text language sql stable as $$ select nullif(current_setting('realtime.topic', true), '') $$;
     grant usage on schema public,auth to anon,authenticated,service_role;
     alter default privileges in schema public grant all on tables to authenticated,service_role;
     alter default privileges in schema public grant all on sequences to authenticated,service_role;
