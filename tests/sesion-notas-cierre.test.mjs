@@ -122,14 +122,14 @@ test('flujo completo: la web se cierra, su nota se borra y la ventanita abre sin
   const cloud = fakeCloud(), sent = [], asked = [];
   const web = noteOf({ cloud, id: 'W1', device: 'WEB', kind: 'web', leaveOnExit: (i) => { sent.push(i); cloud.state.notes = cloud.state.notes.filter(n => n.instance !== i); return true; } });
   web.note.start(); await flush();
-  cloud.state.t += 30000; // la ventanita se abre con la web viva: preguntaria
+  cloud.state.t += 12000; // la ventanita se abre con la web viva (12 s: aun renueva cada 10 s): preguntaria
   const mk = () => createSessionSwitch({ getClient: cloud.getClient, getDeviceId: () => 'EXT', getLabel: () => 'ext', kind: 'extension',
     readMark: () => null, writeMark: () => true, clearMark: () => {}, yieldCloud: async () => true, settle: async () => ({ saved: true }),
     screens: { prompt: (o) => { asked.push(o); }, waiting: () => {}, paused: () => {} }, reload: () => {}, sleep: async () => {}, now: () => cloud.state.t });
   const withWeb = mk().gate('u1'); await flush(); await flush();
   assert.equal(asked.length, 1, 'con la web viva pregunta');
   assert.match(asked[0].detail, /Windows/);
-  assert.match(asked[0].detail, /30 s/);
+  assert.match(asked[0].detail, /12 s/);
   void withWeb;
   asked.length = 0;
   await web.note.stop({ exit: true }); // se cierra la pestaña
