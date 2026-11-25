@@ -10,7 +10,7 @@
 //  - Una sesion en pausa no sube nada, no contesta "lista" a la extension y no tiene la app corriendo.
 //  - Lo que la sesion pausada no alcanzo a subir queda en copias recuperables, nunca se pierde ni pisa la nube.
 import { translateText } from './i18n.js';
-import { findOtherSessions, requestTakeover, ackTakeover, waitForTakeoverAck, createTakeoverWatcher } from './session-handoff.js';
+import { findOtherSessions, requestTakeover, ackTakeover, waitForTakeoverAck, createTakeoverWatcher, createTakeoverNudge } from './session-handoff.js';
 import { settleForTakeover, yieldToCloud, deviceId, deviceLabel } from './sync.js';
 
 export const PAUSE_MARK_KEY = 'propio_session_paused_v1';
@@ -134,14 +134,23 @@ export function createSessionSwitch({
   }
 
   // Ya con la app abierta: mira si alguien pidio el traspaso. `onBeforePause` apaga lo de la extension.
-  function watch({ startedAt, onBeforePause = () => {} }) {
+  // Con `userId`, ademas escucha el aviso de Realtime: solo adelanta la revision (poke); el pedido
+  // real se sigue leyendo de la nube, y la revision cada 5 s queda como respaldo si Realtime falla.
+  function watch({ startedAt, onBeforePause = () => {}, userId = null }) {
+    let nudge = null;
     const watcher = createTakeoverWatcher({
       getClient, deviceId: getDeviceId(), kind, startedAt, now,
       ...(setTimer ? { setTimer, clearTimer } : {}),
-      onTakeover: ({ late }) => { void pause({ late, onBeforePause }); },
+      onTakeover: ({ late }) => { if (nudge) nudge.stop(); void pause({ late, onBeforePause }); },
     });
+    if (userId) nudge = createTakeoverNudge({ getClient, userId, onNudge: () => watcher.poke() });
     watcher.start();
-    return watcher;
+    if (nudge) {
+      nudge.start();
+      try { if (typeof window !== 'undefined') window.addEventListener('pagehide', () => nudge.stop(), { once: true }); } catch { /* nada */ }
+    }
+    return { start: watcher.start, isRunning: watcher.isRunning, poke: watcher.poke,
+      stop() { watcher.stop(); if (nudge) nudge.stop(); } };
   }
 
   async function pause({ late, onBeforePause }) {
@@ -164,4 +173,4 @@ let singleton = null;
 function instance(getClient) { return singleton || (singleton = createSessionSwitch({ getClient })); }
 
 export function resolveSessionGate({ getClient, userId }) { return instance(getClient).gate(userId); }
-export function startSessionPause({ getClient, startedAt, onBeforePause }) { return instance(getClient).watch({ startedAt, onBeforePause }); }
+export function startSessionPause({ getClient, startedAt, onBeforePause, userId }) { return instance(getClient).watch({ startedAt, onBeforePause, userId }); }
