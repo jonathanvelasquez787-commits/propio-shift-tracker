@@ -10,6 +10,8 @@ export const WAIT_POLL_MS = 2000;
 export const WAIT_LIMIT_MS = 15000;
 export const LATE_SECONDS = 40;
 export const PEEK_TIMEOUT_MS = 3000;
+// Tope de cada pregunta a la nube mientras se espera el traspaso: si no contesta, se sigue sin ella.
+export const CALL_LIMIT_MS = 4000;
 const CLOCK_SLACK_MS = 2000;
 
 function limited(promise, ms, setTimer, clearTimer) {
@@ -50,19 +52,21 @@ export async function announcePresence({ getClient, deviceId, label, kind, rando
 // nadie confirmo el traspaso: esas notas eran de paginas que ya no estan. Si una de verdad seguia
 // viva, vuelve a dejar su nota en su siguiente latido.
 export async function dropNotes({ getClient, instances, timeoutMs = PEEK_TIMEOUT_MS, setTimer = setTimeout, clearTimer = clearTimeout }) {
-  let dropped = 0;
-  for (const instance of instances) {
+  // En paralelo: con varias notas muertas que no contestan, el total sigue siendo UN tope, no uno por nota.
+  const results = await Promise.all(instances.map(async (instance) => {
     try {
       const { error } = await limited(getClient().rpc('session_leave', { p_instance: instance }), timeoutMs, setTimer, clearTimer);
-      if (!error) dropped += 1;
-    } catch { /* mejor esfuerzo */ }
-  }
-  return dropped;
+      return !error;
+    } catch { return false; }
+  }));
+  return results.filter(Boolean).length;
 }
 
-export async function requestTakeover({ getClient, deviceId, label, kind }) {
+export async function requestTakeover({ getClient, deviceId, label, kind, timeoutMs = CALL_LIMIT_MS,
+  setTimer = setTimeout, clearTimer = clearTimeout }) {
   try {
-    const { error } = await getClient().rpc('session_takeover_request', { p_device_id: deviceId, p_label: label, p_kind: kind });
+    const { error } = await limited(getClient().rpc('session_takeover_request',
+      { p_device_id: deviceId, p_label: label, p_kind: kind }), timeoutMs, setTimer, clearTimer);
     return !error;
   } catch { return false; }
 }
@@ -74,9 +78,11 @@ export async function ackTakeover({ getClient }) {
   } catch { return false; }
 }
 
-async function readTakeover(getClient) {
+// Con tope de tiempo: si la nube no contesta se devuelve null (como si no hubiera pedido) y quien llama sigue.
+// Sin tope, una sola llamada colgada dejaba a la ventanita esperando para siempre y al revisor de la sesion abierta ocupado.
+async function readTakeover(getClient, { timeoutMs = CALL_LIMIT_MS, setTimer = setTimeout, clearTimer = clearTimeout } = {}) {
   try {
-    const { data, error } = await getClient().rpc('session_takeover_get');
+    const { data, error } = await limited(getClient().rpc('session_takeover_get'), timeoutMs, setTimer, clearTimer);
     if (error || !Array.isArray(data) || !data[0]) return null;
     const row = data[0];
     return { byDeviceId: String(row.by_device_id), byLabel: String(row.by_label), byKind: String(row.by_kind),
@@ -87,10 +93,10 @@ async function readTakeover(getClient) {
 // La sesion nueva espera a que la vieja confirme que ya subio su ultimo estado.
 // Devuelve 'acked' o, pasado el limite, 'timeout' (entonces abre con lo que haya en la nube).
 export async function waitForTakeoverAck({ getClient, deviceId, kind, sleep, now = Date.now,
-  limitMs = WAIT_LIMIT_MS, pollMs = WAIT_POLL_MS }) {
+  limitMs = WAIT_LIMIT_MS, pollMs = WAIT_POLL_MS, callLimitMs = CALL_LIMIT_MS }) {
   const startedAt = now();
   for (;;) {
-    const row = await readTakeover(getClient);
+    const row = await readTakeover(getClient, { timeoutMs: callLimitMs });
     if (row && row.acked && row.byDeviceId === deviceId && row.byKind === kind) return 'acked';
     if (now() - startedAt + pollMs > limitMs) return 'timeout';
     await sleep(pollMs);

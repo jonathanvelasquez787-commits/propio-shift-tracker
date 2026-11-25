@@ -112,6 +112,17 @@ test('yieldToCloud: otra cuenta no se toca y si la nube falla devuelve false', a
   assert.equal(await failing.run("yieldToCloud('u1')"), false);
 });
 
+test('yieldToCloud con permiso retirado: una descarga que llega tarde no cambia lo guardado', async () => {
+  const newer = withBase({ state: { a: 2 }, updated_at: '2026-11-24T11:00:00Z' });
+  const h = syncHarness({ cloud: newer });
+  h.run(`adoptCloud(${JSON.stringify(withBase())}, 'u1'); localStorage = window.localStorage; markDirty();`);
+  h.run("window.localStorage.setItem('propio_shift_tracker_state_es_v4', JSON.stringify({ a: 'cambio local' }));");
+  assert.equal(await h.run("yieldToCloud('u1', { canApply: () => false })"), false);
+  assert.equal(h.run('readMeta().dirty'), true);
+  assert.equal(h.run("listRecoveryCopies('u1').length"), 0);
+  assert.deepEqual(JSON.parse(h.values.get('propio_shift_tracker_state_es_v4')), { a: 'cambio local' });
+});
+
 // ---- session-switch.js: la puerta de arranque ----
 
 function fakeClient({ others = [], takeover = null, failAll = false } = {}) {
