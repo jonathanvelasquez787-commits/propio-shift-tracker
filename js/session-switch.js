@@ -15,6 +15,9 @@ import { getSessionNote } from './session-note.js';
 import { settleForTakeover, yieldToCloud, deviceId, deviceLabel } from './sync.js';
 
 export const PAUSE_MARK_KEY = 'propio_session_paused_v1';
+// Topes de tiempo de "Abrir aqui": pase lo que pase en la nube, la ventanita abre. Normalmente tarda ~3 s.
+export const TAKEOVER_TOTAL_LIMIT_MS = 20000;
+export const YIELD_LIMIT_MS = 5000;
 
 // Letra chica de la pregunta: de que sesion es la nota y hace cuanto dio señal (la mas reciente).
 export function describeOtherSession(others, otherKind) {
@@ -104,8 +107,17 @@ export function createSessionSwitch({
   leaveNote = async () => { const note = getSessionNote(); if (note) await note.stop(); }, dropOld = dropNotes,
   reload = () => window.location.reload(), closeWindow = () => { try { window.close(); } catch { /* nada */ } },
   sleep = ms => new Promise(resolve => setTimeout(resolve, ms)), now = Date.now,
-  setTimer, clearTimer,
+  setTimer, clearTimer, takeoverLimitMs = TAKEOVER_TOTAL_LIMIT_MS, yieldLimitMs = YIELD_LIMIT_MS,
 }) {
+  const startTimer = setTimer || ((fn, ms) => setTimeout(fn, ms));
+  const stopTimer = clearTimer || (id => clearTimeout(id));
+  // Espera `promise` como mucho `ms`. Si se acaba el tiempo (o falla) devuelve `fallback` y avisa con `onTimeout`.
+  function within(promise, ms, fallback, onTimeout = () => {}) {
+    return new Promise((resolve) => {
+      const id = startTimer(() => { try { onTimeout(); } catch { /* nada */ } resolve(fallback); }, ms);
+      Promise.resolve(promise).then((value) => { stopTimer(id); resolve(value); }, () => { stopTimer(id); resolve(fallback); });
+    });
+  }
   // Antes de montar la app. Devuelve 'open' (seguir con el arranque) o 'stay' (se queda la pantalla).
   async function gate(userId) {
     const mark = readMark();
@@ -117,9 +129,16 @@ export function createSessionSwitch({
       return 'stay';
     }
 
-    async function finish() {
+    async function finish(allowed = () => true) {
       // Esta pagina tenia datos viejos de cuando se pauso: se baja lo de la nube (lo sin subir queda en copias).
-      if (mark) { if (await yieldCloud(userId)) clearMark(); }
+      // Con tope: si la nube no contesta se abre igual (la marca queda para intentarlo otra vez) y una descarga
+      // tardia ya no puede cambiar nada.
+      if (mark) {
+        let expired = false;
+        const done = await within((async () => yieldCloud(userId, { canApply: () => !expired && allowed() }))(),
+          yieldLimitMs, false, () => { expired = true; });
+        if (done === true) clearMark();
+      }
       return 'open';
     }
 
@@ -127,15 +146,22 @@ export function createSessionSwitch({
 
     async function takeOver() {
       screens.waiting();
-      // Primero la nota de "estoy aqui", para que la otra sesion me vea al recargarse en pausa.
-      await announce({ getClient, deviceId: getDeviceId(), label: getLabel(), kind });
-      const asked = await requestTakeover({ getClient, deviceId: getDeviceId(), label: getLabel(), kind });
-      if (asked) {
-        const result = await waitForTakeoverAck({ getClient, deviceId: getDeviceId(), kind, sleep, now });
-        // Nadie confirmo: esas notas eran de paginas que ya no estan. Se borran para que no enganen despues.
-        if (result === 'timeout') await dropOld({ getClient, instances: others.map(row => row.instance) });
-      }
-      return finish();
+      let expired = false;
+      const steps = (async () => {
+        // Primero la nota de "estoy aqui", para que la otra sesion me vea al recargarse en pausa.
+        await announce({ getClient, deviceId: getDeviceId(), label: getLabel(), kind });
+        if (expired) return 'open';
+        const asked = await requestTakeover({ getClient, deviceId: getDeviceId(), label: getLabel(), kind });
+        if (asked && !expired) {
+          const result = await waitForTakeoverAck({ getClient, deviceId: getDeviceId(), kind, sleep, now });
+          // Nadie confirmo: esas notas eran de paginas que ya no estan. Se borran para que no enganen despues.
+          if (result === 'timeout' && !expired) await dropOld({ getClient, instances: others.map(row => row.instance) });
+        }
+        if (expired) return 'open';
+        return finish(() => !expired);
+      })();
+      // Tope total: si algun paso se cuelga, se abre igual. Lo que llegue tarde ya no hace nada.
+      return within(steps, takeoverLimitMs, 'open', () => { expired = true; });
     }
 
     if (mark && mark.resume) return takeOver();

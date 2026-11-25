@@ -988,10 +988,13 @@ export async function settleForTakeover({ push = true, waitMs = 8000 } = {}) {
 
 // Deja lo de este navegador igual a lo de la nube. Si habia cambios sin subir, adoptCloud
 // los guarda antes en copias recuperables. Devuelve false si no se pudo leer la nube.
-export async function yieldToCloud(userId) {
+// `canApply`: quien llama puede retirar el permiso (por ejemplo porque se agoto el tiempo y la app ya sigue
+// abriendo): una descarga que llega tarde NO debe cambiar lo guardado en medio del arranque.
+export async function yieldToCloud(userId, { canApply = () => true } = {}) {
   if (readMeta().userId !== userId) return true;
   try {
     const cloud = await fetchCloud(userId);
+    if (!canApply()) return false;
     if (cloud && !isEmptyCloud(cloud)) adoptCloud(cloud, userId);
     return true;
   } catch { return false; }
