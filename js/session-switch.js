@@ -10,7 +10,8 @@
 //  - Una sesion en pausa no sube nada, no contesta "lista" a la extension y no tiene la app corriendo.
 //  - Lo que la sesion pausada no alcanzo a subir queda en copias recuperables, nunca se pierde ni pisa la nube.
 import { translateText } from './i18n.js';
-import { findOtherSessions, announcePresence, requestTakeover, ackTakeover, waitForTakeoverAck, createTakeoverWatcher, createTakeoverNudge } from './session-handoff.js';
+import { findOtherSessions, announcePresence, dropNotes, requestTakeover, ackTakeover, waitForTakeoverAck, createTakeoverWatcher, createTakeoverNudge } from './session-handoff.js';
+import { getSessionNote } from './session-note.js';
 import { settleForTakeover, yieldToCloud, deviceId, deviceLabel } from './sync.js';
 
 export const PAUSE_MARK_KEY = 'propio_session_paused_v1';
@@ -89,6 +90,7 @@ export function createSessionSwitch({
   getClient, getDeviceId = deviceId, getLabel = deviceLabel, kind = currentSessionKind(),
   readMark = readPauseMark, writeMark = writePauseMark, clearMark = clearPauseMark,
   screens = createGateScreens(), settle = settleForTakeover, yieldCloud = yieldToCloud, announce = announcePresence,
+  leaveNote = async () => { const note = getSessionNote(); if (note) await note.stop(); }, dropOld = dropNotes,
   reload = () => window.location.reload(), closeWindow = () => { try { window.close(); } catch { /* nada */ } },
   sleep = ms => new Promise(resolve => setTimeout(resolve, ms)), now = Date.now,
   setTimer, clearTimer,
@@ -117,7 +119,11 @@ export function createSessionSwitch({
       // Primero la nota de "estoy aqui", para que la otra sesion me vea al recargarse en pausa.
       await announce({ getClient, deviceId: getDeviceId(), label: getLabel(), kind });
       const asked = await requestTakeover({ getClient, deviceId: getDeviceId(), label: getLabel(), kind });
-      if (asked) await waitForTakeoverAck({ getClient, deviceId: getDeviceId(), kind, sleep, now });
+      if (asked) {
+        const result = await waitForTakeoverAck({ getClient, deviceId: getDeviceId(), kind, sleep, now });
+        // Nadie confirmo: esas notas eran de paginas que ya no estan. Se borran para que no enganen despues.
+        if (result === 'timeout') await dropOld({ getClient, instances: others.map(row => row.instance) });
+      }
       return finish();
     }
 
@@ -164,6 +170,8 @@ export function createSessionSwitch({
       saved = result.saved === true;
       if (!late && saved) await ackTakeover({ getClient });
     } catch { saved = false; }
+    // Borrar la nota ANTES de recargar: al recargarse la pagina el mensaje de salida casi nunca llega.
+    try { await Promise.race([Promise.resolve(leaveNote()).catch(() => {}), sleep(2500)]); } catch { /* seguir */ }
     writeMark({ saved, resume: false });
     reload();
   }
