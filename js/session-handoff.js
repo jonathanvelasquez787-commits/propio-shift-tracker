@@ -34,6 +34,18 @@ export async function findOtherSessions({ getClient, instance = null, deviceId, 
   } catch { return { ok: false, others: [] }; }
 }
 
+// Deja una nota de "estoy aqui" ANTES de pedir el traspaso. La pagina que va a abrir todavia no
+// tiene la app montada (su nota normal sale despues), y sin esto la otra sesion, al recargarse en
+// pausa, no ve a nadie y se abre sola. Nunca lanza error: si falla, el traspaso sigue igual.
+export async function announcePresence({ getClient, deviceId, label, kind, randomId = () => globalThis.crypto.randomUUID(),
+  timeoutMs = PEEK_TIMEOUT_MS, setTimer = setTimeout, clearTimer = clearTimeout }) {
+  try {
+    const { error } = await limited(getClient().rpc('session_heartbeat',
+      { p_instance: randomId(), p_device_id: deviceId, p_label: label, p_kind: kind }), timeoutMs, setTimer, clearTimer);
+    return !error;
+  } catch { return false; }
+}
+
 export async function requestTakeover({ getClient, deviceId, label, kind }) {
   try {
     const { error } = await getClient().rpc('session_takeover_request', { p_device_id: deviceId, p_label: label, p_kind: kind });

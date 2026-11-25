@@ -10,7 +10,7 @@
 //  - Una sesion en pausa no sube nada, no contesta "lista" a la extension y no tiene la app corriendo.
 //  - Lo que la sesion pausada no alcanzo a subir queda en copias recuperables, nunca se pierde ni pisa la nube.
 import { translateText } from './i18n.js';
-import { findOtherSessions, requestTakeover, ackTakeover, waitForTakeoverAck, createTakeoverWatcher, createTakeoverNudge } from './session-handoff.js';
+import { findOtherSessions, announcePresence, requestTakeover, ackTakeover, waitForTakeoverAck, createTakeoverWatcher, createTakeoverNudge } from './session-handoff.js';
 import { settleForTakeover, yieldToCloud, deviceId, deviceLabel } from './sync.js';
 
 export const PAUSE_MARK_KEY = 'propio_session_paused_v1';
@@ -88,7 +88,7 @@ export function createGateScreens({ body = () => document.getElementById('bootGa
 export function createSessionSwitch({
   getClient, getDeviceId = deviceId, getLabel = deviceLabel, kind = currentSessionKind(),
   readMark = readPauseMark, writeMark = writePauseMark, clearMark = clearPauseMark,
-  screens = createGateScreens(), settle = settleForTakeover, yieldCloud = yieldToCloud,
+  screens = createGateScreens(), settle = settleForTakeover, yieldCloud = yieldToCloud, announce = announcePresence,
   reload = () => window.location.reload(), closeWindow = () => { try { window.close(); } catch { /* nada */ } },
   sleep = ms => new Promise(resolve => setTimeout(resolve, ms)), now = Date.now,
   setTimer, clearTimer,
@@ -114,6 +114,8 @@ export function createSessionSwitch({
 
     async function takeOver() {
       screens.waiting();
+      // Primero la nota de "estoy aqui", para que la otra sesion me vea al recargarse en pausa.
+      await announce({ getClient, deviceId: getDeviceId(), label: getLabel(), kind });
       const asked = await requestTakeover({ getClient, deviceId: getDeviceId(), label: getLabel(), kind });
       if (asked) await waitForTakeoverAck({ getClient, deviceId: getDeviceId(), kind, sleep, now });
       return finish();
