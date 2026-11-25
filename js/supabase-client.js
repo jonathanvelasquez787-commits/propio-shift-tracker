@@ -27,6 +27,9 @@ export function getSupabase() {
         detectSessionInUrl: true,
         flowType: 'pkce',
       },
+      // El latido de Realtime corre en un Web Worker: asi Chrome no lo frena en una pestaña oculta
+      // y el aviso de traspaso de sesion llega aunque la pagina este de fondo.
+      realtime: { worker: true },
     });
   }
   return client;

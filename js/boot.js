@@ -845,7 +845,7 @@ async function boot() {
   // nota; no muestra ni cambia nada (parte 1 de "una sola sesion a la vez").
   startSessionNote({ getClient: getSupabase, getDeviceId: deviceId, getLabel: deviceLabel });
   // Si otra sesion pide el traspaso: sube lo ultimo, avisa y esta pagina queda en pausa.
-  startSessionPause({ getClient: getSupabase, startedAt: pageOpenedAt, onBeforePause: () => stopPropioBridge() });
+  startSessionPause({ getClient: getSupabase, startedAt: pageOpenedAt, onBeforePause: () => stopPropioBridge(), userId });
 
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('pst-propio-bridge/v1:' + userId));
   const accountScope = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('');
