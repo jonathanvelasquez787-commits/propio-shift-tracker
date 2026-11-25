@@ -2477,5 +2477,7 @@
   "s_ffa6623d": "The export could not load. Your data is preserved; you can retry.",
   "s_ffbe3299": "Bonus attributed to this window",
   "s_ffe786bf": "Goal ($)",
-  "s_fff1384d": "Settings → \"Delete my account\" removes your account and active data. Historical encrypted copies are removed by the rotation described above. \"Delete all data\" clears only this browser."
+  "s_fff1384d": "Settings → \"Delete my account\" removes your account and active data. Historical encrypted copies are removed by the rotation described above. \"Delete all data\" clears only this browser.",
+  "s_22cc3774": "Last signal from that session: {{v0}} ago.",
+  "s_d45df09e": "Last signal from that session ({{v0}}): {{v1}} ago."
 }

@@ -644,6 +644,30 @@ function flushOnExit() {
   }
 }
 
+// Borra mi nota de sesion al cerrar o recargar la pagina. Una llamada normal (`client.rpc`) casi nunca
+// llega porque la pagina ya se esta yendo; con `keepalive` el navegador termina el envio solo.
+// Mejor esfuerzo: nunca lanza error y devuelve true solo si se alcanzo a mandar.
+export function sendSessionLeaveOnExit(instance) {
+  if (!instance) return false;
+  const token = currentAccessToken();
+  if (!token) return false;
+  try {
+    fetch(`${SUPABASE_URL}/rest/v1/rpc/session_leave`, {
+      method: 'POST',
+      keepalive: true,
+      headers: {
+        'Content-Type': 'application/json',
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ p_instance: instance }),
+    }).catch(() => {});
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 let cachedToken = null;
 export function setAccessToken(token, userId) {
   cachedToken = token || null;
