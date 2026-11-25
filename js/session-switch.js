@@ -18,6 +18,11 @@ export const PAUSE_MARK_KEY = 'propio_session_paused_v1';
 // Topes de tiempo de "Abrir aqui": pase lo que pase en la nube, la ventanita abre. Normalmente tarda ~3 s.
 export const TAKEOVER_TOTAL_LIMIT_MS = 20000;
 export const YIELD_LIMIT_MS = 5000;
+// Una sesion viva renueva su nota cada 10 s. Si la mas reciente tiene mas de STALE_NOTE_SECONDS, nadie esta
+// contestando alli (pagina cerrada sin avisar, pestana dormida): preguntarle a la persona no sirve de nada.
+// Se pide el traspaso sola y se espera poco (STALE_WAIT_MS) la confirmacion de una sesion dormida que despierte.
+export const STALE_NOTE_SECONDS = 20;
+export const STALE_WAIT_MS = 6000;
 
 // Letra chica de la pregunta: de que sesion es la nota y hace cuanto dio señal (la mas reciente).
 export function describeOtherSession(others, otherKind) {
@@ -144,7 +149,7 @@ export function createSessionSwitch({
 
     if (!others.length) return finish();
 
-    async function takeOver() {
+    async function takeOver({ waitMs } = {}) {
       screens.waiting();
       let expired = false;
       const steps = (async () => {
@@ -153,7 +158,8 @@ export function createSessionSwitch({
         if (expired) return 'open';
         const asked = await requestTakeover({ getClient, deviceId: getDeviceId(), label: getLabel(), kind });
         if (asked && !expired) {
-          const result = await waitForTakeoverAck({ getClient, deviceId: getDeviceId(), kind, sleep, now });
+          const result = await waitForTakeoverAck({ getClient, deviceId: getDeviceId(), kind, sleep, now,
+            ...(waitMs ? { limitMs: waitMs } : {}) });
           // Nadie confirmo: esas notas eran de paginas que ya no estan. Se borran para que no enganen despues.
           if (result === 'timeout' && !expired) await dropOld({ getClient, instances: others.map(row => row.instance) });
         }
@@ -165,6 +171,9 @@ export function createSessionSwitch({
     }
 
     if (mark && mark.resume) return takeOver();
+
+    // Todas las notas son viejas: no hay nadie vivo a quien avisar. Sin pregunta falsa.
+    if (Math.min(...others.map(row => row.ageSeconds)) > STALE_NOTE_SECONDS) return takeOver({ waitMs: STALE_WAIT_MS });
 
     const otherKind = others.some(row => row.kind === 'web') ? 'web' : 'extension';
     const detail = describeOtherSession(others, otherKind);
