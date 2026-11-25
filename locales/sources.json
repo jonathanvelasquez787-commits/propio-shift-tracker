@@ -1925,6 +1925,12 @@
       "js/call-table-view.js"
     ]
   },
+  "s_22cc3774": {
+    "source": "Última señal de esa sesión: hace {{v0}}.",
+    "files": [
+      "js/session-switch.js"
+    ]
+  },
   "s_22f071d7": {
     "source": "Pegar llamadas desde otra fuente",
     "files": [
@@ -12112,6 +12118,12 @@
     "source": "Saltar al contenido",
     "files": [
       "app.html"
+    ]
+  },
+  "s_d45df09e": {
+    "source": "Última señal de esa sesión ({{v0}}): hace {{v1}}.",
+    "files": [
+      "js/session-switch.js"
     ]
   },
   "s_d47fc576": {

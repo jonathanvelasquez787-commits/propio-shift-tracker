@@ -9,12 +9,22 @@
 //  - NUNCA se cierra la sesion de la cuenta (podria tumbar al worker de la extension).
 //  - Una sesion en pausa no sube nada, no contesta "lista" a la extension y no tiene la app corriendo.
 //  - Lo que la sesion pausada no alcanzo a subir queda en copias recuperables, nunca se pierde ni pisa la nube.
-import { translateText } from './i18n.js';
+import { translateText, ui } from './i18n.js';
 import { findOtherSessions, announcePresence, dropNotes, requestTakeover, ackTakeover, waitForTakeoverAck, createTakeoverWatcher, createTakeoverNudge } from './session-handoff.js';
 import { getSessionNote } from './session-note.js';
 import { settleForTakeover, yieldToCloud, deviceId, deviceLabel } from './sync.js';
 
 export const PAUSE_MARK_KEY = 'propio_session_paused_v1';
+
+// Letra chica de la pregunta: de que sesion es la nota y hace cuanto dio señal (la mas reciente).
+export function describeOtherSession(others, otherKind) {
+  const row = others.filter(r => r.kind === otherKind).sort((a, b) => a.ageSeconds - b.ageSeconds)[0];
+  if (!row) return '';
+  const seconds = Math.max(0, Math.round(row.ageSeconds));
+  const when = seconds < 60 ? `${seconds} s` : `${Math.round(seconds / 60)} min`;
+  const label = String(row.label || '').trim().slice(0, 40);
+  return label ? ui`Última señal de esa sesión (${label}): hace ${when}.` : ui`Última señal de esa sesión: hace ${when}.`;
+}
 
 export function currentSessionKind() {
   return typeof location !== 'undefined' && location.protocol === 'chrome-extension:' ? 'extension' : 'web';
@@ -44,7 +54,7 @@ export function clearPauseMark(storage = globalThis.localStorage) {
 export function createGateScreens({ body = () => document.getElementById('bootGateBody') } = {}) {
   const put = (html) => { const el = body(); if (el) el.innerHTML = html; return el; };
   const listen = (id, handler) => { const el = document.getElementById(id); if (el) el.addEventListener('click', handler); };
-  function prompt({ otherKind, onHere, onCancel, cancelled = false }) {
+  function prompt({ otherKind, onHere, onCancel, cancelled = false, detail = '' }) {
     const text = cancelled
       ? translateText('Propio sigue abierto en la otra sesión. Aquí no se abrirá hasta que toques Abrir aquí.')
       : otherKind === 'web'
@@ -55,6 +65,7 @@ export function createGateScreens({ body = () => document.getElementById('bootGa
     <div class="boot-card" id="sessionSwitchCard" data-state="${cancelled ? 'cancelled' : 'prompt'}">
       <div class="boot-card-title">${escapeHtml(title)}</div>
       <p class="boot-card-text">${escapeHtml(text)}</p>
+      ${detail && !cancelled ? `<p class="boot-card-hint" id="sessionSwitchDetail">${escapeHtml(detail)}</p>` : ''}
       <div class="boot-card-actions">
         <button class="mc-btn-primary cyan" id="sessionSwitchHere" type="button">${escapeHtml(translateText('Abrir aquí'))}</button>
         ${cancelled ? '' : `<button class="boot-btn-quiet" id="sessionSwitchCancel" type="button">${escapeHtml(translateText('Cancelar'))}</button>`}
@@ -130,6 +141,7 @@ export function createSessionSwitch({
     if (mark && mark.resume) return takeOver();
 
     const otherKind = others.some(row => row.kind === 'web') ? 'web' : 'extension';
+    const detail = describeOtherSession(others, otherKind);
     return new Promise((resolve) => {
       let busy = false;
       const here = () => { if (busy) return; busy = true; resolve(takeOver()); };
@@ -137,7 +149,7 @@ export function createSessionSwitch({
         screens.prompt({ otherKind, onHere: here, cancelled: true });
         if (kind === 'extension') closeWindow();
       };
-      screens.prompt({ otherKind, onHere: here, onCancel: cancel });
+      screens.prompt({ otherKind, onHere: here, onCancel: cancel, detail });
     });
   }
 
