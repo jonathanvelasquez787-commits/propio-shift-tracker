@@ -12,6 +12,9 @@ function momentLabel(value, now) {
     ...(date.toDateString() === today.toDateString() ? {} : { month:'short', day:'numeric' }) });
 }
 
+// Las horas "p.m." ya terminan en punto: al cerrar la frase con otro punto salia "p.m..".
+const withoutFinalDot = text => text.replace(/\.$/, '');
+
 function pauseDescription(snapshot, now) {
   if (snapshot.devicePassive || snapshot.coordinationConfirmed === false) return translateText('Esta PC registra llamadas y conserva tus opciones, pero no pulsa Start Calls ni Stop Calls ni termina pausas automáticamente.');
   const type = snapshot.pauseType === 'break' ? 'Break' : snapshot.pauseType === 'lunch' ? 'Lunch' : null;
@@ -106,13 +109,14 @@ export function installAutomationStatusUi({ host = window, document = host.docum
     let work;
     try { work = getWorkSession(); } catch { work = null; }
     const at = momentLabel(work?.startedAt, now()), end = momentLabel(work?.endedAt, now());
+    const atDot = withoutFinalDot(at), endDot = withoutFinalDot(end);
     const workText = !at ? '' : end && Date.parse(work.endedAt) < Date.parse(work.startedAt)
       ? translateText('Esta sesión se cerró antes del comienzo laboral; no sumó tiempo de trabajo.')
-      : Date.parse(work.startedAt) > now() ? ui`Inicio laboral previsto: ${at}. La conexión anterior no suma ACW ni tiempo de trabajo.`
-      : work.manual ? ui`Inicio laboral manual: ${at}.`
+      : Date.parse(work.startedAt) > now() ? ui`Inicio laboral previsto: ${atDot}. La conexión anterior no suma ACW ni tiempo de trabajo.`
+      : work.manual ? ui`Inicio laboral manual: ${atDot}.`
       : work.callAtStart && recent && snapshot.startAt && Date.parse(work.startedAt) < Date.parse(snapshot.startAt)
-        ? ui`Inicio laboral: ${at}; se registró una llamada antes del horario.` : ui`Inicio laboral: ${at}.`;
-    setText('automationWorkCheck', workText + (end && Date.parse(work.endedAt) >= Date.parse(work.startedAt) ? ui` Cierre de sesión: ${end}.` : ''));
+        ? ui`Inicio laboral: ${at}; se registró una llamada antes del horario.` : ui`Inicio laboral: ${atDot}.`;
+    setText('automationWorkCheck', workText + (end && Date.parse(work.endedAt) >= Date.parse(work.startedAt) ? ui` Cierre de sesión: ${endDot}.` : ''));
   }
   const timer = host.setInterval(render, 1000);
   const observer = new host.MutationObserver(render);

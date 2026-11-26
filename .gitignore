@@ -37,3 +37,6 @@ tests/screenshots/
 /*.pdb
 /*.log
 /js/locales.generated.js
+
+# Pruebas de Chromium de sesiones (python)
+scripts/e2e-sesion/__pycache__/
