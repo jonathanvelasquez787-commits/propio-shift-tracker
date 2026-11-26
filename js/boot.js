@@ -837,13 +837,21 @@ async function boot() {
   setBootMessage(translateText('Abriendo tu turno…'));
   startAutoSync();
 
+  // Nota de sesion: deja en la nube "hay una sesion abierta aqui" y la renueva. Solo escribe la
+  // nota; no muestra ni cambia nada (parte 1 de "una sola sesion a la vez"). Se deja ANTES de montar
+  // la app (que tarda unos segundos): si la ventanita se abre justo en ese rato, ya ve esta sesion.
+  const sessionNote = startSessionNote({ getClient: getSupabase, getDeviceId: deviceId, getLabel: deviceLabel });
+
   // En apertura rápida lo que la app guarda sola al armarse no cuenta como cambio del usuario.
-  const mounted = fastOpen ? await withoutDirtyMarking(() => mountApp(userId)) : await mountApp(userId);
+  let mounted = false;
+  try {
+    mounted = fastOpen ? await withoutDirtyMarking(() => mountApp(userId)) : await mountApp(userId);
+  } finally {
+    // Si la app no llego a abrir, esta pagina no es una sesion viva: su nota se borra (no deja una nota fantasma).
+    if (!mounted || bridgeUserId !== userId) { try { void sessionNote.stop(); } catch { /* nada */ } }
+  }
   if (!mounted || bridgeUserId !== userId) return;
 
-  // Nota de sesion: deja en la nube "hay una sesion abierta aqui" y la renueva. Solo escribe la
-  // nota; no muestra ni cambia nada (parte 1 de "una sola sesion a la vez").
-  startSessionNote({ getClient: getSupabase, getDeviceId: deviceId, getLabel: deviceLabel });
   // Si otra sesion pide el traspaso: sube lo ultimo, avisa y esta pagina queda en pausa.
   startSessionPause({ getClient: getSupabase, startedAt: pageOpenedAt, onBeforePause: () => stopPropioBridge(), userId });
 

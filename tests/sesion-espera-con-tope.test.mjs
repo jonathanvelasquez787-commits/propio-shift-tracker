@@ -1,5 +1,5 @@
 import { createSessionSwitch } from '../js/session-switch.js';
-import { requestTakeover, waitForTakeoverAck, createTakeoverWatcher, dropNotes } from '../js/session-handoff.js';
+import { requestTakeover, waitForTakeoverAck, createTakeoverWatcher, dropNotes, ackTakeover } from '../js/session-handoff.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -110,4 +110,26 @@ test('borrar notas muertas: varias sin contestar cuestan UN tope, no uno por not
   const count = await dropNotes({ getClient: () => ({ rpc: never }), instances: ['A', 'B', 'C', 'D', 'E'], timeoutMs: 60 });
   assert.equal(count, 0);
   assert.ok(Date.now() - started < 250, 'en paralelo: ~60 ms y no ~300 ms');
+});
+
+test('avisar que ya guardo: si la nube no contesta devuelve false rapido en vez de quedarse esperando', async () => {
+  const started = Date.now();
+  assert.equal(await ackTakeover({ getClient: () => ({ rpc: never }), timeoutMs: 30 }), false);
+  assert.ok(Date.now() - started < 1000);
+  assert.equal(await ackTakeover({ getClient: () => ({ rpc: async () => ({ data: null, error: null }) }) }), true);
+});
+
+test('la sesion que se pausa con el aviso colgado igual borra su nota, deja la marca y se recarga', async () => {
+  const log = []; let mark = null;
+  const sw = createSessionSwitch({
+    getClient: () => ({ rpc: (name) => (name === 'session_takeover_ack' ? never() : Promise.resolve({ data: null, error: null })) }),
+    getDeviceId: () => 'WEB', getLabel: () => 'x', kind: 'web', readMark: () => null, writeMark: (m) => { mark = m; return true; }, clearMark: () => {},
+    screens: { prompt: () => {}, waiting: () => {}, paused: () => {} }, settle: async () => ({ saved: true }),
+    leaveNote: async () => { log.push('nota-borrada'); }, reload: () => log.push('recarga'), yieldCloud: async () => true,
+  });
+  const started = Date.now();
+  await sw.pause({ late: false, onBeforePause: () => log.push('apaga') });
+  assert.deepEqual(log, ['apaga', 'nota-borrada', 'recarga']);
+  assert.deepEqual(mark, { saved: true, resume: false });
+  assert.ok(Date.now() - started < 9000, 'tardo ' + (Date.now() - started) + ' ms: tope de 4 s, no para siempre');
 });

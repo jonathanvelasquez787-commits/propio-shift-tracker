@@ -88,13 +88,18 @@ test('la nota NUNCA cierra sesion, no escribe en el almacenamiento y el worker n
   assert.doesNotMatch(read('js/sync.js'), /session-note|session_heartbeat/);
 });
 
-test('boot.js arranca la nota solo despues de montar la app, con el cliente y el id del dispositivo', () => {
+test('boot.js arranca la nota despues de la puerta y justo ANTES de montar la app, y la apaga si la app no abre', () => {
   const boot = read('js/boot.js');
   assert.match(boot, /import \{ startSessionNote \} from '\.\/session-note\.js';/);
-  const mountAt = boot.indexOf('if (!mounted || bridgeUserId !== userId) return;');
+  const gateAt = boot.indexOf('resolveSessionGate(');
   const noteAt = boot.indexOf('startSessionNote({ getClient: getSupabase, getDeviceId: deviceId, getLabel: deviceLabel });');
-  assert.ok(mountAt > 0 && noteAt > mountAt);
+  const mountCallAt = boot.indexOf('await mountApp(userId)');
+  const abortAt = boot.indexOf('if (!mounted || bridgeUserId !== userId) return;');
+  assert.ok(gateAt > 0 && noteAt > gateAt, 'despues de la puerta (si la puerta deja la pagina en pausa NO hay nota)');
+  assert.ok(noteAt < mountCallAt && mountCallAt < abortAt, 'antes de montar la app');
   assert.equal(boot.split('startSessionNote(').length - 1, 1);
+  const between = boot.slice(noteAt, abortAt);
+  assert.match(between, /finally \{[^}]*sessionNote\.stop\(\)/, 'si la app no abre, la nota se apaga');
 });
 
 test('la migracion deja la tabla cerrada y las funciones solo para cuentas iniciadas', () => {

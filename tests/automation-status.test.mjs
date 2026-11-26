@@ -169,6 +169,16 @@ test('pause explanations distinguish manual return, timed close, missing duratio
  assert.doesNotMatch(x.nodes.automationDetail.textContent,/intentará cerrar/);x.view.stop();
 });
 
+test('work start text does not double the final period of an a.m./p.m. hour',()=>{
+ const x=uiFixture(),snapshot={...createAutomationStatus(state(),now),connectionAt:iso(now-1200000),startAt:iso(now+600000),reason:'before-shift'};
+ for(const work of [{startedAt:iso(now+600000),endedAt:null,manual:false},{startedAt:iso(now-60000),endedAt:null,manual:true},{startedAt:iso(now-60000),endedAt:null,manual:false},{startedAt:iso(now-600000),endedAt:iso(now-1),manual:false}]){
+  x.setWork(work);x.view.update(snapshot);
+  assert.doesNotMatch(x.nodes.automationWorkCheck.textContent,/\.\./,x.nodes.automationWorkCheck.textContent);
+ }
+ x.setWork({startedAt:iso(now-60000),endedAt:null,manual:false});x.view.update(snapshot);
+ assert.match(x.nodes.automationWorkCheck.textContent,/^Inicio laboral: .+\.$/);x.view.stop();
+});
+
 test('work start stays separate from observed connection and handles early calls, manual work and closed sessions',()=>{
  const x=uiFixture(),snapshot={...createAutomationStatus(state(),now),connectionAt:iso(now-1200000),startAt:iso(now+600000),reason:'before-shift'};
  x.setWork({startedAt:iso(now+600000),endedAt:null,manual:false});x.view.update(snapshot);

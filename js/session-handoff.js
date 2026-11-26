@@ -71,9 +71,11 @@ export async function requestTakeover({ getClient, deviceId, label, kind, timeou
   } catch { return false; }
 }
 
-export async function ackTakeover({ getClient }) {
+// Con tope de tiempo: la sesion que se pausa avisa "ya guarde", pero si la nube no contesta NO se queda
+// esperando (antes una llamada colgada aqui dejaba a la web sin pausarse ni recargarse).
+export async function ackTakeover({ getClient, timeoutMs = CALL_LIMIT_MS, setTimer = setTimeout, clearTimer = clearTimeout }) {
   try {
-    const { error } = await getClient().rpc('session_takeover_ack');
+    const { error } = await limited(getClient().rpc('session_takeover_ack'), timeoutMs, setTimer, clearTimer);
     return !error;
   } catch { return false; }
 }
