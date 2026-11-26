@@ -19,3 +19,5 @@ Variables: `LAT` = segundos de latencia por llamada de la nube HTTPS falsa (real
 | scen8 | La nube deja de contestar el traspaso (`HANG=get`: ~18 s; `HANG=both`: ~6 s) | la ventanita abre; con el codigo viejo (<=2.8.68) NUNCA |
 | scen9 | Cierra la pestaña de la web de verdad con latencia (`LAT=0.6`) | notas de web = 0 y sin pregunta falsa |
 | scen10 | Mide cuando la web deja su nota respecto a "app lista" | la nota sale antes (o junto) de "app lista" |
+| scen11 | La nube NO contesta el aviso "ya guarde" (`session_takeover_ack`) al pausarse la web | la web borra su nota (~8 s), se pausa (~9 s) y la ventanita abre (~14 s); con <=2.8.70 la web NUNCA se pausaba |
+| scen12 | La app de la web NO logra montarse (se bloquea `assets/app-main.js`) | la nota de la web aparece y se borra enseguida (no queda una nota viva de una pagina rota) |
