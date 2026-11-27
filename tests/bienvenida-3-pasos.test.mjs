@@ -69,7 +69,6 @@ test('"Otro": la salida estira el ultimo bloque y la meta se reparte en los bloq
   assert.equal(blocks.filter(b => b.type === 'work').reduce((sum, b) => sum + b.goalMin, 0), 390);
   const longer = copy(h.buildOnboardingBlocks(baseBlocks, '07:00', '16:00', 360));
   assert.equal(longer[6].dur, 125);
-  assert.equal(h.buildOnboardingBlocks(baseBlocks, '07:00', '13:00', 360), null);
 });
 
 test('guardar y empezar escribe cada valor con las claves de siempre y no toca el tema', () => {
@@ -159,4 +158,33 @@ test('una paleta solo oscura con el sistema en claro pasa el tema a oscuro; una 
   vm.runInContext("onboardingChoice.palette = 'graphite';", dark);
   dark.finishOnboarding();
   assert.equal(dark.settings.theme, 'auto');
+});
+
+test('cualquier horario se acepta en el primer inicio: uno corto deja los bloques que caben y llega a la salida', () => {
+  const h = context({ weeklySchedule: { mon: { off: false, start: '07:00', end: '15:00', blocks: copy(baseBlocks) } } });
+  const short = copy(h.buildOnboardingBlocks(baseBlocks, '07:00', '12:00', 240));
+  assert.deepEqual(short.map(b => b.type), ['work', 'break', 'work']);
+  assert.equal(short[2].start, '09:30');
+  assert.equal(short[2].dur, 150);
+  assert.equal(short[2].start.split(':').reduce((a, b) => a * 60 + Number(b)) + short[2].dur, 12 * 60);
+  const goals = short.filter(b => b.type === 'work').map(b => b.goalMin);
+  assert.equal(goals.reduce((a, b) => a + b, 0), 240);
+  short.filter(b => b.type === 'work').forEach(b => assert.ok(b.goalMin <= b.dur));
+  const tiny = copy(h.buildOnboardingBlocks(baseBlocks, '07:00', '07:10', 240));
+  assert.deepEqual(tiny, [{ type: 'work', start: '07:00', dur: 10, goalMin: 10 }]);
+  const hour = copy(h.buildOnboardingBlocks(baseBlocks, '08:00', '09:00', 360));
+  assert.deepEqual(hour, [{ type: 'work', start: '08:00', dur: 60, goalMin: 60 }]);
+});
+
+test('el paso Tu turno ya no muestra "muy corto para tus bloques" y deja pasar 07:00-12:00', () => {
+  assert.ok(!settingsSource.includes('muy corto para tus bloques'));
+  const settings = { theme: 'auto', language: 'es', weeklySchedule: { mon: { off: false, start: '07:00', end: '15:00', blocks: copy(baseBlocks) } } };
+  const h = context(settings, { obGoalInput: { value: '240' }, obEndInput: { value: '12:00' } });
+  vm.runInContext("onboardingChoice.goal = 'other'; onboardingChoice.hours = 'other';", h);
+  assert.equal(h.finishOnboarding(), undefined);
+  assert.equal(h.settings.shiftEnd, '12:00');
+  assert.equal(h.settings.productiveGoalMin, 240);
+  assert.equal(h.settings.onboarded, true);
+  assert.equal(h.settings.weeklySchedule.mon.end, '12:00');
+  assert.equal(h.settings.weeklySchedule.mon.blocks.length, 3);
 });
