@@ -336,18 +336,30 @@ let syncingGoals = false;
     }
 
     // Corre los bloques del horario de siempre a la nueva entrada y estira o acorta el ultimo
-    // bloque para llegar a la salida. Devuelve null si el horario no cabe.
+    // bloque para llegar a la salida. Si el horario es mas corto que los bloques de siempre, se
+    // quedan los bloques que caben y el ultimo de Trabajo llega hasta la salida: en el primer
+    // inicio se acepta cualquier horario. Solo devuelve null si no hay bloques base.
     export function buildOnboardingBlocks(baseBlocks, start, end, goalMin) {
+      if (!Array.isArray(baseBlocks) || !baseBlocks.length) return null;
       const delta = hhmmToMin(start) - hhmmToMin(baseBlocks[0].start);
-      const blocks = baseBlocks.map(block => ({ ...block, start: minToHHMM(hhmmToMin(block.start) + delta) }));
+      let blocks = baseBlocks.map(block => ({ ...block, start: minToHHMM(hhmmToMin(block.start) + delta) }));
+      const endMin = hhmmToMin(end);
+      let fits = true;
+      if (!(endMin - hhmmToMin(blocks[blocks.length - 1].start) >= 15)) {
+        fits = false;
+        blocks = blocks.filter(block => hhmmToMin(block.start) <= endMin - 15);
+        while (blocks.length && blocks[blocks.length - 1].type !== 'work') blocks.pop();
+        if (!blocks.length) blocks = [{ type: 'work', start, dur: 0 }];
+      }
       const last = blocks[blocks.length - 1];
-      last.dur = hhmmToMin(end) - hhmmToMin(last.start);
-      if (!(last.dur >= 15)) return null;
+      last.dur = endMin - hhmmToMin(last.start);
       const work = blocks.filter(block => block.type === 'work');
       const total = work.reduce((sum, block) => sum + block.dur, 0);
       let left = goalMin;
       work.forEach((block, index) => {
-        const part = index === work.length - 1 ? left : Math.min(left, Math.round(goalMin * block.dur / total));
+        const share = index === work.length - 1 ? left : Math.min(left, Math.round(goalMin * block.dur / total));
+        // La meta de un bloque no puede ser mayor que su duracion (lo exige el editor de Horario).
+        const part = fits ? share : Math.min(share, block.dur);
         block.goalMin = part;
         left -= part;
       });
@@ -494,8 +506,6 @@ let syncingGoals = false;
       if (!/^\d{2}:\d{2}$/.test(start) || !/^\d{2}:\d{2}$/.test(end) || hhmmToMin(end) <= hhmmToMin(start)) {
         onboardingError('Escribe una entrada y una salida, y la salida debe ser después de la entrada.'); return false;
       }
-      const base = (settings.weeklySchedule?.mon?.blocks || []);
-      if (base.length && !buildOnboardingBlocks(base, start, end, goal)) { onboardingError('Ese horario es muy corto para tus bloques. Cambia la entrada o la salida.'); return false; }
       onboardingError('');
       return true;
     }
