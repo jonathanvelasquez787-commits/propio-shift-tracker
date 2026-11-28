@@ -2818,7 +2818,9 @@
             "si solo se borro el perfil, la bienvenida conserva el horario y la meta que ya habia",
             "estilos de la bienvenida: llaves balanceadas y sin colores fijos",
             "elegir una paleta la muestra al momento y no guarda nada todavia",
-            "una paleta solo oscura con el sistema en claro pasa el tema a oscuro; una que tiene los dos no toca el tema"
+            "una paleta solo oscura con el sistema en claro pasa el tema a oscuro; una que tiene los dos no toca el tema",
+            "cualquier horario se acepta en el primer inicio: uno corto deja los bloques que caben y llega a la salida",
+            "el paso Tu turno ya no muestra \"muy corto para tus bloques\" y deja pasar 07:00-12:00"
           ]
         }
       ]
